@@ -32,7 +32,8 @@
 #define gcry_mpi_addm mpi_addm
 #define gcry_mpi_mul mpi_mul
 #define gcry_mpi_mulm mpi_mulm
-MPI generate_public_prime( unsigned  nbits );
+MPI generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
+	                MPI g, MPI **ret_factors );
 
 /* Here functions for SRP (like g^x mod n) are defined 
  */
@@ -41,49 +42,61 @@ MPI generate_public_prime( unsigned  nbits );
  */
 
 const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA, 0xA2,
-	0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1,
-	0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74, 0x02, 0x0B, 0xBE, 0xA6,
-	0x3B, 0x13, 0x9B, 0x22, 0x51, 0x4A, 0x08, 0x79, 0x8E, 0x34, 0x04, 0xDD,
-	0xEF, 0x95, 0x19, 0xB3, 0xCD, 0x3A, 0x43, 0x1B, 0x30, 0x2B, 0x0A, 0x6D,
-	0xF2, 0x5F, 0x14, 0x37, 0x4F, 0xE1, 0x35, 0x6D, 0x6D, 0x51, 0xC2, 0x45,
-	0xE4, 0x85, 0xB5, 0x76, 0x62, 0x5E, 0x7E, 0xC6, 0xF4, 0x4C, 0x42, 0xE9,
-	0xA6, 0x37, 0xED, 0x6B, 0x0B, 0xFF, 0x5C, 0xB6, 0xF4, 0x06, 0xB7, 0xED,
-	0xEE, 0x38, 0x6B, 0xFB, 0x5A, 0x89, 0x9F, 0xA5, 0xAE, 0x9F, 0x24, 0x11,
-	0x7C, 0x4B, 0x1F, 0xE6, 0x49, 0x28, 0x66, 0x51, 0xEC, 0xE6, 0x53, 0x81,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA,
+	0xA2, 0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 
+	0x1C, 0xD1, 0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74, 0x02, 
+	0x0B, 0xBE, 0xA6, 0x3B, 0x13, 0x9B, 0x22, 0x51, 0x4A, 0x08, 0x79, 
+	0x8E, 0x34, 0x04, 0xDD, 0xEF, 0x95, 0x19, 0xB3, 0xCD, 0x3A, 0x43, 
+	0x1B, 0x30, 0x2B, 0x0A, 0x6D, 0xF2, 0x5F, 0x14, 0x37, 0x4F, 0xE1, 
+	0x35, 0x6D, 0x6D, 0x51, 0xC2, 0x45, 0xE4, 0x85, 0xB5, 0x76, 0x62, 
+	0x5E, 0x7E, 0xC6, 0xF4, 0x4C, 0x42, 0xE9, 0xA6, 0x37, 0xED, 0x6B, 
+	0x0B, 0xFF, 0x5C, 0xB6, 0xF4, 0x06, 0xB7, 0xED, 0xEE, 0x38, 0x6B, 
+	0xFB, 0x5A, 0x89, 0x9F, 0xA5, 0xAE, 0x9F, 0x24, 0x11, 0x7C, 0x4B, 
+	0x1F, 0xE6, 0x49, 0x28, 0x66, 0x51, 0xEC, 0xE6, 0x53, 0x81, 0xFF, 
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n, int bits) {
+int _gnutls_srp_gn(opaque ** ret_g, opaque ** ret_n, int bits)
+{
 
 	MPI g, prime;
 	size_t n;
-	int siz;
-	char* tmp;
+	int siz, qbits;
+	char *tmp;
 
 	n = sizeof diffie_hellman_group1_prime;
 
-	if (bits==n*8) {
+	if (bits == n * 8) {
 		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
 				  diffie_hellman_group1_prime, &n)) {
 			gnutls_assert();
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
-	} else {
-		/* generate a random prime */
-		prime = generate_public_prime(bits);
-	}
+		g = gcry_mpi_set_ui(NULL, SRP_G);
 
-	g = gcry_mpi_set_ui(NULL, SRP_G);
+	} else {
+		g = mpi_new(16); /* this should be ok */
+
+		/* generate a random prime */
+		/* this is an emulation of Michael Wiener's table
+		   * bad emulation.
+		 */
+		qbits = 120 + (((bits / 256) - 1) * 20);
+		if (qbits & 1)	/* better have a even one */
+			qbits++;
+
+		prime = generate_elg_prime(0, bits, qbits, g, NULL);
+
+	}
 
 
 	siz = 0;
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, g);
-	if (ret_g!=NULL) {
+	if (ret_g != NULL) {
 		tmp = gnutls_malloc(siz);
 		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, g);
 
-		if (_gnutls_sbase64_encode( tmp, siz, ret_g) < 0)  {
+		if (_gnutls_sbase64_encode(tmp, siz, ret_g) < 0) {
 			gnutls_free(tmp);
 			return GNUTLS_E_UNKNOWN_ERROR;
 		}
@@ -92,17 +105,17 @@ int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n, int bits) {
 
 	siz = 0;
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, prime);
-	if (ret_n!=NULL) {
+	if (ret_n != NULL) {
 		tmp = gnutls_malloc(siz);
 		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, prime);
-		if (_gnutls_sbase64_encode( tmp, siz, ret_n) < 0) {
+		if (_gnutls_sbase64_encode(tmp, siz, ret_n) < 0) {
 			gnutls_free(tmp);
 			return GNUTLS_E_UNKNOWN_ERROR;
 		}
 
 		gnutls_free(tmp);
 	}
-	
+
 	gcry_mpi_release(g);
 	gcry_mpi_release(prime);
 
@@ -111,13 +124,14 @@ int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n, int bits) {
 }
 
 
-int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, MPI g, MPI prime) {
+int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
+		   MPI prime)
+{
 
 	MPI x, e;
 	int result_size;
 
-	if (gcry_mpi_scan(&x, GCRYMPI_FMT_USG,
-			  text, &textsize)) {
+	if (gcry_mpi_scan(&x, GCRYMPI_FMT_USG, text, &textsize)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -128,11 +142,10 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, MPI g, MPI prime
 	gcry_mpi_powm(e, g, x, prime);
 	gcry_mpi_release(x);
 
-	
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
-	if (result!=NULL) {
+	if (result != NULL) {
 		*result = gnutls_malloc(result_size);
-		gcry_mpi_print(GCRYMPI_FMT_USG, *result, &result_size, e);	
+		gcry_mpi_print(GCRYMPI_FMT_USG, *result, &result_size, e);
 	}
 
 	gcry_mpi_release(e);
@@ -151,7 +164,7 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 	MPI tmpB;
 	MPI b, B;
 	int bits;
-	
+
 	/* calculate:  B = (v + g^b) % N */
 	bits = gcry_mpi_get_nbits(n);
 	b = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
@@ -172,19 +185,20 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 	return B;
 }
 
-MPI _gnutls_calc_srp_u( MPI B) {
-int b_size;
-opaque* b_holder, *hd;
-GNUTLS_MAC_HANDLE td;
-uint32 u;
-MPI ret;
+MPI _gnutls_calc_srp_u(MPI B)
+{
+	int b_size;
+	opaque *b_holder, *hd;
+	GNUTLS_MAC_HANDLE td;
+	uint32 u;
+	MPI ret;
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &b_size, B);
 	b_holder = gnutls_malloc(b_size);
-	
+
 	gcry_mpi_print(GCRYMPI_FMT_USG, b_holder, &b_size, B);
-	
-	
+
+
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(td, b_holder, b_size);
 	hd = gnutls_hash_deinit(td);
@@ -194,7 +208,7 @@ MPI ret;
 
 	ret = gcry_mpi_set_ui(NULL, u);
 
-	return ret;	
+	return ret;
 }
 
 /* S = (A * v^u) ^ b % N 
@@ -202,31 +216,31 @@ MPI ret;
  */
 MPI _gnutls_calc_srp_S1(MPI A, MPI b, MPI u, MPI v, MPI n)
 {
-MPI tmp1, tmp2;
-MPI S;
+	MPI tmp1, tmp2;
+	MPI S;
 
-S = gcry_mpi_alloc_like(n);
-tmp1 = gcry_mpi_alloc_like(n);
-tmp2 = gcry_mpi_alloc_like(n);
+	S = gcry_mpi_alloc_like(n);
+	tmp1 = gcry_mpi_alloc_like(n);
+	tmp2 = gcry_mpi_alloc_like(n);
 
-gcry_mpi_powm(tmp1, v, u, n);
-gcry_mpi_mulm(tmp2, A, tmp1, n);
-gcry_mpi_release(tmp1);
+	gcry_mpi_powm(tmp1, v, u, n);
+	gcry_mpi_mulm(tmp2, A, tmp1, n);
+	gcry_mpi_release(tmp1);
 
-gcry_mpi_powm(S, tmp2, b, n);
-gcry_mpi_release(tmp2);
+	gcry_mpi_powm(S, tmp2, b, n);
+	gcry_mpi_release(tmp2);
 
-return S;
+	return S;
 }
 
 /* A = g^a % N 
  * returns A and a (which is random)
  */
-MPI _gnutls_calc_srp_A(MPI *a, MPI g, MPI n)
+MPI _gnutls_calc_srp_A(MPI * a, MPI g, MPI n)
 {
-MPI tmpa;
-MPI A;
-int bits;
+	MPI tmpa;
+	MPI A;
+	int bits;
 
 	bits = gcry_mpi_get_nbits(n);
 	tmpa = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
@@ -235,23 +249,25 @@ int bits;
 	A = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	gcry_mpi_powm(A, g, tmpa, n);
 
-	if (a!=NULL)
+	if (a != NULL)
 		*a = tmpa;
 	else
 		gcry_mpi_release(tmpa);
-	
+
 	return A;
 }
 
 /* generate x = SHA(s | SHA(U | ":" | p))
  * The output is exactly 20 bytes
  */
-void* _gnutls_calc_srp_sha( char* username, char* password, opaque* salt, int salt_size, int* size) {
-GNUTLS_MAC_HANDLE td;
-opaque* res;
+void *_gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
+			   int salt_size, int *size)
+{
+	GNUTLS_MAC_HANDLE td;
+	opaque *res;
 
 	*size = 20;
-	
+
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(td, username, strlen(username));
 	gnutls_hash(td, ":", 1);
@@ -260,21 +276,25 @@ opaque* res;
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(td, salt, salt_size);
-	gnutls_hash(td, res, 20); /* 20 bytes is the output of sha1 */
+	gnutls_hash(td, res, 20);	/* 20 bytes is the output of sha1 */
 	gnutls_free(res);
 
 	return gnutls_hash_deinit(td);
 }
 
-void* _gnutls_calc_srp_x( char* username, char* password, opaque* salt, int salt_size, uint8 crypt_algo, int* size) {
-	
-	switch(crypt_algo) {
-		case SRPSHA1_CRYPT:
-			return _gnutls_calc_srp_sha( username, password, salt, salt_size, size);
-		case BLOWFISH_CRYPT:
-			return _gnutls_calc_srp_bcrypt( password, salt, salt_size, size);
+void *_gnutls_calc_srp_x(char *username, char *password, opaque * salt,
+			 int salt_size, uint8 crypt_algo, int *size)
+{
+
+	switch (crypt_algo) {
+	case SRPSHA1_CRYPT:
+		return _gnutls_calc_srp_sha(username, password, salt,
+					    salt_size, size);
+	case BLOWFISH_CRYPT:
+		return _gnutls_calc_srp_bcrypt(password, salt, salt_size,
+					       size);
 	}
-	return NULL;	
+	return NULL;
 }
 
 
@@ -283,7 +303,7 @@ void* _gnutls_calc_srp_x( char* username, char* password, opaque* salt, int salt
  */
 MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
 {
-MPI S, tmp1, tmp2, tmp4;
+	MPI S, tmp1, tmp2, tmp4;
 
 	S = gcry_mpi_alloc_like(n);
 	tmp1 = gcry_mpi_alloc_like(n);

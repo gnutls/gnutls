@@ -100,7 +100,7 @@ typedef struct {
 typedef enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT } ConnectionEnd;
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 } BulkCipherAlgorithm;
 typedef enum Extensions { GNUTLS_EXTENSION_SRP=7 } Extensions;
-typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
+typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
 typedef enum MACAlgorithm { GNUTLS_NULL_MAC=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
 typedef enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB } CompressionMethod;

@@ -23,6 +23,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_auth.h"
 
+#include "auth_anon.h"
 /* The functions here are used in order for authentication algorithms
  * to be able to retrieve the needed credentials eg public and private
  * key etc.
@@ -118,5 +119,5 @@ void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx, int *err) {
 }
 
 const void* gnutls_get_auth_info( GNUTLS_STATE state) {
-	return &state->gnutls_key->auth_info;
+	return state->gnutls_key->auth_info;
 }

@@ -22,10 +22,14 @@
  * (it may work BUT it does not check certificates)
  */
 
+#if 0
+
 #include <defines.h>
 #include "gnutls_int.h"
+#include "gnutls_auth_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
+#include "auth_dhe_dss.h"
 #include "gnutls_num.h"
 
 int gen_dhe_dss_server_kx( GNUTLS_KEY , opaque**);
@@ -62,10 +66,26 @@ int gen_dhe_dss_server_kx( GNUTLS_KEY key, opaque** data) {
 	uint8 *data_g;
 	uint8 *data_X;
 	int ret = 0;
+	DHE_DSS_SERVER_CREDENTIALS * cred;
 
-	X = gnutls_calc_dh_secret(&x);
+	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_DHE_DSS, NULL);
+	if (cred==NULL) {
+		bits = DEFAULT_BITS; /* default */
+	} else {
+		bits = cred->bits;
+	}
+
+	g = gnutls_get_dh_params(&p, bits);
+
+	key->auth_info = gnutls_malloc(sizeof(DHE_DSS_AUTH_INFO));
+	if (key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
+	((DHE_DSS_AUTH_INFO*)key->auth_info)->bits = gcry_mpi_get_nbits(p);
+	key->auth_info_size = sizeof(DHE_DSS_AUTH_INFO);
+
+	X = gnutls_calc_dh_secret(&x, g, p);
+
 	key->dh_secret = x;
-	g = gnutls_get_dh_params(&p);
+
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, g);
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_p, p);
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
@@ -195,6 +215,14 @@ int proc_dhe_dss_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 int proc_dhe_dss_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	uint16 n_Y;
 	size_t _n_Y;
+	MPI g, p;
+	
+	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_DHE_DSS, NULL);
+	if (cred==NULL) {
+		bits = DEFAULT_BITS; /* default */
+	} else {
+		bits = cred->bits;
+	}
 
 #if 0 /* removed. I do not know why - maybe I didn't get the protocol,
        * but openssl does not use that byte
@@ -214,7 +242,11 @@ int proc_dhe_dss_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	key->KEY = gnutls_calc_dh_key( key->client_Y, key->dh_secret);
+	g = gnutls_get_dh_params(&p, bits);
+	key->KEY = gnutls_calc_dh_key( key->client_Y, key->dh_secret, p);
+	
+	mpi_release(g);
+	mpi_release(p);
 
 	gnutls_mpi_release(key->client_Y);
 	gnutls_mpi_release(key->dh_secret);
@@ -243,3 +275,4 @@ int proc_dhe_dss_server_cert_vrfy( GNUTLS_KEY key, opaque* data, int data_size) 
 	return 0;
 }
 
+#endif

@@ -18,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-MPI gnutls_calc_dh_secret( MPI *ret_x );
-MPI gnutls_get_dh_params(MPI *ret_p);
-MPI gnutls_calc_dh_key( MPI f, MPI x );
-MPI _gnutls_calc_dh_secret( MPI *ret_x, MPI g, MPI prime );
-MPI _gnutls_calc_dh_key( MPI f, MPI x, MPI prime );
+MPI gnutls_get_dh_params(MPI *ret_p, int bits);
+MPI gnutls_calc_dh_secret( MPI *ret_x, MPI g, MPI prime );
+MPI gnutls_calc_dh_key( MPI f, MPI x, MPI prime );

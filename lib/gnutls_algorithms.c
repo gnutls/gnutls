@@ -25,7 +25,7 @@
 
 /* include all the kx handler's definitions */
 #include "auth_anon.h"
-#include "auth_dhe_dss.h"
+/* #include "auth_dhe_dss.h" */
 #include "auth_srp.h"
 
 #define MAX_CIPHER 256
@@ -158,11 +158,11 @@ struct gnutls_kx_algo_entry {
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static const gnutls_kx_algo_entry kx_algorithms[] = {
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 0, 0, 1,
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_ANON, 0, 0, 0, 1,
 			     &anon_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 0,
-			     &dhe_dss_auth_struct),
+/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 0,
+			     &dhe_dss_auth_struct),*/
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 0, NULL),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 1, 0, 0, NULL),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 1, 0, 0, NULL),
@@ -247,18 +247,18 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* DH_anon */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_ARCFOUR_MD5,
 				  GNUTLS_ARCFOUR,
-				  GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5),
+				  GNUTLS_KX_DH_ANON, GNUTLS_MAC_MD5),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_3DES_EDE_CBC_SHA,
-				  GNUTLS_3DES, GNUTLS_KX_ANON_DH,
+				  GNUTLS_3DES, GNUTLS_KX_DH_ANON,
 				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_RIJNDAEL_128_CBC_SHA,
-				  GNUTLS_RIJNDAEL, GNUTLS_KX_ANON_DH,
+				  GNUTLS_RIJNDAEL, GNUTLS_KX_DH_ANON,
 				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_RIJNDAEL_256_CBC_SHA,
-				  GNUTLS_RIJNDAEL256, GNUTLS_KX_ANON_DH,
+				  GNUTLS_RIJNDAEL256, GNUTLS_KX_DH_ANON,
 				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_TWOFISH_128_CBC_SHA,
-				  GNUTLS_TWOFISH, GNUTLS_KX_ANON_DH,
+				  GNUTLS_TWOFISH, GNUTLS_KX_DH_ANON,
 				  GNUTLS_MAC_SHA),
 
 	/* SRP */

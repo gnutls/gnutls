@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 Nikos Mavroyanopoulos <nmav@hellug.gr>
+ * Copyright (C) 2000,2001 Nikos Mavroyanopoulos <nmav@hellug.gr>
  *
  * This file is part of GNUTLS.
  *
@@ -95,7 +95,7 @@ inline static int encode(uint8 * result, const uint8 * data, int left)
 /* data must be 4 bytes
  * result should be 3 bytes
  */
-#define TOASCII(c) (c<127 ? asciitable[c] : 0xff)
+#define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
 inline static int decode(uint8 * result, const uint8 * data)
 {
 	uint8 a1, a2;
