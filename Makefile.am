@@ -11,7 +11,6 @@ ChangeLog:
 htmldir = ../www-$(PACKAGE)
 
 release:
-	rm -f ChangeLog && make ChangeLog && cvs commit -m "" ChangeLog
 	make dist
 	gpg -b $(distdir).tar.gz
 	gpg --verify $(distdir).tar.gz.sig
