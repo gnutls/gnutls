@@ -137,8 +137,8 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 
 
 /* Do PKCS-1 RSA decryption. 
- * params is modulus, public exp.
- * Can decrypt block type 1 and type packets.
+ * params is modulus, public exp., private key
+ * Can decrypt block type 1 and type 2 packets.
  */
 int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 			      gnutls_datum ciphertext, MPI* params,
@@ -284,7 +284,7 @@ int tot_len = 0;
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	if ( _gnutls_mpi_print( str, &len, r) < 0) {
+	if ( _gnutls_mpi_print_lz( str, &len, r) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
 		return GNUTLS_E_MPI_PRINT_FAILED;
@@ -300,7 +300,7 @@ int tot_len = 0;
 	}
 
 	len = sizeof(str) - 1;
-	if ( _gnutls_mpi_print( str, &len, s) < 0) {
+	if ( _gnutls_mpi_print_lz( str, &len, s) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
 		return GNUTLS_E_MPI_PRINT_FAILED;

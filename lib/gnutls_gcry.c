@@ -44,6 +44,11 @@ int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GCRY_MPI a ) {
 	return gcry_mpi_print( GCRYMPI_FMT_USG, buffer, nbytes, a);
 }
 
+/* Always has the first bit zero */
+int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GCRY_MPI a ) {
+	return gcry_mpi_print( GCRYMPI_FMT_STD, buffer, nbytes, a);
+}
+
 
 /* this function reads an integer
  * from asn1 structs. Combines the read and mpi_scan
