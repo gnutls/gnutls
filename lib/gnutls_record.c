@@ -169,29 +169,37 @@ void gnutls_transport_get_ptr2(gnutls_session session,
   **/
 int gnutls_bye( gnutls_session session, gnutls_close_request how)
 {
-	int ret = 0, ret2 = 0;
+	int ret = 0;
 
 	switch (STATE) {
 		case STATE0:
 		case STATE60:
-			if (STATE==STATE60) {
-				ret = _gnutls_io_write_flush( session);
-			} else {
-				ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
-				STATE = STATE60;
-			}
-
-			if (ret < 0)
+			ret = _gnutls_io_write_flush( session);
+			STATE = STATE60;
+			if (ret < 0) {
+				gnutls_assert();
 				return ret;
-		case STATE61:
-			if ( how == GNUTLS_SHUT_RDWR && ret >= 0) {
-				ret2 = _gnutls_recv_int( session, GNUTLS_ALERT, -1, NULL, 0); 
-				if (ret2 >= 0) session->internals.may_read = 1;
 			}
-			STATE = STATE61;
 
-			if (ret2 < 0)
-				return ret2;
+		case STATE61:
+			ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
+			STATE = STATE61;
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+
+		case STATE62:
+			if ( how == GNUTLS_SHUT_RDWR) {
+				ret = _gnutls_recv_int( session, GNUTLS_ALERT, -1, NULL, 0); 
+				if (ret >= 0) session->internals.may_read = 1;
+			}
+			STATE = STATE62;
+
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
 			break;
 		default:
 			gnutls_assert();
@@ -697,7 +705,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	uint16 header_size;
 	int empty_packet = 0;
 
-	if (sizeofdata == 0 || data == NULL) {
+	if (type != GNUTLS_ALERT && (sizeofdata == 0 || data == NULL)) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
