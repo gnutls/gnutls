@@ -105,13 +105,13 @@ void gaa_help()
 	printf("serv help\nUsage: serv [options]""\n");
 	__gaa_helpsingle('g', "generate", "", "Generate Diffie Hellman Parameters.");
 	__gaa_helpsingle('p', "port", """integer"" ", "The port to connect to.");
-	__gaa_helpsingle('h', "http", "", "Act as an HTTP Server.");
+	__gaa_helpsingle(0, "http", "", "Act as an HTTP Server.");
 	__gaa_helpsingle(0, "ciphers", """cipher1 cipher2..."" ", "Ciphers to enable.");
 	__gaa_helpsingle(0, "protocols", """protocol1 protocol2..."" ", "Protocols to enable.");
 	__gaa_helpsingle(0, "comp", """comp1 comp2..."" ", "Compression methods to enable.");
 	__gaa_helpsingle(0, "macs", """mac1 mac2..."" ", "MACs to enable.");
 	__gaa_helpsingle(0, "kx", """kx1 kx2..."" ", "Key exchange methods to enable.");
-	__gaa_helpsingle(0, "certtypes", """certtype1 certtype2..."" ", "Certificate types to enable.");
+	__gaa_helpsingle(0, "ctypes", """certType1 certType2..."" ", "Certificate types to enable.");
 	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms  and modes.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 
@@ -215,7 +215,7 @@ int gaa_error = 0;
 #define GAA_NB_OPTION           11
 #define GAAOPTID_help	1
 #define GAAOPTID_list	2
-#define GAAOPTID_certtypes	3
+#define GAAOPTID_ctypes	3
 #define GAAOPTID_kx	4
 #define GAAOPTID_macs	5
 #define GAAOPTID_comp	6
@@ -406,7 +406,7 @@ float gaa_getfloat(char *arg)
 }
 /* option structures */
 
-struct GAAOPTION_certtypes 
+struct GAAOPTION_ctypes 
 {
 	char** arg1;
 	int size1;
@@ -477,7 +477,7 @@ int gaa_get_option_num(char *str, int status)
     switch(status)
         {
         case GAA_LETTER_OPTION:
-			GAA_CHECK1STR("", GAAOPTID_certtypes);
+			GAA_CHECK1STR("", GAAOPTID_ctypes);
 			GAA_CHECK1STR("", GAAOPTID_kx);
 			GAA_CHECK1STR("", GAAOPTID_macs);
 			GAA_CHECK1STR("", GAAOPTID_comp);
@@ -488,7 +488,7 @@ int gaa_get_option_num(char *str, int status)
 #line 375 "gaa.skel"
 			GAA_CHECK1STR("h", GAAOPTID_help);
 			GAA_CHECK1STR("l", GAAOPTID_list);
-			GAA_CHECK1STR("h", GAAOPTID_http);
+			GAA_CHECK1STR("", GAAOPTID_http);
 			GAA_CHECK1STR("g", GAAOPTID_generate);
 
 #line 277 "gaa.skel"
@@ -496,7 +496,7 @@ int gaa_get_option_num(char *str, int status)
         case GAA_WORD_OPTION:
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("list", GAAOPTID_list);
-			GAA_CHECKSTR("certtypes", GAAOPTID_certtypes);
+			GAA_CHECKSTR("ctypes", GAAOPTID_ctypes);
 			GAA_CHECKSTR("kx", GAAOPTID_kx);
 			GAA_CHECKSTR("macs", GAAOPTID_macs);
 			GAA_CHECKSTR("comp", GAAOPTID_comp);
@@ -517,7 +517,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 {
     int OK = 0;
     int gaa_last_non_option;
-	struct GAAOPTION_certtypes GAATMP_certtypes;
+	struct GAAOPTION_ctypes GAATMP_ctypes;
 	struct GAAOPTION_kx GAATMP_kx;
 	struct GAAOPTION_macs GAATMP_macs;
 	struct GAAOPTION_comp GAATMP_comp;
@@ -558,11 +558,11 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 
 		return GAA_OK;
 		break;
-	case GAAOPTID_certtypes:
+	case GAAOPTID_ctypes:
 	OK = 0;
-		GAA_LIST_FILL(GAATMP_certtypes.arg1, gaa_getstr, char*, GAATMP_certtypes.size1);
+		GAA_LIST_FILL(GAATMP_ctypes.arg1, gaa_getstr, char*, GAATMP_ctypes.size1);
 #line 34 "serv.gaa"
-{ gaaval->ctype = GAATMP_certtypes.arg1; gaaval->nctype = GAATMP_certtypes.size1 ;};
+{ gaaval->ctype = GAATMP_ctypes.arg1; gaaval->nctype = GAATMP_ctypes.size1 ;};
 
 		return GAA_OK;
 		break;

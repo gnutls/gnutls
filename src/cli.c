@@ -50,6 +50,7 @@
 int resume;
 char *hostname=NULL;
 int port;
+int record_max_size;
 
 int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[16] =
@@ -113,7 +114,7 @@ static void gaa_parser(int argc, char **argv);
 int main(int argc, char **argv)
 {
 	int err, ret;
-	int sd, ii;
+	int sd, ii, i;
 	struct sockaddr_in sa;
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF + 1];
@@ -223,8 +224,13 @@ int main(int argc, char **argv)
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");
 
-	if (resume != 0) {
+	for (i=0;i<2;i++) {
 		gnutls_init(&state, GNUTLS_CLIENT);
+
+		if (i == 1) {
+			gnutls_session_set_data(state, session, session_size);
+			free(session);
+		}
 
 		gnutls_cipher_set_priority(state, cipher_priority);
 		gnutls_compression_set_priority(state, comp_priority);
@@ -241,7 +247,12 @@ int main(int argc, char **argv)
 
 
 		/* use the max record size extension */
-		gnutls_record_set_max_size(state, 2048);
+		if (record_max_size > 0) {
+			if (gnutls_record_set_max_size(state, record_max_size) < 0) {
+				fprintf(stderr, "Cannot set the maximum record size to %d.\n", record_max_size);
+				exit(1);
+			}
+		}
 
 /* This TLS extension may break old implementations.
  */
@@ -265,94 +276,63 @@ int main(int argc, char **argv)
 			printf("- Handshake was completed\n");
 		}
 
-		gnutls_session_get_data(state, NULL, &session_size);
-		session = malloc(session_size);
-		gnutls_session_get_data(state, session, &session_size);
+		if (i == 1) { /* resume */
+			/* check if we actually resumed the previous session */
 
-		gnutls_session_get_id(state, NULL, &session_id_size);
-		session_id = malloc(session_id_size);
-		gnutls_session_get_id(state, session_id, &session_id_size);
+			gnutls_session_get_id(state, NULL, &tmp_session_id_size);
+			tmp_session_id = malloc(tmp_session_id_size);
+			gnutls_session_get_id(state, tmp_session_id, &tmp_session_id_size);
 
-/* print some information */
-		print_info(state);
-
-		printf("- Disconnecting\n");
-		do {
-			ret = gnutls_bye(state, GNUTLS_SHUT_RDWR);
-		} while (ret == GNUTLS_E_INTERRUPTED
-			 || ret == GNUTLS_E_AGAIN);
-
-		shutdown(sd, SHUT_WR);
-		close(sd);
-
-		gnutls_deinit(state);
-
-		printf
-		    ("\n\n- Connecting again- trying to resume previous session\n");
-		sd = socket(AF_INET, SOCK_STREAM, 0);
-		ERR(sd, "socket");
-
-		err = connect(sd, (SA *) & sa, sizeof(sa));
-		ERR(err, "connect");
-
-	}
-
-	/* resume */
-	/* Begin handshake again */
-	gnutls_init(&state, GNUTLS_CLIENT);
-
-	gnutls_cipher_set_priority(state, cipher_priority);
-	gnutls_compression_set_priority(state, comp_priority);
-	gnutls_kx_set_priority(state, kx_priority);
-	gnutls_protocol_set_priority(state, protocol_priority);
-	gnutls_mac_set_priority(state, mac_priority);
-	gnutls_cert_type_set_priority(state, cert_type_priority);
-
-	gnutls_dh_set_prime_bits(state, 1024);
-
-	gnutls_cred_set(state, GNUTLS_CRD_ANON, anon_cred);
-	gnutls_cred_set(state, GNUTLS_CRD_SRP, cred);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
-
-	if (resume != 0) {
-		gnutls_session_set_data(state, session, session_size);
-		free(session);
-	}
-
-	gnutls_transport_set_ptr(state, sd);
-	do {
-		ret = gnutls_handshake(state);
-	} while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-
-	if (ret < 0) {
-		if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
-		    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-			printf("*** Received alert [%d]\n",
-			       gnutls_alert_get_last(state));
-		fprintf(stderr, "*** Handshake failed\n");
-		gnutls_perror(ret);
-		gnutls_deinit(state);
-		return 1;
-	} else {
-		printf("- Handshake was completed\n");
-	}
-
-	if (resume != 0) {
-		/* check if we actually resumed the previous session */
-		gnutls_session_get_id(state, NULL, &tmp_session_id_size);
-		tmp_session_id = malloc(tmp_session_id_size);
-		gnutls_session_get_id(state, tmp_session_id, &tmp_session_id_size);
-
-		if (memcmp(tmp_session_id, session_id, session_id_size) ==
-		    0) {
-			printf("- Previous session was resumed\n");
-		} else {
-			fprintf(stderr,
-				"*** Previous session was NOT resumed\n");
+			if (memcmp(tmp_session_id, session_id, session_id_size) ==
+			    0) {
+				printf("- Previous session was resumed\n");
+			} else {
+				fprintf(stderr,
+					"*** Previous session was NOT resumed\n");
+			}
+			free(tmp_session_id);
+			free(session_id);
 		}
-		free(tmp_session_id);
-		free(session_id);
+
+
+
+		if (resume!=0 && i==0) {
+
+			gnutls_session_get_data(state, NULL, &session_size);
+			session = malloc(session_size);
+			gnutls_session_get_data(state, session, &session_size);
+
+			gnutls_session_get_id(state, NULL, &session_id_size);
+			session_id = malloc(session_id_size);
+			gnutls_session_get_id(state, session_id, &session_id_size);
+
+			/* print some information */
+			print_info(state);
+
+			printf("- Disconnecting\n");
+			do {
+				ret = gnutls_bye(state, GNUTLS_SHUT_RDWR);
+			} while (ret == GNUTLS_E_INTERRUPTED
+				 || ret == GNUTLS_E_AGAIN);
+	
+			shutdown(sd, SHUT_WR);
+			close(sd);
+
+			gnutls_deinit(state);
+
+			printf
+			    ("\n\n- Connecting again- trying to resume previous session\n");
+			sd = socket(AF_INET, SOCK_STREAM, 0);
+			ERR(sd, "socket");
+	
+			err = connect(sd, (SA *) & sa, sizeof(sa));
+			ERR(err, "connect");
+		} else {
+			break;
+		}
+
 	}
+
 /* print some information */
 	print_info(state);
 
@@ -486,6 +466,7 @@ void gaa_parser(int argc, char **argv)
 
 	resume = info.resume;
 	port = info.port;
+	record_max_size = info.record_size;
 
 	if (info.nrest_args==0) hostname="localhost";
 	else hostname = info.rest_args[0];

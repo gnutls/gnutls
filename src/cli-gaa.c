@@ -105,12 +105,13 @@ void gaa_help()
 	printf("cli help\nUsage: cli [options] hostname""\n");
 	__gaa_helpsingle('r', "resume", "", "Connect, establish a session. Connect again and resume this session.");
 	__gaa_helpsingle('p', "port", """integer"" ", "The port to connect to.");
+	__gaa_helpsingle(0, "recordsize", """integer"" ", "The maximum record size to advertize.");
 	__gaa_helpsingle(0, "ciphers", """cipher1 cipher2..."" ", "Ciphers to enable.");
 	__gaa_helpsingle(0, "protocols", """protocol1 protocol2..."" ", "Protocols to enable.");
 	__gaa_helpsingle(0, "comp", """comp1 comp2..."" ", "Compression methods to enable.");
 	__gaa_helpsingle(0, "macs", """mac1 mac2..."" ", "MACs to enable.");
 	__gaa_helpsingle(0, "kx", """kx1 kx2..."" ", "Key exchange methods to enable.");
-	__gaa_helpsingle(0, "certtypes", """certtype1 certtype2..."" ", "Certificate types to enable.");
+	__gaa_helpsingle(0, "ctypes", """certType1 certType2..."" ", "Certificate types to enable.");
 	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms  and modes.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 
@@ -127,34 +128,36 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 39 "cli.gaa"
+#line 42 "cli.gaa"
 	char **rest_args;
-#line 38 "cli.gaa"
+#line 41 "cli.gaa"
 	int nrest_args;
-#line 31 "cli.gaa"
+#line 34 "cli.gaa"
 	char **ctype;
-#line 30 "cli.gaa"
+#line 33 "cli.gaa"
 	int nctype;
-#line 27 "cli.gaa"
+#line 30 "cli.gaa"
 	char **kx;
-#line 26 "cli.gaa"
+#line 29 "cli.gaa"
 	int nkx;
-#line 23 "cli.gaa"
+#line 26 "cli.gaa"
 	char **macs;
-#line 22 "cli.gaa"
+#line 25 "cli.gaa"
 	int nmacs;
-#line 19 "cli.gaa"
+#line 22 "cli.gaa"
 	char **comp;
-#line 18 "cli.gaa"
+#line 21 "cli.gaa"
 	int ncomp;
-#line 15 "cli.gaa"
+#line 18 "cli.gaa"
 	char **proto;
-#line 14 "cli.gaa"
+#line 17 "cli.gaa"
 	int nproto;
-#line 11 "cli.gaa"
+#line 14 "cli.gaa"
 	char **ciphers;
-#line 10 "cli.gaa"
+#line 13 "cli.gaa"
 	int nciphers;
+#line 9 "cli.gaa"
+	int record_size;
 #line 6 "cli.gaa"
 	int port;
 #line 3 "cli.gaa"
@@ -213,17 +216,18 @@ int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           10
+#define GAA_NB_OPTION           11
 #define GAAOPTID_help	1
 #define GAAOPTID_list	2
-#define GAAOPTID_certtypes	3
+#define GAAOPTID_ctypes	3
 #define GAAOPTID_kx	4
 #define GAAOPTID_macs	5
 #define GAAOPTID_comp	6
 #define GAAOPTID_protocols	7
 #define GAAOPTID_ciphers	8
-#define GAAOPTID_port	9
-#define GAAOPTID_resume	10
+#define GAAOPTID_recordsize	9
+#define GAAOPTID_port	10
+#define GAAOPTID_resume	11
 
 #line 168 "gaa.skel"
 
@@ -406,7 +410,7 @@ float gaa_getfloat(char *arg)
 }
 /* option structures */
 
-struct GAAOPTION_certtypes 
+struct GAAOPTION_ctypes 
 {
 	char** arg1;
 	int size1;
@@ -439,6 +443,12 @@ struct GAAOPTION_protocols
 struct GAAOPTION_ciphers 
 {
 	char** arg1;
+	int size1;
+};
+
+struct GAAOPTION_recordsize 
+{
+	int arg1;
 	int size1;
 };
 
@@ -484,12 +494,13 @@ int gaa_get_option_num(char *str, int status)
     switch(status)
         {
         case GAA_LETTER_OPTION:
-			GAA_CHECK1STR("", GAAOPTID_certtypes);
+			GAA_CHECK1STR("", GAAOPTID_ctypes);
 			GAA_CHECK1STR("", GAAOPTID_kx);
 			GAA_CHECK1STR("", GAAOPTID_macs);
 			GAA_CHECK1STR("", GAAOPTID_comp);
 			GAA_CHECK1STR("", GAAOPTID_protocols);
 			GAA_CHECK1STR("", GAAOPTID_ciphers);
+			GAA_CHECK1STR("", GAAOPTID_recordsize);
 			GAA_CHECK1STR("p", GAAOPTID_port);
         case GAA_MULTIPLE_OPTION:
 #line 375 "gaa.skel"
@@ -502,12 +513,13 @@ int gaa_get_option_num(char *str, int status)
         case GAA_WORD_OPTION:
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("list", GAAOPTID_list);
-			GAA_CHECKSTR("certtypes", GAAOPTID_certtypes);
+			GAA_CHECKSTR("ctypes", GAAOPTID_ctypes);
 			GAA_CHECKSTR("kx", GAAOPTID_kx);
 			GAA_CHECKSTR("macs", GAAOPTID_macs);
 			GAA_CHECKSTR("comp", GAAOPTID_comp);
 			GAA_CHECKSTR("protocols", GAAOPTID_protocols);
 			GAA_CHECKSTR("ciphers", GAAOPTID_ciphers);
+			GAA_CHECKSTR("recordsize", GAAOPTID_recordsize);
 			GAA_CHECKSTR("port", GAAOPTID_port);
 			GAA_CHECKSTR("resume", GAAOPTID_resume);
 
@@ -522,12 +534,13 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 {
     int OK = 0;
     int gaa_last_non_option;
-	struct GAAOPTION_certtypes GAATMP_certtypes;
+	struct GAAOPTION_ctypes GAATMP_ctypes;
 	struct GAAOPTION_kx GAATMP_kx;
 	struct GAAOPTION_macs GAATMP_macs;
 	struct GAAOPTION_comp GAATMP_comp;
 	struct GAAOPTION_protocols GAATMP_protocols;
 	struct GAAOPTION_ciphers GAATMP_ciphers;
+	struct GAAOPTION_recordsize GAATMP_recordsize;
 	struct GAAOPTION_port GAATMP_port;
 
 #line 393 "gaa.skel"
@@ -551,30 +564,30 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 36 "cli.gaa"
+#line 39 "cli.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list:
 	OK = 0;
-#line 35 "cli.gaa"
+#line 38 "cli.gaa"
 { print_list(); exit(0); ;};
 
 		return GAA_OK;
 		break;
-	case GAAOPTID_certtypes:
+	case GAAOPTID_ctypes:
 	OK = 0;
-		GAA_LIST_FILL(GAATMP_certtypes.arg1, gaa_getstr, char*, GAATMP_certtypes.size1);
-#line 32 "cli.gaa"
-{ gaaval->ctype = GAATMP_certtypes.arg1; gaaval->nctype = GAATMP_certtypes.size1 ;};
+		GAA_LIST_FILL(GAATMP_ctypes.arg1, gaa_getstr, char*, GAATMP_ctypes.size1);
+#line 35 "cli.gaa"
+{ gaaval->ctype = GAATMP_ctypes.arg1; gaaval->nctype = GAATMP_ctypes.size1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_kx:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_kx.arg1, gaa_getstr, char*, GAATMP_kx.size1);
-#line 28 "cli.gaa"
+#line 31 "cli.gaa"
 { gaaval->kx = GAATMP_kx.arg1; gaaval->nkx = GAATMP_kx.size1 ;};
 
 		return GAA_OK;
@@ -582,7 +595,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_macs:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_macs.arg1, gaa_getstr, char*, GAATMP_macs.size1);
-#line 24 "cli.gaa"
+#line 27 "cli.gaa"
 { gaaval->macs = GAATMP_macs.arg1; gaaval->nmacs = GAATMP_macs.size1 ;};
 
 		return GAA_OK;
@@ -590,7 +603,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_comp:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_comp.arg1, gaa_getstr, char*, GAATMP_comp.size1);
-#line 20 "cli.gaa"
+#line 23 "cli.gaa"
 { gaaval->comp = GAATMP_comp.arg1; gaaval->ncomp = GAATMP_comp.size1 ;};
 
 		return GAA_OK;
@@ -598,7 +611,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_protocols:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_protocols.arg1, gaa_getstr, char*, GAATMP_protocols.size1);
-#line 16 "cli.gaa"
+#line 19 "cli.gaa"
 { gaaval->proto = GAATMP_protocols.arg1; gaaval->nproto = GAATMP_protocols.size1 ;};
 
 		return GAA_OK;
@@ -606,8 +619,18 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_ciphers:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_ciphers.arg1, gaa_getstr, char*, GAATMP_ciphers.size1);
-#line 12 "cli.gaa"
+#line 15 "cli.gaa"
 { gaaval->ciphers = GAATMP_ciphers.arg1; gaaval->nciphers = GAATMP_ciphers.size1 ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_recordsize:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_recordsize.arg1, gaa_getint, GAATMP_recordsize.size1);
+		gaa_index++;
+#line 10 "cli.gaa"
+{ gaaval->record_size = GAATMP_recordsize.arg1 ;};
 
 		return GAA_OK;
 		break;
@@ -630,7 +653,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		break;
 	case GAA_REST:
 		GAA_OPTIONALLIST_FILL(GAAREST_tmp.arg1, gaa_getstr, char*, GAAREST_tmp.size1);
-#line 40 "cli.gaa"
+#line 43 "cli.gaa"
 { gaaval->rest_args = GAAREST_tmp.arg1; gaaval->nrest_args = GAAREST_tmp.size1 ;};
 
 		return GAA_OK;
@@ -658,10 +681,10 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 42 "cli.gaa"
+#line 45 "cli.gaa"
 { gaaval->resume=0; gaaval->port=5556; gaaval->rest_args=NULL; gaaval->nrest_args=0; gaaval->ciphers=NULL;
 	gaaval->kx=NULL; gaaval->comp=NULL; gaaval->macs=NULL; gaaval->ctype=NULL; gaaval->nciphers=0;
-	gaaval->nkx=0; gaaval->ncomp=0; gaaval->nmacs=0; gaaval->nctype = 0; ;};
+	gaaval->nkx=0; gaaval->ncomp=0; gaaval->nmacs=0; gaaval->nctype = 0; gaaval->record_size=0; ;};
 
     }
     inited = 1;
