@@ -22,6 +22,8 @@
 # include <config.h>
 #endif
 
+#include <stdio.h>
+
 #include "utils.h"
 
 void
