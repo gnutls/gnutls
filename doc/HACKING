@@ -127,3 +127,10 @@ I know that this help may not be sufficient. Ask me if there is anything
 else. (I should have updated doc/hacking)
 
 
+
+
+DEBUG:
+
+There are some debug flags in lib/gnutls_int.h
+Use them at your option.
+

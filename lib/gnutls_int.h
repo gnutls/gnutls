@@ -1,5 +1,6 @@
 #include <gcrypt.h>
 
+#undef NDEBUG
 #define HARD_DEBUG
 #define DEBUG
 

@@ -68,7 +68,7 @@ AC_MSG_RESULT($opt_maintainer_mode)
 
 
 if test $ac_cv_prog_gcc != no; then
-  CFLAGS="${CFLAGS} -ffast-math"
+  CFLAGS="${CFLAGS} -O2 -g -ffast-math"
 
 	if test $opt_maintainer_mode = yes; then
 	  CFLAGS="${CFLAGS} -Wall -Wpointer-arith"
@@ -94,4 +94,4 @@ AC_CHECK_SIZEOF(unsigned char, 1)
 
 AM_PROG_LIBTOOL
 
-AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile lib/cert/Makefile])
+AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile ])

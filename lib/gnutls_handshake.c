@@ -101,6 +101,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 		return ret;
 	}
 	if (vrfysize != 12) {
+		assert(0);
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
 
@@ -124,8 +125,10 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 			       36, 12);
 	}
 
-	if (memcmp(vrfy, data, 12) != 0)
+	if (memcmp(vrfy, data, 12) != 0) {
+		assert(0);
 		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
+	}
 
 	gnutls_free(data);
 	gnutls_free(vrfy);
@@ -275,8 +278,9 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	uint8 *dataptr;
 	uint24 num;
 
-	/* If the ciphersuite does not support certificate just quit */
+
 	if (type==GNUTLS_CERTIFICATE) {
+	/* If the ciphersuite does not support certificate just quit */
 		if (state->security_parameters.entity == GNUTLS_CLIENT) {
 			if ( _gnutls_kx_server_certificate( 
 				_gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite)) ==0 )
@@ -291,13 +295,19 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	
 	ret = _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, dataptr, 4);
 	if (ret < 0) return ret;
-	if (ret!=4) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	if (ret!=4) {
+		assert(0);
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Received HANDSHAKE[%d]\n", dataptr[0]);
 #endif
 
-	if (dataptr[0]!=type) return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+	if (dataptr[0]!=type) {
+		assert(0);
+		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+	}
 	
 	num.pint[0] = dataptr[1];
 	num.pint[1] = dataptr[2];
@@ -531,8 +541,10 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 	uint16 x, sizeOfSuites;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		if (datalen < 38)
+		if (datalen < 38) {
+			assert(0);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
 
 #ifdef DEBUG
 		fprintf(stderr, "Server's version: %d.%d\n", data[pos], data[pos+1]);
@@ -548,8 +560,10 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 
 		memmove(&session_id_len, &data[pos++], 1);
 
-		if (datalen < 38 + session_id_len)
+		if (datalen < 38 + session_id_len) {
+			assert(0);
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+		}
 #ifdef HARD_DEBUG
 		fprintf(stderr, "SessionID length: %d\n", session_id_len);
 		fprintf(stderr, "SessionID: %s\n",
@@ -603,14 +617,17 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		gnutls_free(compression_methods);
 
 	} else {		/* Server side reading a client hello */
-		if (datalen < 35)
+		if (datalen < 35) {
+			assert(0);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
 
 #ifdef DEBUG
 		fprintf(stderr, "Client's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
 
 		if ( _gnutls_valid_version( state, data[pos], data[pos+1]) != 0) {
+			assert(0);
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 		}
 		pos+=2;
@@ -657,18 +674,27 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen
 	int pos = 0;
 	char* certificate_list;
 	int i, ret=0;
-	uint16 x, sizeOfCert;
-
+	uint16 x;
+	uint32 sizeOfCert;
+	uint24 num;
+	
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		if (datalen < 2)
+		if (datalen < 2) {
+			assert(0);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
 
-		memmove( &sizeOfCert, &data[pos], 2);
-		pos+=2;
+	        num.pint[0] = data[pos];
+	       	num.pint[1] = data[pos+1];
+		num.pint[2] = data[pos+2];
+		sizeOfCert = uint24touint32(num);
+		
+		pos+=3;
 #ifndef WORDS_BIGENDIAN
-		sizeOfCert=byteswap16(sizeOfCert);
+		sizeOfCert=byteswap32(sizeOfCert);
 #endif
 		if (sizeOfCert > MAX24) {
+			assert(0);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 		certificate_list = gnutls_malloc(sizeOfCert);
@@ -681,8 +707,10 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen
 
 	} else {		/* Server side reading a client certificate */
 		/* actually this is not complete */
-		if (datalen < 1)
+		if (datalen < 1) {
+			assert(0);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
 
 		ret = 0;
 	}
