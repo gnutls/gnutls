@@ -170,15 +170,16 @@ int gnutls_x509_crq_import(gnutls_x509_crq_t crq,
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
-  * This function will copy the name of the Certificate request subject in the provided buffer. The name 
-  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
+  * This function will copy the name of the Certificate request
+  * subject in the provided buffer. The name will be in the form
+  * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
+  * will be ASCII or UTF-8 encoded, depending on the certificate data.
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_buf will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_buf will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf,
@@ -198,25 +199,28 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf,
   * gnutls_x509_crq_get_dn_by_oid - This function returns the Certificate request subject's distinguished name
   * @crq: should contain a gnutls_x509_crq_t structure
   * @oid: holds an Object Identified in null terminated string
-  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
+  * @indx: In case multiple same OIDs exist in the RDN, this specifies
+  *   which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
-  * This function will extract the part of the name of the Certificate request subject, specified
-  * by the given OID. The output will be encoded as described in RFC2253. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
+  * This function will extract the part of the name of the Certificate
+  * request subject, specified by the given OID. The output will be
+  * encoded as described in RFC2253. The output string will be ASCII
+  * or UTF-8 encoded, depending on the certificate data.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * If raw flag is zero, this function will only return known OIDs as text. Other OIDs
-  * will be DER encoded, as described in RFC2253 -- in hex format with a '\#' prefix.
-  * You can check about known OIDs using gnutls_x509_dn_oid_known().
+  * If raw flag is zero, this function will only return known OIDs as
+  * text. Other OIDs will be DER encoded, as described in RFC2253 --
+  * in hex format with a '\#' prefix.  You can check about known OIDs
+  * using gnutls_x509_dn_oid_known().
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_buf will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_buf will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
@@ -240,14 +244,14 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
   * @oid: a pointer to a structure to hold the name (may be null)
   * @sizeof_oid: initially holds the size of @oid
   *
-  * This function will extract the requested OID of the name of the Certificate request subject, specified
-  * by the given index. 
+  * This function will extract the requested OID of the name of the
+  * Certificate request subject, specified by the given index.
   *
   * If oid is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_oid will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_oid will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq_t crq,
