@@ -158,12 +158,10 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 		result = gcry_md_open(&ret->handle, GCRY_MD_RMD160, GCRY_MD_FLAG_HMAC);
 		break;
 	default:
-		gnutls_assert();
 		result = -1;
 	}
 
 	if (result) {
-		gnutls_assert();
 		gnutls_free(ret);
 		ret = GNUTLS_MAC_FAILED;
 	}
