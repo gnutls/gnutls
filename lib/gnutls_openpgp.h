@@ -1,6 +1,8 @@
 #ifndef GNUTLS_OPENPGP_H
 #define GNUTLS_OPENPGP_H
 
+#ifdef HAVE_LIBOPENCDK
+
 int gnutls_certificate_set_openpgp_key_file(
                                             GNUTLS_CERTIFICATE_CREDENTIALS res,
                                             char* CERTFILE,
@@ -28,13 +30,6 @@ int gnutls_openpgp_add_keyring( const char *fname, int is_secret );
 /* internal */
 int _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw);
 
+#endif /* HAVE_LIBOPENCDK */
+
 #endif /*GNUTLS_OPENPGP_H*/
-
-
-
-
-
-
-
-
-

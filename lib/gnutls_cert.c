@@ -296,6 +296,7 @@ void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
 	state->gnutls_internals.server_cert_callback = func;
 }
 
+#ifdef HAVE_LIBOPENCDK
 /*-
   * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
   * @state: is a gnutls state
@@ -353,6 +354,7 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 
 	return verify;
 }
+#endif /* HAVE_LIBOPENCDK */
 
 /**
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
@@ -382,8 +384,10 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 	switch( gnutls_cert_type_get( state)) {
 		case GNUTLS_CRT_X509:
 			return _gnutls_x509_cert_verify_peers( state);
+#ifdef HAVE_LIBOPENCDK
 		case GNUTLS_CRT_OPENPGP:
 			return _gnutls_openpgp_cert_verify_peers( state);
+#endif /* HAVE_LIBOPENCDK */
 		default:
 			return GNUTLS_E_INVALID_REQUEST;
 	}
