@@ -160,6 +160,13 @@ static void ADD_MAC(gnutls_session session, int mac) {
 	gnutls_mac_set_priority(session, _mac_priority);
 }
 
+static void ADD_COMP(gnutls_session session, int c) {
+	static int _comp_priority[] = { 0, 0 };
+	_comp_priority[0] = c;
+
+	gnutls_compression_set_priority(session, _comp_priority);
+}
+
 static void ADD_CERTTYPE(gnutls_session session, int ctype) {
 	static int _ct_priority[] = { 0, 0 };
 	_ct_priority[0] = ctype;
@@ -367,6 +374,22 @@ int ret;
 	ret = do_handshake( session);
 	return ret;
 }
+
+#ifdef HAVE_LIBZ
+int test_zlib( gnutls_session session) {
+int ret;
+	ADD_ALL_CIPHERS(session);
+	ADD_COMP(session, GNUTLS_COMP_ZLIB);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	return ret;
+}
+#endif
 
 int test_sha( gnutls_session session) {
 int ret;

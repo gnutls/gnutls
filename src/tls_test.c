@@ -110,6 +110,9 @@ static const TLS_TEST tls_tests[] = {
 	{ "for ARCFOUR cipher support", test_arcfour, "yes", "no", "dunno"},
 	{ "for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{ "for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
+#ifdef HAVE_LIBZ
+	{ "for ZLIB compression support", test_zlib, "yes", "no", "dunno"},
+#endif
 	{ "for max record size (TLS extension)", test_max_record_size, "yes", "no", "dunno" },
 #ifdef ENABLE_SRP
 	{ "for SRP authentication support (TLS extension)", test_srp, "yes", "no", "dunno" },
