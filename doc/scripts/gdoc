@@ -320,8 +320,8 @@ sub output_tex {
 	$param2 =~ s/_/\\_/g;
 
 	$check = 1;
-	print "\\item {\\it ".$param1."} {\\bf ".$param2."}\n";
-	print "\n";
+	print "\\item {\\it ".$param1."} {\\bf ".$param2."}: \n";
+#	print "\n";
 
 	$param3 = $args{'parameters'}{$parameter};
 	$param3 =~ s/_/\\_/g;
