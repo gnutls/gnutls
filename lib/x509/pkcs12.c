@@ -840,7 +840,6 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char* pass)
 		goto cleanup;
 	}
 
-
 	/* Generate the key.
 	 */
 	result = _pkcs12_string_to_key( 3/*MAC*/, salt.data, salt.size,

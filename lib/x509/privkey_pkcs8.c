@@ -79,8 +79,8 @@ static int decrypt_data(schema_id, ASN1_TYPE pkcs8_asn, const char *root,
 			const struct pbkdf2_params *kdf_params,
 			const struct pbe_enc_params *enc_params,
 			gnutls_datum * decrypted_data);
-static ASN1_TYPE decode_private_key_info(const gnutls_datum * der,
-					 gnutls_x509_privkey pkey);
+static int decode_private_key_info(const gnutls_datum * der,
+				 gnutls_x509_privkey pkey, ASN1_TYPE* out);
 static int write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn, const char* where,
 			     const struct pbkdf2_params *kdf_params,
 			     const struct pbe_enc_params *enc_params);
@@ -259,8 +259,9 @@ static int encode_to_private_key_info(gnutls_x509_privkey pkey,
 /* Converts a PKCS #8 private key info to
  * a PKCS #8 EncryptedPrivateKeyInfo.
  */
-static ASN1_TYPE encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der_key,
-				     const char *password)
+static 
+int encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der_key,
+				     const char *password, ASN1_TYPE* out)
 {
 	int result;
 	gnutls_datum key = { NULL, 0 };
@@ -275,6 +276,7 @@ static ASN1_TYPE encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der
 				 "PKIX1.pkcs-8-EncryptedPrivateKeyInfo",
 				 &pkcs8_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
@@ -301,6 +303,7 @@ static ASN1_TYPE encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
@@ -337,19 +340,22 @@ static ASN1_TYPE encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der
 			     tmp.size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
 	_gnutls_free_datum(&tmp);
 	_gnutls_free_datum(&key);
 
-	return pkcs8_asn;
+	*out = pkcs8_asn;
+
+	return 0;
 
       error:
 	_gnutls_free_datum(&key);
 	_gnutls_free_datum(&tmp);
 	asn1_delete_structure(&pkcs8_asn);
-	return NULL;
+	return result;
 }
 
 
@@ -409,12 +415,12 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 
 		asn1_delete_structure(&pkey_info);	/* we don't need it */
 
-		pkcs8_asn = encode_to_pkcs8_key(schema, &tmp, password);
+		ret = encode_to_pkcs8_key(schema, &tmp, password, &pkcs8_asn);
 		_gnutls_free_datum(&tmp);
 
-		if (pkcs8_asn == NULL) {
+		if (ret < 0) {
 			gnutls_assert();
-			return GNUTLS_E_ASN1_GENERIC_ERROR;
+			return ret;
 		}
 
 		ret =
@@ -567,9 +573,10 @@ int read_pkcs_schema_params(schema_id schema, const char* password,
  * an internal structure (gnutls_private_key)
  * (normally a PKCS #1 encoded RSA key)
  */
-static ASN1_TYPE decode_pkcs8_key(const gnutls_datum * raw_key,
+static 
+int decode_pkcs8_key(const gnutls_datum * raw_key,
 				  const char *password,
-				  gnutls_x509_privkey pkey)
+				  gnutls_x509_privkey pkey, ASN1_TYPE* out)
 {
 	int result, len;
 	opaque enc_oid[64];
@@ -586,6 +593,7 @@ static ASN1_TYPE decode_pkcs8_key(const gnutls_datum * raw_key,
 				 "PKIX1.pkcs-8-EncryptedPrivateKeyInfo",
 				 &pkcs8_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
@@ -594,6 +602,7 @@ static ASN1_TYPE decode_pkcs8_key(const gnutls_datum * raw_key,
 			      NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
@@ -624,6 +633,7 @@ static ASN1_TYPE decode_pkcs8_key(const gnutls_datum * raw_key,
 				       &params_start, &params_end);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 	params_len = params_end - params_start + 1;
@@ -647,19 +657,27 @@ static ASN1_TYPE decode_pkcs8_key(const gnutls_datum * raw_key,
 
 	asn1_delete_structure(&pkcs8_asn);
 
-	ret_asn = decode_private_key_info(&tmp, pkey);
+	result = decode_private_key_info(&tmp, pkey, &ret_asn);
 	_gnutls_free_datum(&tmp);
 
-	return ret_asn;
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	*out = ret_asn;
+
+	return 0;
 
       error:
 	asn1_delete_structure(&pbes2_asn);
 	asn1_delete_structure(&pkcs8_asn);
-	return NULL;
+	return result;
 }
 
-static ASN1_TYPE decode_private_key_info(const gnutls_datum * der,
-					 gnutls_x509_privkey pkey)
+static 
+int decode_private_key_info(const gnutls_datum * der,
+				 gnutls_x509_privkey pkey, ASN1_TYPE* out)
 {
 	int result, len;
 	opaque oid[64], *data = NULL;
@@ -674,6 +692,7 @@ static ASN1_TYPE decode_private_key_info(const gnutls_datum * der,
 				 "PKIX1.pkcs-8-PrivateKeyInfo",
 				 &pkcs8_asn)) != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
@@ -691,6 +710,7 @@ static ASN1_TYPE decode_private_key_info(const gnutls_datum * der,
 			    oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
@@ -701,6 +721,7 @@ static ASN1_TYPE decode_private_key_info(const gnutls_datum * der,
 		_gnutls_x509_log
 		    ("PKCS #8 private key OID '%s' is unsupported.\n",
 		     oid);
+		result = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 		goto error;
 	}
 
@@ -742,14 +763,16 @@ static ASN1_TYPE decode_private_key_info(const gnutls_datum * der,
 		gnutls_assert();
 	}
 
-	return ret_asn;
+	*out = ret_asn;
+
+	return 0;
 
       error:
 	asn1_delete_structure(&pkcs8_asn);
 	if (data != NULL) {
 		gnutls_afree(data);
 	}
-	return NULL;
+	return result;
 
 }
 
@@ -819,14 +842,13 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key,
 	}
 
 	if (flags & GNUTLS_PKCS8_PLAIN || password == NULL) {
-		key->key = decode_private_key_info(&_data, key);
+		result = decode_private_key_info(&_data, key, &key->key);
 	} else {		/* encrypted. */
-		key->key = decode_pkcs8_key(&_data, password, key);
+		result = decode_pkcs8_key(&_data, password, key, &key->key);
 	}
 
-	if (key->key == NULL) {
+	if (result < 0) {
 		gnutls_assert();
-		result = GNUTLS_E_DECRYPTION_FAILED;
 		goto cleanup;
 	}
 
@@ -957,8 +979,7 @@ static int read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 static int read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 			      struct pbkdf2_params *params)
 {
-	int len, result;
-	char oid[64];
+	int result;
 
 	memset(params, 0, sizeof(params));
 

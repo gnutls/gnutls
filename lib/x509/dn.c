@@ -501,7 +501,6 @@ int result;
 		gnutls_assert();
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
-fprintf(stderr, "%s %s\n", given_oid, val_name);
 
 	_gnutls_str_cpy( tmp, sizeof(tmp), "PKIX1.");
 	_gnutls_str_cat( tmp, sizeof(tmp), val_name);
