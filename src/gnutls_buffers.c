@@ -14,9 +14,9 @@ int gnutls_insertDataBuffer(GNUTLS_STATE state, char *data, int length)
 	
 }
 
-int gnutls_getDataBufferSize(GNUTLS_STATE state) {
-	return state->gnutls_internals.bufferSize;
-	return 0;
+int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state) {
+	if (type==GNUTLS_APPLICATION_DATA) return state->gnutls_internals.bufferSize;
+	return -1;
 }
 
 int gnutls_getDataFromBuffer(GNUTLS_STATE state, char *data, int length)

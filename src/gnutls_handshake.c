@@ -112,14 +112,16 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_da
 	memmove( &data[pos++], &length.pint[0], 1);
 	memmove( &data[pos++], &length.pint[1], 1);
 	memmove( &data[pos++], &length.pint[2], 1);
-	memmove( &data[pos], i_data, i_datasize);
+	if (i_datasize > 0) memmove( &data[pos], i_data, i_datasize);
 
 	ret = gnutls_send_int( cd, state, GNUTLS_HANDSHAKE, data, i_datasize);
 	
 	return ret;
 }
 
-
+int _gnutls_send_hello_request(int cd, GNUTLS_STATE state) {
+	return _gnutls_send_handshake( cd, state, NULL, 0, GNUTLS_HELLO_REQUEST);
+}
 
 
 int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID) {
@@ -139,6 +141,9 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID) {
 	
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 
+		datalen = sizeof(uint32) + session_id_len + 28;
+		data = gnutls_malloc ( datalen);
+
 		data[pos++] = GNUTLS_VERSION_MAJOR;
 		data[pos++] = GNUTLS_VERSION_MINOR;		
 #ifdef WORDS_BIGENDIAN
@@ -148,8 +153,6 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID) {
 #endif
 		memmove( state->security_parameters.client_random, &cur_time, 4);
 		memmove( &state->security_parameters.client_random[4], rand, 28);
-		datalen = sizeof(uint32) + session_id_len + 28;
-		data = gnutls_malloc ( datalen);
 
 		memmove( &data[pos], &cur_time, sizeof(uint32));
 		pos += sizeof(uint32);
@@ -180,9 +183,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID) {
 		}
 		z = _gnutls_supported_compression_methods( &compression_methods);
 
-#ifdef WORDS_BIGENDIAN
+
 		memmove( &data[pos++], &z, sizeof(uint8));
-#endif
 		for (i=0;i<z;i++) {
 			datalen += 1;
 			data = gnutls_realloc( data, datalen);
@@ -195,8 +197,47 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID) {
 
 		gnutls_free(cipher_suites);
 		gnutls_free(compression_methods);
-	} else {
 	
+	} else { /* SERVER */
+		datalen = sizeof(uint32) + session_id_len + 28;
+		data = gnutls_malloc ( datalen);
+	
+		data[pos++] = GNUTLS_VERSION_MAJOR;
+		data[pos++] = GNUTLS_VERSION_MINOR;
+#ifdef WORDS_BIGENDIAN
+		cur_time = time(NULL);
+#else
+		cur_time = byteswap32(time(NULL));
+#endif
+		memmove( state->security_parameters.server_random, &cur_time, 4);
+		memmove( &state->security_parameters.server_random[4], rand, 28);
+
+		memmove( &data[pos], &cur_time, sizeof(uint32));
+		pos += sizeof(uint32);
+		memmove( &data[pos], rand, 28);
+		pos+=28;
+
+		memmove( &data[pos++], &session_id_len, sizeof(uint8));		
+		if (session_id_len>0) {
+			memmove( &data[pos], SessionID, session_id_len);
+		}
+		pos+=session_id_len;
+		
+		datalen += 2;
+		data = gnutls_realloc( data, datalen);
+		memmove( &data[pos], &state->gnutls_internals.current_cipher_suite.CipherSuite, 2);
+		pos+=2;
+
+		datalen += 1;
+		data = gnutls_realloc( data, datalen);
+		memmove( &data[pos++], &state->gnutls_internals.compression_method, 1);
+
+		ret = _gnutls_send_handshake( cd, state, data, datalen, GNUTLS_CLIENT_HELLO);
+		gnutls_free(data);
+		gcry_free(rand);
+
+		gnutls_free(cipher_suites);
+		gnutls_free(compression_methods);	
 	}
 
 	return ret;
@@ -306,3 +347,39 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char* data, int datalen, opaq
 	return ret;
 }
 
+
+gnutls_handshake(int cd, GNUTLS_STATE state) {
+int ret;
+
+	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+		ret = _gnutls_send_hello( cd, state, NULL);
+		if (ret<0) {
+			fprintf(stderr, "handshake error(%d)\n", ret);
+			return ret;
+		}
+		/* receive the server handshake */
+		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
+		if (ret<0) {
+			fprintf(stderr, "handshake error(%d)\n", ret);
+			return ret;
+		}		
+		ret = _gnutls_send_change_cipher_spec( cd, state);
+
+	} else { /* SERVER */
+
+		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
+		if (ret<0) {
+			fprintf(stderr, "handshake error(%d)\n", ret);
+			return ret;
+		}
+		ret = _gnutls_send_hello( cd, state, NULL);
+		if (ret<0) {
+			fprintf(stderr, "handshake error(%d)\n", ret);
+			return ret;
+		}
+		ret = _gnutls_send_change_cipher_spec( cd, state);
+	}
+
+	return ret;
+
+}

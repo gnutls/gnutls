@@ -413,13 +413,11 @@ int gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 	int tmplen;
 	int ret = 0;
 
-	if (sizeofdata == 0)
-		return 0;
+
 	if (state->gnutls_internals.valid_connection == VALID_FALSE)
 		return GNUTLS_E_INVALID_SESSION;
 
-	while (gnutls_getDataBufferSize(state) < sizeofdata) {
-
+	while (gnutls_getDataBufferSize(type, state) < sizeofdata) {
 
 		if (read(cd, &gcipher.type, sizeof(ContentType)) !=
 		    sizeof(ContentType)) {
@@ -576,6 +574,10 @@ int gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 					    GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 				}
 				break;
+			case GNUTLS_HANDSHAKE:
+				if (type == GNUTLS_HANDSHAKE) {
+					ret = _gnutls_recv_hello( cd, state, tmpdata, sizeofdata, NULL, 0);
+				}
 			}
 		}
 
@@ -586,6 +588,7 @@ int gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 
 	}
 
+	/* Insert Application data to buffer */
 	if (gcipher.type == type == GNUTLS_APPLICATION_DATA) {
 		ret = gnutls_getDataFromBuffer(state, data, sizeofdata);
 		gnutls_free(tmpdata);
@@ -597,8 +600,15 @@ int gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 		if (sizeofdata != tmplen)
 			return GNUTLS_E_RECEIVED_MORE_DATA;
 		memmove(data, tmpdata, sizeofdata);
+		gnutls_free(tmpdata);
 		ret = sizeofdata;
 	}
 
 	return ret;
+}
+
+int _gnutls_send_change_cipher_spec( int cd, GNUTLS_STATE state) {
+	ChangeCipherSpecType x = GNUTLS_TYPE_CHANGE_CIPHER_SPEC;
+
+	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, (void*) &x, 1);
 }
