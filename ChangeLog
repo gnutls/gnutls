@@ -1,3 +1,34 @@
+2002-05-08 10:32  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, gnutls_gcry.c, gnutls_gcry.h, gnutls_global.c,
+	gnutls_int.h, gnutls_mpi.c, gnutls_mpi.h, Makefile.am,
+	gnutls_gcry.c, gnutls_gcry.h, gnutls_int.h, gnutls_mpi.c,
+	gnutls_mpi.h:
+
+	renamed gnutls_gcry* to gnutls_mpi* 
+
+2002-05-08 10:32  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_mpi.c:
+
+	file gnutls_mpi.c was initially added on branch
+	gnutls_0_4_with_new_dh_primes.  
+
+2002-05-08 10:32  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_mpi.h:
+
+	file gnutls_mpi.h was initially added on branch
+	gnutls_0_4_with_new_dh_primes.  
+
+2002-05-08 10:27  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_global.c:
+
+	Updated libgcrypt initialization stuff. Now depends on libgcrypt
+	1.1.7, and only initializes libgcrypt if this has not been done
+	before.  
+
 2002-05-03 10:46  nmav <nmav@gnutls.org>
 
 	* lib/: auth_anon.c, auth_dhe.c, gnutls_dh.c, gnutls_dh.h:
