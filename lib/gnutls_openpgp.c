@@ -40,12 +40,12 @@
 static void
 release_mpi_array(MPI *arr, size_t n)
 {
-#ifdef DEBUG_OPENPGP
-  fprintf(stderr, "release_mpi_array(%p, %d)\n", arr, n);
-#endif
+  MPI x;
+  
   while (arr && n--)
-    {    
-      gcry_mpi_release(*arr);
+    {
+      x = *arr;
+      _gnutls_mpi_release(&x);
       *arr = NULL; arr++;
     }
 }
@@ -61,6 +61,12 @@ is_file_armored(char *file)
   if ( (fp = fopen(file, "r")) )
     {
       fstat(fileno(fp), &f_stat);
+      if (f_stat.st_size == 0)
+        {
+          fclose(fp);
+          armored = 0;
+          goto leave;
+        }
       data = cdk_alloc_clear(f_stat.st_size+1);
       fread(data, 1, f_stat.st_size, fp);
       if ( strstr(data, "-----BEGIN PGP")
@@ -73,7 +79,8 @@ is_file_armored(char *file)
 #ifdef DEBUG_OPENPGP
   fprintf(stderr, "is_file_armored(%s) = %d\n", file, armored);
 #endif
-  
+
+leave:
   return armored;
 }    
 
@@ -90,7 +97,10 @@ datum_to_openpgp_pkt( const gnutls_datum *raw, PKT *r_pkt )
   cdk_iobuf_new(&buf, raw->size);
   cdk_iobuf_write(buf, raw->data, raw->size);
   if ( (rc = cdk_pkt_parse(buf, &pkt)) != CDKERR_EOF )
-    goto leave;
+    {
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+      goto leave;
+    }
   else
     rc = 0;
 
@@ -112,17 +122,20 @@ iobuf_to_datum(IOBUF buf, gnutls_datum *raw)
 {
   byte *data = NULL;
   size_t n = 0;
+  int rc = 0;
   
   if (!buf || !raw)
     return GNUTLS_E_INVALID_PARAMETERS;
   
   data = cdk_iobuf_get_data_as_buffer(buf, &n);
-  if (data)
+  if (data && n)
     {
       if ( gnutls_set_datum(raw, data, n) < 0 )
         return GNUTLS_E_MEMORY_ERROR;
       cdk_free(data); data = NULL;
     }
+  else
+    rc = GNUTLS_E_UNKNOWN_ERROR;
   
   return 0;
 }
@@ -202,7 +215,8 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
     cert->keyUsage = GNUTLS_X509KEY_DIGITAL_SIGNATURE
                    | GNUTLS_X509KEY_ENCIPHER_ONLY;
 
-  for (i=0; i<cdk_key_pk_get_nmpis(pk->pke_algo, 0); i++)
+  cert->params_size = cdk_key_pk_get_nmpis(pk->pke_algo, 0);
+  for (i=0; i<cert->params_size; i++)
     {      
       n = pk->mpi[i].bytes+2;
       if (gcry_mpi_scan(&cert->params[i], GCRYMPI_FMT_PGP,
@@ -212,7 +226,6 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
           goto leave;
         }
     }
-  cert->params_size = i;
   cert->expiration_time = pk->expiredate;
   cert->activation_time = pk->timestamp;
 
@@ -242,8 +255,13 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
   if ( (rc=cdk_pkt_write_signature(buf, sig)) )
     goto leave;
   data = cdk_iobuf_get_data_as_buffer(buf, &n);
-  gnutls_datum_append( &cert->signature, data, n);
-  cdk_free(data); data = NULL;
+  if (data && n)
+    {      
+      gnutls_datum_append( &cert->signature, data, n);
+      cdk_free(data); data = NULL;
+    }
+  else
+    rc = GNUTLS_E_UNKNOWN_ERROR;
 
 leave:
   cdk_iobuf_close(buf);
@@ -253,7 +271,7 @@ leave:
 #endif
   
   return rc;
-} 
+}
 
 /*-
  * _gnutls_openpgp_key2gnutls_key - Converts an OpenPGP secret key to GnuTLS
@@ -278,8 +296,7 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
   if (!pkey)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  cdk_secure_memory_init();
-  
+  cdk_secure_memory_init(); 
   cdk_iobuf_new(&buf, raw_key.size);
   cdk_iobuf_write(buf, raw_key.data, raw_key.size);
 
@@ -301,11 +318,13 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
     }
   if (sk == NULL)
     {
-      rc = GNUTLS_E_UNKNOWN_ERROR;
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
+  
   pke_algo = sk->pk->pke_algo;
-  for (i=0; i<cdk_key_pk_get_nmpis(pke_algo, 0); i++)
+  pkey->params_size = cdk_key_pk_get_nmpis(pke_algo, 0);
+  for (i=0; i<pkey->params_size; i++)
     {
       n = sk->pk->mpi[i].bytes+2;
       if (gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
@@ -316,8 +335,7 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
           goto leave;
         }
     }
-  pkey->params_size = i;
-
+  pkey->params_size += cdk_key_sk_get_nmpis(pke_algo);
   for (j=0; j<cdk_key_sk_get_nmpis(pke_algo); j++, i++)
     {
       n = sk->mpi[j]->bytes+2;
@@ -335,7 +353,7 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
     pkey->pk_algorithm = GNUTLS_PK_RSA;
   else
     return GNUTLS_E_UNKNOWN_CIPHER;
-  if (gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0)
+  if ( gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0 )
     {
       release_mpi_array(pkey->params, i);
       rc = GNUTLS_E_MEMORY_ERROR;
@@ -367,28 +385,43 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
 {
   struct packet_s *p;
   PKT pkt = NULL;
+  PKT_public_key *pk = NULL;
+  int rc = 0;
   
   if (!cert)
     return GNUTLS_E_INVALID_PARAMETERS;
-  
-  memset( cert, 0, sizeof(gnutls_cert));
-  
-  datum_to_openpgp_pkt(&raw, &pkt);
+
+  memset(cert, 0, sizeof *cert);
+  if ( (rc = datum_to_openpgp_pkt(&raw, &pkt)) )
+    return rc;
   for (p=pkt; p && p->id; p=p->next)
     {
       if (p->id == PKT_PUBKEY)
         {
-          gnutls_set_datum(&cert->raw, raw.data, raw.size);
-          openpgp_pk_to_gnutls_cert(cert, p->p.pk);
+          pk = p->p.pk;
+          break;
         }
-    }  
+    }
+  if (pk == NULL)
+    {
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+      goto leave;
+    }
+
+  if ( gnutls_set_datum(&cert->raw, raw.data, raw.size) < 0 )
+    {
+      rc = GNUTLS_E_MEMORY_ERROR;
+      goto leave;
+    }
+  rc = openpgp_pk_to_gnutls_cert(cert, p->p.pk);
 
 #if DEBUG_OPENPGP
   fprintf(stderr, "_gnutls_openpgp_cert2gnutls_cert (%p, %p) = %d\n",
           cert, raw, 0);
 #endif
-  
-  return 0;
+
+leave:
+  return rc;
 }
 
 /**
@@ -542,17 +575,19 @@ leave:
  **/
 int
 gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
-                                              gnutls_dn *dn)
+                                       gnutls_dn *dn )
 {
   PKT pkt = NULL;
   PKT_userid *uid = NULL;
   char *p;
-  int rc = 0, pos1 = 0, pos2 = 0;
+  int rc = 0;
+  int pos1 = 0, pos2 = 0;
 
   if (!cert || !dn)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  datum_to_openpgp_pkt(cert, &pkt);
+  if ( (rc = datum_to_openpgp_pkt(cert, &pkt)) )
+    return rc;
   uid = openpgp_pkt_to_uid(pkt, 0);
   if (!uid)
     {
@@ -600,7 +635,8 @@ gnutls_openpgp_extract_certificate_version( const gnutls_datum *cert )
   if (!cert)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  datum_to_openpgp_pkt(cert, &pkt);
+  if ( datum_to_openpgp_pkt(cert, &pkt) )
+    return 0;
   pk = openpgp_pkt_to_pk(pkt, 0);
   if (pk)
     version = pk->version;
@@ -626,7 +662,8 @@ gnutls_openpgp_extract_certificate_activation_time( const gnutls_datum *cert )
   if (!cert)
     return GNUTLS_E_INVALID_PARAMETERS;
   
-  datum_to_openpgp_pkt(cert, &pkt);
+  if ( datum_to_openpgp_pkt(cert, &pkt) )
+    return 0;
   pk = openpgp_pkt_to_pk(pkt, 0);
   if (pk)
     timestamp = pk->timestamp;
@@ -653,7 +690,8 @@ gnutls_openpgp_extract_certificate_expiration_time( const gnutls_datum *cert )
   if (!cert)
     return GNUTLS_E_INVALID_PARAMETERS;
   
-  datum_to_openpgp_pkt(cert, &pkt);
+  if ( datum_to_openpgp_pkt(cert, &pkt) )
+    return 0;
   pk = openpgp_pkt_to_pk(pkt, 0);
   if (pk)
     expiredate = pk->expiredate;
@@ -686,7 +724,8 @@ gnutls_openpgp_verify_certificate( const gnutls_datum* cert_list,
   if (cert_list_length != 1)
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;
   
-  datum_to_openpgp_pkt(cert_list, &pkt);
+  if ( (rc = datum_to_openpgp_pkt(cert_list, &pkt)) )
+    return rc;
   rc = cdk_key_check_sigs(pkt);
   if (rc == CDKERR_NOKEY)
     rc = 0; /* fixme */
@@ -712,12 +751,14 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr,size_t *fprlen )
   PKT pkt = NULL;
   PKT_public_key *pk = NULL;
   struct packet_s *p;
+  int rc = 0;
   
   if (!cert || !fpr || !fprlen)
     return GNUTLS_E_UNKNOWN_ERROR;
 
   *fprlen = 0;
-  datum_to_openpgp_pkt(cert, &pkt);
+  if ( (rc = datum_to_openpgp_pkt(cert, &pkt)) )
+    return rc;
   for (p=pkt; p && p->id; p=p->next)
     {
       if (p->id == PKT_PUBKEY)
@@ -748,11 +789,13 @@ gnutls_openpgp_keyid( const gnutls_datum *cert, u32 *keyid )
   PKT pkt;
   PKT_public_key *pk = NULL;
   struct packet_s *p;
+  int rc = 0;
   
   if (!cert || !keyid)
     return GNUTLS_E_UNKNOWN_ERROR;
 
-  datum_to_openpgp_pkt(cert, &pkt);
+  if ( (rc = datum_to_openpgp_pkt(cert, &pkt)) )
+    return rc;
   for (p=pkt; p && p->id; p=p->next)
     {
       if (p->id == PKT_PUBKEY)
@@ -785,5 +828,5 @@ gnutls_openpgp_add_keyring(const char *fname, int is_secret)
   return 0;
 }
 
-
 #endif /* HAVE_LIBOPENCDK */
+
