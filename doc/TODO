@@ -10,16 +10,8 @@ Current list:
   allow easy integration with TLS hardware.
 * Allow adding multiple subject alternative names.
 * Allow verifying of certificates on their reception.
-* Enforce the constraints for verify_peers() or similar, to openpgp 
-  verification functions as well. This needs to be checked a bit.
-* Verify added CRLs
-* Add functions to import certificates, private keys, etc. from
-  files similar to gnutls_x509_crt_import().
-* Print information about the certificate's public key in certtool 
-  output.
+* Verify added CRLs (is it really needed?)
 * Document the format for the supported DN attributes.
-* Add support for Certificate Extensions Profile for Qualified 
-  Certificates (rfc3039)
 * Audit the code
 * Add gnutls_certificate_set_openpgp_keyring()
   function, similar to gnutls_certificate_set_openpgp_key().
