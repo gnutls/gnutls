@@ -1,3 +1,20 @@
+2003-03-11 20:14  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, auth_cert.c, auth_cert.h, auth_dhe.c,
+	auth_rsa.c, auth_rsa_export.c, gnutls_cert.c, gnutls_cert.h,
+	gnutls_int.h, gnutls_privkey.c, gnutls_privkey.h, gnutls_sig.c,
+	gnutls_sig.h, gnutls_x509.c, gnutls_x509.h:
+
+	some improvements in the private key handling api. It is now used
+	internally.  
+
+2003-03-11 07:51  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_ui.c:
+
+	The fingerprint now accepts a pointer to an int instead of a ptr to
+	a size_t.  
+
 2003-03-10 18:29  nmav <nmav@gnutls.org>
 
 	* NEWS, THANKS, configure.in, lib/Makefile.am (utags:
