@@ -101,3 +101,156 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, char** ret_g, ch
 	return result_size;
 
 }
+
+
+/****************
+ * Choose a random value b and calculate B = (v + g^b) % N.
+ * Return: B and if ret_b is not NULL b.
+ */
+MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
+{
+	MPI tmpB;
+	MPI b, B;
+	int bits;
+	
+	/* calculate:  B = (v + g^b) % N */
+	bits = gcry_mpi_get_nbits(n);
+	b = mpi_new(bits);	/* FIXME: allocate in secure memory */
+	gcry_mpi_randomize(b, bits, GCRY_STRONG_RANDOM);
+
+	tmpB = mpi_new(bits);	/* FIXME: allocate in secure memory */
+	B = mpi_new(bits);	/* FIXME: allocate in secure memory */
+	mpi_powm(tmpB, g, b, n);
+	mpi_addm(B, v, tmpB, n);
+
+	mpi_release(tmpB);
+
+	if (ret_b)
+		*ret_b = b;
+	else
+		mpi_release(b);
+
+	return B;
+}
+
+MPI _gnutls_calc_srp_u( MPI B) {
+int b_size;
+opaque* b_holder, *hd;
+GNUTLS_MAC_HANDLE td;
+uint32 u;
+MPI ret;
+
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &b_size, B);
+	b_holder = gnutls_malloc(b_size);
+	
+	gcry_mpi_print(GCRYMPI_FMT_USG, b_holder, &b_size, B);
+	
+	
+	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	gnutls_hash(td, b_holder, b_size);
+	hd = gnutls_hash_deinit(td);
+	memcpy(&u, hd, sizeof(u));
+	gnutls_free(hd);
+	gnutls_free(b_holder);
+
+	ret = mpi_set_ui(NULL, u);
+
+	return ret;	
+}
+
+/* S = (A * v^u) ^ b % N 
+ * this is our shared key
+ */
+MPI _gnutls_calc_srp_S1(MPI A, MPI b, MPI u, MPI v, MPI n)
+{
+MPI tmp1, tmp2;
+MPI S;
+
+S = gcry_mpi_alloc_like(n);
+tmp1 = gcry_mpi_alloc_like(n);
+tmp2 = gcry_mpi_alloc_like(n);
+
+mpi_pow(tmp1, v, u);
+mpi_mul(tmp2, A, tmp1);
+mpi_release(tmp1);
+
+mpi_powm(S, tmp2, b, n);
+mpi_release(tmp2);
+
+return S;
+}
+
+/* A = g^a % N 
+ * returns A and a (which is random)
+ */
+MPI _gnutls_calc_srp_A(MPI *a, MPI g, MPI n)
+{
+MPI tmpa;
+MPI A;
+int bits;
+
+	bits = gcry_mpi_get_nbits(n);
+	tmpa = mpi_new(bits);	/* FIXME: allocate in secure memory */
+	gcry_mpi_randomize(tmpa, bits, GCRY_STRONG_RANDOM);
+
+	A = mpi_new(bits);	/* FIXME: allocate in secure memory */
+	mpi_powm(A, g, tmpa, n);
+
+	if (a!=NULL)
+		*a = tmpa;
+	else
+		mpi_release(tmpa);
+	
+	return A;
+}
+
+/* generate x = SHA(s | SHA(U | ":" | p))
+ * The output is exactly 20 bytes
+ */
+void* _gnutls_calc_srp_sha( char* username, char* password, opaque* salt, int salt_size) {
+GNUTLS_MAC_HANDLE td;
+opaque* hd;
+
+	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	gnutls_hash(td, username, strlen(username));
+	gnutls_hash(td, ":", 1);
+	gnutls_hash(td, password, strlen(password));
+	hd = gnutls_hash_deinit(td);
+
+	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	gnutls_hash(td, salt, salt_size);
+	gnutls_hash(td, hd, 20);
+	gnutls_free(hd);
+
+	hd = gnutls_hash_deinit(td);
+
+	return hd;	
+}
+
+
+/* S = (B - g^x) ^ (a + u * x) % N
+ * this is our shared key
+ */
+MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
+{
+MPI S, tmp1, tmp2, tmp4;
+
+	S = gcry_mpi_alloc_like(n);
+	tmp1 = gcry_mpi_alloc_like(n);
+	tmp2 = gcry_mpi_alloc_like(n);
+
+	mpi_pow(tmp1, g, x);
+	mpi_sub(tmp2, B, tmp1);
+
+	tmp4 = gcry_mpi_alloc_like(n);
+
+	mpi_add(tmp1, u, x);
+	mpi_add(tmp4, a, tmp1);
+	mpi_release(tmp1);
+
+	mpi_powm(S, tmp2, tmp4, n);
+	mpi_release(tmp2);
+	mpi_release(tmp4);
+
+	return S;
+}
