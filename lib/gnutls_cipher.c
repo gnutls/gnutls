@@ -405,7 +405,6 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			    state->connection_state.mac_secret_size +
 			    rand[0] +
 			    1;
-			fprintf(stderr, "Length1: %d\n", rand[0]);
 			length =
 			    make_mul(length,
 				     _gnutls_cipher_get_block_size
@@ -414,7 +413,6 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			    length - compressed->length -
 			    state->connection_state.mac_secret_size - 1;
 			
-			fprintf(stderr, "PSize: %d\n", pad);
 			/* set pad bytes pad */
 			padding = gnutls_malloc(pad);
 			memset(padding, pad, pad);
