@@ -104,6 +104,7 @@ int gnutls_global_init( void)
 		/* gcry_control (GCRYCTL_DISABLE_INTERNAL_LOCKING, NULL, 0); */
 
 		gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL,0);
+		gcry_control (GCRYCTL_SET_VERBOSITY, (int)0);
 	}
 	
 	/* set default recv/send functions
