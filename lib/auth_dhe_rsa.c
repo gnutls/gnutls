@@ -69,7 +69,7 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 	gnutls_datum signature, ddata;
 	X509PKI_AUTH_INFO info;
 
-	bits = state->gnutls_internals.dhe_bits;
+	bits = state->gnutls_internals.x509pki_dhe_bits;
 	if (bits < MIN_BITS)
 		bits = DEFAULT_BITS;	/* default */
 
@@ -280,10 +280,6 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	DECR_LEN( data_size, n_g);
 	data_g = &data[i];
 	i += n_g;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
 
 	DECR_LEN( data_size, 2);
 	n_Y = READuint16(&data[i]);
@@ -292,10 +288,7 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	DECR_LEN( data_size, n_Y);
 	data_Y = &data[i];
 	i += n_Y;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+
 	_n_Y = n_Y;
 	_n_g = n_g;
 	_n_p = n_p;
@@ -314,23 +307,19 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
+	info->dh_bits = gcry_mpi_get_nbits(state->gnutls_key->client_p);
 
 	/* VERIFY SIGNATURE */
 
 	vparams.size = n_Y + n_p + n_g + 6;
 	vparams.data = data;
 
-	if (data_size - vparams.size - 2 <= 0) {	/* check if the peer sent enough data */
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
 	DECR_LEN( data_size, 2);
 	sigsize = READuint16(&data[vparams.size]);
 
 	DECR_LEN( data_size, sigsize);
 	signature.data = &data[vparams.size + 2];
-	signature.size = GMIN(data_size - vparams.size - 2, sigsize);
+	signature.size = sigsize;
 
 	if ((ret =
 	     _gnutls_cert2gnutlsCert( &peer_cert,
@@ -361,7 +350,7 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	MPI g, p;
 	int bits, ret;
 
-	bits = state->gnutls_internals.dhe_bits;
+	bits = state->gnutls_internals.x509pki_dhe_bits;
 	if (bits < MIN_BITS)
 		bits = DEFAULT_BITS;	/* default */
 
