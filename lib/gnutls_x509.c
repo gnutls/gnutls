@@ -1220,7 +1220,7 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 {
 
 	if (type==GNUTLS_X509_FMT_DER)
-		return parse_pkcs7_cert_mem( &res->x509_ca_list, &res->x509_ncas,
+		return parse_der_cert_mem( &res->x509_ca_list, &res->x509_ncas,
 			ca, ca_size);
 	else
 		return parse_pem_cert_mem( &res->x509_ca_list, &res->x509_ncas,
@@ -1521,7 +1521,7 @@ opaque *pdata;
 /**
   * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CA: is a list of trusted CAs or a PKCS7 encoded list
+  * @CA: is a list of trusted CAs or a DER certificate
   * @CRL: is a list of CRLs (ignored for now)
   * @type: is DER or PEM
   *
@@ -1546,7 +1546,7 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, co
 /**
   * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CAFILE: is a file containing the list of trusted CAs (PKCS7 or PEM list)
+  * @CAFILE: is a file containing the list of trusted CAs (DER or PEM list)
   * @CRLFILE: is a file containing CRLs (ignored for now)
   * @type: is PEM or DER
   *
