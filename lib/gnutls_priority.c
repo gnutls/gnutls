@@ -203,10 +203,10 @@ int num=0, i;
   * types that were not specified.
   **/
 int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+#ifdef HAVE_LIBOPENCDK
 GNUTLS_LIST _list = list;
 int num=0, i;
 
-#ifdef HAVE_LIBOPENCDK
 
 	while( *_list != 0) {
 		num++;

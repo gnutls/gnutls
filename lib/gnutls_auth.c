@@ -270,7 +270,7 @@ int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size, int allo
 			 * to passive eavesdropers.
 			 */
 			if ( gnutls_auth_get_type( state) != state->gnutls_key->auth_info_type) {
-				state->gnutls_key->auth_info = gnutls_realloc( 
+				state->gnutls_key->auth_info = gnutls_realloc_fast( 
 					state->gnutls_key->auth_info, size);
 				if (state->gnutls_key->auth_info == NULL) {
 					gnutls_assert();

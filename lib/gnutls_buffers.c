@@ -162,7 +162,7 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 
 		/* this does not fail */
 		state->gnutls_internals.application_data_buffer.data =
-		    gnutls_realloc(state->gnutls_internals.application_data_buffer.data,
+		    gnutls_realloc_fast(state->gnutls_internals.application_data_buffer.data,
 				   state->gnutls_internals.application_data_buffer.size);
 		break;
 		
@@ -183,7 +183,7 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 
 		/* does not fail */
 		state->gnutls_internals.handshake_data_buffer.data =
-		    gnutls_realloc(state->gnutls_internals.handshake_data_buffer.data,
+		    gnutls_realloc_fast(state->gnutls_internals.handshake_data_buffer.data,
 				   state->gnutls_internals.handshake_data_buffer.size);
 		break;
 	default:
@@ -369,9 +369,9 @@ ssize_t _gnutls_io_read_buffered( GNUTLS_STATE state, opaque **iptr, size_t size
 	 */
 	 
 	alloc_size = recvdata+state->gnutls_internals.record_recv_buffer.size;
-	state->gnutls_internals.record_recv_buffer.data = gnutls_realloc(
+	state->gnutls_internals.record_recv_buffer.data = gnutls_realloc_fast(
 		state->gnutls_internals.record_recv_buffer.data, alloc_size);
-	if ( state->gnutls_internals.record_recv_buffer.data==NULL && alloc_size > 0) {
+	if ( state->gnutls_internals.record_recv_buffer.data==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -484,10 +484,10 @@ static int _gnutls_buffer_insert( gnutls_datum * buffer, const opaque* _data, in
 
 	}
 
-	buffer->data = gnutls_realloc( buffer->data, data_size);
+	buffer->data = gnutls_realloc_fast( buffer->data, data_size);
 	buffer->size = data_size;
 	
-	if (buffer->data == NULL && data_size > 0) {
+	if (buffer->data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -844,9 +844,9 @@ ssize_t _gnutls_handshake_io_recv_int( GNUTLS_STATE state, ContentType type, Han
 			if (dsize > 0 && (i==GNUTLS_E_INTERRUPTED || i==GNUTLS_E_AGAIN)) {
 				gnutls_assert();
 
-				state->gnutls_internals.handshake_recv_buffer.data = gnutls_realloc(
+				state->gnutls_internals.handshake_recv_buffer.data = gnutls_realloc_fast(
 					state->gnutls_internals.handshake_recv_buffer.data, dsize);
-				if (state->gnutls_internals.handshake_recv_buffer.data==NULL && dsize > 0) {
+				if (state->gnutls_internals.handshake_recv_buffer.data==NULL) {
 					gnutls_assert();
 					return GNUTLS_E_MEMORY_ERROR;
 				}

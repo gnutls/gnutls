@@ -25,6 +25,8 @@ void (*gnutls_free)(void*);
 int (*_gnutls_is_secure_memory)(const void*);
 void* (*gnutls_realloc)(void*, size_t);
 
+#define gnutls_realloc_fast(x, y) (y==0?x:realloc(x, y))
+
 svoid* gnutls_secure_calloc( size_t nmemb, size_t size);
 void* gnutls_calloc( size_t nmemb, size_t size);
 
