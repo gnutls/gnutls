@@ -1,0 +1,43 @@
+helpnode "cli help\nUsage: cli [options]"
+
+#int resume;
+option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again and resume this session."
+
+#int port;
+option (p, port) INT "integer" { $port = $1 } "The port to connect to."
+
+#char *hostname;
+option (host) STR "hostname" { $hostname = $1 } "The host to connect to."
+
+#int nciphers;
+#char **ciphers;
+option (ciphers) *STR "cipher1 cipher2..." { $ciphers = $1; $nciphers = @1 } "Ciphers to enable."
+
+#int nproto;
+#char **proto;
+option (protocols) *STR "protocol1 protocol2..." { $proto = $1; $nproto = @1 } "Protocols to enable."
+
+#int ncomp;
+#char **comp;
+option (comp) *STR "comp1 comp2..." { $comp = $1; $ncomp = @1 } "Compression methods to enable."
+
+#int nmacs;
+#char **macs;
+option (macs) *STR "mac1 mac2..." { $macs = $1; $nmacs = @1 } "MACs to enable."
+
+#int nkx;
+#char **kx;
+option (kx) *STR "kx1 kx2..." { $kx = $1; $nkx = @1 } "Key exchange methods to enable."
+
+#int nctype;
+#char **ctype;
+option (certtype) *STR "certtype1 certtype2..." { $ctype = $1; $nctype = @1 } "Certificate types to enable."
+
+
+option (l, list) { print_list(); exit(0); } "Print a list of the supported algorithms  and modes."
+option (h, help) { gaa_help(); exit(0); } "prints this help"
+
+init { $resume=0; $port=5556; $hostname="localhost"; $ciphers=NULL;
+	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
+	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; }
+
