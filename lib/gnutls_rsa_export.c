@@ -43,7 +43,6 @@
 const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params rsa_params)
 {
 	if (rsa_params == NULL) {
-		gnutls_assert();
 		return NULL;
 	}
 

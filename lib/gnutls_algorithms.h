@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -60,6 +60,9 @@ const char *gnutls_cipher_get_name(gnutls_cipher_algorithm algorithm);
 
 /* functions for key exchange */
 int _gnutls_kx_priority(gnutls_session session, gnutls_kx_algorithm algorithm);
+int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm algorithm);
+int _gnutls_kx_needs_rsa_params(gnutls_kx_algorithm algorithm);
+
 
 MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm);
 const char *gnutls_kx_get_name(gnutls_kx_algorithm algorithm);
@@ -91,6 +94,8 @@ struct gnutls_kx_algo_entry {
 	const char *name;
 	gnutls_kx_algorithm algorithm;
 	MOD_AUTH_STRUCT *auth_struct;
+	int needs_dh_params;
+	int needs_rsa_params;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 

@@ -219,16 +219,16 @@ const int _gnutls_kx_algorithms_size = MAX_KX_ALGOS;
 
 gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 #ifdef ENABLE_ANON
-	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
+	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0 },
 #endif
-	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
-	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct },
-	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
-	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
+	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0 },
+	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0, 1 },
+	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0 },
+	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0 },
 	/* other algorithms are appended here by gnutls-extra
 	 * initialization function.
 	 */
-	{0, 0, 0}
+	{0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_KX_LOOP(b) \
@@ -775,6 +775,21 @@ int _gnutls_kx_is_ok(gnutls_kx_algorithm algorithm)
 		ret = 1;
 	return ret;
 }
+
+int _gnutls_kx_needs_rsa_params(gnutls_kx_algorithm algorithm)
+{
+	ssize_t ret = 0;
+	GNUTLS_KX_ALG_LOOP(ret = p->needs_rsa_params);
+	return ret;
+}
+
+int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm algorithm)
+{
+	ssize_t ret = 0;
+	GNUTLS_KX_ALG_LOOP(ret = p->needs_dh_params);
+	return ret;
+}
+
 
 /* Version */
 int _gnutls_version_priority(gnutls_session session,

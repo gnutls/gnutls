@@ -86,7 +86,9 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
   * @sc: is an &gnutls_certificate_credentials structure.
   *
   * This function will delete all the CAs associated
-  * with the given credentials.
+  * with the given credentials. Servers that do not use
+  * gnutls_certificate_verify_peers() may call this to
+  * save some memory.
   *
   **/
 void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
@@ -102,8 +104,23 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
 	gnutls_free( sc->x509_ca_list);
 	sc->x509_ca_list = NULL;
 
-	_gnutls_free_datum( &sc->x509_rdn_sequence);
+}
 
+/**
+  * gnutls_certificate_free_ca_names - Used to free all the CA names from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the CA name in the
+  * given credentials. Clients may call this to save some memory
+  * since in client side the CA names are not used.
+  *
+  * CA names are used by servers to advertize the CAs they
+  * support to clients.
+  *
+  **/
+void gnutls_certificate_free_ca_names(gnutls_certificate_credentials sc)
+{
+	_gnutls_free_datum( &sc->x509_rdn_sequence);
 }
 
 /**
@@ -157,15 +174,25 @@ int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res
  * This function also uses the KeyUsage field of the certificate
  * extensions in order to disable unneded algorithms.
  */
-int _gnutls_cert_supported_kx(const gnutls_cert* cert, gnutls_kx_algorithm ** alg,
+int _gnutls_selected_cert_supported_kx( gnutls_session session, gnutls_kx_algorithm ** alg,
 			      int *alg_size)
 {
 	gnutls_kx_algorithm kx;
-	int i;
 	gnutls_pk_algorithm pk;
 	gnutls_kx_algorithm kxlist[MAX_ALGOS];
+	gnutls_cert * cert;
+	int i;
+	
+	if (session->internals.selected_cert_list_length == 0) {
+		gnutls_assert();
+		*alg_size = 0;
+		*alg = NULL;
+		return 0;
+	}
 
+	cert = &session->internals.selected_cert_list[0];
 	i = 0;
+
 	for (kx = 0; kx < MAX_ALGOS; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {

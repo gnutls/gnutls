@@ -46,6 +46,8 @@
 #include <gnutls_alert.h>
 #include <gnutls_state.h>
 #include <ext_srp.h>
+#include <gnutls_rsa_export.h> /* for gnutls_get_rsa_params() */
+#include <auth_anon.h> /* for gnutls_anon_server_credentials */
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_handshake_log( "HSK[%x]: %s (%d)\n", session, x,y)
@@ -568,7 +570,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	memset(session->security_parameters.current_cipher_suite.CipherSuite, '\0', 2);
 
 	retval = GNUTLS_E_UNKNOWN_CIPHER_SUITE;
-	
+
 	for (j = 0; j < datalen; j += 2) {
 		for (i = 0; i < x; i++) {
 			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
@@ -2332,6 +2334,72 @@ int _gnutls_recv_hello_request(gnutls_session session, void *data,
 	}
 }
 
+/* Returns 1 if the given KX has not the corresponding parameters
+ * (DH or RSA) set up. Otherwise returns 0.
+ */
+inline static int check_server_params( gnutls_session session, gnutls_kx_algorithm kx,
+	gnutls_kx_algorithm* alg, int alg_size)
+{
+	int cred_type;
+	const gnutls_certificate_credentials x509_cred;
+	const gnutls_anon_server_credentials anon_cred;
+	gnutls_dh_params dh_params = NULL;
+	gnutls_rsa_params rsa_params = NULL;
+	int j, keep;
+
+	cred_type = _gnutls_map_kx_get_cred( kx, 1);
+	
+	if (cred_type == GNUTLS_CRD_CERTIFICATE) {
+		x509_cred =
+		    _gnutls_get_cred(session->key, cred_type, NULL);
+	
+		if (x509_cred != NULL) {
+			dh_params = x509_cred->dh_params;
+			rsa_params = x509_cred->rsa_params;
+		}
+
+		/* Check also if the certificate supports the
+		 * KX method.
+		 */
+		keep = 1;
+		for (j = 0; j < alg_size; j++) {
+			if (alg[j] == kx) {
+				keep = 0;
+				break;
+			}
+		}
+		
+		if (keep == 1) return 1;
+
+
+	} else if ( cred_type == GNUTLS_CRD_ANON) {
+		anon_cred =
+		    _gnutls_get_cred(session->key, cred_type, NULL);
+	
+		if (anon_cred != NULL) {
+			dh_params = anon_cred->dh_params;
+		}
+	} else return 0; /* no need for params */
+
+
+	/* If the key exchange method needs RSA or DH params,
+	 * but they are not set then remove it.
+	 */
+	if (_gnutls_kx_needs_rsa_params( kx) != 0) {
+		/* needs rsa params. */
+		if (_gnutls_get_rsa_params( rsa_params)==NULL)
+			return 1;
+	}
+	
+	if (_gnutls_kx_needs_dh_params( kx) != 0) {
+		/* needs DH params. */
+		if (_gnutls_get_dh_params( dh_params)==NULL)
+			return 1;
+	}
+
+	return 0;
+}
+
 /* This function will remove algorithms that are not supported by
  * the requested authentication method. We remove an algorithm if
  * we have a certificate with keyUsage bits set.
@@ -2347,13 +2415,12 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 
 	int ret = 0;
 	GNUTLS_CipherSuite *newSuite, cs;
-	int newSuiteSize = 0, i, j, keep;
+	int newSuiteSize = 0, i, keep;
 	const gnutls_certificate_credentials x509_cred;
-	const gnutls_cert* cert = NULL;
-	gnutls_kx_algorithm *alg;
-	int alg_size;
 	gnutls_kx_algorithm kx;
 	int server = session->security_parameters.entity==GNUTLS_SERVER?1:0;
+	gnutls_kx_algorithm *alg;
+	int alg_size;
 
 	/* if we should use a specific certificate, 
 	 * we should remove all algorithms that are not supported
@@ -2367,26 +2434,22 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	/* if x509_cred==NULL we should remove all X509 ciphersuites
 	 */
 
-	cert = NULL;
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
-		cert = _gnutls_server_find_cert(session, requested_pk_algo);
-	}
-
-	if (cert == NULL) {
-		/* No certificate was found 
-		 */
-		alg_size = 0;
-		alg = NULL;
-	} else {
-		/* get all the key exchange algorithms that are 
-		 * supported by the X509 certificate parameters.
-		 */
-		if ((ret =
-		     _gnutls_cert_supported_kx(cert, &alg,
-					       &alg_size)) < 0) {
+		ret = _gnutls_server_select_cert(session, requested_pk_algo);
+		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
+	}
+
+	/* get all the key exchange algorithms that are 
+	 * supported by the X509 certificate parameters.
+	 */
+	if ((ret =
+	     _gnutls_selected_cert_supported_kx(session, &alg,
+				       &alg_size)) < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	newSuite =
@@ -2410,28 +2473,14 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		 */
 		if (_gnutls_get_kx_cred(session, kx, NULL) == NULL) {
 			keep = 1;
-		} else
-		/* If there was no credentials to use with the specified
-		 * key exchange method, then just remove it.
-		 */
-		if (_gnutls_map_kx_get_cred(kx, server) == GNUTLS_CRD_CERTIFICATE) {
-			keep = 1;	/* do not keep */
+		} else {
+			keep = 0;
 
-			if (x509_cred != NULL) {
-				if (server) {
-					/* here we check if the KX algorithm 
-					 * is compatible with the certificate.
-					 */
-					for (j = 0; j < alg_size; j++) {
-						if (alg[j] == kx) {
-							keep = 0;
-							break;
-						}
-					}
-				} else	/* CLIENT */
-					keep = 0;
-			}
+			if (server)
+				keep = check_server_params( session, kx, alg, alg_size);
 		}
+		
+		
 
 		memcpy( &cs.CipherSuite, &(*cipherSuites)[i].CipherSuite, 2);
 

@@ -89,8 +89,9 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session, opaque **);
 int _gnutls_proc_cert_cert_req(gnutls_session, opaque *, size_t);
 int _gnutls_proc_cert_client_cert_vrfy(gnutls_session, opaque *, size_t);
 int _gnutls_proc_cert_server_certificate(gnutls_session, opaque *, size_t);
-int _gnutls_find_apr_cert( gnutls_session session, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_privkey** apr_pkey);
-const gnutls_cert * _gnutls_server_find_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
+int _gnutls_get_selected_cert( gnutls_session session, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_privkey** apr_pkey);
+
+int _gnutls_server_select_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 

@@ -156,7 +156,7 @@ int i;
  */
 int _gnutls_get_private_rsa_params(gnutls_session session, GNUTLS_MPI **params, int* params_size)
 {
-int index;
+int bits;
 const gnutls_certificate_credentials cred;
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -165,14 +165,16 @@ const gnutls_certificate_credentials cred;
 	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ( (index=session->internals.selected_cert_index) < 0) {
+	if (session->internals.selected_cert_list == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
+
+	bits = _gnutls_mpi_get_nbits(session->internals.selected_cert_list[0].params[0]);
 
 	if ( _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite)
 		 == GNUTLS_KX_RSA_EXPORT && 
-		 	_gnutls_mpi_get_nbits(cred->cert_list[index][0].params[0]) > 512) {
+		 	bits > 512) {
 
 		/* EXPORT case: */
 		if (cred->rsa_params == NULL) {
@@ -192,8 +194,8 @@ const gnutls_certificate_credentials cred;
 
 	/* non export cipher suites. */	
 	
-	*params_size = cred->pkey[index].params_size;
-	*params = cred->pkey[index].params;
+	*params_size = session->internals.selected_key->params_size;
+	*params = session->internals.selected_key->params;
 
 	return 0;
 }

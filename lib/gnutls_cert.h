@@ -90,6 +90,7 @@ int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn);
 
 void _gnutls_privkey_deinit(gnutls_privkey *key);
 
-int _gnutls_cert_supported_kx( const gnutls_cert* cert, gnutls_kx_algorithm **alg, int *alg_size);
-
+int _gnutls_selected_cert_supported_kx(struct gnutls_session_int* session, 
+	gnutls_kx_algorithm ** alg, int *alg_size);
+                              
 #endif

@@ -31,34 +31,15 @@
 
 /* returns the prime and the generator of DH params.
  */
-int _gnutls_get_dh_params(gnutls_dh_params dh_primes,
-				GNUTLS_MPI * ret_p, GNUTLS_MPI * ret_g)
+const GNUTLS_MPI* _gnutls_get_dh_params(gnutls_dh_params dh_primes)
 {
-	if (dh_primes == NULL || dh_primes->_prime == NULL ||
-		dh_primes->_generator == NULL) 
+	if (dh_primes == NULL || dh_primes->params[1] == NULL ||
+		dh_primes->params[0] == NULL) 
 	{
-		gnutls_assert();
-		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
+		return NULL;
 	}
 
-	if (ret_p != NULL) { /* caller wants the prime */
-		*ret_p = _gnutls_mpi_copy(dh_primes->_prime);
-		if (*ret_p == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-	}
-
-	if (ret_g != NULL) { /* caller wants the generator */
-		*ret_g = _gnutls_mpi_copy(dh_primes->_generator);
-		if (*ret_g == NULL) {
-			gnutls_assert();
-			if (ret_p) _gnutls_mpi_release(ret_p);
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-	}
-
-	return 0;
+	return dh_primes->params;
 }
 
 int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
@@ -184,8 +165,8 @@ int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *
 
 	/* store the generated values
 	 */
-	dh_params->_prime = tmp_prime;
-	dh_params->_generator = tmp_g;
+	dh_params->params[0] = tmp_prime;
+	dh_params->params[1] = tmp_g;
 
 	return 0;
 
@@ -223,8 +204,8 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
 	if (dh_params == NULL)
 		return;
 
-	_gnutls_mpi_release(&dh_params->_prime);
-	_gnutls_mpi_release(&dh_params->_generator);
+	_gnutls_mpi_release(&dh_params->params[0]);
+	_gnutls_mpi_release(&dh_params->params[1]);
 
 	gnutls_free(dh_params);
 
@@ -250,8 +231,8 @@ int gnutls_dh_params_generate2(gnutls_dh_params params, unsigned int bits)
 {
 int ret;
 
-	ret = _gnutls_dh_generate_prime(&params->_generator, 
-		&params->_prime, bits);
+	ret = _gnutls_dh_generate_prime(&params->params[1], 
+		&params->params[0], bits);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -334,7 +315,7 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
 
 	/* Read PRIME 
 	 */
-	result = _gnutls_x509_read_int( c2, "prime", &params->_prime);
+	result = _gnutls_x509_read_int( c2, "prime", &params->params[0]);
 	if ( result < 0) {
 		asn1_delete_structure(&c2);
 		gnutls_assert();
@@ -343,10 +324,10 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
 
 	/* read the generator
 	 */
-	result = _gnutls_x509_read_int( c2, "base", &params->_generator);
+	result = _gnutls_x509_read_int( c2, "base", &params->params[1]);
 	if ( result < 0) {
 		asn1_delete_structure(&c2);
-		_gnutls_mpi_release( &params->_prime);
+		_gnutls_mpi_release( &params->params[0]);
 		gnutls_assert();
 		return result;
 	}
@@ -385,8 +366,8 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	opaque * p_data, *g_data;
 	opaque * all_data;
 	
-	_gnutls_mpi_print( NULL, &g_size, params->_generator);
-	_gnutls_mpi_print( NULL, &p_size, params->_prime);
+	_gnutls_mpi_print( NULL, &g_size, params->params[1]);
+	_gnutls_mpi_print( NULL, &p_size, params->params[0]);
 
 	all_data = gnutls_malloc( g_size + p_size);
 	if (all_data == NULL) {
@@ -397,8 +378,8 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	p_data = &all_data[0];
 	g_data = &all_data[p_size];
 	
-	_gnutls_mpi_print( p_data, &p_size, params->_prime);
-	_gnutls_mpi_print( g_data, &g_size, params->_generator);
+	_gnutls_mpi_print( p_data, &p_size, params->params[0]);
+	_gnutls_mpi_print( g_data, &g_size, params->params[1]);
 
 	/* Ok. Now we have the data. Create the asn1 structures
 	 */	
@@ -536,15 +517,15 @@ int gnutls_dh_params_export_raw(gnutls_dh_params params,
 
 	size_t size;
 
-	if (params->_generator == NULL ||
-		params->_prime == NULL) 
+	if (params->params[1] == NULL ||
+		params->params[0] == NULL) 
 	{
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	size = 0;
-	_gnutls_mpi_print(NULL, &size, params->_generator);
+	_gnutls_mpi_print(NULL, &size, params->params[1]);
 
 	generator->data = gnutls_malloc(size);
 	if (generator->data == NULL) {
@@ -552,11 +533,11 @@ int gnutls_dh_params_export_raw(gnutls_dh_params params,
 	}
 
 	generator->size = size;
-	_gnutls_mpi_print(generator->data, &size, params->_generator);
+	_gnutls_mpi_print(generator->data, &size, params->params[1]);
 
 
 	size = 0;
-	_gnutls_mpi_print(NULL, &size, params->_prime);
+	_gnutls_mpi_print(NULL, &size, params->params[0]);
 
 	prime->data = gnutls_malloc(size);
 	if (prime->data == NULL) {
@@ -564,10 +545,10 @@ int gnutls_dh_params_export_raw(gnutls_dh_params params,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	prime->size = size;
-	_gnutls_mpi_print(prime->data, &size, params->_prime);
+	_gnutls_mpi_print(prime->data, &size, params->params[0]);
 	
 	if (bits)
-		*bits = _gnutls_mpi_get_nbits( params->_prime);
+		*bits = _gnutls_mpi_get_nbits( params->params[0]);
 
 	return 0;
 

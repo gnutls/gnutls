@@ -576,7 +576,9 @@ typedef struct {
 	/* holds the index of the selected certificate.
 	 * -1 if none.
 	 */
-	int			selected_cert_index; 
+	gnutls_cert*		selected_cert_list;
+	int			selected_cert_list_length;
+	gnutls_privkey*		selected_key;
 	
 	/* holds the extensions we sent to the peer
 	 * (in case of a client)
@@ -646,8 +648,9 @@ struct gnutls_session_int {
 typedef struct gnutls_session_int *gnutls_session;
 
 typedef struct {
-	GNUTLS_MPI _prime;
-        GNUTLS_MPI _generator;
+	/* [0] is the prime, [1] is the generator.
+	 */
+	GNUTLS_MPI params[2];
 } _gnutls_dh_params;
 
 #define gnutls_dh_params _gnutls_dh_params*

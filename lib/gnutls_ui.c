@@ -196,7 +196,6 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
 const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 {
 	const gnutls_certificate_credentials cred;
-	int index;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
@@ -206,15 +205,10 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 		return NULL;
 	}
 
-	index = session->internals.selected_cert_index;
-	if (index < 0) {
-	   gnutls_assert();
-	   return NULL; /* no certificate */
-	}
-	
-	if (cred->ncerts > (unsigned int) index)
-		return &cred->cert_list[index][0].raw;
-	return NULL;
+	if (session->internals.selected_cert_list == NULL)
+		return NULL;
+
+	return &session->internals.selected_cert_list[0].raw;
 }
 
 /**

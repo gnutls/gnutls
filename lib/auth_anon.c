@@ -60,6 +60,7 @@ const MOD_AUTH_STRUCT anon_auth_struct = {
 
 static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 	GNUTLS_MPI g, p;
+	const GNUTLS_MPI *mpis;
 	int ret;
 	const gnutls_anon_server_credentials cred;
 	
@@ -69,28 +70,27 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {
+	mpis = _gnutls_get_dh_params( cred->dh_params);
+	if (mpis == NULL) {
 		gnutls_assert();
-		return ret;
+		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
 	}
 
-	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT), 1)) < 0) {
+	p = mpis[0];
+	g = mpis[1];
+
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT), 1)) < 0) 
+	{
 		gnutls_assert();
-		cleanup_gp:
-		_gnutls_mpi_release(&g);
-		_gnutls_mpi_release(&p);
 		return ret;
 	}
 
 	if ((ret=_gnutls_dh_set_prime_bits( session, _gnutls_mpi_get_nbits(p))) < 0) {
 		gnutls_assert();
-		goto cleanup_gp;
+		return ret;
 	}
 	
 	ret = _gnutls_dh_common_print_server_kx( session, g, p, data);
-	_gnutls_mpi_release(&g);
-	_gnutls_mpi_release(&p);
-
 	if (ret < 0) {
 		gnutls_assert();
 	}
@@ -105,6 +105,7 @@ const gnutls_anon_server_credentials cred;
 int bits;
 int ret;
 GNUTLS_MPI p, g;
+const GNUTLS_MPI *mpis;
   	
 	bits = _gnutls_dh_get_prime_bits( session);
 
@@ -114,16 +115,17 @@ GNUTLS_MPI p, g;
 	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {
+	mpis = _gnutls_get_dh_params( cred->dh_params);
+	if (mpis == NULL) {
 		gnutls_assert();
-		return ret;
+		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
 	}
+
+	p = mpis[0];
+	g = mpis[1];
 
 	ret = _gnutls_proc_dh_common_client_kx( session, data, _data_size, g, p);
 
-	_gnutls_mpi_release(&g);
-	_gnutls_mpi_release(&p);
-	
 	return ret;
 
 }

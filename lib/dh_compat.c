@@ -67,8 +67,8 @@ int gnutls_dh_params_set(gnutls_dh_params dh_params, gnutls_datum prime,
 
 	/* copy the generated values to the structure
 	 */
-	dh_params->_prime = tmp_prime;
-	dh_params->_generator = tmp_g;
+	dh_params->params[0] = tmp_prime;
+	dh_params->params[1] = tmp_g;
 
 	return 0;
 

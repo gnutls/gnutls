@@ -14,7 +14,7 @@ AC_DEFUN(AM_PATH_LIBOPENCDK,
 [dnl
 dnl Get the cflags and libraries from the opencdk-config script
 dnl
-AC_ARG_WITH(libopen-prefix,
+AC_ARG_WITH(libopencdk-prefix,
           [  --with-libopencdk-prefix=PFX   Prefix where libopencdk is installed (optional)],
           libopencdk_config_prefix="$withval", libopencdk_config_prefix="")
 AC_ARG_ENABLE(libopencdktest,

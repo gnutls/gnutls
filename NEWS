@@ -1,3 +1,8 @@
+Version 1.1.0
+- The error codes GNUTLS_E_NO_TEMPORARY_DH_PARAMS and GNUTLS_E_NO_TEMPORARY_RSA_PARAMS
+  are no longer returned by the handshake function. Ciphersuites that
+  require temporary parameters are removed when such parameters do not exist.
+
 Version 1.0.1 (10/12/2003)
 - Some minor fixes in the makefiles. They now include CFLAGS
   from libgcrypt or opencdk if installed in a non standard directory.

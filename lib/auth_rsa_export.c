@@ -88,7 +88,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 
 	/* find the appropriate certificate */
 	if ((ret =
-	     _gnutls_find_apr_cert(session, &apr_cert_list,
+	     _gnutls_get_selected_cert(session, &apr_cert_list,
 				   &apr_cert_list_length,
 				   &apr_pkey)) < 0) {
 		gnutls_assert();

@@ -79,6 +79,7 @@ const MOD_AUTH_STRUCT dhe_dss_auth_struct = {
 static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 {
 	GNUTLS_MPI g, p;
+	const GNUTLS_MPI *mpis;
 	int ret = 0, data_size;
 	int bits;
 	gnutls_cert *apr_cert_list;
@@ -98,17 +99,21 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 
 	/* find the appropriate certificate */
 	if ((ret =
-	     _gnutls_find_apr_cert(session, &apr_cert_list,
+	     _gnutls_get_selected_cert(session, &apr_cert_list,
 				   &apr_cert_list_length,
 				   &apr_pkey)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {
+	mpis = _gnutls_get_dh_params( cred->dh_params);
+	if (mpis == NULL) {
 		gnutls_assert();
-		return ret;
+		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
 	}
+
+	p = mpis[0];
+	g = mpis[1];
 
 	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_CERTIFICATE, 
 		sizeof( CERTIFICATE_AUTH_INFO_INT), 0)) < 0) 
@@ -125,8 +130,6 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	}
 
 	ret = _gnutls_dh_common_print_server_kx( session, g, p, data);
-	_gnutls_mpi_release(&g);
-	_gnutls_mpi_release(&p);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -256,6 +259,7 @@ int bits;
 const gnutls_certificate_credentials cred;
 int ret;
 GNUTLS_MPI p, g;
+const GNUTLS_MPI *mpis;
 
 	bits = _gnutls_dh_get_prime_bits( session);
 
@@ -265,14 +269,16 @@ GNUTLS_MPI p, g;
 	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {
+	mpis = _gnutls_get_dh_params( cred->dh_params);
+	if (mpis == NULL) {
 		gnutls_assert();
-		return ret;
+		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
 	}
 
+	p = mpis[0];
+	g = mpis[1];
+
 	ret = _gnutls_proc_dh_common_client_kx( session, data, _data_size, g, p);
-	_gnutls_mpi_release(&g);
-	_gnutls_mpi_release(&p);
 	
 	return ret;
 

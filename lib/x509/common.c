@@ -626,7 +626,6 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 		{
 			*output_data_size = len;
 			if (result == ASN1_MEM_ERROR) {
-				gnutls_assert();
 				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 			gnutls_assert();
