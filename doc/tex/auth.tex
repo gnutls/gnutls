@@ -116,24 +116,24 @@ How to use srpcrypt:
 \item To create tpasswd.conf which holds the g and n values for
 SRP protocol (generator and a large prime), run:
 \begin{verbatim}
-$ gnutls-srpcrypt --create_conf /etc/tpasswd.conf
+$ gnutls-srpcrypt --create-conf /etc/tpasswd.conf
 \end{verbatim}
 
 
 \item This command will create /etc/tpasswd and will add user 'test' (you will also
 be prompted for a password). Verifiers are stored by default in the
 way libsrp expects (using a modified SHA()). However using this tool you 
-may also specify blowfish srpcrypt instead of SHA (see --crypt parameter).
+may also specify blowfish crypt instead of SHA (see --crypt parameter).
 \begin{verbatim}
 $ gnutls-srpcrypt --passwd /etc/tpasswd \ 
-    --passwd_conf /etc/tpasswd.conf -u test
+    --passwd-conf /etc/tpasswd.conf -u test
 \end{verbatim}
 
 \item This command will check against a password. If the password matches 
 the one in /etc/tpasswd you will get an ok.
 \begin{verbatim}
 $ gnutls-srpcrypt --passwd /etc/tpasswd \ 
-    --passwd_conf /etc/tpasswd.conf --verify -u test
+    --passwd-conf /etc/tpasswd.conf --verify -u test
 \end{verbatim}
 
 \end{itemize}
