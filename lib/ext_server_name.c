@@ -224,7 +224,6 @@ int gnutls_server_name_get(gnutls_session session, void *data,
 
    if (indx >
        session->security_parameters.extensions.server_names_size - 1) {
-      gnutls_assert();
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
    }
 
