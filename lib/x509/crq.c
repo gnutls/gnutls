@@ -460,15 +460,16 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
 {
 int result;
-char null = version - 1;
+char null = version;
 
-	if (null < 0) null = 0;
-	
 	if (crq==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	null -= 1;
+	if (null < 0) null = 0;
+	
 	result = asn1_write_value( crq->crq, "certificationRequestInfo.version", &null, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -492,7 +493,7 @@ int gnutls_x509_crq_get_version(gnutls_x509_crq crq)
 	opaque version[5];
 	int len, result;
 
-	if (cert==NULL) {
+	if (crq==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}

@@ -171,7 +171,6 @@ int ret;
 	switch( signer->pk_algorithm)
 	{
 		case GNUTLS_PK_RSA:
-
 			ret = _pkcs1_rsa_sign( hash, tbs, signer->params, signer->params_size,
 				signature);
 			if (ret < 0) {
@@ -180,7 +179,6 @@ int ret;
 			}
 			return 0;
 			break;
-
 		case GNUTLS_PK_DSA:
 			ret = _gnutls_dsa_sign( signature, tbs, signer->params, signer->params_size);
 			if (ret < 0) {

@@ -122,8 +122,14 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid,
 int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
 {
 int result;
-char null = version - 1;
+char null = version;
 
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	null -= 1;
 	if (null < 0) null = 0;
 
 	result = asn1_write_value( crt->cert, "tbsCertificate.version", &null, 1);
@@ -149,6 +155,11 @@ char null = version - 1;
 int gnutls_x509_crt_set_key(gnutls_x509_crt crt, gnutls_x509_privkey key)
 {
 int result;
+
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	result = _gnutls_x509_encode_and_copy_PKI_params( crt->cert,
 		"tbsCertificate.subjectPublicKeyInfo", key->pk_algorithm,
@@ -177,6 +188,11 @@ int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq)
 {
 int result;
 int pk_algorithm;
+
+	if (crt==NULL || crq == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	pk_algorithm = gnutls_x509_crq_get_pk_algorithm( crq, NULL);
 
@@ -218,6 +234,11 @@ int gnutls_x509_crt_set_ca_status(gnutls_x509_crt crt, unsigned int ca)
 int result;
 gnutls_datum der_data;
 
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	/* generate the extension.
 	 */
 	result = _gnutls_x509_ext_gen_basicConstraints( ca, &der_data);
@@ -258,6 +279,11 @@ int result;
 gnutls_datum der_data;
 gnutls_datum dnsname;
 unsigned int critical;
+
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	/* Check if the extension already exists.
 	 */
@@ -312,6 +338,11 @@ int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer,
 int result;
 gnutls_datum signature;
 const char* pk;
+
+	if (crt==NULL || issuer == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	if (issuer_key->pk_algorithm != GNUTLS_PK_RSA) {
 		gnutls_assert();
@@ -419,6 +450,11 @@ const char* pk;
   **/
 int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time)
 {
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	return _gnutls_x509_set_time( cert->cert, "tbsCertificate.validity.notBefore", act_time);
 }
 
@@ -434,6 +470,10 @@ int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time)
   **/
 int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time)
 {
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 	return _gnutls_x509_set_time( cert->cert, "tbsCertificate.validity.notAfter", exp_time);
 }
 
@@ -455,6 +495,11 @@ int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial
 	size_t serial_size)
 {
 	int ret;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	if ((ret = asn1_write_value(cert->cert, "tbsCertificate.serialNumber", serial, serial_size)) < 0) 
 	{
