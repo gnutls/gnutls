@@ -1487,12 +1487,10 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 			    resumed_security_parameters.version;
 		}
 
-		if (hver <= 0) {
-			if (hver == 0)
-				hver = GNUTLS_E_INTERNAL_ERROR;
+		if (hver == GNUTLS_VERSION_UNKNOWN || hver == 0) {
 			gnutls_assert();
 			gnutls_free(data);
-			return hver;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		data[pos++] = _gnutls_version_get_major(hver);
