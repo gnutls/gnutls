@@ -230,6 +230,13 @@ gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid)
 	return GNUTLS_PK_UNKNOWN;
 }
 
+const char* _gnutls_x509_pk2oid( gnutls_pk_algorithm pk)
+{
+	if (pk == GNUTLS_PK_RSA) return PKIX1_RSA_OID;
+	else if (pk == GNUTLS_PK_DSA) return DSA_OID;
+	else return NULL;
+}
+
 
 /* TIME functions 
  * Convertions between generalized or UTC time to time_t

@@ -481,6 +481,71 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 	return result;
 }
 
+/* Sets an X509 DN in the asn1_struct, and puts the given OID in the DN.
+ * The input is assumed to be raw data.
+ *
+ * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
+ * That is to point in the rndSequence.
+ *
+ */
+int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
+			      const char *asn1_rdn_name,
+			      const char *given_oid, const char *name,
+			      int sizeof_name)
+{
+	int result;
+	char tmp[64];
+
+	if (sizeof_name == 0 || name == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* create a new element 
+	 */
+	result = asn1_write_value( asn1_struct, asn1_rdn_name, "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	_gnutls_str_cpy(tmp, sizeof(tmp), asn1_rdn_name);
+	_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST");
+
+	/* create the set with only one element
+	 */
+	result = asn1_write_value( asn1_struct, tmp, "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+
+	_gnutls_str_cpy(tmp, sizeof(tmp), asn1_rdn_name);
+	_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST.?1.type");
+
+	/* write the type
+	 */
+	result = asn1_write_value( asn1_struct, tmp, given_oid, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	_gnutls_str_cpy(tmp, sizeof(tmp), asn1_rdn_name);
+	_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST.?1.value");
+
+	/* write the data 
+	 */
+	result = asn1_write_value( asn1_struct, tmp, name, sizeof_name);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
 
 /**
   * gnutls_x509_rdn_get - This function parses an RDN sequence and returns a string

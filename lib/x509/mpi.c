@@ -29,9 +29,9 @@
 
 /*
  * some x509 certificate parsing functions that relate to MPI parameter
- * extraction. Returns 2 parameters (m,e).
+ * extraction. This reads the BIT STRING subjectPublicKey.
+ * Returns 2 parameters (m,e).
  */
-
 int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 {
 	opaque str[MAX_PARAMETER_SIZE];
@@ -77,7 +77,7 @@ int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 
 /* reads p,q and g 
- * from the certificate 
+ * from the certificate (subjectPublicKey BIT STRING).
  * params[0-2]
  */
 int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
@@ -272,4 +272,52 @@ int pk_algorithm;
 
 		return GNUTLS_E_X509_CERTIFICATE_ERROR;
 	}
+}
+
+/*
+ * some x509 certificate functions that relate to MPI parameter
+ * setting. This writes the BIT STRING subjectPublicKey.
+ * Needs 2 parameters (m,e).
+ */
+int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
+	opaque * der, int* dersize)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk))
+	     != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (params_size < 2) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result = _gnutls_x509_write_int( spk, "modulus", params[0]);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_write_int( spk, "publicExponent", params[1]);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_der_coding( spk, "", der, dersize, NULL);
+
+	asn1_delete_structure(&spk);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+
 }

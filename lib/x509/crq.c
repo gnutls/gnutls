@@ -31,6 +31,8 @@
 #include <x509_b64.h>
 #include <crq.h>
 #include <dn.h>
+#include <mpi.h>
+#include <sign.h>
 #include <extensions.h>
 #include <libtasn1.h>
 #include <gnutls_ui.h>
@@ -197,6 +199,209 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 		indx, buf, sizeof_buf);
 
 		
+}
+
+/**
+  * gnutls_x509_crq_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
+  * @crq: should contain a gnutls_x509_crq structure
+  * @oid: holds an Object Identified in null terminated string
+  * @name: a pointer to the name
+  * @sizeof_name: holds the size of 'name'
+  *
+  * This function will set the part of the name of the Certificate request subject, specified
+  * by the given OID. 
+  *
+  * Some helper macros with popular OIDs can be found in gnutls/x509.h
+  *
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
+	const char *name, int sizeof_name)
+{
+	if (sizeof_name == 0 || name == NULL || crq == NULL) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	return _gnutls_x509_set_dn_oid( crq->crq, "certificationRequestInfo.subject.rdnSequence", oid,
+		name, sizeof_name);
+}
+
+/**
+  * gnutls_x509_crq_set_version - This function will set the Certificate request version
+  * @crq: should contain a gnutls_x509_crq structure
+  * @version: holds the version number. For v1 Requests must be 0.
+  *
+  * This function will set the version of the certificate request. This
+  * must be zero.
+  *
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crq_set_version(gnutls_x509_crq crq, int version)
+{
+int result;
+uint8 null = version;
+
+	result = asn1_write_value( crq->crq, "certificationRequestInfo.version", &null, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crq_set_key - This function will associate the Certificate request with a key
+  * @crq: should contain a gnutls_x509_crq structure
+  * @key: holds a private key
+  *
+  * This function will set the public parameters from the given private key to the
+  * request.
+  *
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key)
+{
+const char* pk;
+opaque * der;
+int der_size, result;
+
+	if (key->pk_algorithm != GNUTLS_PK_RSA) {
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	pk = _gnutls_x509_pk2oid( key->pk_algorithm);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* write the RSA OID
+	 */
+	result = asn1_write_value( crq->crq, "certificationRequestInfo.subjectPKInfo.algorithm.algorithm", pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* disable parameters, which are not used in RSA.
+	 */
+	result = asn1_write_value( crq->crq, "certificationRequestInfo.subjectPKInfo.algorithm.parameters", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	der_size = MAX_PARAMETER_SIZE*2 + 128;
+	der = gnutls_alloca( der_size);
+	if (der == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	result = _gnutls_x509_write_rsa_params( key->params, key->params_size, der, &der_size);
+	if (result < 0) {
+		gnutls_assert();
+		gnutls_afree(der);
+		return result;
+	}
+
+	/* Write the DER parameters. (in bits)
+	 */
+	result = asn1_write_value( crq->crq, 
+		"certificationRequestInfo.subjectPKInfo.subjectPublicKey", der, der_size*8);
+
+	gnutls_afree(der);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* Step 2. Move up and write the AlgorithmIdentifier, which is also
+	 * the same. Note that requests are self signed.
+	 */
+
+	/* write the RSA OID
+	 */
+	result = asn1_write_value( crq->crq, "signatureAlgorithm.algorithm", pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* disable parameters, which are not used in RSA.
+	 */
+	result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+#if 0
+	/* FIXME: disable attributes.
+	 */
+	result = asn1_write_value( crq->crq, "certificationRequestInfo.attributes", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+#endif
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crq_sign - This function will sign a Certificate request with a key
+  * @crq: should contain a gnutls_x509_crq structure
+  * @key: holds a private key
+  *
+  * This function will sign the certificate request with a private key.
+  * This must be the same key as the one used in gnutls_x509_crt_set_key() since a
+  * certificate request is self signed.
+  *
+  * This must be the last step in a certificate request generation since all
+  * the previously set parameters are now signed.
+  *
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key)
+{
+int result;
+gnutls_datum signature;
+
+	if (key->pk_algorithm != GNUTLS_PK_RSA) {
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	/* Step 3. Self sign the request.
+	 */
+	result = _gnutls_x509_sign_tbs( crq->crq, "certificationRequestInfo", GNUTLS_MAC_SHA,
+		key, &signature);
+	
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* write the signature (bits)
+	 */
+	result = asn1_write_value( crq->crq, "signature", signature.data, signature.size*8);
+
+	_gnutls_free_datum( &signature);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
 }
 
 /**

@@ -19,6 +19,7 @@ const char* _gnutls_x509_oid2ldap_string( const char* OID);
 int _gnutls_x509_oid_data_choice( const char* OID);
 int _gnutls_x509_oid_data_printable( const char* OID);
 gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid);
+const char* _gnutls_x509_pk2oid( gnutls_pk_algorithm pk);
 
 time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when);
 

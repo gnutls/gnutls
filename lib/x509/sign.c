@@ -77,6 +77,14 @@ char* algo;
 	}
 
 	result =
+	    asn1_write_value( dinfo, "digestAlgorithm.parameters", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&dinfo);
+		return _gnutls_asn2err(result);
+	}
+
+	result =
 	    asn1_write_value( dinfo, "digest", digest->data, digest->size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -188,6 +196,32 @@ int ret;
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 	}
+
+}
+
+/* This is the same as the _gnutls_x509_sign, but this one will decode
+ * the ASN1_TYPE given, and sign the DER data. Actually used to get the DER
+ * of the TBS and sign it on the fly.
+ */
+int _gnutls_x509_sign_tbs( ASN1_TYPE cert, const char* tbs_name,
+	gnutls_mac_algorithm hash, gnutls_x509_privkey signer, gnutls_datum* signature) 
+{
+int result;
+opaque buf[MAX_X509_CERT_SIZE];
+int buf_size = sizeof(buf);
+gnutls_datum tbs;
+
+	result = asn1_der_coding( cert, tbs_name, buf, &buf_size, NULL);
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	tbs.data = buf;
+	tbs.size = buf_size;
+	
+	return _gnutls_x509_sign( &tbs, hash, signer, signature);
 
 }
 

@@ -106,3 +106,27 @@ size_t s_len;
 	return 0;
 }
 
+/* Writes the specified integer into the specified node.
+ */
+int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, GNUTLS_MPI mpi)
+{
+opaque tmpstr[MAX_PARAMETER_SIZE];
+size_t s_len;
+int result;
+
+	s_len = sizeof(tmpstr);
+	if (_gnutls_mpi_print( tmpstr, &s_len, mpi) != 0) {
+		gnutls_assert();
+		return GNUTLS_E_MPI_PRINT_FAILED;
+	}
+
+	result = asn1_write_value( node, value, tmpstr, s_len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+
+	return 0;
+}
+
