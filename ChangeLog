@@ -1,8 +1,69 @@
+2002-06-03 11:54  twoaday <twoaday@gnutls.org>
+
+	* libextra/: gnutls-extra.h, gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Corrected some data types and more documentation.  
+
+2002-06-02 21:48  twoaday <twoaday@gnutls.org>
+
+	* libextra/: gnutls-extra.h, gnutls_openpgp.c, gnutls_openpgp.h:
+
+	More fixes for the keyid and some changes for the _mem functions.  
+
+2002-06-02 21:19  twoaday <twoaday@gnutls.org>
+
+	* libextra/: gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Applied the patches. Changed the keyid from u32[2] to byte[8].  
+
+2002-06-02 20:50  nmav <nmav@gnutls.org>
+
+	* Makefile.am, NEWS, configure.in, doc/TODO,
+	lib/gnutls_anon_cred.c, lib/gnutls_x509.c, lib/gnutls_x509.h,
+	libextra/gnutls_srp.c:
+
+	Removed stubs for srp and anonymous authentication. Added test suite
+	directory.  
+
+2002-06-02 20:45  nmav <nmav@gnutls.org>
+
+	* tests/: Makefile.am, test1.pem, test10.pem, test2.pem,
+	test25.pem, test3.pem, x509_test.c:
+
+	added test suite 
+
+2002-06-02 11:51  twoaday <twoaday@gnutls.org>
+
+	* libextra/gnutls_openpgp.c:
+
+	Some modifications for the newest OpenCDK snapshot.  
+
+2002-05-28 10:23  nmav <nmav@gnutls.org>
+
+	* libextra/gnutls_openpgp.c:
+
+	Minor fixes. Added documentation for
+	gnutls_certificate_set_openpgp_trustdb() function.  
+
 2002-05-27 18:56  nmav <nmav@gnutls.org>
 
-	* lib/: gnutls_errors.c, gnutls_errors_int.h:
+	* lib/gnutls_errors.c, lib/gnutls_errors_int.h,
+	libextra/gnutls_openpgp.c:
 
 	Added error code for unsupported trustdb.  
+
+2002-05-27 16:27  twoaday <twoaday@gnutls.org>
+
+	* libextra/gnutls_openpgp.c:
+
+	Check the trustdb format before the handshake begins.  
+
+2002-05-27 11:33  twoaday <twoaday@gnutls.org>
+
+	* libextra/gnutls_openpgp.c:
+
+	Added a check for the trustdb so we can figure out if the format is
+	useable for OpenCDK.  
 
 2002-05-26 15:34  nmav <nmav@gnutls.org>
 
@@ -28,7 +89,9 @@
 2002-05-23 10:55  nmav <nmav@gnutls.org>
 
 	* doc/TODO, lib/auth_cert.c, lib/auth_rsa.c, lib/gnutls_int.h,
-	lib/gnutls_num.h, lib/gnutls_record.c (utags: gnutls_0_4_3):
+	lib/gnutls_num.h, lib/gnutls_record.c, libextra/auth_srp.c,
+	libextra/auth_srp_passwd.c, libextra/gnutls_srp.c,
+	libextra/gnutls_srp.h (utags: gnutls_0_4_3):
 
 	Several clean ups and bug fixes.  
 
@@ -44,13 +107,22 @@
 	lib/gnutls_handshake.c (tags: gnutls_0_4_3), lib/gnutls_mem.c
 	(tags: gnutls_0_4_3), lib/gnutls_mem.h, lib/gnutls_pk.c (tags:
 	gnutls_0_4_3), lib/gnutls_x509.c (tags: gnutls_0_4_3),
-	lib/x509_b64.c (tags: gnutls_0_4_3), src/common.c (tags:
-	gnutls_0_4_3):
+	lib/x509_b64.c (tags: gnutls_0_4_3), libextra/auth_srp.c,
+	libextra/auth_srp_passwd.c, libextra/crypt_bcrypt.c (tags:
+	gnutls_0_4_3), libextra/crypt_srpsha1.c (tags: gnutls_0_4_3),
+	libextra/gnutls_openpgp.c (tags: gnutls_0_4_3),
+	libextra/gnutls_srp.c, src/common.c (tags: gnutls_0_4_3):
 
 	Applied Jeff Johnson's patch which fixes type problems in 64 bit
 	machines. Removed the default allocation handlers, and made the
 	libc's functions to be defaults. Added function which sets the
 	memory allocation functions to be used.  
+
+2002-05-22 10:16  nmav <nmav@gnutls.org>
+
+	* libextra/gnutls_openpgp.c:
+
+	corrected function declaration 
 
 2002-05-21 16:26  nmav <nmav@gnutls.org>
 
@@ -61,25 +133,46 @@
 
 2002-05-21 16:25  nmav <nmav@gnutls.org>
 
-	* lib/: auth_anon.c (tags: gnutls_0_4_3), auth_cert.c, auth_dhe.c
-	(tags: gnutls_0_4_3), auth_rsa.c, gnutls_cipher.c (tags:
-	gnutls_0_4_3), gnutls_constate.c, gnutls_datum.c, gnutls_datum.h
-	(tags: gnutls_0_4_3), gnutls_extensions.c (tags: gnutls_0_4_3),
-	gnutls_handshake.c, gnutls_num.c (tags: gnutls_0_4_3),
-	gnutls_num.h, gnutls_record.c, gnutls_session_pack.c (tags:
-	gnutls_0_4_3), gnutls_v2_compat.c (tags: gnutls_0_4_3),
-	gnutls_x509.c:
+	* lib/auth_anon.c (tags: gnutls_0_4_3), lib/auth_cert.c,
+	lib/auth_dhe.c (tags: gnutls_0_4_3), lib/auth_rsa.c,
+	lib/gnutls_cipher.c (tags: gnutls_0_4_3), lib/gnutls_constate.c,
+	lib/gnutls_datum.c, lib/gnutls_datum.h (tags: gnutls_0_4_3),
+	lib/gnutls_extensions.c (tags: gnutls_0_4_3),
+	lib/gnutls_handshake.c, lib/gnutls_num.c (tags: gnutls_0_4_3),
+	lib/gnutls_num.h, lib/gnutls_record.c, lib/gnutls_session_pack.c
+	(tags: gnutls_0_4_3), lib/gnutls_v2_compat.c (tags: gnutls_0_4_3),
+	lib/gnutls_x509.c, libextra/auth_srp.c:
 
 	Prefixed internal functions with _gnutls_ 
 
+2002-05-20 18:21  twoaday <twoaday@gnutls.org>
+
+	* libextra/: gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Modifications for the new OpenCDK version and some minor fixes.  
+
 2002-05-20 12:01  nmav <nmav@gnutls.org>
 
-	* lib/: Makefile.am, auth_srp.c, auth_srp.h, auth_srp_passwd.c,
-	auth_srp_passwd.h, auth_srp_sb64.c, crypt.c, crypt.h,
-	crypt_bcrypt.c, crypt_bcrypt.h, crypt_srpsha1.c, crypt_srpsha1.h,
-	ext_srp.c, ext_srp.h, gnutls-extra.h, gnutls_extra.c,
-	gnutls_extra.h, gnutls_openpgp.c, gnutls_openpgp.h, gnutls_srp.c,
-	gnutls_srp.h:
+	* lib/Makefile.am, lib/auth_srp.c, lib/auth_srp.h,
+	lib/auth_srp_passwd.c, lib/auth_srp_passwd.h, lib/auth_srp_sb64.c,
+	lib/crypt.c, lib/crypt.h, lib/crypt_bcrypt.c, lib/crypt_bcrypt.h,
+	lib/crypt_srpsha1.c, lib/crypt_srpsha1.h, lib/ext_srp.c,
+	lib/ext_srp.h, lib/gnutls-extra.h, lib/gnutls_extra.c,
+	lib/gnutls_extra.h, lib/gnutls_openpgp.c, lib/gnutls_openpgp.h,
+	lib/gnutls_srp.c, lib/gnutls_srp.h, libextra/Makefile.am,
+	libextra/auth_srp.c, libextra/auth_srp.h (tags: gnutls_0_4_3,
+	gnutls_0_4_2), libextra/auth_srp_passwd.c,
+	libextra/auth_srp_passwd.h (tags: gnutls_0_4_3, gnutls_0_4_2),
+	libextra/auth_srp_sb64.c, libextra/crypt.c, libextra/crypt.h (tags:
+	gnutls_0_4_3, gnutls_0_4_2), libextra/crypt_bcrypt.c,
+	libextra/crypt_bcrypt.h (tags: gnutls_0_4_3, gnutls_0_4_2),
+	libextra/crypt_srpsha1.c, libextra/crypt_srpsha1.h (tags:
+	gnutls_0_4_3, gnutls_0_4_2), libextra/ext_srp.c, libextra/ext_srp.h
+	(tags: gnutls_0_4_3, gnutls_0_4_2), libextra/gnutls-extra.h (tags:
+	gnutls_0_4_2), libextra/gnutls_extra.c, libextra/gnutls_extra.h
+	(tags: gnutls_0_4_2), libextra/gnutls_openpgp.c,
+	libextra/gnutls_openpgp.h (tags: gnutls_0_4_2),
+	libextra/gnutls_srp.c, libextra/gnutls_srp.h (tags: gnutls_0_4_2):
 
 	Moved the gnutls-extra files to libextra directory.  
 
@@ -3662,6 +3755,12 @@
 
 	removed debugging stuff 
 
+2001-11-13 18:42  nmav <nmav@gnutls.org>
+
+	* CVSROOT/: loginfo, loginfo.pl:
+
+	new loginfo script 
+
 2001-11-13 12:26  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_handshake.c (tags: gnutls_0_2_11):
@@ -3702,6 +3801,18 @@
 	* configure.in:
 
 	now requires autoconf 2.50 
+
+2001-11-11 18:48  werner
+
+	* CVSROOT/notify (tags: gnutls_0_4_3, gnutls_0_4_2):
+
+	test 
+
+2001-11-11 18:22  werner
+
+	* CVSROOT/: commitinfo, loginfo:
+
+	Changed log script 
 
 2001-11-10 21:37  nmav <nmav@gnutls.org>
 
@@ -3994,6 +4105,12 @@
 	gnutls_0_2_9):
 
 	updated/fixed the handling of interrupted writes 
+
+2001-10-22 08:40  werner
+
+	* CVSROOT/loginfo:
+
+	Changed to new log script 
 
 2001-10-21 14:32  nmav <nmav@gnutls.org>
 
@@ -6592,6 +6709,12 @@
 
 	updated 
 
+2001-01-29 19:15  wkoch <wk@gnupg.org>
+
+	* CVSROOT/config (tags: gnutls_0_4_3, gnutls_0_4_2):
+
+	initial checkin 
+
 2001-01-28 23:49  nmav <nmav@gnutls.org>
 
 	* lib/: debug.h, defines.h, gnutls_algorithms.h, gnutls_buffers.h
@@ -7146,6 +7269,12 @@
 
 	updated todo 
 
+2000-11-17 21:25  wkoch <wk@gnupg.org>
+
+	* CVSROOT/loginfo:
+
+	add geam and gpgme to the log script 
+
 2000-11-17 16:37  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_cipher_int.c:
@@ -7655,6 +7784,12 @@
 
 	Added some kind of priorities for algorithms. Still experimental.  
 
+2000-07-25 10:47  wkoch <wk@gnupg.org>
+
+	* CVSROOT/loginfo:
+
+	Send mail for all modules 
+
 2000-05-10 06:56  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_int.h, src/cli.c, src/port.h, src/serv.c:
@@ -7942,10 +8077,45 @@
 	Added gnutls_recv... Works only for application data, and it is not 
 	tested.  
 
+2000-03-13 09:29  wkoch <wk@gnupg.org>
+
+	* CVSROOT/log.pl:
+
+	Fixed stupid Y2K bug (The second in the programs I maintain) 
+
 2000-03-07 14:02  wkoch <wk@gnupg.org>
 
 	* Makefile.am, NEWS, README, THANKS, acconfig.h, acinclude.m4,
 	configure.in, lib/Makefile.am, src/Makefile.am:
 
 	Initialized repository for GNU TLS 
+
+1999-07-13 15:35  wkoch <wk@gnupg.org>
+
+	* CVSROOT/loginfo:
+
+	loginfo 
+
+1998-11-27 11:40  koch
+
+	* CVSROOT/log.pl:
+
+	new ChangeLog feature 
+
+1998-10-16 16:17  koch
+
+	* CVSROOT/val-tags (tags: gnutls_0_4_3, gnutls_0_4_2):
+
+	: 
+
+1998-10-16 14:40  koch
+
+	* CVSROOT/: checkoutlist, commitinfo, cvswrappers (tags:
+	gnutls_0_4_3, gnutls_0_4_2), editinfo (tags: gnutls_0_4_3,
+	gnutls_0_4_2), loginfo, modules (tags: gnutls_0_4_3, gnutls_0_4_2),
+	notify, rcsinfo (tags: gnutls_0_4_3, gnutls_0_4_2), taginfo (tags:
+	gnutls_0_4_3, gnutls_0_4_2), verifymsg (tags: gnutls_0_4_3,
+	gnutls_0_4_2):
+
+	initial checkin 
 

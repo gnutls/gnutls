@@ -18,7 +18,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
 	gnutls-api.tex io_debug.h ext_max_record.h gnutls_session_pack.h \
-	gnutls_alert.h asn1-api.tex gnutls_str.h gnutls_state.h gnutls_x509.h \
+	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h \
 	ext_cert_type.h 
 
 lib_LTLIBRARIES = libgnutls.la
@@ -59,11 +59,4 @@ gnutls-api.tex: $(COBJECTS)
 	&& echo "ok"; \
 	done
 
-asn1-api.tex: $(COBJECTS2)
-	@echo "" > asn1-api.tex
-	@for i in $(COBJECTS2); \
-	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> asn1-api.tex \
-	&& echo "ok"; \
-	done
-
-all-local: gnutls-api.tex asn1-api.tex
+all-local: gnutls-api.tex
