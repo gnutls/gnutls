@@ -1,10 +1,10 @@
-Version ?.?.?
-- Fixes in MPI handling (fixes possible with signed integers)
+Version 0.2.91 (10/12/2001)
+- Fixes in MPI handling (fixes possible bug with signed integers)
 - Removed name indication extension
 - Added gnutls_transport_get_ptr() and gnutls_db_get_ptr()
 - Optimizations in server certificate callback.
 - Fixes in anonymous authentication
-- Fixes in client ciphersuite selection
+- Corrections in client ciphersuite selection
 
 Version 0.2.90 (7/12/2001)
 - gnutls_handshake(), gnutls_read() etc. functions no longer require
