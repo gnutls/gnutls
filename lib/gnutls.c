@@ -447,7 +447,10 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 		length = byteswap16(cipher_size);
 #endif
 		memmove( &headers[3], &length, sizeof(uint16));
-		memmove( cipher, headers, HEADER_SIZE); /* cipher does not have headers */
+		/* cipher does not have headers 
+		 * and DOES have size for them
+		 */
+		memmove( cipher, headers, HEADER_SIZE);
 
 		cipher_size += HEADER_SIZE;
 		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {

@@ -73,7 +73,9 @@ int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 	_gnutls_freeTLSCiphertext(gcipher);
 
 	return total_length - HEADER_SIZE;
-	/* notice that the headers are not present in the retun value */
+	/* notice that the headers are not present in the retun value,
+	 * but there is space for them
+	 */
 }
 
 int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
