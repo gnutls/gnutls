@@ -18,7 +18,6 @@ AC_ARG_WITH(libgnutls-prefix,
           libgnutls_config_prefix="$withval", libgnutls_config_prefix="")
 
   if test x$libgnutls_config_prefix != x ; then
-     libgnutls_config_args="$libgnutls_config_args --prefix=$libgnutls_config_prefix"
      if test x${LIBGNUTLS_CONFIG+set} != xset ; then
         LIBGNUTLS_CONFIG=$libgnutls_config_prefix/bin/libgnutls-config
      fi
