@@ -1,3 +1,10 @@
+2002-09-03 10:24  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/appendix.tex, doc/tex/cover.tex.in,
+	doc/tex/gnutls.tex, doc/tex/handshake.tex:
+
+	last changes for 0.5.5 release 
+
 2002-09-01 19:28  nmav <nmav@gnutls.org>
 
 	* doc/tex/: ex1.tex, ex2.tex, ex3.tex, ex4.tex, serv-export.tex,
