@@ -1,5 +1,9 @@
 2005-01-27  Simon Josefsson <simon@josefsson.org>
 
+	* NEWS: Version 1.2.0.
+
+2005-01-27  Simon Josefsson <simon@josefsson.org>
+
 	* lib/gnutls_algorithms.c (tags: gnutls_1_2_0): Make it compile.
 
 2005-01-27  Simon Josefsson <simon@josefsson.org>
