@@ -1,3 +1,9 @@
+2004-08-27 10:52  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c:
+
+	Typo.  
+
 2004-08-26 07:10  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-srp-08.txt:
