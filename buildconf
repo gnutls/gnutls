@@ -7,4 +7,4 @@ autoheader  && \
 automake -a -c || automake -a -c
 autoconf 
 
-echo "You can now run \"./configure\" and \"make\""
+echo "You can now run \"./configure --enable-maintainer-mode\" and \"make\""
