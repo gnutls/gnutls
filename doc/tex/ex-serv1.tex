@@ -51,13 +51,13 @@ gnutls_session initialize_tls_session()
    return session;
 }
 
-gnutls_dh_params dh_params;
+static gnutls_dh_params dh_params;
 
 static int generate_dh_params(void) {
 
    /* Generate Diffie Hellman parameters - for use with DHE
     * kx algorithms. These should be discarded and regenerated
-    * once a day, once a week or once a month. Depends on the
+    * once a day, once a week or once a month. Depending on the
     * security requirements.
     */
    gnutls_dh_params_init( &dh_params);
@@ -77,9 +77,6 @@ int main()
    gnutls_session session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
-   char name[256];
-
-   strcpy(name, "Echo Server");
 
    /* this must be called once in the program
     */
@@ -116,7 +113,7 @@ int main()
    err = listen(listen_sd, 1024);
    SOCKET_ERR(err, "listen");
 
-   printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
+   printf("Server ready. Listening to port '%d'.\n\n", PORT);
 
    client_len = sizeof(sa_cli);
    for (;;) {

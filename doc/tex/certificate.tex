@@ -24,7 +24,28 @@ The API for handling X.509 certificates is described at section \ref{sec:x509api
 on page \pageref{sec:x509api}. Some examples are listed below.
 
 
-\subsection{Verifying an X.509 certificate}
+
+\subsection{X.509 certificates}
+An X.509 certificate usually contains information about the certificate
+holder, the signer, a unique serial number, expiration dates etc. Some
+functions of \gnutls{}' API for certificate parsing are:
+\begin{itemize}
+\item \printfunc{gnutls_x509_crt_init}{gnutls\_x509\_crt\_init}
+\item \printfunc{gnutls_x509_crt_import}{gnutls\_x509\_crt\_import}
+\item \printfunc{gnutls_x509_crt_get_dn}{gnutls\_x509\_crt\_get\_dn}
+\item \printfunc{gnutls_x509_crt_get_serial}{gnutls\_x509\_crt\_get\_serial}
+\item \printfunc{gnutls_x509_crt_get_subject_alt_name}{gnutls\_x509\_crt\_get\_subject\_alt\_name}
+\end{itemize}
+
+\par
+An example program that reads the peer's certificate,
+and prints some information about the peer's certificate in a TLS session,
+is listed below.
+
+\input{ex-x509-info}
+
+
+\subsection{Verifying X.509 certificate paths}
 Verifying certificate\index{Verifying certificate paths} paths is important 
 in X.509 authentication. For this purpose the function
 \printfunc{gnutls_x509_crt_verify}{gnutls\_x509\_crt\_verify} is provided. The
@@ -62,39 +83,8 @@ about the peer's identity. It is required to verify if the certificate's
 owner is the one you expect. See section \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
 for an example.
 
-\par
-Client certificate authentication\index{Certificate authentication!Client} is 
-optional in \tls{}. A server may request a certificate from the client -- using the
-\printfunc{gnutls_certificate_server_set_request}{gnutls\_certificate\_server\_set\_request}
-function. If a certificate is to be requested by the client, at the handshake 
-procedure, the server will send an extra packet,
-than contains a list of acceptable certificate signers, and indicates the
-request of a certificate. The client may then send a certificate, signed
-by one of the server's acceptable signers. In \gnutls{} the server's acceptable
-signers list is constructed using the trusted CA certificates in the
-credentials structure.
 
-\section{Using X.509\index{X.509 certificates} certificates and other structures}
-
-\subsection{Parsing an X.509 certificate}
-An X.509 certificate usually contains information about the certificate
-holder, the signer, a unique serial number, expiration dates etc. Some
-function of the \gnutls{} API for certificate parsing are:
-\begin{itemize}
-\item \printfunc{gnutls_x509_crt_init}{gnutls\_x509\_crt\_init}
-\item \printfunc{gnutls_x509_crt_import}{gnutls\_x509\_crt\_import}
-\item \printfunc{gnutls_x509_crt_get_dn}{gnutls\_x509\_crt\_get\_dn}
-\item \printfunc{gnutls_x509_crt_get_serial}{gnutls\_x509\_crt\_get\_serial}
-\item \printfunc{gnutls_x509_crt_get_subject_alt_name}{gnutls\_x509\_crt\_get\_subject\_alt\_name}
-\end{itemize}
-
-\par
-An example is shown below, that reads the peer's certificate,
-and prints some information about the peer's certificate in a TLS session.
-
-\input{ex-x509-info}
-
-\subsection{Using certificate requests}
+\subsection{PKCS \#10 certificate requests}
 A certificate request is a structure, defined in PKCS \#10, which
 is contains information about an applicant of a certificate service.
 It usually contains a private key, a distinguished name and secondary
@@ -106,7 +96,7 @@ which should return a signed certificate.
 
 \input{ex-crq}
 
-\subsection{Using PKCS \#12 structures}
+\subsection{PKCS \#12 structures}
 A PKCS \#12 structure usually contains a user's private keys and
 certificates. It is commonly used in browsers to export and import
 the user's identities.
