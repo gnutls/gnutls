@@ -21,4 +21,4 @@
 int _gnutls_get_dh_params(gnutls_dh_params, GNUTLS_MPI *ret_p, GNUTLS_MPI* ret_g);
 GNUTLS_MPI gnutls_calc_dh_secret( GNUTLS_MPI *ret_x, GNUTLS_MPI g, GNUTLS_MPI prime );
 GNUTLS_MPI gnutls_calc_dh_key( GNUTLS_MPI f, GNUTLS_MPI x, GNUTLS_MPI prime );
-int _gnutls_dh_generate_prime(GNUTLS_MPI *ret_g, GNUTLS_MPI* ret_n, int bits);
+int _gnutls_dh_generate_prime(GNUTLS_MPI *ret_g, GNUTLS_MPI* ret_n, uint bits);

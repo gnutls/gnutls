@@ -162,7 +162,7 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
   if (err)
     return PKCS5_INVALID_PRF;
 
-  for (i = 1; i <= l; i++)
+  for (i = 1; (uint)i <= l; i++)
     {
       memset (T, 0, hLen);
 
@@ -198,11 +198,11 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 
 	  memcpy (U, p, hLen);
 
-	  for (k = 0; k < hLen; k++)
+	  for (k = 0; (uint)k < hLen; k++)
 	    T[k] ^= U[k];
 	}
 
-      memcpy (DK + (i - 1) * hLen, T, i == l ? r : hLen);
+      memcpy (DK + (i - 1) * hLen, T, (uint)i == l ? r : hLen);
     }
 
   gcry_md_close (prf);

@@ -345,7 +345,7 @@ int _gnutls_dh_get_prime_bits( gnutls_session session) {
 	return session->internals.dh_prime_bits;
 }
 
-int _gnutls_dh_set_peer_public_bits( gnutls_session session, int bits) {
+int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) {
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -373,7 +373,7 @@ int _gnutls_dh_set_peer_public_bits( gnutls_session session, int bits) {
 	return 0;
 }
 
-int _gnutls_dh_set_secret_bits( gnutls_session session, int bits) {
+int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits) {
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -401,7 +401,7 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, int bits) {
 	return 0;
 }
 
-int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, int bits) {
+int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits) {
 	CERTIFICATE_AUTH_INFO info;
 
 	info = _gnutls_get_auth_info(session);
@@ -414,7 +414,8 @@ int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, int bits) {
 }
 
 
-int _gnutls_dh_set_prime_bits( gnutls_session session, int bits) {
+int _gnutls_dh_set_prime_bits( gnutls_session session, uint bits) 
+{
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;

@@ -806,7 +806,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
   *
   **/
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
-	int bits, unsigned int flags)
+	unsigned int bits, unsigned int flags)
 {
 int ret;
 

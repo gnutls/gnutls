@@ -67,7 +67,7 @@ GNUTLS_MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
 				    GNUTLS_MPI ** ret_factors);
 
 int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
-			      int bits)
+			      unsigned int bits)
 {
 	GNUTLS_MPI g, prime;
 	int qbits;
@@ -203,7 +203,7 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
   * no use to call this in client side.
   *
   **/
-int gnutls_dh_params_generate2(gnutls_dh_params params, int bits)
+int gnutls_dh_params_generate2(gnutls_dh_params params, unsigned int bits)
 {
 
 	if (_gnutls_dh_generate_prime(&params->_generator, 
@@ -333,7 +333,8 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
   *
   **/
 int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
-	   gnutls_x509_crt_fmt format, unsigned char* params_data, int* params_data_size)
+	   gnutls_x509_crt_fmt format, unsigned char* params_data, 
+	   unsigned int* params_data_size)
 {
 	ASN1_TYPE c2;
 	int result;
@@ -452,7 +453,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
-		if (result + 1 > *params_data_size) {
+		if ((uint)result + 1 > *params_data_size) {
 			gnutls_assert();
 			gnutls_free(out);
 			*params_data_size = result;
@@ -485,7 +486,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
   * 
   **/
 int gnutls_dh_params_export_raw(gnutls_dh_params params,
-	gnutls_datum * prime, gnutls_datum * generator, int *bits)
+	gnutls_datum * prime, gnutls_datum * generator, unsigned int *bits)
 {
 
 	size_t size;

@@ -18,14 +18,14 @@ gnutls_certificate_type gnutls_certificate_type_get( gnutls_session session);
 #endif
 
 int _gnutls_session_cert_type_supported( gnutls_session, gnutls_certificate_type);
-int _gnutls_dh_set_peer_public_bits( gnutls_session session, int bits);
-int _gnutls_dh_set_secret_bits( gnutls_session session, int bits);
-int _gnutls_dh_set_prime_bits( gnutls_session session, int bits);
+int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits);
+int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits);
+int _gnutls_dh_set_prime_bits( gnutls_session session, uint bits);
 int _gnutls_dh_get_prime_bits( gnutls_session session);
-void gnutls_dh_set_prime_bits( gnutls_session session, int bits);
+void gnutls_dh_set_prime_bits( gnutls_session session, unsigned int bits);
 void _gnutls_handshake_internal_state_clear( gnutls_session);
 
-int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, int bits);
+int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits);
 
 int _gnutls_session_is_resumable( gnutls_session session);
 int _gnutls_session_is_export( gnutls_session session);

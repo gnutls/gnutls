@@ -51,7 +51,7 @@ int gnutls_openpgp_key_get_name( gnutls_openpgp_key key,
 	int idx, char *buf, size_t *sizeof_buf);
 
 int gnutls_openpgp_key_get_pk_algorithm(gnutls_openpgp_key key,
-                                            int *r_bits);
+                                            unsigned int *r_bits);
 
 int gnutls_openpgp_key_get_version( gnutls_openpgp_key key );
 

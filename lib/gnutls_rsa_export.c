@@ -214,7 +214,7 @@ void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
   * no use calling this in client side.
   *
   **/
-int gnutls_rsa_params_generate2(gnutls_rsa_params params, int bits)
+int gnutls_rsa_params_generate2(gnutls_rsa_params params, unsigned int bits)
 {
 	return gnutls_x509_privkey_generate( params, GNUTLS_PK_RSA, bits, 0);
 }
@@ -238,7 +238,7 @@ int gnutls_rsa_params_generate2(gnutls_rsa_params params, int bits)
 int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
 	gnutls_datum * m, gnutls_datum *e,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
-	gnutls_datum* u, int *bits)
+	gnutls_datum* u, unsigned int *bits)
 {
 int ret;
 

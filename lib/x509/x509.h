@@ -72,7 +72,7 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
-int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits);
+int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
 
 int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src);
 int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
@@ -118,7 +118,7 @@ int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
 void gnutls_x509_privkey_deinit(gnutls_x509_privkey key);
 
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
-	int bits, unsigned int flags);
+	unsigned int bits, unsigned int flags);
 
 int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);

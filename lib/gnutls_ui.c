@@ -49,7 +49,7 @@
   * handshake.
   *
   **/
-void gnutls_dh_set_prime_bits(gnutls_session session, int bits)
+void gnutls_dh_set_prime_bits(gnutls_session session, unsigned int bits)
 {
 	session->internals.dh_prime_bits = bits;
 }

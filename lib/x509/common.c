@@ -571,7 +571,7 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
-		if (result + 1 > *output_data_size) {
+		if ((uint)result + 1 > *output_data_size) {
 			gnutls_assert();
 			gnutls_free(out);
 			*output_data_size = result;

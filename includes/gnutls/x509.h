@@ -74,7 +74,7 @@ time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert);
 time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, size_t* result_size);
 
-int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits);
+int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
 	int seq, char *ret, size_t *ret_size, unsigned int* critical);
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
@@ -235,7 +235,7 @@ int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key, unsigned int flags,
 	unsigned char* output_data, size_t* output_data_size);
 
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
-	int bits, unsigned int flags);
+	unsigned int bits, unsigned int flags);
 
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);

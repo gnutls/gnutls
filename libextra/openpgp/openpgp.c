@@ -245,7 +245,7 @@ leave:
   *
   **/
 int
-gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, int *r_bits)
+gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, unsigned int *bits)
 {
     CDK_PACKET *pkt;
     int algo = 0;
@@ -255,8 +255,8 @@ gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, int *r_bits)
 
     pkt = cdk_kbnode_find_packet( key->knode, CDK_PKT_PUBLIC_KEY );
     if( pkt && pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
-        if( r_bits )
-            *r_bits = cdk_pk_get_nbits( pkt->pkt.public_key );
+        if( bits )
+            *bits = cdk_pk_get_nbits( pkt->pkt.public_key );
         algo = pkt->pkt.public_key->pubkey_algo;
         if( is_RSA( algo ) )
             algo = GNUTLS_PK_RSA;

@@ -524,7 +524,7 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result,
   * or a negative value on error.
   *
   **/
-int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
+int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
 {
 	int result;
 	opaque *str = NULL;

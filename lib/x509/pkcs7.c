@@ -299,7 +299,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 			
 		end = end-start+1;
 		
-		if ( end > *certificate_size) {
+		if ( (uint)end > *certificate_size) {
 			*certificate_size = end;
 			result = GNUTLS_E_SHORT_MEMORY_BUFFER;
 			goto cleanup;
@@ -649,7 +649,7 @@ int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7,
 			
 	end = end-start+1;
 		
-	if ( end > *crl_size) {
+	if ( (uint)end > *crl_size) {
 		*crl_size = end;
 		result = GNUTLS_E_SHORT_MEMORY_BUFFER;
 		goto cleanup;
