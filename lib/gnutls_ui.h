@@ -60,9 +60,9 @@ int gnutls_dh_get_bits( GNUTLS_STATE);
 
 /* X509PKI */
 
-void gnutls_x509pki_set_client_cert_callback( GNUTLS_X509PKI_CREDENTIALS, gnutls_x509pki_client_cert_callback_func *);
+void gnutls_x509pki_set_client_cert_callback( GNUTLS_CERTIFICATE_CREDENTIALS, gnutls_x509pki_client_cert_callback_func *);
 
-void gnutls_x509pki_set_server_cert_callback( GNUTLS_X509PKI_CREDENTIALS, gnutls_x509pki_server_cert_callback_func *);
+void gnutls_x509pki_set_server_cert_callback( GNUTLS_CERTIFICATE_CREDENTIALS, gnutls_x509pki_server_cert_callback_func *);
 void gnutls_x509pki_server_set_cert_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 
 /* X.509 certificate handling functions */

@@ -28,11 +28,11 @@ GNUTLS_KXAlgorithm kx;
 
 	cred = gnutls_auth_get_type(state);
 	switch(cred) {
-		case GNUTLS_ANON:
+		case GNUTLS_CRD_ANON:
 			printf("- Anonymous DH using prime of %d bits\n",
 			       gnutls_dh_get_bits( state));
 			break;
-		case GNUTLS_SRP:
+		case GNUTLS_CRD_SRP:
 			/* This should be only called in server
 			 * side.
 			 */
@@ -40,7 +40,7 @@ GNUTLS_KXAlgorithm kx;
 				printf("- SRP authentication. Connected as '%s'\n",
 				       gnutls_srp_server_get_username(state));
 			break;
-		case GNUTLS_X509PKI:
+		case GNUTLS_CRD_CERTIFICATE:
 		   /* in case of X509 PKI
 		    */
 			cert_list = gnutls_x509pki_client_get_peer_certificate_list( state, &cert_list_size);

@@ -23,7 +23,7 @@
 #include "gnutls_auth.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_algorithms.h"
-#include "auth_x509.h"
+#include "auth_cert.h"
 #include <gnutls_datum.h>
 
 #include "auth_anon.h"
@@ -68,15 +68,15 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
   * structure. Thus you will have to keep the structure allocated until   
   * you call gnutls_deinit(). ]
   *
-  * For GNUTLS_ANON cred should be ANON_CLIENT_CREDENTIALS in case of a client.
+  * For GNUTLS_CRD_ANON cred should be ANON_CLIENT_CREDENTIALS in case of a client.
   * In case of a server it should be ANON_SERVER_CREDENTIALS.
   * 
-  * For GNUTLS_SRP cred should be SRP_CLIENT_CREDENTIALS
+  * For GNUTLS_CRD_SRP cred should be SRP_CLIENT_CREDENTIALS
   * in case of a client, and SRP_SERVER_CREDENTIALS, in case
   * of a server.
   *
-  * For GNUTLS_X509PKI cred should be X509PKI_CLIENT_CREDENTIALS
-  * in case of a client, and X509PKI_SERVER_CREDENTIALS, in case
+  * For GNUTLS_CRD_CERTIFICATE cred should be CERTIFICATE_CLIENT_CREDENTIALS
+  * in case of a client, and CERTIFICATE_SERVER_CREDENTIALS, in case
   * of a server.
   **/
 int gnutls_cred_set( GNUTLS_STATE state, GNUTLS_CredType type, void* cred) {
@@ -132,7 +132,7 @@ int gnutls_cred_set( GNUTLS_STATE state, GNUTLS_CredType type, void* cred) {
   * The returned information is to be used to distinguish the function used
   * to access authentication data.
   * 
-  * Eg. for X509PKI ciphersuites (key exchange algorithms: KX_RSA, KX_DHE_RSA),
+  * Eg. for CERTIFICATE ciphersuites (key exchange algorithms: KX_RSA, KX_DHE_RSA),
   * the same function are to be used to access the authentication data.
   **/
 GNUTLS_CredType gnutls_auth_get_type( GNUTLS_STATE state) {
@@ -177,9 +177,9 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
   * is data obtained by the handshake protocol, the key exchange algorithm,
   * and the TLS extensions messages.
   *
-  * In case of GNUTLS_ANON returns a pointer to &ANON_(SERVER/CLIENT)_AUTH_INFO;
-  * In case of GNUTLS_X509PKI returns a pointer to structure &X509PKI_(SERVER/CLIENT)_AUTH_INFO;
-  * In case of GNUTLS_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
+  * In case of GNUTLS_CRD_ANON returns a pointer to &ANON_(SERVER/CLIENT)_AUTH_INFO;
+  * In case of GNUTLS_CRD_CERTIFICATE returns a pointer to structure &CERTIFICATE_(SERVER/CLIENT)_AUTH_INFO;
+  * In case of GNUTLS_CRD_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
   -*/
 void* _gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;
@@ -200,13 +200,13 @@ void _gnutls_free_auth_info( GNUTLS_STATE state) {
 	}
 	
 	switch ( state->gnutls_key->auth_info_type) {
-	case GNUTLS_SRP:
-	case GNUTLS_ANON:
+	case GNUTLS_CRD_SRP:
+	case GNUTLS_CRD_ANON:
 		
 		break;
-	case GNUTLS_X509PKI: {
+	case GNUTLS_CRD_CERTIFICATE: {
 		int i;
-		X509PKI_AUTH_INFO info =
+		CERTIFICATE_AUTH_INFO info =
 		            _gnutls_get_auth_info(state);
 
 			if (info==NULL) break;

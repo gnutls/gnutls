@@ -21,7 +21,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <x509_b64.h>
-#include <auth_x509.h>
+#include <auth_cert.h>
 #include <gnutls_cert.h>
 #include <x509_asn1.h>
 #include <x509_der.h>
@@ -95,13 +95,13 @@ void gnutls_free_cert(gnutls_cert cert)
 
 /**
   * gnutls_x509pki_free_sc - Used to free an allocated x509 SERVER CREDENTIALS structure
-  * @sc: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * @sc: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_x509pki_free_sc(GNUTLS_X509PKI_CREDENTIALS sc)
+void gnutls_x509pki_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 {
 	int i, j;
 
@@ -136,7 +136,7 @@ void gnutls_x509pki_free_sc(GNUTLS_X509PKI_CREDENTIALS sc)
 
 /* Reads a base64 encoded certificate from memory
  */
-static int read_cert_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *cert, int cert_size)
+static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size)
 {
 	int siz, i, siz2;
 	opaque *b64;
@@ -213,7 +213,7 @@ static int read_cert_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *cert, int c
 /* Reads a base64 encoded CA list from memory 
  * This is to be called once.
  */
-static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_size)
+static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int ca_size)
 {
 	int siz, siz2, i;
 	opaque *b64;
@@ -280,7 +280,7 @@ static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_si
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
  */
-static int read_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *key, int key_size)
+static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size)
 {
 	int siz, ret;
 	opaque *b64;
@@ -337,7 +337,7 @@ static int read_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *key, int key
 
 /* Reads a base64 encoded certificate file
  */
-static int read_cert_file(GNUTLS_X509PKI_CREDENTIALS res, char *certfile)
+static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -359,7 +359,7 @@ static int read_cert_file(GNUTLS_X509PKI_CREDENTIALS res, char *certfile)
 /* Reads a base64 encoded CA file (file contains multiple certificate
  * authorities). This is to be called once.
  */
-static int read_ca_file(GNUTLS_X509PKI_CREDENTIALS res, char *cafile)
+static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -382,7 +382,7 @@ static int read_ca_file(GNUTLS_X509PKI_CREDENTIALS res, char *cafile)
 
 /* Reads a PEM encoded PKCS-1 RSA private key file
  */
-static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
+static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -402,7 +402,7 @@ static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
 
 /**
   * gnutls_x509pki_allocate_sc - Used to allocate an x509 SERVER CREDENTIALS structure
-  * @res: is a pointer to an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * @res: is a pointer to an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @ncerts: this is the number of certificate/private key pair you're going to use.
   * This should be 1 in common sites.
   *
@@ -410,9 +410,9 @@ static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_x509pki_allocate_sc(GNUTLS_X509PKI_CREDENTIALS * res, int ncerts)
+int gnutls_x509pki_allocate_sc(GNUTLS_CERTIFICATE_CREDENTIALS * res, int ncerts)
 {
-	*res = gnutls_calloc(1, sizeof(X509PKI_CREDENTIALS_INT));
+	*res = gnutls_calloc(1, sizeof(CERTIFICATE_CREDENTIALS_INT));
 
 	if (*res == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
@@ -448,13 +448,14 @@ int gnutls_x509pki_allocate_sc(GNUTLS_X509PKI_CREDENTIALS * res, int ncerts)
 		}
 
 	}
+	
 	return 0;
 }
 
 /* returns error if the certificate has different algorithm than
  * the given key parameters.
  */
-static int _gnutls_check_key_cert_match( GNUTLS_X509PKI_CREDENTIALS res) {
+static int _gnutls_check_key_cert_match( GNUTLS_CERTIFICATE_CREDENTIALS res) {
 	if (res->pkey->pk_algorithm != res->cert_list[0]->subject_pk_algorithm) {
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
@@ -464,14 +465,14 @@ static int _gnutls_check_key_cert_match( GNUTLS_X509PKI_CREDENTIALS res) {
 
 
 /**
-  * gnutls_x509pki_set_key_file - Used to set keys in a GNUTLS_X509PKI_CREDENTIALS structure
-  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * gnutls_x509pki_set_key_file - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @CERTFILE: is a PEM encoded file containing the certificate list (path) for
   * the specified private key
   * @KEYFILE: is a PEM encoded file containing a private key
   *
   * This function sets a certificate/private key pair in the 
-  * GNUTLS_X509PKI_CREDENTIALS structure. This function may be called
+  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
@@ -479,7 +480,7 @@ static int _gnutls_check_key_cert_match( GNUTLS_X509PKI_CREDENTIALS res) {
   * this function.
   *
   **/
-int gnutls_x509pki_set_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE,
+int gnutls_x509pki_set_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE,
 			   char *KEYFILE)
 {
 	int ret;
@@ -500,7 +501,7 @@ int gnutls_x509pki_set_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE,
 	return 0;
 }
 
-static int generate_rdn_seq( GNUTLS_X509PKI_CREDENTIALS res) {
+static int generate_rdn_seq( GNUTLS_CERTIFICATE_CREDENTIALS res) {
 gnutls_datum tmp;
 int ret, size, i;
 opaque *pdata;
@@ -553,8 +554,8 @@ opaque *pdata;
 }
 
 /**
-  * gnutls_x509pki_set_trust_mem - Used to add trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
-  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * gnutls_x509pki_set_trust_mem - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @CA: is a PEM encoded list of trusted CAs
   * @CRL: is a PEM encoded list of CRLs (ignored for now)
   *
@@ -562,7 +563,7 @@ opaque *pdata;
   * certificates. This function may be called multiple times.
   *
   **/
-int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum *CA,
+int gnutls_x509pki_set_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum *CA,
 			     const gnutls_datum *CRL)
 {
 	int ret;
@@ -577,8 +578,8 @@ int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_da
 }
 
 /**
-  * gnutls_x509pki_set_trust_file - Used to add trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
-  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * gnutls_x509pki_set_trust_file - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @CAFILE: is a PEM encoded file containing trusted CAs
   * @CRLFILE: is a PEM encoded file containing CRLs (ignored for now)
   *
@@ -586,7 +587,7 @@ int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_da
   * certificates. This function may be called multiple times.
   *
   **/
-int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
+int gnutls_x509pki_set_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *CAFILE,
 			     char *CRLFILE)
 {
 	int ret;
@@ -602,14 +603,14 @@ int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
 
 
 /**
-  * gnutls_x509pki_set_key_mem - Used to set keys in a GNUTLS_X509PKI_CREDENTIALS structure
-  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * gnutls_x509pki_set_key_mem - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @CERT: contains a PEM encoded certificate list (path) for
   * the specified private key
   * @KEY: is a PEM encoded private key
   *
   * This function sets a certificate/private key pair in the 
-  * GNUTLS_X509PKI_CREDENTIALS structure. This function may be called
+  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
@@ -617,7 +618,7 @@ int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
   * this function.
   *
   **/
-int gnutls_x509pki_set_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum* CERT,
+int gnutls_x509pki_set_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
 			   const gnutls_datum* KEY)
 {
 	int ret;
@@ -1265,7 +1266,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 				    KXAlgorithm alg)
 {
-	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
+	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_CRD_CERTIFICATE) {
 		switch (alg) {
 		case GNUTLS_KX_RSA:
 			if (cert->keyUsage != 0) {

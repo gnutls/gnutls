@@ -23,7 +23,7 @@ int main()
    struct sockaddr_in sa;
    GNUTLS_STATE state;
    char buffer[MAX_BUF + 1];
-   GNUTLS_X509PKI_CLIENT_CREDENTIALS xcred;
+   GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
    const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
    const int kx_priority[] = { GNUTLS_KX_RSA, 0 };
    const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
@@ -86,7 +86,7 @@ int main()
 
    /* put the x509 credentials to the current state
     */
-   gnutls_cred_set(state, GNUTLS_X509PKI, xcred);
+   gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
 
 
    gnutls_transport_set_ptr( state, sd);

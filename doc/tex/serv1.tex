@@ -31,7 +31,7 @@
 
 /* These are global */
 GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
-GNUTLS_X509PKI_SERVER_CREDENTIALS x509_cred;
+GNUTLS_CERTIFICATE_SERVER_CREDENTIALS x509_cred;
 
 GNUTLS_STATE initialize_state()
 {
@@ -56,8 +56,8 @@ GNUTLS_STATE initialize_state()
    gnutls_kx_set_priority(state, kx_priority);
    gnutls_mac_set_priority(state, mac_priority);
 
-   gnutls_cred_set(state, GNUTLS_SRP, srp_cred);
-   gnutls_cred_set(state, GNUTLS_X509PKI, x509_cred);
+   gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
+   gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
    /* request client certificate if any.
     */
@@ -80,7 +80,7 @@ void print_info(GNUTLS_STATE state)
    printf("\n");
 
    /* print srp specific data */
-   if (gnutls_get_auth_type(state) == GNUTLS_SRP) {
+   if (gnutls_get_auth_type(state) == GNUTLS_CRD_SRP) {
          printf("\n- User '%s' connected\n",
                 gnutls_srp_server_get_username( state));
    }

@@ -20,7 +20,7 @@
 #include <gnutls_int.h>
 #include <auth_srp.h>
 #include <auth_anon.h>
-#include <auth_x509.h>
+#include <auth_cert.h>
 #include <gnutls_errors.h>
 #include <gnutls_auth_int.h>
 #include <gnutls_session_pack.h>
@@ -28,11 +28,11 @@
 #include <gnutls_num.h>
 
 #define PACK_HEADER_SIZE 1
-int _gnutls_pack_x509pki_auth_info( X509PKI_AUTH_INFO info,
+int _gnutls_pack_x509pki_auth_info( CERTIFICATE_AUTH_INFO info,
 				   gnutls_datum * packed_session);
-int _gnutls_unpack_x509pki_auth_info(X509PKI_AUTH_INFO info,
+int _gnutls_unpack_x509pki_auth_info(CERTIFICATE_AUTH_INFO info,
 				     const gnutls_datum * packed_session);
-static int _gnutls_pack_x509pki_auth_info_size( X509PKI_AUTH_INFO info);
+static int _gnutls_pack_x509pki_auth_info_size( CERTIFICATE_AUTH_INFO info);
 
 
 /* Since auth_info structures contain malloced data, this function
@@ -51,7 +51,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 
 
 	switch (gnutls_auth_get_type(state)) {
-	case GNUTLS_SRP:{
+	case GNUTLS_CRD_SRP:{
 			SRP_SERVER_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
 
@@ -65,7 +65,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 			packed_session->size =
 			    PACK_HEADER_SIZE + pack_size + sizeof(uint32);
 
-			packed_session->data[0] = GNUTLS_SRP;
+			packed_session->data[0] = GNUTLS_CRD_SRP;
 			WRITEuint32(pack_size,
 				    &packed_session->
 				    data[PACK_HEADER_SIZE]);
@@ -78,7 +78,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 		}
 
 		break;
-	case GNUTLS_ANON:{
+	case GNUTLS_CRD_ANON:{
 			ANON_CLIENT_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
 			if (info == NULL && state->gnutls_key->auth_info_size!=0)
@@ -87,7 +87,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 			packed_session->size =
 			    PACK_HEADER_SIZE + state->gnutls_key->auth_info_size + sizeof(uint32);
 
-			packed_session->data[0] = GNUTLS_ANON;
+			packed_session->data[0] = GNUTLS_CRD_ANON;
 			WRITEuint32(state->gnutls_key->auth_info_size,
 				    &packed_session->
 				    data[PACK_HEADER_SIZE]);
@@ -99,8 +99,8 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 			
 		}
 		break;
-	case GNUTLS_X509PKI:{
-			X509PKI_AUTH_INFO info =
+	case GNUTLS_CRD_CERTIFICATE:{
+			CERTIFICATE_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
 			if (info == NULL)
 				return GNUTLS_E_INVALID_PARAMETERS;
@@ -141,12 +141,12 @@ int _gnutls_session_size( GNUTLS_STATE state)
 	pack_size = PACK_HEADER_SIZE + sizeof(uint32);
 
 	switch ( gnutls_auth_get_type(state)) {
-	case GNUTLS_SRP:
-	case GNUTLS_ANON:
+	case GNUTLS_CRD_SRP:
+	case GNUTLS_CRD_ANON:
 		pack_size += state->gnutls_key->auth_info_size;
 		break;
-	case GNUTLS_X509PKI: {
-		X509PKI_AUTH_INFO info =
+	case GNUTLS_CRD_CERTIFICATE: {
+		CERTIFICATE_AUTH_INFO info =
 		    _gnutls_get_auth_info(state);
 	
 			if (info == NULL)
@@ -182,7 +182,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 	}
 	
 	switch ( packed_session->data[0]) {
-	case GNUTLS_SRP:{
+	case GNUTLS_CRD_SRP:{
 
 			pack_size =
 			    READuint32(&packed_session->
@@ -211,7 +211,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			       pack_size);
 		}
 		break;
-	case GNUTLS_ANON:{
+	case GNUTLS_CRD_ANON:{
 			pack_size =
 			    READuint32(&packed_session->
 				       data[PACK_HEADER_SIZE]);
@@ -237,27 +237,27 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			       pack_size);
 		}
 		break;
-	case GNUTLS_X509PKI:{
+	case GNUTLS_CRD_CERTIFICATE:{
 			pack_size =
 			    READuint32(&packed_session->
 				       data[PACK_HEADER_SIZE]);
 			
 			if (pack_size == 0) break;
 
-			if (pack_size < sizeof(X509PKI_AUTH_INFO_INT)) {
+			if (pack_size < sizeof(CERTIFICATE_AUTH_INFO_INT)) {
 				gnutls_assert();
 				return GNUTLS_E_DB_ERROR;
 			}
 
 			state->gnutls_key->auth_info =
-			    gnutls_malloc( sizeof(X509PKI_AUTH_INFO_INT));
+			    gnutls_malloc( sizeof(CERTIFICATE_AUTH_INFO_INT));
 			    
 			if (state->gnutls_key->auth_info == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 			state->gnutls_key->auth_info_size =
-			    sizeof(X509PKI_AUTH_INFO_INT);
+			    sizeof(CERTIFICATE_AUTH_INFO_INT);
 
 			ret =
 			    _gnutls_unpack_x509pki_auth_info(state->
@@ -308,20 +308,20 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 	return 0;
 }
 
-int _gnutls_pack_x509pki_auth_info( X509PKI_AUTH_INFO info,
+int _gnutls_pack_x509pki_auth_info( CERTIFICATE_AUTH_INFO info,
 				   gnutls_datum * packed_session)
 {
 	uint32 pos, i;
 	packed_session->size = _gnutls_pack_x509pki_auth_info_size( info);
 
-	packed_session->data[0] = GNUTLS_X509PKI;
+	packed_session->data[0] = GNUTLS_CRD_CERTIFICATE;
 	WRITEuint32( packed_session->size-PACK_HEADER_SIZE-sizeof(uint32), &packed_session->data[PACK_HEADER_SIZE]);
 
 
 	memcpy(&packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
-	       info, sizeof(X509PKI_AUTH_INFO_INT));
+	       info, sizeof(CERTIFICATE_AUTH_INFO_INT));
 	
-	pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(X509PKI_AUTH_INFO_INT);
+	pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(CERTIFICATE_AUTH_INFO_INT);
 
 	for (i=0;i<info->ncerts;i++) {
 		WRITEuint32( info->raw_certificate_list[i].size, &packed_session->data[pos]);
@@ -335,9 +335,9 @@ int _gnutls_pack_x509pki_auth_info( X509PKI_AUTH_INFO info,
 	return 0;
 }
 
-static int _gnutls_pack_x509pki_auth_info_size( X509PKI_AUTH_INFO info)
+static int _gnutls_pack_x509pki_auth_info_size( CERTIFICATE_AUTH_INFO info)
 {
-	uint32 pack_size = sizeof(X509PKI_AUTH_INFO_INT);
+	uint32 pack_size = sizeof(CERTIFICATE_AUTH_INFO_INT);
 	int i;
 
 	if (info == NULL)
@@ -351,7 +351,7 @@ static int _gnutls_pack_x509pki_auth_info_size( X509PKI_AUTH_INFO info)
 }
 
 
-int _gnutls_unpack_x509pki_auth_info(X509PKI_AUTH_INFO info,
+int _gnutls_unpack_x509pki_auth_info(CERTIFICATE_AUTH_INFO info,
 				     const gnutls_datum * packed_session)
 {
 int ret, i, pos, j;
@@ -359,9 +359,9 @@ uint32 size;
 
 	memcpy(info,
 	       &packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
-	       sizeof(X509PKI_AUTH_INFO_INT));
+	       sizeof(CERTIFICATE_AUTH_INFO_INT));
 
-	pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(X509PKI_AUTH_INFO_INT);
+	pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(CERTIFICATE_AUTH_INFO_INT);
 	if (info->ncerts > 0) {
 		info->raw_certificate_list = gnutls_calloc( 1, info->ncerts * sizeof( gnutls_datum));
 		if (info->raw_certificate_list == NULL) {

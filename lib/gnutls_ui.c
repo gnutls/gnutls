@@ -21,7 +21,7 @@
 #include <gnutls_int.h>
 #include <auth_srp.h>
 #include <auth_anon.h>
-#include <auth_x509.h>
+#include <auth_cert.h>
 #include <gnutls_errors.h>
 #include <gnutls_auth_int.h>
 
@@ -44,7 +44,7 @@ const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
 {
 	SRP_SERVER_AUTH_INFO info;
 
-	CHECK_AUTH(GNUTLS_SRP, NULL);
+	CHECK_AUTH(GNUTLS_CRD_SRP, NULL);
 
 	info = _gnutls_get_auth_info(state);
 	if (info == NULL)
@@ -80,7 +80,7 @@ void gnutls_dh_set_bits(GNUTLS_STATE state, int bits)
 int gnutls_dh_get_bits(GNUTLS_STATE state)
 {
 	switch( gnutls_auth_get_type( state)) {
-		case GNUTLS_ANON: {
+		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
 
 			info = _gnutls_get_auth_info(state);
@@ -88,8 +88,8 @@ int gnutls_dh_get_bits(GNUTLS_STATE state)
 				return GNUTLS_E_UNKNOWN_ERROR;
 			return info->dh_bits;
 		}
-		case GNUTLS_X509PKI: {
-			X509PKI_AUTH_INFO info;
+		case GNUTLS_CRD_CERTIFICATE: {
+			CERTIFICATE_AUTH_INFO info;
 
 			info = _gnutls_get_auth_info(state);
 			if (info == NULL)
@@ -106,6 +106,65 @@ int gnutls_dh_get_bits(GNUTLS_STATE state)
 /* X509PKI */
 
 /**
+  * gnutls_x509pki_get_our_certificate - This function returns the raw (DER encoded) certificate sent in the last handshake
+  * @state: is a gnutls state
+  *
+  * This function will return the raw certificate list as sent to the peer,
+  * in the last handshake. These certificates are DER encoded. 
+  * The first certificate in the list is the peer's certificate,
+  * following the issuer's certificate, then the issuer's issuer etc.
+  * Returns NULL in case of an error, or if no certificate was sent.
+  *
+  **/
+const gnutls_datum *gnutls_x509pki_get_our_certificate(GNUTLS_STATE state)
+{
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	int index;
+
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	index = state->gnutls_internals.selected_cert_index;
+	if (index < 0) return NULL; /* no certificate */
+	
+	return &cred->cert_list[index]->raw;
+}
+
+/**
+  * gnutls_x509pki_get_our_certificate_index - This function returns the index of the certificate sent in the last handshake
+  * @state: is a gnutls state
+  *
+  * This function will return the index of the certificate list sent to 
+  * the peer, in the last handshake. The index depends on the sequence
+  * that the certificates were added, and the first certificate is assigned 0. 
+  * Returns a negative value in case of an error, or if no certificate was sent.
+  *
+  **/
+int gnutls_x509pki_get_our_certificate_index(GNUTLS_STATE state)
+{
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	int index;
+
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	index = state->gnutls_internals.selected_cert_index;
+	if (index < 0) return GNUTLS_E_NO_CERTIFICATE_FOUND; /* no certificate */
+	
+	return index;
+}
+
+/**
   * gnutls_x509pki_get_peer_certificate_list - This function returns the peer's raw (DER encoded) certificate
   * @state: is a gnutls state
   * @list_size: is the length of the certificate list
@@ -118,9 +177,9 @@ int gnutls_dh_get_bits(GNUTLS_STATE state)
   **/
 const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state, int *list_size)
 {
-	X509PKI_AUTH_INFO info;
+	CERTIFICATE_AUTH_INFO info;
 
-	CHECK_AUTH(GNUTLS_X509PKI, NULL);
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
 	info = _gnutls_get_auth_info(state);
 	if (info == NULL)
@@ -142,9 +201,9 @@ const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state,
   **/
 int gnutls_x509pki_get_certificate_request_status(GNUTLS_STATE state)
 {
-	X509PKI_AUTH_INFO info;
+	CERTIFICATE_AUTH_INFO info;
 
-	CHECK_AUTH(GNUTLS_X509PKI, 0);
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, 0);
 
 	info = _gnutls_get_auth_info(state);
 	if (info == NULL)

@@ -72,7 +72,7 @@ static char http_buffer[16*1024];
 /* These are global */
 GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
 GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
-GNUTLS_X509PKI_SERVER_CREDENTIALS x509_cred;
+GNUTLS_CERTIFICATE_SERVER_CREDENTIALS x509_cred;
 
 
 GNUTLS_STATE initialize_state(void)
@@ -98,9 +98,9 @@ GNUTLS_STATE initialize_state(void)
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 	
-	gnutls_cred_set(state, GNUTLS_ANON, dh_cred);
-	gnutls_cred_set(state, GNUTLS_SRP, srp_cred);
-	gnutls_cred_set(state, GNUTLS_X509PKI, x509_cred);
+	gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
+	gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
+	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
 	gnutls_mac_set_priority(state, mac_priority);
 
@@ -283,7 +283,6 @@ int main(int argc, char **argv)
 	gnutls_srp_set_server_cred_file( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
 	gnutls_anon_allocate_server_sc( &dh_cred);
-	gnutls_anon_set_server_cred( dh_cred, 1024);
 
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");

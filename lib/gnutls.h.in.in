@@ -38,7 +38,7 @@ typedef enum GNUTLS_BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_AR
 
 typedef enum GNUTLS_KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } GNUTLS_KXAlgorithm;
 
-typedef enum GNUTLS_CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } GNUTLS_CredType;
+typedef enum GNUTLS_CredType { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } GNUTLS_CredType;
 
 typedef enum GNUTLS_MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } GNUTLS_MACAlgorithm;
 typedef enum GNUTLS_DigestAlgorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } GNUTLS_DigestAlgorithm;
@@ -159,30 +159,18 @@ int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
 int gnutls_cred_set( GNUTLS_STATE, GNUTLS_CredType type, void* cred);
 
-/* This will set the Common Name field in case of X509PKI
- * authentication. This will be used while verifying the
- * certificate
- */
-
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 
 struct DSTRUCT;
-typedef struct DSTRUCT* GNUTLS_X509PKI_CREDENTIALS;
-typedef GNUTLS_X509PKI_CREDENTIALS GNUTLS_X509PKI_CLIENT_CREDENTIALS;
-typedef GNUTLS_X509PKI_CREDENTIALS GNUTLS_X509PKI_SERVER_CREDENTIALS;
-#define X509PKI_CLIENT_CREDENTIALS GNUTLS_X509PKI_CLIENT_CREDENTIALS
-#define X509PKI_SERVER_CREDENTIALS GNUTLS_X509PKI_SERVER_CREDENTIALS
+typedef struct DSTRUCT* GNUTLS_CERTIFICATE_CREDENTIALS;
+typedef GNUTLS_CERTIFICATE_CREDENTIALS GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS;
+typedef GNUTLS_CERTIFICATE_CREDENTIALS GNUTLS_CERTIFICATE_SERVER_CREDENTIALS;
 
 typedef struct DSTRUCT* GNUTLS_SRP_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* GNUTLS_SRP_CLIENT_CREDENTIALS;
-#define SRP_SERVER_CREDENTIALS GNUTLS_SRP_SERVER_CREDENTIALS
-#define SRP_CLIENT_CREDENTIALS GNUTLS_GNUTLS_SRP_CLIENT_CREDENTIALS
 
 typedef struct DSTRUCT* GNUTLS_ANON_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* GNUTLS_ANON_CLIENT_CREDENTIALS;
-#define ANON_SERVER_CREDENTIALS GNUTLS_ANON_SERVER_CREDENTIALS
-#define ANON_CLIENT_CREDENTIALS GNUTLS_ANON_CLIENT_CREDENTIALS
-
 
 void gnutls_srp_free_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS sc);
 int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc);
@@ -204,14 +192,14 @@ int gnutls_anon_set_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
-void gnutls_x509pki_free_sc( GNUTLS_X509PKI_CREDENTIALS sc);
-int gnutls_x509pki_allocate_sc( GNUTLS_X509PKI_CREDENTIALS *sc, int ncerts);
+void gnutls_x509pki_free_sc( GNUTLS_CERTIFICATE_CREDENTIALS sc);
+int gnutls_x509pki_allocate_sc( GNUTLS_CERTIFICATE_CREDENTIALS *sc, int ncerts);
 
-int gnutls_x509pki_set_trust_file( GNUTLS_X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
-int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum *CA, const gnutls_datum *CRL);
+int gnutls_x509pki_set_trust_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char* CAFILE, char* CRLFILE);
+int gnutls_x509pki_set_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum *CA, const gnutls_datum *CRL);
 
-int gnutls_x509pki_set_key_file( GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
-int gnutls_x509pki_set_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum* CERT, const gnutls_datum* KEY);
+int gnutls_x509pki_set_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
+int gnutls_x509pki_set_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT, const gnutls_datum* KEY);
 
 #define gnutls_x509pki_free_server_sc gnutls_x509pki_free_sc
 #define gnutls_x509pki_allocate_server_sc gnutls_x509pki_allocate_sc

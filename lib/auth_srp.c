@@ -78,7 +78,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	int err;
 	SRP_SERVER_AUTH_INFO info;
 	
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -241,7 +241,7 @@ int gen_srp_client_kx0(GNUTLS_STATE state, opaque ** data)
 	char *username;
 	char *password;
 	const GNUTLS_SRP_CLIENT_CREDENTIALS cred =
-	    _gnutls_get_cred(state->gnutls_key, GNUTLS_SRP, NULL);
+	    _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_SRP, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -301,7 +301,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	char *username;
 	char *password;
 	const GNUTLS_SRP_CLIENT_CREDENTIALS cred =
-	    _gnutls_get_cred(state->gnutls_key, GNUTLS_SRP, NULL);
+	    _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_SRP, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();

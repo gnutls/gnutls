@@ -21,7 +21,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <x509_b64.h>
-#include <auth_x509.h>
+#include <auth_cert.h>
 #include <gnutls_cert.h>
 #include <x509_asn1.h>
 #include <x509_der.h>

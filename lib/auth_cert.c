@@ -22,7 +22,7 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_errors.h"
 #include <gnutls_cert.h>
-#include <auth_x509.h>
+#include <auth_cert.h>
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
 #include "x509_asn1.h"
@@ -39,9 +39,9 @@
 #include <gnutls_pk.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
- * exported certificate struct (X509PKI_AUTH_INFO)
+ * exported certificate struct (CERTIFICATE_AUTH_INFO)
  */
-int _gnutls_copy_x509_auth_info(X509PKI_AUTH_INFO info, gnutls_cert * cert,
+int _gnutls_copy_x509_auth_info(CERTIFICATE_AUTH_INFO info, gnutls_cert * cert,
 				int ncerts)
 {
 	/* Copy peer's information to AUTH_INFO
@@ -228,9 +228,9 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 	gnutls_datum odn;
 	opaque *data = _data;
 	int data_size = _data_size;
-	const GNUTLS_X509PKI_CREDENTIALS cred;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
@@ -495,22 +495,22 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 {
 	int size, len, ret;
 	opaque *p = data;
-	X509PKI_AUTH_INFO info;
-	const GNUTLS_X509PKI_CREDENTIALS cred;
+	CERTIFICATE_AUTH_INFO info;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int dsize = data_size;
 	int i, j, x;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size = 0;
 	gnutls_datum tmp;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
 
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_X509PKI, sizeof( X509PKI_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_CERTIFICATE, sizeof( CERTIFICATE_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -658,21 +658,21 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 {
 	int size, ret;
 	opaque *p = data;
-	const GNUTLS_X509PKI_CREDENTIALS cred;
-	X509PKI_AUTH_INFO info;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	CERTIFICATE_AUTH_INFO info;
 	int dsize = data_size;
 	int i, j, ind;
 	PKAlgorithm pk_algos[MAX_SIGN_ALGOS];
 	int pk_algos_length;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 	state->gnutls_key->certificate_requested = 1;
 
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_X509PKI, sizeof( X509PKI_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_CERTIFICATE, sizeof( CERTIFICATE_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -782,7 +782,7 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 	int dsize = data_size;
 	opaque *pdata = data;
 	gnutls_datum sig;
-	X509PKI_AUTH_INFO info = _gnutls_get_auth_info( state);
+	CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
 	gnutls_cert peer_cert;
 
 	if (info == NULL || info->ncerts == 0) {
@@ -823,16 +823,16 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 #define CERTTYPE_SIZE 3
 int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 {
-	const GNUTLS_X509PKI_CREDENTIALS cred;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int size;
 	opaque *pdata;
 
 	/* Now we need to generate the RDN sequence. This is
-	 * already in the X509PKI_CRED structure, to improve
+	 * already in the CERTIFICATE_CRED structure, to improve
 	 * performance.
 	 */
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
@@ -871,11 +871,11 @@ int _gnutls_find_apr_cert(GNUTLS_STATE state, gnutls_cert ** apr_cert_list,
 			  int *apr_cert_list_length,
 			  gnutls_private_key ** apr_pkey)
 {
-	const GNUTLS_X509PKI_CREDENTIALS cred;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int ind;
 
 	cred =
-	    _gnutls_get_kx_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	    _gnutls_get_kx_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -1235,19 +1235,19 @@ int gnutls_x509pki_extract_certificate_version(const gnutls_datum * cert)
   **/
 int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 {
-	X509PKI_AUTH_INFO info;
-	const GNUTLS_X509PKI_CREDENTIALS cred;
+	CERTIFICATE_AUTH_INFO info;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	CertificateStatus verify;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size, i, x, ret;
 
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(state);
 	if (info == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
@@ -1407,10 +1407,10 @@ int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_l
 const gnutls_cert *_gnutls_server_find_x509_cert(GNUTLS_STATE state, PKAlgorithm requested_algo)
 {
 	int i;
-	const GNUTLS_X509PKI_CREDENTIALS x509_cred;
+	const GNUTLS_CERTIFICATE_CREDENTIALS x509_cred;
 
 	x509_cred =
-            _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+            _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
         
         if (x509_cred==NULL)
         	return NULL;
@@ -1436,10 +1436,10 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 					PKAlgorithm requested_algo)
 {
 	int i, index = -1, j;
-	const GNUTLS_X509PKI_CREDENTIALS cred;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int my_certs_length;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;

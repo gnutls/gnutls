@@ -35,7 +35,7 @@
 #include "gnutls_random.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_v2_compat.h"
-#include "auth_x509.h"
+#include "auth_cert.h"
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
 #include <gnutls_record.h>
@@ -498,7 +498,7 @@ KXAlgorithm kx;
 	for (j = 0; j < datalen; j += 2) {
 		kx = _gnutls_cipher_suite_get_kx_algo(*((GNUTLS_CipherSuite *) & data[j]));
 		
-		if ( _gnutls_map_kx_get_cred( kx) == GNUTLS_X509PKI) {
+		if ( _gnutls_map_kx_get_cred( kx) == GNUTLS_CRD_CERTIFICATE) {
 			algo = _gnutls_map_pk_get_pk( kx);
 	
 			if (algo!=prev_algo && prev_algo!=0) return -1;
@@ -1011,7 +1011,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 		 * need it */
 		gnutls_free(dataptr);
 		break;
-	case GNUTLS_CERTIFICATE:
+	case GNUTLS_CERTIFICATE_PKT:
 		ret = length32;
 		break;
 	case GNUTLS_SERVER_HELLO_DONE:
@@ -2278,7 +2278,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	int ret = 0;
 	GNUTLS_CipherSuite *newSuite;
 	int newSuiteSize = 0, i, j, keep;
-	const GNUTLS_X509PKI_CREDENTIALS x509_cred;
+	const GNUTLS_CERTIFICATE_CREDENTIALS x509_cred;
 	const gnutls_cert *cert = NULL;
 	KXAlgorithm *alg;
 	int alg_size;
@@ -2288,11 +2288,11 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	/* if we should use a specific certificate, 
 	 * we should remove all algorithms that are not supported
 	 * by that certificate and are on the same authentication
-	 * method (X509PKI).
+	 * method (CERTIFICATE).
 	 */
 
 	x509_cred =
-	    _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	    _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 
 	/* if x509_cred==NULL we should remove all X509 ciphersuites
 	 */
@@ -2340,7 +2340,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 		/* If there was no credentials to use with the specified
 		 * key exchange method, then just remove it.
 		 */
-		if (_gnutls_map_kx_get_cred(kx) == GNUTLS_X509PKI) {
+		if (_gnutls_map_kx_get_cred(kx) == GNUTLS_CRD_CERTIFICATE) {
 			keep = 1;	/* do not keep */
 			if (x509_cred != NULL) {
 				if (state->security_parameters.entity ==

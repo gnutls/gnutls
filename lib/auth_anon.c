@@ -82,7 +82,7 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -230,7 +230,7 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	}
 
 	/* set auth_info */
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_ANON, sizeof( ANON_CLIENT_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_ANON, sizeof( ANON_CLIENT_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
 		return ret;
 	}

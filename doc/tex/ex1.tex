@@ -31,7 +31,7 @@ int main()
    struct sockaddr_in sa;
    GNUTLS_STATE state;
    char buffer[MAX_BUF + 1];
-   GNUTLS_X509PKI_CLIENT_CREDENTIALS xcred;
+   GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
    /* variables used in session resuming */
    int t;
    char *session;
@@ -73,7 +73,7 @@ int main()
       gnutls_kx_set_priority(state, kx_priority);
       gnutls_mac_set_priority(state, mac_priority);
 
-      gnutls_cred_set(state, GNUTLS_X509PKI, xcred);
+      gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
 
       if (t > 0) { /* if this is not the first time we connect */
          gnutls_session_set_data(state, session, session_size);

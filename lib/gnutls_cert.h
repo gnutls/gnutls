@@ -81,7 +81,7 @@ struct GNUTLS_STATE_INT; /* because GNUTLS_STATE is not defined when this file i
 
 int _gnutls_cert_supported_kx( const gnutls_cert* cert, KXAlgorithm **alg, int *alg_size);
 PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm);
-int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert);
+int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert);
 
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data);

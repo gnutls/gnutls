@@ -7,6 +7,9 @@
  * support a server that has multiple certificates
  */
 typedef struct {
+
+	/* X509 stuff */
+
 	gnutls_cert ** cert_list; 
 			/* contains a list of a list of certificates.
 			 * eg:   [0] certificate1, certificate11, certificate111 
@@ -23,6 +26,7 @@ typedef struct {
 				* keys. pkey[i] corresponds to certificate in
 				* cert_list[i][0].
 				*/
+
 	gnutls_cert * ca_list;
 	int ncas;	/* number of CAs in the ca_list 
 			 */
@@ -33,12 +37,12 @@ typedef struct {
 			 * generating it every time.
 			 */
 	gnutls_datum	rdn_sequence;
-} X509PKI_CREDENTIALS_INT;
+} CERTIFICATE_CREDENTIALS_INT;
 
-/* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
-#define GNUTLS_X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
+/* typedef CERTIFICATE_CREDENTIALS_INT * CERTIFICATE_CREDENTIALS; */
+#define GNUTLS_CERTIFICATE_CREDENTIALS CERTIFICATE_CREDENTIALS_INT*
 
-typedef struct X509PKI_AUTH_INFO_INT {
+typedef struct CERTIFICATE_AUTH_INFO_INT {
 	int		  certificate_requested; /* if the peer requested certificate
 						  * this is non zero;
 						  */
@@ -47,11 +51,11 @@ typedef struct X509PKI_AUTH_INFO_INT {
 					         * peer.
 					         */
 	int 		  ncerts; /* holds the size of the list above */
-} *X509PKI_AUTH_INFO;
+} *CERTIFICATE_AUTH_INFO;
 
-typedef struct X509PKI_AUTH_INFO_INT X509PKI_AUTH_INFO_INT;
+typedef struct CERTIFICATE_AUTH_INFO_INT CERTIFICATE_AUTH_INFO_INT;
 
-int _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
+int _gnutls_copy_x509_client_auth_info( CERTIFICATE_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
 
 /* AUTH X509 functions */
 int _gnutls_gen_x509_server_certificate(GNUTLS_STATE, opaque **);

@@ -26,7 +26,7 @@
 #include "x509_asn1.h"
 #include "x509_der.h"
 #include "gnutls_datum.h"
-#include "auth_x509.h"
+#include "auth_cert.h"
 #include <gnutls_random.h>
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
@@ -146,7 +146,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
  */
 int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 {
-	X509PKI_AUTH_INFO auth = state->gnutls_key->auth_info;
+	CERTIFICATE_AUTH_INFO auth = state->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */
 	MPI params[RSA_PARAMS];
 	int ret;

@@ -26,7 +26,7 @@
 #include "gnutls_num.h"
 #include "gnutls_sig.h"
 #include <gnutls_datum.h>
-#include <auth_x509.h>
+#include <auth_cert.h>
 
 static int gen_dhe_server_kx(GNUTLS_STATE, opaque **);
 static int gen_dhe_client_kx(GNUTLS_STATE, opaque **);
@@ -88,7 +88,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 	gnutls_private_key *apr_pkey;
 	int apr_cert_list_length;
 	gnutls_datum signature, ddata;
-	X509PKI_AUTH_INFO info;
+	CERTIFICATE_AUTH_INFO info;
 
 	bits = _gnutls_dh_get_bits( state);
 
@@ -107,7 +107,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_X509PKI, sizeof( X509PKI_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_CERTIFICATE, sizeof( CERTIFICATE_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -255,7 +255,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 	int i, sigsize;
 	gnutls_datum vparams, signature;
 	int ret;
-	X509PKI_AUTH_INFO info = _gnutls_get_auth_info( state);
+	CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
 	gnutls_cert peer_cert;
 
 	if (info == NULL || info->ncerts==0) {

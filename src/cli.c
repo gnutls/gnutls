@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 	int user_term = 0;
 	GNUTLS_SRP_CLIENT_CREDENTIALS cred;
 	GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
-	GNUTLS_X509PKI_CLIENT_CREDENTIALS xcred;
+	GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
 	struct hostent* server_host;
 	
 	signal( SIGPIPE, SIG_IGN);
@@ -179,9 +179,9 @@ int main(int argc, char** argv)
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 
-	gnutls_cred_set( state, GNUTLS_ANON, anon_cred);
-	gnutls_cred_set( state, GNUTLS_SRP, cred);
-	gnutls_cred_set( state, GNUTLS_X509PKI, xcred);
+	gnutls_cred_set( state, GNUTLS_CRD_ANON, anon_cred);
+	gnutls_cred_set( state, GNUTLS_CRD_SRP, cred);
+	gnutls_cred_set( state, GNUTLS_CRD_CERTIFICATE, xcred);
 
 
 	/* use the max record size extension */
@@ -244,9 +244,9 @@ int main(int argc, char** argv)
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 
-	gnutls_cred_set( state, GNUTLS_ANON, NULL);
-	gnutls_cred_set( state, GNUTLS_SRP, cred);
-	gnutls_cred_set( state, GNUTLS_X509PKI, xcred);
+	gnutls_cred_set( state, GNUTLS_CRD_ANON, NULL);
+	gnutls_cred_set( state, GNUTLS_CRD_SRP, cred);
+	gnutls_cred_set( state, GNUTLS_CRD_CERTIFICATE, xcred);
 
 #ifdef RESUME
 	gnutls_session_set_data( state, session, session_size);

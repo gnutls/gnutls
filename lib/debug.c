@@ -190,7 +190,7 @@ static char str[512];
 		case GNUTLS_SERVER_HELLO:
 			strcpy(str, "SERVER HELLO");
 			break;
-		case GNUTLS_CERTIFICATE:
+		case GNUTLS_CERTIFICATE_PKT:
 			strcpy(str, "CERTIFICATE");
 			break;
 		case GNUTLS_SERVER_KEY_EXCHANGE:
