@@ -305,6 +305,9 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	return GNUTLS_CERT_TRUSTED;
 }
 
+/* This function verifies a X.509 certificate list. The certificate list should
+ * lead to a trusted CA in order to be trusted.
+ */
 int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
     int clist_size, gnutls_cert * trusted_cas, int tcas_size, void *CRLs,
 			      int crls_size)
@@ -317,25 +320,37 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 		return ret;
 	}
 
+	/* Verify the certificate path */
 	for (i = 0; i < clist_size; i++) {
 		if (i + 1 >= clist_size)
 			break;
 
 		if ((ret = gnutls_verify_certificate2(&certificate_list[i], &certificate_list[i + 1], 1, NULL, 0)) != GNUTLS_CERT_TRUSTED) {
-			/* we do that because expired means that
-			 * it was verified but it was also expired.
+			 /*
+			 * We only accept the given certificate to be
+			 * expired. If any of the certificates in the
+			 * certificate list is expired then the certificate
+			 * is not trusted.
 			 */
-			if (ret == GNUTLS_CERT_EXPIRED)
-				expired = 1;
-			else
-				return ret;
+			if (ret == GNUTLS_CERT_EXPIRED) {
+				if (i==0) expired = 1;
+				else return GNUTLS_CERT_NOT_TRUSTED;
+			} else
+				return GNUTLS_CERT_NOT_TRUSTED;
 		}
 	}
 
+	/* Now verify the last certificate in the certificate path
+	 * against the trusted CA certificate list.
+	 */
 	ret = gnutls_verify_certificate2(&certificate_list[i], trusted_cas, tcas_size, CRLs, crls_size);
 	
 	if (ret==GNUTLS_CERT_EXPIRED) {
-		expired = 1;
+		/* if the last certificate in the certificate
+		 * list is expired, then the certificate is not
+		 * trusted.
+		 */
+		return GNUTLS_CERT_NOT_TRUSTED;
 	} else
 		if (ret != GNUTLS_CERT_TRUSTED)
 			return ret;
