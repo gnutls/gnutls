@@ -1,4 +1,4 @@
-gnutls1
+GNUTLS_1_0
 {
   global: _gnutls*; gnutls*; _E_*;
   local: *;
