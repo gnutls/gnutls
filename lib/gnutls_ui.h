@@ -98,6 +98,8 @@ int gnutls_x509_extract_key_pk_algorithm( const gnutls_datum * key);
 
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length);
 
+int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
+                                const char *hostname);
 
 /* get data from the session */
 const gnutls_datum* gnutls_certificate_get_peers( gnutls_session, int* list_size);

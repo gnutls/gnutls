@@ -10,6 +10,8 @@ Version 0.5.9
 - Added gnutls_set_default_priority() and gnutls_set_default_export_priority()
   functions, to avoid calling all the *_priority() functions if the defaults
   are acceptable.
+- Added int gnutls_x509_check_certificates_hostname() which check whether
+  the given hostname matches the owner of the given X.509 certificate.
 
 Version 0.5.8 (25/09/2002)
 - Updated documentation.
