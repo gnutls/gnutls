@@ -125,7 +125,7 @@ int _gnutls_verify_x509_mem( const char *ca, int ca_size)
 
 		if ((ret =
 		     _gnutls_x509_cert2gnutls_cert(&x509_ca_list[i - 1],
-					     tmp)) < 0) {
+					     tmp, 0)) < 0) {
 			gnutls_assert();
 			gnutls_free(b64);
 			return ret;
