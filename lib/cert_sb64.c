@@ -168,8 +168,8 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 		if (tmp == -1)
 			return -1;
 		memcpy(&(*result)[j], tmpres, tmp);
+		(*result)[j+tmp] = 0;
 	}
-	(*result)[ret] = 0;	/* null terminated */
 
 	return ret;
 }
