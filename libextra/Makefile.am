@@ -2,7 +2,7 @@ INCLUDES = -I../lib
 include_HEADERS = gnutls-extra.h
 
 EXTRA_DIST = ext_srp.h crypt_bcrypt.h crypt_srpsha1.h gnutls_srp.h \
-	auth_srp.h auth_srp_passwd.h crypt.h gnutls_openpgp.h 
+	auth_srp.h auth_srp_passwd.h crypt.h gnutls_openpgp.h \
 	gnutls-extra-api.tex gnutls_extra.h
 
 lib_LTLIBRARIES = libgnutls-extra.la

@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <gnutls.h>
-#include <gnutls-extra.h>
+#include "../lib/gnutls.h"
+#include "../libextra/gnutls-extra.h"
 #include <time.h>
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)

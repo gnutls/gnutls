@@ -28,7 +28,7 @@ see http://www.gnu.org/philosophy/why-not-lgpl.html.
 
 The GNU Lesser GPL license applies to the main gnutls library, while the
 gnutls-extra library is under the GPL. The gnutls-extra library contains
-the "SRP authentication" source code, and code for the "Openpgp certificate"
+the "SRP authentication" source code, and code for the "Openpgp key"
 support. The gnutls library is located in the lib/ directory, while the 
 gnutls-extra library is at libextra/.
 

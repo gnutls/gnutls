@@ -28,7 +28,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "../lib/gnutls.h"
-#include "../lib/gnutls-extra.h"
+#include "../libextra/gnutls-extra.h"
 #include "common.h"
 #include <signal.h>
 #include "serv-gaa.h"
