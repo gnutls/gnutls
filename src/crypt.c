@@ -96,14 +96,14 @@ static const unsigned char srp_params_1536[] = {
  0x4B, 0x53, 0xDD, 0x9D, 0xA1, 0x15, 0x8B, 0xFD, 0x3E,
  0x2B, 0x9C, 0x8C, 0xF5, 0x6E, 0xDF, 0x01, 0x95, 0x39,
  0x34, 0x96, 0x27, 0xDB, 0x2F, 0xD5, 0x3D, 0x24, 0xB7,
- 0xC4, 0x86, 0x65, 0x77, 0x2E, 0x43, 0x6C, 0x7F, 0x8C,
- 0xE4, 0x42, 0x73, 0x4A, 0xF7, 0xCC, 0xB7, 0xAE, 0x83,
- 0x7C, 0x26, 0x4A, 0xE3, 0xA9, 0xBE, 0xB8, 0x7F, 0x8A,
- 0x2F, 0xE9, 0xB8, 0xB5, 0x29, 0x2E, 0x5A, 0x02, 0x1F,
- 0xFF, 0x5E, 0x91, 0x47, 0x9E, 0x8C, 0xE7, 0xA2, 0x8C,
- 0x24, 0x42, 0xC6, 0xF3, 0x15, 0x18, 0x0F, 0x93, 0x49, 
- 0x9A, 0x23, 0x4D, 0xCF, 0x76, 0xE3, 0xFE, 0xD1, 0x35,
- 0xF9, 0xBB
+ 0xC4, 0x86, 0x65, 0x77, 0x2E, 0x43, 0x7D, 0x6C, 0x7F, 
+ 0x8C, 0xE4, 0x42, 0x73, 0x4A, 0xF7, 0xCC, 0xB7, 0xAE, 
+ 0x83, 0x7C, 0x26, 0x4A, 0xE3, 0xA9, 0xBE, 0xB8, 0x7F, 
+ 0x8A, 0x2F, 0xE9, 0xB8, 0xB5, 0x29, 0x2E, 0x5A, 0x02, 
+ 0x1F, 0xFF, 0x5E, 0x91, 0x47, 0x9E, 0x8C, 0xE7, 0xA2, 
+ 0x8C, 0x24, 0x42, 0xC6, 0xF3, 0x15, 0x18, 0x0F, 0x93, 
+ 0x49, 0x9A, 0x23, 0x4D, 0xCF, 0x76, 0xE3, 0xFE, 0xD1, 
+ 0x35, 0xF9, 0xBB
 };
 
 static const unsigned char srp_params_2048[] = {
@@ -140,7 +140,7 @@ static const unsigned char srp_params_2048[] = {
 
 static void print_num( const char* msg, const gnutls_datum * num)
 {
-int i;
+unsigned int i;
 
 	printf( "%s:\t", msg);
 
@@ -153,11 +153,11 @@ int i;
 
 }
 
-int generate_create_conf(char *tpasswd_conf, int bits)
+int generate_create_conf(char *tpasswd_conf)
 {
 	FILE *fd;
 	char line[5 * 1024];
-	int index = 1, ret;
+	int index = 1;
 	gnutls_datum g, n;
 	gnutls_datum str_g, str_n;
 
@@ -167,46 +167,46 @@ int generate_create_conf(char *tpasswd_conf, int bits)
 		return -1;
 	}
 
-	g.data = &srp_generator;
-	g.size = 1;
+	for (index = 1; index <= 3; index++) {
+
+		g.data = (void*) &srp_generator;
+		g.size = 1;
 	
-	if (bits <= 1024) {
-		n.data = srp_params_1024;
-		n.size = sizeof(srp_params_1024);
-	} else if (bits < 2048) {
-		n.data = srp_params_1536;
-		n.size = sizeof(srp_params_1536);
-	} else {
-		n.data = srp_params_2048;
-		n.size = sizeof(srp_params_2048);
-	}
+		if (index == 1) {
+			n.data = (void*) srp_params_1024;
+			n.size = sizeof(srp_params_1024);
+		} else if (index==2) {
+			n.data = (void*) srp_params_1536;
+			n.size = sizeof(srp_params_1536);
+		} else {
+			n.data = (void*) srp_params_2048;
+			n.size = sizeof(srp_params_2048);
+		}
 
-	print_num("Generator", &g);
-	print_num("Prime", &n);
-#if 0
-	if ((ret=gnutls_dh_params_generate( &n, &g, bits)) < 0) {
-		fprintf(stderr, "Could not generate primes: %s\n", gnutls_strerror(ret));
-		return -1;
-	}
-#endif
+		print_num("Generator", &g);
+		print_num("Prime", &n);
 
-	if (gnutls_srp_base64_encode_alloc( &n, &str_n) < 0) {
-		fprintf(stderr, "Could not encode\n");
-		return -1;
-	}
+		if (gnutls_srp_base64_encode_alloc( &n, &str_n) < 0) {
+			fprintf(stderr, "Could not encode\n");
+			return -1;
+		}
 
-	if (gnutls_srp_base64_encode_alloc( &g, &str_g) < 0) {
-		fprintf(stderr, "Could not encode\n");
-		return -1;
-	}
-	sprintf(line, "%d:%s:%s\n", index, str_n.data, str_g.data);
+		if (gnutls_srp_base64_encode_alloc( &g, &str_g) < 0) {
+			fprintf(stderr, "Could not encode\n");
+			return -1;
+		}
 	
-	gnutls_free( str_n.data);
-	gnutls_free( str_g.data);
+		sprintf(line, "%d:%s:%s\n", index, str_n.data, str_g.data);
+	
+		gnutls_free( str_n.data);
+		gnutls_free( str_g.data);
 
-	fwrite(line, 1, strlen(line), fd);
+		fwrite(line, 1, strlen(line), fd);
+
+	}
 
 	fclose(fd);
+	
 	return 0;
 
 }
@@ -441,7 +441,7 @@ int main(int argc, char **argv)
 	salt = info.salt;
 
 	if (info.create_conf != NULL) {
-		return generate_create_conf(info.create_conf, info.bits);
+		return generate_create_conf(info.create_conf);
 	}
 
 	if (info.passwd == NULL)
