@@ -366,8 +366,9 @@ int gnutls_dh_params_export_raw(gnutls_dh_params params,
 int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params);
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params);
 int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params, 
-	gnutls_datum m, gnutls_datum e,
-	gnutls_datum d, gnutls_datum p, gnutls_datum q, gnutls_datum u);
+	const gnutls_datum *m, const gnutls_datum *e,
+	const gnutls_datum *d, const gnutls_datum *p, 
+	const gnutls_datum *q, const gnutls_datum *u);
 int gnutls_rsa_params_generate2(gnutls_rsa_params params, int bits);
 int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
 	gnutls_datum * m, gnutls_datum *e,
@@ -400,7 +401,9 @@ void* gnutls_session_get_ptr(gnutls_session session);
 
 void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status);
 
-/* fingerprint */
+/* fingerprint 
+ * Actually this function returns the hash of the given data.
+ */
 int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
 	unsigned char* result, int* result_size);
 
