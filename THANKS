@@ -1,4 +1,5 @@
 GNU TLS THANKS -- Acknowledgements.
+Copyright (C) 2005  Free Software Foundation
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
@@ -34,6 +35,7 @@ Aleix Conchillo Flaque          <aleix@member.fsf.org>
 Martijn Koster                  <mak@greenhills.co.uk>
 Marcin Garski                   <mgarski@post.pl>
 Martijn Koster                  <m.koster@greenhills.co.uk>
+Martin Lambers                  <marlam@web.de>
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
