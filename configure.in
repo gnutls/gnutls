@@ -278,7 +278,7 @@ AC_ARG_ENABLE( openpgp-authentication, [  --disable-openpgp-authentication disab
 if test x$ac_enable_openpgp != xno; then
  AC_MSG_RESULT(no)
  AM_PATH_LIBOPENCDK( 0.5.2, AC_DEFINE(HAVE_LIBOPENCDK, 1, [have libopencdk]),
- AC_MSG_ERROR([[
+ AC_MSG_WARN([[
 ***
 *** libopencdk 0.5.2 was not found. You may want to get it from
 *** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
