@@ -107,6 +107,11 @@ int gnutls_certificate_allocate_cred( gnutls_certificate_credentials *sc)
 	return gnutls_certificate_allocate_credentials( sc);
 }
 
+#undef gnutls_handshake_get_direction
+int gnutls_handshake_get_direction(gnutls_session session) {
+	return gnutls_record_get_direction( session);
+}
+
 /* nothing here */
 
 #endif /* GNUTLS_BACKWARDS_COMPATIBLE */

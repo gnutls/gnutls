@@ -133,7 +133,7 @@ int gnutls_bye( gnutls_session session, gnutls_close_request how);
 int gnutls_handshake( gnutls_session session);
 int gnutls_rehandshake( gnutls_session session);
 
-int gnutls_handshake_get_direction(gnutls_session session);
+int gnutls_record_get_direction(gnutls_session session);
 
 gnutls_alert_description gnutls_alert_get( gnutls_session session);
 int 		 gnutls_alert_send( gnutls_session, gnutls_alert_level, gnutls_alert_description);

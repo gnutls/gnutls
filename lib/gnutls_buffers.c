@@ -205,6 +205,8 @@ static ssize_t _gnutls_read( gnutls_session session, void *iptr, size_t sizeOfPt
 #ifdef READ_DEBUG
 	int j,x, sum=0;
 #endif
+	session->internals.direction = 0;
+
 	gnutls_transport_ptr fd = session->internals.transport_recv_ptr;
 
 	left = sizeOfPtr;
@@ -523,7 +525,11 @@ ssize_t _gnutls_io_write_buffered( gnutls_session session, const void *iptr, siz
 	const opaque * ptr;
 	int ret;
 	gnutls_transport_ptr fd = session->internals.transport_send_ptr;
-	
+
+	/* to know where the procedure was interrupted.
+	 */
+	session->internals.direction = 1;
+
 	ptr = iptr;
 
 	/* In case the previous write was interrupted, check if the

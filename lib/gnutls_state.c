@@ -740,3 +740,20 @@ void gnutls_session_set_ptr(gnutls_session session, void* ptr)
 {
 	session->internals.user_ptr = ptr;
 }
+
+
+/**
+  * gnutls_record_get_direction - This function will return the direction of the last interrupted function call
+  * @session: is a a &gnutls_session structure.
+  *
+  * This function provides information about the internals of the record
+  * protocol and is only useful if any gnutls function call was 
+  * interrupted for some reason.
+  *
+  * Returns 0 if the function was interrupted while receiving data, and 
+  * 1 otherwise. 
+  *
+  **/
+int gnutls_record_get_direction(gnutls_session session) {
+	return session->internals.direction;
+}

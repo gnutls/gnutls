@@ -719,10 +719,6 @@ int _gnutls_send_handshake(gnutls_session session, void *i_data,
 	uint32 datasize;
 	int pos = 0;
 
-	/* to know where the procedure was interrupted.
-	 */
-	session->internals.handshake_direction = 1; /* write */
-
 	if (i_data == NULL && i_datasize == 0) {
 		/* we are resuming a previously interrupted
 		 * send.
@@ -965,10 +961,6 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 	uint32 length32 = 0;
 	opaque *dataptr = NULL;
 	HandshakeType recv_type;
-
-	/* to know where the procedure was interrupted.
-	 */
-	session->internals.handshake_direction = 0; /* read */
 
 	ret = _gnutls_recv_handshake_header(session, type, &recv_type);
 	if (ret < 0) {
@@ -1769,22 +1761,6 @@ int gnutls_rehandshake(gnutls_session session)
 	return 0;
 }
 
-/**
-  * gnutls_handshake_get_direction - This function will return the session of the handshake protocol
-  * @session: is a a &gnutls_session structure.
-  *
-  * This function provides information about the handshake procedure, and
-  * is only useful if the gnutls_handshake() call was interrupted for some
-  * reason.
-  *
-  * Returns 0 if the function was interrupted while receiving data, and 
-  * 1 otherwise. 
-  *
-  **/
-int gnutls_handshake_get_direction(gnutls_session session) {
-	return session->internals.handshake_direction;
-}
-
 static int _gnutls_abort_handshake( gnutls_session session, int ret) {
 	if ( ((ret==GNUTLS_E_WARNING_ALERT_RECEIVED) && 
 		( gnutls_alert_get(session) == GNUTLS_A_NO_RENEGOTIATION))
@@ -2027,10 +2003,6 @@ static int _gnutls_send_handshake_final(gnutls_session session, int init)
 {
 	int ret = 0;
 
-	/* to know where the procedure was interrupted.
-	 */
-	session->internals.handshake_direction = 1; /* write */
-
 	/* Send the CHANGE CIPHER SPEC PACKET */
 
 	switch (STATE) {
@@ -2086,10 +2058,6 @@ static int _gnutls_recv_handshake_final(gnutls_session session, int init)
 {
 	int ret = 0;
 	uint8 ch;
-
-	/* to know where the procedure was interrupted.
-	 */
-	session->internals.handshake_direction = 0; /* recv */
 
 	switch (STATE) {
 	case STATE0:

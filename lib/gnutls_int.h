@@ -552,10 +552,10 @@ typedef struct {
 						* which have 0xFF status.
 						*/
 	
-	/* Holds 0 if the handshake procedure was interrupted while
+	/* Holds 0 if the last called function was interrupted while
 	 * receiving, and non zero otherwise.
 	 */
-	int			handshake_direction;
+	int			direction;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
