@@ -64,7 +64,7 @@ static const int ASN_TAGS[][3] = {
   {0x04, DER_BIT_STRING},
   {0x05, DER_NULL},
   {0x06, DER_OBJECT_ID},
-  (0x07, DER_OBJECT_DESC),
+  {0x07, DER_OBJECT_DESC},
   {0x13, DER_STRING},
   {0x16, DER_STRING},
   {0x17, DER_UTC_TIME},
