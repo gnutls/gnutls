@@ -896,22 +896,22 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
-  * This function has the similar semantics to write(). The only
+  * This function has the similar semantics with recv(). The only
   * difference is that is accepts a GNUTLS session, and uses different
   * error codes.
   *
-  * If the EINTR is returned by the internal push function (write())
+  * If the EINTR is returned by the internal push function (the default is recv())
   * then GNUTLS_E_INTERRUPTED will be returned. If GNUTLS_E_INTERRUPTED or
   * GNUTLS_E_AGAIN is returned, you must call this function again, with the
-  * same parameters; cf. gnutls_record_get_direction(). Otherwise the write
-  * operation will be corrupted and the connection will be terminated.
-  *
-  * This function may accept a NULL pointer for data, and 0 for size, if
-  * and only if the previous send was interrupted for some reason.
+  * same parameters; cf. gnutls_record_get_direction(). Alternatively
+  * you could provide a NULL pointer for data, and 0 for size. 
+  * Otherwise the write operation will be corrupted and the connection 
+  * will be terminated.
   *
   * Returns the number of bytes sent, or a negative error code. The number
   * of bytes sent might be less than @sizeofdata. The maximum number of bytes
-  * this function can send in a single call depends on the maximum record size.
+  * this function can send in a single call depends on the negotiated
+  * maximum record size.
   *
   **/
 ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t sizeofdata) 
@@ -925,14 +925,16 @@ ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t siz
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
-  * This function has the similar semantics to read(). The only
+  * This function has the similar semantics to send(). The only
   * difference is that is accepts a GNUTLS session.
-  * Also returns the number of bytes received, zero on EOF, but
-  * a negative error code in case of an error.
   *
-  * If this function returns GNUTLS_E_REHANDSHAKE, then you may
-  * ignore this message, send an alert containing NO_RENEGOTIATION, 
-  * or perform a handshake again. (only a client may receive this message)
+  * If the server requests a renegotiation the client may receive
+  * and error code of GNUTLS_E_REHANDSHAKE. This message may be
+  * simply ignored, replied with an alert containing NO_RENEGOTIATION, 
+  * or replied with a new handshake. 
+  *
+  * Returns the number of bytes received and zero on EOF.
+  * A negative error code is returned in case of an error.
   *
   **/
 ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdata) 
