@@ -12,7 +12,7 @@ See the end for copying conditions.
 - Assume C89 or better; removed checks for size_t, ptrdiff_t and time_t.
 - Man pages for API functions are included.
 
-* Version 1.1.17 (18/08/2004)
+* Version 1.1.17 (2004-08-18)
 - Bug fix of padding string in RSA PKCS#1 v1.5 type 2 encryption,
   reported by Robey Pointer <robey@danger.com>.
 - Generic crypto interface for secret key ciphers, hashes and randomness added.
@@ -20,26 +20,26 @@ See the end for copying conditions.
 - Removed length limit on passwords read by 'certtool'.
 - Documentation fixes.
 
-* Version 1.1.16 (15/08/2004)
+* Version 1.1.16 (2004-08-15)
 - Fix missing gnulib linker parameter when building certtool.
 - Add gnulib module 'progname', needed by module 'error'.
 - Improve building with srcdir != objdir.
 
-* Version 1.1.15 (15/08/2004)
+* Version 1.1.15 (2004-08-15)
 - Certtool has simplistic --smime-to-p7 to translate RFC 2633 messages into
   PKCS #7 format.
 - Ported to Mac OS X / Darwin.
 - Ported to FreeBSD.
 
-* Version 1.1.14 (09/08/2004)
+* Version 1.1.14 (2004-08-09)
 - Documentation converted to Texinfo format.
 - Bug fix of test suite.
 - Configure now print build information, used by Autobuild.
 
-* Version 1.1.13 (05/08/2004)
+* Version 1.1.13 (2004-08-05)
 - Added simple self test suite.
 
-* Version 1.1.12 (02/08/2004)
+* Version 1.1.12 (2004-08-02)
 - Updated the SRP authentication to conform to the
   latest (yet unreleased) draft. Unfortunately this breaks
   compatibility with previous versions.
@@ -51,7 +51,7 @@ See the end for copying conditions.
   Issue pointed out by Patrik Hornik <patrik@hornik.sk>.
 - Added gnutls_certificate_verify_peers2().
 
-* Version 1.1.11 (16/07/2004)
+* Version 1.1.11 (2004-07-16)
 - Added the '_t' suffix to all exported symbols.
 - Fixed bug in RSA encryption, report and patch by Martijn Koster 
   <mak@greenhills.co.uk>.
@@ -65,7 +65,7 @@ See the end for copying conditions.
   callback if they are the static ones defined in extra.h
 - Eliminated some memory leaks. Reported by Yoann Vandoorselaere.
 
-* Version 1.1.10 (12/06/2004)
+* Version 1.1.10 (2004-06-12)
 - Added gnutls_sign_algorithm_get_name() and gnutls_pk_algorithm_get_name()
 - Corrected bug in TLS renegotiation.
 - Corrected bug in OpenPGP key loading using a callback.
@@ -92,13 +92,13 @@ See the end for copying conditions.
 - Some fixes in the session resuming code.
 - Added gnutls_openpgp_keyring_check_id().
 
-* Version 1.1.9 (14/04/2004)
+* Version 1.1.9 (2004-04-14)
 - Added support for authority key identifier and the extended key usage
   X.509 extension fields. The certtoool was updated to support them.
 - The RC2 cipher is no more included. The one in libgcrypt is now used.
 - Added batch support to certtool. Now it can use templates.
 
-* Version 1.1.8 (07/04/2004)
+* Version 1.1.8 (2004-04-07)
 - Implemented all the tests for the SRP group parameters in
   client side. This may lead to incompatibility with very
   old gnutls servers.
@@ -106,7 +106,7 @@ See the end for copying conditions.
   unexpected crashes.
 - Optimized the copying of rsa_params.
 
-* Version 1.1.7 (29/03/2004)
+* Version 1.1.7 (2004-03-29)
 - Added gnutls_certificate_set_params_function() and 
   gnutls_anon_set_params_function() that set the RSA or DH
   parameters using a callback.
@@ -117,14 +117,14 @@ See the end for copying conditions.
 - Deprecated: gnutls_srp_server_set_select_function(), 
   gnutls_certificate_client_set_select_function(), gnutls_srp_server_set_select_function().
 
-* Version 1.1.6 (24/02/2004)
+* Version 1.1.6 (2004-02-24)
 - Several bug fixes, by Arne Thomassen.
 - Fixed a bug where 'server name' extension was always sent.
 
-* Version 1.1.5 (06/01/2004)
+* Version 1.1.5 (2004-01-06)
 - Added the gnutls_sign_algorithm type.
 
-* Version 1.1.4 (04/01/2004)
+* Version 1.1.4 (2004-01-04)
 - Improved gnutls-cli's SRP behaviour in SRP ciphersuites.
   If they are of highest priority then the abbreviated handshake
   is used.
@@ -134,15 +134,15 @@ See the end for copying conditions.
   is to send the maximum version we support.
 - Corrected problem printing the DC attributes in a DN.
 
-* Version 1.1.3 (30/12/2003)
+* Version 1.1.3 (2003-12-30)
 - Implemented TLS 1.1 (and also obsoleted the TLS 1.0 CBC protection
   hack).
 
-* Version 1.1.2 (28/12/2003)
+* Version 1.1.2 (2003-12-28)
 - Added CRL verification functionality to certtool.
 - Corrected the CRL distribution point extension handling.
 
-* Version 1.1.1 (26/12/2003)
+* Version 1.1.1 (2003-12-26)
 - Added PKCS #7 support to certtool utility.
 - Added support for reading and generating CRL distribution
   points extensions in certificates.
@@ -150,7 +150,7 @@ See the end for copying conditions.
   certtool utility.
 - Added support for the Subject Key ID PKIX extension.
 
-* Version 1.1.0 (21/12/2003)
+* Version 1.1.0 (2003-12-21)
 - The error codes GNUTLS_E_NO_TEMPORARY_DH_PARAMS and GNUTLS_E_NO_TEMPORARY_RSA_PARAMS
   are no longer returned by the handshake function. Ciphersuites that
   require temporary parameters are removed when such parameters do not exist.
@@ -163,20 +163,20 @@ See the end for copying conditions.
   certificate's key usage.
 - Added gnutls_openpgp_key_get_key_usage().
 
-* Version 1.0.1 (10/12/2003)
+* Version 1.0.1 (2003-12-10)
 - Some minor fixes in the makefiles. They now include CFLAGS
   from libgcrypt or opencdk if installed in a non standard directory.
 - Fixed the SRP detection test in gnutls-cli-debug.
 - Added gnutls_rsa_params_export_pkcs1() and gnutls_rsa_params_import_pkcs1().
 
-* Version 1.0.0 (04/12/2003)
+* Version 1.0.0 (2003-12-04)
 - Exported the static SRP group parameters.
 - Some fixes in the certificate authenticated SRP ciphersuites.
 - Improved the support for draft-ietf-tls-srp-05. The two-phase
   handshake is now fully supported without any interaction with
   the application layer (except for a callback).
 
-* Version 0.9.99 (28/11/2003)
+* Version 0.9.99 (2003-11-28)
 - Some fixes in the gnutls.h header for the gnutls_server_name_set()
   and gnutls_server_name_get() prototypes.
 - Exported the gnutls_x509_privkey_sign_data(), gnutls_x509_privkey_verify_data() 
@@ -184,7 +184,7 @@ See the end for copying conditions.
 - Some fixes in the openpgp authentication.
 - Removed the Twofish cipher.
 
-* Version 0.9.98 (16/11/2003)
+* Version 0.9.98 (2003-11-16)
 - The openssl compatibility layer was moved to gnutls-openssl
   library instead of being included in the gnutls-extra library.
 - Added the RIPEMD ciphersuites defined in draft-ietf-tls-openpgp-keys-04.
@@ -197,7 +197,7 @@ See the end for copying conditions.
 - Added gnutls_x509_*_get_dn_oid() and gnutls_x509_crt_get_extension_oid()
   functions which return the available OIDs.
 
-* Version 0.9.97 (11/11/2003)
+* Version 0.9.97 (2003-11-11)
 - The certtool utility can now generate PKCS #12 structures
   without specifying a certificate.
 - Added capability to read CRLs to certtool.
@@ -205,39 +205,39 @@ See the end for copying conditions.
   to properly set the required buffer size.
 - Corrected a bug in libgcrypt detection.
 
-* Version 0.9.96 (09/11/2003)
+* Version 0.9.96 (2003-11-09)
 - Some changes to allow compilation with mingw32.
 - Several code cleanups.
 
-* Version 0.9.95 (02/11/2003)
+* Version 0.9.95 (2003-11-02)
 - Improved the verification functions. Added new verification
   output flags and removed the unused and redundant ones.
 - Improved the OpenPGP key support.
 - The prime utility was removed, and its functionality was moved
   to certtool.
 
-* Version 0.9.94 (30/10/2003)
+* Version 0.9.94 (2003-10-30)
 - Added manpages for the included programs.
 - Documented and improved the certtool utility. 
 - Added PKCS #12 support to certtool utility.
 
-* Version 0.9.93 (26/10/2003)
+* Version 0.9.93 (2003-10-26)
 - Corrected some compilation issues.
 - Improved the certtool command line utility.
 
-* Version 0.9.92 (25/10/2003)
+* Version 0.9.92 (2003-10-25)
 - The RFC2818 hostname verification is now case insensitive.
 - Added support for generating X.509 certificates.
 - Added the certtool, a tool for generating X.509 certificates
 
-* Version 0.9.91 (17/10/2003)
+* Version 0.9.91 (2003-10-17)
 - Fixed a compilation issue in the openpgp authentication part.
 
-* Version 0.9.90 (08/10/2003)
+* Version 0.9.90 (2003-10-08)
 - Updated the openpgp key API (depends on the unreleased new
   opencdk).
 
-* Version 0.9.8 (02/10/2003)
+* Version 0.9.8 (2003-10-02)
 - Updated the SRP implementation to follow the latest draft
   (draft-ietf-tls-srp-05).
 - Improved the gnutls-cli behaviour in error handling,
@@ -245,7 +245,7 @@ See the end for copying conditions.
 - Use versioned symbols in the library (where available).
 - RIJNDAEL ciphersuites were renamed to AES.
 
-* Version 0.9.7 (25/08/2003)
+* Version 0.9.7 (2003-08-25)
 - The tex files are now included in the distribution.
 - The library can now decrypt PKCS #12 files encrypted with
   the RC2-40 cipher.
@@ -254,7 +254,7 @@ See the end for copying conditions.
   Arne Thomassen <arne@arne-thomassen.de>.
 - CR is now allowed in the base64 decoder.
 
-* Version 0.9.6 (28/06/2003)
+* Version 0.9.6 (2003-06-28)
 - Added gnutls_x509_privkey_get_key_id() and gnutls_x509_crt_get_key_id()
   functions which return a unique (per public key) ID. These can
   be used to check if the private key corresponds to a given certificate.
@@ -269,18 +269,18 @@ See the end for copying conditions.
   in gnutls/pkcs12.h.
 - The gnutls_transport_ptr type was changed to a pointer type (void*).
 
-* Version 0.9.5 (06/04/2003)
+* Version 0.9.5 (2003-04-06)
 - Several improvements in the PKCS #7 handling
 - Eliminated several hard coded constants in MPI parameters.
 
-* Version 0.9.4 (28/03/2003)
+* Version 0.9.4 (2003-03-28)
 - Corrected a parsing error in the Certificate request message.
 - Corrected behaviour when a certificate request message is received.
   Now a certificate packet is always sent, and in SSL 3.0 cipher suites
   a no_certificate alert is sent instead.
 - Added functionality to generate PKCS #7 structures (with certificates).
 
-* Version 0.9.3 (24/03/2003)
+* Version 0.9.3 (2003-03-24)
 - Support for MD2 was dropped. 
 - Improved the error logging functions, by adding a level, and
   by allowing debugging messages just by increasing the level.
@@ -300,12 +300,12 @@ See the end for copying conditions.
 - Added support for encoding and decoding PKCS #8 2.0 encrypted 
   RSA private keys.
 
-* Version 0.9.2 (15/03/2003)
+* Version 0.9.2 (2003-03-15)
 - Some corrections in the memory mapping code (file is unmapped after 
   it is read).
 - Added support for PKCS#10 certificate requests generation.
 
-* Version 0.9.1 (12/03/2003)
+* Version 0.9.1 (2003-03-12)
 - Corrected a bug in 64 bit architectures, which affected the
   serial number calculation in the record layer.
 - Added gnutls_certificate_free_keys() which deletes all the
@@ -322,7 +322,7 @@ See the end for copying conditions.
 - Fixed a memory leak in SRP code reported by Rupert Kittinger 
   <r.kittinger@efkon.com>.
 
-* Version 0.9.0 (03/03/2003)
+* Version 0.9.0 (2003-03-03)
 - This version is not binary compatible with the previous ones.
 - The library notifies the application on empty and illegal SRP usernames, 
   so that proper notification (via an alert) is sent to the peer.
@@ -350,13 +350,13 @@ See the end for copying conditions.
   gnutls_x509_extract_dn_string()
 - Ported to libtasn1 0.2.x
 
-* Version 0.8.1 (22/01/2003)
+* Version 0.8.1 (2003-01-22)
 - Improved the SRP support, to prevent attackers guessing the
   available usernames by brute force.
 - Improved the SRP detection in gnutls-cli-debug
 - Some fixes which now allow compilation.
 
-* Version 0.8.0 (20/01/2003)
+* Version 0.8.0 (2003-01-20)
 - Added gnutls_x509_extract_dn_string() which returns a 
   distinguished name in a single string.
 - Added gnutls_openpgp_extract_key_name_string() which returns
@@ -372,7 +372,7 @@ See the end for copying conditions.
   and GNUTLS_E_SRP_PWD_PARSING_ERROR. GNUTLS_E_ASCII_ARMOR_ERROR was also 
   replaced by GNUTLS_E_BASE64_DECODING_ERROR.
 
-* Version 0.6.0 (8/12/2002)
+* Version 0.6.0 (2002-12-08)
 - Added "gnutls/compat4.h" header. This is included in gnutls.h
   to emulate the old 0.4.x API.
 - Example programs are now stored in doc/examples/
@@ -398,7 +398,7 @@ See the end for copying conditions.
   were the gnutls library is used with malloc/realloc/free,
   these are binary compatible.
 
-* Version 0.5.11 (5/11/2002)
+* Version 0.5.11 (2002-11-05)
 - Some fixes in 'gnutls-cli' client program to prevent some segmentation 
   faults at exit.
 - Example programs found in the documentation can now be generated by
@@ -411,14 +411,14 @@ See the end for copying conditions.
   case where the memory buffer provided is not long enough.
 - Depends on the new OpenCDK 0.3.2.
 
-* Version 0.5.10 (13/10/2002)
+* Version 0.5.10 (2002-10-13)
 - Updated documentation.
 - Added server name extension. This allows clients to specify the
   name of the server they connect to. Useful to HTTPS.
 - Several corrections in the code base, mostly in signed/unsigned,
   checkings.
 
-* Version 0.5.9 (10/10/2002)
+* Version 0.5.9 (2002-10-10)
 - Corrected some code which worked fine in gcc 3.2, but not with any
   other compiler.
 - Updated 'gnutls-cli' with the '--starttls' option, to allow testing
@@ -433,14 +433,14 @@ See the end for copying conditions.
 - Added int gnutls_x509_check_certificates_hostname() which check whether
   the given hostname matches the owner of the given X.509 certificate.
 
-* Version 0.5.8 (25/09/2002)
+* Version 0.5.8 (2002-09-25)
 - Updated documentation.
 - Added gnutls_record_get_direction() which replaces the obsolete
   gnutls_handshake_get_direction().
 - Added function to convert error codes to alert descriptions
 - Added LZO compression
 
-* Version 0.5.7 (11/09/2002)
+* Version 0.5.7 (2002-09-11)
 - Some fixes in the memory allocation functions (realloc).
 - Improved the string functions used in XML certificate generation.
 - Removed dependency on libgdbm.
@@ -448,7 +448,7 @@ See the end for copying conditions.
   gnutls_dh_params_deinit().
 - Corrected bug in session resuming code in server side.
 
-* Version 0.5.6 (6/09/2002)
+* Version 0.5.6 (2002-09-06)
 - Corrected bugs in SRP implementation, which prevented gnutls 
   to interoperate with other implementations. (interoperability testing
   was done by David Taylor)
@@ -458,7 +458,7 @@ See the end for copying conditions.
 - Added versioning in the XML output of certificate functions.
 - Removed the X.509 test suite.
 
-* Version 0.5.5 (3/09/2002)
+* Version 0.5.5 (2002-09-03)
 - Updated the SRP implementation to the latest draft. The blowfish
   crypt implementation was removed, since the new draft does not allow
   other hash algorithms except for the srpsha. 
@@ -468,7 +468,7 @@ See the end for copying conditions.
   the certificate and the private key from the same file.
 - Updated and corrected documentation.
 
-* Version 0.5.4 (27/08/2002)
+* Version 0.5.4 (2002-08-27)
 - Fixes in TLS 1.0 PRF and SSL3 random functions.
 - gnutls_handshake_set_exportable_detection() was obsoleted.
 - Added gnutls_openpgp_extract_key_id() which returns the key ID.
@@ -477,11 +477,11 @@ See the end for copying conditions.
   export cipher suites.
 - Added the TLS_RSA_EXPORT_ARCFOUR_40_MD5 ciphersuite.
 
-* Version 0.5.3 (23/08/2002)
+* Version 0.5.3 (2002-08-23)
 - No changes. Replaces the tarball of 0.5.2 which accidentally contained
   code from the unstable branch.
 
-* Version 0.5.2 (22/08/2002)
+* Version 0.5.2 (2002-08-22)
 - Added an error code that is returned in clients which connect
   to export only servers. This must be enabled using the
   gnutls_handshake_set_exportable_detection() function.
@@ -489,7 +489,7 @@ See the end for copying conditions.
 - Added gnutls_handshake_get_direction() function which returns
   the state of the handshake when interrupted.
 
-* Version 0.5.1 (17/07/2002)
+* Version 0.5.1 (2002-07-17)
 - Corrected the m4 macros which used <gnutls.h> instead of
   <gnutls/gnutls.h>
 - Documentation fixes
@@ -504,7 +504,7 @@ See the end for copying conditions.
   be used in these programs, to assist in debuging.
 - Fixes in zlib compression code.
 
-* Version 0.5.0 (6/07/2002)
+* Version 0.5.0 (2002-07-06)
 - Added X.509 certificate tests in tests/ directory
 - Removed stubs for SRP and Anonymous authentication. They served
   no purpose since they are always included, unless it was requested
@@ -522,11 +522,11 @@ See the end for copying conditions.
 - Added an OpenSSL compatible interface (with some limitations).
 - Added functions to convert DER encoded certificates to XML format.
 
-* Version 0.4.4 (24/06/2002)
+* Version 0.4.4 (2002-06-24)
 - Corrected bug in PKCS-1 RSA encryption which prevented gnutls to encrypt
   using keys of some specific size.
 
-* Version 0.4.3 (23/05/2002)
+* Version 0.4.3 (2002-05-23)
 - The gnutls-extra library now compiles fine, if the opencdk library is
   not present.
 - Several bug fixes.
@@ -534,7 +534,7 @@ See the end for copying conditions.
   functions, if other than the defaults are to be used.
 - The default memory allocation functions are now the ones in libc.
 
-* Version 0.4.2 (21/05/2002)
+* Version 0.4.2 (2002-05-21)
 - Separated ASN.1 structures parser documentation and TLS library
   documentation.
 - Added gnutls_handshake_set_rsa_pms() function, which disables the
@@ -548,7 +548,7 @@ See the end for copying conditions.
 - Relicensed the library under the GNU Lesser General Public License
 - Added gnutls-extra library which contains the GPL covered code of gnutls.
 
-* Version 0.4.1 (7/04/2002)
+* Version 0.4.1 (2002-04-07)
 - Now uses alloca() for temporary variables
 - Optimized RSA signing
 - Added functions to return the peer's certificate activation and
@@ -556,7 +556,7 @@ See the end for copying conditions.
 - Corrected time function's behaviour (the time value returned no longer
   relate to local timezone).
 
-* Version 0.4.0 (1/04/2002)
+* Version 0.4.0 (2002-04-01)
 - Added support for RFC2630 (PKCS7) X.509 certificate sets
 - Added new functions: gnutls_x509_extract_certificate_pk_algorithm(),
   gnutls_openpgp_extract_key_pk_algorithm().
@@ -564,14 +564,14 @@ See the end for copying conditions.
 - Several optimizations in RSA algorithm
 - Unified the return values because of small buffers.
 
-* Version 0.3.92 (23/03/2002)
+* Version 0.3.92 (2002-03-23)
 - Updated documentation
 - Combined error codes of ASN.1 parser and gnutls
 - Removed GNUTLS_CERT_TRUSTED from the CertificateStatus enumeration
 - Added protection against CBC chosen plaintext attack (disabled by default)
 - Improved and optimized compression support
 
-* Version 0.3.91 (3/03/2002)
+* Version 0.3.91 (2002-03-03)
 - Added gnutls-cli-debug program
 - Corrections in session resumption
 - Rehandshake can now handle negotiation of different authentication
@@ -579,7 +579,7 @@ See the end for copying conditions.
 - gnutls-cli, gnutls-serv, gnutls-srpcrypt and gnutls-cli-debug are 
   now being installed.
 
-* Version 0.3.90 (24/02/2002)
+* Version 0.3.90 (2002-02-24)
 - Handshake messages are not kept in memory any more. Now we use 
   less memory during a handshake
 - Added support for certificates with DSA parameters
@@ -598,21 +598,21 @@ See the end for copying conditions.
 - gnutls_x509_set_trust_(file/mem) can now be called multiple times
 - gnutls_srp_server_set_cred_file() can now be called multiple times
 
-* Version 0.3.5 (25/01/2002)
+* Version 0.3.5 (2002-01-25)
 - Corrected the RSA key exchange method, to avoid attacks against
   PKCS-1 formating.
 
-* Version 0.3.4 (20/01/2002)
+* Version 0.3.4 (2002-01-20)
 - Corrected bugs in DHE_RSA key exchange method
 
-* Version 0.3.3 (19/01/2002)
+* Version 0.3.3 (2002-01-19)
 - Added gnutls_x509pki_verify_certificate()
 - Added gnutls_x509pki_set_trust_mem() and gnutls_x509pki_set_key_mem()
 - Bug fixes in srpcrypt (based on patch by Marc Huber)
 - Bug fixes in the Handshake protocol (based on patch by Guillaume Morin)
 - Corrected library versioning
 
-* Version 0.3.2 (5/01/2002)
+* Version 0.3.2 (2002-01-05)
 - Corrected bug which did not allow a client to accept multiple CA names
 - Added gnutls_fingerprint()
 - Added gnutls_x509pki_extract_certificate_serial()
@@ -621,15 +621,15 @@ See the end for copying conditions.
 - Updated documentation
 - Prefixed all types in gnutls.h with 'GNUTLS_' to avoid namespace collisions
 
-* Version 0.3.1 (21/12/2001)
+* Version 0.3.1 (2001-12-21)
 - Corrections in the configuration files
 - Fixes a bug in anonymous authentication
 
-* Version 0.3.0 (17/12/2001)
+* Version 0.3.0 (2001-12-17)
 - Corrected bug in new integer formatting (now we use the old format again)
 - Several corrections and usual cleanups
 
-* Version 0.2.91 (10/12/2001)
+* Version 0.2.91 (2001-12-10)
 - Fixes in MPI handling (fixes possible bug with signed integers)
 - Removed name indication extension
 - Added gnutls_transport_get_ptr() and gnutls_db_get_ptr()
@@ -637,7 +637,7 @@ See the end for copying conditions.
 - Fixes in anonymous authentication
 - Corrections in client ciphersuite selection
 
-* Version 0.2.90 (7/12/2001)
+* Version 0.2.90 (2001-12-07)
 - gnutls_handshake(), gnutls_read() etc. functions no longer require
   the 'SOCKET cd' argument. This argument is set using the function
   gnutls_set_transport_ptr().
@@ -649,7 +649,7 @@ See the end for copying conditions.
 - Buffer overflow checking in ASN.1 structures parser
 - Updated documentation
 
-* Version 0.2.11 (16/11/2001)
+* Version 0.2.11 (2001-11-16)
 - Changed the meaning of GNUTLS_E_REHANDSHAKE value. If this value
   is returned, then the caller should perform a handshake or send
   an alert to the peer.
@@ -661,12 +661,12 @@ See the end for copying conditions.
 - Usual bugfixes and cleanups
 - Documentation updated (includes ASN.1 documentation)
 
-* Version 0.2.10 (5/11/2001)
+* Version 0.2.10 (2001-11-05)
 - Corrected bugs and improved non blocking IO
 - Added hooks to use external database to store sessions
 - Usual cleanups
 
-* Version 0.2.9 (27/10/2001)
+* Version 0.2.9 (2001-10-27)
 - AUTH_INFO types and structures were moved to library internals
 - AUTH_FAILED is no longer returned in SRP authentication
   (any fatal error in SRP means auth failed)
@@ -675,32 +675,32 @@ See the end for copying conditions.
 - gnutls_recv() and gnutls_send() are now obsolete
 - Changed semantics of gnutls_rehandshake()
 
-* Version 0.2.4 (12/10/2001)
+* Version 0.2.4 (2001-10-12)
 - Better handling of X.509 certificate extensions
 - Added DHE_RSA ciphersuites
 - Updated the Name Indication (dnsname) extension
 - Improvements in Diffie Hellman primes handling
 
-* Version 0.2.3 (19/09/2001)
+* Version 0.2.3 (2001-09-19)
 - Memory optimizations in gnutls_recv()
 - Fixed several memory leaks
 - Added ability to specify callback for x509 client certificate selection
 - Better documentation
 
-* Version 0.2.2 (21/08/2001)
+* Version 0.2.2 (2001-08-21)
 - Several bugfixes (library and documentation)
 
-* Version 0.2.1 (07/08/2001)
+* Version 0.2.1 (2001-08-07)
 - SRP fixes
 
-* Version 0.2.0 (07/08/2001)
+* Version 0.2.0 (2001-08-07)
 - Partial support for X.509v3 Certificate extensions.
 - Added Internal memory handlers
 - Removed gnutls_x509_set_cn()
 - Added X.509 client authentication
 - Several bug fixes and protocol fixes
 
-* Version 0.1.9 (30/07/2001)
+* Version 0.1.9 (2001-07-30)
 - Corrected bug(s) in ChangeCipherSpec packet (fixes renegotiate)
 - SRP is updated to conform to the newest draft.
 - Added support for DNSNAME extension.
@@ -712,7 +712,7 @@ See the end for copying conditions.
 - gnutls_read() semantics are now closer to read(2) - added EOF
 - Documented some part of gnutls in doc/tex/ using Latex
 
-* Version 0.1.4 (22/06/2001)
+* Version 0.1.4 (2001-06-22)
 - Corrected (srp) base64 encoding.
 - Changed bcrypt algorithm to include username.
 - Added RSA Ciphersuites (no certificate checking).
@@ -723,37 +723,37 @@ See the end for copying conditions.
 - Added internal representation of X.509 structures.
 - Added global state
 
-* Version 0.1.3 (01/06/2001)
+* Version 0.1.3 (2001-06-01)
 - Updated API (and the way it is documented - we use inline documentation)
 - Added function to access alert messages.
 - Added support for renegotiating parameters.
 - Better and Faster Resume Database handling.
 - Several bugfixes
 
-* Version 0.1.2 (14/05/2001)
+* Version 0.1.2 (2001-05-14)
 - Updated API
 - Fixes in extension handling
 
-* Version 0.1.1 (13/05/2001)
+* Version 0.1.1 (2001-05-13)
 - Added compatibility with Stanford's libsrp library
 
-* Version 0.1.0 (09/05/2001)
+* Version 0.1.0 (2001-05-09)
 - Added SSL 2.0 client hello support
 - GNUTLS is a gnu library
 - Added support for TLS extensions.
 - Added support for SRP
 
-* Version 0.0.7 (11/01/2001)
+* Version 0.0.7 (2001-01-11)
 - Added server side session resuming (using gdbm)
 - Added twofish algorithm
 
-* Version 0.0.6 (20/12/2000)
+* Version 0.0.6 (2000-12-20)
 - Added client side session resuming
 - Better documentation (check doc/API)
 - Better socket handling (gnutls can be used with select())
 - Some primitive support for non blocking IO and socket options has been added.
 
-* Version 0.0.5 (7/12/2000)
+* Version 0.0.5 (2000-12-07)
 - Added Compression (using ZLIB)
 - Added SSL 3.0 support
 
