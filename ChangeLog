@@ -1,3 +1,15 @@
+2004-11-16 22:20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-psk-03.txt:
+
+	Add.  
+
+2004-11-16 20:27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO:
+
+	Add.  
+
 2004-11-13 23:03  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, configure.in:
