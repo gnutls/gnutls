@@ -286,8 +286,6 @@ void _gnutls_log( int level, const char *fmt, ...) {
  */
 void _gnutls_null_log( void* x, ...) { return; }
 const char* _gnutls_handshake2str( int handshake) { return NULL; }
-char * _gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
-	{ return NULL; }
 const char* _gnutls_packet2str( int packet) { return NULL; }
 
 # endif /* C99_MACROS */
