@@ -321,7 +321,7 @@ unsigned int _gnutls_x509_verify_certificate(
     /* Verify the last certificate in the certificate path
      * against the trusted CA certificate list.
      *
-     * If no CAs are present returns NOT_TRUSTED. Thus works
+     * If no CAs are present returns INVALID. Thus works
      * in self signed etc certificates.
      */
     ret =
