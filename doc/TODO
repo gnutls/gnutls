@@ -10,6 +10,7 @@ Current list:
 * Add support for certificates with DSS parameters
 * Add function to return the certificate verification path
 * Add TLS more extensions
+* Design a Private/Public key database
 * Tools for processing/generating certificates
 * OpenPGP certificate support (through libgcrypt)
 - Add Kerberos support
