@@ -12,7 +12,6 @@ Current list:
 * Add function to verify an openpgp key against a plain key.
 * Add support for extracting CRL distribution points.
 * Add support for generating CRLs.
-* Add PKCS #7 support to certtool utility.
 * Add support for TLS 1.1
 * Drop the compatibility functions.
 * Convert documentation to texinfo format
