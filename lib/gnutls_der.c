@@ -2,6 +2,7 @@
 
 /*
  * Copyright (C) 2000 Tarun Upadhyay <tarun@poboxes.com>
+ * Copyright (C) 2001 Nikos Mavroyanopoulos <nmav@hellug.gr>
  *
  * This file is part of GNUTLS Certificate API.
  *
@@ -23,6 +24,17 @@
 #include "defines.h"
 #include "gnutls_der.h"
 
+typedef struct {
+	unsigned char * data;
+	int pointer;
+	int size;
+} DER_CERT;
+
+int cert_getc( DER_CERT* cert) {
+	if (cert->pointer==cert->size) return -1;
+	return cert->data[cert->pointer++];
+}
+
 tag_attribs *find_tag_attribs(int tagcode, tag_attribs *tag){
   int i;
   tag->type = 0;
@@ -40,8 +52,8 @@ tag_attribs *find_tag_attribs(int tagcode, tag_attribs *tag){
   return tag;
 }  
 
-int read_tag(FILE *instr, tag_attribs* tag){
-  int ch = fgetc(instr);
+int read_tag(DER_CERT *instr, tag_attribs* tag){
+  int ch = cert_getc(instr);
   if (ch == EOF)
 	return READ_ERROR;
 
@@ -51,11 +63,11 @@ int read_tag(FILE *instr, tag_attribs* tag){
   return 0;
 }
 
-int read_length(FILE *instr, tag_attribs *tag){
+int read_length(DER_CERT *instr, tag_attribs *tag){
   int metalength;
   int i;
 
-  metalength = fgetc(instr);
+  metalength = cert_getc(instr);
   tag->length += 1;
   
   if (metalength == EOF)
@@ -65,7 +77,7 @@ int read_length(FILE *instr, tag_attribs *tag){
 	tag->length += metalength;
 	for (i = 0; i < metalength; i++){
 	  tag->value_length <<= 8;
-	  tag->value_length |= fgetc(instr);
+	  tag->value_length |= cert_getc(instr);
 	}
   }
   else
@@ -75,7 +87,7 @@ int read_length(FILE *instr, tag_attribs *tag){
 }
 
 int pretty_print_tag( tag_attribs *tag, FILE *outstr){
-  char fmt[80];
+/*  char fmt[80]; */
   int i;
   
   for (i = 0; i < tag->level; i++)
@@ -100,12 +112,12 @@ int pretty_print_tag( tag_attribs *tag, FILE *outstr){
   return 0;
 }
 
-int process_value(FILE *instr, tag_attribs *tag, FILE *outstr){
+int process_value(DER_CERT *instr, tag_attribs *tag, FILE *outstr){
   int i;
   int ch;
   
   for (i = 0; i < tag->value_length; i++){
-	ch = fgetc(instr);
+	ch = cert_getc(instr);
 	if (ch == EOF)
 	  return READ_ERROR;
 	switch (tag->type){
@@ -130,12 +142,12 @@ int process_value(FILE *instr, tag_attribs *tag, FILE *outstr){
   return 0;
 }
 
-int read_der_certificate(FILE *instr, FILE *outstr){
+int read_der_certificate(DER_CERT *instr, FILE *outstr){
   static int indent = 0;
   tag_attribs tag;
   int current_length;
   int temp_length;
-  int i;
+/*  int i; */
   
   memset(&tag, 0, sizeof(tag));
   tag.level = indent;
@@ -165,8 +177,21 @@ int read_der_certificate(FILE *instr, FILE *outstr){
   return tag.length;
 }
 
-#if 0
-main (int argc, char *argv[]){
-  printf("length of certificate: %d\n", read_der_certificate(stdin, stdout));
+#if DER_STANDALONE
+int main (int argc, char *argv[]){
+int i;
+unsigned char buffer[12000];
+int size =0 ;
+DER_CERT cert;
+
+  while(feof(stdin)==0) {
+  	buffer[size++] = fgetc(stdin);
+  }
+  cert.data = buffer;
+  cert.size = size;
+  cert.pointer = 0;
+
+  printf("length of certificate: %d\n", read_der_certificate( &cert, stdout));
+  return 0;
 }
 #endif
