@@ -1,4 +1,4 @@
-Version 0.4.1
+Version 0.4.1 (7/04/2002)
 - Now uses alloca() for temporary variables
 - Optimized RSA signing
 - Added functions to return the peer's certificate activation and

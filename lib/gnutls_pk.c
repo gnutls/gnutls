@@ -186,8 +186,9 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 	 */
 	if (btype==2)
 		ret = _gnutls_pk_decrypt(GCRY_PK_RSA, &res, c, params, params_len);
-	else
+	else {
 		ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, c, params, params_len);
+	}
 	_gnutls_mpi_release(&c);
 
 	if (ret < 0) {
