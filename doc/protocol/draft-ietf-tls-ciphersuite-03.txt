@@ -6,7 +6,7 @@
 
 Network Working Group                                         Pete Chown
 INTERNET DRAFT                                        Skygate Technology
-<draft-ietf-tls-ciphersuite-02.txt>                     15 November 2000
+<draft-ietf-tls-ciphersuite-03.txt>                      22 January 2001
 
                         AES Ciphersuites for TLS
 
@@ -57,22 +57,18 @@ Overview
 
 Chown                                                           [Page 1]
 
-ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
+ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
 
 
          therefore a desirable choice.
 
      4.  Currently the DHE ciphersuites only allow triple DES (along
-         with some ``export'' variants which offer reduced key lengths).
-         At the same time the DHE ciphersuites are the only ones to
-         offer forward secrecy.
+         with some ``export'' variants which do not use a satisfactory
+         key length).  At the same time the DHE ciphersuites are the
+         only ones to offer forward secrecy.
 
      This document proposes several new ciphersuites, with the aim of
      overcoming these problems.
-
-     The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-     "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in
-     this document are to be interpreted as described in RFC 2119.
 
 Cipher Usage
 
@@ -96,6 +92,30 @@ Cipher Usage
      method.  The ciphersuites defined here use the following options
      for this part of the protocol:
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chown                                                           [Page 2]
+
+ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+
+
      CipherSuite                           Certificate type (if applicable)
                                            and key exchange algorithm
 
@@ -106,21 +126,22 @@ Cipher Usage
      TLS_DHE_RSA_WITH_AES_128_CBC_SHA      DHE_RSA
      TLS_DH_anon_WITH_AES_128_CBC_SHA      DH_anon
 
+     TLS_RSA_WITH_AES_256_CBC_SHA          RSA
+     TLS_DH_DSS_WITH_AES_256_CBC_SHA       DH_DSS
+     TLS_DH_RSA_WITH_AES_256_CBC_SHA       DH_RSA
+     TLS_DHE_DSS_WITH_AES_256_CBC_SHA      DHE_DSS
+     TLS_DHE_RSA_WITH_AES_256_CBC_SHA      DHE_RSA
+     TLS_DH_anon_WITH_AES_256_CBC_SHA      DH_anon
+
      For the meanings of the terms RSA, DH_DSS, DH_RSA, DHE_DSS, DHE_RSA
      and DH_anon, please refer to sections 7.4.2 and 7.4.3 of [TLS].
 
-
-
-Chown                                                           [Page 2]
-
-ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
-
-
-     The AES supports key lengths of 128, 192 and 256 bits.  At the pre­
-     sent time, all of these are believed to be secure against even the
-     best equipped attackers.  The overall strength of TLS is such that
-     there is no gain from using a key length longer than 128 bits.
-     Accordingly the AES will use 128 bit keys.
+     The AES supports key lengths of 128, 192 and 256 bits.  However,
+     this document only defines ciphersuites for 128- and 256-bit keys.
+     This is to avoid unnecessary proliferation of ciphersuites.  Rijn­
+     dael actually allows for 192- and 256-bit block sizes as well as
+     the 128-bit blocks mandated by the AES process.  The ciphersuites
+     defined here all use 128-bit blocks.
 
      The new ciphersuites will have the following definitions:
 
@@ -131,27 +152,26 @@ ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
      CipherSuite TLS_DHE_RSA_WITH_AES_128_CBC_SHA  = { 0x00, 0x33 };
      CipherSuite TLS_DH_anon_WITH_AES_128_CBC_SHA  = { 0x00, 0x34 };
 
-     In the absence of an application profile standard specifying other­
-     wise:
+     CipherSuite TLS_RSA_WITH_AES_256_CBC_SHA      = { 0x00, 0x35 };
+     CipherSuite TLS_DH_DSS_WITH_AES_256_CBC_SHA   = { 0x00, 0x36 };
+     CipherSuite TLS_DH_RSA_WITH_AES_256_CBC_SHA   = { 0x00, 0x37 };
+     CipherSuite TLS_DHE_DSS_WITH_AES_256_CBC_SHA  = { 0x00, 0x38 };
+     CipherSuite TLS_DHE_RSA_WITH_AES_256_CBC_SHA  = { 0x00, 0x39 };
+     CipherSuite TLS_DH_anon_WITH_AES_256_CBC_SHA  = { 0x00, 0x3A };
 
-     1.  Servers MUST provide at least one of
-         TLS_RSA_WITH_AES_128_CBC_SHA and
-         TLS_DHE_RSA_WITH_AES_128_CBC_SHA.
-
-     2.  Clients MUST provide both TLS_RSA_WITH_AES_128_CBC_SHA and
-         TLS_DHE_RSA_WITH_AES_128_CBC_SHA.
-
-     (A TLS implementation which does not follow this requirement is
-     non-compliant with this RFC.  However, it will still be a valid TLS
-     implementation if it complies with [TLS].)
-
-     Implementations MAY provide any of the other ciphersuites described
-     above.
 
 Security Considerations
 
      It is not believed that the new ciphersuites are ever less secure
      than the corresponding older ones.  The AES is believed to be
+
+
+
+Chown                                                           [Page 3]
+
+ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+
+
      secure, and it has withstood extensive cryptanalytic attack.
 
      The ephemeral Diffie-Hellman ciphersuites provide forward secrecy
@@ -159,26 +179,19 @@ Security Considerations
      the maximum benefit from these ciphersuites:
 
      1.  The ephemeral keys should only be used once.  With the TLS pro­
-         tocol as currently defined there is no efficiency gain from
-         reusing ephemeral keys.
+         tocol as currently defined there is no significant efficiency
+         gain from reusing ephemeral keys.
 
      2.  Ephemeral keys should be destroyed securely when they are no
          longer required.
-
-
-
-Chown                                                           [Page 3]
-
-ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
-
 
      3.  The random number generator used to create ephemeral keys must
          not reveal past output even when its internal state is compro­
          mised.
 
      [TLS] describes the anonymous Diffie-Hellman (ADH) ciphersuites as
-     deprecated.  The ADH ciphersuite defined here is not deprecated.
-     However, when it is used, particular care must be taken:
+     deprecated.  The ADH ciphersuites defined here are not deprecated.
+     However, when they are used, particular care must be taken:
 
      1.  ADH provides confidentiality but not authentication.  This
          means that (if authentication is required) the communicating
@@ -195,9 +208,9 @@ ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
          compute a MAC of the TLS Finished message.  An attacker would
          have to negotiate two different TLS connections; one with each
          communicating party.  The Finished messages would be different
-         in each case, because they depend on the master secret.  For
-         this reason, the MACs computed by each party would be differ­
-         ent.
+         in each case, because they depend on the parties' public keys
+         (among other things).  For this reason, the MACs computed by
+         each party would be different.
 
          It is important to note that authentication techniques which do
          not use the Finished message do not usually provide protection
@@ -207,7 +220,15 @@ ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
 
 Copyright
 
-     Copyright (C) The Internet Society 2000. All Rights Reserved.
+
+
+
+Chown                                                           [Page 4]
+
+ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+
+
+     Copyright (C) The Internet Society 2001. All Rights Reserved.
 
      This document and translations of it may be copied and furnished to
      others, and derivative works that comment on or otherwise explain
@@ -220,14 +241,6 @@ Copyright
      Society or other Internet organizations, except as needed for the
      purpose of developing Internet standards in which case the proce­
      dures for copyrights defined in the Internet Standards process must
-
-
-
-Chown                                                           [Page 4]
-
-ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
-
-
      be followed, or as required to translate it into languages other
      than English.
 
@@ -263,6 +276,14 @@ Intellectual Property
      this standard. Please address the information to the IETF Executive
      Director.
 
+
+
+
+Chown                                                           [Page 5]
+
+ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+
+
      During the development of the AES, NIST published the following
      statement on intellectual property:
 
@@ -276,14 +297,6 @@ Intellectual Property
           hereby gives public notice that it may seek redress under
           the antitrust laws of the United States against any party
           in the future who might seek to exercise patent rights
-
-
-
-Chown                                                           [Page 5]
-
-ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
-
-
           against any user of AES that have not been disclosed to
           NIST in response to this request for information.
 
@@ -318,11 +331,20 @@ ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
           understand that the U.S. Government may, during the
           course of the lifetime of the AES or during the FIPS pub­
           lic review process, modify the algorithm's specifications
-          (e.g., to protect against a newly discovered vulnerabil­
-          ity).  Should my submission be selected for inclusion in
-          the AES, I hereby agree not to place any restrictions on
-          the use of the algorithm intending it to be available on
-          a worldwide, non-exclusive, royalty-free basis.
+          (e.g., to protect against a newly discovered
+
+
+
+Chown                                                           [Page 6]
+
+ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+
+
+          vulnerability).  Should my submission be selected for
+          inclusion in the AES, I hereby agree not to place any
+          restrictions on the use of the algorithm intending it to
+          be available on a worldwide, non-exclusive, royalty-free
+          basis.
 
           I do hereby agree to provide the statements for any
           patent or patent application identified to cover practice
@@ -330,15 +352,6 @@ ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
           cally optimized implementations and the right to use such
           implementations for the purposes of the AES evaluation
           process.
-
-
-
-
-
-Chown                                                           [Page 6]
-
-ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
-
 
           I understand that NIST will announce the selected algo­
           rithm(s) and proceed to publish the draft FIPS for public
@@ -375,6 +388,14 @@ ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
           implementations.
 
 
+
+
+
+Chown                                                           [Page 7]
+
+ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+
+
           [signed]
           Joan Daemen, Vincent Rijmen
 
@@ -387,14 +408,6 @@ References
 
      [TLS] T. Dierks, C. Allen, "The TLS Protocol Version 1.0" RFC-2246.
      January, 1999.
-
-
-
-
-Chown                                                           [Page 7]
-
-ietf-tls-ciphersuite-02 AES Ciphersuites for TLS        15 November 2000
-
 
      [AES] J. Daemen, V. Rijmen, "The Rijndael Block Cipher"
      http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf 3rd
@@ -415,19 +428,6 @@ Author's Address
 
      Phone: +44 20 8542 0176
      Email: pc@skygate.co.uk
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
