@@ -23,21 +23,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "prime-gaa.h"
-#include <gcrypt.h>
 #include <gnutls/gnutls.h>
 #include "../lib/defines.h"
-
-MPI _gcry_generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
-	                MPI g, MPI **ret_factors );
 
 int main(int argc, char **argv)
 {
 	gaainfo info;
-	int size, i, qbits;
-	MPI prime;
-	gnutls_datum _prime, _generator;
-	uint8 * tmp1, *tmp2;
-	MPI g;
+	unsigned int i;
+	gnutls_dh_params dh_params;
+	gnutls_datum p, g;
 
 	if (gaa(argc, argv, &info) != -1) {
 		fprintf(stderr, "Error in the arguments.\n");
@@ -45,82 +39,59 @@ int main(int argc, char **argv)
 	}
 	
 	gnutls_global_init();
+	
+	gnutls_dh_params_init( &dh_params);
 
 	fprintf(stderr, "Generating DH parameters...");
-	gcry_control (GCRYCTL_SET_VERBOSITY, (int)0);
 	
-	/* this is an emulation of Michael Wiener's table
-	 * bad emulation.
-	 */
-	qbits = 120 + ( ((info.bits/256)-1)*20 );
-	if( qbits & 1 ) /* better have a even one */
-	qbits++;
-
-	g = mpi_new(16);
-	prime = _gcry_generate_elg_prime( 0, info.bits, qbits, g, NULL);
-
-	/* print generator */
-	size = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &size, g);
-
-	tmp1 = malloc(size);
-   	gcry_mpi_print(GCRYMPI_FMT_USG, tmp1, &size, g);
-
-	_generator.data = tmp1;
-	_generator.size = size;
+	gnutls_dh_params_generate2( dh_params, info.bits);
+	gnutls_dh_params_export_raw( dh_params, &p, &g, NULL);
 
 	if (info.cparams) {
-		printf( "/* generator - %d bits */\n", gcry_mpi_get_nbits(g)); 
-		printf( "\nconst uint8 g[%d] = { ", size);
+
+		printf( "/* generator */\n"); 
+		printf( "\nconst uint8 g[%d] = { ", g.size);
 	
-		for (i=0;i<size;i++) {
+		for (i=0;i<g.size;i++) {
 			if (i%7==0) printf("\n\t");
-			printf( "0x%.2x", tmp1[i]);
-			if (i!=size-1) printf( ", ");
+			printf( "0x%.2x", g.data[i]);
+			if (i!=g.size-1) printf( ", ");
 		}
 
 		printf("\n};\n\n");
 	} else {
 		printf( "\nGenerator: ");
 	
-		for (i=0;i<size;i++) {
+		for (i=0;i<g.size;i++) {
 			if (i!=0 && i%12==0) printf("\n\t");
-			else if (i!=0 && i!=size) printf( ":");
+			else if (i!=0 && i!=g.size) printf( ":");
 
-			printf( "%.2x", tmp1[i]);
+			printf( "%.2x", g.data[i]);
 		}
 
 		printf("\n\n");
 	}
 
 	/* print prime */
-	size = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &size, prime);
-
-	tmp2 = malloc(size);
-   	gcry_mpi_print(GCRYMPI_FMT_USG, tmp2, &size, prime);
-
-	_prime.data = tmp2;
-	_prime.size = size;
 
 	if (info.cparams) {
-		printf( "/* prime - %d bits */\n",  gcry_mpi_get_nbits(prime)); 
-		printf( "\nconst uint8 prime[%d] = { ", size);
+		printf( "/* prime - %d bits */\n", p.size*8);
+		printf( "\nconst uint8 prime[%d] = { ", p.size);
 	
-		for (i=0;i<size;i++) {
+		for (i=0;i<p.size;i++) {
 			if (i%7==0) printf("\n\t");
-			printf( "0x%.2x", tmp2[i]);
-			if (i!=size-1) printf( ", ");
+			printf( "0x%.2x", p.data[i]);
+			if (i!=p.size-1) printf( ", ");
 		}
 
 		printf("\n};\n");
 	} else {
 		printf( "Prime: ");
 
-		for (i=0;i<size;i++) {
+		for (i=0;i<p.size;i++) {
 			if (i!=0 && i%12==0) printf("\n\t");
-			else if (i!=0 && i!=size) printf( ":");
-			printf( "%.2x", tmp2[i]);
+			else if (i!=0 && i!=p.size) printf( ":");
+			printf( "%.2x", p.data[i]);
 		}
 
 		printf("\n\n");
@@ -129,10 +100,10 @@ int main(int argc, char **argv)
 
 	if (!info.cparams) { /* generate a PKCS#3 structure */
 	
-		unsigned char out[2048];
+		unsigned char out[5*1024];
 		int ret, len = sizeof(out);
 	
-		ret = gnutls_pkcs3_export_dh_params( &_prime, &_generator, GNUTLS_X509_FMT_PEM,
+		ret = gnutls_dh_params_export_pkcs3( dh_params, GNUTLS_X509_FMT_PEM,
 			out, &len);
 	
 		if (ret == 0) {

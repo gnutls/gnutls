@@ -6,15 +6,15 @@ Version 0.9.0
   the gnutls_global_set_log_function().
 - gnutls_dh_params_generate() and gnutls_rsa_params_generate() now use 
   gnutls_malloc() to allocate the output parameters.
-- Added gnutls_pkcs3_extract_dh_params() and gnutls_pkcs3_export_dh_params()
-  which extract and export parameters from and to PKCS#3 encoded structures. 
-  These were added to read parameters generated using the openssl dhparam tool.
+- The RSA and DH parameter generation interface was changed. Added
+  ability to import and export from and to PKCS3 structures. This 
+  was needed to read parameters generated using the openssl dhparam tool.
 - Several changes in the temporary (DH/RSA) parameter codebase. No DH 
   parameters are now included in the library. Also the credentials structure 
   can now hold only one temporary parameter of a kind.
 - Added a new Certificate, CRL, Private key and PKCS7 structures handling 
   API, defined in gnutls/x509.h
-- Added support for Certificate Revocation lists. Functions defined
+- Added support for Certificate revocation lists. Functions defined
   in gnutls/x509.h
 - The only functions were removed are:
   gnutls_x509_certificate_to_xml()

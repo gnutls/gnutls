@@ -343,24 +343,36 @@ extern gnutls_free_function gnutls_free;
 typedef void (*gnutls_log_func)( const char*);
 void gnutls_global_set_log_function( gnutls_log_func log_func);
 
-/* DH params */
-int gnutls_dh_params_set( gnutls_dh_params, gnutls_datum prime, gnutls_datum generator, int bits);
+/* Diffie Hellman parameter handling.
+ */
 int gnutls_dh_params_init( gnutls_dh_params*);
 void gnutls_dh_params_deinit( gnutls_dh_params);
-int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits);
+int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *prime,
+			const gnutls_datum* generator);
+int gnutls_dh_params_import_pkcs3(gnutls_dh_params params, 
+	const gnutls_datum * pkcs3_params, gnutls_x509_crt_fmt format);
+int gnutls_dh_params_generate2(gnutls_dh_params params, int bits);
+int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
+	   gnutls_x509_crt_fmt format, unsigned char* params_data, int* params_data_size);
+int gnutls_dh_params_export_raw(gnutls_dh_params params,
+	gnutls_datum * prime, gnutls_datum * generator, int *bits);
 
-/* RSA params */
-int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
-	gnutls_datum m, gnutls_datum e, gnutls_datum d, 
-	gnutls_datum p, gnutls_datum q, gnutls_datum u,
-	int bits);
-int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
-	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
-	gnutls_datum* u, int bits);
+
+/* RSA params 
+ */
 int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params);
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params);
+int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params, 
+	gnutls_datum m, gnutls_datum e,
+	gnutls_datum d, gnutls_datum p, gnutls_datum q, gnutls_datum u);
+int gnutls_rsa_params_generate2(gnutls_rsa_params params, int bits);
+int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
+	gnutls_datum * m, gnutls_datum *e,
+	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
+	gnutls_datum* u, int *bits);
 
-
+/* Session stuff
+ */
 typedef ssize_t (*gnutls_pull_func)(gnutls_transport_ptr, void*, size_t);
 typedef ssize_t (*gnutls_push_func)(gnutls_transport_ptr, const void*, size_t);
 void gnutls_transport_set_ptr(gnutls_session session, gnutls_transport_ptr ptr);

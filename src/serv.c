@@ -158,7 +158,6 @@ gnutls_rsa_params rsa_params;
 
 static int generate_dh_primes(void)
 {
-   gnutls_datum prime, generator;
    int prime_bits = 768;
 
    if (gnutls_dh_params_init(&dh_params) < 0) {
@@ -176,28 +175,18 @@ static int generate_dh_primes(void)
 	   prime_bits);
       fflush(stdout);
 
-      if (gnutls_dh_params_generate(&prime, &generator, prime_bits) < 0) {
+      if (gnutls_dh_params_generate2( dh_params, prime_bits) < 0) {
 	 fprintf(stderr, "Error in prime generation\n");
 	 exit(1);
       }
-
-      if (gnutls_dh_params_set
-	  (dh_params, prime, generator, prime_bits) < 0) {
-	 fprintf(stderr, "Error in prime replacement\n");
-	 exit(1);
-      }
-      gnutls_free(prime.data);
-      gnutls_free(generator.data);
-
 
    return 0;
 }
 
 static void read_dh_params(void)
 {
-   gnutls_datum prime, generator;
    char tmpdata[2048];
-   int size, bits;
+   int size;
    gnutls_datum params;
    FILE* fd;
    
@@ -221,34 +210,20 @@ static void read_dh_params(void)
    params.data = tmpdata;
    params.size = size;
 
-   size = gnutls_pkcs3_extract_dh_params( &params, GNUTLS_X509_FMT_PEM,
-   	&prime, &generator, &bits);
+   size = gnutls_dh_params_import_pkcs3( dh_params, &params, GNUTLS_X509_FMT_PEM);
 
    if (size < 0) {
    	fprintf(stderr, "Error parsing dh params: %s\n", gnutls_strerror(size));
    	exit(1);
    }
 
-   printf("Read Diffie Hellman parameters [%d].\n", bits);
+   printf("Read Diffie Hellman parameters.\n");
    fflush(stdout);
    
-   if (gnutls_dh_params_set
-	(dh_params, prime, generator, bits) < 0) {
-	fprintf(stderr, "Error in prime replacement\n");
-	exit(1);
-   }
-   
-   prime_bits = bits;
-
-   gnutls_free(prime.data);
-   gnutls_free(generator.data);
-
 }
 
 static int generate_rsa_params(void)
 {
-   gnutls_datum m, e, d, p, q, u;
-
    if (gnutls_rsa_params_init(&rsa_params) < 0) {
       fprintf(stderr, "Error in rsa parameter initialization\n");
       exit(1);
@@ -262,22 +237,10 @@ static int generate_rsa_params(void)
    printf("Generating temporary RSA parameters. Please wait...\n");
    fflush(stdout);
 
-   if (gnutls_rsa_params_generate(&m, &e, &d, &p, &q, &u, 512) < 0) {
+   if (gnutls_rsa_params_generate2( rsa_params, 512) < 0) {
       fprintf(stderr, "Error in rsa parameter generation\n");
       exit(1);
    }
-
-   if (gnutls_rsa_params_set(rsa_params, m, e, d, p, q, u, 512) < 0) {
-      fprintf(stderr, "Error in rsa parameter setting\n");
-      exit(1);
-   }
-
-   gnutls_free(m.data);
-   gnutls_free(e.data);
-   gnutls_free(d.data);
-   gnutls_free(p.data);
-   gnutls_free(q.data);
-   gnutls_free(u.data);
 
    return 0;
 }
@@ -321,7 +284,7 @@ gnutls_session initialize_session(void)
       gnutls_db_set_ptr(session, NULL);
    }
 
-   gnutls_dh_set_prime_bits( session, prime_bits);
+/*   gnutls_dh_set_prime_bits( session, prime_bits); */
    gnutls_cipher_set_priority(session, cipher_priority);
    gnutls_compression_set_priority(session, comp_priority);
    gnutls_kx_set_priority(session, kx_priority);

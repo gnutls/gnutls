@@ -165,7 +165,6 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read p */
 
-#warning CHECK IT
 	if ( (result=_gnutls_x509_read_int( spk, "", str, sizeof(str)-1, &params[3])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);

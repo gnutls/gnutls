@@ -78,27 +78,19 @@ gnutls_rsa_params rsa_params;
 
 static int generate_dh_params(void)
 {
-   gnutls_datum prime, generator;
-
    /* Generate Diffie Hellman parameters - for use with DHE
     * kx algorithms. These should be discarded and regenerated
     * once a day, once a week or once a month. Depends on the
     * security requirements.
     */
    gnutls_dh_params_init(&dh_params);
-   gnutls_dh_params_generate(&prime, &generator, DH_BITS);
-   gnutls_dh_params_set(dh_params, prime, generator, DH_BITS);
+   gnutls_dh_params_generate2( dh_params, DH_BITS);
 
-   gnutls_free(prime.data);
-   gnutls_free(generator.data);
-   
    return 0;
 }
 
 static int generate_rsa_params(void)
 {
-   gnutls_datum m, e, d, p, q, u;
-
    gnutls_rsa_params_init(&rsa_params);
 
    /* Generate RSA parameters - for use with RSA-export
@@ -107,15 +99,7 @@ static int generate_rsa_params(void)
     * security requirements.
     */
 
-   gnutls_rsa_params_generate(&m, &e, &d, &p, &q, &u, 512);
-   gnutls_rsa_params_set(rsa_params, m, e, d, p, q, u, 512);
-
-   gnutls_free(m.data);
-   gnutls_free(e.data);
-   gnutls_free(d.data);
-   gnutls_free(p.data);
-   gnutls_free(q.data);
-   gnutls_free(u.data);
+   gnutls_rsa_params_generate2( rsa_params, 512);
 
    return 0;
 }

@@ -151,7 +151,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
 
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx, 
-	char* certificate, int* certificate_size);
+	unsigned char* certificate, int* certificate_size);
 
 /* X.509 Certificate verification functions.
  */

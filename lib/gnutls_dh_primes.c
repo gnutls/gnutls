@@ -24,33 +24,9 @@
 #include <gnutls_datum.h>
 #include <x509_b64.h> /* for PKCS3 PEM decoding */
 #include <gnutls_global.h>
+#include <gnutls_dh.h>
 #include "debug.h"
 
-/* This function takes a number of bits and returns a supported
- * number of bits. Ie a number of bits that we have a prime in the
- * dh_primes structure.
- */
-static int normalize_bits(int bits)
-{
-	if (bits >= 4096)
-		bits = 4096;
-	else if (bits < 256)
-		bits = 128;
-	else if (bits < 700)
-		bits = 512;
-	else if (bits < 1000)
-		bits = 768;
-	else if (bits < 2000)
-		bits = 1024;
-	else if (bits < 3000)
-		bits = 2048;
-	else if (bits < 4000)
-		bits = 3072;
-	else 
-		bits = 4096;
-
-	return bits;
-}
 
 /* returns the prime and the generator of DH params.
  */
@@ -131,35 +107,30 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
  * generated one.
  */
 /**
-  * gnutls_dh_params_set - This function will replace the old DH parameters
-  * @dh_params: Is a structure will hold the prime numbers
+  * gnutls_dh_import_raw - This function will import DH parameters
+  * @dh_params: Is a structure that will hold the prime numbers
   * @prime: holds the new prime
   * @generator: holds the new generator
-  * @bits: is the prime's number of bits. This value is ignored.
   *
   * This function will replace the pair of prime and generator for use in 
   * the Diffie-Hellman key exchange. The new parameters should be stored in the
   * appropriate gnutls_datum. 
   * 
   **/
-int gnutls_dh_params_set(gnutls_dh_params dh_params, gnutls_datum prime,
-			 gnutls_datum generator, int bits)
+int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *prime,
+			const gnutls_datum* generator)
 {
 	GNUTLS_MPI tmp_prime, tmp_g;
 	size_t siz = 0;
 
-	/* sprime is not null, because of the check_bits()
-	 * above.
-	 */
-
-	siz = prime.size;
-	if (_gnutls_mpi_scan(&tmp_prime, prime.data, &siz)) {
+	siz = prime->size;
+	if (_gnutls_mpi_scan(&tmp_prime, prime->data, &siz)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	siz = generator.size;
-	if (_gnutls_mpi_scan(&tmp_g, generator.data, &siz)) {
+	siz = generator->size;
+	if (_gnutls_mpi_scan(&tmp_g, generator->data, &siz)) {
 		_gnutls_mpi_release(&tmp_prime);
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -217,85 +188,38 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
  * numbers.
  */
 /**
-  * gnutls_dh_params_generate - This function will generate new DH parameters
-  * @prime: will hold the new prime
-  * @generator: will hold the new generator
+  * gnutls_dh_params_generate2 - This function will generate new DH parameters
+  * @params: Is the structure that the DH parameters will be stored
   * @bits: is the prime's number of bits
   *
   * This function will generate a new pair of prime and generator for use in 
   * the Diffie-Hellman key exchange. The new parameters will be allocated using
   * gnutls_malloc() and will be stored in the appropriate datum.
-  * This function is normally very slow. An other function
-  * (gnutls_dh_params_set()) should be called in order to replace the 
-  * included DH primes in the gnutls library.
+  * This function is normally slow. 
   * 
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
-  * Also note that the generation of new DH parameters is only usefull
-  * to servers. Clients use the parameters sent by the server, thus it's
+  * Also note that the DH parameters are only usefull to servers. 
+  * Since clients use the parameters sent by the server, thus it's
   * no use calling this in client side.
   *
   **/
-int gnutls_dh_params_generate(gnutls_datum * prime,
-			      gnutls_datum * generator, int bits)
+int gnutls_dh_params_generate2(gnutls_dh_params params, int bits)
 {
 
-	GNUTLS_MPI tmp_prime, tmp_g;
-	size_t siz;
-
-	if (_gnutls_dh_generate_prime(&tmp_g, &tmp_prime, bits) < 0) {
+	if (_gnutls_dh_generate_prime(&params->_generator, 
+		&params->_prime, bits) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, tmp_g);
-
-	generator->data = gnutls_malloc(siz);
-	if (generator->data == NULL) {
-		_gnutls_mpi_release(&tmp_g);
-		_gnutls_mpi_release(&tmp_prime);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	generator->size = siz;
-	_gnutls_mpi_print(generator->data, &siz, tmp_g);
-
-
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, tmp_prime);
-
-	prime->data = gnutls_malloc(siz);
-	if (prime->data == NULL) {
-		gnutls_free(generator->data);
-		_gnutls_mpi_release(&tmp_g);
-		_gnutls_mpi_release(&tmp_prime);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	prime->size = siz;
-	_gnutls_mpi_print(prime->data, &siz, tmp_prime);
-
-#ifdef DEBUG
-	{
-		opaque buffer[512];
-
-		_gnutls_log
-		    ("dh_params_generate: Generated %d bits prime %s, generator %s.\n",
-	     	bits, _gnutls_bin2hex(prime->data, prime->size, buffer, sizeof(buffer)),
-	     	_gnutls_bin2hex(generator->data, generator->size, buffer, sizeof(buffer)));
-	}
-#endif
-
 	return 0;
-
 }
 
 /**
-  * gnutls_pkcs3_extract_dh_params - This function will extract DH params from a pkcs3 structure
-  * @params: should contain a PKCS3 DHParams structure PEM or DER encoded
+  * gnutls_dh_params_import_pkcs3 - This function will import DH params from a pkcs3 structure
+  * @params: A structure were the parameters will be copied to
+  * @pkcs3_params: should contain a PKCS3 DHParams structure PEM or DER encoded
   * @format: the format of params. PEM or DER.
-  * @prime: will hold the prime found
-  * @generator: will hold the generator
-  * @bits: the number of bits of prime (not with precision)
   *
   * This function will extract the DHParams found in a PKCS3 formatted
   * structure. This is the format generated by "openssl dhparam" tool.
@@ -309,10 +233,8 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
   * 0 on success.
   *
   **/
-int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
-				   gnutls_x509_crt_fmt format,
-				   gnutls_datum * prime,
-				   gnutls_datum * generator, int *bits)
+int gnutls_dh_params_import_pkcs3(gnutls_dh_params params, 
+	const gnutls_datum * pkcs3_params, gnutls_x509_crt_fmt format)
 {
 	ASN1_TYPE c2;
 	int result, need_free = 0;
@@ -324,7 +246,7 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 		opaque *out;
 
 		result = _gnutls_fbase64_decode("DH PARAMETERS",
-						params->data, params->size,
+						pkcs3_params->data, pkcs3_params->size,
 						&out);
 
 		if (result <= 0) {
@@ -339,8 +261,8 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 		need_free = 1;
 
 	} else {
-		_params.data = params->data;
-		_params.size = params->size;
+		_params.data = pkcs3_params->data;
+		_params.size = pkcs3_params->size;
 	}
 
 	if ((result = asn1_create_element
@@ -367,42 +289,23 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 	/* Read PRIME 
 	 */
 	len = sizeof(str) - 1;
-	if ((result = asn1_read_value(c2, "prime",
-					    str, &len)) != ASN1_SUCCESS) 
-	{
-		gnutls_assert();
+	result = _gnutls_x509_read_int( c2, "prime", str, len, &params->_prime);
+	if ( result < 0) {
 		asn1_delete_structure(&c2);
-		return _gnutls_asn2err(result);
-	}
-
-	prime->data = gnutls_malloc(len);
-	prime->size = len;
-	if (prime->data == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return result;
 	}
-	memcpy( prime->data, str, len);
-	*bits = normalize_bits( len*8);
 
-	/* Read the GENERATOR
+	/* read the generator
 	 */
 	len = sizeof(str) - 1;
-	if ((result = asn1_read_value(c2, "base",
-					    str, &len)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		gnutls_free( prime->data);
+	result = _gnutls_x509_read_int( c2, "base", str, len, &params->_generator);
+	if ( result < 0) {
 		asn1_delete_structure(&c2);
-		return _gnutls_asn2err(result);
-	}
-
-	generator->data = gnutls_malloc(len);
-	generator->size = len;
-	if (generator->data == NULL) {
+		_gnutls_mpi_release( &params->_prime);
 		gnutls_assert();
-		gnutls_free( prime->data);
-		return GNUTLS_E_MEMORY_ERROR;
+		return result;
 	}
-	memcpy( generator->data, str, len);
 
 	asn1_delete_structure(&c2);
 
@@ -410,9 +313,8 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 }
 
 /**
-  * gnutls_pkcs3_export_dh_params - This function will export DH params to a pkcs3 structure
-  * @prime: will hold the prime found
-  * @generator: will hold the generator
+  * gnutls_dh_params_export_pkcs3 - This function will export DH params to a pkcs3 structure
+  * @params: Holds the DH parameters
   * @format: the format of output params. One of PEM or DER.
   * @params_data: will contain a PKCS3 DHParams structure PEM or DER encoded
   * @params_data_size: holds the size of params_data (and will be replaced by the actual size of parameters)
@@ -429,27 +331,48 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
   * 0 on success.
   *
   **/
-int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
-				   const gnutls_datum * generator,
-				   gnutls_x509_crt_fmt format,
-				   unsigned char* params_data, int* params_data_size)
+int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
+	   gnutls_x509_crt_fmt format, unsigned char* params_data, int* params_data_size)
 {
 	ASN1_TYPE c2;
 	int result;
+	size_t g_size, p_size;
+	opaque * p_data, *g_data;
+	opaque * all_data;
+	
+	_gnutls_mpi_print( NULL, &g_size, params->_generator);
+	_gnutls_mpi_print( NULL, &p_size, params->_prime);
+
+	all_data = gnutls_alloca( g_size + p_size);
+	if (all_data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	p_data = &all_data[0];
+	g_data = &all_data[p_size];
+	
+	_gnutls_mpi_print( p_data, &p_size, params->_prime);
+	_gnutls_mpi_print( g_data, &g_size, params->_generator);
+
+	/* Ok. Now we have the data. Create the asn1 structures
+	 */	
 
 	if ((result = asn1_create_element
 	     (_gnutls_get_gnutls_asn(), "GNUTLS.DHParameter", &c2))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_afree(all_data);
 		return _gnutls_asn2err(result);
 	}
 
 	/* Write PRIME 
 	 */
 	if ((result = asn1_write_value(c2, "prime",
-					    prime->data, prime->size)) != ASN1_SUCCESS) 
+					    p_data, p_size)) != ASN1_SUCCESS) 
 	{
 		gnutls_assert();
+		gnutls_afree(all_data);
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
@@ -457,11 +380,14 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 	/* Write the GENERATOR
 	 */
 	if ((result = asn1_write_value(c2, "base",
-					    generator->data, generator->size)) != ASN1_SUCCESS) {
+					    g_data, g_size)) != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_afree(all_data);
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
+
+	gnutls_afree(all_data);
 
 	if ((result = asn1_write_value(c2, "privateValueLength",
 					    NULL, 0)) != ASN1_SUCCESS) {
@@ -517,11 +443,62 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 		}
 
 		*params_data_size = result;
-		memcpy( params_data, out, result);
-		params_data[result] = 0;
+		
+		if (params_data) {
+			memcpy( params_data, out, result);
+			params_data[result] = 0;
+		}
 		gnutls_free( out);
 		
 	}
 
 	return 0;
+}
+
+/**
+  * gnutls_dh_params_export_raw - This function will export the raw DH parameters
+  * @params: Holds the DH parameters
+  * @prime: will hold the new prime
+  * @generator: will hold the new generator
+  * @bits: if non null will hold is the prime's number of bits
+  *
+  * This function will export the pair of prime and generator for use in 
+  * the Diffie-Hellman key exchange. The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  * 
+  **/
+int gnutls_dh_params_export_raw(gnutls_dh_params params,
+	gnutls_datum * prime, gnutls_datum * generator, int *bits)
+{
+
+	size_t size;
+
+	size = 0;
+	_gnutls_mpi_print(NULL, &size, params->_generator);
+
+	generator->data = gnutls_malloc(size);
+	if (generator->data == NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	generator->size = size;
+	_gnutls_mpi_print(generator->data, &size, params->_generator);
+
+
+	size = 0;
+	_gnutls_mpi_print(NULL, &size, params->_prime);
+
+	prime->data = gnutls_malloc(size);
+	if (prime->data == NULL) {
+		gnutls_free(generator->data);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	prime->size = size;
+	_gnutls_mpi_print(prime->data, &size, params->_prime);
+	
+	if (bits)
+		*bits = _gnutls_mpi_get_nbits( params->_prime);
+
+	return 0;
+
 }

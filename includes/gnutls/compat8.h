@@ -52,4 +52,15 @@ int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
 
 int gnutls_x509_extract_key_pk_algorithm( const gnutls_datum * key);
 
+int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
+	gnutls_datum m, gnutls_datum e, gnutls_datum d, 
+	gnutls_datum p, gnutls_datum q, gnutls_datum u,
+	int bits);
+int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
+	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
+	gnutls_datum* u, int bits);
+
+int gnutls_dh_params_set( gnutls_dh_params, gnutls_datum prime, gnutls_datum generator, int bits);
+int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits);
+
 #endif

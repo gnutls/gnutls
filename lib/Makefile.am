@@ -40,7 +40,8 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_dh_primes.c ext_max_record.c gnutls_alert.c gnutls_int_compat.c \
 	gnutls_str.c gnutls_state.c gnutls_x509.c ext_cert_type.c \
 	gnutls_rsa_export.c auth_rsa_export.c \
-	ext_server_name.c auth_dh_common.c
+	ext_server_name.c auth_dh_common.c \
+	dh_compat.c rsa_compat.c
 
 # Separate so we can create the documentation
 
