@@ -326,6 +326,11 @@ typedef struct {
 	/* keeps the headers of the handshake packet 
 	 */
 	HANDSHAKE_HEADER_BUFFER		handshake_header_buffer;
+	int				client_certificate_index; /* holds
+						* the index of the client
+						* certificate to use. -1
+						* if none.
+						*/
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

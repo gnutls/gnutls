@@ -1481,8 +1481,8 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 			return ret;
 		}
 
-#warning "FIX THIS REQUEST"
-		/* receive the server certificate request */
+		/* receive the server certificate request - if any 
+		 */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_server_certificate_request(cd, state);
 		if (ret < 0) {
@@ -1492,7 +1492,8 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 			return ret;
 		}
 
-		/* receive the server key exchange (B) (SRP only) */
+		/* receive the server key exchange (B) (SRP only) 
+		 */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_server_kx_message2(cd, state);
 		if (ret < 0) {
@@ -1532,6 +1533,7 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
+
 		/* send client certificate verify */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =

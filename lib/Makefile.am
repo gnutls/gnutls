@@ -30,7 +30,7 @@ libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_gcry.c ext_dnsname.c gnutls_pk.c gnutls_cert.c x509_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
 	gnutls_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c gnutls_mem.c \
-	x509_extensions.c auth_x509.c gnutls_ui.c
+	x509_extensions.c auth_x509.c gnutls_ui.c gnutls_sig.c
 
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

@@ -39,6 +39,8 @@
 #define MAX(X,Y) (X >= Y ? X : Y);
 #define CAFILE "x509/ca.pem"
 #define CRLFILE NULL
+#define CLIKEYFILE "x509/clikey.pem"
+#define CLICERTFILE "x509/clicert.pem"
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X->common_name); \
@@ -144,11 +146,12 @@ int main(int argc, char** argv)
 
 
 	/* X509 stuff */
-	if (gnutls_allocate_x509_client_sc( &xcred, 0) < 0) { /* no priv key */
+	if (gnutls_allocate_x509_client_sc( &xcred, 1) < 0) { 
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 	gnutls_set_x509_client_trust( xcred, CAFILE, CRLFILE);
+	gnutls_set_x509_client_key( xcred, CLICERTFILE, CLIKEYFILE);
 
 	/* SRP stuff */
 	if (gnutls_allocate_srp_client_sc( &cred)<0) {

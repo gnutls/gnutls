@@ -5,7 +5,7 @@
 
 #include <gnutls_ui.h>
 
-typedef struct {
+typedef struct gnutls_cert {
 	MPI *params;		/* the size of params depends on the public 
 				 * key algorithm 
 				 */

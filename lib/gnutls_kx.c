@@ -236,8 +236,10 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 	_gnutls_log( "Sending client certificate verify message\n");
 #endif
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_cert_vrfy( state, &data);
-	if (data_size < 0) 
+	if (data_size < 0) {
+		gnutls_assert();
 		return data_size;
+	}
 	ret =
 	    _gnutls_send_handshake(cd, state, data,
 				   data_size,

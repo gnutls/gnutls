@@ -29,6 +29,7 @@
 #include <gnutls_datum.h>
 #include "debug.h"
 
+
 /* Do PKCS-1 RSA encryption. 
  * pkey is the public key and n the modulus.
  */
@@ -63,11 +64,30 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 	psize = k - 3 - plaintext.size;
 
 	ps = &edata[2];
-	_gnutls_get_random(ps, psize, GNUTLS_WEAK_RANDOM);
-	for (i = 0; i < psize; i++) {
-		if (ps[i] == 0)
+	switch(btype) {
+	    case 2:
+		_gnutls_get_random(ps, psize, GNUTLS_WEAK_RANDOM);
+		for (i = 0; i < psize; i++) {
+			if (ps[i] == 0)
+				ps[i] = 0xff;
+		}
+		break;
+	    case 1:
+		for (i = 0; i < psize; i++)
 			ps[i] = 0xff;
+	        break;
+#ifdef ALLOW_BLOCK_0
+	    case 0:
+		for (i = 0; i < psize; i++) {
+			ps[i] = 0x00;
+		}
+	        break;
+#endif
+	    default:
+	        gnutls_assert();
+	        return GNUTLS_E_UNKNOWN_ERROR;
 	}
+	
 	ps[psize] = 0;
 	memcpy(&ps[psize + 1], plaintext.data, plaintext.size);
 
