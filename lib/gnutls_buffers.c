@@ -900,7 +900,7 @@ ssize_t _gnutls_handshake_io_recv_int( gnutls_session session, ContentType type,
  * for finished messages to use them. Used in HMAC calculation
  * and finished messages.
  */
-int _gnutls_handshake_buffer_put( gnutls_session session, char *data, size_t length)
+int _gnutls_handshake_buffer_put( gnutls_session session, opaque *data, size_t length)
 {
 
 	if (length==0) return 0;	

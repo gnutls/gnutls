@@ -36,7 +36,7 @@ int _gnutls_m_plaintext2compressed(gnutls_session session,
 						     gnutls_datum plaintext)
 {
 	int size;
-	char *data;
+	opaque *data;
 	
 	size = _gnutls_compress( session->connection_state.write_compression_state,
 		plaintext.data, plaintext.size, &data, MAX_RECORD_SEND_SIZE+1024);
@@ -56,7 +56,7 @@ int _gnutls_m_compressed2plaintext(gnutls_session session,
 						     compressed)
 {
 	int size;
-	char* data;
+	opaque* data;
 
 	size = _gnutls_decompress( session->connection_state.read_compression_state,
 		compressed.data, compressed.size, &data, MAX_RECORD_RECV_SIZE);

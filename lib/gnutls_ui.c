@@ -293,7 +293,7 @@ int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data,
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = _gnutls_hash_get_algo_len(algo);
 	
-	if (hash_len < 0 || hash_len > *result_size ||
+	if (hash_len < 0 || (uint)hash_len > *result_size ||
 		result==NULL) 
 	{
 		*result_size = hash_len;

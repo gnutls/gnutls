@@ -358,7 +358,7 @@ inline static int
 _gnutls_handshake_hash_pending( gnutls_session session) {
 size_t siz;
 int ret;
-char * data;
+opaque * data;
 
 	if (session->internals.handshake_mac_handle_sha==NULL ||
 		session->internals.handshake_mac_handle_md5==NULL) {

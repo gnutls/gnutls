@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_record_buffer_put(ContentType type, gnutls_session session, char *data, size_t length);
+int _gnutls_record_buffer_put(ContentType type, gnutls_session session, opaque *data, size_t length);
 int _gnutls_record_buffer_get_size(ContentType type, gnutls_session session);
 int _gnutls_record_buffer_get(ContentType type, gnutls_session session, opaque *data, size_t length);
 ssize_t _gnutls_io_read_buffered( gnutls_session, opaque **iptr, size_t n, ContentType);
