@@ -163,7 +163,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 
 	AC_MSG_CHECKING([whether we have GNU assembler])
 	
-	GAS=`as --version|grep GNU`
+	GAS=`as --version < /dev/null|grep GNU`
 	if test "$GAS"; then
 	  CFLAGS="${CFLAGS} -pipe"
 	  AC_MSG_RESULT(yes)
@@ -258,7 +258,6 @@ AC_CONFIG_COMMANDS([default],[[
  echo "#endif" >> lib/gnutls.h
  echo "#endif /* GNUTLS_H */" >> lib/gnutls.h
  echo "" >> lib/gnutls.h
- chmod -w lib/gnutls.h 
  chmod +x lib/libgnutls-config
 ]],[[]])
 
