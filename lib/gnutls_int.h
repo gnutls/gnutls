@@ -1,18 +1,18 @@
 #include <gcrypt.h>
 #include <mhash.h>
 
-// #define HARD_DEBUG
+#define HARD_DEBUG
 #define DEBUG
 
 #define svoid void /* for functions that allocate using secure_free */
-#define secure_free free
+#define secure_free(x) if (x!=NULL) free(x)
 #define secure_malloc malloc
 #define secure_realloc realloc
 #define secure_calloc calloc
 #define gnutls_malloc malloc
 #define gnutls_realloc realloc
 #define gnutls_calloc calloc
-#define gnutls_free free
+#define gnutls_free(x) if (x!=NULL) free(x)
 
 typedef struct {
 	uint8	pint[3];

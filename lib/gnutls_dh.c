@@ -43,6 +43,9 @@ static const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 	mpi_release(g);
 */
 
+#define E_SIZE 1024
+#define X_SIZE 200
+
 /****************
  * Choose a random value x and calculate e = g^x mod p.
  * Return: e and if ret_x is not NULL x.
@@ -59,11 +62,11 @@ MPI _gnutls_calc_dh_secret(MPI * ret_x)
 	/*dump_mpi(stderr, "prime=", prime ); */
 
 	g = mpi_set_ui(NULL, 2);
-	x = mpi_new(200);	/* FIXME: allocate in secure memory */
-	gcry_mpi_randomize(x, 200, GCRY_STRONG_RANDOM);
+	x = mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
+	gcry_mpi_randomize(x, X_SIZE, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
-	e = mpi_new(1024);
+	e = mpi_new(E_SIZE);
 	mpi_powm(e, g, x, prime);
 
 	if (ret_x)
@@ -79,11 +82,11 @@ MPI __gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 {
 	MPI e, x;
 
-	x = mpi_new(200);	/* FIXME: allocate in secure memory */
-	gcry_mpi_randomize(x, 200, GCRY_STRONG_RANDOM);
+	x = mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
+	gcry_mpi_randomize(x, X_SIZE, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
-	e = mpi_new(1024);
+	e = mpi_new(E_SIZE);
 	mpi_powm(e, g, x, prime);
 
 	if (ret_x)
@@ -118,7 +121,7 @@ MPI _gnutls_calc_dh_key(MPI f, MPI x)
 	MPI k, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;
 
-	k = mpi_new(1024);	/* FIXME: allocate in secure memory */
+	k = mpi_new(E_SIZE);	/* FIXME: allocate in secure memory */
 	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_STD,
 			  diffie_hellman_group1_prime, &n))
 		abort();
@@ -133,7 +136,7 @@ MPI __gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 {
 	MPI k;
 
-	k = mpi_new(1024);	/* FIXME: allocate in secure memory */
+	k = mpi_new(E_SIZE);	/* FIXME: allocate in secure memory */
 
 	mpi_powm(k, f, x, prime);
 	return k;

@@ -360,8 +360,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		datalen = 2 + 4 + (session_id_len + 1) + 28 + 3;
 		data = gnutls_malloc(datalen);
 
-		data[pos++] = GNUTLS_VERSION_MAJOR;
-		data[pos++] = GNUTLS_VERSION_MINOR;
+		data[pos++] = state->connection_state.version.major;
+		data[pos++] = state->connection_state.version.minor;
 #ifdef WORDS_BIGENDIAN
 		cur_time = time(NULL);
 #else
@@ -430,8 +430,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		datalen = 2 + sizeof(uint32) + session_id_len + 1 + 28;
 		data = gnutls_malloc(datalen);
 
-		data[pos++] = GNUTLS_VERSION_MAJOR;
-		data[pos++] = GNUTLS_VERSION_MINOR;
+		data[pos++] = state->connection_state.version.major;
+		data[pos++] = state->connection_state.version.minor;
 #ifdef WORDS_BIGENDIAN
 		cur_time = time(NULL);
 #else

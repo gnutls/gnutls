@@ -326,7 +326,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 
 	for (i = 0; i < iterations; i++) {
 		err =
-		    _gnutls_text2TLSPlaintext(type, &gtxt, &data[i * Size],
+		    _gnutls_text2TLSPlaintext(state, type, &gtxt, &data[i * Size],
 					      Size);
 		if (err < 0) {
 			/*gnutls_perror(err); */
@@ -405,7 +405,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 	if (iterations > 1) {
 		Size = sizeofdata % 16384;
 		err =
-		    _gnutls_text2TLSPlaintext(type, &gtxt, &data[ret],
+		    _gnutls_text2TLSPlaintext(state, type, &gtxt, &data[ret],
 					      Size);
 		if (err < 0) {
 			/*gnutls_perror(err); */
@@ -521,7 +521,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 
 	if ( _gnutls_valid_version( state, gcipher.version.major, gcipher.version.minor) !=0) {
 #ifdef DEBUG
-		fprintf(stderr, "Peer's Version: %d.%d\n", gcipher.version.major, gcipher.version.minor);
+		fprintf(stderr, "INVALID VERSION PACKET: %d.%d\n", gcipher.version.major, gcipher.version.minor);
 #endif
 		_gnutls_send_alert(cd, state, GNUTLS_FATAL,
 				   GNUTLS_PROTOCOL_VERSION);
@@ -539,6 +539,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 #endif
 
 #ifdef HARD_DEBUG
+	fprintf(stderr, "Expected Packet[%d] %d with length: %d\n", (int)state->connection_state.read_sequence_number, type, sizeofdata);
 	fprintf(stderr, "Received Packet[%d] %d with length: %d\n", (int)state->connection_state.read_sequence_number, gcipher.type, gcipher.length);
 #endif
 
@@ -719,5 +720,5 @@ int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	ChangeCipherSpecType x = GNUTLS_TYPE_CHANGE_CIPHER_SPEC;
 
 	return gnutls_send_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
-			       (void *) &x, 1);
+			       (uint8 *) &x, 1);
 }

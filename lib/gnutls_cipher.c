@@ -8,6 +8,18 @@
 #define MD5_DIGEST mhash_get_block_size(MHASH_MD5)
 #define SHA_DIGEST mhash_get_block_size(MHASH_SHA1)
 
+int make_mul(int x, int y)
+{
+	int ret = 0;
+
+	do {
+		ret += y;
+	} while (ret < x);
+
+	return ret;
+
+}
+
 /* Sets the specified cipher into the pending state */
 int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 {
@@ -88,34 +100,46 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 
 /* Update internals from CipherSuite selected */
 
-rc = _gnutls_set_cipher( state, _gnutls_cipher_suite_get_cipher_algo(state->gnutls_internals.current_cipher_suite));
-if (rc<0) return rc;
-rc = _gnutls_set_mac( state, _gnutls_cipher_suite_get_mac_algo(state->gnutls_internals.current_cipher_suite));
-if (rc<0) return rc;
+	rc =
+	    _gnutls_set_cipher(state,
+			       _gnutls_cipher_suite_get_cipher_algo(state->
+								    gnutls_internals.
+								    current_cipher_suite));
+	if (rc < 0)
+		return rc;
+	rc =
+	    _gnutls_set_mac(state,
+			    _gnutls_cipher_suite_get_mac_algo(state->
+							      gnutls_internals.
+							      current_cipher_suite));
+	if (rc < 0)
+		return rc;
 
-/* Set the keys since we have the master secret*/
-_gnutls_set_keys(state);
-
-
-/* FIXME: This is not implemented (no compression algorithms used)
- * state->security_parameters.compression_algorithm = _gnutls_cipher_suite_get_mac_algo(state->gnutls_internals.current_cipher_suite);
+/* Setup the keys since we have the master secret 
  */
- 
-#ifdef DEBUG
-	fprintf(stderr, "Cipher Suite: %s\n", _gnutls_cipher_suite_get_name(state->gnutls_internals.current_cipher_suite));
-#endif
+	_gnutls_set_keys(state);
 
+
+/* FIXME: Compression is not implemented (no compression algorithms used)
+ */
+
+#ifdef DEBUG
+	fprintf(stderr, "Cipher Suite: %s\n",
+		_gnutls_cipher_suite_get_name(state->gnutls_internals.
+					      current_cipher_suite));
+	fprintf(stderr, "Compression: %s\n", "none");
+#endif
 
 	gnutls_free(state->connection_state.write_mac_secret);
 	gnutls_free(state->connection_state.read_mac_secret);
 
 	if (state->connection_state.read_cipher_state != NULL)
-		gcry_cipher_close(state->connection_state.
-				  read_cipher_state);
+		gcry_cipher_close(state->
+				  connection_state.read_cipher_state);
 
 	if (state->connection_state.write_cipher_state != NULL)
-		gcry_cipher_close(state->connection_state.
-				  write_cipher_state);
+		gcry_cipher_close(state->
+				  connection_state.write_cipher_state);
 
 	gnutls_free(state->connection_state.read_compression_state);
 	gnutls_free(state->connection_state.write_compression_state);
@@ -125,7 +149,7 @@ _gnutls_set_keys(state);
 		state->connection_state.read_compression_state = NULL;
 		state->connection_state.write_compression_state = NULL;
 		break;
- 	default:
+	default:
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
 
@@ -136,8 +160,10 @@ _gnutls_set_keys(state);
 		state->connection_state.mac_secret_size = 0;
 		break;
 	case MAC_MD5:
-		state->connection_state.read_mac_secret = gnutls_malloc(MD5_DIGEST);
-		state->connection_state.write_mac_secret = gnutls_malloc(MD5_DIGEST);
+		state->connection_state.read_mac_secret =
+		    gnutls_malloc(MD5_DIGEST);
+		state->connection_state.write_mac_secret =
+		    gnutls_malloc(MD5_DIGEST);
 		state->connection_state.mac_secret_size = MD5_DIGEST;
 		break;
 	case MAC_SHA:
@@ -173,87 +199,90 @@ _gnutls_set_keys(state);
 	case GNUTLS_SERVER:
 		if (state->connection_state.write_cipher_state != NULL) {
 			rc =
-			    gcry_cipher_setkey(state->connection_state.
-					       write_cipher_state,
-					       state->cipher_specs.
-					       server_write_key,
-					       state->security_parameters.
-					       key_size);
-			    gcry_cipher_setiv(state->connection_state.
-					  write_cipher_state,
-					  state->cipher_specs.
-					  server_write_IV,
-					  state->security_parameters.
-					  IV_size);
+			    gcry_cipher_setkey(state->
+					       connection_state.write_cipher_state,
+					       state->
+					       cipher_specs.server_write_key,
+					       state->
+					       security_parameters.key_size);
+			gcry_cipher_setiv(state->
+					  connection_state.write_cipher_state,
+					  state->
+					  cipher_specs.server_write_IV,
+					  state->
+					  security_parameters.IV_size);
 
 		}
 		if (state->connection_state.mac_secret_size > 0) {
 			memmove(state->connection_state.read_mac_secret,
-				state->cipher_specs.client_write_mac_secret,
+				state->cipher_specs.
+				client_write_mac_secret,
 				state->connection_state.mac_secret_size);
 			memmove(state->connection_state.write_mac_secret,
-				state->cipher_specs.
-				server_write_mac_secret,
+				state->
+				cipher_specs.server_write_mac_secret,
 				state->connection_state.mac_secret_size);
 		}
 
 		if (state->connection_state.read_cipher_state != NULL) {
 			rc =
-			    gcry_cipher_setkey(state->connection_state.
-					       read_cipher_state,
-					       state->cipher_specs.
-					       client_write_key,
-					       state->security_parameters.
-					       key_size);
-			    gcry_cipher_setiv(state->connection_state.
-					  read_cipher_state,
-					  state->cipher_specs.
-					  client_write_IV,
-					  state->security_parameters.
-					  IV_size);
+			    gcry_cipher_setkey(state->
+					       connection_state.read_cipher_state,
+					       state->
+					       cipher_specs.client_write_key,
+					       state->
+					       security_parameters.key_size);
+			gcry_cipher_setiv(state->
+					  connection_state.read_cipher_state,
+					  state->
+					  cipher_specs.client_write_IV,
+					  state->
+					  security_parameters.IV_size);
 		}
 		break;
 
 	case GNUTLS_CLIENT:
 		if (state->connection_state.read_cipher_state != NULL) {
 			rc =
-			    gcry_cipher_setkey(state->connection_state.
-					       read_cipher_state,
-					       state->cipher_specs.
-					       server_write_key,
-					       state->security_parameters.
-					       key_size);
-			gcry_cipher_setiv(state->connection_state.
-					  read_cipher_state,
-					  state->cipher_specs.
-					  server_write_IV,
-					  state->security_parameters.
-					  IV_size);
+			    gcry_cipher_setkey(state->
+					       connection_state.read_cipher_state,
+					       state->
+					       cipher_specs.server_write_key,
+					       state->
+					       security_parameters.key_size);
+			gcry_cipher_setiv(state->
+					  connection_state.read_cipher_state,
+					  state->
+					  cipher_specs.server_write_IV,
+					  state->
+					  security_parameters.IV_size);
 
 		}
 		if (state->connection_state.mac_secret_size > 0) {
 			memmove(state->connection_state.read_mac_secret,
-				state->cipher_specs.server_write_mac_secret,
+				state->cipher_specs.
+				server_write_mac_secret,
 				state->connection_state.mac_secret_size);
 			memmove(state->connection_state.write_mac_secret,
-				state->cipher_specs.client_write_mac_secret,
+				state->cipher_specs.
+				client_write_mac_secret,
 				state->connection_state.mac_secret_size);
 		}
 
 		if (state->connection_state.write_cipher_state != NULL) {
-			gcry_cipher_setiv(state->connection_state.
-					  write_cipher_state,
-					  state->cipher_specs.
-					  client_write_IV,
-					  state->security_parameters.
-					  IV_size);
+			gcry_cipher_setiv(state->
+					  connection_state.write_cipher_state,
+					  state->
+					  cipher_specs.client_write_IV,
+					  state->
+					  security_parameters.IV_size);
 			rc =
-			    gcry_cipher_setkey(state->connection_state.
-					       write_cipher_state,
-					       state->cipher_specs.
-					       client_write_key,
-					       state->security_parameters.
-					       key_size);
+			    gcry_cipher_setkey(state->
+					       connection_state.write_cipher_state,
+					       state->
+					       cipher_specs.client_write_key,
+					       state->
+					       security_parameters.key_size);
 		}
 		break;
 
@@ -271,7 +300,6 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 {
 	GNUTLSCiphertext *ciphertext;
 	uint8 *padding, *content, *MAC;
-	uint8 padding_length;
 	uint16 c_length;
 	int rc;
 	uint8 *data;
@@ -285,7 +313,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	content = gnutls_malloc(compressed->length);
 	memmove(content, compressed->fragment, compressed->length);
 
-/* not needed in mhash */
+/* not needed since in mhash the buffer is automaticaly allocated */
 /*	if (state->connection_state.mac_secret_size>0) {
 		MAC = gnutls_malloc(state->connection_state.mac_secret_size);
 	}*/
@@ -300,19 +328,19 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	case MAC_SHA:
 		td =
 		    mhash_hmac_init(MHASH_SHA1,
-				    state->connection_state.
-				    write_mac_secret,
-				    state->connection_state.
-				    mac_secret_size,
+				    state->
+				    connection_state.write_mac_secret,
+				    state->
+				    connection_state.mac_secret_size,
 				    mhash_get_hash_pblock(MHASH_SHA1));
 		break;
 	case MAC_MD5:
 		td =
 		    mhash_hmac_init(MHASH_MD5,
-				    state->connection_state.
-				    write_mac_secret,
-				    state->connection_state.
-				    mac_secret_size,
+				    state->
+				    connection_state.write_mac_secret,
+				    state->
+				    connection_state.mac_secret_size,
 				    mhash_get_hash_pblock(MHASH_MD5));
 		break;
 	default:
@@ -370,22 +398,26 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		case GNUTLS_3DES:
 
 			rand = gcry_random_bytes(1, GCRY_STRONG_RANDOM);
+			rand[0] = rand[0] % (255-_gnutls_cipher_get_block_size(GNUTLS_3DES));
+			
 			length =
 			    compressed->length +
 			    state->connection_state.mac_secret_size +
-			    rand[0] + 1;
+			    rand[0] +
+			    1;
+			fprintf(stderr, "Length1: %d\n", rand[0]);
 			length =
-			    (length / _gnutls_cipher_get_block_size(GNUTLS_3DES));
-			length *= _gnutls_cipher_get_block_size(GNUTLS_3DES);
-
+			    make_mul(length,
+				     _gnutls_cipher_get_block_size
+				     (GNUTLS_3DES));
 			pad =
 			    length - compressed->length -
 			    state->connection_state.mac_secret_size - 1;
-
+			
+			fprintf(stderr, "PSize: %d\n", pad);
 			/* set pad bytes pad */
 			padding = gnutls_malloc(pad);
 			memset(padding, pad, pad);
-			padding_length = pad;
 
 			data = gnutls_malloc(length);
 			memmove(data, content, compressed->length);
@@ -397,13 +429,13 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			memmove(&data
 				[pad +
 				 state->connection_state.mac_secret_size +
-				 compressed->length], &padding_length, 1);
+				 compressed->length], &pad, 1);
 
 			gnutls_free(padding);
 
-			gcry_cipher_encrypt(state->connection_state.
-					    write_cipher_state, data,
-					    length, data, length);
+			gcry_cipher_encrypt(state->
+					    connection_state.write_cipher_state,
+					    data, length, data, length);
 
 			ciphertext->fragment = data;
 			ciphertext->length = length;
@@ -448,7 +480,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	uint8 *macpointer;
 	uint8 pad;
 	uint64 seq_num;
-	int length;
+	uint16 length;
 	MHASH td;
 
 
@@ -470,19 +502,19 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	case MAC_SHA:
 		td =
 		    mhash_hmac_init(MHASH_SHA1,
-				    state->connection_state.
-				    read_mac_secret,
-				    state->connection_state.
-				    mac_secret_size,
+				    state->
+				    connection_state.read_mac_secret,
+				    state->
+				    connection_state.mac_secret_size,
 				    mhash_get_hash_pblock(MHASH_SHA1));
 		break;
 	case MAC_MD5:
 		td =
 		    mhash_hmac_init(MHASH_MD5,
-				    state->connection_state.
-				    read_mac_secret,
-				    state->connection_state.
-				    mac_secret_size,
+				    state->
+				    connection_state.read_mac_secret,
+				    state->
+				    connection_state.mac_secret_size,
 				    mhash_get_hash_pblock(MHASH_MD5));
 		break;
 	default:
@@ -520,10 +552,10 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	case CIPHER_BLOCK:
 		switch (state->security_parameters.bulk_cipher_algorithm) {
 		case GNUTLS_3DES:
-			gcry_cipher_decrypt(state->connection_state.
-					    read_cipher_state, content,
-					    ciphertext->length, content,
-					    ciphertext->length);
+			gcry_cipher_decrypt(state->
+					    connection_state.read_cipher_state,
+					    content, ciphertext->length,
+					    content, ciphertext->length);
 
 			pad = content[ciphertext->length - 1];	/* pad */
 			length =
@@ -531,6 +563,8 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			    state->connection_state.mac_secret_size - pad -
 			    1;
 
+			if (pad > ciphertext->length - state->connection_state.mac_secret_size)
+				return GNUTLS_E_RECEIVED_BAD_MESSAGE;
 			data = gnutls_malloc(length);
 			memmove(data, content, length);
 
@@ -560,7 +594,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	c_length = compressed->length;
 #else
 	seq_num = byteswap64(state->connection_state.read_sequence_number);
-	c_length = byteswap16((uint16)compressed->length);
+	c_length = byteswap16((uint16) compressed->length);
 #endif
 
 
@@ -573,9 +607,11 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 		mhash(td, data, compressed->length);
 		MAC = mhash_hmac_end(td);
 	}
-		/* HMAC was not the same. */
-	if (memcmp( MAC, &content[compressed->length], state->connection_state.mac_secret_size) != 0) {
-#ifdef DEBUG	
+	/* HMAC was not the same. */
+	if (memcmp
+	    (MAC, &content[compressed->length],
+	     state->connection_state.mac_secret_size) != 0) {
+#ifdef DEBUG
 		fprintf(stderr, "MAC FAILED\n");
 #endif
 		return GNUTLS_E_MAC_FAILED;

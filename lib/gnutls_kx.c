@@ -19,8 +19,6 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 	int ret=0;
 
 
-	n_X = n_g = n_p = 512 - 2;
-
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo(state->
 					     gnutls_internals.current_cipher_suite);
@@ -187,8 +185,9 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 }
 
-/* We have this as an upper limit. */
-#define MAX_KX_MESSAGE_SIZE 16000
+/* We have this as an upper limit, since the record layer defines this
+ * as a maximum packet length */
+#define MAX_KX_MESSAGE_SIZE 16384
 
 int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 {

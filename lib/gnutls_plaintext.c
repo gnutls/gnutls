@@ -3,7 +3,7 @@
 #include "gnutls_errors.h"
 
 /* Plaintext Handling */
-int _gnutls_text2TLSPlaintext(ContentType type, GNUTLSPlaintext** plain, char *text, uint16 length)
+int _gnutls_text2TLSPlaintext(GNUTLS_STATE state, ContentType type, GNUTLSPlaintext** plain, char *text, uint16 length)
 {
 	GNUTLSPlaintext *plaintext;
 
@@ -17,8 +17,8 @@ int _gnutls_text2TLSPlaintext(ContentType type, GNUTLSPlaintext** plain, char *t
 	memmove(plaintext->fragment, text, length);
 	plaintext->length = length;
 	plaintext->type = type;
-	plaintext->version.major = GNUTLS_VERSION_MAJOR;
-	plaintext->version.minor = GNUTLS_VERSION_MINOR;
+	plaintext->version.major = state->connection_state.version.major;
+	plaintext->version.minor = state->connection_state.version.minor;
 
 	return 0;
 }
