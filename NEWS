@@ -1,4 +1,4 @@
-Version 1.1.10
+Version 1.1.10 (12/06/2004)
 - Added gnutls_sign_algorithm_get_name() and gnutls_pk_algorithm_get_name()
 - Corrected bug in TLS renegotiation.
 - Corrected bug in OpenPGP key loading using a callback.
@@ -23,6 +23,7 @@ Version 1.1.10
   gnutls_rsa_export_get_pubkey() to retrieve parameters of the DH or
   RSA-EXPORT key exchange.
 - Some fixes in the session resuming code.
+- Added gnutls_openpgp_keyring_check_id().
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage

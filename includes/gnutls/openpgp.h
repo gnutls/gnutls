@@ -93,6 +93,9 @@ void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring ring);
 int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring ring,
     const gnutls_datum* data, gnutls_openpgp_key_fmt format);
 
+int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring ring,
+    const unsigned char keyid[8], unsigned int flags);
+
 /* Trustdb functions.
  */
 struct gnutls_openpgp_trustdb_int; /* object to hold (parsed) openpgp trustdbs */

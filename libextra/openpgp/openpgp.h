@@ -61,6 +61,8 @@ void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring keyring);
 int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring * keyring);
 int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring keyring,
     const gnutls_datum * data, gnutls_openpgp_key_fmt format);
+int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring ring,
+    const unsigned char keyid[8], unsigned int flags);
 
 void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb trustdb);
 int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb * trustdb);
@@ -84,7 +86,6 @@ int _gnutls_openpgp_privkey_to_gkey(gnutls_privkey * dest,
     gnutls_openpgp_privkey src);
 
 void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key);
-
 
 #else				/* no opencdk */
 

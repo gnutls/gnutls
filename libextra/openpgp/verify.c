@@ -76,34 +76,6 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb trustdb,
 }
 
 /**
- * gnutls_openpgp_keyring_check_id - Check if a key id exists in the keyring
- * @ring: holds the keyring to check against
- * @keyid: will hold the keyid to check for.
- * @flags: unused (should be 0)
- *
- * Check if a given key ID exists in the keyring.
- *
- * Returns 0 on success (if keyid exists) and a negative error code
- * on failure.
- */
-int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring ring, 
-    const unsigned char keyid[8], unsigned int flags)
-{
-int rc;
-cdk_pkt_pubkey_t sig_pk;
-uint32 id[2];
-
-    id[0] = _gnutls_read_uint32( keyid);
-    id[1] = _gnutls_read_uint32( &keyid[4]);
-
-    rc = cdk_keydb_get_pk( ring->hd, id, &sig_pk);
-    if (!rc)
-       return 0;
-    else
-       return GNUTLS_E_NO_CERTIFICATE_FOUND;
-}
-
-/**
  * gnutls_openpgp_key_verify_ring - Verify all signatures in the key
  * @key: the structure that holds the key.
  * @keyring: holds the keyring to check against
