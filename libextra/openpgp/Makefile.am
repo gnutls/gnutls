@@ -2,6 +2,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl		\
 	-I$(top_srcdir)/lib -I$(top_srcdir)/includes -I../includes	\
 	-I$(top_srcdir)/libextra/opencdk
 
+if ENABLE_MINITASN1
+AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
+else
+AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
+endif
+
 noinst_LTLIBRARIES = libgnutls_openpgp.la
 
 COBJECTS = pgp.c xml.c pgpverify.c extras.c compat.c privkey.c
