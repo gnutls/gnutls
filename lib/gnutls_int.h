@@ -340,8 +340,8 @@ typedef struct {
 #define CompressionMethod_Priority GNUTLS_Priority
 #define Protocol_Priority GNUTLS_Priority
 
-typedef int x509pki_client_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int x509pki_server_cert_callback_func(const gnutls_datum *, int);
+typedef int x509pki_client_cert_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int x509pki_server_cert_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];

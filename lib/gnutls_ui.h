@@ -38,8 +38,8 @@ typedef struct {
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
 
-typedef int x509pki_client_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int x509pki_server_cert_callback_func(const gnutls_datum *, int);
+typedef int x509pki_client_cert_callback_func(GNUTLS_STATE, const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int x509pki_server_cert_callback_func(GNUTLS_STATE, const gnutls_datum *, int);
 
 /* Functions that allow AUTH_INFO structures handling
  */

@@ -223,7 +223,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		 * will be prompted to choose one.
 		 */
 		try =
-		    state->gnutls_internals.client_cert_callback(NULL, 0,
+		    state->gnutls_internals.client_cert_callback( state, NULL, 0,
 								 NULL, 0);
 	}
 
@@ -326,7 +326,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 			my_certs[i] = cred->cert_list[i][0].raw;
 		}
 		indx =
-		    state->gnutls_internals.client_cert_callback(my_certs,
+		    state->gnutls_internals.client_cert_callback(state, my_certs,
 								 cred->
 								 ncerts,
 								 issuers_dn,
@@ -1333,7 +1333,7 @@ int _gnutls_server_find_cert_list_index(GNUTLS_STATE state,
 			my_certs[i] = cred->cert_list[i][0].raw;
 		}
 		index =
-		    state->gnutls_internals.server_cert_callback(my_certs,
+		    state->gnutls_internals.server_cert_callback(state, my_certs,
 								 cred->ncerts);
 
 	      clear:
