@@ -7,30 +7,8 @@ The following authentication schemas are supported in \gnutls:
  \item SRP authentication
 \end{enumerate}
 
-\section{Authentication using X.509 certificates}
-This authentication method is part of the certificate authentication
-method in \gnutls{}.
-The X.509 protocols rely on a hierarchical trust model. In this trust model
-Certification Authorities (CAs) are used to certify entities.
-Usually more than one certification authorities exist, and certification
-authorities may certify other authorities to issue certificates as well,
-following a hierachical model. 
-One needs to trust one or more CAs for his secure
-communications. In that case only the certificates issued by the trusted
-authorities are acceptable. 
-\par
-X.509 certificates contain the public parameters, 
-of a public key algorithm, and the authority's signature, which proves the
-authenticity of the parameters.
-\par
-The key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
-available in X.509 authentication. 
-
-\par
-Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit. See 
-\htmladdnormallink{http://www.gnupg.org/aegypten/}{http://www.gnupg.org/aegypten/}}. 
-\gnutls{} only includes the required,
-in order to use the TLS ciphersuites which require X.509 certificates.
+% x.509 section
+\input{x509}
 
 \begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
@@ -56,10 +34,8 @@ parameters which are send to the peer.
 
 \end{figure}
 
-\section{Authentication using OpenPGP keys}
-This authentication method is part of the certificate authentication
-method in \gnutls{}. All the key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
-available in OpenPGP authentication. 
+
+% openpgp section
 
 \input{openpgp}
 
