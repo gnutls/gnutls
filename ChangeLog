@@ -1,3 +1,11 @@
+2002-12-04 12:16  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, ex-pgp-keyserver.tex, examples.tex,
+	macros.tex, preparation.tex:
+
+	Added a chapter for sources preparation. Based on the documenation
+	of libksba.  
+
 2002-12-02 22:00  nmav <nmav@gnutls.org>
 
 	* configure.in, doc/tex/ex-pgp-keyserver.tex:
