@@ -1,3 +1,9 @@
+2004-06-17 19:21  nmav <nmav@gnutls.org>
+
+	* doc/tex/: certificate.tex, gnutls.bib, tlsintro.tex:
+
+	added links to gpgme and to Rescola's book.  
+
 2004-06-16 13:22  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_pk.c, gnutls_pk.c:
