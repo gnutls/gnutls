@@ -207,6 +207,8 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert,
 /* Private key handling
  */
 
+/* Flags for the gnutls_x509_privkey_export_pkcs8() function.
+ */
 typedef enum gnutls_privkey_pkcs8_flags {
 	GNUTLS_PKCS8_PLAIN=1,  /* if set the private key will not
 			        * be encrypted.

@@ -9,7 +9,8 @@
 
 /* This function will write a pkcs12 structure into a file.
  * cert: is a DER encoded certificate
- * pkcs8_key: is a PKCS #8 encrypted key
+ * pkcs8_key: is a PKCS #8 encrypted key (note that this must be
+ *  encrypted using a PKCS #12 cipher, or some browsers will crash)
  * password: is the password used to encrypt the PKCS #12 packet.
  */
 int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,

@@ -3,14 +3,12 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-* Update to the latest SRP Draft.
 * Add a callback function in certificate authentication, to receive
   the certificate and the private key.
 * Convert documentation to texinfo format
 * Audit the code
 * Allow sending V2 Hello messages. It seems that some (old) broken 
   implementations require that.
-* Add GPGSM certificate manager support
 * Allow unexpected Client Hello messages
 * Add Kerberos support
 

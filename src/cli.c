@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -49,7 +49,6 @@
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
 #define MAX_BUF 4096
-#define GERR(ret) fprintf(stderr, "* Error: %s\n", gnutls_strerror(ret))
 
 /* global stuff here */
 int resume, starttls;
@@ -195,8 +194,36 @@ static gnutls_session init_tls_session( const char* hostname)
    return session;
 }
 
-
 static void gaa_parser(int argc, char **argv);
+
+/* Returns zero if the error code was successfully handled.
+ */
+static int handle_error( socket_st * hd, int err) 
+{
+int alert, ret;
+const char* err_type;
+
+	 if (gnutls_error_is_fatal(err) == 0) {
+	 	ret = 0;
+	 	err_type = "Non fatal";
+	 } else {
+	 	ret = err;
+	 	err_type = "Fatal";
+	 }
+
+	fprintf(stderr,
+		"*** %s error: %s\n", err_type, gnutls_strerror(err));
+
+	 if (err == GNUTLS_E_WARNING_ALERT_RECEIVED
+	     || err == GNUTLS_E_FATAL_ALERT_RECEIVED) {
+	    alert = gnutls_alert_get(hd->session);
+	    printf("*** Received alert [%d]: %s\n",
+		   alert, gnutls_alert_get_name(alert));
+	 }
+	 
+	 return ret;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -206,7 +233,7 @@ int main(int argc, char **argv)
    char buffer[MAX_BUF + 1];
    char *session_data = NULL;
    char *session_id = NULL;
-   int session_data_size, alert;
+   int session_data_size;
    int session_id_size;
    fd_set rset;
    int maxfd;
@@ -264,13 +291,7 @@ int main(int argc, char **argv)
 
       ret = do_handshake(&hd);
 
-      if (ret < 0) {
-	 if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
-	     || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-	    alert = gnutls_alert_get(hd.session);
-	    printf("*** Received alert [%d]: %s\n",
-		   alert, gnutls_alert_get_name(alert));
-	 }
+      if (ret < 0 && handle_error(&hd, ret) < 0) {
 	 fprintf(stderr, "*** Handshake has failed\n");
 	 gnutls_perror(ret);
 	 gnutls_deinit(hd.session);
@@ -338,10 +359,9 @@ int main(int argc, char **argv)
 	 if (ret == 0) {
 	    printf("- Peer has closed the GNUTLS connection\n");
 	    break;
-	 } else if (ret < 0 && user_term == 0) {
+	 } else if (ret < 0 && user_term == 0 && handle_error(&hd, ret) < 0) {
 	    fprintf(stderr,
-		    "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
-		    ret);
+		    "*** Server has terminated the connection abnormally.\n");
 	    break;
 	 } else if (ret > 0) {
 	    if (quiet != 0)
@@ -361,9 +381,8 @@ int main(int argc, char **argv)
   	    if (hd.secure == 0) {
   	       fprintf(stderr, "*** Starting TLS handshake\n");
 	       ret = do_handshake(&hd);
-	       if (ret < 0) {
+	       if (ret < 0 && handle_error(&hd, ret) < 0) {
  		 fprintf(stderr, "*** Handshake has failed\n");
-		 gnutls_perror(ret);
 		 socket_bye(&hd);
 		 user_term = 1;
 	       }
@@ -386,7 +405,7 @@ int main(int argc, char **argv)
 	    if (quiet != 0)
 	       printf("- Sent: %d bytes\n", ret);
 	 } else
-	    GERR(ret);
+	    handle_error(&hd, ret);
 
       }
    }
