@@ -338,9 +338,11 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 
 	/* Actual encryption (inplace).
 	 */
-	if ( (ret = _gnutls_cipher_encrypt(session->connection_state.
+	ret = _gnutls_cipher_encrypt(session->connection_state.
 			      write_cipher_state, cipher_data, 
-			      length)) < 0) {
+			      length);
+	if (ret < 0) {
+		gnutls_assert();
 		return ret;
 	}
 
