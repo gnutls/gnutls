@@ -84,8 +84,11 @@ int gnutls_global_init( void)
 {
 	int result;
 
-	if (_gnutls_init!=0) return 0;
-	_gnutls_init = 1;
+	_gnutls_init++;
+
+	if (_gnutls_init!=1) {
+		return 0;
+	}
 
 	/* for gcrypt in order to be able to allocate memory */
 	gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
@@ -128,12 +131,14 @@ int gnutls_global_init( void)
 
 void gnutls_global_deinit( void) {
 
-	asn1_delete_structure( PKCS1_ASN);
-	asn1_delete_structure( PKIX1_ASN);
+	_gnutls_init--;
 	
-	_gnutls_dh_clear_mpis();
-
-	_gnutls_init = 0;
+	if (_gnutls_init==0) {
+		asn1_delete_structure( PKCS1_ASN);
+		asn1_delete_structure( PKIX1_ASN);
+	
+		_gnutls_dh_clear_mpis();
+	}
 	
 }
 
