@@ -274,4 +274,3 @@ size_t gnutls_record_check_pending(GNUTLS_STATE state);
 void gnutls_openpgp_send_key(GNUTLS_STATE state, GNUTLS_OpenPGPKeyStatus status);
 
 int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* data, char* result, size_t* result_size);
-int gnutls_openpgp_fingerprint( const gnutls_datum* data, char* result, size_t* result_size);
