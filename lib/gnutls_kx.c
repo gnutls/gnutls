@@ -91,6 +91,16 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Sending server KX message\n");
 #endif
+
+
+	if (state->gnutls_internals.auth_struct->gnutls_generate_server_kx==NULL) 
+		return 0;
+
+	/* copy random bytes - some algorithms need that.
+	 */
+	memcpy( state->gnutls_key->server_random, state->security_parameters.server_random, 32);
+	memcpy( state->gnutls_key->client_random, state->security_parameters.client_random, 32);
+	
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx( state->gnutls_key, &data);
 
 	if (data_size < 0) {

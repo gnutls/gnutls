@@ -1,8 +1,5 @@
-EXTRA_DIST = TODO gnutls.3 gnutls-api.txt gnutls-api.html
-man_MANS = gnutls.3
+EXTRA_DIST = TODO gnutls-api.txt gnutls-api.html
 
-gnutls.3: 
-	@scripts/gdoc -man ../lib/*.c > gnutls.3
 gnutls-api: gnutls-api.html gnutls-api.txt
 gnutls-api.html: 
 	@scripts/gdoc -html ../lib/*.c > gnutls-api.html

@@ -139,6 +139,10 @@ typedef struct {
 	MPI				b;
 	MPI				a;
 	MPI				x;
+	/* RSA: 
+	 * modulus is A
+	 * exponent is B
+	 */
 	
 	/* this is used to hold the peers authentication data 
 	 */
@@ -147,6 +151,10 @@ typedef struct {
 
 	uint8				crypt_algo;
 	
+	/* These are needed in RSA and DH signature calculation 
+	 */
+	opaque				server_random[32];
+	opaque				client_random[32];
 	AUTH_CRED*			cred; /* used in srp, etc */
 } GNUTLS_KEY_A;
 typedef GNUTLS_KEY_A* GNUTLS_KEY;
@@ -287,61 +295,15 @@ typedef struct {
 	opaque*		fragment;
 } GNUTLSCompressed;
 
-/* This is used for both block ciphers and stream ciphers. In stream ciphers
- * the padding is just ignored.
- */
-typedef struct {
-	opaque*		content;
-	opaque*		MAC;
-	uint8*		padding;
-	uint8		padding_length;
-} GNUTLS_GenericBlockCipher;
-
-typedef struct {
-	opaque*		content;
-	opaque*		MAC;
-} GNUTLS_GenericStreamCipher;
-
 typedef struct {
 	uint8			type;
-	ProtocolVersion	version;
+	ProtocolVersion		version;
 	uint16			length;
 	void*			fragment; /* points GenericStreamCipher
 					   		 * or GenericBlockCipher
 							 */
 } GNUTLSCiphertext;
 
-
-/* Handshake protocol */
-
-
-typedef struct {
-	HandshakeType	msg_type;
-	uint24		length;
-	void*		body;
-} GNUTLS_Handshake;
-
-typedef struct {
-	uint32	gmt_unix_time;
-	opaque  random_bytes[28];
-} GNUTLS_random;
-
-
-typedef struct {
-	ProtocolVersion	client_version;
-	GNUTLS_random		random;
-	opaque*			session_id;
-	GNUTLS_CipherSuite*	cipher_suites;
-	CompressionMethod*	compression_methods;
-} GNUTLS_ClientHello;
-
-typedef struct {
-	ProtocolVersion	server_version;
-	GNUTLS_random		random;
-	opaque*			session_id;
-	GNUTLS_CipherSuite	cipher_suite;
-	CompressionMethod	compression_method;
-} GNUTLS_ServerHello;
 
 /* functions */
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);

@@ -47,6 +47,11 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
+typedef struct {
+	unsigned char * data;
+	int size;
+} gnutls_datum;
+
 /* internal functions */
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
@@ -136,5 +141,9 @@ typedef struct {
 	int dh_bits;
 } ANON_AUTH_INFO;
 
+typedef struct {
+	gnutls_datum * cert_list;
+	int cert_list_size;
+} X509PKI_SERVER_CREDENTIALS;
 
 /* error codes appended here */

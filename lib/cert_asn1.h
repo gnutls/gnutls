@@ -167,5 +167,11 @@ delete_tree2(node_asn *root);
 int 
 append_sequence_set(node_asn *node);
 
+int
+create_structure(char *dest_name,char *source_name);
+
+int
+delete_structure(char *root_name);
+
 #endif
 

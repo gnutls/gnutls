@@ -49,7 +49,7 @@ typedef GNUTLS_MAC_HANDLE_INT* GNUTLS_MAC_HANDLE;
 
 GNUTLS_MAC_HANDLE gnutls_hmac_init( MACAlgorithm algorithm, void* key, int keylen);
 int gnutls_hmac_get_algo_len(MACAlgorithm algorithm);
-int gnutls_hmac(GNUTLS_MAC_HANDLE handle, void* text, int textlen);
+int gnutls_hmac(GNUTLS_MAC_HANDLE handle, const void* text, int textlen);
 void* gnutls_hmac_deinit( GNUTLS_MAC_HANDLE handle);
 
 GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3( MACAlgorithm algorithm, void* key, int keylen);
@@ -57,7 +57,7 @@ void* gnutls_mac_deinit_ssl3( GNUTLS_MAC_HANDLE handle);
 
 GNUTLS_MAC_HANDLE gnutls_hash_init(MACAlgorithm algorithm);
 int gnutls_hash_get_algo_len(MACAlgorithm algorithm);
-int gnutls_hash(GNUTLS_MAC_HANDLE handle, void* text, int textlen);
+int gnutls_hash(GNUTLS_MAC_HANDLE handle, const void* text, int textlen);
 void* gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle);
 
 void *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random, int random_len, int bytes);

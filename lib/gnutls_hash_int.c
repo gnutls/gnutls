@@ -99,7 +99,7 @@ int gnutls_hash_get_algo_len(MACAlgorithm algorithm)
 
 }
 
-int gnutls_hash(GNUTLS_MAC_HANDLE handle, void *text, int textlen)
+int gnutls_hash(GNUTLS_MAC_HANDLE handle, const void *text, int textlen)
 {
 #ifdef USE_MHASH
 	mhash(handle->handle, text, textlen);
@@ -210,7 +210,7 @@ int gnutls_hmac_get_algo_len(MACAlgorithm algorithm)
 
 }
 
-int gnutls_hmac(GNUTLS_MAC_HANDLE handle, void *text, int textlen)
+int gnutls_hmac(GNUTLS_MAC_HANDLE handle, const void *text, int textlen)
 {
 
 #ifdef USE_MHASH
