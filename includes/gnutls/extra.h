@@ -76,13 +76,4 @@ int gnutls_global_init_extra(void);
  */
 const char* gnutls_extra_check_version( const char *req_version);
 
-/* base64 */
-int gnutls_srp_base64_encode( const gnutls_datum_t *data, char* result, int* result_size);
-int gnutls_srp_base64_encode_alloc( const gnutls_datum_t *data, gnutls_datum_t* result);
-
-int gnutls_srp_base64_decode( const gnutls_datum_t *b64_data, char* result, int* result_size);
-int gnutls_srp_base64_decode_alloc( const gnutls_datum_t *b64_data, 
-   gnutls_datum_t* result);
-
-
 #endif
