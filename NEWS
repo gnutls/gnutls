@@ -1,3 +1,6 @@
+Version 1.1.16
+- Fix missing gnulib linker parameter when building certtool.
+
 Version 1.1.15 (15/08/2004)
 - Certtool has simplistic --smime-to-p7 to translate RFC 2633 messages into
   PKCS #7 format.
