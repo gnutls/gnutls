@@ -150,11 +150,13 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
   * @state: is a &GNUTLS_STATE structure.
   *
   * This function must be called after a succesful gnutls_handshake().
-  * Returns a pointer to authentication information.   
+  * Returns a pointer to authentication information. That information
+  * is data obtained by the handshake protocol, the key exchange algorithm,
+  * and the TLS extensions messages.
   *
-  * In case of %GNUTLS_KX_ANON returns a pointer to &DH_ANON_AUTH_INFO;
+  * In case of %GNUTLS_ANON returns a pointer to &ANON_AUTH_INFO;
   *
-  * In case of %GNUTLS_KX_SRP returns a pointer to structure &SRP_AUTH_INFO;
+  * In case of %GNUTLS_SRP returns a pointer to structure &SRP_AUTH_INFO;
   **/
 const void* gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;
