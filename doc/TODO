@@ -5,7 +5,6 @@ in order to avoid having people working on the same thing.
 
 
 Current list:
-* test
 * Convert the current sexp stuff to the gcrypt ac API. 
 * Check opera and DHE-RSA
 * Check opera (which sends an closure alert during the handshake
