@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -73,7 +74,7 @@ static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
 static gnutls_certificate_credentials xcred;
 
-int protocol_priority[PRI_MAX] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+int protocol_priority[PRI_MAX] = { GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
 	/* Do not use anonymous authentication, unless you know what that means */
@@ -124,7 +125,7 @@ static int cert_callback(gnutls_session session,
 	/* Print the server's trusted CAs
 	 */
 	if (nreqs > 0)
-		printf("- Server's trusted authorities:\n");
+		printf("- Server's trusted authorities (%d):\n", nreqs);
 	else
 		printf
 		    ("- Server did not send us any trusted authorities names.\n");
@@ -169,6 +170,7 @@ static gnutls_session init_tls_session(const char *hostname)
 	gnutls_kx_set_priority(session, kx_priority);
 	gnutls_protocol_set_priority(session, protocol_priority);
 	gnutls_mac_set_priority(session, mac_priority);
+
 
 	gnutls_dh_set_prime_bits(session, 512);
 
@@ -675,15 +677,31 @@ static int do_handshake(socket_st * socket)
 static int srp_username_callback( gnutls_session session, unsigned int times,
 	char** username, char** password)
 {
+	if (srp_username == NULL || srp_passwd ==NULL) {
+		return -1;
+	}
+
 	/* We should ask here the user for his SRP username
 	 * and password.
 	 */
-	if (times == 1 && srp_username && srp_passwd) {
+	if (times == 1) {
 		*username = gnutls_strdup( srp_username);
 		*password = gnutls_strdup( srp_passwd);
 		
 		return 0;
-	}
+	} else
+		/* At the first time return username and password, if
+		 * the kx_priority[0] is an SRP method.
+		 */
+		if (times == 0 && (kx_priority[0] == GNUTLS_KX_SRP ||
+			kx_priority[0] == GNUTLS_KX_SRP_RSA ||
+			kx_priority[0] == GNUTLS_KX_SRP_DSS)) {
+
+			*username = gnutls_strdup( srp_username);
+			*password = gnutls_strdup( srp_passwd);
+		
+			return 0;
+		}
 	
 	return -1;
 }
