@@ -3,17 +3,18 @@
 \label{sec:tlsintro}
 \tls{} stands for 'Transport Layer Security' and is the successor of \ssl{},
 the Secure Sockets Layer protocol\footnote{described in \cite{SSL3}} designed by Netscape. 
-\tlsI{}\footnote{described in {\it RFC 2246}\cite{RFC2246}} is an Internet protocol,
+\tlsI{} is an Internet protocol,
 defined by {IETF}\footnote{IETF or Internet Engineering Task Force 
 is a large open international community of network
 designers, operators, vendors, and researchers concerned with the evolution of 
 the Internet architecture and the smooth operation of the Internet. It is open 
-to any interested individual.}, 
-that provides confidentiality, and authentication layers over any reliable
-transport layer. The description, below, refers to \tlsI{} but also
-applies to \sslIII{} since the differences of these protocols are minor.
-Older protocols such as \sslII{} are not discussed nor implemented in \gnutls{} 
-since they are not considered secure today.
+to any interested individual.}, described in \cite{RFC2246} and
+also in \cite{RESCOLA}. The protocol provides confidentiality, and 
+authentication layers over any reliable transport layer. The description, 
+below, refers to \tlsI{} but also applies to \sslIII{} since the differences 
+of these protocols are minor. Older protocols such as \sslII{} are not 
+discussed nor implemented in \gnutls{} since they are not considered secure 
+today.
 
 \input{layers}
 

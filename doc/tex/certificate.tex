@@ -219,7 +219,9 @@ functions can be found at \emph{gnutls/openpgp.h}.
 The verification functions of OpenPGP keys, included in \gnutls{}, 
 are simple ones, and do not use the features of the ``web of trust''.
 For that reason, if the verification needs are complex, 
-the assistance of external tools like GnuPG is recommended.
+the assistance of external tools like GnuPG and GPGME\footnote{
+Available at \htmladdnormallink{http://www.gnupg.org/related\_software/gpgme/}}
+is recommended.
 \par
 There are two verification functions in \gnutls{},
 The \printfunc{gnutls_openpgp_key_verify_ring}{gnutls\_openpgp\_key\_verify\_ring}
