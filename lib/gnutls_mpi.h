@@ -6,6 +6,7 @@
 
 #define GNUTLS_MPI gcry_mpi_t
 
+#define _gnutls_mpi_cmp gcry_mpi_cmp
 #define _gnutls_mpi_cmp_ui gcry_mpi_cmp_ui
 #define _gnutls_mpi_mod gcry_mpi_mod
 #define _gnutls_mpi_new gcry_mpi_new
@@ -19,6 +20,7 @@
 #define _gnutls_mpi_invm gcry_mpi_invm
 #define _gnutls_mpi_addm gcry_mpi_addm
 #define _gnutls_mpi_subm gcry_mpi_subm
+#define _gnutls_mpi_sub_ui gcry_mpi_sub_ui
 #define _gnutls_mpi_mulm gcry_mpi_mulm
 #define _gnutls_mpi_mul gcry_mpi_mul
 #define _gnutls_mpi_add gcry_mpi_add
