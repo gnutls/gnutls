@@ -58,7 +58,12 @@ tmpl.stamp: scan.stamp
 	gtkdoc-mktmpl --module=$(PACKAGE) --output-dir=.
 
 sgml.stamp: tmpl.stamp
-	gtkdoc-mkdb --module=$(PACKAGE) --source-dir=$(top_srcdir)/lib \
+	gtkdoc-mkdb --module=$(PACKAGE) \
+		--source-dir=$(top_builddir)/includes/gnutls \
+		--source-dir=$(top_srcdir)/lib \
+		--source-dir=$(top_srcdir)/lib/x509 \
+		--source-dir=$(top_srcdir)/libextra \
+		--source-dir=$(top_srcdir)/libextra/openpgp \
 		--tmpl-dir=. --output-dir=. \
 		--main-sgml-file=$(srcdir)/$(PACKAGE)-docs.tmpl
 
