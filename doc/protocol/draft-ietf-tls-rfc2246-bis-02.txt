@@ -3,15 +3,14 @@
 
 
 
-
                                                               Tim Dierks |
                                                                 Certicom |
                                                            Eric Rescorla |
 INTERNET-DRAFT                                                RTFM, Inc. |
-<draft-ietf-tls-rfc2246-bis-01.txt>  March 2002 (Expires September 2002) |
+<draft-ietf-tls-rfc2246-bis-02.txt>    October 2002 (Expires April 2003) |
 
                             The TLS Protocol
-                              Version 1.0
+                              Version 1.1                                |
 
 Status of this Memo
 
@@ -37,7 +36,7 @@ Copyright Notice
 
 Abstract
 
-   This document specifies Version 1.0 of the Transport Layer Security
+   This document specifies Version 1.1 of the Transport Layer Security   |
    (TLS) protocol. The TLS protocol provides communications privacy over
    the Internet. The protocol allows client/server applications to
    communicate in a way that is designed to prevent eavesdropping,
@@ -55,7 +54,7 @@ Table of Contents
 
 
 
-Dierks & Rescorla            Standards Track                     [Page 1]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                     [Page 1]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    4.4.     Numbers                                                   7
@@ -109,7 +108,7 @@ Dierks & Rescorla            Standards Track                     [Page 1]draft-
 
 
 
-Dierks & Rescorla            Standards Track                     [Page 2]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                     [Page 2]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    A.4.     Handshake protocol                                       51
@@ -152,20 +151,25 @@ Change history                                                           |
 
    Note: Change bars in this draft are from RFC 2246, not draft-00       |
 
+   02-Nov-02 ekr@rtfm.com                                                |
+    * Changed this to be TLS 1.1.                                        |
+    * Added fixes for the Rogaway and Vaudenay CBC attacks               |
+    * Separated references into normative and informative                |
+
    01-Mar-02 ekr@rtfm.com                                                |
     * Tightened up the language in F.1.1.2 [Peter Watkins]               |
     * Fixed smart quotes [Bodo Moeller]                                  |
+
+
+
+Dierks & Rescorla            Standards Track                     [Page 3]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
     * Changed handling of padding errors to prevent CBC-based attack     |
       [Bodo Moeller]                                                     |
     * Fixed certificate_list spec in the appendix [Aman Sawrup]          |
     * Fixed a bug in the V2 definitions [Aman Sawrup]                    |
     * Fixed S 7.2.1 to point out that you don't need a close notify      |
-
-
-
-Dierks & Rescorla            Standards Track                     [Page 3]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
       if you just sent some other fatal alert [Andreas Sterbenz]         |
     * Marked alert 41 reserved [Andreas Sterbenz]                        |
     * Changed S 7.4.2 to point out that 512-bit keys cannot be used for  |
@@ -209,16 +213,14 @@ Dierks & Rescorla            Standards Track                     [Page 3]draft-
        data encryption (e.g., DES [DES], RC4 [RC4], etc.) The keys for
        this symmetric encryption are generated uniquely for each
        connection and are based on a secret negotiated by another
+
+
+
+Dierks & Rescorla            Standards Track                     [Page 4]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        protocol (such as the TLS Handshake Protocol). The Record
        Protocol can also be used without encryption.
-
-
-
-
-
-
-Dierks & Rescorla            Standards Track                     [Page 4]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
 
      - - The connection is reliable. Message transport includes a
        message integrity check using a keyed MAC. Secure hash functions
@@ -240,7 +242,7 @@ Dierks & Rescorla            Standards Track                     [Page 4]draft-
        authentication can be made optional, but is generally required
        for at least one of the peers.
 
-       - - The negotiation of a shared secret is secure: the negotiated
+     - - The negotiation of a shared secret is secure: the negotiated    |
        secret is unavailable to eavesdroppers, and for any authenticated
        connection the secret cannot be obtained, even by an attacker who
        can place himself in the middle of the connection.
@@ -265,15 +267,15 @@ Dierks & Rescorla            Standards Track                     [Page 4]draft-
 
 2. Goals
 
+
+
+
+Dierks & Rescorla            Standards Track                     [Page 5]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
    The goals of TLS Protocol, in order of their priority, are:
 
     1. Cryptographic security: TLS should be used to establish a secure
-
-
-
-Dierks & Rescorla            Standards Track                     [Page 5]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        connection between two parties.
 
     2. Interoperability: Independent programmers should be able to
@@ -319,15 +321,15 @@ Dierks & Rescorla            Standards Track                     [Page 5]draft-
 
    This document deals with the formatting of data in an external
    representation. The following very basic and somewhat casually
+
+
+
+Dierks & Rescorla            Standards Track                     [Page 6]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
    defined presentation syntax will be used. The syntax draws from
    several sources in its structure. Although it resembles the
    programming language "C" in its syntax and XDR [XDR] in both its
-
-
-
-Dierks & Rescorla            Standards Track                     [Page 6]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
    syntax and intent, it would be risky to draw too many parallels. The
    purpose of this presentation language is to document TLS only, not to
    have general application beyond that particular goal.
@@ -376,10 +378,7 @@ Dierks & Rescorla            Standards Track                     [Page 6]draft-
 
 
 
-
-
-
-Dierks & Rescorla            Standards Track                     [Page 7]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                     [Page 7]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 4.1. Basic block size
@@ -433,7 +432,7 @@ Dierks & Rescorla            Standards Track                     [Page 7]draft-
 
 
 
-Dierks & Rescorla            Standards Track                     [Page 8]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                     [Page 8]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Variable length vectors are defined by specifying a subrange of legal
@@ -487,7 +486,7 @@ Dierks & Rescorla            Standards Track                     [Page 8]draft-
 
 
 
-Dierks & Rescorla            Standards Track                     [Page 9]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                     [Page 9]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    be assigned a value, as demonstrated in the following example.  Since
@@ -541,7 +540,7 @@ Dierks & Rescorla            Standards Track                     [Page 9]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 10]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 10]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    The fields within a structure may be qualified using the type's name
@@ -595,7 +594,7 @@ Dierks & Rescorla            Standards Track                    [Page 10]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 11]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 11]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
        orange VariantRecord
@@ -649,7 +648,7 @@ Dierks & Rescorla            Standards Track                    [Page 11]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 12]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 12]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    An RSA encrypted value is encoded with PKCS #1 block type 2 as
@@ -703,7 +702,7 @@ Dierks & Rescorla            Standards Track                    [Page 12]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 13]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 13]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    data). Additional hash algorithms can be defined by cipher suites and
@@ -757,7 +756,7 @@ Dierks & Rescorla            Standards Track                    [Page 13]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 14]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 14]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    The secret is partitioned into two halves (with the possibility of
@@ -811,7 +810,7 @@ Dierks & Rescorla            Standards Track                    [Page 14]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 15]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 15]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 6.1. Connection states
@@ -819,8 +818,8 @@ Dierks & Rescorla            Standards Track                    [Page 15]draft-
    A TLS connection state is the operating environment of the TLS Record
    Protocol. It specifies a compression algorithm, encryption algorithm,
    and MAC algorithm. In addition, the parameters for these algorithms
-   are known: the MAC secret and the bulk encryption keys and IVs for
-   the connection in both the read and the write directions. Logically,
+   are known: the MAC secret and the bulk encryption keys for the        |
+   connection in both the read and the write directions. Logically,
    there are always four connection states outstanding: the current read
    and write states, and the pending read and write states. All records
    are processed under the current read and write states. The security
@@ -865,7 +864,7 @@ Dierks & Rescorla            Standards Track                    [Page 15]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 16]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 16]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    server random
@@ -910,19 +909,18 @@ Dierks & Rescorla            Standards Track                    [Page 16]draft-
        server write MAC secret
        client write key
        server write key
-       client write IV (for block ciphers only)
-       server write IV (for block ciphers only)
 
    The client write parameters are used by the server when receiving and
    processing records and vice-versa. The algorithm used for generating
    these items from the security parameters is described in section 6.3.
 
-
-
-Dierks & Rescorla            Standards Track                    [Page 17]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
    Once the security parameters have been set and the keys have been
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 17]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
    generated, the connection states can be instantiated by making them   |
    the current states. These current states MUST be updated for each
    record processed. Each connection state includes the following
@@ -932,14 +930,10 @@ Dierks & Rescorla            Standards Track                    [Page 17]draft-
        The current state of the compression algorithm.
 
    cipher state
-       The current state of the encryption algorithm. This will consist
-       of the scheduled key for that connection. In addition, for block
-       ciphers running in CBC mode (the only mode specified for TLS),
-       this will initially contain the IV for that connection state and
-       be updated to contain the ciphertext of the last block encrypted
-       or decrypted as records are processed. For stream ciphers, this
-       will contain whatever the necessary state information is to allow
-       the stream to continue to encrypt or decrypt data.
+       The current state of the encryption algorithm. This will consist  |
+       of the scheduled key for that connection. For stream ciphers,     |
+       this will also contain whatever the necessary state information   |
+       is to allow the stream to continue to encrypt or decrypt data.
 
    MAC secret
        The MAC secret for this connection as generated above.
@@ -970,17 +964,17 @@ Dierks & Rescorla            Standards Track                    [Page 17]draft-
 
        struct {
            uint8 major, minor;
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 18]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        } ProtocolVersion;
 
        enum {
            change_cipher_spec(20), alert(21), handshake(22),
            application_data(23), (255)
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 18]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        } ContentType;
 
        struct {
@@ -994,9 +988,10 @@ Dierks & Rescorla            Standards Track                    [Page 18]draft-
        The higher level protocol used to process the enclosed fragment.
 
    version
-       The version of the protocol being employed. This document
-       describes TLS Version 1.0, which uses the version { 3, 1 }. The
-       version value 3.1 is historical: TLS version 1.0 is a minor
+       The version of the protocol being employed. This document         |
+       describes TLS Version 1.1, which uses the version { 3, 2 }. The   |
+       version value 3.2 is historical: TLS version 1.1 is a minor       |
+       modification to the TLS 1.0 protocol, which was itself a minor    |
        modification to the SSL 3.0 protocol, which bears the version
        value 3.0. (See Appendix A.1).
 
@@ -1023,17 +1018,16 @@ Dierks & Rescorla            Standards Track                    [Page 18]draft-
    functions are initialized with default state information whenever a
    connection state is made active.
 
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 19]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
    Compression must be lossless and may not increase the content length
    by more than 1024 bytes. If the decompression function encounters a
    TLSCompressed.fragment that would decompress to a length in excess of
    2^14 bytes, it should report a fatal decompression failure error.
+
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 19]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
 
        struct {
            ContentType type;       /* same as TLSPlaintext.type */
@@ -1079,16 +1073,17 @@ Dierks & Rescorla            Standards Track                    [Page 19]draft-
    version
        The version field is identical to TLSCompressed.version.
 
-
-
-Dierks & Rescorla            Standards Track                    [Page 20]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
    length
        The length (in bytes) of the following TLSCiphertext.fragment.
        The length may not exceed 2^14 + 2048.
 
-       fragment
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 20]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
+   fragment                                                              |
        The encrypted form of TLSCompressed.fragment, with the MAC.
 
 6.2.3.1. Null or standard stream cipher
@@ -1133,19 +1128,55 @@ Dierks & Rescorla            Standards Track                    [Page 20]draft-
    functions convert TLSCompressed.fragment structures to and from block
    TLSCiphertext.fragment structures.
 
-
-
-Dierks & Rescorla            Standards Track                    [Page 21]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        block-ciphered struct {
+           opaque encryptedIV;[CipherSpec.block_length];                 |
            opaque content[TLSCompressed.length];
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 21]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
            opaque MAC[CipherSpec.hash_size];
            uint8 padding[GenericBlockCipher.padding_length];
            uint8 padding_length;
        } GenericBlockCipher;
 
    The MAC is generated as described in Section 6.2.3.1.
+
+   encryptedIV                                                           |
+       Unlike previous versions of SSL and TLS, TLS 1.1 uses an explicit |
+       IV in order to prevent the attacks described by [CBCATT].         |
+       We recommend the following equivalently strong procedures         |
+       for generating the IV.                                            |
+
+       (1) Generate a cryptographically strong random number and         |
+           use it directly as the IV.                                    |
+
+       (2) Generate a cryptographically strong random number and         |
+           prepend it to the ciphertext prior to encryption. In          |
+           this case, a fixed IV may be used to encrypt the              |
+           prepended cipher block. Alternately, the CBC residue          |
+           from the previous record may be used as the IV for            |
+           the prepended block. This preserves maximum code              |
+           compatibility with TLS 1.0 and SSL 3. It also has             |
+           the advantage that it does not require the ability            |
+           to quickly reset the IV, which is known to be a               |
+           problem on some systems.                                      |
+
+       The following alternative procedure MAY be used: However, it has not|
+       been demonstrated to be equivalently cryptographically strong to the|
+       above procedures. The sender prepends a fixed block to the plaintext|
+       (or alternatively a block generated with a weak PRNG). He then    |
+       encrypts as in (2) above, using the CBC residue from the previous |
+       block as the IV for the prepended block. Note that in this case   |
+       the IV for the first block MUST be generated using a cryptographically|
+       strong PRNG.                                                      |
+
+       The decryption operation for all three alternatives is the same. The|
+       receiver decrypts the entire GenericBlockCipher structure and then|
+       discards the first cipher block, corresponding to the encryptedIV |
+       compnent.                                                         |
 
    padding
        Padding that is added to force the length of the plaintext to be
@@ -1154,8 +1185,16 @@ Dierks & Rescorla            Standards Track                    [Page 21]draft-
        results in the TLSCiphertext.length being an integral multiple of
        the block length. Lengths longer than necessary might be
        desirable to frustrate attacks on a protocol based on analysis of
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 22]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        the lengths of exchanged messages. Each uint8 in the padding data |
-       vector MUST be filled with the padding length value.
+       vector MUST be filled with the padding length value. The receiver |
+       MUST check this padding and SHOULD use the bad_record_mac alert   |
+       to indivate padding errors.
 
    padding_length
        The padding length MUST be such that the total size of the        |
@@ -1180,35 +1219,33 @@ Dierks & Rescorla            Standards Track                    [Page 21]draft-
           encryption would be xx 06 06 06 06 06 06 06, where xx is the
           last octet of the MAC.
 
- Note: With block ciphers in CBC mode (Cipher Block Chaining) the
-       initialization vector (IV) for the first record is generated with
-       the other keys and secrets when the security parameters are set.
-       The IV for subsequent records is the last ciphertext block from
-       the previous record.
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 22]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
+ Note: With block ciphers in CBC mode (Cipher Block Chaining),           |
+       it is critical that the entire plaintext of the record be known   |
+       before any ciphertext is transmitted. Otherwise it is possible    |
+       for the attacker to mount the attack described in [CBCATT].
 
 6.3. Key calculation
 
-   The Record Protocol requires an algorithm to generate keys, IVs, and
-   MAC secrets from the security parameters provided by the handshake
+   The Record Protocol requires an algorithm to generate keys, and MAC   |
+   secrets from the security parameters provided by the handshake
    protocol.
 
    The master secret is hashed into a sequence of secure bytes, which
    are assigned to the MAC secrets, keys, and non-export IVs required by
    the current connection state (see Appendix A.6). CipherSpecs require
-   a client write MAC secret, a server write MAC secret, a client write
-   key, a server write key, a client write IV, and a server write IV,
-   which are generated from the master secret in that order. Unused
-   values are empty.
+   a client write MAC secret, a server write MAC secret, a client write  |
+   key, and a server write key, which are generated from the master      |
+   secret in that order. Unused values are empty.
 
    When generating keys and MAC secrets, the master secret is used as an
-   entropy source, and the random values provide unencrypted salt
-   material and IVs for exportable ciphers.
+   entropy source, and the random values provide unencrypted salt        |
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 23]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
+   material for exportable ciphers.
 
    To generate the key material, compute
 
@@ -1224,27 +1261,13 @@ Dierks & Rescorla            Standards Track                    [Page 22]draft-
        server_write_MAC_secret[SecurityParameters.hash_size]
        client_write_key[SecurityParameters.key_material_length]
        server_write_key[SecurityParameters.key_material_length]
-       client_write_IV[SecurityParameters.IV_size]
-       server_write_IV[SecurityParameters.IV_size]
 
-   The client_write_IV and server_write_IV are only generated for non-
-   export block ciphers. For exportable block ciphers, the
-   initialization vectors are generated later, as described below. Any
-   extra key_block material is discarded.
 
    Implementation note:
        The cipher spec which is defined in this document which requires
-       the most material is 3DES_EDE_CBC_SHA: it requires 2 x 24 byte
-       keys, 2 x 20 byte MAC secrets, and 2 x 8 byte IVs, for a total of
-       104 bytes of key material.
-
-
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 23]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
+       the most material is 3DES_EDE_CBC_SHA: it requires 2 x 24 byte    |
+       keys, 2 x 20 byte MAC secrets, for a total 88 bytes of key        |
+       material.
 
    Exportable encryption algorithms (for which CipherSpec.is_exportable
    is true) require additional processing as follows to derive their
@@ -1261,22 +1284,6 @@ Dierks & Rescorla            Standards Track                    [Page 23]draft-
                                   SecurityParameters.client_random +
                                   SecurityParameters.server_random);
 
-   Exportable encryption algorithms derive their IVs solely from the
-   random values from the hello messages:
-
-       iv_block = PRF("", "IV block", SecurityParameters.client_random +
-                      SecurityParameters.server_random);
-
-   The iv_block is partitioned into two initialization vectors as the
-   key_block was above:
-
-       client_write_IV[SecurityParameters.IV_size]
-       server_write_IV[SecurityParameters.IV_size]
-
-   Note that the PRF is used without a secret in this case: this just
-   means that the secret has a length of zero bytes and contributes
-   nothing to the hashing in the PRF.
-
 6.3.1. Export key generation example
 
    TLS_RSA_EXPORT_WITH_RC2_CBC_40_MD5 requires five random bytes for
@@ -1286,6 +1293,12 @@ Dierks & Rescorla            Standards Track                    [Page 23]draft-
    keys are salted because this is an exportable encryption algorithm.
 
        key_block               = PRF(master_secret,
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 24]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
                                      "key expansion",
                                      server_random +
                                      client_random)[0..41]
@@ -1293,13 +1306,6 @@ Dierks & Rescorla            Standards Track                    [Page 23]draft-
        server_write_MAC_secret = key_block[16..31]
        client_write_key        = key_block[32..36]
        server_write_key        = key_block[37..41]
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 24]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        final_client_write_key  = PRF(client_write_key,
                                      "client write key",
                                      client_random +
@@ -1309,10 +1315,6 @@ Dierks & Rescorla            Standards Track                    [Page 24]draft-
                                      client_random +
                                      server_random)[0..15]
 
-       iv_block                = PRF("", "IV block", client_random +
-                                     server_random)[0..15]
-       client_write_IV = iv_block[0..7]
-       server_write_IV = iv_block[8..15]
 
 7. The TLS Handshake Protocol
 
@@ -1345,14 +1347,14 @@ Dierks & Rescorla            Standards Track                    [Page 24]draft-
        48-byte secret shared between the client and server.
 
    is resumable
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 25]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        A flag indicating whether the session can be used to initiate new
        connections.
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 25]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
 
    These items are then used to create security parameters for use by
    the Record Layer when protecting application data. Many connections
@@ -1399,15 +1401,15 @@ Dierks & Rescorla            Standards Track                    [Page 25]draft-
            close_notify(0),
            unexpected_message(10),
            bad_record_mac(20),
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 26]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
            decryption_failed(21),
            record_overflow(22),
            decompression_failure(30),
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 26]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
            handshake_failure(40),
            no_certificate_RESERVED (41),                                 |
            bad_certificate(42),
@@ -1453,14 +1455,15 @@ Dierks & Rescorla            Standards Track                    [Page 26]draft-
    required to send a close_notify alert before closing the write side   |
    of the connection. The other party MUST respond with a close_notify   |
    alert of its own and close down the connection immediately,
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 27]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
    discarding any pending writes. It is not required for the initiator
    of the close to wait for the responding close_notify alert before
    closing the read side of the connection.
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 27]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
 
    If the application protocol using TLS provides that any data may be
    carried over the underlying transport after the TLS connection is
@@ -1493,7 +1496,6 @@ Dierks & Rescorla            Standards Track                    [Page 27]draft-
 
    bad_record_mac
        This alert is returned if a record is received with an incorrect  |
-       This alert is returned if a record is received with an incorrect  |
        MAC. This alert also SHOULD be returned if a TLSCiphertext        |
        decrypted in an invalid way: either it wasn't an even multiple of |
        the block length, or its padding values, when checked, weren't    |
@@ -1506,14 +1508,15 @@ Dierks & Rescorla            Standards Track                    [Page 27]draft-
        This message is always fatal.                                     |
 
        NB: Differentiating between bad_record_mac and decryption_failed  |
-       alerts may permit certain attacks against CBC mode as used in     |
-       TLS. It is preferable to uniformly use the bad_record_mac alert   |
-       to hide the specific type of the error.                           |
+       alerts may permit certain attacks against CBC mode as used in TLS |
 
 
 
+Dierks & Rescorla            Standards Track                    [Page 28]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
-Dierks & Rescorla            Standards Track                    [Page 28]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+
+       [CBCATTACK]. It is preferable to uniformly use the bad_record_mac |
+       alert to hide the specific type of the error.                     |
 
 
    record_overflow
@@ -1560,16 +1563,16 @@ Dierks & Rescorla            Standards Track                    [Page 28]draft-
        A valid certificate chain or partial chain was received, but the
        certificate was not accepted because the CA certificate could not |
        be located or couldn't be matched with a known, trusted CA.  This
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 29]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        message is always fatal.
 
    access_denied
        A valid certificate was received, but when access control was
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 29]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        applied, the sender decided not to proceed with negotiation.
        This message is always fatal.
 
@@ -1614,16 +1617,16 @@ Dierks & Rescorla            Standards Track                    [Page 29]draft-
        by a close_notify. This message is generally a warning.
 
    no_renegotiation
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 30]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        Sent by the client in response to a hello request or by the
        server in response to a client hello after initial handshaking.
        Either of these would normally lead to renegotiation; when that
        is not appropriate, the recipient should respond with this alert;
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 30]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        at that point, the original requester can decide whether to
        proceed with the connection. One case where this would be
        appropriate would be where a server has spawned a process to
@@ -1671,11 +1674,7 @@ Dierks & Rescorla            Standards Track                    [Page 30]draft-
 
 
 
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 31]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 31]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    receiving party MAY decide at its discretion whether to treat this as |
@@ -1729,7 +1728,7 @@ Dierks & Rescorla            Standards Track                    [Page 31]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 32]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 32]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    However, you SHOULD never send data over a link encrypted with 40 bit |
@@ -1783,7 +1782,7 @@ Dierks & Rescorla            Standards Track                    [Page 32]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 33]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 33]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Cipher Spec. At this point, the handshake is complete and the client
@@ -1837,7 +1836,7 @@ Dierks & Rescorla            Standards Track                    [Page 33]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 34]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 34]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
       Client                                                Server
@@ -1891,7 +1890,7 @@ Dierks & Rescorla            Standards Track                    [Page 34]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 35]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 35]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    The handshake protocol messages are presented below in the order they |
@@ -1945,7 +1944,7 @@ Dierks & Rescorla            Standards Track                    [Page 35]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 36]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 36]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 7.4.1.2. Client hello
@@ -1976,33 +1975,33 @@ Dierks & Rescorla            Standards Track                    [Page 36]draft-
    random_bytes
        28 bytes generated by a secure random number generator.
 
-       The client hello message includes a variable length session
-       identifier. If not empty, the value identifies a session between
-       the same client and server whose security parameters the client
-       wishes to reuse. The session identifier MAY be from an earlier    |
-       connection, this connection, or another currently active
-       connection. The second option is useful if the client only wishes
-       to update the random structures and derived values of a
-       connection, while the third option makes it possible to establish
-       several independent secure connections without repeating the full
-       handshake protocol. These independent connections may occur
-       sequentially or simultaneously; a SessionID becomes valid when
-       the handshake negotiating it completes with the exchange of
-       Finished messages and persists until removed due to aging or
-       because a fatal error was encountered on a connection associated
-       with the session. The actual contents of the SessionID are
-       defined by the server.
+   The client hello message includes a variable length session           |
+   identifier. If not empty, the value identifies a session between the
+   same client and server whose security parameters the client wishes to |
+   reuse. The session identifier MAY be from an earlier connection, this
+   connection, or another currently active connection. The second option
+   is useful if the client only wishes to update the random structures
+   and derived values of a connection, while the third option makes it
+   possible to establish several independent secure connections without
+   repeating the full handshake protocol. These independent connections
+   may occur sequentially or simultaneously; a SessionID becomes valid
+   when the handshake negotiating it completes with the exchange of
+   Finished messages and persists until removed due to aging or because
+   a fatal error was encountered on a connection associated with the
+   session. The actual contents of the SessionID are defined by the
+   server.
 
-           opaque SessionID<0..32>;
-
+       opaque SessionID<0..32>;
 
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 37]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
 
 
-       Warning:
+Dierks & Rescorla            Standards Track                    [Page 37]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
+   Warning:
        Because the SessionID is transmitted without encryption or        |
        immediate MAC protection, servers MUST not place confidential
        information in session identifiers or let the contents of fake
@@ -2011,36 +2010,35 @@ Dierks & Rescorla            Standards Track                    [Page 37]draft-
        protected by the Finished messages exchanged at the end of the
        handshake.)
 
-       The CipherSuite list, passed from the client to the server in the
-       client hello message, contains the combinations of cryptographic
-       algorithms supported by the client in order of the client's
-       preference (favorite choice first). Each CipherSuite defines a
-       key exchange algorithm, a bulk encryption algorithm (including
-       secret key length) and a MAC algorithm. The server will select a
-       cipher suite or, if no acceptable choices are presented, return a
-       handshake failure alert and close the connection.
+   The CipherSuite list, passed from the client to the server in the     |
+   client hello message, contains the combinations of cryptographic
+   algorithms supported by the client in order of the client's
+   preference (favorite choice first). Each CipherSuite defines a key
+   exchange algorithm, a bulk encryption algorithm (including secret key
+   length) and a MAC algorithm. The server will select a cipher suite
+   or, if no acceptable choices are presented, return a handshake
+   failure alert and close the connection.
 
-           uint8 CipherSuite[2];    /* Cryptographic suite selector */
+       uint8 CipherSuite[2];    /* Cryptographic suite selector */
 
-       The client hello includes a list of compression algorithms
-       supported by the client, ordered according to the client's
-       preference.
+   The client hello includes a list of compression algorithms supported
+   by the client, ordered according to the client's preference.
 
-           enum { null(0), (255) } CompressionMethod;
+       enum { null(0), (255) } CompressionMethod;
 
-           struct {
-               ProtocolVersion client_version;
-               Random random;
-               SessionID session_id;
-               CipherSuite cipher_suites<2..2^16-1>;
-               CompressionMethod compression_methods<1..2^8-1>;
-           } ClientHello;
+       struct {
+           ProtocolVersion client_version;
+           Random random;
+           SessionID session_id;
+           CipherSuite cipher_suites<2..2^16-1>;
+           CompressionMethod compression_methods<1..2^8-1>;
+       } ClientHello;
 
    client_version
        The version of the TLS protocol by which the client wishes to     |
        communicate during this session. This SHOULD be the latest
-       (highest valued) version supported by the client. For this
-       version of the specification, the version will be 3.1 (See
+       (highest valued) version supported by the client. For this        |
+       version of the specification, the version will be 3.2 (See
        Appendix E for details about backward compatibility).
 
    random
@@ -2053,7 +2051,8 @@ Dierks & Rescorla            Standards Track                    [Page 37]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 38]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+
+Dierks & Rescorla            Standards Track                    [Page 38]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    cipher_suites
@@ -2107,13 +2106,13 @@ Note: For the intended use of trailing data in the ClientHello, see RFC  |
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 39]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 39]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    server_version
        This field will contain the lower of that suggested by the client
        in the client hello and the highest supported by the server. For
-       this version of the specification, the version is 3.1 (See
+       this version of the specification, the version is 3.2 (See        |
        Appendix E for details about backward compatibility).
 
    random
@@ -2140,7 +2139,7 @@ Dierks & Rescorla            Standards Track                    [Page 39]draft-
        ClientHello.cipher_suites. For resumed sessions this field is the
        value from the state of the session being resumed.
 
-       compression_method
+   compression_method                                                    |
        The single compression algorithm selected by the server from the
        list in ClientHello.compression_methods. For resumed sessions
        this field is the value from the resumed session state.
@@ -2161,7 +2160,7 @@ Dierks & Rescorla            Standards Track                    [Page 39]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 40]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 40]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
        algorithm for the certificate MUST be the same as the algorithm   |
@@ -2215,7 +2214,7 @@ Dierks & Rescorla            Standards Track                    [Page 40]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 41]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 41]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    certificate_list
@@ -2269,7 +2268,7 @@ Dierks & Rescorla            Standards Track                    [Page 41]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 42]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 42]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Meaning of this message:
@@ -2279,11 +2278,11 @@ Dierks & Rescorla            Standards Track                    [Page 42]draft-
        public key with which the client can complete a key exchange
        (with the result being the premaster secret.)
 
-       As additional CipherSuites are defined for TLS which include new
-       key exchange algorithms, the server key exchange message will be
-       sent if and only if the certificate type associated with the key
-       exchange algorithm does not provide enough information for the
-       client to exchange a premaster secret.
+   As additional CipherSuites are defined for TLS which include new key  |
+   exchange algorithms, the server key exchange message will be sent if
+   and only if the certificate type associated with the key exchange
+   algorithm does not provide enough information for the client to
+   exchange a premaster secret.
 
  Note: According to current US export law, RSA moduli larger than 512
        bits may not be used for key exchange in software exported from
@@ -2323,7 +2322,7 @@ Dierks & Rescorla            Standards Track                    [Page 42]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 43]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 43]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
        struct {
@@ -2377,7 +2376,7 @@ Dierks & Rescorla            Standards Track                    [Page 43]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 44]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 44]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Structure of this message:
@@ -2406,9 +2405,8 @@ Dierks & Rescorla            Standards Track                    [Page 44]draft-
            thus, this message can be used both to describe known roots
            and a desired authorization space.
 
-           Note: values listed as RESERVED may not be used. They were    |
-           used in SSLv3.                                                |
-
+ Note: values listed as RESERVED may not be used. They were used in      |
+           SSLv3.                                                        |
 
  Note: DistinguishedName is derived from [X509].
 
@@ -2428,13 +2426,13 @@ Dierks & Rescorla            Standards Track                    [Page 44]draft-
        phase of the key exchange.
 
        Upon receipt of the server hello done message the client SHOULD   |
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 45]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        verify that the server provided a valid certificate if required
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 45]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        and check that the server hello parameters are acceptable.
 
    Structure of this message:
@@ -2482,13 +2480,13 @@ Dierks & Rescorla            Standards Track                    [Page 45]draft-
        data.
 
    Structure of this message:
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 46]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        The choice of messages depends on which key exchange method has
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 46]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        been selected. See Section 7.4.3 for the KeyExchangeAlgorithm
        definition.
 
@@ -2536,13 +2534,13 @@ Dierks & Rescorla            Standards Track                    [Page 46]draft-
 
  Note: An attack discovered by Daniel Bleichenbacher [BLEI] can be used
        to attack a TLS server which is using PKCS#1 encoded RSA. The
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 47]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        attack takes advantage of the fact that by failing in different
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 47]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        ways, a TLS server can be coerced into revealing whether a
        particular message, when decrypted, is properly PKCS#1 formatted
        or not.
@@ -2590,13 +2588,13 @@ Dierks & Rescorla            Standards Track                    [Page 47]draft-
 
    Meaning of this message:
        This structure conveys the client's Diffie-Hellman public value
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 48]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        (Yc) if it was not already included in the client's certificate.
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 48]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        The encoding used for Yc is determined by the enumerated
        PublicValueEncoding. This structure is a variant of the client
        key exchange message, not a message in itself.
@@ -2647,7 +2645,8 @@ Dierks & Rescorla            Standards Track                    [Page 48]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 49]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+
+Dierks & Rescorla            Standards Track                    [Page 49]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Here handshake_messages refers to all handshake messages sent or
@@ -2701,7 +2700,7 @@ Dierks & Rescorla            Standards Track                    [Page 49]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 50]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 50]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    may be different from handshake_messages in Section 7.4.8 because it
@@ -2755,7 +2754,7 @@ Dierks & Rescorla            Standards Track                    [Page 50]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 51]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 51]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 8.1.1. RSA
@@ -2809,7 +2808,7 @@ Dierks & Rescorla            Standards Track                    [Page 51]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 52]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 52]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 A. Protocol constant values
@@ -2822,7 +2821,7 @@ A.1. Record layer
         uint8 major, minor;
     } ProtocolVersion;
 
-    ProtocolVersion version = { 3, 1 };     /* TLS v1.0 */
+    ProtocolVersion version = { 3, 2 };     /* TLS v1.1 */               |
 
     enum {
         change_cipher_spec(20), alert(21), handshake(22),
@@ -2863,7 +2862,7 @@ A.1. Record layer
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 53]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 53]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
         opaque MAC[CipherSpec.hash_size];
@@ -2917,7 +2916,7 @@ A.3. Alert messages
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 54]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 54]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 A.4. Handshake protocol
@@ -2971,7 +2970,7 @@ A.4.1. Hello messages
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 55]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 55]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
     } ClientHello;
@@ -3025,7 +3024,7 @@ A.4.2. Server authentication and key exchange messages
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 56]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 56]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
                 opaque md5_hash[16];
@@ -3079,7 +3078,7 @@ A.4.3. Client authentication and key exchange messages
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 57]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 57]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
             case implicit: struct {};
@@ -3102,8 +3101,8 @@ A.5. The CipherSuite
    The following values define the CipherSuite codes used in the client
    hello and server hello messages.
 
-   A CipherSuite defines a cipher specification supported in TLS Version
-   1.0.
+   A CipherSuite defines a cipher specification supported in TLS Version |
+   1.1.
 
    TLS_NULL_WITH_NULL_NULL is specified and is the initial state of a
    TLS connection during the first handshake on that channel, but must
@@ -3133,7 +3132,7 @@ A.5. The CipherSuite
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 58]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 58]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    DH denotes cipher suites in which the server's certificate contains
@@ -3187,7 +3186,7 @@ Dierks & Rescorla            Standards Track                    [Page 58]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 59]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 59]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
        specified.
@@ -3241,7 +3240,7 @@ A.6. The Security Parameters
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 60]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 60]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 B. Glossary
@@ -3295,7 +3294,7 @@ B. Glossary
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 61]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 61]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    client write MAC secret
@@ -3326,7 +3325,7 @@ Dierks & Rescorla            Standards Track                    [Page 61]draft-
        Standard," published May, 1994 by the U.S. Dept. of Commerce.
        [DSS]
 
-       digital signatures
+   digital signatures                                                    |
        Digital signatures utilize public key cryptography and one-way
        hash functions to produce a signature of the data that can be
        authenticated, and is difficult to forge or repudiate.
@@ -3349,7 +3348,7 @@ Dierks & Rescorla            Standards Track                    [Page 61]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 62]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 62]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Message Authentication Code (MAC)
@@ -3403,7 +3402,7 @@ Dierks & Rescorla            Standards Track                    [Page 62]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 63]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 63]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    session
@@ -3438,7 +3437,7 @@ Dierks & Rescorla            Standards Track                    [Page 63]draft-
        cryptographically-strong keystream, which is then exclusive-ORed
        with the plaintext.
 
-       symmetric cipher
+   symmetric cipher                                                      |
        See bulk cipher.
 
    Transport Layer Security (TLS)
@@ -3457,7 +3456,7 @@ Dierks & Rescorla            Standards Track                    [Page 63]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 64]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 64]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 C. CipherSuite definitions
@@ -3511,7 +3510,7 @@ TLS_DH_anon_WITH_3DES_EDE_CBC_SHA       DH_anon        3DES_EDE_CBC SHA
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 65]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 65]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
       DH_DSS          DH with DSS-based certificates     None
@@ -3565,7 +3564,7 @@ Dierks & Rescorla            Standards Track                    [Page 65]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 66]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 66]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Block Size
@@ -3619,7 +3618,7 @@ Dierks & Rescorla            Standards Track                    [Page 66]draft-
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 67]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 67]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 D. Implementation Notes
@@ -3673,7 +3672,7 @@ D.3. Certificates and authentication
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 68]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 68]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Implementations are responsible for verifying the integrity of
@@ -3727,39 +3726,42 @@ D.4. CipherSuites
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 69]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 69]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 E. Backward Compatibility With SSL
 
    For historical reasons and in order to avoid a profligate consumption
-   of reserved port numbers, application protocols which are secured by
-   TLS 1.0, SSL 3.0, and SSL 2.0 all frequently share the same
+   of reserved port numbers, application protocols which are secured by  |
+   TLS 1.1, TLS 1.0, SSL 3.0, and SSL 2.0 all frequently share the same
    connection port: for example, the https protocol (HTTP secured by SSL
    or TLS) uses port 443 regardless of which security protocol it is
    using. Thus, some mechanism must be determined to distinguish and
    negotiate among the various protocols.
 
-   TLS version 1.0 and SSL 3.0 are very similar; thus, supporting both
-   is easy. TLS clients who wish to negotiate with SSL 3.0 servers
-   should send client hello messages using the SSL 3.0 record format and
-   client hello structure, sending {3, 1} for the version field to note
-   that they support TLS 1.0. If the server supports only SSL 3.0, it
-   will respond with an SSL 3.0 server hello; if it supports TLS, with a
-   TLS server hello. The negotiation then proceeds as appropriate for
-   the negotiated protocol.
+   TLS versions 1.1, 1.0, and SSL 3.0 are very similar; thus, supporting |
+   both is easy. TLS clients who wish to negotiate with such older       |
+   servers should send client hello messages using the SSL 3.0 record
+   format and client hello structure, sending {3, 2} for the version     |
+   field to note that they support TLS 1.1. If the server supports only  |
+   TLS 1.0 or SSL 3.0, it will respond with a downrev 3.0 server hello;  |
+   if it supports TLS 1.1 it will respond with a TLS 1.1 server hello.   |
+   The negotiation then proceeds as appropriate for the negotiated
+   protocol.
 
-   Similarly, a TLS server which wishes to interoperate with SSL 3.0
-   clients should accept SSL 3.0 client hello messages and respond with
-   an SSL 3.0 server hello if an SSL 3.0 client hello is received which
-   has a version field of {3, 0}, denoting that this client does not
-   support TLS.
+   Similarly, a TLS 1.1  server which wishes to interoperate with TLS    |
+   1.0 or SSL 3.0 clients SHOULD accept SSL 3.0 client hello messages    |
+   and respond with a SSL 3.0 server hello if an SSL 3.0 client hello    |
+   with a version field of {3, 0} is received, denoting that this client |
+   does not support TLS. Similarly, if a SSL 3.0 or TLS 1.0 hello with a |
+   version field of {3, 1} is received, the server SHOULD respond with a |
+   TLS 1.0 hello with a version field of {3, 1}.
 
    Whenever a client already knows the highest protocol known to a
    server (for example, when resuming a session), it should initiate the
    connection in that native protocol.
 
-   TLS 1.0 clients that support SSL Version 2.0 servers must send SSL
+   TLS 1.1 clients that support SSL Version 2.0 servers must send SSL    |
    Version 2.0 client hello messages [SSL2]. TLS servers should accept
    either client hello format if they wish to support SSL 2.0 clients on
    the same connection port. The only deviations from the Version 2.0
@@ -3775,15 +3777,15 @@ E. Backward Compatibility With SSL
    2.0. These are assumed to use RSA for key exchange and
    authentication.
 
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 70]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        V2CipherSpec TLS_RC4_128_WITH_MD5          = { 0x01,0x00,0x80 };
        V2CipherSpec TLS_RC4_128_EXPORT40_WITH_MD5 = { 0x02,0x00,0x80 };
        V2CipherSpec TLS_RC2_CBC_128_CBC_WITH_MD5  = { 0x03,0x00,0x80 };
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 70]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        V2CipherSpec TLS_RC2_CBC_128_CBC_EXPORT40_WITH_MD5
                                                   = { 0x04,0x00,0x80 };
        V2CipherSpec TLS_IDEA_128_CBC_WITH_MD5     = { 0x05,0x00,0x80 };
@@ -3829,15 +3831,15 @@ E.1. Version 2 client hello
 
    version
        The highest version of the protocol supported by the client
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 71]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
        (equals ProtocolVersion.version, see Appendix A.1).
 
    cipher_spec_length
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 71]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
        This field is the total length of the field cipher_specs. It
        cannot be zero and must be a multiple of the V2CipherSpec length
        (3).
@@ -3883,13 +3885,64 @@ E.2. Avoiding man-in-the-middle version rollback
    to 0x03 (the other padding bytes are random). After decrypting the
    ENCRYPTED-KEY-DATA field, servers that support TLS should issue an
    error if these eight padding bytes are 0x03. Version 2.0 servers
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 72]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
    receiving blocks padded in this manner will proceed normally.
 
 
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 72]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 73]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 F. Security analysis
@@ -3943,7 +3996,7 @@ F.1.1.1. Anonymous key exchange
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 73]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 74]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    from the server key exchange message. The result is sent in a client
@@ -3997,7 +4050,7 @@ F.1.1.2. RSA key exchange and authentication
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 74]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 75]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    the certificate verify message (see Section 7.4.8). The client signs
@@ -4051,7 +4104,7 @@ F.1.2. Version rollback attacks
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 75]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 76]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    Because TLS includes substantial improvements over SSL Version 2.0,
@@ -4105,7 +4158,7 @@ F.1.4. Resuming sessions
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 76]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 77]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    force a full handshake. An upper limit of 24 hours is suggested for
@@ -4149,6 +4202,19 @@ F.2. Protecting application data
  Note: MAC secrets may be larger than encryption keys, so messages can
        remain tamper resistant even if encryption keys are broken.
 
+F.3. Explicit IVs                                                        |
+
+       [CBCATT] describes a chosen plaintext attack on TLS that depends  |
+       on knowing the IV for a record. Previous versions of TLS [TLS1.0] |
+       used the CBC residue of the previous record as the IV and         |
+       therefore enabled this attack. This version uses an explicit IV   |
+       in order to protect against this attack.                          |
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 78]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
 F.3. Final notes
 
    For TLS to be able to provide a secure connection, both the client
@@ -4156,12 +4222,6 @@ F.3. Final notes
    addition, the implementation must be free of security errors.
 
    The system is only as strong as the weakest key exchange and
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 77]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
    authentication algorithm supported, and only trustworthy
    cryptographic functions should be used. Short public keys, 40-bit
    bulk encryption keys, and anonymous servers should be used with great
@@ -4206,14 +4266,7 @@ Dierks & Rescorla            Standards Track                    [Page 77]draft-
 
 
 
-
-
-
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 78]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 79]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 G. Patent Statement
@@ -4267,7 +4320,7 @@ G. Patent Statement
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 79]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+Dierks & Rescorla            Standards Track                    [Page 80]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
    The Internet Society, Internet Architecture Board, Internet
@@ -4283,15 +4336,10 @@ Security Considerations
 
    Security issues are discussed throughout this memo.
 
-References
+Normative References                                                     |
 
-   [3DES]   W. Tuchman, "Hellman Presents No Shortcut Solutions To DES,"
+   [3DES]   W. Tuchman, "Hellman Presents No Shortcut Solutions To DES," |
             IEEE Spectrum, v. 16, n. 7, July 1979, pp40-41.
-
-   [BLEI]   Bleichenbacher D., "Chosen Ciphertext Attacks against
-            Protocols Based on RSA Encryption Standard PKCS #1" in
-            Advances in Cryptology -- CRYPTO'98, LNCS vol. 1462, pages:
-            1--12, 1998.
 
    [DES]    ANSI X3.106, "American National Standard for Information
             Systems-Data Link Encryption," American National Standards
@@ -4305,12 +4353,6 @@ References
             Institute of Standards and Technology, U.S. Department of
             Commerce, May 18, 1994.
 
-   [FTP]    Postel J., and J. Reynolds, "File Transfer Protocol", STD 9,
-            RFC 959, October 1985.
-
-   [HTTP]   Berners-Lee, T., Fielding, R., and H. Frystyk, "Hypertext
-            Transfer Protocol -- HTTP/1.0", RFC 1945, May 1996.
-
    [HMAC]   Krawczyk, H., Bellare, M., and R. Canetti, "HMAC: Keyed-
             Hashing for Message Authentication," RFC 2104, February
             1997.
@@ -4318,11 +4360,6 @@ References
    [IDEA]   X. Lai, "On the Design and Security of Block Ciphers," ETH
             Series in Information Processing, v. 1, Konstanz: Hartung-
             Gorre Verlag, 1992.
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 80]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
 
    [MD2]    Kaliski, B., "The MD2 Message Digest Algorithm", RFC 1319,
             April 1992.
@@ -4334,6 +4371,12 @@ Dierks & Rescorla            Standards Track                    [Page 80]draft-
             version 1.5, November 1993.
 
    [PKCS6]  RSA Laboratories, "PKCS #6: RSA Extended Certificate Syntax
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 81]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
             Standard," version 1.5, November 1993.
 
    [PKCS7]  RSA Laboratories, "PKCS #7: RSA Cryptographic Message Syntax
@@ -4354,12 +4397,6 @@ Dierks & Rescorla            Standards Track                    [Page 80]draft-
             Communications of the ACM, v. 21, n. 2, Feb 1978, pp.
             120-126.
 
-   [RSADSI] Contact RSA Data Security, Inc., Tel: 415-595-8782
-
-            [SCH]    B. Schneier. Applied Cryptography: Protocols,
-            Algorithms, and Source Code in C, Published by John Wiley &
-            Sons, Inc. 1994.
-
    [SHA]    NIST FIPS PUB 180-1, "Secure Hash Standard," National
             Institute of Standards and Technology, U.S. Department of
             Commerce, Work in Progress, May 31, 1994.
@@ -4370,18 +4407,54 @@ Dierks & Rescorla            Standards Track                    [Page 80]draft-
    [SSL3]   A. Frier, P. Karlton, and P. Kocher, "The SSL 3.0 Protocol",
             Netscape Communications Corp., Nov 18, 1996.
 
-            [SUBGROUP] R. Zuccherato, "Methods for Avoiding the Small-   |
-            Subgroup Attacks on the Diffie-Hellman Key Agreement Method  |
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 81]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
-
-
-            for S/MIME", RFC 2785, March 2000.                           |
-
-            [REQ]    Bradner, S., "Key words for use in RFCs to Indicate |
+   [REQ]    Bradner, S., "Key words for use in RFCs to Indicate          |
             Requirement Levels", BCP 14, RFC 2119, March 1997.           |
+
+   [TLS1.0] Dierks, T., and Allen, C., "The TLS Protocol, Version 1.0",  |
+            RFC 2246, January, 1999.                                     |
+   [X509]   CCITT. Recommendation X.509: "The Directory - Authentication |
+            Framework". 1988.                                            |
+
+
+
+
+
+
+Informative References                                                   |
+
+   [BLEI]   Bleichenbacher D., "Chosen Ciphertext Attacks against        |
+            Protocols Based on RSA Encryption Standard PKCS #1" in       |
+            Advances in Cryptology -- CRYPTO'98, LNCS vol. 1462, pages:  |
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 82]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
+            1--12, 1998.                                                 |
+
+   [CBCATT] Moeller, B., "Security of CBC Ciphersuites in SSL/TLS:       |
+            Problems and Countermeasures",                               |
+            http://www.openssl.org/~bodo/tls-cbc.txt.                    |
+
+   [PADATT] Moeller, B., Post to TLS WG mailing list <ietf-              |
+            tls@lists.certicom.com>                                      |
+
+   [FTP]    Postel J., and J. Reynolds, "File Transfer Protocol", STD 9, |
+            RFC 959, October 1985.                                       |
+
+   [HTTP]   Berners-Lee, T., Fielding, R., and H. Frystyk, "Hypertext    |
+            Transfer Protocol -- HTTP/1.0", RFC 1945, May 1996.          |
+
+   [RSADSI] Contact RSA Data Security, Inc., Tel: 415-595-8782           |
+
+   [SCH]    B. Schneier. Applied Cryptography: Protocols, Algorithms,    |
+            and Source Code in C, Published by John Wiley & Sons, Inc.   |
+            1994.                                                        |
+
+   [SUBGROUP] R. Zuccherato, "Methods for Avoiding the Small-Subgroup    |
+            Attacks on the Diffie-Hellman Key Agreement Method for       |
+            S/MIME", RFC 2785, March 2000.                               |
 
    [TCP]    Postel, J., "Transmission Control Protocol," STD 7, RFC 793,
             September 1981.
@@ -4392,24 +4465,27 @@ Dierks & Rescorla            Standards Track                    [Page 81]draft-
    [TEL]      Postel J., and J. Reynolds, "Telnet Option
             Specifications", STD 8, RFC 855, May 1993.
 
-   [X509]   CCITT. Recommendation X.509: "The Directory - Authentication
-            Framework". 1988.
-
    [XDR]    R. Srinivansan, Sun Microsystems, RFC-1832: XDR: External
             Data Representation Standard, August 1995.
 
-Credits
+
+Credits                                                                  |
 
    Win Treese
-   Open Market
 
-   EMail: treese@openmarket.com
+   EMail: treese@acm.org                                                 |
 
 
    Editors
 
    Tim Dierks                Eric Rescorla                               |
-   Certicom                      RTFM, Inc.                              |
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 83]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
+
+
+                        RTFM, Inc.                                       |
 
    EMail: tim@dierks.org         EMail: ekr@rtfm.com                     |
 
@@ -4417,56 +4493,26 @@ Credits
    Authors' Addresses
 
    Tim Dierks                         Philip L. Karlton
-   Certicom                           Netscape Communications
 
-   EMail: tdierks@certicom.com
-
-   Alan O. Freier                     Paul C. Kocher
-   Netscape Communications            Independent Consultant
-
-   EMail: freier@netscape.com         EMail: pck@netcom.com
-
-
-
-
-Dierks & Rescorla            Standards Track                    [Page 82]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+   EMail: tim@dierks.org                                                 |
 
 
    Other contributors
+   [TODO: I need current addresses for the people marked with            |
+   XXXX. I'll redo this section when I have them]                        |
 
-   Martin Abadi                       Robert Relyea
-   Digital Equipment Corporation      Netscape Communications
+   Martin Abadi XXXX                                                     |
+   Robert Relyea XXXX                                                    |
+   Ran Canetti                                                           |
+   Jim Roskind   XXXX                                                    |
+   Taher Elgamal XXXX                                                    |
+   Michael Sabin XXXX                                                    |
+   Anil Gangolli XXXX                                                    |
+   Dan Simon                                                             |
+   Kipp Hickman  XXXX                                                    |
+   Tom Weinstein XXXX                                                    |
+   Hugo Krawczyk
 
-   EMail: ma@pa.dec.com               EMail: relyea@netscape.com
-
-   Ran Canetti                        Jim Roskind
-   IBM Watson Research Center         Netscape Communications
-
-   EMail: canetti@watson.ibm.com      EMail: jar@netscape.com
-
-
-   Taher Elgamal                      Micheal J. Sabin, Ph. D.
-   Securify                           Consulting Engineer
-
-   EMail: elgamal@securify.com        EMail: msabin@netcom.com
-
-
-   Anil R. Gangolli                   Dan Simon
-   Structured Arts Computing Corp.    Microsoft
-
-   EMail: gangolli@structuredarts.com EMail:  dansimon@microsoft.com
-
-
-   Kipp E.B. Hickman                  Tom Weinstein
-   Netscape Communications            Netscape Communications
-
-   EMail: kipp@netscape.com           EMail: tomw@netscape.com
-
-
-   Hugo Krawczyk                                                         |
-   IBM Watson Research Center                                            |
-
-   EMail: hugo@watson.ibm.com
 
 Comments
 
@@ -4483,7 +4529,14 @@ Comments
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 83]draft-ietlf-tls-rfc2246-bis-00.txt TLS                        March 2002
+
+
+
+
+
+
+
+Dierks & Rescorla            Standards Track                    [Page 84]draft-ietlf-tls-rfc2246-bis-02.txt TLS                      October 2002
 
 
 Full Copyright Statement
@@ -4537,4 +4590,4 @@ Full Copyright Statement
 
 
 
-Dierks & Rescorla            Standards Track                    [Page 84]
+Dierks & Rescorla            Standards Track                    [Page 85]
