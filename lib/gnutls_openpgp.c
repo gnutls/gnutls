@@ -39,6 +39,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#define OPENPGP_NAME_SIZE GNUTLS_X509_CN_SIZE
 
 static void
 release_mpi_array(MPI *arr, size_t n)
@@ -157,8 +158,7 @@ read_keyring_blob(const gnutls_datum* keyring, size_t pos)
       keyring_blob_release(blob);
       return NULL;
     }
-  blob->size = keyring->data[pos+1] << 24 | keyring->data[pos+2] << 16
-             | keyring->data[pos+3] <<  8 | keyring->data[pos+4];
+  blob->size = buffer_to_u32( keyring->data+pos+1 );
   if (!blob->size)
     {
       keyring_blob_release(blob);
@@ -341,7 +341,7 @@ openpgp_pkt_to_sig(PKT pkt, size_t idx)
   struct packet_s *p = NULL;
   size_t n = 0;
 
-  for (p=pkt; p && p->id && pkt; p=p->next)
+  for (p=pkt; p && p->id; p=p->next)
     {
       if (p->id == PKT_SIG && n == idx)
         return p->p.sig;
@@ -358,7 +358,7 @@ openpgp_pkt_to_pk(PKT pkt, size_t idx)
   struct packet_s *p = NULL;
   size_t n = 0;
 
-  for (p=pkt; p && p->id && pkt; p=p->next)
+  for (p=pkt; p && p->id; p=p->next)
     {
       if (p->id == PKT_PUBKEY && n == idx)
         return p->p.pk;
@@ -375,7 +375,7 @@ openpgp_pkt_to_uid(PKT pkt, size_t idx)
   struct packet_s *p = NULL;
   size_t n = 0;
 
-  for (p=pkt; p && p->id && pkt; p=p->next)
+  for (p=pkt; p && p->id; p=p->next)
     {
       if (p->id == PKT_USERID && n == idx)
         return p->p.uid;
@@ -660,8 +660,8 @@ gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
       memcpy(ks.u.fpr, pattern, 20);
       break;
 
-    case KEY_ATTR_NONE:
-      break; /* just to make the (strict) compiler happy */
+    default:
+      goto leave;
     }
   
   rc = cdk_keydb_search_key(khd, &pk, &ks);
@@ -931,6 +931,7 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
   char *p;
   int rc = 0;
   int pos1 = 0, pos2 = 0;
+  size_t size = 0;
 
   if (!cert || !dn)
     return GNUTLS_E_INVALID_PARAMETERS;
@@ -945,7 +946,9 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
       goto leave;
     }
   memset(dn, 0, sizeof *dn);
-  strcpy(dn->name, uid->name);
+  size = uid->size < OPENPGP_NAME_SIZE? uid->size : OPENPGP_NAME_SIZE;
+  memcpy(dn->name, uid->name, size);
+  dn->name[size-1] = '\0'; /* make sure it's a string */
 
   /*
    * Extract the email address from the userID string and save it to
@@ -959,8 +962,10 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
     pos2 = p-uid->name+1;
   if (pos1 && pos2)
     {
-      memcpy(dn->email, uid->name+pos1, pos2-pos1);
-      dn->email[pos2-pos1-1] = '\0'; /* make sure it's a string */
+      pos2 -= pos1;
+      size = pos2 < OPENPGP_NAME_SIZE? pos2 : OPENPGP_NAME_SIZE;
+      memcpy(dn->email, uid->name+pos1, size);
+      dn->email[size-1] = '\0'; /* make sure it's a string */
     }
   
 leave:
@@ -1218,7 +1223,7 @@ leave:
  * @fprlen: the integer to save the length of the fingerprint.
  *
  * Returns the fingerprint of the OpenPGP key. Depence on the algorithm,
- * the fingerprint can be 16 oder 20 bytes.
+ * the fingerprint can be 16 or 20 bytes.
  **/
 int
 gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr, size_t *fprlen)
@@ -1240,7 +1245,7 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr, size_t *fprlen)
       if (p->id == PKT_PUBKEY)
         {
           pk = p->p.pk;
-          if ( is_RSA(pk->pke_algo) )
+          if ( is_RSA(pk->pke_algo) && pk->version < 4 )
             *fprlen = 16;
           else
             *fprlen = 20;
