@@ -211,23 +211,23 @@ const char* msg;
 static void print_key_usage( unsigned int x) 
 {
 	if (x&GNUTLS_KEY_DIGITAL_SIGNATURE)
-		fprintf(outfile,"\t\tDigital signature.\n");
+		fprintf(stderr,"\t\tDigital signature.\n");
 	if (x&GNUTLS_KEY_NON_REPUDIATION)
-		fprintf(outfile,"\t\tNon repudiation.\n");
+		fprintf(stderr,"\t\tNon repudiation.\n");
 	if (x&GNUTLS_KEY_KEY_ENCIPHERMENT)
-		fprintf(outfile,"\t\tKey encipherment.\n");
+		fprintf(stderr,"\t\tKey encipherment.\n");
 	if (x&GNUTLS_KEY_DATA_ENCIPHERMENT)
-		fprintf(outfile,"\t\tData encipherment.\n");
+		fprintf(stderr,"\t\tData encipherment.\n");
 	if (x&GNUTLS_KEY_KEY_AGREEMENT)
-		fprintf(outfile,"\t\tKey agreement.\n");
+		fprintf(stderr,"\t\tKey agreement.\n");
 	if (x&GNUTLS_KEY_KEY_CERT_SIGN)
-		fprintf(outfile,"\t\tCertificate signing.\n");
+		fprintf(stderr,"\t\tCertificate signing.\n");
 	if (x&GNUTLS_KEY_CRL_SIGN)
-		fprintf(outfile,"\t\tCRL signing.\n");
+		fprintf(stderr,"\t\tCRL signing.\n");
 	if (x&GNUTLS_KEY_ENCIPHER_ONLY)
-		fprintf(outfile,"\t\tKey encipher only.\n");
+		fprintf(stderr,"\t\tKey encipher only.\n");
 	if (x&GNUTLS_KEY_DECIPHER_ONLY)
-		fprintf(outfile,"\t\tKey decipher only.\n");
+		fprintf(stderr,"\t\tKey decipher only.\n");
 }
 
 static void print_private_key( gnutls_x509_privkey key)
@@ -286,6 +286,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	const char* str;
 	int vers = 3; /* the default version in the certificate 
 	               */
+	unsigned int usage = 0, server;
 	gnutls_x509_crq crq; /* request */
 
 	size = gnutls_x509_crt_init(&crt);
@@ -365,8 +366,8 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		exit(1);
 	}
 
-	result = read_yesno( "Is this a web server certificate? (Y/N): ");
-	if (result != 0) {
+	server = read_yesno( "Is this a web server certificate? (Y/N): ");
+	if (server != 0) {
 		str = read_str( "Enter the dnsName of the subject of the certificate: ");
 		if (str != NULL) {
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_DNSNAME, str);
@@ -388,6 +389,48 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		}
 	}
 
+
+	if (!ca_status || server) {
+		int pk;
+		const char* msg1, *msg2;
+		
+		if (server) msg1 = "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (Y/N): ";
+		else msg1 = "Will the certificate be used for signing (required for TLS)? (Y/N): ";
+
+		if (server) msg2 = "Will the certificate be used for encryption (RSA ciphersuites)? (Y/N): ";
+		else msg2 = "Will the certificate be used for encryption (not required for TLS)? (Y/N): ";
+
+		pk = gnutls_x509_crt_get_pk_algorithm( crt, NULL);
+
+		if (pk != GNUTLS_PK_DSA) { /* DSA keys can only sign.
+				  	    */
+			result = read_yesno( msg1);
+			if (result) usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+
+			result = read_yesno( msg2);
+			if (result) usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
+		} else usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+	}
+
+
+	if (ca_status) {
+		result = read_yesno( "Will the certificate be used to sign other certificates? (Y/N): ");
+		if (result) usage |= GNUTLS_KEY_KEY_CERT_SIGN;
+
+		result = read_yesno( "Will the certificate be used to sign CRLs? (Y/N): ");
+		if (result) usage |= GNUTLS_KEY_CRL_SIGN;
+	}
+
+	if (usage != 0) {
+		result = gnutls_x509_crt_set_key_usage( crt, usage);
+		if (result < 0) {
+			fprintf(stderr, "key_usage: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+	}
+
+	/* Version.
+	 */
 	result = gnutls_x509_crt_set_version( crt, vers);
 	if (result < 0) {
 		fprintf(stderr, "set_version: %s\n", gnutls_strerror(result));
@@ -981,7 +1024,7 @@ static void print_certificate_info( gnutls_x509_crt crt)
 	ret = gnutls_x509_crt_get_key_usage( crt, &key_usage, &critical);
 	
 	if (ret >= 0) {
-		fprintf(stderr, "\tKey usage:\n");
+		fprintf(stderr, "\tKey usage: %s\n", critical?"(critical)":"");
 		print_key_usage(key_usage);
 	}
 

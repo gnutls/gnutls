@@ -86,20 +86,25 @@ int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
 
 int gnutls_x509_crt_get_key_usage( gnutls_x509_crt cert, unsigned int* key_usage,
 	unsigned int* critical);
+int gnutls_x509_crt_set_key_usage(gnutls_x509_crt crt, unsigned int usage);
 
 int gnutls_x509_dn_oid_known(const char* oid);
 
 /* key_usage will be an OR of the following values:
  */
-#define GNUTLS_KEY_DIGITAL_SIGNATURE 		256
-#define GNUTLS_KEY_NON_REPUDIATION		128
-#define GNUTLS_KEY_KEY_ENCIPHERMENT		64
-#define GNUTLS_KEY_DATA_ENCIPHERMENT		32
-#define GNUTLS_KEY_KEY_AGREEMENT		16
-#define GNUTLS_KEY_KEY_CERT_SIGN		8
-#define GNUTLS_KEY_CRL_SIGN			4
-#define GNUTLS_KEY_ENCIPHER_ONLY		2
-#define GNUTLS_KEY_DECIPHER_ONLY		1
+#define GNUTLS_KEY_DIGITAL_SIGNATURE 		128 /* when the key is to be
+						     * used for signing.
+						     */
+#define GNUTLS_KEY_NON_REPUDIATION		64
+#define GNUTLS_KEY_KEY_ENCIPHERMENT		32 /* when the key is to be 
+						    * used for encryption.
+						    */
+#define GNUTLS_KEY_DATA_ENCIPHERMENT		16
+#define GNUTLS_KEY_KEY_AGREEMENT		8
+#define GNUTLS_KEY_KEY_CERT_SIGN		4
+#define GNUTLS_KEY_CRL_SIGN			2
+#define GNUTLS_KEY_ENCIPHER_ONLY		1
+#define GNUTLS_KEY_DECIPHER_ONLY		256
 
 int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx, 
 	void* oid, size_t * sizeof_oid);

@@ -105,14 +105,16 @@ static const TLS_TEST tls_tests[] = {
 #endif
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
 	{ "for ephemeral Diffie Hellman prime size", test_dhe_bits, "", "N/A", "N/A" },
-	{ "for AES cipher support", test_aes, "yes", "no", "dunno"},
+	{ "for AES cipher support (TLS extension)", test_aes, "yes", "no", "dunno"},
 	{ "for 3DES cipher support", test_3des, "yes", "no", "dunno"},
 	{ "for ARCFOUR cipher support", test_arcfour, "yes", "no", "dunno"},
 	{ "for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{ "for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
+	{ "for RIPEMD160 MAC support (TLS extension)", test_rmd, "yes", "no", "dunno"},
 #ifdef HAVE_LIBZ
-	{ "for ZLIB compression support", test_zlib, "yes", "no", "dunno"},
+	{ "for ZLIB compression support (TLS extension)", test_zlib, "yes", "no", "dunno"},
 #endif
+	{ "for LZO compression support (GnuTLS extension)", test_lzo, "yes", "no", "dunno"},
 	{ "for max record size (TLS extension)", test_max_record_size, "yes", "no", "dunno" },
 #ifdef ENABLE_SRP
 	{ "for SRP authentication support (TLS extension)", test_srp, "yes", "no", "dunno" },

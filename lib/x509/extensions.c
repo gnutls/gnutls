@@ -28,6 +28,7 @@
 #include <libtasn1.h>
 #include <common.h>
 #include <x509.h>
+#include <extensions.h>
 
 /* This function will attempt to return the requested extension found in
  * the given X509v3 certificate. The return value is allocated and stored into
@@ -339,10 +340,11 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 			     int extnValueLen)
 {
 	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	char str[10];
 	int len, result;
+	uint8 str[2];
 
-	keyUsage[0] = 0;
+	str[0] = str[1] = 0;
+	*keyUsage = 0;
 
 	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext
@@ -359,15 +361,15 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 		return 0;
 	}
 
-	len = sizeof(str) - 1;
+	len = sizeof(str);
 	result = asn1_read_value(ext, "", str, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&ext);
 		return 0;
 	}
-
-	keyUsage[0] = str[0];
+	
+	*keyUsage = str[0] | (str[1] << 8);
 
 	asn1_delete_structure(&ext);
 
@@ -446,6 +448,42 @@ int _gnutls_x509_ext_gen_basicConstraints(int CA, gnutls_datum* der_ext)
 
 	asn1_write_value(ext, "pathLenConstraint", NULL, 0);
 	
+	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
+
+	asn1_delete_structure(&ext);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}
+
+/* generate the keyUsage in a DER encoded extension
+ * Use an ORed SEQUENCE of GNUTLS_KEY_* for usage.
+ */
+int _gnutls_x509_ext_gen_keyUsage(uint16 usage, gnutls_datum* der_ext)
+{
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+	int result;
+	uint8 str[2];
+
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	str[0] = usage & 0xff;
+	str[1] = usage >> 8;
+	result = asn1_write_value(ext, "", str, 9);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&ext);
+		return _gnutls_asn2err(result);
+	}
+
 	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
 
 	asn1_delete_structure(&ext);

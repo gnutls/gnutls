@@ -392,7 +392,25 @@ int ret;
 }
 #endif
 
-int test_sha( gnutls_session session) {
+int test_lzo( gnutls_session session) {
+int ret;
+	gnutls_handshake_set_private_extensions( session, 1);
+
+	ADD_ALL_CIPHERS(session);
+	ADD_COMP(session, GNUTLS_COMP_LZO);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+
+	return ret;
+}
+
+int test_sha( gnutls_session session) 
+{
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -406,7 +424,23 @@ int ret;
 	return ret;
 }
 
-int test_3des( gnutls_session session) {
+int test_rmd( gnutls_session session) 
+{
+int ret;
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_MAC(session, GNUTLS_MAC_RMD160);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	return ret;
+}
+
+int test_3des( gnutls_session session) 
+{
 int ret;
 	ADD_CIPHER(session, GNUTLS_CIPHER_3DES_CBC);
 	ADD_ALL_COMP(session);
@@ -451,7 +485,7 @@ int ret;
 
 }
 
-/* Advertize both TLS 1.0 and SSL 3.0 if the connection fails,
+/* Advertize both TLS 1.0 and SSL 3.0. If the connection fails,
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
 int test_tls1_2( gnutls_session session) {

@@ -7,6 +7,8 @@ Version 1.1.0
   to specify certificates for the handshake without storing them to the
   credentials structure.
 - Added support for generating and exporting DSA private keys.
+- Added gnutls_x509_crt_set_key_usage() and certtool can now set the
+  certificate's key usage.
 
 Version 1.0.1 (10/12/2003)
 - Some minor fixes in the makefiles. They now include CFLAGS

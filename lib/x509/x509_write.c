@@ -217,7 +217,7 @@ int pk_algorithm;
 /**
   * gnutls_x509_crt_set_ca_status - This function will set the basicConstraints extension
   * @crt: should contain a gnutls_x509_crt structure
-  * @ca: true(1) or false(0). Depending on the Certificat authority status.
+  * @ca: true(1) or false(0). Depending on the Certificate authority status.
   *
   * This function will set the basicConstraints certificate extension. 
   *
@@ -243,6 +243,48 @@ gnutls_datum der_data;
 	}
 
 	result = _gnutls_x509_crt_set_extension( crt, "2.5.29.19", &der_data, 1);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt->use_extensions = 1;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crt_set_key_usage - This function will set the keyUsage extension
+  * @crt: should contain a gnutls_x509_crt structure
+  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
+  *
+  * This function will set the keyUsage certificate extension. 
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crt_set_key_usage(gnutls_x509_crt crt, unsigned int usage)
+{
+int result;
+gnutls_datum der_data;
+
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_keyUsage( (uint8)usage, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( crt, "2.5.29.15", &der_data, 1);
 
 	_gnutls_free_datum( &der_data);
 
