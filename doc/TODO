@@ -4,6 +4,7 @@ in order to avoid having people working on the same thing.
 
 Current list:
 * Convert the current sexp stuff to the gcrypt ac API. 
+* Check opera and DHE-RSA
 * Check opera (which sends an closure alert during the handshake
   which we do not read).
 * Make the current ciphering code a bit more abstract to
