@@ -4,7 +4,7 @@ bin_SCRIPTS = libgnutls-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
 
-DIST_SUBDIRS = minitasn1
+DIST_SUBDIRS = minitasn1 x509
 SUBDIRS = $(MINITASN1_DIR) x509
 
 EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \

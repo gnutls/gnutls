@@ -57,3 +57,4 @@ examples: $(EXAMPLE_OBJECTS)
 		cat $$i|grep -v "^\\\\" > ../examples/$$out.c; \
 		done
 
+dist-hook: examples
