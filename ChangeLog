@@ -1,3 +1,9 @@
+2004-09-11 12:05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
 2004-09-10 12:14  Simon Josefsson <simon@josefsson.org>
 
 	* src/certtool.c:
