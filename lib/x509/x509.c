@@ -1706,6 +1706,12 @@ int i;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	ret = gnutls_x509_crt_get_pk_algorithm( crt, NULL);
+	if (ret != GNUTLS_PK_RSA) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	ret = _gnutls_x509_crt_get_mpis( crt, params, &params_size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -1757,6 +1763,12 @@ int params_size = MAX_PUBLIC_PARAMS_SIZE;
 int i;
 
 	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = gnutls_x509_crt_get_pk_algorithm( crt, NULL);
+	if (ret != GNUTLS_PK_DSA) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}

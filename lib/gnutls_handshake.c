@@ -1224,11 +1224,9 @@ opaque buf[2*TLS_MAX_SESSION_ID_SIZE+1];
 	_gnutls_handshake_log("HSK[%x]: SessionID: %s\n", session,
 		    _gnutls_bin2hex(session_id, session_id_len, buf, sizeof(buf)));
 
-	if ((session->internals.resumed_security_parameters.
-	     session_id_size > 0)
-	    && memcmp(session_id,
-		      session->internals.
-		      resumed_security_parameters.session_id,
+	if (session_id_len > 0 &&
+        	session->internals.resumed_security_parameters.session_id_size == session_id_len &&
+		memcmp(session_id, session->internals.resumed_security_parameters.session_id,
 		      session_id_len) == 0) {
 		/* resume session */
 		memcpy(session->internals.
@@ -1243,7 +1241,8 @@ opaque buf[2*TLS_MAX_SESSION_ID_SIZE+1];
 
 		return 0;
 	} else {
-		/* keep the new session id */
+		/* keep the new session id 
+		 */
 		session->internals.resumed = RESUME_FALSE;	/* we are not resuming */
 		session->security_parameters.session_id_size =
 		    session_id_len;
@@ -1302,7 +1301,6 @@ static int _gnutls_read_server_hello(gnutls_session session, opaque *data,
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
 	DECR_LEN(len, session_id_len);
-
 
 	/* check if we are resuming and set the appropriate
 	 * values;
@@ -2367,6 +2365,8 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 
 	cred_type = _gnutls_map_kx_get_cred( kx, 1);
 	
+	/* Read the DH parameters if any.
+	 */
 	if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 		x509_cred =
 		    _gnutls_get_cred(session->key, cred_type, NULL);
