@@ -753,7 +753,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   if ( is_file_armored(CERTFILE) )
     {
       rc = cdk_iobuf_open(&buf, CERTFILE, IOBUF_MODE_RD);
-      if (rc == -1)
+      if ( rc )
         return GNUTLS_E_FILE_ERROR;
       memset(&afx, 0, sizeof afx);
       rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
@@ -768,7 +768,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   else
     {
       rc = cdk_iobuf_open(&buf, CERTFILE, IOBUF_MODE_RD);
-      if (rc == -1)
+      if ( rc )
         return GNUTLS_E_FILE_ERROR;
     }
   res->cert_list = gnutls_realloc(res->cert_list,
@@ -832,7 +832,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   if ( is_file_armored(KEYFILE) )
     {
       rc = cdk_iobuf_open(&buf, KEYFILE, IOBUF_MODE_RD);
-      if (rc == -1)
+      if ( rc )
         return GNUTLS_E_FILE_ERROR;
       memset(&afx, 0, sizeof afx);
       rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
@@ -847,7 +847,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   else
     {
       rc = cdk_iobuf_open(&buf, KEYFILE, IOBUF_MODE_RD);
-      if (rc == -1)
+      if ( rc )
         return GNUTLS_E_FILE_ERROR;
     }
   iobuf_to_datum(buf, &raw);
@@ -1114,7 +1114,7 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
     return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
   rc = cdk_iobuf_open( &buf, trustdb, IOBUF_MODE_RD );
-  if (rc == -1)
+  if ( rc )
     {
       trustval = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
@@ -1400,10 +1400,10 @@ gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
   if ( is_file_armored( (char*)file) )
     {
       rc = cdk_iobuf_open(&buf, file, IOBUF_MODE_RD);
-      if (rc == -1)
+      if ( rc )
         return GNUTLS_E_FILE_ERROR;
       rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
-      if (rc)
+      if ( rc )
         {
           cdk_iobuf_close(buf);
           return GNUTLS_E_ASCII_ARMOR_ERROR;
@@ -1412,7 +1412,7 @@ gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
   else
     {
       rc = cdk_iobuf_open(&buf, file, IOBUF_MODE_RD);
-      if (rc == -1)
+      if ( rc )
         return GNUTLS_E_FILE_ERROR;
     }
   data = cdk_iobuf_get_data(buf, &nbytes);
