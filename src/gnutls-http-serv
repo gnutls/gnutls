@@ -1,4 +1,5 @@
 #! /bin/sh
 
-./gnutls-serv --http --x509certfile x509/cert.pem --x509keyfile x509/key.pem --x509cafile x509/ca.pem $*
+./gnutls-serv --http --x509certfile x509/cert.pem --x509keyfile x509/key.pem --x509cafile x509/ca.pem \
+	--srppasswd srp/tpasswd --srppasswdconf srp/tpasswd.conf $*
 

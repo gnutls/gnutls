@@ -69,8 +69,10 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 #define V state->gnutls_key->x
 #define S state->gnutls_key->KEY
 
-/* Send the first key exchange message ( g, n, s) and append the verifier algorithm number */
-int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
+/* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
+ * Data is allocated by the called, and should have data_size size.
+ */
+int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 {
 	size_t n_g, n_n, n_s;
 	size_t ret;
@@ -128,13 +130,12 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	gcry_mpi_set(N, pwd_entry->n);
 	gcry_mpi_set(V, pwd_entry->v);
 
-	(*data) = gnutls_malloc(n_n + n_g + pwd_entry->salt_size + 6 + 1);
-	if ((*data)==NULL) {
+	if (data_size < n_n + n_g + pwd_entry->salt_size + 6 + 1) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	data_g = (*data); 
+	data_g = data; 
 
 	/* firstly copy the algorithm used to generate the verifier 
 	 */

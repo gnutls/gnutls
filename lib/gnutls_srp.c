@@ -403,6 +403,17 @@ int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc) {
 	return 0;
 }
 
+inline
+static int file_exists( const char* file) {
+FILE* fd;
+
+	fd = fopen( file, "r");
+	if (fd==NULL) return -1;
+
+	fclose(fd);
+	return 0;
+}
+
 /**
   * gnutls_srp_set_server_cred_file - Used to set the password files, in a GNUTLS_SRP_SERVER_CREDENTIALS structure
   * @res: is an &GNUTLS_SRP_SERVER_CREDENTIALS structure.
@@ -416,6 +427,17 @@ int i;
 	if (password_file==NULL || password_conf_file==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+
+	/* Check if the files can be opened */
+	if (file_exists( password_file)!=0) {
+		gnutls_assert();
+		return GNUTLS_E_FILE_ERROR;
+	}
+
+	if (file_exists( password_conf_file)!=0) {
+		gnutls_assert();
+		return GNUTLS_E_FILE_ERROR;
 	}
 	
 	res->password_file = gnutls_realloc( res->password_file,

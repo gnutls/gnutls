@@ -215,7 +215,6 @@ static int pwd_read_conf( const char* pconf_file, GNUTLS_SRP_PWD_ENTRY* entry, i
 	fd = fopen( pconf_file, "r");
 	if (fd==NULL) {
 		gnutls_assert();
-		gnutls_free(entry);
 		return GNUTLS_E_FILE_ERROR;
 	}
 

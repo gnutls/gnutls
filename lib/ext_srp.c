@@ -64,7 +64,7 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
+int _gnutls_srp_send_params( GNUTLS_STATE state, opaque* data, int data_size) {
 	uint8 len;
 
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
@@ -77,17 +77,17 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		const GNUTLS_SRP_CLIENT_CREDENTIALS cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_CRD_SRP, NULL);
 
-		(*data) = NULL;
-
 		if (cred==NULL) return 0;
 
 		if (cred->username!=NULL) { /* send username */
 			len = strlen(cred->username);
-			(*data) = gnutls_malloc(len+1); /* hold the size also */
-			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
+			if (data_size < len+1) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
 			
-			(*data)[0] = len;
-			memcpy( &(*data)[1], cred->username, len);
+			data[0] = len;
+			memcpy( &data[1], cred->username, len);
 			return len + 1;
 		}
 	} else { /* SERVER SIDE sending (g,n,s) */
@@ -101,7 +101,7 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 			return 0; /* no data to send */
 		
 		if (state->gnutls_internals.resumed==RESUME_FALSE)
-			return gen_srp_server_hello( state, data);
+			return gen_srp_server_hello( state, data, data_size);
 		else
 			return 0;
 	}

@@ -34,7 +34,7 @@ typedef struct {
 	char *name;
 	uint16 type;
 	int (*gnutls_ext_func_recv)( GNUTLS_STATE, const opaque*, int); /* recv data */
-	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque**); /* send data */
+	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque*, int); /* send data */
 } gnutls_extension_entry;
 
 static gnutls_extension_entry extensions[] = {
@@ -176,8 +176,9 @@ static void _gnutls_extension_list_add( GNUTLS_STATE state, uint8 type) {
 int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data) {
 int next, size;
 uint16 pos=0;
-opaque* sdata;
-int (*ext_func_send)( GNUTLS_STATE, opaque**);
+opaque sdata[1024];
+int sdata_size = sizeof(sdata);
+int (*ext_func_send)( GNUTLS_STATE, opaque*, int);
 
 
 	(*data) = gnutls_malloc(2); /* allocate size for size */
@@ -193,7 +194,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 		next--;
 		ext_func_send = _gnutls_ext_func_send(next);
 		if (ext_func_send == NULL) continue;
-		size = ext_func_send( state, &sdata);
+		size = ext_func_send( state, sdata, sdata_size);
 
 		if (size > 0) {
 			(*data) = gnutls_realloc( (*data), pos+size+4);
@@ -212,7 +213,6 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 			
 			memcpy( &(*data)[pos], sdata, size);
 			pos+=size;
-			gnutls_free(sdata);
 			
 			/* add this extension to the extension list
 			 */

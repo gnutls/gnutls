@@ -23,7 +23,7 @@ typedef struct SRP_SERVER_AUTH_INFO_INT {
 } *SRP_SERVER_AUTH_INFO;
 
 int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size);
-int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data);
+int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size);
 
 typedef struct  SRP_SERVER_AUTH_INFO_INT  SRP_SERVER_AUTH_INFO_INT;
 

@@ -80,7 +80,7 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque** data) {
+int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque* data, int data_size) {
 	uint16 len;
 	/* this function sends the client extension data (dnsname) */
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
@@ -89,10 +89,12 @@ int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque** data) {
 			gnutls_assert();
 			
 			len = 1;
-			(*data) = gnutls_malloc(len); /* hold the size and the type also */
-			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
+			if (data_size < len) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
 			
-			(*data)[0] = _gnutls_mre_record2num( state->gnutls_internals.proposed_record_size);
+			data[0] = _gnutls_mre_record2num( state->gnutls_internals.proposed_record_size);
 			return len;
 		}
 
@@ -100,17 +102,18 @@ int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque** data) {
 
 		if (state->security_parameters.max_record_size != DEFAULT_MAX_RECORD_SIZE) {
 			len = 1;
-			(*data) = gnutls_malloc(len); 
-			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
+			if (data_size < len) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
 			
-			(*data)[0] = _gnutls_mre_record2num( state->security_parameters.max_record_size);
+			data[0] = _gnutls_mre_record2num( state->security_parameters.max_record_size);
 			return len;
 		}	
 	
 	
 	}
 
-	*data = NULL;
 	return 0;
 }
 

@@ -102,7 +102,7 @@ int _gnutls_cert_type_recv_params( GNUTLS_STATE state, const opaque* data, int d
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_cert_type_send_params( GNUTLS_STATE state, opaque** data) {
+int _gnutls_cert_type_send_params( GNUTLS_STATE state, opaque* data, int data_size) {
 	uint16 len, i;
 	
 	/* this function sends the client extension data (dnsname) */
@@ -118,15 +118,16 @@ int _gnutls_cert_type_send_params( GNUTLS_STATE state, opaque** data) {
 			/* We don't use this extension if X.509 certificates
 			 * are used.
 			 */
-				*data=NULL;
 				return 0;
 			}
 			
-			(*data) = gnutls_malloc(len);
-			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
-			
+			if (data_size < len) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
+
 			for (i=0;i<len;i++) {
-				(*data)[i] = _gnutls_cert_type2num( state->gnutls_internals.
+				data[i] = _gnutls_cert_type2num( state->gnutls_internals.
 					cert_type_priority.algorithm_priority[i]);
 			}
 			return len;
@@ -136,17 +137,18 @@ int _gnutls_cert_type_send_params( GNUTLS_STATE state, opaque** data) {
 
 		if ( state->security_parameters.cert_type != DEFAULT_CERT_TYPE) {
 			len = 1;
-			(*data) = gnutls_malloc(len); 
-			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
+			if (data_size < len) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
 			
-			(*data)[0] = _gnutls_cert_type2num( state->security_parameters.cert_type);
+			data[0] = _gnutls_cert_type2num( state->security_parameters.cert_type);
 			return len;
 		}	
 	
 	
 	}
 
-	*data = NULL;
 	return 0;
 }
 
