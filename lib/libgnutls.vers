@@ -1,0 +1,5 @@
+gnutls1
+{
+  global: _gnutls*; gnutls*; _E_*;
+  local: *;
+};

@@ -1,0 +1,5 @@
+gnutls1
+{
+   global: gnutls*; SSL*; TLS*; X509*; BIO*; ERR*; RAND*; MD5*; RIPEMD160*;
+   local: *;
+};

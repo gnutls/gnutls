@@ -4,6 +4,12 @@ bin_SCRIPTS = libgnutls-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
 
+if HAVE_LD_VERSION_SCRIPT
+  libgnutls_version_script_cmd = -Wl,--version-script=$(srcdir)/libgnutls.vers
+else
+  libgnutls_version_script_cmd =
+endif
+
 DIST_SUBDIRS = minitasn1 x509
 SUBDIRS = $(MINITASN1_DIR) x509
 
@@ -12,7 +18,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
 	gnutls_compress_int.h gnutls_session.h gnutls_priority.h gnutls_auth.h \
-	auth_anon.h gnutls_extensions.h gnutls_buffer.h \
+	auth_anon.h gnutls_extensions.h gnutls_buffer.h libgnutls.vers \
 	gnutls_auth_int.h gnutls_random.h x509_b64.h gnutls_v2_compat.h \
 	libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
 	gnutls-api.tex gnutls_datum.h auth_cert.h gnutls_mpi.h \
@@ -53,6 +59,7 @@ libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/dn.lo x509/crl.lo x509/common.lo
 	x509/pkcs12_encr.lo x509/rfc2818_hostname.lo x509/rc2.lo
 
 libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
+	$(libgnutls_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 pkix_asn1_tab.c: pkix.asn
