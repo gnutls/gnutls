@@ -35,7 +35,7 @@
  */
 int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 {
-	KX_Algorithm algorithm;
+	KXAlgorithm algorithm;
 	MPI x, X, g, p;
 	int n_X, n_g, n_p;
 	uint16 _n_X, _n_g, _n_p;
@@ -51,7 +51,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 					     gnutls_internals.current_cipher_suite);
 
 	/* Do key exchange only if the algorithm permits it */
-	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
+	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
 
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
 			X = _gnutls_calc_dh_secret(&x);
@@ -127,7 +127,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
  */
 int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 {
-	KX_Algorithm algorithm;
+	KXAlgorithm algorithm;
 	MPI x, X;
 	int n_X;
 	uint16 _n_X;
@@ -218,7 +218,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 {
-	KX_Algorithm algorithm;
+	KXAlgorithm algorithm;
 	uint16 n_Y, n_g, n_p;
 	int _n_Y, _n_g, _n_p;
 	uint8 *data;
@@ -233,7 +233,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 					     gnutls_internals.current_cipher_suite);
 
 	/* Do key exchange only if the algorithm permits it */
-	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
+	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
 
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
 
@@ -289,7 +289,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 
 int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 {
-	KX_Algorithm algorithm;
+	KXAlgorithm algorithm;
 	uint16 n_Y;
 	int _n_Y;
 	uint8 *data;
@@ -308,7 +308,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 					     gnutls_internals.current_cipher_suite);
 
 	/* Do key exchange only if the algorithm permits it */
-	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
+	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
 
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
 

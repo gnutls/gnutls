@@ -298,7 +298,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	dataptr = gnutls_realloc( dataptr, length32+4);
 	if (length32>0 && data!=NULL)
 		*data = gnutls_malloc( length32);
-	
+
 	if (datalen!=NULL) *datalen = length32;
 
 	ret = _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, &dataptr[4], length32);

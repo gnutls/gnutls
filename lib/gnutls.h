@@ -20,9 +20,11 @@
 
 enum ContentType { GNUTLS_APPLICATION_DATA=23 };
 typedef enum ContentType ContentType;
-enum BulkCipherAlgorithm { CIPHER_NULL, CIPHER_3DES = 4 };
+enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4 };
 typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
-enum MACAlgorithm { MAC_NULL, MAC_MD5, MAC_SHA };
+enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
+typedef enum KXAlgorithm KXAlgorithm;
+enum MACAlgorithm { GNUTLS_MAC_NULL, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
 typedef enum MACAlgorithm MACAlgorithm;
 enum CompressionMethod { COMPRESSION_NULL };
 typedef enum CompressionMethod CompressionMethod;
@@ -44,6 +46,11 @@ void gnutls_perror( int error);
 
 #define gnutls_send( x, y, z, w) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
 #define gnutls_recv( x, y, z, w) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
+
+/* functions to set priority of cipher suites */
+void gnutls_set_cipher_priority( int num, ...);
+void gnutls_set_kx_priority( int num, ...);
+void gnutls_set_mac_priority( int num, ...);
 
 
 #define	GNUTLS_E_MAC_FAILED -1

@@ -65,12 +65,12 @@ if test $ac_cv_prog_gcc != no; then
   CFLAGS="${CFLAGS} -ffast-math"
 
 	if test $opt_maintainer_mode = yes; then
-	  CFLAGS="${CFLAGS} -Wall -Wpointer-arith -pedantic"
+	  CFLAGS="${CFLAGS} -Wall -Wpointer-arith"
 	fi
 fi
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h pwd.h locale.h strings.h mcrypt.h)
+AC_CHECK_HEADERS(unistd.h pwd.h locale.h strings.h mcrypt.h stdarg.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h fcntl.h sys/wait.h)
 AC_CHECK_HEADERS(utime.h signal.h)
 AC_CHECK_HEADERS(termios.h termio.h sgtty.h)

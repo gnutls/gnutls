@@ -1,1 +1,1 @@
-#define PORT 6667
+#define PORT 5555

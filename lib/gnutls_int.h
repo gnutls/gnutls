@@ -70,7 +70,7 @@ typedef struct {
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4 };
-enum KX_Algorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
+enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
 enum IsExportable { EXPORTABLE_TRUE, EXPORTABLE_FALSE };
@@ -81,7 +81,7 @@ enum ValidSession { VALID_TRUE, VALID_FALSE };
 enum ResumableSession { RESUME_TRUE, RESUME_FALSE };
 
 typedef enum KeyExchangeAlgorithm KeyExchangeAlgorithm;
-typedef enum KX_Algorithm KX_Algorithm;
+typedef enum KXAlgorithm KXAlgorithm;
 typedef enum ValidSession ValidSession;
 typedef enum ResumableSession ResumableSession;
 typedef enum ConnectionEnd ConnectionEnd;

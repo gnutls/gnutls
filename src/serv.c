@@ -24,6 +24,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
 #include "../lib/gnutls.h"
 #include <port.h>
 
@@ -61,6 +63,9 @@ int main()
     client_len = sizeof(sa_cli);
     for (;;) {
 	gnutls_init(&state, GNUTLS_SERVER);
+	gnutls_set_cipher_priority( 2, GNUTLS_3DES);
+	gnutls_set_kx_priority( 1, GNUTLS_KX_ANON_DH);
+	gnutls_set_mac_priority(2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
 
@@ -74,7 +79,7 @@ int main()
 	if (ret < 0) {
 	    close(sd);
 	    gnutls_deinit(&state);
-	    fprintf(stderr, "Handshake has failed\n", ret);
+	    fprintf(stderr, "Handshake has failed (%d)\n", ret);
 	    gnutls_perror(ret);
 	    continue;
 	}
@@ -98,7 +103,7 @@ int main()
 			    "\nPeer has closed the GNUTLS connection\n");
 		    break;
 		} else {
-		    fprintf(stderr, "\nReceived corrupted data\n");
+		    fprintf(stderr, "\nReceived corrupted data. Closing the connection.\n");
 		    break;
 		}
 
