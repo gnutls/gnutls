@@ -1084,8 +1084,6 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 
 	res->x509_ncas = i - 1;
 
-
-
 	return 0;
 }
 

@@ -105,26 +105,26 @@ void gnutls_certificate_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 		for (j = 0; j < sc->cert_list_length[i]; j++) {
 			gnutls_free_cert(sc->cert_list[i][j]);
 		}
-		gnutls_free(sc->cert_list[i]);
+		gnutls_free( sc->cert_list[i]);
 	}
 
 	gnutls_free(sc->cert_list_length);
 	gnutls_free(sc->cert_list);
 
 	for (j = 0; j < sc->x509_ncas; j++) {
-		gnutls_free_cert(sc->x509_ca_list[j]);
+		gnutls_free_cert( sc->x509_ca_list[j]);
 	}
 
-	gnutls_free(sc->x509_ca_list);
+	gnutls_free( sc->x509_ca_list);
 
 	for (i = 0; i < sc->ncerts; i++) {
 		_gnutls_free_private_key(sc->pkey[i]);
 	}
 
-	gnutls_free(sc->pkey);
-	gnutls_free(sc->x509_rdn_sequence.data);
+	gnutls_free( sc->pkey);
+	gnutls_free( sc->x509_rdn_sequence.data);
 
-	gnutls_free(sc);
+	gnutls_free( sc);
 }
 
 
@@ -258,7 +258,7 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
   * This function returns 0 on success.
   **/
 void gnutls_certificate_client_set_select_func(GNUTLS_STATE state,
-					     certificate_client_callback_func
+					     certificate_client_select_func
 					     * func)
 {
 	state->gnutls_internals.client_cert_callback = func;
@@ -290,7 +290,7 @@ void gnutls_certificate_client_set_select_func(GNUTLS_STATE state,
   *
   **/
 void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
-					     certificate_server_callback_func
+					     certificate_server_select_func
 					     * func)
 {
 	state->gnutls_internals.server_cert_callback = func;

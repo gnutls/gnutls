@@ -11,7 +11,7 @@ typedef struct {
 } GNUTLS_SRP_PWD_ENTRY;
 
 /* this is localy alocated. It should be freed using the provided function */
-GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username, int* err);
+GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_STATE state, char* username, int* err);
 void _gnutls_srp_clear_pwd_entry( GNUTLS_SRP_PWD_ENTRY * entry);
 GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry(void);
 int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result);

@@ -8,8 +8,9 @@ typedef struct {
 #define GNUTLS_SRP_CLIENT_CREDENTIALS SRP_CLIENT_CREDENTIALS_INT*
 
 typedef struct {
-	char* password_file;
-	char* password_conf_file;
+	char** password_file;
+	char** password_conf_file;
+	int password_files;
 } SRP_SERVER_CREDENTIALS_INT;
 
 #define GNUTLS_SRP_SERVER_CREDENTIALS SRP_SERVER_CREDENTIALS_INT*

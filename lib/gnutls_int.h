@@ -388,8 +388,9 @@ typedef struct {
 #define Protocol_Priority GNUTLS_Priority
 #define CertType_Priority GNUTLS_Priority
 
-typedef int certificate_client_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int certificate_server_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
+typedef int certificate_client_select_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int certificate_server_select_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
+typedef int srp_server_select_func(struct GNUTLS_STATE_INT*, const char**, int);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
@@ -504,8 +505,12 @@ typedef struct {
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
 	 */
-	certificate_client_callback_func*	client_cert_callback;
-	certificate_server_callback_func*	server_cert_callback;
+	certificate_client_select_func*	client_cert_callback;
+	certificate_server_select_func*	server_cert_callback;
+
+	/* Callback to select the proper password file
+	 */
+	srp_server_select_func*		server_srp_callback;
 
 	/* bits to use for DHE and DHA 
 	 * use _gnutls_dh_get_bits() and gnutls_dh_set_bits() 

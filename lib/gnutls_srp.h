@@ -11,5 +11,4 @@ int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n, int bits);
 extern const uint8 diffie_hellman_group1_prime[130];
 
 /* g is defined to be 2 */
-#define SRP_G 2
 #define SRP_MAX_HASH_SIZE 24

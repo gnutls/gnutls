@@ -317,20 +317,22 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
   * the structure.
   **/
 void gnutls_srp_free_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS sc) {
-	gnutls_free(sc);
+	gnutls_free( sc->username);
+	gnutls_free( sc->password);
+	gnutls_free( sc);
 }
 
 /**
-  * gnutls_srp_allocate_server_sc - Used to allocate an GNUTLS_SRP_CLIENT_CREDENTIALS structure
-  * @sc: is a pointer to an &GNUTLS_SRP_CLIENT_CREDENTIALS structure.
+  * gnutls_srp_allocate_server_sc - Used to allocate an GNUTLS_SRP_SERVER_CREDENTIALS structure
+  * @sc: is a pointer to an &GNUTLS_SRP_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
 int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc) {
-	*sc = gnutls_malloc( sizeof(SRP_CLIENT_CREDENTIALS_INT));
-	
+	*sc = gnutls_calloc( 1, sizeof(SRP_CLIENT_CREDENTIALS_INT));
+  
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 
 	return 0;
@@ -366,6 +368,14 @@ int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *usernam
   * the structure.
   **/
 void gnutls_srp_free_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS sc) {
+int i;
+	for (i=0;i<sc->password_files;i++) {
+		gnutls_free( sc->password_file[i]);
+		gnutls_free( sc->password_conf_file[i]);
+	}
+	gnutls_free(sc->password_file);
+	gnutls_free(sc->password_conf_file);
+	
 	gnutls_free(sc);
 }
 
@@ -377,9 +387,8 @@ void gnutls_srp_free_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS sc) {
   * this helper function is provided in order to allocate
   * the structure.
   **/
-
 int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc) {
-	*sc = gnutls_malloc( sizeof(SRP_SERVER_CREDENTIALS_INT));
+	*sc = gnutls_calloc( 1, sizeof(SRP_SERVER_CREDENTIALS_INT));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
@@ -394,17 +403,67 @@ int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc) {
   *
   **/
 int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
+int i;
+	res->password_file = gnutls_realloc( res->password_file,
+		sizeof(char*)*(res->password_files+1));
+	if (res->password_file==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-	res->password_file = gnutls_strdup( password_file);
-	if (res->password_file==NULL) return GNUTLS_E_MEMORY_ERROR;
-	
-	res->password_conf_file = gnutls_strdup( password_conf_file);
+	res->password_conf_file = gnutls_realloc( res->password_conf_file,
+		sizeof(char*)*(res->password_files+1));
 	if (res->password_conf_file==NULL) {
-		gnutls_free(res->password_file);
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	i = res->password_files++;
+	
+	res->password_file[i] = gnutls_strdup( password_file);
+	if (res->password_file[i]==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	res->password_conf_file[i] = gnutls_strdup( password_conf_file);
+	if (res->password_conf_file[i]==NULL) {
+		gnutls_assert();
+		gnutls_free(res->password_file[i]);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	return 0;
 }
 
-
+/**
+  * gnutls_srp_server_set_select_func - Used to set a callback to assist in selecting the proper password file
+  * @state: is a &GNUTLS_STATE structure.
+  * @func: is the callback function
+  *
+  * The callback's function form is:
+  * int (*callback)(GNUTLS_STATE, const char** pfiles, int npfiles);
+  *
+  * 'pfiles' contains 'npfiles' char* structures which hold
+  * the password file name. 
+  *
+  * This function specifies what we, in case of a server, are going
+  * to do when we have to use a password file. If this callback
+  * function is not provided then gnutls will automaticaly select the
+  * first password file
+  *
+  * In case the callback returned a negative number then gnutls will
+  * not attempt to choose the appropriate certificate and the caller function
+  * will fail.
+  *
+  * The callback function will only be called once per handshake.
+  * The callback function should return the index of the certificate
+  * choosen by the server. -1 indicates an error.
+  *
+  **/
+void gnutls_srp_server_set_select_func(GNUTLS_STATE state,
+					     srp_server_select_func
+					     * func)
+{
+	state->gnutls_internals.server_srp_callback = func;
+}

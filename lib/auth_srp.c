@@ -88,7 +88,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	
 	_gnutls_str_cpy( username, MAX_SRP_USERNAME, state->security_parameters.extensions.srp_username);
 
-	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, username, &err);
+	pwd_entry = _gnutls_srp_pwd_read_entry( state, username, &err);
 
 	if (pwd_entry == NULL) {
 		if (err==0)

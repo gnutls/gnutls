@@ -111,15 +111,21 @@ int indx;
 
 	if (_gnutls_mpi_scan(&entry->v, verifier, &verifier_size) || entry->v == NULL) {
 		gnutls_assert();
-		gnutls_free(entry->salt);
+		gnutls_free( entry->salt);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
+	gnutls_free( verifier);
 
 	/* now go for username */
 	*p='\0';
 
 	entry->username = gnutls_strdup(str);
+	if (entry->username==NULL) {
+		gnutls_free( entry->salt);
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return indx;
 }
@@ -195,7 +201,7 @@ int tmp_size;
 
 /* this function opens the tpasswd.conf file
  */
-static int pwd_read_conf( const GNUTLS_SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_PWD_ENTRY* entry, int index) {
+static int pwd_read_conf( const char* pconf_file, GNUTLS_SRP_PWD_ENTRY* entry, int index) {
 	FILE * fd;
 	char line[2*1024];
 	int i;
@@ -203,7 +209,7 @@ static int pwd_read_conf( const GNUTLS_SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_P
 
 	sprintf( indexstr, "%d", index); /* Flawfinder: ignore */
 
-	fd = fopen( cred->password_conf_file, "r");
+	fd = fopen( pconf_file, "r");
 	if (fd==NULL) {
 		gnutls_assert();
 		gnutls_free(entry);
@@ -229,14 +235,15 @@ static int pwd_read_conf( const GNUTLS_SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_P
 }
 
 
-GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username, int *err) {
+GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_STATE state, char* username, int *err) {
 	const GNUTLS_SRP_SERVER_CREDENTIALS cred;
 	FILE * fd;
 	char line[2*1024];
 	int i, len;
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	int index;
-
+	int pwd_index = 0;
+	
 	if (entry==NULL) {
 		gnutls_assert();
 		*err = 1;
@@ -245,7 +252,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 
 	*err = 0; /* normal exit */
 	
-	cred = _gnutls_get_cred( key, GNUTLS_CRD_SRP, NULL);
+	cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_CRD_SRP, NULL);
 	if (cred==NULL) {
 		*err = 1;
 		gnutls_assert();
@@ -253,7 +260,23 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 		return NULL;
 	}
 
-	fd = fopen( cred->password_file, "r");
+	if (cred->password_files<=0) {
+		gnutls_assert();
+		return NULL;
+	}
+	
+	/* use the callback to select a password file */
+	if (state->gnutls_internals.server_srp_callback!=NULL) {
+		pwd_index = state->gnutls_internals.server_srp_callback(
+			state, cred->password_file, cred->password_files);
+		
+		if (pwd_index < 0) {
+			gnutls_assert();
+			return NULL;
+		}
+	}
+
+	fd = fopen( cred->password_file[pwd_index], "r");
 	if (fd==NULL) {
 		*err = 1; /* failed due to critical error */
 		gnutls_assert();
@@ -270,7 +293,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	    len = strlen(username);
 	    if (strncmp( username, line, (i>len)?i:len) == 0) {
 			if ((index = pwd_put_values( entry, line, strlen(line))) >= 0)
-				if (pwd_read_conf( cred, entry, index)==0) {
+				if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, index)==0) {
 					return entry;
 				} else {
 					gnutls_free(entry);
