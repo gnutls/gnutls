@@ -2,12 +2,12 @@
 
 Network Working Group                                      S. Hollenbeck
 Internet-Draft                                            VeriSign, Inc.
-Updates: 2246 (if approved)                           September 20, 2002
-Expires: March 21, 2003
+Updates: 2246 (if approved)                              October 7, 2002
+Expires: April 7, 2003
 
 
          Transport Layer Security Protocol Compression Methods
-                   draft-ietf-tls-compression-01.txt
+                   draft-ietf-tls-compression-02.txt
 
 Status of this Memo
 
@@ -30,7 +30,7 @@ Status of this Memo
    The list of Internet-Draft Shadow Directories can be accessed at
    http://www.ietf.org/shadow.html.
 
-   This Internet-Draft will expire on March 21, 2003.
+   This Internet-Draft will expire on April 7, 2003.
 
 Copyright Notice
 
@@ -52,9 +52,9 @@ Conventions Used In This Document
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 1]
+Hollenbeck               Expires April 7, 2003                  [Page 1]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -63,17 +63,19 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 Table of Contents
 
-   1. Introduction . . . . . . . . . . . . . . . . . . . . . . . . .   3
-   2. Compression Methods  . . . . . . . . . . . . . . . . . . . . .   4
-   3. Intellectual Property Considerations . . . . . . . . . . . . .   5
-   4. Internationalization Considerations  . . . . . . . . . . . . .   6
-   5. IANA Considerations  . . . . . . . . . . . . . . . . . . . . .   7
-   6. Security Considerations  . . . . . . . . . . . . . . . . . . .   8
-   7. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . .   9
-      Normative References . . . . . . . . . . . . . . . . . . . . .  10
-      Informative References . . . . . . . . . . . . . . . . . . . .  11
-      Author's Address . . . . . . . . . . . . . . . . . . . . . . .  11
-      Full Copyright Statement . . . . . . . . . . . . . . . . . . .  12
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   2.  Compression Methods  . . . . . . . . . . . . . . . . . . . . .  4
+   2.1 ZLIB Compression . . . . . . . . . . . . . . . . . . . . . . .  5
+   2.2 LZS Compression  . . . . . . . . . . . . . . . . . . . . . . .  5
+   3.  Intellectual Property Considerations . . . . . . . . . . . . .  6
+   4.  Internationalization Considerations  . . . . . . . . . . . . .  7
+   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  8
+   6.  Security Considerations  . . . . . . . . . . . . . . . . . . .  9
+   7.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 10
+       Normative References . . . . . . . . . . . . . . . . . . . . . 11
+       Informative References . . . . . . . . . . . . . . . . . . . . 12
+       Author's Address . . . . . . . . . . . . . . . . . . . . . . . 12
+       Full Copyright Statement . . . . . . . . . . . . . . . . . . . 13
 
 
 
@@ -106,11 +108,9 @@ Table of Contents
 
 
 
-
-
-Hollenbeck               Expires March 21, 2003                 [Page 2]
+Hollenbeck               Expires April 7, 2003                  [Page 2]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 1. Introduction
@@ -164,9 +164,9 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 3]
+Hollenbeck               Expires April 7, 2003                  [Page 3]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 2. Compression Methods
@@ -202,9 +202,13 @@ Internet-Draft          TLS Compression Methods           September 2002
 
    enum { null(0), ZLIB(1), LZS(2), (255) } CompressionMethod;
 
-   The ZLIB compression method is described in RFC 1950 [5] and RFC 1951
-   [6].  The Lempel Zif Stac (LZS) compression method is described in
-   ANSI publication X3.241 [7].
+   These two compression methods are defined to provide implementers
+   with alternatives based on compression performance, ease of
+   implementation, and licensing requirements (see Section 3 for a
+   description of intellectual property considerations).  ZLIB is
+   generally known as a freely-available, widely-deployed compression
+   method, whereas LZS is generally known to provide memory footprint
+   and performance advantages in stateful networking applications.
 
    As described in section 6 of RFC 2246, TLS is a stateful protocol.
    Compression methods used with TLS can be either stateful (the
@@ -213,16 +217,68 @@ Internet-Draft          TLS Compression Methods           September 2002
    there seems to be little known benefit in using a stateless
    compression method within TLS.  Compression methods SHOULD be
    stateful to take advantage of the state management features offered
+
+
+
+Hollenbeck               Expires April 7, 2003                  [Page 4]
+
+Internet-Draft          TLS Compression Methods             October 2002
+
+
    by TLS.
 
+2.1 ZLIB Compression
+
+   The ZLIB compression method and encoding format is described in RFC
+   1950 [5] and RFC 1951 [6].  Examples of ZLIB use in IETF protocols
+   can be found in RFC 1979 [7], RFC 2394 [8], and RFC 3274 [9].
+
+   ZLIB allows the sending compressor to select from among several
+   options to provide varying compression ratios, processing speeds, and
+   memory requirements.  The receiving decompressor will automatically
+   adjust to the parameters selected by the sender.
+
+   The sender MUST flush the compressor completely each time a
+   compressed payload is produced.  All data that was submitted for
+   compression MUST be included in the compressed output, with no data
+   retained to be included in a later output payload.  Flushing ensures
+   that each payload is complete so that compressed packet payloads can
+   be decompressed independently.
+
+2.2 LZS Compression
+
+   The Lempel Zif Stac (LZS) compression method and encoding format is
+   described in ANSI publication X3.241 [10].  Examples of LZS use in
+   IETF protocols can be found in RFC 1967 [11], RFC 1974 [12], and RFC
+   2395 [13].
+
+   LZS has the ability to maintain history information when compressing
+   and decompressing packet payloads.  When used with TLS, the
+   compression history MUST be reset by the sender before compressing
+   data and the decompression history MUST be reset by the receiver
+   before decompressing data to ensure that compressed packet payloads
+   can be decompressed independently.
+
+   The sender MUST flush the compressor completely each time a
+   compressed payload is produced.  All data that was submitted for
+   compression MUST be included in the compressed output, with no data
+   retained to be included in a later output payload.  Flushing ensures
+   that each payload is complete so that compressed packet payloads can
+   be decompressed independently.
 
 
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 4]
+
+
+
+
+
+
+Hollenbeck               Expires April 7, 2003                  [Page 5]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 3. Intellectual Property Considerations
@@ -276,9 +332,9 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 5]
+Hollenbeck               Expires April 7, 2003                  [Page 6]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 4. Internationalization Considerations
@@ -332,9 +388,9 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 6]
+Hollenbeck               Expires April 7, 2003                  [Page 7]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 5. IANA Considerations
@@ -388,9 +444,9 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 7]
+Hollenbeck               Expires April 7, 2003                  [Page 8]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 6. Security Considerations
@@ -399,17 +455,11 @@ Internet-Draft          TLS Compression Methods           September 2002
    model addressed by TLS.  The security considerations described
    throughout RFC 2246 [2] apply here as well.
 
-   Data compression prior to encryption typically "flattens" the
-   distribution of unencrypted octets (or very slightly increases the
-   unicity distance) by using fewer bits to represent common characters.
-   An increase in unicity distance typically indicates an increase in
-   the amount of work required of an attacker to recover the original
-   plaintext.  However, compression methods often require a structured
-   header at the beginning of the compressed data stream, giving an
-   attacker a target for testing keys in a brute force search.
-   Compression can thus decrease and not increase the security of
-   encryption if an attacker has little prior knowledge of the original
-   plaintext.
+   Depending on the ciphersuite, symmetric encryption in TLS does not
+   fully hide the length of symmetrically encrypted data.  Use of TLS
+   compression SHOULD take into account that the length of compressed
+   data may leak more information than the length of the original
+   uncompressed data.
 
 
 
@@ -444,9 +494,15 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 8]
+
+
+
+
+
+
+Hollenbeck               Expires April 7, 2003                  [Page 9]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 7. Acknowledgements
@@ -500,9 +556,9 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 21, 2003                 [Page 9]
+Hollenbeck               Expires April 7, 2003                 [Page 10]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 Normative References
@@ -556,26 +612,43 @@ Normative References
 
 
 
-Hollenbeck               Expires March 21, 2003                [Page 10]
+Hollenbeck               Expires April 7, 2003                 [Page 11]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 Informative References
 
-   [4]  Bray, T., Paoli, J., Sperberg-McQueen, C. and E. Maler,
-        "Extensible Markup Language (XML) 1.0 (2nd ed)", W3C REC-xml,
-        October 2000, <http://www.w3.org/TR/REC-xml>.
+   [4]   Bray, T., Paoli, J., Sperberg-McQueen, C. and E. Maler,
+         "Extensible Markup Language (XML) 1.0 (2nd ed)", W3C REC-xml,
+         October 2000, <http://www.w3.org/TR/REC-xml>.
 
-   [5]  Deutsch, L. and J-L. Gailly, "ZLIB Compressed Data Format
-        Specification version 3.3", RFC 1950, May 1996.
+   [5]   Deutsch, L. and J-L. Gailly, "ZLIB Compressed Data Format
+         Specification version 3.3", RFC 1950, May 1996.
 
-   [6]  Deutsch, P., "DEFLATE Compressed Data Format Specification
-        version 1.3", RFC 1951, May 1996.
+   [6]   Deutsch, P., "DEFLATE Compressed Data Format Specification
+         version 1.3", RFC 1951, May 1996.
 
-   [7]  American National Standards Institute, "Data Compression Method,
-        Adaptive Coding with Sliding Window of Information Interchange",
-        ANSI X3.241, 1994.
+   [7]   Woods, J., "PPP Deflate Protocol", RFC 1979, August 1996.
+
+   [8]   Pereira, R., "IP Payload Compression Using DEFLATE", RFC 2394,
+         December 1998.
+
+   [9]   Gutmann, P., "Compressed Data Content Type for Cryptographic
+         Message Syntax (CMS)", RFC 3274, June 2002.
+
+   [10]  American National Standards Institute, "Data Compression
+         Method, Adaptive Coding with Sliding Window of Information
+         Interchange", ANSI X3.241, 1994.
+
+   [11]  Schneider, K., Friend, R. and K. Fox, "PPP LZS-DCP Compression
+         Protocol (LZS-DCP)", RFC 1967, August 1996.
+
+   [12]  Friend, R., Simpson, W. and K. Fox, "PPP Stac LZS Compression
+         Protocol", RFC 1974, August 1996.
+
+   [13]  Friend, R. and R. Monsour, "IP Payload Compression Using LZS",
+         RFC 2395, December 1998.
 
 
 Author's Address
@@ -595,26 +668,9 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Hollenbeck               Expires March 21, 2003                [Page 11]
+Hollenbeck               Expires April 7, 2003                 [Page 12]
 
-Internet-Draft          TLS Compression Methods           September 2002
+Internet-Draft          TLS Compression Methods             October 2002
 
 
 Full Copyright Statement
@@ -668,4 +724,4 @@ Acknowledgement
 
 
 
-Hollenbeck               Expires March 21, 2003                [Page 12]
+Hollenbeck               Expires April 7, 2003                 [Page 13]
