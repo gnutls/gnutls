@@ -39,7 +39,6 @@
 #include <gnutls_str.h>
 #include <debug.h>
 #include <x509_b64.h>
-#include <gnutls_privkey.h>
 #include <gnutls_x509.h>
 #include "x509/common.h"
 #include "x509/x509.h"
@@ -155,7 +154,8 @@ static int _gnutls_check_key_cert_match( gnutls_certificate_credentials res)
 {
 int pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
 	
-	if (res->pkey[res->ncerts-1].pk_algorithm != (unsigned int)pk) {
+	if (gnutls_x509_privkey_get_pk_algorithm(res->pkey[res->ncerts-1]) != pk) 
+	{
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
@@ -431,77 +431,6 @@ int read_cert_mem(gnutls_certificate_credentials res, const char *cert, int cert
 
 
 
-/* This will check if the given DER key is a PKCS-1 RSA key.
- * Returns 0 if the key is an RSA one.
- */
-int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
-{
-	ASN1_TYPE c2;
-	int result;
-
-	if (key_struct->size == 0 || key_struct->data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
-	if ((result=asn1_create_element
-	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPrivateKey", &c2
-	       )) != ASN1_SUCCESS) 
-	{
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&c2, key_struct->data, key_struct->size, NULL);
-	asn1_delete_structure(&c2);
-
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-	
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	return 0;
-}
-
-/* This will check if the given DER key is an openssl formated DSA key.
- * Returns 0 if the key is a DSA one.
- */
-int _gnutls_der_check_if_dsa_key(const gnutls_datum * key_struct)
-{
-	ASN1_TYPE c2;
-	int result;
-
-	if (key_struct->size == 0 || key_struct->data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
-	if ((result=asn1_create_element
-	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", &c2
-	       )) != ASN1_SUCCESS) 
-	{
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&c2, key_struct->data, key_struct->size, NULL);
-	asn1_delete_structure(&c2);
-
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-	
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	return 0;
-}
-
-
-
-
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
  * type indicates the certificate format.
@@ -510,102 +439,34 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 	gnutls_x509_crt_fmt type)
 {
 	int ret;
-	opaque *b64 = NULL;
 	gnutls_datum tmp;
-	gnutls_pk_algorithm pk;
 
 	/* allocate space for the pkey list
 	 */
-	res->pkey = gnutls_realloc_fast( res->pkey, (res->ncerts+1)*sizeof(gnutls_private_key));
+	res->pkey = gnutls_realloc_fast( res->pkey, (res->ncerts+1)*sizeof(gnutls_x509_privkey));
 	if (res->pkey==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	/* read PKCS-1 private key */
-
-	if (type==GNUTLS_X509_FMT_DER) { /* DER */
-		int cv;
-		
-		tmp.data = (opaque*)key;
-		tmp.size = key_size;
-
-		/* The only way to distinguish the keys
-		 * is to count the sequence of integers.
-		 */
-		pk = GNUTLS_PK_UNKNOWN;
-		cv = _gnutls_der_check_if_rsa_key( &tmp);
-		if (cv==0)
-			pk = GNUTLS_PK_RSA;
-		else {
-		   cv = _gnutls_der_check_if_dsa_key( &tmp);
-		   if (cv == 0) pk = GNUTLS_PK_DSA;
-	        }
-
-	} else { /* PEM */
-
-		/* If we find the "DSA PRIVATE" string in the
-		 * pem encoded certificate then it's a DSA key.
-		 */
-		if (strstr( key, "DSA PRIVATE")!=NULL) {
-			pk = GNUTLS_PK_DSA;
-			key = strstr( key, PEM_KEY_DSA_SEP);
-			if (key == NULL) {
-				gnutls_assert();
-				return GNUTLS_E_BASE64_DECODING_ERROR;
-			}			key_size = strlen( key);
-		} else {
-			pk = GNUTLS_PK_RSA;
-			key = strstr( key, PEM_KEY_RSA_SEP);
-			if (key == NULL) {
-				gnutls_assert();
-				return GNUTLS_E_BASE64_DECODING_ERROR;
-			}
-			key_size = strlen( key);
-		}
-			
-
-		ret = _gnutls_fbase64_decode( NULL, key, key_size, &b64);
-
-		if (ret < 0) {
-			gnutls_assert();
-			return GNUTLS_E_BASE64_DECODING_ERROR;
-		}
-
-		tmp.data = b64;
-		tmp.size = ret;
+	ret = gnutls_x509_privkey_init( &res->pkey[res->ncerts]);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
-	switch (pk) { /* decode the key */
-		case GNUTLS_PK_RSA:
-			if ((ret =
-			     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
-						tmp)) < 0) {
-				gnutls_assert();
-				gnutls_free(b64);
-				return ret;
-			}
-			break;
-		case GNUTLS_PK_DSA:
-			if ((ret =
-			     _gnutls_DSAkey2gnutlsKey(&res->pkey[res->ncerts],
-							tmp)) < 0) {
-				gnutls_assert();
-				gnutls_free(b64);
-				return ret;
-			}
-			break;
-		default:
-			gnutls_assert();
-			gnutls_free(b64);
-			return GNUTLS_E_INTERNAL_ERROR;
+	tmp.data = (opaque*)key;
+	tmp.size = key_size;
+
+	ret = gnutls_x509_privkey_import( res->pkey[res->ncerts], &tmp, type);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_privkey_deinit( res->pkey[res->ncerts]);
+		res->pkey[res->ncerts] = NULL;
+
+		return ret;
 	}
 
-	/* this doesn't hurt in the DER case, since
-	 * b64 is NULL
-	 */
-	gnutls_free(b64);
-	
 	return 0;
 }
 
@@ -747,7 +608,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 	sc->cert_list = NULL;
 
 	for (i = 0; i < sc->ncerts; i++) {
-		_gnutls_free_private_key(sc->pkey[i]);
+		gnutls_x509_privkey_deinit(sc->pkey[i]);
 	}
 
 	gnutls_free( sc->pkey);

@@ -6,22 +6,11 @@
 #include <gnutls_ui.h>
 #include "x509/x509.h"
 
-#define MAX_PARAMS_SIZE 6 /* ok for RSA and DSA */
+#define MAX_PUBLIC_PARAMS_SIZE 4 /* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
-#define MAX_PARAMETER_SIZE 1200
-#define DSA_PRIVATE_PARAMS 5
 #define DSA_PUBLIC_PARAMS 4
-#define RSA_PRIVATE_PARAMS 6
 #define RSA_PUBLIC_PARAMS 2
-
-#if MAX_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
-# error INCREASE MAX_PARAMS
-#endif
-
-#if MAX_PARAMS_SIZE - DSA_PRIVATE_PARAMS < 0
-# error INCREASE MAX_PARAMS
-#endif
 
 /* For key Usage, test as:
  * if (st.keyUsage & KEY_DIGITAL_SIGNATURE) ...
@@ -37,7 +26,7 @@
 #define KEY_DECIPHER_ONLY		1
 
 typedef struct gnutls_cert {
-	MPI params[MAX_PARAMS_SIZE];	/* the size of params depends on the public 
+	MPI params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 
 				 * key algorithm 
 				 * RSA: [0] is modulus
 				 *      [1] is public exponent
@@ -61,29 +50,6 @@ typedef struct gnutls_cert {
 	gnutls_datum raw;
 	
 } gnutls_cert;
-
-typedef struct {
-	MPI params[MAX_PARAMS_SIZE];/* the size of params depends on the public 
-				 * key algorithm 
-				 */
-				/*
-				 * RSA: [0] is modulus
-				 *      [1] is public exponent
-				 *	[2] is private exponent
-				 *	[3] is prime1 (p)
-				 *	[4] is prime2 (q)
-				 *	[5] is coefficient (u == inverse of p mod q)
-				 * DSA: [0] is p
-				 *      [1] is q
-				 *      [2] is g
-				 *      [3] is y (public key)
-				 *      [4] is x (private key)
-				 */
-	int params_size; /* holds the number of params */
-
-	gnutls_pk_algorithm pk_algorithm;
-
-} gnutls_private_key;
 
 struct gnutls_session_int; /* because gnutls_session is not defined when this file is included */
 

@@ -15,3 +15,4 @@ int _gnutls_check_key_usage( const gnutls_cert* cert, gnutls_kx_algorithm alg);
 
 int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params);
 int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params);
+

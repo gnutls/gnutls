@@ -31,7 +31,6 @@
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>
-#include <gnutls_privkey.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_dh.h>
 #include <gnutls_str.h>
@@ -82,7 +81,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 	_gnutls_free_datum( &sc->keyring);
 
 	for (i = 0; i < sc->ncerts; i++) {
-		_gnutls_free_private_key(sc->pkey[i]);
+		gnutls_x509_privkey_deinit(sc->pkey[i]);
 	}
 
 	gnutls_free( sc->pkey);

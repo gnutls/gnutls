@@ -17,7 +17,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
 	gnutls-api.tex gnutls_datum.h auth_cert.h gnutls_mpi.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
-	gnutls_privkey.h gnutls_constate.h gnutls_global.h \
+	gnutls_constate.h gnutls_global.h \
 	gnutls_sig.h gnutls_mem.h gnutls_ui.h \
 	io_debug.h ext_max_record.h gnutls_session_pack.h \
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h \
@@ -34,7 +34,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	auth_anon.c gnutls_extensions.c gnutls_auth.c gnutls_random.c \
 	gnutls_v2_compat.c gnutls_datum.c auth_rsa.c gnutls_session_pack.c \
 	gnutls_mpi.c gnutls_pk.c gnutls_cert.c \
-	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
+	gnutls_global.c gnutls_constate.c gnutls_anon_cred.c \
 	pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c \
 	auth_cert.c gnutls_ui.c gnutls_sig.c auth_dhe.c \
 	gnutls_dh_primes.c ext_max_record.c gnutls_alert.c gnutls_int_compat.c \

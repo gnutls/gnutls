@@ -191,8 +191,8 @@ const gnutls_certificate_credentials cred;
 
 	/* non export cipher suites. */	
 	
-	*params_size = cred->pkey[index].params_size;
-	*params = cred->pkey[index].params;
+	*params_size = cred->pkey[index]->params_size;
+	*params = cred->pkey[index]->params;
 
 	return 0;
 }
