@@ -35,10 +35,8 @@
 #define X509_DEBUG
 #define RECORD_DEBUG
 #define COMPRESSION_DEBUG
-*/
-#define HANDSHAKE_DEBUG
 #define DEBUG
-
+*/
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -410,8 +408,8 @@ typedef struct {
 } HANDSHAKE_HEADER_BUFFER;
 
 /* Openpgp key retrieval callback */
-typedef int (*gnutls_openpgp_recv_key_func)(const unsigned char *keyfpr, 
-	unsigned int keyfpr_length, gnutls_datum *key);
+typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session,
+	const unsigned char *keyfpr, unsigned int keyfpr_length, gnutls_datum *);
 
 typedef struct {
 	gnutls_buffer			application_data_buffer; /* holds data to be delivered to application layer */

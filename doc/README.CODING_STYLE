@@ -45,6 +45,13 @@ The rules here are not always used, although we try to stick to them.
   2. Output parameters
 
 
+*** Callback function parameters:
+  Callback functions should be avoided, if this is possible. 
+ Callbacks that refer to a TLS session should include the
+ current session as a parameter, in order for the called, to
+ be able to retrieve the data associated with the session.
+ This is not always done though -- see the push/pull callbacks.
+
 *** Return values:
   Functions in gnutls return an int type, when possible. In that
  case 0 should be returned in case of success, or maybe a positive
