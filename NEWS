@@ -1,7 +1,5 @@
 Version 0.9.3
 - Support for MD2 was dropped. 
-- Only basic X.509 functionality is included in the gnutls library.
-  The rest was moved to the libgnutls-x509.
 - Improved the error logging functions, by adding a level, and
   by allowing debugging messages just by increasing the level.
 - The diffie Hellman ciphersuites are now of higher priority than
