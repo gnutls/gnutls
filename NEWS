@@ -1,7 +1,6 @@
-Version 1.1.6
+Version 1.1.6 (24/02/2004)
 - Several bug fixes, by Arne Thomassen.
 - Fixed a bug where 'server name' extension was always sent.
-- Corrected the return values of gnutls_x509_crt_check_hostname().
 
 Version 1.1.5 (06/01/2004)
 - Added the gnutls_sign_algorithm type.
