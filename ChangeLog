@@ -1,3 +1,16 @@
+2004-03-16 14:11  nmav <nmav@gnutls.org>
+
+	* configure.in, src/Makefile.am, src/certtool.c, src/crypt.c,
+	src/getpass.c, src/getpass.h:
+
+	replaced the getpass() call with an internal one.  
+
+2004-03-16 12:21  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, ex-pgp-keyserver.tex, examples.tex:
+
+	removed the openpgp key retrieval example.  
+
 2004-03-15 15:54  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/Makefile.am:
