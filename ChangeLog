@@ -1,3 +1,42 @@
+2002-12-06 17:28  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/x509_b64.c:
+
+	Changed the semantics of gnutls_pem_base64_encode_alloc() and
+	gnutls_pem_base64_decode_alloc(). In the default case were the
+	gnutls library is used with malloc/realloc/free, these are binary
+	compatible.  
+	
+	They now require the returned data to be freed using the
+	gnutls_global_get_free_function().  
+
+2002-12-06 17:21  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_int.h, gnutls_ui.h:
+
+	some cleanups.  
+
+2002-12-06 17:14  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, doc/tex/Makefile.am, doc/tex/callbacks.tex,
+	doc/tex/library.tex, lib/gnutls.h.in.in, lib/gnutls_datum.c,
+	lib/gnutls_datum.h, lib/gnutls_db.c, lib/gnutls_global.c,
+	lib/gnutls_mem.c, lib/gnutls_mem.h, lib/gnutls_state.c,
+	lib/gnutls_str.c, lib/gnutls_str.h, src/cli.c, src/serv.c:
+
+	Added the new functions gnutls_get_malloc_function(),
+	gnutls_get_free_function(). Also changed the way callback functions
+	must allocate data. They now need to use these functions, instead of
+	just calling malloc().  
+
+2002-12-06 13:33  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_extensions.c,
+	gnutls_handshake.c:
+
+	added error code to report illegal srp usernames. Some fixes in the
+	extension parsing to report fatal errors.  
+
 2002-12-04 23:38  nmav <nmav@gnutls.org>
 
 	* lib/: x509_extensions.c, x509_verify.c:
