@@ -18,7 +18,7 @@ GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION", [version of gnutls])
 
 GNUTLS_GCRYPT_VERSION=1:1.1.94
-GNUTLS_LIBTASN1_VERSION=0.2.5
+GNUTLS_LIBTASN1_VERSION=0.2.10
 AC_DEFINE_UNQUOTED(GNUTLS_GCRYPT_VERSION, "$GNUTLS_GCRYPT_VERSION", [version of gcrypt])
 AC_DEFINE_UNQUOTED(GNUTLS_LIBTASN1_VERSION, "$GNUTLS_LIBTASN1_VERSION", [version of libtasn1])
 
@@ -368,20 +368,17 @@ AM_CONDITIONAL(ENABLE_OPENSSL, test "$ac_enable_openssl" = "yes")
 AC_ARG_WITH(included-libtasn1,
 	[  --with-included-libtasn1 Use the included libtasn1],
 minitasn1_enabled=$withval, 
-minitasn1_enabled=no
+minitasn1_enabled=no)
 
-dnl We now need libtasn1 0.2.x
+dnl We now need libtasn1 0.2.10
 dnl
-AC_CHECK_LIB( tasn1, asn1_read_tag,:, 
+AM_PATH_LIBTASN1($GNUTLS_LIBTASN1_VERSION,,
  minitasn1_enabled=yes
-AC_MSG_WARN([[
+ AC_MSG_WARN([[
 *** 
-*** LibtASN1 0.2.x was not found. Will use the included one.]])))
+*** LibtASN1 0.2.x was not found. Will use the included one.
+]]))
 
-
-if test x$opt_developer_mode = xyes; then
- minitasn1_enabled=yes
-fi
 
 SAVED_LIBS=$LIBS
 
@@ -454,10 +451,6 @@ AC_MSG_RESULT($use_lzo)
 if test x$use_lzo = xyes; then
 
 AC_DEFINE(USE_LZO, 1, [whether to use the lzo compression])
-
-if test x$opt_developer_mode = xyes; then
- minilzo_enabled=yes
-fi
 
 AC_ARG_WITH(included-lzo,
 	[  --with-included-lzo     include minilzo in libgnutls-extra],

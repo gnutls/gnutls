@@ -299,6 +299,44 @@ asn1_delete_structure(ASN1_TYPE *structure)
 }
 
 
+/**
+  * asn1_delete_element - Deletes the element of a structure. 
+  * @structure: pointer to the structure that contains the element you want to delete.
+  * @element_name: element's name you want to delete.
+  * Description:
+  * 
+  * Deletes the element named *element_name inside *structure. 
+  *
+  * Returns:
+  *
+  *   ASN1_SUCCESS\: everything OK
+  *
+  *   ASN1_ELEMENT_NOT_FOUND
+  *
+  **/
+asn1_retCode
+asn1_delete_element(ASN1_TYPE structure,const char *element_name)
+{
+  node_asn *p2,*p3,*source_node;
+
+  source_node=_asn1_find_node(structure,element_name);
+
+  if(source_node==ASN1_TYPE_EMPTY) return ASN1_ELEMENT_NOT_FOUND;
+
+  p2=source_node->right;
+  p3=_asn1_find_left(source_node);
+  if(!p3){
+    p3=_asn1_find_up(source_node);
+    if(p3) 
+      _asn1_set_down(p3,p2);
+    else
+      if(source_node->right) source_node->right->left=NULL;
+  }
+  else _asn1_set_right(p3,p2);
+
+  return asn1_delete_structure(&source_node);
+}
+
 
 node_asn *
 _asn1_copy_structure3(node_asn *source_node)
