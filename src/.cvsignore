@@ -16,4 +16,5 @@ gnutls-cli
 gnutls-cli-debug
 gnutls-serv
 retcodes
+errcodes
 srptool
