@@ -33,8 +33,8 @@ AB_INIT
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 LT_CURRENT=14
-LT_REVISION=26
-LT_AGE=1
+LT_REVISION=0
+LT_AGE=2
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
