@@ -367,8 +367,8 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 {
 	int i = 0, ret;
 	CertificateStatus status=0;
-	
-	if (tcas_size == 0 || clist_size == 0) {
+
+	if ( clist_size == 0) {
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 
@@ -401,8 +401,12 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 		}
 	}
 
+
 	/* Now verify the last certificate in the certificate path
 	 * against the trusted CA certificate list.
+         *
+	 * If no CAs are present returns NOT_TRUSTED. Thus works
+	 * in self signed etc certificates.
 	 */
 	ret = gnutls_verify_certificate2(&certificate_list[i], trusted_cas, tcas_size, 
 		CRLs, crls_size, 0, GNUTLS_CERT_NOT_TRUSTED);
