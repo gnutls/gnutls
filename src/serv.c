@@ -153,6 +153,7 @@ static void listener_free (listener_item * j)
 static int prime_nums[] = { 768, 1024, 0 };
 
 GNUTLS_DH_PARAMS dh_params;
+GNUTLS_RSA_PARAMS rsa_params;
 
 static int generate_dh_primes(void)
 {
@@ -193,11 +194,50 @@ static int generate_dh_primes(void)
    return 0;
 }
 
+static int generate_rsa_params(void)
+{
+   gnutls_datum m, e, d, p, q, u;
+
+   if (gnutls_rsa_params_init(&rsa_params) < 0) {
+      fprintf(stderr, "Error in rsa parameter initialization\n");
+      exit(1);
+   }
+
+   /* Generate RSA parameters - for use with RSA-export
+    * cipher suites. These should be discarded and regenerated
+    * once a day, once every 500 transactions etc. Depends on the
+    * security requirements.
+    */
+   printf
+	  ("Generating temporary RSA parameters. Please wait...");
+   fflush(stdout);
+
+   if (gnutls_rsa_params_generate(&m, &e, &d, &p, &q, &u, 512) < 0) {
+	 fprintf(stderr, "Error in rsa parameter generation\n");
+	 exit(1);
+   }
+
+   if (gnutls_rsa_params_set
+	  (rsa_params, m, e, d, p, q, u, 512) < 0) {
+	 fprintf(stderr, "Error in rsa parameter setting\n");
+	 exit(1);
+   }
+
+   free(m.data);
+   free(e.data);
+   free(d.data);
+   free(p.data);
+   free(q.data);
+   free(u.data);
+
+   return 0;
+}
+
 int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[16] =
     { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
   /* Do not use anonymous authentication, unless you know what that means */ 
-  GNUTLS_KX_ANON_DH, 0
+  GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
 };
 int cipher_priority[16] =
     { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
@@ -463,8 +503,10 @@ int main(int argc, char **argv)
     * Diffie Hellman. See gnutls_dh_params_generate(), and
     * gnutls_dh_params_set().
     */
-   if (generate != 0)
+   if (generate != 0) {
+      generate_rsa_params();
       generate_dh_primes();
+   }
 
    if (gnutls_certificate_allocate_cred(&cert_cred) < 0) {
       fprintf(stderr, "memory error\n");
@@ -515,11 +557,16 @@ int main(int argc, char **argv)
 	 exit(1);
       }
 
-   if (generate != 0)
+   if (generate != 0) {
       if (gnutls_certificate_set_dh_params(cert_cred, dh_params) < 0) {
 	 fprintf(stderr, "Error while setting DH parameters\n");
 	 exit(1);
       }
+      if (gnutls_certificate_set_rsa_params(cert_cred, rsa_params) < 0) {
+	 fprintf(stderr, "Error while setting RSA parameters\n");
+	 exit(1);
+      }
+   }
 
    /* this is a password file (created with the included srpcrypt utility) 
     * Read README.crypt prior to using SRP.
@@ -930,11 +977,13 @@ void gaa_parser(int argc, char **argv)
       for (j = i = 0; i < info.nkx; i++) {
 	 if (strncasecmp(info.kx[i], "SRP", 3) == 0)
 	    kx_priority[j++] = GNUTLS_KX_SRP;
-	 if (strncasecmp(info.kx[i], "RSA", 3) == 0)
+	 if (strcasecmp(info.kx[i], "RSA") == 0)
 	    kx_priority[j++] = GNUTLS_KX_RSA;
-	 if (strncasecmp(info.kx[i], "DHE_RSA", 7) == 0)
+	 if (strcasecmp(info.kx[i], "RSA-EXPORT") == 0)
+	    kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
+	 if (strncasecmp(info.kx[i], "DHE-RSA", 7) == 0)
 	    kx_priority[j++] = GNUTLS_KX_DHE_RSA;
-	 if (strncasecmp(info.kx[i], "DHE_DSS", 7) == 0)
+	 if (strncasecmp(info.kx[i], "DHE-DSS", 7) == 0)
 	    kx_priority[j++] = GNUTLS_KX_DHE_DSS;
 	 if (strncasecmp(info.kx[i], "ANON", 4) == 0)
 	    kx_priority[j++] = GNUTLS_KX_ANON_DH;

@@ -74,7 +74,7 @@ int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[16] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
   /* Do not use anonymous authentication, unless you know what that means */ 
-   GNUTLS_KX_ANON_DH, 0
+   GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
 };
 int cipher_priority[16] =
     { GNUTLS_CIPHER_ARCFOUR_EXPORT, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
@@ -248,7 +248,7 @@ int main(int argc, char **argv)
       gnutls_mac_set_priority(state, mac_priority);
       gnutls_cert_type_set_priority(state, cert_type_priority);
 
-      gnutls_dh_set_prime_bits(state, 1024);
+      gnutls_dh_set_prime_bits(state, 512);
 
       gnutls_cred_set(state, GNUTLS_CRD_ANON, anon_cred);
       if (srp_username!=NULL)
@@ -590,11 +590,13 @@ void gaa_parser(int argc, char **argv)
       for (j = i = 0; i < info.nkx; i++) {
 	 if (strncasecmp(info.kx[i], "SRP", 3) == 0)
 	    kx_priority[j++] = GNUTLS_KX_SRP;
-	 if (strncasecmp(info.kx[i], "RSA", 3) == 0)
+	 if (strcasecmp(info.kx[i], "RSA") == 0)
 	    kx_priority[j++] = GNUTLS_KX_RSA;
-	 if (strncasecmp(info.kx[i], "DHE_RSA", 7) == 0)
+	 if (strcasecmp(info.kx[i], "RSA-EXPORT") == 0)
+	    kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
+	 if (strncasecmp(info.kx[i], "DHE-RSA", 7) == 0)
 	    kx_priority[j++] = GNUTLS_KX_DHE_RSA;
-	 if (strncasecmp(info.kx[i], "DHE_DSS", 7) == 0)
+	 if (strncasecmp(info.kx[i], "DHE-DSS", 7) == 0)
 	    kx_priority[j++] = GNUTLS_KX_DHE_DSS;
 	 if (strncasecmp(info.kx[i], "ANON", 4) == 0)
 	    kx_priority[j++] = GNUTLS_KX_ANON_DH;
