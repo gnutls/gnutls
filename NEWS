@@ -15,7 +15,8 @@ Version 0.9.3
 - Added the new functions: gnutls_certificate_set_x509_key()
   gnutls_certificate_set_x509_trust(), gnutls_certificate_set_x509_crl(),
   gnutls_x509_crt_export(), gnutls_x509_crl_export().
-
+- Added support for encoding and decoding PKCS #8 2.0 encrypted 
+  RSA private keys.
 
 Version 0.9.2 (15/03/2003)
 - Some corrections in the memory mapping code (file is unmapped after 

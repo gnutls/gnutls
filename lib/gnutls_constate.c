@@ -541,9 +541,9 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 		session->connection_state.read_cipher_state =
 		    _gnutls_cipher_init(session->security_parameters.
 					read_bulk_cipher_algorithm,
-					session->cipher_specs.
+					&session->cipher_specs.
 					client_write_key,
-					session->cipher_specs.
+					&session->cipher_specs.
 					client_write_IV);
 		if (session->connection_state.read_cipher_state ==
 		    GNUTLS_CIPHER_FAILED
@@ -575,9 +575,9 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 		session->connection_state.read_cipher_state =
 		    _gnutls_cipher_init(session->security_parameters.
 					read_bulk_cipher_algorithm,
-					session->cipher_specs.
+					&session->cipher_specs.
 					server_write_key,
-					session->cipher_specs.
+					&session->cipher_specs.
 					server_write_IV);
 
 		if (session->connection_state.read_cipher_state ==
@@ -724,9 +724,9 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 		session->connection_state.write_cipher_state =
 		    _gnutls_cipher_init(session->security_parameters.
 					write_bulk_cipher_algorithm,
-					session->cipher_specs.
+					&session->cipher_specs.
 					server_write_key,
-					session->cipher_specs.
+					&session->cipher_specs.
 					server_write_IV);
 
 		if (session->connection_state.write_cipher_state ==
@@ -761,9 +761,9 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 		session->connection_state.write_cipher_state =
 		    _gnutls_cipher_init(session->security_parameters.
 					write_bulk_cipher_algorithm,
-					session->cipher_specs.
+					&session->cipher_specs.
 					client_write_key,
-					session->cipher_specs.
+					&session->cipher_specs.
 					client_write_IV);
 
 		if (session->connection_state.write_cipher_state ==

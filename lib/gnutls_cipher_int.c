@@ -24,7 +24,8 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
-GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, gnutls_datum key, gnutls_datum iv)
+GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, 
+	const gnutls_datum *key, const gnutls_datum *iv)
 {
 GNUTLS_CIPHER_HANDLE ret;
 
@@ -52,8 +53,8 @@ GNUTLS_CIPHER_HANDLE ret;
 		ret = GNUTLS_CIPHER_FAILED;
 	}
 	if (ret!=GNUTLS_CIPHER_FAILED) {
-		gcry_cipher_setkey(ret, key.data, key.size);
-		if (iv.data!=NULL && iv.size>0) gcry_cipher_setiv(ret, iv.data, iv.size);
+		gcry_cipher_setkey(ret, key->data, key->size);
+		if (iv->data!=NULL && iv->size>0) gcry_cipher_setiv(ret, iv->data, iv->size);
 	}
 
 return ret;	

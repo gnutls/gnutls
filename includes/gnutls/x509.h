@@ -209,6 +209,9 @@ int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm a
 
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+int gnutls_x509_privkey_export_pkcs8( gnutls_x509_privkey key,
+	gnutls_x509_crt_fmt format, char* password, unsigned int flags,
+	unsigned char* output_data, int* output_data_size);
 int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum * m, gnutls_datum *e,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
