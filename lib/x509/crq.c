@@ -276,9 +276,8 @@ int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq_t crq,
  *
  */
 static int parse_attribute(ASN1_TYPE asn1_struct,
-			   const char *attr_name,
-			   const char *given_oid, int indx,
-			   char *buf, size_t * sizeof_buf)
+    const char *attr_name, const char *given_oid, int indx,
+    char *buf, size_t * sizeof_buf)
 {
     int k1, result;
     char tmpbuffer1[64];
@@ -412,6 +411,79 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq_t crq,
 
     return parse_attribute(crq->crq, "certificationRequestInfo.attributes",
 			   "1.2.840.113549.1.9.7", 0, pass, sizeof_pass);
+}
+
+/**
+  * gnutls_x509_crq_set_attribute_by_oid - This function will set an attribute in the request
+  * @crq: should contain a gnutls_x509_crq_t structure
+  * @oid: holds an Object Identified in null terminated string
+  * @buf: a pointer to a structure that holds the attribute data
+  * @sizeof_buf: holds the size of @buf
+  *
+  * This function will set the attribute in the certificate request specified
+  * by the given Object ID. The attribute must be be DER encoded.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crq_set_attribute_by_oid(gnutls_x509_crq_t crq,
+    const char* oid, void* buf, size_t sizeof_buf)
+{
+    int result;
+
+    if (crq == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_REQUEST;
+    }
+
+    /* Add the attribute.
+     */
+    result =
+	asn1_write_value(crq->crq, "certificationRequestInfo.attributes",
+			 "NEW", 1);
+    if (result != ASN1_SUCCESS) {
+	gnutls_assert();
+	return _gnutls_asn2err(result);
+    }
+
+    result =
+	_gnutls_x509_encode_and_write_attribute(oid,
+            crq->crq, "certificationRequestInfo.attributes.?LAST",
+            buf, sizeof_buf, 1);
+
+    if (result < 0) {
+	gnutls_assert();
+	return result;
+    }
+
+    return 0;
+}
+
+/**
+  * gnutls_x509_crq_get_attribute_by_oid - This function will get an attribute of the request 
+  * @crq: should contain a gnutls_x509_crq_t structure
+  * @oid: holds an Object Identified in null terminated string
+  * @indx: In case multiple same OIDs exist in the attribute list, this specifies
+  *   which to send. Use zero to get the first one.
+  * @buf: a pointer to a structure to hold the attribute data (may be null)
+  * @sizeof_buf: initially holds the size of @buf
+  *
+  * This function will return the attribute in the certificate request specified
+  * by the given Object ID. The attribute will be DER encoded.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crq_get_attribute_by_oid(gnutls_x509_crq_t crq,
+    const char* oid, int indx, void* buf, size_t* sizeof_buf)
+{
+    if (crq == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_REQUEST;
+    }
+
+    return parse_attribute(crq->crq, "certificationRequestInfo.attributes",
+	oid, indx, buf, sizeof_buf);
 }
 
 /**
@@ -553,6 +625,50 @@ int gnutls_x509_crq_set_key(gnutls_x509_crq_t crq,
 
 /**
   * gnutls_x509_crq_set_challenge_password - This function will set a challenge password 
+  * @crq: should contain a gnutls_x509_crq_t structure
+  * @pass: holds a null terminated password
+  *
+  * This function will set a challenge password to be used when revoking the request.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
+					   const char *pass)
+{
+    int result;
+
+    if (crq == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_REQUEST;
+    }
+
+    /* Add the attribute.
+     */
+    result =
+	asn1_write_value(crq->crq, "certificationRequestInfo.attributes",
+			 "NEW", 1);
+    if (result != ASN1_SUCCESS) {
+	gnutls_assert();
+	return _gnutls_asn2err(result);
+    }
+
+    result =
+	_gnutls_x509_encode_and_write_attribute("1.2.840.113549.1.9.7",
+						crq->crq,
+						"certificationRequestInfo.attributes.?LAST",
+						pass, strlen(pass), 1);
+
+    if (result < 0) {
+	gnutls_assert();
+	return result;
+    }
+
+    return 0;
+}
+
+/**
+  * gnutls_x509_crq_set_attribute_by_oid - This function will set a challenge password 
   * @crq: should contain a gnutls_x509_crq_t structure
   * @pass: holds a null terminated password
   *

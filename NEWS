@@ -20,6 +20,11 @@ See the end for copying conditions.
   GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT which has the old semantics.
 - Nettle self tests now build properly, reported by Pierre
   <pierre42d@9online.fr>.
+- Eliminated some memory leaks in DHE and RSA-EXPORT cipher suites.
+  Reported by Yoann Vandoorselaere <yoann@prelude-ids.org>.
+- Added the functions:
+    gnutls_x509_crq_get_attribute_by_oid() and
+    gnutls_x509_crq_set_attribute_by_oid().
 
 * Version 1.2.0 (2005-01-27)
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
