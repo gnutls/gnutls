@@ -235,7 +235,7 @@ setkey_core(struct arctwo_ctx *ctx,
 }
 
 void
-pkcs12_arctwo_set_key(struct arctwo_ctx *ctx,
+gutmann_arctwo_set_key(struct arctwo_ctx *ctx,
 		      unsigned length, const uint8_t *key)
 {
   setkey_core (ctx, length, key, 0);
@@ -310,34 +310,34 @@ int main (void)
     { 0x22, 0x69, 0x55, 0x2a, 0xb0, 0xf8, 0x5c, 0xa6 };
 
   /* First test. */
-  pkcs12_arctwo_set_key (&ctx, sizeof(key_1), key_1);
+  gutmann_arctwo_set_key (&ctx, sizeof(key_1), key_1);
   arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_1);
   if (memcmp (scratch, ciphertext_1, sizeof(ciphertext_1)))
     puts ("RFC2268 encryption test 1 failed.");
 
-  pkcs12_arctwo_set_key (&ctx, sizeof(key_1), key_1);
+  gutmann_arctwo_set_key (&ctx, sizeof(key_1), key_1);
   arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
   if (memcmp (scratch, plaintext_1, sizeof(plaintext_1)))
     puts ("RFC2268 decryption test 1 failed.");
 
   /* Second test. */
-  pkcs12_arctwo_set_key (&ctx, sizeof(key_2), key_2);
+  gutmann_arctwo_set_key (&ctx, sizeof(key_2), key_2);
   arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_2);
   if (memcmp (scratch, ciphertext_2, sizeof(ciphertext_2)))
     puts ("RFC2268 encryption test 2 failed.");
 
-  pkcs12_arctwo_set_key (&ctx, sizeof(key_2), key_2);
+  gutmann_arctwo_set_key (&ctx, sizeof(key_2), key_2);
   arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
   if (memcmp (scratch, plaintext_2, sizeof(plaintext_2)))
     puts ("RFC2268 decryption test 2 failed.");
 
   /* Third test. */
-  pkcs12_arctwo_set_key(&ctx, sizeof(key_3), key_3);
+  gutmann_arctwo_set_key(&ctx, sizeof(key_3), key_3);
   arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_3);
   if (memcmp(scratch, ciphertext_3, sizeof(ciphertext_3)))
     puts ("RFC2268 encryption test 3 failed.");
 
-  pkcs12_arctwo_set_key (&ctx, sizeof(key_3), key_3);
+  gutmann_arctwo_set_key (&ctx, sizeof(key_3), key_3);
   arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
   if (memcmp(scratch, plaintext_3, sizeof(plaintext_3)))
     puts ("RFC2268 decryption test 3 failed.");

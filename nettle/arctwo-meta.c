@@ -32,5 +32,8 @@
 const struct nettle_cipher nettle_arctwo128
 = _NETTLE_CIPHER(arctwo, ARCTWO, 128);
 
-const struct nettle_cipher nettle_pkcs12_arctwo40
-= _NETTLE_CIPHER(pkcs12_arctwo, ARCTWO, 40);
+const struct nettle_cipher nettle_arctwo40
+= _NETTLE_CIPHER(arctwo, ARCTWO, 40);
+
+const struct nettle_cipher nettle_gutmann_arctwo40
+= _NETTLE_CIPHER(gutmann_arctwo, ARCTWO, 40);

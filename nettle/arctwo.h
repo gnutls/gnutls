@@ -34,9 +34,9 @@
 #define arctwo_encrypt nettle_arctwo_encrypt
 #define arctwo_decrypt nettle_arctwo_decrypt
 
-#define pkcs12_arctwo_ctx arctwo_ctx
-#define pkcs12_arctwo_encrypt arctwo_encrypt
-#define pkcs12_arctwo_decrypt arctwo_decrypt
+#define gutmann_arctwo_ctx arctwo_ctx
+#define gutmann_arctwo_encrypt arctwo_encrypt
+#define gutmann_arctwo_decrypt arctwo_decrypt
 
 #define ARCTWO_BLOCK_SIZE 8
 
@@ -55,8 +55,8 @@ void
 arctwo_set_key(struct arctwo_ctx *ctx,
 	       unsigned length, const uint8_t *key);
 void
-pkcs12_arctwo_set_key(struct arctwo_ctx *ctx,
-		      unsigned length, const uint8_t *key);
+gutmann_arctwo_set_key(struct arctwo_ctx *ctx,
+		       unsigned length, const uint8_t *key);
 
 void
 arctwo_encrypt(struct arctwo_ctx *ctx,

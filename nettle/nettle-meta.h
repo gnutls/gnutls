@@ -116,7 +116,8 @@ extern const struct nettle_cipher nettle_twofish192;
 extern const struct nettle_cipher nettle_twofish256;
 
 extern const struct nettle_cipher nettle_arctwo128;
-extern const struct nettle_cipher nettle_pkcs12_arctwo40;
+extern const struct nettle_cipher nettle_arctwo40;
+extern const struct nettle_cipher nettle_gutmann_arctwo40;
 
 
 /* Hash algorithms */

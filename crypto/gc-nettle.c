@@ -201,7 +201,7 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
       break;
 
     case GC_ARCTWO40:
-      cinf->info = &nettle_pkcs12_arctwo40;
+      cinf->info = &nettle_arctwo40;
       break;
 
     default:
