@@ -162,7 +162,7 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 	
 	_gnutls_write_uint16( n_g, data_g);
 
-	ret = n_g + n_n + pwd_entry->salt_size + 5 + 1;
+	ret = n_g + n_n + pwd_entry->salt_size + 5;
 	_gnutls_srp_clear_pwd_entry( pwd_entry);
 
 	return ret;
