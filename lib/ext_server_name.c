@@ -38,28 +38,28 @@ int _gnutls_server_name_recv_params(gnutls_session session,
 {
    int i;
    const char *p;
-   uint16 len;
+   uint16 len, type;
    int server_names = 0;
 
    if (session->security_parameters.entity == GNUTLS_SERVER) {
-      DECR_LEN(data_size, 2);
+      DECR_LENGTH_RET(data_size, 2, 0);
       len = _gnutls_read_uint16(data);
 
-      i = data_size;
       p = data + 2;
 
       /* Count all server_names in the packet. */
-      while (i > 0) {
+      while (data_size > 0) {
+	 DECR_LENGTH_RET(data_size, 1, 0);
+	 p++;
+
 	 DECR_LEN(data_size, 2);
 	 len = _gnutls_read_uint16(p);
 	 p += 2;
 
-	 DECR_LEN(data_size, len);
+	 DECR_LENGTH_RET(data_size, len, 0);
 	 server_names++;
 
 	 p += len;
-	 i -= len + 2;
-
       }
 
       session->security_parameters.extensions.server_names_size =
@@ -72,16 +72,19 @@ int _gnutls_server_name_recv_params(gnutls_session session,
 
       p = data + 2;
       for (i = 0; i < server_names; i++) {
+         type = *p;
+         p++;
+         
 	 len = _gnutls_read_uint16(p);
 	 p += 2;
 
-	 switch (*p) {
+	 switch (type) {
 	 case 0: /* NAME_DNS */
-	    if (len - 1 <= MAX_SERVER_NAME_SIZE) {
+	    if (len <= MAX_SERVER_NAME_SIZE) {
 	       memcpy(session->security_parameters.extensions.
-		      server_names[i].name, &p[1], len - 1);
+		      server_names[i].name, p, len);
 	       session->security_parameters.extensions.server_names[i].
-		   name_length = len - 1;
+		   name_length = len;
 	       session->security_parameters.extensions.server_names[i].
 		   type = GNUTLS_NAME_DNS;
 	       break;
@@ -109,46 +112,58 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
    /* this function sends the client extension data (dnsname) */
    if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
+      /* uint16 */
+      total_size = 2;
       for (i = 0;
 	   i < session->security_parameters.extensions.server_names_size;
 	   i++) {
+	   /* count the total size */
+	   len = session->security_parameters.extensions.server_names[i].name_length;
+	   /* uint8 + uint16 + size */
+	   total_size += len + 1 + 2;
+      }
+
+      /* UINT16: total size of all names */
+      if (data_size < 2) return GNUTLS_E_INVALID_REQUEST;
+
+      p = data;
+
+      DECR_LEN( data_size, 2);
+      _gnutls_write_uint16(total_size, p);
+      p += 2;
+
+      for (i = 0;
+	   i < session->security_parameters.extensions.server_names_size;
+	   i++) 
+      {
+
 	 switch (session->security_parameters.extensions.server_names[i].
 		 type) {
 	 case GNUTLS_NAME_DNS:
-	    if (session->security_parameters.extensions.server_names != NULL && (len = session->security_parameters.extensions.server_names[0].name_length) > 0) {	/* send dnsname */
 
-	       /* UINT16: total size of all names
+               len = session->security_parameters.extensions.server_names[i].name_length;	
+               if (len == 0) break;
+
+	       /* UINT8: type of this extension
 	        * UINT16: size of the first name
-	        * UINT8: type of this extension
 	        * REST of the data ( we only send one name);
 	        */
-	       if (data_size < len + 5) {
-		  gnutls_assert();
-		  return GNUTLS_E_INVALID_REQUEST;
-	       }
-
-	       p = data;
-
-	       _gnutls_write_uint16(len + 3, p);
-	       p += 2;
-
-	       _gnutls_write_uint16(len + 1, p);
-	       p += 2;
+               DECR_LEN( data_size, len + 3);
 
 	       *p = 0;		/* NAME_DNS type */
 	       p++;
 
+	       _gnutls_write_uint16(len, p);
+	       p += 2;
+
 	       memcpy(p,
 		      session->security_parameters.extensions.
 		      server_names[0].name, len);
-	       len = len + 5;
-	    }
+   	       p += len;
 	    break;
 	 default:
 	    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	 }
-	 data += len;
-	 total_size += len;
       }
    }
    if (total_size == 0)
