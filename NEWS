@@ -1,6 +1,7 @@
 Version 1.0.3
 - Corrected bug in gnutls_bye() which made it return an error code
   of INVALID_REQUEST instead of success.
+- Corrected a bug in the GNUTLS_KEY key usage definitions.
 
 Version 1.0.2 (18/12/2003)
 - Corrected a bug in the RSA key generation. This was
