@@ -90,7 +90,7 @@ int gnutls_rehandshake( GNUTLS_STATE state);
 
 
 GNUTLS_AlertDescription gnutls_alert_get_last( GNUTLS_STATE state);
-int 		 gnutls_alert_send(GNUTLS_SOCKET_PTR, GNUTLS_STATE, GNUTLS_AlertLevel, GNUTLS_AlertDescription);
+int 		 gnutls_alert_send( GNUTLS_STATE, GNUTLS_AlertLevel, GNUTLS_AlertDescription);
 int 		 gnutls_alert_send_appropriate(  GNUTLS_STATE state, int err);
 
 /* get information on the current state */
