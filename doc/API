@@ -93,11 +93,12 @@ void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...);
 	not use that except for disabling algorithms that were not
 	specified.
 
-int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred);
+int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred, int cred_size);
 	Sets the needed credentials for the specified (in kx) authentication
 	algorithm. Eg username, password - or public and private keys etc.
 	The (void* cred) parameter is a structure that depends on the
 	specified kx algorithm and on the current state (client or server).
+	cred_size is the size of the structure.
 
 	In GNUTLS_KX_ANON cred should be NULL.
 

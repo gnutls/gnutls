@@ -638,6 +638,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 	time_t cur_time;
 	char* rand;
 	int len = datalen;
+	int err;
 	
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		if (datalen < 38) {
@@ -720,7 +721,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 
 		/* check if the credentials (username, public key etc. are ok - actually check if they exist)
 		 */
-		if ( _gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite)) == NULL) {
+		if ( _gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite), &err) == NULL && err!=0) {
 			gnutls_assert();
 			return GNUTLS_E_INSUFICIENT_CRED;
 		}
@@ -845,7 +846,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 
 		/* check if the credentials (username, public key etc. are ok)
 		 */
-		if ( _gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite)) == NULL) {
+		if ( _gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite), &err) == NULL && err!=0) {
 			gnutls_assert();
 			return GNUTLS_E_INSUFICIENT_CRED;
 		}

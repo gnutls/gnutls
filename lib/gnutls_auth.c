@@ -36,6 +36,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
 		ccred = state->gnutls_key->cred;
 		while(ccred!=NULL) {
 			ncred = ccred->next;
+			if (ccred->credentials!=NULL) gnutls_free(ccred->credentials);
 			if (ccred!=NULL) gnutls_free(ccred);
 			ccred = ncred;
 		}
@@ -49,7 +50,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
  * This creates a linked list of the form:
  * { algorithm, credentials, pointer to next }
  */
-int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred) {
+int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred, int cred_size) {
 	AUTH_CRED * ccred, *pcred;
 	int exists=0;	
 	
@@ -58,7 +59,10 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred) {
 		state->gnutls_key->cred = gnutls_malloc(sizeof(AUTH_CRED));
 		if (state->gnutls_key->cred == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
-		state->gnutls_key->cred->credentials = cred;
+		/* copy credentials localy */
+		state->gnutls_key->cred->credentials = gnutls_malloc(cred_size);
+		memcpy( state->gnutls_key->cred->credentials, cred, cred_size);
+		
 		state->gnutls_key->cred->next = NULL;
 		state->gnutls_key->cred->algorithm = kx;
 	} else {
@@ -77,11 +81,17 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred) {
 			if (pcred->next == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
 			ccred = pcred->next;
-			ccred->credentials = cred;
+
+			/* copy credentials localy */
+			ccred->credentials = gnutls_malloc(cred_size);
+			memcpy( ccred->credentials, cred, cred_size);
+
 			ccred->next = NULL;
 			ccred->algorithm = kx;
 		} else { /* modify existing entry */
-			ccred->credentials = cred;
+			gnutls_free(ccred->credentials);
+			ccred->credentials = gnutls_malloc(cred_size);
+			memcpy( ccred->credentials, cred, cred_size);
 		}
 	}
 
@@ -92,7 +102,7 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred) {
  * This returns an pointer to the linked list. Don't
  * free that!!!
  */
-void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx) {
+void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx, int *err) {
 	AUTH_CRED * ccred;
 	
 	ccred = key->cred;
@@ -102,7 +112,11 @@ void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx) {
 		}
 		ccred = ccred->next;
 	}
-	if (ccred==NULL) return NULL;
+	if (ccred==NULL) {
+		if (err!=NULL) *err=-1;
+		return NULL;
+	}
 			
+	if (err!=NULL) *err=0;
 	return ccred->credentials;
 }

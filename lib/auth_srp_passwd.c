@@ -152,7 +152,12 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	int i;
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	
-	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_SRP);
+	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_SRP, NULL);
+	if (cred==NULL) {
+		gnutls_assert();
+		gnutls_free(entry);
+		return NULL;
+	}
 
 	fd = fopen( cred->password_file, "r");
 	if (fd==NULL) {
