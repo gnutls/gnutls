@@ -507,8 +507,9 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* Only encrypt if we don't have data to send 
 	 * from the previous run. - probably interrupted.
 	 */
-	if (state->gnutls_internals.send_buffer.size == 0) {
-
+	if (state->gnutls_internals.send_buffer.size != 0) {
+		ret = _gnutls_flush(cd, state);
+	} else {
 		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, data, data2send, &cipher, type);
 		if (cipher_size <= 0) {
 			gnutls_assert();
@@ -529,20 +530,10 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}
 
-	} else {
-		/* order write buffered to write
-		 * the buffered data.
-		 */
-		cipher = NULL;
-		cipher_size = state->gnutls_internals.send_buffer.size +
-			state->gnutls_internals.send_buffer_prev_size;
 
-		retval = state->gnutls_internals.send_buffer_user_size;
+		ret = _gnutls_write_buffered(cd, state, cipher, cipher_size);
 	}
-
-	if (cipher!=NULL) ret = _gnutls_write_buffered(cd, state, cipher, cipher_size);
-	else ret = _gnutls_flush(cd, state);
-	
+		
 	if ( ret != cipher_size) {
 		gnutls_free( cipher);
 		if ( ret < 0 && gnutls_is_fatal_error(ret)==0) {
