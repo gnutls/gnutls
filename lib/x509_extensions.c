@@ -20,7 +20,7 @@
  */
 
 #include <gnutls_int.h>
-#include <libasn1.h>
+#include <libtasn1.h>
 #include <gnutls_num.h>
 #include <gnutls_cert.h>
 #include <gnutls_errors.h>

@@ -1,4 +1,4 @@
-INCLUDES = -I../libextra -I../libasn1/lib/
+INCLUDES = -I../libextra -I../libtasn1/lib/
 include_HEADERS = gnutls.h 
 bin_SCRIPTS = libgnutls-config
 
@@ -46,10 +46,10 @@ libgnutls_la_SOURCES = $(COBJECTS)
 libgnutls_la_LDFLAGS = $(LIBASN1_LINK) -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 pkix_asn1_tab.c: pkix.asn
-	-../libasn1/src/asn1c pkix.asn pkix_asn1_tab.c
+	-../libtasn1/src/asn1c pkix.asn pkix_asn1_tab.c
 
 gnutls_asn1_tab.c: gnutls.asn
-	-../libasn1/src/asn1c gnutls.asn gnutls_asn1_tab.c
+	-../libtasn1/src/asn1c gnutls.asn gnutls_asn1_tab.c
 
 gnutls-api.tex: $(COBJECTS)
 	@echo "" > gnutls-api.tex

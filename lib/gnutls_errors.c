@@ -21,7 +21,7 @@
 
 #include <gnutls_int.h>
 #include "gnutls_errors.h"
-#include <libasn1.h>
+#include <libtasn1.h>
 #ifdef STDC_HEADERS
 # include <stdarg.h>
 #endif

@@ -2,7 +2,7 @@
 # define GNUTLS_CERT_H
 
 #include <gnutls_pk.h>
-#include <libasn1.h>
+#include <libtasn1.h>
 #include <gnutls_ui.h>
 
 #define MAX_PARAMS_SIZE 6 /* ok for RSA and DSA */

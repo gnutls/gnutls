@@ -22,7 +22,7 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"
-#include "libasn1.h"
+#include "libtasn1.h"
 #include "gnutls_global.h"
 #include "gnutls_num.h"		/* GMAX */
 #include <gnutls_sig.h>
