@@ -1168,7 +1168,7 @@ static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile)
 
 	fd1 = fopen(certfile, "r");
 	if (fd1 == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_FILE_ERROR;
 
 	siz = fread(x, 1, sizeof(x), fd1);
 	fclose(fd1);
@@ -1191,7 +1191,7 @@ static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile)
 	fd1 = fopen(cafile, "r");
 	if (fd1 == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_FILE_ERROR;
 	}
 
 	siz = fread(x, 1, sizeof(x), fd1);
@@ -1213,7 +1213,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
 
 	fd2 = fopen(keyfile, "r");
 	if (fd2 == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_FILE_ERROR;
 
 	siz = fread(x, 1, sizeof(x), fd2);
 	fclose(fd2);
@@ -1910,7 +1910,7 @@ int _gnutls_verify_x509_file( char *cafile)
 	fd1 = fopen(cafile, "r");
 	if (fd1 == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_FILE_ERROR;
 	}
 
 	siz = fread(x, 1, sizeof(x), fd1);

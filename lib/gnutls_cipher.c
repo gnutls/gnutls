@@ -46,8 +46,10 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 	gnutls_datum comp, ciph;
 	int err;
 
-	if (plain.size == 0) comp = plain;
-	else {
+	if (plain.size == 0) { 
+		comp.data = NULL;
+		comp.size = 0;
+	} else {
 		err = _gnutls_plaintext2TLSCompressed(state, &comp, plain);
 		if (err < 0) {
 			gnutls_assert();
@@ -61,8 +63,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 		return err;
 	}
 
-	if (plain.size != 0) /* in that case it is not allocated */
-		gnutls_free_datum(&comp);
+	gnutls_free_datum(&comp);
 
 	/* copy the headers */
 	memcpy( ciph.data, headers, headers_size);
@@ -95,8 +96,10 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 		return ret;
 	}
 
-	if (gcomp.size==0) gtxt = gcomp;
-	else {
+	if (gcomp.size==0) {
+		gtxt.data = NULL;
+		gtxt.size = 0;
+	} else {
 		ret = _gnutls_TLSCompressed2plaintext(state, &gtxt, gcomp);
 		if (ret < 0) {
 			gnutls_free_datum(&gcomp);
