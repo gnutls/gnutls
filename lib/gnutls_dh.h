@@ -21,3 +21,5 @@
 MPI gnutls_get_dh_params(MPI *ret_p, int bits);
 MPI gnutls_calc_dh_secret( MPI *ret_x, MPI g, MPI prime );
 MPI gnutls_calc_dh_key( MPI f, MPI x, MPI prime );
+
+#define DEFAULT_BITS 1024

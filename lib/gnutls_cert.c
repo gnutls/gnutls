@@ -32,6 +32,7 @@
 #include <x509_verify.h>
 #include <x509_extensions.h>
 #include <gnutls_algorithms.h>
+#include <gnutls_dh.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -343,6 +344,9 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS * res, int ncerts)
 	if (*res == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+
+	(*res)->dh_bits = DEFAULT_BITS;
+	
 	(*res)->ncerts = 0;	/* this is right - set_key() increments it */
 
 	if (ncerts > 0) {
@@ -425,6 +429,21 @@ int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
 	if ((ret = read_ca_file(res, CAFILE)) < 0)
 		return ret;
 
+	return 0;
+}
+
+/**
+  * gnutls_set_x509_dh_bits - Used to set the bits for a DHE_* ciphersuite
+  * @res: is an &X509PKI_CREDENTIALS structure.
+  * @bits: is the number of bits
+  *
+  * This function sets the number of bits, for use in a Diffie Hellman key exchange.
+  * This will only occur in a DHE ciphersuite.
+  *
+  **/
+int gnutls_set_x509_dh_bits(X509PKI_CREDENTIALS res, int bits)
+{
+	res->dh_bits = bits;
 	return 0;
 }
 
@@ -1042,7 +1061,7 @@ int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
 /**
   * gnutls_set_x509_cert_callback - Used to set a callback while selecting the proper (client) certificate
   * @cred: is an &X509PKI_CLIENT_CREDENTIALS structure.
-  * @x509_cert_callback: is the callback function
+  * @func: is the callback function
   *
   * The callback's function form is:
   * int (*callback)(gnutls_DN *client_cert, gnutls_DN *issuer_cert, int ncerts, gnutls_DN* req_ca_cert, int nreqs);
@@ -1079,13 +1098,8 @@ int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
   *
   * This function returns 0 on success.
   **/
-int gnutls_set_x509_cert_callback(X509PKI_CREDENTIALS cred,
-				  int (*x509_cert_callback) (gnutls_DN *,
-							     gnutls_DN *,
-							     int,
-							     gnutls_DN *,
-							     int))
+int gnutls_set_x509_cert_callback(X509PKI_CREDENTIALS cred, x509_cert_callback_func* func)
 {
-	cred->client_cert_callback = x509_cert_callback;
+	cred->client_cert_callback = func;
 	return 0;
 }

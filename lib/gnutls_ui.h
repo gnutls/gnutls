@@ -35,6 +35,8 @@ typedef struct {
 #define X509KEY_ENCIPHER_ONLY		2
 #define X509KEY_DECIPHER_ONLY		1
 
+typedef int x509_cert_callback_func(gnutls_DN *, gnutls_DN *, int, gnutls_DN *, int);
+
 
 # ifdef LIBGNUTLS_VERSION /* defined only in gnutls.h */
 
@@ -52,7 +54,7 @@ int gnutls_anon_client_get_dh_bits(  ANON_CLIENT_AUTH_INFO info);
 
 /* X509PKI */
 
-int gnutls_set_x509_cert_callback( X509PKI_CREDENTIALS, int (*x509_cert_callback)(gnutls_DN*, gnutls_DN*, int, gnutls_DN*, int));
+int gnutls_set_x509_cert_callback( X509PKI_CREDENTIALS, x509_cert_callback_func *);
 int gnutls_x509pki_set_cert_request( GNUTLS_STATE, CertificateRequest);
 
 const gnutls_DN* gnutls_x509pki_get_peer_dn(  X509PKI_CLIENT_AUTH_INFO info);

@@ -125,6 +125,20 @@ int gnutls_x509pki_get_peer_certificate_version(  X509PKI_CLIENT_AUTH_INFO info)
 }
 
 /**
+  * gnutls_x509pki_get_dh_bits - This function returns the number of bits used in a DHE handshake
+  * @info: is an X509PKI_CLIENT_AUTH_INFO structure
+  *
+  * This function will return the number of bits used in a Diffie Hellman Handshake. This will only
+  * occur in case of DHE_* ciphersuites. The return value may be zero if no applicable ciphersuite was
+  * used.
+  *
+  **/
+int gnutls_x509pki_get_dh_bits(  X509PKI_CLIENT_AUTH_INFO info) {
+	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	return info->dh_bits;
+}
+
+/**
   * gnutls_x509pki_get_peer_certificate_activation_time - This function returns the peer's certificate activation time
   * @info: is an X509PKI_CLIENT_AUTH_INFO structure
   *

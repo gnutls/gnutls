@@ -26,8 +26,6 @@
 #include "gnutls_num.h"
 #include "gnutls_gcry.h"
 
-#define DEFAULT_BITS 1024
-
 int gen_anon_server_kx( GNUTLS_STATE, opaque**);
 int gen_anon_client_kx( GNUTLS_STATE, opaque**);
 int proc_anon_server_kx( GNUTLS_STATE, opaque*, int);
@@ -91,19 +89,27 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 
 	state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_SERVER_AUTH_INFO));
 	if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
+
 	((ANON_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->dh_bits = gcry_mpi_get_nbits(p);
 	state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO_INT);
 
 	X = gnutls_calc_dh_secret(&x, g, p);
-	if (X==NULL) 
+	if (X==NULL) {
+		gnutls_assert();
+		_gnutls_mpi_release( &g);
+		_gnutls_mpi_release( &p);
 		return GNUTLS_E_MEMORY_ERROR;
-
+	}
+	
 	state->gnutls_key->dh_secret = x;
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, g);
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_p, p);
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_g + n_p + n_X + 6);
 	if (*data==NULL) {
+		_gnutls_mpi_release( &X);
+		_gnutls_mpi_release( &g);
+		_gnutls_mpi_release( &p);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	data_p = &(*data)[0];
@@ -149,7 +155,7 @@ int ret;
 	_gnutls_mpi_release(&X);
 	
 	WRITEuint16( n_X, &(*data)[0]);
-	
+
 	/* calculate the key after calculating the message */
 	state->gnutls_key->KEY = gnutls_calc_dh_key(state->gnutls_key->client_Y, x, state->gnutls_key->client_p);
 	if (state->gnutls_key->KEY==NULL)
@@ -255,7 +261,8 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 		bits = cred->dh_bits;
 	}
 
-#if 0 /* removed. I do not know why - maybe I didn't get the protocol,
+#if 0
+	  /* removed. I do not know why - maybe I didn't get the protocol,
        * but openssl does not use that byte
        */
 	if (data[0] != 1) {

@@ -30,7 +30,8 @@ typedef struct {
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
 	 */
-	int		(*client_cert_callback)(gnutls_DN*, gnutls_DN*, int, gnutls_DN*, int);
+	x509_cert_callback_func*	client_cert_callback;
+	int 				dh_bits;
 } X509PKI_CREDENTIALS_INT;
 
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
@@ -46,12 +47,24 @@ typedef struct X509PKI_CLIENT_AUTH_INFO_INT {
 	char		  subjectAltDNSName[X509_CN_SIZE];
 	unsigned char	  keyUsage;
 	int		  certificate_requested;
+	int		  dh_bits; /* bits of the DH (if DHE_RSA is used) */
 } *X509PKI_CLIENT_AUTH_INFO;
 
 typedef struct X509PKI_CLIENT_AUTH_INFO_INT X509PKI_CLIENT_AUTH_INFO_INT;
 typedef X509PKI_CLIENT_AUTH_INFO X509PKI_SERVER_AUTH_INFO;
+typedef X509PKI_CLIENT_AUTH_INFO_INT X509PKI_SERVER_AUTH_INFO_INT;
 
 void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
+
+/* AUTH X509 functions */
+int _gnutls_gen_x509_server_certificate(GNUTLS_STATE, opaque **);
+int _gnutls_gen_x509_client_certificate(GNUTLS_STATE, opaque **);
+int _gnutls_gen_x509_client_cert_vrfy(GNUTLS_STATE, opaque **);
+int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE, opaque **);
+int _gnutls_proc_x509_cert_req(GNUTLS_STATE, opaque *, int);
+int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE, opaque *, int);
+int _gnutls_proc_x509_server_certificate(GNUTLS_STATE, opaque *, int);
+#define _gnutls_proc_x509_client_certificate _gnutls_proc_x509_server_certificate
 
 #endif
 
