@@ -1283,8 +1283,8 @@ int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 }
 
 /* finds the most appropriate certificate in the cert list.
- * The 'appropriate' is defined by the user.
- * FIXME: provide user callback.
+ * The 'appropriate' is defined by the user. 
+ * (frontend to _gnutls_server_find_cert_index())
  */
 const gnutls_cert *_gnutls_server_find_cert(GNUTLS_STATE state,
 					    gnutls_cert ** cert_list,

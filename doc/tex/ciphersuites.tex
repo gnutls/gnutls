@@ -1,9 +1,10 @@
 \newpage
 \section{TLS Cipher suites}
 \par 
-\tls 1.0 supports ciphersuites like {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
+\tls 1.0 supports ciphersuites like {\bf TLS\_X509PKI\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
 These ciphersuites contain three parameters:
 \begin{itemize}
+\item The key authentication method (X.509 PKI in the example)
 \item The key exchange algorithm (DHE\_RSA in the example)
 \item The Symmetric encryption algorithm and mode (3DES\_CBC in this
 example)
@@ -30,14 +31,6 @@ DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm
 parameters which are send to the peer. Currently \gnutls does not support this ciphersuite.
 \\
 \hline
-DH\_DSS & Static Diffie Hellman parameters signed by a DSS certificate.
-\gnutls does not support this ciphersuite.
-\\
-\hline
-DH\_RSA & Static Diffie Hellman parameters signed by an RSA certificate.
-\gnutls does not support this ciphersuite.
-\\
-\hline
 \end{tabular}
 
 \caption{Supported X.509 key exchange algorithms}
@@ -48,7 +41,7 @@ DH\_RSA & Static Diffie Hellman parameters signed by an RSA certificate.
 \begin{tabular}{|l|p{9cm}|}
 
 \hline
-DH\_ANON & This algorithm exchanges not signed diffie Hellman parameters. That way encryption may 
+ANON\_DH & This algorithm exchanges not signed diffie Hellman parameters. That way encryption may 
 be performed but there is no indication of the identity of the peer. This kind of
 authentication is vulnerable to man in the middle attack, but this protocol
 can be used even if there is no prior communication or common trusted

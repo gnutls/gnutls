@@ -149,7 +149,7 @@ int cert_callback( const gnutls_datum *client_certs, int ncerts, const gnutls_da
 }
 
 const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0 };
+const int kx_priority[] = { GNUTLS_KX_X509PKI_RSA, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
 const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };

@@ -47,11 +47,11 @@ typedef struct {
 /* This table maps the Key exchange algorithms to
  * the certificate algorithms. Eg. if we have
  * RSA algorithm in the certificate then we can
- * use GNUTLS_KX_RSA or GNUTLS_KX_DHE_RSA.
+ * use GNUTLS_KX_X509PKI_RSA or GNUTLS_KX_X509PKI_DHE_RSA.
  */
 static const gnutls_pk_map pk_mappings[] = {
-	{GNUTLS_KX_RSA, GNUTLS_PK_RSA},
-	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA},
+	{GNUTLS_KX_X509PKI_RSA, GNUTLS_PK_RSA},
+	{GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_PK_RSA},
 	{0}
 };
 
@@ -959,7 +959,7 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
 		switch (alg) {
-		case GNUTLS_KX_RSA:
+		case GNUTLS_KX_X509PKI_RSA:
 			if (cert->keyUsage != 0) {
 				if (!
 				    (cert->
@@ -970,7 +970,7 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 					return 0;
 			}
 			return 0;
-		case GNUTLS_KX_DHE_RSA:
+		case GNUTLS_KX_X509PKI_DHE_RSA:
 			if (cert->keyUsage != 0) {
 				if (!
 				    (cert->
@@ -991,7 +991,7 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 
 /* returns the KX algorithms that are supported by a
  * certificate. (Eg a certificate with RSA params, supports
- * GNUTLS_KX_RSA algorithm).
+ * GNUTLS_KX_X509PKI_RSA algorithm).
  * This function also uses the KeyUsage field of the certificate
  * extensions in order to disable unneded algorithms.
  */
