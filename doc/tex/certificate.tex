@@ -160,7 +160,8 @@ when we are the owner of a key and we also have the secret key.
 In the case we don't trust the owner, those signatures are skipped
 for the web of trust calculation.
 \par
-All checks in GnuTLS are done in \printfunc{gnutls_openpgp_verify_key}{gnutls\_openpgp\_verify\_key}. 
+All checks in GnuTLS are done in \printfunc{gnutls_openpgp_key_verify_ring}{gnutls\_openpgp\_key\_verify\_ring}
+and \printfunc{gnutls_openpgp_key_verify_trustdb}{gnutls\_openpgp\_key\_verify\_trustdb}. 
 If a trust database is available, this is the file which contains all information about the
 key owner (ownertrust), additional checks are performed.
 \\

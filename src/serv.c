@@ -618,6 +618,7 @@ int main(int argc, char **argv)
    }
 #endif
 
+#ifdef HAVE_LIBOPENCDK
    if (pgp_keyring != NULL) {
       ret =
 	  gnutls_certificate_set_openpgp_keyring_file(cert_cred,
@@ -644,6 +645,7 @@ int main(int argc, char **argv)
 		 ret, pgp_certfile, pgp_keyfile);
 	 GERR(ret);
       }
+#endif
 
    if (x509_certfile != NULL)
       if ((ret = gnutls_certificate_set_x509_key_file
