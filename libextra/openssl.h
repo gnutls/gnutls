@@ -25,7 +25,7 @@
 
 #ifndef GNUTLS_OPENSSL_H
 #define GNUTLS_OPENSSL_H
-#include <gnutls.h>
+#include <gnutls/gnutls.h>
 #include <gcrypt.h>
 
 #define OPENSSL_VERSION_NUMBER (0x0090604F)
