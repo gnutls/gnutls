@@ -1,17 +1,21 @@
 
-N: Nikos Mavroyanopoulos	
+N: Nikos Mavroyanopoulos 
+A: nmav
 E: nmav@hellug.gr
 S: Core library.
 
-N: Fabio Fiorina
+N: Fabio Fiorina 
+A: fiorinaf
 E: Fabio.Fiorina@alcatel.it
 S: ASN.1 structures parser library (libtasn1).
 
 N: Timo Schulz
+A: twoaday
 E: twoaday@freakmail.de
 S: OpenPGP support (opencdk library).
 
 N: Andrew McDonald
+A: admcd
 E: andrew@mcdonald.org.uk
 S: OpenSSL compatible interface.
 
