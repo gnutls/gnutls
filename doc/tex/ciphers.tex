@@ -7,8 +7,8 @@ stream algorithms like {\bf ARCFOUR\footnote{ARCFOUR is a compatible
 algorithm with RSA's RC4 algorithm.}} See \hyperref{fig:ciphers}{figure }{}{fig:ciphers} for a complete list. 
 Ciphers are encryption algorithms that use a single (secret) key
 to encrypt and decrypt data. Block algorithms in TLS also provide protection
-against statistical analysis of the data. \gnutls makes use of this property
-thus, if you're operating in \tlsI mode, a random number of blocks will be
+against statistical analysis of the data. \gnutls{} makes use of this property
+thus, if you're operating in \tlsI{} mode, a random number of blocks will be
 appended to the data. This will prevent eavesdroppers from guessing the 
 actual data size.
 
@@ -26,12 +26,12 @@ ARCFOUR & ARCFOUR is a fast stream cipher.
 AES\_CBC & AES or RIJNDAEL is the block cipher algorithm that replaces the old 
 (and insecure\footnote{due to small key length}) DES algorithm. Has
 128 bits block size and is used in CBC mode. This is not officially
-supported in TLS (yet).
+supported in TLS.
 \\
 \hline
 TWOFISH\_CBC & TWOFISH is a block cipher algorithm by Counterpane. Has
 128 bits block size and is used in CBC mode. This algorithm is not
-part of TLS. It is a \gnutls extension.
+part of TLS. It is a \gnutls{} extension.
 \\
 \hline
 \end{tabular}

@@ -46,7 +46,7 @@ Ephemeral Diffie Hellman parameters, offer perfect forward secrecy.
 \\
 \hline
 DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are send to the peer. Currently \gnutls does not support this ciphersuite.
+parameters which are send to the peer. Currently \gnutls{} does not support this ciphersuite.
 \\
 \hline
 \end{tabular}
@@ -101,7 +101,7 @@ This is achieved since SRP does not use the plain password to perform authentica
 verifier. The verifier is $g^{x}mod(n)$ and $x$ is a value calculated
 from the username and the password. 
 \par SRP is normaly used with a SHA based hash function, to calculate
-the value of $x$. In \gnutls in addition to original SHA hash function,
+the value of $x$. In \gnutls{} in addition to original SHA hash function,
 a hash function based on blowfish crypt is also supported. The blowfish
 crypt function has the property of variable complexity, thus the
 verifier may resist future attacks based on computational power, by just increasing

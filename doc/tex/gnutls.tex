@@ -67,10 +67,10 @@ software from some countries.}
 
 \input{errors}
 
-\section{Client Examples}
+\section{Client examples}
 This section contains examples of \tls{} and \ssl{} clients, using \gnutls{}. 
 
-\subsection{Simple Client example with X.509 Authentication}
+\subsection{Simple client example with X.509 certificate support}
 Let's assume now that we want to create a client which communicates
 with servers using the X509 authentication schema. The following client
 is a very simple \tls{} client, it does not support session resuming nor
@@ -90,7 +90,7 @@ This function should be called after a successful
 
 \input{ex1}
 
-\subsection{Simple Client example with SRP Authentication}
+\subsection{Simple client example with SRP authentication}
 Although {\bf SRP} is not part of the \tls{} standard, \gnutls{} implements
 {\it David Taylor's} proposal\footnote{This is work in progress.}  for using the SRP algorithm
 within the \tls{} handshake protocol. The following client
@@ -99,7 +99,7 @@ and authenticates using {\it username} and {\it password}.
 
 \input{srp1}
 
-\section{Server Examples}
+\section{Server examples}
 This section contains examples of \tls{} and \ssl{} servers, using \gnutls{}.
 
 \subsection{Echo Server with X.509 and SRP authentication}

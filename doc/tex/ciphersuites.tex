@@ -2,7 +2,7 @@
 \section{TLS Cipher suites}
 \par 
 The Handshake Protocol of \tlsI{} negotiates cipher suites 
-that of the form \\
+of the form \\
 {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
 The cipher suites contain three parameters:
 \begin{itemize}
@@ -16,7 +16,7 @@ MAC\_SHA is used in the above example.
 
 The ciphersuite negotiated in the handshake protocol, will affect 
 the Record Protocol, by enabling encryption and data authentication.
-Note that \tlsI does not always
+Note that \tlsI{} does not always
 negotiate the strongest available cipher suite. There are cases where
 a man in the middle attacker could make the two entities negotiate
 the least secure method they support. For that reason do not enable
