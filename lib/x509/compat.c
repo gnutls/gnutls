@@ -31,7 +31,6 @@
 #include <dn.h>
 #include <libtasn1.h>
 #include <gnutls/x509.h>
-#include <gnutls/compat8.h>
 
 /**
   * gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
@@ -42,7 +41,7 @@
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t gnutls_x509_extract_certificate_activation_time(const
+time_t _gnutls_x509_get_raw_crt_activation_time(const
 							  gnutls_datum *
 							  cert)
 {
@@ -74,7 +73,7 @@ time_t gnutls_x509_extract_certificate_activation_time(const
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t gnutls_x509_extract_certificate_expiration_time(const
+time_t _gnutls_x509_get_raw_crt_expiration_time(const
 							  gnutls_datum *
 							  cert)
 {

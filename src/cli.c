@@ -74,7 +74,7 @@ static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
 static gnutls_certificate_credentials xcred;
 
-int protocol_priority[PRI_MAX] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+int protocol_priority[PRI_MAX] = { GNUTLS_TLS1_1, GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
 	/* Do not use anonymous authentication, unless you know what that means */
@@ -677,10 +677,14 @@ static int do_handshake(socket_st * socket)
 static int srp_username_callback( gnutls_session session, unsigned int times,
 	char** username, char** password)
 {
+	if (srp_username == NULL || srp_passwd ==NULL) {
+		return -1;
+	}
+
 	/* We should ask here the user for his SRP username
 	 * and password.
 	 */
-	if (times == 1 && srp_username && srp_passwd) {
+	if (times == 1) {
 		*username = gnutls_strdup( srp_username);
 		*password = gnutls_strdup( srp_passwd);
 		

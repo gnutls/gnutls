@@ -28,7 +28,6 @@
 #include <openpgp/gnutls_openpgp.h>
 
 #ifdef HAVE_LIBOPENCDK
-#include <gnutls/compat8.h>
 #include <strfile.h>
 #include <gnutls_str.h>
 #include <stdio.h>
