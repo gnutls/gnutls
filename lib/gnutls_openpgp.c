@@ -460,7 +460,7 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
   if (!pkey || raw_key.size <= 0)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  cdk_secure_memory_init(); 
+  cdk_secmem_init( 16384 );
   cdk_iobuf_new(&buf, raw_key.size);
   cdk_iobuf_write(buf, raw_key.data, raw_key.size);
 
@@ -952,7 +952,7 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
   if (pos1 && pos2)
     {
       pos2 -= pos1;
-      size = pos2 < OPENPGP_NAME_SIZE? pos2 : OPENPGP_NAME_SIZE;
+      size = pos2 < OPENPGP_NAME_SIZE? pos2 : OPENPGP_NAME_SIZE-1;
       memcpy(dn->email, uid->name+pos1, size);
       dn->email[size-1] = '\0'; /* make sure it's a string */
     }
