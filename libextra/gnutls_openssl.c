@@ -21,11 +21,16 @@
 
 #include <gnutls/gnutls.h>
 #include <openssl_compat.h>
-#include <gcrypt.h>
+#include <gc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <gnutls/openssl.h>
+
+struct MD_CTX
+{
+  gc_hash handle;
+};
 
 /* WARNING: Error functions aren't currently thread-safe */
 
@@ -852,7 +857,7 @@ void RAND_seed(const void *buf, int num)
 
 int RAND_bytes(unsigned char *buf, int num)
 {
-    gcry_randomize(buf, num, GCRY_STRONG_RANDOM);
+    gc_random(buf, num);
     return 1;
 }
 
@@ -882,81 +887,62 @@ int RAND_egd_bytes(const char *path, int bytes)
 
 void MD5_Init(MD5_CTX * ctx)
 {
-    gcry_md_open(&ctx->handle, GCRY_MD_MD5, 0);
+    gc_hash_open(GC_MD5, 0, &ctx->handle);
 }
 
 void MD5_Update(MD5_CTX * ctx, const void *buf, int len)
 {
-    gcry_md_write(ctx->handle, buf, len);
+    gc_hash_write(ctx->handle, len, buf);
 }
 
 void MD5_Final(unsigned char *md, MD5_CTX * ctx)
 {
-    unsigned char *local_md;
+    const char *local_md;
 
-    gcry_md_final(ctx->handle);
-    local_md = gcry_md_read(ctx->handle, 0);
+    local_md = gc_hash_read(ctx->handle);
     if (md)
-	memcpy(md, local_md, gcry_md_get_algo_dlen(GCRY_MD_MD5));
-    gcry_md_close(ctx->handle);
+	memcpy(md, local_md, gc_hash_digest_length(GC_MD5));
+    gc_hash_close(ctx->handle);
 }
 
 unsigned char *MD5(const unsigned char *buf, unsigned long len,
 		   unsigned char *md)
 {
-    unsigned char *local_md;
-
     if (!md)
 	return NULL;
 
-    local_md = malloc(gcry_md_get_algo_dlen(GCRY_MD_MD5));
-    if (!local_md)
-	return NULL;
-
-    gcry_md_hash_buffer(GCRY_MD_MD5, local_md, buf, len);
-
-    memcpy(md, local_md, gcry_md_get_algo_dlen(GCRY_MD_MD5));
-    free(local_md);
+    gc_hash_buffer (GC_MD5, buf, len, md);
 
     return md;
 }
 
 void RIPEMD160_Init(RIPEMD160_CTX * ctx)
 {
-    gcry_md_open(&ctx->handle, GCRY_MD_RMD160, 0);
+    gc_hash_open(GC_RMD160, 0, &ctx->handle);
 }
 
 void RIPEMD160_Update(RIPEMD160_CTX * ctx, const void *buf, int len)
 {
-    gcry_md_write(ctx->handle, buf, len);
+    gc_hash_write(ctx->handle, len, buf);
 }
 
 void RIPEMD160_Final(unsigned char *md, RIPEMD160_CTX * ctx)
 {
-    unsigned char *local_md;
-    gcry_md_final(ctx->handle);
-    local_md = gcry_md_read(ctx->handle, 0);
+    const char *local_md;
+
+    local_md = gc_hash_read(ctx->handle);
     if (md)
-	memcpy(md, local_md, gcry_md_get_algo_dlen(GCRY_MD_RMD160));
-    gcry_md_close(ctx->handle);
+	memcpy(md, local_md, gc_hash_digest_length(GC_RMD160));
+    gc_hash_close(ctx->handle);
 }
 
 unsigned char *RIPEMD160(const unsigned char *buf, unsigned long len,
 			 unsigned char *md)
 {
-    unsigned char *local_md;
-
     if (!md)
 	return NULL;
 
-    local_md = malloc(gcry_md_get_algo_dlen(GCRY_MD_RMD160));
-    if (!local_md)
-	return NULL;
-
-    gcry_md_hash_buffer(GCRY_MD_RMD160, local_md, buf, len);
-
-    memcpy(md, local_md, gcry_md_get_algo_dlen(GCRY_MD_RMD160));
-    free(local_md);
+    gc_hash_buffer (GC_RMD160, buf, len, md);
 
     return md;
 }

@@ -34,7 +34,6 @@ extern "C" {
 #endif
 
 #include <gnutls/gnutls.h>
-#include <gcrypt.h>
 
 /* Extra definitions that do not longer exist in gnutls.
  */
@@ -162,10 +161,8 @@ struct _SSL
 
 #define rbio gnutls_state
 
-typedef struct
-{
-    gcry_md_hd_t handle;
-} MD_CTX;
+struct MD_CTX;
+typedef struct MD_CTX MD_CTX;
 
 struct RSA;
 typedef struct RSA RSA;
