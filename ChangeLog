@@ -1,3 +1,9 @@
+2004-11-23 01:20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rfc3943.txt:
+
+	Add.  
+
 2004-11-19 17:18  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_ui.c:
