@@ -16,6 +16,8 @@ See the end for copying conditions.
 - Started using GNULib for portability files, although not yet inside lib/.
 - Added gnutls_certificate_verify_peers to gnutls/compat.h.
 - Improvements to the manual.
+- Known bug: the library require snprintf.  This has not yet been
+  fixed, but will be handled via GNULib later on.
 
 * Version 1.1.18 (2004-08-24)
 - Corrected handling of certificate with dates after year 2038.
