@@ -178,13 +178,14 @@ static int check_bits(int bits)
   * @p: holds the first prime (p)
   * @q: holds the second prime (q)
   * @u: holds the coefficient
-  * @bits: is the prime's number of bits
+  * @bits: is the modulus's number of bits
   *
-  * This function will replace the pair of prime and generator for use in 
-  * the Diffie-Hellman key exchange. The new parameters should be stored in the
+  * This function will replace the parameters used in the RSA-EXPORT key
+  * exchange. The new parameters should be stored in the
   * appropriate gnutls_datum. 
   * 
-  * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
+  * Note that the bits value should only be 512. That is because the
+  * RSA-EXPORT ciphersuites are only allowed to sign a modulus of 512 bits.
   *
   **/
 int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
