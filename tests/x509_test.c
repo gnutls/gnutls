@@ -45,7 +45,7 @@ int i = 0, exp_result;
 
 	gnutls_global_init();
 
-	fprintf(stderr, "This program will perform some tests on X.509 certificate\n");
+	fprintf(stderr, "This test will perform some checks on X.509 certificate\n");
 	fprintf(stderr, "verification functions.\n\n");
 
 	for (;;) {
@@ -71,6 +71,8 @@ int i = 0, exp_result;
 			
 		printf("\n");
 	}
+
+	printf("\n");
 
 	return 0;
 
