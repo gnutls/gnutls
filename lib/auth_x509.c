@@ -1209,7 +1209,7 @@ int gnutls_x509pki_extract_certificate_version(const gnutls_datum * cert)
   * @state: is a gnutls state
   *
   * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
-  * Status should be one of the CertificateStatus enumerated elements.
+  * The return value (status) should be one of the CertificateStatus enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. Returns a negative error code in case of an error, or GNUTLS_CERT_NONE if no certificate was sent.
   *
