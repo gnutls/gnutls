@@ -55,6 +55,7 @@ int port;
 int record_max_size;
 int fingerprint;
 int crlf;
+int quiet = 0;
 
 char *srp_passwd;
 char *srp_username;
@@ -403,7 +404,7 @@ int main(int argc, char **argv)
 	       }
 	    }
 	    if (ret > 0) {
-	       printf("- Received[%d]: ", ret);
+	       if (quiet!=0) printf("- Received[%d]: ", ret);
 	       for (ii = 0; ii < ret; ii++) {
 		  fputc(buffer[ii], stdout);
 	       }
@@ -431,9 +432,9 @@ int main(int argc, char **argv)
 	    	
 	    ret = gnutls_record_send(state, buffer, strlen(buffer));
 	 } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-	 if (ret > 0)
-	    printf("- Sent: %d bytes\n", ret);
-	 else
+	 if (ret > 0) {
+	    if (quiet!=0) printf("- Sent: %d bytes\n", ret);
+	 } else
 	    GERR(ret);
 
       }

@@ -49,9 +49,11 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	GNUTLS_MPI m, res;
 	opaque *edata, *ps;
 	size_t k, psize;
-	
-	k = _gnutls_mpi_get_nbits(params[0]) / 8;
-	if (k % 8 != 0) k++;
+	size_t mod_bits;
+
+	mod_bits = _gnutls_mpi_get_nbits(params[0]);	
+	k = mod_bits / 8;
+	if ( mod_bits % 8 != 0) k++;
 
 	if (plaintext.size > k - 11) {
 		gnutls_assert();
@@ -170,10 +172,11 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 	int k, i, ret;
 	GNUTLS_MPI c, res;
 	opaque *edata;
-	size_t esize;
+	size_t esize, mod_bits;
 
-	k = _gnutls_mpi_get_nbits(params[0]) / 8;
-	if (k % 8 != 0) k++;
+	mod_bits = _gnutls_mpi_get_nbits(params[0]);	
+	k = mod_bits / 8;
+	if ( mod_bits % 8 != 0) k++;
 
 	esize = ciphertext.size;
 
