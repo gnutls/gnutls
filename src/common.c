@@ -484,13 +484,13 @@ void print_list(void)
 	printf("Ciphers:");
 	printf(" AES-128-CBC");
 	printf(", 3DES-CBC");
-	printf(", ARCFOUR\n");
+	printf(", ARCFOUR");
 	printf(", ARCFOUR-40\n");
 
 	printf("MACs:");
 	printf(" MD5");
 	printf(", RMD160");
-	printf(", SHA-1\n");
+	printf(", SHA1\n");
 
 	printf("Key exchange algorithms:");
 	printf(" RSA");
@@ -504,6 +504,7 @@ void print_list(void)
 
 	printf("Compression methods:");
 	printf(" ZLIB");
+	printf(", LZO");
 	printf(", NULL\n");
 }
 

@@ -1,4 +1,4 @@
-Version 1.0.0
+Version 1.0.0 (04/12/2003)
 - Exported the static SRP group parameters.
 - Some fixes in the certificate authenticated SRP ciphersuites.
 - Improved the support for draft-ietf-tls-srp-05. The two-phase
