@@ -666,7 +666,7 @@ int main(int argc, char **argv)
 
    if (generate != 0 || read_dh_params != NULL) {
       gnutls_certificate_set_dh_params(cert_cred, dh_params);
-      gnutls_certificate_set_rsa_params(cert_cred, rsa_params);
+      gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
    }
 
    /* this is a password file (created with the included srpcrypt utility) 
