@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2002 Nikos Mavroyanopoulos
+ *  Copyright (C) 2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -624,12 +624,12 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 	    (_gnutls_get_pkix(), "PKIX1.SubjectAltName", &c2, "san"))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
-		gnutls_free_datum( &dnsname);
+		_gnutls_free_datum( &dnsname);
 		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_der_decoding(&c2, dnsname.data, dnsname.size, NULL);
-	gnutls_free_datum( &dnsname);
+	_gnutls_free_datum( &dnsname);
 
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
@@ -2066,7 +2066,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 	gCert->cert_type = GNUTLS_CRT_X509;
 
 	if ( !(fast & CERT_NO_COPY)) {
-		if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
+		if (_gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
@@ -2080,7 +2080,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 	     "cert"))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
-		gnutls_free_datum( &gCert->raw);
+		_gnutls_free_datum( &gCert->raw);
 		return _gnutls_asn2err(result);
 	}
 
@@ -2094,7 +2094,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 			_gnutls_log("CERT: Decoding error %d\n", result);
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->raw);
 			return _gnutls_asn2err(result);
 		}
 	}
@@ -2109,7 +2109,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 			_gnutls_log("CERT: Decoding error %d\n", result);
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->raw);
 			return _gnutls_asn2err(result);
 		}
 	}
@@ -2124,7 +2124,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->raw);
 			return _gnutls_asn2err(result);
 		}
 	}
@@ -2145,8 +2145,8 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		if ((len % 8) != 0) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
-			gnutls_free_datum( &gCert->signature);
+			_gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->signature);
 			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		}
 	
@@ -2162,7 +2162,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		if (gCert->version < 0) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->raw);
 			return GNUTLS_E_ASN1_GENERIC_ERROR;  
 		}
 	}
@@ -2178,14 +2178,14 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->raw);
 			return _gnutls_asn2err(result);
 		}
 
 		if ( (result=_gnutls_extract_x509_cert_mpi_params( oid, gCert, c2, "cert", str, sizeof(str))) < 0) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->raw);
 			return result;
 		}
 	}
@@ -2197,7 +2197,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 					  gCert, fast)) < 0) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
-			gnutls_free_datum( &gCert->raw);
+			_gnutls_free_datum( &gCert->raw);
 			return result;
 		}
 

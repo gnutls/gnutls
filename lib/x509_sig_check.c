@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -69,7 +69,7 @@ int start, end;
 	len = end - start + 1;
 	str = &cert->raw.data[start];
 
-	if (gnutls_set_datum( &ret, str, len) < 0) {
+	if (_gnutls_set_datum( &ret, str, len) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -163,11 +163,11 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, GNUTLS
 	digest_size = sizeof(digest);	
 	if ( (ret = _gnutls_get_ber_digest_info( &decrypted, &hash, digest, &digest_size)) != 0) {
 		gnutls_assert();
-		gnutls_sfree_datum( &decrypted);
+		_gnutls_free_datum( &decrypted);
 		return ret;
 	}
 
-	gnutls_sfree_datum( &decrypted);
+	_gnutls_free_datum( &decrypted);
 
 	if (digest_size != _gnutls_hash_get_algo_len(hash)) {
 		gnutls_assert();
@@ -210,32 +210,32 @@ gnutls_datum tbs;
 		
 			if (_pkcs1_rsa_verify_sig( &signature, &tbs, issuer->params, issuer->params_size)!=0) {
 				gnutls_assert();
-				gnutls_free_datum( &tbs);
+				_gnutls_free_datum( &tbs);
 				return GNUTLS_CERT_INVALID;
 			}
 
-			gnutls_free_datum(&tbs);
+			_gnutls_free_datum(&tbs);
 			return 0;
 			break;
 
 		case GNUTLS_PK_DSA:
 			if (_gnutls_dsa_verify( &tbs, &signature, issuer->params, issuer->params_size)!=0) {
 				gnutls_assert();
-				gnutls_free_datum( &tbs);
+				_gnutls_free_datum( &tbs);
 				return GNUTLS_CERT_INVALID;
 			}
 
-			gnutls_free_datum(&tbs);
+			_gnutls_free_datum(&tbs);
 			return 0;
 			break;
 		default:
 			gnutls_assert();
-			gnutls_free_datum(&tbs);
+			_gnutls_free_datum(&tbs);
 			return GNUTLS_E_INTERNAL_ERROR;
 
 	}
 
-	gnutls_free_datum(&tbs);
+	_gnutls_free_datum(&tbs);
 
 	_gnutls_x509_log( "X509_SIG: PK: %d\n", issuer->subject_pk_algorithm);	
 

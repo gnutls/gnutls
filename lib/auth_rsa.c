@@ -327,12 +327,12 @@ int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 	} else {		/* TLS 1 */
 		*data = gnutls_malloc(sdata.size + 2);
 		if (*data == NULL) {
-			gnutls_free_datum(&sdata);
+			_gnutls_free_datum(&sdata);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		_gnutls_write_datum16( *data, sdata);
 		ret = sdata.size + 2;
-		gnutls_free_datum(&sdata);
+		_gnutls_free_datum(&sdata);
 		return ret;
 	}
 

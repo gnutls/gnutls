@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -358,7 +358,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	e->data = malloc(siz);
 	if (e->data == NULL) {
 		FREE_ALL_MPIS;
-		gnutls_free_datum( m);
+		_gnutls_free_datum( m);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -372,8 +372,8 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	d->data = malloc(siz);
 	if (d->data == NULL) {
 		FREE_ALL_MPIS;
-		gnutls_free_datum( m);
-		gnutls_free_datum( e);
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -387,9 +387,9 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	p->data = malloc(siz);
 	if (p->data == NULL) {
 		FREE_ALL_MPIS;
-		gnutls_free_datum( m);
-		gnutls_free_datum( e);
-		gnutls_free_datum( d);
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
+		_gnutls_free_datum( d);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -403,10 +403,10 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	q->data = malloc(siz);
 	if (q->data == NULL) {
 		FREE_ALL_MPIS;
-		gnutls_free_datum( m);
-		gnutls_free_datum( e);
-		gnutls_free_datum( d);
-		gnutls_free_datum( p);
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
+		_gnutls_free_datum( d);
+		_gnutls_free_datum( p);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -420,11 +420,11 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	u->data = malloc(siz);
 	if (u->data == NULL) {
 		FREE_ALL_MPIS;
-		gnutls_free_datum( m);
-		gnutls_free_datum( e);
-		gnutls_free_datum( d);
-		gnutls_free_datum( p);
-		gnutls_free_datum( q);
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
+		_gnutls_free_datum( d);
+		_gnutls_free_datum( p);
+		_gnutls_free_datum( q);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 

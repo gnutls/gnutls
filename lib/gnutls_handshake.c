@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -2389,7 +2389,6 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		/* if it is defined but had no credentials 
 		 */
 		if (_gnutls_get_kx_cred(session, kx, NULL) == NULL) {
-fprintf(stderr, "HERE\n");
 			keep = 1;
 		} else
 		/* If there was no credentials to use with the specified
@@ -2398,14 +2397,12 @@ fprintf(stderr, "HERE\n");
 		if (_gnutls_map_kx_get_cred(kx, server) == GNUTLS_CRD_CERTIFICATE) {
 			keep = 1;	/* do not keep */
 
-fprintf(stderr, "THERE %d\n", kx);
 			if (x509_cred != NULL) {
 				if (server) {
 					/* here we check if the KX algorithm 
 					 * is compatible with the certificate.
 					 */
 					for (j = 0; j < alg_size; j++) {
-fprintf(stderr, "ALG %d\n", alg[j]);
 
 						if (alg[j] == kx) {
 							keep = 0;

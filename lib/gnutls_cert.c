@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ *  Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -50,8 +50,8 @@ void _gnutls_free_cert(gnutls_cert cert)
 		_gnutls_mpi_release(&cert.params[i]);
 	}
 
-	gnutls_free_datum(&cert.signature);
-	gnutls_free_datum(&cert.raw);
+	_gnutls_free_datum(&cert.signature);
+	_gnutls_free_datum(&cert.raw);
 
 	return;
 }
@@ -87,7 +87,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 	}
 
 	gnutls_free( sc->x509_ca_list);
-	gnutls_free_datum( &sc->keyring);
+	_gnutls_free_datum( &sc->keyring);
 
 	for (i = 0; i < sc->ncerts; i++) {
 		_gnutls_free_private_key(sc->pkey[i]);

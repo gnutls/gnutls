@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -167,7 +167,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 
 	*data = gnutls_realloc_fast(*data, data_size + signature.size + 2);
 	if (*data == NULL) {
-		gnutls_free_datum(&signature);
+		_gnutls_free_datum(&signature);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -175,7 +175,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	_gnutls_write_datum16(&(*data)[data_size], signature);
 	data_size += signature.size + 2;
 
-	gnutls_free_datum(&signature);
+	_gnutls_free_datum(&signature);
 
 	return data_size;
 }

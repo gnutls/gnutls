@@ -87,7 +87,7 @@ int _gnutls_encrypt(gnutls_session session, const char* headers, size_t headers_
 		ciphertext_size - headers_size, comp, type, random_pad);
 
 	if (free_comp)
-		gnutls_free_datum(&comp);
+		_gnutls_free_datum(&comp);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -140,14 +140,14 @@ int _gnutls_decrypt(gnutls_session session, char *ciphertext,
 		
 		if (gtxt.size > data_size) {
 			gnutls_assert();
-			gnutls_free_datum( &gtxt);
+			_gnutls_free_datum( &gtxt);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		
 		memcpy( data, gtxt.data, gtxt.size);
 		ret = gtxt.size;
 
-		gnutls_free_datum( &gtxt);
+		_gnutls_free_datum( &gtxt);
 	}
 	
 	return ret;

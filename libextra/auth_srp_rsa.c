@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -127,7 +127,7 @@ int apr_cert_list_length;
 
 	*data = gnutls_realloc_fast(*data, data_size + signature.size + 2);
 	if (*data == NULL) {
-		gnutls_free_datum(&signature);
+		_gnutls_free_datum(&signature);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -135,7 +135,7 @@ int apr_cert_list_length;
 	_gnutls_write_datum16(&(*data)[data_size], signature);
 	data_size += signature.size + 2;
 
-	gnutls_free_datum(&signature);
+	_gnutls_free_datum(&signature);
 
 	return data_size;
 

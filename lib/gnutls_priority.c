@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *

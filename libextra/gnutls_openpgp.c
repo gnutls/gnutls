@@ -444,7 +444,7 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
         pkey->pk_algorithm = GNUTLS_PK_DSA;
     else if( is_RSA(pke_algo) )
         pkey->pk_algorithm = GNUTLS_PK_RSA;
-    rc = gnutls_set_datum( &pkey->raw, raw_key->data, raw_key->size );
+    rc = _gnutls_set_datum( &pkey->raw, raw_key->data, raw_key->size );
     if( rc < 0 ) {
         release_mpi_array( pkey->params, i );
         rc = GNUTLS_E_MEMORY_ERROR;
@@ -485,7 +485,7 @@ _gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, gnutls_datum raw )
     if( !pkt )
         rc = GNUTLS_E_INTERNAL_ERROR;
     if( !rc )
-        rc = gnutls_set_datum( &cert->raw, raw.data, raw.size );
+        rc = _gnutls_set_datum( &cert->raw, raw.data, raw.size );
     if( !rc )
         rc = openpgp_pk_to_gnutls_cert( cert, pkt->pkt.public_key );
 
@@ -623,8 +623,11 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
             int n = res->ncerts;
             cdkPKT_public_key *pk = pkt->pkt.public_key;
             res->cert_list_length[n] = 1;
-            gnutls_set_datum( &res->cert_list[n][0].raw,
-                              cert->data, cert->size );
+            if (_gnutls_set_datum( &res->cert_list[n][0].raw,
+                              cert->data, cert->size ) < 0) {
+                 gnutls_assert();
+                 return GNUTLS_E_MEMORY_ERROR;
+            }
             openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
             i++;
         }
@@ -643,10 +646,14 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
         return GNUTLS_E_MEMORY_ERROR;   
     }
     /* ncerts has been incremented before */
-    gnutls_set_datum( &raw, key->data, key->size );
-    rc =_gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], &raw );
-    gnutls_free_datum(&raw);
-  
+    rc = _gnutls_set_datum( &raw, key->data, key->size );
+    if (rc < 0) {
+    	gnutls_assert();
+    	return rc;
+    }
+    rc = _gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], &raw );
+    _gnutls_free_datum(&raw);
+
 leave:
     cdk_kbnode_release( knode );
   

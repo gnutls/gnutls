@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -437,11 +437,16 @@ int _gnutls_get_rnd_srp_params(gnutls_datum *g, gnutls_datum* p, int bits)
 	i = 0;
 	do {
 		if (_gnutls_dh_default_params[i].bits == bits) {
-			gnutls_set_datum( p, _gnutls_dh_default_params[i].prime.data,
-				_gnutls_dh_default_params[i].prime.size);
+			if (_gnutls_set_datum( p, _gnutls_dh_default_params[i].prime.data,
+				_gnutls_dh_default_params[i].prime.size) < 0) {
+				return GNUTLS_E_MEMORY_ERROR;
+			}
 
-			gnutls_set_datum( g, _gnutls_dh_default_params[i].generator.data,
-				_gnutls_dh_default_params[i].generator.size);
+			if (_gnutls_set_datum( g, _gnutls_dh_default_params[i].generator.data,
+				_gnutls_dh_default_params[i].generator.size) < 0) {
+				_gnutls_free_datum( p);
+				return GNUTLS_E_MEMORY_ERROR;
+			}
 
 			break;
 		}
@@ -450,8 +455,8 @@ int _gnutls_get_rnd_srp_params(gnutls_datum *g, gnutls_datum* p, int bits)
 
 	if (g->data == NULL || p->data == NULL) {
 		gnutls_assert();
-		gnutls_free_datum(g);
-		gnutls_free_datum(p);
+		_gnutls_free_datum(g);
+		_gnutls_free_datum(p);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -585,11 +590,11 @@ int gnutls_dh_params_set(gnutls_dh_params dh_params, gnutls_datum prime,
 	sprime->generator.data = NULL;
 	sprime->prime.data = NULL;
 
-	if (gnutls_set_datum(&sprime->prime, prime.data, prime.size) < 0) {
+	if (_gnutls_set_datum(&sprime->prime, prime.data, prime.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	if (gnutls_set_datum
+	if (_gnutls_set_datum
 	    (&sprime->generator, generator.data, generator.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

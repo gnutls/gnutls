@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -118,7 +118,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 
 	pos = 0;
 	if (hash_size > 0) {
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.client_write_mac_secret,
 		     &key_block[pos], hash_size) < 0) {
 			gnutls_free(key_block);
@@ -126,7 +126,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 		}
 		pos += hash_size;
 
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.server_write_mac_secret,
 		     &key_block[pos], hash_size) < 0) {
 			gnutls_free(key_block);
@@ -229,7 +229,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 			pos += key_size;
 		}
 
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.client_write_key,
 		     client_write_key, client_write_key_size) < 0) {
 			gnutls_free(key_block);
@@ -242,7 +242,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 				 _gnutls_bin2hex(client_write_key,
 						 client_write_key_size));
 
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.server_write_key,
 		     server_write_key, server_write_key_size) < 0) {
 			gnutls_free(key_block);
@@ -266,7 +266,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 	/* IV generation in export and non export ciphers.
 	 */
 	if (IV_size > 0 && export_flag == 0) {
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.client_write_IV, &key_block[pos],
 		     IV_size) < 0) {
 			gnutls_free(key_block);
@@ -274,7 +274,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 		}
 		pos += IV_size;
 
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.server_write_IV, &key_block[pos],
 		     IV_size) < 0) {
 			gnutls_free(key_block);
@@ -322,14 +322,14 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 			return ret;
 		}
 
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.client_write_IV, iv_block,
 		     IV_size) < 0) {
 			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		if (gnutls_sset_datum
+		if (_gnutls_sset_datum
 		    (&session->cipher_specs.server_write_IV,
 		     &iv_block[IV_size], IV_size) < 0) {
 			gnutls_free(key_block);
@@ -514,7 +514,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 	/* Free all the previous keys/ sessions etc.
 	 */
 	if (session->connection_state.read_mac_secret.data != NULL)
-		gnutls_sfree_datum(&session->connection_state.
+		_gnutls_free_datum(&session->connection_state.
 				   read_mac_secret);
 
 	if (session->connection_state.read_cipher_state != NULL)
@@ -556,12 +556,15 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 		 * session.
 		 */
 		if (mac_size > 0) {
-			gnutls_sset_datum(&session->connection_state.
+			if (_gnutls_sset_datum(&session->connection_state.
 					  read_mac_secret,
 					  session->cipher_specs.
 					  client_write_mac_secret.data,
 					  session->cipher_specs.
-					  client_write_mac_secret.size);
+					  client_write_mac_secret.size) < 0) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
 
 		}
 
@@ -588,12 +591,15 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 		/* copy mac secret to connection session
 		 */
 		if (mac_size > 0) {
-			gnutls_sset_datum(&session->connection_state.
+			if (_gnutls_sset_datum(&session->connection_state.
 					  read_mac_secret,
 					  session->cipher_specs.
 					  server_write_mac_secret.data,
 					  session->cipher_specs.
-					  server_write_mac_secret.size);
+					  server_write_mac_secret.size) < 0) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
 		}
 
 		break;
@@ -692,7 +698,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 	/* Free all the previous keys/ sessions etc.
 	 */
 	if (session->connection_state.write_mac_secret.data != NULL)
-		gnutls_sfree_datum(&session->connection_state.
+		_gnutls_free_datum(&session->connection_state.
 				   write_mac_secret);
 
 	if (session->connection_state.write_cipher_state != NULL)
@@ -735,12 +741,15 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 		 * session.
 		 */
 		if (mac_size > 0) {
-			gnutls_sset_datum(&session->connection_state.
+			if (_gnutls_sset_datum(&session->connection_state.
 					  write_mac_secret,
 					  session->cipher_specs.
 					  server_write_mac_secret.data,
 					  session->cipher_specs.
-					  server_write_mac_secret.size);
+					  server_write_mac_secret.size) < 0) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
 
 		}
 
@@ -767,12 +776,15 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 		/* copy mac secret to connection session
 		 */
 		if (mac_size > 0) {
-			gnutls_sset_datum(&session->connection_state.
+			if (_gnutls_sset_datum(&session->connection_state.
 					  write_mac_secret,
 					  session->cipher_specs.
 					  client_write_mac_secret.data,
 					  session->cipher_specs.
-					  client_write_mac_secret.size);
+					  client_write_mac_secret.size) < 0) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
 		}
 
 		break;

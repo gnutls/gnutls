@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -150,7 +150,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 
 	asn1_delete_structure(&pkey_asn);
 
-	if (gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
+	if (_gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
 		_gnutls_mpi_release(&pkey->params[0]);
 		_gnutls_mpi_release(&pkey->params[1]);
 		_gnutls_mpi_release(&pkey->params[2]);
@@ -248,7 +248,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 
 	asn1_delete_structure(&dsa_asn);
 
-	if (gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
+	if (_gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
 		_gnutls_mpi_release(&pkey->params[0]);
 		_gnutls_mpi_release(&pkey->params[1]);
 		_gnutls_mpi_release(&pkey->params[2]);
@@ -271,7 +271,7 @@ void _gnutls_free_private_key(gnutls_private_key pkey)
 		_gnutls_mpi_release(&pkey.params[i]);
 	}
 
-	gnutls_free_datum(&pkey.raw);
+	_gnutls_free_datum(&pkey.raw);
 
 	return;
 }

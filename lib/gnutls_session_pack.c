@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -395,7 +395,7 @@ uint32 size;
 			size = _gnutls_read_uint32( &packed_session->data[ pos]);
 			pos += sizeof(uint32);
 
-			ret = gnutls_set_datum( &info->raw_certificate_list[i], &packed_session->data[ pos], size);
+			ret = _gnutls_set_datum( &info->raw_certificate_list[i], &packed_session->data[ pos], size);
 			pos += size;
 				
 			if (ret < 0) {
@@ -408,7 +408,7 @@ uint32 size;
 	
 	clear:
 		for (j=0;j<i;j++)
-			gnutls_free_datum( &info->raw_certificate_list[j]);
+			_gnutls_free_datum( &info->raw_certificate_list[j]);
 
 		gnutls_free( info->raw_certificate_list);
 		return GNUTLS_E_MEMORY_ERROR;

@@ -75,7 +75,7 @@ char random[2*TLS_RANDOM_SIZE];
 			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE, 
 			       session->security_parameters.master_secret); 
 	}
-	gnutls_sfree_datum(&PREMASTER);
+	_gnutls_free_datum(&PREMASTER);
 	
 	if (ret<0) return ret;
 	

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -251,8 +251,8 @@ void _gnutls_deinit(gnutls_session session)
 
 	_gnutls_handshake_io_buffer_clear( session);
 
-	gnutls_sfree_datum(&session->connection_state.read_mac_secret);
-	gnutls_sfree_datum(&session->connection_state.write_mac_secret);
+	_gnutls_free_datum(&session->connection_state.read_mac_secret);
+	_gnutls_free_datum(&session->connection_state.write_mac_secret);
 
 	_gnutls_buffer_clear( &session->internals.handshake_hash_buffer);
 	_gnutls_buffer_clear( &session->internals.handshake_data_buffer);
@@ -272,12 +272,12 @@ void _gnutls_deinit(gnutls_session session)
 	if (session->connection_state.write_compression_state != NULL)
 		_gnutls_comp_deinit(session->connection_state.write_compression_state, 0);
 
-	gnutls_sfree_datum( &session->cipher_specs.server_write_mac_secret);
-	gnutls_sfree_datum( &session->cipher_specs.client_write_mac_secret);
-	gnutls_sfree_datum( &session->cipher_specs.server_write_IV);
-	gnutls_sfree_datum( &session->cipher_specs.client_write_IV);
-	gnutls_sfree_datum( &session->cipher_specs.server_write_key);
-	gnutls_sfree_datum( &session->cipher_specs.client_write_key);
+	_gnutls_free_datum( &session->cipher_specs.server_write_mac_secret);
+	_gnutls_free_datum( &session->cipher_specs.client_write_mac_secret);
+	_gnutls_free_datum( &session->cipher_specs.server_write_IV);
+	_gnutls_free_datum( &session->cipher_specs.client_write_IV);
+	_gnutls_free_datum( &session->cipher_specs.server_write_key);
+	_gnutls_free_datum( &session->cipher_specs.client_write_key);
 
 	if (session->key != NULL) {
 		_gnutls_mpi_release(&session->key->KEY);

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -267,7 +267,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
-	if (gnutls_sset_datum(plaintext, &edata[i], esize - i) < 0) {
+	if (_gnutls_sset_datum(plaintext, &edata[i], esize - i) < 0) {
 		gnutls_assert();
 		gnutls_free(edata);
 		return GNUTLS_E_MEMORY_ERROR;
@@ -293,17 +293,17 @@ int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertex
 
 	if (plain.size != vdata->size) {
 		gnutls_assert();
-		gnutls_sfree_datum( &plain);
+		_gnutls_free_datum( &plain);
 		return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 	}
 
 	if ( memcmp(plain.data, vdata->data, plain.size)!=0) {
 		gnutls_assert();
-		gnutls_sfree_datum( &plain);
+		_gnutls_free_datum( &plain);
 		return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 	}
 
-	gnutls_sfree_datum( &plain);
+	_gnutls_free_datum( &plain);
 
 	return 0; /* ok */
 }

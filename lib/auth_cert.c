@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -76,7 +76,7 @@ int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
 	for (i = 0; i < ncerts; i++) {
 		if (cert->raw.size > 0) {
 			ret =
-			    gnutls_set_datum(&info->
+			    _gnutls_set_datum(&info->
 					     raw_certificate_list[i],
 					     cert[i].raw.data,
 					     cert[i].raw.size);
@@ -93,7 +93,7 @@ int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
       clear:
 
 	for (j = 0; j < i; j++)
-		gnutls_free_datum(&info->raw_certificate_list[j]);
+		_gnutls_free_datum(&info->raw_certificate_list[j]);
 
 	gnutls_free(info->raw_certificate_list);
 	info->raw_certificate_list = NULL;
@@ -904,7 +904,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 	if (peer_certificate_list_size == 0) {
 		gnutls_assert();
-		gnutls_free_datum( &akey);
+		_gnutls_free_datum( &akey);
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
@@ -920,7 +920,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 	if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
 		gnutls_assert();
-		gnutls_free_datum( &akey);
+		_gnutls_free_datum( &akey);
 		CLEAR_CERTS;
 		gnutls_afree(peer_certificate_list);
 		return GNUTLS_E_INIT_LIBEXTRA;
@@ -930,12 +930,12 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 	     _E_gnutls_openpgp_cert2gnutls_cert(&peer_certificate_list[0],
 					      tmp)) < 0) {
 		gnutls_assert();
-		gnutls_free_datum( &akey);
+		_gnutls_free_datum( &akey);
 		CLEAR_CERTS;
 		gnutls_afree(peer_certificate_list);
 		return ret;
 	}
-	gnutls_free_datum( &akey);
+	_gnutls_free_datum( &akey);
 
 	if ((ret =
 	     _gnutls_copy_certificate_auth_info(info,
@@ -1118,7 +1118,7 @@ int _gnutls_gen_cert_client_cert_vrfy(gnutls_session session, opaque ** data)
 
 	*data = gnutls_malloc(signature.size + 2);
 	if (*data == NULL) {
-		gnutls_free_datum(&signature);
+		_gnutls_free_datum(&signature);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	size = signature.size;
@@ -1126,7 +1126,7 @@ int _gnutls_gen_cert_client_cert_vrfy(gnutls_session session, opaque ** data)
 
 	memcpy(&(*data)[2], signature.data, size);
 
-	gnutls_free_datum(&signature);
+	_gnutls_free_datum(&signature);
 
 	return size + 2;
 }

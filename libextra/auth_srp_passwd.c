@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -84,7 +84,7 @@ int indx;
 	/* now go for verifier */
 	p = rindex( str, ':'); /* we have verifier */
 	if (p==NULL) {
-		gnutls_free_datum(&entry->salt);
+		_gnutls_free_datum(&entry->salt);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	
@@ -95,7 +95,7 @@ int indx;
 	ret = _gnutls_sbase64_decode( p, len, &verifier);
 	if (ret <= 0) {
 		gnutls_assert();
-		gnutls_free_datum(&entry->salt);
+		_gnutls_free_datum(&entry->salt);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
@@ -108,7 +108,7 @@ int indx;
 
 	entry->username = gnutls_strdup(str);
 	if (entry->username==NULL) {
-		gnutls_free_datum( &entry->salt);
+		_gnutls_free_datum( &entry->salt);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -152,7 +152,7 @@ int ret;
 	/* now go for n - modulo */
 	p = rindex( str, ':'); /* we have n */
 	if (p==NULL) {
-		gnutls_free_datum( &entry->g);
+		_gnutls_free_datum( &entry->g);
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
@@ -165,7 +165,7 @@ int ret;
 
 	if (ret < 0) {
 		gnutls_assert();
-		gnutls_free_datum( &entry->g);
+		_gnutls_free_datum( &entry->g);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	
@@ -357,10 +357,10 @@ SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 }
 
 void _gnutls_srp_clear_pwd_entry( SRP_PWD_ENTRY * entry) {
-	gnutls_free_datum(&entry->v);
-	gnutls_free_datum(&entry->g);
-	gnutls_free_datum(&entry->n);
-	gnutls_free_datum(&entry->salt);
+	_gnutls_free_datum(&entry->v);
+	_gnutls_free_datum(&entry->g);
+	_gnutls_free_datum(&entry->n);
+	_gnutls_free_datum(&entry->salt);
 
 	gnutls_free(entry->username);
 	gnutls_free(entry);

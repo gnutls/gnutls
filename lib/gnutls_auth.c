@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -224,7 +224,7 @@ void _gnutls_free_auth_info( gnutls_session session) {
 
 			if (info==NULL) break;
 			for (i=0;i<info->ncerts;i++) {
-				gnutls_free_datum( &info->raw_certificate_list[i]);
+				_gnutls_free_datum( &info->raw_certificate_list[i]);
 			}
 	
 			gnutls_free( info->raw_certificate_list);
