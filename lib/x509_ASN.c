@@ -1,6 +1,5 @@
-
 /* A Bison parser, made from x509_ASN.y
-   by GNU bison 1.30.  */
+   by GNU bison 1.32.  */
 
 #define YYBISON 1  /* Identify Bison output.  */
 
@@ -44,9 +43,9 @@
 
 #line 30 "x509_ASN.y"
  
-#include <gnutls_int.h>
+#include <defines.h>
 #include <x509_asn1.h>
-#include <gnutls_errors.h>
+#include <gnutls_errors_int.h>
 
 FILE *file_asn1;         /* Pointer to file to parse */
 extern int parse_mode;   /* PARSE_MODE_CHECK  = only syntax check
@@ -60,12 +59,17 @@ int yylex(void);
 
 
 #line 48 "x509_ASN.y"
+#ifndef YYSTYPE
 typedef union {
   unsigned int constant;
   char str[129];
   node_asn* node;
-} YYSTYPE;
-#include <stdio.h>
+} yystype;
+# define YYSTYPE yystype
+#endif
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
 
 
 
@@ -111,7 +115,7 @@ static const char yytranslate[] =
       36,    37,    38,    39
 };
 
-#if YYDEBUG != 0
+#if YYDEBUG
 static const short yyprhs[] =
 {
        0,     0,     1,     4,     6,     9,    12,    14,    16,    18,
@@ -163,7 +167,7 @@ static const short yyrhs[] =
 
 #endif
 
-#if YYDEBUG != 0
+#if YYDEBUG
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
@@ -181,7 +185,7 @@ static const short yyrline[] =
 #endif
 
 
-#if YYDEBUG != 0 || defined YYERROR_VERBOSE
+#if (YYDEBUG) || defined YYERROR_VERBOSE
 
 /* YYTNAME[TOKEN_NUM] -- String name of the token TOKEN_NUM. */
 static const char *const yytname[] =
@@ -357,7 +361,7 @@ static const short yycheck[] =
 #line 3 "/usr/share/bison/bison.simple"
 
 /* Skeleton output parser for bison,
-   Copyright 1984, 1989, 1990, 2000, 2001 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -384,58 +388,120 @@ static const short yycheck[] =
    It was written by Richard Stallman by simplifying the hairy parser
    used when %semantic_parser is specified.  */
 
-#ifndef YYSTACK_USE_ALLOCA
-# ifdef alloca
-#  define YYSTACK_USE_ALLOCA 1
-# else /* alloca not defined */
-#  ifdef __GNUC__
-#   define YYSTACK_USE_ALLOCA 1
-#   define alloca __builtin_alloca
-#  else /* not GNU C.  */
-#   if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi) || (defined (__sun) && defined (__i386))
-#    define YYSTACK_USE_ALLOCA 1
-#    include <alloca.h>
-#   else /* not sparc */
-     /* We think this test detects Watcom and Microsoft C.  */
-     /* This used to test MSDOS, but that is a bad idea since that
-	symbol is in the user namespace.  */
-#    if (defined (_MSDOS) || defined (_MSDOS_)) && !defined (__TURBOC__)
-#     if 0
-       /* No need for malloc.h, which pollutes the namespace; instead,
-	  just don't use alloca.  */
-#      include <malloc.h>
-#     endif
-#    else /* not MSDOS, or __TURBOC__ */
-#     if defined(_AIX)
-       /* I don't know what this was needed for, but it pollutes the
-	  namespace.  So I turned it off.  rms, 2 May 1997.  */
-       /* #include <malloc.h>  */
- #pragma alloca
-#      define YYSTACK_USE_ALLOCA 1
-#     else /* not MSDOS, or __TURBOC__, or _AIX */
-#      if 0
-	/* haible@ilog.fr says this works for HPUX 9.05 and up, and on
-	   HPUX 10.  Eventually we can turn this on.  */
-#       ifdef __hpux
-#        define YYSTACK_USE_ALLOCA 1
-#        define alloca __builtin_alloca
-#  	endif /* __hpux */
-#      endif
-#     endif /* not _AIX */
-#    endif /* not MSDOS, or __TURBOC__ */
-#   endif /* not sparc */
-#  endif /* not GNU C */
-# endif /* alloca not defined */
-#endif /* YYSTACK_USE_ALLOCA not defined */
+/* All symbols defined below should begin with yy or YY, to avoid
+   infringing on user name space.  This should be done even for local
+   variables, as they might otherwise be expanded by user macros.
+   There are some unavoidable exceptions within include files to
+   define necessary library symbols; they are noted "INFRINGES ON
+   USER NAME SPACE" below.  */
 
-#ifndef YYSTACK_USE_ALLOCA
-# define YYSTACK_USE_ALLOCA 0
+#ifdef __cplusplus
+# define YYSTD(x) std::x
+#else
+# define YYSTD(x) x
 #endif
 
-#if YYSTACK_USE_ALLOCA
-# define YYSTACK_ALLOC alloca
-#else
-# define YYSTACK_ALLOC malloc
+#if ! defined (yyoverflow) || defined (YYERROR_VERBOSE)
+
+/* The parser invokes alloca or malloc; define the necessary symbols.  */
+
+# if YYSTACK_USE_ALLOCA
+#  define YYSTACK_ALLOC alloca
+#  define YYSIZE_T YYSTD (size_t)
+# else
+#  ifndef YYSTACK_USE_ALLOCA
+#   if defined (alloca) || defined (_ALLOCA_H)
+#    define YYSTACK_ALLOC alloca
+#    define YYSIZE_T YYSTD (size_t)
+#   else
+#    ifdef __GNUC__
+#     define YYSTACK_ALLOC __builtin_alloca
+#    endif
+#   endif
+#  endif
+# endif
+
+# ifdef YYSTACK_ALLOC
+   /* Pacify GCC's `empty if-body' warning. */
+#  define YYSTACK_FREE(Ptr) do { /* empty */; } while (0)
+# else
+#  ifdef __cplusplus
+#   include <cstdlib> /* INFRINGES ON USER NAME SPACE */
+#   define YYSIZE_T std::size_t
+#  else
+#   ifdef __STDC__
+#    include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
+#    define YYSIZE_T size_t
+#   endif
+#  endif
+#  define YYSTACK_ALLOC YYSTD (malloc)
+#  define YYSTACK_FREE YYSTD (free)
+# endif
+
+/* A type that is properly aligned for any stack member.  */
+union yyalloc
+{
+  short yyss;
+  YYSTYPE yyvs;
+# if YYLSP_NEEDED
+  YYLTYPE yyls;
+# endif
+};
+
+/* The size of the maximum gap between one aligned stack and the next.  */
+# define YYSTACK_GAP_MAX (sizeof (union yyalloc) - 1)
+
+/* The size of an array large to enough to hold all stacks, each with
+   N elements.  */
+# if YYLSP_NEEDED
+#  define YYSTACK_BYTES(N) \
+     ((N) * (sizeof (short) + sizeof (YYSTYPE) + sizeof (YYLTYPE))	\
+      + 2 * YYSTACK_GAP_MAX)
+# else
+#  define YYSTACK_BYTES(N) \
+     ((N) * (sizeof (short) + sizeof (YYSTYPE))				\
+      + YYSTACK_GAP_MAX)
+# endif
+
+/* Relocate the TYPE STACK from its old location to the new one.  The
+   local variables YYSIZE and YYSTACKSIZE give the old and new number of
+   elements in the stack, and YYPTR gives the new location of the
+   stack.  Advance YYPTR to a properly aligned location for the next
+   stack.  */
+# define YYSTACK_RELOCATE(Type, Stack)					\
+    do									\
+      {									\
+	YYSIZE_T yynewbytes;						\
+	yymemcpy ((char *) yyptr, (char *) (Stack),			\
+		  yysize * (YYSIZE_T) sizeof (Type));			\
+	Stack = &yyptr->Stack;						\
+	yynewbytes = yystacksize * sizeof (Type) + YYSTACK_GAP_MAX;	\
+	yyptr += yynewbytes / sizeof (*yyptr);				\
+      }									\
+    while (0)
+
+#endif /* ! defined (yyoverflow) || defined (YYERROR_VERBOSE) */
+
+
+#if ! defined (YYSIZE_T) && defined (__SIZE_TYPE__)
+# define YYSIZE_T __SIZE_TYPE__
+#endif
+#if ! defined (YYSIZE_T) && defined (size_t)
+# define YYSIZE_T size_t
+#endif
+#if ! defined (YYSIZE_T)
+# ifdef __cplusplus
+#  include <cstddef> /* INFRINGES ON USER NAME SPACE */
+#  define YYSIZE_T std::size_t
+# else
+#  ifdef __STDC__
+#   include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+#   define YYSIZE_T size_t
+#  endif
+# endif
+#endif
+#if ! defined (YYSIZE_T)
+# define YYSIZE_T unsigned int
 #endif
 
 #define yyerrok		(yyerrstatus = 0)
@@ -508,10 +574,20 @@ while (0)
 
 /* Enable debugging if requested.  */
 #if YYDEBUG
+
+# ifndef YYFPRINTF
+#  ifdef __cplusplus
+#   include <cstdio>  /* INFRINGES ON USER NAME SPACE */
+#  else
+#   include <stdio.h> /* INFRINGES ON USER NAME SPACE */
+#  endif
+#  define YYFPRINTF YYSTD (fprintf)
+# endif
+
 # define YYDPRINTF(Args)			\
 do {						\
   if (yydebug)					\
-    fprintf Args;				\
+    YYFPRINTF Args;				\
 } while (0)
 /* Nonzero means print parse trace. [The following comment makes no
    sense to me.  Could someone clarify it?  --akim] Since this is
@@ -528,7 +604,12 @@ int yydebug;
 #endif
 
 /* YYMAXDEPTH -- maximum size the stacks can grow to (effective only
-   if the built-in stack extension method is used).  */
+   if the built-in stack extension method is used).
+
+   Do not make this value too large; the results are undefined if
+   SIZE_MAX < YYSTACK_BYTES (YYMAXDEPTH)
+   evaluated with infinite-precision integer arithmetic.  */
+
 #if YYMAXDEPTH == 0
 # undef YYMAXDEPTH
 #endif
@@ -537,38 +618,86 @@ int yydebug;
 # define YYMAXDEPTH 10000
 #endif
 
-/* Define __yy_memcpy.  Note that the size argument
-   should be passed with type unsigned int, because that is what the non-GCC
-   definitions require.  With GCC, __builtin_memcpy takes an arg
-   of type size_t, but it can handle unsigned int.  */
-
-#if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
-# define __yy_memcpy(To, From, Count)	__builtin_memcpy (To, From, Count)
-#else				/* not GNU C or C++ */
+#if ! defined (yyoverflow) && ! defined (yymemcpy)
+# if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
+#  define yymemcpy __builtin_memcpy
+# else				/* not GNU C or C++ */
 
 /* This is the most reliable way to avoid incompatibilities
    in available built-in functions on various systems.  */
 static void
-# ifndef __cplusplus
-__yy_memcpy (to, from, count)
-     char *to;
-     const char *from;
-     unsigned int count;
-# else /* __cplusplus */
-__yy_memcpy (char *to, const char *from, unsigned int count)
-# endif
+#  if defined (__STDC__) || defined (__cplusplus)
+yymemcpy (char *yyto, const char *yyfrom, YYSIZE_T yycount)
+#  else
+yymemcpy (yyto, yyfrom, yycount)
+     char *yyto;
+     const char *yyfrom;
+     YYSIZE_T yycount;
+#  endif
 {
-  register const char *f = from;
-  register char *t = to;
-  register int i = count;
+  register const char *yyf = yyfrom;
+  register char *yyt = yyto;
+  register YYSIZE_T yyi = yycount;
 
-  while (i-- > 0)
-    *t++ = *f++;
+  while (yyi-- != 0)
+    *yyt++ = *yyf++;
 }
+# endif
+#endif
 
+#ifdef YYERROR_VERBOSE
+
+# ifndef yystrlen
+#  if defined (__GLIBC__) && defined (_STRING_H)
+#   define yystrlen strlen
+#  else
+/* Return the length of YYSTR.  */
+static YYSIZE_T
+#   if defined (__STDC__) || defined (__cplusplus)
+yystrlen (const char *yystr)
+#   else
+yystrlen (yystr)
+     const char *yystr;
+#   endif
+{
+  register const char *yys = yystr;
+
+  while (*yys++ != '\0')
+    continue;
+
+  return yys - yystr - 1;
+}
+#  endif
+# endif
+
+# ifndef yystpcpy
+#  if defined (__GLIBC__) && defined (_STRING_H) && defined (_GNU_SOURCE)
+#   define yystpcpy stpcpy
+#  else
+/* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
+   YYDEST.  */
+static char *
+#   if defined (__STDC__) || defined (__cplusplus)
+yystpcpy (char *yydest, const char *yysrc)
+#   else
+yystpcpy (yydest, yysrc)
+     char *yydest;
+     const char *yysrc;
+#   endif
+{
+  register char *yyd = yydest;
+  register const char *yys = yysrc;
+
+  while ((*yyd++ = *yys++) != '\0')
+    continue;
+
+  return yyd - 1;
+}
+#  endif
+# endif
 #endif
 
-#line 216 "/usr/share/bison/bison.simple"
+#line 341 "/usr/share/bison/bison.simple"
 
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
@@ -602,7 +731,7 @@ int yyparse (void);
 /* YY_DECL_VARIABLES -- depending whether we use a pure parser,
    variables are global, or local to YYPARSE.  */
 
-#define _YY_DECL_VARIABLES				\
+#define YY_DECL_NON_LSP_VARIABLES			\
 /* The lookahead symbol.  */				\
 int yychar;						\
 							\
@@ -614,13 +743,13 @@ int yynerrs;
 
 #if YYLSP_NEEDED
 # define YY_DECL_VARIABLES			\
-_YY_DECL_VARIABLES				\
+YY_DECL_NON_LSP_VARIABLES			\
 						\
 /* Location data for the lookahead symbol.  */	\
 YYLTYPE yylloc;
 #else
 # define YY_DECL_VARIABLES			\
-_YY_DECL_VARIABLES
+YY_DECL_NON_LSP_VARIABLES
 #endif
 
 
@@ -641,6 +770,7 @@ yyparse (YYPARSE_PARAM_ARG)
 
   register int yystate;
   register int yyn;
+  int yyresult;
   /* Number of tokens to shift before error messages enabled.  */
   int yyerrstatus;
   /* Lookahead token as an internal (translated) token number.  */
@@ -648,7 +778,7 @@ yyparse (YYPARSE_PARAM_ARG)
 
   /* Three stacks and their tools:
      `yyss': related to states,
-     `yysv': related to semantic values,
+     `yyvs': related to semantic values,
      `yyls': related to locations.
 
      Refer to the stacks thru separate pointers, to allow yyoverflow
@@ -677,16 +807,15 @@ yyparse (YYPARSE_PARAM_ARG)
 # define YYPOPSTACK   (yyvsp--, yyssp--)
 #endif
 
-  int yystacksize = YYINITDEPTH;
-  int yyfree_stacks = 0;
+  YYSIZE_T yystacksize = YYINITDEPTH;
 
 
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
-# if YYLSP_NEEDED
+#if YYLSP_NEEDED
   YYLTYPE yyloc;
-# endif
+#endif
 
   /* When reducing, the number of symbols on the RHS of the reduced
      rule. */
@@ -725,81 +854,71 @@ yyparse (YYPARSE_PARAM_ARG)
 
   if (yyssp >= yyss + yystacksize - 1)
     {
-      /* Give user a chance to reallocate the stack. Use copies of
-	 these so that the &'s don't force the real ones into memory.
-	 */
-      YYSTYPE *yyvs1 = yyvs;
-      short *yyss1 = yyss;
-#if YYLSP_NEEDED
-      YYLTYPE *yyls1 = yyls;
-#endif
-
       /* Get the current used size of the three stacks, in elements.  */
-      int size = yyssp - yyss + 1;
+      YYSIZE_T yysize = yyssp - yyss + 1;
 
 #ifdef yyoverflow
-      /* Each stack pointer address is followed by the size of the
-	 data in use in that stack, in bytes.  */
-# if YYLSP_NEEDED
-      /* This used to be a conditional around just the two extra args,
-	 but that might be undefined if yyoverflow is a macro.  */
-      yyoverflow ("parser stack overflow",
-		  &yyss1, size * sizeof (*yyssp),
-		  &yyvs1, size * sizeof (*yyvsp),
-		  &yyls1, size * sizeof (*yylsp),
-		  &yystacksize);
-# else
-      yyoverflow ("parser stack overflow",
-		  &yyss1, size * sizeof (*yyssp),
-		  &yyvs1, size * sizeof (*yyvsp),
-		  &yystacksize);
-# endif
+      {
+	/* Give user a chance to reallocate the stack. Use copies of
+	   these so that the &'s don't force the real ones into
+	   memory.  */
+	YYSTYPE *yyvs1 = yyvs;
+	short *yyss1 = yyss;
 
-      yyss = yyss1; yyvs = yyvs1;
+	/* Each stack pointer address is followed by the size of the
+	   data in use in that stack, in bytes.  */
 # if YYLSP_NEEDED
-      yyls = yyls1;
+	YYLTYPE *yyls1 = yyls;
+	/* This used to be a conditional around just the two extra args,
+	   but that might be undefined if yyoverflow is a macro.  */
+	yyoverflow ("parser stack overflow",
+		    &yyss1, yysize * sizeof (*yyssp),
+		    &yyvs1, yysize * sizeof (*yyvsp),
+		    &yyls1, yysize * sizeof (*yylsp),
+		    &yystacksize);
+	yyls = yyls1;
+# else
+	yyoverflow ("parser stack overflow",
+		    &yyss1, yysize * sizeof (*yyssp),
+		    &yyvs1, yysize * sizeof (*yyvsp),
+		    &yystacksize);
 # endif
+	yyss = yyss1;
+	yyvs = yyvs1;
+      }
 #else /* no yyoverflow */
       /* Extend the stack our own way.  */
       if (yystacksize >= YYMAXDEPTH)
-	{
-	  yyerror ("parser stack overflow");
-	  if (yyfree_stacks)
-	    {
-	      free (yyss);
-	      free (yyvs);
-# if YYLSP_NEEDED
-	      free (yyls);
-# endif
-	    }
-	  return 2;
-	}
+	goto yyoverflowlab;
       yystacksize *= 2;
       if (yystacksize > YYMAXDEPTH)
 	yystacksize = YYMAXDEPTH;
-# if !YYSTACK_USE_ALLOCA
-      yyfree_stacks = 1;
-# endif
-      yyss = (short *) YYSTACK_ALLOC (yystacksize * sizeof (*yyssp));
-      __yy_memcpy ((char *)yyss, (char *)yyss1,
-		   size * (unsigned int) sizeof (*yyssp));
-      yyvs = (YYSTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yyvsp));
-      __yy_memcpy ((char *)yyvs, (char *)yyvs1,
-		   size * (unsigned int) sizeof (*yyvsp));
+
+      {
+	short *yyss1 = yyss;
+	union yyalloc *yyptr =
+	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
+	if (! yyptr)
+	  goto yyoverflowlab;
+	YYSTACK_RELOCATE (short, yyss);
+	YYSTACK_RELOCATE (YYSTYPE, yyvs);
 # if YYLSP_NEEDED
-      yyls = (YYLTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yylsp));
-      __yy_memcpy ((char *)yyls, (char *)yyls1,
-		   size * (unsigned int) sizeof (*yylsp));
+	YYSTACK_RELOCATE (YYLTYPE, yyls);
 # endif
+# undef YYSTACK_RELOCATE
+	if (yyss1 != yyssa)
+	  YYSTACK_FREE (yyss1);
+      }
 #endif /* no yyoverflow */
 
-      yyssp = yyss + size - 1;
-      yyvsp = yyvs + size - 1;
+      yyssp = yyss + yysize - 1;
+      yyvsp = yyvs + yysize - 1;
 #if YYLSP_NEEDED
-      yylsp = yyls + size - 1;
+      yylsp = yyls + yysize - 1;
 #endif
 
-      YYDPRINTF ((stderr, "Stack size increased to %d\n", yystacksize));
+      YYDPRINTF ((stderr, "Stack size increased to %lu\n",
+		  (unsigned long int) yystacksize));
 
       if (yyssp >= yyss + yystacksize - 1)
 	YYABORT;
@@ -854,13 +973,14 @@ yybackup:
 	which are defined only if `YYDEBUG' is set.  */
       if (yydebug)
 	{
-	  fprintf (stderr, "Next token is %d (%s", yychar, yytname[yychar1]);
+	  YYFPRINTF (stderr, "Next token is %d (%s",
+		     yychar, yytname[yychar1]);
 	  /* Give the individual parser a way to print the precise
 	     meaning of a token, for further debugging info.  */
 # ifdef YYPRINT
 	  YYPRINT (stderr, yychar, yylval);
 # endif
-	  fprintf (stderr, ")\n");
+	  YYFPRINTF (stderr, ")\n");
 	}
 #endif
     }
@@ -892,7 +1012,8 @@ yybackup:
     YYACCEPT;
 
   /* Shift the lookahead token.  */
-  YYDPRINTF ((stderr, "Shifting token %d (%s), ", yychar, yytname[yychar1]));
+  YYDPRINTF ((stderr, "Shifting token %d (%s), ",
+	      yychar, yytname[yychar1]));
 
   /* Discard the token being shifted unless it is eof.  */
   if (yychar != YYEOF)
@@ -951,15 +1072,15 @@ yyreduce:
      are defined only if `YYDEBUG' is set.  */
   if (yydebug)
     {
-      int i;
+      int yyi;
 
-      fprintf (stderr, "Reducing via rule %d (line %d), ",
-	       yyn, yyrline[yyn]);
+      YYFPRINTF (stderr, "Reducing via rule %d (line %d), ",
+		 yyn, yyrline[yyn]);
 
       /* Print the symbols being reduced, and their result.  */
-      for (i = yyprhs[yyn]; yyrhs[i] > 0; i++)
-	fprintf (stderr, "%s ", yytname[yyrhs[i]]);
-      fprintf (stderr, " -> %s\n", yytname[yyr1[yyn]]);
+      for (yyi = yyprhs[yyn]; yyrhs[yyi] > 0; yyi++)
+	YYFPRINTF (stderr, "%s ", yytname[yyrhs[yyi]]);
+      YYFPRINTF (stderr, " -> %s\n", yytname[yyr1[yyn]]);
     }
 #endif
 
@@ -967,438 +1088,438 @@ yyreduce:
 
 case 3:
 #line 111 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 4:
 #line 112 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 5:
 #line 115 "x509_ASN.y"
 {strcpy(yyval.str,"-");
-                       strcat(yyval.str,yyvsp[0].str);;
-    break;}
+                       strcat(yyval.str,yyvsp[0].str);}
+    break;
 case 6:
 #line 119 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 7:
 #line 120 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 8:
 #line 123 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 9:
 #line 124 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 10:
 #line 127 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 11:
 #line 128 "x509_ASN.y"
-{strcpy(yyval.str,yyvsp[0].str);;
-    break;}
+{strcpy(yyval.str,yyvsp[0].str);}
+    break;
 case 12:
 #line 131 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_CONSTANT); 
-                                       _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);;
-    break;}
+                                       _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);}
+    break;
 case 13:
 #line 133 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_CONSTANT);
 	                               _asn1_set_name(yyval.node,yyvsp[-3].str); 
-                                       _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);;
-    break;}
+                                       _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);}
+    break;
 case 14:
 #line 138 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 15:
 #line 139 "x509_ASN.y"
 {yyval.node=yyvsp[-2].node;
-                                            _asn1_set_right(_asn1_get_last_right(yyvsp[-2].node),yyvsp[0].node);;
-    break;}
+                                            _asn1_set_right(_asn1_get_last_right(yyvsp[-2].node),yyvsp[0].node);}
+    break;
 case 16:
 #line 143 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_IDENTIFIER);
-                                 _asn1_set_name(yyval.node,yyvsp[0].str);;
-    break;}
+                                 _asn1_set_name(yyval.node,yyvsp[0].str);}
+    break;
 case 17:
 #line 146 "x509_ASN.y"
 {yyval.node=yyvsp[-1].node;
                                  _asn1_set_right(_asn1_get_last_right(yyval.node),_asn1_add_node(TYPE_IDENTIFIER));
-                                 _asn1_set_name(_asn1_get_last_right(yyval.node),yyvsp[0].str);;
-    break;}
+                                 _asn1_set_name(_asn1_get_last_right(yyval.node),yyvsp[0].str);}
+    break;
 case 18:
 #line 151 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_CONSTANT); 
-                                   _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);;
-    break;}
+                                   _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);}
+    break;
 case 19:
 #line 153 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_CONSTANT);
 	                            _asn1_set_name(yyval.node,yyvsp[-3].str); 
-                                    _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);;
-    break;}
+                                    _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);}
+    break;
 case 20:
 #line 158 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 21:
 #line 159 "x509_ASN.y"
 {yyval.node=yyvsp[-1].node;
-                                                    _asn1_set_right(_asn1_get_last_right(yyvsp[-1].node),yyvsp[0].node);;
-    break;}
+                                                    _asn1_set_right(_asn1_get_last_right(yyvsp[-1].node),yyvsp[0].node);}
+    break;
 case 22:
 #line 163 "x509_ASN.y"
-{yyval.constant=CONST_UNIVERSAL;;
-    break;}
+{yyval.constant=CONST_UNIVERSAL;}
+    break;
 case 23:
 #line 164 "x509_ASN.y"
-{yyval.constant=CONST_PRIVATE;;
-    break;}
+{yyval.constant=CONST_PRIVATE;}
+    break;
 case 24:
 #line 165 "x509_ASN.y"
-{yyval.constant=CONST_APPLICATION;;
-    break;}
+{yyval.constant=CONST_APPLICATION;}
+    break;
 case 25:
 #line 168 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_TAG); 
-                            _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);;
-    break;}
+                            _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);}
+    break;
 case 26:
 #line 170 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_TAG | yyvsp[-2].constant); 
-                                _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);;
-    break;}
+                                _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);}
+    break;
 case 27:
 #line 174 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 28:
 #line 175 "x509_ASN.y"
-{yyval.node=_asn1_mod_type(yyvsp[-1].node,CONST_EXPLICIT);;
-    break;}
+{yyval.node=_asn1_mod_type(yyvsp[-1].node,CONST_EXPLICIT);}
+    break;
 case 29:
 #line 176 "x509_ASN.y"
-{yyval.node=_asn1_mod_type(yyvsp[-1].node,CONST_IMPLICIT);;
-    break;}
+{yyval.node=_asn1_mod_type(yyvsp[-1].node,CONST_IMPLICIT);}
+    break;
 case 30:
 #line 179 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_DEFAULT); 
-                                       _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);;
-    break;}
+                                       _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);}
+    break;
 case 31:
 #line 181 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_DEFAULT|CONST_TRUE);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_DEFAULT|CONST_TRUE);}
+    break;
 case 32:
 #line 182 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_DEFAULT|CONST_FALSE);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_DEFAULT|CONST_FALSE);}
+    break;
 case 33:
 #line 185 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_INTEGER);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_INTEGER);}
+    break;
 case 34:
 #line 186 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_INTEGER|CONST_LIST);
-	                                 _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+	                                 _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 35:
 #line 189 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_INTEGER|CONST_MIN_MAX);
                                          _asn1_set_down(yyval.node,_asn1_add_node(TYPE_SIZE)); 
                                          _asn1_set_value(_asn1_get_down(yyval.node),yyvsp[-1].str,strlen(yyvsp[-1].str)+1); 
-                                         _asn1_set_name(_asn1_get_down(yyval.node),yyvsp[-4].str);;
-    break;}
+                                         _asn1_set_name(_asn1_get_down(yyval.node),yyvsp[-4].str);}
+    break;
 case 36:
 #line 195 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_BOOLEAN);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_BOOLEAN);}
+    break;
 case 37:
 #line 198 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_TIME|CONST_UTC);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_TIME|CONST_UTC);}
+    break;
 case 38:
 #line 199 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_TIME|CONST_GENERALIZED);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_TIME|CONST_GENERALIZED);}
+    break;
 case 39:
 #line 202 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SIZE|CONST_1_PARAM);
-	                              _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);;
-    break;}
+	                              _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);}
+    break;
 case 40:
 #line 205 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SIZE|CONST_MIN_MAX);
 	                              _asn1_set_value(yyval.node,yyvsp[-4].str,strlen(yyvsp[-4].str)+1);
-                                      _asn1_set_name(yyval.node,yyvsp[-1].str);;
-    break;}
+                                      _asn1_set_name(yyval.node,yyvsp[-1].str);}
+    break;
 case 41:
 #line 210 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 42:
 #line 211 "x509_ASN.y"
-{yyval.node=yyvsp[-1].node;;
-    break;}
+{yyval.node=yyvsp[-1].node;}
+    break;
 case 43:
 #line 214 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_OCTET_STRING);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_OCTET_STRING);}
+    break;
 case 44:
 #line 215 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_OCTET_STRING|CONST_SIZE);
-                                           _asn1_set_down(yyval.node,yyvsp[0].node);;
-    break;}
+                                           _asn1_set_down(yyval.node,yyvsp[0].node);}
+    break;
 case 45:
 #line 219 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_CONSTANT);
 	                           _asn1_set_name(yyval.node,yyvsp[-3].str); 
-                                    _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);;
-    break;}
+                                    _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);}
+    break;
 case 46:
 #line 224 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 47:
 #line 225 "x509_ASN.y"
 {yyval.node=yyvsp[-2].node;
-                                                       _asn1_set_right(_asn1_get_last_right(yyvsp[-2].node),yyvsp[0].node);;
-    break;}
+                                                       _asn1_set_right(_asn1_get_last_right(yyvsp[-2].node),yyvsp[0].node);}
+    break;
 case 48:
 #line 229 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_BIT_STRING);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_BIT_STRING);}
+    break;
 case 49:
 #line 231 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_BIT_STRING|CONST_LIST);
-                                _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                                _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 50:
 #line 236 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_ENUMERATED|CONST_LIST);
-                                _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                                _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 51:
 #line 240 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_OBJECT_ID);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_OBJECT_ID);}
+    break;
 case 52:
 #line 243 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_IDENTIFIER);
-                                       _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);;
-    break;}
+                                       _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);}
+    break;
 case 53:
 #line 245 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_IDENTIFIER|CONST_SIZE);
                                        _asn1_set_value(yyval.node,yyvsp[-1].str,strlen(yyvsp[-1].str)+1);
-                                       _asn1_set_down(yyval.node,yyvsp[0].node);;
-    break;}
+                                       _asn1_set_down(yyval.node,yyvsp[0].node);}
+    break;
 case 54:
 #line 248 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 55:
 #line 249 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 56:
 #line 250 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 58:
 #line 252 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 59:
 #line 253 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 60:
 #line 254 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 61:
 #line 255 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 62:
 #line 256 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 63:
 #line 257 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 64:
 #line 258 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 65:
 #line 259 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_NULL);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_NULL);}
+    break;
 case 66:
 #line 262 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 67:
 #line 263 "x509_ASN.y"
 {yyval.node=_asn1_mod_type(yyvsp[0].node,CONST_TAG);
                                                _asn1_set_right(yyvsp[-1].node,_asn1_get_down(yyval.node));
-                                               _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                                               _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 68:
 #line 268 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 69:
 #line 269 "x509_ASN.y"
 {yyval.node=_asn1_mod_type(yyvsp[-1].node,CONST_DEFAULT);
                                                        _asn1_set_right(yyvsp[0].node,_asn1_get_down(yyval.node));
-						       _asn1_set_down(yyval.node,yyvsp[0].node);;
-    break;}
+						       _asn1_set_down(yyval.node,yyvsp[0].node);}
+    break;
 case 70:
 #line 272 "x509_ASN.y"
-{yyval.node=_asn1_mod_type(yyvsp[-1].node,CONST_OPTION);;
-    break;}
+{yyval.node=_asn1_mod_type(yyvsp[-1].node,CONST_OPTION);}
+    break;
 case 71:
 #line 275 "x509_ASN.y"
-{yyval.node=_asn1_set_name(yyvsp[0].node,yyvsp[-1].str);;
-    break;}
+{yyval.node=_asn1_set_name(yyvsp[0].node,yyvsp[-1].str);}
+    break;
 case 72:
 #line 278 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 73:
 #line 279 "x509_ASN.y"
 {yyval.node=yyvsp[-2].node;
-                                                _asn1_set_right(_asn1_get_last_right(yyvsp[-2].node),yyvsp[0].node);;
-    break;}
+                                                _asn1_set_right(_asn1_get_last_right(yyvsp[-2].node),yyvsp[0].node);}
+    break;
 case 74:
 #line 283 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SEQUENCE);
-                                              _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                                              _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 75:
 #line 285 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SEQUENCE_OF);
-                                              _asn1_set_down(yyval.node,yyvsp[0].node);;
-    break;}
+                                              _asn1_set_down(yyval.node,yyvsp[0].node);}
+    break;
 case 76:
 #line 287 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SEQUENCE_OF|CONST_SIZE);
                                             _asn1_set_right(yyvsp[-2].node,yyvsp[0].node);
-                                            _asn1_set_down(yyval.node,yyvsp[-2].node);;
-    break;}
+                                            _asn1_set_down(yyval.node,yyvsp[-2].node);}
+    break;
 case 77:
 #line 292 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SET);
-                                     _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                                     _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 78:
 #line 294 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SET_OF);
-                                     _asn1_set_down(yyval.node,yyvsp[0].node);;
-    break;}
+                                     _asn1_set_down(yyval.node,yyvsp[0].node);}
+    break;
 case 79:
 #line 296 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_SET_OF|CONST_SIZE);
                                        _asn1_set_right(yyvsp[-2].node,yyvsp[0].node);
-                                       _asn1_set_down(yyval.node,yyvsp[-2].node);;
-    break;}
+                                       _asn1_set_down(yyval.node,yyvsp[-2].node);}
+    break;
 case 80:
 #line 301 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_CHOICE);
-                                             _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                                             _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 81:
 #line 305 "x509_ASN.y"
-{yyval.node=_asn1_add_node(TYPE_ANY);;
-    break;}
+{yyval.node=_asn1_add_node(TYPE_ANY);}
+    break;
 case 82:
 #line 306 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_ANY|CONST_DEFINED_BY);
                                         _asn1_set_down(yyval.node,_asn1_add_node(TYPE_CONSTANT));
-	                                _asn1_set_name(_asn1_get_down(yyval.node),yyvsp[0].str);;
-    break;}
+	                                _asn1_set_name(_asn1_get_down(yyval.node),yyvsp[0].str);}
+    break;
 case 83:
 #line 311 "x509_ASN.y"
-{yyval.node=_asn1_set_name(yyvsp[0].node,yyvsp[-2].str);;
-    break;}
+{yyval.node=_asn1_set_name(yyvsp[0].node,yyvsp[-2].str);}
+    break;
 case 84:
 #line 315 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_OBJECT_ID|CONST_ASSIGN);
                          _asn1_set_name(yyval.node,yyvsp[-6].str);  
-                         _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                         _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 85:
 #line 319 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_OBJECT_ID|CONST_ASSIGN|CONST_1_PARAM);
                          _asn1_set_name(yyval.node,yyvsp[-5].str);  
                          _asn1_set_value(yyval.node,yyvsp[-4].str,strlen(yyvsp[-4].str)+1);
-                         _asn1_set_down(yyval.node,yyvsp[-1].node);;
-    break;}
+                         _asn1_set_down(yyval.node,yyvsp[-1].node);}
+    break;
 case 86:
 #line 324 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_INTEGER|CONST_ASSIGN);
                          _asn1_set_name(yyval.node,yyvsp[-3].str);  
-                         _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);;
-    break;}
+                         _asn1_set_value(yyval.node,yyvsp[0].str,strlen(yyvsp[0].str)+1);}
+    break;
 case 87:
 #line 329 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 88:
 #line 330 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 89:
 #line 333 "x509_ASN.y"
-{yyval.node=yyvsp[0].node;;
-    break;}
+{yyval.node=yyvsp[0].node;}
+    break;
 case 90:
 #line 334 "x509_ASN.y"
 {yyval.node=yyvsp[-1].node;
-                                                          _asn1_set_right(_asn1_get_last_right(yyvsp[-1].node),yyvsp[0].node);;
-    break;}
+                                                          _asn1_set_right(_asn1_get_last_right(yyvsp[-1].node),yyvsp[0].node);}
+    break;
 case 91:
 #line 338 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_OBJECT_ID);
                                                           _asn1_set_down(yyval.node,yyvsp[-1].node);
-                                                          _asn1_set_name(yyval.node,yyvsp[-3].str);;
-    break;}
+                                                          _asn1_set_name(yyval.node,yyvsp[-3].str);}
+    break;
 case 92:
 #line 341 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_OBJECT_ID);
-                                                          _asn1_set_name(yyval.node,yyvsp[-2].str);;
-    break;}
+                                                          _asn1_set_name(yyval.node,yyvsp[-2].str);}
+    break;
 case 93:
 #line 345 "x509_ASN.y"
-{yyval.node=NULL;;
-    break;}
+{yyval.node=NULL;}
+    break;
 case 94:
 #line 347 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_IMPORTS);
                          _asn1_set_down(yyval.node,_asn1_add_node(TYPE_OBJECT_ID));
                          _asn1_set_name(_asn1_get_down(yyval.node),yyvsp[-1].str);  
                          _asn1_set_down(_asn1_get_down(yyval.node),yyvsp[0].node);
-                         _asn1_set_right(yyval.node,yyvsp[-3].node);;
-    break;}
+                         _asn1_set_right(yyval.node,yyvsp[-3].node);}
+    break;
 case 95:
 #line 354 "x509_ASN.y"
-{yyval.constant=CONST_EXPLICIT;;
-    break;}
+{yyval.constant=CONST_EXPLICIT;}
+    break;
 case 96:
 #line 355 "x509_ASN.y"
-{yyval.constant=CONST_IMPLICIT;;
-    break;}
+{yyval.constant=CONST_IMPLICIT;}
+    break;
 case 97:
 #line 361 "x509_ASN.y"
 {yyval.node=_asn1_add_node(TYPE_DEFINITIONS|yyvsp[-6].constant|((yyvsp[-2].node==NULL)?0:CONST_IMPORTS));
@@ -1414,11 +1535,11 @@ case 97:
 		      if(result_parse==ASN_IDENTIFIER_NOT_FOUND)
 		      	asn1_delete_structure(yyval.node);
 		      else p_tree=yyval.node;
-		    };
-    break;}
+		    }}
+    break;
 }
 
-#line 610 "/usr/share/bison/bison.simple"
+#line 727 "/usr/share/bison/bison.simple"
 
 
   yyvsp -= yylen;
@@ -1430,11 +1551,11 @@ case 97:
 #if YYDEBUG
   if (yydebug)
     {
-      short *ssp1 = yyss - 1;
-      fprintf (stderr, "state stack now");
-      while (ssp1 != yyssp)
-	fprintf (stderr, " %d", *++ssp1);
-      fprintf (stderr, "\n");
+      short *yyssp1 = yyss - 1;
+      YYFPRINTF (stderr, "state stack now");
+      while (yyssp1 != yyssp)
+	YYFPRINTF (stderr, " %d", *++yyssp1);
+      YYFPRINTF (stderr, "\n");
     }
 #endif
 
@@ -1472,46 +1593,47 @@ yyerrlab:
 
       if (yyn > YYFLAG && yyn < YYLAST)
 	{
-	  int size = 0;
-	  char *msg;
-	  int x, count;
+	  YYSIZE_T yysize = 0;
+	  char *yymsg;
+	  int yyx, yycount;
 
-	  count = 0;
-	  /* Start X at -yyn if nec to avoid negative indexes in yycheck.  */
-	  for (x = (yyn < 0 ? -yyn : 0);
-	       x < (int) (sizeof (yytname) / sizeof (char *)); x++)
-	    if (yycheck[x + yyn] == x)
-	      size += strlen (yytname[x]) + 15, count++;
-	  size += strlen ("parse error, unexpected `") + 1;
-	  size += strlen (yytname[YYTRANSLATE (yychar)]);
-	  msg = (char *) malloc (size);
-	  if (msg != 0)
+	  yycount = 0;
+	  /* Start YYX at -YYN if negative to avoid negative indexes in
+	     YYCHECK.  */
+	  for (yyx = yyn < 0 ? -yyn : 0;
+	       yyx < (int) (sizeof (yytname) / sizeof (char *)); yyx++)
+	    if (yycheck[yyx + yyn] == yyx)
+	      yysize += yystrlen (yytname[yyx]) + 15, yycount++;
+	  yysize += yystrlen ("parse error, unexpected ") + 1;
+	  yysize += yystrlen (yytname[YYTRANSLATE (yychar)]);
+	  yymsg = (char *) YYSTACK_ALLOC (yysize);
+	  if (yymsg != 0)
 	    {
-	      strcpy (msg, "parse error, unexpected `");
-	      strcat (msg, yytname[YYTRANSLATE (yychar)]);
-	      strcat (msg, "'");
+	      char *yyp = yystpcpy (yymsg, "parse error, unexpected ");
+	      yyp = yystpcpy (yyp, yytname[YYTRANSLATE (yychar)]);
 
-	      if (count < 5)
+	      if (yycount < 5)
 		{
-		  count = 0;
-		  for (x = (yyn < 0 ? -yyn : 0);
-		       x < (int) (sizeof (yytname) / sizeof (char *)); x++)
-		    if (yycheck[x + yyn] == x)
+		  yycount = 0;
+		  for (yyx = yyn < 0 ? -yyn : 0;
+		       yyx < (int) (sizeof (yytname) / sizeof (char *));
+		       yyx++)
+		    if (yycheck[yyx + yyn] == yyx)
 		      {
-			strcat (msg, count == 0 ? ", expecting `" : " or `");
-			strcat (msg, yytname[x]);
-			strcat (msg, "'");
-			count++;
+			const char *yyq = ! yycount ? ", expecting " : " or ";
+			yyp = yystpcpy (yyp, yyq);
+			yyp = yystpcpy (yyp, yytname[yyx]);
+			yycount++;
 		      }
 		}
-	      yyerror (msg);
-	      free (msg);
+	      yyerror (yymsg);
+	      YYSTACK_FREE (yymsg);
 	    }
 	  else
-	    yyerror ("parse error; also virtual memory exceeded");
+	    yyerror ("parse error; also virtual memory exhausted");
 	}
       else
-#endif /* YYERROR_VERBOSE */
+#endif /* defined (YYERROR_VERBOSE) */
 	yyerror ("parse error");
     }
   goto yyerrlab1;
@@ -1574,11 +1696,11 @@ yyerrpop:
 #if YYDEBUG
   if (yydebug)
     {
-      short *ssp1 = yyss - 1;
-      fprintf (stderr, "Error: state stack now");
-      while (ssp1 != yyssp)
-	fprintf (stderr, " %d", *++ssp1);
-      fprintf (stderr, "\n");
+      short *yyssp1 = yyss - 1;
+      YYFPRINTF (stderr, "Error: state stack now");
+      while (yyssp1 != yyssp)
+	YYFPRINTF (stderr, " %d", *++yyssp1);
+      YYFPRINTF (stderr, "\n");
     }
 #endif
 
@@ -1623,30 +1745,30 @@ yyerrhandle:
 | yyacceptlab -- YYACCEPT comes here.  |
 `-------------------------------------*/
 yyacceptlab:
-  if (yyfree_stacks)
-    {
-      free (yyss);
-      free (yyvs);
-#if YYLSP_NEEDED
-      free (yyls);
-#endif
-    }
-  return 0;
-
+  yyresult = 0;
+  goto yyreturn;
 
 /*-----------------------------------.
 | yyabortlab -- YYABORT comes here.  |
 `-----------------------------------*/
 yyabortlab:
-  if (yyfree_stacks)
-    {
-      free (yyss);
-      free (yyvs);
-#if YYLSP_NEEDED
-      free (yyls);
+  yyresult = 1;
+  goto yyreturn;
+
+/*---------------------------------------------.
+| yyoverflowab -- parser overflow comes here.  |
+`---------------------------------------------*/
+yyoverflowlab:
+  yyerror ("parser stack overflow");
+  yyresult = 2;
+  /* Fall through.  */
+
+yyreturn:
+#ifndef yyoverflow
+  if (yyss != yyssa)
+    YYSTACK_FREE (yyss);
 #endif
-    }
-  return 1;
+  return yyresult;
 }
 #line 377 "x509_ASN.y"
 

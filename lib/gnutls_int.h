@@ -35,8 +35,6 @@
 #define RECORD_DEBUG
 #define DEBUG
 */
-#define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define DEBUG
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -270,6 +268,7 @@ typedef struct GNUTLS_KEY_INT* GNUTLS_KEY;
 
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
+#include <gnutls_compress_int.h>
 #include <gnutls_cert.h>
 
 typedef struct {
@@ -355,6 +354,8 @@ typedef struct {
 typedef struct {
 	GNUTLS_CIPHER_HANDLE write_cipher_state;
 	GNUTLS_CIPHER_HANDLE read_cipher_state;
+	GNUTLS_COMP_HANDLE   read_compression_state;
+	GNUTLS_COMP_HANDLE   write_compression_state;
 	gnutls_datum 	read_mac_secret;
 	gnutls_datum 	write_mac_secret;
 	uint64		read_sequence_number;

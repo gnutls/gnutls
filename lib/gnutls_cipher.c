@@ -46,10 +46,13 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 	gnutls_datum comp, ciph;
 	int err;
 
-	err = _gnutls_plaintext2TLSCompressed(state, &comp, plain);
-	if (err < 0) {
-		gnutls_assert();
-		return err;
+	if (plain.size == 0) comp = plain;
+	else {
+		err = _gnutls_plaintext2TLSCompressed(state, &comp, plain);
+		if (err < 0) {
+			gnutls_assert();
+			return err;
+		}
 	}
 
 	err = _gnutls_compressed2TLSCiphertext(state, &ciph, comp, type, headers_size, random_pad);
@@ -58,7 +61,8 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 		return err;
 	}
 
-	gnutls_free_datum(&comp);
+	if (plain.size != 0) /* in that case it is not allocated */
+		gnutls_free_datum(&comp);
 
 	/* copy the headers */
 	memcpy( ciph.data, headers, headers_size);
@@ -78,6 +82,8 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 	gnutls_datum gcipher;
 	int ret;
 
+	*data = NULL;
+
 	if (ciphertext_size == 0)
 		return 0;
 
@@ -89,14 +95,17 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 		return ret;
 	}
 
-	ret = _gnutls_TLSCompressed2plaintext(state, &gtxt, gcomp);
-	if (ret < 0) {
+	if (gcomp.size==0) gtxt = gcomp;
+	else {
+		ret = _gnutls_TLSCompressed2plaintext(state, &gtxt, gcomp);
+		if (ret < 0) {
+			gnutls_free_datum(&gcomp);
+			return ret;
+		}
+
 		gnutls_free_datum(&gcomp);
-		return ret;
 	}
-
-	gnutls_free_datum(&gcomp);
-
+	
 	ret = gtxt.size;
 
 	*data = gtxt.data;
@@ -351,18 +360,19 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
+	if (length > 0) {
+		data = gnutls_malloc(length);
+		if (data==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+	} else data = NULL;
 
-	data = gnutls_malloc(length);
-	if (data==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+	if (data!=NULL) {
+		memcpy(data, ciphertext.data, length);
 	}
-
-	memcpy(data, ciphertext.data, length);
 	compress->data = data;
 	compress->size = length;
-
-
 
 	c_length = CONVuint16((uint16) compress->size);
 	seq_num = CONVuint64( &state->connection_state.read_sequence_number);
@@ -376,7 +386,10 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 			gnutls_hmac(td, &minor, 1);
 		}
 		gnutls_hmac(td, &c_length, 2);
-		gnutls_hmac(td, data, compress->size);
+		
+		if (data!=NULL)
+			gnutls_hmac(td, data, compress->size);
+
 		if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
 			gnutls_mac_deinit_ssl3(td, MAC);
 		} else {

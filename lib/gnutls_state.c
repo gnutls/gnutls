@@ -241,6 +241,11 @@ void gnutls_deinit(GNUTLS_STATE state)
 	if (state->connection_state.write_cipher_state != NULL)
 		gnutls_cipher_deinit(state->connection_state.write_cipher_state);
 
+	if (state->connection_state.read_compression_state != NULL)
+		gnutls_comp_deinit(state->connection_state.read_compression_state, 1);
+	if (state->connection_state.write_compression_state != NULL)
+		gnutls_comp_deinit(state->connection_state.write_compression_state, 0);
+
 	gnutls_sfree_datum( &state->cipher_specs.server_write_mac_secret);
 	gnutls_sfree_datum( &state->cipher_specs.client_write_mac_secret);
 	gnutls_sfree_datum( &state->cipher_specs.server_write_IV);

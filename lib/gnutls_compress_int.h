@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -18,5 +18,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int gnutls_decompress( CompressionMethod algorithm, char* compressed, int compressed_size, char** plain);
-int gnutls_compress( CompressionMethod algorithm, char* plain, int plain_size, char** compressed);
+#ifndef GNUTLS_COMP_INT
+# define GNUTLS_COMP_INT
+
+#ifdef HAVE_LIBZ
+# include <zlib.h>
+# define GNUTLS_COMP_HANDLE z_stream*
+# define GNUTLS_COMP_FAILED NULL
+#else
+# define GNUTLS_COMP_HANDLE void*
+# define GNUTLS_COMP_FAILED NULL
+#endif
+
+GNUTLS_COMP_HANDLE gnutls_comp_init( CompressionMethod, int d);
+void gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d);
+
+int gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size);
+int gnutls_compress( GNUTLS_COMP_HANDLE, char* plain, int plain_size, char** compressed, int max_comp_size);
+
+#endif

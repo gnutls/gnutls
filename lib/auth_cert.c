@@ -751,17 +751,14 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	}
 	i = dsize;
 
-	DECR_LEN(dsize, 3);
-	len = READuint24(p);
-	p += 3;
-
-	for (; i > 0; len = READuint24(p), p += 3) {
+	while(i > 0) {
+		DECR_LEN(dsize, 3);
+		len = READuint24(p);
+		p += 3;
 		DECR_LEN(dsize, len);
 		peer_certificate_list_size++;
 		p += len;
 		i -= len + 3;
-		if (i > 0)
-			DECR_LEN(dsize, 3);
 	}
 
 	if (peer_certificate_list_size == 0) {

@@ -25,8 +25,7 @@
 /*****************************************************/
 
 
-#include <gnutls_int.h> 
-
+#include <gnutls_int.h>
 #include "x509_asn1.h" 
 #include "x509_der.h"
 #include <gnutls_str.h>
