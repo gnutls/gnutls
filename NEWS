@@ -9,7 +9,6 @@ Version 1.1.10
 - Added gnutls_auth_client_get_type() and gnutls_auth_server_get_type()
 - Opencdk library is being included if not found.
 - certtool can now add ip address SAN extension.
-- Fixes in openpgp signature verification.
 - certtool has now support for more X.520 DN attribute types.
 - Better handling of EOF in gnutls_record_recv().
 - _gnutls_deinit() is no longer used. Sessions are not
