@@ -57,15 +57,15 @@ gnutls_protocol_version ver = gnutls_protocol_get_version( session);
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	ret = _gnutls_generate_master( session, 1);
-	if  (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	if (ver == GNUTLS_SSL3) {
+		ret = _gnutls_generate_master( session, 1);
+		if  (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
-	if (ver == GNUTLS_SSL3)
 		_gnutls_mac_deinit_ssl3_handshake( td_sha, &concat[16], session->security_parameters.master_secret, TLS_MASTER_SIZE);
-	else
+	} else
 		_gnutls_hash_deinit(td_sha, &concat[16]);
 
 	switch (cert->subject_pk_algorithm) {
@@ -294,6 +294,7 @@ opaque concat[36];
 GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 gnutls_datum dconcat;
+gnutls_protocol_version ver = gnutls_protocol_get_version( session);
 
 	td_md5 = _gnutls_hash_copy( session->internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
@@ -308,9 +309,20 @@ gnutls_datum dconcat;
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	_gnutls_hash_deinit(td_md5, concat);
-	_gnutls_hash_deinit(td_sha, &concat[16]);
-	
+	if (ver == GNUTLS_SSL3) {
+		ret = _gnutls_generate_master( session, 1);
+		if  (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		_gnutls_mac_deinit_ssl3_handshake( td_md5, concat, session->security_parameters.master_secret, TLS_MASTER_SIZE);
+		_gnutls_mac_deinit_ssl3_handshake( td_sha, &concat[16], session->security_parameters.master_secret, TLS_MASTER_SIZE);
+	} else {
+		_gnutls_hash_deinit(td_md5, concat);
+		_gnutls_hash_deinit(td_sha, &concat[16]);
+	}
+
 	dconcat.data = concat;
 	dconcat.size = 20+16; /* md5+ sha */
 
