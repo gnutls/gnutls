@@ -84,7 +84,8 @@ AC_ARG_WITH( mcrypt, [  --with-mcrypt           enable mcrypt support],
 )
 
 AC_ARG_WITH( mhash, [  --with-mhash            enable mhash support],
- [AC_CHECK_LIB(mhash, mhash_init_m, AC_DEFINE(USE_MHASH))])
+ [AC_CHECK_LIB(mhash, mhash_init, AC_DEFINE(USE_MHASH) 
+LIBS="${LIBS} -lmhash")])
 
 if test $ac_cv_prog_gcc != no; then
   CFLAGS="${CFLAGS} -O2 -g -ffast-math"
