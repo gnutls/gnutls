@@ -22,7 +22,7 @@ GNUTLS_KXAlgorithm kx;
 
 	/* print the key exchange's algorithm name
     	 */
-	kx = gnutls_kx_get_algo(state);
+	kx = gnutls_kx_get(state);
 	tmp = gnutls_kx_get_name( kx);
 	printf("- Key Exchange: %s\n", tmp);
 
@@ -120,13 +120,13 @@ GNUTLS_KXAlgorithm kx;
 	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
 	printf("- Version: %s\n", tmp);
 
-	tmp = gnutls_compression_get_name(gnutls_compression_get_algo( state));
+	tmp = gnutls_compression_get_name(gnutls_compression_get( state));
 	printf("- Compression: %s\n", tmp);
 
-	tmp = gnutls_cipher_get_name(gnutls_cipher_get_algo( state));
+	tmp = gnutls_cipher_get_name(gnutls_cipher_get( state));
 	printf("- Cipher: %s\n", tmp);
 
-	tmp = gnutls_mac_get_name(gnutls_mac_get_algo( state));
+	tmp = gnutls_mac_get_name(gnutls_mac_get( state));
 	printf("- MAC: %s\n", tmp);
 
 	return 0;

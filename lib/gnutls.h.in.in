@@ -93,10 +93,10 @@ int 		 gnutls_alert_send( GNUTLS_STATE, GNUTLS_AlertLevel, GNUTLS_AlertDescripti
 int 		 gnutls_alert_send_appropriate(  GNUTLS_STATE state, int err);
 
 /* get information on the current state */
-GNUTLS_BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state);
-GNUTLS_KXAlgorithm 	    gnutls_kx_get_algo( GNUTLS_STATE state);
-GNUTLS_MACAlgorithm	    gnutls_mac_get_algo( GNUTLS_STATE state);
-GNUTLS_CompressionMethod   gnutls_compression_get_algo( GNUTLS_STATE state);
+GNUTLS_BulkCipherAlgorithm gnutls_cipher_get( GNUTLS_STATE state);
+GNUTLS_KXAlgorithm 	    gnutls_kx_get( GNUTLS_STATE state);
+GNUTLS_MACAlgorithm	    gnutls_mac_get( GNUTLS_STATE state);
+GNUTLS_CompressionMethod   gnutls_compression_get( GNUTLS_STATE state);
 
 /* the name of the specified algorithms */
 const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm);

@@ -126,12 +126,12 @@ void peer_print_info( GNUTLS_STATE state)
 	 */ 
 
 	/* print srp specific data */
-	if (gnutls_kx_get_algo(state) == GNUTLS_KX_SRP) {
+	if (gnutls_kx_get(state) == GNUTLS_KX_SRP) {
 		sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
 		       gnutls_srp_server_get_username( state));
 	}
 
-	if (gnutls_kx_get_algo(state) == GNUTLS_KX_ANON_DH) {
+	if (gnutls_kx_get(state) == GNUTLS_KX_ANON_DH) {
 		sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
 		       gnutls_dh_get_bits( state));
 	}
@@ -142,23 +142,23 @@ void peer_print_info( GNUTLS_STATE state)
 	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
 	sprintf(tmp2, "Protocol version: <b>%s</b><br>\n", tmp);
 
-	tmp = gnutls_kx_get_name(gnutls_kx_get_algo(state));
+	tmp = gnutls_kx_get_name(gnutls_kx_get(state));
 	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
 
-	if (gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_RSA || gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_DSS) {
+	if (gnutls_kx_get(state) == GNUTLS_KX_DHE_RSA || gnutls_kx_get(state) == GNUTLS_KX_DHE_DSS) {
 		sprintf(tmp2, "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
 			        gnutls_dh_get_bits( state));
 	}
 			
 	tmp =
 	    gnutls_compression_get_name
-	    (gnutls_compression_get_algo(state));
+	    (gnutls_compression_get(state));
 	sprintf(tmp2, "Compression: <b>%s</b><br>\n", tmp);
 	
-	tmp = gnutls_cipher_get_name(gnutls_cipher_get_algo(state));
+	tmp = gnutls_cipher_get_name(gnutls_cipher_get(state));
 	sprintf(tmp2, "Cipher: <b>%s</b><br>\n", tmp);
 	
-	tmp = gnutls_mac_get_name(gnutls_mac_get_algo(state));
+	tmp = gnutls_mac_get_name(gnutls_mac_get(state));
 	sprintf(tmp2, "MAC: <b>%s</b><br>\n", tmp);
 
 	strcat( http_buffer, "</P>\n");

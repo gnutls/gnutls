@@ -982,42 +982,42 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 }
 
 /**
-  * gnutls_cipher_get_algo - Returns the currently used cipher.
+  * gnutls_cipher_get - Returns the currently used cipher.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the currently used cipher.
   **/
-GNUTLS_BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state) {
+GNUTLS_BulkCipherAlgorithm gnutls_cipher_get( GNUTLS_STATE state) {
 	return state->security_parameters.read_bulk_cipher_algorithm;
 }
 
 /**
-  * gnutls_kx_get_algo - Returns the key exchange algorithm.
+  * gnutls_kx_get - Returns the key exchange algorithm.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the key exchange algorithm used in the last handshake.
   **/
-GNUTLS_KXAlgorithm gnutls_kx_get_algo( GNUTLS_STATE state) {
+GNUTLS_KXAlgorithm gnutls_kx_get( GNUTLS_STATE state) {
 	return state->security_parameters.kx_algorithm;
 }
 
 /**
-  * gnutls_mac_get_algo - Returns the currently used mac algorithm.
+  * gnutls_mac_get - Returns the currently used mac algorithm.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the currently used mac algorithm.
   **/
-GNUTLS_MACAlgorithm gnutls_mac_get_algo( GNUTLS_STATE state) {
+GNUTLS_MACAlgorithm gnutls_mac_get( GNUTLS_STATE state) {
 	return state->security_parameters.read_mac_algorithm;
 }
 
 /**
-  * gnutls_compression_get_algo - Returns the currently used compression algorithm.
+  * gnutls_compression_get - Returns the currently used compression algorithm.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the currently used compression method.
   **/
-GNUTLS_CompressionMethod gnutls_compression_get_algo( GNUTLS_STATE state) {
+GNUTLS_CompressionMethod gnutls_compression_get( GNUTLS_STATE state) {
 	return state->security_parameters.read_compression_algorithm;
 }
 

@@ -593,7 +593,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 
 	if ((ret =
 	     _gnutls_check_x509pki_key_usage(&peer_certificate_list[0],
-					     gnutls_kx_get_algo(state)))
+					     gnutls_kx_get(state)))
 	    < 0) {
 		gnutls_assert();
 		CLEAR_CERTS;
