@@ -134,7 +134,9 @@ static char input[128];
 
 static const char* read_pass( const char* input_str)
 {
+#ifdef _WIN32
 static char input[128];
+#endif
 const char* pass;
 
 	if (info.pass) return info.pass;
@@ -272,6 +274,8 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	int size, serial;
 	int days, result, ca_status;
 	const char* str;
+	int vers = 0; /* the default version in the certificate 
+	               */
 	gnutls_x509_crq crq; /* request */
 
 	size = gnutls_x509_crt_init(&crt);
@@ -314,11 +318,6 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		}
 	}
 
-	result = gnutls_x509_crt_set_version( crt, 2);
-	if (result < 0) {
-		fprintf(stderr, "set_version: %s\n", gnutls_strerror(result));
-		exit(1);
-	}
 
 	serial = read_int( "Enter the certificate's serial number (decimal): ");
 	buffer[2] = serial & 0xff;
@@ -360,6 +359,9 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	if (result != 0) {
 		str = read_str( "Enter the dnsName of the subject of the certificate: ");
 		if (str != NULL) {
+			vers = 2; /* only version 3 certificates, can
+			           * have extensions.
+			           */
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_DNSNAME, str);
 			if (result < 0) {
 				fprintf(stderr, "subject_alt_name: %s\n", gnutls_strerror(result));
@@ -371,12 +373,19 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		str = read_str( "Enter the e-mail of the subject of the certificate: ");
 	
 		if (str != NULL) {
+			vers = 2;
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_RFC822NAME, str);
 			if (result < 0) {
 				fprintf(stderr, "subject_alt_name: %s\n", gnutls_strerror(result));
 				exit(1);
 			}
 		}
+	}
+
+	result = gnutls_x509_crt_set_version( crt, vers);
+	if (result < 0) {
+		fprintf(stderr, "set_version: %s\n", gnutls_strerror(result));
+		exit(1);
 	}
 
 	*ret_key = key;
