@@ -47,6 +47,10 @@
 #define SSL_OP_ALL (0x000FFFFF)
 #define SSL_OP_NO_TLSv1 (0x0400000)
 
+#define SSL_MODE_ENABLE_PARTIAL_WRITE (0x1)
+#define SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER (0x2)
+#define SSL_MODE_AUTO_RETRY (0x4)
+
 typedef gnutls_x509_dn X509_NAME;
 typedef gnutls_datum X509;
 
@@ -156,8 +160,9 @@ int SSL_CTX_use_certificate_file(SSL_CTX *ctx, const char *certfile, int type);
 int SSL_CTX_use_PrivateKey_file(SSL_CTX *ctx, const char *keyfile, int type);
 void SSL_CTX_set_verify(SSL_CTX *ctx, int verify_mode,
                         int (*verify_callback)(int, X509_STORE_CTX *));
-unsigned long SSL_CTX_set_options(SSL_CTX *ssl, unsigned long options);
-
+unsigned long SSL_CTX_set_options(SSL_CTX *ctx, unsigned long options);
+long SSL_CTX_set_mode(SSL_CTX *ctx, long mode);
+int SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *list);
 
 /* SSL structure handling */
 
@@ -171,7 +176,7 @@ void SSL_set_connect_state(SSL *ssl);
 int SSL_pending(SSL *ssl);
 void SSL_set_verify(SSL *ssl, int verify_mode,
                     int (*verify_callback)(int, X509_STORE_CTX *));
-
+const X509 *SSL_get_peer_certificate(SSL *ssl);
 
 /* SSL connection open/close/read/write functions */
 
@@ -180,12 +185,26 @@ int SSL_shutdown(SSL *ssl);
 int SSL_read(SSL *ssl, const void *buf, int len);
 int SSL_write(SSL *ssl, const void *buf, int len);
 
+int SSL_want(SSL *ssl);
+
+#define SSL_NOTHING (1)
+#define SSL_WRITING (2)
+#define SSL_READING (3)
+#define SSL_X509_LOOKUP (4)
+
+#define SSL_want_nothing(s) (SSL_want(s) == SSL_NOTHING)
+#define SSL_want_read(s) (SSL_want(s) == SSL_READING)
+#define SSL_want_write(s) (SSL_want(s) == SSL_WRITING)
+#define SSL_want_x509_lookup(s) (SSL_want(s) == SSL_X509_LOOKUP)
+
 
 /* SSL_METHOD functions */
 
 SSL_METHOD *SSLv23_client_method(void);
-SSL_METHOD *TLSv1_client_method(void);
 SSL_METHOD *SSLv23_server_method(void);
+SSL_METHOD *SSLv3_client_method(void);
+SSL_METHOD *SSLv3_server_method(void);
+SSL_METHOD *TLSv1_client_method(void);
 SSL_METHOD *TLSv1_server_method(void);
 
 
@@ -195,11 +214,13 @@ SSL_CIPHER *SSL_get_current_cipher(SSL *ssl);
 const char *SSL_CIPHER_get_name(SSL_CIPHER *cipher);
 int SSL_CIPHER_get_bits(SSL_CIPHER *cipher, int *bits);
 const char *SSL_CIPHER_get_version(SSL_CIPHER *cipher);
+char *SSL_CIPHER_description(SSL_CIPHER *cipher, char *buf, int size);
 
 
 /* X509 functions */
 
 X509_NAME *X509_get_subject_name(X509 *cert);
+X509_NAME *X509_get_issuer_name(X509 *cert);
 char *X509_NAME_oneline(gnutls_x509_dn *name, char *buf, int len);
 
 
@@ -223,6 +244,8 @@ const char *RAND_file_name(char *buf, size_t len);
 int RAND_load_file(const char *name, long maxbytes);
 int RAND_write_file(const char *name);
 
+int RAND_egd_bytes(const char *path, int bytes);
+#define RAND_egd(p) RAND_egd_bytes((p), 255)
 
 /* message digest functions */
 

@@ -102,6 +102,22 @@ unsigned long SSL_CTX_set_options(SSL_CTX *ctx, unsigned long options)
     return (ctx->options |= options);
 }
 
+long SSL_CTX_set_mode(SSL_CTX *ctx, long mode)
+{
+    return 0;
+}
+
+int SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *list)
+{
+    /* FIXME: ignore this for the moment */
+    /* We've going to have to parse the "list" string to do this */
+    /* It is a string, which in its simplest form is something like
+       "DES-CBC3-SHA:IDEA-CBC-MD5", but can be rather more complicated
+       (see OpenSSL's ciphers(1) manpage for details) */
+
+    return 1;
+}
+
 
 /* SSL structure handling */
 
@@ -176,7 +192,7 @@ int SSL_set_fd(SSL *ssl, int fd)
 void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio)
 {
     gnutls_transport_set_ptr (ssl->gnutls_state, rbio->fd);
-    free(BIO);
+    /*    free(BIO); ? */
 }
 
 void SSL_set_connect_state(SSL *ssl)
@@ -196,6 +212,16 @@ void SSL_set_verify(SSL *ssl, int verify_mode,
     ssl->verify_callback = verify_callback;
 }
 
+const X509 *SSL_get_peer_certificate(SSL *ssl)
+{
+    const gnutls_datum *cert_list;
+    int cert_list_size = 0;
+
+    cert_list = gnutls_certificate_get_peers(ssl->gnutls_state,
+                                             &cert_list_size);
+
+    return cert_list;
+}
 
 /* SSL connection open/close/read/write functions */
 
@@ -300,6 +326,11 @@ int SSL_write(SSL *ssl, const void *buf, int len)
     return ret;
 }
 
+int SSL_want(SSL *ssl)
+{
+    return SSL_NOTHING;
+}
+
 
 /* SSL_METHOD functions */
 
@@ -369,22 +400,49 @@ SSL_METHOD *SSLv23_server_method(void)
     return m;
 }
 
-SSL_METHOD *SSLv23_client_method(void)
+SSL_METHOD *SSLv3_client_method(void)
 {
     SSL_METHOD *m;
     m = (SSL_METHOD *)calloc(1, sizeof(SSL_METHOD));
     if (!m)
         return NULL;
 
-    m->protocol_priority[0] = GNUTLS_TLS1;
-    m->protocol_priority[1] = GNUTLS_SSL3;
+    m->protocol_priority[0] = GNUTLS_SSL3;
     m->protocol_priority[2] = 0;
 
-    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
-    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
-    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
-    m->cipher_priority[4] = 0;
+    m->cipher_priority[2] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[3] = 0;
+
+    m->comp_priority[0] = GNUTLS_COMP_ZLIB;
+    m->comp_priority[1] = GNUTLS_COMP_NULL;
+    m->comp_priority[2] = 0;
+
+    m->kx_priority[0] = GNUTLS_KX_DHE_RSA;
+    m->kx_priority[1] = GNUTLS_KX_RSA;
+    m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
+    m->kx_priority[3] = 0;
+
+    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[1] = GNUTLS_MAC_MD5;
+    m->mac_priority[2] = 0;
+
+    return m;
+}
+
+SSL_METHOD *SSLv3_server_method(void)
+{
+    SSL_METHOD *m;
+    m = (SSL_METHOD *)calloc(1, sizeof(SSL_METHOD));
+    if (!m)
+        return NULL;
+
+    m->protocol_priority[0] = GNUTLS_SSL3;
+    m->protocol_priority[2] = 0;
+
+    m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[3] = 0;
 
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
     m->comp_priority[1] = GNUTLS_COMP_NULL;
@@ -522,6 +580,39 @@ const char *SSL_CIPHER_get_version(SSL_CIPHER *cipher)
     return ("unknown");
 }
 
+char *SSL_CIPHER_description(SSL_CIPHER *cipher, char *buf, int size)
+{
+    char *tmpbuf;
+    int tmpsize;
+    int local_alloc;
+
+    if (buf)
+    {
+        tmpbuf = buf;
+        tmpsize = size;
+        local_alloc = 0;
+    }
+    else
+    {
+        tmpbuf = (char *)malloc(128);
+        tmpsize = 128;
+        local_alloc = 1;
+    }
+
+    if (snprintf(tmpbuf, tmpsize, "%s %s %s %s",
+                 gnutls_protocol_get_name(cipher->version),
+                 gnutls_kx_get_name(cipher->kx),
+                 gnutls_cipher_get_name(cipher->cipher),
+                 gnutls_mac_get_name(cipher->mac)) == -1)
+    {
+        if (local_alloc)
+            free(tmpbuf);
+        return "Buffer too small";
+    }
+
+    return tmpbuf;
+}
+
 
 /* X509 functions */
 
@@ -529,7 +620,19 @@ X509_NAME *X509_get_subject_name(X509 *cert)
 {
     gnutls_x509_dn *dn;
     dn = (gnutls_x509_dn *)calloc(1, sizeof(gnutls_x509_dn));
-    if (gnutls_x509_extract_certificate_dn(cert, dn) < 0)
+    if (gnutls_x509_extract_certificate_dn(&cert[0], dn) < 0)
+    {
+        free(dn);
+        return NULL;
+    }
+    return dn;
+}
+
+X509_NAME *X509_get_issuer_name(X509 *cert)
+{
+    gnutls_x509_dn *dn;
+    dn = (gnutls_x509_dn *)calloc(1, sizeof(gnutls_x509_dn));
+    if (gnutls_x509_extract_certificate_dn(&cert[1], dn) < 0)
     {
         free(dn);
         return NULL;
@@ -567,9 +670,9 @@ BIO *BIO_new_socket(int sock, int close_flag)
     if (!bio)
         return NULL;
 
-    BIO->fd = sock;
+    bio->fd = sock;
 
-    return BIO;
+    return bio;
 }
 
 
@@ -622,6 +725,12 @@ int RAND_load_file(const char *name, long maxbytes)
 int RAND_write_file(const char *name)
 {
     return 0;
+}
+
+int RAND_egd_bytes(const char *path, int bytes)
+{
+    /* fake it */
+    return bytes;
 }
 
 
