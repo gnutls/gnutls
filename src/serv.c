@@ -89,19 +89,15 @@ GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
 
 # include <gdbm.h>
 
- typedef struct {
-	GDBM_FILE read_dbf;
- } DBF;
-
- static DBF dbf;
+ static GDBM_FILE read_dbf;
 
 # define DB_FILE "gnutls-rsm.db"
 
  static void wrap_gdbm_init(void);
  static void wrap_gdbm_deinit(void);
- static int wrap_gdbm_store( DBF* dbf, gnutls_datum key, gnutls_datum data);
- static gnutls_datum wrap_gdbm_fetch( DBF* dbf, gnutls_datum key);
- static int wrap_gdbm_delete( DBF* dbf, gnutls_datum key);
+ static int wrap_gdbm_store( void* dbf, gnutls_datum key, gnutls_datum data);
+ static gnutls_datum wrap_gdbm_fetch( void* dbf, gnutls_datum key);
+ static int wrap_gdbm_delete( void* dbf, gnutls_datum key);
 
 #endif
 
@@ -182,7 +178,7 @@ GNUTLS_STATE initialize_state(void)
    gnutls_db_set_retrieve_func( state, wrap_gdbm_fetch);
    gnutls_db_set_remove_func( state, wrap_gdbm_delete);
    gnutls_db_set_store_func( state, wrap_gdbm_store);
-   gnutls_db_set_ptr( state, &dbf);
+   gnutls_db_set_ptr( state, read_dbf);
 #endif
 
    /* null cipher is here only for debuging 
@@ -763,7 +759,7 @@ void serv_version(void) {
 
 static void wrap_gdbm_init(void) {
 	GDBM_FILE tmpdbf;
-	
+
 	/* create db */
 	tmpdbf = gdbm_open(DB_FILE, 0, GDBM_NEWDB, 0600, NULL);
 	if (tmpdbf==NULL) {
@@ -772,18 +768,18 @@ static void wrap_gdbm_init(void) {
 	}
 	gdbm_close( tmpdbf);
 
-	dbf.read_dbf = gdbm_open(DB_FILE, 0, GDBM_READER, 0600, NULL);
-	if (dbf.read_dbf==NULL) {
+	read_dbf = gdbm_open(DB_FILE, 0, GDBM_READER, 0600, NULL);
+	if (read_dbf==NULL) {
 		fprintf(stderr, "Error opening gdbm database\n");
 		exit(1);
 	}
 }
 
 static void wrap_gdbm_deinit(void) {
-	gdbm_close( dbf.read_dbf);
+	gdbm_close( read_dbf);
 }
 
-static int wrap_gdbm_store( DBF* dbf, gnutls_datum key, gnutls_datum data) {
+static int wrap_gdbm_store( void* dbf, gnutls_datum key, gnutls_datum data) {
 	datum _key, _data;
 	int res;
 	GDBM_FILE write_dbf;
@@ -806,14 +802,14 @@ static int wrap_gdbm_store( DBF* dbf, gnutls_datum key, gnutls_datum data) {
 	return res;
 }
 
-static gnutls_datum wrap_gdbm_fetch( DBF* dbf, gnutls_datum key) {
+static gnutls_datum wrap_gdbm_fetch( void* dbf, gnutls_datum key) {
 	datum _key, _res;
 	gnutls_datum res2;
 	
 	_key.dptr = key.data;
 	_key.dsize = key.size;
 	
-	_res = gdbm_fetch( dbf->read_dbf, _key);
+	_res = gdbm_fetch( (GDBM_FILE)dbf, _key);
 
 	res2.data = _res.dptr;
 	res2.size = _res.dsize;
@@ -821,7 +817,7 @@ static gnutls_datum wrap_gdbm_fetch( DBF* dbf, gnutls_datum key) {
 	return res2;
 }
 
-static int wrap_gdbm_delete( DBF* dbf, gnutls_datum key) {
+static int wrap_gdbm_delete( void* dbf, gnutls_datum key) {
 	datum _key;
 	int res;
 	GDBM_FILE write_dbf;
@@ -834,7 +830,7 @@ static int wrap_gdbm_delete( DBF* dbf, gnutls_datum key) {
 	
 	_key.dptr = key.data;
 	_key.dsize = key.size;
-	
+
 	res = gdbm_delete( write_dbf, _key);
 	gdbm_close( write_dbf);
 
