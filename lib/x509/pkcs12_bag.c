@@ -134,7 +134,7 @@ int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag)
   * This function will return the bag's data. 
   *
   **/
-int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_const_datum * data)
+int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum * data)
 {
 	if (bag == NULL) {
 		gnutls_assert();

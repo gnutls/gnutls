@@ -192,11 +192,7 @@ typedef struct {
 	unsigned int size;
 } gnutls_datum;
 
-
-typedef struct {
-	const unsigned char * data;
-	unsigned int size;
-} gnutls_const_datum;
+#define gnutls_const_datum gnutls_datum
 
 /* internal functions */
 
