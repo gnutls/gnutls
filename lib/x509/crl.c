@@ -487,3 +487,79 @@ int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl crl,
 
 }
 
+/**
+  * gnutls_x509_crl_export - This function will export the CRL
+  * @crl: Holds the revocation list
+  * @format: the format of output params. One of PEM or DER.
+  * @output_data: will contain a private key PEM or DER encoded
+  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will export the revocation list to DER or PEM format.
+  *
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  *
+  * If the structure is PEM encoded, it will have a header
+  * of "BEGIN X509 CRL".
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_x509_crl_export( gnutls_x509_crl crl,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+{
+	return _gnutls_x509_export_int( crl->crl, format, PEM_CRL, *output_data_size,
+		output_data, output_data_size);
+}
+
+/*-
+  * _gnutls_x509_crl_cpy - This function copies a gnutls_x509_crl structure
+  * @dest: The structure where to copy
+  * @src: The structure to be copied
+  *
+  * This function will copy an X.509 certificate structure. 
+  *
+  * Returns 0 on success.
+  *
+  -*/
+int _gnutls_x509_crl_cpy(gnutls_x509_crl dest, gnutls_x509_crl src)
+{
+int ret;
+int der_size;
+opaque * der;
+gnutls_datum tmp;
+
+	ret = gnutls_x509_crl_export( src, GNUTLS_X509_FMT_DER, NULL, &der_size);
+	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		gnutls_assert();
+		return ret;
+	}
+
+	der = gnutls_alloca( der_size);
+	if (der == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret = gnutls_x509_crl_export( src, GNUTLS_X509_FMT_DER, der, &der_size);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_afree( der);
+		return ret;
+	}
+
+	tmp.data = der;
+	tmp.size = der_size;
+	ret = gnutls_x509_crl_import( dest, &tmp, GNUTLS_X509_FMT_DER);
+
+	gnutls_afree( der);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+
+}

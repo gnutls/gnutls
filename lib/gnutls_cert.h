@@ -83,6 +83,8 @@ typedef enum ConvFlags {
 
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCert,
 	int flags);
+int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
+	unsigned int flags);
 void _gnutls_free_cert(gnutls_cert* cert);
 int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn);
 

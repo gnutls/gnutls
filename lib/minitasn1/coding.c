@@ -783,6 +783,8 @@ asn1_der_coding(ASN1_TYPE element,const char *name,unsigned char *der,int *len,
 	  if(p->value[0]=='F') der[counter++]=0;
 	  else der[counter++]=0xFF;
 	}
+	else 
+	  counter+=2;
       }
       move=RIGHT;
       break;

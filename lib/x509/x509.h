@@ -77,6 +77,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid,
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, int* critical);
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits);
 
+int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src);
 int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
 	gnutls_const_datum* start);
 int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
@@ -90,6 +91,7 @@ int _gnutls_x509_compare_raw_dn(const gnutls_const_datum * dn1,
 int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert, gnutls_x509_crl * crl_list, int crl_list_length);
 
 
+int _gnutls_x509_crl_cpy(gnutls_x509_crl dest, gnutls_x509_crl src);
 int _gnutls_x509_crl_get_raw_issuer_dn( gnutls_x509_crl crl,
 	gnutls_const_datum* dn);
 int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
@@ -101,11 +103,15 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
 int gnutls_x509_crl_init(gnutls_x509_crl * crl);
 int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 			   gnutls_x509_crt_fmt format);
+int gnutls_x509_crl_export( gnutls_x509_crl crl,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
 
 int gnutls_x509_crt_init(gnutls_x509_crt * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt cert);
 int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
+int gnutls_x509_crt_export( gnutls_x509_crt cert,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
 
 int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
 	int *critical);

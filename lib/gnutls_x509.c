@@ -162,17 +162,14 @@ uint pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
 	return 0;
 }
 
-#define MAX_FILE_SIZE 100*1024
-
 /* Reads a DER encoded certificate list from memory and stores it to
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
  * returns the number of certificates parsed (1)
  */
-static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts, 
-	const char *input_cert, int input_cert_size)
+static int parse_crt_mem( gnutls_cert** cert_list, int* ncerts, 
+	gnutls_x509_crt cert)
 {
 	int i;
-	gnutls_datum tmp;
 	int ret;
 
 	i = *ncerts + 1;
@@ -187,11 +184,8 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	tmp.data = (opaque*)input_cert;
-	tmp.size = input_cert_size;
-
-	ret = _gnutls_x509_cert2gnutls_cert( 
-		&cert_list[0][i - 1], &tmp, 0);
+	ret = _gnutls_x509_crt2gnutls_cert( 
+		&cert_list[0][i-1], cert, 0);
 	if ( ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -200,6 +194,39 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	*ncerts = i;
 
 	return 1; /* one certificate parsed */
+}
+
+/* Reads a DER encoded certificate list from memory and stores it to
+ * a gnutls_cert structure. This is only called if PKCS7 read fails.
+ * returns the number of certificates parsed (1)
+ */
+static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts, 
+	const char *input_cert, int input_cert_size)
+{
+	gnutls_datum tmp;
+	gnutls_x509_crt cert;
+	int ret;
+
+	ret = gnutls_x509_crt_init( &cert);
+	if ( ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	tmp.data = (opaque*)input_cert;
+	tmp.size = input_cert_size;
+
+	ret = gnutls_x509_crt_import( cert, &tmp, GNUTLS_X509_FMT_DER);
+	if ( ret < 0) {
+		gnutls_assert();
+		gnutls_x509_crt_deinit( cert);
+		return ret;
+	}
+
+	ret = parse_crt_mem( cert_list, ncerts, cert);
+	gnutls_x509_crt_deinit( cert);
+	
+	return ret;
 }
 
 #define CERT_PEM 1
@@ -511,7 +538,13 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 		return ret;
 	}
 
-	privkey_cpy( &res->pkey[res->ncerts], tmpkey);
+	ret = privkey_cpy( &res->pkey[res->ncerts], tmpkey);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_privkey_deinit( tmpkey);
+
+		return ret;
+	}
 
 	gnutls_x509_privkey_deinit( tmpkey);
 
@@ -704,6 +737,50 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 }
 
 /**
+  * gnutls_certificate_free_cas - Used to free all the CAs from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the CAs associated
+  * with the given credentials.
+  *
+  **/
+void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
+{
+	uint j;
+
+        for (j = 0; j < sc->x509_ncas; j++) {
+		gnutls_x509_crt_deinit( sc->x509_ca_list[j]);
+        }
+        
+        sc->x509_ncas = 0;
+
+	gnutls_free( sc->x509_ca_list);
+	sc->x509_ca_list = NULL;
+}
+
+/**
+  * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the CRLs associated
+  * with the given credentials.
+  *
+  **/
+void gnutls_certificate_free_crls(gnutls_certificate_credentials sc)
+{
+	uint j;
+
+        for (j = 0; j < sc->x509_ncrls; j++) {
+		gnutls_x509_crl_deinit( sc->x509_crl_list[j]);
+        }
+        
+        sc->x509_ncrls = 0;
+
+	gnutls_free( sc->x509_crl_list);
+	sc->x509_crl_list = NULL;
+}
+
+/**
   * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials structure
   * @res: is an &gnutls_certificate_credentials structure.
   * @CERT: contains a certificate list (path) for the specified private key
@@ -741,6 +818,78 @@ int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, cons
 
 	if ((ret = read_cert_mem( res, CERT->data, CERT->size, type)) < 0)
 		return ret;
+
+	res->ncerts++;
+
+	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
+  * gnutls_certificate_set_x509_key - Used to set keys in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
+  * @cert_list: contains a certificate list (path) for the specified private key
+  * @cert_list_size: holds the size of the certificate list
+  * @key: is a gnutls_x509_privkey  key
+  *
+  * This function sets a certificate/private key pair in the 
+  * gnutls_certificate_credentials structure. This function may be called
+  * more than once (in case multiple keys/certificates exist for the
+  * server).
+  *
+  **/
+int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res, 
+	gnutls_x509_crt *cert_list, int cert_list_size,
+	gnutls_x509_privkey key)
+{
+	int ret, i;
+
+	/* this should be first 
+	 */
+
+	res->pkey = gnutls_realloc_fast( res->pkey, (res->ncerts+1)*sizeof(gnutls_privkey));
+	if (res->pkey==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret = privkey_cpy( &res->pkey[res->ncerts], key);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	res->cert_list = gnutls_realloc_fast( res->cert_list, 
+		(1+ res->ncerts)*sizeof(gnutls_cert*));
+	if ( res->cert_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	res->cert_list_length = gnutls_realloc_fast( res->cert_list_length,
+		(1+ res->ncerts)*sizeof(int));
+	if (res->cert_list_length==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	res->cert_list[res->ncerts] = NULL; /* for realloc */
+	res->cert_list_length[res->ncerts] = 0;
+
+
+	for (i=0;i<cert_list_size;i++) {
+		ret = parse_crt_mem( &res->cert_list[res->ncerts], 
+			&res->cert_list_length[res->ncerts], cert_list[i]);
+		if ( ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+	res->ncerts++;
 
 	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
 		gnutls_assert();
@@ -1062,6 +1211,48 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res,
 }
 
 /**
+  * gnutls_certificate_set_x509_trust - Used to add trusted CAs in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
+  * @ca_list: is a list of trusted CAs
+  * @ca_list_size: holds the size of the CA list
+  *
+  * This function adds the trusted CAs in order to verify client
+  * certificates. This function may be called multiple times.
+  *
+  * In case of a server the CAs set here will be sent to the client
+  * if a certificate request is sent. This can be disabled using 
+  * gnutls_certificate_send_x509_rdn_sequence().
+  *
+  **/
+int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res, 
+	gnutls_x509_crt * ca_list, int ca_list_size)
+{
+	int ret, i, ret2;
+
+	res->x509_ca_list = gnutls_realloc_fast( res->x509_ca_list, 
+		(ca_list_size + res->x509_ncas)*sizeof(gnutls_x509_crt));
+	if ( res->x509_ca_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	for (i=0;i<ca_list_size;i++) {
+		ret = _gnutls_x509_crt_cpy( res->x509_ca_list[i+res->x509_ncas], 
+			ca_list[i]);
+		if ( ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		res->x509_ncas++;
+	}
+
+	if ((ret2 = generate_rdn_seq(res)) < 0)
+		return ret2;
+
+	return 0;
+}
+
+/**
   * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials structure
   * @res: is an &gnutls_certificate_credentials structure.
   * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
@@ -1275,6 +1466,41 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res,
 		return ret;
 
 	return ret;
+}
+
+/**
+  * gnutls_certificate_set_x509_crl - Used to add CRLs in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
+  * @crl_list: is a list of trusted CRLs. They should have been verified before.
+  * @crl_list_size: holds the size of the crl_list
+  *
+  * This function adds the trusted CRLs in order to verify client or server
+  * certificates. This function may be called multiple times.
+  *
+  **/
+int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res, 
+	gnutls_x509_crl* crl_list, int crl_list_size)
+{
+	int ret, i;
+
+	res->x509_crl_list = gnutls_realloc_fast( res->x509_crl_list, 
+		(crl_list_size + res->x509_ncrls)*sizeof(gnutls_x509_crl));
+	if ( res->x509_crl_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	for (i=0;i<crl_list_size;i++) {
+		ret = _gnutls_x509_crl_cpy( res->x509_crl_list[i+res->x509_ncrls], 
+			crl_list[i]);
+		if ( ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		res->x509_ncrls++;
+	}
+
+	return 0;
 }
 
 /**

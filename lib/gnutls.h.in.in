@@ -314,10 +314,13 @@ void gnutls_certificate_free_credentials( gnutls_certificate_credentials sc);
 int gnutls_certificate_allocate_credentials( gnutls_certificate_credentials *sc);
 
 void gnutls_certificate_free_keys(gnutls_certificate_credentials sc);
+void gnutls_certificate_free_cas(gnutls_certificate_credentials sc);
+void gnutls_certificate_free_crls(gnutls_certificate_credentials sc);
 
 void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params);
 void gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
 void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, unsigned int flags);
+
 
 int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials res, const char* CAFILE, 
 	gnutls_x509_crt_fmt);
@@ -334,6 +337,27 @@ int gnutls_certificate_set_x509_key_file( gnutls_certificate_credentials res,
 int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum* CERT, const gnutls_datum* KEY,
 	gnutls_x509_crt_fmt);
+
+
+/* New functions to allow setting already parsed X.509 stuff.
+ */
+struct gnutls_x509_privkey_int;
+typedef struct gnutls_x509_privkey_int* gnutls_x509_privkey;
+
+struct gnutls_x509_crl_int;
+typedef struct gnutls_x509_crl_int* gnutls_x509_crl;
+
+struct gnutls_x509_crt_int;
+typedef struct gnutls_x509_crt_int* gnutls_x509_crt;
+
+int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res, 
+	gnutls_x509_crt *cert_list, int cert_list_size,
+	gnutls_x509_privkey key);
+int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res, 
+	gnutls_x509_crt * ca_list, int ca_list_size);
+int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res, 
+	gnutls_x509_crl* crl_list, int crl_list_size);
+
 
 /* global state functions 
  */

@@ -36,7 +36,7 @@
 #include <gnutls_ui.h>
 
 /**
-  * gnutls_x509_crt_init - This function initializes a gnutls_crl structure
+  * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt structure
   * @cert: The structure to be initialized
   *
   * This function will initialize an X.509 certificate structure. 
@@ -59,6 +59,57 @@ int gnutls_x509_crt_init(gnutls_x509_crt * cert)
 		return 0;		/* success */
 	}
 	return GNUTLS_E_MEMORY_ERROR;
+}
+
+/*-
+  * _gnutls_x509_crt_cpy - This function copies a gnutls_x509_crt structure
+  * @dest: The structure where to copy
+  * @src: The structure to be copied
+  *
+  * This function will copy an X.509 certificate structure. 
+  *
+  * Returns 0 on success.
+  *
+  -*/
+int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src)
+{
+int ret;
+int der_size;
+opaque * der;
+gnutls_datum tmp;
+
+	ret = gnutls_x509_crt_export( src, GNUTLS_X509_FMT_DER, NULL, &der_size);
+	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		gnutls_assert();
+		return ret;
+	}
+
+	der = gnutls_alloca( der_size);
+	if (der == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret = gnutls_x509_crt_export( src, GNUTLS_X509_FMT_DER, der, &der_size);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_afree( der);
+		return ret;
+	}
+
+	tmp.data = der;
+	tmp.size = der_size;
+	ret = gnutls_x509_crt_import( dest, &tmp, GNUTLS_X509_FMT_DER);
+
+	gnutls_afree( der);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+
 }
 
 /**
@@ -1005,13 +1056,38 @@ gnutls_datum tmp;
 		return _gnutls_asn2err(result);
 	}
 	
-	tmp.data = cert_buf;
 	tmp.size = cert_buf_size;
 
 	result = gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
 	gnutls_afree( cert_buf);
 
 	return result;
+}
+
+/**
+  * gnutls_x509_crt_export - This function will export the certificate
+  * @cert: Holds the certificate
+  * @format: the format of output params. One of PEM or DER.
+  * @output_data: will contain a private key PEM or DER encoded
+  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will export the certificate to DER or PEM format.
+  *
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  *
+  * If the structure is PEM encoded, it will have a header
+  * of "BEGIN CERTIFICATE".
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_x509_crt_export( gnutls_x509_crt cert,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+{
+	return _gnutls_x509_export_int( cert->cert, format, "CERTIFICATE", *output_data_size,
+		output_data, output_data_size);
 }
 
 

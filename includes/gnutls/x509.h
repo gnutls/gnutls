@@ -46,13 +46,13 @@ extern "C" {
 
 /* Certificate handling functions */
                       
-struct gnutls_x509_crt_int;
-typedef struct gnutls_x509_crt_int* gnutls_x509_crt;
 
 int gnutls_x509_crt_init(gnutls_x509_crt * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt cert);
 int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
+int gnutls_x509_crt_export( gnutls_x509_crt cert,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
 	 int *sizeof_buf);
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, 
@@ -107,14 +107,14 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
 
 /* CRL handling functions */
 
-struct gnutls_x509_crl_int;
-typedef struct gnutls_x509_crl_int* gnutls_x509_crl;
 
 int gnutls_x509_crl_init(gnutls_x509_crl * crl);
 void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
 
 int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data, 
 	gnutls_x509_crt_fmt format);
+int gnutls_x509_crl_export( gnutls_x509_crl crl,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
 
 int gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl crl, 
 	char *buf, int *sizeof_buf);
@@ -191,8 +191,6 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert,
 
 /* Private key handling
  */
-struct gnutls_x509_privkey_int;
-typedef struct gnutls_x509_privkey_int* gnutls_x509_privkey;
 
 int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
 void gnutls_x509_privkey_deinit(gnutls_x509_privkey key);

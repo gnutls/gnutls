@@ -1058,8 +1058,10 @@ pkcs-5-PBES2-params ::= SEQUENCE {
 
 pkcs-5-id-PBKDF2 OBJECT IDENTIFIER ::= {pkcs-5 12}
 
+-- pkcs-5-id-hmacWithSHA1 OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) 2 7}
+
 -- pkcs-5-algid-hmacWithSHA1 AlgorithmIdentifier ::=
---  {algorithm pkcs-5-id-hmacWithSHA1, parameters NULL : NULL}
+--   {algorithm pkcs-5-id-hmacWithSHA1, parameters NULL : NULL}
 
 pkcs-5-PBKDF2-params ::= SEQUENCE {
   salt CHOICE {
