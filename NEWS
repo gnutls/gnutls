@@ -1,3 +1,6 @@
+Version 0.2.3 (21/08/2001)
+- Fixed several memory leaks
+
 Version 0.2.2 (21/08/2001)
 - Several bugfixes (library and documentation)
 

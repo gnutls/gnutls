@@ -172,6 +172,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 
 	/* free priorities */
 	GNUTLS_FREE(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
+	GNUTLS_FREE(state->gnutls_internals.ProtocolPriority.algorithm_priority);
 	GNUTLS_FREE(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
 	GNUTLS_FREE(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
 	GNUTLS_FREE(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);
@@ -448,15 +449,20 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, &data[i*Size], Size, &cipher, type);
 		if (cipher_size <= 0) {
 			gnutls_assert();
+			if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
 			return cipher_size; /* error */
 		}
 		
 		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
+			gnutls_free( cipher);
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
+
+		gnutls_free(cipher);
+
 #ifdef RECORD_DEBUG
 		_gnutls_log( "Record: Sended Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
@@ -469,21 +475,30 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			gnutls_assert();
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}
+
 	}
+
 
 	/* rest of data 
 	 */
 	if (iterations > 1) {
 		Size = sizeofdata % MAX_ENC_LEN;
 		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, &data[i*Size], Size, &cipher, type);
-		if (cipher_size<=0) return cipher_size;
-
+		if (cipher_size<=0) {
+			if (cipher_size == 0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
+			gnutls_assert();
+			return cipher_size;
+		}
+		
 		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
+			gnutls_free(cipher);
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
+
+		gnutls_free(cipher);
 
 		/* increase sequence number
 		 */
@@ -495,8 +510,6 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	}
 
 	ret += sizeofdata;
-
-	gnutls_free(cipher);
 
 	return ret;
 }

@@ -76,14 +76,6 @@ GNUTLS_STATE initialize_state()
 	int ret;
 
 
-	/* this is a password file (created with the included crypt utility) 
-	 * Read README.crypt prior to using SRP.
-	 */
-	gnutls_allocate_srp_server_sc( &srp_cred);
-	gnutls_set_srp_server_cred( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
-
-	gnutls_allocate_anon_server_sc( &dh_cred);
-	gnutls_set_anon_server_cred( dh_cred, 1024);
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
@@ -374,7 +366,14 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	/* this is a password file (created with the included crypt utility) 
+	 * Read README.crypt prior to using SRP.
+	 */
+	gnutls_allocate_srp_server_sc( &srp_cred);
+	gnutls_set_srp_server_cred( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
+	gnutls_allocate_anon_server_sc( &dh_cred);
+	gnutls_set_anon_server_cred( dh_cred, 1024);
 
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
@@ -394,6 +393,7 @@ int main(int argc, char **argv)
 	printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
 
 	client_len = sizeof(sa_cli);
+	
 	for (;;) {
 		state = initialize_state();
 
@@ -465,7 +465,7 @@ int main(int argc, char **argv)
 		 */
 		close(sd);
 		gnutls_deinit(state);
-		
+
 	}
 	close(listen_sd);
 

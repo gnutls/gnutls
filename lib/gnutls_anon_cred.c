@@ -34,7 +34,7 @@
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_anon_server_sc( ANON_SERVER_CREDENTIALS* sc) {
+void gnutls_free_anon_server_sc( ANON_SERVER_CREDENTIALS sc) {
 	gnutls_free(sc);
 }
 
@@ -46,7 +46,7 @@ void gnutls_free_anon_server_sc( ANON_SERVER_CREDENTIALS* sc) {
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS **sc) {
+int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS *sc) {
 	*sc = gnutls_malloc(sizeof( ANON_SERVER_CREDENTIALS));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;

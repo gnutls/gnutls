@@ -55,7 +55,7 @@ _asn1_add_node(unsigned int type)
 
   if(parse_mode==PARSE_MODE_CHECK) return NULL;
 
-  punt=(node_asn *) malloc(sizeof(node_asn));
+  punt=(node_asn *) gnutls_malloc(sizeof(node_asn));
 
   punt->left=NULL;
   punt->name=NULL;
@@ -75,11 +75,11 @@ _asn1_set_value(node_asn *node,unsigned char *value,unsigned int len)
 
   if(node==NULL) return node;
   if(node->value){
-    free(node->value);
+    gnutls_free(node->value);
     node->value=NULL;  
   }
   if(!len) return node;
-  node->value=(unsigned char *) malloc(len);
+  node->value=(unsigned char *) gnutls_malloc(len);
   memcpy(node->value,value,len);
   return node;
 }
@@ -92,7 +92,7 @@ _asn1_set_name(node_asn *node,char *name)
   if(node==NULL) return node;
 
   if(node->name){
-    free(node->name);
+    gnutls_free(node->name);
     node->name=NULL;
   }
 
@@ -100,7 +100,7 @@ _asn1_set_name(node_asn *node,char *name)
 
   if(strlen(name))
 	{
-  	node->name=(char *) malloc(strlen(name)+1);
+  	node->name=(char *) gnutls_malloc(strlen(name)+1);
   	strcpy(node->name,name);
       }
   else node->name=NULL;
@@ -187,9 +187,9 @@ _asn1_remove_node(node_asn *node)
 
   if(node==NULL) return;
 
-  free(node->name);
-  free(node->value);
-  free(node);
+  gnutls_free(node->name);
+  gnutls_free(node->value);
+  gnutls_free(node);
 }
 
 
@@ -317,7 +317,7 @@ _asn1_convert_integer(char *value,unsigned char *value_out,int value_out_size, i
 
 
 int
-asn1_create_tree(static_asn *root,node_asn **pointer)
+asn1_create_tree(const static_asn *root,node_asn **pointer)
 {
   node_asn *p,*p_last;
   unsigned long k;
@@ -795,7 +795,7 @@ _asn1_append_sequence_set(node_asn *node)
   p2=_asn1_copy_structure3(p);
   while(p->right) p=p->right;
   _asn1_set_right(p,p2);
-  temp=(char *) malloc(10);
+  temp=(char *) gnutls_malloc(10);
   if(p->name==NULL) strcpy(temp,"?1");
   else{
     n=strtol(p->name+1,NULL,0);
@@ -804,7 +804,7 @@ _asn1_append_sequence_set(node_asn *node)
     _asn1_ltostr(n,temp+1);
   } 
   _asn1_set_name(p2,temp);
-  free(temp);
+  gnutls_free(temp);
 
   return ASN_OK;
 }
@@ -851,7 +851,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   case TYPE_INTEGER: case TYPE_ENUMERATED:
     if(len==0){
       if(isdigit(value[0])){
-	value_temp=(unsigned char *)malloc(4);
+	value_temp=(unsigned char *)gnutls_malloc(4);
 	_asn1_convert_integer(value,value_temp,4, &len);
       }
       else{ /* is an identifier like v1 */
@@ -860,7 +860,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	while(p){
 	  if(type_field(p->type)==TYPE_CONSTANT){
 	    if((p->name) && (!strcmp(p->name,value))){
-	      value_temp=(unsigned char *)malloc(4);
+	      value_temp=(unsigned char *)gnutls_malloc(4);
 	      _asn1_convert_integer(p->value,value_temp,4, &len);
 	      break;
 	    }
@@ -871,7 +871,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
       }
     }
     else{
-      value_temp=(unsigned char *)malloc(len);
+      value_temp=(unsigned char *)gnutls_malloc(len);
       memcpy(value_temp,value,len);
     }
 
@@ -880,7 +880,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
     else negative=0;
 
     if(negative && (type_field(node->type)==TYPE_ENUMERATED)) 
-      {free(value_temp);return ASN_VALUE_NOT_VALID;}
+      {gnutls_free(value_temp);return ASN_VALUE_NOT_VALID;}
 
     for(k=0;k<len-1;k++)
       if(negative && (value_temp[k]!=0xFF)) break;
@@ -890,17 +890,17 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
        (!negative && (value_temp[k]&0x80))) k--; 
 
     _asn1_length_der(len-k,NULL,&len2);
-    temp=(unsigned char *)malloc(len-k+len2);
+    temp=(unsigned char *)gnutls_malloc(len-k+len2);
     _asn1_octet_der(value_temp+k,len-k,temp,&len2);
     _asn1_set_value(node,temp,len2);
 
-    free(temp);
+    gnutls_free(temp);
 
     if(node->type&CONST_DEFAULT){
       p=node->down;
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
       if(isdigit(p->value[0])){
-	default_temp=(unsigned char *)malloc(4);
+	default_temp=(unsigned char *)gnutls_malloc(4);
 	_asn1_convert_integer(p->value,default_temp,4,&len2);
       }
       else{ /* is an identifier like v1 */
@@ -909,7 +909,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	while(p2){
 	  if(type_field(p2->type)==TYPE_CONSTANT){
 	    if((p2->name) && (!strcmp(p2->name,p->value))){
-	      default_temp=(unsigned char *)malloc(4);
+	      default_temp=(unsigned char *)gnutls_malloc(4);
 	      _asn1_convert_integer(p2->value,default_temp,4,&len2);
 	      break;
 	    }
@@ -926,9 +926,9 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	  }
 	if(k2==len2) _asn1_set_value(node,NULL,0);
       }
-      free(default_temp);
+      gnutls_free(default_temp);
     }
-    free(value_temp);
+    gnutls_free(value_temp);
     break;
   case TYPE_OBJECT_ID:
     for(k=0;k<strlen(value);k++)
@@ -972,17 +972,17 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
     break;
   case  TYPE_OCTET_STRING:
     _asn1_length_der(len,NULL,&len2);
-    temp=(unsigned char *)malloc(len+len2);
+    temp=(unsigned char *)gnutls_malloc(len+len2);
     _asn1_octet_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
-    free(temp);
+    gnutls_free(temp);
     break;
   case  TYPE_BIT_STRING:
     _asn1_length_der((len>>3)+2,NULL,&len2);
-    temp=(unsigned char *)malloc((len>>3)+2+len2);
+    temp=(unsigned char *)gnutls_malloc((len>>3)+2+len2);
     _asn1_bit_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
-    free(temp);
+    gnutls_free(temp);
     break;
   case  TYPE_CHOICE:
     p=node->down;
@@ -1001,10 +1001,10 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
     break;
   case TYPE_ANY:
     _asn1_length_der(len,NULL,&len2);
-    temp=(unsigned char *)malloc(len+len2);
+    temp=(unsigned char *)gnutls_malloc(len+len2);
     _asn1_octet_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
-    free(temp);
+    gnutls_free(temp);
     break;
   case TYPE_SEQUENCE_OF: case TYPE_SET_OF:
     if(strcmp(value,"NEW")) return ASN_VALUE_NOT_VALID;    

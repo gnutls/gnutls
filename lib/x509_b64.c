@@ -355,9 +355,12 @@ int _gnutls_fbase64_decode( uint8 * data, int data_size,
 	}
 
 	if ((ret = _gnutls_base64_decode( kdata, kdata_size, result)) < 0) {
+		gnutls_free(kdata);
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	} 
+	gnutls_free(kdata);
+	
 	return ret;
 }
 
