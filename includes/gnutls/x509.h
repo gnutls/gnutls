@@ -76,11 +76,11 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, size_t* resul
 
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits);
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, char *ret, size_t *ret_size, int* critical);
-int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, int* critical);
+	int seq, char *ret, size_t *ret_size, unsigned int* critical);
+int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
 
 int gnutls_x509_crt_get_key_usage( gnutls_x509_crt cert, unsigned int* key_usage,
-	int* critical);
+	unsigned int* critical);
 
 /* key_usage will be an OR of the following values:
  */
@@ -96,7 +96,7 @@ int gnutls_x509_crt_get_key_usage( gnutls_x509_crt cert, unsigned int* key_usage
 
 int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, 
 	const char* oid, int indx,
-	unsigned char* buf, size_t * sizeof_buf, int * critical);
+	unsigned char* buf, size_t * sizeof_buf, unsigned int * critical);
 
 int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail);
 
