@@ -19,6 +19,13 @@
  */
 
 #include "gnutls_int.h"
+#include "gnutls_errors.h"
+#include "gnutls_gcry.h"
+#include "gnutls_cert.h"
+#include "gnutls_datum.h"
+#include "gnutls_global.h"
+#include "auth_cert.h"
+#include "gnutls_openpgp.h"
 
 #ifdef HAVE_LIBOPENCDK
 
@@ -32,13 +39,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "gnutls_errors.h"
-#include "gnutls_gcry.h"
-#include "gnutls_cert.h"
-#include "gnutls_datum.h"
-#include "gnutls_global.h"
-#include "auth_cert.h"
-#include "gnutls_openpgp.h"
 
 static void
 release_mpi_array(MPI *arr, size_t n)
