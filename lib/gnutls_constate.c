@@ -54,6 +54,9 @@ static const int servwrite_length = sizeof(servwrite) - 1;
 int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size,
 		     int key_size, int export_flag)
 {
+
+/* FIXME: This function is too long
+ */
 	opaque *key_block;
 	char random[2 * TLS_RANDOM_SIZE];
 	char rrandom[2 * TLS_RANDOM_SIZE];
@@ -199,13 +202,12 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size,
 			client_write_key_size = EXPORT_FINAL_KEY_SIZE;
 			pos += key_size;
 
-			if (state->security_parameters.version == GNUTLS_SSL3) {	/* SSL 3 */
+			if (state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3 */
 				ret =
-				    _gnutls_ssl3_hash_md5(&key_block
-								 [pos], key_size,
-								 random, 2 * TLS_RANDOM_SIZE,
-								 EXPORT_FINAL_KEY_SIZE,
-								 server_write_key);
+				    _gnutls_ssl3_hash_md5(&key_block[pos], key_size,
+							 random, 2 * TLS_RANDOM_SIZE,
+							 EXPORT_FINAL_KEY_SIZE,
+							 server_write_key);
 			} else {	/* TLS 1.0 */
 				ret =
 				    _gnutls_PRF(&key_block[pos], key_size,
