@@ -29,9 +29,14 @@ The rules here are not always used, although we try to stick to them.
  "gnutls_global_" for the global structures handling
  and probably more.
 
+ Internal functions -- that are not exported in the API -- should
+ be prefixed with an underscore. Ie. _gnutls_handshake_begin()
+
 
 *** Constructed types:
   The constructed types in gnutls always have the "gnutls_" prefix.
+ Definitions, value defaults and enumerated values should be in
+ capitals. Ie GNUTLS_CIPHER_3DES_CBC
 
 
 *** Function parameters:

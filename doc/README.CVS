@@ -39,3 +39,7 @@ $ make ChangeLog
 $ cd doc/tex
 $ make gnutls.ps
 $ make gnutls.html
+
+4. If you intend to change any code in gnutls, check the
+ doc/README.CODING_STYLE.
+
