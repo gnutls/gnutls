@@ -12,7 +12,7 @@ following software:
 * texinfo (http://www.gnu.org/software/texinfo/)
 * gtk-doc CVS (to generate reference HTML manual in doc/reference/)
   with the patch below, from:
-  http://bugzilla.gnome.org/show_bug.cgi?id=156300
+  http://bugzilla.gnome.org/show_bug.cgi?id=156643
 
 Those are optional:
 * latex/dvips (in order to create gnutls.ps)
@@ -41,24 +41,16 @@ $ make ChangeLog
 Index: gtk-doc.make
 ===================================================================
 RCS file: /cvs/gnome/gtk-doc/gtk-doc.make,v
-retrieving revision 1.9
-diff -u -p -r1.9 gtk-doc.make
---- gtk-doc.make	14 Oct 2004 18:59:25 -0000	1.9
-+++ gtk-doc.make	5 Jan 2005 02:19:49 -0000
-@@ -49,6 +49,7 @@ all-local: html-build.stamp
- scan-build.stamp: $(HFILE_GLOB) $(CFILE_GLOB)
- 	@echo '*** Scanning header files ***'
- 	@-chmod -R u+w $(srcdir)
-+	test -f $(DOC_MODULE).types || touch $(DOC_MODULE).types
- 	if grep -l '^..*$$' $(srcdir)/$(DOC_MODULE).types > /dev/null ; then \
- 	    CC="$(GTKDOC_CC)" LD="$(GTKDOC_LD)" CFLAGS="$(GTKDOC_CFLAGS)" LDFLAGS="$(GTKDOC_LIBS)" gtkdoc-scangobj $(SCANGOBJ_OPTIONS) --module=$(DOC_MODULE) --output-dir=$(srcdir) ; \
- 	else \
-@@ -66,7 +67,7 @@ $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES):
- 
+retrieving revision 1.10
+diff -u -p -r1.10 gtk-doc.make
+--- gtk-doc.make        28 Jan 2005 11:16:47 -0000      1.10
++++ gtk-doc.make        30 Jan 2005 12:09:49 -0000
+@@ -65,7 +65,7 @@ $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES):
+
  #### templates ####
- 
+
 -tmpl-build.stamp: $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES) $(DOC_MODULE)-sections.txt $(DOC_MODULE)-overrides.txt
-+tmpl-build.stamp tmpl/*.sgml: $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES) $(DOC_MODULE)-sections.txt $(DOC_MODULE)-overrides.txt
- 	@echo '*** Rebuilding template files ***'
- 	@-chmod -R u+w $(srcdir)
- 	cd $(srcdir) && gtkdoc-mktmpl --module=$(DOC_MODULE)
++tmpl-build.stamp $(srcdir)/tmpl/*.sgml: $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES) $(DOC_MODULE)-sections.txt $(DOC_MODULE)-overrides.txt
+        @echo '*** Rebuilding template files ***'
+        @-chmod -R u+w $(srcdir)
+        cd $(srcdir) && gtkdoc-mktmpl --module=$(DOC_MODULE)
