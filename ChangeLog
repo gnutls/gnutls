@@ -1,3 +1,10 @@
+2002-11-25 10:39  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_int.h, gnutls_x509.c:
+
+	gnutls_x509_extract_certificate_dn_string() now behaves as described
+	in RFC2253.  
+
 2002-11-23 08:10  nmav <nmav@gnutls.org>
 
 	* doc/README.CODING_STYLE, lib/gnutls_int.h:
