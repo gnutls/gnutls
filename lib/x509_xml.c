@@ -32,6 +32,8 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
+#include <gnutls_str.h>
+#include <gnutls_x509.h>
 
 static void *find_default_value(ASN1_TYPE x)
 {
@@ -62,18 +64,24 @@ static void *find_default_value(ASN1_TYPE x)
 
 static int is_node_printable(ASN1_TYPE x)
 {
+
 	switch (type_field(x->type)) {
-	case TYPE_CONSTANT:
 	case TYPE_TAG:
 	case TYPE_SIZE:
 	case TYPE_DEFAULT:
 		return 0;
+	case TYPE_CONSTANT: {
+		ASN1_TYPE up = _asn1_find_up( x);
+	
+		if (up!=NULL && type_field(up->type)!= TYPE_ANY &&
+			 up->value!=NULL) return 0;
+		}
+		return 1;
 	}
 	if (x->name == NULL)
 		return 0;
 	if (x->value == NULL && x->down == NULL)
 		return 0;
-//  else if (x->value==NULL && !(x->type&CONST_DEFAULT)) return 0;
 	return 1;
 }
 
@@ -116,19 +124,45 @@ static int is_leaf(ASN1_TYPE p)
 #define UNNAMED "unnamed"
 /* This function removes the '?' character from ASN.1 names
  */
-static int normalize_name( const char* aname, char* output, int output_size) 
+static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 {
 	if (output_size > 0)
 		output[0] = 0;
+	else return GNUTLS_E_INTERNAL_ERROR;
 
-	if (aname==NULL) return 0;
+	if (p==NULL) return GNUTLS_E_INTERNAL_ERROR;
 
-	if ( aname[0]=='?') {
+	if ( type_field(p->type)==TYPE_CONSTANT) {
+		ASN1_TYPE up = _asn1_find_up(p);
+		const char * tmp;
+				
+		if ( up && type_field(up->type)==TYPE_ANY &&
+			up->left && up->left->value &&
+			 up->type & CONST_DEFINED_BY &&
+			 type_field(up->left->type)==TYPE_OBJECT_ID) {
+
+			 tmp = _gnutls_x509_oid2string(up->left->value);
+			 if ( tmp != NULL)
+				 _gnutls_str_cpy( output, output_size, tmp);
+			 else {
+			 	_gnutls_str_cpy( output, output_size, "DEFINED_BY_");
+			 	_gnutls_str_cat( output, output_size, p->name);
+			 }
+		} else {
+			 _gnutls_str_cpy( output, output_size, "DEFINED_BY_");
+			 _gnutls_str_cat( output, output_size, p->name);
+		}
+		
+		
+		return 0;
+	}
+
+	if ( p->name[0]=='?') {
 		_gnutls_str_cpy( output, output_size, UNNAMED);
-		if (strlen(aname) > 1)
-			_gnutls_str_cat( output, output_size, &aname[1]);
+		if (strlen(p->name) > 1)
+			_gnutls_str_cat( output, output_size, &p->name[1]);
 	} else {
-		_gnutls_str_cpy( output, output_size, aname);
+		_gnutls_str_cpy( output, output_size, p->name);
 	}
 	return 0;
 }
@@ -162,6 +196,12 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 	if (root == NULL)
 		return GNUTLS_E_UNKNOWN_ERROR;
 
+	ret = asn1_expand_any_defined_by( _gnutls_get_pkix(),
+					&structure);
+
+//asn1_print_structure( stdout, structure, name, ASN1_PRINT_ALL);
+//return 0;
+////
 	p = root;
 	while (p) {
 
@@ -169,7 +209,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			for (k = 0; k < indent; k++)
 				APPEND(" ", 1);
 
-			if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+			if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -221,8 +261,27 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 				STR_APPEND(" type=\"OBJECT ID\"");
 				break;
 			case TYPE_ANY:
-				STR_APPEND(" type=\"ANY\"");
-				STR_APPEND(" encoding=\"HEX\"");
+//				if (p->type&CONST_DEFINED_BY) {
+//					STR_APPEND(" type=\"ANY DEFINED BY\"");
+//				} else {
+					STR_APPEND(" type=\"ANY\"");
+//				}
+				if (!p->down) STR_APPEND(" encoding=\"HEX\"");
+				break;
+			case TYPE_CONSTANT: {
+				ASN1_TYPE up = _asn1_find_up(p);
+
+				if ( up && type_field(up->type)==TYPE_ANY &&
+					up->left && up->left->value &&
+					 up->type & CONST_DEFINED_BY &&
+					 type_field(up->left->type)==TYPE_OBJECT_ID) {
+
+					if (_gnutls_x509_oid_data_printable( up->left->value)==0) {
+						STR_APPEND(" encoding=\"HEX\"");
+					}
+
+				}
+				}
 				break;
 			case TYPE_SET:
 				STR_APPEND(" type=\"SET\"");
@@ -353,19 +412,55 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 					STR_APPEND(value);
 				break;
 			case TYPE_ANY:
-				if (value) {
-					len3 = -1;
+				if (!p->down) {
+					if (value) {
+						len3 = -1;
+						len2 =
+						    _asn1_get_length_der(value,
+									 &len3);
+						for (k = 0; k < len2; k++) {
+							snprintf(tmp, sizeof(tmp),
+								 "%02X",
+								 (value)[k +
+								 len3]);
+							STR_APPEND(tmp);
+						}
+					}
+				}
+				break;
+			case TYPE_CONSTANT: {
+				ASN1_TYPE up = _asn1_find_up(p);
+
+				if ( up && type_field(up->type)==TYPE_ANY &&
+					up->left && up->left->value &&
+					 up->type & CONST_DEFINED_BY &&
+					 type_field(up->left->type)==TYPE_OBJECT_ID) {
+					
 					len2 =
-					    _asn1_get_length_der(value,
+					    _asn1_get_length_der(up->value,
 								 &len3);
 
-					for (k = 0; k < len2; k++) {
-						snprintf(tmp, sizeof(tmp),
-							 "%02X",
-							 (value)[k +
+					if (len2 > 0 && strcmp( p->name, "type")==0) {
+						ret = _gnutls_x509_attribute_type2string( up->left->value, up->value+len3, len2, tmp, sizeof(tmp));
+	
+						if (ret >= 0) {
+							STR_APPEND( tmp);
+						}
+					} else {
+						for (k = 0; k < len2; k++) {
+							snprintf(tmp, sizeof(tmp),
+								 "%02X",
+								 (up->value)[k +
 								 len3]);
-						STR_APPEND(tmp);
+							STR_APPEND(tmp);
+						}
+						
 					}
+				} else {
+					if (value)
+						STR_APPEND(value);
+				}
+
 				}
 				break;
 			case TYPE_SET:
@@ -395,7 +490,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			} while (x != NULL);
 		} else if (p == root) {
 			if (is_node_printable(p)) {
-				if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+				if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
 					gnutls_assert();
 					return ret;
 				}
@@ -408,7 +503,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			break;
 		} else {
 			if (is_node_printable(p)) {
-				if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+				if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
 					gnutls_assert();
 					return ret;
 				}
@@ -434,7 +529,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 							     k++)
 								STR_APPEND(" ");
 
-						if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+						if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
 							gnutls_assert();
 							return ret;
 						}

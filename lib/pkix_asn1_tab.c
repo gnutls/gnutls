@@ -353,7 +353,7 @@ const ASN1_ARRAY_TYPE pkix_asn1_tab[]={
   {0,2,"AttributeValue"},
   {"AttributeType",1073741836,0},
   {"AttributeValue",1614807053,0},
-  {"AttributeType",1,0},
+  {"type",1,0},
   {"AttributeTypeAndValue",1610612741,0},
   {"type",1073741826,"AttributeType"},
   {"value",2,"AttributeValue"},
