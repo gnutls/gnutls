@@ -1867,8 +1867,8 @@ static int _gnutls_handshake_hash_init( gnutls_session session) {
   *
   * The non-fatal errors such as GNUTLS_E_AGAIN and GNUTLS_E_INTERRUPTED
   * interrupt the handshake procedure, which should be later be resumed.
-  * (call this function again, until it returns 0); cf.
-  * gnutls_record_get_direction().
+  * Call this function again, until it returns 0; cf.
+  * gnutls_record_get_direction() and gnutls_error_is_fatal().
   *
   * If this function is called by a server after a rehandshake request then
   * GNUTLS_E_GOT_APPLICATION_DATA or GNUTLS_E_WARNING_ALERT_RECEIVED 
