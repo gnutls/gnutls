@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -70,89 +70,8 @@ void _gnutls_print_state(GNUTLS_STATE state)
 
 }
 
-const char* _gnutls_alert2str( int alert) {
-static char str[512];
 
-	switch(alert) {
-		case GNUTLS_A_CLOSE_NOTIFY:
-			strcpy(str, "Close Notify");
-			break;
-		case GNUTLS_A_UNEXPECTED_MESSAGE:
-			strcpy(str, "Unexpected message");
-			break;
-		case GNUTLS_A_BAD_RECORD_MAC:
-			strcpy(str, "Bad record MAC");
-			break;
-
-		case GNUTLS_A_DECRYPTION_FAILED:
-			strcpy(str, "Decryption Failed");
-			break;
-		case GNUTLS_A_RECORD_OVERFLOW:
-			strcpy(str, "Record Overflow"); 
-			break;
-
-		case GNUTLS_A_DECOMPRESSION_FAILURE:
-			strcpy(str, "Decompression Failed");
-			break;
-
-		case GNUTLS_A_HANDSHAKE_FAILURE:
-			strcpy(str, "Handshake failed");
-			break;
-		case GNUTLS_A_BAD_CERTIFICATE:
-			strcpy(str, "Certificate is bad");
-			break;
-		case GNUTLS_A_UNSUPPORTED_CERTIFICATE:
-			strcpy(str, "Certificate is not supported");
-			break;
-		case GNUTLS_A_CERTIFICATE_REVOKED:
-			strcpy(str, "Certificate was revoked");
-			break;
-		case GNUTLS_A_CERTIFICATE_EXPIRED:
-			strcpy(str, "Certificate is expired");
-			break;
-		case GNUTLS_A_CERTIFICATE_UNKNOWN:
-			strcpy(str, "Unknown Certificate");
-			break;
-		case GNUTLS_A_ILLEGAL_PARAMETER:
-			strcpy(str, "Illegal Parameter");
-			break;
-		case GNUTLS_A_UNKNOWN_CA:
-			strcpy(str, "CA is not known");
-			break;
-		case GNUTLS_A_ACCESS_DENIED:
-			strcpy(str, "Access was denied");
-			break;
-		case GNUTLS_A_DECODE_ERROR:
-			strcpy(str, "Decode error");
-			break;
-		case GNUTLS_A_DECRYPT_ERROR:
-			strcpy(str, "Decrypt error");
-			break;
-		case GNUTLS_A_EXPORT_RESTRICTION:
-			strcpy(str, "Export Restriction");
-			break;
-		case GNUTLS_A_PROTOCOL_VERSION:
-			strcpy(str, "Error in protocol version");
-			break;
-		case GNUTLS_A_INSUFFICIENT_SECURITY:
-			strcpy(str, "Insufficient Security");
-			break;
-		case GNUTLS_A_USER_CANCELED:
-			strcpy(str, "User Canceled");
-			break;
-		case GNUTLS_A_NO_RENEGOTIATION:
-			strcpy(str, "No renegotiation is allowed");
-			break;
-		default:
-			strcpy(str, "Unknown Alert");
-			
-	}	
-	return str;	
-	
-}
-
-
-char* _gnutls_packet2str( int packet) {
+const char* _gnutls_packet2str( int packet) {
 static char str[512];
 
 	switch(packet) {
@@ -177,7 +96,7 @@ static char str[512];
 	
 }
 
-char* _gnutls_handshake2str( int handshake) {
+const char* _gnutls_handshake2str( int handshake) {
 static char str[512];
 
 	switch(handshake) {

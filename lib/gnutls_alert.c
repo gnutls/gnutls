@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -126,4 +126,90 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   **/
 GNUTLS_AlertDescription gnutls_alert_get_last( GNUTLS_STATE state) {
 	return state->gnutls_internals.last_alert;
+}
+
+/**
+  * gnutls_alert_str - Returns a string describing the alert number given
+  * @alert: is an alert number &GNUTLS_STATE structure.
+  *
+  * Returns a string that describes the given alert number.
+  * See. gnutls_alert_get_last().
+  *
+  **/
+const char* gnutls_alert_str( int alert) {
+
+	switch(alert) {
+		case GNUTLS_A_CLOSE_NOTIFY:
+			return "Close Notify";
+			break;
+		case GNUTLS_A_UNEXPECTED_MESSAGE:
+			return "Unexpected message";
+			break;
+		case GNUTLS_A_BAD_RECORD_MAC:
+			return "Bad record MAC";
+			break;
+
+		case GNUTLS_A_DECRYPTION_FAILED:
+			return "Decryption Failed";
+			break;
+		case GNUTLS_A_RECORD_OVERFLOW:
+			return "Record Overflow"; 
+			break;
+
+		case GNUTLS_A_DECOMPRESSION_FAILURE:
+			return "Decompression Failed";
+			break;
+
+		case GNUTLS_A_HANDSHAKE_FAILURE:
+			return "Handshake failed";
+			break;
+		case GNUTLS_A_BAD_CERTIFICATE:
+			return "Certificate is bad";
+			break;
+		case GNUTLS_A_UNSUPPORTED_CERTIFICATE:
+			return "Certificate is not supported";
+			break;
+		case GNUTLS_A_CERTIFICATE_REVOKED:
+			return "Certificate was revoked";
+			break;
+		case GNUTLS_A_CERTIFICATE_EXPIRED:
+			return "Certificate is expired";
+			break;
+		case GNUTLS_A_CERTIFICATE_UNKNOWN:
+			return "Unknown Certificate";
+			break;
+		case GNUTLS_A_ILLEGAL_PARAMETER:
+			return "Illegal Parameter";
+			break;
+		case GNUTLS_A_UNKNOWN_CA:
+			return "CA is not known";
+			break;
+		case GNUTLS_A_ACCESS_DENIED:
+			return "Access was denied";
+			break;
+		case GNUTLS_A_DECODE_ERROR:
+			return "Decode error";
+			break;
+		case GNUTLS_A_DECRYPT_ERROR:
+			return "Decrypt error";
+			break;
+		case GNUTLS_A_EXPORT_RESTRICTION:
+			return "Export Restriction";
+			break;
+		case GNUTLS_A_PROTOCOL_VERSION:
+			return "Error in protocol version";
+			break;
+		case GNUTLS_A_INSUFFICIENT_SECURITY:
+			return "Insufficient Security";
+			break;
+		case GNUTLS_A_USER_CANCELED:
+			return "User Canceled";
+			break;
+		case GNUTLS_A_NO_RENEGOTIATION:
+			return "No renegotiation is allowed";
+			break;
+		default:
+			return "Unknown Alert";
+			
+	}	
 }

@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 	char buffer[MAX_BUF + 1];
 	char *session;
 	char *session_id;
-	int session_size;
+	int session_size, alert;
 	int session_id_size;
 	char *tmp_session_id;
 	int tmp_session_id_size;
@@ -269,8 +269,9 @@ int main(int argc, char **argv)
 		if (ret < 0) {
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-				printf("*** Received alert [%d]\n",
-				       gnutls_alert_get_last(state));
+				alert = gnutls_alert_get_last( state);
+				printf("*** Received alert [%d]: %s\n",
+				       alert, gnutls_alert_str( alert));
 
 			fprintf(stderr, "*** Handshake has failed\n");
 			gnutls_perror(ret);

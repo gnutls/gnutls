@@ -1,3 +1,46 @@
+2002-02-20 20:53  nmav <nmav@gnutls.org>
+
+	* lib/x509_verify.c:
+
+	some fixes in verification procedure 
+
+2002-02-19 18:57  twoaday <twoaday@gnutls.org>
+
+	* lib/: .cvsignore, gnutls_cert.h, gnutls_errors_int.h,
+	gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Applied the patches to fix the GDOC problem.  Some bug fixes all
+	over the place and the implementation of some function stubs.  
+
+2002-02-19 08:17  nmav <nmav@gnutls.org>
+
+	* doc/tex/ex3.tex, lib/gnutls.h.in.in, lib/gnutls_cert.c,
+	lib/gnutls_int.h, lib/gnutls_x509.c, lib/x509_sig_check.c,
+	src/common.c:
+
+	removed CERT_CORRUPTED 
+
+2002-02-19 08:09  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.c:
+
+	openpgp fingerprint is calculated dynamically.  
+
+2002-02-18 20:31  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, auth_cert.h, gnutls.h.in.in:
+
+	Added some support the OpenPGP Certificate message, with key
+	fingerprints.  
+
+2002-02-18 14:11  nmav <nmav@gnutls.org>
+
+	* ChangeLog, lib/auth_cert.c, lib/gnutls.h.in.in, lib/gnutls_int.h,
+	lib/gnutls_state.c, lib/gnutls_state.h, src/cli-gaa.c,
+	src/cli-gaa.h, src/cli.c, src/cli.gaa, src/common.c:
+
+	Added some stuff for the client to send the OpenPGP fingerprint.  
+
 2002-02-17 20:07  nmav <nmav@gnutls.org>
 
 	* lib/: auth_rsa.c, gnutls_pk.c:

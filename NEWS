@@ -3,17 +3,21 @@ Version ?.?.?
   less memory during a handshake
 - Added support for certificates with DSA parameters
 - Added DHE_DSS cipher suites
-- Added check for the requested TLS extensions
-- Added a minimal string library to assist in ASN.1 parsing
-- Added gnutls_x509_extract_subject_alt_name(), which deprecates 
-  gnutls_x509_extract_subject_dns_name()
-- gnutls_x509_set_trust_(file/mem) can now be called multiple times
-- gnutls_srp_server_set_cred_file() can now be called multiple times
 - Key exchange methods changed so they do not depend on the 
   certificate type.
 - Improved Diffie Hellman key exchange support.
 - Bug fixes in the RSA key exchange.
+- Added check for the requested TLS extensions
 - TLS extensions now use a 16 bit type field.
+- Added a minimal string library to assist in ASN.1 parsing
+- Changes in ASN.1 parser to work with the new bison
+- Added gnutls_x509_extract_subject_alt_name(), which deprecates 
+  gnutls_x509_extract_subject_dns_name()
+- gnutls_x509_set_trust_(file/mem) can now be called multiple times
+- gnutls_srp_server_set_cred_file() can now be called multiple times
+
+
+OpenPGP:
 - Added openpgp key support (EXPERIMENTAL)
 
 Version 0.3.5 (25/01/2002)

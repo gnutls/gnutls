@@ -27,7 +27,7 @@ int main()
    const char *PORT = "443";
    const char *SERVER = "127.0.0.1";
    int err, ret;
-   int sd, ii;
+   int sd, ii, alert;
    struct sockaddr_in sa;
    GNUTLS_STATE state;
    char buffer[MAX_BUF + 1];
@@ -144,7 +144,8 @@ int main()
          }
       } else {
          if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-            printf("* Received alert [%d]\n", gnutls_alert_get_last(state));
+            alert = gnutls_alert_get_last(state);
+            printf("* Received alert [%d]: %s\n", alert, gnutls_alert_str(alert));
          if (ret == GNUTLS_E_REHANDSHAKE) {
             printf("* Received HelloRequest message (server asked to rehandshake)\n");
             gnutls_alert_send_appropriate( state, ret); /* we don't want rehandshake */
