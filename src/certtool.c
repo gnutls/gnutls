@@ -645,7 +645,7 @@ void generate_signed_crl( void)
 	gnutls_x509_privkey ca_key;
 	gnutls_x509_crt ca_crt;
 
-	fprintf(stderr, "Generating a signed CRLe...\n");
+	fprintf(stderr, "Generating a signed CRL...\n");
 
 	ca_key = load_ca_private_key();
 	ca_crt = load_ca_cert();
@@ -853,6 +853,15 @@ void certificate_info( void)
 	}
 	
 	print_certificate_info( crt, outfile, 1);
+
+	size = sizeof(buffer);
+	ret = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	fprintf(outfile, "\n%s\n", buffer);
 }
 
 static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int all)
@@ -1218,6 +1227,15 @@ void crl_info()
 	}
 	
 	print_crl_info( crl, outfile, 1);
+
+	size = sizeof(buffer);
+	ret = gnutls_x509_crl_export(crl, GNUTLS_X509_FMT_PEM, buffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	fprintf(outfile, "\n%s\n", buffer);
 	
 }
 
@@ -1279,7 +1297,13 @@ void privkey_info( void)
 		fprintf(outfile, "Public Key ID: %s\n", printable);
 	}
 
-	fprintf(outfile, "\n");
+	size = sizeof(buffer);
+	ret = gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM, buffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	fprintf(outfile, "\n%s\n", buffer);
 }
 
 /* mand should be non zero if it is required to read a private key.
