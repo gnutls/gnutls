@@ -596,7 +596,7 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 	uint8 *csalt;
 	uint8 *rtext;
 	uint8 cost;
-	int i, salt_size = strlen(salt);
+	int i, salt_size = strlen(salt), len;
 	unsigned char *local_salt, *v;
 	int passwd_len, vsize;
 	opaque *tmp;
@@ -615,7 +615,14 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 	}
 	sp++;
 
-	if (_gnutls_sbase64_decode(sp, (int)rindex(sp, ':') - (int)sp, &csalt) < 0) {
+	len = (int)rindex(sp, ':');
+	if (len==0) { /* no ':' was found */
+		gnutls_assert();
+		return NULL;
+	}
+	len -= (int) sp;
+	
+	if (_gnutls_sbase64_decode(sp, len, &csalt) < 0) {
 		gnutls_assert();
 		return NULL;
 	}
