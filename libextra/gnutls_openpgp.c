@@ -464,13 +464,13 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
 
     cdk_keydb_get_keyblock( out, &snode );
     if( !snode ) {
-        rc = GNUTLS_E_INTERNAL_ERROR;
+        rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
         goto leave;
     }
 
     pkt = cdk_kbnode_find_packet( snode, CDK_PKT_SECRET_KEY );
     if( !pkt ) {
-        rc = GNUTLS_E_INTERNAL_ERROR;
+        rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
         goto leave;
     }
     sk = pkt->pkt.secret_key;
@@ -607,7 +607,7 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
     }    
 
     if( !cdk_kbnode_find( knode, CDK_PKT_PUBLIC_KEY ) ) {
-        rc = GNUTLS_E_INTERNAL_ERROR;
+        rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
         goto leave;
     }
     rc = kbnode_to_datum( knode, key );
@@ -1056,11 +1056,11 @@ _gnutls_openpgp_get_key_trust( const char *trustdb,
 
     rc = datum_to_kbnode( key, &knode );
     if( rc )
-        return GNUTLS_E_INTERNAL_ERROR;
+        return rc;
 
     pkt = cdk_kbnode_find_packet( knode, CDK_PKT_PUBLIC_KEY );
     if( !pkt ) {
-        rc = GNUTLS_E_INTERNAL_ERROR;
+        rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
         goto leave;
     }
     pk = pkt->pkt.public_key;
@@ -1105,6 +1105,8 @@ _gnutls_openpgp_get_key_trust( const char *trustdb,
     }
 
 leave:
+    if( rc )
+        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
     cdk_kbnode_release( knode );
     return rc;
 }
@@ -1213,7 +1215,7 @@ gnutls_openpgp_fingerprint( const gnutls_datum *cert,
 
     pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
     if( !pkt )
-        return GNUTLS_E_INTERNAL_ERROR;
+        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     
     pk = pkt->pkt.public_key;
     *fprlen = 20;
@@ -1246,7 +1248,7 @@ gnutls_openpgp_extract_key_id( const gnutls_datum *cert,
 
     pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
     if( !pkt )
-        return GNUTLS_E_INTERNAL_ERROR;
+        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     
     pk = pkt->pkt.public_key;
     cdk_pk_get_keyid( pk, kid );
