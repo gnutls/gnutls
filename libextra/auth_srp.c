@@ -132,7 +132,26 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	data_g = data; 
+	/* copy the salt 
+	 */
+	data_s = data;
+
+	n_s = pwd_entry->salt_size;
+	memcpy(&data_s[2], pwd_entry->salt, n_s);
+
+	_gnutls_write_uint16( n_s, data_s);
+
+	/* copy N (mod n) */
+	data_n = &data_s[2 + n_s];
+
+	if (_gnutls_mpi_print( &data_n[2], &n_n, N)!=0) {
+		gnutls_assert();
+		return GNUTLS_E_MPI_PRINT_FAILED;
+	}
+	
+	_gnutls_write_uint16( n_n, data_n);
+
+	data_g = &data_n[2 + n_n]; 
 
 	/* copy G (generator) to data */
 
@@ -142,23 +161,6 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 	}
 	
 	_gnutls_write_uint16( n_g, data_g);
-
-	/* copy N (mod n) */
-	data_n = &data_g[2 + n_g];
-
-	if (_gnutls_mpi_print( &data_n[2], &n_n, N)!=0) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_PRINT_FAILED;
-	}
-	
-	_gnutls_write_uint16( n_n, data_n);
-
-	/* copy the salt */
-	data_s = &data_n[2 + n_n];
-	n_s = pwd_entry->salt_size;
-	memcpy(&data_s[2], pwd_entry->salt, n_s);
-
-	_gnutls_write_uint16( n_s, data_s);
 
 	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
 	_gnutls_srp_clear_pwd_entry( pwd_entry);
@@ -305,24 +307,20 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_si
 	username = cred->username;
 	password = cred->password;
 
-	if (username == NULL || password == NULL)
+	if (username == NULL || password == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
-/* read the algorithm used to generate V */
-	
 	i = 0;
 
 	DECR_LEN( data_size, 2);
-	n_g = _gnutls_read_uint16( &data[i]);
+	n_s = _gnutls_read_uint16( &data[i]);
 	i += 2;
 
-	DECR_LEN( data_size, n_g);
-	data_g = &data[i];
-	i += n_g;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+	DECR_LEN( data_size, n_s);
+	data_s = &data[i];
+	i += n_s;
 
 	DECR_LEN( data_size, 2);
 	n_n = _gnutls_read_uint16( &data[i]);
@@ -333,12 +331,12 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_si
 	i += n_n;
 	
 	DECR_LEN( data_size, 2);
-	n_s = _gnutls_read_uint16( &data[i]);
+	n_g = _gnutls_read_uint16( &data[i]);
 	i += 2;
 
-	DECR_LEN( data_size, n_s);
-	data_s = &data[i];
-	i += n_s;
+	DECR_LEN( data_size, n_g);
+	data_g = &data[i];
+	i += n_g;
 
 	_n_s = n_s;
 	_n_g = n_g;
