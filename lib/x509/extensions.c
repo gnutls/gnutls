@@ -32,14 +32,17 @@
 /* This function will attempt to return the requested extension found in
  * the given X509v3 certificate. The return value is allocated and stored into
  * ret.
+ *
+ * Critical will be either 0 or 1.
  */
 int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const char* extension_id, 
-	gnutls_datum* ret)
+	gnutls_datum* ret, int * _critical)
 {
 	int k, result, len;
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
 	char str[1024];
-	char critical[10];
+	char str_critical[10];
+	int critical = 0;
 	char extnID[128];
 	char extnValue[256];
 
@@ -85,9 +88,9 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 			_gnutls_str_cpy(name2, sizeof(name2), name);
 			_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
 
-			len = sizeof(critical) - 1;
+			len = sizeof(str_critical);
 			result =
-			    asn1_read_value(cert->cert, name2, critical, &len);
+			    asn1_read_value(cert->cert, name2, str_critical, &len);
 
 			if (result == ASN1_ELEMENT_NOT_FOUND) {
 				gnutls_assert();
@@ -96,6 +99,10 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 				gnutls_assert();
 				return _gnutls_asn2err(result);
 			}
+
+			if (strcmp( str_critical, "TRUE")==0)
+				critical = 1;
+			else critical = 0;
 
 			_gnutls_str_cpy(name2, sizeof(name2), name);
 			_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
@@ -108,7 +115,7 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 				break;
 			else {
 				if (result == ASN1_MEM_ERROR
-				    && strcmp(critical, "FALSE") == 0) {
+				    && critical == 0) {
 
 					_gnutls_x509_log
 					    ("X509_EXT: Cannot parse extension: %s. Too small buffer.",
@@ -130,6 +137,9 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 
 				ret->size = len;
 				memcpy( ret->data, extnValue, len);
+				
+				if (_critical)
+					*_critical = critical;
 				
 				return 0;
 			}

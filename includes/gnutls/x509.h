@@ -73,10 +73,11 @@ int gnutls_x509_certificate_get_serial(gnutls_x509_certificate cert, char* resul
 
 int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int* bits);
 int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert, 
-	int seq, char *ret, int *ret_size);
-int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert);
+	int seq, char *ret, int *ret_size, int* critical);
+int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert, int* critical);
 
-int gnutls_x509_certificate_get_key_usage( gnutls_x509_certificate cert, unsigned int* key_usage);
+int gnutls_x509_certificate_get_key_usage( gnutls_x509_certificate cert, unsigned int* key_usage,
+	int* critical);
 
 /* key_usage will be an OR of the following values:
  */
@@ -91,7 +92,7 @@ int gnutls_x509_certificate_get_key_usage( gnutls_x509_certificate cert, unsigne
 #define GNUTLS_KEY_DECIPHER_ONLY		1
 
 int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, const char* oid,
-	unsigned char* buf, int * sizeof_buf);
+	unsigned char* buf, int * sizeof_buf, int * critical);
 
 int gnutls_x509_certificate_to_xml(gnutls_x509_certificate cert, gnutls_datum* res, int detail);
 

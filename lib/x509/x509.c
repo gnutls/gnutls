@@ -561,6 +561,7 @@ int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int*
   * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
   * @ret: is the place where the alternative name will be copied to
   * @ret_size: holds the size of ret.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
   *
   * This function will return the alternative names, contained in the
   * given certificate.
@@ -577,7 +578,7 @@ int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int*
   *
   **/
 int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert, 
-	int seq, char *ret, int *ret_size)
+	int seq, char *ret, int *ret_size, int *critical)
 {
 	int result;
 	gnutls_datum dnsname;
@@ -591,7 +592,7 @@ int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert,
 	memset(ret, 0, *ret_size);
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 17", &dnsname)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 17", &dnsname, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}
@@ -671,6 +672,7 @@ int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert,
 /**
   * gnutls_x509_certificate_get_ca_status - This function returns the certificate CA status
   * @cert: should contain a gnutls_x509_certificate structure
+  * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return certificates CA status, by reading the 
   * basicConstraints X.509 extension. If the certificate is a CA a positive
@@ -682,14 +684,14 @@ int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert,
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert)
+int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert, int* critical)
 {
 	int result;
 	gnutls_datum basicConstraints;
 	int ca;
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 19", &basicConstraints)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 19", &basicConstraints, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}
@@ -715,6 +717,7 @@ int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert)
   * gnutls_x509_certificate_get_key_usage - This function returns the certificate's key usage
   * @cert: should contain a gnutls_x509_certificate structure
   * @key_usage: where the key usage bits will be stored
+  * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return certificate's key usage, by reading the 
   * keyUsage X.509 extension. The key usage value will ORed values of the:
@@ -729,14 +732,15 @@ int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert)
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned int *key_usage)
+int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned int *key_usage,
+	int *critical)
 {
 	int result;
 	gnutls_datum keyUsage;
 	uint16 _usage;
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 15", &keyUsage)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 15", &keyUsage, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}
@@ -766,6 +770,7 @@ int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned
   * @oid: holds an Object Identified in null terminated string
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
+  * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return the extension specified by the OID in the certificate.
   * The extensions will be returned as binary data DER encoded, in the provided
@@ -777,13 +782,13 @@ int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned
   *
   **/
 int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, const char* oid,
-	unsigned char* buf, int * sizeof_buf)
+	unsigned char* buf, int * sizeof_buf, int * critical)
 {
 	int result;
 	gnutls_datum output;
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, oid, &output)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, oid, &output, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}

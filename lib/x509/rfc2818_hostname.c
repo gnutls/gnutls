@@ -179,8 +179,7 @@ int gnutls_x509_certificate_check_hostname(gnutls_x509_certificate cert,
       dnsnamesize = sizeof(dnsname);
       ret =
           gnutls_x509_certificate_get_subject_alt_name(cert, i,
-                                                           dnsname,
-                                                           &dnsnamesize);
+                                        dnsname, &dnsnamesize, NULL);
 
       if (ret == GNUTLS_SAN_DNSNAME) {
          found_dnsname = 1;

@@ -243,7 +243,7 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_subject_alt_name( xcert, seq, ret, ret_size);
+	result = gnutls_x509_certificate_get_subject_alt_name( xcert, seq, ret, ret_size, NULL);
 	
 	gnutls_x509_certificate_deinit( xcert);
 	
@@ -278,7 +278,7 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_ca_status( xcert);
+	result = gnutls_x509_certificate_get_ca_status( xcert, NULL);
 	
 	gnutls_x509_certificate_deinit( xcert);
 	
