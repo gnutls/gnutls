@@ -2,4 +2,3 @@
 * OpenPGP certificate support (through libgcrypt)
 * Document API using texi (any volunteers?)
 * Add Kerberos support (who wants that?)
-* make gnutls_clean_db() clean only expired sessions

@@ -46,15 +46,33 @@ int gnutls_set_db_name( GNUTLS_STATE state, char* filename) {
 
 int gnutls_clean_db( GNUTLS_STATE state) {
 #ifdef HAVE_LIBGDBM
-FILE * tmp;
+GDBM_FILE dbf;
+datum key;
+time_t timestamp;
 
-	tmp = fopen( state->gnutls_internals.db_name, "w");
-	if (tmp!=NULL) fclose(tmp);
+	dbf = gdbm_open(state->gnutls_internals.db_name, 0, GDBM_WRCREAT, 0600, NULL);
+	if (dbf==NULL) return GNUTLS_E_AGAIN;
+	key = gdbm_firstkey(dbf);
+
+	timestamp = time(0);
+
+	while( key.dptr != NULL) {
+
+		if ( ((SecurityParameters*)(key.dptr))->timestamp > timestamp || ((SecurityParameters*)(key.dptr))->timestamp == 0) {
+		    /* delete expired entry */
+		    gdbm_delete( dbf, key);
+		}
+		
+		free(key.dptr);
+		key = gdbm_nextkey(dbf, key);
+	}
+	gdbm_close(dbf);
 
 	return 0;
 #else
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 #endif
+
 }
 
 int _gnutls_server_register_current_session( GNUTLS_STATE state)
@@ -99,7 +117,7 @@ int ret;
 	gdbm_close(dbf);
 
 	if (content.dptr==NULL) return GNUTLS_E_INVALID_SESSION;
-	if ( ((SecurityParameters*)(content.dptr))->timestamp > time(0) || ((SecurityParameters*)(content.dptr))->timestamp < 0) return GNUTLS_E_INVALID_SESSION;
+	if ( ((SecurityParameters*)(content.dptr))->timestamp > time(0) || ((SecurityParameters*)(content.dptr))->timestamp == 0) return GNUTLS_E_INVALID_SESSION;
 
 	/* if not expired */	
 
