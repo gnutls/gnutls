@@ -973,7 +973,10 @@ EncapsulatedContentInfo ::= SEQUENCE {
 CertificateRevocationLists ::= SET OF CertificateList
 
 CertificateChoices ::= CHOICE {
-  certificate Certificate
+-- Although the paper uses Certificate type, we
+-- don't use it since, we don't need to parse it.
+-- We only need to read and store it.
+  certificate ANY
 }
 
 CertificateSet ::= SET OF CertificateChoices

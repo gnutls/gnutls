@@ -1125,6 +1125,10 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 
 		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
+			if (result == ASN1_MEM_ERROR) {
+				_gnutls_x509_log("Length required for der coding: %d\n", len);
+				*output_data_size = B64FSIZE(strlen(pem_header),len);
+			}
 			gnutls_afree(tmp);
 			return _gnutls_asn2err(result);
 		}

@@ -142,13 +142,7 @@ int _gnutls_base64_encode(const uint8 * data, size_t data_size, uint8 ** result)
 	int ret, tmp;
 	char tmpres[4];
 
-	ret = data_size % 3;
-	if (ret != 0)
-		ret = 4;
-	else
-		ret = 0;
-
-	ret += (data_size / 3) * 4;
+	ret = B64SIZE( data_size);
 
 	(*result) = gnutls_malloc(ret + 1);
 	if ((*result) == NULL)
@@ -194,17 +188,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	strcat(bottom, msg); /* Flawfinder: ignore */
 	strcat(bottom, "-----\n"); /* Flawfinder: ignore */
 
-	ret = data_size % 3;
-	if (ret != 0)
-		ret = 4;
-	else
-		ret = 0;
-
-	ret += strlen(top) + strlen(bottom);
-
-	tmp = (data_size / 3) * 4;
-	ret += (tmp / 64) + (tmp % 64 > 0 ? 1 : 0);	/* add new lines */
-	ret += tmp;
+	ret = B64FSIZE( strlen(msg), data_size);
 
 	(*result) = gnutls_calloc(1, ret + 1);
 	if ((*result) == NULL)
@@ -325,14 +309,13 @@ int size;
 int _gnutls_base64_decode(const uint8 * data, size_t data_size, uint8 ** result)
 {
 	unsigned int i, j;
-	int ret, tmp;
+	int ret, tmp, est;
 	uint8 tmpres[3];
 
-	data_size /= 4;
-	data_size *= 4;
+	est = ((data_size * 3) / 4) + 1;
+	ret = 0;
 
-	ret = data_size / 4 * 3;
-	(*result) = gnutls_malloc(ret+1);
+	(*result) = gnutls_malloc(est);
 	if ((*result) == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
@@ -343,8 +326,8 @@ int _gnutls_base64_decode(const uint8 * data, size_t data_size, uint8 ** result)
 			return tmp;
 		}
 		memcpy(&(*result)[j], tmpres, tmp);
-		if (tmp < 3)
-			ret -= (3 - tmp);
+		ret += tmp;
+
 		j += 3;
 	}
 	return ret;

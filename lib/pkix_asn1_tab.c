@@ -893,7 +893,7 @@ const ASN1_ARRAY_TYPE pkix_asn1_tab[]={
   {"CertificateRevocationLists",1610612751,0},
   {0,2,"CertificateList"},
   {"CertificateChoices",1610612754,0},
-  {"certificate",2,"Certificate"},
+  {"certificate",13,0},
   {"CertificateSet",1610612751,0},
   {0,2,"CertificateChoices"},
   {"SignerInfos",1610612751,0},

@@ -590,7 +590,6 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 		goto cleanup;	
 	}
 
-#error FIX THAT.
 	result = asn1_write_value(c2, "certificates.?LAST.certificate", crt->data, crt->size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
