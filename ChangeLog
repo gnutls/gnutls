@@ -1,3 +1,10 @@
+2003-03-05 17:23  nmav <nmav@gnutls.org>
+
+	* doc/: README.CODING_STYLE, tex/certificate.tex,
+	tex/ex-rfc2818.tex, tex/ex-serv-export.tex, tex/ex-serv1.tex:
+
+	some documentation fixes.  
+
 2003-03-04 14:39  nmav <nmav@gnutls.org>
 
 	* NEWS (tags: gnutls_0_8_3):
