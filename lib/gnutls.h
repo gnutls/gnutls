@@ -103,6 +103,21 @@ typedef enum crypt_algo crypt_algo;
 char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt);
 int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt);
 
+/* Functions for setting/clearing credentials */
+int gnutls_clear_creds( GNUTLS_STATE state);
+int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred);
+
+/* Credential structures for SRP - used in gnutls_set_cred(); */
+typedef struct {
+	char* username;
+	char* password;
+} SRP_CLIENT_CREDENTIALS;
+
+typedef struct {
+	char* password_file;
+} SRP_SERVER_CREDENTIALS;
+
+
 /* these are deprecated must be replaced by gnutls_errors.h */
 #define	GNUTLS_E_MAC_FAILED  -1
 #define	GNUTLS_E_UNKNOWN_CIPHER -2

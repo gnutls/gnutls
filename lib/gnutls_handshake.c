@@ -35,6 +35,7 @@
 #include "gnutls_db.h"
 #include "gnutls_extensions.h"
 #include "gnutls_random.h"
+#include "gnutls_auth_int.h"
 
 #ifdef DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
@@ -716,6 +717,14 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 				fprintf(stderr, "Selected cipher suite: ");
 				fprintf(stderr, "%s\n", _gnutls_cipher_suite_get_name(state->gnutls_internals.current_cipher_suite ) );
 #endif
+
+		/* check if the credentials (username, public key etc. are ok - actually check if they exist)
+		 */
+		if ( _gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite)) == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INSUFICIENT_CRED;
+		}
+
 		/* set the MOD_AUTH_STRUCT to the appropriate struct
 		 * according to the KX algorithm. This is needed since all the
 		 * handshake functions are read from there;
@@ -833,6 +842,14 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 
 		if (ret<0) return ret;
 
+
+		/* check if the credentials (username, public key etc. are ok)
+		 */
+		if ( _gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite)) == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INSUFICIENT_CRED;
+		}
+		
 		/* set the MOD_AUTH_STRUCT to the appropriate struct
 		 * according to the KX algorithm. This is needed since all the
 		 * handshake functions are read from there;

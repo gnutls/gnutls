@@ -23,6 +23,7 @@
 #include "gnutls_errors.h"
 #include "auth_srp_passwd.h"
 #include "auth_srp.h"
+#include "gnutls_auth_int.h"
 
 int gen_srp_server_kx( GNUTLS_KEY, opaque**);
 int gen_srp_server_kx2( GNUTLS_KEY, opaque**);
@@ -202,11 +203,17 @@ int gen_srp_client_kx0( GNUTLS_KEY key, opaque** data) {
 	size_t n_a, bits;
 	uint16 _n_a;
 	uint8 *data_a;
-	char *username = ((SRP_CLIENT_CREDENTIALS*)key->cred)->username;
-	char *password = ((SRP_CLIENT_CREDENTIALS*)key->cred)->password;
+	char *username;
+	char *password;
+	SRP_CLIENT_CREDENTIALS* cred = _gnutls_get_kx_cred( key, GNUTLS_KX_SRP);
+
+	if (cred==NULL) return  GNUTLS_E_INSUFICIENT_CRED;
+	
+	username = cred->username;
+	password = cred->password;
 
 	if (username==NULL || password == NULL) 
-		 return GNUTLS_E_INSUFICIENT_CRED;
+		 return  GNUTLS_E_INSUFICIENT_CRED;
         
         bits = gcry_mpi_get_nbits( N);
         _a = mpi_new(bits);	/* FIXME: allocate in secure memory */
@@ -243,8 +250,17 @@ int proc_srp_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	int i;
 	GNUTLS_MAC_HANDLE td;
 	opaque* hd;
-	char *username = ((SRP_CLIENT_CREDENTIALS*)key->cred)->username;
-	char *password = ((SRP_CLIENT_CREDENTIALS*)key->cred)->password;
+	char *username;
+	char *password;
+	SRP_CLIENT_CREDENTIALS* cred = _gnutls_get_kx_cred( key, GNUTLS_KX_SRP);
+
+	if (cred==NULL) return GNUTLS_E_INSUFICIENT_CRED;
+	
+	username = cred->username;
+	password = cred->password;
+
+	if (username==NULL || password == NULL) 
+		 return GNUTLS_E_INSUFICIENT_CRED;
 
 	i = 0;
 	memcpy(&n_g, &data[i], 2);
