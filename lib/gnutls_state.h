@@ -19,10 +19,10 @@ gnutls_certificate_type gnutls_certificate_type_get( gnutls_session session);
 
 int _gnutls_session_cert_type_supported( gnutls_session, gnutls_certificate_type);
 
-int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits);
 int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits);
 
-int _gnutls_dh_set_prime( gnutls_session session, GNUTLS_MPI gen, GNUTLS_MPI prime);
+int _gnutls_dh_set_peer_public( gnutls_session session, mpi_t public);
+int _gnutls_dh_set_prime( gnutls_session session, mpi_t gen, mpi_t prime);
 
 int _gnutls_dh_get_allowed_prime_bits( gnutls_session session);
 void gnutls_dh_set_prime_bits( gnutls_session session, unsigned int bits);

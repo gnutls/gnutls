@@ -392,7 +392,7 @@ int _gnutls_dh_get_allowed_prime_bits( gnutls_session session)
 	return session->internals.dh_prime_bits;
 }
 
-int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) 
+int _gnutls_dh_set_peer_public( gnutls_session session, mpi_t public)
 {
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
@@ -400,7 +400,9 @@ int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits)
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
-			info->dh.peer_public_bits = bits;
+
+			 _gnutls_mpi_print_lz( info->dh.public_key, &info->dh.public_key_size, public);
+			info->dh.peer_public_bits = _gnutls_mpi_get_nbits(public);
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -410,7 +412,8 @@ int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			info->dh.peer_public_bits = bits;
+			 _gnutls_mpi_print_lz( info->dh.public_key, &info->dh.public_key_size, public);
+			info->dh.peer_public_bits = _gnutls_mpi_get_nbits(public);
 			break;
 		}
 		default:

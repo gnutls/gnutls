@@ -54,6 +54,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session);
 
 int gnutls_dh_get_prime(gnutls_session, gnutls_datum* prime);
 int gnutls_dh_get_generator(gnutls_session, gnutls_datum* gen);
+int gnutls_dh_get_public_key(gnutls_session, gnutls_datum* gen);
 
 /* RSA */
 int gnutls_rsa_export_get_modulus_bits(gnutls_session session);

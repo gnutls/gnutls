@@ -133,6 +133,49 @@ CERTIFICATE_AUTH_INFO cert_info;
 	return 0;
 }
 
+/**
+  * gnutls_dh_get_public_key - This function returns the peer's public key used in DH authentication
+  * @session: is a gnutls session
+  * @raw_key: will hold the public key. To be treated as constant.
+  *
+  * This function will return the peer's public key used in the last Diffie Hellman authentication.
+  * Should be used for both anonymous and ephemeral diffie Hellman.
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_dh_get_public_key(gnutls_session session, gnutls_datum* key)
+{
+dh_info_st dh;
+ANON_SERVER_AUTH_INFO anon_info;
+CERTIFICATE_AUTH_INFO cert_info;
+
+	switch( gnutls_auth_get_type( session)) {
+		case GNUTLS_CRD_ANON: {
+			anon_info = _gnutls_get_auth_info(session);
+			if (anon_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = anon_info->dh;
+			break;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+
+			cert_info = _gnutls_get_auth_info(session);
+			if (cert_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = cert_info->dh;
+			break;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	key->data = dh.public_key;
+	key->size = dh.public_key_size;
+	
+	return 0;
+}
+
 
 /**
   * gnutls_dh_get_generator - This function returns the generator used in DH authentication

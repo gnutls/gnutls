@@ -114,6 +114,9 @@ int err;
 		
 		break;
 #endif
+	   default:
+	        gnutls_free(ret);
+		return NULL;	
 	}
 	return ret;
 }
@@ -123,8 +126,6 @@ int err;
 
 	if (handle!=NULL) {
 		switch( handle->algo) {
-			/* case GNUTLS_COMP_LZO:
-				break; */
 #ifdef HAVE_LIBZ
 			case GNUTLS_COMP_DEFLATE:
 				if (d)
@@ -133,6 +134,8 @@ int err;
 					err = deflateEnd( handle->handle);
 				break;
 #endif
+			default:
+				break;
 		}
 		gnutls_free( handle->handle);
 		gnutls_free( handle);

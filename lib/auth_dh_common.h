@@ -10,6 +10,8 @@ typedef struct dh_info_st_int {
 	size_t prime_size;
 	opaque generator[16];
 	size_t generator_size;
+	opaque public_key[1024];
+	size_t public_key_size;
 } dh_info_st;
 
 int _gnutls_gen_dh_common_client_kx(gnutls_session, opaque **);

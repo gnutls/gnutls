@@ -32,7 +32,7 @@
 /* Functions that refer to the libgcrypt library.
  */
  
-void _gnutls_mpi_release( GNUTLS_MPI* x) {
+void _gnutls_mpi_release( mpi_t* x) {
 	if (*x==NULL) return;
 	gcry_mpi_release(*x);
 	*x=NULL;
@@ -40,7 +40,7 @@ void _gnutls_mpi_release( GNUTLS_MPI* x) {
 
 /* returns zero on success
  */
-int _gnutls_mpi_scan( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes ) {
+int _gnutls_mpi_scan( mpi_t *ret_mpi, const opaque *buffer, size_t *nbytes ) {
 	int ret;
 	
 	ret = gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_USG, buffer, *nbytes, nbytes);
@@ -56,7 +56,7 @@ int _gnutls_mpi_scan( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes 
 	return 0;
 }
 
-int _gnutls_mpi_scan_pgp( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes)
+int _gnutls_mpi_scan_pgp( mpi_t *ret_mpi, const opaque *buffer, size_t *nbytes)
 {
 int ret;
 	ret = gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_PGP, buffer, *nbytes, nbytes);
@@ -72,7 +72,7 @@ int ret;
 	return 0;
 }
 
-int _gnutls_mpi_print( void *buffer, size_t *nbytes, const GNUTLS_MPI a ) 
+int _gnutls_mpi_print( void *buffer, size_t *nbytes, const mpi_t a ) 
 {
 int ret;
 
@@ -85,7 +85,7 @@ int ret;
 }
 
 /* Always has the first bit zero */
-int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const GNUTLS_MPI a ) 
+int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const mpi_t a ) 
 {
 int ret;
 
@@ -98,7 +98,7 @@ int ret;
 }
 
 /* Always has the first bit zero */
-int _gnutls_mpi_dprint_lz( gnutls_datum* dest, const GNUTLS_MPI a ) 
+int _gnutls_mpi_dprint_lz( gnutls_datum* dest, const mpi_t a ) 
 {
 int ret;
 opaque* buf = NULL;
@@ -130,7 +130,7 @@ size_t bytes = 0;
  * steps.
  */
 int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, 
-	GNUTLS_MPI* ret_mpi)
+	mpi_t* ret_mpi)
 {
 int result;
 size_t s_len;
@@ -171,7 +171,7 @@ int tmpstr_size;
 
 /* Writes the specified integer into the specified node.
  */
-int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, GNUTLS_MPI mpi, int lz)
+int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, mpi_t mpi, int lz)
 {
 opaque *tmpstr;
 size_t s_len;

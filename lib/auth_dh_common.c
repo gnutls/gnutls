@@ -56,8 +56,7 @@ int _gnutls_proc_dh_common_client_kx(gnutls_session session, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( session, _gnutls_mpi_get_nbits(
-		session->key->client_Y));
+	ret=_gnutls_dh_set_peer_public( session, session->key->client_Y);
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -132,8 +131,7 @@ int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( session, _gnutls_mpi_get_nbits(
-		session->key->client_Y));
+	ret=_gnutls_dh_set_peer_public( session, session->key->client_Y);
 	if (ret<0) {
 		gnutls_assert();
 		failed:
@@ -232,8 +230,7 @@ int _gnutls_proc_dh_common_server_kx( gnutls_session session, opaque* data, size
 		return ret;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( session, _gnutls_mpi_get_nbits(
-		session->key->client_Y));
+	ret = _gnutls_dh_set_peer_public( session, session->key->client_Y);
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
