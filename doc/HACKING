@@ -1,4 +1,5 @@
-[ this is mostly outdated... sorry ]
+[ this is mostly outdated... you should check the mailing list archives  ]
+[ at http://lists.gnupg.org for more information on new functions. sorry ]
 
 So far, the following functions have been implemented:
 (The functions prefixed by '_' are internal functions, not intended
