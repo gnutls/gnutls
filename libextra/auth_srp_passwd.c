@@ -49,7 +49,7 @@ int indx;
 	p = rindex( str, ':'); /* we have index */
 	if (p==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 	
 	*p='\0';
@@ -59,14 +59,14 @@ int indx;
 	indx = atoi(p);
 	if (indx==0) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 	
 	/* now go for salt */
 	p = rindex( str, ':'); /* we have salt */
 	if (p==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 	
 	*p='\0';
@@ -78,14 +78,14 @@ int indx;
 
 	if (entry->salt.size <= 0) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 
 	/* now go for verifier */
 	p = rindex( str, ':'); /* we have verifier */
 	if (p==NULL) {
 		_gnutls_free_datum(&entry->salt);
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 	
 	*p='\0';
@@ -96,7 +96,7 @@ int indx;
 	if (ret <= 0) {
 		gnutls_assert();
 		_gnutls_free_datum(&entry->salt);
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 
 	verifier_size = ret;
@@ -131,7 +131,7 @@ int ret;
 	p = rindex( str, ':'); /* we have g */
 	if (p==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 	
 	*p='\0';
@@ -144,7 +144,7 @@ int ret;
 
 	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 
 	entry->g.data = tmp;
@@ -155,7 +155,7 @@ int ret;
 	if (p==NULL) {
 		_gnutls_free_datum( &entry->g);
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 	
 	*p='\0';
@@ -167,7 +167,7 @@ int ret;
 	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_free_datum( &entry->g);
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
 	
 	entry->n.data = tmp;
@@ -203,11 +203,11 @@ static int pwd_read_conf( const char* pconf_file, SRP_PWD_ENTRY* entry, int inde
 			if ((index = pwd_put_values2( entry, line)) >= 0)
 				return 0;
 			else {
-				return GNUTLS_E_PWD_ERROR;
+				return GNUTLS_E_SRP_PWD_ERROR;
 			}
 	    }
     }
-    return GNUTLS_E_PWD_ERROR;
+    return GNUTLS_E_SRP_PWD_ERROR;
 	
 }
 

@@ -101,7 +101,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 			 */
 			pwd_entry = _gnutls_randomize_pwd_entry();
 		} else {
-		        return GNUTLS_E_PWD_ERROR;
+		        return GNUTLS_E_SRP_PWD_ERROR;
 		}
 	}
 

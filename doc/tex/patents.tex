@@ -5,8 +5,11 @@ decided to approve such patents. In order for \gnutls{} to be free in all
 countries, we try not to include patented algorithms, which could turn the 
 library being non free.
 
-\section{TLS patent}
-\index{Patents!TLS}
+\par 
+Note that this chapter does not offer any legal advice of any kind.
+
+\section{SSL patent}
+\index{Patents!SSL}
 A patent which we couln't avoid was a patent by Netscape Communications 
 Corporation on the Secure Sockets Layer (\ssl{}) work that \tlsI{} is based on.
 Fortunately Netscape has provided a statement that allows royalty free 
@@ -40,10 +43,13 @@ Communications' statement in RFC2246\cite{RFC2246}.
 
 \section{SRP patent}
 \index{Patents!SRP}
+\label{ap:srppatent}
+The status of SRP is unclear.
 A patent application was filed by Stanford University on the SRP algorithm.
-The letters\footnote{found in \htmladdnormallink{http://www.ietf.org/ietf/IPR/PHOENIX-SRP-RFC2945.txt}{http://www.ietf.org/ietf/IPR/WU-SRP}} below were sent to IETF.
+The letters\footnote{found in \htmladdnormallink{http://www.ietf.org/ietf/IPR/WU-SRP}{http://www.ietf.org/ietf/IPR/WU-SRP}} below were sent to IETF.
 
 \begin{verbatim}
+=============================================================================
 Received April 26, 2000
 Kirsten Leute <kirsten.leute@stanford.edu>
 
@@ -69,7 +75,7 @@ Associate
 Fax: (650) 725-7295
 kirsten.leute@stanford.edu
 
-======================================================================================
+=============================================================================
 Received December 22, 2000
 From: Thomas Wu <tjw@CS.Stanford.EDU>
 
@@ -87,15 +93,18 @@ http://otl.stanford.edu/
 Tom Wu
 tjw@CS.Stanford.EDU
 
+=============================================================================
 \end{verbatim}
 
 \par
-\gnutls{} uses the SRP algorithm as described in RFC 2945, which
+\gnutls{}, as part of it's SRP authentication method,
+uses the SRP algorithm as described in RFC 2945, which
 is available royalty-free by Stanford, so the above patent does
-not cause any harm. However 
-the US patent 6226383 held by Phoenix, known as the SPEKE patent
+not cause any harm. 
+
+However the US patent 6226383 held by Phoenix, known as the SPEKE patent,
 may apply to the SRP algorithm according to Phoenix.
-See \htmladdnormallink{http://www.ietf.org/ietf/IPR/PHOENIX-SRP-RFC2945.txt}{http://www.ietf.org/ietf/IPR/PHOENIX-SRP-RFC2945.txt}. 
-Also the EKE patents (US 5241599 and US 5440635), held by Lucent,
-may also apply to the SRP algorithm. See
+The letter sent to IETF by Phoenix is available at \htmladdnormallink{http://www.ietf.org/ietf/IPR/PHOENIX-SRP-RFC2945.txt}{http://www.ietf.org/ietf/IPR/PHOENIX-SRP-RFC2945.txt}.
+The EKE patents (US 5241599 and US 5440635), held by Lucent,
+may also apply to the SRP algorithm. See the letter sent to IETF found in
 \htmladdnormallink{http://www.ietf.org/ietf/IPR/LUCENT-SRP}{http://www.ietf.org/ietf/IPR/LUCENT-SRP}.

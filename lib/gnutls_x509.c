@@ -1288,7 +1288,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 		if (siz2 < 0) {
 			gnutls_assert();
-			return GNUTLS_E_PARSING_ERROR;
+			return GNUTLS_E_BASE64_DECODING_ERROR;
 		}
 
 		ret = parse_pkcs7_cert_mem( cert_list, ncerts, b64,
@@ -1306,7 +1306,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 	if (ptr == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 	siz = strlen( ptr);
 
@@ -1319,7 +1319,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 		if (siz2 < 0) {
 			gnutls_assert();
-			return GNUTLS_E_PARSING_ERROR;
+			return GNUTLS_E_BASE64_DECODING_ERROR;
 		}
 
 		*cert_list =
@@ -1544,14 +1544,14 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 			key = strstr( key, PEM_KEY_DSA_SEP);
 			if (key == NULL) {
 				gnutls_assert();
-				return GNUTLS_E_PARSING_ERROR;
+				return GNUTLS_E_BASE64_DECODING_ERROR;
 			}			key_size = strlen( key);
 		} else {
 			pk = GNUTLS_PK_RSA;
 			key = strstr( key, PEM_KEY_RSA_SEP);
 			if (key == NULL) {
 				gnutls_assert();
-				return GNUTLS_E_PARSING_ERROR;
+				return GNUTLS_E_BASE64_DECODING_ERROR;
 			}
 			key_size = strlen( key);
 		}
@@ -1561,7 +1561,7 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 
 		if (ret < 0) {
 			gnutls_assert();
-			return GNUTLS_E_PARSING_ERROR;
+			return GNUTLS_E_BASE64_DECODING_ERROR;
 		}
 
 		tmp.data = b64;

@@ -80,7 +80,7 @@ map_cdk_rc( int rc )
     case CDK_MPI_Error: return GNUTLS_E_MPI_SCAN_FAILED;
     case CDK_Error_No_Key: return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     case CDK_Wrong_Format: return GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED;
-    case CDK_Armor_Error: return GNUTLS_E_ASCII_ARMOR_ERROR;
+    case CDK_Armor_Error: return GNUTLS_E_BASE64_DECODING_ERROR;
     case CDK_Inv_Value: return GNUTLS_E_INVALID_REQUEST;
     default: return GNUTLS_E_INTERNAL_ERROR;
     }

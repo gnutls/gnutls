@@ -78,11 +78,12 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("Internal error in memory allocation.", GNUTLS_E_MEMORY_ERROR, 1 ), 
 	ERROR_ENTRY("An unimplemented feature has been requested.", GNUTLS_E_UNIMPLEMENTED_FEATURE, 1 ), 
 	ERROR_ENTRY("Insuficient credentials for that request.", GNUTLS_E_INSUFICIENT_CREDENTIALS, 1 ), 
-	ERROR_ENTRY("Error in password file.", GNUTLS_E_PWD_ERROR, 1 ), 
+	ERROR_ENTRY("Error in SRP password file.", GNUTLS_E_SRP_PWD_ERROR, 1 ), 
 	ERROR_ENTRY("Wrong padding in PKCS1 packet.", GNUTLS_E_PKCS1_WRONG_PAD, 1 ), 
 	ERROR_ENTRY("The requested session has expired.", GNUTLS_E_EXPIRED, 1 ), 
 	ERROR_ENTRY("Hashing has failed.", GNUTLS_E_HASH_FAILED, 1 ), 
-	ERROR_ENTRY("Parsing error.", GNUTLS_E_PARSING_ERROR, 1 ), 
+	ERROR_ENTRY("Certificate parsing error.", GNUTLS_E_BASE64_DECODING_ERROR, 1 ), 
+	ERROR_ENTRY("Parsing error in SRP password file.", GNUTLS_E_SRP_PWD_PARSING_ERROR, 1 ), 
 	ERROR_ENTRY("The requested data, were not available.", GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 0 ), 
 	ERROR_ENTRY("Error in the pull function.", GNUTLS_E_PULL_ERROR, 1 ), 
 	ERROR_ENTRY("Error in the push function.", GNUTLS_E_PUSH_ERROR, 1 ), 
@@ -102,7 +103,6 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("The request is invalid.", GNUTLS_E_INVALID_REQUEST, 1 ), 
 	ERROR_ENTRY("An illegal parameter has been received.", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1 ), 
 	ERROR_ENTRY("Error while reading file.", GNUTLS_E_FILE_ERROR, 1 ), 
-	ERROR_ENTRY("Error in ASCII armoring.", GNUTLS_E_ASCII_ARMOR_ERROR, 1 ), 
 
 	ERROR_ENTRY("ASN1 parser: Element was not found.", GNUTLS_E_ASN1_ELEMENT_NOT_FOUND, 1 ), 
 	ERROR_ENTRY("ASN1 parser: Identifier was not found", GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND, 1 ), 
@@ -149,6 +149,10 @@ static gnutls_error_entry error_algorithms[] = {
   * error 0 otherwise. However you may want to check the
   * error code manualy, since some non-fatal errors to the protocol
   * may be fatal for you (your program).
+  *
+  * This is only useful if you are dealing with errors from the
+  * record layer, or the handshake layer.
+  *
   **/
 int gnutls_error_is_fatal(int error)
 {

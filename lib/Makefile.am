@@ -14,11 +14,11 @@ EXTRA_DIST = minitasn1 debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	auth_anon.h gnutls_extensions.h gnutls_buffer.h \
 	gnutls_auth_int.h gnutls_random.h x509_b64.h gnutls_v2_compat.h \
 	libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
-	gnutls_datum.h auth_cert.h gnutls_mpi.h \
+	gnutls-api.tex gnutls_datum.h auth_cert.h gnutls_mpi.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
-	gnutls-api.tex io_debug.h ext_max_record.h gnutls_session_pack.h \
+	io_debug.h ext_max_record.h gnutls_session_pack.h \
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h \
 	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h auth_dh_common.h \
 	gnutls.sym

@@ -449,7 +449,7 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 	if ((ret = _gnutls_base64_decode( kdata, kdata_size, result)) < 0) {
 		gnutls_free(kdata);
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_BASE64_DECODING_ERROR;
 	} 
 	gnutls_free(kdata);
 	

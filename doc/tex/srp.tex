@@ -1,4 +1,5 @@
 \section{Authentication using SRP\index{SRP authentication}}
+
 Authentication using the SRP\footnote{SRP stands for Secure Password Protocol and 
 is described in \cite{RFC2945}. The SRP key exchange is not a part of the \tlsI{} protocol}
 is actually password authentication, since the two peers are identified by the knowledge of a password. 
@@ -12,6 +13,9 @@ the user's password. This kind of protection is similar to the one used traditio
 in the \emph{UNIX} ``passwd'' file, where the contents of this file did not cause
 harm to the system security if they were revealed.
 \par
+Before using SRP authentication, it is recommended to read \ref{ap:srppatent} on page
+\pageref{ap:srppatent}, about  the patents that relate to SRP.
+
 The implementation in \gnutls{} is based on paper \cite{TLSSRP}.
 Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp}.
 
