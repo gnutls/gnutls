@@ -136,7 +136,7 @@ typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
 /* If you want to change this, then also change the 
  * define in gnutls_int.h, and recompile.
  */
-typedef int gnutls_transport_ptr;
+typedef void * gnutls_transport_ptr;
 
 struct gnutls_session_int;
 typedef struct gnutls_session_int* gnutls_session;
