@@ -147,7 +147,7 @@ $blankline_texinfo = "";
 		     $type_func, "{\\\\bf \$1}",
 		     $type_struct, "{\\\\it \$1}",
 		     $type_param, "{\\\\bf \$1}" );
-$blankline_tex = "\\";
+$blankline_tex = "\\\\";
 
 # sgml, docbook format
 %highlights_sgml = ( $type_constant, "<replaceable class=\"option\">\$1</replaceable>",
