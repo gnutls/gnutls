@@ -1,0 +1,183 @@
+
+
+
+
+
+
+INTERNET-DRAFT                                                   H. Ohta
+TLS Working Group                                               H. Tsuji
+Expires March 2001                       Mitsubishi Electric Corporation
+                                                          September 2000
+
+
+                       Addition of MISTY1 to TLS
+
+                     <draft-ietf-tls-misty1-00.txt>
+
+
+Status of this Memo
+
+   This document is an Internet-Draft and is in full conformance with
+   all provisions of Section 10 of RFC2026.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet- Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+Abstract
+
+   This document proposes the addition of new cipher suites to the TLS
+   protocol version 1.0 to support the MISTY1 encryption algorithm as a
+   bulk cipher algorithm.
+
+1. Introduction
+
+   This document proposes the addition of new cipher suites to the TLS
+   protocol version 1.0[2] to support MISTY1 encryption algorithm[1] as
+   a bulk cipher algorithm.  MISTY1 is a block cipher with a 128-bit key
+   and a 64-bit block.  It is designed on the basis of the theory of
+   provable security against differential and linear cryptanalysis, and
+   moreover it realizes high-speed encryption on hardware platforms as
+   well as on software environments.
+
+
+
+
+Ohta, Tsuji                Expires March 2001                   [Page 1]
+
+
+
+
+
+
+Internet-Draft         Addition of MISTY1 to TLS          September 2000
+
+
+   This document defines the additional cipher specification to the TLS
+   protocol version 1.0.
+
+2. The Cipher Suites
+
+   The following values define the CipherSuite codes for the cipher
+   suites that use the MISTY1 CBC mode as a bulk cipher algorithm.
+
+    CipherSuite TLS_RSA_WITH_MISTY1_CBC_SHA            = { 0x00,0xXX };
+    CipherSuite TLS_DH_DSS_WITH_MISTY1_CBC_SHA         = { 0x00,0xXX };
+    CipherSuite TLS_DH_RSA_WITH_MISTY1_CBC_SHA         = { 0x00,0xXX };
+    CipherSuite TLS_DHE_DSS_WITH_MISTY1_CBC_SHA        = { 0x00,0xXX };
+    CipherSuite TLS_DHE_RSA_WITH_MISTY1_CBC_SHA        = { 0x00,0xXX };
+    CipherSuite TLS_DH_anon_WITH_MISTY1_CBC_SHA        = { 0x00,0xXX };
+
+   Note: Above CipherSuite numbers should be assigned and registerd.
+
+3. CipherSuite Definitions
+
+CipherSuite                      Is       Key          Cipher      Hash
+                             Exportable Exchange
+
+TLS_RSA_WITH_MISTY1_CBC_SHA             RSA            MISTY1_CBC  SHA
+TLS_DH_DSS_WITH_MISTY1_CBC_SHA          DH_DSS         MISTY1_CBC  SHA
+TLS_DH_RSA_WITH_MISTY1_CBC_SHA          DH_RSA         MISTY1_CBC  SHA
+TLS_DHE_DSS_WITH_MISTY1_CBC_SHA         DHE_DSS        MISTY1_CBC  SHA
+TLS_DHE_RSA_WITH_MISTY1_CBC_SHA         DHE_RSA        MISTY1_CBC  SHA
+TLS_DH_anon_WITH_MISTY1_CBC_SHA         DH_anon        MISTY1_CBC  SHA
+
+                         Key      Expanded   Effective   IV    Block
+    Cipher       Type  Material Key Material  Key Bits  Size   Size
+
+    MISTY1_CBC   Block   16         16         128        8      8
+
+   Note: Key Exchange Algorithms and Hash Functions are defined in TLS.
+
+4. Security Considerations
+
+   MISTY1 cipher suites are subject to the same security consideration
+   as TLS.  In addition, MISTY1 is designed in consideratin of the
+   theory of provable security against differential and liner
+   cryptanalysis.
+
+5. References
+
+   [1]  H. Ohta and M. Matsui, "A Description of the MISTY1 Encryption
+        Algorithm", Internet-Draft <draft-ohta-misty1desc-02.txt>, July
+        2000
+
+
+
+Ohta, Tsuji                Expires March 2001                   [Page 2]
+
+
+
+
+
+
+Internet-Draft         Addition of MISTY1 to TLS          September 2000
+
+
+   [2]  T. Dierks and C. Allen, "The TLS Protocol Version 1.0", RFC
+        2246, January 1999
+
+6. Author's Addresses
+
+   Hidenori Ohta
+   Mitsubishi Electric Corporation, Information Technology R&D Center
+   5-1-1 Ofuna, Kamakura, Kanagawa 247-8501, Japan
+   Phone: +81-467-41-2183
+   FAX:   +81-467-41-2185
+   EMail: hidenori@iss.isl.melco.co.jp
+
+   Hirosato Tsuji
+   Mitsubishi Electric Corporation, Information Technology R&D Center
+   5-1-1 Ofuna, Kamakura, Kanagawa 247-8501, Japan
+   Phone: +81-467-41-2183
+   FAX:   +81-467-41-2185
+   EMail: hirosato@iss.isl.melco.co.jp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ohta, Tsuji                Expires March 2001                   [Page 3]
+
+
+
