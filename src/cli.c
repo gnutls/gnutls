@@ -172,7 +172,7 @@ int main(int argc, char **argv)
    if (x509_cafile != NULL) {
       ret =
 	  gnutls_certificate_set_x509_trust_file(xcred, x509_cafile,
-					 x509_crlfile, x509ctype);
+					 x509ctype);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 trust file\n");
       } else {

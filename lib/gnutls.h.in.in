@@ -229,9 +229,9 @@ int gnutls_certificate_allocate_sc( GNUTLS_CERTIFICATE_CREDENTIALS *sc);
 int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS);
 
 int gnutls_certificate_set_x509_trust_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char* CAFILE, 
-	char* CRLFILE, GNUTLS_X509_CertificateFmt);
-int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum *CA, 	
-	const gnutls_datum *CRL, GNUTLS_X509_CertificateFmt);
+	GNUTLS_X509_CertificateFmt);
+int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
+	const gnutls_datum *CA, GNUTLS_X509_CertificateFmt);
 
 int gnutls_certificate_set_x509_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, 
 	char *CERTFILE, char* KEYFILE, GNUTLS_X509_CertificateFmt);

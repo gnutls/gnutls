@@ -52,14 +52,15 @@ int print_info(GNUTLS_STATE state)
             printf("- Peer's certificate is invalid\n");
          if ( status & GNUTLS_CERT_EXPIRED)
             printf("- Peer's certificate is expired\n");
-         if ( status & GNUTLS_CERT_NOT_TRUSTED)
-            printf("- Peer's certificate is not trusted\n");
-         else
-            printf("- Peer's certificate is trusted\n");
          if ( status & GNUTLS_CERT_CORRUPTED)
             printf("- Peer's certificate is corrupted.\n");
          if ( status & GNUTLS_CERT_REVOKED)
             printf("- Peer's certificate is revoked\n");
+
+         if ( status & GNUTLS_CERT_NOT_TRUSTED)
+            printf("- Peer's certificate is not trusted\n");
+         else
+            printf("- Peer's certificate is trusted\n");
       }
 
       /* Check if we have been using ephemeral Diffie Hellman.

@@ -1,3 +1,38 @@
+2002-03-29 12:12  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_algorithms.c, gnutls_cipher.c, gnutls_cipher_int.c,
+	gnutls_cipher_int.h, gnutls_compress.c, gnutls_compress_int.c,
+	gnutls_compress_int.h, gnutls_constate.c, gnutls_handshake.c,
+	gnutls_hash_int.c, gnutls_hash_int.h, gnutls_int.h, gnutls_kx.c,
+	gnutls_sig.c, gnutls_srp.c, gnutls_state.c, gnutls_ui.c,
+	x509_sig_check.c:
+
+	Prefixed with underscore several internal functions.  
+
+2002-03-29 11:38  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, auth_dhe.c, auth_rsa.c, gnutls_algorithms.c,
+	gnutls_algorithms.h, gnutls_cert.c, gnutls_cert.h, gnutls_global.c,
+	gnutls_x509.c:
+
+	removed unneeded functions 
+
+2002-03-29 11:38  nmav <nmav@gnutls.org>
+
+	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa:
+
+	added crlf option 
+
+2002-03-29 11:16  nmav <nmav@gnutls.org>
+
+	* ChangeLog, doc/TODO, lib/auth_rsa.c, lib/gnutls_int.h,
+	lib/gnutls_pk.c, lib/gnutls_pk.h, lib/gnutls_sig.c, lib/x509_der.c,
+	lib/x509_sig_check.c, src/cli.c, src/serv-gaa.c, src/serv-gaa.h,
+	src/serv.gaa:
+
+	Some cleanups in the certificate authentication. Parameters are 
+	passed together with the length, to avoid abuse.  
+
 2002-03-28 12:46  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_x509.c, x509_b64.c:

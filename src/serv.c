@@ -348,7 +348,7 @@ int main(int argc, char **argv)
 
    if (x509_cafile != NULL) {
       if ((ret=gnutls_certificate_set_x509_trust_file
-	  (cert_cred, x509_cafile, x509_crlfile, x509ctype)) < 0) {
+	  (cert_cred, x509_cafile, x509ctype)) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_cafile);
 	 exit(1);
       } else {

@@ -1522,15 +1522,14 @@ opaque *pdata;
   * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @CA: is a list of trusted CAs or a DER certificate
-  * @CRL: is a list of CRLs (ignored for now)
   * @type: is DER or PEM
   *
   * This function adds the trusted CAs in order to verify client
   * certificates. This function may be called multiple times.
   *
   **/
-int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum *CA,
-			     const gnutls_datum *CRL, GNUTLS_X509_CertificateFmt type)
+int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
+	const gnutls_datum *CA, GNUTLS_X509_CertificateFmt type)
 {
 	int ret, ret2;
 
@@ -1547,7 +1546,6 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, co
   * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @CAFILE: is a file containing the list of trusted CAs (DER or PEM list)
-  * @CRLFILE: is a file containing CRLs (ignored for now)
   * @type: is PEM or DER
   *
   * This function sets the trusted CAs in order to verify client
@@ -1555,8 +1553,8 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, co
   * Returns the number of certificate processed.
   *
   **/
-int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *CAFILE,
-			     char *CRLFILE, GNUTLS_X509_CertificateFmt type)
+int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, 
+		char *CAFILE, GNUTLS_X509_CertificateFmt type)
 {
 	int ret, ret2;
 
