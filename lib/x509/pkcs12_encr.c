@@ -60,7 +60,6 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
 		      opaque * keybuf)
 {
     int rc;
-    gcry_error_t err;
     unsigned int i, j;
     gc_hash md;
     mpi_t num_b1 = NULL;
@@ -93,8 +92,8 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
     }
 
     for (;;) {
-	err = gc_hash_open(GC_SHA1, 0, &md);
-	if (err) {
+	rc = gc_hash_open(GC_SHA1, 0, &md);
+	if (rc) {
 	    gnutls_assert();
 	    return GNUTLS_E_DECRYPTION_FAILED;
 	}
