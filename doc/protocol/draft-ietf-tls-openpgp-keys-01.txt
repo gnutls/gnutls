@@ -1,4 +1,3 @@
-[ THIS IS NOT A DRAFT (YET) ]
 
 
 TLS Working Group                                     N. Mavroyanopoulos
@@ -34,15 +33,15 @@ Status of this Memo
 Abstract
 
    This document proposes extensions to the TLS protocol to support
-   OpenPGP keys, in a way that allows the use of the existing cipher
-   suites.
+   OpenPGP trust model and keys.  The extensions discussed here
+   include a certificate type negotiation mechanism, and the required
+   modifications to the TLS Handshake Protocol.  
 
    This document uses the same notation used in the TLS Protocol draft.
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this
    document are to be interpreted as described in RFC 2119.
-
 
 
 
@@ -109,13 +108,15 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    client can use, sorted by client preference. This extension 
    SHOULD be omitted if the client supports only X.509 certificates.
 
-   The "extension_data" field of this extension will contain a
-   CertificateTypeExtension structure.
+
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 2]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
+
+   The "extension_data" field of this extension will contain a
+   CertificateTypeExtension structure.
 
    enum { client, server } ClientOrServerExtension;
 
@@ -166,15 +167,14 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    DHE_RSA                 RSA public key which can be used for
                            signing.
 
-   An OpenPGP key appearing in the Certificate message will be sent 
-   in binary OpenPGP format. The option is also available to send an 
-   OpenPGP fingerprint, instead of sending the entire key.  The
-
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 3]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
+   An OpenPGP key appearing in the Certificate message will be sent 
+   in binary OpenPGP format. The option is also available to send an 
+   OpenPGP fingerprint, instead of sending the entire key.  The
    process of fingerprint generation is described in [OpenPGP].  The
    peer shall respond with a "certificate_unobtainable" fatal alert if
    the key with the given key fingerprint cannot be found.  The 
@@ -221,18 +221,20 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    certificate_params_types is a list of accepted client certificate 
    parameter types, sorted in order of the server's preference.
 
-2.1.4 Client certificate
 
-   The client certificate message is sent using the same formatting as
-   the server certificate message. This message is only sent in response
-   to the certificate request message.  If no OpenPGP key is available 
-   from the client, then a certificate that contains an empty PGPKey is
+
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 4]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
+2.1.4 Client certificate
+
+   The client certificate message is sent using the same formatting as
+   the server certificate message. This message is only sent in response
+   to the certificate request message.  If no OpenPGP key is available 
+   from the client, then a certificate that contains an empty PGPKey is
    sent.  The server may respond with a "handshake_failure" fatal alert
    if client authentication is required. This transaction follows the
    TLS specification.
@@ -277,18 +279,18 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    CipherSuite TLS_DHE_RSA_WITH_AES_128_CBC_RMD       = { 0x00, 0x78 };
    CipherSuite TLS_DHE_RSA_WITH_AES_256_CBC_RMD       = { 0x00, 0x79 };
 
-   CipherSuite TLS_RSA_WITH_CAST_128_CBC_SHA          = { 0x00, 0x7A };
-   CipherSuite TLS_RSA_WITH_CAST_128_CBC_RMD          = { 0x00, 0x7B };
-   CipherSuite TLS_RSA_WITH_3DES_EDE_CBC_RMD          = { 0x00, 0x7C };
-   CipherSuite TLS_RSA_WITH_AES_128_CBC_RMD           = { 0x00, 0x7D };
-   CipherSuite TLS_RSA_WITH_AES_256_CBC_RMD           = { 0x00, 0x7E };
-
 
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 5]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
+
+   CipherSuite TLS_RSA_WITH_CAST_128_CBC_SHA          = { 0x00, 0x7A };
+   CipherSuite TLS_RSA_WITH_CAST_128_CBC_RMD          = { 0x00, 0x7B };
+   CipherSuite TLS_RSA_WITH_3DES_EDE_CBC_RMD          = { 0x00, 0x7C };
+   CipherSuite TLS_RSA_WITH_AES_128_CBC_RMD           = { 0x00, 0x7D };
+   CipherSuite TLS_RSA_WITH_AES_256_CBC_RMD           = { 0x00, 0x7E };
 
    All of the above cipher suites use either the CAST [CAST], 
    AES [AES], or 3DES block ciphers in CBC mode.  The choice of hash
@@ -323,11 +325,6 @@ Author's Address
 
    Nikos Mavroyanopoulos
    nmav@gnutls.org
-
-
-
-
-
 
 
 
