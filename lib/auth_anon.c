@@ -72,7 +72,7 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_X;
-	const ANON_SERVER_CREDENTIALS cred;
+	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
 
 	cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_ANON, NULL);
 	if (cred==NULL) {
@@ -88,7 +88,7 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	}
 
 	if ( state->gnutls_key->auth_info == NULL) {
-		state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_SERVER_AUTH_INFO));
+		state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_SERVER_AUTH_INFO_INT));
 		if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
 		state->gnutls_key->auth_info_type = GNUTLS_ANON;
 		state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO_INT);
@@ -241,7 +241,7 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 
 	/* set auth_info */
 	if (state->gnutls_key->auth_info==NULL)
-		state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_CLIENT_AUTH_INFO));
+		state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_CLIENT_AUTH_INFO_INT));
 	else
 		if (gnutls_auth_get_type( state) != state->gnutls_key->auth_info_type) {
 	        	gnutls_assert();
@@ -265,7 +265,7 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	size_t _n_Y;
 	MPI g, p;
 	int bits, ret;
-	const ANON_SERVER_CREDENTIALS cred;
+	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
 
 	cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_ANON, NULL);
 	if (cred==NULL) {
