@@ -654,7 +654,8 @@ int main(int argc, char **argv)
 
     if (user_term != 0)
 	socket_bye(&hd);
-
+    else
+	gnutls_deinit(hd.session);
 
 #ifdef ENABLE_SRP
     gnutls_srp_free_client_credentials(srp_cred);
