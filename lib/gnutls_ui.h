@@ -97,7 +97,6 @@ int gnutls_openpgp_verify_key( const gnutls_datum* key_list, int key_list_length
 /* get data from the state */
 const gnutls_datum* gnutls_certificate_get_peers( GNUTLS_STATE, int* list_size);
 const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state);
-int gnutls_certificate_get_ours_index(GNUTLS_STATE state);
 
 int gnutls_certificate_client_get_request_status(  GNUTLS_STATE);
 int gnutls_certificate_verify_peers( GNUTLS_STATE);

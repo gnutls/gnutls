@@ -134,35 +134,6 @@ const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state)
 }
 
 /**
-  * gnutls_certificate_get_ours_index - This function returns the index of the certificate sent in the last handshake
-  * @state: is a gnutls state
-  *
-  * This function will return the index of the certificate sent to 
-  * the peer, in the last handshake. The index depends on the sequence
-  * that the certificates were added, and the first certificate is assigned 0. 
-  * Returns a negative value in case of an error, or if no certificate was sent.
-  *
-  **/
-int gnutls_certificate_get_ours_index(GNUTLS_STATE state)
-{
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
-	int index;
-
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
-
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
-	}
-
-	index = state->gnutls_internals.selected_cert_index;
-	if (index < 0) return GNUTLS_E_NO_CERTIFICATE_FOUND; /* no certificate */
-	
-	return index;
-}
-
-/**
   * gnutls_certificate_get_peers - This function returns the peer's raw certificate
   * @state: is a gnutls state
   * @list_size: is the length of the certificate list
