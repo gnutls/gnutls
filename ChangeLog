@@ -1,3 +1,16 @@
+2002-11-14 13:48  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_alert.c, gnutls_alert.h:
+
+	Added some new alert codes from the extensions draft.  
+
+2002-11-14 09:19  nmav <nmav@gnutls.org>
+
+	* doc/tex/: ex-client2.tex, examples.tex:
+
+	updated the basic client to support OpenPGP certificate
+	authentication.  
+
 2002-11-12 13:29  nmav <nmav@gnutls.org>
 
 	* doc/tex/: Makefile.am, ex-serv-pgp.tex, examples.tex:
