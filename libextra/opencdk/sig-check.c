@@ -285,20 +285,29 @@ _cdk_pk_check_sig( cdk_keydb_hd_t hd, cdk_kbnode_t knode, cdk_kbnode_t snode )
         }
         cdk_kbnode_hash( knode, md, 0, 0, 0 );
         cdk_kbnode_hash( node, md, sig->version==4, 0, 0 );
-        if( pk->keyid[0] == sig->keyid[0] && pk->keyid[1] == sig->keyid[1] )
-            rc = _cdk_sig_check( pk, sig, md, &is_expired );
-        else if( hd ) {
+        if( hd ) {
             rc = cdk_keydb_get_pk( hd, sig->keyid, &sig_pk );
             if( !rc )
                 rc = _cdk_sig_check( sig_pk, sig, md, &is_expired );
             _cdk_free_pubkey( sig_pk );
 	}
+
+        if (!hd || rc==CDK_Error_No_Key) {
+               /* Only check the self signature if the given key
+                * is not in the keydb.
+                */
+               if( pk->keyid[0] == sig->keyid[0] && pk->keyid[1] == sig->keyid[1] ) {
+                  rc = _cdk_sig_check( pk, sig, md, &is_expired );
+                  if (rc == 0)
+                     rc = CDK_Self_Sig;
+               }
+        }
+
     }
  fail:
     cdk_md_close( md );
     return rc;
 }
-
 
 /**
  * cdk_pk_check_sigs:
@@ -318,6 +327,7 @@ cdk_pk_check_sigs( cdk_kbnode_t knode, cdk_keydb_hd_t hd, int * r_status )
     u32 keyid = 0;
     int key_status = 0;
     int rc = 0;
+    int checked_one = 0;
 
     if( !knode || !r_status )
         return CDK_Inv_Value;
@@ -344,15 +354,28 @@ cdk_pk_check_sigs( cdk_kbnode_t knode, cdk_keydb_hd_t hd, int * r_status )
             sig->flags.missing_key = 1;
             continue;
         }
-        else if( rc && rc != CDK_Error_No_Key ) {
-            *r_status = CDK_KEY_INVALID;
-            break; /* invalid self signature or key signature */
+        else if( rc) {
+            if (rc != CDK_Self_Sig && rc != CDK_Error_No_Key) {
+               /* invalid self signature or key signature */
+
+               *r_status = CDK_KEY_INVALID;
+               rc = 0; /* it's ok even if the verification failed. */
+               goto finish; 
+            }
         }
+        if (rc != CDK_Self_Sig) checked_one = 1;
+        else rc = 0; /* a self sig is not a fatal error. */
+
         _cdk_log_debug( "signature %s: signer %08lX keyid %08lX\n",
                         rc==CDK_Bad_Sig? "BAD" : "good", sig->keyid[1],
                         keyid );
     }
-    if( !rc || rc == CDK_Error_No_Key )
+
+    if( !rc || rc == CDK_Error_No_Key)
         *r_status = CDK_KEY_VALID;
+
+    if(checked_one==0) *r_status |= CDK_KEY_NO_SIGNERS;
+
+finish:
     return rc;
 }
