@@ -207,7 +207,7 @@ int _gnutls_finished(GNUTLS_STATE state, int type, int skip, void *ret)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_handshake_buffer_get(state, data, siz);
+	_gnutls_handshake_buffer_peek(state, data, siz);
 
 	gnutls_hash(td, data, siz);
 	gnutls_hash(td2, data, siz);
