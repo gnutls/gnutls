@@ -46,7 +46,7 @@ int _gnutls_server_name_recv_params(gnutls_session session,
    if (session->security_parameters.entity == GNUTLS_SERVER) {
       DECR_LENGTH_RET(data_size, 2, 0);
       len = _gnutls_read_uint16(data);
-      
+
       if ( len != data_size) {
          /* This is unexpected packet length, but
           * just ignore it, for now.
@@ -121,7 +121,8 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
    ssize_t data_size = _data_size;
    int total_size = 0;
 
-   /* this function sends the client extension data (dnsname) */
+   /* this function sends the client extension data (dnsname) 
+    */
    if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
       /* uint16 */
@@ -130,9 +131,12 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 	   i < session->security_parameters.extensions.server_names_size;
 	   i++) 
       {
-	   /* count the total size */
+	   /* count the total size 
+	    */
 	   len = session->security_parameters.extensions.server_names[i].name_length;
-	   /* uint8 + uint16 + size */
+
+	   /* uint8 + uint16 + size 
+	    */
 	   total_size += 1 + 2 + len;
       }
 
@@ -141,7 +145,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
       /* UINT16: write total size of all names 
        */
       DECR_LENGTH_RET( data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
-      _gnutls_write_uint16(total_size, p);
+      _gnutls_write_uint16(total_size-2, p);
       p += 2;
 
       for (i = 0;
@@ -179,8 +183,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 	 }
       }
    }
-   if (total_size == 0)
-      return 0;
+
    return total_size;
 }
 
