@@ -425,6 +425,7 @@ gc_hash_clone (gc_hash handle, gc_hash * outhandle)
     }
 
   memcpy (newhinf->context, oldhinf->context, newhinf->info->context_size);
+  memcpy (newhinf->digest, oldhinf->digest, MAX_DIGEST_SIZE);
 
   *outhandle = newhinf;
 
@@ -493,6 +494,11 @@ gc_hash_close (gc_hash handle)
 {
   hinfo *hinf = (hinfo*) handle;
 
+  if (hinf->mode == GC_HMAC)
+    {
+      free (hinf->inner);
+      free (hinf->outer);
+    }
   free (hinf->context);
   free (hinf);
 }
