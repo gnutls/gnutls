@@ -1,3 +1,27 @@
+/*
+ * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ *
+ * Author: Nikos Mavroyanopoulos
+ *
+ * This file is part of GNUTLS.
+ *
+ * The GNUTLS library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * USA
+ *
+ */
+
 int _gnutls_x509_sign(const gnutls_datum_t * tbs,
     gnutls_digest_algorithm_t hash, gnutls_x509_privkey_t signer,
     gnutls_datum_t * signature);
