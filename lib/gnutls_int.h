@@ -105,7 +105,7 @@ typedef int gnutls_transport_ptr;
 typedef unsigned char opaque;
 typedef struct { opaque pint[3]; } uint24;
 
-# include <gnutls_mpi.h>
+#include <gnutls_mpi.h>
 
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
 
@@ -139,6 +139,8 @@ typedef struct {
 	unsigned int size;
 } gnutls_datum;
 typedef gnutls_datum gnutls_sdatum;
+
+#include <gnutls_buffer.h>
 
 /* This is the maximum number of algorithms (ciphers or macs etc).
  * keep it synced with GNUTLS_MAX_ALGORITHM_NUM in gnutls.h
@@ -406,12 +408,13 @@ typedef struct {
 } HANDSHAKE_HEADER_BUFFER;
 
 typedef struct {
-	gnutls_datum			application_data_buffer; /* holds data to be delivered to application layer */
-	gnutls_datum			handshake_hash_buffer; /* used to keep all handshake messages */
+	gnutls_buffer			application_data_buffer; /* holds data to be delivered to application layer */
+	gnutls_buffer			handshake_hash_buffer; /* used to keep the last received handshake 
+								* message */
 	GNUTLS_MAC_HANDLE		handshake_mac_handle_sha; /* hash of the handshake messages */
 	GNUTLS_MAC_HANDLE		handshake_mac_handle_md5; /* hash of the handshake messages */
 
-	gnutls_datum			handshake_data_buffer; /* this is a buffer that holds the current handshake message */
+	gnutls_buffer			handshake_data_buffer; /* this is a buffer that holds the current handshake message */
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
 	HandshakeState			handshake_state; /* holds
 					* a number which indicates where
@@ -447,19 +450,19 @@ typedef struct {
 	/* These buffers are used in the handshake
 	 * protocol only. freed using _gnutls_handshake_io_buffer_clear();
 	 */
-	gnutls_datum 			handshake_send_buffer;
+	gnutls_buffer 			handshake_send_buffer;
 	size_t	 			handshake_send_buffer_prev_size;
 	ContentType			handshake_send_buffer_type;
 	HandshakeType			handshake_send_buffer_htype;
 	ContentType			handshake_recv_buffer_type;
 	HandshakeType			handshake_recv_buffer_htype;
-	gnutls_datum 			handshake_recv_buffer;
+	gnutls_buffer 			handshake_recv_buffer;
 	
 					/* this buffer holds a record packet -mostly used for
 					 * non blocking IO.
 					 */
-	gnutls_datum			record_recv_buffer;
-	gnutls_datum			record_send_buffer; /* holds cached data
+	gnutls_buffer			record_recv_buffer;
+	gnutls_buffer			record_send_buffer; /* holds cached data
 					* for the gnutls_io_write_buffered()
 					* function.
 					*/ 

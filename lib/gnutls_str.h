@@ -1,3 +1,6 @@
+#ifndef GNUTLS_STR_H
+# define GNUTLS_STR_H
+
 #include <gnutls_int.h>
 
 void _gnutls_str_cpy( char* dest, size_t dest_tot_size, const char* src);
@@ -5,7 +8,7 @@ void _gnutls_mem_cpy( char* dest, size_t dest_tot_size, const char* src, size_t 
 void _gnutls_str_cat( char* dest, size_t dest_tot_size, const char* src);
 
 typedef struct {
-	char * string;
+	opaque * data;
 	size_t max_length;
 	size_t length;
 	REALLOC_FUNC realloc_func;
@@ -24,3 +27,5 @@ gnutls_datum _gnutls_string2datum( gnutls_string* str);
 int _gnutls_string_copy_str( gnutls_string* dest, const char* src);
 int _gnutls_string_append_str( gnutls_string*, const char* str);
 int _gnutls_string_append_data( gnutls_string*, const void* data, size_t data_size);
+
+#endif

@@ -302,7 +302,7 @@ ssize_t gnutls_send_int( gnutls_session session, ContentType type, HandshakeType
 	 * If the previous send was interrupted then a null pointer is
 	 * ok, and means to resume.
 	 */
-	if (session->internals.record_send_buffer.size == 0 &&
+	if (session->internals.record_send_buffer.length == 0 &&
 	  (sizeofdata == 0 || _data==NULL)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
@@ -338,7 +338,7 @@ ssize_t gnutls_send_int( gnutls_session session, ContentType type, HandshakeType
 	/* Only encrypt if we don't have data to send 
 	 * from the previous run. - probably interrupted.
 	 */
-	if (session->internals.record_send_buffer.size > 0) {
+	if (session->internals.record_send_buffer.length > 0) {
 		ret = _gnutls_io_write_flush( session);
 		if (ret > 0) cipher_size = ret;
 		else cipher_size = 0;

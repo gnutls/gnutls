@@ -173,6 +173,17 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 	(*session)->security_parameters.write_compression_algorithm = GNUTLS_COMP_NULL;
 
 	(*session)->internals.enable_private = 0;
+	
+	/* Initialize buffers */
+	_gnutls_buffer_init( &(*session)->internals.application_data_buffer);
+	_gnutls_buffer_init( &(*session)->internals.handshake_data_buffer);
+	_gnutls_buffer_init( &(*session)->internals.handshake_hash_buffer);
+
+	_gnutls_buffer_init( &(*session)->internals.record_send_buffer);
+	_gnutls_buffer_init( &(*session)->internals.record_recv_buffer);
+
+	_gnutls_buffer_init( &(*session)->internals.handshake_send_buffer);
+	_gnutls_buffer_init( &(*session)->internals.handshake_recv_buffer);
 
 	(*session)->gnutls_key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
 	if ( (*session)->gnutls_key == NULL) {
@@ -243,11 +254,11 @@ void _gnutls_deinit(gnutls_session session)
 	gnutls_sfree_datum(&session->connection_state.read_mac_secret);
 	gnutls_sfree_datum(&session->connection_state.write_mac_secret);
 
-	_gnutls_free(session->internals.application_data_buffer.data);
-	_gnutls_free(session->internals.handshake_data_buffer.data);
-	_gnutls_free(session->internals.handshake_hash_buffer.data);
-	_gnutls_free(session->internals.record_recv_buffer.data);
-	_gnutls_free(session->internals.record_send_buffer.data);
+	_gnutls_buffer_clear( &session->internals.handshake_hash_buffer);
+	_gnutls_buffer_clear( &session->internals.handshake_data_buffer);
+	_gnutls_buffer_clear( &session->internals.application_data_buffer);
+	_gnutls_buffer_clear( &session->internals.record_recv_buffer);
+	_gnutls_buffer_clear( &session->internals.record_send_buffer);
 
 	gnutls_clear_creds( session);
 

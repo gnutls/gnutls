@@ -62,7 +62,8 @@ int _gnutls_server_select_comp_method(gnutls_session session,
 /* Clears the handshake hash buffers and handles.
  */
 inline static
-void _gnutls_handshake_hash_buffers_clear( gnutls_session session) {
+void _gnutls_handshake_hash_buffers_clear( gnutls_session session) 
+{
 	_gnutls_hash_deinit( session->internals.handshake_mac_handle_md5, NULL);
 	_gnutls_hash_deinit( session->internals.handshake_mac_handle_sha, NULL);
 	session->internals.handshake_mac_handle_md5 = NULL;
