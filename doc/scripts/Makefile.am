@@ -1,3 +1,3 @@
-EXTRA_DIST = gdoc
+EXTRA_DIST = gdoc sort1.pl
 
 
