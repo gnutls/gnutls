@@ -48,12 +48,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	int k, psize, i, ret, pad;
 	MPI m, res;
 	opaque *edata, *ps;
-	MPI tmp_params[2];
 
-	if (params_len < 2) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
 	
 	k = gcry_mpi_get_nbits(params[0]) / 8;
 
@@ -80,8 +75,10 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	switch (btype) {
 	case 2:
 		/* using public key */
-		tmp_params[0] = params[0];
-		tmp_params[1] = params[1];
+		if (params_len < RSA_PUBLIC_PARAMS) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
 		
 		if ( (ret=_gnutls_get_random(ps, psize, GNUTLS_WEAK_RANDOM)) < 0) {
 			gnutls_assert();
@@ -94,8 +91,11 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		break;
 	case 1:
 		/* using private key */
-		tmp_params[0] = params[0];
-		tmp_params[1] = params[2];
+
+		if (params_len < RSA_PRIVATE_PARAMS) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
 		
 		for (i = 0; i < psize; i++)
 			ps[i] = 0xff;
@@ -115,7 +115,10 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	}
 	gnutls_free(edata);
 
-	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, tmp_params, 2);
+	if (btype==2) /* encrypt */
+		ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, params, params_len);
+	else /* sign */
+		ret = _gnutls_pk_sign(GCRY_PK_RSA, &res, m, params, params_len);
 
 	_gnutls_mpi_release(&m);
 
@@ -621,6 +624,16 @@ int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey, int pkey_len)
 				     "(private-key(dsa(p%m)(q%m)(g%m)(y%m)(x%m)))",
 				     pkey[0], pkey[1], pkey[2],
 				     pkey[3], pkey[4]);
+		else gnutls_assert();
+
+		break;
+	case GCRY_PK_RSA:
+		if (pkey_len >=6)
+			rc = gcry_sexp_build(&s_key, NULL,
+				     "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
+				     pkey[0], pkey[1], pkey[2], pkey[3], pkey[4], pkey[5]);
+		else gnutls_assert();
+
 		break;
 
 	default:
@@ -649,26 +662,39 @@ int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey, int pkey_len)
 		return GNUTLS_E_PK_SIGNATURE_FAILED;
 
 	} else {
-		GCRY_SEXP list = gcry_sexp_find_token( s_sig, "r" , 0);
-		if (list == NULL) {
-			gnutls_assert();
-			gcry_sexp_release(s_sig);
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
-
-		data[0] = gcry_sexp_nth_mpi( list, 1, 0 );
-		gcry_sexp_release (list);
+		GCRY_SEXP list;
 		
-		list = gcry_sexp_find_token( s_sig, "s" , 0);
-		if (list == NULL) {
-			gnutls_assert();
-			gcry_sexp_release(s_sig);
-			return GNUTLS_E_INTERNAL_ERROR;
+		if (algo==GCRY_PK_DSA) {
+			list = gcry_sexp_find_token( s_sig, "r" , 0);
+			if (list == NULL) {
+				gnutls_assert();
+				gcry_sexp_release(s_sig);
+				return GNUTLS_E_INTERNAL_ERROR;
+			}
+	
+			data[0] = gcry_sexp_nth_mpi( list, 1, 0 );
+			gcry_sexp_release (list);
+			
+			list = gcry_sexp_find_token( s_sig, "s" , 0);
+			if (list == NULL) {
+				gnutls_assert();
+				gcry_sexp_release(s_sig);
+				return GNUTLS_E_INTERNAL_ERROR;
+			}
+
+			data[1] = gcry_sexp_nth_mpi( list, 1, 0 );
+			gcry_sexp_release (list);
+		} else { /* GCRY_PK_RSA */
+			list = gcry_sexp_find_token( s_sig, "s" , 0);
+			if (list == NULL) {
+				gnutls_assert();
+				gcry_sexp_release(s_sig);
+				return GNUTLS_E_INTERNAL_ERROR;
+			}
+
+			data[0] = gcry_sexp_nth_mpi( list, 1, 0 );
+			gcry_sexp_release (list);
 		}
-
-		data[1] = gcry_sexp_nth_mpi( list, 1, 0 );
-		gcry_sexp_release (list);
-
 	}
 
 	gcry_sexp_release(s_sig);
@@ -688,6 +714,12 @@ static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey, int pkey_
 			rc = gcry_sexp_build(&s_pkey, NULL,
 				     "(public-key(dsa(p%m)(q%m)(g%m)(y%m)))",
 				     pkey[0], pkey[1], pkey[2], pkey[3]);
+		break;
+	case GCRY_PK_RSA:
+		if (pkey_len >= 2)
+			rc = gcry_sexp_build(&s_pkey, NULL,
+				     "(public-key(rsa(n%m)(e%m)))",
+				     pkey[0], pkey[1]);
 		break;
 
 	default:
@@ -712,6 +744,11 @@ static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey, int pkey_
 		rc = gcry_sexp_build(&s_sig, NULL,
 				     "(sig-val(dsa(r%m)(s%m)))",
 				     data[0], data[1]);
+		break;
+	case GCRY_PK_RSA:
+		rc = gcry_sexp_build(&s_sig, NULL,
+				     "(sig-val(rsa(s%m)))",
+				     data[0]);
 		break;
 
 	default:
