@@ -51,79 +51,160 @@
 int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size);
 int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struct);
 
+int _gnutls_x509_attribute_type2string( const char* OID, void* value, 
+	int value_size, char * res, int res_size) {
 
-#define _READ(a, aa, b, c, d, e, res, f) \
-	result = _IREAD(a, aa, sizeof(aa), b, c, d, e, res, sizeof(res)-1, f); \
-	if (result<0) return result; \
-	if (result==1) continue
+int result;
+char str[1024], tmpname[1024];
+char* TYPE = NULL, *ANAME = NULL;
+int CHOICE = -1, len = -1;
+ASN1_TYPE tmpasn;
 
+	if (value==NULL || value_size <=0 || res==NULL || res_size <=0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	res[0] = 0;
 
-static int _IREAD(ASN1_TYPE rasn, char *name3, int name3_size, char *rstr, char *OID,
-	   char *ANAME, char *TYPE, char *res, int res_size, int CHOICE)
-{
-	char name2[256];
-	int result, len;
-	char str[1024];
-	ASN1_TYPE tmpasn;
+fprintf(stderr, "OID: %s\n", OID);
+fprintf(stderr, "len: %d\n", value_size);
+fprintf( stderr, "val: %.02x%.02x\n", ((unsigned char*)value)[0], ((unsigned char*)value)[1]);
 
-	if (strcmp(rstr, OID) == 0) {
+	if (strcmp( OID, "2 5 4 6") == 0) {
+#ifdef DEBUG
+# warning " FIX COUNTRY HERE"
+#endif
+		ANAME = "X520OrganizationName";
+		TYPE = "countryName";
+		CHOICE = 1;
+	} else 	if (strcmp( OID, "2 5 4 10") == 0) {
+		ANAME = "X520OrganizationName";
+		TYPE = "OrganizationName";
+		CHOICE = 1;
+	} else 	if (strcmp( OID, "2 5 4 11") == 0) {
+		ANAME = "X520OrganizationalUnitName";
+		TYPE = "OrganizationalUnitName",
+		CHOICE = 1;
+	} else 	if (strcmp( OID, "2 5 4 3") == 0) {
+		ANAME = "X520CommonName";
+		TYPE = "CommonName";
+		CHOICE = 1;
+	} else 	if (strcmp( OID, "2 5 4 7") == 0) {
+		ANAME = "X520LocalityName";
+		TYPE = "LocalityName";
+		CHOICE = 1;
+	} else 	if (strcmp( OID, "2 5 4 8") == 0) {
+		ANAME = "X520StateOrProvinceName";
+		TYPE = "StateOrProvinceName";
+		CHOICE = 1;
+	} else 	if (strcmp( OID, "1 2 840 113549 1 9 1") == 0) {
+		ANAME = "Pkcs9email";
+		TYPE = "emailAddress";
+		CHOICE = 0;
+	}
 
-		_gnutls_str_cpy(str, sizeof(str), "PKIX1."); 
-		_gnutls_str_cat(str, sizeof(str), ANAME); 
-		_gnutls_str_cpy(name2, sizeof(name2), "temp-structure-"); 
-		_gnutls_str_cat(name2, sizeof(name2), TYPE); 
+	if (ANAME==NULL || TYPE == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
 
-		if ((result =
-		     _gnutls_asn1_create_element(_gnutls_get_pkix(), str,
-					   &tmpasn, name2)) != ASN1_SUCCESS) {
-			gnutls_assert();
-			return _gnutls_asn2err(result);
-		}
+	_gnutls_str_cpy(str, sizeof(str), "PKIX1."); 
+	_gnutls_str_cat(str, sizeof(str), ANAME); 
+	_gnutls_str_cpy( tmpname, sizeof(tmpname), "temp-structure-"); 
+	_gnutls_str_cat( tmpname, sizeof(tmpname), TYPE); 
 
-		len = sizeof(str) -1;
-		if ((result =
-		     asn1_read_value(rasn, name3, str, &len)) != ASN1_SUCCESS) {
-			asn1_delete_structure(&tmpasn);
-			return 1;
-		}
+	if ((result =
+	     _gnutls_asn1_create_element(_gnutls_get_pkix(), str,
+				   &tmpasn, tmpname)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
 
-		if ((result = asn1_der_decoding(&tmpasn, str, len, NULL)) != ASN1_SUCCESS) {
-			asn1_delete_structure(&tmpasn);
-			return 1;
-		}
-		_gnutls_str_cpy(name3, name3_size, name2);
+	if ((result = asn1_der_decoding(&tmpasn, value, value_size, NULL)) != ASN1_SUCCESS) {
+		asn1_delete_structure(&tmpasn);
+		return _gnutls_asn2err(result);
+	}
+
+	/* If this is a choice then we read the choice. Otherwise it
+	 * is the value;
+	 */
+	len = sizeof( str) - 1;
+	if ((result = asn1_read_value(tmpasn, tmpname, str, &len)) != ASN1_SUCCESS) {	/* CHOICE */
+		asn1_delete_structure(&tmpasn);
+		return _gnutls_asn2err(result);
+	}
+
+	if (CHOICE == 0) {
+		str[len] = 0;
+		_gnutls_str_cpy(res, res_size, str); 
+		
+	} else {	/* CHOICE */
+		str[len] = 0;
+		_gnutls_str_cat( tmpname, sizeof(tmpname), "."); 
+		_gnutls_str_cat( tmpname, sizeof(tmpname), str); 
 
 		len = sizeof(str) - 1;
-		if ((result = asn1_read_value(tmpasn, name3, str, &len)) != ASN1_SUCCESS) {	/* CHOICE */
-			asn1_delete_structure(&tmpasn);
-			return 1;
-		}
-
-		if (CHOICE == 0) {
-			str[len] = 0;
-			/* strlen(str) < res_size, checked above */
-			_gnutls_str_cpy(res, res_size, str); 
-			
-		} else {	/* CHOICE */
-			str[len] = 0;
-			_gnutls_str_cat(name3, name3_size, "."); 
-			_gnutls_str_cat(name3, name3_size, str); 
-			len = sizeof(str) - 1;
-
-			if ((result =
-			     asn1_read_value(tmpasn, name3, str,
+		if ((result =
+		     asn1_read_value(tmpasn, tmpname, str,
 					     &len)) != ASN1_SUCCESS) {
-				asn1_delete_structure(&tmpasn);
-				return 1;
-			}
-			str[len] = 0;
-			if ( len < res_size)
-				_gnutls_str_cpy(res, res_size, str); 
+			asn1_delete_structure(&tmpasn);
+			return _gnutls_asn2err(result);
 		}
-		asn1_delete_structure(&tmpasn);
-
+		str[len] = 0;
+		_gnutls_str_cpy(res, res_size, str); 
 	}
+	asn1_delete_structure(&tmpasn);
+
 	return 0;
+
+}
+
+static int _IREAD(ASN1_TYPE rasn, char* name, const char *OID, 
+	gnutls_DN *dn)
+{
+	int result, len;
+	char str[1024];
+	char* res = NULL;
+	int res_size = -1;
+	
+	if (strcmp( OID, "2 5 4 6") == 0) {
+		res = dn->country;
+		res_size = sizeof(dn->country);
+	} else 	if (strcmp( OID, "2 5 4 10") == 0) {
+		res = dn->organization;
+		res_size = sizeof(dn->organization);
+	} else 	if (strcmp( OID, "2 5 4 11") == 0) {
+		res = dn->organizational_unit_name;
+		res_size = sizeof(dn->organizational_unit_name);
+	} else 	if (strcmp( OID, "2 5 4 3") == 0) {
+		res = dn->common_name;
+		res_size = sizeof(dn->common_name);
+	} else 	if (strcmp( OID, "2 5 4 7") == 0) {
+		res = dn->locality_name;
+		res_size = sizeof(dn->locality_name);
+	} else 	if (strcmp( OID, "2 5 4 8") == 0) {
+		res = dn->state_or_province_name;
+		res_size = sizeof(dn->state_or_province_name);
+	} else 	if (strcmp( OID, "1 2 840 113549 1 9 1") == 0) {
+		res = dn->email;
+		res_size = sizeof(dn->email);
+	}
+
+	if (res==NULL || res_size < 0) return 1;
+
+	len = sizeof(str) -1;
+	/* Read the DER value of the 'value' part of the
+	 * AttributeTypeAndValue.
+	 */
+	if ((result =
+	     asn1_read_value(rasn, name, str, &len)) != ASN1_SUCCESS) {
+		return 1;
+	}
+	
+	result = _gnutls_x509_attribute_type2string( OID, str, len, res, res_size);
+	if (result < 0) return 1;
+	else return 0;
 }
 
 /* this function will convert up to 3 digit
@@ -196,6 +277,7 @@ int _gnutls_x509_get_name_type(ASN1_TYPE rasn, char *root, gnutls_DN * dn)
 			_gnutls_str_cat(name3, sizeof(name3), ".type"); 
 
 			len = sizeof(str) - 1;
+			/* read OID */
 			result = asn1_read_value(rasn, name3, str, &len);
 
 			if (result == ASN1_ELEMENT_NOT_FOUND)
@@ -206,36 +288,15 @@ int _gnutls_x509_get_name_type(ASN1_TYPE rasn, char *root, gnutls_DN * dn)
 			}
 
 			_gnutls_str_cpy(name3, sizeof(name3), name2);
-			_gnutls_str_cat(name3, sizeof(name3), ".value"); 
+			_gnutls_str_cat(name3, sizeof(name3), ".value");
 
 			if (result == ASN1_SUCCESS) {
-#ifdef DEBUG
-# warning " FIX COUNTRY HERE"
-#endif
-				_READ(rasn, name3, str, "2 5 4 6",
-				      "X520OrganizationName",
-				      "countryName", dn->country, 1);
-				_READ(rasn, name3, str, "2 5 4 10",
-				      "X520OrganizationName",
-				      "OrganizationName", dn->organization,
-				      1);
-				_READ(rasn, name3, str, "2 5 4 11",
-				      "X520OrganizationalUnitName",
-				      "OrganizationalUnitName",
-				      dn->organizational_unit_name, 1);
-				_READ(rasn, name3, str, "2 5 4 3",
-				      "X520CommonName", "CommonName",
-				      dn->common_name, 1);
-				_READ(rasn, name3, str, "2 5 4 7",
-				      "X520LocalityName", "LocalityName",
-				      dn->locality_name, 1);
-				_READ(rasn, name3, str, "2 5 4 8",
-				      "X520StateOrProvinceName",
-				      "StateOrProvinceName",
-				      dn->state_or_province_name, 1);
-				_READ(rasn, name3, str,
-				      "1 2 840 113549 1 9 1", "Pkcs9email",
-				      "emailAddress", dn->email, 0);
+				result = _IREAD(rasn, name3, str, dn);
+				if (result < 0) {
+					return result;
+				}
+				
+				if (result==1) continue;
 			}
 		} while (1);
 	} while (1);
