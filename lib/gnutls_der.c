@@ -165,6 +165,8 @@ int read_der_certificate(FILE *instr, FILE *outstr){
   return tag.length;
 }
 
+#if 0
 main (int argc, char *argv[]){
   printf("length of certificate: %d\n", read_der_certificate(stdin, stdout));
 }
+#endif
