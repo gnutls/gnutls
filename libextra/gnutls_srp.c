@@ -197,13 +197,15 @@ GNUTLS_MPI _gnutls_calc_srp_S1(GNUTLS_MPI A, GNUTLS_MPI b, GNUTLS_MPI u, GNUTLS_
 	_gnutls_mpi_mulm(tmp2, A, tmp1, n);
 	_gnutls_mpi_powm(S, tmp2, b, n);
 
-	return S;
-
-	freeall:
 	_gnutls_mpi_release(&tmp1);
 	_gnutls_mpi_release(&tmp2);
 
-	return NULL;
+	return S;
+
+	freeall:
+		_gnutls_mpi_release(&tmp1);
+		_gnutls_mpi_release(&tmp2);
+		return NULL;
 }
 
 /* A = g^a % N 
