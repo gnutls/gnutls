@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 #include <gnutls.h>
 #include <signal.h>
-#include "port.h"
+#include <port.h>
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
@@ -37,6 +37,7 @@ int main()
 	
 	if (ret<0) {
 		fprintf(stderr, "handshake failed(%d)\n", ret);
+		return 1;
 	} else {
 		fprintf(stderr, "handshake finished\n");
 	}
@@ -46,8 +47,10 @@ int main()
 	if (gnutls_is_fatal_error(ret)==1) {
 		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
 			fprintf(stderr, "Peer has closed the GNUTLS connection\n");
+			return 0;
 		} else {
 			fprintf(stderr, "Received corrupted data(%d)\n", ret);
+			return 1;
 		}
 	} else {
 		fprintf(stdout, "Received: %s\n", buffer);
@@ -57,8 +60,10 @@ int main()
 	if (gnutls_is_fatal_error(ret)==1) {
 		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
 			fprintf(stderr, "Peer has closed the GNUTLS connection\n");
+			return 0;
 		} else {
 			fprintf(stderr, "Received corrupted data(%d)\n", ret);
+			return 1;
 		}
 	} else {
 		fprintf(stdout, "Received: %s\n", buffer);

@@ -1,10 +1,10 @@
 #include <defines.h>
+#include <mhash.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_compress.h"
 #include "gnutls_cipher.h"
 #include "gnutls_algorithms.h"
-#include <mhash.h>
 
 #define MD5_DIGEST 16
 #define SHA_DIGEST 20

@@ -1,4 +1,5 @@
 #include <defines.h>
+#include <mhash.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "debug.h"
@@ -7,7 +8,6 @@
 #include "gnutls_cipher.h"
 #include "gnutls_buffers.h"
 #include "gnutls_handshake.h"
-#include <mhash.h>
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
@@ -501,7 +501,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 	if (ret != gcipher.length) {
 #ifdef DEBUG
 		fprintf(stderr,
-			"Received packet with length: %d\nExpecting %d\n",
+			"Received packet with length: %d\nExpected %d\n",
 			ret, gcipher.length);
 #endif
 		gnutls_free(gcipher.fragment);
@@ -584,12 +584,13 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 			break;
 			
 		case GNUTLS_CHANGE_CIPHER_SPEC:
-			if (type != GNUTLS_CHANGE_CIPHER_SPEC)
+
+			if (type != GNUTLS_CHANGE_CIPHER_SPEC) {
 				return GNUTLS_E_UNEXPECTED_PACKET;
+			}
 			if (((ChangeCipherSpecType)
-			     tmpdata[0]) ==
-			    GNUTLS_TYPE_CHANGE_CIPHER_SPEC && tmplen == 1) {
-				ret = _gnutls_connection_state_init(state);
+			     tmpdata[0]) == GNUTLS_TYPE_CHANGE_CIPHER_SPEC && tmplen == 1) {
+				ret = 0; // _gnutls_connection_state_init(state);
 
 			} else {
 				state->gnutls_internals.valid_connection
@@ -602,14 +603,17 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 			return ret;
 
 		case GNUTLS_HANDSHAKE:
+
 			if (type == GNUTLS_HANDSHAKE) {
 				ret =
 				    _gnutls_recv_handshake
-				    (cd, state, tmpdata, tmplen);
+				    (cd, state, tmpdata, tmplen, data, sizeofdata);
+				
 				gnutls_free(tmpdata);
 				state->
 				    connection_state.read_sequence_number++;
 			} else {
+
 				ret = GNUTLS_E_RECEIVED_BAD_MESSAGE;
 			}
 			return ret;

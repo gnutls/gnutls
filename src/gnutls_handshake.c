@@ -1,4 +1,5 @@
 #include <defines.h>
+#include <mhash.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "debug.h"
@@ -14,6 +15,77 @@
 #else
 #define ERR(x, y)
 #endif
+
+#define HASH_TRUE 1
+#define HASH_FALSE 0
+
+
+#define SERVER_MSG "server finished"
+#define CLIENT_MSG "client finished"
+_gnutls_send_finished( int cd, GNUTLS_STATE state) {
+uint8* data;
+uint8 concat[36]; /* md5+sha1 */
+int ret;
+
+
+	memset(concat, 0, 36);
+	memmove( concat, state->gnutls_internals.md_md5, 16);
+	memmove( &concat[16], state->gnutls_internals.md_sha1, 20);
+	
+	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+		data = gnutls_PRF(state->security_parameters.master_secret, 48,
+	                       CLIENT_MSG, strlen(CLIENT_MSG), concat, 36,
+				12);
+	} else { /* server */
+	
+		data = gnutls_PRF(state->security_parameters.master_secret, 48,
+	                       SERVER_MSG, strlen(SERVER_MSG), concat, 36,
+	                       12);	
+	}
+
+	ret = _gnutls_send_handshake( cd, state, data, 12, GNUTLS_FINISHED, HASH_FALSE);
+	gnutls_free(data);
+	
+	return ret;
+}
+
+_gnutls_recv_finished( int cd, GNUTLS_STATE state) {
+uint8* data, vrfy[12];
+uint8 concat[36]; /* md5+sha1 */
+int ret=0;
+
+	memset( concat, 0, 36);
+	memset( vrfy, 0, 12);
+	memmove( concat, state->gnutls_internals.md_md5, 16);
+	memmove( &concat[16], state->gnutls_internals.md_sha1, 20);
+
+	state->gnutls_internals.next_handshake_type = GNUTLS_FINISHED;
+	ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, vrfy, 12);
+	if (ret<0) {
+		ERR("recv finished int", ret);
+		return ret;
+	}
+	if (ret!=12) return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
+
+	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+		data = gnutls_PRF(state->security_parameters.master_secret, 48,
+				SERVER_MSG, strlen(SERVER_MSG), concat, 36,
+				12);
+	} else { /* server */
+	
+		data = gnutls_PRF(state->security_parameters.master_secret, 48,
+	                       CLIENT_MSG, strlen(CLIENT_MSG), concat, 36,
+	                       12);	
+	}
+
+	if ( memcmp( vrfy, data, 12) != 0) ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
+
+	gnutls_free(data);
+	
+	return ret;
+}
+
+
 
 int SelectSuite( opaque ret[2], char* data, int datalen) {
 int x, pos=0, i,j;
@@ -96,7 +168,7 @@ int _gnutls_supported_compression_methods(CompressionMethod **comp) {
 	return SUPPORTED_COMPRESSION_METHODS;
 }
 
-int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_datasize, HandshakeType type) {
+int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_datasize, HandshakeType type, int hash) {
 	int ret;
 	uint8* data; 
 	uint24 length;
@@ -117,34 +189,54 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_da
 	memmove( &data[pos++], &length.pint[0], 1);
 	memmove( &data[pos++], &length.pint[1], 1);
 	memmove( &data[pos++], &length.pint[2], 1);
+
 	if (i_datasize > 0) memmove( &data[pos], i_data, i_datasize-4);
+
+	if (hash==HASH_TRUE) {
+		mhash( state->gnutls_internals.td_md5, data ,i_datasize);	
+		mhash( state->gnutls_internals.td_sha1, data, i_datasize);
+	}
 
 	ret = gnutls_send_int( cd, state, GNUTLS_HANDSHAKE, data, i_datasize);
 	
 	return ret;
 }
 
-int _gnutls_recv_handshake( int cd, GNUTLS_STATE state, void* data, uint32 datasize) {
+int _gnutls_recv_handshake( int cd, GNUTLS_STATE state, void* data, uint32 datasize, void* output_data, uint32 output_datasize) {
 	int ret;
 	uint32 length32=0;
 	int pos=0;
-	char *dataptr=data;
+	uint8 *dataptr=data;
 	uint24 num;
+
 
 	num.pint[0] = dataptr[1];
 	num.pint[1] = dataptr[2];
 	num.pint[2] = dataptr[3];
 	length32 = uint24touint32( num);
 
+
 #ifndef WORDS_BIGENDIAN	
 	length32 = byteswap32(length32);
 #endif
 
+	mhash( state->gnutls_internals.td_md5, dataptr, length32 + 4);
+	mhash( state->gnutls_internals.td_sha1, dataptr, length32 + 4);
 
+	ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	switch(dataptr[0]) {
 		case GNUTLS_CLIENT_HELLO:
 		case GNUTLS_SERVER_HELLO:
-			ret = _gnutls_recv_hello( cd, state, &dataptr[4], length32, NULL, 0);
+			if (state->gnutls_internals.next_handshake_type == dataptr[0])
+				ret = _gnutls_recv_hello( cd, state, &dataptr[4], length32, NULL, 0);
+			break;
+		case GNUTLS_SERVER_HELLO_DONE:
+			ret = 0;
+			break;
+		case GNUTLS_FINISHED:
+			if (output_datasize > length32) output_datasize=length32;
+			memmove( output_data, &dataptr[4], length32);
+			ret = length32;
 			break;
 	}
 
@@ -152,7 +244,7 @@ int _gnutls_recv_handshake( int cd, GNUTLS_STATE state, void* data, uint32 datas
 }
 
 int _gnutls_send_hello_request(int cd, GNUTLS_STATE state) {
-	return _gnutls_send_handshake( cd, state, NULL, 0, GNUTLS_HELLO_REQUEST);
+	return _gnutls_send_handshake( cd, state, NULL, 0, GNUTLS_HELLO_REQUEST, HASH_FALSE);
 }
 
 
@@ -231,7 +323,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 		gnutls_free(cipher_suites);
 		gnutls_free(compression_methods);
 
-		ret = _gnutls_send_handshake( cd, state, data, datalen, GNUTLS_CLIENT_HELLO);
+		ret = _gnutls_send_handshake( cd, state, data, datalen, GNUTLS_CLIENT_HELLO, HASH_TRUE);
 		gnutls_free(data);
 
 	
@@ -270,7 +362,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 		memmove( &data[pos++], &state->gnutls_internals.compression_method, 1);
 
 		gcry_free(rand);
-		ret = _gnutls_send_handshake( cd, state, data, datalen, GNUTLS_SERVER_HELLO);
+		ret = _gnutls_send_handshake( cd, state, data, datalen, GNUTLS_SERVER_HELLO, HASH_TRUE);
 		gnutls_free(data);
 
 	}
@@ -390,31 +482,74 @@ int ret;
 char* session_id;
 uint8 session_id_size;
 
+	state->gnutls_internals.td_md5 = mhash_init(MHASH_MD5);
+	state->gnutls_internals.td_sha1 = mhash_init(MHASH_SHA1);
+
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		ret = _gnutls_send_hello( cd, state, NULL, 0);
 		if (ret<0) {
 			ERR("send hello", ret);
 			return ret;
 		}
-		/* receive the server handshake */
+
+		/* receive the server hello */
+		state->gnutls_internals.next_handshake_type = GNUTLS_SERVER_HELLO;
 		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
 		if (ret<0) {
 			ERR("recv hello", ret);
 			return ret;
 		}
-		ret = gnutls_recv_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, NULL, 0);
+
+		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+		
+		/* receive the server hello done */
+		state->gnutls_internals.next_handshake_type = GNUTLS_SERVER_HELLO_DONE;
+		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
 		if (ret<0) {
-			ERR("recv ChangeCipherSpec", ret);
+			ERR("recv server hello done", ret);
 			return ret;
 		}
+
+		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
+
+		/* Send the CHANGE CIPHER SPEC PACKET */
 		ret = _gnutls_send_change_cipher_spec( cd, state);
 		if (ret<0) {
 			ERR("send ChangeCipherSpec", ret);
 			return ret;
 		}
 
+
+		state->gnutls_internals.md_md5 = mhash_end( state->gnutls_internals.td_md5);
+		state->gnutls_internals.md_sha1 = mhash_end( state->gnutls_internals.td_sha1);
+
+
+		/* Initialize the connection state (start encryption) */
+		_gnutls_connection_state_init(state);
+
+		/* send the finished message */
+
+		ret = _gnutls_send_finished( cd, state);
+		if (ret<0) {
+			ERR("send Finished", ret);
+			return ret;
+		}
+
+		ret = gnutls_recv_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, NULL, 0);
+		if (ret<0) {
+			ERR("recv ChangeCipherSpec", ret);
+			return ret;
+		}
+
+		ret = _gnutls_recv_finished( cd, state);
+		if (ret<0) {
+			ERR("recv finished", ret);
+			return ret;
+		}
+
 	} else { /* SERVER */
 		
+		state->gnutls_internals.next_handshake_type = GNUTLS_CLIENT_HELLO;
 		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
 		if (ret<0) {
 			ERR("recv hello", ret);
@@ -428,15 +563,50 @@ uint8 session_id_size;
 			return ret;
 		}
 		gnutls_free(session_id);
+
+		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+
+		/* send the server hello done */
+		ret = _gnutls_send_handshake( cd, state, NULL, 0, GNUTLS_SERVER_HELLO_DONE, HASH_TRUE);
+		if (ret<0) {
+			ERR("send server hello done", ret);
+			return ret;
+		}
+
+		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
+
+
+		/* Initialize the connection state (start encryption) */
+
 		
+
+		ret = gnutls_recv_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, NULL, 0);
+		if (ret<0) {
+			ERR("recv ChangeCipherSpec", ret);
+			return ret;
+		}
+
+		_gnutls_connection_state_init(state);
+		
+		state->gnutls_internals.md_md5 = mhash_end( state->gnutls_internals.td_md5);
+		state->gnutls_internals.md_sha1 = mhash_end( state->gnutls_internals.td_sha1);
+
+
+		ret = _gnutls_recv_finished( cd, state);
+		if (ret<0) {
+			ERR("recv finished", ret);
+			return ret;
+		}
+
 		ret = _gnutls_send_change_cipher_spec( cd, state);
 		if (ret<0) {
 			ERR("send ChangeCipherSpec", ret);
 			return ret;
 		}
-		ret = gnutls_recv_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, NULL, 0);
+
+		ret = _gnutls_send_finished( cd, state);
 		if (ret<0) {
-			ERR("recv ChangeCipherSpec", ret);
+			ERR("recv finished", ret);
 			return ret;
 		}
 	}
@@ -459,3 +629,4 @@ char* rand;
 #endif
 	return 0;
 }
+

@@ -4,8 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "gnutls.h"
-#include "port.h"
+#include <gnutls.h>
+#include <port.h>
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
@@ -48,10 +48,21 @@ int main()
 
 
 
-		gnutls_handshake(sd, state);
+		ret = gnutls_handshake(sd, state);
+		if (ret<0) {
+			close(sd);
+			gnutls_deinit(&state);
+			fprintf(stderr, "Handshake has failed(%d)\n", ret);
+			continue;
+		}
 		fprintf(stderr, "Handshake was completed\n");
 
 		ret = gnutls_send(sd, state, "hello world\n", sizeof("hello world\n"));
+		if (ret<0) {
+			close(sd);
+			gnutls_deinit(&state);
+			continue;
+		}
 		fprintf(stderr, "Data was send (%d)\n", ret);
 		
 		gnutls_close(sd, state);

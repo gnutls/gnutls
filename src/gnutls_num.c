@@ -1,4 +1,5 @@
 #include <defines.h>
+#include <mhash.h>
 #include <gnutls_int.h>
 
 uint32 uint24touint32( uint24 num) {

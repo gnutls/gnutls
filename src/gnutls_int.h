@@ -44,6 +44,15 @@ typedef enum AlertDescription AlertDescription;
 typedef enum AlertLevel AlertLevel;
 typedef enum ChangeCipherSpecType ChangeCipherSpecType;
 
+enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
+		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
+		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
+		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
+		     GNUTLS_FINISHED=20 };
+			
+typedef enum HandshakeType HandshakeType;
+
+
 typedef struct {
 	ChangeCipherSpecType type;
 } ChangeCipherSpec;
@@ -125,6 +134,12 @@ typedef struct {
 	AlertDescription	last_alert;
 	GNUTLS_CipherSuite	current_cipher_suite;
 	CompressionMethod	compression_method;
+	/* for the handshake protocol */
+	HandshakeType		next_handshake_type;
+	MHASH			td_md5;
+	MHASH			td_sha1;
+	void*			md_md5;
+	void*			md_sha1;
 } GNUTLS_INTERNALS;
 
 typedef struct {
@@ -191,13 +206,6 @@ typedef struct {
 
 /* Handshake protocol */
 
-enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
-		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
-		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
-		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
-		     GNUTLS_FINISHED=20 };
-			
-typedef enum HandshakeType HandshakeType;
 
 typedef struct {
 	HandshakeType	msg_type;
@@ -232,3 +240,7 @@ typedef struct {
 /* functions */
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
 int gnutls_close(int cd, GNUTLS_STATE state);
+svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
+		  int label_size, opaque * seed, int seed_size,
+		  int total_bytes);
+		  

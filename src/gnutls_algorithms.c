@@ -1,4 +1,5 @@
 #include <defines.h>
+#include <mhash.h>
 #include "gnutls_int.h"
 #include "gnutls_algorithms.h"
 
