@@ -8,7 +8,8 @@ noinst_LTLIBRARIES = libx509.la
 
 COBJECTS = crl.c dn.c common.c x509.c extensions.c \
 	rfc2818_hostname.c verify.c mpi.c privkey.c pkcs7.c \
-	crq.c xml.c sign.c pkcs5.c privkey_pkcs8.c pkcs12.c
+	crq.c xml.c sign.c pkcs5.c privkey_pkcs8.c pkcs12.c \
+	pkcs12_bag.c
 
 COMPAT_OBJECTS = compat.c
 

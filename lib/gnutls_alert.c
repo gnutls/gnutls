@@ -232,11 +232,11 @@ int _level = -1;
 	return ret;
 }
 
-
+ 
 /* Sends the appropriate alert, depending
- * on the error message.
+ * on the error message. Deprecated. May be removed.
  */
-/**
+/*-
   * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
   * @session: is a &gnutls_session structure.
   * @err: is an integer
@@ -250,7 +250,7 @@ int _level = -1;
   * If the return value is GNUTLS_E_INVALID_REQUEST, then no alert has
   * been sent to the peer.
   *
-  **/
+  -*/
 int gnutls_alert_send_appropriate( gnutls_session session, int err) {
 int alert;
 int level;

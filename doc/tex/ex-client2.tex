@@ -30,7 +30,7 @@ int main()
    gnutls_certificate_credentials xcred;
    /* Allow connections to servers that have OpenPGP keys as well.
     */
-   const int cert_type_priority[2] = { GNUTLS_CRT_X509, 
+   const int cert_type_priority[3] = { GNUTLS_CRT_X509, 
       GNUTLS_CRT_OPENPGP, 0 };
 
    gnutls_global_init();

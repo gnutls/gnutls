@@ -1,5 +1,5 @@
 typedef enum gnutls_privkey_pkcs8_flags {
-	GNUTLS_PKCS8_PLAIN=1,  /* if set the private key will not
+	GNUTLS_PKCS8_PLAIN=1   /* if set the private key will not
 			        * be encrypted.
 				*/
 } gnutls_privkey_pkcs8_flags;

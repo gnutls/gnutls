@@ -633,3 +633,76 @@ opaque *data = NULL;
 
 	return 0;
 }
+
+/* Reads a value from an ASN1 tree, and puts the output
+ * in an allocated variable in the given datum.
+ * If str is non zero, then the output will be treated as
+ * an octet string.
+ */
+int _gnutls_x509_read_value( ASN1_TYPE c, const char* root, gnutls_datum *ret, int str)
+{
+int len = 0, result;
+opaque* tmp = NULL;
+ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	result = asn1_read_value(c, root, NULL, &len);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		return result;
+	}
+
+	tmp = gnutls_malloc(len);
+	if (tmp == NULL) {
+		gnutls_assert();
+		result = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+	
+	result = asn1_read_value(c, root, tmp, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* Extract the OCTET STRING.
+	 */
+
+	if (str) {
+
+		if ((result=asn1_create_element
+		    (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;	
+		}
+
+		result = asn1_der_decoding(&c2, tmp, len, NULL);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;	
+		}
+
+
+		result = asn1_read_value(c2, "", tmp, &len);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+	}
+	
+	ret->data = tmp;
+	ret->size = len;
+	
+	return 0;
+
+	cleanup:
+		if (c2) asn1_delete_structure(&c2);
+		gnutls_free(tmp);
+		return result;
+
+}

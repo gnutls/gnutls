@@ -29,8 +29,8 @@ static int cert_callback(gnutls_session session,
       len = sizeof(issuer_dn);
       ret = gnutls_x509_rdn_get(&req_ca_rdn[i], issuer_dn, &len);
       if (ret >= 0) {
-	 printf("   [%d]: ", i);
-	 printf("%s\n", issuer_dn);
+         printf("   [%d]: ", i);
+         printf("%s\n", issuer_dn);
       }
    }
 

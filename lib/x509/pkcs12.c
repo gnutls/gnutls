@@ -46,7 +46,7 @@ int _decode_pkcs12_auth_safe( ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe, gnutls_
 {
 char oid[128];
 ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-opaque *tmp = NULL;
+gnutls_datum auth_safe = { NULL, 0 };
 int tmp_size, len, result;
 
 	len = sizeof(oid) - 1;
@@ -62,58 +62,15 @@ int tmp_size, len, result;
 		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
 	}
 
+	/* Step 1. Read the content data
+	 */
 
 	tmp_size = 0;
-	result = asn1_read_value(pkcs12, "authSafe.content", NULL, &tmp_size);
-	if (result!=ASN1_MEM_ERROR) {
+	result = _gnutls_x509_read_value(pkcs12, "authSafe.content", &auth_safe, 1);
+	if (result < 0) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
-
-	tmp = gnutls_malloc(tmp_size);
-	if (tmp==NULL) {
-		gnutls_assert();
-		result = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
-	}
-
-	result = asn1_read_value(pkcs12, "authSafe.content", tmp, &tmp_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	/* tmp, tmp_size hold the data and the size of the CertificateSet structure
-	 * actually the ANY stuff.
-	 */
-
-	/* Step 1. Extract the OCTET STRING.
-	 */
-
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	
-	}
-
-	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	
-	}
-
-	result = asn1_read_value(c2, "", tmp, &tmp_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	asn1_delete_structure(&c2);
 
 	/* Step 2. Extract the authenticatedSafe.
 	 */
@@ -124,7 +81,8 @@ int tmp_size, len, result;
 		result = _gnutls_asn2err(result);
 		goto cleanup;	
 	}
-	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
+
+	result = asn1_der_decoding(&c2, auth_safe.data, auth_safe.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -132,10 +90,10 @@ int tmp_size, len, result;
 	}
 
 	if (raw == NULL) {
-		gnutls_free(tmp);
+		_gnutls_free_datum(&auth_safe);
 	} else {
-		raw->data = tmp;
-		raw->size = tmp_size;
+		raw->data = auth_safe.data;
+		raw->size = auth_safe.size;
 	}
 
 	*authen_safe = c2;
@@ -144,7 +102,7 @@ int tmp_size, len, result;
 
 	cleanup:
 		if (c2) asn1_delete_structure(&c2);
-		gnutls_free(tmp);
+		_gnutls_free_datum( &auth_safe);
 		return result;
 }
 
@@ -276,68 +234,44 @@ int gnutls_pkcs12_export( gnutls_pkcs12 pkcs12,
 		output_data, output_data_size);
 }
 
+#define BAG_PKCS8_KEY "1.2.840.113549.1.12.10.1.1"
+#define BAG_PKCS8_ENCRYPTED_KEY "1.2.840.113549.1.12.10.1.2"
+#define BAG_CERTIFICATE "1.2.840.113549.1.12.10.1.3"
+#define BAG_CRL "1.2.840.113549.1.12.10.1.4"
+
+static int _oid2bag( const char* oid)
+{
+	if (strcmp(oid, BAG_PKCS8_KEY)==0) 
+		return GNUTLS_BAG_PKCS8_KEY;
+	if (strcmp(oid, BAG_PKCS8_ENCRYPTED_KEY)==0) 
+		return GNUTLS_BAG_PKCS8_ENCRYPTED_KEY;
+	if (strcmp(oid, BAG_CERTIFICATE)==0) 
+		return GNUTLS_BAG_CERTIFICATE;
+	if (strcmp(oid, BAG_CRL)==0) 
+		return GNUTLS_BAG_CRL;
+	
+	return GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE;
+
+}
+
 
 static
-int _parse_safe_contents( ASN1_TYPE sc, const char* sc_name) 
+int _parse_safe_contents( ASN1_TYPE sc, const char* sc_name, gnutls_pkcs12_bag bag) 
 {
 char oid[128];
 ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-opaque *tmp = NULL;
-int tmp_size, len, result;
+gnutls_datum content = { NULL, 0 };
+int len, result;
+int bag_type;
 
-	tmp_size = 0;
-	result = asn1_read_value(sc, sc_name, NULL, &tmp_size);
-	if (result!=ASN1_MEM_ERROR) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	tmp = gnutls_malloc(tmp_size);
-	if (tmp==NULL) {
-		gnutls_assert();
-		result = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
-	}
-
-	result = asn1_read_value(sc, sc_name, tmp, &tmp_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	/* tmp, tmp_size hold the data and the size of the SafeContents structure
-	 * actually the ANY stuff.
+	/* Step 1. Extract the content.
 	 */
 
-
-	/* Step 1. Extract the OCTET STRING.
-	 */
-
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS) {
+	result = _gnutls_x509_read_value(sc, sc_name, &content, 1);
+	if (result < 0) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	
-	}
-
-	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	
-	}
-
-	result = asn1_read_value(c2, "", tmp, &tmp_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
-
-	asn1_delete_structure(&c2);
-
 
 	/* Step 2. Extract the SEQUENCE.
 	 */
@@ -349,14 +283,13 @@ int tmp_size, len, result;
 		goto cleanup;	
 	}
 
-	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
+	result = asn1_der_decoding(&c2, content.data, content.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;	
 	}
-	gnutls_free(tmp);
-	tmp = NULL;
+	_gnutls_free_datum(&content);
 
 	len = sizeof(oid);
 	result = asn1_read_value(c2, "?1.bagId", oid, &len);
@@ -366,40 +299,53 @@ int tmp_size, len, result;
 		goto cleanup;
 	}
 
+	/* Read the Bag type
+	 */
+	bag_type = _oid2bag( oid);
+	
+	if (bag_type < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Read the Bag Value
+	 */
+
+	result = _gnutls_x509_read_value( c2, "?1.bagValue", &bag->data, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
 	asn1_delete_structure(&c2);
 
-fprintf(stderr, "BAG OID: %s\n", oid);
+	bag->type = bag_type;
 
 	return 0;
 
 	cleanup:
 		if (c2) asn1_delete_structure(&c2);
-		gnutls_free(tmp);
+		_gnutls_free_datum( &content);
 		return result;
 }
 
 
-/* FIXME: This is not a proper API. PKCS 12 packets are too complex to
- * handle like this. A proper API has to be designed.
- */
 
 /**
-  * gnutls_pkcs12_get_certificate - This function returns a certificate in a PKCS12 structure
+  * gnutls_pkcs12_get_bag - This function returns a Bag from a PKCS12 structure
   * @pkcs12_struct: should contain a gnutls_pkcs12 structure
-  * @indx: contains the index of the certificate to extract
-  * @certificate: the contents of the certificate will be copied there (may be null)
-  * @certificate_size: should hold the size of the certificate
+  * @indx: contains the index of the bag to extract
+  * @bag: An initialized bag, where the contents of the bag will be copied
   *
-  * This function will return an (X.509) certificate of the PKCS12 structure.
-  * Returns 0 on success. If the provided buffer is not long enough,
-  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+  * This function will return a Bag from the PKCS12 structure.
+  * Returns 0 on success.
   *
-  * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+  * After the last Bag has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
   * will be returned.
   *
   **/
-int gnutls_pkcs12_get_certificate(gnutls_pkcs12 pkcs12, 
-	int indx, unsigned char* certificate, int* certificate_size)
+int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12, 
+	int indx, gnutls_pkcs12_bag bag)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len;
@@ -407,8 +353,6 @@ int gnutls_pkcs12_get_certificate(gnutls_pkcs12 pkcs12,
 	char oid[128];
 	char counter[MAX_INT_DIGITS];
 	gnutls_datum tmp = {NULL, 0};
-
-	if (certificate_size == NULL) return GNUTLS_E_INVALID_REQUEST;
 
 	/* Step 1. decode the data.
 	 */
@@ -430,7 +374,7 @@ int gnutls_pkcs12_get_certificate(gnutls_pkcs12 pkcs12,
 
 	result = asn1_read_value(c2, root2, oid, &len);
 
-	if (result == ASN1_VALUE_NOT_FOUND) {
+	if (result == ASN1_ELEMENT_NOT_FOUND) {
 		result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 		goto cleanup;	
 	}
@@ -443,20 +387,28 @@ int gnutls_pkcs12_get_certificate(gnutls_pkcs12 pkcs12,
 
 	/* Not encrypted Bag
 	 */
-	if (strcmp( oid, DATA_OID) == 0) {
-		_gnutls_str_cpy( root2, sizeof(root2), "?"); 
-		_gnutls_int2str( indx+1, counter);
-		_gnutls_str_cat( root2, sizeof(root2), counter); 
-		_gnutls_str_cat( root2, sizeof(root2), ".content"); 
 
-		result = _parse_safe_contents( c2, root2);
+	_gnutls_str_cpy( root2, sizeof(root2), "?"); 
+	_gnutls_int2str( indx+1, counter);
+	_gnutls_str_cat( root2, sizeof(root2), counter); 
+	_gnutls_str_cat( root2, sizeof(root2), ".content"); 
+
+	if (strcmp( oid, DATA_OID) == 0) {
+		result = _parse_safe_contents( c2, root2, bag);
 		goto cleanup;
 	}
 	
 	/* ENC_DATA_OID needs decryption */
-fprintf(stderr, "OID: %s\n", oid);
 
-return GNUTLS_E_MEMORY_ERROR;
+	bag->type = GNUTLS_BAG_ENCRYPTED;
+
+	result = _gnutls_x509_read_value( c2, root2, &bag->data, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
 
 	cleanup:
 		_gnutls_free_datum( &tmp);

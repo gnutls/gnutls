@@ -135,6 +135,7 @@ static gnutls_error_entry error_algorithms[] = {
         ERROR_ENTRY("The certificate has unsupported attributes.", GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE, 1),
         ERROR_ENTRY("The hash algorithm is unknown.", GNUTLS_E_UNKNOWN_HASH_ALGORITHM, 1),
         ERROR_ENTRY("The PKCS structure's content type is unknown.", GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE, 1),
+        ERROR_ENTRY("The PKCS structure's Bag type is unknown.", GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE, 1),
 	{0, 0, 0, 0}
 };
 
