@@ -19,6 +19,9 @@
  */
 
 #include "gnutls_int.h"
+
+#ifdef ENABLE_SRP
+
 #include "gnutls_auth_int.h"
 #include "auth_srp.h"
 #include "gnutls_errors.h"
@@ -104,3 +107,5 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 	}
 	return 0;
 }
+
+#endif /* ENABLE_SRP */

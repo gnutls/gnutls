@@ -1,3 +1,5 @@
+#ifdef ENABLE_SRP
+
 int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, MPI g, MPI prime);
 MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v);
 MPI _gnutls_calc_srp_u( MPI B);
@@ -12,3 +14,5 @@ extern const uint8 diffie_hellman_group1_prime[130];
 
 /* g is defined to be 2 */
 #define SRP_MAX_HASH_SIZE 24
+
+#endif

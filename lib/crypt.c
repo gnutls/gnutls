@@ -19,6 +19,9 @@
  */
 
 #include "gnutls_int.h"
+
+#ifdef ENABLE_SRP
+
 #include "crypt_bcrypt.h"
 #include "crypt_srpsha1.h"
 #include "gnutls_random.h"
@@ -56,3 +59,5 @@ int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt, MPI 
 	}
 	return 1;
 }
+
+#endif

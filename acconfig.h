@@ -35,3 +35,5 @@
 
 #undef DEFINE_SIZE_T
 
+#undef ENABLE_SRP
+#undef ENABLE_ANON

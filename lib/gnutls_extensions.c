@@ -38,7 +38,9 @@ typedef struct {
 } gnutls_extension_entry;
 
 static gnutls_extension_entry extensions[] = {
+#ifdef ENABLE_SRP
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
+#endif
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_MAX_RECORD_SIZE, _gnutls_max_record_recv_params, _gnutls_max_record_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_CERT_TYPE, _gnutls_cert_type_recv_params, _gnutls_cert_type_send_params),
 	{0}

@@ -21,6 +21,9 @@
 /* Functions for operating in an SRP passwd file are included here */
 
 #include "gnutls_int.h"
+
+#ifdef ENABLE_SRP
+
 #include "x509_b64.h"
 #include "gnutls_errors.h"
 #include "auth_srp_passwd.h"
@@ -427,3 +430,5 @@ int _gnutls_srp_generate_prime(opaque ** ret_g, opaque ** ret_n, int bits)
 	return 0;
 
 }
+
+#endif /* ENABLE SRP */

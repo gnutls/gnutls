@@ -35,6 +35,9 @@
  */
  
 #include "gnutls_int.h"
+
+#ifdef ENABLE_SRP
+
 #include "crypt_bcrypt.h"
 #include "gnutls_random.h"
 #include "auth_srp_passwd.h"
@@ -766,3 +769,5 @@ int _gnutls_calc_srp_bcrypt(const char* username, const char *passwd, opaque * s
 	memcpy( digest, text, BCRYPT_SIZE);
 	return 0;
 }
+
+#endif /* ENABLE_SRP */

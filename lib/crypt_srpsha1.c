@@ -19,6 +19,9 @@
  */
 
 #include "gnutls_int.h"
+
+#ifdef ENABLE_SRP
+
 #include "gnutls_random.h"
 #include "gnutls_hash_int.h"
 #include "auth_srp_passwd.h"
@@ -168,3 +171,5 @@ char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
 
 	return e;
 }
+
+#endif

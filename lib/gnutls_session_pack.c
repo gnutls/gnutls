@@ -51,6 +51,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 
 
 	switch (gnutls_auth_get_type(state)) {
+#ifdef ENABLE_SRP
 	case GNUTLS_CRD_SRP:{
 			SRP_SERVER_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
@@ -78,6 +79,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 		}
 
 		break;
+#endif
 	case GNUTLS_CRD_ANON:{
 			ANON_CLIENT_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
@@ -183,6 +185,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 	}
 	
 	switch ( packed_session->data[0]) {
+#ifdef ENABLE_SRP
 	case GNUTLS_CRD_SRP:{
 
 			pack_size =
@@ -212,6 +215,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			       pack_size);
 		}
 		break;
+#endif
 	case GNUTLS_CRD_ANON:{
 			pack_size =
 			    READuint32(&packed_session->

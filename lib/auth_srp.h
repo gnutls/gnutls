@@ -1,5 +1,7 @@
 #include <gnutls_auth.h>
 
+#ifdef ENABLE_SRP
+
 typedef struct {
 	char* username;
 	char* password;
@@ -24,3 +26,5 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data);
 
 typedef struct  SRP_SERVER_AUTH_INFO_INT  SRP_SERVER_AUTH_INFO_INT;
+
+#endif /* ENABLE_SRP */

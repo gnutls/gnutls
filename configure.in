@@ -247,6 +247,30 @@ else
  AC_MSG_RESULT()
 fi
 
+AC_MSG_CHECKING([whether to disable SRP authentication support])
+AC_ARG_ENABLE( srp, [  --disable-srp-authentication  disable the SRP authentication support],
+ ac_enable_srp=no
+)
+if test x$ac_enable_srp != xno; then
+ AC_MSG_RESULT(no)
+ AC_DEFINE(ENABLE_SRP)
+else
+ AC_MSG_RESULT(yes)
+fi
+
+AC_MSG_CHECKING([whether to disable anonymous authentication support])
+AC_ARG_ENABLE( srp, [  --disable-anon-authentication disable the anonymous authentication support],
+ ac_enable_anon=no
+)
+if test x$ac_enable_anon != xno; then
+ AC_MSG_RESULT(no)
+ AC_DEFINE(ENABLE_ANON)
+else
+ AC_MSG_RESULT(yes)
+fi
+
+
+
 
 
 

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -279,5 +279,18 @@ int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size, int allo
 			}
 		}
 	}
+	return 0;
+}
+
+/* this function will copy an MPI key to 
+ * opaque data.
+ */
+int _gnutls_generate_key(GNUTLS_KEY key) {
+        _gnutls_mpi_print( NULL, &key->key.size, key->KEY);
+	key->key.data = gnutls_secure_malloc( key->key.size);
+	if ( key->key.data==NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	_gnutls_mpi_print( key->key.data, &key->key.size, key->KEY);
 	return 0;
 }

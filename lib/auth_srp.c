@@ -19,6 +19,9 @@
  */
 
 #include "gnutls_int.h"
+
+#ifdef ENABLE_SRP
+
 #include "gnutls_errors.h"
 #include "auth_srp_passwd.h"
 #include "gnutls_auth.h"
@@ -441,3 +444,4 @@ int proc_srp_server_kx2(GNUTLS_STATE state, opaque * data, int data_size)
 	return 0;
 }
 
+#endif /* ENABLE_SRP */

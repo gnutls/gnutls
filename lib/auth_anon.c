@@ -19,6 +19,9 @@
  */
 
 #include "gnutls_int.h"
+
+#ifdef ENABLE_ANON
+
 #include "gnutls_auth_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
@@ -52,19 +55,6 @@ MOD_AUTH_STRUCT anon_auth_struct = {
 	NULL,
 	NULL
 };
-
-/* this function will copy an MPI key to 
- * opaque data.
- */
-int _gnutls_generate_key(GNUTLS_KEY key) {
-        _gnutls_mpi_print( NULL, &key->key.size, key->KEY);
-	key->key.data = gnutls_secure_malloc( key->key.size);
-	if ( key->key.data==NULL) {
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	_gnutls_mpi_print( key->key.data, &key->key.size, key->KEY);
-	return 0;
-}
 
 int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	MPI x, X, g, p;
@@ -340,3 +330,4 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	return 0;
 }
 
+#endif /* ENABLE_ANON */

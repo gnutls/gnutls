@@ -28,6 +28,8 @@
 
 /* SRP */
 
+#ifdef ENABLE_SRP
+
 /**
   * gnutls_srp_server_get_username - This function returns the username of the peer
   * @state: is a gnutls state
@@ -49,7 +51,9 @@ const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
 	return info->username;
 }
 
-/* ANON */
+#endif
+
+/* ANON & DHE */
 
 /**
   * gnutls_dh_set_prime_bits - Used to set the bits for a DH ciphersuite

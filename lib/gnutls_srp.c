@@ -19,6 +19,9 @@
  */
 
 #include <gnutls_int.h>
+
+#ifdef ENABLE_SRP
+
 #include <gnutls_errors.h>
 #include <crypt_bcrypt.h>
 #include <gnutls_srp.h>
@@ -479,3 +482,5 @@ void gnutls_srp_server_set_select_func(GNUTLS_STATE state,
 {
 	state->gnutls_internals.server_srp_callback = func;
 }
+
+#endif /* ENABLE_SRP */

@@ -19,6 +19,9 @@
  */
 
 #include "gnutls_int.h"
+
+#ifdef ENABLE_ANON
+
 #include "gnutls_auth_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
@@ -87,3 +90,5 @@ int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
 	
 	return 0;
 }
+
+#endif

@@ -174,11 +174,15 @@ extern MOD_AUTH_STRUCT anon_auth_struct;
 extern MOD_AUTH_STRUCT srp_auth_struct;
 
 static const gnutls_kx_algo_entry kx_algorithms[] = {
+#ifdef ENABLE_ANON
 	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
+#endif
 	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
 	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
 	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
+#ifdef ENABLE_SRP
 	{ "SRP", GNUTLS_KX_SRP, &srp_auth_struct },
+#endif
 	{0}
 };
 

@@ -20,6 +20,8 @@
 
 #include "gnutls_int.h"
 
+#ifdef ENABLE_SRP
+
 /* this a modified base64 for srp !!! 
  * It seems that everybody makes it's own base64 convertion.
  */
@@ -304,3 +306,5 @@ int main()
 
 }
 #endif
+
+#endif /* ENABLE_SRP */
