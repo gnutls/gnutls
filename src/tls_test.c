@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_srp_set_client_credentials( srp_cred, "test", "test");
+	gnutls_srp_set_client_credentials( srp_cred, "guest", "guest");
 
 	/* ANON stuff */
 	if (gnutls_anon_allocate_client_credentials(&anon_cred) < 0) {

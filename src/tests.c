@@ -64,6 +64,11 @@ int ret, alert;
 		}
 
 		if (srp) {
+			if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret ==
+				GNUTLS_E_FATAL_ALERT_RECEIVED) &&
+				gnutls_alert_get(session) == GNUTLS_A_BAD_RECORD_MAC)
+				return SUCCEED;
+
 			if (ret == GNUTLS_E_DECRYPTION_FAILED)
 				return SUCCEED; /* SRP was detected */
 		}
