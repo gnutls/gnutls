@@ -71,6 +71,11 @@ struct gnutls_cipher_entry {
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
+/* Note that all algorithms are in CBC or STREAM modes. 
+ * Do not add any algorithms in other modes (like ECB).
+ * View first: "The order of encryption and authentication for
+ * protecting communications" by Hugo Krawczyk - CRYPTO 2001
+ */
 static const gnutls_cipher_entry algorithms[] = {
 	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES, 8, 24, 1, 8),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL, 16, 16, 1, 16),
