@@ -5,7 +5,7 @@ aclocal.m4:
  include(libgnutls.m4)
 
 configure.in:
- AM_PATH_GNUTLS( 0.2.3,, AC_MSG_ERROR[[*** gnutls was not found]]))
+ AM_PATH_LIBGNUTLS( 0.2.3,, AC_MSG_ERROR[[*** gnutls was not found]]))
 
 
-these macros define GNUTLS_LIBS and GNUTLS_CFLAGS.
+these macros define LIBGNUTLS_LIBS and LIBGNUTLS_CFLAGS.
