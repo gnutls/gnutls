@@ -104,7 +104,9 @@ bits -- which are considered weak -- and sends them to the client.
 DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
 parameters which are sent to the peer. The key in the certificate must allow
 the key to be used for signing. Note that key exchange algorithms which use
-Ephemeral Diffie Hellman parameters, offer perfect forward secrecy.
+Ephemeral Diffie Hellman parameters, offer perfect forward secrecy. That means
+that even if the private key used for signing is compromised, it cannot be
+used to reveal past session data.
 \\
 \hline
 DHE\_DSS & The DSS algorithm is used to sign Ephemeral Diffie Hellman
