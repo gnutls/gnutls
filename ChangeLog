@@ -1,3 +1,19 @@
+2003-12-02 21:39  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_cipher.c, gnutls_cipher_int.c:
+
+	some cleanups in the record protocol processing.  
+
+2003-12-02 18:20  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, doc/tex/srp.tex, lib/gnutls.h.in.in,
+	lib/gnutls_errors.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_state.c, src/cli.c:
+
+	Improved the support for draft-ietf-tls-srp-05. The two-phase 
+	handshake is now fully supported without any interaction with the
+	application layer (except for a callback).  
+
 2003-12-01 14:07  nmav <nmav@gnutls.org>
 
 	* src/common.c:
