@@ -2689,7 +2689,7 @@ void smime_to_pkcs7(void)
       if (len == -1)
 	error (EXIT_FAILURE, 0, "Cannot find RFC 2822 header/body separator");
     }
-  while (strcmp (lineptr, "\r\n") != 0);
+  while (strcmp (lineptr, "\r\n") != 0 && strcmp (lineptr, "\n") != 0);
 
   do
     {
@@ -2697,13 +2697,13 @@ void smime_to_pkcs7(void)
       if (len == -1)
 	error (EXIT_FAILURE, 0, "Message has RFC 2822 header but no body");
     }
-  while (strcmp (lineptr, "\r\n") == 0);
+  while (strcmp (lineptr, "\r\n") == 0 && strcmp (lineptr, "\n") == 0);
 
   printf ("-----BEGIN PKCS7-----\n");
 
   do
     {
-      if (strcmp (lineptr, "\r\n") != 0)
+      if (strcmp (lineptr, "\r\n") != 0 && strcmp (lineptr, "\n") != 0)
 	printf("%s", lineptr);
       len = getline (&lineptr, &linesize, infile);
     }
