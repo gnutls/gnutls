@@ -27,6 +27,7 @@
 #include <stddef.h>
 
 #define GC_MD5_LEN 16
+#define GC_SHA1_LEN 16
 
 enum Gc_rc
 {
