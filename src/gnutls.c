@@ -4,6 +4,7 @@
 #include "gnutls_compress.h"
 #include "gnutls_plaintext.h"
 #include "gnutls_cipher.h"
+#include "gnutls_buffers.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <mhash.h>
@@ -29,6 +30,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->cipher_specs.server_write_key = NULL;
 	(*state)->cipher_specs.client_write_key = NULL;
 
+	(*state)->gnutls_internals.buffer = NULL;
 }
 
 int gnutls_deinit(GNUTLS_STATE * state)
@@ -140,7 +142,7 @@ svoid *gnutls_PRF( opaque* secret, int secret_size, uint8* label, int label_size
 }
 
 /* if  master_secret, client_random and server_random have been initialized,
- * this functions creates the keys and stores them into state->cipher_specs
+ * this function creates the keys and stores them into state->cipher_specs
  */
 int _gnutls_set_keys( GNUTLS_STATE state) {
 	char* key_block;
@@ -285,102 +287,60 @@ int gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, in
 }
 
 
-#if 0
 int gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, int sizeofdata) {
         GNUTLSPlaintext *gtxt;
         GNUTLSCompressed *gcomp;
-        GNUTLSCiphertext *gcipher;
+        GNUTLSCiphertext gcipher;
 	int iterations, i, err;
-	uint16 length;
-	int ret=0, Size;
+	char* tmpdata;
+	int ret=0;
 	
 	if (sizeofdata==0) return 0;
 
-	if (sizeofdata<16384) {
-		iterations=1;
-		Size=sizeofdata;
-	} else {
-		iterations = sizeofdata/16384; 
-		Size = 16384;
-	}
-	for (i=0;i<iterations;i++) {
-		err = _gnutls_text2TLSPlaintext(type, &gtxt, &data[i*Size], Size);
-		if (err<0) {
-			/*gnutls_perror(err);*/
-			return err;
+	do {
+		read( cd, &gcipher.type, sizeof(ContentType));
+		read( cd, &gcipher.version, sizeof(ProtocolVersion));
+		if ( gcipher.version.major != GNUTLS_VERSION_MAJOR || gcipher.version.minor != GNUTLS_VERSION_MINOR) {
+			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 		}
 
-	        err = _gnutls_TLSPlaintext2TLSCompressed(state, &gcomp, gtxt);
-		if (err<0) {
-			/*gnutls_perror(err);*/
-			return err;
-		}
-
-		_gnutls_freeTLSPlaintext(gtxt);
-	
-		err = _gnutls_TLSCompressed2TLSCiphertext( state, &gcipher, gcomp);
-		if (err<0) {
-			/*gnutls_perror(err);*/
-			return err;
-		}
-
-		_gnutls_freeTLSCompressed(gcomp);
-		
-		write( cd, &gcipher->type, sizeof(ContentType));
-		write( cd, &gcipher->version.major, 1);
-		write( cd, &gcipher->version.minor, 1);
-#ifdef WORDS_BIGENDIAN
-		length=gcipher->length;
-#else
-		length=byteswap16(gcipher->length);
+		read( cd, &gcipher.length, sizeof(uint16));
+#ifndef WORDS_BIGENDIAN
+		gcipher.length = byteswap16(gcipher.length);
 #endif
-		write( cd, &length, sizeof(uint16));
-		_print_TLSCiphertext( gcipher);
-		write( cd, gcipher->fragment, gcipher->length);
-		state->connection_state.write_sequence_number++;
-		ret += Size;
-		
-		_gnutls_freeTLSCiphertext(gcipher);
-	}
-	/* rest data */
-	if (iterations>1) {
-		Size=sizeofdata%16384;
-		err = _gnutls_text2TLSPlaintext(type, &gtxt, &data[ret], Size);
-		if (err<0) {
-			/*gnutls_perror(err);*/
-			return err;
-		}
-
-	        err = _gnutls_TLSPlaintext2TLSCompressed(state, &gcomp, gtxt);
-		if (err<0) {
-			/*gnutls_perror(err);*/
-			return err;
-		}
-
-		_gnutls_freeTLSPlaintext(gtxt);
+		gcipher.fragment = gnutls_malloc(gcipher.length);
 	
-		err = _gnutls_TLSCompressed2TLSCiphertext( state, &gcipher, gcomp);
-		if (err<0) {
-			/*gnutls_perror(err);*/
-			return err;
+		/* read ciphertext */
+		if (read( cd, gcipher.fragment, gcipher.length)!= gcipher.length) {
+			gnutls_free(gcipher.fragment);
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+
+		if (ret = _gnutls_TLSCiphertext2TLSCompressed( state, &gcomp, &gcipher) < 0){
+			gnutls_free(gcipher.fragment);
+			return ret;
+		}
+		gnutls_free(gcipher.fragment);
+	
+		if (ret = _gnutls_TLSCompressed2TLSPlaintext( state, &gtxt, gcomp) < 0){
+			return ret;
 		}
 		_gnutls_freeTLSCompressed(gcomp);
-#ifdef WORDS_BIGENDIAN
-		length=gcipher->length;
-#else
-		length=byteswap16(gcipher->length);
-#endif
-		write( cd, &gcipher->type, sizeof(ContentType));
-		write( cd, &gcipher->version.major, 1);
-		write( cd, &gcipher->version.minor, 1);
-		write( cd, &length, sizeof(uint16));
-		write( cd, gcipher->fragment, gcipher->length);
-		state->connection_state.write_sequence_number++;
-		ret += Size;
-		
-		_gnutls_freeTLSCiphertext(gcipher);
-	}
+	
+		if (ret = _gnutls_TLSPlaintext2text( &tmpdata, gtxt) < 0){
+			return ret;
+		}
 
+		gnutls_insertDataBuffer(state, type, tmpdata, gtxt->length);
+
+		_gnutls_freeTLSPlaintext(gtxt);
+
+		/* Incread sequence number */
+		state->connection_state.read_sequence_number++;
+		
+	} while( gnutls_getDataBufferSize(state, type) < sizeofdata);
+
+	ret = gnutls_getDataFromBuffer(state, type, data, sizeofdata);
+	
 	return ret;
 }
-#endif

@@ -9,7 +9,7 @@
 #define MD5_DIGEST 16
 #define SHA_DIGEST 20
 
-/* Sets the specified cipher into the state */
+/* Sets the specified cipher into the pending state */
 int _gnutls_set_cipher( GNUTLS_STATE state, BulkCipherAlgorithm algo) {
 
 	switch (algo) {
@@ -38,7 +38,7 @@ int _gnutls_set_cipher( GNUTLS_STATE state, BulkCipherAlgorithm algo) {
 	
 }
 
-/* Sets the specified algorithm into compression state */
+/* Sets the specified algorithm into pending compression state */
 int _gnutls_set_compression( GNUTLS_STATE state, CompressionMethod algo) {
 
 	switch (algo) {
@@ -52,7 +52,7 @@ int _gnutls_set_compression( GNUTLS_STATE state, CompressionMethod algo) {
 	
 }
 
-
+/* Sets the specified mac algorithm into pending state */
 int _gnutls_set_mac( GNUTLS_STATE state, MACAlgorithm algo) {
 
 	switch (algo) {
@@ -80,7 +80,7 @@ int _gnutls_set_mac( GNUTLS_STATE state, MACAlgorithm algo) {
 }
 
 /* Sets the current connection state to conform with the
- * Security parameters, and initializes encryption.
+ * Security parameters(pending state), and initializes encryption.
  */
 int _gnutls_connection_state_init(GNUTLS_STATE state) {
 	int rc;
@@ -421,7 +421,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	}
 
 //	gnutls_free( MAC);
-	free( MAC);
+	if (td>=0) free( MAC);
 	gnutls_free( content);
 
 	return 0;

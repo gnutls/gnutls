@@ -73,9 +73,15 @@ typedef struct {
 } ConnectionState;
 
 typedef struct {
+	char*	buffer;
+	uint32  bufferSize;
+} GNUTLS_INTERNALS;
+
+typedef struct {
 	SecurityParameters security_parameters;
 	CipherSpecs cipher_specs;
 	ConnectionState connection_state;
+	GNUTLS_INTERNALS gnutls_internals;
 } GNUTLS_STATE_INT;
 
 typedef GNUTLS_STATE_INT *GNUTLS_STATE;
@@ -135,6 +141,8 @@ typedef struct {
 
 int gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, int sizeofdata);
 #define gnutls_send( x, y, z, w) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
+int gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, int sizeofdata);
+#define gnutls_recv( x, y, z, w) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
 
 #define	GNUTLS_E_MAC_FAILED -1
 #define	GNUTLS_E_UNKNOWN_CIPHER -2
@@ -143,4 +151,6 @@ int gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, in
 #define	GNUTLS_E_UNKNOWN_ERROR -5
 #define	GNUTLS_E_UNKNOWN_CIPHER_TYPE -6
 #define	GNUTLS_E_LARGE_PACKET -7
-	
+#define GNUTLS_E_UNSUPPORTED_VERSION_PACKET -8
+#define GNUTLS_E_UNEXPECTED_PACKET_LENGTH -9
+

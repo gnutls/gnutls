@@ -9,15 +9,18 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+//#define ENCRYPT
                      
 int main()
 {
 	GNUTLS_STATE state;
-	char text[] = "ena xelidoni sto bouno\n";
+	char text[] = "A very large english test\n";
 	GNUTLSPlaintext *gtxt;
 	GNUTLSCompressed *gcomp;
 	GNUTLSCiphertext *gcipher;
 	int cd;
+	int ret;
+	char tmp[11];
 	
 	
 	gnutls_init(&state, GNUTLS_CLIENT);
@@ -29,12 +32,26 @@ int main()
 	_gnutls_set_keys( state);
 	_gnutls_connection_state_init( state);
 
+#ifdef ENCRYPT
 	remove("ciphertext");
 	cd = open( "ciphertext", O_WRONLY|O_CREAT, S_IRWXU);
 
 	gnutls_send( cd, state, text, strlen(text));
 
 	close(cd);
+#else
+	cd = open( "ciphertext", O_RDONLY);
+
+	memset( tmp, 0, 10);
+	ret = gnutls_recv( cd, state, tmp, 10);
+	if (ret < 0) 
+		fprintf(stderr, "ret: %d\n", ret);
+	
+	tmp[10]='\0';
+	fprintf(stderr, "tmp: %s\n", tmp);
+
+	close(cd);
+#endif
 	gnutls_deinit(&state);
 	return 0;
 }
