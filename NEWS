@@ -1,3 +1,7 @@
+Version 0.9.98
+- The openssl compatibility layer was moved to gnutls-openssl
+  library instead of being included in the gnutls-extra library.
+
 Version 0.9.97 (11/11/2003)
 - The certtool utility can now generate PKCS #12 structures
   without specifying a certificate.

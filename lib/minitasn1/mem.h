@@ -6,6 +6,9 @@
  * support alloca.
  */
 #ifdef HAVE_ALLOCA
+# ifdef HAVE_ALLOCA_H
+#  include <alloca.h>
+# endif
 # define _asn1_alloca alloca
 # define _asn1_afree(x)
 #else

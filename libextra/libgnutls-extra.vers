@@ -1,5 +1,5 @@
 GNUTLS_1_0
 {
-   global: gnutls*; OpenSSL*; SSL*; TLS*; X509*; BIO*; ERR*; RAND*; MD5*; RIPEMD160*;
+   global: gnutls*;
    local: *;
 };
