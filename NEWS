@@ -2,6 +2,7 @@ Version 1.1.9
 - Added support for authority key identifier and the extended key usage
   X.509 extension fields. The certtoool was updated to support them.
 - The RC2 cipher is no more included. The one in libgcrypt is now used.
+- Added batch support to certtool. Now can use templates.
 
 Version 1.1.8 (07/04/2004)
 - Implemented all the tests for the SRP group parameters in

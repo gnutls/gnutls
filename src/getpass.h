@@ -1,1 +1,1 @@
-const char* read_pass (char *msg);
+const char* read_pass (const char *msg);

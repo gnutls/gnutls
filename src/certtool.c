@@ -33,6 +33,7 @@
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
 #include <getpass.h>
+#include <certtool-cfg.h>
 
 static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all);
 int generate_prime(int bits);
@@ -58,8 +59,12 @@ gnutls_x509_crt* load_cert_list(int mand, int *size);
 static gaainfo info;
 FILE* outfile;
 FILE* infile;
-int in_cert_format;
-int out_cert_format;
+static int in_cert_format;
+static int out_cert_format;
+
+/* non interactive operation if set
+ */
+static int batch;
 
 unsigned char buffer[50*1024];
 const int buffer_size = sizeof(buffer);
@@ -234,6 +239,296 @@ static void print_key_purpose( const char* x, FILE* out)
 	else fprintf(out,"\t\t%s\n", x);
 }
 
+
+/* Wrapper functions for non-interactive mode.
+ */
+const char* get_pass(const char* str)
+{
+	if (batch)
+		return password;
+	else
+		return read_pass(str);
+}
+
+void get_country_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!country) return;
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COUNTRY_NAME, 0, 
+			country, strlen(country));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
+	}
+
+}
+
+void get_organization_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!organization) return;
+
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 
+			organization, strlen(organization));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
+	}
+
+}
+
+void get_unit_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!unit) return;
+		
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 
+			unit, strlen(unit));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
+	}
+
+}
+
+void get_state_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!state) return;
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, 
+			state, strlen(state));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "State or province name: ", GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME);
+	}
+
+}
+
+void get_locality_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!locality) return;
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_LOCALITY_NAME, 0, 
+			locality, strlen(locality));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+	}
+
+}
+
+void get_cn_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!cn) return;
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COMMON_NAME, 0, 
+			cn, strlen(cn));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+	}
+
+}
+
+void get_pkcs9_email_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!pkcs9_email) return;
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_PKCS9_EMAIL, 0, 
+			pkcs9_email, strlen(pkcs9_email));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "E-mail: ", GNUTLS_OID_PKCS9_EMAIL);
+	}
+
+}
+
+int get_serial( void) 
+{
+	if (batch) {
+		if (!serial) return 0;
+		return serial;
+	} else {
+		return read_int( "Enter the certificate's serial number (decimal): ");
+	}
+}
+
+int get_days( void)
+{
+int days;
+
+	if (batch) {
+		if (expiration_days <= 0) return 365;
+		else return expiration_days;
+	} else {
+		do {
+			days = read_int( "The generated certificate will expire in (days): ");
+		} while( days==0);
+		return days;
+	}
+}
+
+int get_ca_status( void)
+{
+	if (batch) {
+		return ca;
+	} else {
+		return read_yesno( "Does the certificate belong to an authority? (Y/N): ");
+	}
+}
+
+int get_tls_client_status( void)
+{
+	if (batch) {
+		return tls_www_client;
+	} else {
+		return read_yesno( "Is this a TLS web client certificate? (Y/N): ");
+	}
+}
+
+int get_tls_server_status( void)
+{
+	if (batch) {
+		return tls_www_server;
+	} else {
+		return read_yesno( "Is this also a TLS web server certificate? (Y/N): ");
+	}
+}
+
+const char* get_dns_name( void)
+{
+	if (batch) {
+		return dns_name;
+	} else {
+		return read_str( "Enter the dnsName of the subject of the certificate: ");
+	}
+}
+
+const char* get_email( void)
+{
+	if (batch) {
+		return email;
+	} else {
+		return read_str( "Enter the e-mail of the subject of the certificate: ");
+	}
+}
+
+int get_sign_status( int server)
+{
+const char* msg;
+
+	if (batch) {
+		return signing_key;
+	} else {
+		if (server) msg = "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (Y/N): ";
+		else msg = "Will the certificate be used for signing (required for TLS)? (Y/N): ";
+		return read_yesno( msg);
+	}
+}
+
+int get_encrypt_status( int server)
+{
+const char* msg;
+
+	if (batch) {
+		return encryption_key;
+	} else {
+		if (server) msg = "Will the certificate be used for encryption (RSA ciphersuites)? (Y/N): ";
+		else msg = "Will the certificate be used for encryption (not required for TLS)? (Y/N): ";
+		return read_yesno( msg);
+	}
+}
+
+int get_cert_sign_status(void)
+{
+	if (batch) {
+		return cert_sign_key;
+	} else {
+		return read_yesno( "Will the certificate be used to sign other certificates? (Y/N): ");
+	}
+}
+
+int get_crl_sign_status(void)
+{
+	if (batch) {
+		return crl_sign_key;
+	} else {
+		return read_yesno( "Will the certificate be used to sign CRLs? (Y/N): ");
+	}
+}
+
+int get_code_sign_status(void)
+{
+	if (batch) {
+		return code_sign_key;
+	} else {
+		return read_yesno( "Will the certificate be used to sign code? (Y/N): ");
+	}
+}
+
+int get_ocsp_sign_status(void)
+{
+	if (batch) {
+		return ocsp_sign_key;
+	} else {
+		return read_yesno( "Will the certificate be used to sign OCSP requests? (Y/N): ");
+	}
+}
+
+int get_time_stamp_status( void)
+{
+	if (batch) {
+		return time_stamping_key;
+	} else {
+		return read_yesno( "Will the certificate be used for time stamping? (Y/N): ");
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 static void print_private_key( gnutls_x509_privkey key)
 {
 int ret;
@@ -254,7 +549,7 @@ size_t size;
 		
 		if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
 		else flags = GNUTLS_PKCS_USE_PKCS12_3DES;
-		if ((pass=read_pass("Enter password: ")) == NULL) flags = GNUTLS_PKCS_PLAIN;
+		if ((pass=get_pass("Enter password: ")) == NULL) flags = GNUTLS_PKCS_PLAIN;
 
 		size = sizeof(buffer);
 		ret = gnutls_x509_privkey_export_pkcs8( key, out_cert_format, pass, flags, buffer, &size);
@@ -307,18 +602,20 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 
 		key = load_private_key(1);
 
+		if (!batch)
 		fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
 		"Just press enter to ignore a field.\n");
 
-		read_crt_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
-		read_crt_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
-		read_crt_set( crt, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
-		read_crt_set( crt, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-		read_crt_set( crt, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-		read_crt_set( crt, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+		get_country_crt_set( crt);
+		get_organization_crt_set(crt);
+		get_unit_crt_set( crt);
+		get_locality_crt_set( crt);
+		get_state_crt_set( crt);
+		get_cn_crt_set( crt);
 	
-		fprintf(stderr, "This field should not be used in new certificates.\n");
-		read_crt_set( crt, "E-mail: ", GNUTLS_OID_PKCS9_EMAIL);
+		if (!batch) fprintf(stderr, "This field should not be used in new certificates.\n");
+
+		get_pkcs9_email_crt_set( crt);
 
 		result = gnutls_x509_crt_set_key( crt, key);
 		if (result < 0) {
@@ -335,7 +632,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 	}
 
 
-	serial = read_int( "Enter the certificate's serial number (decimal): ");
+	serial = get_serial();
 	buffer[3] = serial & 0xff;
 	buffer[2] = (serial >> 8) & 0xff;
 	buffer[1] = (serial >> 16) & 0xff;
@@ -348,12 +645,11 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 	}
 
 
-	fprintf(stderr, "\n\nActivation/Expiration time.\n");	
+	if (!batch) fprintf(stderr, "\n\nActivation/Expiration time.\n");	
+
 	gnutls_x509_crt_set_activation_time( crt, time(NULL));
 
-	do {
-		days = read_int( "The generated certificate will expire in (days): ");
-	} while( days==0);
+	days = get_days();
 	
 	result = gnutls_x509_crt_set_expiration_time( crt, time(NULL)+days*24*60*60);
 	if (result < 0) {
@@ -362,9 +658,9 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 	}
 	
 
-	fprintf(stderr, "\n\nExtensions.\n");	
+	if (!batch) fprintf(stderr, "\n\nExtensions.\n");	
 
-	ca_status = read_yesno( "Does the certificate belong to an authority? (Y/N): ");
+	ca_status = get_ca_status();
 
 	result = gnutls_x509_crt_set_ca_status( crt, ca_status);
 	if (result < 0) {
@@ -372,7 +668,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 		exit(1);
 	}
 
-	client = read_yesno( "Is this a TLS web client certificate? (Y/N): ");
+	client = get_tls_client_status();
 	if (client != 0) {
 		result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_CLIENT, 0);
 		if (result < 0) {
@@ -381,9 +677,9 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 		}
 	}
 
-	server = read_yesno( "Is this also a TLS web server certificate? (Y/N): ");
+	server = get_tls_server_status();
 	if (server != 0) {
-		str = read_str( "Enter the dnsName of the subject of the certificate: ");
+		str = get_dns_name();
 		if (str != NULL) {
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_DNSNAME, str);
 			if (result < 0) {
@@ -400,7 +696,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 		
 	} else {
 
-		str = read_str( "Enter the e-mail of the subject of the certificate: ");
+		str = get_email();
 	
 		if (str != NULL) {
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_RFC822NAME, str);
@@ -414,35 +710,29 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 
 	if (!ca_status || server) {
 		int pk;
-		const char* msg1, *msg2;
-		
-		if (server) msg1 = "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (Y/N): ";
-		else msg1 = "Will the certificate be used for signing (required for TLS)? (Y/N): ";
 
-		if (server) msg2 = "Will the certificate be used for encryption (RSA ciphersuites)? (Y/N): ";
-		else msg2 = "Will the certificate be used for encryption (not required for TLS)? (Y/N): ";
 
 		pk = gnutls_x509_crt_get_pk_algorithm( crt, NULL);
 
 		if (pk != GNUTLS_PK_DSA) { /* DSA keys can only sign.
 				  	    */
-			result = read_yesno( msg1);
+			result = get_sign_status(server);
 			if (result) usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
-			result = read_yesno( msg2);
+			result = get_encrypt_status( server);
 			if (result) usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
 		} else usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 	}
 
 
 	if (ca_status) {
-		result = read_yesno( "Will the certificate be used to sign other certificates? (Y/N): ");
+		result = get_cert_sign_status();
 		if (result) usage |= GNUTLS_KEY_KEY_CERT_SIGN;
 
-		result = read_yesno( "Will the certificate be used to sign CRLs? (Y/N): ");
+		result = get_crl_sign_status();
 		if (result) usage |= GNUTLS_KEY_CRL_SIGN;
 
-		result = read_yesno( "Will the certificate be used to sign code? (Y/N): ");
+		result = get_code_sign_status();
 		if (result) {
 			result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_CODE_SIGNING, 0);
 			if (result < 0) {
@@ -451,7 +741,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 			}
 		}
 
-		result = read_yesno( "Will the certificate be used to sign OCSP requests? (Y/N): ");
+		result = get_ocsp_sign_status();
 		if (result) {
 			result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_OCSP_SIGNING, 0);
 			if (result < 0) {
@@ -460,7 +750,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 			}
 		}
 
-		result = read_yesno( "Will the certificate be used for time stamping? (Y/N): ");
+		result = get_time_stamp_status();
 		if (result) {
 			result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TIME_STAMPING, 0);
 			if (result < 0) {
@@ -792,6 +1082,12 @@ int ret;
 
 	if (info.outcert_format) out_cert_format = GNUTLS_X509_FMT_DER;
 	else out_cert_format = GNUTLS_X509_FMT_PEM;
+
+	batch = 0;
+	if (info.template) {
+		batch = 1;
+		parse_template( info.template);
+	}
 
 	gnutls_global_set_log_function( tls_log_func);
 	gnutls_global_set_log_level(info.debug);
@@ -1235,7 +1531,7 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 
 	fprintf(out, "\n");
 
-	if (out==stderr) /* interactive */
+	if (out==stderr && batch == 0) /* interactive */
 	if (read_yesno( "Is the above information ok? (Y/N): ")==0) {
 		exit(1);
 	}

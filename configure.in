@@ -172,6 +172,7 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS(unistd.h strings.h stddef.h alloca.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
 AC_CHECK_HEADERS(errno.h sys/time.h time.h)
+AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h)
 AC_CHECK_FUNCS(isascii memmove strnstr mmap gmtime_r inet_ntop,,)
 AC_FUNC_ALLOCA
 
@@ -504,6 +505,7 @@ AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
 AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
 libextra/openpgp/Makefile lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
+src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
 doc/examples/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile])

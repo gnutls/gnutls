@@ -9,7 +9,7 @@
 
 #define OUT_STREAM stdout
 
-const char *read_pass(char *msg)
+const char *read_pass(const char *msg)
 {
 #ifndef _WIN32
 	struct termios old, new;

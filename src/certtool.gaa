@@ -87,6 +87,10 @@ option (outfile) STR "FILE" { $outfile = $1 } "Output file."
 #char *infile;
 option (infile) STR "FILE" { $infile = $1 } "Output file."
 
+#char *template;
+option (template) STR "FILE" { $template = $1 } "Template file to use for non interactive operation."
+
+
 #int debug;
 option (d, debug) INT "LEVEL" { $debug = $1 } "specify the debug level. Default is 1."
 
@@ -98,5 +102,5 @@ option ( copyright) { print_license(); exit(0); } "shows the program's license"
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; 
-	$export = 0; }
+	$export = 0; $template = NULL; }
 
