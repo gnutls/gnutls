@@ -591,8 +591,9 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 
 
 static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, char* extnValue, int extnValueLen) {
-	fprintf(stderr, "Extension: %s, %s\n", extnID, critical);
-
+#ifdef DEBUG
+	_gnutls_log("Extension: %s, %s\n", extnID, critical);
+#endif
 	if (strcmp( extnID, "2 5 29 14")==0) { /* subject Key ID */
 		/* we don't use it */
 		return 0;
