@@ -12,7 +12,7 @@ AC_DEFINE_UNQUOTED(T_OS, "$target_os", [OS name])
 dnl Gnutls Version
 GNUTLS_MAJOR_VERSION=0
 GNUTLS_MINOR_VERSION=5
-GNUTLS_MICRO_VERSION=7
+GNUTLS_MICRO_VERSION=8
 GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
 AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION", [version of gnutls])
@@ -116,10 +116,9 @@ affect compiling.])
 if test $ac_cv_c_compiler_gnu != no; then
 
 	if test x$opt_developer_mode = xyes; then
-
-	  CFLAGS="${CFLAGS} -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
+	  CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
 	else
-	  CFLAGS="${CFLAGS} -O2 -finline-functions -fexpensive-optimizations -fomit-frame-pointer"
+	  CFLAGS="${CFLAGS} -O2 -finline-functions"
 	fi
 
 	if test x$opt_dmalloc_mode = xyes; then
@@ -154,7 +153,7 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS(unistd.h pwd.h strings.h stdarg.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
 AC_CHECK_HEADERS(errno.h sys/time.h time.h)
-AC_CHECK_FUNCS(bzero memset memmove bcopy,,)
+AC_CHECK_FUNCS(bzero memset memmove bcopy memcmp memcpy,,)
 AC_FUNC_ALLOCA
 
 

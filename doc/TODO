@@ -6,6 +6,7 @@ Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
 * Add support for the certificate authenticated SRP cipher suites
 * Add option to read the SRP parameters using a callback (server side)
+* Add functions to generate SRP parameters and SRP verifiers
 * Convert documentation to texinfo format
 * Merge common stuff in DHE and DHA key exchange
 * Add support for certificate CRLs in certificate verification

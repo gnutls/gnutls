@@ -21,8 +21,8 @@ extreme care for the alert information not to leak, to a possible attacker
 \begin{itemize}
 \item \printfunc{gnutls_alert_send}{gnutls\_alert\_send}:
 to send an alert signal.
-\item \printfunc{gnutls_alert_send_appropriate}{gnutls\_alert\_send\_appropriate}:
-to send an alert signal that depends on a given gnutls error number.
+\item \printfunc{gnutls_error_to_alert}{gnutls\_error\_to\_alert}:
+to map a gnutls error number to an alert signal.
 \item \printfunc{gnutls_alert_get}{gnutls\_alert\_get}:
 returns the last received alert.
 \item \printfunc{gnutls_alert_get_name}{gnutls\_alert\_get\_name}:

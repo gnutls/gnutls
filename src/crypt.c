@@ -61,6 +61,9 @@ int generate_create_conf(char *tpasswd_conf, int bits)
 
 	_gnutls_srp_generate_prime(&g, &n, bits);
 	sprintf(line, "%d:%s:%s\n", index, n, g);
+	
+	gnutls_free( n);
+	gnutls_free( g);
 
 	fwrite(line, 1, strlen(line), fd);
 
