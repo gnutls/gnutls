@@ -26,9 +26,10 @@
 char *organization = NULL, *unit = NULL, *locality = NULL, *state = NULL;
 char *cn = NULL, *challenge_password = NULL, *pkcs9_email = NULL, *country = NULL;
 char *dns_name = NULL, *email = NULL, *crl_dist_points = NULL, *password= NULL;
+char *pkcs12_key_name = NULL;
 int serial = 0, expiration_days=0, ca=0, tls_www_client=0, tls_www_server=0, signing_key=0;
 int encryption_key=0, cert_sign_key=0, crl_sign_key=0, code_sign_key=0, ocsp_sign_key=0;
-int time_stamping_key=0;
+int time_stamping_key=0, crl_next_update=0;
 
 int parse_template(const char *template)
 {
@@ -54,9 +55,12 @@ int parse_template(const char *template)
 		{NULL,    '\0', "dns_name",      CFG_STR,          (void *) &dns_name,     0},
 		{NULL,    '\0', "email",      CFG_STR,          (void *) &email,     0},
 		{NULL, '\0', "crl_dist_points", CFG_STR, (void *) &crl_dist_points, 0},
+		{NULL, '\0', "pkcs12_key_name", CFG_STR, (void *) &pkcs12_key_name, 0},
 
 		{NULL,    '\0', "serial",      CFG_INT,          (void *) &serial,     0},
 		{NULL,    '\0', "expiration_days",      CFG_INT,          (void *) &expiration_days,     0},
+
+		{NULL,    '\0', "crl_next_update",      CFG_INT,          (void *) &crl_next_update,     0},
 
 		{NULL,    '\0', "ca",      CFG_BOOL,          (void *) &ca,     0},
 		{NULL,    '\0', "tls_www_client",      CFG_BOOL,          (void *) &tls_www_client,     0},

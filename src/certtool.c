@@ -242,12 +242,28 @@ static void print_key_purpose( const char* x, FILE* out)
 
 /* Wrapper functions for non-interactive mode.
  */
-const char* get_pass(const char* str)
+const char* get_pass(void)
 {
 	if (batch)
 		return password;
 	else
-		return read_pass(str);
+		return read_pass("Enter password: ");
+}
+
+const char* get_challenge_pass(void)
+{
+	if (batch)
+		return challenge_password;
+	else
+		return read_pass("Enter a challenge password: ");
+}
+
+const char* get_crl_dist_point_url(void)
+{
+	if (batch)
+		return crl_dist_points;
+	else
+		return read_str( "Enter the URI of the CRL distribution point: ");
 }
 
 void get_country_crt_set( gnutls_x509_crt crt)
@@ -397,7 +413,7 @@ int days;
 		else return expiration_days;
 	} else {
 		do {
-			days = read_int( "The generated certificate will expire in (days): ");
+			days = read_int( "The certificate will expire in (days): ");
 		} while( days==0);
 		return days;
 	}
@@ -410,6 +426,21 @@ int get_ca_status( void)
 	} else {
 		return read_yesno( "Does the certificate belong to an authority? (Y/N): ");
 	}
+}
+
+const char* get_pkcs12_key_name( void)
+{
+const char* name;
+
+	if (batch) {
+		if (!pkcs12_key_name) return "Anonymous";
+		return pkcs12_key_name;
+	} else {
+		do {
+			name = read_str("Enter a name for the key: ");
+		} while( name == NULL);
+	}
+	return name;
 }
 
 int get_tls_client_status( void)
@@ -519,8 +550,132 @@ int get_time_stamp_status( void)
 	}
 }
 
+int get_crl_next_update( void)
+{
+int days;
 
+	if (batch) {
+		if (crl_next_update <= 0) return 365;
+		else return crl_next_update;
+	} else {
+		do {
+			days = read_int( "The next CRL will be issued in (days): ");
+		} while( days==0);
+		return days;
+	}
+}
 
+/* CRQ stuff.
+ */
+void get_country_crq_set( gnutls_x509_crq crq)
+{
+int ret;
+
+	if (batch) {
+		if (!country) return;
+		ret = gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COUNTRY_NAME, 0, 
+			country, strlen(country));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crq_set( crq, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
+	}
+
+}
+
+void get_organization_crq_set( gnutls_x509_crq crq)
+{
+int ret;
+
+	if (batch) {
+		if (!organization) return;
+
+		ret = gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_ORGANIZATION_NAME, 0, 
+			organization, strlen(organization));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crq_set( crq, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
+	}
+
+}
+
+void get_unit_crq_set( gnutls_x509_crq crq)
+{
+int ret;
+
+	if (batch) {
+		if (!unit) return;
+		
+		ret = gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, 
+			unit, strlen(unit));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crq_set( crq, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
+	}
+
+}
+
+void get_state_crq_set( gnutls_x509_crq crq)
+{
+int ret;
+
+	if (batch) {
+		if (!state) return;
+		ret = gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, 
+			state, strlen(state));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crq_set( crq, "State or province name: ", GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME);
+	}
+
+}
+
+void get_locality_crq_set( gnutls_x509_crq crq)
+{
+int ret;
+
+	if (batch) {
+		if (!locality) return;
+		ret = gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_LOCALITY_NAME, 0, 
+			locality, strlen(locality));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crq_set( crq, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+	}
+
+}
+
+void get_cn_crq_set( gnutls_x509_crq crq)
+{
+int ret;
+
+	if (batch) {
+		if (!cn) return;
+		ret = gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COMMON_NAME, 0, 
+			cn, strlen(cn));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crq_set( crq, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+	}
+
+}
 
 
 
@@ -549,7 +704,7 @@ size_t size;
 		
 		if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
 		else flags = GNUTLS_PKCS_USE_PKCS12_3DES;
-		if ((pass=get_pass("Enter password: ")) == NULL) flags = GNUTLS_PKCS_PLAIN;
+		if ((pass=get_pass()) == NULL) flags = GNUTLS_PKCS_PLAIN;
 
 		size = sizeof(buffer);
 		ret = gnutls_x509_privkey_export_pkcs8( key, out_cert_format, pass, flags, buffer, &size);
@@ -836,9 +991,7 @@ gnutls_x509_crl generate_crl( void)
 	fprintf(stderr, "\n\nthisUpdate/nextUpdate time.\n");	
 	gnutls_x509_crl_set_this_update( crl, time(NULL));
 
-	do {
-		days = read_int( "The next CRL will be issued in (days): ");
-	} while( days==0);
+	days = get_crl_next_update();
 	
 	result = gnutls_x509_crl_set_next_update( crl, time(NULL)+days*24*60*60);
 	if (result < 0) {
@@ -874,9 +1027,7 @@ gnutls_x509_crt update_certificate( void)
 	fprintf(stderr, "Activation/Expiration time.\n");	
 	gnutls_x509_crt_set_activation_time( crt, time(NULL));
 	
-	do {
-		days = read_int( "The updated certificate will expire in (days): ");
-	} while( days==0);
+	days = get_days();
 	
 	result = gnutls_x509_crt_set_expiration_time( crt, time(NULL)+days*24*60*60);
 	if (result < 0) {
@@ -901,7 +1052,7 @@ void generate_self_signed( void)
 
 	crt = generate_certificate( &key, NULL);
 
-	uri = read_str( "Enter the URI of the CRL distribution point: ");
+	uri = get_crl_dist_point_url();
 	if (uri) {
 		result = gnutls_x509_crt_set_crl_dist_points( crt, GNUTLS_SAN_URI,
 			uri, 0 /* all reasons */);
@@ -1665,7 +1816,7 @@ void privkey_info( void)
 	if (!info.pkcs8) {
 		ret = gnutls_x509_privkey_import(key, &pem, in_cert_format);
 	} else {
-		pass = read_pass("Enter password: ");
+		pass = get_pass();
 		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, in_cert_format, pass, 0);
 	}
 
@@ -1747,7 +1898,7 @@ const char* pass;
 	if (!info.pkcs8)
 		ret = gnutls_x509_privkey_import( key, &dat, in_cert_format);
 	else {
-		pass = read_pass("Enter password: ");
+		pass = get_pass();
 		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, in_cert_format,
 			pass, 0);
 	}
@@ -1839,7 +1990,7 @@ size_t size;
 	if (!info.pkcs8)
 		ret = gnutls_x509_privkey_import( key, &dat, in_cert_format);
 	else {
-		pass = read_pass("Enter password: ");
+		pass = get_pass();
 		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, in_cert_format,
 			pass, 0);
 	}
@@ -2005,12 +2156,12 @@ void generate_request(void)
 	 */
 	key = generate_private_key_int();
 
-	read_crq_set( crq, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
-	read_crq_set( crq, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
-	read_crq_set( crq, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
-	read_crq_set( crq, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-	read_crq_set( crq, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-	read_crq_set( crq, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+	get_country_crq_set( crq);
+	get_organization_crq_set(crq);
+	get_unit_crq_set( crq);
+	get_locality_crq_set( crq);
+	get_state_crq_set( crq);
+	get_cn_crq_set( crq);
 
 	ret = gnutls_x509_crq_set_version( crq, 1);
 	if (ret < 0) {
@@ -2018,7 +2169,7 @@ void generate_request(void)
 		exit(1);
 	}
 
-	pass = read_pass("Enter a challenge password: ");
+	pass = get_challenge_pass();
 	
 	if (pass != NULL) {
 		ret = gnutls_x509_crq_set_challenge_password( crq, pass);
@@ -2437,11 +2588,9 @@ void generate_pkcs12( void)
 	key = load_private_key(1);
 	crt = load_cert(0);
 	
-	do {
-		name = read_str("Enter a name for the key: ");
-	} while( name == NULL);
+	name = get_pkcs12_key_name();
 
-	password = read_pass( "Enter password: ");
+	password = get_pass();
 
 	result = gnutls_pkcs12_bag_init( &bag);
 	if (result < 0) {
@@ -2674,7 +2823,7 @@ void pkcs12_info( void)
 	data.data = buffer;
 	data.size = size;
 
-	password = read_pass( "Enter password: ");
+	password = get_pass();
 	
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {
