@@ -723,7 +723,7 @@ int _gnutls_cipher_suite_count()
 
 #define SWAP(x, y) memcpy(tmp,x,size); \
 		   memcpy(x,y,size); \
-		   memcpy(y,tmp,size)
+		   memcpy(y,tmp,size);
 
 #define MAX_ELEM_SIZE 4
 inline
@@ -742,11 +742,12 @@ inline
 	i = pivot = 0;
 	j = full = (nmemb - 1) * size;
 
-	memcpy(ptmp, &base[pivot], size);	/* set pivot item */
+	memcpy(ptmp, &base[0], size);	/* set pivot item */
 
 	while (i < j) {
-		while ((compar(state, &base[i], ptmp) <= 0) && (i < full))
+		while ((compar(state, &base[i], ptmp) <= 0) && (i < full)) {
 			i += size;
+		}
 		while ((compar(state, &base[j], ptmp) >= 0) && (j > 0))
 			j -= size;
 
@@ -759,7 +760,6 @@ inline
 		SWAP(&base[pivot], &base[j]);
 		pivot = j;
 	} else if (i < pivot) {
-		fprintf(stderr, "HERE!");
 		SWAP(&base[pivot], &base[i]);
 		pivot = i;
 	}
@@ -784,11 +784,8 @@ _gnutls_qsort(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
 	if (snmemb <= 1)
 		return;
 	pivot = _gnutls_partition(state, _base, nmemb, size, compar);
-#ifdef SORT_DEBUG
-	fprintf(stderr, "pivot: %d\n", pivot);
-#endif
 
-	_gnutls_qsort(state, base, pivot+1, size, compar);
+	_gnutls_qsort(state, base, pivot<nmemb ? pivot+1 : pivot, size, compar);
 	_gnutls_qsort(state, &base[(pivot + 1) * size], nmemb - pivot - 1,
 		      size, compar);
 }
@@ -804,22 +801,18 @@ _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 	KXAlgorithm kA2 =
 	    _gnutls_cipher_suite_get_kx_algo(*(GNUTLS_CipherSuite *) i_A2);
 	BulkCipherAlgorithm cA1 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
-						 i_A1);
+	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *) i_A1);
 	BulkCipherAlgorithm cA2 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
-						 i_A2);
+	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *) i_A2);
 	MACAlgorithm mA1 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
-					      i_A1);
+	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *) i_A1);
 	MACAlgorithm mA2 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
-					      i_A2);
+	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *) i_A2);
 
-	int p1 = _gnutls_kx_priority(state, kA1)*100;
-	int p2 = _gnutls_kx_priority(state, kA2)*100;
-	p1 += _gnutls_cipher_priority(state, cA1)*10;
-	p2 += _gnutls_cipher_priority(state, cA2)*10;
+	int p1 = (_gnutls_kx_priority(state, kA1)+1)*100;
+	int p2 = (_gnutls_kx_priority(state, kA2)+1)*100;
+	p1 += (_gnutls_cipher_priority(state, cA1)+1)*10;
+	p2 += (_gnutls_cipher_priority(state, cA2)+1)*10;
 	p1 += _gnutls_mac_priority(state, mA1);
 	p2 += _gnutls_mac_priority(state, mA2);
 
@@ -827,11 +820,7 @@ _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 		return 1;
 	} else {
 		if (p1 == p2) {
-			/* compare the addresses */
-			/* since it is in a list... if A1 is before A2 then it is greater */
-			if ((uint32) i_A1 < (uint32) i_A2)
-				return 1;
-			return -1;
+			return 0;
 		}
 		return -1;
 	}
@@ -846,18 +835,15 @@ _gnutls_bsort(GNUTLS_STATE state, void *_base, size_t nmemb,
 	int i, j;
 	int full = nmemb * size;
 	char *base = _base;
-	char *tmp = gnutls_malloc(size);
+	char tmp[MAX_ELEM_SIZE];
 
 	for (i = 0; i < full; i += size) {
 		for (j = 0; j < full; j += size) {
 			if (compar(state, &base[i], &base[j]) < 0) {
-				memcpy(tmp, &base[i], size);
-				memcpy(&base[i], &base[j], size);
-				memcpy(&base[j], tmp, size);
+				SWAP(&base[j], &base[i]);
 			}
 		}
 	}
-	free(tmp);
 
 }
 #endif
@@ -898,7 +884,7 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 		      sizeof(GNUTLS_CipherSuite), _gnutls_compare_algo);
 
 	for (i = 0; i < count; i++) {
-		if (_gnutls_kx_priority
+/*		if (_gnutls_kx_priority
 		    (state,
 		     _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0)
 			continue;
@@ -911,7 +897,7 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 		     _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i]))
 		    < 0)
 			continue;
-
+*/
 		(*ciphers)[j].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
 		(*ciphers)[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
 		j++;
@@ -922,6 +908,7 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 	for (i = 0; i < j; i++)
 		fprintf(stderr, "\t%d: %s\n", i,
 			_gnutls_cipher_suite_get_name((*ciphers)[i]));
+	exit(0);
 #endif
 
 	ret_count = j;
