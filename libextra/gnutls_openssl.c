@@ -119,6 +119,60 @@ int SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *list)
 }
 
 
+/* SSL_CTX statistics */
+
+long SSL_CTX_sess_number(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_connect(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_connect_good(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_connect_renegotiate(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_accept(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_accept_good(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_accept_renegotiate(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_hits(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_misses(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+long SSL_CTX_sess_timeouts(SSL_CTX *ctx)
+{
+    return 0;
+}
+
+
+
 /* SSL structure handling */
 
 SSL *SSL_new(SSL_CTX *ctx)
@@ -138,7 +192,7 @@ SSL *SSL_new(SSL_CTX *ctx)
         return NULL;
     }
 
-    gnutls_init(&ssl->gnutls_state, GNUTLS_CLIENT);
+    gnutls_init(&ssl->gnutls_state, ctx->method->connend);
 
     gnutls_protocol_set_priority (ssl->gnutls_state, ctx->method->protocol_priority);
     gnutls_cipher_set_priority (ssl->gnutls_state, ctx->method->cipher_priority);
@@ -286,6 +340,64 @@ int SSL_connect(SSL *ssl)
     err = store->error;
     free(store);
 
+    /* FIXME: deal with error from callback */
+
+    return 1;
+}
+
+int SSL_accept(SSL *ssl)
+{
+    X509_STORE_CTX *store;
+    int cert_list_size = 0;
+    int err;
+    int i, j;
+    int x_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    /* take options into account before accepting */
+
+    if (ssl->options & SSL_OP_NO_TLSv1)
+    {
+        for (i=0, j=0;
+             i < GNUTLS_MAX_ALGORITHM_NUM && x_priority[i] != 0;
+             i++, j++)
+        {
+            if (ssl->ctx->method->protocol_priority[j] == GNUTLS_TLS1)
+                j++;
+            else
+                x_priority[i] = ssl->ctx->method->protocol_priority[j];
+        }
+        if (i < GNUTLS_MAX_ALGORITHM_NUM)
+            x_priority[i] = 0;
+        gnutls_protocol_set_priority (ssl->gnutls_state,
+                                      ssl->ctx->method->protocol_priority);
+    }
+
+    /* FIXME: dh params, do we want client cert? */
+
+    err = gnutls_handshake(ssl->gnutls_state);
+    ssl->last_error = err;
+
+    if (err < 0)
+    {
+        last_error = err;
+        return 0;
+    }
+
+    store = (X509_STORE_CTX *)calloc(1, sizeof(X509_STORE_CTX));
+    store->ssl = ssl;
+    store->cert_list = gnutls_certificate_get_peers(ssl->gnutls_state,
+                                                    &cert_list_size);
+
+    if (ssl->verify_callback)
+    {
+        ssl->verify_callback(1 /*FIXME*/, store);
+    }
+    ssl->state = SSL_ST_OK;
+
+    err = store->error;
+    free(store);
+
+    /* FIXME: deal with error from callback */
+
     return 1;
 }
 
@@ -376,6 +488,8 @@ SSL_METHOD *SSLv23_client_method(void)
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
+    m->connend = GNUTLS_CLIENT;
+
     return m;
 }
 
@@ -409,6 +523,8 @@ SSL_METHOD *SSLv23_server_method(void)
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
+    m->connend = GNUTLS_SERVER;
+
     return m;
 }
 
@@ -439,6 +555,8 @@ SSL_METHOD *SSLv3_client_method(void)
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
+    m->connend = GNUTLS_CLIENT;
+
     return m;
 }
 
@@ -468,6 +586,8 @@ SSL_METHOD *SSLv3_server_method(void)
     m->mac_priority[0] = GNUTLS_MAC_SHA;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
+
+    m->connend = GNUTLS_SERVER;
 
     return m;
 }
@@ -501,6 +621,8 @@ SSL_METHOD *TLSv1_client_method(void)
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
+    m->connend = GNUTLS_CLIENT;
+
     return m;
 }
 
@@ -532,6 +654,8 @@ SSL_METHOD *TLSv1_server_method(void)
     m->mac_priority[0] = GNUTLS_MAC_SHA;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
+
+    m->connend = GNUTLS_SERVER;
 
     return m;
 }
@@ -628,7 +752,7 @@ char *SSL_CIPHER_description(SSL_CIPHER *cipher, char *buf, int size)
 
 /* X509 functions */
 
-X509_NAME *X509_get_subject_name(X509 *cert)
+X509_NAME *X509_get_subject_name(const X509 *cert)
 {
     gnutls_x509_dn *dn;
     dn = (gnutls_x509_dn *)calloc(1, sizeof(gnutls_x509_dn));
@@ -640,7 +764,7 @@ X509_NAME *X509_get_subject_name(X509 *cert)
     return dn;
 }
 
-X509_NAME *X509_get_issuer_name(X509 *cert)
+X509_NAME *X509_get_issuer_name(const X509 *cert)
 {
     gnutls_x509_dn *dn;
     dn = (gnutls_x509_dn *)calloc(1, sizeof(gnutls_x509_dn));
@@ -664,6 +788,12 @@ char *X509_NAME_oneline(gnutls_x509_dn *name, char *buf, int len)
              name->organizational_unit_name,
              name->common_name, name->email);
     return buf;
+}
+
+void X509_free(const X509 *cert)
+{
+    /* only get certificates as const items */
+    return;
 }
 
 

@@ -63,6 +63,7 @@ typedef struct
     int comp_priority[GNUTLS_MAX_ALGORITHM_NUM];
     int kx_priority[GNUTLS_MAX_ALGORITHM_NUM];
     int mac_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    GNUTLS_ConnectionEnd connend;
 } SSL_METHOD;
 
 typedef struct
@@ -164,6 +165,21 @@ unsigned long SSL_CTX_set_options(SSL_CTX *ctx, unsigned long options);
 long SSL_CTX_set_mode(SSL_CTX *ctx, long mode);
 int SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *list);
 
+
+/* SSL_CTX statistics */
+
+long SSL_CTX_sess_number(SSL_CTX *ctx);
+long SSL_CTX_sess_connect(SSL_CTX *ctx);
+long SSL_CTX_sess_connect_good(SSL_CTX *ctx);
+long SSL_CTX_sess_connect_renegotiate(SSL_CTX *ctx);
+long SSL_CTX_sess_accept(SSL_CTX *ctx);
+long SSL_CTX_sess_accept_good(SSL_CTX *ctx);
+long SSL_CTX_sess_accept_renegotiate(SSL_CTX *ctx);
+long SSL_CTX_sess_hits(SSL_CTX *ctx);
+long SSL_CTX_sess_misses(SSL_CTX *ctx);
+long SSL_CTX_sess_timeouts(SSL_CTX *ctx);
+
+
 /* SSL structure handling */
 
 SSL *SSL_new(SSL_CTX *ctx);
@@ -183,6 +199,7 @@ const X509 *SSL_get_peer_certificate(SSL *ssl);
 /* SSL connection open/close/read/write functions */
 
 int SSL_connect(SSL *ssl);
+int SSL_accept(SSL *ssl);
 int SSL_shutdown(SSL *ssl);
 int SSL_read(SSL *ssl, void *buf, int len);
 int SSL_write(SSL *ssl, const void *buf, int len);
@@ -221,9 +238,10 @@ char *SSL_CIPHER_description(SSL_CIPHER *cipher, char *buf, int size);
 
 /* X509 functions */
 
-X509_NAME *X509_get_subject_name(X509 *cert);
-X509_NAME *X509_get_issuer_name(X509 *cert);
+X509_NAME *X509_get_subject_name(const X509 *cert);
+X509_NAME *X509_get_issuer_name(const X509 *cert);
 char *X509_NAME_oneline(gnutls_x509_dn *name, char *buf, int len);
+void X509_free(const X509 *cert);
 
 
 /* BIO functions */
