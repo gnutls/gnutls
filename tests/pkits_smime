@@ -33,7 +33,7 @@ for msg in smime/*; do
     $CERTTOOL --p7-info --infile out > out2 2>&1
     rc=$?
     if test $rc != 0; then
-	echo "PKCS#7 FATAL $msg."
+	echo "PKCS#7 FATAL $msg"
 	ret=1
     fi
 done
