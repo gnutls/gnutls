@@ -526,7 +526,7 @@ int _gnutls_gen_openpgp_client_certificate(GNUTLS_STATE state,
 int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
 					       opaque ** data)
 {
-	int ret, fpr_size;
+	int ret, fpr_size, packet_size;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
 	gnutls_private_key *apr_pkey;
@@ -541,16 +541,16 @@ int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
 		return ret;
 	}
 
-	ret = 3 + 1;
+	packet_size = 3 + 1;
 
 	/* Only v4 fingerprints are sent 
 	 */
-	if (apr_cert_list_length > 0 && apr_cert_list->version == 4)
-		ret += 20 + 1;
+	if (apr_cert_list_length > 0 && apr_cert_list[0].version == 4)
+		packet_size += 20 + 1;
 	else			/* empty certificate case */
 		return _gnutls_gen_openpgp_client_certificate(state, data);
 
-	(*data) = gnutls_malloc(ret);
+	(*data) = gnutls_malloc(packet_size);
 	pdata = (*data);
 
 	if (pdata == NULL) {
@@ -558,7 +558,7 @@ int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	WRITEuint24(ret - 3, pdata);
+	WRITEuint24(packet_size - 3, pdata);
 	pdata += 3;
 
 	*pdata = PGP_KEY_FINGERPRINT;	/* key fingerprint */
@@ -573,7 +573,7 @@ int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
 		return ret;
 	}
 
-	return ret;
+	return packet_size;
 }
 
 
@@ -882,7 +882,6 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
-
 
 	if ((ret =
 	     _gnutls_auth_info_set(state, GNUTLS_CRD_CERTIFICATE,
