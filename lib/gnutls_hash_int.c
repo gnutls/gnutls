@@ -427,3 +427,4 @@ int _gnutls_ssl3_generate_random(void *secret, int secret_len,
 
 	return 0;
 }
+

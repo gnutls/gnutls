@@ -166,6 +166,8 @@ mac_init( gnutls_mac_algorithm mac, opaque* secret, int secret_size, int ver)
 {
 GNUTLS_MAC_HANDLE td;
 
+	if (mac == GNUTLS_MAC_NULL) return GNUTLS_MAC_FAILED;
+
 	if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
 		td =
 		    _gnutls_mac_init_ssl3( mac, secret,
@@ -174,7 +176,7 @@ GNUTLS_MAC_HANDLE td;
 		td =
 		    _gnutls_hmac_init( mac, secret, secret_size);
 	}
-
+	
 	return td;
 }
 
