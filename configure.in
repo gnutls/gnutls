@@ -60,28 +60,28 @@ CFLAGS="${CFLAGS} -D_REENTRANT -D_THREAD_SAFE"
 opt_dmalloc_mode=no
 AC_MSG_CHECKING([whether in dmalloc mode])
 AC_ARG_ENABLE(dmalloc-mode,
-[  --enable-dmalloc-mode      enable dmalloc mode],
-opt_dmalloc_mode=$enableval)
+	AS_HELP_STRING([--enable-dmalloc-mode], [enable dmalloc mode]),
+	opt_dmalloc_mode=$enableval)
 AC_MSG_RESULT($opt_dmalloc_mode)
 
 opt_efence_mode=no
 AC_MSG_CHECKING([whether in electric fence mode])
 AC_ARG_ENABLE(efence-mode,
-[  --enable-efence-mode       enable electric fence mode],
+	AS_HELP_STRING([--enable-efence-mode], [enable electric fence mode]),
 opt_efence_mode=$enableval)
 AC_MSG_RESULT($opt_efence_mode)
 
 opt_developer_mode=no
 AC_MSG_CHECKING([whether in developer mode])
 AC_ARG_ENABLE(developer-mode,
-[  --enable-developer-mode    enable developer mode],
+	AS_HELP_STRING([--enable-developer-mode], [enable developer mode]),
 opt_developer_mode=$enableval)
 AC_MSG_RESULT($opt_developer_mode)
 
 opt_profiler_mode=no
 AC_MSG_CHECKING([whether in profile mode])
 AC_ARG_ENABLE(profile-mode,
-[  --enable-profile-mode      enable profiler],
+	AS_HELP_STRING([--enable-profile-mode], [enable profiler]),
 opt_profiler_mode=$enableval)
 AC_MSG_RESULT($opt_profiler_mode)
 
@@ -92,7 +92,6 @@ AC_MSG_RESULT([***
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_LN_S
-dnl AC_PROG_MAKE_SET
 GTK_DOC_CHECK(1.1)
 
 AC_MSG_RESULT([***
@@ -100,7 +99,6 @@ AC_MSG_RESULT([***
 ])
 
 gl_EARLY
-
 AC_C_CONST
 AC_C_INLINE
 
@@ -111,17 +109,14 @@ int z,y,x;
 test_mac(x,y,z);
 return 0;
 ], 
-dnl ***** OK
-AC_DEFINE(C99_MACROS, 1, [C99 macros are supported])
-AC_MSG_RESULT(yes),
-dnl ***** NOT FOUND
-AC_MSG_RESULT(no)
-AC_MSG_WARN([C99 macros are not supported by your compiler. This may
-affect compiling.])
-)
+	dnl ***** OK
+	AC_DEFINE(C99_MACROS, 1, [C99 macros are supported])
+	AC_MSG_RESULT(yes),
+	dnl ***** NOT FOUND
+	AC_MSG_RESULT(no)
+	AC_MSG_WARN([C99 macros not supported. This may affect compiling.]))
 
 if test $ac_cv_c_compiler_gnu != no; then
-
 	if test x$opt_developer_mode = xyes; then
 	  CFLAGS="${CFLAGS} -g -Wno-format-y2k -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wmissing-braces -Winline -Wstrict-prototypes"
 	else
@@ -129,18 +124,16 @@ if test $ac_cv_c_compiler_gnu != no; then
 	fi
 
 	if test x$opt_dmalloc_mode = xyes; then
-	  AC_CHECK_LIB( dmalloc, main)
+	  AC_CHECK_LIB(dmalloc, main)
 	  AC_DEFINE(USE_DMALLOC, 1, [enable the use of dmalloc])
 	else
 		if test x$opt_efence_mode = xyes; then
-		  AC_CHECK_LIB( efence, main)
+		  AC_CHECK_LIB(efence, main)
 		  AC_DEFINE(USE_EFENCE, 1, [use electric fence])
 		fi
 	fi
 
-
 	AC_MSG_CHECKING([whether we have GNU assembler])
-
 	GAS=`as --version < /dev/null 2>/dev/null | grep GNU`
 	if test "$GAS"; then
 	  CFLAGS="${CFLAGS} -pipe"
@@ -166,7 +159,6 @@ AC_CHECK_HEADERS(netdb.h)
 AC_CHECK_FUNCS(vasprintf isascii memmove memmem mmap gmtime_r inet_ntop,,)
 AC_FUNC_ALLOCA
 
-
 AC_MSG_RESULT([***
 *** Detecting system's parameters...
 ])
@@ -183,11 +175,11 @@ AC_CHECK_TYPES(uint,,, [
 
 AC_CHECK_TYPE(ssize_t,
 DEFINE_SSIZE_T="#include <sys/types.h>"
-AC_SUBST( DEFINE_SSIZE_T)
+AC_SUBST(DEFINE_SSIZE_T)
 ,
 AC_DEFINE(NO_SSIZE_T, 1, [no ssize_t type was found])
 DEFINE_SSIZE_T="typedef int ssize_t;"
-AC_SUBST( DEFINE_SSIZE_T)
+AC_SUBST(DEFINE_SSIZE_T)
 ,[
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -228,8 +220,8 @@ AC_DEFINE(USE_GCRYPT, 1, [use gcrypt])
 
 # Use Nettle too?
 AC_ARG_WITH(nettle,
-   AC_HELP_STRING([--with-nettle],
-	          [Use Nettle for crypto (still need Libgcrypt)]),
+   AS_HELP_STRING([--with-nettle],
+	          [use Nettle for crypto (still need Libgcrypt)]),
   nettle=$withval, nettle=no)
 AC_MSG_CHECKING([whether to use Nettle too])
 if test "$nettle" != "no" ; then
@@ -247,9 +239,10 @@ AM_CONDITIONAL(LIBGCRYPT, test "$nettle" = "no")
 AM_CONDITIONAL(NETTLE, test "$nettle" != "no")
 
 AC_MSG_CHECKING([whether to disable SRP authentication support])
-AC_ARG_ENABLE( srp-authentication, [  --disable-srp-authentication     Disable the SRP authentication support],
- ac_enable_srp=no
-)
+AC_ARG_ENABLE(srp-authentication,
+	AS_HELP_STRING([--disable-srp-authentication],
+		[disable the SRP authentication support]),
+	ac_enable_srp=no)
 if test x$ac_enable_srp != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_SRP, 1, [enable SRP authentication])
@@ -258,9 +251,10 @@ else
 fi
 
 AC_MSG_CHECKING([whether to disable anonymous authentication support])
-AC_ARG_ENABLE( anon-authentication, [  --disable-anon-authentication    Disable the anonymous authentication support],
- ac_enable_anon=no
-)
+AC_ARG_ENABLE(anon-authentication,
+	AS_HELP_STRING([--disable-anon-authentication],
+		[disable the anonymous authentication support]),
+	ac_enable_anon=no)
 if test x$ac_enable_anon != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_ANON, 1, [enable anonymous authentication])
@@ -269,9 +263,10 @@ else
 fi
 
 AC_MSG_CHECKING([whether to disable extra PKI stuff])
-AC_ARG_ENABLE( extra-pki, [  --disable-extra-pki              only enable the basic PKI stuff],
- ac_enable_pki=no
-)
+AC_ARG_ENABLE(extra-pki,
+	AS_HELP_STRING([--disable-extra-pki],
+		[only enable the basic PKI stuff]),
+	ac_enable_pki=no)
 if test x$ac_enable_pki != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_PKI, 1, [whether to include all the PKCS #x stuff and other PKI stuff])
@@ -279,36 +274,32 @@ else
  AC_MSG_RESULT(yes)
 fi
 
-
 dnl Check whether to disable OpenPGP authentication completely
 dnl from libgnutls-extra.
 
 ac_enable_openpgp=yes
 AC_MSG_CHECKING([whether to disable OpenPGP Certificate authentication support])
-AC_ARG_ENABLE( openpgp-authentication, [  --disable-openpgp-authentication Disable the OpenPGP authentication support],
- ac_enable_openpgp=no
-)
-
+AC_ARG_ENABLE(openpgp-authentication,
+	AS_HELP_STRING([--disable-openpgp-authentication],
+		[disable the OpenPGP authentication support]),
+	ac_enable_openpgp=no)
 if test x$ac_enable_openpgp = xno; then
  AC_MSG_RESULT(yes)
 else
  AC_DEFINE(USE_OPENPGP, 1, [use openpgp authentication])
  AC_MSG_RESULT(no)
 fi
-
 AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
 
 dnl Test whether to use the included opencdk library
 dnl 
 if test x$ac_enable_openpgp = xyes; then
  AC_ARG_WITH(included-opencdk,
- 	[  --with-included-opencdk Use the included opencdk],
-  ac_enable_included_opencdk=$withval, 
-  ac_enable_included_opencdk=no
-  )
-
+	AS_HELP_STRING([--with-included-opencdk], [use the included opencdk]),
+		ac_enable_included_opencdk=$withval, 
+		ac_enable_included_opencdk=no)
 if test x$ac_enable_included_opencdk = xno;then 
-  AM_PATH_LIBOPENCDK( 0.5.5, ,
+  AM_PATH_LIBOPENCDK(0.5.5, ,
    ac_enable_included_opencdk=yes
    AC_MSG_WARN([[
 ***
@@ -317,23 +308,20 @@ if test x$ac_enable_included_opencdk = xno;then
 ***
 *** Will use the included opencdk.
 ***
-]])
-)
+]]))
 fi
-
 AC_MSG_CHECKING([whether to use the included opencdk])
 AC_MSG_RESULT($ac_enable_included_opencdk)
-
 fi
 
 AM_CONDITIONAL(ENABLE_INCLUDED_OPENCDK, test "$ac_enable_included_opencdk" = "yes")
 
-
 ac_enable_openssl=yes
 AC_MSG_CHECKING([whether to disable OpenSSL compatibility layer])
-AC_ARG_ENABLE( openssl-compatibility, [  --disable-openssl-compatibility Disable the OpenSSL compatibility support],
- ac_enable_openssl=no
-)
+AC_ARG_ENABLE(openssl-compatibility,
+	AS_HELP_STRING([--disable-openssl-compatibility],
+		[disable the OpenSSL compatibility support]),
+	ac_enable_openssl=no)
 if test x$ac_enable_openssl != xno; then
  AC_MSG_RESULT(no)
 else
@@ -344,9 +332,10 @@ AM_CONDITIONAL(ENABLE_OPENSSL, test "$ac_enable_openssl" = "yes")
 
 
 AC_ARG_WITH(included-libtasn1,
-	[  --with-included-libtasn1 Use the included libtasn1],
-minitasn1_enabled=yes, 
-minitasn1_enabled=no)
+	AS_HELP_STRING([--with-included-libtasn1],
+		[use the included libtasn1]),
+	minitasn1_enabled=yes,
+	minitasn1_enabled=no)
 
 if test x$minitasn1_enabled = xno; then
 AM_PATH_LIBTASN1($GNUTLS_LIBTASN1_VERSION,,
@@ -371,13 +360,14 @@ AM_CONDITIONAL(ENABLE_MINITASN1, test "$minitasn1_enabled" = "yes")
 dnl Check for libcfg+
 
 AC_ARG_WITH(included-libcfg,
-	[  --with-included-libcfg   Use the included libcfg+ (certtool only)],
+	AS_HELP_STRING([--with-included-libcfg],
+		[use the included libcfg+ (certtool only)]),
 libcfg_enabled=$withval, 
 libcfg_enabled=no
 
 dnl We search for libcfg+ which is used by certtool
 dnl
-AC_CHECK_LIB( cfg+, cfg_get_context,:, 
+AC_CHECK_LIB(cfg+, cfg_get_context,:, 
  libcfg_enabled=yes
 AC_MSG_WARN([[
 *** 
@@ -395,10 +385,10 @@ dnl
 
 AC_MSG_CHECKING([whether to include zlib compression support])
 
-AC_ARG_WITH( zlib, [  --without-zlib          disable zlib compression support],
- ac_zlib=$withval,
- ac_zlib=yes
-)
+AC_ARG_WITH(zlib,
+	AS_HELP_STRING([--without-zlib], [disable zlib compression support]),
+	ac_zlib=$withval,
+	ac_zlib=yes)
 
 if test x$ac_zlib != xno; then
  AC_MSG_RESULT(yes)
@@ -417,10 +407,9 @@ dnl
 minilzo_enabled=no
 use_lzo=yes
 AC_ARG_WITH(lzo,
-	[  --without-lzo           do not use lzo compression],
- use_lzo=no,
- use_lzo=yes
-)
+	AS_HELP_STRING([--without-lzo], [do not use lzo compression]),
+	use_lzo=no,
+	use_lzo=yes)
 
 AC_MSG_CHECKING([whether to include lzo compression support])
 AC_MSG_RESULT($use_lzo)
@@ -430,17 +419,17 @@ if test x$use_lzo = xyes; then
 AC_DEFINE(USE_LZO, 1, [whether to use the lzo compression])
 
 AC_ARG_WITH(included-lzo,
-	[  --with-included-lzo     include minilzo in libgnutls-extra],
- minilzo_enabled=$withval,
- minilzo_enabled=no
-)
+	AS_HELP_STRING([--with-included-lzo],
+		[include minilzo in libgnutls-extra]),
+	minilzo_enabled=$withval,
+	minilzo_enabled=no)
 
 AC_MSG_CHECKING([whether to use the included lzo compression library])
 
 AC_MSG_RESULT($minilzo_enabled)
 
 if test x$minilzo_enabled = xno; then
-AC_CHECK_LIB( lzo, lzo1x_1_compress, minilzo_enabled=no, 
+AC_CHECK_LIB(lzo, lzo1x_1_compress, minilzo_enabled=no, 
  minilzo_enabled=yes
  AC_MSG_WARN(
 *** 
@@ -476,23 +465,17 @@ AM_PROG_LIBTOOL
 
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBTASN1_LIBS $LIBGCRYPT_LIBS $LIBS"
 LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS $LIBTASN1_CFLAGS -I${includedir}"
-
-CFLAGS="${CFLAGS} ${LIBGCRYPT_CFLAGS}"
-
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
-SERV_LIBS="$LIBS $SERV_LIBS"
-AC_SUBST(SERV_LIBS)
-
 LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LIBOPENCDK_LIBS $LZO_LIBS $LIBGNUTLS_LIBS"
 LIBGNUTLS_EXTRA_CFLAGS="$LIBOPENCDK_CFLAGS -I${includedir}"
-
 AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
 AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
-if test $ac_cv_c_compiler_gnu != no; then
+CFLAGS="${CFLAGS} ${LIBGCRYPT_CFLAGS}"
 
+if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_profiler_mode = xyes; then
 	  AC_CHECK_PROG(FC_OK, fc-config, yes, no)
 	  if test x$FC_OK = xyes; then
@@ -505,7 +488,6 @@ AC_MSG_WARN(***
 	  fi
 	fi
 fi
-
 
 AC_CONFIG_FILES(lib/gnutls.h.in)
 
