@@ -43,11 +43,6 @@
   * DH anonymous cipher suites. This will set the
   * minimum size of the prime that will be used for the handshake.
   *
-  * In the client side it sets the minimum accepted number of bits.
-  * If a server sends a prime with less bits than that 
-  * GNUTLS_E_DH_PRIME_UNACCEPTABLE will be returned by the
-  * handshake.
-  *
   **/
 void gnutls_dh_set_prime_bits(gnutls_session session, int bits)
 {
@@ -201,7 +196,7 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
-	if (cred == NULL) {
+	if (cred == NULL || cred->cert_list == NULL) {
 		gnutls_assert();
 		return NULL;
 	}
@@ -220,10 +215,9 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
   * @session: is a gnutls session
   * @list_size: is the length of the certificate list
   *
-  * This function will return the peer's raw certificate (list) as 
-  * sent by the peer.
-  * These certificates are in raw format (DER encoded for X.509). 
-  * In case of a X.509 then a certificate list may be present. 
+  * This function will return the peer's raw certificate (list) as sent by the peer.
+  * These certificates are in raw format (DER encoded for X509). 
+  * In case of a X509 then a certificate list may be present. 
   * The first certificate in the list is the peer's certificate,
   * following the issuer's certificate, then the issuer's issuer etc.
   * Returns NULL in case of an error, or if no certificate was sent.
@@ -265,47 +259,39 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
 	return info->certificate_requested;
 }
 
+
+typedef gnutls_mac_algorithm gnutls_digest_algorithm;
 /**
-  * gnutls_fingerprint - This function calculates the fingerprint of the given data
+  * gnutls_x509_fingerprint - This function calculates the fingerprint of the given data
   * @algo: is a digest algorithm
   * @data: is the data
-  * @result: is the place where the result will be copied (may be null). 
+  * @result: is the place where the result will be copied. 
   * @result_size: should hold the size of the result. The actual size
   * of the returned result will also be copied there.
   *
   * This function will calculate a fingerprint (actually a hash), of the
   * given data. The result is not printable data. You should convert it
   * to hex, or to something else printable.
-  *
-  * This is the usual way to calculate a fingerprint of an X.509 
-  * DER encoded certificate. Note however that the fingerprint 
-  * of an OpenPGP is not just a hash and cannot be calculated with
-  * this function.
-  *
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size)
+int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size)
 {
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = _gnutls_hash_get_algo_len(algo);
 	
-	if (hash_len < 0 || (size_t)hash_len > *result_size ||
-		result==NULL) 
-	{
+	if (hash_len < 0 || (size_t)hash_len > *result_size) {
 		*result_size = hash_len;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 	*result_size = hash_len;
-
-	if (result) {
-		td = _gnutls_hash_init( algo);
-		if (td==NULL) return GNUTLS_E_HASH_FAILED;
 	
-		_gnutls_hash( td, data->data, data->size);
+	td = _gnutls_hash_init( algo);
+	if (td==NULL) return GNUTLS_E_HASH_FAILED;
 	
-		_gnutls_hash_deinit( td, result);
-	}
+	_gnutls_hash( td, data->data, data->size);
+	
+	_gnutls_hash_deinit( td, result);
 		
 	return 0;
 }
@@ -334,22 +320,9 @@ void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutl
   * cipher suites.
   *
   **/
-void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params dh_params) {
+int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params dh_params) {
 	res->dh_params = dh_params;
-}
-
-/**
-  * gnutls_certificate_set_verify_flags - This function will set the flags to be used at certificate verification
-  * @res: is a gnutls_certificate_credentials structure
-  * @flags: are the flagsis a structure that holds diffie hellman parameters.
-  *
-  * This function will set the flags to be used at verification of the certificates.
-  * Flags must be OR of the gnutls_certificate_verify_flags enumerations.
-  *
-  **/
-void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, unsigned int flags) 
-{
-	res->verify_flags = flags;
+	return 0;
 }
 
 /**
@@ -362,7 +335,7 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, uns
   * cipher suites.
   *
   **/
-void gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params) 
-{
+int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params) {
 	res->rsa_params = rsa_params;
+	return 0;
 }
