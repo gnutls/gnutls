@@ -1,4 +1,4 @@
-EXTRA_DIST = common.h prime.gaa crypt.gaa crypt-gaa.h README.crypt prime-gaa.h \
+EXTRA_DIST = common.h prime.gaa crypt.gaa crypt-gaa.h README.srpcrypt prime-gaa.h \
 		README 
 SUBDIRS = srp x509
 

@@ -7,7 +7,7 @@ Makefile
 Makefile.in
 .deps
 .libs
-crypt
+srpcrypt
 asn1c
 CertificateExample
 CrlExample
