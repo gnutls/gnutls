@@ -245,7 +245,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
   *
   **/
 int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
-				  int *sizeof_buf)
+				  size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || crl == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -280,7 +280,7 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
   **/
 int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
 					 const char *oid, int indx,
-					 char *buf, int *sizeof_buf)
+					 char *buf, size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || crl == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -411,7 +411,7 @@ int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl)
   **/
 int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
 				    unsigned char *serial,
-				    int *serial_size, time_t * time)
+				    size_t *serial_size, time_t * time)
 {
 
 	int result;
@@ -525,7 +525,7 @@ int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl crl,
   *
   **/
 int gnutls_x509_crl_export( gnutls_x509_crl crl,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
 	return _gnutls_x509_export_int( crl->crl, format, PEM_CRL, *output_data_size,
 		output_data, output_data_size);

@@ -26,7 +26,7 @@
 # include <stdarg.h>
 #endif
 
-extern void (*_gnutls_log_func)( int, const char*);
+extern LOG_FUNC _gnutls_log_func;
 
 #define ERROR_ENTRY(desc, name, fatal) \
 	{ desc, #name, name, fatal}

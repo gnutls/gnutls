@@ -713,7 +713,7 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
   *
   **/
 int gnutls_x509_rdn_get(const gnutls_datum * idn,
-				  char *buf, unsigned int *sizeof_buf)
+				  char *buf, size_t *sizeof_buf)
 {
 	int result;
 	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
@@ -767,7 +767,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
   *
   **/
 int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid, int indx,
-				  char *buf, unsigned int *sizeof_buf)
+				  char *buf, size_t *sizeof_buf)
 {
 	int result;
 	ASN1_TYPE dn = ASN1_TYPE_EMPTY;

@@ -166,7 +166,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
   *
   **/
 int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
-					 int *sizeof_buf)
+					 size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || crq == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -199,7 +199,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   *
   **/
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
-	int indx, char *buf, int *sizeof_buf)
+	int indx, char *buf, size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || crq == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -222,7 +222,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 static int parse_attribute(ASN1_TYPE asn1_struct,
 			      const char *attr_name,
 			      const char *given_oid, int indx,
-			      char *buf, int *sizeof_buf)
+			      char *buf, size_t *sizeof_buf)
 {
 	int k1, result;
 	char tmpbuffer1[64];
@@ -363,7 +363,7 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
   *
   **/
 int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq, 
-	char* pass, int* sizeof_pass)
+	char* pass, size_t* sizeof_pass)
 {
 	return parse_attribute( crq->crq, "certificationRequestInfo.attributes",
 		"1.2.840.113549.1.9.7", 0, pass, sizeof_pass);
@@ -623,7 +623,7 @@ gnutls_datum signature;
   *
   **/
 int gnutls_x509_crq_export( gnutls_x509_crq crq,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
 	return _gnutls_x509_export_int( crq->crq, format, PEM_CRQ, *output_data_size,
 		output_data, output_data_size);

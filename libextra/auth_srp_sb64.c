@@ -27,7 +27,7 @@
 /* this a modified base64 for srp !!! 
  * It seems that everybody makes an own base64 conversion.
  */
-static const uint8 b64table[64] =
+static const uint8 b64table[] =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./";
 
 static const uint8 asciitable[128] = {

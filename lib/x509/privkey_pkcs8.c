@@ -398,7 +398,7 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 				     const char *password,
 				     unsigned int flags,
 				     unsigned char *output_data,
-				     int *output_data_size)
+				     size_t *output_data_size)
 {
 	ASN1_TYPE pkcs8_asn, pkey_info;
 	int ret;

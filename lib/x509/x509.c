@@ -300,7 +300,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
   *
   **/
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
-					 int *sizeof_buf)
+					 size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || cert == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -333,7 +333,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   *
   **/
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
-	int indx, char *buf, int *sizeof_buf)
+	int indx, char *buf, size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || cert == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -362,7 +362,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid,
   *
   **/
 int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
-					 int *sizeof_buf)
+					 size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || cert == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -395,7 +395,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   *
   **/
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
-	int indx, char *buf, int *sizeof_buf)
+	int indx, char *buf, size_t *sizeof_buf)
 {
 	if (sizeof_buf == 0 || cert == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -493,7 +493,8 @@ time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert)
   * Returns a negative value in case of an error, and 0 on success.
   *
   **/
-int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, int* result_size)
+int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, 
+	size_t* result_size)
 {
 	int ret;
 
@@ -642,7 +643,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
   *
   **/
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, char *ret, int *ret_size, int *critical)
+	int seq, char *ret, size_t *ret_size, int *critical)
 {
 	int result;
 	gnutls_datum dnsname;
@@ -847,7 +848,7 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
   *
   **/
 int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
-	int indx, unsigned char* buf, int * sizeof_buf, int * critical)
+	int indx, unsigned char* buf, size_t * sizeof_buf, int * critical)
 {
 	int result;
 	gnutls_datum output;
@@ -979,7 +980,7 @@ int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
   **/
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
 	gnutls_digest_algorithm algo, char *buf,
-	 int *sizeof_buf)
+	 size_t *sizeof_buf)
 {
 opaque *cert_buf;
 int cert_buf_size;
@@ -1037,7 +1038,7 @@ gnutls_datum tmp;
   *
   **/
 int gnutls_x509_crt_export( gnutls_x509_crt cert,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
 	return _gnutls_x509_export_int( cert->cert, format, "CERTIFICATE", *output_data_size,
 		output_data, output_data_size);
@@ -1064,7 +1065,7 @@ int gnutls_x509_crt_export( gnutls_x509_crt cert,
   *
   **/
 int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
-	unsigned char* output_data, int* output_data_size)
+	unsigned char* output_data, size_t* output_data_size)
 {
 GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
 int params_size = MAX_PUBLIC_PARAMS_SIZE;

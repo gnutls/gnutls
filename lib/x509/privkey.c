@@ -467,7 +467,7 @@ int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key)
   *
   **/
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
 	char * msg;
 		
@@ -1075,7 +1075,7 @@ opaque algo = GNUTLS_PK_DSA;
   *
   **/
 int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key, unsigned int flags,
-	unsigned char* output_data, int* output_data_size)
+	unsigned char* output_data, size_t* output_data_size)
 {
 		
 	if (key->pk_algorithm == GNUTLS_PK_RSA)

@@ -25,7 +25,6 @@
 #include <gnutls_dh.h>
 #include "x509/rc2.h"
 
-typedef void (*LOG_FUNC)( int, const char*);
 #define gnutls_log_func LOG_FUNC
 
 /* created by asn1c */

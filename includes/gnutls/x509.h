@@ -52,31 +52,31 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt cert);
 int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
 int gnutls_x509_crt_export( gnutls_x509_crt cert,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
-	 int *sizeof_buf);
+	 size_t *sizeof_buf);
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, 
-	const char* oid, int indx, char *buf, int *sizeof_buf);
+	const char* oid, int indx, char *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
-	 int *sizeof_buf);
+	 size_t *sizeof_buf);
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, 
-	const char* oid, int indx, char *buf, int *sizeof_buf);
+	const char* oid, int indx, char *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
                                 const char *hostname);
 
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
-	unsigned char* output_data, int* output_data_size);
+	unsigned char* output_data, size_t* output_data_size);
 
 
 time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert);
 time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);
-int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, int* result_size);
+int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, size_t* result_size);
 
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits);
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, char *ret, int *ret_size, int* critical);
+	int seq, char *ret, size_t *ret_size, int* critical);
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, int* critical);
 
 int gnutls_x509_crt_get_key_usage( gnutls_x509_crt cert, unsigned int* key_usage,
@@ -96,7 +96,7 @@ int gnutls_x509_crt_get_key_usage( gnutls_x509_crt cert, unsigned int* key_usage
 
 int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, 
 	const char* oid, int indx,
-	unsigned char* buf, int * sizeof_buf, int * critical);
+	unsigned char* buf, size_t * sizeof_buf, int * critical);
 
 int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail);
 
@@ -107,10 +107,10 @@ int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail);
 
 /* RDN handling */
 int gnutls_x509_rdn_get(const gnutls_datum * idn,
-				  char *buf, unsigned int *sizeof_buf);
+				  char *buf, size_t *sizeof_buf);
 
 int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
-	int indx, char *buf, unsigned int *sizeof_buf);
+	int indx, char *buf, size_t *sizeof_buf);
 
 
 /* CRL handling functions */
@@ -122,12 +122,12 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
 int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data, 
 	gnutls_x509_crt_fmt format);
 int gnutls_x509_crl_export( gnutls_x509_crl crl,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 
 int gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl crl, 
-	char *buf, int *sizeof_buf);
+	char *buf, size_t *sizeof_buf);
 int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, 
-	const char* oid, int indx, char *buf, int *sizeof_buf);
+	const char* oid, int indx, char *buf, size_t *sizeof_buf);
 
 int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_version(gnutls_x509_crl crl);
@@ -137,7 +137,7 @@ time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl);
 
 int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index, unsigned char* serial,
-        int* serial_size, time_t* time);
+        size_t* serial_size, time_t* time);
 
 int gnutls_x509_crl_check_issuer( gnutls_x509_crl crl,
 	gnutls_x509_crt issuer);
@@ -155,15 +155,15 @@ int gnutls_pkcs7_get_certificate_count( gnutls_pkcs7 pkcs7);
 int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
 int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx, 
-	unsigned char* certificate, int* certificate_size);
+	unsigned char* certificate, size_t* certificate_size);
 int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, 
 	const gnutls_datum* crt);
 
 int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
-	int indx, unsigned char* crl, int* crl_size);
+	int indx, unsigned char* crl, size_t* crl_size);
 int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7);
 int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, 
 	const gnutls_datum* crt);
@@ -204,7 +204,7 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
 	gnutls_digest_algorithm algo, char *buf,
-	 int *sizeof_buf);
+	size_t *sizeof_buf);
 
 /* Private key handling
  */
@@ -232,16 +232,16 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey privkey,
 	const gnutls_datum *u);
 int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key);
 int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key, unsigned int flags,
-	unsigned char* output_data, int* output_data_size);
+	unsigned char* output_data, size_t* output_data_size);
 
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
 	int bits, unsigned int flags);
 
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 int gnutls_x509_privkey_export_pkcs8( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, const char* password, unsigned int flags,
-	unsigned char* output_data, int* output_data_size);
+	unsigned char* output_data, size_t* output_data_size);
 int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum * m, gnutls_datum *e,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
@@ -257,9 +257,9 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq crq);
 int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
 int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
-					 int *sizeof_buf);
+					 size_t *sizeof_buf);
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
-	int indx, char *buf, int *sizeof_buf);
+	int indx, char *buf, size_t *sizeof_buf);
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
 	const char *name, int sizeof_name);
 int gnutls_x509_crq_set_version(gnutls_x509_crq crq, int version);
@@ -268,10 +268,10 @@ int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key);
 
 int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq, const char* pass);
 int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq, 
-	const char* pass, int* sizeof_pass);
+	const char* pass, size_t* sizeof_pass);
 
 int gnutls_x509_crq_export( gnutls_x509_crq crq,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 
 
 

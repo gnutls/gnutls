@@ -48,7 +48,7 @@ int _gnutls_x509_der_encode( ASN1_TYPE src, const char* src_name,
 
 int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	gnutls_x509_crt_fmt format, char* pem_header,
-	int tmp_buf_size, unsigned char* output_data, int* output_data_size);
+	int tmp_buf_size, unsigned char* output_data, size_t* output_data_size);
 
 int _gnutls_x509_read_value( ASN1_TYPE c, const char* root, gnutls_datum *ret, int str);
 int _gnutls_x509_write_value( ASN1_TYPE c, const char* root, const gnutls_datum* data, int str);

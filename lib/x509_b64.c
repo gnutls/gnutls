@@ -27,8 +27,9 @@
 #include <gnutls_datum.h>
 #include <x509_b64.h>
 
-static const uint8 b64table[64] =
+static const uint8 b64table[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 static const uint8 asciitable[128] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,

@@ -519,7 +519,7 @@ gnutls_x509_subject_alt_name _gnutls_x509_san_find_type( char* str_type) {
  */
 int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	gnutls_x509_crt_fmt format, char* pem_header,
-	int tmp_buf_size, unsigned char* output_data, int* output_data_size)
+	int tmp_buf_size, unsigned char* output_data, size_t* output_data_size)
 {
 	int result;
 	if (tmp_buf_size == 0) tmp_buf_size = 16*1024;

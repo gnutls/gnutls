@@ -242,7 +242,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
   *
   **/
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, 
-	int indx, unsigned char* certificate, int* certificate_size)
+	int indx, unsigned char* certificate, size_t* certificate_size)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len;
@@ -380,7 +380,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
   *
   **/
 int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
 	return _gnutls_x509_export_int( pkcs7->pkcs7, format, PEM_PKCS7, *output_data_size,
 		output_data, output_data_size);
@@ -609,7 +609,7 @@ int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
   *
   **/
 int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
-	int indx, unsigned char* crl, int* crl_size)
+	int indx, unsigned char* crl, size_t* crl_size)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;

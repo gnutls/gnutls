@@ -205,6 +205,7 @@ typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
 
 /* STATE (stop) */
 
+typedef void (*LOG_FUNC)( int, const char*);
 
 /* Pull & Push functions defines: 
  */
