@@ -105,9 +105,9 @@ char *x509_crlfile = NULL;
 #define RENEGOTIATE
 
 /* These are global */
-gnutls_srp_server_credentials srp_cred;
-gnutls_anon_server_credentials dh_cred;
-gnutls_certificate_credentials cert_cred;
+gnutls_srp_server_credentials srp_cred = NULL;
+gnutls_anon_server_credentials dh_cred = NULL;
+gnutls_certificate_credentials cert_cred = NULL;
 
 const int ssl_session_cache = 128;
 
@@ -295,8 +295,12 @@ gnutls_session initialize_session(void)
    gnutls_certificate_type_set_priority(session, cert_type_priority);
 
    gnutls_credentials_set(session, GNUTLS_CRD_ANON, dh_cred);
-   gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
-   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
+
+   if (srp_cred != NULL)
+      gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
+
+   if (cert_cred != NULL)
+      gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
    gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUEST);
 
@@ -667,9 +671,9 @@ int main(int argc, char **argv)
     * Read README.crypt prior to using SRP.
     */
 #ifdef ENABLE_SRP
-   gnutls_srp_allocate_server_credentials(&srp_cred);
+   if (srp_passwd != NULL) {
+      gnutls_srp_allocate_server_credentials(&srp_cred);
 
-   if (srp_passwd != NULL)
       if ((ret =
 	   gnutls_srp_set_server_credentials_file(srp_cred, srp_passwd,
 						  srp_passwd_conf)) < 0) {
@@ -678,6 +682,7 @@ int main(int argc, char **argv)
 	 fprintf(stderr, "Error while setting SRP parameters\n");
 	 GERR(ret);
       }
+   }
 #endif
 
 #ifdef ENABLE_ANON

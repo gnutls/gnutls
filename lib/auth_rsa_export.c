@@ -99,6 +99,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	 * of 512 bits or less.
 	 */
 	if ( _gnutls_mpi_get_nbits( apr_pkey->params[0]) <= 512) {
+		gnutls_assert();
 		return GNUTLS_E_INT_RET_0;
 	}
 
@@ -108,7 +109,8 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 		return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
 	}
 
-	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_CERTIFICATE, sizeof( CERTIFICATE_AUTH_INFO_INT), 0)) < 0) {
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_CERTIFICATE, 
+		sizeof( CERTIFICATE_AUTH_INFO_INT), 0)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -167,7 +169,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_write_datum16(&(*data)[data_size], signature);
+	_gnutls_write_datum16(&((*data)[data_size]), signature);
 	data_size += signature.size + 2;
 
 	_gnutls_free_datum(&signature);
@@ -265,10 +267,6 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	DECR_LEN( data_size, n_m);
 	data_m = &data[i];
 	i += n_m;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
 
 	DECR_LEN( data_size, 2);
 	n_e = _gnutls_read_uint16(&data[i]);
@@ -277,10 +275,6 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	DECR_LEN( data_size, n_e);
 	data_e = &data[i];
 	i += n_e;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
 
 	_n_e = n_e;
 	_n_m = n_m;
@@ -297,7 +291,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 
 	ret=_gnutls_rsa_export_set_modulus_bits( session, _gnutls_mpi_get_nbits(
 		session->key->rsa[0]));
-	if (ret<0) {
+	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}

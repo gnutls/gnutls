@@ -11,15 +11,24 @@ typedef void svoid; /* for functions that allocate using gnutls_secure_malloc */
  * memory leaks may occur in systems which do not
  * support alloca.
  */
+#ifdef USE_EFENCE
+# define gnutls_alloca gnutls_malloc
+# define gnutls_afree gnutls_free
+#endif
+
 #ifdef HAVE_ALLOCA
 # ifdef HAVE_ALLOCA_H
 #  include <alloca.h>
 # endif
-# define gnutls_alloca alloca
-# define gnutls_afree(x)
+# ifndef gnutls_alloca
+#  define gnutls_alloca alloca
+#  define gnutls_afree(x)
+# endif
 #else
-# define gnutls_alloca gnutls_malloc
-# define gnutls_afree gnutls_free
+# ifndef gnutls_alloca
+#  define gnutls_alloca gnutls_malloc
+#  define gnutls_afree gnutls_free
+# endif
 #endif /* HAVE_ALLOCA */
 
 typedef void* (*gnutls_alloc_function)(size_t);

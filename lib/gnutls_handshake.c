@@ -2317,8 +2317,9 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	 */
 
 	cert = NULL;
-	if (session->security_parameters.entity == GNUTLS_SERVER)
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		cert = _gnutls_server_find_cert(session, requested_pk_algo);
+	}
 
 	if (cert == NULL) {
 		/* No certificate was found 
@@ -2371,7 +2372,6 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 					 * is compatible with the certificate.
 					 */
 					for (j = 0; j < alg_size; j++) {
-
 						if (alg[j] == kx) {
 							keep = 0;
 							break;

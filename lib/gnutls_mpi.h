@@ -32,8 +32,8 @@ void _gnutls_mpi_release( GNUTLS_MPI* x);
 int _gnutls_mpi_scan( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes );
 int _gnutls_mpi_scan_pgp( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes );
 
-int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a );
-int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a );
+int _gnutls_mpi_print( void *buffer, size_t *nbytes, const GNUTLS_MPI a );
+int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const GNUTLS_MPI a );
 
 
 #endif

@@ -261,10 +261,10 @@ openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdk_pkt_pubkey_t pk )
     if( is_DSA(pk->pubkey_algo) || pk->pubkey_algo == GCRY_PK_RSA_S )
         cert->keyUsage = KEY_DIGITAL_SIGNATURE;
     else if( pk->pubkey_algo == GCRY_PK_RSA_E )
-        cert->keyUsage = KEY_ENCIPHER_ONLY;
+        cert->keyUsage = KEY_KEY_ENCIPHERMENT;
     else if( pk->pubkey_algo == GCRY_PK_RSA )
         cert->keyUsage = KEY_DIGITAL_SIGNATURE
-            | KEY_ENCIPHER_ONLY;
+            | KEY_KEY_ENCIPHERMENT;
 
     cert->params_size = cdk_pk_get_npkey( pk->pubkey_algo );
     for( i = 0; i < cert->params_size; i++ ) {

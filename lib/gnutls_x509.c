@@ -1003,17 +1003,21 @@ int _gnutls_check_key_usage( const gnutls_cert* cert,
 				 * type algorithm, and key's usage does not permit
 				 * encipherment, then fail.
 				 */
-				if (!(keyUsage & KEY_KEY_ENCIPHERMENT))
+				if (!(keyUsage & KEY_KEY_ENCIPHERMENT)) {
+					gnutls_assert();
 					return
 					    GNUTLS_E_KEY_USAGE_VIOLATION;
+				}
 			}
 
 			if ( encipher_type == CIPHER_SIGN) { 
 				/* The same as above, but for sign only keys
 				 */
-				if (!(keyUsage & KEY_DIGITAL_SIGNATURE))
+				if (!(keyUsage & KEY_DIGITAL_SIGNATURE)) {
+					gnutls_assert();
 					return
 					    GNUTLS_E_KEY_USAGE_VIOLATION;
+				}
 			}
 		}
 	}

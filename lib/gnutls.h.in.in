@@ -85,7 +85,7 @@ typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5,
 /* exported for other gnutls headers. This is the maximum number
  * of algorithms (ciphers, kx or macs). 
  */
-#define GNUTLS_MAX_ALGORITHM_NUM 10
+#define GNUTLS_MAX_ALGORITHM_NUM 16
 
 typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, 
 	GNUTLS_COMP_ZLIB, 

@@ -292,6 +292,8 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 
 		if (gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
 
+			/* Makes the issuers_dn stuff.
+			 */
 			do {
 				/* This works like DECR_LEN() 
 				 */
@@ -314,12 +316,14 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 
 			} while (issuers_dn_len < MAX_ISSUERS);
 
-			my_certs =
-			    gnutls_alloca(cred->ncerts * sizeof(gnutls_datum));
-			if (my_certs == NULL) {
-				result = GNUTLS_E_MEMORY_ERROR;
-				gnutls_assert();
-				goto error;
+			if (cred->ncerts != 0) {
+				my_certs =
+				    gnutls_alloca(cred->ncerts * sizeof(gnutls_datum));
+				if (my_certs == NULL) {
+					result = GNUTLS_E_MEMORY_ERROR;
+					gnutls_assert();
+					goto error;
+				}
 			}
 
 			/* put the requested DNs to req_dn, only in case
@@ -362,12 +366,18 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 			issuers_dn = NULL;
 		}
 
-		/* maps j -> i */
-		ij_map = gnutls_alloca(sizeof(int) * cred->ncerts);
-		if (ij_map == NULL) {
-			result = GNUTLS_E_MEMORY_ERROR;
-			gnutls_assert();
-			goto error;
+		/* If not certificates are present.
+		 */
+		/* maps j -> i 
+		 */
+
+		if (cred->ncerts != 0) {
+			ij_map = gnutls_alloca(sizeof(int) * cred->ncerts);
+			if (ij_map == NULL) {
+				result = GNUTLS_E_MEMORY_ERROR;
+				gnutls_assert();
+				goto error;
+			}
 		}
 
 		/* put our certificate's issuer and dn into cdn, idn
@@ -405,12 +415,14 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		 * This will make it relative to the certificates
 		 * we've got.
 		 */
-		if (indx != -1)
+		if (indx != -1 && cred->ncerts != 0)
 			indx = ij_map[indx];
+		else
+			indx = -1;
 
-		gnutls_afree(my_certs);
-		gnutls_afree(ij_map);
-		gnutls_afree(issuers_dn);
+		if (my_certs) gnutls_afree(my_certs);
+		if (ij_map) gnutls_afree(ij_map);
+		if (issuers_dn) gnutls_afree(issuers_dn);
 	}
 
 	*ind = indx;

@@ -71,7 +71,7 @@ int ret;
 	return 0;
 }
 
-int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a ) 
+int _gnutls_mpi_print( void *buffer, size_t *nbytes, const GNUTLS_MPI a ) 
 {
 int ret;
 
@@ -82,7 +82,7 @@ int ret;
 }
 
 /* Always has the first bit zero */
-int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a ) 
+int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const GNUTLS_MPI a ) 
 {
 int ret;
 

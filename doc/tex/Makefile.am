@@ -18,7 +18,7 @@ TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex ../../lib/x509/x509-ap
 	memory.tex openpgp.tex x509.tex howto.tex openssl.tex \
 	appendix.tex x509cert.xml.tex pgpcert.xml.tex \
 	programs.tex library.tex certificate.tex record_weaknesses.tex \
-	tlsintro.tex compression.tex $(EXAMPLE_OBJECTS) \
+	tlsintro.tex compression.tex $(EXAMPLE_OBJECTS) preface.tex \
 	tls_extensions.tex srp.tex preparation.tex callbacks.tex
 
 gnutls.html: build_api_pgp build_api_lib build_api_x509 build_api_extra $(TEX_OBJECTS)
