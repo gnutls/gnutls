@@ -1,0 +1,10 @@
+.cvsignore
+cli
+serv
+Makefile
+.deps
+.libs
+logfile
+Makefile.in
+.deps
+.libs
