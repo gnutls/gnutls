@@ -705,9 +705,8 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 
 
-	/* Incread sequence number */
+	/* Increase sequence number */
 	state->connection_state.read_sequence_number++;
-
 
 
 	/* Get Application data from buffer */
