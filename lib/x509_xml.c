@@ -113,8 +113,30 @@ static int is_leaf(ASN1_TYPE p)
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
 
-#define XML_HEADER "<?xml version='1.0' encoding='UTF-8'?>\n"
+#define UNNAMED "UNNAMED"
+/* This function removes the '?' character from ASN.1 names
+ */
+static int normalize_name( const char* aname, char* output, int output_size) 
+{
+	if (output_size > 0)
+		output[0] = 0;
 
+	if (aname==NULL) return 0;
+
+	if ( aname[0]=='?') {
+		_gnutls_str_cpy( output, output_size, UNNAMED);
+		if (strlen(aname) > 1)
+			_gnutls_str_cat( output, output_size, &aname[1]);
+	} else {
+		_gnutls_str_cpy( output, output_size, aname);
+	}
+	return 0;
+}
+
+#define XML_HEADER "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+
+/* FIXME: This function is way too expensive.
+ */
 static int
 _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			 gnutls_datum * res)
@@ -122,6 +144,8 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 	node_asn *p, *root;
 	int k, indent = 0, len, len2, len3;
 	opaque tmp[1024];
+	char nname[256];
+	int ret;
 
 	if (res == NULL || structure == NULL) {
 		gnutls_assert();
@@ -140,11 +164,18 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 
 	p = root;
 	while (p) {
+
 		if (is_node_printable(p) && p->name) {
 			for (k = 0; k < indent; k++)
 				APPEND(" ", 1);
-			snprintf(tmp, sizeof(tmp), "<%s", p->name);
-			STR_APPEND(tmp);
+
+			if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+
+			APPEND("<", 1);
+			STR_APPEND(nname);
 		}
 
 		if (is_node_printable(p)) {
@@ -364,23 +395,27 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			} while (x != NULL);
 		} else if (p == root) {
 			if (is_node_printable(p)) {
-				tmp[0] = 0;
-				if (p->name)
-					snprintf(tmp, sizeof(tmp) - 1,
-						 "</%s>", p->name);
-				strcat(tmp, "\n");
-				STR_APPEND(tmp);
+				if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+					gnutls_assert();
+					return ret;
+				}
+
+				APPEND("</", 2);
+				STR_APPEND(nname);
+				APPEND(">\n", 2);
 			}
 			p = NULL;
 			break;
 		} else {
 			if (is_node_printable(p)) {
-				tmp[0] = 0;
-				if (p->name)
-					snprintf(tmp, sizeof(tmp) - 1,
-						 "</%s>", p->name);
-				strcat(tmp, "\n");
-				STR_APPEND(tmp);
+				if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+					gnutls_assert();
+					return ret;
+				}
+
+				APPEND("</", 2);
+				STR_APPEND(nname);
+				APPEND(">\n", 2);
 			}
 			if (p->right)
 				p = p->right;
@@ -399,15 +434,14 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 							     k++)
 								STR_APPEND(" ");
 
-						tmp[0] = 0;
-						if (p->name)
-							snprintf(tmp,
-								 sizeof
-								 (tmp) - 1,
-								 "</%s>",
-								 p->name);
-						strcat(tmp, "\n");
-						STR_APPEND(tmp);
+						if ((ret=normalize_name( p->name, nname, sizeof(nname))) < 0) {
+							gnutls_assert();
+							return ret;
+						}
+
+						APPEND("</", 2);
+						STR_APPEND(nname);
+						APPEND(">\n", 2);
 					}
 					if (p == root) {
 						p = NULL;
@@ -423,7 +457,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 		}
 	}
 	
-	APPEND( "\0", 1);
+	APPEND( "\n\0", 2);
 	
 	return 0;
 }
