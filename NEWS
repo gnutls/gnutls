@@ -1,20 +1,29 @@
-Version 1.0.6
+Version 1.0.6 (12/02/2004)
+* Backported things from the development branch:
 - Improved gnutls-cli's SRP behaviour in SRP ciphersuites.
   If they are of highest priority then the abbreviated handshake
   is used.
+- The error codes GNUTLS_E_NO_TEMPORARY_DH_PARAMS and GNUTLS_E_NO_TEMPORARY_RSA_PARAMS
+  are no longer returned by the handshake function. Ciphersuites that
+  require temporary parameters are removed when such parameters do not exist.
+- Added the callbacks gnutls_certificate_client_retrieve_function() and
+  gnutls_certificate_server_retrieve_function(), to allow a client or a server
+  to specify certificates for the handshake without storing them to the
+  credentials structure.
+- Added support for generating and exporting DSA private keys.
 
 Version 1.0.5 (11/02/2004)
 - Fixed a bug where 'server name' extension was always sent.
-- Backported several things from the development branch:
- - Added CRL verification functionality to certtool.
- - Corrected the CRL distribution point extension handling.
- - Added PKCS #7 support to certtool utility.
- - Added support for reading and generating CRL distribution
-   points extensions in certificates.
- - Added support for generating CRLs in the library and the
-   certtool utility.
- - Added support for the Subject Key ID PKIX extension.
- - Added the gnutls_sign_algorithm type.
+* Backported things from the development branch:
+- Added CRL verification functionality to certtool.
+- Corrected the CRL distribution point extension handling.
+- Added PKCS #7 support to certtool utility.
+- Added support for reading and generating CRL distribution
+  points extensions in certificates.
+- Added support for generating CRLs in the library and the
+  certtool utility.
+- Added support for the Subject Key ID PKIX extension.
+- Added the gnutls_sign_algorithm type.
 
 Version 1.0.4 (04/01/2004)
 - Changed handshake behaviour to send the lowest TLS version

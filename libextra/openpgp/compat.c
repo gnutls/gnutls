@@ -1,6 +1,7 @@
 /*
  *  Copyright (C) 2002 Timo Schulz
  *  Portions Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS-EXTRA.
  *
@@ -48,7 +49,7 @@
  * NOTE: this function does not verify using any "web of trust". You
  * may use GnuPG for that purpose, or any other external PGP application.
  -*/
-int gnutls_openpgp_verify_key(const char *trustdb,
+int _gnutls_openpgp_verify_key(const char *trustdb,
 			  const gnutls_datum * keyring,
 			  const gnutls_datum * cert_list,
 			  int cert_list_length)
@@ -148,7 +149,7 @@ leave:
  * Returns the fingerprint of the OpenPGP key. Depence on the algorithm,
  * the fingerprint can be 16 or 20 bytes.
  -*/
-int gnutls_openpgp_fingerprint(const gnutls_datum * cert,
+int _gnutls_openpgp_fingerprint(const gnutls_datum * cert,
 			   unsigned char *fpr, size_t * fprlen)
 {
 	gnutls_openpgp_key key;
@@ -178,12 +179,12 @@ int gnutls_openpgp_fingerprint(const gnutls_datum * cert,
 }
 
 /*-
- * gnutls_openpgp_extract_key_creation_time - Extract the timestamp
+ * gnutls_openpgp_get_raw_key_creation_time - Extract the timestamp
  * @cert: the raw data that contains the OpenPGP public key.
  *
  * Returns the timestamp when the OpenPGP key was created.
  -*/
-time_t gnutls_openpgp_extract_key_creation_time(const gnutls_datum * cert)
+time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum * cert)
 {
 	gnutls_openpgp_key key;
 	int ret;
@@ -210,13 +211,13 @@ time_t gnutls_openpgp_extract_key_creation_time(const gnutls_datum * cert)
 
 
 /*-
- * gnutls_openpgp_extract_key_expiration_time - Extract the expire date
+ * gnutls_openpgp_get_raw_key_expiration_time - Extract the expire date
  * @cert: the raw data that contains the OpenPGP public key.
  *
  * Returns the time when the OpenPGP key expires. A value of '0' means
  * that the key doesn't expire at all.
  -*/
-time_t gnutls_openpgp_extract_key_expiration_time(const gnutls_datum * cert)
+time_t _gnutls_openpgp_get_raw_key_expiration_time(const gnutls_datum * cert)
 {
 	gnutls_openpgp_key key;
 	int ret;

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -20,7 +21,7 @@
  */
 
 /* Functions to manipulate the session (gnutls_int.h), and some other stuff
- * are included here. The file's name is traditionaly gnutls_state even if the
+ * are included here. The file's name is traditionally gnutls_state even if the
  * state has been renamed to session.
  */
 
@@ -273,6 +274,7 @@ void _gnutls_deinit(gnutls_session session)
 	_gnutls_buffer_clear( &session->internals.record_send_buffer);
 
 	gnutls_credentials_clear( session);
+	_gnutls_selected_certs_deinit( session);
 
 	if (session->connection_state.read_cipher_state != NULL)
 		_gnutls_cipher_deinit(session->connection_state.read_cipher_state);
@@ -502,30 +504,6 @@ void _gnutls_record_set_default_version(gnutls_session session,
 {
 	session->internals.default_record_version[0] = major;
 	session->internals.default_record_version[1] = minor;
-}
-
-/**
-  * gnutls_record_set_cbc_protection - Used to disable the CBC protection
-  * @session: is a &gnutls_session structure.
-  * @prot: is an integer (0 or 1)
-  *
-  * A newly discovered attack against the record protocol requires some
-  * counter-measures to be taken. GnuTLS will not enable them by default.
-  * The protection is to send an empty record packet, before each actual record 
-  * packet, in order to assure that the IV is not known to potential attackers.
-  *
-  * This function will enable or disable the chosen plaintext protection
-  * in the TLS record protocol (used with ciphers in CBC mode).
-  * if prot == 0 then protection is disabled (default), otherwise it
-  * is enabled.
-  *
-  * The protection used will slightly decrease performance, and add 
-  * 20 or more bytes per record packet.
-  *
-  **/
-void gnutls_record_set_cbc_protection(gnutls_session session, int prot)
-{
-	session->internals.cbc_protection_hack = prot;
 }
 
 /**
@@ -777,7 +755,7 @@ void gnutls_session_set_ptr(gnutls_session session, void* ptr)
 
 /**
   * gnutls_record_get_direction - This function will return the direction of the last interrupted function call
-  * @session: is a a &gnutls_session structure.
+  * @session: is a &gnutls_session structure.
   *
   * This function provides information about the internals of the record
   * protocol and is only useful if a prior gnutls function call (e.g.

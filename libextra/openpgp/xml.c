@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2002 Timo Schulz <twoaday@freakmail.de>
  * Portions Copyright 2003 Nikos Mavroyanopoulos <nmav@gnutls.org>
+ * Copyright 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -338,7 +339,7 @@ gnutls_openpgp_key_to_xml( gnutls_openpgp_key key,
                             gnutls_datum *xmlkey, int ext )
 {
     cdk_kbnode_t node, ctx = NULL;
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     char name[MAX_CN];
     size_t name_len;
     const char *s;

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -205,8 +206,8 @@ void gnutls_perror(int error)
   * @error: is an error returned by a gnutls function. Error is always a negative value.
   *
   * This function is similar to strerror(). Differences: it accepts an error
-  * number returned by a gnutls function; it might return NULL in the case of
-  * an unknown error number.
+  * number returned by a gnutls function; In case of an unknown error
+  * a descriptive string is sent instead of NULL.
   **/
 const char* gnutls_strerror(int error)
 {
@@ -215,7 +216,7 @@ const char* gnutls_strerror(int error)
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret =
 			      p->desc);
-
+	if (ret == NULL) return "(unknown error code)";
 	return ret;
 }
 

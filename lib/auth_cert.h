@@ -3,6 +3,31 @@
 # include "gnutls_cert.h"
 # include "gnutls_auth.h"
 # include "x509/x509.h"
+#include "../libextra/openpgp/openpgp.h"
+
+typedef struct retr_st {
+	gnutls_certificate_type type;
+	union cert {
+		gnutls_x509_crt* x509;
+		gnutls_openpgp_key pgp;
+	} cert;
+	uint ncerts;
+
+	union key {
+		gnutls_x509_privkey x509;
+		gnutls_openpgp_privkey pgp;
+	} key;
+	
+	uint deinit_all;
+} gnutls_retr_st;
+
+typedef int gnutls_certificate_client_retrieve_function(gnutls_session,
+	const gnutls_datum* req_ca_rdn, int nreqs,
+	const gnutls_pk_algorithm* pk_algos, int pk_algos_length,
+	gnutls_retr_st *);
+
+typedef int gnutls_certificate_server_retrieve_function(
+   struct gnutls_session_int*, gnutls_retr_st*);
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
@@ -59,6 +84,9 @@ typedef struct {
 			 * generating on every handshake.
 			 */
 	gnutls_datum	x509_rdn_sequence;
+
+	gnutls_certificate_client_retrieve_function*	client_get_cert_callback;
+	gnutls_certificate_server_retrieve_function*	server_get_cert_callback;
 } CERTIFICATE_CREDENTIALS_INT;
 
 /* typedef CERTIFICATE_CREDENTIALS_INT * CERTIFICATE_CREDENTIALS; */
@@ -89,8 +117,13 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session, opaque **);
 int _gnutls_proc_cert_cert_req(gnutls_session, opaque *, size_t);
 int _gnutls_proc_cert_client_cert_vrfy(gnutls_session, opaque *, size_t);
 int _gnutls_proc_cert_server_certificate(gnutls_session, opaque *, size_t);
-int _gnutls_find_apr_cert( gnutls_session session, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_privkey** apr_pkey);
-const gnutls_cert * _gnutls_server_find_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
+int _gnutls_get_selected_cert( gnutls_session session, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_privkey** apr_pkey);
+
+int _gnutls_server_select_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
+void _gnutls_selected_certs_deinit( gnutls_session session);
+void _gnutls_selected_certs_set( gnutls_session session,
+        gnutls_cert* certs, int ncerts, gnutls_privkey* key,
+        int need_free);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 

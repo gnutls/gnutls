@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -25,7 +26,10 @@
 #include "gnutls_cert.h"
 
 
-/* Cred type mappings to KX algorithms */
+/* Cred type mappings to KX algorithms 
+ * FIXME: The mappings are not 1-1. Some KX such as SRP_RSA require
+ * more than one credentials type.
+ */
 typedef struct {
 	gnutls_kx_algorithm algorithm;
 	gnutls_credentials_type client_type;
@@ -40,8 +44,8 @@ static const gnutls_cred_map cred_mappings[] = {
 	{ GNUTLS_KX_DHE_DSS, 	GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
 	{ GNUTLS_KX_DHE_RSA, 	GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
 	{ GNUTLS_KX_SRP,     	GNUTLS_CRD_SRP,		GNUTLS_CRD_SRP     },
-	{ GNUTLS_KX_SRP_RSA,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE     },
-	{ GNUTLS_KX_SRP_DSS,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE     },
+	{ GNUTLS_KX_SRP_RSA,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE },
+	{ GNUTLS_KX_SRP_DSS,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE },
 	{ 0, 0, 0}
 };
 
@@ -155,16 +159,15 @@ static const gnutls_cipher_entry algorithms[] = {
 struct gnutls_hash_entry {
 	const char *name;
 	gnutls_mac_algorithm id;
-	size_t digestsize;
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-	{"SHA", GNUTLS_MAC_SHA, 20},
-	{"MD5", GNUTLS_MAC_MD5, 16},
-	{"RIPEMD160", GNUTLS_MAC_RMD160, 20},
-	{"NULL", GNUTLS_MAC_NULL, 0},
-	{0, 0, 0}
+	{"SHA", GNUTLS_MAC_SHA},
+	{"MD5", GNUTLS_MAC_MD5},
+	{"RIPEMD160", GNUTLS_MAC_RMD160},
+	{"NULL", GNUTLS_MAC_NULL},
+	{0, 0}
 };
 
 #define GNUTLS_HASH_LOOP(b) \
@@ -219,16 +222,16 @@ const int _gnutls_kx_algorithms_size = MAX_KX_ALGOS;
 
 gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 #ifdef ENABLE_ANON
-	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
+	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0 },
 #endif
-	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
-	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct },
-	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
-	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
+	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0 },
+	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0, 1 },
+	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0 },
+	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0 },
 	/* other algorithms are appended here by gnutls-extra
 	 * initialization function.
 	 */
-	{0, 0, 0}
+	{0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_KX_LOOP(b) \
@@ -476,15 +479,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 
 
 /* Generic Functions */
-
-/* HASHES */
-int _gnutls_mac_get_digest_size(gnutls_mac_algorithm algorithm)
-{
-	size_t ret = 0;
-	GNUTLS_HASH_ALG_LOOP(ret = p->digestsize);
-	return ret;
-
-}
 
 inline int _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm algorithm)
 {				/* actually returns the priority */
@@ -775,6 +769,21 @@ int _gnutls_kx_is_ok(gnutls_kx_algorithm algorithm)
 		ret = 1;
 	return ret;
 }
+
+int _gnutls_kx_needs_rsa_params(gnutls_kx_algorithm algorithm)
+{
+	ssize_t ret = 0;
+	GNUTLS_KX_ALG_LOOP(ret = p->needs_rsa_params);
+	return ret;
+}
+
+int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm algorithm)
+{
+	ssize_t ret = 0;
+	GNUTLS_KX_ALG_LOOP(ret = p->needs_dh_params);
+	return ret;
+}
+
 
 /* Version */
 int _gnutls_version_priority(gnutls_session session,
@@ -1344,7 +1353,7 @@ gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm)
 	return ret;
 }
 
-/* Returns the encipher type for the the given key exchange algorithm.
+/* Returns the encipher type for the given key exchange algorithm.
  * That one of CIPHER_ENCRYPT, CIPHER_SIGN, CIPHER_IGN.
  *
  * ex. GNUTLS_KX_RSA requires a certificate able to encrypt... so returns CIPHER_ENCRYPT.

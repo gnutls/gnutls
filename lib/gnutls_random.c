@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -25,14 +26,6 @@
 #include <gnutls_int.h>
 #include <gnutls_random.h>
 #include <gnutls_errors.h>
-#ifndef USE_GCRYPT
-# ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-# endif
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <fcntl.h>
-#endif
 
 /* fills the buffer 'res' with random bytes of 'bytes' long.
  * level is WEAK, STRONG, or VERY_STRONG (libgcrypt)

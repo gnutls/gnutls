@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
+ * Copyright (C) 2004 Free Software Foundation
  *
  * GNUTLS-EXTRA is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,6 +20,7 @@
 #include <config.h>
 
 #include <gnutls/gnutls.h>
+#include <gnutls/compat8.h>
 #include <gcrypt.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -60,9 +61,6 @@ const MOD_AUTH_STRUCT rsa_auth_struct = {
 	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
-/* in auth_dhe.c */
-extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
-
 /* This function reads the RSA parameters from peer's certificate;
  */
 int _gnutls_get_public_rsa_params(gnutls_session session, 
@@ -82,32 +80,13 @@ int i;
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
-	switch( session->security_parameters.cert_type) {
-		case GNUTLS_CRT_X509:
-			if ((ret =
-			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-					     &info->raw_certificate_list[0], CERT_ONLY_PUBKEY|CERT_NO_COPY)) < 0) {
-				gnutls_assert();
-				return ret;
-			}
-			break;
-
-		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_INIT_LIBEXTRA;
-			}
-			if ((ret =
-			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
-					     &info->raw_certificate_list[0])) < 0) {
-				gnutls_assert();
-				return ret;
-			}
-			break;
-
-		default:
+	ret =
+	     _gnutls_raw_cert_to_gcert( &peer_cert, session->security_parameters.cert_type,
+			&info->raw_certificate_list[0], CERT_ONLY_PUBKEY|CERT_NO_COPY); 
+	
+	if (ret < 0) {
 			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
+			return ret;
 	}
 
 
@@ -116,7 +95,7 @@ int i;
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	_gnutls_mpi_get_nbits(peer_cert.params[0]) > 512) {
 
-		_gnutls_free_cert( &peer_cert);
+		_gnutls_gcert_deinit( &peer_cert);
 
 		if (session->key->rsa[0] == NULL ||
 			session->key->rsa[1] == NULL) {
@@ -147,7 +126,7 @@ int i;
 	for (i=0;i<*params_len;i++) {
 		params[i] = _gnutls_mpi_copy(peer_cert.params[i]);
 	}
-	_gnutls_free_cert( &peer_cert);
+	_gnutls_gcert_deinit( &peer_cert);
 
 	return 0;
 }
@@ -156,7 +135,7 @@ int i;
  */
 int _gnutls_get_private_rsa_params(gnutls_session session, GNUTLS_MPI **params, int* params_size)
 {
-int index;
+int bits;
 const gnutls_certificate_credentials cred;
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -165,14 +144,16 @@ const gnutls_certificate_credentials cred;
 	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if ( (index=session->internals.selected_cert_index) < 0) {
+	if (session->internals.selected_cert_list == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
+
+	bits = _gnutls_mpi_get_nbits(session->internals.selected_cert_list[0].params[0]);
 
 	if ( _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite)
 		 == GNUTLS_KX_RSA_EXPORT && 
-		 	_gnutls_mpi_get_nbits(cred->cert_list[index][0].params[0]) > 512) {
+		 	bits > 512) {
 
 		/* EXPORT case: */
 		if (cred->rsa_params == NULL) {
@@ -192,8 +173,8 @@ const gnutls_certificate_credentials cred;
 
 	/* non export cipher suites. */	
 	
-	*params_size = cred->pkey[index].params_size;
-	*params = cred->pkey[index].params;
+	*params_size = session->internals.selected_key->params_size;
+	*params = session->internals.selected_key->params;
 
 	return 0;
 }

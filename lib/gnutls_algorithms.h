@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -31,7 +31,6 @@ int _gnutls_version_get_minor( gnutls_protocol_version ver);
 gnutls_protocol_version _gnutls_version_get( int major, int minor);
 
 /* functions for macs */
-int   _gnutls_mac_get_digest_size(gnutls_mac_algorithm algorithm);
 const char* gnutls_mac_get_name(gnutls_mac_algorithm algorithm);
 int   _gnutls_mac_is_ok(gnutls_mac_algorithm algorithm);
 int   _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm algorithm);
@@ -60,6 +59,9 @@ const char *gnutls_cipher_get_name(gnutls_cipher_algorithm algorithm);
 
 /* functions for key exchange */
 int _gnutls_kx_priority(gnutls_session session, gnutls_kx_algorithm algorithm);
+int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm algorithm);
+int _gnutls_kx_needs_rsa_params(gnutls_kx_algorithm algorithm);
+
 
 MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm);
 const char *gnutls_kx_get_name(gnutls_kx_algorithm algorithm);
@@ -91,6 +93,8 @@ struct gnutls_kx_algo_entry {
 	const char *name;
 	gnutls_kx_algorithm algorithm;
 	MOD_AUTH_STRUCT *auth_struct;
+	int needs_dh_params;
+	int needs_rsa_params;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 

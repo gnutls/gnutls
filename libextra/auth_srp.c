@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -67,8 +68,67 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 #define V session->key->x
 #define S session->key->KEY
 
+/* Checks if b%n==0 which is a fatal srp error.
+ * Returns a proper error code in that case, and 0 when
+ * all are ok.
+ */
 inline
-static int check_a_mod_n( GNUTLS_MPI a, GNUTLS_MPI n);
+static int check_b_mod_n( GNUTLS_MPI b, GNUTLS_MPI n)
+{
+int ret;
+GNUTLS_MPI r = _gnutls_mpi_alloc_like(b);
+
+	if (r == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	_gnutls_mpi_mod( r, b, n);
+	ret = _gnutls_mpi_cmp_ui(r, 0);
+	
+	_gnutls_mpi_release( &r);
+
+	if (ret == 0) {
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
+	
+	return 0;
+}
+
+/* Checks if a%n==0,+1,-1%n which is a fatal srp error.
+ * Returns a proper error code in that case, and 0 when
+ * all are ok.
+ */
+inline
+static int check_a_mod_n( GNUTLS_MPI a, GNUTLS_MPI n)
+{
+int ret;
+GNUTLS_MPI r = _gnutls_mpi_alloc_like(a);
+
+	if (r == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	_gnutls_mpi_mod( r, a, n);
+	ret = _gnutls_mpi_cmp_ui(r, 0);
+	if (ret != 0) ret = _gnutls_mpi_cmp_ui(r, 1);
+	if (ret != 0) {
+		_gnutls_mpi_sub_ui( r, n, 1);
+		ret = _gnutls_mpi_cmp(a, r);
+	}
+	
+	_gnutls_mpi_release( &r);
+
+	if (ret == 0) {
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
+	
+	return 0;
+}
+
 
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
@@ -297,7 +357,10 @@ int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _da
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	
+
+	_gnutls_dump_mpi( "SRP A: ", A);
+	_gnutls_dump_mpi( "SRP B: ", B);
+
 	/* Checks if A % n == 0 or
 	 * A % n == +-1.
 	 */
@@ -305,9 +368,6 @@ int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _da
 		gnutls_assert();
 		return ret;
 	}
-
-	_gnutls_dump_mpi( "SRP A: ", A);
-	_gnutls_dump_mpi( "SRP B: ", B);
 
 	/* Start the SRP calculations.
 	 * - Calculate u 
@@ -348,65 +408,6 @@ int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _da
 }
 
 
-/* Checks if b%n==0 which is a fatal srp error.
- * Returns a proper error code in that case, and 0 when
- * all are ok.
- */
-static int check_b_mod_n( GNUTLS_MPI b, GNUTLS_MPI n)
-{
-int ret;
-GNUTLS_MPI r = _gnutls_mpi_alloc_like(b);
-
-	if (r == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	_gnutls_mpi_mod( r, b, n);
-	ret = _gnutls_mpi_cmp_ui(r, 0);
-	
-	_gnutls_mpi_release( &r);
-
-	if (ret == 0) {
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
-	
-	return 0;
-}
-
-/* Checks if a%n==0,+1,-1%n which is a fatal srp error.
- * Returns a proper error code in that case, and 0 when
- * all are ok.
- */
-inline
-static int check_a_mod_n( GNUTLS_MPI a, GNUTLS_MPI n)
-{
-int ret;
-GNUTLS_MPI r = _gnutls_mpi_alloc_like(a);
-
-	if (r == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	_gnutls_mpi_mod( r, a, n);
-	ret = _gnutls_mpi_cmp_ui(r, 0);
-	if (ret != 0) ret = _gnutls_mpi_cmp_ui(r, 1);
-	if (ret != 0) {
-		_gnutls_mpi_sub_ui( r, n, 1);
-		ret = _gnutls_mpi_cmp(a, r);
-	}
-	
-	_gnutls_mpi_release( &r);
-
-	if (ret == 0) {
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
-	
-	return 0;
-}
 
 /* Static parameters according to draft-ietf-tls-srp-05
  */

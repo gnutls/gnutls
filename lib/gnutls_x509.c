@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -220,7 +221,7 @@ static int parse_crt_mem( gnutls_cert** cert_list, uint* ncerts,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = _gnutls_x509_crt2gnutls_cert( 
+	ret = _gnutls_x509_crt_to_gcert( 
 		&cert_list[0][i-1], cert, 0);
 	if ( ret < 0) {
 		gnutls_assert();
@@ -357,7 +358,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, uint* ncerts, const
 			tmp2.data = pcert;
 			tmp2.size = pcert_size;
 
-			ret = _gnutls_x509_cert2gnutls_cert( 
+			ret = _gnutls_x509_raw_cert_to_gcert( 
 				&cert_list[0][i - 1], &tmp2, 0);
 
 			if ( ret < 0) {
@@ -385,10 +386,10 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, uint* ncerts, const
  * a gnutls_cert structure. Returns the number of certificate parsed.
  */
 static int parse_pem_cert_mem( gnutls_cert** cert_list, uint* ncerts, 
-	const opaque *input_cert, int input_cert_size)
+	const char *input_cert, int input_cert_size)
 {
 	int size, siz2, i;
-	const opaque *ptr;
+	const char *ptr;
 	opaque *ptr2;
 	gnutls_datum tmp;
 	int ret, count;
@@ -441,7 +442,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, uint* ncerts,
 		tmp.data = ptr2;
 		tmp.size = siz2;
 
-		ret = _gnutls_x509_cert2gnutls_cert( 
+		ret = _gnutls_x509_raw_cert_to_gcert( 
 			&cert_list[0][i - 1], &tmp, 0);
 		if ( ret < 0) {
 			gnutls_assert();
@@ -519,7 +520,7 @@ int read_cert_mem(gnutls_certificate_credentials res, const void *cert, int cert
 }
 
 
-static int privkey_cpy( gnutls_privkey* dest, gnutls_x509_privkey src)
+int _gnutls_x509_privkey_to_gkey( gnutls_privkey* dest, gnutls_x509_privkey src)
 {
 int i, ret;
 
@@ -547,15 +548,46 @@ int i, ret;
 	return ret;
 }
 
-void _gnutls_privkey_deinit(gnutls_privkey *key)
+void _gnutls_gkey_deinit(gnutls_privkey *key)
 {
 int i;
+	if (key == NULL) return;
 
 	for (i = 0; i < key->params_size; i++) {
 		_gnutls_mpi_release( &key->params[i]);
 	}
 }
 
+int _gnutls_x509_raw_privkey_to_gkey( gnutls_privkey* privkey, const gnutls_datum* raw_key,
+	gnutls_x509_crt_fmt type)
+{
+gnutls_x509_privkey tmpkey;
+int ret;
+
+	ret = gnutls_x509_privkey_init( &tmpkey);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = gnutls_x509_privkey_import( tmpkey, raw_key, type);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_privkey_deinit( tmpkey);
+		return ret;
+	}
+
+	ret = _gnutls_x509_privkey_to_gkey( privkey, tmpkey);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_privkey_deinit( tmpkey);
+		return ret;
+	}
+
+	gnutls_x509_privkey_deinit( tmpkey);
+	
+	return 0;
+}
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
@@ -566,7 +598,6 @@ static int read_key_mem(gnutls_certificate_credentials res, const void *key, int
 {
 	int ret;
 	gnutls_datum tmp;
-	gnutls_x509_privkey tmpkey;
 
 	/* allocate space for the pkey list
 	 */
@@ -576,32 +607,14 @@ static int read_key_mem(gnutls_certificate_credentials res, const void *key, int
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = gnutls_x509_privkey_init( &tmpkey); //res->pkey[res->ncerts]);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
 	tmp.data = (opaque*)key;
 	tmp.size = key_size;
 
-	ret = gnutls_x509_privkey_import( tmpkey, &tmp, type);
+	ret = _gnutls_x509_raw_privkey_to_gkey( &res->pkey[res->ncerts], &tmp, type);
 	if (ret < 0) {
 		gnutls_assert();
-		gnutls_x509_privkey_deinit( tmpkey);
-
 		return ret;
 	}
-
-	ret = privkey_cpy( &res->pkey[res->ncerts], tmpkey);
-	if (ret < 0) {
-		gnutls_assert();
-		gnutls_x509_privkey_deinit( tmpkey);
-
-		return ret;
-	}
-
-	gnutls_x509_privkey_deinit( tmpkey);
 
 	return 0;
 }
@@ -827,7 +840,7 @@ int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = privkey_cpy( &res->pkey[res->ncerts], key);
+	ret = _gnutls_x509_privkey_to_gkey( &res->pkey[res->ncerts], key);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

@@ -1,23 +1,23 @@
 /*
- *  Copyright (C) 2002 Timo Schulz
- *  Portions Copyright (C) 2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2002 Timo Schulz
+ * Portions Copyright (C) 2003 Nikos Mavroyanopoulos
+ * Copyright 2004 Free Software Foundation
  *
- *  This file is part of GNUTLS-EXTRA.
+ * This file is part of GNUTLS.
  *
- *  The GNUTLS library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public   
- *  License as published by the Free Software Foundation; either 
- *  version 2.1 of the License, or (at your option) any later version.
+ * GNUTLS-EXTRA is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * GNUTLS-EXTRA is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
- *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
 /* Functions on OpenPGP key parsing
@@ -207,7 +207,7 @@ int
 gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key key, 
                             void *fpr, size_t *fprlen )
 {
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     cdk_pkt_pubkey_t pk = NULL;
 
     if( !fpr || !fprlen ) {
@@ -235,7 +235,7 @@ int
 _gnutls_openpgp_count_key_names( gnutls_openpgp_key key)
 {
     cdk_kbnode_t p, ctx = NULL;
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     int nuids = 0;
 
     if( key == NULL ) {
@@ -271,7 +271,7 @@ gnutls_openpgp_key_get_name( gnutls_openpgp_key key,
         char *buf, size_t *sizeof_buf)
 {
     cdk_kbnode_t ctx = NULL, p;
-    CDK_PACKET *pkt = NULL;
+    cdk_packet_t pkt = NULL;
     cdk_pkt_userid_t uid = NULL;
     int pos = 0;
     size_t size = 0;
@@ -344,7 +344,7 @@ leave:
 int
 gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, unsigned int *bits)
 {
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     int algo = 0;
   
     if( !key )
@@ -376,7 +376,7 @@ gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, unsigned int *bits)
 int
 gnutls_openpgp_key_get_version( gnutls_openpgp_key key)
 {
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     int version = 0;
 
     if( !key)
@@ -399,7 +399,7 @@ gnutls_openpgp_key_get_version( gnutls_openpgp_key key)
 time_t
 gnutls_openpgp_key_get_creation_time( gnutls_openpgp_key key)
 {
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     time_t timestamp = 0;
 
     if( !key)
@@ -423,7 +423,7 @@ gnutls_openpgp_key_get_creation_time( gnutls_openpgp_key key)
 time_t
 gnutls_openpgp_key_get_expiration_time( gnutls_openpgp_key key)
 {
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     time_t expiredate = 0;
 
     if( !key)
@@ -447,7 +447,7 @@ int
 gnutls_openpgp_key_get_id( gnutls_openpgp_key key,
                                unsigned char keyid[8])
 {
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     cdk_pkt_pubkey_t pk = NULL;
     unsigned long kid[2];
   
@@ -505,13 +505,50 @@ int gnutls_openpgp_key_check_hostname(gnutls_openpgp_key key,
                                         dnsname, &dnsnamesize);
 
       if (_gnutls_hostname_compare(dnsname, hostname)) {
-         return 1;
+         return GNUTLS_E_NAME_DOES_NOT_MATCH;
       }
    }
 
    /* not found a matching name
     */
    return 0;
+}
+
+/**
+  * gnutls_openpgp_key_get_key_usage - This function returns the key's usage
+  * @key: should contain a gnutls_openpgp_key structure
+  * @key_usage: where the key usage bits will be stored
+  *
+  * This function will return certificate's key usage, by checking the
+  * key algorithm. The key usage value will ORed values of the:
+  * GNUTLS_KEY_DIGITAL_SIGNATURE, GNUTLS_KEY_KEY_ENCIPHERMENT.
+  *
+  * A negative value may be returned in case of parsing error.
+  *
+  **/
+int gnutls_openpgp_key_get_key_usage(gnutls_openpgp_key key, unsigned int *key_usage)
+{
+cdk_packet_t pkt;
+int algo = 0;
+  
+	if( !key )
+		return GNUTLS_E_INVALID_REQUEST;
+
+	*key_usage = 0;
+
+	pkt = cdk_kbnode_find_packet( key->knode, CDK_PKT_PUBLIC_KEY);
+	if( pkt && pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
+	        algo = pkt->pkt.public_key->pubkey_algo;
+
+		if( is_DSA(algo) || algo == GCRY_PK_RSA_S )
+			*key_usage |= KEY_DIGITAL_SIGNATURE;
+		else if( algo == GCRY_PK_RSA_E )
+			*key_usage |= KEY_KEY_ENCIPHERMENT;
+		else if( algo == GCRY_PK_RSA )
+			*key_usage |= KEY_DIGITAL_SIGNATURE | KEY_KEY_ENCIPHERMENT;
+	}
+
+	return 0;
 }
 
 #endif

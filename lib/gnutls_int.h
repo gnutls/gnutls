@@ -226,6 +226,7 @@ typedef void (*LOG_FUNC)( int, const char*);
 typedef ssize_t (*gnutls_pull_func)(gnutls_transport_ptr, void*, size_t);
 typedef ssize_t (*gnutls_push_func)(gnutls_transport_ptr, const void*, size_t);
 
+
 /* Store & Retrieve functions defines: 
  */
 typedef int (*gnutls_db_store_func)(void*, gnutls_datum key, gnutls_datum data);
@@ -302,7 +303,9 @@ typedef struct {
 /* Versions should be in order of the oldest
  * (eg. SSL3 is before TLS1)
  */
-typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1, GNUTLS_VERSION_UNKNOWN=0xff } 
+#define GNUTLS_TLS1 GNUTLS_TLS1_0
+typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1_0, 
+	GNUTLS_TLS1_1, GNUTLS_VERSION_UNKNOWN=0xff } 
 gnutls_protocol_version;
 
 /* This structure holds parameters got from TLS extension
@@ -578,11 +581,15 @@ typedef struct {
 	 */
 	uint16			proposed_record_size;
 	
-	/* holds the index of the selected certificate.
-	 * -1 if none.
+	/* holds the selected certificate and key.
+	 * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
+	 * to change them.
 	 */
-	int			selected_cert_index; 
-	
+	gnutls_cert*		selected_cert_list;
+	int			selected_cert_list_length;
+	gnutls_privkey*		selected_key;
+	int			selected_need_free;
+
 	/* holds the extensions we sent to the peer
 	 * (in case of a client)
 	 */
@@ -651,8 +658,9 @@ struct gnutls_session_int {
 typedef struct gnutls_session_int *gnutls_session;
 
 typedef struct {
-	GNUTLS_MPI _prime;
-        GNUTLS_MPI _generator;
+	/* [0] is the prime, [1] is the generator.
+	 */
+	GNUTLS_MPI params[2];
 } _gnutls_dh_params;
 
 #define gnutls_dh_params _gnutls_dh_params*

@@ -10,46 +10,7 @@ The available authentication methods in \gnutls{} are:
  \item SRP authentication
 \end{enumerate}
 
-% x.509 section
-\input{x509}
-
-\begin{figure}[hbtp]
-\index{Key exchange algorithms}
-\begin{tabular}{|l|p{9cm}|}
-\hline
-RSA & The RSA algorithm is used to encrypt a key and send it to the peer.
-The certificate must allow the key to be used for encryption.
-\\
-\hline
-RSA\_EXPORT & The RSA algorithm is used to encrypt a key and send it to the peer.
-In the EXPORT algorithm, the server signs temporary RSA parameters of 512
-bits -- which are considered weak -- and sends them to the client.
-\\
-\hline
-DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are sent to the peer. The key in the certificate must allow
-the key to be used for signing. Note that key exchange algorithms which use
-Ephemeral Diffie Hellman parameters, offer perfect forward secrecy.
-\\
-\hline
-DHE\_DSS & The DSS algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are sent to the peer. DSS stands for Digital Signature
-Standard.
-\\
-\hline
-\end{tabular}
-
-\caption{Key exchange algorithms for OpenPGP and X.509 certificates.}
-\label{fig:cert}
-
-\end{figure}
-
-
-% openpgp section
-
-\input{openpgp}
-
-
+\input{cert_auth}
 
 \section{Anonymous authentication\index{Anonymous authentication}}
 The anonymous key exchange perform encryption but there is no indication of 
@@ -59,6 +20,10 @@ but this protocol can be used even if there is no prior communication and
 trusted parties with the peer, or when full anonymity is required.
 Unless really required, do not use anonymous authentication.
 Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:anon}.
+\par
+Note that the key exchange methods for anonymous authentication
+require Diffie Hellman parameters to be generated and associated with an
+anonymous credentials structure. 
 
 \begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
@@ -75,3 +40,49 @@ ANON\_DH & This algorithm exchanges Diffie Hellman parameters.
 \end{figure}
 
 \input{srp}
+
+\section{Authentication and credentials}
+In \gnutls{} every key exchange method is associated with a
+credentials type. So in order to enable to enable a specific
+method, the corresponding credentials type should be initialized
+and set using \printfunc{gnutls_credentials_set}{gnutls\_credentials\_set}.
+A mapping is shown in \hyperref{figure}{figure }{}{fig:kxcred}.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|l|p{4.5cm}|}
+
+\hline
+\bf{Key exchange} & \bf{Client credentials} & \bf{Server credentials}
+\\
+\hline
+\hline
+KX\_RSA &&
+\\
+\cline{1-1}
+KX\_DHE\_RSA & CRD\_CERTIFICATE & CRD\_CERTIFICATE
+\\
+\cline{1-1}
+KX\_DHE\_DSS &&
+\\
+\cline{1-1}
+KX\_RSA\_EXPORT &&
+\\
+\hline
+KX\_SRP\_RSA & CRD\_SRP & CRD\_SRP
+\\
+\cline{1-1}
+KX\_SRP\_DSS && CRD\_CERTIFICATE
+\\
+\hline
+KX\_SRP & CRD\_SRP & CRD\_SRP
+\\
+\hline
+KX\_ANON\_DH & CRD\_ANON & CRD\_ANON
+\\
+\hline
+\end{tabular}
+
+\caption{Key exchange algorithms and the corresponding credential types}
+\label{fig:kxcred}
+
+\end{figure}

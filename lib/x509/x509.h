@@ -64,6 +64,11 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 	unsigned int seq, void *ret, size_t *ret_size, unsigned int* critical);
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, unsigned int raw_flag, void *buf, size_t *sizeof_buf);
+int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
+					 size_t *sizeof_buf);
+int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
+					 size_t *sizeof_buf);
+
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
 
@@ -136,5 +141,8 @@ int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 #define GNUTLS_CRL_REASON_CERTIFICATE_HOLD 2
 #define GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN 1
 #define GNUTLS_CRL_REASON_AA_COMPROMISE 32768
+
+time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert);
+time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);
 
 #endif

@@ -5,7 +5,7 @@ To use \gnutls{}, you have to perform some changes to your sources and
 your build system. The necessary changes are explained in the following
 subsections.
 
-\subsection{Headers}
+\subsection*{Headers}
 
 All the data types and functions of the \gnutls{} library are defined in
 the header file `gnutls/gnutls.h'. This must be included in all programs that
@@ -14,7 +14,7 @@ make use of the \gnutls{} library.
 The extra functionality of the \gnutlse{} library is available by
 including the header file `gnutls/extra.h' in your programs.
 
-\subsection{Version check}
+\subsection*{Version check}
 It is often desirable to check that the version of `gnutls' used is indeed
 one which fits all requirements.  Even with binary compatibility new
 features may have been introduced but due to problem with the dynamic
@@ -23,7 +23,7 @@ the version is okay right after program startup.
 See the function \printfunc{gnutls_check_version}{gnutls\_check\_version}
 
 
-\subsection{Building the source}
+\subsection*{Building the source}
 
 If you want to compile a source file including the `gnutls/gnutls.h' header
 file, you must make sure that the compiler can find it in the

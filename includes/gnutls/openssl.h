@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 #include <gnutls/gnutls.h>
+#include <gnutls/compat8.h>
 #include <gcrypt.h>
 
 #define OPENSSL_VERSION_NUMBER (0x0090604F)

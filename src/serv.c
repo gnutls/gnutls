@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -137,6 +138,7 @@ static const char *safe_strerror(int value)
 
 static void listener_free(listener_item * j)
 {
+
    if (j->http_request)
       free(j->http_request);
    if (j->http_response)
@@ -665,7 +667,7 @@ int main(int argc, char **argv)
 
    if (generate != 0 || read_dh_params != NULL) {
       gnutls_certificate_set_dh_params(cert_cred, dh_params);
-      gnutls_certificate_set_rsa_params(cert_cred, rsa_params);
+      gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
    }
 
    /* this is a password file (created with the included srpcrypt utility) 
@@ -1128,8 +1130,8 @@ static int wrap_db_delete(void *dbf, gnutls_datum key)
 
 void print_serv_license(void)
 {
-	fprintf(stdout,
-		"\nCopyright (C) 2001-2003 Paul Sheer, Nikos Mavroyanopoulos\n"
+	fputs(	"\nCopyright (C) 2001-2003 Paul Sheer, Nikos Mavroyanopoulos\n"
+		"\nCopyright (C) 2004 Free Software Foundation\n"
 		"This program is free software; you can redistribute it and/or modify \n"
 		"it under the terms of the GNU General Public License as published by \n"
 		"the Free Software Foundation; either version 2 of the License, or \n"
@@ -1140,7 +1142,7 @@ void print_serv_license(void)
 		"GNU General Public License for more details. \n" "\n"
 		"You should have received a copy of the GNU General Public License \n"
 		"along with this program; if not, write to the Free Software \n"
-		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
+		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n", stdout);
 }
 
 #ifdef HAVE_LIBOPENCDK

@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -491,13 +492,14 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
 	}
 
 	/* decrypt signature */
-	if ( (ret=_gnutls_pk_verify( GCRY_PK_DSA, mdata, rs, params, 
-		params_len)) < 0) {
-	    _gnutls_mpi_release(&mdata);
-	     gnutls_assert();
-	     return ret;
-	}
+	ret=_gnutls_pk_verify( GCRY_PK_DSA, mdata, rs, params, 
+		params_len);
 	_gnutls_mpi_release(&mdata);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0; /* ok */
 }

@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -144,7 +145,10 @@ int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 		if (gtxt.size > data_size) {
 			gnutls_assert();
 			_gnutls_free_datum( &gtxt);
-			return GNUTLS_E_MEMORY_ERROR;
+			/* This shouldn't have happen and
+			 * is a TLS fatal error.
+			 */
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		
 		memcpy( data, gtxt.data, gtxt.size);
@@ -157,7 +161,8 @@ int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 }
 
 inline
-static GNUTLS_MAC_HANDLE mac_init( gnutls_mac_algorithm mac, opaque* secret, int secret_size, int ver) 
+static GNUTLS_MAC_HANDLE 
+mac_init( gnutls_mac_algorithm mac, opaque* secret, int secret_size, int ver) 
 {
 GNUTLS_MAC_HANDLE td;
 
@@ -165,7 +170,7 @@ GNUTLS_MAC_HANDLE td;
 		td =
 		    _gnutls_mac_init_ssl3( mac, secret,
 		    		secret_size);
-	} else { /* TLS 1 */
+	} else { /* TLS 1.x */
 		td =
 		    _gnutls_hmac_init( mac, secret, secret_size);
 	}
@@ -223,7 +228,6 @@ int length;
 		*pad = (uint8) (blocksize - (length % blocksize)) + rand;
 
 		length += *pad;
-
 		break;
 	default:
 		gnutls_assert();
@@ -250,12 +254,13 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 	GNUTLS_MAC_HANDLE td;
 	uint8 type = _type;
 	uint8 major, minor;
-	int hash_size = _gnutls_mac_get_digest_size(session->security_parameters.write_mac_algorithm);
+	int hash_size = _gnutls_hash_get_algo_len(session->security_parameters.write_mac_algorithm);
 	gnutls_protocol_version ver;
 	int blocksize =
 	    _gnutls_cipher_get_block_size(session->security_parameters.
 					  write_bulk_cipher_algorithm);
 	CipherType block_algo = _gnutls_cipher_is_block(session->security_parameters.write_bulk_cipher_algorithm);
+	opaque* data_ptr;
 
 
 	ver = gnutls_protocol_get_version( session);
@@ -280,7 +285,7 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 		_gnutls_hmac(td, UINT64DATA(session->connection_state.write_sequence_number), 8);
 		
 		_gnutls_hmac(td, &type, 1);
-		if ( ver != GNUTLS_SSL3) { /* TLS 1.0 only */
+		if ( ver >= GNUTLS_TLS1) { /* TLS 1.0 or higher */
 			_gnutls_hmac(td, &major, 1);
 			_gnutls_hmac(td, &minor, 1);
 		}
@@ -306,18 +311,27 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	memcpy(cipher_data, compressed.data, compressed.size);
-	if (hash_size > 0)
-		memcpy(&cipher_data[compressed.size], MAC, hash_size);
-	if (block_algo==CIPHER_BLOCK && pad > 0)
-		memset(&cipher_data[ length - pad], pad - 1, pad);
+	data_ptr = cipher_data;
+
+	memcpy(data_ptr, compressed.data, compressed.size);
+	data_ptr += compressed.size;
+
+	if (hash_size > 0) {
+		memcpy(data_ptr, MAC, hash_size);
+		data_ptr += hash_size;
+	}
+	if (block_algo==CIPHER_BLOCK && pad > 0) {
+		memset(data_ptr, pad - 1, pad);
+	}
 
 
 	/* Actual encryption (inplace).
 	 */
-	if ( (ret = _gnutls_cipher_encrypt(session->connection_state.
+	ret = _gnutls_cipher_encrypt(session->connection_state.
 			      write_cipher_state, cipher_data, 
-			      length)) < 0) {
+			      length);
+	if (ret < 0) {
+		gnutls_assert();
 		return ret;
 	}
 
@@ -340,7 +354,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 	int ret, i, pad_failed = 0;
 	uint8 major, minor;
 	gnutls_protocol_version ver;
-	int hash_size = _gnutls_mac_get_digest_size(session->security_parameters.read_mac_algorithm);
+	int hash_size = _gnutls_hash_get_algo_len(session->security_parameters.read_mac_algorithm);
 
 	ver = gnutls_protocol_get_version( session);
 	minor = _gnutls_version_get_minor(ver);
@@ -395,9 +409,8 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 
 		length =
 		    ciphertext.size - hash_size - pad;
-
-		if (pad >
-		    ciphertext.size - hash_size) {
+		    
+		if (pad > ciphertext.size - hash_size) {
 			gnutls_assert();
 			/* We do not fail here. We check below for the
 			 * the pad_failed. If zero means success.
@@ -405,14 +418,12 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 			pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 		}
 		
-		/* Check the pading bytes (TLS 1.0 only)
+		/* Check the pading bytes (TLS 1.x)
 		 */
-		if ( ver == GNUTLS_TLS1)
+		if ( ver >= GNUTLS_TLS1)
 		for (i=2;i<pad;i++) {
 			if (ciphertext.data[ciphertext.size-i] != ciphertext.data[ciphertext.size - 1]) 
-			{
 				pad_failed = GNUTLS_E_DECRYPTION_FAILED;
-			}
 		}
 		
 		break;
@@ -431,7 +442,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		_gnutls_hmac(td, UINT64DATA(session->connection_state.read_sequence_number), 8);
 		
 		_gnutls_hmac(td, &type, 1);
-		if ( ver != GNUTLS_SSL3) { /* TLS 1.0 only */
+		if ( ver >= GNUTLS_TLS1) { /* TLS 1.x */
 			_gnutls_hmac(td, &major, 1);
 			_gnutls_hmac(td, &minor, 1);
 		}

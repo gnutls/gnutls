@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -128,7 +129,8 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
       if (session->security_parameters.extensions.server_names_size == 0)
 	   return 0;
 
-      /* uint16 */
+      /* uint16 
+       */
       total_size = 2;
       for (i = 0;
 	   i < session->security_parameters.extensions.server_names_size;
@@ -203,8 +205,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   * gnutls_server_name_type.
   *
   * If @type is GNUTLS_NAME_DNS, then this function is to be used by servers
-  * that support virtual hosting, and the data will be null terminated.
-  * The client may give the server the dnsname they connected to.
+  * that support virtual hosting, and the data will be a null terminated UTF-8 string.
   *
   * If @data has not enough size to hold the server name GNUTLS_E_SHORT_MEMORY_BUFFER
   * is returned, and @data_length will hold the required size.
@@ -265,12 +266,13 @@ int gnutls_server_name_get(gnutls_session session, void *data,
   * @name_length: holds the length of name
   *
   * This function is to be used by clients that want to inform 
-  * ( via a TLS extension mechanism) the server of the name they
+  * (via a TLS extension mechanism) the server of the name they
   * connected to. This should be used by clients that connect
   * to servers that do virtual hosting.
   *
   * The value of @name depends on the @ind type. In case of GNUTLS_NAME_DNS,
-  * a null terminated string is expected. 
+  * an ASCII or UTF-8 null terminated string, without the trailing dot, is expected. 
+  * IPv4 or IPv6 addresses are not permitted.
   *
   **/
 int gnutls_server_name_set(gnutls_session session,

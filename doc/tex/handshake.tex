@@ -34,7 +34,7 @@ handshake.
 
 \input{ciphersuites}
 
-\subsection{Client authentication}
+\subsection*{Client authentication}
 In the case of ciphersuites that use certificate authentication, the
 authentication\index{Certificate authentication!Client} of the client is
 optional in \tls{}. A server may request a certificate from the client -- using the
@@ -46,7 +46,7 @@ by one of the server's acceptable signers. In \gnutls{} the server's acceptable
 signers list is constructed using the trusted CA certificates in the
 credentials structure.
 
-\subsection{Resuming Sessions\index{Resuming sessions}}
+\subsection*{Resuming Sessions\index{Resuming sessions}}
 \label{resume}
 \par
 The 
@@ -64,7 +64,7 @@ it may be normal for a server not to resume a session even if you requested that
 Also note that you must enable, using the priority functions, at least the
 algorithms used in the last session.
 
-\subsection{Resuming internals}
+\subsection*{Resuming internals}
 The resuming capability, mostly in the server side, is one of the problems of a thread-safe TLS
 implementations. The problem is that all threads must share information in
 order to be able to resume sessions. The gnutls approach is, in case of a

@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -122,7 +123,6 @@ typedef enum gnutls_handshake_description { GNUTLS_HANDSHAKE_HELLO_REQUEST,
 /* Note that the status bits have different meanings
  * in openpgp keys and x.509 certificate verification.
  */
-#define GNUTLS_CERT_NOT_TRUSTED GNUTLS_CERT_INVALID
 typedef enum gnutls_certificate_status { 
 	GNUTLS_CERT_INVALID=2, /* will be set if the certificate
 				* was not verified.
@@ -147,7 +147,8 @@ typedef enum gnutls_openpgp_key_status { GNUTLS_OPENPGP_KEY,
 typedef enum gnutls_close_request { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } gnutls_close_request;
 
 #define GNUTLS_TLS1 GNUTLS_TLS1_0
-typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1_0 } gnutls_protocol_version;
+typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1_0,
+	} gnutls_protocol_version;
 
 typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
 } gnutls_certificate_type;
@@ -233,8 +234,6 @@ const char* gnutls_strerror( int error);
 void gnutls_handshake_set_private_extensions(gnutls_session session, int allow);
 gnutls_handshake_description gnutls_handshake_get_last_out( gnutls_session session);
 gnutls_handshake_description gnutls_handshake_get_last_in( gnutls_session session);
-
-void gnutls_record_set_cbc_protection(gnutls_session session, int prot);
 
 /* Record layer functions.
  */
@@ -354,6 +353,7 @@ int gnutls_certificate_allocate_credentials( gnutls_certificate_credentials *sc)
 
 void gnutls_certificate_free_keys(gnutls_certificate_credentials sc);
 void gnutls_certificate_free_cas(gnutls_certificate_credentials sc);
+void gnutls_certificate_free_ca_names(gnutls_certificate_credentials sc);
 void gnutls_certificate_free_crls(gnutls_certificate_credentials sc);
 
 void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params);

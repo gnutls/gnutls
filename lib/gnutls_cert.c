@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -59,7 +60,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 
 	for (i = 0; i < sc->ncerts; i++) {
 		for (j = 0; j < sc->cert_list_length[i]; j++) {
-			_gnutls_free_cert( &sc->cert_list[i][j]);
+			_gnutls_gcert_deinit( &sc->cert_list[i][j]);
 		}
 		gnutls_free( sc->cert_list[i]);
 	}
@@ -71,7 +72,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 	sc->cert_list = NULL;
 
 	for (i = 0; i < sc->ncerts; i++) {
-		_gnutls_privkey_deinit( &sc->pkey[i]);
+		_gnutls_gkey_deinit( &sc->pkey[i]);
 	}
 
 	gnutls_free( sc->pkey);
@@ -86,7 +87,9 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
   * @sc: is an &gnutls_certificate_credentials structure.
   *
   * This function will delete all the CAs associated
-  * with the given credentials.
+  * with the given credentials. Servers that do not use
+  * gnutls_certificate_verify_peers() may call this to
+  * save some memory.
   *
   **/
 void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
@@ -102,8 +105,23 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
 	gnutls_free( sc->x509_ca_list);
 	sc->x509_ca_list = NULL;
 
-	_gnutls_free_datum( &sc->x509_rdn_sequence);
+}
 
+/**
+  * gnutls_certificate_free_ca_names - Used to free all the CA names from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the CA name in the
+  * given credentials. Clients may call this to save some memory
+  * since in client side the CA names are not used.
+  *
+  * CA names are used by servers to advertize the CAs they
+  * support to clients.
+  *
+  **/
+void gnutls_certificate_free_ca_names(gnutls_certificate_credentials sc)
+{
+	_gnutls_free_datum( &sc->x509_rdn_sequence);
 }
 
 /**
@@ -157,15 +175,25 @@ int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res
  * This function also uses the KeyUsage field of the certificate
  * extensions in order to disable unneded algorithms.
  */
-int _gnutls_cert_supported_kx(const gnutls_cert* cert, gnutls_kx_algorithm ** alg,
+int _gnutls_selected_cert_supported_kx( gnutls_session session, gnutls_kx_algorithm ** alg,
 			      int *alg_size)
 {
 	gnutls_kx_algorithm kx;
-	int i;
 	gnutls_pk_algorithm pk;
 	gnutls_kx_algorithm kxlist[MAX_ALGOS];
+	gnutls_cert * cert;
+	int i;
+	
+	if (session->internals.selected_cert_list_length == 0) {
+		gnutls_assert();
+		*alg_size = 0;
+		*alg = NULL;
+		return 0;
+	}
 
+	cert = &session->internals.selected_cert_list[0];
 	i = 0;
+
 	for (kx = 0; kx < MAX_ALGOS; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
@@ -228,7 +256,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * the raw certificates (DER for X.509 or binary for OpenPGP), of the
   * client.
   *
-  * @req_ca_cert, is only used in X.509 certificates. 
+  * @req_ca_dn, is only used in X.509 certificates. 
   * Contains a list with the CA names that the server considers trusted. 
   * Normally we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
@@ -236,7 +264,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   *
   * This function specifies what we, in case of a client, are going
   * to do when we have to send a certificate. If this callback
-  * function is not provided then gnutls will automaticaly try to
+  * function is not provided then gnutls will automatically try to
   * find an appropriate certificate to send. The appropriate certificate
   * is chosen based on the CAs sent by the server, and the requested
   * public key algorithms.
@@ -271,7 +299,7 @@ void gnutls_certificate_client_set_select_function(gnutls_session session,
   *
   * This function specifies what we, in case of a server, are going
   * to do when we have to send a certificate. If this callback
-  * function is not provided then gnutls will automaticaly try to
+  * function is not provided then gnutls will automatically try to
   * find an appropriate certificate to send. (actually send the first in the list)
   *
   * In case the callback returned a negative number then gnutls will
@@ -290,11 +318,73 @@ void gnutls_certificate_server_set_select_function(gnutls_session session,
 	session->internals.server_cert_callback = func;
 }
 
+/**
+  * gnutls_certificate_client_set_retrieve_function - Used to set a callback to retrieve the certificate
+  * @cred: is a &gnutls_certificate_credentials structure.
+  * @func: is the callback function
+  *
+  * This function sets a callback to be called in order to retrieve the certificate
+  * to be used in the handshake.
+  * The callback's function prototype is:
+  * int (*callback)(gnutls_session, const gnutls_datum* req_ca_dn, int nreqs, 
+  * gnutls_pk_algorithm* pk_algos, int pk_algos_length, gnutls_retr_st st);
+  *
+  * @st should contain the certificates and private keys.
+  *
+  * @req_ca_cert, is only used in X.509 certificates. 
+  * Contains a list with the CA names that the server considers trusted. 
+  * Normally we should send a certificate that is signed
+  * by one of these CAs. These names are DER encoded. To get a more
+  * meaningful value use the function gnutls_x509_rdn_get().
+  *
+  * @pk_algos, contains a list with server's acceptable signature algorithms.
+  * The certificate returned should support the server's given algorithms.
+  *
+  * If the callback function is provided then gnutls will call it, in the
+  * handshake, after the certificate request message has been received.
+  *
+  * The callback function should set the certificate list to be sent, and
+  * return 0 on success.  The value (-1) indicates error and the handshake
+  * will be terminated.
+  **/
+void gnutls_certificate_client_set_retrieve_function(gnutls_certificate_credentials cred,
+			gnutls_certificate_client_retrieve_function * func)
+{
+	cred->client_get_cert_callback = func;
+}
+
+/**
+  * gnutls_certificate_server_set_retrieve_function - Used to set a callback to retrieve the certificate
+  * @cred: is a &gnutls_certificate_credentials structure.
+  * @func: is the callback function
+  *
+  * This function sets a callback to be called in order to retrieve the certificate
+  * to be used in the handshake.
+  * The callback's function prototype is:
+  * int (*callback)(gnutls_session, const gnutls_datum* req_ca_dn, int nreqs, 
+  * gnutls_pk_algorithm* pk_algos, int pk_algos_length, gnutls_retr_st st);
+  *
+  * @st should contain the certificates and private keys.
+  *
+  * If the callback function is provided then gnutls will call it, in the
+  * handshake, after the certificate request message has been received.
+  *
+  * The callback function should set the certificate list to be sent, and
+  * return 0 on success.  The value (-1) indicates error and the handshake
+  * will be terminated.
+  **/
+void gnutls_certificate_server_set_retrieve_function(gnutls_certificate_credentials cred,
+			gnutls_certificate_server_retrieve_function * func)
+{
+	cred->server_get_cert_callback = func;
+}
+
+
 /* These are set by the gnutls_extra library's initialization function.
  */
 
-OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_extract_key_creation_time = NULL;
-OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_extract_key_expiration_time = NULL;
+OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_creation_time = NULL;
+OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_expiration_time = NULL;
 OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
 
 /*-
@@ -420,12 +510,12 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
 
 	switch( gnutls_certificate_type_get( session)) {
 		case GNUTLS_CRT_X509:
-			return gnutls_x509_extract_certificate_expiration_time(
+			return _gnutls_x509_get_raw_crt_expiration_time(
 				&info->raw_certificate_list[0]);
 		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_extract_key_expiration_time==NULL)
+			if (_E_gnutls_openpgp_get_raw_key_expiration_time==NULL)
 				return (time_t)-1;
-			return _E_gnutls_openpgp_extract_key_expiration_time(
+			return _E_gnutls_openpgp_get_raw_key_expiration_time(
 				&info->raw_certificate_list[0]);
 		default:
 			return (time_t)-1;
@@ -460,15 +550,59 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 
 	switch( gnutls_certificate_type_get( session)) {
 		case GNUTLS_CRT_X509:
-			return gnutls_x509_extract_certificate_activation_time(
+			return _gnutls_x509_get_raw_crt_activation_time(
 				&info->raw_certificate_list[0]);
 		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_extract_key_creation_time==NULL)
+			if (_E_gnutls_openpgp_get_raw_key_creation_time==NULL)
 				return (time_t)-1;
-			return _E_gnutls_openpgp_extract_key_creation_time(
+			return _E_gnutls_openpgp_get_raw_key_creation_time(
 				&info->raw_certificate_list[0]);
 		default:
 			return (time_t)-1;
+	}
+}
+
+OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
+OPENPGP_RAW_PRIVKEY_TO_GKEY _E_gnutls_openpgp_raw_privkey_to_gkey;
+
+int _gnutls_raw_cert_to_gcert(gnutls_cert * gcert, gnutls_certificate_type type,
+	const gnutls_datum *raw_cert, int flags /* OR of ConvFlags */)
+{
+	switch( type) {
+		case GNUTLS_CRT_X509:
+			return _gnutls_x509_raw_cert_to_gcert( gcert,
+					     raw_cert, flags);
+		case GNUTLS_CRT_OPENPGP:
+			if (_E_gnutls_openpgp_raw_key_to_gcert==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INIT_LIBEXTRA;
+			}
+			return
+			     _E_gnutls_openpgp_raw_key_to_gcert( gcert,
+					     raw_cert);
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+	}
+}
+
+int _gnutls_raw_privkey_to_gkey(gnutls_privkey * key, gnutls_certificate_type type,
+	const gnutls_datum *raw_key, int key_enc /* DER or PEM */)
+{
+	switch( type) {
+		case GNUTLS_CRT_X509:
+			return _gnutls_x509_raw_privkey_to_gkey( key,
+					     raw_key, key_enc);
+		case GNUTLS_CRT_OPENPGP:
+			if (_E_gnutls_openpgp_raw_privkey_to_gkey==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INIT_LIBEXTRA;
+			}
+			return
+			     _E_gnutls_openpgp_raw_privkey_to_gkey( key, raw_key);
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 }
 
@@ -482,7 +616,7 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
  * extensions found in the certificate are unsupported and critical. 
  * The critical extensions will be catched by the verification functions.
  */
-int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCert,
+int _gnutls_x509_raw_cert_to_gcert(gnutls_cert * gcert, const gnutls_datum *derCert,
 	int flags /* OR of ConvFlags */)
 {
 	int ret;
@@ -501,7 +635,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 		return ret;
 	}
 	
-	ret = _gnutls_x509_crt2gnutls_cert( gcert, cert, flags);
+	ret = _gnutls_x509_crt_to_gcert( gcert, cert, flags);
 	gnutls_x509_crt_deinit( cert);
 	
 	return ret;
@@ -509,7 +643,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 
 /* Like above but it accepts a parsed certificate instead.
  */
-int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
+int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt cert,
 	unsigned int flags)
 {
 	int ret = 0;
@@ -566,9 +700,11 @@ int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
 
 }
 
-void _gnutls_free_cert(gnutls_cert *cert)
+void _gnutls_gcert_deinit(gnutls_cert *cert)
 {
 	int i;
+
+	if (cert == NULL) return;
 
 	for (i = 0; i < cert->params_size; i++) {
 		_gnutls_mpi_release( &cert->params[i]);

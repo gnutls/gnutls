@@ -43,7 +43,7 @@ libgnutls_extra_la_DEPENDENCIES = $(LZO_OBJECTS)
 libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) 
 
 libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) \
-	openpgp/openpgp.lo openpgp/xml.lo \
+	openpgp/openpgp.lo openpgp/xml.lo openpgp/privkey.lo \
 	openpgp/extras.lo openpgp/verify.lo openpgp/compat.lo \
 	../lib/libgnutls.la
 

@@ -32,8 +32,8 @@ extern "C" {
 
 #include <gnutls/gnutls.h>
 
-struct gnutls_openpgp_key_int; /* object to hold (parsed) openpgp keys */
-typedef struct gnutls_openpgp_key_int* gnutls_openpgp_key;
+/* gnutls_openpgp_key should be defined in gnutls.h
+ */
 
 typedef enum gnutls_openpgp_key_fmt { GNUTLS_OPENPGP_FMT_RAW,
         GNUTLS_OPENPGP_FMT_BASE64 } gnutls_openpgp_key_fmt;
@@ -47,6 +47,10 @@ int gnutls_openpgp_key_export(gnutls_openpgp_key key,
 	gnutls_openpgp_key_fmt format, void* output_data,
 	size_t* output_data_size);
 
+/* The key_usage flags are defined in gnutls.h. They are
+ * the GNUTLS_KEY_* definitions.
+ */
+int gnutls_openpgp_key_get_key_usage( gnutls_openpgp_key cert, unsigned int* key_usage);
 int gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key key,
 	void* result, size_t* result_size);
 	
@@ -67,6 +71,15 @@ int gnutls_openpgp_key_check_hostname( gnutls_openpgp_key key, const char *hostn
 
 int gnutls_openpgp_key_to_xml( gnutls_openpgp_key key, gnutls_datum *xmlkey,
 	int ext);
+
+/* privkey stuff.
+ */
+int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey * key);
+void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key);
+int gnutls_openpgp_privkey_get_pk_algorithm( gnutls_openpgp_privkey key, unsigned int *bits);
+int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey key, 
+	const gnutls_datum * data, gnutls_openpgp_key_fmt format,
+	const char* pass, unsigned int flags);
 
 /* Keyring stuff.
  */
@@ -106,6 +119,11 @@ int gnutls_openpgp_key_verify_trustdb(
 	unsigned int flags,
 	unsigned int * verify /* the output of the verification */);
 
+
+/* certificate authentication stuff.
+ */
+int gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials res,
+	gnutls_openpgp_key key, gnutls_openpgp_privkey pkey);
 
 #ifdef __cplusplus
 }
