@@ -1,7 +1,10 @@
-Version 1.0.4
+Version 1.0.4 (04/01/2004)
 - Changed handshake behaviour to send the lowest TLS version
   when an unsupported version was advertized. The current behaviour
   is to send the maximum version we support.
+- certtool no longer asks the password in unencrypted private
+  keys.
+- The source is now compiled to use the reentrant libc functions.
 
 Version 1.0.3 (21/12/2003)
 - Corrected bug in gnutls_bye() which made it return an error code
