@@ -111,8 +111,7 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
   * @sc: is an &gnutls_certificate_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate)
-  * the structure.
+  * this helper function is provided in order to free (deallocate) it.
   *
   * This function does not free any temporary parameters associated
   * with this structure (ie RSA and DH parameters are not freed by
@@ -137,8 +136,9 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
   * @res: is a pointer to an &gnutls_certificate_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate
-  * the structure.
+  * this helper function is provided in order to allocate it.
+  *
+  * Returns 0 on success.
   **/
 int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res)
 {
@@ -220,6 +220,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * @session: is a &gnutls_session structure.
   * @func: is the callback function
   *
+  * This function sets a callback to be called while selecting the (client) certificate.
   * The callback's function prototype is:
   * int (*callback)(gnutls_session, const gnutls_datum *client_cert, int ncerts, const gnutls_datum* req_ca_dn, int nreqs);
   *
@@ -261,6 +262,7 @@ void gnutls_certificate_client_set_select_function(gnutls_session session,
   * @session: is a &gnutls_session structure.
   * @func: is the callback function
   *
+  * This function sets a callback to be called while selecting the (server) certificate.
   * The callback's function form is:
   * int (*callback)(gnutls_session, gnutls_datum *server_cert, int ncerts);
   *

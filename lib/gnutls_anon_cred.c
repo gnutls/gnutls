@@ -30,15 +30,14 @@
 #include "gnutls_num.h"
 #include "gnutls_mpi.h"
 
-static int anon_tmp;
+static const int anon_dummy;
 
 /**
   * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials structure
   * @sc: is an &gnutls_anon_server_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate)
-  * the structure.
+  * this helper function is provided in order to free (deallocate) it.
   **/
 void gnutls_anon_free_server_credentials( gnutls_anon_server_credentials sc) {
 
@@ -50,8 +49,7 @@ void gnutls_anon_free_server_credentials( gnutls_anon_server_credentials sc) {
   * @sc: is a pointer to an &gnutls_anon_server_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate
-  * the structure.
+  * this helper function is provided in order to allocate it.
   **/
 int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc) {
 
@@ -66,8 +64,7 @@ int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc)
   * @sc: is an &gnutls_anon_client_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate)
-  * the structure.
+  * this helper function is provided in order to free (deallocate) it.
   **/
 void gnutls_anon_free_client_credentials( gnutls_anon_client_credentials sc) {
 }
@@ -77,15 +74,14 @@ void gnutls_anon_free_client_credentials( gnutls_anon_client_credentials sc) {
   * @sc: is a pointer to an &gnutls_anon_client_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate
-  * the structure.
+  * this helper function is provided in order to allocate it.
   **/
 int gnutls_anon_allocate_client_credentials( gnutls_anon_client_credentials *sc) 
 {
-	/* anon_tmp is only there for *sc not to be null.
+	/* anon_dummy is only there for *sc not to be null.
 	 * it is not used at all;
 	 */
-	*sc = (void*) &anon_tmp;
+	*sc = (void*) &anon_dummy;
 	
 	return 0;
 }

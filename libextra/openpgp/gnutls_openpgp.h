@@ -31,8 +31,8 @@ typedef enum {
 
 int gnutls_certificate_set_openpgp_key_file(
     gnutls_certificate_credentials res,
-    char* CERTFILE,
-    char* KEYFILE);
+    const char* CERTFILE,
+    const char* KEYFILE);
 
 int gnutls_openpgp_count_key_names(
     const gnutls_datum *cert );

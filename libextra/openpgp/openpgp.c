@@ -57,7 +57,7 @@ int gnutls_openpgp_key_init(gnutls_openpgp_key * key)
   * gnutls_openpgp_key_deinit - This function deinitializes memory used by a gnutls_openpgp_key structure
   * @key: The structure to be initialized
   *
-  * This function will deinitialize a CRL structure. 
+  * This function will deinitialize a key structure. 
   *
   **/
 void gnutls_openpgp_key_deinit(gnutls_openpgp_key key)
@@ -200,7 +200,7 @@ size_t input_data_size = *output_data_size;
  * @fpr: the buffer to save the fingerprint.
  * @fprlen: the integer to save the length of the fingerprint.
  *
- * Returns the fingerprint of the OpenPGP key. Depence on the algorithm,
+ * Returns the fingerprint of the OpenPGP key. Depends on the algorithm,
  * the fingerprint can be 16 or 20 bytes.
  **/
 int

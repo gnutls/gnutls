@@ -85,7 +85,7 @@ leave:
  * Verify all signatures in the key, using the given set of keys (keyring). 
  * If a signer key is not available, the signature is skipped.
  *
- * The certificate verification output will be put in 'verify' and will be
+ * The key verification output will be put in @verify and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
  *
  * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
@@ -145,9 +145,8 @@ void cdk_md_close( cdk_md_hd_t hd );
  * @flags: unused (should be 0)
  * @verify: will hold the key verification output.
  *
- * Verify the self signature in the key.
- *
- * The certificate verification output will be put in 'verify' and will be
+ * Verifies the self signature in the key.
+ * The key verification output will be put in @verify and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
  *
  * GNUTLS_CERT_INVALID\: The self signature on the key is invalid.
@@ -233,7 +232,7 @@ int gnutls_openpgp_key_verify_self( gnutls_openpgp_key key,
  * @verify: will hold the certificate verification output.
  *
  * Checks if the key is revoked or disabled, in the trustdb.
- * The verification output will be put in 'verify' and will be
+ * The verification output will be put in @verify and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
  *
  * GNUTLS_CERT_INVALID\: A signature on the key is invalid.

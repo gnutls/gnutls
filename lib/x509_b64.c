@@ -313,8 +313,7 @@ int size;
   * encoding. This is the encoding used in PEM messages. This function will
   * allocate the required memory to hold the encoded data.
   *
-  * You should use the function gnutls_free() to
-  * free the returned data.
+  * You should use gnutls_free() to free the returned data.
   * 
   **/
 int gnutls_pem_base64_encode_alloc( const char* msg, const gnutls_datum *data, 
@@ -524,8 +523,7 @@ int size;
   * "-----BEGIN header" and decode only this part. Otherwise it will decode the 
   * first PEM packet found.
   *
-  * You should use the function gnutls_free() to
-  * free the returned data.
+  * You should use gnutls_free() to free the returned data.
   *
   **/
 int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, 

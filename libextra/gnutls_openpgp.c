@@ -519,8 +519,8 @@ stream_to_datum( cdk_stream_t inp, gnutls_datum *raw )
  **/
 int
 gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
-                                        gnutls_datum *cert,
-                                        gnutls_datum *key )
+                                        const gnutls_datum *cert,
+                                       const  gnutls_datum *key )
 {
     gnutls_datum raw;
     cdk_kbnode_t knode = NULL, ctx = NULL, p;
@@ -652,8 +652,8 @@ leave:
  **/
 int
 gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
-                                         char* certfile,
-                                         char* keyfile )
+                                         const char* certfile,
+                                         const char* keyfile )
 {
     struct stat statbuf;
     int rc = 0;
@@ -940,7 +940,7 @@ _gnutls_openpgp_request_key( gnutls_session session, gnutls_datum* ret,
  **/
 int
 gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
-                                         char* keyserver,
+                                         const char* keyserver,
                                          int port)
 {
     if( !res || !keyserver ) {
@@ -972,7 +972,7 @@ gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
  **/
 int
 gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
-                                        char* trustdb )
+                                       const char* trustdb )
 {
     if( !res || !trustdb ) {
         gnutls_assert( );

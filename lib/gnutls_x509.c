@@ -1158,11 +1158,17 @@ static int parse_der_ca_mem( gnutls_x509_crt** cert_list, uint* ncerts,
   * @type: is DER or PEM
   *
   * This function adds the trusted CAs in order to verify client
-  * certificates. This function may be called multiple times.
+  * or server certificates. In case of a client this is not required
+  * to be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers().
+  * This function may be called multiple times.
   *
   * In case of a server the CAs set here will be sent to the client
   * if a certificate request is sent. This can be disabled using 
   * gnutls_certificate_send_x509_rdn_sequence().
+  *
+  * Returns the number of certificates processed or a negative
+  * value on error.
   *
   **/
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
@@ -1190,11 +1196,16 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res,
   * @ca_list_size: holds the size of the CA list
   *
   * This function adds the trusted CAs in order to verify client
-  * certificates. This function may be called multiple times.
+  * or server certificates. In case of a client this is not required
+  * to be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers().
+  * This function may be called multiple times.
   *
   * In case of a server the CAs set here will be sent to the client
   * if a certificate request is sent. This can be disabled using 
   * gnutls_certificate_send_x509_rdn_sequence().
+  *
+  * Returns 0 on success.
   *
   **/
 int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res, 
@@ -1231,10 +1242,18 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res,
   * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
   * @type: is PEM or DER
   *
-  * This function sets the trusted CAs in order to verify client
-  * certificates. This function may be called multiple times, and the
-  * given certificates will be appended to the trusted certificate list.
-  * Returns the number of certificate processed.
+  * This function adds the trusted CAs in order to verify client
+  * or server certificates. In case of a client this is not required
+  * to be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers().
+  * This function may be called multiple times.
+  *
+  * In case of a server the CAs set here will be sent to the client
+  * if a certificate request is sent. This can be disabled using 
+  * gnutls_certificate_send_x509_rdn_sequence().
+  *
+  * Returns the number of certificates processed or a negative
+  * value on error.
   *
   **/
 int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res, 
@@ -1429,7 +1448,13 @@ int read_crl_mem(gnutls_certificate_credentials res, const void *crl, int crl_si
   * @type: is DER or PEM
   *
   * This function adds the trusted CRLs in order to verify client or server
-  * certificates. This function may be called multiple times.
+  * certificates.  In case of a client this is not required
+  * to be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers().
+  * This function may be called multiple times.
+  *
+  * Returns the number of CRLs processed or a negative value
+  * on error. 
   *
   **/
 int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res, 
@@ -1450,7 +1475,12 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res,
   * @crl_list_size: holds the size of the crl_list
   *
   * This function adds the trusted CRLs in order to verify client or server
-  * certificates. This function may be called multiple times.
+  * certificates.  In case of a client this is not required
+  * to be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers().
+  * This function may be called multiple times.
+  *
+  * Returns 0 on success.
   *
   **/
 int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res, 
@@ -1484,10 +1514,14 @@ int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res,
   * @crlfile: is a file containing the list of verified CRLs (DER or PEM list)
   * @type: is PEM or DER
   *
-  * This function sets the trusted CRLs in order to verify client or server
-  * certificates. This function may be called multiple times, and the
-  * given CRLs will be appended to the crl list.
-  * Returns the number of certificate processed.
+  * This function adds the trusted CRLs in order to verify client or server
+  * certificates.  In case of a client this is not required
+  * to be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers().
+  * This function may be called multiple times.
+  *
+  * Returns the number of CRLs processed or a negative value
+  * on error. 
   *
   **/
 int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res, 

@@ -481,7 +481,6 @@ void print_list(void)
 
 	printf("Ciphers:");
 	printf(" AES-128-CBC");
-	printf(", TWOFISH-128-CBC");
 	printf(", 3DES-CBC");
 	printf(", ARCFOUR\n");
 	printf(", ARCFOUR-40\n");
@@ -548,9 +547,6 @@ void parse_ciphers(char **ciphers, int nciphers, int *cipher_priority)
 			if (strncasecmp(ciphers[i], "AES", 3) == 0)
 				cipher_priority[j++] =
 				    GNUTLS_CIPHER_AES_128_CBC;
-			if (strncasecmp(ciphers[i], "TWO", 3) == 0)
-				cipher_priority[j++] =
-				    GNUTLS_CIPHER_TWOFISH_128_CBC;
 			if (strncasecmp(ciphers[i], "3DE", 3) == 0)
 				cipher_priority[j++] =
 				    GNUTLS_CIPHER_3DES_CBC;

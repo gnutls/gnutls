@@ -384,6 +384,11 @@ static const unsigned char srp_params_1024[] = {
 
 static const unsigned char srp_generator = 0x02;
 
+const gnutls_datum gnutls_srp_1024_group_prime = {
+	srp_params_1024, sizeof(srp_params_1024) };
+const gnutls_datum gnutls_srp_1024_group_generator = {
+	&srp_generator, sizeof(srp_generator) };
+
 static const unsigned char srp_params_1536[] = {
  0x9D, 0xEF, 0x3C, 0xAF, 0xB9, 0x39, 0x27, 0x7A, 0xB1,
  0xF1, 0x2A, 0x86, 0x17, 0xA4, 0x7B, 0xBB, 0xDB, 0xA5,
@@ -408,6 +413,11 @@ static const unsigned char srp_params_1536[] = {
  0x49, 0x9A, 0x23, 0x4D, 0xCF, 0x76, 0xE3, 0xFE, 0xD1, 
  0x35, 0xF9, 0xBB
 };
+
+const gnutls_datum gnutls_srp_1536_group_prime = {
+	srp_params_1536, sizeof(srp_params_1536) };
+const gnutls_datum gnutls_srp_1536_group_generator = {
+	&srp_generator, sizeof(srp_generator) };
 
 static const unsigned char srp_params_2048[] = {
  0xAC, 0x6B, 0xDB, 0x41, 0x32, 0x4A, 0x9A, 0x9B, 0xF1,
@@ -440,6 +450,12 @@ static const unsigned char srp_params_2048[] = {
  0x72, 0xFC, 0xD6, 0x8E, 0xF2, 0x0F, 0xA7, 0x11, 0x1F,
  0x9E, 0x4A, 0xFF, 0x73
 };
+
+const gnutls_datum gnutls_srp_2048_group_prime = {
+	srp_params_2048, sizeof(srp_params_2048) };
+const gnutls_datum gnutls_srp_2048_group_generator = {
+	&srp_generator, sizeof(srp_generator) };
+
 
 /* Check if G and N are parameters from the SRP draft.
  */
