@@ -2,12 +2,12 @@
 
 Network Working Group                                      S. Hollenbeck
 Internet-Draft                                            VeriSign, Inc.
-Updates: 2246 (if approved)                              October 7, 2002
-Expires: April 7, 2003
+Updates: 2246 (if approved)                             October 23, 2002
+Expires: April 23, 2003
 
 
          Transport Layer Security Protocol Compression Methods
-                   draft-ietf-tls-compression-02.txt
+                   draft-ietf-tls-compression-03.txt
 
 Status of this Memo
 
@@ -30,7 +30,7 @@ Status of this Memo
    The list of Internet-Draft Shadow Directories can be accessed at
    http://www.ietf.org/shadow.html.
 
-   This Internet-Draft will expire on April 7, 2003.
+   This Internet-Draft will expire on April 23, 2003.
 
 Copyright Notice
 
@@ -48,14 +48,16 @@ Abstract
    additional compression methods associated with lossless data
    compression algorithms for use with TLS.
 
-Conventions Used In This Document
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 1]
+
+Hollenbeck               Expires April 23, 2003                 [Page 1]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
+
+Conventions Used In This Document
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -65,17 +67,18 @@ Table of Contents
 
    1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
    2.  Compression Methods  . . . . . . . . . . . . . . . . . . . . .  4
-   2.1 ZLIB Compression . . . . . . . . . . . . . . . . . . . . . . .  5
-   2.2 LZS Compression  . . . . . . . . . . . . . . . . . . . . . . .  5
-   3.  Intellectual Property Considerations . . . . . . . . . . . . .  6
-   4.  Internationalization Considerations  . . . . . . . . . . . . .  7
-   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  8
-   6.  Security Considerations  . . . . . . . . . . . . . . . . . . .  9
-   7.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 10
-       Normative References . . . . . . . . . . . . . . . . . . . . . 11
-       Informative References . . . . . . . . . . . . . . . . . . . . 12
-       Author's Address . . . . . . . . . . . . . . . . . . . . . . . 12
-       Full Copyright Statement . . . . . . . . . . . . . . . . . . . 13
+   2.1 Compression History and Packet Processing  . . . . . . . . . .  5
+   2.2 ZLIB Compression . . . . . . . . . . . . . . . . . . . . . . .  5
+   2.3 LZS Compression  . . . . . . . . . . . . . . . . . . . . . . .  5
+   3.  Intellectual Property Considerations . . . . . . . . . . . . .  7
+   4.  Internationalization Considerations  . . . . . . . . . . . . .  8
+   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  9
+   6.  Security Considerations  . . . . . . . . . . . . . . . . . . . 10
+   7.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 11
+       Normative References . . . . . . . . . . . . . . . . . . . . . 12
+       Informative References . . . . . . . . . . . . . . . . . . . . 13
+       Author's Address . . . . . . . . . . . . . . . . . . . . . . . 13
+       Full Copyright Statement . . . . . . . . . . . . . . . . . . . 14
 
 
 
@@ -105,10 +108,7 @@ Table of Contents
 
 
 
-
-
-
-Hollenbeck               Expires April 7, 2003                  [Page 2]
+Hollenbeck               Expires April 23, 2003                 [Page 2]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -164,7 +164,7 @@ Internet-Draft          TLS Compression Methods             October 2002
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 3]
+Hollenbeck               Expires April 23, 2003                 [Page 3]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -215,19 +215,35 @@ Internet-Draft          TLS Compression Methods             October 2002
    compressor maintains it's state through all compressed records) or
    stateless (the compressor compresses each record independently), but
    there seems to be little known benefit in using a stateless
-   compression method within TLS.  Compression methods SHOULD be
-   stateful to take advantage of the state management features offered
+   compression method within TLS.
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 4]
+
+Hollenbeck               Expires April 23, 2003                 [Page 4]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
 
-   by TLS.
+   All of the compression methods described in this document are
+   stateful.  It is recommended that other compression methods that
+   might be standardized in the future be stateful as well.
 
-2.1 ZLIB Compression
+2.1 Compression History and Packet Processing
+
+   Some compression methods have the ability to maintain history
+   information when compressing and decompressing packet payloads.  The
+   compression history allows a higher compression ratio to be achieved
+   on a stream as compared to per-packet compression, but maintaining a
+   history across packets implies that a packet might contain data
+   needed to completely decompress data contained in a different packet.
+   History maintenance thus requires both a reliable link and sequenced
+   packet delivery.  History information MAY be maintained and exploited
+   when using the compression methods described in this document if TLS
+   is being used with a protocol that provides reliable, sequenced
+   packet delivery.
+
+2.2 ZLIB Compression
 
    The ZLIB compression method and encoding format is described in RFC
    1950 [5] and RFC 1951 [6].  Examples of ZLIB use in IETF protocols
@@ -238,14 +254,16 @@ Internet-Draft          TLS Compression Methods             October 2002
    memory requirements.  The receiving decompressor will automatically
    adjust to the parameters selected by the sender.
 
-   The sender MUST flush the compressor completely each time a
-   compressed payload is produced.  All data that was submitted for
-   compression MUST be included in the compressed output, with no data
-   retained to be included in a later output payload.  Flushing ensures
-   that each payload is complete so that compressed packet payloads can
-   be decompressed independently.
+   ZLIB has the ability to maintain history information when compressing
+   and decompressing packet payloads.  If TLS is not being used with a
+   protocol that provides reliable, sequenced packet delivery, the
+   sender MUST flush the compressor completely each time a compressed
+   payload is produced.  All data that was submitted for compression
+   MUST be included in the compressed output, with no data retained to
+   be included in a later output payload.  Flushing ensures that each
+   compressed packet payload can be decompressed completely.
 
-2.2 LZS Compression
+2.3 LZS Compression
 
    The Lempel Zif Stac (LZS) compression method and encoding format is
    described in ANSI publication X3.241 [10].  Examples of LZS use in
@@ -253,18 +271,25 @@ Internet-Draft          TLS Compression Methods             October 2002
    2395 [13].
 
    LZS has the ability to maintain history information when compressing
-   and decompressing packet payloads.  When used with TLS, the
+   and decompressing packet payloads.  If TLS is not being used with a
+   protocol that provides reliable, sequenced packet delivery, the
+
+
+
+Hollenbeck               Expires April 23, 2003                 [Page 5]
+
+Internet-Draft          TLS Compression Methods             October 2002
+
+
    compression history MUST be reset by the sender before compressing
    data and the decompression history MUST be reset by the receiver
    before decompressing data to ensure that compressed packet payloads
-   can be decompressed independently.
-
-   The sender MUST flush the compressor completely each time a
-   compressed payload is produced.  All data that was submitted for
-   compression MUST be included in the compressed output, with no data
-   retained to be included in a later output payload.  Flushing ensures
-   that each payload is complete so that compressed packet payloads can
-   be decompressed independently.
+   can be decompressed completely.  The sender MUST flush the compressor
+   completely each time a compressed payload is produced.  All data that
+   was submitted for compression MUST be included in the compressed
+   output, with no data retained to be included in a later output
+   payload.  Flushing ensures that each compressed packet payload can be
+   decompressed completely.
 
 
 
@@ -276,7 +301,38 @@ Internet-Draft          TLS Compression Methods             October 2002
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 5]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hollenbeck               Expires April 23, 2003                 [Page 6]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -332,7 +388,7 @@ Internet-Draft          TLS Compression Methods             October 2002
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 6]
+Hollenbeck               Expires April 23, 2003                 [Page 7]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -388,7 +444,7 @@ Internet-Draft          TLS Compression Methods             October 2002
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 7]
+Hollenbeck               Expires April 23, 2003                 [Page 8]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -444,7 +500,7 @@ Internet-Draft          TLS Compression Methods             October 2002
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 8]
+Hollenbeck               Expires April 23, 2003                 [Page 9]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -455,11 +511,11 @@ Internet-Draft          TLS Compression Methods             October 2002
    model addressed by TLS.  The security considerations described
    throughout RFC 2246 [2] apply here as well.
 
-   Depending on the ciphersuite, symmetric encryption in TLS does not
-   fully hide the length of symmetrically encrypted data.  Use of TLS
-   compression SHOULD take into account that the length of compressed
-   data may leak more information than the length of the original
-   uncompressed data.
+   Some symmetric encryption ciphersuites do not hide the length of
+   symmetrically encrypted data at all.  Others hide it to some extent,
+   but still don't hide it fully.  Use of TLS compression SHOULD take
+   into account that the length of compressed data may leak more
+   information than the length of the original uncompressed data.
 
 
 
@@ -500,7 +556,7 @@ Internet-Draft          TLS Compression Methods             October 2002
 
 
 
-Hollenbeck               Expires April 7, 2003                  [Page 9]
+Hollenbeck               Expires April 23, 2003                [Page 10]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -513,7 +569,7 @@ Internet-Draft          TLS Compression Methods             October 2002
    Jeffrey Altman, Eric Rescorla, and Marc Van Heyningen.  Later
    suggestions that have been incorporated into this document were
    provided by Tim Dierks, Pasi Eronen, Peter Gutmann, Nikos
-   Mavroyanopoulos, and Bodo Moeller.
+   Mavroyanopoulos, Alexey Melnikov, and Bodo Moeller.
 
 
 
@@ -556,7 +612,7 @@ Internet-Draft          TLS Compression Methods             October 2002
 
 
 
-Hollenbeck               Expires April 7, 2003                 [Page 10]
+Hollenbeck               Expires April 23, 2003                [Page 11]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -612,7 +668,7 @@ Normative References
 
 
 
-Hollenbeck               Expires April 7, 2003                 [Page 11]
+Hollenbeck               Expires April 23, 2003                [Page 12]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -668,7 +724,7 @@ Author's Address
 
 
 
-Hollenbeck               Expires April 7, 2003                 [Page 12]
+Hollenbeck               Expires April 23, 2003                [Page 13]
 
 Internet-Draft          TLS Compression Methods             October 2002
 
@@ -724,4 +780,4 @@ Acknowledgement
 
 
 
-Hollenbeck               Expires April 7, 2003                 [Page 13]
+Hollenbeck               Expires April 23, 2003                [Page 14]
