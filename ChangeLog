@@ -1,3 +1,18 @@
+2003-11-26 08:59  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/protocol/rfc3279.txt, doc/tex/cover.tex.in,
+	doc/tex/gnutls.bib, doc/tex/library.tex, lib/gnutls_pk.c:
+
+	Exported the gnutls_x509_privkey_sign_data(),
+	gnutls_x509_privkey_verify_data() and gnutls_x509_crt_verify_data().  
+
+2003-11-26 08:57  nmav <nmav@gnutls.org>
+
+	* src/certtool.c:
+
+	only generate v3 certificates, since we always use the CA
+	(basicConstraints) extension.  
+
 2003-11-25 12:31  nmav <nmav@gnutls.org>
 
 	* doc/tex/certificate.tex, doc/tex/ex-crq.tex, doc/tex/gnutls.bib,
