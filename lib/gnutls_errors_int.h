@@ -86,7 +86,6 @@
 
 #define GNUTLS_E_ILLEGAL_SRP_USERNAME -90
 #define GNUTLS_E_SRP_PWD_PARSING_ERROR -91
-#define GNUTLS_E_EMPTY_SRP_USERNAME -92
 #define GNUTLS_E_NO_TEMPORARY_DH_PARAMS -93
 
 /* For certificate and key stuff
@@ -129,5 +128,6 @@
 /* _INT_ internal errors. Not exported */
 
 #define GNUTLS_E_INT_RET_0 -1251
+#define GNUTLS_E_INT_HANDSHAKE_AGAIN -1252
 
 #endif /* GNUTLS_ERRORS_IH */

@@ -250,7 +250,8 @@ int protocol_priority[PRI_MAX] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
    /* Do not use anonymous authentication, unless you know what that means */
-   GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
+   GNUTLS_KX_SRP_DSS, GNUTLS_KX_SRP_RSA, GNUTLS_KX_ANON_DH, 
+   GNUTLS_KX_RSA_EXPORT, 0
 };
 int cipher_priority[PRI_MAX] =
     { GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_3DES_CBC,

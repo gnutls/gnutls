@@ -1884,6 +1884,10 @@ int gnutls_handshake(gnutls_session session)
 
 #define IMED_RET( str, ret) do { \
 	if (ret < 0) { \
+		if (ret == GNUTLS_E_INT_HANDSHAKE_AGAIN) { \
+			STATE = STATE0; \
+			return GNUTLS_E_AGAIN; \
+		} \
 		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \

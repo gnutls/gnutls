@@ -463,7 +463,7 @@ int gaa_getint(char *arg)
 {
     int tmp;
     char a;
-    if(sscanf(arg, "%d%c", &tmp, &a) < 1)
+    if(sscanf(arg, "%d%c", &tmp, &a) != 1)
     {
         printf("Option %s: '%s' isn't an integer\n", gaa_current_option, arg);
         GAAERROR(-1);
@@ -489,7 +489,7 @@ float gaa_getfloat(char *arg)
 {
     float tmp;
     char a;
-    if(sscanf(arg, "%f%c", &tmp, &a) < 1)
+    if(sscanf(arg, "%f%c", &tmp, &a) != 1)
     {
         printf("Option %s: '%s' isn't a float number\n", gaa_current_option, arg);
         GAAERROR(-1);

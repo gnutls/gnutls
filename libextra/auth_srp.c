@@ -32,6 +32,7 @@
 #include "auth_srp.h"
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
+#include <gnutls_alert.h>
 
 int _gnutls_gen_srp_server_kx(gnutls_session, opaque **);
 int _gnutls_gen_srp_client_kx(gnutls_session, opaque **);
@@ -84,10 +85,18 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 
 	if (state->security_parameters.extensions.srp_username[0] == 0) {
 		/* The peer didn't send a valid SRP extension with the
-		 * SRP username.
+		 * SRP username. The draft requires that we send an
+		 * alert and start the handshake again.
 		 */
 		gnutls_assert();
-		return GNUTLS_E_EMPTY_SRP_USERNAME;
+		ret = gnutls_alert_send( state, GNUTLS_AL_WARNING,
+			GNUTLS_A_MISSING_SRP_USERNAME);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		return GNUTLS_E_INT_HANDSHAKE_AGAIN;
 	}
 
 	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT), 1)) < 0) {

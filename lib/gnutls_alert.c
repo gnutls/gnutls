@@ -154,10 +154,6 @@ int _level = -1;
 			ret = GNUTLS_A_BAD_RECORD_MAC;
 			_level = GNUTLS_AL_FATAL;
 			break;
-		case GNUTLS_E_EMPTY_SRP_USERNAME:
-			ret = GNUTLS_A_MISSING_SRP_USERNAME;
-			_level = GNUTLS_AL_FATAL;
-			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
 			ret = GNUTLS_A_DECOMPRESSION_FAILURE;
 			_level = GNUTLS_AL_FATAL;
