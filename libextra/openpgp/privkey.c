@@ -1,0 +1,122 @@
+/*
+ *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *
+ * This file is part of GNUTLS.
+ *
+ * GNUTLS-EXTRA is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * GNUTLS-EXTRA is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ */
+
+/* Functions on OpenPGP privkey parsing
+ */
+
+#include <gnutls_int.h>
+
+#ifdef HAVE_LIBOPENCDK
+
+#include <gnutls_datum.h>
+#include <gnutls_global.h>
+#include <gnutls_errors.h>
+#include <opencdk.h>
+#include <openpgp.h>
+#include <x509/rfc2818.h>
+#include <gnutls_cert.h>
+
+/**
+  * gnutls_openpgp_privkey_init - This function initializes a gnutls_openpgp_privkey structure
+  * @key: The structure to be initialized
+  *
+  * This function will initialize an OpenPGP key structure. 
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey * key)
+{
+	*key = gnutls_calloc( 1, sizeof(gnutls_openpgp_privkey_int));
+
+	if (*key) {
+		return 0; /* success */
+	}
+	return GNUTLS_E_MEMORY_ERROR;
+}
+
+/**
+  * gnutls_openpgp_privkey_deinit - This function deinitializes memory used by a gnutls_openpgp_privkey structure
+  * @key: The structure to be initialized
+  *
+  * This function will deinitialize a key structure. 
+  *
+  **/
+void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key)
+{
+	if (!key) return;
+
+	_gnutls_privkey_deinit( &key->pkey);
+	gnutls_free(key);
+}
+
+/**
+  * gnutls_openpgp_privkey_import - This function will import a RAW or BASE64 encoded key
+  * @key: The structure to store the parsed key.
+  * @data: The RAW or BASE64 encoded key.
+  * @format: One of gnutls_openpgp_key_fmt elements.
+  * @pass: Unused for now
+  * @flags: should be zero
+  *
+  * This function will convert the given RAW or Base64 encoded key
+  * to the native gnutls_openpgp_privkey format. The output will be stored in 'key'.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey key, 
+	const gnutls_datum * data, gnutls_openpgp_key_fmt format,
+	const char* pass, unsigned int flags)
+{
+int rc;
+
+	rc = _gnutls_openpgp_key2gnutls_key( &key->pkey, data, format);
+	if( rc) {
+		gnutls_assert();
+		return rc;
+	}
+	
+	return 0;
+}
+
+/**
+  * gnutls_openpgp_privkey_get_pk_algorithm - This function returns the key's PublicKey algorithm
+  * @key: is an OpenPGP key
+  * @bits: if bits is non null it will hold the size of the parameters' in bits
+  *
+  * This function will return the public key algorithm of an OpenPGP
+  * certificate.
+  *
+  * If bits is non null, it should have enough size to hold the parameters
+  * size in bits. For RSA the bits returned is the modulus. 
+  * For DSA the bits returned are of the public exponent.
+  *
+  * Returns a member of the GNUTLS_PKAlgorithm enumeration on success,
+  * or a negative value on error.
+  *
+  **/
+int
+gnutls_openpgp_privkey_get_pk_algorithm( gnutls_openpgp_privkey key, unsigned int *bits)
+{
+	return key->pkey.pk_algorithm;
+}
+
+
+#endif
