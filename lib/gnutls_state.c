@@ -427,6 +427,31 @@ void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
 	state->gnutls_internals.cbc_protection_hack = prot;
 }
 
+/**
+  * gnutls_handshake_set_rsa_pms_check - Used to disable the RSA PMS check
+  * @state: is a &GNUTLS_STATE structure.
+  * @prot: is an integer (0 or 1)
+  *
+  * The TLS 1.0 handshake protocol includes a check in the in the RSA
+  * encrypted data (only in the case of RSA key exchange), which allows
+  * to detect version roll back attacks. 
+  *
+  * However it seems that some broken TLS clients exist which do not
+  * use this check properly. The only solution is to disable this
+  * check completely.
+  *
+  * if check == 0 then the check is enabled (default), otherwise it
+  * is disabled.
+  *
+  * The protection used will slightly decrease performance, and add 
+  * 20 or more bytes per record packet.
+  *
+  **/
+void gnutls_handshake_set_rsa_pms_check(GNUTLS_STATE state, int prot)
+{
+	state->gnutls_internals.rsa_pms_check = prot;
+}
+
 inline
 static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size, void* result)
 {

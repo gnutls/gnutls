@@ -554,6 +554,7 @@ typedef struct {
 	GNUTLS_Version		default_record_version;
 
 	int			cbc_protection_hack;
+	int			rsa_pms_check; /* 0 means enabled */
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

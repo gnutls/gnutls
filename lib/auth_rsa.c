@@ -194,13 +194,14 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
 	} else {
 		ret = 0;
-		if (_gnutls_get_adv_version_major(state) !=
-		    plaintext.data[0]
-		    || _gnutls_get_adv_version_minor(state) !=
-		    plaintext.data[1]) {
-			gnutls_assert();
-			ret = GNUTLS_E_DECRYPTION_FAILED;
-		}
+		if (state->gnutls_internals.rsa_pms_check==0)
+			if (_gnutls_get_adv_version_major(state) !=
+			    plaintext.data[0]
+			    || _gnutls_get_adv_version_minor(state) !=
+			    plaintext.data[1]) {
+				gnutls_assert();
+				ret = GNUTLS_E_DECRYPTION_FAILED;
+			}
 
 		state->gnutls_key->key.data = plaintext.data;
 		state->gnutls_key->key.size = plaintext.size;
