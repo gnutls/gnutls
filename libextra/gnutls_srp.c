@@ -544,7 +544,8 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
   *
   * @username contains the actual username. 
   * The @salt, @verifier, @generator and @prime must be filled
-  * in using the gnutls_malloc().
+  * in using the gnutls_malloc(). For convenience @prime and @generator 
+  * may also be one of the static parameters defined in extra.h.
   *
   * In case the callback returned a negative number then gnutls will
   * assume that the username does not exist.
@@ -561,9 +562,7 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
   **/
 void
 gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
-					   cred,
-					   gnutls_srp_server_credentials_function
-					   * func)
+    cred, gnutls_srp_server_credentials_function * func)
 {
     cred->pwd_callback = func;
 }

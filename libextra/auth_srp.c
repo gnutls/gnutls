@@ -407,7 +407,9 @@ int _gnutls_proc_srp_client_kx(gnutls_session_t session, opaque * data,
 
 
 
-/* Static parameters according to draft-ietf-tls-srp-05
+/* Static parameters according to draft-ietf-tls-srp-07
+ * Note that if more parameters are added check_g_n()
+ * and _gnutls_srp_entry_free() should be changed.
  */
 static const unsigned char srp_params_1024[] = {
     0xEE, 0xAF, 0x0A, 0xB9, 0xAD, 0xB3, 0x8D, 0xD6,
