@@ -9,6 +9,7 @@ Version 0.9.6
 - Corrected a bug in gnutls-srpcrypt where a non allocated variable
   was freed.
 - SRP programs are now built by default.
+- Added API to read and write to PKCS #12 structures.
 
 Version 0.9.5 (06/04/2003)
 - Several improvements in the PKCS #7 handling
