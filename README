@@ -2,4 +2,3 @@
 the needed configure, makefiles etc. using Automake, Autoconf, and libtool.
 
 * The library needs libgcrypt and libmhash (until hmac is included in libgcrypt)
-
