@@ -300,7 +300,18 @@ else
  AC_MSG_RESULT(yes)
 fi
 
+libasn1_enabled=no
 
+AC_CHECK_LIB(asn1, asn1_array2tree,, 
+ libasn1_enabled=yes
+ AC_MSG_WARN(
+*** 
+*** LibASN1 was not found. Will use the included one.))
+
+
+AC_ARG_WITH(included-libasn1,
+	[  --with-included-libasn1 Use the included libasn1],
+libasn1_enabled=yes, libasn1_enabled=no)
 
 
 
@@ -337,7 +348,17 @@ AC_MSG_WARN(***
 	fi
 fi
 
-AC_CONFIG_SUBDIRS(libasn1)
+
+if test "$libasn1_enabled" = yes; then
+ AC_CONFIG_SUBDIRS(libasn1)
+ LIBASN1_DIR=libasn1
+ AC_SUBST(LIBASN1_DIR)
+ LIBASN1_LINK=../libasn1/lib/libasn1.la
+else
+ LIBASN1_LINK=-lasn1
+fi
+
+AC_SUBST(LIBASN1_LINK)
 
 AC_CONFIG_FILES(lib/gnutls.h.in)
 
