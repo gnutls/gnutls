@@ -390,7 +390,7 @@ void gnutls_certificate_server_set_select_function(gnutls_session session,
   * to be used in the handshake.
   * The callback's function prototype is:
   * int (*callback)(gnutls_session, const gnutls_datum* req_ca_dn, int nreqs, 
-  * gnutls_pk_algorithm* pk_algos, int pk_algos_length, gnutls_retr_st st);
+  * gnutls_pk_algorithm* pk_algos, int pk_algos_length, gnutls_retr_st* st);
   *
   * @st should contain the certificates and private keys.
   *
@@ -425,8 +425,7 @@ void gnutls_certificate_client_set_retrieve_function(gnutls_certificate_credenti
   * This function sets a callback to be called in order to retrieve the certificate
   * to be used in the handshake.
   * The callback's function prototype is:
-  * int (*callback)(gnutls_session, const gnutls_datum* req_ca_dn, int nreqs, 
-  * gnutls_pk_algorithm* pk_algos, int pk_algos_length, gnutls_retr_st st);
+  * int (*callback)(gnutls_session, gnutls_retr_st* st);
   *
   * @st should contain the certificates and private keys.
   *
