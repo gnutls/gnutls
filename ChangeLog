@@ -1,3 +1,70 @@
+2002-03-20 12:21  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, gnutls_cipher.c, gnutls_compress.c,
+	gnutls_compress_int.c, gnutls_compress_int.h, gnutls_constate.c,
+	gnutls_int.h, gnutls_state.c, x509_ASN.c, x509_ASN.y, x509_asn1.c:
+
+	Improved compression support. Corrected several bugs in empty 
+	fragment sending and receiving.  
+
+2002-03-19 21:08  fiorinaf <ffiorina@gnutls.org>
+
+	* lib/x509_asn1.c:
+
+	segmentation fault bug fix 
+
+2002-03-18 20:45  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	New OpenCDK interface for secure memory.  
+
+2002-03-18 18:25  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_errors_int.h, gnutls_openpgp.c:
+
+	Detection of revoked OpenPGP userID's.  
+
+2002-03-18 15:53  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_ui.h:
+
+	added missing prototypes 
+
+2002-03-18 12:06  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Support for multiple userID's.  
+
+2002-03-18 07:43  nmav <nmav@gnutls.org>
+
+	* src/: cli.c, serv.c:
+
+	removed default parameters arguments 
+
+2002-03-17 23:09  nmav <nmav@gnutls.org>
+
+	* ChangeLog, THANKS, acconfig.h, configure.in,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_mem.c,
+	lib/gnutls_mem.h, src/cli.c:
+
+	Added hooks for electric fence 
+
+2002-03-17 21:51  nmav <nmav@gnutls.org>
+
+	* lib/x509_verify.c:
+
+	Checking of certificate lists even if the CA size is zero. Pointed
+	out by Andrew McDonald 
+
+2002-03-13 13:19  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Improved code for the various keyrings and support for armored 
+	keyring files.  
+
 2002-03-12 14:13  nmav <nmav@gnutls.org>
 
 	* ChangeLog, NEWS, acconfig.h, configure.in, lib/gnutls_int.h,
