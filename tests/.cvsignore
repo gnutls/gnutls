@@ -7,3 +7,10 @@ simple
 *.lo
 *.la
 chain*.pem
+ReadMe.txt
+certpairs
+certs
+crls
+pkcs12
+pkits.ldif
+smime
