@@ -31,6 +31,7 @@
 #include "gnutls_cipher_int.h"
 #include "gnutls_priority.h"
 #include "gnutls_algorithms.h"
+#include "gnutls_db.h"
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -438,19 +439,17 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 	
 	for (i = 0; i < iterations; i++) {
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
-		if (cipher_size<=0) return cipher_size;
+		if (cipher_size <= 0) return cipher_size; /* error */
+		
 #ifdef WORDS_BIGENDIAN
 		length = cipher_size;
 #else
 		length = byteswap16(cipher_size);
 #endif
 		memmove( &headers[3], &length, sizeof(uint16));
-		if (_gnutls_Write(cd, headers, sizeof(headers)) != sizeof(headers)) {
-			state->gnutls_internals.valid_connection = VALID_FALSE;
-			state->gnutls_internals.resumable = RESUME_FALSE;
-			gnutls_assert();
-			return GNUTLS_E_UNABLE_SEND_DATA;
-		}
+		memmove( cipher, headers, HEADER_SIZE); /* cipher does not have headers */
+
+		cipher_size += HEADER_SIZE;
 		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -470,12 +469,9 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 		length = byteswap16(cipher_size);
 #endif
 		memmove( &headers[3], &length, sizeof(uint16));
-		if (_gnutls_Write(cd, headers, sizeof(headers)) != sizeof(headers)) {
-			state->gnutls_internals.valid_connection = VALID_FALSE;
-			state->gnutls_internals.resumable = RESUME_FALSE;
-			gnutls_assert();
-			return GNUTLS_E_UNABLE_SEND_DATA;
-		}
+		memmove( cipher, headers, HEADER_SIZE);
+
+		cipher_size += HEADER_SIZE;
 		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;

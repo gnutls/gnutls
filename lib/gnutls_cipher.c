@@ -35,7 +35,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 	GNUTLSPlaintext *gtxt;
 	GNUTLSCompressed *gcomp;
 	GNUTLSCiphertext *gcipher;
-	int total_length = 0, err;
+	int total_length, err;
 
 	if (data_size == 0)
 		return 0;
@@ -63,18 +63,17 @@ int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 
 	_gnutls_freeTLSCompressed(gcomp);
 
-	*ciphertext = gnutls_malloc(gcipher->length);
+	total_length = HEADER_SIZE + gcipher->length;
+	*ciphertext = gnutls_malloc(total_length);
 	if (*ciphertext == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	memmove((*ciphertext), gcipher->fragment, gcipher->length);
-
-
-	total_length += gcipher->length;
+	memmove( &(*ciphertext)[HEADER_SIZE], gcipher->fragment, gcipher->length);
 	_gnutls_freeTLSCiphertext(gcipher);
 
-	return total_length;
+	return total_length - HEADER_SIZE;
+	/* notice that the headers are not present in the retun value */
 }
 
 int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
