@@ -552,12 +552,16 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 	char *ptr = iptr;
 
 	if (iptr==NULL && n == 0) {
-		/* resuming interrupted write. Put some random data into
-		 * the data field so send_int() will proceed normally.
+		/* resuming interrupted write. 
 		 */
 		return _gnutls_flush( fd, state);
 	}
 
+	/* Fixme: Potential problem here. If ie one message has been
+	 * sent, and the next send_int() gets an interrupt.
+	 * This might be more dangerous with small message fragments.
+	 * (setting max_record_size to a smaller value)
+	 */
 	left = n;
 	while (left > 0) {
 		i = gnutls_send_int(fd, state, type, htype, &ptr[i], left);
