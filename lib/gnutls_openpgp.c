@@ -1135,8 +1135,6 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
     }
   if (flags & TRUST_FLAG_REVOKED)
     trustval |= GNUTLS_CERT_REVOKED;
-  if (ot == TRUST_EXPIRED)
-      trustval |= GNUTLS_CERT_EXPIRED;
   switch (ot)
     {
     case TRUST_NEVER:
@@ -1225,9 +1223,6 @@ gnutls_openpgp_verify_key( const char *trustdb,
       rc = GNUTLS_CERT_REVOKED;
       break;
       
-    case CDK_KEY_EXPIRED:
-      rc = GNUTLS_CERT_EXPIRED;
-      break;
     }
 
 leave:

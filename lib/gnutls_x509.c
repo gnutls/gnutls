@@ -475,7 +475,7 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
 }
 
 /**
-  * gnutls_x509_extract_subject_alt_name - This function returns the peer's alt name, if any
+  * gnutls_x509_extract_certificate_subject_alt_name - This function returns the peer's alt name, if any
   * @cert: should contain an X.509 DER encoded certificate
   * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
   * @ret: is the place where dns name will be copied to
@@ -495,7 +495,7 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   *
   **/
-int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, char *ret, int *ret_size)
+int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, int seq, char *ret, int *ret_size)
 {
 	int result;
 	gnutls_datum dnsname;
@@ -804,12 +804,28 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
   *
   * This function will try to verify the given certificate list and return it's status (TRUSTED, EXPIRED etc.). 
   * The return value (status) should be one or more of the CertificateStatus 
-  * enumerated elements bitwise or'd.
+  * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
+  * by this function, you should check them using the appropriate functions.
   *
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
-  * Returns a negative error code in case of an error.
+  * The return value (status) should be one or more of the CertificateStatus 
+  * enumerated elements bitwise or'd.
+  *
+  * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
+  *
+  * GNUTLS_CERT_INVALID\: the certificate chain is broken.
+  *
+  * GNUTLS_CERT_REVOKED\: the certificate has been revoked
+  *  (not implemented yet).
+  *
+  * GNUTLS_CERT_CORRUPTED\: the certificate is corrupted.
+  *
+  * A negative error code is returned in case of an error.
+  * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that
+  * no certificate was sent by the peer.
+  *  
   *
   **/
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length)

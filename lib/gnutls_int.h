@@ -106,7 +106,7 @@ typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCip
 typedef enum CertificateStatus { 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
 	GNUTLS_CERT_INVALID=4, 
-	GNUTLS_CERT_EXPIRED=8, GNUTLS_CERT_CORRUPTED=16,
+	GNUTLS_CERT_CORRUPTED=16,
 	GNUTLS_CERT_REVOKED=32
 } CertificateStatus;
 #define GNUTLS_CertificateStatus CertificateStatus

@@ -303,7 +303,7 @@ void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
   * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
   * @state: is a gnutls state
   *
-  * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
+  * This function will try to verify the peer's certificate and return it's status (TRUSTED, INVALID etc.). 
   * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
@@ -359,29 +359,14 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
   * @state: is a gnutls state
   *
-  * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
+  * This function will try to verify the peer's certificate and return it's status (TRUSTED, INVALID etc.). 
   * The return value (status) should be one of the CertificateStatus enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
   * The return value (status) should be one or more of the CertificateStatus 
-  * enumerated elements bitwise or'd.
-  *
-  * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
-  *
-  * GNUTLS_CERT_INVALID\: the certificate chain is broken.
-  *
-  * GNUTLS_CERT_REVOKED\: the certificate has been revoked
-  *  (not implemented yet).
-  *
-  * GNUTLS_CERT_EXPIRED\: the certificate has expired.
-  *
-  * GNUTLS_CERT_CORRUPTED\: the certificate is corrupted.
-  *
-  * A negative error code is returned in case of an error.
-  * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that
-  * no certificate was sent by the peer.
-  *
+  * enumerated elements bitwise or'd. The return value is the same as
+  * gnutls_x509_verify_certificate().
   *
   **/
 int gnutls_certificate_verify_peers(GNUTLS_STATE state)
@@ -408,3 +393,81 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 			return GNUTLS_E_INVALID_REQUEST;
 	}
 }
+
+/**
+  * gnutls_certificate_expiration_time_peers - This function returns the peer's certificate expiration time
+  * @state: is a gnutls state
+  *
+  * This function will return the peer's certificate expiration time.
+  *
+  * Returns (time_t) -1 on error.
+  *
+  **/
+time_t gnutls_certificate_expiration_time_peers(GNUTLS_STATE state)
+{
+	CERTIFICATE_AUTH_INFO info;
+
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL) {
+		gnutls_assert();
+		return (time_t) -1;
+	}
+	
+	if (info->raw_certificate_list == NULL || info->ncerts == 0) {
+		gnutls_assert();
+		return (time_t) -1;
+	}
+
+	switch( gnutls_cert_type_get( state)) {
+		case GNUTLS_CRT_X509:
+			return gnutls_x509_extract_certificate_expiration_time(
+				&info->raw_certificate_list[0]);
+		case GNUTLS_CRT_OPENPGP:
+			return gnutls_openpgp_extract_key_expiration_time(
+				&info->raw_certificate_list[0]);
+		default:
+			return (time_t)-1;
+	}
+}
+
+/**
+  * gnutls_certificate_activation_time_peers - This function returns the peer's certificate activation time
+  * @state: is a gnutls state
+  *
+  * This function will return the peer's certificate activation time.
+  * This is the creation time for openpgp keys.
+  *
+  * Returns (time_t) -1 on error.
+  *
+  **/
+time_t gnutls_certificate_activation_time_peers(GNUTLS_STATE state)
+{
+	CERTIFICATE_AUTH_INFO info;
+
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL) {
+		gnutls_assert();
+		return (time_t) -1;
+	}
+	
+	if (info->raw_certificate_list == NULL || info->ncerts == 0) {
+		gnutls_assert();
+		return (time_t) -1;
+	}
+
+	switch( gnutls_cert_type_get( state)) {
+		case GNUTLS_CRT_X509:
+			return gnutls_x509_extract_certificate_activation_time(
+				&info->raw_certificate_list[0]);
+		case GNUTLS_CRT_OPENPGP:
+			return gnutls_openpgp_extract_key_creation_time(
+				&info->raw_certificate_list[0]);
+		default:
+			return (time_t)-1;
+	}
+}
+

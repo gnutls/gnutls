@@ -90,7 +90,6 @@ time_t _gnutls_utcTime2gtime(char *ttime)
 		return (time_t) -1;
 	}
 	xx[2] = 0;
-
 /* get the year
  */
 	memcpy(xx, ttime, 2);	/* year */
@@ -134,7 +133,6 @@ time_t _gnutls_utcTime2gtime(char *ttime)
 	etime.tm_sec = 0;
 
 	ret = mktime_utc(&etime);
-
 	return ret;
 }
 
@@ -195,23 +193,6 @@ time_t _gnutls_generalTime2gtime(char *ttime)
 
 	etime.tm_isdst = -1;
 	etime.tm_sec = 0;
-
-	return ret;
-}
-
-/* Returns 0 or EXPIRED. 
- */
-static int check_if_expired(gnutls_cert * cert)
-{
-	CertificateStatus ret = GNUTLS_CERT_EXPIRED;
-
-	if (cert->expiration_time == (time_t) (-1))
-		return GNUTLS_CERT_INVALID;
-
-	/* get the issuer of 'cert'
-	 */
-	if (time(NULL) < cert->expiration_time)
-		ret = 0;
 
 	return ret;
 }
@@ -403,12 +384,6 @@ int gnutls_verify_certificate2(gnutls_cert * cert,
 		return ret_else | GNUTLS_CERT_INVALID;
 	}
 
-	ret = check_if_expired(issuer);
-	if (ret != 0) {
-		gnutls_assert();
-		return ret_else | ret;
-	}
-
 	ret = gnutls_x509_verify_signature(cert, issuer);
 	if (ret != 0) {
 		gnutls_assert();
@@ -446,12 +421,6 @@ int _gnutls_x509_verify_certificate(gnutls_cert * certificate_list,
 
 	if (clist_size == 0) {
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-	}
-
-	ret = check_if_expired(&certificate_list[0]);
-	if (ret != 0) {
-		gnutls_assert();
-		status |= ret;
 	}
 
 	/* Verify the certificate path */

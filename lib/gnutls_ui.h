@@ -87,7 +87,7 @@ int gnutls_x509_extract_certificate_version( const gnutls_datum*);
 int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
 time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
 time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
-int gnutls_x509_extract_subject_alt_name( const gnutls_datum*, int seq, char*, int*);
+int gnutls_x509_extract_certificate_subject_alt_name( const gnutls_datum*, int seq, char*, int*);
 int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size);
 int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int* bits);
 
@@ -112,7 +112,10 @@ int gnutls_openpgp_verify_key( const gnutls_datum* keyring,
 
 /* get data from the state */
 const gnutls_datum* gnutls_certificate_get_peers( GNUTLS_STATE, int* list_size);
-const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state);
+const gnutls_datum *gnutls_certificate_get_ours( GNUTLS_STATE state);
+
+time_t gnutls_certificate_activation_time_peers(GNUTLS_STATE state);
+time_t gnutls_certificate_expiration_time_peers(GNUTLS_STATE state);
 
 int gnutls_certificate_client_get_request_status(  GNUTLS_STATE);
 int gnutls_certificate_verify_peers( GNUTLS_STATE);

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <gnutls.h>
+#include <time.h>
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
@@ -11,6 +12,17 @@
 	PRINTX( "E:", X.email)
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
 	PRINTX( "EMAIL:", X.email)
+
+static const char* my_ctime( time_t* tv) {
+static char buf[256];
+struct tm* tp;
+
+tp = localtime(tv);
+strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp);
+
+return buf;
+
+}
 
 void print_x509_info(GNUTLS_STATE state)
 {
@@ -25,6 +37,8 @@ void print_x509_info(GNUTLS_STATE state)
 	char printable[120];
 	char *print;
 	int bits, algo;
+	time_t expiret = gnutls_certificate_expiration_time_peers(state);
+	time_t activet = gnutls_certificate_activation_time_peers(state);
 
 	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
@@ -33,6 +47,9 @@ void print_x509_info(GNUTLS_STATE state)
 
 
 	printf(" - Certificate info:\n");
+
+	printf(" # Certificate is valid since: %s", my_ctime( &activet));
+	printf(" # Certificate expires: %s", my_ctime( &expiret));
 
 	/* Print the fingerprint of the certificate
 	 */
@@ -97,11 +114,16 @@ void print_openpgp_info(GNUTLS_STATE state)
 	char *print;
 	const gnutls_datum *cert_list;
 	int cert_list_size = 0;
+	time_t expiret = gnutls_certificate_expiration_time_peers(state);
+	time_t activet = gnutls_certificate_activation_time_peers(state);
 
 	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
 	if (cert_list_size > 0) {
 		int algo, bits;
+
+		printf(" # Key was created at: %s", my_ctime( &activet));
+		printf(" # Key expires: %s", my_ctime( &expiret));
 		
 		if (gnutls_openpgp_fingerprint
 		    (&cert_list[0], digest, &digest_size) >= 0) {
