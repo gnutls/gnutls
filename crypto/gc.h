@@ -68,7 +68,8 @@ enum Gc_hash
   {
     GC_MD5,
     GC_SHA1,
-    GC_RMD160
+    GC_RMD160,
+    GC_MD2
   };
 typedef enum Gc_hash Gc_hash;
 
@@ -82,6 +83,7 @@ typedef void *gc_hash;
 
 #define GC_MD5_LEN 16
 #define GC_SHA1_LEN 20
+#define GC_MD2_LEN 16
 
 /* Public-key types. */
 enum Gc_pk

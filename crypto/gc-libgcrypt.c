@@ -231,6 +231,10 @@ gc_hash_open (int hash, int mode, gc_hash * outhandle)
       gcryalg = GCRY_MD_RMD160;
       break;
 
+    case GC_MD2:
+      gcryalg = GCRY_MD_MD2;
+      break;
+
     default:
       return GC_INVALID_HASH;
     }
@@ -285,6 +289,10 @@ gc_hash_digest_length (int hash)
 
     case GC_RMD160:
       gcryalg = GCRY_MD_RMD160;
+      break;
+
+    case GC_MD2:
+      gcryalg = GCRY_MD_MD2;
       break;
 
     default:
@@ -342,6 +350,10 @@ gc_hash_buffer (int hash, const char *in, size_t inlen, char *out)
       gcryalg = GCRY_MD_RMD160;
       break;
 
+    case GC_MD2:
+      gcryalg = GCRY_MD_MD2;
+      break;
+
     default:
       return GC_INVALID_HASH;
     }
@@ -368,6 +380,33 @@ gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN])
   gcry_md_write (hd, in, inlen);
 
   p = gcry_md_read (hd, GCRY_MD_MD5);
+  if (p == NULL)
+    return GC_INVALID_HASH;
+
+  memcpy (out, p, outlen);
+
+  gcry_md_close (hd);
+
+  return GC_OK;
+}
+
+int
+gc_md2 (const char *in, size_t inlen, char out[GC_MD2_LEN])
+{
+  size_t outlen = gcry_md_get_algo_dlen (GCRY_MD_MD2);
+  gcry_md_hd_t hd;
+  gpg_error_t err;
+  unsigned char *p;
+
+  assert (outlen == GC_MD2_LEN);
+
+  err = gcry_md_open (&hd, GCRY_MD_MD2, 0);
+  if (err != GPG_ERR_NO_ERROR)
+    return GC_INVALID_HASH;
+
+  gcry_md_write (hd, in, inlen);
+
+  p = gcry_md_read (hd, GCRY_MD_MD2);
   if (p == NULL)
     return GC_INVALID_HASH;
 
