@@ -1233,10 +1233,11 @@ int _verify_x509_mem( const char* cert, int cert_size)
 				fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
 				exit(1);
 			}
-			
-			fprintf( outfile, "\tVerifying against certificate[%d]: %s\n", i-1, name);
+
+			fprintf( outfile, "\tVerifying against certificate[%d].\n", i-1);
 
 			if (strcmp( issuer_name, name) != 0) {
+				fprintf(stderr, "Error: Issuer's name: %s\n", name);
 				fprintf(stderr, "Error: Issuer's name does not match the next certificate.\n");
 				exit(1);
 			}
@@ -1244,7 +1245,7 @@ int _verify_x509_mem( const char* cert, int cert_size)
 			fprintf( outfile, "\tVerification output: ");
 			print_verification_res( x509_cert_list[i-2], x509_cert_list[i-1], 
 				x509_crl_list, x509_ncrls);
-			fprintf( outfile, "\n\n");
+			fprintf( outfile, ".\n\n");
 
 		}
 
@@ -1292,7 +1293,7 @@ int _verify_x509_mem( const char* cert, int cert_size)
 	print_verification_res( x509_cert_list[x509_ncerts-1], x509_cert_list[x509_ncerts-1], 
 				x509_crl_list, x509_ncrls);
 
-	fprintf( outfile, "\n\n");
+	fprintf( outfile, ".\n\n");
 
 	for (i=0;i<x509_ncerts;i++) {
 		gnutls_x509_crt_deinit( x509_cert_list[i]);
@@ -1332,6 +1333,12 @@ time_t now = time(0);
 		comma = 1;
 	} else {
 		fprintf(outfile, "Verified");
+		comma = 1;
+	}
+
+	if (output&GNUTLS_CERT_ISSUER_NOT_CA) {
+		if (comma) fprintf(outfile, ", ");
+		fprintf(outfile, "Issuer is not a CA");
 		comma = 1;
 	}
 

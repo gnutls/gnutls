@@ -197,6 +197,8 @@ gnutls_datum cert_signature = { NULL, 0 };
 gnutls_x509_crt issuer;
 int ret, issuer_version, result;
 
+	if (output) *output = 0;
+
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
 	else {
@@ -591,8 +593,7 @@ int gnutls_x509_crt_verify( gnutls_x509_crt cert,
 {
 	/* Verify certificate 
 	 */
-	*verify =
-	    _gnutls_verify_certificate2( cert, CA_list, CA_list_length, flags, verify);
+	_gnutls_verify_certificate2( cert, CA_list, CA_list_length, flags, verify);
 
 	return 0;
 }
