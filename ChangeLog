@@ -1,3 +1,11 @@
+2003-05-28 09:50  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_buffers.c, NEWS, lib/gnutls_buffers.c:
+
+	Corrected a bug in the record layer buffering, which affected the
+	case where external pull function was used. Report and a patch by
+	Sergey Poznyakoff <gray@Mirddin.farlep.net>.  
+
 2003-05-16 18:01  nmav <nmav@gnutls.org>
 
 	* lib/: defines.h, pkix.asn, pkix_asn1_tab.c:
