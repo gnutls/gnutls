@@ -172,7 +172,7 @@ static int generate_dh_primes(void)
        * security requirements.
        */
       printf
-	  ("Generating Diffie Hellman parameters [%d]. Please wait...",
+	  ("Generating Diffie Hellman parameters [%d]. Please wait...\n",
 	   prime_nums[i]);
       fflush(stdout);
 
@@ -209,7 +209,7 @@ static int generate_rsa_params(void)
     * security requirements.
     */
    printf
-	  ("Generating temporary RSA parameters. Please wait...");
+	  ("Generating temporary RSA parameters. Please wait...\n");
    fflush(stdout);
 
    if (gnutls_rsa_params_generate(&m, &e, &d, &p, &q, &u, 512) < 0) {
