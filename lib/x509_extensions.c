@@ -32,95 +32,12 @@
 #include <gnutls_str.h>
 #include <gnutls_x509.h>
 #include "x509/common.h"
+#include "x509/x509.h"
+#include "x509/extensions.h"
 
 /* This file contains code to parse the X.509 certificate
  * extensions. Not all the PKIX extensions are supported.
  */
-
-/* Here we only extract the KeyUsage field
- */
-static int _extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
-			     int extnValueLen)
-{
-	ASN1_TYPE ext;
-	char str[10];
-	int len, result;
-
-	keyUsage[0] = 0;
-
-	if ((result=_gnutls_asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext,
-	     "ku")) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&ext, extnValue, extnValueLen, NULL);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return 0;
-	}
-
-	len = sizeof(str) - 1;
-	result = asn1_read_value(ext, "ku", str, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return 0;
-	}
-
-	keyUsage[0] = str[0];
-
-	asn1_delete_structure(&ext);
-
-	return 0;
-}
-
-static int _extract_basicConstraints(int *CA, opaque * extnValue,
-				     int extnValueLen)
-{
-	ASN1_TYPE ext;
-	char str[128];
-	int len, result;
-
-	*CA = 0;
-
-	if ((result=_gnutls_asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext,
-	     "bc")) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&ext, extnValue, extnValueLen, NULL);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return 0;
-	}
-
-	len = sizeof(str) - 1;
-	result = asn1_read_value(ext, "bc.cA", str, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&ext);
-		return 0;
-	}
-
-	asn1_delete_structure(&ext);
-
-	if (strcmp(str, "TRUE") == 0)
-		*CA = 1;
-	else
-		*CA = 0;
-
-
-	return 0;
-}
-
 
 /*
  * If no_critical_ext is non zero, then unsupported critical extensions
@@ -137,14 +54,14 @@ static int _parse_extension(gnutls_cert * cert, char *extnID,
 	}
 
 	if (strcmp(extnID, "2 5 29 15") == 0) {	/* Key Usage */
-		return _extract_keyUsage(&cert->keyUsage, extnValue, extnValueLen);
+		return _gnutls_x509_ext_extract_keyUsage(&cert->keyUsage, extnValue, extnValueLen);
 	}
 
 	if (strcmp(extnID, "2 5 29 19") == 0) {	/* Basic Constraints */
 		/* actually checks if a certificate belongs to
 		 * a Certificate Authority.
 		 */
-		return _extract_basicConstraints(&cert->CA, extnValue,
+		return _gnutls_x509_ext_extract_basicConstraints(&cert->CA, extnValue,
 						 extnValueLen);
 	}
 

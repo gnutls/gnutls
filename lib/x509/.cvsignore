@@ -1,0 +1,14 @@
+.deps
+.libs
+*.lo
+*.o
+*.la
+Makefile.in
+gnutls.h.in
+Makefile
+.cvsignore
+*.da
+*.gcov
+*.bb
+*.bbg
+*.tex

@@ -75,6 +75,21 @@ int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int*
 int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert, 
 	int seq, char *ret, int *ret_size);
 int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert);
+
+int gnutls_x509_certificate_get_key_usage( gnutls_x509_certificate cert, unsigned int* key_usage);
+
+/* key_usage will be an OR of the following values:
+ */
+#define GNUTLS_KEY_DIGITAL_SIGNATURE 		256
+#define GNUTLS_KEY_NON_REPUDIATION		128
+#define GNUTLS_KEY_GNUTLS_KEY_ENCIPHERMENT	64
+#define GNUTLS_KEY_DATA_ENCIPHERMENT		32
+#define GNUTLS_KEY_GNUTLS_KEY_AGREEMENT		16
+#define GNUTLS_KEY_GNUTLS_KEY_CERT_SIGN		8
+#define GNUTLS_KEY_CRL_SIGN			4
+#define GNUTLS_KEY_ENCIPHER_ONLY		2
+#define GNUTLS_KEY_DECIPHER_ONLY		1
+
 int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, const char* oid,
 	unsigned char* buf, int * sizeof_buf);
 

@@ -686,9 +686,7 @@ int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert)
 {
 	int result;
 	gnutls_datum basicConstraints;
-	ASN1_TYPE c2;
-	char str[128];
-	int len;
+	int ca;
 
 	if ((result =
 	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 19", &basicConstraints)) < 0) {
@@ -701,40 +699,65 @@ int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if ((result=_gnutls_asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &c2, "bc"))
-	    != ASN1_SUCCESS) {
-		gnutls_assert();
-		_gnutls_free_datum( &basicConstraints);
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&c2, basicConstraints.data, basicConstraints.size, NULL);
+	result = _gnutls_x509_ext_extract_basicConstraints( &ca, basicConstraints.data,
+		basicConstraints.size);
 	_gnutls_free_datum( &basicConstraints);
 
-
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-
-		_gnutls_log("X509 certificate: Decoding error %d\n", result);
+	if (result < 0) {
 		gnutls_assert();
-		asn1_delete_structure(&c2);
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
-	len = sizeof(str) - 1;
-	result = asn1_read_value(c2, "bc.cA", str, &len);
-	asn1_delete_structure(&c2);
+	return ca;	
+}
 
-	if (result != ASN1_SUCCESS) {
+/**
+  * gnutls_x509_certificate_get_key_usage - This function returns the certificate's key usage
+  * @cert: should contain a gnutls_x509_certificate structure
+  * @key_usage: where the key usage bits will be stored
+  *
+  * This function will return certificate's key usage, by reading the 
+  * keyUsage X.509 extension. The key usage value will ORed values of the:
+  * GNUTLS_KEY_DIGITAL_SIGNATURE, GNUTLS_KEY_NON_REPUDIATION,
+  * GNUTLS_KEY_GNUTLS_KEY_ENCIPHERMENT, GNUTLS_KEY_DATA_ENCIPHERMENT,
+  * GNUTLS_KEY_GNUTLS_KEY_AGREEMENT, GNUTLS_KEY_GNUTLS_KEY_CERT_SIGN,
+  * GNUTLS_KEY_CRL_SIGN, GNUTLS_KEY_ENCIPHER_ONLY,
+  * GNUTLS_KEY_DECIPHER_ONLY.
+  *
+  * A negative value may be returned in case of parsing error.
+  * If the certificate does not contain the keyUsage extension
+  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+  *
+  **/
+int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned int *key_usage)
+{
+	int result;
+	gnutls_datum keyUsage;
+	uint16 _usage;
+
+	if ((result =
+	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 15", &keyUsage)) < 0) {
+	     	gnutls_assert();
+		return result;
+	}
+
+	if (keyUsage.size == 0 || keyUsage.data==NULL) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}        
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
 
-	if (strcmp(str, "TRUE") == 0)
-		return 1; /* CA */
-	else
-		return 0; /* not a CA */
+	result = _gnutls_x509_ext_extract_keyUsage( &_usage, keyUsage.data,
+		keyUsage.size);
+	_gnutls_free_datum( &keyUsage);
+	
+	*key_usage = _usage;
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
 }
 
 /**
