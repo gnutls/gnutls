@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
+ * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -500,9 +500,12 @@ void gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
   * @res: is a gnutls_certificate_credentials_t structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
-  * This function will set the diffie hellman parameters for a certificate
-  * server to use. These parameters will be used in Ephemeral Diffie Hellman 
-  * cipher suites.
+  * This function will set the diffie hellman parameters for a
+  * certificate server to use. These parameters will be used in
+  * Ephemeral Diffie Hellman cipher suites.  Note that only a pointer
+  * to the parameters are stored in the certificate handle, so if you
+  * deallocate the parameters before the certificate is deallocated,
+  * you must change the parameters stored in the certificate first.
   *
   **/
 void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
