@@ -1,7 +1,5 @@
 #include <config.h>
 
-
-
 #ifdef STDC_HEADERS
 # include <string.h>
 # include <stdlib.h>

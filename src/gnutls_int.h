@@ -8,6 +8,10 @@
 #define gnutls_calloc calloc
 #define gnutls_free free
 
+typedef struct {
+	uint8	pint[3];
+} uint24;
+
 #define rotl64(x,n)   (((x) << ((uint16)(n))) | ((x) >> (64 - (uint16)(n))))
 #define rotr64(x,n)   (((x) >> ((uint16)(n))) | ((x) << (64 - (uint16)(n))))
 #define rotl32(x,n)   (((x) << ((uint16)(n))) | ((x) >> (32 - (uint16)(n))))
@@ -22,7 +26,7 @@
 typedef unsigned char opaque;
 
 
-enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
+enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 };
 enum AlertLevel { GNUTLS_WARNING, GNUTLS_FATAL };
 enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTLS_BAD_RECORD_MAC=20,
 			GNUTLS_DECRYPTION_FAILED, GNUTLS_RECORD_OVERFLOW,  GNUTLS_DECOMPRESSION_FAILURE=30,
@@ -57,8 +61,10 @@ enum MACAlgorithm { MAC_NULL, MAC_MD5, MAC_SHA };
 enum CompressionMethod { COMPRESSION_NULL };
 
 enum ValidSession { VALID_TRUE, VALID_FALSE };
+enum ResumableSession { RESUME_TRUE, RESUME_FALSE };
 
 typedef enum ValidSession ValidSession;
+typedef enum ResumableSession ResumableSession;
 typedef enum ConnectionEnd ConnectionEnd;
 typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
 typedef enum CipherType CipherType;
@@ -104,6 +110,7 @@ typedef struct {
 typedef struct {
 	char*	buffer;
 	uint32  bufferSize;
+	ResumableSession resumable;
 	ValidSession	 valid_connection;
 	AlertDescription last_alert;
 } GNUTLS_INTERNALS;
@@ -170,4 +177,48 @@ typedef struct {
 } GNUTLSCiphertext;
 
 
+/* Handshake protocol */
+
+enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
+		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
+		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
+		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
+		     GNUTLS_FINISHED=20 };
+			
+typedef enum HandshakeType HandshakeType;
+
+typedef struct {
+	HandshakeType	msg_type;
+	uint24		length;
+	void*		body;
+} GNUTLS_Handshake;
+
+typedef struct {
+	uint32	gmt_unix_time;
+	opaque  random_bytes[28];
+} GNUTLS_random;
+
+typedef struct {
+	uint8 CipherSuite[2];
+} GNUTLS_CipherSuite;
+
+typedef struct {
+	ProtocolVersion		client_version;
+	GNUTLS_random		random;
+	opaque*			session_id;
+	GNUTLS_CipherSuite*	cipher_suites;
+	CompressionMethod*	compression_methods;
+} GNUTLS_ClientHello;
+
+typedef struct {
+	ProtocolVersion		server_version;
+	GNUTLS_random		random;
+	opaque*			session_id;
+	GNUTLS_CipherSuite	cipher_suite;
+	CompressionMethod	compression_method;
+} GNUTLS_ServerHello;
+
+#define GNUTLS_DH_anon_WITH_3DES_EDE_CBC_SHA { 0x00, 0x1B }
+
+/* functions */
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
