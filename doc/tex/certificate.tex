@@ -64,7 +64,7 @@ distinguished name are defined in \emph{gnutls/x509.h}.
 \\
 The \emph{Version} field in a certificate has values either 1 or 3 for version 3 certificates.
 Version 1 certificates do not support the extensions field so it is not possible
-to distinguish a CA from a person, so their usage should be avoided.
+to distinguish a CA from a person, thus their usage should be avoided.
 \\
 \\
 The \emph{validity} dates are there to indicate the date that the specific certificate
@@ -82,10 +82,19 @@ All the supported X.509 version 3 extensions are shown in the table below.
 subject key ID & 2.5.29.14 & A unique ID of the subject's key.
 \\
 \hline
-key usage & 2.5.29.15 & Constraints the key's usage of the certificate.
+subject key id & 2.5.29.14 & An identifier of the key of the subject.
+\\
+\hline
+authority key id & 2.5.29.35 & An identifier of the authority's key used to sign the certificate.
 \\
 \hline
 subject alternative name & 2.5.29.17 & Alternative names to subject's distinguished name.
+\\
+\hline
+key usage & 2.5.29.15 & Constraints the key's usage of the certificate.
+\\
+\hline
+extended key usage & 2.5.29.37 & Constraints the purpose of the certificate.
 \\
 \hline
 basic constraints & 2.5.29.19 & Indicates whether this is a CA certificate or not.
