@@ -313,18 +313,21 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 	_gnutls_mpi_mul(tmp1, u, x);
 	_gnutls_mpi_add(tmp4, a, tmp1);
 	_gnutls_mpi_powm(S, tmp2, tmp4, n);
-	
-	return S;
-
-	freeall:
 
 	_gnutls_mpi_release(&tmp1);
 	_gnutls_mpi_release(&tmp2);
 	_gnutls_mpi_release(&tmp3);
 	_gnutls_mpi_release(&tmp4);
-	_gnutls_mpi_release(&S);
+	
+	return S;
 
-	return NULL;
+	freeall:
+		_gnutls_mpi_release(&tmp1);
+		_gnutls_mpi_release(&tmp2);
+		_gnutls_mpi_release(&tmp3);
+		_gnutls_mpi_release(&tmp4);
+		_gnutls_mpi_release(&S);
+		return NULL;
 }
 
 /**
