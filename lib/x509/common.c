@@ -713,6 +713,7 @@ int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim)
 
     _gnutls_str_cat(name, sizeof(name), ".utcTime");
 
+    len = strlen( name);
     result = asn1_write_value(c2, name, str_time, len);
     if (result != ASN1_SUCCESS) {
 	gnutls_assert();
