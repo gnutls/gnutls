@@ -11,7 +11,7 @@
 #endif
 
 #include <time.h>
-
+#include <ctype.h>
 
 /* for open */
 #ifdef HAVE_SYS_TYPES_H

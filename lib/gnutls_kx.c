@@ -1,8 +1,11 @@
 #include "defines.h"
 #include "gnutls_int.h"
+#include "gnutls_handshake.h"
 #include "gnutls_kx.h"
 #include "gnutls_dh.h"
 #include "gnutls_errors.h"
+#include "gnutls_algorithms.h"
+#include "debug.h"
 
 #define MASTER_SECRET "master secret"
 
@@ -47,13 +50,13 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			mpi_release(p);
 
 			_n_p = n_p;
+
 #ifndef WORDS_BIGENDIAN
 			_n_p = byteswap16(_n_p);
 			memmove(data_p, &_n_p, 2);
 #else
 			memmove(data_p, &_n_p, 2);
 #endif
-
 
 			data_g = &data_p[2+n_p];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_g[2],
@@ -110,8 +113,6 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	
 	memmove( random, state->security_parameters.client_random, 32);
 	memmove( &random[32], state->security_parameters.server_random, 32);
-
-	n_X = 1530;
 
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo(state->
@@ -187,7 +188,6 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 /* We have this as an upper limit, since the record layer defines this
  * as a maximum packet length */
-#define MAX_KX_MESSAGE_SIZE 16384
 
 int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 {
@@ -195,12 +195,11 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 	uint16 n_Y, n_g, n_p;
 	int _n_Y, _n_g, _n_p;
 	uint8 *data;
+	int datasize;
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_Y;
-	int ret=0, i=0;
-
-	n_Y = n_g = n_p = 512 - 2;
+	int ret=0, i;
 
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo(state->
@@ -211,19 +210,20 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
 
-			state->gnutls_internals.next_handshake_type = GNUTLS_SERVER_KEY_EXCHANGE;
-			data = gnutls_malloc( MAX_KX_MESSAGE_SIZE);
-			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, MAX_KX_MESSAGE_SIZE);
-			state->gnutls_internals.next_handshake_type = GNUTLS_NONE;
+			ret = _gnutls_recv_handshake(cd, state, &data, &datasize, GNUTLS_SERVER_KEY_EXCHANGE);
 
-
+			if (ret < 0) return ret;
+			
+			i=0;
 			memmove( &n_p, &data[i], 2);
 			i+=2;
+
 #ifndef WORDS_BIGENDIAN
 			n_p = byteswap16(n_p);
 #endif
 			data_p = &data[i];
 			i+=n_p;	
+			if (i>datasize) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 			
 			memmove( &n_g, &data[i], 2);
 #ifndef WORDS_BIGENDIAN
@@ -232,6 +232,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 			i+=2;
 			data_g = &data[i];
 			i+=n_g;
+			if (i>datasize) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 			
 			memmove( &n_Y, &data[i], 2);
 			i+=2;
@@ -240,6 +241,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 #endif
 			data_Y = &data[i];
 			i+=n_Y;
+			if (i>datasize) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 			
 			_n_Y = n_Y;
 			_n_g = n_g;
@@ -264,16 +266,15 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	uint16 n_Y;
 	int _n_Y;
 	uint8 *data;
+	int datasize;
 	int ret=0;
 	uint8 *premaster;
 	int premaster_size;
 	svoid* master;
-	char* random = gnutls_malloc(64);
+	uint8* random = gnutls_malloc(64);
 	
 	memmove( random, state->security_parameters.client_random, 32);
 	memmove( &random[32], state->security_parameters.server_random, 32);
-
-	n_Y = 1000 - 3;
 
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo(state->
@@ -284,10 +285,8 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
 
-			state->gnutls_internals.next_handshake_type = GNUTLS_CLIENT_KEY_EXCHANGE;
-			data = gnutls_malloc( MAX_KX_MESSAGE_SIZE);
-			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, MAX_KX_MESSAGE_SIZE);
-			state->gnutls_internals.next_handshake_type = GNUTLS_NONE;
+			ret = _gnutls_recv_handshake(cd, state, &data, &datasize, GNUTLS_CLIENT_KEY_EXCHANGE);
+			if (ret < 0) return ret;
 			
 			if ( data[0] != 1) return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 

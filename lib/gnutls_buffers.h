@@ -1,5 +1,7 @@
-int gnutls_insertDataBuffer(GNUTLS_STATE state, char *data, int length);
+int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, int length);
 int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state);
-int gnutls_getDataFromBuffer(GNUTLS_STATE state, char *data, int length);
+int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, int length);
 ssize_t Read(int fd, void *iptr, size_t n);
 ssize_t Write(int fd, const void *iptr, size_t n);
+ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, void *iptr, size_t sizeOfPtr);
+ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, void *, size_t);

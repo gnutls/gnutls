@@ -301,9 +301,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	GNUTLSCiphertext *ciphertext;
 	uint8 *padding, *content, *MAC;
 	uint16 c_length;
-	int rc;
 	uint8 *data;
-	uint8 *macpointer;
 	uint8 pad;
 	uint8 *rand;
 	uint64 seq_num;
@@ -473,9 +471,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	GNUTLSCompressed *compressed;
 	uint8 *content, *MAC;
 	uint16 c_length;
-	int rc;
 	uint8 *data;
-	uint8 *macpointer;
 	uint8 pad;
 	uint64 seq_num;
 	uint16 length;

@@ -23,6 +23,9 @@ _gnutls_set_keys( GNUTLS_STATE):
 _gnutls_connection_state_init( GNUTLS_STATE):
 	This function sets the current connection state to conform with the
 	security parameters(pending state), and initializes encryption.
+	This function is to be called after a successful handshake. It
+	sets the algorithms (mac,cipher etc) from the handshake, and setups
+	all the keys and IV needed (uses the previous functions).
 
 gnutls_send( int desc, GNUTLS_STATE, char* data, int datalen):
 gnutls_recv( int desc, GNUTLS_STATE, char* data, int datalen):

@@ -59,7 +59,7 @@ static gnutls_kx_algo_entry kx_algorithms[] = {
                         GNUTLS_KX_LOOP( if(p->algorithm == algorithm) { a; break; } )
 
 #define GNUTLS_CIPHER_SUITE_ENTRY(suite, kx_algorithm, cipher_algorithm, mac_algorithm) \
-	{ #suite, suite, kx_algorithm, cipher_algorithm, mac_algorithm}
+	{ #suite, suite, kx_algorithm, cipher_algorithm, mac_algorithm }
 
 struct gnutls_cipher_suite_entry {
 	char*			name;

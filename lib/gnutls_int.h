@@ -1,7 +1,7 @@
 #include <gcrypt.h>
 #include <mhash.h>
 
-/* #define HARD_DEBUG */
+//#define HARD_DEBUG
 #define DEBUG
 
 #define svoid void /* for functions that allocate using secure_free */
@@ -27,7 +27,7 @@ typedef struct {
 
 #define byteswap16(x)  ((rotl16(x, 8) & 0x00ff) | (rotr16(x, 8) & 0xff00))
 #define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ff) | (rotr32(x, 8) & 0xff00ff00))
-#define byteswap64(x)  ((rotl64(x, 8) & 0x00ff00ff00ff00ff) | (rotr64(x, 8) & 0xff00ff00ff00ff00))
+#define byteswap64(x)  ((rotl64(x, 8) & 0x00ff00ff00ff00ffLL) | (rotr64(x, 8) & 0xff00ff00ff00ff00LL))
 
 typedef unsigned char opaque;
 
@@ -52,7 +52,7 @@ enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HE
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
 		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
 		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
-		     GNUTLS_FINISHED=20, GNUTLS_NONE=255 };
+		     GNUTLS_FINISHED=20 };
 			
 typedef enum HandshakeType HandshakeType;
 
@@ -144,6 +144,8 @@ typedef struct {
 typedef struct {
 	char*			buffer;
 	uint32			bufferSize;
+	char*			buffer_handshake;
+	uint32			bufferSize_handshake;
 	ResumableSession	resumable;
 	ValidSession		valid_connection;
 	AlertDescription	last_alert;
@@ -193,14 +195,14 @@ typedef struct {
 } ProtocolVersion;
 
 typedef struct {
-	ContentType	type;
+	uint8	type;
 	ProtocolVersion	version;
 	uint16		length;
 	opaque*		fragment;
 } GNUTLSPlaintext;
 
 typedef struct {
-	ContentType	type;
+	uint8	type;
 	ProtocolVersion	version;
 	uint16		length;
 	opaque*		fragment;
@@ -222,7 +224,7 @@ typedef struct {
 } GNUTLS_GenericStreamCipher;
 
 typedef struct {
-	ContentType		type;
+	uint8		type;
 	ProtocolVersion		version;
 	uint16			length;
 	void*			fragment; /* points GenericStreamCipher
@@ -269,4 +271,7 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);
 int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor);
- 
+int _gnutls_set_keys(GNUTLS_STATE state);
+ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
+ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
+int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
