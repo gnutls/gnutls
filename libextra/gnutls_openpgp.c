@@ -815,6 +815,7 @@ gnutls_openpgp_count_key_names( const gnutls_datum *cert )
 /**
  * gnutls_openpgp_extract_key_name - Extracts the userID
  * @cert: the raw data that contains the OpenPGP public key.
+ * @idx: the index of the ID to extract
  * @dn: the structure to store the userID specific data in.
  *
  * Extracts the userID from the raw OpenPGP key.
@@ -883,6 +884,82 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
         memcpy( dn->email, uid->name+pos1, size );
         dn->email[size-1] = '\0'; /* make sure it's a string */
     }
+    if( uid->is_revoked ) {
+        rc = GNUTLS_E_OPENPGP_UID_REVOKED;
+        goto leave; 
+    }
+  
+leave:
+    cdk_kbnode_release( knode );
+    return rc;
+}
+
+/**
+ * gnutls_openpgp_extract_key_name_string - Extracts the userID
+ * @cert: the raw data that contains the OpenPGP public key.
+ * @idx: the index of the ID to extract
+ * @buf: a pointer to a structure to hold the peer's name
+ * @sizeof_buf: holds the size of 'buf'
+ *
+ * Extracts the userID from the raw OpenPGP key.
+ **/
+int
+gnutls_openpgp_extract_key_name_string( const gnutls_datum *cert,
+                                 int idx,
+                                 char *buf, unsigned int sizeof_buf)
+{
+    CDK_KBNODE knode = NULL, ctx = NULL, p;
+    CDK_PACKET *pkt = NULL;
+    cdkPKT_user_id *uid = NULL;
+    char *email;
+    int pos = 0, pos1 = 0, pos2 = 0;
+    size_t size = 0;
+    int rc = 0;
+
+    if( !cert || !buf ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
+    
+    if( idx < 0 || idx > gnutls_openpgp_count_key_names( cert ) ) {
+        gnutls_assert( );
+        return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
+    if( (rc = map_cdk_rc( rc )) ) {
+        gnutls_assert( );
+        return rc;
+    }
+    if( !idx )
+        pkt = cdk_kbnode_find_packet( knode, CDK_PKT_USER_ID );
+    else {
+        pos = 0;
+        while( (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
+            pkt = cdk_kbnode_get_packet( p );
+            if( pkt->pkttype == CDK_PKT_USER_ID && ++pos == idx )
+                break;
+        }
+    }
+
+    if( !pkt ) {
+        rc = GNUTLS_E_INTERNAL_ERROR;
+        goto leave;   
+    }
+    
+    uid = pkt->pkt.user_id;
+    
+    if (uid->len >= sizeof_buf) {
+    	gnutls_assert();
+    	rc = GNUTLS_E_SHORT_MEMORY_BUFFER;
+    	goto leave;
+    }
+
+    size = uid->len < sizeof_buf? uid->len : sizeof_buf-1;
+    memcpy( buf, uid->name, size);
+
+    buf[size] = '\0'; /* make sure it's a string */
+
     if( uid->is_revoked ) {
         rc = GNUTLS_E_OPENPGP_UID_REVOKED;
         goto leave; 
@@ -2070,6 +2147,14 @@ void gnutls_openpgp_set_recv_key_function( gnutls_session session,
                                            gnutls_openpgp_recv_key_func func )
 {
 
+}
+
+int
+gnutls_openpgp_extract_key_name_string( const gnutls_datum *cert,
+                                 int idx,
+                                 char *buf, unsigned int sizeof_buf)
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 #endif /* HAVE_LIBOPENCDK */
 

@@ -1,6 +1,8 @@
 Version 0.6.1
 - Added gnutls_x509_extract_dn_string() which returns a 
   distinguished name in a single string.
+- Added gnutls_openpgp_extract_key_name_string() which returns
+  an openpgp user ID in a single string.
 
 Version 0.6.0 (8/12/2002)
 - Added "gnutls/compat4.h" header. This is included in gnutls.h
