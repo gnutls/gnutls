@@ -18,14 +18,5 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_freeTLSCompressed(GNUTLSCompressed * compressed);
-int _gnutls_TLSPlaintext2TLSCompressed(GNUTLS_STATE state,
-						     GNUTLSCompressed **
-						     compress,
-						     GNUTLSPlaintext *
-						     plaintext);
-int _gnutls_TLSCompressed2TLSPlaintext(GNUTLS_STATE state,
-						     GNUTLSPlaintext**
-						     plain,
-						     GNUTLSCompressed *
-						     compressed);
+int _gnutls_plaintext2TLSCompressed(GNUTLS_STATE state, gnutls_datum* compress, gnutls_datum plaintext);
+int _gnutls_TLSCompressed2plaintext(GNUTLS_STATE state, gnutls_datum* plain, gnutls_datum compressed);

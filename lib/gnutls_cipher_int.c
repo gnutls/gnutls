@@ -85,7 +85,7 @@ return ret;
 }
 
 int gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) {
-	if (handle!=NULL) {
+	if (handle!=GNUTLS_CIPHER_FAILED) {
 #ifdef USE_MCRYPT
 		mcrypt_generic( handle, text, textlen);
 #else
@@ -99,7 +99,7 @@ int gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) 
 }
 
 int gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int ciphertextlen) {
-	if (handle!=NULL) {
+	if (handle!=GNUTLS_CIPHER_FAILED) {
 #ifdef USE_MCRYPT
 		mdecrypt_generic( handle, ciphertext, ciphertextlen);
 #else
@@ -113,7 +113,7 @@ int gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int cip
 }
 
 void gnutls_cipher_deinit(GNUTLS_CIPHER_HANDLE handle) {
-	if (handle!=NULL) {
+	if (handle!=GNUTLS_CIPHER_FAILED) {
 #ifdef USE_MCRYPT
 		mcrypt_generic_end( handle);
 #else

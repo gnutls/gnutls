@@ -25,7 +25,6 @@
 #include "debug.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_compress.h"
-#include "gnutls_plaintext.h"
 #include "gnutls_cipher.h"
 #include "gnutls_buffers.h"
 #include "gnutls_kx.h"
@@ -97,8 +96,8 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 
 #define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
 
-/* Read a v2 client hello. Some browsers still use that beast!!!
- * However they set their version to 3.0 or 3.1 --- that's cool!
+/* Read a v2 client hello. Some browsers still use that beast!
+ * However they set their version to 3.0 or 3.1.
  */
 int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 			      int datalen)
@@ -108,19 +107,18 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	int ret = 0;
 	uint16 sizeOfSuites;
 	GNUTLS_Version version;
-	opaque random[32];
+	opaque random[TLS_RANDOM_SIZE];
 	int len = datalen;
 	int err;
 	uint16 challenge;
-	opaque session_id[32];
+	opaque session_id[TLS_MAX_SESSION_ID_SIZE];
 	
 	/* we only want to get here once - only in client hello */
 	state->gnutls_internals.v2_hello = 0;
 
-
 	DECR_LEN(len, 2);
 #ifdef DEBUG
-	fprintf(stderr, "Client's version: %d.%d\n", data[pos],
+	fprintf(stderr, "V2 Handshake: Client's version: %d.%d\n", data[pos],
 		data[pos + 1]);
 #endif
 
@@ -141,26 +139,23 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	DECR_LEN(len, 2);
 	sizeOfSuites = READuint16( &data[pos]);
 	pos += 2;
-fprintf(stderr, "suites: %d\n", sizeOfSuites);
 	
 	/* read session id length */
 	DECR_LEN(len, 2);
 	session_id_len = READuint16( &data[pos]);
 	pos += 2;
 
-	if (session_id_len > 32) { 
+	if (session_id_len > TLS_MAX_SESSION_ID_SIZE) { 
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-fprintf(stderr, "sessid: %d\n", session_id_len);
 
 	/* read challenge length */
 	DECR_LEN(len, 2);
 	challenge = READuint16( &data[pos]);
 	pos += 2;
-fprintf(stderr, "challenge: %d\n", challenge);
 
-	if ( challenge < 16 || challenge > 32) {
+	if ( challenge < 16 || challenge > TLS_RANDOM_SIZE) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
@@ -196,7 +191,7 @@ fprintf(stderr, "challenge: %d\n", challenge);
 	if (state->gnutls_internals.auth_struct == NULL) {
 #ifdef DEBUG
 		fprintf(stderr,
-			"Cannot find the appropriate handler for the KX algorithm\n");
+			"V2 Handshake: Cannot find the appropriate handler for the KX algorithm\n");
 #endif
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
@@ -210,9 +205,13 @@ fprintf(stderr, "challenge: %d\n", challenge);
 	pos+=session_id_len;
 	
 	DECR_LEN(len, challenge);
-	memset( random, 0, 32);
-	memcpy( random, &data[pos], challenge);
-fprintf(stderr, "challenge: %s\n", _gnutls_bin2hex(random, 32));
+	memset( random, 0, TLS_RANDOM_SIZE);
+	
+	/* Well, I think that this is not what TLS 1.0 defines,
+	 * but with this, we are compatible with netscape browser!
+	 */
+	memcpy( &random[TLS_RANDOM_SIZE-challenge], &data[pos], challenge);
+
 	_gnutls_set_client_random( state, random);
 
 	/* generate server random value */
@@ -231,9 +230,9 @@ fprintf(stderr, "challenge: %s\n", _gnutls_bin2hex(random, 32));
 	if (ret == 0) {		/* resumed! */
 		/* get the new random values */
 		memcpy(state->gnutls_internals.resumed_security_parameters.server_random,
-		       state->security_parameters.server_random, 32);
+		       state->security_parameters.server_random, TLS_RANDOM_SIZE);
 		memcpy(state->gnutls_internals.resumed_security_parameters.client_random,
-		       state->security_parameters.client_random, 32);
+		       state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
 		state->gnutls_internals.resumed = RESUME_TRUE;
 		return 0;

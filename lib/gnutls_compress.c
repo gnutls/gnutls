@@ -24,62 +24,44 @@
 #include "gnutls_errors.h"
 #include "gnutls_compress_int.h"
 
-int _gnutls_TLSPlaintext2TLSCompressed(GNUTLS_STATE state,
-						     GNUTLSCompressed **
+int _gnutls_plaintext2TLSCompressed(GNUTLS_STATE state,
+						     gnutls_datum*
 						     compress,
-						     GNUTLSPlaintext *
-						     plaintext)
+						     gnutls_datum plaintext)
 {
 	int size;
-	GNUTLSCompressed *compressed;
 	char *data;
 	
-	*compress = gnutls_malloc(sizeof(GNUTLSCompressed));
-	compressed = *compress;
-
 	data=NULL;
 	
-	size = gnutls_compress( state->security_parameters.compression_algorithm, plaintext->fragment, plaintext->length, &data);
+	size = gnutls_compress( state->security_parameters.compression_algorithm, plaintext.data, plaintext.size, &data);
 	if (size < 0) {
 		if (data!=NULL) gnutls_free(data);
-		gnutls_free(*compress);
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
-	compressed->fragment = data;
-	compressed->length = size;
-	compressed->type = plaintext->type;
-	compressed->version.major = plaintext->version.major;
-	compressed->version.minor = plaintext->version.minor;
+	compress->data = data;
+	compress->size = size;
 
 	return 0;
 }
 
-int _gnutls_TLSCompressed2TLSPlaintext(GNUTLS_STATE state,
-						     GNUTLSPlaintext**
-						     plain,
-						     GNUTLSCompressed *
+int _gnutls_TLSCompressed2plaintext(GNUTLS_STATE state,
+						     gnutls_datum* plain,
+						     gnutls_datum
 						     compressed)
 {
-	GNUTLSPlaintext *plaintext;
 	int size;
 	char* data;
 
-	*plain = gnutls_malloc(sizeof(GNUTLSPlaintext));
-	plaintext = *plain;
-
 	data=NULL;
 	
-	size = gnutls_decompress( state->security_parameters.compression_algorithm, compressed->fragment, compressed->length, &data);
+	size = gnutls_decompress( state->security_parameters.compression_algorithm, compressed.data, compressed.size, &data);
 	if (size < 0) {
 		if (data!=NULL) gnutls_free(data);
-		gnutls_free(*plain);
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
-	plaintext->fragment = data;
-	plaintext->length = size;
-	plaintext->type = compressed->type;
-	plaintext->version.major = compressed->version.major;
-	plaintext->version.minor = compressed->version.minor;
+	plain->data = data;
+	plain->size = size;
 
 	return 0;
 }
@@ -87,13 +69,3 @@ int _gnutls_TLSCompressed2TLSPlaintext(GNUTLS_STATE state,
 
 
 
-int _gnutls_freeTLSCompressed(GNUTLSCompressed * compressed)
-{
-	if (compressed == NULL)
-		return 0;
-
-	gnutls_free(compressed->fragment);
-	gnutls_free(compressed);
-
-	return 0;
-}

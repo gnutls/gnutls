@@ -92,23 +92,23 @@ struct gnutls_cipher_entry {
 	BulkCipherAlgorithm id;
 	size_t blocksize;
 	size_t keysize;
-	size_t block;
+	CipherType block;
 	size_t iv;
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
 /* Note that all algorithms are in CBC or STREAM modes. 
- * Do not add any algorithms in other modes.
+ * Do not add any algorithms in other modes (avoid modified algorithms).
  * View first: "The order of encryption and authentication for
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  */
 static const gnutls_cipher_entry algorithms[] = {
-	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES_CBC, 8, 24, 1, 8),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL_CBC, 16, 16, 1, 16),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL256_CBC, 16, 32, 1, 16),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_TWOFISH_CBC, 16, 16, 1, 16),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_NULL_CIPHER, 1, 0, 0, 0),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES_CBC, 8, 24, CIPHER_BLOCK, 8),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL_CBC, 16, 16, CIPHER_BLOCK, 16),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL256_CBC, 16, 32, CIPHER_BLOCK, 16),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_TWOFISH_CBC, 16, 16, CIPHER_BLOCK, 16),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, CIPHER_STREAM, 0),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_NULL_CIPHER, 1, 0, CIPHER_STREAM, 0),
 	{0}
 };
 
@@ -221,6 +221,8 @@ typedef struct {
 	KXAlgorithm kx_algorithm;
 	MACAlgorithm mac_algorithm;
 } gnutls_cipher_suite_entry;
+
+#define GNUTLS_RSA_NULL_MD5 { 0x00, 0x01 }
 
 #define GNUTLS_DH_anon_3DES_EDE_CBC_SHA { 0x00, 0x1B }
 #define GNUTLS_DH_anon_ARCFOUR_MD5 { 0x00, 0x18 }
@@ -366,6 +368,10 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 				  GNUTLS_MAC_SHA),
 
 	/* RSA */
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_NULL_MD5,
+				  GNUTLS_NULL_CIPHER,
+				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5),
+
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_SHA,
 				  GNUTLS_ARCFOUR,
 				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA),

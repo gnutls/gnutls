@@ -63,8 +63,6 @@ void _gnutls_print_state(GNUTLS_STATE state)
 		state->security_parameters.entity);
 	fprintf(stderr, "Cipher Algorithm: %d\n",
 		state->security_parameters.bulk_cipher_algorithm);
-	fprintf(stderr, "Cipher Type: %d\n",
-		state->security_parameters.cipher_type);
 	fprintf(stderr, "Key Size: %d\n",
 		state->security_parameters.key_size);
 	fprintf(stderr, "Key Material: %d\n",

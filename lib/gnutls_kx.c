@@ -81,7 +81,7 @@ char random[64];
  * server. It does nothing if this type of message is not required
  * by the selected ciphersuite. 
  */
-int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
+int _gnutls_send_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
@@ -113,7 +113,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 }
 
 /* Currently only used in SRP */
-int _gnutls_send_server_kx_message2(int cd, GNUTLS_STATE state)
+int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
@@ -154,7 +154,7 @@ int _gnutls_send_server_kx_message2(int cd, GNUTLS_STATE state)
 /* This is the function for the client to send the key
  * exchange message 
  */
-int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
+int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data;
 	int data_size;
@@ -198,7 +198,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 /* Only used in SRP currently
  */
-int _gnutls_send_client_kx_message0(int cd, GNUTLS_STATE state)
+int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data;
 	int data_size;
@@ -234,7 +234,7 @@ int _gnutls_send_client_kx_message0(int cd, GNUTLS_STATE state)
  * FIXME: this function does almost nothing except sending garbage to
  * peer.
  */
-int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
+int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data;
 	int ret = 0;
@@ -266,7 +266,7 @@ int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
 }
 
 
-int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
+int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	uint8 *data;
@@ -298,7 +298,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_recv_server_kx_message2(int cd, GNUTLS_STATE state)
+int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	uint8 *data;
@@ -335,7 +335,7 @@ int _gnutls_recv_server_kx_message2(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
+int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	uint8 *data;
@@ -379,7 +379,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 }
 
 /* only used in SRP */
-int _gnutls_recv_client_kx_message0(int cd, GNUTLS_STATE state)
+int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	uint8 *data;
@@ -418,7 +418,7 @@ int _gnutls_recv_client_kx_message0(int cd, GNUTLS_STATE state)
 
 /* This is called when we want send our certificate
  */
-int _gnutls_send_certificate(int cd, GNUTLS_STATE state)
+int _gnutls_send_certificate(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data = NULL;
 	int data_size = 0;

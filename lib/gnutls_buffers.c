@@ -22,7 +22,7 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #ifdef HAVE_ERRNO_H
-# include <errno.h>
+ # include <errno.h>
 #endif
 
 int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, int length)
@@ -35,7 +35,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 
 		state->gnutls_internals.buffer.size += length;
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Inserted %d bytes of Data(%d) into buffer\n", length, type);
+	fprintf(stderr, "BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer.data =
 		    gnutls_realloc(state->gnutls_internals.buffer.data,
@@ -47,7 +47,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 
 		state->gnutls_internals.buffer_handshake.size += length;
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Inserted %d bytes of Data(%d) into buffer\n", length, type);
+	fprintf(stderr, "BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer_handshake.data =
 		    gnutls_realloc(state->gnutls_internals.buffer_handshake.data,
@@ -91,7 +91,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 			length = state->gnutls_internals.buffer.size;
 		}
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Read %d bytes of Data(%d) from buffer\n", length, type);
+	fprintf(stderr, "BUFFER: Read %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer.size -= length;
 		memmove(data, state->gnutls_internals.buffer.data, length);
@@ -109,7 +109,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 			length = state->gnutls_internals.buffer_handshake.size;
 		}
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Read %d bytes of Data(%d) from buffer\n", length, type);
+	fprintf(stderr, "BUFFER: Read %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer_handshake.size -= length;
 		memmove(data, state->gnutls_internals.buffer_handshake.data, length);
@@ -155,7 +155,7 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 	}
 
 #ifdef READ_DEBUG
-	fprintf(stderr, "read %d bytes from %d\n", (sizeOfPtr-left), fd);
+	fprintf(stderr, "READ: read %d bytes from %d\n", (sizeOfPtr-left), fd);
 	for (x=0;x<((sizeOfPtr-left)/16)+1;x++) {
 		fprintf(stderr, "%.4x - ",x);
 		for (j=0;j<16;j++) {
@@ -186,7 +186,7 @@ ssize_t _gnutls_Write(int fd, const void *iptr, size_t n)
 	const char *ptr = iptr;
 
 #ifdef WRITE_DEBUG
-	fprintf(stderr, "wrote %d bytes to %d\n", n, fd);
+	fprintf(stderr, "WRITE: wrote %d bytes to %d\n", n, fd);
 	for (x=0;x<(n/16)+1;x++) {
 		fprintf(stderr, "%.4x - ",x);
 		for (j=0;j<16;j++) {
@@ -261,7 +261,7 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 
 	state->gnutls_internals.hash_buffer.size += length;
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Inserted %d bytes of Hash Data into buffer\n", length);
+	fprintf(stderr, "HASH_BUFFER: Inserted %d bytes of Data\n", length);
 #endif
 	state->gnutls_internals.hash_buffer.data =
 		    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
@@ -283,7 +283,7 @@ int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 		length = state->gnutls_internals.hash_buffer.size;
 	}
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Got %d bytes of Hash Data from buffer\n", length);
+	fprintf(stderr, "HASH BUFFER: Got %d bytes of Data\n", length);
 #endif
 	state->gnutls_internals.hash_buffer.size -= length;
 	memmove(data, state->gnutls_internals.hash_buffer.data, length);
@@ -299,13 +299,15 @@ int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 
 }
 
+/* this function does not touch the buffer
+ */
 int gnutls_readHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 {
 	if (length > state->gnutls_internals.hash_buffer.size) {
 		length = state->gnutls_internals.hash_buffer.size;
 	}
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Read %d bytes of Hash Data from buffer\n", length);
+	fprintf(stderr, "HASH BUFFER: Read %d bytes of Data\n", length);
 #endif
 	memmove(data, state->gnutls_internals.hash_buffer.data, length);
 	return length;	
@@ -317,7 +319,7 @@ int gnutls_clearHashDataBuffer( GNUTLS_STATE state)
 {
 
 #ifdef BUFFERS_DEBUG
-	fprintf(stderr, "Cleared Hash Data from buffer\n");
+	fprintf(stderr, "HASH BUFFER: Cleared Data from buffer\n");
 #endif
 	state->gnutls_internals.hash_buffer.size = 0;
 	if (state->gnutls_internals.hash_buffer.data!=NULL)

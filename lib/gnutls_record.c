@@ -23,7 +23,6 @@
 #include "gnutls_errors.h"
 #include "debug.h"
 #include "gnutls_compress.h"
-#include "gnutls_plaintext.h"
 #include "gnutls_cipher.h"
 #include "gnutls_buffers.h"
 #include "gnutls_handshake.h"
@@ -353,7 +352,7 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 {
 	char *key_block;
 	char keyexp[] = "key expansion";
-	char random[64];
+	char random[2*TLS_RANDOM_SIZE];
 	int hash_size;
 	int IV_size;
 	int key_size;
@@ -362,8 +361,8 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	IV_size = state->security_parameters.IV_size;
 	key_size = state->security_parameters.key_material_length;
 
-	memmove(random, state->security_parameters.server_random, 32);
-	memmove(&random[32], state->security_parameters.client_random, 32);
+	memmove(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, 32);
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3 */
 		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, 48, random, 64,
@@ -373,24 +372,41 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 		    gnutls_PRF( state->security_parameters.master_secret, 48,
 			       keyexp, strlen(keyexp), random, 64, 2 * hash_size + 2 * key_size + 2 * IV_size);
 	}
+	
+	if (key_block==NULL) return GNUTLS_E_MEMORY_ERROR;
 
-	state->cipher_specs.client_write_mac_secret = secure_malloc(hash_size);
-	memmove(state->cipher_specs.client_write_mac_secret, &key_block[0], hash_size);
+	if (hash_size>0) {
+		state->cipher_specs.client_write_mac_secret = secure_malloc(hash_size);
+		if (state->cipher_specs.client_write_mac_secret==NULL) 
+			return GNUTLS_E_MEMORY_ERROR;
+		memmove(state->cipher_specs.client_write_mac_secret, &key_block[0], hash_size);
 
-	state->cipher_specs.server_write_mac_secret = secure_malloc(hash_size);
-	memmove(state->cipher_specs.server_write_mac_secret, &key_block[hash_size], hash_size);
+		state->cipher_specs.server_write_mac_secret = secure_malloc(hash_size);
+		if (state->cipher_specs.server_write_mac_secret==NULL) 
+			return GNUTLS_E_MEMORY_ERROR;
+		memmove(state->cipher_specs.server_write_mac_secret, &key_block[hash_size], hash_size);
+	}
+	
+	if (key_size>0) {
+		state->cipher_specs.client_write_key = secure_malloc(key_size);
+		if (state->cipher_specs.client_write_key==NULL) 
+			return GNUTLS_E_MEMORY_ERROR;
+		memmove(state->cipher_specs.client_write_key, &key_block[2 * hash_size], key_size);
 
-	state->cipher_specs.client_write_key = secure_malloc(key_size);
-	memmove(state->cipher_specs.client_write_key, &key_block[2 * hash_size], key_size);
-
-	state->cipher_specs.server_write_key = secure_malloc(key_size);
-	memmove(state->cipher_specs.server_write_key, &key_block[2 * hash_size + key_size], key_size);
-
+		state->cipher_specs.server_write_key = secure_malloc(key_size);
+		if (state->cipher_specs.server_write_key==NULL) 
+			return GNUTLS_E_MEMORY_ERROR;
+		memmove(state->cipher_specs.server_write_key, &key_block[2 * hash_size + key_size], key_size);
+	}
 	if (IV_size > 0) {
 		state->cipher_specs.client_write_IV = secure_malloc(IV_size);
+		if (state->cipher_specs.client_write_IV==NULL) 
+			return GNUTLS_E_MEMORY_ERROR;
 		memmove(state->cipher_specs.client_write_IV, &key_block[2 * key_size + 2 * hash_size], IV_size);
 	
 		state->cipher_specs.server_write_IV = secure_malloc(IV_size);
+		if (state->cipher_specs.server_write_IV==NULL) 
+			return GNUTLS_E_MEMORY_ERROR;
 		memmove(state->cipher_specs.server_write_IV, &key_block[2 * hash_size + 2 * key_size + IV_size], IV_size);
 	}
 	
@@ -398,7 +414,7 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	return 0;
 }
 
-int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
+int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
 {
 	uint8 data[2];
 
@@ -406,7 +422,7 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescri
 	memmove(&data[1], &desc, 1);
 
 #ifdef DEBUG
-	fprintf(stderr, "Record: Sending Alert[%d|%d] - %s - was received\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
+	fprintf(stderr, "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
 #endif
 
 	return gnutls_send_int(cd, state, GNUTLS_ALERT, data, 2, 0);
@@ -421,7 +437,7 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescri
   * you may continue using the TCP connection. The connection should
   * have been initiated using gnutls_handshake() or similar function.
   **/
-int gnutls_bye(int cd, GNUTLS_STATE state)
+int gnutls_bye(SOCKET cd, GNUTLS_STATE state)
 {
 	int ret;
 
@@ -435,7 +451,7 @@ int gnutls_bye(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int gnutls_close_nowait(int cd, GNUTLS_STATE state)
+int gnutls_close_nowait(SOCKET cd, GNUTLS_STATE state)
 {
 	int ret;
 
@@ -451,7 +467,7 @@ int gnutls_close_nowait(int cd, GNUTLS_STATE state)
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current state.    
  */
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void *_data, size_t sizeofdata, int flags)
+ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const void *_data, size_t sizeofdata, int flags)
 {
 	uint8 *cipher;
 	int i, cipher_size;
@@ -464,6 +480,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 	if (sizeofdata == 0)
 		return 0;
 	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
 	
@@ -486,16 +503,20 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 
 	for (i = 0; i < iterations; i++) {
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
-		if (cipher_size <= 0) return cipher_size; /* error */
-
+		if (cipher_size <= 0) {
+			gnutls_assert();
+			return cipher_size; /* error */
+		}
+		
 		WRITEuint16( cipher_size, &headers[3]);
 		
-		/* cipher does not have headers 
-		 * and DOES have size for them
-		 */
-		memmove( cipher, headers, HEADER_SIZE);
+		if (_gnutls_Write(cd, headers, HEADER_SIZE) != HEADER_SIZE) {
+			state->gnutls_internals.valid_connection = VALID_FALSE;
+			state->gnutls_internals.resumable = RESUME_FALSE;
+			gnutls_assert();
+			return GNUTLS_E_UNABLE_SEND_DATA;
+		}
 
-		cipher_size += HEADER_SIZE;
 		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -554,7 +575,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 /* This function is to be called if the handshake was successfully 
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
-ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
+ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 {
 	int ret = 0;
 	uint8 type=GNUTLS_CHANGE_CIPHER_SPEC;
@@ -562,6 +583,7 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	uint8 headers[5];
 
 	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
@@ -595,7 +617,7 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 
 #define RCVLOWAT state->gnutls_internals.lowat /* this is the default for TCP - just don't change that! */
 
-static int _gnutls_clear_peeked_data( int cd, GNUTLS_STATE state) {
+static int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state) {
 char peekdata;
 
 	/* this was already read by using MSG_PEEK - so it shouldn't fail */
@@ -611,8 +633,7 @@ char peekdata;
  * flags is the sockets flags to use. Currently only MSG_DONTWAIT is
  * supported.
  */
-#define SSL2_HSIZE
-ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata, int flags)
+ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata, int flags)
 {
 	uint8 *tmpdata;
 	int tmplen;
@@ -639,6 +660,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	}
 
 	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
@@ -665,6 +687,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	 */
 		version = GNUTLS_VERSION_UNKNOWN; /* assume unknown version */
 		length = (((headers[0] & 0x7f) << 8)) | headers[1];
+
 		header_size = 2;
 		recv_type = GNUTLS_HANDSHAKE; /* we accept only v2 client hello
 					       */
@@ -686,7 +709,13 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 #ifdef DEBUG
 		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d) %d.%d\n", headers[0], headers[1], headers[2]);
 #endif
-		_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
+		if (type!=GNUTLS_ALERT) {
+			/* some browsers return garbage, when
+			 * we send them a close notify. 
+			 * silently ignore that.
+			 */
+			_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
+		}
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
@@ -1054,7 +1083,7 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * difference is that is accepts a GNUTLS state. Currently flags cannot
   * be anything except 0.
   **/
-ssize_t gnutls_send(int cd, GNUTLS_STATE state, const void *data, size_t sizeofdata, int flags) {
+ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata, int flags) {
 	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, flags);
 }
 
@@ -1073,7 +1102,7 @@ ssize_t gnutls_send(int cd, GNUTLS_STATE state, const void *data, size_t sizeofd
   * if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
   * if there are no data in the socket. 
   **/
-ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags) {
+ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags) {
 	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, flags);
 }
 
@@ -1087,7 +1116,7 @@ ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata, i
   * This function has the same semantics as write() has. The only
   * difference is that is accepts a GNUTLS state.
   **/
-ssize_t gnutls_write(int cd, GNUTLS_STATE state, const void *data, size_t sizeofdata) {
+ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata) {
 	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, 0);
 }
 
@@ -1101,6 +1130,6 @@ ssize_t gnutls_write(int cd, GNUTLS_STATE state, const void *data, size_t sizeof
   * This function has the same semantics as read() has. The only
   * difference is that is accepts a GNUTLS state. 
   **/
-ssize_t gnutls_read(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
+ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
 	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, 0);
 }

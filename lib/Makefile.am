@@ -4,7 +4,7 @@ bin_SCRIPTS = libgnutls-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
 
-EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls_plaintext.h \
+EXTRA_DIST = debug.h gnutls_compress.h defines.h \
 	gnutls_cipher.h gnutls_buffers.h gnutls_errors.h gnutls_int.h \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
@@ -16,7 +16,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls_plaintext.h \
 	cert_asn1.h cert_der.h gnutls_datum.h auth_x509.h gnutls_gcry.h \
 	ext_dnsname.h gnutls_pk.h gnutls_record.h
 lib_LTLIBRARIES = libgnutls.la
-libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c gnutls_plaintext.c \
+libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c \
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c \

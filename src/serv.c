@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include "../lib/gnutls.h"
 #include <port.h>
+#include <signal.h>
 
 #define PKIX "pkix.asn"
 #define PKCS "pkcs1.asn"
@@ -49,6 +50,8 @@ void PARSE()
 {
 	/* this is to be moved to gnutls */
 	int result = parser_asn1(PKIX);
+
+	signal( SIGPIPE, SIG_IGN);
 
 	if (result == ASN_SYNTAX_ERROR) {
 		printf("%s: PARSE ERROR\n", PKIX);
@@ -113,9 +116,12 @@ GNUTLS_STATE initialize_state()
 	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
 		fprintf(stderr, "*** DB error (%d)\n", ret);
 
-	gnutls_set_cipher_priority(state, GNUTLS_ARCFOUR,
+	/* null cipher is here only for debuging 
+	 * purposes.
+	 */
+	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR,
 				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
-	gnutls_set_compression_priority(state, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
 			       GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);

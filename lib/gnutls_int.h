@@ -23,19 +23,24 @@
 #define GNUTLS_INT_H
 
 
+/*
 #define READ_DEBUG
-//#define WRITE_DEBUG
-//#define HARD_DEBUG
+#define WRITE_DEBUG
 #define BUFFERS_DEBUG
 #define HANDSHAKE_DEBUG
+#define HARD_DEBUG
 #define DEBUG
+*/
 
-
+#define SOCKET int
 #define LIST ...
 
 #define MAX32 4294967295
 #define MAX24 16777215
 #define MAX16 65535
+
+#define TLS_RANDOM_SIZE 32
+#define TLS_MAX_SESSION_ID_SIZE 32
 
 /* the default for TCP */
 #define DEFAULT_LOWAT 1
@@ -164,8 +169,8 @@ typedef struct {
 
 	/* These are needed in RSA and DH signature calculation 
 	 */
-	opaque				server_random[32];
-	opaque				client_random[32];
+	opaque				server_random[TLS_RANDOM_SIZE];
+	opaque				client_random[TLS_RANDOM_SIZE];
 	ProtocolVersion			version;
 	opaque				dnsname[256];
 	
@@ -185,7 +190,6 @@ typedef struct {
 	ConnectionEnd entity;
 	BulkCipherAlgorithm bulk_cipher_algorithm;
 	KXAlgorithm kx_algorithm;
-	CipherType cipher_type;
 	MACAlgorithm mac_algorithm;
 	CompressionMethod compression_algorithm;
 	uint8 IV_size;
@@ -193,9 +197,9 @@ typedef struct {
 	uint8 key_material_length;
 	uint8 hash_size;
 	opaque master_secret[48];
-	opaque client_random[32];
-	opaque server_random[32];
-	opaque session_id[32];
+	opaque client_random[TLS_RANDOM_SIZE];
+	opaque server_random[TLS_RANDOM_SIZE];
+	opaque session_id[TLS_MAX_SESSION_ID_SIZE];
 	uint8 session_id_size;
 	time_t timestamp;
 } SecurityParameters;
@@ -287,42 +291,19 @@ typedef GNUTLS_STATE_INT *GNUTLS_STATE;
 typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
 		GNUTLS_APPLICATION_DATA } ContentType;
 
-typedef struct {
-	uint8		type;
-	ProtocolVersion	version;
-	uint16		length;
-	opaque*		fragment;
-} GNUTLSPlaintext;
-
-typedef struct {
-	uint8	type;
-	ProtocolVersion	version;
-	uint16		length;
-	opaque*		fragment;
-} GNUTLSCompressed;
-
-typedef struct {
-	uint8			type;
-	ProtocolVersion		version;
-	uint16			length;
-	void*			fragment; /* points GenericStreamCipher
-					   		 * or GenericBlockCipher
-							 */
-} GNUTLSCiphertext;
-
 
 /* functions */
-int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
-int gnutls_close(int cd, GNUTLS_STATE state);
+int _gnutls_send_alert( SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
+int gnutls_close(SOCKET cd, GNUTLS_STATE state);
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 int _gnutls_set_keys(GNUTLS_STATE state);
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void* data, size_t sizeofdata, int flags);
-ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata, int flags);
-int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
+ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const void* data, size_t sizeofdata, int flags);
+ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata, int flags);
+int _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
 int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);
 #define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)
 
