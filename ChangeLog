@@ -1,3 +1,13 @@
+2004-07-28 10:28  nmav <nmav@gnutls.org>
+
+	* NEWS, libgcrypt.m4, opencdk.m4, lib/Makefile.am, lib/auth_srp.c,
+	lib/auth_srp.h, lib/auth_srp_passwd.c, lib/auth_srp_passwd.h,
+	lib/auth_srp_rsa.c, lib/auth_srp_sb64.c, lib/ext_srp.c,
+	lib/ext_srp.h, lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_extensions.c, lib/gnutls_srp.c, lib/gnutls_srp.h:
+
+	SRP ciphersuites were moved to the gnutls (lgpl) library.  
+
 2004-07-27 21:43  nmav <nmav@gnutls.org>
 
 	* .cvsusers:
