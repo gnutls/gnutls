@@ -401,7 +401,14 @@ inline int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
 	return -1;
 }
 
-char *_gnutls_mac_get_name(MACAlgorithm algorithm)
+/**
+  * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
+  * @algorithm: is a MAC algorithm
+  *
+  * Returns an allocated (with malloc) string that contains the name 
+  * of the specified MAC algorithm.
+  **/
+char *gnutls_mac_get_name(MACAlgorithm algorithm)
 {
 	char *ret = NULL;
 	char *pointerTo_;
@@ -462,7 +469,14 @@ inline
 	return -1;
 }
 
-char *_gnutls_compression_get_name(CompressionMethod algorithm)
+/**
+  * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
+  * @algorithm: is a Compression algorithm
+  *
+  * Returns a localy allocated (with malloc) pointer to a string that contains the name 
+  * of the specified compression algorithm.
+  **/
+char *gnutls_compression_get_name(CompressionMethod algorithm)
 {
 	char *ret = NULL;
 	char *pointerTo_;
@@ -585,7 +599,14 @@ int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm)
 
 }
 
-char *_gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
+/**
+  * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
+  * @algorithm: is an encryption algorithm
+  *
+  * Returns a localy allocated (with malloc) pointer to a string that contains the name 
+  * of the specified cipher.
+  **/
+char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 {
 	char *ret = NULL;
 	char *pointerTo_;
@@ -787,7 +808,14 @@ int _gnutls_kx_DH_public_value(KXAlgorithm algorithm)
 
 }
 
-char *_gnutls_kx_get_name(KXAlgorithm algorithm)
+/**
+  * gnutls_kx_get_name - Returns a string with the name of the specified key exchange algorithm
+  * @algorithm: is a key exchange algorithm
+  *
+  * Returns a localy allocated (with malloc) pointer to a string that contains the name 
+  * of the specified key exchange algorithm.
+  **/
+char *gnutls_kx_get_name(KXAlgorithm algorithm)
 {
 	char *ret = NULL;
 	char *pointerTo_;

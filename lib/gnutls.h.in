@@ -20,8 +20,6 @@
 
 #define LIBGNUTLS_VERSION "@VERSION@"
 
-enum ContentType { GNUTLS_APPLICATION_DATA=23 };
-typedef enum ContentType ContentType;
 #define GNUTLS_AES GNUTLS_RIJNDAEL
 
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 } BulkCipherAlgorithm;
@@ -47,8 +45,6 @@ struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
 /* internal functions */
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata, int flags);
-ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata, int flags);
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE state);
@@ -66,10 +62,10 @@ MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state);
 CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state);
 
 /* the name of the specified algorithms */
-char *_gnutls_cipher_get_name(BulkCipherAlgorithm);
-char *_gnutls_mac_get_name(MACAlgorithm);
-char *_gnutls_compression_get_name(CompressionMethod);
-char *_gnutls_kx_get_name(KXAlgorithm algorithm);
+char *gnutls_cipher_get_name(BulkCipherAlgorithm);
+char *gnutls_mac_get_name(MACAlgorithm);
+char *gnutls_compression_get_name(CompressionMethod);
+char *gnutls_kx_get_name(KXAlgorithm algorithm);
 
 
 /* error functions */
@@ -77,12 +73,10 @@ int gnutls_is_fatal_error( int error);
 void gnutls_perror( int error);
 char* gnutls_strerror(int error);
 
-
-#define gnutls_send( x, y, z, w, e) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w, e)
-#define gnutls_recv( x, y, z, w, e) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w, e)
-
-#define gnutls_write( x, y, z, w) gnutls_send( x, y, z, w, 0)
-#define gnutls_read( x, y, z, w) gnutls_recv( x, y, z, w, 0)
+ssize_t gnutls_send(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags);
+ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags);
+ssize_t gnutls_write(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata);
+ssize_t gnutls_read(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata);
 
 /* functions to set priority of cipher suites */
 void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...);
@@ -111,7 +105,7 @@ const char* gnutls_check_version();
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
-int gnutls_set_kx_cred( GNUTLS_STATE, int kx, void* cred);
+int gnutls_set_kx_cred( GNUTLS_STATE, KXAlgorithm kx, void* cred);
 const void* gnutls_get_auth_info( GNUTLS_STATE);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */

@@ -35,14 +35,28 @@
 	GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
 #endif
 
+/**
+  * gnutls_set_cache_expiration - Sets the expiration time for resumed sessions.
+  * @state: is a &GNUTLS_STATE structure.
+  * @seconds: is the number of seconds.
+  *
+  * Sets the expiration time for resumed sessions. The default is 3600 (one hour)
+  * at the time writing this.
+  **/
 int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds) {
 	state->gnutls_internals.expire_time = seconds;
 	return 0;
 }
 
-/* creates the database specified by filename, 
- * and opens it for reading.
- */
+/**
+  * gnutls_set_db_name - Sets the name of the database that holds TLS sessions.
+  * @state: is a &GNUTLS_STATE structure.
+  * @filename: is the filename for the database
+  *
+  * Sets the name of the (gdbm) database to be used to keep
+  * the sessions to be resumed. This function also creates the database
+  * - if it does not exist - and opens it for reading.
+  **/
 int gnutls_set_db_name( GNUTLS_STATE state, char* filename) {
 #ifdef HAVE_LIBGDBM
 GDBM_FILE dbf;
@@ -81,9 +95,13 @@ GDBM_FILE dbf;
 }
 
 
-/* This function removes expired and invalid sessions from the
- * database
- */
+/**
+  * gnutls_clean_db - removes expired and invalid sessions from the database
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function Deletes all expired records in the db. This db may become huge
+  * if this function is not called.
+  **/
 int gnutls_clean_db( GNUTLS_STATE state) {
 #ifdef HAVE_LIBGDBM
 GDBM_FILE dbf;

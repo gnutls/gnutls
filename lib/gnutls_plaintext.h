@@ -18,6 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_text2TLSPlaintext(GNUTLS_STATE state, ContentType type, GNUTLSPlaintext**, char *text, uint16 length);
+int _gnutls_text2TLSPlaintext(GNUTLS_STATE state, ContentType type, GNUTLSPlaintext**, const char *text, uint16 length);
 int _gnutls_freeTLSPlaintext(GNUTLSPlaintext* plaintext);
 int _gnutls_TLSPlaintext2text( char**, GNUTLSPlaintext* plaintext);

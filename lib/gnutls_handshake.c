@@ -672,6 +672,18 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 	return ret;
 }
 
+/**
+  * gnutls_send_hello_request - This function will renegotiate security parameters
+  * @cd: is a connection descriptor, as returned by socket().
+  * @state: is a a &GNUTLS_STATE structure.
+  *
+  * This function will renegotiate security parameters with the
+  * client. This should only be called in case of a server.
+  * If the client does not wish to renegotiate parameters he
+  * will reply with an alert message, thus the return code will be
+  * GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
+  * GNUTLS_NO_RENEGOTIATION.
+  **/
 int gnutls_send_hello_request(int cd, GNUTLS_STATE state)
 {
 int 	ret;
@@ -1114,9 +1126,17 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data,
 }
 
 
-/* This is the main function in the handshake protocol. This does actually
- * everything. (exchange hello messages etc).
- */
+/**
+  * gnutls_handshake - This the main function in the handshake protocol.
+  * @cd: is a connection descriptor, as returned by socket().
+  * @state: is a a &GNUTLS_STATE structure.
+  *
+  * This function does the handshake of the TLS/SSL protocol,
+  * and initializes the TLS connection. Here the identity of the peer
+  * is checked automatically.
+  * This function will fail if any problem is encountered,
+  * and the connection should be terminated.
+  **/
 int gnutls_handshake(int cd, GNUTLS_STATE state)
 {
 	int ret;
@@ -1130,10 +1150,21 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
-/* in this function we initiate the handshake and we receive - 
- * if requested - the certificate. This certificate should be checked
- * somehow.
- */
+/**
+  * gnutls_handshake_begin - This function does a partial handshake of the TLS/SSL protocol.
+  * @cd: is a connection descriptor, as returned by socket().
+  * @state: is a a &GNUTLS_STATE structure.
+  *
+  * This function initiates the handshake of the TLS/SSL protocol.
+  * Here we will receive - if requested and supported by the ciphersuite -
+  * the peer's certificate. By calling this function you it is your job
+  * to check the peer's identity (by checking the certificate etc.).
+  *
+  * This function will fail if any problem in the handshake is encountered.   
+  * However this failure will not be fatal. You may choose to
+  * continue the handshake - eg. even if the certificate cannot
+  * be verified- by calling gnutls_handshake_finish()
+  **/
 int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 {
 	int ret;
@@ -1307,9 +1338,16 @@ static int _gnutls_recv_handshake_final(int cd, GNUTLS_STATE state,
 	return ret;
 }
 
-/* in this function we finish the handshake procedure
- * This should happen only if we trust the peer. (check certificate)
- */
+/**
+  * gnutls_handshake_finish - This function finished a partial handshake of the TLS/SSL protocol.
+  * @cd: is a connection descriptor, as returned by socket().
+  * @state: is a a &GNUTLS_STATE structure.
+  *
+  * This function does the final stuff of the handshake protocol.
+  * You should call it only if you used gnutls_handshake_begin() and
+  * you have somehow verified the identity of the peer.
+  * This function will fail if any problem is encountered.
+  **/
 int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 {
 	int ret = 0;

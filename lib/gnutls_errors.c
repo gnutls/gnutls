@@ -85,6 +85,16 @@ static gnutls_error_entry error_algorithms[] = {
 
 
 
+/**
+  * gnutls_is_fatal_error - Returns non-zero in case of a fatal error
+  * @error: is an error returned by a gnutls function. Error is always a negative value.
+  *
+  * If a function returns a negative value you may feed that value
+  * to this function to see if it is fatal. Returns 1 for a fatal 
+  * error 0 otherwise. However you may want to check the
+  * error code manualy, since some non-fatal errors to the protocol
+  * may be fatal for you (your program).
+  **/
 int gnutls_is_fatal_error(int error)
 {
 	int ret = 0;
@@ -92,6 +102,13 @@ int gnutls_is_fatal_error(int error)
 	return ret;
 }
 
+/**
+  * gnutls_perror - prints a string to stderr with a description of an error
+  * @error: is an error returned by a gnutls function. Error is always a negative value.
+  *
+  * This function is like perror(). However it accepts an error returned by a gnutls
+  * function. 
+  **/
 void gnutls_perror(int error)
 {
 	char *ret = NULL;
@@ -116,6 +133,15 @@ void gnutls_perror(int error)
 	free( ret);
 }
 
+
+/**
+  * gnutls_strerror - Returns a string with a description of an error
+  * @error: is an error returned by a gnutls function. Error is always a negative value.
+  *
+  * This function is like strerror(). However it accepts an error returned by a gnutls
+  * function. gnutls_strerror() returns a malloc'ed value thus 
+  * it should be free'd.
+  **/
 char* gnutls_strerror(int error)
 {
 	char *ret = NULL;

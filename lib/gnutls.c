@@ -56,15 +56,32 @@ int gnutls_is_secure_memory(const void* mem) {
 	return 0;
 }
 
+/**
+  * gnutls_set_lowat - Used to set the lowat value in order for select to check for pending data.
+  * @state: is a &GNUTLS_STATE structure.
+  * @num: is the low water value.
+  *
+  * Used to set the lowat value in order for select to check
+  * if there are pending data to socket buffer. Used only   
+  * if you have changed the default low water value (default is 1).
+  * Normally you will not need that function.
+  **/
 int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	state->gnutls_internals.lowat = num;
 	return 0;
 }
 
-/* This function initializes the state to null (null encryption etc...).
- * If you add anything here that needs allocation also add
- * entries in gnutls_deinit().
- */
+/**
+  * gnutls_init - This function initializes the state to null (null encryption etc...).
+  * @con_end: is used to indicate if this state is to be used for server or 
+  * client. Can be one of GNUTLS_CLIENT and GNUTLS_SERVER. 
+  * @state: is a pointer to a &GNUTLS_STATE structure.
+  *
+  * This function initializes the current state to null. Every state
+  * must be initialized before use, so internal structures can be allocated.
+  * This function allocates structures which can only be free'd
+  * by calling gnutls_deinit(). Returns zero on success.
+  **/
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
 	/* for gcrypt in order to be able to allocate memory */
@@ -99,7 +116,12 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 }
 
 #define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
-/* This function clears all buffers associated with the state. */
+/**
+  * gnutls_init - This function clears all buffers associated with the &state
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function clears all buffers associated with the &state.
+  **/
 int gnutls_deinit(GNUTLS_STATE state)
 {
 	/* if the session has failed abnormally it has to be removed from the db */
@@ -378,6 +400,14 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescri
 	return gnutls_send_int(cd, state, GNUTLS_ALERT, data, 2, 0);
 }
 
+/**
+  * gnutls_close - This function terminates the current TLS/SSL connection.
+  * @cd: is a connection descriptor.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Terminates the current TLS/SSL connection. If the return value is 0
+  * you may continue using the TCP connection.
+  **/
 int gnutls_close(int cd, GNUTLS_STATE state)
 {
 	int ret;
@@ -408,7 +438,7 @@ int gnutls_close_nowait(int cd, GNUTLS_STATE state)
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current state.    
  */
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_data, size_t sizeofdata, int flags)
+ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void *_data, size_t sizeofdata, int flags)
 {
 	uint8 *cipher;
 	int i, cipher_size;
@@ -416,7 +446,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 	int iterations;
 	int Size;
 	uint8 headers[5];
-	uint8 *data=_data;
+	const uint8 *data=_data;
 
 	if (sizeofdata == 0)
 		return 0;
@@ -858,15 +888,42 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	return ret;
 }
 
+/**
+  * gnutls_get_current_cipher - Returns the currently used cipher.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the currently used cipher.
+  **/
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state) {
 	return state->security_parameters.bulk_cipher_algorithm;
 }
+
+/**
+  * gnutls_get_current_kx - Returns the key exchange algorithm.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the key exchange algorithm used in the last handshake.
+  **/
 KXAlgorithm gnutls_get_current_kx( GNUTLS_STATE state) {
 	return state->security_parameters.kx_algorithm;
 }
+
+/**
+  * gnutls_get_current_mac_algorithm - Returns the currently used mac algorithm.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the currently used mac algorithm.
+  **/
 MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state) {
 	return state->security_parameters.mac_algorithm;
 }
+
+/**
+  * gnutls_get_current_compression_method - Returns the currently used compression algorithm.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the currently used compression method.
+  **/
 CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state) {
 	return state->security_parameters.compression_algorithm;
 }
@@ -943,6 +1000,79 @@ gnutls_check_version( const char *req_version )
     return NULL;
 }
 
+/**
+  * gnutls_get_last_alert - Returns the last alert number received.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the last alert number received. This function
+  * should be called if %GNUTLS_E_WARNING_ALERT_RECEIVED or
+  * %GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls function.
+  * The peer may send alerts if he thinks some things were not 
+  * right. Check gnutls.h for the available alert descriptions.
+  **/
 AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
 	return state->gnutls_internals.last_alert;
+}
+
+/**
+  * gnutls_send - sends to the peer the specified data
+  * @cd: is a connection descriptor
+  * @state: is a &GNUTLS_STATE structure.
+  * @data: contains the data to send
+  * @sizeofdata: is the length of the data
+  * @flags: contains the flags to pass to send() function.
+  *
+  * This function has the same semantics as send() has. The only
+  * difference is that is accepts a GNUTLS state. Currently flags cannot
+  * be anything except 0.
+  **/
+ssize_t gnutls_send(int cd, GNUTLS_STATE state, const void *data, size_t sizeofdata, int flags) {
+	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, flags);
+}
+
+/**
+  * gnutls_recv - receives data from the TLS connection
+  * @cd: is a connection descriptor
+  * @state: is a &GNUTLS_STATE structure.
+  * @data: contains the data to send
+  * @sizeofdata: is the length of the data
+  * @flags: contains the flags to pass to recv() function.
+  *
+  * This function has the same semantics as recv() has. The only
+  * difference is that is accepts a GNUTLS state. Flags are the flags
+  * passed to recv() and should be used with care in gnutls.  
+  * The only acceptable flag is currently MSG_DONTWAIT. In that case,
+  * if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
+  * if there are no data in the socket. 
+  **/
+ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags) {
+	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, flags);
+}
+
+/**
+  * gnutls_write - sends to the peer the specified data
+  * @cd: is a connection descriptor
+  * @state: is a &GNUTLS_STATE structure.
+  * @data: contains the data to send
+  * @sizeofdata: is the length of the data
+  *
+  * This function has the same semantics as write() has. The only
+  * difference is that is accepts a GNUTLS state.
+  **/
+ssize_t gnutls_write(int cd, GNUTLS_STATE state, const void *data, size_t sizeofdata) {
+	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, 0);
+}
+
+/**
+  * gnutls_read - reads data from the TLS connection
+  * @cd: is a connection descriptor
+  * @state: is a &GNUTLS_STATE structure.
+  * @data: contains the data to send
+  * @sizeofdata: is the length of the data
+  *
+  * This function has the same semantics as read() has. The only
+  * difference is that is accepts a GNUTLS state. 
+  **/
+ssize_t gnutls_read(int cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
+	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, 0);
 }

@@ -44,7 +44,7 @@ static int print_info( GNUTLS_STATE state) {
 char *tmp;
 const DH_ANON_AUTH_INFO *dh_info;
 
-	tmp = _gnutls_kx_get_name(gnutls_get_current_kx( state));
+	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp); free(tmp);
 	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
 		dh_info = gnutls_get_auth_info(state);
@@ -53,13 +53,13 @@ const DH_ANON_AUTH_INFO *dh_info;
 			       dh_info->bits);
 	}
 
-	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
+	tmp = gnutls_compression_get_name(gnutls_get_current_compression_method( state));
 	printf("- Compression: %s\n", tmp); free(tmp);
 
-	tmp = _gnutls_cipher_get_name(gnutls_get_current_cipher( state));
+	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher( state));
 	printf("- Cipher: %s\n", tmp); free(tmp);
 
-	tmp = _gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
+	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
 	printf("- MAC: %s\n", tmp); free(tmp);
 
 	return 0;
@@ -82,7 +82,6 @@ int main()
 	int maxfd;
 	struct timeval tv;
 	int user_term = 0;
-	char *tmp;
 	SRP_CLIENT_CREDENTIALS cred;
 	
 	cred.username = "test";

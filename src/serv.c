@@ -132,21 +132,21 @@ int main()
 		}
 
 		/* print state information */
-		tmp = _gnutls_kx_get_name(gnutls_get_current_kx(state));
+		tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
 		printf("- Key Exchange: %s\n", tmp);
 		free(tmp);
 		tmp =
-		    _gnutls_compression_get_name
+		    gnutls_compression_get_name
 		    (gnutls_get_current_compression_method(state));
 		printf("- Compression: %s\n", tmp);
 		free(tmp);
 		tmp =
-		    _gnutls_cipher_get_name(gnutls_get_current_cipher
+		    gnutls_cipher_get_name(gnutls_get_current_cipher
 					    (state));
 		printf("- Cipher: %s\n", tmp);
 		free(tmp);
 		tmp =
-		    _gnutls_mac_get_name(gnutls_get_current_mac_algorithm
+		    gnutls_mac_get_name(gnutls_get_current_mac_algorithm
 					 (state));
 		printf("- MAC: %s\n", tmp);
 		free(tmp);

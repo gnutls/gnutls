@@ -50,7 +50,29 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
  * This creates a linked list of the form:
  * { algorithm, credentials, pointer to next }
  */
-int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred) {
+/**
+  * gnutls_set_kx_cred - Sets the needed credentials for the specified (in kx) authentication algorithm.
+  * @state: is a &GNUTLS_STATE structure.
+  * @kx: is a key exchange algorithm
+  * @cred: is a pointer to a structure.
+  *
+  * Sets the needed credentials for the specified (in kx) authentication
+  * algorithm. Eg username, password - or public and private keys etc.  
+  * The (void* cred) parameter is a structure that depends on the
+  * specified kx algorithm and on the current state (client or server).
+  * [ In order to minimize memory usage, and share credentials between 
+  * several threads gnutls keeps a pointer to cred, and not the whole cred
+  * structure. Thus you will have to keep the structure allocated until   
+  * you call gnutls_deinit(). ]
+  *
+  * For %GNUTLS_KX_DH_ANON cred should be NULL in case of a client.
+  * In case of a server it should be &DH_ANON_SERVER_CREDENTIALS.   
+  * 
+  * For %GNUTLS_KX_SRP cred should be &SRP_CLIENT_CREDENTIALS
+  * in case of a client, and &SRP_SERVER_CREDENTIALS, in case
+  * of a server.
+  **/
+int gnutls_set_kx_cred( GNUTLS_STATE state, KXAlgorithm kx, void* cred) {
 	AUTH_CRED * ccred, *pcred;
 	int exists=0;	
 	
@@ -118,6 +140,17 @@ void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx, int *err) {
 	return ccred->credentials;
 }
 
+/**
+  * gnutls_get_auth_info - Returns a pointer to authentication information.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function must be called after a succesful gnutls_handshake().
+  * Returns a pointer to authentication information.   
+  *
+  * In case of %GNUTLS_KX_ANON returns a pointer to &DH_ANON_AUTH_INFO;
+  *
+  * In case of %GNUTLS_KX_SRP returns a pointer to structure &SRP_AUTH_INFO;
+  **/
 const void* gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;
 }

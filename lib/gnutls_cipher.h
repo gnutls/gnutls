@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_encrypt( GNUTLS_STATE state, char* data, size_t data_size, uint8** ciphertext, ContentType type);
+int _gnutls_encrypt( GNUTLS_STATE state, const char* data, size_t data_size, uint8** ciphertext, ContentType type);
 int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 		    size_t ciphertext_size, uint8 ** data,
 		    ContentType type);

@@ -31,7 +31,7 @@
 #include "gnutls_random.h"
 #include "gnutls_num.h"
 
-int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
+int _gnutls_encrypt(GNUTLS_STATE state, const char *data, size_t data_size,
 		    uint8 ** ciphertext, ContentType type)
 {
 	GNUTLSPlaintext *gtxt;

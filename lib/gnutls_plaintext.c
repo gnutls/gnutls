@@ -24,7 +24,7 @@
 #include "gnutls_algorithms.h"
 
 /* Plaintext Handling */
-int _gnutls_text2TLSPlaintext(GNUTLS_STATE state, ContentType type, GNUTLSPlaintext** plain, char *text, uint16 length)
+int _gnutls_text2TLSPlaintext(GNUTLS_STATE state, ContentType type, GNUTLSPlaintext** plain, const char *text, uint16 length)
 {
 	GNUTLSPlaintext *plaintext;
 

@@ -22,11 +22,20 @@
 #include "gnutls_errors.h"
 #include "debug.h"
 
-/* Returns all session parameters - in order to support resuming.
- * The client should call this - and keep the returned session - if he wants to resume his 
- * current version later by calling gnutls_set_current_session().
- * This function must be called after a successful handshake.
- */
+
+/**
+  * gnutls_get_current_session - Returns all session parameters.
+  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a pointer to space to hold the session.
+  * @session_size: is the session's size, or it will be set by the function.
+  *
+  * Returns all session parameters - in order to support resuming.
+  * The client should call this - and keep the returned session - if he wants to
+  * resume that current version later by calling gnutls_set_current_session()
+  * This function must be called after a successful handshake.
+  *
+  * Resuming sessions is really useful and speedups connections after a succesful one.
+  **/
 int gnutls_get_current_session( GNUTLS_STATE state, opaque* session, int *session_size) {
 
 	*session_size = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size;
@@ -42,8 +51,20 @@ int gnutls_get_current_session( GNUTLS_STATE state, opaque* session, int *sessio
 	return 0;
 }
 
-/* Returns session id
- */
+
+/**
+  * gnutls_get_current_session_id - Returns session id.
+  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a pointer to space to hold the session id.
+  * @session_size: is the session id's size, or it will be set by the function.
+  *
+  * Returns the current session id. This can be used if you want to check if
+  * the next session you tried to resume was actually resumed.
+  * (resumed sessions have the same sessionID with the first session)
+  *
+  * Session id is some data set by the server, that identify the current session. 
+  * In TLS 1.0 session id should not be more than 32 bytes.
+  **/
 int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size) {
 
 	( *session_size = state->security_parameters.session_id_size);
@@ -57,10 +78,19 @@ int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *sessi
 	return 0;
 }
 
-/* Sets all session parameters - in order to support resuming 
- * session must be the one returned by get_current_session();
- * This function should be called before gnutls_handshake_begin
- */
+/**
+  * gnutls_set_current_session - Sets all session parameters
+  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a pointer to space to hold the session.
+  * @session_size: is the session's size
+  *
+  * Sets all session parameters - in order to support resuming
+  * session must be the one returned by gnutls_get_current_session();
+  * This function should be called before gnutls_handshake_begin() or gnutls_handshake().
+  * Keep in mind that session resuming is advisory. The server may
+  * choose not to resume the session, thus a full handshake will be
+  * performed.
+  **/
 int gnutls_set_current_session( GNUTLS_STATE state, opaque* session, int session_size) {
 	int auth_info_size = session_size - sizeof(SecurityParameters);
 	int timestamp = time(0);
