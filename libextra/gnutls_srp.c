@@ -503,7 +503,7 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
 }
 
 /**
-  * gnutls_srp_server_set_credentials_function - Used to set a callback to retrieve the user's SRP credentials
+  * gnutls_srp_set_server_credentials_function - Used to set a callback to retrieve the user's SRP credentials
   * @cred: is a &gnutls_srp_server_credentials structure.
   * @func: is the callback function
   *
@@ -525,7 +525,7 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
   * -1 indicates an error.
   *
   **/
-void gnutls_srp_server_set_credentials_function(
+void gnutls_srp_set_server_credentials_function(
 	gnutls_srp_server_credentials cred, 
 	gnutls_srp_server_credentials_function * func)
 {

@@ -57,7 +57,7 @@ typedef int gnutls_srp_server_credentials_function(
 	gnutls_datum* prime
 );
 
-void gnutls_srp_server_set_credentials_function( 
+void gnutls_srp_set_server_credentials_function( 
 	gnutls_srp_server_credentials, 
 	gnutls_srp_server_credentials_function *);
 
