@@ -535,7 +535,7 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
   * @indx: the index of the certificate to delete
   *
   * This function will delete a certificate from a PKCS7 or RFC2630 certificate set.
-  * Index starts from 1. Returns 0 on success.
+  * Index starts from 0. Returns 0 on success.
   *
   **/
 int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
@@ -778,7 +778,7 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7,
   * @indx: the index of the crl to delete
   *
   * This function will delete a crl from a PKCS7 or RFC2630 crl set.
-  * Index starts from 1. Returns 0 on success.
+  * Index starts from 0. Returns 0 on success.
   *
   **/
 int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx)
