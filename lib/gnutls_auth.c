@@ -123,18 +123,18 @@ int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
 }
 
 /**
-  * gnutls_get_auth_info_type - Returns the type of credentials for the current authentication schema.
+  * gnutls_get_auth_type - Returns the type of credentials for the current authentication schema.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns type of credentials for the current authentication schema.
-  * The returned information can be used to distinguish the appropriate structures
-  * for the gnutls_get_auth_info() function.
-  * Eg. if this function returns GNUTLS_X509PKI then the return type
-  *  of gnutls_get_auth_info() will be X509PKI_(SERVER/CLIENT)_AUTH_INFO
-  * (depends on the side - client/server)
+  * The returned information is to be used to distinguish the function used
+  * to access authentication data.
+  * 
+  * Eg. for X509PKI ciphersuites (key exchange algorithms: KX_RSA, KX_DHE_RSA),
+  * the same function are to be used to access the authentication data.
   **/
 
-CredType gnutls_get_auth_info_type( GNUTLS_STATE state) {
+CredType gnutls_get_auth_type( GNUTLS_STATE state) {
 	return _gnutls_map_kx_get_cred(
 		state->security_parameters.kx_algorithm);
 }
@@ -165,8 +165,8 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
 	return ccred->credentials;
 }
 
-/**
-  * gnutls_get_auth_info - Returns a pointer to authentication information.
+/*-
+  * _gnutls_get_auth_info - Returns a pointer to authentication information.
   * @state: is a &GNUTLS_STATE structure.
   *
   * This function must be called after a succesful gnutls_handshake().
@@ -177,8 +177,8 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
   * In case of GNUTLS_ANON returns a pointer to &ANON_(SERVER/CLIENT)_AUTH_INFO;
   * In case of GNUTLS_X509PKI returns a pointer to structure &X509PKI_(SERVER/CLIENT)_AUTH_INFO;
   * In case of GNUTLS_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
-  **/
-void* gnutls_get_auth_info( GNUTLS_STATE state) {
+  -*/
+void* _gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;
 }
 

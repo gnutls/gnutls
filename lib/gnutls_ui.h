@@ -43,29 +43,31 @@ typedef int x509_cert_callback_func(gnutls_DN *, gnutls_DN *, int, gnutls_DN *, 
 /* Functions that allow AUTH_INFO structures handling
  */
 
+CredType gnutls_get_auth_type( GNUTLS_STATE state);
+
 /* SRP */
 
-const char* gnutls_srp_server_get_username( const SRP_SERVER_AUTH_INFO info);
+const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
 
 /* ANON */
 
-int gnutls_anon_server_get_dh_bits(  ANON_SERVER_AUTH_INFO info);
-int gnutls_anon_client_get_dh_bits(  ANON_CLIENT_AUTH_INFO info);
+int gnutls_anon_server_get_dh_bits( GNUTLS_STATE state);
+int gnutls_anon_client_get_dh_bits( GNUTLS_STATE state);
 
 /* X509PKI */
 
 int gnutls_set_x509_cert_callback( X509PKI_CREDENTIALS, x509_cert_callback_func *);
 int gnutls_x509pki_set_cert_request( GNUTLS_STATE, CertificateRequest);
 
-const gnutls_DN* gnutls_x509pki_get_peer_dn(  X509PKI_CLIENT_AUTH_INFO info);
-const gnutls_DN* gnutls_x509pki_get_issuer_dn(  X509PKI_CLIENT_AUTH_INFO info);
-CertificateStatus gnutls_x509pki_get_peer_certificate_status(  X509PKI_CLIENT_AUTH_INFO info);
-int gnutls_x509pki_get_peer_certificate_version(  X509PKI_CLIENT_AUTH_INFO info);
-time_t gnutls_x509pki_get_peer_certificate_activation_time(  X509PKI_CLIENT_AUTH_INFO info);
-time_t gnutls_x509pki_get_peer_certificate_expiration_time(  X509PKI_CLIENT_AUTH_INFO info);
-unsigned char gnutls_x509pki_get_key_usage(  X509PKI_CLIENT_AUTH_INFO info);
-const char* gnutls_x509pki_get_subject_dns_name(  X509PKI_CLIENT_AUTH_INFO info);
-int gnutls_x509pki_get_dh_bits(  X509PKI_CLIENT_AUTH_INFO info);
+const gnutls_DN* gnutls_x509pki_get_peer_dn( GNUTLS_STATE);
+const gnutls_DN* gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE);
+CertificateStatus gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
+int gnutls_x509pki_get_peer_certificate_version( GNUTLS_STATE);
+time_t gnutls_x509pki_get_peer_certificate_activation_time( GNUTLS_STATE);
+time_t gnutls_x509pki_get_peer_certificate_expiration_time( GNUTLS_STATE);
+unsigned char gnutls_x509pki_get_key_usage( GNUTLS_STATE);
+const char* gnutls_x509pki_get_subject_dns_name( GNUTLS_STATE);
+int gnutls_x509pki_get_dh_bits( GNUTLS_STATE);
 
 #define gnutls_x509pki_server_get_dh_bits gnutls_x509pki_get_dh_bits
 #define gnutls_x509pki_client_get_dh_bits gnutls_x509pki_get_dh_bits

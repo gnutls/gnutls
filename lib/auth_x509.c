@@ -38,9 +38,9 @@
 #include <ext_dnsname.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
- * exported certificate struct (X509PKI_CLIENT_AUTH_INFO)
+ * exported certificate struct (X509PKI_AUTH_INFO)
  */
-void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify) {
+void _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify) {
  /* Copy peer's information to AUTH_INFO
   */
   	memcpy( &info->peer_dn, &cert->cert_info, sizeof(gnutls_DN));
@@ -514,7 +514,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 {
 	int size, len, ret;
 	opaque *p = data;
-	X509PKI_CLIENT_AUTH_INFO info;
+	X509PKI_AUTH_INFO info;
 	const X509PKI_CREDENTIALS cred;
 	int dsize = data_size;
 	int i, j, x;
@@ -529,12 +529,12 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 	if (state->gnutls_key->auth_info == NULL) {
-		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO_INT));
+		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
 		if (state->gnutls_key->auth_info == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		state->gnutls_key->auth_info_size = sizeof(X509PKI_CLIENT_AUTH_INFO_INT);
+		state->gnutls_key->auth_info_size = sizeof(X509PKI_AUTH_INFO_INT);
 
 		info = state->gnutls_key->auth_info;
 		info->peer_certificate_status = GNUTLS_CERT_NONE;
@@ -674,7 +674,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 	int size, ret;
 	opaque *p = data;
 	const X509PKI_CREDENTIALS cred;
-	X509PKI_CLIENT_AUTH_INFO info;
+	X509PKI_AUTH_INFO info;
 	int dsize = data_size;
 	int i;
 	int found;
@@ -688,12 +688,12 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 	state->gnutls_key->certificate_requested = 1;
 
 	if (state->gnutls_key->auth_info == NULL) {
-		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO_INT));
+		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
 		if (state->gnutls_key->auth_info == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		state->gnutls_key->auth_info_size = sizeof(X509PKI_CLIENT_AUTH_INFO_INT);
+		state->gnutls_key->auth_info_size = sizeof(X509PKI_AUTH_INFO_INT);
 
 		info = state->gnutls_key->auth_info;
 		info->peer_certificate_status = GNUTLS_CERT_NONE;

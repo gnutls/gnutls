@@ -58,27 +58,26 @@
 	PRINTX( "S:", X->state_or_province_name); \
 	PRINTX( "C:", X->country); \
 	PRINTX( "E:", X->email); \
-	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(x509_info))
+	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(state))
 
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
-ANON_CLIENT_AUTH_INFO dh_info;
-X509PKI_CLIENT_AUTH_INFO x509_info;
+CredType cred;
 const gnutls_DN* dn;
+CertificateStatus status;
+
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp);
-	if (gnutls_get_auth_info_type(state) == GNUTLS_ANON) {
-		dh_info = gnutls_get_auth_info(state);
-		if (dh_info != NULL)
-			printf("- Anonymous DH using prime of %d bits\n",
-			       gnutls_anon_client_get_dh_bits(dh_info));
-	}
 
-	if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
-		x509_info = gnutls_get_auth_info(state);
-		if (x509_info != NULL) {
-			CertificateStatus status = gnutls_x509pki_client_get_peer_certificate_status(x509_info);
+	cred = gnutls_get_auth_type(state);
+	switch(cred) {
+		case GNUTLS_ANON:
+			printf("- Anonymous DH using prime of %d bits\n",
+			       gnutls_anon_client_get_dh_bits( state));
+
+		case GNUTLS_X509PKI:
+			status = gnutls_x509pki_client_get_peer_certificate_status( state);
 			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:
 				printf("- Peer's X509 Certificate was NOT verified\n");
@@ -96,19 +95,18 @@ const gnutls_DN* dn;
 				printf("- Peer's X509 Certificate was invalid\n");
 				break;
 			}
-
+			
 			if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
 				printf(" - Certificate info:\n");
-				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
+				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version( state));
 
-				dn = gnutls_x509pki_client_get_peer_dn( x509_info);
+				dn = gnutls_x509pki_client_get_peer_dn( state);
 				PRINT_DN( dn);
 
-				dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
+				dn = gnutls_x509pki_client_get_issuer_dn( state);
 				printf(" - Certificate Issuer's info:\n");
 				PRINT_DN( dn);
 			}
-		}
 	}
 
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
@@ -256,7 +254,6 @@ int main(int argc, char** argv)
 	shutdown( sd, SHUT_WR);
 	close(sd);
 	gnutls_deinit( state);	
-	
 
 	printf("\n\n- Connecting again- trying to resume previous session\n");
 	sd = socket(AF_INET, SOCK_STREAM, 0);

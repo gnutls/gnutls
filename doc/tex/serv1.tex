@@ -63,7 +63,6 @@ GNUTLS_STATE initialize_state()
 
 void print_info(GNUTLS_STATE state)
 {
-   SRP_SERVER_AUTH_INFO srp_info;
    const char *tmp;
    unsigned char sesid[32];
    int sesid_size, i;
@@ -76,12 +75,11 @@ void print_info(GNUTLS_STATE state)
    printf("\n");
 
    /* print srp specific data */
-   if (gnutls_get_auth_info_type(state) == GNUTLS_SRP) {
-      srp_info = gnutls_get_auth_info(state);
-      if (srp_info != NULL)
+   if (gnutls_get_auth_type(state) == GNUTLS_SRP) {
          printf("\n- User '%s' connected\n",
-                gnutls_srp_server_get_username(srp_info));
+                gnutls_srp_server_get_username( state));
    }
+
    /* print state information */
    tmp = gnutls_version_get_name(gnutls_get_current_version(state));
    printf("- Version: %s\n", tmp);

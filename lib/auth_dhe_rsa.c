@@ -68,7 +68,7 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 	gnutls_private_key *apr_pkey;
 	int apr_cert_list_length;
 	gnutls_datum signature, ddata;
-	X509PKI_SERVER_AUTH_INFO info;
+	X509PKI_AUTH_INFO info;
 
 	cred =
 	    _gnutls_get_kx_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
@@ -92,12 +92,12 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 
 	if ( state->gnutls_key->auth_info==NULL) {
 		state->gnutls_key->auth_info =
-		    gnutls_calloc(1, sizeof(X509PKI_SERVER_AUTH_INFO_INT));
+		    gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
 		if (state->gnutls_key->auth_info == NULL)
 			return GNUTLS_E_MEMORY_ERROR;
 
 		state->gnutls_key->auth_info_size =
-		    sizeof(X509PKI_SERVER_AUTH_INFO_INT);
+		    sizeof(X509PKI_AUTH_INFO_INT);
 
 		info = state->gnutls_key->auth_info;
 		info->dh_bits = gcry_mpi_get_nbits(p);

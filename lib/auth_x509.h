@@ -37,7 +37,7 @@ typedef struct {
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
 #define X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
 
-typedef struct X509PKI_CLIENT_AUTH_INFO_INT {
+typedef struct X509PKI_AUTH_INFO_INT {
 	gnutls_DN	  peer_dn;
 	gnutls_DN	  issuer_dn;
 	CertificateStatus peer_certificate_status;
@@ -48,13 +48,11 @@ typedef struct X509PKI_CLIENT_AUTH_INFO_INT {
 	unsigned char	  keyUsage;
 	int		  certificate_requested;
 	int		  dh_bits; /* bits of the DH (if DHE_RSA is used) */
-} *X509PKI_CLIENT_AUTH_INFO;
+} *X509PKI_AUTH_INFO;
 
-typedef struct X509PKI_CLIENT_AUTH_INFO_INT X509PKI_CLIENT_AUTH_INFO_INT;
-typedef X509PKI_CLIENT_AUTH_INFO X509PKI_SERVER_AUTH_INFO;
-typedef X509PKI_CLIENT_AUTH_INFO_INT X509PKI_SERVER_AUTH_INFO_INT;
+typedef struct X509PKI_AUTH_INFO_INT X509PKI_AUTH_INFO_INT;
 
-void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
+void _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
 
 /* AUTH X509 functions */
 int _gnutls_gen_x509_server_certificate(GNUTLS_STATE, opaque **);

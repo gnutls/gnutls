@@ -1,4 +1,7 @@
-Version 0.2.4
+Version 0.3.0
+- AUTH_INFO types and structures were moved to library internals
+
+Version 0.2.4 (12/10/2001)
 - Better handling of X.509 certificate extensions
 - Added DHE_RSA ciphersuites
 - Updated the Name Indication (dnsname) extension

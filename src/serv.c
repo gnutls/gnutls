@@ -75,8 +75,6 @@ GNUTLS_STATE initialize_state()
 	GNUTLS_STATE state;
 	int ret;
 
-
-
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
 		fprintf(stderr, "*** DB error (%d)\n\n", ret);
@@ -87,7 +85,7 @@ GNUTLS_STATE initialize_state()
 	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, 
 				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, 0);
+	gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	
 	gnutls_set_cred(state, GNUTLS_ANON, dh_cred);
@@ -109,17 +107,16 @@ GNUTLS_STATE initialize_state()
 	PRINTX( "S:", X->state_or_province_name); \
 	PRINTX( "C:", X->country); \
 	PRINTX( "E:", X->email); \
-	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(x509_info))
+	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(state))
 
 void print_info(GNUTLS_STATE state)
 {
-	SRP_SERVER_AUTH_INFO srp_info;
-	ANON_SERVER_AUTH_INFO dh_info;
-	X509PKI_SERVER_AUTH_INFO x509_info;
 	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
 	const gnutls_DN* dn;
+	CredType cred;
+	CertificateStatus status;
 	
 	/* print session_id specific data */
 	gnutls_get_current_session_id( state, sesid, &sesid_size);
@@ -133,24 +130,24 @@ void print_info(GNUTLS_STATE state)
 		printf("%s\n", (char*)gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME));
 	}
 	
-	/* print srp specific data */
-	if (gnutls_get_auth_info_type(state) == GNUTLS_SRP) {
-		srp_info = gnutls_get_auth_info(state);
-		if (srp_info != NULL)
-			printf("\n- User '%s' connected\n",
-			       gnutls_srp_server_get_username(srp_info));
-	}
-	if (gnutls_get_auth_info_type(state) == GNUTLS_ANON) {
-		dh_info = gnutls_get_auth_info(state);
-		if (dh_info != NULL)
-			printf("\n- Anonymous DH using prime of %d bits\n",
-			        gnutls_anon_server_get_dh_bits(dh_info));
-	}
+	/* we could also use the KX algorithm to distinguish the functions
+	 * to call, but this is easier.
+	 */
+	cred = gnutls_get_auth_type(state);
 
-	if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
-		x509_info = gnutls_get_auth_info(state);
-		if (x509_info != NULL) {
-			CertificateStatus status = gnutls_x509pki_client_get_peer_certificate_status(x509_info);
+	switch(cred) {
+		case GNUTLS_SRP:
+			/* print srp specific data */
+			printf("\n- User '%s' connected\n",
+			       gnutls_srp_server_get_username( state));
+			break;
+		case GNUTLS_ANON:
+			printf("\n- Anonymous DH using prime of %d bits\n",
+			        gnutls_anon_server_get_dh_bits( state));
+			break;
+
+		case GNUTLS_X509PKI: 
+			status = gnutls_x509pki_client_get_peer_certificate_status( state);
 			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:
 				printf("- Peer's X509 Certificate was NOT verified\n");
@@ -167,24 +164,27 @@ void print_info(GNUTLS_STATE state)
 			case GNUTLS_CERT_INVALID:
 				printf("- Peer's X509 Certificate was invalid\n");
 				break;
-
+			}
+		
+			if (gnutls_get_current_kx(state) == GNUTLS_KX_DHE_RSA || gnutls_get_current_kx(state) == GNUTLS_KX_DHE_DSS) {
+				printf("\n- Ephemeral DH using prime of %d bits\n",
+			        gnutls_x509pki_server_get_dh_bits( state));
 			}
 			
 			if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
 				printf(" - Certificate info:\n");
-				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
+				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(state));
 
-				dn = gnutls_x509pki_client_get_peer_dn( x509_info);
+				dn = gnutls_x509pki_client_get_peer_dn( state);
 				if (dn!=NULL)
 					PRINT_DN( dn);
-	
-				dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
+
+				dn = gnutls_x509pki_client_get_issuer_dn( state);
 				if (dn!=NULL) {
 					printf(" - Certificate Issuer's info:\n");
 					PRINT_DN( dn);
 				}
 			}
-		}
 	}
 
 
@@ -215,8 +215,6 @@ void print_info(GNUTLS_STATE state)
 #define tmp2 &http_buffer[strlen(http_buffer)]
 void peer_print_info(int cd, GNUTLS_STATE state)
 {
-	SRP_SERVER_AUTH_INFO srp_info;
-	ANON_SERVER_AUTH_INFO dh_info;
 	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
@@ -236,21 +234,19 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 		sprintf(tmp2, "<b>%s</b></p>\n", (char*)gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME));
 	}
 
+	/* Here unlike print_info() we use the kx algorithm to distinguish
+	 * the functions to call.
+	 */ 
+
 	/* print srp specific data */
 	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
-		srp_info = gnutls_get_auth_info(state);
-		if (srp_info != NULL) {
-			sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
-			       gnutls_srp_server_get_username(srp_info));
-		}
+		sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
+		       gnutls_srp_server_get_username( state));
 	}
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
-		dh_info = gnutls_get_auth_info(state);
-		if (dh_info != NULL) {
-			sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
-			       gnutls_anon_server_get_dh_bits( dh_info));
-		}
 
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+		sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
+		       gnutls_anon_server_get_dh_bits( state));
 	}
 
 	/* print state information */
@@ -262,6 +258,11 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
 	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
 
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_DHE_RSA || gnutls_get_current_kx(state) == GNUTLS_KX_DHE_DSS) {
+		sprintf(tmp2, "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
+			        gnutls_x509pki_server_get_dh_bits( state));
+	}
+			
 	tmp =
 	    gnutls_compression_get_name
 	    (gnutls_get_current_compression_method(state));

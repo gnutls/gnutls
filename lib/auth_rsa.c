@@ -142,7 +142,7 @@ return ret;
  */
 int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 {
-	X509PKI_CLIENT_AUTH_INFO auth = state->gnutls_key->auth_info;
+	X509PKI_AUTH_INFO auth = state->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */
 	MPI pkey, n;
 	int ret;
