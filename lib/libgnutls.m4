@@ -153,7 +153,7 @@ main ()
      LIBGNUTLS_LIBS=""
      ifelse([$3], , :, [$3])
   fi
-  rm -f conf.libngnutlstest
+  rm -f conf.libgnutlstest
   AC_SUBST(LIBGNUTLS_CFLAGS)
   AC_SUBST(LIBGNUTLS_LIBS)
 ])
