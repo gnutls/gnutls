@@ -108,6 +108,9 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 {
 	int rc, mac_size;
 
+	state->connection_state.write_sequence_number = 0;
+	state->connection_state.read_sequence_number = 0;
+
 /* Update internals from CipherSuite selected */
 
 	rc =

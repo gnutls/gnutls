@@ -390,8 +390,8 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
 #ifdef HARD_DEBUG
-		fprintf(stderr, "Send Packet[%d] %d with length: %d\n",
-			(int) state->connection_state.write_sequence_number, gcipher->type, gcipher->length);
+		fprintf(stderr, "Send Packet[%d] %s(%d) with length: %d\n",
+			(int) state->connection_state.write_sequence_number, packet2str(gcipher->type), gcipher->type, gcipher->length);
 #endif
 #ifdef WORDS_BIGENDIAN
 		length = gcipher->length;
@@ -516,6 +516,8 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
+	/* If we expect a change cipher spec then just return - no decryption */
+
 	if (Read(cd, &gcipher.version.major, 1) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
@@ -551,10 +553,10 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 #endif
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "Expected Packet[%d] %d with length: %d\n",
-		(int) state->connection_state.read_sequence_number, type, sizeofdata);
-	fprintf(stderr, "Received Packet[%d] %d with length: %d\n",
-		(int) state->connection_state.read_sequence_number, gcipher.type, gcipher.length);
+	fprintf(stderr, "Expected Packet[%d] %s(%d) with length: %d\n",
+		(int) state->connection_state.read_sequence_number, packet2str(type), type, sizeofdata);
+	fprintf(stderr, "Received Packet[%d] %s(%d) with length: %d\n",
+		(int) state->connection_state.read_sequence_number, packet2str(gcipher.type), gcipher.type, gcipher.length);
 #endif
 
 	if (gcipher.length > 18432) {	/* 2^14+2048 */
@@ -584,6 +586,15 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
+
+	if (type == GNUTLS_CHANGE_CIPHER_SPEC && gcipher.type == GNUTLS_CHANGE_CIPHER_SPEC) {
+#ifdef HARD_DEBUG
+		fprintf(stderr, "Received Change Cipher Spec Packet\n");
+#endif
+		if (gcipher.length!=1) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		return 0;
+	}
+
 
 	ret = _gnutls_TLSCiphertext2TLSCompressed(state, &gcomp, &gcipher);
 	if (ret < 0) {
@@ -626,7 +637,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		switch (gcipher.type) {
 		case GNUTLS_ALERT:
 #ifdef HARD_DEBUG
-			fprintf(stderr, "Alert[%d|%d] was received\n", tmpdata[0], tmpdata[1]);
+			fprintf(stderr, "Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], alert2str((int)tmpdata[1]));
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];
 

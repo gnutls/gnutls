@@ -122,3 +122,110 @@ void _print_TLSCiphertext(GNUTLSCiphertext * ciphertext)
 		bin2hex(ciphertext->fragment, ciphertext->length));
 	fprintf(stderr, "\n");
 }
+
+char* alert2str( int alert) {
+static char str[512];
+
+	switch(alert) {
+		case GNUTLS_CLOSE_NOTIFY:
+			strcpy(str, "Close Notify");
+			break;
+		case GNUTLS_UNEXPECTED_MESSAGE:
+			strcpy(str, "Unexpected message");
+			break;
+		case GNUTLS_BAD_RECORD_MAC:
+			strcpy(str, "Bad record MAC");
+			break;
+
+		case GNUTLS_DECRYPTION_FAILED:
+			strcpy(str, "Decryption Failed");
+			break;
+		case GNUTLS_RECORD_OVERFLOW:
+			strcpy(str, "Record Overflow");
+			break;
+
+		case GNUTLS_DECOMPRESSION_FAILURE:
+			strcpy(str, "Decompression Failed");
+			break;
+
+		case GNUTLS_HANDSHAKE_FAILURE:
+			strcpy(str, "Handshake failed");
+			break;
+		case GNUTLS_BAD_CERTIFICATE:
+			strcpy(str, "Certificate is bad");
+			break;
+		case GNUTLS_UNSUPPORTED_CERTIFICATE:
+			strcpy(str, "Certificate is not supported");
+			break;
+		case GNUTLS_CERTIFICATE_REVOKED:
+			strcpy(str, "Certificate was revoked");
+			break;
+		case GNUTLS_CERTIFICATE_EXPIRED:
+			strcpy(str, "Certificate is expired");
+			break;
+		case GNUTLS_CERTIFICATE_UNKNOWN:
+			strcpy(str, "Unknown Certificate");
+			break;
+		case GNUTLS_ILLEGAL_PARAMETER:
+			strcpy(str, "Illegal Parameter");
+			break;
+		case GNUTLS_UNKNOWN_CA:
+			strcpy(str, "CA is not known");
+			break;
+		case GNUTLS_ACCESS_DENIED:
+			strcpy(str, "Access was denied");
+			break;
+		case GNUTLS_DECODE_ERROR:
+			strcpy(str, "Decode error");
+			break;
+		case GNUTLS_DECRYPT_ERROR:
+			strcpy(str, "Decrypt error");
+			break;
+		case GNUTLS_EXPORT_RESTRICTION:
+			strcpy(str, "Export Restriction");
+			break;
+		case GNUTLS_PROTOCOL_VERSION:
+			strcpy(str, "Error in protocol version");
+			break;
+		case GNUTLS_INSUFFICIENT_SECURITY:
+			strcpy(str, "Insufficient Security");
+			break;
+		case GNUTLS_USER_CANCELED:
+			strcpy(str, "User Canceled");
+			break;
+		case GNUTLS_NO_RENEGOTIATION:
+			strcpy(str, "No renegotiation is allowed");
+			break;
+		default:
+			strcpy(str, "Unknown Alert");
+			
+	}	
+	return str;	
+	
+}
+
+
+char* packet2str( int packet) {
+static char str[512];
+
+	switch(packet) {
+		case GNUTLS_CHANGE_CIPHER_SPEC:
+			strcpy(str, "Change Cipher Spec");
+			break;		
+		case GNUTLS_ALERT:
+			strcpy(str, "Alert");
+			break;		
+		case GNUTLS_HANDSHAKE:
+			strcpy(str, "Handshake");
+			break;
+		case GNUTLS_APPLICATION_DATA:
+			strcpy(str, "Application Data");
+			break;
+
+		default:
+			strcpy(str, "Unknown Packet");
+			
+	}	
+	return str;	
+	
+}
