@@ -155,7 +155,6 @@ void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12)
   * @pkcs12: The structure to store the parsed PKCS12.
   * @data: The DER or PEM encoded PKCS12.
   * @format: One of DER or PEM
-  * @password: the password that will be used to decrypt the structure
   * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
   *
   * This function will convert the given DER or PEM encoded PKCS12
@@ -167,7 +166,7 @@ void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12)
   *
   **/
 int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
-	gnutls_x509_crt_fmt format, const char* password, unsigned int flags)
+	gnutls_x509_crt_fmt format, unsigned int flags)
 {
 	int result = 0, need_free = 0;
 	gnutls_datum _data = { data->data, data->size };
@@ -246,7 +245,7 @@ static int _oid2bag( const char* oid)
 	if (strcmp(oid, BAG_CRL)==0) 
 		return GNUTLS_BAG_CRL;
 	
-	return GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE;
+	return GNUTLS_BAG_UNKNOWN;
 
 }
 

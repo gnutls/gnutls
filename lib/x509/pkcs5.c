@@ -19,10 +19,11 @@
 
 /* XXX what about namespace? */
 
-#include <defines.h>
+#include <gnutls_int.h>
 
 #ifdef ENABLE_PKI
 
+#include <pkcs12.h>
 #include <gcrypt.h>
 #include "pkcs5.h"
 
@@ -82,6 +83,10 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 
   if (dkLen == 0)
     return PKCS5_INVALID_DERIVED_KEY_LENGTH;
+
+  if ((rc=_pkcs12_check_pass( P, Plen)) < 0) {
+  	return rc;
+  }
 
   /*
    *

@@ -42,6 +42,8 @@
 #include "x509/x509.h"
 #include "x509/mpi.h"
 
+void gnutls_certificate_free_crls(gnutls_certificate_credentials sc);
+
 /**
   * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials structure
   * @sc: is an &gnutls_certificate_credentials structure.

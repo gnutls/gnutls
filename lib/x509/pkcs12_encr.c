@@ -7,6 +7,23 @@
 
 #include <gcrypt.h>
 #include <gnutls_errors.h>
+#include <ctype.h>
+
+/* Returns 0 if the password is ok, or a negative error
+ * code instead.
+ */
+int _pkcs12_check_pass( const char* pass, size_t plen) 
+{
+const unsigned char* p = pass;
+int i;
+
+	for (i=0;i<plen;i++) {
+		if ( p[i] < 128) continue;
+		return GNUTLS_E_INVALID_PASSWORD;
+	}
+	
+	return 0;
+}
 
 int 
 _pkcs12_string_to_key (int id, const char *salt, int salt_size, int iter, const char *pw,
@@ -22,10 +39,15 @@ _pkcs12_string_to_key (int id, const char *salt, int salt_size, int iter, const 
 
   cur_keylen = 0;
   pwlen = strlen (pw);
-  if (pwlen > 63/2 || salt_size > 8)
-    {
+  if (pwlen > 63/2 || salt_size > 8) {
+      gnutls_assert();
       return GNUTLS_E_INVALID_REQUEST;
-    }
+  }
+
+  if ((rc=_pkcs12_check_pass( pw, pwlen)) < 0) {
+  	gnutls_assert();
+  	return rc;
+  }
 
   /* Store salt and password in BUF_I */
   p = buf_i;
