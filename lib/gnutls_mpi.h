@@ -14,7 +14,7 @@
 #define _gnutls_mpi_randomize gcry_mpi_randomize
 #define _gnutls_mpi_get_nbits gcry_mpi_get_nbits
 #define _gnutls_mpi_powm gcry_mpi_powm
-#define _gnutls_mpi_invm _gcry_mpi_invm
+#define _gnutls_mpi_invm gcry_mpi_invm
 #define _gnutls_mpi_addm gcry_mpi_addm
 #define _gnutls_mpi_subm gcry_mpi_subm
 #define _gnutls_mpi_mulm gcry_mpi_mulm

@@ -33,8 +33,6 @@
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>
 
-void _gcry_mpi_invm( MPI x, MPI a, MPI n );
-
 /* Converts an RSA PKCS#1 key to
  * an internal structure (gnutls_private_key)
  */
