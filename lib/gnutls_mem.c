@@ -79,8 +79,8 @@ void *ret;
 }
 
 char* _gnutls_strdup( const char* str) {
-int siz = strlen( str);
-char * ret;
+size_t siz = strlen( str);
+char* ret;
 
 	ret = gnutls_malloc( siz + 1);
 	if (ret == NULL)
@@ -91,3 +91,34 @@ char * ret;
 	
 	return ret;
 }
+
+
+#if 0
+/* don't use them. They are included for documentation.
+ */
+
+/**
+  * gnutls_malloc - Allocates and returns data
+  *
+  * This function will allocate 's' bytes data, and
+  * return a pointer to memory. This function is supposed
+  * to be used by callbacks.
+  *
+  * The allocation function used is the one set by gnutls_global_set_mem_functions().
+  *
+  **/
+void* gnutls_malloc( size_t s);
+
+/**
+  * gnutls_free - Returns a free() like function
+  * @d: pointer to memory
+  *
+  * This function will free data pointed by ptr.
+  *
+  * The deallocation function used is the one set by gnutls_global_set_mem_functions().
+  *
+  **/
+void gnutls_free( void* ptr);
+
+#endif
+

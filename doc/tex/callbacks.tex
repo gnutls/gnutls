@@ -16,9 +16,8 @@ data to the transport layer.
 Other callback functions such as the one set by
 \printfunc{gnutls_srp_set_server_credentials_function}{gnutls\_srp\_set\_server\_credentials\_function},
 may require more complicated input, including data to be allocated.
-These callbacks should use the following function to get a malloc()
-and a free() like functions, to allocate data.
+These callbacks should allocate and free memory using the functions shown below.
 \begin{itemize}
-\item \printfunc{gnutls_global_get_malloc_function}{gnutls\_global\_get\_malloc\_function}
-\item \printfunc{gnutls_global_get_free_function}{gnutls\_global\_get\_free\_function}
+\item \printfunc{gnutls_malloc}{gnutls\_malloc}
+\item \printfunc{gnutls_free}{gnutls\_free}
 \end{itemize}

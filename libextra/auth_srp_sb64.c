@@ -315,7 +315,7 @@ int size;
   * encoding. This is the encoding used in SRP password files. This function will
   * allocate the required memory to hold the encoded data.
   *
-  * You should use the function returned by gnutls_global_get_free_function() to
+  * You should use the function returned by gnutls_free() to
   * free the returned data.
   * 
   **/
@@ -385,7 +385,7 @@ int size;
   * will be allocated, and stored into result.
   * It will decode using the base64 algorithm found in libsrp.
   *
-  * You should use the function returned by gnutls_global_get_free_function() to
+  * You should use the function returned by gnutls_free() to
   * free the returned data.
   * 
   **/
