@@ -13,4 +13,5 @@ certs
 crls
 pkcs12
 pkits.ldif
+pkits.schema
 smime
