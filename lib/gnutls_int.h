@@ -30,9 +30,9 @@
 #define HARD_DEBUG
 #define BUFFERS_DEBUG
 #define RECORD_DEBUG
-#define HANDSHAKE_DEBUG*/
+#define HANDSHAKE_DEBUG
 #define DEBUG
-
+*/
 
 #define SOCKET int
 #define LIST ...
@@ -268,7 +268,10 @@ typedef struct {
 				      */
 } CipherSpecs;
 
-typedef enum GNUTLS_Version { GNUTLS_TLS1, GNUTLS_SSL3, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
+/* Versions should be in order of the oldest
+ * (eg. SSL3 is before TLS1)
+ */
+typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
 
 typedef struct {
 	GNUTLS_Version	version;
@@ -290,6 +293,7 @@ typedef struct {
 #define MACAlgorithm_Priority GNUTLS_Priority
 #define KXAlgorithm_Priority GNUTLS_Priority
 #define CompressionMethod_Priority GNUTLS_Priority
+#define Protocol_Priority GNUTLS_Priority
 
 typedef struct {
 	gnutls_datum			buffer;
@@ -305,6 +309,8 @@ typedef struct {
 	MACAlgorithm_Priority		MACAlgorithmPriority;
 	KXAlgorithm_Priority		KXAlgorithmPriority;
 	CompressionMethod_Priority	CompressionMethodPriority;
+	Protocol_Priority		ProtocolPriority;
+	
 	/* resumed session */
 	ResumableSession		resumed; /* TRUE or FALSE - if we are resuming a session */
 	SecurityParameters		resumed_security_parameters;
@@ -344,10 +350,10 @@ int gnutls_close(SOCKET cd, GNUTLS_STATE state);
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);
-void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
+void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
-ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const void* data, size_t sizeofdata, int flags);
-ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata, int flags);
+ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void* data, size_t sizeofdata, int flags);
+ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType, char* data, size_t sizeofdata, int flags);
 int _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
 int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);
 #define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)

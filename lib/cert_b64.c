@@ -296,49 +296,51 @@ inline static int cpydata(uint8 * data, int data_size, uint8 ** result)
 
 /* decodes data and puts the result into result (localy alocated)
  * The result_size is the return value
- * FIXME: This function is a mess
  */
 #define ENDSTR "-----\n"
 int _gnutls_fbase64_decode( uint8 * data, int data_size,
 			   uint8 ** result)
 {
-	int i, ret;
-	char top[80];
-	char bottom[80];
+	int ret;
+	char top[] = "-----BEGIN ";
+	char bottom[] = "\n-----END ";
 	uint8 *rdata;
 	int rdata_size;
 	uint8 *kdata;
 	int kdata_size;
 
-	strcpy(top, "-----BEGIN ");
-
-	strcpy(bottom, "\n-----END ");
-
-	i = 0;
-	do {
-		rdata = &data[i];
-		data_size --;
-		i++;
-	} while (data_size > 0 && strncmp(rdata, top, strlen(top)) != 0);
+	rdata = strstr( data, top);
+	if (rdata==NULL) {
+		gnutls_assert();
+		return -1;
+	}
+	data_size -= (int)rdata-(int)data;
 
 	if (data_size < 4 + strlen(bottom)) {
 		gnutls_assert();
 		return -1;
 	}
-	
-	do {
-		data_size--;
-		rdata++;
-	} while( ( strncmp( rdata, ENDSTR, strlen(ENDSTR)) != 0) && data_size > 0) ;
 
+	kdata = strstr( rdata, ENDSTR);
+	if (kdata==NULL) {
+		gnutls_assert();
+		return -1;
+	}
 	data_size -= strlen(ENDSTR);
-	rdata += strlen(ENDSTR);
+	data_size -= (int)kdata-(int)rdata;
+	
+	rdata = kdata + strlen(ENDSTR);
+	
+	/* position is now after the ---BEGIN--- headers */
 
-	rdata_size = 0;
-	do {
-		rdata_size++;
-	} while (rdata_size < data_size
-		 && strncmp(&rdata[rdata_size], bottom, strlen(bottom)) != 0);
+	kdata = strstr( rdata, bottom);
+	if (kdata==NULL) {
+		gnutls_assert();
+		return -1;
+	}
+	/* position of kdata is before the ----END--- footer 
+	 */
+	rdata_size = (int)kdata-(int)rdata;
 
 	if (rdata_size < 4) {
 		gnutls_assert();

@@ -21,6 +21,10 @@
 #include "gnutls_auth.h"
 
 /* functions for version */
+
+GNUTLS_Version _gnutls_version_lowest( GNUTLS_STATE state);
+GNUTLS_Version _gnutls_version_max( GNUTLS_STATE state);
+int _gnutls_version_priority(GNUTLS_STATE state, GNUTLS_Version version);
 int _gnutls_version_is_supported(GNUTLS_STATE state, const GNUTLS_Version version);
 int _gnutls_version_get_major( GNUTLS_Version ver);
 int _gnutls_version_get_minor( GNUTLS_Version ver);

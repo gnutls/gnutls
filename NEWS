@@ -5,6 +5,7 @@ Version 0.1.5
 - Reentracy fixes in ASN.1 Parsing.
 - Optimizations in hash/hmac functions
 - (Error) message handling has changed
+- Better Protocol Version handling
 
 Version 0.1.4 (22/06/2001)
 - Corrected (srp) base64 encoding.

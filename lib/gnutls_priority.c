@@ -185,3 +185,50 @@ int gnutls_set_compression_priority( GNUTLS_STATE state, LIST) {
 	va_end(ap);
 	return 0;
 }
+
+/**
+  * gnutls_set_protocol_priority - Sets the priority on the protocol versions supported by gnutls.
+  * @state: is a &GNUTLS_STATE structure.
+  * @LIST: is a 0 terminated list of GNUTLS_Version elements.
+  *
+  * Sets the priority on the protocol versions supported by gnutls.
+  * Priority is higher for protocols specified before others.
+  * After specifying the protocols you want, you should add 0.
+  * Note that the priority is set on the client. The server does
+  * not use the protocols's priority except for disabling
+  * protocols that were not specified.
+  **/
+int gnutls_set_protocol_priority( GNUTLS_STATE state, LIST) {
+	
+	va_list ap;
+	int i,num=0;
+	va_list _ap;
+	
+	va_start( ap, state);
+	_ap = ap;
+
+	while( va_arg( ap, int) != 0) {
+		num++;
+	}
+	
+	if (state->gnutls_internals.ProtocolPriority.algorithm_priority!=NULL)
+		gnutls_free(state->gnutls_internals.ProtocolPriority.algorithm_priority);
+
+	state->gnutls_internals.ProtocolPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+
+	if (state->gnutls_internals.ProtocolPriority.algorithm_priority == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	state->gnutls_internals.ProtocolPriority.algorithms = num;
+	for (i=0;i<num;i++) {
+		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = va_arg( _ap, int);
+	}
+	va_end(ap);
+
+	/* set the current version to the lowest
+	 */
+	_gnutls_set_current_version( state, state->gnutls_internals.ProtocolPriority.algorithm_priority[num-1]);
+	return 0;
+}

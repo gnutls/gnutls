@@ -111,12 +111,13 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	int err;
 	uint16 challenge;
 	opaque session_id[TLS_MAX_SESSION_ID_SIZE];
+	GNUTLS_Version ver;
 	
 	/* we only want to get here once - only in client hello */
 	state->gnutls_internals.v2_hello = 0;
 
 	DECR_LEN(len, 2);
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "V2 Handshake: Client's version: %d.%d\n", data[pos],
 		data[pos + 1]);
 #endif
@@ -125,11 +126,17 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* if we do not support that version  */
 	if (_gnutls_version_is_supported(state, version) == 0) {
+		ver = _gnutls_version_lowest( state);
+	} else {
+		ver = version;
+	}
+
+	if (ver==GNUTLS_VERSION_UNKNOWN || ver > version) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	} else {
-		gnutls_set_current_version(state, version);
 	}
+
+	_gnutls_set_current_version(state, ver);
 
 	pos += 2;
 
@@ -188,7 +195,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 				   (state->security_parameters.
 				    current_cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 		fprintf(stderr,
 			"V2 Handshake: Cannot find the appropriate handler for the KX algorithm\n");
 #endif

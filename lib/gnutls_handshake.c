@@ -39,7 +39,7 @@
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
 
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
 #else
 #define ERR(x, y)
@@ -243,6 +243,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	int len = datalen;
 	int err;
 	opaque random[TLS_RANDOM_SIZE];
+	GNUTLS_Version ver;
 
 	if (state->gnutls_internals.v2_hello != 0) {	/* version 2.0 */
 		return _gnutls_read_client_hello_v2(state, data, datalen);
@@ -250,7 +251,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 
 	DECR_LEN(len, 2);
 
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Client's version: %d.%d\n", data[pos],
 		data[pos + 1]);
 #endif
@@ -259,11 +260,23 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 
 	/* if we do not support that version  */
 	if (_gnutls_version_is_supported(state, version) == 0) {
+		/* If he requested something we do not support
+		 * then we send him the lowest we support.
+		 */
+		ver = _gnutls_version_lowest( state);
+	} else {
+		ver = version;
+	}
+
+	/* he should have send us the highest version
+	 * he supports.
+	 */
+	if (ver==GNUTLS_VERSION_UNKNOWN || ver > version) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	} else {
-		gnutls_set_current_version(state, version);
 	}
+
+	_gnutls_set_current_version(state, ver);
 
 	pos += 2;
 
@@ -341,7 +354,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 				   (state->security_parameters.
 				    current_cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 		fprintf(stderr,
 			"Cannot find the appropriate handler for the KX algorithm\n");
 #endif
@@ -589,7 +602,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 		gnutls_insertHashDataBuffer(state, data, i_datasize);
 
 	ret =
-	    _gnutls_Send_int(cd, state, GNUTLS_HANDSHAKE, data,
+	    _gnutls_Send_int(cd, state, GNUTLS_HANDSHAKE, type, data,
 			     i_datasize);
 
 	gnutls_free(data);
@@ -615,7 +628,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	dataptr = gnutls_malloc(HANDSHAKE_HEADERS_SIZE);
 
 	ret =
-	    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, dataptr,
+	    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, type, dataptr,
 			     SSL2_HEADERS);
 	if (ret < 0) {
 		gnutls_assert();
@@ -632,7 +645,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	    || type != GNUTLS_CLIENT_HELLO) {
 
 		ret =
-		    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE,
+		    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, type,
 				     &dataptr[SSL2_HEADERS],
 				     HANDSHAKE_HEADERS_SIZE -
 				     SSL2_HEADERS);
@@ -698,7 +711,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	sum = handshake_headers;
 	do {
 		ret =
-		    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE,
+		    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, type,
 				     &dataptr[sum], length32);
 		sum += ret;
 	} while (((sum - handshake_headers) < length32) && (ret > 0));
@@ -811,7 +824,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Server's version: %d.%d\n", data[pos],
 		data[pos + 1]);
 #endif
@@ -821,7 +834,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	} else {
-		gnutls_set_current_version(state, version);
+		_gnutls_set_current_version(state, version);
 	}
 	pos += 2;
 
@@ -922,7 +935,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
 				   (cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 		fprintf(stderr,
 			"Cannot find the appropriate handler for the KX algorithm\n");
 #endif
@@ -978,6 +991,7 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state)
 	int i, datalen, ret = 0;
 	uint16 x;
 	opaque random[TLS_RANDOM_SIZE];
+	GNUTLS_Version hver;
 
 	opaque *SessionID =
 	    state->gnutls_internals.resumed_security_parameters.session_id;
@@ -994,10 +1008,11 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state)
 	 */
 	data = gnutls_malloc(datalen);
 
+	hver = _gnutls_version_max(state);
 	data[pos++] =
-	    _gnutls_version_get_major(state->connection_state.version);
+	    _gnutls_version_get_major( hver);
 	data[pos++] =
-	    _gnutls_version_get_minor(state->connection_state.version);
+	    _gnutls_version_get_minor( hver);
 
 	_gnutls_create_random(random);
 	_gnutls_set_client_random(state, random);
@@ -1408,7 +1423,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	int ret = 0;
 
 	ret =
-	    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
+	    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
 			    NULL, 0, 0);
 	if (ret < 0) {
 		ERR("recv ChangeCipherSpec", ret);

@@ -236,7 +236,7 @@ int rc;
 
 	_gnutls_set_read_keys(state);
 	 
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
 					      security_parameters.current_cipher_suite));
@@ -381,7 +381,7 @@ int rc;
 	
 	_gnutls_set_write_keys(state);
 
-#ifdef DEBUG
+#ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
 					      security_parameters.current_cipher_suite));

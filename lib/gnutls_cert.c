@@ -221,10 +221,25 @@ gnutls_datum tmp;
 
 	res->ca_list = NULL;
 
+{FILE* fd;
+fd = fopen("/tmp/aaa1", "w");
+fwrite( ptr, siz, 1, fd);
+fclose(fd);
+
+}
+
+
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
 		siz-=siz2; /* FIXME: this is not enough
 			    */
+
+{FILE* fd;
+fd = fopen("/tmp/test1", "w");
+fwrite( b64, siz2, 1, fd);
+fclose(fd);
+
+}
 
 		if (siz2 < 0) {
 			gnutls_assert();
@@ -385,9 +400,6 @@ int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE)
 {
 int ret;
 
-/* FIXME: This function fails (DER parsing) if it is called
- * after gnutls_set_x509_key(). why?
- */
 	if ( (ret=read_ca_file( res, CAFILE)) < 0)
 		return ret;
 

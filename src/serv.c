@@ -97,6 +97,8 @@ GNUTLS_STATE initialize_state()
 	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority(state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
 			       GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
+	
 	gnutls_set_cred(state, GNUTLS_ANON, dh_cred);
 	gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
 	gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
@@ -312,7 +314,6 @@ int main(int argc, char **argv)
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
-
 
 
 

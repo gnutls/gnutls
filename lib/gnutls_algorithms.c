@@ -34,6 +34,7 @@
 #define MAX_KX 256
 #define MAX_CIPHERSUITE 256
 #define MAX_COMPRESSION 256
+#define MAX_VERSION 256
 
 
 /* Cred type mappings to KX algorithms */
@@ -74,6 +75,7 @@ typedef struct {
 static const gnutls_version_entry sup_versions[] = {
 	{"SSL 3.0", GNUTLS_SSL3, 3, 0, 1},
 	{"TLS 1.0", GNUTLS_TLS1, 3, 1, 1},
+	{"UNKNOWN", GNUTLS_VERSION_UNKNOWN, 0, 0, 1},
 	{0}
 };
 
@@ -700,6 +702,48 @@ int _gnutls_kx_is_ok(KXAlgorithm algorithm)
 	return ret;
 }
 
+/* Version */
+int _gnutls_version_priority(GNUTLS_STATE state,
+				     GNUTLS_Version version)
+{				/* actually returns the priority */
+	int i;
+
+	if (state->gnutls_internals.ProtocolPriority.algorithm_priority==NULL) {
+		gnutls_assert();
+		return -1;
+	}
+
+	for (i = 0;
+	     i <
+	     state->gnutls_internals.ProtocolPriority.algorithms;
+	     i++) {
+		if (state->gnutls_internals.
+		    ProtocolPriority.algorithm_priority[i] ==
+		    version)
+			return i;
+	}
+	return -1;
+}
+
+GNUTLS_Version _gnutls_version_lowest(GNUTLS_STATE state)
+{				/* returns the lowest version supported */
+	if (state->gnutls_internals.ProtocolPriority.algorithm_priority==NULL) {
+		return GNUTLS_VERSION_UNKNOWN;
+	} else
+	return state->gnutls_internals.ProtocolPriority.
+		algorithm_priority[state->gnutls_internals.ProtocolPriority.algorithms-1];
+}
+
+GNUTLS_Version _gnutls_version_max(GNUTLS_STATE state)
+{				/* returns the maximum version supported */
+	if (state->gnutls_internals.ProtocolPriority.algorithm_priority==NULL) {
+		return GNUTLS_VERSION_UNKNOWN;
+	} else
+	return state->gnutls_internals.ProtocolPriority.
+		algorithm_priority[0];
+}
+
+
 /**
   * gnutls_version_get_name - Returns a string with the name of the specified SSL/TLS version
   * @version: is a (gnutls) version number
@@ -754,10 +798,15 @@ int
 _gnutls_version_is_supported(GNUTLS_STATE state,
 			     const GNUTLS_Version version)
 {
-	size_t ret = 0;
-	/* FIXME: make it to read it from the state */
+int ret;
+
 	GNUTLS_VERSION_ALG_LOOP(ret = p->supported);
-	return ret;
+	if (ret == 0) return 0;
+
+	if (_gnutls_version_priority( state, version) < 0)
+		return 0; /* disabled by the user */
+	else
+		return 1;
 }
 
 /* Type to KX mappings */

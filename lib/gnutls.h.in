@@ -38,7 +38,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
 
-typedef enum GNUTLS_Version { GNUTLS_TLS1, GNUTLS_SSL3 } GNUTLS_Version;
+typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
 #define SOCKET int
 #define LIST ...
@@ -97,14 +97,14 @@ ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdat
 ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata);
 
 /* functions to set priority of cipher suites */
-void gnutls_set_cipher_priority( GNUTLS_STATE state, LIST);
-void gnutls_set_mac_priority( GNUTLS_STATE state, LIST);
-void gnutls_set_compression_priority( GNUTLS_STATE state, LIST);
-void gnutls_set_kx_priority( GNUTLS_STATE state, LIST);
+int gnutls_set_cipher_priority( GNUTLS_STATE state, LIST);
+int gnutls_set_mac_priority( GNUTLS_STATE state, LIST);
+int gnutls_set_compression_priority( GNUTLS_STATE state, LIST);
+int gnutls_set_kx_priority( GNUTLS_STATE state, LIST);
+int gnutls_set_protocol_priority( GNUTLS_STATE state, LIST);
 
 
 /* set our version - 0 for TLS 1.0 and 1 for SSL3 */
-void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 const char *gnutls_version_get_name(GNUTLS_Version version);
 

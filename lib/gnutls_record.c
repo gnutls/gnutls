@@ -49,7 +49,7 @@ GNUTLS_Version ver;
 	return ver;
 }
 
-void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
+void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
 	state->connection_state.version = version;
 	if (state->gnutls_key!=NULL) {
 		state->gnutls_key->version.major = _gnutls_version_get_major(version);
@@ -102,7 +102,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */
+	gnutls_set_protocol_priority( *state, GNUTLS_TLS1, 0); /* default */
 
 	(*state)->gnutls_key = gnutls_calloc(1, sizeof(GNUTLS_KEY_A));
 
@@ -341,11 +341,11 @@ int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDes
 	memcpy(&data[0], &level, 1);
 	memcpy(&data[1], &desc, 1);
 
-#ifdef DEBUG
+#ifdef RECORD_DEBUG
 	fprintf(stderr, "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
 #endif
 
-	return gnutls_send_int(cd, state, GNUTLS_ALERT, data, 2, 0);
+	return gnutls_send_int(cd, state, GNUTLS_ALERT, -1, data, 2, 0);
 }
 
 /**
@@ -367,7 +367,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, int wait)
 	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
 	/* receive the closure alert */
-	if (wait==0) gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0, 0); 
+	if (wait==0) gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
 
 	state->gnutls_internals.valid_connection = VALID_FALSE;
 
@@ -379,7 +379,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, int wait)
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current state.    
  */
-ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const void *_data, size_t sizeofdata, int flags)
+ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata, int flags)
 {
 	uint8 *cipher;
 	int i, cipher_size;
@@ -388,6 +388,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
 	int Size;
 	uint8 headers[5];
 	const uint8 *data=_data;
+	GNUTLS_Version lver;
 
 	if (sizeofdata == 0)
 		return 0;
@@ -405,9 +406,23 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
 	}
 
 	headers[0]=type;
-	headers[1]=_gnutls_version_get_major(state->connection_state.version);
-	headers[2]=_gnutls_version_get_minor(state->connection_state.version);
+	
+	if (htype==GNUTLS_CLIENT_HELLO) { /* then send the lowest 
+			  		   * protocol we support 
+					   */
+		lver = _gnutls_version_lowest(state);
+		if (lver==GNUTLS_VERSION_UNKNOWN) {
+			gnutls_assert();
+			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+		}
+	} else { /* send the current */
+		lver = gnutls_get_current_version( state);
+	}
 
+	headers[1]=_gnutls_version_get_major( lver);
+	headers[2]=_gnutls_version_get_minor( lver);
+
+	
 #ifdef RECORD_DEBUG
 	fprintf(stderr, "Record: Sending Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
@@ -495,7 +510,7 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 	fprintf(stderr, "Record: Sending ChangeCipherSpec\n");
 #endif
 
-	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, data, 1, 0);
+	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1, 0);
 
 }
 
@@ -510,6 +525,8 @@ char peekdata;
 	return 0;
 }
 
+#define CHECK_RECORD_VERSION
+
 /* This function behave exactly like read(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is Userdata only)
@@ -517,7 +534,7 @@ char peekdata;
  * flags is the sockets flags to use. Currently only MSG_DONTWAIT is
  * supported.
  */
-ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata, int flags)
+ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata, int flags)
 {
 	uint8 *tmpdata;
 	int tmplen;
@@ -564,7 +581,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 	/* Read the first two bytes to determine if this is a 
 	 * version 2 message 
 	 */
-	if ( headers[0] > 127 && type==GNUTLS_HANDSHAKE) { 
+	if ( headers[0] > 127 && type==GNUTLS_HANDSHAKE && htype == GNUTLS_CLIENT_HELLO) { 
 
 	/* if msb set and expecting handshake message
 	 * it should be SSL 2 hello 
@@ -576,7 +593,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		recv_type = GNUTLS_HANDSHAKE; /* we accept only v2 client hello
 					       */
 		state->gnutls_internals.v2_hello = length;
-#ifdef DEBUG
+#ifdef RECORD_DEBUG
 		fprintf(stderr, "Record: V2 packet received. Length: %d\n", length);
 #endif
 
@@ -584,15 +601,18 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		/* version 3.x 
 		 */
 		recv_type = headers[0];
+#ifdef CHECK_RECORD_VERSION
 		version = _gnutls_version_get( headers[1], headers[2]);
+#endif
 
 		length = READuint16( &headers[3]);
 	}
-	
-	if ( gnutls_get_current_version(state) != version && recv_type != GNUTLS_HANDSHAKE) {
-#ifdef DEBUG
+
+#ifdef CHECK_RECORD_VERSION
+	if ( htype!=GNUTLS_CLIENT_HELLO && gnutls_get_current_version(state) != version) {
+# ifdef RECORD_DEBUG
 		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d) %d.%d\n", headers[0], headers[1], headers[2]);
-#endif
+# endif
 		if (type!=GNUTLS_ALERT) {
 			/* some browsers return garbage, when
 			 * we send them a close notify. 
@@ -604,7 +624,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
-
+#endif
 
 #ifdef RECORD_DEBUG
 	fprintf(stderr, "Record: Expected Packet[%d] %s(%d) with length: %d\n",
@@ -614,7 +634,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 #endif
 
 	if (length > MAX_RECV_SIZE) {
-#ifdef DEBUG
+#ifdef RECORD_DEBUG
 		fprintf(stderr, "Record: FATAL ERROR: Received packet with length: %d\n", length);
 #endif
 		_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
@@ -668,7 +688,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 	 * received that data.
 	 */
 	if (ret != length) {
-#ifdef DEBUG
+#ifdef RECORD_DEBUG
 		fprintf(stderr, "Record: Received packet with length: %d\nExpected %d\n", ret, length);
 #endif
 		gnutls_free(ciphertext);
@@ -736,7 +756,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 	} else {
 		switch (recv_type) {
 		case GNUTLS_ALERT:
-#ifdef DEBUG
+#ifdef RECORD_DEBUG
 			fprintf(stderr, "Record: Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];
@@ -793,7 +813,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 
 			break;
 		default:
-#ifdef DEBUG
+#ifdef RECORD_DEBUG
 			fprintf(stderr, "Record: Received Unknown packet %d expecting %d\n", recv_type, type);
 #endif
 			gnutls_assert();
@@ -974,7 +994,7 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * be anything except 0.
   **/
 ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata, int flags) {
-	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, flags);
+	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, flags);
 }
 
 /**
@@ -993,7 +1013,7 @@ ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, const void *data, size_t size
   * if there are no data in the socket. 
   **/
 ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags) {
-	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, flags);
+	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, flags);
 }
 
 /**
@@ -1007,7 +1027,7 @@ ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata
   * difference is that is accepts a GNUTLS state.
   **/
 ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata) {
-	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, 0);
+	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, 0);
 }
 
 /**
@@ -1021,5 +1041,5 @@ ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t siz
   * difference is that is accepts a GNUTLS state. 
   **/
 ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
-	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, data, sizeofdata, 0);
+	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, 0);
 }

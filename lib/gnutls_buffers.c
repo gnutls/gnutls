@@ -213,7 +213,7 @@ ssize_t _gnutls_Write(int fd, const void *iptr, size_t n, int flags)
 	return n;
 
 }
-ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, void *iptr, size_t n)
+ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t n)
 {
 	size_t left;
 	ssize_t i = 0;
@@ -221,7 +221,7 @@ ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, void *ipt
 
 	left = n;
 	while (left > 0) {
-		i = gnutls_send_int(fd, state, type, &ptr[i], left, 0);
+		i = gnutls_send_int(fd, state, type, htype, &ptr[i], left, 0);
 		if (i <= 0) {
 			return i;
 		}
@@ -232,7 +232,7 @@ ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, void *ipt
 
 }
 
-ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, void *iptr, size_t sizeOfPtr)
+ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
 {
 	size_t left;
 	ssize_t i=0;
@@ -240,7 +240,7 @@ ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, void *ipt
 
 	left = sizeOfPtr;
 	while (left > 0) {
-		i = gnutls_recv_int(fd, state, type, &ptr[i], left, 0);
+		i = gnutls_recv_int(fd, state, type, htype, &ptr[i], left, 0);
 		if (i < 0) {
 			return i;
 		} else {
