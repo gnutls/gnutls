@@ -63,9 +63,23 @@ ANON\_DH & This algorithm exchanges Diffie Hellman parameters.
 \subsection{Authentication using SRP}
 Authentication using the SRP\footnote{SRP stands for Secure Password Protocol and 
 is described in RFC2945. The SRP key exchange is not a part of the \tlsI protocol}
-can be described as password authentication, since the two peers are identified by the knowledge 
-of a password. This protocol also offers protection against off-line attacks (password file stealing
-etc.). 
+is actually password authentication, since the two peers are identified by the knowledge of a password. 
+This protocol also offers protection against off-line attacks (password file stealing etc). 
+This is achieved since SRP does not use the plain password to perform authentication, but something called a 
+verifier. The verifier is $g^{x}mod(n)$ and $x$ is a value calculated
+from the username and the password. 
+\par SRP is normaly used with a SHA based hash function, to calculate
+the value of $x$. In \gnutls in addition to original SHA hash function,
+a hash function based on blowfish crypt is also supported. The blowfish
+crypt function has the property of variable complexity, thus the
+verifier may resist future attacks based on computational power, by just increasing
+the complexity of the function (sometimes called 'the cost').
+\par The advantage of SRP authentication, over other proposed secure password 
+authentication schemas, is that SRP does not require the server to hold
+the user's password. This kind of protection is similar to the one used traditionaly
+in the \emph{UNIX} 'passwd' file, where the contents of this file did not cause
+harm to the system security if they were revealed.
+\par
 Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp}.
 
 \begin{figure}[hbtp]
