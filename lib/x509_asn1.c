@@ -187,8 +187,10 @@ _asn1_remove_node(node_asn *node)
 
   if(node==NULL) return;
 
-  gnutls_free(node->name);
-  gnutls_free(node->value);
+  if (node->name!=NULL)
+	  gnutls_free(node->name);
+  if (node->value!=NULL)
+	  gnutls_free(node->value);
   gnutls_free(node);
 }
 
