@@ -13,7 +13,6 @@
 #define DSA_PUBLIC_PARAMS 4
 #define RSA_PRIVATE_PARAMS 6
 #define RSA_PUBLIC_PARAMS 2
-#define MAX_SIGNATURE_SIZE 512
 
 #if MAX_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
 # error INCREASE MAX_PARAMS
@@ -58,12 +57,6 @@ typedef struct gnutls_cert {
 			/* holds the type (PGP, X509)
 			 */
 	CertificateType     cert_type;
-	
-	/* Holds the signed DHE parameters.
-	 * stored here for optimization.
-	 */
-	opaque	   dh_signature[MAX_SIGNATURE_SIZE];
-	int	   dh_signature_size;
 	
 	gnutls_datum raw; /* the raw certificate */
 } gnutls_cert;
