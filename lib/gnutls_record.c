@@ -305,7 +305,7 @@ ssize_t gnutls_send_int( gnutls_session session, ContentType type, HandshakeType
 	if (session->internals.record_send_buffer.length == 0 &&
 	  (sizeofdata == 0 || _data==NULL)) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	if (type!=GNUTLS_ALERT) /* alert messages are sent anyway */
@@ -694,7 +694,7 @@ ssize_t gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType
 	ret = 0;
 
 	if (sizeofdata == 0 || data == NULL) {
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	if ( _gnutls_session_is_valid(session)!=0 || session->internals.may_read!=0) {

@@ -259,7 +259,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
   *
   * This function will convert the given data to printable data, using the base64 
   * encoding. This is the encoding used in PEM messages. If the provided
-  * buffer is not long enough GNUTLS_E_INVALID_REQUEST is returned.
+  * buffer is not long enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
   * 
   **/
 int gnutls_pem_base64_encode( const char* msg, const gnutls_datum *data, char* result, int* result_size) {
@@ -273,7 +273,7 @@ int size;
 	if (result==NULL || *result_size < size) {
 		gnutls_free(ret);
 		*result_size = size;
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	} else {
 		memcpy( result, ret, size);
 		gnutls_free(ret);
@@ -476,6 +476,8 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
   *
   * Note that b64_data should be null terminated.
   * 
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
+  * or 0 on success.
   **/
 int gnutls_pem_base64_decode( const char* header, const gnutls_datum *b64_data, char* result, int* result_size) 
 {
@@ -489,7 +491,7 @@ int size;
 	if (result==NULL || *result_size < size) {
 		gnutls_free(ret);
 		*result_size = size;
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	} else {
 		memcpy( result, ret, size);
 		gnutls_free(ret);

@@ -513,7 +513,7 @@ static int check_bits(int bits)
 	} while (supported_bits[i] != 0);
 
 	gnutls_assert();
-	return GNUTLS_E_INVALID_PARAMETERS;
+	return GNUTLS_E_INVALID_REQUEST;
 }
 
 /* Replaces the prime in the static DH parameters, with a randomly
@@ -543,7 +543,7 @@ int gnutls_dh_params_set(gnutls_dh_params dh_params, gnutls_datum prime,
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	i = 0;
@@ -681,7 +681,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	if (_gnutls_dh_generate_prime(&tmp_g, &tmp_prime, bits) < 0) {

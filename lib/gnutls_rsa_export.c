@@ -162,7 +162,7 @@ static int check_bits(int bits)
 	} while (supported_bits[i] != 0);
 
 	gnutls_assert();
-	return GNUTLS_E_INVALID_PARAMETERS;
+	return GNUTLS_E_INVALID_REQUEST;
 }
 
 #define FREE_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
@@ -198,7 +198,7 @@ int gnutls_rsa_params_set(gnutls_rsa_params rsa_params,
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	for (i=0;i<RSA_PRIVATE_PARAMS;i++) {
@@ -330,7 +330,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	ret = _gnutls_rsa_generate_params( rsa_params, bits);

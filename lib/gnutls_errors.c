@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -96,9 +96,9 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("TLS Application data were received, while expected handshake data.", GNUTLS_E_GOT_APPLICATION_DATA, 1 ), 
 	ERROR_ENTRY("Error in Database backend.", GNUTLS_E_DB_ERROR, 1 ), 
 	ERROR_ENTRY("The certificate type is not supported.", GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE, 1 ), 
-	ERROR_ENTRY("Invalid parameters given in request.", GNUTLS_E_INVALID_PARAMETERS, 1 ), 
+	ERROR_ENTRY("The memory buffer given, is too short to hold parameters.", GNUTLS_E_SHORT_MEMORY_BUFFER, 1 ), 
 	ERROR_ENTRY("The request is invalid.", GNUTLS_E_INVALID_REQUEST, 1 ), 
-	ERROR_ENTRY("An illegal parameter has been received.", GNUTLS_E_ILLEGAL_PARAMETER, 1 ), 
+	ERROR_ENTRY("An illegal parameter has been received.", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1 ), 
 	ERROR_ENTRY("Error while reading file.", GNUTLS_E_FILE_ERROR, 1 ), 
 	ERROR_ENTRY("Error in ASCII armoring.", GNUTLS_E_ASCII_ARMOR_ERROR, 1 ), 
 

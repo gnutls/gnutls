@@ -98,7 +98,7 @@ int _gnutls_record_buffer_put(ContentType type, gnutls_session session, char *da
 	
 	default:
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	return 0;
@@ -115,7 +115,7 @@ int _gnutls_record_buffer_get_size(ContentType type, gnutls_session session)
 			return session->internals.handshake_data_buffer.length;
 		
 		default:
-			return GNUTLS_E_INVALID_PARAMETERS;
+			return GNUTLS_E_INVALID_REQUEST;
 	}
 	return 0;
 }
@@ -139,7 +139,7 @@ int _gnutls_record_buffer_get(ContentType type, gnutls_session session, char *da
 {
 	if (length==0 || data==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	switch(type) {
@@ -183,7 +183,7 @@ int _gnutls_record_buffer_get(ContentType type, gnutls_session session, char *da
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 
@@ -334,7 +334,7 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
  	   || (session->internals.record_recv_buffer.length+sizeOfPtr) > MAX_RECV_SIZE) 
 	{
 		gnutls_assert(); /* internal error */
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	/* leave peeked data to the kernel space only if application data
@@ -535,7 +535,7 @@ ssize_t _gnutls_io_write_buffered( gnutls_session session, const void *iptr, siz
 	 */
 	if (session->internals.record_send_buffer.length > 0 && iptr != NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	/* If data in the buffer exist
@@ -804,7 +804,7 @@ ssize_t _gnutls_handshake_io_recv_int( gnutls_session session, ContentType type,
 
 	if (sizeOfPtr == 0 || iptr == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	if (session->internals.handshake_recv_buffer.length > 0) {

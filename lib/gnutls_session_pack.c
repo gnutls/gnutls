@@ -65,7 +65,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 			
 			if (info == NULL && session->gnutls_key->auth_info_size!=0) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_PARAMETERS;
+				return GNUTLS_E_INVALID_REQUEST;
 			}
 
 			pack_size = session->gnutls_key->auth_info_size;
@@ -91,7 +91,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 			    _gnutls_get_auth_info(session);
 			if (info == NULL && session->gnutls_key->auth_info_size!=0) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_PARAMETERS;
+				return GNUTLS_E_INVALID_REQUEST;
 			}
 			
 			packed_session->size =
@@ -114,7 +114,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 			    _gnutls_get_auth_info(session);
 			if (info == NULL && session->gnutls_key->auth_info_size!=0) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_PARAMETERS;
+				return GNUTLS_E_INVALID_REQUEST;
 			}
 
 			ret =

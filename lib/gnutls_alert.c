@@ -141,7 +141,7 @@ int _level = -1;
 			ret = GNUTLS_A_DECOMPRESSION_FAILURE;
 			_level = GNUTLS_AL_FATAL;
 			break;
-		case GNUTLS_E_ILLEGAL_PARAMETER:
+		case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
                         ret = GNUTLS_A_ILLEGAL_PARAMETER;
 			_level = GNUTLS_AL_FATAL;
                         break;

@@ -89,7 +89,7 @@ int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, s
 			
 			if (new_type < 0) {
 				gnutls_assert();
-				return GNUTLS_E_ILLEGAL_PARAMETER;
+				return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			}
 
 			if ( (ret=_gnutls_session_cert_type_supported( session, new_type)) < 0) {
@@ -107,7 +107,6 @@ int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, s
 }
 
 /* returns data_size or a negative number on failure
- * data is allocated localy
  */
 int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, size_t data_size) {
 	uint len, i;
@@ -130,7 +129,7 @@ int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, size_t 
 			
 			if (data_size < len + 1) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 			
 			/* this is a vector!
@@ -150,7 +149,7 @@ int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, size_t 
 			len = 1;
 			if (data_size < len) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 			
 			data[0] = _gnutls_cert_type2num( session->security_parameters.cert_type);
@@ -173,7 +172,7 @@ int _gnutls_num2cert_type( int num) {
 	case 1:
 		return GNUTLS_CRT_OPENPGP;
 	default:
-		return GNUTLS_E_ILLEGAL_PARAMETER;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 }
 
@@ -187,7 +186,7 @@ int _gnutls_cert_type2num( int cert_type) {
 	case GNUTLS_CRT_OPENPGP:
 		return 1;
 	default:
-		return GNUTLS_E_ILLEGAL_PARAMETER;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 }

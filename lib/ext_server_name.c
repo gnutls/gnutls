@@ -111,7 +111,6 @@ int _gnutls_server_name_recv_params(gnutls_session session,
 }
 
 /* returns data_size or a negative number on failure
- * data is allocated localy
  */
 int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 				    size_t _data_size)
@@ -141,7 +140,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 
       /* UINT16: write total size of all names 
        */
-      DECR_LENGTH_RET( data_size, 2, GNUTLS_E_INVALID_REQUEST);
+      DECR_LENGTH_RET( data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
       _gnutls_write_uint16(total_size, p);
       p += 2;
 
@@ -161,7 +160,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 	        * UINT16: size of the first name
 	        * LEN: the actual server name.
 	        */
-               DECR_LENGTH_RET( data_size, len + 3, GNUTLS_E_INVALID_REQUEST);
+               DECR_LENGTH_RET( data_size, len + 3, GNUTLS_E_SHORT_MEMORY_BUFFER);
 
 	       *p = 0;		/* NAME_DNS type */
 	       p++;
@@ -200,7 +199,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   * that support virtual hosting, and the data will be null terminated.
   * The client may give the server the dnsname they connected to.
   *
-  * If data has not enough size to hold the server name GNUTLS_E_INVALID_REQUEST
+  * If data has not enough size to hold the server name GNUTLS_E_SHORT_MEMORY_BUFFER
   * is returned, and data_length will hold the required size.
   *
   * 'index' is used to retrieve more than one server names (if sent by the client).
@@ -241,7 +240,7 @@ int gnutls_get_server_name(gnutls_session session, void *data,
       *data_length =
 	  session->security_parameters.extensions.server_names[index].
 	  name_length;
-      return GNUTLS_E_INVALID_REQUEST;
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
    }
 
    return 0;
@@ -273,7 +272,7 @@ int gnutls_set_server_name(gnutls_session session,
       return GNUTLS_E_INVALID_REQUEST;
 
    if (name_length > MAX_SERVER_NAME_SIZE)
-      return GNUTLS_E_INVALID_REQUEST;
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
    server_names =
        session->security_parameters.extensions.server_names_size + 1;

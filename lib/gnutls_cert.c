@@ -195,7 +195,7 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, gnutls_kx_algorithm ** a
 
 	if (i==0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	*alg = gnutls_calloc(1, sizeof(gnutls_kx_algorithm) * i);

@@ -70,7 +70,7 @@ int _gnutls_max_record_recv_params( gnutls_session session, const opaque* data,
 
 			if (new_size < 0 || new_size != session->internals.proposed_record_size) {
 				gnutls_assert();
-				return GNUTLS_E_ILLEGAL_PARAMETER;
+				return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			} else {
 				session->security_parameters.max_record_recv_size = session->internals.proposed_record_size;
 			}
@@ -84,7 +84,6 @@ int _gnutls_max_record_recv_params( gnutls_session session, const opaque* data,
 }
 
 /* returns data_size or a negative number on failure
- * data is allocated localy
  */
 int _gnutls_max_record_send_params( gnutls_session session, opaque* data, 
 	size_t data_size) 
@@ -99,7 +98,7 @@ int _gnutls_max_record_send_params( gnutls_session session, opaque* data,
 			len = 1;
 			if (data_size < len) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 			
 			data[0] = (uint8) _gnutls_mre_record2num( session->internals.proposed_record_size);
@@ -112,7 +111,7 @@ int _gnutls_max_record_send_params( gnutls_session session, opaque* data,
 			len = 1;
 			if (data_size < len) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 			
 			data[0] = (uint8) _gnutls_mre_record2num( session->security_parameters.max_record_recv_size);
@@ -139,7 +138,7 @@ int _gnutls_mre_num2record( int num) {
 	case 4:
 		return 4096;
 	default:
-		return GNUTLS_E_ILLEGAL_PARAMETER;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 }
 
@@ -157,7 +156,7 @@ int _gnutls_mre_record2num( uint16 record_size) {
 	case 4096:
 		return 4;
 	default:
-		return GNUTLS_E_ILLEGAL_PARAMETER;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 
 }

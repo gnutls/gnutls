@@ -736,7 +736,7 @@ int _gnutls_send_handshake(gnutls_session session, void *i_data,
 
 	if (i_data == NULL && i_datasize > 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	/* first run */

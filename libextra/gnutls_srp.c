@@ -347,7 +347,7 @@ int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *
 
 	if (username==NULL || password == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	res->username = gnutls_strdup( username);
@@ -421,7 +421,7 @@ int i;
 	
 	if (password_file==NULL || password_conf_file==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	/* Check if the files can be opened */

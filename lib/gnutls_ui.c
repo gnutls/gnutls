@@ -282,7 +282,7 @@ int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* dat
 	
 	if (hash_len < 0 || (size_t)hash_len > *result_size) {
 		*result_size = hash_len;
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 	*result_size = hash_len;
 	
