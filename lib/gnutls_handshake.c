@@ -1853,9 +1853,9 @@ int gnutls_handshake(gnutls_session session)
 	}
 
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = gnutls_handshake_client(session);
+		ret = _gnutls_handshake_client(session);
 	} else {
-		ret = gnutls_handshake_server(session);
+		ret = _gnutls_handshake_server(session);
 	}
 	if (ret < 0) {
 		/* In the case of a rehandshake abort
@@ -1866,7 +1866,7 @@ int gnutls_handshake(gnutls_session session)
 		return ret;
 	}
 	
-	ret = gnutls_handshake_common(session);
+	ret = _gnutls_handshake_common(session);
 
 	if (ret < 0) {
 		if (_gnutls_abort_handshake( session, ret) == 0)
@@ -1894,10 +1894,10 @@ int gnutls_handshake(gnutls_session session)
 
 
 /*
- * gnutls_handshake_client 
+ * _gnutls_handshake_client 
  * This function performs the client side of the handshake of the TLS/SSL protocol.
  */
-int gnutls_handshake_client(gnutls_session session)
+int _gnutls_handshake_client(gnutls_session session)
 {
 	int ret = 0;
 
@@ -2067,7 +2067,7 @@ static int _gnutls_recv_handshake_final(gnutls_session session, int init)
 	case STATE0:
 	case STATE30:
 		ret =
-		    gnutls_recv_int(session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
+		    _gnutls_recv_int(session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
 				    &ch, 1);
 		STATE = STATE30;
 		if (ret <= 0) {
@@ -2111,11 +2111,11 @@ static int _gnutls_recv_handshake_final(gnutls_session session, int init)
 }
 
  /*
-  * gnutls_handshake_server 
+  * _gnutls_handshake_server 
   * This function does the server stuff of the handshake protocol.
   */
 
-int gnutls_handshake_server(gnutls_session session)
+int _gnutls_handshake_server(gnutls_session session)
 {
 	int ret = 0;
 
@@ -2207,7 +2207,7 @@ int gnutls_handshake_server(gnutls_session session)
 	return 0;
 }
 
-int gnutls_handshake_common(gnutls_session session)
+int _gnutls_handshake_common(gnutls_session session)
 {
 	int ret = 0;
 

@@ -182,7 +182,7 @@ int gnutls_bye( gnutls_session session, gnutls_close_request how)
 				return ret;
 		case STATE61:
 			if ( how == GNUTLS_SHUT_RDWR && ret >= 0) {
-				ret2 = gnutls_recv_int( session, GNUTLS_ALERT, -1, NULL, 0); 
+				ret2 = _gnutls_recv_int( session, GNUTLS_ALERT, -1, NULL, 0); 
 				if (ret2 >= 0) session->internals.may_read = 1;
 			}
 			STATE = STATE61;
@@ -286,7 +286,7 @@ ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
  * and only if the previous send was interrupted for some reason.
  *
  */
-ssize_t gnutls_send_int( gnutls_session session, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
+ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
 	int cipher_size;
@@ -444,7 +444,7 @@ ssize_t _gnutls_send_change_cipher_spec( gnutls_session session, int again)
 	_gnutls_handshake_log( "REC[%x]: Sent ChangeCipherSpec\n", session);
 
 	if (again==0)
-		return gnutls_send_int( session, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
+		return _gnutls_send_int( session, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
 	else {
 		return _gnutls_io_write_flush( session);
 	}
@@ -670,7 +670,7 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
  * send (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
  */
-ssize_t gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
+ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
 {
 	uint8 *tmpdata;
 	int tmplen;
@@ -901,7 +901,7 @@ ssize_t gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType
   *
   **/
 ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t sizeofdata) {
-	return gnutls_send_int( session, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
+	return _gnutls_send_int( session, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
 /**
@@ -921,7 +921,7 @@ ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t siz
   *
   **/
 ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdata) {
-	return gnutls_recv_int( session, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
+	return _gnutls_recv_int( session, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
 /**

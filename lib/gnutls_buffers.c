@@ -746,7 +746,7 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 
 	left = n;
 	while (left > 0) {
-		ret = gnutls_send_int( session, type, htype, &ptr[n-left], left);
+		ret = _gnutls_send_int( session, type, htype, &ptr[n-left], left);
 
 		if (ret <= 0) {
 			if (ret==0) {
@@ -836,7 +836,7 @@ ssize_t _gnutls_handshake_io_recv_int( gnutls_session session, ContentType type,
 	
 	while (left > 0) {
 		dsize = sizeOfPtr - left;
-		i = gnutls_recv_int( session, type, htype, &ptr[dsize], left);
+		i = _gnutls_recv_int( session, type, htype, &ptr[dsize], left);
 		if (i < 0) {
 			
 			if (dsize > 0 && (i==GNUTLS_E_INTERRUPTED || i==GNUTLS_E_AGAIN)) {
