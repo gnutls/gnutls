@@ -289,7 +289,7 @@ int old;
 
 int test_aes( gnutls_session session) {
 int ret;
-	ADD_CIPHER(session, GNUTLS_CIPHER_RIJNDAEL_128_CBC);
+	ADD_CIPHER(session, GNUTLS_CIPHER_AES_128_CBC);
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
 	ADD_ALL_PROTOCOLS(session);
@@ -322,7 +322,7 @@ int ret;
 
 int test_unknown_ciphersuites( gnutls_session session) {
 int ret;
-	ADD_CIPHER3(session, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
+	ADD_CIPHER3(session, GNUTLS_CIPHER_AES_128_CBC,
 		GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128);
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);

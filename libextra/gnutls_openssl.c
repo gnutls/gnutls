@@ -477,9 +477,9 @@ SSL_METHOD *SSLv23_client_method(void)
     m->protocol_priority[1] = GNUTLS_SSL3;
     m->protocol_priority[2] = 0;
 
-    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
-    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
     m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 
@@ -512,9 +512,9 @@ SSL_METHOD *SSLv23_server_method(void)
     m->protocol_priority[1] = GNUTLS_SSL3;
     m->protocol_priority[2] = 0;
 
-    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
-    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
     m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 
@@ -610,9 +610,9 @@ SSL_METHOD *TLSv1_client_method(void)
     m->protocol_priority[0] = GNUTLS_TLS1;
     m->protocol_priority[1] = 0;
 
-    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
-    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
     m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 
@@ -644,9 +644,9 @@ SSL_METHOD *TLSv1_server_method(void)
     m->protocol_priority[0] = GNUTLS_TLS1;
     m->protocol_priority[1] = 0;
 
-    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
-    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
     m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 

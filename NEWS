@@ -3,6 +3,7 @@ Version 0.9.8
   (draft-ietf-tls-srp-05).
 - Improved the gnutls-cli behaviour in error handling.
 - Use versioned symbols in the library (where available).
+- RIJNDAEL ciphersuites were renamed to AES.
 
 Version 0.9.7 (25/08/2003)
 - The tex files are now included in the distribution.
