@@ -18,6 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#include "gnutls_int.h"
+
+#ifdef HAVE_LIBOPENCDK
+
 #include <stdio.h>
 #include <gcrypt.h>
 #include <opencdk.h>
@@ -25,7 +29,6 @@
 #include <sys/stat.h>
 
 #include "gnutls_errors_int.h"
-#include "gnutls_int.h"
 #include "gnutls_gcry.h"
 #include "gnutls_cert.h"
 #include "gnutls_datum.h"
@@ -680,6 +683,4 @@ gnutls_openpgp_add_keyring(const char *fname, int is_secret)
 }
 
 
-
-
-
+#endif /* HAVE_LIBOPENCDK */

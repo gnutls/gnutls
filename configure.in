@@ -79,55 +79,6 @@ AC_PROG_INSTALL
 
 dnl AC_PROG_MAKE_SET
 
-AC_MSG_RESULT([***
-*** Checking for external libraries...
-])
-
-AM_PATH_LIBGCRYPT(1.1.4,,
- 	AC_MSG_ERROR([[
-***  
-*** libgcrypt was not found. You may want to get it from
-*** ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/
-***
-]]))
-dnl Can't disable - gnutls depends on gcrypt
-AC_DEFINE(USE_GCRYPT)
-
-dnl MCRYPT
-
-AC_ARG_WITH( mcrypt, [  --with-mcrypt           enable libmcrypt support],
- [AM_PATH_LIBMCRYPT( 2.4.0,, 
- 	AC_MSG_ERROR([[*** libmcrypt was not found]])
-    AC_MSG_ERROR([[*** You need libmcrypt 2.4.x to compile this program. http://mcrypt.hellug.gr]])
- )
- ]
-)
-
-LIBS="${LIBS} ${LIBMCRYPT_LIBS}"
-
-AC_ARG_WITH( mhash, [  --with-mhash            enable libmhash support],
- [AC_CHECK_LIB(mhash, mhash_init, AC_DEFINE(USE_MHASH) 
-LIBS="${LIBS} -lmhash")])
-
-AC_MSG_CHECKING([whether to check for external libraries])
-
-dnl if used --with-ext-libraries then we will not check
-dnl for any library (libz, libgdbm)
-
-AC_ARG_WITH( ext-libraries, [  --without-ext-libraries disable external libraries support],
- ac_ext_libraries=$withval
-)
-
-if test x$ac_ext_libraries != xno; then
- AC_MSG_RESULT(yes)
- AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN("GDBM was not found. You will not be able to use Server side session resuming."))
- AC_CHECK_LIB(z, compress,,AC_MSG_WARN("ZLIB was not found. You will not be able to use ZLIB compression."))
-else
- AC_MSG_RESULT()
-
-
-fi
-
 
 AC_MSG_RESULT([***
 *** Detecting compiler options...
@@ -231,9 +182,65 @@ AC_CHECK_TYPE(time_t,
 ]
 )
 
-
-
 AC_C_BIGENDIAN
+
+
+AC_MSG_RESULT([***
+*** Checking for external libraries...
+])
+
+AM_PATH_LIBGCRYPT(1.1.4,,
+ 	AC_MSG_ERROR([[
+***  
+*** libgcrypt was not found. You may want to get it from
+*** ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/
+***
+]]))
+dnl Can't disable - gnutls depends on gcrypt
+AC_DEFINE(USE_GCRYPT)
+
+dnl MCRYPT
+
+AC_ARG_WITH( mcrypt, [  --with-mcrypt           enable libmcrypt support],
+ [AM_PATH_LIBMCRYPT( 2.4.0,, 
+ 	AC_MSG_ERROR([[*** libmcrypt was not found]])
+    AC_MSG_ERROR([[*** You need libmcrypt 2.4.x to compile this program. http://mcrypt.hellug.gr]])
+ )
+ ]
+)
+
+LIBS="${LIBS} ${LIBMCRYPT_LIBS}"
+
+AC_ARG_WITH( mhash, [  --with-mhash            enable libmhash support],
+ [AC_CHECK_LIB(mhash, mhash_init, AC_DEFINE(USE_MHASH) 
+LIBS="${LIBS} -lmhash")])
+
+AC_MSG_CHECKING([whether to check for external libraries])
+
+dnl if used --with-ext-libraries then we will not check
+dnl for any library (libz, libgdbm, opencdk)
+
+AC_ARG_WITH( ext-libraries, [  --without-ext-libraries disable external libraries support],
+ ac_ext_libraries=$withval
+)
+
+if test x$ac_ext_libraries != xno; then
+ AC_MSG_RESULT(yes)
+ AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN(
+*** 
+*** GDBM was not found. You will not be able to use Server side session resuming.))
+ AC_CHECK_LIB(z, compress,,AC_MSG_WARN(
+*** 
+*** ZLIB was not found. You will not be able to use ZLIB compression.))
+ AC_CHECK_LIB(opencdk, cdk_iobuf_new,,AC_MSG_WARN(
+***
+*** OPENCDK was not found. You will not be able to use OpenPGP keys with gnutls.))
+else
+ AC_MSG_RESULT()
+fi
+
+
+
 
 AC_MSG_RESULT([***
 *** Detecting options for shared libraries...
@@ -267,6 +274,6 @@ AC_CONFIG_COMMANDS([lib/gnutls.h],[[
 
 AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile doc/tex/Makefile \
-doc/tex/cover.tex doc/scripts/Makefile])
+doc/tex/cover.tex doc/scripts/Makefile src/openpgp/Makefile])
 AC_OUTPUT
 
