@@ -85,8 +85,6 @@ int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_private_key *pkey, g
 	memcpy( &sdata.data[2*TLS_RANDOM_SIZE], params->data, params->size);
 
 	ret = _gnutls_pkcs1_rsa_generate_sig( pkey, &sdata, signature);
-fprintf(stderr, "GSIG[%d]: %s\n", signature->size, _gnutls_bin2hex(signature->data, signature->size));
-fprintf(stderr, "DATA[%d]: %s\n", sdata.size, _gnutls_bin2hex(sdata.data, sdata.size));
 
 	gnutls_free_datum( &sdata);
 	if (ret < 0) {
@@ -249,9 +247,6 @@ int _gnutls_verify_sig_params( GNUTLS_STATE state, gnutls_cert *cert, const gnut
 	memcpy( sdata.data, state->security_parameters.client_random, TLS_RANDOM_SIZE);
 	memcpy( &sdata.data[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
 	memcpy( &sdata.data[2*TLS_RANDOM_SIZE], params->data, params->size);
-
-fprintf(stderr, "VSIG[%d]: %s\n", signature->size, _gnutls_bin2hex(signature->data, signature->size));
-fprintf(stderr, "DATA[%d]: %s\n", sdata.size, _gnutls_bin2hex(sdata.data, sdata.size));
 
 	ret = _gnutls_pkcs1_rsa_verify_sig( cert, &sdata, signature);
 	gnutls_free_datum( &sdata);
