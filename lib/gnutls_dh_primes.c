@@ -299,7 +299,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
   * in prime and generator structures.
   *
   * If the structure is PEM encoded, it should have a header
-  * of "BEGIN DH PARAMETERS".
+  * of "BEGIN DH PARAMETERS", and must be null terminated.
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.
@@ -463,11 +463,8 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 		return _gnutls_asn2err(result);
 	}
 
-	/* FIXME: Remove this, once libtasn1 is fixed.
-	 * Write the privateValueLength (to overcome a bug in libtasn1)
-	 */
 	if ((result = asn1_write_value(c2, "c2.privateValueLength",
-					    "\0", 1)) != ASN1_SUCCESS) {
+					    NULL, 0)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);

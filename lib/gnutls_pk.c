@@ -143,6 +143,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	} else { /* psize > k !!! */
 		/* This is an impossible situation */
 		gnutls_assert();
+		_gnutls_mpi_release(&res);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
