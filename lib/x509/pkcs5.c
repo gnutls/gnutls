@@ -17,8 +17,6 @@
  *
  */
 
-/* XXX what about namespace? */
-
 #include <gnutls_int.h>
 
 #ifdef ENABLE_PKI
@@ -164,8 +162,6 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 
       for (u = 1; u <= c; u++)
 	{
-	  int Ulen;
-
 	  gcry_md_reset (prf);
 
 	  rc = gcry_md_setkey (prf, P, Plen);
@@ -174,19 +170,25 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 
 	  if (u == 1)
 	    {
-	      char tmp[4];
-	      memcpy (U, S, Slen);
-	      tmp[0] = (i & 0xff000000) >> 24;
-	      tmp[1] = (i & 0x00ff0000) >> 16;
-	      tmp[2] = (i & 0x0000ff00) >> 8;
-	      tmp[3] = (i & 0x000000ff) >> 0;
-	      memcpy (U + Slen, tmp, 4);
-	      Ulen = Slen + 4;
+	      char *tmp;
+	      size_t tmplen = Slen + 4;
+	      
+	      tmp = gnutls_alloca( tmplen);
+	      if (tmp == NULL)
+	         return PKCS5_INVALID_PRF;
+
+	      memcpy (tmp, S, Slen);
+	      tmp[Slen + 0] = (i & 0xff000000) >> 24;
+	      tmp[Slen + 1] = (i & 0x00ff0000) >> 16;
+	      tmp[Slen + 2] = (i & 0x0000ff00) >> 8;
+	      tmp[Slen + 3] = (i & 0x000000ff) >> 0;
+
+  	      gcry_md_write (prf, tmp, tmplen);
 	    }
 	  else
-	    Ulen = hLen;
-
-	  gcry_md_write (prf, U, Ulen);
+	    {
+  	      gcry_md_write (prf, U, hLen);
+	    }
 
 	  p = gcry_md_read (prf, PRF);
 	  if (p == NULL)
