@@ -1,4 +1,4 @@
-helpnode "gnutls-serv help\nUsage: gnutls-serv [options]"
+helpnode "GNU TLS test server\nUsage: gnutls-serv [options]\n\n"
 
 #int generate;
 option (g, generate) { $generate = 1 } "Generate Diffie Hellman Parameters."
@@ -71,6 +71,10 @@ option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Cer
 
 option (l, list) { print_list(); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
+
+option (v, version) { serv_version(); exit(0); } "prints the program's version number"
+option ( copyright) { print_license(); exit(0); } "prints the program's license"
+
 
 init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;

@@ -1,4 +1,4 @@
-helpnode "gnutls-cli help\nUsage: gnutls-cli [options] hostname"
+helpnode "GNU TLS test client\nUsage:  gnutls-cli [options] hostname\n\n"
 
 #int resume;
 option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again and resume this session."
@@ -73,6 +73,9 @@ option (srppasswd) STR "PASSWD" { $srp_passwd = $1 } "SRP password to use."
 
 option (l, list) { print_list(); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
+
+option (v, version) { cli_version(); exit(0); } "prints the program's version number"
+option ( copyright) { print_license(); exit(0); } "prints the program's license"
 
 #int nrest_args;
 #char **rest_args;

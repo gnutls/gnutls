@@ -99,6 +99,7 @@ int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 #define DEFAULT_SRP_USERNAME "test"
 #define DEFAULT_SRP_PASSWD "test"
 
+
 static int cert_callback(GNUTLS_STATE state,
 			 const gnutls_datum * client_certs, int ncerts,
 			 const gnutls_datum * req_ca_cert, int nreqs)
@@ -632,4 +633,9 @@ void gaa_parser(int argc, char **argv)
       comp_priority[j] = 0;
    }
 
+}
+
+void cli_version(void) {
+	fprintf(stderr, "GNU TLS test client, ");
+	fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
 }

@@ -721,3 +721,8 @@ void gaa_parser(int argc, char **argv)
 
 
 }
+
+void serv_version(void) {
+	fprintf(stderr, "GNU TLS test server, ");
+	fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
+}
