@@ -79,9 +79,6 @@ int gnutls_certificate_set_openpgp_keyring_mem(
     GNUTLS_CERTIFICATE_CREDENTIALS c,
     const opaque *data, size_t dlen );
 
-int gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS res,
-                                   const char *data, size_t len);
-
 int gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS res, const char *name);
 
 int gnutls_global_init_extra(void);
