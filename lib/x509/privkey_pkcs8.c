@@ -474,9 +474,9 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
  */
 static
 int read_pkcs_schema_params(schema_id schema, const char *password,
-			    const opaque * data, int data_size,
-			    struct pbkdf2_params *kdf_params,
-			    struct pbe_enc_params *enc_params)
+    const opaque * data, int data_size,
+    struct pbkdf2_params *kdf_params,
+    struct pbe_enc_params *enc_params)
 {
     ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY;
     int result;
@@ -822,10 +822,8 @@ int decode_private_key_info(const gnutls_datum_t * der,
   *
   **/
 int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
-				     const gnutls_datum_t * data,
-				     gnutls_x509_crt_fmt_t format,
-				     const char *password,
-				     unsigned int flags)
+    const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
+    const char *password, unsigned int flags)
 {
     int result = 0, need_free = 0;
     gnutls_datum_t _data;
