@@ -260,9 +260,12 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	}
 
 	i = 0;
+	
+	DECR_LEN( data_size, 2);
 	n_p = READuint16(&data[i]);
 	i += 2;
 
+	DECR_LEN( data_size, n_p);
 	data_p = &data[i];
 	i += n_p;
 	if (i > data_size) {
@@ -270,9 +273,11 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
+	DECR_LEN( data_size, 2);
 	n_g = READuint16(&data[i]);
 	i += 2;
 
+	DECR_LEN( data_size, n_g);
 	data_g = &data[i];
 	i += n_g;
 	if (i > data_size) {
@@ -280,9 +285,11 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
+	DECR_LEN( data_size, 2);
 	n_Y = READuint16(&data[i]);
 	i += 2;
 
+	DECR_LEN( data_size, n_Y);
 	data_Y = &data[i];
 	i += n_Y;
 	if (i > data_size) {
@@ -318,7 +325,10 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
+	DECR_LEN( data_size, 2);
 	sigsize = READuint16(&data[vparams.size]);
+
+	DECR_LEN( data_size, sigsize);
 	signature.data = &data[vparams.size + 2];
 	signature.size = GMIN(data_size - vparams.size - 2, sigsize);
 
@@ -355,10 +365,11 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	if (bits < MIN_BITS)
 		bits = DEFAULT_BITS;	/* default */
 
-
+	DECR_LEN( data_size, 2);
 	n_Y = READuint16(&data[0]);
 	_n_Y = n_Y;
 
+	DECR_LEN( data_size, n_Y);
 	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y, &data[2], &_n_Y)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;

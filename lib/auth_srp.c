@@ -323,12 +323,15 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 /* read the algorithm used to generate V */
 	
 	i = 0;
+	DECR_LEN( data_size, 1);
 	memcpy( &pwd_algo, data, 1);
-
 	i++;
+
+	DECR_LEN( data_size, 2);
 	n_g = READuint16( &data[i]);
 	i += 2;
 
+	DECR_LEN( data_size, n_g);
 	data_g = &data[i];
 	i += n_g;
 	if (i > data_size) {
@@ -336,9 +339,11 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
+	DECR_LEN( data_size, 2);
 	n_n = READuint16( &data[i]);
 	i += 2;
 
+	DECR_LEN( data_size, n_n);
 	data_n = &data[i];
 	i += n_n;
 	if (i > data_size) {
@@ -346,9 +351,11 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 	
+	DECR_LEN( data_size, 2);
 	n_s = READuint16( &data[i]);
 	i += 2;
 
+	DECR_LEN( data_size, n_s);
 	data_s = &data[i];
 	i += n_s;
 	if (i > data_size) {
@@ -390,8 +397,10 @@ int proc_srp_client_kx0(GNUTLS_STATE state, opaque * data, int data_size)
 {
 	size_t _n_A;
 
+	DECR_LEN( data_size, 2);
 	_n_A = READuint16( &data[0]);
 
+	DECR_LEN( data_size, _n_A);
 	if (_gnutls_mpi_scan(&A, &data[2], &_n_A) || A == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -406,8 +415,10 @@ int proc_srp_server_kx2(GNUTLS_STATE state, opaque * data, int data_size)
 	size_t _n_B;
 	int ret;
 	
+	DECR_LEN( data_size, 2);
 	_n_B = READuint16( &data[0]);
 
+	DECR_LEN( data_size, _n_B);
 	if (_gnutls_mpi_scan(&B, &data[2], &_n_B) || B==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;

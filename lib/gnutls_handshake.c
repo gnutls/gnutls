@@ -791,6 +791,9 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 		}
 		*recv_type = dataptr[0];
 
+		/* we do not use DECR_LEN because we know
+		 * that the packet has enough data.
+		 */
 		length32 = READuint24(&dataptr[1]);
 		handshake_header_size = HANDSHAKE_HEADER_SIZE;
 

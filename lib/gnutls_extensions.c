@@ -88,21 +88,26 @@ uint16 size;
 
 	if (data_size < 2) return 0;
 
+	DECR_LEN( data_size, 2);
 	next = READuint16( data);
 	pos+=2;
 
 	if (data_size < next) return 0;
+	DECR_LEN( data_size, next);
 	
 	do {
 		next--; if (next < 0) return 0;
+		DECR_LEN( data_size, 1);
 		memcpy( &type, &data[pos], 1);
 		pos++;
 
 		next-=2; if (next < 0) return 0;
 
+		DECR_LEN( data_size, 2);
 		size = READuint16(&data[pos]);
 		pos+=2;
 				
+		DECR_LEN( data_size, size);
 		sdata = &data[pos];
 		pos+=size;
 		next-=size; if (next < 0) return 0;

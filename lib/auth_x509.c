@@ -518,11 +518,12 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	}
 	i = dsize;
 
+	DECR_LEN(dsize, 3);
 	len = READuint24(p);
 	p += 3;
 
-	for (; i > 0; len = READuint24(p), p += 3) {
-		DECR_LEN(dsize, (len + 3));
+	for (; i > 0; DECR_LEN(dsize, 3), len = READuint24(p), p += 3) {
+		DECR_LEN(dsize, len);
 		peer_certificate_list_size++;
 		p += len;
 		i -= len + 3;
@@ -532,6 +533,11 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
+
+	/* Now we start parsing the list (again).
+	 * We don't use DECR_LEN since the list has
+	 * been parsed before.
+	 */
 	dsize = data_size;
 	i = dsize;
 	peer_certificate_list =
@@ -690,6 +696,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 		return 0;
 	}
 
+	DECR_LEN(dsize, size);
 	if ((ret =
 	     _gnutls_find_acceptable_client_cert(state, p, size,
 						 &ind)) < 0) {
@@ -772,10 +779,7 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 	size = READuint16(pdata);
 	pdata += 2;
 
-	if (size < data_size - 2) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+	DECR_LEN(dsize, size);
 
 	sig.data = pdata;
 	sig.size = size;
