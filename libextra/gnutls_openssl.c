@@ -363,7 +363,7 @@ int SSL_CIPHER_get_bits(SSL_CIPHER *cipher, int *bits)
     if (!cipher)
         return 0;
 
-    bit_result = gnutls_cipher_get_key_size(cipher->cipher);
+    bit_result = (8 * gnutls_cipher_get_key_size(cipher->cipher));
 
     if (bits)
         *bits = bit_result;
