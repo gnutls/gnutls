@@ -692,10 +692,79 @@ gnutls_certificate_set_openpgp_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                        gnutls_datum *cert,
                                        gnutls_datum *key)
 {
-    if (!res || !key || !cert)
-      return GNUTLS_E_INVALID_PARAMETERS;
+  struct packet_s *p;
+  gnutls_datum raw;
+  PKT pk = NULL;
+  int rc = 0;
+  int i;
+  
+  if (!res || !key || !cert)
+    return GNUTLS_E_INVALID_PARAMETERS;
 
-    return 0;
+  rc = datum_to_openpgp_pkt(cert, &pk);
+  if (rc)
+    goto leave;
+
+  /* fixme: too much duplicated code from (set_openpgp_key_file) */
+  res->cert_list = gnutls_realloc(res->cert_list,
+                                  (1+res->ncerts)*sizeof(gnutls_cert*));
+  if (res->cert_list == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  res->cert_list_length = gnutls_realloc(res->cert_list_length,
+                                         (1+res->ncerts)*sizeof(int));
+  if (res->cert_list_length == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;    
+    }
+
+  res->cert_list[res->ncerts] = gnutls_calloc(1, sizeof(gnutls_cert));
+  if (res->cert_list[res->ncerts] == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR; 
+    }
+
+  for (i=1, p=pk; p && p->id; p=p->next)
+    {
+      if (i > MAX_PARAMS_SIZE)
+        break;
+      if (p->id == PKT_PUBKEY)
+        {
+          int n = res->ncerts;
+          res->cert_list_length[n] = 1;
+          gnutls_set_datum(&res->cert_list[n][0].raw, cert->data, cert->size);
+          openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], p->p.pk );
+          i++;
+        }
+      else if (p->id == PKT_SIG)
+        {
+          int n = res->ncerts;
+          openpgp_sig_to_gnutls_cert( &res->cert_list[n][0], p->p.sig ); 
+        }
+    }
+  
+  res->ncerts++;
+  res->pkey = gnutls_realloc(res->pkey,
+                             (res->ncerts)*sizeof(gnutls_private_key));
+  if (res->pkey == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;   
+    }
+  /* ncerts has been incremented before */
+  gnutls_set_datum(&raw, key->data, key->size);
+  rc =_gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], raw);
+  gnutls_free_datum(&raw);
+  
+leave:
+  cdk_pkt_release(pk);
+  
+  return rc;
 }
 
 /**
@@ -979,6 +1048,41 @@ gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
   return expiredate;
 }
 
+static int
+is_trusted_key(const char *trustdb, PKT_public_key *pk)
+{
+  int flags = 0;
+  int trustval = 0;
+  int rc = 0;
+  IOBUF buf;
+
+  if (!trustdb || !pk)
+    return TRUST_UNKNOWN;
+
+  rc = cdk_iobuf_open( &buf, trustdb, IOBUF_MODE_RD );
+  if (rc == -1)
+    {
+      trustval = 0;
+      goto leave;
+    }
+  rc = cdk_trustdb_find_ownertrust(buf, pk, &trustval, &flags);
+  cdk_iobuf_close(buf);
+  if (rc)
+    goto leave;
+
+  /* fixme: how shall we handle revoked or disabled keys? */
+  if (flags || trustval == TRUST_UNKNOWN || trustval == TRUST_UNDEFINED)
+    trustval = -1;
+
+  if (trustval >= TRUST_MARGINAL)
+    trustval = 1;
+  else if (trustval == TRUST_NEVER)
+    trustval = 0;
+
+leave:
+  return trustval;
+}
+               
 /**
  * gnutls_openpgp_verify_key - Verify all signatures on the key
  * @cert_list: the structure that holds the certificates.
@@ -989,9 +1093,10 @@ gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
  * The return value is one of the CertificateStatus entries.
  **/
 int
-gnutls_openpgp_verify_key( const gnutls_datum* keyring,
+gnutls_openpgp_verify_key( char *trustdb,
+                           const gnutls_datum* keyring,
                            const gnutls_datum* cert_list,
-                           int cert_list_length)
+                           int cert_list_length )
 {
   PKT pkt = NULL;
   KEYDB_HD khd = NULL;
@@ -1021,6 +1126,22 @@ gnutls_openpgp_verify_key( const gnutls_datum* keyring,
       goto leave;
       return GNUTLS_CERT_INVALID;
     }
+  
+  if (trustdb)
+    {
+      PKT_public_key *pk = NULL;
+
+      pk = openpgp_pkt_to_pk(pkt, 0);
+      if (!pk)
+        goto leave;
+      
+      if ( !is_trusted_key(trustdb, pk) )
+        {
+          rc = GNUTLS_CERT_INVALID;
+          goto leave;
+        }
+    }
+            
   rc = cdk_key_check_sigs(pkt, khd, &status);
   if (rc == CDKERR_NOKEY || rc == CDKERR_BAD_SIGNATURE)
     rc = 0; /* fixme */
@@ -1399,8 +1520,8 @@ leave:
  **/
 void
 gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
-                                          char* keyserver,
-                                          int port)
+                                         char* keyserver,
+                                         int port)
 {
   if (!res || !keyserver)
     return;
@@ -1411,6 +1532,16 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
   res->pgp_key_server = keyserver;
   res->pgp_key_server_port = port;
 }
+
+void
+gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
+                                       char* trustdb)
+{
+  if (!res || !trustdb)
+    return;
+
+  res->pgp_trustdb = gnutls_strdup(trustdb);
+} 
 
 #endif /* HAVE_LIBOPENCDK */
 
