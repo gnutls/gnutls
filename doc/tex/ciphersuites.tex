@@ -29,12 +29,14 @@ the key to be used for signing
 \\
 \hline
 DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are send to the peer \\
-\hline
-DH\_DSS & Static Diffie Hellman parameters signed by a DSS certificate.
+parameters which are send to the peer. Currently \gnutls does not support this ciphersuite.
 \\
 \hline
+DH\_DSS & Static Diffie Hellman parameters signed by a DSS certificate.
+Currently \gnutls does not support this ciphersuite.
+\hline
 DH\_RSA & Static Diffie Hellman parameters signed by an RSA certificate.
+Currently \gnutls does not support this ciphersuite.
 \\
 \hline
 DH\_ANON & Diffie Hellman parameters not signed. This key exchange method is
