@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -42,7 +42,7 @@ static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
  * params is modulus, public exp.
  */
 int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
-			      gnutls_datum plaintext, GNUTLS_MPI* params,
+			      const gnutls_datum *plaintext, GNUTLS_MPI* params,
 			      uint params_len,
 			      uint btype)
 {
@@ -57,7 +57,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	k = mod_bits / 8;
 	if ( mod_bits % 8 != 0) k++;
 
-	if (plaintext.size > k - 11) {
+	if (plaintext->size > k - 11) {
 		gnutls_assert();
 		return GNUTLS_E_PK_ENCRYPTION_FAILED;
 	}
@@ -74,7 +74,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 
 	edata[0] = 0;
 	edata[1] = btype;
-	psize = k - 3 - plaintext.size;
+	psize = k - 3 - plaintext->size;
 
 	ps = &edata[2];
 	switch (btype) {
@@ -111,7 +111,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	}
 
 	ps[psize] = 0;
-	memcpy(&ps[psize + 1], plaintext.data, plaintext.size);
+	memcpy(&ps[psize + 1], plaintext->data, plaintext->size);
 
 	if (_gnutls_mpi_scan(&m, edata, &k) != 0) {
 		gnutls_assert();

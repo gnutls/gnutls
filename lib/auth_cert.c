@@ -1055,7 +1055,7 @@ int _gnutls_gen_cert_client_cert_vrfy(gnutls_session session,
 
 	if (apr_pkey != NULL) {
 		if ((ret =
-		     _gnutls_generate_sig_from_hdata(session,
+		     _gnutls_tls_sign_hdata(session,
 						     &apr_cert_list[0],
 						     apr_pkey,
 						     &signature)) < 0) {

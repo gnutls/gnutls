@@ -1,11 +1,12 @@
 INCLUDES = -I../ -I../minitasn1/ -I../../includes/
 EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
-	x509-api.tex compat.h verify.h mpi.h
+	x509-api.tex compat.h verify.h mpi.h crq.h sign.h
 
 noinst_LTLIBRARIES = libx509.la
 
-COBJECTS = crl.c dn.c common.c x509.c extensions.c \
-	pkcs7.c xml.c rfc2818_hostname.c verify.c mpi.c privkey.c
+COBJECTS = crl.c dn.c common.c x509.c extensions.c crq.c \
+	pkcs7.c xml.c rfc2818_hostname.c verify.c mpi.c privkey.c \
+	sign.c
 
 COMPAT_OBJECTS = compat.c
 

@@ -255,8 +255,8 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
 }
 
 
-#define PEM_KEY_DSA "DSA PRIVATE"
-#define PEM_KEY_RSA "RSA PRIVATE"
+#define PEM_KEY_DSA "DSA PRIVATE KEY"
+#define PEM_KEY_RSA "RSA PRIVATE KEY"
 
 /**
   * gnutls_x509_privkey_import - This function will import a DER or PEM encoded Certificate
@@ -478,67 +478,16 @@ int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key)
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
 {
-	int result;
-	
-	if (format == GNUTLS_X509_FMT_DER) {
-		if ((result=asn1_der_coding( key->key, "", output_data, output_data_size, NULL)) != ASN1_SUCCESS) {
-			gnutls_assert();
-			
-			if (result == ASN1_MEM_ERROR)
-				return GNUTLS_E_SHORT_MEMORY_BUFFER;
-
-			return _gnutls_asn2err(result);
-		}
-
-	} else { /* PEM */
-		opaque tmp[5*1024];
-		opaque *out;
-		int len;
-		char * msg;
+	char * msg;
 		
-		len = sizeof(tmp) - 1;
-		if ((result=asn1_der_coding( key->key, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
-			gnutls_assert();
-			return _gnutls_asn2err(result);
-		}
+	if (key->pk_algorithm == GNUTLS_PK_RSA)
+		msg = PEM_KEY_RSA;
+	else if (key->pk_algorithm == GNUTLS_PK_DSA)
+		msg = PEM_KEY_DSA;
+	else msg = NULL;
 
-		if (key->pk_algorithm == GNUTLS_PK_RSA)
-			msg = "RSA PRIVATE KEY";
-		else if (key->pk_algorithm == GNUTLS_PK_DSA)
-			msg = "DSA PRIVATE KEY";
-		else msg = NULL;
-
-		result = _gnutls_fbase64_encode( msg,
-						tmp, len, &out);
-
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		if (result == 0) {	/* oooops */
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
-
-		if (result + 1 > *output_data_size) {
-			gnutls_assert();
-			gnutls_free(out);
-			*output_data_size = result;
-			return GNUTLS_E_SHORT_MEMORY_BUFFER;
-		}
-
-		*output_data_size = result;
-		
-		if (output_data) {
-			memcpy( output_data, out, result);
-			output_data[result] = 0;
-		}
-		gnutls_free( out);
-		
-	}
-
-	return 0;
+	return _gnutls_x509_export_int( key->key, format, msg, *output_data_size,
+		output_data, output_data_size);
 }
 
 /**

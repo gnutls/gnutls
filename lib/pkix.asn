@@ -980,4 +980,23 @@ CertificateSet ::= SET OF CertificateChoices
 SignerInfos ::= SET OF ANY -- this is not correct but we don't use it
  -- anyway
 
+
+-- BEGIN of RFC2986
+
+-- Certificate requests
+CertificationRequestInfo ::= SEQUENCE {
+     version       INTEGER { v1(0) },
+     subject       Name,
+     subjectPKInfo SubjectPublicKeyInfo,
+     attributes    [0] Attributes
+}
+
+Attributes ::= SET OF Attribute
+
+CertificationRequest ::= SEQUENCE {
+     certificationRequestInfo CertificationRequestInfo,
+     signatureAlgorithm AlgorithmIdentifier,
+     signature          BIT STRING
+}
+
 END

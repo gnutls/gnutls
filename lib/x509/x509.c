@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions on X.509 Certificate parsing
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
@@ -46,7 +49,13 @@ int gnutls_x509_crt_init(gnutls_x509_crt * cert)
 	*cert = gnutls_calloc( 1, sizeof(gnutls_x509_crt_int));
 
 	if (*cert) {
-		(*cert)->cert = ASN1_TYPE_EMPTY;
+		int result = asn1_create_element(_gnutls_get_pkix(),
+				     "PKIX1.Certificate",
+				     &(*cert)->cert);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 		return 0;		/* success */
 	}
 	return GNUTLS_E_MEMORY_ERROR;
@@ -79,7 +88,7 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt cert)
   * to the native gnutls_x509_crt format. The output will be stored in 'cert'.
   *
   * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
-  * "CERTIFICATE" and must be a null terminated string.
+  * "CERTIFICATE".
   *
   * Returns 0 on success.
   *
@@ -116,16 +125,6 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 		_data.size = result;
 		
 		need_free = 1;
-	}
-
-	cert->cert = ASN1_TYPE_EMPTY;
-
-	result = asn1_create_element(_gnutls_get_pkix(),
-				     "PKIX1.Certificate",
-				     &cert->cert);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_der_decoding(&cert->cert, _data.data, _data.size, NULL);
@@ -205,8 +204,6 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	return 0;
 
       cleanup:
-	if (cert->cert)
-		asn1_delete_structure(&cert->cert);
 	_gnutls_free_datum(&cert->signed_data);
 	_gnutls_free_datum(&cert->signature);
 	if (need_free) _gnutls_free_datum( &_data);
@@ -1002,4 +999,77 @@ gnutls_datum tmp;
 	tmp.size = cert_buf_size;
 
 	return gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
+}
+
+
+/* A generic export function. Will export the given ASN.1 encoded data
+ * to PEM or DER raw data.
+ */
+int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
+	gnutls_x509_crt_fmt format, char* pem_header,
+	int tmp_buf_size, unsigned char* output_data, int* output_data_size)
+{
+	int result;
+	
+	if (format == GNUTLS_X509_FMT_DER) {
+		if ((result=asn1_der_coding( asn1_data, "", output_data, output_data_size, NULL)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			
+			if (result == ASN1_MEM_ERROR)
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
+
+			return _gnutls_asn2err(result);
+		}
+
+	} else { /* PEM */
+		opaque *tmp;
+		opaque *out;
+		int len;
+		
+		tmp = gnutls_alloca( tmp_buf_size);
+		if (tmp == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		
+		len = tmp_buf_size - 1;
+		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			gnutls_afree(tmp);
+			return _gnutls_asn2err(result);
+		}
+
+		result = _gnutls_fbase64_encode( pem_header,
+						tmp, len, &out);
+
+		gnutls_afree(tmp);
+
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		if (result == 0) {	/* oooops */
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		if (result + 1 > *output_data_size) {
+			gnutls_assert();
+			gnutls_free(out);
+			*output_data_size = result;
+			return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		}
+
+		*output_data_size = result;
+		
+		if (output_data) {
+			memcpy( output_data, out, result);
+			output_data[result] = 0;
+		}
+		gnutls_free( out);
+		
+	}
+
+	return 0;
 }

@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions that relate on PKCS7 certificate lists parsing.
+ */
+
 #include <libtasn1.h>
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
@@ -33,8 +36,7 @@
   * gnutls_pkcs7_init - This function initializes a gnutls_pkcs7 structure
   * @pkcs7: The structure to be initialized
   *
-  * This function will initialize a PKCS7 structure. PKCS7 stands for
-  * Certificate Revocation List.
+  * This function will initialize a PKCS7 structure. 
   *
   * Returns 0 on success.
   *
@@ -44,7 +46,13 @@ int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7)
 	*pkcs7 = gnutls_calloc( 1, sizeof(gnutls_pkcs7_int));
 
 	if (*pkcs7) {
-		(*pkcs7)->pkcs7 = ASN1_TYPE_EMPTY;
+		int result = asn1_create_element(_gnutls_get_pkix(),
+				     "PKIX1.ContentInfo",
+				     &(*pkcs7)->pkcs7);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 		return 0;		/* success */
 	}
 	return GNUTLS_E_MEMORY_ERROR;
@@ -74,7 +82,7 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7)
   * This function will convert the given DER or PEM encoded PKCS7
   * to the native gnutls_pkcs7 format. The output will be stored in 'pkcs7'.
   *
-  * If the PKCS7 is PEM encoded it should have a header of "X509 PKCS7".
+  * If the PKCS7 is PEM encoded it should have a header of "PKCS7".
   *
   * Returns 0 on success.
   *
@@ -105,15 +113,6 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 		need_free = 1;
 	}
 
-	pkcs7->pkcs7 = ASN1_TYPE_EMPTY;
-
-	result = asn1_create_element(_gnutls_get_pkix(),
-				     "PKIX1.ContentInfo",
-				     &pkcs7->pkcs7);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
 
 	result = asn1_der_decoding(&pkcs7->pkcs7, _data.data, _data.size, NULL);
 	if (result != ASN1_SUCCESS) {
@@ -127,8 +126,6 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	return 0;
 
       cleanup:
-	if (pkcs7->pkcs7)
-		asn1_delete_structure(&pkcs7->pkcs7);
 	if (need_free) _gnutls_free_datum( &_data);
 	return result;
 }

@@ -44,7 +44,13 @@ int gnutls_x509_crl_init(gnutls_x509_crl * crl)
 	*crl = gnutls_calloc(1, sizeof(gnutls_x509_crl_int));
 
 	if (*crl) {
-		(*crl)->crl = ASN1_TYPE_EMPTY;
+		int result = asn1_create_element(_gnutls_get_pkix(),
+				     "PKIX1.CertificateList",
+				     &(*crl)->crl);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 		return 0;	/* success */
 	}
 	return GNUTLS_E_MEMORY_ERROR;
@@ -110,15 +116,6 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 		need_free = 1;
 	}
 
-	crl->crl = ASN1_TYPE_EMPTY;
-
-	result = asn1_create_element(_gnutls_get_pkix(),
-				     "PKIX1.CertificateList",
-				     &crl->crl);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
 
 	result =
 	    asn1_der_decoding(&crl->crl, _data.data, _data.size, NULL);
@@ -205,8 +202,6 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 	return 0;
 
       cleanup:
-	if (crl->crl)
-		asn1_delete_structure(&crl->crl);
 	_gnutls_free_datum(&crl->signed_data);
 	_gnutls_free_datum(&crl->signature);
 	if (need_free)

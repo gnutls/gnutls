@@ -1,7 +1,7 @@
 #ifndef GNUTLS_PK_H
 # define GNUTLS_PK_H
 
-int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
+int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, const gnutls_datum *plaintext,
 		      MPI * params, uint params_len, uint btype);
 int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *plaintext,
 		      MPI *params, uint params_len);

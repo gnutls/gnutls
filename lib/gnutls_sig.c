@@ -34,13 +34,14 @@
 #include <gnutls_sig.h>
 
 
-int _gnutls_generate_sig( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature);
+static
+int _gnutls_tls_sign( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature);
 
 
 /* Generates a signature of all the previous sent packets in the 
  * handshake procedure.
  */
-int _gnutls_generate_sig_from_hdata( gnutls_session session, gnutls_cert* cert, gnutls_privkey* pkey, gnutls_datum *signature) {
+int _gnutls_tls_sign_hdata( gnutls_session session, gnutls_cert* cert, gnutls_privkey* pkey, gnutls_datum *signature) {
 gnutls_datum dconcat;
 int ret;
 opaque concat[36];
@@ -77,7 +78,7 @@ GNUTLS_MAC_HANDLE td_sha;
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 	}
-	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
+	ret = _gnutls_tls_sign( cert, pkey, &dconcat, signature);
 	if (ret < 0)
 		gnutls_assert();
 	
@@ -88,7 +89,7 @@ GNUTLS_MAC_HANDLE td_sha;
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_generate_sig_params( gnutls_session session, gnutls_cert* cert, gnutls_privkey* pkey, gnutls_datum* params, gnutls_datum *signature) 
+int _gnutls_tls_sign_params( gnutls_session session, gnutls_cert* cert, gnutls_privkey* pkey, gnutls_datum* params, gnutls_datum *signature) 
 {
 gnutls_datum dconcat;
 int ret;
@@ -135,7 +136,7 @@ opaque concat[36];
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 	}
-	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
+	ret = _gnutls_tls_sign( cert, pkey, &dconcat, signature);
 	if (ret < 0)
 		gnutls_assert();
 	
@@ -148,10 +149,9 @@ opaque concat[36];
  * Cert is the certificate of the corresponding private key. It is only checked if
  * it supports signing.
  */
-int _gnutls_generate_sig( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
+static
+int _gnutls_tls_sign( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
 {
-int ret;
-gnutls_datum tmpdata;
 
 	/* If our certificate supports signing
 	 */
@@ -163,14 +163,25 @@ gnutls_datum tmpdata;
 			return GNUTLS_E_KEY_USAGE_VIOLATION;
 		}
 
-	tmpdata.data = hash_concat->data;
-	tmpdata.size = hash_concat->size;
+	return _gnutls_sign( pkey->pk_algorithm, pkey->params, pkey->params_size, 
+		hash_concat, signature);
+		
+}
 
-	switch(pkey->pk_algorithm) {
+
+/* This will create a PKCS1 or DSA signature, using the given parameters, and the
+ * given data. The output will be allocated and be put in signature.
+ */
+int _gnutls_sign( gnutls_pk_algorithm algo, GNUTLS_MPI* params, int params_size, 
+	const gnutls_datum* data, gnutls_datum *signature)
+{
+int ret;
+
+	switch(algo) {
 		case GNUTLS_PK_RSA:
 			/* encrypt */
-			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params, 
-				pkey->params_size, 1)) < 0) {
+			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, data, params, 
+				params_size, 1)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
@@ -178,8 +189,8 @@ gnutls_datum tmpdata;
 			break;
 		case GNUTLS_PK_DSA:
 			/* sign */
-			if ((ret=_gnutls_dsa_sign( signature, &tmpdata, pkey->params, 
-				pkey->params_size)) < 0) {
+			if ((ret=_gnutls_dsa_sign( signature, data, params, 
+				params_size)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
@@ -190,14 +201,14 @@ gnutls_datum tmpdata;
 			break;
 	}
 
-
-
 	return 0;
 }
 
 
-
-int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_concat, gnutls_datum *signature) {
+static
+int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_concat, 
+	gnutls_datum *signature) 
+{
 	int ret;
 	gnutls_datum vdata;
 

@@ -1,6 +1,10 @@
 #ifndef X509_H
 # define X509_H
 
+#define OID_SHA1 "1.3.14.3.2.26"
+#define OID_MD5 "1.2.840.113549.2.5"
+#define OID_MD2 "1.2.840.113549.2.2"
+
 typedef struct gnutls_x509_crl_int {
 	ASN1_TYPE crl;
 	gnutls_datum signed_data; /* Holds the signed data of the CRL.
@@ -126,5 +130,8 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
 	gnutls_datum* u);
 
+int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
+	gnutls_x509_crt_fmt format, char* pem_header,
+	int tmp_buf_size, unsigned char* output_data, int* output_data_size);
 
 #endif

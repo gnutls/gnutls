@@ -306,7 +306,7 @@ int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 	}
 
 	if ((ret =
-	     _gnutls_pkcs1_rsa_encrypt(&sdata, session->key->key,
+	     _gnutls_pkcs1_rsa_encrypt(&sdata, &session->key->key,
 				       params, params_len, 2)) < 0) {
 		gnutls_assert();
 		return ret;

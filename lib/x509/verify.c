@@ -357,15 +357,11 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 }
 
 
-#define OID_SHA1 "1.3.14.3.2.26"
-#define OID_MD5 "1.2.840.113549.2.5"
-#define OID_MD2 "1.2.840.113549.2.2"
-
 /* Reads the digest information.
  * we use DER here, although we should use BER. It works fine
  * anyway.
  */
-static int _gnutls_get_ber_digest_info( const gnutls_datum *info, gnutls_mac_algorithm *hash, 
+static int decode_ber_digest_info( const gnutls_datum *info, gnutls_mac_algorithm *hash, 
 	opaque* digest, int *digest_size) 
 {
 ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
@@ -442,7 +438,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
 	int digest_size; 
 	GNUTLS_HASH_HANDLE hd;
 	gnutls_datum decrypted;
-	
+
 	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &decrypted, *signature, params, params_len, 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -452,7 +448,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
 	 */
 
 	digest_size = sizeof(digest);	
-	if ( (ret = _gnutls_get_ber_digest_info( &decrypted, &hash, digest, &digest_size)) != 0) {
+	if ( (ret = decode_ber_digest_info( &decrypted, &hash, digest, &digest_size)) != 0) {
 		gnutls_assert();
 		_gnutls_free_datum( &decrypted);
 		return ret;
@@ -466,6 +462,11 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
 	}
 
 	hd = _gnutls_hash_init( hash);
+	if (hd == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+
 	_gnutls_hash( hd, text->data, text->size);
 	_gnutls_hash_deinit( hd, md);
 
