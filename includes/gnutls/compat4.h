@@ -95,3 +95,6 @@
 #define gnutls_set_server_name gnutls_server_name_set
 #define gnutls_get_server_name gnutls_server_name_get
 
+#define GNUTLS_E_PARSING_ERROR GNUTLS_E_BASE64_DECODING_ERROR
+#define GNUTLS_E_PWD_ERROR GNUTLS_E_SRP_PWD_ERROR
+#define GNUTLS_E_ASCII_ARMOR_ERROR GNUTLS_E_BASE64_DECODING_ERROR
