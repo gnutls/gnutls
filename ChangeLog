@@ -1,3 +1,10 @@
+2003-12-22 11:36  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/TODO, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa:
+
+	Added PKCS #7 support to certtool utility.  
+
 2003-12-21 09:47  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/TODO (tags: gnutls_1_1_0), lib/dh_compat.c,
