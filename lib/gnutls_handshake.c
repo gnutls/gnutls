@@ -2434,7 +2434,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	/* if x509_cred==NULL we should remove all X509 ciphersuites
 	 */
 
-	if (session->security_parameters.entity == GNUTLS_SERVER) {
+	if (session->security_parameters.entity == GNUTLS_SERVER && x509_cred != NULL) {
 		ret = _gnutls_server_select_cert(session, requested_pk_algo);
 		if (ret < 0) {
 			gnutls_assert();
