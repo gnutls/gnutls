@@ -43,7 +43,7 @@ of the certificate authentication methods, but is limited to a session. See the
 \printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}
 function. The above functions verify if the given certificate path leads
 to a trusted CA certificate. You should also verify if the certificate's
-owner is the one you expect. See \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
+owner is the one you expect. See section \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
 for an example.
 
 \par
@@ -96,7 +96,7 @@ Kevin, for some reason. A reason could be that Bob is lazy enough, and
 signs other people's keys without being sure that they belong to the 
 actual owner.
 
-\par
+\subsection{Verifying an OpenPGP key}
 First we've to differentiate between ownertrust and validity. Sometimes trust
 and validity is used as a synonym but this is not correct.
 \par
@@ -115,12 +115,11 @@ the signature he made. There are different ownertrust levels:
 For example we need three marginally trusted signature to make a key
 valid or one full trusted signature. The ultimate trust is only used
 when we are the owner of a key and we also have the secret key.
-\par
 In the case we don't trust the owner, those signatures are skipped
 for the web of trust calculation.
 \par
 All checks in GnuTLS are done in \printfunc{gnutls_openpgp_verify_key}{gnutls\_openpgp\_verify\_key}. 
-If a trustdb is available, this is the file which contains all information about the
+If a trust database is available, this is the file which contains all information about the
 key owner (ownertrust), additional checks are performed.
 \\
 First we get the trustdb entry to see if the key is not disabled because
@@ -137,6 +136,4 @@ it was created by the key itself.
 \\
 Validity means if the signatures on the key are valid and the key was not 
 changed by somebody or corrupted during transport.
-
-
 
