@@ -1,3 +1,9 @@
+2004-12-17 22:22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-psk-05.txt:
+
+	Add.  
+
 2004-12-15 17:11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/gnutls.texi:
