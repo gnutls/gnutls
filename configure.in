@@ -11,8 +11,8 @@ AC_DEFINE_UNQUOTED(T_OS, "$target_os", [OS name])
 
 dnl Gnutls Version
 GNUTLS_MAJOR_VERSION=0
-GNUTLS_MINOR_VERSION=5
-GNUTLS_MICRO_VERSION=12
+GNUTLS_MINOR_VERSION=6
+GNUTLS_MICRO_VERSION=0
 GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
 AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION", [version of gnutls])
@@ -292,10 +292,10 @@ AC_ARG_ENABLE( openpgp-authentication, [  --disable-openpgp-authentication disab
 )
 if test x$ac_enable_openpgp != xno; then
  AC_MSG_RESULT(no)
- AM_PATH_LIBOPENCDK( 0.3.5, AC_DEFINE(HAVE_LIBOPENCDK, 1, [have libopencdk]),
+ AM_PATH_LIBOPENCDK( 0.4.0, AC_DEFINE(HAVE_LIBOPENCDK, 1, [have libopencdk]),
  AC_MSG_WARN([[
 ***
-*** libopencdk 0.3.5 was not found. You will not be able to use OpenPGP keys with gnutls.
+*** libopencdk 0.4.0 was not found. You will not be able to use OpenPGP keys with gnutls.
 ]]))
 else
  AC_MSG_RESULT(yes)
