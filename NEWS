@@ -1,3 +1,6 @@
+Version 0.9.8
+- Updated the SRP implementation to follow the latest draft.
+
 Version 0.9.7 (25/08/2003)
 - The tex files are now included in the distribution.
 - The library can now decrypt PKCS #12 files encrypted with
