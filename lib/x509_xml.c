@@ -35,6 +35,8 @@
 #include <gnutls_str.h>
 #include <gnutls_x509.h>
 
+static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root);
+
 static void *find_default_value(ASN1_TYPE x)
 {
 	ASN1_TYPE p = x;
@@ -198,6 +200,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 
 	ret = asn1_expand_any_defined_by( _gnutls_get_pkix(),
 					&structure);
+	ret = _gnutls_x509_expand_extensions( &structure, name);
 
 //asn1_print_structure( stdout, structure, name, ASN1_PRINT_ALL);
 //return 0;
@@ -604,4 +607,52 @@ int gnutls_x509_get_certificate_xml(const gnutls_datum * cert, int detail, gnutl
 	}
 
 	return 0;
+}
+
+/* This function will attempt to parse Extensions in
+ * an X509v3 certificate
+ *
+ * If no_critical_ext is non zero, then unsupported critical extensions
+ * do not lead into a fatal error.
+ */
+static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root)
+{
+	int k, result, len;
+	char name[128], name2[128], counter[MAX_INT_DIGITS];
+	char name1[128];
+	char extnID[128];
+
+	k = 0;
+	do {
+		k++;
+
+		_gnutls_str_cpy(name, sizeof(name), root);
+		_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.extensions.?"); 
+		_gnutls_int2str(k, counter);
+		_gnutls_str_cat(name, sizeof(name), counter); 
+
+		_gnutls_str_cpy(name2, sizeof(name2), name);
+		_gnutls_str_cat(name2, sizeof(name2), ".extnID");
+
+		_gnutls_str_cpy(name1, sizeof(name1), name);
+		_gnutls_str_cat(name1, sizeof(name1), ".extnValue");
+
+		len = sizeof(extnID) - 1;
+
+		result = asn1_expand_octet_string( _gnutls_get_pkix(),
+			rasn, name1, name2);
+			
+		if (result == ASN1_ELEMENT_NOT_FOUND)
+			break;
+		else if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+	} while (1);
+
+	if (result == ASN1_ELEMENT_NOT_FOUND)
+		return 0;
+	else
+		return _gnutls_asn2err(result);
 }
