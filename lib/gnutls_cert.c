@@ -81,7 +81,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 	_gnutls_free_datum( &sc->keyring);
 
 	for (i = 0; i < sc->ncerts; i++) {
-		gnutls_privkey_deinit( &sc->pkey[i]);
+		_gnutls_privkey_deinit( &sc->pkey[i]);
 	}
 
 	gnutls_free( sc->pkey);
