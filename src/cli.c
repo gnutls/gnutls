@@ -235,6 +235,7 @@ int main(int argc, char **argv)
       /* allow the use of private ciphersuites.
        */
       gnutls_handshake_set_private_extensions( state, 1);
+      gnutls_handshake_set_exportable_detection( state, 1);
 
       if (i == 1) {
 	 gnutls_session_set_data(state, session, session_size);
