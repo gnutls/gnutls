@@ -1,3 +1,54 @@
+2002-10-26 12:34  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_buffers.c, lib/gnutls_buffers.h,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_record.c,
+	lib/gnutls_state.c, lib/gnutls_str.c, lib/gnutls_str.h:
+
+	Optimizations in buffering code, which reduce the number of
+	malloc/realloc calls.  
+
+2002-10-26 09:46  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_errors.c, src/retcodes.c:
+
+	The error code table now contains all the error codes sorted.  
+
+2002-10-25 14:31  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/tex/Makefile.am, doc/tex/appendix.tex,
+	doc/tex/errors.tex, doc/tex/gnutls.tex, lib/gnutls_errors.c,
+	lib/gnutls_pk.c, src/Makefile.am, src/retcodes.c:
+
+	Documented error codes in an appendix. This documentation is
+	generated automatically using the retcodes program.  
+
+2002-10-24 19:07  nmav <nmav@gnutls.org>
+
+	* doc/: scripts/gdoc, scripts/sort1.pl, tex/Makefile.am:
+
+	Added script to sort function  names in function reference.  
+
+2002-10-24 17:42  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, gnutls_cipher.c, gnutls_constate.c,
+	gnutls_errors.c, gnutls_errors_int.h, gnutls_handshake.c,
+	gnutls_pk.c, gnutls_v2_compat.c:
+
+	Added more descriptive error codes to be returned by
+	gnutls_strerror(). Removed old and unused error codes.  
+
+2002-10-24 16:39  nmav <nmav@gnutls.org>
+
+	* src/: tls_test-gaa.c, tls_test-gaa.h, tls_test.c, tls_test.gaa:
+
+	gnutls-cli-debug now accepts one hostname only 
+
+2002-10-24 16:33  nmav <nmav@gnutls.org>
+
+	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa:
+
+	gnutls-cli now accepts one hostname only 
+
 2002-10-23 18:36  nmav <nmav@gnutls.org>
 
 	* doc/TODO, doc/tex/Makefile.am, lib/Makefile.am, lib/auth_anon.c,
