@@ -10,6 +10,22 @@ real world programs)
 * Documentation:
  view the doc/ directory and the examples in the src/ directory.
 
+
+LICENSE ISSUES:
+
+COPYING.LIB (GNU Lesser GPL) applies to the whole gnutls library
+except for the SRP and OPENPGP parts, which are under the GPL.
+
+In order to create a library under the LGPL run the configure script with 
+the following parameters:
+    --disable-srp-authentication
+    --disable-openpgp-authentication
+
+or the library will be under the GPL. In both cases the libraries are
+binary compatible. In the LGPL case the functions are replaced with
+stubs that always fail.
+
+
 BUGS:
 
 Currently gnuTLS needs a lot of testing. By notifying the developers

@@ -7,6 +7,7 @@ Version ?.?.?
   is a resumpted one.
 - Added gnutls_state_set_ptr() and gnutls_state_get_ptr() functions, to
   assist in callback functions.
+- Relicensed under the GNU Lesser General Public License
 
 Version 0.4.1 (7/04/2002)
 - Now uses alloca() for temporary variables
