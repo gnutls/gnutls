@@ -1,3 +1,16 @@
+2002-11-17 12:13  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_int_compat.c:
+
+	added compatibility function for the openpgp_keyserver.  
+
+2002-11-17 12:12  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, appendix.tex, auth.tex, compression.tex,
+	examples.tex, gnutls.bib, gnutls.tex, openpgp.tex, tlsintro.tex:
+
+	added bibliography in documentation.  
+
 2002-11-16 09:50  nmav <nmav@gnutls.org>
 
 	* doc/tex/Makefile.am, doc/tex/ex-pgp-keyserver.tex,
