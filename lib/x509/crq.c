@@ -105,6 +105,11 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 {
 	int result = 0, need_free = 0;
 	gnutls_datum _data;
+
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 	
 	_data.data = data->data;
 	_data.size = data->size;
@@ -171,6 +176,11 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
 					 size_t *sizeof_buf)
 {
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	return _gnutls_x509_parse_dn( crq->crq, "certificationRequestInfo.subject.rdnSequence",
 		buf, sizeof_buf);
 }
@@ -198,6 +208,11 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf)
 {
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	return _gnutls_x509_parse_dn_oid( crq->crq, "certificationRequestInfo.subject.rdnSequence", oid,
 		indx, buf, sizeof_buf);
 }
@@ -356,6 +371,11 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
 int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq, 
 	char* pass, size_t* sizeof_pass)
 {
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	return parse_attribute( crq->crq, "certificationRequestInfo.attributes",
 		"1.2.840.113549.1.9.7", 0, pass, sizeof_pass);
 }
@@ -403,6 +423,11 @@ int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
 int result;
 uint8 null = version;
 
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	result = asn1_write_value( crq->crq, "certificationRequestInfo.version", &null, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -426,6 +451,11 @@ uint8 null = version;
 int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key)
 {
 int result;
+
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	result = _gnutls_x509_encode_and_copy_PKI_params( crq->crq,
 		"certificationRequestInfo.subjectPKInfo", key->pk_algorithm,
@@ -452,6 +482,11 @@ int result;
 int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq, const char* pass)
 {
 int result;
+
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	/* Add the attribute.
 	 */
@@ -492,6 +527,11 @@ int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key)
 int result;
 gnutls_datum signature;
 const char* pk;
+
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	if (key->pk_algorithm != GNUTLS_PK_RSA) {
 		gnutls_assert();
@@ -568,6 +608,11 @@ const char* pk;
 int gnutls_x509_crq_export( gnutls_x509_crq crq,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	return _gnutls_x509_export_int( crq->crq, format, PEM_CRQ, *output_data_size,
 		output_data, output_data_size);
 }
@@ -592,6 +637,11 @@ int gnutls_x509_crq_export( gnutls_x509_crq crq,
 int gnutls_x509_crq_get_pk_algorithm( gnutls_x509_crq crq, unsigned int* bits)
 {
 int result;
+
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	result = _gnutls_x509_get_pk_algorithm( crq->crq, "certificationRequestInfo.subjectPKInfo",
 		bits);

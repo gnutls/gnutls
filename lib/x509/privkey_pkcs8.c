@@ -407,6 +407,11 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 	gnutls_datum tmp;
 	schema_id schema;
 
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	/* Get the private key info
 	 * tmp holds the DER encoding.
 	 */
@@ -823,6 +828,11 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key,
 	int result = 0, need_free = 0;
 	gnutls_datum _data;
 	int encrypted;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	_data.data = data->data;
 	_data.size = data->size;

@@ -97,6 +97,11 @@ void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag)
   **/
 gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag, int indx)
 {
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	if (indx >= bag->bag_elements) 
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	return bag->element[indx].type;
@@ -111,6 +116,11 @@ gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag, int ind
   **/
 int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag)
 {
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	return bag->bag_elements;
 }
 
@@ -125,6 +135,11 @@ int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag)
   **/
 int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_const_datum * data)
 {
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	if (indx >= bag->bag_elements) 
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
@@ -281,6 +296,10 @@ int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag bag, gnutls_pkcs12_bag_type typ
 	const gnutls_datum* data)
 {
 int ret;
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	if (bag->bag_elements == MAX_BAG_ELEMENTS-1) {
 		gnutls_assert();
@@ -332,6 +351,11 @@ int gnutls_pkcs12_bag_set_crt(gnutls_pkcs12_bag bag, gnutls_x509_crt crt)
 int ret;
 gnutls_datum data;
 
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	ret = _gnutls_x509_der_encode( crt->cert, "", &data, 0);
 	if (ret < 0) {
 		gnutls_assert();
@@ -361,6 +385,12 @@ int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag bag, gnutls_x509_crl crl)
 {
 int ret;
 gnutls_datum data;
+
+
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	ret = _gnutls_x509_der_encode( crl->crl, "", &data, 0);
 	if (ret < 0) {
@@ -393,6 +423,12 @@ int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag bag, int indx,
 {
 int ret;
 
+
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	if (indx > bag->bag_elements-1) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -424,6 +460,10 @@ int ret;
 int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag bag, int indx, 
 	gnutls_datum* id)
 {
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	if (indx > bag->bag_elements-1) {
 		gnutls_assert();
@@ -451,6 +491,11 @@ int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag bag, int indx,
 int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag bag, int indx, 
 	char **name)
 {
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	if (indx > bag->bag_elements-1) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -478,6 +523,11 @@ int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag bag, int indx,
 int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag bag, int indx, 
 	const char* name)
 {
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	if (indx > bag->bag_elements-1) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -506,6 +556,11 @@ int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass)
 {
 int ret;
 gnutls_datum dec;
+
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 	
 	if (bag->element[0].type != GNUTLS_BAG_ENCRYPTED) {
 		gnutls_assert();
@@ -554,6 +609,11 @@ ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
 gnutls_datum der = {NULL, 0};
 gnutls_datum enc = {NULL, 0};
 schema_id id;
+
+	if (bag == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	if (bag->element[0].type == GNUTLS_BAG_ENCRYPTED) {
 		gnutls_assert();

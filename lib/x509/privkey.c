@@ -269,6 +269,11 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
 {
 	int result = 0, need_free = 0;
 	gnutls_datum _data;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 	
 	_data.data = data->data;
 	_data.size = data->size;
@@ -374,6 +379,11 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key,
 	int i = 0, ret;
 	size_t siz = 0;
 
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	siz = m->size;
 	if (_gnutls_mpi_scan(&key->params[0], m->data, &siz)) {
 		gnutls_assert();
@@ -444,6 +454,11 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key,
   **/
 int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key)
 {
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
         return key->pk_algorithm;
 }
 
@@ -473,6 +488,11 @@ int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
 	char * msg;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 		
 	if (key->pk_algorithm == GNUTLS_PK_RSA)
 		msg = PEM_KEY_RSA;
@@ -505,6 +525,11 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum* u)
 {
 	size_t siz;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	siz = 0;
 	_gnutls_mpi_print(NULL, &siz, key->params[0]);
@@ -813,6 +838,11 @@ int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm a
 {
 int ret;
 
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	switch( algo) {
 		case GNUTLS_PK_DSA:
 			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -879,8 +909,14 @@ int result;
 GNUTLS_HASH_HANDLE hd;
 gnutls_datum der = { NULL, 0 };
 
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	if (*output_data_size < 20) {
 		gnutls_assert();
+		*output_data_size = 20;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 

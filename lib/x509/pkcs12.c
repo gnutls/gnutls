@@ -174,6 +174,11 @@ int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
 	int result = 0, need_free = 0;
 	gnutls_datum _data = { data->data, data->size };
 
+	if (pkcs12==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	/* If the PKCS12 is in PEM format then decode it
 	 */
 	if (format == GNUTLS_X509_FMT_PEM) {
@@ -233,6 +238,11 @@ int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
 int gnutls_pkcs12_export( gnutls_pkcs12 pkcs12,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
+	if (pkcs12==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	return _gnutls_x509_export_int( pkcs12->pkcs12, format, PEM_PKCS12, *output_data_size,
 		output_data, output_data_size);
 }
@@ -485,6 +495,11 @@ int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12,
 	char counter[MAX_INT_DIGITS];
 	gnutls_datum tmp = {NULL, 0};
 
+	if (pkcs12==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	/* Step 1. decode the data.
 	 */
 	result = _decode_pkcs12_auth_safe( pkcs12->pkcs12, &c2, NULL);
@@ -617,6 +632,11 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag)
 	int enc = 0, dum = 1;
 	char null;
 
+	if (pkcs12==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	/* Step 1. Check if the pkcs12 structure is empty. In that
 	 * case generate an empty PFX.
 	 */
@@ -723,6 +743,11 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass)
 	gnutls_datum tmp = {NULL, 0};
 	opaque sha_mac[20];
 
+	if (pkcs12==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	/* Generate the salt.
 	 */
 	_gnutls_get_random(salt, sizeof(salt), GNUTLS_WEAK_RANDOM);
@@ -825,6 +850,11 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char* pass)
 	gnutls_datum tmp = {NULL, 0}, salt = {NULL, 0};
 	opaque sha_mac[20];
 	opaque sha_mac_orig[20];
+
+	if (pkcs12==NULL || pass == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	/* read the iterations
 	 */
