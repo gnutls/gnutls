@@ -107,7 +107,7 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 					cipher,
 					gnutls_datum compressed, ContentType _type)
 {
-	uint8 *MAC = NULL;
+	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
 	uint8 *data;
 	uint8 pad;
@@ -163,9 +163,9 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, compressed.data, compressed.size);
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
-			MAC = gnutls_mac_deinit_ssl3(td);
+			gnutls_mac_deinit_ssl3(td, MAC);
 		} else {
-			MAC = gnutls_hmac_deinit(td);
+			gnutls_hmac_deinit(td, MAC);
 		}
 	}
 	switch (_gnutls_cipher_is_block(state->security_parameters.write_bulk_cipher_algorithm)) {
@@ -232,9 +232,6 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
-	if (td != GNUTLS_MAC_FAILED)
-		gnutls_free(MAC);
-
 	return 0;
 }
 
@@ -243,7 +240,7 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 					compress,
 					gnutls_datum ciphertext, uint8 type)
 {
-	uint8 *MAC = NULL;
+	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
 	uint8 *data;
 	uint8 pad;
@@ -351,9 +348,9 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, data, compress->size);
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
-			MAC = gnutls_mac_deinit_ssl3(td);
+			gnutls_mac_deinit_ssl3(td, MAC);
 		} else {
-			MAC = gnutls_hmac_deinit(td);
+			gnutls_hmac_deinit(td, MAC);
 		}
 	}
 	/* HMAC was not the same. */
@@ -362,10 +359,6 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 		gnutls_assert();
 		return GNUTLS_E_MAC_FAILED;
 	}
-
-
-	if (td != GNUTLS_MAC_FAILED)
-		gnutls_free(MAC);
 
 	return 0;
 }

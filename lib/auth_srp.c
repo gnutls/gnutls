@@ -241,7 +241,7 @@ int proc_srp_server_hello(GNUTLS_KEY key, const opaque * data, int data_size)
 	const uint8 *data_s;
 	uint8 pwd_algo;
 	int i;
-	opaque *hd;
+	opaque hd[SRP_MAX_HASH_SIZE];
 	char *username;
 	char *password;
 	const SRP_CLIENT_CREDENTIALS *cred =
@@ -308,18 +308,12 @@ int proc_srp_server_hello(GNUTLS_KEY key, const opaque * data, int data_size)
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
 	 */
-	hd = _gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g);
-	if (hd==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_HASH_FAILED;
-	}
+	_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g, hd);
 
 	if (gcry_mpi_scan(&key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-
-	gnutls_free(hd);
 
 	return 0;
 }

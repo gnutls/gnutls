@@ -121,9 +121,9 @@ void *_gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip)
 	int siz;
 	GNUTLS_MAC_HANDLE td;
 	GNUTLS_MAC_HANDLE td2;
-	char *data;
+	char tmp[MAX_HASH_SIZE];
 	char *concat = gnutls_malloc(36);
-	char *mesg;
+	char *mesg, *data;
 
 	td = gnutls_mac_init_ssl3_handshake(GNUTLS_MAC_MD5,
 					    state->security_parameters.
@@ -151,14 +151,12 @@ void *_gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip)
 	gnutls_mac_ssl3(td, mesg, siz);
 	gnutls_mac_ssl3(td2, mesg, siz);
 
-	data = gnutls_mac_deinit_ssl3_handshake(td);
-	memcpy(concat, data, 16);
-	gnutls_free(data);
+	gnutls_mac_deinit_ssl3_handshake(td, tmp);
+	memcpy(concat, tmp, 16);
 
-	data = gnutls_mac_deinit_ssl3_handshake(td2);
+	gnutls_mac_deinit_ssl3_handshake(td2, tmp);
 
-	memcpy(&concat[16], data, 20);
-	gnutls_free(data);
+	memcpy(&concat[16], tmp, 20);
 	return concat;
 }
 
@@ -170,9 +168,10 @@ void *_gnutls_finished(GNUTLS_STATE state, int type, int skip)
 	int siz;
 	GNUTLS_MAC_HANDLE td;
 	GNUTLS_MAC_HANDLE td2;
-	char *data;
+	char tmp[MAX_HASH_SIZE];
 	char concat[36];
 	char *mesg;
+	char *data;
 
 	td = gnutls_hash_init(GNUTLS_MAC_MD5);
 	td2 = gnutls_hash_init(GNUTLS_MAC_SHA);
@@ -187,14 +186,12 @@ void *_gnutls_finished(GNUTLS_STATE state, int type, int skip)
 
 	gnutls_free(data);
 
-	data = gnutls_hash_deinit(td);
-	memcpy(concat, data, 16);
-	gnutls_free(data);
+	gnutls_hash_deinit(td, tmp);
+	memcpy(concat, tmp, 16);
 
-	data = gnutls_hash_deinit(td2);
+	gnutls_hash_deinit(td2, tmp);
 
-	memcpy(&concat[16], data, 20);
-	gnutls_free(data);
+	memcpy(&concat[16], tmp, 20);
 
 	if (type == GNUTLS_SERVER) {
 		mesg = SERVER_MSG;

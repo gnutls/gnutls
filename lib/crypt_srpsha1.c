@@ -32,7 +32,7 @@ static const char magic[] = "";
 char *crypt_srpsha1(const char *username, const char *passwd,
 		    const char *salt, MPI g, MPI n)
 {
-	unsigned char *sp, *r1;
+	unsigned char *sp, r1[MAX_HASH_SIZE];
 	int salt_size = strlen(salt);
 	unsigned char *local_salt, *v;
 	int passwd_len;
@@ -48,7 +48,7 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	gnutls_hash(h1, (char *) username, strlen(username));
 	gnutls_hash(h1, ":", 1);
 	gnutls_hash(h1, (char *) passwd, passwd_len);
-	r1 = gnutls_hash_deinit(h1);
+	gnutls_hash_deinit(h1, r1);
 
 	
 	local_salt = malloc(salt_size + 1);
@@ -79,12 +79,11 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 
 	gnutls_hash(h1, r1, hash_len);
 
-	gnutls_free(r1);
-	r1 = gnutls_hash_deinit(h1);
+	gnutls_hash_deinit(h1, r1);
 
 	/* v = g^x mod n */
 	vsize = _gnutls_srp_gx(r1, hash_len, &v, g, n);
-	gnutls_free(r1);
+
 	if (vsize == -1 || v == NULL) {
 		gnutls_assert();
 		return NULL;

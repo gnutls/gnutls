@@ -189,7 +189,7 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 MPI _gnutls_calc_srp_u(MPI B)
 {
 	int b_size;
-	opaque *b_holder, *hd;
+	opaque *b_holder, hd[MAX_HASH_SIZE];
 	GNUTLS_MAC_HANDLE td;
 	uint32 u;
 	MPI ret;
@@ -208,9 +208,10 @@ MPI _gnutls_calc_srp_u(MPI B)
 		return NULL;
 	}
 	gnutls_hash(td, b_holder, b_size);
-	hd = gnutls_hash_deinit(td);
+	gnutls_hash_deinit(td, hd);
+	
 	memcpy(&u, hd, sizeof(u));
-	gnutls_free(hd);
+
 	gnutls_free(b_holder);
 
 	ret = gcry_mpi_set_ui(NULL, u);
@@ -267,11 +268,11 @@ MPI _gnutls_calc_srp_A(MPI * a, MPI g, MPI n)
 /* generate x = SHA(s | SHA(U | ":" | p))
  * The output is exactly 20 bytes
  */
-void *_gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
-			   int salt_size, int *size)
+int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
+			   int salt_size, int *size, void* digest)
 {
 	GNUTLS_MAC_HANDLE td;
-	opaque *res;
+	opaque res[MAX_HASH_SIZE];
 
 	*size = 20;
 
@@ -279,29 +280,32 @@ void *_gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 	gnutls_hash(td, username, strlen(username));
 	gnutls_hash(td, ":", 1);
 	gnutls_hash(td, password, strlen(password));
-	res = gnutls_hash_deinit(td);
+	
+	gnutls_hash_deinit(td, res);
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(td, salt, salt_size);
 	gnutls_hash(td, res, 20);	/* 20 bytes is the output of sha1 */
 	gnutls_free(res);
 
-	return gnutls_hash_deinit(td);
+	gnutls_hash_deinit(td, digest);
+
+	return 0;
 }
 
-void *_gnutls_calc_srp_x(char *username, char *password, opaque * salt,
-			 int salt_size, uint8 crypt_algo, int *size)
+int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
+			 int salt_size, uint8 crypt_algo, int *size, void* digest)
 {
 
 	switch (crypt_algo) {
 	case SRPSHA1_CRYPT:
 		return _gnutls_calc_srp_sha(username, password, salt,
-					    salt_size, size);
+					    salt_size, size, digest);
 	case BLOWFISH_CRYPT:
 		return _gnutls_calc_srp_bcrypt(username, password, salt, salt_size,
-					       size);
+					       size, digest);
 	}
-	return NULL;
+	return -1;
 }
 
 

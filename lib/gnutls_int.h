@@ -30,9 +30,9 @@
 #define HARD_DEBUG
 #define BUFFERS_DEBUG
 #define RECORD_DEBUG
-#define HANDSHAKE_DEBUG*/
+#define HANDSHAKE_DEBUG
 #define DEBUG
-
+*/
 
 #define SOCKET int
 #define LIST ...
@@ -44,6 +44,7 @@
 #define TLS_RANDOM_SIZE 32
 #define TLS_MAX_SESSION_ID_SIZE 32
 #define TLS_MASTER_SIZE 48
+#define MAX_HASH_SIZE 20
 
 #define MAX_DNSNAME_SIZE 256
 

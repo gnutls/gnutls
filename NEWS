@@ -3,6 +3,7 @@ Version 0.1.5
 - SRP is updated to conform to the newest draft.
 - Added support for DNSNAME extension.
 - Reentracy fixes in ASN.1 Parsing.
+- Optimizations in hash/hmac functions
 
 Version 0.1.4 (22/06/2001)
 - Corrected (srp) base64 encoding.

@@ -719,12 +719,12 @@ char *crypt_bcrypt_wrapper(const char* username, const char *pass_new, int cost,
 	return e;
 }
 
-void *_gnutls_calc_srp_bcrypt(const char* username, const char *passwd, opaque * salt, int salt_size, int* size)
+#define BCRYPT_SIZE 24
+int _gnutls_calc_srp_bcrypt(const char* username, const char *passwd, opaque * salt, int salt_size, int* size, void* digest)
 {
 	blf_ctx *ctx;
-	opaque text[24];
+	opaque text[BCRYPT_SIZE];
 	int passwd_len, i;
-	opaque *tmp;
 
 	strncpy( text, username, sizeof(text));
 	if ( (sizeof(text)-strlen(username)-1) > 0)
@@ -733,7 +733,7 @@ void *_gnutls_calc_srp_bcrypt(const char* username, const char *passwd, opaque *
 	*size = sizeof(text);
 	
 	/* we need 16 + cost */
-	if (salt_size < 17) return NULL;
+	if (salt_size < 17) return -1;
 	
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
 	if (passwd_len > 56)
@@ -741,15 +741,14 @@ void *_gnutls_calc_srp_bcrypt(const char* username, const char *passwd, opaque *
 
 	ctx = _blf_init(&salt[1], passwd, passwd_len, (int)(salt[0]));
 
-	tmp = malloc(sizeof(text));
-	memcpy(tmp, text, sizeof(text));
-
 	for (i = 0; i < 64; i++) {
-		_blf_encrypt(ctx, (uint8 *) tmp);
-		_blf_encrypt(ctx, (uint8 *) & tmp[8]);
-		_blf_encrypt(ctx, (uint8 *) & tmp[16]);
+		_blf_encrypt(ctx, (uint8 *) text);
+		_blf_encrypt(ctx, (uint8 *) & text[8]);
+		_blf_encrypt(ctx, (uint8 *) & text[16]);
 	}
 
 	_blf_deinit(ctx);
-	return tmp;
+	
+	memcpy( digest, text, BCRYPT_SIZE);
+	return 0;
 }

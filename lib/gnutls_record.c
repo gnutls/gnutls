@@ -193,15 +193,18 @@ int gnutls_deinit(GNUTLS_STATE state)
 }
 
 inline
-static void *_gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size)
+static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size, void* result)
 {
 	GNUTLS_MAC_HANDLE td1;
 
 	td1 = gnutls_hmac_init(algorithm, secret, secret_size);
 	gnutls_hmac(td1, seed, seed_size);
-	return gnutls_hmac_deinit(td1);
+	gnutls_hmac_deinit(td1, result);
+	
+	return;
 }
 
+#define MAX_SEED_SIZE 40
 
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
@@ -211,10 +214,15 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 
 	GNUTLS_MAC_HANDLE td2;
 	opaque *ret;
-	void *A, *Atmp;
+	void *A;
 	int i = 0, times, how, blocksize, A_size;
-	void *final;
+	opaque final[20], Atmp[MAX_SEED_SIZE];
 
+	if (seed_size > MAX_SEED_SIZE) {
+		gnutls_assert();
+		return NULL;
+	}
+	
 	ret = secure_calloc(1, total_bytes);
 
 	blocksize = gnutls_hmac_get_algo_len(algorithm);
@@ -223,13 +231,8 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 	} while (i < total_bytes);
 
 	/* calculate A(0) */
-	A = gnutls_malloc(seed_size);
-	if (A==NULL) {
-		gnutls_assert();
-		return NULL;
-	}
-	
-	
+	A = Atmp;
+
 	memcpy( A, seed, seed_size);
 	A_size = seed_size;
 
@@ -238,22 +241,15 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 		td2 = gnutls_hmac_init(algorithm, secret, secret_size);
 
 		/* here we calculate A(i+1) */
-		Atmp = _gnutls_cal_PRF_A( algorithm, secret, secret_size, A, A_size);
-		if (Atmp==NULL) {
-			gnutls_assert();
-			return NULL;
-		}
+		_gnutls_cal_PRF_A( algorithm, secret, secret_size, A, A_size, Atmp);
+
 		A_size = blocksize;
 		gnutls_free(A);
 		A = Atmp;
 
 		gnutls_hmac(td2, A, A_size);
 		gnutls_hmac(td2, seed, seed_size);
-		final = gnutls_hmac_deinit(td2);
-		if (final==NULL) {
-			gnutls_assert();
-			return NULL;
-		}
+		gnutls_hmac_deinit(td2, final);
 
 		if ( (1+i) * blocksize < total_bytes) {
 			how = blocksize;
@@ -264,9 +260,7 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 		if (how > 0) {
 			memcpy(&ret[i * blocksize], final, how);
 		}
-		gnutls_free(final);
 	}
-	gnutls_free(A);
 	return ret;
 }
 
