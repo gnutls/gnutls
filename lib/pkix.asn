@@ -1028,7 +1028,13 @@ pkcs-9-challengePassword        ::= CHOICE {
       printableString       PrintableString (SIZE (1..pkcs-9-ub-challengePassword)),
       utf8String            UTF8String (SIZE (1..pkcs-9-ub-challengePassword)) }
 
+pkcs-9-at-localKeyId               OBJECT IDENTIFIER ::= {pkcs-9 21}
+
 pkcs-9-localKeyId ::= OCTET STRING
+
+pkcs-9-at-friendlyName             OBJECT IDENTIFIER ::= {pkcs-9 20}
+
+pkcs-9-friendlyName ::= BMPString      (SIZE (1..255))
 
 -- PKCS #8 stuff
 

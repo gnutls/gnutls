@@ -336,7 +336,7 @@ char counter[MAX_INT_DIGITS];
 		_gnutls_str_cat( root, sizeof(root), counter); 
 		_gnutls_str_cat( root, sizeof(root), ".bagValue"); 
 
-		result = _gnutls_x509_read_value( c2, root, &bag->data[i], 0);
+		result = _gnutls_x509_read_value( c2, root, &bag->element[i].data, 0);
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -344,9 +344,9 @@ char counter[MAX_INT_DIGITS];
 
 		if (bag_type == GNUTLS_BAG_CERTIFICATE ||
 			bag_type == GNUTLS_BAG_CRL) {
-			gnutls_datum tmp = bag->data[i];
+			gnutls_datum tmp = bag->element[i].data;
 
-			result = _pkcs12_decode_crt_bag( bag_type, &tmp, &bag->data[i]);
+			result = _pkcs12_decode_crt_bag( bag_type, &tmp, &bag->element[i].data);
 			if (result < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -355,7 +355,7 @@ char counter[MAX_INT_DIGITS];
 			_gnutls_free_datum( &tmp);
 		}
 
-		bag->type[i] = bag_type;
+		bag->element[i].type = bag_type;
 		
 	}
 
@@ -471,10 +471,10 @@ int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12,
 	
 	/* ENC_DATA_OID needs decryption */
 
-	bag->type[0] = GNUTLS_BAG_ENCRYPTED;
+	bag->element[0].type = GNUTLS_BAG_ENCRYPTED;
 	bag->bag_elements = 1;
 
-	result = _gnutls_x509_read_value( c2, root2, &bag->data[0], 0);
+	result = _gnutls_x509_read_value( c2, root2, &bag->element[0].data, 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -609,7 +609,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag)
 	if (enc) {
 		/* Encrypted packets are written directly.
 		 */
-		result = asn1_write_value( c2, "?LAST.content", bag->data[0].data, bag->data[0].size);
+		result = asn1_write_value( c2, "?LAST.content", bag->element[0].data.data, bag->element[0].data.size);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
@@ -747,6 +747,99 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass)
 		return result;
 }
 
+#define FRIENDLY_NAME_OID "1.2.840.113549.1.9.20"
+#define KEY_ID_OID "1.2.840.113549.1.9.21"
+
+static int write_attributes( gnutls_pkcs12_bag bag, int elem, ASN1_TYPE c2, const char* where) {
+int result;
+char root[128];
+
+	/* If the bag attributes are empty, then write
+	 * nothing to the attribute field.
+	 */
+	if (bag->element[elem].friendly_name == NULL &&
+		bag->element[elem].local_key_id.data == NULL) {
+		/* no attributes
+		 */
+		result = asn1_write_value(c2, where, NULL, 0);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+		return 0;
+	}
+
+	if (bag->element[elem].local_key_id.data != NULL) {
+
+		/* Add a new Attribute
+		 */
+		result = asn1_write_value(c2, where, "NEW", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+		_gnutls_str_cpy( root, sizeof(root), where); 
+		_gnutls_str_cat( root, sizeof(root), ".?LAST"); 
+
+		result = _gnutls_x509_encode_and_write_attribute(
+			KEY_ID_OID, c2, root, bag->element[elem].local_key_id.data,
+			bag->element[elem].local_key_id.size, 1);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+	}
+
+	if (bag->element[elem].friendly_name != NULL) {
+		opaque* name;
+		int size, i;
+		const char* p;
+
+		/* Add a new Attribute
+		 */
+		result = asn1_write_value(c2, where, "NEW", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+		
+		/* convert name to BMPString
+		 */
+		size = strlen(bag->element[elem].friendly_name)*2;
+		name = gnutls_malloc(size);
+		
+		if (name == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		
+		p = bag->element[elem].friendly_name;
+		for (i=0;i<size;i+=2) {
+			name[i] = 0;
+			name[i+1] = *p;
+			p++;
+		}
+
+		_gnutls_str_cpy( root, sizeof(root), where); 
+		_gnutls_str_cat( root, sizeof(root), ".?LAST"); 
+		
+		result = _gnutls_x509_encode_and_write_attribute(
+			FRIENDLY_NAME_OID, c2, root, name, size, 1);
+
+		gnutls_free(name);
+
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+	}
+
+	return 0;
+}
+
+
 /* Encodes the bag into a SafeContents structure, and puts the output in
  * the given datum. Enc is set to non zero if the data are encrypted;
  */
@@ -758,7 +851,7 @@ int result;
 int i;
 const char* oid;
 
-	if (bag->type[0] == GNUTLS_BAG_ENCRYPTED && enc) {
+	if (bag->element[0].type == GNUTLS_BAG_ENCRYPTED && enc) {
 		*enc = 1;
 		return 0; /* ENCRYPTED BAG, do nothing. */
 	} else if (enc) *enc = 0;
@@ -775,7 +868,7 @@ const char* oid;
 
 	for (i=0;i<bag->bag_elements;i++) {
 
-		oid = bag2oid( bag->type[i]);
+		oid = bag2oid( bag->element[i].type);
 		if (oid==NULL) {
 			gnutls_assert();
 			continue;
@@ -799,25 +892,25 @@ const char* oid;
 
 		/* Set empty attributes
 		 */
-		result = asn1_write_value(c2, "?LAST.bagAttributes", NULL, 0);
-		if (result != ASN1_SUCCESS) {
+		result = write_attributes(bag, i, c2, "?LAST.bagAttributes");
+		if (result < 0) {
 			gnutls_assert();
-			result = _gnutls_asn2err(result);
 			goto cleanup;
 		}
+
 
 		/* Copy the Bag Value
 		 */
 
-		if (bag->type[i] == GNUTLS_BAG_CERTIFICATE ||
-			bag->type[i] == GNUTLS_BAG_CRL) {
+		if (bag->element[i].type == GNUTLS_BAG_CERTIFICATE ||
+			bag->element[i].type == GNUTLS_BAG_CRL) {
 			gnutls_datum tmp;
 
 			/* in that case encode it to a CertBag or
 			 * a CrlBag.
 			 */
 
-			result = _pkcs12_encode_crt_bag( bag->type[i], &bag->data[i], &tmp);
+			result = _pkcs12_encode_crt_bag( bag->element[i].type, &bag->element[i].data, &tmp);
 
 			if (result < 0) {
 				gnutls_assert();
@@ -832,7 +925,7 @@ const char* oid;
 		} else {
 
 			result = _gnutls_x509_write_value( c2, "?LAST.bagValue", 
-				&bag->data[i], 0);
+				&bag->element[i].data, 0);
 		}
 
 		if (result < 0) {

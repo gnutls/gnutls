@@ -54,6 +54,22 @@ int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag)
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
+static inline
+void _pkcs12_bag_free_data( gnutls_pkcs12_bag bag)
+{
+int i;
+
+	for (i=0;i<bag->bag_elements;i++) {
+		_gnutls_free_datum( &bag->element[i].data);
+		_gnutls_free_datum( &bag->element[i].local_key_id);
+		gnutls_free( bag->element[i].friendly_name);
+		bag->element[i].friendly_name = NULL;
+		bag->element[i].type = 0;
+	}
+
+}
+
+
 /**
   * gnutls_pkcs12_bag_deinit - This function deinitializes memory used by a gnutls_pkcs12 structure
   * @bag: The structure to be initialized
@@ -63,10 +79,7 @@ int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag)
   **/
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag)
 {
-int i;
-
-	for (i=0;i<bag->bag_elements;i++)
-		_gnutls_free_datum( &bag->data[i]);
+	_pkcs12_bag_free_data( bag);
 
 	gnutls_free(bag);
 }
@@ -84,7 +97,7 @@ gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag, int ind
 {
 	if (indx >= bag->bag_elements) 
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	return bag->type[indx];
+	return bag->element[indx].type;
 }
 
 /**
@@ -113,8 +126,8 @@ int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum* da
 	if (indx >= bag->bag_elements) 
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
-	data->data = bag->data[indx].data;
-	data->size = bag->data[indx].size;
+	data->data = bag->element[indx].data.data;
+	data->size = bag->element[indx].data.size;
 
 	return 0;
 }
@@ -258,7 +271,8 @@ int _pkcs12_encode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* raw
   * @data: the data to be copied.
   *
   * This function will insert the given data of the given type into the
-  * bag.
+  * bag. On success returns the index of the added bag, or a negative
+  * value on error.
   *
   **/
 int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag bag, gnutls_pkcs12_bag_type type,
@@ -277,27 +291,146 @@ int ret;
 		 * only one element.
 		 */
 	
-		if (bag->type[0] == GNUTLS_BAG_PKCS8_KEY ||
-			bag->type[0] == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY ||
-			bag->type[0] == GNUTLS_BAG_ENCRYPTED) {
+		if (bag->element[0].type == GNUTLS_BAG_PKCS8_KEY ||
+			bag->element[0].type == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY ||
+			bag->element[0].type == GNUTLS_BAG_ENCRYPTED) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
 		}
 	}
 
-	ret = _gnutls_set_datum( &bag->data[bag->bag_elements], data->data, data->size);
+	ret = _gnutls_set_datum( &bag->element[bag->bag_elements].data, data->data, data->size);
 
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	bag->type[bag->bag_elements] = type;
+	bag->element[bag->bag_elements].type = type;
 
 	bag->bag_elements++;
 
+	return bag->bag_elements-1;
+}
+
+/**
+  * gnutls_pkcs12_bag_set_key_id - This function sets a key ID into the bag element
+  * @bag: The bag
+  * @indx: The bag's element to add the id
+  * @id: the ID
+  *
+  * This function will add the given key ID, to the specified, by the index, bag
+  * element. The key ID will be encoded as a 'Local key identifier' bag attribute,
+  * which is usually used to distinguish the local private key and the certificate pair.
+  * 
+  * Returns 0 on success, or a negative value on error.
+  *
+  **/
+int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag bag, int indx, 
+	const gnutls_datum* id)
+{
+int ret;
+
+	if (indx > bag->bag_elements-1) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = _gnutls_set_datum( &bag->element[indx].local_key_id, 
+		id->data, id->size);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	return 0;
 }
+
+/**
+  * gnutls_pkcs12_bag_get_key_id - This function gets the key ID from the bag element
+  * @bag: The bag
+  * @indx: The bag's element to add the id
+  * @id: where the ID will be copied (to be treated as const)
+  *
+  * This function will return the key ID, of the specified bag element.
+  * The key ID is usually used to distinguish the local private key and the certificate pair.
+  * 
+  * Returns 0 on success, or a negative value on error.
+  *
+  **/
+int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag bag, int indx, 
+	gnutls_datum* id)
+{
+
+	if (indx > bag->bag_elements-1) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	id->data = bag->element[indx].local_key_id.data;
+	id->size = bag->element[indx].local_key_id.size;
+
+	return 0;
+}
+
+/**
+  * gnutls_pkcs12_bag_get_friendly_name - This function returns the friendly name of the bag element
+  * @bag: The bag
+  * @indx: The bag's element to add the id
+  * @name: will hold a pointer to the name (to be treated as const)
+  *
+  * This function will return the friendly name, of the specified bag element.
+  * The key ID is usually used to distinguish the local private key and the certificate pair.
+  * 
+  * Returns 0 on success, or a negative value on error.
+  *
+  **/
+int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag bag, int indx, 
+	char **name)
+{
+	if (indx > bag->bag_elements-1) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	*name = bag->element[indx].friendly_name;
+
+	return 0;
+}
+
+
+/**
+  * gnutls_pkcs12_bag_set_friendly_name - This function sets a friendly name into the bag element
+  * @bag: The bag
+  * @indx: The bag's element to add the id
+  * @name: the name
+  *
+  * This function will add the given key friendly name, to the specified, by the index, bag
+  * element. The name will be encoded as a 'Friendly name' bag attribute,
+  * which is usually used to set a user name to the local private key and the certificate pair.
+  * 
+  * Returns 0 on success, or a negative value on error.
+  *
+  **/
+int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag bag, int indx, 
+	const char* name)
+{
+	if (indx > bag->bag_elements-1) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	bag->element[indx].friendly_name = gnutls_strdup(name);
+
+	if (name == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	return 0;
+}
+
 
 /**
   * gnutls_pkcs12_bag_decrypt - This function will decrypt an encrypted bag
@@ -312,13 +445,13 @@ int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass)
 int ret;
 gnutls_datum dec;
 	
-	if (bag->type[0] != GNUTLS_BAG_ENCRYPTED) {
+	if (bag->element[0].type != GNUTLS_BAG_ENCRYPTED) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	ret = _gnutls_pkcs7_decrypt_data( 
-		&bag->data[0], pass, &dec);
+		&bag->element[0].data, pass, &dec);
 
         if (ret < 0) {
 		gnutls_assert();
@@ -329,7 +462,7 @@ gnutls_datum dec;
          * stuff, and parse it.
          */
 
-        _gnutls_free_datum( &bag->data[0]);
+        _gnutls_free_datum( &bag->element[0].data);
 
 	ret = _pkcs12_decode_safe_contents( &dec, bag);
 
@@ -354,12 +487,12 @@ gnutls_datum dec;
   **/
 int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag bag, const char* pass, unsigned int flags)
 {
-int ret, i;
+int ret;
 ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
 gnutls_datum der = {NULL, 0};
 gnutls_datum enc = {NULL, 0};
 
-	if (bag->type[0] == GNUTLS_BAG_ENCRYPTED) {
+	if (bag->element[0].type == GNUTLS_BAG_ENCRYPTED) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -398,13 +531,10 @@ gnutls_datum enc = {NULL, 0};
         /* encryption succeeded. 
          */
 
-        for (i=0;i<bag->bag_elements;i++) {
-		_gnutls_free_datum( &bag->data[i]);
-		bag->type[i] = 0;
-	}
+	_pkcs12_bag_free_data( bag);
 
-	bag->type[0] = GNUTLS_BAG_ENCRYPTED;
-	bag->data[0] = enc;
+	bag->element[0].type = GNUTLS_BAG_ENCRYPTED;
+	bag->element[0].data = enc;
 	
 	bag->bag_elements = 1;
 

@@ -491,8 +491,7 @@ int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE as
 const char *val_name;
 char tmp[128];
 ASN1_TYPE c2;
-opaque *der;
-int der_len, result;
+int result;
 
 
 	/* Find how to encode the data.
@@ -502,6 +501,7 @@ int der_len, result;
 		gnutls_assert();
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
+fprintf(stderr, "%s %s\n", given_oid, val_name);
 
 	_gnutls_str_cpy( tmp, sizeof(tmp), "PKIX1.");
 	_gnutls_str_cat( tmp, sizeof(tmp), val_name);
@@ -514,7 +514,7 @@ int der_len, result;
 
 	tmp[0] = 0;
 
-	if (_gnutls_x509_oid_data_choice( given_oid) == 1) {
+	if ((result=_gnutls_x509_oid_data_choice( given_oid)) > 0) {
 		char* string_type;
 		int i;
 
@@ -550,19 +550,6 @@ int der_len, result;
 		return _gnutls_asn2err(result);
 	}
 
-	der_len = 0;
-	asn1_der_coding( c2, "", NULL, &der_len, NULL);
-
-	der = gnutls_alloca( der_len);
-	result = asn1_der_coding( c2, "", der, &der_len, NULL);
-	
-	asn1_delete_structure( &c2);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		gnutls_afree(der);
-		return _gnutls_asn2err(result);
-	}
 	
 	/* write the data (value)
 	 */
@@ -576,7 +563,6 @@ int der_len, result;
 		result = asn1_write_value( asn1_struct, tmp, "NEW", 1);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
-			gnutls_afree(der);
 			return _gnutls_asn2err(result);
 		}
 
@@ -584,13 +570,10 @@ int der_len, result;
 	
 	}
 
-	result = asn1_write_value( asn1_struct, tmp, der, der_len);
-
-	gnutls_afree(der);
-
-	if (result != ASN1_SUCCESS) {
+	result = _gnutls_x509_der_encode_and_copy( c2, "", asn1_struct, tmp, 0);
+	if (result < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
 	/* write the type

@@ -16,9 +16,15 @@ typedef enum gnutls_pkcs12_bag_type {
 
 #define MAX_BAG_ELEMENTS 32
 
+struct bag_element {
+	gnutls_datum data;
+	gnutls_pkcs12_bag_type type;
+	gnutls_datum local_key_id;
+	char * friendly_name;
+};
+
 typedef struct gnutls_pkcs12_bag_int {
-	gnutls_datum data[MAX_BAG_ELEMENTS];
-	gnutls_pkcs12_bag_type type[MAX_BAG_ELEMENTS];
+	struct bag_element element[MAX_BAG_ELEMENTS];
 	int bag_elements;
 } gnutls_pkcs12_bag_int;
 
