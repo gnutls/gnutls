@@ -1024,7 +1024,7 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	} else { /* PEM */
 		opaque *tmp;
 		opaque *out;
-		int len = tmp_buf_size * 2 + 64;
+		int len = tmp_buf_size;
 		
 		tmp = gnutls_alloca( len);
 		if (tmp == NULL) {

@@ -234,6 +234,8 @@ int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key);
 int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key);
 
 int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq, const char* pass);
+int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq, 
+	char* pass, int* sizeof_pass);
 
 int gnutls_x509_crq_export( gnutls_x509_crq crq,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);

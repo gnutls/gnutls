@@ -201,6 +201,165 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 		
 }
 
+/* Parses an Attribute list in the asn1_struct, and searches for the
+ * given OID. The index indicates the attribute value to be returned.
+ *
+ * Only printable data are returned, or GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * asn1_attr_name must be a string in the form "certificationRequestInfo.attributes"
+ *
+ */
+static int parse_attribute(ASN1_TYPE asn1_struct,
+			      const char *attr_name,
+			      const char *given_oid, int indx,
+			      char *buf, int *sizeof_buf)
+{
+	int k1, result;
+	char tmpbuffer1[64];
+	char tmpbuffer3[64];
+	char counter[MAX_INT_DIGITS];
+	char value[200];
+	char escaped[256];
+	char oid[128];
+	int len, printable;
+
+	if (*sizeof_buf == 0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	buf[0] = 0;
+
+	k1 = 0;
+	do {
+
+		k1++;
+		/* create a string like "attribute.?1"
+		 */
+		_gnutls_int2str(k1, counter);
+		_gnutls_str_cpy(tmpbuffer1, sizeof(tmpbuffer1),
+				attr_name);
+
+		if (strlen( tmpbuffer1) > 0)
+			_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), ".");
+		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), "?");
+		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), counter);
+
+		len = sizeof(value) - 1;
+		result =
+		    asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
+
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			gnutls_assert();
+			break;
+		}
+
+		if (result != ASN1_VALUE_NOT_FOUND) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+				/* Move to the attibute type and values
+				 */
+			/* Read the OID 
+			 */
+			_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
+					tmpbuffer1);
+			_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3),
+					".type");
+
+			len = sizeof(oid) - 1;
+			result =
+			    asn1_read_value(asn1_struct, tmpbuffer3, oid,
+					    &len);
+
+			if (result == ASN1_ELEMENT_NOT_FOUND)
+				break;
+			else if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				result = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+
+			if (strcmp(oid, given_oid) == 0) { /* Found the OID */
+				
+				/* Read the Value 
+				 */
+				_gnutls_str_cpy(tmpbuffer3,
+						sizeof(tmpbuffer3),
+						tmpbuffer1);
+
+				_gnutls_int2str(indx + 1, counter);
+
+				_gnutls_str_cat(tmpbuffer3,
+						sizeof(tmpbuffer3),
+						".values.?");
+				_gnutls_str_cat(tmpbuffer3,
+						sizeof(tmpbuffer3),
+						counter);
+
+				len = sizeof(value) - 1;
+				result =
+				    asn1_read_value(asn1_struct,
+						    tmpbuffer3, value,
+						    &len);
+
+				if (result != ASN1_SUCCESS) {
+					gnutls_assert();
+					result = _gnutls_asn2err(result);
+					goto cleanup;
+				}
+
+
+				printable =
+				    _gnutls_x509_oid_data_printable(oid);
+
+				if (printable == 1) {
+					if ((result =
+					     _gnutls_x509_oid_data2string
+					     (oid, value, len, buf,
+					      sizeof_buf)) < 0) {
+						gnutls_assert();
+						goto cleanup;
+					}
+
+					return 0;
+				} else {
+					gnutls_assert();
+					return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+				}
+			}
+
+	} while (1);
+
+	gnutls_assert();
+
+	result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+      cleanup:
+	return result;
+}
+
+/**
+  * gnutls_x509_crq_get_challenge_password - This function will get the challenge password 
+  * @crq: should contain a gnutls_x509_crq structure
+  * @pass: will hold a null terminated password
+  * @sizeof_pass: Initialy holds the size of pass.
+  *
+  * This function will return the challenge password in the
+  * request.
+  *
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq, 
+	char* pass, int* sizeof_pass)
+{
+	return parse_attribute( crq->crq, "certificationRequestInfo.attributes",
+		"1.2.840.113549.1.9.7", 0, pass, sizeof_pass);
+}
+
 /**
   * gnutls_x509_crq_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
   * @crq: should contain a gnutls_x509_crq structure
