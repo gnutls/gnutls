@@ -303,8 +303,6 @@ int main(int argc, char **argv)
 
 		ret = do_handshake(&hd);
 
-		/* Note that every error on handshake is fatal.
-		 */
 		if (ret < 0) {
 			fprintf(stderr, "*** Handshake has failed\n");
 			gnutls_perror(ret);
@@ -581,15 +579,15 @@ static void check_rehandshake(socket_st socket, int ret)
 		 * the server thinks we ignored his request.
 		 * This is a bad design of this client.
 		 */
-		printf("* Received rehandshake request\n");
+		printf("*** Received rehandshake request\n");
 		/* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
 
 		ret = do_handshake(&socket);
 
 		if (ret == 0) {
-			printf("* Rehandshake was performed.\n");
+			printf("*** Rehandshake was performed.\n");
 		} else {
-			printf("* Rehandshake Failed.\n");
+			printf("*** Rehandshake Failed.\n");
 		}
 	}
 }
