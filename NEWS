@@ -1,4 +1,4 @@
-Version 0.1.5
+Version 0.1.9
 - Corrected bug(s) in ChangeCipherSpec packet (fixes renegotiate)
 - SRP is updated to conform to the newest draft.
 - Added support for DNSNAME extension.
@@ -6,6 +6,7 @@ Version 0.1.5
 - Optimizations in hash/hmac functions
 - (Error) message handling has changed
 - Better Protocol Version handling
+- Added x509 Certificate Verification
 
 Version 0.1.4 (22/06/2001)
 - Corrected (srp) base64 encoding.
