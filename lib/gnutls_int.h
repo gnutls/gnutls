@@ -63,11 +63,8 @@
 #define gnutls_calloc calloc
 #define gnutls_free free
 
-typedef struct {
-	uint8	pint[3];
-} uint24;
-
 typedef unsigned char opaque;
+typedef struct { opaque pint[3]; } uint24;
 
 typedef enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 } crypt_algo;
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;

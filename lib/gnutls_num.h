@@ -26,3 +26,4 @@ uint32 CONVuint32( uint32 data);
 uint16 CONVuint16( uint16 data);
 uint16 READuint64( const opaque* data);
 uint32 CONVuint64( uint64 data);
+uint32 READuint24( const opaque* data);

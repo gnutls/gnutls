@@ -32,7 +32,7 @@
 #define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ff) | (rotr32(x, 8) & 0xff00ff00))
 #define byteswap64(x)  ((rotl64(x, 8) & 0x00ff00ff00ff00ffLL) | (rotr64(x, 8) & 0xff00ff00ff00ff00LL))
 
-
+inline
 uint32 uint24touint32( uint24 num) {
 uint32 ret=0;
 
@@ -41,6 +41,8 @@ uint32 ret=0;
 	((uint8*)&ret)[3] = num.pint[2];
 	return ret;
 }
+
+inline
 uint24 uint32touint24( uint32 num) {
 uint24 ret;
 
@@ -51,6 +53,24 @@ uint24 ret;
 
 }
 
+/* data should be at least 3 bytes */
+inline
+uint32 READuint24( const opaque* data) {
+uint32 res;
+uint24 num;
+	
+	num.pint[0] = data[0];
+	num.pint[1] = data[1];
+	num.pint[2] = data[2];
+
+	res = uint24touint32( num);
+#ifndef WORDS_BIGENDIAN
+	res = byteswap32( res);
+#endif
+return res;
+}
+
+inline
 uint32 READuint32( const opaque* data) {
 uint32 res;
 
@@ -61,6 +81,7 @@ uint32 res;
 return res;
 }
 
+inline
 uint16 READuint16( const opaque* data) {
 uint16 res;
 	memcpy( &res, data, sizeof(uint16));
@@ -70,6 +91,7 @@ uint16 res;
 return res;
 }
 
+inline
 uint32 CONVuint32( uint32 data) {
 #ifndef WORDS_BIGENDIAN
 	return byteswap32( data);
@@ -78,6 +100,7 @@ uint32 CONVuint32( uint32 data) {
 #endif
 }
 
+inline
 uint16 CONVuint16( uint16 data) {
 #ifndef WORDS_BIGENDIAN
 	return byteswap16( data);
@@ -86,6 +109,7 @@ uint16 CONVuint16( uint16 data) {
 #endif
 }
 
+inline
 uint64 READuint64( const opaque* data) {
 uint64 res;
 
@@ -96,7 +120,7 @@ uint64 res;
 return res;
 }
 
-
+inline
 uint64 CONVuint64( uint64 data) {
 #ifndef WORDS_BIGENDIAN
  return byteswap64( data);

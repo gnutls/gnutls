@@ -10,3 +10,5 @@ Makefile
 *.gcov
 *.bb
 *.bbg
+libgnutls-config
+gnutls.h

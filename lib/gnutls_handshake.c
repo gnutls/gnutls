@@ -475,21 +475,21 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 {
 	int ret;
 	uint8 *data;
-	uint24 length;
+	uint24 length24;
 	uint32 datasize;
 	int pos = 0;
 
-	datasize = CONVuint32(i_datasize);
+	datasize = CONVuint32( i_datasize);
 
-	length = uint32touint24(datasize);
+	length24 = uint32touint24( datasize);
 
 	i_datasize += HANDSHAKE_HEADERS_SIZE;
 	data = gnutls_malloc(i_datasize);
 
 	memcpy(&data[pos++], &type, 1);
-	memcpy(&data[pos++], &length.pint[0], 1);
-	memcpy(&data[pos++], &length.pint[1], 1);
-	memcpy(&data[pos++], &length.pint[2], 1);
+	memcpy(&data[pos++], &length24.pint[0], 1);
+	memcpy(&data[pos++], &length24.pint[1], 1);
+	memcpy(&data[pos++], &length24.pint[2], 1);
 
 	if (i_datasize > 4)
 		memcpy(&data[pos], i_data, i_datasize - 4);
@@ -525,7 +525,6 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 	int ret;
 	uint32 length32 = 0, sum = 0;
 	uint8 *dataptr=NULL; /* for realloc */
-	uint24 num;
 	int handshake_headers = HANDSHAKE_HEADERS_SIZE;
 	HandshakeType recv_type;
 
@@ -579,12 +578,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 			return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 		}
 	
-		num.pint[0] = dataptr[1];
-		num.pint[1] = dataptr[2];
-		num.pint[2] = dataptr[3];
-		length32 = uint24touint32(num);
-
-		length32 = CONVuint32(length32);
+		length32 = READuint24( &dataptr[1]);
 
 #ifdef HANDSHAKE_DEBUG
 		fprintf(stderr, "Handshake: %s was received [%ld bytes]\n",
@@ -1099,7 +1093,6 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data,
 	char *certificate_list;
 	int ret = 0;
 	uint32 sizeOfCert;
-	uint24 num;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		if (datalen < 2) {
@@ -1107,13 +1100,8 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data,
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 
-		num.pint[0] = data[pos];
-		num.pint[1] = data[pos + 1];
-		num.pint[2] = data[pos + 2];
-		sizeOfCert = uint24touint32(num);
-
+		sizeOfCert = READuint24( &data[pos]);
 		pos += 3;
-		sizeOfCert = CONVuint32( sizeOfCert);
 
 		if (sizeOfCert > MAX24) {
 			gnutls_assert();

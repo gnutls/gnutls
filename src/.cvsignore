@@ -1,6 +1,8 @@
 .cvsignore
 cli
 serv
+prime
+gnutls-rsm.db
 Makefile
 Makefile.in
 .deps
