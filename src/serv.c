@@ -455,7 +455,7 @@ int main(int argc, char **argv)
    }
 
    if (gnutls_global_init_extra() < 0) {
-      fprintf(stderr, "global state initialization error\n");
+      fprintf(stderr, "global state (extra) initialization error\n");
       exit(1);
    }
 
@@ -900,6 +900,8 @@ void gaa_parser(int argc, char **argv)
 	    cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
 	 if (strncasecmp(info.ciphers[i], "ARC", 3) == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR;
+	 if (strncasecmp(info.ciphers[i], "NUL", 3) == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_NULL;
       }
       cipher_priority[j] = 0;
    }
