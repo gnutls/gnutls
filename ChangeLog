@@ -1,3 +1,16 @@
+2003-04-16 19:09  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, gnutls_errors.c, gnutls_errors_int.h,
+	gnutls_x509.c, pkix.asn, pkix_asn1_tab.c:
+
+	Renamed all of the PKCS #xx stuff names, to pkcs-x-name.  
+
+2003-04-16 10:44  nmav <nmav@gnutls.org>
+
+	* lib/: pkix.asn, pkix_asn1_tab.c:
+
+	added definitions for pkcs12 
+
 2003-04-15 13:59  nmav <nmav@gnutls.org>
 
 	* src/cli.c:
