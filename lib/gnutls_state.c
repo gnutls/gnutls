@@ -348,3 +348,21 @@ int _gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits) {
 	return 0;
 }
 
+/**
+  * gnutls_openpgp_send_key - This function will order gnutls to send the openpgp fingerprint instead of the key
+  * @state: is a pointer to a &GNUTLS_STATE structure.
+  * @status: is one of OPENPGP_KEY, or OPENPGP_KEY_FINGERPRINT
+  *
+  * This function will order gnutls to send the key fingerprint instead
+  * of the key in the initial handshake procedure. This should be used
+  * with care and only when there is indication or knowledge that the 
+  * server can obtain the client's key.
+  *
+  **/
+void gnutls_openpgp_send_key(GNUTLS_STATE state, GNUTLS_OpenPGPKeyStatus status) {
+	state->gnutls_internals.pgp_fingerprint = status;
+}
+
+int _gnutls_openpgp_send_fingerprint(GNUTLS_STATE state) {
+	return state->gnutls_internals.pgp_fingerprint;
+}

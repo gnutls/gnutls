@@ -159,7 +159,7 @@ inline
 /* Locates the most appropriate x509 certificate using the
  * given DN
  */
-static int _find_x509_cert( const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+static int _find_x509_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 			   opaque * _data, int _data_size,
 			   PKAlgorithm * pk_algos, int pk_algos_length,
 			   int *indx)
@@ -227,7 +227,7 @@ static int _find_x509_cert( const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 
 /* Locates the most appropriate openpgp cert
  */
-static int _find_openpgp_cert( const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+static int _find_openpgp_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 			      PKAlgorithm * pk_algos, int pk_algos_length,
 			      int *indx)
 {
@@ -303,14 +303,14 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		if (state->security_parameters.cert_type ==
 		    GNUTLS_CRT_X509)
 			result =
-			    _find_x509_cert( cred, _data, _data_size,
+			    _find_x509_cert(cred, _data, _data_size,
 					    pk_algos, pk_algos_length,
 					    &indx);
 
 		if (state->security_parameters.cert_type ==
 		    GNUTLS_CRT_OPENPGP)
 			result =
-			    _find_openpgp_cert( cred, pk_algos,
+			    _find_openpgp_cert(cred, pk_algos,
 					       pk_algos_length, &indx);
 
 
@@ -475,6 +475,8 @@ int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 	return ret;
 }
 
+enum PGPKeyDescriptorType { PGP_KEY_FINGERPRINT, PGP_KEY };
+
 int _gnutls_gen_openpgp_client_certificate(GNUTLS_STATE state,
 					   opaque ** data)
 {
@@ -509,7 +511,7 @@ int _gnutls_gen_openpgp_client_certificate(GNUTLS_STATE state,
 	WRITEuint24(ret - 3, pdata);
 	pdata += 3;
 
-	*pdata = 1;		/* whole key */
+	*pdata = PGP_KEY;	/* whole key */
 	pdata++;
 
 	if (apr_cert_list_length > 0) {
@@ -521,15 +523,73 @@ int _gnutls_gen_openpgp_client_certificate(GNUTLS_STATE state,
 	return ret;
 }
 
+int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
+					       opaque ** data)
+{
+	int ret;
+	opaque *pdata;
+	gnutls_cert *apr_cert_list;
+	gnutls_private_key *apr_pkey;
+	int apr_cert_list_length;
+
+	/* find the appropriate certificate */
+	if ((ret =
+	     _gnutls_find_apr_cert(state, &apr_cert_list,
+				   &apr_cert_list_length,
+				   &apr_pkey)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = 3 + 1;
+
+	/* Only v4 fingerprints are sent 
+	 */
+	if (apr_cert_list_length > 0 && apr_cert_list->version == 4)
+		ret += 20 + 1;
+	else			/* empty certificate case */
+		return _gnutls_gen_openpgp_client_certificate(state, data);
+
+	(*data) = gnutls_malloc(ret);
+	pdata = (*data);
+
+	if (pdata == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	WRITEuint24(ret - 3, pdata);
+	pdata += 3;
+
+	*pdata = PGP_KEY_FINGERPRINT;	/* key fingerprint */
+	pdata++;
+
+	*pdata = 20;
+	pdata++;
+
+	memcpy(pdata, apr_cert_list[0].fingerprint, 20);
+
+	return ret;
+}
+
 
 
 int _gnutls_gen_cert_client_certificate(GNUTLS_STATE state, opaque ** data)
 {
 	switch (state->security_parameters.cert_type) {
 	case GNUTLS_CRT_OPENPGP:
-		return _gnutls_gen_openpgp_client_certificate(state, data);
+		if (_gnutls_openpgp_send_fingerprint(state) == 0)
+			return
+			    _gnutls_gen_openpgp_client_certificate(state,
+								   data);
+		else
+			return
+			    _gnutls_gen_openpgp_client_certificate_fpr
+			    (state, data);
+
 	case GNUTLS_CRT_X509:
 		return _gnutls_gen_x509_client_certificate(state, data);
+
 	default:
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
@@ -843,42 +903,53 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 
 	/* Read PGPKeyDescriptor */
 	DECR_LEN(dsize, 1);
-	if (*p != 1) {		/* only full certificate are accepted */
+	if (*p == PGP_KEY_FINGERPRINT) { /* the fingerprint */
+	
+		/* FIXME: Add stuff here to retrieve, and probably
+		 * cache fingerprints and keys.
+		 */
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+	} else if (*p == PGP_KEY) { /* the whole key */
+
+		p++;
+
+		/* Read the actual certificate */
+		DECR_LEN(dsize, 3);
+		len = READuint24(p);
+		p += 3;
+
+		if (size == 0) {
+			gnutls_assert();
+			/* no certificate was sent */
+			return GNUTLS_E_NO_CERTIFICATE_FOUND;
+		}
+
+		DECR_LEN(dsize, len);
+		peer_certificate_list_size++;
+
+		if (peer_certificate_list_size == 0) {
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+
+		peer_certificate_list =
+		    gnutls_calloc(1, sizeof(gnutls_cert) *
+				  (peer_certificate_list_size));
+
+		if (peer_certificate_list == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		tmp.size = len;
+		tmp.data = p;
+
+	} else {
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
-	p++;
-
-	/* Read the actual certificate */
-	DECR_LEN(dsize, 3);
-	len = READuint24(p);
-	p += 3;
-
-	if (size == 0) {
-		gnutls_assert();
-		/* no certificate was sent */
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-	}
-
-	DECR_LEN(dsize, len);
-	peer_certificate_list_size++;
-
-	if (peer_certificate_list_size == 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
-	peer_certificate_list =
-	    gnutls_calloc(1, sizeof(gnutls_cert) *
-			  (peer_certificate_list_size));
-
-	if (peer_certificate_list == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	tmp.size = len;
-	tmp.data = p;
 
 	if ((ret =
 	     _gnutls_openpgp_cert2gnutls_cert(&peer_certificate_list[0],
@@ -919,7 +990,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 
 	return 0;
 }
-#endif /* HAVE_LIBOPENCDK */
+#endif				/* HAVE_LIBOPENCDK */
 
 int _gnutls_proc_cert_server_certificate(GNUTLS_STATE state, opaque * data,
 					 int data_size)
@@ -929,7 +1000,7 @@ int _gnutls_proc_cert_server_certificate(GNUTLS_STATE state, opaque * data,
 	case GNUTLS_CRT_OPENPGP:
 		return _gnutls_proc_openpgp_server_certificate(state, data,
 							       data_size);
-#endif /* HAVE_LIBOPENCDK */
+#endif				/* HAVE_LIBOPENCDK */
 	case GNUTLS_CRT_X509:
 		return _gnutls_proc_x509_server_certificate(state, data,
 							    data_size);
@@ -940,8 +1011,8 @@ int _gnutls_proc_cert_server_certificate(GNUTLS_STATE state, opaque * data,
 }
 
 #define MAX_SIGN_ALGOS 2
-typedef enum CertificateSigType { RSA_SIGN =
-	    1, DSA_SIGN } CertificateSigType;
+typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN
+} CertificateSigType;
 
 /* Checks if we support the given signature algorithm 
  * (RSA or DSA). Returns the corresponding PKAlgorithm
@@ -1130,7 +1201,7 @@ int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 						     raw_certificate_list
 						     [0]);
 		break;
-#endif /* HAVE_LIBOPENCDK */
+#endif				/* HAVE_LIBOPENCDK */
 	default:
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;

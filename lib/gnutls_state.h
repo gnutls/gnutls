@@ -21,4 +21,6 @@ int _gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
 int _gnutls_dh_get_prime_bits( GNUTLS_STATE state);
 void gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
 
+int _gnutls_openpgp_send_fingerprint( GNUTLS_STATE state);
+
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509

@@ -8,38 +8,40 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 42 "cli.gaa"
+#line 45 "cli.gaa"
 	char **rest_args;
-#line 41 "cli.gaa"
+#line 44 "cli.gaa"
 	int nrest_args;
-#line 34 "cli.gaa"
+#line 37 "cli.gaa"
 	char **ctype;
-#line 33 "cli.gaa"
+#line 36 "cli.gaa"
 	int nctype;
-#line 30 "cli.gaa"
+#line 33 "cli.gaa"
 	char **kx;
-#line 29 "cli.gaa"
+#line 32 "cli.gaa"
 	int nkx;
-#line 26 "cli.gaa"
+#line 29 "cli.gaa"
 	char **macs;
-#line 25 "cli.gaa"
+#line 28 "cli.gaa"
 	int nmacs;
-#line 22 "cli.gaa"
+#line 25 "cli.gaa"
 	char **comp;
-#line 21 "cli.gaa"
+#line 24 "cli.gaa"
 	int ncomp;
-#line 18 "cli.gaa"
+#line 21 "cli.gaa"
 	char **proto;
-#line 17 "cli.gaa"
+#line 20 "cli.gaa"
 	int nproto;
-#line 14 "cli.gaa"
+#line 17 "cli.gaa"
 	char **ciphers;
-#line 13 "cli.gaa"
+#line 16 "cli.gaa"
 	int nciphers;
-#line 9 "cli.gaa"
+#line 12 "cli.gaa"
 	int record_size;
-#line 6 "cli.gaa"
+#line 9 "cli.gaa"
 	int port;
+#line 6 "cli.gaa"
+	int fingerprint;
 #line 3 "cli.gaa"
 	int resume;
 

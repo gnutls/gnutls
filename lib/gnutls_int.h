@@ -131,6 +131,10 @@ typedef enum CertificateRequest { GNUTLS_CERT_IGNORE,
 } CertificateRequest;
 #define GNUTLS_CertificateRequest CertificateRequest
 
+typedef enum GNUTLS_OpenPGPKeyStatus { GNUTLS_OPENPGP_KEY, 
+	GNUTLS_OPENPGP_KEY_FINGERPRINT
+} GNUTLS_OpenPGPKeyStatus;
+
 typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 
 } CloseRequest;
 #define GNUTLS_CloseRequest CloseRequest
@@ -552,6 +556,11 @@ typedef struct {
 	 */
 	uint8			extensions_sent[MAX_EXT_TYPES];
 	uint8			extensions_sent_size;
+	
+	/* is 0 if we are to send the whole PGP key, or non zero
+	 * if the fingerprint is to be sent.
+	 */
+	int			pgp_fingerprint;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

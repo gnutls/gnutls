@@ -230,8 +230,8 @@ void print_list(void)
 	printf(", OPENPGP\n");
 
 	printf("Protocols:");
-	printf(" TLS 1.0");
-	printf(", SSL 3.0\n");
+	printf(" TLS1.0");
+	printf(", SSL3.0\n");
 
 	printf("Ciphers:");
 	printf(" RIJNDAEL_128_CBC");

@@ -1,3 +1,77 @@
+2002-02-17 20:07  nmav <nmav@gnutls.org>
+
+	* lib/: auth_rsa.c, gnutls_pk.c:
+
+	Corrected bug in RSA authentication, responsible for random (very
+	very rare, and difficult to reproduce) failures.  
+
+2002-02-17 13:14  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_x509.c, x509_verify.c:
+
+	Improved X.509 verification functions. They are still too primitive.  
+
+2002-02-16 20:50  nmav <nmav@gnutls.org>
+
+	* lib/auth_rsa.c:
+
+	Some cleanups.  
+
+2002-02-15 17:30  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Fixed some memory leaks.  Code to handle ElGamal keys.  Some minor
+	bug fixes.  
+
+2002-02-15 17:04  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_record.c:
+
+	renamed gnutls_read to gnutls_record_read and gnutls_write to 
+	gnutls_record_write.  
+
+2002-02-15 17:03  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, ciphersuites.tex, cover.tex.in,
+	errors.tex, ex1.tex, ex2.tex, gnutls.tex, layers.ps, layers.tex,
+	serv1.tex, srp1.tex:
+
+	Added TLS Layers section.  
+
+2002-02-15 11:34  nmav <nmav@gnutls.org>
+
+	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa, serv-gaa.c, serv.gaa:
+
+	updated client and server 
+
+2002-02-15 11:34  nmav <nmav@gnutls.org>
+
+	* doc/protocol/draft-ietf-tls-openpgp-keys-00.txt:
+
+	removed 
+
+2002-02-15 11:23  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_extensions.c, gnutls_extensions.h,
+	gnutls_record.c:
+
+	Extension types now use a 16 bit type field (following the current
+	draft).  Some fixes in the max record size extension.  
+
+2002-02-14 21:38  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Basic HKP keyserver support.  Function to retrieve the key from the
+	keyring by keyid, fingerprint.  
+
+2002-02-14 11:52  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_cert.c, x509_verify.c:
+
+	Verification function returns the GNUTLS_CERT_VALID flag.  
+
 2002-02-14 10:57  nmav <nmav@gnutls.org>
 
 	* lib/: auth_srp_passwd.c, gnutls_int.h, gnutls_srp.c, gnutls_ui.h:

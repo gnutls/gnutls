@@ -51,6 +51,7 @@ int resume;
 char *hostname=NULL;
 int port;
 int record_max_size;
+int fingerprint;
 
 int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[16] =
@@ -245,6 +246,9 @@ int main(int argc, char **argv)
 		gnutls_cred_set(state, GNUTLS_CRD_SRP, cred);
 		gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
 
+		/* send the fingerprint */
+		if (fingerprint!=0)
+			gnutls_openpgp_send_key( state, GNUTLS_OPENPGP_KEY_FINGERPRINT);
 
 		/* use the max record size extension */
 		if (record_max_size > 0) {
@@ -467,7 +471,8 @@ void gaa_parser(int argc, char **argv)
 	resume = info.resume;
 	port = info.port;
 	record_max_size = info.record_size;
-
+	fingerprint = info.fingerprint;
+	
 	if (info.nrest_args==0) hostname="localhost";
 	else hostname = info.rest_args[0];
 
