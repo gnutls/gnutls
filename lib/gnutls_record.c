@@ -808,9 +808,20 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
+#if 0			
 			/* even if data is unexpected put it into the buffer */
 			gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen);
 			/* no peeked data to clear since this packet was unexpected */
+#endif
+			/* We no longer assume this as normal, since
+			 * in this case we don't leave data into kernel
+			 * buffer, thus select() will not return.
+			 * Return an error for now, and we'll handle
+			 * it if there is a need for it.
+			 */
+			gnutls_assert();
+			gnutls_free(tmpdata);
+			return GNUTLS_E_UNEXPECTED_PACKET;
 
 			break;
 		case GNUTLS_HANDSHAKE:

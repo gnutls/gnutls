@@ -633,7 +633,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	if (ret <= 0) {
 		gnutls_assert();
 		gnutls_free(dataptr);
-		return ret;
+		return (ret < 0)?ret:GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 	if (ret != SSL2_HEADERS) {
 		gnutls_assert();
@@ -652,7 +652,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 		if (ret <= 0) {
 			gnutls_assert();
 			gnutls_free(dataptr);
-			return ret;
+			return (ret<0)?ret:GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 		if (ret != HANDSHAKE_HEADERS_SIZE - SSL2_HEADERS) {
 			gnutls_assert();
@@ -1429,7 +1429,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	if (ret <= 0) {
 		ERR("recv ChangeCipherSpec", ret);
 		gnutls_assert();
-		return ret;
+		return (ret<0)?ret:GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
 	/* Initialize the connection state (start encryption) - in case of server */
