@@ -12,6 +12,7 @@ Version ?.?.?
 - Removed the gdbm backend. Applications are now responsible for the
   session resuming backend. The gnutls-serv application contains an
   simple example on how to use gdbm for resuming.
+- Headers for the gnutls library are now installed in $(includedir)/gnutls
 
 Version 0.4.3 (23/05/2002)
 - The gnutls-extra library now compiles fine, if the opencdk library is
