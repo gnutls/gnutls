@@ -1,3 +1,18 @@
+2003-02-05 20:20  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/Makefile.am, lib/gnutls_int.h,
+	lib/gnutls_x509.c:
+
+	Added preliminary CRL support. This will be under the new X.509 API.
+	Other x509 functions will be updated later.  
+
+2003-02-05 07:56  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_dh_primes.c, gnutls_pk.c:
+
+	some fixes. There wasn't any limitation in libtasn1 code... just my
+	lazyness.  
+
 2003-02-03 17:41  nmav <nmav@gnutls.org>
 
 	* src/: prime-gaa.c, prime-gaa.h, prime.c, prime.gaa:
