@@ -19,7 +19,6 @@
  *
  */
 
-#include <libtasn1.h>
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
@@ -30,6 +29,7 @@
 #include <x509.h>
 #include <dn.h>
 #include <extensions.h>
+#include <libtasn1.h>
 
 /**
   * gnutls_x509_certificate_init - This function initializes a gnutls_crl structure
@@ -577,7 +577,7 @@ int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int*
   * error code.
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative 
   * name, or the type of alternative name if everything was ok. The type is 
-  * one of the enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
+  * one of the enumerated gnutls_x509_subject_alt_name.
   *
   * If the certificate does not have an Alternative name with the specified 
   * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -995,3 +995,4 @@ int gnutls_x509_certificate_check_revocation(gnutls_x509_certificate cert,
 	}
 	return 0;		/* not revoked. */
 }
+

@@ -1,32 +1,6 @@
 #ifndef GNUTLS_UI_H
 # define GNUTLS_UI_H
 
-
-/* Extra definitions */
-
-#define GNUTLS_X509_CN_SIZE 256
-#define GNUTLS_X509_C_SIZE 3
-#define GNUTLS_X509_O_SIZE 256
-#define GNUTLS_X509_OU_SIZE 256
-#define GNUTLS_X509_L_SIZE 256
-#define GNUTLS_X509_S_SIZE 256
-#define GNUTLS_X509_EMAIL_SIZE 256
-
-typedef struct {
-	char common_name[GNUTLS_X509_CN_SIZE];
-	char country[GNUTLS_X509_C_SIZE];
-	char organization[GNUTLS_X509_O_SIZE];
-	char organizational_unit_name[GNUTLS_X509_OU_SIZE];
-	char locality_name[GNUTLS_X509_L_SIZE];
-	char state_or_province_name[GNUTLS_X509_S_SIZE];
-	char email[GNUTLS_X509_EMAIL_SIZE];
-} gnutls_x509_dn;
-
-typedef struct {
-	char name[GNUTLS_X509_CN_SIZE];
-	char email[GNUTLS_X509_CN_SIZE];
-} gnutls_openpgp_name;	
-
 typedef enum gnutls_x509_subject_alt_name {
 	GNUTLS_SAN_DNSNAME=1, GNUTLS_SAN_RFC822NAME,
 	GNUTLS_SAN_URI, GNUTLS_SAN_IPADDRESS

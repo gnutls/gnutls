@@ -25,6 +25,7 @@
 #include <x509.h>
 #include <dn.h>
 #include <common.h>
+#include <gnutls/compat8.h>
 
 static int hostname_compare(const char *certname, const char *hostname);
 
@@ -43,8 +44,8 @@ static int hostname_compare(const char *certname, const char *hostname);
 int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
                                 const char *hostname)
 {
-
-   char dnsname[GNUTLS_X509_CN_SIZE];
+#define MAX_CN 256
+   char dnsname[MAX_CN];
    int dnsnamesize;
    int found_dnsname = 0;
    int ret = 0;
@@ -67,7 +68,7 @@ int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
     */
    for (i = 0; !(ret < 0); i++) {
 
-      dnsnamesize = GNUTLS_X509_CN_SIZE;
+      dnsnamesize = MAX_CN;
       ret =
           gnutls_x509_extract_certificate_subject_alt_name(cert, i,
                                                            dnsname,
@@ -154,7 +155,7 @@ int gnutls_x509_certificate_check_hostname(gnutls_x509_certificate cert,
                                 const char *hostname)
 {
 
-   char dnsname[GNUTLS_X509_CN_SIZE];
+   char dnsname[MAX_CN];
    int dnsnamesize;
    int found_dnsname = 0;
    int ret = 0;

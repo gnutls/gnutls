@@ -23,5 +23,4 @@ void _gnutls_print_state(gnutls_session session);
 void _gnutls_dump_mpi(char* prefix,MPI a);
 const char* _gnutls_packet2str( int packet);
 const char* _gnutls_handshake2str( int handshake);
-char* GET_CN( gnutls_datum);
 #endif

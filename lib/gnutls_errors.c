@@ -273,7 +273,6 @@ void _gnutls_log( const char *fmt, ...) {
  * be called. This may affect performance.
  */
 void _gnutls_null_log( void* x, ...) { return; }
-char* GET_CN( gnutls_datum x) { return NULL; }
 const char* _gnutls_handshake2str( int handshake) { return NULL; }
 char * _gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 	{ return NULL; }

@@ -61,12 +61,12 @@ void gnutls_global_set_log_function( GNUTLS_LOG_FUNC log_func) {
 }
 
 
+#ifdef DEBUG
 /* default logging function */
 static void dlog( const char* str) {
-#ifdef DEBUG
 	fputs( str, stderr);
-#endif
 }
+#endif
 
 extern gnutls_alloc_function gnutls_secure_malloc;
 extern gnutls_alloc_function gnutls_malloc;
@@ -176,7 +176,9 @@ int gnutls_global_init( void)
 	
 	/* set default recv/send functions
 	 */
+#ifdef DEBUG
 	gnutls_global_set_log_function( dlog);
+#endif
 
 	/* initialize parser 
 	 * This should not deal with files in the final

@@ -220,9 +220,10 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
   * @session: is a gnutls session
   * @list_size: is the length of the certificate list
   *
-  * This function will return the peer's raw certificate (list) as sent by the peer.
-  * These certificates are in raw format (DER encoded for X509). 
-  * In case of a X509 then a certificate list may be present. 
+  * This function will return the peer's raw certificate (list) as 
+  * sent by the peer.
+  * These certificates are in raw format (DER encoded for X.509). 
+  * In case of a X.509 then a certificate list may be present. 
   * The first certificate in the list is the peer's certificate,
   * following the issuer's certificate, then the issuer's issuer etc.
   * Returns NULL in case of an error, or if no certificate was sent.
@@ -267,7 +268,7 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
 
 typedef gnutls_mac_algorithm gnutls_digest_algorithm;
 /**
-  * gnutls_x509_fingerprint - This function calculates the fingerprint of the given data
+  * gnutls_fingerprint - This function calculates the fingerprint of the given data
   * @algo: is a digest algorithm
   * @data: is the data
   * @result: is the place where the result will be copied. 
@@ -280,7 +281,7 @@ typedef gnutls_mac_algorithm gnutls_digest_algorithm;
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size)
+int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size)
 {
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = _gnutls_hash_get_algo_len(algo);
