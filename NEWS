@@ -6,6 +6,7 @@ Version 1.0.17
 - Added some default limits in the verification of certificate
   chains, to avoid denial of service attacks. Also added 
   gnutls_certificate_set_verify_limits() to override them.
+- Added gnutls_certificate_verify_peers2().
 
 Version 1.0.16 (10/07/2004)
 - Do not free the SRP (prime and generator) parameters obtained from the 
