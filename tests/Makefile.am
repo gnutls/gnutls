@@ -24,8 +24,10 @@ LDADD = ../lib/libgnutls.la libutils.la
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
-TESTS = simple anonself
-check_PROGRAMS = $(TESTS)
+ctests = simple anonself
+TESTS = pkcs12_neon $(ctests)	
+check_PROGRAMS = $(ctests)
+dist_check_SCRIPTS = pkcs12_neon
 
 # LIBS=`../lib/libgnutls-config --libs`  -lgcrypt
 # LIBS2=`../lib/libgnutls-config --libs` `../libextra/libgnutls-extra-config --libs` -lgcrypt -lopencdk
