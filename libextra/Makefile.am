@@ -78,10 +78,10 @@ COBJECTS_EXTRA = gnutls_extra.c
 
 libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^gnutls.*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
-	$(LIBOPENCDK_LIBS) $(LZO_LIBS)
+	$(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS) \
-	$(PGP_COBJECTS) $(OPENCDK_COBJECTS) gnutls_extra.h
+libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS)	\
+	gnutls_extra.h
 
 libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
 
