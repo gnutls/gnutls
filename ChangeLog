@@ -1,3 +1,23 @@
+2004-04-18 19:41  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex-serv-srp.tex, doc/tex/programs.tex,
+	src/Makefile.am, NEWS, doc/TODO, doc/tex/ex-serv-srp.tex,
+	doc/tex/programs.tex, doc/tex/srp.tex, src/Makefile.am:
+
+	Renamed gnutls-srpcrypt to srptool 
+
+2004-04-18 12:20  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/auth_cert.c:
+
+	Corrected bug in OpenPGP key loading using a callback.  
+
+2004-04-18 12:11  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_cert.c:
+
+	Corrected bug in OpenPGP key loading using a callback.  
+
 2004-04-17 13:49  nmav <nmav@gnutls.org>
 
 	* NEWS (tags: gnutls_1_0_11), lib/gnutls_str.c (tags:
