@@ -111,7 +111,9 @@
 
 #ifdef USE_VA_COPY
 # ifndef HAVE_VA_COPY
-# define va_copy(x,y) __va_copy(x,y)
+# define VA_COPY __va_copy
+# else
+# define VA_COPY va_copy
 # endif
 #endif
 

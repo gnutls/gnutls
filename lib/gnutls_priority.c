@@ -45,7 +45,7 @@ int gnutls_set_cipher_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	va_start( ap, state);
 
 #ifdef USE_VA_COPY
-	va_copy( _ap, ap);
+	VA_COPY( _ap, ap);
 #else
 	_ap = ap;
 #endif
@@ -92,7 +92,7 @@ int gnutls_set_kx_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	va_start( ap, state);
 
 #ifdef USE_VA_COPY
-	va_copy( _ap, ap);
+	VA_COPY( _ap, ap);
 #else
 	_ap = ap;
 #endif
@@ -137,7 +137,7 @@ int gnutls_set_mac_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	va_start( ap, state);
 
 #ifdef USE_VA_COPY
-	va_copy( _ap, ap);
+	VA_COPY( _ap, ap);
 #else
 	_ap = ap;
 #endif
@@ -182,7 +182,7 @@ int gnutls_set_compression_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	va_start( ap, state);
 
 #ifdef USE_VA_COPY
-	va_copy( _ap, ap);
+	VA_COPY( _ap, ap);
 #else
 	_ap = ap;
 #endif
@@ -226,7 +226,7 @@ int gnutls_set_protocol_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	va_start( ap, state);
 
 #ifdef USE_VA_COPY
-	va_copy( _ap, ap);
+	VA_COPY( _ap, ap);
 #else
 	_ap = ap;
 #endif
