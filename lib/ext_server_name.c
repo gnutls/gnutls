@@ -193,7 +193,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   * @data: will hold the data
   * @data_length: will hold the data length. Must hold the maximum size of data.
   * @type: will hold the server name indicator type
-  * @index: is the index of the server_name
+  * @indx: is the index of the server_name
   *
   * This function will allow you to get the name indication (if any),
   * a client has sent. The name indication may be any of the enumeration
@@ -213,7 +213,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   **/
 int gnutls_server_name_get(gnutls_session session, void *data,
 			   int *data_length,
-			   int * type, int index)
+			   int * type, int indx)
 {
    char *_data = data;
    
@@ -222,23 +222,23 @@ int gnutls_server_name_get(gnutls_session session, void *data,
       return GNUTLS_E_INVALID_REQUEST;
    }
 
-   if (index >
+   if (indx >
        session->security_parameters.extensions.server_names_size - 1) {
       gnutls_assert();
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
    }
 
    *type =
-       session->security_parameters.extensions.server_names[index].type;
+       session->security_parameters.extensions.server_names[indx].type;
 
    if (*data_length > /* greater since we need one extra byte for the null */
-       session->security_parameters.extensions.server_names[index].
+       session->security_parameters.extensions.server_names[indx].
        name_length) {
       *data_length =
-	  session->security_parameters.extensions.server_names[index].
+	  session->security_parameters.extensions.server_names[indx].
 	  name_length;
       memcpy(data,
-	     session->security_parameters.extensions.server_names[index].
+	     session->security_parameters.extensions.server_names[indx].
 	     name, *data_length);
 
       if (*type == GNUTLS_NAME_DNS)	/* null terminate */
@@ -246,7 +246,7 @@ int gnutls_server_name_get(gnutls_session session, void *data,
 
    } else {
       *data_length =
-	  session->security_parameters.extensions.server_names[index].
+	  session->security_parameters.extensions.server_names[indx].
 	  name_length;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
    }

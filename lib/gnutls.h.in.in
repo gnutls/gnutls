@@ -220,7 +220,7 @@ typedef enum gnutls_server_name_type { GNUTLS_NAME_DNS=1
 } gnutls_server_name_type;
 
 int gnutls_get_server_name(gnutls_session session, void* data, int* data_length,
-				       int *type, int index);
+				       int *type, int indx);
 
 int gnutls_set_server_name(gnutls_session session,
 			       gnutls_server_name_type type,
