@@ -1,3 +1,9 @@
+2004-06-16 13:22  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_pk.c, gnutls_pk.c:
+
+	Corrected bug in PKCS #1 encryption.  
+
 2004-06-13 21:32  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/TODO, doc/tex/auth.tex,
