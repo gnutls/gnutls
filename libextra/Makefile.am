@@ -72,7 +72,7 @@ libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
 libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS) \
 	$(PGP_COBJECTS) $(OPENCDK_COBJECTS)
 
-libgnutls_extra_la_LIBADD = ../lib/libgnutls.la
+libgnutls_extra_la_LIBADD = ../lib/libgnutls.la ../gl/libgnu.la
 
 
 gnutls-extra-api.texi: $(COBJECTS_EXTRA)

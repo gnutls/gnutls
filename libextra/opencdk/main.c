@@ -336,15 +336,7 @@ _cdk_log_debug (const char *fmt, ...)
     va_end (arg);
 }
 
-
-#ifndef HAVE_PWD_H
-char *
-getpass (const char * prompt)
-{
-    return NULL; /* fixme */
-}
-#endif
-
+#include <getpass.h>
 
 char *
 _cdk_passphrase_get( cdk_ctx_t hd, const char * prompt )
