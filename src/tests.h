@@ -1,5 +1,5 @@
 #define SUCCEED 1
-#define FAILED 0
+#define GFAILED 0
 #define UNSURE -1
 
 int test_srp( gnutls_session state);

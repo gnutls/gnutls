@@ -1,3 +1,14 @@
+#{
+
+/* C declarations */
+
+#include <config.h>
+#ifdef _WIN32
+# include <windows.h>
+#endif
+
+#}
+
 helpnode "GNU TLS debug client\nUsage: gnutls-cli-debug [options] hostname\n\n"
 
 #int pp;

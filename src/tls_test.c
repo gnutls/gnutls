@@ -240,7 +240,7 @@ int main(int argc, char **argv)
 			printf(" %s\n", tls_tests[i].suc_str);
 			if (i==0) tls1_ok = 1;
 			if (i==1) ssl3_ok = 1;
-		} else if (ret==FAILED)
+		} else if (ret==GFAILED)
 			printf(" %s\n", tls_tests[i].fail_str);
 		else printf(" %s\n", tls_tests[i].unsure_str);
 
