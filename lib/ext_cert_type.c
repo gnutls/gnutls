@@ -111,6 +111,17 @@ int _gnutls_cert_type_send_params( GNUTLS_STATE state, opaque** data) {
 		if (state->gnutls_internals.cert_type_priority.algorithms > 0) {
 			
 			len = state->gnutls_internals.cert_type_priority.algorithms;
+
+			if (len==1 && 
+				state->gnutls_internals.cert_type_priority.algorithm_priority[0]==GNUTLS_CRT_X509) 
+					{
+			/* We don't use this extension if X.509 certificates
+			 * are used.
+			 */
+				*data=NULL;
+				return 0;
+			}
+			
 			(*data) = gnutls_malloc(len);
 			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
 			
