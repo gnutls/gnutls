@@ -71,8 +71,9 @@ AC_ARG_ENABLE(profile-mode,
 opt_profiler_mode=$enableval)
 AC_MSG_RESULT($opt_profiler_mode)
 
-
 AC_PROG_CC
+
+AC_PROG_YACC
 
 AC_TYPE_SIZE_T
 

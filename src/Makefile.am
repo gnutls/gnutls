@@ -1,6 +1,9 @@
-EXTRA_DIST = port.h prime.gaa crypt.gaa crypt-gaa.h README.crypt prime-gaa.h README tpasswd tpasswd.conf
+EXTRA_DIST = port.h prime.gaa crypt.gaa crypt-gaa.h README.crypt prime-gaa.h \
+		README tpasswd tpasswd.conf Certificate.txt
+
 INCLUDES = -I../lib
-noinst_PROGRAMS = serv cli crypt prime
+
+noinst_PROGRAMS = serv cli crypt prime CertificateExample
 serv_SOURCES = serv.c
 serv_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 crypt_SOURCES = crypt-gaa.c crypt.c
@@ -9,6 +12,10 @@ prime_SOURCES = prime-gaa.c prime.c
 prime_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 cli_SOURCES = cli.c
 cli_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+
+CertificateExample_SOURCES = CertificateExample.c
+CertificateExample_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+
 
 crypt-gaa.c: crypt.gaa
 	gaa crypt.gaa -o crypt-gaa.c -i crypt-gaa.h
