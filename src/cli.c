@@ -145,10 +145,10 @@ static gnutls_session init_tls_session( const char* hostname)
 
    gnutls_dh_set_prime_bits(session, 512);
 
-   gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
+   gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
    if (srp_username != NULL)
-      gnutls_cred_set(session, GNUTLS_CRD_SRP, cred);
-   gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+      gnutls_credentials_set(session, GNUTLS_CRD_SRP, cred);
+   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
    /* send the fingerprint */
    if (fingerprint != 0)

@@ -159,7 +159,7 @@ int test_srp( gnutls_session session) {
 		ADD_ALL_MACS(session);
 
 		ADD_KX(session, GNUTLS_KX_SRP);
-		gnutls_cred_set(session, GNUTLS_CRD_SRP, srp_cred);
+		gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 
 		return do_handshake( session);
 }
@@ -172,7 +172,7 @@ int test_export( gnutls_session session) {
 		ADD_ALL_MACS(session);
 
 		ADD_KX(session, GNUTLS_KX_RSA_EXPORT);
-		gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 		return do_handshake( session);
 }
@@ -185,7 +185,7 @@ int test_dhe( gnutls_session session) {
 		ADD_ALL_MACS(session);
 
 		ADD_KX2(session, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS);
-		gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 		return do_handshake( session);
 }
@@ -198,7 +198,7 @@ int ret;
 	ADD_PROTOCOL(session, GNUTLS_SSL3);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	if (ret==SUCCEED) ssl3_ok = 1;
@@ -222,7 +222,7 @@ int old;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	if (ret==FAILED) return ret;
@@ -255,7 +255,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	return ret;
@@ -269,7 +269,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	if (ret==FAILED) return ret;
@@ -289,7 +289,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	return ret;
@@ -303,7 +303,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_MAC(session, GNUTLS_MAC_MD5);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	return ret;
@@ -317,7 +317,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_MAC(session, GNUTLS_MAC_SHA);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	return ret;
@@ -331,7 +331,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	return ret;
@@ -345,7 +345,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	return ret;
@@ -359,7 +359,7 @@ int ret;
 	ADD_PROTOCOL(session, GNUTLS_TLS1);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	if (ret==SUCCEED) tls1_ok = 1;
@@ -376,7 +376,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	if (ret==FAILED) {
@@ -404,7 +404,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_KX(session, GNUTLS_KX_RSA);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	if (ret < 0) return FAILED;
@@ -421,7 +421,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	gnutls_record_set_max_size( session, 512);
 
 	ret = do_handshake( session);
@@ -441,14 +441,14 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	gnutls_record_set_max_size( session, 512);
 
 	ret = do_handshake( session);
 	return ret;
 }
 
-void _gnutls_record_set_default_version(gnutls_session session, GNUTLS_Version version);
+void _gnutls_record_set_default_version(gnutls_session session, gnutls_protocol_version version);
 
 int test_version_rollback( gnutls_session session) {
 int ret;
@@ -466,7 +466,7 @@ int ret;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	_gnutls_record_set_default_version( session, GNUTLS_SSL3);
 
 	ret = do_handshake( session);
@@ -486,7 +486,7 @@ int test_anonymous( gnutls_session session) {
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_KX(session, GNUTLS_KX_ANON_DH);
-	gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
 
 	return do_handshake( session);
 
@@ -506,7 +506,7 @@ int tmp_session_id_size;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
-	gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
+	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
 
 	gnutls_session_set_data(session, session_data, session_data_size);
 
@@ -538,7 +538,7 @@ int ret;
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
 
-	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
 	if (ret < 0) return FAILED;

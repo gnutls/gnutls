@@ -592,7 +592,7 @@ int main(int argc, char **argv)
    }
 
 
-   gnutls_anon_allocate_server_cred(&dh_cred);
+   gnutls_anon_allocate_server_credentials(&dh_cred);
    if (generate != 0)
       gnutls_anon_set_server_dh_params(dh_cred, dh_params);
 
