@@ -83,8 +83,8 @@ int err;
 				else
 					err = deflateEnd( handle->handle);
 				break;
-		}
 #endif
+		}
 		gnutls_free( handle->handle);
 		gnutls_free( handle);
 
