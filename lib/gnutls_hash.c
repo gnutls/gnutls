@@ -71,14 +71,19 @@ int gnutls_hash(GNUTLS_HASH_HANDLE handle, void* text, int textlen) {
 }
 
 void* gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle) {
-void* mac;
+char* mac;
 int maclen;
+char* ret;
 
     maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle));
+    ret = gnutls_malloc(maclen);
+    
+    gcry_md_final(handle);
     mac = gcry_md_read(handle,0);
+    memmove( ret, mac, maclen);
     gcry_md_close(handle);
     
-    return mac;
+    return ret;
 }
 
 
@@ -134,13 +139,18 @@ int gnutls_hmac(GNUTLS_MAC_HANDLE handle, void* text, int textlen) {
 }
 
 void* gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle) {
-void* mac;
+char* mac;
 int maclen;
+char* ret;
 
     maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle));
+    ret = gnutls_malloc( maclen);
+    
+    gcry_md_final(handle);
     mac = gcry_md_read(handle,0);
+    memmove( ret, mac, maclen);
     gcry_md_close(handle);
     
-    return mac;
+    return ret;
 }
 
