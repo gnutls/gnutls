@@ -2,19 +2,23 @@
 
 Authentication using the SRP\footnote{SRP stands for Secure Remote Password and 
 is described in \cite{RFC2945}. The SRP key exchange is not a part of the \tlsI{} protocol}
-protocol is actually password authentication, since the two peers are identified by the knowledge of a password.
-This protocol also offers protection against off-line attacks, such as password 
-file stealing. 
-This is achieved since SRP does not use the plain password to perform authentication, 
-but something called a verifier, which is calculated using the user's password.
-\par The advantage of SRP authentication, over other proposed secure password 
+protocol is actually password authentication. The two peers can be identified using a
+single password, or there can be combinations where the client is 
+authenticated using SRP and the server using a certificate.
+\par
+The advantage of SRP authentication, over other proposed secure password 
 authentication schemas, is that SRP does not require the server to hold
 the user's password. This kind of protection is similar to the one used traditionally
 in the \emph{UNIX} ``passwd'' file, where the contents of this file did not cause
 harm to the system security if they were revealed.
+The SRP holds instead of the plain password something called a verifier, 
+which is calculated using the user's password, and if stolen cannot
+be used to impersonate the user. See \cite{TOMSRP} for a detailed description
+of the SRP protocol, and for the Stanford SRP libraries.
+
 \par
 The implementation in \gnutls{} is based on paper \cite{TLSSRP}.
-Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp}.
+The available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp}.
 
 \begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
@@ -40,7 +44,7 @@ authenticated using a certificate with RSA parameters.
 
 The default behaviour of \gnutls{} is to read the usernames and
 SRP verifiers from password files. These password files are the ones used
-by \emph{libsrp} and can be specified using the
+by the \emph{srp libraries} and can be specified using the
 \printfunc{gnutls_srp_set_server_credentials_file}{gnutls\_srp\_set\_server\_credentials\_file}.
 If a different password file format is to be used, then the 
 function \printfunc{gnutls_srp_set_server_credentials_function}{gnutls\_srp\_set\_server\_credentials\_function},

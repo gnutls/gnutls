@@ -10,19 +10,21 @@ eavesdropping, tampering, or message forgery.
 \par
 Technically \gnutls{} is a portable ANSI {\bf C} based library which implements the 
 \tlsI{}\footnote{See section \ref{sec:tlsintro} on page \pageref{sec:tlsintro} for
-a more detailed description of the protocols.} and \sslIII{} protocols. 
+a more detailed description of the protocols.} and \sslIII{} protocols,
+accompanied with the required framework for authentication and
+public key infrastructure.
 The library is available under the GNU Lesser GPL license\footnote{A copy of the license is included
 in the distribution}.
 Important features of the \gnutls{} library include:
 
 \begin{itemize}
-\item Thread safety
 \item Support for both \tlsI{} and \sslIII{} protocols.
 \item Support for both {\bf X.509} and {\bf OpenPGP} certificates.
 \item Support for handling and verification of certificates.
 \item Support for {\bf SRP} for \tls{} authentication.
 \item Support for \tls{} {\bf Extension mechanism}.
 \item Support for \tls{} {\bf Compression Methods}.
+\item Thread safety
 \end{itemize}
 
 Additionaly \gnutls{} provides a limited emulation API for the widely used
@@ -49,12 +51,6 @@ library.
 In order to ease integration in embedded systems, parts of the \gnutls{} library 
 can be disabled at compile time. That way a small library, with the required features,
 can be generated.
-
-\par
-See \htmladdnormallink{http://www.gnutls.org/}{http://www.gnutls.org/}
-and \htmladdnormallink{http://www.gnu.org/software/gnutls/}{http://www.gnu.org/software/gnutls/} 
-for updated versions of the \gnutls{} software and this document.
-
 
 \section{General Idea}
 % explain how it works

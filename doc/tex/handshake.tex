@@ -1,10 +1,11 @@
 \section{The TLS handshake protocol\index{TLS protocols!Handshake}}
 \label{handshake}
 
-The Handshake protocol is fully controlled by application layer (your 
-program). Within this protocol the parameters for cipher suites, supported
-authentication methods etc. are negotiated. Thus the application layer
-has to set up the required parameters for the connection.
+The Handshake protocol is responsible for the ciphersuite negotiation,
+the initial key exchange, and the authentication of the two peers.
+This is fully controlled by the application layer, thus your program
+has to set up the required parameters. Available functions to control
+the handshake protocol include:
 
 \begin{itemize}
 \item \printfunc{gnutls_cipher_set_priority}{gnutls\_cipher\_set\_priority}:
