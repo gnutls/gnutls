@@ -2,11 +2,12 @@
 
 Network Working Group                                      S. Hollenbeck
 Internet-Draft                                            VeriSign, Inc.
-Expires: March 6, 2003                                 September 5, 2002
+Updates: 2246 (if approved)                           September 20, 2002
+Expires: March 21, 2003
 
 
          Transport Layer Security Protocol Compression Methods
-                     draft-ietf-tls-compression-00.txt
+                   draft-ietf-tls-compression-01.txt
 
 Status of this Memo
 
@@ -29,7 +30,7 @@ Status of this Memo
    The list of Internet-Draft Shadow Directories can be accessed at
    http://www.ietf.org/shadow.html.
 
-   This Internet-Draft will expire on March 6, 2003.
+   This Internet-Draft will expire on March 21, 2003.
 
 Copyright Notice
 
@@ -51,8 +52,7 @@ Conventions Used In This Document
 
 
 
-
-Hollenbeck               Expires March 6, 2003                  [Page 1]
+Hollenbeck               Expires March 21, 2003                 [Page 1]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -108,7 +108,7 @@ Table of Contents
 
 
 
-Hollenbeck               Expires March 6, 2003                  [Page 2]
+Hollenbeck               Expires March 21, 2003                 [Page 2]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -164,7 +164,7 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 6, 2003                  [Page 3]
+Hollenbeck               Expires March 21, 2003                 [Page 3]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -197,30 +197,30 @@ Internet-Draft          TLS Compression Methods           September 2002
    allocation of compression method identifiers is described in Section
    5.
 
-   In addition, this definition is updated to include assignment of
-   three additional compression methods:
+   In addition, this definition is updated to include assignment of two
+   additional compression methods:
 
-   enum { null(0), ZLIB(1), LZS(2), RLE(3), (255) } CompressionMethod;
+   enum { null(0), ZLIB(1), LZS(2), (255) } CompressionMethod;
 
-   The ZLIB compression method is described in RFC 1950 [5].  The Lempel
-   Zif Stac (LZS) compression method is described in ANSI publication
-   X3-241 [6].  The Run Length Encoding (RLE) compression method is
-   described in part 5 of the Digital Imaging and Communications in
-   Medicine standard [7].
+   The ZLIB compression method is described in RFC 1950 [5] and RFC 1951
+   [6].  The Lempel Zif Stac (LZS) compression method is described in
+   ANSI publication X3.241 [7].
 
-
-
-
-
-
-
-
-
+   As described in section 6 of RFC 2246, TLS is a stateful protocol.
+   Compression methods used with TLS can be either stateful (the
+   compressor maintains it's state through all compressed records) or
+   stateless (the compressor compresses each record independently), but
+   there seems to be little known benefit in using a stateless
+   compression method within TLS.  Compression methods SHOULD be
+   stateful to take advantage of the state management features offered
+   by TLS.
 
 
 
 
-Hollenbeck               Expires March 6, 2003                  [Page 4]
+
+
+Hollenbeck               Expires March 21, 2003                 [Page 4]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -231,7 +231,8 @@ Internet-Draft          TLS Compression Methods           September 2002
    intellectual property rights claims.  Implementers are encouraged to
    seek legal guidance to better understand the implications of
    developing implementations of the compression methods described in
-   this document.
+   this document or other documents that describe compression methods
+   for use with TLS.
 
 
 
@@ -275,8 +276,7 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-
-Hollenbeck               Expires March 6, 2003                  [Page 5]
+Hollenbeck               Expires March 21, 2003                 [Page 5]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -332,7 +332,7 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 6, 2003                  [Page 6]
+Hollenbeck               Expires March 21, 2003                 [Page 6]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -388,7 +388,7 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-Hollenbeck               Expires March 6, 2003                  [Page 7]
+Hollenbeck               Expires March 21, 2003                 [Page 7]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -396,14 +396,20 @@ Internet-Draft          TLS Compression Methods           September 2002
 6. Security Considerations
 
    This document does not introduce any topics that alter the threat
-   model addressed by TLS.  However, data compression prior to
-   encryption can potentially provide a security benefit in "flattening"
-   the distribution of unencrypted octets (or increasing the unicity
-   distance) by using fewer bits to represent common characters.  In
-   situations where the unencrypted octets represent human-readable
-   text, reducing the predictability of text patterns can make it
-   slightly more difficult to mount a successful attack on the encrypted
-   octets.
+   model addressed by TLS.  The security considerations described
+   throughout RFC 2246 [2] apply here as well.
+
+   Data compression prior to encryption typically "flattens" the
+   distribution of unencrypted octets (or very slightly increases the
+   unicity distance) by using fewer bits to represent common characters.
+   An increase in unicity distance typically indicates an increase in
+   the amount of work required of an attacker to recover the original
+   plaintext.  However, compression methods often require a structured
+   header at the beginning of the compressed data stream, giving an
+   attacker a target for testing keys in a brute force search.
+   Compression can thus decrease and not increase the security of
+   encryption if an attacker has little prior knowledge of the original
+   plaintext.
 
 
 
@@ -438,13 +444,7 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-
-
-
-
-
-
-Hollenbeck               Expires March 6, 2003                  [Page 8]
+Hollenbeck               Expires March 21, 2003                 [Page 8]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -454,7 +454,10 @@ Internet-Draft          TLS Compression Methods           September 2002
    The concepts described in this document were originally discussed on
    the IETF TLS working group mailing list in December, 2000.  The
    author acknowledges the contributions to that discussion provided by
-   Jeffrey Altman, Eric Rescorla, and Marc Van Heyningen.
+   Jeffrey Altman, Eric Rescorla, and Marc Van Heyningen.  Later
+   suggestions that have been incorporated into this document were
+   provided by Tim Dierks, Pasi Eronen, Peter Gutmann, Nikos
+   Mavroyanopoulos, and Bodo Moeller.
 
 
 
@@ -497,10 +500,7 @@ Internet-Draft          TLS Compression Methods           September 2002
 
 
 
-
-
-
-Hollenbeck               Expires March 6, 2003                  [Page 9]
+Hollenbeck               Expires March 21, 2003                 [Page 9]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -556,7 +556,7 @@ Normative References
 
 
 
-Hollenbeck               Expires March 6, 2003                 [Page 10]
+Hollenbeck               Expires March 21, 2003                [Page 10]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -570,14 +570,12 @@ Informative References
    [5]  Deutsch, L. and J-L. Gailly, "ZLIB Compressed Data Format
         Specification version 3.3", RFC 1950, May 1996.
 
-   [6]  American National Standards Institute, "Data Compression Method,
+   [6]  Deutsch, P., "DEFLATE Compressed Data Format Specification
+        version 1.3", RFC 1951, May 1996.
+
+   [7]  American National Standards Institute, "Data Compression Method,
         Adaptive Coding with Sliding Window of Information Interchange",
         ANSI X3.241, 1994.
-
-   [7]  National Electrical Manufacturers Association, "Digital Imaging
-        and Communications in Medicine (DICOM) Part 5: Data Structures
-        and Encoding", 2001, <http://medical.nema.org/dicom/2001/
-        01_05PU.PDF>.
 
 
 Author's Address
@@ -612,7 +610,9 @@ Author's Address
 
 
 
-Hollenbeck               Expires March 6, 2003                 [Page 11]
+
+
+Hollenbeck               Expires March 21, 2003                [Page 11]
 
 Internet-Draft          TLS Compression Methods           September 2002
 
@@ -668,4 +668,4 @@ Acknowledgement
 
 
 
-Hollenbeck               Expires March 6, 2003                 [Page 12]
+Hollenbeck               Expires March 21, 2003                [Page 12]
