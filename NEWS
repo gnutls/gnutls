@@ -1,3 +1,7 @@
+Version 0.8.9
+- Corrected a null pointer dereference in gnutls_certificate_get_ours(). 
+  Report and Patch by Steve Langasek <vorlon@netexpress.net>.
+
 Version 0.8.8 (10/06/2003)
 - Corrected a bug in the record layer buffering, which affected
   the case where external pull function was used. Report and patch
