@@ -1,3 +1,35 @@
+2003-12-19 13:53  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cert.h:
+
+	Corrected a bug in the GNUTLS_KEY key usage definitions.  
+
+2003-12-19 13:53  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cert.h, src/certtool.c, src/tests.c,
+	src/tests.h, src/tls_test.c:
+
+	Added gnutls_x509_crt_set_key_usage() and certtool can now set the 
+	certificate's key usage.  
+
+2003-12-19 11:48  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, auth.tex, cert_auth.tex, certificate.tex,
+	ciphers.tex, ciphersuites.tex, compression.tex, handshake.tex,
+	openpgp.tex, preparation.tex, record_weaknesses.tex,
+	tls_extensions.tex, x509.tex:
+
+	some updated in documentation 
+
+2003-12-19 08:47  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_int.h, lib/gnutls_record.c, src/cli.c,
+	lib/auth_cert.c, lib/gnutls_int.h, lib/gnutls_record.c, src/cli.c,
+	src/serv.c:
+
+	Corrected bug in gnutls_bye() which made it return an error code of
+	INVALID_REQUEST instead of success.  
+
 2003-12-18 14:19  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in (utags: gnutls_1_0_2):
