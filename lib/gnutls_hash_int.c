@@ -125,7 +125,7 @@ void *gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle)
 }
 
 
-GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, char *key,
+GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, void *key,
 				   int keylen)
 {
 	GNUTLS_MAC_HANDLE ret =
@@ -232,11 +232,11 @@ void *gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle)
 	return ret;
 }
 
-GNUTLS_MAC_HANDLE gnutls_hash_init_ssl3(MACAlgorithm algorithm, char *key,
+GNUTLS_MAC_HANDLE gnutls_hash_init_ssl3(MACAlgorithm algorithm, void *key,
 					int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;
-	char *ipad;
+	char ipad[48];
 	char *digest;
 	int padsize;
 
@@ -251,7 +251,6 @@ GNUTLS_MAC_HANDLE gnutls_hash_init_ssl3(MACAlgorithm algorithm, char *key,
 		padsize = 0;
 	}
 	if (padsize>0) {
-		ipad = gnutls_malloc(padsize);
 		memset(ipad, 0x36, padsize);
 	}
 	ret = gnutls_hash_init(algorithm);
@@ -259,10 +258,9 @@ GNUTLS_MAC_HANDLE gnutls_hash_init_ssl3(MACAlgorithm algorithm, char *key,
 		ret->key = key;
 		ret->keysize = keylen;
 
-		if (keylen>0) gnutls_hash(ret, key, keylen);
+		if (keylen > 0) gnutls_hash(ret, key, keylen);
 		gnutls_hash(ret, ipad, padsize);
 	}
-	if (padsize>0) gnutls_free(ipad);
 
 	return ret;
 }
@@ -271,8 +269,9 @@ void *gnutls_hash_deinit_ssl3(GNUTLS_MAC_HANDLE handle)
 {
 	void *ret=NULL;
 	GNUTLS_MAC_HANDLE td;
-	char *opad;
+	char opad[48];
 	int padsize;
+	int block;
 	
 	switch (handle->algorithm) {
 	case GNUTLS_MAC_MD5:
@@ -285,22 +284,20 @@ void *gnutls_hash_deinit_ssl3(GNUTLS_MAC_HANDLE handle)
 		padsize=0;
 	}
 	if (padsize>0) {
-		opad = gnutls_malloc(padsize);
 		memset(opad, 0x5C, padsize);
 	}
 
 	td = gnutls_hash_init(handle->algorithm);
 	if (td!=GNUTLS_MAC_FAILED) {
-		if (handle->keysize) gnutls_hash(td, handle->key, handle->keysize);
+		if (handle->keysize > 0) gnutls_hash(td, handle->key, handle->keysize);
 
 		gnutls_hash(td, opad, padsize);
-		gnutls_free(opad);
-
+		block = gnutls_hmac_get_algo_len(handle->algorithm);
 		ret = gnutls_hash_deinit(handle);	/* get the previous hash */
-		gnutls_hash(td, ret, gnutls_hmac_get_algo_len(handle->algorithm));
+		gnutls_hash(td, ret, block);
 		gnutls_free(ret);
 
-		ret = gnutls_hash_deinit(handle);
+		ret = gnutls_hash_deinit(td);
 	}
 	return ret;
 }
@@ -335,7 +332,6 @@ static void *ssl3_md5(int i, char *secret, int secret_len, char *random,
 
 	digest = ssl3_sha(i, secret, secret_len, random, random_len);
 
-	gnutls_hash(td, secret, secret_len);
 	gnutls_hash(td, digest, gnutls_hash_get_algo_len(GNUTLS_MAC_SHA));
 	gnutls_free(digest);
 
@@ -348,18 +344,21 @@ void *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
 {
 	int size = 0, i = 0;
 	char *digest;
-	char *ret = gnutls_malloc(bytes);
-	int block = gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
+	char *ret = secure_malloc(bytes);
+	int block = gnutls_hash_get_algo_len(GNUTLS_MAC_MD5);
 
 	while (size < bytes) {
+
 		digest =
 		    ssl3_md5(i, secret, secret_len, random, random_len);
 
-
 		size += block;
+			
 		memmove(&ret[size - block], digest,
-			size > bytes ? (block - bytes % block) : block);
+			size > bytes ? (block - (bytes % block)) : block);
+		gnutls_free(digest);
 		i++;
 	}
 
+	return ret;
 }

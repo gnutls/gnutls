@@ -76,6 +76,10 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->cipher_specs.client_write_key = NULL;
 
 	(*state)->gnutls_internals.buffer = NULL;
+	/* SSL3 stuff */
+	(*state)->gnutls_internals.client_hash_buffer = NULL;
+	(*state)->gnutls_internals.server_hash_buffer = NULL;
+	
 	(*state)->gnutls_internals.buffer_handshake = NULL;
 	(*state)->gnutls_internals.client_md_md5 = NULL;
 	(*state)->gnutls_internals.client_md_sha1 = NULL;
@@ -275,9 +279,14 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	memmove(random, state->security_parameters.server_random, 32);
 	memmove(&random[32], state->security_parameters.client_random, 32);
 
-	key_block =
-	    gnutls_PRF( state->security_parameters.master_secret, 48,
-		       keyexp, strlen(keyexp), random, 64, 2 * hash_size + 2 * key_size + 2 * IV_size);
+	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3 */
+		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, 48, random, 64,
+			2 * hash_size + 2 * key_size + 2 * IV_size);
+	} else { /* TLS 1.0 */
+		key_block =
+		    gnutls_PRF( state->security_parameters.master_secret, 48,
+			       keyexp, strlen(keyexp), random, 64, 2 * hash_size + 2 * key_size + 2 * IV_size);
+	}
 
 	state->cipher_specs.client_write_mac_secret = secure_malloc(hash_size);
 	memmove(state->cipher_specs.client_write_mac_secret, &key_block[0], hash_size);

@@ -2,7 +2,7 @@
 
 #define GNUTLS_INT_H
 
-#define HARD_DEBUG
+//#define HARD_DEBUG
 //#define READ_DEBUG
 //#define WRITE_DEBUG
 #define DEBUG
@@ -82,7 +82,7 @@ typedef struct {
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
-enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_DES=3, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
+enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
@@ -178,6 +178,10 @@ typedef struct {
 typedef struct {
 	char*			buffer;
 	uint32			bufferSize;
+	char*			client_hash_buffer; /* used in SSL3 */
+	uint32			client_hash_bufferSize; /* used in SSL3 */
+	char*			server_hash_buffer; /* used in SSL3 */
+	uint32			server_hash_bufferSize; /* used in SSL3 */
 	char*			buffer_handshake;
 	uint32			bufferSize_handshake;
 	ResumableSession	resumable; /* TRUE or FALSE */
@@ -205,9 +209,8 @@ typedef struct {
 	int				certificate_requested; /* non zero if client certificate was requested */
 	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
 	BulkCipherAlgorithm_Priority	BulkCipherAlgorithmPriority;
-	MACAlgorithm_Priority	MACAlgorithmPriority;
-	KXAlgorithm_Priority	KXAlgorithmPriority;
-	
+	MACAlgorithm_Priority		MACAlgorithmPriority;
+	KXAlgorithm_Priority		KXAlgorithmPriority;
 } GNUTLS_INTERNALS;
 
 typedef struct {

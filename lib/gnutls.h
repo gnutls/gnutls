@@ -20,7 +20,7 @@
 
 enum ContentType { GNUTLS_APPLICATION_DATA=23 };
 typedef enum ContentType ContentType;
-enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_DES=3, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
+enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
 typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 typedef enum KXAlgorithm KXAlgorithm;

@@ -207,14 +207,14 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	}
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-	master =
-	    gnutls_ssl3_generate_random( premaster, premaster_size,
-		       random, 64, 48);
+		master =
+		    gnutls_ssl3_generate_random( premaster, premaster_size,
+			       random, 64, 48);
 	} else {
-	master =
-	    gnutls_PRF( premaster, premaster_size,
-		       MASTER_SECRET, strlen(MASTER_SECRET), random, 64,
-		       48);
+		master =
+		    gnutls_PRF( premaster, premaster_size,
+			       MASTER_SECRET, strlen(MASTER_SECRET), random, 64,
+			       48);
 	}
 	secure_free(premaster);
 #ifdef HARD_DEBUG
@@ -379,6 +379,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	uint16 n_Y;
 	size_t _n_Y;
 	uint8 *data;
+	int i;
 	int datasize;
 	int ret = 0;
 	uint8 *premaster = NULL;
@@ -454,16 +455,24 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 		}
 	}
 
+#ifdef HARD_DEBUG
+		fprintf(stderr, "PREMASTER SECRET: ");
+		for (i=0;i<premaster_size;i++) fprintf(stderr, "%x",premaster[i]);
+		fprintf(stderr, "\n");
+#endif
+
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-	master =
-	    gnutls_ssl3_generate_random( premaster, premaster_size,
-		       random, 64, 48); secure_free(premaster);
+		master =
+		    gnutls_ssl3_generate_random( premaster, premaster_size,
+			       random, 64, 48);
+
 	} else {
-	master =
-	    gnutls_PRF( premaster, premaster_size,
-		       MASTER_SECRET, strlen(MASTER_SECRET),
-		       random, 64, 48); secure_free(premaster);	
+		master =
+		    gnutls_PRF( premaster, premaster_size,
+			       MASTER_SECRET, strlen(MASTER_SECRET),
+			       random, 64, 48); 
 	}
+	secure_free(premaster);
 #ifdef HARD_DEBUG
 	fprintf(stderr, "master secret: %s\n", _gnutls_bin2hex(master, 48));
 #endif

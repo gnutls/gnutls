@@ -413,7 +413,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	*cipher = gnutls_malloc(sizeof(GNUTLSCiphertext));
 	ciphertext = *cipher;
 
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
 		td =
 		    gnutls_hash_init_ssl3(state->security_parameters.
 					  mac_algorithm,
@@ -448,11 +448,17 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	if (td != GNUTLS_MAC_FAILED) {	/* actually when the algorithm in not the NULL one */
 		gnutls_hmac(td, &seq_num, 8);
 		gnutls_hmac(td, &compressed->type, 1);
-		gnutls_hmac(td, &compressed->version.major, 1);
-		gnutls_hmac(td, &compressed->version.minor, 1);
+		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS 1.0 only */
+			gnutls_hmac(td, &compressed->version.major, 1);
+			gnutls_hmac(td, &compressed->version.minor, 1);
+		}
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, compressed->fragment, compressed->length);
-		MAC = gnutls_hmac_deinit(td);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
+			MAC = gnutls_hash_deinit_ssl3(td);
+		} else {
+			MAC = gnutls_hmac_deinit(td);
+		}
 	}
 	switch (state->security_parameters.cipher_type) {
 	case CIPHER_STREAM:
@@ -478,8 +484,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		rand = gcry_random_bytes(1, GCRY_WEAK_RANDOM);
 
 		/* make rand a multiple of blocksize */
-		if (_gnutls_version_ssl3(state->connection_state.version)
-		    == 0) {
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
 			rand[0] = 0;
 		} else {
 			rand[0] =
@@ -638,11 +643,17 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	if (td != GNUTLS_MAC_FAILED) {
 		gnutls_hmac(td, &seq_num, 8);
 		gnutls_hmac(td, &compressed->type, 1);
-		gnutls_hmac(td, &compressed->version.major, 1);
-		gnutls_hmac(td, &compressed->version.minor, 1);
+		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS 1.0 only */
+			gnutls_hmac(td, &compressed->version.major, 1);
+			gnutls_hmac(td, &compressed->version.minor, 1);
+		}
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, data, compressed->length);
-		MAC = gnutls_hmac_deinit(td);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
+			MAC = gnutls_hash_deinit_ssl3(td);
+		} else {
+			MAC = gnutls_hmac_deinit(td);
+		}
 	}
 	/* HMAC was not the same. */
 	if (memcmp

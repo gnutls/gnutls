@@ -48,47 +48,101 @@
  */
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
+#define SSL3_CLIENT_MSG "CLNT"
+#define SSL3_SERVER_MSG "SRVR"
 int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 {
 	uint8 *data;
 	uint8 concat[36];	/* md5+sha1 */
 	int ret;
-
-
-	memset(concat, 0, 36);
+	GNUTLS_MAC_HANDLE td; /* for SSL3 */
+	GNUTLS_MAC_HANDLE td2;
+	int data_size;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) { /* we are a CLIENT */
-		memmove(concat, state->gnutls_internals.client_md_md5, 16);
-		memmove(&concat[16],
-			state->gnutls_internals.client_md_sha1, 20);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3 */
+			/* Calculate The SSL3 Finished */
+			td = gnutls_hash_init_ssl3( GNUTLS_MAC_MD5, state->security_parameters.master_secret, 48);
+			td2 = gnutls_hash_init_ssl3( GNUTLS_MAC_SHA, state->security_parameters.master_secret, 48);
+			
+			ret = gnutls_getHashDataBufferSize( GNUTLS_CLIENT, state);
+			data = gnutls_malloc( ret);
 
-		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			gnutls_getHashDataFromBuffer( GNUTLS_CLIENT, state, data, ret);
+
+			gnutls_hash(td, data, ret);
+			gnutls_hash(td2, data, ret);
+			
+			gnutls_free(data);
+			gnutls_hash(td, SSL3_CLIENT_MSG, strlen(SSL3_CLIENT_MSG));
+			data = gnutls_hash_deinit_ssl3(td);
+			memcpy( concat, data, 16);
+			gnutls_free(data);
+			
+			gnutls_hash(td2, SSL3_CLIENT_MSG, strlen(SSL3_CLIENT_MSG));
+			data = gnutls_hash_deinit_ssl3(td2);
+
+			memcpy( &concat[16], data, 20);
+			gnutls_free(data);
+			
+			data_size = 36;
 			data = concat;
 		} else {
+			memmove(concat, state->gnutls_internals.client_md_md5, 16);
+			memmove(&concat[16],
+				state->gnutls_internals.client_md_sha1, 20);
+	
 			data =
 			    gnutls_PRF( state->security_parameters.master_secret,
 				       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
 				       36, 12);
+			data_size = 12;
 		}
 	} else {		/* server */
-		memmove(concat, state->gnutls_internals.server_md_md5, 16);
-		memmove(&concat[16],
-			state->gnutls_internals.server_md_sha1, 20);
-
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			/* Calculate The SSL3 Finished */
+			td = gnutls_hash_init_ssl3( GNUTLS_MAC_MD5, state->security_parameters.master_secret, 48);
+			td2 = gnutls_hash_init_ssl3( GNUTLS_MAC_SHA, state->security_parameters.master_secret, 48);
+			
+			ret = gnutls_getHashDataBufferSize( GNUTLS_SERVER, state);
+			data = gnutls_malloc( ret);
+
+			gnutls_getHashDataFromBuffer( GNUTLS_SERVER, state, data, ret);
+
+			gnutls_hash(td, data, ret);
+			gnutls_hash(td2, data, ret);
+			
+			gnutls_free(data);
+			gnutls_hash(td, SSL3_SERVER_MSG, strlen(SSL3_SERVER_MSG));
+			data = gnutls_hash_deinit_ssl3(td);
+			memcpy( concat, data, 16);
+			gnutls_free(data);
+			
+			gnutls_hash(td2, SSL3_SERVER_MSG, strlen(SSL3_SERVER_MSG));
+			data = gnutls_hash_deinit_ssl3(td2);
+
+			memcpy( &concat[16], data, 20);
+			gnutls_free(data);
+			
+			data_size = 36;
 			data = concat;
-		} else {
+		} else { /* TLS 1 - Using PRF */
+			memmove(concat, state->gnutls_internals.server_md_md5, 16);
+			memmove(&concat[16],
+				state->gnutls_internals.server_md_sha1, 20);	
+
 			data =
 			    gnutls_PRF( state->security_parameters.master_secret,
 				       48, SERVER_MSG, strlen(SERVER_MSG), concat,
 				       36, 12);
+			data_size = 12;
+
 		}
 	}
 
-	ret = _gnutls_send_handshake(cd, state, data, 12, GNUTLS_FINISHED);
-	if (_gnutls_version_ssl3(state->connection_state.version) != 0) {
+	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_FINISHED);
+	if (_gnutls_version_ssl3(state->connection_state.version) != 0) 
 		gnutls_free(data);
-	}
 
 	return ret;
 }
@@ -99,9 +153,12 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 {
 	uint8 *data, *vrfy;
+	int data_size;
 	uint8 concat[36];	/* md5+sha1 */
 	int ret;
 	int vrfysize;
+	GNUTLS_MAC_HANDLE td; /* SSL3 */
+	GNUTLS_MAC_HANDLE td2;
 
 	ret = 0;
 
@@ -110,32 +167,89 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 		ERR("recv finished int", ret);
 		return ret;
 	}
-	if (vrfysize != 12) {
+
+	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+		data_size=36;
+	} else {
+		data_size=12;
+	}
+
+	if (vrfysize != data_size) {
 		gnutls_assert();
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		memmove(concat, state->gnutls_internals.server_md_md5, 16);
-		memmove(&concat[16],
-			state->gnutls_internals.server_md_sha1, 20);
-
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			/* Calculate The SSL3 Finished */
+			td = gnutls_hash_init_ssl3( GNUTLS_MAC_MD5, state->security_parameters.master_secret, 48);
+			td2 = gnutls_hash_init_ssl3( GNUTLS_MAC_SHA, state->security_parameters.master_secret, 48);
+			
+			ret = gnutls_getHashDataBufferSize( GNUTLS_SERVER, state);
+			data = gnutls_malloc( ret);
+
+			gnutls_getHashDataFromBuffer( GNUTLS_SERVER, state, data, ret);
+
+			gnutls_hash(td, data, ret);
+			gnutls_hash(td2, data, ret);
+			
+			gnutls_free(data);
+			gnutls_hash(td, SSL3_SERVER_MSG, strlen(SSL3_SERVER_MSG));
+			data = gnutls_hash_deinit_ssl3(td);
+			memcpy( concat, data, 16);
+			gnutls_free(data);
+			
+			gnutls_hash(td2, SSL3_SERVER_MSG, strlen(SSL3_SERVER_MSG));
+			data = gnutls_hash_deinit_ssl3(td2);
+
+			memcpy( &concat[16], data, 20);
+			gnutls_free(data);
+			
+			data_size = 36;
 			data = concat;
 		} else {
+			memmove(concat, state->gnutls_internals.server_md_md5, 16);
+			memmove(&concat[16],
+				state->gnutls_internals.server_md_sha1, 20);
+
 			data =
 			    gnutls_PRF( state->security_parameters.master_secret,
 				       48, SERVER_MSG, strlen(SERVER_MSG), concat,
 				       36, 12);
 		}
 	} else {		/* server */
-		memmove(concat, state->gnutls_internals.client_md_md5, 16);
-		memmove(&concat[16],
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			/* Calculate The SSL3 Finished */
+			td = gnutls_hash_init_ssl3( GNUTLS_MAC_MD5, state->security_parameters.master_secret, 48);
+			td2 = gnutls_hash_init_ssl3( GNUTLS_MAC_SHA, state->security_parameters.master_secret, 48);
+			
+			ret = gnutls_getHashDataBufferSize( GNUTLS_CLIENT, state);
+			data = gnutls_malloc( ret);
+
+			gnutls_getHashDataFromBuffer( GNUTLS_CLIENT, state, data, ret);
+
+			gnutls_hash(td, data, ret);
+			gnutls_hash(td2, data, ret);
+			gnutls_free(data);
+			
+			gnutls_hash(td, SSL3_CLIENT_MSG, strlen(SSL3_CLIENT_MSG));
+			data = gnutls_hash_deinit_ssl3(td);
+			memcpy( concat, data, 16);
+			gnutls_free(data);
+			
+			gnutls_hash(td2, SSL3_CLIENT_MSG, strlen(SSL3_CLIENT_MSG));
+			data = gnutls_hash_deinit_ssl3(td2);
+
+			memcpy( &concat[16], data, 20);
+			gnutls_free(data);
+			
+			data_size = 36;
+			data = concat;		
+		} else { /* TLS 1.0 */
+			memmove(concat, state->gnutls_internals.client_md_md5, 16);
+			memmove(&concat[16],
 			state->gnutls_internals.client_md_sha1, 20);
 
-		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-			data = concat;
-		} else {
 			data =
 			    gnutls_PRF( state->security_parameters.master_secret,
 				       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
@@ -143,12 +257,13 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 		}
 	}
 
-	if (memcmp(vrfy, data, 12) != 0) {
+	if (memcmp(vrfy, data, data_size) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
 
-	gnutls_free(data);
+	if (_gnutls_version_ssl3(state->connection_state.version) != 0)
+		gnutls_free(data);
 	gnutls_free(vrfy);
 	
 	return ret;
@@ -250,16 +365,24 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 		memmove(&data[pos], i_data, i_datasize - 4);
 
 	if (state->gnutls_internals.client_hash == HASH_TRUE) {
-		gnutls_hash(state->gnutls_internals.client_td_md5, data,
-		      i_datasize);
-		gnutls_hash(state->gnutls_internals.client_td_sha1, data,
-		      i_datasize);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			gnutls_insertHashDataBuffer( GNUTLS_CLIENT, state, data, i_datasize);
+		} else { /* TLS 1 */
+			gnutls_hash(state->gnutls_internals.client_td_md5, data,
+			      i_datasize);
+			gnutls_hash(state->gnutls_internals.client_td_sha1, data,
+			      i_datasize);
+		}
 	}
 	if (state->gnutls_internals.server_hash == HASH_TRUE) {
-		gnutls_hash(state->gnutls_internals.server_td_md5, data,
-		      i_datasize);
-		gnutls_hash(state->gnutls_internals.server_td_sha1, data,
-		      i_datasize);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			gnutls_insertHashDataBuffer( GNUTLS_SERVER, state, data, i_datasize);
+		} else { /* TLS 1 */
+			gnutls_hash(state->gnutls_internals.server_td_md5, data,
+			      i_datasize);
+			gnutls_hash(state->gnutls_internals.server_td_sha1, data,
+			      i_datasize);
+		}
 	}
 
 #ifdef HARD_DEBUG
@@ -355,17 +478,25 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 
 	/* here we do the hashing work needed at finished messages */
 	if (state->gnutls_internals.client_hash == HASH_TRUE) {
-		gnutls_hash(state->gnutls_internals.client_td_md5, dataptr,
-		      length32 + 4);
-		gnutls_hash(state->gnutls_internals.client_td_sha1, dataptr,
-		      length32 + 4);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			gnutls_insertHashDataBuffer( GNUTLS_CLIENT, state, dataptr, length32+4);
+		} else { /* TLS 1 */
+			gnutls_hash(state->gnutls_internals.client_td_md5, dataptr,
+			      length32 + 4);
+			gnutls_hash(state->gnutls_internals.client_td_sha1, dataptr,
+			      length32 + 4);
+		}
 	}
 
 	if (state->gnutls_internals.server_hash == HASH_TRUE) {
-		gnutls_hash(state->gnutls_internals.server_td_md5, dataptr,
-		      length32 + 4);
-		gnutls_hash(state->gnutls_internals.server_td_sha1, dataptr,
-		      length32 + 4);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			gnutls_insertHashDataBuffer( GNUTLS_SERVER, state, dataptr, length32+4);
+		} else { /* TLS 1 */
+			gnutls_hash(state->gnutls_internals.server_td_md5, dataptr,
+			      length32 + 4);
+			gnutls_hash(state->gnutls_internals.server_td_sha1, dataptr,
+			      length32 + 4);
+		}
 	}
 
 	
@@ -806,13 +937,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 	/* These are in order to hash the messages transmitted and received.
 	 * (needed by the protocol)
 	 */
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-/* FIXME!!! we need to keep the messages and hash them - later! */
-//		state->gnutls_internals.client_td_md5 = gnutls_hash_init_ssl3(GNUTLS_MAC_MD5);
-//		state->gnutls_internals.client_td_sha1 = gnutls_hash_init_ssl3(GNUTLS_MAC_SHA);
-//		state->gnutls_internals.server_td_md5 = gnutls_hash_init_ssl3(GNUTLS_MAC_MD5);
-//		state->gnutls_internals.server_td_sha1 = gnutls_hash_init_ssl3(GNUTLS_MAC_SHA);
-	} else {
+	if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS */
 		state->gnutls_internals.client_td_md5 = gnutls_hash_init(GNUTLS_MAC_MD5);
 		state->gnutls_internals.client_td_sha1 = gnutls_hash_init(GNUTLS_MAC_SHA);
 		state->gnutls_internals.server_td_md5 = gnutls_hash_init(GNUTLS_MAC_MD5);
@@ -917,17 +1042,12 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			ERR("send ChangeCipherSpec", ret);
 			return ret;
 		}
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-		state->gnutls_internals.client_md_md5 =
-		    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_md5);
-		state->gnutls_internals.client_md_sha1 =
-		    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_sha1);
-	} else {
-		state->gnutls_internals.client_md_md5 =
-		    gnutls_hash_deinit(state->gnutls_internals.client_td_md5);
-		state->gnutls_internals.client_md_sha1 =
-		    gnutls_hash_deinit(state->gnutls_internals.client_td_sha1);
-	}
+		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS1 */
+			state->gnutls_internals.client_md_md5 =
+			    gnutls_hash_deinit(state->gnutls_internals.client_td_md5);
+			state->gnutls_internals.client_md_sha1 =
+			    gnutls_hash_deinit(state->gnutls_internals.client_td_sha1);
+		}
 
 		/* Initialize the connection state (start encryption) */
 		ret = _gnutls_connection_state_init(state);
@@ -954,12 +1074,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-			state->gnutls_internals.server_md_md5 =
-			    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_md5);
-			state->gnutls_internals.server_md_sha1 =
-		    	    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_sha1);
-		} else {
+		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS1 */
 			state->gnutls_internals.server_md_md5 =
 			    gnutls_hash_deinit(state->gnutls_internals.server_td_md5);
 			state->gnutls_internals.server_md_sha1 =
@@ -1054,12 +1169,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		ret = _gnutls_connection_state_init(state);
 		if (ret<0) return ret;
 
-		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-			state->gnutls_internals.client_md_md5 =
-			    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_md5);
-			state->gnutls_internals.client_md_sha1 =
-			    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_sha1);
-		} else {
+		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS 1.0 */
 			state->gnutls_internals.client_md_md5 =
 			    gnutls_hash_deinit(state->gnutls_internals.client_td_md5);
 			state->gnutls_internals.client_md_sha1 =
@@ -1081,12 +1191,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-			state->gnutls_internals.server_md_md5 =
-			    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_md5);
-			state->gnutls_internals.server_md_sha1 =
-			    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_sha1);
-		} else {
+		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS 1.0 */
 			state->gnutls_internals.server_md_md5 =
 			    gnutls_hash_deinit(state->gnutls_internals.server_td_md5);
 			state->gnutls_internals.server_md_sha1 =
