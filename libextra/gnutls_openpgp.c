@@ -1892,7 +1892,7 @@ gnutls_openpgp_add_keyring_file( gnutls_datum *keyring, const char *name )
 
 int
 gnutls_openpgp_add_keyring_mem( gnutls_datum *keyring,
-                                const char *data, size_t len )
+                                const opaque *data, size_t len )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
 }
@@ -1906,7 +1906,8 @@ gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS c,
 
 int
 gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
-                                            const char *file )
+						const opaque* data,
+                                            size_t dlen)
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
 }
