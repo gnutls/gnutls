@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-## Copyright (c) 2002, 2003 Simon Josefsson                      ##
+## Copyright (c) 2002, 2003, 2004 Simon Josefsson                ##
 ##                    added -texinfo, -listfunc                  ##
 ##                    man page revamp                            ##
 ##                    various improvements                       ##
@@ -21,7 +21,8 @@
 
 # usage:
 # gdoc [ -docbook | -html | -text | -man | -tex | -texinfo | -listfunc ]
-#      [ -sourceversion verno ] [ -includefuncprefix ] [ -bugsto address ]
+#      [ -sourceversion verno ] [ -include file | -includefuncprefix ]
+#      [ -bugsto address ]
 #      [ -seeinfo infonode ] [ -copyright notice ] [ -verbatimcopying ]
 #      [ -function funcname [ -function funcname ...] ] c file(s)s > outputfile
 #
@@ -32,10 +33,14 @@
 #       Version number for source code, e.g. '1.0.4'.  Used in 'man' headers.
 #       Defaults to using current date.
 #
+#  -include FILE
+#       For man pages, mention #include <FILE.h> in the synopsis.
+#
 #  -includefuncprefix
-#       For man pages, generate a #include <FILE.h> based on the function
-#       prefix.  For example, a function gss_init_sec_context will generate
-#       an include statement of #include <gss.h>.
+#       For man pages, mention a #include <FILE.h> in the synopsis.
+#       The FILE derived from the function prefix.  For example, a
+#       function gss_init_sec_context will generate an include
+#       statement of #include <gss.h>.
 #
 #  -bugsto address
 #       For man pages, include a section about reporting bugs and mention
@@ -172,7 +177,7 @@ $blankline_text = "";
 
 sub usage {
     print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man | -tex | -texinfo  -listfunc ]\n";
-    print "         [ -sourceversion verno ] [ -includefuncprefix ]\n";
+    print "         [ -sourceversion verno ] [ -include file | -includefuncprefix ]\n";
     print "         [ -bugsto address ] [ -seeinfo infonode ] [ -copyright notice]\n";
     print "         [ -verbatimcopying ]\n";
     print "         [ -function funcname [ -function funcname ...] ]\n";
@@ -224,6 +229,8 @@ while ($ARGV[0] =~ m/^-(.*)/) {
 	$modulename = shift @ARGV;
     } elsif ($cmd eq "-sourceversion") {
 	$sourceversion = shift @ARGV;
+    } elsif ($cmd eq "-include") {
+	$include = shift @ARGV;
     } elsif ($cmd eq "-includefuncprefix") {
 	$includefuncprefix = 1;
     } elsif ($cmd eq "-bugsto") {
@@ -594,6 +601,8 @@ sub output_man {
     print $args{'function'}."\n";
 
     print ".SH SYNOPSIS\n";
+    print ".B #include <". $args{'include'} . ">\n"
+	if $args{'include'};
     print ".B #include <". lc((split /_/, $args{'function'})[0]) . ".h>\n"
 	if $args{'includefuncprefix'};
     print ".sp\n";
@@ -740,6 +749,7 @@ sub dump_function {
 	output_function({'function' => $function_name,
 			 'module' => $modulename,
 			 'sourceversion' => $sourceversion,
+			 'include' => $include,
 			 'includefuncprefix' => $includefuncprefix,
 			 'bugsto' => $bugsto,
 			 'copyright' => $copyright,
