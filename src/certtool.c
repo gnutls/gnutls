@@ -40,6 +40,7 @@
 #include <getline.h>
 #include <error.h>
 #include <exit.h>
+#include <progname.h>
 
 static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all);
 int generate_prime(int bits);
@@ -86,6 +87,7 @@ static void tls_log_func(int level, const char *str)
 
 int main(int argc, char **argv)
 {
+    set_program_name (argv[0]);
     cfg_init();
     gaa_parser(argc, argv);
 
