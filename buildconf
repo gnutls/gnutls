@@ -1,3 +1,3 @@
 #!/bin/sh
 autoreconf --force --install
-echo "You can now run \"./configure\" and \"make\""
+echo "You can now run \"./configure --enable-developer-mode\" and \"make\""

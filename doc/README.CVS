@@ -26,7 +26,7 @@ $ cd gnutls
 $ ./buildconf
 
 3. Compile the sources
-$ ./configure
+$ ./configure --enable-developer-mode
 $ make
 
 * Create the ChangeLog
