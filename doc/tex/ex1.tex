@@ -44,7 +44,7 @@ int main()
       exit(1);
    }
    /* X509 stuff */
-   if (gnutls_certificate_allocate_client_cred(&xcred) < 0) {
+   if (gnutls_certificate_allocate_client_credentials(&xcred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
    }
@@ -71,7 +71,7 @@ int main()
       gnutls_kx_set_priority(session, kx_priority);
       gnutls_mac_set_priority(session, mac_priority);
 
-      gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+      gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
       if (t > 0) { /* if this is not the first time we connect */
          gnutls_session_set_data(session, session_data, session_data_size);
@@ -168,7 +168,7 @@ int main()
 
    }  /* for() */
 
-   gnutls_certificate_free_client_cred(xcred);
+   gnutls_certificate_free_client_credentials(xcred);
 
    gnutls_global_deinit();
 

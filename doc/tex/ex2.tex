@@ -36,7 +36,7 @@ int main()
       exit(1);
    }
    /* X509 stuff */
-   if (gnutls_certificate_allocate_client_cred(&xcred) < 0) {  
+   if (gnutls_certificate_allocate_client_credentials(&xcred) < 0) {  
       fprintf(stderr, "memory error\n");
       exit(1);
    }
@@ -86,7 +86,7 @@ int main()
 
    /* put the x509 credentials to the current session
     */
-   gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 
    gnutls_transport_set_ptr( session, sd);
@@ -138,7 +138,7 @@ int main()
 
    gnutls_session_deinit(session);
 
-   gnutls_certificate_free_client_cred(xcred);
+   gnutls_certificate_free_client_credentials(xcred);
 
    gnutls_global_deinit();
 

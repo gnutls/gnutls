@@ -1,6 +1,7 @@
 \chapter{How to use GNUTLS\index{Example programs} in applications}
 \section{Client examples}
 This section contains examples of \tls{} and \ssl{} clients, using \gnutls{}. 
+Note that these examples contain little or no error checking.
 
 \subsection{Simple client example with X.509 certificate support}
 Let's assume now that we want to create a client which communicates
@@ -25,11 +26,11 @@ This function should be called after a successful
 \par HTTPS clients have to verify not only the peer's certificate,
 but also the hostname in this certificate. That is to know that
 they actually connected to the right site.
-RFC2818 specifies some hostname checking algorithm, and this (a simple form)
+RFC2818 specifies some hostname checking algorithm, and this --a simple form--
 is implemented in the following example.
 
 \par
-This function should be called after a successful
+This function should be called right after a successful
 \printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}
 
 \input{ex-rfc2818}
@@ -58,9 +59,17 @@ and authenticates using {\it username} and {\it password}.
 \section{Server examples}
 This section contains examples of \tls{} and \ssl{} servers, using \gnutls{}.
 
-\subsection{Echo Server with X.509 and SRP authentication}
-The following example is a server which supports both {\bf SRP} and {\bf X.509} authentication.
-This server also supports {\it session resuming}.
+\subsection{Echo Server with X.509 authentication}
+This example is a server which supports {\bf X.509} authentication.
 \input{serv1}
+
+\subsection{Echo Server with X.509 authentication II}
+The following example is a server which supports {\bf X.509} authentication.
+This server also supports export-grade cipher suites and session resuming.
+\input{serv-export}
+
+\subsection{Echo Server with SRP authentication}
+This is a server which supports {\bf SRP} authentication.
+\input{serv-srp}
 
 \input{openssl}

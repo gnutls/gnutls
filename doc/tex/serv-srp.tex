@@ -10,33 +10,29 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
 
-#define KEYFILE "key.pem"
-#define CERTFILE "cert.pem"
-#define CAFILE "ca.pem"
-#define CRLFILE NULL
+#define SRP_PASSWD "tpasswd"
+#define SRP_PASSWD_CONF "tpasswd.conf"
 
-/* This is a sample TLS 1.0 echo server.
+/* This is a sample TLS-SRP echo server.
  */
-
 
 #define SA struct sockaddr
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
-#define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_server_credentials x509_cred;
+gnutls_srp_server_credentials srp_cred;
 
 gnutls_session initialize_tls_session()
 {
    gnutls_session session;
    int ret;
    const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-   const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, 0 };
-   const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_CBC, 
-      GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
+   const int kx_priority[] = { GNUTLS_KX_SRP, 0 };
+   const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_3DES_CBC, 0};
    const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };
    const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
@@ -48,39 +44,15 @@ gnutls_session initialize_tls_session()
    gnutls_kx_set_priority(session, kx_priority);
    gnutls_mac_set_priority(session, mac_priority);
 
-   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+   gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 
    /* request client certificate if any.
     */
-   gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUEST);
+   gnutls_certificate_server_set_request( session, GNUTLS_CERT_IGNORE);
 
    gnutls_dh_set_prime_bits( session, DH_BITS);
 
-   /* some broken clients may require this in order to connect. 
-    * This may weaken security though.
-    */
-   /* gnutls_handshake_set_rsa_pms_check( session, 1); */
-
-   
    return session;
-}
-
-gnutls_dh_params dh_params;
-
-static int generate_dh_primes(void) {
-gnutls_datum prime, generator;
-
-   /* Generate Diffie Hellman parameters - for use with DHE
-    * kx algorithms. These should be discarded and regenerated
-    * once a day, once a week or once a month. Depends on the
-    * security requirements.
-    */
-   gnutls_dh_params_init( &dh_params);
-   gnutls_dh_params_generate( &prime, &generator, DH_BITS);
-   gnutls_dh_params_set( dh_params, prime, generator);
-
-   free( prime.data);
-   free( generator.data);
 }
 
 int main()
@@ -99,22 +71,18 @@ int main()
 
    strcpy(name, "Echo Server");
 
-   /* this must be called once in the program
+   /* these must be called once in the program
     */
    gnutls_global_init();
+   gnutls_global_init_extra(); /* for SRP */
 
-   gnutls_certificate_allocate_server_credentials(&x509_cred);
-   gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, 
-      GNUTLS_X509_FMT_PEM);
+   /* SRP_PASSWD a password file (created with the included srpcrypt utility) 
+    */
+   gnutls_srp_allocate_server_credentials(&srp_cred);
+   gnutls_srp_set_server_credentials_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
-   if (gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 
-      GNUTLS_X509_FMT_PEM);
 
-   generate_dh_params();
-   
-   gnutls_certificate_set_dh_params( x509_cred, dh_params);
-
-   /* Socket operations
+   /* TCP socket operations
     */
    listen_sd = socket(AF_INET, SOCK_STREAM, 0);
    SOCKET_ERR(listen_sd, "socket");
@@ -154,7 +122,6 @@ int main()
       }
       printf("- Handshake was completed\n");
 
-      /* see the Getting peer's information example */
       /* print_info(session); */
 
       i = 0;
@@ -197,7 +164,7 @@ int main()
    }
    close(listen_sd);
 
-   gnutls_certificate_free_server_credentials(x509_cred);
+   gnutls_srp_free_server_credentials(srp_cred);
 
    gnutls_global_deinit();
 

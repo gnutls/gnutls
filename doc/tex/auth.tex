@@ -99,42 +99,9 @@ SRP & Authentication using the SRP protocol.
 \caption{Supported SRP key exchange algorithms}
 \label{fig:srp}
 
+\gnutls{} includes a program to manipulate the required for SRP
+authentication. See \ref{srpcrypt} on page \pageref{srpcrypt} for
+more information.
+
 \end{figure}
 
-\subsection{The included ``srpcrypt'' program}
-The ``gnutls-srpcrypt'' is a very simple program that emulates the programs in the libsrp 
-found in \htmladdnormallink{http://srp.stanford.edu}{http://srp.stanford.edu}.
-It is intended for use in places where you don't expect srp
-authentication to be the performed for system users.
-
-Traditionaly libsrp used two files. One called 'tpasswd' which holds usernames 
-and verifiers, and 'tpasswd.conf' which holds generators and primes.
-\par
-How to use srpcrypt:
-
-\begin{itemize}
-
-
-\item To create tpasswd.conf which holds the g and n values for
-SRP protocol (generator and a large prime), run:
-\begin{verbatim}
-$ gnutls-srpcrypt --create-conf /etc/tpasswd.conf
-\end{verbatim}
-
-
-\item This command will create /etc/tpasswd and will add user 'test' (you will also
-be prompted for a password). Verifiers are stored by default in the
-way libsrp expects (using a modified SHA()). 
-\begin{verbatim}
-$ gnutls-srpcrypt --passwd /etc/tpasswd \ 
-    --passwd-conf /etc/tpasswd.conf -u test
-\end{verbatim}
-
-\item This command will check against a password. If the password matches 
-the one in /etc/tpasswd you will get an ok.
-\begin{verbatim}
-$ gnutls-srpcrypt --passwd /etc/tpasswd \ 
-    --passwd-conf /etc/tpasswd.conf --verify -u test
-\end{verbatim}
-
-\end{itemize}

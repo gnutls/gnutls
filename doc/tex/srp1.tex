@@ -44,11 +44,11 @@ int main()
       exit(1);
    }
 
-   if (gnutls_srp_allocate_client_cred(&xcred) < 0) {
+   if (gnutls_srp_allocate_client_credentials(&xcred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
    }
-   gnutls_srp_set_client_cred(xcred, USERNAME, PASSWORD);
+   gnutls_srp_set_client_credentials(xcred, USERNAME, PASSWORD);
 
    /* connects to server 
     */
@@ -92,7 +92,7 @@ int main()
 
    /* put the SRP credentials to the current state
     */
-   gnutls_cred_set(state, GNUTLS_CRD_SRP, xcred);
+   gnutls_credentials_set(state, GNUTLS_CRD_SRP, xcred);
 
    gnutls_transport_set_ptr( state, sd);
 
@@ -143,7 +143,7 @@ int main()
 
    gnutls_session_deinit(state);
 
-   gnutls_srp_free_client_cred(xcred);
+   gnutls_srp_free_client_credentials(xcred);
 
    gnutls_global_deinit();
 
