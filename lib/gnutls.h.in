@@ -55,21 +55,9 @@ typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
 	GNUTLS_PK_DH
 } PKAlgorithm;
 
-typedef struct {
-	MPI *params;		/* the size of params depends on the public 
-				 * key algorithm 
-				 */
-	PKAlgorithm subject_pk_algorithm;
-
-	char *common_name;
-	char *country;
-	char *organization;
-	char *organizational_unit_name;
-	char *locality_name;
-	char *state_or_province_name;
-
-	gnutls_datum raw; /* the raw certificate */
-} gnutls_cert;
+/* You cannot use this structure directly
+ */
+typedef struct gnutls_cert gnutls_cert;
 
 
 /* internal functions */
