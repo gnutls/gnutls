@@ -717,6 +717,10 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 	uint32 datasize;
 	int pos = 0;
 
+	/* to know where the procedure was interrupted.
+	 */
+	state->gnutls_internals.handshake_direction = 1; /* write */
+
 	if (i_data == NULL && i_datasize == 0) {
 		/* we are resuming a previously interrupted
 		 * send.
@@ -959,6 +963,10 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 	uint32 length32 = 0;
 	opaque *dataptr = NULL;
 	HandshakeType recv_type;
+
+	/* to know where the procedure was interrupted.
+	 */
+	state->gnutls_internals.handshake_direction = 0; /* read */
 
 	ret = _gnutls_recv_handshake_header(state, type, &recv_type);
 	if (ret < 0) {
@@ -1765,6 +1773,22 @@ int gnutls_rehandshake(GNUTLS_STATE state)
 	STATE = STATE0;
 
 	return 0;
+}
+
+/**
+  * gnutls_handshake_check_direction - This function will return the state of the handshake protocol
+  * @state: is a a &GNUTLS_STATE structure.
+  *
+  * This function provides information about the handshake procedure, and
+  * is only useful if the gnutls_handshake() call was interrupted for some
+  * reason.
+  *
+  * Returns 0 if the function was interrupted while receiving data, and 
+  * 1 otherwise. 
+  *
+  **/
+int gnutls_handshake_check_direction(GNUTLS_STATE state) {
+	return state->gnutls_internals.handshake_direction;
 }
 
 static int _gnutls_abort_handshake( GNUTLS_STATE state, int ret) {

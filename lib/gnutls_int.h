@@ -569,6 +569,12 @@ typedef struct {
 						* enable cipher suites
 						* which have 0xFF status.
 						*/
+	
+	/* Holds 0 if the handshake procedure was interrupted while
+	 * receiving, and non zero otherwise.
+	 */
+	int			handshake_direction;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } GNUTLS_INTERNALS;
