@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <gnutls/x509.h>
 #include <time.h>
 #include "certtool-gaa.h"
@@ -1229,13 +1230,19 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 		else
 		    fprintf(out, "\n");
 
-		print = printable;
+		fprintf(out, "\t\tDER Data: ");
 		for (j = 0; j < size; j++) {
-		    sprintf(print, "%.2x", (unsigned char) buffer[j]);
-		    print += 2;
+		  fprintf(out, "%.2x", (unsigned char) buffer[j]);
 		}
-		fprintf(out, "\t\tDER Data: %s\n", printable);
-
+		fprintf(out, "\n");
+		fprintf(out, "\t\tASCII: ");
+		for (j = 0; j < size; j++) {
+		  if (isprint (buffer[j]))
+		    fprintf(out, "%c", (unsigned char) buffer[j]);
+		  else
+		    fprintf(out, ".");
+		}
+		fprintf(out, "\n");
 	    }
 
 	    ret = 0;
