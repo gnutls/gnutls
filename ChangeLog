@@ -1,3 +1,86 @@
+2002-08-26 16:10  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_cipher_int.c, lib/gnutls_int.h, src/cli.c, src/serv.c,
+	src/tests.c, doc/tex/auth.tex, doc/tex/ciphers.tex,
+	doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/ex4.tex,
+	doc/tex/srp1.tex:
+
+	Renamed GNUTLS_CIPHER_ARCFOUR to GNUTLS_CIPHER_ARCFOUR_128 
+
+2002-08-26 15:30  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_state.c:
+
+	better export ciphersuite detection 
+
+2002-08-26 10:13  nmav <nmav@gnutls.org>
+
+	* src/: Makefile.am, common.c, common.h, tests.c, tests.h,
+	tls_test.c:
+
+	Improved the gnutls-cli-debug program 
+
+2002-08-26 08:18  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_cipher_int.c, lib/gnutls_int.h, doc/tex/ciphers.tex,
+	src/cli.c, src/serv.c, src/tests.c:
+
+	renamed ARCFOUR-EXPORT to ARCFOUR-40 
+
+2002-08-26 08:14  nmav <nmav@gnutls.org>
+
+	* lib/: auth_rsa.c, auth_rsa_export.c, gnutls_kx.c,
+	gnutls_rsa_export.h, gnutls_state.c, gnutls_state.h:
+
+	Added support for RSA_EXPORT_WITH_RC4_EXPORT_MD5 with RSA
+	certificates with modulus less than 512 bits. This change made the
+	code a bit messy.  
+
+2002-08-25 19:06  nmav <nmav@gnutls.org>
+
+	* src/: serv.c, tests.c, tests.h, tls_test.c:
+
+	improvements in server html output 
+
+2002-08-25 18:41  nmav <nmav@gnutls.org>
+
+	* doc/tex/: auth.tex, ciphers.tex, intro.tex:
+
+	changes in order to keep up with the addition of export-grade
+	ciphersuite 
+
+2002-08-25 18:17  nmav <nmav@gnutls.org>
+
+	* lib/auth_dhe.c:
+
+	corrected bug in DHE key exchange 
+
+2002-08-25 18:10  nmav <nmav@gnutls.org>
+
+	* src/: cli.c, serv.c:
+
+	changes for export cipher suites 
+
+2002-08-25 18:10  nmav <nmav@gnutls.org>
+
+	* NEWS:
+
+	Added the first EXPORT-grade ciphersuite 
+
+2002-08-25 18:08  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, auth_cert.h, auth_dhe.c, auth_rsa.c,
+	auth_rsa_export.c, gnutls.h.in.in, gnutls_algorithms.c,
+	gnutls_cert.c, gnutls_dh_primes.c, gnutls_errors.c,
+	gnutls_errors_int.h, gnutls_int.h, gnutls_kx.c,
+	gnutls_rsa_export.c, gnutls_rsa_export.h, gnutls_state.c,
+	gnutls_state.h, gnutls_ui.c, gnutls_ui.h, gnutls_x509.c:
+
+	Corrected bug in DHE key exchange which prevented from parsing the
+	given certificates properly.  
+
 2002-08-22 22:18  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in (utags: gnutls_0_5_3):
