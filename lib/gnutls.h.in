@@ -174,29 +174,17 @@ typedef struct {
 	int ne; /* nothing of interest here */
 } X509PKI_CLIENT_CREDENTIALS;
 
-typedef struct {
-	gnutls_cert ** cert_list; 
-		       /* contains a list of a list of certificates.
-			* eg:   [0] certificate1, certificate11, certificate111 
-			* (if more than one, one certificate certifies the one before)
-			*       [1] certificate2, certificate22, ...
-			*/
-	int * cert_list_length;
-			/* contains the number of the certificates in one
-			 * row.
-			 */
-	int ncerts;     /* contains the number of columns in cert_list.
-			 */
-	gnutls_private_key * pkey;   /* private keys. It contains ncerts private
-				* keys. 
-				*/
-} X509PKI_SERVER_CREDENTIALS;
+struct X509PKI_SERVER_CRED;
+typedef struct X509PKI_SERVER_CRED* X509PKI_SERVER_CREDENTIALS;
+
 
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
 void gnutls_free_x509_sc( X509PKI_SERVER_CREDENTIALS sc);
-int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE, char *KEYFILE);
+int gnutls_allocate_x509_sc( X509PKI_SERVER_CREDENTIALS *sc, int vsites);
+int gnutls_set_x509_key( X509PKI_SERVER_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
+int gnutls_set_x509_trust( X509PKI_SERVER_CREDENTIALS res, char* CAFILE, char* CRLFILE);
 
 /* global state functions 
  */

@@ -102,89 +102,159 @@ int n,i;
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_x509_sc( X509PKI_SERVER_CREDENTIALS sc) {
+void gnutls_free_x509_sc( X509PKI_SERVER_CREDENTIALS* sc) {
 int i,j;
 
-	for (i=0;i<sc.ncerts;i++) {
-		for (j=0;j<sc.cert_list_length[i];j++) {
-			gnutls_free_cert( sc.cert_list[i][j]);
+	for (i=0;i<sc->ncerts;i++) {
+		for (j=0;j<sc->cert_list_length[i];j++) {
+			gnutls_free_cert( sc->cert_list[i][j]);
 		}
-		gnutls_free( sc.cert_list[i]);
+		gnutls_free( sc->cert_list[i]);
 	}
-	gnutls_free( sc.cert_list );
-	for (i=0;i<sc.ncerts;i++) {
-		_gnutls_free_private_key( sc.pkey[i]);
+	gnutls_free( sc->cert_list );
+	for (i=0;i<sc->ncerts;i++) {
+		_gnutls_free_private_key( sc->pkey[i]);
 	}
-	gnutls_free(sc.pkey);
+	gnutls_free(sc->pkey);
 }
 
-/* FIXME: this function is a mess 
- */
-/**
-  * gnutls_allocate_x509_sc - Used to allocate an x509 SERVER CREDENTIALS structure
-  * @res: is a pointer to an &X509PKI_SERVER_CREDENTIALS structure.
-  * @CERTFILE: is the name of a PEM encoded certificate file
-  * @KEYFILE: is the name of a PEM encoded key file
-  *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate
-  * the structure from the given keys.
-  * FIXME: does not support multiple keys yet.
-  **/
-int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
-		      char *KEYFILE)
-{
-	FILE *fd1, *fd2;
-	char x[100 * 1024];
-	int siz, ret;
-	opaque *b64;
-	gnutls_datum tmp;
+#define MAX_FILE_SIZE 100*1024
+#define CERT_SEP "-----BEGIN"
 
-	fd1 = fopen(CERTFILE, "r");
+/* Reads a base64 encoded certificate file
+ */
+static int read_cert_file( X509PKI_SERVER_CREDENTIALS * res, char* certfile) {
+int siz, i, siz2;
+opaque* b64;
+char x[MAX_FILE_SIZE];
+char* ptr;
+FILE* fd1;
+gnutls_datum tmp;
+int ret;
+
+	fd1 = fopen(certfile, "r");
 	if (fd1 == NULL)
 		return GNUTLS_E_UNKNOWN_ERROR;
 
-	fd2 = fopen(KEYFILE, "r");
-	if (fd2 == NULL) {
-		fclose(fd1);
+	siz = fread(x, 1, sizeof(x), fd1);
+	fclose(fd1);
+	
+	ptr = x;
+	i=1;
+
+	res->cert_list[res->ncerts] = NULL;
+
+	do {
+		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
+		siz-=siz2; /* FIXME: this is not enough
+			    */
+
+		if (siz2 < 0) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+		ptr = strstr( ptr, CERT_SEP)+1;
+
+		res->cert_list[res->ncerts] =
+		    (gnutls_cert *) gnutls_realloc( res->cert_list[res->ncerts], i * sizeof(gnutls_cert));
+
+		if (res->cert_list[res->ncerts] == NULL)
+			return GNUTLS_E_MEMORY_ERROR;
+
+		tmp.data = b64;
+		tmp.size = siz2;
+		if ((ret =
+		     _gnutls_cert2gnutlsCert(&res->cert_list[res->ncerts][i-1], tmp)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		gnutls_free( b64);
+
+		i++;
+	} while( (ptr=strstr( ptr, CERT_SEP))!=NULL);
+
+	res->cert_list_length[res->ncerts] = i-1;
+	
+	/* WE DO NOT CATCH OVERRUNS in gnutls_set_x509_key().
+	 * This function should be called as many times as specified 
+	 * in allocate_x509_sc().
+	 */
+	res->ncerts++;
+
+	return 0;
+}
+
+/* Reads a base64 encoded CA file (file contains multiple certificate
+ * authorities)
+ */
+static int read_ca_file( X509PKI_SERVER_CREDENTIALS * res, char* cafile) {
+int siz, siz2, i;
+opaque* b64;
+char x[MAX_FILE_SIZE];
+char* ptr;
+FILE* fd1;
+int ret;
+gnutls_datum tmp;
+
+	fd1 = fopen(cafile, "r");
+	if (fd1 == NULL)
 		return GNUTLS_E_UNKNOWN_ERROR;
-	}
 
 	siz = fread(x, 1, sizeof(x), fd1);
-	siz = _gnutls_fbase64_decode(x, siz, &b64);
-
-	if (siz < 0) {
-		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
-	}
-
-	res->cert_list =
-	    (gnutls_cert **) gnutls_malloc(1 * sizeof(gnutls_cert *));
-	if (res->cert_list == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-	res->cert_list[0] =
-	    (gnutls_cert *) gnutls_malloc(1 * sizeof(gnutls_cert));
-	if (res->cert_list[0] == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-	res->cert_list_length = (int *) gnutls_malloc(1 * sizeof(int *));
-	if (res->cert_list_length == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-	res->ncerts = 1;
-
-	res->cert_list_length[0] = 1;
-
 	fclose(fd1);
 
-	tmp.data = b64;
-	tmp.size = siz;
-	if ((ret =
-	     _gnutls_cert2gnutlsCert(&res->cert_list[0][0], tmp)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	ptr = x;
+	res->ncas=0;
+	i=1;
+
+	res->ca_list = NULL;
+
+	do {
+		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
+		siz-=siz2; /* FIXME: this is not enough
+			    */
+
+		if (siz2 < 0) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+		ptr = strstr( ptr, CERT_SEP)+1;
+
+		res->ca_list =
+		    (gnutls_cert *) gnutls_realloc(res->ca_list, i * sizeof(gnutls_cert));
+		if (res->ca_list == NULL)
+			return GNUTLS_E_MEMORY_ERROR;
+
+		tmp.data = b64;
+		tmp.size = siz2;
+		if ((ret =
+		     _gnutls_cert2gnutlsCert(&res->ca_list[i-1], tmp)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		gnutls_free( b64);
+
+		i++;
+	} while( (ptr=strstr( ptr, CERT_SEP))!=NULL);
+
+	res->ncas = i-1;
+	
+	return 0;
+}
+
+
+/* Reads a PEM encoded PKCS-1 RSA private key file
+ */
+static int read_key_file( X509PKI_SERVER_CREDENTIALS * res, char* keyfile) {
+int siz, ret;
+opaque* b64;
+gnutls_datum tmp;
+char x[MAX_FILE_SIZE];
+FILE* fd2;
+
+	fd2 = fopen(keyfile, "r");
+	if (fd2 == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
 
 /* second file - PKCS-1 private key */
 
@@ -198,17 +268,82 @@ int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	res->pkey = gnutls_malloc(1 * sizeof(gnutls_private_key));
-	if (res->pkey == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
 	tmp.data = b64;
 	tmp.size = siz;
-	if ( (ret =_gnutls_pkcs1key2gnutlsKey(&res->pkey[0], tmp)) < 0) {
+	if ( (ret =_gnutls_pkcs1key2gnutlsKey(&res->pkey[res->ncerts], tmp)) < 0) {
 		gnutls_assert();
 		return ret;
 	} 
 
+	return 0;
+}
+
+
+/**
+  * gnutls_allocate_x509_sc - Used to allocate an x509 SERVER CREDENTIALS structure
+  * @res: is a pointer to an &X509PKI_SERVER_CREDENTIALS structure.
+  * @vsites: this is the number of certificate/private key pair you're going to use.
+  * This should be 1 in common sites.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to allocate
+  * the structure from the given keys.
+  **/
+int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS ** res, int vsites)
+{
+	*res = gnutls_calloc( 1, sizeof( X509PKI_SERVER_CREDENTIALS));
+
+	if (*res==NULL) return GNUTLS_E_MEMORY_ERROR;
+
+	(*res)->ncerts=0; /* this is right - set_key() increments it */
+	(*res)->cert_list =
+	    (gnutls_cert **) gnutls_malloc( vsites * sizeof(gnutls_cert *));
+
+	if ( (*res)->cert_list == NULL) {
+		gnutls_free(*res);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	(*res)->cert_list_length = (int *) gnutls_malloc( vsites * sizeof(int *));
+	if ( (*res)->cert_list_length == NULL) {
+		gnutls_free( *res);
+		gnutls_free( (*res)->cert_list);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	(*res)->pkey = gnutls_malloc( vsites * sizeof(gnutls_private_key));
+	if ( (*res)->pkey == NULL) {
+		gnutls_free( *res);
+		gnutls_free( (*res)->cert_list);
+		gnutls_free( (*res)->cert_list_length);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+		
+	return 0;
+}
+
+
+int gnutls_set_x509_key(X509PKI_SERVER_CREDENTIALS * res, char* CERTFILE, char *KEYFILE)
+{
+int ret;
+
+	/* this should be first 
+	 */
+	if ( (ret=read_key_file( res, KEYFILE)) < 0)
+		return ret;
+
+	if ( (ret=read_cert_file( res, CERTFILE)) < 0)
+		return ret;
+
+	return 0;
+}
+
+int gnutls_set_x509_trust(X509PKI_SERVER_CREDENTIALS * res, char* CAFILE, char* CRLFILE)
+{
+int ret;
+
+	if ( (ret=read_ca_file( res, CAFILE)) < 0)
+		return ret;
 
 	return 0;
 }
@@ -488,7 +623,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	gCert->state_or_province_name = NULL;
 
 	if ((result =
-	     _get_Name_type( c2, "certificate2.tbsCertificate.subject", gCert)) < 0) {
+	     _get_Name_type( c2, "certificate3.tbsCertificate.subject", gCert)) < 0) {
 		gnutls_assert();
 		delete_structure(c2);
 		return result;

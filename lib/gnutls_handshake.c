@@ -1712,6 +1712,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	 */
 
 	x509_cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+
 	/* if x509_cred==NULL we should remove all X509 ciphersuites
 	 */
 

@@ -21,12 +21,13 @@ typedef struct {
 			 */
 	int ncerts;     /* contains the number of columns in cert_list.
 			 */
-	/* FIXME: replace datum with an internal type 
-	 */
 	gnutls_private_key * pkey;   /* private keys. It contains ncerts private
 				* keys. pkey[i] corresponds to certificate in
 				* cert_list[i][0].
 				*/
+	gnutls_cert * ca_list;
+	int ncas;	/* number of CAs in the ca_list 
+			 */
 } X509PKI_SERVER_CREDENTIALS;
 
 typedef struct {
