@@ -1,14 +1,11 @@
 \section{Authentication using SRP\index{SRP authentication}}
 Authentication using the SRP\footnote{SRP stands for Secure Password Protocol and 
-is described in RFC2945. The SRP key exchange is not a part of the \tlsI{} protocol}
+is described in \cite{RFC2945}. The SRP key exchange is not a part of the \tlsI{} protocol}
 is actually password authentication, since the two peers are identified by the knowledge of a password. 
 This protocol also offers protection against off-line attacks, such as password 
 file stealing. 
-This is achieved since SRP does not use the plain password to perform authentication, but something called a 
-verifier. The verifier is $g^{x}mod(n)$ and $x$ is a value calculated
-from the user name and the password. 
-\par SRP is normally used with a SHA based hash function, to calculate
-the value of $x$. 
+This is achieved since SRP does not use the plain password to perform authentication, 
+but something called a verifier, which is calculated using the user's password.
 \par The advantage of SRP authentication, over other proposed secure password 
 authentication schemas, is that SRP does not require the server to hold
 the user's password. This kind of protection is similar to the one used traditionally

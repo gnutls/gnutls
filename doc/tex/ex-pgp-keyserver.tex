@@ -18,49 +18,56 @@
  * in the initialization of a gnutls session.
  */
 
-static const char *hostname = "keyserver.somewhere.com";
+static const char *hostname = "hkp://keyserver.somewhere.com";
 static const short port = 11371;
 
 int
 recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr, 
        unsigned int keyfpr_length, gnutls_datum * key)
 {
-   const unsigned char *keyid;
    int rc;
    CDK_KBNODE knode = NULL;
+   unsigned char* buf = NULL;
 
    /* The key fingerprint should be 20 bytes
+    * in v4 keys.
     */
    if (keyfpr_length != 20)
       return -1;
 
-   /* The key id is the last 4 bytes of the key fingerprint
-    */
-   keyid = &keyfpr[16];
+   rc = cdk_keyserver_recv_key( hostname, port, keyfpr, 
+      CDK_DBSEARCH_FPR, &knode );
 
-   if (key == NULL) {
-      return -1;
-   }
-
-   rc = cdk_keyserver_recv_key( hostname, port, keyid, &knode );
    if( !rc ) {
-       unsigned char *buf = cdk_calloc( 1, 20001 );
        size_t len = 20000;
+       buf = cdk_calloc( 1, len + 1 );
+
+       if (buf == NULL) {
+          rc = -1;
+          goto finish;
+       }
+
        cdk_kbnode_write_to_mem( knode, buf, &len);
 
        key->data = malloc( len);
-       if (key->data==NULL) return -1;
+       if (key->data==NULL) {
+          rc = -1;
+          goto finish;
+       }
+
        memcpy( key->data, buf, len);
 
-       cdk_free( buf );
-       cdk_kbnode_release( knode );
-
-       return 0; /* success */
+       rc = 0; /* success */
 
    } else {
-       cdk_kbnode_release( knode );
-       return -1; /* failure */
+       rc = -1;
    }
+
+   finish:
+
+   cdk_free( buf );
+   cdk_kbnode_release( knode );
+   return rc;
 
 }
 
