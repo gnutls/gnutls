@@ -1,3 +1,11 @@
+2002-10-23 18:36  nmav <nmav@gnutls.org>
+
+	* doc/TODO, doc/tex/Makefile.am, lib/Makefile.am, lib/auth_anon.c,
+	lib/auth_dh_common.c, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/rfc2818_hostname.c:
+
+	Merged common stuff in DHE and anonymous DH key exchange.  
+
 2002-10-14 21:36  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/Makefile.am, doc/tex/ex-client-resume.tex,
