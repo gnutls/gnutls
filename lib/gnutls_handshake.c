@@ -265,9 +265,9 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 	/* if we do not support that version  */
 	if (_gnutls_version_is_supported(session, version) == 0) {
 		/* If he requested something we do not support
-		 * then we send him the lowest we support.
+		 * then we send him the highest we support.
 		 */
-		ver = _gnutls_version_lowest(session);
+		ver = _gnutls_version_max(session);
 	} else {
 		ver = version;
 	}

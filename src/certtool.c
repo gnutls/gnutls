@@ -31,7 +31,6 @@
 #include <time.h>
 #include "certtool-gaa.h"
 #include <gnutls/pkcs12.h>
-#include <fileio.h>
 #include <unistd.h>
 
 static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all);

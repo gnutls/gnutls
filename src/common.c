@@ -535,10 +535,11 @@ void parse_protocols(char **protocols, int protocols_size,
 		for (j = i = 0; i < protocols_size; i++) {
 			if (strncasecmp(protocols[i], "SSL", 3) == 0)
 				protocol_priority[j++] = GNUTLS_SSL3;
-			if (strncasecmp(protocols[i], "TLS1.1", 6) == 0)
+			else if (strncasecmp(protocols[i], "TLS1.1", 6) == 0)
 				protocol_priority[j++] = GNUTLS_TLS1_1;
-			if (strncasecmp(protocols[i], "TLS1.0", 6) == 0)
+			else if (strncasecmp(protocols[i], "TLS", 6) == 0)
 				protocol_priority[j++] = GNUTLS_TLS1;
+			else fprintf(stderr, "Unknown protocol: '%s'\n", protocols[i]);
 		}
 		protocol_priority[j] = 0;
 	}
@@ -553,17 +554,18 @@ void parse_ciphers(char **ciphers, int nciphers, int *cipher_priority)
 			if (strncasecmp(ciphers[i], "AES", 3) == 0)
 				cipher_priority[j++] =
 				    GNUTLS_CIPHER_AES_128_CBC;
-			if (strncasecmp(ciphers[i], "3DE", 3) == 0)
+			else if (strncasecmp(ciphers[i], "3DE", 3) == 0)
 				cipher_priority[j++] =
 				    GNUTLS_CIPHER_3DES_CBC;
-			if (strcasecmp(ciphers[i], "ARCFOUR-40") == 0)
+			else if (strcasecmp(ciphers[i], "ARCFOUR-40") == 0)
 				cipher_priority[j++] =
 				    GNUTLS_CIPHER_ARCFOUR_40;
-			if (strcasecmp(ciphers[i], "ARCFOUR") == 0)
+			else if (strcasecmp(ciphers[i], "ARCFOUR") == 0)
 				cipher_priority[j++] =
 				    GNUTLS_CIPHER_ARCFOUR_128;
-			if (strncasecmp(ciphers[i], "NUL", 3) == 0)
+			else if (strncasecmp(ciphers[i], "NUL", 3) == 0)
 				cipher_priority[j++] = GNUTLS_CIPHER_NULL;
+			else fprintf(stderr, "Unknown cipher: '%s'\n", ciphers[i]);
 		}
 		cipher_priority[j] = 0;
 	}
@@ -576,10 +578,11 @@ void parse_macs(char **macs, int nmacs, int *mac_priority)
 		for (j = i = 0; i < nmacs; i++) {
 			if (strncasecmp(macs[i], "MD5", 3) == 0)
 				mac_priority[j++] = GNUTLS_MAC_MD5;
-			if (strncasecmp(macs[i], "RMD", 3) == 0)
+			else if (strncasecmp(macs[i], "RMD", 3) == 0)
 				mac_priority[j++] = GNUTLS_MAC_RMD160;
-			if (strncasecmp(macs[i], "SHA", 3) == 0)
+			else if (strncasecmp(macs[i], "SHA", 3) == 0)
 				mac_priority[j++] = GNUTLS_MAC_SHA;
+			else fprintf(stderr, "Unknown MAC: '%s'\n", macs[i]);
 		}
 		mac_priority[j] = 0;
 	}
@@ -593,8 +596,9 @@ void parse_ctypes(char **ctype, int nctype, int *cert_type_priority)
 			if (strncasecmp(ctype[i], "OPE", 3) == 0)
 				cert_type_priority[j++] =
 				    GNUTLS_CRT_OPENPGP;
-			if (strncasecmp(ctype[i], "X", 1) == 0)
+			else if (strncasecmp(ctype[i], "X", 1) == 0)
 				cert_type_priority[j++] = GNUTLS_CRT_X509;
+			else fprintf(stderr, "Unknown certificate type: '%s'\n", ctype[i]);
 		}
 		cert_type_priority[j] = 0;
 	}
@@ -607,20 +611,21 @@ void parse_kx(char **kx, int nkx, int *kx_priority)
 		for (j = i = 0; i < nkx; i++) {
 			if (strcasecmp(kx[i], "SRP") == 0)
 				kx_priority[j++] = GNUTLS_KX_SRP;
-			if (strcasecmp(kx[i], "SRP-RSA") == 0)
+			else if (strcasecmp(kx[i], "SRP-RSA") == 0)
 				kx_priority[j++] = GNUTLS_KX_SRP_RSA;
-			if (strcasecmp(kx[i], "SRP-DSS") == 0)
+			else if (strcasecmp(kx[i], "SRP-DSS") == 0)
 				kx_priority[j++] = GNUTLS_KX_SRP_DSS;
-			if (strcasecmp(kx[i], "RSA") == 0)
+			else if (strcasecmp(kx[i], "RSA") == 0)
 				kx_priority[j++] = GNUTLS_KX_RSA;
-			if (strcasecmp(kx[i], "RSA-EXPORT") == 0)
+			else if (strcasecmp(kx[i], "RSA-EXPORT") == 0)
 				kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
-			if (strncasecmp(kx[i], "DHE-RSA", 7) == 0)
+			else if (strncasecmp(kx[i], "DHE-RSA", 7) == 0)
 				kx_priority[j++] = GNUTLS_KX_DHE_RSA;
-			if (strncasecmp(kx[i], "DHE-DSS", 7) == 0)
+			else if (strncasecmp(kx[i], "DHE-DSS", 7) == 0)
 				kx_priority[j++] = GNUTLS_KX_DHE_DSS;
-			if (strncasecmp(kx[i], "ANON", 4) == 0)
+			else if (strncasecmp(kx[i], "ANON", 4) == 0)
 				kx_priority[j++] = GNUTLS_KX_ANON_DH;
+			else fprintf(stderr, "Unknown key exchange: '%s'\n", kx[i]);
 		}
 		kx_priority[j] = 0;
 	}

@@ -298,7 +298,8 @@ typedef struct {
 /* Versions should be in order of the oldest
  * (eg. SSL3 is before TLS1)
  */
-typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1, 
+#define GNUTLS_TLS1 GNUTLS_TLS1_0
+typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1_0, 
 	GNUTLS_TLS1_1, GNUTLS_VERSION_UNKNOWN=0xff } 
 gnutls_protocol_version;
 
