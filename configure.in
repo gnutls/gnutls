@@ -277,7 +277,7 @@ dnl
 AC_CHECK_LIB( tasn1, asn1_read_tag,:, 
  minitasn1_enabled=yes
 *** 
-*** LibtASN1 was not found. Will use the included one.))
+*** LibtASN1 0.2.x was not found. Will use the included one.))
 
 
 if test x$opt_developer_mode = xyes; then
