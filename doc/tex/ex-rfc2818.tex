@@ -13,7 +13,7 @@ void verify_certificate( gnutls_session session, const char* hostname)
    int status;
 
    /* This verification function uses the trusted CAs in the credentials
-    * structure. So you must have installed one or more CAs.
+    * structure. So you must have installed one or more CA certificates.
     */
    status = gnutls_certificate_verify_peers(session);
 
