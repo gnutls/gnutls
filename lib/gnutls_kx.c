@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004, 2005  Free Software Foundation
  * Copyright (C) 2000,2001 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -57,7 +57,7 @@ static int generate_normal_master(gnutls_session_t session,
 				  int keep_premaster)
 {
     int ret = 0;
-    opaque random[2 * TLS_RANDOM_SIZE];
+    opaque random[2 * TLS_RANDOM_SIZE + 1];
     char buf[64];
 
     memcpy(random, session->security_parameters.client_random,
