@@ -1,3 +1,25 @@
+2004-10-25 19:12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Move LIBS (i.e., -lz) to end of LIBGNUTLS_LIBS, to fix 
+	libgnutls*-config --libs output, reported by Yoann Vandoorselaere 
+	<yoann@prelude-ids.org>.  
+
+2004-10-25 19:10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, NEWS:
+
+	Add.  
+
+2004-10-25 19:09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Move LIBS (i.e., -lz) to end of LIBGNUTLS_LIBS, to fix 
+	libgnutls*-config --libs output, reported by Yoann Vandoorselaere 
+	<yoann@prelude-ids.org>.  
+
 2004-10-24 19:21  Simon Josefsson <simon@josefsson.org>
 
 	* AUTHORS:
