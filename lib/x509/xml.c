@@ -460,7 +460,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure,
 			len2 = _asn1_get_length_der(up->value, &len3);
 
 			if (len2 > 0 && strcmp(p->name, "type") == 0) {
-			    int len = sizeof(tmp);
+			    size_t len = sizeof(tmp);
 			    ret =
 				_gnutls_x509_oid_data2string(up->left->
 							     value,

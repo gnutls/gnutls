@@ -134,7 +134,7 @@ static int encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 				      gnutls_datum_t * der,
 				      ASN1_TYPE * pkey_info)
 {
-    int result;
+    int result, len;
     size_t size;
     opaque *data = NULL;
     opaque null = 0;
@@ -230,8 +230,8 @@ static int encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 
     /* DER Encode the generated private key info.
      */
-    size = 0;
-    result = asn1_der_coding(*pkey_info, "", NULL, &size, NULL);
+    len = 0;
+    result = asn1_der_coding(*pkey_info, "", NULL, &len, NULL);
     if (result != ASN1_MEM_ERROR) {
 	gnutls_assert();
 	result = _gnutls_asn2err(result);
@@ -240,14 +240,14 @@ static int encode_to_private_key_info(gnutls_x509_privkey_t pkey,
 
     /* allocate data for the der
      */
-    der->size = size;
-    der->data = gnutls_malloc(size);
+    der->size = len;
+    der->data = gnutls_malloc(len);
     if (der->data == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
     }
 
-    result = asn1_der_coding(*pkey_info, "", der->data, &size, NULL);
+    result = asn1_der_coding(*pkey_info, "", der->data, &len, NULL);
     if (result != ASN1_SUCCESS) {
 	gnutls_assert();
 	result = _gnutls_asn2err(result);
