@@ -39,7 +39,7 @@ void print_x509_info(gnutls_session session)
 	size_t digest_size = sizeof(digest);
 	int i, j;
 	int serial_size = sizeof(serial);
-	char printable[120];
+	char printable[256];
 	char *print;
 	int bits, algo;
 	time_t expiret, activet;
@@ -47,8 +47,10 @@ void print_x509_info(gnutls_session session)
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
 
-	if (cert_list_size <= 0)
+	if (cert_list_size <= 0) {
+		fprintf(stderr, "No certificates found!\n");
 		return;
+	}
 
 	printf(" - Got a certificate list of %d certificates.\n\n",
 	       cert_list_size);
