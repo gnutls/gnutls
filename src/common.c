@@ -6,7 +6,7 @@
 
 void print_cert_info(gnutls_session session);
 
-#define XML
+#undef XML
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
