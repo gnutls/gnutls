@@ -1,5 +1,5 @@
 INCLUDES = -I../../ -DVERSION=\"gnutls/opencdk\"
-EXTRA_DIST =  md.h packet.h opencdk.h context.h \
+EXTRA_DIST =  md.h packet.h opencdk.h context.h README \
         main.h cipher.h stream.h types.h filters.h
 noinst_LTLIBRARIES = libopencdk.la
 libopencdk_la_SOURCES = new-packet.c \
