@@ -177,7 +177,7 @@ static void load_keys(void)
 	    exit(1);
 	}
 
-	ret = gnutls_x509_crt_list_import(x509_crt, MAX_CRT, &data, GNUTLS_X509_FMT_PEM, 0);
+	ret = gnutls_x509_crt_list_import(x509_crt, MAX_CRT, &data, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED);
 	if (ret < 0) {
 	    fprintf(stderr,
 		    "*** Error loading cert file: %s\n",
@@ -185,7 +185,7 @@ static void load_keys(void)
 	    exit(1);
 	}
 	x509_crt_size = ret;
-	fprintf(stderr, "Processed %d client certificates...\n", ret);
+	/* fprintf(stderr, "Processed %d client certificates...\n", ret); */
 
 	munmap_file(data);
 

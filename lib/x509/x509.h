@@ -39,6 +39,10 @@ typedef struct gnutls_x509_crt_int {
     int use_extensions;
 } gnutls_x509_crt_int;
 
+typedef enum gnutls_certificate_import_flags {
+    GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED=1
+} gnutls_certificate_import_flags;
+                                 
 
 #define MAX_PRIV_PARAMS_SIZE 6	/* ok for RSA and DSA */
 

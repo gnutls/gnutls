@@ -1915,7 +1915,7 @@ int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
   * @cert_max: The number of certs.
   * @data: The PEM encoded certificate.
   * @format: One of DER or PEM. Only PEM is supported for now.
-  * @flags: must be zero.
+  * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
   *
   * This function will convert the given PEM encoded certificate list
   * to the native gnutls_x509_crt_t format. The output will be stored in @certs.
@@ -1953,6 +1953,15 @@ int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int cert_max,
     count = 0;
 
     do {
+        if (count >= cert_max) {
+            if (flags & GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED) {
+                gnutls_assert();
+                ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+                goto error;
+            }
+            break;
+        }
+        
 	ret = gnutls_x509_crt_init( &certs[count]);
 	if (ret < 0) {
             gnutls_assert();
@@ -1989,7 +1998,7 @@ int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int cert_max,
 	    ptr = NULL;
 
 	count++;
-    } while (cert_max > count && ptr != NULL);
+    } while (ptr != NULL);
 
     return count;
 

@@ -69,7 +69,6 @@ extern "C" {
 /* Key purpose Object Identifiers.
  */
 #define GNUTLS_KP_TLS_WWW_SERVER		"1.3.6.1.5.5.7.3.1"
-#define GNUTLS_KP_TLS_WWW_CLIENT		"1.3.6.1.5.5.7.3.2"
 #define GNUTLS_KP_CODE_SIGNING			"1.3.6.1.5.5.7.3.3"
 #define GNUTLS_KP_EMAIL_PROTECTION		"1.3.6.1.5.5.7.3.4"
 #define GNUTLS_KP_TIME_STAMPING			"1.3.6.1.5.5.7.3.8"
@@ -78,6 +77,14 @@ extern "C" {
 
 /* Certificate handling functions 
  */
+
+typedef enum gnutls_certificate_import_flags {
+    GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED=1 
+         /* Fail if the certificates in the buffer are more than
+          * the space allocated for certificates. The error code
+          * will be GNUTLS_E_SHORT_MEMORY_BUFFER.
+          */
+} gnutls_certificate_import_flags;
 
 int gnutls_x509_crt_init(gnutls_x509_crt_t * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert);
