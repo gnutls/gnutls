@@ -16,6 +16,8 @@ See the end for copying conditions.
 - Uses memmem instead of strnstr in lib/.
 - Using more GNULib portability files, although not yet inside lib/.
 - Added gnutls_certificate_verify_peers to gnutls/compat.h.
+  Nikos deprecated gnutls_certificate_verify_peers in favor of
+  gnutls_certificate_verify_peers2 earlier in the 1.1 branch.
 - Improvements to the manual.
 - Known bug: the library require snprintf.  This has not yet been
   fixed, but will be handled via GNULib later on.
