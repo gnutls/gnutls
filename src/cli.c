@@ -30,6 +30,14 @@
 #include "../lib/gnutls.h"
 #include <sys/time.h>
 
+#ifndef SHUT_WR
+# define SHUT_WR 1
+#endif
+
+#ifndef SHUT_RDWR
+# define SHUT_RDWR 2
+#endif
+
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
 #define MAX_BUF 4096
@@ -175,7 +183,7 @@ int main(int argc, char** argv)
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_set_cipher_priority( state, GNUTLS_ARCFOUR, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
@@ -230,7 +238,7 @@ int main(int argc, char** argv)
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_set_cipher_priority( state, GNUTLS_ARCFOUR, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, 0);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 
