@@ -3,7 +3,7 @@ Copyright (C) 2004 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.1.18
+* Version 1.1.18 (2004-08-24)
 - Corrected handling of certificate with dates after year 2038.
 - Corrected DER decoder which could incorrectly treat input as BER and fail.
 - Correct certtool --smime-to-p7 end of line character handling.
