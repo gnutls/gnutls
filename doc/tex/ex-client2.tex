@@ -114,13 +114,14 @@ int main()
    } else if (ret < 0) {
       fprintf(stderr, "*** Error: %s\n", gnutls_strerror(ret));
       goto end;
-   } else if (ret > 0) {
-      printf("- Received %d bytes: ", ret);
-      for (ii = 0; ii < ret; ii++) {
-         fputc(buffer[ii], stdout);
-      }
-      fputs("\n", stdout);
    }
+
+   printf("- Received %d bytes: ", ret);
+   for (ii = 0; ii < ret; ii++) {
+      fputc(buffer[ii], stdout);
+   }
+   fputs("\n", stdout);
+
    gnutls_bye( session, GNUTLS_SHUT_RDWR);
 
  end:

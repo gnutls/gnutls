@@ -16,10 +16,6 @@ void verify_certificate( gnutls_session session, const char* hostname)
    int cert_list_size;
    gnutls_x509_crt cert;
 
-   /* This function only works with X.509 certificates.
-    */
-   if ( gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
-      return;
 
    /* This verification function uses the trusted CAs in the credentials
     * structure. So you must have installed one or more CA certificates.
@@ -40,6 +36,13 @@ void verify_certificate( gnutls_session session, const char* hostname)
    if (status & GNUTLS_CERT_REVOKED)
      printf("The certificate has been revoked.\n");
 
+
+   /* Up to here the process is the same for X.509 certificates and
+    * OpenPGP keys. From now on X.509 certificates are assumed. This can
+    * be easily extended to work with openpgp keys as well.
+    */
+   if ( gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
+      return;
 
    if ( gnutls_x509_crt_init( &cert) < 0) {
       printf("error in initialization\n");
@@ -73,7 +76,7 @@ void verify_certificate( gnutls_session session, const char* hostname)
    }
 
    if ( !gnutls_x509_crt_check_hostname( cert, hostname)) {
-      printf("The certificate does not match hostname\n");
+      printf("The certificate's owner does not match hostname '%s'\n", hostname);
       return;
    }
 

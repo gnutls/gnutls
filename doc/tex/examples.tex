@@ -17,16 +17,15 @@ are used in most of the other examples below, without redefining them.
 
 \subsection{Obtaining session information}
 The following function prints information about the current \tls{} session.
-\par
 This function should be called after a successful
 \printfunc{gnutls_handshake}{gnutls\_handshake}
 
 \input{ex-session-info}
 
 \subsection{Verifying peer's certificate}
-\par A TLS connection is not secure just after the handshake has finished.
-It must be considered secure, after the peer's identity has been
-verified. That is, you usually have to verify not only the peer's 
+A TLS connection is not secure just after the handshake has finished.
+It must be considered secure, after the peer's certificate and identity have been
+verified. That is, you usually have to verify not only the signature in peer's 
 certificate, but also the hostname in the certificate, expiration dates etc. 
 After this step you should treat the connection as being a secure one.
 
