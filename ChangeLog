@@ -1,3 +1,18 @@
+2003-08-12 12:00  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, dh_compat.c, gnutls_cipher_int.c,
+	gnutls_compress.c, gnutls_dh_primes.c, gnutls_errors.c,
+	gnutls_errors_int.h, gnutls_mem.c, gnutls_record.c,
+	gnutls_rsa_export.c, rsa_compat.c, x509_b64.c:
+
+	more fixes by Arne.  
+
+2003-08-12 11:57  nmav <nmav@gnutls.org>
+
+	* lib/rc2.c:
+
+	Cleaned up the RC2 cipher.  
+
 2003-08-11 18:29  nmav <nmav@gnutls.org>
 
 	* doc/tex/alert.tex, doc/tex/ciphersuites.tex,
