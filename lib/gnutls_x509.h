@@ -10,9 +10,11 @@ typedef enum ConvFlags {
 
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert, ConvFlags flags);
 
+/* for int2str */
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(unsigned int k, char *data);
 
+#define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
 #define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
 #define PEM_PKCS7_SEP "-----BEGIN PKCS7"
 

@@ -150,13 +150,13 @@ int _gnutls_base64_encode(const uint8 * data, int data_size, uint8 ** result)
 
 	(*result) = gnutls_malloc(ret + 1);
 	if ((*result) == NULL)
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 
 	for (i = j = 0; i < data_size; i += 3, j += 4) {
 		tmp = encode(tmpres, &data[i], data_size - i);
 		if (tmp == -1) {
 			gnutls_free( (*result));
-			return -1;
+			return GNUTLS_E_MEMORY_ERROR;
 		}
 		memcpy(&(*result)[j], tmpres, tmp);
 	}
@@ -182,7 +182,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	memset(top, 0, sizeof(top));
 
 	if (strlen(msg) > 50)
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 
 	strcat(top, "-----BEGIN "); /* Flawfinder: ignore */
 	strcat(top, msg); /* Flawfinder: ignore */
@@ -206,7 +206,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 
 	(*result) = gnutls_calloc(1, ret + 1);
 	if ((*result) == NULL)
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 
 	strcat(*result, top); /* Flawfinder: ignore */
 	pos = strlen(top);
@@ -215,7 +215,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 		tmp = encode(tmpres, &data[i], data_size - i);
 		if (tmp == -1) {
 			gnutls_free( (*result));
-			return -1;
+			return GNUTLS_E_MEMORY_ERROR;
 		}
 		ptr = &(*result)[j + pos];
 
@@ -249,7 +249,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 }
 
 /**
-  * gnutls_b64_encode_fmt - This function will convert raw data to Base64 encoded
+  * gnutls_pem_base64_encode - This function will convert raw data to Base64 encoded
   * @msg: is a message to be put in the header
   * @data: contain the raw data
   * @result: the place where base64 data will be copied
@@ -259,9 +259,8 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
   * encoding. This is the encoding used in PEM messages. If the provided
   * buffer is not long enough GNUTLS_E_INVALID_REQUEST is returned.
   * 
-  * 
   **/
-int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size) {
+int gnutls_pem_base64_encode( const char* msg, const gnutls_datum *data, char* result, int* result_size) {
 opaque* ret;
 int size;
 
@@ -283,7 +282,7 @@ int size;
 }
 
 /**
-  * gnutls_b64_encode_fmt2 - This function will convert raw data to Base64 encoded
+  * gnutls_pem_base64_encode_alloc - This function will convert raw data to Base64 encoded
   * @msg: is a message to be put in the encoded header
   * @data: contains the raw data
   * @result: will hold the newly allocated encoded data
@@ -293,7 +292,8 @@ int size;
   * allocate (using malloc) the required memory to hold the encoded data.
   * 
   **/
-int gnutls_b64_encode_fmt2( const char* msg, const gnutls_datum *data, gnutls_datum* result) {
+int gnutls_pem_base64_encode_alloc( const char* msg, const gnutls_datum *data, gnutls_datum* result) 
+{
 opaque* ret;
 int size, res;
 
@@ -337,7 +337,7 @@ int _gnutls_base64_decode(const uint8 * data, int data_size, uint8 ** result)
 	ret = data_size / 4 * 3;
 	(*result) = gnutls_malloc(ret+1);
 	if ((*result) == NULL)
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 
 	for (i = j = 0; i < data_size; i += 4) {
 		tmp = decode(tmpres, &data[i]);
@@ -379,7 +379,7 @@ inline static int cpydata(const uint8 * data, int data_size, uint8 ** result)
  * The result_size is the return value
  */
 #define ENDSTR "-----\n"
-int _gnutls_fbase64_decode( const uint8 * data, int data_size,
+int _gnutls_fbase64_decode( const char* header, const uint8 * data, int data_size,
 			   uint8 ** result)
 {
 	int ret;
@@ -389,23 +389,36 @@ int _gnutls_fbase64_decode( const uint8 * data, int data_size,
 	int rdata_size;
 	uint8 *kdata;
 	int kdata_size;
+	char pem_header[128];
 
-	rdata = strstr( data, top);
+	if (header != NULL) {
+		if (strlen(header) > sizeof(pem_header) - sizeof(top) - 1) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		strcpy( pem_header, top);
+		strcpy( pem_header, header);
+		rdata = strstr( data, pem_header);
+	} else {
+		rdata = strstr( data, top);
+	}
+
 	if (rdata==NULL) {
 		gnutls_assert();
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
+
 	data_size -= (unsigned long int)rdata-(unsigned long int)data;
 
 	if (data_size < 4 + strlen(bottom)) {
 		gnutls_assert();
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	kdata = strstr( rdata, ENDSTR);
 	if (kdata==NULL) {
 		gnutls_assert();
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 	data_size -= strlen(ENDSTR);
 	data_size -= (unsigned long int)kdata-(unsigned long int)rdata;
@@ -417,22 +430,23 @@ int _gnutls_fbase64_decode( const uint8 * data, int data_size,
 	kdata = strstr( rdata, bottom);
 	if (kdata==NULL) {
 		gnutls_assert();
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
+
 	/* position of kdata is before the ----END--- footer 
 	 */
 	rdata_size = (unsigned long int)kdata-(unsigned long int)rdata;
 
 	if (rdata_size < 4) {
 		gnutls_assert();
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	kdata_size = cpydata(rdata, rdata_size, &kdata);
 
 	if (kdata_size < 4) {
 		gnutls_assert();
-		return -1;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	if ((ret = _gnutls_base64_decode( kdata, kdata_size, result)) < 0) {
@@ -446,19 +460,23 @@ int _gnutls_fbase64_decode( const uint8 * data, int data_size,
 }
 
 /**
-  * gnutls_b64_decode_fmt - This function will decode base64 encoded data
+  * gnutls_pem_base64_decode - This function will decode base64 encoded data
+  * @header: The PEM header (eg. CERTIFICATE)
   * @b64_data: contain the encoded data
   * @result: the place where decoded data will be copied
   * @result_size: holds the size of the result
   *
-  * This function will decode the given encoded data.
+  * This function will decode the given encoded data. If the header given
+  * is non null this function will search for "-----BEGIN header" and decode
+  * only this part. Otherwise it will decode the first PEM packet found.
   * 
   **/
-int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size) {
+int gnutls_pem_base64_decode( const char* header, const gnutls_datum *b64_data, char* result, int* result_size) 
+{
 opaque* ret;
 int size;
 
-	size = _gnutls_fbase64_decode( b64_data->data, b64_data->size, &ret);
+	size = _gnutls_fbase64_decode( header, b64_data->data, b64_data->size, &ret);
 	if (size < 0)
 		return size;
 
@@ -476,19 +494,24 @@ int size;
 }
 
 /**
-  * gnutls_b64_decode_fmt2 - This function will decode base64 encoded data
+  * gnutls_pem_base64_decode_alloc - This function will decode base64 encoded data
+  * @header: The PEM header (eg. CERTIFICATE)
   * @b64_data: contains the encoded data
   * @result: the place where decoded data lie
   *
   * This function will decode the given encoded data. The decoded data
   * will be allocated, using malloc, and stored into result.
+  * If the header given is non null this function will search for 
+  * "-----BEGIN header" and decode only this part. Otherwise it will decode the 
+  * first PEM packet found.
   * 
   **/
-int gnutls_b64_decode_fmt2( const gnutls_datum *b64_data, gnutls_datum* result) {
+int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, gnutls_datum* result) 
+{
 opaque* ret;
 int size, res;
 
-	size = _gnutls_fbase64_decode( b64_data->data, b64_data->size, &ret);
+	size = _gnutls_fbase64_decode( header, b64_data->data, b64_data->size, &ret);
 	if (size < 0)
 		return size;
 

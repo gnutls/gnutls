@@ -59,6 +59,30 @@ const char *gnutls_cert_type_get_name( gnutls_certificate_type type)
 	return gnutls_certificate_type_get_name( type);
 }
 
+#undef gnutls_b64_encode_fmt
+int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size) 
+{
+	return gnutls_pem_base64_encode( msg, data, result, result_size);
+}
+
+#undef gnutls_b64_encode_fmt2
+int gnutls_b64_encode_fmt2( const char* msg, const gnutls_datum *data, gnutls_datum* result) 
+{
+	return gnutls_pem_base64_encode_alloc( msg, data, result);
+}
+
+#undef gnutls_b64_decode_fmt
+int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size) 
+{
+	return gnutls_pem_base64_decode( NULL, b64_data, result, result_size);
+}
+
+#undef gnutls_b64_decode_fmt2
+int gnutls_b64_decode_fmt2( const gnutls_datum *b64_data, gnutls_datum* result) 
+{
+	return gnutls_pem_base64_decode_alloc( NULL, b64_data, result);
+}
+
 /* nothing here */
 
 #endif /* GNUTLS_BACKWARDS_COMPATIBLE */

@@ -95,8 +95,8 @@ typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1 } gnutls_proto
 typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
 } gnutls_certificate_type;
 
-typedef enum gnutls_x509_certificate_fmt { GNUTLS_X509_FMT_DER, 
-	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_fmt;
+typedef enum gnutls_x509_certificate_format { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_format;
 
 typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA
 } gnutls_pk_algorithm;
@@ -268,15 +268,15 @@ int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_
 int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
 
 int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials res, const char* CAFILE, 
-	gnutls_x509_certificate_fmt);
+	gnutls_x509_certificate_format);
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CA, gnutls_x509_certificate_fmt);
+	const gnutls_datum *CA, gnutls_x509_certificate_format);
 
 int gnutls_certificate_set_x509_key_file( gnutls_certificate_credentials res, 
-	const char *CERTFILE, const char* KEYFILE, gnutls_x509_certificate_fmt);
+	const char *CERTFILE, const char* KEYFILE, gnutls_x509_certificate_format);
 int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum* CERT, const gnutls_datum* KEY,
-	gnutls_x509_certificate_fmt);
+	gnutls_x509_certificate_format);
 
 /* global state functions 
  */
@@ -347,7 +347,7 @@ int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* da
 #define GNUTLS_LIST const int*
 #define GNUTLS_TRANSPORT_PTR gnutls_transport_ptr
 #define GNUTLS_PKAlgorithm gnutls_pk_algorithm
-#define GNUTLS_X509_CertificateFmt gnutls_x509_certificate_fmt
+#define GNUTLS_X509_CertificateFmt gnutls_x509_certificate_format
 #define GNUTLS_CertificateType gnutls_certificate_type
 #define GNUTLS_Version gnutls_protocol_version
 #define GNUTLS_CloseRequest gnutls_close_request
@@ -388,4 +388,9 @@ int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* da
 #define gnutls_cert_type_get gnutls_certificate_type_get
 #define gnutls_cert_type_set_priority gnutls_certificate_type_set_priority
 #define gnutls_cert_type_get_name gnutls_certificate_type_get_name
+
+#define gnutls_b64_encode_fmt gnutls_pem_base64_encode
+#define gnutls_b64_encode_fmt2 gnutls_pem_base64_encode_alloc
+#define gnutls_b64_decode_fmt(a,b,c) gnutls_pem_base64_decode( NULL,a,b,c)
+#define gnutls_b64_decode_fmt2(a,b)  gnutls_pem_base64_decode_alloc(NULL,a,b)
 

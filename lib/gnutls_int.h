@@ -179,8 +179,8 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT,
 	GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA 
 } ContentType;
 
-typedef enum gnutls_x509_certificate_fmt { GNUTLS_X509_FMT_DER, 
-	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_fmt;
+typedef enum gnutls_x509_certificate_format { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_format;
 
 typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
 	GNUTLS_PK_UNKNOWN = 0xff

@@ -101,7 +101,7 @@ int _gnutls_verify_x509_mem( const char *ca, int ca_size)
 	i = 1;
 
 	do {
-		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
+		siz2 = _gnutls_fbase64_decode( NULL, ptr, siz, &b64);
 		siz -= siz2;	/* FIXME: this is not enough
 				 */
 
