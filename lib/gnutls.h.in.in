@@ -210,6 +210,9 @@ int gnutls_x509pki_allocate_sc( GNUTLS_X509PKI_CREDENTIALS *sc, int ncerts);
 int gnutls_x509pki_set_key_file( GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
 int gnutls_x509pki_set_trust_file( GNUTLS_X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
 
+int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum *CA, const gnutls_datum *CRL);
+int gnutls_x509pki_set_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum* CERT, const gnutls_datum* KEY);
+
 #define gnutls_x509pki_free_server_sc gnutls_x509pki_free_sc
 #define gnutls_x509pki_allocate_server_sc gnutls_x509pki_allocate_sc
 #define gnutls_x509pki_set_server_key_file gnutls_x509pki_set_key_file

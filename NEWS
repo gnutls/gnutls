@@ -1,7 +1,8 @@
 Version ?.?.?
 - Added gnutls_x509pki_verify_certificate()
+- Added gnutls_x509pki_set_trust_mem() and gnutls_x509pki_set_key_mem()
 
-Version 0.3.2 (5/01/2001)
+Version 0.3.2 (5/01/2002)
 - Corrected bug which did not allow a client to accept multiple CA names
 - Added gnutls_fingerprint()
 - Added gnutls_x509pki_extract_certificate_serial()

@@ -136,26 +136,18 @@ void gnutls_x509pki_free_sc(GNUTLS_X509PKI_CREDENTIALS sc)
 #define MAX_FILE_SIZE 100*1024
 #define CERT_SEP "-----BEGIN"
 
-/* Reads a base64 encoded certificate file
+/* Reads a base64 encoded certificate from memory
  */
-static int read_cert_file(GNUTLS_X509PKI_CREDENTIALS res, char *certfile)
+static int read_cert_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *cert, int cert_size)
 {
 	int siz, i, siz2;
 	opaque *b64;
-	char x[MAX_FILE_SIZE];
-	char *ptr;
-	FILE *fd1;
+	const char *ptr;
 	gnutls_datum tmp;
 	int ret;
 
-	fd1 = fopen(certfile, "r");
-	if (fd1 == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
-
-	siz = fread(x, 1, sizeof(x), fd1);
-	fclose(fd1);
-
-	ptr = x;
+	ptr = cert;
+	siz = cert_size;
 	i = 1;
 
 	res->cert_list[res->ncerts] = NULL;
@@ -214,29 +206,20 @@ static int read_cert_file(GNUTLS_X509PKI_CREDENTIALS res, char *certfile)
 	return 0;
 }
 
-/* Reads a base64 encoded CA file (file contains multiple certificate
- * authorities). This is to be called once.
+/* Reads a base64 encoded CA list from memory 
+ * This is to be called once.
  */
-static int read_ca_file(GNUTLS_X509PKI_CREDENTIALS res, char *cafile)
+static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_size)
 {
 	int siz, siz2, i;
 	opaque *b64;
-	char x[MAX_FILE_SIZE];
-	char *ptr;
-	FILE *fd1;
+	const char *ptr;
 	int ret;
 	gnutls_datum tmp;
 
-	fd1 = fopen(cafile, "r");
-	if (fd1 == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
-	}
+	siz = ca_size;
 
-	siz = fread(x, 1, sizeof(x), fd1);
-	fclose(fd1);
-
-	ptr = x;
+	ptr = ca;
 	res->ncas = 0;
 	i = 1;
 
@@ -287,26 +270,18 @@ static int read_ca_file(GNUTLS_X509PKI_CREDENTIALS res, char *cafile)
 }
 
 
-/* Reads a PEM encoded PKCS-1 RSA private key file
+/* Reads a PEM encoded PKCS-1 RSA private key from memory
  */
-static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
+static int read_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *key, int key_size)
 {
 	int siz, ret;
 	opaque *b64;
 	gnutls_datum tmp;
-	char x[MAX_FILE_SIZE];
-	FILE *fd2;
 
-	fd2 = fopen(keyfile, "r");
-	if (fd2 == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
+	/* read PKCS-1 private key */
+	siz = key_size;
 
-/* second file - PKCS-1 private key */
-
-	siz = fread(x, 1, sizeof(x), fd2);
-	fclose(fd2);
-
-	siz = _gnutls_fbase64_decode(x, siz, &b64);
+	siz = _gnutls_fbase64_decode(key, siz, &b64);
 
 	if (siz < 0) {
 		gnutls_assert();
@@ -329,6 +304,64 @@ static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
 	return 0;
 }
 
+/* Reads a base64 encoded certificate file
+ */
+static int read_cert_file(GNUTLS_X509PKI_CREDENTIALS res, char *certfile)
+{
+	int siz;
+	char x[MAX_FILE_SIZE];
+	FILE *fd1;
+
+	fd1 = fopen(certfile, "r");
+	if (fd1 == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
+
+	siz = fread(x, 1, sizeof(x), fd1);
+	fclose(fd1);
+
+	return read_cert_mem( res, x, siz);
+
+}
+
+/* Reads a base64 encoded CA file (file contains multiple certificate
+ * authorities). This is to be called once.
+ */
+static int read_ca_file(GNUTLS_X509PKI_CREDENTIALS res, char *cafile)
+{
+	int siz;
+	char x[MAX_FILE_SIZE];
+	FILE *fd1;
+
+	fd1 = fopen(cafile, "r");
+	if (fd1 == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
+	siz = fread(x, 1, sizeof(x), fd1);
+	fclose(fd1);
+
+	return read_ca_mem( res, x, siz);
+}
+
+
+/* Reads a PEM encoded PKCS-1 RSA private key file
+ */
+static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
+{
+	int siz;
+	char x[MAX_FILE_SIZE];
+	FILE *fd2;
+
+	fd2 = fopen(keyfile, "r");
+	if (fd2 == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
+
+	siz = fread(x, 1, sizeof(x), fd2);
+	fclose(fd2);
+
+	return read_key_mem( res, x, siz);
+}
 
 /**
   * gnutls_x509pki_allocate_sc - Used to allocate an x509 SERVER CREDENTIALS structure
@@ -430,6 +463,101 @@ int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
 	gnutls_datum tmp;
 
 	if ((ret = read_ca_file(res, CAFILE)) < 0)
+		return ret;
+
+	/* Generate the RDN sequence 
+	 * This will be sent to clients when a certificate
+	 * request message is sent.
+	 */
+
+	/* FIXME: in case of a client it is not needed
+	 * to do that. This would save time and memory.
+	 * However we don't have that information available
+	 * here.
+	 */
+
+	size = 0;
+	for (i = 0; i < res->ncas; i++) {
+		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		size += (2 + tmp.size);
+	}
+
+	res->rdn_sequence.data = gnutls_malloc(size);
+	if (res->rdn_sequence.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	res->rdn_sequence.size = size;
+
+	pdata = res->rdn_sequence.data;
+
+	for (i = 0; i < res->ncas; i++) {
+		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
+			gnutls_free(res->rdn_sequence.data);
+			res->rdn_sequence.size = 0;
+			res->rdn_sequence.data = NULL;
+			gnutls_assert();
+			return ret;
+		}
+		WRITEdatum16(pdata, tmp);
+		pdata += (2 + tmp.size);
+	}
+
+	return 0;
+}
+
+/**
+  * gnutls_x509pki_set_key_mem - Used to set keys in a GNUTLS_X509PKI_CREDENTIALS structure
+  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * @CERT: contains a PEM encoded certificate list (path) for
+  * the specified private key
+  * @KEY: is a PEM encoded private key
+  *
+  * This function sets a certificate/private key pair in the 
+  * GNUTLS_X509PKI_CREDENTIALS structure. This function may be called
+  * more than once (in case multiple keys/certificates exist for the
+  * server).
+  *
+  * Currently only PKCS-1 PEM encoded RSA private keys are accepted by
+  * this function.
+  *
+  **/
+int gnutls_x509pki_set_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum* CERT,
+			   const gnutls_datum* KEY)
+{
+	int ret;
+
+	/* this should be first 
+	 */
+	if ((ret = read_key_mem( res, KEY->data, KEY->size)) < 0)
+		return ret;
+
+	if ((ret = read_cert_mem( res, CERT->data, CERT->size)) < 0)
+		return ret;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509pki_set_trust_mem - Used to set trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
+  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * @CA: is a PEM encoded list of trusted CAs
+  * @CRL: is a PEM encoded list of CRLs (ignored for now)
+  *
+  * This function sets the trusted CAs in order to verify client
+  * certificates.
+  **/
+int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum *CA,
+			     const gnutls_datum *CRL)
+{
+	int ret, size, i;
+	opaque *pdata;
+	gnutls_datum tmp;
+
+	if ((ret = read_ca_mem(res, CA->data, CA->size)) < 0)
 		return ret;
 
 	/* Generate the RDN sequence 
