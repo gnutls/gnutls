@@ -91,25 +91,25 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 2.1.1.1 Extension Type                                  
 
-   A new value, "cert_type(7)", has been added to the enumerated
+   A new value, "cert_type(7)", is added to the enumerated 
    ExtensionType, defined in [TLSEXT].  This value is used as the 
-   extension number for the extensions in both the client hello message 
-   and the server hello message.  This value was chosen based on the 
-   version of defined in [TLSEXT] that was current at the time of 
-   writing, so may be changed in future.
+   extension number for the extensions in both the client hello 
+   message and the server hello message. The new extension type 
+   will be used for certificate type negotiation.
 
 2.1.1.2 Client Hello
 
-   An extension of type CertificateTypeExtension is appended to the
-   standard client hello message using the client hello extension 
-   mechanism defined in [TLSEXT].
+   In order to indicate the support of multiple certificate types
+   clients will include an extension of type "cert_type" to the
+   extended client hello message. The the hello extension mechanism 
+   is described in [TLSEXT].
 
-   This extension carries a list of supported Certificate types the 
+   This extension carries a list of supported certificate types the 
    client can use, sorted by client preference. This extension 
-   SHOULD NOT be used if the client supports only X.509 certificates.
+   SHOULD be omitted if the client supports only X.509 certificates.
 
-
-
+   The "extension_data" field of this extension will contain a
+   CertificateTypeExtension structure.
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 2]
 
@@ -123,7 +123,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    struct {
       select(ClientOrServerExtension) {
          case client:
-            CertificateType certificate_type<1..2^8-1>;
+            CertificateType certificate_types<1..2^8-1>;
          case server:
             CertificateType certificate_type;
       }
@@ -131,16 +131,17 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 2.1.1.3 Server Hello
 
-   The certificate type selected by the server (certificate_type), 
-   is encoded in an CertificateTypeExtension structure, which is 
-   sent in an extended server hello message, using an extension of 
-   type "cert_type".
+   Servers that receive an extended client hello containing the
+   "cert_type" extension MUST select a certificate type, or terminate
+   the connection with a fatal alert of type "unsupported_certificate".
 
-   The CertificateTypeExtension structure may be omited if the server
-   only supports X.509 certificates. In case the server does not
-   support any of the certificate types sent by the client, the 
-   server should terminate the connection with a fatal alert of 
-   "unsupported_certificate" type.
+   The certificate type selected by the server, is encoded in a
+   CertificateTypeExtension structure, which is included in the 
+   extended server hello message, using an extension of type 
+   "cert_type".
+
+   Servers that only support X.509 certificates MAY omit including
+   the "cert_type" extension in the extended server hello.
 
 2.1.2 Server certificate 
 
@@ -166,13 +167,13 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    An OpenPGP key appearing in the Certificate message will be sent 
    in binary OpenPGP format. The option is also available to send an 
    OpenPGP fingerprint, instead of sending the entire key.  The
-   process of fingerprint generation is described in [OpenPGP].  The
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 3]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
+   process of fingerprint generation is described in [OpenPGP].  The
    peer will respond with a "certificate_unobtainable" fatal alert if
    the key with the given key fingerprint cannot be found.  The 
    "certificate_unobtainable" fatal alert is defined in section 4 of 
@@ -223,13 +224,13 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    the server certificate message. This message is only sent in response
    to the certificate request message.  If no OpenPGP key is available 
    from the client, then a certificate that contains an empty PGPKey is
-   returned.  The server may respond with a "handshake_failure" fatal 
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 4]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
+   returned.  The server may respond with a "handshake_failure" fatal 
    alert if client authentication is required. This transaction follows
    the TLS specification.
 
@@ -280,13 +281,13 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    CipherSuite TLS_RSA_WITH_AES_256_CBC_RMD           = { 0x00, 0x7E };
 
    All of the above cipher suites use either the CAST [CAST], 
-   AES [AES], or 3DES block ciphers in CBC mode.  The choice of hash
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 5]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
+   AES [AES], or 3DES block ciphers in CBC mode.  The choice of hash
    is either SHA-1 or RIPEMD-160. Implementations are not required
    to support the above cipher suites. 
 
@@ -318,7 +319,6 @@ Author's Address
 
    Nikos Mavroyanopoulos
    nmav@gnu.org
-
 
 
 
