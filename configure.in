@@ -1,8 +1,28 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.57)
+
+dnl Copyright (C) 2004 Free Software Foundation, Inc.
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
+dnl
+dnl This file is part of GNU TLS.
+dnl
+dnl GNU TLS is free software; you can redistribute it and/or modify it
+dnl under the terms of the GNU Lesser General Public License as
+dnl published by the Free Software Foundation; either version 2.1 of
+dnl the License, or (at your option) any later version.
+dnl
+dnl GNU TLS is distributed in the hope that it will be useful, but
+dnl WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl Lesser General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU Lesser General Public
+dnl License along with GNU TLS; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+dnl 02111-1307, USA
+
 AC_INIT
 
-AC_PREFIX_DEFAULT(/usr/local)
+AC_PREREQ(2.57)
 
 AC_CANONICAL_TARGET([])
 AC_DEFINE_UNQUOTED(T_CPU, "$target_cpu", [CPU name])
