@@ -1565,8 +1565,11 @@ xml_add_mpi( gnutls_datum *xmlkey, CDK_MPI *m, const char *tag )
 void
 xml_add_key_mpi( gnutls_datum *xmlkey, PKT_public_key *pk )
 {
+    const char *s = "    <KEY ENCODING=\"HEX\"/>\n";
+
+    gnutls_datum_append( xmlkey, s, strlen( s ) );
+         
     if ( is_RSA( pk->pubkey_algo ) ) {
-        printf("RSA! ");
         xml_add_mpi( xmlkey, pk->mpi[0], "RSA-N" );
         xml_add_mpi( xmlkey, pk->mpi[1], "RSA-E" );
     }
@@ -1574,7 +1577,12 @@ xml_add_key_mpi( gnutls_datum *xmlkey, PKT_public_key *pk )
         xml_add_mpi( xmlkey, pk->mpi[0], "DSA-P" );
         xml_add_mpi( xmlkey, pk->mpi[1], "DSA-Q" );
         xml_add_mpi( xmlkey, pk->mpi[2], "DSA-G" );
-        xml_add_mpi( xmlkey, pk->mpi[2], "DSA-Y" );
+        xml_add_mpi( xmlkey, pk->mpi[3], "DSA-Y" );
+    }
+    else if ( is_ELG( pk->pubkey_algo ) ) {
+        xml_add_mpi( xmlkey, pk->mpi[0], "ELG-P" );
+        xml_add_mpi( xmlkey, pk->mpi[1], "ELG-G" );
+        xml_add_mpi( xmlkey, pk->mpi[2], "ELG-Y" );
     }
 }
 
@@ -1601,7 +1609,8 @@ xml_add_key( gnutls_datum *xmlkey, int ext, PKT_public_key *pk, int sub )
     xml_add_tag( xmlkey, "FINGERPRINT", fpr );
 
     if ( is_DSA( pk->pubkey_algo ) ) algo = "DSA";
-    else algo = "RSA";    
+    else if ( is_RSA( pk->pubkey_algo ) ) algo = "RSA";
+    else algo = "ELG";
     xml_add_tag( xmlkey, "PKALGO", algo );
 
     sprintf( tmp, "%d", cdk_pk_get_nbits( pk ) );
@@ -1729,6 +1738,9 @@ gnutls_certificate_openpgp_get_as_xml( const gnutls_datum *cert, int ext,
 
     memset( xmlkey, 0, sizeof *xmlkey );
 
+    s = "<?xml version=\"1.0\"?>\n\n";
+    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    
     s = "<OPENPGPKEY>\n";
     gnutls_datum_append( xmlkey, s, strlen( s ) );
 
