@@ -108,8 +108,8 @@
 # patterns, which are highlighted appropriately.
 #
 # 'funcname()' - function
-# '$ENVVAR' - environmental variable
-# '&struct_name' - name of a structure
+# '$ENVVAR' - environmental variable OBSOLETE (?)
+# '#struct_name' - name of a structure
 # '@parameter' - name of a parameter
 # '%CONST' - name of a constant.
 
@@ -126,7 +126,7 @@ use POSIX qw(strftime);
 $type_constant = "\\\%(\\w+)";
 $type_func = "(\\w+\\(\\))";
 $type_param = "\\\@(\\w+)";
-$type_struct = "\\\&(\\w+)";
+$type_struct = "\\\#(\\w+)";
 $type_env = "(\\\$\\w+)";
 
 
@@ -140,7 +140,7 @@ $type_env = "(\\\$\\w+)";
 		     $type_param, "<tt><b>\$1</b></tt>" );
 $blankline_html = "<p>";
 
-%highlights_texinfo = ( $type_constant, "\\\@var{\$1}",
+%highlights_texinfo = ( $type_constant, "\\\@code{\$1}",
 			$type_func, "\\\@code{\$1}",
 			$type_struct, "\\\@code{\$1}",
 			$type_param, "\\\@code{\$1}" );
@@ -161,9 +161,9 @@ $blankline_tex = "\\\\";
 $blankline_sgml = "</para><para>\n";
 
 # these are pretty rough
-%highlights_man = ( $type_constant, "\\n.I \\\"\$1\\\"\\n",
-		    $type_func, "\\n.B \\\"\$1\\\"\\n",
-		    $type_struct, "\\n.I \\\"\$1\\\"\\n",
+%highlights_man = ( "\\s*" .$type_constant . "\\s*", "\\n.I \\\"\$1\\\"\\n",
+		    $type_func . "\\s*", "\\n.B \\\"\$1\\\"\\n",
+		    $type_struct . "\\s*", "\\n.I \\\"\$1\\\"\\n",
 		    $type_param."([\.\, ]*)\n?", "\\n.I \\\"\$1\$2\\\"\\n" );
 $blankline_man = "";
 
@@ -467,7 +467,7 @@ sub output_tex {
 #	print "\n";
 
 	$param3 = $args{'parameters'}{$parameter};
-	$param3 =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
+	$param3 =~ s/#([a-zA-Z\_]+)/{\\it \1}/g;
 
 	$out = just_highlight($param3);
 	$out =~ s/_/\\_/g;
@@ -481,14 +481,14 @@ sub output_tex {
     foreach $section (@{$args{'sectionlist'}}) {
 	$sec = $section;
 	$sec =~ s/_/\\_/g;
-	$sec =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
+	$sec =~ s/#([a-zA-Z\_]+)/{\\it \1}/g;
 
 	print "\n{\\large{$sec}}\\\\\n";
 	print "\\begin{rmfamily}\n";
 
 	$sec = $args{'sections'}{$section};
 	$sec =~ s/\\:/:/g;
-	$sec =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
+	$sec =~ s/#([a-zA-Z\_]+)/{\\it \1}/g;
 	$sec =~ s/->/\$\\rightarrow\$/g;
 	$sec =~ s/([0-9]+)\^([0-9]+)/\$\{\1\}\^\{\2\}\$/g;
 
@@ -776,13 +776,13 @@ sub dump_function {
 $state = 0;
 $section = "";
 
-$doc_special = "\@\%\$\&";
+$doc_special = "\@\%\$\#";
 
 $doc_start = "^/\\*\\*\$";
 $doc_end = "\\*/";
 $doc_com = "\\s*\\*\\s*";
 $doc_func = $doc_com."(\\w+):?";
-$doc_sect = $doc_com."([".$doc_special."[:upper:]][\\w ]+):(.*)";
+$doc_sect = $doc_com."([".$doc_special."[:upper:]][\\w ]+):\\s*(.*)";
 $doc_content = $doc_com."(.*)";
 
 %constants = ();
