@@ -217,25 +217,43 @@ static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
 #define RCVLOWAT state->gnutls_internals.lowat 
 
 int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state) {
-char peekdata1;
+char peekdata1[10];
 char *peekdata2;
+char * peek;
+int ret, sum;
 
-	if (state->gnutls_internals.have_peeked_data==0)
+	if (state->gnutls_internals.have_peeked_data==0 || RCVLOWAT==0)
 		return 0;
 		
-	if (RCVLOWAT != 1) {
-		if (RCVLOWAT == 0)
-			return 0;
-			
+	if (RCVLOWAT > sizeof(peekdata1)) {
 		peekdata2 = gnutls_malloc( RCVLOWAT);
-	
-	        /* this was already read by using MSG_PEEK - so it shouldn't fail */
-	        _gnutls_read( cd, peekdata2, RCVLOWAT, 0); 
-        
-      		gnutls_free(peekdata2);
+		if (peekdata2==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		
+		peek = peekdata2;
+		
         } else {
-	        _gnutls_read( cd, &peekdata1, RCVLOWAT, 0); 
+        	peek = peekdata1;
         }
+
+        /* this was already read by using MSG_PEEK - so it shouldn't fail */
+	sum = 0;
+        do { /* we need this to finish now */
+        	ret = _gnutls_read( cd, peek, RCVLOWAT-sum, 0);
+        	if (ret > 0) sum+=ret;
+       	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN || sum < RCVLOWAT);
+
+	if (peek==peekdata2) {
+		gnutls_free(peekdata2);
+	}
+	
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	state->gnutls_internals.have_peeked_data=0;
 
        	return 0;
@@ -332,7 +350,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 * into the kernel buffer (using a read with MSG_PEEK), thus making
 	 * select think, that the socket is ready for reading
 	 */
-	if (ret >= 0 && recvlowat > 0) {
+	if (ret == (recvdata - recvlowat) && recvlowat > 0) {
 		ret2 = _gnutls_read( fd, &buf[buf_pos], recvlowat, MSG_PEEK);
 
 		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) {
