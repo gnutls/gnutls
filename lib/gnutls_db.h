@@ -24,3 +24,6 @@ int _gnutls_server_register_current_session( GNUTLS_STATE state);
 int _gnutls_server_restore_session( GNUTLS_STATE state, uint8* session_id, int session_id_size);
 int gnutls_clean_db( GNUTLS_STATE state);
 int _gnutls_db_remove_session( GNUTLS_STATE state, uint8* session_id, int session_id_size);
+int _gnutls_store_session( GNUTLS_STATE state, gnutls_datum session_id, gnutls_datum session_data);
+gnutls_datum _gnutls_retrieve_session( GNUTLS_STATE state, gnutls_datum session_id);
+int _gnutls_remove_session( GNUTLS_STATE state, gnutls_datum session_id);

@@ -55,15 +55,13 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
   * if you have changed the default low water value (default is 1).
   * Normally you will not need that function. 
   * This function is only usefull if using berkeley style sockets.
-  * Otherwise it does nothing.
+  * Otherwise it must be called and set lowat to zero.
   *
   **/
 int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	state->gnutls_internals.lowat = num;
 	return 0;
 }
-
-extern ssize_t (*_gnutls_pull_func)( SOCKET, void*, size_t);
 
 /**
   * gnutls_init - This function initializes the state to null (null encryption etc...).
@@ -108,10 +106,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
-	if (_gnutls_pull_func==NULL)
-		gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
-	else
-		gnutls_set_lowat((*state), 0);
+	gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 
 	gnutls_set_max_handshake_data_buffer_size( (*state), MAX_HANDSHAKE_DATA_BUFFER_SIZE);
 

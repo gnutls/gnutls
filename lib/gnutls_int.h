@@ -150,6 +150,11 @@ typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
  */
 typedef ssize_t (*PULL_FUNC)(SOCKET, void*, size_t);
 typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
+/* Store & Retrieve functions defines: 
+ */
+typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
+typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
+typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
 
 typedef struct {
 	KXAlgorithm algorithm;
@@ -425,6 +430,13 @@ typedef struct {
 	 */
 	PULL_FUNC _gnutls_pull_func;
 	PUSH_FUNC _gnutls_push_func;
+	/* STORE & RETRIEVE functions. Only used if other
+	 * backend than gdbm is used.
+	 */
+	DB_STORE_FUNC db_store_func;
+	DB_RETR_FUNC db_retrieve_func;
+	DB_REMOVE_FUNC db_remove_func;
+	void* db_ptr;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

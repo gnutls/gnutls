@@ -136,10 +136,18 @@ int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_
 /* returns the session ID */
 int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size);
 
+typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
+typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
+typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
+
 int gnutls_set_lowat( GNUTLS_STATE state, int num);
 int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
 int gnutls_set_db_name( GNUTLS_STATE state, char* filename);	
 int gnutls_clean_db( GNUTLS_STATE state);
+void gnutls_set_db_retrieve_func( GNUTLS_STATE, DB_RETR_FUNC);
+void gnutls_set_db_remove_func( GNUTLS_STATE, DB_REMOVE_FUNC);
+void gnutls_set_db_store_func( GNUTLS_STATE, DB_STORE_FUNC);
+void gnutls_set_db_ptr( GNUTLS_STATE, void* db_ptr);
 
 void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
 
@@ -222,9 +230,11 @@ int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int
 
 typedef ssize_t (*PULL_FUNC)(SOCKET, void*, size_t);
 typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
+
 typedef void (*LOG_FUNC)( const char*);
 
-void gnutls_global_set_push_func( PUSH_FUNC push_func);
-void gnutls_global_set_pull_func( PULL_FUNC pull_func);
+void gnutls_set_push_func( GNUTLS_STATE, PUSH_FUNC push_func);
+void gnutls_set_pull_func( GNUTLS_STATE, PULL_FUNC pull_func);
+
 
 
