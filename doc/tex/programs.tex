@@ -25,7 +25,7 @@ $ gnutls-srpcrypt --create-conf /etc/tpasswd.conf
 
 \item This command will create /etc/tpasswd and will add user 'test' (you will also
 be prompted for a password). Verifiers are stored by default in the
-way libsrp expects (using a modified SHA()). 
+way libsrp expects.
 \begin{verbatim}
 $ gnutls-srpcrypt --passwd /etc/tpasswd \ 
     --passwd-conf /etc/tpasswd.conf -u test

@@ -3,12 +3,12 @@
 
 Transport Layer Security Working                               D. Taylor
 Group                                             Forge Research Pty Ltd
-Internet-Draft                                         September 4, 2002
-Expires: March 5, 2003
+Internet-Draft                                         November 29, 2002
+Expires: May 30, 2003
 
 
                     Using SRP for TLS Authentication
-                         draft-ietf-tls-srp-03
+                         draft-ietf-tls-srp-04
 
 Status of this Memo
 
@@ -31,7 +31,7 @@ Status of this Memo
    The list of Internet-Draft Shadow Directories can be accessed at
    http://www.ietf.org/shadow.html.
 
-   This Internet-Draft will expire on March 5, 2003.
+   This Internet-Draft will expire on May 30, 2003.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Abstract
 
 
 
-Taylor                   Expires March 5, 2003                  [Page 1]
+Taylor                    Expires May 30, 2003                  [Page 1]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
 Table of Contents
@@ -68,18 +68,16 @@ Table of Contents
    2.2   SRP Verifier Message Digest Selection  . . . . . . . . . . .  5
    2.3   Changes to the Handshake Message Contents  . . . . . . . . .  5
    2.3.1 Client hello . . . . . . . . . . . . . . . . . . . . . . . .  5
-   2.3.2 Server hello . . . . . . . . . . . . . . . . . . . . . . . .  5
-   2.3.3 Server certificate . . . . . . . . . . . . . . . . . . . . .  5
+   2.3.2 Server certificate . . . . . . . . . . . . . . . . . . . . .  5
+   2.3.3 Server key exchange  . . . . . . . . . . . . . . . . . . . .  5
    2.3.4 Client key exchange  . . . . . . . . . . . . . . . . . . . .  6
-   2.3.5 Server key exchange  . . . . . . . . . . . . . . . . . . . .  6
    2.4   Calculating the Pre-master Secret  . . . . . . . . . . . . .  6
    2.5   Cipher Suite Definitions . . . . . . . . . . . . . . . . . .  6
    2.6   New Message Structures . . . . . . . . . . . . . . . . . . .  7
    2.6.1 ExtensionType  . . . . . . . . . . . . . . . . . . . . . . .  7
    2.6.2 Client Hello . . . . . . . . . . . . . . . . . . . . . . . .  7
-   2.6.3 Server Hello . . . . . . . . . . . . . . . . . . . . . . . .  8
-   2.6.4 Client Key Exchange  . . . . . . . . . . . . . . . . . . . .  8
-   2.6.5 Server Key Exchange  . . . . . . . . . . . . . . . . . . . .  8
+   2.6.3 Server Key Exchange  . . . . . . . . . . . . . . . . . . . .  7
+   2.6.4 Client Key Exchange  . . . . . . . . . . . . . . . . . . . .  9
    3.    Security Considerations  . . . . . . . . . . . . . . . . . . 10
          References . . . . . . . . . . . . . . . . . . . . . . . . . 11
          Author's Address . . . . . . . . . . . . . . . . . . . . . . 11
@@ -109,9 +107,11 @@ Table of Contents
 
 
 
-Taylor                   Expires March 5, 2003                  [Page 2]
+
+
+Taylor                    Expires May 30, 2003                  [Page 2]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
 1. Introduction
@@ -120,8 +120,8 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
    DSA digital signatures, or Kerberos, for authentication.
 
    These authentication methods do not seem well suited to the
-   applications now being adapted to use TLS (IMAP [3], FTP [5], or
-   TELNET [6], for example).  Given these protocols (and others like
+   applications now being adapted to use TLS (IMAP [4], FTP [6], or
+   TELNET [7], for example).  Given these protocols (and others like
    them) are designed to use the user name and password method of
    authentication, being able to safely use user names and passwords to
    authenticate the TLS connection provides a much easier route to
@@ -140,14 +140,6 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
    "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this
    document are to be interpreted as described in RFC 2119.
 
-   Changes in this version:
-
-      Changed the order of the s, N, and g parameters for the Server
-      Hello message in the handshake sequence diagram to conform to the
-      SRPExtension structure.
-
-      Removed the requirement to add leading zeros to encoded numbers
-      whose most significant bit is set.
 
 
 
@@ -165,21 +157,28 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 
-Taylor                   Expires March 5, 2003                  [Page 3]
+
+
+
+
+
+
+
+
+Taylor                    Expires May 30, 2003                  [Page 3]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
 2. SRP Authentication in TLS
 
 2.1 Modifications to the TLS Handshake Sequence
 
-   The SRP protocol can not be implemented using the sequence of
-   handshake messages defined in [1] due to the sequence in which the
-   SRP messages must be sent.
+   The advent of SRP-6 [3] allows the SRP protocol to be implemented
+   using the standard sequence of handshake messages defined in [1].
 
-   This document presents a new sequence of handshake messages for
-   handshakes using the SRP authentication method.
+   The parameters to various messages are given in the following
+   diagram.
 
 2.1.1 Message Sequence
 
@@ -187,66 +186,65 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
 
           Client                                 Server
             |                                      |
-       Client Hello (U) ------------------------>  |
-            |  <---------------------------- Server Hello (s, N, g)
+       Client Hello (I) ------------------------>  |
+            |  <---------------------------- Server Hello
             |  <---------------------------- Certificate*
-       Client Key Exchange (A) ----------------->  |
-            |  <---------------------------- Server Key Exchange (B)
+            |  <---------------------------- Server Key Exchange (N, g, s, B)
             |  <---------------------------- Server Hello Done
-       change cipher spec                          |
+       Client Key Exchange (A) ----------------->  |
+       [Change cipher spec]                        |
        Finished -------------------------------->  |
-            |                                change cipher spec
+            |                        [Change cipher spec]
             |  <---------------------------- Finished
             |                                      |
+       Application Data  <--------------> Application Data
 
    * Indicates optional or situation-dependent messages that are not
    always sent.
 
    The identifiers given after each message name refer to the SRP
-   variables included in that message.  The variables U, g, N, s, A, and
-   B are defined in [2].
+   variables included in that message.  The variables I, N, g, s, A, and
+   B are defined in [3].
 
-   Extended client and server hello messages, as defined in [7], are
-   used to to send the initial client and server values.
+   An extended client hello message, as defined in [8], is used to send
+   the client identifier (the user name).
 
-   The client key exchange message is sent during the sequence of server
-   messages.  This modification is required because the client must send
-   its public key (A) before it receives the servers public key (B), as
-   stated in Section 3 of [2].
+   Servers MAY add an SRP extension to the server hello message.  For
+   the cipher suites defined in this document no information is carried
+   in the SRP extension in the server hello message.  The option to add
+   an SRP extension to the server hello message is given in case it is
+   required in future.
 
 2.1.2 Session Re-use
 
    The short handshake mechanism for re-using sessions for new
-   connections, and renegotiating keys for existing connections will
 
 
 
-Taylor                   Expires March 5, 2003                  [Page 4]
+Taylor                    Expires May 30, 2003                  [Page 4]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
+   connections, and renegotiating keys for existing connections will
    still work with the SRP authentication mechanism and handshake.
 
    When a client attemps to re-use a session that uses SRP
-   authentication, it MUST still include the SRP extension carrying the
-   user name (U) in the client hello message, in case the server cannot
-   or will not allow re-use of the session, meaning a full handshake
+   authentication, it MUST include the SRP extension carrying the user
+   name (I) in the client hello message, in case the server cannot or
+   will not allow re-use of the session, meaning a full handshake
    sequence is required.
 
-   If a client requests an existing session and the server agrees to use
-   it (meaning the short handshake will be used), the server MAY omit
-   the SRP extension from the server hello message, as the information
-   it contains is not used in the short handshake.
+   If the server does agree to re-use an existing session the server
+   MUST ignore the information in the SRP extension of the client hello
+   message, except for its inclusion in the finished message hashes.
+   This is to ensure attackers cannot replace the authenticated identity
+   without supplying the proper authentication information.
 
 2.2 SRP Verifier Message Digest Selection
 
-   The cipher suites defined in this document use the SHA-1 message
-   digest with the SRP algorithm, as specified in [2].  Implementations
-   conforming to this document MUST use the SHA-1 message digest.
-
-   Future documents may define other cipher suites that use different
-   message digests, or other similar functions, with the SRP algorithm.
+   Implementations conforming to this document MUST use the SHA-1
+   message digest with the SRP algorithm.
 
 2.3 Changes to the Handshake Message Contents
 
@@ -258,15 +256,9 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
 2.3.1 Client hello
 
    The user name is appended to the standard client hello message using
-   the hello message extension mechanism defined in [7].
+   the hello message extension mechanism defined in [8].
 
-2.3.2 Server hello
-
-   The the generator (g), the prime (N), and the salt value (s) read
-   from the SRP password file are appended to the server hello message
-   using the hello message extension mechanism defined in [7].
-
-2.3.3 Server certificate
+2.3.2 Server certificate
 
    The server MUST send a certificate if it agrees to an SRP cipher
    suite that requires the server to provide additional authentication
@@ -274,34 +266,32 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
    which ciphersuites defined in this document require a server
    certificate to be sent.
 
-
-
-
-Taylor                   Expires March 5, 2003                  [Page 5]
-
-Internet-Draft      Using SRP for TLS Authentication      September 2002
-
-
    Because the server's certificate is only used for generating a
    digital signature in SRP cipher suites, the certificate sent MUST
    contain a public key that can be used for generating digital
    signatures.
 
-2.3.4 Client key exchange
+2.3.3 Server key exchange
 
-   The client key exchange message carries the client's public key (A),
-   which is calculated using both information known locally, and
-   information received in the server hello message.  This message MUST
-   be sent before the server key exchange message.
+   The server key exchange message contains the prime (N), the generator
 
-2.3.5 Server key exchange
 
-   The server key exchange message contains the server's public key (B).
-   The server key exchange message MUST be sent after the client key
-   exchange message.
+
+Taylor                    Expires May 30, 2003                  [Page 5]
+
+Internet-Draft      Using SRP for TLS Authentication       November 2002
+
+
+   (g), and the salt value (s) read from the SRP password file based on
+   the value of (I) received in the client hello extension.  The server
+   key exchange message also contains the server's public key (B).
 
    If the server has sent a certificate message, the server key exchange
    message MUST be signed.
+
+2.3.4 Client key exchange
+
+   The client key exchange message carries the client's public key (A).
 
 2.4 Calculating the Pre-master Secret
 
@@ -309,15 +299,15 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
    [2]) is used as the pre-master secret.
 
    The finished messages perform the same function as the client and
-   server evidence messages specified in [2].  If either the client or
-   the server calculate an incorrect value, the finished messages will
-   not be understood, and the connection will be dropped as specified in
-   [1].
+   server evidence messages (M1 and M2) specified in [2].  If either the
+   client or the server calculate an incorrect value, the finished
+   messages will not be understood, and the connection will be dropped
+   as specified in [1].
 
 2.5 Cipher Suite Definitions
 
    The following cipher suites are added by this draft.  The usage of
-   AES ciphersuites is as defined in [4].
+   AES ciphersuites is as defined in [5].
 
       CipherSuite TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA     = { 0x00,0x50 };
 
@@ -331,13 +321,6 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
 
       CipherSuite TLS_SRP_SHA_DSS_WITH_AES_128_CBC_SHA  = { 0x00,0x55 };
 
-
-
-Taylor                   Expires March 5, 2003                  [Page 6]
-
-Internet-Draft      Using SRP for TLS Authentication      September 2002
-
-
       CipherSuite TLS_SRP_SHA_WITH_AES_256_CBC_SHA      = { 0x00,0x56 };
 
       CipherSuite TLS_SRP_SHA_RSA_WITH_AES_256_CBC_SHA  = { 0x00,0x57 };
@@ -347,6 +330,13 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
    Cipher suites that do not include a digitial signature algorithm
    identifier assume the server is authenticated by its possesion of the
    SRP database.
+
+
+
+Taylor                    Expires May 30, 2003                  [Page 6]
+
+Internet-Draft      Using SRP for TLS Authentication       November 2002
+
 
    Cipher suites that begin with TLS_SRP_SHA_RSA or TLS_SRP_SHA_DSS
    require the server to send a certificate message containing a
@@ -367,31 +357,14 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
 2.6.1 ExtensionType
 
    A new value, "srp(6)", has been added to the enumerated
-   ExtensionType, defined in [7].  This value is used as the extension
-   number for the extensions in both the client hello message and the
-   server hello message.
+   ExtensionType, defined in [8].  This value MUST be used as the
+   extension number for the SRP extension.
 
 2.6.2 Client Hello
 
-   The user name (U) is encoded in an SRPExtension structure, and sent
+   The user name (I) is encoded in an SRPExtension structure, and sent
    in an extended client hello message, using an extension of type
    "srp".
-
-
-
-
-
-
-
-
-
-
-
-
-
-Taylor                   Expires March 5, 2003                  [Page 7]
-
-Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
    enum { client, server } ClientOrServerExtension;
@@ -399,61 +372,30 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
    struct {
       select(ClientOrServerExtension) {
          case client:
-            opaque srp_U<1..2^8-1>;
+            opaque srp_I<1..2^8-1>;
          case server:
-            opaque srp_s<1..2^8-1>
-            opaque srp_N<1..2^16-1>;
-            opaque srp_g<1..2^16-1>;
+            /* empty struct */
       }
    } SRPExtension;
 
 
-2.6.3 Server Hello
-
-   The generator (g), the prime (N), and the salt value (s) are encoded
-   in an SRPExtension structure, which is sent in an extended server
-   hello message, using an extension of type "srp".
-
-2.6.4 Client Key Exchange
-
-   When the value of KeyExchangeAlgorithm is set to "srp", the client's
-   ephemeral public key (A) is sent in the client key exchange message,
-   encoded in an ClientSRPPublic structure.
-
-   An extra value, srp, has been added to the enumerated
-   KeyExchangeAlgorithm, originally defined in TLS [1].
-
-   struct {
-      select (KeyExchangeAlgorithm) {
-         case rsa: EncryptedPreMasterSecret;
-         case diffie_hellman: ClientDiffieHellmanPublic;
-         case srp: ClientSRPPublic;   /* new entry */
-      } exchange_keys;
-   } ClientKeyExchange;
-
-   enum { rsa, diffie_hellman, srp } KeyExchangeAlgorithm;
-
-   struct {
-      opaque srp_A<1..2^16-1>;
-   } ClientSRPPublic;
-
-
-2.6.5 Server Key Exchange
+2.6.3 Server Key Exchange
 
    When the value of KeyExchangeAlgorithm is set to "srp", the server's
-   ephemeral public key (B) is sent in the server key exchange message,
+   SRP parameters are sent in the server key exchange message, encoded
+   in a ServerSRPParams structure.
+
+   If a certificate is sent to the client the server key exchange
 
 
 
-Taylor                   Expires March 5, 2003                  [Page 8]
+Taylor                    Expires May 30, 2003                  [Page 7]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
-   encoded in an ServerSRPPublic structure.
-
-   The following table gives the SignatureAlgorithm value to be used for
-   each ciphersuite.
+   message must be signed.  The following table gives the
+   SignatureAlgorithm value to be used for each ciphersuite.
 
       Ciphersuite                            SignatureAlgorithm
 
@@ -485,14 +427,17 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
             ServerRSAParams params;
             Signature signed_params;
          case srp:   /* new entry */
-            ServerSRPPublic params;
+            ServerSRPParams params;
             Signature signed_params;
       };
    } ServerKeyExchange;
 
    struct {
+      opaque srp_N<1..2^16-1>;
+      opaque srp_g<1..2^16-1>;
+      opaque srp_s<1..2^8-1>
       opaque srp_B<1..2^16-1>;
-   } ServerSRPPublic;     /* SRP parameters */
+   } ServerSRPParams;     /* SRP parameters */
 
 
 
@@ -500,10 +445,65 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 
-
-Taylor                   Expires March 5, 2003                  [Page 9]
+Taylor                    Expires May 30, 2003                  [Page 8]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
+
+
+2.6.4 Client Key Exchange
+
+   When the value of KeyExchangeAlgorithm is set to "srp", the client's
+   ephemeral public key (A) is sent in the client key exchange message,
+   encoded in an ClientSRPPublic structure.
+
+   An extra value, srp, has been added to the enumerated
+   KeyExchangeAlgorithm, originally defined in TLS [1].
+
+   struct {
+      select (KeyExchangeAlgorithm) {
+         case rsa: EncryptedPreMasterSecret;
+         case diffie_hellman: ClientDiffieHellmanPublic;
+         case srp: ClientSRPPublic;   /* new entry */
+      } exchange_keys;
+   } ClientKeyExchange;
+
+   enum { rsa, diffie_hellman, srp } KeyExchangeAlgorithm;
+
+   struct {
+      opaque srp_A<1..2^16-1>;
+   } ClientSRPPublic;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Taylor                    Expires May 30, 2003                  [Page 9]
+
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
 3. Security Considerations
@@ -557,9 +557,9 @@ Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 
-Taylor                   Expires March 5, 2003                 [Page 10]
+Taylor                    Expires May 30, 2003                 [Page 10]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
 References
@@ -570,20 +570,23 @@ References
    [2]  Wu, T., "The SRP Authentication and Key Exchange System", RFC
         2945, September 2000.
 
-   [3]  Newman, C., "Using TLS with IMAP, POP3 and ACAP", RFC 2595, June
+   [3]  Wu, T., "SRP-6: Improvements and Refinements to the Secure
+        Remote Password Protocol", October 2002.
+
+   [4]  Newman, C., "Using TLS with IMAP, POP3 and ACAP", RFC 2595, June
         1999.
 
-   [4]  Chown, P., "Advanced Encryption Standard (AES) Ciphersuites for
+   [5]  Chown, P., "Advanced Encryption Standard (AES) Ciphersuites for
         Transport Layer Security (TLS)", RFC 3268, June 2002.
 
-   [5]  Ford-Hutchinson, P., Carpenter, M., Hudson, T., Murray, E. and
+   [6]  Ford-Hutchinson, P., Carpenter, M., Hudson, T., Murray, E. and
         V. Wiegand, "Securing FTP with TLS", draft-murray-auth-ftp-ssl-
         09 (work in progress), April 2002.
 
-   [6]  Boe, M. and J. Altman, "TLS-based Telnet Security", draft-ietf-
+   [7]  Boe, M. and J. Altman, "TLS-based Telnet Security", draft-ietf-
         tn3270e-telnet-tls-06 (work in progress), April 2002.
 
-   [7]  Blake-Wilson, S., Nystrom, M., Hopwood, D., Mikkelsen, J. and T.
+   [8]  Blake-Wilson, S., Nystrom, M., Hopwood, D., Mikkelsen, J. and T.
         Wright, "TLS Extensions", draft-ietf-tls-extensions-05 (work in
         progress), July 2002.
 
@@ -610,18 +613,17 @@ Author's Address
 
 
 
-
-
-
-Taylor                   Expires March 5, 2003                 [Page 11]
+Taylor                    Expires May 30, 2003                 [Page 11]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
 Appendix A. Acknowledgements
 
    Thanks to all on the IETF tls mailing list for ideas and analysis.
 
+   Thanks to Tom Wu for adapting the SRP protocol so it fits the
+   standard TLS handshake message sequence.
 
 
 
@@ -667,11 +669,9 @@ Appendix A. Acknowledgements
 
 
 
-
-
-Taylor                   Expires March 5, 2003                 [Page 12]
+Taylor                    Expires May 30, 2003                 [Page 12]
 
-Internet-Draft      Using SRP for TLS Authentication      September 2002
+Internet-Draft      Using SRP for TLS Authentication       November 2002
 
 
 Full Copyright Statement
@@ -725,6 +725,6 @@ Acknowledgement
 
 
 
-Taylor                   Expires March 5, 2003                 [Page 13]
+Taylor                    Expires May 30, 2003                 [Page 13]
 
 
