@@ -113,7 +113,7 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
       if (ret == GNUTLS_SAN_DNSNAME) {
          found_dnsname = 1;
          if (_gnutls_hostname_compare(dnsname, hostname)) {
-            return GNUTLS_E_NAME_DOES_NOT_MATCH;
+            return 1;
          }
       }
 
@@ -127,11 +127,11 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
       		0, dnsname, &dnsnamesize) < 0) {
          /* got an error, can't find a name 
           */
-         return GNUTLS_E_NAME_DOES_NOT_MATCH;
+         return 1;
       }
 
       if (_gnutls_hostname_compare(dnsname, hostname)) {
-         return GNUTLS_E_NAME_DOES_NOT_MATCH;
+         return 1;
       }
    }
 

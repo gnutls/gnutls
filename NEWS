@@ -1,5 +1,9 @@
+Version 1.0.7
+- Corrected the return values of gnutls_x509_crt_check_hostname().
+
 Version 1.0.6 (12/02/2004)
-* Backported things from the development branch:
+* Backported things from the development branch (while maintaining
+  backwards compatibility):
 - Improved gnutls-cli's SRP behaviour in SRP ciphersuites.
   If they are of highest priority then the abbreviated handshake
   is used.
