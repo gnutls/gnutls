@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004, 2005 Free Software Foundation
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -266,7 +266,6 @@ static int cert_callback(gnutls_session session,
     char issuer_dn[256];
     int i, ret;
     size_t len;
-    gnutls_certificate_type type;
 
     if (verbose) {
 
@@ -293,31 +292,28 @@ static int cert_callback(gnutls_session session,
      * The certificate must be of any of the "sign algorithms"
      * supported by the server.
      */
-    st->type = type;
+
+    st->type = gnutls_certificate_type_get(session);
+
     st->ncerts = 0;
 
-    type = gnutls_certificate_type_get(session);
-    if (type == GNUTLS_CRT_X509) {
+    if (st->type == GNUTLS_CRT_X509) {
 	if (x509_crt != NULL && x509_key != NULL) {
 	    st->ncerts = 1;
 
 	    st->cert.x509 = &x509_crt;
 	    st->key.x509 = x509_key;
 
-	    st->type = type;
-
 	    st->deinit_all = 0;
 
 	    return 0;
 	}
-    } else if (type == GNUTLS_CRT_OPENPGP) {
+    } else if (st->type == GNUTLS_CRT_OPENPGP) {
 	if (pgp_key != NULL && pgp_crt != NULL) {
 	    st->ncerts = 1;
 
 	    st->cert.pgp = pgp_crt;
 	    st->key.pgp = pgp_key;
-
-	    st->type = type;
 
 	    st->deinit_all = 0;
 
