@@ -1,3 +1,32 @@
+2003-03-12 12:43  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls_dh_primes.c, lib/gnutls_x509.c,
+	src/cli.c:
+
+	Use mmap() if available to read files.  
+
+2003-03-12 12:06  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/Makefile.am, lib/defines.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_x509.c, lib/strnstr.c,
+	lib/x509_b64.c:
+
+	* Added an strnstr() function and the requirement in some functions
+	  to use null terminated PEM structures is no more.  
+
+2003-03-12 10:57  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_cert.c, lib/auth_cert.h, lib/auth_dhe.c,
+	lib/auth_rsa.c, lib/auth_rsa_export.c, lib/gnutls_cert.c,
+	lib/gnutls_cert.h, lib/gnutls_mpi.h, lib/gnutls_sig.c,
+	lib/gnutls_sig.h, lib/gnutls_x509.c:
+
+	* Added ability to generate RSA keys.  
+	* Increased the maximum parameter size in order to read some large
+	  keys by some CAs. Patch by Ian Peters <itp@ximian.com>.  
+	* Rolled back some of yesterdays changes. The gnutls_x509_privkey,
+	  was replaced (again) by the gnutls_privkey.  
+
 2003-03-11 20:14  nmav <nmav@gnutls.org>
 
 	* lib/: Makefile.am, auth_cert.c, auth_cert.h, auth_dhe.c,
