@@ -630,7 +630,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	ret =
 	    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, type, dataptr,
 			     SSL2_HEADERS);
-	if (ret < 0) {
+	if (ret <= 0) {
 		gnutls_assert();
 		gnutls_free(dataptr);
 		return ret;
@@ -649,7 +649,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 				     &dataptr[SSL2_HEADERS],
 				     HANDSHAKE_HEADERS_SIZE -
 				     SSL2_HEADERS);
-		if (ret < 0) {
+		if (ret <= 0) {
 			gnutls_assert();
 			gnutls_free(dataptr);
 			return ret;
@@ -1426,7 +1426,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	ret =
 	    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
 			    &ch, 1, 0);
-	if (ret < 0) {
+	if (ret <= 0) {
 		ERR("recv ChangeCipherSpec", ret);
 		gnutls_assert();
 		return ret;
