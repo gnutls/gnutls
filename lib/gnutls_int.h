@@ -65,6 +65,8 @@ typedef int gnutls_transport_ptr;
 #define MAX_LOG_SIZE 1024 /* maximum number of log message */
 #define MAX_SRP_USERNAME 256
 
+/* we can receive up to MAX_EXT_TYPES extensions.
+ */
 #define MAX_EXT_TYPES 16
 
 /* The initial size of the receive
@@ -525,9 +527,9 @@ typedef struct {
 	/* holds the extensions we sent to the peer
 	 * (in case of a client)
 	 */
-	uint8			extensions_sent[MAX_EXT_TYPES];
-	uint8			extensions_sent_size;
-	
+	uint16			extensions_sent[MAX_EXT_TYPES];
+	uint16			extensions_sent_size;
+
 	/* is 0 if we are to send the whole PGP key, or non zero
 	 * if the fingerprint is to be sent.
 	 */

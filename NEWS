@@ -2,6 +2,8 @@ Version 0.5.6
 - Corrected bugs in SRP implementation, which prevented gnutls 
   to interoperate with other implementations.
 - Corrected bug in cert_type extension.
+- Corrected extension type checks which used an 8 bit extension size,
+  instead of 16 bits.
 
 Version 0.5.5 (3/09/2002)
 - Updated the SRP implementation to the latest draft. The blowfish

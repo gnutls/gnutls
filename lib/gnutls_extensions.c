@@ -83,7 +83,7 @@ const char *_gnutls_extension_get_name(uint16 type)
 /* Checks if the extension we just received is one of the 
  * requested ones. Otherwise it's a fatal error.
  */
-static int _gnutls_extension_list_check( gnutls_session session, uint8 type) {
+static int _gnutls_extension_list_check( gnutls_session session, uint16 type) {
 int i;
 	if (session->security_parameters.entity==GNUTLS_CLIENT) {
 		for(i=0;i<session->internals.extensions_sent_size;i++) {
@@ -154,12 +154,10 @@ int i;
  * This list is used to check whether the (later) received
  * extensions are the ones we requested.
  */
-static void _gnutls_extension_list_add( gnutls_session session, uint8 type) {
+static void _gnutls_extension_list_add( gnutls_session session, uint16 type) {
 
 	if (session->security_parameters.entity==GNUTLS_CLIENT) {
-		if (session->internals.extensions_sent_size <
-			sizeof(session->internals.extensions_sent)) {
-	
+		if (session->internals.extensions_sent_size < MAX_EXT_TYPES) {
 			session->internals.extensions_sent[session->internals.extensions_sent_size] = type;
 			session->internals.extensions_sent_size++;
 		} else {
