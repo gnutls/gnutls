@@ -29,6 +29,8 @@ static int last_error = 0;
 
 int SSL_library_init(void)
 {
+    gnutls_global_init();
+    /* NB: we haven't got anywhere to call gnutls_global_deinit() */
     return 1;
 }
 
@@ -43,7 +45,6 @@ void OpenSSL_add_all_algorithms(void)
 SSL_CTX *SSL_CTX_new(SSL_METHOD *method)
 {
     SSL_CTX *ctx;
-    gnutls_global_init();
     
     ctx = (SSL_CTX *)calloc(1, sizeof(SSL_CTX));
     ctx->method = method;
@@ -53,15 +54,8 @@ SSL_CTX *SSL_CTX_new(SSL_METHOD *method)
 
 void SSL_CTX_free(SSL_CTX *ctx)
 {
-    free(ctx->method->protocol_priority);
-    free(ctx->method->cipher_priority);
-    free(ctx->method->comp_priority);
-    free(ctx->method->kx_priority);
-    free(ctx->method->mac_priority);
     free(ctx->method);
     free(ctx);
-
-    gnutls_global_deinit();
 }
 
 int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
@@ -289,30 +283,25 @@ SSL_METHOD *SSLv23_client_method(void)
     if (!m)
         return NULL;
 
-    m->protocol_priority = (int *)calloc(3, sizeof(int));
     m->protocol_priority[0] = GNUTLS_TLS1;
     m->protocol_priority[1] = GNUTLS_SSL3;
     m->protocol_priority[2] = 0;
 
-    m->cipher_priority = (int *)calloc(5, sizeof(int));
     m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
     m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
     m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
     m->cipher_priority[4] = 0;
 
-    m->comp_priority = (int *)calloc(3, sizeof(int));
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
     m->comp_priority[1] = GNUTLS_COMP_NULL;
     m->comp_priority[2] = 0;
 
-    m->kx_priority = (int *)calloc(4, sizeof(int));
     m->kx_priority[0] = GNUTLS_KX_DHE_RSA;
     m->kx_priority[1] = GNUTLS_KX_RSA;
     m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
     m->kx_priority[3] = 0;
 
-    m->mac_priority = (int *)calloc(3, sizeof(int));
     m->mac_priority[0] = GNUTLS_MAC_SHA;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
@@ -346,7 +335,7 @@ const char *SSL_CIPHER_get_name(SSL_CIPHER *cipher)
     if (!cipher)
         return ("NONE");
 
-    /* FIXME */
+    /* FIXME? - the openssl name is of the form "DES-CBC3-SHA" */
     return gnutls_cipher_get_name(cipher->cipher);
 }
 
@@ -384,13 +373,14 @@ int SSL_CIPHER_get_bits(SSL_CIPHER *cipher, int *bits)
 
 const char *SSL_CIPHER_get_version(SSL_CIPHER *cipher)
 {
+    const char *ret;
+
     if (!cipher)
         return ("(NONE)");
 
-    if (cipher->version == GNUTLS_TLS1)
-        return ("TLSv1");
-    else if (cipher->version == GNUTLS_SSL3)
-        return ("SSLv3");
+    ret = gnutls_protocol_get_name(cipher->version);
+    if (ret)
+        return ret;
 
     return ("unknown");
 }

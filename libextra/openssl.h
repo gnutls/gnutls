@@ -30,6 +30,7 @@
 
 #define OPENSSL_VERSION_NUMBER (0x0090604F)
 #define SSLEAY_VERSION_NUMBER OPENSSL_VERSION_NUMBER
+#define OPENSSL_VERSION_TEXT ("GNUTLS " LIBGNUTLS_VERSION)
 
 #define SSL_ERROR_NONE        (0)
 #define SSL_ERROR_SSL         (1)
@@ -58,11 +59,11 @@ struct _SSL;
 
 typedef struct
 {
-    int *protocol_priority;
-    int *cipher_priority;
-    int *comp_priority;
-    int *kx_priority;
-    int *mac_priority;
+    int protocol_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    int cipher_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    int comp_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    int kx_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    int mac_priority[GNUTLS_MAX_ALGORITHM_NUM];
 } SSL_METHOD;
 
 
