@@ -3,3 +3,4 @@
 * Document API using texi (any volunteers?)
 * use SRP password format as in Tom Wu's srp library
 * Add Kerberos support (who wants that?)
+* make gnutls_clean_db() clean only expired sessions
