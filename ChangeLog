@@ -1,3 +1,16 @@
+2003-01-30 20:36  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_ui.c:
+
+	more doc for the gnutls_set_dh_prime_bits().  
+
+2003-01-30 09:16  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls.sym, lib/gnutls_alert.c,
+	lib/gnutls_int_compat.c:
+
+	removed backward compatibility functions for 0.9.0 version.  
+
 2003-01-25 08:57  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_errors.c, gnutls_errors_int.h:
