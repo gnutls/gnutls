@@ -468,7 +468,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Record: Sending Packet[%d] %s(%d) with length: %d\n",
-		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(type), type, sizeofdata);
+		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
 	for (i = 0; i < iterations; i++) {
@@ -491,10 +491,10 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 		}
 #ifdef HARD_DEBUG
 		fprintf(stderr, "Record: Sended Packet[%d] %s(%d) with length: %d\n",
-		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(type), type, cipher_size);
+		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 #endif
 
-		state->connection_state.write_sequence_number++;
+		uint64pp( &state->connection_state.write_sequence_number);
 	}
 		/* rest data */
 	if (iterations > 1) {
@@ -514,7 +514,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
 
-		state->connection_state.write_sequence_number++;
+		uint64pp( &state->connection_state.write_sequence_number);
 	}
 
 	ret += sizeofdata;
@@ -666,9 +666,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Record: Expected Packet[%d] %s(%d) with length: %d\n",
-		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(type), type, sizeofdata);
+		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 	fprintf(stderr, "Record: Received Packet[%d] %s(%d) with length: %d\n",
-		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(recv_type), recv_type, length);
+		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, length);
 #endif
 
 	if (length > MAX_RECV_SIZE) {
@@ -770,7 +770,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Record: Decrypted Packet[%d] %s(%d) with length: %d\n",
-		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(recv_type), recv_type, tmplen);
+		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
 #endif
 
 	gnutls_free(ciphertext);
@@ -788,7 +788,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			/* Increase sequence number 
 			 * this is needed only here because we return immediately
 			 */
-			state->connection_state.read_sequence_number++;
+			uint64pp( &state->connection_state.read_sequence_number);
 
 			/* if close notify is received and
 			 * the alert is not fatal
@@ -852,7 +852,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 
 	/* Increase sequence number */
-	state->connection_state.read_sequence_number++;
+	uint64pp( &state->connection_state.read_sequence_number);
 
 
 	/* Get Application data from buffer */

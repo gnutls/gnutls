@@ -1157,13 +1157,12 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
   *
   * This function initiates the handshake of the TLS/SSL protocol.
   * Here we will receive - if requested and supported by the ciphersuite -
-  * the peer's certificate. By calling this function you it is your job
-  * to check the peer's identity (by checking the certificate etc.).
+  * the peer's certificate. 
   *
   * This function will fail if any problem in the handshake is encountered.   
-  * However this failure will not be fatal. You may choose to
+  * However this failure will not be fatal. However you may choose to
   * continue the handshake - eg. even if the certificate cannot
-  * be verified- by calling gnutls_handshake_finish()
+  * be verified- by calling gnutls_handshake_finish().
   **/
 int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 {

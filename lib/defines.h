@@ -66,13 +66,12 @@
 #endif
 
 #if SIZEOF_UNSIGNED_LONG_INT == 8
+# define HAVE_UINT64
+/* only used native uint64 in 64 bit machines */
  typedef unsigned long int uint64;
  typedef signed long int sint64;
-#elif SIZEOF_UNSIGNED_LONG_LONG == 8
- typedef unsigned long long uint64;
- typedef signed long long sint64;
 #else
-# error "Cannot find a 64 bit integer in your system, sorry."
+typedef struct { unsigned char i[8]; } uint64;
 #endif
 
 

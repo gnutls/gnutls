@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -20,19 +20,43 @@
 
 #include <defines.h>
 #include <gnutls_int.h>
+#include <gnutls_num.h>
+#include <gnutls_errors.h>
 
-#define rotl64(x,n)   (((x) << ((uint16)(n))) | ((x) >> (64 - (uint16)(n))))
-#define rotr64(x,n)   (((x) >> ((uint16)(n))) | ((x) << (64 - (uint16)(n))))
 #define rotl32(x,n)   (((x) << ((uint16)(n))) | ((x) >> (32 - (uint16)(n))))
 #define rotr32(x,n)   (((x) >> ((uint16)(n))) | ((x) << (32 - (uint16)(n))))
 #define rotl16(x,n)   (((x) << ((uint16)(n))) | ((x) >> (16 - (uint16)(n))))
 #define rotr16(x,n)   (((x) >> ((uint16)(n))) | ((x) << (16 - (uint16)(n))))
 
 #define byteswap16(x)  ((rotl16(x, 8) & 0x00ff) | (rotr16(x, 8) & 0xff00))
-#define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ff) | (rotr32(x, 8) & 0xff00ff00))
-#define byteswap64(x)  ((rotl64(x, 8) & 0x00ff00ff00ff00ffLL) | (rotr64(x, 8) & 0xff00ff00ff00ff00LL))
+#define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ffU) | (rotr32(x, 8) & 0xff00ff00U))
 
-inline
+#ifndef HAVE_UINT64
+
+int uint64zero( uint64 *x) {
+
+	memset( x->i, 0, 8);
+	return 0;
+}
+
+int uint64pp( uint64 *x) {
+register int i, y = 0;
+
+	for (i=7;i>=0;i--) {
+		if ( x->i[i] == 0xff) {
+			x->i[i] = 0;
+			y = 1;
+		} else (x->i[i])++;
+
+		if (y==0) break;
+		else y=0;
+	}
+	
+	return 0;
+}
+
+#endif /* HAVE_UINT64 */
+
 uint32 uint24touint32( uint24 num) {
 uint32 ret=0;
 
@@ -42,7 +66,6 @@ uint32 ret=0;
 	return ret;
 }
 
-inline
 uint24 uint32touint24( uint32 num) {
 uint24 ret;
 
@@ -54,7 +77,6 @@ uint24 ret;
 }
 
 /* data should be at least 3 bytes */
-inline
 uint32 READuint24( const opaque* data) {
 uint32 res;
 uint24 num;
@@ -70,7 +92,6 @@ uint24 num;
 return res;
 }
 
-inline
 void WRITEuint24( uint32 num, opaque* data) {
 uint24 tmp;
 	
@@ -85,7 +106,6 @@ uint24 tmp;
 	return;
 }
 
-inline
 uint32 READuint32( const opaque* data) {
 uint32 res;
 
@@ -96,7 +116,6 @@ uint32 res;
 return res;
 }
 
-inline
 void WRITEuint32( uint32 num, opaque* data) {
 
 #ifndef WORDS_BIGENDIAN
@@ -106,7 +125,6 @@ void WRITEuint32( uint32 num, opaque* data) {
 	return;
 }
 
-inline
 uint16 READuint16( const opaque* data) {
 uint16 res;
 	memcpy( &res, data, sizeof(uint16));
@@ -116,7 +134,6 @@ uint16 res;
 return res;
 }
 
-inline
 void WRITEuint16( uint16 num, opaque* data) {
 
 #ifndef WORDS_BIGENDIAN
@@ -126,7 +143,6 @@ void WRITEuint16( uint16 num, opaque* data) {
 	return;
 }
 
-inline
 uint32 CONVuint32( uint32 data) {
 #ifndef WORDS_BIGENDIAN
 	return byteswap32( data);
@@ -135,7 +151,6 @@ uint32 CONVuint32( uint32 data) {
 #endif
 }
 
-inline
 uint16 CONVuint16( uint16 data) {
 #ifndef WORDS_BIGENDIAN
 	return byteswap16( data);
@@ -144,32 +159,48 @@ uint16 CONVuint16( uint16 data) {
 #endif
 }
 
-inline
-uint64 READuint64( const opaque* data) {
-uint64 res;
-
-	memcpy( &res, data, sizeof(uint64));
-#ifndef WORDS_BIGENDIAN
-	res = byteswap64( res);
+uint8* CONVuint64( const uint64* data) {
+uint8* ret = gnutls_malloc( 8);
+#ifdef HAVE_UINT64
+uint64 tmp = *data;
 #endif
-return res;
+
+if (ret==NULL) {
+	gnutls_assert();
+	return NULL;
 }
 
-inline
-void WRITEuint64( uint64 num, opaque* data) {
+#ifdef HAVE_UINT64
+# ifndef WORDS_BIGENDIAN
+ tmp = byteswap64( tmp);
+ memcpy( ret, &tmp, 8);
+ 
+# else
+ memcpy( ret, &tmp, 8);
 
-#ifndef WORDS_BIGENDIAN
-	num = byteswap64( num);
-#endif
-	memcpy( data, &num, sizeof(uint64));
-	return;
+# endif /* WORDS_BIGENDIAN */
+#else 
+ memcpy( ret, data->i, 8);
+
+#endif /* HAVE_UINT64 */
+ return ret;
 }
 
-inline
-uint64 CONVuint64( uint64 data) {
-#ifndef WORDS_BIGENDIAN
- return byteswap64( data);
-#else
- return data;
-#endif
+uint32 uint64touint32( const uint64* num) {
+uint32 ret;
+
+#ifdef HAVE_UINT64
+ ret = (uint32) *num;
+#else 
+ memcpy( &ret, &num->i[4], 4);
+# ifndef WORDS_BIGENDIAN
+ ret = byteswap32(ret);
+# endif
+ 
+#endif /* HAVE_UINT64 */
+
+ return ret;
 }
+
+
+

@@ -27,12 +27,7 @@
 #include "debug.h"
 
 /* These should be added in gcrypt.h */
-#define gcry_mpi_add mpi_add
-#define gcry_mpi_subm mpi_subm
-#define gcry_mpi_addm mpi_addm
-#define gcry_mpi_mul mpi_mul
-#define gcry_mpi_mulm mpi_mulm
-MPI generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
+MPI _gcry_generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
 	                MPI g, MPI **ret_factors );
 
 /* Here functions for SRP (like g^x mod n) are defined 
@@ -85,7 +80,7 @@ int _gnutls_srp_gn(opaque ** ret_g, opaque ** ret_n, int bits)
 		if (qbits & 1)	/* better have a even one */
 			qbits++;
 
-		prime = generate_elg_prime(0, bits, qbits, g, NULL);
+		prime = _gcry_generate_elg_prime(0, bits, qbits, g, NULL);
 
 	}
 

@@ -28,7 +28,7 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 	uint8 len;
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
-			state->gnutls_key->auth_info = gnutls_malloc(sizeof(SRP_AUTH_INFO));
+			state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(SRP_AUTH_INFO));
 			if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
 			
 			if (sizeof( ((SRP_AUTH_INFO*)state->gnutls_key->auth_info)->username) > data_size) {

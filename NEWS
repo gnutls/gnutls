@@ -1,8 +1,9 @@
-Version 0.1.3
+Version 0.1.3 (01/06/2001)
 - Updated API (and the way it is documented - we use inline documentation)
 - Added function to access alert messages.
 - Added support for renegotiating parameters.
 - Better and Faster Resume Database handling.
+- Several bugfixes
 
 Version 0.1.2 (14/05/2001)
 - Updated API

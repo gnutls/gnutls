@@ -45,11 +45,13 @@ int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt, MPI 
 		switch(salt[1]) {
 		case '2':
 			cr = crypt_bcrypt(passwd, salt, g, n);
+			if (cr==NULL) return 1;
 			if (strncmp(cr, salt, strlen(cr))==0) return 0;
 			break;
 		}
 	default:
 		cr = crypt_srpsha1(username, passwd, salt, g, n);
+		if (cr==NULL) return 1;
 		if (strncmp(cr, salt, strlen(cr))==0) return 0;
 		break;
 	}

@@ -29,7 +29,7 @@
 #include "../lib/cert_b64.h"
 #include "prime-gaa.h"
 
-MPI generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
+MPI _gcry_generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
 	                MPI g, MPI **ret_factors );
 
 int main(int argc, char **argv)
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	qbits++;
 
 	g = mpi_new(16);
-	prime = generate_elg_prime( 0, info.bits, qbits, g, NULL);
+	prime = _gcry_generate_elg_prime( 0, info.bits, qbits, g, NULL);
 
 	/* print generator */
 	size = 0;

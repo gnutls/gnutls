@@ -120,7 +120,7 @@ typedef struct {
 } SRP_SERVER_CREDENTIALS;
 
 typedef struct {
-	char* username;
+	char username[256];
 } SRP_AUTH_INFO;
 
 /* Credential structures for DH_ANON */
