@@ -1,3 +1,60 @@
+2004-08-16 21:02  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c:
+
+	Oops, revert DES, not supported.  
+
+2004-08-16 21:01  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c:
+
+	Support AES-256 and DES in --ciphers too.  
+
+2004-08-16 20:49  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, README:
+
+	Fix.  
+
+2004-08-16 20:48  Simon Josefsson <simon@josefsson.org>
+
+	* README:
+
+	Add.  
+
+2004-08-16 20:40  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Fix.  
+
+2004-08-16 20:18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/: gnutls_hash_int.c, gnutls_hash_int.h:
+
+	Move hashing to generic crypto API.  Implement hashing for
+	nettle/libgcrypt in generic crypto API.  
+
+2004-08-16 19:10  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/gnutls_errors.c, lib/gnutls_errors_int.h,
+	lib/gnutls_random.c, lib/gnutls_random.h:
+
+	Move randomness calls to generic crypto API.  Implement randomness
+	for libgcrypt and nettle wrappers.  
+
+2004-08-15 22:33  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Typo.  
+
+2004-08-15 22:31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, NEWS:
+
+	Fix.  
+
 2004-08-15 21:34  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am, configure.in:
