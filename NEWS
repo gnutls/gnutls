@@ -9,6 +9,7 @@ Version 0.5.11
 - gnutls_x509_extract_certificate_dn_string() was rewritten.
 - Added GNUTLS_E_SHORT_MEMORY_BUFFER error code, which is returned in the
   case where the memory buffer provided is not long enough.
+- Depends on the new OpenCDK 0.3.0.
 
 Version 0.5.10 (13/10/2002)
 - Updated documentation.
