@@ -1,3 +1,28 @@
+2003-10-27 09:51  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_dh_primes.c:
+
+	Used the new gcrypt API for generating primes and groups.  
+
+2003-10-27 09:50  nmav <nmav@gnutls.org>
+
+	* src/: certtool-gaa.c, certtool-gaa.h, certtool.c, certtool.gaa:
+
+	added the --der option to certtool.  
+
+2003-10-27 08:54  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/tex/programs.tex, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa:
+
+	several improvements for the certtool utility.  
+
+2003-10-27 07:39  nmav <nmav@gnutls.org>
+
+	* doc/Makefile.am:
+
+	Added manpages created by Ivo Timmermans <ivo@o2w.nl> 
+
 2003-10-26 22:11  nmav <nmav@gnutls.org>
 
 	* src/: certtool.c, cli-gaa.c, cli-gaa.h, cli.c, cli.gaa, common.c:
