@@ -4,7 +4,8 @@ in order to avoid having people working on the same thing.
 
 Current list:
 * Add a callback function in certificate authentication, to receive
-  the certificate and the private key.
+  the certificate and the private key. This might require a rewrite
+  of the certificate selection part.
 * Add support for generating and handling DSA keys
 * Convert documentation to texinfo format
 * Audit the code
