@@ -112,7 +112,7 @@ const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm);
 const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm);
 const char *gnutls_compression_get_name( GNUTLS_CompressionMethod);
 const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm);
-const char *gnutls_certificate_type_get_name( GNUTLS_CertificateType type);
+const char *gnutls_cert_type_get_name( GNUTLS_CertificateType type);
 
 
 /* error functions */
