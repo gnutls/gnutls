@@ -42,7 +42,7 @@ int main()
     int client_len;
     char topbuf[512];
     GNUTLS_STATE state;
-    char buffer[MAX_BUF];
+    char buffer[MAX_BUF+1];
 
 
     listen_sd = socket(AF_INET, SOCK_STREAM, 0);
@@ -61,7 +61,7 @@ int main()
     client_len = sizeof(sa_cli);
     for (;;) {
 	gnutls_init(&state, GNUTLS_SERVER);
-	gnutls_set_cipher_priority( state, 3, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR);
+	gnutls_set_cipher_priority( state, 4, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR);
 	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 1, GNUTLS_KX_ANON_DH);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
@@ -95,7 +95,7 @@ int main()
 	}
 */
 	for (;;) {
-	    bzero( buffer, MAX_BUF);
+	    bzero( buffer, MAX_BUF+1);
 	    ret = gnutls_read(sd, state, buffer, MAX_BUF);
 	    if (gnutls_is_fatal_error(ret) == 1) {
 		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {

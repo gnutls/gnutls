@@ -46,7 +46,7 @@ int main()
 	int sd, ii;
 	struct sockaddr_in sa;
 	GNUTLS_STATE state;
-	char buffer[MAX_BUF];
+	char buffer[MAX_BUF+1];
 	char *session;
 	char* session_id;
 	int session_size;
@@ -76,7 +76,7 @@ int main()
 	gnutls_init(&state, GNUTLS_CLIENT);
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, 3, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL);
+	gnutls_set_cipher_priority( state, 4, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH);
 	gnutls_set_compression_priority( state, 1, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
@@ -118,7 +118,7 @@ int main()
 	
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, 3, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR);
+	gnutls_set_cipher_priority( state, 4, GNUTLS_3DES, GNUTLS_TWOFISH , GNUTLS_RIJNDAEL, GNUTLS_ARCFOUR);
 	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
@@ -172,11 +172,11 @@ int main()
 		select(maxfd+1, &rset, NULL, NULL, &tv);
 
 		if (FD_ISSET(sd, &rset)) {
-			bzero(buffer, MAX_BUF);
+			bzero(buffer, MAX_BUF+1);
 
 			ret = gnutls_read(sd, state, buffer, MAX_BUF);
 			/* remove new line */
-			if (buffer[strlen(buffer)-1]=='\n') buffer[strlen(buffer)-1]='\0';
+
 			if (gnutls_is_fatal_error(ret) == 1) {
 				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED || ret == GNUTLS_E_INVALID_SESSION) {
 					fprintf(stderr,
@@ -188,8 +188,8 @@ int main()
 					break;
 				}
 			} else {
-				fprintf(stdout, "- Received: ");
-				for (ii=0;ii<MAX_BUF;ii++) {
+				fprintf(stdout, "- Received[%d]: ", ret);
+				for (ii=0;ii<ret;ii++) {
 					fputc(buffer[ii], stdout);
 				}
 				fputs("\n", stdout);
@@ -204,6 +204,7 @@ int main()
 				continue;
 			}
 			gnutls_write( sd, state, buffer, strlen(buffer));
+			fprintf(stdout, "- Sended: %d bytes\n", strlen(buffer));
 		}
 	}
 	if (user_term!=0) gnutls_close(sd, state);
