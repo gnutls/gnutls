@@ -158,7 +158,7 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS(unistd.h strings.h stddef.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
 AC_CHECK_HEADERS(errno.h sys/time.h time.h)
-AC_CHECK_FUNCS(memset memmove strnstr memcmp memcpy mmap,,)
+AC_CHECK_FUNCS(memmove strnstr mmap,,)
 AC_FUNC_ALLOCA
 
 
