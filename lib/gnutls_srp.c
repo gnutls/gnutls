@@ -21,7 +21,7 @@
 #include <defines.h>
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#define gcry_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x)) 
+
 /* Here functions for SRP (like g^x mod n) are defined 
  */
 
@@ -45,11 +45,11 @@ static const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-int _gnutls_srp_gx(opaque *text, int textsize, opaque** result) {
+int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, char** ret_g, char** ret_n) {
 
 	MPI g, prime, x, e;
 	size_t n = sizeof diffie_hellman_group1_prime;
-	int result_size;
+	int result_size, siz;
 	
 	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
 			  diffie_hellman_group1_prime, &n)) {
@@ -65,12 +65,11 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result) {
 
 	g = mpi_set_ui(NULL, SRP_G);
 
-	/* e = g^x mod prime */
 	e = gcry_mpi_alloc_like(prime);
 
+	/* e = g^x mod prime (n) */
 	mpi_powm(e, g, x, prime);
 
-	mpi_release(prime);
 	mpi_release(x);
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
@@ -78,7 +77,27 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result) {
 		*result = gnutls_malloc(result_size);
 		gcry_mpi_print(GCRYMPI_FMT_USG, *result, &result_size, e);	
 	}
+
+	siz = 0;
+	gcry_mpi_print(GCRYMPI_FMT_HEX, NULL, &siz, g);
+	if (ret_g!=NULL) {
+		*ret_g = gnutls_malloc(siz+1);
+		gcry_mpi_print(GCRYMPI_FMT_HEX, *ret_g, &siz, g);
+		(*ret_g)[siz] = 0;
+	}
+
+	siz = 0;
+	gcry_mpi_print(GCRYMPI_FMT_HEX, NULL, &siz, prime);
+	if (ret_n!=NULL) {
+		*ret_n = gnutls_malloc(siz+1);
+		gcry_mpi_print(GCRYMPI_FMT_HEX, *ret_n, &siz, prime);
+		(*ret_n)[siz] = 0;
+	}
+
 	mpi_release(e);
+	mpi_release(g);
+	mpi_release(prime);
+
 	return result_size;
 
 }

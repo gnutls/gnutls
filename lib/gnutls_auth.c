@@ -32,14 +32,14 @@
 int gnutls_clear_creds( GNUTLS_STATE state) {
 	AUTH_CRED * ccred, *ncred;
 	
-	if (state->gnutls_internals.cred!=NULL) { /* begining of the list */
-		ccred = state->gnutls_internals.cred;
+	if (state->gnutls_key->cred!=NULL) { /* begining of the list */
+		ccred = state->gnutls_key->cred;
 		while(ccred!=NULL) {
 			ncred = ccred->next;
 			if (ccred!=NULL) gnutls_free(ccred);
 			ccred = ncred;
 		}
-		state->gnutls_internals.cred = NULL;
+		state->gnutls_key->cred = NULL;
 	}
 
 	return 0;
@@ -53,16 +53,16 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred) {
 	AUTH_CRED * ccred, *pcred;
 	int exists=0;	
 	
-	if (state->gnutls_internals.cred==NULL) { /* begining of the list */
+	if (state->gnutls_key->cred==NULL) { /* begining of the list */
 		
-		state->gnutls_internals.cred = gnutls_malloc(sizeof(AUTH_CRED));
-		if (state->gnutls_internals.cred == NULL) return GNUTLS_E_MEMORY_ERROR;
+		state->gnutls_key->cred = gnutls_malloc(sizeof(AUTH_CRED));
+		if (state->gnutls_key->cred == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
-		state->gnutls_internals.cred->credentials = cred;
-		state->gnutls_internals.cred->next = NULL;
-		state->gnutls_internals.cred->algorithm = kx;
+		state->gnutls_key->cred->credentials = cred;
+		state->gnutls_key->cred->next = NULL;
+		state->gnutls_key->cred->algorithm = kx;
 	} else {
-		ccred = state->gnutls_internals.cred;
+		ccred = state->gnutls_key->cred;
 		while(ccred!=NULL) {
 			if (ccred->algorithm==kx) {
 				exists=1;
@@ -89,12 +89,13 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred) {
 }
 
 /* 
- * This returns an item from the linked list
+ * This returns an pointer to the linked list. Don't
+ * free that!!!
  */
-AUTH_CRED *gnutls_get_kx_cred( GNUTLS_STATE state, int kx) {
+void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx) {
 	AUTH_CRED * ccred;
 	
-	ccred = state->gnutls_internals.cred;
+	ccred = key->cred;
 	while(ccred!=NULL) {
 		if (ccred->algorithm==kx) {
 			break;

@@ -99,7 +99,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.buffer_handshake = NULL;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	(*state)->gnutls_internals.cred = NULL; /* no credentials by default */
+	(*state)->gnutls_key->cred = NULL; /* no credentials by default */
+	(*state)->gnutls_key->username = NULL; /* no default username */
 
 	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */
 
@@ -110,7 +111,14 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_key->client_p = NULL;
 	(*state)->gnutls_key->client_g = NULL;
 	(*state)->gnutls_key->dh_secret = NULL;
-	
+
+	(*state)->gnutls_key->A = NULL;
+	(*state)->gnutls_key->a = NULL;	
+	(*state)->gnutls_key->x = NULL;
+	(*state)->gnutls_key->u = NULL;
+	(*state)->gnutls_key->B = NULL;
+	(*state)->gnutls_key->b = NULL;	
+
 	(*state)->gnutls_internals.certificate_requested = 0;
 	(*state)->gnutls_internals.certificate_verify_needed = 0;
 
@@ -129,7 +137,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	/* Set default priorities */
 	gnutls_set_cipher_priority( (*state), 2, GNUTLS_RIJNDAEL, GNUTLS_3DES);
 	gnutls_set_compression_priority( (*state), 1, GNUTLS_NULL_COMPRESSION);
-	gnutls_set_kx_priority( (*state), 2, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
+	gnutls_set_kx_priority( (*state), 1, GNUTLS_KX_ANON_DH);
 	gnutls_set_mac_priority( (*state), 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 
 	(*state)->security_parameters.session_id_size = 0;
@@ -181,8 +189,18 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	mpi_release((*state)->gnutls_key->client_Y);
 	mpi_release((*state)->gnutls_key->client_p);
 	mpi_release((*state)->gnutls_key->client_g);
+
+	mpi_release((*state)->gnutls_key->u);
+	mpi_release((*state)->gnutls_key->a);
+	mpi_release((*state)->gnutls_key->x);
+	mpi_release((*state)->gnutls_key->A);
+	mpi_release((*state)->gnutls_key->B);
+	mpi_release((*state)->gnutls_key->b);
+
 	mpi_release((*state)->gnutls_key->dh_secret);
 	gnutls_free((*state)->gnutls_key);
+
+	gnutls_free((*state)->gnutls_key->username);
 
 	/* free priorities */
 	if ((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)

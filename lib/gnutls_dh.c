@@ -60,8 +60,6 @@ static const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 /* #define E_SIZE 1024 */
 #define X_SIZE 512
 
-#define gcry_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x))
-
 /****************
  * Choose a random value x and calculate e = g^x mod p.
  * Return: e and if ret_x is not NULL x.

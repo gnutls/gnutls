@@ -604,7 +604,7 @@ char *
 	int i, salt_size = strlen(salt);
 	unsigned char *local_salt, *v;
 	int passwd_len;
-	char *tmp;
+	char *tmp, *g, *n;
 
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
 	if (passwd_len > 56)
@@ -640,7 +640,7 @@ char *
 	}
 
 	/* v = g^x mod n */
-	vsize = _gnutls_srp_gx(text, 8*3, &v);
+	vsize = _gnutls_srp_gx(text, 8*3, &v, &g, &n);
 	if (vsize==-1 || v==NULL) {
 		gnutls_assert();
 		return NULL;
@@ -649,9 +649,11 @@ char *
 	_gnutls_base64_encode(v, vsize, &rtext);
 	gnutls_free(v);
 
-	tmp = gnutls_calloc( 1, strlen(magic)+3+strlen(sp)+1+strlen(rtext)+1);
+	tmp = gnutls_malloc( strlen(magic)+3+strlen(sp)+1+strlen(rtext)+strlen(g)+2+strlen(n)+1);
 
-	sprintf( tmp, "%s%.2u$%s$%s", magic, (unsigned int) cost, sp, rtext);
+	sprintf( tmp, "%s%.2u$%s$%s$%s$%s", magic, (unsigned int) cost, sp, rtext, g, n);
+	gnutls_free(g);
+	gnutls_free(n);
 
 	gnutls_free(local_salt);
 	gnutls_free(rtext);
@@ -679,15 +681,13 @@ char *crypt_bcrypt_wrapper(const char *pass_new, int cost)
 	   	return NULL;
 	   }
 
-		/* base64 encoded text is 4/3 times larger than orignal */
 	   tcp = gnutls_calloc( 1, strlen(magic)+ 3 + result_size +1+1);
-       sprintf(tcp, "%s%.2u$%s$", magic, cost, result); /* magic for the BCRYPT */
+       sprintf(tcp, "%s%.2u$%s$", magic, cost, result);
 
 	   gnutls_free(result);
 
 	   _gnutls_free_rand(rand);
 	   
-       /* no longer need cleartext */
        e = crypt_bcrypt(pass_new, (const char *) tcp);
 	   gnutls_free(tcp);
 	   	   

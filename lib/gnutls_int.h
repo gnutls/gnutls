@@ -108,22 +108,12 @@ typedef struct {
 	AlertDescription description;
 } Alert;
 
-typedef struct {
-	/* For DH KX */
-	MPI				KEY;
-	MPI				client_Y;
-	MPI				client_g;
-	MPI				client_p;
-	MPI				dh_secret;
-} GNUTLS_KEY_A;
-typedef GNUTLS_KEY_A* GNUTLS_KEY;
-
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 };
 enum Extensions { GNUTLS_EXTENSION_SRP=7 };
-enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
+enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
 enum MACAlgorithm { GNUTLS_NULL_MAC, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
@@ -143,9 +133,41 @@ typedef enum MACAlgorithm MACAlgorithm;
 typedef enum CompressionMethod CompressionMethod;
 typedef enum Extensions Extensions;
 
+/* STATE (stop) */
+
+typedef struct {
+	KXAlgorithm algorithm;
+	void* credentials;
+	void* next;
+} AUTH_CRED;
+
+typedef struct {
+	/* For DH KX */
+	MPI				KEY;
+	MPI				client_Y;
+	MPI				client_g;
+	MPI				client_p;
+	MPI				dh_secret;
+	/* for SRP */
+	MPI				A;
+	MPI				B;
+	MPI				u;
+	MPI				b;
+	MPI				a;
+	MPI				x;
+	
+	char*				username; /* user in srp */
+	AUTH_CRED*			cred; /* used in srp, etc */
+} GNUTLS_KEY_A;
+typedef GNUTLS_KEY_A* GNUTLS_KEY;
+
+
+/* STATE (cont) */
+
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
 #include <gnutls_auth.h>
+
 
 typedef struct {
 	ConnectionEnd entity;
@@ -237,7 +259,7 @@ typedef struct {
 	char*				db_name;
 	int				expire_time;
 	MOD_AUTH_STRUCT*		auth_struct; /* used in handshake packets and KX algorithms */
-	AUTH_CRED*			cred;
+
 } GNUTLS_INTERNALS;
 
 typedef struct {
@@ -346,5 +368,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data
 int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
 int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);
 #define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)
+
+#define gcry_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x)) 
 
 #endif /* GNUTLS_INT_H */

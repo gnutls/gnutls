@@ -92,12 +92,16 @@ int crypt, salt;
         
     if (info.passwd != NULL) {
      	verify_passwd( info.passwd, info.username, passwd);
-     	free(cr);
      	return 0;
     }
 
 
     cr = gnutls_crypt( info.username, passwd, crypt, salt);
+    if (cr==NULL) {
+    	fprintf(stderr, "Cannot gnutls_crypt()...\n");
+    	return -1;
+    }
+    
     printf("%s:%s\n", info.username, cr);
     free(cr);
 	return 0;

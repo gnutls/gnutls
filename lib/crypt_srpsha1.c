@@ -39,7 +39,7 @@ char *
 	int passwd_len;
 	GNUTLS_MAC_HANDLE h1;
 	int vsize, hash_len = gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
-	char *tmp;
+	char *tmp, *g, *n;
 	uint8 *rtext, * csalt;
 			
 	passwd_len = strlen(passwd);	/* we do not want the null */
@@ -74,7 +74,7 @@ char *
 	r1 = gnutls_hash_deinit(h1);
 	
 	/* v = g^x mod n */
-	vsize = _gnutls_srp_gx(r1, hash_len, &v);
+	vsize = _gnutls_srp_gx(r1, hash_len, &v, &g, &n);
 	gnutls_free(r1);
 	if (vsize==-1 || v==NULL) {
 		gnutls_assert();
@@ -84,9 +84,11 @@ char *
 	_gnutls_base64_encode(v, vsize, &rtext);
 	gnutls_free(v);
 
-	tmp = gnutls_calloc( 1, strlen(sp)+strlen(rtext)+strlen(magic)+1+1 );
+	tmp = gnutls_malloc( strlen(sp)+strlen(rtext)+strlen(magic)+strlen(g)+2+strlen(n)+1+1 );
 	
-	sprintf( tmp, "%s%s$%s", magic, sp, rtext);
+	sprintf( tmp, "%s%s$%s$%s$%s", magic, sp, rtext,g ,n);
+	gnutls_free(g);
+	gnutls_free(n);
 
 	gnutls_free(rtext);
 	gnutls_free(local_salt);
@@ -102,7 +104,7 @@ char *crypt_srpsha1_wrapper(const char* username, const char *pass_new, int salt
        char *e = NULL;
 	   int result_size;
 	   
-	   if (salt > 50 || salt < 0) return NULL; /* wow that's pretty long salt */
+	   if (salt > 50 || salt <= 0) return NULL; /* wow that's pretty long salt */
 	   
        rand = _gnutls_get_random( salt, GNUTLS_WEAK_RANDOM);
 

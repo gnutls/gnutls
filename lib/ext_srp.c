@@ -22,7 +22,11 @@
 #include "gnutls_int.h"
 
 int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_size) {
-	/* actually this reads username from data */
+	if (data_size > 0) {
+		state->gnutls_key->username = gnutls_malloc(data_size+1);
+		memcpy(state->gnutls_key->username, data, data_size);
+		state->gnutls_key->username[data_size]=0; /* null terminated */
+	}
 	return 0;
 }
 
@@ -32,5 +36,9 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 	/* this functions sends the server extension data */
 	(*data) = NULL;
+	if (state->gnutls_key->username!=NULL) { /* send username */
+		(*data) = strdup( state->gnutls_key->username);
+		return strlen(state->gnutls_key->username);
+	}
 	return 0;
 }

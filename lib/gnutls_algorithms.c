@@ -26,6 +26,7 @@
 /* include all the kx handler's definitions */
 #include "auth_anon.h"
 #include "auth_dhe_dss.h"
+#include "auth_srp.h"
 
 #define MAX_CIPHER 256
 #define MAX_MAC 256
@@ -160,7 +161,7 @@ static gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 0, NULL),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS,  1, 1, 0, 0, NULL),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA,  1, 1, 0, 0, NULL),
-//	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP,   0, 0, 0, 0, &srp_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP,   0, 0, 0, 0, &srp_auth_struct),
 	{0}
 };
 
