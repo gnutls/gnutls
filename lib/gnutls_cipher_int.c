@@ -23,7 +23,7 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
-GNUTLS_CIPHER_HANDLE gnutls_cipher_init( BulkCipherAlgorithm cipher, gnutls_datum key, gnutls_datum iv)
+GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( BulkCipherAlgorithm cipher, gnutls_datum key, gnutls_datum iv)
 {
 GNUTLS_CIPHER_HANDLE ret;
 
@@ -84,7 +84,7 @@ GNUTLS_CIPHER_HANDLE ret;
 return ret;	
 }
 
-int gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) {
+int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) {
 	if (handle!=GNUTLS_CIPHER_FAILED) {
 #ifdef USE_MCRYPT
 		mcrypt_generic( handle, text, textlen);
@@ -98,7 +98,7 @@ int gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) 
 	return 0;
 }
 
-int gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int ciphertextlen) {
+int _gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int ciphertextlen) {
 	if (handle!=GNUTLS_CIPHER_FAILED) {
 #ifdef USE_MCRYPT
 		mdecrypt_generic( handle, ciphertext, ciphertextlen);
@@ -112,7 +112,7 @@ int gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int cip
 	return 0;
 }
 
-void gnutls_cipher_deinit(GNUTLS_CIPHER_HANDLE handle) {
+void _gnutls_cipher_deinit(GNUTLS_CIPHER_HANDLE handle) {
 	if (handle!=GNUTLS_CIPHER_FAILED) {
 #ifdef USE_MCRYPT
 		mcrypt_generic_end( handle);

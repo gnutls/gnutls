@@ -56,7 +56,7 @@ char random[2*TLS_RANDOM_SIZE];
 
 	if ( gnutls_protocol_get_version( state) == GNUTLS_SSL3) {
 		ret =
-		    gnutls_ssl3_generate_random( PREMASTER.data, PREMASTER.size,
+		    _gnutls_ssl3_generate_random( PREMASTER.data, PREMASTER.size,
 			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE,
 			       state->security_parameters.master_secret);
 

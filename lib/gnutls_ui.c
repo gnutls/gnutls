@@ -276,7 +276,7 @@ typedef MACAlgorithm GNUTLS_DigestAlgorithm;
 int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* data, char* result, size_t* result_size)
 {
 	GNUTLS_HASH_HANDLE td;
-	int hash_len = gnutls_hash_get_algo_len(algo);
+	int hash_len = _gnutls_hash_get_algo_len(algo);
 	
 	if (hash_len > *result_size || hash_len < 0) {
 		*result_size = hash_len;
@@ -284,12 +284,12 @@ int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* dat
 	}
 	*result_size = hash_len;
 	
-	td = gnutls_hash_init( algo);
+	td = _gnutls_hash_init( algo);
 	if (td==NULL) return GNUTLS_E_HASH_FAILED;
 	
-	gnutls_hash( td, data->data, data->size);
+	_gnutls_hash( td, data->data, data->size);
 	
-	gnutls_hash_deinit( td, result);
+	_gnutls_hash_deinit( td, result);
 		
 	return 0;
 }

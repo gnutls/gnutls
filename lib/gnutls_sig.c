@@ -49,22 +49,22 @@ GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 
 
-	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	td_sha = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
 	if (td_sha == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	gnutls_hash_deinit(td_sha, &concat[16]);
+	_gnutls_hash_deinit(td_sha, &concat[16]);
 
 	switch (cert->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
-			td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+			td_md5 = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
 			if (td_md5 == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_HASH_FAILED;
 			}
-			gnutls_hash_deinit(td_md5, concat);
+			_gnutls_hash_deinit(td_md5, concat);
 
 			dconcat.data = concat;
 			dconcat.size = 36;
@@ -98,31 +98,31 @@ GNUTLS_MAC_HANDLE td_sha;
 opaque concat[36];
 
 
-	td_sha = gnutls_hash_init( GNUTLS_MAC_SHA);
+	td_sha = _gnutls_hash_init( GNUTLS_MAC_SHA);
 	if (td_sha == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_sha, params->data, params->size);
+	_gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, params->data, params->size);
 
-	gnutls_hash_deinit(td_sha, &concat[16]);
+	_gnutls_hash_deinit(td_sha, &concat[16]);
 
 	switch (cert->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
-			td_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
+			td_md5 = _gnutls_hash_init( GNUTLS_MAC_MD5);
 			if (td_md5 == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_HASH_FAILED;
 			}
 
-			gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-			gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-			gnutls_hash( td_md5, params->data, params->size);
+			_gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+			_gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+			_gnutls_hash( td_md5, params->data, params->size);
 
-			gnutls_hash_deinit(td_md5, concat);
+			_gnutls_hash_deinit(td_md5, concat);
 
 			dconcat.data = concat;
 			dconcat.size = 36;
@@ -268,21 +268,21 @@ GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 gnutls_datum dconcat;
 
-	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	td_md5 = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	td_sha = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
 	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_hash_deinit( td_md5, NULL);
+		_gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	gnutls_hash_deinit(td_md5, concat);
-	gnutls_hash_deinit(td_sha, &concat[16]);
+	_gnutls_hash_deinit(td_md5, concat);
+	_gnutls_hash_deinit(td_sha, &concat[16]);
 	
 	dconcat.data = concat;
 	dconcat.size = 20+16; /* md5+ sha */
@@ -308,29 +308,29 @@ GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 opaque concat[36];
 
-	td_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
+	td_md5 = _gnutls_hash_init( GNUTLS_MAC_MD5);
 	if (td_md5 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td_sha = gnutls_hash_init( GNUTLS_MAC_SHA);
+	td_sha = _gnutls_hash_init( GNUTLS_MAC_SHA);
 	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_hash_deinit( td_md5, NULL);
+		_gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_md5, params->data, params->size);
+	_gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_md5, params->data, params->size);
 
-	gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_sha, params->data, params->size);
+	_gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, params->data, params->size);
 
-	gnutls_hash_deinit(td_md5, concat);
-	gnutls_hash_deinit(td_sha, &concat[16]);
+	_gnutls_hash_deinit(td_md5, concat);
+	_gnutls_hash_deinit(td_sha, &concat[16]);
 
 	dconcat.data = concat;
 	dconcat.size = 36;

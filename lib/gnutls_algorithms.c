@@ -1060,7 +1060,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 	}
 
 	for (i = j = 0; i < count; i++) {
-		/* remove cipher suites which are not used in the
+		/* remove cipher suites which do not support the
 		 * protocol version used.
 		 */
 		if ( _gnutls_cipher_suite_get_version(tmp_ciphers[i]) > version)

@@ -25,7 +25,7 @@
 /* The flag d is the direction (compressed, decompress). Non zero is
  * decompress.
  */
-GNUTLS_COMP_HANDLE gnutls_comp_init( CompressionMethod method, int d)
+GNUTLS_COMP_HANDLE _gnutls_comp_init( CompressionMethod method, int d)
 {
 GNUTLS_COMP_HANDLE ret;
 int err;
@@ -71,7 +71,7 @@ int err;
 	return ret;
 }
 
-void gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d) {
+void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d) {
 int err;
 
 	if (handle!=NULL) {
@@ -96,7 +96,7 @@ int err;
 /* These functions are memory consuming 
  */
 
-int gnutls_compress( GNUTLS_COMP_HANDLE handle, char* plain, int plain_size, char** compressed, int max_comp_size) {
+int _gnutls_compress( GNUTLS_COMP_HANDLE handle, char* plain, int plain_size, char** compressed, int max_comp_size) {
 int compressed_size=GNUTLS_E_COMPRESSION_FAILED;
 #ifdef HAVE_LIBZ
 uLongf size;
@@ -150,7 +150,7 @@ int err;
 	return compressed_size;
 }
 
-int gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size) {
+int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size) {
 int plain_size=GNUTLS_E_DECOMPRESSION_FAILED, err;
 #ifdef HAVE_LIBZ
 uLongf size;

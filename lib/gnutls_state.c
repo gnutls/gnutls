@@ -237,14 +237,14 @@ void gnutls_deinit(GNUTLS_STATE state)
 	gnutls_clear_creds( state);
 
 	if (state->connection_state.read_cipher_state != NULL)
-		gnutls_cipher_deinit(state->connection_state.read_cipher_state);
+		_gnutls_cipher_deinit(state->connection_state.read_cipher_state);
 	if (state->connection_state.write_cipher_state != NULL)
-		gnutls_cipher_deinit(state->connection_state.write_cipher_state);
+		_gnutls_cipher_deinit(state->connection_state.write_cipher_state);
 
 	if (state->connection_state.read_compression_state != NULL)
-		gnutls_comp_deinit(state->connection_state.read_compression_state, 1);
+		_gnutls_comp_deinit(state->connection_state.read_compression_state, 1);
 	if (state->connection_state.write_compression_state != NULL)
-		gnutls_comp_deinit(state->connection_state.write_compression_state, 0);
+		_gnutls_comp_deinit(state->connection_state.write_compression_state, 0);
 
 	gnutls_sfree_datum( &state->cipher_specs.server_write_mac_secret);
 	gnutls_sfree_datum( &state->cipher_specs.client_write_mac_secret);
@@ -432,9 +432,9 @@ static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_
 {
 	GNUTLS_MAC_HANDLE td1;
 
-	td1 = gnutls_hmac_init(algorithm, secret, secret_size);
-	gnutls_hmac(td1, seed, seed_size);
-	gnutls_hmac_deinit(td1, result);
+	td1 = _gnutls_hmac_init(algorithm, secret, secret_size);
+	_gnutls_hmac(td1, seed, seed_size);
+	_gnutls_hmac_deinit(td1, result);
 	
 	return;
 }
@@ -444,7 +444,7 @@ static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
-static int gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes, opaque* ret)
+static int _gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes, opaque* ret)
 {
 
 	GNUTLS_MAC_HANDLE td2;
@@ -456,7 +456,7 @@ static int gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_si
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
-	blocksize = gnutls_hmac_get_algo_len(algorithm);
+	blocksize = _gnutls_hmac_get_algo_len(algorithm);
 	do {
 		i += blocksize;
 	} while (i < total_bytes);
@@ -468,16 +468,16 @@ static int gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_si
 
 	times = i / blocksize;
 	for (i = 0; i < times; i++) {
-		td2 = gnutls_hmac_init(algorithm, secret, secret_size);
+		td2 = _gnutls_hmac_init(algorithm, secret, secret_size);
 
 		/* here we calculate A(i+1) */
 		_gnutls_cal_PRF_A( algorithm, secret, secret_size, Atmp, A_size, Atmp);
 
 		A_size = blocksize;
 
-		gnutls_hmac(td2, Atmp, A_size);
-		gnutls_hmac(td2, seed, seed_size);
-		gnutls_hmac_deinit(td2, final);
+		_gnutls_hmac(td2, Atmp, A_size);
+		_gnutls_hmac(td2, seed, seed_size);
+		_gnutls_hmac_deinit(td2, final);
 
 		if ( (1+i) * blocksize < total_bytes) {
 			how = blocksize;
@@ -553,13 +553,13 @@ int _gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size
 		l_s++;
 	}
 
-	result = gnutls_P_hash( GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes, o1);
+	result = _gnutls_P_hash( GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes, o1);
 	if (result<0) {
 		gnutls_assert();
 		return result;
 	}
 
-	result = gnutls_P_hash( GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes, o2);
+	result = _gnutls_P_hash( GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes, o2);
 	if (result<0) {
 		gnutls_assert();
 		return result;

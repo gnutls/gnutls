@@ -60,7 +60,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
 	if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3 */
-		ret = gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
+		ret = _gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
 			block_size, key_block);
 	} else { /* TLS 1.0 */
 		ret =
@@ -280,11 +280,11 @@ int rc;
 		gnutls_sfree_datum( &state->connection_state.read_mac_secret);
 
 	if (state->connection_state.read_cipher_state != NULL)
-		gnutls_cipher_deinit(state->connection_state.
+		_gnutls_cipher_deinit(state->connection_state.
 				     read_cipher_state);
 
 	if (state->connection_state.read_compression_state != NULL)
-		gnutls_comp_deinit(state->connection_state.
+		_gnutls_comp_deinit(state->connection_state.
 				     read_compression_state, 1);
 
 
@@ -299,7 +299,7 @@ int rc;
 		/* initialize cipher state
 		 */
 		state->connection_state.read_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.
+		    _gnutls_cipher_init(state->security_parameters.
 				       read_bulk_cipher_algorithm,
 				       state->cipher_specs.client_write_key,
 				       state->cipher_specs.client_write_IV);
@@ -325,7 +325,7 @@ int rc;
 
 	case GNUTLS_CLIENT:
 		state->connection_state.read_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.
+		    _gnutls_cipher_init(state->security_parameters.
 				       read_bulk_cipher_algorithm,
 				       state->cipher_specs.
 				       server_write_key,
@@ -356,7 +356,7 @@ int rc;
 	}
 
 	state->connection_state.read_compression_state =
-	    gnutls_comp_init(state->security_parameters.
+	    _gnutls_comp_init(state->security_parameters.
 			       read_compression_algorithm, 1);
 
 	if (state->connection_state.read_compression_state ==
@@ -438,11 +438,11 @@ int rc;
 		gnutls_sfree_datum( &state->connection_state.write_mac_secret);
 
 	if (state->connection_state.write_cipher_state != NULL)
-		gnutls_cipher_deinit(state->connection_state.
+		_gnutls_cipher_deinit(state->connection_state.
 				     write_cipher_state);
 
 	if (state->connection_state.write_compression_state != NULL)
-		gnutls_comp_deinit(state->connection_state.
+		_gnutls_comp_deinit(state->connection_state.
 				     write_compression_state, 0);
 
 	mac_size =
@@ -456,7 +456,7 @@ int rc;
 		/* initialize cipher state
 		 */
 		state->connection_state.write_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.write_bulk_cipher_algorithm,
+		    _gnutls_cipher_init(state->security_parameters.write_bulk_cipher_algorithm,
 				       state->cipher_specs.server_write_key,
 				       state->cipher_specs.server_write_IV);
 
@@ -482,7 +482,7 @@ int rc;
 
 	case GNUTLS_CLIENT:
 		state->connection_state.write_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.
+		    _gnutls_cipher_init(state->security_parameters.
 				       write_bulk_cipher_algorithm,
 				       state->cipher_specs.client_write_key,
 				       state->cipher_specs.client_write_IV);
@@ -512,7 +512,7 @@ int rc;
 
 
 	state->connection_state.write_compression_state =
-	    gnutls_comp_init(state->security_parameters.write_compression_algorithm, 0);
+	    _gnutls_comp_init(state->security_parameters.write_compression_algorithm, 0);
 
 	if (state->connection_state.write_compression_state == GNUTLS_COMP_FAILED) {
 		gnutls_assert();

@@ -136,14 +136,14 @@ MPI _gnutls_calc_srp_u(MPI B)
 	_gnutls_mpi_print( b_holder, &b_size, B);
 
 
-	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	td = _gnutls_hash_init(GNUTLS_MAC_SHA);
 	if (td==NULL) {
 		gnutls_free(b_holder);
 		gnutls_assert();
 		return NULL;
 	}
-	gnutls_hash(td, b_holder, b_size);
-	gnutls_hash_deinit(td, hd);
+	_gnutls_hash(td, b_holder, b_size);
+	_gnutls_hash_deinit(td, hd);
 	
 	memcpy(&u, hd, sizeof(u));
 
@@ -234,25 +234,25 @@ int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 
 	*size = 20;
 
-	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	td = _gnutls_hash_init(GNUTLS_MAC_SHA);
 	if (td==NULL) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	gnutls_hash(td, username, strlen(username));
-	gnutls_hash(td, ":", 1);
-	gnutls_hash(td, password, strlen(password));
+	_gnutls_hash(td, username, strlen(username));
+	_gnutls_hash(td, ":", 1);
+	_gnutls_hash(td, password, strlen(password));
 	
-	gnutls_hash_deinit(td, res);
+	_gnutls_hash_deinit(td, res);
 
-	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	td = _gnutls_hash_init(GNUTLS_MAC_SHA);
 	if (td==NULL) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	gnutls_hash(td, salt, salt_size);
-	gnutls_hash(td, res, 20);	/* 20 bytes is the output of sha1 */
+	_gnutls_hash(td, salt, salt_size);
+	_gnutls_hash(td, res, 20);	/* 20 bytes is the output of sha1 */
 
-	gnutls_hash_deinit(td, digest);
+	_gnutls_hash_deinit(td, digest);
 
 	return 0;
 }

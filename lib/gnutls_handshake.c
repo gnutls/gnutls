@@ -59,8 +59,8 @@ int _gnutls_server_select_comp_method(GNUTLS_STATE state,
  */
 inline static
 void _gnutls_handshake_hash_buffers_clear( GNUTLS_STATE state) {
-	gnutls_hash_deinit( state->gnutls_internals.handshake_mac_handle_md5, NULL);
-	gnutls_hash_deinit( state->gnutls_internals.handshake_mac_handle_sha, NULL);
+	_gnutls_hash_deinit( state->gnutls_internals.handshake_mac_handle_md5, NULL);
+	_gnutls_hash_deinit( state->gnutls_internals.handshake_mac_handle_sha, NULL);
 	state->gnutls_internals.handshake_mac_handle_md5 = NULL;
 	state->gnutls_internals.handshake_mac_handle_sha = NULL;
 	_gnutls_handshake_buffer_clear( state);
@@ -134,16 +134,16 @@ static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, opaque * ret)
 	GNUTLS_MAC_HANDLE td_sha;
 	char *mesg;
 
-	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	td_md5 = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	td_sha = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
 	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_hash_deinit( td_md5, NULL);
+		_gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
 
@@ -153,11 +153,11 @@ static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, opaque * ret)
 		mesg = SSL3_CLIENT_MSG;
 	}
 
-	gnutls_hash(td_md5, mesg, siz);
-	gnutls_hash(td_sha, mesg, siz);
+	_gnutls_hash(td_md5, mesg, siz);
+	_gnutls_hash(td_sha, mesg, siz);
 
-	gnutls_mac_deinit_ssl3_handshake(td_md5, ret, state->security_parameters.master_secret, TLS_MASTER_SIZE);
-	gnutls_mac_deinit_ssl3_handshake(td_sha, &ret[16], state->security_parameters.master_secret, TLS_MASTER_SIZE);
+	_gnutls_mac_deinit_ssl3_handshake(td_md5, ret, state->security_parameters.master_secret, TLS_MASTER_SIZE);
+	_gnutls_mac_deinit_ssl3_handshake(td_sha, &ret[16], state->security_parameters.master_secret, TLS_MASTER_SIZE);
 
 	return 0;
 }
@@ -175,22 +175,22 @@ int _gnutls_finished(GNUTLS_STATE state, int type, void *ret)
 	GNUTLS_MAC_HANDLE td_sha;
 
 
-	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	td_md5 = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	td_sha = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
 	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_hash_deinit( td_md5, NULL);
+		_gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
 
 
-	gnutls_hash_deinit(td_md5, concat);
-	gnutls_hash_deinit(td_sha, &concat[16]);
+	_gnutls_hash_deinit(td_md5, concat);
+	_gnutls_hash_deinit(td_sha, &concat[16]);
 
 	if (type == GNUTLS_SERVER) {
 		mesg = SERVER_MSG;
@@ -377,8 +377,8 @@ char * data;
 	}
 
 	if (siz > 0) {
-		gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, data, siz);
-		gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, data, siz);
+		_gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, data, siz);
+		_gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, data, siz);
 	}
 	
 	_gnutls_handshake_buffer_empty( state);
@@ -690,8 +690,8 @@ int ret;
 	}
 
 	if ( type != GNUTLS_HELLO_REQUEST) {
-		gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, dataptr, datalen);
-		gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, dataptr, datalen);
+		_gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, dataptr, datalen);
+		_gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, dataptr, datalen);
 	}
 
 	return 0;
@@ -1783,7 +1783,7 @@ inline
 static int _gnutls_handshake_hash_init( GNUTLS_STATE state) {
 
 	if ( state->gnutls_internals.handshake_mac_handle_md5==NULL) {
-		state->gnutls_internals.handshake_mac_handle_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
+		state->gnutls_internals.handshake_mac_handle_md5 = _gnutls_hash_init( GNUTLS_MAC_MD5);
 
 		if (state->gnutls_internals.handshake_mac_handle_md5==GNUTLS_HASH_FAILED) {
 			gnutls_assert();
@@ -1792,7 +1792,7 @@ static int _gnutls_handshake_hash_init( GNUTLS_STATE state) {
 	}
 
 	if ( state->gnutls_internals.handshake_mac_handle_sha==NULL) {
-		state->gnutls_internals.handshake_mac_handle_sha = gnutls_hash_init( GNUTLS_MAC_SHA);
+		state->gnutls_internals.handshake_mac_handle_sha = _gnutls_hash_init( GNUTLS_MAC_SHA);
 		if (state->gnutls_internals.handshake_mac_handle_sha==GNUTLS_HASH_FAILED) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;

@@ -33,7 +33,7 @@ int _gnutls_plaintext2TLSCompressed(GNUTLS_STATE state,
 	
 	data=NULL;
 	
-	size = gnutls_compress( state->connection_state.write_compression_state,
+	size = _gnutls_compress( state->connection_state.write_compression_state,
 		plaintext.data, plaintext.size, &data, MAX_RECORD_SIZE+1024);
 	if (size < 0) {
 		gnutls_assert();
@@ -55,7 +55,7 @@ int _gnutls_TLSCompressed2plaintext(GNUTLS_STATE state,
 
 	data=NULL;
 	
-	size = gnutls_decompress( state->connection_state.read_compression_state,
+	size = _gnutls_decompress( state->connection_state.read_compression_state,
 		compressed.data, compressed.size, &data, MAX_RECORD_SIZE);
 	if (size < 0) {
 		gnutls_assert();

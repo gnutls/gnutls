@@ -33,8 +33,8 @@
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
 #define X509_DEBUG
 #define RECORD_DEBUG
-*/
 #define DEBUG
+*/
 
 /* It might be a good idea to replace int with void*
  * here.

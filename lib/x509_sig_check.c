@@ -166,14 +166,14 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *p
 
 	gnutls_sfree_datum( &decrypted);
 
-	if (digest_size != gnutls_hash_get_algo_len(hash)) {
+	if (digest_size != _gnutls_hash_get_algo_len(hash)) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
-	hd = gnutls_hash_init( hash);
-	gnutls_hash( hd, text->data, text->size);
-	gnutls_hash_deinit( hd, md);
+	hd = _gnutls_hash_init( hash);
+	_gnutls_hash( hd, text->data, text->size);
+	_gnutls_hash_deinit( hd, md);
 
 	if (memcmp( md, digest, digest_size)!=0) {
 		gnutls_assert();
