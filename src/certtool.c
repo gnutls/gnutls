@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -35,9 +36,15 @@
 #include <getpass.h>
 #include <certtool-cfg.h>
 
+/* Gnulib portability files. */
+#include <getline.h>
+#include <error.h>
+#include <exit.h>
+
 static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all);
 int generate_prime(int bits);
 void pkcs7_info(void);
+void smime_to_pkcs7(void);
 void pkcs12_info(void);
 void generate_pkcs12(void);
 void verify_chain(void);
@@ -859,6 +866,9 @@ void gaa_parser(int argc, char **argv)
     case 14:
 	verify_crl();
 	break;
+    case 15:
+      smime_to_pkcs7();
+      break;
     default:
 	fprintf(stderr, "GnuTLS' certtool utility.\n");
 	fprintf(stderr,
@@ -2656,6 +2666,45 @@ void pkcs7_info(void)
     }
 
 
+}
+
+void smime_to_pkcs7(void)
+{
+  size_t linesize = 0;
+  char *lineptr = NULL;
+  ssize_t len;
+
+  /* Find body.  FIXME: Handle non-b64 Content-Transfer-Encoding.
+     Reject non-S/MIME tagged Content-Type's? */
+  do
+    {
+      len = getline (&lineptr, &linesize, infile);
+      if (len == -1)
+	error (EXIT_FAILURE, 0, "Cannot find RFC 2822 header/body separator");
+    }
+  while (strcmp (lineptr, "\r\n") != 0);
+
+  do
+    {
+      len = getline (&lineptr, &linesize, infile);
+      if (len == -1)
+	error (EXIT_FAILURE, 0, "Message has RFC 2822 header but no body");
+    }
+  while (strcmp (lineptr, "\r\n") == 0);
+
+  printf ("-----BEGIN PKCS7-----\n");
+
+  do
+    {
+      if (strcmp (lineptr, "\r\n") != 0)
+	printf("%s", lineptr);
+      len = getline (&lineptr, &linesize, infile);
+    }
+  while (len != -1);
+
+  printf ("-----END PKCS7-----\n");
+
+  free (lineptr);
 }
 
 #else				/* ENABLE_PKI */

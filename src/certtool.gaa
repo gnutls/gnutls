@@ -59,6 +59,8 @@ option (p12-info) { $action = 9; } "Print information on a PKCS #12 structure."
 
 option (p7-info) { $action = 12; } "Print information on a PKCS #7 structure."
 
+option (smime-to-p7) { $action = 15; } "Convert S/MIME to PKCS #7 structure."
+
 option (k, key-info) { $action = 6; } "Print information on a private key."
 
 option (to-p12) { $action = 8; } "Generate a PKCS #12 structure."
