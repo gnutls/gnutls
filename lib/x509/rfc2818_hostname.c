@@ -73,7 +73,8 @@ int _gnutls_hostname_compare(const char *certname, const char *hostname)
   *
   * This function will check if the given certificate's subject matches
   * the given hostname. This is a basic implementation of the matching 
-  * described in RFC2818 (HTTPS), which takes into account wildcards.
+  * described in RFC2818 (HTTPS), which takes into account wildcards,
+  * and the subject alternative name PKIX extension.
   *
   * Returns non zero on success, and zero on failure.
   *
