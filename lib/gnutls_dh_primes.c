@@ -61,38 +61,70 @@ int _gnutls_get_dh_params(gnutls_dh_params dh_primes,
 	return 0;
 }
 
-/* These should be added in gcrypt.h */
-GNUTLS_MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
-				    unsigned qbits, GNUTLS_MPI g,
-				    GNUTLS_MPI ** ret_factors);
-
 int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 			      unsigned int bits)
 {
-	GNUTLS_MPI g, prime;
-	int qbits;
-
+	GNUTLS_MPI g=NULL, prime=NULL;
+	gcry_error_t err;
+	int result, times = 0, qbits;
+	GNUTLS_MPI *factors = NULL;
+	
 	g = mpi_new(16);	/* this should be ok */
 	if (g == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		result = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
 	}
 
-	/* generate a random prime */
-	/* this is an emulation of Michael Wiener's table
-	 * bad emulation.
-	 */
-	qbits = 120 + (((bits / 256) - 1) * 20);
-	if (qbits & 1)		/* better have an even number */
-		qbits++;
-
-	prime = _gcry_generate_elg_prime(0, bits, qbits, g, NULL);
+	prime = mpi_new(32);
 	if (prime == NULL) {
 		gnutls_assert();
-		_gnutls_mpi_release(&g);
-		return GNUTLS_E_MEMORY_ERROR;
+		result = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}	
+
+	/* Calculate the size of a prime factor of (prime-1)/2.
+	 * This is a bad emulation of Michael Wiener's table
+	 */
+        qbits = 120 + (((bits / 256) - 1) * 20);
+                if (qbits & 1)          /* better have an even number */
+ 	               qbits++;
+
+	/* find a prime number of size bits.
+	 */
+	do {
+		err = gcry_prime_generate( &prime, bits, qbits,
+			&factors, NULL, NULL, GCRY_STRONG_RANDOM,
+			GCRY_PRIME_FLAG_SPECIAL_FACTOR);
+	
+		if (err != 0) {
+			gnutls_assert();
+			result = GNUTLS_E_INTERNAL_ERROR;
+			goto cleanup;
+		}
+
+		err = gcry_prime_check( prime, 0);
+		
+		times++;
+	} while( err != 0 && times < 10);
+
+	if (err != 0) {
+		gnutls_assert();
+		result = GNUTLS_E_INTERNAL_ERROR;
+		goto cleanup;
 	}
 
+	/* generate the group generator.
+	 */
+	err = gcry_prime_group_generator (&g, prime, factors, NULL);
+	if (err != 0) {
+		gnutls_assert();
+		result = GNUTLS_E_INTERNAL_ERROR;
+		goto cleanup;
+	}
+	
+	gcry_prime_release_factors (factors); factors = NULL;
+	
 	if (ret_g)
 		*ret_g = g;
 	else
@@ -104,6 +136,13 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 
 	return 0;
 
+	cleanup:
+		gcry_prime_release_factors (factors);
+		_gnutls_mpi_release(&g);
+		_gnutls_mpi_release(&prime);
+		
+		return result;
+	
 }
 
 /* Replaces the prime in the static DH parameters, with a randomly
