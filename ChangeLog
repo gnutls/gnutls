@@ -1,3 +1,24 @@
+2004-07-27 21:43  nmav <nmav@gnutls.org>
+
+	* .cvsusers:
+
+	added Simon 
+
+2004-07-27 10:24  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/gnutls.bib, lib/Makefile.am:
+
+	avoid using libtool's convenience libraries since they are buggy and 
+	cause conflicts in linking.  
+
+2004-07-27 10:06  nmav <nmav@gnutls.org>
+
+	* NEWS, NEWS:
+
+	* Updated the SRP authentication to conform to the 
+	  latest (yet unreleased) draft. Unfortunately this breaks 
+	  compatibility with previous versions.  
+
 2004-07-25 07:57  nmav <nmav@gnutls.org>
 
 	* lib/Makefile.am:
