@@ -1,3 +1,6 @@
+Version 1.1.15
+- Ported to Mac OS X / Darwin.
+
 Version 1.1.14 (09/08/2004)
 - Documentation converted to Texinfo format.
 - Bug fix of test suite.
