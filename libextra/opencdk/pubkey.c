@@ -528,8 +528,10 @@ cdk_pk_get_nbits( cdk_pkt_pubkey_t pk )
 int
 cdk_pk_get_npkey( int algo )
 {
-size_t bytes;
+    size_t bytes;
 
+    if (algo == 16)
+        algo = 20; /* XXX: libgcrypt returns 0 for 16 */
     if (gcry_pk_algo_info( algo, GCRYCTL_GET_ALGO_NPKEY, NULL, &bytes))
     	return 0;
     

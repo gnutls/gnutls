@@ -113,7 +113,6 @@ typedef enum {
     CDK_Inv_Packet_Ver = 23,
     CDK_Too_Short = 24,
     CDK_Unusable_Key = 25,
-    CDK_Self_Sig = 26
 } cdk_error_t;
 
 
@@ -268,7 +267,7 @@ enum cdk_key_flag_t {
     CDK_KEY_INVALID = 1, /* missing or wrong self signature */
     CDK_KEY_EXPIRED = 2,
     CDK_KEY_REVOKED = 4,
-    CDK_KEY_NO_SIGNERS = 8
+    CDK_KEY_NOSIGNER= 8,
 };
 
 enum cdk_trust_flag_t {

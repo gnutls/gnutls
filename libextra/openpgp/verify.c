@@ -125,7 +125,7 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
 
     if (status & CDK_KEY_INVALID) *verify |= GNUTLS_CERT_INVALID;
     if (status & CDK_KEY_REVOKED) *verify |= GNUTLS_CERT_REVOKED;
-    if (status & CDK_KEY_NO_SIGNERS) *verify |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+    if (status & CDK_KEY_NOSIGNER) *verify |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
     return 0;
 }

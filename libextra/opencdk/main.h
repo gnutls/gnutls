@@ -1,6 +1,5 @@
-/* -*- Mode: C; c-file-style: "bsd" -*-
- * main.h
- *       Copyright (C) 2002, 2003 Timo Schulz
+/* main.h
+ *       Copyright (C) 2002, 2003, 2004 Timo Schulz
  *
  * This file is part of OpenCDK.
  *
@@ -104,7 +103,8 @@ int _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
 void _cdk_hash_sig_data (cdk_pkt_signature_t sig, cdk_md_hd_t hd);
 void _cdk_hash_userid( cdk_pkt_userid_t uid, int sig_version, cdk_md_hd_t md);
 void _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, cdk_md_hd_t md, int use_fpr);
-int _cdk_pk_check_sig( cdk_keydb_hd_t hd, cdk_kbnode_t knode,cdk_kbnode_t snode );
+int _cdk_pk_check_sig(cdk_keydb_hd_t hd, cdk_kbnode_t knode,
+                       cdk_kbnode_t snode, int * is_selfsig);
     
 
 /*-- kbnode.c --*/
