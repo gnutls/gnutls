@@ -1,15 +1,17 @@
-Version 1.0.14
+Version 1.0.14 (12/06/2004)
 - Automatically disable certificate types that do not have corresponding
   certificates.
 - Updates in the documentation.
 - certtool can now add ip address SAN extension.
 - certtool has now support for more X.520 DN attribute types.
 - Opencdk library is being included if not found.
+- Added gnutls_openpgp_keyring_check_id().
 - Corrected a serious bug in the included libtasn1 library.
 - Corrected session resuming in SRP ciphersuites.
 - Updated to conform to the latest srp draft (draft-ietf-tls-srp-07)
 - Added the functions gnutls_x509_crt_get_pk_rsa_raw() and
   gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from certificates.
+- Some fixes in the session resuming code.
 
 Version 1.0.13 (29/04/2004)
 - Some complilation fixes.
