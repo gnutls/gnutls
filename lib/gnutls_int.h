@@ -3,6 +3,10 @@
 #define HARD_DEBUG
 #define DEBUG
 
+#define MAX32 4294967295
+#define MAX24 16777215
+#define MAX16 65535
+
 /* for message digests */
 #define GNUTLS_HASH_HANDLE GCRY_MD_HD
 #define GNUTLS_MAC_HANDLE GCRY_MD_HD

@@ -101,16 +101,16 @@ GNUTLS_MAC_HANDLE ret;
 			break;
 		case GNUTLS_MAC_SHA:
 			ret = gcry_md_open( GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
-			if (!ret) return GNUTLS_MAC_FAILED;
+			if (!ret) ret = GNUTLS_MAC_FAILED;
 			break;
 		case GNUTLS_MAC_MD5:
 			ret = gcry_md_open( GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
-			if (!ret) return GNUTLS_MAC_FAILED;
+			if (!ret) ret = GNUTLS_MAC_FAILED;
 			break;
 		default:
 			ret = GNUTLS_MAC_FAILED;
 	}
-	gcry_md_setkey(ret, key, keylen);
+	if (ret!=GNUTLS_MAC_FAILED) gcry_md_setkey(ret, key, keylen);
 	
 	return ret;
 }

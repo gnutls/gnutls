@@ -263,7 +263,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 
 
 /* This function will receive handshake messages of the given types,
- * and will pass the message to the right place in order to be processes.
+ * and will pass the message to the right place in order to be processed.
  * Eg. for the SERVER_HELLO message (if it is expected), it will be
  * send to _gnutls_recv_hello().
  */
@@ -271,9 +271,21 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 				int* datalen, HandshakeType type)
 {
 	int ret;
-	uint32 length32 = 0;
+	uint32 length32 = 0, sum=0;
 	uint8 *dataptr;
 	uint24 num;
+
+	/* If the ciphersuite does not support certificate just quit */
+	if (type==GNUTLS_CERTIFICATE) {
+		if (state->security_parameters.entity == GNUTLS_CLIENT) {
+			if ( _gnutls_kx_server_certificate( 
+				_gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite)) ==0 )
+			return 0;
+		} else { /* server */
+			if (_gnutls_kx_client_certificate( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite)==0))
+			return 0;
+		}
+	}
 
 	dataptr = gnutls_malloc(4);
 	
@@ -302,11 +314,16 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 
 	if (datalen!=NULL) *datalen = length32;
 
-	ret = _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, &dataptr[4], length32);
-	if (ret!=length32) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	if (ret < 0) return ret;
+	sum=4;
+	do {
+		ret = _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, &dataptr[sum], length32);
+		sum += ret;
+	} while( ( (sum-4) < length32) && (ret > 0) );
 
-	if (length32>0 && data!=NULL)
+	if (ret < 0) return ret;
+	ret = GNUTLS_E_UNKNOWN_ERROR;
+
+	if (length32 > 0 && data!=NULL)
 		memmove( *data, &dataptr[4], length32);
 
 	if (state->gnutls_internals.client_hash == HASH_TRUE) {
@@ -323,13 +340,16 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 		      length32 + 4);
 	}
 
-	ret = GNUTLS_E_UNKNOWN_ERROR;
 	
 	switch (dataptr[0]) {
 	case GNUTLS_CLIENT_HELLO:
 	case GNUTLS_SERVER_HELLO:
 		ret = _gnutls_recv_hello(cd, state, &dataptr[4],
 					       length32, NULL, 0);
+		break;
+	case GNUTLS_CERTIFICATE:
+		ret = _gnutls_recv_certificate(cd, state, &dataptr[4],
+					       length32);
 		break;
 	case GNUTLS_SERVER_HELLO_DONE:
 		ret = 0;
@@ -371,6 +391,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	session_id_len = SessionIDLen;
 	if (SessionID == NULL)
 		session_id_len = 0;
+
 	rand = gcry_random_bytes(28, GCRY_STRONG_RANDOM);
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
@@ -630,6 +651,46 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 	return ret;
 }
 
+int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen)
+{
+	uint8 session_id_len = 0, z;
+	int pos = 0;
+	char* certificate_list;
+	int i, ret=0;
+	uint16 x, sizeOfCert;
+
+	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+		if (datalen < 2)
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+
+		memmove( &sizeOfCert, &data[pos], 2);
+		pos+=2;
+#ifndef WORDS_BIGENDIAN
+		sizeOfCert=byteswap16(sizeOfCert);
+#endif
+		if (sizeOfCert > MAX24) {
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+		certificate_list = gnutls_malloc(sizeOfCert);
+		
+		memmove( certificate_list, &data[pos], sizeOfCert);
+		
+		/* Verify certificates !!! */
+		
+		gnutls_free(certificate_list); /* oooops! */
+
+	} else {		/* Server side reading a client certificate */
+		/* actually this is not complete */
+		if (datalen < 1)
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+
+		ret = 0;
+	}
+
+	return ret;
+}
+
+
 /* This is the main function in the handshake protocol. This does actually
  * everything. (exchange hello messages etc).
  */
@@ -665,8 +726,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		HASH(client_hash);
 		HASH(server_hash);
 		ret =
-		    _gnutls_recv_handshake(cd, state, NULL, NULL,
-					   GNUTLS_SERVER_HELLO);
+		    _gnutls_recv_handshake(cd, state, NULL, NULL, GNUTLS_SERVER_HELLO);
 		NOT_HASH(client_hash);
 		NOT_HASH(server_hash);
 		if (ret < 0) {
@@ -675,6 +735,17 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		}
 
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+		HASH(client_hash);
+		HASH(server_hash);
+		ret =
+		    _gnutls_recv_handshake(cd, state, NULL, NULL, GNUTLS_CERTIFICATE);
+		NOT_HASH(client_hash);
+		NOT_HASH(server_hash);
+		if (ret < 0) {
+			ERR("recv server certificate", ret);
+			return ret;
+		}
+		
 
 		/* receive the server key exchange */
 		HASH(client_hash);

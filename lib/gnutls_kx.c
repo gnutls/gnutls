@@ -45,6 +45,9 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 	uint8 *data_X;
 	int ret=0;
 
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Sending server KX message\n");
+#endif
 
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo(state->
@@ -138,6 +141,9 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	svoid* master;
 	char* random = gnutls_malloc(64);
 	
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Sending client KX message\n");
+#endif
 	memmove( random, state->security_parameters.client_random, 32);
 	memmove( &random[32], state->security_parameters.server_random, 32);
 
@@ -228,6 +234,9 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 	uint8 *data_Y;
 	int ret=0, i;
 
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Receiving Server KX message\n");
+#endif
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo(state->
 					     gnutls_internals.current_cipher_suite);
@@ -299,7 +308,10 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	int premaster_size=0;
 	svoid* master;
 	uint8* random = gnutls_malloc(64);
-	
+
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Receiving client KX message\n");
+#endif	
 	memmove( random, state->security_parameters.client_random, 32);
 	memmove( &random[32], state->security_parameters.server_random, 32);
 
