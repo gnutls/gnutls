@@ -727,20 +727,36 @@ int _gnutls_version_priority(GNUTLS_STATE state,
 
 GNUTLS_Version _gnutls_version_lowest(GNUTLS_STATE state)
 {				/* returns the lowest version supported */
+	int i, min = 0xff;
+	
 	if (state->gnutls_internals.ProtocolPriority.algorithm_priority==NULL) {
 		return GNUTLS_VERSION_UNKNOWN;
 	} else
-	return state->gnutls_internals.ProtocolPriority.
-		algorithm_priority[state->gnutls_internals.ProtocolPriority.algorithms-1];
+		for (i=0;i<state->gnutls_internals.ProtocolPriority.algorithms;i++) {
+			if (state->gnutls_internals.ProtocolPriority.algorithm_priority[i] < min)
+				min = state->gnutls_internals.ProtocolPriority.algorithm_priority[i];
+		}
+
+	if (min==0xff) return GNUTLS_VERSION_UNKNOWN; /* unknown version */
+
+	return min;
 }
 
 GNUTLS_Version _gnutls_version_max(GNUTLS_STATE state)
 {				/* returns the maximum version supported */
+	int i, max=0x00;
+
 	if (state->gnutls_internals.ProtocolPriority.algorithm_priority==NULL) {
 		return GNUTLS_VERSION_UNKNOWN;
 	} else
-	return state->gnutls_internals.ProtocolPriority.
-		algorithm_priority[0];
+		for (i=0;i<state->gnutls_internals.ProtocolPriority.algorithms;i++) {
+			if (state->gnutls_internals.ProtocolPriority.algorithm_priority[i] > max)
+				max = state->gnutls_internals.ProtocolPriority.algorithm_priority[i];
+		}
+	
+	if (max==0x00) return GNUTLS_VERSION_UNKNOWN; /* unknown version */
+		
+	return max;
 }
 
 

@@ -114,7 +114,8 @@ return ret;
 		if (plaintext.size != TLS_MASTER_SIZE) {	/* WOW */
 			RANDOMIZE_KEY(state->gnutls_key->key, secure_malloc);
 		} else {
-			if (_gnutls_get_adv_version_major( state) != plaintext.data[0] || _gnutls_get_adv_version_minor( state) != plaintext.data[1]) {
+			if (_gnutls_get_adv_version_major( state) != plaintext.data[0] 
+				|| _gnutls_get_adv_version_minor( state) != plaintext.data[1]) {
 				gnutls_assert();
 				ret = GNUTLS_E_DECRYPTION_FAILED;
 			}

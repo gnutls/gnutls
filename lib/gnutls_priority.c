@@ -56,7 +56,8 @@ int gnutls_set_cipher_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 
 	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
-	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+
+	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
 	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 		
@@ -103,7 +104,7 @@ int gnutls_set_kx_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 
 	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
-	state->gnutls_internals.KXAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	state->gnutls_internals.KXAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
 	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 	state->gnutls_internals.KXAlgorithmPriority.algorithms = num;
@@ -148,7 +149,7 @@ int gnutls_set_mac_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	
 	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);	
-	state->gnutls_internals.MACAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	state->gnutls_internals.MACAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
 	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority ==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 	state->gnutls_internals.MACAlgorithmPriority.algorithms = num;
@@ -193,7 +194,7 @@ int gnutls_set_compression_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	
 	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);	
-	state->gnutls_internals.CompressionMethodPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	state->gnutls_internals.CompressionMethodPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
 	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
@@ -238,7 +239,7 @@ int gnutls_set_protocol_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	if (state->gnutls_internals.ProtocolPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.ProtocolPriority.algorithm_priority);
 
-	state->gnutls_internals.ProtocolPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	state->gnutls_internals.ProtocolPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
 
 	if (state->gnutls_internals.ProtocolPriority.algorithm_priority == NULL) {
 		gnutls_assert();
@@ -247,7 +248,7 @@ int gnutls_set_protocol_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	
 	state->gnutls_internals.ProtocolPriority.algorithms = num;
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = va_arg( _ap, int);
+		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = va_arg( _ap, GNUTLS_Version);
 	}
 	va_end(ap);
 

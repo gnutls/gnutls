@@ -59,7 +59,7 @@ char random[2*TLS_RANDOM_SIZE];
 	_gnutls_log( "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
 #endif
 
-	if ( state->connection_state.version == GNUTLS_SSL3) {
+	if ( state->security_parameters.version == GNUTLS_SSL3) {
 		master =
 		    gnutls_ssl3_generate_random( premaster, premaster_size,
 			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE);

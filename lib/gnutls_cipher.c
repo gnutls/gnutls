@@ -132,10 +132,10 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 	    _gnutls_cipher_get_block_size(state->security_parameters.
 					  write_bulk_cipher_algorithm);
 
-	minor = _gnutls_version_get_minor(state->connection_state.version);
-	major = _gnutls_version_get_major(state->connection_state.version);
+	minor = _gnutls_version_get_minor(state->security_parameters.version);
+	major = _gnutls_version_get_major(state->security_parameters.version);
 
-	if ( state->connection_state.version == GNUTLS_SSL3) { /* SSL 3.0 */
+	if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3.0 */
 		td =
 		    gnutls_mac_init_ssl3(state->security_parameters.
 					  write_mac_algorithm,
@@ -166,13 +166,13 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		gnutls_hmac(td, UINT64DATA(seq_num), 8);
 		
 		gnutls_hmac(td, &type, 1);
-		if ( state->connection_state.version != GNUTLS_SSL3) { /* TLS 1.0 only */
+		if ( state->security_parameters.version != GNUTLS_SSL3) { /* TLS 1.0 only */
 			gnutls_hmac(td, &major, 1);
 			gnutls_hmac(td, &minor, 1);
 		}
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, compressed.data, compressed.size);
-		if ( state->connection_state.version == GNUTLS_SSL3) { /* SSL 3.0 */
+		if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3.0 */
 			gnutls_mac_deinit_ssl3(td, MAC);
 		} else {
 			gnutls_hmac_deinit(td, MAC);
@@ -197,7 +197,7 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		}
 
 		/* make rand a multiple of blocksize */
-		if ( state->connection_state.version == GNUTLS_SSL3) {
+		if ( state->security_parameters.version == GNUTLS_SSL3) {
 			rand = 0;
 		} else {
 			rand = (rand / blocksize) * blocksize;
@@ -261,13 +261,13 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	uint8 major, minor;
 	int hash_size = _gnutls_mac_get_digest_size(state->security_parameters.read_mac_algorithm);
 
-	minor = _gnutls_version_get_minor(state->connection_state.version);
-	major = _gnutls_version_get_major(state->connection_state.version);
+	minor = _gnutls_version_get_minor(state->security_parameters.version);
+	major = _gnutls_version_get_major(state->security_parameters.version);
 
 	blocksize = _gnutls_cipher_get_block_size(state->security_parameters.
 					  read_bulk_cipher_algorithm);
 
-	if ( state->connection_state.version == GNUTLS_SSL3) {
+	if ( state->security_parameters.version == GNUTLS_SSL3) {
 		td =
 		    gnutls_mac_init_ssl3(state->security_parameters.
 					  read_mac_algorithm,
@@ -354,13 +354,13 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 		gnutls_hmac(td, UINT64DATA(seq_num), 8);
 		
 		gnutls_hmac(td, &type, 1);
-		if ( state->connection_state.version != GNUTLS_SSL3) { /* TLS 1.0 only */
+		if ( state->security_parameters.version != GNUTLS_SSL3) { /* TLS 1.0 only */
 			gnutls_hmac(td, &major, 1);
 			gnutls_hmac(td, &minor, 1);
 		}
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, data, compress->size);
-		if ( state->connection_state.version == GNUTLS_SSL3) { /* SSL 3.0 */
+		if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3.0 */
 			gnutls_mac_deinit_ssl3(td, MAC);
 		} else {
 			gnutls_hmac_deinit(td, MAC);

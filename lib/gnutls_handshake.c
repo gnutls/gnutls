@@ -86,6 +86,9 @@ static void resume_copy_required_values(GNUTLS_STATE state)
 	state->security_parameters.entity =
 	    state->gnutls_internals.resumed_security_parameters.entity;
 
+	state->security_parameters.version =
+	    state->gnutls_internals.resumed_security_parameters.version;
+
 	memcpy(state->security_parameters.session_id,
 	       state->gnutls_internals.resumed_security_parameters.
 	       session_id, sizeof(state->security_parameters.session_id));
@@ -299,7 +302,8 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	DECR_LEN(len, 1);
 	memcpy(&session_id_len, &data[pos++], 1);
 
-	/* RESUME SESSION */
+	/* RESUME SESSION 
+	 */
 	if (session_id_len > TLS_MAX_SESSION_ID_SIZE) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -403,7 +407,7 @@ int _gnutls_send_finished(SOCKET cd, GNUTLS_STATE state, int again)
 	int data_size=0;
 
 	if (again==0) {
-		if (state->connection_state.version == GNUTLS_SSL3) {
+		if (state->security_parameters.version == GNUTLS_SSL3) {
 			data =
 			    _gnutls_ssl3_finished(state,
 						  state->security_parameters.
@@ -444,7 +448,7 @@ int _gnutls_recv_finished(SOCKET cd, GNUTLS_STATE state)
 		gnutls_assert();
 		return ret;
 	}
-	if (state->connection_state.version == GNUTLS_SSL3) {
+	if (state->security_parameters.version == GNUTLS_SSL3) {
 		data_size = 36;
 	} else {
 		data_size = 12;
@@ -454,7 +458,7 @@ int _gnutls_recv_finished(SOCKET cd, GNUTLS_STATE state)
 		gnutls_assert();
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
-	if (state->connection_state.version == GNUTLS_SSL3) {
+	if (state->security_parameters.version == GNUTLS_SSL3) {
 		/* skip the bytes from the last message */
 		data =
 		    _gnutls_ssl3_finished(state,
@@ -654,17 +658,18 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 	uint8 *dataptr = NULL;	/* for realloc */
 	int handshake_header_size = HANDSHAKE_HEADER_SIZE;
 
-	/* if we have data into the buffer then return them, do not read the next packet
+	/* if we have data into the buffer then return them, do not read the next packet.
+	 * In order to return we need a full TLS handshake header, or in case of a version 2
+	 * packet, then we return the first byte.
 	 */
-	if (state->gnutls_internals.handshake_header_buffer.header_size ==
-	    handshake_header_size) {
-		*recv_type =
-		    state->gnutls_internals.handshake_header_buffer.
-		    recv_type;
+	if ((state->gnutls_internals.handshake_header_buffer.header_size == handshake_header_size ||
+		(state->gnutls_internals.v2_hello!=0 && type==GNUTLS_CLIENT_HELLO)) &&
+		state->gnutls_internals.handshake_header_buffer.packet_length > 0) {
 
-		state->gnutls_internals.handshake_header_buffer.header_size = 0;	/* reset buffering */
-		return state->gnutls_internals.handshake_header_buffer.
-		    packet_length;
+		*recv_type =
+		    state->gnutls_internals.handshake_header_buffer.recv_type;
+
+		return state->gnutls_internals.handshake_header_buffer.packet_length;
 	}
 
 	/* Note: SSL2_HEADERS == 1 */
@@ -678,7 +683,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 		    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE, type,
 				       dataptr, SSL2_HEADERS);
 	
-		if (ret <= 0) {
+		if (ret < 0) {
 			gnutls_assert();
 			return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
@@ -687,7 +692,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
-		state->gnutls_internals.handshake_header_buffer.header_size += SSL2_HEADERS;
+		state->gnutls_internals.handshake_header_buffer.header_size += ret;
 	}
 
 	if (state->gnutls_internals.v2_hello == 0 || type != GNUTLS_CLIENT_HELLO) {
@@ -711,6 +716,9 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 
 		length32 = READuint24(&dataptr[1]);
 		handshake_header_size = HANDSHAKE_HEADER_SIZE;
+
+		state->gnutls_internals.handshake_header_buffer.header_size += ret;
+		
 #ifdef HANDSHAKE_DEBUG
 		_gnutls_log("Handshake: %s was received [%ld bytes]\n",
 			    _gnutls_handshake2str(dataptr[0]),
@@ -735,6 +743,16 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 		}
 	}
 
+	/* put the packet into the buffer */
+	state->gnutls_internals.handshake_header_buffer.header_size = handshake_header_size;
+	state->gnutls_internals.handshake_header_buffer.packet_length = length32;
+	state->gnutls_internals.handshake_header_buffer.recv_type = *recv_type;
+
+	if (*recv_type != type) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+	}
+
 	if (*recv_type != GNUTLS_HELLO_REQUEST) {
 		if ((ret =
 		     gnutls_insert_to_handshake_buffer(state, dataptr,
@@ -745,23 +763,11 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 		}
 	}
 
-	if (*recv_type != type) {
-		gnutls_assert();
-
-		/* put the packet into the buffer */
-		state->gnutls_internals.handshake_header_buffer.
-		    header_size = handshake_header_size;
-		state->gnutls_internals.handshake_header_buffer.
-		    packet_length = length32;
-		state->gnutls_internals.handshake_header_buffer.recv_type =
-		    *recv_type;
-		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
-	}
-
-	state->gnutls_internals.handshake_header_buffer.header_size = 0;	/* no buffering */
-
 	return length32;
 }
+
+#define _gnutls_clear_handshake_header_buffer( state) state->gnutls_internals.handshake_header_buffer.header_size = 0
+
 
 /* This function will receive handshake messages of the given types,
  * and will pass the message to the right place in order to be processed.
@@ -820,6 +826,13 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 			    ret;
 		}
 	}
+
+	/* If we fail before this then we will reuse the handshake header
+	 * have have received above. if we get here the we clear the handshake
+	 * header we received.
+	 */
+	_gnutls_clear_handshake_header_buffer( state);
+
 	ret = GNUTLS_E_UNKNOWN_ERROR;
 
 	if (data != NULL && length32 > 0)
@@ -835,6 +848,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 			return ret;
 		}
 	}
+	
 	switch (recv_type) {
 	case GNUTLS_CLIENT_HELLO:
 	case GNUTLS_SERVER_HELLO:
@@ -898,6 +912,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	} else {
 		_gnutls_set_current_version(state, version);
 	}
+
 	pos += 2;
 
 	DECR_LEN(len, TLS_RANDOM_SIZE);
@@ -1055,8 +1070,10 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
 	    state->gnutls_internals.resumed_security_parameters.
 	    session_id_size;
 
-	if (SessionID == NULL)
+	if (SessionID == NULL || session_id_len == 0) {
 		session_id_len = 0;
+		SessionID = NULL;
+	}
 
 	data = NULL;
 	datalen = 0;
@@ -1076,12 +1093,20 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
 		 */
 		if (SessionID==NULL)
 			hver = _gnutls_version_max(state);
-		else
-			hver = gnutls_get_current_version(state);
+		else { /* we are resuming a session */
+			hver = state->gnutls_internals.resumed_security_parameters.version;
+			_gnutls_set_current_version( state, hver);
+		}
 
+		if (hver <= 0) {
+			if (hver==0) hver = GNUTLS_E_UNKNOWN_ERROR;
+			gnutls_assert();
+			return hver;
+		}
+		
 		data[pos++] = _gnutls_version_get_major(hver);
 		data[pos++] = _gnutls_version_get_minor(hver);
-		
+
 		_gnutls_create_random(random);
 		_gnutls_set_client_random(state, random);
 
@@ -1198,9 +1223,9 @@ static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state, int again)
 		}
 
 		data[pos++] =
-		    _gnutls_version_get_major(state->connection_state.version);
+		    _gnutls_version_get_major(state->security_parameters.version);
 		data[pos++] =
-		    _gnutls_version_get_minor(state->connection_state.version);
+		    _gnutls_version_get_minor(state->security_parameters.version);
 
 		memcpy(&data[pos],
 		       state->security_parameters.server_random, TLS_RANDOM_SIZE);

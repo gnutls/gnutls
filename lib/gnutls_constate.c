@@ -53,7 +53,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	memcpy(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
 	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
-	if ( state->connection_state.version == GNUTLS_SSL3) { /* SSL 3 */
+	if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3 */
 		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
 			block_size);
 	} else { /* TLS 1.0 */
@@ -152,6 +152,7 @@ int _gnutls_set_write_keys(GNUTLS_STATE state)
 	dst->session_id_size = src->session_id_size; \
 	dst->timestamp = src->timestamp; \
 	dst->max_record_size = src->max_record_size; \
+	dst->version = src->version; \
 	memcpy( &dst->extensions, &src->extensions, sizeof(TLSExtensions));
 	
 static void _gnutls_cpy_read_security_parameters( SecurityParameters * dst, SecurityParameters* src) {

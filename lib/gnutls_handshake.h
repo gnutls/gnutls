@@ -38,8 +38,8 @@ int _gnutls_remove_unwanted_ciphersuites( GNUTLS_STATE state, GNUTLS_CipherSuite
 void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
 
 #define set_adv_version( state, major, minor) \
-	state->gnutls_internals.adv_version_major = data[pos]; \
-	state->gnutls_internals.adv_version_minor = data[pos+1]
+	state->gnutls_internals.adv_version_major = major; \
+	state->gnutls_internals.adv_version_minor = minor
 
 
 #define STATE state->gnutls_internals.handshake_state

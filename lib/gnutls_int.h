@@ -234,6 +234,11 @@ typedef struct {
 	uint8 CipherSuite[2];
 } GNUTLS_CipherSuite;
 
+/* Versions should be in order of the oldest
+ * (eg. SSL3 is before TLS1)
+ */
+typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
+
 /* This structure holds parameters got from TLS extension
  * mechanism. (some extensions may hold parameters in AUTH_INFO
  * structures instead - see SRP).
@@ -291,6 +296,7 @@ typedef struct {
 	time_t 			timestamp;
 	TLSExtensions		extensions;
 	uint16			max_record_size;
+	GNUTLS_Version		version; /* moved here */
 } SecurityParameters;
 
 /* This structure holds the generated keys
@@ -308,13 +314,8 @@ typedef struct {
 				      */
 } CipherSpecs;
 
-/* Versions should be in order of the oldest
- * (eg. SSL3 is before TLS1)
- */
-typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
 
 typedef struct {
-	GNUTLS_Version	version;
 	GNUTLS_CIPHER_HANDLE write_cipher_state;
 	GNUTLS_CIPHER_HANDLE read_cipher_state;
 	gnutls_datum 	read_mac_secret;
@@ -414,7 +415,9 @@ typedef struct {
 	char*				db_name;
 	int				expire_time;
 	struct MOD_AUTH_STRUCT_INT*	auth_struct; /* used in handshake packets and KX algorithms */
-	int				v2_hello; /* set 0 normally - 1 if v2 hello was received - server side only */
+	int				v2_hello; /* 0 if the client hello is v3+.
+						   * non-zero if we got a v2 hello.
+						   */
 #ifdef HAVE_LIBGDBM
 	GDBM_FILE			db_reader;
 #endif

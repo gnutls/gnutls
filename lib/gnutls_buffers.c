@@ -1,4 +1,4 @@
-#define READ_DEBUG
+#define IO_DEBUG 5
 /*
  *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-#define IO_DEBUG 5
+
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
@@ -712,9 +712,13 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 	ptr = iptr;
 	left = sizeOfPtr;
 
+	if (sizeOfPtr == 0 || iptr == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+
 	if (state->gnutls_internals.handshake_recv_buffer.size > 0) {
 		/* if we have already received some data */
-		fprintf(stderr, "C1: BUFFER_SIZE: %d\n", state->gnutls_internals.handshake_recv_buffer.size);
 		if (sizeOfPtr <= state->gnutls_internals.handshake_recv_buffer.size) {
 			/* if requested less data then return it.
 			 */
@@ -726,7 +730,6 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 			memmove( state->gnutls_internals.handshake_recv_buffer.data, 
 				&state->gnutls_internals.handshake_recv_buffer.data[sizeOfPtr], 
 				state->gnutls_internals.handshake_recv_buffer.size);
-		fprintf(stderr, "C2: BUFFER_SIZE: %d\n", state->gnutls_internals.handshake_recv_buffer.size);
 			
 			return sizeOfPtr;
 		}
@@ -766,7 +769,6 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 				state->gnutls_internals.handshake_recv_buffer.size = 0;
 
 			gnutls_assert();
-		fprintf(stderr, "C3: BUFFER_SIZE: %d\n", state->gnutls_internals.handshake_recv_buffer.size);
 
 			return i;
 		} else {
@@ -780,20 +782,7 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 
 	state->gnutls_internals.handshake_recv_buffer.size = 0;
 
-{int x,j,sum=0;
-	fprintf(stderr,  "HREAD: read %d bytes from %d\n", (sizeOfPtr-left), fd);
-	for (x=0;x<((sizeOfPtr-left)/16)+1;x++) {
-		fprintf(stderr,  "%.4x - ",x);
-		for (j=0;j<16;j++) {
-			if (sum<(sizeOfPtr-left)) {
-				fprintf(stderr,  "%.2x ", ((unsigned char*)ptr)[sum++]);
-			}
-		}
-		fprintf(stderr,  "\n");
-	
-	}
-}
-	return (sizeOfPtr - left);
+	return sizeOfPtr - left;
 }
 
 /* Buffer for handshake packets. Keeps the packets in order

@@ -63,7 +63,7 @@ static char http_buffer[16*1024];
 
 #define HTTP_END  "</BODY></HTML>\n\n"
 
-#define RENEGOTIATE
+//#define RENEGOTIATE
 
 /* These are global */
 SRP_SERVER_CREDENTIALS srp_cred;
@@ -474,7 +474,7 @@ int main(int argc, char **argv)
 			}
 			i++;
 #ifdef RENEGOTIATE
-			if (i == 10) {
+			if (i == 20) {
 				do {
 					ret = gnutls_rehandshake(sd, state);
 				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);

@@ -64,6 +64,6 @@ static int send_debug (int fd, const char *buf, int len, int flags)
     return send (fd, buf, len, flags);
 }
 
-//#define send send_debug
+#define send send_debug
 
 #endif

@@ -38,12 +38,12 @@
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
-	ver = state->connection_state.version;
+	ver = state->security_parameters.version;
 	return ver;
 }
 
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
-	state->connection_state.version = version;
+	state->security_parameters.version = version;
 }
 
 /**
@@ -532,8 +532,8 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
-	if ( sizeofdata > 128) //MAX_RECORD_SIZE)
-		data2send = 128; //MAX_RECORD_SIZE;
+	if ( sizeofdata > MAX_RECORD_SIZE)
+		data2send = MAX_RECORD_SIZE;
 	else 
 		data2send = sizeofdata;
 
