@@ -479,6 +479,7 @@ void print_list(void)
 
 	printf("Protocols:");
 	printf(" TLS1.0");
+	printf(", TLS1.1");
 	printf(", SSL3.0\n");
 
 	printf("Ciphers:");
@@ -534,7 +535,9 @@ void parse_protocols(char **protocols, int protocols_size,
 		for (j = i = 0; i < protocols_size; i++) {
 			if (strncasecmp(protocols[i], "SSL", 3) == 0)
 				protocol_priority[j++] = GNUTLS_SSL3;
-			if (strncasecmp(protocols[i], "TLS", 3) == 0)
+			if (strncasecmp(protocols[i], "TLS1.1", 6) == 0)
+				protocol_priority[j++] = GNUTLS_TLS1_1;
+			if (strncasecmp(protocols[i], "TLS1.0", 6) == 0)
 				protocol_priority[j++] = GNUTLS_TLS1;
 		}
 		protocol_priority[j] = 0;

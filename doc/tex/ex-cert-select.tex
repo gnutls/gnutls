@@ -26,6 +26,7 @@
 
 static int cert_callback(gnutls_session session,
                   const gnutls_datum* req_ca_rdn, int nreqs,
+                  const gnutls_pk_algorithm* sign_algos, int sign_algos_length,
                   gnutls_retr_st * st);
 
 gnutls_x509_crt crt;
@@ -192,6 +193,7 @@ int main()
 
 static int cert_callback(gnutls_session session,
                   const gnutls_datum* req_ca_rdn, int nreqs,
+                  const gnutls_pk_algorithm* sign_algos, int sign_algos_length,
                   gnutls_retr_st * st)
 {
    char issuer_dn[256];
@@ -217,6 +219,8 @@ static int cert_callback(gnutls_session session,
    }
 
    /* Select a certificate and return it.
+    * The certificate must be of any of the "sign algorithms"
+    * supported by the server.
     */
 
    type = gnutls_certificate_type_get( session);

@@ -51,11 +51,13 @@
   * Returns the version of the currently used protocol. 
   *
   **/
-gnutls_protocol_version gnutls_protocol_get_version(gnutls_session session) {
+gnutls_protocol_version gnutls_protocol_get_version(gnutls_session session) 
+{
 	return session->security_parameters.version;
 }
 
-void _gnutls_set_current_version(gnutls_session session, gnutls_protocol_version version) {
+void _gnutls_set_current_version(gnutls_session session, gnutls_protocol_version version) 
+{
 	session->security_parameters.version = version;
 }
 
@@ -253,48 +255,6 @@ gnutls_protocol_version lver;
 	}
 }
 
-inline static
-ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
-	opaque* erecord, unsigned int erecord_size)
-{
-	int cipher_size;
-	int retval;
-	int data2send;
-	uint8 headers[5];
-
-	if (type!=GNUTLS_APPLICATION_DATA ||
-		_gnutls_cipher_is_block( gnutls_cipher_get(session))!=CIPHER_BLOCK) 
-		/* alert messages and stream ciphers
-		 * do not need this protection 
-		 */
-		return 0;
-
-	headers[0] = type;
-	
-	copy_record_version( session, (HandshakeType)(-1), &headers[1]);
-
-	data2send = 0;
-
-	cipher_size = _gnutls_encrypt( session, headers, RECORD_HEADER_SIZE, NULL, 0, erecord, erecord_size, type, 0);
-	if (cipher_size <= 0) {
-		gnutls_assert();
-		if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-		return cipher_size; /* error */
-	}
-
-	retval = cipher_size;
-
-	/* increase sequence number
-	 */
-	if (_gnutls_uint64pp( &session->connection_state.write_sequence_number) != 0) {
-		_gnutls_session_invalidate( session);
-		gnutls_assert();
-		return GNUTLS_E_RECORD_LIMIT_REACHED;
-	}
-
-	return retval;
-}
-
 /* This function behaves exactly like write(). The only difference is
  * that it accepts, the gnutls_session and the ContentType of data to
  * send (if called by the user the Content is specific)
@@ -367,27 +327,6 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type,
 
 		retval = session->internals.record_send_buffer_user_size;
 	} else {
-
-		/* Prepend our packet with an empty record. This is to
-		 * avoid the recent CBC attacks.
-		 */
-		/* if this protection has been disabled
-		 */
-		if (session->internals.cbc_protection_hack!=0) {
-			erecord_size = MAX_RECORD_OVERHEAD;
-			erecord = gnutls_alloca( erecord_size);
-			if (erecord==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-
-			erecord_size = 
-				_gnutls_create_empty_record( session, type, erecord, erecord_size);
-			if (erecord_size < 0) {
-				gnutls_assert();
-				return erecord_size;
-			}
-		}
 
 		/* now proceed to packet encryption
 		 */
@@ -563,10 +502,10 @@ static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[R
 /* Here we check if the advertized version is the one we
  * negotiated in the handshake.
  */
+#ifdef CHECK_RECORD_VERSION
 inline
 static int _gnutls_check_record_version( gnutls_session session, HandshakeType htype, opaque version[2]) 
 {
-#ifdef CHECK_RECORD_VERSION
 	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && 
 		gnutls_protocol_get_version(session) != _gnutls_version_get( version[0], version[1])) {
 
@@ -576,10 +515,12 @@ static int _gnutls_check_record_version( gnutls_session session, HandshakeType h
 
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
-#endif
 
 	return 0;
 }
+#else
+# define _gnutls_check_record_version(x,y,z) 0
+#endif
 
 /* This function will check if the received record type is
  * the one we actually expect.

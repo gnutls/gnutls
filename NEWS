@@ -1,6 +1,7 @@
 Version 1.1.2 (28/12/2003)
 - Added CRL verification functionality to certtool.
 - Corrected the CRL distribution point extension handling.
+- Implemented TLS 1.1
 
 Version 1.1.1 (26/12/2003)
 - Added PKCS #7 support to certtool utility.

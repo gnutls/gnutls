@@ -248,7 +248,7 @@ static int generate_rsa_params(void)
    return 0;
 }
 
-int protocol_priority[PRI_MAX] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+int protocol_priority[PRI_MAX] = { GNUTLS_TLS1_1, GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
    /* Do not use anonymous authentication, unless you know what that means */

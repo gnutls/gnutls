@@ -507,30 +507,6 @@ void _gnutls_record_set_default_version(gnutls_session session,
 }
 
 /**
-  * gnutls_record_set_cbc_protection - Used to disable the CBC protection
-  * @session: is a &gnutls_session structure.
-  * @prot: is an integer (0 or 1)
-  *
-  * A newly discovered attack against the record protocol requires some
-  * counter-measures to be taken. GnuTLS will not enable them by default.
-  * The protection is to send an empty record packet, before each actual record 
-  * packet, in order to assure that the IV is not known to potential attackers.
-  *
-  * This function will enable or disable the chosen plaintext protection
-  * in the TLS record protocol (used with ciphers in CBC mode).
-  * if prot == 0 then protection is disabled (default), otherwise it
-  * is enabled.
-  *
-  * The protection used will slightly decrease performance, and add 
-  * 20 or more bytes per record packet.
-  *
-  **/
-void gnutls_record_set_cbc_protection(gnutls_session session, int prot)
-{
-	session->internals.cbc_protection_hack = prot;
-}
-
-/**
   * gnutls_handshake_set_private_extensions - Used to enable the private cipher suites
   * @session: is a &gnutls_session structure.
   * @allow: is an integer (0 or 1)

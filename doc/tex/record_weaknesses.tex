@@ -10,15 +10,7 @@ and exploit the facts that
 \item the IV for CBC encrypted packets is the last block of the previous encrypted packet
 \end{enumerate}
 
-\gnutls{} implements all the known counter-measures for these attacks. For the first
-two cases, \gnutls{} does only have one error code for both of the decryption failures,
-and processes the message normally even if a padding error occured. This avoids
-both of these attacks.
-For the latter, an empty record can be sent before every record packet, and this is
-believed to avoid the known attacks in CBC encrypted packets. See the function
-\printfunc{gnutls_record_set_cbc_protection}{gnutls\_record\_set\_cbc\_protection}
-for more information.
-
-For a detailed discussion see the archives of the TLS Working Group mailing list
+Those weaknesses were solved in \tlsII{} which is implemented in
+\gnutls{}. For a detailed discussion see the archives of the TLS Working Group mailing list
 and the paper \cite{CBCATT}.
 
