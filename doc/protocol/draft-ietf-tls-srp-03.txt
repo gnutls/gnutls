@@ -3,12 +3,12 @@
 
 Transport Layer Security Working                               D. Taylor
 Group                                             Forge Research Pty Ltd
-Internet-Draft                                           August 21, 2002
-Expires: February 19, 2003
+Internet-Draft                                         September 4, 2002
+Expires: March 5, 2003
 
 
                     Using SRP for TLS Authentication
-                         draft-ietf-tls-srp-02
+                         draft-ietf-tls-srp-03
 
 Status of this Memo
 
@@ -31,7 +31,7 @@ Status of this Memo
    The list of Internet-Draft Shadow Directories can be accessed at
    http://www.ietf.org/shadow.html.
 
-   This Internet-Draft will expire on February 19, 2003.
+   This Internet-Draft will expire on March 5, 2003.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Abstract
 
 
 
-Taylor                 Expires February 19, 2003                [Page 1]
+Taylor                   Expires March 5, 2003                  [Page 1]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 Table of Contents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Taylor                 Expires February 19, 2003                [Page 2]
+Taylor                   Expires March 5, 2003                  [Page 2]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 1. Introduction
@@ -140,6 +140,14 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
    "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this
    document are to be interpreted as described in RFC 2119.
 
+   Changes in this version:
+
+      Changed the order of the s, N, and g parameters for the Server
+      Hello message in the handshake sequence diagram to conform to the
+      SRPExtension structure.
+
+      Removed the requirement to add leading zeros to encoded numbers
+      whose most significant bit is set.
 
 
 
@@ -157,17 +165,9 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-
-
-
-
-
-
-
-
-Taylor                 Expires February 19, 2003                [Page 3]
+Taylor                   Expires March 5, 2003                  [Page 3]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 2. SRP Authentication in TLS
@@ -188,7 +188,7 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
           Client                                 Server
             |                                      |
        Client Hello (U) ------------------------>  |
-            |  <---------------------------- Server Hello (g, N, s)
+            |  <---------------------------- Server Hello (s, N, g)
             |  <---------------------------- Certificate*
        Client Key Exchange (A) ----------------->  |
             |  <---------------------------- Server Key Exchange (B)
@@ -221,9 +221,9 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-Taylor                 Expires February 19, 2003                [Page 4]
+Taylor                   Expires March 5, 2003                  [Page 4]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
    still work with the SRP authentication mechanism and handshake.
@@ -277,9 +277,9 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-Taylor                 Expires February 19, 2003                [Page 5]
+Taylor                   Expires March 5, 2003                  [Page 5]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
    Because the server's certificate is only used for generating a
@@ -333,9 +333,9 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-Taylor                 Expires February 19, 2003                [Page 6]
+Taylor                   Expires March 5, 2003                  [Page 6]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
       CipherSuite TLS_SRP_SHA_WITH_AES_256_CBC_SHA      = { 0x00,0x56 };
@@ -364,12 +364,6 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
    handshake that uses SRP for authentication.  The representation
    language used is the same as that used in [1].
 
-   When encoding the numbers g, N, A, and B as opaque types, if the most
-   significant bit is set, an extra byte of value 0x00 (all bits
-   cleared) MUST be added as the most significant byte.  This is done as
-   a safeguard against implementations that do not assume these numbers
-   are positive.
-
 2.6.1 ExtensionType
 
    A new value, "srp(6)", has been added to the enumerated
@@ -389,9 +383,15 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-Taylor                 Expires February 19, 2003                [Page 7]
+
+
+
+
+
+
+Taylor                   Expires March 5, 2003                  [Page 7]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
    enum { client, server } ClientOrServerExtension;
@@ -445,9 +445,9 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-Taylor                 Expires February 19, 2003                [Page 8]
+Taylor                   Expires March 5, 2003                  [Page 8]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
    encoded in an ServerSRPPublic structure.
@@ -501,9 +501,9 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-Taylor                 Expires February 19, 2003                [Page 9]
+Taylor                   Expires March 5, 2003                  [Page 9]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 3. Security Considerations
@@ -557,9 +557,9 @@ Internet-Draft      Using SRP for TLS Authentication         August 2002
 
 
 
-Taylor                 Expires February 19, 2003               [Page 10]
+Taylor                   Expires March 5, 2003                 [Page 10]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 References
@@ -613,9 +613,9 @@ Author's Address
 
 
 
-Taylor                 Expires February 19, 2003               [Page 11]
+Taylor                   Expires March 5, 2003                 [Page 11]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 Appendix A. Acknowledgements
@@ -669,9 +669,9 @@ Appendix A. Acknowledgements
 
 
 
-Taylor                 Expires February 19, 2003               [Page 12]
+Taylor                   Expires March 5, 2003                 [Page 12]
 
-Internet-Draft      Using SRP for TLS Authentication         August 2002
+Internet-Draft      Using SRP for TLS Authentication      September 2002
 
 
 Full Copyright Statement
@@ -725,6 +725,6 @@ Acknowledgement
 
 
 
-Taylor                 Expires February 19, 2003               [Page 13]
+Taylor                   Expires March 5, 2003                 [Page 13]
 
 
