@@ -112,11 +112,11 @@ static int is_leaf(ASN1_TYPE p)
 
 }
 
-#define APPEND(y, z) if (_gnutls_datum_append_m( res, y, z, realloc) < 0) { \
+#define APPEND(y, z) if (_gnutls_string_append_data( &str, y, z) < 0) { \
 		gnutls_assert(); \
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
-#define STR_APPEND(y) if (_gnutls_datum_append_m( res, y, strlen(y), realloc) < 0) { \
+#define STR_APPEND(y) if (_gnutls_string_append_str( &str, y) < 0) { \
 		gnutls_assert(); \
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
@@ -180,14 +180,14 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 	opaque tmp[1024];
 	char nname[256];
 	int ret;
+	gnutls_string str;
 
 	if (res == NULL || structure == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
-
-	res->data = NULL;
-	res->size = 0;
+	
+	_gnutls_string_init( &str, malloc, realloc, free);
 
 	STR_APPEND(XML_HEADER);
 
@@ -553,6 +553,8 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 	}
 	
 	APPEND( "\n\0", 2);
+	
+	*res = _gnutls_string2datum( &str);
 	
 	return 0;
 }
