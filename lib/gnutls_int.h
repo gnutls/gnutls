@@ -45,6 +45,8 @@
 #define TLS_MAX_SESSION_ID_SIZE 32
 #define TLS_MASTER_SIZE 48
 
+#define MAX_DNSNAME_SIZE 256
+
 /* the default for TCP */
 #define DEFAULT_LOWAT 1
 
@@ -118,7 +120,7 @@ typedef struct {
 /* STATE */
 typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL256_CBC } BulkCipherAlgorithm;
-typedef enum Extensions { GNUTLS_EXTENSION_SRP=7, GNUTLS_EXTENSION_DNSNAME } Extensions;
+typedef enum Extensions { GNUTLS_EXTENSION_DNSNAME=0, GNUTLS_EXTENSION_SRP=6 } Extensions;
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
 typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
@@ -167,7 +169,8 @@ typedef struct {
 	/* this is used to hold the peers authentication data 
 	 */
 	void*				auth_info;
-	int				auth_info_size; /* needed in order to store to db for restoring */
+	int				auth_info_size; /* needed in order to store to db for restoring 
+							 */
 	uint8				crypt_algo;
 
 	/* These are needed in RSA and DH signature calculation 
@@ -175,7 +178,6 @@ typedef struct {
 	opaque				server_random[TLS_RANDOM_SIZE];
 	opaque				client_random[TLS_RANDOM_SIZE];
 	ProtocolVersion			version;
-	opaque				dnsname[256];
 	
 	AUTH_CRED*			cred; /* used to specify keys/certificates etc */
 } GNUTLS_KEY_A;
@@ -191,6 +193,14 @@ typedef GNUTLS_KEY_A* GNUTLS_KEY;
 typedef struct {
 	uint8 CipherSuite[2];
 } GNUTLS_CipherSuite;
+
+/* This structure holds parameters got from TLS extension
+ * mechanism. (some extensions may hold parameters in AUTH_INFO
+ * structures instead - see SRP).
+ */
+typedef struct {
+	opaque dnsname[MAX_DNSNAME_SIZE];
+} TLSExtensions;
 
 /* This structure and AUTH_INFO, are stored in the resume database,
  * and are restored, in case of resume.
@@ -223,6 +233,7 @@ typedef struct {
 	opaque 			session_id[TLS_MAX_SESSION_ID_SIZE];
 	uint8 			session_id_size;
 	time_t 			timestamp;
+	TLSExtensions		extensions;
 } SecurityParameters;
 
 /* This structure holds the generated keys

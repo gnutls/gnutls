@@ -38,8 +38,8 @@ typedef struct {
 
 #define MAX_EXT 20 /* maximum supported extension */
 static gnutls_extension_entry extensions[] = {
-	GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
-	GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_DNSNAME, _gnutls_dnsname_recv_params, _gnutls_dnsname_send_params),
+	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
+	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_DNSNAME, _gnutls_dnsname_recv_params, _gnutls_dnsname_send_params),
 	{0}
 };
 
@@ -170,4 +170,42 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 	}
 	return size;
 
+}
+
+/**
+  * gnutls_ext_get_dnsname - Used to get the dnsname a client connected to
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function is to be used by servers that support virtual hosting.
+  * The client may give the server the dnsname they connected to.
+  * if no name was given this function returns NULL.
+  *
+  **/
+const char* gnutls_ext_get_dnsname( GNUTLS_STATE state) {
+	if (state->security_parameters.entity==GNUTLS_CLIENT) return NULL;
+
+	if (strlen( state->security_parameters.extensions.dnsname) == 0) return NULL;
+
+	return state->security_parameters.extensions.dnsname;
+}
+
+/**
+  * gnutls_ext_set_dnsname - Used to set the dnsname as an extension
+  * @state: is a &GNUTLS_STATE structure.
+  * @dnsname: is a null terminated string that contains the dns name.
+  *
+  * This function is to be used by clients that want to inform 
+  * ( via a TLS extension mechanism) the server of the name they
+  * connected to. This should be used by clients that connect
+  * to servers that do virtual hosting.
+  **/
+int gnutls_ext_set_dnsname( GNUTLS_STATE state, char* dnsname) {
+
+	if (state->security_parameters.entity==GNUTLS_SERVER) return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	
+	if (strlen( dnsname) >= MAX_DNSNAME_SIZE) return GNUTLS_E_MEMORY_ERROR;
+
+	strcpy( state->security_parameters.extensions.dnsname, dnsname);
+
+	return 0;
 }

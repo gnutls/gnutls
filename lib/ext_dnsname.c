@@ -22,19 +22,23 @@
 #include "gnutls_auth_int.h"
 #include "auth_x509.h"
 #include "gnutls_errors.h"
+#include "gnutls_num.h"
 
 int _gnutls_dnsname_recv_params( GNUTLS_STATE state, const opaque* data, int data_size) {
-	uint8 len;
+	uint16 len;
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
-			if (sizeof( state->gnutls_key->dnsname) > data_size) {
-				len = data[0];
-				if (len > data_size) {
+			if (sizeof( state->security_parameters.extensions.dnsname) > data_size) {
+				len = READuint16( data);
+				if (len > data_size || len >= MAX_DNSNAME_SIZE) {
 					gnutls_assert();
 					return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 				}
-				memcpy( state->gnutls_key->dnsname, &data[1], len);
-				state->gnutls_key->dnsname[len]=0; /* null terminated */
+				/* note that dnsname is in UTF-8
+				 * format.
+				 */
+				memcpy( state->security_parameters.extensions.dnsname, &data[2], len);
+				state->security_parameters.extensions.dnsname[len]=0; /* null terminated */
 			}
 		}
 	}
@@ -45,15 +49,15 @@ int _gnutls_dnsname_recv_params( GNUTLS_STATE state, const opaque* data, int dat
  * data is allocated localy
  */
 int _gnutls_dnsname_send_params( GNUTLS_STATE state, opaque** data) {
-	uint8 len;
+	uint16 len;
 	/* this function sends the client extension data (dnsname) */
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 
-		if ( (len = strlen(state->gnutls_key->dnsname)) > 0) { /* send dnsname */
-			(*data) = gnutls_malloc(len+1); /* hold the size also */
-			(*data)[0] = len;
-			memcpy( &(*data)[1], state->gnutls_key->dnsname, len);
-			return len + 1;
+		if ( (len = strlen(state->security_parameters.extensions.dnsname)) > 0) { /* send dnsname */
+			(*data) = gnutls_malloc(len+2); /* hold the size also */
+			WRITEuint16( len, *data);
+			memcpy( &(*data)[2], state->security_parameters.extensions.dnsname, len);
+			return len + 2;
 		}
 	}
 	return 0;

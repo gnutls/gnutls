@@ -142,41 +142,28 @@ int _gnutls_set_write_keys(GNUTLS_STATE state)
 	return _gnutls_set_keys( state, hash_size, IV_size, key_size);
 }
 
-
+#define CPY_COMMON dst->entity = src->entity; \
+	dst->kx_algorithm = src->kx_algorithm; \
+	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(GNUTLS_CipherSuite)); \
+	memcpy( dst->master_secret, src->master_secret, TLS_MASTER_SIZE); \
+	memcpy( dst->client_random, src->client_random, TLS_RANDOM_SIZE); \
+	memcpy( dst->server_random, src->server_random, TLS_RANDOM_SIZE); \
+	memcpy( dst->session_id, src->session_id, TLS_MAX_SESSION_ID_SIZE); \
+	dst->session_id_size = src->session_id_size; \
+	dst->timestamp = src->timestamp; \
+	memcpy( &dst->extensions, &src->extensions, sizeof(TLSExtensions));
+	
 static void _gnutls_cpy_read_security_parameters( SecurityParameters * dst, SecurityParameters* src) {
-	dst->entity = src->entity;
-	dst->kx_algorithm = src->kx_algorithm;
+	CPY_COMMON;	
 
-	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(GNUTLS_CipherSuite));
-	
-	memcpy( dst->master_secret, src->master_secret, TLS_MASTER_SIZE);
-	memcpy( dst->client_random, src->client_random, TLS_RANDOM_SIZE);
-	memcpy( dst->server_random, src->server_random, TLS_RANDOM_SIZE);
-
-	memcpy( dst->session_id, src->session_id, TLS_MAX_SESSION_ID_SIZE);
-
-	dst->session_id_size = src->session_id_size;
-	dst->timestamp = src->timestamp;
-	
 	dst->read_bulk_cipher_algorithm = src->read_bulk_cipher_algorithm;
 	dst->read_mac_algorithm = src->read_mac_algorithm;
 	dst->read_compression_algorithm = src->read_compression_algorithm;
 }
 
 static void _gnutls_cpy_write_security_parameters( SecurityParameters * dst, SecurityParameters* src) {
-	dst->entity = src->entity;
-	dst->kx_algorithm = src->kx_algorithm;
-
-	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(GNUTLS_CipherSuite));
-	
-	memcpy( dst->master_secret, src->master_secret, TLS_MASTER_SIZE);
-	memcpy( dst->client_random, src->client_random, TLS_RANDOM_SIZE);
-	memcpy( dst->server_random, src->server_random, TLS_RANDOM_SIZE);
-
-	memcpy( dst->session_id, src->session_id, TLS_MAX_SESSION_ID_SIZE);
-	dst->session_id_size = src->session_id_size;
-	dst->timestamp = src->timestamp;
-	
+	CPY_COMMON;
+		
 	dst->write_bulk_cipher_algorithm = src->write_bulk_cipher_algorithm;
 	dst->write_mac_algorithm = src->write_mac_algorithm;
 	dst->write_compression_algorithm = src->write_compression_algorithm;

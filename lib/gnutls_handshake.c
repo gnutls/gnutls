@@ -1746,12 +1746,12 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	 */
 
 	cert = NULL;
-	if (state->gnutls_key->dnsname[0] != 0) {
+	if (state->security_parameters.extensions.dnsname[0] != 0) {
 		cert =
 		    (gnutls_cert *) _gnutls_find_cert(x509_cred->cert_list,
 						      x509_cred->ncerts,
-						      state->gnutls_key->
-						      dnsname);
+						      state->security_parameters.
+						      extensions.dnsname);
 	}
 
 	if (cert == NULL) {	/* if no such cert, use the first in the list 
