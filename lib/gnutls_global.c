@@ -145,7 +145,7 @@ void gnutls_global_deinit() {
   * probably be ok.
   * This function should be called once and after gnutls_global_init().
   * PULL_FUNC is of the form, 
-  * ssize_t (*PULL_FUNC)(SOCKET, const void*, size_t);
+  * ssize_t (*PULL_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
   **/
 void gnutls_set_pull_function( GNUTLS_STATE state, PULL_FUNC pull_func) {
 	state->gnutls_internals._gnutls_pull_func = pull_func;
@@ -164,7 +164,7 @@ void gnutls_set_pull_function( GNUTLS_STATE state, PULL_FUNC pull_func) {
   *  
   * This function should be called once and after gnutls_global_init().
   * PUSH_FUNC is of the form, 
-  * ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
+  * ssize_t (*PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
   **/
 void gnutls_set_push_function( GNUTLS_STATE state, PUSH_FUNC push_func) {
 	state->gnutls_internals._gnutls_push_func = push_func;

@@ -73,7 +73,7 @@ void gnutls_set_lowat(GNUTLS_STATE state, int num) {
   * handle.
   *
   **/
-void gnutls_set_transport_ptr(GNUTLS_STATE state, SOCKET ptr) {
+void gnutls_set_transport_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr) {
 	state->gnutls_internals.transport_ptr = ptr;
 }
 
@@ -455,11 +455,11 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   * have been initiated using gnutls_handshake().
   * 'how' should be one of GNUTLS_SHUT_RDWR, GNUTLS_SHUT_WR.
   *
-  * in case of GNUTLS_SHUT_RDWR then the connection gets terminated and
+  * In case of GNUTLS_SHUT_RDWR then the TLS connection gets terminated and
   * further receives and sends will be disallowed. If the return
   * value is zero you may continue using the connection.
   *
-  * in case of GNUTLS_SHUT_WR then the connection gets terminated and
+  * In case of GNUTLS_SHUT_WR then the TLS connection gets terminated and
   * further sends will be disallowed. In order to reuse the connection
   * you should wait for an EOF from the peer.
   *
@@ -1119,7 +1119,7 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
-  * This function has the same semantics as write() has. The only
+  * This function has the similar semantics to write(). The only
   * difference is that is accepts a GNUTLS state, and uses different
   * error codes.
   *
@@ -1142,7 +1142,7 @@ ssize_t gnutls_write( GNUTLS_STATE state, const void *data, size_t sizeofdata) {
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
-  * This function has the same semantics as write() has. The only
+  * This function has the similar semantics to read(). The only
   * difference is that is accepts a GNUTLS state.
   * Also returns the number of bytes received, zero on EOF, but
   * a negative error code in case of an error.

@@ -189,7 +189,7 @@ static ssize_t _gnutls_read( GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, i
 #ifdef READ_DEBUG
 	int j,x, sum=0;
 #endif
-	SOCKET fd = state->gnutls_internals.transport_ptr;
+	GNUTLS_SOCKET_PTR fd = state->gnutls_internals.transport_ptr;
 
 	left = sizeOfPtr;
 	while (left > 0) {
@@ -517,7 +517,7 @@ ssize_t _gnutls_write_buffered( GNUTLS_STATE state, const void *iptr, size_t n)
 	ssize_t retval, i;
 	const opaque * ptr;
 	int ret;
-	SOCKET fd = state->gnutls_internals.transport_ptr;
+	GNUTLS_SOCKET_PTR fd = state->gnutls_internals.transport_ptr;
 	
 	ptr = iptr;
 	
