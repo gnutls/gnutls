@@ -31,3 +31,7 @@ int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12,
 
 int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag);
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag);
+
+int 
+_pkcs12_string_to_key (int id, const char *salt, int salt_size, int iter, const char *pw,
+               int req_keylen, unsigned char *keybuf);

@@ -1094,6 +1094,11 @@ pkcs-12-PFX ::= SEQUENCE {
     	macData    	pkcs-12-MacData OPTIONAL
 }
 
+pkcs-12-PbeParams ::= SEQUENCE {
+	salt	OCTET STRING,
+	iterations INTEGER
+}
+
 pkcs-12-MacData ::= ANY
 -- we don't use it
 -- SEQUENCE {

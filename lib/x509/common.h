@@ -48,3 +48,6 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	int tmp_buf_size, unsigned char* output_data, int* output_data_size);
 
 int _gnutls_x509_read_value( ASN1_TYPE c, const char* root, gnutls_datum *ret, int str);
+
+int _gnutls_x509_decrypt_pkcs7_encrypted_data( const gnutls_datum* data,
+        const char* password, gnutls_datum* dec);
