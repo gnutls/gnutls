@@ -1,3 +1,17 @@
+2002-09-13 09:09  nmav <nmav@gnutls.org>
+
+	* README, lib/gnutls.h.in.in, lib/gnutls_alert.c:
+
+	Added a new function to convert from an error to an alert code.  
+
+2002-09-12 10:39  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_alert.c, gnutls_algorithms.c,
+	gnutls_algorithms.h, gnutls_compress_int.c, gnutls_handshake.c,
+	gnutls_int.h:
+
+	Improved support for zlib.  
+
 2002-09-11 20:05  nmav <nmav@gnutls.org>
 
 	* doc/protocol/: draft-ietf-tls-compression-00.txt,
