@@ -77,6 +77,12 @@ opaque* ptr = _ptr;
 
 void* gnutls_realloc( void* ptr, size_t size) {
 void* ret;
+	if ( ptr != NULL && size <= _gnutls_malloc_ptr_size(ptr)) {
+		/* do nothing, just return the pointer.
+		 * It's much faster.
+		 */
+		return ptr;
+	}
 	ret = gnutls_malloc( size);
 	if (ret==NULL) return ret;
 	
@@ -128,6 +134,12 @@ size_t _secure_ptr_size( svoid* ptr) {
 
 svoid* secure_realloc( svoid* ptr, size_t size) {
 svoid* ret;
+	if ( ptr != NULL && size <= _secure_ptr_size(ptr)) {
+		/* do not do realloc.
+		 * return the previous pointer.
+		 */
+		return ptr;
+	}
 	ret = secure_malloc( size);
 	if (ret==NULL) return ret;
 
