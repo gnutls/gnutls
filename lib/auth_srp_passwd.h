@@ -2,7 +2,7 @@ typedef struct {
 	char* username;
 	int algorithm;
 	
-	opaque* salt;
+	opaque *salt;
 	int salt_size;
 	
 	MPI v;
@@ -10,6 +10,7 @@ typedef struct {
 	MPI n;
 } GNUTLS_SRP_PWD_ENTRY;
 
-/* this is localy alocated. It should be freed */
+/* this is localy alocated. It should be freed using the provided function */
 GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username);
-
+void _gnutls_srp_clear_pwd_entry( GNUTLS_SRP_PWD_ENTRY * entry);
+GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry();

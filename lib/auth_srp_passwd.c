@@ -27,6 +27,8 @@
 #include "auth_srp_passwd.h"
 #include "auth_srp.h"
 #include "gnutls_auth_int.h"
+#include "gnutls_srp.h"
+#include "gnutls_random.h"
 
 static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
 char * p;
@@ -154,6 +156,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 
 	fd = fopen( cred->password_file, "r");
 	if (fd==NULL) {
+		gnutls_assert();
 		gnutls_free(entry);
 		return NULL;
 	}
@@ -175,4 +178,44 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
     }
 	return NULL;
 	
+}
+
+#define RND_SALT_SIZE 16
+GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
+	GNUTLS_SRP_PWD_ENTRY * pwd_entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
+	size_t n = sizeof diffie_hellman_group1_prime;
+	opaque * rand;
+	
+	pwd_entry->g = gcry_mpi_set_ui(NULL, SRP_G);
+	pwd_entry->v = gcry_mpi_new(160);
+    gcry_mpi_randomize( pwd_entry->v, 160, GCRY_WEAK_RANDOM);
+
+	if (gcry_mpi_scan(&pwd_entry->n, GCRYMPI_FMT_USG,
+                          diffie_hellman_group1_prime, &n)) {
+                gnutls_assert();
+   	        return NULL;
+	}
+
+	pwd_entry->salt_size = RND_SALT_SIZE;
+	rand = _gnutls_get_random(RND_SALT_SIZE, GNUTLS_WEAK_RANDOM);
+	pwd_entry->salt = gnutls_malloc(RND_SALT_SIZE);
+	memcpy( pwd_entry->salt, rand, RND_SALT_SIZE);
+	_gnutls_free_rand( rand);
+	
+	pwd_entry->algorithm = 0;
+
+	return pwd_entry;
+}
+
+void _gnutls_srp_clear_pwd_entry( GNUTLS_SRP_PWD_ENTRY * entry) {
+	mpi_release(entry->v);
+	mpi_release(entry->g);
+	mpi_release(entry->n);
+	
+	gnutls_free(entry->salt);
+	gnutls_free(entry->username);
+	
+	gnutls_free(entry);
+	
+	return;
 }

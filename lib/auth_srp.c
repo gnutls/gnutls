@@ -78,7 +78,8 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	pwd_entry = _gnutls_srp_pwd_read_entry( key, key->username);
 
 	if (pwd_entry == NULL) {
-		return GNUTLS_E_PWD_ERROR;
+		pwd_entry = _gnutls_randomize_pwd_entry();
+		/* return GNUTLS_E_PWD_ERROR; */
 	}
 
 	pwd_algo = (uint8) pwd_entry->algorithm;
@@ -99,6 +100,11 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 
 	/* copy G (generator) to data */
 	data_g = (*data);
+
+	/* but first copy the algorithm used to generate the verifier */
+	memcpy( data_g, &pwd_algo, 1);
+	data_g++;
+	
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, G);
 	_n_g = n_g;
 #ifndef WORDS_BIGENDIAN
@@ -132,11 +138,8 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	memcpy(data_s, &_n_s, 2);
 #endif
 
-	/* copy the algorithm used to generate the verifier */
-	memcpy( &data_s[2+n_s], &pwd_algo, 1);
-
 	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
-	gnutls_free(pwd_entry);
+	_gnutls_srp_clear_pwd_entry(pwd_entry);
 
 	return ret;
 }
@@ -248,7 +251,10 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	if (username == NULL || password == NULL)
 		return GNUTLS_E_INSUFICIENT_CRED;
 
-	i = 0;
+/* read the algorithm used to generate V */
+	memcpy( &pwd_algo, data, 1);
+
+	i = 1;
 	memcpy(&n_g, &data[i], 2);
 	i += 2;
 #ifndef WORDS_BIGENDIAN
@@ -297,9 +303,6 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-
-/* read the algorithm used to generate V */
-	memcpy( &pwd_algo, &data_s[n_s], 1);
 
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
