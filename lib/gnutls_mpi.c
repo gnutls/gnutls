@@ -88,6 +88,7 @@ int _gnutls_x509_read_int( ASN1_TYPE node, const char* value,
 	char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi)
 {
 int len, result;
+size_t s_len;
 
 	len = tmpstr_size - 1;
 	result = asn1_read_value( node, value, tmpstr, &len);
@@ -96,7 +97,8 @@ int len, result;
 		return _gnutls_asn2err(result);
 	}
 
-	if (_gnutls_mpi_scan( ret_mpi, tmpstr, &len) != 0) {
+	s_len = len;
+	if (_gnutls_mpi_scan( ret_mpi, tmpstr, &s_len) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}

@@ -466,7 +466,8 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
 	GNUTLS_MPI * params, int params_len) {
 
 	GNUTLS_MPI mdata;
-	int ret, k;
+	int ret;
+	size_t k;
 	GNUTLS_MPI rs[2];
 
 	if (vdata->size != 20) { /* sha-1 only */

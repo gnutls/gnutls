@@ -244,7 +244,7 @@ GNUTLS_MPI _gnutls_calc_srp_A(GNUTLS_MPI * a, GNUTLS_MPI g, GNUTLS_MPI n)
  * The output is exactly 20 bytes
  */
 int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
-			   int salt_size, int *size, void* digest)
+			   int salt_size, size_t *size, void* digest)
 {
 	GNUTLS_HASH_HANDLE td;
 	opaque res[MAX_HASH_SIZE];
@@ -598,7 +598,8 @@ int gnutls_srp_verifier( char* username, char* password, const gnutls_datum *sal
 	gnutls_datum * res)
 {
 GNUTLS_MPI _n, _g;
-int ret, digest_size = 20;
+int ret;
+size_t digest_size = 20;
 opaque digest[20];
 size_t size;
 

@@ -77,7 +77,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 	SRP_PWD_ENTRY *pwd_entry;
 	SRP_SERVER_AUTH_INFO info;
 	ssize_t data_size;
-	size_t n_b;
+	size_t n_b, tmp_size;
 	uint8 *data_b;
 
 	if (state->security_parameters.extensions.srp_username[0] == 0) {
@@ -111,12 +111,14 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan( &N, pwd_entry->n.data, &pwd_entry->n.size) < 0) {
+	tmp_size = pwd_entry->n.size;
+	if (_gnutls_mpi_scan( &N, pwd_entry->n.data, &tmp_size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan( &V, pwd_entry->v.data, &pwd_entry->v.size) < 0) {
+	tmp_size = pwd_entry->v.size;
+	if (_gnutls_mpi_scan( &V, pwd_entry->v.data, &tmp_size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
