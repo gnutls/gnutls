@@ -167,7 +167,7 @@ dsa_sign(const gnutls_datum_t * text,
     GNUTLS_HASH_HANDLE hd;
     gnutls_datum_t digest;
 
-    hd = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    hd = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (hd == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_HASH_FAILED;

@@ -44,7 +44,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm_t algorithm)
     ret->algorithm = algorithm;
 
     switch (algorithm) {
-    case GNUTLS_MAC_SHA:
+    case GNUTLS_MAC_SHA1:
 	result = gc_hash_open(GC_SHA1, 0, &ret->handle);
 	break;
     case GNUTLS_MAC_MD5:
@@ -72,7 +72,7 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm_t algorithm)
     int ret;
 
     switch (algorithm) {
-    case GNUTLS_MAC_SHA:
+    case GNUTLS_MAC_SHA1:
 	ret = gc_hash_digest_length(GC_SHA1);
 	break;
     case GNUTLS_MAC_MD5:
@@ -150,7 +150,7 @@ mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
 	return GNUTLS_MAC_FAILED;
 
     switch (algorithm) {
-    case GNUTLS_MAC_SHA:
+    case GNUTLS_MAC_SHA1:
 	result = gc_hash_open(GC_SHA1, GC_HMAC, &ret->handle);
 	break;
     case GNUTLS_MAC_MD5:
@@ -201,7 +201,7 @@ inline static int get_padsize(gnutls_mac_algorithm_t algorithm)
     switch (algorithm) {
     case GNUTLS_MAC_MD5:
 	return 48;
-    case GNUTLS_MAC_SHA:
+    case GNUTLS_MAC_SHA1:
 	return 40;
     default:
 	return 0;
@@ -317,7 +317,7 @@ static int ssl3_sha(int i, opaque * secret, int secret_len,
 	text1[j] = 65 + i;	/* A==65 */
     }
 
-    td = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    td = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (td == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_HASH_FAILED;
@@ -353,7 +353,7 @@ static int ssl3_md5(int i, opaque * secret, int secret_len,
 	return ret;
     }
 
-    _gnutls_hash(td, tmp, _gnutls_hash_get_algo_len(GNUTLS_MAC_SHA));
+    _gnutls_hash(td, tmp, _gnutls_hash_get_algo_len(GNUTLS_MAC_SHA1));
 
     _gnutls_hash_deinit(td, digest);
     return 0;

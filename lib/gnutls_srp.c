@@ -183,7 +183,7 @@ mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, mpi_t n)
     _gnutls_mpi_print(&holder[n_size - a_size], &a_size, A);
     _gnutls_mpi_print(&holder[n_size + n_size - b_size], &b_size, B);
 
-    td = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    td = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (td == NULL) {
 	gnutls_free(holder);
 	gnutls_assert();
@@ -285,7 +285,7 @@ int _gnutls_calc_srp_sha(const char *username, const char *password,
 
     *size = 20;
 
-    td = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    td = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (td == NULL) {
 	return GNUTLS_E_MEMORY_ERROR;
     }
@@ -295,7 +295,7 @@ int _gnutls_calc_srp_sha(const char *username, const char *password,
 
     _gnutls_hash_deinit(td, res);
 
-    td = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    td = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (td == NULL) {
 	return GNUTLS_E_MEMORY_ERROR;
     }

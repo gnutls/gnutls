@@ -1912,7 +1912,7 @@ inline static int _gnutls_handshake_hash_init(gnutls_session_t session)
 
     if (session->internals.handshake_mac_handle_sha == NULL) {
 	session->internals.handshake_mac_handle_sha =
-	    _gnutls_hash_init(GNUTLS_MAC_SHA);
+	    _gnutls_hash_init(GNUTLS_MAC_SHA1);
 	if (session->internals.handshake_mac_handle_sha ==
 	    GNUTLS_HASH_FAILED) {
 	    gnutls_assert();

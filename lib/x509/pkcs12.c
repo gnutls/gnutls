@@ -840,7 +840,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
     /* MAC the data
      */
-    td1 = _gnutls_hmac_init(GNUTLS_MAC_SHA, key, sizeof(key));
+    td1 = _gnutls_hmac_init(GNUTLS_MAC_SHA1, key, sizeof(key));
     if (td1 == GNUTLS_MAC_FAILED) {
 	gnutls_assert();
 	result = GNUTLS_E_INTERNAL_ERROR;
@@ -957,7 +957,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
     /* MAC the data
      */
-    td1 = _gnutls_hmac_init(GNUTLS_MAC_SHA, key, sizeof(key));
+    td1 = _gnutls_hmac_init(GNUTLS_MAC_SHA1, key, sizeof(key));
     if (td1 == GNUTLS_MAC_FAILED) {
 	gnutls_assert();
 	result = GNUTLS_E_INTERNAL_ERROR;

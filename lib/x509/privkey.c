@@ -1307,7 +1307,7 @@ int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
     } else
 	return GNUTLS_E_INTERNAL_ERROR;
 
-    hd = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    hd = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (hd == GNUTLS_HASH_FAILED) {
 	gnutls_assert();
 	result = GNUTLS_E_INTERNAL_ERROR;
@@ -1336,15 +1336,17 @@ int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
   * @flags: should be 0 for now
   * @data: holds the data to be signed
   * @signature: will contain the signature
-  * @signature_size: holds the size of signature (and will be replaced by the new size)
+  * @signature_size: holds the size of signature (and will be replaced
+  *   by the new size)
   *
-  * This function will sign the given data using a signature algorithm supported by
-  * the private key. Signature algorithms are always used together with a hash functions.
-  * Different hash functions may be used for the RSA algorithm, but only
-  * SHA-1 for the DSA keys.
+  * This function will sign the given data using a signature algorithm
+  * supported by the private key. Signature algorithms are always used
+  * together with a hash functions.  Different hash functions may be
+  * used for the RSA algorithm, but only SHA-1 for the DSA keys.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &signature_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * *signature_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.

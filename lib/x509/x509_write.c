@@ -386,7 +386,7 @@ int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt,
   * @crt: should contain a gnutls_x509_crt_t structure
   * @issuer: is the certificate of the certificate issuer
   * @issuer_key: holds the issuer's private key
-  * @dig: The message digest to use. GNUTLS_DIG_SHA is the safe choice unless you know what you're doing.
+  * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
   * @flags: must be 0
   *
   * This function will sign the certificate with the issuer's private key, and
@@ -437,7 +437,7 @@ int gnutls_x509_crt_sign2(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 int gnutls_x509_crt_sign(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
     gnutls_x509_privkey_t issuer_key)
 {
-    return gnutls_x509_crt_sign2( crt, issuer, issuer_key, GNUTLS_MAC_SHA, 0);
+    return gnutls_x509_crt_sign2( crt, issuer, issuer_key, GNUTLS_MAC_SHA1, 0);
 }
 
 /**

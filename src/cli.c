@@ -97,7 +97,7 @@ int cipher_priority[PRI_MAX] =
 };
 int comp_priority[PRI_MAX] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 int mac_priority[PRI_MAX] =
-    { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
+    { GNUTLS_MAC_SHA1, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
 int cert_type_priority[PRI_MAX] =
     { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 

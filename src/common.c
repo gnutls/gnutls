@@ -648,7 +648,7 @@ void parse_macs(char **macs, int nmacs, int *mac_priority)
 	    else if (strncasecmp(macs[i], "RMD", 3) == 0)
 		mac_priority[j++] = GNUTLS_MAC_RMD160;
 	    else if (strncasecmp(macs[i], "SHA", 3) == 0)
-		mac_priority[j++] = GNUTLS_MAC_SHA;
+		mac_priority[j++] = GNUTLS_MAC_SHA1;
 	    else
 		fprintf(stderr, "Unknown MAC: '%s'\n", macs[i]);
 	}

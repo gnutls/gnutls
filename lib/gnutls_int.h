@@ -192,7 +192,7 @@ typedef enum gnutls_params_type { GNUTLS_PARAMS_RSA_EXPORT = 1,
 } gnutls_params_type_t;
 
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_UNKNOWN = 0,
-    GNUTLS_MAC_NULL = 1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA,
+    GNUTLS_MAC_NULL = 1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA1,
     GNUTLS_MAC_RMD160
 } gnutls_mac_algorithm_t;
 typedef gnutls_mac_algorithm_t gnutls_digest_algorithm_t;
@@ -247,7 +247,7 @@ typedef enum gnutls_pk_algorithm {
 
 typedef enum gnutls_sign_algorithm {
     GNUTLS_SIGN_UNKNOWN = 0,
-    GNUTLS_SIGN_RSA_SHA = 1, GNUTLS_SIGN_DSA_SHA,
+    GNUTLS_SIGN_RSA_SHA1 = 1, GNUTLS_SIGN_DSA_SHA1,
     GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2, GNUTLS_SIGN_RSA_RMD160
 } gnutls_sign_algorithm_t;
 

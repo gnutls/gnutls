@@ -129,7 +129,7 @@ int _gnutls_tls_sign_params(gnutls_session_t session, gnutls_cert * cert,
     opaque concat[36];
 
 
-    td_sha = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    td_sha = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (td_sha == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_HASH_FAILED;
@@ -384,7 +384,7 @@ int _gnutls_verify_sig_params(gnutls_session_t session, gnutls_cert * cert,
 	return GNUTLS_E_HASH_FAILED;
     }
 
-    td_sha = _gnutls_hash_init(GNUTLS_MAC_SHA);
+    td_sha = _gnutls_hash_init(GNUTLS_MAC_SHA1);
     if (td_sha == NULL) {
 	gnutls_assert();
 	_gnutls_hash_deinit(td_md5, NULL);

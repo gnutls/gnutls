@@ -805,7 +805,7 @@ int _gnutls_PRF(const opaque * secret, int secret_size, const char *label,
     }
 
     result =
-	_gnutls_P_hash(GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size,
+	_gnutls_P_hash(GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
 		       total_bytes, o2);
     if (result < 0) {
 	gnutls_assert();

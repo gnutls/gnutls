@@ -250,7 +250,7 @@ int gnutls_set_default_priority(gnutls_session_t session)
     };
     static const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };
     static const int mac_priority[] =
-	{ GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
+	{ GNUTLS_MAC_SHA1, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
 
     gnutls_cipher_set_priority(session, cipher_priority);
     gnutls_compression_set_priority(session, comp_priority);
@@ -291,7 +291,7 @@ int gnutls_set_default_export_priority(gnutls_session_t session)
     };
     static const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };
     static const int mac_priority[] =
-	{ GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
+	{ GNUTLS_MAC_SHA1, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
 
     gnutls_cipher_set_priority(session, cipher_priority);
     gnutls_compression_set_priority(session, comp_priority);

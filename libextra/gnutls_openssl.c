@@ -497,7 +497,7 @@ SSL_METHOD *SSLv23_client_method(void)
     m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
     m->kx_priority[3] = 0;
 
-    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[0] = GNUTLS_MAC_SHA1;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
@@ -532,7 +532,7 @@ SSL_METHOD *SSLv23_server_method(void)
     m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
     m->kx_priority[3] = 0;
 
-    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[0] = GNUTLS_MAC_SHA1;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
@@ -564,7 +564,7 @@ SSL_METHOD *SSLv3_client_method(void)
     m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
     m->kx_priority[3] = 0;
 
-    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[0] = GNUTLS_MAC_SHA1;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
@@ -596,7 +596,7 @@ SSL_METHOD *SSLv3_server_method(void)
     m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
     m->kx_priority[3] = 0;
 
-    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[0] = GNUTLS_MAC_SHA1;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
@@ -630,7 +630,7 @@ SSL_METHOD *TLSv1_client_method(void)
     m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
     m->kx_priority[3] = 0;
 
-    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[0] = GNUTLS_MAC_SHA1;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 
@@ -664,7 +664,7 @@ SSL_METHOD *TLSv1_server_method(void)
     m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
     m->kx_priority[3] = 0;
 
-    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[0] = GNUTLS_MAC_SHA1;
     m->mac_priority[1] = GNUTLS_MAC_MD5;
     m->mac_priority[2] = 0;
 

@@ -69,7 +69,7 @@ FILE *outfile;
 FILE *infile;
 static int in_cert_format;
 static int out_cert_format;
-gnutls_digest_algorithm_t dig = GNUTLS_DIG_SHA;
+gnutls_digest_algorithm_t dig = GNUTLS_DIG_SHA1;
 
 #define UNKNOWN "Unknown"
 
@@ -813,7 +813,7 @@ void gaa_parser(int argc, char **argv)
     	   fprintf(stderr, "Warning: MD5 is broken, and should not be used any more for digital signatures.\n");
     	   dig = GNUTLS_DIG_MD5;
     	} else if (strcasecmp(info.hash, "sha1")==0)
-    	   dig = GNUTLS_DIG_SHA;
+    	   dig = GNUTLS_DIG_SHA1;
     	else if (strcasecmp(info.hash, "rmd160")==0)
     	   dig = GNUTLS_DIG_RMD160;
     	else fprintf(stderr, "Unsupported hash algorithm '%s'. Using the default.\n", info.hash);
@@ -1323,7 +1323,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     if (all) {
 	size = sizeof(buffer);
 	if ((ret =
-	     gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_SHA, buffer,
+	     gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, buffer,
 					     &size)) < 0) {
 	    fprintf(out, "Error in fingerprint calculation: %s\n",
 		    gnutls_strerror(ret));
@@ -1333,8 +1333,23 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 		sprintf(print, "%.2x ", (unsigned char) buffer[i]);
 		print += 3;
 	    }
-	    fprintf(out, "\tFingerprint: %s\n", printable);
+	    fprintf(out, "\tMD5 Fingerprint: %s\n", printable);
 	}
+
+	if ((ret =
+	     gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_SHA1, buffer,
+					     &size)) < 0) {
+	    fprintf(out, "Error in fingerprint calculation: %s\n",
+		    gnutls_strerror(ret));
+	} else {
+	    print = printable;
+	    for (i = 0; i < size; i++) {
+		sprintf(print, "%.2x ", (unsigned char) buffer[i]);
+		print += 3;
+	    }
+	    fprintf(out, "\tSHA1 Fingerprint: %s\n", printable);
+	}
+
     }
 
     size = sizeof(buffer);

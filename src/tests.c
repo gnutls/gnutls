@@ -108,7 +108,7 @@ static const int cipher_priority[16] =
     GNUTLS_CIPHER_ARCFOUR_40, 0
 };
 static const int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
-static const int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+static const int mac_priority[16] = { GNUTLS_MAC_SHA1, GNUTLS_MAC_MD5, 0 };
 static const int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
 
 #define ADD_ALL_CIPHERS(session) gnutls_cipher_set_priority(session, cipher_priority)
@@ -612,7 +612,7 @@ test_code_t test_sha(gnutls_session session)
     ADD_ALL_COMP(session);
     ADD_ALL_CERTTYPES(session);
     ADD_ALL_PROTOCOLS(session);
-    ADD_MAC(session, GNUTLS_MAC_SHA);
+    ADD_MAC(session, GNUTLS_MAC_SHA1);
     ADD_ALL_KX(session);
     gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
