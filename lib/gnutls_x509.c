@@ -1036,6 +1036,52 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 }
 
 
+/* Reads a DER certificate from memory and stores it to
+ * a gnutls_cert structure.
+ */
+static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts, 
+	const char *input_cert, int input_cert_size)
+{
+	int siz, i;
+	const char *ptr;
+	gnutls_datum tmp;
+	int ret;
+
+	ptr = input_cert;
+	siz = input_cert_size;
+	i = *ncerts + 1;
+
+	*cert_list =
+	    (gnutls_cert *) gnutls_realloc( *cert_list,
+					   i *
+					   sizeof(gnutls_cert));
+
+	if ( *cert_list == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	/* set defaults to zero 
+	 */
+
+	memset( &cert_list[0][i - 1], 0, sizeof(gnutls_cert));
+
+	tmp.data = (opaque*)ptr;
+	tmp.size = siz;
+
+	if ((ret =
+	     _gnutls_x509_cert2gnutls_cert(
+				     &cert_list[0][i - 1],
+				     tmp)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	i++;
+
+	*ncerts = i - 1;
+
+	return 0;
+}
+
 /* Reads a base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure.
  */
@@ -1113,8 +1159,10 @@ static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 
 /* Reads a base64 encoded certificate from memory
+ * type==0 -> PEM
+ * else -> DER
  */
-static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size)
+static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size, int type)
 {
 	int ret;
 
@@ -1136,7 +1184,11 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 	res->cert_list[res->ncerts] = NULL; /* for realloc */
 	res->cert_list_length[res->ncerts] = 0;
 
-	ret = parse_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
+	if (type==0)
+		ret = parse_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
+		cert, cert_size);
+	else
+		ret = parse_der_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
 		cert, cert_size);
 
 	if (ret < 0) {
@@ -1161,8 +1213,10 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
+ * type==0 -> PEM
+ * else -> DER
  */
-static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size)
+static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size, int type)
 {
 	int siz, ret;
 	opaque *b64;
@@ -1179,46 +1233,63 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 
 	/* read PKCS-1 private key */
 	siz = key_size;
+
+	if (type==0) { /* PEM */
+		/* If we find the "DSA PRIVATE" string in the
+		 * pem encoded certificate then it's a DSA key.
+		 */
+		if (strstr( key, "DSA PRIVATE")!=NULL) 
+			pk = GNUTLS_PK_DSA;
+		else
+			pk = GNUTLS_PK_RSA;
+
+		siz = _gnutls_fbase64_decode(key, siz, &b64);
+
+		if (siz < 0) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+
+		tmp.data = b64;
+		tmp.size = siz;
 	
-	/* If we find the "DSA PRIVATE" string in the
-	 * pem encoded certificate then it's a DSA key.
-	 */
-	if (strstr( key, "DSA PRIVATE")!=NULL) 
-		pk = GNUTLS_PK_DSA;
-	else
-		pk = GNUTLS_PK_RSA;
-
-	siz = _gnutls_fbase64_decode(key, siz, &b64);
-
-	if (siz < 0) {
-		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
-	}
-
-	tmp.data = b64;
-	tmp.size = siz;
+		switch (pk) { /* decode the key */
+			case GNUTLS_PK_RSA:
+				if ((ret =
+				     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
+							tmp)) < 0) {
+					gnutls_assert();
+					gnutls_free(b64);
+					return ret;
+				}
+				break;
+			case GNUTLS_PK_DSA:
+				if ((ret =
+				     _gnutls_DSAkey2gnutlsKey(&res->pkey[res->ncerts],
+								tmp)) < 0) {
+					gnutls_assert();
+					gnutls_free(b64);
+					return ret;
+				}
+				break;	
+		}
 	
-	switch (pk) { /* decode the key */
-		case GNUTLS_PK_RSA:
-			if ((ret =
-			     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
-							tmp)) < 0) {
-				gnutls_assert();
-				gnutls_free(b64);
-				return ret;
-			}
-			break;
-		case GNUTLS_PK_DSA:
-			if ((ret =
-			     _gnutls_DSAkey2gnutlsKey(&res->pkey[res->ncerts],
-							tmp)) < 0) {
-				gnutls_assert();
-				gnutls_free(b64);
-				return ret;
-			}
-			break;	
+		gnutls_free(b64);
+	} else { /* DER */
+
+		/* FIXME: only RSA keys supported 
+		 */
+		tmp.data = (opaque*)key;
+		tmp.size = key_size;
+		
+		if ((ret =
+		     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
+					tmp)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
-	gnutls_free(b64);
+	
 	return 0;
 }
 
@@ -1240,7 +1311,7 @@ static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile)
 
 	x[siz-1] = 0;
 
-	return read_cert_mem( res, x, siz);
+	return read_cert_mem( res, x, siz, 0);
 
 }
 
@@ -1285,7 +1356,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
 
 	x[siz-1] = 0;
 
-	return read_key_mem( res, x, siz);
+	return read_key_mem( res, x, siz, 0);
 }
 
 
@@ -1452,10 +1523,10 @@ int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, cons
 
 	/* this should be first 
 	 */
-	if ((ret = read_key_mem( res, KEY->data, KEY->size)) < 0)
+	if ((ret = read_key_mem( res, KEY->data, KEY->size, 0)) < 0)
 		return ret;
 
-	if ((ret = read_cert_mem( res, CERT->data, CERT->size)) < 0)
+	if ((ret = read_cert_mem( res, CERT->data, CERT->size, 0)) < 0)
 		return ret;
 
 	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
@@ -1465,6 +1536,44 @@ int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, cons
 
 	return 0;
 }
+
+/**
+  * gnutls_certificate_set_x509_raw_key_mem - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * @CERT: contains a DER encoded certificate for
+  * the specified private key
+  * @KEY: is a DER encoded private key
+  *
+  * This function sets a certificate/private key pair in the 
+  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
+  * more than once (in case multiple keys/certificates exist for the
+  * server).
+  *
+  * Currently are supported: RSA PKCS-1 DER encoded private keys, 
+  * DER encoded DSA private keys.
+  *
+  **/
+int gnutls_certificate_set_x509_der_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
+			   const gnutls_datum* KEY)
+{
+	int ret;
+
+	/* this should be first 
+	 */
+	if ((ret = read_key_mem( res, KEY->data, KEY->size, 1)) < 0)
+		return ret;
+
+	if ((ret = read_cert_mem( res, CERT->data, CERT->size, 1)) < 0)
+		return ret;
+
+	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
 
 
 static int _read_rsa_params(opaque * der, int dersize, MPI * params)

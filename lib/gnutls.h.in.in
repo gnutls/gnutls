@@ -229,6 +229,8 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, co
 int gnutls_certificate_set_x509_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
 int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
 	const gnutls_datum* CERT, const gnutls_datum* KEY);
+int gnutls_certificate_set_x509_der_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
+	const gnutls_datum* CERT, const gnutls_datum* KEY);
 
 int gnutls_certificate_set_openpgp_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
 int gnutls_certificate_set_openpgp_key_mem( GNUTLS_CERTIFICATE_CREDENTIALS res,
