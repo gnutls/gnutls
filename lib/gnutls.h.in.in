@@ -294,7 +294,13 @@ int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int
 typedef ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_TRANSPORT_PTR, void*, size_t);
 typedef ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
 void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR ptr);
+void gnutls_transport_set_ptr2(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR recv_ptr,
+	GNUTLS_TRANSPORT_PTR send_ptr);
+
 GNUTLS_TRANSPORT_PTR gnutls_transport_get_ptr(GNUTLS_STATE state);
+void gnutls_transport_get_ptr2(GNUTLS_STATE state,
+	GNUTLS_TRANSPORT_PTR *recv_ptr,
+	GNUTLS_TRANSPORT_PTR *send_ptr);
 
 void gnutls_transport_set_lowat( GNUTLS_STATE state, int num);
 

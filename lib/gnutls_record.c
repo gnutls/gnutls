@@ -85,8 +85,29 @@ void gnutls_transport_set_lowat(GNUTLS_STATE state, int num) {
   * handle.
   *
   **/
-void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR ptr) {
-	state->gnutls_internals.transport_ptr = ptr;
+void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR ptr) 
+{
+	state->gnutls_internals.transport_recv_ptr = ptr;
+	state->gnutls_internals.transport_send_ptr = ptr;
+}
+
+
+/**
+  * gnutls_transport_set_ptr2 - Used to set first argument of the transport functions
+  * @state: is a &GNUTLS_STATE structure.
+  * @recv_ptr: is the value for the pull function
+  * @send_ptr: is the value for the push function
+  *
+  * Used to set the first argument of the transport function (like PUSH and
+  * PULL). In berkeley style sockets this function will set the connection
+  * handle. With this function you can use two different pointers for
+  * receiving and sending.
+  *
+  **/
+void gnutls_transport_set_ptr2(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR recv_ptr,
+	GNUTLS_TRANSPORT_PTR send_ptr) {
+	state->gnutls_internals.transport_send_ptr = send_ptr;
+	state->gnutls_internals.transport_recv_ptr = recv_ptr;
 }
 
 /**
@@ -98,7 +119,26 @@ void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR ptr) {
   *
   **/
 GNUTLS_TRANSPORT_PTR gnutls_transport_get_ptr(GNUTLS_STATE state) {
-	return state->gnutls_internals.transport_ptr;
+	return state->gnutls_internals.transport_recv_ptr;
+}
+
+/**
+  * gnutls_transport_get_ptr2 - Used to return the first argument of the transport functions
+  * @state: is a &GNUTLS_STATE structure.
+  * @recv_ptr: will hold the value for the pull function
+  * @send_ptr: will hold the value for the push function
+  *
+  * Used to get the first argument of the transport function (like PUSH and
+  * PULL). This must have been set using gnutls_transport_set_ptr().
+  *
+  **/
+void gnutls_transport_get_ptr2(GNUTLS_STATE state,
+	GNUTLS_TRANSPORT_PTR *recv_ptr,
+	GNUTLS_TRANSPORT_PTR *send_ptr) 
+{
+	
+	*recv_ptr = state->gnutls_internals.transport_recv_ptr;
+	*send_ptr = state->gnutls_internals.transport_send_ptr;
 }
 
 /**

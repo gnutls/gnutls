@@ -518,7 +518,8 @@ typedef struct {
 	/* Holds the first argument of PUSH and PULL
 	 * functions;
 	 */
-	int transport_ptr;
+	int transport_recv_ptr;
+	int transport_send_ptr;
 	
 	/* STORE & RETRIEVE functions. Only used if other
 	 * backend than gdbm is used.
