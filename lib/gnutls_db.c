@@ -99,8 +99,9 @@ GDBM_FILE dbf;
   * gnutls_clean_db - removes expired and invalid sessions from the database
   * @state: is a &GNUTLS_STATE structure.
   *
-  * This function Deletes all expired records in the db. This db may become huge
-  * if this function is not called.
+  * This function Deletes all expired records in the resumed sessions' database. 
+  * This database may become huge if this function is not called.
+  * (this function is also quite expensive)
   **/
 int gnutls_clean_db( GNUTLS_STATE state) {
 #ifdef HAVE_LIBGDBM
