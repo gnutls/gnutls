@@ -5,13 +5,13 @@ in order to avoid having people working on the same thing.
 Current list:
 + Make gnutls independent of the Certificate Manager (in order to support
  other x.509 certificate managers)
++ Trace memory leaks in libgcrypt
++ Audit the code (we need help. Contact nmav@gnutls.org)
 * Add callbacks to get SRP parameters (instead of a reading password file)
-* Trace memory leaks in libgcrypt
 * Drop dnsname extension
 * Minimize footprint.
 * Add support for certificates with DSS parameters
 * Add more TLS extensions
-* Audit the code (volunteers?)
 * Add support for PKCS8 encrypted private keys
 * OpenPGP certificate support
 - Add Kerberos support

@@ -141,8 +141,8 @@ typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
 typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
 typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
 
-int gnutls_set_lowat( GNUTLS_STATE state, int num);
-int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
+void gnutls_set_lowat( GNUTLS_STATE state, int num);
+void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
 int gnutls_set_db_name( GNUTLS_STATE state, char* filename);	
 int gnutls_clean_db( GNUTLS_STATE state);
 void gnutls_set_db_retrieve_func( GNUTLS_STATE, DB_RETR_FUNC);
