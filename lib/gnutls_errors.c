@@ -70,7 +70,8 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("Encryption of the TLS record packet has failed.", GNUTLS_E_ENCRYPTION_FAILED, 1 ), 
 	ERROR_ENTRY("Public key decryption has failed.", GNUTLS_E_PK_DECRYPTION_FAILED, 1 ), 
 	ERROR_ENTRY("Public key encryption has failed.", GNUTLS_E_PK_ENCRYPTION_FAILED, 1 ), 
-	ERROR_ENTRY("Public key signing has failed.", GNUTLS_E_PK_SIGNATURE_FAILED, 1 ), 
+	ERROR_ENTRY("Public key signing has failed.", GNUTLS_E_PK_SIGN_FAILED, 1 ), 
+	ERROR_ENTRY("Public key signature verification has failed.", GNUTLS_E_PK_SIG_VERIFY_FAILED, 1 ), 
 	ERROR_ENTRY("Decompression of the TLS record packet has failed.", GNUTLS_E_DECOMPRESSION_FAILED, 1 ), 
 	ERROR_ENTRY("Compression of the TLS record packet has failed.", GNUTLS_E_COMPRESSION_FAILED, 1 ), 
 

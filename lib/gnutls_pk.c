@@ -294,13 +294,13 @@ int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertex
 	if (plain.size != vdata->size) {
 		gnutls_assert();
 		gnutls_sfree_datum( &plain);
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
+		return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 	}
 
 	if ( memcmp(plain.data, vdata->data, plain.size)!=0) {
 		gnutls_assert();
 		gnutls_sfree_datum( &plain);
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
+		return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 	}
 
 	gnutls_sfree_datum( &plain);
@@ -386,7 +386,7 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
 	k = hash->size;
 	if (k!=20) { /* SHA only */
 		gnutls_assert();
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
+		return GNUTLS_E_PK_SIGN_FAILED;
 	}
 
 	if (_gnutls_mpi_scan(&mdata, hash->data, &k) != 0) {
@@ -470,7 +470,7 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
 
 	if (vdata->size != 20) { /* sha-1 only */
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 	}
 
 	if (decode_ber_rs( sig_value, &rs[0], &rs[1])!=0) {
@@ -673,7 +673,7 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 
 	if (rc != 0) {
 		gnutls_assert();
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
+		return GNUTLS_E_PK_SIGN_FAILED;
 
 	} else {
 		GCRY_SEXP list;
@@ -787,7 +787,7 @@ static int _gnutls_pk_verify(int algo, GNUTLS_MPI hash, GNUTLS_MPI* data, GNUTLS
 
 	if (rc != 0) {
 		gnutls_assert();
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
+		return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 	}
 
 	return 0;

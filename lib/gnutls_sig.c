@@ -237,7 +237,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 			vdata.data = &hash_concat->data[16];
 			vdata.size = 20; /* sha1 */
 
-			/* decrypt signature */
+			/* verify signature */
 			if ( (ret=_gnutls_dsa_verify( &vdata, signature, cert->params,
 				cert->params_size)) < 0) { 
 			     gnutls_assert();

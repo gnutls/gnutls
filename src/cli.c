@@ -56,6 +56,7 @@ int record_max_size;
 int fingerprint;
 int crlf;
 int quiet = 0;
+extern int xml;
 
 char *srp_passwd;
 char *srp_username;
@@ -387,6 +388,7 @@ void gaa_parser(int argc, char **argv)
       exit(1);
    }
 
+   xml = info.xml;
    starttls = info.starttls;
    resume = info.resume;
    port = info.port;

@@ -4,9 +4,8 @@
 #include <gnutls/extra.h>
 #include <time.h>
 
+int xml = 0;
 void print_cert_info(gnutls_session session);
-
-#undef XML
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
@@ -53,8 +52,7 @@ void print_x509_info(gnutls_session session)
 	if (cert_list_size <= 0)
 		return;
 
-#ifdef XML
-	{
+	if (xml) {
 		gnutls_datum res;
 
 		gnutls_x509_certificate_to_xml(&cert_list[0], &res, 0);
@@ -64,7 +62,6 @@ void print_x509_info(gnutls_session session)
 
 		return;
 	}
-#endif
 
 	printf(" - Certificate info:\n");
 
@@ -163,8 +160,7 @@ void print_openpgp_info(gnutls_session session)
 	if (cert_list_size > 0) {
 		int algo, bits;
 
-#ifdef XML
-		{
+		if (xml) {
 			gnutls_datum res;
 
 			gnutls_openpgp_key_to_xml(&cert_list[0], &res, 0);
@@ -174,7 +170,6 @@ void print_openpgp_info(gnutls_session session)
 
 			return;
 		}
-#endif
 
 		printf(" # Key was created at: %s", my_ctime(&activet));
 		printf(" # Key expires: ");
@@ -214,9 +209,12 @@ void print_openpgp_info(gnutls_session session)
 
 			printf(" # PGP Key fingerprint: %s\n", printable);
 
-			gnutls_openpgp_extract_key_name(&cert_list
-							[0], 0, &pgp_name);
-			PRINT_PGP_NAME(pgp_name);
+			if (gnutls_openpgp_extract_key_name(&cert_list
+							[0], 0, &pgp_name) < 0) {
+				fprintf(stderr, "Could not extract name\n");
+			} else {
+				PRINT_PGP_NAME(pgp_name);
+			}
 
 		}
 

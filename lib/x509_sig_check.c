@@ -180,7 +180,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, GNUTLS
 
 	if (memcmp( md, digest, digest_size)!=0) {
 		gnutls_assert();
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
+		return GNUTLS_E_PK_SIG_VERIFY_FAILED;
 	}
 
 	return 0;		
