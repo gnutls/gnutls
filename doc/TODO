@@ -4,11 +4,11 @@ in order to avoid having people working on the same thing.
 
 Current list:
 * Audit the code
-* Add function(s) to get the DHE/A parameters
 * Add PKCS-12 support
 * Convert documentation to texinfo format
 * Merge common stuff in DHE and DHA key exchange
 * Add GPGSM certificate manager support
+* Add support for certificate CRLs
 - Add Kerberos support
 
 (+) Means high priority 
