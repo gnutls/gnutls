@@ -39,15 +39,9 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
       CDK_DBSEARCH_FPR, &knode );
 
    if( !rc ) {
-       size_t len = 20000;
-       buf = cdk_calloc( 1, len + 1 );
+       size_t len;
 
-       if (buf == NULL) {
-          rc = -1;
-          goto finish;
-       }
-
-       cdk_kbnode_write_to_mem( knode, buf, &len);
+       cdk_kbnode_write_to_mem( knode, NULL, &len);
 
        key->data = malloc( len);
        if (key->data==NULL) {
@@ -55,7 +49,7 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
           goto finish;
        }
 
-       memcpy( key->data, buf, len);
+       cdk_kbnode_write_to_mem( knode, key->data, &len);
 
        rc = 0; /* success */
 
