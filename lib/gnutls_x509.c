@@ -2880,7 +2880,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
 {
    gnutls_x509_dn dn;
    gnutls_string str;
-   int ret;
+   int ret, i;
    char str_buffer[256];
 
    if (buf == NULL || sizeof_buf == 0) {
@@ -2896,9 +2896,9 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
 		gnutls_assert(); \
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
-#define PRINTX( x, y, i) \
+#define PRINTX( x, y) \
    if (y[0]!=0) { \
-      if (i!=0) STR_APPEND( ","); \
+      if (i==0) i=1; else { STR_APPEND( ","); } \
       STR_APPEND( x); \
       STR_APPEND( "="); \
       STR_APPEND( str_escape(y, str_buffer, sizeof(str_buffer))); \
@@ -2911,13 +2911,14 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
       
    if (ret < 0) return ret;
 
-   PRINTX( "CN", dn.common_name, 0);
-   PRINTX( "E", dn.email, 1);
-   PRINTX( "OU", dn.organizational_unit_name, 1);
-   PRINTX( "O", dn.organization, 1);
-   PRINTX( "L", dn.locality_name, 1);
-   PRINTX( "ST", dn.state_or_province_name, 1);
-   PRINTX( "C", dn.country, 1);
+   i = 0;
+   PRINTX( "CN", dn.common_name);
+   PRINTX( "E", dn.email);
+   PRINTX( "OU", dn.organizational_unit_name);
+   PRINTX( "O", dn.organization);
+   PRINTX( "L", dn.locality_name);
+   PRINTX( "ST", dn.state_or_province_name);
+   PRINTX( "C", dn.country);
  
    if (str.length >= sizeof_buf) {
         _gnutls_string_clear( &str);
