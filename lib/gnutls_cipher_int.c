@@ -38,6 +38,13 @@ GNUTLS_CIPHER_HANDLE ret;
 		ret = GNUTLS_CIPHER_FAILED;
 #endif
 		break;
+	case GNUTLS_AES:
+#ifdef USE_MCRYPT
+		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
+#else
+		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
+#endif
+		break;
 	case GNUTLS_3DES:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "tripledes", NULL, "cbc", NULL);
