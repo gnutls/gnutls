@@ -1,3 +1,6 @@
+Version 0.0.8 (28/01/2001)
+- GNUTLS is a gnu library
+
 Version 0.0.7 (11/01/2001)
 - Added server side session resuming (using gdbm)
 - Added twofish algorithm
