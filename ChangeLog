@@ -1,3 +1,46 @@
+2004-08-25 13:42  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls.h.in.in:
+
+	Move remaining SRP functions to lib/.  
+
+2004-08-25 13:35  Simon Josefsson <simon@josefsson.org>
+
+	* lib/: gnutls_anon_cred.c, gnutls_dh_primes.c, gnutls_srp.c,
+	gnutls_ui.c, gnutls_ui.h:
+
+	Doc fix.  
+
+2004-08-25 13:18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_alert.c:
+
+	Doc fix.  
+
+2004-08-25 12:39  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am:
+
+	(release): Copy gtk-doc.  
+
+2004-08-25 12:38  Simon Josefsson <simon@josefsson.org>
+
+	* lib/: gnutls.h.in.in, gnutls_global.c, gnutls_ui.c, gnutls_ui.h:
+
+	Fix prototypes.  
+
+2004-08-25 12:07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/: gnutls.h.in.in, gnutls_ui.h:
+
+	Fix prototypes. (Unfinished, there should be a tool to do this...) 
+
+2004-08-25 11:39  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-psk-01.txt:
+
+	Add.  
+
 2004-08-24 18:04  Simon Josefsson <simon@josefsson.org>
 
 	* doc/: TODO, protocol/draft-badra-tls-express-00.txt,
