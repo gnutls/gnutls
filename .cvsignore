@@ -22,3 +22,6 @@ INSTALL
 mkinstalldirs
 missing
 install-sh
+ChangeLog
+.cvsusers
+ChangeLog.bak
