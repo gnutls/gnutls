@@ -113,7 +113,7 @@ static int is_leaf(ASN1_TYPE p)
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
 
-#define UNNAMED "UNNAMED"
+#define UNNAMED "unnamed"
 /* This function removes the '?' character from ASN.1 names
  */
 static int normalize_name( const char* aname, char* output, int output_size) 
