@@ -183,32 +183,15 @@ static void rc2_decrypt(void *context, uint8 * outbuf, const uint8 * inbuf)
 	do_rc2_decrypt(ctx, outbuf, inbuf);
 }
 
-
+static int disable_p2 = 0;
 
 static gpg_err_code_t
 do_rc2_setkey(void *context, const uint8 * key, unsigned int keylen)
 {
-	static int initialized, disable_p2;
-	static const char *selftest_failed;
 	uint i;
 	uint8 *S, x;
 	RC2_context *ctx = (RC2_context *) context;
 	int bits = keylen * 8, len;
-
-	/* Self test is for the plain cipher (with phase 2 stripped)
-	 */
-
-	if (!initialized) {
-		initialized = 1;
-		disable_p2 = 1; /* strip phase 2 */
-		selftest_failed = selftest();
-		disable_p2 = 0;
-	}
-	if (selftest_failed) {
-		gnutls_assert();
-		_gnutls_x509_log( selftest_failed);
-		return GPG_ERR_SELFTEST_FAILED;
-	}
 
 	if (keylen < 40 / 8)	/* we want at least 40 bits */
 		return GPG_ERR_INV_KEYLEN;
@@ -352,6 +335,22 @@ static gcry_module_t rc2_40_mod;
 
 int _gnutls_register_rc2_cipher(void)
 {
+const char* selftest_failed;
+
+	/* Self test is for the plain cipher (with phase 2 stripped)
+	 */
+	disable_p2 = 1; /* strip phase 2 */
+	selftest_failed = selftest();
+	disable_p2 = 0;
+
+	if (selftest_failed) {
+		gnutls_assert();
+		_gnutls_x509_log( selftest_failed);
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	/* If self test succeeded then register the cipher.
+	 */
 	if (gcry_cipher_register(&cipher_spec_rc2,
 				 &_gcry_rc2_40_id, &rc2_40_mod)) {
 		gnutls_assert();
