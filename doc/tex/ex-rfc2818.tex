@@ -23,9 +23,17 @@ void verify_certificate( gnutls_session session, const char* hostname)
       return;
    }
 
-   if (status & GNUTLS_CERT_INVALID || status & GNUTLS_CERT_NOT_TRUSTED
-      || status & GNUTLS_CERT_CORRUPTED || status & GNUTLS_CERT_REVOKED) {
-      printf("The certificate is not trusted\n");
+   if (status & GNUTLS_CERT_INVALID)
+      printf("The certificate chain is broken.\n");
+
+   if (status & GNUTLS_CERT_CORRUPTED)
+      printf("The certificate is corrupted.\n");
+
+   if (status & GNUTLS_CERT_REVOKED)
+      printf("The certificate has been revoked.\n");
+
+   if (status & GNUTLS_CERT_NOT_TRUSTED) {
+      printf("The certificate is not trusted.\n");
       return;
    }
 

@@ -11,16 +11,20 @@ The rules here are not always used, although we try to stick to them.
  is the implementation of the RSA certificate authentication
  method.
 
+ An other way to distinguish files, might be using different
+ subdirectories. Use the lib/x509/ directory, which contains
+ all the X.509 certificate and crl stuff.
+
 
 *** Function names:
   All the function names use underscore "_", to separate words,
  functions like gnutlsDoThat, are not used. The function names
  usually start with "gnutls_" prefix, and the words that follow
  specify the exact part of gnutls that this function refers to.
- Ie "gnutls_x509_extract_certificate_dn", refers to the X.509 
+ Ie "gnutls_x509_crt_get_dn", refers to the X.509 
  certificate parsing part of gnutls. Currently used prefixes are:
- "gnutls_x509_" for the X.509 certificate part
- "gnutls_openpgp_" for the openpgp key part
+ "gnutls_x509_crt_" for the X.509 certificate part
+ "gnutls_openpgp_key_" for the openpgp key part
  "gnutls_session_" for the TLS session part (but this may be omited)
  "gnutls_handshake_" for the TLS handshake part
  "gnutls_record_" for the TLS record part
@@ -47,7 +51,7 @@ The rules here are not always used, although we try to stick to them.
   2. Output parameters
 
   When data and size is expected, a gnutls_datum structure should be
-  used.
+  used (or more precisely a pointer to the structure).
 
 *** Callback function parameters:
   Callback functions should be avoided, if this is possible. 

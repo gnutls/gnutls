@@ -14,7 +14,7 @@
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
 #define CAFILE "ca.pem"
-#define CRLFILE NULL
+#define CRLFILE "crl.pem"
 
 /* This is a sample TLS 1.0 echo server.
  */
@@ -93,6 +93,9 @@ int main()
 
    gnutls_certificate_allocate_credentials(&x509_cred);
    gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, 
+      GNUTLS_X509_FMT_PEM);
+
+   gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE, 
       GNUTLS_X509_FMT_PEM);
 
    gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 

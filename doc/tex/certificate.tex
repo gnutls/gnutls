@@ -32,21 +32,50 @@ parameters from given X.509 certificates. Some of them are:
 
 The API for handling X.509 certificates is described at section \ref{sec:x509api}
 on page \pageref{sec:x509api}. A function which converts an X.509 DER certificate
-to an XML form is provided. See appendix \ref{ap:xml} on page \pageref{ap:xml} for
+to an XML form is also provided. See appendix \ref{ap:xml} on page \pageref{ap:xml} for
 more information.
 
 
-\par
+\subsection{Verifying an X.509 certificate}
 Verifying certificate\index{Verifying certificate paths} paths is important 
-in X.509 authentication. For this purpose you should use functions like
-\printfunc{gnutls_x509_crt_verify}{gnutls\_x509\_crt\_verify}.
-A more generic one is also provided and can be used with all
-of the certificate authentication methods, but is limited to a session. See the
-\printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}
-function. The above functions verify if the given certificate path leads
-to a trusted CA certificate. You should also verify if the certificate's
+in X.509 authentication. For this purpose the function
+\printfunc{gnutls_x509_crt_verify}{gnutls\_x509\_crt\_verify} is provided. The
+output of this function is the bitwise OR of the elements of the
+``gnutls\_certificate\_status'' enumeration. A detailed description of
+these elements can be found in figure \ref{fig:verify}.
+The function \printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}
+is equivalent to the previous one, and will verify the peer's certificate in a TLS session.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+CERT\_INVALID & The certificate chain is broken. 
+\\
+\hline
+CERT\_NOT\_TRUSTED & The certificate is not signed by one of the authorities marked as trusted.
+\\
+\hline
+CERT\_REVOKED & The certificate has been revoked.
+\\
+\hline
+CERT\_CORRUPTED & The certificate is corrupted.
+\\
+\hline
+\end{tabular}
+\caption{Certificate verification}
+\label{fig:verify}
+\end{figure}
+
+\par
+Although the verification of a certificate path indicates that the
+certificate is signed by trusted authority, does not reveal anything
+about the peer's identity. It is required to verify if the certificate's
 owner is the one you expect. See section \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
 for an example.
+
+
+
 
 \par
 Client certificate authentication\index{Certificate authentication!Client} is 
