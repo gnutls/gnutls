@@ -2337,6 +2337,12 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 
 		keep = 0;
 
+		/* if it is defined but had no credentials 
+		 */
+		if (_gnutls_get_kx_cred
+		    (state->gnutls_key, kx, NULL) == NULL)
+			keep = 1;
+		else
 		/* If there was no credentials to use with the specified
 		 * key exchange method, then just remove it.
 		 */
@@ -2357,14 +2363,6 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 				} else	/* CLIENT */
 					keep = 0;
 			}
-		} else {
-
-			/* if it is defined but had no credentials 
-			 */
-
-			if (_gnutls_get_kx_cred
-			    (state->gnutls_key, kx, NULL) == NULL)
-				keep = 1;
 		}
 
 		if (keep == 0) {
