@@ -9,6 +9,8 @@ gnutls_TEXINFOS = gnutls.texi fdl.texi error_codes.texi \
 	pgp1.eps pgp1.png x509-1.eps x509-1.png \
 	build_api_pgp build_api_lib build_api_x509 build_api_extra examples
 
+AM_MAKEINFOHTMLFLAGS = --no-split
+
 build_api_lib:
 	cd ../lib && make gnutls-api.texi
 
