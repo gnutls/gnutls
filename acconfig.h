@@ -33,5 +33,6 @@
 #undef ENABLE_ANON
 
 #undef HAVE_LIBOPENCDK
+#undef HAVE_LIBGDBM
 
 #undef C99_MACROS

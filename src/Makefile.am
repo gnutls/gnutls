@@ -7,7 +7,7 @@ INCLUDES = -I../lib -I../libtasn1/lib
 
 bin_PROGRAMS = gnutls-serv gnutls-cli gnutls-srpcrypt gnutls-cli-debug
 gnutls_serv_SOURCES = serv-gaa.c serv.c common.c
-gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS) #$(SERV_LIBS)
+gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS) $(SERV_LIBS)
 gnutls_srpcrypt_SOURCES = crypt-gaa.c crypt.c
 gnutls_srpcrypt_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
 gnutls_cli_SOURCES = cli-gaa.c cli.c common.c 
