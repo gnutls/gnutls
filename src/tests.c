@@ -445,7 +445,7 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret < 0) return FAILED;
+	if (ret == FAILED) return FAILED;
 
 	if (gnutls_protocol_get_version(session)==GNUTLS_TLS1) return SUCCEED;
 	return UNSURE;
@@ -463,7 +463,7 @@ int ret;
 	gnutls_record_set_max_size( session, 512);
 
 	ret = do_handshake( session);
-	if (ret<0) return FAILED;
+	if (ret == FAILED) return ret;
 
 	ret = gnutls_record_get_max_size(session);
 	if (ret==512) return SUCCEED;
@@ -557,7 +557,7 @@ int tmp_session_id_size;
 	tmp_session_id_size = session_id_size;
 
 	ret = do_handshake( session);
-	if (ret < 0) return FAILED;
+	if (ret == FAILED) return ret;
 	
 	/* check if we actually resumed the previous session */
 
@@ -584,7 +584,7 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret < 0) return FAILED;
+	if (ret == FAILED) return ret;
 
 	printf("\n");
 	print_cert_info( session);
@@ -640,7 +640,7 @@ int ret;
         gnutls_certificate_client_set_select_function( session, cert_callback);
 
 	ret = do_handshake( session);
-	if (ret < 0) return FAILED;
+	if (ret ==FAILED) return ret;
 
 	return SUCCEED;
 }
