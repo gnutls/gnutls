@@ -30,8 +30,12 @@ extern const static_asn pkcs1_asn1_tab[];
 extern const static_asn pkix_asn1_tab[];
 
 static void* old_sig_handler;
-ssize_t (*_gnutls_recv_func)( SOCKET, void*, size_t, int);
-ssize_t (*_gnutls_send_func)( SOCKET,const void*, size_t, int);
+
+typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
+typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
+
+RECV_FUNC _gnutls_recv_func;
+SEND_FUNC _gnutls_send_func;
 
 static node_asn *PKIX1_ASN;
 static node_asn *PKCS1_ASN;
@@ -45,8 +49,8 @@ node_asn* _gnutls_get_pkcs() {
 }
 
 /**
-  * gnutls_set_recv_func - This function sets the recv() function
-  * @(*recv_func): it's a recv(2) like function
+  * gnutls_global_set_recv_func - This function sets the recv() function
+  * @recv_func: it's a recv(2) like function
   *
   * This is the function were you set the recv() function gnutls
   * is going to use. Normaly you may not use this function since
@@ -56,13 +60,13 @@ node_asn* _gnutls_get_pkcs() {
   * called once and after gnutls_global_init().
   *
   **/
-void gnutls_set_recv_func( ssize_t (*recv_func)(SOCKET,void*,size_t,int)) {
+void gnutls_global_set_recv_func( RECV_FUNC recv_func) {
 	_gnutls_recv_func = recv_func;
 }
 
 /**
-  * gnutls_set_send_func - This function sets the send() function
-  * @(*send_func): it's a send(2) like function
+  * gnutls_global_set_send_func - This function sets the send() function
+  * @send_func: it's a send(2) like function
   *
   * This is the function were you set the send() function gnutls
   * is going to use. Normaly you may not use this function since
@@ -71,7 +75,7 @@ void gnutls_set_recv_func( ssize_t (*recv_func)(SOCKET,void*,size_t,int)) {
   * a front end to this function. This function should be
   * called once and after gnutls_global_init().
   **/
-void gnutls_set_send_func( ssize_t (*send_func)(SOCKET, const void*,size_t,int)) {
+void gnutls_global_set_send_func( SEND_FUNC send_func) {
 	_gnutls_send_func = send_func;
 }
 

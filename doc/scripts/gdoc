@@ -226,7 +226,7 @@ sub output_html {
     my %args = %{$_[0]};
     my ($parameter, $section);
     my $count;
-    print "<h2>Function</h2>\n";
+    print "\n\n<a name=\"". $args{'function'} . "\">&nbsp</a><h2>Function</h2>\n";
 
     print "<i>".$args{'functiontype'}."</i>\n";
     print "<b>".$args{'function'}."</b>\n";

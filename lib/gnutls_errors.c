@@ -32,6 +32,7 @@ struct gnutls_error_entry {
 typedef struct gnutls_error_entry gnutls_error_entry;
 
 static gnutls_error_entry error_algorithms[] = {
+	GNUTLS_ERROR_ENTRY( GNUTLS_E_SUCCESS, 0),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_MAC_FAILED, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_UNKNOWN_CIPHER, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_UNKNOWN_CIPHER_SUITE, 1),
@@ -103,6 +104,7 @@ static gnutls_error_entry error_algorithms[] = {
 int gnutls_is_fatal_error(int error)
 {
 	int ret = 0;
+
 	GNUTLS_ERROR_ALG_LOOP(ret = p->fatal);
 	return ret;
 }

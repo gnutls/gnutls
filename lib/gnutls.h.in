@@ -234,8 +234,14 @@ int gnutls_set_x509_trust( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE)
 int gnutls_global_init();
 void gnutls_global_deinit();
 
-void gnutls_set_recv_func( ssize_t (*recv_func)(SOCKET, void*, size_t, int));
-void gnutls_set_send_func( ssize_t (*send_func)(SOCKET, const void*, size_t, int));
+typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
+typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
+
+RECV_FUNC _gnutls_recv_func;
+SEND_FUNC _gnutls_send_func;
+
+void gnutls_global_set_send_func( SEND_FUNC send_func);
+void gnutls_global_set_recv_func( RECV_FUNC recv_func);
 
 
 /* error codes appended here */

@@ -562,7 +562,6 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 	if (state->gnutls_internals.valid_connection == VALID_FALSE || sizeofdata==0) {
 		return 0; /* EOF */
-/*		return GNUTLS_E_INVALID_SESSION; */
 	}
 
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
@@ -729,11 +728,14 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 #endif
 		gnutls_free(ciphertext);
 		gnutls_free(tmpdata);
-		if (tmplen!=1) {
+
+		if (tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
-		return 0;
+		memcpy( data, tmpdata, sizeofdata);
+
+		return tmplen;
 	}
 
 #ifdef RECORD_DEBUG

@@ -1421,10 +1421,11 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 					int init)
 {
 	int ret = 0;
+	char ch;
 
 	ret =
 	    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
-			    NULL, 0, 0);
+			    &ch, 1, 0);
 	if (ret < 0) {
 		ERR("recv ChangeCipherSpec", ret);
 		gnutls_assert();

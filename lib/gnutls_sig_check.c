@@ -168,10 +168,6 @@ _gnutls_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e
 		return ret;
 	}
 
-#ifdef DEBUG
-fprintf(stderr, "digest_size: %s\n", _gnutls_bin2hex(digest,digest_size));
-#endif
-
 	gnutls_free_datum( &decrypted);
 
 	if (digest_size != gnutls_hash_get_algo_len(hash)) {
@@ -182,9 +178,7 @@ fprintf(stderr, "digest_size: %s\n", _gnutls_bin2hex(digest,digest_size));
 	hd = gnutls_hash_init( hash);
 	gnutls_hash( hd, text->data, text->size);
 	gnutls_hash_deinit( hd, md);
-#ifdef DEBUG
-	fprintf(stderr, "cmd: %s\n", _gnutls_bin2hex(md, 16));
-#endif
+
 	if (memcmp( md, digest, digest_size)!=0) {
 		gnutls_assert();
 		return GNUTLS_E_PK_SIGNATURE_FAILED;
@@ -216,7 +210,7 @@ gnutls_datum* tbs;
 		return GNUTLS_CERT_TRUSTED;
 	}
 #ifdef DEBUG
-fprintf(stderr, "PK: %d\n", issuer->subject_pk_algorithm);	
+	fprintf(stderr, "PK: %d\n", issuer->subject_pk_algorithm);	
 #endif
 
 	gnutls_assert();
