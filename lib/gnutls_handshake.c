@@ -221,8 +221,7 @@ int _gnutls_tls_create_random(opaque * dst)
 
 	/* Use weak random numbers for the most of the
 	 * buffer except for the first 4 that are the
-	 * system's time, and the last 3 which are of
-	 * better quality.
+	 * system's time.
 	 */
 
 	tim = time(NULL);
@@ -230,13 +229,7 @@ int _gnutls_tls_create_random(opaque * dst)
 	_gnutls_write_uint32(tim, dst);
 
 	if (_gnutls_get_random
-	    (&dst[4], TLS_RANDOM_SIZE - 7, GNUTLS_WEAK_RANDOM) < 0) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	if (_gnutls_get_random
-	    (&dst[29], 3, GNUTLS_STRONG_RANDOM) < 0) {
+	    (&dst[4], TLS_RANDOM_SIZE - 4, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
