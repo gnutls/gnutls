@@ -959,7 +959,7 @@ _gnutls_qsort(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
 #ifdef DEBUG
 	if (size > MAX_ELEM_SIZE) {
 		gnutls_assert();
-		fprintf(stderr, "QSORT BUG\n");
+		_gnutls_log( "QSORT BUG\n");
 		exit(1);
 	}
 #endif
@@ -1062,9 +1062,9 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 	}
 
 #ifdef SORT_DEBUG
-	fprintf(stderr, "Unsorted: \n");
+	_gnutls_log( "Unsorted: \n");
 	for (i = 0; i < count; i++)
-		fprintf(stderr, "\t%d: %s\n", i,
+		_gnutls_log( "\t%d: %s\n", i,
 			_gnutls_cipher_suite_get_name((tmp_ciphers)[i]));
 #endif
 
@@ -1095,11 +1095,11 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 	}
 
 #ifdef SORT_DEBUG
-	fprintf(stderr, "Sorted: \n");
+	_gnutls_log( "Sorted: \n");
 	for (i = 0; i < j; i++)
-		fprintf(stderr, "\t%d: %s\n", i,
+		_gnutls_log( "\t%d: %s\n", i,
 			_gnutls_cipher_suite_get_name((*ciphers)[i]));
-	fprintf(stderr, "SORT BUG\n");
+	_gnutls_log( "SORT BUG\n");
 	exit(0);
 #endif
 

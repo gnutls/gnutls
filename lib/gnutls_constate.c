@@ -66,7 +66,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	if (key_block==NULL) return GNUTLS_E_MEMORY_ERROR;
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
+	_gnutls_log( "KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
 #endif
 
 	pos = 0;
@@ -237,7 +237,7 @@ int rc;
 	_gnutls_set_read_keys(state);
 	 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Cipher Suite: %s\n",
+	_gnutls_log( "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
 					      security_parameters.current_cipher_suite));
 #endif
@@ -267,7 +267,7 @@ int rc;
 						read_mac_algorithm);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Handshake: Initializing internal [read] cipher states\n");
+	_gnutls_log( "Handshake: Initializing internal [read] cipher states\n");
 #endif
 
 	switch (state->security_parameters.entity) {
@@ -382,7 +382,7 @@ int rc;
 	_gnutls_set_write_keys(state);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Cipher Suite: %s\n",
+	_gnutls_log( "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
 					      security_parameters.current_cipher_suite));
 #endif
@@ -413,7 +413,7 @@ int rc;
 					write_mac_algorithm);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Handshake: Initializing internal [write] cipher states\n");
+	_gnutls_log( "Handshake: Initializing internal [write] cipher states\n");
 #endif
 
 	switch (state->security_parameters.entity) {

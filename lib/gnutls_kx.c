@@ -53,9 +53,9 @@ char random[2*TLS_RANDOM_SIZE];
 	premaster = state->gnutls_key->key.data;
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "PREMASTER SECRET[%d]: %s\n", premaster_size, _gnutls_bin2hex(premaster, premaster_size));
-	fprintf(stderr, "CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
-	fprintf(stderr, "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
+	_gnutls_log( "PREMASTER SECRET[%d]: %s\n", premaster_size, _gnutls_bin2hex(premaster, premaster_size));
+	_gnutls_log( "CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
+	_gnutls_log( "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
 #endif
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
@@ -76,7 +76,7 @@ char random[2*TLS_RANDOM_SIZE];
 	if (master==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
 #ifdef HARD_DEBUG
-	fprintf(stderr, "MASTER SECRET: %s\n", _gnutls_bin2hex(master, TLS_MASTER_SIZE));
+	_gnutls_log( "MASTER SECRET: %s\n", _gnutls_bin2hex(master, TLS_MASTER_SIZE));
 #endif
 	memcpy(state->security_parameters.master_secret, master, TLS_MASTER_SIZE);
 	secure_free(master);
@@ -98,7 +98,7 @@ int _gnutls_send_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 		return 0;
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Sending server KX message\n");
+	_gnutls_log( "Sending server KX message\n");
 #endif
 
 
@@ -130,7 +130,7 @@ int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 		data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx2( state->gnutls_key, &data);
 
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr, "Sending server KX message2\n");
+		_gnutls_log( "Sending server KX message2\n");
 #endif
 
 		if (data_size<0) {
@@ -162,7 +162,7 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 		return 0;
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Sending client KX message\n");
+	_gnutls_log( "Sending client KX message\n");
 #endif
 
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_kx( state->gnutls_key, &data);
@@ -194,7 +194,7 @@ int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 		return 0;
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Sending client KX message0\n");
+	_gnutls_log( "Sending client KX message0\n");
 #endif
 
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_kx0( state->gnutls_key, &data);
@@ -235,7 +235,7 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 	}
 	
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Sending client certificate verify message\n");
+	_gnutls_log( "Sending client certificate verify message\n");
 #endif
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_cert_vrfy( state->gnutls_key, &data);
 	if (data_size < 0) 
@@ -259,7 +259,7 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx!=NULL) {
 
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr, "Receiving Server KX message\n");
+		_gnutls_log( "Receiving Server KX message\n");
 #endif
 
 		ret =
@@ -289,7 +289,7 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx2 != NULL) {
 
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr, "Receiving Server KX message2\n");
+		_gnutls_log( "Receiving Server KX message2\n");
 #endif
 
 		ret =
@@ -320,7 +320,7 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx != NULL) {
 
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr, "Receiving client KX message\n");
+		_gnutls_log( "Receiving client KX message\n");
 #endif
 
 		ret =
@@ -351,7 +351,7 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx0 != NULL) {
 
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr, "Receiving client KX message0\n");
+		_gnutls_log( "Receiving client KX message0\n");
 #endif
 
 		ret =
@@ -383,7 +383,7 @@ int _gnutls_send_certificate(SOCKET cd, GNUTLS_STATE state)
 		return 0;
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Sending certificate message\n");
+	_gnutls_log( "Sending certificate message\n");
 #endif
 
 
@@ -440,7 +440,7 @@ int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state)
 		return 0;
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Sending Client Certificate\n");
+	_gnutls_log( "Sending Client Certificate\n");
 #endif
 
 	return _gnutls_send_certificate(cd, state);

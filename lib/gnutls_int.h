@@ -48,6 +48,7 @@
 #define MAX_HASH_SIZE 20
 
 #define MAX_X509_CERT_SIZE 10*1024
+#define MAX_LOG_SIZE 1024 /* maximum number of log message */
 
 #define MAX_DNSNAME_SIZE 256
 

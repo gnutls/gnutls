@@ -119,7 +119,7 @@ int len;
 
 	if (*hash==-1) {
 #ifdef DEBUG
-		fprintf(stderr, "HASH OID: %s\n", str);
+		_gnutls_log( "HASH OID: %s\n", str);
 #endif
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -210,7 +210,7 @@ gnutls_datum* tbs;
 		return GNUTLS_CERT_TRUSTED;
 	}
 #ifdef DEBUG
-	fprintf(stderr, "PK: %d\n", issuer->subject_pk_algorithm);	
+	_gnutls_log( "PK: %d\n", issuer->subject_pk_algorithm);	
 #endif
 
 	gnutls_assert();

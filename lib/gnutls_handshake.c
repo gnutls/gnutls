@@ -40,7 +40,7 @@
 #include "gnutls_constate.h"
 
 #ifdef HANDSHAKE_DEBUG
-#define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
+#define ERR(x, y) _gnutls_log( "GNUTLS Error: %s (%d)\n", x,y)
 #else
 #define ERR(x, y)
 #endif
@@ -252,7 +252,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	DECR_LEN(len, 2);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Client's version: %d.%d\n", data[pos],
+	_gnutls_log( "Client's version: %d.%d\n", data[pos],
 		data[pos + 1]);
 #endif
 
@@ -355,7 +355,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 				    current_cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr,
+		_gnutls_log(
 			"Cannot find the appropriate handler for the KX algorithm\n");
 #endif
 		gnutls_assert();
@@ -371,7 +371,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 					      compression_method,
 					      &data[pos], z);
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Selected Compression Method: %s\n",
+	_gnutls_log( "Selected Compression Method: %s\n",
 		gnutls_compression_get_name(state->gnutls_internals.
 					    compression_method));
 #endif
@@ -501,15 +501,15 @@ static int _gnutls_server_SelectSuite(GNUTLS_STATE state, opaque ret[2],
 	x = _gnutls_remove_unwanted_ciphersuites(state, &ciphers, x);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Requested cipher suites: \n");
+	_gnutls_log( "Requested cipher suites: \n");
 	for (j = 0; j < datalen; j += 2)
-		fprintf(stderr, "\t%s\n",
+		_gnutls_log( "\t%s\n",
 			_gnutls_cipher_suite_get_name(*
 						      ((GNUTLS_CipherSuite
 							*) & data[j])));
-	fprintf(stderr, "Supported cipher suites: \n");
+	_gnutls_log( "Supported cipher suites: \n");
 	for (j = 0; j < x; j++)
-		fprintf(stderr, "\t%s\n",
+		_gnutls_log( "\t%s\n",
 			_gnutls_cipher_suite_get_name(ciphers[j]));
 #endif
 	memset(ret, '\0', 2);
@@ -519,8 +519,8 @@ static int _gnutls_server_SelectSuite(GNUTLS_STATE state, opaque ret[2],
 			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
 			    0) {
 #ifdef HANDSHAKE_DEBUG
-				fprintf(stderr, "Selected cipher suite: ");
-				fprintf(stderr, "%s\n",
+				_gnutls_log( "Selected cipher suite: ");
+				_gnutls_log( "%s\n",
 					_gnutls_cipher_suite_get_name(*
 								      ((GNUTLS_CipherSuite *) & data[j])));
 #endif
@@ -592,7 +592,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 		memcpy(&data[pos], i_data, i_datasize - 4);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Handshake: %s was send [%ld bytes]\n",
+	_gnutls_log( "Handshake: %s was send [%ld bytes]\n",
 		_gnutls_handshake2str(type), i_datasize);
 #endif
 
@@ -671,7 +671,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 		length32 = READuint24(&dataptr[1]);
 
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr, "Handshake: %s was received [%ld bytes]\n",
+		_gnutls_log( "Handshake: %s was received [%ld bytes]\n",
 			_gnutls_handshake2str(dataptr[0]),
 			length32 + HANDSHAKE_HEADERS_SIZE);
 #endif
@@ -684,7 +684,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 
 		recv_type = dataptr[0];
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr,
+		_gnutls_log(
 			"Handshake: %s(v2) was received [%ld bytes]\n",
 			_gnutls_handshake2str(recv_type),
 			length32 + handshake_headers);
@@ -757,7 +757,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 		break;
 	case GNUTLS_CERTIFICATE_REQUEST:
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr, "Requested Client Certificate!\n");
+		_gnutls_log( "Requested Client Certificate!\n");
 #endif
 		/* FIXME: just ignore that message for the time being 
 		 * we have to parse it and the store the needed information
@@ -825,7 +825,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Server's version: %d.%d\n", data[pos],
+	_gnutls_log( "Server's version: %d.%d\n", data[pos],
 		data[pos + 1]);
 #endif
 	DECR_LEN(len, 2);
@@ -853,8 +853,8 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	DECR_LEN(len, session_id_len);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "SessionID length: %d\n", session_id_len);
-	fprintf(stderr, "SessionID: %s\n",
+	_gnutls_log( "SessionID length: %d\n", session_id_len);
+	_gnutls_log( "SessionID: %s\n",
 		_gnutls_bin2hex(&data[pos], session_id_len));
 #endif
 	if ((state->gnutls_internals.resumed_security_parameters.
@@ -907,8 +907,8 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	       cipher_suite.CipherSuite, 2);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Selected cipher suite: ");
-	fprintf(stderr, "%s\n",
+	_gnutls_log( "Selected cipher suite: ");
+	_gnutls_log( "%s\n",
 		_gnutls_cipher_suite_get_name(state->
 					      security_parameters.
 					      current_cipher_suite));
@@ -936,7 +936,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 				   (cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
 #ifdef HANDSHAKE_DEBUG
-		fprintf(stderr,
+		_gnutls_log(
 			"Cannot find the appropriate handler for the KX algorithm\n");
 #endif
 		gnutls_assert();
@@ -1110,7 +1110,7 @@ static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state)
 	pos += session_id_len;
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Handshake: SessionID: %s\n",
+	_gnutls_log( "Handshake: SessionID: %s\n",
 		_gnutls_bin2hex(SessionID, session_id_len));
 #endif
 
@@ -1264,7 +1264,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state)
 #ifdef HANDSHAKE_DEBUG
 		if (state->gnutls_internals.resumed_security_parameters.
 		    session_id_size > 0)
-			fprintf(stderr, "Ask to resume: %s\n",
+			_gnutls_log( "Ask to resume: %s\n",
 				_gnutls_bin2hex(state->gnutls_internals.
 						resumed_security_parameters.
 						session_id,
@@ -1650,7 +1650,7 @@ int _gnutls_generate_session_id(char *session_id, uint8 * len)
 	*len = TLS_RANDOM_SIZE;
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Generated SessionID: %s\n",
+	_gnutls_log( "Generated SessionID: %s\n",
 		_gnutls_bin2hex(session_id, TLS_RANDOM_SIZE));
 #endif
 	return 0;

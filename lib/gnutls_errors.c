@@ -20,6 +20,8 @@
 
 #include "gnutls_errors.h"
 
+extern void (*_gnutls_log_func)( const char*);
+
 
 #define GNUTLS_ERROR_ENTRY(name, fatal) \
 	{ #name, name, fatal }
@@ -124,7 +126,7 @@ void gnutls_perror(int error)
 	GNUTLS_ERROR_ALG_LOOP(ret =
 			      gnutls_strdup(p->name + sizeof("GNUTLS_E_") - 1));
 
-	fprintf(stderr, "GNUTLS ERROR: %s\n", ret);
+	_gnutls_log( "GNUTLS ERROR: %s\n", ret);
 	
 	free( ret);
 }
@@ -147,4 +149,21 @@ const char* gnutls_strerror(int error)
 			      p->name + sizeof("GNUTLS_E_") - 1);
 
 	return ret;
+}
+
+/* this function will output a message using the
+ * caller provided function 
+ */
+void _gnutls_log( const char *fmt, ...) {
+ va_list args;
+ char str[MAX_LOG_SIZE];
+ void (*log_func)() = _gnutls_log_func;
+ 
+ va_start(args,fmt);
+ vsprintf( str,fmt,args);
+ va_end(args);   
+  
+ log_func( str);
+ 
+ return;
 }

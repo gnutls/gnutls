@@ -33,9 +33,11 @@ static void* old_sig_handler;
 
 typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
 typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
+typedef void (*LOG_FUNC)( const char*);
 
 RECV_FUNC _gnutls_recv_func;
 SEND_FUNC _gnutls_send_func;
+LOG_FUNC _gnutls_log_func;
 
 static node_asn *PKIX1_ASN;
 static node_asn *PKCS1_ASN;
@@ -79,8 +81,27 @@ void gnutls_global_set_send_func( SEND_FUNC send_func) {
 	_gnutls_send_func = send_func;
 }
 
+/**
+  * gnutls_global_set_log_func - This function sets the logging function
+  * @send_func: it's a send(2) like function
+  *
+  * This is the function were you set the logging function gnutls
+  * is going to use. Normaly you may not use this function since
+  * it is only used for debug reason.
+  **/
+void gnutls_global_set_log_func( LOG_FUNC log_func) {
+	_gnutls_log_func = log_func;
+}
+
 int gnutls_is_secure_memory(const void* mem) {
 	return 0;
+}
+
+/* default logging function */
+static void dlog( const char* str) {
+#ifdef DEBUG
+	fprintf( stderr, str);
+#endif
 }
 
 /**
@@ -108,6 +129,7 @@ int gnutls_global_init()
 	 */
 	_gnutls_recv_func = recv;
 	_gnutls_send_func = send;
+	_gnutls_log_func = dlog;
 
 	/* initialize parser 
 	 * This should not deal with files in the final

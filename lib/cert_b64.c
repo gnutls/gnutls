@@ -393,7 +393,7 @@ int main()
 
 
 	if (siz < 0) {
-		fprintf(stderr, "ERROR %d\n", siz);
+		_gnutls_log( "ERROR %d\n", siz);
 		exit(1);
 	}
 	fwrite(b64, siz, 1, stdout);

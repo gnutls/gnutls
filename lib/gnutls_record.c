@@ -342,7 +342,7 @@ int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDes
 	memcpy(&data[1], &desc, 1);
 
 #ifdef RECORD_DEBUG
-	fprintf(stderr, "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
+	_gnutls_log( "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
 #endif
 
 	return gnutls_send_int(cd, state, GNUTLS_ALERT, -1, data, 2, 0);
@@ -424,7 +424,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 	
 #ifdef RECORD_DEBUG
-	fprintf(stderr, "Record: Sending Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_log( "Record: Sending Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
@@ -451,7 +451,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
 #ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: Sended Packet[%d] %s(%d) with length: %d\n",
+		_gnutls_log( "Record: Sended Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 #endif
 
@@ -507,7 +507,7 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Record: Sending ChangeCipherSpec\n");
+	_gnutls_log( "Record: Sending ChangeCipherSpec\n");
 #endif
 
 	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1, 0);
@@ -593,7 +593,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 					       */
 		state->gnutls_internals.v2_hello = length;
 #ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: V2 packet received. Length: %d\n", length);
+		_gnutls_log( "Record: V2 packet received. Length: %d\n", length);
 #endif
 
 	} else {
@@ -611,7 +611,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_get_current_version(state) != version) {
 		gnutls_assert();
 # ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
+		_gnutls_log( "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
 # endif
 		if (type!=GNUTLS_ALERT) {
 			/* some browsers return garbage, when
@@ -626,15 +626,15 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 #endif
 
 #ifdef RECORD_DEBUG
-	fprintf(stderr, "Record: Expected Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_log( "Record: Expected Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
-	fprintf(stderr, "Record: Received Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_log( "Record: Received Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, length);
 #endif
 
 	if (length > MAX_RECV_SIZE) {
 #ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: FATAL ERROR: Received packet with length: %d\n", length);
+		_gnutls_log( "Record: FATAL ERROR: Received packet with length: %d\n", length);
 #endif
 		_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -688,7 +688,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 */
 	if (ret != length) {
 #ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: Received packet with length: %d\nExpected %d\n", ret, length);
+		_gnutls_log( "Record: Received packet with length: %d\nExpected %d\n", ret, length);
 #endif
 		gnutls_free(ciphertext);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -724,7 +724,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 */
 	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
 #ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
+		_gnutls_log( "Record: ChangeCipherSpec Packet was received\n");
 #endif
 
 		gnutls_free(ciphertext);
@@ -741,7 +741,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	}
 
 #ifdef RECORD_DEBUG
-	fprintf(stderr, "Record: Decrypted Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_log( "Record: Decrypted Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
 #endif
 
@@ -761,7 +761,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		switch (recv_type) {
 		case GNUTLS_ALERT:
 #ifdef RECORD_DEBUG
-			fprintf(stderr, "Record: Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
+			_gnutls_log( "Record: Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];
 
@@ -830,7 +830,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			break;
 		default:
 #ifdef RECORD_DEBUG
-			fprintf(stderr, "Record: Received Unknown packet %d expecting %d\n", recv_type, type);
+			_gnutls_log( "Record: Received Unknown packet %d expecting %d\n", recv_type, type);
 #endif
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_ERROR;

@@ -673,7 +673,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
-		fprintf(stderr, "Decoding error %d\n", result);
+		_gnutls_log( "Decoding error %d\n", result);
 #endif		
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
@@ -720,7 +720,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 */
 		gnutls_assert();
 #ifdef DEBUG
-fprintf(stderr, "ALGORITHM: %s\n", str);
+_gnutls_log( "ALGORITHM: %s\n", str);
 return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 #endif
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;

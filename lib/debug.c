@@ -32,7 +32,7 @@ void _gnutls_dump_mpi(char* prefix, MPI a)
 	
 	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, &n, a))
 		strcpy(buf, "[can't print value]");
-	fprintf(stderr, "MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
+	_gnutls_log( "MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
 }
 
 
@@ -57,16 +57,16 @@ char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 void _gnutls_print_state(GNUTLS_STATE state)
 {
 
-	fprintf(stderr, "GNUTLS State:\n");
-	fprintf(stderr, "Connection End: %d\n",
+	_gnutls_log( "GNUTLS State:\n");
+	_gnutls_log( "Connection End: %d\n",
 		state->security_parameters.entity);
-	fprintf(stderr, "Cipher Algorithm: %d\n",
+	_gnutls_log( "Cipher Algorithm: %d\n",
 		state->security_parameters.read_bulk_cipher_algorithm);
-	fprintf(stderr, "MAC algorithm: %d\n",
+	_gnutls_log( "MAC algorithm: %d\n",
 		state->security_parameters.read_mac_algorithm);
-	fprintf(stderr, "Compression Algorithm: %d\n",
+	_gnutls_log( "Compression Algorithm: %d\n",
 		state->security_parameters.read_compression_algorithm);
-	fprintf(stderr, "\n");
+	_gnutls_log( "\n");
 
 }
 
