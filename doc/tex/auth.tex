@@ -1,0 +1,83 @@
+\section{Authentication methods}
+\par
+The following authentication schemas are supported in \gnutls:
+\begin{enumerate}
+ \item X509 Public Key Infrastructure
+ \item Anonymous authentication
+ \item SRP authentication
+\end{enumerate}
+
+\subsection{Authentication using X.509 certificates}
+If using this kind of authentication then the key exchange methods
+shown in \hyperref{figure}{figure }{}{fig:x509} are
+available to use. Authentication in this method is performed using signed
+certificates by a trusted Certificate Authority (CA). Note that \gnutls is
+not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit.}. 
+It does only include the required,
+in order to use the TLS ciphersuites which require X.509 certificates.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+\hline
+RSA & The RSA algorithm is used to encrypt a key and send it to the peer.
+The certificate must allow the key to be used for encryption.
+\\
+\hline
+DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
+parameters which are send to the peer. The key in the certificate must allow
+the key to be used for signing 
+\\
+\hline
+DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
+parameters which are send to the peer. Currently \gnutls does not support this ciphersuite.
+\\
+\hline
+\end{tabular}
+
+\caption{Supported X.509 key exchange algorithms}
+\label{fig:x509}
+
+\end{figure}
+
+\subsection{Anonymous authentication}
+The anonymous key exchanges perform encryption but there is no indication of the 
+identity of the peer. This kind of authentication is vulnerable to man in the middle attack, 
+but this protocol can be used even if there is no prior communication or common trusted
+parties with the peer. Unless really required, do not use anonymous authentication.
+Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:anon}.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+ANON\_DH & This algorithm exchanges Diffie Hellman parameters. 
+\\
+\hline
+\end{tabular}
+
+\caption{Supported anonymous key exchange algorithms}
+\label{fig:anon}
+
+\end{figure}
+
+\subsection{Authentication using SRP}
+Authentication using the SRP\footnote{SRP stands for Secure Password Protocol and 
+is described in RFC2945. The SRP key exchange is not a part of the TLS 1.0 protocol}
+is actually password authentication, since the two peers are identified by the knowledge 
+of a password. This protocol also offers protection against off-line attacks (password file stealing
+etc.). Use SRP authentication if password based authentication is required.
+Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp}.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+SRP & Authentication using the SRP protocol. 
+\\
+\hline
+\end{tabular}
+
+\caption{Supported SRP key exchange algorithms}
+\label{fig:srp}
+
+\end{figure}
