@@ -155,7 +155,9 @@ static void munmap_file(gnutls_datum data)
     munmap(data.data, data.size);
 }
 
-static gnutls_x509_crt x509_crt = NULL;
+#define MAX_CRT 6
+static unsigned int x509_crt_size;
+static gnutls_x509_crt x509_crt[MAX_CRT];
 static gnutls_x509_privkey x509_key = NULL;
 
 static gnutls_openpgp_key pgp_crt = NULL;
@@ -174,15 +176,16 @@ static void load_keys(void)
 	    fprintf(stderr, "*** Error loading cert file.\n");
 	    exit(1);
 	}
-	gnutls_x509_crt_init(&x509_crt);
 
-	ret = gnutls_x509_crt_import(x509_crt, &data, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_list_import(x509_crt, MAX_CRT, &data, GNUTLS_X509_FMT_PEM, 0);
 	if (ret < 0) {
 	    fprintf(stderr,
 		    "*** Error loading cert file: %s\n",
 		    gnutls_strerror(ret));
 	    exit(1);
 	}
+	x509_crt_size = ret;
+	fprintf(stderr, "Processed %d client certificates...\n", ret);
 
 	munmap_file(data);
 
@@ -299,9 +302,9 @@ static int cert_callback(gnutls_session session,
 
     if (st->type == GNUTLS_CRT_X509) {
 	if (x509_crt != NULL && x509_key != NULL) {
-	    st->ncerts = 1;
+	    st->ncerts = x509_crt_size;
 
-	    st->cert.x509 = &x509_crt;
+	    st->cert.x509 = x509_crt;
 	    st->key.x509 = x509_key;
 
 	    st->deinit_all = 0;

@@ -23,6 +23,7 @@ See the end for copying conditions.
 - Eliminated some memory leaks in DHE and RSA-EXPORT cipher suites.
   Reported by Yoann Vandoorselaere <yoann@prelude-ids.org>.
 - Added the functions:
+    gnutls_x509_crt_list_import(),
     gnutls_x509_crq_get_attribute_by_oid(),
     gnutls_x509_crq_set_attribute_by_oid() and
     gnutls_x509_crt_set_extension_by_oid().

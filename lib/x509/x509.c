@@ -1906,3 +1906,94 @@ int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
 }
 
 #endif
+
+#define CLEAR_CERTS \
+    for(j=0;j<count;j++) gnutls_x509_crt_deinit( certs[j])
+/**
+  * gnutls_x509_crt_list_import - This function will import a PEM encoded certificate list
+  * @certs: The structures to store the parsed certificate. Must not be initialized.
+  * @cert_max: The number of certs.
+  * @data: The PEM encoded certificate.
+  * @format: One of DER or PEM. Only PEM is supported for now.
+  * @flags: must be zero.
+  *
+  * This function will convert the given PEM encoded certificate list
+  * to the native gnutls_x509_crt_t format. The output will be stored in @certs.
+  *
+  * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
+  * "CERTIFICATE".
+  *
+  * Returns the number of certificates read or a negative error value.
+  *
+  **/
+int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int cert_max,
+    const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format, unsigned int flags)
+{
+    int size;
+    const char *ptr;
+    gnutls_datum_t tmp;
+    int ret;
+    unsigned int count=0,j;
+
+    /* move to the certificate
+     */
+    ptr = memmem(data->data, data->size,
+		 PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
+    if (ptr == NULL)
+	ptr = memmem(data->data, data->size,
+		     PEM_CERT_SEP2, sizeof(PEM_CERT_SEP2) - 1);
+
+    if (ptr == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_BASE64_DECODING_ERROR;
+    }
+    size = data->size - (ptr - (char*)data->data);
+
+    count = 0;
+
+    do {
+	ret = gnutls_x509_crt_init( &certs[count]);
+	if (ret < 0) {
+            gnutls_assert();
+            goto error;
+        }
+
+	tmp.data = (void*)ptr;
+	tmp.size = size;
+
+	ret = gnutls_x509_crt_import( certs[count], &tmp, GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+            gnutls_assert();
+            goto error;
+        }
+        
+	/* now we move ptr after the pem header 
+	 */
+	ptr++;
+	/* find the next certificate (if any)
+	 */
+	size = data->size - (ptr - (char*)data->data);
+
+	if (size > 0) {
+	    char *ptr2;
+
+	    ptr2 =
+		memmem(ptr, size, PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
+	    if (ptr2 == NULL)
+		ptr2 = memmem(ptr, size, PEM_CERT_SEP2,
+			      sizeof(PEM_CERT_SEP2) - 1);
+
+	    ptr = ptr2;
+	} else
+	    ptr = NULL;
+
+	count++;
+    } while (cert_max > count && ptr != NULL);
+
+    return count;
+
+error:
+    CLEAR_CERTS;
+    return ret;
+}
+

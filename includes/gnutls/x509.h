@@ -83,6 +83,8 @@ int gnutls_x509_crt_init(gnutls_x509_crt_t * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_import(gnutls_x509_crt_t cert, const gnutls_datum_t * data,
     gnutls_x509_crt_fmt_t format);
+int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int cert_max,
+    const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format, unsigned int flags);
 int gnutls_x509_crt_export( gnutls_x509_crt_t cert,
     gnutls_x509_crt_fmt_t format, void* output_data, size_t* output_data_size);
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
