@@ -1,3 +1,10 @@
+2004-03-15 15:54  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/Makefile.am:
+
+	Finally corrected a compilation issue when opencdk was installed in
+	a non-base directory. Some other minor fixes.  
+
 2004-03-13 09:14  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/tex/auth.tex, lib/gnutls.h.in.in,
