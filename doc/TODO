@@ -6,8 +6,6 @@ Current list:
 + Audit the code
 * Add function to clone GNUTLS_STATE structures
 * Precalculate signatures for DHE cipher suites
-* Add the ability to negotiate different type of authentication
-  in rehandshake
 * Minimize footprint.
 * Improve support for compression
 - Add Kerberos support
