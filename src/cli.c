@@ -94,12 +94,12 @@ int cert_list_size = 0;
 			
 			if (cert_list_size > 0) {
 				printf(" - Certificate info:\n");
-				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_extract_certificate_version( &cert_list[0]));
+				printf(" - Certificate version: #%d\n", gnutls_x509pki_extract_certificate_version( &cert_list[0]));
 
-				gnutls_x509pki_client_extract_dn( &cert_list[0], &dn);
+				gnutls_x509pki_extract_certificate_dn( &cert_list[0], &dn);
 				PRINT_DN( dn);
 
-				gnutls_x509pki_client_extract_issuer_dn( &cert_list[0], &dn);
+				gnutls_x509pki_extract_certificate_issuer_dn( &cert_list[0], &dn);
 				printf(" - Certificate Issuer's info:\n");
 				PRINT_DN( dn);
 			}
@@ -189,20 +189,20 @@ int main(int argc, char** argv)
 	}
 
 	/* X509 stuff */
-	if (gnutls_allocate_x509_client_sc( &xcred, 1) < 0) {  /* space for 1 certificate */
+	if (gnutls_x509pki_allocate_client_sc( &xcred, 1) < 0) {  /* space for 1 certificate */
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_set_x509_client_trust( xcred, CAFILE, CRLFILE);
-	gnutls_set_x509_client_key( xcred, CLICERTFILE, CLIKEYFILE);
-	gnutls_set_x509_cert_callback( xcred, cert_callback);
+	gnutls_x509pki_set_client_trust( xcred, CAFILE, CRLFILE);
+	gnutls_x509pki_set_client_key( xcred, CLICERTFILE, CLIKEYFILE);
+	gnutls_x509pki_set_client_cert_callback( xcred, cert_callback);
 
 	/* SRP stuff */
-	if (gnutls_allocate_srp_client_sc( &cred)<0) {
+	if (gnutls_srp_allocate_client_sc( &cred)<0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_set_srp_client_cred( cred, "test", "test");
+	gnutls_srp_set_client_cred( cred, "test", "test");
 	
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
@@ -407,9 +407,10 @@ int main(int argc, char** argv)
 	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);
 	
-	gnutls_free_srp_client_sc( cred);
-	gnutls_free_x509_client_sc( xcred);
 	gnutls_deinit( state);
+
+	gnutls_srp_free_client_sc( cred);
+	gnutls_x509pki_free_client_sc( xcred);
 
 	gnutls_global_deinit();
 	

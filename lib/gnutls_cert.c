@@ -33,6 +33,7 @@
 #include <x509_extensions.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_dh.h>
+#include <gnutls_auth_int.h>
 
 #ifdef DEBUG
 # warning MAX ALGORITHM PARAMS == 2, ok for RSA
@@ -96,14 +97,14 @@ void gnutls_free_cert(gnutls_cert cert)
 }
 
 /**
-  * gnutls_free_x509_sc - Used to free an allocated x509 SERVER CREDENTIALS structure
+  * gnutls_x509pki_free_sc - Used to free an allocated x509 SERVER CREDENTIALS structure
   * @sc: is an &X509PKI_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_x509_sc(X509PKI_CREDENTIALS sc)
+void gnutls_x509pki_free_sc(X509PKI_CREDENTIALS sc)
 {
 	int i, j;
 
@@ -205,9 +206,9 @@ static int read_cert_file(X509PKI_CREDENTIALS res, char *certfile)
 
 	res->cert_list_length[res->ncerts] = i - 1;
 
-	/* WE DO NOT CATCH OVERRUNS in gnutls_set_x509_key().
+	/* WE DO NOT CATCH OVERRUNS in gnutls_x509pki_set_key().
 	 * This function should be called as many times as specified 
-	 * in allocate_x509_sc().
+	 * in x509pki_allocate_sc().
 	 */
 	res->ncerts++;
 
@@ -331,7 +332,7 @@ static int read_key_file(X509PKI_CREDENTIALS res, char *keyfile)
 
 
 /**
-  * gnutls_allocate_x509_sc - Used to allocate an x509 SERVER CREDENTIALS structure
+  * gnutls_x509pki_allocate_sc - Used to allocate an x509 SERVER CREDENTIALS structure
   * @res: is a pointer to an &X509PKI_CREDENTIALS structure.
   * @ncerts: this is the number of certificate/private key pair you're going to use.
   * This should be 1 in common sites.
@@ -340,15 +341,13 @@ static int read_key_file(X509PKI_CREDENTIALS res, char *keyfile)
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS * res, int ncerts)
+int gnutls_x509pki_allocate_sc(X509PKI_CREDENTIALS * res, int ncerts)
 {
 	*res = gnutls_calloc(1, sizeof(X509PKI_CREDENTIALS_INT));
 
 	if (*res == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-
-	(*res)->dh_bits = DEFAULT_BITS;
 
 	(*res)->ncerts = 0;	/* this is right - set_key() increments it */
 
@@ -384,7 +383,7 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS * res, int ncerts)
 }
 
 /**
-  * gnutls_set_x509_key - Used to set keys in a X509PKI_CREDENTIALS structure
+  * gnutls_x509pki_set_key - Used to set keys in a X509PKI_CREDENTIALS structure
   * @res: is an &X509PKI_CREDENTIALS structure.
   * @CERTFILE: is a PEM encoded file containing the certificate list (path) for
   * the specified private key
@@ -399,8 +398,8 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS * res, int ncerts)
   * this function.
   *
   **/
-int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char *CERTFILE,
-			char *KEYFILE)
+int gnutls_x509pki_set_key(X509PKI_CREDENTIALS res, char *CERTFILE,
+			   char *KEYFILE)
 {
 	int ret;
 
@@ -416,7 +415,7 @@ int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char *CERTFILE,
 }
 
 /**
-  * gnutls_set_x509_trust - Used to set trusted CAs in a X509PKI_CREDENTIALS structure
+  * gnutls_x509pki_set_trust - Used to set trusted CAs in a X509PKI_CREDENTIALS structure
   * @res: is an &X509PKI_CREDENTIALS structure.
   * @CAFILE: is a PEM encoded file containing trusted CAs
   * @CRLFILE: is a PEM encoded file containing CRLs (ignored for now)
@@ -424,8 +423,8 @@ int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char *CERTFILE,
   * This function sets the trusted CAs in order to verify client
   * certificates.
   **/
-int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
-			  char *CRLFILE)
+int gnutls_x509pki_set_trust(X509PKI_CREDENTIALS res, char *CAFILE,
+			     char *CRLFILE)
 {
 	int ret, size, i;
 	opaque *pdata;
@@ -438,7 +437,7 @@ int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
 	 * This will be sent to clients when a certificate
 	 * request message is sent.
 	 */
-	
+
 	/* FIXME: in case of a client it is not needed
 	 * to do that. This would save time and memory.
 	 * However we don't have that information available
@@ -447,16 +446,14 @@ int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
 
 	size = 0;
 	for (i = 0; i < res->ncas; i++) {
-		if ((ret =
-		     _gnutls_find_dn(&tmp,
-				     &res->ca_list[i])) < 0) {
+		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
 			gnutls_assert();
 			return ret;
 		}
 		size += (2 + tmp.size);
 	}
 
-	res->rdn_sequence.data = gnutls_malloc( size);
+	res->rdn_sequence.data = gnutls_malloc(size);
 	if (res->rdn_sequence.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -466,16 +463,14 @@ int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
 	pdata = res->rdn_sequence.data;
 
 	for (i = 0; i < res->ncas; i++) {
-		if ((ret =
-		     _gnutls_find_dn(&tmp,
-				     &res->ca_list[i])) < 0) {
+		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
 			gnutls_free(res->rdn_sequence.data);
 			res->rdn_sequence.size = 0;
 			res->rdn_sequence.data = NULL;
 			gnutls_assert();
 			return ret;
 		}
-		WRITEdatum16( pdata, tmp);
+		WRITEdatum16(pdata, tmp);
 		pdata += (2 + tmp.size);
 	}
 
@@ -483,18 +478,17 @@ int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
 }
 
 /**
-  * gnutls_set_x509_dh_bits - Used to set the bits for a DHE_* ciphersuite
-  * @res: is an &X509PKI_CREDENTIALS structure.
+  * gnutls_x509pki_set_dh_bits - Used to set the bits for a DHE_* ciphersuite
+  * @state: is a &GNUTLS_STATE structure.
   * @bits: is the number of bits
   *
   * This function sets the number of bits, for use in a Diffie Hellman key exchange.
-  * This will only occur in a DHE ciphersuite.
+  * This value will only be used in case of DHE ciphersuite.
   *
   **/
-int gnutls_set_x509_dh_bits(X509PKI_CREDENTIALS res, int bits)
+void gnutls_x509pki_set_dh_bits(GNUTLS_STATE state, int bits)
 {
-	res->dh_bits = bits;
-	return 0;
+	state->gnutls_internals.x509pki_dhe_bits = bits;
 }
 
 
@@ -831,8 +825,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	opaque str[MAX_X509_CERT_SIZE];
 	int len = sizeof(str);
 
-	memset( gCert, 0, sizeof(gnutls_cert));
-	
+	memset(gCert, 0, sizeof(gnutls_cert));
+
 	gCert->valid = 1;
 
 	if (asn1_create_structure
@@ -913,7 +907,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 
 	}
-	
+
 	len = sizeof(gCert->signature);
 	result =
 	    asn1_read_value
@@ -961,7 +955,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 /* Returns 0 if it's ok to use the KXAlgorithm with this cert
  * (using KeyUsage field). 
  */
-int _gnutls_check_x509_key_usage(const gnutls_cert * cert, KXAlgorithm alg)
+int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
+				    KXAlgorithm alg)
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
 		switch (alg) {
@@ -1013,7 +1008,7 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 	for (kx = 0; kx < 255; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
-			if (_gnutls_check_x509_key_usage(cert, kx) == 0) {
+			if (_gnutls_check_x509pki_key_usage(cert, kx) == 0) {
 				kxlist[i] = kx;
 				i++;
 			}
@@ -1035,31 +1030,65 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
  * The 'appropriate' is defined by the user.
  * FIXME: provide user callback.
  */
-const gnutls_cert *_gnutls_find_cert( GNUTLS_STATE state, gnutls_cert ** cert_list,
-			       int cert_list_length)
+const gnutls_cert *_gnutls_server_find_cert(GNUTLS_STATE state,
+					    gnutls_cert ** cert_list,
+					    int cert_list_length)
 {
 	int i;
 
-	i = _gnutls_find_cert_list_index( state, cert_list, cert_list_length);
-	if (i<0) return NULL;
-	
+	i = _gnutls_server_find_cert_list_index(state, cert_list,
+					 cert_list_length);
+	if (i < 0)
+		return NULL;
+
 	return &cert_list[i][0];
 }
 
 /* finds the most appropriate certificate in the cert list.
  * The 'appropriate' is defined by the user.
- * FIXME: provide user callback.
  */
-int _gnutls_find_cert_list_index( GNUTLS_STATE state, gnutls_cert ** cert_list,
-				 int cert_list_length)
+int _gnutls_server_find_cert_list_index(GNUTLS_STATE state,
+					gnutls_cert ** cert_list,
+					int cert_list_length)
 {
-	int index = 0;
+	int i, index = -1;
+	const X509PKI_CREDENTIALS cred;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	if (cred->ncerts > 0)
+		index = 0;	/* default is use the first certificate */
+
+	if (state->gnutls_internals.client_cert_callback != NULL && cred->ncerts > 0) {	/* use the callback to get certificate */
+		gnutls_datum *my_certs = NULL;
+
+		my_certs =
+		    gnutls_malloc(cred->ncerts * sizeof(gnutls_datum));
+		if (my_certs == NULL)
+			goto clear;
+
+		/* put our certificate's issuer and dn into cdn, idn
+		 */
+		for (i = 0; i < cred->ncerts; i++) {
+			my_certs[i] = cred->cert_list[i][0].raw;
+		}
+		index =
+		    state->gnutls_internals.server_cert_callback(my_certs,
+								 cred->ncerts);
+
+	      clear:
+		gnutls_free(my_certs);
+	}
 
 	return index;
 }
 
 /**
-  * gnutls_x509pki_set_cert_request - Used to set whether to request a client certificate
+  * gnutls_x509pki_server_set_cert_request - Used to set whether to request a client certificate
   * @state: is an &GNUTLS_STATE structure.
   * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
   *
@@ -1070,16 +1099,15 @@ int _gnutls_find_cert_list_index( GNUTLS_STATE state, gnutls_cert ** cert_list,
   * call this function then the client will not be asked to
   * send a certificate.
   **/
-int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
-				    CertificateRequest req)
+void gnutls_x509pki_server_set_cert_request(GNUTLS_STATE state,
+					    CertificateRequest req)
 {
 	state->gnutls_internals.send_cert_req = req;
-	return 0;
 }
 
 /**
-  * gnutls_set_x509_cert_callback - Used to set a callback while selecting the proper (client) certificate
-  * @cred: is an &X509PKI_CLIENT_CREDENTIALS structure.
+  * gnutls_x509pki_set_client_cert_callback - Used to set a callback while selecting the proper (client) certificate
+  * @state: is a &GNUTLS_STATE structure.
   * @func: is the callback function
   *
   * The callback's function form is:
@@ -1091,7 +1119,7 @@ int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
   * 'req_ca_cert' contains a list with the CA names that the server
   * considers trusted. Normaly we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
-  * meaningful value use the function _gnutls_dn2gnutlsdn().
+  * meaningful value use the function gnutls_x509pki_extract_dn().
   *
   * This function specifies what we (in case of a client) are going
   * to do when we have to send a certificate. If this callback
@@ -1116,9 +1144,40 @@ int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
   *
   * This function returns 0 on success.
   **/
-int gnutls_set_x509_cert_callback(X509PKI_CREDENTIALS cred,
-				  x509_cert_callback_func * func)
+void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
+					     x509pki_client_cert_callback_func
+					     * func)
 {
-	cred->client_cert_callback = func;
-	return 0;
+	state->gnutls_internals.client_cert_callback = func;
+}
+
+/**
+  * gnutls_x509pki_set_server_cert_callback - Used to set a callback while selecting the proper (server) certificate
+  * @state: is a &GNUTLS_STATE structure.
+  * @func: is the callback function
+  *
+  * The callback's function form is:
+  * int (*callback)(gnutls_datum *server_cert, int ncerts);
+  *
+  * 'server_cert' contains 'ncerts' gnutls_datum structures which hold
+  * the DER encoded X.509 certificates of the server. 
+  *
+  * This function specifies what we (in case of a server) are going
+  * to do when we have to send a certificate. If this callback
+  * function is not provided then gnutls will automaticaly try to
+  * find an appropriate certificate to send. (actually send the first in the list)
+  *
+  * In case the callback returned a negative number then gnutls will
+  * not attempt to choose the appropriate certificate and the caller function
+  * will fail.
+  *
+  * The callback function should return the index of the certificate
+  * choosen by the server (or -1 in case of an error)
+  *
+  **/
+void gnutls_x509pki_set_server_cert_callback(GNUTLS_STATE state,
+					     x509pki_server_cert_callback_func
+					     * func)
+{
+	state->gnutls_internals.server_cert_callback = func;
 }

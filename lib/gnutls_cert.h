@@ -49,14 +49,14 @@ struct GNUTLS_STATE_INT; /* because GNUTLS_STATE is not defined when this file i
 int _gnutls_cert_supported_kx( const gnutls_cert* cert, KXAlgorithm **alg, int *alg_size);
 PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm);
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert);
-const gnutls_cert* _gnutls_find_cert( struct GNUTLS_STATE_INT*, gnutls_cert** cert_list, int cert_list_length);
-int _gnutls_find_cert_list_index( struct GNUTLS_STATE_INT*, gnutls_cert ** cert_list, int cert_list_length);
+const gnutls_cert* _gnutls_server_find_cert( struct GNUTLS_STATE_INT*, gnutls_cert** cert_list, int cert_list_length);
+int _gnutls_server_find_cert_list_index( struct GNUTLS_STATE_INT*, gnutls_cert ** cert_list, int cert_list_length);
 
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data);
 int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_DN * dn);
 void gnutls_free_cert(gnutls_cert cert);
-int _gnutls_check_x509_key_usage( const gnutls_cert * cert, KXAlgorithm alg);
+int _gnutls_check_x509pki_key_usage( const gnutls_cert * cert, KXAlgorithm alg);
 int _gnutls_get_version(node_asn * c2, char *root);
 time_t _gnutls_get_time(node_asn * c2, char *root, char *when);
 

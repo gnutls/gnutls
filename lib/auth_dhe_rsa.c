@@ -62,7 +62,6 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 	uint8 *data_g;
 	uint8 *data_X;
 	int ret = 0, data_size;
-	const X509PKI_CREDENTIALS cred;
 	int bits;
 	gnutls_cert *apr_cert_list;
 	gnutls_private_key *apr_pkey;
@@ -70,13 +69,9 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 	gnutls_datum signature, ddata;
 	X509PKI_AUTH_INFO info;
 
-	cred =
-	    _gnutls_get_kx_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
+	bits = state->gnutls_internals.x509pki_dhe_bits;
+	if (bits < MIN_BITS)
 		bits = DEFAULT_BITS;	/* default */
-	} else {
-		bits = cred->dh_bits;
-	}
 
 	/* find the appropriate certificate */
 	if ((ret =
@@ -357,16 +352,11 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	uint16 n_Y;
 	size_t _n_Y;
 	MPI g, p;
-	const X509PKI_CREDENTIALS cred;
 	int bits, ret;
 
-	cred =
-	    _gnutls_get_kx_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
+	bits = state->gnutls_internals.x509pki_dhe_bits;
+	if (bits < MIN_BITS)
 		bits = DEFAULT_BITS;	/* default */
-	} else {
-		bits = cred->dh_bits;
-	}
 
 
 	n_Y = READuint16(&data[0]);

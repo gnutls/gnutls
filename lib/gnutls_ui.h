@@ -38,7 +38,8 @@ typedef struct {
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
 
-typedef int x509_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int x509pki_client_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int x509pki_server_cert_callback_func(const gnutls_datum *, int);
 
 /* Functions that allow AUTH_INFO structures handling
  */
@@ -56,12 +57,17 @@ int gnutls_anon_client_get_dh_bits( GNUTLS_STATE state);
 
 /* X509PKI */
 
-int gnutls_set_x509_cert_callback( X509PKI_CREDENTIALS, x509_cert_callback_func *);
-int gnutls_x509pki_set_cert_request( GNUTLS_STATE, CertificateRequest);
+void gnutls_x509pki_set_client_cert_callback( X509PKI_CREDENTIALS, x509pki_client_cert_callback_func *);
+
+void gnutls_x509pki_set_server_cert_callback( X509PKI_CREDENTIALS, x509pki_server_cert_callback_func *);
+void gnutls_x509pki_server_set_cert_request( GNUTLS_STATE, CertificateRequest);
+
+void gnutls_x509pki_set_dh_bits( GNUTLS_STATE state, int bits);
 
 /* X.509 certificate handling functions */
 int gnutls_x509pki_extract_dn( const gnutls_datum*, gnutls_DN*);
-int gnutls_x509pki_extract_issuer_dn(  const gnutls_datum*, gnutls_DN *);
+int gnutls_x509pki_extract_certificate_dn( const gnutls_datum*, gnutls_DN*);
+int gnutls_x509pki_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_DN *);
 int gnutls_x509pki_extract_certificate_version( const gnutls_datum*);
 time_t gnutls_x509pki_extract_certificate_activation_time( const gnutls_datum*);
 time_t gnutls_x509pki_extract_certificate_expiration_time( const gnutls_datum*);
@@ -76,23 +82,11 @@ int gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
 #define gnutls_x509pki_server_get_dh_bits gnutls_x509pki_get_dh_bits
 #define gnutls_x509pki_client_get_dh_bits gnutls_x509pki_get_dh_bits
 
-#define gnutls_x509pki_server_extract_dn gnutls_x509pki_extract_dn
-#define gnutls_x509pki_server_extract_issuer_dn gnutls_x509pki_extract_issuer_dn
 #define gnutls_x509pki_server_get_peer_certificate_status gnutls_x509pki_get_peer_certificate_status
 #define gnutls_x509pki_server_get_peer_certificate_list gnutls_x509pki_get_peer_certificate_list
-#define gnutls_x509pki_server_extract_certificate_version gnutls_x509pki_extract_certificate_version
-#define gnutls_x509pki_server_extract_certificate_activation_time gnutls_x509pki_extract_certificate_activation_time
-#define gnutls_x509pki_server_extract_certificate_expiration_time gnutls_x509pki_extract_certificate_expiration_time
-#define gnutls_x509pki_server_extract_subject_dns_name gnutls_x509pki_extract_subject_dns_name
 
-#define gnutls_x509pki_client_extract_dn gnutls_x509pki_extract_dn
-#define gnutls_x509pki_client_extract_issuer_dn gnutls_x509pki_extract_issuer_dn
 #define gnutls_x509pki_client_get_peer_certificate_status gnutls_x509pki_get_peer_certificate_status
 #define gnutls_x509pki_client_get_peer_certificate_list gnutls_x509pki_get_peer_certificate_list
-#define gnutls_x509pki_client_extract_certificate_version gnutls_x509pki_extract_certificate_version
-#define gnutls_x509pki_client_extract_certificate_activation_time gnutls_x509pki_extract_certificate_activation_time
-#define gnutls_x509pki_client_extract_certificate_expiration_time gnutls_x509pki_extract_certificate_expiration_time
-#define gnutls_x509pki_client_extract_subject_dns_name gnutls_x509pki_extract_subject_dns_name
 
 # endif /* LIBGNUTLS_VERSION */
 

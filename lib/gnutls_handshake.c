@@ -1875,6 +1875,9 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	int alg_size;
 	KXAlgorithm kx;
 
+	/* ONLY USED IN CASE OF A SERVER.
+	 */
+	 
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
 		return 0;
 
@@ -1893,7 +1896,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	cert = NULL;
 
 	cert =
-	    _gnutls_find_cert(state, x509_cred->cert_list,
+	    _gnutls_server_find_cert(state, x509_cred->cert_list,
 						      x509_cred->ncerts);
 
 	if (cert == NULL) {

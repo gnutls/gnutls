@@ -27,17 +27,12 @@ typedef struct {
 	int ncas;	/* number of CAs in the ca_list 
 			 */
 
-	/* this is a callback function to call if no appropriate
-	 * client certificates were found.
-	 */
-	x509_cert_callback_func*	client_cert_callback;
-	int 				dh_bits;
-					/* holds a sequence of the
-					 * RDNs of the CAs above.
-					 * This is better than
-					 * generating it every time.
-					 */
-	gnutls_datum			rdn_sequence;
+			/* holds a sequence of the
+			 * RDNs of the CAs above.
+			 * This is better than
+			 * generating it every time.
+			 */
+	gnutls_datum	rdn_sequence;
 } X509PKI_CREDENTIALS_INT;
 
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */

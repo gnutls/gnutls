@@ -42,6 +42,8 @@
 
 #define GNUTLS_LIST ...
 
+#define MIN_BITS 1023
+
 #define MAX32 4294967295
 #define MAX24 16777215
 #define MAX16 65535
@@ -338,7 +340,8 @@ typedef struct {
 #define CompressionMethod_Priority GNUTLS_Priority
 #define Protocol_Priority GNUTLS_Priority
 
-typedef int x509_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int x509pki_client_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int x509pki_server_cert_callback_func(const gnutls_datum *, int);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
@@ -451,7 +454,10 @@ typedef struct {
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
 	 */
-	x509_cert_callback_func*	x509_client_cert_callback;
+	x509pki_client_cert_callback_func*	client_cert_callback;
+	x509pki_server_cert_callback_func*	server_cert_callback;
+	int				x509pki_dhe_bits;
+	
 	int				max_handshake_data_buffer_size;
 
 	/* PUSH & PULL functions.

@@ -95,7 +95,7 @@ GNUTLS_STATE initialize_state()
 
 	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
-	gnutls_x509pki_set_cert_request( state, GNUTLS_CERT_REQUEST);
+	gnutls_x509pki_server_set_cert_request( state, GNUTLS_CERT_REQUEST);
 
 	return state;
 }
@@ -169,13 +169,13 @@ void print_info(GNUTLS_STATE state)
 
 			if (cert_list_size > 0) {
 				printf(" - Certificate info:\n");
-				printf(" - Certificate version: #%d\n", gnutls_x509pki_server_extract_certificate_version( &cert_list[0]));
+				printf(" - Certificate version: #%d\n", gnutls_x509pki_extract_certificate_version( &cert_list[0]));
 
-				if ( gnutls_x509pki_server_extract_dn( &cert_list[0], &dn) >= 0) {
+				if ( gnutls_x509pki_extract_certificate_dn( &cert_list[0], &dn) >= 0) {
 					PRINT_DN( dn);
 				}
 				
-				if (gnutls_x509pki_server_extract_dn( &cert_list[0], &dn) >= 0) {
+				if (gnutls_x509pki_extract_certificate_issuer_dn( &cert_list[0], &dn) >= 0) {
 					printf(" - Certificate Issuer's info:\n");
 					PRINT_DN( dn);
 				}
@@ -357,17 +357,17 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_allocate_x509_server_sc(&x509_cred, 1) < 0) {
+	if (gnutls_x509pki_allocate_server_sc(&x509_cred, 1) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 
-	if (gnutls_set_x509_server_trust( x509_cred, CAFILE, CRLFILE) < 0) {
+	if (gnutls_x509pki_set_server_trust( x509_cred, CAFILE, CRLFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_set_x509_server_key( x509_cred, CERTFILE, KEYFILE) < 0) {
+	if (gnutls_x509pki_set_server_key( x509_cred, CERTFILE, KEYFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
@@ -375,11 +375,11 @@ int main(int argc, char **argv)
 	/* this is a password file (created with the included srpcrypt utility) 
 	 * Read README.crypt prior to using SRP.
 	 */
-	gnutls_allocate_srp_server_sc( &srp_cred);
-	gnutls_set_srp_server_cred( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
+	gnutls_srp_allocate_server_sc( &srp_cred);
+	gnutls_srp_set_server_cred( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
-	gnutls_allocate_anon_server_sc( &dh_cred);
-	gnutls_set_anon_server_cred( dh_cred, 1024);
+	gnutls_anon_allocate_server_sc( &dh_cred);
+	gnutls_anon_set_server_cred( dh_cred, 1024);
 
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
@@ -504,9 +504,9 @@ int main(int argc, char **argv)
 	}
 	close(listen_sd);
 
-	gnutls_free_x509_server_sc(x509_cred);
-	gnutls_free_srp_server_sc(srp_cred);
-	gnutls_free_anon_server_sc(dh_cred);
+	gnutls_x509pki_free_server_sc(x509_cred);
+	gnutls_srp_free_server_sc(srp_cred);
+	gnutls_anon_free_server_sc(dh_cred);
 
 	gnutls_global_deinit();
 	

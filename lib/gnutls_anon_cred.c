@@ -34,7 +34,7 @@
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_anon_server_sc( ANON_SERVER_CREDENTIALS sc) {
+void gnutls_anon_free_server_sc( ANON_SERVER_CREDENTIALS sc) {
 	gnutls_free(sc);
 }
 
@@ -46,7 +46,7 @@ void gnutls_free_anon_server_sc( ANON_SERVER_CREDENTIALS sc) {
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS *sc) {
+int gnutls_anon_allocate_server_sc( ANON_SERVER_CREDENTIALS *sc) {
 	*sc = gnutls_malloc(sizeof( ANON_SERVER_CREDENTIALS));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -54,7 +54,7 @@ int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS *sc) {
 }
 
 /**
-  * gnutls_set_anon_server_cred - Used to set the number of bits to use in DH, in a ANON_SERVER_CREDENTIALS structure
+  * gnutls_anon_set_server_cred - Used to set the number of bits to use in DH, in a ANON_SERVER_CREDENTIALS structure
   * @res: is an &ANON_SERVER_CREDENTIALS structure.
   * @dh_bits: is the number of bits in DH key exchange
   *
@@ -63,7 +63,7 @@ int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS *sc) {
   *
   **/
 
-int gnutls_set_anon_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits) {
+int gnutls_anon_set_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits) {
 	res->dh_bits = dh_bits;
 	return 0;
 }
