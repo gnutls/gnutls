@@ -1,3 +1,36 @@
+2002-08-17 20:49  nmav <nmav@gnutls.org>
+
+	* AUTHORS:
+
+	included cvs aliases into authors file 
+
+2002-08-17 15:34  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_algorithms.c, gnutls.h.in.in:
+
+	Added gnutls_cipher_suite_get_name(). This functions constructs the
+	name of a cipher suite using the given algorithms.  
+
+2002-08-15 21:49  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_handshake.c, gnutls_int.h:
+
+	Added new function gnutls_handshake_check_direction(), which returns
+	the state where the handshake function was interrupted.  
+
+2002-08-15 09:58  nmav <nmav@gnutls.org>
+
+	* buildconf, configure.in, doc/README.CVS:
+
+	Added the --enable-maintainer-mode configure option, and renamed the
+	old one to --enable-developer-mode.  
+
+2002-08-15 03:36  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls.h.in.in, lib/gnutls_x509.c:
+
+	added some missing consts 
+
 2002-07-21 19:15  admcd <admcd@gnutls.org>
 
 	* doc/tex/openssl.tex:
