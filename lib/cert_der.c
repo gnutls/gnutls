@@ -209,6 +209,7 @@ _asn1_time_der(unsigned char *str,unsigned char *der,int *der_len)
 }
 
 
+/*
 void
 _asn1_get_utctime_der(unsigned char *der,int *der_len,unsigned char *str)
 {
@@ -241,10 +242,11 @@ _asn1_get_utctime_der(unsigned char *der,int *der_len,unsigned char *str)
   }
   strcpy(str,temp);
 }
+*/
 
 
 void
-_asn1_generalizedtime_der(unsigned char *der,int *der_len,unsigned char *str)
+_asn1_get_time_der(unsigned char *der,int *der_len,unsigned char *str)
 {
   int len_len,str_len;
 
@@ -1056,16 +1058,9 @@ asn1_get_der(node_asn *root,unsigned char *der,int len)
 	move=RIGHT;
       break;
       case TYPE_TIME:
-	if(p->type&CONST_UTC){
-	  _asn1_get_utctime_der(der+counter,&len2,temp);
-	  _asn1_set_value(p,temp,strlen(temp)+1);
-	  counter+=len2;
-	}
-	else{
-	  _asn1_generalizedtime_der(der+counter,&len2,temp);
-	  _asn1_set_value(p,temp,strlen(temp)+1);
-	  counter+=len2;
-	}
+	_asn1_get_time_der(der+counter,&len2,temp);
+	_asn1_set_value(p,temp,strlen(temp)+1);
+	counter+=len2;
 	move=RIGHT;
 	break;
       case TYPE_OCTET_STRING:
