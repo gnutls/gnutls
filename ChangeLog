@@ -1,3 +1,28 @@
+2003-12-20 20:22  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, auth_cert.c, auth_dhe.c, auth_rsa.c,
+	auth_rsa_export.c, gnutls_cert.c, gnutls_cert.h, gnutls_x509.c,
+	gnutls_x509.h:
+
+	several cleanups.  
+
+2003-12-20 18:53  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c:
+
+	Corrected bug which disallowed ciphersuites other than the
+	CERTIFICATE ones to work.  
+
+2003-12-20 18:49  nmav <nmav@gnutls.org>
+
+	* doc/TODO, lib/auth_cert.c, lib/gnutls_cert.c, lib/gnutls_int.h,
+	lib/gnutls_ui.h, lib/gnutls_x509.c, lib/gnutls_x509.h:
+
+	Improved gnutls_certificate_client_retrieve_function() and
+	gnutls_certificate_server_retrieve_function() so that the parsing
+	time spent within them is minimized. Also added
+	gnutls_openpgp_privkey struct. No testing yet.  
+
 2003-12-19 13:53  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_cert.h:
