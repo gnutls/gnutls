@@ -21,16 +21,6 @@
 #ifndef DEFINES_H
 # define DEFINES_H
 
-#ifndef __GNUC__
-# if HAVE_ALLOCA_H
-#  include <alloca.h>
-# else
-#  ifdef _AIX
-#pragma alloca
-#  endif
-# endif
-#endif
-
 #include <config.h>
 
 #ifdef STDC_HEADERS
