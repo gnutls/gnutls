@@ -1,0 +1,13 @@
+helpnode "tls_test help\nUsage: tls_test [options] hostname"
+
+#int pp;
+option (p, port) INT "integer" { $pp = $1 } "The port to connect to."
+
+option (h, help) { gaa_help(); exit(0); } "prints this help"
+
+#int nrest_args;
+#char **rest_args;
+rest optional *STR "hostname" { $rest_args = $1; $nrest_args = @1 }
+
+init { $rest_args=NULL; $nrest_args=0; $pp = 5556; }
+
