@@ -53,7 +53,7 @@ void gnutls_dh_set_prime_bits(gnutls_session session, int bits)
   * gnutls_dh_get_prime_bits - This function returns the bits used in DH authentication
   * @session: is a gnutls session
   *
-  * This function will return the bits used in the last Diffie Hellman authentication
+  * This function will return the bits of the prime used in the last Diffie Hellman authentication
   * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
   * Returns a negative value in case of an error.
   *
