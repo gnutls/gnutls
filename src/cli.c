@@ -98,7 +98,7 @@ int main()
 		gnutls_send( sd, state, buffer, strlen(buffer));
 	}
 	gnutls_close(sd, state);
-
+	
 	shutdown( sd, SHUT_WR);
 
 	gnutls_deinit(&state);
