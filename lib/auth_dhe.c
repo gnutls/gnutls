@@ -28,33 +28,54 @@
 #include <gnutls_datum.h>
 #include <auth_x509.h>
 
-static int gen_dhe_rsa_server_kx(GNUTLS_STATE, opaque **);
-static int gen_dhe_rsa_client_kx(GNUTLS_STATE, opaque **);
-static int proc_dhe_rsa_server_kx(GNUTLS_STATE, opaque *, int);
-static int proc_dhe_rsa_client_kx(GNUTLS_STATE, opaque *, int);
+static int gen_dhe_server_kx(GNUTLS_STATE, opaque **);
+static int gen_dhe_client_kx(GNUTLS_STATE, opaque **);
+static int proc_dhe_server_kx(GNUTLS_STATE, opaque *, int);
+static int proc_dhe_client_kx(GNUTLS_STATE, opaque *, int);
 
 MOD_AUTH_STRUCT dhe_rsa_auth_struct = {
 	"DHE_RSA",
 	_gnutls_gen_x509_server_certificate,
 	_gnutls_gen_x509_client_certificate,
-	gen_dhe_rsa_server_kx,
+	gen_dhe_server_kx,
 	NULL,
 	NULL,
-	gen_dhe_rsa_client_kx,
+	gen_dhe_client_kx,
 	_gnutls_gen_x509_client_cert_vrfy,	/* gen client cert vrfy */
 	_gnutls_gen_x509_server_cert_req,	/* server cert request */
 
 	_gnutls_proc_x509_server_certificate,
 	_gnutls_proc_x509_client_certificate,
-	proc_dhe_rsa_server_kx,
+	proc_dhe_server_kx,
 	NULL,
 	NULL,
-	proc_dhe_rsa_client_kx,
+	proc_dhe_client_kx,
 	_gnutls_proc_x509_client_cert_vrfy,	/* proc client cert vrfy */
 	_gnutls_proc_x509_cert_req	/* proc server cert request */
 };
 
-static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
+MOD_AUTH_STRUCT dhe_dss_auth_struct = {
+	"DHE_DSS",
+	_gnutls_gen_x509_server_certificate,
+	_gnutls_gen_x509_client_certificate,
+	gen_dhe_server_kx,
+	NULL,
+	NULL,
+	gen_dhe_client_kx,
+	_gnutls_gen_x509_client_cert_vrfy,	/* gen client cert vrfy */
+	_gnutls_gen_x509_server_cert_req,	/* server cert request */
+
+	_gnutls_proc_x509_server_certificate,
+	_gnutls_proc_x509_client_certificate,
+	proc_dhe_server_kx,
+	NULL,
+	NULL,
+	proc_dhe_client_kx,
+	_gnutls_proc_x509_client_cert_vrfy,	/* proc client cert vrfy */
+	_gnutls_proc_x509_cert_req	/* proc server cert request */
+};
+
+static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 {
 	MPI x, X, g, p;
 	size_t n_X, n_g, n_p;
@@ -169,7 +190,7 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 	return data_size;
 }
 
-static int gen_dhe_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
+static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 {
 	MPI x, X;
 	size_t n_X;
@@ -223,7 +244,7 @@ static int gen_dhe_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	return n_X + 2;
 }
 
-static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
+static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 				  int data_size)
 {
 	uint16 n_Y, n_g, n_p;
@@ -330,7 +351,7 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	return ret;
 }
 
-static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
+static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 				  int data_size)
 {
 	uint16 n_Y;
