@@ -31,8 +31,12 @@
 #include <common.h>
 #include <signal.h>
 
-#define KEYFILE "x509/key.pem"
-#define CERTFILE "x509/cert.pem"
+#define KEYFILE2 "x509/key.pem"
+#define CERTFILE2 "x509/cert.pem"
+
+#define KEYFILE1 "x509/key-dsa.pem"
+#define CERTFILE1 "x509/cert-dsa.pem"
+
 #define CAFILE "x509/ca.pem"
 #define CRLFILE NULL
 
@@ -76,7 +80,7 @@ GNUTLS_STATE initialize_state(void)
 	GNUTLS_STATE state;
 	int ret;
 	int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-	int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
+	int kx_priority[] = { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
 	int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 	int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 	int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
@@ -252,7 +256,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_x509pki_allocate_server_sc(&x509_cred, 1) < 0) {
+	if (gnutls_x509pki_allocate_server_sc(&x509_cred, 2) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
@@ -262,7 +266,12 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_x509pki_set_server_key_file( x509_cred, CERTFILE, KEYFILE) < 0) {
+	if (gnutls_x509pki_set_server_key_file( x509_cred, CERTFILE1, KEYFILE1) < 0) {
+		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
+		exit(1);
+	}
+
+	if (gnutls_x509pki_set_server_key_file( x509_cred, CERTFILE2, KEYFILE2) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}

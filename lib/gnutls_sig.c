@@ -127,7 +127,6 @@ opaque concat[36];
 			dconcat.data = concat;
 			dconcat.size = 36;
 			break;
-	
 		case GNUTLS_PK_DSA:
 			dconcat.data = &concat[16];
 			dconcat.size = 20;
@@ -170,7 +169,6 @@ gnutls_datum tmpdata;
 
 	switch(pkey->pk_algorithm) {
 		case GNUTLS_PK_RSA:
-
 			/* encrypt */
 			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params, 1)) < 0) {
 			     gnutls_assert();
@@ -179,7 +177,6 @@ gnutls_datum tmpdata;
 
 			break;
 		case GNUTLS_PK_DSA:
-
 			/* sign */
 			if ((ret=_gnutls_dsa_sign( signature, &tmpdata, pkey->params)) < 0) {
 			     gnutls_assert();

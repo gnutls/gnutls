@@ -49,6 +49,7 @@ typedef struct {
 static const gnutls_pk_map pk_mappings[] = {
 	{GNUTLS_KX_RSA, GNUTLS_PK_RSA},
 	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA},
+	{GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA},
 	{0}
 };
 

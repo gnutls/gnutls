@@ -9,7 +9,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
 	gnutls_compress_int.h gnutls_session.h gnutls_priority.h gnutls_auth.h \
-	auth_anon.h auth_dhe_dss.h gnutls_extensions.h ext_srp.h \
+	auth_anon.h gnutls_extensions.h ext_srp.h \
 	gnutls_auth_int.h crypt_bcrypt.h gnutls_random.h crypt_srpsha1.h \
 	x509_b64.h gnutls_srp.h auth_srp.h auth_srp_passwd.h gnutls_v2_compat.h \
 	crypt.h libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
@@ -28,14 +28,14 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c \
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c \
 	gnutls_compress_int.c gnutls_session.c gnutls_db.c x509_b64.c \
-	auth_anon.c auth_dhe_dss.c gnutls_extensions.c ext_srp.c gnutls_auth.c \
+	auth_anon.c gnutls_extensions.c ext_srp.c gnutls_auth.c \
 	crypt_bcrypt.c crypt.c gnutls_random.c crypt_srpsha1.c gnutls_srp.c \
 	auth_srp.c auth_srp_passwd.c gnutls_v2_compat.c auth_srp_sb64.c \
 	gnutls_datum.c auth_rsa.c gnutls_session_pack.c \
 	gnutls_gcry.c gnutls_pk.c gnutls_cert.c x509_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
 	x509_sig_check.c pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c \
-	x509_extensions.c auth_x509.c gnutls_ui.c gnutls_sig.c auth_dhe_rsa.c \
+	x509_extensions.c auth_x509.c gnutls_ui.c gnutls_sig.c auth_dhe.c \
 	gnutls_dh_primes.c ext_max_record.c gnutls_alert.c gnutls_int_compat.c \
 	gnutls_str.c
 

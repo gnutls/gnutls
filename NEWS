@@ -1,15 +1,17 @@
 Version ?.?.?
-- gnutls_check_pending() was renamed to gnutls_record_check_pending()
+- Handshake messages are not kept in memory any more. Now we use less memory
+  during a handshake
+- Added support for DSA certificates
+- Added DHE_DSS cipher suites
+- Added check for the requested TLS extensions
+- Added a minimal string library to assist in ASN.1 parsing
+- gnutls_x509pki_set_trust_(file/mem) can now be called multiple times
 - Key exchange methods changed so they do not depend on the Certificate
   type (GNUTLS_KX_X509PKI_* renamed to GNUTLS_KX_*)
 - Combined gnutls_x509pki_(set/get)_dh_bits() and gnutls_anon_server/client_get_dh_bits()
   to gnutls_dh_(set/get)_bits()
+- gnutls_check_pending() was renamed to gnutls_record_check_pending()
 - gnutls_anon_set_server_cred() was deprecated by gnutls_dh_set_bits()
-- gnutls_x509pki_set_trust_(file/mem) can now be called multiple times
-- Added a minimal string library to assist in ASN.1 parsing
-- Handshake messages are not kept in memory any more. Now we use less memory
-  during a handshake
-- Added check for the requested TLS extensions
 - gnutls_*_get_algo() renamed to gnutls_*_get()
 
 Version 0.3.5 (25/01/2002)

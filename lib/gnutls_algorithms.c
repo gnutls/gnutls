@@ -174,6 +174,7 @@ typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 extern MOD_AUTH_STRUCT rsa_auth_struct;
 extern MOD_AUTH_STRUCT dhe_rsa_auth_struct;
+extern MOD_AUTH_STRUCT dhe_dss_auth_struct;
 extern MOD_AUTH_STRUCT anon_auth_struct;
 extern MOD_AUTH_STRUCT srp_auth_struct;
 
@@ -181,6 +182,7 @@ static const gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, &anon_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, &rsa_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP, &srp_auth_struct),
 	{0}
 };
@@ -227,24 +229,21 @@ typedef struct {
 #define GNUTLS_RSA_ARCFOUR_SHA { 0x00, 0x05 }
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
-#define GNUTLS_RSA_DES_CBC_SHA { 0x00, 0x09 }
 #define GNUTLS_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x2F }
 #define GNUTLS_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x35 }
 #define GNUTLS_RSA_TWOFISH_128_CBC_SHA { 0xF6, 0x51 }
 
 /* X509PKI_DHE_DSS */
+#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xF6, 0x54 }
 #define GNUTLS_DHE_DSS_RIJNDAEL_256_CBC_SHA { 0x00, 0x38 }
 #define GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
-#define GNUTLS_DHE_DSS_DES_CBC_SHA { 0x00, 0x12 }
-#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xF6, 0x54 }
 #define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA { 0x00, 0x13 }
 
 /* X509PKI_DHE_RSA */
 #define GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA { 0xF6, 0x55 }
-#define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
-#define GNUTLS_DHE_RSA_DES_CBC_SHA { 0x00, 0x15 }
 #define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 }
 #define GNUTLS_DHE_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x39 }
+#define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
 
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* ANON_DH */
