@@ -408,3 +408,36 @@ gc_hmac_md5 (const char *key, size_t keylen,
 
   return GC_OK;
 }
+
+int
+gc_hmac_sha1 (const char *key, size_t keylen,
+	     const char *in, size_t inlen,
+	     char outhash[GC_SHA1_LEN])
+{
+  size_t hlen = gcry_md_get_algo_dlen (GCRY_MD_SHA1);
+  gcry_md_hd_t mdh;
+  unsigned char *hash;
+  gpg_error_t err;
+
+  assert (hlen == GC_SHA1_LEN);
+
+  err = gcry_md_open (&mdh, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
+  if (err != GPG_ERR_NO_ERROR)
+    return GC_INVALID_HASH;
+
+  err = gcry_md_setkey (mdh, key, keylen);
+  if (err != GPG_ERR_NO_ERROR)
+    return GC_INVALID_HASH;
+
+  gcry_md_write (mdh, in, inlen);
+
+  hash = gcry_md_read (mdh, GCRY_MD_SHA1);
+  if (hash == NULL)
+    return GC_INVALID_HASH;
+
+  memcpy (outhash, hash, hlen);
+
+  gcry_md_close (mdh);
+
+  return GC_OK;
+}

@@ -543,10 +543,9 @@ gc_hash_buffer (int hash, const char *in, size_t inlen, char *out)
  * gc_md5:
  * @in: input character array of data to hash.
  * @inlen: length of input character array of data to hash.
- * @out: newly allocated character array with hash of data.
+ * @out: pre-allocated character array with hash of data.
  *
- * Compute hash of data using MD5.  The @out buffer must be
- * deallocated by the caller.
+ * Compute hash of data using MD5.
  *
  * Return value: Returns %GC_OK iff successful.
  **/
@@ -568,10 +567,9 @@ gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN])
  * @keylen: length of input character array with key to use.
  * @in: input character array of data to hash.
  * @inlen: length of input character array of data to hash.
- * @outhash: newly allocated character array with keyed hash of data.
+ * @outhash: pre-allocated character array with keyed hash of data.
  *
- * Compute keyed checksum of data using HMAC-MD5.  The @outhash buffer
- * must be deallocated by the caller.
+ * Compute keyed checksum of data using HMAC-MD5.
  *
  * Return value: Returns %GC_OK iff successful.
  **/
@@ -585,6 +583,32 @@ gc_hmac_md5 (const char *key, size_t keylen,
   hmac_md5_set_key (&ctx, keylen, key);
   hmac_md5_update (&ctx, inlen, in);
   hmac_md5_digest (&ctx, GC_MD5_LEN, outhash);
+
+  return GC_OK;
+}
+
+/**
+ * gc_hmac_sha1:
+ * @key: input character array with key to use.
+ * @keylen: length of input character array with key to use.
+ * @in: input character array of data to hash.
+ * @inlen: length of input character array of data to hash.
+ * @outhash: pre-allocated character array with keyed hash of data.
+ *
+ * Compute keyed checksum of data using HMAC-SHA1.
+ *
+ * Return value: Returns %GC_OK iff successful.
+ **/
+int
+gc_hmac_sha1 (const char *key, size_t keylen,
+	      const char *in, size_t inlen,
+	      char outhash[SHA1_DIGEST_SIZE])
+{
+  struct hmac_sha1_ctx ctx;
+
+  hmac_sha1_set_key (&ctx, keylen, key);
+  hmac_sha1_update (&ctx, inlen, in);
+  hmac_sha1_digest (&ctx, SHA1_DIGEST_SIZE, outhash);
 
   return GC_OK;
 }

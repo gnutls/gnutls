@@ -121,5 +121,8 @@ extern int gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN]);
 extern int gc_hmac_md5 (const char *key, size_t keylen,
 			const char *in, size_t inlen,
 			char outhash[GC_MD5_LEN]);
+extern int gc_hmac_sha1 (const char *key, size_t keylen,
+			 const char *in, size_t inlen,
+			 char outhash[GC_SHA1_LEN]);
 
 #endif /* GC_H */
