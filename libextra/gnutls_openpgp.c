@@ -840,7 +840,18 @@ gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials_t c,
     return gnutls_openpgp_add_keyring_file(&c->keyring, file);
 }
 
-
+/**
+ * gnutls_certificate_set_openpgp_keyring_mem - Add keyring data for OpenPGP
+ * @c: A certificate credentials structure
+ * @data: buffer with keyring data.
+ * @dlen: length of data buffer.
+ *
+ * The function is used to set keyrings that will be used internally
+ * by various OpenPGP functions. For example to find a key when it
+ * is needed for an operations. The keyring will also be used at the
+ * verification functions.
+ *
+ **/
 int
 gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials_t c,
 					   const opaque * data,

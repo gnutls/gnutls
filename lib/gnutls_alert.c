@@ -239,24 +239,22 @@ int gnutls_error_to_alert(int err, int *level)
 }
 
 
-/* Sends the appropriate alert, depending
- * on the error message. Deprecated. May be removed.
+/**
+ * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
+ * @session: is a &gnutls_session_t structure.
+ * @err: is an integer
+ *
+ * This function is DEPRECATED, and may be removed.
+ *
+ * Sends an alert to the peer depending on the error code returned by a gnutls
+ * function. This function will call gnutls_error_to_alert() to determine
+ * the appropriate alert to send.
+ *
+ * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
+ *
+ * If the return value is GNUTLS_E_INVALID_REQUEST, then no alert has
+ * been sent to the peer.
  */
-/*-
-  * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
-  * @session: is a &gnutls_session_t structure.
-  * @err: is an integer
-  *
-  * Sends an alert to the peer depending on the error code returned by a gnutls
-  * function. This function will call gnutls_error_to_alert() to determine
-  * the appropriate alert to send.
-  *
-  * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
-  *
-  * If the return value is GNUTLS_E_INVALID_REQUEST, then no alert has
-  * been sent to the peer.
-  *
-  -*/
 int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 {
     int alert;

@@ -31,8 +31,23 @@
 /* Openpgp certificate stuff 
  */
 
-typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session_t, const unsigned char *keyfpr, 
-    unsigned int keyfpr_length, gnutls_datum_t *key);
+/**
+ * gnutls_openpgp_recv_key_func - Callback prototype to get OpenPGP keys
+ * @session: a TLS session
+ * @keyfpr: key fingerprint
+ * @keyfpr_length: length of key fingerprint
+ * @key: output key.
+ *
+ * A callback of this type is used to retrieve OpenPGP keys.  Only
+ * useful on the server, and will only be used if the peer send a key
+ * fingerprint instead of a full key.  See also
+ * gnutls_openpgp_set_recv_key_function().
+ *
+ */
+typedef int (*gnutls_openpgp_recv_key_func) (gnutls_session_t session,
+					     const unsigned char *keyfpr,
+					     unsigned int keyfpr_length,
+					     gnutls_datum_t *key);
 
 void gnutls_openpgp_set_recv_key_function( gnutls_session_t session,
 					   gnutls_openpgp_recv_key_func func);
