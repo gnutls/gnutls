@@ -5,3 +5,9 @@
 \newcommand{\sslII}{{\emph{SSL 2.0}}} 
 \newcommand{\ssl}{{\emph{SSL}}} 
 \newcommand{\HRule}{\rule{\linewidth}{0.4mm}}
+
+% accepts section name, function name
+\newcommand{\printfunc}[2]{%
+	\hyperref{#2}{#2  (see Section }{)}{#1}
+}
+
