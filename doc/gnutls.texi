@@ -193,7 +193,7 @@ to the transport layer functions, in order to communicate with the
 peer.  Every session has a unique session ID shared with the peer.
 
 Since TLS sessions can be resumed, servers would probably need a
-database backend to hold the session's parameters. Every
+database backend to hold the session's parameters.  Every
 @acronym{GnuTLS} session after a successful handshake calls the
 appropriate backend function (@xref{resume}, for information on
 initialization) to store the newly negotiated session. The session
@@ -320,6 +320,7 @@ The protocol layering in TLS is shown in the figure below.
 @c \end{figure}
 
 @section The transport layer
+@cindex Transport protocol
 
 @acronym{TLS} is not limited to one transport layer, it can be used
 above any transport layer, as long as it is a reliable one.  A set of
@@ -352,7 +353,6 @@ work, thus making it easy to add @acronym{TLS} support to existing
 TCP/IP servers.
 
 @section The TLS record protocol
-@cindex TLS protocols
 @cindex Record protocol
 
 The Record protocol is the secure communications provider. Its purpose
@@ -492,6 +492,8 @@ in @acronym{GnuTLS}. For a detailed discussion see the archives of the
 TLS Working Group mailing list and the paper @cite{CBCATT}.
 
 @section The TLS alert protocol
+@anchor{alert}
+@cindex Alert protocol
 
 The Alert protocol is there to allow signals to be sent between peers.
 These signals are mostly used to inform the peer about the cause of a
@@ -524,7 +526,8 @@ Returns the name, in a character array, of the given alert.
 @end itemize
 
 @section The TLS handshake protocol
-@cindex TLS handshake protocol
+@anchor{handshake}
+@cindex Handshake protocol
 
 The Handshake protocol is responsible for the ciphersuite negotiation,
 the initial key exchange, and the authentication of the two peers.
@@ -598,7 +601,7 @@ enable and set priorities on the individual ciphers. It may imply that
 all combinations of ciphersuites are allowed, but this is not
 true. For several reasons, not discussed here, some combinations were
 not defined in the @acronym{TLS} protocol.  The supported ciphersuites
-are shown in appendix @xref{ciphersuites}.
+are shown in @ref{ciphersuites}.
 
 @subsection Client authentication
 @cindex Client Certificate authentication
@@ -615,6 +618,7 @@ certificate, signed by one of the server's acceptable signers. In
 using the trusted CA certificates in the credentials structure.
 
 @subsection Resuming Sessions
+@anchor{resume}
 @cindex Resuming sessions
 
 The @code{gnutls_handshake} function, is expensive since a lot of
@@ -624,7 +628,7 @@ resuming} is a feature of the @acronym{TLS} protocol which allows a
 client to connect to a server, after a successful handshake, without
 the expensive calculations.  This is achieved by using the previously
 established keys. @acronym{GnuTLS} supports this feature, and the
-example (@pxref{resume client}) illustrates a typical use of it.
+example (@pxref{ex:resume-client}) illustrates a typical use of it.
 
 Keep in mind that sessions are expired after some time, for security
 reasons, thus it may be normal for a server not to resume a session
@@ -738,7 +742,7 @@ connection. The available authentication methods in @acronym{GnuTLS} are:
 
 X.509 certificates contain the public parameters, of a public key
 algorithm, and an authority's signature, which proves the authenticity
-of the parameters.  @xref{x509trust}, for more information on X.509
+of the parameters.  @xref{x509:trust}, for more information on X.509
 protocols.
 
 @c openpgp section
@@ -752,9 +756,8 @@ signer is trusted the key is considered trusted or not.
 @acronym{GnuTLS}'s OpenPGP authentication implementation is based on
 the @cite{TLSPGP} proposal.
 
-@xref{The OpenPGP trust model}, for more information about the OpenPGP
-trust model.  For a more detailed introduction to OpenPGP and GnuPG
-see @cite{GPGH}.
+@xref{pgp:trust}, for more information about the OpenPGP trust model.
+For a more detailed introduction to OpenPGP and GnuPG see @cite{GPGH}.
 
 @subsection Using certificate authentication
 
@@ -797,7 +800,7 @@ after a successful handshake, to verify the signatures of the
 certificate.  An alternative way, which reports a more detailed
 verification output, is to use @code{gnutls_certificate_get_peers} to
 obtain the raw certificate of the peer and verify it using the
-functions discussed in @ref{x509trust}.
+functions discussed in @ref{x509:trust}.
 
 In a handshake, the negotiated cipher suite depends on the
 certificate's parameters, so not all key exchange methods will be
@@ -1063,9 +1066,11 @@ int main()
 
 @node More on certificate authentication
 @chapter More on certificate authentication
+@anchor{certificate}
 @cindex Certificate authentication
 
 @section The X.509 trust model
+@anchor{x509:trust}
 @cindex X.509 certificates
 
 The X.509 protocols rely on a hierarchical trust model. In this trust
@@ -1082,9 +1087,9 @@ certificates as well, following a hierarchical model.
 
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
-acceptable. See figure @ref{fig:x509-1} for a typical example.  The
-API for handling X.509 certificates is described at section
-@ref{sec:x509api}.  Some examples are listed below.
+acceptable.  See the figure above for a typical example.  The API for
+handling X.509 certificates is described at section @ref{sec:x509api}.
+Some examples are listed below.
 
 @subsection X.509 certificates
 
@@ -1233,6 +1238,7 @@ An example of a PKCS #12 structure generation can be found at section
 @ref{ex:pkcs12}.
 
 @section The OpenPGP trust model
+@anchor{pgp:trust}
 @cindex OpenPGP Keys
 
 The OpenPGP key authentication relies on a distributed trust model,
@@ -1433,6 +1439,7 @@ starts, in order to send the correct certificate, use the correct
 password file@footnote{in SRP authentication}, or anything else!
 
 @chapter How to use @acronym{GnuTLS} in applications
+@anchor{examples}
 @cindex Example programs
 
 @section Preparation
@@ -1621,6 +1628,7 @@ certificate selection callback.
 @verbatiminclude examples/ex-cert-select.c
 
 @subsection Client with Resume capability example
+@anchor{ex:resume-client}
 
 This is a modification of the simple client example. Here we
 demonstrate the use of session resumption. The client tries to connect
@@ -1737,6 +1745,7 @@ Current limitations imposed by the compatibility layer include:
 @chapter Included programs
 
 @section Invoking srptool
+@anchor{srptool}
 @cindex srptool
 
 The ``srptool'' is a very simple program that emulates the programs in
@@ -2004,6 +2013,35 @@ signing_key
 # Whether this key will be used for time stamping.
 #time_stamping_key
 @end example
+
+@chapter Function reference
+@cindex Function reference
+
+@section Core functions
+
+The prototypes for the following functions lie in
+@file{gnutls/gnutls.h}.
+
+@section X.509 certificate functions
+@anchor{sec:x509api}
+@cindex X.509 Functions
+
+The following functions are to be used for X.509 certificate handling.
+Their prototypes lie in @file{gnutls/x509.h}.
+
+@section @acronym{GnuTLS-extra} functions
+@cindex @acronym{GnuTLS-extra} functions
+
+These functions are only available in the GPL version of the library
+called @code{gnutls-extra}. The prototypes for this library lie in
+@file{gnutls/extra.h}.
+
+@section OpenPGP functions
+@cindex OpenPGP functions
+@anchor{sec:openpgpapi}
+
+The following functions are to be used for OpenPGP certificate
+handling.  Their prototypes lie in @file{gnutls/openpgp.h}.
 
 @chapter Certificate to XML convertion functions
 @cindex Certificate to XML convertion
@@ -2273,6 +2311,7 @@ functions:
 @include error_codes.texi
 
 @chapter All the supported ciphersuites in @acronym{GnuTLS}
+@anchor{ciphersuites}
 @cindex Ciphersuites
 
 @itemize
