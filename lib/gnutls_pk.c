@@ -425,7 +425,7 @@ opaque str[MAX_PARAMETER_SIZE];
 	if (result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
 	result =
@@ -434,7 +434,7 @@ opaque str[MAX_PARAMETER_SIZE];
 		gnutls_assert();
 		_gnutls_mpi_release( s);
 		asn1_delete_structure(sig);
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
 	asn1_delete_structure(sig);
