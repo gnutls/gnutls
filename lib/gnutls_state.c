@@ -117,25 +117,25 @@ int _gnutls_session_cert_type_supported( gnutls_session session,
 {
 uint i;
 uint cert_found = 0;
-
-	const gnutls_certificate_credentials cred;
+const gnutls_certificate_credentials cred;
 		
-	cred =
-	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
-
-	if (session->security_parameters.entity==GNUTLS_SERVER && 
-		cred != NULL) {
+	if (session->security_parameters.entity==GNUTLS_SERVER) {
+		cred =
+		    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+		
+		if (cred == NULL)
+			return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 
 		for (i = 0; i < cred->ncerts; i++) {
 			if (cred->cert_list[i][0].cert_type == cert_type) {
 				cert_found = 1;
 				break;
 			}
-			if (cert_found == 0)
-				/* no certificate is of that type.
-				 */
-				return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 		}
+		if (cert_found == 0)
+			/* no certificate is of that type.
+			 */
+			return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 	}
 			
 

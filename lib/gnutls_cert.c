@@ -248,7 +248,6 @@ int _gnutls_selected_cert_supported_kx( gnutls_session session, gnutls_kx_algori
 	int i;
 	
 	if (session->internals.selected_cert_list_length == 0) {
-		gnutls_assert();
 		*alg_size = 0;
 		*alg = NULL;
 		return 0;

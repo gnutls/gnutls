@@ -98,7 +98,12 @@ int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, s
 
 			if ( (ret=_gnutls_session_cert_type_supported( session, new_type)) < 0) {
 				gnutls_assert();
-				return ret;
+				/* The peer has requested unsupported certificate
+				 * types. Instead of failing, procceed normally.
+				 * (the ciphersuite selection would fail, or a
+				 * non certificate ciphersuite will be selected).
+				 */
+				return 0;
 			}
 
 			_gnutls_session_cert_type_set( session, new_type);
