@@ -789,7 +789,8 @@ int gen_rsa_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 
 	/* If our certificate supports signing
 	 */
-	if ( apr_cert_list[0].keyUsage != 0)
+	if ( apr_cert_list != NULL)
+	   if ( apr_cert_list[0].keyUsage != 0)
 		if ( !(apr_cert_list[0].keyUsage & X509KEY_DIGITAL_SIGNATURE)) {
 			gnutls_assert();
 			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;

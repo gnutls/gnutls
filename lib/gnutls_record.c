@@ -363,13 +363,13 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
   *
   * Terminates the current TLS/SSL connection. The connection should
   * have been initiated using gnutls_handshake().
-  * 'how' should be one of GNUTLS_SHUT_WR, GNUTLS_SHUT_W.
+  * 'how' should be one of GNUTLS_SHUT_RDWR, GNUTLS_SHUT_WR.
   *
-  * in case of GNUTLS_SHUT_WR then the connection gets terminated and
+  * in case of GNUTLS_SHUT_RDWR then the connection gets terminated and
   * further receives and sends will be disallowed. If the return
   * value is zero you may continue using the TCP connection.
   *
-  * in case of GNUTLS_SHUT_W then the connection gets terminated and
+  * in case of GNUTLS_SHUT_WR then the connection gets terminated and
   * further sends will be disallowed. In order to reuse the TCP connection
   * you should wait for an EOF from the peer.
   *
@@ -380,7 +380,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 
 	ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
-	if ( how == GNUTLS_SHUT_WR && ret == 0) {
+	if ( how == GNUTLS_SHUT_RDWR && ret == 0) {
 		ret2 = gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
 		state->gnutls_internals.may_read = 1;
 	}
@@ -748,7 +748,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 				 * not call close().
 				 */
 				if (type != GNUTLS_ALERT)
-					gnutls_bye( cd, state, GNUTLS_SHUT_W);
+					gnutls_bye( cd, state, GNUTLS_SHUT_WR);
 
 				gnutls_free(tmpdata);
 

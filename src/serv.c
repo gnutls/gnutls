@@ -457,7 +457,7 @@ int main(int argc, char **argv)
 			}
 		}
 		printf("\n");
-		gnutls_bye(sd, state, 1); /* do not wait for
+		gnutls_bye(sd, state, GNUTLS_SHUT_WR); /* do not wait for
 		 * the peer to close the connection.
 		 */
 		close(sd);

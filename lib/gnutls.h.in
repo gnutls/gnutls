@@ -20,6 +20,8 @@
 
 #define LIBGNUTLS_VERSION "@VERSION@"
 
+#include <sys/types.h>
+
 #define GNUTLS_AES GNUTLS_RIJNDAEL
 
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL256_CBC } BulkCipherAlgorithm;
@@ -43,7 +45,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 
 typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
 typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
-typedef enum CloseRequest { GNUTLS_SHUT_WR=0, GNUTLS_SHUT_W=1 } CloseRequest;
+typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
 
 typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
