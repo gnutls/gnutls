@@ -33,6 +33,7 @@ E: andrew@mcdonald.org.uk
 S: OpenSSL compatible interface.
 
 -----BEGIN PGP PUBLIC KEY BLOCK-----
+URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.
 
 mKsEPNUHKwEFALqJSBHn6Qk5ex138kwymxA3idCFoTi5Q6mVooEVVaYVfeDG+5uV
