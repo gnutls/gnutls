@@ -69,19 +69,27 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 	int result, times = 0, qbits;
 	GNUTLS_MPI *factors = NULL;
 	
+        /* useless since gcry_prime_group_generator allocates its own MPI
+         * fixed by BBP */
+#if 0
 	g = mpi_new(16);	/* this should be ok */
 	if (g == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
+#endif
 
+        /* useless + memleak since gcry_prime_generate allocates irs own prime
+         * fixed by BBP */
+#if 0
 	prime = mpi_new(32);
 	if (prime == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}	
+#endif
 
 	/* Calculate the size of a prime factor of (prime-1)/2.
 	 * This is a bad emulation of Michael Wiener's table
@@ -97,6 +105,12 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 	/* find a prime number of size bits.
 	 */
 	do {
+                /* fixed by BBP */
+                if (times) {
+		        _gnutls_mpi_release(&prime);
+	                gcry_prime_release_factors (factors);
+                }
+
 		err = gcry_prime_generate( &prime, bits, qbits,
 			&factors, NULL, NULL, GCRY_STRONG_RANDOM,
 			GCRY_PRIME_FLAG_SPECIAL_FACTOR);
