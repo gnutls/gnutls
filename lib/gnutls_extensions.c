@@ -36,6 +36,7 @@ typedef struct {
 	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque**); /* send data */
 } gnutls_extension_entry;
 
+#define MAX_EXT 256 /* maximum supported extension */
 static gnutls_extension_entry extensions[] = {
 	GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_SRP, NULL, NULL),
 	{0}
@@ -53,19 +54,20 @@ static gnutls_extension_entry extensions[] = {
 
 void* _gnutls_ext_func_recv(int type)
 {
-	void* ret;
+	void* ret=NULL;
 	GNUTLS_EXTENSION_LOOP(ret = p->gnutls_ext_func_recv);
 	return ret;
 
 }
 void* _gnutls_ext_func_send(int type)
 {
-	void* ret;
+	void* ret=NULL;
 	GNUTLS_EXTENSION_LOOP(ret = p->gnutls_ext_func_send);
 	return ret;
 
 }
 
+void _gnutls_tolow(char *str, int size);
 char *_gnutls_extension_get_name(int type)
 {
 	char *ret = NULL;
@@ -87,8 +89,7 @@ char *_gnutls_extension_get_name(int type)
 }
 
 int _gnutls_parse_extensions( GNUTLS_STATE state, const opaque* data, int data_size) {
-uint16 length;
-int i, next, size, pos=0;
+int next, size, pos=0;
 int type;
 const opaque* sdata;
 int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
@@ -123,8 +124,36 @@ int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
 }
 
 int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data) {
+int next, size;
+uint16 pos=0;
+opaque* sdata;
+int (*ext_func_send)( GNUTLS_STATE, opaque**);
 
-(*data) = NULL;
-return 0;
+
+	(*data) = gnutls_malloc(2); /* allocate size for size */
+	pos+=2;
+	
+	next = MAX_EXT; /* maximum supported extensions */
+	do {
+		next--;
+		ext_func_send = _gnutls_ext_func_send(next);
+		if (ext_func_send == NULL) continue;
+		size = ext_func_send( state, &sdata);
+		if (size > 0) {
+			(*data) = gnutls_realloc( (*data), pos+size);
+			memcpy( &(*data)[pos], sdata, size);
+			pos+=size;
+			gnutls_free(sdata);
+		}
+		
+	} while(next >= 0);
+
+	pos-=2; /* remove the size of the size header! */
+#ifndef WORDS_BIGENDIAN
+	pos = byteswap16(pos);
+#endif
+	memcpy( (*data), &pos, sizeof(uint16));
+
+	return 0;
 
 }

@@ -31,6 +31,6 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
  */
 int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 	/* this functions sends the server extension data */
-	(*data) = gnutls_calloc(1, 1);
-	return 1;
+	(*data) = NULL;
+	return 0;
 }
