@@ -209,8 +209,8 @@ void print_openpgp_info(gnutls_session session)
 
 			printf(" # PGP Key fingerprint: %s\n", printable);
 
-			if (gnutls_openpgp_extract_key_name(&cert_list
-							[0], 0, &pgp_name) < 0) {
+			if (gnutls_openpgp_extract_key_name(&cert_list[0],
+							0, &pgp_name) < 0) {
 				fprintf(stderr, "Could not extract name\n");
 			} else {
 				PRINT_PGP_NAME(pgp_name);
