@@ -236,6 +236,28 @@ gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid)
 	return GNUTLS_PK_UNKNOWN;
 }
 
+/* returns -1 on error
+ */
+gnutls_mac_algorithm _gnutls_x509_oid2mac_algorithm( const char* oid)
+{
+	if (strcmp( oid, OID_SHA1) == 0)
+		return GNUTLS_MAC_SHA;
+	else if (strcmp( oid, OID_MD5) == 0)
+		return GNUTLS_MAC_MD5;
+	else if (strcmp( oid, OID_MD2) == 0)
+		return GNUTLS_MAC_MD2;
+
+	return (gnutls_mac_algorithm)-1;
+}
+
+const char* _gnutls_x509_mac2oid( gnutls_mac_algorithm mac)
+{
+	if (mac == GNUTLS_MAC_SHA) return OID_SHA1;
+	else if (mac == GNUTLS_MAC_MD5) return OID_MD5;
+	else if (mac == GNUTLS_MAC_MD2) return OID_MD2;
+	else return NULL;
+}
+
 const char* _gnutls_x509_pk2oid( gnutls_pk_algorithm pk)
 {
 	if (pk == GNUTLS_PK_RSA) return PKIX1_RSA_OID;

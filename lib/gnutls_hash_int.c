@@ -207,27 +207,7 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 
 int _gnutls_hmac_get_algo_len(gnutls_mac_algorithm algorithm)
 {
-	int ret;
-
-	switch (algorithm) {
-	case GNUTLS_MAC_NULL:
-		ret = 0;
-		break;
-	case GNUTLS_MAC_SHA:
-		ret = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
-		break;
-	case GNUTLS_MAC_MD5:
-		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
-		break;
-	case GNUTLS_MAC_MD2:
-		ret = gcry_md_get_algo_dlen(GCRY_MD_MD2);
-		break;
-	default:
-		ret = 0;
-	}
-
-	return ret;
-
+	return _gnutls_hash_get_algo_len( algorithm);
 }
 
 int _gnutls_hmac(GNUTLS_MAC_HANDLE handle, const void *text, size_t textlen)

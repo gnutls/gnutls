@@ -391,15 +391,7 @@ int len;
 		return _gnutls_asn2err(result);
 	}
 
-	*hash = (gnutls_mac_algorithm)-1;
-	
-	if ( strcmp(str, OID_MD5)==0) { /* MD5 */
-		*hash = GNUTLS_MAC_MD5;
-	} else if ( strcmp(str, OID_SHA1)==0) { /* SHA1 ID */
-		*hash = GNUTLS_MAC_SHA;
-	} else if ( strcmp(str, OID_MD2)==0) { /* MD2 */
-		*hash = GNUTLS_MAC_MD2;
-	}
+	*hash = _gnutls_x509_oid2mac_algorithm( str);
 
 	if (*hash==(gnutls_mac_algorithm)-1) {
 

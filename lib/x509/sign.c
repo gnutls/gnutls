@@ -36,6 +36,7 @@
 #include <x509.h>
 #include <mpi.h>
 #include <sign.h>
+#include <common.h>
 #include <verify.h>
 
 /* Writes the digest information and the digest in a DER encoded
@@ -46,20 +47,12 @@ static int encode_ber_digest_info( gnutls_mac_algorithm hash,
 {
 ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
 int result;
-char* algo;
+const char* algo;
 
-	switch(hash) {
-		case GNUTLS_MAC_MD5:
-			algo = OID_MD5;
-			break;
-		case GNUTLS_MAC_MD2:
-			algo = OID_MD2;
-			break;
-		case GNUTLS_MAC_SHA:
-			algo = OID_SHA1;
-			break;
-		default:
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	algo = _gnutls_x509_mac2oid( hash);
+	if (algo == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
 	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), 
