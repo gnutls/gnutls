@@ -255,30 +255,23 @@ static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_
 	return;
 }
 
-#define MAX_SEED_SIZE 140
+#define MAX_SEED_SIZE 200
 
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
-static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes)
+static int gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes, opaque* ret)
 {
 
 	GNUTLS_MAC_HANDLE td2;
-	opaque *ret;
 	int i = 0, times, how, blocksize, A_size;
 	opaque final[20], Atmp[MAX_SEED_SIZE];
 
 	if (seed_size > MAX_SEED_SIZE || total_bytes<=0) {
 		gnutls_assert();
-		return NULL;
+		return GNUTLS_E_INTERNAL;
 	}
 	
-	ret = secure_calloc(1, total_bytes);
-	if (ret==NULL) {
-		gnutls_assert();
-		return ret;
-	}
-
 	blocksize = gnutls_hmac_get_algo_len(algorithm);
 	do {
 		i += blocksize;
@@ -312,7 +305,8 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 			memcpy(&ret[i * blocksize], final, how);
 		}
 	}
-	return ret;
+	
+	return 0;
 }
 
 /* Function that xor's buffers using the maximum word size supported
@@ -335,22 +329,30 @@ int modlen = _length%sizeof(unsigned long int);
 	return ;
 }
 
+#define MAX_PRF_BYTES 200
+
 /* The PRF function expands a given secret 
- * needed by the TLS specification
+ * needed by the TLS specification. ret must have a least total_bytes
+ * available.
  */
-svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
+int gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes, void* ret)
 {
 	int l_s, s_seed_size;
-	char *o1, *o2;
 	char *s1, *s2;
-	char *s_seed;
+	opaque s_seed[MAX_SEED_SIZE];
+	opaque o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
+	int result;
 
+	if (total_bytes > MAX_PRF_BYTES) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL;
+	}
 	/* label+seed = s_seed */
 	s_seed_size = seed_size + label_size;
-	s_seed = gnutls_malloc(s_seed_size);
-	if (s_seed==NULL) {
+
+	if (s_seed_size > MAX_SEED_SIZE) {
 		gnutls_assert();
-		return NULL;
+		return GNUTLS_E_INTERNAL;
 	}
 
 	memcpy(s_seed, label, label_size);
@@ -364,26 +366,23 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 		l_s++;
 	}
 
-	o1 = gnutls_P_hash( GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes);
-	if (o1==NULL) {
+	result = gnutls_P_hash( GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes, o1);
+	if (result<0) {
 		gnutls_assert();
-		return NULL;
+		return result;
 	}
 
-	o2 = gnutls_P_hash( GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes);
-	if (o2==NULL) {
+	result = gnutls_P_hash( GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes, o2);
+	if (result<0) {
 		gnutls_assert();
-		return NULL;
+		return result;
 	}
-
-
-	gnutls_free(s_seed);
 
 	_gnutls_xor(o1, o2, total_bytes);
 
-	secure_free(o2);
+	memcpy( ret, o1, total_bytes);
 
-	return o1;
+	return 0; /* ok */
 
 }
 

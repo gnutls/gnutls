@@ -60,7 +60,7 @@ int gnutls_hash_get_algo_len(MACAlgorithm algorithm);
 int gnutls_hash(GNUTLS_HASH_HANDLE handle, const void* text, int textlen);
 void gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void* digest);
 
-svoid *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random, int random_len, int bytes);
+int gnutls_ssl3_generate_random(void *secret, int secret_len, void *random, int random_len, int bytes, opaque* ret);
 
 GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3_handshake(MACAlgorithm algorithm, void *key, int keylen);
 void gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle, void* digest);

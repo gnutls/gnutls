@@ -113,34 +113,39 @@ void _gnutls_set_client_random(GNUTLS_STATE state, uint8 * random)
 /* Calculate The SSL3 Finished message */
 #define SSL3_CLIENT_MSG "CLNT"
 #define SSL3_SERVER_MSG "SRVR"
-void *_gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip)
+static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip, opaque* ret)
 {
 	int siz;
 	GNUTLS_MAC_HANDLE td;
 	GNUTLS_MAC_HANDLE td2;
 	char tmp[MAX_HASH_SIZE];
-	char *concat;
 	char *mesg, *data;
 
-	concat = gnutls_malloc(36);
-	if (concat==NULL) {
-		gnutls_assert();
-		return NULL;
-	}
-	
 	td = gnutls_mac_init_ssl3_handshake(GNUTLS_MAC_MD5,
 					    state->security_parameters.
 					    master_secret, 48);
+	if (td==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+
 	td2 =
 	    gnutls_mac_init_ssl3_handshake(GNUTLS_MAC_SHA,
 					   state->security_parameters.
 					   master_secret, 48);
+	if (td2==NULL) {
+		gnutls_assert();
+		gnutls_mac_deinit_ssl3_handshake(td, tmp);
+		return GNUTLS_E_HASH_FAILED;
+	}
 
 	siz = gnutls_get_handshake_buffer_size(state) - skip;
 	data = gnutls_malloc(siz);
 	if (data==NULL) {
 		gnutls_assert();
-		return NULL;
+		gnutls_mac_deinit_ssl3_handshake(td2, tmp);
+		gnutls_mac_deinit_ssl3_handshake(td, tmp);
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	gnutls_read_handshake_buffer(state, data, siz);
@@ -159,35 +164,47 @@ void *_gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip)
 	gnutls_mac_ssl3(td2, mesg, siz);
 
 	gnutls_mac_deinit_ssl3_handshake(td, tmp);
-	memcpy(concat, tmp, 16);
+	memcpy(ret, tmp, 16);
 
 	gnutls_mac_deinit_ssl3_handshake(td2, tmp);
 
-	memcpy(&concat[16], tmp, 20);
-	return concat;
+	memcpy(&ret[16], tmp, 20);
+	return 0;
 }
 
 /* Hash the handshake messages as required by TLS 1.0 */
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
-void *_gnutls_finished(GNUTLS_STATE state, int type, int skip)
+int _gnutls_finished(GNUTLS_STATE state, int type, int skip, void* ret)
 {
 	int siz;
 	GNUTLS_MAC_HANDLE td;
 	GNUTLS_MAC_HANDLE td2;
 	char tmp[MAX_HASH_SIZE];
-	char concat[36];
-	char *mesg;
-	char *data;
+	opaque concat[36];
+	opaque *mesg, *data;
 
 	td = gnutls_hash_init(GNUTLS_MAC_MD5);
+	if (td==GNUTLS_HASH_FAILED) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+	
 	td2 = gnutls_hash_init(GNUTLS_MAC_SHA);
+	if (td2==GNUTLS_HASH_FAILED) {
+		gnutls_assert();
+		gnutls_hash_deinit( td2, tmp);
+		return GNUTLS_E_HASH_FAILED;
+	}
 
 	siz = gnutls_get_handshake_buffer_size(state) - skip;
-	data = gnutls_malloc(siz);
+
+	data = gnutls_malloc( siz);
 	if (data==NULL) {
 		gnutls_assert();
-		return NULL;
+		gnutls_hash_deinit( td2, tmp);
+		gnutls_hash_deinit( td, tmp);
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	gnutls_read_handshake_buffer(state, data, siz);
@@ -209,10 +226,8 @@ void *_gnutls_finished(GNUTLS_STATE state, int type, int skip)
 	} else {
 		mesg = CLIENT_MSG;
 	}
-	data =
-	    gnutls_PRF(state->security_parameters.master_secret,
-		       48, mesg, strlen(mesg), concat, 36, 12);
-	return data;
+	return gnutls_PRF(state->security_parameters.master_secret,
+		       48, mesg, strlen(mesg), concat, 36, 12, ret);
 }
 
 /* this function will produce TLS_RANDOM_SIZE bytes of random data
@@ -401,28 +416,33 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
  */
 int _gnutls_send_finished( GNUTLS_STATE state, int again)
 {
-	uint8 *data=NULL;
+	uint8 data[36];
 	int ret;
 	int data_size=0;
 
 	if (again==0) {
 		if (state->security_parameters.version == GNUTLS_SSL3) {
-			data =
+			ret =
 			    _gnutls_ssl3_finished(state,
 						  state->security_parameters.
-						  entity, 0);
+						  entity, 0, data);
 			data_size = 36;
 		} else {		/* TLS 1.0 */
-			data =
+			ret =
 			    _gnutls_finished(state,
-					     state->security_parameters.entity, 0);
+					     state->security_parameters.entity, 0, data);
 			data_size = 12;
 		}
 	}
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	
 	ret =
 	    _gnutls_send_handshake( state, data, data_size,
 				   GNUTLS_FINISHED);
-	gnutls_free(data);
 
 	return ret;
 }
@@ -432,7 +452,7 @@ int _gnutls_send_finished( GNUTLS_STATE state, int again)
  */
 int _gnutls_recv_finished( GNUTLS_STATE state)
 {
-	uint8 *data, *vrfy;
+	uint8 data[36], *vrfy;
 	int data_size;
 	int ret;
 	int vrfysize;
@@ -457,27 +477,32 @@ int _gnutls_recv_finished( GNUTLS_STATE state)
 		gnutls_assert();
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
+	
 	if (state->security_parameters.version == GNUTLS_SSL3) {
 		/* skip the bytes from the last message */
-		data =
+		ret =
 		    _gnutls_ssl3_finished(state,
 					  (state->security_parameters.
 					   entity + 1) % 2,
 					  vrfysize +
-					  HANDSHAKE_HEADER_SIZE);
+					  HANDSHAKE_HEADER_SIZE, data);
 	} else {		/* TLS 1.0 */
-		data =
+		ret =
 		    _gnutls_finished(state,
 				     (state->security_parameters.entity +
 				      1) % 2,
-				     vrfysize + HANDSHAKE_HEADER_SIZE);
+				     vrfysize + HANDSHAKE_HEADER_SIZE, data);
+	}
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	if (memcmp(vrfy, data, data_size) != 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
-	gnutls_free(data);
 	gnutls_free(vrfy);
 
 	return ret;

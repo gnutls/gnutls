@@ -19,8 +19,8 @@
  */
 
 #include <gnutls_int.h>
-
 #include <gnutls_hash_int.h>
+#include <gnutls_errors.h>
 
 /* This file handles all the internal functions that cope with hashes
  * and hmacs. Currently it uses the functions provided by
@@ -367,7 +367,7 @@ void gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle, void* digest)
 	return;
 }
 
-static void ssl3_sha(int i, char *secret, int secret_len, char *random,
+static int ssl3_sha(int i, char *secret, int secret_len, char *random,
 	       int random_len, void* digest)
 {
 	int j;
@@ -380,42 +380,63 @@ static void ssl3_sha(int i, char *secret, int secret_len, char *random,
 	}
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	if (td == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+
 	gnutls_hash(td, text1, i + 1);
 	gnutls_hash(td, secret, secret_len);
 	gnutls_hash(td, random, random_len);
 	
 	gnutls_hash_deinit(td, digest);
+	return 0;
 }
 
-static void ssl3_md5(int i, char *secret, int secret_len, char *random,
+static int ssl3_md5(int i, char *secret, int secret_len, char *random,
 	       int random_len, void* digest)
 {
 	opaque tmp[MAX_HASH_SIZE];
 	GNUTLS_MAC_HANDLE td;
-
+	int ret;
+	
 	td = gnutls_hash_init(GNUTLS_MAC_MD5);
+	if (td == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+
 	gnutls_hash(td, secret, secret_len);
 
-	ssl3_sha(i, secret, secret_len, random, random_len, tmp);
+	ret = ssl3_sha(i, secret, secret_len, random, random_len, tmp);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_hash_deinit(td, digest);
+		return ret;
+	}
 
 	gnutls_hash(td, tmp, gnutls_hash_get_algo_len(GNUTLS_MAC_SHA));
 
 	gnutls_hash_deinit(td, digest);
-
+	return 0;
 }
 
-svoid *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
-			   int random_len, int bytes)
+int gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
+			   int random_len, int bytes, opaque* ret)
 {
 	int size = 0, i = 0;
 	char digest[MAX_HASH_SIZE];
-	char *ret = secure_malloc(bytes);
 	int block = gnutls_hash_get_algo_len(GNUTLS_MAC_MD5);
+	int result;
 
 	while (size < bytes) {
 
-	    	ssl3_md5(i, secret, secret_len, random, random_len, digest);
-
+	    	result = ssl3_md5(i, secret, secret_len, random, random_len, digest);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+		
 		size += block;
 			
 		memcpy(&ret[size - block], digest,
@@ -423,5 +444,5 @@ svoid *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
 		i++;
 	}
 
-	return ret;
+	return 0;
 }

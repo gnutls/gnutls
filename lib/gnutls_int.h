@@ -30,10 +30,11 @@
 #define HARD_DEBUG
 #define WRITE_DEBUG
 #define READ_DEBUG
-#define RECORD_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define DEBUG
+#define RECORD_DEBUG
 */
+#define DEBUG
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -131,6 +132,7 @@ typedef struct {
 	opaque * data;
 	int size;
 } gnutls_datum;
+typedef gnutls_datum gnutls_sdatum;
 
 typedef struct {
 	AlertLevel level;
@@ -182,7 +184,7 @@ typedef struct {
 
 struct GNUTLS_KEY_INT {
 	/* For DH KX */
-	gnutls_datum			key;
+	gnutls_sdatum			key;
 	MPI				KEY;
 	MPI				client_Y;
 	MPI				client_g;
@@ -245,17 +247,10 @@ typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1, GNUTLS_VERSION_UNKNOWN
 
 /* This structure holds parameters got from TLS extension
  * mechanism. (some extensions may hold parameters in AUTH_INFO
- * structures instead - see SRP).
+ * structures also - see SRP).
  */
-typedef enum GNUTLS_NAME_IND { GNUTLS_DNSNAME=1 } GNUTLS_NAME_IND; 
 
 typedef struct {
-	opaque dnsname[MAX_DNSNAME_SIZE];
-	GNUTLS_NAME_IND type;
-} name_ind;
-
-typedef struct {
-	name_ind	name;
 	opaque 		srp_username[MAX_SRP_USERNAME];
 } TLSExtensions;
 
@@ -502,9 +497,9 @@ typedef struct GNUTLS_STATE_INT *GNUTLS_STATE;
 
 /* functions */
 int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
-svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
+int gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
-		  int total_bytes);
+		  int total_bytes, void* ret);
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
 void _gnutls_free_auth_info( GNUTLS_STATE state);

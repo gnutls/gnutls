@@ -109,11 +109,11 @@ return ret;
 #ifdef DEBUG
 		_gnutls_log( "Possible PKCS-1 format attack\n");
 #endif
-		RANDOMIZE_KEY(state->gnutls_key->key, secure_malloc);
+		RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
 	} else {
 		ret = 0;
 		if (plaintext.size != TLS_MASTER_SIZE) {	/* WOW */
-			RANDOMIZE_KEY(state->gnutls_key->key, secure_malloc);
+			RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
 		} else {
 			if (_gnutls_get_adv_version_major( state) != plaintext.data[0] 
 				|| _gnutls_get_adv_version_minor( state) != plaintext.data[1]) {
@@ -157,7 +157,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
-	RANDOMIZE_KEY(state->gnutls_key->key, secure_malloc);
+	RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
 
 	ver = _gnutls_version_max(state);
 

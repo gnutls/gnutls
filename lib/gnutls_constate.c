@@ -36,7 +36,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	opaque *key_block;
 	char keyexp[] = "key expansion";
 	char random[2*TLS_RANDOM_SIZE];
-	int pos;
+	int pos, ret;
 	int block_size;
 	
 	if (state->cipher_specs.generated_keys!=0) {
@@ -49,57 +49,78 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	
 
 	block_size = 2 * hash_size + 2 * key_size + 2 * IV_size;
-
+	key_block = gnutls_secure_malloc( block_size);
+	if (key_block==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 	memcpy(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
 	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
 	if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3 */
-		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
-			block_size);
+		ret = gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
+			block_size, key_block);
 	} else { /* TLS 1.0 */
-		key_block =
+		ret =
 		    gnutls_PRF( state->security_parameters.master_secret, TLS_MASTER_SIZE,
 			       keyexp, strlen(keyexp), random, 2*TLS_RANDOM_SIZE, 
-			       block_size);
+			       block_size, key_block);
 	}
 	
-	if (key_block==NULL) return GNUTLS_E_MEMORY_ERROR;
-
+	if (ret<0) {
+		gnutls_assert();
+		gnutls_secure_free(key_block);
+		return ret;
+	}
+	
 #ifdef HARD_DEBUG
 	_gnutls_log( "KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
 #endif
 
 	pos = 0;
 	if (hash_size > 0) {
-		if (gnutls_sset_datum( &state->cipher_specs.client_write_mac_secret, &key_block[pos], hash_size) < 0 )
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_mac_secret, &key_block[pos], hash_size) < 0 ) {
+			gnutls_secure_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
+		}
 		pos+=hash_size;
 
-		if (gnutls_sset_datum( &state->cipher_specs.server_write_mac_secret, &key_block[pos], hash_size) < 0 )
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_mac_secret, &key_block[pos], hash_size) < 0 ) {
+			gnutls_secure_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
+		}
 		pos+=hash_size;
 	}
 	
 	if (key_size > 0) {
-		if (gnutls_sset_datum( &state->cipher_specs.client_write_key, &key_block[pos], key_size) < 0 )
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_key, &key_block[pos], key_size) < 0 ) {
+			gnutls_secure_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
+		}
 		pos+=key_size;
 
-		if (gnutls_sset_datum( &state->cipher_specs.server_write_key, &key_block[pos], key_size) < 0 )
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_key, &key_block[pos], key_size) < 0 ) {
+			gnutls_secure_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
+		}
 		pos+=key_size;
 	}
 	if (IV_size > 0) {
-		if (gnutls_sset_datum( &state->cipher_specs.client_write_IV, &key_block[pos], IV_size) < 0 )
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_IV, &key_block[pos], IV_size) < 0 ) {
+			gnutls_secure_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
+		}
 		pos+=IV_size;
 	
-		if (gnutls_sset_datum( &state->cipher_specs.server_write_IV, &key_block[pos], IV_size) < 0 )
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_IV, &key_block[pos], IV_size) < 0 ) {
+			gnutls_secure_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
+		}
 		pos+=IV_size;
 	}
 	
-	secure_free(key_block);
+	gnutls_secure_free(key_block);
 
 	state->cipher_specs.generated_keys = 1;
 
@@ -236,8 +257,10 @@ int rc;
 	}
 
 
-	_gnutls_set_read_keys(state);
-	 
+	rc = _gnutls_set_read_keys(state);
+	if (rc < 0)
+		return rc;
+		
 #ifdef HANDSHAKE_DEBUG
 	_gnutls_log( "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
@@ -381,7 +404,9 @@ int rc;
 		_gnutls_cpy_write_security_parameters( &state->security_parameters, &state->gnutls_internals.resumed_security_parameters);
 	}
 	
-	_gnutls_set_write_keys(state);
+	rc = _gnutls_set_write_keys(state);
+	if (rc < 0)
+		return rc;
 
 #ifdef HANDSHAKE_DEBUG
 	_gnutls_log( "Cipher Suite: %s\n",

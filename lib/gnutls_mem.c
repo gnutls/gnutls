@@ -36,6 +36,7 @@ int _gnutls_is_secure_memory(const void *ign)
 
 int _gnutls_is_secure_memory(const svoid * mem)
 {
+	if (mem==NULL) return 0;
 	return *((opaque *) mem - 1);
 }
 
@@ -122,21 +123,26 @@ void *gnutls_realloc_fast(void *ptr, size_t size)
 
 void gnutls_free(void *_ptr)
 {
-	opaque *ptr = _ptr;
-
 	if (_ptr == NULL)
 		return;
 
-	ptr -= EXTRA_SIZE;
+	if ( _gnutls_is_secure_memory( _ptr) != 0) {
+		return gnutls_secure_free( _ptr);
+	} else {
+		opaque *ptr = _ptr;
+
+
+		ptr -= EXTRA_SIZE;
 
 #ifdef MALLOC_DEBUG
-	_gnutls_log("Freed: %x with %d bytes\n", _ptr,
+		_gnutls_log("Freed: %x with %d bytes\n", _ptr,
 		    _gnutls_malloc_ptr_size(_ptr));
 #endif
-	free(ptr);
+		free(ptr);
+	}
 }
 
-svoid *secure_malloc(size_t size)
+svoid *gnutls_secure_malloc(size_t size)
 {
 	opaque *ret;
 	ret = gnutls_malloc(size);
@@ -149,10 +155,10 @@ svoid *secure_malloc(size_t size)
 
 }
 
-svoid *secure_calloc(size_t nmemb, size_t size)
+svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 {
 	svoid *ret;
-	ret = secure_malloc(size);
+	ret = gnutls_secure_malloc(size);
 	if (ret == NULL)
 		return ret;
 
@@ -161,35 +167,39 @@ svoid *secure_calloc(size_t nmemb, size_t size)
 	return ret;
 }
 
-size_t _secure_ptr_size(svoid * ptr)
+size_t _gnutls_secure_ptr_size(svoid * ptr)
 {
 	return _gnutls_malloc_ptr_size(ptr);
 }
 
-svoid *secure_realloc(svoid * ptr, size_t size)
+svoid *gnutls_secure_realloc(svoid * ptr, size_t size)
 {
 	svoid *ret;
-	if (ptr != NULL && size <= _secure_ptr_size(ptr)) {
+	if (ptr != NULL && size <= _gnutls_secure_ptr_size(ptr)) {
 		/* do not do realloc.
 		 * return the previous pointer.
 		 */
 		return ptr;
 	}
-	ret = secure_malloc(size);
+	ret = gnutls_secure_malloc(size);
 	if (ret == NULL)
 		return ret;
 
 	if (ptr != NULL) {
-		memcpy(ret, ptr, GMIN(_secure_ptr_size(ptr), size));
-		secure_free(ptr);
+		memcpy(ret, ptr, GMIN(_gnutls_secure_ptr_size(ptr), size));
+		gnutls_secure_free(ptr);
 	}
 
 	return ret;
 }
 
-void secure_free(svoid * ptr)
+void gnutls_secure_free(svoid * ptr)
 {
-	memset(ptr, 0, _secure_ptr_size(ptr));
+opaque* _ptr = ptr;
+
+	memset(ptr, 0, _gnutls_secure_ptr_size(ptr));
+	*((opaque *) _ptr - 1) = 0;	/* not secure mem */
+
 	gnutls_free(ptr);
 }
 

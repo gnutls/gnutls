@@ -56,7 +56,7 @@ int gnutls_set_datum( gnutls_datum* dat, const void* data, int data_size) {
 }
 
 int gnutls_sset_datum( gnutls_datum* dat, const void* data, int data_size) {
-	dat->data = secure_malloc(data_size);
+	dat->data = gnutls_secure_malloc(data_size);
 	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
 	dat->size = data_size;
@@ -75,7 +75,7 @@ void gnutls_free_datum( gnutls_datum* dat) {
 
 void gnutls_sfree_datum( gnutls_datum* dat) {
 	if (dat->data!=NULL && dat->size!=0)
-		secure_free( dat->data);
+		gnutls_secure_free( dat->data);
 
 	dat->data = NULL;
 	dat->size = 0;

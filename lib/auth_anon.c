@@ -57,7 +57,7 @@ MOD_AUTH_STRUCT anon_auth_struct = {
  */
 int _gnutls_generate_key(GNUTLS_KEY key) {
         _gnutls_mpi_print( NULL, &key->key.size, key->KEY);
-	key->key.data = secure_malloc( key->key.size);
+	key->key.data = gnutls_secure_malloc( key->key.size);
 	if ( key->key.data==NULL) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}

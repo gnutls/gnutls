@@ -5,12 +5,12 @@ in order to avoid having people working on the same thing.
 Current list:
 + Trace memory leaks in libgcrypt
 + Audit the code
+* Add support for certificates with DSS parameters
+* OpenPGP certificate support
 * Add callbacks to get SRP parameters (instead of a reading password file)
 * Minimize footprint.
-* Add support for certificates with DSS parameters
 * Add more TLS extensions
 * Add support for PKCS8 encrypted private keys
-* OpenPGP certificate support
 - Add Kerberos support
 
 (+) Means high priority 

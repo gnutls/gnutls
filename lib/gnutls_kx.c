@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "gnutls_gcry.h"
 #include <gnutls_record.h>
+#include <gnutls_datum.h>
 
 /* This file contains important thing for the TLS handshake procedure.
  */
@@ -40,47 +41,40 @@ int _gnutls_generate_master( GNUTLS_STATE state) {
 	return 0;
 }
 
+#define PREMASTER state->gnutls_key->key
 static int generate_normal_master( GNUTLS_STATE state) {
-int premaster_size;
-opaque* premaster, *master;
 int ret = 0;
 char random[2*TLS_RANDOM_SIZE];
 
 	memcpy(random, state->security_parameters.client_random, TLS_RANDOM_SIZE);
 	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
 
-	/* generate premaster */
-        premaster_size = state->gnutls_key->key.size;
-	premaster = state->gnutls_key->key.data;
-
 #ifdef HARD_DEBUG
-	_gnutls_log( "PREMASTER SECRET[%d]: %s\n", premaster_size, _gnutls_bin2hex(premaster, premaster_size));
+	_gnutls_log( "PREMASTER SECRET[%d]: %s\n", PREMASTER.size, _gnutls_bin2hex(PREMASTER.data, PREMASTER.size));
 	_gnutls_log( "CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
 	_gnutls_log( "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
 #endif
 
 	if ( state->security_parameters.version == GNUTLS_SSL3) {
-		master =
-		    gnutls_ssl3_generate_random( premaster, premaster_size,
-			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE);
+		ret =
+		    gnutls_ssl3_generate_random( PREMASTER.data, PREMASTER.size,
+			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE,
+			       state->security_parameters.master_secret);
 
 	} else {
-		master =
-		    gnutls_PRF( premaster, premaster_size,
+		ret =
+		    gnutls_PRF( PREMASTER.data, PREMASTER.size,
 			       MASTER_SECRET, strlen(MASTER_SECRET),
-			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE); 
+			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE, 
+			       state->security_parameters.master_secret); 
 	}
-	secure_free(premaster);
-	state->gnutls_key->key.size = 0;
-	state->gnutls_key->key.data = NULL;
+	gnutls_sfree_datum(&PREMASTER);
 	
-	if (master==NULL) return GNUTLS_E_MEMORY_ERROR;
+	if (ret<0) return ret;
 	
 #ifdef HARD_DEBUG
-	_gnutls_log( "MASTER SECRET: %s\n", _gnutls_bin2hex(master, TLS_MASTER_SIZE));
+	_gnutls_log( "MASTER SECRET: %s\n", _gnutls_bin2hex(state->security_parameters.master_secret, TLS_MASTER_SIZE));
 #endif
-	memcpy(state->security_parameters.master_secret, master, TLS_MASTER_SIZE);
-	secure_free(master);
 	return ret;
 }
 
