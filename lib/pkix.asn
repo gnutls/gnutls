@@ -1026,26 +1026,26 @@ Pkcs9challengePassword        ::= CHOICE {
 
 -- Private-key information syntax
 
-PrivateKeyInfo ::= SEQUENCE {
-  version Version,
+pkcs-8-PrivateKeyInfo ::= SEQUENCE {
+  version pkcs-8-Version,
   privateKeyAlgorithm AlgorithmIdentifier,
-  privateKey PrivateKey,
+  privateKey pkcs-8-PrivateKey,
   attributes [0] Attributes OPTIONAL }
 
-Version ::= INTEGER {v1(0)}
+pkcs-8-Version ::= INTEGER {v1(0)}
 
-PrivateKey ::= OCTET STRING
+pkcs-8-PrivateKey ::= OCTET STRING
 
-Attributes ::= SET OF Attribute
+pkcs-8-Attributes ::= SET OF Attribute
 
 -- Encrypted private-key information syntax
 
-EncryptedPrivateKeyInfo ::= SEQUENCE {
+pkcs-8-EncryptedPrivateKeyInfo ::= SEQUENCE {
     encryptionAlgorithm AlgorithmIdentifier,
-    encryptedData EncryptedData 
+    encryptedData pkcs-8-EncryptedData 
 }
 
-EncryptedData ::= OCTET STRING
+pkcs-8-EncryptedData ::= OCTET STRING
 
 -- PKCS #5 stuff
 
@@ -1088,13 +1088,13 @@ pkcs-5-PBKDF2-params ::= SEQUENCE {
 
 pkcs-12	OBJECT IDENTIFIER ::= {pkcs 12}
 
-PFX ::= SEQUENCE {
+pkcs-12-PFX ::= SEQUENCE {
     	version		INTEGER {v3(3)},
     	authSafe	ContentInfo,
-    	macData    	MacData OPTIONAL
+    	macData    	pkcs-12-MacData OPTIONAL
 }
 
-MacData ::= ANY
+pkcs-12-MacData ::= ANY
 -- we don't use it
 -- SEQUENCE {
 --    	mac 		ANY, --DigestInfo,
@@ -1104,53 +1104,53 @@ MacData ::= ANY
 -- deprecated. A higher value, like 1024 is recommended.
 --}
 
-AuthenticatedSafe ::= SEQUENCE OF ContentInfo
+pkcs-12-AuthenticatedSafe ::= SEQUENCE OF ContentInfo
 	-- Data if unencrypted
 	-- EncryptedData if password-encrypted
 	-- EnvelopedData if public key-encrypted
 
-SafeContents ::= SEQUENCE OF SafeBag
+pkcs-12-SafeContents ::= SEQUENCE OF pkcs-12-SafeBag
 
 -- To replace TYPE-IDENTIFIER
-BAG-TYPE ::= SEQUENCE {
+pkcs-12-BAG-TYPE ::= SEQUENCE {
      type-id    OBJECT IDENTIFIER,
      value      [0] EXPLICIT ANY DEFINED BY type-id }
 
 
-SafeBag ::= SEQUENCE {
-  	bagId	      	BAG-TYPE,
+pkcs-12-SafeBag ::= SEQUENCE {
+  	bagId	      	pkcs-12-BAG-TYPE,
   	bagValue      	[0] EXPLICIT ANY DEFINED BY badId,
-  	bagAttributes 	SET OF PKCS12Attribute OPTIONAL
+  	bagAttributes 	SET OF pkcs-12-PKCS12Attribute OPTIONAL
 }
 
 -- Bag types
 
 
-bagtypes OBJECT IDENTIFIER ::= {pkcs-12 10 1}
+pkcs-12-bagtypes OBJECT IDENTIFIER ::= {pkcs-12 10 1}
 
-keyBag OBJECT IDENTIFIER ::= {bagtypes 1}
-pkcs8ShroudedKeyBag OBJECT IDENTIFIER ::= {bagtypes 2}
-certBag OBJECT IDENTIFIER ::= {bagtypes 3}
-crlBag OBJECT IDENTIFIER ::= {bagtypes 4}
+pkcs-12-keyBag OBJECT IDENTIFIER ::= {pkcs-12-bagtypes 1}
+pkcs-12-pkcs8ShroudedKeyBag OBJECT IDENTIFIER ::= {pkcs-12-bagtypes 2}
+pkcs-12-certBag OBJECT IDENTIFIER ::= {pkcs-12-bagtypes 3}
+pkcs-12-crlBag OBJECT IDENTIFIER ::= {pkcs-12-bagtypes 4}
 
-KeyBag ::= PrivateKeyInfo
+pkcs-12-KeyBag ::= pkcs-8-PrivateKeyInfo
 
 -- Shrouded KeyBag
 
-PKCS8ShroudedKeyBag ::= EncryptedPrivateKeyInfo
+pkcs-12-PKCS8ShroudedKeyBag ::= pkcs-8-EncryptedPrivateKeyInfo
 
 -- CertBag
 
-CertBag ::= SEQUENCE {
-	certId    BAG-TYPE,
+pkcs-12-CertBag ::= SEQUENCE {
+	certId    pkcs-12-BAG-TYPE,
 	certValue [0] EXPLICIT ANY DEFINED BY certId
 }
 
 -- x509Certificate BAG-TYPE ::= {OCTET STRING IDENTIFIED BY {pkcs-9-certTypes 1}}
 -- DER-encoded X.509 certificate stored in OCTET STRING
 
-CRLBag ::= SEQUENCE {
-	crlId     	BAG-TYPE,
+pkcs-12-CRLBag ::= SEQUENCE {
+	crlId     	pkcs-12-BAG-TYPE,
 	crlValue 	[0] EXPLICIT ANY DEFINED BY crlId
 }
 
@@ -1158,32 +1158,32 @@ CRLBag ::= SEQUENCE {
 --	{OCTET STRING IDENTIFIED BY {pkcs-9-crlTypes 1}}
 -- DER-encoded X.509 CRL stored in OCTET STRING
 
-PKCS12Attribute ::= ANY
+pkcs-12-PKCS12Attribute ::= ANY
 
 -- PKCS #7 stuff (needed in PKCS 12)
 
-id-data OBJECT IDENTIFIER ::= { iso(1) member-body(2)
+pkcs-7-data OBJECT IDENTIFIER ::= { iso(1) member-body(2)
     us(840) rsadsi(113549) pkcs(1) pkcs7(7) 1 }
 
-id-encryptedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
+pkcs-7-encryptedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
     us(840) rsadsi(113549) pkcs(1) pkcs7(7) 6 }
 
-Data ::= OCTET STRING
+pkcs-7-Data ::= OCTET STRING
 
-EncryptedData ::= SEQUENCE {
+pkcs-7-EncryptedData ::= SEQUENCE {
     version CMSVersion,
-    encryptedContentInfo EncryptedContentInfo,
-    unprotectedAttrs [1] IMPLICIT UnprotectedAttributes OPTIONAL }
+    encryptedContentInfo pkcs-7-EncryptedContentInfo,
+    unprotectedAttrs [1] IMPLICIT pkcs-7-UnprotectedAttributes OPTIONAL }
 
-EncryptedContentInfo ::= SEQUENCE {
+pkcs-7-EncryptedContentInfo ::= SEQUENCE {
     contentType ContentType,
-    contentEncryptionAlgorithm ContentEncryptionAlgorithmIdentifier,
-    encryptedContent [0] IMPLICIT EncryptedContent OPTIONAL }
+    contentEncryptionAlgorithm pkcs-7-ContentEncryptionAlgorithmIdentifier,
+    encryptedContent [0] IMPLICIT pkcs-7-EncryptedContent OPTIONAL }
 
-ContentEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
+pkcs-7-ContentEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
 
-EncryptedContent ::= OCTET STRING
+pkcs-7-EncryptedContent ::= OCTET STRING
 
-UnprotectedAttributes ::= SET SIZE (1..MAX) OF Attribute
+pkcs-7-UnprotectedAttributes ::= SET SIZE (1..MAX) OF Attribute
 
 END

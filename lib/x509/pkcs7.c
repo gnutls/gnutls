@@ -59,7 +59,7 @@ int tmp_size, len, result;
 	if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
 		gnutls_assert();
 		_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
-		return GNUTLS_E_UNKNOWN_PKCS7_CONTENT_TYPE;
+		return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
 	}
 
 	if ((result=asn1_create_element
@@ -371,7 +371,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
   * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
-  * of "BEGIN CERTIFICATE".
+  * of "BEGIN PKCS7".
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.

@@ -65,7 +65,7 @@ static int read_pbkdf2_params( ASN1_TYPE pbes2_asn, const gnutls_datum* der,
 	struct pbkdf2_params* params);
 static int read_pbe_enc_params( ASN1_TYPE pbes2_asn, const gnutls_datum* der, 
 	struct pbe_enc_params* params);
-static int decrypt_data( ASN1_TYPE pkcs8_asn, char* password,
+static int decrypt_data( ASN1_TYPE pkcs8_asn, const char* password,
 	const struct pbkdf2_params* kdf_params, const struct pbe_enc_params *enc_params, 
 	gnutls_datum* decrypted_data);
 static ASN1_TYPE decode_private_key_info( const gnutls_datum* der, gnutls_x509_privkey pkey);
@@ -98,7 +98,7 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				   "PKIX1.PrivateKeyInfo", pkey_info
+				   "PKIX1.pkcs-8-PrivateKeyInfo", pkey_info
 				   )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -212,7 +212,7 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
  * a PKCS #8 EncryptedPrivateKeyInfo.
  */
 static ASN1_TYPE encode_to_pkcs8_key( const gnutls_datum *raw_key, 
-	char* password, unsigned int flags)
+	const char* password, unsigned int flags)
 {
 	int result;
 	gnutls_datum key = {NULL, 0};
@@ -224,7 +224,7 @@ static ASN1_TYPE encode_to_pkcs8_key( const gnutls_datum *raw_key,
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				   "PKIX1.EncryptedPrivateKeyInfo", &pkcs8_asn
+				   "PKIX1.pkcs-8-EncryptedPrivateKeyInfo", &pkcs8_asn
 				   )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
@@ -306,7 +306,7 @@ static ASN1_TYPE encode_to_pkcs8_key( const gnutls_datum *raw_key,
   *
   **/
 int gnutls_x509_privkey_export_pkcs8( gnutls_x509_privkey key,
-	gnutls_x509_crt_fmt format, char* password, unsigned int flags,
+	gnutls_x509_crt_fmt format, const char* password, unsigned int flags,
 	unsigned char* output_data, int* output_data_size)
 {
 ASN1_TYPE pkcs8_asn, pkey_info;
@@ -357,7 +357,7 @@ gnutls_datum tmp;
  * (normally a PKCS #1 encoded RSA key)
  */
 static ASN1_TYPE decode_pkcs8_key( const gnutls_datum *raw_key, 
-	char* password, gnutls_x509_privkey pkey)
+	const char* password, gnutls_x509_privkey pkey)
 {
 	int result, len;
 	opaque enc_oid[64];
@@ -371,7 +371,7 @@ static ASN1_TYPE decode_pkcs8_key( const gnutls_datum *raw_key,
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				   "PKIX1.EncryptedPrivateKeyInfo", &pkcs8_asn
+				   "PKIX1.pkcs-8-EncryptedPrivateKeyInfo", &pkcs8_asn
 				   )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
@@ -481,7 +481,7 @@ static ASN1_TYPE decode_private_key_info( const gnutls_datum* der, gnutls_x509_p
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				   "PKIX1.PrivateKeyInfo", &pkcs8_asn
+				   "PKIX1.pkcs-8-PrivateKeyInfo", &pkcs8_asn
 				   )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
@@ -575,7 +575,7 @@ static ASN1_TYPE decode_private_key_info( const gnutls_datum* der, gnutls_x509_p
   *
   **/
 int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key, const gnutls_datum * data,
-	gnutls_x509_crt_fmt format, char * password, unsigned int flags)
+	gnutls_x509_crt_fmt format, const char * password, unsigned int flags)
 {
 	int result = 0, need_free = 0;
 	gnutls_datum _data = { data->data, data->size };
@@ -803,7 +803,7 @@ char oid[64];
 
 }
 
-static int decrypt_data( ASN1_TYPE pkcs8_asn,  char* password,
+static int decrypt_data( ASN1_TYPE pkcs8_asn, const char* password,
 	const struct pbkdf2_params *kdf_params, const struct pbe_enc_params *enc_params, 
 	gnutls_datum* decrypted_data)
 {
