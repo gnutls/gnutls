@@ -1340,7 +1340,6 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-
 	cipher_num = ret;
 	
 	cipher_num *= sizeof(uint16);	/* in order to get bytes */
@@ -1358,7 +1357,7 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 	_gnutls_write_uint16(cipher_num, *ret_data);
 	pos += 2;
 
-	for (i = 0; i < (cipher_num / 2) - 1; i++) {
+	for (i = 0; i < (cipher_num / 2); i++) {
 		memcpy( &(*ret_data)[pos], cipher_suites[i].CipherSuite, 2);
 		pos += 2;
 	}

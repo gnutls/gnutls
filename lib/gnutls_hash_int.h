@@ -59,6 +59,8 @@ int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void* text, int textlen);
 void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void* digest);
 
 int _gnutls_ssl3_generate_random(void *secret, int secret_len, void *random, int random_len, int bytes, opaque* ret);
+int _gnutls_ssl3_hash_md5(void *first, int first_len, 
+	void *second, int second_len, int ret_len, opaque* ret);
 
 void _gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle, void* digest, opaque* key, uint32 key_size);
 

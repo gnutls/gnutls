@@ -534,8 +534,9 @@ static int _gnutls_P_hash( MACAlgorithm algorithm, const opaque * secret, int se
 {
 
 	GNUTLS_MAC_HANDLE td2;
-	int i = 0, times, how, blocksize, A_size;
+	int i, times, how, blocksize, A_size;
 	opaque final[20], Atmp[MAX_SEED_SIZE];
+	int output_bytes;
 
 	if (seed_size > MAX_SEED_SIZE || total_bytes<=0) {
 		gnutls_assert();
@@ -543,16 +544,19 @@ static int _gnutls_P_hash( MACAlgorithm algorithm, const opaque * secret, int se
 	}
 	
 	blocksize = _gnutls_hmac_get_algo_len(algorithm);
+
+	output_bytes = 0;
 	do {
-		i += blocksize;
-	} while (i < total_bytes);
+		output_bytes += blocksize;
+	} while (output_bytes < total_bytes);
 
 	/* calculate A(0) */
 
 	memcpy( Atmp, seed, seed_size);
 	A_size = seed_size;
 
-	times = i / blocksize;
+	times = output_bytes / blocksize;
+
 	for (i = 0; i < times; i++) {
 		td2 = _gnutls_hmac_init(algorithm, secret, secret_size);
 
@@ -579,23 +583,13 @@ static int _gnutls_P_hash( MACAlgorithm algorithm, const opaque * secret, int se
 	return 0;
 }
 
-/* Function that xor's buffers using the maximum word size supported
- * by the system. It should be faster. - only if one / and % are much faster
- * than the whole xor operation.
+/* Xor's two buffers and puts the output in the first one.
  */
 inline static
-void _gnutls_xor(void* _o1, void* _o2, int _length) {
-unsigned long int* o1 = _o1;
-unsigned long int* o2 = _o2;
-int i, length = _length/sizeof(unsigned long int);
-int modlen = _length%sizeof(unsigned long int);
-
+void _gnutls_xor(opaque* o1, opaque* o2, int length) {
+int i;
 	for (i = 0; i < length; i++) {
 		o1[i] ^= o2[i];
-	}
-	i*=sizeof(unsigned long int);
-	for (;i<modlen;i++) {
-		((unsigned char*)_o1)[i] ^= ((unsigned char*)_o2)[i];
 	}
 	return ;
 }

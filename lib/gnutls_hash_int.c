@@ -99,6 +99,7 @@ int _gnutls_hash_get_algo_len(MACAlgorithm algorithm)
 
 int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text, int textlen)
 {
+	if (textlen > 0)
 #ifdef USE_MHASH
 	mhash(handle->handle, text, textlen);
 #else
@@ -450,6 +451,35 @@ static int ssl3_md5(int i, char *secret, int secret_len, char *random,
 
 	_gnutls_hash_deinit(td, digest);
 	return 0;
+}
+
+int _gnutls_ssl3_hash_md5(void *first, int first_len, 
+	void *second, int second_len, int ret_len, opaque* ret) 
+{
+	opaque digest[MAX_HASH_SIZE];
+	GNUTLS_MAC_HANDLE td;
+	int block = _gnutls_hash_get_algo_len(GNUTLS_MAC_MD5);
+	
+	td = _gnutls_hash_init(GNUTLS_MAC_MD5);
+	if (td == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+
+	_gnutls_hash(td, first, first_len);
+	_gnutls_hash(td, second, second_len);
+
+	_gnutls_hash_deinit(td, digest);
+	
+	if ( block > ret_len) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	memcpy( ret, digest, ret_len);
+
+	return 0;
+	
 }
 
 int _gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
