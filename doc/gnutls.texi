@@ -319,6 +319,7 @@ differences of these protocols are minor. Older protocols such as
 * The TLS Alert Protocol::
 * The TLS Handshake Protocol::
 * TLS Extensions::
+* On SSL 2 and older protocols::
 @end menu
 
 @node TLS layers
@@ -755,6 +756,29 @@ begins within the first handshake packet.  The functions
 @code{gnutls_server_name_set} and @code{gnutls_server_name_get} can be
 used to enable this extension, or to retrieve the name sent by a
 client.
+
+@node On SSL 2 and older protocols
+@section On SSL 2 and older protocols
+@cindex SSL 2
+
+One of the initial decisions in the @acronym{GnuTLS} development was
+to implement the security protocols for the transport layer.
+Initially @acronym{TLS} 1.0 was implemented since it was the latest at
+that time, and was considered to be the most advanced in security
+properties.  Later the @acronym{SSL} 3.0 protocol was implemented
+since it is still the only protocol supported by several servers and
+there are no serious security vulnerabilities known.
+
+One question that may arise is why we didn't implement @acronym{SSL}
+2.0 in the library.  There are several reasons, most important being
+that it has serious security flaws, unacceptable for a modern security
+library.  Other than that, this protocol is barely used by anyone
+these days (it has been deprecated since 1996).
+
+@cindex PCT
+Other protocols such as Microsoft's @acronym{PCT} 1 and @acronym{PCT}
+2 were not implemented because they were also abandoned and deprecated
+by @acronym{SSL} 3.0 and later @acronym{TLS} 1.0.
 
 @node Authentication methods
 @chapter Authentication methods
