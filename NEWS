@@ -1,4 +1,4 @@
-Version 1.0.11
+Version 1.0.11 (17/04/2004)
 - Added gnutls_sign_algorithm_get_name() and gnutls_pk_algorithm_get_name()
 
 Version 1.0.10 (03/04/2004)
