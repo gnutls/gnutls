@@ -548,8 +548,8 @@ void parse_protocols(char **protocols, int protocols_size,
 				protocol_priority[j++] = GNUTLS_SSL3;
 			else if (strncasecmp(protocols[i], "TLS1.1", 6) == 0)
 				protocol_priority[j++] = GNUTLS_TLS1_1;
-			else if (strncasecmp(protocols[i], "TLS", 6) == 0)
-				protocol_priority[j++] = GNUTLS_TLS1;
+			else if (strncasecmp(protocols[i], "TLS", 3) == 0)
+				protocol_priority[j++] = GNUTLS_TLS1_0;
 			else fprintf(stderr, "Unknown protocol: '%s'\n", protocols[i]);
 		}
 		protocol_priority[j] = 0;

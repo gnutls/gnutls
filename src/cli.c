@@ -74,7 +74,7 @@ static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
 static gnutls_certificate_credentials xcred;
 
-int protocol_priority[PRI_MAX] = { GNUTLS_TLS1_1, GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+int protocol_priority[PRI_MAX] = { GNUTLS_TLS1_1, GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
 	/* Do not use anonymous authentication, unless you know what that means */
@@ -158,19 +158,19 @@ static gnutls_session init_tls_session(const char *hostname)
 
 	/* allow the use of private ciphersuites.
 	 */
-	if (disable_extensions == 0)
+	if (disable_extensions == 0) {
 		gnutls_handshake_set_private_extensions(session, 1);
-
-	if (disable_extensions == 0)
 		gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname,
 				       strlen(hostname));
+		gnutls_certificate_type_set_priority(session, cert_type_priority);
+	}
 
 	gnutls_cipher_set_priority(session, cipher_priority);
 	gnutls_compression_set_priority(session, comp_priority);
 	gnutls_kx_set_priority(session, kx_priority);
 	gnutls_protocol_set_priority(session, protocol_priority);
 	gnutls_mac_set_priority(session, mac_priority);
-	gnutls_certificate_type_set_priority(session, cert_type_priority);
+
 
 	gnutls_dh_set_prime_bits(session, 512);
 

@@ -2,7 +2,7 @@
 \index{Compression algorithms}
 The TLS' record layer also supports compression. The algorithms
 implemented in \gnutls{} can be found in figure \ref{fig:compression}.
-All the algorithms except for ZLIB which is referenced in \cite{TLSCOMP}, should be 
+All the algorithms except for DEFLATE which is referenced in \cite{TLSCOMP}, should be 
 considered as \gnutls' extensions\footnote{You should use \printfunc{gnutls_handshake_set_private_extensions}{gnutls\_handshake\_set\_private\_extensions}
 to enable private extensions.}, and
 should be advertised only when the peer is known to have a compliant client,
@@ -23,7 +23,7 @@ the paper \cite{TLSCOMP}.
 \begin{tabular}{|l|p{9cm}|}
 
 \hline
-ZLIB & ZLIB compression, using the deflate algorithm.
+DEFLATE & Zlib compression, using the deflate algorithm.
 \\
 \hline
 LZO & LZO is a very fast compression algorithm. This algorithm is only

@@ -202,9 +202,11 @@ ext_send_func ext_send;
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
+fprintf(stderr, "Data type: [%d]\n", next);
 			/* write extension type */
 			_gnutls_write_uint16( next, &(*data)[pos]);
 			pos+=2;
+fprintf(stderr, "Data size: %d\n", size);
 			
 			/* write size */
 			_gnutls_write_uint16( size, &(*data)[pos]);
@@ -231,6 +233,7 @@ ext_send_func ext_send;
 	pos-=2; /* remove the size of the size header! */
 
 	_gnutls_write_uint16( pos, (*data));
+fprintf(stderr, "Total size: %d\n", pos);
 
 	if (size==2) { /* empty */
 		size = 0;

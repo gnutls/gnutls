@@ -126,7 +126,11 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
     */
    if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-      /* uint16 */
+      if (session->security_parameters.extensions.server_names_size == 0)
+	   return 0;
+
+      /* uint16 
+       */
       total_size = 2;
       for (i = 0;
 	   i < session->security_parameters.extensions.server_names_size;

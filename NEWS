@@ -1,5 +1,6 @@
 Version 1.1.6
 - Several bug fixes, by Arne Thomassen.
+- Fixed a bug where 'server name' extension was always sent.
 
 Version 1.1.5 (06/01/2004)
 - Added the gnutls_sign_algorithm type.
