@@ -9,6 +9,8 @@ See the end for copying conditions.
 - Added second precision to the X.509 parsing and generation functions.
 - Corrected bug in _gnutls_x509_get_dn_oid(), and returns the
   actual OID.
+- Add parameter --la-file to libgnutls-config and libgnutls-extra-config,
+  tiny patch contributed by Joe Orton <joe@manyfish.co.uk>.
 
 * Version 1.1.20 (2004-10-12)
 - Fix compile problem in gl/getpass.c on some systems.
