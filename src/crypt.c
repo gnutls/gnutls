@@ -32,24 +32,27 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-int crypt_int(char *username, char *passwd, int crypt, int salt,
-	      char *tpasswd_conf, char *tpasswd);
-static int read_conf_values(MPI * g, MPI * n, char *str, int str_size);
+#define _MAX(x,y) x>y?x:y
 
-int generate_create_conf(char *file)
+int crypt_int(char *username, char *passwd, int crypt, int salt,
+	      char *tpasswd_conf, char *tpasswd, int uindex);
+static int read_conf_values(MPI * g, MPI * n, char *str, int str_size);
+static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, MPI n);
+
+int generate_create_conf(char *tpasswd_conf, int bits)
 {
 	FILE *fd;
 	char line[5 * 1024];
 	int index = 1;
 	unsigned char *g, *n;
 
-	fd = fopen(file, "w");
+	fd = fopen(tpasswd_conf, "w");
 	if (fd == NULL) {
-		fprintf(stderr, "Cannot open file '%s'\n", file);
+		fprintf(stderr, "Cannot open file '%s'\n", tpasswd_conf);
 		return -1;
 	}
 
-	_gnutls_srp_gn(&g, &n);
+	_gnutls_srp_gn(&g, &n, bits);
 	sprintf(line, "%d:%s:%s\n", index, n, g);
 
 	fwrite(line, 1, strlen(line), fd);
@@ -59,35 +62,26 @@ int generate_create_conf(char *file)
 
 }
 
+static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, MPI n) {
+	if (salt==NULL) return -1;
 
-int verify_passwd(char *conffile, char *file, char *username, char *passwd)
-{
-	FILE *fd;
-	char line[5 * 1024];
-	int i;
-	MPI g, n;
-	int index;
-	char *p;
-
-	fd = fopen(conffile, "r");
-	if (fd == NULL) {
-		fprintf(stderr, "Cannot find %s\n", conffile);
-		return -1;
+	if (gnutls_crypt_vrfy
+	    (username, passwd, salt, g, n) == 0) {
+		fprintf(stderr, "Password verified\n");
+		return 0;
+	} else {
+		fprintf(stderr,
+			"Password does NOT match\n");
 	}
+	return -1;
+}
 
-	p = fgets(line, sizeof(line) - 1, fd);
-
-	if (p == NULL) {
-		fprintf(stderr, "Cannot find entry in %s\n", conffile);
-		return -1;
-	}
-	line[sizeof(line) - 1] = 0;
-
-	fclose(fd);
-	if ((index = read_conf_values(&g, &n, line, strlen(line))) < 0) {
-		fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
-		return -1;
-	}
+/* accepts password file */
+static int find_index(char* username, char* file) {
+FILE * fd;
+char *pos;
+char line[5*1024];
+int i;
 
 	fd = fopen(file, "r");
 	if (fd == NULL) {
@@ -102,15 +96,80 @@ int verify_passwd(char *conffile, char *file, char *username, char *passwd)
 		       && (i < sizeof(line))) {
 			i++;
 		}
-		if (strncmp(username, line, (i>strlen(username))?i:strlen(username)) == 0) {
-			if (gnutls_crypt_vrfy
-			    (username, passwd, &line[++i], g, n) == 0) {
-				fprintf(stderr, "Password verified\n");
-			} else {
-				fprintf(stderr,
-					"Password does NOT match\n");
+		if (strncmp(username, line, _MAX(i,strlen(username)) )  == 0) {
+			/* find the index */
+			pos = rindex(line, ':');
+			pos++;
+			fclose(fd);
+			return atoi(pos);
+		}
+	}
+
+	fclose(fd);
+	return -1;
+}
+
+int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
+{
+	FILE *fd;
+	char line[5 * 1024];
+	int i;
+	MPI g, n;
+	int iindex;
+	char *p, *pos;
+
+	iindex = find_index( username, tpasswd);
+	if (iindex==-1) {
+		fprintf(stderr, "Cannot find '%s' in %s\n", username, tpasswd);
+		return -1;
+	}
+	
+	fd = fopen(conffile, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "Cannot find %s\n", conffile);
+		return -1;
+	}
+
+	do {
+		p = fgets(line, sizeof(line) - 1, fd);
+	} while(p!=NULL && atoi(p)!=iindex);
+	
+	if (p == NULL) {
+		fprintf(stderr, "Cannot find entry in %s\n", conffile);
+		return -1;
+	}
+	line[sizeof(line) - 1] = 0;
+
+	fclose(fd);
+
+	if ((iindex = read_conf_values(&g, &n, line, strlen(line))) < 0) {
+		fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
+		return -1;
+	}
+
+
+	fd = fopen(tpasswd, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "Cannot open file '%s'\n", tpasswd);
+		return -1;
+	}
+
+	while (fgets(line, sizeof(line), fd) != NULL) {
+		/* move to first ':' */
+		i = 0;
+		while ((line[i] != ':') && (line[i] != '\0')
+		       && (i < sizeof(line))) {
+			i++;
+		}
+		if (strncmp(username, line, _MAX(i,strlen(username)) )  == 0) {
+			pos = index(line, ':');
+			fclose(fd);
+			if (pos==NULL) {
+				fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
+				return -1;
 			}
-			return 0;
+			pos++;
+			return _verify_passwd_int( username, passwd, pos, g, n);
 		}
 	}
 
@@ -137,7 +196,7 @@ int main(int argc, char **argv)
 	salt = info.salt;
 
 	if (info.create_conf != NULL) {
-		return generate_create_conf(info.create_conf);
+		return generate_create_conf(info.create_conf, info.bits);
 	}
 
 	if (info.passwd == NULL)
@@ -184,19 +243,19 @@ int main(int argc, char **argv)
 
 
 	return crypt_int(info.username, passwd, crypt, salt,
-			 info.passwd_conf, info.passwd);
+			 info.passwd_conf, info.passwd, info.index);
 
 }
 
 int crypt_int(char *username, char *passwd, int crypt, int salt,
-	      char *tpasswd_conf, char *tpasswd)
+	      char *tpasswd_conf, char *tpasswd, int uindex)
 {
 	FILE *fd;
 	char *cr;
 	MPI g, n;
 	char line[5 * 1024];
 	char *p;
-	int index;
+	int iindex;
 
 	fd = fopen(tpasswd_conf, "r");
 	if (fd == NULL) {
@@ -204,7 +263,10 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 		return -1;
 	}
 
-	p = fgets(line, sizeof(line) - 1, fd);
+	do { /* find the specified uindex in file */
+		p = fgets(line, sizeof(line) - 1, fd);
+		iindex = atoi(p);
+	} while( p!=NULL && iindex!=uindex);
 
 	if (p == NULL) {
 		fprintf(stderr, "Cannot find entry in %s\n", tpasswd_conf);
@@ -213,7 +275,7 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 	line[sizeof(line) - 1] = 0;
 
 	fclose(fd);
-	if ((index = read_conf_values(&g, &n, line, strlen(line))) < 0) {
+	if ((iindex = read_conf_values(&g, &n, line, strlen(line))) < 0) {
 		fprintf(stderr, "Cannot parse conf file '%s'\n",
 			tpasswd_conf);
 		return -1;
@@ -224,14 +286,16 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 		fprintf(stderr, "Cannot gnutls_crypt()...\n");
 		return -1;
 	} else {
-
+#warning "FIXME: DELETE PREVIOUS ENTRY"		
+		/* delete previous entry */
+		
 		fd = fopen(tpasswd, "a");
 		if (fd == NULL) {
 			fprintf(stderr, "Cannot open '%s' for append\n",
 				tpasswd);
 			return -1;
 		}
-		fprintf(fd, "%s:%s:%u\n", username, cr, index);
+		fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
 		fclose(fd);
 		free(cr);
 	}
