@@ -6,7 +6,6 @@ Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
 * Add more functions to parse DER encoded private keys
 * Add option to read the SRP parameters using a callback (server side)
-* Add functions to generate SRP parameters and SRP verifiers
 * Convert documentation to texinfo format
 * Add support for certificate CRLs in certificate verification
 * Audit the code
