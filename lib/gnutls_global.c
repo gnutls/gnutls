@@ -194,8 +194,6 @@ int gnutls_global_init( void)
 		goto out;
 	}
 
-	/* set default recv/send functions
-	 */
 #ifdef DEBUG
 	gnutls_global_set_log_function( dlog);
 #endif
