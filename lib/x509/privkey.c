@@ -846,3 +846,239 @@ int ret;
 
 		return ret;
 }
+
+
+/* Hashes the public parameters of an RSA key.
+ */
+int _gnutls_x509_hash_rsa_key( GNUTLS_MPI * params,
+	unsigned char* output_data, int* output_data_size)
+{
+
+opaque* mod = NULL, *exp = NULL;
+size_t mod_size, exp_size;
+int ret = 0;
+GNUTLS_HASH_HANDLE hd;
+opaque algo = GNUTLS_PK_RSA;
+
+	if ( *output_data_size < _gnutls_hash_get_algo_len( GNUTLS_MAC_SHA)) {
+		gnutls_assert();
+		*output_data_size = _gnutls_hash_get_algo_len( GNUTLS_MAC_SHA);
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	/* get the size of modulus and the public
+	 * exponent.
+	 */
+
+	_gnutls_mpi_print( NULL, &mod_size, params[0]);
+
+	mod = gnutls_malloc( mod_size);
+	if (mod == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if (_gnutls_mpi_print( mod, &mod_size, params[0]) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_PRINT_FAILED;
+		goto error;
+	}
+
+	_gnutls_mpi_print( NULL, &exp_size, params[1]);
+
+	exp = gnutls_malloc( exp_size);
+	if (exp == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto error;
+	}
+
+	if (_gnutls_mpi_print( exp, &exp_size, params[1]) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_PRINT_FAILED;
+		goto error;
+	}
+
+	/* hash the parameters.
+	 */
+
+	hd = _gnutls_hash_init( GNUTLS_MAC_SHA);
+	if (hd == GNUTLS_HASH_FAILED) {
+		gnutls_assert();
+		ret = GNUTLS_E_INTERNAL_ERROR;
+		goto error;
+	}
+	
+	_gnutls_hash( hd, &algo, 1);
+	_gnutls_hash( hd, mod, mod_size);
+	_gnutls_hash( hd, exp, exp_size);
+	
+	_gnutls_hash_deinit( hd, output_data);
+
+	gnutls_free( mod);
+	gnutls_free( exp);
+
+	*output_data_size = _gnutls_hash_get_algo_len( GNUTLS_MAC_SHA);
+	
+	return 0;
+
+	error:
+		gnutls_free( mod);
+		gnutls_free( exp);
+
+		return ret;
+}
+
+/* Hashes the public parameters of a DSA key.
+ */
+int _gnutls_x509_hash_dsa_key( GNUTLS_MPI * params,
+	unsigned char* output_data, int* output_data_size)
+{
+
+opaque* p = NULL, *q = NULL;
+opaque* g = NULL, *y = NULL;
+size_t p_size, q_size;
+size_t g_size, y_size;
+int ret = 0;
+GNUTLS_HASH_HANDLE hd;
+opaque algo = GNUTLS_PK_DSA;
+
+	if ( *output_data_size < _gnutls_hash_get_algo_len( GNUTLS_MAC_SHA)) {
+		gnutls_assert();
+		*output_data_size = _gnutls_hash_get_algo_len( GNUTLS_MAC_SHA);
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+
+	/* get the size of modulus and the public
+	 * exponent.
+	 */
+
+	_gnutls_mpi_print( NULL, &p_size, params[0]);
+
+	p = gnutls_malloc( p_size);
+	if (p == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if (_gnutls_mpi_print( p, &p_size, params[0]) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_PRINT_FAILED;
+		goto error;
+	}
+
+	/* Read q.
+	 */
+	_gnutls_mpi_print( NULL, &q_size, params[1]);
+
+	q = gnutls_malloc( q_size);
+	if (q == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if (_gnutls_mpi_print( q, &q_size, params[1]) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_PRINT_FAILED;
+		goto error;
+	}
+
+	/* Read g.
+	 */
+	_gnutls_mpi_print( NULL, &g_size, params[2]);
+
+	g = gnutls_malloc( g_size);
+	if (g == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if (_gnutls_mpi_print( g, &g_size, params[2]) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_PRINT_FAILED;
+		goto error;
+	}
+
+	/* Read y.
+	 */
+	_gnutls_mpi_print( NULL, &y_size, params[3]);
+
+	y = gnutls_malloc( y_size);
+	if (y == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if (_gnutls_mpi_print( y, &y_size, params[3]) != 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_MPI_PRINT_FAILED;
+		goto error;
+	}
+
+
+	/* hash the parameters.
+	 */
+	 
+	hd = _gnutls_hash_init( GNUTLS_MAC_SHA);
+	if (hd == GNUTLS_HASH_FAILED) {
+		gnutls_assert();
+		ret = GNUTLS_E_INTERNAL_ERROR;
+		goto error;
+	}
+	
+	_gnutls_hash( hd, &algo, 1);
+	_gnutls_hash( hd, p, p_size);
+	_gnutls_hash( hd, q, q_size);
+	_gnutls_hash( hd, g, g_size);
+	_gnutls_hash( hd, y, y_size);
+
+	_gnutls_hash_deinit( hd, output_data);
+
+	gnutls_free( p);
+	gnutls_free( q);
+	gnutls_free( g);
+	gnutls_free( y);
+
+	*output_data_size = _gnutls_hash_get_algo_len( GNUTLS_MAC_SHA);
+	
+	return 0;
+
+	error:
+		gnutls_free( p);
+		gnutls_free( q);
+		gnutls_free( g);
+		gnutls_free( y);
+
+		return ret;
+}
+
+/**
+  * gnutls_x509_privkey_get_key_id - This function will return a unique ID of the key's parameters
+  * @key: Holds the key
+  * @output_data: will contain a private key PEM or DER encoded
+  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will return a unique ID the depends on the public key
+  * parameters. This ID can be used in checking whether a certificate
+  * corresponds to the given key.
+  *
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. The output will normally
+  * be a SHA-1 hash output, which is 20 bytes.
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key,
+	unsigned char* output_data, int* output_data_size)
+{
+		
+	if (key->pk_algorithm == GNUTLS_PK_RSA)
+		return _gnutls_x509_hash_rsa_key( key->params, output_data, output_data_size);
+	else if (key->pk_algorithm == GNUTLS_PK_DSA)
+		return _gnutls_x509_hash_dsa_key( key->params, output_data, output_data_size);
+	else return GNUTLS_E_INTERNAL_ERROR;
+
+	return 0;
+}

@@ -46,6 +46,7 @@
 #include "x509/compat.h"
 #include "x509/mpi.h"
 #include "x509/pkcs7.h"
+#include "x509/privkey.h"
 
 /*
  * some x509 certificate parsing functions.
@@ -152,13 +153,41 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
  */
 static int _gnutls_check_key_cert_match( gnutls_certificate_credentials res) 
 {
+opaque cid[20];
+opaque kid[20];
+int cid_size, kid_size;
 uint pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
-	
+
 	if (res->pkey[res->ncerts-1].pk_algorithm != pk) 
 	{
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
+
+	if (pk == GNUTLS_PK_RSA) {
+		kid_size = sizeof(kid);
+		_gnutls_x509_hash_rsa_key( res->pkey[res->ncerts-1].params, kid, &kid_size);
+
+		cid_size = sizeof(cid);
+		_gnutls_x509_hash_rsa_key( res->cert_list[res->ncerts-1][0].params, cid, &cid_size);
+	} else if ( pk == GNUTLS_PK_DSA) {
+		kid_size = sizeof(kid);
+		_gnutls_x509_hash_dsa_key( res->pkey[res->ncerts-1].params, kid, &kid_size);
+
+		cid_size = sizeof(cid);
+		_gnutls_x509_hash_dsa_key( res->cert_list[res->ncerts-1][0].params, cid, &cid_size);
+	}
+	
+	if (cid_size != kid_size) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
+	}
+	
+	if (memcmp( kid, cid, kid_size) != 0) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
+	}
+	
 	return 0;
 }
 

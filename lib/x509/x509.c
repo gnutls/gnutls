@@ -34,6 +34,8 @@
 #include <extensions.h>
 #include <libtasn1.h>
 #include <gnutls_ui.h>
+#include <mpi.h>
+#include <privkey.h>
 
 /**
   * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt structure
@@ -1036,6 +1038,55 @@ int gnutls_x509_crt_export( gnutls_x509_crt cert,
 {
 	return _gnutls_x509_export_int( cert->cert, format, "CERTIFICATE", *output_data_size,
 		output_data, output_data_size);
+}
+
+
+/**
+  * gnutls_x509_crt_get_key_id - This function will return a unique ID of the public key's parameters
+  * @crt: Holds the certificate
+  * @output_data: will contain a private key PEM or DER encoded
+  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will return a unique ID the depends on the public key
+  * parameters. This ID can be used in checking whether a certificate
+  * corresponds to the given private key.
+  *
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. The output will normally
+  * be a SHA-1 hash output, which is 20 bytes.
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt,
+	unsigned char* output_data, int* output_data_size)
+{
+GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
+int params_size = MAX_PUBLIC_PARAMS_SIZE;
+int i, pk, ret = 0;;
+
+	pk = gnutls_x509_crt_get_pk_algorithm( crt, NULL);
+
+	ret = _gnutls_x509_crt_get_mpis( crt, params, &params_size);
+	
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+		
+	if (pk == GNUTLS_PK_RSA)
+		ret = _gnutls_x509_hash_rsa_key( params, output_data, output_data_size);
+	else if (pk == GNUTLS_PK_DSA)
+		ret = _gnutls_x509_hash_dsa_key( params, output_data, output_data_size);
+	else ret = GNUTLS_E_INTERNAL_ERROR;
+
+	/* release all allocated MPIs
+	 */
+	for (i = 0; i < params_size; i++) {
+		_gnutls_mpi_release( &params[i]);
+	}
+	return ret; 
 }
 
 

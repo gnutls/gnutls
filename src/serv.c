@@ -629,8 +629,8 @@ int main(int argc, char **argv)
       }
 
    if (x509_certfile != NULL)
-      if (gnutls_certificate_set_x509_key_file
-	  (cert_cred, x509_certfile, x509_keyfile, x509ctype) < 0) {
+      if ((ret = gnutls_certificate_set_x509_key_file
+	  (cert_cred, x509_certfile, x509_keyfile, x509ctype)) < 0) {
 	 fprintf(stderr,
 		 "Error reading '%s' or '%s'\n", x509_certfile,
 		 x509_keyfile);
