@@ -1,0 +1,7 @@
+#! /bin/sh
+
+aclocal && \
+libtoolize -c --force --ltdl && \
+autoheader  && \
+automake -a -c || automake -a -c
+autoconf 
