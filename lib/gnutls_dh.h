@@ -18,8 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-const mpi_t* _gnutls_get_dh_params(gnutls_dh_params);
-mpi_t gnutls_calc_dh_secret( mpi_t *ret_x, mpi_t g, mpi_t prime );
-mpi_t gnutls_calc_dh_key( mpi_t f, mpi_t x, mpi_t prime );
-int _gnutls_dh_generate_prime(mpi_t *ret_g, mpi_t* ret_n, uint bits);
+const mpi_t *_gnutls_get_dh_params(gnutls_dh_params);
+mpi_t gnutls_calc_dh_secret(mpi_t * ret_x, mpi_t g, mpi_t prime);
+mpi_t gnutls_calc_dh_key(mpi_t f, mpi_t x, mpi_t prime);
+int _gnutls_dh_generate_prime(mpi_t * ret_g, mpi_t * ret_n, uint bits);
 void gnutls_dh_params_deinit(gnutls_dh_params dh_params);

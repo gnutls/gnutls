@@ -29,56 +29,65 @@ gnutls_alloc_function gnutls_malloc = malloc;
 gnutls_free_function gnutls_free = free;
 gnutls_realloc_function gnutls_realloc = realloc;
 
-void* (*gnutls_calloc)(size_t, size_t) = calloc;
-char* (*gnutls_strdup)(const char*) = _gnutls_strdup;
+void *(*gnutls_calloc) (size_t, size_t) = calloc;
+char *(*gnutls_strdup) (const char *) = _gnutls_strdup;
 
-int _gnutls_is_secure_mem_null( const void* ign) { return 0; }
+int _gnutls_is_secure_mem_null(const void *ign)
+{
+    return 0;
+}
 
-int (*_gnutls_is_secure_memory)(const void*) = _gnutls_is_secure_mem_null;
+int (*_gnutls_is_secure_memory) (const void *) =
+    _gnutls_is_secure_mem_null;
 
 
 void *_gnutls_calloc(size_t nmemb, size_t size)
 {
-	void *ret;
-	size *= nmemb;
-	ret = gnutls_malloc(size);
-	if (ret != NULL) memset(ret, 0, size);
-	return ret;
+    void *ret;
+    size *= nmemb;
+    ret = gnutls_malloc(size);
+    if (ret != NULL)
+	memset(ret, 0, size);
+    return ret;
 }
 
 svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 {
-	svoid *ret;
-	size *= nmemb;
-	ret = gnutls_secure_malloc(size);
-	if (ret != NULL) memset(ret, 0, size);
-	return ret;
+    svoid *ret;
+    size *= nmemb;
+    ret = gnutls_secure_malloc(size);
+    if (ret != NULL)
+	memset(ret, 0, size);
+    return ret;
 }
 
 /* This realloc will free ptr in case realloc
  * fails.
  */
-void* gnutls_realloc_fast( void* ptr, size_t size) 
+void *gnutls_realloc_fast(void *ptr, size_t size)
 {
-void *ret;
+    void *ret;
 
-	if (size == 0) return ptr;
+    if (size == 0)
+	return ptr;
 
-	ret = gnutls_realloc( ptr, size);
-	if ( ret == NULL) {
-		gnutls_free( ptr);
-	}
+    ret = gnutls_realloc(ptr, size);
+    if (ret == NULL) {
+	gnutls_free(ptr);
+    }
 
-	return ret;
+    return ret;
 }
 
-char* _gnutls_strdup( const char* str) {
-size_t siz = strlen( str) + 1;
-char* ret;
+char *_gnutls_strdup(const char *str)
+{
+    size_t siz = strlen(str) + 1;
+    char *ret;
 
-	ret = gnutls_malloc( siz);
-	if (ret != NULL) memcpy( ret, str, siz);
-	return ret;
+    ret = gnutls_malloc(siz);
+    if (ret != NULL)
+	memcpy(ret, str, siz);
+    return ret;
 }
 
 
@@ -96,7 +105,7 @@ char* ret;
   * The allocation function used is the one set by gnutls_global_set_mem_functions().
   *
   **/
-void* gnutls_malloc( size_t s)
+void *gnutls_malloc(size_t s)
 {
 }
 
@@ -109,9 +118,8 @@ void* gnutls_malloc( size_t s)
   * The deallocation function used is the one set by gnutls_global_set_mem_functions().
   *
   **/
-void gnutls_free( void* ptr)
+void gnutls_free(void *ptr)
 {
 }
 
 #endif
-

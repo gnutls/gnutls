@@ -26,23 +26,25 @@
 
 char *strnstr(const char *haystack, const char *needle, size_t haystacklen)
 {
-	char *p;
-	ssize_t plen;
-	ssize_t len = strlen(needle);
+    char *p;
+    ssize_t plen;
+    ssize_t len = strlen(needle);
 
-	if (*needle == '\0')	/* everything matches empty string */
-		return (char*) haystack;
+    if (*needle == '\0')	/* everything matches empty string */
+	return (char *) haystack;
 
-	plen = haystacklen;
-	for (p = (char*) haystack; p != NULL; p = memchr(p + 1, *needle, plen-1)) {
-		plen = haystacklen - (p - haystack);
+    plen = haystacklen;
+    for (p = (char *) haystack; p != NULL;
+	 p = memchr(p + 1, *needle, plen - 1)) {
+	plen = haystacklen - (p - haystack);
 
-		if (plen < len) return NULL;
+	if (plen < len)
+	    return NULL;
 
-		if (strncmp(p, needle, len) == 0)
-			return (p);
-	}
-	return NULL;
+	if (strncmp(p, needle, len) == 0)
+	    return (p);
+    }
+    return NULL;
 }
 
 #endif

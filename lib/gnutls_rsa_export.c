@@ -23,7 +23,7 @@
 /* This file contains code for RSA temporary keys. These keys are
  * only used in export cipher suites.
  */
- 
+
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
@@ -42,114 +42,114 @@
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.
  */
-const mpi_t* _gnutls_get_rsa_params(gnutls_rsa_params rsa_params)
+const mpi_t *_gnutls_get_rsa_params(gnutls_rsa_params rsa_params)
 {
-	if (rsa_params == NULL) {
-		return NULL;
-	}
+    if (rsa_params == NULL) {
+	return NULL;
+    }
 
-	return rsa_params->params;
+    return rsa_params->params;
 
 }
 
 /* resarr will contain: modulus(0), public exponent(1), private exponent(2),
  * prime1 - p (3), prime2 - q(4), u (5).
  */
-int _gnutls_rsa_generate_params(mpi_t* resarr, int* resarr_len, int bits)
+int _gnutls_rsa_generate_params(mpi_t * resarr, int *resarr_len, int bits)
 {
 
-	int ret;
-	gcry_sexp_t parms, key, list;
+    int ret;
+    gcry_sexp_t parms, key, list;
 
-	ret = gcry_sexp_build( &parms, NULL, "(genkey(rsa(nbits %d)))", bits);
-	if (ret != 0) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
+    ret = gcry_sexp_build(&parms, NULL, "(genkey(rsa(nbits %d)))", bits);
+    if (ret != 0) {
+	gnutls_assert();
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
 
-	/* generate the RSA key */
-	ret = gcry_pk_genkey( &key, parms);
-	gcry_sexp_release( parms);
+    /* generate the RSA key */
+    ret = gcry_pk_genkey(&key, parms);
+    gcry_sexp_release(parms);
 
-	if (ret != 0) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
+    if (ret != 0) {
+	gnutls_assert();
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
 
-       	list = gcry_sexp_find_token( key, "n", 0);
-	if (list == NULL) {
-        	gnutls_assert();
-        	gcry_sexp_release( key);
-                return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	resarr[0] = gcry_sexp_nth_mpi(list, 1, 0);
-	gcry_sexp_release(list);
-
-       	list = gcry_sexp_find_token( key, "e", 0);
-	if (list == NULL) {
-        	gnutls_assert();
-        	gcry_sexp_release( key);
-                return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	resarr[1] = gcry_sexp_nth_mpi(list, 1, 0);
-	gcry_sexp_release(list);
-
-       	list = gcry_sexp_find_token( key, "d", 0);
-	if (list == NULL) {
-        	gnutls_assert();
-        	gcry_sexp_release( key);
-                return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	resarr[2] = gcry_sexp_nth_mpi(list, 1, 0);
-	gcry_sexp_release(list);
-
-       	list = gcry_sexp_find_token( key, "p", 0);
-	if (list == NULL) {
-        	gnutls_assert();
-        	gcry_sexp_release( key);
-                return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	resarr[3] = gcry_sexp_nth_mpi(list, 1, 0);
-	gcry_sexp_release(list);
-
-
-       	list = gcry_sexp_find_token( key, "q", 0);
-	if (list == NULL) {
-        	gnutls_assert();
-        	gcry_sexp_release( key);
-                return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	resarr[4] = gcry_sexp_nth_mpi(list, 1, 0);
-	gcry_sexp_release(list);
-
-
-       	list = gcry_sexp_find_token( key, "u", 0);
-	if (list == NULL) {
-        	gnutls_assert();
-        	gcry_sexp_release( key);
-                return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	resarr[5] = gcry_sexp_nth_mpi(list, 1, 0);
-	gcry_sexp_release(list);
-
+    list = gcry_sexp_find_token(key, "n", 0);
+    if (list == NULL) {
+	gnutls_assert();
 	gcry_sexp_release(key);
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
 
-	_gnutls_dump_mpi( "n: ", resarr[0]);
-	_gnutls_dump_mpi( "e: ", resarr[1]);
-	_gnutls_dump_mpi( "d: ", resarr[2]);
-	_gnutls_dump_mpi( "p: ", resarr[3]);
-	_gnutls_dump_mpi( "q: ", resarr[4]);
-	_gnutls_dump_mpi( "u: ", resarr[5]);
-	
-	*resarr_len = 6;
+    resarr[0] = gcry_sexp_nth_mpi(list, 1, 0);
+    gcry_sexp_release(list);
 
-	return 0;
+    list = gcry_sexp_find_token(key, "e", 0);
+    if (list == NULL) {
+	gnutls_assert();
+	gcry_sexp_release(key);
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+    resarr[1] = gcry_sexp_nth_mpi(list, 1, 0);
+    gcry_sexp_release(list);
+
+    list = gcry_sexp_find_token(key, "d", 0);
+    if (list == NULL) {
+	gnutls_assert();
+	gcry_sexp_release(key);
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+    resarr[2] = gcry_sexp_nth_mpi(list, 1, 0);
+    gcry_sexp_release(list);
+
+    list = gcry_sexp_find_token(key, "p", 0);
+    if (list == NULL) {
+	gnutls_assert();
+	gcry_sexp_release(key);
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+    resarr[3] = gcry_sexp_nth_mpi(list, 1, 0);
+    gcry_sexp_release(list);
+
+
+    list = gcry_sexp_find_token(key, "q", 0);
+    if (list == NULL) {
+	gnutls_assert();
+	gcry_sexp_release(key);
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+    resarr[4] = gcry_sexp_nth_mpi(list, 1, 0);
+    gcry_sexp_release(list);
+
+
+    list = gcry_sexp_find_token(key, "u", 0);
+    if (list == NULL) {
+	gnutls_assert();
+	gcry_sexp_release(key);
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+    resarr[5] = gcry_sexp_nth_mpi(list, 1, 0);
+    gcry_sexp_release(list);
+
+    gcry_sexp_release(key);
+
+    _gnutls_dump_mpi("n: ", resarr[0]);
+    _gnutls_dump_mpi("e: ", resarr[1]);
+    _gnutls_dump_mpi("d: ", resarr[2]);
+    _gnutls_dump_mpi("p: ", resarr[3]);
+    _gnutls_dump_mpi("q: ", resarr[4]);
+    _gnutls_dump_mpi("u: ", resarr[5]);
+
+    *resarr_len = 6;
+
+    return 0;
 
 }
 
@@ -168,13 +168,16 @@ int _gnutls_rsa_generate_params(mpi_t* resarr, int* resarr_len, int bits)
   * The new parameters should be stored in the appropriate gnutls_datum. 
   * 
   **/
-int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params, 
-	const gnutls_datum *m, const gnutls_datum *e,
-	const gnutls_datum *d, const gnutls_datum *p, 
-	const gnutls_datum *q, const gnutls_datum *u)
+int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params,
+				 const gnutls_datum * m,
+				 const gnutls_datum * e,
+				 const gnutls_datum * d,
+				 const gnutls_datum * p,
+				 const gnutls_datum * q,
+				 const gnutls_datum * u)
 {
-	return gnutls_x509_privkey_import_rsa_raw( rsa_params,
-		m, e, d, p, q, u);
+    return gnutls_x509_privkey_import_rsa_raw(rsa_params,
+					      m, e, d, p, q, u);
 }
 
 /**
@@ -186,17 +189,17 @@ int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params,
   **/
 int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
 {
-int ret;
+    int ret;
 
-	ret = gnutls_x509_privkey_init( rsa_params);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	
-	(*rsa_params)->crippled = 1;
-	
-	return 0;
+    ret = gnutls_x509_privkey_init(rsa_params);
+    if (ret < 0) {
+	gnutls_assert();
+	return ret;
+    }
+
+    (*rsa_params)->crippled = 1;
+
+    return 0;
 }
 
 /**
@@ -208,7 +211,7 @@ int ret;
   **/
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
 {
-	gnutls_x509_privkey_deinit(rsa_params);
+    gnutls_x509_privkey_deinit(rsa_params);
 }
 
 /**
@@ -222,7 +225,7 @@ void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
   **/
 int gnutls_rsa_params_cpy(gnutls_rsa_params dst, gnutls_rsa_params src)
 {
-	return gnutls_x509_privkey_cpy( dst, src);
+    return gnutls_x509_privkey_cpy(dst, src);
 }
 
 /**
@@ -240,9 +243,10 @@ int gnutls_rsa_params_cpy(gnutls_rsa_params dst, gnutls_rsa_params src)
   * no use calling this in client side.
   *
   **/
-int gnutls_rsa_params_generate2(gnutls_rsa_params params, unsigned int bits)
+int gnutls_rsa_params_generate2(gnutls_rsa_params params,
+				unsigned int bits)
 {
-	return gnutls_x509_privkey_generate( params, GNUTLS_PK_RSA, bits, 0);
+    return gnutls_x509_privkey_generate(params, GNUTLS_PK_RSA, bits, 0);
 }
 
 /**
@@ -261,11 +265,11 @@ int gnutls_rsa_params_generate2(gnutls_rsa_params params, unsigned int bits)
   * 0 on success.
   *
   **/
-int gnutls_rsa_params_import_pkcs1(gnutls_rsa_params params, 
-	const gnutls_datum * pkcs1_params, gnutls_x509_crt_fmt format)
+int gnutls_rsa_params_import_pkcs1(gnutls_rsa_params params,
+				   const gnutls_datum * pkcs1_params,
+				   gnutls_x509_crt_fmt format)
 {
-	return gnutls_x509_privkey_import( params, pkcs1_params,
-		format);
+    return gnutls_x509_privkey_import(params, pkcs1_params, format);
 }
 
 
@@ -287,12 +291,13 @@ int gnutls_rsa_params_import_pkcs1(gnutls_rsa_params params,
   * 0 on success.
   *
   **/
-int gnutls_rsa_params_export_pkcs1( gnutls_rsa_params params,
-	   gnutls_x509_crt_fmt format, unsigned char* params_data, 
-	   size_t* params_data_size)
+int gnutls_rsa_params_export_pkcs1(gnutls_rsa_params params,
+				   gnutls_x509_crt_fmt format,
+				   unsigned char *params_data,
+				   size_t * params_data_size)
 {
-	return gnutls_x509_privkey_export( params, format,
-		params_data, params_data_size);
+    return gnutls_x509_privkey_export(params, format,
+				      params_data, params_data_size);
 }
 
 
@@ -313,21 +318,22 @@ int gnutls_rsa_params_export_pkcs1( gnutls_rsa_params params,
   * 
   **/
 int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
-	gnutls_datum * m, gnutls_datum *e,
-	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
-	gnutls_datum* u, unsigned int *bits)
+				 gnutls_datum * m, gnutls_datum * e,
+				 gnutls_datum * d, gnutls_datum * p,
+				 gnutls_datum * q, gnutls_datum * u,
+				 unsigned int *bits)
 {
-int ret;
+    int ret;
 
-	ret = gnutls_x509_privkey_export_rsa_raw( params, m, e, d, p, q, u);
-	if ( ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+    ret = gnutls_x509_privkey_export_rsa_raw(params, m, e, d, p, q, u);
+    if (ret < 0) {
+	gnutls_assert();
+	return ret;
+    }
 
-	if (bits)
-		*bits = _gnutls_mpi_get_nbits(params->params[3]);
+    if (bits)
+	*bits = _gnutls_mpi_get_nbits(params->params[3]);
 
-	return 0;
+    return 0;
 
 }

@@ -33,11 +33,11 @@
 int _gnutls_get_random(opaque * res, int bytes, int level)
 {
     if (level == GNUTLS_WEAK_RANDOM) {
-      gcry_create_nonce( res, bytes);
-      return 0;
+	gcry_create_nonce(res, bytes);
+	return 0;
     }
 
-    gcry_randomize( res, bytes, level);
+    gcry_randomize(res, bytes, level);
 
     return 0;
 }

@@ -31,84 +31,87 @@
 void _gnutls_print_state(gnutls_session session)
 {
 
-	_gnutls_debug_log( "GNUTLS State:\n");
-	_gnutls_debug_log( "Connection End: %d\n",
-		session->security_parameters.entity);
-	_gnutls_debug_log( "Cipher Algorithm: %d\n",
-		session->security_parameters.read_bulk_cipher_algorithm);
-	_gnutls_debug_log( "MAC algorithm: %d\n",
-		session->security_parameters.read_mac_algorithm);
-	_gnutls_debug_log( "Compression Algorithm: %d\n",
-		session->security_parameters.read_compression_algorithm);
-	_gnutls_debug_log( "\n");
+    _gnutls_debug_log("GNUTLS State:\n");
+    _gnutls_debug_log("Connection End: %d\n",
+		      session->security_parameters.entity);
+    _gnutls_debug_log("Cipher Algorithm: %d\n",
+		      session->security_parameters.
+		      read_bulk_cipher_algorithm);
+    _gnutls_debug_log("MAC algorithm: %d\n",
+		      session->security_parameters.read_mac_algorithm);
+    _gnutls_debug_log("Compression Algorithm: %d\n",
+		      session->security_parameters.
+		      read_compression_algorithm);
+    _gnutls_debug_log("\n");
 
 }
 
 #endif
 
-const char* _gnutls_packet2str( content_type_t packet) 
+const char *_gnutls_packet2str(content_type_t packet)
 {
-	switch(packet) {
-		case GNUTLS_CHANGE_CIPHER_SPEC:
-			return "Change Cipher Spec";
-		case GNUTLS_ALERT:
-			return "Alert";
-		case GNUTLS_HANDSHAKE:
-			return "Handshake";
-		case GNUTLS_APPLICATION_DATA:
-			return "Application Data";
+    switch (packet) {
+    case GNUTLS_CHANGE_CIPHER_SPEC:
+	return "Change Cipher Spec";
+    case GNUTLS_ALERT:
+	return "Alert";
+    case GNUTLS_HANDSHAKE:
+	return "Handshake";
+    case GNUTLS_APPLICATION_DATA:
+	return "Application Data";
 
-		default:
-			return "Unknown Packet";
-	}	
+    default:
+	return "Unknown Packet";
+    }
 }
 
-const char* _gnutls_handshake2str( HandshakeType handshake) 
+const char *_gnutls_handshake2str(HandshakeType handshake)
 {
 
-	switch(handshake) {
-		case GNUTLS_HELLO_REQUEST:
-			return "HELLO REQUEST";
-			break;
-		case GNUTLS_CLIENT_HELLO:
-			return "CLIENT HELLO";
-			break;		
-		case GNUTLS_SERVER_HELLO:
-			return "SERVER HELLO";
-			break;
-		case GNUTLS_CERTIFICATE_PKT:
-			return "CERTIFICATE";
-			break;
-		case GNUTLS_SERVER_KEY_EXCHANGE:
-			return "SERVER KEY EXCHANGE";
-			break;
-		case GNUTLS_CERTIFICATE_REQUEST:
-			return "CERTIFICATE REQUEST";
-			break;
-		case GNUTLS_SERVER_HELLO_DONE:
-			return "SERVER HELLO DONE";
-			break;
-		case GNUTLS_CERTIFICATE_VERIFY:
-			return "CERTIFICATE VERIFY";
-			break;
-		case GNUTLS_CLIENT_KEY_EXCHANGE:
-			return "CLIENT KEY EXCHANGE";
-			break;
-		case GNUTLS_FINISHED:
-			return "FINISHED";
-			break;
-		default:
-			return "Unknown Handshake packet";
-			
-	}	
+    switch (handshake) {
+    case GNUTLS_HELLO_REQUEST:
+	return "HELLO REQUEST";
+	break;
+    case GNUTLS_CLIENT_HELLO:
+	return "CLIENT HELLO";
+	break;
+    case GNUTLS_SERVER_HELLO:
+	return "SERVER HELLO";
+	break;
+    case GNUTLS_CERTIFICATE_PKT:
+	return "CERTIFICATE";
+	break;
+    case GNUTLS_SERVER_KEY_EXCHANGE:
+	return "SERVER KEY EXCHANGE";
+	break;
+    case GNUTLS_CERTIFICATE_REQUEST:
+	return "CERTIFICATE REQUEST";
+	break;
+    case GNUTLS_SERVER_HELLO_DONE:
+	return "SERVER HELLO DONE";
+	break;
+    case GNUTLS_CERTIFICATE_VERIFY:
+	return "CERTIFICATE VERIFY";
+	break;
+    case GNUTLS_CLIENT_KEY_EXCHANGE:
+	return "CLIENT KEY EXCHANGE";
+	break;
+    case GNUTLS_FINISHED:
+	return "FINISHED";
+	break;
+    default:
+	return "Unknown Handshake packet";
+
+    }
 }
 
-void _gnutls_dump_mpi(const char* prefix, mpi_t a)
+void _gnutls_dump_mpi(const char *prefix, mpi_t a)
 {
-	opaque buf[1024];
-	size_t n = sizeof buf;
-	
-	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, n, &n, a))
-		strcpy(buf, "[can't print value]"); /* Flawfinder: ignore */
-	_gnutls_hard_log( "MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
+    opaque buf[1024];
+    size_t n = sizeof buf;
+
+    if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, n, &n, a))
+	strcpy(buf, "[can't print value]");	/* Flawfinder: ignore */
+    _gnutls_hard_log("MPI: length: %d\n\t%s%s\n", (n - 1) / 2, prefix,
+		     buf);
 }

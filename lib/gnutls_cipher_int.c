@@ -25,75 +25,91 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
-cipher_hd_t _gnutls_cipher_init( gnutls_cipher_algorithm cipher, 
-	const gnutls_datum *key, const gnutls_datum *iv)
+cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm cipher,
+				const gnutls_datum * key,
+				const gnutls_datum * iv)
 {
-cipher_hd_t ret = NULL;
-gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
+    cipher_hd_t ret = NULL;
+    gcry_error_t err = GPG_ERR_GENERAL;	/* doesn't matter */
 
 
-	switch (cipher) {
-	case GNUTLS_CIPHER_AES_128_CBC:
-		err = gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
-		break;
-	case GNUTLS_CIPHER_AES_256_CBC:
-		err = gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
-		break;
-	case GNUTLS_CIPHER_3DES_CBC:
-		err = gcry_cipher_open(&ret, GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC, 0);
-		break;
-	case GNUTLS_CIPHER_DES_CBC:
-		err = gcry_cipher_open(&ret, GCRY_CIPHER_DES, GCRY_CIPHER_MODE_CBC, 0);
-		break;
-	case GNUTLS_CIPHER_ARCFOUR_128:
-	case GNUTLS_CIPHER_ARCFOUR_40:
-		err = gcry_cipher_open(&ret, GCRY_CIPHER_ARCFOUR, GCRY_CIPHER_MODE_STREAM, 0);
-		break;
-	case GNUTLS_CIPHER_RC2_40_CBC:
-		err = gcry_cipher_open(&ret, GCRY_CIPHER_RFC2268_40, GCRY_CIPHER_MODE_CBC, 0);
-		break;
-	default:
-		return NULL;
-	}
+    switch (cipher) {
+    case GNUTLS_CIPHER_AES_128_CBC:
+	err =
+	    gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL,
+			     GCRY_CIPHER_MODE_CBC, 0);
+	break;
+    case GNUTLS_CIPHER_AES_256_CBC:
+	err =
+	    gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL256,
+			     GCRY_CIPHER_MODE_CBC, 0);
+	break;
+    case GNUTLS_CIPHER_3DES_CBC:
+	err =
+	    gcry_cipher_open(&ret, GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC,
+			     0);
+	break;
+    case GNUTLS_CIPHER_DES_CBC:
+	err =
+	    gcry_cipher_open(&ret, GCRY_CIPHER_DES, GCRY_CIPHER_MODE_CBC,
+			     0);
+	break;
+    case GNUTLS_CIPHER_ARCFOUR_128:
+    case GNUTLS_CIPHER_ARCFOUR_40:
+	err =
+	    gcry_cipher_open(&ret, GCRY_CIPHER_ARCFOUR,
+			     GCRY_CIPHER_MODE_STREAM, 0);
+	break;
+    case GNUTLS_CIPHER_RC2_40_CBC:
+	err =
+	    gcry_cipher_open(&ret, GCRY_CIPHER_RFC2268_40,
+			     GCRY_CIPHER_MODE_CBC, 0);
+	break;
+    default:
+	return NULL;
+    }
 
-	if (err == 0) {
-		gcry_cipher_setkey(ret, key->data, key->size);
-		if (iv->data!=NULL && iv->size>0) gcry_cipher_setiv(ret, iv->data, iv->size);
-	} else if (cipher != GNUTLS_CIPHER_NULL) {
-		gnutls_assert();
-		_gnutls_x509_log("Gcrypt cipher[%d] error: %s\n", cipher, gcry_strerror(err));
-	}
+    if (err == 0) {
+	gcry_cipher_setkey(ret, key->data, key->size);
+	if (iv->data != NULL && iv->size > 0)
+	    gcry_cipher_setiv(ret, iv->data, iv->size);
+    } else if (cipher != GNUTLS_CIPHER_NULL) {
+	gnutls_assert();
+	_gnutls_x509_log("Gcrypt cipher[%d] error: %s\n", cipher,
+			 gcry_strerror(err));
+    }
 
-	return ret;	
+    return ret;
 }
 
-int _gnutls_cipher_encrypt(cipher_hd_t handle, void* text, 
-	int textlen) 
+int _gnutls_cipher_encrypt(cipher_hd_t handle, void *text, int textlen)
 {
-	if (handle!=GNUTLS_CIPHER_FAILED) {
-		if (gcry_cipher_encrypt( handle, text, textlen, NULL, textlen)!=0) {
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
+    if (handle != GNUTLS_CIPHER_FAILED) {
+	if (gcry_cipher_encrypt(handle, text, textlen, NULL, textlen) != 0) {
+	    gnutls_assert();
+	    return GNUTLS_E_INTERNAL_ERROR;
 	}
-	return 0;
+    }
+    return 0;
 }
 
-int _gnutls_cipher_decrypt(cipher_hd_t handle, void* ciphertext, 
-	int ciphertextlen) 
+int _gnutls_cipher_decrypt(cipher_hd_t handle, void *ciphertext,
+			   int ciphertextlen)
 {
-	if (handle!=GNUTLS_CIPHER_FAILED) {
-		if (gcry_cipher_decrypt( handle, ciphertext, ciphertextlen, NULL, ciphertextlen)!=0) {
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
+    if (handle != GNUTLS_CIPHER_FAILED) {
+	if (gcry_cipher_decrypt
+	    (handle, ciphertext, ciphertextlen, NULL,
+	     ciphertextlen) != 0) {
+	    gnutls_assert();
+	    return GNUTLS_E_INTERNAL_ERROR;
 	}
-	return 0;
+    }
+    return 0;
 }
 
-void _gnutls_cipher_deinit(cipher_hd_t handle) 
+void _gnutls_cipher_deinit(cipher_hd_t handle)
 {
-	if (handle!=GNUTLS_CIPHER_FAILED) {
-		gcry_cipher_close(handle);
-	}
+    if (handle != GNUTLS_CIPHER_FAILED) {
+	gcry_cipher_close(handle);
+    }
 }

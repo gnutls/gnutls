@@ -45,12 +45,12 @@
   **/
 int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring * keyring)
 {
-	*keyring = gnutls_calloc( 1, sizeof(gnutls_openpgp_keyring_int));
+    *keyring = gnutls_calloc(1, sizeof(gnutls_openpgp_keyring_int));
 
-	if (*keyring) {
-		return 0; /* success */
-	}
-	return GNUTLS_E_MEMORY_ERROR;
+    if (*keyring) {
+	return 0;		/* success */
+    }
+    return GNUTLS_E_MEMORY_ERROR;
 }
 
 /**
@@ -62,14 +62,15 @@ int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring * keyring)
   **/
 void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring keyring)
 {
-	if (!keyring) return;
+    if (!keyring)
+	return;
 
-	if (keyring->hd) {
-		cdk_free( keyring->hd);
-		keyring->hd = NULL;
-	}
-	
-	gnutls_free(keyring);
+    if (keyring->hd) {
+	cdk_free(keyring->hd);
+	keyring->hd = NULL;
+    }
+
+    gnutls_free(keyring);
 }
 
 /**
@@ -84,32 +85,32 @@ void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring keyring)
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring keyring, 
-	const gnutls_datum * data,
-	gnutls_openpgp_key_fmt format)
+int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring keyring,
+				  const gnutls_datum * data,
+				  gnutls_openpgp_key_fmt format)
 {
-int rc;
-keybox_blob *blob = NULL;
+    int rc;
+    keybox_blob *blob = NULL;
 
 
-	blob = kbx_read_blob( data, 0);
-	if( !blob ) {
-		gnutls_assert();
-		return GNUTLS_E_OPENPGP_KEYRING_ERROR;
-	}
-	
-	keyring->hd = kbx_to_keydb( blob);
-	if( !keyring->hd ) {
-		gnutls_assert();
-		rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
-		goto leave;
-	}
-	
-	rc = 0;
-	
-	leave:
-		kbx_blob_release( blob );
-		return rc;
+    blob = kbx_read_blob(data, 0);
+    if (!blob) {
+	gnutls_assert();
+	return GNUTLS_E_OPENPGP_KEYRING_ERROR;
+    }
+
+    keyring->hd = kbx_to_keydb(blob);
+    if (!keyring->hd) {
+	gnutls_assert();
+	rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
+	goto leave;
+    }
+
+    rc = 0;
+
+  leave:
+    kbx_blob_release(blob);
+    return rc;
 }
 
 
@@ -127,12 +128,12 @@ keybox_blob *blob = NULL;
   **/
 int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb * trustdb)
 {
-	*trustdb = gnutls_calloc( 1, sizeof(gnutls_openpgp_trustdb_int));
+    *trustdb = gnutls_calloc(1, sizeof(gnutls_openpgp_trustdb_int));
 
-	if (*trustdb) {
-		return 0; /* success */
-	}
-	return GNUTLS_E_MEMORY_ERROR;
+    if (*trustdb) {
+	return 0;		/* success */
+    }
+    return GNUTLS_E_MEMORY_ERROR;
 }
 
 /**
@@ -144,14 +145,15 @@ int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb * trustdb)
   **/
 void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb trustdb)
 {
-	if (!trustdb) return;
+    if (!trustdb)
+	return;
 
-	if (trustdb->st) {
-		cdk_stream_close( trustdb->st);
-		trustdb->st = NULL;
-	}
-	
-	gnutls_free(trustdb);
+    if (trustdb->st) {
+	cdk_stream_close(trustdb->st);
+	trustdb->st = NULL;
+    }
+
+    gnutls_free(trustdb);
 }
 
 /**
@@ -165,18 +167,17 @@ void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb trustdb)
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb trustdb, 
-	const char * file)
+int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb trustdb,
+				       const char *file)
 {
-int rc;
-	
-	rc = cdk_stream_open( file, &trustdb->st);
-	if( rc ) {
-		rc = _gnutls_map_cdk_rc( rc );
-		gnutls_assert();
-		return rc;
-	}
+    int rc;
 
-	return 0;
+    rc = cdk_stream_open(file, &trustdb->st);
+    if (rc) {
+	rc = _gnutls_map_cdk_rc(rc);
+	gnutls_assert();
+	return rc;
+    }
+
+    return 0;
 }
-

@@ -3,18 +3,18 @@
 #include <auth_dh_common.h>
 
 typedef struct {
-	gnutls_dh_params dh_params;
-	/* this callback is used to retrieve the DH or RSA
-	 * parameters.
-	 */
-	gnutls_params_function * params_func;
+    gnutls_dh_params dh_params;
+    /* this callback is used to retrieve the DH or RSA
+     * parameters.
+     */
+    gnutls_params_function *params_func;
 } anon_server_credentials_st;
 #define gnutls_anon_server_credentials anon_server_credentials_st*
 
 #define gnutls_anon_client_credentials void*
 
 typedef struct anon_client_auth_info_st {
-	dh_info_t dh;
+    dh_info_t dh;
 } *anon_client_auth_info_t;
 
 typedef anon_client_auth_info_t anon_server_auth_info_t;
@@ -22,5 +22,6 @@ typedef anon_client_auth_info_t anon_server_auth_info_t;
 typedef struct anon_client_auth_info_st anon_client_auth_info_st;
 typedef anon_client_auth_info_st anon_server_auth_info_st;
 
-gnutls_dh_params _gnutls_anon_get_dh_params(const gnutls_anon_server_credentials sc,
-	gnutls_session session);
+gnutls_dh_params _gnutls_anon_get_dh_params(const
+					    gnutls_anon_server_credentials
+					    sc, gnutls_session session);

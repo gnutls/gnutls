@@ -41,38 +41,40 @@
 #include "gnutls_auth_int.h"
 
 /* This selects the best supported ciphersuite from the ones provided */
-static int _gnutls_handshake_select_v2_suite(gnutls_session session, opaque *data, int datalen)
+static int _gnutls_handshake_select_v2_suite(gnutls_session session,
+					     opaque * data, int datalen)
 {
-	int i, j, ret;
-	opaque* _data;
-	int _datalen;
+    int i, j, ret;
+    opaque *_data;
+    int _datalen;
 
-	_gnutls_handshake_log( "HSK[%x]: Parsing a version 2.0 client hello.\n", session);
-	
-	_data = gnutls_malloc( datalen);
-	if (_data==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+    _gnutls_handshake_log("HSK[%x]: Parsing a version 2.0 client hello.\n",
+			  session);
+
+    _data = gnutls_malloc(datalen);
+    if (_data == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    if (datalen % 3 != 0) {
+	gnutls_assert();
+	return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+    }
+
+    i = _datalen = 0;
+    for (j = 0; j < datalen; j += 3) {
+	if (data[j] == 0) {
+	    memcpy(&_data[i], &data[j + 1], 2);
+	    i += 2;
+	    _datalen += 2;
 	}
+    }
 
-	if (datalen % 3 != 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+    ret = _gnutls_server_select_suite(session, _data, _datalen);
+    gnutls_free(_data);
 
-	i = _datalen = 0;
-	for (j = 0; j < datalen; j += 3) {
-		if (data[j] == 0) {
-			memcpy( &_data[i], &data[j+1], 2);
-			i+=2;
-			_datalen+=2;
-		}
-	}
-
-	ret = _gnutls_server_select_suite( session, _data, _datalen);
-	gnutls_free(_data);
-
-	return ret;
+    return ret;
 
 }
 
@@ -81,152 +83,162 @@ static int _gnutls_handshake_select_v2_suite(gnutls_session session, opaque *dat
  * However they set their version to 3.0 or 3.1.
  */
 int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
-			      int datalen)
+				 int datalen)
 {
-	uint16 session_id_len = 0;
-	int pos = 0;
-	int ret = 0;
-	uint16 sizeOfSuites;
-	gnutls_protocol_version version;
-	opaque random[TLS_RANDOM_SIZE];
-	int len = datalen;
-	int err;
-	uint16 challenge;
-	opaque session_id[TLS_MAX_SESSION_ID_SIZE];
-	gnutls_protocol_version ver;
-	
-	/* we only want to get here once - only in client hello */
-	session->internals.v2_hello = 0;
+    uint16 session_id_len = 0;
+    int pos = 0;
+    int ret = 0;
+    uint16 sizeOfSuites;
+    gnutls_protocol_version version;
+    opaque random[TLS_RANDOM_SIZE];
+    int len = datalen;
+    int err;
+    uint16 challenge;
+    opaque session_id[TLS_MAX_SESSION_ID_SIZE];
+    gnutls_protocol_version ver;
 
-	DECR_LEN(len, 2);
+    /* we only want to get here once - only in client hello */
+    session->internals.v2_hello = 0;
 
-	_gnutls_handshake_log( "HSK[%x]: SSL 2.0 Hello: Client's version: %d.%d\n", 
-		session, data[pos], data[pos + 1]);
+    DECR_LEN(len, 2);
 
-	set_adv_version( session, data[pos], data[pos+1]);
-	
-	version = _gnutls_version_get(data[pos], data[pos + 1]);
+    _gnutls_handshake_log
+	("HSK[%x]: SSL 2.0 Hello: Client's version: %d.%d\n", session,
+	 data[pos], data[pos + 1]);
 
-	/* if we do not support that version  
-	 */
-	if (_gnutls_version_is_supported(session, version) == 0) {
-		ver = _gnutls_version_lowest( session);
-	} else {
-		ver = version;
-	}
+    set_adv_version(session, data[pos], data[pos + 1]);
 
-	_gnutls_set_current_version(session, ver);
+    version = _gnutls_version_get(data[pos], data[pos + 1]);
 
-	pos += 2;
+    /* if we do not support that version  
+     */
+    if (_gnutls_version_is_supported(session, version) == 0) {
+	ver = _gnutls_version_lowest(session);
+    } else {
+	ver = version;
+    }
 
+    _gnutls_set_current_version(session, ver);
 
-	/* Read uint16 cipher_spec_length */
-	DECR_LEN(len, 2);
-	sizeOfSuites = _gnutls_read_uint16( &data[pos]);
-	pos += 2;
-	
-	/* read session id length */
-	DECR_LEN(len, 2);
-	session_id_len = _gnutls_read_uint16( &data[pos]);
-	pos += 2;
-
-	if (session_id_len > TLS_MAX_SESSION_ID_SIZE) { 
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
-	/* read challenge length */
-	DECR_LEN(len, 2);
-	challenge = _gnutls_read_uint16( &data[pos]);
-	pos += 2;
-
-	if ( challenge < 16 || challenge > TLS_RANDOM_SIZE) {
-		gnutls_assert();
-		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	}
-
-	/* find an appropriate cipher suite */
-
-	DECR_LEN(len, sizeOfSuites);
-	ret = _gnutls_handshake_select_v2_suite(session, &data[pos], sizeOfSuites);
-
-	pos += sizeOfSuites;
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	/* check if the credentials (username, public key etc.) are ok
-	 */
-	if (_gnutls_get_kx_cred( session, _gnutls_cipher_suite_get_kx_algo(
-		&session->security_parameters.current_cipher_suite), &err) == NULL && err != 0) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
-
-	/* set the mod_auth_st to the appropriate struct
-	 * according to the KX algorithm. This is needed since all the
-	 * handshake functions are read from there;
-	 */
-	session->internals.auth_struct =
-	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (&session->security_parameters.
-				    current_cipher_suite));
-	if (session->internals.auth_struct == NULL) {
-
-		_gnutls_handshake_log(
-			"HSK[%x]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
-				session);
-
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	
-
-	/* read random new values -skip session id for now */
-	DECR_LEN(len, session_id_len); /* skip session id for now */
-	memcpy( session_id, &data[pos], session_id_len);
-	pos += session_id_len;
-	
-	DECR_LEN(len, challenge);
-	memset( random, 0, TLS_RANDOM_SIZE);
-	
-	memcpy( &random[TLS_RANDOM_SIZE-challenge], &data[pos], challenge);
-
-	_gnutls_set_client_random( session, random);
-
-	/* generate server random value */
-
-	_gnutls_tls_create_random( random);
-	_gnutls_set_server_random( session, random);
-	
-	session->security_parameters.timestamp = time(NULL);
+    pos += 2;
 
 
-	/* RESUME SESSION */
+    /* Read uint16 cipher_spec_length */
+    DECR_LEN(len, 2);
+    sizeOfSuites = _gnutls_read_uint16(&data[pos]);
+    pos += 2;
 
-	DECR_LEN(len, session_id_len);
-	ret = _gnutls_server_restore_session(session, session_id, session_id_len);
+    /* read session id length */
+    DECR_LEN(len, 2);
+    session_id_len = _gnutls_read_uint16(&data[pos]);
+    pos += 2;
 
-	if (ret == 0) {		/* resumed! */
-		/* get the new random values */
-		memcpy(session->internals.resumed_security_parameters.server_random,
-		       session->security_parameters.server_random, TLS_RANDOM_SIZE);
-		memcpy(session->internals.resumed_security_parameters.client_random,
-		       session->security_parameters.client_random, TLS_RANDOM_SIZE);
+    if (session_id_len > TLS_MAX_SESSION_ID_SIZE) {
+	gnutls_assert();
+	return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+    }
 
-		session->internals.resumed = RESUME_TRUE;
-		return 0;
-	} else {
-		_gnutls_generate_session_id(session->security_parameters.
-					    session_id,
-					    &session->security_parameters.
-					    session_id_size);
-		session->internals.resumed = RESUME_FALSE;
-	}
+    /* read challenge length */
+    DECR_LEN(len, 2);
+    challenge = _gnutls_read_uint16(&data[pos]);
+    pos += 2;
 
-	session->internals.compression_method = GNUTLS_COMP_NULL;
+    if (challenge < 16 || challenge > TLS_RANDOM_SIZE) {
+	gnutls_assert();
+	return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+    }
 
+    /* find an appropriate cipher suite */
+
+    DECR_LEN(len, sizeOfSuites);
+    ret =
+	_gnutls_handshake_select_v2_suite(session, &data[pos],
+					  sizeOfSuites);
+
+    pos += sizeOfSuites;
+    if (ret < 0) {
+	gnutls_assert();
+	return ret;
+    }
+
+    /* check if the credentials (username, public key etc.) are ok
+     */
+    if (_gnutls_get_kx_cred
+	(session,
+	 _gnutls_cipher_suite_get_kx_algo(&session->security_parameters.
+					  current_cipher_suite),
+	 &err) == NULL && err != 0) {
+	gnutls_assert();
+	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    }
+
+    /* set the mod_auth_st to the appropriate struct
+     * according to the KX algorithm. This is needed since all the
+     * handshake functions are read from there;
+     */
+    session->internals.auth_struct =
+	_gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
+			       (&session->security_parameters.
+				current_cipher_suite));
+    if (session->internals.auth_struct == NULL) {
+
+	_gnutls_handshake_log
+	    ("HSK[%x]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
+	     session);
+
+	gnutls_assert();
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+
+
+    /* read random new values -skip session id for now */
+    DECR_LEN(len, session_id_len);	/* skip session id for now */
+    memcpy(session_id, &data[pos], session_id_len);
+    pos += session_id_len;
+
+    DECR_LEN(len, challenge);
+    memset(random, 0, TLS_RANDOM_SIZE);
+
+    memcpy(&random[TLS_RANDOM_SIZE - challenge], &data[pos], challenge);
+
+    _gnutls_set_client_random(session, random);
+
+    /* generate server random value */
+
+    _gnutls_tls_create_random(random);
+    _gnutls_set_server_random(session, random);
+
+    session->security_parameters.timestamp = time(NULL);
+
+
+    /* RESUME SESSION */
+
+    DECR_LEN(len, session_id_len);
+    ret =
+	_gnutls_server_restore_session(session, session_id,
+				       session_id_len);
+
+    if (ret == 0) {		/* resumed! */
+	/* get the new random values */
+	memcpy(session->internals.resumed_security_parameters.
+	       server_random, session->security_parameters.server_random,
+	       TLS_RANDOM_SIZE);
+	memcpy(session->internals.resumed_security_parameters.
+	       client_random, session->security_parameters.client_random,
+	       TLS_RANDOM_SIZE);
+
+	session->internals.resumed = RESUME_TRUE;
 	return 0;
+    } else {
+	_gnutls_generate_session_id(session->security_parameters.
+				    session_id,
+				    &session->security_parameters.
+				    session_id_size);
+	session->internals.resumed = RESUME_FALSE;
+    }
+
+    session->internals.compression_method = GNUTLS_COMP_NULL;
+
+    return 0;
 }

@@ -43,12 +43,12 @@
   **/
 int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey * key)
 {
-	*key = gnutls_calloc( 1, sizeof(gnutls_openpgp_privkey_int));
+    *key = gnutls_calloc(1, sizeof(gnutls_openpgp_privkey_int));
 
-	if (*key) {
-		return 0; /* success */
-	}
-	return GNUTLS_E_MEMORY_ERROR;
+    if (*key) {
+	return 0;		/* success */
+    }
+    return GNUTLS_E_MEMORY_ERROR;
 }
 
 /**
@@ -60,10 +60,11 @@ int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey * key)
   **/
 void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key)
 {
-	if (!key) return;
+    if (!key)
+	return;
 
-	_gnutls_gkey_deinit( &key->pkey);
-	gnutls_free(key);
+    _gnutls_gkey_deinit(&key->pkey);
+    gnutls_free(key);
 }
 
 /**
@@ -80,19 +81,20 @@ void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key)
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey key, 
-	const gnutls_datum * data, gnutls_openpgp_key_fmt format,
-	const char* pass, unsigned int flags)
+int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey key,
+				  const gnutls_datum * data,
+				  gnutls_openpgp_key_fmt format,
+				  const char *pass, unsigned int flags)
 {
-int rc;
+    int rc;
 
-	rc = _gnutls_openpgp_raw_privkey_to_gkey( &key->pkey, data);
-	if( rc) {
-		gnutls_assert();
-		return rc;
-	}
-	
-	return 0;
+    rc = _gnutls_openpgp_raw_privkey_to_gkey(&key->pkey, data);
+    if (rc) {
+	gnutls_assert();
+	return rc;
+    }
+
+    return 0;
 }
 
 /**
@@ -112,18 +114,17 @@ int rc;
   *
   **/
 int
-gnutls_openpgp_privkey_get_pk_algorithm( gnutls_openpgp_privkey key, unsigned int *bits)
+gnutls_openpgp_privkey_get_pk_algorithm(gnutls_openpgp_privkey key,
+					unsigned int *bits)
 {
-	int pk = key->pkey.pk_algorithm;
+    int pk = key->pkey.pk_algorithm;
 
-	if (bits) {
-		*bits = 0;
-		if (pk == GNUTLS_PK_RSA)
-			*bits = _gnutls_mpi_get_nbits( key->pkey.params[0]);
-		if (pk == GNUTLS_PK_DSA)
-			*bits = _gnutls_mpi_get_nbits( key->pkey.params[3]);
-	}
-	return pk;
+    if (bits) {
+	*bits = 0;
+	if (pk == GNUTLS_PK_RSA)
+	    *bits = _gnutls_mpi_get_nbits(key->pkey.params[0]);
+	if (pk == GNUTLS_PK_DSA)
+	    *bits = _gnutls_mpi_get_nbits(key->pkey.params[3]);
+    }
+    return pk;
 }
-
-

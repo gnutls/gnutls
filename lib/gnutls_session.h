@@ -18,5 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int gnutls_session_set_data( gnutls_session session, const opaque* session_data, int session_data_size);
-int gnutls_session_get_data( gnutls_session session, opaque* session_data, int *session_data_size);
+int gnutls_session_set_data(gnutls_session session,
+			    const opaque * session_data,
+			    int session_data_size);
+int gnutls_session_get_data(gnutls_session session, opaque * session_data,
+			    int *session_data_size);

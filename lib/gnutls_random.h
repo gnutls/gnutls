@@ -4,4 +4,4 @@
 #define GNUTLS_STRONG_RANDOM GCRY_STRONG_RANDOM
 #define GNUTLS_VERY_STRONG_RANDOM GCRY_VERY_STRONG_RANDOM
 
-int _gnutls_get_random(opaque* res, int bytes, int);
+int _gnutls_get_random(opaque * res, int bytes, int);

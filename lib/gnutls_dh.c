@@ -47,66 +47,65 @@
  */
 mpi_t gnutls_calc_dh_secret(mpi_t * ret_x, mpi_t g, mpi_t prime)
 {
-	mpi_t e, x;
-	int x_size = _gnutls_mpi_get_nbits(prime) - 1;
-	/* The size of the secret key is less than
-	 * prime/2
-	 */
+    mpi_t e, x;
+    int x_size = _gnutls_mpi_get_nbits(prime) - 1;
+    /* The size of the secret key is less than
+     * prime/2
+     */
 
-	if (x_size > MAX_BITS || x_size <= 0) {
-		gnutls_assert();
-		return NULL;
-	}
+    if (x_size > MAX_BITS || x_size <= 0) {
+	gnutls_assert();
+	return NULL;
+    }
 
-	x = _gnutls_mpi_new(x_size);
-	if (x == NULL) {
-		gnutls_assert();
-		if (ret_x)
-			*ret_x = NULL;
-
-		return NULL;
-	}
-
-	/* (x_size/8)*8 is there to overcome a bug in libgcrypt
-	 * which does not really check the bits given but the bytes.
-	 */
-	_gnutls_mpi_randomize(x, (x_size/8)*8, GCRY_STRONG_RANDOM);
-
-	e = _gnutls_mpi_alloc_like(prime);
-	if (e == NULL) {
-		gnutls_assert();
-		if (ret_x)
-			*ret_x = NULL;
-
-		_gnutls_mpi_release( &x);
-		return NULL;
-	}
-
-	_gnutls_mpi_powm(e, g, x, prime);
-
+    x = _gnutls_mpi_new(x_size);
+    if (x == NULL) {
+	gnutls_assert();
 	if (ret_x)
-		*ret_x = x;
-	else
-		_gnutls_mpi_release(&x);
-	return e;
+	    *ret_x = NULL;
+
+	return NULL;
+    }
+
+    /* (x_size/8)*8 is there to overcome a bug in libgcrypt
+     * which does not really check the bits given but the bytes.
+     */
+    _gnutls_mpi_randomize(x, (x_size / 8) * 8, GCRY_STRONG_RANDOM);
+
+    e = _gnutls_mpi_alloc_like(prime);
+    if (e == NULL) {
+	gnutls_assert();
+	if (ret_x)
+	    *ret_x = NULL;
+
+	_gnutls_mpi_release(&x);
+	return NULL;
+    }
+
+    _gnutls_mpi_powm(e, g, x, prime);
+
+    if (ret_x)
+	*ret_x = x;
+    else
+	_gnutls_mpi_release(&x);
+    return e;
 }
 
 
 mpi_t gnutls_calc_dh_key(mpi_t f, mpi_t x, mpi_t prime)
 {
-	mpi_t k;
-	int bits;
-	
-	bits = _gnutls_mpi_get_nbits(prime);
-	if (bits <= 0 || bits > MAX_BITS) {
-		gnutls_assert();
-		return NULL;
-	}
+    mpi_t k;
+    int bits;
 
-	k = _gnutls_mpi_alloc_like(prime);
-	if (k == NULL)
-		return NULL;
-	_gnutls_mpi_powm(k, f, x, prime);
-	return k;
+    bits = _gnutls_mpi_get_nbits(prime);
+    if (bits <= 0 || bits > MAX_BITS) {
+	gnutls_assert();
+	return NULL;
+    }
+
+    k = _gnutls_mpi_alloc_like(prime);
+    if (k == NULL)
+	return NULL;
+    _gnutls_mpi_powm(k, f, x, prime);
+    return k;
 }
-

@@ -30,17 +30,18 @@
 /* Returns 0 if the password is ok, or a negative error
  * code instead.
  */
-static int _pkcs12_check_pass( const char* pass, size_t plen) 
+static int _pkcs12_check_pass(const char *pass, size_t plen)
 {
-const unsigned char* p = pass;
-unsigned int i;
+    const unsigned char *p = pass;
+    unsigned int i;
 
-	for (i=0;i<plen;i++) {
-		if ( isascii(p[i])) continue;
-		return GNUTLS_E_INVALID_PASSWORD;
-	}
-	
-	return 0;
+    for (i = 0; i < plen; i++) {
+	if (isascii(p[i]))
+	    continue;
+	return GNUTLS_E_INVALID_PASSWORD;
+    }
+
+    return 0;
 }
 
 /* ID should be:
@@ -48,103 +49,96 @@ unsigned int i;
  * 2 for IV
  * 1 for encryption key
  */
-int 
-_pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_size, 
-	unsigned int iter, const char *pw,
-	unsigned int req_keylen, opaque *keybuf)
+int
+_pkcs12_string_to_key(unsigned int id, const opaque * salt,
+		      unsigned int salt_size, unsigned int iter,
+		      const char *pw, unsigned int req_keylen,
+		      opaque * keybuf)
 {
-  int rc;
-  gcry_error_t err;
-  unsigned int i, j;
-  gcry_md_hd_t md;
-  mpi_t num_b1 = NULL;
-  unsigned int pwlen;
-  opaque hash[20], buf_b[64], buf_i[128], *p;
-  size_t cur_keylen;
-  size_t n;
+    int rc;
+    gcry_error_t err;
+    unsigned int i, j;
+    gcry_md_hd_t md;
+    mpi_t num_b1 = NULL;
+    unsigned int pwlen;
+    opaque hash[20], buf_b[64], buf_i[128], *p;
+    size_t cur_keylen;
+    size_t n;
 
-  cur_keylen = 0;
-  pwlen = strlen (pw);
-  if (pwlen > 63/2) {
-      gnutls_assert();
-      return GNUTLS_E_INVALID_REQUEST;
-  }
-
-  if ((rc=_pkcs12_check_pass( pw, pwlen)) < 0) {
-  	gnutls_assert();
-  	return rc;
-  }
-
-  /* Store salt and password in BUF_I */
-  p = buf_i;
-  for(i=0; i < 64; i++)
-    *p++ = salt [i % salt_size];
-  for(i=j=0; i < 64; i += 2)
-    {
-      *p++ = 0;
-      *p++ = pw[j];
-      if (++j > pwlen) /* Note, that we include the trailing zero */
-        j = 0;
+    cur_keylen = 0;
+    pwlen = strlen(pw);
+    if (pwlen > 63 / 2) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_REQUEST;
     }
 
-  for (;;)
-    {
-      err = gcry_md_open (&md, GCRY_MD_SHA1, 0);
-      if (err)
-        {
-          gnutls_assert();
-          return GNUTLS_E_DECRYPTION_FAILED;
-        }
-      for(i=0; i < 64; i++)
-        gcry_md_putc (md, id);
-      gcry_md_write (md, buf_i, 128);
-      memcpy (hash, gcry_md_read (md, 0), 20);
-      gcry_md_close (md);
-      for (i=1; i < iter; i++)
-        gcry_md_hash_buffer (GCRY_MD_SHA1, hash, hash, 20);
+    if ((rc = _pkcs12_check_pass(pw, pwlen)) < 0) {
+	gnutls_assert();
+	return rc;
+    }
 
-      for (i=0; i < 20 && cur_keylen < req_keylen; i++)
-        keybuf[cur_keylen++] = hash[i];
-      if (cur_keylen == req_keylen)
-        {
-          gcry_mpi_release (num_b1);
-          return 0; /* ready */
-        }
-      
-      /* need more bytes. */
-      for(i=0; i < 64; i++)
-        buf_b[i] = hash[i % 20];
-      n = 64;
-      rc = _gnutls_mpi_scan(&num_b1, buf_b, &n);
-      if (rc < 0)
-        {
-          gnutls_assert();
-          return rc;
-        }
-      gcry_mpi_add_ui (num_b1, num_b1, 1);
-      for (i=0; i < 128; i += 64)
-        {
-          mpi_t num_ij;
+    /* Store salt and password in BUF_I */
+    p = buf_i;
+    for (i = 0; i < 64; i++)
+	*p++ = salt[i % salt_size];
+    for (i = j = 0; i < 64; i += 2) {
+	*p++ = 0;
+	*p++ = pw[j];
+	if (++j > pwlen)	/* Note, that we include the trailing zero */
+	    j = 0;
+    }
 
-          n = 64;
-          rc = _gnutls_mpi_scan (&num_ij, buf_i + i, &n);
-          if (rc < 0)
-            {
-              gnutls_assert();
-              return rc;
-            }
-          gcry_mpi_add (num_ij, num_ij, num_b1);
-          gcry_mpi_clear_highbit (num_ij, 64*8);
-          n = 64;
-          rc = _gnutls_mpi_print( buf_i + i, &n, num_ij);
-          if (rc < 0)
-            {
-              gnutls_assert();
-              return rc;
-            }
-          gcry_mpi_release (num_ij);
-        }
+    for (;;) {
+	err = gcry_md_open(&md, GCRY_MD_SHA1, 0);
+	if (err) {
+	    gnutls_assert();
+	    return GNUTLS_E_DECRYPTION_FAILED;
+	}
+	for (i = 0; i < 64; i++)
+	    gcry_md_putc(md, id);
+	gcry_md_write(md, buf_i, 128);
+	memcpy(hash, gcry_md_read(md, 0), 20);
+	gcry_md_close(md);
+	for (i = 1; i < iter; i++)
+	    gcry_md_hash_buffer(GCRY_MD_SHA1, hash, hash, 20);
+
+	for (i = 0; i < 20 && cur_keylen < req_keylen; i++)
+	    keybuf[cur_keylen++] = hash[i];
+	if (cur_keylen == req_keylen) {
+	    gcry_mpi_release(num_b1);
+	    return 0;		/* ready */
+	}
+
+	/* need more bytes. */
+	for (i = 0; i < 64; i++)
+	    buf_b[i] = hash[i % 20];
+	n = 64;
+	rc = _gnutls_mpi_scan(&num_b1, buf_b, &n);
+	if (rc < 0) {
+	    gnutls_assert();
+	    return rc;
+	}
+	gcry_mpi_add_ui(num_b1, num_b1, 1);
+	for (i = 0; i < 128; i += 64) {
+	    mpi_t num_ij;
+
+	    n = 64;
+	    rc = _gnutls_mpi_scan(&num_ij, buf_i + i, &n);
+	    if (rc < 0) {
+		gnutls_assert();
+		return rc;
+	    }
+	    gcry_mpi_add(num_ij, num_ij, num_b1);
+	    gcry_mpi_clear_highbit(num_ij, 64 * 8);
+	    n = 64;
+	    rc = _gnutls_mpi_print(buf_i + i, &n, num_ij);
+	    if (rc < 0) {
+		gnutls_assert();
+		return rc;
+	    }
+	    gcry_mpi_release(num_ij);
+	}
     }
 }
 
-#endif /* ENABLE_PKI */
+#endif				/* ENABLE_PKI */

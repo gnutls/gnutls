@@ -47,8 +47,10 @@
   * has been called.
   *
   **/
-void gnutls_db_set_retrieve_function( gnutls_session session, gnutls_db_retr_func retr_func) {
-	session->internals.db_retrieve_func = retr_func;
+void gnutls_db_set_retrieve_function(gnutls_session session,
+				     gnutls_db_retr_func retr_func)
+{
+    session->internals.db_retrieve_func = retr_func;
 }
 
 /**
@@ -63,8 +65,10 @@ void gnutls_db_set_retrieve_function( gnutls_session session, gnutls_db_retr_fun
   * has been called.
   *
   **/
-void gnutls_db_set_remove_function( gnutls_session session, gnutls_db_remove_func rem_func) {
-	session->internals.db_remove_func = rem_func;
+void gnutls_db_set_remove_function(gnutls_session session,
+				   gnutls_db_remove_func rem_func)
+{
+    session->internals.db_remove_func = rem_func;
 }
 
 /**
@@ -79,8 +83,10 @@ void gnutls_db_set_remove_function( gnutls_session session, gnutls_db_remove_fun
   * has been called.
   *
   **/
-void gnutls_db_set_store_function( gnutls_session session, gnutls_db_store_func store_func) {
-	session->internals.db_store_func = store_func;
+void gnutls_db_set_store_function(gnutls_session session,
+				  gnutls_db_store_func store_func)
+{
+    session->internals.db_store_func = store_func;
 }
 
 /**
@@ -92,8 +98,9 @@ void gnutls_db_set_store_function( gnutls_session session, gnutls_db_store_func 
   * the first argument. 
   *
   **/
-void gnutls_db_set_ptr( gnutls_session session, void* ptr) {
-	session->internals.db_ptr = ptr;
+void gnutls_db_set_ptr(gnutls_session session, void *ptr)
+{
+    session->internals.db_ptr = ptr;
 }
 
 /**
@@ -104,8 +111,9 @@ void gnutls_db_set_ptr( gnutls_session session, void* ptr) {
   * the first argument. 
   *
   **/
-void* gnutls_db_get_ptr( gnutls_session session) {
-	return session->internals.db_ptr;
+void *gnutls_db_get_ptr(gnutls_session session)
+{
+    return session->internals.db_ptr;
 }
 
 /**
@@ -116,8 +124,9 @@ void* gnutls_db_get_ptr( gnutls_session session) {
   * Sets the expiration time for resumed sessions. The default is 3600 (one hour)
   * at the time writing this.
   **/
-void gnutls_db_set_cache_expiration( gnutls_session session, int seconds) {
-	session->internals.expire_time = seconds;
+void gnutls_db_set_cache_expiration(gnutls_session session, int seconds)
+{
+    session->internals.expire_time = seconds;
 }
 
 /**
@@ -131,193 +140,215 @@ void gnutls_db_set_cache_expiration( gnutls_session session, int seconds) {
   * backend.
   *
   **/
-int gnutls_db_check_entry( gnutls_session session, gnutls_datum session_entry) {
-time_t timestamp;
+int gnutls_db_check_entry(gnutls_session session,
+			  gnutls_datum session_entry)
+{
+    time_t timestamp;
 
-	timestamp = time(0);
+    timestamp = time(0);
 
-	if (session_entry.data != NULL)
-		if ( timestamp - ((security_parameters_st*)(session_entry.data))->timestamp <= session->internals.expire_time || ((security_parameters_st*)(session_entry.data))->timestamp > timestamp|| ((security_parameters_st*)(session_entry.data))->timestamp == 0)
-			return GNUTLS_E_EXPIRED;
-	
-	return 0;
+    if (session_entry.data != NULL)
+	if (timestamp -
+	    ((security_parameters_st *) (session_entry.data))->timestamp <=
+	    session->internals.expire_time
+	    || ((security_parameters_st *) (session_entry.data))->
+	    timestamp > timestamp
+	    || ((security_parameters_st *) (session_entry.data))->
+	    timestamp == 0)
+	    return GNUTLS_E_EXPIRED;
+
+    return 0;
 }
 
 /* The format of storing data is:
  * (forget it). Check gnutls_session_pack.c
  */
-int _gnutls_server_register_current_session( gnutls_session session)
+int _gnutls_server_register_current_session(gnutls_session session)
 {
-gnutls_datum key;
-gnutls_datum content;
-int ret = 0;
+    gnutls_datum key;
+    gnutls_datum content;
+    int ret = 0;
 
-	key.data = session->security_parameters.session_id;
-	key.size = session->security_parameters.session_id_size;
+    key.data = session->security_parameters.session_id;
+    key.size = session->security_parameters.session_id_size;
 
-	if (session->internals.resumable==RESUME_FALSE) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-	
-	if (session->security_parameters.session_id==NULL || session->security_parameters.session_id_size==0) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-	
+    if (session->internals.resumable == RESUME_FALSE) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_SESSION;
+    }
+
+    if (session->security_parameters.session_id == NULL
+	|| session->security_parameters.session_id_size == 0) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_SESSION;
+    }
+
 /* allocate space for data */
-	ret = _gnutls_session_size( session);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	content.size = ret;
-
-	content.data = gnutls_malloc( content.size);
-	if (content.data==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	
-/* copy data */
-	ret = _gnutls_session_pack( session, &content);
-	if (ret < 0) {
-		gnutls_free( content.data);
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = _gnutls_store_session( session, key, content);
-
-	gnutls_free( content.data);
-
+    ret = _gnutls_session_size(session);
+    if (ret < 0) {
+	gnutls_assert();
 	return ret;
+    }
+    content.size = ret;
+
+    content.data = gnutls_malloc(content.size);
+    if (content.data == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_MEMORY_ERROR;
+    }
+
+/* copy data */
+    ret = _gnutls_session_pack(session, &content);
+    if (ret < 0) {
+	gnutls_free(content.data);
+	gnutls_assert();
+	return ret;
+    }
+
+    ret = _gnutls_store_session(session, key, content);
+
+    gnutls_free(content.data);
+
+    return ret;
 }
 
 /* Checks if both db_store and db_retrieve functions have
  * been set up.
  */
-static int _gnutls_db_func_is_ok( gnutls_session session) {
-	if (session->internals.db_store_func!=NULL &&
-		session->internals.db_retrieve_func!=NULL &&
-		session->internals.db_remove_func!=NULL) return 0;
-	else return GNUTLS_E_DB_ERROR;
-}
-
-
-int _gnutls_server_restore_session( gnutls_session session, uint8* session_id, int session_id_size)
+static int _gnutls_db_func_is_ok(gnutls_session session)
 {
-gnutls_datum data;
-gnutls_datum key;
-int ret;
-
-	key.data = session_id;
-	key.size = session_id_size;
-
-	if (_gnutls_db_func_is_ok(session)!=0) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-
-	data = _gnutls_retrieve_session( session, key);
-
-	if (data.data==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-
-	/* expiration check is performed inside */
-	ret = gnutls_session_set_data( session, data.data, data.size);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	gnutls_free(data.data);
-
+    if (session->internals.db_store_func != NULL &&
+	session->internals.db_retrieve_func != NULL &&
+	session->internals.db_remove_func != NULL)
 	return 0;
+    else
+	return GNUTLS_E_DB_ERROR;
 }
 
-int _gnutls_db_remove_session( gnutls_session session, uint8* session_id, int session_id_size)
+
+int _gnutls_server_restore_session(gnutls_session session,
+				   uint8 * session_id, int session_id_size)
 {
-gnutls_datum key;
+    gnutls_datum data;
+    gnutls_datum key;
+    int ret;
 
-	key.data = session_id;
-	key.size = session_id_size;
+    key.data = session_id;
+    key.size = session_id_size;
 
-	return _gnutls_remove_session( session, key);
+    if (_gnutls_db_func_is_ok(session) != 0) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_SESSION;
+    }
+
+    data = _gnutls_retrieve_session(session, key);
+
+    if (data.data == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_SESSION;
+    }
+
+    /* expiration check is performed inside */
+    ret = gnutls_session_set_data(session, data.data, data.size);
+    if (ret < 0) {
+	gnutls_assert();
+	return ret;
+    }
+
+    gnutls_free(data.data);
+
+    return 0;
+}
+
+int _gnutls_db_remove_session(gnutls_session session, uint8 * session_id,
+			      int session_id_size)
+{
+    gnutls_datum key;
+
+    key.data = session_id;
+    key.size = session_id_size;
+
+    return _gnutls_remove_session(session, key);
 }
 
 
 /* Stores session data to the db backend.
  */
-int _gnutls_store_session( gnutls_session session, gnutls_datum session_id, gnutls_datum session_data)
+int _gnutls_store_session(gnutls_session session, gnutls_datum session_id,
+			  gnutls_datum session_data)
 {
-int ret = 0;
+    int ret = 0;
 
-	if (session->internals.resumable==RESUME_FALSE) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-	
-	if (_gnutls_db_func_is_ok(session)!=0) {
-		return GNUTLS_E_DB_ERROR;
-	}
-	
-	if (session_id.data==NULL || session_id.size==0) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-	
-	if (session_data.data==NULL || session_data.size==0) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-	/* if we can't read why bother writing? */
+    if (session->internals.resumable == RESUME_FALSE) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_SESSION;
+    }
 
-	if (session->internals.db_store_func!=NULL)
-		ret = session->internals.db_store_func( session->internals.db_ptr, session_id, session_data);
+    if (_gnutls_db_func_is_ok(session) != 0) {
+	return GNUTLS_E_DB_ERROR;
+    }
 
-	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
+    if (session_id.data == NULL || session_id.size == 0) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_SESSION;
+    }
+
+    if (session_data.data == NULL || session_data.size == 0) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_SESSION;
+    }
+    /* if we can't read why bother writing? */
+
+    if (session->internals.db_store_func != NULL)
+	ret =
+	    session->internals.db_store_func(session->internals.db_ptr,
+					     session_id, session_data);
+
+    return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
 
 }
 
 /* Retrieves session data from the db backend.
  */
-gnutls_datum _gnutls_retrieve_session( gnutls_session session, gnutls_datum session_id)
+gnutls_datum _gnutls_retrieve_session(gnutls_session session,
+				      gnutls_datum session_id)
 {
-gnutls_datum ret = { NULL, 0 };
+    gnutls_datum ret = { NULL, 0 };
 
-	if (session_id.data==NULL || session_id.size==0) {
-		gnutls_assert();
-		return ret;
-	}
-	
-	if (session->internals.db_retrieve_func!=NULL)
-		ret = session->internals.db_retrieve_func( session->internals.db_ptr, session_id);
-
+    if (session_id.data == NULL || session_id.size == 0) {
+	gnutls_assert();
 	return ret;
+    }
+
+    if (session->internals.db_retrieve_func != NULL)
+	ret =
+	    session->internals.db_retrieve_func(session->internals.db_ptr,
+						session_id);
+
+    return ret;
 
 }
 
 /* Removes session data from the db backend.
  */
-int _gnutls_remove_session( gnutls_session session, gnutls_datum session_id)
+int _gnutls_remove_session(gnutls_session session, gnutls_datum session_id)
 {
-int ret = 0;
+    int ret = 0;
 
-	if (_gnutls_db_func_is_ok(session)!=0) {
-		return GNUTLS_E_DB_ERROR;
-	}
-	
-	if (session_id.data==NULL || session_id.size==0)
-		return GNUTLS_E_INVALID_SESSION;
+    if (_gnutls_db_func_is_ok(session) != 0) {
+	return GNUTLS_E_DB_ERROR;
+    }
 
-	/* if we can't read why bother writing? */
-	if (session->internals.db_remove_func!=NULL)
-		ret = session->internals.db_remove_func( session->internals.db_ptr, session_id);
+    if (session_id.data == NULL || session_id.size == 0)
+	return GNUTLS_E_INVALID_SESSION;
 
-	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
+    /* if we can't read why bother writing? */
+    if (session->internals.db_remove_func != NULL)
+	ret =
+	    session->internals.db_remove_func(session->internals.db_ptr,
+					      session_id);
+
+    return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
 
 }
 
@@ -333,9 +364,13 @@ int ret = 0;
   * Normally gnutls_deinit() will remove abnormally terminated sessions.
   *
   **/
-void gnutls_db_remove_session(gnutls_session session) {
-	/* if the session has failed abnormally it has 
-	 * to be removed from the db 
-	 */
-	_gnutls_db_remove_session( session, session->security_parameters.session_id, session->security_parameters.session_id_size);
+void gnutls_db_remove_session(gnutls_session session)
+{
+    /* if the session has failed abnormally it has 
+     * to be removed from the db 
+     */
+    _gnutls_db_remove_session(session,
+			      session->security_parameters.session_id,
+			      session->security_parameters.
+			      session_id_size);
 }

@@ -22,33 +22,48 @@
 
 /* functions for version */
 
-gnutls_protocol_version _gnutls_version_lowest( gnutls_session session);
-gnutls_protocol_version _gnutls_version_max( gnutls_session session);
-int _gnutls_version_priority(gnutls_session session, gnutls_protocol_version version);
-int _gnutls_version_is_supported(gnutls_session session, const gnutls_protocol_version version);
-int _gnutls_version_get_major( gnutls_protocol_version ver);
-int _gnutls_version_get_minor( gnutls_protocol_version ver);
-gnutls_protocol_version _gnutls_version_get( int major, int minor);
+gnutls_protocol_version _gnutls_version_lowest(gnutls_session session);
+gnutls_protocol_version _gnutls_version_max(gnutls_session session);
+int _gnutls_version_priority(gnutls_session session,
+			     gnutls_protocol_version version);
+int _gnutls_version_is_supported(gnutls_session session,
+				 const gnutls_protocol_version version);
+int _gnutls_version_get_major(gnutls_protocol_version ver);
+int _gnutls_version_get_minor(gnutls_protocol_version ver);
+gnutls_protocol_version _gnutls_version_get(int major, int minor);
 
 /* functions for macs */
-const char* gnutls_mac_get_name(gnutls_mac_algorithm algorithm);
-int   _gnutls_mac_is_ok(gnutls_mac_algorithm algorithm);
-int   _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm algorithm);
+const char *gnutls_mac_get_name(gnutls_mac_algorithm algorithm);
+int _gnutls_mac_is_ok(gnutls_mac_algorithm algorithm);
+int _gnutls_mac_priority(gnutls_session session,
+			 gnutls_mac_algorithm algorithm);
 
 /* functions for cipher suites */
-int   _gnutls_supported_ciphersuites(gnutls_session session, cipher_suite_st **ciphers);
-int   _gnutls_supported_ciphersuites_sorted(gnutls_session session, cipher_suite_st **ciphers);
-int   _gnutls_supported_compression_methods(gnutls_session session, uint8 **comp);
+int _gnutls_supported_ciphersuites(gnutls_session session,
+				   cipher_suite_st ** ciphers);
+int _gnutls_supported_ciphersuites_sorted(gnutls_session session,
+					  cipher_suite_st ** ciphers);
+int _gnutls_supported_compression_methods(gnutls_session session,
+					  uint8 ** comp);
 
-const char* _gnutls_cipher_suite_get_name(cipher_suite_st *algorithm);
-gnutls_cipher_algorithm _gnutls_cipher_suite_get_cipher_algo(const cipher_suite_st *algorithm);
-gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const cipher_suite_st *algorithm);
-gnutls_mac_algorithm _gnutls_cipher_suite_get_mac_algo(const cipher_suite_st *algorithm);
-gnutls_protocol_version _gnutls_cipher_suite_get_version(const cipher_suite_st *algorithm);
-cipher_suite_st  _gnutls_cipher_suite_get_suite_name(cipher_suite_st *algorithm);
+const char *_gnutls_cipher_suite_get_name(cipher_suite_st * algorithm);
+gnutls_cipher_algorithm _gnutls_cipher_suite_get_cipher_algo(const
+							     cipher_suite_st
+							     * algorithm);
+gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const cipher_suite_st
+						     * algorithm);
+gnutls_mac_algorithm _gnutls_cipher_suite_get_mac_algo(const
+						       cipher_suite_st *
+						       algorithm);
+gnutls_protocol_version _gnutls_cipher_suite_get_version(const
+							 cipher_suite_st *
+							 algorithm);
+cipher_suite_st _gnutls_cipher_suite_get_suite_name(cipher_suite_st *
+						    algorithm);
 
 /* functions for ciphers */
-int _gnutls_cipher_priority(gnutls_session session, gnutls_cipher_algorithm algorithm);
+int _gnutls_cipher_priority(gnutls_session session,
+			    gnutls_cipher_algorithm algorithm);
 int _gnutls_cipher_get_block_size(gnutls_cipher_algorithm algorithm);
 int _gnutls_cipher_is_block(gnutls_cipher_algorithm algorithm);
 int _gnutls_cipher_is_ok(gnutls_cipher_algorithm algorithm);
@@ -58,54 +73,61 @@ int _gnutls_cipher_get_export_flag(gnutls_cipher_algorithm algorithm);
 const char *gnutls_cipher_get_name(gnutls_cipher_algorithm algorithm);
 
 /* functions for key exchange */
-int _gnutls_kx_priority(gnutls_session session, gnutls_kx_algorithm algorithm);
+int _gnutls_kx_priority(gnutls_session session,
+			gnutls_kx_algorithm algorithm);
 int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm algorithm);
 int _gnutls_kx_needs_rsa_params(gnutls_kx_algorithm algorithm);
 
 
-mod_auth_st * _gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm);
+mod_auth_st *_gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm);
 const char *gnutls_kx_get_name(gnutls_kx_algorithm algorithm);
 int _gnutls_kx_is_ok(gnutls_kx_algorithm algorithm);
 
 /* functions for compression */
-int _gnutls_compression_priority(gnutls_session session, gnutls_compression_method algorithm);
+int _gnutls_compression_priority(gnutls_session session,
+				 gnutls_compression_method algorithm);
 int _gnutls_compression_is_ok(gnutls_compression_method algorithm);
 int _gnutls_compression_get_num(gnutls_compression_method algorithm);
 gnutls_compression_method _gnutls_compression_get_id(int num);
-const char *gnutls_compression_get_name(gnutls_compression_method algorithm);
+const char *gnutls_compression_get_name(gnutls_compression_method
+					algorithm);
 
 int _gnutls_compression_get_mem_level(gnutls_compression_method algorithm);
-int _gnutls_compression_get_comp_level(gnutls_compression_method algorithm);
+int _gnutls_compression_get_comp_level(gnutls_compression_method
+				       algorithm);
 int _gnutls_compression_get_wbits(gnutls_compression_method algorithm);
 
 /* Type to KX mappings */
-gnutls_kx_algorithm _gnutls_map_kx_get_kx(gnutls_credentials_type type, int server);
-gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm algorithm, int server);
+gnutls_kx_algorithm _gnutls_map_kx_get_kx(gnutls_credentials_type type,
+					  int server);
+gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm
+						algorithm, int server);
 
 /* KX to PK mapping */
-gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm);
+gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm
+					  kx_algorithm);
 
-enum encipher_type { CIPHER_ENCRYPT=0, CIPHER_SIGN=1, CIPHER_IGN };
+enum encipher_type { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };
 
 enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm algorithm);
 
 struct gnutls_kx_algo_entry {
-	const char *name;
-	gnutls_kx_algorithm algorithm;
-	mod_auth_st *auth_struct;
-	int needs_dh_params;
-	int needs_rsa_params;
+    const char *name;
+    gnutls_kx_algorithm algorithm;
+    mod_auth_st *auth_struct;
+    int needs_dh_params;
+    int needs_rsa_params;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 struct gnutls_compression_entry {
-	const char *name;
-	gnutls_compression_method id;
-	int num; /* the number reserved in TLS for the specific compression method */
+    const char *name;
+    gnutls_compression_method id;
+    int num;			/* the number reserved in TLS for the specific compression method */
 
-	/* used in zlib compressor */
-	int window_bits;
-	int mem_level;
-	int comp_level;
+    /* used in zlib compressor */
+    int window_bits;
+    int mem_level;
+    int comp_level;
 };
 typedef struct gnutls_compression_entry gnutls_compression_entry;

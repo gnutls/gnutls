@@ -21,6 +21,6 @@
 #ifdef DEBUG
 void _gnutls_print_state(gnutls_session session);
 #endif
-const char* _gnutls_packet2str( content_type_t packet);
-const char* _gnutls_handshake2str( HandshakeType handshake);
-void _gnutls_dump_mpi(const char* prefix, mpi_t a);
+const char *_gnutls_packet2str(content_type_t packet);
+const char *_gnutls_handshake2str(HandshakeType handshake);
+void _gnutls_dump_mpi(const char *prefix, mpi_t a);

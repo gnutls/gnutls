@@ -18,5 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_m_plaintext2compressed(gnutls_session session, gnutls_datum* compress, gnutls_datum plaintext);
-int _gnutls_m_compressed2plaintext(gnutls_session session, gnutls_datum* plain, gnutls_datum compressed);
+int _gnutls_m_plaintext2compressed(gnutls_session session,
+				   gnutls_datum * compress,
+				   gnutls_datum plaintext);
+int _gnutls_m_compressed2plaintext(gnutls_session session,
+				   gnutls_datum * plain,
+				   gnutls_datum compressed);

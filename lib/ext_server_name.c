@@ -38,77 +38,77 @@
 int _gnutls_server_name_recv_params(gnutls_session session,
 				    const opaque * data, size_t _data_size)
 {
-   int i;
-   const unsigned char *p;
-   uint16 len, type;
-   ssize_t data_size = _data_size;
-   int server_names = 0;
+    int i;
+    const unsigned char *p;
+    uint16 len, type;
+    ssize_t data_size = _data_size;
+    int server_names = 0;
 
-   if (session->security_parameters.entity == GNUTLS_SERVER) {
-      DECR_LENGTH_RET(data_size, 2, 0);
-      len = _gnutls_read_uint16(data);
+    if (session->security_parameters.entity == GNUTLS_SERVER) {
+	DECR_LENGTH_RET(data_size, 2, 0);
+	len = _gnutls_read_uint16(data);
 
-      if ( len != data_size) {
-         /* This is unexpected packet length, but
-          * just ignore it, for now.
-          */
-         gnutls_assert();
-         return 0;
-      }
+	if (len != data_size) {
+	    /* This is unexpected packet length, but
+	     * just ignore it, for now.
+	     */
+	    gnutls_assert();
+	    return 0;
+	}
 
-      p = data + 2;
+	p = data + 2;
 
-      /* Count all server_names in the packet. */
-      while (data_size > 0) {
-	 DECR_LENGTH_RET(data_size, 1, 0);
-	 p++;
+	/* Count all server_names in the packet. */
+	while (data_size > 0) {
+	    DECR_LENGTH_RET(data_size, 1, 0);
+	    p++;
 
-	 DECR_LEN(data_size, 2);
-	 len = _gnutls_read_uint16(p);
-	 p += 2;
+	    DECR_LEN(data_size, 2);
+	    len = _gnutls_read_uint16(p);
+	    p += 2;
 
-	 DECR_LENGTH_RET(data_size, len, 0);
-	 server_names++;
+	    DECR_LENGTH_RET(data_size, len, 0);
+	    server_names++;
 
-	 p += len;
-      }
+	    p += len;
+	}
 
-      session->security_parameters.extensions.server_names_size =
-	  server_names;
-      if (server_names == 0)
-	 return 0;		/* no names found */
+	session->security_parameters.extensions.server_names_size =
+	    server_names;
+	if (server_names == 0)
+	    return 0;		/* no names found */
 
-      /* we cannot accept more server names.
-       */
-      if ( server_names > MAX_SERVER_NAME_EXTENSIONS)
-         server_names = MAX_SERVER_NAME_EXTENSIONS;
+	/* we cannot accept more server names.
+	 */
+	if (server_names > MAX_SERVER_NAME_EXTENSIONS)
+	    server_names = MAX_SERVER_NAME_EXTENSIONS;
 
-      p = data + 2;
-      for (i = 0; i < server_names; i++) {
-         type = *p;
-         p++;
-         
-	 len = _gnutls_read_uint16(p);
-	 p += 2;
+	p = data + 2;
+	for (i = 0; i < server_names; i++) {
+	    type = *p;
+	    p++;
 
-	 switch (type) {
-	 case 0: /* NAME_DNS */
-	    if (len <= MAX_SERVER_NAME_SIZE) {
-	       memcpy(session->security_parameters.extensions.
-		      server_names[i].name, p, len);
-	       session->security_parameters.extensions.server_names[i].
-		   name_length = len;
-	       session->security_parameters.extensions.server_names[i].
-		   type = GNUTLS_NAME_DNS;
-	       break;
+	    len = _gnutls_read_uint16(p);
+	    p += 2;
+
+	    switch (type) {
+	    case 0:		/* NAME_DNS */
+		if (len <= MAX_SERVER_NAME_SIZE) {
+		    memcpy(session->security_parameters.extensions.
+			   server_names[i].name, p, len);
+		    session->security_parameters.extensions.
+			server_names[i].name_length = len;
+		    session->security_parameters.extensions.
+			server_names[i].type = GNUTLS_NAME_DNS;
+		    break;
+		}
 	    }
-	 }
 
-	 /* move to next record */
-	 p += len;
-      }
-   }
-   return 0;
+	    /* move to next record */
+	    p += len;
+	}
+    }
+    return 0;
 }
 
 /* returns data_size or a negative number on failure
@@ -116,80 +116,84 @@ int _gnutls_server_name_recv_params(gnutls_session session,
 int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 				    size_t _data_size)
 {
-   uint16 len;
-   opaque *p;
-   uint i;
-   ssize_t data_size = _data_size;
-   int total_size = 0;
+    uint16 len;
+    opaque *p;
+    uint i;
+    ssize_t data_size = _data_size;
+    int total_size = 0;
 
-   /* this function sends the client extension data (dnsname) 
-    */
-   if (session->security_parameters.entity == GNUTLS_CLIENT) {
+    /* this function sends the client extension data (dnsname) 
+     */
+    if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-      if (session->security_parameters.extensions.server_names_size == 0)
-	   return 0;
+	if (session->security_parameters.extensions.server_names_size == 0)
+	    return 0;
 
-      /* uint16 
-       */
-      total_size = 2;
-      for (i = 0;
-	   i < session->security_parameters.extensions.server_names_size;
-	   i++) 
-      {
-	   /* count the total size 
-	    */
-	   len = session->security_parameters.extensions.server_names[i].name_length;
+	/* uint16 
+	 */
+	total_size = 2;
+	for (i = 0;
+	     i < session->security_parameters.extensions.server_names_size;
+	     i++) {
+	    /* count the total size 
+	     */
+	    len =
+		session->security_parameters.extensions.server_names[i].
+		name_length;
 
-	   /* uint8 + uint16 + size 
-	    */
-	   total_size += 1 + 2 + len;
-      }
+	    /* uint8 + uint16 + size 
+	     */
+	    total_size += 1 + 2 + len;
+	}
 
-      p = data;
+	p = data;
 
-      /* UINT16: write total size of all names 
-       */
-      DECR_LENGTH_RET( data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
-      _gnutls_write_uint16(total_size-2, p);
-      p += 2;
+	/* UINT16: write total size of all names 
+	 */
+	DECR_LENGTH_RET(data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
+	_gnutls_write_uint16(total_size - 2, p);
+	p += 2;
 
-      for (i = 0;
-	   i < session->security_parameters.extensions.server_names_size;
-	   i++) 
-      {
+	for (i = 0;
+	     i < session->security_parameters.extensions.server_names_size;
+	     i++) {
 
-	 switch (session->security_parameters.extensions.server_names[i].
-		 type) {
-	 case GNUTLS_NAME_DNS:
+	    switch (session->security_parameters.extensions.
+		    server_names[i].type) {
+	    case GNUTLS_NAME_DNS:
 
-               len = session->security_parameters.extensions.server_names[i].name_length;	
-               if (len == 0) break;
+		len =
+		    session->security_parameters.extensions.
+		    server_names[i].name_length;
+		if (len == 0)
+		    break;
 
-	       /* UINT8: type of this extension
-	        * UINT16: size of the first name
-	        * LEN: the actual server name.
-	        */
-               DECR_LENGTH_RET( data_size, len + 3, GNUTLS_E_SHORT_MEMORY_BUFFER);
+		/* UINT8: type of this extension
+		 * UINT16: size of the first name
+		 * LEN: the actual server name.
+		 */
+		DECR_LENGTH_RET(data_size, len + 3,
+				GNUTLS_E_SHORT_MEMORY_BUFFER);
 
-	       *p = 0;		/* NAME_DNS type */
-	       p++;
+		*p = 0;		/* NAME_DNS type */
+		p++;
 
-	       _gnutls_write_uint16(len, p);
-	       p += 2;
+		_gnutls_write_uint16(len, p);
+		p += 2;
 
-	       memcpy(p,
-		      session->security_parameters.extensions.
-		      server_names[0].name, len);
-   	       p += len;
-	    break;
-	 default:
-	    gnutls_assert();
-	    return GNUTLS_E_INTERNAL_ERROR;
-	 }
-      }
-   }
+		memcpy(p,
+		       session->security_parameters.extensions.
+		       server_names[0].name, len);
+		p += len;
+		break;
+	    default:
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	    }
+	}
+    }
 
-   return total_size;
+    return total_size;
 }
 
 /**
@@ -216,46 +220,45 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   *
   **/
 int gnutls_server_name_get(gnutls_session session, void *data,
-			   size_t *data_length,
-			   unsigned int * type, 
-			   unsigned int indx)
+			   size_t * data_length,
+			   unsigned int *type, unsigned int indx)
 {
-   char *_data = data;
-   
-   if (session->security_parameters.entity == GNUTLS_CLIENT) {
-      gnutls_assert();
-      return GNUTLS_E_INVALID_REQUEST;
-   }
+    char *_data = data;
 
-   if (indx+1 >
-       session->security_parameters.extensions.server_names_size) {
-      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-   }
+    if (session->security_parameters.entity == GNUTLS_CLIENT) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_REQUEST;
+    }
 
-   *type =
-       session->security_parameters.extensions.server_names[indx].type;
+    if (indx + 1 >
+	session->security_parameters.extensions.server_names_size) {
+	return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
 
-   if (*data_length > /* greater since we need one extra byte for the null */
-       session->security_parameters.extensions.server_names[indx].
-       name_length) {
-      *data_length =
-	  session->security_parameters.extensions.server_names[indx].
-	  name_length;
-      memcpy(data,
-	     session->security_parameters.extensions.server_names[indx].
-	     name, *data_length);
+    *type =
+	session->security_parameters.extensions.server_names[indx].type;
 
-      if (*type == GNUTLS_NAME_DNS)	/* null terminate */
-	 _data[(*data_length)] = 0;
+    if (*data_length >		/* greater since we need one extra byte for the null */
+	session->security_parameters.extensions.server_names[indx].
+	name_length) {
+	*data_length =
+	    session->security_parameters.extensions.server_names[indx].
+	    name_length;
+	memcpy(data,
+	       session->security_parameters.extensions.server_names[indx].
+	       name, *data_length);
 
-   } else {
-      *data_length =
-	  session->security_parameters.extensions.server_names[indx].
-	  name_length;
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
-   }
+	if (*type == GNUTLS_NAME_DNS)	/* null terminate */
+	    _data[(*data_length)] = 0;
 
-   return 0;
+    } else {
+	*data_length =
+	    session->security_parameters.extensions.server_names[indx].
+	    name_length;
+	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+    return 0;
 }
 
 /**
@@ -279,31 +282,31 @@ int gnutls_server_name_set(gnutls_session session,
 			   gnutls_server_name_type type,
 			   const void *name, size_t name_length)
 {
-   int server_names;
+    int server_names;
 
-   if (session->security_parameters.entity == GNUTLS_SERVER) {
-      gnutls_assert();
-      return GNUTLS_E_INVALID_REQUEST;
-   }
+    if (session->security_parameters.entity == GNUTLS_SERVER) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_REQUEST;
+    }
 
-   if (name_length > MAX_SERVER_NAME_SIZE)
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    if (name_length > MAX_SERVER_NAME_SIZE)
+	return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
-   server_names =
-       session->security_parameters.extensions.server_names_size + 1;
+    server_names =
+	session->security_parameters.extensions.server_names_size + 1;
 
-   if (server_names > MAX_SERVER_NAME_EXTENSIONS)
-      server_names = MAX_SERVER_NAME_EXTENSIONS;
+    if (server_names > MAX_SERVER_NAME_EXTENSIONS)
+	server_names = MAX_SERVER_NAME_EXTENSIONS;
 
-   session->security_parameters.extensions.server_names[server_names -
-							1].type = type;
-   memcpy(session->security_parameters.extensions.
-	  server_names[server_names - 1].name, name, name_length);
-   session->security_parameters.extensions.server_names[server_names -
-							1].name_length =
-       name_length;
+    session->security_parameters.extensions.server_names[server_names -
+							 1].type = type;
+    memcpy(session->security_parameters.extensions.
+	   server_names[server_names - 1].name, name, name_length);
+    session->security_parameters.extensions.server_names[server_names -
+							 1].name_length =
+	name_length;
 
-   session->security_parameters.extensions.server_names_size++;
+    session->security_parameters.extensions.server_names_size++;
 
-   return 0;
+    return 0;
 }

@@ -54,7 +54,8 @@ typedef long ptrdiff_t;
 #endif
 
 #ifndef HAVE_STRNSTR
-char *strnstr(const char *haystack, const char *needle, size_t haystacklen);
+char *strnstr(const char *haystack, const char *needle,
+	      size_t haystacklen);
 #endif
 
 #ifdef HAVE_STDDEF_H
@@ -99,7 +100,7 @@ typedef signed int sint;
  * it is not used.
  */
 typedef struct {
-	unsigned char i[8];
+    unsigned char i[8];
 } uint64;
 
 #ifndef HAVE_ISASCII

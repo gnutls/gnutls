@@ -18,13 +18,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_encrypt( gnutls_session session, const opaque* headers, size_t headers_size, const opaque* data, size_t data_size, 
-	opaque* ciphertext, size_t ciphertext_size, content_type_t type, int random_pad);
+int _gnutls_encrypt(gnutls_session session, const opaque * headers,
+		    size_t headers_size, const opaque * data,
+		    size_t data_size, opaque * ciphertext,
+		    size_t ciphertext_size, content_type_t type,
+		    int random_pad);
 
-int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
+int _gnutls_decrypt(gnutls_session session, opaque * ciphertext,
 		    size_t ciphertext_size, uint8 * data, size_t data_size,
 		    content_type_t type);
-int _gnutls_compressed2ciphertext(gnutls_session session, opaque* cipher_data, int cipher_size, gnutls_datum compressed, 
-	content_type_t _type, int random_pad);
-int _gnutls_ciphertext2compressed(gnutls_session session, opaque * compress_data, int compress_size, 
-	gnutls_datum ciphertext, uint8 type);
+int _gnutls_compressed2ciphertext(gnutls_session session,
+				  opaque * cipher_data, int cipher_size,
+				  gnutls_datum compressed,
+				  content_type_t _type, int random_pad);
+int _gnutls_ciphertext2compressed(gnutls_session session,
+				  opaque * compress_data,
+				  int compress_size,
+				  gnutls_datum ciphertext, uint8 type);

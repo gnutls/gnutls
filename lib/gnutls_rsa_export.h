@@ -18,8 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-const mpi_t* _gnutls_get_rsa_params(gnutls_rsa_params);
-int _gnutls_peers_cert_less_512( gnutls_session session);
-int _gnutls_rsa_generate_params(mpi_t* resarr, int* resarr_len, int bits);
+const mpi_t *_gnutls_get_rsa_params(gnutls_rsa_params);
+int _gnutls_peers_cert_less_512(gnutls_session session);
+int _gnutls_rsa_generate_params(mpi_t * resarr, int *resarr_len, int bits);
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params);
-

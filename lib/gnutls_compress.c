@@ -32,41 +32,43 @@
 /* These functions allocate the return value internally
  */
 int _gnutls_m_plaintext2compressed(gnutls_session session,
-						     gnutls_datum*
-						     compress,
-						     gnutls_datum plaintext)
+				   gnutls_datum *
+				   compress, gnutls_datum plaintext)
 {
-	int size;
-	opaque *data;
-	
-	size = _gnutls_compress( session->connection_state.write_compression_state,
-		plaintext.data, plaintext.size, &data, MAX_RECORD_SEND_SIZE+1024);
-	if (size < 0) {
-		gnutls_assert();
-		return GNUTLS_E_COMPRESSION_FAILED;
-	}
-	compress->data = data;
-	compress->size = size;
+    int size;
+    opaque *data;
 
-	return 0;
+    size =
+	_gnutls_compress(session->connection_state.write_compression_state,
+			 plaintext.data, plaintext.size, &data,
+			 MAX_RECORD_SEND_SIZE + 1024);
+    if (size < 0) {
+	gnutls_assert();
+	return GNUTLS_E_COMPRESSION_FAILED;
+    }
+    compress->data = data;
+    compress->size = size;
+
+    return 0;
 }
 
 int _gnutls_m_compressed2plaintext(gnutls_session session,
-						     gnutls_datum* plain,
-						     gnutls_datum
-						     compressed)
+				   gnutls_datum * plain,
+				   gnutls_datum compressed)
 {
-	int size;
-	opaque* data;
+    int size;
+    opaque *data;
 
-	size = _gnutls_decompress( session->connection_state.read_compression_state,
-		compressed.data, compressed.size, &data, MAX_RECORD_RECV_SIZE);
-	if (size < 0) {
-		gnutls_assert();
-		return GNUTLS_E_DECOMPRESSION_FAILED;
-	}
-	plain->data = data;
-	plain->size = size;
+    size =
+	_gnutls_decompress(session->connection_state.
+			   read_compression_state, compressed.data,
+			   compressed.size, &data, MAX_RECORD_RECV_SIZE);
+    if (size < 0) {
+	gnutls_assert();
+	return GNUTLS_E_DECOMPRESSION_FAILED;
+    }
+    plain->data = data;
+    plain->size = size;
 
-	return 0;
+    return 0;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
- 
+
 /* This debug file was contributed by 
  * Paul Sheer <psheer@icon.co.za>. Some changes were made by nmav.
  * Its purpose is to debug non blocking behaviour of gnutls. The included
@@ -27,7 +27,7 @@
 
 #include <gnutls_int.h>
 
-#define EDUNNO EAGAIN /* EAGAIN */
+#define EDUNNO EAGAIN		/* EAGAIN */
 
 extern int errno;
 static int initialized_rand = 0;
@@ -36,32 +36,32 @@ static int initialized_rand = 0;
 		srand(time(0)); \
 		initialized_rand = 1; \
 		}
-static int recv_debug (int fd, char *buf, int len, int flags)
+static int recv_debug(int fd, char *buf, int len, int flags)
 {
     INITIALIZE_RAND;
-    
+
     if (!(rand() % IO_DEBUG)) {
 	errno = EDUNNO;
 	return -1;
     }
     if (len > 1)
 	len = 1;
-    return recv (fd, buf, len, flags);
+    return recv(fd, buf, len, flags);
 }
 
 #define recv recv_debug
 
-static int send_debug (int fd, const char *buf, int len, int flags)
+static int send_debug(int fd, const char *buf, int len, int flags)
 {
     INITIALIZE_RAND;
-    
+
     if (!(rand() % IO_DEBUG)) {
 	errno = EDUNNO;
 	return -1;
     }
     if (len > 10)
 	len = 10;
-    return send (fd, buf, len, flags);
+    return send(fd, buf, len, flags);
 }
 
 #define send send_debug

@@ -31,18 +31,20 @@ typedef mpi_t GNUTLS_MPI;
 #define _gnutls_prime_check gcry_prime_check
 #define _gnutls_mpi_div gcry_mpi_div
 
-# define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x)) 
-# define _gnutls_mpi_salloc_like(x) _gnutls_mpi_snew(_gnutls_mpi_get_nbits(x)) 
+# define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x))
+# define _gnutls_mpi_salloc_like(x) _gnutls_mpi_snew(_gnutls_mpi_get_nbits(x))
 
-void _gnutls_mpi_release( mpi_t* x);
+void _gnutls_mpi_release(mpi_t * x);
 
-int _gnutls_mpi_scan( mpi_t *ret_mpi, const opaque *buffer, size_t *nbytes );
-int _gnutls_mpi_scan_pgp( mpi_t *ret_mpi, const opaque *buffer, size_t *nbytes );
+int _gnutls_mpi_scan(mpi_t * ret_mpi, const opaque * buffer,
+		     size_t * nbytes);
+int _gnutls_mpi_scan_pgp(mpi_t * ret_mpi, const opaque * buffer,
+			 size_t * nbytes);
 
-int _gnutls_mpi_print( void *buffer, size_t *nbytes, const mpi_t a );
-int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const mpi_t a );
+int _gnutls_mpi_print(void *buffer, size_t * nbytes, const mpi_t a);
+int _gnutls_mpi_print_lz(void *buffer, size_t * nbytes, const mpi_t a);
 
-int _gnutls_mpi_dprint_lz( gnutls_datum* dest, const mpi_t a );
+int _gnutls_mpi_dprint_lz(gnutls_datum * dest, const mpi_t a);
 #define _gnutls_mpi_dprint _gnutls_mpi_dprint_lz
 
 #endif

@@ -40,13 +40,13 @@ int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *
 void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials sc);
 int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials *sc);
 int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, 
-	const char *password_file, const char* password_conf_file);
+    const char *password_file, const char* password_conf_file);
 
 const char* gnutls_srp_server_get_username( gnutls_session state);
 
 int gnutls_srp_verifier( const char* username, const char* password, const gnutls_datum *salt, 
-	const gnutls_datum* g, const gnutls_datum* n, 
-	gnutls_datum * res);
+    const gnutls_datum* g, const gnutls_datum* n, 
+    gnutls_datum * res);
 
 /* The static parameters defined in draft-ietf-tls-srp-05
  * Those should be used as input to gnutls_srp_verifier().
@@ -61,46 +61,46 @@ extern const gnutls_datum gnutls_srp_1024_group_prime;
 extern const gnutls_datum gnutls_srp_1024_group_generator;
 
 typedef int gnutls_srp_server_credentials_function(
-	gnutls_session, 
-	const char* username, gnutls_datum* salt, 
-	gnutls_datum* verifier, gnutls_datum* generator,
-	gnutls_datum* prime
+    gnutls_session, 
+    const char* username, gnutls_datum* salt, 
+    gnutls_datum* verifier, gnutls_datum* generator,
+    gnutls_datum* prime
 );
 void gnutls_srp_set_server_credentials_function( 
-	gnutls_srp_server_credentials, 
-	gnutls_srp_server_credentials_function *);
+    gnutls_srp_server_credentials, 
+    gnutls_srp_server_credentials_function *);
 
 typedef int gnutls_srp_client_credentials_function(gnutls_session, unsigned int,
-	char **, char**);
+    char **, char**);
 void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials, 
-	gnutls_srp_client_credentials_function *);
+    gnutls_srp_client_credentials_function *);
 
 
 /* Openpgp certificate stuff 
  */
 
 typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session, const unsigned char *keyfpr, 
-	unsigned int keyfpr_length, gnutls_datum *key);
+    unsigned int keyfpr_length, gnutls_datum *key);
 
 void gnutls_openpgp_set_recv_key_function( gnutls_session, gnutls_openpgp_recv_key_func);
 
 int gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res, 
-	const char *CERTFILE, const char* KEYFILE);
+    const char *CERTFILE, const char* KEYFILE);
 int gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
-	const gnutls_datum* CERT, const gnutls_datum* KEY);
+    const gnutls_datum* CERT, const gnutls_datum* KEY);
 
 int gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
-	const char* keyserver, int port);
+    const char* keyserver, int port);
 
 int gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials res,
-	const char* trustdb);
+    const char* trustdb);
 
 int gnutls_certificate_set_openpgp_keyring_mem(
-	gnutls_certificate_credentials c,
-	const unsigned char *data, size_t dlen );
+    gnutls_certificate_credentials c,
+    const unsigned char *data, size_t dlen );
 
 int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials res, 
-	const char *name);
+    const char *name);
 
 int gnutls_global_init_extra(void);
 
