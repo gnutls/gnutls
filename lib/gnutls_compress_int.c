@@ -23,7 +23,9 @@
 #include "gnutls_compress.h"
 #include "gnutls_errors.h"
 #include "gnutls_compress_int.h"
+#ifdef HAVE_ZLIB_H
 #include <zlib.h>
+#endif
 
 #define MAX_COMP_SIZE 17408 /* 2^14+1024 */
 int gnutls_compress( CompressionMethod algorithm, char* plain, int plain_size, char** compressed) {
