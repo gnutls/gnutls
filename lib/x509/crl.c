@@ -403,17 +403,17 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl)
   * @indx: the index of the certificate to extract (starting from 0)
   * @serial: where the serial number will be copied
   * @serial_size: initially holds the size of serial
-  * @time: if non null, will hold the time this certificate was revoked
+  * @t: if non null, will hold the time this certificate was revoked
   *
-  * This function will return the serial number of the specified, by the index, 
-  * revoked certificate.
+  * This function will return the serial number of the specified, by
+  * the index, revoked certificate.
   *
   * Returns a negative value on failure.
   *
   **/
 int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
 				   unsigned char *serial,
-				   size_t * serial_size, time_t * time)
+				   size_t * serial_size, time_t * t)
 {
 
     int result, _serial_size;
@@ -448,8 +448,8 @@ int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
 	return _gnutls_asn2err(result);
     }
 
-    if (time) {
-	*time = _gnutls_x509_get_time(crl->crl, date_name);
+    if (t) {
+	*t = _gnutls_x509_get_time(crl->crl, date_name);
     }
 
     return 0;
