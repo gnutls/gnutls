@@ -162,7 +162,7 @@ gc_cipher_setkey (gc_cipher handle, size_t keylen, const char *key)
 {
   gcry_error_t err;
 
-  err = gcry_cipher_setkey (handle, key, keylen);
+  err = gcry_cipher_setkey ((gcry_cipher_hd_t) handle, key, keylen);
   if (gcry_err_code (err))
     return GC_INVALID_CIPHER;
 
@@ -174,7 +174,7 @@ gc_cipher_setiv (gc_cipher handle, size_t ivlen, const char *iv)
 {
   gcry_error_t err;
 
-  err = gcry_cipher_setiv (handle, iv, ivlen);
+  err = gcry_cipher_setiv ((gcry_cipher_hd_t) handle, iv, ivlen);
   if (gcry_err_code (err))
     return GC_INVALID_CIPHER;
 
@@ -184,7 +184,8 @@ gc_cipher_setiv (gc_cipher handle, size_t ivlen, const char *iv)
 int
 gc_cipher_encrypt_inline (gc_cipher handle, size_t len, char *data)
 {
-  if (gcry_cipher_encrypt (handle, data, len, NULL, len) != 0)
+  if (gcry_cipher_encrypt ((gcry_cipher_hd_t) handle,
+			   data, len, NULL, len) != 0)
     return GC_INVALID_CIPHER;
 
   return GC_OK;
@@ -193,7 +194,8 @@ gc_cipher_encrypt_inline (gc_cipher handle, size_t len, char *data)
 int
 gc_cipher_decrypt_inline (gc_cipher handle, size_t len, char *data)
 {
-  if (gcry_cipher_decrypt (handle, data, len, NULL, len) != 0)
+  if (gcry_cipher_decrypt ((gcry_cipher_hd_t) handle,
+			   data, len, NULL, len) != 0)
     return GC_INVALID_CIPHER;
 
   return GC_OK;
