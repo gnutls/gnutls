@@ -48,10 +48,8 @@ extern "C" {
 @DEFINE_SSIZE_T@
 #endif
 
-#ifndef HAVE_TIME_T
-# define HAVE_TIME_T
-@DEFINE_TIME_T@
-#endif
+/* Get time_t. */
+#include <time.h>
 
 #include <gnutls/compat.h>
 
