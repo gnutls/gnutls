@@ -1,4 +1,5 @@
-This is the GNU TLS library.
+This is the GNU TLS library. More up to date information can be found
+at http://gnutls.hellug.gr
 
 It is a TLS implementation for the GNU project. 
 It is currently under heavy development. (and still not ready for 
@@ -8,4 +9,8 @@ real world programs)
 
 * Run the buildconf script before doing anything. This will create
 the needed configure, makefiles etc. using Automake, Autoconf, and libtool.
+
+BUGS:
+
+If you find any report it to bug-gnutls@gnu.org
 
