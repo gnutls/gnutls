@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <defines.h>
-#include "gnutls_record.h"
-#include "gnutls_handshake.h"
+#include "gnutls_int.h"
 #include "gnutls_errors.h"
 
 
