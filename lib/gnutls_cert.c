@@ -447,14 +447,17 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session, unsigned int* st
   *
   * This function will try to verify the peer's certificate and return its status (trusted, invalid etc.).
   * The value of @status should be one or more of the gnutls_certificate_status_t
-  * enumerated elements bitwise or'd.
-  * However you must also check the peer's name in order to check if the verified certificate belongs to the
-  * actual peer.
+  * enumerated elements bitwise or'd. To avoid denial of service attacks
+  * some default upper limits regarding the certificate key size and
+  * chain size are set. To override them use gnutls_certificate_set_verify_limits().
+  *
+  * Note that you must also check the peer's name in order to 
+  * check if the verified certificate belongs to the actual peer.
   *
   * Returns a negative error code on error and zero on success.
   *
-  * This is the same as gnutls_x509_verify_certificate().
-  *
+  * This is the same as gnutls_x509_verify_certificate() and
+  * uses the loaded CAs in the credentials as trusted CAs.
   **/
 int gnutls_certificate_verify_peers2(gnutls_session_t session, unsigned int *status)
 {

@@ -86,10 +86,7 @@ mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g, mpi_t n, mpi_t v)
     mpi_t tmpB = NULL, tmpV = NULL;
     mpi_t b = NULL, B = NULL, k = NULL;
     int bits;
-    size_t n_size = 0;
 
-    /* get the size of n in bytes */
-    _gnutls_mpi_print( NULL, &n_size, n);
 
     /* calculate:  B = (k*v + g^b) % N 
      */
@@ -121,7 +118,7 @@ mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g, mpi_t n, mpi_t v)
 	goto error;
     }
 
-    k = _gnutls_calc_srp_u(n, g, n_size);
+    k = _gnutls_calc_srp_u(n, g, n);
     if (k == NULL) {
 	gnutls_assert();
 	goto error;
@@ -156,14 +153,17 @@ mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g, mpi_t n, mpi_t v)
 /* This calculates the SHA1(A | B)
  * A and B will be left-padded with zeros to fill n_size.
  */
-mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, size_t n_size)
+mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, mpi_t n)
 {
     size_t b_size, a_size;
     opaque *holder, hd[MAX_HASH_SIZE];
-    size_t holder_size, hash_size;
+    size_t holder_size, hash_size, n_size;
     GNUTLS_HASH_HANDLE td;
     int ret;
     mpi_t res;
+
+    /* get the size of n in bytes */
+    _gnutls_mpi_print( NULL, &n_size, n);
 
     _gnutls_mpi_print(NULL, &a_size, A);
     _gnutls_mpi_print(NULL, &b_size, B);
@@ -325,10 +325,6 @@ mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
 {
     mpi_t S = NULL, tmp1 = NULL, tmp2 = NULL;
     mpi_t tmp4 = NULL, tmp3 = NULL, k = NULL;
-    size_t n_size = 0;
-
-    /* get the size of n in bytes */
-    _gnutls_mpi_print( NULL, &n_size, n);
 
     S = _gnutls_mpi_alloc_like(n);
     if (S == NULL)
@@ -341,7 +337,7 @@ mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
 	goto freeall;
     }
 
-    k = _gnutls_calc_srp_u(n, g, n_size);
+    k = _gnutls_calc_srp_u(n, g, n);
     if (k == NULL) {
 	gnutls_assert();
 	goto freeall;
