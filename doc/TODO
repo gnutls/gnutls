@@ -5,9 +5,6 @@ in order to avoid having people working on the same thing.
 Current list:
 * Check opera (which sends an closure alert during the handshake
   which we do not read).
-* Modify the verification function, gnutls_x509_crt_list_verify(), 
-  to check the list in reverse order, to save unneeded checks and
-  avoid possible attacks.
 * Make the current ciphering code a bit more abstract to
   allow easy integration with TLS hardware.
 * Allow adding multiple subject alternative names.
