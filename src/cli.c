@@ -58,16 +58,16 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 		x509_info = gnutls_get_auth_info(state);
 		if (x509_info != NULL) {
 			switch( x509_info->peer_certificate_status) {
-			case GNUTLS_NOT_VERIFIED:
+			case GNUTLS_CERT_NOT_TRUSTED:
 				printf("- Peer's X509 Certificate was NOT verified\n");
 				break;
-			case GNUTLS_EXPIRED:
+			case GNUTLS_CERT_EXPIRED:
 				printf("- Peer's X509 Certificate was verified but is expired\n");
 				break;
-			case GNUTLS_VERIFIED:
+			case GNUTLS_CERT_TRUSTED:
 				printf("- Peer's X509 Certificate was verified\n");
 				break;
-			case GNUTLS_INVALID:
+			case GNUTLS_CERT_INVALID:
 			default:
 				printf("- Peer's X509 Certificate was invalid\n");
 				break;

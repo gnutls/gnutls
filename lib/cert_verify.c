@@ -21,59 +21,301 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"
+#include "cert_asn1.h"
+#include "cert_der.h"
+#include "gnutls_global.h"
+#include "gnutls_num.h"		/* GMAX */
 
-int gnutls_verify_certificate2( gnutls_cert* cert, gnutls_cert* trusted_cas, int tcas_size,
-	void* CRLs, int crls_size) {
+/* TIME functions */
+
+static time_t utcTime2gtime(char *ttime)
+{
+	char xx[3];
+	struct tm ctime;
+
+	xx[2] = 0;
+
+/* get the year
+ */
+	memcpy(xx, ttime += 2, 2);	/* year */
+	ctime.tm_year = atoi(xx);
+
+	if (ctime.tm_year > 49)
+		ctime.tm_year += 1900;
+	else
+		ctime.tm_year += 2000;
+
+/* get the month
+ */
+	memcpy(xx, ttime += 2, 2);	/* month */
+	ctime.tm_mon = atoi(xx);
+
+/* get the day
+ */
+	memcpy(xx, ttime += 2, 2);	/* day */
+	ctime.tm_mday = atoi(xx);
+
+/* get the hour
+ */
+	memcpy(xx, ttime += 2, 2);	/* hour */
+	ctime.tm_hour = atoi(xx);
+
+/* get the minutes
+ */
+	memcpy(xx, ttime += 2, 2);	/* minutes */
+	ctime.tm_min = atoi(xx);
+
+	return mktime(&ctime);
+
+}
+
+static time_t generalTime2gtime(char *ttime)
+{
+	char xx[5];
+	struct tm ctime;
+
+	if (strchr(ttime, 'Z') == 0) {
+		gnutls_assert();
+		/* sorry we don't support it yet
+		 */
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	xx[4] = 0;
+
+/* get the year
+ */
+	memcpy(xx, ttime += 2, 4);	/* year */
+	ctime.tm_year = atoi(xx);
+
+	xx[2] = 0;
+
+/* get the month
+ */
+	memcpy(xx, ttime += 2, 2);	/* month */
+	ctime.tm_mon = atoi(xx);
+
+/* get the day
+ */
+	memcpy(xx, ttime += 2, 2);	/* day */
+	ctime.tm_mday = atoi(xx);
+
+/* get the hour
+ */
+	memcpy(xx, ttime += 2, 2);	/* hour */
+	ctime.tm_hour = atoi(xx);
+
+/* get the minutes
+ */
+	memcpy(xx, ttime += 2, 2);	/* minutes */
+	ctime.tm_min = atoi(xx);
+
+	return mktime(&ctime);
+}
+
+static int check_if_expired(gnutls_cert * cert)
+{
+	CertificateStatus ret = GNUTLS_CERT_EXPIRED;
+	opaque ttime[256];
+	int len, result;
+	time_t ctime;
+	node_asn *c2;
+
+	/* get the issuer of 'cert'
+	 */
+	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der(c2, cert->raw.data, cert->raw.size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	len = sizeof(ttime) - 1;
+	if ((result =
+	     asn1_read_value(c2, "certificate2.tbsCertificate.validity.notAfter", ttime, &len)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	/* CHOICE */
+	if (strcmp(ttime, "GeneralizedTime") == 0) {
+		len = sizeof(ttime) - 1;
+		result =
+		    asn1_read_value(c2, "certificate2.tbsCertificate.validity.notAfter.generalTime", ttime, &len);
+		if (result == ASN_OK)
+			ctime = generalTime2gtime(ttime);
+	} else {		/* UTCTIME */
+		len = sizeof(ttime) - 1;
+		result =
+		    asn1_read_value(c2, "certificate2.tbsCertificate.validity.notAfter.UTCTime", ttime, &len);
+		if (result == ASN_OK)
+			ctime = utcTime2gtime(ttime);
+	}
+
+	if (result != ASN_OK || ctime == (time_t) - 1) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	if (time(NULL) < ctime)
+		ret = GNUTLS_CERT_TRUSTED;
+
+	asn1_delete_structure(c2);
+
+	return ret;
+}
+
+
+
+
+#define MAX_DN 10*1024
+
+/* This function checks if 'certs' issuer is 'issuer_cert'.
+ * This does a straight compare of the DER rdnSequence. 
+ */
+static
+int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
+{
+	node_asn *c2;
+	int result, len;
+	int issuer_len;
+	opaque issuer_dn[MAX_DN];
+	opaque dn[MAX_DN];
+
+	/* get the issuer of 'cert'
+	 */
+	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+	result = asn1_get_der(c2, cert->raw.data, cert->raw.size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	issuer_len = sizeof(issuer_dn) - 1;
+	if ((result =
+	     asn1_read_value(c2, "certificate2.tbsCertificate.subject.rdnSequence", issuer_dn, &issuer_len)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	asn1_delete_structure(c2);
+
+
+	/* get the 'subject' info of 'issuer_cert'
+	 */
+	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+	result = asn1_get_der(c2, issuer_cert->raw.data, issuer_cert->raw.size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	len = sizeof(dn) - 1;
+	if ((result =
+	     asn1_read_value(c2, "certificate2.tbsCertificate.subject.rdnSequence", dn, &len)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	asn1_delete_structure(c2);
+
+	if (memcmp(dn, issuer_dn, GMAX(len, issuer_len)) == 0)
+		return 0;
+
+	return -1;		/* do not match */
+
+}
+
+static gnutls_cert *find_issuer(gnutls_cert * cert, gnutls_cert * trusted_cas, int tcas_size)
+{
+	int i;
+
+	/* this is serial search. 
+	 */
+
+	for (i = 0; i < tcas_size; i++) {
+		if (compare_dn(cert, &trusted_cas[i]) == 0)
+			return &trusted_cas[i];
+	}
+
+	return NULL;
+}
+
+
+int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, int tcas_size,
+			       void *CRLs, int crls_size)
+{
 /* CRL is ignored for now */
-	
-	gnutls_cert* issuer;
+
+	gnutls_cert *issuer;
 	CertificateStatus ret;
-	
-	issuer = find_issuer( cert, trusted_cas, tcas_size);
+
+	if (tcas_size > 1)
+		issuer = find_issuer(cert, trusted_cas, tcas_size);
 	/* issuer is not in trusted certificate
 	 * authorities.
 	 */
-	if (issuer==NULL) return GNUTLS_NOT_VERIFIED;
-	
-	ret = verify_signature( cert, issuer);
-	if (ret!=GNUTLS_VERIFIED)
-		return ret;
-	
-	/* Check CRL 
-	 */
-	 
-	 
-	 ret = check_if_expired( cert);
+	if (issuer == NULL)
+		return GNUTLS_CERT_NOT_TRUSTED;
 
-	 if (ret==GNUTLS_EXPIRED) 
-	 	return ret;
-	 
-	 return GNUTLS_VERIFIED;
+//      ret = verify_signature(cert, issuer);
+	//      if (ret != GNUTLS_CERT_TRUSTED)
+	//              return ret;
+
+	/* Check CRL --not done yet.
+	 */
+
+	ret = check_if_expired( cert);
+
+	if (ret == GNUTLS_CERT_EXPIRED)
+		return ret;
+
+	return GNUTLS_CERT_TRUSTED;
 }
 
-int gnutls_verify_certificate( gnutls_cert* certificate_list, 
-	int clist_size, gnutls_cert* trusted_cas, int tcas_size, void* CRLs, 
-	int crls_size) 
+int gnutls_verify_certificate(gnutls_cert * certificate_list,
+    int clist_size, gnutls_cert * trusted_cas, int tcas_size, void *CRLs,
+			      int crls_size)
 {
-	int i=0, int expired=0;
+	int i = 0;
+	int expired = 0;
 	CertificateStatus ret;
-		
-	for( i=0;i<clist_size;i++) {
-		if (i+1 > clist_size) break;
-		
-		if ( (ret=gnutls_verify_certificate2( certificate_list[i], certificate_list[i+1], 1, NULL, 0)) != GNUTLS_VERIFIED) {
+
+	for (i = 0; i < clist_size; i++) {
+		if (i + 1 > clist_size)
+			break;
+
+		if ((ret = gnutls_verify_certificate2(&certificate_list[i], &certificate_list[i + 1], 1, NULL, 0)) != GNUTLS_CERT_TRUSTED) {
 			/* we do that because expired means that
 			 * it was verified but it was also expired.
 			 */
-			if (ret==GNUTLS_EXPIRED) expired=1;
-			else return ret;
+			if (ret == GNUTLS_CERT_EXPIRED)
+				expired = 1;
+			else
+				return ret;
 		}
 	}
-	
-	ret = gnutls_verify_certificate2( certificate_list[i], trysted_cas, tcas_size, CRLs, crls_size);
 
-	if (ret!=GNUTLS_VERIFIED) return ret;
-	
-	if (expired!=0) return GNUTLS_EXPIRED;
-	return GNUTLS_VERIFIED;
+	ret = gnutls_verify_certificate2(&certificate_list[i], trusted_cas, tcas_size, CRLs, crls_size);
+
+	if (ret != GNUTLS_CERT_TRUSTED)
+		return ret;
+
+	if (expired != 0)
+		return GNUTLS_CERT_EXPIRED;
+	return GNUTLS_CERT_TRUSTED;
 }

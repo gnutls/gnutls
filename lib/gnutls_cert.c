@@ -83,13 +83,6 @@ int n,i;
 	}
 	gnutls_free( cert.params);
 	
-//	GNUTLS_FREE( cert.common_name);
-//	GNUTLS_FREE( cert.country);
-//	GNUTLS_FREE( cert.organization);
-//	GNUTLS_FREE( cert.organizational_unit_name);
-//	GNUTLS_FREE( cert.locality_name);
-//	GNUTLS_FREE( cert.state_or_province_name);
-
 	gnutls_free_datum( &cert.raw);
 
 	return;

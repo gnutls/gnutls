@@ -31,6 +31,7 @@
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_global.h>
+#include <cert_verify.h>
 #include "debug.h"
 
 int gen_rsa_certificate(GNUTLS_KEY, opaque **);
@@ -454,14 +455,10 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 
 	/* FIXME: Verify certificate 
 	 */
-	ret = GNUTLS_NOT_VERIFIED;
+	ret = GNUTLS_CERT_NOT_TRUSTED;
 
-#warning "WE DO NOT VERIFY RSA CERTIFICATES"
-
-/*	ret = gnutls_verify_certificate( peer_certificate_list, peer_certificate_list_size,
-		cred->ca_list, cred->ncas, NULL);
- */
-
+	ret = gnutls_verify_certificate( peer_certificate_list, peer_certificate_list_size, 
+		cred->ca_list, cred->ncas, NULL, 0);
 
 	info->peer_certificate_status = ret;
 

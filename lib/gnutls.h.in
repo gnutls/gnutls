@@ -177,7 +177,7 @@ typedef struct {
 	char username[256];
 } SRP_SERVER_AUTH_INFO;
 
-typedef enum verified { GNUTLS_VERIFIED, GNUTLS_NOT_VERIFIED, GNUTLS_EXPIRED, GNUTLS_INVALID } CertificateStatus;
+typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
 
 typedef struct {
 	char common_name[256];
