@@ -638,6 +638,8 @@ void certificate_info( void)
 		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+
+	fprintf(outfile, "X.509 certificate info:\n\n");
 	
 	fprintf(outfile, "Version: %d\n", gnutls_x509_crt_get_version(crt));
 
@@ -800,7 +802,7 @@ static void print_certificate_info( gnutls_x509_crt crt)
 	const char* cprint;
 	char dn[256];
 	
-	fprintf( stderr, "\n\nCertificate info:\n\n");
+	fprintf( stderr, "\n\nX.509 certificate info:\n\n");
 	
 	fprintf(stderr, "Version: %d\n", gnutls_x509_crt_get_version(crt));
 
