@@ -1150,10 +1150,14 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
-/**
+ /*
   * gnutls_handshake_begin - This function does a partial handshake of the TLS/SSL protocol.
   * @cd: is a connection descriptor, as returned by socket().
   * @state: is a a &GNUTLS_STATE structure.
+  *
+  * NOTE: I intend to make this function obsolete. If a certificate
+  * cannot be verified then this information will be available in the auth_info
+  * structure. Thus not need for these functions.
   *
   * This function initiates the handshake of the TLS/SSL protocol.
   * Here we will receive - if requested and supported by the ciphersuite -
@@ -1163,7 +1167,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
   * However this failure will not be fatal. However you may choose to
   * continue the handshake - eg. even if the certificate cannot
   * be verified- by calling gnutls_handshake_finish().
-  **/
+  */
 int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 {
 	int ret;
@@ -1230,10 +1234,19 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		/* FIXME: send our certificate - if required */
 		/* NOTE: these should not be send if we are resuming */
 
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+
+		if (state->gnutls_internals.resumed == RESUME_FALSE)
+			ret = _gnutls_send_certificate(cd, state);
+		if (ret < 0) {
+			ERR("send server certificate", ret);
+			gnutls_assert();
+			gnutls_clearHashDataBuffer(state);
+			return ret;
+		}
+
 
 		/* send server key exchange (A) */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)
@@ -1244,6 +1257,8 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
+
+		/* FIXME: Send certificate request */
 
 /* Added for SRP which uses a different handshake */
 		/* receive the client key exchange message */
@@ -1269,7 +1284,8 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 	}
 }
 
-/* This function sends the final handshake packets and initializes connection */
+/* This function sends the final handshake packets and initializes connection 
+ */
 static int _gnutls_send_handshake_final(int cd, GNUTLS_STATE state,
 					int init)
 {
@@ -1303,7 +1319,8 @@ static int _gnutls_send_handshake_final(int cd, GNUTLS_STATE state,
 	return ret;
 }
 
-/* This function receives the final handshake packets */
+/* This function receives the final handshake packets 
+ */
 static int _gnutls_recv_handshake_final(int cd, GNUTLS_STATE state,
 					int init)
 {
@@ -1337,7 +1354,7 @@ static int _gnutls_recv_handshake_final(int cd, GNUTLS_STATE state,
 	return ret;
 }
 
-/**
+ /*
   * gnutls_handshake_finish - This function finished a partial handshake of the TLS/SSL protocol.
   * @cd: is a connection descriptor, as returned by socket().
   * @state: is a a &GNUTLS_STATE structure.
@@ -1346,7 +1363,7 @@ static int _gnutls_recv_handshake_final(int cd, GNUTLS_STATE state,
   * You should call it only if you used gnutls_handshake_begin() and
   * you have somehow verified the identity of the peer.
   * This function will fail if any problem is encountered.
-  **/
+  */
 int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 {
 	int ret = 0;

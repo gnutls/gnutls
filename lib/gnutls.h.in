@@ -144,6 +144,7 @@ typedef struct {
 typedef struct {
 	gnutls_datum * cert_list;
 	int cert_list_size;
+	gnutls_datum pkey; /* private key */
 } X509PKI_SERVER_CREDENTIALS;
 
 /* error codes appended here */

@@ -2,6 +2,7 @@
  #define GNUTLS_AUTH_H
 typedef struct {
 	char* name; /* null terminated */
+	int (*gnutls_generate_certificate)( GNUTLS_KEY, opaque**);
 	int (*gnutls_generate_server_kx)( GNUTLS_KEY, opaque**);
 	int (*gnutls_generate_server_kx2)( GNUTLS_KEY, opaque**); /* used in SRP */
 	int (*gnutls_generate_client_kx0)( GNUTLS_KEY, opaque**);

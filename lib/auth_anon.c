@@ -35,6 +35,7 @@ int proc_anon_client_kx( GNUTLS_KEY, opaque*, int);
 
 MOD_AUTH_STRUCT anon_auth_struct = {
 	"ANON",
+	NULL,
 	gen_anon_server_kx,
 	NULL,
 	NULL,

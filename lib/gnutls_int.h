@@ -142,6 +142,7 @@ typedef struct {
 	/* RSA: 
 	 * modulus is A
 	 * exponent is B
+	 * private key is u;
 	 */
 	
 	/* this is used to hold the peers authentication data 

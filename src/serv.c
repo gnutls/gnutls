@@ -82,6 +82,7 @@ int main()
 		gnutls_init(&state, GNUTLS_SERVER);
 		if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
 			fprintf(stderr, "*** DB error (%d)\n", ret);
+		
 		gnutls_set_cipher_priority(state, GNUTLS_TWOFISH,
 					   GNUTLS_RIJNDAEL, GNUTLS_3DES,
 					   GNUTLS_ARCFOUR, 0);

@@ -38,6 +38,7 @@ int proc_srp_client_kx0(GNUTLS_KEY, opaque *, int);
 
 MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
+	NULL,
 	gen_srp_server_kx,
 	gen_srp_server_kx2,
 	gen_srp_client_kx0,

@@ -40,3 +40,21 @@ void WRITEdatum8( opaque* dest, gnutls_datum dat) {
 	dest[0] = (uint8) dat.size;
 	memcpy( &dest[1], dat.data, dat.size);
 }
+
+int gnutls_set_datum( gnutls_datum* dat, const void* data, int data_size) {
+	dat->data = gnutls_malloc(data_size);
+	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
+	
+	dat->size = data_size;
+	memcpy( dat->data, data, data_size);
+	
+	return 0;
+}
+
+void gnutls_free_datum( gnutls_datum* dat) {
+	if (dat->data!=NULL && dat->size!=0)
+		gnutls_free( dat->data);
+
+	dat->data = NULL;
+	dat->size = 0;
+}

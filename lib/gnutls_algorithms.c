@@ -27,6 +27,7 @@
 #include "auth_anon.h"
 /* #include "auth_dhe_dss.h" */
 #include "auth_srp.h"
+#include "auth_x509.h"
 
 #define MAX_CIPHER 256
 #define MAX_MAC 256
@@ -190,12 +191,12 @@ typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 static const gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_ANON, 0, 0, 0, 1,
 			     &anon_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, &x509pki_auth_struct),
 /*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 0,
 			     &dhe_dss_auth_struct),*/
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 1, 0, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 1, 0, 0, NULL),
+/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 0, NULL),*/
+/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 1, 0, 0, NULL),*/
+/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 1, 0, 0, NULL),*/
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP, 0, 0, 0, 0, &srp_auth_struct),
 	{0}
 };
