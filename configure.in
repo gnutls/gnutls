@@ -300,18 +300,18 @@ else
  AC_MSG_RESULT(yes)
 fi
 
-libasn1_enabled=no
+libtasn1_enabled=no
 
 AC_CHECK_LIB(asn1, asn1_array2tree,:, 
- libasn1_enabled=yes
+ libtasn1_enabled=yes
  AC_MSG_WARN(
 *** 
 *** LibASN1 was not found. Will use the included one.))
 
 
-AC_ARG_WITH(included-libasn1,
-	[  --with-included-libasn1 Use the included libasn1],
-libasn1_enabled=yes, libasn1_enabled=no)
+AC_ARG_WITH(included-libtasn1,
+	[  --with-included-libtasn1 Use the included libtasn1],
+libtasn1_enabled=yes, libtasn1_enabled=no)
 
 
 
@@ -320,7 +320,7 @@ AC_MSG_RESULT([***
 ])
 AM_PROG_LIBTOOL
 
-LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls -lasn1 $LIBGCRYPT_LIBS"
+LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls -ltasn1 $LIBGCRYPT_LIBS"
 LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
 
 AC_SUBST(LIBGNUTLS_LIBS)
@@ -349,13 +349,13 @@ AC_MSG_WARN(***
 fi
 
 
-if test "$libasn1_enabled" = yes; then
- AC_CONFIG_SUBDIRS(libasn1)
- LIBASN1_DIR=libasn1
+if test "$libtasn1_enabled" = yes; then
+ AC_CONFIG_SUBDIRS(libtasn1)
+ LIBASN1_DIR=libtasn1
  AC_SUBST(LIBASN1_DIR)
- LIBASN1_LINK=../libasn1/lib/libasn1.la
+ LIBASN1_LINK=../libtasn1/lib/libtasn1.la
 else
- LIBASN1_LINK=-lasn1
+ LIBASN1_LINK=-ltasn1
 fi
 
 AC_SUBST(LIBASN1_LINK)
