@@ -1,3 +1,9 @@
+2004-11-19 17:18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.c:
+
+	Doc fix.  
+
 2004-11-17 14:06  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO:
