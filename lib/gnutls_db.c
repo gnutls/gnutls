@@ -301,11 +301,27 @@ int ret = 0;
 	return ret;
 }
 
+/* Checks if both db_store and db_retrieve functions have
+ * been set up.
+ */
+static int _gnutls_db_func_is_ok( GNUTLS_STATE state) {
+	if (state->gnutls_internals.db_store_func!=NULL &&
+		state->gnutls_internals.db_retrieve_func!=NULL &&
+		state->gnutls_internals.db_remove_func!=NULL) return 0;
+	else return GNUTLS_E_DB_ERROR;
+}
+
+
 int _gnutls_server_restore_session( GNUTLS_STATE state, uint8* session_id, int session_id_size)
 {
 gnutls_datum data;
 gnutls_datum key = { session_id, session_id_size };
 int ret;
+
+	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_SESSION;
+	}
 
 	data = _gnutls_retrieve_session( state, key);
 
@@ -333,18 +349,6 @@ gnutls_datum key = { session_id, session_id_size };
 
 	return _gnutls_remove_session( state, key);
 }
-
-
-/* Checks if both db_store and db_retrieve functions have
- * been set up.
- */
-static int _gnutls_db_func_is_ok( GNUTLS_STATE state) {
-	if (state->gnutls_internals.db_store_func!=NULL &&
-		state->gnutls_internals.db_retrieve_func!=NULL &&
-		state->gnutls_internals.db_remove_func!=NULL) return 0;
-	else return GNUTLS_E_DB_ERROR;
-}
-
 
 
 /* Stores session data to the db backend.
@@ -416,11 +420,6 @@ datum content;
 #endif
 gnutls_datum ret = { NULL, 0 };
 
-	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
-		gnutls_assert();
-		return ret;
-	}
-	
 	if (session_id.data==NULL || session_id.size==0) {
 		gnutls_assert();
 		return ret;
