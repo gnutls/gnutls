@@ -1,3 +1,25 @@
+2004-05-12 16:32  nmav <nmav@gnutls.org>
+
+	* configure.in:
+
+	Added configure option to disable lzo completely.  
+
+2004-05-12 15:52  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/certtool.cfg, doc/tex/srp.tex,
+	lib/Makefile.am:
+
+	opencdk is being included if not found.  
+
+2004-05-12 15:49  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/certtool.cfg, doc/tex/srp.tex, src/certtool.c,
+	src/crypt-gaa.c, src/crypt-gaa.h, src/crypt.gaa,
+	src/certtool-cfg.c, src/certtool-cfg.h, src/certtool.c,
+	src/crypt-gaa.c, src/crypt.gaa:
+
+	certtool can now add ip address SAN extension.  
+
 2004-05-11 11:35  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_handshake.c, gnutls_handshake.c:
