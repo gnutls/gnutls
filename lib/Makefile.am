@@ -29,7 +29,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	auth_anon.h gnutls_extensions.h gnutls_buffer.h libgnutls.vers \
 	gnutls_auth_int.h gnutls_random.h x509_b64.h gnutls_v2_compat.h \
 	libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
-	gnutls-api.tex gnutls-api.texi gnutls_datum.h auth_cert.h gnutls_mpi.h \
+	gnutls-api.texi gnutls_datum.h auth_cert.h gnutls_mpi.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_constate.h gnutls_global.h strfile.h \
 	gnutls_sig.h gnutls_mem.h gnutls_ui.h \
@@ -79,14 +79,12 @@ pkix_asn1_tab.c: pkix.asn
 gnutls_asn1_tab.c: gnutls.asn
 	-asn1Parser gnutls.asn gnutls_asn1_tab.c
 
-gnutls-api.tex gnutls-api.texi: $(COBJECTS)
-	@echo "" > gnutls-api.tex
+gnutls-api.texi: $(COBJECTS)
 	@echo "" > gnutls-api.texi
 	@for i in $(COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
-		../doc/scripts/gdoc -tex $$i >> gnutls-api.tex && \
 		../doc/scripts/gdoc -texinfo $$i >> gnutls-api.texi && \
 		echo "ok"; \
 	done
 
-dist-hook: gnutls-api.tex gnutls-api.texi
+dist-hook: gnutls-api.texi

@@ -13,7 +13,7 @@ else
 endif
 
 EXTRA_DIST = libgnutls-extra.vers \
-	openssl_compat.h gnutls-extra-api.tex gnutls-extra-api.texi \
+	openssl_compat.h gnutls-extra-api.texi \
 	gnutls_extra.h libgnutls-extra-config.in \
 	libgnutls-extra.m4 lzoconf.h minilzo.h
 
@@ -76,14 +76,12 @@ libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS) \
 libgnutls_extra_la_LIBADD = ../lib/libgnutls.la
 
 
-gnutls-extra-api.tex gnutls-extra-api.texi: $(COBJECTS_EXTRA)
-	@echo "" > gnutls-extra-api.tex
+gnutls-extra-api.texi: $(COBJECTS_EXTRA)
 	@echo "" > gnutls-extra-api.texi
 	@for i in $(COBJECTS_EXTRA); do \
 		echo -n "Creating documentation for file $$i... " && \
-		../doc/scripts/gdoc -tex $$i >> gnutls-extra-api.tex && \
 		../doc/scripts/gdoc -texinfo $$i >> gnutls-extra-api.texi && \
 		echo "ok"; \
 	done
 
-dist-hook: gnutls-extra-api.tex gnutls-extra-api.texi
+dist-hook: gnutls-extra-api.texi
