@@ -1,3 +1,21 @@
+2004-08-11 15:23  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Typo.  
+
+2004-08-11 15:14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi:
+
+	Fix direntry.  
+
+2004-08-11 15:10  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi:
+
+	Add.  
+
 2004-08-10 16:20  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS:
