@@ -154,5 +154,5 @@ int gnutls_set_db_name( GNUTLS_STATE state, char* filename);
         the sessions to be resumed.
 
 int gnutls_clean_db( GNUTLS_STATE state);
-	Deletes all the records in the db. This db may become huge
+	Deletes all expired records in the db. This db may become huge
 	if this is not called.

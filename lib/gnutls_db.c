@@ -58,7 +58,7 @@ time_t timestamp;
 
 	while( key.dptr != NULL) {
 
-		if ( ((SecurityParameters*)(key.dptr))->timestamp > timestamp || ((SecurityParameters*)(key.dptr))->timestamp == 0) {
+		if ( timestamp - ((SecurityParameters*)(key.dptr))->timestamp <= state->gnutls_internals.expire_time || ((SecurityParameters*)(key.dptr))->timestamp == 0) {
 		    /* delete expired entry */
 		    gdbm_delete( dbf, key);
 		}
