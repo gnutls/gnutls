@@ -66,8 +66,6 @@ int main()
 
 
       gnutls_set_cred(state, GNUTLS_X509PKI, xcred);
-      gnutls_x509_set_cn(state, "www.host.com");
-
 
       if (t > 0) { /* if this is not the first time we connect */
          gnutls_set_current_session(state, session, session_size);

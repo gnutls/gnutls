@@ -82,11 +82,6 @@ int main()
     */
    gnutls_set_cred(state, GNUTLS_X509PKI, xcred);
 
-   /* This should be the CN in the server's 
-    * certificate.
-    */
-   gnutls_x509_set_cn(state, "www.host.com");
-
 
    /* Perform the TLS handshake
     */
