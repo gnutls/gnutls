@@ -18,7 +18,7 @@ static int compar(const void *_n1, const void *_n2)
     return strcmp(n1->name, n2->name);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     int i, j;
     const char *desc;
