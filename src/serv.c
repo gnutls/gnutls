@@ -308,7 +308,7 @@ int read_request( GNUTLS_STATE state, char *data, int data_size, int rnl)
 
 void check_alert( GNUTLS_STATE state, int ret) {
 	if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-		ret = gnutls_get_last_alert(state);
+		ret = gnutls_alert_get_last(state);
 		if (ret == GNUTLS_A_NO_RENEGOTIATION)
 			printf("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
 		else
@@ -466,7 +466,7 @@ int main(int argc, char **argv)
 					ret = gnutls_rehandshake( state);
 				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
-				if (gnutls_get_last_alert(state)!=GNUTLS_A_NO_RENEGOTIATION) {
+				if (gnutls_alert_get_last(state)!=GNUTLS_A_NO_RENEGOTIATION) {
 					printf("* Requesting rehandshake.\n");
 					/* continue handshake proccess */
 					do {

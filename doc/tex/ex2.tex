@@ -116,7 +116,7 @@ int main()
       }
    } else {
       if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-         printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
+         printf("* Received alert [%d]\n", gnutls_alert_get_last(state));
       if (ret == GNUTLS_E_REHANDSHAKE)
          printf("* Received HelloRequest message (server asked to rehandshake)\n");
          gnutls_send_appropriate_alert( state, ret); /* we don't want rehandshake */

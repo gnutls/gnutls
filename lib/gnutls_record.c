@@ -387,7 +387,7 @@ int gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size,
 }
 
 /**
-  * gnutls_send_alert - This function sends an alert message to the peer
+  * gnutls_alert_send - This function sends an alert message to the peer
   * @state: is a &GNUTLS_STATE structure.
   * @level: is the level of the alert
   * @desc: is the alert description
@@ -399,7 +399,7 @@ int gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size,
   * Returns 0 on success.
   *
   **/
-int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
+int gnutls_alert_send( GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
 {
 	uint8 data[2];
 	int ret;
@@ -421,7 +421,7 @@ int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription de
  * on the error message.
  */
 /**
-  * gnutls_send_appropriate_alert - This function sends an alert to the peer depending on the error code
+  * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
   * @state: is a &GNUTLS_STATE structure.
   * @err: is an integer
   *
@@ -437,39 +437,39 @@ int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription de
   * been sent to the peer.
   *
   **/
-int gnutls_send_appropriate_alert( GNUTLS_STATE state, int err) {
+int gnutls_alert_send_appropriate( GNUTLS_STATE state, int err) {
 int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	switch (err) { /* send appropriate alert */
 		case GNUTLS_E_MAC_FAILED:
-			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
+			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
 			break;
 		case GNUTLS_E_DECRYPTION_FAILED:
-			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_DECRYPTION_FAILED);
+			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_DECRYPTION_FAILED);
 			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
-			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_DECOMPRESSION_FAILURE);
+			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_DECOMPRESSION_FAILURE);
 			break;
 		case GNUTLS_E_ILLEGAL_PARAMETER:
-                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_ILLEGAL_PARAMETER);
+                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_ILLEGAL_PARAMETER);
                         break;
 		case GNUTLS_E_ASN1_PARSING_ERROR:
 		case GNUTLS_E_NO_CERTIFICATE_FOUND:
-                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
+                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
-                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_HANDSHAKE_FAILURE);
+                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_HANDSHAKE_FAILURE);
                         break;
 		case GNUTLS_E_UNEXPECTED_PACKET:
-                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
+                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
                         break;
 		case GNUTLS_E_REHANDSHAKE:
-                        ret = gnutls_send_alert( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION);
+                        ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION);
                         break;
 		case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
-                        ret = gnutls_send_alert( state, GNUTLS_AL_WARNING, GNUTLS_A_PROTOCOL_VERSION);
+                        ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_PROTOCOL_VERSION);
 			break;
 		case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
-			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
+			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
 			break;
 	}
 	return ret;
@@ -508,7 +508,7 @@ int gnutls_bye( GNUTLS_STATE state, CloseRequest how)
 			if (STATE==STATE60) {
 				ret = _gnutls_write_flush( state);
 			} else {
-				ret = gnutls_send_alert( state, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
+				ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
 				STATE = STATE60;
 			}
 
@@ -1123,7 +1123,7 @@ gnutls_check_version( const char *req_version )
 }
 
 /**
-  * gnutls_get_last_alert - Returns the last alert number received.
+  * gnutls_alert_get_last - Returns the last alert number received.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the last alert number received. This function
@@ -1132,7 +1132,7 @@ gnutls_check_version( const char *req_version )
   * The peer may send alerts if he thinks some things were not 
   * right. Check gnutls.h for the available alert descriptions.
   **/
-AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
+AlertDescription gnutls_alert_get_last( GNUTLS_STATE state) {
 	return state->gnutls_internals.last_alert;
 }
 
