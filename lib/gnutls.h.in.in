@@ -106,10 +106,23 @@ typedef enum gnutls_handshake_description { GNUTLS_HANDSHAKE_HELLO_REQUEST,
 	GNUTLS_HANDSHAKE_FINISHED=20 
 } gnutls_handshake_description;
 
+/* Note that the status bits have different meanings
+ * in openpgp keys and x.509 certificate verification.
+ */
 typedef enum gnutls_certificate_status { 
-	GNUTLS_CERT_NOT_TRUSTED=2, 
-	GNUTLS_CERT_INVALID=4, /* refers to certificate chain */
-	GNUTLS_CERT_REVOKED=32, /* will be present only if crls are checked */
+	GNUTLS_CERT_NOT_TRUSTED=2, /* will be set if the certificate
+				    * was not verified.
+				    */
+	GNUTLS_CERT_INVALID=4, /* in X.509 API will be set only when
+				* verifying certificate chains.
+				*/
+	GNUTLS_CERT_REVOKED=32, /* in X.509 this will be set only if CRLs are checked
+				 */
+
+	/* Those are extra information about the verification
+	 * process. Will be set only if the certificate was 
+	 * not verified.
+	 */
 	GNUTLS_CERT_ISSUER_NOT_FOUND=64,
 	GNUTLS_CERT_ISSUER_NOT_CA=128
 } gnutls_certificate_status;

@@ -118,12 +118,12 @@ int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag)
   * gnutls_pkcs12_bag_get_data - This function returns the bag's data
   * @bag: The bag
   * @indx: The element of the bag to get the data from
-  * @data: where the data will be copied to. Should be treated as constant.
+  * @data: where the bag's data will be. Should be treated as constant.
   *
   * This function will return the bag's data. 
   *
   **/
-int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_const_datum* data)
+int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_const_datum * data)
 {
 	if (indx >= bag->bag_elements) 
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
