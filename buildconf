@@ -2,6 +2,7 @@
 
 aclocal && \
 libtoolize -c --force && \
+aclocal && \
 autoheader  && \
 automake -a -c || automake -a -c
 autoconf 
