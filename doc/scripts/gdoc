@@ -76,6 +76,10 @@
 # '@parameter' - name of a parameter
 # '%CONST' - name of a constant.
 
+# In tex the symbol '->' will be replaced with rightarrow,
+# and 2^5 with ${2}^{5}$.
+
+
 # match expressions used to find embedded type information
 $type_constant = "\\\%(\\w+)";
 #$type_func = "(\\w+\\(\\))";
