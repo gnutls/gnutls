@@ -415,13 +415,6 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-///int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-//int kx_priority[16] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
-//int cipher_priority[16] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
-//int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
-//int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
-//int cert_type_priority[16] = { GNUTLS_CRT_OPENPGP, GNUTLS_CRT_X509, 0 };
-
 static gaainfo info;
 void gaa_parser( int argc, char** argv) {
 int i,j;
@@ -508,7 +501,9 @@ int i,j;
 }
 
 void print_list(void) {
-	
+	/* FIXME: This is hard coded. Make it print all the supported
+	 * algorithms.
+	 */
 	printf("\n");
 	printf("Certificate types:");
 	printf(" X.509");
