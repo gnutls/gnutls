@@ -101,7 +101,13 @@ which should return a signed certificate.
 A PKCS \#12 structure usually contains a user's private keys and
 certificates. It is commonly used in browsers to export and import
 the user's identities.
-
+\par
+In \gnutls{} the PKCS \#12 structures are handled using the
+\emph{gnutls\_pkcs12} type. This is an abstract type that
+may hold several \emph{gnutls\_pkcs12\_bag} types. The Bag types are the
+holders of the actual data, which may be certificates, private
+keys or encrypted data. An Bag of type encrypted should be decrypted
+in order for its data to be accessed. 
 \par
 The following example is about generating a PKCS \#12 structure.
 

@@ -32,6 +32,7 @@
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
 
+static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all);
 int generate_prime(int bits);
 void pkcs7_info( void);
 void pkcs12_info( void);
@@ -49,6 +50,7 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 static void gaa_parser(int argc, char **argv);
 void generate_self_signed( void);
 void generate_request(void);
+gnutls_x509_crt* load_cert_list(int mand, int *size);
 
 static gaainfo info;
 FILE* outfile;
@@ -460,6 +462,56 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 
 }
 
+gnutls_x509_crl generate_crl( void)
+{
+	gnutls_x509_crl crl;
+	gnutls_x509_crt * crts;
+	int size;
+	int days, result, i;
+	int vers = 2; /* the default version in the CRL
+	               */
+
+	result = gnutls_x509_crl_init(&crl);
+	if (result < 0) {
+		fprintf(stderr, "crl_init: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	crts = load_cert_list(1, &size);
+
+	for (i=0;i<size;i++) {
+	
+		result = gnutls_x509_crl_set_crt( crl, crts[i], time(0));
+		if (result < 0) {
+			fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+	}
+
+	fprintf(stderr, "\n\nthisUpdate/nextUpdate time.\n");	
+	gnutls_x509_crl_set_this_update( crl, time(NULL));
+
+	do {
+		days = read_int( "The next CRL will be issued in (days): ");
+	} while( days==0);
+	
+	result = gnutls_x509_crl_set_next_update( crl, time(NULL)+days*24*60*60);
+	if (result < 0) {
+		fprintf(stderr, "next_update: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+	
+	/* Version.
+	 */
+	result = gnutls_x509_crl_set_version( crl, vers);
+	if (result < 0) {
+		fprintf(stderr, "set_version: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+	
+	return crl;
+}
+
 gnutls_x509_crt update_certificate( void)
 {
 	gnutls_x509_crt crt;
@@ -563,6 +615,43 @@ void generate_signed_certificate( void)
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
+}
+
+void generate_signed_crl( void)
+{
+	gnutls_x509_crl crl;
+	size_t size;
+	int result;
+	gnutls_x509_privkey ca_key;
+	gnutls_x509_crt ca_crt;
+
+	fprintf(stderr, "Generating a signed CRLe...\n");
+
+	ca_key = load_ca_private_key();
+	ca_crt = load_ca_cert();
+
+	crl = generate_crl();
+
+	print_crl_info( crl, stderr, 0);
+	
+	fprintf(stderr, "\n\nSigning CRL...\n");
+
+	result = gnutls_x509_crl_sign( crl, ca_crt, ca_key);
+	if (result < 0) {
+		fprintf(stderr, "crl_sign: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	size = sizeof(buffer);
+	result = gnutls_x509_crl_export( crl, out_cert_format, buffer, &size);	
+	if (result < 0) {
+		fprintf(stderr, "crl_export: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	fwrite( buffer, 1, size, outfile);
+
+	gnutls_x509_crl_deinit(crl);
 }
 
 void update_signed_certificate( void)
@@ -679,6 +768,9 @@ int ret;
 			break;
 		case 12:
 			pkcs7_info();
+			break;
+		case 13:
+			generate_signed_crl();
 			break;
 		default:
 			fprintf(stderr, "GnuTLS' certtool utility.\n");
@@ -1011,19 +1103,81 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 	}
 }
 
-void crl_info(void)
+static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all)
 {
-	gnutls_x509_crl crl;
 	int ret, rc;
-	size_t size;
 	time_t tim;
-	unsigned int i;
-	gnutls_datum pem;
-	unsigned char serial[40];
+	unsigned int i, j;
+	char serial[128];
 	size_t serial_size = sizeof(serial), dn_size;
 	char printable[256];
 	char *print, dn[256];
 	const char* cprint;
+
+	fprintf(out, "Version: %d\n", gnutls_x509_crl_get_version(crl));
+
+	/* Issuer
+	 */
+	if (all) {
+		dn_size = sizeof(dn);
+
+		ret = gnutls_x509_crl_get_issuer_dn(crl, dn, &dn_size);
+		if (ret >= 0)
+			fprintf(out, "Issuer: %s\n", dn);
+
+		fprintf(out, "Signature Algorithm: ");
+		ret = gnutls_x509_crl_get_signature_algorithm(crl);
+
+		cprint = get_algorithm( ret);
+		fprintf(out,  "%s\n", cprint);
+	}
+
+	/* Validity
+	 */
+	fprintf(out, "Update dates:\n");
+
+	tim = gnutls_x509_crl_get_this_update(crl);
+	fprintf(out, "\tIssued at: %s", ctime(&tim));
+
+	tim = gnutls_x509_crl_get_next_update(crl);
+	fprintf(out, "\tNext at: %s", ctime(&tim));
+
+	fprintf(out, "\n");
+	
+	/* Count the certificates.
+	 */
+	 
+	rc = gnutls_x509_crl_get_crt_count( crl);
+	fprintf(out, "Revoked certificates: %d\n", rc);
+
+	for (j=0;j<(unsigned int)rc;j++) {
+		/* serial number
+		 */
+		serial_size = sizeof(serial);
+		ret = gnutls_x509_crl_get_crt_serial(crl, j, serial, &serial_size, &tim);
+		
+		if (ret < 0) {
+			fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+		} else {
+			print = printable;
+			for (i = 0; i < serial_size; i++) {
+				sprintf(print, "%.2x ",
+					(unsigned char) serial[i]);
+				print += 3;
+			}
+			fprintf(out, "\tCertificate SN: %s\n", printable);
+			fprintf(out, "\tRevoked at: %s\n", ctime( &tim));
+		}
+	}
+
+}
+
+void crl_info()
+{
+	gnutls_x509_crl crl;
+	int ret;
+	size_t size;
+	gnutls_datum pem;
 		
 	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 	buffer[size] = 0;
@@ -1039,56 +1193,8 @@ void crl_info(void)
 		exit(1);
 	}
 	
-	fprintf(outfile, "Version: %d\n", gnutls_x509_crl_get_version(crl));
-
-	/* Issuer
-	 */
-	dn_size = sizeof(dn);
-
-	ret = gnutls_x509_crl_get_issuer_dn(crl, dn, &dn_size);
-	if (ret >= 0)
-		fprintf(outfile, "Issuer: %s\n", dn);
-
-	fprintf(outfile, "Signature Algorithm: ");
-	ret = gnutls_x509_crl_get_signature_algorithm(crl);
-
-	cprint = get_algorithm( ret);
-	fprintf(outfile,  "%s\n", cprint);
-
-	/* Validity
-	 */
-	fprintf(outfile, "Update dates:\n");
-
-	tim = gnutls_x509_crl_get_this_update(crl);
-	fprintf(outfile, "\tIssued at: %s", ctime(&tim));
-
-	tim = gnutls_x509_crl_get_next_update(crl);
-	fprintf(outfile, "\tNext at: %s", ctime(&tim));
-
-	fprintf(outfile, "\n");
+	print_crl_info( crl, outfile, 1);
 	
-	/* Count the certificates.
-	 */
-	 
-	rc = gnutls_x509_crl_get_crt_count( crl);
-	fprintf(outfile, "Revoked certificates: %d\n", rc);
-
-	for (i=0;i<(unsigned int)rc;i++) {
-		/* serial number
-		 */
-		serial_size = sizeof(serial);
-		if (gnutls_x509_crl_get_crt_serial(crl, i, serial, &serial_size, &tim) >= 0) {
-			print = printable;
-			for (i = 0; i < serial_size; i++) {
-				sprintf(print, "%.2x ",
-					(unsigned char) serial[i]);
-				print += 3;
-			}
-			fprintf(outfile, "\tCertificate SN: %s\n", printable);
-			fprintf(outfile, "\tRevoked at: %s\n", ctime( &tim));
-		}
-	
-	}
 }
 
 void privkey_info( void)
@@ -1350,13 +1456,29 @@ size_t size;
  */
 gnutls_x509_crt load_cert(int mand)
 {
-FILE* fd;
-gnutls_x509_crt crt;
-int ret;
-gnutls_datum dat;
-size_t size;
+gnutls_x509_crt *crt;
+int size;
 
-	fprintf(stderr, "Loading certificate...\n");
+	crt = load_cert_list( mand, &size);
+
+	return crt[0];
+}
+
+#define MAX_CERTS 256
+
+/* Loads a certificate list
+ */
+gnutls_x509_crt* load_cert_list(int mand, int *crt_size)
+{
+FILE* fd;
+static gnutls_x509_crt crt[MAX_CERTS];
+char* ptr;
+int ret, i;
+gnutls_datum dat;
+size_t size, ptr_size;
+
+	*crt_size = 0;
+	fprintf(stderr, "Loading certificate list...\n");
 
 	if (info.cert==NULL) {
 		fprintf(stderr, "You must specify a certificate.\n");
@@ -1375,20 +1497,36 @@ size_t size;
 
 	fclose(fd);
 
-	ret = gnutls_x509_crt_init(&crt);
-	if (ret < 0) {
-		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
-		exit(1);
+	ptr = buffer;
+	ptr_size = size;
+
+	for (i=0;i<MAX_CERTS;i++) {
+		ret = gnutls_x509_crt_init(&crt[i]);
+		if (ret < 0) {
+			fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	
+		dat.data = ptr;
+		dat.size = ptr_size;
+	
+		ret = gnutls_x509_crt_import( crt[i], &dat, in_cert_format);
+		if (ret < 0 && *crt_size > 0) break;
+		if (ret < 0) {
+			fprintf(stderr, "crt_import: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		
+		ptr = strstr( ptr, "---END");
+		if (ptr==NULL) break;
+		ptr++;
+
+		ptr_size = size;
+		ptr_size -= ((void*)ptr - (void*)buffer);
+
+		(*crt_size)++;
 	}
-	
-	dat.data = buffer;
-	dat.size = size;
-	
-	ret = gnutls_x509_crt_import( crt, &dat, in_cert_format);
-	if (ret < 0) {
-		fprintf(stderr, "crt_import: %s\n", gnutls_strerror(ret));
-		exit(1);
-	}	
+	fprintf(stderr, "Loaded %d certificates.\n", *crt_size);
 
 	return crt;
 }

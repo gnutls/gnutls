@@ -2,6 +2,8 @@ Version 1.1.1
 - Added PKCS #7 support to certtool utility.
 - Added support for reading and generating CRL distribution
   points extensions in certificates.
+- Added support for generating CRLs in the library and the
+  certtool utility.
 - Added support for the Subject Key ID PKIX extension.
 
 Version 1.1.0 (21/12/2003)

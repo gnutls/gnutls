@@ -191,6 +191,19 @@ int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index, unsigned char
 int gnutls_x509_crl_check_issuer( gnutls_x509_crl crl,
 	gnutls_x509_crt issuer);
 
+/* CRL writing.
+ */
+int gnutls_x509_crl_set_version(gnutls_x509_crl crl, unsigned int version);
+int gnutls_x509_crl_sign(gnutls_x509_crl crl, gnutls_x509_crt issuer, 
+	gnutls_x509_privkey issuer_key);
+int gnutls_x509_crl_set_this_update(gnutls_x509_crl crl, time_t act_time);
+int gnutls_x509_crl_set_next_update(gnutls_x509_crl crl, time_t exp_time);
+int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl crl, const void* serial, 
+	size_t serial_size, time_t revocation_time);
+int gnutls_x509_crl_set_crt(gnutls_x509_crl crl, gnutls_x509_crt crt,
+	time_t revocation_time);
+
+
 /* PKCS7 structures handling 
  */
 

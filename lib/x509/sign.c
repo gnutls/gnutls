@@ -262,4 +262,119 @@ gnutls_datum tbs;
 	return result;
 }
 
+/*-
+  * _gnutls_x509_pkix_sign - This function will sign a CRL or a certificate with a key
+  * @src: should contain an ASN1_TYPE
+  * @issuer: is the certificate of the certificate issuer
+  * @issuer_key: holds the issuer's private key
+  *
+  * This function will sign a CRL or a certificate with the issuer's private key, and
+  * will copy the issuer's information into the CRL or certificate.
+  *
+  * Returns 0 on success.
+  *
+  -*/
+int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char* src_name, 
+	gnutls_x509_crt issuer, gnutls_x509_privkey issuer_key)
+{
+int result;
+gnutls_datum signature;
+const char* pk;
+char name[128];
+
+	/* Step 1. Copy the issuer's name into the certificate.
+	 */
+	_gnutls_str_cpy( name, sizeof(name), src_name);
+	_gnutls_str_cat( name, sizeof(name), ".issuer");
+
+	result = _gnutls_asn1_copy_node( &src, name,
+		issuer->cert, "tbsCertificate.subject");
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* Step 1.5. Write the signature stuff in the tbsCertificate.
+	 */
+	/* write the RSA OID
+	 */
+	pk = _gnutls_x509_sign2oid( issuer_key->pk_algorithm, GNUTLS_MAC_SHA);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	_gnutls_str_cpy( name, sizeof(name), src_name);
+	_gnutls_str_cat( name, sizeof(name), ".signature.algorithm");
+
+	result = asn1_write_value( src, name, pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+#warning CHECKME
+	/* disable parameters, which are not used in RSA.
+	 */
+	_gnutls_str_cpy( name, sizeof(name), src_name);
+	_gnutls_str_cat( name, sizeof(name), ".signature.parameters");
+
+	result = asn1_write_value( src, name, NULL, 0);
+	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
+		/* Here we ignore the element not found error, since this
+		 * may have been disabled before.
+		 */
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+
+	/* Step 2. Sign the certificate.
+	 */
+	result = _gnutls_x509_sign_tbs( src, src_name, GNUTLS_MAC_SHA,
+		issuer_key, &signature);
+	
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* write the signature (bits)
+	 */
+	result = asn1_write_value( src, "signature", signature.data, signature.size*8);
+
+	_gnutls_free_datum( &signature);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* Step 2. Move up and write the AlgorithmIdentifier, which is also
+	 * the same. 
+	 */
+
+	/* write the RSA or DSA OID
+	 */
+	result = asn1_write_value( src, "signatureAlgorithm.algorithm", pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+#warning CHECKME
+	/* disable parameters, which are not used in RSA.
+	 */
+	result = asn1_write_value( src, "signatureAlgorithm.parameters", NULL, 0);
+	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
+		/* Here we ignore the element not found error, since this
+		 * may have been disabled before.
+		 */
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
 #endif

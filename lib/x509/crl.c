@@ -393,7 +393,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl)
 }
 
 /**
-  * gnutls_x509_crl_get_crt - This function returns the serial number of a revoked certificate
+  * gnutls_x509_crl_get_crt_serial - This function returns the serial number of a revoked certificate
   * @crl: should contain a gnutls_x509_crl structure
   * @index: the index of the certificate to extract (starting from 0)
   * @serial: where the serial number will be copied
