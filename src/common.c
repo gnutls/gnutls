@@ -55,6 +55,7 @@ void print_x509_info(gnutls_session session)
 	if (cert_list_size <= 0)
 		return;
 
+#if 0 /* FIXME */
 	if (xml) {
 		gnutls_datum res;
 
@@ -65,6 +66,7 @@ void print_x509_info(gnutls_session session)
 
 		return;
 	}
+#endif
 
 	printf(" - Certificate info:\n");
 
@@ -163,6 +165,7 @@ void print_openpgp_info(gnutls_session session)
 	if (cert_list_size > 0) {
 		int algo, bits;
 
+#if 0
 		if (xml) {
 			gnutls_datum res;
 
@@ -173,6 +176,7 @@ void print_openpgp_info(gnutls_session session)
 
 			return;
 		}
+#endif
 
 		printf(" # Key was created at: %s", my_ctime(&activet));
 		printf(" # Key expires: ");

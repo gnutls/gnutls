@@ -446,11 +446,6 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
         pkey->pk_algorithm = GNUTLS_PK_DSA;
     else if( is_RSA(pke_algo) )
         pkey->pk_algorithm = GNUTLS_PK_RSA;
-    rc = _gnutls_set_datum( &pkey->raw, raw_key->data, raw_key->size );
-    if( rc < 0 ) {
-        release_mpi_array( pkey->params, i );
-        rc = GNUTLS_E_MEMORY_ERROR;
-    }
 
 leave:
     cdk_stream_close( out );
