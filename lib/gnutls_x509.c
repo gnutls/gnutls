@@ -220,7 +220,7 @@ static int parse_crt_mem( gnutls_cert** cert_list, uint* ncerts,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = _gnutls_x509_crt2gnutls_cert( 
+	ret = _gnutls_x509_crt_to_gcert( 
 		&cert_list[0][i-1], cert, 0);
 	if ( ret < 0) {
 		gnutls_assert();
@@ -357,7 +357,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, uint* ncerts, const
 			tmp2.data = pcert;
 			tmp2.size = pcert_size;
 
-			ret = _gnutls_x509_cert2gnutls_cert( 
+			ret = _gnutls_x509_raw_cert_to_gcert( 
 				&cert_list[0][i - 1], &tmp2, 0);
 
 			if ( ret < 0) {
@@ -441,7 +441,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, uint* ncerts,
 		tmp.data = ptr2;
 		tmp.size = siz2;
 
-		ret = _gnutls_x509_cert2gnutls_cert( 
+		ret = _gnutls_x509_raw_cert_to_gcert( 
 			&cert_list[0][i - 1], &tmp, 0);
 		if ( ret < 0) {
 			gnutls_assert();
@@ -519,7 +519,7 @@ int read_cert_mem(gnutls_certificate_credentials res, const void *cert, int cert
 }
 
 
-int _gnutls_x509_privkey2gnutls_key( gnutls_privkey* dest, gnutls_x509_privkey src)
+int _gnutls_x509_privkey_to_gkey( gnutls_privkey* dest, gnutls_x509_privkey src)
 {
 int i, ret;
 
@@ -547,7 +547,7 @@ int i, ret;
 	return ret;
 }
 
-void _gnutls_privkey_deinit(gnutls_privkey *key)
+void _gnutls_gkey_deinit(gnutls_privkey *key)
 {
 int i;
 	if (key == NULL) return;
@@ -557,7 +557,7 @@ int i;
 	}
 }
 
-int _gnutls_x509_key2gnutls_key( gnutls_privkey* privkey, const gnutls_datum* raw_key,
+int _gnutls_x509_raw_privkey_to_gkey( gnutls_privkey* privkey, const gnutls_datum* raw_key,
 	gnutls_x509_crt_fmt type)
 {
 gnutls_x509_privkey tmpkey;
@@ -576,7 +576,7 @@ int ret;
 		return ret;
 	}
 
-	ret = _gnutls_x509_privkey2gnutls_key( privkey, tmpkey);
+	ret = _gnutls_x509_privkey_to_gkey( privkey, tmpkey);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_x509_privkey_deinit( tmpkey);
@@ -609,7 +609,7 @@ static int read_key_mem(gnutls_certificate_credentials res, const void *key, int
 	tmp.data = (opaque*)key;
 	tmp.size = key_size;
 
-	ret = _gnutls_x509_key2gnutls_key( &res->pkey[res->ncerts], &tmp, type);
+	ret = _gnutls_x509_raw_privkey_to_gkey( &res->pkey[res->ncerts], &tmp, type);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -839,7 +839,7 @@ int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = _gnutls_x509_privkey2gnutls_key( &res->pkey[res->ncerts], key);
+	ret = _gnutls_x509_privkey_to_gkey( &res->pkey[res->ncerts], key);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

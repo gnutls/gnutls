@@ -141,7 +141,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 /* reads DSA's Y
  * from the certificate 
- * params[3]
+ * only sets params[3]
  */
 int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 {
@@ -163,7 +163,7 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 		return _gnutls_asn2err(result);
 	}
 
-	/* Read p */
+	/* Read Y */
 
 	if ( (result=_gnutls_x509_read_int( spk, "", &params[3])) < 0) {
 		gnutls_assert();

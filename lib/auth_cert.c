@@ -398,6 +398,8 @@ static int call_client_cert_callback(gnutls_session session,
 
 }
 
+OPENPGP_KEY_DEINIT _E_gnutls_openpgp_key_deinit;
+OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
 /* Calls the client get callback.
  */
 static int call_get_cert_callback( gnutls_session session,
@@ -468,8 +470,14 @@ cleanup:
 		}
 	} else {
 		if (st.deinit_all_keys) {
-			gnutls_openpgp_key_deinit(st.cert.pgp);
-			gnutls_openpgp_privkey_deinit(st.key.pgp);
+			if (_E_gnutls_openpgp_key_deinit == NULL ||
+				_E_gnutls_openpgp_privkey_deinit == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INIT_LIBEXTRA;
+			}
+
+			_E_gnutls_openpgp_key_deinit(st.cert.pgp);
+			_E_gnutls_openpgp_privkey_deinit(st.key.pgp);
 		}
 	}
 
@@ -683,7 +691,7 @@ int _gnutls_gen_openpgp_certificate(gnutls_session session, opaque ** data)
 
 OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint = NULL;
 OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key = NULL;
-extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
+extern OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
 
 int _gnutls_gen_openpgp_certificate_fpr(gnutls_session session,
 					opaque ** data)
@@ -788,7 +796,7 @@ int _gnutls_gen_cert_server_certificate(gnutls_session session,
 /* Process server certificate
  */
 
-#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_cert_deinit(&peer_certificate_list[x])
+#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_gcert_deinit(&peer_certificate_list[x])
 int _gnutls_proc_x509_server_certificate(gnutls_session session,
 					 opaque * data, size_t data_size)
 {
@@ -882,7 +890,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 		tmp.data = p;
 
 		if ((ret =
-		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list
+		     _gnutls_x509_raw_cert_to_gcert(&peer_certificate_list
 						   [j], &tmp,
 						   CERT_ONLY_EXTENSIONS)) <
 		    0) {
@@ -919,7 +927,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 
 }
 
-#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_cert_deinit(&peer_certificate_list[x])
+#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_gcert_deinit(&peer_certificate_list[x])
 int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 					    opaque * data,
 					    size_t data_size)
@@ -1044,14 +1052,14 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 	memset(peer_certificate_list, 0, sizeof(gnutls_cert) *
 	       peer_certificate_list_size);
 
-	if (_E_gnutls_openpgp_cert2gnutls_cert == NULL) {
+	if (_E_gnutls_openpgp_raw_key_to_gcert == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_INIT_LIBEXTRA;
 		goto cleanup;
 	}
 
 	if ((ret =
-	     _E_gnutls_openpgp_cert2gnutls_cert(&peer_certificate_list[0],
+	     _E_gnutls_openpgp_raw_key_to_gcert(&peer_certificate_list[0],
 						&tmp)) < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -1274,29 +1282,9 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session,
 	sig.data = pdata;
 	sig.size = size;
 
-	switch (session->security_parameters.cert_type) {
-	case GNUTLS_CRT_X509:
-		ret =
-		    _gnutls_x509_cert2gnutls_cert(&peer_cert,
-						  &info->
-						  raw_certificate_list[0],
-						  CERT_NO_COPY);
-		break;
-	case GNUTLS_CRT_OPENPGP:
-		if (_E_gnutls_openpgp_cert2gnutls_cert == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_INIT_LIBEXTRA;
-		}
-		ret =
-		    _E_gnutls_openpgp_cert2gnutls_cert(&peer_cert,
-						       &info->
-						       raw_certificate_list
-						       [0]);
-		break;
-	default:
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
+	ret = _gnutls_raw_cert_to_gcert( &peer_cert,
+		session->security_parameters.cert_type,
+		&info->raw_certificate_list[0], CERT_NO_COPY);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1306,10 +1294,10 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session,
 	if ((ret =
 	     _gnutls_verify_sig_hdata(session, &peer_cert, &sig)) < 0) {
 		gnutls_assert();
-		_gnutls_cert_deinit(&peer_cert);
+		_gnutls_gcert_deinit(&peer_cert);
 		return ret;
 	}
-	_gnutls_cert_deinit(&peer_cert);
+	_gnutls_gcert_deinit(&peer_cert);
 
 	return 0;
 }
@@ -1426,7 +1414,7 @@ static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
 	}
 
 	for (i = 0; i < ncerts; i++) {
-		ret = _gnutls_x509_crt2gnutls_cert(&local_certs[i], 
+		ret = _gnutls_x509_crt_to_gcert(&local_certs[i], 
 			certs[i], 0);
 		if (ret < 0)
 			break;
@@ -1435,7 +1423,7 @@ static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
 	if (ret < 0) {
 		gnutls_assert();
 		for (j = 0; j < i; j++) {
-			_gnutls_cert_deinit(&local_certs[j]);
+			_gnutls_gcert_deinit(&local_certs[j]);
 		}
 		gnutls_free(local_certs);
 		return NULL;
@@ -1459,7 +1447,7 @@ static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key)
 	}
 
 	ret =
-	    _gnutls_x509_privkey2gnutls_key(local_key, key);
+	    _gnutls_x509_privkey_to_gkey(local_key, key);
 	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
@@ -1469,7 +1457,8 @@ static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key)
 }
 
 
-
+OPENPGP_KEY_TO_GCERT _E_gnutls_openpgp_key_to_gcert;
+OPENPGP_PRIVKEY_TO_GKEY _E_gnutls_openpgp_privkey_to_gkey;
 
 /* converts the given pgp certificate to gnutls_cert* and allocates
  * space for them.
@@ -1486,7 +1475,12 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 		return NULL;
 	}
 
-	ret = _gnutls_openpgp_key2gnutls_cert(&local_certs[i], cert);
+	if (_E_gnutls_openpgp_key_to_gcert==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	ret = _E_gnutls_openpgp_key_to_gcert(&local_certs[i], cert);
 	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
@@ -1495,7 +1489,7 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 	if (ret < 0) {
 		gnutls_assert();
 		for (j = 0; j < i; j++) {
-			_gnutls_cert_deinit(&local_certs[j]);
+			_gnutls_gcert_deinit(&local_certs[j]);
 		}
 		gnutls_free(local_certs);
 		return NULL;
@@ -1518,8 +1512,13 @@ static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey key)
 		return NULL;
 	}
 
+	if (_E_gnutls_openpgp_privkey_to_gkey==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
 	ret =
-	    _gnutls_openpgp_privkey2gnutls_key(local_key, key);
+	    _E_gnutls_openpgp_privkey_to_gkey(local_key, key);
 	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
@@ -1537,13 +1536,13 @@ void _gnutls_selected_certs_deinit(gnutls_session session)
 		for (i = 0;
 		     i < session->internals.selected_cert_list_length;
 		     i++) {
-			_gnutls_cert_deinit(&session->internals.
+			_gnutls_gcert_deinit(&session->internals.
 					    selected_cert_list[i]);
 		}
 		session->internals.selected_cert_list = NULL;
 		session->internals.selected_cert_list_length = 0;
 
-		_gnutls_privkey_deinit(session->internals.selected_key);
+		_gnutls_gkey_deinit(session->internals.selected_key);
 	}
 
 	return;

@@ -1077,7 +1077,8 @@ char name[128];
 		return algo;
 	}
 
-	/* Now read the parameters' bits */
+	/* Now read the parameters' bits 
+	 */
 	_gnutls_str_cpy( name, sizeof(name), src_name);
 	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
 

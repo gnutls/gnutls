@@ -32,11 +32,8 @@ extern "C" {
 
 #include <gnutls/gnutls.h>
 
-struct gnutls_openpgp_key_int; /* object to hold (parsed) openpgp keys */
-typedef struct gnutls_openpgp_key_int* gnutls_openpgp_key;
-
-struct gnutls_openpgp_privkey_int; /* object to hold (parsed) openpgp private keys */
-typedef struct gnutls_openpgp_privkey_int* gnutls_openpgp_privkey;
+/* gnutls_openpgp_key should be defined in gnutls.h
+ */
 
 typedef enum gnutls_openpgp_key_fmt { GNUTLS_OPENPGP_FMT_RAW,
         GNUTLS_OPENPGP_FMT_BASE64 } gnutls_openpgp_key_fmt;
@@ -122,7 +119,7 @@ int gnutls_openpgp_key_verify_trustdb(
 /* certificate authentication stuff.
  */
 int gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials res,
-	gnutls_openpgp_key key, gnutls_openpgp_privkey pkey)
+	gnutls_openpgp_key key, gnutls_openpgp_privkey pkey);
 
 #ifdef __cplusplus
 }

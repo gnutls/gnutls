@@ -68,14 +68,13 @@ int gnutls_openpgp_recv_key(
     gnutls_datum *key );
 
 /* internal */
-int _gnutls_openpgp_cert2gnutls_cert(
+int _gnutls_openpgp_raw_key_to_gcert(
     gnutls_cert *cert,
     const gnutls_datum *raw );
 
 int
-_gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
-                                const gnutls_datum *raw_key,
-                                gnutls_openpgp_key_fmt format);
+_gnutls_openpgp_raw_privkey_to_gkey( gnutls_privkey *pkey,
+                                const gnutls_datum *raw_key);
 
 int
 _gnutls_openpgp_request_key(

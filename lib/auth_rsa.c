@@ -80,7 +80,7 @@ int i;
 	}
 	
 	ret =
-	     _gnutls_cert2gnutls_cert( &peer_cert, session->security_parameters.cert_type,
+	     _gnutls_raw_cert_to_gcert( &peer_cert, session->security_parameters.cert_type,
 			&info->raw_certificate_list[0], CERT_ONLY_PUBKEY|CERT_NO_COPY); 
 	
 	if (ret < 0) {
@@ -94,7 +94,7 @@ int i;
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	_gnutls_mpi_get_nbits(peer_cert.params[0]) > 512) {
 
-		_gnutls_cert_deinit( &peer_cert);
+		_gnutls_gcert_deinit( &peer_cert);
 
 		if (session->key->rsa[0] == NULL ||
 			session->key->rsa[1] == NULL) {
@@ -125,7 +125,7 @@ int i;
 	for (i=0;i<*params_len;i++) {
 		params[i] = _gnutls_mpi_copy(peer_cert.params[i]);
 	}
-	_gnutls_cert_deinit( &peer_cert);
+	_gnutls_gcert_deinit( &peer_cert);
 
 	return 0;
 }

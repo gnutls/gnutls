@@ -77,8 +77,8 @@ int gnutls_openpgp_key_verify_trustdb( gnutls_openpgp_key key,
 int gnutls_openpgp_key_verify_self( gnutls_openpgp_key key,
         unsigned int flags, unsigned int *verify);
 
-int _gnutls_openpgp_key2gnutls_cert(gnutls_cert * gcert, gnutls_openpgp_key cert);
-int _gnutls_openpgp_privkey2gnutls_key( gnutls_privkey* dest, gnutls_openpgp_privkey src);
+int _gnutls_openpgp_key_to_gcert(gnutls_cert * gcert, gnutls_openpgp_key cert);
+int _gnutls_openpgp_privkey_to_gkey( gnutls_privkey* dest, gnutls_openpgp_privkey src);
 
 void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key);
 

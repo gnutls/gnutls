@@ -59,7 +59,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 
 	for (i = 0; i < sc->ncerts; i++) {
 		for (j = 0; j < sc->cert_list_length[i]; j++) {
-			_gnutls_cert_deinit( &sc->cert_list[i][j]);
+			_gnutls_gcert_deinit( &sc->cert_list[i][j]);
 		}
 		gnutls_free( sc->cert_list[i]);
 	}
@@ -71,7 +71,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 	sc->cert_list = NULL;
 
 	for (i = 0; i < sc->ncerts; i++) {
-		_gnutls_privkey_deinit( &sc->pkey[i]);
+		_gnutls_gkey_deinit( &sc->pkey[i]);
 	}
 
 	gnutls_free( sc->pkey);
@@ -568,24 +568,23 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 	}
 }
 
-/* in auth_dhe.c */
-OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
-OPENPGP_KEY2GNUTLS_KEY _E_gnutls_openpgp_key2gnutls_key;
+OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
+OPENPGP_RAW_PRIVKEY_TO_GKEY _E_gnutls_openpgp_raw_privkey_to_gkey;
 
-int _gnutls_cert2gnutls_cert(gnutls_cert * gcert, gnutls_certificate_type type,
+int _gnutls_raw_cert_to_gcert(gnutls_cert * gcert, gnutls_certificate_type type,
 	const gnutls_datum *raw_cert, int flags /* OR of ConvFlags */)
 {
 	switch( type) {
 		case GNUTLS_CRT_X509:
-			return _gnutls_x509_cert2gnutls_cert( gcert,
+			return _gnutls_x509_raw_cert_to_gcert( gcert,
 					     raw_cert, flags);
 		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
+			if (_E_gnutls_openpgp_raw_key_to_gcert==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_INIT_LIBEXTRA;
 			}
 			return
-			     _E_gnutls_openpgp_cert2gnutls_cert( gcert,
+			     _E_gnutls_openpgp_raw_key_to_gcert( gcert,
 					     raw_cert);
 		default:
 			gnutls_assert();
@@ -593,20 +592,20 @@ int _gnutls_cert2gnutls_cert(gnutls_cert * gcert, gnutls_certificate_type type,
 	}
 }
 
-int _gnutls_key2gnutls_key(gnutls_privkey * key, gnutls_certificate_type type,
+int _gnutls_raw_privkey_to_gkey(gnutls_privkey * key, gnutls_certificate_type type,
 	const gnutls_datum *raw_key, int key_enc /* DER or PEM */)
 {
 	switch( type) {
 		case GNUTLS_CRT_X509:
-			return _gnutls_x509_key2gnutls_key( key,
+			return _gnutls_x509_raw_privkey_to_gkey( key,
 					     raw_key, key_enc);
 		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_key2gnutls_key==NULL) {
+			if (_E_gnutls_openpgp_raw_privkey_to_gkey==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_INIT_LIBEXTRA;
 			}
 			return
-			     _E_gnutls_openpgp_key2gnutls_key( key, raw_key, key_enc);
+			     _E_gnutls_openpgp_raw_privkey_to_gkey( key, raw_key);
 		default:
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
@@ -623,7 +622,7 @@ int _gnutls_key2gnutls_key(gnutls_privkey * key, gnutls_certificate_type type,
  * extensions found in the certificate are unsupported and critical. 
  * The critical extensions will be catched by the verification functions.
  */
-int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCert,
+int _gnutls_x509_raw_cert_to_gcert(gnutls_cert * gcert, const gnutls_datum *derCert,
 	int flags /* OR of ConvFlags */)
 {
 	int ret;
@@ -642,7 +641,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 		return ret;
 	}
 	
-	ret = _gnutls_x509_crt2gnutls_cert( gcert, cert, flags);
+	ret = _gnutls_x509_crt_to_gcert( gcert, cert, flags);
 	gnutls_x509_crt_deinit( cert);
 	
 	return ret;
@@ -650,7 +649,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 
 /* Like above but it accepts a parsed certificate instead.
  */
-int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
+int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt cert,
 	unsigned int flags)
 {
 	int ret = 0;
@@ -707,7 +706,7 @@ int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
 
 }
 
-void _gnutls_cert_deinit(gnutls_cert *cert)
+void _gnutls_gcert_deinit(gnutls_cert *cert)
 {
 	int i;
 

@@ -189,7 +189,7 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 	}
 
 	if ((ret =
-	     _gnutls_cert2gnutls_cert( &peer_cert, session->security_parameters.cert_type,
+	     _gnutls_raw_cert_to_gcert( &peer_cert, session->security_parameters.cert_type,
 			     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
 		gnutls_assert();
 		return 0;
@@ -197,17 +197,17 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 
 	if (peer_cert.subject_pk_algorithm != GNUTLS_PK_RSA) {
 		gnutls_assert();
-		_gnutls_cert_deinit( &peer_cert);
+		_gnutls_gcert_deinit( &peer_cert);
 		return 0;
 	}
 
 	if ( _gnutls_mpi_get_nbits( peer_cert.params[0]) 
 		<= 512) {
-		_gnutls_cert_deinit( &peer_cert);
+		_gnutls_gcert_deinit( &peer_cert);
 		return 1;
 	}
 	
-	_gnutls_cert_deinit( &peer_cert);
+	_gnutls_gcert_deinit( &peer_cert);
 	
 	return 0;
 }
@@ -285,7 +285,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	signature.size = sigsize;
 
 	if ((ret =
-	     _gnutls_cert2gnutls_cert( &peer_cert, session->security_parameters.cert_type,
+	     _gnutls_raw_cert_to_gcert( &peer_cert, session->security_parameters.cert_type,
 			     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -296,7 +296,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 				      &peer_cert,
 				      &vparams, &signature);
 	
-	_gnutls_cert_deinit( &peer_cert);
+	_gnutls_gcert_deinit( &peer_cert);
 	if (ret < 0) {
 		gnutls_assert();
 	}

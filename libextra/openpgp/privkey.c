@@ -30,6 +30,7 @@
 #include <gnutls_errors.h>
 #include <opencdk.h>
 #include <openpgp.h>
+#include <gnutls_openpgp.h>
 #include <x509/rfc2818.h>
 #include <gnutls_cert.h>
 
@@ -63,7 +64,7 @@ void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key)
 {
 	if (!key) return;
 
-	_gnutls_privkey_deinit( &key->pkey);
+	_gnutls_gkey_deinit( &key->pkey);
 	gnutls_free(key);
 }
 
@@ -87,7 +88,7 @@ int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey key,
 {
 int rc;
 
-	rc = _gnutls_openpgp_key2gnutls_key( &key->pkey, data, format);
+	rc = _gnutls_openpgp_raw_privkey_to_gkey( &key->pkey, data);
 	if( rc) {
 		gnutls_assert();
 		return rc;
@@ -115,7 +116,16 @@ int rc;
 int
 gnutls_openpgp_privkey_get_pk_algorithm( gnutls_openpgp_privkey key, unsigned int *bits)
 {
-	return key->pkey.pk_algorithm;
+	int pk = key->pkey.pk_algorithm;
+
+	if (bits) {
+		*bits = 0;
+		if (pk == GNUTLS_PK_RSA)
+			*bits = _gnutls_mpi_get_nbits( key->pkey.params[0]);
+		if (pk == GNUTLS_PK_DSA)
+			*bits = _gnutls_mpi_get_nbits( key->pkey.params[3]);
+	}
+	return pk;
 }
 
 
