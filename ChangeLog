@@ -1,3 +1,20 @@
+2003-10-04 13:44  nmav <nmav@gnutls.org>
+
+	* doc/tex/: fdl.tex, funcs.tex, gnutls.bib:
+
+	Documentation is now under FDL 1.2.  
+
+2003-10-04 06:45  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls_handshake.c, src/serv.c:
+
+	- Updated to use opencdk 0.5.1 (patch by Mikhail 
+	  Teterin <mi+mx@aldan.algebra.com>) 
+	- Corrected some alignment problems in IA64 (patch by 
+	  Ian Wienand <ianw@gelato.unsw.edu.au>) 
+	- Corrected bug in SRP. Patch by Casey Marshall
+	<rsdio@metastatic.org> 
+
 2003-10-03 12:16  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/tex/Makefile.am, doc/tex/funcs.tex,
