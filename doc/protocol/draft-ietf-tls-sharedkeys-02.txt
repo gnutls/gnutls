@@ -1,10 +1,10 @@
 
 TLS Working Group                                              P.Gutmann
 Internet-Draft                                    University of Auckland
-Expires: December 2003                                         June 2003
+Expires: April 2004                                         October 2003
 
                   Use of Shared Keys in the TLS Protocol
-                       draft-ietf-tls-sharedkeys-01
+                       draft-ietf-tls-sharedkeys-02
 
 Status of this Memo
 
@@ -36,8 +36,11 @@ The TLS handshake requires the use of CPU-intensive public-key algorithms with
 a considerable overhead in resource-constrained environments or ones such as
 mainframes where users are charged for CPU time.  This document describes a
 means of employing TLS using symmetric keys or passwords shared in advance
-among communicating parties.  No modifications or alterations to the TLS
-protocol are required for this process.
+among communicating parties.  As an additional benefit, this mechanism
+provides cryptographic authentication of both client and server without
+requiring the transmission of passwords or the use of certificates.  No
+modifications or alterations to the TLS protocol are required for this
+process.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document (in
@@ -50,7 +53,9 @@ example mobile and embedded devices.  In these situations the initial TLS
 handshake can take as long as half a minute with a 1Kbit RSA key.  In many
 cases a fully general public-key-based handshake is unnecessary, since the
 device is only syncing to a host PC or contacting a fixed base station, which
-would allow a pre-shared symmetric key to be used instead.
+would allow a pre-shared symmetric key to be used instead.  An example of this
+kind of use is using 3GPP cellular mechanisms to establish keys used to secure
+a TLS tunnel to a mobile device.
 
 In a slight variation of this case, CPU power is available but is too
 expensive to devote to public-key operations.  This situation is common in
@@ -108,8 +113,56 @@ the type of keying material required by TLS, we need to apply the TLS
 pseudorandom function (PRF) to produce the master secret with which we seed
 the session cache.  The shared secret thus takes the place of the 48-byte
 premaster secret usually used to derive the master secret.  As with the
-variable-length session ID, we need to canonicalise the variable-length secret
-by zero-padding it to the standard 48-byte length for the premaster secret.
+variable-length session ID, we need to canonicalise the variable-length
+secret.
+
+The obvious way to do this would be to by zero-pad it to the standard 48-byte
+length usually used for the premaster secret, as for the session ID.
+Unfortunately this straightforward approach doesn't work.  Unlike the SSL PRF,
+which uses the full secret for both the MD5 and SHA-1 halves, the TLS PRF
+isn't a pure black-box design because it splits the secret into two halves
+before using it.  This would result in the second (SHA-1) half in most cases
+end up with only the zero padding bytes as its "secret".  The reasoning behind
+this splitting of the secret was that there might be some interaction between
+the two algorithms that could cause security problems.
+
+As a result, it's necessary to be aware of the PRF's internal structure and
+pre-process the input in a way that negates what the PRF does.  Some of the
+possible options to fix the problem are:
+
+1. Synthesise a new PRF from HMAC to pre-PRF the input to the TLS PRF.  Apart
+   from just being an awful approach, this violates the minimal code-change
+   requirement for TLS implementations that the shared-keys mechanism is
+   supposed to provide.  Instead of simply feeding data in via a standard
+   mechanism, implementors would now need to extend their TLS implementation
+   to introduce new crypto mechanisms.
+
+2. Repeat the input (or some variant thereof) to fill the 48-byte secret
+   value.  This is problematic in that it creates key equivalence classes,
+   for example "ABCD" == "ABCDABCD".
+
+3. Unsplit the input, so that instead of arranaging it as 1 x 48 bytes it's
+   done as 2 x 24 bytes.  This limits the overall key size, and is specific to
+   the PRF being used - a future PRF design may not split the input in this
+   manner, negating the un-splitting step.
+
+The least ugly solution is a variation of 2, prepending a single length byte
+to the secret, then repeating it to fill 48 bytes, to fix the problem of key
+equivalence classes.  This is the approach used here.
+
+Currently the shared-key mechanism always uses the TLS PRF (even if it's used
+with SSL, since this is purely a TLS mechanism).  If in the future a new PRF
+is introduced, it will be necessary to provide some means of switching over to
+the new PRF if both it and the current one are in active use.  Presumably the
+only reason to introduce a new, incompatible PRF would be a successful attack
+on the current one, in which case the point is moot.  However, if for some
+reason it's necessary to keep both PRFs in active use at the same time, then
+some mechanism such as adding the session ID and shared key in the standard
+manner using the TLS PRF and some transformation of the session ID and the
+shared key using the new PRF can be adopted.  Since the details of a possible
+PRF switch are impossible to predict (it may entail a complete protocol
+overhaul for example), this document does not attempt to guess at the details
+beyond providing this implementation hint.
 
 Finally, we need a means of injecting the resulting session ID and master
 secret into the session cache.  This is the only modification required to
@@ -145,12 +198,19 @@ using the TLS PRF:
   master_secret = PRF(shared_secret, "shared secret", "")[0..47];
 
 The shared secret or password/passphrase takes the place of the premaster
-secret that is normally used at this point, padded with zero bytes if
-necessary to the standard length of 48 bytes.  In C this may be expressed as:
+secret that is normally used at this point, arranged as follows: First, the
+shared secret/password has a single length byte prepended to it.  The length +
+secret value is then repeated as required to fill the standard 48 bytes.  In C
+this may be expressed as:
 
-  memset( premaster_secret, 0, 48 );
-  memcpy( premaster_secret, shared_secret, 
-          min( shared_secret_length, 48 ) );
+  for( premaster_index = 0; premaster_index < 48; )
+    {
+    int i;
+
+    premaster_secret[ premaster_index++ ] = shared_secret_length;
+    for( i = 0; i < shared_secret_length && premaster_index < 48; i++ )
+      premaster_secret[ premaster_index++ ] = shared_secret[ i ];
+    }
 
 This formats the shared secret in a manner that allows it to be used directly
 in place of the standard premaster secret derived from the public-key-based
@@ -160,8 +220,10 @@ The 'seed' component of the calculation (normally occupied by the client and
 server nonces) is empty in this case, however applications may choose to use
 an application or system-specific value to ensure that the same shared secret
 used with another application or system yields a different master secret.
-Note that the use of the client and server nonces will always produce
-different keys for each session, even if the same master secret is employed.
+When the 'seed' component is non-empty, it should not contain information
+computed from the shared_secret value [SIGMA].  Note that the use of the
+client and server nonces will always produce different keys for each session,
+even if the same master secret is employed.
 
 The final step involves injecting the session ID and master secret into the
 session cache.  This is an implementation-specific issue beyond the scope of
@@ -185,32 +247,29 @@ TLS.  This is required in order to allow the mechanism to function for both
 SSLv3 and TLS, since using different PRFs would require a different session ID
 for each PRF used.
 
-[Note: Is this a good idea?  It makes administration simpler, but also makes
-       some rollback attacks possible.  If rollback attacks are a major 
-       concern we could also force the first 2 bytes of the pseudo-premaster 
-       secret to the version number as for the real premaster secret]
-
 3.2 Test vectors
 
 The following test vectors are derived from the transformation of the password
 "test" into a master_secret value to be added to the session cache:
 
   Shared secret:
-  
-    74 65 73 74   ("test")
-  
-  Shared secret zero-padded to 48-byte premaster secret size:
 
-    74 65 73 74 00 00 00 00 ... 00 00
-  
+    74 65 73 74   ("test")
+
+  Shared secret expanded to 48-byte premaster secret size:
+
+    04 74 65 73 74 04 74 65
+    73 74 04 74 65 73 74 04
+    ...
+
   Master secret added to session cache:
 
-    F9 74 60 1A F7 02 49 3B 
-    C5 A1 06 C0 C3 11 0F 18 
-    60 FD E0 4D 15 29 60 FE 
-    9F 83 61 84 1E 91 5C AB 
-    8A CB F5 75 C4 E2 33 1D 
-    4B 2F F9 F4 C3 9B 4B C1
+    F5 CE 30 92 B8 09 70 D9
+    22 D5 A1 2C EB 7C 43 FA
+    9C 46 A8 83 EA 6E EF 98
+    EB A5 15 12 FD B1 B6 5A
+    5A 47 B8 C4 C5 63 5B 30
+    86 96 F4 FC FB D5 45 78
 
 4. Security considerations
 
@@ -239,6 +298,82 @@ Implementations should limit the enthusiasm with which they re-seed the
 session cache after such an event; standard precautions against online
 password-guessing attacks apply.
 
+This mechanism is purely a shared-key session establishment mechanism and does
+not provide perfect forward secrecy (PFS) by negotiating additional new keying
+material for each session.  Users requiring PFS can either use a shared-key
+mechanism that also provides PFS such as SRP [SRP], or perform a rehandshake
+using a standard PFS-providing mechanism over the shared key-protected
+channel.  Note though that both of these mechanisms negate the two main
+advantages of the shared-key mechanism, requiring both considerable re-
+engineering of an existing TLS implementation and considerable CPU time to
+perform the PFS cryptographic operations.
+
+Since it does not contain an innate cryptographic mechanism to provide PFS,
+the shared-key mechanism is vulnerable to an offline password-guessing attack
+as follows: An attacker who records all of the handshake messages and knows
+the plaintext for at least one encrypted message can perform the TLS key-
+derivation using a selection of guessed passwords, perform the cryptographic
+operations required to process the TLS handshake exchange, and then apply the
+resulting cryptographic keys to the known-plaintext message.  Such an attack
+consumes considerable time and CPU resources, but is nevertheless possible.
+
+There are three possible defences against this type of attack, the first two
+of which are standard defences against password-guessing attacks:
+
+1. Don't use weak, easily-guess passwords or keys.
+
+2. Perform iterated pre-processing of the password/key before adding it to the
+   session cache.  This has the disadvantage that it negates the shared-key
+   advantage of low CPU consumption during the handshake phase, however the
+   preprocessing can be performed offline on a one-off basis and only the
+   preprocessed key stored by the two communicating parties.  An attacker can,
+   however, also generate a dictionary of pre-processed keys offline, given
+   sufficient CPU and storage space.  The use of a per-server diversifier
+   ('seed' in the PRF process) makes use of a precomputed dictionary
+   impractical, and a secret diversifier makes a general offline attack
+   considerably more difficult through to impossible depending on the
+   circumstances.
+
+3. Use a mechanism that allows for the use of shared keys but also provides
+   PFS, with the advantages and disadvantages described earlier.
+
+Note that the two password-guessing attacks possible against the shared-key
+mechanism, while superficially similar, have quite different requirements on
+the attacker's side.  An online attack merely requires that the attacker know
+the URL of the server that they wish to attack.  An offline attack requires
+that an attacker both know the URL of the server that they wish to attack and
+be able to record complete sessions between the client and the server in order
+to provide the material required for the offline attack.
+
+The TLS specification requires that when a session is resumed, the resumed
+session use the same cipher suite as the original one.  Since with a shared-
+secret session there is no actual session being resumed, it's not possible to
+meet this requirement.  Two approaches are possible to resolve this:
+
+1. When the session cache is seeded on the server, a cipher suite acceptable
+   to the server is specified for the resumed session.  This complies with the
+   requirements, but requires that the server know that the client is capable
+   of supporting this particular suite.  In closed environments (for example
+   syncing to a host PC or a fixed base station, or in a mainframe
+   environment) this is likely to be the case.
+
+2. The requirements are relaxed to allow the client and server to negotiate a
+   cipher suite in the usual manner.  In order to subvert this, an attacker
+   would have to be able to perform a real-time simultaneous break of both
+   HMAC-MD5 and HMAC-SHA1.  In particular the attacker would need to be able
+   to subvert:
+
+     HMAC( secret, PRF( secret, MD5+SHA1 hash ) )
+
+   in the Finished message, which expands to:
+
+     HMAC( secret, HMAC-MD5^HMAC-SHA1( secret, MD5+SHA1 hash ) )
+
+   Because of the unlikeliness of this occurring (an attacker capable of doing
+   this can subvert any TLS session, with or without shared secrets), it
+   appears safe to relax the requirement for resuming with the same cipher
+   suite.
+
 References (Normative)
 
   [RFC 2119] "Key words for use in RFCs to Indicate Requirement Levels",
@@ -252,6 +387,14 @@ References (Informative)
   [RFC 1510] "The Kerberos Network Authentication Service (V5)",
              RFC 1510, John Kohl and B. Clifford Neuman, September
              1993.
+
+  [SIGMA] "SIGMA: the `SIGn-and-MAc' Approach to Authenticated
+          Diffie-Hellman and its Use in the IKE Protocols", Hugo
+          Krawczyk, Proceedings of of Crypto'03, Springer-Verlag
+          Lecture Notes in Computer Science No.2729, p.399.
+
+  [SRP] "Using SRP for TLS Authentication", David Taylor, IETF draft,
+        November 2002.
 
 Author's Address
 
