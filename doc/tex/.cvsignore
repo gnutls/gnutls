@@ -5,3 +5,6 @@ gnutls-api.tex
 *.ps
 *.dvi
 *.toc
+*.log
+*.png
+index.html

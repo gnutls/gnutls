@@ -1,4 +1,4 @@
-Version ?.?.?
+Version 0.2.90 (7/12/2001)
 - gnutls_handshake(), gnutls_read() etc. functions no longer require
   the 'SOCKET cd' argument. This argument is set using the function
   gnutls_set_transport_ptr().
