@@ -51,6 +51,7 @@ Free Documentation License".
 * Preface::
 * The Library::
 * Introduction to TLS::
+* Authentication methods::
 * Copying This Manual::
 * Index::
 @end menu
