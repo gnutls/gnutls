@@ -93,8 +93,11 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 
 /* Openpgp certificate stuff */
 int gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
-                                                  gnutls_openpgp_name *name);
+                                 int idx,
+                                 gnutls_openpgp_name *dn );
+
 int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );
+
 time_t gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert );
 
