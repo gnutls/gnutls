@@ -166,6 +166,9 @@ int _level = -1;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
 		case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
                 case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
+                case GNUTLS_E_INSUFICIENT_CREDENTIALS:
+		case GNUTLS_E_NO_CIPHER_SUITES:
+		case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
                         ret = GNUTLS_A_HANDSHAKE_FAILURE;
 			_level = GNUTLS_AL_FATAL;
                         break;

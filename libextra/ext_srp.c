@@ -33,6 +33,7 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _d
 	ssize_t data_size = _data_size;
 
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0 && 
+		_gnutls_kx_priority( state, GNUTLS_KX_SRP_DSS) < 0 && 
 		_gnutls_kx_priority( state, GNUTLS_KX_SRP_RSA) < 0) {
 		/* algorithm was not allowed in this session
 		 */
@@ -67,7 +68,10 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _d
 inline static int is_srp( GNUTLS_CipherSuite suite) {
 	int kx = _gnutls_cipher_suite_get_kx_algo( suite);
 	
-	if (kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA)) return 1;
+	if (kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA) ||
+	  kx == GNUTLS_KX_SRP_DSS) {
+		return 1;
+	}
 	
 	return 0;
 }
@@ -79,6 +83,7 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_siz
 	uint len;
 
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0 && 
+		_gnutls_kx_priority( state, GNUTLS_KX_SRP_DSS) < 0 && 
 		_gnutls_kx_priority( state, GNUTLS_KX_SRP_RSA) < 0) {
 		/* algorithm was not allowed in this session
 		 */

@@ -39,15 +39,15 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 
-static int gen_srp_rsa_server_kx2(gnutls_session, opaque **);
-static int proc_srp_rsa_server_kx2(gnutls_session, opaque *, size_t);
+static int gen_srp_cert_server_kx2(gnutls_session, opaque **);
+static int proc_srp_cert_server_kx2(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT srp_rsa_auth_struct = {
 	"SRP",
 	_gnutls_gen_cert_server_certificate,
 	NULL,
 	NULL,
-	gen_srp_rsa_server_kx2,
+	gen_srp_cert_server_kx2,
 	_gnutls_gen_srp_client_kx0,
 	NULL,
 	NULL,
@@ -56,15 +56,35 @@ const MOD_AUTH_STRUCT srp_rsa_auth_struct = {
 	_gnutls_proc_cert_server_certificate,
 	NULL, /* certificate */
 	NULL,
-	proc_srp_rsa_server_kx2,
+	proc_srp_cert_server_kx2,
 	_gnutls_proc_srp_client_kx0,
 	NULL,
 	NULL,
 	NULL
 };
 
+const MOD_AUTH_STRUCT srp_dss_auth_struct = {
+	"SRP",
+	_gnutls_gen_cert_server_certificate,
+	NULL,
+	NULL,
+	gen_srp_cert_server_kx2,
+	_gnutls_gen_srp_client_kx0,
+	NULL,
+	NULL,
+	NULL,
 
-static int gen_srp_rsa_server_kx2(gnutls_session session, opaque ** data)
+	_gnutls_proc_cert_server_certificate,
+	NULL, /* certificate */
+	NULL,
+	proc_srp_cert_server_kx2,
+	_gnutls_proc_srp_client_kx0,
+	NULL,
+	NULL,
+	NULL
+};
+
+static int gen_srp_cert_server_kx2(gnutls_session session, opaque ** data)
 {
 ssize_t ret, data_size;
 gnutls_datum signature, ddata;
@@ -123,7 +143,7 @@ int apr_cert_list_length;
 
 extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 
-static int proc_srp_rsa_server_kx2(gnutls_session session, opaque * data, size_t _data_size)
+static int proc_srp_cert_server_kx2(gnutls_session session, opaque * data, size_t _data_size)
 {
 ssize_t ret;
 int i, sigsize;

@@ -2233,6 +2233,7 @@ int _gnutls_check_x509_key_usage( const gnutls_cert * cert,
 			}
 			return 0;
 		case GNUTLS_KX_SRP_RSA:
+		case GNUTLS_KX_SRP_DSS:
 		case GNUTLS_KX_DHE_RSA:
 		case GNUTLS_KX_DHE_DSS:
 		case GNUTLS_KX_RSA_EXPORT:

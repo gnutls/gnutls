@@ -374,6 +374,7 @@ void print_list(void)
 	printf(", DHE-RSA");
 	printf(", SRP");
 	printf(", SRP-RSA");
+	printf(", SRP-DSS");
 	printf(", ANON-DH\n");
 
 	printf("Compression methods:");
@@ -398,4 +399,113 @@ void print_license(void)
 		"You should have received a copy of the GNU General Public License \n"
 		"along with this program; if not, write to the Free Software \n"
 		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
+}
+
+void parse_protocols( char** protocols, int protocols_size, int* protocol_priority)
+{
+int i,j;
+
+   if (protocols != NULL && protocols_size > 0) {
+      for (j = i = 0; i < protocols_size; i++) {
+	 if (strncasecmp(protocols[i], "SSL", 3) == 0)
+	    protocol_priority[j++] = GNUTLS_SSL3;
+	 if (strncasecmp(protocols[i], "TLS", 3) == 0)
+	    protocol_priority[j++] = GNUTLS_TLS1;
+      }
+      protocol_priority[j] = 0;
+   }
+}
+
+void parse_ciphers( char** ciphers, int nciphers, int* cipher_priority)
+{   
+int j,i;
+
+   if (ciphers != NULL && nciphers > 0) {
+      for (j = i = 0; i < nciphers; i++) {
+	 if (strncasecmp(ciphers[i], "RIJ", 3) == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+	 if (strncasecmp(ciphers[i], "TWO", 3) == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_TWOFISH_128_CBC;
+	 if (strncasecmp(ciphers[i], "3DE", 3) == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
+	 if (strcasecmp(ciphers[i], "ARCFOUR-40") == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
+	 if (strcasecmp(ciphers[i], "ARCFOUR") == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_128;
+	 if (strncasecmp(ciphers[i], "NUL", 3) == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_NULL;
+      }
+      cipher_priority[j] = 0;
+   }
+}
+
+void parse_macs( char** macs, int nmacs, int *mac_priority)
+{
+int i,j;
+   if (macs != NULL && nmacs > 0) {
+      for (j = i = 0; i < nmacs; i++) {
+	 if (strncasecmp(macs[i], "MD5", 3) == 0)
+	    mac_priority[j++] = GNUTLS_MAC_MD5;
+	 if (strncasecmp(macs[i], "SHA", 3) == 0)
+	    mac_priority[j++] = GNUTLS_MAC_SHA;
+      }
+      mac_priority[j] = 0;
+   }
+}
+
+void parse_ctypes( char** ctype, int nctype, int * cert_type_priority)
+{
+int i,j;
+   if (ctype != NULL && nctype > 0) {
+      for (j = i = 0; i < nctype; i++) {
+	 if (strncasecmp(ctype[i], "OPE", 3) == 0)
+	    cert_type_priority[j++] = GNUTLS_CRT_OPENPGP;
+	 if (strncasecmp(ctype[i], "X", 1) == 0)
+	    cert_type_priority[j++] = GNUTLS_CRT_X509;
+      }
+      cert_type_priority[j] = 0;
+   }
+}
+
+void parse_kx( char** kx, int nkx, int* kx_priority)
+{
+int i,j;
+   if (kx != NULL && nkx > 0) {
+      for (j = i = 0; i < nkx; i++) {
+	 if (strcasecmp(kx[i], "SRP") == 0)
+	    kx_priority[j++] = GNUTLS_KX_SRP;
+	 if (strcasecmp(kx[i], "SRP-RSA") == 0)
+	    kx_priority[j++] = GNUTLS_KX_SRP_RSA;
+	 if (strcasecmp(kx[i], "SRP-DSS") == 0)
+	    kx_priority[j++] = GNUTLS_KX_SRP_DSS;
+	 if (strcasecmp(kx[i], "RSA") == 0)
+	    kx_priority[j++] = GNUTLS_KX_RSA;
+	 if (strcasecmp(kx[i], "RSA-EXPORT") == 0)
+	    kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
+	 if (strncasecmp(kx[i], "DHE-RSA", 7) == 0)
+	    kx_priority[j++] = GNUTLS_KX_DHE_RSA;
+	 if (strncasecmp(kx[i], "DHE-DSS", 7) == 0)
+	    kx_priority[j++] = GNUTLS_KX_DHE_DSS;
+	 if (strncasecmp(kx[i], "ANON", 4) == 0)
+	    kx_priority[j++] = GNUTLS_KX_ANON_DH;
+      }
+      kx_priority[j] = 0;
+   }
+}
+
+void parse_comp( char** comp, int ncomp, int* comp_priority)
+{
+int i,j;
+   if (comp != NULL && ncomp > 0) {
+      for (j = i = 0; i < ncomp; i++) {
+	 if (strncasecmp(comp[i], "NUL", 3) == 0)
+	    comp_priority[j++] = GNUTLS_COMP_NULL;
+	 if (strncasecmp(comp[i], "ZLI", 3) == 0)
+	    comp_priority[j++] = GNUTLS_COMP_ZLIB;
+	 if (strncasecmp(comp[i], "LZO", 3) == 0)
+	    comp_priority[j++] = GNUTLS_COMP_LZO;
+      }
+      comp_priority[j] = 0;
+   }
+
 }

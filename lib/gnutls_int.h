@@ -35,8 +35,10 @@
 #define X509_DEBUG
 #define RECORD_DEBUG
 #define COMPRESSION_DEBUG
-#define DEBUG
 */
+#define HANDSHAKE_DEBUG
+#define DEBUG
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -145,7 +147,7 @@ typedef gnutls_datum gnutls_sdatum;
 /* This is the maximum number of algorithms (ciphers or macs etc).
  * keep it synced with GNUTLS_MAX_ALGORITHM_NUM in gnutls.h
  */
-#define MAX_ALGOS 8
+#define MAX_ALGOS 10
 
 #define MAX_CIPHERSUITES 256
 
@@ -159,7 +161,7 @@ typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL=1,
 
 typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
 	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
-	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA
+	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS
 } gnutls_kx_algorithm;
 
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } gnutls_mac_algorithm;

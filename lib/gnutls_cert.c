@@ -59,6 +59,7 @@ static const gnutls_pk_map pk_mappings[] = {
 	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA},
 	{GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA},
 	{GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA},
+	{GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA},
 	{0}
 };
 

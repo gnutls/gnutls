@@ -553,7 +553,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	if (x<=0) {
 		gnutls_assert();
 		if (x<0) return x;
-		else return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		else return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 	}
 
 #ifdef HANDSHAKE_DEBUG
@@ -2389,6 +2389,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		/* if it is defined but had no credentials 
 		 */
 		if (_gnutls_get_kx_cred(session, kx, NULL) == NULL) {
+fprintf(stderr, "HERE\n");
 			keep = 1;
 		} else
 		/* If there was no credentials to use with the specified
@@ -2396,14 +2397,16 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		 */
 		if (_gnutls_map_kx_get_cred(kx, server) == GNUTLS_CRD_CERTIFICATE) {
 			keep = 1;	/* do not keep */
+
+fprintf(stderr, "THERE %d\n", kx);
 			if (x509_cred != NULL) {
 				if (server) {
 					/* here we check if the KX algorithm 
 					 * is compatible with the certificate.
 					 */
-fprintf(stderr, "KX: %d\n", kx);
 					for (j = 0; j < alg_size; j++) {
-fprintf(stderr, "ALG: %d\n", alg[j]);
+fprintf(stderr, "ALG %d\n", alg[j]);
+
 						if (alg[j] == kx) {
 							keep = 0;
 							break;

@@ -938,83 +938,12 @@ void gaa_parser(int argc, char **argv)
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;
 
-   if (info.proto != NULL && info.nproto > 0) {
-      for (j = i = 0; i < info.nproto; i++) {
-	 if (strncasecmp(info.proto[i], "SSL", 3) == 0)
-	    protocol_priority[j++] = GNUTLS_SSL3;
-	 if (strncasecmp(info.proto[i], "TLS", 3) == 0)
-	    protocol_priority[j++] = GNUTLS_TLS1;
-      }
-      protocol_priority[j] = 0;
-   }
-
-   if (info.ciphers != NULL && info.nciphers > 0) {
-      for (j = i = 0; i < info.nciphers; i++) {
-	 if (strncasecmp(info.ciphers[i], "RIJ", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
-	 if (strncasecmp(info.ciphers[i], "TWO", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_TWOFISH_128_CBC;
-	 if (strncasecmp(info.ciphers[i], "3DE", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
-	 if (strncasecmp(info.ciphers[i], "ARC", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_128;
-	 if (strncasecmp(info.ciphers[i], "NUL", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_NULL;
-      }
-      cipher_priority[j] = 0;
-   }
-
-   if (info.macs != NULL && info.nmacs > 0) {
-      for (j = i = 0; i < info.nmacs; i++) {
-	 if (strncasecmp(info.macs[i], "MD5", 3) == 0)
-	    mac_priority[j++] = GNUTLS_MAC_MD5;
-	 if (strncasecmp(info.macs[i], "SHA", 3) == 0)
-	    mac_priority[j++] = GNUTLS_MAC_SHA;
-      }
-      mac_priority[j] = 0;
-   }
-
-   if (info.ctype != NULL && info.nctype > 0) {
-      for (j = i = 0; i < info.nctype; i++) {
-	 if (strncasecmp(info.ctype[i], "OPE", 3) == 0)
-	    cert_type_priority[j++] = GNUTLS_CRT_OPENPGP;
-	 if (strncasecmp(info.ctype[i], "X", 1) == 0)
-	    cert_type_priority[j++] = GNUTLS_CRT_X509;
-      }
-      cert_type_priority[j] = 0;
-   }
-
-   if (info.kx != NULL && info.nkx > 0) {
-      for (j = i = 0; i < info.nkx; i++) {
-	 if (strcasecmp(info.kx[i], "SRP") == 0)
-	    kx_priority[j++] = GNUTLS_KX_SRP;
-	 if (strcasecmp(info.kx[i], "SRP-RSA") == 0)
-	    kx_priority[j++] = GNUTLS_KX_SRP_RSA;
-	 if (strcasecmp(info.kx[i], "RSA") == 0)
-	    kx_priority[j++] = GNUTLS_KX_RSA;
-	 if (strcasecmp(info.kx[i], "RSA-EXPORT") == 0)
-	    kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
-	 if (strncasecmp(info.kx[i], "DHE-RSA", 7) == 0)
-	    kx_priority[j++] = GNUTLS_KX_DHE_RSA;
-	 if (strncasecmp(info.kx[i], "DHE-DSS", 7) == 0)
-	    kx_priority[j++] = GNUTLS_KX_DHE_DSS;
-	 if (strncasecmp(info.kx[i], "ANON", 4) == 0)
-	    kx_priority[j++] = GNUTLS_KX_ANON_DH;
-      }
-      kx_priority[j] = 0;
-   }
-
-   if (info.comp != NULL && info.ncomp > 0) {
-      for (j = i = 0; i < info.ncomp; i++) {
-	 if (strncasecmp(info.comp[i], "NUL", 3) == 0)
-	    comp_priority[j++] = GNUTLS_COMP_NULL;
-	 if (strncasecmp(info.comp[i], "ZLI", 3) == 0)
-	    comp_priority[j++] = GNUTLS_COMP_ZLIB;
-	 if (strncasecmp(info.comp[i], "LZO", 3) == 0)
-	    comp_priority[j++] = GNUTLS_COMP_LZO;
-      }
-      comp_priority[j] = 0;
-   }
+   parse_protocols( info.proto, info.nproto, protocol_priority);
+   parse_ciphers( info.ciphers, info.nciphers, cipher_priority);
+   parse_macs( info.macs, info.nmacs, mac_priority);
+   parse_ctypes( info.ctype, info.nctype, cert_type_priority);
+   parse_kx( info.kx, info.nkx, kx_priority);
+   parse_comp( info.comp, info.ncomp, comp_priority);
 }
 
 void serv_version(void) {
