@@ -20,8 +20,8 @@
 
 #include <gnutls_int.h>
 
-#define GMIN(x,y) (x<y)?x:y
-#define GMAX(x,y) (x>y)?x:y
+#define GMIN(x,y) ((x<y)?x:y)
+#define GMAX(x,y) ((x>y)?x:y)
 
 #define rotl32(x,n)   (((x) << ((uint16)(n))) | ((x) >> (32 - (uint16)(n))))
 #define rotr32(x,n)   (((x) >> ((uint16)(n))) | ((x) << (32 - (uint16)(n))))

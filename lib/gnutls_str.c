@@ -137,12 +137,14 @@ int _gnutls_string_append_str( gnutls_string* dest, const char * src)
 		
 		return tot_len;
 	} else {
-		dest->string = dest->realloc_func( dest->string, GMAX(tot_len, MIN_CHUNK));
+		size_t new_len = GMAX( src_len) + dest->max_length;
+
+		dest->string = dest->realloc_func( dest->string, new_len);
 		if (dest->string == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		dest->max_length = GMAX( MIN_CHUNK, tot_len);
+		dest->max_length = new_len;
 
 		memcpy( &dest->string[dest->length], src, src_len);
 		dest->length = tot_len;
@@ -161,12 +163,14 @@ int _gnutls_string_append_data( gnutls_string* dest, const void * data, size_t d
 		
 		return tot_len;
 	} else {
-		dest->string = dest->realloc_func( dest->string, GMAX(tot_len, MIN_CHUNK));
+		size_t new_len = GMAX( src_len) + dest->max_length;
+
+		dest->string = dest->realloc_func( dest->string, new_len);
 		if (dest->string == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		dest->max_length = GMAX( MIN_CHUNK, tot_len);
+		dest->max_length = new_len;
 
 		memcpy( &dest->string[dest->length], data, data_size);
 		dest->length = tot_len;
