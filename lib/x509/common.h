@@ -40,7 +40,7 @@ const char* _gnutls_x509_pk_to_oid( gnutls_pk_algorithm pk);
 
 gnutls_sign_algorithm _gnutls_x509_pk_to_sign(
         gnutls_pk_algorithm pk, gnutls_mac_algorithm mac);
-const char* _gnutls_x509_sign_to_oid( gnutls_sign_algorithm, gnutls_mac_algorithm mac);
+const char* _gnutls_x509_sign_to_oid( gnutls_pk_algorithm, gnutls_mac_algorithm mac);
 const char* _gnutls_x509_mac_to_oid( gnutls_mac_algorithm mac);
 
 time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when);
