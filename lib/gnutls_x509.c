@@ -2186,6 +2186,9 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
   * Returns 0 on success. If the provided buffer is not long enough,
   * then GNUTLS_E_INVALID_REQUEST is returned.
   *
+  * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+  * will be returned.
+  *
   **/
 int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size)
 {
