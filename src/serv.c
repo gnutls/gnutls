@@ -165,7 +165,7 @@ static int generate_dh_primes(void)
 
     /* Generate Diffie Hellman parameters - for use with DHE
      * kx algorithms. These should be discarded and regenerated
-     * once a day, once a week or once a month. Depends on the
+     * once a week or once a month. Depends on the
      * security requirements.
      */
     printf
