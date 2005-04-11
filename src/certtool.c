@@ -58,7 +58,7 @@ void certificate_info(void);
 void crl_info(void);
 void privkey_info(void);
 static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
-    unsigned int);
+				   unsigned int);
 static void gaa_parser(int argc, char **argv);
 void generate_self_signed(void);
 void generate_request(void);
@@ -94,6 +94,25 @@ int main(int argc, char **argv)
     return 0;
 }
 
+const char *raw_to_string(const unsigned char *raw, size_t raw_size)
+{
+    static char buf[1024];
+    size_t i;
+    if (raw_size == 0)
+	return NULL;
+
+    if (raw_size * 3 + 1 >= sizeof(buf))
+	return NULL;
+
+    for (i = 0; i < raw_size; i++) {
+	sprintf(&(buf[i * 3]), "%02X%s", raw[i],
+		(i == raw_size - 1) ? "" : ":");
+    }
+    buf[sizeof(buf) - 1] = '\0';
+
+    return buf;
+}
+
 
 
 static gnutls_x509_privkey generate_private_key_int(void)
@@ -115,7 +134,7 @@ static gnutls_x509_privkey generate_private_key_int(void)
 	msg = "RSA";
 	key_type = GNUTLS_PK_RSA;
     }
-    
+
 
     if (info.privkey)
 	return load_private_key(1);
@@ -327,7 +346,7 @@ gnutls_x509_crt generate_certificate(gnutls_x509_privkey * ret_key,
 					    time(NULL) +
 					    days * 24 * 60 * 60);
     if (result < 0) {
-	fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
+	fprintf(stderr, "set_expiration: %s\n", gnutls_strerror(result));
 	exit(1);
     }
 
@@ -441,7 +460,8 @@ gnutls_x509_crt generate_certificate(gnutls_x509_privkey * ret_key,
 	if (result) {
 	    result =
 		gnutls_x509_crt_set_key_purpose_oid(crt,
-			GNUTLS_KP_CODE_SIGNING, 0);
+						    GNUTLS_KP_CODE_SIGNING,
+						    0);
 	    if (result < 0) {
 		fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
 		exit(1);
@@ -544,7 +564,7 @@ gnutls_x509_crl generate_crl(void)
 
 	result = gnutls_x509_crl_set_crt(crl, crts[i], time(0));
 	if (result < 0) {
-	    fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
+	    fprintf(stderr, "crl_set_crt: %s\n", gnutls_strerror(result));
 	    exit(1);
 	}
     }
@@ -597,7 +617,7 @@ gnutls_x509_crt update_certificate(void)
 					    time(NULL) +
 					    days * 24 * 60 * 60);
     if (result < 0) {
-	fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
+	fprintf(stderr, "set_expiration: %s\n", gnutls_strerror(result));
 	exit(1);
     }
 
@@ -808,15 +828,19 @@ void gaa_parser(int argc, char **argv)
     else
 	out_cert_format = GNUTLS_X509_FMT_PEM;
 
-    if (info.hash!=NULL) {
-    	if (strcasecmp(info.hash, "md5")==0) {
-    	   fprintf(stderr, "Warning: MD5 is broken, and should not be used any more for digital signatures.\n");
-    	   dig = GNUTLS_DIG_MD5;
-    	} else if (strcasecmp(info.hash, "sha1")==0)
-    	   dig = GNUTLS_DIG_SHA1;
-    	else if (strcasecmp(info.hash, "rmd160")==0)
-    	   dig = GNUTLS_DIG_RMD160;
-    	else fprintf(stderr, "Unsupported hash algorithm '%s'. Using the default.\n", info.hash);
+    if (info.hash != NULL) {
+	if (strcasecmp(info.hash, "md5") == 0) {
+	    fprintf(stderr,
+		    "Warning: MD5 is broken, and should not be used any more for digital signatures.\n");
+	    dig = GNUTLS_DIG_MD5;
+	} else if (strcasecmp(info.hash, "sha1") == 0)
+	    dig = GNUTLS_DIG_SHA1;
+	else if (strcasecmp(info.hash, "rmd160") == 0)
+	    dig = GNUTLS_DIG_RMD160;
+	else
+	    fprintf(stderr,
+		    "Unsupported hash algorithm '%s'. Using the default.\n",
+		    info.hash);
     }
 
     batch = 0;
@@ -915,7 +939,7 @@ void certificate_info(void)
 {
     gnutls_x509_crt crt[MAX_CRTS];
     size_t size;
-    int ret,i, count;
+    int ret, i, count;
     gnutls_datum pem;
     unsigned int crt_num;
 
@@ -928,11 +952,17 @@ void certificate_info(void)
     pem.size = size;
 
     crt_num = MAX_CRTS;
-    ret = gnutls_x509_crt_list_import(crt, &crt_num, &pem, in_cert_format, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+    ret =
+	gnutls_x509_crt_list_import(crt, &crt_num, &pem, in_cert_format,
+				    GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
     if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
-	fprintf(stderr, "Too many certificates (%d), will only read the first %d.\n", crt_num, MAX_CRTS);
+	fprintf(stderr,
+		"Too many certificates (%d), will only read the first %d.\n",
+		crt_num, MAX_CRTS);
 	crt_num = MAX_CRTS;
-        ret = gnutls_x509_crt_list_import(crt, &crt_num, &pem, in_cert_format,0);
+	ret =
+	    gnutls_x509_crt_list_import(crt, &crt_num, &pem,
+					in_cert_format, 0);
     }
 
     if (ret < 0) {
@@ -941,47 +971,50 @@ void certificate_info(void)
     }
     count = ret;
 
-    for(i=0;i<count;i++) {
-        print_certificate_info(crt[i], outfile, 1);
+    for (i = 0; i < count; i++) {
+	print_certificate_info(crt[i], outfile, 1);
 
-        if (!info.xml) {
-  	    size = sizeof(buffer);
+	if (!info.xml) {
+	    size = sizeof(buffer);
 	    ret =
-	        gnutls_x509_crt_export(crt[i], GNUTLS_X509_FMT_PEM, buffer,
-				   &size);
+		gnutls_x509_crt_export(crt[i], GNUTLS_X509_FMT_PEM, buffer,
+				       &size);
 	    if (ret < 0) {
-	        fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
-	        exit(1);
-	     }
-	     fprintf(outfile, "\n%s\n", buffer);
+		fprintf(stderr, "Encoding error: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	    }
+	    fprintf(outfile, "\n%s\n", buffer);
 
-         } else {
-     	     gnutls_datum xml;
+	} else {
+	    gnutls_datum xml;
 
-	     ret = gnutls_x509_crt_to_xml(crt[i], &xml, GNUTLS_XML_SHOW_ALL);
-	     if (ret < 0) {
-	         fprintf(stderr, "XML encoding error: %s\n",
-		    gnutls_strerror(ret));
-	         exit(1);
-	     }
+	    ret =
+		gnutls_x509_crt_to_xml(crt[i], &xml, GNUTLS_XML_SHOW_ALL);
+	    if (ret < 0) {
+		fprintf(stderr, "XML encoding error: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	    }
 
-	     fprintf(outfile, "\n%s\n", xml.data);
-	     gnutls_free(xml.data);
-         }
+	    fprintf(outfile, "\n%s\n", xml.data);
+	    gnutls_free(xml.data);
+	}
     }
-    
+
 }
 
-static void print_hex_datum( gnutls_datum* dat)
+static void print_hex_datum(gnutls_datum * dat)
 {
-unsigned int j;
+    unsigned int j;
 #define SPACE "\t"
-        fprintf(outfile,"\n"SPACE);
-	for (j = 0; j < dat->size; j++) {
-	    fprintf(outfile, "%.2x:", (unsigned char) dat->data[j]);
-	    if ((j+1)%15==0) fprintf(outfile,"\n"SPACE);
-	}
-	fprintf(outfile, "\n");
+    fprintf(outfile, "\n" SPACE);
+    for (j = 0; j < dat->size; j++) {
+	fprintf(outfile, "%.2x:", (unsigned char) dat->data[j]);
+	if ((j + 1) % 15 == 0)
+	    fprintf(outfile, "\n" SPACE);
+    }
+    fprintf(outfile, "\n");
 }
 
 
@@ -1047,7 +1080,8 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 	    cprint = UNKNOWN;
 	fprintf(out, "%s\n", cprint);
 	if (ret == GNUTLS_SIGN_RSA_MD5 || ret == GNUTLS_SIGN_RSA_MD2) {
-	    fprintf(stderr, "Warning: certificate uses a broken signature algorithm that can be forged.\n");
+	    fprintf(stderr,
+		    "Warning: certificate uses a broken signature algorithm that can be forged.\n");
 	}
     }
 
@@ -1078,36 +1112,38 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     /* Print the raw public keys    
      */
     if (all) {
-    if (ret==GNUTLS_PK_RSA) {
-    	gnutls_datum m,e;
-    	
-    	ret = gnutls_x509_crt_get_pk_rsa_raw( crt, &m,&e);
-    	if (ret < 0) {
-    	    fprintf(stderr, "Error in key RSA data export: %s\n", gnutls_strerror(ret));
-    	}
-        
-        fprintf(outfile, "modulus:");
-        print_hex_datum( &m);
-        fprintf(outfile, "public exponent:");
-        print_hex_datum( &e);
+	if (ret == GNUTLS_PK_RSA) {
+	    gnutls_datum m, e;
 
-    } else if (ret==GNUTLS_PK_DSA) {
-        gnutls_datum p,q,g,y;
-    
-    	ret = gnutls_x509_crt_get_pk_dsa_raw( crt, &p,&q,&g,&y);
-    	if (ret < 0) {
-    	    fprintf(stderr, "Error in key DSA data export: %s\n", gnutls_strerror(ret));
-    	}
+	    ret = gnutls_x509_crt_get_pk_rsa_raw(crt, &m, &e);
+	    if (ret < 0) {
+		fprintf(stderr, "Error in key RSA data export: %s\n",
+			gnutls_strerror(ret));
+	    }
 
-        fprintf(outfile, "public key:");
-        print_hex_datum( &y);
-        fprintf(outfile, "p:");
-        print_hex_datum( &p);
-        fprintf(outfile, "q:");
-        print_hex_datum( &q);
-        fprintf(outfile, "g:");
-        print_hex_datum( &g);
-    }
+	    fprintf(outfile, "modulus:");
+	    print_hex_datum(&m);
+	    fprintf(outfile, "public exponent:");
+	    print_hex_datum(&e);
+
+	} else if (ret == GNUTLS_PK_DSA) {
+	    gnutls_datum p, q, g, y;
+
+	    ret = gnutls_x509_crt_get_pk_dsa_raw(crt, &p, &q, &g, &y);
+	    if (ret < 0) {
+		fprintf(stderr, "Error in key DSA data export: %s\n",
+			gnutls_strerror(ret));
+	    }
+
+	    fprintf(outfile, "public key:");
+	    print_hex_datum(&y);
+	    fprintf(outfile, "p:");
+	    print_hex_datum(&p);
+	    fprintf(outfile, "q:");
+	    print_hex_datum(&q);
+	    fprintf(outfile, "g:");
+	    print_hex_datum(&g);
+	}
     }
 
     if (version >= 3)
@@ -1542,45 +1578,49 @@ void privkey_info(void)
 
     /* Print the raw public and private keys    
      */
-    if (ret==GNUTLS_PK_RSA) {
-    	gnutls_datum m,e,d,p,q,u;
-    	
-    	ret = gnutls_x509_privkey_export_rsa_raw( key, &m,&e,&d,&p,&q,&u);
-    	if (ret < 0) {
-    	    fprintf(stderr, "Error in key RSA data export: %s\n", gnutls_strerror(ret));
-    	}
-        
-        fprintf(outfile, "modulus:");
-        print_hex_datum( &m);
-        fprintf(outfile, "public exponent:");
-        print_hex_datum( &e);
-        fprintf(outfile, "private exponent:");
-        print_hex_datum( &d);
-        fprintf(outfile, "prime1:");
-        print_hex_datum( &p);
-        fprintf(outfile, "prime2:");
-        print_hex_datum( &q);
-        fprintf(outfile, "coefficient:");
-        print_hex_datum( &u);
+    if (ret == GNUTLS_PK_RSA) {
+	gnutls_datum m, e, d, p, q, u;
 
-    } else if (ret==GNUTLS_PK_DSA) {
-        gnutls_datum p,q,g,y,x;
-    
-    	ret = gnutls_x509_privkey_export_dsa_raw( key, &p,&q,&g,&y,&x);
-    	if (ret < 0) {
-    	    fprintf(stderr, "Error in key DSA data export: %s\n", gnutls_strerror(ret));
-    	}
+	ret =
+	    gnutls_x509_privkey_export_rsa_raw(key, &m, &e, &d, &p, &q,
+					       &u);
+	if (ret < 0) {
+	    fprintf(stderr, "Error in key RSA data export: %s\n",
+		    gnutls_strerror(ret));
+	}
 
-        fprintf(outfile, "private key:");
-        print_hex_datum( &x);
-        fprintf(outfile, "public key:");
-        print_hex_datum( &y);
-        fprintf(outfile, "p:");
-        print_hex_datum( &p);
-        fprintf(outfile, "q:");
-        print_hex_datum( &q);
-        fprintf(outfile, "g:");
-        print_hex_datum( &g);
+	fprintf(outfile, "modulus:");
+	print_hex_datum(&m);
+	fprintf(outfile, "public exponent:");
+	print_hex_datum(&e);
+	fprintf(outfile, "private exponent:");
+	print_hex_datum(&d);
+	fprintf(outfile, "prime1:");
+	print_hex_datum(&p);
+	fprintf(outfile, "prime2:");
+	print_hex_datum(&q);
+	fprintf(outfile, "coefficient:");
+	print_hex_datum(&u);
+
+    } else if (ret == GNUTLS_PK_DSA) {
+	gnutls_datum p, q, g, y, x;
+
+	ret = gnutls_x509_privkey_export_dsa_raw(key, &p, &q, &g, &y, &x);
+	if (ret < 0) {
+	    fprintf(stderr, "Error in key DSA data export: %s\n",
+		    gnutls_strerror(ret));
+	}
+
+	fprintf(outfile, "private key:");
+	print_hex_datum(&x);
+	fprintf(outfile, "public key:");
+	print_hex_datum(&y);
+	fprintf(outfile, "p:");
+	print_hex_datum(&p);
+	fprintf(outfile, "q:");
+	print_hex_datum(&q);
+	fprintf(outfile, "g:");
+	print_hex_datum(&g);
     }
 
     fprintf(outfile, "\n");
@@ -2576,8 +2616,8 @@ void print_bag_data(gnutls_pkcs12_bag bag)
 {
     int result;
     int count, i, type;
-    gnutls_datum cdata;
-    const char *str;
+    gnutls_datum cdata, id;
+    const char *str, *name;
     gnutls_datum out;
 
     count = gnutls_pkcs12_bag_get_count(bag);
@@ -2585,6 +2625,8 @@ void print_bag_data(gnutls_pkcs12_bag bag)
 	fprintf(stderr, "get_count: %s\n", gnutls_strerror(count));
 	exit(1);
     }
+
+
 
     fprintf(outfile, "\tElements: %d\n", count);
 
@@ -2595,8 +2637,25 @@ void print_bag_data(gnutls_pkcs12_bag bag)
 	    exit(1);
 	}
 
-	fprintf(outfile, "\tType: %s\n", BAGTYPE(type));
+	name = NULL;
+	result = gnutls_pkcs12_bag_get_friendly_name(bag, i, &name);
+	if (result < 0) {
+	    fprintf(stderr, "get_friendly_name: %s\n",
+		    gnutls_strerror(type));
+	    exit(1);
+	}
+	if (name)
+	    fprintf(outfile, "\tFriendly name: %s\n", name);
 
+	id.data = NULL;
+	id.size = 0;
+	result = gnutls_pkcs12_bag_get_key_id(bag, i, &id);
+	if (result < 0) {
+	    fprintf(stderr, "get_key_id: %s\n", gnutls_strerror(type));
+	    exit(1);
+	}
+	fprintf(outfile, "\tKey ID: %s\n", raw_to_string(id.data,id.size));
+	
 	result = gnutls_pkcs12_bag_get_data(bag, i, &cdata);
 	if (result < 0) {
 	    fprintf(stderr, "get_data: %s\n", gnutls_strerror(result));
