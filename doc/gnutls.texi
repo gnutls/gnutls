@@ -362,6 +362,7 @@ required callbacks to access the transport layer.
 @item @code{gnutls_transport_set_push_function}
 @item @code{gnutls_transport_set_pull_function}
 @item @code{gnutls_transport_set_ptr}
+@item @code{gnutls_transport_set_lowat}
 @end itemize
 
 These functions accept a callback function as a parameter.  The
@@ -376,6 +377,10 @@ IO is used. All @acronym{GnuTLS} functions can be resumed (called
 again), if any of these error codes is returned.  The error codes
 above refer to the system call, not the @acronym{GnuTLS} function,
 since signals do not interrupt @acronym{GnuTLS}' functions.
+
+For non blocking sockets or other custom made pull/push functions
+the @code{gnutls_transport_set_lowat} must be called, with a zero
+low water mark value.
 
 By default, if the transport functions are not set, @acronym{GnuTLS}
 will use the Berkeley Sockets functions.  In this case
@@ -398,6 +403,9 @@ To send a record packet (with application data).
 
 @item @code{gnutls_record_recv}:
 To receive a record packet (with application data).
+
+@item @code{gnutls_record_get_direction}:
+To get the direction of the last interrupted function call.
 @end itemize
 
 As you may have already noticed, the functions which access the Record
