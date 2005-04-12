@@ -744,6 +744,57 @@ int _gnutls_x509_export_int(ASN1_TYPE asn1_data,
     return 0;
 }
 
+/* Decodes an octet string. Leave string_type null for a normal
+ * octet string. Otherwise put something like BMPString, PrintableString
+ * etc.
+ */
+int _gnutls_x509_decode_octet_string( const char* string_type,
+    const opaque* der, size_t der_size,
+    opaque* output, size_t* output_size)
+{
+ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+int result;
+char strname[64];
+ 
+        if (string_type == NULL)
+            _gnutls_str_cpy( strname, sizeof(strname), "PKIX1.pkcs-7-Data");
+        else {
+            _gnutls_str_cpy( strname, sizeof(strname), "PKIX1.");
+            _gnutls_str_cat( strname, sizeof(strname), string_type);
+        }
+
+	if ((result = asn1_create_element
+	     (_gnutls_get_pkix(), strname,
+	      &c2)) != ASN1_SUCCESS) {
+	    gnutls_assert();
+	    result = _gnutls_asn2err(result);
+	    goto cleanup;
+	}
+
+	result = asn1_der_decoding(&c2, der, der_size, NULL);
+	if (result != ASN1_SUCCESS) {
+	    gnutls_assert();
+	    result = _gnutls_asn2err(result);
+	    goto cleanup;
+	}
+
+
+	result = asn1_read_value(c2, "", output, output_size);
+	if (result != ASN1_SUCCESS) {
+	    gnutls_assert();
+	    result = _gnutls_asn2err(result);
+	    goto cleanup;
+	}
+	
+	return 0;
+
+  cleanup:
+    if (c2)
+	asn1_delete_structure(&c2);
+	
+    return result;
+}
+
 
 /* Reads a value from an ASN1 tree, and puts the output
  * in an allocated variable in the given datum.
@@ -754,8 +805,8 @@ int _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
 			    gnutls_datum_t * ret, int str)
 {
     int len = 0, result;
+    size_t slen;
     opaque *tmp = NULL;
-    ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
     result = asn1_read_value(c, root, NULL, &len);
     if (result != ASN1_MEM_ERROR) {
@@ -782,30 +833,13 @@ int _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
      */
 
     if (str) {
-
-	if ((result = asn1_create_element
-	     (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data",
-	      &c2)) != ASN1_SUCCESS) {
-	    gnutls_assert();
-	    result = _gnutls_asn2err(result);
-	    goto cleanup;
-	}
-
-	result = asn1_der_decoding(&c2, tmp, len, NULL);
-	if (result != ASN1_SUCCESS) {
-	    gnutls_assert();
-	    result = _gnutls_asn2err(result);
-	    goto cleanup;
-	}
-
-
-	result = asn1_read_value(c2, "", tmp, &len);
-	if (result != ASN1_SUCCESS) {
-	    gnutls_assert();
-	    result = _gnutls_asn2err(result);
-	    goto cleanup;
-	}
-
+        slen =  len;
+        result = _gnutls_x509_decode_octet_string(NULL, tmp, slen, tmp, &slen);
+        if (result < 0) {
+            gnutls_assert();
+            goto cleanup;
+        }
+        len = slen;
     }
 
     ret->data = tmp;
@@ -814,8 +848,6 @@ int _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
     return 0;
 
   cleanup:
-    if (c2)
-	asn1_delete_structure(&c2);
     gnutls_free(tmp);
     return result;
 
@@ -863,7 +895,6 @@ int _gnutls_x509_der_encode(ASN1_TYPE src, const char *src_name,
     }
 
     if (str) {
-
 	if ((result = asn1_create_element
 	     (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data",
 	      &c2)) != ASN1_SUCCESS) {

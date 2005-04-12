@@ -6,6 +6,7 @@ See the end for copying conditions.
 * Version 1.2.2
 - gnutls_error_to_alert() now considers
   GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET.
+- Fixed pkcs12 friendly name and local key identifier decoding.
 
 * Version 1.2.1 (2005-04-04)
 - gnutls_bye() will no longer fail when RDWR is used and application

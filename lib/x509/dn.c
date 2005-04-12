@@ -763,12 +763,15 @@ int _gnutls_x509_write_attribute(const char *given_oid,
 
 /* Decodes an X.509 Attribute (if multi==1) or an AttributeTypeAndValue
  * otherwise.
+ *
+ * octet_string should be non zero if we are to decode octet strings after
+ * decoding.
+ *
+ * The output is allocated and stored in value.
  */
 int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct,
-					   const char *where, char *oid,
-					   int oid_size,
-					   gnutls_datum_t * value,
-					   int multi)
+    const char *where, char *oid, int oid_size,
+    gnutls_datum_t * value, int multi, int octet_string)
 {
     char tmpbuffer[128];
     int len, result;
@@ -796,7 +799,7 @@ int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct,
     if (multi)
 	_gnutls_str_cat(tmpbuffer, sizeof(tmpbuffer), "s.?1");	/* .values.?1 */
 
-    result = _gnutls_x509_read_value(asn1_struct, tmpbuffer, value, 0);
+    result = _gnutls_x509_read_value(asn1_struct, tmpbuffer, value, octet_string);
     if (result < 0) {
 	gnutls_assert();
 	return result;

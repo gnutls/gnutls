@@ -298,10 +298,15 @@ static const char *bag_to_oid(int bag)
 
 static inline char *ucs2_to_ascii(char *data, int size)
 {
-    int i;
+    int i, j;
 
-    for (i = 0; i < size / 2; i++)
-	data[i] = data[i * 2 + 1];
+    for (i = 0; i < size / 2; i++) {
+        j = 2*i + 1;
+	if (isascii(data[j]))
+	    data[i] = data[i * 2 + 1];
+        else
+            data[i] = '?';
+    }
     data[i] = 0;
 
     return data;
@@ -434,21 +439,38 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 
 		result =
 		    _gnutls_x509_decode_and_read_attribute(c2, root, oid,
-							   sizeof(oid),
-							   &attr_val, 1);
+			sizeof(oid), &attr_val, 1, 0);
 
 		if (result < 0) {
 		    gnutls_assert();
-		    goto cleanup;
+		    continue; /* continue in case we find some known attributes */
 		}
 
-
-		if (strcmp(oid, KEY_ID_OID) == 0)
+		if (strcmp(oid, KEY_ID_OID) == 0) {
+		    result = _gnutls_x509_decode_octet_string( NULL, attr_val.data, attr_val.size,
+		        attr_val.data, &attr_val.size);
+                    if (result < 0) {
+ 		       _gnutls_free_datum( &attr_val);
+                        gnutls_assert();
+		        _gnutls_x509_log
+			    ("Error decoding PKCS12 Bag Attribute OID '%s'\n", oid);
+			continue;
+                    }
 		    bag->element[i].local_key_id = attr_val;
-		else if (strcmp(oid, FRIENDLY_NAME_OID) == 0)
+		} else if (strcmp(oid, FRIENDLY_NAME_OID) == 0) {
+		    result = _gnutls_x509_decode_octet_string( "BMPString", attr_val.data, attr_val.size,
+		        attr_val.data, &attr_val.size);
+                    if (result < 0) {
+ 		       _gnutls_free_datum( &attr_val);
+                        gnutls_assert();
+		        _gnutls_x509_log
+			    ("Error decoding PKCS12 Bag Attribute OID '%s'\n", oid);
+			continue;
+                    }
 		    bag->element[i].friendly_name =
 			ucs2_to_ascii(attr_val.data, attr_val.size);
-		else {
+		} else {
+		    _gnutls_free_datum( &attr_val);
 		    _gnutls_x509_log
 			("Unknown PKCS12 Bag Attribute OID '%s'\n", oid);
 		}
