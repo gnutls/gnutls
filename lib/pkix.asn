@@ -127,7 +127,8 @@ GeneralName ::= CHOICE {
      rfc822Name                      [1]     IA5String,
      dNSName                         [2]     IA5String,
      x400Address                     [3]     ORAddress,
-     directoryName                   [4]     Name,
+-- Changed to work with the libtasn1 parser.
+     directoryName                   [4]     EXPLICIT RDNSequence, --Name,
      ediPartyName                    [5]     EDIPartyName,
      uniformResourceIdentifier       [6]     IA5String,
      iPAddress                       [7]     OCTET STRING,
