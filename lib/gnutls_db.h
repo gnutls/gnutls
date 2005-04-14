@@ -22,16 +22,12 @@
  *
  */
 
-void gnutls_set_cache_expiration(gnutls_session_t session, int seconds);
-int gnutls_db_set_name(gnutls_session_t session, const char *filename);
 int _gnutls_server_register_current_session(gnutls_session_t session);
 int _gnutls_server_restore_session(gnutls_session_t session,
 				   uint8 * session_id,
 				   int session_id_size);
-int gnutls_db_clean(gnutls_session_t session);
 int _gnutls_db_remove_session(gnutls_session_t session, uint8 * session_id,
 			      int session_id_size);
-void gnutls_db_remove_session(gnutls_session_t session);
 int _gnutls_store_session(gnutls_session_t session,
 			  gnutls_datum_t session_id,
 			  gnutls_datum_t session_data);
