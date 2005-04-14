@@ -77,7 +77,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_priority.h gnutls_auth.h auth_anon.h			\
 	gnutls_extensions.h gnutls_buffer.h gnutls_auth_int.h		\
 	gnutls_random.h x509_b64.h gnutls_v2_compat.h			\
-	gnutls_errors_int.h gnutls_datum.h auth_cert.h gnutls_mpi.h	\
+	gnutls_datum.h auth_cert.h gnutls_mpi.h	\
 	gnutls_pk.h gnutls_record.h gnutls_cert.h gnutls_constate.h	\
 	gnutls_global.h strfile.h gnutls_sig.h gnutls_mem.h		\
 	io_debug.h ext_max_record.h gnutls_session_pack.h	\

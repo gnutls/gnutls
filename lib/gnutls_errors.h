@@ -23,7 +23,9 @@
  */
 
 #include <defines.h>
-#include "gnutls_errors_int.h"
+
+#define GNUTLS_E_INT_RET_0 -1251
+#define GNUTLS_E_INT_HANDSHAKE_AGAIN -1252
 
 #ifdef __FILE__
 # ifdef __LINE__
@@ -36,10 +38,6 @@
 #endif
 
 int _gnutls_asn2err(int asn_err);
-const char *gnutls_strerror(int error);
-void gnutls_perror(int error);
-int gnutls_error_is_fatal(int error);
-
 void _gnutls_log(int, const char *fmt, ...);
 
 extern int _gnutls_log_level;

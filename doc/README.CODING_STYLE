@@ -72,5 +72,5 @@ The rules here are not always used, although we try to stick to them.
  value, if some other indication is needed.
  
  A negative value always indicates failure. All the available
- error codes are defined in gnutls_errors_int.h and a description
+ error codes are defined in gnutls.h and a description
  is available in gnutls_errors.c
