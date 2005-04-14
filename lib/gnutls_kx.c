@@ -58,12 +58,12 @@ static int generate_normal_master(gnutls_session_t session,
 				  int keep_premaster)
 {
     int ret = 0;
-    opaque random[2 * TLS_RANDOM_SIZE + 1];
+    opaque rnd[2 * TLS_RANDOM_SIZE + 1];
     char buf[64];
 
-    memcpy(random, session->security_parameters.client_random,
+    memcpy(rnd, session->security_parameters.client_random,
 	   TLS_RANDOM_SIZE);
-    memcpy(&random[TLS_RANDOM_SIZE],
+    memcpy(&rnd[TLS_RANDOM_SIZE],
 	   session->security_parameters.server_random, TLS_RANDOM_SIZE);
 
     _gnutls_hard_log("INT: PREMASTER SECRET[%d]: %s\n", PREMASTER.size,
@@ -79,7 +79,7 @@ static int generate_normal_master(gnutls_session_t session,
     if (gnutls_protocol_get_version(session) == GNUTLS_SSL3) {
 	ret =
 	    _gnutls_ssl3_generate_random(PREMASTER.data, PREMASTER.size,
-					 random, 2 * TLS_RANDOM_SIZE,
+					 rnd, 2 * TLS_RANDOM_SIZE,
 					 TLS_MASTER_SIZE,
 					 session->security_parameters.
 					 master_secret);
@@ -88,7 +88,7 @@ static int generate_normal_master(gnutls_session_t session,
 	ret =
 	    _gnutls_PRF(PREMASTER.data, PREMASTER.size,
 			MASTER_SECRET, strlen(MASTER_SECRET),
-			random, 2 * TLS_RANDOM_SIZE, TLS_MASTER_SIZE,
+			rnd, 2 * TLS_RANDOM_SIZE, TLS_MASTER_SIZE,
 			session->security_parameters.master_secret);
     }
 

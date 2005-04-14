@@ -306,7 +306,7 @@ void _gnutls_mac_deinit_ssl3_handshake(mac_hd_t handle,
 }
 
 static int ssl3_sha(int i, opaque * secret, int secret_len,
-		    opaque * random, int random_len, void *digest)
+		    opaque * rnd, int rnd_len, void *digest)
 {
     int j;
     opaque text1[26];
@@ -325,14 +325,14 @@ static int ssl3_sha(int i, opaque * secret, int secret_len,
 
     _gnutls_hash(td, text1, i + 1);
     _gnutls_hash(td, secret, secret_len);
-    _gnutls_hash(td, random, random_len);
+    _gnutls_hash(td, rnd, rnd_len);
 
     _gnutls_hash_deinit(td, digest);
     return 0;
 }
 
 static int ssl3_md5(int i, opaque * secret, int secret_len,
-		    opaque * random, int random_len, void *digest)
+		    opaque * rnd, int rnd_len, void *digest)
 {
     opaque tmp[MAX_HASH_SIZE];
     mac_hd_t td;
@@ -346,7 +346,7 @@ static int ssl3_md5(int i, opaque * secret, int secret_len,
 
     _gnutls_hash(td, secret, secret_len);
 
-    ret = ssl3_sha(i, secret, secret_len, random, random_len, tmp);
+    ret = ssl3_sha(i, secret, secret_len, rnd, rnd_len, tmp);
     if (ret < 0) {
 	gnutls_assert();
 	_gnutls_hash_deinit(td, digest);
@@ -390,7 +390,7 @@ int _gnutls_ssl3_hash_md5(void *first, int first_len,
 }
 
 int _gnutls_ssl3_generate_random(void *secret, int secret_len,
-				 void *random, int random_len,
+				 void *rnd, int rnd_len,
 				 int ret_bytes, opaque * ret)
 {
     int i = 0, copy, output_bytes;
@@ -408,7 +408,7 @@ int _gnutls_ssl3_generate_random(void *secret, int secret_len,
     for (i = 0; i < times; i++) {
 
 	result =
-	    ssl3_md5(i, secret, secret_len, random, random_len, digest);
+	    ssl3_md5(i, secret, secret_len, rnd, rnd_len, digest);
 	if (result < 0) {
 	    gnutls_assert();
 	    return result;

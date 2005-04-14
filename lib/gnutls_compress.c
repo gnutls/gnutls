@@ -34,8 +34,8 @@
 /* These functions allocate the return value internally
  */
 int _gnutls_m_plaintext2compressed(gnutls_session_t session,
-				   gnutls_datum_t *
-				   compress, gnutls_datum_t plaintext)
+				   gnutls_datum_t * compressed,
+				   gnutls_datum_t plaintext)
 {
     int size;
     opaque *data;
@@ -48,8 +48,8 @@ int _gnutls_m_plaintext2compressed(gnutls_session_t session,
 	gnutls_assert();
 	return GNUTLS_E_COMPRESSION_FAILED;
     }
-    compress->data = data;
-    compress->size = size;
+    compressed->data = data;
+    compressed->size = size;
 
     return 0;
 }
