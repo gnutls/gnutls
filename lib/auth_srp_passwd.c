@@ -190,14 +190,14 @@ static int pwd_put_values2(SRP_PWD_ENTRY * entry, char *str)
  * values. They are put in the entry.
  */
 static int pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry,
-			 int index)
+			 int idx)
 {
     FILE *fd;
     char line[2 * 1024];
     uint i, len;
     char indexstr[10];
 
-    sprintf(indexstr, "%d", index);	/* Flawfinder: ignore */
+    sprintf(indexstr, "%d", idx);	/* Flawfinder: ignore */
 
     fd = fopen(pconf_file, "r");
     if (fd == NULL) {
@@ -213,7 +213,7 @@ static int pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry,
 	    i++;
 	}
 	if (strncmp(indexstr, line, MAX(i, len)) == 0) {
-	    if ((index = pwd_put_values2(entry, line)) >= 0)
+	    if ((idx = pwd_put_values2(entry, line)) >= 0)
 		return 0;
 	    else {
 		return GNUTLS_E_SRP_PWD_ERROR;
@@ -232,7 +232,7 @@ int _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
     char line[2 * 1024];
     uint i, len;
     int ret;
-    int index, last_index;
+    int idx, last_idx;
     SRP_PWD_ENTRY *entry;
 
     *_entry = gnutls_calloc(1, sizeof(SRP_PWD_ENTRY));
@@ -296,7 +296,7 @@ int _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	return GNUTLS_E_SRP_PWD_ERROR;
     }
 
-    last_index = 1;		/* a default value */
+    last_idx = 1;		/* a default value */
 
     len = strlen(username);
     while (fgets(line, sizeof(line), fd) != NULL) {
@@ -307,12 +307,12 @@ int _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	}
 
 	if (strncmp(username, line, MAX(i, len)) == 0) {
-	    if ((index = pwd_put_values(entry, line)) >= 0) {
+	    if ((idx = pwd_put_values(entry, line)) >= 0) {
 		/* Keep the last index in memory, so we can retrieve fake parameters (g,n)
 		 * when the user does not exist.
 		 */
-		last_index = index;
-		if (pwd_read_conf(cred->password_conf_file, entry, index)
+		last_idx = idx;
+		if (pwd_read_conf(cred->password_conf_file, entry, idx)
 		    == 0) {
 		    return 0;
 		} else {
@@ -331,7 +331,7 @@ int _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
     /* user was not found. Fake him. Actually read the g,n values from
      * the last index found and randomize the entry.
      */
-    if (pwd_read_conf(cred->password_conf_file, entry, last_index) == 0) {
+    if (pwd_read_conf(cred->password_conf_file, entry, last_idx) == 0) {
 	ret = _randomize_pwd_entry(entry);
 	if (ret < 0) {
 	    gnutls_assert();

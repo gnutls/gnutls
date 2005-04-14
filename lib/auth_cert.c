@@ -1542,7 +1542,7 @@ int _gnutls_server_select_cert(gnutls_session_t session,
     gnutls_pk_algorithm_t requested_algo)
 {
     uint i;
-    int index, ret;
+    int idx, ret;
     gnutls_certificate_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -1560,7 +1560,7 @@ int _gnutls_server_select_cert(gnutls_session_t session,
     /* Otherwise... */
 
     ret = 0;
-    index = -1;			/* default is use no certificate */
+    idx = -1;			/* default is use no certificate */
 
 
     for (i = 0; i < cred->ncerts; i++) {
@@ -1572,7 +1572,7 @@ int _gnutls_server_select_cert(gnutls_session_t session,
 	     */
 	    if (session->security_parameters.cert_type ==
 		cred->cert_list[i][0].cert_type) {
-		index = i;
+		idx = i;
 		break;
 	    }
 	}
@@ -1581,10 +1581,10 @@ int _gnutls_server_select_cert(gnutls_session_t session,
     /* store the certificate pointer for future use, in the handshake.
      * (This will allow not calling this callback again.)
      */
-    if (index >= 0 && ret == 0) {
+    if (idx >= 0 && ret == 0) {
 	_gnutls_selected_certs_set(session,
-	    &cred->cert_list[index][0], cred->cert_list_length[index],
-            &cred->pkey[index], 0);
+	    &cred->cert_list[idx][0], cred->cert_list_length[idx],
+            &cred->pkey[idx], 0);
     }
 
     return ret;

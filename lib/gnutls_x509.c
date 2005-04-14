@@ -506,15 +506,14 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
 	size = input_cert_size - (ptr - input_cert);
 
 	if (size > 0) {
-	    char *ptr2;
+	    char *ptr3;
 
-	    ptr2 =
-		memmem(ptr, size, PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
-	    if (ptr2 == NULL)
-		ptr2 = memmem(ptr, size, PEM_CERT_SEP2,
+	    ptr3 = memmem(ptr, size, PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
+	    if (ptr3 == NULL)
+		ptr3 = memmem(ptr, size, PEM_CERT_SEP2,
 			      sizeof(PEM_CERT_SEP2) - 1);
 
-	    ptr = ptr2;
+	    ptr = ptr3;
 	} else
 	    ptr = NULL;
 
@@ -1185,15 +1184,14 @@ static int parse_pem_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
 	size = input_cert_size - (ptr - input_cert);
 
 	if (size > 0) {
-	    char *ptr2;
+	    char *ptr3;
 
-	    ptr2 =
-		memmem(ptr, size, PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
-	    if (ptr2 == NULL)
+	    ptr3 = memmem(ptr, size, PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
+	    if (ptr3 == NULL)
 		ptr = memmem(ptr, size,
 			     PEM_CERT_SEP2, sizeof(PEM_CERT_SEP2) - 1);
 
-	    ptr = ptr2;
+	    ptr = ptr3;
 	} else
 	    ptr = NULL;
 

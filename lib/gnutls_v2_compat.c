@@ -92,7 +92,7 @@ int _gnutls_read_client_hello_v2(gnutls_session_t session, opaque * data,
     int ret = 0;
     uint16 sizeOfSuites;
     gnutls_protocol_t version;
-    opaque random[TLS_RANDOM_SIZE];
+    opaque rnd[TLS_RANDOM_SIZE];
     int len = datalen;
     int err;
     uint16 challenge;
@@ -200,16 +200,16 @@ int _gnutls_read_client_hello_v2(gnutls_session_t session, opaque * data,
     pos += session_id_len;
 
     DECR_LEN(len, challenge);
-    memset(random, 0, TLS_RANDOM_SIZE);
+    memset(rnd, 0, TLS_RANDOM_SIZE);
 
-    memcpy(&random[TLS_RANDOM_SIZE - challenge], &data[pos], challenge);
+    memcpy(&rnd[TLS_RANDOM_SIZE - challenge], &data[pos], challenge);
 
-    _gnutls_set_client_random(session, random);
+    _gnutls_set_client_random(session, rnd);
 
     /* generate server random value */
 
-    _gnutls_tls_create_random(random);
-    _gnutls_set_server_random(session, random);
+    _gnutls_tls_create_random(rnd);
+    _gnutls_set_server_random(session, rnd);
 
     session->security_parameters.timestamp = time(NULL);
 
