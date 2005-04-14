@@ -7,6 +7,9 @@ See the end for copying conditions.
 - gnutls_error_to_alert() now considers
   GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET.
 - Fixed pkcs12 friendly name and local key identifier decoding.
+- Internal cleanups, removed duplicate typedef/struct definitions,
+  and made source code include external include file, to check
+  function prototypes during compile time.
 - API and ABI modifications:
   No changes since last version.
 
