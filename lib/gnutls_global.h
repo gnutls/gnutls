@@ -27,7 +27,6 @@
 
 #include <libtasn1.h>
 
-int gnutls_global_init(void);
 int gnutls_is_secure_memory(const void *mem);
 
 extern ASN1_TYPE _gnutls_pkix1_asn;
