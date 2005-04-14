@@ -133,7 +133,6 @@ typedef struct gnutls_compression_entry gnutls_compression_entry;
 
 /* Functions for sign algorithms. */
 gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid);
-gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid);
 gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign(gnutls_pk_algorithm_t pk,
 						gnutls_mac_algorithm_t mac);
 const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t,
