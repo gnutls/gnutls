@@ -447,7 +447,6 @@ extern gnutls_realloc_function gnutls_realloc;
 extern gnutls_calloc_function gnutls_calloc;
 extern gnutls_free_function gnutls_free;
 
-extern void *(*gnutls_calloc) (size_t, size_t);
 extern char* (*gnutls_strdup)( const char*);
 
 typedef void (*gnutls_log_func)( int, const char*);
