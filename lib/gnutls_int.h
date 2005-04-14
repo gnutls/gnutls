@@ -590,7 +590,6 @@ struct gnutls_session_int {
  */
 void _gnutls_set_current_version(gnutls_session_t session,
 				 gnutls_protocol_t version);
-gnutls_protocol_t gnutls_protocol_get_version(gnutls_session_t session);
 void _gnutls_free_auth_info(gnutls_session_t session);
 
 /* These two macros return the advertized TLS version of
@@ -608,9 +607,5 @@ void _gnutls_free_auth_info(gnutls_session_t session);
 
 void _gnutls_set_adv_version(gnutls_session_t, gnutls_protocol_t);
 gnutls_protocol_t _gnutls_get_adv_version(gnutls_session_t);
-
-int gnutls_fingerprint(gnutls_digest_algorithm_t algo,
-		       const gnutls_datum_t * data, void *result,
-		       size_t * result_size);
 
 #endif				/* GNUTLS_INT_H */
