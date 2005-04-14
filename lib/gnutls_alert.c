@@ -24,7 +24,6 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <gnutls_alert.h>
 #include <gnutls_record.h>
 #include <debug.h>
 
