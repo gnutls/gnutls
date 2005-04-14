@@ -46,12 +46,6 @@ EXTRA_DIST += getndelim2.h getndelim2.c
 
 ## end   gnulib module getline
 
-## begin gnulib module getpass-gnu
-
-libgnu_la_SOURCES += getpass.h
-
-## end   gnulib module getpass-gnu
-
 ## begin gnulib module minmax
 
 libgnu_la_SOURCES += minmax.h
