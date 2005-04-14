@@ -123,16 +123,14 @@ static void resume_copy_required_values(gnutls_session_t session)
 	session->internals.resumed_security_parameters.session_id_size;
 }
 
-void _gnutls_set_server_random(gnutls_session_t session, uint8 * random)
+void _gnutls_set_server_random(gnutls_session_t session, uint8 * rnd)
 {
-    memcpy(session->security_parameters.server_random, random,
-	   TLS_RANDOM_SIZE);
+    memcpy(session->security_parameters.server_random, rnd, TLS_RANDOM_SIZE);
 }
 
-void _gnutls_set_client_random(gnutls_session_t session, uint8 * random)
+void _gnutls_set_client_random(gnutls_session_t session, uint8 * rnd)
 {
-    memcpy(session->security_parameters.client_random, random,
-	   TLS_RANDOM_SIZE);
+    memcpy(session->security_parameters.client_random, rnd, TLS_RANDOM_SIZE);
 }
 
 /* Calculate The SSL3 Finished message 

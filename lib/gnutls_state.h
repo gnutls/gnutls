@@ -53,8 +53,9 @@ int _gnutls_dh_set_group(gnutls_session_t session, mpi_t gen, mpi_t prime);
 int _gnutls_dh_get_allowed_prime_bits(gnutls_session_t session);
 void _gnutls_handshake_internal_state_clear(gnutls_session_t);
 
-int _gnutls_rsa_export_set_pubkey(gnutls_session_t session, mpi_t exp,
-				  mpi_t mod);
+int _gnutls_rsa_export_set_pubkey(gnutls_session_t session,
+				  mpi_t exponent,
+				  mpi_t modulus);
 
 int _gnutls_session_is_resumable(gnutls_session_t session);
 int _gnutls_session_is_export(gnutls_session_t session);

@@ -37,8 +37,8 @@ int _gnutls_generate_session_id(opaque * session_id, uint8 * len);
 int _gnutls_handshake_common(gnutls_session_t session);
 int _gnutls_handshake_client(gnutls_session_t session);
 int _gnutls_handshake_server(gnutls_session_t session);
-void _gnutls_set_server_random(gnutls_session_t session, uint8 * random);
-void _gnutls_set_client_random(gnutls_session_t session, uint8 * random);
+void _gnutls_set_server_random(gnutls_session_t session, uint8 * rnd);
+void _gnutls_set_client_random(gnutls_session_t session, uint8 * rnd);
 int _gnutls_tls_create_random(opaque * dst);
 int _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 					 cipher_suite_st ** cipherSuites,

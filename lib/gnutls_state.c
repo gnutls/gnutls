@@ -488,8 +488,9 @@ int _gnutls_dh_set_secret_bits(gnutls_session_t session, uint bits)
 /* This function will set in the auth info structure the
  * RSA exponent and the modulus.
  */
-int _gnutls_rsa_export_set_pubkey(gnutls_session_t session, mpi_t exp,
-				  mpi_t mod)
+int _gnutls_rsa_export_set_pubkey(gnutls_session_t session,
+				  mpi_t exponent,
+				  mpi_t modulus)
 {
     cert_auth_info_t info;
     int ret;
@@ -498,13 +499,13 @@ int _gnutls_rsa_export_set_pubkey(gnutls_session_t session, mpi_t exp,
     if (info == NULL)
 	return GNUTLS_E_INTERNAL_ERROR;
 
-    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.modulus, mod);
+    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.modulus, modulus);
     if (ret < 0) {
 	gnutls_assert();
 	return ret;
     }
 
-    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.exponent, exp);
+    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.exponent, exponent);
     if (ret < 0) {
 	gnutls_assert();
 	_gnutls_free_datum(&info->rsa_export.modulus);
