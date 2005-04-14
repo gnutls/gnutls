@@ -42,7 +42,6 @@ MOSTLYCLEANFILES += alloca.h alloca.h-t
 
 ## begin gnulib module getline
 
-libgnu_la_SOURCES += getline.h
 EXTRA_DIST += getndelim2.h getndelim2.c
 
 ## end   gnulib module getline
