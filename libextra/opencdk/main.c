@@ -183,14 +183,13 @@ _secmem_init (size_t size)
 }
 
 
-/* Not used?
 static void
 _secmem_end (void)
 {
     gcry_control (GCRYCTL_TERM_SECMEM);
     secmem_init = 0;
 }
-*/
+
 
 void *
 cdk_salloc (size_t size, int clear)
