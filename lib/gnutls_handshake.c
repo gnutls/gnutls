@@ -262,7 +262,7 @@ int _gnutls_read_client_hello(gnutls_session_t session, opaque * data,
     uint16 suite_size;
     gnutls_protocol_t version;
     int len = datalen;
-    opaque random[TLS_RANDOM_SIZE], *suite_ptr;
+    opaque rnd[TLS_RANDOM_SIZE], *suite_ptr;
     gnutls_protocol_t ver;
 
     if (session->internals.v2_hello != 0) {	/* version 2.0 */
@@ -301,8 +301,8 @@ int _gnutls_read_client_hello(gnutls_session_t session, opaque * data,
     _gnutls_set_client_random(session, &data[pos]);
     pos += TLS_RANDOM_SIZE;
 
-    _gnutls_tls_create_random(random);
-    _gnutls_set_server_random(session, random);
+    _gnutls_tls_create_random(rnd);
+    _gnutls_set_server_random(session, rnd);
 
     session->security_parameters.timestamp = time(NULL);
 
@@ -1503,7 +1503,7 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
     int extdatalen;
     int pos = 0;
     int datalen = 0, ret = 0;
-    opaque random[TLS_RANDOM_SIZE];
+    opaque rnd[TLS_RANDOM_SIZE];
     gnutls_protocol_t hver;
     opaque extdata[MAX_EXT_DATA_LENGTH];
 
@@ -1568,10 +1568,10 @@ static int _gnutls_send_client_hello(gnutls_session_t session, int again)
 
 	/* Generate random data 
 	 */
-	_gnutls_tls_create_random(random);
-	_gnutls_set_client_random(session, random);
+	_gnutls_tls_create_random(rnd);
+	_gnutls_set_client_random(session, rnd);
 
-	memcpy(&data[pos], random, TLS_RANDOM_SIZE);
+	memcpy(&data[pos], rnd, TLS_RANDOM_SIZE);
 	pos += TLS_RANDOM_SIZE;
 
 	/* Copy the Session ID 
@@ -2393,14 +2393,15 @@ inline static int check_server_params(gnutls_session_t session,
     int cred_type;
     gnutls_dh_params_t dh_params = NULL;
     gnutls_rsa_params_t rsa_params = NULL;
-    int j, remove;
+    int j;
 
     cred_type = _gnutls_map_kx_get_cred(kx, 1);
 
     /* Read the Diffie Hellman parameters, if any.
      */
     if (cred_type == GNUTLS_CRD_CERTIFICATE) {
-      const gnutls_certificate_credentials_t x509_cred =
+      int delete;
+      gnutls_certificate_credentials_t x509_cred =
 	_gnutls_get_cred(session->key, cred_type, NULL);
 
 	if (x509_cred != NULL) {
@@ -2413,20 +2414,20 @@ inline static int check_server_params(gnutls_session_t session,
 	/* Check also if the certificate supports the
 	 * KX method.
 	 */
-	remove = 1;
+	delete = 1;
 	for (j = 0; j < alg_size; j++) {
 	    if (alg[j] == kx) {
-		remove = 0;
+		delete = 0;
 		break;
 	    }
 	}
 
-	if (remove == 1)
+	if (delete == 1)
 	    return 1;
 
 #ifdef ENABLE_ANON
     } else if (cred_type == GNUTLS_CRD_ANON) {
-      const gnutls_anon_server_credentials_t anon_cred =
+      gnutls_anon_server_credentials_t anon_cred =
 	_gnutls_get_cred(session->key, cred_type, NULL);
 
 	if (anon_cred != NULL) {
@@ -2469,7 +2470,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 
     int ret = 0;
     cipher_suite_st *newSuite, cs;
-    int newSuiteSize = 0, i, remove;
+    int newSuiteSize = 0, i;
     gnutls_certificate_credentials_t x509_cred;
     gnutls_kx_algorithm_t kx;
     int server =
@@ -2518,28 +2519,29 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
     /* now removes ciphersuites based on the KX algorithm
      */
     for (i = 0; i < numCipherSuites; i++) {
+	int delete = 0;
+
 	/* finds the key exchange algorithm in
 	 * the ciphersuite
 	 */
 	kx = _gnutls_cipher_suite_get_kx_algo(&(*cipherSuites)[i]);
-	remove = 0;
 
 	/* if it is defined but had no credentials 
 	 */
 	if (_gnutls_get_kx_cred(session, kx, NULL) == NULL) {
-	    remove = 1;
+	    delete = 1;
 	} else {
-	    remove = 0;
+	    delete = 0;
 
 	    if (server)
-		remove = check_server_params(session, kx, alg, alg_size);
+		delete = check_server_params(session, kx, alg, alg_size);
 	}
 
 
 
 	memcpy(&cs.suite, &(*cipherSuites)[i].suite, 2);
 
-	if (remove == 0) {
+	if (delete == 0) {
 
 	    _gnutls_handshake_log("HSK[%x]: Keeping ciphersuite: %s\n",
 				  session,
