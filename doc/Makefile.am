@@ -64,5 +64,5 @@ x509-api.texi: ../lib/x509/x509-api.texi
 pgp-api.texi: ../libextra/openpgp/pgp-api.texi
 	-scripts/sort2.pl < ../libextra/openpgp/pgp-api.texi > pgp-api.texi
 
-error_codes.texi: ../lib/gnutls_errors_int.h ../lib/gnutls_errors.c ../src/errcodes.c
+error_codes.texi: ../includes/gnutls/gnutls.h ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi
