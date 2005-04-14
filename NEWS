@@ -18,8 +18,8 @@ See the end for copying conditions.
 - Optimizations ("-O2 -finline-functions") are not enabled by default,
   instead the standard autoconf defaults are used.  Use `./configure
   CFLAGS="-O2 -finline-functions"' to get the old optimizations.
-- Added the option --get-dh-params to certtool, in order to get them
-  included in the library primes and generators.
+- Added the option --get-dh-params to certtool, in order to get the
+  parameters included in the library primes and generators.
 - Improved the semantics of GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, to
   allow only trusted Version 1 CAs and introduced
   GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT which has the old semantics.
