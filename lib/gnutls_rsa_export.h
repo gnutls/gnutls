@@ -25,4 +25,4 @@
 const mpi_t *_gnutls_get_rsa_params(gnutls_rsa_params_t);
 int _gnutls_peers_cert_less_512(gnutls_session_t session);
 int _gnutls_rsa_generate_params(mpi_t * resarr, int *resarr_len, int bits);
-void gnutls_rsa_params_deinit(gnutls_rsa_params_t rsa_params);
+

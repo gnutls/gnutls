@@ -22,42 +22,18 @@
  *
  */
 
-#ifndef AUTH_X509_H
-# define AUTH_X509_H
+#ifndef AUTH_CERT_H
+# define AUTH_CERT_H
 # include "gnutls_cert.h"
 # include "gnutls_auth.h"
 # include "auth_dh_common.h"
 # include "x509/x509.h"
 # include "../libextra/openpgp/openpgp.h"
 
-typedef struct retr_st {
-    gnutls_certificate_type_t type;
-    union cert {
-	gnutls_x509_crt_t *x509;
-	gnutls_openpgp_key_t pgp;
-    } cert;
-    uint ncerts;
-
-    union key {
-	gnutls_x509_privkey_t x509;
-	gnutls_openpgp_privkey_t pgp;
-    } key;
-
-    uint deinit_all;
-} gnutls_retr_st;
-
-typedef int gnutls_certificate_client_retrieve_function(gnutls_session_t,
-    const gnutls_datum_t *req_ca_rdn, int nreqs,
-    const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length,
-    gnutls_retr_st *);
-
-typedef int gnutls_certificate_server_retrieve_function(struct
-    gnutls_session_int*, gnutls_retr_st *);
-
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
  */
-typedef struct {
+typedef struct gnutls_certificate_credentials_st {
     gnutls_dh_params_t dh_params;
     gnutls_rsa_params_t rsa_params;
     /* this callback is used to retrieve the DH or RSA
@@ -119,8 +95,6 @@ typedef struct {
     gnutls_certificate_client_retrieve_function *client_get_cert_callback;
     gnutls_certificate_server_retrieve_function *server_get_cert_callback;
 } certificate_credentials_st;
-
-#define gnutls_certificate_credentials_t certificate_credentials_st*
 
 typedef struct rsa_info_st {
     gnutls_datum_t modulus;

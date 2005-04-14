@@ -45,8 +45,6 @@
 #include "x509/x509.h"
 #include "x509/mpi.h"
 
-void gnutls_certificate_free_crls(gnutls_certificate_credentials_t sc);
-
 /**
   * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials_t structure
   * @sc: is an #gnutls_certificate_credentials_t structure.
@@ -403,7 +401,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session,
 				      unsigned int *status)
 {
     cert_auth_info_t info;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     int peer_certificate_list_size, ret;
 
     CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);

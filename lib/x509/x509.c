@@ -36,7 +36,6 @@
 #include <dn.h>
 #include <extensions.h>
 #include <libtasn1.h>
-#include <gnutls_ui.h>
 #include <mpi.h>
 #include <privkey.h>
 #include <verify.h>

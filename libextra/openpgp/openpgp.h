@@ -28,8 +28,6 @@ typedef struct gnutls_openpgp_trustdb_int {
     cdk_stream_t st;
 } gnutls_openpgp_trustdb_int;
 
-typedef struct gnutls_openpgp_key_int *gnutls_openpgp_key_t;
-typedef struct gnutls_openpgp_privkey_int *gnutls_openpgp_privkey_t;
 typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
 typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb_t;
 

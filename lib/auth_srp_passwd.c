@@ -227,7 +227,7 @@ static int pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry,
 int _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 			       SRP_PWD_ENTRY ** _entry)
 {
-    const gnutls_srp_server_credentials_t cred;
+    gnutls_srp_server_credentials_t cred;
     FILE *fd;
     char line[2 * 1024];
     uint i, len;

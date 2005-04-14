@@ -21,9 +21,3 @@
  * USA
  *
  */
-
-int gnutls_session_set_data(gnutls_session_t session,
-			    const opaque * session_data,
-			    int session_data_size);
-int gnutls_session_get_data(gnutls_session_t session,
-			    opaque * session_data, int *session_data_size);

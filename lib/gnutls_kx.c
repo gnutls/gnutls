@@ -142,7 +142,7 @@ int _gnutls_send_server_kx_message(gnutls_session_t session, int again)
 
     ret =
 	_gnutls_send_handshake(session, data, data_size,
-			       GNUTLS_SERVER_KEY_EXCHANGE);
+			       GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE);
     gnutls_free(data);
 
     if (ret < 0) {
@@ -184,7 +184,7 @@ int _gnutls_send_server_certificate_request(gnutls_session_t session,
     }
     ret =
 	_gnutls_send_handshake(session, data, data_size,
-			       GNUTLS_CERTIFICATE_REQUEST);
+			       GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
     gnutls_free(data);
 
     if (ret < 0) {
@@ -222,7 +222,7 @@ int _gnutls_send_client_kx_message(gnutls_session_t session, int again)
     }
     ret =
 	_gnutls_send_handshake(session, data, data_size,
-			       GNUTLS_CLIENT_KEY_EXCHANGE);
+			       GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
     gnutls_free(data);
 
     if (ret < 0) {
@@ -278,7 +278,7 @@ int _gnutls_send_client_certificate_verify(gnutls_session_t session,
     }
     ret =
 	_gnutls_send_handshake(session, data,
-			       data_size, GNUTLS_CERTIFICATE_VERIFY);
+			       data_size, GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
     gnutls_free(data);
 
     return ret;
@@ -304,7 +304,7 @@ int _gnutls_recv_server_kx_message(gnutls_session_t session)
 	ret =
 	    _gnutls_recv_handshake(session, &data,
 				   &datasize,
-				   GNUTLS_SERVER_KEY_EXCHANGE,
+				   GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE,
 				   MANDATORY_PACKET);
 	if (ret < 0) {
 	    gnutls_assert();
@@ -337,7 +337,7 @@ int _gnutls_recv_server_certificate_request(gnutls_session_t session)
 	ret =
 	    _gnutls_recv_handshake(session, &data,
 				   &datasize,
-				   GNUTLS_CERTIFICATE_REQUEST,
+				   GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST,
 				   OPTIONAL_PACKET);
 	if (ret < 0)
 	    return ret;
@@ -370,7 +370,7 @@ int _gnutls_recv_client_kx_message(gnutls_session_t session)
 	ret =
 	    _gnutls_recv_handshake(session, &data,
 				   &datasize,
-				   GNUTLS_CLIENT_KEY_EXCHANGE,
+				   GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE,
 				   MANDATORY_PACKET);
 	if (ret < 0)
 	    return ret;
@@ -437,7 +437,7 @@ int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 				 */
 	ret =
 	    _gnutls_send_handshake(session, data, data_size,
-				   GNUTLS_CERTIFICATE_PKT);
+				   GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
 	gnutls_free(data);
     }
 
@@ -478,7 +478,7 @@ int _gnutls_send_server_certificate(gnutls_session_t session, int again)
     }
     ret =
 	_gnutls_send_handshake(session, data, data_size,
-			       GNUTLS_CERTIFICATE_PKT);
+			       GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
     gnutls_free(data);
 
     if (ret < 0) {
@@ -514,7 +514,7 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 	ret =
 	    _gnutls_recv_handshake(session, &data,
 				   &datasize,
-				   GNUTLS_CERTIFICATE_PKT, optional);
+				   GNUTLS_HANDSHAKE_CERTIFICATE_PKT, optional);
 	if (ret < 0) {
 	    if (optional == OPTIONAL_PACKET &&
 		ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
@@ -581,7 +581,7 @@ int _gnutls_recv_server_certificate(gnutls_session_t session)
 	ret =
 	    _gnutls_recv_handshake(session, &data,
 				   &datasize,
-				   GNUTLS_CERTIFICATE_PKT,
+				   GNUTLS_HANDSHAKE_CERTIFICATE_PKT,
 				   MANDATORY_PACKET);
 	if (ret < 0) {
 	    gnutls_assert();
@@ -624,7 +624,7 @@ int _gnutls_recv_client_certificate_verify_message(gnutls_session_t
 	ret =
 	    _gnutls_recv_handshake(session, &data,
 				   &datasize,
-				   GNUTLS_CERTIFICATE_VERIFY,
+				   GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY,
 				   OPTIONAL_PACKET);
 	if (ret < 0)
 	    return ret;

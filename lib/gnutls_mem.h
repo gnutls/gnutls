@@ -55,11 +55,6 @@ typedef void svoid;		/* for functions that allocate using gnutls_secure_malloc *
 # endif
 #endif				/* HAVE_ALLOCA */
 
-typedef void *(*gnutls_alloc_function) (size_t);
-typedef int (*gnutls_is_secure_function) (const void *);
-typedef void (*gnutls_free_function) (void *);
-typedef void *(*gnutls_realloc_function) (void *, size_t);
-
 extern gnutls_alloc_function gnutls_secure_malloc;
 extern gnutls_alloc_function gnutls_malloc;
 extern gnutls_free_function gnutls_free;

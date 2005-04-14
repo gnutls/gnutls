@@ -98,7 +98,7 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 				   unsigned int *status)
 {
     cert_auth_info_t info;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     gnutls_x509_crt_t *peer_certificate_list;
     int peer_certificate_list_size, i, x, ret;
 

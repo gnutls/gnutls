@@ -41,7 +41,6 @@
 #include <sign.h>
 #include <extensions.h>
 #include <libtasn1.h>
-#include <gnutls_ui.h>
 
 /**
   * gnutls_x509_crq_init - This function initializes a gnutls_x509_crq_t structure

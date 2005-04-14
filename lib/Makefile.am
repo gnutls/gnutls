@@ -26,7 +26,8 @@ SUBDIRS += minitasn1
 endif
 
 AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl			\
-	-I$(top_srcdir)/includes -I$(srcdir)/x509			\
+	-I$(top_srcdir)/includes -I../includes				\
+	-I$(srcdir)/x509						\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/libextra/openpgp/	\
 	-I$(top_srcdir)/libextra/opencdk 				\
 	$(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
@@ -79,7 +80,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_errors_int.h gnutls_datum.h auth_cert.h gnutls_mpi.h	\
 	gnutls_pk.h gnutls_record.h gnutls_cert.h gnutls_constate.h	\
 	gnutls_global.h strfile.h gnutls_sig.h gnutls_mem.h		\
-	gnutls_ui.h io_debug.h ext_max_record.h gnutls_session_pack.h	\
+	io_debug.h ext_max_record.h gnutls_session_pack.h	\
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h	\
 	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h		\
 	auth_dh_common.h ext_srp.h gnutls_srp.h auth_srp.h		\

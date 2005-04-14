@@ -376,7 +376,7 @@ static int call_get_cert_callback(gnutls_session_t session,
     gnutls_retr_st st;
     int ret;
     gnutls_certificate_type_t type = gnutls_certificate_type_get(session);
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -473,7 +473,7 @@ static int _select_client_cert(gnutls_session_t session,
 {
     int result;
     int indx = -1;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     opaque *data = _data;
     ssize_t data_size = _data_size;
     int issuers_dn_length;
@@ -773,7 +773,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session_t session,
     int size, len, ret;
     opaque *p = data;
     cert_auth_info_t info;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     ssize_t dsize = data_size;
     int i, j, x;
     gnutls_cert *peer_certificate_list;
@@ -901,7 +901,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session_t session,
     int size, ret, len;
     opaque *p = data;
     cert_auth_info_t info;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     ssize_t dsize = data_size;
     int i, x;
     gnutls_cert *peer_certificate_list = NULL;
@@ -1097,7 +1097,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session_t session, opaque * data,
 {
     int size, ret;
     opaque *p;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     cert_auth_info_t info;
     ssize_t dsize;
     int i, j;
@@ -1268,7 +1268,7 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session_t session,
 int _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 				     opaque ** data)
 {
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     int size;
     opaque *pdata;
 
@@ -1543,7 +1543,7 @@ int _gnutls_server_select_cert(gnutls_session_t session,
 {
     uint i;
     int index, ret;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {

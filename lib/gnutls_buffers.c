@@ -780,7 +780,7 @@ ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session)
  */
 ssize_t _gnutls_handshake_io_send_int(gnutls_session_t session,
 				      content_type_t type,
-				      handshake_t htype,
+				      gnutls_handshake_description_t htype,
 				      const void *iptr, size_t n)
 {
     size_t left;
@@ -898,7 +898,7 @@ ssize_t _gnutls_handshake_io_send_int(gnutls_session_t session,
  */
 ssize_t _gnutls_handshake_io_recv_int(gnutls_session_t session,
 				      content_type_t type,
-				      handshake_t htype, void *iptr,
+				      gnutls_handshake_description_t htype, void *iptr,
 				      size_t sizeOfPtr)
 {
     size_t left;

@@ -68,38 +68,38 @@ const char *_gnutls_packet2str(content_type_t packet)
     }
 }
 
-const char *_gnutls_handshake2str(handshake_t handshake)
+const char *_gnutls_handshake2str(gnutls_handshake_description_t handshake)
 {
 
     switch (handshake) {
-    case GNUTLS_HELLO_REQUEST:
+    case GNUTLS_HANDSHAKE_HELLO_REQUEST:
 	return "HELLO REQUEST";
 	break;
-    case GNUTLS_CLIENT_HELLO:
+    case GNUTLS_HANDSHAKE_CLIENT_HELLO:
 	return "CLIENT HELLO";
 	break;
-    case GNUTLS_SERVER_HELLO:
+    case GNUTLS_HANDSHAKE_SERVER_HELLO:
 	return "SERVER HELLO";
 	break;
-    case GNUTLS_CERTIFICATE_PKT:
+    case GNUTLS_HANDSHAKE_CERTIFICATE_PKT:
 	return "CERTIFICATE";
 	break;
-    case GNUTLS_SERVER_KEY_EXCHANGE:
+    case GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE:
 	return "SERVER KEY EXCHANGE";
 	break;
-    case GNUTLS_CERTIFICATE_REQUEST:
+    case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
 	return "CERTIFICATE REQUEST";
 	break;
-    case GNUTLS_SERVER_HELLO_DONE:
+    case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
 	return "SERVER HELLO DONE";
 	break;
-    case GNUTLS_CERTIFICATE_VERIFY:
+    case GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY:
 	return "CERTIFICATE VERIFY";
 	break;
-    case GNUTLS_CLIENT_KEY_EXCHANGE:
+    case GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE:
 	return "CLIENT KEY EXCHANGE";
 	break;
-    case GNUTLS_FINISHED:
+    case GNUTLS_HANDSHAKE_FINISHED:
 	return "FINISHED";
 	break;
     default:

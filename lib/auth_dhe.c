@@ -89,7 +89,7 @@ static int gen_dhe_server_kx(gnutls_session_t session, opaque ** data)
     gnutls_privkey *apr_pkey;
     int apr_cert_list_length;
     gnutls_datum_t signature, ddata;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     gnutls_dh_params_t dh_params;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -228,7 +228,7 @@ static int proc_dhe_server_kx(gnutls_session_t session, opaque * data,
 static int proc_dhe_client_kx(gnutls_session_t session, opaque * data,
 			      size_t _data_size)
 {
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     int ret;
     mpi_t p, g;
     const mpi_t *mpis;

@@ -80,7 +80,7 @@ static int gen_rsa_export_server_kx(gnutls_session_t session,
     int apr_cert_list_length;
     gnutls_datum_t signature, ddata;
     cert_auth_info_t info;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {

@@ -27,24 +27,13 @@
 
 #include <gnutls_auth.h>
 
-typedef int gnutls_srp_server_credentials_function(gnutls_session_t,
-   const char *username, gnutls_datum_t * salt,
-   gnutls_datum_t *verifier, gnutls_datum_t *generator,
-   gnutls_datum_t * prime);
-
-typedef int gnutls_srp_client_credentials_function(gnutls_session_t,
-   unsigned int times, char **username, char **password);
-
-
-typedef struct {
+typedef struct gnutls_srp_client_credentials_st {
     char *username;
     char *password;
     gnutls_srp_client_credentials_function *get_function;
 } srp_client_credentials_st;
 
-#define gnutls_srp_client_credentials_t srp_client_credentials_st*
-
-typedef struct {
+typedef struct gnutls_srp_server_credentials_st {
     char *password_file;
     char *password_conf_file;
     /* callback function, instead of reading the
@@ -52,8 +41,6 @@ typedef struct {
      */
     gnutls_srp_server_credentials_function *pwd_callback;
 } srp_server_cred_st;
-
-#define gnutls_srp_server_credentials_t srp_server_cred_st*
 
 /* these structures should not use allocated data */
 typedef struct srp_server_auth_info_st {

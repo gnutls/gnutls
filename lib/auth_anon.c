@@ -67,7 +67,7 @@ static int gen_anon_server_kx(gnutls_session_t session, opaque ** data)
     const mpi_t *mpis;
     int ret;
     gnutls_dh_params_t dh_params;
-    const gnutls_anon_server_credentials_t cred;
+    gnutls_anon_server_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
     if (cred == NULL) {
@@ -106,7 +106,7 @@ static int gen_anon_server_kx(gnutls_session_t session, opaque ** data)
 static int proc_anon_client_kx(gnutls_session_t session, opaque * data,
 			       size_t _data_size)
 {
-    const gnutls_anon_server_credentials_t cred;
+    gnutls_anon_server_credentials_t cred;
     int bits;
     int ret;
     mpi_t p, g;

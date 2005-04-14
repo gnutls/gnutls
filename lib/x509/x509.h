@@ -89,10 +89,6 @@ typedef struct gnutls_x509_privkey_int {
     ASN1_TYPE key;
 } gnutls_x509_privkey_int;
 
-typedef struct gnutls_x509_crt_int *gnutls_x509_crt_t;
-typedef struct gnutls_x509_crl_int *gnutls_x509_crl_t;
-typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey_t;
-
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
 					 const char *oid, int indx,
 					 unsigned int raw_flag, void *buf,

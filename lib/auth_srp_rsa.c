@@ -83,7 +83,7 @@ static int gen_srp_cert_server_kx(gnutls_session_t session, opaque ** data)
 {
     ssize_t ret, data_size;
     gnutls_datum_t signature, ddata;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     gnutls_cert *apr_cert_list;
     gnutls_privkey *apr_pkey;
     int apr_cert_list_length;

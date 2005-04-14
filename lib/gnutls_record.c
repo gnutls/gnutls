@@ -254,12 +254,12 @@ inline static int session_is_valid(gnutls_session_t session)
  * version must have 2 bytes at least.
  */
 inline static
-void copy_record_version(gnutls_session_t session, handshake_t htype,
+void copy_record_version(gnutls_session_t session, gnutls_handshake_description_t htype,
 			 opaque version[2])
 {
     gnutls_protocol_t lver;
 
-    if (htype != GNUTLS_CLIENT_HELLO
+    if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
 	|| session->internals.default_record_version[0] == 0) {
 	lver = gnutls_protocol_get_version(session);
 
@@ -286,7 +286,7 @@ void copy_record_version(gnutls_session_t session, handshake_t htype,
  *
  */
 ssize_t _gnutls_send_int(gnutls_session_t session, content_type_t type,
-			 handshake_t htype, const void *_data,
+			 gnutls_handshake_description_t htype, const void *_data,
 			 size_t sizeofdata)
 {
     uint8 *cipher;
@@ -494,7 +494,7 @@ static int check_buffers(gnutls_session_t session, content_type_t type,
  */
 static
 int record_check_headers(gnutls_session_t session,
-    uint8 headers[RECORD_HEADER_SIZE], content_type_t type, handshake_t htype,
+    uint8 headers[RECORD_HEADER_SIZE], content_type_t type, gnutls_handshake_description_t htype,
     /*output */ content_type_t * recv_type, opaque version[2], uint16 * length,
     uint16 * header_size)
 {
@@ -503,7 +503,7 @@ int record_check_headers(gnutls_session_t session,
      * version 2 message 
      */
 
-    if (htype == GNUTLS_CLIENT_HELLO && type == GNUTLS_HANDSHAKE
+    if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && type == GNUTLS_HANDSHAKE
 	&& headers[0] > 127) {
 
 	/* if msb set and expecting handshake message
@@ -547,9 +547,9 @@ int record_check_headers(gnutls_session_t session,
  */
 inline
     static int record_check_version(gnutls_session_t session,
-				    handshake_t htype, opaque version[2])
+				    gnutls_handshake_description_t htype, opaque version[2])
 {
-    if (htype == GNUTLS_CLIENT_HELLO) {
+    if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO) {
 	/* Reject hello packets with major version higher than 3.
 	 */
 	if (version[0] > 3) {
@@ -559,7 +559,7 @@ inline
 		 htype, version[0], version[1]);
 	    return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
-    } else if (htype != GNUTLS_SERVER_HELLO &&
+    } else if (htype != GNUTLS_HANDSHAKE_SERVER_HELLO &&
 	       gnutls_protocol_get_version(session) !=
 	       _gnutls_version_get(version[0], version[1])) {
 	/* Reject record packets that have a different version than the
@@ -581,7 +581,7 @@ inline
  */
 static int record_check_type(gnutls_session_t session,
     content_type_t recv_type, content_type_t type,
-    handshake_t htype, opaque * data, int data_size)
+    gnutls_handshake_description_t htype, opaque * data, int data_size)
 {
 
     int ret;
@@ -648,7 +648,7 @@ static int record_check_type(gnutls_session_t session,
 	     * if expecting client hello (for rehandshake
 	     * reasons). Otherwise it is an unexpected packet
 	     */
-	    if (type==GNUTLS_ALERT || (htype == GNUTLS_CLIENT_HELLO
+	    if (type==GNUTLS_ALERT || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
 		&& type == GNUTLS_HANDSHAKE))
 		return GNUTLS_E_GOT_APPLICATION_DATA;
 	    else {
@@ -736,10 +736,10 @@ inline
  * receive (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
  *
- * The handshake_t was introduced to support SSL V2.0 client hellos.
+ * The gnutls_handshake_description_t was introduced to support SSL V2.0 client hellos.
  */
 ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
-			 handshake_t htype, opaque * data,
+			 gnutls_handshake_description_t htype, opaque * data,
 			 size_t sizeofdata)
 {
     gnutls_datum_t tmp;

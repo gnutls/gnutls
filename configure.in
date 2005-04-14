@@ -497,9 +497,6 @@ AC_CONFIG_FILES(lib/gnutls.h.in)
 AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
  test -f lib/gnutls.h.in || (echo "Could not generate includes/gnutls/gnutls.h" && exit 1)
  cat lib/gnutls.h.in > includes/gnutls/gnutls.h
- cat $srcdir/lib/gnutls_ui.h >> includes/gnutls/gnutls.h
- echo "" >> includes/gnutls/gnutls.h
- cat $srcdir/lib/gnutls_errors_int.h | grep -v _INT_ >> includes/gnutls/gnutls.h
  echo "" >> includes/gnutls/gnutls.h
  echo "#ifdef __cplusplus" >> includes/gnutls/gnutls.h
  echo "}" >> includes/gnutls/gnutls.h

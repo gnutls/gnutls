@@ -364,7 +364,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
   **/
 const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
 {
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
 
     CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 

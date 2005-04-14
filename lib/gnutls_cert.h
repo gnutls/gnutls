@@ -27,7 +27,6 @@
 
 #include <gnutls_pk.h>
 #include <libtasn1.h>
-#include <gnutls_ui.h>
 #include "x509/x509.h"
 
 #define MAX_PUBLIC_PARAMS_SIZE 4	/* ok for RSA and DSA */

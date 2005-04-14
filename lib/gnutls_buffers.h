@@ -56,9 +56,9 @@ int _gnutls_handshake_buffer_get_ptr(gnutls_session_t session,
         session->internals.handshake_send_buffer_prev_size = 0
 
 ssize_t _gnutls_handshake_io_recv_int(gnutls_session_t, content_type_t,
-				      handshake_t, void *, size_t);
+				      gnutls_handshake_description_t, void *, size_t);
 ssize_t _gnutls_handshake_io_send_int(gnutls_session_t, content_type_t,
-				      handshake_t, const void *, size_t);
+				      gnutls_handshake_description_t, const void *, size_t);
 ssize_t _gnutls_io_write_flush(gnutls_session_t session);
 ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session);
 

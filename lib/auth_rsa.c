@@ -142,7 +142,7 @@ int _gnutls_get_private_rsa_params(gnutls_session_t session,
 				   mpi_t ** params, int *params_size)
 {
     int bits;
-    const gnutls_certificate_credentials_t cred;
+    gnutls_certificate_credentials_t cred;
     gnutls_rsa_params_t rsa_params;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);

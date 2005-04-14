@@ -41,7 +41,6 @@
 #include <sign.h>
 #include <extensions.h>
 #include <libtasn1.h>
-#include <gnutls_ui.h>
 
 static void disable_optional_stuff(gnutls_x509_crl_t crl);
 
