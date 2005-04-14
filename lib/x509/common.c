@@ -223,6 +223,8 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
 	if (res)
 	    _gnutls_str_cpy(res, *res_size, str);
 	*res_size = len;
+
+	asn1_delete_structure(&tmpasn);
     } else {			/* CHOICE */
 	int non_printable = 0, teletex = 0;
 	str[len] = 0;
