@@ -36,7 +36,6 @@
 #include "gnutls_mpi.h"
 #include <gnutls_state.h>
 #include <gnutls_datum.h>
-#include <gnutls_alert.h>
 #include <gnutls_rsa_export.h>
 
 /* This file contains important thing for the TLS handshake procedure.

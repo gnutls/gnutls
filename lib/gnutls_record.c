@@ -43,7 +43,6 @@
 #include "gnutls_datum.h"
 #include "ext_max_record.h"
 #include <gnutls_state.h>
-#include <gnutls_alert.h>
 #include <gnutls_dh.h>
 
 /**

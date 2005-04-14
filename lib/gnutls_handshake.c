@@ -46,7 +46,6 @@
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
 #include <gnutls_record.h>
-#include <gnutls_alert.h>
 #include <gnutls_state.h>
 #include <ext_srp.h>
 #include <gnutls_rsa_export.h>	/* for gnutls_get_rsa_params() */

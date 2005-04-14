@@ -60,20 +60,10 @@ int _gnutls_srp_recv_params(gnutls_session_t session, const opaque * data,
 	    }
 	    memcpy(session->security_parameters.extensions.srp_username,
 		   &data[1], len);
-	    session->security_parameters.extensions.srp_username[len] = 0;	/* null terminated */
+	    /* null terminated */
+	    session->security_parameters.extensions.srp_username[len] = 0;
 	}
     }
-    return 0;
-}
-
-/* Checks if the given cipher suite is an SRP one
- */
-inline static int is_srp(cipher_suite_st suite)
-{
-    int kx = _gnutls_cipher_suite_get_kx_algo(&suite);
-
-    if (IS_SRP_KX(kx))
-	return 1;
     return 0;
 }
 
@@ -117,10 +107,10 @@ int _gnutls_srp_send_params(gnutls_session_t session, opaque * data,
 	     */
 	    char *username = NULL, *password = NULL;
 
-	    if (cred->
-		get_function(session,
-			     session->internals.handshake_restarted,
-			     &username, &password) < 0 || username == NULL
+	    if (cred-> get_function(session,
+				    session->internals.handshake_restarted,
+				    &username, &password) < 0
+		|| username == NULL
 		|| password == NULL) {
 
 		if (session->internals.handshake_restarted) {

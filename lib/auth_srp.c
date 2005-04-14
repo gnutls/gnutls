@@ -36,7 +36,6 @@
 #include "auth_srp.h"
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <gnutls_alert.h>
 
 int _gnutls_gen_srp_server_kx(gnutls_session_t, opaque **);
 int _gnutls_gen_srp_client_kx(gnutls_session_t, opaque **);
