@@ -504,17 +504,17 @@ AC_CONFIG_COMMANDS([chmod-config],[[
  chmod +x libextra/libgnutls-extra-config
 ]],[[]])
 
-AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
-	libextra/openpgp/Makefile libextra/opencdk/Makefile \
-	doc/reference/Makefile \
-	lib/libgnutls-config libextra/libgnutls-extra-config \
-	doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
-	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
-	doc/scripts/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
-	includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile \
+AC_CONFIG_FILES([Makefile \
+	doc/Makefile doc/scripts/Makefile \
+	doc/manpages/Makefile doc/reference/Makefile \
 	gl/Makefile nettle/Makefile nettle/tests/Makefile \
 	crypto/Makefile tests/Makefile \
-	lib/gnutls.pc libextra/gnutls-extra.pc \
-	includes/gnutls/gnutls.h])
+	includes/Makefile includes/gnutls/gnutls.h \
+	lib/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
+	libextra/Makefile libextra/openpgp/Makefile libextra/opencdk/Makefile \
+	src/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
+	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
+	lib/libgnutls-config libextra/libgnutls-extra-config \
+	lib/gnutls.pc libextra/gnutls-extra.pc])
 
 AC_OUTPUT

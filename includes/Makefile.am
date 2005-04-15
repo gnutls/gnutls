@@ -19,11 +19,11 @@
 # along with GNUTLS; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-nobase_include_HEADERS = gnutls/extra.h gnutls/gnutls.h gnutls/x509.h	\
-	gnutls/pkcs12.h gnutls/compat.h gnutls/openpgp.h
+nobase_include_HEADERS = gnutls/extra.h gnutls/x509.h gnutls/pkcs12.h	\
+	gnutls/compat.h gnutls/openpgp.h
 
 if ENABLE_OPENSSL
 nobase_include_HEADERS += gnutls/openssl.h
 endif
 
-SUBDIRS = gnutls
+nobase_nodist_include_HEADERS = gnutls/gnutls.h
