@@ -42,6 +42,8 @@ extern "C" {
 
 #define LIBGNUTLS_VERSION "@VERSION@"
 
+@POSSIBLY_WARN_ABOUT_MISSING_FEATURES@
+
 /* Get size_t. */
 #include <stddef.h>
 
@@ -866,3 +868,9 @@ int gnutls_srp_base64_decode_alloc( const gnutls_datum_t *b64_data,
 #define GNUTLS_E_RANDOM_FAILED -206
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* GNUTLS_H */

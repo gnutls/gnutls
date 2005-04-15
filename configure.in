@@ -492,37 +492,29 @@ AC_MSG_WARN(***
 	fi
 fi
 
-AC_CONFIG_FILES(lib/gnutls.h.in)
-
-AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
- test -f lib/gnutls.h.in || (echo "Could not generate includes/gnutls/gnutls.h" && exit 1)
- cat lib/gnutls.h.in > includes/gnutls/gnutls.h
- echo "" >> includes/gnutls/gnutls.h
- echo "#ifdef __cplusplus" >> includes/gnutls/gnutls.h
- echo "}" >> includes/gnutls/gnutls.h
- echo "#endif" >> includes/gnutls/gnutls.h
-
 if test $ac_full -eq 0; then
- echo "#ifdef __GNUC__" >> includes/gnutls/gnutls.h
- echo "#warning This is not the official GnuTLS library. Several features were disabled at compilation." >> includes/gnutls/gnutls.h
- echo "#endif /* __GNUC__ */" >> includes/gnutls/gnutls.h
+  AC_SUBST(POSSIBLY_WARN_ABOUT_MISSING_FEATURES, [[
+#ifdef __GNUC__
+#warning This is not the official GnuTLS library. Several features were disabled at compilation.
+#endif /* __GNUC__ */]])
 fi
 
- echo "#endif /* GNUTLS_H */" >> includes/gnutls/gnutls.h
- echo "" >> includes/gnutls/gnutls.h
+AC_CONFIG_COMMANDS([chmod-config],[[
  chmod +x lib/libgnutls-config
  chmod +x libextra/libgnutls-extra-config
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
-libextra/openpgp/Makefile libextra/opencdk/Makefile doc/reference/Makefile \
-lib/libgnutls-config libextra/libgnutls-extra-config \
-doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
-src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
-doc/scripts/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
-includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile \
-gl/Makefile nettle/Makefile nettle/tests/Makefile \
-crypto/Makefile tests/Makefile \
-lib/gnutls.pc libextra/gnutls-extra.pc])
+	libextra/openpgp/Makefile libextra/opencdk/Makefile \
+	doc/reference/Makefile \
+	lib/libgnutls-config libextra/libgnutls-extra-config \
+	doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
+	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
+	doc/scripts/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
+	includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile \
+	gl/Makefile nettle/Makefile nettle/tests/Makefile \
+	crypto/Makefile tests/Makefile \
+	lib/gnutls.pc libextra/gnutls-extra.pc \
+	includes/gnutls/gnutls.h])
 
 AC_OUTPUT
