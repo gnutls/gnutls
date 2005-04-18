@@ -1027,8 +1027,6 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     time_t tim;
     char serial[40];
     size_t serial_size = sizeof(serial), dn_size, size;
-    char printable[256];
-    char *print;
     const char *cprint;
     char dn[256];
     char oid[128] = "";
@@ -1042,12 +1040,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     /* serial number
      */
     if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
-	print = printable;
-	for (i = 0; i < serial_size; i++) {
-	    sprintf(print, "%.2x ", (unsigned char) serial[i]);
-	    print += 3;
-	}
-	fprintf(out, "Serial Number (hex): %s\n", printable);
+	fprintf(out, "Serial Number (hex): %s\n", raw_to_string(serial, serial_size));
     }
 
     /* Subject
@@ -1279,13 +1272,8 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     }
 
     if (ret >= 0) {
-	print = printable;
-	for (i = 0; i < size; i++) {
-	    sprintf(print, "%.2x ", (unsigned char) buffer[i]);
-	    print += 3;
-	}
 	fprintf(out, "\tSubject Key ID: %s\n\t\t%s\n",
-		critical ? "(critical)" : "", printable);
+		critical ? "(critical)" : "", raw_to_string( buffer, size));
     }
 
     /* Authority Key ID 
@@ -1301,13 +1289,8 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     }
 
     if (ret >= 0) {
-	print = printable;
-	for (i = 0; i < size; i++) {
-	    sprintf(print, "%.2x ", (unsigned char) buffer[i]);
-	    print += 3;
-	}
 	fprintf(out, "\tAuthority Key ID: %s\n\t\t%s\n",
-		critical ? "(critical)" : "", printable);
+		critical ? "(critical)" : "", raw_to_string(buffer,size));
     }
 
     /* other extensions:
@@ -1376,12 +1359,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 	    fprintf(out, "Error in fingerprint calculation: %s\n",
 		    gnutls_strerror(ret));
 	} else {
-	    print = printable;
-	    for (i = 0; i < size; i++) {
-		sprintf(print, "%.2x ", (unsigned char) buffer[i]);
-		print += 3;
-	    }
-	    fprintf(out, "\tMD5 Fingerprint: %s\n", printable);
+	    fprintf(out, "\tMD5 Fingerprint: %s\n", raw_to_string( buffer, size));
 	}
 
 	size = sizeof(buffer);
@@ -1391,12 +1369,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 	    fprintf(out, "Error in fingerprint calculation: %s\n",
 		    gnutls_strerror(ret));
 	} else {
-	    print = printable;
-	    for (i = 0; i < size; i++) {
-		sprintf(print, "%.2x ", (unsigned char) buffer[i]);
-		print += 3;
-	    }
-	    fprintf(out, "\tSHA1 Fingerprint: %s\n", printable);
+	    fprintf(out, "\tSHA1 Fingerprint: %s\n", raw_to_string( buffer, size));
 	}
 
     }
@@ -1406,12 +1379,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 	fprintf(out, "Error in key id calculation: %s\n",
 		gnutls_strerror(ret));
     } else {
-	print = printable;
-	for (i = 0; i < size; i++) {
-	    sprintf(print, "%.2x ", (unsigned char) buffer[i]);
-	    print += 3;
-	}
-	fprintf(out, "\tPublic Key ID: %s\n", printable);
+	fprintf(out, "\tPublic Key ID: %s\n", raw_to_string( buffer, size));
     }
 
     fprintf(out, "\n");
@@ -1429,8 +1397,7 @@ static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all)
     unsigned int i, j;
     char serial[128];
     size_t serial_size = sizeof(serial), dn_size;
-    char printable[256];
-    char *print, dn[256];
+    char dn[256];
     const char *cprint;
 
     fprintf(out, "CRL information:\n");
@@ -1483,12 +1450,7 @@ static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all)
 	if (ret < 0) {
 	    fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
 	} else {
-	    print = printable;
-	    for (i = 0; i < serial_size; i++) {
-		sprintf(print, "%.2x ", (unsigned char) serial[i]);
-		print += 3;
-	    }
-	    fprintf(out, "\tCertificate SN: %s\n", printable);
+	    fprintf(out, "\tCertificate SN: %s\n", raw_to_string(serial, serial_size));
 	    fprintf(out, "\tRevoked at: %s\n", ctime(&tim));
 	}
     }
@@ -1537,8 +1499,6 @@ void privkey_info(void)
     int ret;
     unsigned int i;
     gnutls_datum pem;
-    char printable[256];
-    char *print;
     const char *cprint;
     const char *pass;
 
@@ -1630,12 +1590,7 @@ void privkey_info(void)
 	fprintf(stderr, "Error in key id calculation: %s\n",
 		gnutls_strerror(ret));
     } else {
-	print = printable;
-	for (i = 0; i < size; i++) {
-	    sprintf(print, "%.2x ", (unsigned char) buffer[i]);
-	    print += 3;
-	}
-	fprintf(outfile, "Public Key ID: %s\n", printable);
+	fprintf(outfile, "Public Key ID: %s\n", raw_to_string( buffer, size));
     }
 
     size = sizeof(buffer);
