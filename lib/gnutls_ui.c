@@ -594,8 +594,7 @@ void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t
   **/
 void
 gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t
-					 res,
-					 gnutls_rsa_params_t rsa_params)
+    res, gnutls_rsa_params_t rsa_params)
 {
     res->rsa_params = rsa_params;
 }

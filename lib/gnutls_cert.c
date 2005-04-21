@@ -134,10 +134,7 @@ void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc)
   *
   -*/
 gnutls_dh_params_t _gnutls_certificate_get_dh_params(const
-						     gnutls_certificate_credentials_t
-						     sc,
-						     gnutls_session_t
-						     session)
+    gnutls_certificate_credentials_t sc, gnutls_session_t session)
 {
     gnutls_params_st params;
     int ret;
@@ -167,10 +164,7 @@ gnutls_dh_params_t _gnutls_certificate_get_dh_params(const
   *
   -*/
 gnutls_rsa_params_t _gnutls_certificate_get_rsa_params(const
-						       gnutls_certificate_credentials_t
-						       sc,
-						       gnutls_session_t
-						       session)
+    gnutls_certificate_credentials_t sc, gnutls_session_t session)
 {
     gnutls_params_st params;
     int ret;
@@ -253,8 +247,7 @@ gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t *
  * extensions in order to disable unneded algorithms.
  */
 int _gnutls_selected_cert_supported_kx(gnutls_session_t session,
-				       gnutls_kx_algorithm_t ** alg,
-				       int *alg_size)
+    gnutls_kx_algorithm_t ** alg, int *alg_size)
 {
     gnutls_kx_algorithm_t kx;
     gnutls_pk_algorithm_t pk;
@@ -312,8 +305,7 @@ int _gnutls_selected_cert_supported_kx(gnutls_session_t session,
   * send a certificate.
   **/
 void gnutls_certificate_server_set_request(gnutls_session_t session,
-					   gnutls_certificate_request_t
-					   req)
+    gnutls_certificate_request_t req)
 {
     session->internals.send_cert_req = req;
 }
@@ -398,7 +390,7 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
   *
   -*/
 int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session,
-				      unsigned int *status)
+    unsigned int *status)
 {
     cert_auth_info_t info;
     gnutls_certificate_credentials_t cred;
@@ -610,9 +602,8 @@ OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
 OPENPGP_RAW_PRIVKEY_TO_GKEY _E_gnutls_openpgp_raw_privkey_to_gkey;
 
 int _gnutls_raw_cert_to_gcert(gnutls_cert * gcert,
-			      gnutls_certificate_type_t type,
-			      const gnutls_datum_t * raw_cert,
-			      int flags /* OR of ConvFlags */ )
+    gnutls_certificate_type_t type, const gnutls_datum_t * raw_cert,
+    int flags /* OR of ConvFlags */ )
 {
     switch (type) {
     case GNUTLS_CRT_X509:
@@ -630,9 +621,8 @@ int _gnutls_raw_cert_to_gcert(gnutls_cert * gcert,
 }
 
 int _gnutls_raw_privkey_to_gkey(gnutls_privkey * key,
-				gnutls_certificate_type_t type,
-				const gnutls_datum_t * raw_key,
-				int key_enc /* DER or PEM */ )
+    gnutls_certificate_type_t type, const gnutls_datum_t * raw_key,
+    int key_enc /* DER or PEM */ )
 {
     switch (type) {
     case GNUTLS_CRT_X509:
@@ -660,8 +650,7 @@ int _gnutls_raw_privkey_to_gkey(gnutls_privkey * key,
  * The critical extensions will be catched by the verification functions.
  */
 int _gnutls_x509_raw_cert_to_gcert(gnutls_cert * gcert,
-				   const gnutls_datum_t * derCert,
-				   int flags /* OR of ConvFlags */ )
+    const gnutls_datum_t * derCert, int flags /* OR of ConvFlags */ )
 {
     int ret;
     gnutls_x509_crt_t cert;
@@ -687,8 +676,8 @@ int _gnutls_x509_raw_cert_to_gcert(gnutls_cert * gcert,
 
 /* Like above but it accepts a parsed certificate instead.
  */
-int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt_t cert,
-			      unsigned int flags)
+int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, 
+    gnutls_x509_crt_t cert, unsigned int flags)
 {
     int ret = 0;
 

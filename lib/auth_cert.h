@@ -105,9 +105,13 @@ typedef struct cert_auth_info_st {
     int certificate_requested;	/* if the peer requested certificate
 				 * this is non zero;
 				 */
-    dh_info_st dh;
 
+    /* These (dh/rsa) are just copies from the credentials_t structure.
+     * They must not be freed.
+     */
+    dh_info_st dh;
     rsa_info_st rsa_export;
+
     gnutls_datum_t *raw_certificate_list;	/* holds the raw certificate of the
 						 * peer.
 						 */
