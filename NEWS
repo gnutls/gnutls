@@ -6,7 +6,7 @@ See the end for copying conditions.
 * Version 1.2.2
 - gnutls_error_to_alert() now considers
   GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET.
-- Fixed error in session resuming that could cause a creah in a session.
+- Fixed error in session resuming that could cause a crash in a session.
 - Fixed pkcs12 friendly name and local key identifier decoding.
 - Internal cleanups, removed duplicate typedef/struct definitions,
   and made source code include external include file, to check
