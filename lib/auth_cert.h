@@ -107,7 +107,7 @@ typedef struct cert_auth_info_st {
 				 */
 
     /* These (dh/rsa) are just copies from the credentials_t structure.
-     * They must not be freed.
+     * They must be freed.
      */
     dh_info_st dh;
     rsa_info_st rsa_export;
