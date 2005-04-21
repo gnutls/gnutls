@@ -82,7 +82,7 @@ static const gnutls_alert_entry sup_alerts[] = {
   * See gnutls_alert_get().
   *
   **/
-const char *gnutls_alert_get_name(gnutls_alert_level_t alert)
+const char *gnutls_alert_get_name(gnutls_alert_description_t alert)
 {
     const char *ret = NULL;
 
