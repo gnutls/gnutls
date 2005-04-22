@@ -262,9 +262,9 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
   * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate
-  * issuer specified by the given OID. The output will be encoded as
-  * described in RFC2253. The output string will be ASCII or UTF-8
-  * encoded, depending on the certificate data.
+  * issuer specified by the given OID. The output, if the raw flag is not
+  * used, will be encoded as described in RFC2253. Thus a string that is
+  * ASCII or UTF-8 encoded, depending on the certificate data.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * If raw flag is zero, this function will only return known OIDs as
@@ -366,7 +366,8 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
   * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate
-  * subject, specified by the given OID. The output string will be
+  * subject specified by the given OID. The output, if the raw flag is not
+  * used, will be encoded as described in RFC2253. Thus a string that is
   * ASCII or UTF-8 encoded, depending on the certificate data.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
