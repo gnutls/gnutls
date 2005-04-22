@@ -362,7 +362,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
-  * @buf: a pointer to a structure to hold the name (may be null)
+  * @buf: a pointer where the DN part will be copied (may be null).
   * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate
