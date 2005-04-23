@@ -279,6 +279,9 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
   * GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls function.
   * The peer may send alerts if he thinks some things were not 
   * right. Check gnutls.h for the available alert descriptions.
+  *
+  * If no alert has been received the returned value is undefined.
+  *
   **/
 gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session)
 {
