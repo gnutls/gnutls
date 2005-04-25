@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.2.2
+* Version 1.2.2 (2005-04-25)
 - gnutls_error_to_alert() now considers
   GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET.
 - Fixed error in session resuming that could cause a crash in a session.
@@ -12,7 +12,9 @@ See the end for copying conditions.
   and made source code include external include file, to check
   function prototypes during compile time.
 - API and ABI modifications:
-  No changes since last version.
+  No changes since last version.  At least not intentional, but due
+  to the include header changes, there may be inadvertant changes,
+  please let us know if you find any.
 
 * Version 1.2.1 (2005-04-04)
 - gnutls_bye() will no longer fail when RDWR is used and application
