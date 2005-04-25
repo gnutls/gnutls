@@ -29,14 +29,16 @@ endif
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi fdl.texi error_codes.texi			\
 	gnutls-api.texi gnutls-extra-api.texi x509-api.texi		\
-	pgp-api.texi examples/ex-client2.c examples/ex-session-info.c	\
-	examples/ex-verify.c examples/ex-cert-select.c			\
-	examples/ex-client-resume.c examples/ex-client-srp.c		\
+	pgp-api.texi examples/ex-client1.c examples/ex-client2.c	\
+	examples/ex-session-info.c examples/ex-verify.c			\
+	examples/ex-cert-select.c examples/ex-client-resume.c		\
+	examples/ex-client-srp.c examples/ex-rfc2818.c			\
 	examples/ex-serv1.c examples/ex-serv-export.c			\
-	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
-	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
-	examples/ex-pkcs12.c internals.eps internals.png layers.eps	\
-	layers.png pgp1.eps pgp1.png x509-1.eps x509-1.png
+	examples/ex-serv-anon.c examples/ex-serv-pgp.c			\
+	examples/ex-serv-srp.c examples/ex-alert.c			\
+	examples/ex-x509-info.c examples/ex-crq.c examples/ex-pkcs12.c	\
+	internals.eps internals.png layers.eps layers.png pgp1.eps	\
+	pgp1.png x509-1.eps x509-1.png
 
 AM_MAKEINFOHTMLFLAGS = --no-split
 
