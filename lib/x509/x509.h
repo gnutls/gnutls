@@ -71,6 +71,8 @@ typedef struct gnutls_x509_privkey_int {
      *      [3] is prime1 (p)
      *      [4] is prime2 (q)
      *      [5] is coefficient (u == inverse of p mod q)
+     *          note that other packages used inverse of q mod p,
+     *          so we need to perform conversions.
      * DSA: [0] is p
      *      [1] is q
      *      [2] is g

@@ -41,6 +41,11 @@
 static int _encode_rsa(ASN1_TYPE * c2, mpi_t * params);
 static int _encode_dsa(ASN1_TYPE * c2, mpi_t * params);
 
+/* remove this when libgcrypt can handle the PKCS #1 coefficients from
+ * rsa keys
+ */
+#define CALC_COEFF 1
+
 /**
   * gnutls_x509_privkey_init - This function initializes a gnutls_crl structure
   * @key: The structure to be initialized
@@ -198,7 +203,8 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
 	gnutls_assert();
 	goto error;
     }
-#if 1
+
+#ifdef CALC_COEFF
     /* Calculate the coefficient. This is because the gcrypt
      * library is uses the p,q in the reverse order.
      */
@@ -211,7 +217,7 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
     }
 
     _gnutls_mpi_invm(pkey->params[5], pkey->params[3], pkey->params[4]);
-    /*                              p, q */
+    /* p, q */
 #else
     if ((result = _gnutls_x509_read_int(pkey_asn, "coefficient",
 					&pkey->params[5])) < 0) {
@@ -326,8 +332,7 @@ static ASN1_TYPE decode_dsa_key(const gnutls_datum_t * raw_key,
   *
   **/
 int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
-			       const gnutls_datum_t * data,
-			       gnutls_x509_crt_fmt_t format)
+    const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;
     gnutls_datum_t _data;
@@ -441,12 +446,8 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
   * 
   **/
 int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
-				       const gnutls_datum_t * m,
-				       const gnutls_datum_t * e,
-				       const gnutls_datum_t * d,
-				       const gnutls_datum_t * p,
-				       const gnutls_datum_t * q,
-				       const gnutls_datum_t * u)
+    const gnutls_datum_t * m, const gnutls_datum_t * e, const gnutls_datum_t * d,
+    const gnutls_datum_t * p, const gnutls_datum_t * q, const gnutls_datum_t * u)
 {
     int i = 0, ret;
     size_t siz = 0;
@@ -491,12 +492,25 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
+#ifdef CALC_COEFF
+    key->params[5] =
+	_gnutls_mpi_snew(_gnutls_mpi_get_nbits(key->params[0]));
+
+    if (key->params[5] == NULL) {
+	gnutls_assert();
+	FREE_RSA_PRIVATE_PARAMS;
+	return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    _gnutls_mpi_invm(key->params[5], key->params[3], key->params[4]);
+#else
     siz = u->size;
     if (_gnutls_mpi_scan(&key->params[5], u->data, &siz)) {
 	gnutls_assert();
 	FREE_RSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
+#endif
 
     if (!key->crippled) {
 	ret = _encode_rsa(&key->key, key->params);
@@ -528,11 +542,8 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
   * 
   **/
 int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
-				       const gnutls_datum_t * p,
-				       const gnutls_datum_t * q,
-				       const gnutls_datum_t * g,
-				       const gnutls_datum_t * y,
-				       const gnutls_datum_t * x)
+    const gnutls_datum_t * p, const gnutls_datum_t * q, const gnutls_datum_t * g,
+    const gnutls_datum_t * y, const gnutls_datum_t * x)
 {
     int i = 0, ret;
     size_t siz = 0;
@@ -640,9 +651,7 @@ int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey_t key)
   *
   **/
 int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
-			       gnutls_x509_crt_fmt_t format,
-			       void *output_data,
-			       size_t * output_data_size)
+    gnutls_x509_crt_fmt_t format, void *output_data, size_t * output_data_size)
 {
     char *msg;
     int ret;
@@ -683,8 +692,7 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
     }
 
     return _gnutls_x509_export_int(key->key, format, msg,
-				   *output_data_size, output_data,
-				   output_data_size);
+	*output_data_size, output_data, output_data_size);
 }
 
 /**
@@ -703,77 +711,92 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
   * 
   **/
 int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey_t key,
-				       gnutls_datum_t * m,
-				       gnutls_datum_t * e,
-				       gnutls_datum_t * d,
-				       gnutls_datum_t * p,
-				       gnutls_datum_t * q,
-				       gnutls_datum_t * u)
+    gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
+    gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u)
 {
     int ret;
+    mpi_t coeff = NULL;
 
     if (key == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INVALID_REQUEST;
     }
+    
+    m->data=e->data=d->data=p->data=q->data=u->data=NULL;
+    m->size=e->size=d->size=p->size=q->size=u->size=0;
 
     ret = _gnutls_mpi_dprint(m, key->params[0]);
     if (ret < 0) {
 	gnutls_assert();
-	return ret;
+	goto error;
     }
 
     /* E */
     ret = _gnutls_mpi_dprint(e, key->params[1]);
     if (ret < 0) {
-	_gnutls_free_datum(m);
 	gnutls_assert();
-	return ret;
+	goto error;
     }
 
     /* D */
     ret = _gnutls_mpi_dprint(d, key->params[2]);
     if (ret < 0) {
-	_gnutls_free_datum(m);
-	_gnutls_free_datum(e);
 	gnutls_assert();
-	return ret;
+	goto error;
     }
 
     /* P */
     ret = _gnutls_mpi_dprint(p, key->params[3]);
     if (ret < 0) {
-	_gnutls_free_datum(m);
-	_gnutls_free_datum(d);
-	_gnutls_free_datum(e);
 	gnutls_assert();
-	return ret;
+	goto error;
     }
 
     /* Q */
     ret = _gnutls_mpi_dprint(q, key->params[4]);
     if (ret < 0) {
-	_gnutls_free_datum(m);
-	_gnutls_free_datum(d);
-	_gnutls_free_datum(e);
-	_gnutls_free_datum(p);
 	gnutls_assert();
-	return ret;
+	goto error;
     }
 
+#ifdef CALC_COEFF
+    coeff =
+	_gnutls_mpi_snew(_gnutls_mpi_get_nbits(key->params[0]));
+
+    if (coeff == NULL) {
+	gnutls_assert();
+	ret = GNUTLS_E_MEMORY_ERROR;
+	goto error;
+    }
+
+    _gnutls_mpi_invm(coeff, key->params[4], key->params[3]);
+    ret = _gnutls_mpi_dprint(u, coeff);
+    if (ret < 0) {
+	gnutls_assert();
+	goto error;
+    }
+
+    _gnutls_mpi_release( &coeff);
+#else
     /* U */
     ret = _gnutls_mpi_dprint(u, key->params[5]);
     if (ret < 0) {
-	_gnutls_free_datum(m);
-	_gnutls_free_datum(d);
-	_gnutls_free_datum(e);
-	_gnutls_free_datum(p);
-	_gnutls_free_datum(q);
 	gnutls_assert();
-	return ret;
+	goto error;
     }
+#endif
 
     return 0;
+
+error:
+    _gnutls_free_datum(m);
+    _gnutls_free_datum(d);
+    _gnutls_free_datum(e);
+    _gnutls_free_datum(p);
+    _gnutls_free_datum(q);
+    _gnutls_mpi_release( &coeff);
+    
+    return ret;
 }
 
 /**
@@ -791,11 +814,8 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey_t key,
   * 
   **/
 int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
-				       gnutls_datum_t * p,
-				       gnutls_datum_t * q,
-				       gnutls_datum_t * g,
-				       gnutls_datum_t * y,
-				       gnutls_datum_t * x)
+    gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * g,
+    gnutls_datum_t * y, gnutls_datum_t * x)
 {
     int ret;
 
@@ -864,12 +884,12 @@ static int _encode_rsa(ASN1_TYPE * c2, mpi_t * params)
     opaque *m_data, *pube_data, *prie_data;
     opaque *p1_data, *p2_data, *u_data, *exp1_data, *exp2_data;
     opaque *all_data = NULL, *p;
-    mpi_t exp1 = NULL, exp2 = NULL, q1 = NULL, p1 = NULL;
+    mpi_t exp1 = NULL, exp2 = NULL, q1 = NULL, p1 = NULL, u=NULL;
     opaque null = '\0';
 
     /* Read all the sizes */
     total = 0;
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < 5; i++) {
 	_gnutls_mpi_print_lz(NULL, &size[i], params[i]);
 	total += size[i];
     }
@@ -904,8 +924,20 @@ static int _encode_rsa(ASN1_TYPE * c2, mpi_t * params)
 	goto cleanup;
     }
 
-    _gnutls_mpi_add_ui(p1, params[3], -1);
-    _gnutls_mpi_add_ui(q1, params[4], -1);
+    u = _gnutls_mpi_salloc_like(params[3]);
+    if (u == NULL) {
+	gnutls_assert();
+	result = GNUTLS_E_MEMORY_ERROR;
+	goto cleanup;
+    }
+
+    _gnutls_mpi_invm(u, params[4], params[3]);
+    /* inverse of q mod p */
+    _gnutls_mpi_print_lz(NULL, &size[5], u);
+    total += size[5];
+
+    _gnutls_mpi_sub_ui(p1, params[3], 1);
+    _gnutls_mpi_sub_ui(q1, params[4], 1);
 
     _gnutls_mpi_mod(exp1, params[2], p1);
     _gnutls_mpi_mod(exp2, params[2], q1);
@@ -950,7 +982,7 @@ static int _encode_rsa(ASN1_TYPE * c2, mpi_t * params)
     _gnutls_mpi_print_lz(prie_data, &size[2], params[2]);
     _gnutls_mpi_print_lz(p1_data, &size[3], params[3]);
     _gnutls_mpi_print_lz(p2_data, &size[4], params[4]);
-    _gnutls_mpi_print_lz(u_data, &size[5], params[5]);
+    _gnutls_mpi_print_lz(u_data, &size[5], u);
     _gnutls_mpi_print_lz(exp1_data, &size[6], exp1);
     _gnutls_mpi_print_lz(exp2_data, &size[7], exp2);
 
@@ -1027,6 +1059,7 @@ static int _encode_rsa(ASN1_TYPE * c2, mpi_t * params)
     _gnutls_mpi_release(&exp2);
     _gnutls_mpi_release(&q1);
     _gnutls_mpi_release(&p1);
+    _gnutls_mpi_release(&u);
     gnutls_free(all_data);
 
     if ((result = asn1_write_value(*c2, "otherPrimeInfos",
@@ -1046,6 +1079,7 @@ static int _encode_rsa(ASN1_TYPE * c2, mpi_t * params)
     return 0;
 
   cleanup:
+    _gnutls_mpi_release(&u);
     _gnutls_mpi_release(&exp1);
     _gnutls_mpi_release(&exp2);
     _gnutls_mpi_release(&q1);

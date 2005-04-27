@@ -51,6 +51,7 @@ typedef gcry_mpi_t mpi_t;
 #define _gnutls_mpi_mul gcry_mpi_mul
 #define _gnutls_mpi_add gcry_mpi_add
 #define _gnutls_mpi_add_ui gcry_mpi_add_ui
+#define _gnutls_mpi_sub_ui gcry_mpi_sub_ui
 #define _gnutls_mpi_mul_ui gcry_mpi_mul_ui
 #define _gnutls_prime_check gcry_prime_check
 #define _gnutls_mpi_div gcry_mpi_div
