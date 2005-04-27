@@ -3,6 +3,11 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.2.3
+- Corrected bug in record packet parsing that could lead
+  to a denial of service attack.
+- Corrected bug in RSA key export.
+
 * Version 1.2.2 (2005-04-25)
 - gnutls_error_to_alert() now considers
   GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET.
