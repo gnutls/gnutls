@@ -6,7 +6,8 @@ See the end for copying conditions.
 * Version 1.2.3
 - Corrected bug in record packet parsing that could lead
   to a denial of service attack.
-- Corrected bug in RSA key export.
+- Corrected bug in RSA key export. Previously exported keys
+  can be fixed using certtool. Use certtool -k <infile >outfile
 - API and ABI modifications:
     gnutls_x509_privkey_fix(): Add.
 
