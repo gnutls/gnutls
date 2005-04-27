@@ -468,13 +468,12 @@ int _gnutls_ciphertext2compressed(gnutls_session_t session,
 
 	/* Check the pading bytes (TLS 1.x)
 	 */
-	if (ver >= GNUTLS_TLS1)
+	if (ver >= GNUTLS_TLS1 && pad_failed==0)
 	    for (i = 2; i < pad; i++) {
 		if (ciphertext.data[ciphertext.size - i] !=
 		    ciphertext.data[ciphertext.size - 1])
 		    pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 	    }
-
 	break;
     default:
 	gnutls_assert();
