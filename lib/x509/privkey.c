@@ -667,12 +667,8 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
     else
 	msg = NULL;
  
-    /* we encode the exported key anyway
-     */
-#if 0
     if (key->crippled) {	/* encode the parameters on the fly.
 				 */
-#endif
 	switch (key->pk_algorithm) {
 	case GNUTLS_PK_DSA:
 	    ret = _encode_dsa(&key->key, key->params);
@@ -692,13 +688,12 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 	    gnutls_assert();
 	    return GNUTLS_E_INVALID_REQUEST;
 	}
-#if 0
     }
-#endif
 
     return _gnutls_x509_export_int(key->key, format, msg,
 	*output_data_size, output_data, output_data_size);
 }
+
 
 /**
   * gnutls_x509_privkey_export_rsa_raw - This function will export the RSA private key
@@ -1457,6 +1452,50 @@ int gnutls_x509_privkey_verify_data(gnutls_x509_privkey_t key,
     }
 
     return result;
+}
+
+/**
+  * gnutls_x509_privkey_fix - This function will recalculate some parameters of the key.
+  * @key: Holds the key
+  *
+  * This function will recalculate the secondary parameters in a key.
+  * In RSA keys, this can be the coefficient and exponent1,2.
+  *
+  * Return value: In case of failure a negative value will be
+  *   returned, and 0 on success.
+  *
+  **/
+int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key)
+{
+    int ret;
+
+    if (key == NULL) {
+	gnutls_assert();
+	return GNUTLS_E_INVALID_REQUEST;
+    }
+
+    if (!key->crippled) asn1_delete_structure(&key->key);
+    switch (key->pk_algorithm) {
+	case GNUTLS_PK_DSA:
+	    ret = _encode_dsa(&key->key, key->params);
+	    if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	    }
+	    break;
+	case GNUTLS_PK_RSA:
+	    ret = _encode_rsa(&key->key, key->params);
+	    if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	    }
+	    break;
+	default:
+	    gnutls_assert();
+	    return GNUTLS_E_INVALID_REQUEST;
+    }
+
+    return 0;
 }
 
 #endif

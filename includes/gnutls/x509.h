@@ -379,6 +379,7 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
     const gnutls_datum_t *m, const gnutls_datum_t *e,
     const gnutls_datum_t *d, const gnutls_datum_t *p, const gnutls_datum_t *q, 
     const gnutls_datum_t *u);
+int gnutls_x509_privkey_fix(gnutls_x509_privkey_t key);
 
 int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
     gnutls_datum_t * p, gnutls_datum_t *q,

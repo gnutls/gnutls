@@ -1593,6 +1593,12 @@ void privkey_info(void)
 	fprintf(outfile, "Public Key ID: %s\n", raw_to_string( buffer, size));
     }
 
+    ret = gnutls_x509_privkey_fix( key);
+    if (ret < 0) {
+	fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+	exit(1);
+    }
+
     size = sizeof(buffer);
     ret =
 	gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM, buffer,
