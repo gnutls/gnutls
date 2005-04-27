@@ -144,9 +144,8 @@ int gnutls_x509_privkey_cpy(gnutls_x509_privkey_t dst,
 /* Converts an RSA PKCS#1 key to
  * an internal structure (gnutls_private_key)
  */
-ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
-					       raw_key,
-					       gnutls_x509_privkey_t pkey)
+ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(
+    const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 {
     int result;
     ASN1_TYPE pkey_asn;
@@ -667,9 +666,13 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 	msg = PEM_KEY_DSA;
     else
 	msg = NULL;
-
+ 
+    /* we encode the exported key anyway
+     */
+#if 0
     if (key->crippled) {	/* encode the parameters on the fly.
 				 */
+#endif
 	switch (key->pk_algorithm) {
 	case GNUTLS_PK_DSA:
 	    ret = _encode_dsa(&key->key, key->params);
@@ -689,7 +692,9 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 	    gnutls_assert();
 	    return GNUTLS_E_INVALID_REQUEST;
 	}
+#if 0
     }
+#endif
 
     return _gnutls_x509_export_int(key->key, format, msg,
 	*output_data_size, output_data, output_data_size);
