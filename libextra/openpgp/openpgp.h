@@ -92,8 +92,6 @@ void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey_t key);
 
 #else				/* no opencdk */
 
-typedef void *gnutls_openpgp_key_t;
-typedef void *gnutls_openpgp_privkey_t;
 typedef void *gnutls_openpgp_keyring_t;
 typedef void *gnutls_openpgp_trustdb_t;
 
