@@ -27,6 +27,7 @@
 #define GNUTLS_INT_H
 
 #include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
 
 #include <defines.h>
 
@@ -360,12 +361,6 @@ typedef struct {
     size_t packet_length;
     gnutls_handshake_description_t recv_type;
 } handshake_header_buffer_st;
-
-/* Openpgp key retrieval callback */
-typedef int (*gnutls_openpgp_recv_key_func) (struct gnutls_session_int *,
-					     const unsigned char *keyfpr,
-					     unsigned int keyfpr_length,
-					     gnutls_datum_t *);
 
 typedef struct {
     gnutls_buffer application_data_buffer;	/* holds data to be delivered to application layer */
