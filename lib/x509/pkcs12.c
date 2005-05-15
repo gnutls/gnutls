@@ -326,6 +326,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
     gnutls_datum_t attr_val;
     int count = 0, i, attributes, j;
     char counter[MAX_INT_DIGITS];
+    size_t size;
 
     /* Step 1. Extract the SEQUENCE.
      */
@@ -447,8 +448,11 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 		}
 
 		if (strcmp(oid, KEY_ID_OID) == 0) {
-		    result = _gnutls_x509_decode_octet_string( NULL, attr_val.data, attr_val.size,
-		        attr_val.data, &attr_val.size);
+		    size = attr_val.size;
+
+		    result = _gnutls_x509_decode_octet_string( NULL, attr_val.data, size,
+		        attr_val.data, &size);
+                    attr_val.size = size;
                     if (result < 0) {
  		       _gnutls_free_datum( &attr_val);
                         gnutls_assert();
@@ -458,8 +462,10 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
                     }
 		    bag->element[i].local_key_id = attr_val;
 		} else if (strcmp(oid, FRIENDLY_NAME_OID) == 0) {
-		    result = _gnutls_x509_decode_octet_string( "BMPString", attr_val.data, attr_val.size,
-		        attr_val.data, &attr_val.size);
+		    size = attr_val.size;
+		    result = _gnutls_x509_decode_octet_string( "BMPString", attr_val.data, size,
+		        attr_val.data, &size);
+                    attr_val.size = size;
                     if (result < 0) {
  		       _gnutls_free_datum( &attr_val);
                         gnutls_assert();
