@@ -755,7 +755,7 @@ int _gnutls_x509_decode_octet_string( const char* string_type,
     opaque* output, size_t* output_size)
 {
 ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-int result, tmp_output_size=*output_size;
+int result, tmp_output_size;
 char strname[64];
  
         if (string_type == NULL)
@@ -780,7 +780,7 @@ char strname[64];
 	    goto cleanup;
 	}
 
-
+        tmp_output_size = *output_size;
 	result = asn1_read_value(c2, "", output, &tmp_output_size);
 	*output_size = tmp_output_size;
 
