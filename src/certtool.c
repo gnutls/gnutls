@@ -946,8 +946,6 @@ void certificate_info(void)
     size = fread(buffer, 1, sizeof(buffer) - 1, infile);
     buffer[size] = 0;
 
-    gnutls_x509_crt_init(&crt);
-
     pem.data = buffer;
     pem.size = size;
 
