@@ -26,10 +26,10 @@
 
 #define GNUTLS_INT_H
 
+#include <defines.h>
+
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
-
-#include <defines.h>
 
 /*
  * They are not needed any more. You can simply enable
