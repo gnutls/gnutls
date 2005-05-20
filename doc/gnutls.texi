@@ -999,16 +999,17 @@ This algorithm exchanges Diffie Hellman parameters.
 @section Authentication using @acronym{SRP}
 @cindex @acronym{SRP} authentication
 
-Authentication using the @acronym{SRP}@footnote{@acronym{SRP} stands
-for Secure Remote Password, and is described in @cite{RFC2945}}. The
-@acronym{SRP} key exchange is an extension to the @acronym{TLS}
-protocol, and is actually password authentication.  The two peers can
-be identified using a single password, or there can be combinations
-where the client is authenticated using @acronym{SRP} and the server
-using a certificate.
+Authentication via the Secure Remote Password protocol,
+@acronym{SRP}@footnote{@acronym{SRP} is described in @cite{RFC2945}},
+is supported.  The @acronym{SRP} key exchange is an extension to the
+@acronym{TLS} protocol, and it is a password based authentication
+(unlike @acronym{X.509} or @acronym{OpenPGP} that uses certificates).
+The two peers can be identified using a single password, or there can
+be combinations where the client is authenticated using @acronym{SRP}
+and the server using a certificate.
 
 The advantage of @acronym{SRP} authentication, over other proposed
-secure password authentication schemas, is that @acronym{SRP} does not
+secure password authentication schemes, is that @acronym{SRP} does not
 require the server to hold the user's password.  This kind of
 protection is similar to the one used traditionally in the @emph{UNIX}
 @file{/etc/passwd} file, where the contents of this file did not cause
