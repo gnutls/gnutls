@@ -64,6 +64,9 @@ option (smime-to-p7) { $action = 15; } "Convert S/MIME to PKCS #7 structure."
 
 option (k, key-info) { $action = 6; } "Print information on a private key."
 
+#int fix_key;
+option (fix-key) { $fix_key = 1; } "Regenerate the parameters in a private key."
+
 option (to-p12) { $action = 8; } "Generate a PKCS #12 structure."
 
 #int pkcs8;
@@ -111,5 +114,5 @@ option ( copyright) { print_license(); exit(0); } "shows the program's license"
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; 
-	$export = 0; $template = NULL; $xml = 0; $hash=NULL; }
+	$export = 0; $template = NULL; $xml = 0; $hash=NULL; $fix_key = 0;}
 

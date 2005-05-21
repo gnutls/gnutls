@@ -1392,7 +1392,7 @@ static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all)
 {
     int ret, rc;
     time_t tim;
-    unsigned int i, j;
+    unsigned int j;
     char serial[128];
     size_t serial_size = sizeof(serial), dn_size;
     char dn[256];
@@ -1495,7 +1495,6 @@ void privkey_info(void)
     gnutls_x509_privkey key;
     size_t size;
     int ret;
-    unsigned int i;
     gnutls_datum pem;
     const char *cprint;
     const char *pass;
@@ -1591,10 +1590,12 @@ void privkey_info(void)
 	fprintf(outfile, "Public Key ID: %s\n", raw_to_string( buffer, size));
     }
 
-    ret = gnutls_x509_privkey_fix( key);
-    if (ret < 0) {
-	fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
-	exit(1);
+    if (info.fix_key != 0) {
+        ret = gnutls_x509_privkey_fix( key);
+        if (ret < 0) {
+  	    fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+	    exit(1);
+        }
     }
 
     size = sizeof(buffer);
