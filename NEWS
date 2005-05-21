@@ -3,6 +3,12 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.2.4
+- Corrected some bugs that could affect 64 bit systems.
+- Some corrections in the header files to include the prototype
+  of memmem properly (affected 64 bit systems). Report and patch
+  by Yoann Vandoorselaere <yoann@prelude-ids.org>.
+
 * Version 1.2.3 (2005-04-28)
 - Corrected bug in record packet parsing that could lead
   to a denial of service attack.
