@@ -47,9 +47,11 @@ static gnutls_datum_t mmap_file(const char *file)
 
     fstat(fd, &stat_st);
 
-    if ((ptr =
-	 mmap(NULL, stat_st.st_size, PROT_READ, MAP_SHARED, fd,
-	      0)) == MAP_FAILED)
+    ptr =
+        mmap(NULL, stat_st.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    close(fd);
+
+    if(ptr == MAP_FAILED)
 	return mmaped_file;
 
     mmaped_file.data = ptr;
