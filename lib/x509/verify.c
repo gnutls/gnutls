@@ -295,6 +295,24 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
     return result;
 }
 
+/**
+  * gnutls_x509_crt_check_issuer - This function checks if the certificate given has the given issuer
+  * @cert: is the certificate to be checked
+  * @issuer: is the certificate of a possible issuer
+  *
+  * This function will check if the given certificate was issued by the
+  * given issuer. It will return true (1) if the given certificate is issued
+  * by the given issuer, and false (0) if not.
+  *
+  * A negative value is returned in case of an error.
+  *
+  **/
+int gnutls_x509_crt_check_issuer(gnutls_x509_crt_t cert,
+				 gnutls_x509_crt_t issuer)
+{
+    return is_issuer(cert, issuer);
+}
+
 
 /* The algorithm used is:
  * 1. Check last certificate in the chain. If it is not verified return.
@@ -316,7 +334,6 @@ unsigned int _gnutls_x509_verify_certificate(
 {
     int i = 0, ret;
     unsigned int status = 0, output;
-
 
     /* Verify the last certificate in the certificate path
      * against the trusted CA certificate list.
@@ -353,6 +370,15 @@ unsigned int _gnutls_x509_verify_certificate(
     }
 #endif
 
+    /* Check if the last certificate in the path is self signed.
+     * In that case ignore it (a certificate is trusted only if it
+     * leads to a trusted party by us, not the server's).
+     */
+    if (gnutls_x509_crt_check_issuer( certificate_list[clist_size-1],
+        certificate_list[clist_size-1]) > 0 && clist_size > 0) {
+        clist_size--;
+    }
+
     /* Verify the certificate path (chain) 
      */
     for (i = clist_size-1; i > 0; i--) {
@@ -362,7 +388,8 @@ unsigned int _gnutls_x509_verify_certificate(
         /* note that here we disable this V1 CA flag. So that no version 1
          * certificates can exist in a supplied chain.
          */
-        flags ^= GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
+        if (!(flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT))
+            flags ^= GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
 	if ((ret =
 	     _gnutls_verify_certificate2(certificate_list[i-1],
                   &certificate_list[i], 1, flags, NULL)) == 0) {
@@ -707,23 +734,6 @@ int gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
     return 0;
 }
 
-/**
-  * gnutls_x509_crt_check_issuer - This function checks if the certificate given has the given issuer
-  * @cert: is the certificate to be checked
-  * @issuer: is the certificate of a possible issuer
-  *
-  * This function will check if the given certificate was issued by the
-  * given issuer. It will return true (1) if the given certificate is issued
-  * by the given issuer, and false (0) if not.
-  *
-  * A negative value is returned in case of an error.
-  *
-  **/
-int gnutls_x509_crt_check_issuer(gnutls_x509_crt_t cert,
-				 gnutls_x509_crt_t issuer)
-{
-    return is_issuer(cert, issuer);
-}
 
 
 #ifdef ENABLE_PKI

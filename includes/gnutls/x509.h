@@ -316,7 +316,8 @@ typedef enum gnutls_certificate_verify_flags {
                                        */
     GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT=8 /* Allow CA certificates that have version 1 (both root
                                               * and intermediate). This might be dangerous since those haven't
-	                                      * the basicConstraints extension.
+	                                      * the basicConstraints extension. Must be used in combination
+	                                      * with GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
 					      */
 } gnutls_certificate_verify_flags;
 
