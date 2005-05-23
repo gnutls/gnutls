@@ -12,8 +12,8 @@ See the end for copying conditions.
   regenerate the (optional) parameters in a private key. It should
   be used together with --key-info.
 - Corrected a bug in certificate chain verification that could lead
-  to marking a trusted chain as non trusted, if it included the last
-  self signed certifcate.
+  to marking a trusted chain as non trusted, if the last certificate in
+  the chain was a self signed one.
 
 * Version 1.2.3 (2005-04-28)
 - Corrected bug in record packet parsing that could lead
