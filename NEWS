@@ -15,6 +15,7 @@ See the end for copying conditions.
   to marking a trusted chain as non trusted, if the last certificate in
   the chain was a self signed one.
 - Gnulib portability files were updated.
+- License were updated to reflect new FSF address.
 
 * Version 1.2.3 (2005-04-28)
 - Corrected bug in record packet parsing that could lead

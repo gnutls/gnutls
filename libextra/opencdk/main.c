@@ -16,7 +16,7 @@
  *  
  * You should have received a copy of the GNU General Public License 
  * along with OpenCDK; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
 #ifdef HAVE_CONFIG_H
@@ -183,13 +183,14 @@ _secmem_init (size_t size)
 }
 
 
+/* Not used?
 static void
 _secmem_end (void)
 {
     gcry_control (GCRYCTL_TERM_SECMEM);
     secmem_init = 0;
 }
-
+*/
 
 void *
 cdk_salloc (size_t size, int clear)
