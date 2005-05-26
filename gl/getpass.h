@@ -14,18 +14,18 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef GETPASS_H
-#define GETPASS_H
+# define GETPASS_H
 
 /* Get getpass declaration, if available.  */
-#include <unistd.h>
+# include <unistd.h>
 
-#if defined HAVE_DECL_GETPASS && !HAVE_DECL_GETPASS
+# if defined HAVE_DECL_GETPASS && !HAVE_DECL_GETPASS
 /* Read a password of arbitrary length from /dev/tty or stdin.  */
 char *getpass (const char *prompt);
 
-#endif
+# endif
 
 #endif /* GETPASS_H */
