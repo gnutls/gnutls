@@ -2598,7 +2598,7 @@ void print_bag_data(gnutls_pkcs12_bag bag)
 	}
 
 	name = NULL;
-	result = gnutls_pkcs12_bag_get_friendly_name(bag, i, &name);
+	result = gnutls_pkcs12_bag_get_friendly_name(bag, i, (char**)&name);
 	if (result < 0) {
 	    fprintf(stderr, "get_friendly_name: %s\n",
 		    gnutls_strerror(type));

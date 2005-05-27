@@ -378,7 +378,8 @@ static int call_get_cert_callback(gnutls_session_t session,
     gnutls_certificate_type_t type = gnutls_certificate_type_get(session);
     gnutls_certificate_credentials_t cred;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -479,7 +480,8 @@ static int _select_client_cert(gnutls_session_t session,
     int issuers_dn_length;
     gnutls_datum_t *issuers_dn = NULL;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -780,7 +782,8 @@ int _gnutls_proc_x509_server_certificate(gnutls_session_t session,
     int peer_certificate_list_size = 0;
     gnutls_datum_t tmp;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -908,7 +911,8 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session_t session,
     int peer_certificate_list_size = 0;
     gnutls_datum_t tmp, akey = { NULL, 0 };
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -1104,7 +1108,8 @@ int _gnutls_proc_cert_cert_req(gnutls_session_t session, opaque * data,
     gnutls_pk_algorithm_t pk_algos[MAX_SIGN_ALGOS];
     int pk_algos_length;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -1277,7 +1282,8 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
      * performance.
      */
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -1545,7 +1551,8 @@ int _gnutls_server_select_cert(gnutls_session_t session,
     int idx, ret;
     gnutls_certificate_credentials_t cred;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;

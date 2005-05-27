@@ -2401,8 +2401,8 @@ inline static int check_server_params(gnutls_session_t session,
      */
     if (cred_type == GNUTLS_CRD_CERTIFICATE) {
       int delete;
-      gnutls_certificate_credentials_t x509_cred =
-	_gnutls_get_cred(session->key, cred_type, NULL);
+      gnutls_certificate_credentials_t x509_cred = 
+        (gnutls_certificate_credentials_t)_gnutls_get_cred(session->key, cred_type, NULL);
 
 	if (x509_cred != NULL) {
 	    dh_params =
@@ -2428,7 +2428,7 @@ inline static int check_server_params(gnutls_session_t session,
 #ifdef ENABLE_ANON
     } else if (cred_type == GNUTLS_CRD_ANON) {
       gnutls_anon_server_credentials_t anon_cred =
-	_gnutls_get_cred(session->key, cred_type, NULL);
+	(gnutls_anon_server_credentials_t)_gnutls_get_cred(session->key, cred_type, NULL);
 
 	if (anon_cred != NULL) {
 	    dh_params = _gnutls_anon_get_dh_params(anon_cred, session);
@@ -2485,7 +2485,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
      */
 
     x509_cred =
-	_gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+	(gnutls_certificate_credentials_t)_gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 
     /* if x509_cred==NULL we should remove all X509 ciphersuites
      */

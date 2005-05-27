@@ -368,7 +368,8 @@ const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
 
     CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL || cred->cert_list == NULL) {
 	gnutls_assert();
 	return NULL;

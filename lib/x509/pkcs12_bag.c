@@ -510,7 +510,7 @@ int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t bag, int indx,
   *
   **/
 int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t bag, int indx,
-					char **name)
+    char **name)
 {
     if (bag == NULL) {
 	gnutls_assert();

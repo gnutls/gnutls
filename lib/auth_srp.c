@@ -247,7 +247,10 @@ int _gnutls_gen_srp_client_kx(gnutls_session_t session, opaque ** data)
     uint8 *data_a;
     char *username, *password;
     char buf[64];
-    const gnutls_srp_client_credentials_t cred =
+    gnutls_srp_client_credentials_t cred;
+    
+    
+    cred = (gnutls_srp_client_credentials_t)
 	_gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
 
     if (cred == NULL) {
@@ -652,8 +655,9 @@ int _gnutls_proc_srp_server_kx(gnutls_session_t session, opaque * data,
     opaque hd[SRP_MAX_HASH_SIZE];
     char *username, *password;
     ssize_t data_size = _data_size;
+    gnutls_srp_client_credentials_t cred;
 
-    const gnutls_srp_client_credentials_t cred =
+    cred = (gnutls_srp_client_credentials_t)
 	_gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
 
     if (cred == NULL) {

@@ -145,7 +145,8 @@ int _gnutls_get_private_rsa_params(gnutls_session_t session,
     gnutls_certificate_credentials_t cred;
     gnutls_rsa_params_t rsa_params;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;

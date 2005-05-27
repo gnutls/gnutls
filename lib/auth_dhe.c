@@ -92,7 +92,8 @@ static int gen_dhe_server_kx(gnutls_session_t session, opaque ** data)
     gnutls_certificate_credentials_t cred;
     gnutls_dh_params_t dh_params;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -234,7 +235,8 @@ static int proc_dhe_client_kx(gnutls_session_t session, opaque * data,
     const mpi_t *mpis;
     gnutls_dh_params_t dh_params;
 
-    cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    cred = (gnutls_certificate_credentials_t)
+        _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
