@@ -282,7 +282,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 
     if (out_str.length >= (unsigned int) *sizeof_buf) {
 	gnutls_assert();
-	*sizeof_buf = out_str.length;
+	*sizeof_buf = out_str.length + 1;
 	result = GNUTLS_E_SHORT_MEMORY_BUFFER;
 	goto cleanup;
     }
