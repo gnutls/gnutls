@@ -2108,7 +2108,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 		exit(1);
 	    }
 
-	    fprintf(outfile, "\tIssued by: %s\n", name);
+	    fprintf(outfile, "\tIssued by: %s\n", issuer_name);
 
 	    /* Get the Issuer's name
 	     */
