@@ -291,7 +291,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	memcpy(buf, out_str.data, out_str.length);
 	buf[out_str.length] = 0;
     }
-    *sizeof_buf = out_str.length + 1;
+    *sizeof_buf = out_str.length;
 
     result = 0;
 
