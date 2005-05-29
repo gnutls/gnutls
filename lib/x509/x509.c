@@ -1913,7 +1913,7 @@ int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
   * @certs: The structures to store the parsed certificate. Must not be initialized.
   * @cert_max: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
   * @data: The PEM encoded certificate.
-  * @format: One of DER or PEM. Only PEM is supported for now.
+  * @format: One of DER or PEM.
   * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
   *
   * This function will convert the given PEM encoded certificate list
@@ -1934,6 +1934,30 @@ int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int* cert_max
     gnutls_datum_t tmp;
     int ret, nocopy=0;
     unsigned int count=0,j;
+
+    if (format==GNUTLS_X509_FMT_DER) {
+        if (*cert_max < 1) {
+            *cert_max = 1;
+            return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
+
+        count = 1; /* import only the first one */
+        
+        ret = gnutls_x509_crt_init( &certs[0]);
+	if (ret < 0) {
+            gnutls_assert();
+            goto error;
+        }
+        
+        ret = gnutls_x509_crt_import( certs[0], data, format);
+	if (ret < 0) {
+            gnutls_assert();
+            goto error;
+        }
+        
+        *cert_max = 1;
+        return 1;
+    }
 
     /* move to the certificate
      */
