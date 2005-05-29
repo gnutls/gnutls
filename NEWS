@@ -4,7 +4,8 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.5
-- Fixed off-by-one bug in the size parameter of gnutls_x509_crt_get_issuer_dn.
+- Fixed off-by-one bug in the size parameter of gnutls_x509_crt_get_issuer_dn,
+  reported by Adam Langley <alangley@gmail.com>.
 
 * Version 1.2.4 (2005-05-28)
 - Corrected some bugs that could affect 64 bit systems.
