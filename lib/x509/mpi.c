@@ -346,7 +346,7 @@ int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
     _gnutls_str_cpy(name, sizeof(name), dst_name);
     _gnutls_str_cat(name, sizeof(name), ".algorithm");
 
-    pk = _gnutls_x509_sign_to_oid(pk_algorithm, dig);
+    pk = _gnutls_x509_sign_to_oid(pk_algorithm, HASH2MAC(dig));
     if (pk == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INVALID_REQUEST;

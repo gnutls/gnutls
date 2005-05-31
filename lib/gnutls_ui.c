@@ -461,7 +461,7 @@ int gnutls_fingerprint(gnutls_digest_algorithm_t algo,
 		       size_t * result_size)
 {
     GNUTLS_HASH_HANDLE td;
-    int hash_len = _gnutls_hash_get_algo_len(algo);
+    int hash_len = _gnutls_hash_get_algo_len(HASH2MAC(algo));
 
     if (hash_len < 0 || (uint) hash_len > *result_size || result == NULL) {
 	*result_size = hash_len;
@@ -470,7 +470,7 @@ int gnutls_fingerprint(gnutls_digest_algorithm_t algo,
     *result_size = hash_len;
 
     if (result) {
-	td = _gnutls_hash_init(algo);
+	td = _gnutls_hash_init(HASH2MAC(algo));
 	if (td == NULL)
 	    return GNUTLS_E_HASH_FAILED;
 

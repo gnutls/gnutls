@@ -753,7 +753,7 @@ int gnutls_x509_crq_sign2(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
   **/
 int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
-    return gnutls_x509_crq_sign2(crq, key, GNUTLS_MAC_SHA1, 0);
+    return gnutls_x509_crq_sign2(crq, key, GNUTLS_DIG_SHA1, 0);
 }
 
 /**

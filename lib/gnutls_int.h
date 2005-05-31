@@ -104,6 +104,8 @@
 #define DECR_LENGTH_RET(len, x, RET) do { len-=x; if (len<0) {gnutls_assert(); return RET;} } while (0)
 #define DECR_LENGTH_COM(len, x, COM) do { len-=x; if (len<0) {gnutls_assert(); COM;} } while (0)
 
+#define HASH2MAC(x) ((gnutls_mac_algorithm_t)x)
+
 typedef unsigned char opaque;
 typedef struct {
     opaque pint[3];

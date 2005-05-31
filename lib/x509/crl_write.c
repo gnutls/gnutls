@@ -136,7 +136,7 @@ int gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
     gnutls_x509_privkey_t issuer_key)
 {
-    return gnutls_x509_crl_sign2( crl, issuer, issuer_key, GNUTLS_MAC_SHA1, 0);
+    return gnutls_x509_crl_sign2( crl, issuer, issuer_key, GNUTLS_DIG_SHA1, 0);
 }
 
 /**

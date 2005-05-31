@@ -126,7 +126,7 @@ pkcs1_rsa_sign(gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
     GNUTLS_HASH_HANDLE hd;
     gnutls_datum_t digest, info;
 
-    hd = _gnutls_hash_init(hash);
+    hd = _gnutls_hash_init(HASH2MAC(hash));
     if (hd == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_HASH_FAILED;
@@ -136,7 +136,7 @@ pkcs1_rsa_sign(gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
     _gnutls_hash_deinit(hd, _digest);
 
     digest.data = _digest;
-    digest.size = _gnutls_hash_get_algo_len(hash);
+    digest.size = _gnutls_hash_get_algo_len(HASH2MAC(hash));
 
     /* Encode the digest as a DigestInfo
      */
