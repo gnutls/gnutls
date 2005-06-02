@@ -247,7 +247,10 @@ int gnutls_x509_crt_set_extension_by_oid(gnutls_x509_crt_t crt,
     unsigned int critical)
 {
     int result;
-    gnutls_datum_t der_data = {(void*)buf, sizeof_buf};
+    gnutls_datum_t der_data;
+
+    der_data.data =(void*)buf;
+    der_data.size = sizeof_buf;
 
     if (crt == NULL) {
 	gnutls_assert();
