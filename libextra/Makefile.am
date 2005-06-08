@@ -97,7 +97,7 @@ endif
 
 LZO_OBJECTS = 
 if ENABLE_INCLUDED_LZO
-LZO_OBJECTS += lzoconf.h minilzo.h minilzo.c
+LZO_OBJECTS += lzodefs.h lzoconf.h minilzo.h minilzo.c
 endif
 
 libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^gnutls.*' \

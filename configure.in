@@ -411,7 +411,7 @@ minilzo_enabled=no
 use_lzo=yes
 AC_ARG_WITH(lzo,
 	AS_HELP_STRING([--without-lzo], [do not use lzo compression]),
-	use_lzo=no,
+	use_lzo=$withval,
 	use_lzo=yes)
 
 AC_MSG_CHECKING([whether to include lzo compression support])

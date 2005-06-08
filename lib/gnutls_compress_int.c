@@ -108,9 +108,7 @@ comp_hd_t _gnutls_comp_init(gnutls_compression_method_t method, int d)
 
 	    if (ret->handle == NULL) {
 		gnutls_assert();
-	      cleanup_ret:
-		gnutls_free(ret);
-		return NULL;
+		goto cleanup_ret;
 	    }
 	}
 
@@ -120,6 +118,10 @@ comp_hd_t _gnutls_comp_init(gnutls_compression_method_t method, int d)
 	break;
     }
     return ret;
+
+    cleanup_ret:
+        gnutls_free(ret);
+	return NULL;
 }
 
 void _gnutls_comp_deinit(comp_hd_t handle, int d)

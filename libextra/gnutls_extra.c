@@ -29,7 +29,11 @@
 #include <gnutls_extra.h>
 #include <gnutls_algorithms.h>
 #ifdef USE_LZO
-# include <minilzo.h>
+# ifdef USE_MINILZO
+#  include "minilzo.h"
+# else
+#  include <lzo1x.h>
+# endif
 #endif
 
 
