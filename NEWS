@@ -6,6 +6,8 @@ See the end for copying conditions.
 * Version 1.2.5
 - Fixed off-by-one bug in the size parameter of gnutls_x509_crt_get*_dn,
   reported by Adam Langley <alangley@gmail.com>.
+- Corrected some stuff in minilzo detection. Pointed out by 
+  Sergey Lipnevich.
 
 * Version 1.2.4 (2005-05-28)
 - Corrected some bugs that could affect 64 bit systems.
