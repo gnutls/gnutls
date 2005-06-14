@@ -8,6 +8,7 @@ See the end for copying conditions.
   reported by Adam Langley <alangley@gmail.com>.
 - Corrected some stuff in minilzo detection. Pointed out by 
   Sergey Lipnevich.
+- MiniLZO updated to version 2.00.
 
 * Version 1.2.4 (2005-05-28)
 - Corrected some bugs that could affect 64 bit systems.
