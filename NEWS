@@ -4,6 +4,8 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.5
+- More builddir != srcdir fixes, reported by Mike Castle
+  <dalgoda@ix.netcom.com>.
 - Fixed off-by-one bug in the size parameter of gnutls_x509_crt_get*_dn,
   reported by Adam Langley <alangley@gmail.com>.
 - Corrected some stuff in minilzo detection. Pointed out by 
