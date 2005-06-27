@@ -38,7 +38,7 @@ gnutls_TEXINFOS = gnutls.texi fdl.texi error_codes.texi			\
 	examples/ex-serv-srp.c examples/ex-alert.c			\
 	examples/ex-x509-info.c examples/ex-crq.c examples/ex-pkcs12.c	\
 	internals.eps internals.png layers.eps layers.png pgp1.eps	\
-	pgp1.png x509-1.eps x509-1.png
+	pgp1.png x509-1.eps x509-1.png gnutls-logo.eps
 
 AM_MAKEINFOHTMLFLAGS = --no-split
 
