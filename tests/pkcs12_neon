@@ -27,7 +27,7 @@ for p12 in 'client.p12 foobar' noclient.p12 unclient.p12; do
     set -- $p12
     file=$1
     passwd=$2
-    $CERTTOOL --p12-info --inder --password "$passwd"
+    $CERTTOOL --p12-info --inder --password "$passwd" \
 		--infile $srcdir/$file > out 2>&1
     rc=$?
     if test $rc != 0; then
