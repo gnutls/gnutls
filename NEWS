@@ -11,6 +11,9 @@ See the end for copying conditions.
 - Corrected some stuff in minilzo detection. Pointed out by 
   Sergey Lipnevich.
 - MiniLZO updated to version 2.00.
+- gnutls_x509_crt_list_import now accept a DER formatted CRL.
+- API and ABI modifications:
+  No changes since last version.
 
 * Version 1.2.4 (2005-05-28)
 - Corrected some bugs that could affect 64 bit systems.
