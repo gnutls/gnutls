@@ -1,0 +1,7 @@
+.deps
+.libs
+Makefile
+Makefile.in
+libminilzo.la
+minilzo.lo
+testmini

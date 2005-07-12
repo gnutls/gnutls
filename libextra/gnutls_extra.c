@@ -30,7 +30,7 @@
 #include <gnutls_algorithms.h>
 #ifdef USE_LZO
 # ifdef USE_MINILZO
-#  include "minilzo.h"
+#  include "minilzo/minilzo.h"
 # else
 #  include <lzo1x.h>
 # endif

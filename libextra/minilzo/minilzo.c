@@ -446,6 +446,10 @@
 #  else
 #    define LZO_INFO_CCVER      "unknown"
 #  endif
+#elif 0 && defined(SDCC) && defined(__VERSION__) && !defined(__GNUC__)
+#  define LZO_CC_SDCC           1
+#  define LZO_INFO_CC           "sdcc"
+#  define LZO_INFO_CCVER        LZO_CPP_MACRO_EXPAND(SDCC)
 #elif defined(__PATHSCALE__) && defined(__PATHCC_PATCHLEVEL__)
 #  define LZO_CC_PATHSCALE      (__PATHCC__ * 0x10000L + __PATHCC_MINOR__ * 0x100 + __PATHCC_PATCHLEVEL__)
 #  define LZO_INFO_CC           "Pathscale C"
@@ -603,9 +607,18 @@
 #elif (UINT_MAX <= LZO_0xffffL) && defined(__AVR__)
 #  define LZO_ARCH_AVR              1
 #  define LZO_INFO_ARCH             "avr"
+#elif defined(__bfin__)
+#  define LZO_ARCH_BLACKFIN         1
+#  define LZO_INFO_ARCH             "blackfin"
 #elif (UINT_MAX == LZO_0xffffL) && defined(__C166__)
 #  define LZO_ARCH_C166             1
 #  define LZO_INFO_ARCH             "c166"
+#elif defined(__cris__)
+#  define LZO_ARCH_CRIS             1
+#  define LZO_INFO_ARCH             "cris"
+#elif defined(__H8300__) || defined(__H8300H__) || defined(__H8300S__) || defined(__H8300SX__)
+#  define LZO_ARCH_H8300            1
+#  define LZO_INFO_ARCH             "h8300"
 #elif defined(__hppa__) || defined(__hppa)
 #  define LZO_ARCH_HPPA             1
 #  define LZO_INFO_ARCH             "hppa"
@@ -624,6 +637,9 @@
 #elif defined(__ia64__) || defined(__ia64) || defined(_M_IA64)
 #  define LZO_ARCH_IA64             1
 #  define LZO_INFO_ARCH             "ia64"
+#elif defined(__m32r__)
+#  define LZO_ARCH_M32R             1
+#  define LZO_INFO_ARCH             "m32r"
 #elif (LZO_OS_TOS) || defined(__m68k__) || defined(__m68000__) || defined(__mc68000__) || defined(_M_M68K)
 #  define LZO_ARCH_M68K             1
 #  define LZO_INFO_ARCH             "m68k"
@@ -648,6 +664,9 @@
 #elif defined(__sparc__) || defined(__sparc) || defined(__sparcv8)
 #  define LZO_ARCH_SPARC            1
 #  define LZO_INFO_ARCH             "sparc"
+#elif (UINT_MAX == LZO_0xffffL) && defined(__z80)
+#  define LZO_ARCH_Z80              1
+#  define LZO_INFO_ARCH             "z80"
 #else
 #  define LZO_ARCH_UNKNOWN          1
 #  define LZO_INFO_ARCH             "unknown"
@@ -690,7 +709,10 @@
 #  endif
 #endif
 #if (LZO_ARCH_I386)
-#  if (UINT_MAX != LZO_0xffffffffL)
+#  if (UINT_MAX != LZO_0xffffL) && defined(__i386_int16__)
+#    error "this should not happen"
+#  endif
+#  if (UINT_MAX != LZO_0xffffffffL) && !defined(__i386_int16__)
 #    error "this should not happen"
 #  endif
 #  if (ULONG_MAX != LZO_0xffffffffL)
@@ -938,6 +960,17 @@ extern "C" {
 #endif
 #if !defined(LZO_SIZEOF_LONG_LONG) && !defined(LZO_SIZEOF___INT64)
 #if (LZO_SIZEOF_LONG > 0 && LZO_SIZEOF_LONG < 8)
+#  if defined(__LONG_MAX__) && defined(__LONG_LONG_MAX__)
+#    if (LZO_CC_GNUC >= 0x030300ul)
+#      if ((__LONG_MAX__)+0 == (__LONG_LONG_MAX__)+0)
+#        define LZO_SIZEOF_LONG_LONG      LZO_SIZEOF_LONG
+#      endif
+#    endif
+#  endif
+#endif
+#endif
+#if !defined(LZO_SIZEOF_LONG_LONG) && !defined(LZO_SIZEOF___INT64)
+#if (LZO_SIZEOF_LONG > 0 && LZO_SIZEOF_LONG < 8)
 #if (LZO_ARCH_I086 && LZO_CC_DMC)
 #elif (LZO_CC_CILLY) && defined(__GNUC__)
 #  define LZO_SIZEOF_LONG_LONG      8
@@ -969,6 +1002,7 @@ extern "C" {
 #  define LZO_SIZEOF_LONG_LONG      8
 #elif (defined(__vms) || defined(__VMS)) && (__INITIAL_POINTER_SIZE+0 == 64)
 #  define LZO_SIZEOF_LONG_LONG      8
+#elif (LZO_CC_SDCC) && (LZO_SIZEOF_INT == 2)
 #elif 1 && defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
 #  define LZO_SIZEOF_LONG_LONG      8
 #endif
@@ -988,8 +1022,20 @@ extern "C" {
 #  else
 #    error "LZO_MM"
 #  endif
-#elif (LZO_ARCH_AVR || LZO_ARCH_C166 || LZO_ARCH_I086 || LZO_ARCH_MCS51 || LZO_ARCH_MCS251)
+#elif (LZO_ARCH_AVR || LZO_ARCH_C166 || LZO_ARCH_I086 || LZO_ARCH_MCS51 || LZO_ARCH_MCS251 || LZO_ARCH_Z80)
 #  define LZO_SIZEOF_VOID_P         2
+#elif (LZO_ARCH_H8300)
+#  if defined(__NORMAL_MODE__)
+#    define LZO_SIZEOF_VOID_P       2
+#  elif defined(__H8300H__) || defined(__H8300S__) || defined(__H8300SX__)
+#    define LZO_SIZEOF_VOID_P       4
+#  else
+#    define LZO_SIZEOF_VOID_P       2
+#  endif
+#  if (LZO_CC_GNUC && (LZO_CC_GNUC < 0x040000ul)) && (LZO_SIZEOF_INT == 4)
+#    define LZO_SIZEOF_SIZE_T       LZO_SIZEOF_INT
+#    define LZO_SIZEOF_PTRDIFF_T    LZO_SIZEOF_INT
+#  endif
 #elif (LZO_OS_CONSOLE_PS2)
 #  define LZO_SIZEOF_VOID_P         4
 #elif (LZO_SIZEOF_LONG == 8) && ((defined(__mips__) && defined(__R5900__)) || defined(__MIPS_PSX2__))
@@ -1457,7 +1503,7 @@ extern "C" {
 #undef LZO_HAVE_CONFIG_H
 #include "minilzo.h"
 
-#if !defined(MINILZO_VERSION) || (MINILZO_VERSION != 0x2000)
+#if !defined(MINILZO_VERSION) || (MINILZO_VERSION != 0x2010)
 #  error "version mismatch in miniLZO source files"
 #endif
 
@@ -1880,7 +1926,7 @@ _lzo_version_date(void)
 #define LZO_BASE 65521u
 #define LZO_NMAX 5552
 
-#define LZO_DO1(buf,i)  {s1 += buf[i]; s2 += s1;}
+#define LZO_DO1(buf,i)  s1 += buf[i]; s2 += s1
 #define LZO_DO2(buf,i)  LZO_DO1(buf,i); LZO_DO1(buf,i+1);
 #define LZO_DO4(buf,i)  LZO_DO2(buf,i); LZO_DO2(buf,i+2);
 #define LZO_DO8(buf,i)  LZO_DO4(buf,i); LZO_DO4(buf,i+4);
@@ -1917,6 +1963,12 @@ lzo_adler32(lzo_uint32 adler, const lzo_bytep buf, lzo_uint len)
     return (s2 << 16) | s1;
 }
 
+#undef LZO_DO1
+#undef LZO_DO2
+#undef LZO_DO4
+#undef LZO_DO8
+#undef LZO_DO16
+
 #undef lzo_memcmp
 #undef lzo_memcpy
 #undef lzo_memmove
@@ -1932,7 +1984,6 @@ lzo_adler32(lzo_uint32 adler, const lzo_bytep buf, lzo_uint len)
 #define lzo_hmemcpy             lzo_memcpy
 #define lzo_hmemmove            lzo_memmove
 #define lzo_hmemset             lzo_memset
-#define LZO_WANT_ACCLIB_HMEMCPY 1
 #define __LZOLIB_HMEMCPY_CH_INCLUDED 1
 #if !defined(LZOLIB_PUBLIC)
 #  define LZOLIB_PUBLIC(r,f)    r __LZOLIB_FUNCNAME(f)

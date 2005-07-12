@@ -38,9 +38,9 @@
 #ifndef __LZOCONF_H_INCLUDED
 #define __LZOCONF_H_INCLUDED
 
-#define LZO_VERSION             0x2000
-#define LZO_VERSION_STRING      "2.00"
-#define LZO_VERSION_DATE        "May 30 2005"
+#define LZO_VERSION             0x2010
+#define LZO_VERSION_STRING      "2.01"
+#define LZO_VERSION_DATE        "Jun 27 2005"
 
 /* internal Autoconf configuration file - only used when building LZO */
 #if defined(LZO_HAVE_CONFIG_H)
@@ -247,15 +247,15 @@ typedef int
 
 typedef int
 (__LZO_CDECL *lzo_compress_dict_t)(const lzo_bytep src, lzo_uint  src_len,
-                                        lzo_bytep dst, lzo_uintp dst_len,
-                                        lzo_voidp wrkmem,
-                                  const lzo_bytep dict, lzo_uint dict_len );
+                                         lzo_bytep dst, lzo_uintp dst_len,
+                                         lzo_voidp wrkmem,
+                                   const lzo_bytep dict, lzo_uint dict_len );
 
 typedef int
 (__LZO_CDECL *lzo_decompress_dict_t)(const lzo_bytep src, lzo_uint  src_len,
-                                        lzo_bytep dst, lzo_uintp dst_len,
-                                        lzo_voidp wrkmem,
-                                  const lzo_bytep dict, lzo_uint dict_len );
+                                           lzo_bytep dst, lzo_uintp dst_len,
+                                           lzo_voidp wrkmem,
+                                     const lzo_bytep dict, lzo_uint dict_len );
 
 
 /* Callback interface. Currently only the progress indicator ("nprogress")

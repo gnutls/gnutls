@@ -29,10 +29,11 @@
 
 #ifdef USE_LZO
 # ifdef USE_MINILZO
-#  include "../libextra/minilzo.h"	/* get the prototypes only.
-					 * Since LZO is a GPLed library, the gnutls_global_init_extra() has
-					 * to be called, before LZO compression can be used.
-					 */
+/* Get the prototypes only.  Since LZO is a GPLed library, the
+ * gnutls_global_init_extra() has to be called, before LZO compression
+ * can be used.
+ */
+#  include "../libextra/minilzo/minilzo.h"
 # else
 #  include <lzo1x.h>
 # endif

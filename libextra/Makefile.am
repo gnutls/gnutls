@@ -93,21 +93,20 @@ libgnutls_extra_la_LDFLAGS += $(LIBOPENCDK_LIBS)
 endif
 endif
 
-# LZO
-
-LZO_OBJECTS = 
-if ENABLE_INCLUDED_LZO
-LZO_OBJECTS += lzodefs.h lzoconf.h minilzo.h minilzo.c
-endif
-
 libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^gnutls.*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES = $(COBJECTS) $(LZO_OBJECTS) gnutls_extra.h
+libgnutls_extra_la_SOURCES = $(COBJECTS) gnutls_extra.h
 
 libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
 
+# LZO
+
+if ENABLE_INCLUDED_LZO
+SUBDIRS += minilzo
+libgnutls_extra_la_LIBADD += minilzo/libminilzo.la
+endif
 
 gnutls-extra-api.texi: $(COBJECTS)
 	@echo "" > gnutls-extra-api.texi
