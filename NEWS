@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.2.6
 - MiniLZO updated to version 2.01 and moved to separate directory.
+- Collision between system LZO header files and MiniLZO header file
+  fixed, reported by Matthias Urlichs <smurf@smurf.noris.de>.
+- Will now test for liblzo functionality in liblzo2 too, reported by
+  Thomas Klausner <tk@giga.or.at>.
 - API and ABI modifications:
   No changes since last version.
 
