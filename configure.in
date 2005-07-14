@@ -418,35 +418,35 @@ AC_MSG_CHECKING([whether to include lzo compression support])
 AC_MSG_RESULT($use_lzo)
 
 if test x$use_lzo = xyes; then
+  AC_DEFINE(USE_LZO, 1, [whether to use the lzo compression])
 
-AC_DEFINE(USE_LZO, 1, [whether to use the lzo compression])
-
-AC_ARG_WITH(included-lzo,
+  AC_ARG_WITH(included-lzo,
 	AS_HELP_STRING([--with-included-lzo],
 		[include minilzo in libgnutls-extra]),
 	minilzo_enabled=$withval,
 	minilzo_enabled=no)
 
-AC_MSG_CHECKING([whether to use the included lzo compression library])
+  AC_MSG_CHECKING([whether to use the included lzo compression library])
+  AC_MSG_RESULT($minilzo_enabled)
 
-AC_MSG_RESULT($minilzo_enabled)
+  LZO_LIBS=
+  if test "$minilzo_enabled" != "yes"; then
+    AC_CHECK_LIB(lzo2, lzo1x_1_compress, LZO_LIBS=-llzo2)
+    if test "$LZO_LIBS" = ""; then
+      AC_CHECK_LIB(lzo, lzo1x_1_compress, LZO_LIBS=-llzo, [
+        minilzo_enabled=yes
+        AC_MSG_WARN(
+***
+*** Could not find liblzo or liblzo2. Will use the included minilzo.
+)
+      ])
+    fi
+  fi
+  AC_SUBST(LZO_LIBS)
 
-if test x$minilzo_enabled = xno; then
-AC_CHECK_LIB(lzo, lzo1x_1_compress, minilzo_enabled=no, 
- minilzo_enabled=yes
- AC_MSG_WARN(
-*** 
-*** Liblzo was not found. Will use the included minilzo.))
-fi
-
-if test x"$minilzo_enabled" = xyes; then
-AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
-else
-LZO_LIBS=-llzo
-AC_SUBST(LZO_LIBS)
-fi
-
-dnl use lzo
+  if test "$minilzo_enabled" = "yes"; then
+    AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
+  fi
 fi
 
 AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
