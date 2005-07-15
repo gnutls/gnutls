@@ -52,7 +52,7 @@ static void print_x509_certificate_info(gnutls_session_t session)
 	 */
 	gnutls_x509_crt_init(&cert);
 
-	gnutls_x509_crt_import(cert, &cert_list[0]);
+	gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER);
 
 	printf("Certificate info:\n");
 
