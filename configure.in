@@ -444,6 +444,12 @@ if test x$use_lzo = xyes; then
   fi
   AC_SUBST(LZO_LIBS)
 
+  if test "$LZO_LIBS" = "-llzo"; then
+    AC_CHECK_HEADERS(lzo1x.h)
+  elif test "$LZO_LIBS" = "-llzo2"; then
+    AC_CHECK_HEADERS(lzo/lzo1x.h)
+  fi
+
   if test "$minilzo_enabled" = "yes"; then
     AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
   fi

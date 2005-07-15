@@ -34,7 +34,9 @@
  * can be used.
  */
 #  include "../libextra/minilzo/minilzo.h"
-# else
+# elif HAVE_LZO_LZO1X_H
+#  include <lzo/lzo1x.h>
+# elif HAVE_LZO1X_H
 #  include <lzo1x.h>
 # endif
 
