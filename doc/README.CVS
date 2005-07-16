@@ -10,7 +10,7 @@ following software:
 * automake 1.8 or newer (http://www.gnu.org/software/automake/)
 * libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
 * texinfo (http://www.gnu.org/software/texinfo/)
-* gtk-doc CVS (to generate reference HTML manual in doc/reference/)
+* gtk-doc 1.4 (to generate reference HTML manual in doc/reference/)
   with the patch below, from:
   http://bugzilla.gnome.org/show_bug.cgi?id=156643
 
