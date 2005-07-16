@@ -85,6 +85,8 @@ gnutls_dh_params_t _gnutls_anon_get_dh_params(const
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate it.
+  *
+  * Returns a negative value in case of an error.
   **/
 int
 gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
@@ -115,6 +117,8 @@ void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t
  *
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to allocate it.
+ *
+ * Returns a negative value in case of an error.
  **/
 int
 gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t *
