@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.2.6
+* Version 1.2.6 (2005-07-16)
 - MiniLZO updated to version 2.01 and moved to separate directory.
 - Collision between system LZO header files and MiniLZO header file
   fixed, reported by Matthias Urlichs <smurf@smurf.noris.de>.
