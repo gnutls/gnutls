@@ -9,6 +9,7 @@ See the end for copying conditions.
   fixed, reported by Matthias Urlichs <smurf@smurf.noris.de>.
 - Will now test for liblzo functionality in liblzo2 too, reported by
   Thomas Klausner <tk@giga.or.at>.
+- Minilibtasn1 is now 0.2.14 (no code changes).
 - API and ABI modifications:
   No changes since last version.
 
