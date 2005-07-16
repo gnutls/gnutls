@@ -305,7 +305,7 @@ int _gnutls_selected_cert_supported_kx(gnutls_session_t session,
   * send a certificate.
   **/
 void gnutls_certificate_server_set_request(gnutls_session_t session,
-    gnutls_certificate_request_t req)
+					   gnutls_certificate_request_t req)
 {
     session->internals.send_cert_req = req;
 }

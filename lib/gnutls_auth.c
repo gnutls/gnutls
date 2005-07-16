@@ -171,8 +171,8 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
   * to access authentication data.
   * 
   **/
-gnutls_credentials_type_t gnutls_auth_server_get_type(gnutls_session_t
-						      session)
+gnutls_credentials_type_t
+gnutls_auth_server_get_type(gnutls_session_t session)
 {
     return
 	_gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
@@ -189,8 +189,8 @@ gnutls_credentials_type_t gnutls_auth_server_get_type(gnutls_session_t
   * to access authentication data.
   * 
   **/
-gnutls_credentials_type_t gnutls_auth_client_get_type(gnutls_session_t
-						      session)
+gnutls_credentials_type_t
+gnutls_auth_client_get_type(gnutls_session_t session)
 {
     return
 	_gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo

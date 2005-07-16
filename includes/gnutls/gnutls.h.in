@@ -634,10 +634,10 @@ int gnutls_srp_base64_decode_alloc( const gnutls_datum_t *b64_data,
    */
 
   gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session);
-  gnutls_credentials_type_t gnutls_auth_server_get_type(gnutls_session_t
-							session);
-  gnutls_credentials_type_t gnutls_auth_client_get_type(gnutls_session_t
-							session);
+  gnutls_credentials_type_t
+  gnutls_auth_server_get_type(gnutls_session_t session);
+  gnutls_credentials_type_t
+  gnutls_auth_client_get_type(gnutls_session_t session);
 
   /* DH */
 
@@ -669,16 +669,15 @@ int gnutls_srp_base64_decode_alloc( const gnutls_datum_t *b64_data,
    gnutls_certificate_server_retrieve_function * func);
 
   void gnutls_certificate_server_set_request(gnutls_session_t session,
-					     gnutls_certificate_request_t
-					     req);
+					     gnutls_certificate_request_t req);
 
   /* get data from the session
    */
-  const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
-						     session, unsigned int
-						     *list_size);
-  const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t
-						    session);
+  const gnutls_datum_t *
+  gnutls_certificate_get_peers(gnutls_session_t session,
+			       unsigned int *list_size);
+  const gnutls_datum_t *
+  gnutls_certificate_get_ours(gnutls_session_t session);
 
   time_t gnutls_certificate_activation_time_peers(gnutls_session_t session);
   time_t gnutls_certificate_expiration_time_peers(gnutls_session_t session);
@@ -732,8 +731,8 @@ int gnutls_srp_base64_decode_alloc( const gnutls_datum_t *b64_data,
 				     gnutls_params_st *);
 
   void
-  gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
-					 res, gnutls_params_function * func);
+  gnutls_certificate_set_params_function(gnutls_certificate_credentials_t res,
+					 gnutls_params_function * func);
   void gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
 				       gnutls_params_function * func);
 

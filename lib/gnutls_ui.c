@@ -528,8 +528,8 @@ void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
   *
   **/
 void
-gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
-				       res, gnutls_params_function * func)
+gnutls_certificate_set_params_function(gnutls_certificate_credentials_t res,
+				       gnutls_params_function * func)
 {
     res->params_func = func;
 }
