@@ -1313,8 +1313,7 @@ int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
 
 
 /**
-  * gnutls_x509_crt_get_key_id - This function will return a unique ID of
-  *                              the public key's parameters
+  * gnutls_x509_crt_get_key_id - Return unique ID of public key's parameters
   * @crt: Holds the certificate
   * @flags: should be 0 for now
   * @output_data: will contain the key ID

@@ -1280,8 +1280,7 @@ int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 }
 
 /**
-  * gnutls_x509_privkey_get_key_id - This function will return a unique ID
-  *                                  of the key's parameters
+  * gnutls_x509_privkey_get_key_id - Return unique ID of the key's parameters
   * @key: Holds the key
   * @flags: should be 0 for now
   * @output_data: will contain the key ID

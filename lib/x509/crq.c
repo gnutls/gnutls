@@ -757,8 +757,7 @@ int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 }
 
 /**
-  * gnutls_x509_crq_export - This function will export the
-  *                          generated certificate request
+  * gnutls_x509_crq_export - Export the generated certificate request
   * @crq: Holds the request
   * @format: the format of output params. One of PEM or DER.
   * @output_data: will contain a certificate request PEM or DER encoded
