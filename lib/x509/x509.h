@@ -125,7 +125,7 @@ int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl_t crl,
     gnutls_datum_t * dn);
 int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl);
 int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
-    unsigned char *serial, size_t * serial_size, time_t * tim);
+    unsigned char *serial, size_t * serial_size, time_t * t);
 
 void gnutls_x509_crl_deinit(gnutls_x509_crl_t crl);
 int gnutls_x509_crl_init(gnutls_x509_crl_t * crl);
