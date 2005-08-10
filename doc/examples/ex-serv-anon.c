@@ -23,7 +23,7 @@
 /* These are global */
 gnutls_anon_server_credentials_t anoncred;
 
-gnutls_session_t initialize_tls_session()
+gnutls_session_t initialize_tls_session(void)
 {
     gnutls_session_t session;
     const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
@@ -59,7 +59,7 @@ static int generate_dh_params(void)
     return 0;
 }
 
-int main()
+int main(void)
 {
     int err, listen_sd, i;
     int sd, ret;
@@ -153,7 +153,7 @@ int main()
     }
     close(listen_sd);
 
-    gnutls_anon_free_client_credentials (anoncred);
+    gnutls_anon_free_server_credentials (anoncred);
 
     gnutls_global_deinit();
 

@@ -7,8 +7,9 @@
 static const char *bin2hex(const void *bin, size_t bin_size)
 {
     static char printable[110];
-    unsigned char *_bin = bin;
+    const unsigned char *_bin = bin;
     char *print;
+    size_t i;
 
     if (bin_size > 50)
 	bin_size = 50;
@@ -23,13 +24,12 @@ static const char *bin2hex(const void *bin, size_t bin_size)
 }
 
 /* This function will print information about this session's peer
- * certificate. 
+ * certificate.
  */
-static void print_x509_certificate_info(gnutls_session_t session)
+void print_x509_certificate_info(gnutls_session_t session)
 {
     char serial[40];
     char dn[128];
-    int i;
     size_t size;
     unsigned int algo, bits;
     time_t expiration_time, activation_time;

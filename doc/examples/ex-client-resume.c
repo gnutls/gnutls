@@ -1,4 +1,4 @@
-
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
@@ -12,13 +12,12 @@ extern void tcp_close(int sd);
 #define MAX_BUF 1024
 #define CRLFILE "crl.pem"
 #define CAFILE "ca.pem"
-#define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
-int main()
+int main(void)
 {
     int ret;
-    int sd, ii, alert;
+    int sd, ii;
     gnutls_session_t session;
     char buffer[MAX_BUF + 1];
     gnutls_certificate_credentials_t xcred;

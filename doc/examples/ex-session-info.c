@@ -26,6 +26,11 @@ int print_info(gnutls_session_t session)
      */
     cred = gnutls_auth_get_type(session);
     switch (cred) {
+    case GNUTLS_CRD_SRP:
+      printf ("- SRP session with username %s\n",
+	      gnutls_srp_server_get_username (session));
+      break;
+
     case GNUTLS_CRD_ANON:	/* anonymous authentication */
 
 	printf("- Anonymous DH using prime of %d bits\n",

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
@@ -60,7 +61,7 @@ void verify_certificate( gnutls_session_t session, const char* hostname)
 
    /* Beware here we do not check for errors.
     */
-   if ( gnutls_x509_crt_get_expiration( cert) < time(0)) {
+   if ( gnutls_x509_crt_get_expiration_time( cert) < time(0)) {
       printf("The certificate has expired\n");
       return;
    }

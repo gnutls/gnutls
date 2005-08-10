@@ -37,7 +37,7 @@ static int wrap_db_delete(void *dbf, gnutls_datum_t key);
 
 #define TLS_SESSION_CACHE 50
 
-gnutls_session_t initialize_tls_session()
+gnutls_session_t initialize_tls_session(void)
 {
     gnutls_session_t session;
 
@@ -99,7 +99,7 @@ static int generate_rsa_params(void)
     return 0;
 }
 
-int main()
+int main(void)
 {
     int err, listen_sd, i;
     int sd, ret;

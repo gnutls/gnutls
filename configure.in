@@ -509,7 +509,7 @@ AC_CONFIG_COMMANDS([chmod-config],[[
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile \
-	doc/Makefile doc/scripts/Makefile \
+	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile \
 	gl/Makefile nettle/Makefile nettle/tests/Makefile \
 	crypto/Makefile tests/Makefile \

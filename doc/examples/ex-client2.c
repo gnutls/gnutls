@@ -53,7 +53,7 @@ void tcp_close(int sd)
     close(sd);
 }
 
-int main()
+int main(void)
 {
     int ret, sd, ii;
     gnutls_session_t session;

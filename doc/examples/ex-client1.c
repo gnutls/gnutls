@@ -16,43 +16,10 @@
 #define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
-/* Connects to the peer and returns a socket
- * descriptor.
- */
-int tcp_connect(void)
-{
-    const char *PORT = "5556";
-    const char *SERVER = "127.0.0.1";
-    int err, sd;
-    struct sockaddr_in sa;
+extern int tcp_connect(void);
+extern void tcp_close(int sd);
 
-    /* connects to server 
-     */
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-
-    memset(&sa, '\0', sizeof(sa));
-    sa.sin_family = AF_INET;
-    sa.sin_port = htons(atoi(PORT));
-    inet_pton(AF_INET, SERVER, &sa.sin_addr);
-
-    err = connect(sd, (SA *) & sa, sizeof(sa));
-    if (err < 0) {
-	fprintf(stderr, "Connect error\n");
-	exit(1);
-    }
-
-    return sd;
-}
-
-/* closes the given socket descriptor.
- */
-void tcp_close(int sd)
-{
-    shutdown(sd, SHUT_RDWR);	/* no more receptions */
-    close(sd);
-}
-
-int main()
+int main(void)
 {
     int ret, sd, ii;
     gnutls_session_t session;

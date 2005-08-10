@@ -30,7 +30,7 @@
 gnutls_srp_server_credentials_t srp_cred;
 gnutls_certificate_credentials_t cert_cred;
 
-gnutls_session_t initialize_tls_session()
+gnutls_session_t initialize_tls_session(void)
 {
     gnutls_session_t session;
     const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
@@ -54,7 +54,7 @@ gnutls_session_t initialize_tls_session()
     return session;
 }
 
-int main()
+int main(void)
 {
     int err, listen_sd, i;
     int sd, ret;

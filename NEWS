@@ -4,6 +4,7 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.7
+- Fixed examples in doc/examples/, suggested by Fran <e_agf@yahoo.es>.
 - Doc fixes for gnutls_transport_set_push and gnutls_transport_set_pull.
 - API and ABI modifications:
   No changes since last version.

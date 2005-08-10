@@ -1,0 +1,34 @@
+## Process this file with automake to produce Makefile.in
+# Copyright (C) 2005 Free Software Foundation
+#
+# Author: Simon Josefsson
+#
+# This file is part of GNUTLS.
+#
+# This file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this file; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+AM_CPPFLAGS = -I$(top_srcdir)/includes
+LDADD = libexamples.la \
+	$(top_srcdir)/lib/libgnutls.la	\
+	$(top_srcdir)/libextra/libgnutls-extra.la
+
+noinst_PROGRAMS = ex-cert-select ex-client1 ex-client2			\
+	ex-client-resume ex-client-srp ex-crq ex-serv1 ex-serv-anon	\
+	ex-serv-export ex-serv-pgp ex-serv-srp
+
+lib_LTLIBRARIES = libexamples.la
+
+libexamples_la_SOURCES = ex-alert.c ex-pkcs12.c ex-rfc2818.c	\
+	ex-session-info.c ex-x509-info.c ex-verify.c tcp.c

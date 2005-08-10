@@ -1,6 +1,6 @@
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 
@@ -21,14 +21,14 @@ const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
     GNUTLS_KX_SRP_RSA, 0
 };
 
-int main()
+int main(void)
 {
     int ret;
     int sd, ii;
     gnutls_session_t session;
     char buffer[MAX_BUF + 1];
     gnutls_srp_client_credentials_t srp_cred;
-    gnutls_certificate_client_credentials_t cert_cred;
+    gnutls_certificate_credentials_t cert_cred;
 
     gnutls_global_init();
 
@@ -38,7 +38,7 @@ int main()
     gnutls_global_init_extra();
 
     gnutls_srp_allocate_client_credentials(&srp_cred);
-    gnutls_certificate_allocate_client_credentials(&cert_cred);
+    gnutls_certificate_allocate_credentials(&cert_cred);
 
     gnutls_certificate_set_x509_trust_file(cert_cred, CAFILE,
 					   GNUTLS_X509_FMT_PEM);

@@ -6,13 +6,13 @@
 
 /* All the available CRLs
  */
-extern gnutls_x509_crl_t *crl_list;
-extern int crl_list_size;
+gnutls_x509_crl_t *crl_list;
+int crl_list_size;
 
 /* All the available trusted CAs
  */
-extern gnutls_x509_crt_t *ca_list;
-extern int ca_list_size;
+gnutls_x509_crt_t *ca_list;
+int ca_list_size;
 
 static void verify_cert2(gnutls_x509_crt_t crt,
     gnutls_x509_crt_t issuer, gnutls_x509_crl_t * crl_list, int crl_list_size);
@@ -28,7 +28,7 @@ void verify_certificate_chain(gnutls_session_t session,
     const char *hostname, const gnutls_datum_t * cert_chain,
     int cert_chain_length)
 {
-    int i, ret;
+    int i;
     gnutls_x509_crt_t cert[cert_chain_length];
 
     /* Import all the certificates in the chain to
@@ -80,7 +80,7 @@ void verify_certificate_chain(gnutls_session_t session,
  * which is supposed to be it's issuer. Also checks the
  * crl_list if the certificate is revoked.
  */
-static void verify_cert2(gnutls_x509_crt crt_t, gnutls_x509_crt_t issuer, 
+static void verify_cert2(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer, 
     gnutls_x509_crl_t * crl_list, int crl_list_size)
 {
     unsigned int output;

@@ -21,7 +21,7 @@
 
 EXTRA_DIST = TODO README.CVS README.autoconf certtool.cfg \
 	gnutls.ps gnutls.pdf gnutls.html
-SUBDIRS = scripts manpages
+SUBDIRS = examples scripts manpages
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif

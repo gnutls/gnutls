@@ -32,11 +32,46 @@ gnutls_certificate_credentials_t cred;
 const int cert_type_priority[2] = { GNUTLS_CRT_OPENPGP, 0 };
 gnutls_dh_params_t dh_params;
 
-/* Defined in a previous example */
-extern int generate_dh_params(void);
-extern gnutls_session_t initialize_tls_session(void);
+static int generate_dh_params(void)
+{
 
-int main()
+  /* Generate Diffie Hellman parameters - for use with DHE
+   * kx algorithms. These should be discarded and regenerated
+   * once a day, once a week or once a month. Depending on the
+   * security requirements.
+   */
+  gnutls_dh_params_init(&dh_params);
+  gnutls_dh_params_generate2(dh_params, DH_BITS);
+
+  return 0;
+}
+
+/* These are global */
+gnutls_certificate_credentials_t x509_cred;
+
+gnutls_session_t initialize_tls_session(void)
+{
+  gnutls_session_t session;
+
+  gnutls_init(&session, GNUTLS_SERVER);
+
+  /* avoid calling all the priority functions, since the defaults
+   * are adequate.
+   */
+  gnutls_set_default_priority(session);
+
+  gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+
+  /* request client certificate if any.
+   */
+  gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUEST);
+
+  gnutls_dh_set_prime_bits(session, DH_BITS);
+
+  return session;
+}
+
+int main(void)
 {
     int err, listen_sd, i;
     int sd, ret;

@@ -11,17 +11,22 @@
 #include <sys/stat.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 /* A TLS client that loads the certificate and key.
  */
 
 #define MAX_BUF 1024
-#define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 #define CERT_FILE "cert.pem"
 #define KEY_FILE "key.pem"
 #define CAFILE "ca.pem"
+
+extern int tcp_connect(void);
+extern void tcp_close(int sd);
 
 static int cert_callback(gnutls_session_t session,
 			 const gnutls_datum_t * req_ca_rdn, int nreqs,
@@ -107,7 +112,7 @@ static void load_keys(void)
 
 }
 
-int main()
+int main(void)
 {
     int ret, sd, ii;
     gnutls_session_t session;

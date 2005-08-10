@@ -39,7 +39,7 @@ int write_pkcs12(const gnutls_datum_t * cert,
     ret = gnutls_pkcs12_bag_set_data(bag, GNUTLS_BAG_CERTIFICATE, cert);
     if (ret < 0) {
 	fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-	exit(1);
+	return 1;
     }
 
     /* ret now holds the bag's index.
@@ -69,7 +69,7 @@ int write_pkcs12(const gnutls_datum_t * cert,
 				     pkcs8_key);
     if (ret < 0) {
 	fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-	exit(1);
+	return 1;
     }
 
     /* Note that since the PKCS #8 key is already encrypted we don't
@@ -104,13 +104,13 @@ int write_pkcs12(const gnutls_datum_t * cert,
 			     &pkcs12_struct_size);
     if (ret < 0) {
 	fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-	exit(1);
+	return 1;
     }
 
     fd = fopen(OUTFILE, "w");
     if (fd == NULL) {
 	fprintf(stderr, "cannot open file\n");
-	exit(1);
+	return 1;
     }
     fwrite(pkcs12_struct, 1, pkcs12_struct_size, fd);
     fclose(fd);
@@ -119,4 +119,5 @@ int write_pkcs12(const gnutls_datum_t * cert,
     gnutls_pkcs12_bag_deinit(key_bag);
     gnutls_pkcs12_deinit(pkcs12);
 
+    return 0;
 }

@@ -28,7 +28,7 @@
 /* These are global */
 gnutls_certificate_credentials_t x509_cred;
 
-gnutls_session_t initialize_tls_session()
+gnutls_session_t initialize_tls_session(void)
 {
     gnutls_session_t session;
 
@@ -66,7 +66,7 @@ static int generate_dh_params(void)
     return 0;
 }
 
-int main()
+int main(void)
 {
     int err, listen_sd, i;
     int sd, ret;
