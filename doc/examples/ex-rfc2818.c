@@ -5,78 +5,87 @@
 /* This function will try to verify the peer's certificate, and
  * also check if the hostname matches, and the activation, expiration dates.
  */
-void verify_certificate( gnutls_session_t session, const char* hostname)
+void
+verify_certificate (gnutls_session_t session, const char *hostname)
 {
-   unsigned int status;
-   const gnutls_datum_t* cert_list;
-   int cert_list_size, ret;
-   gnutls_x509_crt_t cert;
+  unsigned int status;
+  const gnutls_datum_t *cert_list;
+  int cert_list_size, ret;
+  gnutls_x509_crt_t cert;
 
 
-   /* This verification function uses the trusted CAs in the credentials
-    * structure. So you must have installed one or more CA certificates.
-    */
-   ret = gnutls_certificate_verify_peers2(session, &status);
+  /* This verification function uses the trusted CAs in the credentials
+   * structure. So you must have installed one or more CA certificates.
+   */
+  ret = gnutls_certificate_verify_peers2 (session, &status);
 
-   if (ret < 0) {
-      printf("Error\n");
+  if (ret < 0)
+    {
+      printf ("Error\n");
       return;
-   }
+    }
 
-   if (status & GNUTLS_CERT_INVALID)
-      printf("The certificate is not trusted.\n");
+  if (status & GNUTLS_CERT_INVALID)
+    printf ("The certificate is not trusted.\n");
 
-   if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-      printf("The certificate hasn't got a known issuer.\n");
+  if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
+    printf ("The certificate hasn't got a known issuer.\n");
 
-   if (status & GNUTLS_CERT_REVOKED)
-     printf("The certificate has been revoked.\n");
+  if (status & GNUTLS_CERT_REVOKED)
+    printf ("The certificate has been revoked.\n");
 
 
-   /* Up to here the process is the same for X.509 certificates and
-    * OpenPGP keys. From now on X.509 certificates are assumed. This can
-    * be easily extended to work with openpgp keys as well.
-    */
-   if ( gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
+  /* Up to here the process is the same for X.509 certificates and
+   * OpenPGP keys. From now on X.509 certificates are assumed. This can
+   * be easily extended to work with openpgp keys as well.
+   */
+  if (gnutls_certificate_type_get (session) != GNUTLS_CRT_X509)
+    return;
+
+  if (gnutls_x509_crt_init (&cert) < 0)
+    {
+      printf ("error in initialization\n");
       return;
+    }
 
-   if ( gnutls_x509_crt_init( &cert) < 0) {
-      printf("error in initialization\n");
+  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+  if (cert_list == NULL)
+    {
+      printf ("No certificate was found!\n");
       return;
-   }
+    }
 
-   cert_list = gnutls_certificate_get_peers( session, &cert_list_size);
-   if ( cert_list == NULL) {
-      printf("No certificate was found!\n");
+  /* This is not a real world example, since we only check the first 
+   * certificate in the given chain.
+   */
+  if (gnutls_x509_crt_import (cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0)
+    {
+      printf ("error parsing certificate\n");
       return;
-   }
+    }
 
-   /* This is not a real world example, since we only check the first 
-    * certificate in the given chain.
-    */
-   if ( gnutls_x509_crt_import( cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0) {
-      printf("error parsing certificate\n");
+  /* Beware here we do not check for errors.
+   */
+  if (gnutls_x509_crt_get_expiration_time (cert) < time (0))
+    {
+      printf ("The certificate has expired\n");
       return;
-   }
+    }
 
-   /* Beware here we do not check for errors.
-    */
-   if ( gnutls_x509_crt_get_expiration_time( cert) < time(0)) {
-      printf("The certificate has expired\n");
+  if (gnutls_x509_crt_get_activation_time (cert) > time (0))
+    {
+      printf ("The certificate is not yet activated\n");
       return;
-   }
+    }
 
-   if ( gnutls_x509_crt_get_activation_time( cert) > time(0)) {
-      printf("The certificate is not yet activated\n");
+  if (!gnutls_x509_crt_check_hostname (cert, hostname))
+    {
+      printf ("The certificate's owner does not match hostname '%s'\n",
+	      hostname);
       return;
-   }
+    }
 
-   if ( !gnutls_x509_crt_check_hostname( cert, hostname)) {
-      printf("The certificate's owner does not match hostname '%s'\n", hostname);
-      return;
-   }
+  gnutls_x509_crt_deinit (cert);
 
-   gnutls_x509_crt_deinit( cert);
-
-   return;
+  return;
 }

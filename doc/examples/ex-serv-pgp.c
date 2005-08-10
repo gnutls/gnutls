@@ -32,7 +32,8 @@ gnutls_certificate_credentials_t cred;
 const int cert_type_priority[2] = { GNUTLS_CRT_OPENPGP, 0 };
 gnutls_dh_params_t dh_params;
 
-static int generate_dh_params(void)
+static int
+generate_dh_params (void)
 {
 
   /* Generate Diffie Hellman parameters - for use with DHE
@@ -40,8 +41,8 @@ static int generate_dh_params(void)
    * once a day, once a week or once a month. Depending on the
    * security requirements.
    */
-  gnutls_dh_params_init(&dh_params);
-  gnutls_dh_params_generate2(dh_params, DH_BITS);
+  gnutls_dh_params_init (&dh_params);
+  gnutls_dh_params_generate2 (dh_params, DH_BITS);
 
   return 0;
 }
@@ -49,133 +50,143 @@ static int generate_dh_params(void)
 /* These are global */
 gnutls_certificate_credentials_t x509_cred;
 
-gnutls_session_t initialize_tls_session(void)
+gnutls_session_t
+initialize_tls_session (void)
 {
   gnutls_session_t session;
 
-  gnutls_init(&session, GNUTLS_SERVER);
+  gnutls_init (&session, GNUTLS_SERVER);
 
   /* avoid calling all the priority functions, since the defaults
    * are adequate.
    */
-  gnutls_set_default_priority(session);
+  gnutls_set_default_priority (session);
 
-  gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
   /* request client certificate if any.
    */
-  gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUEST);
+  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
 
-  gnutls_dh_set_prime_bits(session, DH_BITS);
+  gnutls_dh_set_prime_bits (session, DH_BITS);
 
   return session;
 }
 
-int main(void)
+int
+main (void)
 {
-    int err, listen_sd, i;
-    int sd, ret;
-    struct sockaddr_in sa_serv;
-    struct sockaddr_in sa_cli;
-    int client_len;
-    char topbuf[512];
-    gnutls_session_t session;
-    char buffer[MAX_BUF + 1];
-    int optval = 1;
-    char name[256];
+  int err, listen_sd, i;
+  int sd, ret;
+  struct sockaddr_in sa_serv;
+  struct sockaddr_in sa_cli;
+  int client_len;
+  char topbuf[512];
+  gnutls_session_t session;
+  char buffer[MAX_BUF + 1];
+  int optval = 1;
+  char name[256];
 
-    strcpy(name, "Echo Server");
+  strcpy (name, "Echo Server");
 
-    /* this must be called once in the program
-     */
-    gnutls_global_init();
+  /* this must be called once in the program
+   */
+  gnutls_global_init ();
 
-    gnutls_certificate_allocate_credentials(&cred);
-    gnutls_certificate_set_openpgp_keyring_file(cred, RINGFILE);
+  gnutls_certificate_allocate_credentials (&cred);
+  gnutls_certificate_set_openpgp_keyring_file (cred, RINGFILE);
 
-    gnutls_certificate_set_openpgp_key_file(cred, CERTFILE, KEYFILE);
+  gnutls_certificate_set_openpgp_key_file (cred, CERTFILE, KEYFILE);
 
-    generate_dh_params();
+  generate_dh_params ();
 
-    gnutls_certificate_set_dh_params(cred, dh_params);
+  gnutls_certificate_set_dh_params (cred, dh_params);
 
-    /* Socket operations
-     */
-    listen_sd = socket(AF_INET, SOCK_STREAM, 0);
-    SOCKET_ERR(listen_sd, "socket");
+  /* Socket operations
+   */
+  listen_sd = socket (AF_INET, SOCK_STREAM, 0);
+  SOCKET_ERR (listen_sd, "socket");
 
-    memset(&sa_serv, '\0', sizeof(sa_serv));
-    sa_serv.sin_family = AF_INET;
-    sa_serv.sin_addr.s_addr = INADDR_ANY;
-    sa_serv.sin_port = htons(PORT);	/* Server Port number */
+  memset (&sa_serv, '\0', sizeof (sa_serv));
+  sa_serv.sin_family = AF_INET;
+  sa_serv.sin_addr.s_addr = INADDR_ANY;
+  sa_serv.sin_port = htons (PORT);	/* Server Port number */
 
-    setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
+  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof (int));
 
-    err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
-    SOCKET_ERR(err, "bind");
-    err = listen(listen_sd, 1024);
-    SOCKET_ERR(err, "listen");
+  err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
+  SOCKET_ERR (err, "bind");
+  err = listen (listen_sd, 1024);
+  SOCKET_ERR (err, "listen");
 
-    printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
+  printf ("%s ready. Listening to port '%d'.\n\n", name, PORT);
 
-    client_len = sizeof(sa_cli);
-    for (;;) {
-	session = initialize_tls_session();
-	gnutls_certificate_type_set_priority(session, cert_type_priority);
+  client_len = sizeof (sa_cli);
+  for (;;)
+    {
+      session = initialize_tls_session ();
+      gnutls_certificate_type_set_priority (session, cert_type_priority);
 
-	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
+      sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
-	printf("- connection from %s, port %d\n",
-	       inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
-			 sizeof(topbuf)), ntohs(sa_cli.sin_port));
+      printf ("- connection from %s, port %d\n",
+	      inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
+			 sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
-	gnutls_transport_set_ptr(session, (gnutls_transport_ptr_t) sd);
-	ret = gnutls_handshake(session);
-	if (ret < 0) {
-	    close(sd);
-	    gnutls_deinit(session);
-	    fprintf(stderr, "*** Handshake has failed (%s)\n\n",
-		    gnutls_strerror(ret));
-	    continue;
+      gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
+      ret = gnutls_handshake (session);
+      if (ret < 0)
+	{
+	  close (sd);
+	  gnutls_deinit (session);
+	  fprintf (stderr, "*** Handshake has failed (%s)\n\n",
+		   gnutls_strerror (ret));
+	  continue;
 	}
-	printf("- Handshake was completed\n");
+      printf ("- Handshake was completed\n");
 
-	/* see the Getting peer's information example */
-	/* print_info(session); */
+      /* see the Getting peer's information example */
+      /* print_info(session); */
 
-	i = 0;
-	for (;;) {
-	    bzero(buffer, MAX_BUF + 1);
-	    ret = gnutls_record_recv(session, buffer, MAX_BUF);
+      i = 0;
+      for (;;)
+	{
+	  bzero (buffer, MAX_BUF + 1);
+	  ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
-	    if (ret == 0) {
-		printf("\n- Peer has closed the GNUTLS connection\n");
-		break;
-	    } else if (ret < 0) {
-		fprintf(stderr, "\n*** Received corrupted "
-			"data(%d). Closing the connection.\n\n", ret);
-		break;
-	    } else if (ret > 0) {
-		/* echo data back to the client
-		 */
-		gnutls_record_send(session, buffer, strlen(buffer));
+	  if (ret == 0)
+	    {
+	      printf ("\n- Peer has closed the GNUTLS connection\n");
+	      break;
+	    }
+	  else if (ret < 0)
+	    {
+	      fprintf (stderr, "\n*** Received corrupted "
+		       "data(%d). Closing the connection.\n\n", ret);
+	      break;
+	    }
+	  else if (ret > 0)
+	    {
+	      /* echo data back to the client
+	       */
+	      gnutls_record_send (session, buffer, strlen (buffer));
 	    }
 	}
-	printf("\n");
-	/* do not wait for the peer to close the connection.
-	 */
-	gnutls_bye(session, GNUTLS_SHUT_WR);
+      printf ("\n");
+      /* do not wait for the peer to close the connection.
+       */
+      gnutls_bye (session, GNUTLS_SHUT_WR);
 
-	close(sd);
-	gnutls_deinit(session);
+      close (sd);
+      gnutls_deinit (session);
 
     }
-    close(listen_sd);
+  close (listen_sd);
 
-    gnutls_certificate_free_credentials(cred);
+  gnutls_certificate_free_credentials (cred);
 
-    gnutls_global_deinit();
+  gnutls_global_deinit ();
 
-    return 0;
+  return 0;
 
 }
