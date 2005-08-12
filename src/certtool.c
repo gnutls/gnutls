@@ -87,7 +87,6 @@ static void tls_log_func(int level, const char *str)
 
 int main(int argc, char **argv)
 {
-    set_program_name(argv[0]);
     cfg_init();
     gaa_parser(argc, argv);
 
