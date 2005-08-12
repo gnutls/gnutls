@@ -461,7 +461,7 @@ AC_MSG_RESULT([***
 
 gl_SOURCE_BASE(gl)
 gl_M4_BASE(gl/m4)
-gl_MODULES(getline error memmem getpass-gnu minmax snprintf)
+gl_MODULES(getline error memmem getpass-gnu minmax snprintf memmove)
 gl_LGPL
 gl_INIT
 

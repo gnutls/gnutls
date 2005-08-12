@@ -123,12 +123,4 @@ typedef signed char int8;
 # error "Cannot find an 8 bit char in your system, sorry."
 #endif
 
-#ifndef HAVE_MEMMOVE
-# ifdef HAVE_BCOPY
-#  define memmove(d, s, n) bcopy ((s), (d), (n))
-# else
-#  error "Neither memmove nor bcopy exists on your system."
-# endif
-#endif
-
 #endif				/* defines_h */
