@@ -21,40 +21,12 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-
 #include "int.h"
 #include "errors_int.h"
-
-#ifdef LIBTASN1_DEBUG
-# ifdef __FILE__
-#  ifdef __LINE__
-#   define _libtasn1_assert() fprintf(stderr, "LIBTASN1_ASSERT: %s:%d\n", __FILE__,__LINE__);
-#  else
-#   define _libtasn1_assert() 
-#  endif
-# else /* __FILE__ defined */
-#  define _libtasn1_assert() 
-# endif
-#else /* no debug */
-# define _libtasn1_assert() 
-#endif
 
 const char* libtasn1_strerror(int error);
 void libtasn1_perror(int error);
 
-#ifdef LIBTASN1_DEBUG
- void _libtasn1_log( const char *fmt, ...);
-#else
-
-/* These macros only work with C99 compliant compilers
- */
-# ifdef C99_MACROS
-#  define _libtasn1_log(...)
-# else
-#  define _libtasn1_log _libtasn1_null_log
-void _libtasn1_null_log( void*, ...);
-# endif /* C99_MACROS */
-
-#endif /* DEBUG */
+void _libtasn1_log( const char *fmt, ...);
 
 #endif /* ERRORS_H */
