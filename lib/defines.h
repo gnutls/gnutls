@@ -25,14 +25,15 @@
 #ifndef DEFINES_H
 # define DEFINES_H
 
-#include <config.h>
-
-#ifdef STDC_HEADERS
-# include <string.h>
-# include <stdlib.h>
-# include <stdio.h>
-# include <ctype.h>
+#if HAVE_CONFIG_H
+# include <config.h>
 #endif
+
+#include <stddef.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
 
 #ifdef NO_SSIZE_T
 # define HAVE_SSIZE_T
@@ -41,12 +42,6 @@ typedef int ssize_t;
 
 #ifdef HAVE_STRINGS_H
 # include <strings.h>
-#endif
-
-#include <memmem.h>
-
-#ifdef HAVE_STDDEF_H
-# include <stddef.h>
 #endif
 
 #ifdef HAVE_SYS_TYPES_H
@@ -75,6 +70,8 @@ typedef int ssize_t;
 #ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
 #endif
+
+#include "memmem.h"
 
 #ifndef HAVE_UINT
 typedef unsigned int uint;
