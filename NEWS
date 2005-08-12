@@ -5,6 +5,7 @@ See the end for copying conditions.
 
 * Version 1.2.7
 - Fixed examples in doc/examples/, suggested by Fran <e_agf@yahoo.es>.
+- Gnulib is now used for the core library, enabling future code cleanups.
 - Doc fixes for gnutls_transport_set_push and gnutls_transport_set_pull.
 - API and ABI modifications:
   No changes since last version.
