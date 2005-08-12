@@ -72,6 +72,7 @@ typedef int ssize_t;
 #endif
 
 #include "memmem.h"
+#include "isascii.h"
 
 #ifndef HAVE_UINT
 typedef unsigned int uint;
@@ -86,12 +87,6 @@ typedef signed int sint;
 typedef struct {
     unsigned char i[8];
 } uint64;
-
-#ifndef HAVE_ISASCII
-# ifndef isascii
-#  define isascii(x) (x<128?1:0)
-# endif
-#endif
 
 #if SIZEOF_UNSIGNED_LONG == 4
 typedef unsigned long int uint32;
