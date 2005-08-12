@@ -12,7 +12,7 @@ AC_DEFUN([gl_FUNC_ISASCII],
   AC_REQUIRE([AC_GNU_SOURCE])
  
   AC_REPLACE_FUNCS(isascii)
-  AC_CHECK_DECLS_ONCE(isascii)
+  AC_CHECK_DECLS(isascii,,,[#include <ctype.h>])
 ])
 
 # Prerequisites of lib/isascii.h.
