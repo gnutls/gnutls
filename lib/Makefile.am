@@ -66,7 +66,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_ui.c gnutls_sig.c auth_dhe.c gnutls_dh_primes.c		\
 	ext_max_record.c gnutls_alert.c gnutls_str.c gnutls_state.c	\
 	gnutls_x509.c ext_cert_type.c gnutls_rsa_export.c		\
-	auth_rsa_export.c ext_server_name.c auth_dh_common.c memmem.c
+	auth_rsa_export.c ext_server_name.c auth_dh_common.c
 
 HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
@@ -82,7 +82,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_session_pack.h gnutls_str.h gnutls_state.h		\
 	gnutls_x509.h ext_cert_type.h gnutls_rsa_export.h		\
 	ext_server_name.h auth_dh_common.h ext_srp.h gnutls_srp.h	\
-	auth_srp.h auth_srp_passwd.h memmem.h
+	auth_srp.h auth_srp_passwd.h
 
 # Separate so we can create the documentation
 
@@ -92,7 +92,8 @@ libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 libgnutls_la_LDFLAGS = -export-symbols-regex '^(_gnutls|gnutls|_E_).*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_la_LIBADD = ../crypto/libgc.la x509/libgnutls_x509.la	\
+libgnutls_la_LIBADD = ../gl/libgnu.la ../crypto/libgc.la \
+	x509/libgnutls_x509.la	\
 	$(LIBGCRYPT_LIBS)
 
 if ENABLE_MINITASN1
