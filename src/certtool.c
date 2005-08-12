@@ -39,7 +39,7 @@
 /* Gnulib portability files. */
 #include <getline.h>
 #include <error.h>
-#include <progname.h>
+const char *program_name = "certtool";
 
 static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all);
 int generate_prime(int bits, int how);
