@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Free Software Foundation
+ * Copyright (C) 2004, 2005 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -29,9 +29,13 @@
 #include <cfg+.h>
 #include <gnutls/x509.h>
 #include <string.h>
+#include <limits.h>
+#include <inttypes.h>
 
 /* Gnulib portability files. */
 #include <getpass.h>
+#include "error.h"
+#include "readline.h"
 
 extern int batch;
 
@@ -205,15 +209,31 @@ void read_crq_set(gnutls_x509_crq crq, const char *input_str,
 
 int read_int(const char *input_str)
 {
-    char input[128];
+  char *in;
+  char *endptr;
+  long l;
 
-    fputs(input_str, stderr);
-    fgets(input, sizeof(input), stdin);
+  in = readline (input_str);
 
-    if (strlen(input) == 1)	/* only newline */
-	return 0;
+  l = strtol (in, &endptr, 0);
 
-    return atoi(input);
+  if (*endptr != '\0')
+    {
+      error (0, 0, "Trailing garbage ignored: `%s'", endptr);
+      free (in);
+      return 0;
+    }
+
+  if (l <= INT_MIN || l >= INT_MAX)
+    {
+      error (0, 0, "Integer out of range: `%s'", in);
+      free (in);
+      return 0;
+    }
+
+  free (in);
+
+  return (int) l;
 }
 
 const char *read_str(const char *input_str)
