@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2001, 2003, 2004 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2001, 2003, 2004, 2005 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,8 @@
 #include <stdio.h>
 #if HAVE_STDIO_EXT_H
 # include <stdio_ext.h>
-#else
+#endif
+#if !HAVE___FSETLOCKING
 # define __fsetlocking(stream, type) /* empty */
 #endif
 #if !_LIBC
