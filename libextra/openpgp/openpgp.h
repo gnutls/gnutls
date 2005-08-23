@@ -1,7 +1,9 @@
 #ifndef OPENPGP_H
 # define OPENPGP_H
 
-#include <config.h>
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 typedef enum gnutls_openpgp_key_fmt_t {
     GNUTLS_OPENPGP_FMT_RAW, GNUTLS_OPENPGP_FMT_BASE64
