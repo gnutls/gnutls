@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-AM_CPPFLAGS = -I$(top_srcdir)/includes
+AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes
 LDADD = libexamples.la \
 	$(top_srcdir)/lib/libgnutls.la	\
 	$(top_srcdir)/libextra/libgnutls-extra.la
