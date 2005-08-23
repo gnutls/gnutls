@@ -8,7 +8,6 @@
 # include <winsock.h>
 # include <io.h>
 # include <winbase.h>
-# define socklen_t int
 # define close closesocket
 #else
 # include <sys/socket.h>
