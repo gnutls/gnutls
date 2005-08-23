@@ -21,8 +21,8 @@
 
 AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes
 LDADD = libexamples.la \
-	$(top_srcdir)/lib/libgnutls.la	\
-	$(top_srcdir)/libextra/libgnutls-extra.la
+	../../lib/libgnutls.la	\
+	../../libextra/libgnutls-extra.la
 
 noinst_PROGRAMS = ex-cert-select ex-client1 ex-client2			\
 	ex-client-resume ex-client-srp ex-crq ex-serv1 ex-serv-anon	\
