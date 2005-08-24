@@ -1,7 +1,6 @@
 /*
- * Copyright (C) 2004 Simon Josefsson
- * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Author: Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -415,15 +414,15 @@ void print_cert_vrfy(gnutls_session session)
     rc = gnutls_certificate_verify_peers2(session, &status);
     printf("\n");
 
-    if (rc < 0) {
-      printf("- Could not verify certificate (err: %s)\n",
-	     gnutls_strerror(status));
+    if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND) {
+      printf("- Peer did not send any certificate.\n");
       return;
     }
 
-    if (status == GNUTLS_E_NO_CERTIFICATE_FOUND) {
-	printf("- Peer did not send any certificate.\n");
-	return;
+    if (rc < 0) {
+      printf("- Could not verify certificate (err: %s)\n",
+	     gnutls_strerror(rc));
+      return;
     }
 
     if (gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
