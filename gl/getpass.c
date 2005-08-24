@@ -31,6 +31,10 @@
 /* For PASS_MAX. */
 #include <limits.h>
 
+#ifndef PASS_MAX
+# define PASS_MAX 512
+#endif
+
 char *getpass(const char *prompt)
 {
   char getpassbuf[PASS_MAX + 1];
