@@ -301,24 +301,29 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
  */
 
 typedef enum gnutls_certificate_verify_flags {
-    GNUTLS_VERIFY_DISABLE_CA_SIGN=1, /* if set a signer does not have to be
-                                      * a certificate authority. This flag should normaly 
-                                      * be disabled, unless you know what this means.
-                                      */
-    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT=2, /* Allow only trusted CA certificates that have version 1.
-                                           * This is safer than GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT,
-                                           * and should be used instead. That way only signers in your 
-                                           * trusted list will be allowed to have certificates of version 1.
-                                           */
-    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME=4,/* If a certificate is not signed by anyone
-                                       * trusted but exists in the trusted CA list
-                                       * do not treat it as trusted.
-                                       */
-    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT=8 /* Allow CA certificates that have version 1 (both root
-                                              * and intermediate). This might be dangerous since those haven't
-	                                      * the basicConstraints extension. Must be used in combination
-	                                      * with GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
-					      */
+  /* If set a signer does not have to be a certificate authority. This
+   * flag should normaly be disabled, unless you know what this means.
+   */
+  GNUTLS_VERIFY_DISABLE_CA_SIGN=1,
+
+  /* Allow only trusted CA certificates that have version 1.  This is
+   * safer than GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, and should be
+   * used instead. That way only signers in your trusted list will be
+   * allowed to have certificates of version 1.
+   */
+  GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT=2,
+
+  /* If a certificate is not signed by anyone trusted but exists in
+   * the trusted CA list do not treat it as trusted.
+   */
+  GNUTLS_VERIFY_DO_NOT_ALLOW_SAME=4,
+
+  /* Allow CA certificates that have version 1 (both root and
+   * intermediate). This might be dangerous since those haven't the
+   * basicConstraints extension. Must be used in combination with
+   * GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
+   */
+  GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT=8
 } gnutls_certificate_verify_flags;
 
 int gnutls_x509_crt_check_issuer( gnutls_x509_crt_t cert,
