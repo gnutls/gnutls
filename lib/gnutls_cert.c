@@ -494,20 +494,24 @@ int gnutls_certificate_verify_peers2(gnutls_session_t session,
     }
 }
 
-/*-
+/**
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
   * @session: is a gnutls session
   *
-  * This function will try to verify the peer's certificate and return its status (trusted, invalid etc.).
-  * However you must also check the peer's name in order to check if the verified certificate belongs to the
-  * actual peer.
+  * This function will try to verify the peer's certificate and return
+  * its status (trusted, invalid etc.).  However you must also check
+  * the peer's name in order to check if the verified certificate
+  * belongs to the actual peer.
   *
-  * The return value should be one or more of the gnutls_certificate_status_t
-  * enumerated elements bitwise or'd, or a negative value on error.
+  * The return value should be one or more of the
+  * gnutls_certificate_status_t enumerated elements bitwise or'd, or a
+  * negative value on error.
   *
   * This is the same as gnutls_x509_verify_certificate().
   *
-  -*/
+  * Deprecated: Use gnutls_certificate_verify_peers2() instead.
+  *
+  **/
 int gnutls_certificate_verify_peers(gnutls_session_t session)
 {
     unsigned int status;

@@ -1261,11 +1261,11 @@ static int parse_der_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
   * This function adds the trusted CAs in order to verify client
   * or server certificates. In case of a client this is not required
   * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers().
+  * gnutls_certificate_verify_peers2().
   * This function may be called multiple times.
   *
-  * In case of a server the CAs set here will be sent to the client
-  * if a certificate request is sent. This can be disabled using 
+  * In case of a server the CAs set here will be sent to the client if
+  * a certificate request is sent. This can be disabled using
   * gnutls_certificate_send_x509_rdn_sequence().
   *
   * Returns the number of certificates processed or a negative
@@ -1300,11 +1300,11 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t
   * This function adds the trusted CAs in order to verify client
   * or server certificates. In case of a client this is not required
   * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers().
+  * gnutls_certificate_verify_peers2().
   * This function may be called multiple times.
   *
-  * In case of a server the CAs set here will be sent to the client
-  * if a certificate request is sent. This can be disabled using 
+  * In case of a server the CAs set here will be sent to the client if
+  * a certificate request is sent. This can be disabled using
   * gnutls_certificate_send_x509_rdn_sequence().
   *
   * Returns 0 on success.
@@ -1357,11 +1357,11 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
   * This function adds the trusted CAs in order to verify client
   * or server certificates. In case of a client this is not required
   * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers().
+  * gnutls_certificate_verify_peers2().
   * This function may be called multiple times.
   *
-  * In case of a server the CAs set here will be sent to the client
-  * if a certificate request is sent. This can be disabled using 
+  * In case of a server the CAs set here will be sent to the client if
+  * a certificate request is sent. This can be disabled using
   * gnutls_certificate_send_x509_rdn_sequence().
   *
   * Returns the number of certificates processed or a negative
@@ -1567,11 +1567,10 @@ int read_crl_mem(gnutls_certificate_credentials_t res, const void *crl,
   * This function adds the trusted CRLs in order to verify client or server
   * certificates.  In case of a client this is not required
   * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers().
+  * gnutls_certificate_verify_peers2().
   * This function may be called multiple times.
   *
-  * Returns the number of CRLs processed or a negative value
-  * on error. 
+  * Returns the number of CRLs processed or a negative value on error.
   *
   **/
 int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t
@@ -1595,7 +1594,7 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t
   * This function adds the trusted CRLs in order to verify client or server
   * certificates.  In case of a client this is not required
   * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers().
+  * gnutls_certificate_verify_peers2().
   * This function may be called multiple times.
   *
   * Returns 0 on success.
@@ -1641,8 +1640,7 @@ int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
   * gnutls_certificate_verify_peers2().
   * This function may be called multiple times.
   *
-  * Returns the number of CRLs processed or a negative value
-  * on error. 
+  * Returns the number of CRLs processed or a negative value on error.
   *
   **/
 int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t
