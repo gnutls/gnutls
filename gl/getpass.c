@@ -19,44 +19,76 @@
 # include <config.h>
 #endif
 
-#if !_LIBC
-# include "getpass.h"
-#endif
+#include "getpass.h"
 
-#if _LIBC
-# define HAVE_STDIO_EXT_H 1
-#endif
+#include <stdio.h>
+
+#ifdef WIN32
+
+/* Windows implementation by Martin Lambers <marlam@marlam.de>,
+   improved by Simon Josefsson. */
+
+/* For PASS_MAX. */
+#include <limits.h>
+
+char *getpass(const char *prompt)
+{
+  char getpassbuf[PASS_MAX + 1];
+  size_t i = 0;
+  int c;
+
+  if (prompt)
+    {
+      fputs (prompt, stderr);
+      fflush (stderr);
+    }
+
+  for (;;)
+    {
+      c = _getch();
+      if (c == '\r')
+	{
+	  getpassbuf[i] = '\0';
+	  break;
+	}
+      else if (i < PASS_MAX)
+	{
+	  getpassbuf[i++] = c;
+	}
+
+      if (i >= PASS_MAX)
+	{
+	  getpassbuf[i] = '\0';
+	  break;
+	}
+    }
+
+  if (prompt)
+    {
+      fputs ("\r\n", stderr);
+      fflush (stderr);
+    }
+
+  return strdup (getpassbuf);
+}
+#else /* WIN32 */
 
 #include <stdbool.h>
 
-#include <stdio.h>
 #if HAVE_STDIO_EXT_H
 # include <stdio_ext.h>
 #endif
 #if !HAVE___FSETLOCKING
 # define __fsetlocking(stream, type) /* empty */
 #endif
-#if !_LIBC
-# include "getline.h"
+
+#if HAVE_TERMIOS_H
+# include <termios.h>
 #endif
 
-#include <termios.h>
-#include <unistd.h>
+#include "getline.h"
 
-#if _LIBC
-# include <wchar.h>
-#endif
-
-#if _LIBC
-# define NOTCANCEL_MODE "c"
-#else
-# define NOTCANCEL_MODE
-#endif
-
-#if _LIBC
-# define flockfile(s) _IO_flockfile (s)
-# define funlockfile(s) _IO_funlockfile (s)
-#elif USE_UNLOCKED_IO
+#if USE_UNLOCKED_IO
 # include "unlocked-io.h"
 #else
 # if !HAVE_DECL_FFLUSH_UNLOCKED
@@ -81,18 +113,6 @@
 # endif
 #endif
 
-#if _LIBC
-# include <bits/libc-lock.h>
-#else
-# define __libc_cleanup_push(function, arg) /* empty */
-# define __libc_cleanup_pop(execute) /* empty */
-#endif
-
-#if !_LIBC
-# define __getline getline
-# define __tcgetattr tcgetattr
-#endif
-
 /* It is desirable to use this bit on systems that have it.
    The only bit of terminal state we want to twiddle is echoing, which is
    done in software; there is no need to change the state of the terminal
@@ -115,7 +135,7 @@ getpass (const char *prompt)
   FILE *tty;
   FILE *in, *out;
   struct termios s, t;
-  bool tty_changed;
+  bool tty_changed = false;
   static char *buf;
   static size_t bufsize;
   ssize_t nread;
@@ -123,7 +143,7 @@ getpass (const char *prompt)
   /* Try to write to and read from the terminal if we can.
      If we can't open the terminal, use stderr and stdin.  */
 
-  tty = fopen ("/dev/tty", "w+" NOTCANCEL_MODE);
+  tty = fopen ("/dev/tty", "w+");
   if (tty == NULL)
     {
       in = stdin;
@@ -137,15 +157,11 @@ getpass (const char *prompt)
       out = in = tty;
     }
 
-  /* Make sure the stream we opened is closed even if the thread is
-     canceled.  */
-  __libc_cleanup_push (call_fclose, tty);
-
   flockfile (out);
 
   /* Turn echoing off if it is on now.  */
-
-  if (__tcgetattr (fileno (in), &t) == 0)
+#if HAVE_TCGETATTR
+  if (tcgetattr (fileno (in), &t) == 0)
     {
       /* Save the old one. */
       s = t;
@@ -153,23 +169,14 @@ getpass (const char *prompt)
       t.c_lflag &= ~(ECHO|ISIG);
       tty_changed = (tcsetattr (fileno (in), TCSAFLUSH|TCSASOFT, &t) == 0);
     }
-  else
-    tty_changed = false;
+#endif
 
   /* Write the prompt.  */
-#ifdef USE_IN_LIBIO
-  if (_IO_fwide (out, 0) > 0)
-    __fwprintf (out, L"%s", prompt);
-  else
-#endif
-    fputs_unlocked (prompt, out);
+  fputs_unlocked (prompt, out);
   fflush_unlocked (out);
 
   /* Read the password.  */
-  nread = __getline (&buf, &bufsize, in);
-
-#if !_LIBC
-  /* As far as is known, glibc doesn't need this no-op fseek.  */
+  nread = getline (&buf, &bufsize, in);
 
   /* According to the C standard, input may not be followed by output
      on the same stream without an intervening call to a file
@@ -181,7 +188,6 @@ getpass (const char *prompt)
      from POSIX version to POSIX version, so play it safe and invoke
      fseek even if in != out.  */
   fseek (out, 0, SEEK_CUR);
-#endif
 
   if (buf != NULL)
     {
@@ -194,25 +200,22 @@ getpass (const char *prompt)
 	  if (tty_changed)
 	    {
 	      /* Write the newline that was not echoed.  */
-#ifdef USE_IN_LIBIO
-	      if (_IO_fwide (out, 0) > 0)
-		putwc_unlocked (L'\n', out);
-	      else
-#endif
-		putc_unlocked ('\n', out);
+	      putc_unlocked ('\n', out);
 	    }
 	}
     }
 
   /* Restore the original setting.  */
+#if TCSETATTR
   if (tty_changed)
-    (void) tcsetattr (fileno (in), TCSAFLUSH|TCSASOFT, &s);
+    tcsetattr (fileno (in), TCSAFLUSH|TCSASOFT, &s);
+#endif
 
   funlockfile (out);
-
-  __libc_cleanup_pop (0);
 
   call_fclose (tty);
 
   return buf;
 }
+
+#endif
