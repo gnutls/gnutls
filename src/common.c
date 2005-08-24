@@ -410,18 +410,19 @@ void print_openpgp_info(gnutls_session session, const char *hostname)
 
 void print_cert_vrfy(gnutls_session session)
 {
+    int status, rc;
 
-    int status;
-    status = gnutls_certificate_verify_peers(session);
+    rc = gnutls_certificate_verify_peers2(session, &status);
     printf("\n");
+
+    if (rc < 0) {
+      printf("- Could not verify certificate (err: %s)\n",
+	     gnutls_strerror(status));
+      return;
+    }
 
     if (status == GNUTLS_E_NO_CERTIFICATE_FOUND) {
 	printf("- Peer did not send any certificate.\n");
-	return;
-    }
-    if (status < 0) {
-	printf("- Could not verify certificate (err: %s)\n",
-	       gnutls_strerror(status));
 	return;
     }
 
