@@ -23,59 +23,7 @@
 
 #include <stdio.h>
 
-#ifdef WIN32
-
-/* Windows implementation by Martin Lambers <marlam@marlam.de>,
-   improved by Simon Josefsson. */
-
-/* For PASS_MAX. */
-#include <limits.h>
-
-#ifndef PASS_MAX
-# define PASS_MAX 512
-#endif
-
-char *getpass(const char *prompt)
-{
-  char getpassbuf[PASS_MAX + 1];
-  size_t i = 0;
-  int c;
-
-  if (prompt)
-    {
-      fputs (prompt, stderr);
-      fflush (stderr);
-    }
-
-  for (;;)
-    {
-      c = _getch();
-      if (c == '\r')
-	{
-	  getpassbuf[i] = '\0';
-	  break;
-	}
-      else if (i < PASS_MAX)
-	{
-	  getpassbuf[i++] = c;
-	}
-
-      if (i >= PASS_MAX)
-	{
-	  getpassbuf[i] = '\0';
-	  break;
-	}
-    }
-
-  if (prompt)
-    {
-      fputs ("\r\n", stderr);
-      fflush (stderr);
-    }
-
-  return strdup (getpassbuf);
-}
-#else /* WIN32 */
+#if !defined WIN32
 
 #include <stdbool.h>
 
@@ -83,7 +31,7 @@ char *getpass(const char *prompt)
 # include <stdio_ext.h>
 #endif
 #if !HAVE___FSETLOCKING
-# define __fsetlocking(stream, type) /* empty */
+# define __fsetlocking(stream, type)	/* empty */
 #endif
 
 #if HAVE_TERMIOS_H
@@ -170,8 +118,8 @@ getpass (const char *prompt)
       /* Save the old one. */
       s = t;
       /* Tricky, tricky. */
-      t.c_lflag &= ~(ECHO|ISIG);
-      tty_changed = (tcsetattr (fileno (in), TCSAFLUSH|TCSASOFT, &t) == 0);
+      t.c_lflag &= ~(ECHO | ISIG);
+      tty_changed = (tcsetattr (fileno (in), TCSAFLUSH | TCSASOFT, &t) == 0);
     }
 #endif
 
@@ -212,7 +160,7 @@ getpass (const char *prompt)
   /* Restore the original setting.  */
 #if TCSETATTR
   if (tty_changed)
-    tcsetattr (fileno (in), TCSAFLUSH|TCSASOFT, &s);
+    tcsetattr (fileno (in), TCSAFLUSH | TCSASOFT, &s);
 #endif
 
   funlockfile (out);
@@ -222,4 +170,57 @@ getpass (const char *prompt)
   return buf;
 }
 
+#else /* WIN32 */
+
+/* Windows implementation by Martin Lambers <marlam@marlam.de>,
+   improved by Simon Josefsson. */
+
+/* For PASS_MAX. */
+#include <limits.h>
+
+#ifndef PASS_MAX
+# define PASS_MAX 512
+#endif
+
+char *
+getpass (const char *prompt)
+{
+  char getpassbuf[PASS_MAX + 1];
+  size_t i = 0;
+  int c;
+
+  if (prompt)
+    {
+      fputs (prompt, stderr);
+      fflush (stderr);
+    }
+
+  for (;;)
+    {
+      c = _getch ();
+      if (c == '\r')
+	{
+	  getpassbuf[i] = '\0';
+	  break;
+	}
+      else if (i < PASS_MAX)
+	{
+	  getpassbuf[i++] = c;
+	}
+
+      if (i >= PASS_MAX)
+	{
+	  getpassbuf[i] = '\0';
+	  break;
+	}
+    }
+
+  if (prompt)
+    {
+      fputs ("\r\n", stderr);
+      fflush (stderr);
+    }
+
+  return strdup (getpassbuf);
+}
 #endif
