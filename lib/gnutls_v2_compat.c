@@ -39,7 +39,6 @@
 #include "gnutls_hash_int.h"
 #include "gnutls_db.h"
 #include "gnutls_extensions.h"
-#include "gnutls_random.h"
 #include "gnutls_auth_int.h"
 
 /* This selects the best supported ciphersuite from the ones provided */

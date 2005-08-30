@@ -34,7 +34,6 @@
 #include "libtasn1.h"
 #include "gnutls_datum.h"
 #include "auth_cert.h"
-#include <gnutls_random.h>
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_global.h>

@@ -34,7 +34,6 @@
 #include "auth_srp.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_srp.h"
-#include "gnutls_random.h"
 #include "gnutls_dh.h"
 #include "debug.h"
 #include <gnutls_str.h>

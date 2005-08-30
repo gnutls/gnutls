@@ -40,7 +40,6 @@
 #include <extensions.h>
 #include <mpi.h>
 #include <gnutls_algorithms.h>
-#include <gnutls_random.h>
 #include <gnutls_num.h>
 #include <gc.h>
 

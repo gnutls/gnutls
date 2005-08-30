@@ -34,7 +34,6 @@
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
 #include "debug.h"
-#include "gnutls_random.h"
 #include "gnutls_num.h"
 #include "gnutls_datum.h"
 #include "gnutls_kx.h"

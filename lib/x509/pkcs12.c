@@ -34,7 +34,6 @@
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
-#include <gnutls_random.h>
 #include <common.h>
 #include <x509_b64.h>
 #include <pkcs12.h>
