@@ -50,6 +50,7 @@
 #include <ext_srp.h>
 #include <gnutls_rsa_export.h>	/* for gnutls_get_rsa_params() */
 #include <auth_anon.h>		/* for gnutls_anon_server_credentials_t */
+#include <gc.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_handshake_log( "HSK[%x]: %s (%d)\n", session, x,y)
@@ -239,10 +240,9 @@ int _gnutls_tls_create_random(opaque * dst)
     /* generate server random value */
     _gnutls_write_uint32(tim, dst);
 
-    if (_gnutls_get_random
-	(&dst[4], TLS_RANDOM_SIZE - 4, GNUTLS_WEAK_RANDOM) < 0) {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
+    if (gc_nonce (&dst[4], TLS_RANDOM_SIZE - 4) != GC_OK) {
+      gnutls_assert();
+      return GNUTLS_E_RANDOM_FAILED;
     }
 
     return 0;
@@ -2352,9 +2352,9 @@ int _gnutls_generate_session_id(opaque * session_id, uint8 * len)
 {
     *len = TLS_MAX_SESSION_ID_SIZE;
 
-    if (_gnutls_get_random(session_id, *len, GNUTLS_WEAK_RANDOM) < 0) {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
+    if (gc_nonce (session_id, *len) != GC_OK) {
+      gnutls_assert();
+      return GNUTLS_E_RANDOM_FAILED;
     }
 
     return 0;

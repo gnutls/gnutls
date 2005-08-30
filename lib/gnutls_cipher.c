@@ -40,6 +40,7 @@
 #include "gnutls_kx.h"
 #include "gnutls_record.h"
 #include "gnutls_constate.h"
+#include <gc.h>
 
 inline static int is_write_comp_null(gnutls_session_t session)
 {
@@ -215,9 +216,9 @@ calc_enc_length(gnutls_session_t session, int data_size,
 
 	break;
     case CIPHER_BLOCK:
-	if (_gnutls_get_random(&rnd, 1, GNUTLS_WEAK_RANDOM) < 0) {
-	    gnutls_assert();
-	    return GNUTLS_E_MEMORY_ERROR;
+	if (gc_nonce (&rnd, 1) != GC_OK) {
+	  gnutls_assert();
+	  return GNUTLS_E_RANDOM_FAILED;
 	}
 
 	/* make rnd a multiple of blocksize */
@@ -337,10 +338,9 @@ int _gnutls_compressed2ciphertext(gnutls_session_t session,
 	session->security_parameters.version >= GNUTLS_TLS1_1) {
 	/* copy the random IV.
 	 */
-	if (_gnutls_get_random(data_ptr, blocksize, GNUTLS_WEAK_RANDOM) <
-	    0) {
-	    gnutls_assert();
-	    return GNUTLS_E_MEMORY_ERROR;
+	if (gc_nonce (data_ptr, blocksize) != GC_OK) {
+	  gnutls_assert();
+	  return GNUTLS_E_RANDOM_FAILED;
 	}
 	data_ptr += blocksize;
     }
