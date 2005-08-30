@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004 Simon Josefsson
+ * Copyright (C) 2004, 2005 Simon Josefsson
  * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -46,8 +46,9 @@ void srptool_version(void)
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
-#include <gcrypt.h>		/* for randomize */
 #include <crypt-gaa.h>
+
+#include <gc.h>		/* for randomize */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -456,11 +457,11 @@ char *_srp_crypt(const char *username, const char *passwd, int salt_size,
 
     /* generate the salt 
      */
-#ifdef HAVE_GCRY_CREATE_NONCE
-    gcry_create_nonce(salt, salt_size);
-#else
-    gcry_randomize(salt, salt_size, GCRY_WEAK_RANDOM);
-#endif
+    if (gc_nonce (salt, salt_size) != GC_OK)
+      {
+	error (0, 0, "could not create nonce");
+	return NULL;
+      }
 
     dat_salt.data = salt;
     dat_salt.size = salt_size;
