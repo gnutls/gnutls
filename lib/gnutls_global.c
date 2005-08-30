@@ -39,6 +39,9 @@ int _gnutls_log_level = 0;	/* default log level */
 ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
 
+/* To shut up missing symbols from error module. */
+char *program_name = "gnutls";
+
 /**
   * gnutls_global_set_log_function - This function sets the logging function
   * @log_func: it's a log function
