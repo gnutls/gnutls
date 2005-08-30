@@ -72,7 +72,6 @@ typedef int ssize_t;
 #endif
 
 #include "memmem.h"
-#include "isascii.h"
 
 #ifndef HAVE_UINT
 typedef unsigned int uint;
