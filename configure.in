@@ -392,9 +392,12 @@ AC_ARG_WITH(zlib,
 
 if test x$ac_zlib != xno; then
  AC_MSG_RESULT(yes)
- AC_CHECK_LIB(z, compress,,AC_MSG_WARN(
+ AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
+ if test "$ac_cv_libz" != yes; then
+   AC_MSG_WARN(
 *** 
-*** ZLIB was not found. You will not be able to use ZLIB compression.))
+*** ZLIB was not found. You will not be able to use ZLIB compression.)
+ fi
 else
  AC_MSG_RESULT(no)
 fi
