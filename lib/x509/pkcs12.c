@@ -40,6 +40,7 @@
 #include <pkcs12.h>
 #include <dn.h>
 #include <mpi.h>
+#include <gc.h>
 
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
@@ -823,7 +824,10 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
     /* Generate the salt.
      */
-    _gnutls_get_random(salt, sizeof(salt), GNUTLS_WEAK_RANDOM);
+    if (gc_nonce (salt, sizeof(salt)) != GC_OK) {
+      gnutls_assert();
+      return GNUTLS_E_RANDOM_FAILED;
+    }
 
     /* Write the salt into the structure.
      */

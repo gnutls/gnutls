@@ -42,6 +42,7 @@
 #include <gnutls_algorithms.h>
 #include <gnutls_random.h>
 #include <gnutls_num.h>
+#include <gc.h>
 
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
@@ -1237,10 +1238,9 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
     /* generate the key
      */
     if (schema == PBES2) {
-	result =
-	    gc_pkcs5_pbkdf2_sha1(password, strlen(password),
-				 kdf_params->salt, kdf_params->salt_size,
-				 kdf_params->iter_count, key_size, key);
+	result = gc_pkcs5_pbkdf2_sha1(password, strlen(password),
+				      kdf_params->salt, kdf_params->salt_size,
+				      kdf_params->iter_count, key_size, key);
 
 	if (result != GC_OK) {
 	    gnutls_assert();
@@ -1481,7 +1481,10 @@ static int generate_key(schema_id schema,
     else if (schema == PKCS12_RC2_40_SHA1)
 	enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
 
-    _gnutls_get_random(rnd, 2, GNUTLS_STRONG_RANDOM);
+    if (gc_pseudo_random (rnd, 2) != GC_OK) {
+      gnutls_assert();
+      return GNUTLS_E_RANDOM_FAILED;
+    }
 
     /* generate salt */
 
@@ -1491,8 +1494,10 @@ static int generate_key(schema_id schema,
     else
 	kdf_params->salt_size = 8;
 
-    _gnutls_get_random(kdf_params->salt, kdf_params->salt_size,
-		       GNUTLS_STRONG_RANDOM);
+    if (gc_pseudo_random (kdf_params->salt, kdf_params->salt_size) != GC_OK) {
+      gnutls_assert();
+      return GNUTLS_E_RANDOM_FAILED;
+    }
 
     kdf_params->iter_count = 256 + rnd[0];
     key->size = kdf_params->key_size =
@@ -1520,10 +1525,11 @@ static int generate_key(schema_id schema,
 	    return GNUTLS_E_ENCRYPTION_FAILED;
 	}
 
-	if (enc_params->iv_size)
-	    _gnutls_get_random(enc_params->iv, enc_params->iv_size,
-			       GNUTLS_WEAK_RANDOM);
-
+	if (enc_params->iv_size &&
+	    gc_nonce (enc_params->iv, enc_params->iv_size) != GC_OK) {
+	    gnutls_assert();
+	    return GNUTLS_E_RANDOM_FAILED;
+	}
     } else {			/* PKCS12 schemas */
 	ret =
 	    _pkcs12_string_to_key(1 /*KEY*/, kdf_params->salt,
