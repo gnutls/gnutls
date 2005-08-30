@@ -34,7 +34,7 @@ gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
 srptool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)		\
-	../gl/libgnu.la
+	../gl/libgnu.la ../crypto/libgc.la
 
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
 	common.c
