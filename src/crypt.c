@@ -62,6 +62,8 @@ void srptool_version(void)
 
 /* Gnulib portability files. */
 #include <getpass.h>
+#include <error.h>
+const char *program_name = "srptool";
 
 #define _MAX(x,y) (x>y?x:y)
 
