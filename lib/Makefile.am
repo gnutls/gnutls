@@ -92,8 +92,7 @@ libgnutls_la_LDFLAGS = -export-symbols-regex '^(_gnutls|gnutls|_E_).*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_la_LIBADD = ../gl/libgnu.la ../crypto/libgc.la \
-	x509/libgnutls_x509.la	\
-	$(LIBGCRYPT_LIBS)
+	x509/libgnutls_x509.la @LTLIBZ@ $(LIBGCRYPT_LIBS)
 
 if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la
