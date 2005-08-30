@@ -42,6 +42,7 @@
 #include <gnutls_sig.h>
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
+#include <gc.h>
 
 int _gnutls_gen_rsa_client_kx(gnutls_session_t, opaque **);
 int _gnutls_proc_rsa_client_kx(gnutls_session_t, opaque *, size_t);
@@ -190,15 +191,6 @@ int _gnutls_get_private_rsa_params(gnutls_session_t session,
     return 0;
 }
 
-
-
-#define RANDOMIZE_KEY(x, galloc, rand) x.size=TLS_MASTER_SIZE; x.data=galloc(x.size); \
-		if (x.data==NULL) return GNUTLS_E_MEMORY_ERROR; \
-		if (_gnutls_get_random( x.data, x.size, rand) < 0) { \
-			gnutls_assert(); \
-			return GNUTLS_E_MEMORY_ERROR; \
-		}
-
 int _gnutls_proc_rsa_client_kx(gnutls_session_t session, opaque * data,
 			       size_t _data_size)
 {
@@ -264,10 +256,20 @@ int _gnutls_proc_rsa_client_kx(gnutls_session_t session, opaque * data,
     }
 
     if (randomize_key != 0) {
-	/* we do not need strong random numbers here.
-	 */
-	RANDOMIZE_KEY(session->key->key,
-		      gnutls_malloc, GNUTLS_WEAK_RANDOM);
+      session->key->key.size = TLS_MASTER_SIZE;
+      session->key->key.data = gnutls_malloc (session->key->key.size);
+      if (session->key->key.data == NULL)
+	{
+	  gnutls_assert();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      /* we do not need strong random numbers here.
+       */
+      if (gc_nonce(session->key->key.data, session->key->key.size) != GC_OK) {
+	gnutls_assert();
+	return GNUTLS_E_RANDOM_FAILED;
+      }
 
     } else {
 	session->key->key.data = plaintext.data;
@@ -303,8 +305,21 @@ int _gnutls_gen_rsa_client_kx(gnutls_session_t session, opaque ** data)
 	gnutls_assert();
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
-    RANDOMIZE_KEY(session->key->key, gnutls_secure_malloc,
-		  GNUTLS_STRONG_RANDOM);
+
+    session->key->key.size = TLS_MASTER_SIZE;
+    session->key->key.data = gnutls_secure_malloc(session->key->key.size);
+
+    if (session->key->key.data == NULL)
+      {
+	gnutls_assert();
+	return GNUTLS_E_MEMORY_ERROR;
+      }
+
+    if (gc_pseudo_random(session->key->key.data,
+			 session->key->key.size) != GC_OK) {
+      gnutls_assert();
+      return GNUTLS_E_RANDOM_FAILED;
+    }
 
     ver = _gnutls_get_adv_version(session);
 
