@@ -97,17 +97,17 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum_t * ciphertext,
 	    return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	if ((ret = gc_pseudo_random (ps, psize)) != GC_OK) {
+	if (gc_pseudo_random (ps, psize) != GC_OK) {
 	    gnutls_assert();
 	    gnutls_afree(edata);
-	    return ret;
+	    return GNUTLS_E_RANDOM_FAILED;
 	}
 	for (i = 0; i < psize; i++)
 	    while (ps[i] == 0) {
-		if ((ret = gc_pseudo_random (&ps[i], 1)) != GC_OK) {
+		if (gc_pseudo_random (&ps[i], 1) != GC_OK) {
 		    gnutls_assert();
 		    gnutls_afree(edata);
-		    return ret;
+		    return GNUTLS_E_RANDOM_FAILED;
 		}
 	    }
 	break;
