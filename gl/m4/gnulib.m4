@@ -10,11 +10,16 @@
 # Invoked as: gnulib-tool --import
 # Reproduce by: gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --aux-dir=build-aux --libtool --lgpl alloca-opt error getdelim getline getpass isascii memmem memmove minmax readline size_max snprintf stdbool vasnprintf xsize
 
+# This macro should be invoked from ./configure.in, in the section
+# "Checks for programs", right after AC_PROG_CC, and certainly before
+# any checks for libraries, header files, types and library functions.
 AC_DEFUN([gl_EARLY],
 [
   AC_GNU_SOURCE
 ])
 
+# This macro should be invoked from ./configure.in, in the section
+# "Check for header files, types and library functions".
 AC_DEFUN([gl_INIT],
 [
   gl_FUNC_ALLOCA
