@@ -1,6 +1,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
@@ -33,7 +34,9 @@ verify_certificate_chain (gnutls_session_t session,
 			  int cert_chain_length)
 {
   int i;
-  gnutls_x509_crt_t cert[cert_chain_length];
+  gnutls_x509_crt_t *cert;
+
+  cert = malloc (sizeof (*cert) * cert_chain_length);
 
   /* Import all the certificates in the chain to
    * native certificate format.
