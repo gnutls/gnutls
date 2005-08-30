@@ -58,7 +58,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c	\
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c		\
 	gnutls_compress_int.c gnutls_session.c gnutls_db.c x509_b64.c	\
-	auth_anon.c gnutls_extensions.c gnutls_auth.c gnutls_random.c	\
+	auth_anon.c gnutls_extensions.c gnutls_auth.c			\
 	gnutls_v2_compat.c gnutls_datum.c auth_rsa.c			\
 	gnutls_session_pack.c gnutls_mpi.c gnutls_pk.c gnutls_cert.c	\
 	gnutls_global.c gnutls_constate.c gnutls_anon_cred.c		\
