@@ -5,19 +5,20 @@
 #
 # This file is part of GNUTLS.
 #
-# This file is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# The GNUTLS library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public License
+# as published by the Free Software Foundation; either version 2.1 of
+# the License, or (at your option) any later version.
 #
-# This file is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
+# The GNUTLS library is distributed in the hope that it will be
+#useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this file; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# You should have received a copy of the GNU Lesser General Public
+# License along with the GNUTLS library; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA 02110-1301, USA
 
 SUBDIRS = x509
 if ENABLE_MINITASN1
@@ -88,11 +89,14 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 	gnutls.asn pkix.asn
 
-libgnutls_la_LDFLAGS = -export-symbols-regex '^(_gnutls|gnutls|_E_).*' \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_la_LIBADD = ../gl/libgnu.la ../crypto/libgc.la \
 	x509/libgnutls_x509.la @LTLIBZ@ $(LIBGCRYPT_LIBS)
+
+if HAVE_LD_VERSION_SCRIPT
+libgnutls_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libgnutls.vers
+endif
 
 if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la

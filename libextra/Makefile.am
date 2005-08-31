@@ -93,13 +93,18 @@ libgnutls_extra_la_LDFLAGS += $(LIBOPENCDK_LIBS)
 endif
 endif
 
-libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^gnutls.*' \
+libgnutls_extra_la_LDFLAGS += \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
 libgnutls_extra_la_SOURCES = $(COBJECTS) gnutls_extra.h
 
 libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
+
+if HAVE_LD_VERSION_SCRIPT
+libgnutls_extra_la_LDFLAGS += \
+	-Wl,--version-script=$(srcdir)/libgnutls-extra.vers
+endif
 
 # LZO
 
