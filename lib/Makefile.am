@@ -95,7 +95,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la ../crypto/libgc.la \
 	x509/libgnutls_x509.la @LTLIBZ@ $(LIBGCRYPT_LIBS)
 
 if HAVE_LD_VERSION_SCRIPT
-libgnutls_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libgnutls.vers
+libgnutls_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutls.vers
 endif
 
 if ENABLE_MINITASN1
