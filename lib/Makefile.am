@@ -87,7 +87,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
-	gnutls.asn pkix.asn
+	gnutls.asn pkix.asn libgnutls.vers
 
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
