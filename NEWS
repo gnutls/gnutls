@@ -17,6 +17,7 @@ See the end for copying conditions.
 - Doc fixes for gnutls_transport_set_push and gnutls_transport_set_pull.
 - Minilibtasn1 is now 0.2.15 (removed optional use of C99 macros).
 - Disable zlib support if zlib.h is not present.
+- A number of internal cleanups.
 - API and ABI modifications:
   No changes since last version.
 
