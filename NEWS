@@ -15,7 +15,7 @@ See the end for copying conditions.
 - Fixed examples in doc/examples/, suggested by Fran <e_agf@yahoo.es>.
 - Gnulib is now used for the core library, enabling future code cleanups.
 - Doc fixes for gnutls_transport_set_push and gnutls_transport_set_pull.
-- Minilibtasn1 is now 0.2.15 (removed optional use of C99 macros).
+- Minilibtasn1 is now 0.2.17 (removed optional use of C99 macros).
 - Disable zlib support if zlib.h is not present.
 - A number of internal cleanups.
 - API and ABI modifications:
