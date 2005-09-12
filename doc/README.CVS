@@ -11,8 +11,6 @@ following software:
 * libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
 * texinfo (http://www.gnu.org/software/texinfo/)
 * gtk-doc 1.4 (to generate reference HTML manual in doc/reference/)
-  with the patch below, from:
-  http://bugzilla.gnome.org/show_bug.cgi?id=156643
 
 Those are optional:
 * latex/dvips (in order to create gnutls.ps)
@@ -37,20 +35,3 @@ $ make ChangeLog
 
 4. If you intend to change any code in gnutls, check the file
  doc/README.CODING_STYLE.
-
-Index: gtk-doc.make
-===================================================================
-RCS file: /cvs/gnome/gtk-doc/gtk-doc.make,v
-retrieving revision 1.10
-diff -u -p -r1.10 gtk-doc.make
---- gtk-doc.make        28 Jan 2005 11:16:47 -0000      1.10
-+++ gtk-doc.make        30 Jan 2005 12:09:49 -0000
-@@ -65,7 +65,7 @@ $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES):
-
- #### templates ####
-
--tmpl-build.stamp: $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES) $(DOC_MODULE)-sections.txt $(DOC_MODULE)-overrides.txt
-+tmpl-build.stamp $(srcdir)/tmpl/*.sgml: $(DOC_MODULE)-decl.txt $(SCANOBJ_FILES) $(DOC_MODULE)-sections.txt $(DOC_MODULE)-overrides.txt
-        @echo '*** Rebuilding template files ***'
-        @-chmod -R u+w $(srcdir)
-        cd $(srcdir) && gtkdoc-mktmpl --module=$(DOC_MODULE)
