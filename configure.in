@@ -206,19 +206,6 @@ AC_SUBST(DEFINE_SSIZE_T)
 
 AC_C_BIGENDIAN
 
-AC_CHECK_TYPE([socklen_t],, [AC_DEFINE([socklen_t], [int],
-              [Define to `int' if `socklen_t' is missing.])], [
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-#ifdef HAVE_NETDB_H
-#include <netdb.h>
-#endif
-])
-
 AC_MSG_RESULT([***
 *** Checking for external libraries...
 ])
