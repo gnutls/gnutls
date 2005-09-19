@@ -27,7 +27,6 @@
 #include <sys/types.h>
 #include <string.h>
 #include <sys/time.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -124,35 +123,33 @@ static void init_global_tls_stuff(void);
 
 
 /* Helper functions to load a certificate and key
- * files into memory. They use mmap for simplicity.
+ * files into memory.
  */
-static gnutls_datum mmap_file(const char *file)
+static gnutls_datum load_file(const char *file)
 {
-    int fd;
-    gnutls_datum mmaped_file = { NULL, 0 };
-    struct stat stat_st;
+    FILE *f;
+    gnutls_datum loaded_file = { NULL, 0 };
+    long filelen;
     void *ptr;
 
-    fd = open(file, 0);
-    if (fd == -1)
-	return mmaped_file;
+    if (!(f = fopen(file, "r"))
+	|| fseek(f, 0, SEEK_END) != 0
+	|| (filelen = ftell(f)) < 0
+	|| fseek(f, 0, SEEK_SET) != 0
+	|| !(ptr = malloc((size_t)filelen))
+	|| fread(ptr, 1, (size_t)filelen, f) < (size_t)filelen)
+      {
+	return loaded_file;
+      }
 
-    fstat(fd, &stat_st);
-
-    if ((ptr =
-	 mmap(NULL, stat_st.st_size, PROT_READ, MAP_SHARED, fd,
-	      0)) == MAP_FAILED)
-	return mmaped_file;
-
-    mmaped_file.data = ptr;
-    mmaped_file.size = stat_st.st_size;
-
-    return mmaped_file;
+    loaded_file.data = ptr;
+    loaded_file.size = (unsigned int)filelen;
+    return loaded_file;
 }
 
-static void munmap_file(gnutls_datum data)
+static void unload_file(gnutls_datum data)
 {
-    munmap(data.data, data.size);
+    free(data.data);
 }
 
 #define MAX_CRT 6
@@ -172,7 +169,7 @@ static void load_keys(void)
     gnutls_datum data;
 
     if (x509_certfile != NULL && x509_keyfile != NULL) {
-	data = mmap_file(x509_certfile);
+	data = load_file(x509_certfile);
 	if (data.data == NULL) {
 	    fprintf(stderr, "*** Error loading cert file.\n");
 	    exit(1);
@@ -196,9 +193,9 @@ static void load_keys(void)
 	x509_crt_size = ret;
 	/* fprintf(stderr, "Processed %d client certificates...\n", ret); */
 
-	munmap_file(data);
+	unload_file(data);
 
-	data = mmap_file(x509_keyfile);
+	data = load_file(x509_keyfile);
 	if (data.data == NULL) {
 	    fprintf(stderr, "*** Error loading key file.\n");
 	    exit(1);
@@ -215,11 +212,11 @@ static void load_keys(void)
 	    exit(1);
 	}
 
-	munmap_file(data);
+	unload_file(data);
     }
 #ifdef USE_OPENPGP
     if (pgp_certfile != NULL && pgp_keyfile != NULL) {
-	data = mmap_file(pgp_certfile);
+	data = load_file(pgp_certfile);
 	if (data.data == NULL) {
 	    fprintf(stderr, "*** Error loading PGP cert file.\n");
 	    exit(1);
@@ -236,9 +233,9 @@ static void load_keys(void)
 	    exit(1);
 	}
 
-	munmap_file(data);
+	unload_file(data);
 
-	data = mmap_file(x509_keyfile);
+	data = load_file(x509_keyfile);
 	if (data.data == NULL) {
 	    fprintf(stderr, "*** Error loading PGP key file.\n");
 	    exit(1);
@@ -257,7 +254,7 @@ static void load_keys(void)
 	    exit(1);
 	}
 
-	munmap_file(data);
+	unload_file(data);
     }
 #endif
 
