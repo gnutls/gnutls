@@ -4,6 +4,8 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.8
+- The command line tool no longer uses mmap, to make it more portable,
+  patch from Martin Lambers <marlam@marlam.de>.
 - API and ABI modifications:
   No changes since last version.
 
