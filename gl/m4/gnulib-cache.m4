@@ -14,16 +14,15 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --aux-dir=. --lgpl --libtool --macro-prefix=gl error getline getpass memmem memmove minmax readline snprintf
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --aux-dir=. --lgpl --libtool --macro-prefix=gl error getline getpass memmem memmove minmax readline snprintf socklen
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
-gl_MODULES([error getline getpass memmem memmove minmax readline snprintf])
+gl_MODULES([error getline getpass memmem memmove minmax readline snprintf socklen])
 gl_AVOID([])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
+gl_TESTS_BASE([gl/tests])
 gl_LIB([libgnu])
 gl_LGPL
 gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
-
-# gnulib-cache.m4 ends here
