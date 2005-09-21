@@ -26,7 +26,6 @@ AC_DEFUN([gl_EARLY],
 AC_DEFUN([gl_INIT],
 [
   gl_FUNC_ALLOCA
-  gl_ERROR
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
@@ -47,8 +46,6 @@ AC_DEFUN([gl_INIT],
 AC_DEFUN([gl_FILE_LIST], [
   lib/alloca_.h
   lib/asnprintf.c
-  lib/error.c
-  lib/error.h
   lib/getdelim.c
   lib/getdelim.h
   lib/getline.c
@@ -74,7 +71,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/xsize.h
   m4/alloca.m4
   m4/eoverflow.m4
-  m4/error.m4
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
@@ -96,7 +92,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/socklen.m4
   m4/stdbool.m4
   m4/stdint_h.m4
-  m4/strerror_r.m4
   m4/vasnprintf.m4
   m4/wchar_t.m4
   m4/wint_t.m4
