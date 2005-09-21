@@ -38,8 +38,6 @@
 
 /* Gnulib portability files. */
 #include <getline.h>
-#include <error.h>
-const char *program_name = "certtool";
 
 static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all);
 int generate_prime(int bits, int how);
@@ -2862,16 +2860,20 @@ void smime_to_pkcs7(void)
     do {
 	len = getline(&lineptr, &linesize, infile);
 	if (len == -1)
-	    error(EXIT_FAILURE, 0,
-		  "Cannot find RFC 2822 header/body separator");
+	  {
+	    fprintf (stderr, "Cannot find RFC 2822 header/body separator\n");
+	    exit (1);
+	  }
     }
     while (strcmp(lineptr, "\r\n") != 0 && strcmp(lineptr, "\n") != 0);
 
     do {
 	len = getline(&lineptr, &linesize, infile);
 	if (len == -1)
-	    error(EXIT_FAILURE, 0,
-		  "Message has RFC 2822 header but no body");
+	  {
+	    fprintf (stderr, "Message has RFC 2822 header but no body\n");
+	    exit (1);
+	  }
     }
     while (strcmp(lineptr, "\r\n") == 0 && strcmp(lineptr, "\n") == 0);
 

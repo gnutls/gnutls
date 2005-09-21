@@ -34,7 +34,6 @@
 
 /* Gnulib portability files. */
 #include <getpass.h>
-#include "error.h"
 #include "readline.h"
 
 extern int batch;
@@ -219,14 +218,14 @@ int read_int(const char *input_str)
 
   if (*endptr != '\0')
     {
-      error (0, 0, "Trailing garbage ignored: `%s'", endptr);
+      fprintf (stderr, "Trailing garbage ignored: `%s'\n", endptr);
       free (in);
       return 0;
     }
 
   if (l <= INT_MIN || l >= INT_MAX)
     {
-      error (0, 0, "Integer out of range: `%s'", in);
+      fprintf (stderr, "Integer out of range: `%s'\n", in);
       free (in);
       return 0;
     }
