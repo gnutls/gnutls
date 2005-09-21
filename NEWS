@@ -5,6 +5,7 @@ See the end for copying conditions.
 
 * Version 1.2.8
 - The test for socklen_t has been moved to gnulib.
+- Link failures for duplicate or missing "program_name" symbol has been fixed.
 - The command line tool no longer uses mmap, to make it more portable,
   patch from Martin Lambers <marlam@marlam.de>.
 - API and ABI modifications:
