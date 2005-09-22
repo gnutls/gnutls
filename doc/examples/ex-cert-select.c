@@ -7,7 +7,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -37,38 +36,34 @@ gnutls_x509_crt_t crt;
 gnutls_x509_privkey_t key;
 
 /* Helper functions to load a certificate and key
- * files into memory. They use mmap for simplicity.
+ * files into memory.
  */
-static gnutls_datum_t
-mmap_file (const char *file)
+static gnutls_datum 
+load_file (const char *file)
 {
-  int fd;
-  gnutls_datum_t mmaped_file = { NULL, 0 };
-  struct stat stat_st;
+  FILE *f;
+  gnutls_datum loaded_file = { NULL, 0 };
+  long filelen;
   void *ptr;
 
-  fd = open (file, 0);
-  if (fd == -1)
-    return mmaped_file;
+  if (!(f = fopen(file, "r"))
+      || fseek(f, 0, SEEK_END) != 0
+      || (filelen = ftell(f)) < 0
+      || fseek(f, 0, SEEK_SET) != 0
+      || !(ptr = malloc((size_t)filelen))
+      || fread(ptr, 1, (size_t)filelen, f) < (size_t)filelen)
+    {
+      return loaded_file;
+    }
 
-  fstat (fd, &stat_st);
-
-  ptr = mmap (NULL, stat_st.st_size, PROT_READ, MAP_SHARED, fd, 0);
-  close (fd);
-
-  if (ptr == MAP_FAILED)
-    return mmaped_file;
-
-  mmaped_file.data = ptr;
-  mmaped_file.size = stat_st.st_size;
-
-  return mmaped_file;
+  loaded_file.data = ptr;
+  loaded_file.size = (unsigned int)filelen;
+  return loaded_file;
 }
 
-static void
-munmap_file (gnutls_datum_t data)
+static void unload_file(gnutls_datum data)
 {
-  munmap (data.data, data.size);
+  free(data.data);
 }
 
 /* Load the certificate and the private key.
@@ -79,7 +74,7 @@ load_keys (void)
   int ret;
   gnutls_datum_t data;
 
-  data = mmap_file (CERT_FILE);
+  data = load_file (CERT_FILE);
   if (data.data == NULL)
     {
       fprintf (stderr, "*** Error loading cert file.\n");
@@ -95,9 +90,9 @@ load_keys (void)
       exit (1);
     }
 
-  munmap_file (data);
+  unload_file (data);
 
-  data = mmap_file (KEY_FILE);
+  data = load_file (KEY_FILE);
   if (data.data == NULL)
     {
       fprintf (stderr, "*** Error loading key file.\n");
@@ -114,7 +109,7 @@ load_keys (void)
       exit (1);
     }
 
-  munmap_file (data);
+  unload_file (data);
 
 }
 

@@ -191,7 +191,7 @@ main (void)
       i = 0;
       for (;;)
 	{
-	  bzero (buffer, MAX_BUF + 1);
+	  memset (buffer, 0, MAX_BUF + 1);
 	  ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
 	  if (ret == 0)
