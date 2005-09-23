@@ -4,6 +4,10 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.8
+- If you pass a X.509 CA or PGP trust database to the command line tool,
+  it will now abort the connection if the server certificate validation fails.
+  Use the parameter --insecure to continue even after certificate validation
+  failures.
 - The test for socklen_t has been moved to gnulib.
 - Link failures for duplicate or missing "program_name" symbol has been fixed.
 - The command line tool no longer uses mmap, to make it more portable,
