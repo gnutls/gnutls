@@ -12,8 +12,9 @@ See the end for copying conditions.
 - The test for socklen_t has been moved to gnulib.
 - Link failures for duplicate or missing "program_name" symbol has been fixed,
   patch from Martin Lambers <marlam@marlam.de>.
-- The command line tool no longer uses mmap, to make it more portable,
-  patch from Martin Lambers <marlam@marlam.de>.
+- The command line tool and the examples no longer uses mmap or bzero,
+  to make them more portable, patch from Martin Lambers
+  <marlam@marlam.de>.
 - API and ABI modifications:
   No changes since last version.
 
