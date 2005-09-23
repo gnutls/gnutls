@@ -101,6 +101,8 @@ option (srpusername) STR "NAME" { $srp_username = $1 } "SRP username to use."
 #char *srp_passwd;
 option (srppasswd) STR "PASSWD" { $srp_passwd = $1 } "SRP password to use."
 
+#int insecure;
+option (insecure) { $insecure = 1 } "Don't abort program if server certificate can't be validated."
 
 option (l, list) { print_list(); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"

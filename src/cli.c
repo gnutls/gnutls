@@ -52,7 +52,7 @@
 #define MAX_BUF 4096
 
 /* global stuff here */
-int resume, starttls;
+int resume, starttls, insecure;
 char *hostname = NULL;
 int port;
 int record_max_size;
@@ -446,8 +446,8 @@ int main(int argc, char **argv)
     char buffer[MAX_BUF + 1];
     char *session_data = NULL;
     char *session_id = NULL;
-    int session_data_size;
-    int session_id_size;
+    size_t session_data_size;
+    size_t session_id_size;
     fd_set rset;
     int maxfd;
     struct timeval tv;
@@ -697,6 +697,7 @@ void gaa_parser(int argc, char **argv)
     print_cert = info.print_cert;
     starttls = info.starttls;
     resume = info.resume;
+    insecure = info.insecure;
     port = info.port;
     record_max_size = info.record_size;
     fingerprint = info.fingerprint;
@@ -841,9 +842,24 @@ static int do_handshake(socket_st * socket)
     } while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
 
     if (ret == 0) {
-	socket->secure = 1;
 	/* print some information */
 	print_info(socket->session, socket->hostname);
+
+	if ((x509_cafile || pgp_trustdb) && !insecure) {
+	  int rc;
+	  unsigned int status;
+
+	  /* abort if verification fail  */
+	  rc = gnutls_certificate_verify_peers2(socket->session, &status);
+	  if (rc != 0 || status != 0)
+	    {
+	      printf ("*** Verifying server certificate failed...\n");
+	      exit (1);
+	    }
+	  }
+
+	socket->secure = 1;
+
     }
     return ret;
 }
