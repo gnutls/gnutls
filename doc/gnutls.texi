@@ -2068,6 +2068,8 @@ Usage:  gnutls-cli [options] hostname
      --x509certfile FILE      X.509 Certificate file to use.
      --srpusername NAME       SRP username to use.
      --srppasswd PASSWD       SRP password to use.
+     --insecure               Don't abort program if server
+                              certificate can't be validated.
      -l, --list               Print a list of the supported
                               algorithms  and modes.
      -h, --help               prints this help
