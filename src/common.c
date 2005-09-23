@@ -84,7 +84,8 @@ void print_x509_info(gnutls_session session, const char *hostname)
 {
     gnutls_x509_crt crt;
     const gnutls_datum *cert_list;
-    int cert_list_size = 0, ret;
+    size_t cert_list_size = 0;
+    int ret;
     char digest[20];
     char serial[40];
     char dn[256];
@@ -409,7 +410,8 @@ void print_openpgp_info(gnutls_session session, const char *hostname)
 
 void print_cert_vrfy(gnutls_session session)
 {
-    int status, rc;
+    int rc;
+    unsigned int status;
 
     rc = gnutls_certificate_verify_peers2(session, &status);
     printf("\n");
@@ -431,7 +433,7 @@ void print_cert_vrfy(gnutls_session session)
 	if (status & GNUTLS_CERT_INVALID)
 	    printf("- Peer's certificate is NOT trusted\n");
 	else
-	    printf("- Peer's certificate is trusted\n");
+	  printf("- Peer's certificate is trusted\n");
     } else {
 	if (status & GNUTLS_CERT_INVALID)
 	    printf("- Peer's key is invalid\n");
