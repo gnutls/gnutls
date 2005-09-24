@@ -152,7 +152,7 @@ AC_CHECK_HEADERS(errno.h sys/time.h time.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_FUNCS(vasprintf isascii memmove memmem mmap gmtime_r inet_ntop,,)
+AC_CHECK_FUNCS(vasprintf isascii memmove memmem mmap gmtime_r,,)
 AC_FUNC_ALLOCA
 
 AC_MSG_RESULT([***

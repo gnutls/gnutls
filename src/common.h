@@ -38,6 +38,5 @@ void parse_protocols(char **protocols, int protocols_size,
 const char *raw_to_string(const unsigned char *raw, size_t raw_size);
 
 void sockets_init(void);
-#ifndef HAVE_INET_NTOP
-const char *inet_ntop(int af, const void *src, char *dst, size_t cnt);
-#endif
+
+#include "inet_ntop.h"

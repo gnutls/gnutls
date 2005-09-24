@@ -724,31 +724,6 @@ void parse_comp(char **comp, int ncomp, int *comp_priority)
 
 }
 
-#ifndef HAVE_INET_NTOP
-
-#ifdef _WIN32
-# include <winsock.h>
-#else
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-#endif
-
-const char *inet_ntop(int af, const void *src, char *dst, size_t cnt)
-{
-    char *ret;
-
-    ret = inet_ntoa(*((struct in_addr *) src));
-
-    if (ret == NULL || strlen(ret) > cnt) {
-	return NULL;
-    }
-    strcpy(dst, ret);
-
-    return dst;
-}
-#endif
-
 void sockets_init(void)
 {
 #ifdef _WIN32
