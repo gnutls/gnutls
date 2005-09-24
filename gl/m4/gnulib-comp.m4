@@ -29,6 +29,7 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
+  gl_INET_NTOP
   gl_FUNC_MEMMEM
   gl_FUNC_MEMMOVE
   gl_MINMAX
@@ -52,6 +53,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getline.h
   lib/getpass.c
   lib/getpass.h
+  lib/inet_ntop.c
+  lib/inet_ntop.h
   lib/memmem.c
   lib/memmem.h
   lib/memmove.c
@@ -74,6 +77,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
+  m4/inet_ntop.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
   m4/lib-ld.m4
@@ -90,6 +94,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/size_max.m4
   m4/snprintf.m4
   m4/socklen.m4
+  m4/sockpfaf.m4
   m4/stdbool.m4
   m4/stdint_h.m4
   m4/vasnprintf.m4
