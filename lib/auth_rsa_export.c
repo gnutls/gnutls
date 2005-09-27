@@ -259,12 +259,12 @@ static int proc_rsa_export_server_kx(gnutls_session_t session,
     _n_e = n_e;
     _n_m = n_m;
 
-    if (_gnutls_mpi_scan(&session->key->rsa[0], data_m, &_n_m) != 0) {
+    if (_gnutls_mpi_scan_nz(&session->key->rsa[0], data_m, &_n_m) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-    if (_gnutls_mpi_scan(&session->key->rsa[1], data_e, &_n_e) != 0) {
+    if (_gnutls_mpi_scan_nz(&session->key->rsa[1], data_e, &_n_e) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }

@@ -61,6 +61,8 @@ typedef gcry_mpi_t mpi_t;
 
 void _gnutls_mpi_release(mpi_t * x);
 
+int _gnutls_mpi_scan_nz(mpi_t * ret_mpi, const opaque * buffer,
+		     size_t * nbytes);
 int _gnutls_mpi_scan(mpi_t * ret_mpi, const opaque * buffer,
 		     size_t * nbytes);
 int _gnutls_mpi_scan_pgp(mpi_t * ret_mpi, const opaque * buffer,

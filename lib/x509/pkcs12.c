@@ -940,7 +940,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
     opaque sha_mac[20];
     opaque sha_mac_orig[20];
 
-    if (pkcs12 == NULL || pass == NULL) {
+    if (pkcs12 == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INVALID_REQUEST;
     }

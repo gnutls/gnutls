@@ -810,7 +810,7 @@ int decode_private_key_info(const gnutls_datum_t * der,
   * @data: The DER or PEM encoded key.
   * @format: One of DER or PEM
   * @password: the password to decrypt the key (if it is encrypted).
-  * @flags: use 0.
+  * @flags: 0 if encrypted or GNUTLS_PKCS_PLAIN if not encrypted.
   *
   * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
   * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
@@ -880,7 +880,7 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
 	need_free = 1;
     }
 
-    if (flags & GNUTLS_PKCS_PLAIN || password == NULL) {
+    if (flags & GNUTLS_PKCS_PLAIN) {
 	result = decode_private_key_info(&_data, key, &key->key);
     } else {			/* encrypted. */
 	result = decode_pkcs8_key(&_data, password, key, &key->key);

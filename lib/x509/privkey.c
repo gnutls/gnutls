@@ -457,35 +457,35 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
     }
 
     siz = m->size;
-    if (_gnutls_mpi_scan(&key->params[0], m->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[0], m->data, &siz)) {
 	gnutls_assert();
 	FREE_RSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = e->size;
-    if (_gnutls_mpi_scan(&key->params[1], e->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[1], e->data, &siz)) {
 	gnutls_assert();
 	FREE_RSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = d->size;
-    if (_gnutls_mpi_scan(&key->params[2], d->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[2], d->data, &siz)) {
 	gnutls_assert();
 	FREE_RSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = p->size;
-    if (_gnutls_mpi_scan(&key->params[3], p->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[3], p->data, &siz)) {
 	gnutls_assert();
 	FREE_RSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = q->size;
-    if (_gnutls_mpi_scan(&key->params[4], q->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[4], q->data, &siz)) {
 	gnutls_assert();
 	FREE_RSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
@@ -504,7 +504,7 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
     _gnutls_mpi_invm(key->params[5], key->params[3], key->params[4]);
 #else
     siz = u->size;
-    if (_gnutls_mpi_scan(&key->params[5], u->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[5], u->data, &siz)) {
 	gnutls_assert();
 	FREE_RSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
@@ -553,35 +553,35 @@ int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
     }
 
     siz = p->size;
-    if (_gnutls_mpi_scan(&key->params[0], p->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[0], p->data, &siz)) {
 	gnutls_assert();
 	FREE_DSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = q->size;
-    if (_gnutls_mpi_scan(&key->params[1], q->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[1], q->data, &siz)) {
 	gnutls_assert();
 	FREE_DSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = g->size;
-    if (_gnutls_mpi_scan(&key->params[2], g->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[2], g->data, &siz)) {
 	gnutls_assert();
 	FREE_DSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = y->size;
-    if (_gnutls_mpi_scan(&key->params[3], y->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[3], y->data, &siz)) {
 	gnutls_assert();
 	FREE_DSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     siz = x->size;
-    if (_gnutls_mpi_scan(&key->params[4], x->data, &siz)) {
+    if (_gnutls_mpi_scan_nz(&key->params[4], x->data, &siz)) {
 	gnutls_assert();
 	FREE_DSA_PRIVATE_PARAMS;
 	return GNUTLS_E_MPI_SCAN_FAILED;

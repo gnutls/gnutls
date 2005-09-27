@@ -87,12 +87,15 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
     p = buf_i;
     for (i = 0; i < 64; i++)
 	*p++ = salt[i % salt_size];
-    for (i = j = 0; i < 64; i += 2) {
-	*p++ = 0;
-	*p++ = pw[j];
-	if (++j > pwlen)	/* Note, that we include the trailing zero */
-	    j = 0;
-    }
+    if (pw) {
+        for (i = j = 0; i < 64; i += 2) {
+  	    *p++ = 0;
+	    *p++ = pw[j];
+	    if (++j > pwlen)	/* Note, that we include the trailing zero */
+	        j = 0;
+        }
+    } else 
+      memset(p, 0, 64);
 
     for (;;) {
 	rc = gc_hash_open(GC_SHA1, 0, &md);
@@ -104,7 +107,7 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
 	    unsigned char lid = id & 0xFF;
 	    gc_hash_write(md, 1, &lid);
 	}
-	gc_hash_write(md, 128, buf_i);
+	gc_hash_write(md, pw?128:64, buf_i);
 	memcpy(hash, gc_hash_read(md), 20);
 	gc_hash_close(md);
 	for (i = 1; i < iter; i++)

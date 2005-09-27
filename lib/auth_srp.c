@@ -162,19 +162,19 @@ int _gnutls_gen_srp_server_kx(gnutls_session_t session, opaque ** data)
     }
 
     /* copy from pwd_entry to local variables (actually in session) */
-    if (_gnutls_mpi_scan(&G, pwd_entry->g.data, &pwd_entry->g.size) < 0) {
+    if (_gnutls_mpi_scan_nz(&G, pwd_entry->g.data, &pwd_entry->g.size) < 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     tmp_size = pwd_entry->n.size;
-    if (_gnutls_mpi_scan(&N, pwd_entry->n.data, &tmp_size) < 0) {
+    if (_gnutls_mpi_scan_nz(&N, pwd_entry->n.data, &tmp_size) < 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     tmp_size = pwd_entry->v.size;
-    if (_gnutls_mpi_scan(&V, pwd_entry->v.data, &tmp_size) < 0) {
+    if (_gnutls_mpi_scan_nz(&V, pwd_entry->v.data, &tmp_size) < 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
@@ -356,7 +356,7 @@ int _gnutls_proc_srp_client_kx(gnutls_session_t session, opaque * data,
     _n_A = _gnutls_read_uint16(&data[0]);
 
     DECR_LEN(data_size, _n_A);
-    if (_gnutls_mpi_scan(&A, &data[2], &_n_A) || A == NULL) {
+    if (_gnutls_mpi_scan_nz(&A, &data[2], &_n_A) || A == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
@@ -725,17 +725,17 @@ int _gnutls_proc_srp_server_kx(gnutls_session_t session, opaque * data,
     _n_n = n_n;
     _n_b = n_b;
 
-    if (_gnutls_mpi_scan(&N, data_n, &_n_n) != 0) {
+    if (_gnutls_mpi_scan_nz(&N, data_n, &_n_n) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-    if (_gnutls_mpi_scan(&G, data_g, &_n_g) != 0) {
+    if (_gnutls_mpi_scan_nz(&G, data_g, &_n_g) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-    if (_gnutls_mpi_scan(&B, data_b, &_n_b) != 0) {
+    if (_gnutls_mpi_scan_nz(&B, data_b, &_n_b) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
@@ -771,7 +771,7 @@ int _gnutls_proc_srp_server_kx(gnutls_session_t session, opaque * data,
 	return ret;
     }
 
-    if (_gnutls_mpi_scan(&session->key->x, hd, &_n_g) != 0) {
+    if (_gnutls_mpi_scan_nz(&session->key->x, hd, &_n_g) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }

@@ -45,7 +45,7 @@ int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result,
     mpi_t x, e;
     size_t result_size;
 
-    if (_gnutls_mpi_scan(&x, text, &textsize)) {
+    if (_gnutls_mpi_scan_nz(&x, text, &textsize)) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
@@ -195,7 +195,7 @@ mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, mpi_t n)
     /* convert the bytes of hd to integer
      */
     hash_size = 20;		/* SHA */
-    ret = _gnutls_mpi_scan(&res, hd, &hash_size);
+    ret = _gnutls_mpi_scan_nz(&res, hd, &hash_size);
     gnutls_free(holder);
 
     if (ret < 0) {
@@ -676,13 +676,13 @@ int gnutls_srp_verifier(const char *username, const char *password,
     }
 
     size = prime->size;
-    if (_gnutls_mpi_scan(&_n, prime->data, &size)) {
+    if (_gnutls_mpi_scan_nz(&_n, prime->data, &size)) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
     size = generator->size;
-    if (_gnutls_mpi_scan(&_g, generator->data, &size)) {
+    if (_gnutls_mpi_scan_nz(&_g, generator->data, &size)) {
 	gnutls_assert();
 	return GNUTLS_E_MPI_SCAN_FAILED;
     }

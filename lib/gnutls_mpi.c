@@ -53,6 +53,20 @@ int _gnutls_mpi_scan(mpi_t * ret_mpi, const opaque * buffer,
     if (ret)
 	return GNUTLS_E_MPI_SCAN_FAILED;
 
+    return 0;
+}
+
+/* returns zero on success. Fails if the number is zero.
+ */
+int _gnutls_mpi_scan_nz(mpi_t * ret_mpi, const opaque * buffer,
+		     size_t * nbytes)
+{
+    int ret;
+
+    ret = gcry_mpi_scan(ret_mpi, GCRYMPI_FMT_USG, buffer, *nbytes, nbytes);
+    if (ret)
+	return GNUTLS_E_MPI_SCAN_FAILED;
+
     /* MPIs with 0 bits are illegal
      */
     if (_gnutls_mpi_get_nbits(*ret_mpi) == 0) {
