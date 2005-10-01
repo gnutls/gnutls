@@ -4,6 +4,9 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.8
+- Don't install the auxilliary libexamples library used by the
+  examples in doc/examples/ on "make install", report and tiny patch
+  from Thomas Klausner <tk@giga.or.at>.
 - If you pass a X.509 CA or PGP trust database to the command line
   tool, it will now abort the connection if the server certificate
   validation fails.  Use the parameter --insecure to continue even
