@@ -640,6 +640,7 @@ int main(int argc, char **argv)
 		    }
 		} else {
 		    user_term = 1;
+		    break;
 		}
 		continue;
 	    }
