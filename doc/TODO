@@ -4,23 +4,22 @@ in order to avoid having people working on the same thing.
 
 Current list:
 * Convert the current sexp stuff to the gcrypt ac API. 
-* Check opera and DHE-RSA
-* Check opera (which sends an closure alert during the handshake
-  which we do not read).
 * Make the current ciphering code a bit more abstract to
   allow easy integration with TLS hardware.
+* Make the session data (used for session resuming) platform
+  independent.
 * Allow adding multiple subject alternative names.
 * Allow verifying of certificates on their reception.
 * Verify added CRLs (is it really needed?)
 * Document the format for the supported DN attributes.
 * Audit the code
-* Add gnutls_certificate_set_openpgp_keyring()
+- Add gnutls_certificate_set_openpgp_keyring()
   function, similar to gnutls_certificate_set_openpgp_key().
-* Use subkeys with the 0x20 flag in openpgp keys (if present),
+- Use subkeys with the 0x20 flag in openpgp keys (if present),
   instead of the main key.
-* Add function to extract the signers of an openpgp key. Should
+- Add function to extract the signers of an openpgp key. Should
   be similar to gnutls_x509_crt_get_dn_oid().
-* Add function to verify an openpgp key against a plain key.
+- Add function to verify an openpgp key against a plain key.
 - Clean up name space of helper functions in library (memmem,
    firstElement, bit_mask, ...) for platforms that libtool's
    -export-symbols-regex doesn't work.
