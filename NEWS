@@ -21,6 +21,8 @@ See the end for copying conditions.
   <marlam@marlam.de>.
 - Made the PKCS #12 API handle null passwords. Based on patch by
   Anton Altaparmakov <aia21@cam.ac.uk>.
+- The GTK-DOC manual should build with current released tools.
+  (But a copy of the output is included, so the tools are not required.)
 - API and ABI modifications:
   No changes since last version.
 
