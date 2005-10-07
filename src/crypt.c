@@ -62,8 +62,6 @@ void srptool_version(void)
 
 /* Gnulib portability files. */
 #include <getpass.h>
-#include <error.h>
-const char *program_name = "srptool";
 
 #define _MAX(x,y) (x>y?x:y)
 
@@ -457,11 +455,11 @@ char *_srp_crypt(const char *username, const char *passwd, int salt_size,
     if ((unsigned) salt_size > sizeof(salt))
 	return NULL;
 
-    /* generate the salt 
+    /* generate the salt
      */
     if (gc_nonce (salt, salt_size) != GC_OK)
       {
-	error (0, 0, "could not create nonce");
+	fprintf(stderr, "Could not create nonce\n");
 	return NULL;
       }
 
