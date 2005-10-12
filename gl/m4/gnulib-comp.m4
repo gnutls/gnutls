@@ -26,9 +26,6 @@ AC_DEFUN([gl_EARLY],
 AC_DEFUN([gl_INIT],
 [
   gl_FUNC_ALLOCA
-  gl_GC
-  gl_GC_HMAC_SHA1
-  gl_GC_PBKDF2_SHA1
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
@@ -37,12 +34,10 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_MEMMOVE
   gl_MINMAX
   gl_FUNC_READLINE
-  gl_C_RESTRICT
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
   gl_SOCKLEN_T
   AM_STDBOOL_H
-  gl_STDINT_H
   gl_FUNC_VASNPRINTF
   gl_XSIZE
 ])
@@ -53,25 +48,17 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/config.rpath
   lib/alloca_.h
   lib/asnprintf.c
-  lib/gc-gnulib.c
-  lib/gc-libgcrypt.c
-  lib/gc-pbkdf2-sha1.c
-  lib/gc.h
   lib/getdelim.c
   lib/getdelim.h
   lib/getline.c
   lib/getline.h
   lib/getpass.c
   lib/getpass.h
-  lib/hmac-sha1.c
-  lib/hmac.h
   lib/inet_ntop.c
   lib/inet_ntop.h
   lib/memmem.c
   lib/memmem.h
   lib/memmove.c
-  lib/memxor.c
-  lib/memxor.h
   lib/minmax.h
   lib/printf-args.c
   lib/printf-args.h
@@ -79,28 +66,20 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/printf-parse.h
   lib/readline.c
   lib/readline.h
-  lib/sha1.c
-  lib/sha1.h
   lib/size_max.h
   lib/snprintf.c
   lib/snprintf.h
   lib/stdbool_.h
-  lib/stdint_.h
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/xsize.h
   m4/alloca.m4
   m4/eoverflow.m4
-  m4/gc-hmac-sha1.m4
-  m4/gc-pbkdf2-sha1.m4
-  m4/gc.m4
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
-  m4/hmac-sha1.m4
   m4/inet_ntop.m4
   m4/intmax_t.m4
-  m4/inttypes.m4
   m4/inttypes_h.m4
   m4/lib-ld.m4
   m4/lib-link.m4
@@ -109,19 +88,15 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/longlong.m4
   m4/memmem.m4
   m4/memmove.m4
-  m4/memxor.m4
   m4/minmax.m4
   m4/onceonly_2_57.m4
   m4/readline.m4
-  m4/restrict.m4
-  m4/sha1.m4
   m4/signed.m4
   m4/size_max.m4
   m4/snprintf.m4
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdbool.m4
-  m4/stdint.m4
   m4/stdint_h.m4
   m4/vasnprintf.m4
   m4/wchar_t.m4
