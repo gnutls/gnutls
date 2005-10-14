@@ -191,7 +191,7 @@ static void load_keys(void)
             exit(1);
 	}
 	x509_crt_size = ret;
-	/* fprintf(stderr, "Processed %d client certificates...\n", ret); */
+	fprintf(stderr, "Processed %d client certificates...\n", ret);
 
 	unload_file(data);
 
@@ -213,6 +213,8 @@ static void load_keys(void)
 	}
 
 	unload_file(data);
+	
+	fprintf(stderr, "Processed %d client X.509 certificates...\n", x509_crt_size);
     }
 #ifdef USE_OPENPGP
     if (pgp_certfile != NULL && pgp_keyfile != NULL) {
@@ -255,6 +257,7 @@ static void load_keys(void)
 	}
 
 	unload_file(data);
+	fprintf(stderr, "Processed 1 client PGP certificate...\n");
     }
 #endif
 
@@ -330,6 +333,7 @@ static int cert_callback(gnutls_session session,
 	}
     }
 
+    printf("- Successfully sent %d certificate(s) to server.\n", st->ncerts);
     return 0;
 
 }
