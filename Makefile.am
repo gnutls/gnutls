@@ -21,11 +21,7 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
-SUBDIRS = gl 
-if NETTLE
-SUBDIRS += nettle
-endif
-SUBDIRS += crypto includes lib libextra src doc tests
+SUBDIRS = gl includes lib libextra src doc tests
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
