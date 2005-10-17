@@ -27,7 +27,9 @@ AC_DEFUN([gl_INIT],
 [
   gl_FUNC_ALLOCA
   gl_GC
+  gl_GC_HMAC_MD5
   gl_GC_HMAC_SHA1
+  gl_GC_MD5
   gl_GC_PBKDF2_SHA1
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
@@ -63,10 +65,13 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getline.h
   lib/getpass.c
   lib/getpass.h
+  lib/hmac-md5.c
   lib/hmac-sha1.c
   lib/hmac.h
   lib/inet_ntop.c
   lib/inet_ntop.h
+  lib/md5.c
+  lib/md5.h
   lib/memmem.c
   lib/memmem.h
   lib/memmove.c
@@ -91,12 +96,15 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/xsize.h
   m4/alloca.m4
   m4/eoverflow.m4
+  m4/gc-hmac-md5.m4
   m4/gc-hmac-sha1.m4
+  m4/gc-md5.m4
   m4/gc-pbkdf2-sha1.m4
   m4/gc.m4
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
+  m4/hmac-md5.m4
   m4/hmac-sha1.m4
   m4/inet_ntop.m4
   m4/intmax_t.m4
@@ -107,6 +115,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-prefix.m4
   m4/longdouble.m4
   m4/longlong.m4
+  m4/md5.m4
   m4/memmem.m4
   m4/memmove.m4
   m4/memxor.m4
