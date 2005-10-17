@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl			\
+AM_CPPFLAGS = -I$(top_srcdir)/gl					\
 	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
 	-I$(top_srcdir)/lib/minitasn1 -I$(srcdir)/openpgp		\
 	$(LIBGCRYPT_CFLAGS)
@@ -68,7 +68,7 @@ lib_LTLIBRARIES += libgnutls-openssl.la
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la ../crypto/libgc.la
+libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la
 
 libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

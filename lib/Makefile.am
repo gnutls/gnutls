@@ -25,7 +25,7 @@ if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
 
-AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl			\
+AM_CPPFLAGS = -I$(top_srcdir)/gl					\
 	-I$(top_srcdir)/includes -I../includes				\
 	-I$(srcdir)/x509						\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/libextra/openpgp/	\
@@ -91,8 +91,8 @@ libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_la_LIBADD = ../gl/libgnu.la ../crypto/libgc.la \
-	x509/libgnutls_x509.la @LTLIBZ@ $(LIBGCRYPT_LIBS)
+libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
+	@LTLIBZ@ $(LIBGCRYPT_LIBS)
 
 if HAVE_LD_VERSION_SCRIPT
 libgnutls_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutls.vers

@@ -22,7 +22,7 @@ EXTRA_DIST = README README.srptool gnutls-http-serv
 SUBDIRS = srp x509 openpgp cfg
 
 INCLUDES = -I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes \
-	-I$(top_srcdir)/gl -I$(top_srcdir)/crypto -I$(srcdir)/cfg
+	-I$(top_srcdir)/gl -I$(srcdir)/cfg
 
 bin_PROGRAMS = gnutls-serv gnutls-cli srptool gnutls-cli-debug certtool
 
@@ -34,7 +34,7 @@ gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
 srptool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)		\
-	../gl/libgnu.la ../crypto/libgc.la
+	../gl/libgnu.la
 
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
 	common.c
