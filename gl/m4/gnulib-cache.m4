@@ -14,10 +14,10 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --aux-dir=. --lgpl --libtool --macro-prefix=gl gc gc-hmac-md5 gc-md5 gc-pbkdf2-sha1 getline getpass inet_ntop memmem memmove minmax readline snprintf socklen
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --aux-dir=. --lgpl --libtool --macro-prefix=gl gc gc-hmac-md5 gc-md5 gc-pbkdf2-sha1 gc-sha1 getline getpass inet_ntop memmem memmove minmax readline snprintf socklen
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
-gl_MODULES([gc gc-hmac-md5 gc-md5 gc-pbkdf2-sha1 getline getpass inet_ntop memmem memmove minmax readline snprintf socklen])
+gl_MODULES([gc gc-hmac-md5 gc-md5 gc-pbkdf2-sha1 gc-sha1 getline getpass inet_ntop memmem memmove minmax readline snprintf socklen])
 gl_AVOID([])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
