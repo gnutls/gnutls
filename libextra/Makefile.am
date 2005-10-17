@@ -68,7 +68,7 @@ lib_LTLIBRARIES += libgnutls-openssl.la
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la
+libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la ../gl/libgnu.la
 
 libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

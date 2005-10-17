@@ -30,7 +30,7 @@
 /* for message digests */
 
 typedef struct {
-    gc_hash handle;
+    gc_hash_handle handle;
     gnutls_mac_algorithm_t algorithm;
     const void *key;
     int keysize;

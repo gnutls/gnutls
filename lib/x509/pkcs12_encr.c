@@ -59,7 +59,7 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
 {
     int rc;
     unsigned int i, j;
-    gc_hash md;
+    gc_hash_handle md;
     mpi_t num_b1 = NULL;
     unsigned int pwlen;
     opaque hash[20], buf_b[64], buf_i[128], *p;

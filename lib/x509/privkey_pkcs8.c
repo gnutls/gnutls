@@ -1237,9 +1237,9 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
     /* generate the key
      */
     if (schema == PBES2) {
-	result = gc_pkcs5_pbkdf2_sha1(password, strlen(password),
-				      kdf_params->salt, kdf_params->salt_size,
-				      kdf_params->iter_count, key_size, key);
+	result = gc_pbkdf2_sha1(password, strlen(password),
+				kdf_params->salt, kdf_params->salt_size,
+				kdf_params->iter_count, key, key_size);
 
 	if (result != GC_OK) {
 	    gnutls_assert();
@@ -1515,10 +1515,10 @@ static int generate_key(schema_id schema,
 
     if (schema == PBES2) {
 
-	ret = gc_pkcs5_pbkdf2_sha1(password, strlen(password),
-				   kdf_params->salt, kdf_params->salt_size,
-				   kdf_params->iter_count,
-				   kdf_params->key_size, key->data);
+	ret = gc_pbkdf2_sha1(password, strlen(password),
+			     kdf_params->salt, kdf_params->salt_size,
+			     kdf_params->iter_count,
+			     key->data, kdf_params->key_size);
 	if (ret != GC_OK) {
 	    gnutls_assert();
 	    return GNUTLS_E_ENCRYPTION_FAILED;
