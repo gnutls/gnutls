@@ -19,9 +19,9 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-AM_CPPFLAGS = -I../includes -I$(top_srcdir)/includes
+AM_CPPFLAGS = -I../includes -I$(top_srcdir)/includes -I$(top_srcdir)/gl
 AM_LDFLAGS = -no-install
-LDADD = ../lib/libgnutls.la libutils.la
+LDADD = ../lib/libgnutls.la ../gl/libgnu.la libutils.la
 
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
@@ -30,7 +30,7 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 
-ctests = simple anonself openssl
-TESTS = pkcs12_neon $(ctests)	
+ctests = simple anonself openssl gc
+TESTS = pkcs12_neon $(ctests)
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon
