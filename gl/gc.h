@@ -42,12 +42,45 @@ typedef enum Gc_rc Gc_rc;
 enum Gc_hash
   {
     GC_MD5,
-    GC_SHA1
+    GC_SHA1,
+    GC_MD2,
+    GC_RMD160
   };
 typedef enum Gc_hash Gc_hash;
 
+enum Gc_hash_mode
+  {
+    GC_HMAC = 1
+  };
+typedef enum Gc_hash_mode Gc_hash_mode;
+
+typedef void *gc_hash_handle;
+
 #define GC_MD5_DIGEST_SIZE 16
 #define GC_SHA1_DIGEST_SIZE 20
+
+/* Cipher types. */
+enum Gc_cipher
+  {
+    GC_AES128,
+    GC_AES192,
+    GC_AES256,
+    GC_3DES,
+    GC_DES,
+    GC_ARCFOUR128,
+    GC_ARCFOUR40,
+    GC_ARCTWO40
+  };
+typedef enum Gc_cipher Gc_cipher;
+
+enum Gc_cipher_mode
+  {
+    GC_CBC,
+    GC_STREAM
+  };
+typedef enum Gc_cipher_mode Gc_cipher_mode;
+
+typedef void *gc_cipher_handle;
 
 /* Call before respectively after any other functions. */
 extern Gc_rc gc_init (void);
@@ -64,7 +97,31 @@ extern void gc_set_allocators (gc_malloc_t func_malloc,
 			       gc_realloc_t func_realloc,
 			       gc_free_t func_free);
 
+/* Ciphers. */
+extern Gc_rc gc_cipher_open (Gc_cipher cipher, Gc_cipher_mode mode,
+			     gc_cipher_handle * outhandle);
+extern Gc_rc gc_cipher_setkey (gc_cipher_handle handle,
+			       size_t keylen, const char *key);
+extern Gc_rc gc_cipher_setiv (gc_cipher_handle handle,
+			      size_t ivlen, const char *iv);
+extern Gc_rc gc_cipher_encrypt_inline (gc_cipher_handle handle,
+				       size_t len, char *data);
+extern Gc_rc gc_cipher_decrypt_inline (gc_cipher_handle handle,
+				       size_t len, char *data);
+extern Gc_rc gc_cipher_close (gc_cipher_handle handle);
+
 /* Hashes. */
+
+extern Gc_rc gc_hash_open (Gc_hash hash, Gc_hash_mode mode,
+			   gc_hash_handle * outhandle);
+extern Gc_rc gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle);
+extern size_t gc_hash_digest_length (Gc_hash hash);
+extern void gc_hash_hmac_setkey (gc_hash_handle handle,
+				 size_t len, const char *key);
+extern void gc_hash_write (gc_hash_handle handle,
+			   size_t len, const char *data);
+extern const char *gc_hash_read (gc_hash_handle handle);
+extern void gc_hash_close (gc_hash_handle handle);
 
 /* Compute a hash value over buffer IN of INLEN bytes size using the
    algorithm HASH, placing the result in the pre-allocated buffer OUT.
