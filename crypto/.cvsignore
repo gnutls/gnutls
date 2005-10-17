@@ -1,7 +1,0 @@
-.deps
-.libs
-Makefile
-Makefile.in
-test-gc
-*.lo
-*.la
