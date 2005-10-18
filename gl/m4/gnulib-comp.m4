@@ -29,6 +29,7 @@ AC_DEFUN([gl_INIT],
   gl_GC
   gl_GC_HMAC_MD5
   gl_GC_HMAC_SHA1
+  gl_GC_MD4
   gl_GC_MD5
   gl_GC_PBKDF2_SHA1
   gl_GC_SHA1
@@ -71,6 +72,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/hmac.h
   lib/inet_ntop.c
   lib/inet_ntop.h
+  lib/md4.c
+  lib/md4.h
   lib/md5.c
   lib/md5.h
   lib/memmem.c
@@ -99,6 +102,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/eoverflow.m4
   m4/gc-hmac-md5.m4
   m4/gc-hmac-sha1.m4
+  m4/gc-md4.m4
   m4/gc-md5.m4
   m4/gc-pbkdf2-sha1.m4
   m4/gc-sha1.m4
@@ -117,6 +121,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-prefix.m4
   m4/longdouble.m4
   m4/longlong.m4
+  m4/md4.m4
   m4/md5.m4
   m4/memmem.m4
   m4/memmove.m4
