@@ -211,14 +211,13 @@ AC_MSG_RESULT([***
 ])
 
 AM_PATH_LIBGCRYPT($GNUTLS_GCRYPT_VERSION,,
+dnl Can't disable - gnutls depends on gcrypt
  	AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from
 *** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
 ***
 ]]))
-dnl Can't disable - gnutls depends on gcrypt
-AC_DEFINE(USE_GCRYPT, 1, [use gcrypt])
 ac_cv_libgcrypt=yes
 libgcrypt=yes
 
