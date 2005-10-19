@@ -2,8 +2,8 @@
  * Copyright (C) 2002, 2003, 2004, 2005  Simon Josefsson
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published
- * by the Free Software Foundation; either version 2, or (at your
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2.1, or (at your
  * option) any later version.
  *
  * This file is distributed in the hope that it will be useful, but
@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this file; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
+/* Hashes. */
 #ifdef GC_USE_MD4
 # include "md4.h"
 #endif
@@ -49,11 +50,14 @@
 #ifdef GC_USE_HMAC_MD5
 # include "hmac.h"
 #endif
+
+/* Ciphers. */
+#ifdef GC_USE_ARCFOUR
+# include "arcfour.h"
+#endif
 #ifdef GC_USE_RIJNDAEL
 # include "rijndael-api-fst.h"
 #endif
-
-#include <gcrypt.h>
 
 Gc_rc
 gc_init (void)
@@ -154,9 +158,14 @@ gc_set_allocators (gc_malloc_t func_malloc,
 typedef struct _gc_cipher_ctx {
   Gc_cipher alg;
   Gc_cipher_mode mode;
+#ifdef GC_USE_ARCFOUR
+  arcfour_context arcfourContext;
+#endif
+#ifdef GC_USE_RIJNDAEL
   rijndaelKeyInstance aesEncKey;
   rijndaelKeyInstance aesDecKey;
   rijndaelCipherInstance aesContext;
+#endif
 } _gc_cipher_ctx;
 
 Gc_rc
@@ -173,6 +182,21 @@ gc_cipher_open (Gc_cipher alg, Gc_cipher_mode mode,
 
   switch (alg)
     {
+#ifdef GC_USE_ARCFOUR
+    case GC_ARCFOUR128:
+    case GC_ARCFOUR40:
+      switch (mode)
+	{
+	case GC_STREAM:
+	  break;
+
+	default:
+	  rc = GC_INVALID_CIPHER;
+	}
+      break;
+#endif
+
+#ifdef GC_USE_RIJNDAEL
     case GC_AES128:
     case GC_AES192:
     case GC_AES256:
@@ -186,6 +210,7 @@ gc_cipher_open (Gc_cipher alg, Gc_cipher_mode mode,
 	  rc = GC_INVALID_CIPHER;
 	}
       break;
+#endif
 
     default:
       rc = GC_INVALID_CIPHER;
@@ -206,6 +231,14 @@ gc_cipher_setkey (gc_cipher_handle handle, size_t keylen, const char *key)
 
   switch (ctx->alg)
     {
+#ifdef GC_USE_ARCFOUR
+    case GC_ARCFOUR128:
+    case GC_ARCFOUR40:
+      arcfour_setkey (&ctx->arcfourContext, key, keylen);
+      break;
+#endif
+
+#ifdef GC_USE_RIJNDAEL
     case GC_AES128:
     case GC_AES192:
     case GC_AES256:
@@ -232,6 +265,7 @@ gc_cipher_setkey (gc_cipher_handle handle, size_t keylen, const char *key)
 	  return GC_INVALID_CIPHER;
       }
       break;
+#endif
 
     default:
       return GC_INVALID_CIPHER;
@@ -247,6 +281,7 @@ gc_cipher_setiv (gc_cipher_handle handle, size_t ivlen, const char *iv)
 
   switch (ctx->alg)
     {
+#ifdef GC_USE_RIJNDAEL
     case GC_AES128:
     case GC_AES192:
     case GC_AES256:
@@ -276,6 +311,7 @@ gc_cipher_setiv (gc_cipher_handle handle, size_t ivlen, const char *iv)
 	  return GC_INVALID_CIPHER;
 	}
       break;
+#endif
 
     default:
       return GC_INVALID_CIPHER;
@@ -291,6 +327,14 @@ gc_cipher_encrypt_inline (gc_cipher_handle handle, size_t len, char *data)
 
   switch (ctx->alg)
     {
+#ifdef GC_USE_ARCFOUR
+    case GC_ARCFOUR128:
+    case GC_ARCFOUR40:
+      arcfour_stream (&ctx->arcfourContext, data, data, len);
+      break;
+#endif
+
+#ifdef GC_USE_RIJNDAEL
     case GC_AES128:
     case GC_AES192:
     case GC_AES256:
@@ -303,6 +347,7 @@ gc_cipher_encrypt_inline (gc_cipher_handle handle, size_t len, char *data)
 	  return GC_INVALID_CIPHER;
       }
       break;
+#endif
 
     default:
       return GC_INVALID_CIPHER;
@@ -318,6 +363,14 @@ gc_cipher_decrypt_inline (gc_cipher_handle handle, size_t len, char *data)
 
   switch (ctx->alg)
     {
+#ifdef GC_USE_ARCFOUR
+    case GC_ARCFOUR128:
+    case GC_ARCFOUR40:
+      arcfour_stream (&ctx->arcfourContext, data, data, len);
+      break;
+#endif
+
+#ifdef GC_USE_RIJNDAEL
     case GC_AES128:
     case GC_AES192:
     case GC_AES256:
@@ -330,6 +383,7 @@ gc_cipher_decrypt_inline (gc_cipher_handle handle, size_t len, char *data)
 	  return GC_INVALID_CIPHER;
       }
       break;
+#endif
 
     default:
       return GC_INVALID_CIPHER;
@@ -427,6 +481,8 @@ gc_hmac_sha1 (const void *key, size_t keylen,
   return GC_OK;
 }
 #endif
+
+#include <gcrypt.h>
 
 Gc_rc
 gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)

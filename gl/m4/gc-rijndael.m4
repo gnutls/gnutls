@@ -7,7 +7,8 @@ dnl with or without modifications, as long as this notice is preserved.
 AC_DEFUN([gl_GC_RIJNDAEL],
 [
   AC_REQUIRE([gl_GC])
-  AC_DEFINE(GC_USE_RIJNDAEL, 1, [Define to if you want to support RIJNDAEL through GC.])
+  AC_DEFINE(GC_USE_RIJNDAEL, 1,
+    [Define if you want to support RIJNDAEL through GC.])
   if test "$ac_cv_libgcrypt" != yes; then
     gl_RIJNDAEL
   fi
