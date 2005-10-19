@@ -2,8 +2,8 @@
  * Copyright (C) 2002, 2003, 2004, 2005  Simon Josefsson
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1, or (at your
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your
  * option) any later version.
  *
  * This file is distributed in the hope that it will be useful, but
@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU General Public License
  * along with this file; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
@@ -52,6 +52,8 @@
 #ifdef GC_USE_RIJNDAEL
 # include "rijndael-api-fst.h"
 #endif
+
+#include <gcrypt.h>
 
 Gc_rc
 gc_init (void)
@@ -149,7 +151,7 @@ gc_set_allocators (gc_malloc_t func_malloc,
 }
 /* Ciphers. */
 
-typedef struct {
+typedef struct _gc_cipher_ctx {
   Gc_cipher alg;
   Gc_cipher_mode mode;
   rijndaelKeyInstance aesEncKey;
@@ -162,10 +164,9 @@ gc_cipher_open (Gc_cipher alg, Gc_cipher_mode mode,
 		gc_cipher_handle * outhandle)
 {
   _gc_cipher_ctx *ctx;
-  puts("copen");
-  *outhandle = ctx = malloc (sizeof (_gc_cipher_ctx));
-  if (*!outhandle)
-    return GC_MALLOC_ERROR;
+  Gc_rc rc = GC_OK;
+
+  ctx = calloc (sizeof (*ctx), 1);
 
   ctx->alg = alg;
   ctx->mode = mode;
@@ -173,35 +174,36 @@ gc_cipher_open (Gc_cipher alg, Gc_cipher_mode mode,
   switch (alg)
     {
     case GC_AES128:
-      break;
-
     case GC_AES192:
-      break;
-
     case GC_AES256:
+      switch (mode)
+	{
+	case GC_ECB:
+	case GC_CBC:
+	  break;
+
+	default:
+	  rc = GC_INVALID_CIPHER;
+	}
       break;
 
     default:
-      return GC_INVALID_CIPHER;
+      rc = GC_INVALID_CIPHER;
     }
 
-  switch (mode)
-    {
-    case GC_CBC:
-      break;
+  if (rc == GC_OK)
+    *outhandle = ctx;
+  else
+    free (ctx);
 
-    default:
-      return GC_INVALID_CIPHER;
-    }
-
-  return GC_OK;
+  return rc;
 }
 
 Gc_rc
 gc_cipher_setkey (gc_cipher_handle handle, size_t keylen, const char *key)
 {
   _gc_cipher_ctx *ctx = handle;
-  puts("setkey");
+
   switch (ctx->alg)
     {
     case GC_AES128:
@@ -213,10 +215,19 @@ gc_cipher_setkey (gc_cipher_handle handle, size_t keylen, const char *key)
 	char keyMaterial[RIJNDAEL_MAX_KEY_SIZE + 1];
 
 	for (i = 0; i < keylen; i++)
-	  sprintf (&keyMaterial[2*i], "%02x", key[i]);
+	  sprintf (&keyMaterial[2*i], "%02x", key[i] & 0xFF);
 
-	rc = rijndaelMakeKey (&ctx->aesKey, RIJNDAEL_DIR_ENCRYPT,
+	rc = rijndaelMakeKey (&ctx->aesEncKey, RIJNDAEL_DIR_ENCRYPT,
 			      keylen * 8, keyMaterial);
+	if (rc < 0)
+	  return GC_INVALID_CIPHER;
+
+	rc = rijndaelMakeKey (&ctx->aesDecKey, RIJNDAEL_DIR_DECRYPT,
+			      keylen * 8, keyMaterial);
+	if (rc < 0)
+	  return GC_INVALID_CIPHER;
+
+	rc = rijndaelCipherInit (&ctx->aesContext, RIJNDAEL_MODE_ECB, NULL);
 	if (rc < 0)
 	  return GC_INVALID_CIPHER;
       }
@@ -232,12 +243,43 @@ gc_cipher_setkey (gc_cipher_handle handle, size_t keylen, const char *key)
 Gc_rc
 gc_cipher_setiv (gc_cipher_handle handle, size_t ivlen, const char *iv)
 {
-  gcry_error_t err;
+  _gc_cipher_ctx *ctx = handle;
 
-  puts("setiv");
-  err = gcry_cipher_setiv ((gcry_cipher_hd_t) handle, iv, ivlen);
-  if (gcry_err_code (err))
-    return GC_INVALID_CIPHER;
+  switch (ctx->alg)
+    {
+    case GC_AES128:
+    case GC_AES192:
+    case GC_AES256:
+      switch (ctx->mode)
+	{
+	case GC_ECB:
+	  /* Doesn't use IV. */
+	  break;
+
+	case GC_CBC:
+	  {
+	    rijndael_rc rc;
+	    size_t i;
+	    char ivMaterial[2 * RIJNDAEL_MAX_IV_SIZE + 1];
+
+	    for (i = 0; i < ivlen; i++)
+	      sprintf (&ivMaterial[2*i], "%02x", iv[i] & 0xFF);
+
+	    rc = rijndaelCipherInit (&ctx->aesContext, RIJNDAEL_MODE_CBC,
+				     ivMaterial);
+	    if (rc < 0)
+	      return GC_INVALID_CIPHER;
+	  }
+	  break;
+
+	default:
+	  return GC_INVALID_CIPHER;
+	}
+      break;
+
+    default:
+      return GC_INVALID_CIPHER;
+    }
 
   return GC_OK;
 }
@@ -245,10 +287,26 @@ gc_cipher_setiv (gc_cipher_handle handle, size_t ivlen, const char *iv)
 Gc_rc
 gc_cipher_encrypt_inline (gc_cipher_handle handle, size_t len, char *data)
 {
-  puts("encrypt");
-  if (gcry_cipher_encrypt ((gcry_cipher_hd_t) handle,
-			   data, len, NULL, len) != 0)
-    return GC_INVALID_CIPHER;
+  _gc_cipher_ctx *ctx = handle;
+
+  switch (ctx->alg)
+    {
+    case GC_AES128:
+    case GC_AES192:
+    case GC_AES256:
+      {
+	int nblocks;
+
+	nblocks = rijndaelBlockEncrypt (&ctx->aesContext, &ctx->aesEncKey,
+					data, 8 * len, data);
+	if (nblocks < 0)
+	  return GC_INVALID_CIPHER;
+      }
+      break;
+
+    default:
+      return GC_INVALID_CIPHER;
+    }
 
   return GC_OK;
 }
@@ -256,10 +314,26 @@ gc_cipher_encrypt_inline (gc_cipher_handle handle, size_t len, char *data)
 Gc_rc
 gc_cipher_decrypt_inline (gc_cipher_handle handle, size_t len, char *data)
 {
-  puts("decrypt");
-  if (gcry_cipher_decrypt ((gcry_cipher_hd_t) handle,
-			   data, len, NULL, len) != 0)
-    return GC_INVALID_CIPHER;
+  _gc_cipher_ctx *ctx = handle;
+
+  switch (ctx->alg)
+    {
+    case GC_AES128:
+    case GC_AES192:
+    case GC_AES256:
+      {
+	int nblocks;
+
+	nblocks = rijndaelBlockDecrypt (&ctx->aesContext, &ctx->aesDecKey,
+					data, 8 * len, data);
+	if (nblocks < 0)
+	  return GC_INVALID_CIPHER;
+      }
+      break;
+
+    default:
+      return GC_INVALID_CIPHER;
+    }
 
   return GC_OK;
 }
@@ -353,3 +427,123 @@ gc_hmac_sha1 (const void *key, size_t keylen,
   return GC_OK;
 }
 #endif
+
+Gc_rc
+gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
+{
+  int gcryalg, gcrymode;
+  gcry_error_t err;
+
+  switch (hash)
+    {
+    case GC_MD4:
+      gcryalg = GCRY_MD_MD4;
+      break;
+
+    case GC_MD5:
+      gcryalg = GCRY_MD_MD5;
+      break;
+
+    case GC_SHA1:
+      gcryalg = GCRY_MD_SHA1;
+      break;
+
+    case GC_RMD160:
+      gcryalg = GCRY_MD_RMD160;
+      break;
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  switch (mode)
+    {
+    case 0:
+      gcrymode = 0;
+      break;
+
+    case GC_HMAC:
+      gcrymode = GCRY_MD_FLAG_HMAC;
+      break;
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  err = gcry_md_open ((gcry_md_hd_t *) outhandle, gcryalg, gcrymode);
+  if (gcry_err_code (err))
+    return GC_INVALID_HASH;
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
+{
+  int err;
+
+  err = gcry_md_copy ((gcry_md_hd_t *) outhandle, (gcry_md_hd_t) handle);
+  if (err)
+    return GC_INVALID_HASH;
+
+  return GC_OK;
+}
+
+size_t
+gc_hash_digest_length (Gc_hash hash)
+{
+  int gcryalg;
+
+  switch (hash)
+    {
+    case GC_MD4:
+      gcryalg = GCRY_MD_MD4;
+      break;
+
+    case GC_MD5:
+      gcryalg = GCRY_MD_MD5;
+      break;
+
+    case GC_SHA1:
+      gcryalg = GCRY_MD_SHA1;
+      break;
+
+    case GC_RMD160:
+      gcryalg = GCRY_MD_RMD160;
+      break;
+
+    default:
+      return 0;
+    }
+
+  return gcry_md_get_algo_dlen (gcryalg);
+}
+
+void
+gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
+{
+  gcry_md_setkey ((gcry_md_hd_t) handle, key, len);
+}
+
+void
+gc_hash_write (gc_hash_handle handle, size_t len, const char *data)
+{
+  gcry_md_write ((gcry_md_hd_t) handle, data, len);
+}
+
+const char *
+gc_hash_read (gc_hash_handle handle)
+{
+  const char *digest;
+
+  gcry_md_final ((gcry_md_hd_t) handle);
+  digest = gcry_md_read ((gcry_md_hd_t) handle, 0);
+
+  return digest;
+}
+
+void
+gc_hash_close (gc_hash_handle handle)
+{
+  gcry_md_close ((gcry_md_hd_t) handle);
+}
