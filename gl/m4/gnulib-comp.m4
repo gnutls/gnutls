@@ -32,6 +32,7 @@ AC_DEFUN([gl_INIT],
   gl_GC_MD4
   gl_GC_MD5
   gl_GC_PBKDF2_SHA1
+  gl_GC_RIJNDAEL
   gl_GC_SHA1
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
@@ -88,6 +89,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/printf-parse.h
   lib/readline.c
   lib/readline.h
+  lib/rijndael-alg-fst.c
+  lib/rijndael-alg-fst.h
+  lib/rijndael-api-fst.c
+  lib/rijndael-api-fst.h
   lib/sha1.c
   lib/sha1.h
   lib/size_max.h
@@ -105,6 +110,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gc-md4.m4
   m4/gc-md5.m4
   m4/gc-pbkdf2-sha1.m4
+  m4/gc-rijndael.m4
   m4/gc-sha1.m4
   m4/gc.m4
   m4/getdelim.m4
@@ -130,6 +136,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/onceonly_2_57.m4
   m4/readline.m4
   m4/restrict.m4
+  m4/rijndael.m4
   m4/sha1.m4
   m4/signed.m4
   m4/size_max.m4

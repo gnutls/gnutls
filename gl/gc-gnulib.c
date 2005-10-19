@@ -49,6 +49,9 @@
 #ifdef GC_USE_HMAC_MD5
 # include "hmac.h"
 #endif
+#ifdef GC_USE_RIJNDAEL
+# include "rijndael-api-fst.h"
+#endif
 
 Gc_rc
 gc_init (void)
@@ -143,6 +146,133 @@ gc_set_allocators (gc_malloc_t func_malloc,
 		   gc_realloc_t func_realloc, gc_free_t func_free)
 {
   return;
+}
+/* Ciphers. */
+
+typedef struct {
+  Gc_cipher alg;
+  Gc_cipher_mode mode;
+  rijndaelKeyInstance aesEncKey;
+  rijndaelKeyInstance aesDecKey;
+  rijndaelCipherInstance aesContext;
+} _gc_cipher_ctx;
+
+Gc_rc
+gc_cipher_open (Gc_cipher alg, Gc_cipher_mode mode,
+		gc_cipher_handle * outhandle)
+{
+  _gc_cipher_ctx *ctx;
+  puts("copen");
+  *outhandle = ctx = malloc (sizeof (_gc_cipher_ctx));
+  if (*!outhandle)
+    return GC_MALLOC_ERROR;
+
+  ctx->alg = alg;
+  ctx->mode = mode;
+
+  switch (alg)
+    {
+    case GC_AES128:
+      break;
+
+    case GC_AES192:
+      break;
+
+    case GC_AES256:
+      break;
+
+    default:
+      return GC_INVALID_CIPHER;
+    }
+
+  switch (mode)
+    {
+    case GC_CBC:
+      break;
+
+    default:
+      return GC_INVALID_CIPHER;
+    }
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_cipher_setkey (gc_cipher_handle handle, size_t keylen, const char *key)
+{
+  _gc_cipher_ctx *ctx = handle;
+  puts("setkey");
+  switch (ctx->alg)
+    {
+    case GC_AES128:
+    case GC_AES192:
+    case GC_AES256:
+      {
+	rijndael_rc rc;
+	size_t i;
+	char keyMaterial[RIJNDAEL_MAX_KEY_SIZE + 1];
+
+	for (i = 0; i < keylen; i++)
+	  sprintf (&keyMaterial[2*i], "%02x", key[i]);
+
+	rc = rijndaelMakeKey (&ctx->aesKey, RIJNDAEL_DIR_ENCRYPT,
+			      keylen * 8, keyMaterial);
+	if (rc < 0)
+	  return GC_INVALID_CIPHER;
+      }
+      break;
+
+    default:
+      return GC_INVALID_CIPHER;
+    }
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_cipher_setiv (gc_cipher_handle handle, size_t ivlen, const char *iv)
+{
+  gcry_error_t err;
+
+  puts("setiv");
+  err = gcry_cipher_setiv ((gcry_cipher_hd_t) handle, iv, ivlen);
+  if (gcry_err_code (err))
+    return GC_INVALID_CIPHER;
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_cipher_encrypt_inline (gc_cipher_handle handle, size_t len, char *data)
+{
+  puts("encrypt");
+  if (gcry_cipher_encrypt ((gcry_cipher_hd_t) handle,
+			   data, len, NULL, len) != 0)
+    return GC_INVALID_CIPHER;
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_cipher_decrypt_inline (gc_cipher_handle handle, size_t len, char *data)
+{
+  puts("decrypt");
+  if (gcry_cipher_decrypt ((gcry_cipher_hd_t) handle,
+			   data, len, NULL, len) != 0)
+    return GC_INVALID_CIPHER;
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_cipher_close (gc_cipher_handle handle)
+{
+  _gc_cipher_ctx *ctx = handle;
+
+  if (ctx)
+    free (ctx);
+
+  return GC_OK;
 }
 
 /* Hashes. */
