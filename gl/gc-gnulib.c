@@ -559,3 +559,127 @@ gc_hmac_sha1 (const void *key, size_t keylen,
   return GC_OK;
 }
 #endif
+
+#include <gcrypt.h>
+
+/* Hashes. */
+
+Gc_rc
+gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
+{
+  int gcryalg, gcrymode;
+  gcry_error_t err;
+
+  switch (hash)
+    {
+    case GC_MD4:
+      gcryalg = GCRY_MD_MD4;
+      break;
+
+    case GC_MD5:
+      gcryalg = GCRY_MD_MD5;
+      break;
+
+    case GC_SHA1:
+      gcryalg = GCRY_MD_SHA1;
+      break;
+
+    case GC_RMD160:
+      gcryalg = GCRY_MD_RMD160;
+      break;
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  switch (mode)
+    {
+    case 0:
+      gcrymode = 0;
+      break;
+
+    case GC_HMAC:
+      gcrymode = GCRY_MD_FLAG_HMAC;
+      break;
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  err = gcry_md_open ((gcry_md_hd_t *) outhandle, gcryalg, gcrymode);
+  if (gcry_err_code (err))
+    return GC_INVALID_HASH;
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
+{
+  int err;
+
+  err = gcry_md_copy ((gcry_md_hd_t *) outhandle, (gcry_md_hd_t) handle);
+  if (err)
+    return GC_INVALID_HASH;
+
+  return GC_OK;
+}
+
+size_t
+gc_hash_digest_length (Gc_hash hash)
+{
+  int gcryalg;
+
+  switch (hash)
+    {
+    case GC_MD4:
+      gcryalg = GCRY_MD_MD4;
+      break;
+
+    case GC_MD5:
+      gcryalg = GCRY_MD_MD5;
+      break;
+
+    case GC_SHA1:
+      gcryalg = GCRY_MD_SHA1;
+      break;
+
+    case GC_RMD160:
+      gcryalg = GCRY_MD_RMD160;
+      break;
+
+    default:
+      return 0;
+    }
+
+  return gcry_md_get_algo_dlen (gcryalg);
+}
+
+void
+gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
+{
+  gcry_md_setkey ((gcry_md_hd_t) handle, key, len);
+}
+
+void
+gc_hash_write (gc_hash_handle handle, size_t len, const char *data)
+{
+  gcry_md_write ((gcry_md_hd_t) handle, data, len);
+}
+
+const char *
+gc_hash_read (gc_hash_handle handle)
+{
+  const char *digest;
+
+  gcry_md_final ((gcry_md_hd_t) handle);
+  digest = gcry_md_read ((gcry_md_hd_t) handle, 0);
+
+  return digest;
+}
+
+void
+gc_hash_close (gc_hash_handle handle)
+{
+  gcry_md_close ((gcry_md_hd_t) handle);
+}
