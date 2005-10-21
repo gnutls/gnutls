@@ -103,9 +103,9 @@ md4_finish_ctx (struct md4_ctx *ctx, void *resbuf)
   memcpy (&ctx->buffer[bytes], fillbuf, pad);
 
   /* Put the 64-bit file length in *bits* at the end of the buffer.  */
-  *(uint32_t *) & ctx->buffer[bytes + pad] = SWAP (ctx->total[0] << 3);
-  *(uint32_t *) & ctx->buffer[bytes + pad + 4] = SWAP ((ctx->total[1] << 3) |
-						       (ctx->total[0] >> 29));
+  *(uint32_t *) &ctx->buffer[bytes + pad] = SWAP (ctx->total[0] << 3);
+  *(uint32_t *) &ctx->buffer[bytes + pad + 4] = SWAP ((ctx->total[1] << 3) |
+						      (ctx->total[0] >> 29));
 
   /* Process last bytes.  */
   md4_process_block (ctx->buffer, bytes + pad + 8, ctx);

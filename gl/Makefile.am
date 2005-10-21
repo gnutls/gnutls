@@ -40,7 +40,11 @@ MOSTLYCLEANFILES += alloca.h alloca.h-t
 
 ## begin gnulib module gc
 
+if GL_COND_LIBTOOL
+libgnu_la_LIBADD += $(LTLIBGCRYPT)
+else
 libgnu_la_LIBADD += $(LIBGCRYPT)
+endif
 
 ## end   gnulib module gc
 
