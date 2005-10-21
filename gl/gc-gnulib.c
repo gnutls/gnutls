@@ -58,6 +58,9 @@
 #ifdef GC_USE_ARCTWO
 # include "arctwo.h"
 #endif
+#ifdef GC_USE_DES
+# include "des.h"
+#endif
 #ifdef GC_USE_RIJNDAEL
 # include "rijndael-api-fst.h"
 #endif
@@ -167,6 +170,9 @@ typedef struct _gc_cipher_ctx {
 #ifdef GC_USE_ARCFOUR
   arcfour_context arcfourContext;
 #endif
+#ifdef GC_USE_DES
+  des_ctx desContext;
+#endif
 #ifdef GC_USE_RIJNDAEL
   rijndaelKeyInstance aesEncKey;
   rijndaelKeyInstance aesDecKey;
@@ -207,6 +213,19 @@ gc_cipher_open (Gc_cipher alg, Gc_cipher_mode mode,
       switch (mode)
 	{
 	case GC_STREAM:
+	  break;
+
+	default:
+	  rc = GC_INVALID_CIPHER;
+	}
+      break;
+#endif
+
+#ifdef GC_USE_DES
+    case GC_DES:
+      switch (mode)
+	{
+	case GC_ECB:
 	  break;
 
 	default:
@@ -260,6 +279,14 @@ gc_cipher_setkey (gc_cipher_handle handle, size_t keylen, const char *key)
     case GC_ARCFOUR128:
     case GC_ARCFOUR40:
       arcfour_setkey (&ctx->arcfourContext, key, keylen);
+      break;
+#endif
+
+#ifdef GC_USE_DES
+    case GC_DES:
+      if (keylen != 8)
+	return GC_INVALID_CIPHER;
+      des_setkey (&ctx->desContext, key);
       break;
 #endif
 
@@ -365,6 +392,13 @@ gc_cipher_encrypt_inline (gc_cipher_handle handle, size_t len, char *data)
       break;
 #endif
 
+#ifdef GC_USE_DES
+    case GC_DES:
+      for (; len >= 8; len -= 8, data += 8)
+	des_ecb_encrypt (&ctx->desContext, data, data);
+      break;
+#endif
+
 #ifdef GC_USE_RIJNDAEL
     case GC_AES128:
     case GC_AES192:
@@ -404,6 +438,13 @@ gc_cipher_decrypt_inline (gc_cipher_handle handle, size_t len, char *data)
     case GC_ARCFOUR128:
     case GC_ARCFOUR40:
       arcfour_stream (&ctx->arcfourContext, data, data, len);
+      break;
+#endif
+
+#ifdef GC_USE_DES
+    case GC_DES:
+      for (; len >= 8; len -= 8, data += 8)
+	des_ecb_decrypt (&ctx->desContext, data, data);
       break;
 #endif
 
@@ -518,125 +559,3 @@ gc_hmac_sha1 (const void *key, size_t keylen,
   return GC_OK;
 }
 #endif
-
-#include <gcrypt.h>
-
-Gc_rc
-gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
-{
-  int gcryalg, gcrymode;
-  gcry_error_t err;
-
-  switch (hash)
-    {
-    case GC_MD4:
-      gcryalg = GCRY_MD_MD4;
-      break;
-
-    case GC_MD5:
-      gcryalg = GCRY_MD_MD5;
-      break;
-
-    case GC_SHA1:
-      gcryalg = GCRY_MD_SHA1;
-      break;
-
-    case GC_RMD160:
-      gcryalg = GCRY_MD_RMD160;
-      break;
-
-    default:
-      return GC_INVALID_HASH;
-    }
-
-  switch (mode)
-    {
-    case 0:
-      gcrymode = 0;
-      break;
-
-    case GC_HMAC:
-      gcrymode = GCRY_MD_FLAG_HMAC;
-      break;
-
-    default:
-      return GC_INVALID_HASH;
-    }
-
-  err = gcry_md_open ((gcry_md_hd_t *) outhandle, gcryalg, gcrymode);
-  if (gcry_err_code (err))
-    return GC_INVALID_HASH;
-
-  return GC_OK;
-}
-
-Gc_rc
-gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
-{
-  int err;
-
-  err = gcry_md_copy ((gcry_md_hd_t *) outhandle, (gcry_md_hd_t) handle);
-  if (err)
-    return GC_INVALID_HASH;
-
-  return GC_OK;
-}
-
-size_t
-gc_hash_digest_length (Gc_hash hash)
-{
-  int gcryalg;
-
-  switch (hash)
-    {
-    case GC_MD4:
-      gcryalg = GCRY_MD_MD4;
-      break;
-
-    case GC_MD5:
-      gcryalg = GCRY_MD_MD5;
-      break;
-
-    case GC_SHA1:
-      gcryalg = GCRY_MD_SHA1;
-      break;
-
-    case GC_RMD160:
-      gcryalg = GCRY_MD_RMD160;
-      break;
-
-    default:
-      return 0;
-    }
-
-  return gcry_md_get_algo_dlen (gcryalg);
-}
-
-void
-gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
-{
-  gcry_md_setkey ((gcry_md_hd_t) handle, key, len);
-}
-
-void
-gc_hash_write (gc_hash_handle handle, size_t len, const char *data)
-{
-  gcry_md_write ((gcry_md_hd_t) handle, data, len);
-}
-
-const char *
-gc_hash_read (gc_hash_handle handle)
-{
-  const char *digest;
-
-  gcry_md_final ((gcry_md_hd_t) handle);
-  digest = gcry_md_read ((gcry_md_hd_t) handle, 0);
-
-  return digest;
-}
-
-void
-gc_hash_close (gc_hash_handle handle)
-{
-  gcry_md_close ((gcry_md_hd_t) handle);
-}
