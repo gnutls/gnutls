@@ -28,6 +28,7 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_ALLOCA
   gl_GC
   gl_GC_ARCFOUR
+  gl_GC_ARCTWO
   gl_GC_HMAC_MD5
   gl_GC_HMAC_SHA1
   gl_GC_MD4
@@ -60,6 +61,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/alloca_.h
   lib/arcfour.c
   lib/arcfour.h
+  lib/arctwo.c
+  lib/arctwo.h
   lib/asnprintf.c
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
@@ -108,8 +111,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/xsize.h
   m4/alloca.m4
   m4/arcfour.m4
+  m4/arctwo.m4
   m4/eoverflow.m4
   m4/gc-arcfour.m4
+  m4/gc-arctwo.m4
   m4/gc-hmac-md5.m4
   m4/gc-hmac-sha1.m4
   m4/gc-md4.m4
