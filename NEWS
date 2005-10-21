@@ -4,6 +4,17 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.9
+- The low-level crypto alternative to libgcrypt used earlier (Nettle)
+  has been replaced with crypto code from gnulib.  This leads to
+  easier re-use of these components in other projects, leading to more
+  review and simpler maintenance.  The new configure parameter
+  --with-builtin-crypto replaces the old --with-nettle, and must be
+  used to enable this functionality.  See README under "Experimental"
+  for more information.  Internally, GnuTLS has been updated to use
+  the new "Generic Crypto" API in gl/gc.h.  The API is similar to the
+  old crypto/gc.h, because the gnulib code were based on GnuTLS's
+  gc.h.
+- Fix compiler warning in the "anonself" self test.
 - API and ABI modifications:
   No changes since last version.
 
