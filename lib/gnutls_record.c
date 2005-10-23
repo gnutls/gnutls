@@ -302,7 +302,7 @@ ssize_t _gnutls_send_int(gnutls_session_t session, content_type_t type,
      * ok, and means to resume.
      */
     if (session->internals.record_send_buffer.length == 0 &&
-	(sizeofdata == 0 || _data == NULL)) {
+	(sizeofdata == 0 && _data == NULL)) {
 	gnutls_assert();
 	return GNUTLS_E_INVALID_REQUEST;
     }
