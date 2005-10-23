@@ -4,6 +4,8 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.9
+- Make it possible to send empty data through gnutls_record_send,
+  to align with the send API.
 - The (experimental) low-level crypto alternative to libgcrypt used
   earlier (Nettle) has been replaced with crypto code from gnulib.
   This leads to easier re-use of these components in other projects,
