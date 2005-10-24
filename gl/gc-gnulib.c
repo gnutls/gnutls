@@ -537,6 +537,195 @@ gc_cipher_close (gc_cipher_handle handle)
 
 /* Hashes. */
 
+#define MAX_DIGEST_SIZE 20
+
+typedef struct _gc_hash_ctx {
+  Gc_hash alg;
+  Gc_hash_mode mode;
+  char hash[MAX_DIGEST_SIZE];
+#ifdef GC_USE_MD5
+  struct md5_ctx md5Context;
+#endif
+#ifdef GC_USE_MD4
+  struct md4_ctx md4Context;
+#endif
+#ifdef GC_USE_SHA1
+  struct sha1_ctx sha1Context;
+#endif
+} _gc_hash_ctx;
+
+Gc_rc
+gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
+{
+  _gc_hash_ctx *ctx;
+  Gc_rc rc = GC_OK;
+
+  ctx = calloc (sizeof (*ctx), 1);
+
+  ctx->alg = hash;
+  ctx->mode = mode;
+
+  switch (hash)
+    {
+#ifdef GC_USE_MD4
+    case GC_MD4:
+      md4_init_ctx (&ctx->md4Context);
+      break;
+#endif
+
+#ifdef GC_USE_MD5
+    case GC_MD5:
+      md5_init_ctx (&ctx->md5Context);
+      break;
+#endif
+
+#ifdef GC_USE_SHA1
+    case GC_SHA1:
+      sha1_init_ctx (&ctx->sha1Context);
+      break;
+#endif
+
+    default:
+      rc = GC_INVALID_HASH;
+      break;
+    }
+
+  switch (mode)
+    {
+    case 0:
+      break;
+
+    default:
+      rc = GC_INVALID_HASH;
+      break;
+    }
+
+  if (rc == GC_OK)
+    *outhandle = ctx;
+  else
+    free (ctx);
+
+  return GC_OK;
+}
+
+Gc_rc
+gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
+{
+  _gc_hash_ctx *in = handle;
+  _gc_hash_ctx *out;
+  Gc_rc rc = GC_OK;
+
+  *outhandle = out = calloc (sizeof (*out), 1);
+  if (!out)
+    return GC_MALLOC_ERROR;
+
+  memcpy (out, in, sizeof (*out));
+
+  return GC_OK;
+}
+
+size_t
+gc_hash_digest_length (Gc_hash hash)
+{
+  size_t len;
+
+  switch (hash)
+    {
+    case GC_MD4:
+      len = GC_MD4_DIGEST_SIZE;
+      break;
+
+    case GC_MD5:
+      len = GC_MD5_DIGEST_SIZE;
+      break;
+
+    case GC_SHA1:
+      len = GC_SHA1_DIGEST_SIZE;
+      break;
+
+    default:
+      return 0;
+    }
+
+  return len;
+}
+
+void
+gc_hash_write (gc_hash_handle handle, size_t len, const char *data)
+{
+  _gc_hash_ctx *ctx = handle;
+  Gc_rc rc = GC_OK;
+
+  switch (ctx->alg)
+    {
+#ifdef GC_USE_MD4
+    case GC_MD4:
+      md4_process_bytes (data, len, &ctx->md4Context);
+      break;
+#endif
+
+#ifdef GC_USE_MD5
+    case GC_MD5:
+      md5_process_bytes (data, len, &ctx->md5Context);
+      break;
+#endif
+
+#ifdef GC_USE_SHA1
+    case GC_SHA1:
+      sha1_process_bytes (data, len, &ctx->sha1Context);
+      break;
+#endif
+
+    default:
+      break;
+    }
+}
+
+const char *
+gc_hash_read (gc_hash_handle handle)
+{
+  _gc_hash_ctx *ctx = handle;
+  const char *ret = NULL;
+  Gc_rc rc;
+
+  switch (ctx->alg)
+    {
+#ifdef GC_USE_MD4
+    case GC_MD4:
+      md4_finish_ctx (&ctx->md4Context, ctx->hash);
+      ret = ctx->hash;
+      break;
+#endif
+
+#ifdef GC_USE_MD5
+    case GC_MD5:
+      md5_finish_ctx (&ctx->md5Context, ctx->hash);
+      ret = ctx->hash;
+      break;
+#endif
+
+#ifdef GC_USE_SHA1
+    case GC_SHA1:
+      sha1_finish_ctx (&ctx->sha1Context, ctx->hash);
+      ret = ctx->hash;
+      break;
+#endif
+
+    default:
+      return NULL;
+    }
+
+  return ret;
+}
+
+void
+gc_hash_close (gc_hash_handle handle)
+{
+  _gc_hash_ctx *ctx = handle;
+
+  free (ctx);
+}
+
 Gc_rc
 gc_hash_buffer (Gc_hash hash, const void *in, size_t inlen, char *resbuf)
 {
@@ -613,127 +802,3 @@ gc_hmac_sha1 (const void *key, size_t keylen,
   return GC_OK;
 }
 #endif
-
-#include <gcrypt.h>
-
-/* Hashes. */
-
-Gc_rc
-gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
-{
-  int gcryalg, gcrymode;
-  gcry_error_t err;
-
-  switch (hash)
-    {
-    case GC_MD4:
-      gcryalg = GCRY_MD_MD4;
-      break;
-
-    case GC_MD5:
-      gcryalg = GCRY_MD_MD5;
-      break;
-
-    case GC_SHA1:
-      gcryalg = GCRY_MD_SHA1;
-      break;
-
-    case GC_RMD160:
-      gcryalg = GCRY_MD_RMD160;
-      break;
-
-    default:
-      return GC_INVALID_HASH;
-    }
-
-  switch (mode)
-    {
-    case 0:
-      gcrymode = 0;
-      break;
-
-    case GC_HMAC:
-      gcrymode = GCRY_MD_FLAG_HMAC;
-      break;
-
-    default:
-      return GC_INVALID_HASH;
-    }
-
-  err = gcry_md_open ((gcry_md_hd_t *) outhandle, gcryalg, gcrymode);
-  if (gcry_err_code (err))
-    return GC_INVALID_HASH;
-
-  return GC_OK;
-}
-
-Gc_rc
-gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
-{
-  int err;
-
-  err = gcry_md_copy ((gcry_md_hd_t *) outhandle, (gcry_md_hd_t) handle);
-  if (err)
-    return GC_INVALID_HASH;
-
-  return GC_OK;
-}
-
-size_t
-gc_hash_digest_length (Gc_hash hash)
-{
-  int gcryalg;
-
-  switch (hash)
-    {
-    case GC_MD4:
-      gcryalg = GCRY_MD_MD4;
-      break;
-
-    case GC_MD5:
-      gcryalg = GCRY_MD_MD5;
-      break;
-
-    case GC_SHA1:
-      gcryalg = GCRY_MD_SHA1;
-      break;
-
-    case GC_RMD160:
-      gcryalg = GCRY_MD_RMD160;
-      break;
-
-    default:
-      return 0;
-    }
-
-  return gcry_md_get_algo_dlen (gcryalg);
-}
-
-void
-gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
-{
-  gcry_md_setkey ((gcry_md_hd_t) handle, key, len);
-}
-
-void
-gc_hash_write (gc_hash_handle handle, size_t len, const char *data)
-{
-  gcry_md_write ((gcry_md_hd_t) handle, data, len);
-}
-
-const char *
-gc_hash_read (gc_hash_handle handle)
-{
-  const char *digest;
-
-  gcry_md_final ((gcry_md_hd_t) handle);
-  digest = gcry_md_read ((gcry_md_hd_t) handle, 0);
-
-  return digest;
-}
-
-void
-gc_hash_close (gc_hash_handle handle)
-{
-  gcry_md_close ((gcry_md_hd_t) handle);
-}
