@@ -53,6 +53,9 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm_t algorithm)
     case GNUTLS_MAC_RMD160:
 	result = gc_hash_open(GC_RMD160, 0, &ret->handle);
 	break;
+    case GNUTLS_MAC_MD2:
+	result = gc_hash_open(GC_MD2, 0, &ret->handle);
+	break;
     default:
 	gnutls_assert();
 	result = -1;
@@ -81,6 +84,9 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm_t algorithm)
     case GNUTLS_MAC_RMD160:
 	ret = gc_hash_digest_length(GC_RMD160);
 	break;
+    case GNUTLS_MAC_MD2:
+	ret = gc_hash_digest_length(GC_MD2);
+      break;
     default:
 	ret = 0;
 	break;
