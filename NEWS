@@ -27,6 +27,9 @@ See the end for copying conditions.
   based on GnuTLS's gc.h.
 - Fix compiler warning in the "anonself" self test.
 - API and ABI modifications:
+gnutls_x509_crt_list_verify: Added 'const' to prototype in <gnutls/x509.h>.
+                             This doesn't reflect a change in behaviour,
+                             so we don't break backwards compatibility.
 GNUTLS_MAC_MD2: New gnutls_mac_algorithm_t value.
 GNUTLS_DIG_MD2: New gnutls_digest_algorithm_t value.
 GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2,
