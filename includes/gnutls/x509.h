@@ -381,7 +381,15 @@ extern "C"
      * basicConstraints extension. Must be used in combination with
      * GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
      */
-    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 8
+    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 8,
+
+    /* Allow certificates to be signed using the broken MD2 algorithm.
+     */
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
+
+    /* Allow certificates to be signed using the broken MD5 algorithm.
+     */
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
