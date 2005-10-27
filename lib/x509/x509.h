@@ -25,6 +25,8 @@
 #ifndef X509_H
 # define X509_H
 
+#include <gnutls/x509.h>
+
 #define HASH_OID_SHA1 "1.3.14.3.2.26"
 #define HASH_OID_MD5 "1.2.840.113549.2.5"
 #define HASH_OID_MD2 "1.2.840.113549.2.2"
@@ -38,11 +40,6 @@ typedef struct gnutls_x509_crt_int {
     ASN1_TYPE cert;
     int use_extensions;
 } gnutls_x509_crt_int;
-
-typedef enum gnutls_certificate_import_flags {
-    GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED=1
-} gnutls_certificate_import_flags;
-                                 
 
 #define MAX_PRIV_PARAMS_SIZE 6	/* ok for RSA and DSA */
 
