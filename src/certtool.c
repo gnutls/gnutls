@@ -2240,6 +2240,13 @@ static void print_verification_res(gnutls_x509_crt crt,
 	comma = 1;
     }
 
+    if (output & GNUTLS_CERT_INSECURE_ALGORITHM) {
+      if (comma)
+	fprintf(outfile, ", ");
+      fprintf(outfile, "Insecure algorithm");
+      comma = 1;
+    }
+
     /* Check expiration dates.
      */
 
@@ -2341,6 +2348,13 @@ void verify_crl(void)
 	    fprintf(outfile, ", ");
 	fprintf(outfile, "Issuer is not a CA");
 	comma = 1;
+    }
+
+    if (output & GNUTLS_CERT_INSECURE_ALGORITHM) {
+      if (comma)
+	fprintf(outfile, ", ");
+      fprintf(outfile, "Insecure algorithm");
+      comma = 1;
     }
 
     /* Check expiration dates.
