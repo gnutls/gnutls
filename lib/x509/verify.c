@@ -143,7 +143,7 @@ static int check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
  * This does a straight (DER) compare of the issuer/subject fields in
  * the given certificates.
  *
- * Returns 1 if the match and zero if they don't match. Otherwise
+ * Returns 1 if they match and zero if they don't match. Otherwise
  * a negative value is returned to indicate error.
  */
 static
@@ -285,7 +285,11 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	ret = 0;
     }
 
-    {
+    /* If the certificate is not self signed check if the algorithms
+     * used are secure. If the certificate is self signed it doesn't
+     * really matter.
+     */
+    if (is_issuer(cert, cert) != 0) {
       int sigalg;
 
       sigalg = gnutls_x509_crt_get_signature_algorithm(cert);
