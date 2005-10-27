@@ -410,7 +410,7 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
   *
   **/
 int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq_t crq,
-					   char *pass,
+					   const char *pass,
 					   size_t * sizeof_pass)
 {
     if (crq == NULL) {
