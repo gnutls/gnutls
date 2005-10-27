@@ -155,7 +155,8 @@ typedef enum {
      * not verified.
      */
     GNUTLS_CERT_SIGNER_NOT_FOUND=64,
-    GNUTLS_CERT_SIGNER_NOT_CA=128
+    GNUTLS_CERT_SIGNER_NOT_CA=128,
+    GNUTLS_CERT_INSECURE_ALGORITHM=256
 } gnutls_certificate_status_t;
 
 typedef enum { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } gnutls_certificate_request_t;
