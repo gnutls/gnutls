@@ -256,7 +256,6 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	}
     }
 
-
     result =
 	_gnutls_x509_get_signed_data(cert->cert, "tbsCertificate",
 				     &cert_signed_data);
@@ -284,6 +283,21 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 	if (output)
 	    *output |= GNUTLS_CERT_INVALID;
 	ret = 0;
+    }
+
+    {
+      int sigalg;
+
+      sigalg = gnutls_x509_crt_get_signature_algorithm(cert);
+
+      if (((sigalg == GNUTLS_SIGN_RSA_MD2) &&
+	   !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2)) ||
+	  ((sigalg == GNUTLS_SIGN_RSA_MD5) &&
+	   !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5)))
+	{
+	  if (output)
+	    *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
+	}
     }
 
     result = ret;
@@ -915,6 +929,21 @@ static int _gnutls_verify_crl2(gnutls_x509_crl_t crl,
 	if (output)
 	    *output |= GNUTLS_CERT_INVALID;
 	ret = 0;
+    }
+
+    {
+      int sigalg;
+
+      sigalg = gnutls_x509_crl_get_signature_algorithm(crl);
+
+      if (((sigalg == GNUTLS_SIGN_RSA_MD2) &&
+	   !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2)) ||
+	  ((sigalg == GNUTLS_SIGN_RSA_MD5) &&
+	   !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5)))
+	{
+	  if (output)
+	    *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
+	}
     }
 
     result = ret;
