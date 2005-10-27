@@ -289,7 +289,7 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
      * used are secure. If the certificate is self signed it doesn't
      * really matter.
      */
-    if (is_issuer(cert, cert) != 0) {
+    if (is_issuer(cert, cert) == 0) {
       int sigalg;
 
       sigalg = gnutls_x509_crt_get_signature_algorithm(cert);
