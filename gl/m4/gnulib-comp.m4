@@ -33,6 +33,7 @@ AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_GC_DES
   gl_GC_HMAC_MD5
   gl_GC_HMAC_SHA1
+  gl_GC_MD2
   gl_GC_MD4
   gl_GC_MD5
   gl_GC_PBKDF2_SHA1
@@ -42,6 +43,7 @@ AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
   gl_INET_NTOP
+  gl_MD2
   gl_FUNC_MEMMEM
   gl_FUNC_MEMMOVE
   gl_MINMAX
@@ -83,6 +85,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/hmac.h
   lib/inet_ntop.c
   lib/inet_ntop.h
+  lib/md2.c
+  lib/md2.h
   lib/md4.c
   lib/md4.h
   lib/md5.c
@@ -123,6 +127,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gc-des.m4
   m4/gc-hmac-md5.m4
   m4/gc-hmac-sha1.m4
+  m4/gc-md2.m4
   m4/gc-md4.m4
   m4/gc-md5.m4
   m4/gc-pbkdf2-sha1.m4
@@ -143,6 +148,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-prefix.m4
   m4/longdouble.m4
   m4/longlong.m4
+  m4/md2.m4
   m4/md4.m4
   m4/md5.m4
   m4/memmem.m4
