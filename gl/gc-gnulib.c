@@ -617,7 +617,7 @@ gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
   else
     free (ctx);
 
-  return GC_OK;
+  return rc;
 }
 
 Gc_rc
@@ -625,7 +625,6 @@ gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
 {
   _gc_hash_ctx *in = handle;
   _gc_hash_ctx *out;
-  Gc_rc rc = GC_OK;
 
   *outhandle = out = calloc (sizeof (*out), 1);
   if (!out)
@@ -670,7 +669,6 @@ void
 gc_hash_write (gc_hash_handle handle, size_t len, const char *data)
 {
   _gc_hash_ctx *ctx = handle;
-  Gc_rc rc = GC_OK;
 
   switch (ctx->alg)
     {
@@ -708,7 +706,6 @@ gc_hash_read (gc_hash_handle handle)
 {
   _gc_hash_ctx *ctx = handle;
   const char *ret = NULL;
-  Gc_rc rc;
 
   switch (ctx->alg)
     {
@@ -850,5 +847,5 @@ gc_hmac_sha1 (const void *key, size_t keylen,
 void
 gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
 {
-  return GC_INVALID_HASH;
+  return;
 }
