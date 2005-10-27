@@ -145,6 +145,7 @@ int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
 
 int gnutls_x509_crt_get_key_usage(gnutls_x509_crt_t cert,
     unsigned int *key_usage, unsigned int *critical);
+int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert);
 
 int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key);
