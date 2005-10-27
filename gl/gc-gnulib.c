@@ -846,3 +846,9 @@ gc_hmac_sha1 (const void *key, size_t keylen,
   return GC_OK;
 }
 #endif
+
+void
+gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
+{
+  return GC_INVALID_HASH;
+}
