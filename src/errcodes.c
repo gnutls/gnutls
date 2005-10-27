@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     const char *_name;
     error_name names_to_sort[400];	/* up to 400 names  */
 
-    printf("@itemize\n");
+    printf("@table @code\n");
 
     memset(names_to_sort, 0, sizeof(names_to_sort));
     j = 0;
@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
 	if (desc == NULL || _name == NULL)
 	    continue;
 
-	printf("@item @code{%s}:\n%s\n\n", _name, desc);
+	printf("@item %s:\n%s\n\n", _name, desc);
     }
 
-    printf("@end itemize\n");
+    printf("@end table\n");
 
     return 0;
 }

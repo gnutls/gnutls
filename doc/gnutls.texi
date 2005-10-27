@@ -396,17 +396,17 @@ The Record protocol is the secure communications provider. Its purpose
 is to encrypt, authenticate and --optionally-- compress packets.
 The following functions are available:
 
-@itemize
+@table @code
 
-@item @code{gnutls_record_send}
+@item gnutls_record_send:
 To send a record packet (with application data).
 
-@item @code{gnutls_record_recv}:
+@item gnutls_record_recv:
 To receive a record packet (with application data).
 
-@item @code{gnutls_record_get_direction}:
+@item gnutls_record_get_direction:
 To get the direction of the last interrupted function call.
-@end itemize
+@end table
 
 As you may have already noticed, the functions which access the Record
 protocol, are quite limited, given the importance of this protocol in
@@ -442,42 +442,40 @@ data size.
 
 Supported cipher algorithms:
 
-@itemize
-
-@item @code{3DES_CBC}
+@table @code
+@item 3DES_CBC
 @code{3DES_CBC} is the DES block cipher algorithm used with triple
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
-@item @code{ARCFOUR_128}
+@item ARCFOUR_128
 ARCFOUR is a fast stream cipher.
 
-@item @code{ARCFOUR_40}
+@item ARCFOUR_40
 This is the ARCFOUR cipher that is fed with a 40 bit key,
 which is considered weak.
 
-@item @code{AES_CBC}
+@item AES_CBC
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  Has 128 bits block size and is used in CBC mode. This
 is not officially supported in TLS.
-
-@end itemize
+@end table
 
 Supported MAC algorithms:
 
-@itemize
-@item @code{MAC_MD5}
+@table @code
+@item MAC_MD5
 MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs
 128 bits of data.
 
-@item @code{MAC_SHA}
+@item MAC_SHA
 SHA is a cryptographic hash algorithm designed by NSA. Outputs 160
 bits of data.
 
-@item @code{MAC_RMD160}
+@item MAC_RMD160
 RIPEMD is a cryptographic hash algorithm developed in the framework of
 the EU project RIPE. Outputs 160 bits of data.
 
-@end itemize
+@end table
 
 @node Compression algorithms used in the record layer
 @subsection Compression algorithms used in the record layer
@@ -504,7 +502,7 @@ on the paper @cite{TLSCOMP}.
 
 Supported compression algorithms:
 
-@itemize
+@table @code
 @item DEFLATE
 Zlib compression, using the deflate algorithm.
 
@@ -513,7 +511,7 @@ LZO is a very fast compression algorithm. This algorithm is only
 available if the @acronym{GnuTLS-extra} library has been initialized
 and the private extensions are enabled.
 
-@end itemize
+@end table
 
 @node Weaknesses and countermeasures
 @subsection Weaknesses and countermeasures
@@ -562,20 +560,20 @@ information that is included does not leak. You must take extreme care
 for the alert information not to leak to a possible attacker, via
 public log files etc.
 
-@itemize
-@item @code{gnutls_alert_send}:
+@table @code
+@item gnutls_alert_send:
 To send an alert signal.
 
-@item @code{gnutls_error_to_alert}:
+@item gnutls_error_to_alert:
 To map a gnutls error number to an alert signal.
 
-@item @code{gnutls_alert_get}:
+@item gnutls_alert_get:
 Returns the last received alert.
 
-@item @code{gnutls_alert_get_name}:
+@item gnutls_alert_get_name:
 Returns the name, in a character array, of the given alert.
 
-@end itemize
+@end table
 
 @node The TLS Handshake Protocol
 @section The TLS Handshake Protocol
@@ -588,41 +586,41 @@ This is fully controlled by the application layer, thus your program
 has to set up the required parameters. Available functions to control
 the handshake protocol include:
 
-@itemize
-@item @code{gnutls_cipher_set_priority}:
+@table @code
+@item gnutls_cipher_set_priority:
 To set the priority of bulk cipher algorithms.
 
-@item @code{gnutls_mac_set_priority}:
+@item gnutls_mac_set_priority:
 To set the priority of MAC algorithms.
 
-@item @code{gnutls_kx_set_priority}:
+@item gnutls_kx_set_priority:
 To set the priority of key exchange algorithms.
 
-@item @code{gnutls_compression_set_priority}:
+@item gnutls_compression_set_priority:
 To set the priority of compression methods.
 
-@item @code{gnutls_certificate_type_set_priority}:
+@item gnutls_certificate_type_set_priority:
 To set the priority of certificate types (e.g., @acronym{OpenPGP},
 @acronym{X.509}).
 
-@item @code{gnutls_protocol_set_priority}:
+@item gnutls_protocol_set_priority:
 To set the priority of protocol versions (e.g., @acronym{SSL} 3.0,
 @acronym{TLS} 1.0).
 
-@item @code{gnutls_set_default_priority}:
+@item gnutls_set_default_priority:
 To set some defaults in the current session.  That way you don't have
 to call each priority function, independently, but you have to live
 with the defaults.
 
-@item @code{gnutls_credentials_set}:
+@item gnutls_credentials_set:
 To set the appropriate credentials structures.
 
-@item @code{gnutls_certificate_server_set_request}:
+@item gnutls_certificate_server_set_request:
 To set whether client certificate is required or not.
 
-@item @code{gnutls_handshake}:
+@item gnutls_handshake:
 To initiate the handshake.
-@end itemize
+@end table
 
 @subsection TLS cipher suites
 
@@ -734,14 +732,14 @@ order to remove them, and save space. The function
 A number of extensions to the @acronym{TLS} protocol have been
 proposed mainly in @acronym{RFC} 3546
 (@url{http://www.ietf.org/rfc/rfc3546.txt}). The extensions supported
-in @acronym{GnuTLS} are
+in @acronym{GnuTLS} are:
 
 @itemize
 @item Maximum fragment length negotiation
 @item Server name indication
 @end itemize
 
-discussed in the subsections that follow.
+and they will be discussed in the subsections that follow.
 
 @subsection Maximum fragment length negotiation
 @cindex TLS Extensions
@@ -943,18 +941,18 @@ functions:
 Key exchange algorithms for @acronym{OpenPGP} and @acronym{X.509}
 certificates:
 
-@itemize
+@table @code
 
-@item @code{RSA}:
+@item RSA:
 The RSA algorithm is used to encrypt a key and send it to the peer.
 The certificate must allow the key to be used for encryption.
 
-@item @code{RSA_EXPORT}:
+@item RSA_EXPORT:
 The RSA algorithm is used to encrypt a key and send it to the peer.
 In the EXPORT algorithm, the server signs temporary RSA parameters of
 512 bits -- which are considered weak -- and sends them to the client.
 
-@item @code{DHE_RSA}:
+@item DHE_RSA:
 The RSA algorithm is used to sign Ephemeral Diffie Hellman parameters
 which are sent to the peer. The key in the certificate must allow the
 key to be used for signing. Note that key exchange algorithms which
@@ -962,13 +960,13 @@ use Ephemeral Diffie Hellman parameters, offer perfect forward
 secrecy. That means that even if the private key used for signing is
 compromised, it cannot be used to reveal past session data.
 
-@item @code{DHE_DSS}:
+@item DHE_DSS:
 The DSS algorithm is used to sign Ephemeral Diffie Hellman parameters
 which are sent to the peer. The certificate must contain DSA
 parameters to use this key exchange algorithm. DSS stands for Digital
 Signature Standard.
 
-@end itemize
+@end table
 
 @node Anonymous authentication
 @section Anonymous authentication
@@ -988,12 +986,12 @@ an anonymous credentials structure.
 
 Supported anonymous key exchange algorithms:
 
-@itemize
+@table @code
 
-@item @code{ANON_DH}:
+@item ANON_DH:
 This algorithm exchanges Diffie Hellman parameters.
 
-@end itemize
+@end table
 
 @node Authentication using SRP
 @section Authentication using @acronym{SRP}
@@ -1025,20 +1023,20 @@ users passwords with the @acronym{SRP} password files. That way
 The implementation in @acronym{GnuTLS} is based on paper
 @cite{TLSSRP}.  The supported @acronym{SRP} key exchange methods are:
 
-@itemize
+@table @code
 
-@item @code{SRP}:
+@item SRP:
 Authentication using the @acronym{SRP} protocol.
 
-@item @code{SRP_DSS}:
+@item SRP_DSS:
 Client authentication using the @acronym{SRP} protocol. Server is
 authenticated using a certificate with DSA parameters.
 
-@item @code{SRP_RSA}:
+@item SRP_RSA:
 Client authentication using the @acronym{SRP} protocol. Server is
 authenticated using a certificate with RSA parameters.
 
-@end itemize
+@end table
 
 If clients supporting @acronym{SRP} know the username and password
 before the connection, should initialize the client credentials and
@@ -1221,27 +1219,27 @@ certificate holder, the signer, a unique serial number, expiration
 dates and some other fields @cite{RFC3280} as shown in the table
 below.
 
-@itemize
+@table @code
 
-@item @code{version}:
+@item version:
 The field that indicates the version of the certificate.
 
-@item @code{serialNumber}:
+@item serialNumber:
 This field holds a unique serial number per certificate.
 
-@item @code{issuer}:
+@item issuer:
 Holds the issuer's distinguished name.
 
-@item @code{validity}:
+@item validity:
 The activation and expiration dates.
 
-@item @code{subject}:
+@item subject:
 The subject's distinguished name of the certificate.
 
-@item @code{extensions}:
+@item extensions:
 The extensions are fields only present in version 3 certificates.
 
-@end itemize
+@end table
 
 The certificate's @emph{subject or issuer name} is not just a single
 string.  It is a Distinguished name and in the @acronym{ASN.1}
@@ -1264,30 +1262,30 @@ fields. Those may be e-mail addresses, flags that indicate whether the
 belongs to a CA etc.  All the supported @acronym{X.509} version 3
 extensions are shown in the table below.
 
-@itemize
+@table @code
 
-@item @code{subject key id} (2.5.29.14):
+@item subject key id (2.5.29.14):
 An identifier of the key of the subject.
 
-@item @code{authority key id} (2.5.29.35):
+@item authority key id (2.5.29.35):
 An identifier of the authority's key used to sign the certificate.
 
-@item @code{subject alternative name} (2.5.29.17):
+@item subject alternative name (2.5.29.17):
 Alternative names to subject's distinguished name.
 
-@item @code{key usage} (2.5.29.15):
+@item key usage (2.5.29.15):
 Constraints the key's usage of the certificate.
 
-@item @code{extended key usage} (2.5.29.37):
+@item extended key usage (2.5.29.37):
 Constraints the purpose of the certificate.
 
-@item @code{basic constraints} (2.5.29.19):
+@item basic constraints (2.5.29.19):
 Indicates whether this is a CA certificate or not.
 
-@item @code{CRL distribution points} (2.5.29.31):
+@item CRL distribution points (2.5.29.31):
 This extension is set by the CA, in order to inform about the issued CRLs.
 
-@end itemize
+@end table
 
 In @acronym{GnuTLS} the @acronym{X.509} certificate structures are handled using
 the @code{gnutls_x509_crt_t} type and the corresponding private keys
@@ -1309,19 +1307,29 @@ The function @code{gnutls_certificate_verify_peers2} is equivalent to
 the previous one, and will verify the peer's certificate in a TLS
 session.
 
-@itemize
+@table @code
 
-@item @code{CERT_INVALID}:
+@item CERT_INVALID:
 The certificate is not signed by one of the known authorities, or
 the signature is invalid.
 
-@item @code{CERT_REVOKED}:
-The certificate has been revoked.
+@item CERT_REVOKED:
+The certificate has been revoked by its CA.
 
-@item @code{CERT_SIGNER_NOT_FOUND}:
-The certificate's issuer is not known.
+@item CERT_SIGNER_NOT_FOUND:
+The certificate's issuer is not known. This is the case when the
+issuer is not in the trusted certificates list.
 
-@end itemize
+@item GNUTLS_CERT_SIGNER_NOT_CA:
+The certificate's signer was not a CA. This may happen if
+this was a version 1 certificate, which is common with some CAs, or
+a version 3 certificate without the basic constrains extension.
+
+@item GNUTLS_CERT_INSECURE_ALGORITHM:
+The certificate was signed using an insecure algorithm such as MD2 or MD5.
+These algorithms have been broken and should not be trusted.
+
+@end table
 
 Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
@@ -1423,19 +1431,23 @@ checks a @acronym{GnuPG} trust database for the given key. This
 function does not check the key signatures, only checks for disabled
 and revoked keys.
 
-@itemize
+@table @code
 
-@item @code{CERT_INVALID}:
+@item CERT_INVALID:
 A signature on the key is invalid. That means that the key was
 modified by somebody, or corrupted during transport.
 
-@item @code{CERT_REVOKED}:
+@item CERT_REVOKED:
 The key has been revoked by its owner.
 
-@item @code{CERT_SIGNER_NOT_FOUND}:
+@item CERT_SIGNER_NOT_FOUND:
 The key was not signed by a known signer.
 
-@end itemize
+@item GNUTLS_CERT_INSECURE_ALGORITHM:
+The certificate was signed using an insecure algorithm such as MD2 or MD5.
+These algorithms have been broken and should not be trusted.
+
+@end table
 
 @node How to use TLS in application protocols
 @chapter How to use @acronym{TLS} in application protocols
@@ -2740,117 +2752,153 @@ functions:
 @anchor{ciphersuites}
 @cindex Ciphersuites
 
-@itemize
+@multitable @columnfractions .45 .20 .35
 
-@item @code{TLS_RSA_NULL_MD5} (0x00 0x01):
-RFC 2246
+@item @code{TLS_RSA_NULL_MD5} 
+@tab 0x00 0x01
+@tab RFC 2246
 
-@item @code{TLS_ANON_DH_3DES_EDE_CBC_SHA} (0x00 0x1B):
-RFC 2246
+@item @code{TLS_ANON_DH_3DES_EDE_CBC_SHA} 
+@tab 0x00 0x1B
+@tab RFC 2246
 
-@item @code{TLS_ANON_DH_ARCFOUR_MD5} (0x00 0x18):
-RFC 2246
+@item @code{TLS_ANON_DH_ARCFOUR_MD5}
+@tab 0x00 0x18
+@tab RFC 2246
 
-@item @code{TLS_ANON_DH_AES_128_CBC_SHA} (0x00 0x34):
-RFC 2246
+@item @code{TLS_ANON_DH_AES_128_CBC_SHA}
+@tab 0x00 0x34
+@tab RFC 2246
 
-@item @code{TLS_ANON_DH_AES_256_CBC_SHA} (0x00 0x3A):
-RFC 2246
+@item @code{TLS_ANON_DH_AES_256_CBC_SHA}
+@tab 0x00 0x3A
+@tab RFC 2246
 
-@item @code{TLS_RSA_ARCFOUR_SHA} (0x00 0x05):
-RFC 2246
+@item @code{TLS_RSA_ARCFOUR_SHA}
+@tab 0x00 0x05
+@tab  RFC 2246
 
-@item @code{TLS_RSA_ARCFOUR_MD5} (0x00 0x04):
-RFC 2246
+@item @code{TLS_RSA_ARCFOUR_MD5}
+@tab 0x00 0x04
+@tab RFC 2246
 
-@item @code{TLS_RSA_3DES_EDE_CBC_SHA} (0x00 0x0A):
-RFC 2246
+@item @code{TLS_RSA_3DES_EDE_CBC_SHA}
+@tab 0x00 0x0A
+@tab RFC 2246
 
-@item @code{TLS_RSA_EXPORT_ARCFOUR_40_MD5} (0x00 0x03):
-RFC 2246
+@item @code{TLS_RSA_EXPORT_ARCFOUR_40_MD5}
+@tab 0x00 0x03
+@tab RFC 2246
 
-@item @code{TLS_DHE_DSS_3DES_EDE_CBC_SHA} (0x00 0x13):
-RFC 2246
+@item @code{TLS_DHE_DSS_3DES_EDE_CBC_SHA}
+@tab 0x00 0x13
+@tab RFC 2246
 
-@item @code{TLS_DHE_RSA_3DES_EDE_CBC_SHA} (0x00 0x16):
-RFC 2246
+@item @code{TLS_DHE_RSA_3DES_EDE_CBC_SHA}
+@tab 0x00 0x16
+@tab RFC 2246
 
-@item @code{TLS_RSA_AES_128_CBC_SHA} (0x00 0x2F):
-RFC 3268
+@item @code{TLS_RSA_AES_128_CBC_SHA}
+@tab 0x00 0x2F
+@tab RFC 3268
 
-@item @code{TLS_RSA_AES_128_CBC_SHA} (0x00 0x35):
-RFC 3268
+@item @code{TLS_RSA_AES_128_CBC_SHA}
+@tab 0x00 0x35
+@tab RFC 3268
 
-@item @code{TLS_DHE_DSS_AES_256_CBC_SHA} (0x00 0x38):
-RFC 3268
+@item @code{TLS_DHE_DSS_AES_256_CBC_SHA}
+@tab 0x00 0x38
+@tab RFC 3268
 
-@item @code{TLS_DHE_DSS_AES_128_CBC_SHA} (0x00 0x32):
-RFC 3268
+@item @code{TLS_DHE_DSS_AES_128_CBC_SHA}
+@tab 0x00 0x32
+@tab RFC 3268
 
-@item @code{TLS_DHE_RSA_AES_256_CBC_SHA} (0x00 0x39):
-RFC 3268
+@item @code{TLS_DHE_RSA_AES_256_CBC_SHA}
+@tab 0x00 0x39
+@tab RFC 3268
 
-@item @code{TLS_DHE_RSA_AES_128_CBC_SHA} (0x00 0x33):
-RFC 3268
+@item @code{TLS_DHE_RSA_AES_128_CBC_SHA}
+@tab 0x00 0x33
+@tab RFC 3268
 
-@item @code{TLS_SRP_SHA_3DES_EDE_CBC_SHA} (0x00 0x50):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_3DES_EDE_CBC_SHA}
+@tab 0x00 0x50
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_AES_128_CBC_SHA} (0x00 0x53):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_AES_128_CBC_SHA}
+@tab 0x00 0x53
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_AES_256_CBC_SHA} (0x00 0x56):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_AES_256_CBC_SHA}
+@tab 0x00 0x56
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA} (0x00 0x51):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA}
+@tab 0x00 0x51
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_DSS_3DES_EDE_CBC_SHA} (0x00 0x52):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_DSS_3DES_EDE_CBC_SHA}
+@tab 0x00 0x52
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_RSA_AES_128_CBC_SHA} (0x00 0x54):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_RSA_AES_128_CBC_SHA}
+@tab 0x00 0x54
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_DSS_AES_128_CBC_SHA} (0x00 0x55):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_DSS_AES_128_CBC_SHA}
+@tab 0x00 0x55
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_RSA_AES_256_CBC_SHA} (0x00 0x57):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_RSA_AES_256_CBC_SHA}
+@tab 0x00 0x57
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_SRP_SHA_DSS_AES_256_CBC_SHA} (0x00 0x58):
-draft-ietf-tls-srp
+@item @code{TLS_SRP_SHA_DSS_AES_256_CBC_SHA}
+@tab 0x00 0x58
+@tab draft-ietf-tls-srp
 
-@item @code{TLS_DHE_DSS_3DES_EDE_CBC_RMD} (0x00 0x72):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_DHE_DSS_3DES_EDE_CBC_RMD}
+@tab 0x00 0x72
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_DHE_RSA_3DES_EDE_CBC_RMD} (0x00 0x77):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_DHE_RSA_3DES_EDE_CBC_RMD}
+@tab 0x00 0x77
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_DHE_DSS_AES_256_CBC_RMD} (0x00 0x73):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_DHE_DSS_AES_256_CBC_RMD}
+@tab 0x00 0x73
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_DHE_DSS_AES_128_CBC_RMD} (0x00 0x74):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_DHE_DSS_AES_128_CBC_RMD}
+@tab 0x00 0x74
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_DHE_RSA_AES_128_CBC_RMD} (0x00 0x78):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_DHE_RSA_AES_128_CBC_RMD}
+@tab 0x00 0x78
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_DHE_RSA_AES_256_CBC_RMD} (0x00 0x79):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_DHE_RSA_AES_256_CBC_RMD}
+@tab 0x00 0x79
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_RSA_3DES_EDE_CBC_RMD} (0x00 0x7C):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_RSA_3DES_EDE_CBC_RMD}
+@tab 0x00 0x7C
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_RSA_AES_128_CBC_RMD} (0x00 0x7D):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_RSA_AES_128_CBC_RMD}
+@tab 0x00 0x7D
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_RSA_AES_256_CBC_RMD} (0x00 0x7E):
-draft-ietf-tls-openpgp-keys
+@item @code{TLS_RSA_AES_256_CBC_RMD}
+@tab 0x00 0x7E
+@tab draft-ietf-tls-openpgp-keys
 
-@item @code{TLS_DHE_DSS_ARCFOUR_SHA} (0x00 0x66):
-draft-ietf-tls-56-bit-ciphersuites
+@item @code{TLS_DHE_DSS_ARCFOUR_SHA}
+@tab 0x00 0x66
+@tab draft-ietf-tls-56-bit-ciphersuites
 
-@end itemize
+@end multitable
 
 @c @node References
 @c @chapter References
