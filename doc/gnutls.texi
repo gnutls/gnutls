@@ -7,7 +7,6 @@
 
 @include my-bib-macros.texi
 @mybibusetable{Bibliography}
-@c @mybibsetrefnode{@mybibnode{}}
 
 @c Unify some of the indices.
 @syncodeindex tp fn
@@ -20,6 +19,7 @@ This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
 Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -83,7 +83,8 @@ Free Documentation License''.
 * Copying This Manual::
 * Concept Index::
 * Function and Data Index::
-* @mybibnode{}::
+@c * @mybibnode{}::
+* Bibliography::
 @end menu
 
 
@@ -2921,8 +2922,10 @@ functions:
 @c texi2dvi has problem if unnumbered is put there. However makeinfo works great.
 @c STUPID texinfo.
 
-@node @mybibnode{}
-@unnumbered @mybibnode{}
+@c @node @mybibnode{}
+@c @unnumbered @mybibnode{}
+@node Bibliography
+@unnumbered Bibliography
 @include bibliography.texi
 
 

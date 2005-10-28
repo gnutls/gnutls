@@ -2,6 +2,9 @@
 @c %% my-bib-macros.texi --- Texinfo macros providing a crude
 @c %% bibliography and citation capability.
 
+@c % This is modified for use with gnutls. texi2dvi had some problems using
+@c % this, thus some things are hard coded here. (for the sake of a good pdf output)
+ 
 @c % Copyright (C) 2004  Aaron S. Hawley
 
 @c % Author: Aaron S. Hawley <ashawley@gnu.uvm.edu>
@@ -207,7 +210,7 @@
 @end macro
 
 @macro mybibmakeref{node, ref}
-[\ref\] (See @ref{\ref\}.)
+[\ref\] (@xref{Bibliography,\ref\}.)
 @end macro
 
 @c %% @mybibcite{REF} : Creates a cross referenced citation REF.
@@ -224,8 +227,7 @@
 @end ifset
 @c %**else if
 @ifset mybibtable
-@item 
-@anchor{\ref\}[\ref\]
+@item @anchor{\ref\}[\ref\]
 @end ifset
 
 @end macro
