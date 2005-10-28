@@ -4,6 +4,7 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.9
+- Documentation was updated and improved.
 - MD2 is now supported.
 - Due to cryptographic advances, verifying untrusted X.509
   certificates signed with RSA-MD2 or RSA-MD5 will now fail with a
