@@ -8,7 +8,4 @@ AC_DEFUN([gl_MD2],
 [
   AC_LIBSOURCES([md2.c, md2.h])
   AC_LIBOBJ([md2])
-
-  dnl Prerequisites of lib/md2.c.
-  AC_REQUIRE([AC_C_BIGENDIAN])
 ])

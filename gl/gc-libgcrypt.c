@@ -363,7 +363,10 @@ void
 gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
 {
   _gc_hash_ctx *ctx = handle;
-  gcry_md_setkey (ctx->gch, key, len);
+#ifdef GC_USE_MD2
+  if (ctx->alg != GC_MD2)
+#endif
+    gcry_md_setkey (ctx->gch, key, len);
 }
 
 void
@@ -421,6 +424,13 @@ gc_hash_buffer (Gc_hash hash, const void *in, size_t inlen, char *resbuf)
 
   switch (hash)
     {
+#ifdef GC_USE_MD2
+    case GC_MD2:
+      md2_buffer (in, inlen, resbuf);
+      return GC_OK;
+      break;
+#endif
+
 #ifdef GC_USE_MD4
     case GC_MD4:
       gcryalg = GCRY_MD_MD4;
