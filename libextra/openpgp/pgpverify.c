@@ -93,8 +93,9 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb_t trustdb,
  *
  * GNUTLS_CERT_REVOKED: The key has been revoked.
  *
- * NOTE: this function does not verify using any "web of trust". You
- * may use GnuPG for that purpose, or any other external PGP application.
+ * Note that this function does not verify using any "web of
+ * trust". You may use GnuPG for that purpose, or any other external
+ * PGP application.
  *
  * Returns 0 on success.
  **/
@@ -262,8 +263,9 @@ int gnutls_openpgp_key_verify_self(gnutls_openpgp_key_t key,
  *
  * GNUTLS_CERT_REVOKED: The key has been revoked.
  *
- * NOTE: this function does not verify using any "web of trust". You
- * may use GnuPG for that purpose, or any other external PGP application.
+ * Note that this function does not verify using any "web of
+ * trust". You may use GnuPG for that purpose, or any other external
+ * PGP application.
  *
  * Returns 0 on success.
  **/
