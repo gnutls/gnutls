@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-## Copyright (c) 2002, 2003, 2004 Simon Josefsson                ##
+## Copyright (c) 2002, 2003, 2004, 2005 Simon Josefsson          ##
 ##                    added -texinfo, -listfunc                  ##
 ##                    man page revamp                            ##
 ##                    various improvements                       ##
@@ -352,7 +352,6 @@ sub output_texinfo {
     my $count;
 
     print "\@subheading ".$args{'function'}."\n";
-    print "\@anchor{".$args{'function'}."}\n";
     print "\@deftypefun {" . $args{'functiontype'} . "} ";
     print "{".$args{'function'}."} ";
     print "(";
