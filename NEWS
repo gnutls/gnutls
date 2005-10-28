@@ -40,8 +40,8 @@ GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5: New gnutls_certificate_verify_flags values.
                                   gnutls_x509_crt_verify, or
                                   gnutls_certificate_set_verify_flags.
 GNUTLS_CERT_INSECURE_ALGORITHM: New gnutls_certificate_status_t value,
-                                used when broken algorithms is used
-                                (currently MD2/MD5).
+                                used when broken signature algorithms
+                                is used (currently RSA-MD2/MD5).
 
 * Version 1.2.8 (2005-10-07)
 - Libgcrypt 1.2.2 is required to fix a bug for forking GnuTLS servers.
