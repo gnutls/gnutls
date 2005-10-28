@@ -240,11 +240,11 @@ and receives will be disallowed. An example of a fatal error code is
 @code{GNUTLS_E_DECRYPTION_FAILED}. Non-fatal errors may warn about
 something, ie a warning alert was received, or indicate the some
 action has to be taken. This is the case with the error code
-@code{GNUTLS_E_REHANDSHAKE} returned by @code{gnutls_record_recv}.
+@code{GNUTLS_E_REHANDSHAKE} returned by @ref{gnutls_record_recv}.
 This error code indicates that the server requests a re-handshake. The
 client may ignore this request, or may reply with an alert.  You can
 test if an error code is a fatal one by using the
-@code{gnutls_error_is_fatal}.
+@ref{gnutls_error_is_fatal}.
 
 If any non fatal errors, that require an action, are to be returned by
 a function, these error codes will be documented in the function's
@@ -258,7 +258,7 @@ differently, depending on the sensitivity of the data they
 contain. However for performance reasons, the default memory functions
 do not overwrite sensitive data from memory, nor protect such objects
 from being written to the swap.  In order to change the default
-behavior the @code{gnutls_global_set_mem_functions} function is
+behavior the @ref{gnutls_global_set_mem_functions} function is
 available which can be used to set other memory handlers than the
 defaults.
 
@@ -282,22 +282,22 @@ data to the transport layer.
 
 @itemize
 
-@item @code{gnutls_transport_set_push_function}
+@item @ref{gnutls_transport_set_push_function}
 
-@item @code{gnutls_transport_set_pull_function}
+@item @ref{gnutls_transport_set_pull_function}
 
 @end itemize
 
 Other callback functions such as the one set by
-@code{gnutls_srp_set_server_credentials_function}, may require more
+@ref{gnutls_srp_set_server_credentials_function}, may require more
 complicated input, including data to be allocated.  These callbacks
 should allocate and free memory using the functions shown below.
 
 @itemize
 
-@item @code{gnutls_malloc}
+@item @ref{gnutls_malloc}
 
-@item @code{gnutls_free}
+@item @ref{gnutls_free}
 
 @end itemize
 
@@ -361,10 +361,10 @@ functions is provided and their purpose is to load to @acronym{GnuTLS} the
 required callbacks to access the transport layer.
 
 @itemize
-@item @code{gnutls_transport_set_push_function}
-@item @code{gnutls_transport_set_pull_function}
-@item @code{gnutls_transport_set_ptr}
-@item @code{gnutls_transport_set_lowat}
+@item @ref{gnutls_transport_set_push_function}
+@item @ref{gnutls_transport_set_pull_function}
+@item @ref{gnutls_transport_set_ptr}
+@item @ref{gnutls_transport_set_lowat}
 @end itemize
 
 These functions accept a callback function as a parameter.  The
@@ -381,7 +381,7 @@ above refer to the system call, not the @acronym{GnuTLS} function,
 since signals do not interrupt @acronym{GnuTLS}' functions.
 
 For non blocking sockets or other custom made pull/push functions
-the @code{gnutls_transport_set_lowat} must be called, with a zero
+the @ref{gnutls_transport_set_lowat} must be called, with a zero
 low water mark value.
 
 By default, if the transport functions are not set, @acronym{GnuTLS}
@@ -398,15 +398,15 @@ The Record protocol is the secure communications provider. Its purpose
 is to encrypt, authenticate and ---optionally--- compress packets.
 The following functions are available:
 
-@table @code
+@table @asis
 
-@item gnutls_record_send:
+@item @ref{gnutls_record_send}:
 To send a record packet (with application data).
 
-@item gnutls_record_recv:
+@item @ref{gnutls_record_recv}:
 To receive a record packet (with application data).
 
-@item gnutls_record_get_direction:
+@item @ref{gnutls_record_get_direction}:
 To get the direction of the last interrupted function call.
 @end table
 
@@ -488,7 +488,7 @@ implemented in @acronym{GnuTLS} can be found in the table below.
 All the algorithms except for DEFLATE which is
 referenced in @mybibcite{TLSCOMP}, should be considered as
 @acronym{GnuTLS}' extensions@footnote{You should use
-@code{gnutls_handshake_set_private_extensions} to enable private
+@ref{gnutls_handshake_set_private_extensions} to enable private
 extensions.}, and should be advertised only when the peer is known to
 have a compliant client, to avoid interoperability problems.
 
@@ -561,17 +561,17 @@ information that is included does not leak. You must take extreme care
 for the alert information not to leak to a possible attacker, via
 public log files etc.
 
-@table @code
-@item gnutls_alert_send:
+@table @asis
+@item @ref{gnutls_alert_send}:
 To send an alert signal.
 
-@item gnutls_error_to_alert:
+@item @ref{gnutls_error_to_alert}:
 To map a gnutls error number to an alert signal.
 
-@item gnutls_alert_get:
+@item @ref{gnutls_alert_get}:
 Returns the last received alert.
 
-@item gnutls_alert_get_name:
+@item @ref{gnutls_alert_get_name}:
 Returns the name, in a character array, of the given alert.
 
 @end table
@@ -587,39 +587,39 @@ This is fully controlled by the application layer, thus your program
 has to set up the required parameters. Available functions to control
 the handshake protocol include:
 
-@table @code
-@item gnutls_cipher_set_priority:
+@table @asis
+@item @ref{gnutls_cipher_set_priority}:
 To set the priority of bulk cipher algorithms.
 
-@item gnutls_mac_set_priority:
+@item @ref{gnutls_mac_set_priority}:
 To set the priority of MAC algorithms.
 
-@item gnutls_kx_set_priority:
+@item @ref{gnutls_kx_set_priority}:
 To set the priority of key exchange algorithms.
 
-@item gnutls_compression_set_priority:
+@item @ref{gnutls_compression_set_priority}:
 To set the priority of compression methods.
 
-@item gnutls_certificate_type_set_priority:
+@item @ref{gnutls_certificate_type_set_priority}:
 To set the priority of certificate types (e.g., @acronym{OpenPGP},
 @acronym{X.509}).
 
-@item gnutls_protocol_set_priority:
+@item @ref{gnutls_protocol_set_priority}:
 To set the priority of protocol versions (e.g., @acronym{SSL} 3.0,
 @acronym{TLS} 1.0).
 
-@item gnutls_set_default_priority:
+@item @ref{gnutls_set_default_priority}:
 To set some defaults in the current session.  That way you don't have
 to call each priority function, independently, but you have to live
 with the defaults.
 
-@item gnutls_credentials_set:
+@item @ref{gnutls_credentials_set}:
 To set the appropriate credentials structures.
 
-@item gnutls_certificate_server_set_request:
+@item @ref{gnutls_certificate_server_set_request}:
 To set whether client certificate is required or not.
 
-@item gnutls_handshake:
+@item @ref{gnutls_handshake}:
 To initiate the handshake.
 @end table
 
@@ -661,7 +661,7 @@ are shown in @ref{ciphersuites}.
 In the case of ciphersuites that use certificate authentication, the
 authentication of the client is optional in @acronym{TLS}.  A server
 may request a certificate from the client --- using the
-@code{gnutls_certificate_server_set_request} function. If a
+@ref{gnutls_certificate_server_set_request} function. If a
 certificate is to be requested from the client during the handshake,
 the server will send a certificate request message that contains a
 list of acceptable certificate signers. The client may then send a
@@ -673,7 +673,7 @@ using the trusted CA certificates in the credentials structure.
 @anchor{resume}
 @cindex Resuming sessions
 
-The @code{gnutls_handshake} function, is expensive since a lot of
+The @ref{gnutls_handshake} function, is expensive since a lot of
 calculations are performed. In order to support many fast connections
 to the same server a client may use session resuming. @strong{Session
 resuming} is a feature of the @acronym{TLS} protocol which allows a
@@ -698,11 +698,11 @@ parameters. See the functions:
 
 @itemize
 
-@item @code{gnutls_session_get_data}
+@item @ref{gnutls_session_get_data}
 
-@item @code{gnutls_session_get_id}
+@item @ref{gnutls_session_get_id}
 
-@item @code{gnutls_session_set_data}
+@item @ref{gnutls_session_set_data}
 
 @end itemize
 
@@ -712,19 +712,19 @@ registered with:
 
 @itemize
 
-@item @code{gnutls_db_set_remove_function}
+@item @ref{gnutls_db_set_remove_function}
 
-@item @code{gnutls_db_set_store_function}
+@item @ref{gnutls_db_set_store_function}
 
-@item @code{gnutls_db_set_retrieve_function}
+@item @ref{gnutls_db_set_retrieve_function}
 
-@item @code{gnutls_db_set_ptr}
+@item @ref{gnutls_db_set_ptr}
 
 @end itemize
 
 It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
-@code{gnutls_db_check_entry} is provided for that reason.
+@ref{gnutls_db_check_entry} is provided for that reason.
 
 @node TLS Extensions
 @section TLS Extensions
@@ -749,8 +749,8 @@ and they will be discussed in the subsections that follow.
 This extension allows a @acronym{TLS} implementation to negotiate a
 smaller value for record packet maximum length. This extension may be
 useful to clients with constrained capabilities. See the
-@code{gnutls_record_set_max_size} and the
-@code{gnutls_record_get_max_size} functions.
+@ref{gnutls_record_set_max_size} and the
+@ref{gnutls_record_get_max_size} functions.
 
 @subsection Server name indication
 @anchor{serverind}
@@ -765,7 +765,7 @@ connects to, when the handshake procedure begins. For that reason the
 This extension solves that problem within the @acronym{TLS} protocol,
 and allows a client to send the HTTP hostname before the handshake
 begins within the first handshake packet.  The functions
-@code{gnutls_server_name_set} and @code{gnutls_server_name_get} can be
+@ref{gnutls_server_name_set} and @ref{gnutls_server_name_get} can be
 used to enable this extension, or to retrieve the name sent by a
 client.
 
@@ -853,8 +853,8 @@ certificate and private key pair. A client may or may not have such a
 pair. The certificate and key pair should be loaded, before any
 @acronym{TLS} session is initialized, in a certificate credentials
 structure. This should be done by using
-@code{gnutls_certificate_set_x509_key_file} or
-@code{gnutls_certificate_set_openpgp_key_file} depending on the
+@ref{gnutls_certificate_set_x509_key_file} or
+@ref{gnutls_certificate_set_openpgp_key_file} depending on the
 certificate type.  In the @acronym{X.509} case, the functions will
 also accept and use a certificate list that leads to a trusted
 authority. The certificate list must be ordered in such way that every
@@ -868,21 +868,21 @@ callback can be set using the functions:
 
 @itemize
 
-@item @code{gnutls_certificate_server_set_retrieve_function}
+@item @ref{gnutls_certificate_server_set_retrieve_function}
 
-@item @code{gnutls_certificate_client_set_retrieve_function}
+@item @ref{gnutls_certificate_client_set_retrieve_function}
 
 @end itemize
 
 Certificate verification is possible by loading the trusted
 authorities into the credentials structure by using
-@code{gnutls_certificate_set_x509_trust_file} or
-@code{gnutls_certificate_set_openpgp_keyring_file} for openpgp
+@ref{gnutls_certificate_set_x509_trust_file} or
+@ref{gnutls_certificate_set_openpgp_keyring_file} for openpgp
 keys. Note however that the peer's certificate is not automatically
-verified, you should call @code{gnutls_certificate_verify_peers2},
+verified, you should call @ref{gnutls_certificate_verify_peers2},
 after a successful handshake, to verify the signatures of the
 certificate.  An alternative way, which reports a more detailed
-verification output, is to use @code{gnutls_certificate_get_peers} to
+verification output, is to use @ref{gnutls_certificate_get_peers} to
 obtain the raw certificate of the peer and verify it using the
 functions discussed in @ref{The X.509 trust model}.
 
@@ -910,13 +910,13 @@ credentials structure.  See the functions:
 
 @itemize
 
-@item @code{gnutls_dh_params_generate2}
+@item @ref{gnutls_dh_params_generate2}
 
-@item @code{gnutls_certificate_set_dh_params}
+@item @ref{gnutls_certificate_set_dh_params}
 
-@item @code{gnutls_rsa_params_generate2}
+@item @ref{gnutls_rsa_params_generate2}
 
-@item @code{gnutls_certificate_set_rsa_export_params}
+@item @ref{gnutls_certificate_set_rsa_export_params}
 
 @end itemize
 
@@ -927,13 +927,13 @@ functions:
 
 @itemize
 
-@item @code{gnutls_dh_params_import_pkcs3}
+@item @ref{gnutls_dh_params_import_pkcs3}
 
-@item @code{gnutls_rsa_params_import_pkcs1}
+@item @ref{gnutls_rsa_params_import_pkcs1}
 
-@item @code{gnutls_dh_params_export_pkcs3}
+@item @ref{gnutls_dh_params_export_pkcs3}
 
-@item @code{gnutls_rsa_params_export_pkcs1}
+@item @ref{gnutls_rsa_params_export_pkcs1}
 
 @end itemize
 
@@ -1039,9 +1039,9 @@ authenticated using a certificate with RSA parameters.
 
 If clients supporting @acronym{SRP} know the username and password
 before the connection, should initialize the client credentials and
-call the function @code{gnutls_srp_set_client_credentials}.
+call the function @ref{gnutls_srp_set_client_credentials}.
 Alternatively they could specify a callback function by using the
-function @code{gnutls_srp_set_client_credentials_function}.  This has
+function @ref{gnutls_srp_set_client_credentials_function}.  This has
 the advantage that allows probing the server for @acronym{SRP}
 support.  In that case the callback function will be called twice per
 handshake.  The first time is before the ciphersuite is negotiated,
@@ -1056,20 +1056,20 @@ In server side the default behaviour of @acronym{GnuTLS} is to read
 the usernames and @acronym{SRP} verifiers from password files. These
 password files are the ones used by the @emph{Stanford srp libraries}
 and can be specified using the
-@code{gnutls_srp_set_server_credentials_file}.  If a different
+@ref{gnutls_srp_set_server_credentials_file}.  If a different
 password file format is to be used, then the function
-@code{gnutls_srp_set_server_credentials_function}, should be called,
+@ref{gnutls_srp_set_server_credentials_function}, should be called,
 in order to set an appropriate callback.
 
 Some helper functions such as:
 
 @itemize
 
-@item @code{gnutls_srp_verifier}
+@item @ref{gnutls_srp_verifier}
 
-@item @code{gnutls_srp_base64_encode}
+@item @ref{gnutls_srp_base64_encode}
 
-@item @code{gnutls_srp_base64_decode}
+@item @ref{gnutls_srp_base64_decode}
 
 @end itemize
 
@@ -1084,7 +1084,7 @@ also included.  @xref{srptool}, for more information.
 In @acronym{GnuTLS} every key exchange method is associated with a
 credentials type. So in order to enable to enable a specific method,
 the corresponding credentials type should be initialized and set using
-@code{gnutls_credentials_set}.  A mapping is shown below.
+@ref{gnutls_credentials_set}.  A mapping is shown below.
 
 Key exchange algorithms and the corresponding credential types:
 
@@ -1123,15 +1123,15 @@ Several parameters such as the ones used for Diffie-Hellman
 authentication are stored within the credentials structures, so all
 sessions can access them. Those parameters are stored in structures
 such as @code{gnutls_dh_params_t} and @code{gnutls_rsa_params_t}, and
-functions like @code{gnutls_certificate_set_dh_params} and
-@code{gnutls_certificate_set_rsa_export_params} can be used to
+functions like @ref{gnutls_certificate_set_dh_params} and
+@ref{gnutls_certificate_set_rsa_export_params} can be used to
 associate those parameters with the given credentials structure.
 
 Since those parameters need to be renewed from time to time and a
 global structure such as the credentials, may not be easy to modify
 since it is accessible by all sessions, an alternative interface is
 available using a callback function.  This can be set using the
-@code{gnutls_certificate_set_params_function}.  An example is shown
+@ref{gnutls_certificate_set_params_function}.  An example is shown
 below.
 
 @example
@@ -1298,11 +1298,11 @@ parsing capabilities can be found at section @ref{ex:x509-info}.
 @cindex Verifying certificate paths
 
 Verifying certificate paths is important in @acronym{X.509} authentication. For
-this purpose the function @code{gnutls_x509_crt_verify} is
+this purpose the function @ref{gnutls_x509_crt_verify} is
 provided. The output of this function is the bitwise OR of the
 elements of the @code{gnutls_certificate_status_t} enumeration.  A
 detailed description of these elements can be found in figure below.
-The function @code{gnutls_certificate_verify_peers2} is equivalent to
+The function @ref{gnutls_certificate_verify_peers2} is equivalent to
 the previous one, and will verify the peer's certificate in a TLS
 session.
 
@@ -1331,9 +1331,9 @@ These algorithms have been broken and should not be trusted.
 @end table
 
 There is also to possibility to pass some input to the verification functions in
-the form of flags. For  @code{gnutls_x509_crt_verify} the flags are passed straightforward, but
-@code{gnutls_certificate_verify_peers2} depends on the flags set by calling @code{gnutls_certificate_set_verify_flags}.
-All the available flags are part of the enumeration @code{gnutls_certificate_verify_flags} and
+the form of flags. For  @ref{gnutls_x509_crt_verify} the flags are passed straightforward, but
+@ref{gnutls_certificate_verify_peers2} depends on the flags set by calling @code{gnutls_certificate_set_verify_flags}.
+All the available flags are part of the enumeration @ref{gnutls_certificate_verify_flags} and
 are explained in the table below.
 @table @code
 @item GNUTLS_VERIFY_DISABLE_CA_SIGN:
@@ -1451,8 +1451,8 @@ GPGME (@url{http://www.gnupg.org/related_software/gpgme/}) is
 recommended.
 
 There are two verification functions in @acronym{GnuTLS}, The
-@code{gnutls_openpgp_key_verify_ring} and the
-@code{gnutls_openpgp_key_verify_trustdb}.  The first one checks an
+@ref{gnutls_openpgp_key_verify_ring} and the
+@ref{gnutls_openpgp_key_verify_trustdb}.  The first one checks an
 @acronym{OpenPGP} key against a given set of public keys (keyring) and
 returns the key status. The key verification status is the same as in
 @acronym{X.509} certificates, although the meaning and interpretation are
@@ -1659,7 +1659,7 @@ indeed one which fits all requirements.  Even with binary
 compatibility new features may have been introduced but due to problem
 with the dynamic linker an old version is actually used.  So you may
 want to check that the version is okay right after program startup.
-See the function @code{gnutls_check_version}.
+See the function @ref{gnutls_check_version}.
 
 @node Building the source
 @subsection Building the source
@@ -1819,7 +1819,7 @@ Most of the times it is desirable to know the security properties of
 the current established session.  This includes the underlying ciphers
 and the protocols involved.  That is the purpose of the following
 function.  Note that this function will print meaningful values only
-if called after a successful @code{gnutls_handshake}.
+if called after a successful @ref{gnutls_handshake}.
 
 @verbatiminclude examples/ex-session-info.c
 
@@ -2483,9 +2483,9 @@ functions:
 
 @itemize
 
-@item @code{gnutls_x509_crt_to_xml}
+@item @ref{gnutls_x509_crt_to_xml}
 
-@item @code{gnutls_openpgp_key_to_xml}
+@item @ref{gnutls_openpgp_key_to_xml}
 
 @end itemize
 

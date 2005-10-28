@@ -351,6 +351,8 @@ sub output_texinfo {
     my ($parameter, $section);
     my $count;
 
+    print "\@subheading ".$args{'function'}."\n";
+    print "\@anchor{".$args{'function'}."}\n";
     print "\@deftypefun {" . $args{'functiontype'} . "} ";
     print "{".$args{'function'}."} ";
     print "(";
