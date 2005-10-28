@@ -486,7 +486,7 @@ the EU project RIPE. Outputs 160 bits of data.
 The TLS record layer also supports compression.  The algorithms
 implemented in @acronym{GnuTLS} can be found in the table below.
 All the algorithms except for DEFLATE which is
-referenced in @mybibcite{TLSCOMP}, should be considered as
+referenced in @mybibcite{RFC3749}, should be considered as
 @acronym{GnuTLS}' extensions@footnote{You should use
 @ref{gnutls_handshake_set_private_extensions} to enable private
 extensions.}, and should be advertised only when the peer is known to
@@ -500,7 +500,7 @@ tunnels, and in cases where network usage has to be minimized. As a
 drawback, compression increases latency.
 
 The record layer compression in @acronym{GnuTLS} is implemented based
-on the paper @mybibcite{TLSCOMP}.
+on the proposal @mybibcite{RFC3749}.
 The supported compression algorithms are:
 
 @table @code
