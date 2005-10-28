@@ -60,6 +60,10 @@ Eric Rescola, "SSL and TLS: Designing and Building Secure Systems", 2001
 Alan Freier and Philip Karlton and Paul Kocher, "The SSL Protocol Version 3.0",
 November 1996, Available from @url{http://wp.netscape.com/eng/ssl3/draft302.txt}.
 
+@mybibitem{STEVENS}
+Richard Stevens, "UNIX Network Programming, Volume 1", Prentice Hall PTR, 
+January 1998
+
 @mybibitem{TLSEXT}
 Simon Blake-Wilson and Magnus Nystrom and David Hopwood and Jan Mikkelsen and Tim Wright,
 "Transport Layer Security (TLS) Extensions", June 2003,

@@ -8,6 +8,9 @@
 @include my-bib-macros.texi
 @mybibusetable{Bibliography}
 
+@c don't indent the paragraphs.
+@paragraphindent 0
+
 @c Unify some of the indices.
 @syncodeindex tp fn
 @syncodeindex pg cp
@@ -106,9 +109,10 @@ because it uses @acronym{GnuTLS}; there are several ways to compromise
 a program or a communication line and @acronym{GnuTLS} only helps with
 some of them.
 
-This document tries to be self contained, although basic network
+Although this document tries to be self contained, basic network
 programming and PKI knowlegde is assumed in most of it. A good introduction
-to Public Key Infrastructure can be found in @mybibcite{GUTPKI}.
+to networking can be found in @mybibcite{STEVENS} and for 
+Public Key Infrastructure in @mybibcite{GUTPKI}.
 
 @anchor{Availability}
 
