@@ -10,7 +10,8 @@ See the end for copying conditions.
   hashes will now fail with a GNUTLS_CERT_INSECURE_ALGORITHM
   verification output.  For applications that must remain
   interoperable, you can use the GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 or
-  GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 flags when verifying certificates.
+  GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 flags when verifying certificates.
+  Naturally, this is not recommended to be the default behaviour.
   For example, call gnutls_certificate_set_verify_flags with these
   flags to change the verification mode used by
   gnutls_certificate_verify_peers2.
