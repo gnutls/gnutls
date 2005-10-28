@@ -395,7 +395,7 @@ TCP/IP servers.
 @cindex Record protocol
 
 The Record protocol is the secure communications provider. Its purpose
-is to encrypt, authenticate and --optionally-- compress packets.
+is to encrypt, authenticate and ---optionally--- compress packets.
 The following functions are available:
 
 @table @code
@@ -660,7 +660,7 @@ are shown in @ref{ciphersuites}.
 
 In the case of ciphersuites that use certificate authentication, the
 authentication of the client is optional in @acronym{TLS}.  A server
-may request a certificate from the client -- using the
+may request a certificate from the client --- using the
 @code{gnutls_certificate_server_set_request} function. If a
 certificate is to be requested from the client during the handshake,
 the server will send a certificate request message that contains a
@@ -949,7 +949,7 @@ The certificate must allow the key to be used for encryption.
 @item RSA_EXPORT:
 The RSA algorithm is used to encrypt a key and send it to the peer.
 In the EXPORT algorithm, the server signs temporary RSA parameters of
-512 bits -- which are considered weak -- and sends them to the client.
+512 bits --- which are considered weak --- and sends them to the client.
 
 @item DHE_RSA:
 The RSA algorithm is used to sign Ephemeral Diffie Hellman parameters
@@ -1475,7 +1475,7 @@ famous ``HTTP over TLS'' or @acronym{HTTPS} protocol @mybibcite{RFC2818}.
 
 Despite its wide use, this method is not as good as it seems.  This
 approach starts the @acronym{TLS} Handshake procedure just after the
-client connects on the --so called-- secure port.  That way the
+client connects on the ---so called--- secure port.  That way the
 @acronym{TLS} protocol does not know anything about the client, and
 popular methods like the host advertising in HTTP do not
 work@footnote{See also the Server Name Indication extension on
@@ -1876,8 +1876,8 @@ the DHE ciphersuites and session resuming.
 
 The following example is an echo server which supports
 @acronym{@acronym{OpenPGP}} key authentication. You can easily combine
-this functionality --that is have a server that supports both
-@acronym{X.509} and @acronym{OpenPGP} certificates-- but we separated
+this functionality ---that is have a server that supports both
+@acronym{X.509} and @acronym{OpenPGP} certificates--- but we separated
 them to keep these examples as simple as possible.
 
 @verbatiminclude examples/ex-serv-pgp.c
