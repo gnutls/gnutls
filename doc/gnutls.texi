@@ -1335,6 +1335,9 @@ the form of flags. For  @ref{gnutls_x509_crt_verify} the flags are passed straig
 @ref{gnutls_certificate_verify_peers2} depends on the flags set by calling @code{gnutls_certificate_set_verify_flags}.
 All the available flags are part of the enumeration @ref{gnutls_certificate_verify_flags} and
 are explained in the table below.
+
+@anchor{gnutls_certificate_verify_flags}
+@tindex gnutls_certificate_verify_flags
 @table @code
 @item GNUTLS_VERIFY_DISABLE_CA_SIGN:
 If set a signer does not have to be a certificate authority. This
