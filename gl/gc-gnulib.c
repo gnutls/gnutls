@@ -654,6 +654,10 @@ gc_hash_digest_length (Gc_hash hash)
       len = GC_MD5_DIGEST_SIZE;
       break;
 
+    case GC_RMD160:
+      len = GC_RMD160_DIGEST_SIZE;
+      break;
+
     case GC_SHA1:
       len = GC_SHA1_DIGEST_SIZE;
       break;

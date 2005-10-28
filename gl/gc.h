@@ -60,6 +60,7 @@ typedef void *gc_hash_handle;
 #define GC_MD2_DIGEST_SIZE 16
 #define GC_MD4_DIGEST_SIZE 16
 #define GC_MD5_DIGEST_SIZE 16
+#define GC_RMD160_DIGEST_SIZE 20
 #define GC_SHA1_DIGEST_SIZE 20
 
 /* Cipher types. */

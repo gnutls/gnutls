@@ -286,35 +286,35 @@ gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
 size_t
 gc_hash_digest_length (Gc_hash hash)
 {
-  int gcryalg;
+  size_t len;
 
   switch (hash)
     {
     case GC_MD2:
-      gcryalg = GCRY_MD_MD2;
+      len = GC_MD2_DIGEST_SIZE;
       break;
 
     case GC_MD4:
-      gcryalg = GCRY_MD_MD4;
+      len = GC_MD4_DIGEST_SIZE;
       break;
 
     case GC_MD5:
-      gcryalg = GCRY_MD_MD5;
-      break;
-
-    case GC_SHA1:
-      gcryalg = GCRY_MD_SHA1;
+      len = GC_MD5_DIGEST_SIZE;
       break;
 
     case GC_RMD160:
-      gcryalg = GCRY_MD_RMD160;
+      len = GC_RMD160_DIGEST_SIZE;
+      break;
+
+    case GC_SHA1:
+      len = GC_SHA1_DIGEST_SIZE;
       break;
 
     default:
       return 0;
     }
 
-  return gcry_md_get_algo_dlen (gcryalg);
+  return len;
 }
 
 void
