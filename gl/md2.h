@@ -20,7 +20,7 @@
 # define MD2_H 1
 
 # include <stdio.h>
-# include <stdint.h>
+# include <stddef.h>
 
 # define MD2_DIGEST_SIZE 16
 
