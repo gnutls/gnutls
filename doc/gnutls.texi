@@ -1330,6 +1330,39 @@ These algorithms have been broken and should not be trusted.
 
 @end table
 
+There is also to possibility to pass some input to the verification functions in
+the form of flags. For  @code{gnutls_x509_crt_verify} the flags are passed straightforward, but
+@code{gnutls_certificate_verify_peers2} depends on the flags set by calling @code{gnutls_certificate_set_verify_flags}.
+All the available flags are part of the enumeration @code{gnutls_certificate_verify_flags} and
+are explained in the table below.
+@table @code
+@item GNUTLS_VERIFY_DISABLE_CA_SIGN:
+If set a signer does not have to be a certificate authority. This
+flag should normaly be disabled, unless you know what this means.
+
+@item GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT:
+Allow only trusted CA certificates that have version 1.  This is
+safer than GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, and should be
+used instead. That way only signers in your trusted list will be
+allowed to have certificates of version 1.
+
+@item GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT:
+Allow CA certificates that have version 1 (both root and
+intermediate). This is dangerous since those haven't the
+basicConstraints extension. Must be used in combination with
+GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
+
+@item GNUTLS_VERIFY_DO_NOT_ALLOW_SAME:
+If a certificate is not signed by anyone trusted but exists in
+the trusted CA list do not treat it as trusted.
+
+@item GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2:
+Allow certificates to be signed using the broken MD2 algorithm.
+
+@item GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5:
+Allow certificates to be signed using the broken MD5 algorithm.
+@end table
+
 Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
 about the peer's identity. It is required to verify if the
