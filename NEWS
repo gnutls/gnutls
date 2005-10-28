@@ -6,7 +6,7 @@ See the end for copying conditions.
 * Version 1.2.9
 - MD2 is now supported.
 - Due to cryptographic advances, verifying untrusted X.509
-  certificates signed with MD2 or MD5 will now fail with a
+  certificates signed with RSA-MD2 or RSA-MD5 will now fail with a
   GNUTLS_CERT_INSECURE_ALGORITHM verification output.  For
   applications that must remain interoperable, you can use the
   GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 or GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5
