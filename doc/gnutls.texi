@@ -1013,7 +1013,7 @@ protection is similar to the one used traditionally in the @emph{UNIX}
 harm to the system security if they were revealed.  The @acronym{SRP}
 needs instead of the plain password something called a verifier, which
 is calculated using the user's password, and if stolen cannot be used
-to impersonate the user. See @mybibcite{TOMSRP} for a detailed description
+to impersonate the user. Check @mybibcite{TOMSRP} for a detailed description
 of the @acronym{SRP} protocol and the Stanford @acronym{SRP}
 libraries, which includes a PAM module that synchronizes the system's
 users passwords with the @acronym{SRP} password files. That way
@@ -1366,8 +1366,8 @@ Allow certificates to be signed using the broken MD5 algorithm.
 Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
 about the peer's identity. It is required to verify if the
-certificate's owner is the one you expect. See @mybibcite{RFC2818} and
-section @ref{ex:verify} for an example.
+certificate's owner is the one you expect. For more information consult @mybibcite{RFC2818} 
+and section @ref{ex:verify} for an example.
 
 @node PKCS #10 certificate requests
 @subsection @acronym{PKCS} #10 certificate requests
@@ -2226,8 +2226,7 @@ Usage: gnutls-serv [options]
 This is a program to generate @acronym{X.509} certificates, certificate
 requests, CRLs and private keys. The program can be used interactively
 or non interactively by specifying the @code{--template} command line
-option. See @file{doc/certtool.cfg}, in the distribution, for an
-example of a template file.
+option. See below for an example of a template file.
 
 How to use certtool interactively:
 
