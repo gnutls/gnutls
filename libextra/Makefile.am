@@ -84,7 +84,7 @@ endif
 libgnutls_extra_la_LIBADD =
 libgnutls_extra_la_LDFLAGS =
 if ENABLE_OPENPGP
-COBJECTS += gnutls_openpgp.c
+libgnutls_extra_la_SOURCES += gnutls_openpgp.c
 libgnutls_extra_la_LIBADD += openpgp/libgnutls_openpgp.la
 if ENABLE_INCLUDED_OPENCDK
 libgnutls_extra_la_LIBADD += opencdk/libminiopencdk.la
