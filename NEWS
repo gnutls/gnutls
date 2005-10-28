@@ -5,16 +5,15 @@ See the end for copying conditions.
 
 * Version 1.2.9
 - MD2 is now supported.
-- MD2 and MD5 as X.509 certificate signing algorithms are now disabled
-  by default.  Verifying untrusted certificates signed with these
-  hashes will now fail with a GNUTLS_CERT_INSECURE_ALGORITHM
-  verification output.  For applications that must remain
-  interoperable, you can use the GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 or
-  GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 flags when verifying certificates.
-  Naturally, this is not recommended to be the default behaviour.
-  For example, call gnutls_certificate_set_verify_flags with these
-  flags to change the verification mode used by
-  gnutls_certificate_verify_peers2.
+- Due to cryptographic advances, verifying untrusted X.509
+  certificates signed with MD2 or MD5 will now fail with a
+  GNUTLS_CERT_INSECURE_ALGORITHM verification output.  For
+  applications that must remain interoperable, you can use the
+  GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 or GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5
+  flags when verifying certificates.  Naturally, this is not
+  recommended to be the default behaviour.  For example, call
+  gnutls_certificate_set_verify_flags with these flags to change the
+  verification mode used by gnutls_certificate_verify_peers2.
 - Make it possible to send empty data through gnutls_record_send,
   to align with the send API.
 - The (experimental) low-level crypto alternative to libgcrypt used
