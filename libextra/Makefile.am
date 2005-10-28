@@ -59,9 +59,11 @@ lib_LTLIBRARIES = libgnutls-extra.la
 
 COBJECTS = gnutls_extra.c
 
+libgnutls_openssl_la_LDFLAGS =
+libgnutls_extra_la_SOURCES = 
+
 # OpenSSL
 
-libgnutls_openssl_la_LDFLAGS =
 if ENABLE_OPENSSL
 lib_LTLIBRARIES += libgnutls-openssl.la
 
@@ -97,7 +99,7 @@ libgnutls_extra_la_LDFLAGS += \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES = $(COBJECTS) gnutls_extra.h libgnutls-extra.vers
+libgnutls_extra_la_SOURCES += $(COBJECTS) gnutls_extra.h libgnutls-extra.vers
 
 libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
 
