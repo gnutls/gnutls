@@ -112,7 +112,7 @@ gnutls_asn1_tab.c: gnutls.asn
 
 gnutls-api.texi: $(COBJECTS) $(SRP_COBJECTS)
 	@echo "" > gnutls-api.texi
-	@for i in $<; do \
+	@for i in $(COBJECTS) $(SRP_COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
 		../doc/scripts/gdoc -texinfo $$i >> gnutls-api.texi && \
 		echo "ok"; \
