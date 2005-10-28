@@ -27,8 +27,14 @@
 /* Get prototype. */
 #include "gc.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 /* Get libgcrypt API. */
 #include <gcrypt.h>
+#ifdef GC_USE_MD2
+# include "md2.h"
+#endif
 
 #include <assert.h>
 
@@ -218,16 +224,33 @@ gc_cipher_close (gc_cipher_handle handle)
 
 /* Hashes. */
 
+typedef struct _gc_hash_ctx {
+  Gc_hash alg;
+  Gc_hash_mode mode;
+  gcry_md_hd_t gch;
+#ifdef GC_USE_MD2
+  char hash[GC_MD2_DIGEST_SIZE];
+  struct md2_ctx md2Context;
+#endif
+} _gc_hash_ctx;
+
 Gc_rc
 gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
 {
+  _gc_hash_ctx *ctx;
   int gcryalg, gcrymode;
   gcry_error_t err;
+  Gc_rc rc = GC_OK;
+
+  ctx = calloc (sizeof (*ctx), 1);
+
+  ctx->alg = hash;
+  ctx->mode = mode;
 
   switch (hash)
     {
     case GC_MD2:
-      gcryalg = GCRY_MD_MD2;
+      gcryalg = GCRY_MD_NONE;
       break;
 
     case GC_MD4:
@@ -247,7 +270,7 @@ gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
       break;
 
     default:
-      return GC_INVALID_HASH;
+      rc = GC_INVALID_HASH;
     }
 
   switch (mode)
@@ -261,24 +284,43 @@ gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
       break;
 
     default:
-      return GC_INVALID_HASH;
+      rc = GC_INVALID_HASH;
     }
 
-  err = gcry_md_open ((gcry_md_hd_t *) outhandle, gcryalg, gcrymode);
-  if (gcry_err_code (err))
-    return GC_INVALID_HASH;
+  if (rc == GC_OK && gcryalg != GCRY_MD_NONE)
+    {
+      err = gcry_md_open (&ctx->gch, gcryalg, gcrymode);
+      if (gcry_err_code (err))
+	rc = GC_INVALID_HASH;
+    }
 
-  return GC_OK;
+  if (rc == GC_OK)
+    *outhandle = ctx;
+  else
+    free (ctx);
+
+  return rc;
 }
 
 Gc_rc
 gc_hash_clone (gc_hash_handle handle, gc_hash_handle * outhandle)
 {
+  _gc_hash_ctx *in = handle;
+  _gc_hash_ctx *out;
   int err;
 
-  err = gcry_md_copy ((gcry_md_hd_t *) outhandle, (gcry_md_hd_t) handle);
+  *outhandle = out = calloc (sizeof (*out), 1);
+  if (!out)
+    return GC_MALLOC_ERROR;
+
+  memcpy (out, in, sizeof (*out));
+
+  err = gcry_md_copy (&out->gch, in->gch);
   if (err)
-    return GC_INVALID_HASH;
+    {
+      free (out);
+      return GC_INVALID_HASH;
+    }
 
   return GC_OK;
 }
@@ -320,22 +362,41 @@ gc_hash_digest_length (Gc_hash hash)
 void
 gc_hash_hmac_setkey (gc_hash_handle handle, size_t len, const char *key)
 {
-  gcry_md_setkey ((gcry_md_hd_t) handle, key, len);
+  _gc_hash_ctx *ctx = handle;
+  gcry_md_setkey (ctx->gch, key, len);
 }
 
 void
 gc_hash_write (gc_hash_handle handle, size_t len, const char *data)
 {
-  gcry_md_write ((gcry_md_hd_t) handle, data, len);
+  _gc_hash_ctx *ctx = handle;
+
+#ifdef GC_USE_MD2
+  if (ctx->alg == GC_MD2)
+    md2_process_bytes (data, len, &ctx->md2Context);
+  else
+#endif
+    gcry_md_write (ctx->gch, data, len);
 }
 
 const char *
 gc_hash_read (gc_hash_handle handle)
 {
+  _gc_hash_ctx *ctx = handle;
   const char *digest;
 
-  gcry_md_final ((gcry_md_hd_t) handle);
-  digest = gcry_md_read ((gcry_md_hd_t) handle, 0);
+#ifdef GC_USE_MD2
+  if (ctx->alg == GC_MD2)
+    {
+      md2_finish_ctx (&ctx->md2Context, ctx->hash);
+      digest = ctx->hash;
+    }
+  else
+#endif
+    {
+      gcry_md_final (ctx->gch);
+      digest = gcry_md_read (ctx->gch, 0);
+    }
 
   return digest;
 }
@@ -343,7 +404,14 @@ gc_hash_read (gc_hash_handle handle)
 void
 gc_hash_close (gc_hash_handle handle)
 {
-  gcry_md_close ((gcry_md_hd_t) handle);
+  _gc_hash_ctx *ctx = handle;
+
+#ifdef GC_USE_MD2
+  if (ctx->alg != GC_MD2)
+#endif
+    gcry_md_close (ctx->gch);
+
+  free (ctx);
 }
 
 Gc_rc
@@ -353,12 +421,6 @@ gc_hash_buffer (Gc_hash hash, const void *in, size_t inlen, char *resbuf)
 
   switch (hash)
     {
-#ifdef GC_USE_MD2
-    case GC_MD2:
-      gcryalg = GCRY_MD_MD2;
-      break;
-#endif
-
 #ifdef GC_USE_MD4
     case GC_MD4:
       gcryalg = GCRY_MD_MD4;
@@ -398,30 +460,7 @@ gc_hash_buffer (Gc_hash hash, const void *in, size_t inlen, char *resbuf)
 Gc_rc
 gc_md2 (const void *in, size_t inlen, void *resbuf)
 {
-  size_t outlen = gcry_md_get_algo_dlen (GCRY_MD_MD2);
-  gcry_md_hd_t hd;
-  gpg_error_t err;
-  unsigned char *p;
-
-  assert (outlen == GC_MD2_DIGEST_SIZE);
-
-  err = gcry_md_open (&hd, GCRY_MD_MD2, 0);
-  if (err != GPG_ERR_NO_ERROR)
-    return GC_INVALID_HASH;
-
-  gcry_md_write (hd, in, inlen);
-
-  p = gcry_md_read (hd, GCRY_MD_MD2);
-  if (p == NULL)
-    {
-      gcry_md_close (hd);
-      return GC_INVALID_HASH;
-    }
-
-  memcpy (resbuf, p, outlen);
-
-  gcry_md_close (hd);
-
+  md2_buffer (in, inlen, resbuf);
   return GC_OK;
 }
 #endif
