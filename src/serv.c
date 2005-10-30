@@ -50,6 +50,7 @@ static int debug;
 
 int verbose;
 static int nodb;
+int require_cert;
 
 char *srp_passwd;
 char *srp_passwd_conf;
@@ -318,7 +319,10 @@ gnutls_session initialize_session(void)
     if (cert_cred != NULL)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
-    gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUEST);
+    if (require_cert)
+	    gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUIRE);
+    else
+	    gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUEST);
 
     return session;
 }
@@ -1031,6 +1035,7 @@ void gaa_parser(int argc, char **argv)
 	exit(1);
     }
 
+    require_cert = info.require_cert;
     debug = info.debug;
     verbose = info.quiet;
     nodb = info.nodb;
