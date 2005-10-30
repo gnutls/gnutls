@@ -514,7 +514,12 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 	    _gnutls_recv_handshake(session, &data,
 				   &datasize,
 				   GNUTLS_HANDSHAKE_CERTIFICATE_PKT, optional);
+
 	if (ret < 0) {
+	    /* Handle the case of old SSL3 clients who send
+	     * a warning alert instead of an empty certificate to indicate
+	     * no certificate.
+	     */
 	    if (optional == OPTIONAL_PACKET &&
 		ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
 		gnutls_protocol_get_version(session) == GNUTLS_SSL3 &&
@@ -527,8 +532,11 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 		gnutls_assert();
 		return 0;
 	    }
-	    /* certificate was required */
-	    if (optional == MANDATORY_PACKET) {
+
+	    /* certificate was required 
+	     */
+	    if (ret == (GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) &&
+	        optional == MANDATORY_PACKET) {
 		gnutls_assert();
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	    }
@@ -544,7 +552,6 @@ int _gnutls_recv_client_certificate(gnutls_session_t session)
 	    gnutls_assert();
 	    return 0;
 	}
-
 
 	ret =
 	    session->internals.auth_struct->
