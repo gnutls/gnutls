@@ -27,7 +27,7 @@ SUBDIRS += reference
 endif
 
 info_TEXINFOS = gnutls.texi
-gnutls_TEXINFOS = gnutls.texi fdl.texi error_codes.texi	bibliography.texi \
+gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi error_codes.texi	bibliography.texi \
 	gnutls-api.texi gnutls-extra-api.texi x509-api.texi		\
 	my-bib-macros.texi \
 	pgp-api.texi examples/ex-client1.c examples/ex-client2.c	\
