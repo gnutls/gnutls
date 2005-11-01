@@ -390,12 +390,6 @@ extern "C"
     /* Allow certificates to be signed using the broken MD5 algorithm.
      */
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32
-
-    /* Increment this define if you add new enum's.  The purpose of
-       this CPP symbol is to let application figure out which flags
-       are supported through CPP checks in the code, and to avoid
-       lengthy autoconf snippets in every application. */
-#define GNUTLS_CERTIFICATE_VERIFY_FLAGS_LAST 32
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
