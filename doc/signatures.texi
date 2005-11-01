@@ -103,3 +103,15 @@ If you are using @ref{gnutls_x509_crt_verify} or
 @ref{gnutls_x509_crt_list_verify}, you can pass the
 @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} parameter directly in the
 @code{flags} parameter.
+
+If you are using these flags, it may also be a good idea to warn the
+user when verification failure occur for this reason.  The simplest is
+to not use the flags by default, and only fall back to using them
+after warning the user.  If you wish to inspect the certificate chain
+yourself, you can use @ref{gnutls_certificate_get_peers} to extract
+the raw server's certificate chain, then use
+@ref{gnutls_x509_crt_import} to parse each of the certificates, and
+then use @ref{gnutls_x509_crt_get_signature_algorithm} to find out the
+signing algorithm used for each certificate.  If any of the
+intermediary certificates are using @code{GNUTLS_SIGN_RSA_MD2} or
+@code{GNUTLS_SIGN_RSA_MD5}, you could present a warning.
