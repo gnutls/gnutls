@@ -63,10 +63,16 @@ The last two requirements in the list are the most important in digital signatur
 against somebody who would like to generate two messages with the same hash output. When an
 algorithm is considered broken usually it means that the Collision resistance of the algorithm is
 less than brute force. Using the birthday paradox the brute force attack takes 
-@math{2^{hash size \over 2}}operations. Today colliding certificates using the MD5 hash algorithm
+@iftex
+@math{2^{\texttt{hash size} \over 2}} 
+@end iftex
+@ifnottex
+@math{2^(hash size / 2)}
+@end ifnottex
+operations. Today colliding certificates using the MD5 hash algorithm
 have been generated as shown in @mybibcite{WEGER}.
 
-@subsubsection Trading security for interoperability
+@subsection Trading security for interoperability
 
 If you connect to a server and use GnuTLS' functions to verify the
 certificate chain, and get a @ref{GNUTLS_CERT_INSECURE_ALGORITHM}

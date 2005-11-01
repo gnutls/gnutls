@@ -1187,6 +1187,7 @@ int main()
 @menu
 * The X.509 trust model::
 * The OpenPGP trust model::
+* Digital signatures::
 @end menu
 
 @node The X.509 trust model
@@ -1210,7 +1211,6 @@ handling @acronym{X.509} certificates is described at section
 @menu
 * X.509 certificates::
 * Verifying X.509 certificate paths::
-* Digital signatures::
 * PKCS #10 certificate requests::
 * PKCS #12 structures::
 @end menu
@@ -1381,11 +1381,6 @@ about the peer's identity. It is required to verify if the
 certificate's owner is the one you expect. For more information consult @mybibcite{RFC2818} 
 and section @ref{ex:verify} for an example.
 
-@node Digital signatures
-@subsection Digital signatures
-@cindex Digital signatures
-@include signatures.texi
-
 @node PKCS #10 certificate requests
 @subsection @acronym{PKCS} #10 certificate requests
 @cindex Certificate requests
@@ -1497,6 +1492,12 @@ The certificate was signed using an insecure algorithm such as MD2 or MD5.
 These algorithms have been broken and should not be trusted.
 
 @end table
+
+@node Digital signatures
+@section Digital signatures
+@cindex Digital signatures
+@include signatures.texi
+
 
 @node How to use TLS in application protocols
 @chapter How to use @acronym{TLS} in application protocols
