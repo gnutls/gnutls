@@ -12,9 +12,10 @@ See the end for copying conditions.
   applications that must remain interoperable, you can use the
   GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 or GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5
   flags when verifying certificates.  Naturally, this is not
-  recommended default behaviour for applications.  To use this, call
-  gnutls_certificate_set_verify_flags with these flags to change the
-  verification mode used by gnutls_certificate_verify_peers2.
+  recommended default behaviour for applications.  To enable the
+  broken algorithms, call gnutls_certificate_set_verify_flags with the
+  proper flag, to change the verification mode used by
+  gnutls_certificate_verify_peers2.
 - Make it possible to send empty data through gnutls_record_send,
   to align with the send(2) API.
 - Some changes in the certificate receiving part of handshake to prevent
