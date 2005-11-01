@@ -554,10 +554,11 @@ void gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
 /**
   * gnutls_certificate_set_verify_flags - This function will set the flags to be used at certificate verification
   * @res: is a gnutls_certificate_credentials_t structure
-  * @flags: are the flagsis a structure that holds diffie hellman parameters.
+  * @flags: are the flags
   *
-  * This function will set the flags to be used at verification of the certificates.
-  * Flags must be OR of the gnutls_certificate_verify_flags enumerations.
+  * This function will set the flags to be used at verification of the
+  * certificates.  Flags must be OR of the
+  * #gnutls_certificate_verify_flags enumerations.
   *
   **/
 void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
