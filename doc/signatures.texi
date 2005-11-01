@@ -83,7 +83,9 @@ First, it is important to know that you do not have to enable any of
 the flags discussed here to be able to use trusted root CA
 certificates signed using @code{RSA-MD2} or @code{RSA-MD5}.  The only
 attack today is that it is possible to generate certificates with
-colliding signatures; you cannot forge signatures.
+colliding signatures (collision resistance); you cannot generate a
+certificate that has the same signature as an already existing
+signature (2nd preimage resistance).
 
 If you are using @ref{gnutls_certificate_verify_peers2} to verify the
 certificate chain, you can call
