@@ -17,6 +17,8 @@ See the end for copying conditions.
   verification mode used by gnutls_certificate_verify_peers2.
 - Make it possible to send empty data through gnutls_record_send,
   to align with the send(2) API.
+- Some changes in the certificate receiving part of handshake to prevent
+  some possible errors with non-blocking servers.
 - The (experimental) low-level crypto alternative to libgcrypt used
   earlier (Nettle) has been replaced with crypto code from gnulib.
   This leads to easier re-use of these components in other projects,
