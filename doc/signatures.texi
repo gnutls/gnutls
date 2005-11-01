@@ -66,4 +66,40 @@ less than brute force. Using the birthday paradox the brute force attack takes
 @math{2^{hash size \over 2}}operations. Today colliding certificates using the MD5 hash algorithm
 have been generated as shown in @mybibcite{WEGER}.
 
+@subsubsection Trading security for interoperability
 
+If you connect to a server and use GnuTLS' functions to verify the
+certificate chain, and get a @ref{GNUTLS_CERT_INSECURE_ALGORITHM}
+validation error (@pxref{Verifying X.509 certificate paths}), it means
+that somewhere in the certificate chain there is a certificate signed
+using @code{RSA-MD2} or @code{RSA-MD5}.  These two digital signature
+algorithms are considered broken, so GnuTLS fail when attempting to
+verify the certificate.  In some situations, it may be useful to be
+able to verify the certificate chain anyway, assuming an attacker did
+not utilize the fact that these signatures algorithms are broken.
+This section will give help on how to achieve that.
+
+First, it is important to know that you do not have to enable any of
+the flags discussed here to be able to use trusted root CA
+certificates signed using @code{RSA-MD2} or @code{RSA-MD5}.  The only
+attack today is that it is possible to generate certificates with
+colliding signatures; you cannot forge signatures.
+
+If you are using @ref{gnutls_certificate_verify_peers2} to verify the
+certificate chain, you can call
+@ref{gnutls_certificate_set_verify_flags} with the
+@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2} or
+@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} flag, as in:
+
+@example
+  gnutls_certificate_set_verify_flags (x509cred,
+                                       GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5);
+@end example
+
+This will tell the verifier algorithm to enable @code{RSA-MD5} when
+verifying the certificates.
+
+If you are using @ref{gnutls_x509_crt_verify} or
+@ref{gnutls_x509_crt_list_verify}, you can pass the
+@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} parameter directly in the
+@code{flags} parameter.
