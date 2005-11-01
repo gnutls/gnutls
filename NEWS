@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 1.2.9
 - Documentation was updated and improved.
-- MD2 is now supported.
+- RSA-MD2 is now supported for verifying digital signatures.
 - Due to cryptographic advances, verifying untrusted X.509
   certificates signed with RSA-MD2 or RSA-MD5 will now fail with a
   GNUTLS_CERT_INSECURE_ALGORITHM verification output.  For
