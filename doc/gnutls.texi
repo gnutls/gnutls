@@ -1329,17 +1329,21 @@ The certificate's signer was not a CA. This may happen if
 this was a version 1 certificate, which is common with some CAs, or
 a version 3 certificate without the basic constrains extension.
 
+@anchor{GNUTLS_CERT_INSECURE_ALGORITHM}
 @item GNUTLS_CERT_INSECURE_ALGORITHM:
-The certificate was signed using an insecure algorithm such as MD2 or MD5.
-These algorithms have been broken and should not be trusted.
+The certificate was signed using an insecure algorithm such as MD2 or
+MD5.  These algorithms have been broken and should not be trusted.
 
 @end table
 
-There is also to possibility to pass some input to the verification functions in
-the form of flags. For  @ref{gnutls_x509_crt_verify} the flags are passed straightforward, but
-@ref{gnutls_certificate_verify_peers2} depends on the flags set by calling @code{gnutls_certificate_set_verify_flags}.
-All the available flags are part of the enumeration @ref{gnutls_certificate_verify_flags} and
-are explained in the table below.
+There is also to possibility to pass some input to the verification
+functions in the form of flags. For @ref{gnutls_x509_crt_verify} the
+flags are passed straightforward, but
+@ref{gnutls_certificate_verify_peers2} depends on the flags set by
+calling @ref{gnutls_certificate_set_verify_flags}.  All the available
+flags are part of the enumeration
+@ref{gnutls_certificate_verify_flags} and are explained in the table
+below.
 
 @anchor{gnutls_certificate_verify_flags}
 @tindex gnutls_certificate_verify_flags
