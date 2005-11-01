@@ -933,7 +933,8 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 {
     opaque key[20];
     int result;
-    unsigned int iter, len;
+    unsigned int iter;
+    int len;
     mac_hd_t td1 = NULL;
     gnutls_datum_t tmp = { NULL, 0 }, salt = {
     NULL, 0};

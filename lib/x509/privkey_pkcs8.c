@@ -58,7 +58,7 @@ struct pbkdf2_params {
     opaque salt[32];
     int salt_size;
     unsigned int iter_count;
-    int key_size;
+    unsigned int key_size;
 };
 
 struct pbe_enc_params {
