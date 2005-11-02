@@ -778,7 +778,7 @@ client.
 @cindex SSL 2
 
 One of the initial decisions in the @acronym{GnuTLS} development was
-to implement the security protocols for the transport layer.
+to implement the known security protocols for the transport layer.
 Initially @acronym{TLS} 1.0 was implemented since it was the latest at
 that time, and was considered to be the most advanced in security
 properties.  Later the @acronym{SSL} 3.0 protocol was implemented
@@ -789,7 +789,7 @@ One question that may arise is why we didn't implement @acronym{SSL}
 2.0 in the library.  There are several reasons, most important being
 that it has serious security flaws, unacceptable for a modern security
 library.  Other than that, this protocol is barely used by anyone
-these days (it has been deprecated since 1996).
+these days since it has been deprecated since 1996.
 
 @cindex PCT
 Other protocols such as Microsoft's @acronym{PCT} 1 and @acronym{PCT}
