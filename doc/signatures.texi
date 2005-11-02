@@ -3,14 +3,40 @@ work, and give the rationale for disabling some of the algorithms used.
 
 Digital signatures work by using somebody's secret key to sign some arbitrary data.
 Then anybody else could use the public key of that person to verify the signature.
-Since the data may be arbitrary thus not a suitable input to a cryptographic digital
-signature algorithm and also for performance reasons cryptographic hash algorithms are used to
+Since the data may be arbitrary it is not suitable input to a cryptographic digital
+signature algorithm. For this reason and also for performance cryptographic hash algorithms are used to
 preprocess the input to the signature algorithm. This works as long as it is difficult enough
 to generate two different messages with the same hash algorithm output. In that case the
 same signature could be used as a proof for both messages. Nobody wants to sign an innocent
 message of donating 1 @euro{} to Greenpeace and find out that he donated 1.000.000 @euro{}
 to Bad Inc. 
 
+For a hash algorithm to be called cryptographic the following three requirements must hold
+@enumerate
+@item Preimage resistance. That means the algorithm must be one way and given
+the output of the hash function @math{H(x)}, it is impossible to calculate @math{x}.
+
+@item 2nd preimage resistance. That means that given a pair @math{x,y} with @math{y=H(x)} it is impossible
+to calculate an @math{x'} such that @math{y=H(x')}.
+
+@item Collision resistance. That means that it is impossible to calculate random @math{x} and @math{x'} such
+@math{H(x')=H(x)}.
+@end enumerate
+
+The last two requirements in the list are the most important in digital signatures. These protect
+against somebody who would like to generate two messages with the same hash output. When an
+algorithm is considered broken usually it means that the Collision resistance of the algorithm is
+less than brute force. Using the birthday paradox the brute force attack takes 
+@iftex
+@math{2^{(\rm{hash\ size}) / 2}} 
+@end iftex
+@ifnottex
+@math{2^{((hash size) / 2)}} 
+@end ifnottex
+operations. Today colliding certificates using the MD5 hash algorithm
+have been generated as shown in @mybibcite{WEGER}.
+
+@subsection Supported algorithms
 The available digital signature algorithms in @acronym{GnuTLS} are listed below:
 
 @table @code
@@ -47,30 +73,6 @@ the EU project RIPE. Outputs 160 bits of data.
 
 @end table
 
-For a hash algorithm to be called cryptographic the following three requirements must hold
-@enumerate
-@item Preimage resistance. That means the algorithm must be one way and given
-the output of the hash function @math{H(x)}, it is impossible to calculate @math{x}.
-
-@item 2nd preimage resistance. That means that given a pair @math{x,y} with @math{y=H(x)} it is impossible
-to calculate an @math{x'} such that @math{y=H(x')}.
-
-@item Collision resistance. That means that it is impossible to calculate random @math{x} and @math{x'} such
-@math{H(x')=H(x)}.
-@end enumerate
-
-The last two requirements in the list are the most important in digital signatures. These protect
-against somebody who would like to generate two messages with the same hash output. When an
-algorithm is considered broken usually it means that the Collision resistance of the algorithm is
-less than brute force. Using the birthday paradox the brute force attack takes 
-@iftex
-@math{2^{(\rm{hash\ size}) / 2}} 
-@end iftex
-@ifnottex
-@math{2^{((hash size) / 2)}} 
-@end ifnottex
-operations. Today colliding certificates using the MD5 hash algorithm
-have been generated as shown in @mybibcite{WEGER}.
 
 @subsection Trading security for interoperability
 
