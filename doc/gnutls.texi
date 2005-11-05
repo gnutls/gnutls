@@ -975,7 +975,7 @@ Signature Standard.
 @section Anonymous authentication
 @cindex Anonymous authentication
 
-The anonymous key exchange perform encryption but there is no
+The anonymous key exchange performs encryption but there is no
 indication of the identity of the peer.  This kind of authentication
 is vulnerable to a man in the middle attack, but this protocol can be
 used even if there is no prior communication and trusted parties with
@@ -1004,7 +1004,7 @@ Authentication via the Secure Remote Password protocol,
 @acronym{SRP}@footnote{@acronym{SRP} is described in @mybibcite{RFC2945}},
 is supported.  The @acronym{SRP} key exchange is an extension to the
 @acronym{TLS} protocol, and it is a password based authentication
-(unlike @acronym{X.509} or @acronym{OpenPGP} that uses certificates).
+(unlike @acronym{X.509} or @acronym{OpenPGP} that use certificates).
 The two peers can be identified using a single password, or there can
 be combinations where the client is authenticated using @acronym{SRP}
 and the server using a certificate.
@@ -1065,7 +1065,7 @@ password file format is to be used, then the function
 @ref{gnutls_srp_set_server_credentials_function}, should be called,
 in order to set an appropriate callback.
 
-Some helper functions such as:
+Some helper functions such as
 
 @itemize
 
@@ -1077,8 +1077,8 @@ Some helper functions such as:
 
 @end itemize
 
-Are included in @acronym{GnuTLS}, and may be used to generate, and
-maintain @acronym{SRP} verifiers, and password files.  A program to
+are included in @acronym{GnuTLS}, and can be used to generate and
+maintain @acronym{SRP} verifiers and password files.  A program to
 manipulate the required parameters for @acronym{SRP} authentication is
 also included.  @xref{srptool}, for more information.
 
