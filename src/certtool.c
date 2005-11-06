@@ -2514,7 +2514,7 @@ void generate_pkcs12(void)
 	key_id.data = _key_id;
 	key_id.size = size;
 
-	result = gnutls_pkcs12_bag_set_key_id(kbag, result, &key_id);
+	result = gnutls_pkcs12_bag_set_key_id(kbag, index, &key_id);
 	if (result < 0) {
 	    fprintf(stderr, "bag_set_key_id: %s\n",
 		    gnutls_strerror(result));
