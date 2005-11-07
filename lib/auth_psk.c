@@ -36,51 +36,53 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 
-int _gnutls_gen_psk_client_kx(gnutls_session_t, opaque **);
+int _gnutls_gen_psk_client_kx (gnutls_session_t, opaque **);
 
-int _gnutls_proc_psk_client_kx(gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st psk_auth_struct = {
-    "PSK",
-    NULL,
-    NULL,
-    NULL,
-    _gnutls_gen_psk_client_kx,
-    NULL,
-    NULL,
+  "PSK",
+  NULL,
+  NULL,
+  NULL,
+  _gnutls_gen_psk_client_kx,
+  NULL,
+  NULL,
 
-    NULL,
-    NULL,			/* certificate */
-    NULL,
-    _gnutls_proc_psk_client_kx,
-    NULL,
-    NULL
+  NULL,
+  NULL,				/* certificate */
+  NULL,
+  _gnutls_proc_psk_client_kx,
+  NULL,
+  NULL
 };
 
 /* Set the PSK premaster secret.
  */
-static int set_psk_session_key( gnutls_session_t session, gnutls_datum* psk)
+static int
+set_psk_session_key (gnutls_session_t session, gnutls_datum * psk)
 {
-    /* set the session key
-     */
-    session->key->key.size = 4 + psk->size + psk->size;
-    session->key->key.data = gnutls_malloc( session->key->key.size);
-    if (session->key->key.data == NULL) {
-        gnutls_assert();
-        return GNUTLS_E_MEMORY_ERROR;
+  /* set the session key
+   */
+  session->key->key.size = 4 + psk->size + psk->size;
+  session->key->key.data = gnutls_malloc (session->key->key.size);
+  if (session->key->key.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    /* format of the premaster secret:
-     * (uint16) psk_size
-     * psk_size bytes of zeros
-     * (uint16) psk_size
-     * the psk
-     */
-    _gnutls_write_uint16( psk->size, session->key->key.data);
-    memset( &session->key->key.data[2], 0, psk->size);
-    _gnutls_write_datum16( &session->key->key.data[psk->size + 2], *psk);
+  /* format of the premaster secret:
+   * (uint16) psk_size
+   * psk_size bytes of zeros
+   * (uint16) psk_size
+   * the psk
+   */
+  _gnutls_write_uint16 (psk->size, session->key->key.data);
+  memset (&session->key->key.data[2], 0, psk->size);
+  _gnutls_write_datum16 (&session->key->key.data[psk->size + 2], *psk);
 
-    return 0;
+  return 0;
 }
 
 
@@ -94,112 +96,123 @@ static int set_psk_session_key( gnutls_session_t session, gnutls_datum* psk)
  * } ClientKeyExchange;
  *
  */
-int _gnutls_gen_psk_client_kx(gnutls_session_t session, opaque ** data)
+int
+_gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
 {
-    int ret;
-    gnutls_psk_client_credentials_t cred;
-    gnutls_datum *psk;
-    
-    cred = (gnutls_psk_client_credentials_t)
-	_gnutls_get_cred(session->key, GNUTLS_CRD_PSK, NULL);
+  int ret;
+  gnutls_psk_client_credentials_t cred;
+  gnutls_datum *psk;
 
-    if (cred == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+  cred = (gnutls_psk_client_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-    psk = &cred->key;
+  psk = &cred->key;
 
-    if (cred->username.data == NULL || psk == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+  if (cred->username.data == NULL || psk == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-    ret = set_psk_session_key( session, psk);
-    if (ret < 0) {
-        gnutls_assert();
-        return ret;
+  ret = set_psk_session_key (session, psk);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    (*data) = gnutls_malloc( 2 + cred->username.size);
-    if ((*data) == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
+  (*data) = gnutls_malloc (2 + cred->username.size);
+  if ((*data) == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    _gnutls_write_datum16( *data, cred->username);
+  _gnutls_write_datum16 (*data, cred->username);
 
-    return (cred->username.size + 2);
+  return (cred->username.size + 2);
 }
 
 
 /* just read the username from the client key exchange.
  */
-int _gnutls_proc_psk_client_kx(gnutls_session_t session, opaque * data,
-			       size_t _data_size)
+int
+_gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
+			    size_t _data_size)
 {
-    ssize_t data_size = _data_size;
-    int ret;
-    gnutls_datum username;
-    gnutls_psk_client_credentials_t cred;
-    gnutls_datum psk;
-    psk_server_auth_info_t info;
+  ssize_t data_size = _data_size;
+  int ret;
+  gnutls_datum username;
+  gnutls_psk_client_credentials_t cred;
+  gnutls_datum psk;
+  psk_server_auth_info_t info;
 
-    cred = (gnutls_psk_client_credentials_t)
-	_gnutls_get_cred(session->key, GNUTLS_CRD_PSK, NULL);
+  cred = (gnutls_psk_client_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
 
-    if (cred == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-    if ((ret =
-         _gnutls_auth_info_set(session, GNUTLS_CRD_PSK,
-                               sizeof(psk_server_auth_info_st), 1)) < 0) {
-        gnutls_assert();
-        return ret;
+  if ((ret =
+       _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
+			      sizeof (psk_server_auth_info_st), 1)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    DECR_LEN(data_size, 2);
-    username.size = _gnutls_read_uint16(&data[0]);
+  DECR_LEN (data_size, 2);
+  username.size = _gnutls_read_uint16 (&data[0]);
 
-    DECR_LEN(data_size, username.size);
+  DECR_LEN (data_size, username.size);
 
-    username.data = &data[2];
+  username.data = &data[2];
 
 
-    /* copy the username to the auth info structures
-     */
-    info = _gnutls_get_auth_info(session);
+  /* copy the username to the auth info structures
+   */
+  info = _gnutls_get_auth_info (session);
 
-    if (username.size > MAX_SRP_USERNAME) {
-        gnutls_assert();
-        return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+  if (username.size > MAX_SRP_USERNAME)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ILLEGAL_SRP_USERNAME;
     }
 
-    memcpy(info->username, username.data, username.size);
-    info->username[ username.size] = 0;
+  memcpy (info->username, username.data, username.size);
+  info->username[username.size] = 0;
 
-    /* find the key of this username
-     */
-    ret = _gnutls_psk_pwd_find_entry( session, info->username, &psk);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  /* find the key of this username
+   */
+  ret = _gnutls_psk_pwd_find_entry (session, info->username, &psk);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    ret = set_psk_session_key( session, &psk);
-    if (ret < 0) {
-        gnutls_assert();
-        goto error;
+  ret = set_psk_session_key (session, &psk);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto error;
     }
 
-    return 0;
+  return 0;
 
 error:
-    _gnutls_free_datum( &psk);
-    return ret;
+  _gnutls_free_datum (&psk);
+  return ret;
 }
 
 
-#endif				/* ENABLE_SRP */
+#endif /* ENABLE_SRP */

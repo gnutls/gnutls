@@ -41,40 +41,44 @@
 /* Here functions for SRP (like g^x mod n) are defined 
  */
 
-int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result,
-		   mpi_t g, mpi_t prime, gnutls_alloc_function galloc_func)
+int
+_gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
+		mpi_t g, mpi_t prime, gnutls_alloc_function galloc_func)
 {
-    mpi_t x, e;
-    size_t result_size;
+  mpi_t x, e;
+  size_t result_size;
 
-    if (_gnutls_mpi_scan_nz(&x, text, &textsize)) {
-	gnutls_assert();
-	return GNUTLS_E_MPI_SCAN_FAILED;
+  if (_gnutls_mpi_scan_nz (&x, text, &textsize))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-    e = _gnutls_mpi_alloc_like(prime);
-    if (e == NULL) {
-	gnutls_assert();
-	_gnutls_mpi_release(&x);
+  e = _gnutls_mpi_alloc_like (prime);
+  if (e == NULL)
+    {
+      gnutls_assert ();
+      _gnutls_mpi_release (&x);
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  /* e = g^x mod prime (n) */
+  _gnutls_mpi_powm (e, g, x, prime);
+  _gnutls_mpi_release (&x);
+
+  _gnutls_mpi_print (NULL, &result_size, e);
+  if (result != NULL)
+    {
+      *result = galloc_func (result_size);
+      if ((*result) == NULL)
 	return GNUTLS_E_MEMORY_ERROR;
+
+      _gnutls_mpi_print (*result, &result_size, e);
     }
 
-    /* e = g^x mod prime (n) */
-    _gnutls_mpi_powm(e, g, x, prime);
-    _gnutls_mpi_release(&x);
+  _gnutls_mpi_release (&e);
 
-    _gnutls_mpi_print(NULL, &result_size, e);
-    if (result != NULL) {
-	*result = galloc_func(result_size);
-	if ((*result) == NULL)
-	    return GNUTLS_E_MEMORY_ERROR;
-
-	_gnutls_mpi_print(*result, &result_size, e);
-    }
-
-    _gnutls_mpi_release(&e);
-
-    return result_size;
+  return result_size;
 
 }
 
@@ -84,295 +88,315 @@ int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result,
  * where k == SHA1(N|g)
  * Return: B and if ret_b is not NULL b.
  */
-mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g, mpi_t n, mpi_t v)
+mpi_t
+_gnutls_calc_srp_B (mpi_t * ret_b, mpi_t g, mpi_t n, mpi_t v)
 {
-    mpi_t tmpB = NULL, tmpV = NULL;
-    mpi_t b = NULL, B = NULL, k = NULL;
-    int bits;
+  mpi_t tmpB = NULL, tmpV = NULL;
+  mpi_t b = NULL, B = NULL, k = NULL;
+  int bits;
 
 
-    /* calculate:  B = (k*v + g^b) % N 
-     */
-    bits = _gnutls_mpi_get_nbits(n);
-    b = _gnutls_mpi_snew(bits);
-    if (b == NULL) {
-	gnutls_assert();
-	return NULL;
+  /* calculate:  B = (k*v + g^b) % N 
+   */
+  bits = _gnutls_mpi_get_nbits (n);
+  b = _gnutls_mpi_snew (bits);
+  if (b == NULL)
+    {
+      gnutls_assert ();
+      return NULL;
     }
 
-    tmpV = _gnutls_mpi_alloc_like(n);
+  tmpV = _gnutls_mpi_alloc_like (n);
 
-    if (tmpV == NULL) {
-	gnutls_assert();
-	goto error;
+  if (tmpV == NULL)
+    {
+      gnutls_assert ();
+      goto error;
     }
 
-    _gnutls_mpi_randomize(b, bits, GCRY_STRONG_RANDOM);
+  _gnutls_mpi_randomize (b, bits, GCRY_STRONG_RANDOM);
 
-    tmpB = _gnutls_mpi_snew(bits);
-    if (tmpB == NULL) {
-	gnutls_assert();
-	goto error;
+  tmpB = _gnutls_mpi_snew (bits);
+  if (tmpB == NULL)
+    {
+      gnutls_assert ();
+      goto error;
     }
 
-    B = _gnutls_mpi_snew(bits);
-    if (B == NULL) {
-	gnutls_assert();
-	goto error;
+  B = _gnutls_mpi_snew (bits);
+  if (B == NULL)
+    {
+      gnutls_assert ();
+      goto error;
     }
 
-    k = _gnutls_calc_srp_u(n, g, n);
-    if (k == NULL) {
-	gnutls_assert();
-	goto error;
+  k = _gnutls_calc_srp_u (n, g, n);
+  if (k == NULL)
+    {
+      gnutls_assert ();
+      goto error;
     }
 
-    _gnutls_mpi_mulm(tmpV, k, v, n);
-    _gnutls_mpi_powm(tmpB, g, b, n);
+  _gnutls_mpi_mulm (tmpV, k, v, n);
+  _gnutls_mpi_powm (tmpB, g, b, n);
 
-    _gnutls_mpi_addm(B, tmpV, tmpB, n);
+  _gnutls_mpi_addm (B, tmpV, tmpB, n);
 
-    _gnutls_mpi_release(&k);
-    _gnutls_mpi_release(&tmpB);
-    _gnutls_mpi_release(&tmpV);
+  _gnutls_mpi_release (&k);
+  _gnutls_mpi_release (&tmpB);
+  _gnutls_mpi_release (&tmpV);
 
-    if (ret_b)
-	*ret_b = b;
-    else
-	_gnutls_mpi_release(&b);
+  if (ret_b)
+    *ret_b = b;
+  else
+    _gnutls_mpi_release (&b);
 
-    return B;
+  return B;
 
-  error:
-    _gnutls_mpi_release(&b);
-    _gnutls_mpi_release(&B);
-    _gnutls_mpi_release(&k);
-    _gnutls_mpi_release(&tmpB);
-    _gnutls_mpi_release(&tmpV);
-    return NULL;
+error:
+  _gnutls_mpi_release (&b);
+  _gnutls_mpi_release (&B);
+  _gnutls_mpi_release (&k);
+  _gnutls_mpi_release (&tmpB);
+  _gnutls_mpi_release (&tmpV);
+  return NULL;
 
 }
 
 /* This calculates the SHA1(A | B)
  * A and B will be left-padded with zeros to fill n_size.
  */
-mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, mpi_t n)
+mpi_t
+_gnutls_calc_srp_u (mpi_t A, mpi_t B, mpi_t n)
 {
-    size_t b_size, a_size;
-    opaque *holder, hd[MAX_HASH_SIZE];
-    size_t holder_size, hash_size, n_size;
-    GNUTLS_HASH_HANDLE td;
-    int ret;
-    mpi_t res;
+  size_t b_size, a_size;
+  opaque *holder, hd[MAX_HASH_SIZE];
+  size_t holder_size, hash_size, n_size;
+  GNUTLS_HASH_HANDLE td;
+  int ret;
+  mpi_t res;
 
-    /* get the size of n in bytes */
-    _gnutls_mpi_print(NULL, &n_size, n);
+  /* get the size of n in bytes */
+  _gnutls_mpi_print (NULL, &n_size, n);
 
-    _gnutls_mpi_print(NULL, &a_size, A);
-    _gnutls_mpi_print(NULL, &b_size, B);
+  _gnutls_mpi_print (NULL, &a_size, A);
+  _gnutls_mpi_print (NULL, &b_size, B);
 
-    if (a_size > n_size || b_size > n_size) {
-	gnutls_assert();
-	return NULL;		/* internal error */
+  if (a_size > n_size || b_size > n_size)
+    {
+      gnutls_assert ();
+      return NULL;		/* internal error */
     }
 
-    holder_size = n_size + n_size;
+  holder_size = n_size + n_size;
 
-    holder = gnutls_calloc(1, holder_size);
-    if (holder == NULL)
-	return NULL;
+  holder = gnutls_calloc (1, holder_size);
+  if (holder == NULL)
+    return NULL;
 
-    _gnutls_mpi_print(&holder[n_size - a_size], &a_size, A);
-    _gnutls_mpi_print(&holder[n_size + n_size - b_size], &b_size, B);
+  _gnutls_mpi_print (&holder[n_size - a_size], &a_size, A);
+  _gnutls_mpi_print (&holder[n_size + n_size - b_size], &b_size, B);
 
-    td = _gnutls_hash_init(GNUTLS_MAC_SHA1);
-    if (td == NULL) {
-	gnutls_free(holder);
-	gnutls_assert();
-	return NULL;
+  td = _gnutls_hash_init (GNUTLS_MAC_SHA1);
+  if (td == NULL)
+    {
+      gnutls_free (holder);
+      gnutls_assert ();
+      return NULL;
     }
-    _gnutls_hash(td, holder, holder_size);
-    _gnutls_hash_deinit(td, hd);
+  _gnutls_hash (td, holder, holder_size);
+  _gnutls_hash_deinit (td, hd);
 
-    /* convert the bytes of hd to integer
-     */
-    hash_size = 20;		/* SHA */
-    ret = _gnutls_mpi_scan_nz(&res, hd, &hash_size);
-    gnutls_free(holder);
+  /* convert the bytes of hd to integer
+   */
+  hash_size = 20;		/* SHA */
+  ret = _gnutls_mpi_scan_nz (&res, hd, &hash_size);
+  gnutls_free (holder);
 
-    if (ret < 0) {
-	gnutls_assert();
-	return NULL;
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return NULL;
     }
 
-    return res;
+  return res;
 }
 
 /* S = (A * v^u) ^ b % N 
  * this is our shared key (server premaster secret)
  */
-mpi_t _gnutls_calc_srp_S1(mpi_t A, mpi_t b, mpi_t u, mpi_t v, mpi_t n)
+mpi_t
+_gnutls_calc_srp_S1 (mpi_t A, mpi_t b, mpi_t u, mpi_t v, mpi_t n)
 {
-    mpi_t tmp1 = NULL, tmp2 = NULL;
-    mpi_t S = NULL;
+  mpi_t tmp1 = NULL, tmp2 = NULL;
+  mpi_t S = NULL;
 
-    S = _gnutls_mpi_alloc_like(n);
-    if (S == NULL)
-	return NULL;
-
-    tmp1 = _gnutls_mpi_alloc_like(n);
-    tmp2 = _gnutls_mpi_alloc_like(n);
-
-    if (tmp1 == NULL || tmp2 == NULL)
-	goto freeall;
-
-    _gnutls_mpi_powm(tmp1, v, u, n);
-    _gnutls_mpi_mulm(tmp2, A, tmp1, n);
-    _gnutls_mpi_powm(S, tmp2, b, n);
-
-    _gnutls_mpi_release(&tmp1);
-    _gnutls_mpi_release(&tmp2);
-
-    return S;
-
-  freeall:
-    _gnutls_mpi_release(&tmp1);
-    _gnutls_mpi_release(&tmp2);
+  S = _gnutls_mpi_alloc_like (n);
+  if (S == NULL)
     return NULL;
+
+  tmp1 = _gnutls_mpi_alloc_like (n);
+  tmp2 = _gnutls_mpi_alloc_like (n);
+
+  if (tmp1 == NULL || tmp2 == NULL)
+    goto freeall;
+
+  _gnutls_mpi_powm (tmp1, v, u, n);
+  _gnutls_mpi_mulm (tmp2, A, tmp1, n);
+  _gnutls_mpi_powm (S, tmp2, b, n);
+
+  _gnutls_mpi_release (&tmp1);
+  _gnutls_mpi_release (&tmp2);
+
+  return S;
+
+freeall:
+  _gnutls_mpi_release (&tmp1);
+  _gnutls_mpi_release (&tmp2);
+  return NULL;
 }
 
 /* A = g^a % N 
  * returns A and a (which is random)
  */
-mpi_t _gnutls_calc_srp_A(mpi_t * a, mpi_t g, mpi_t n)
+mpi_t
+_gnutls_calc_srp_A (mpi_t * a, mpi_t g, mpi_t n)
 {
-    mpi_t tmpa;
-    mpi_t A;
-    int bits;
+  mpi_t tmpa;
+  mpi_t A;
+  int bits;
 
-    bits = _gnutls_mpi_get_nbits(n);
-    tmpa = _gnutls_mpi_snew(bits);
-    if (tmpa == NULL) {
-	gnutls_assert();
-	return NULL;
+  bits = _gnutls_mpi_get_nbits (n);
+  tmpa = _gnutls_mpi_snew (bits);
+  if (tmpa == NULL)
+    {
+      gnutls_assert ();
+      return NULL;
     }
 
-    _gnutls_mpi_randomize(tmpa, bits, GCRY_STRONG_RANDOM);
+  _gnutls_mpi_randomize (tmpa, bits, GCRY_STRONG_RANDOM);
 
-    A = _gnutls_mpi_snew(bits);
-    if (A == NULL) {
-	gnutls_assert();
-	_gnutls_mpi_release(&tmpa);
-	return NULL;
+  A = _gnutls_mpi_snew (bits);
+  if (A == NULL)
+    {
+      gnutls_assert ();
+      _gnutls_mpi_release (&tmpa);
+      return NULL;
     }
-    _gnutls_mpi_powm(A, g, tmpa, n);
+  _gnutls_mpi_powm (A, g, tmpa, n);
 
-    if (a != NULL)
-	*a = tmpa;
-    else
-	_gnutls_mpi_release(&tmpa);
+  if (a != NULL)
+    *a = tmpa;
+  else
+    _gnutls_mpi_release (&tmpa);
 
-    return A;
+  return A;
 }
 
 /* generate x = SHA(s | SHA(U | ":" | p))
  * The output is exactly 20 bytes
  */
-int _gnutls_calc_srp_sha(const char *username, const char *password,
-			 opaque * salt, int salt_size, size_t * size,
-			 void *digest)
+int
+_gnutls_calc_srp_sha (const char *username, const char *password,
+		      opaque * salt, int salt_size, size_t * size,
+		      void *digest)
 {
-    GNUTLS_HASH_HANDLE td;
-    opaque res[MAX_HASH_SIZE];
+  GNUTLS_HASH_HANDLE td;
+  opaque res[MAX_HASH_SIZE];
 
-    *size = 20;
+  *size = 20;
 
-    td = _gnutls_hash_init(GNUTLS_MAC_SHA1);
-    if (td == NULL) {
-	return GNUTLS_E_MEMORY_ERROR;
+  td = _gnutls_hash_init (GNUTLS_MAC_SHA1);
+  if (td == NULL)
+    {
+      return GNUTLS_E_MEMORY_ERROR;
     }
-    _gnutls_hash(td, username, strlen(username));
-    _gnutls_hash(td, ":", 1);
-    _gnutls_hash(td, password, strlen(password));
+  _gnutls_hash (td, username, strlen (username));
+  _gnutls_hash (td, ":", 1);
+  _gnutls_hash (td, password, strlen (password));
 
-    _gnutls_hash_deinit(td, res);
+  _gnutls_hash_deinit (td, res);
 
-    td = _gnutls_hash_init(GNUTLS_MAC_SHA1);
-    if (td == NULL) {
-	return GNUTLS_E_MEMORY_ERROR;
+  td = _gnutls_hash_init (GNUTLS_MAC_SHA1);
+  if (td == NULL)
+    {
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    _gnutls_hash(td, salt, salt_size);
-    _gnutls_hash(td, res, 20);	/* 20 bytes is the output of sha1 */
+  _gnutls_hash (td, salt, salt_size);
+  _gnutls_hash (td, res, 20);	/* 20 bytes is the output of sha1 */
 
-    _gnutls_hash_deinit(td, digest);
+  _gnutls_hash_deinit (td, digest);
 
-    return 0;
+  return 0;
 }
 
-int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
-		       size_t salt_size, size_t * size, void *digest)
+int
+_gnutls_calc_srp_x (char *username, char *password, opaque * salt,
+		    size_t salt_size, size_t * size, void *digest)
 {
 
-    return _gnutls_calc_srp_sha(username, password, salt,
-				salt_size, size, digest);
+  return _gnutls_calc_srp_sha (username, password, salt,
+			       salt_size, size, digest);
 }
 
 
 /* S = (B - k*g^x) ^ (a + u * x) % N
  * this is our shared key (client premaster secret)
  */
-mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
-			  mpi_t a, mpi_t u, mpi_t n)
+mpi_t
+_gnutls_calc_srp_S2 (mpi_t B, mpi_t g, mpi_t x, mpi_t a, mpi_t u, mpi_t n)
 {
-    mpi_t S = NULL, tmp1 = NULL, tmp2 = NULL;
-    mpi_t tmp4 = NULL, tmp3 = NULL, k = NULL;
+  mpi_t S = NULL, tmp1 = NULL, tmp2 = NULL;
+  mpi_t tmp4 = NULL, tmp3 = NULL, k = NULL;
 
-    S = _gnutls_mpi_alloc_like(n);
-    if (S == NULL)
-	return NULL;
-
-    tmp1 = _gnutls_mpi_alloc_like(n);
-    tmp2 = _gnutls_mpi_alloc_like(n);
-    tmp3 = _gnutls_mpi_alloc_like(n);
-    if (tmp1 == NULL || tmp2 == NULL || tmp3 == NULL) {
-	goto freeall;
-    }
-
-    k = _gnutls_calc_srp_u(n, g, n);
-    if (k == NULL) {
-	gnutls_assert();
-	goto freeall;
-    }
-
-    _gnutls_mpi_powm(tmp1, g, x, n);	/* g^x */
-    _gnutls_mpi_mulm(tmp3, tmp1, k, n);	/* k*g^x mod n */
-    _gnutls_mpi_subm(tmp2, B, tmp3, n);
-
-    tmp4 = _gnutls_mpi_alloc_like(n);
-    if (tmp4 == NULL)
-	goto freeall;
-
-    _gnutls_mpi_mul(tmp1, u, x);
-    _gnutls_mpi_add(tmp4, a, tmp1);
-    _gnutls_mpi_powm(S, tmp2, tmp4, n);
-
-    _gnutls_mpi_release(&tmp1);
-    _gnutls_mpi_release(&tmp2);
-    _gnutls_mpi_release(&tmp3);
-    _gnutls_mpi_release(&tmp4);
-    _gnutls_mpi_release(&k);
-
-    return S;
-
-  freeall:
-    _gnutls_mpi_release(&k);
-    _gnutls_mpi_release(&tmp1);
-    _gnutls_mpi_release(&tmp2);
-    _gnutls_mpi_release(&tmp3);
-    _gnutls_mpi_release(&tmp4);
-    _gnutls_mpi_release(&S);
+  S = _gnutls_mpi_alloc_like (n);
+  if (S == NULL)
     return NULL;
+
+  tmp1 = _gnutls_mpi_alloc_like (n);
+  tmp2 = _gnutls_mpi_alloc_like (n);
+  tmp3 = _gnutls_mpi_alloc_like (n);
+  if (tmp1 == NULL || tmp2 == NULL || tmp3 == NULL)
+    {
+      goto freeall;
+    }
+
+  k = _gnutls_calc_srp_u (n, g, n);
+  if (k == NULL)
+    {
+      gnutls_assert ();
+      goto freeall;
+    }
+
+  _gnutls_mpi_powm (tmp1, g, x, n);	/* g^x */
+  _gnutls_mpi_mulm (tmp3, tmp1, k, n);	/* k*g^x mod n */
+  _gnutls_mpi_subm (tmp2, B, tmp3, n);
+
+  tmp4 = _gnutls_mpi_alloc_like (n);
+  if (tmp4 == NULL)
+    goto freeall;
+
+  _gnutls_mpi_mul (tmp1, u, x);
+  _gnutls_mpi_add (tmp4, a, tmp1);
+  _gnutls_mpi_powm (S, tmp2, tmp4, n);
+
+  _gnutls_mpi_release (&tmp1);
+  _gnutls_mpi_release (&tmp2);
+  _gnutls_mpi_release (&tmp3);
+  _gnutls_mpi_release (&tmp4);
+  _gnutls_mpi_release (&k);
+
+  return S;
+
+freeall:
+  _gnutls_mpi_release (&k);
+  _gnutls_mpi_release (&tmp1);
+  _gnutls_mpi_release (&tmp2);
+  _gnutls_mpi_release (&tmp3);
+  _gnutls_mpi_release (&tmp4);
+  _gnutls_mpi_release (&S);
+  return NULL;
 }
 
 /**
@@ -383,11 +407,12 @@ mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
   * this helper function is provided in order to free (deallocate) it.
   *
   **/
-void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
+void
+gnutls_srp_free_client_credentials (gnutls_srp_client_credentials_t sc)
 {
-    gnutls_free(sc->username);
-    gnutls_free(sc->password);
-    gnutls_free(sc);
+  gnutls_free (sc->username);
+  gnutls_free (sc->password);
+  gnutls_free (sc);
 }
 
 /**
@@ -399,15 +424,15 @@ void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
   *
   * Returns 0 on success.
   **/
-int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t
-					   * sc)
+int
+gnutls_srp_allocate_client_credentials (gnutls_srp_client_credentials_t * sc)
 {
-    *sc = gnutls_calloc(1, sizeof(srp_client_credentials_st));
+  *sc = gnutls_calloc (1, sizeof (srp_client_credentials_st));
 
-    if (*sc == NULL)
-	return GNUTLS_E_MEMORY_ERROR;
+  if (*sc == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -422,26 +447,29 @@ int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t
   *
   * Returns 0 on success.
   **/
-int gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res,
-				      char *username, char *password)
+int
+gnutls_srp_set_client_credentials (gnutls_srp_client_credentials_t res,
+				   char *username, char *password)
 {
 
-    if (username == NULL || password == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (username == NULL || password == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    res->username = gnutls_strdup(username);
-    if (res->username == NULL)
-	return GNUTLS_E_MEMORY_ERROR;
+  res->username = gnutls_strdup (username);
+  if (res->username == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
 
-    res->password = gnutls_strdup(password);
-    if (res->password == NULL) {
-	gnutls_free(res->username);
-	return GNUTLS_E_MEMORY_ERROR;
+  res->password = gnutls_strdup (password);
+  if (res->password == NULL)
+    {
+      gnutls_free (res->username);
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -452,12 +480,13 @@ int gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res,
   * this helper function is provided in order to free (deallocate) it.
   *
   **/
-void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
+void
+gnutls_srp_free_server_credentials (gnutls_srp_server_credentials_t sc)
 {
-    gnutls_free(sc->password_file);
-    gnutls_free(sc->password_conf_file);
+  gnutls_free (sc->password_file);
+  gnutls_free (sc->password_conf_file);
 
-    gnutls_free(sc);
+  gnutls_free (sc);
 }
 
 /**
@@ -469,15 +498,15 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
   * 
   * Returns 0 on success.
   **/
-int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t
-					   * sc)
+int
+gnutls_srp_allocate_server_credentials (gnutls_srp_server_credentials_t * sc)
 {
-    *sc = gnutls_calloc(1, sizeof(srp_server_cred_st));
+  *sc = gnutls_calloc (1, sizeof (srp_server_cred_st));
 
-    if (*sc == NULL)
-	return GNUTLS_E_MEMORY_ERROR;
+  if (*sc == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -492,42 +521,48 @@ int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t
   * Returns 0 on success.
   *
   **/
-int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
-					   res, const char *password_file,
-					   const char *password_conf_file)
+int
+gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t
+					res, const char *password_file,
+					const char *password_conf_file)
 {
 
-    if (password_file == NULL || password_conf_file == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (password_file == NULL || password_conf_file == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    /* Check if the files can be opened */
-    if (_gnutls_file_exists(password_file) != 0) {
-	gnutls_assert();
-	return GNUTLS_E_FILE_ERROR;
+  /* Check if the files can be opened */
+  if (_gnutls_file_exists (password_file) != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_FILE_ERROR;
     }
 
-    if (_gnutls_file_exists(password_conf_file) != 0) {
-	gnutls_assert();
-	return GNUTLS_E_FILE_ERROR;
+  if (_gnutls_file_exists (password_conf_file) != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_FILE_ERROR;
     }
 
-    res->password_file = gnutls_strdup(password_file);
-    if (res->password_file == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
+  res->password_file = gnutls_strdup (password_file);
+  if (res->password_file == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    res->password_conf_file = gnutls_strdup(password_conf_file);
-    if (res->password_conf_file == NULL) {
-	gnutls_assert();
-	gnutls_free(res->password_file);
-	res->password_file = NULL;
-	return GNUTLS_E_MEMORY_ERROR;
+  res->password_conf_file = gnutls_strdup (password_conf_file);
+  if (res->password_conf_file == NULL)
+    {
+      gnutls_assert ();
+      gnutls_free (res->password_file);
+      res->password_file = NULL;
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    return 0;
+  return 0;
 }
 
 
@@ -561,12 +596,12 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
   *
   **/
 void
-gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
-					   cred,
-					   gnutls_srp_server_credentials_function
-					   * func)
+gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
+					    cred,
+					    gnutls_srp_server_credentials_function
+					    * func)
 {
-    cred->pwd_callback = func;
+  cred->pwd_callback = func;
 }
 
 /**
@@ -601,12 +636,12 @@ gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
   *
   **/
 void
-gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials_t
-					   cred,
-					   gnutls_srp_client_credentials_function
-					   * func)
+gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t
+					    cred,
+					    gnutls_srp_client_credentials_function
+					    * func)
 {
-    cred->get_function = func;
+  cred->get_function = func;
 }
 
 
@@ -619,16 +654,17 @@ gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials_t
   * Returns NULL in case of an error.
   *
   **/
-const char *gnutls_srp_server_get_username(gnutls_session_t session)
+const char *
+gnutls_srp_server_get_username (gnutls_session_t session)
 {
-    srp_server_auth_info_t info;
+  srp_server_auth_info_t info;
 
-    CHECK_AUTH(GNUTLS_CRD_SRP, NULL);
+  CHECK_AUTH (GNUTLS_CRD_SRP, NULL);
 
-    info = _gnutls_get_auth_info(session);
-    if (info == NULL)
-	return NULL;
-    return info->username;
+  info = _gnutls_get_auth_info (session);
+  if (info == NULL)
+    return NULL;
+  return info->username;
 }
 
 /**
@@ -648,43 +684,48 @@ const char *gnutls_srp_server_get_username(gnutls_session_t session)
   * binary format.
   *
   **/
-int gnutls_srp_verifier(const char *username, const char *password,
-			const gnutls_datum_t * salt,
-			const gnutls_datum_t * generator,
-			const gnutls_datum_t * prime, gnutls_datum_t * res)
+int
+gnutls_srp_verifier (const char *username, const char *password,
+		     const gnutls_datum_t * salt,
+		     const gnutls_datum_t * generator,
+		     const gnutls_datum_t * prime, gnutls_datum_t * res)
 {
-    mpi_t _n, _g;
-    int ret;
-    size_t digest_size = 20, size;
-    opaque digest[20];
+  mpi_t _n, _g;
+  int ret;
+  size_t digest_size = 20, size;
+  opaque digest[20];
 
-    ret = _gnutls_calc_srp_sha(username, password, salt->data,
-			       salt->size, &digest_size, digest);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret = _gnutls_calc_srp_sha (username, password, salt->data,
+			      salt->size, &digest_size, digest);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    size = prime->size;
-    if (_gnutls_mpi_scan_nz(&_n, prime->data, &size)) {
-	gnutls_assert();
-	return GNUTLS_E_MPI_SCAN_FAILED;
+  size = prime->size;
+  if (_gnutls_mpi_scan_nz (&_n, prime->data, &size))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-    size = generator->size;
-    if (_gnutls_mpi_scan_nz(&_g, generator->data, &size)) {
-	gnutls_assert();
-	return GNUTLS_E_MPI_SCAN_FAILED;
+  size = generator->size;
+  if (_gnutls_mpi_scan_nz (&_g, generator->data, &size))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-    ret = _gnutls_srp_gx(digest, 20, &res->data, _g, _n, malloc);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret = _gnutls_srp_gx (digest, 20, &res->data, _g, _n, malloc);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
-    res->size = ret;
+  res->size = ret;
 
-    return 0;
+  return 0;
 }
 
-#endif				/* ENABLE_SRP */
+#endif /* ENABLE_SRP */

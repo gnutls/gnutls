@@ -24,20 +24,21 @@
 
 #include <gnutls_int.h>
 
-const char *_gnutls_extension_get_name(uint16 type);
-int _gnutls_parse_extensions(gnutls_session_t, const opaque *, int);
-int _gnutls_gen_extensions(gnutls_session_t session, opaque * data,
-			   size_t data_size);
+const char *_gnutls_extension_get_name (uint16 type);
+int _gnutls_parse_extensions (gnutls_session_t, const opaque *, int);
+int _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
+			    size_t data_size);
 
 typedef int (*ext_recv_func) (gnutls_session_t, const opaque *, size_t);	/* recv data */
 typedef int (*ext_send_func) (gnutls_session_t, opaque *, size_t);	/* send data */
 
-ext_send_func _gnutls_ext_func_send(uint16 type);
-ext_recv_func _gnutls_ext_func_recv(uint16 type);
+ext_send_func _gnutls_ext_func_send (uint16 type);
+ext_recv_func _gnutls_ext_func_recv (uint16 type);
 
-typedef struct {
-    const char *name;
-    uint16 type;
-    ext_recv_func gnutls_ext_func_recv;
-    ext_send_func gnutls_ext_func_send;
+typedef struct
+{
+  const char *name;
+  uint16 type;
+  ext_recv_func gnutls_ext_func_recv;
+  ext_send_func gnutls_ext_func_send;
 } gnutls_extension_entry;

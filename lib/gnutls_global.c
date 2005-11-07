@@ -51,9 +51,10 @@ ASN1_TYPE _gnutls_gnutls_asn;
   * gnutls_log_func is of the form, 
   * void (*gnutls_log_func)( int level, const char*);
   **/
-void gnutls_global_set_log_function(gnutls_log_func log_func)
+void
+gnutls_global_set_log_function (gnutls_log_func log_func)
 {
-    _gnutls_log_func = log_func;
+  _gnutls_log_func = log_func;
 }
 
 /**
@@ -68,17 +69,19 @@ void gnutls_global_set_log_function(gnutls_log_func log_func)
   * Use a log level over 10 to enable all debugging options.
   *
   **/
-void gnutls_global_set_log_level(int level)
+void
+gnutls_global_set_log_level (int level)
 {
-    _gnutls_log_level = level;
+  _gnutls_log_level = level;
 }
 
 
 #ifdef DEBUG
 /* default logging function */
-static void dlog(int level, const char *str)
+static void
+dlog (int level, const char *str)
 {
-    fputs(str, stderr);
+  fputs (str, stderr);
 }
 #endif
 
@@ -90,7 +93,7 @@ extern gnutls_realloc_function gnutls_realloc;
 extern char *(*gnutls_strdup) (const char *);
 extern void *(*gnutls_calloc) (size_t, size_t);
 
-int _gnutls_is_secure_mem_null(const void *);
+int _gnutls_is_secure_mem_null (const void *);
 
 /**
   * gnutls_global_set_mem_functions - This function sets the memory allocation functions
@@ -109,41 +112,46 @@ int _gnutls_is_secure_mem_null(const void *);
   * This function must be called before gnutls_global_init() is called.
   *
   **/
-void gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
-				     gnutls_alloc_function
-				     secure_alloc_func,
-				     gnutls_is_secure_function
-				     is_secure_func,
-				     gnutls_realloc_function realloc_func,
-				     gnutls_free_function free_func)
+void
+gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
+				 gnutls_alloc_function
+				 secure_alloc_func,
+				 gnutls_is_secure_function
+				 is_secure_func,
+				 gnutls_realloc_function realloc_func,
+				 gnutls_free_function free_func)
 {
-    gnutls_secure_malloc = secure_alloc_func;
-    gnutls_malloc = alloc_func;
-    gnutls_realloc = realloc_func;
-    gnutls_free = free_func;
+  gnutls_secure_malloc = secure_alloc_func;
+  gnutls_malloc = alloc_func;
+  gnutls_realloc = realloc_func;
+  gnutls_free = free_func;
 
-    if (is_secure_func != NULL)
-	_gnutls_is_secure_memory = is_secure_func;
-    else
-	_gnutls_is_secure_memory = _gnutls_is_secure_mem_null;
+  if (is_secure_func != NULL)
+    _gnutls_is_secure_memory = is_secure_func;
+  else
+    _gnutls_is_secure_memory = _gnutls_is_secure_mem_null;
 
-    /* if using the libc's default malloc
-     * use libc's calloc as well.
-     */
-    if (gnutls_malloc == malloc) {
-	gnutls_calloc = calloc;
-    } else {			/* use the included ones */
-	gnutls_calloc = _gnutls_calloc;
+  /* if using the libc's default malloc
+   * use libc's calloc as well.
+   */
+  if (gnutls_malloc == malloc)
+    {
+      gnutls_calloc = calloc;
     }
-    gnutls_strdup = _gnutls_strdup;
+  else
+    {				/* use the included ones */
+      gnutls_calloc = _gnutls_calloc;
+    }
+  gnutls_strdup = _gnutls_strdup;
 
 }
 
 #ifdef DEBUG
-static void _gnutls_gcry_log_handler(void *dummy, int level,
-				     const char *fmt, va_list list)
+static void
+_gnutls_gcry_log_handler (void *dummy, int level,
+			  const char *fmt, va_list list)
 {
-    _gnutls_log(fmt, list);
+  _gnutls_log (fmt, list);
 }
 #endif
 
@@ -164,82 +172,92 @@ static int _gnutls_init = 0;
   * want to disable libgcrypt's internal lockings etc.
   *
   **/
-int gnutls_global_init(void)
+int
+gnutls_global_init (void)
 {
-    int result = 0;
-    int res;
+  int result = 0;
+  int res;
 
-    if (_gnutls_init)
-	goto out;
-    _gnutls_init++;
+  if (_gnutls_init)
+    goto out;
+  _gnutls_init++;
 
-    if (gcry_control( GCRYCTL_ANY_INITIALIZATION_P) == 0) {
-      const char* p;
-      p = strchr( GNUTLS_GCRYPT_VERSION, ':');
-      if (p==NULL) p = GNUTLS_GCRYPT_VERSION;
-      else p++;
+  if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
+    {
+      const char *p;
+      p = strchr (GNUTLS_GCRYPT_VERSION, ':');
+      if (p == NULL)
+	p = GNUTLS_GCRYPT_VERSION;
+      else
+	p++;
 
-      if (gcry_check_version(p)==NULL) {
-	gnutls_assert();
-	_gnutls_debug_log("Checking for libgcrypt failed '%s'\n", p);
-	return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
-      }
+      if (gcry_check_version (p) == NULL)
+	{
+	  gnutls_assert ();
+	  _gnutls_debug_log ("Checking for libgcrypt failed '%s'\n", p);
+	  return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
+	}
 
       /* for gcrypt in order to be able to allocate memory */
-      gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
+      gcry_set_allocation_handler (gnutls_malloc, gnutls_secure_malloc,
+				   _gnutls_is_secure_memory, gnutls_realloc,
+				   gnutls_free);
 
       /* gcry_control (GCRYCTL_DISABLE_INTERNAL_LOCKING, NULL, 0); */
 
-      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL,0);
+      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
 
 #ifdef DEBUG
       /* applications may want to override that, so we only use
        * it in debugging mode.
        */
-      gcry_set_log_handler( _gnutls_gcry_log_handler, NULL);
+      gcry_set_log_handler (_gnutls_gcry_log_handler, NULL);
 #endif
     }
 
-    if (gc_init() != GC_OK) {
-	gnutls_assert();
-	_gnutls_debug_log("Initializing crypto backend failed\n");
-	return GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY;
+  if (gc_init () != GC_OK)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Initializing crypto backend failed\n");
+      return GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY;
     }
 
-    /* for gcrypt in order to be able to allocate memory */
-    gc_set_allocators(gnutls_malloc, gnutls_secure_malloc,
-		      _gnutls_is_secure_memory,
-		      gnutls_realloc, gnutls_free);
+  /* for gcrypt in order to be able to allocate memory */
+  gc_set_allocators (gnutls_malloc, gnutls_secure_malloc,
+		     _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
 
 #ifdef DEBUG
-    gnutls_global_set_log_function(dlog);
+  gnutls_global_set_log_function (dlog);
 #endif
 
-    /* initialize parser 
-     * This should not deal with files in the final
-     * version.
-     */
+  /* initialize parser 
+   * This should not deal with files in the final
+   * version.
+   */
 
-    if (asn1_check_version(GNUTLS_LIBTASN1_VERSION) == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
+  if (asn1_check_version (GNUTLS_LIBTASN1_VERSION) == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
     }
 
-    res = asn1_array2tree(pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
-    if (res != ASN1_SUCCESS) {
-	result = _gnutls_asn2err(res);
-	goto out;
+  res = asn1_array2tree (pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
+  if (res != ASN1_SUCCESS)
+    {
+      result = _gnutls_asn2err (res);
+      goto out;
     }
 
-    res = asn1_array2tree(gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
-    if (res != ASN1_SUCCESS) {
-	asn1_delete_structure(&_gnutls_pkix1_asn);
-	result = _gnutls_asn2err(res);
-	goto out;
+  res = asn1_array2tree (gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
+  if (res != ASN1_SUCCESS)
+    {
+      asn1_delete_structure (&_gnutls_pkix1_asn);
+      result = _gnutls_asn2err (res);
+      goto out;
     }
 
-  out:
-    return result;
+out:
+  return result;
 }
 
 /**
@@ -250,13 +268,15 @@ int gnutls_global_init(void)
   *
   **/
 
-void gnutls_global_deinit(void)
+void
+gnutls_global_deinit (void)
 {
 
-    if (_gnutls_init == 1) {
-	_gnutls_init--;
-	asn1_delete_structure(&_gnutls_gnutls_asn);
-	asn1_delete_structure(&_gnutls_pkix1_asn);
+  if (_gnutls_init == 1)
+    {
+      _gnutls_init--;
+      asn1_delete_structure (&_gnutls_gnutls_asn);
+      asn1_delete_structure (&_gnutls_pkix1_asn);
     }
 
 }
@@ -279,10 +299,11 @@ void gnutls_global_deinit(void)
   * PULL_FUNC is of the form, 
   * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
   **/
-void gnutls_transport_set_pull_function(gnutls_session_t session,
-					gnutls_pull_func pull_func)
+void
+gnutls_transport_set_pull_function (gnutls_session_t session,
+				    gnutls_pull_func pull_func)
 {
-    session->internals._gnutls_pull_func = pull_func;
+  session->internals._gnutls_pull_func = pull_func;
 }
 
 /**
@@ -299,47 +320,50 @@ void gnutls_transport_set_pull_function(gnutls_session_t session,
   * PUSH_FUNC is of the form, 
   * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
   **/
-void gnutls_transport_set_push_function(gnutls_session_t session,
-					gnutls_push_func push_func)
+void
+gnutls_transport_set_push_function (gnutls_session_t session,
+				    gnutls_push_func push_func)
 {
-    session->internals._gnutls_push_func = push_func;
+  session->internals._gnutls_push_func = push_func;
 }
 
 
 /* Taken from libgcrypt. Needed to configure scripts.
  */
 
-static const char *parse_version_number(const char *s, int *number)
+static const char *
+parse_version_number (const char *s, int *number)
 {
-    int val = 0;
+  int val = 0;
 
-    if (*s == '0' && isdigit(s[1]))
-	return NULL;		/* leading zeros are not allowed */
-    for (; isdigit(*s); s++) {
-	val *= 10;
-	val += *s - '0';
+  if (*s == '0' && isdigit (s[1]))
+    return NULL;		/* leading zeros are not allowed */
+  for (; isdigit (*s); s++)
+    {
+      val *= 10;
+      val += *s - '0';
     }
-    *number = val;
-    return val < 0 ? NULL : s;
+  *number = val;
+  return val < 0 ? NULL : s;
 }
 
 /* The parse version functions were copied from libgcrypt.
  */
-static const char *parse_version_string(const char *s, int *major,
-					int *minor, int *micro)
+static const char *
+parse_version_string (const char *s, int *major, int *minor, int *micro)
 {
-    s = parse_version_number(s, major);
-    if (!s || *s != '.')
-	return NULL;
-    s++;
-    s = parse_version_number(s, minor);
-    if (!s || *s != '.')
-	return NULL;
-    s++;
-    s = parse_version_number(s, micro);
-    if (!s)
-	return NULL;
-    return s;			/* patchlevel */
+  s = parse_version_number (s, major);
+  if (!s || *s != '.')
+    return NULL;
+  s++;
+  s = parse_version_number (s, minor);
+  if (!s || *s != '.')
+    return NULL;
+  s++;
+  s = parse_version_number (s, micro);
+  if (!s)
+    return NULL;
+  return s;			/* patchlevel */
 }
 
 /**
@@ -352,31 +376,33 @@ static const char *parse_version_string(const char *s, int *major,
   * but the version string is simply returned.
   *
   **/
-const char *gnutls_check_version(const char *req_version)
+const char *
+gnutls_check_version (const char *req_version)
 {
-    const char *ver = VERSION;
-    int my_major, my_minor, my_micro;
-    int rq_major, rq_minor, rq_micro;
-    const char *my_plvl, *rq_plvl;
+  const char *ver = VERSION;
+  int my_major, my_minor, my_micro;
+  int rq_major, rq_minor, rq_micro;
+  const char *my_plvl, *rq_plvl;
 
-    if (!req_version)
-	return ver;
+  if (!req_version)
+    return ver;
 
-    my_plvl = parse_version_string(ver, &my_major, &my_minor, &my_micro);
-    if (!my_plvl)
-	return NULL;		/* very strange our own version is bogus */
-    rq_plvl = parse_version_string(req_version, &rq_major, &rq_minor,
-				   &rq_micro);
-    if (!rq_plvl)
-	return NULL;		/* req version string is invalid */
+  my_plvl = parse_version_string (ver, &my_major, &my_minor, &my_micro);
+  if (!my_plvl)
+    return NULL;		/* very strange our own version is bogus */
+  rq_plvl = parse_version_string (req_version, &rq_major, &rq_minor,
+				  &rq_micro);
+  if (!rq_plvl)
+    return NULL;		/* req version string is invalid */
 
-    if (my_major > rq_major
-	|| (my_major == rq_major && my_minor > rq_minor)
-	|| (my_major == rq_major && my_minor == rq_minor
-	    && my_micro > rq_micro)
-	|| (my_major == rq_major && my_minor == rq_minor
-	    && my_micro == rq_micro && strcmp(my_plvl, rq_plvl) >= 0)) {
-	return ver;
+  if (my_major > rq_major
+      || (my_major == rq_major && my_minor > rq_minor)
+      || (my_major == rq_major && my_minor == rq_minor
+	  && my_micro > rq_micro)
+      || (my_major == rq_major && my_minor == rq_minor
+	  && my_micro == rq_micro && strcmp (my_plvl, rq_plvl) >= 0))
+    {
+      return ver;
     }
-    return NULL;
+  return NULL;
 }

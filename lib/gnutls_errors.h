@@ -33,12 +33,12 @@
 # else
 #  define gnutls_assert()
 # endif
-#else				/* __FILE__ not defined */
+#else /* __FILE__ not defined */
 # define gnutls_assert()
 #endif
 
-int _gnutls_asn2err(int asn_err);
-void _gnutls_log(int, const char *fmt, ...);
+int _gnutls_asn2err (int asn_err);
+void _gnutls_log (int, const char *fmt, ...);
 
 extern int _gnutls_log_level;
 
@@ -69,6 +69,6 @@ extern int _gnutls_log_level;
 # define _gnutls_write_log _gnutls_null_log
 # define _gnutls_x509_log _gnutls_null_log
 
-void _gnutls_null_log(void *, ...);
+void _gnutls_null_log (void *, ...);
 
-#endif				/* C99_MACROS */
+#endif /* C99_MACROS */

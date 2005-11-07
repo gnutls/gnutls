@@ -24,6 +24,7 @@
 
 #include <gnutls/x509.h>
 
-typedef struct gnutls_x509_crq_int {
+typedef struct gnutls_x509_crq_int
+{
   ASN1_TYPE crq;
 } gnutls_x509_crq_int;

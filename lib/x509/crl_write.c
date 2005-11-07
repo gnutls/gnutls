@@ -42,7 +42,7 @@
 #include <extensions.h>
 #include <libtasn1.h>
 
-static void disable_optional_stuff(gnutls_x509_crl_t crl);
+static void disable_optional_stuff (gnutls_x509_crl_t crl);
 
 /**
   * gnutls_x509_crl_set_version - This function will set the CRL version
@@ -56,28 +56,30 @@ static void disable_optional_stuff(gnutls_x509_crl_t crl);
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl,
-				unsigned int version)
+int
+gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
 {
-    int result;
-    char null = version;
+  int result;
+  char null = version;
 
-    if (crl == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    null -= 1;
-    if (null < 0)
-	null = 0;
+  null -= 1;
+  if (null < 0)
+    null = 0;
 
-    result = asn1_write_value(crl->crl, "tbsCertList.version", &null, 1);
-    if (result != ASN1_SUCCESS) {
-	gnutls_assert();
-	return _gnutls_asn2err(result);
+  result = asn1_write_value (crl->crl, "tbsCertList.version", &null, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
     }
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -97,28 +99,32 @@ int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
-    gnutls_x509_privkey_t issuer_key, gnutls_digest_algorithm_t dig, unsigned int flags)
+int
+gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
+		       gnutls_x509_privkey_t issuer_key,
+		       gnutls_digest_algorithm_t dig, unsigned int flags)
 {
-    int result;
+  int result;
 
-    if (crl == NULL || issuer == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (crl == NULL || issuer == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    /* disable all the unneeded OPTIONAL fields.
-     */
-    disable_optional_stuff(crl);
+  /* disable all the unneeded OPTIONAL fields.
+   */
+  disable_optional_stuff (crl);
 
-    result = _gnutls_x509_pkix_sign(crl->crl, "tbsCertList", 
-        dig, issuer, issuer_key);
-    if (result < 0) {
-	gnutls_assert();
-	return result;
+  result = _gnutls_x509_pkix_sign (crl->crl, "tbsCertList",
+				   dig, issuer, issuer_key);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
     }
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -133,10 +139,11 @@ int gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
-    gnutls_x509_privkey_t issuer_key)
+int
+gnutls_x509_crl_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
+		      gnutls_x509_privkey_t issuer_key)
 {
-    return gnutls_x509_crl_sign2( crl, issuer, issuer_key, GNUTLS_DIG_SHA1, 0);
+  return gnutls_x509_crl_sign2 (crl, issuer, issuer_key, GNUTLS_DIG_SHA1, 0);
 }
 
 /**
@@ -149,15 +156,16 @@ int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_this_update(gnutls_x509_crl_t crl, time_t act_time)
+int
+gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl, time_t act_time)
 {
-    if (crl == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    return _gnutls_x509_set_time(crl->crl, "tbsCertList.thisUpdate",
-				 act_time);
+  return _gnutls_x509_set_time (crl->crl, "tbsCertList.thisUpdate", act_time);
 }
 
 /**
@@ -170,14 +178,15 @@ int gnutls_x509_crl_set_this_update(gnutls_x509_crl_t crl, time_t act_time)
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_next_update(gnutls_x509_crl_t crl, time_t exp_time)
+int
+gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl, time_t exp_time)
 {
-    if (crl == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
-    return _gnutls_x509_set_time(crl->crl, "tbsCertList.nextUpdate",
-				 exp_time);
+  return _gnutls_x509_set_time (crl->crl, "tbsCertList.nextUpdate", exp_time);
 }
 
 /**
@@ -192,53 +201,58 @@ int gnutls_x509_crl_set_next_update(gnutls_x509_crl_t crl, time_t exp_time)
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl_t crl,
-				   const void *serial, size_t serial_size,
-				   time_t revocation_time)
+int
+gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
+				const void *serial, size_t serial_size,
+				time_t revocation_time)
 {
-    int ret;
+  int ret;
 
-    if (crl == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    ret =
-	asn1_write_value(crl->crl, "tbsCertList.revokedCertificates",
-			 "NEW", 1);
-    if (ret != ASN1_SUCCESS) {
-	gnutls_assert();
-	return _gnutls_asn2err(ret);
+  ret =
+    asn1_write_value (crl->crl, "tbsCertList.revokedCertificates", "NEW", 1);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
     }
 
-    ret =
-	asn1_write_value(crl->crl,
-			 "tbsCertList.revokedCertificates.?LAST.userCertificate",
-			 serial, serial_size);
-    if (ret != ASN1_SUCCESS) {
-	gnutls_assert();
-	return _gnutls_asn2err(ret);
+  ret =
+    asn1_write_value (crl->crl,
+		      "tbsCertList.revokedCertificates.?LAST.userCertificate",
+		      serial, serial_size);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
     }
 
-    ret =
-	_gnutls_x509_set_time(crl->crl,
-			      "tbsCertList.revokedCertificates.?LAST.revocationDate",
-			      revocation_time);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret =
+    _gnutls_x509_set_time (crl->crl,
+			   "tbsCertList.revokedCertificates.?LAST.revocationDate",
+			   revocation_time);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    ret =
-	asn1_write_value(crl->crl,
-			 "tbsCertList.revokedCertificates.?LAST.crlEntryExtensions",
-			 NULL, 0);
-    if (ret != ASN1_SUCCESS) {
-	gnutls_assert();
-	return _gnutls_asn2err(ret);
+  ret =
+    asn1_write_value (crl->crl,
+		      "tbsCertList.revokedCertificates.?LAST.crlEntryExtensions",
+		      NULL, 0);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
     }
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -252,46 +266,51 @@ int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl_t crl,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_crt(gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
-			    time_t revocation_time)
+int
+gnutls_x509_crl_set_crt (gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
+			 time_t revocation_time)
 {
-    int ret;
-    opaque serial[128];
-    size_t serial_size;
+  int ret;
+  opaque serial[128];
+  size_t serial_size;
 
-    if (crl == NULL || crt == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (crl == NULL || crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    serial_size = sizeof(serial);
-    ret = gnutls_x509_crt_get_serial(crt, serial, &serial_size);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  serial_size = sizeof (serial);
+  ret = gnutls_x509_crt_get_serial (crt, serial, &serial_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    ret =
-	gnutls_x509_crl_set_crt_serial(crl, serial, serial_size,
-				       revocation_time);
-    if (ret < 0) {
-	gnutls_assert();
-	return _gnutls_asn2err(ret);
+  ret =
+    gnutls_x509_crl_set_crt_serial (crl, serial, serial_size,
+				    revocation_time);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
     }
 
-    return 0;
+  return 0;
 }
 
 
 /* If OPTIONAL fields have not been initialized then
  * disable them.
  */
-static void disable_optional_stuff(gnutls_x509_crl_t crl)
+static void
+disable_optional_stuff (gnutls_x509_crl_t crl)
 {
 
-    asn1_write_value(crl->crl, "tbsCertList.crlExtensions", NULL, 0);
+  asn1_write_value (crl->crl, "tbsCertList.crlExtensions", NULL, 0);
 
-    return;
+  return;
 }
 
-#endif				/* ENABLE_PKI */
+#endif /* ENABLE_PKI */

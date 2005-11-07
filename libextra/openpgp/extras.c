@@ -45,14 +45,16 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring_t * keyring)
+int
+gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring)
 {
-    *keyring = gnutls_calloc(1, sizeof(gnutls_openpgp_keyring_int));
+  *keyring = gnutls_calloc (1, sizeof (gnutls_openpgp_keyring_int));
 
-    if (*keyring) {
-	return 0;		/* success */
+  if (*keyring)
+    {
+      return 0;			/* success */
     }
-    return GNUTLS_E_MEMORY_ERROR;
+  return GNUTLS_E_MEMORY_ERROR;
 }
 
 /**
@@ -62,17 +64,19 @@ int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring_t * keyring)
   * This function will deinitialize a CRL structure. 
   *
   **/
-void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring_t keyring)
+void
+gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
 {
-    if (!keyring)
-	return;
+  if (!keyring)
+    return;
 
-    if (keyring->hd) {
-	cdk_free(keyring->hd);
-	keyring->hd = NULL;
+  if (keyring->hd)
+    {
+      cdk_free (keyring->hd);
+      keyring->hd = NULL;
     }
 
-    gnutls_free(keyring);
+  gnutls_free (keyring);
 }
 
 /**
@@ -86,22 +90,23 @@ void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring_t keyring)
  * Returns 0 on success (if keyid exists) and a negative error code
  * on failure.
  */
-int gnutls_openpgp_keyring_check_id(gnutls_openpgp_keyring_t ring,
-				    const unsigned char keyid[8],
-				    unsigned int flags)
+int
+gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
+				 const unsigned char keyid[8],
+				 unsigned int flags)
 {
-    int rc;
-    cdk_pkt_pubkey_t sig_pk;
-    uint32 id[2];
+  int rc;
+  cdk_pkt_pubkey_t sig_pk;
+  uint32 id[2];
 
-    id[0] = _gnutls_read_uint32(keyid);
-    id[1] = _gnutls_read_uint32(&keyid[4]);
+  id[0] = _gnutls_read_uint32 (keyid);
+  id[1] = _gnutls_read_uint32 (&keyid[4]);
 
-    rc = cdk_keydb_get_pk(ring->hd, id, &sig_pk);
-    if (!rc)
-	return 0;
-    else
-	return GNUTLS_E_NO_CERTIFICATE_FOUND;
+  rc = cdk_keydb_get_pk (ring->hd, id, &sig_pk);
+  if (!rc)
+    return 0;
+  else
+    return GNUTLS_E_NO_CERTIFICATE_FOUND;
 }
 
 /**
@@ -116,32 +121,35 @@ int gnutls_openpgp_keyring_check_id(gnutls_openpgp_keyring_t ring,
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
-				  const gnutls_datum_t * data,
-				  gnutls_openpgp_key_fmt_t format)
+int
+gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
+			       const gnutls_datum_t * data,
+			       gnutls_openpgp_key_fmt_t format)
 {
-    int rc;
-    keybox_blob *blob = NULL;
+  int rc;
+  keybox_blob *blob = NULL;
 
 
-    blob = kbx_read_blob(data, 0);
-    if (!blob) {
-	gnutls_assert();
-	return GNUTLS_E_OPENPGP_KEYRING_ERROR;
+  blob = kbx_read_blob (data, 0);
+  if (!blob)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_OPENPGP_KEYRING_ERROR;
     }
 
-    keyring->hd = kbx_to_keydb(blob);
-    if (!keyring->hd) {
-	gnutls_assert();
-	rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
-	goto leave;
+  keyring->hd = kbx_to_keydb (blob);
+  if (!keyring->hd)
+    {
+      gnutls_assert ();
+      rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
+      goto leave;
     }
 
-    rc = 0;
+  rc = 0;
 
-  leave:
-    kbx_blob_release(blob);
-    return rc;
+leave:
+  kbx_blob_release (blob);
+  return rc;
 }
 
 
@@ -157,14 +165,16 @@ int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb_t * trustdb)
+int
+gnutls_openpgp_trustdb_init (gnutls_openpgp_trustdb_t * trustdb)
 {
-    *trustdb = gnutls_calloc(1, sizeof(gnutls_openpgp_trustdb_int));
+  *trustdb = gnutls_calloc (1, sizeof (gnutls_openpgp_trustdb_int));
 
-    if (*trustdb) {
-	return 0;		/* success */
+  if (*trustdb)
+    {
+      return 0;			/* success */
     }
-    return GNUTLS_E_MEMORY_ERROR;
+  return GNUTLS_E_MEMORY_ERROR;
 }
 
 /**
@@ -174,17 +184,19 @@ int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb_t * trustdb)
   * This function will deinitialize a CRL structure. 
   *
   **/
-void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb_t trustdb)
+void
+gnutls_openpgp_trustdb_deinit (gnutls_openpgp_trustdb_t trustdb)
 {
-    if (!trustdb)
-	return;
+  if (!trustdb)
+    return;
 
-    if (trustdb->st) {
-	cdk_stream_close(trustdb->st);
-	trustdb->st = NULL;
+  if (trustdb->st)
+    {
+      cdk_stream_close (trustdb->st);
+      trustdb->st = NULL;
     }
 
-    gnutls_free(trustdb);
+  gnutls_free (trustdb);
 }
 
 /**
@@ -198,17 +210,19 @@ void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb_t trustdb)
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb_t trustdb,
-				       const char *file)
+int
+gnutls_openpgp_trustdb_import_file (gnutls_openpgp_trustdb_t trustdb,
+				    const char *file)
 {
-    int rc;
+  int rc;
 
-    rc = cdk_stream_open(file, &trustdb->st);
-    if (rc) {
-	rc = _gnutls_map_cdk_rc(rc);
-	gnutls_assert();
-	return rc;
+  rc = cdk_stream_open (file, &trustdb->st);
+  if (rc)
+    {
+      rc = _gnutls_map_cdk_rc (rc);
+      gnutls_assert ();
+      return rc;
     }
 
-    return 0;
+  return 0;
 }

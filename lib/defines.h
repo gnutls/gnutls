@@ -83,8 +83,9 @@ typedef signed int sint;
 /* some systems had problems with long long int, thus,
  * it is not used.
  */
-typedef struct {
-    unsigned char i[8];
+typedef struct
+{
+  unsigned char i[8];
 } uint64;
 
 #if SIZEOF_UNSIGNED_LONG == 4
@@ -114,4 +115,4 @@ typedef signed char int8;
 # error "Cannot find an 8 bit char in your system, sorry."
 #endif
 
-#endif				/* defines_h */
+#endif /* defines_h */

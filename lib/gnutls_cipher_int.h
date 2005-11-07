@@ -28,12 +28,12 @@
 #define cipher_hd_t gc_cipher_handle
 #define GNUTLS_CIPHER_FAILED NULL
 
-cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
-				const gnutls_datum_t * key,
-				const gnutls_datum_t * iv);
-int _gnutls_cipher_encrypt(cipher_hd_t handle, void *text, int textlen);
-int _gnutls_cipher_decrypt(cipher_hd_t handle, void *ciphertext,
-			   int ciphertextlen);
-void _gnutls_cipher_deinit(cipher_hd_t handle);
+cipher_hd_t _gnutls_cipher_init (gnutls_cipher_algorithm_t cipher,
+				 const gnutls_datum_t * key,
+				 const gnutls_datum_t * iv);
+int _gnutls_cipher_encrypt (cipher_hd_t handle, void *text, int textlen);
+int _gnutls_cipher_decrypt (cipher_hd_t handle, void *ciphertext,
+			    int ciphertextlen);
+void _gnutls_cipher_deinit (cipher_hd_t handle);
 
-#endif				/* GNUTLS_CIPHER_INT */
+#endif /* GNUTLS_CIPHER_INT */

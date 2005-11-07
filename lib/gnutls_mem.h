@@ -53,18 +53,18 @@ typedef void svoid;		/* for functions that allocate using gnutls_secure_malloc *
 #  define gnutls_alloca gnutls_malloc
 #  define gnutls_afree gnutls_free
 # endif
-#endif				/* HAVE_ALLOCA */
+#endif /* HAVE_ALLOCA */
 
 extern int (*_gnutls_is_secure_memory) (const void *);
 
 /* this realloc function will return ptr if size==0, and
  * will free the ptr if the new allocation failed.
  */
-void *gnutls_realloc_fast(void *ptr, size_t size);
+void *gnutls_realloc_fast (void *ptr, size_t size);
 
-svoid *gnutls_secure_calloc(size_t nmemb, size_t size);
+svoid *gnutls_secure_calloc (size_t nmemb, size_t size);
 
-void *_gnutls_calloc(size_t nmemb, size_t size);
-char *_gnutls_strdup(const char *);
+void *_gnutls_calloc (size_t nmemb, size_t size);
+char *_gnutls_strdup (const char *);
 
-#endif				/* GNUTLS_MEM_H */
+#endif /* GNUTLS_MEM_H */

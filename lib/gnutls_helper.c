@@ -24,15 +24,15 @@
 
 #include <gnutls_int.h>
 
-int _gnutls_file_exists(const char *file)
+int
+_gnutls_file_exists (const char *file)
 {
-    FILE *fd;
+  FILE *fd;
 
-    fd = fopen(file, "r");
-    if (fd == NULL)
-	return -1;
+  fd = fopen (file, "r");
+  if (fd == NULL)
+    return -1;
 
-    fclose(fd);
-    return 0;
+  fclose (fd);
+  return 0;
 }
-

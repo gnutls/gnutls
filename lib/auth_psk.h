@@ -27,23 +27,26 @@
 
 #include <gnutls_auth.h>
 
-typedef struct gnutls_psk_client_credentials_st {
-    gnutls_datum username;
-    gnutls_datum key;
-    gnutls_psk_client_credentials_function *get_function;
+typedef struct gnutls_psk_client_credentials_st
+{
+  gnutls_datum username;
+  gnutls_datum key;
+  gnutls_psk_client_credentials_function *get_function;
 } psk_client_credentials_st;
 
-typedef struct gnutls_psk_server_credentials_st {
-    char *password_file;
-    /* callback function, instead of reading the
-     * password files.
-     */
-    gnutls_psk_server_credentials_function *pwd_callback;
+typedef struct gnutls_psk_server_credentials_st
+{
+  char *password_file;
+  /* callback function, instead of reading the
+   * password files.
+   */
+  gnutls_psk_server_credentials_function *pwd_callback;
 } psk_server_cred_st;
 
 /* these structures should not use allocated data */
-typedef struct psk_server_auth_info_st {
-    char username[MAX_SRP_USERNAME+1];
+typedef struct psk_server_auth_info_st
+{
+  char username[MAX_SRP_USERNAME + 1];
 } *psk_server_auth_info_t;
 
 
@@ -51,6 +54,6 @@ typedef struct psk_server_auth_info_st {
 
 typedef struct psk_server_auth_info_st psk_server_auth_info_st;
 
-#endif				/* ENABLE_PSK */
+#endif /* ENABLE_PSK */
 
 #endif

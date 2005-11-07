@@ -40,127 +40,137 @@
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
-static int gen_anon_server_kx(gnutls_session_t, opaque **);
-static int proc_anon_client_kx(gnutls_session_t, opaque *, size_t);
-static int proc_anon_server_kx(gnutls_session_t, opaque *, size_t);
+static int gen_anon_server_kx (gnutls_session_t, opaque **);
+static int proc_anon_client_kx (gnutls_session_t, opaque *, size_t);
+static int proc_anon_server_kx (gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st anon_auth_struct = {
-    "ANON",
-    NULL,
-    NULL,
-    gen_anon_server_kx,
-    _gnutls_gen_dh_common_client_kx,	/* this can be shared */
-    NULL,
-    NULL,
+  "ANON",
+  NULL,
+  NULL,
+  gen_anon_server_kx,
+  _gnutls_gen_dh_common_client_kx,	/* this can be shared */
+  NULL,
+  NULL,
 
-    NULL,
-    NULL,			/* certificate */
-    proc_anon_server_kx,
-    proc_anon_client_kx,
-    NULL,
-    NULL
+  NULL,
+  NULL,				/* certificate */
+  proc_anon_server_kx,
+  proc_anon_client_kx,
+  NULL,
+  NULL
 };
 
-static int gen_anon_server_kx(gnutls_session_t session, opaque ** data)
+static int
+gen_anon_server_kx (gnutls_session_t session, opaque ** data)
 {
-    mpi_t g, p;
-    const mpi_t *mpis;
-    int ret;
-    gnutls_dh_params_t dh_params;
-    gnutls_anon_server_credentials_t cred;
+  mpi_t g, p;
+  const mpi_t *mpis;
+  int ret;
+  gnutls_dh_params_t dh_params;
+  gnutls_anon_server_credentials_t cred;
 
-    cred = (gnutls_anon_server_credentials_t)
-        _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
-    if (cred == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+  cred = (gnutls_anon_server_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-    dh_params = _gnutls_anon_get_dh_params(cred, session);
-    mpis = _gnutls_get_dh_params(dh_params);
-    if (mpis == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
+  dh_params = _gnutls_anon_get_dh_params (cred, session);
+  mpis = _gnutls_get_dh_params (dh_params);
+  if (mpis == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
     }
 
-    p = mpis[0];
-    g = mpis[1];
+  p = mpis[0];
+  g = mpis[1];
 
-    if ((ret =
-	 _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
-			       sizeof(anon_server_auth_info_st), 1)) < 0) {
-	gnutls_assert();
-	return ret;
+  if ((ret =
+       _gnutls_auth_info_set (session, GNUTLS_CRD_ANON,
+			      sizeof (anon_server_auth_info_st), 1)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    _gnutls_dh_set_group(session, g, p);
+  _gnutls_dh_set_group (session, g, p);
 
-    ret = _gnutls_dh_common_print_server_kx(session, g, p, data);
-    if (ret < 0) {
-	gnutls_assert();
+  ret = _gnutls_dh_common_print_server_kx (session, g, p, data);
+  if (ret < 0)
+    {
+      gnutls_assert ();
     }
 
-    return ret;
+  return ret;
 }
 
 
-static int proc_anon_client_kx(gnutls_session_t session, opaque * data,
-			       size_t _data_size)
+static int
+proc_anon_client_kx (gnutls_session_t session, opaque * data,
+		     size_t _data_size)
 {
-    gnutls_anon_server_credentials_t cred;
-    int bits;
-    int ret;
-    mpi_t p, g;
-    gnutls_dh_params_t dh_params;
-    const mpi_t *mpis;
+  gnutls_anon_server_credentials_t cred;
+  int bits;
+  int ret;
+  mpi_t p, g;
+  gnutls_dh_params_t dh_params;
+  const mpi_t *mpis;
 
-    bits = _gnutls_dh_get_allowed_prime_bits(session);
+  bits = _gnutls_dh_get_allowed_prime_bits (session);
 
-    cred = (gnutls_anon_server_credentials_t)
-        _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
-    if (cred == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+  cred = (gnutls_anon_server_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-    dh_params = _gnutls_anon_get_dh_params(cred, session);
-    mpis = _gnutls_get_dh_params(dh_params);
-    if (mpis == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
+  dh_params = _gnutls_anon_get_dh_params (cred, session);
+  mpis = _gnutls_get_dh_params (dh_params);
+  if (mpis == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
     }
 
-    p = mpis[0];
-    g = mpis[1];
+  p = mpis[0];
+  g = mpis[1];
 
-    ret =
-	_gnutls_proc_dh_common_client_kx(session, data, _data_size, g, p);
+  ret = _gnutls_proc_dh_common_client_kx (session, data, _data_size, g, p);
 
-    return ret;
+  return ret;
 
 }
 
-int proc_anon_server_kx(gnutls_session_t session, opaque * data,
-			size_t _data_size)
+int
+proc_anon_server_kx (gnutls_session_t session, opaque * data,
+		     size_t _data_size)
 {
 
-    int ret;
+  int ret;
 
-    /* set auth_info */
-    if ((ret =
-	 _gnutls_auth_info_set(session, GNUTLS_CRD_ANON,
-			       sizeof(anon_client_auth_info_st), 1)) < 0) {
-	gnutls_assert();
-	return ret;
+  /* set auth_info */
+  if ((ret =
+       _gnutls_auth_info_set (session, GNUTLS_CRD_ANON,
+			      sizeof (anon_client_auth_info_st), 1)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    ret = _gnutls_proc_dh_common_server_kx(session, data, _data_size);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    return 0;
+  return 0;
 }
 
-#endif				/* ENABLE_ANON */
+#endif /* ENABLE_ANON */

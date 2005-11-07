@@ -32,38 +32,43 @@
 /* compare hostname against certificate, taking account of wildcards
  * return 1 on success or 0 on error 
  */
-int _gnutls_hostname_compare(const char *certname, const char *hostname)
+int
+_gnutls_hostname_compare (const char *certname, const char *hostname)
 {
-    const char *cmpstr1, *cmpstr2;
+  const char *cmpstr1, *cmpstr2;
 
-    if (strlen(certname) == 0 || strlen(hostname) == 0)
-	return 0;
-
-    if (strlen(certname) > 2 && strncmp(certname, "*.", 2) == 0) {
-	/* a wildcard certificate */
-
-	cmpstr1 = certname + 1;
-
-	/* find the first dot in hostname, compare from there on */
-	cmpstr2 = strchr(hostname, '.');
-
-	if (cmpstr2 == NULL) {
-	    /* error, the hostname we're connecting to is only a local part */
-	    return 0;
-	}
-
-	if (strcasecmp(cmpstr1, cmpstr2) == 0) {
-	    return 1;
-	}
-
-	return 0;
-    }
-
-    if (strcasecmp(certname, hostname) == 0) {
-	return 1;
-    }
-
+  if (strlen (certname) == 0 || strlen (hostname) == 0)
     return 0;
+
+  if (strlen (certname) > 2 && strncmp (certname, "*.", 2) == 0)
+    {
+      /* a wildcard certificate */
+
+      cmpstr1 = certname + 1;
+
+      /* find the first dot in hostname, compare from there on */
+      cmpstr2 = strchr (hostname, '.');
+
+      if (cmpstr2 == NULL)
+	{
+	  /* error, the hostname we're connecting to is only a local part */
+	  return 0;
+	}
+
+      if (strcasecmp (cmpstr1, cmpstr2) == 0)
+	{
+	  return 1;
+	}
+
+      return 0;
+    }
+
+  if (strcasecmp (certname, hostname) == 0)
+    {
+      return 1;
+    }
+
+  return 0;
 }
 
 /**
@@ -79,64 +84,69 @@ int _gnutls_hostname_compare(const char *certname, const char *hostname)
   * Returns non zero on success, and zero on failure.
   *
   **/
-int gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
-				   const char *hostname)
+int
+gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
 {
 
-    char dnsname[MAX_CN];
-    size_t dnsnamesize;
-    int found_dnsname = 0;
-    int ret = 0;
-    int i = 0;
+  char dnsname[MAX_CN];
+  size_t dnsnamesize;
+  int found_dnsname = 0;
+  int ret = 0;
+  int i = 0;
 
-    /* try matching against:
-     *  1) a DNS name as an alternative name (subjectAltName) extension
-     *     in the certificate
-     *  2) the common name (CN) in the certificate
-     *
-     *  either of these may be of the form: *.domain.tld
-     *
-     *  only try (2) if there is no subjectAltName extension of
-     *  type dNSName
-     */
+  /* try matching against:
+   *  1) a DNS name as an alternative name (subjectAltName) extension
+   *     in the certificate
+   *  2) the common name (CN) in the certificate
+   *
+   *  either of these may be of the form: *.domain.tld
+   *
+   *  only try (2) if there is no subjectAltName extension of
+   *  type dNSName
+   */
 
-    /* Check through all included subjectAltName extensions, comparing
-     * against all those of type dNSName.
-     */
-    for (i = 0; !(ret < 0); i++) {
+  /* Check through all included subjectAltName extensions, comparing
+   * against all those of type dNSName.
+   */
+  for (i = 0; !(ret < 0); i++)
+    {
 
-	dnsnamesize = sizeof(dnsname);
-	ret =
-	    gnutls_x509_crt_get_subject_alt_name(cert, i,
-						 dnsname, &dnsnamesize,
-						 NULL);
+      dnsnamesize = sizeof (dnsname);
+      ret =
+	gnutls_x509_crt_get_subject_alt_name (cert, i,
+					      dnsname, &dnsnamesize, NULL);
 
-	if (ret == GNUTLS_SAN_DNSNAME) {
-	    found_dnsname = 1;
-	    if (_gnutls_hostname_compare(dnsname, hostname)) {
-		return 1;
+      if (ret == GNUTLS_SAN_DNSNAME)
+	{
+	  found_dnsname = 1;
+	  if (_gnutls_hostname_compare (dnsname, hostname))
+	    {
+	      return 1;
 	    }
 	}
 
     }
 
-    if (!found_dnsname) {
-	/* not got the necessary extension, use CN instead 
-	 */
-	dnsnamesize = sizeof(dnsname);
-	if (gnutls_x509_crt_get_dn_by_oid(cert, OID_X520_COMMON_NAME, 0,
-					  0, dnsname, &dnsnamesize) < 0) {
-	    /* got an error, can't find a name 
-	     */
-	    return 1;
+  if (!found_dnsname)
+    {
+      /* not got the necessary extension, use CN instead 
+       */
+      dnsnamesize = sizeof (dnsname);
+      if (gnutls_x509_crt_get_dn_by_oid (cert, OID_X520_COMMON_NAME, 0,
+					 0, dnsname, &dnsnamesize) < 0)
+	{
+	  /* got an error, can't find a name 
+	   */
+	  return 1;
 	}
 
-	if (_gnutls_hostname_compare(dnsname, hostname)) {
-	    return 1;
+      if (_gnutls_hostname_compare (dnsname, hostname))
+	{
+	  return 1;
 	}
     }
 
-    /* not found a matching name
-     */
-    return 0;
+  /* not found a matching name
+   */
+  return 0;
 }

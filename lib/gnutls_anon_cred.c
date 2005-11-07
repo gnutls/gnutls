@@ -42,11 +42,11 @@ static const int anon_dummy;
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
   **/
-void gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t
-					 sc)
+void
+gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
 {
 
-    gnutls_free(sc);
+  gnutls_free (sc);
 }
 
 /*-
@@ -56,27 +56,32 @@ void gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t
   * This function will return the dh parameters pointer.
   *
   -*/
-gnutls_dh_params_t _gnutls_anon_get_dh_params(const
-					      gnutls_anon_server_credentials_t
-					      sc, gnutls_session_t session)
+gnutls_dh_params_t
+_gnutls_anon_get_dh_params (const
+			    gnutls_anon_server_credentials_t
+			    sc, gnutls_session_t session)
 {
-    gnutls_params_st params;
-    int ret;
+  gnutls_params_st params;
+  int ret;
 
-    if (session->internals.params.anon_dh_params)
-	return session->internals.params.anon_dh_params;
+  if (session->internals.params.anon_dh_params)
+    return session->internals.params.anon_dh_params;
 
-    if (sc->dh_params) {
-	session->internals.params.anon_dh_params = sc->dh_params;
-    } else if (sc->params_func) {
-	ret = sc->params_func(session, GNUTLS_PARAMS_DH, &params);
-	if (ret == 0 && params.type == GNUTLS_PARAMS_DH) {
-	    session->internals.params.anon_dh_params = params.params.dh;
-	    session->internals.params.free_anon_dh_params = params.deinit;
+  if (sc->dh_params)
+    {
+      session->internals.params.anon_dh_params = sc->dh_params;
+    }
+  else if (sc->params_func)
+    {
+      ret = sc->params_func (session, GNUTLS_PARAMS_DH, &params);
+      if (ret == 0 && params.type == GNUTLS_PARAMS_DH)
+	{
+	  session->internals.params.anon_dh_params = params.params.dh;
+	  session->internals.params.free_anon_dh_params = params.deinit;
 	}
     }
 
-    return session->internals.params.anon_dh_params;
+  return session->internals.params.anon_dh_params;
 }
 
 /**
@@ -89,13 +94,13 @@ gnutls_dh_params_t _gnutls_anon_get_dh_params(const
   * Returns a negative value in case of an error.
   **/
 int
-gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
-					sc)
+gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
+					 sc)
 {
 
-    *sc = gnutls_calloc(1, sizeof(anon_server_credentials_st));
+  *sc = gnutls_calloc (1, sizeof (anon_server_credentials_st));
 
-    return 0;
+  return 0;
 }
 
 
@@ -106,8 +111,8 @@ gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
   **/
-void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t
-					 sc)
+void
+gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc)
 {
 }
 
@@ -121,15 +126,15 @@ void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t
  * Returns a negative value in case of an error.
  **/
 int
-gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t *
-					sc)
+gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
+					 sc)
 {
-    /* anon_dummy is only there for *sc not to be null.
-     * it is not used at all;
-     */
-    *sc = (void *) &anon_dummy;
+  /* anon_dummy is only there for *sc not to be null.
+   * it is not used at all;
+   */
+  *sc = (void *) &anon_dummy;
 
-    return 0;
+  return 0;
 }
 
 #endif

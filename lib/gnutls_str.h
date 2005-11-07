@@ -27,37 +27,38 @@
 
 #include <gnutls_int.h>
 
-void _gnutls_str_cpy(char *dest, size_t dest_tot_size, const char *src);
-void _gnutls_mem_cpy(char *dest, size_t dest_tot_size, const char *src,
-		     size_t src_size);
-void _gnutls_str_cat(char *dest, size_t dest_tot_size, const char *src);
+void _gnutls_str_cpy (char *dest, size_t dest_tot_size, const char *src);
+void _gnutls_mem_cpy (char *dest, size_t dest_tot_size, const char *src,
+		      size_t src_size);
+void _gnutls_str_cat (char *dest, size_t dest_tot_size, const char *src);
 
-typedef struct {
-    opaque *data;
-    size_t max_length;
-    size_t length;
-    gnutls_realloc_function realloc_func;
-    gnutls_alloc_function alloc_func;
-    gnutls_free_function free_func;
+typedef struct
+{
+  opaque *data;
+  size_t max_length;
+  size_t length;
+  gnutls_realloc_function realloc_func;
+  gnutls_alloc_function alloc_func;
+  gnutls_free_function free_func;
 } gnutls_string;
 
-void _gnutls_string_init(gnutls_string *, gnutls_alloc_function,
-			 gnutls_realloc_function, gnutls_free_function);
-void _gnutls_string_clear(gnutls_string *);
+void _gnutls_string_init (gnutls_string *, gnutls_alloc_function,
+			  gnutls_realloc_function, gnutls_free_function);
+void _gnutls_string_clear (gnutls_string *);
 
 /* Beware, do not clear the string, after calling this
  * function
  */
-gnutls_datum_t _gnutls_string2datum(gnutls_string * str);
+gnutls_datum_t _gnutls_string2datum (gnutls_string * str);
 
-int _gnutls_string_copy_str(gnutls_string * dest, const char *src);
-int _gnutls_string_append_str(gnutls_string *, const char *str);
-int _gnutls_string_append_data(gnutls_string *, const void *data,
-			       size_t data_size);
+int _gnutls_string_copy_str (gnutls_string * dest, const char *src);
+int _gnutls_string_append_str (gnutls_string *, const char *str);
+int _gnutls_string_append_data (gnutls_string *, const void *data,
+				size_t data_size);
 
-char *_gnutls_bin2hex(const void *old, size_t oldlen, char *buffer,
-		      size_t buffer_size);
-int _gnutls_hex2bin(const opaque* hex_data, int hex_size, opaque * bin_data,
-        size_t * bin_size);
+char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
+		       size_t buffer_size);
+int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
+		     size_t * bin_size);
 
 #endif

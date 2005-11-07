@@ -24,5 +24,6 @@
 
 #include <gnutls/x509.h>
 
-ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *raw_key,
-					       gnutls_x509_privkey_t pkey);
+ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *
+						raw_key,
+						gnutls_x509_privkey_t pkey);

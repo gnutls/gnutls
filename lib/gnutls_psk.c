@@ -46,11 +46,12 @@
   * this helper function is provided in order to free (deallocate) it.
   *
   **/
-void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
+void
+gnutls_psk_free_client_credentials (gnutls_psk_client_credentials_t sc)
 {
-    _gnutls_free_datum(&sc->username);
-    _gnutls_free_datum(&sc->key);
-    gnutls_free(sc);
+  _gnutls_free_datum (&sc->username);
+  _gnutls_free_datum (&sc->key);
+  gnutls_free (sc);
 }
 
 /**
@@ -62,14 +63,15 @@ void gnutls_psk_free_client_credentials(gnutls_psk_client_credentials_t sc)
   *
   * Returns 0 on success.
   **/
-int gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t* sc)
+int
+gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
 {
-    *sc = gnutls_calloc(1, sizeof(psk_client_credentials_st));
+  *sc = gnutls_calloc (1, sizeof (psk_client_credentials_st));
 
-    if (*sc == NULL)
-	return GNUTLS_E_MEMORY_ERROR;
+  if (*sc == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -84,50 +86,59 @@ int gnutls_psk_allocate_client_credentials(gnutls_psk_client_credentials_t* sc)
   *
   * Returns 0 on success.
   **/
-int gnutls_psk_set_client_credentials(gnutls_psk_client_credentials_t res,
-				      const char *username, const gnutls_datum *key,
-                                      unsigned int flags)
+int
+gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
+				   const char *username,
+				   const gnutls_datum * key,
+				   unsigned int flags)
 {
-int ret;
+  int ret;
 
-    if (username == NULL || key == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (username == NULL || key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    ret = _gnutls_set_datum(&res->username, username, strlen(username));
-    if (ret < 0) 
-	return ret;
+  ret = _gnutls_set_datum (&res->username, username, strlen (username));
+  if (ret < 0)
+    return ret;
 
-    if (flags == GNUTLS_PSK_KEY_RAW) {
-            if (_gnutls_set_datum( &res->key, key->data, key->size) < 0) {
-                gnutls_assert();
-                ret = GNUTLS_E_MEMORY_ERROR;
-                goto error;
-            }
-    } else { /* HEX key */
-            res->key.size = key->size / 2;
-            res->key.data = gnutls_malloc( res->key.size);
-            if (res->key.data == NULL) {
-                gnutls_assert();
-                ret = GNUTLS_E_MEMORY_ERROR;
-                goto error;
-            }
+  if (flags == GNUTLS_PSK_KEY_RAW)
+    {
+      if (_gnutls_set_datum (&res->key, key->data, key->size) < 0)
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto error;
+	}
+    }
+  else
+    {				/* HEX key */
+      res->key.size = key->size / 2;
+      res->key.data = gnutls_malloc (res->key.size);
+      if (res->key.data == NULL)
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto error;
+	}
 
-            ret = gnutls_hex_decode( key, (char*)res->key.data, &res->key.size);
-            if (ret < 0) {
-                gnutls_assert();
-                goto error;
-            }
+      ret = gnutls_hex_decode (key, (char *) res->key.data, &res->key.size);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto error;
+	}
 
     }
 
-    return 0;
+  return 0;
 
 error:
-        _gnutls_free_datum( &res->username);
+  _gnutls_free_datum (&res->username);
 
-        return ret;
+  return ret;
 }
 
 /**
@@ -138,10 +149,11 @@ error:
   * this helper function is provided in order to free (deallocate) it.
   *
   **/
-void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
+void
+gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t sc)
 {
-    gnutls_free(sc->password_file);
-    gnutls_free(sc);
+  gnutls_free (sc->password_file);
+  gnutls_free (sc);
 }
 
 /**
@@ -153,14 +165,15 @@ void gnutls_psk_free_server_credentials(gnutls_psk_server_credentials_t sc)
   * 
   * Returns 0 on success.
   **/
-int gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t* sc)
+int
+gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
 {
-    *sc = gnutls_calloc(1, sizeof(psk_server_cred_st));
+  *sc = gnutls_calloc (1, sizeof (psk_server_cred_st));
 
-    if (*sc == NULL)
-	return GNUTLS_E_MEMORY_ERROR;
+  if (*sc == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
 
-    return 0;
+  return 0;
 }
 
 
@@ -175,28 +188,32 @@ int gnutls_psk_allocate_server_credentials(gnutls_psk_server_credentials_t* sc)
   * Returns 0 on success.
   *
   **/
-int gnutls_psk_set_server_credentials_file(gnutls_psk_server_credentials_t
-					   res, const char *password_file)
+int
+gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
+					res, const char *password_file)
 {
 
-    if (password_file == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (password_file == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    /* Check if the files can be opened */
-    if (_gnutls_file_exists(password_file) != 0) {
-	gnutls_assert();
-	return GNUTLS_E_FILE_ERROR;
+  /* Check if the files can be opened */
+  if (_gnutls_file_exists (password_file) != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_FILE_ERROR;
     }
 
-    res->password_file = gnutls_strdup(password_file);
-    if (res->password_file == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
+  res->password_file = gnutls_strdup (password_file);
+  if (res->password_file == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    return 0;
+  return 0;
 }
 
 
@@ -222,12 +239,12 @@ int gnutls_psk_set_server_credentials_file(gnutls_psk_server_credentials_t
   *
   **/
 void
-gnutls_psk_set_server_credentials_function(gnutls_psk_server_credentials_t
-					   cred,
-					   gnutls_psk_server_credentials_function
-					   * func)
+gnutls_psk_set_server_credentials_function (gnutls_psk_server_credentials_t
+					    cred,
+					    gnutls_psk_server_credentials_function
+					    * func)
 {
-    cred->pwd_callback = func;
+  cred->pwd_callback = func;
 }
 
 /**
@@ -252,12 +269,12 @@ gnutls_psk_set_server_credentials_function(gnutls_psk_server_credentials_t
   *
   **/
 void
-gnutls_psk_set_client_credentials_function(gnutls_psk_client_credentials_t
-					   cred,
-					   gnutls_psk_client_credentials_function
-					   * func)
+gnutls_psk_set_client_credentials_function (gnutls_psk_client_credentials_t
+					    cred,
+					    gnutls_psk_client_credentials_function
+					    * func)
 {
-    cred->get_function = func;
+  cred->get_function = func;
 }
 
 
@@ -270,16 +287,17 @@ gnutls_psk_set_client_credentials_function(gnutls_psk_client_credentials_t
   * Returns NULL in case of an error.
   *
   **/
-const char *gnutls_psk_server_get_username(gnutls_session_t session)
+const char *
+gnutls_psk_server_get_username (gnutls_session_t session)
 {
-    psk_server_auth_info_t info;
+  psk_server_auth_info_t info;
 
-    CHECK_AUTH(GNUTLS_CRD_PSK, NULL);
+  CHECK_AUTH (GNUTLS_CRD_PSK, NULL);
 
-    info = _gnutls_get_auth_info(session);
-    if (info == NULL)
-	return NULL;
-    return info->username;
+  info = _gnutls_get_auth_info (session);
+  if (info == NULL)
+    return NULL;
+  return info->username;
 }
 
 /**
@@ -296,16 +314,19 @@ const char *gnutls_psk_server_get_username(gnutls_session_t session)
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
   * or 0 on success.
   **/
-int gnutls_hex_decode(const gnutls_datum_t * hex_data, char *result,
-                             size_t *result_size)
+int
+gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
+		   size_t * result_size)
 {
-    int ret;
+  int ret;
 
-    ret = _gnutls_hex2bin(hex_data->data, hex_data->size, (opaque*)result, result_size);
-    if (ret < 0)
-        return ret;
+  ret =
+    _gnutls_hex2bin (hex_data->data, hex_data->size, (opaque *) result,
+		     result_size);
+  if (ret < 0)
+    return ret;
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -320,18 +341,20 @@ int gnutls_hex_decode(const gnutls_datum_t * hex_data, char *result,
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
   * or 0 on success.
   **/
-int gnutls_hex_encode(const gnutls_datum_t * data, char *result,
-                             size_t *result_size)
+int
+gnutls_hex_encode (const gnutls_datum_t * data, char *result,
+		   size_t * result_size)
 {
-    if (*result_size < data->size + data->size + 1) {
-         gnutls_assert();
-         return GNUTLS_E_SHORT_MEMORY_BUFFER;
+  if (*result_size < data->size + data->size + 1)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-    _gnutls_bin2hex(data->data, data->size, result, *result_size);
+  _gnutls_bin2hex (data->data, data->size, result, *result_size);
 
-    return 0;
+  return 0;
 }
 
 
-#endif				/* ENABLE_PSK */
+#endif /* ENABLE_PSK */

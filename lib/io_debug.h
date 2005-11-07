@@ -42,32 +42,36 @@ static int initialized_rand = 0;
 		srand(time(0)); \
 		initialized_rand = 1; \
 		}
-static int recv_debug(int fd, char *buf, int len, int flags)
+static int
+recv_debug (int fd, char *buf, int len, int flags)
 {
-    INITIALIZE_RAND;
+  INITIALIZE_RAND;
 
-    if (!(rand() % IO_DEBUG)) {
-	errno = EDUNNO;
-	return -1;
+  if (!(rand () % IO_DEBUG))
+    {
+      errno = EDUNNO;
+      return -1;
     }
-    if (len > 1)
-	len = 1;
-    return recv(fd, buf, len, flags);
+  if (len > 1)
+    len = 1;
+  return recv (fd, buf, len, flags);
 }
 
 #define recv recv_debug
 
-static int send_debug(int fd, const char *buf, int len, int flags)
+static int
+send_debug (int fd, const char *buf, int len, int flags)
 {
-    INITIALIZE_RAND;
+  INITIALIZE_RAND;
 
-    if (!(rand() % IO_DEBUG)) {
-	errno = EDUNNO;
-	return -1;
+  if (!(rand () % IO_DEBUG))
+    {
+      errno = EDUNNO;
+      return -1;
     }
-    if (len > 10)
-	len = 10;
-    return send(fd, buf, len, flags);
+  if (len > 10)
+    len = 10;
+  return send (fd, buf, len, flags);
 }
 
 #define send send_debug

@@ -34,206 +34,206 @@ extern LOG_FUNC _gnutls_log_func;
 #define ERROR_ENTRY(desc, name, fatal) \
 	{ desc, #name, name, fatal}
 
-struct gnutls_error_entry {
-    const char *desc;
-    const char *_name;
-    int number;
-    int fatal;
+struct gnutls_error_entry
+{
+  const char *desc;
+  const char *_name;
+  int number;
+  int fatal;
 };
 typedef struct gnutls_error_entry gnutls_error_entry;
 
 static gnutls_error_entry error_algorithms[] = {
-    /* "Short Description", Error code define, critical (0,1) -- 1 in most cases */
-    ERROR_ENTRY("Success.", GNUTLS_E_SUCCESS, 0),
-    ERROR_ENTRY("Could not negotiate a supported cipher suite.",
-		GNUTLS_E_UNKNOWN_CIPHER_SUITE, 1),
-    ERROR_ENTRY("The cipher type is unsupported.",
-		GNUTLS_E_UNKNOWN_CIPHER_TYPE, 1),
-    ERROR_ENTRY("The certificate and the given key do not match.",
-		GNUTLS_E_CERTIFICATE_KEY_MISMATCH, 1),
-    ERROR_ENTRY("Could not negotiate a supported compression method.",
-		GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM, 1),
-    ERROR_ENTRY("An unknown public key algorithm was encountered.",
-		GNUTLS_E_UNKNOWN_PK_ALGORITHM, 1),
+  /* "Short Description", Error code define, critical (0,1) -- 1 in most cases */
+  ERROR_ENTRY ("Success.", GNUTLS_E_SUCCESS, 0),
+  ERROR_ENTRY ("Could not negotiate a supported cipher suite.",
+	       GNUTLS_E_UNKNOWN_CIPHER_SUITE, 1),
+  ERROR_ENTRY ("The cipher type is unsupported.",
+	       GNUTLS_E_UNKNOWN_CIPHER_TYPE, 1),
+  ERROR_ENTRY ("The certificate and the given key do not match.",
+	       GNUTLS_E_CERTIFICATE_KEY_MISMATCH, 1),
+  ERROR_ENTRY ("Could not negotiate a supported compression method.",
+	       GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM, 1),
+  ERROR_ENTRY ("An unknown public key algorithm was encountered.",
+	       GNUTLS_E_UNKNOWN_PK_ALGORITHM, 1),
 
-    ERROR_ENTRY("An algorithm that is not enabled was negotiated.",
-		GNUTLS_E_UNWANTED_ALGORITHM, 1),
-    ERROR_ENTRY("A large TLS record packet was received.",
-		GNUTLS_E_LARGE_PACKET, 1),
-    ERROR_ENTRY("A record packet with illegal version was received.",
-		GNUTLS_E_UNSUPPORTED_VERSION_PACKET, 1),
-    ERROR_ENTRY
-	("The Diffie Hellman prime sent by the server is not acceptable (not long enough).",
-	 GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1),
-    ERROR_ENTRY("A TLS packet with unexpected length was received.",
-		GNUTLS_E_UNEXPECTED_PACKET_LENGTH, 1),
-    ERROR_ENTRY
-	("The specified session has been invalidated for some reason.",
-	 GNUTLS_E_INVALID_SESSION, 1),
+  ERROR_ENTRY ("An algorithm that is not enabled was negotiated.",
+	       GNUTLS_E_UNWANTED_ALGORITHM, 1),
+  ERROR_ENTRY ("A large TLS record packet was received.",
+	       GNUTLS_E_LARGE_PACKET, 1),
+  ERROR_ENTRY ("A record packet with illegal version was received.",
+	       GNUTLS_E_UNSUPPORTED_VERSION_PACKET, 1),
+  ERROR_ENTRY
+    ("The Diffie Hellman prime sent by the server is not acceptable (not long enough).",
+     GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1),
+  ERROR_ENTRY ("A TLS packet with unexpected length was received.",
+	       GNUTLS_E_UNEXPECTED_PACKET_LENGTH, 1),
+  ERROR_ENTRY ("The specified session has been invalidated for some reason.",
+	       GNUTLS_E_INVALID_SESSION, 1),
 
-    ERROR_ENTRY("GnuTLS internal error.", GNUTLS_E_INTERNAL_ERROR, 1),
-    ERROR_ENTRY("An illegal TLS extension was received.",
-		GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION, 1),
-    ERROR_ENTRY("A TLS fatal alert has been received.",
-		GNUTLS_E_FATAL_ALERT_RECEIVED, 1),
-    ERROR_ENTRY("An unexpected TLS packet was received.",
-		GNUTLS_E_UNEXPECTED_PACKET, 1),
-    ERROR_ENTRY("A TLS warning alert has been received.",
-		GNUTLS_E_WARNING_ALERT_RECEIVED, 0),
-    ERROR_ENTRY
-	("An error was encountered at the TLS Finished packet calculation.",
-	 GNUTLS_E_ERROR_IN_FINISHED_PACKET, 1),
-    ERROR_ENTRY("The peer did not send any certificate.",
-		GNUTLS_E_NO_CERTIFICATE_FOUND, 1),
+  ERROR_ENTRY ("GnuTLS internal error.", GNUTLS_E_INTERNAL_ERROR, 1),
+  ERROR_ENTRY ("An illegal TLS extension was received.",
+	       GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION, 1),
+  ERROR_ENTRY ("A TLS fatal alert has been received.",
+	       GNUTLS_E_FATAL_ALERT_RECEIVED, 1),
+  ERROR_ENTRY ("An unexpected TLS packet was received.",
+	       GNUTLS_E_UNEXPECTED_PACKET, 1),
+  ERROR_ENTRY ("A TLS warning alert has been received.",
+	       GNUTLS_E_WARNING_ALERT_RECEIVED, 0),
+  ERROR_ENTRY
+    ("An error was encountered at the TLS Finished packet calculation.",
+     GNUTLS_E_ERROR_IN_FINISHED_PACKET, 1),
+  ERROR_ENTRY ("The peer did not send any certificate.",
+	       GNUTLS_E_NO_CERTIFICATE_FOUND, 1),
 
-    ERROR_ENTRY("No temporary RSA parameters were found.",
-		GNUTLS_E_NO_TEMPORARY_RSA_PARAMS, 1),
-    ERROR_ENTRY("No temporary DH parameters were found.",
-		GNUTLS_E_NO_TEMPORARY_DH_PARAMS, 1),
-    ERROR_ENTRY("An unexpected TLS handshake packet was received.",
-		GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET, 1),
-    ERROR_ENTRY("The scanning of a large integer has failed.",
-		GNUTLS_E_MPI_SCAN_FAILED, 1),
-    ERROR_ENTRY("Could not export a large integer.",
-		GNUTLS_E_MPI_PRINT_FAILED, 1),
-    ERROR_ENTRY("Decryption has failed.", GNUTLS_E_DECRYPTION_FAILED, 1),
-    ERROR_ENTRY("Encryption has failed.", GNUTLS_E_ENCRYPTION_FAILED, 1),
-    ERROR_ENTRY("Public key decryption has failed.",
-		GNUTLS_E_PK_DECRYPTION_FAILED, 1),
-    ERROR_ENTRY("Public key encryption has failed.",
-		GNUTLS_E_PK_ENCRYPTION_FAILED, 1),
-    ERROR_ENTRY("Public key signing has failed.", GNUTLS_E_PK_SIGN_FAILED,
-		1),
-    ERROR_ENTRY("Public key signature verification has failed.",
-		GNUTLS_E_PK_SIG_VERIFY_FAILED, 1),
-    ERROR_ENTRY("Decompression of the TLS record packet has failed.",
-		GNUTLS_E_DECOMPRESSION_FAILED, 1),
-    ERROR_ENTRY("Compression of the TLS record packet has failed.",
-		GNUTLS_E_COMPRESSION_FAILED, 1),
+  ERROR_ENTRY ("No temporary RSA parameters were found.",
+	       GNUTLS_E_NO_TEMPORARY_RSA_PARAMS, 1),
+  ERROR_ENTRY ("No temporary DH parameters were found.",
+	       GNUTLS_E_NO_TEMPORARY_DH_PARAMS, 1),
+  ERROR_ENTRY ("An unexpected TLS handshake packet was received.",
+	       GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET, 1),
+  ERROR_ENTRY ("The scanning of a large integer has failed.",
+	       GNUTLS_E_MPI_SCAN_FAILED, 1),
+  ERROR_ENTRY ("Could not export a large integer.",
+	       GNUTLS_E_MPI_PRINT_FAILED, 1),
+  ERROR_ENTRY ("Decryption has failed.", GNUTLS_E_DECRYPTION_FAILED, 1),
+  ERROR_ENTRY ("Encryption has failed.", GNUTLS_E_ENCRYPTION_FAILED, 1),
+  ERROR_ENTRY ("Public key decryption has failed.",
+	       GNUTLS_E_PK_DECRYPTION_FAILED, 1),
+  ERROR_ENTRY ("Public key encryption has failed.",
+	       GNUTLS_E_PK_ENCRYPTION_FAILED, 1),
+  ERROR_ENTRY ("Public key signing has failed.", GNUTLS_E_PK_SIGN_FAILED,
+	       1),
+  ERROR_ENTRY ("Public key signature verification has failed.",
+	       GNUTLS_E_PK_SIG_VERIFY_FAILED, 1),
+  ERROR_ENTRY ("Decompression of the TLS record packet has failed.",
+	       GNUTLS_E_DECOMPRESSION_FAILED, 1),
+  ERROR_ENTRY ("Compression of the TLS record packet has failed.",
+	       GNUTLS_E_COMPRESSION_FAILED, 1),
 
-    ERROR_ENTRY("Internal error in memory allocation.",
-		GNUTLS_E_MEMORY_ERROR, 1),
-    ERROR_ENTRY("An unimplemented or disabled feature has been requested.",
-		GNUTLS_E_UNIMPLEMENTED_FEATURE, 1),
-    ERROR_ENTRY("Insufficient credentials for that request.",
-		GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1),
-    ERROR_ENTRY("Error in SRP password file.", GNUTLS_E_SRP_PWD_ERROR, 1),
-    ERROR_ENTRY("Wrong padding in PKCS1 packet.", GNUTLS_E_PKCS1_WRONG_PAD,
-		1),
-    ERROR_ENTRY("The requested session has expired.", GNUTLS_E_EXPIRED, 1),
-    ERROR_ENTRY("Hashing has failed.", GNUTLS_E_HASH_FAILED, 1),
-    ERROR_ENTRY("Base64 decoding error.", GNUTLS_E_BASE64_DECODING_ERROR,
-		1),
-    ERROR_ENTRY("Base64 encoding error.", GNUTLS_E_BASE64_ENCODING_ERROR,
-		1),
-    ERROR_ENTRY("Parsing error in SRP password file.",
-		GNUTLS_E_SRP_PWD_PARSING_ERROR, 1),
-    ERROR_ENTRY("The requested data were not available.",
-		GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 0),
-    ERROR_ENTRY("Error in the pull function.", GNUTLS_E_PULL_ERROR, 1),
-    ERROR_ENTRY("Error in the push function.", GNUTLS_E_PUSH_ERROR, 1),
-    ERROR_ENTRY
-	("The upper limit of record packet sequence numbers has been reached. Wow!",
-	 GNUTLS_E_RECORD_LIMIT_REACHED, 1),
-    ERROR_ENTRY("Error in the certificate.", GNUTLS_E_CERTIFICATE_ERROR,
-		1),
-    ERROR_ENTRY("Unknown Subject Alternative name in X.509 certificate.",
-		GNUTLS_E_X509_UNKNOWN_SAN, 1),
+  ERROR_ENTRY ("Internal error in memory allocation.",
+	       GNUTLS_E_MEMORY_ERROR, 1),
+  ERROR_ENTRY ("An unimplemented or disabled feature has been requested.",
+	       GNUTLS_E_UNIMPLEMENTED_FEATURE, 1),
+  ERROR_ENTRY ("Insufficient credentials for that request.",
+	       GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1),
+  ERROR_ENTRY ("Error in SRP password file.", GNUTLS_E_SRP_PWD_ERROR, 1),
+  ERROR_ENTRY ("Wrong padding in PKCS1 packet.", GNUTLS_E_PKCS1_WRONG_PAD,
+	       1),
+  ERROR_ENTRY ("The requested session has expired.", GNUTLS_E_EXPIRED, 1),
+  ERROR_ENTRY ("Hashing has failed.", GNUTLS_E_HASH_FAILED, 1),
+  ERROR_ENTRY ("Base64 decoding error.", GNUTLS_E_BASE64_DECODING_ERROR,
+	       1),
+  ERROR_ENTRY ("Base64 encoding error.", GNUTLS_E_BASE64_ENCODING_ERROR,
+	       1),
+  ERROR_ENTRY ("Parsing error in SRP password file.",
+	       GNUTLS_E_SRP_PWD_PARSING_ERROR, 1),
+  ERROR_ENTRY ("The requested data were not available.",
+	       GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 0),
+  ERROR_ENTRY ("Error in the pull function.", GNUTLS_E_PULL_ERROR, 1),
+  ERROR_ENTRY ("Error in the push function.", GNUTLS_E_PUSH_ERROR, 1),
+  ERROR_ENTRY
+    ("The upper limit of record packet sequence numbers has been reached. Wow!",
+     GNUTLS_E_RECORD_LIMIT_REACHED, 1),
+  ERROR_ENTRY ("Error in the certificate.", GNUTLS_E_CERTIFICATE_ERROR,
+	       1),
+  ERROR_ENTRY ("Unknown Subject Alternative name in X.509 certificate.",
+	       GNUTLS_E_X509_UNKNOWN_SAN, 1),
 
-    ERROR_ENTRY("Unsupported critical extension in X.509 certificate.",
-		GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION, 1),
-    ERROR_ENTRY("Key usage violation in certificate has been detected.",
-		GNUTLS_E_KEY_USAGE_VIOLATION, 1),
-    ERROR_ENTRY("Function was interrupted.", GNUTLS_E_AGAIN, 0),
-    ERROR_ENTRY("Function was interrupted.", GNUTLS_E_INTERRUPTED, 0),
-    ERROR_ENTRY("Rehandshake was requested by the peer.",
-		GNUTLS_E_REHANDSHAKE, 0),
-    ERROR_ENTRY
-	("TLS Application data were received, while expecting handshake data.",
-	 GNUTLS_E_GOT_APPLICATION_DATA, 1),
-    ERROR_ENTRY("Error in Database backend.", GNUTLS_E_DB_ERROR, 1),
-    ERROR_ENTRY("The certificate type is not supported.",
-		GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE, 1),
-    ERROR_ENTRY("The given memory buffer is too short to hold parameters.",
-		GNUTLS_E_SHORT_MEMORY_BUFFER, 1),
-    ERROR_ENTRY("The request is invalid.", GNUTLS_E_INVALID_REQUEST, 1),
-    ERROR_ENTRY("An illegal parameter has been received.",
-		GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1),
-    ERROR_ENTRY("Error while reading file.", GNUTLS_E_FILE_ERROR, 1),
+  ERROR_ENTRY ("Unsupported critical extension in X.509 certificate.",
+	       GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION, 1),
+  ERROR_ENTRY ("Key usage violation in certificate has been detected.",
+	       GNUTLS_E_KEY_USAGE_VIOLATION, 1),
+  ERROR_ENTRY ("Function was interrupted.", GNUTLS_E_AGAIN, 0),
+  ERROR_ENTRY ("Function was interrupted.", GNUTLS_E_INTERRUPTED, 0),
+  ERROR_ENTRY ("Rehandshake was requested by the peer.",
+	       GNUTLS_E_REHANDSHAKE, 0),
+  ERROR_ENTRY
+    ("TLS Application data were received, while expecting handshake data.",
+     GNUTLS_E_GOT_APPLICATION_DATA, 1),
+  ERROR_ENTRY ("Error in Database backend.", GNUTLS_E_DB_ERROR, 1),
+  ERROR_ENTRY ("The certificate type is not supported.",
+	       GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE, 1),
+  ERROR_ENTRY ("The given memory buffer is too short to hold parameters.",
+	       GNUTLS_E_SHORT_MEMORY_BUFFER, 1),
+  ERROR_ENTRY ("The request is invalid.", GNUTLS_E_INVALID_REQUEST, 1),
+  ERROR_ENTRY ("An illegal parameter has been received.",
+	       GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1),
+  ERROR_ENTRY ("Error while reading file.", GNUTLS_E_FILE_ERROR, 1),
 
-    ERROR_ENTRY("ASN1 parser: Element was not found.",
-		GNUTLS_E_ASN1_ELEMENT_NOT_FOUND, 1),
-    ERROR_ENTRY("ASN1 parser: Identifier was not found",
-		GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND, 1),
-    ERROR_ENTRY("ASN1 parser: Error in DER parsing.",
-		GNUTLS_E_ASN1_DER_ERROR, 1),
-    ERROR_ENTRY("ASN1 parser: Value was not found.",
-		GNUTLS_E_ASN1_VALUE_NOT_FOUND, 1),
-    ERROR_ENTRY("ASN1 parser: Generic parsing error.",
-		GNUTLS_E_ASN1_GENERIC_ERROR, 1),
-    ERROR_ENTRY("ASN1 parser: Value is not valid.",
-		GNUTLS_E_ASN1_VALUE_NOT_VALID, 1),
-    ERROR_ENTRY("ASN1 parser: Error in TAG.", GNUTLS_E_ASN1_TAG_ERROR, 1),
-    ERROR_ENTRY("ASN1 parser: error in implicit tag",
-		GNUTLS_E_ASN1_TAG_IMPLICIT, 1),
-    ERROR_ENTRY("ASN1 parser: Error in type 'ANY'.",
-		GNUTLS_E_ASN1_TYPE_ANY_ERROR, 1),
-    ERROR_ENTRY("ASN1 parser: Syntax error.", GNUTLS_E_ASN1_SYNTAX_ERROR,
-		1),
-    ERROR_ENTRY("ASN1 parser: Overflow in DER parsing.",
-		GNUTLS_E_ASN1_DER_OVERFLOW, 1),
+  ERROR_ENTRY ("ASN1 parser: Element was not found.",
+	       GNUTLS_E_ASN1_ELEMENT_NOT_FOUND, 1),
+  ERROR_ENTRY ("ASN1 parser: Identifier was not found",
+	       GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND, 1),
+  ERROR_ENTRY ("ASN1 parser: Error in DER parsing.",
+	       GNUTLS_E_ASN1_DER_ERROR, 1),
+  ERROR_ENTRY ("ASN1 parser: Value was not found.",
+	       GNUTLS_E_ASN1_VALUE_NOT_FOUND, 1),
+  ERROR_ENTRY ("ASN1 parser: Generic parsing error.",
+	       GNUTLS_E_ASN1_GENERIC_ERROR, 1),
+  ERROR_ENTRY ("ASN1 parser: Value is not valid.",
+	       GNUTLS_E_ASN1_VALUE_NOT_VALID, 1),
+  ERROR_ENTRY ("ASN1 parser: Error in TAG.", GNUTLS_E_ASN1_TAG_ERROR, 1),
+  ERROR_ENTRY ("ASN1 parser: error in implicit tag",
+	       GNUTLS_E_ASN1_TAG_IMPLICIT, 1),
+  ERROR_ENTRY ("ASN1 parser: Error in type 'ANY'.",
+	       GNUTLS_E_ASN1_TYPE_ANY_ERROR, 1),
+  ERROR_ENTRY ("ASN1 parser: Syntax error.", GNUTLS_E_ASN1_SYNTAX_ERROR,
+	       1),
+  ERROR_ENTRY ("ASN1 parser: Overflow in DER parsing.",
+	       GNUTLS_E_ASN1_DER_OVERFLOW, 1),
 
-    ERROR_ENTRY("Too many empty record packets have been received.",
-		GNUTLS_E_TOO_MANY_EMPTY_PACKETS, 1),
-    ERROR_ENTRY("The initialization of GnuTLS-extra has failed.",
-		GNUTLS_E_INIT_LIBEXTRA, 1),
-    ERROR_ENTRY
-	("The GnuTLS library version does not match the GnuTLS-extra library version.",
-	 GNUTLS_E_LIBRARY_VERSION_MISMATCH, 1),
-    ERROR_ENTRY("The gcrypt library version is too old.",
-		GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY, 1),
+  ERROR_ENTRY ("Too many empty record packets have been received.",
+	       GNUTLS_E_TOO_MANY_EMPTY_PACKETS, 1),
+  ERROR_ENTRY ("The initialization of GnuTLS-extra has failed.",
+	       GNUTLS_E_INIT_LIBEXTRA, 1),
+  ERROR_ENTRY
+    ("The GnuTLS library version does not match the GnuTLS-extra library version.",
+     GNUTLS_E_LIBRARY_VERSION_MISMATCH, 1),
+  ERROR_ENTRY ("The gcrypt library version is too old.",
+	       GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY, 1),
 
-    ERROR_ENTRY("The tasn1 library version is too old.",
-		GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY, 1),
-    ERROR_ENTRY
-	("The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported.",
-	 GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED, 1),
+  ERROR_ENTRY ("The tasn1 library version is too old.",
+	       GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY, 1),
+  ERROR_ENTRY
+    ("The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported.",
+     GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED, 1),
 
-    ERROR_ENTRY("Error loading the keyring.",
-		GNUTLS_E_OPENPGP_KEYRING_ERROR, 1),
-    ERROR_ENTRY("The initialization of LZO has failed.",
-		GNUTLS_E_LZO_INIT_FAILED, 1),
-    ERROR_ENTRY("No supported compression algorithms have been found.",
-		GNUTLS_E_NO_COMPRESSION_ALGORITHMS, 1),
-    ERROR_ENTRY("No supported cipher suites have been found.",
-		GNUTLS_E_NO_CIPHER_SUITES, 1),
-    ERROR_ENTRY("Could not get OpenPGP key.",
-		GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
+  ERROR_ENTRY ("Error loading the keyring.",
+	       GNUTLS_E_OPENPGP_KEYRING_ERROR, 1),
+  ERROR_ENTRY ("The initialization of LZO has failed.",
+	       GNUTLS_E_LZO_INIT_FAILED, 1),
+  ERROR_ENTRY ("No supported compression algorithms have been found.",
+	       GNUTLS_E_NO_COMPRESSION_ALGORITHMS, 1),
+  ERROR_ENTRY ("No supported cipher suites have been found.",
+	       GNUTLS_E_NO_CIPHER_SUITES, 1),
+  ERROR_ENTRY ("Could not get OpenPGP key.",
+	       GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
 
-    ERROR_ENTRY("The SRP username supplied is illegal.",
-		GNUTLS_E_ILLEGAL_SRP_USERNAME, 1),
+  ERROR_ENTRY ("The SRP username supplied is illegal.",
+	       GNUTLS_E_ILLEGAL_SRP_USERNAME, 1),
 
-    ERROR_ENTRY("The OpenPGP fingerprint is not supported.",
-		GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED, 1),
-    ERROR_ENTRY("The certificate has unsupported attributes.",
-		GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE, 1),
-    ERROR_ENTRY("The OID is not supported.", GNUTLS_E_X509_UNSUPPORTED_OID,
-		1),
-    ERROR_ENTRY("The hash algorithm is unknown.",
-		GNUTLS_E_UNKNOWN_HASH_ALGORITHM, 1),
-    ERROR_ENTRY("The PKCS structure's content type is unknown.",
-		GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE, 1),
-    ERROR_ENTRY("The PKCS structure's bag type is unknown.",
-		GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE, 1),
-    ERROR_ENTRY("The given password contains invalid characters.",
-		GNUTLS_E_INVALID_PASSWORD, 1),
-    ERROR_ENTRY("The Message Authentication Code verification failed.",
-		GNUTLS_E_MAC_VERIFY_FAILED, 1),
-    ERROR_ENTRY("Some constraint limits were reached.",
-		GNUTLS_E_CONSTRAINT_ERROR, 1),
-    ERROR_ENTRY("Failed to acquire random data.", GNUTLS_E_RANDOM_FAILED,
-		1),
-    {NULL, NULL, 0, 0}
+  ERROR_ENTRY ("The OpenPGP fingerprint is not supported.",
+	       GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED, 1),
+  ERROR_ENTRY ("The certificate has unsupported attributes.",
+	       GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE, 1),
+  ERROR_ENTRY ("The OID is not supported.", GNUTLS_E_X509_UNSUPPORTED_OID,
+	       1),
+  ERROR_ENTRY ("The hash algorithm is unknown.",
+	       GNUTLS_E_UNKNOWN_HASH_ALGORITHM, 1),
+  ERROR_ENTRY ("The PKCS structure's content type is unknown.",
+	       GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE, 1),
+  ERROR_ENTRY ("The PKCS structure's bag type is unknown.",
+	       GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE, 1),
+  ERROR_ENTRY ("The given password contains invalid characters.",
+	       GNUTLS_E_INVALID_PASSWORD, 1),
+  ERROR_ENTRY ("The Message Authentication Code verification failed.",
+	       GNUTLS_E_MAC_VERIFY_FAILED, 1),
+  ERROR_ENTRY ("Some constraint limits were reached.",
+	       GNUTLS_E_CONSTRAINT_ERROR, 1),
+  ERROR_ENTRY ("Failed to acquire random data.", GNUTLS_E_RANDOM_FAILED,
+	       1),
+  {NULL, NULL, 0, 0}
 };
 
 #define GNUTLS_ERROR_LOOP(b) \
@@ -259,12 +259,13 @@ static gnutls_error_entry error_algorithms[] = {
   * record layer or the handshake layer.
   *
   **/
-int gnutls_error_is_fatal(int error)
+int
+gnutls_error_is_fatal (int error)
 {
-    int ret = 0;
+  int ret = 0;
 
-    GNUTLS_ERROR_ALG_LOOP(ret = p->fatal);
-    return ret;
+  GNUTLS_ERROR_ALG_LOOP (ret = p->fatal);
+  return ret;
 }
 
 /**
@@ -274,15 +275,16 @@ int gnutls_error_is_fatal(int error)
   * This function is like perror(). The only difference is that it accepts an 
   * error number returned by a gnutls function.
   **/
-void gnutls_perror(int error)
+void
+gnutls_perror (int error)
 {
-    const char *ret = NULL;
+  const char *ret = NULL;
 
-    /* avoid prefix */
-    GNUTLS_ERROR_ALG_LOOP(ret = p->desc);
-    if (ret == NULL)
-	ret = "(unknown)";
-    fprintf(stderr, "GNUTLS ERROR: %s\n", ret);
+  /* avoid prefix */
+  GNUTLS_ERROR_ALG_LOOP (ret = p->desc);
+  if (ret == NULL)
+    ret = "(unknown)";
+  fprintf (stderr, "GNUTLS ERROR: %s\n", ret);
 }
 
 
@@ -294,63 +296,67 @@ void gnutls_perror(int error)
   * number returned by a gnutls function; In case of an unknown error
   * a descriptive string is sent instead of NULL.
   **/
-const char *gnutls_strerror(int error)
+const char *
+gnutls_strerror (int error)
 {
-    const char *ret = NULL;
+  const char *ret = NULL;
 
-    /* avoid prefix */
-    GNUTLS_ERROR_ALG_LOOP(ret = p->desc);
-    if (ret == NULL)
-	return "(unknown error code)";
-    return ret;
+  /* avoid prefix */
+  GNUTLS_ERROR_ALG_LOOP (ret = p->desc);
+  if (ret == NULL)
+    return "(unknown error code)";
+  return ret;
 }
 
 /* This will print the actual define of the
  * given error code.
  */
-const char *_gnutls_strerror(int error)
+const char *
+_gnutls_strerror (int error)
 {
-    const char *ret = NULL;
+  const char *ret = NULL;
 
-    /* avoid prefix */
-    GNUTLS_ERROR_ALG_LOOP(ret = p->_name);
+  /* avoid prefix */
+  GNUTLS_ERROR_ALG_LOOP (ret = p->_name);
 
-    return ret;
+  return ret;
 }
 
-int _gnutls_asn2err(int asn_err)
+int
+_gnutls_asn2err (int asn_err)
 {
-    switch (asn_err) {
+  switch (asn_err)
+    {
     case ASN1_FILE_NOT_FOUND:
-	return GNUTLS_E_FILE_ERROR;
+      return GNUTLS_E_FILE_ERROR;
     case ASN1_ELEMENT_NOT_FOUND:
-	return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+      return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
     case ASN1_IDENTIFIER_NOT_FOUND:
-	return GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND;
+      return GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND;
     case ASN1_DER_ERROR:
-	return GNUTLS_E_ASN1_DER_ERROR;
+      return GNUTLS_E_ASN1_DER_ERROR;
     case ASN1_VALUE_NOT_FOUND:
-	return GNUTLS_E_ASN1_VALUE_NOT_FOUND;
+      return GNUTLS_E_ASN1_VALUE_NOT_FOUND;
     case ASN1_GENERIC_ERROR:
-	return GNUTLS_E_ASN1_GENERIC_ERROR;
+      return GNUTLS_E_ASN1_GENERIC_ERROR;
     case ASN1_VALUE_NOT_VALID:
-	return GNUTLS_E_ASN1_VALUE_NOT_VALID;
+      return GNUTLS_E_ASN1_VALUE_NOT_VALID;
     case ASN1_TAG_ERROR:
-	return GNUTLS_E_ASN1_TAG_ERROR;
+      return GNUTLS_E_ASN1_TAG_ERROR;
     case ASN1_TAG_IMPLICIT:
-	return GNUTLS_E_ASN1_TAG_IMPLICIT;
+      return GNUTLS_E_ASN1_TAG_IMPLICIT;
     case ASN1_ERROR_TYPE_ANY:
-	return GNUTLS_E_ASN1_TYPE_ANY_ERROR;
+      return GNUTLS_E_ASN1_TYPE_ANY_ERROR;
     case ASN1_SYNTAX_ERROR:
-	return GNUTLS_E_ASN1_SYNTAX_ERROR;
+      return GNUTLS_E_ASN1_SYNTAX_ERROR;
     case ASN1_MEM_ERROR:
-	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
     case ASN1_MEM_ALLOC_ERROR:
-	return GNUTLS_E_MEMORY_ERROR;
+      return GNUTLS_E_MEMORY_ERROR;
     case ASN1_DER_OVERFLOW:
-	return GNUTLS_E_ASN1_DER_OVERFLOW;
+      return GNUTLS_E_ASN1_DER_OVERFLOW;
     default:
-	return GNUTLS_E_ASN1_GENERIC_ERROR;
+      return GNUTLS_E_ASN1_GENERIC_ERROR;
     }
 }
 
@@ -358,20 +364,21 @@ int _gnutls_asn2err(int asn_err)
 /* this function will output a message using the
  * caller provided function 
  */
-void _gnutls_log(int level, const char *fmt, ...)
+void
+_gnutls_log (int level, const char *fmt, ...)
 {
-    va_list args;
-    char str[MAX_LOG_SIZE];
-    void (*log_func) (int, const char *) = _gnutls_log_func;
+  va_list args;
+  char str[MAX_LOG_SIZE];
+  void (*log_func) (int, const char *) = _gnutls_log_func;
 
-    if (_gnutls_log_func == NULL)
-	return;
+  if (_gnutls_log_func == NULL)
+    return;
 
-    va_start(args, fmt);
-    vsnprintf(str, MAX_LOG_SIZE - 1, fmt, args);	/* Flawfinder: ignore */
-    va_end(args);
+  va_start (args, fmt);
+  vsnprintf (str, MAX_LOG_SIZE - 1, fmt, args);	/* Flawfinder: ignore */
+  va_end (args);
 
-    log_func(level, str);
+  log_func (level, str);
 }
 
 #ifndef DEBUG
@@ -380,10 +387,11 @@ void _gnutls_log(int level, const char *fmt, ...)
 /* Without C99 macros these functions have to
  * be called. This may affect performance.
  */
-void _gnutls_null_log(void *x, ...)
+void
+_gnutls_null_log (void *x, ...)
 {
-    return;
+  return;
 }
 
-# endif				/* C99_MACROS */
-#endif				/* DEBUG */
+# endif	/* C99_MACROS */
+#endif /* DEBUG */

@@ -27,43 +27,44 @@
 #include <gnutls_record.h>
 #include <debug.h>
 
-typedef struct {
-    gnutls_alert_description_t alert;
-    const char *desc;
+typedef struct
+{
+  gnutls_alert_description_t alert;
+  const char *desc;
 } gnutls_alert_entry;
 
 static const gnutls_alert_entry sup_alerts[] = {
-    {GNUTLS_A_CLOSE_NOTIFY, "Close notify"},
-    {GNUTLS_A_UNEXPECTED_MESSAGE, "Unexpected message"},
-    {GNUTLS_A_BAD_RECORD_MAC, "Bad record MAC"},
-    {GNUTLS_A_DECRYPTION_FAILED, "Decryption failed"},
-    {GNUTLS_A_RECORD_OVERFLOW, "Record overflow"},
-    {GNUTLS_A_DECOMPRESSION_FAILURE, "Decompression failed"},
-    {GNUTLS_A_HANDSHAKE_FAILURE, "Handshake failed"},
-    {GNUTLS_A_BAD_CERTIFICATE, "Certificate is bad"},
-    {GNUTLS_A_UNSUPPORTED_CERTIFICATE, "Certificate is not supported"},
-    {GNUTLS_A_CERTIFICATE_REVOKED, "Certificate was revoked"},
-    {GNUTLS_A_CERTIFICATE_EXPIRED, "Certificate is expired"},
-    {GNUTLS_A_CERTIFICATE_UNKNOWN, "Unknown certificate"},
-    {GNUTLS_A_ILLEGAL_PARAMETER, "Illegal parameter"},
-    {GNUTLS_A_UNKNOWN_CA, "CA is unknown"},
-    {GNUTLS_A_ACCESS_DENIED, "Access was denied"},
-    {GNUTLS_A_DECODE_ERROR, "Decode error"},
-    {GNUTLS_A_DECRYPT_ERROR, "Decrypt error"},
-    {GNUTLS_A_EXPORT_RESTRICTION, "Export restriction"},
-    {GNUTLS_A_PROTOCOL_VERSION, "Error in protocol version"},
-    {GNUTLS_A_INSUFFICIENT_SECURITY, "Insufficient security"},
-    {GNUTLS_A_USER_CANCELED, "User canceled"},
-    {GNUTLS_A_INTERNAL_ERROR, "Internal error"},
-    {GNUTLS_A_NO_RENEGOTIATION, "No renegotiation is allowed"},
-    {GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
-     "Could not retrieve the specified certificate"},
-    {GNUTLS_A_UNSUPPORTED_EXTENSION, "An unsupported extension was sent"},
-    {GNUTLS_A_UNRECOGNIZED_NAME,
-     "The server name sent was not recognized"},
-    {GNUTLS_A_UNKNOWN_SRP_USERNAME, "The SRP username is not known"},
-    {GNUTLS_A_MISSING_SRP_USERNAME, "The SRP username was not sent"},
-    {0, NULL}
+  {GNUTLS_A_CLOSE_NOTIFY, "Close notify"},
+  {GNUTLS_A_UNEXPECTED_MESSAGE, "Unexpected message"},
+  {GNUTLS_A_BAD_RECORD_MAC, "Bad record MAC"},
+  {GNUTLS_A_DECRYPTION_FAILED, "Decryption failed"},
+  {GNUTLS_A_RECORD_OVERFLOW, "Record overflow"},
+  {GNUTLS_A_DECOMPRESSION_FAILURE, "Decompression failed"},
+  {GNUTLS_A_HANDSHAKE_FAILURE, "Handshake failed"},
+  {GNUTLS_A_BAD_CERTIFICATE, "Certificate is bad"},
+  {GNUTLS_A_UNSUPPORTED_CERTIFICATE, "Certificate is not supported"},
+  {GNUTLS_A_CERTIFICATE_REVOKED, "Certificate was revoked"},
+  {GNUTLS_A_CERTIFICATE_EXPIRED, "Certificate is expired"},
+  {GNUTLS_A_CERTIFICATE_UNKNOWN, "Unknown certificate"},
+  {GNUTLS_A_ILLEGAL_PARAMETER, "Illegal parameter"},
+  {GNUTLS_A_UNKNOWN_CA, "CA is unknown"},
+  {GNUTLS_A_ACCESS_DENIED, "Access was denied"},
+  {GNUTLS_A_DECODE_ERROR, "Decode error"},
+  {GNUTLS_A_DECRYPT_ERROR, "Decrypt error"},
+  {GNUTLS_A_EXPORT_RESTRICTION, "Export restriction"},
+  {GNUTLS_A_PROTOCOL_VERSION, "Error in protocol version"},
+  {GNUTLS_A_INSUFFICIENT_SECURITY, "Insufficient security"},
+  {GNUTLS_A_USER_CANCELED, "User canceled"},
+  {GNUTLS_A_INTERNAL_ERROR, "Internal error"},
+  {GNUTLS_A_NO_RENEGOTIATION, "No renegotiation is allowed"},
+  {GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
+   "Could not retrieve the specified certificate"},
+  {GNUTLS_A_UNSUPPORTED_EXTENSION, "An unsupported extension was sent"},
+  {GNUTLS_A_UNRECOGNIZED_NAME,
+   "The server name sent was not recognized"},
+  {GNUTLS_A_UNKNOWN_SRP_USERNAME, "The SRP username is not known"},
+  {GNUTLS_A_MISSING_SRP_USERNAME, "The SRP username was not sent"},
+  {0, NULL}
 };
 
 #define GNUTLS_ALERT_LOOP(b) \
@@ -82,13 +83,14 @@ static const gnutls_alert_entry sup_alerts[] = {
   * number or NULL.  See gnutls_alert_get().
   *
   **/
-const char *gnutls_alert_get_name(gnutls_alert_description_t alert)
+const char *
+gnutls_alert_get_name (gnutls_alert_description_t alert)
 {
-    const char *ret = NULL;
+  const char *ret = NULL;
 
-    GNUTLS_ALERT_ID_LOOP(ret = p->desc);
+  GNUTLS_ALERT_ID_LOOP (ret = p->desc);
 
-    return ret;
+  return ret;
 }
 
 /**
@@ -108,26 +110,27 @@ const char *gnutls_alert_get_name(gnutls_alert_description_t alert)
   * Returns 0 on success.
   *
   **/
-int gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
-		      gnutls_alert_description_t desc)
+int
+gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
+		   gnutls_alert_description_t desc)
 {
-    uint8 data[2];
-    int ret;
-    const char *name;
+  uint8 data[2];
+  int ret;
+  const char *name;
 
-    data[0] = (uint8) level;
-    data[1] = (uint8) desc;
+  data[0] = (uint8) level;
+  data[1] = (uint8) desc;
 
-    name = gnutls_alert_get_name((int) data[1]);
-    if (name == NULL)
-	name = "(unknown)";
-    _gnutls_record_log("REC: Sending Alert[%d|%d] - %s\n", data[0],
-		       data[1], name);
+  name = gnutls_alert_get_name ((int) data[1]);
+  if (name == NULL)
+    name = "(unknown)";
+  _gnutls_record_log ("REC: Sending Alert[%d|%d] - %s\n", data[0],
+		      data[1], name);
 
-    if ((ret = _gnutls_send_int(session, GNUTLS_ALERT, -1, data, 2)) >= 0)
-	return 0;
-    else
-	return ret;
+  if ((ret = _gnutls_send_int (session, GNUTLS_ALERT, -1, data, 2)) >= 0)
+    return 0;
+  else
+    return ret;
 }
 
 /**
@@ -145,31 +148,33 @@ int gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
   * mapping to an alert.
   *
   **/
-int gnutls_error_to_alert(int err, int *level)
+int
+gnutls_error_to_alert (int err, int *level)
 {
-    int ret = GNUTLS_E_INVALID_REQUEST;
-    int _level = -1;
+  int ret = GNUTLS_E_INVALID_REQUEST;
+  int _level = -1;
 
-    switch (err) {		/* send appropriate alert */
+  switch (err)
+    {				/* send appropriate alert */
     case GNUTLS_E_DECRYPTION_FAILED:
-	/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
-	 * it is not defined in SSL3. Note that we must
-	 * not distinguish Decryption failures from mac
-	 * check failures, due to the possibility of some 
-	 * attacks.
-	 */
-	ret = GNUTLS_A_BAD_RECORD_MAC;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      /* GNUTLS_A_DECRYPTION_FAILED is not sent, because
+       * it is not defined in SSL3. Note that we must
+       * not distinguish Decryption failures from mac
+       * check failures, due to the possibility of some 
+       * attacks.
+       */
+      ret = GNUTLS_A_BAD_RECORD_MAC;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_DECOMPRESSION_FAILED:
-	ret = GNUTLS_A_DECOMPRESSION_FAILURE;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_DECOMPRESSION_FAILURE;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
     case GNUTLS_E_ILLEGAL_SRP_USERNAME:
-	ret = GNUTLS_A_ILLEGAL_PARAMETER;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_ILLEGAL_PARAMETER;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_ASN1_ELEMENT_NOT_FOUND:
     case GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND:
     case GNUTLS_E_ASN1_DER_ERROR:
@@ -181,63 +186,63 @@ int gnutls_error_to_alert(int err, int *level)
     case GNUTLS_E_ASN1_TYPE_ANY_ERROR:
     case GNUTLS_E_ASN1_SYNTAX_ERROR:
     case GNUTLS_E_ASN1_DER_OVERFLOW:
-	ret = GNUTLS_A_BAD_CERTIFICATE;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_BAD_CERTIFICATE;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
     case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
     case GNUTLS_E_INSUFFICIENT_CREDENTIALS:
     case GNUTLS_E_NO_CIPHER_SUITES:
     case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
-	ret = GNUTLS_A_HANDSHAKE_FAILURE;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_HANDSHAKE_FAILURE;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
-	ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_UNEXPECTED_PACKET:
     case GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET:
-	ret = GNUTLS_A_UNEXPECTED_MESSAGE;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_UNEXPECTED_MESSAGE;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_REHANDSHAKE:
-	ret = GNUTLS_A_NO_RENEGOTIATION;
-	_level = GNUTLS_AL_WARNING;
-	break;
+      ret = GNUTLS_A_NO_RENEGOTIATION;
+      _level = GNUTLS_AL_WARNING;
+      break;
     case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
-	ret = GNUTLS_A_PROTOCOL_VERSION;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_PROTOCOL_VERSION;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE:
-	ret = GNUTLS_A_UNSUPPORTED_CERTIFICATE;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_UNSUPPORTED_CERTIFICATE;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
-	ret = GNUTLS_A_RECORD_OVERFLOW;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_RECORD_OVERFLOW;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_INTERNAL_ERROR:
     case GNUTLS_E_NO_TEMPORARY_DH_PARAMS:
     case GNUTLS_E_NO_TEMPORARY_RSA_PARAMS:
-	ret = GNUTLS_A_INTERNAL_ERROR;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_INTERNAL_ERROR;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_OPENPGP_GETKEY_FAILED:
-	ret = GNUTLS_A_CERTIFICATE_UNOBTAINABLE;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_CERTIFICATE_UNOBTAINABLE;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
     case GNUTLS_E_NO_CERTIFICATE_FOUND:
-	ret = GNUTLS_A_INSUFFICIENT_SECURITY;
-	_level = GNUTLS_AL_FATAL;
-	break;
+      ret = GNUTLS_A_INSUFFICIENT_SECURITY;
+      _level = GNUTLS_AL_FATAL;
+      break;
     }
 
-    if (level != NULL)
-	*level = _level;
+  if (level != NULL)
+    *level = _level;
 
-    return ret;
+  return ret;
 }
 
 
@@ -257,17 +262,19 @@ int gnutls_error_to_alert(int err, int *level)
  *
  * Returns zero on success.
  */
-int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
+int
+gnutls_alert_send_appropriate (gnutls_session_t session, int err)
 {
-    int alert;
-    int level;
+  int alert;
+  int level;
 
-    alert = gnutls_error_to_alert(err, &level);
-    if (alert < 0) {
-	return alert;
+  alert = gnutls_error_to_alert (err, &level);
+  if (alert < 0)
+    {
+      return alert;
     }
 
-    return gnutls_alert_send(session, level, alert);
+  return gnutls_alert_send (session, level, alert);
 }
 
 /**
@@ -283,7 +290,8 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
   * If no alert has been received the returned value is undefined.
   *
   **/
-gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session)
+gnutls_alert_description_t
+gnutls_alert_get (gnutls_session_t session)
 {
-    return session->internals.last_alert;
+  return session->internals.last_alert;
 }

@@ -39,32 +39,34 @@
   *
   * Resuming sessions is really useful and speedups connections after a succesful one.
   **/
-int gnutls_session_get_data(gnutls_session_t session,
-			    void *session_data, size_t * session_data_size)
+int
+gnutls_session_get_data (gnutls_session_t session,
+			 void *session_data, size_t * session_data_size)
 {
 
-    gnutls_datum_t psession;
-    int ret;
+  gnutls_datum_t psession;
+  int ret;
 
-    if (session->internals.resumable == RESUME_FALSE)
-	return GNUTLS_E_INVALID_SESSION;
+  if (session->internals.resumable == RESUME_FALSE)
+    return GNUTLS_E_INVALID_SESSION;
 
-    psession.data = session_data;
+  psession.data = session_data;
 
-    ret = _gnutls_session_pack(session, &psession);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret = _gnutls_session_pack (session, &psession);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
-    *session_data_size = psession.size;
+  *session_data_size = psession.size;
 
-    if (psession.size > *session_data_size)
-	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+  if (psession.size > *session_data_size)
+    return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
-    if (session_data != NULL)
-	memcpy(session_data, psession.data, psession.size);
+  if (session_data != NULL)
+    memcpy (session_data, psession.data, psession.size);
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -80,25 +82,28 @@ int gnutls_session_get_data(gnutls_session_t session,
   *
   * Resuming sessions is really useful and speedups connections after a succesful one.
   **/
-int gnutls_session_get_data2(gnutls_session_t session, gnutls_datum * data)
+int
+gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum * data)
 {
 
-    int ret;
+  int ret;
 
-    if (data == NULL) {
-	return GNUTLS_E_INVALID_REQUEST;
+  if (data == NULL)
+    {
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
-    if (session->internals.resumable == RESUME_FALSE)
-	return GNUTLS_E_INVALID_SESSION;
+  if (session->internals.resumable == RESUME_FALSE)
+    return GNUTLS_E_INVALID_SESSION;
 
-    ret = _gnutls_session_pack(session, data);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret = _gnutls_session_pack (session, data);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    return 0;
+  return 0;
 }
 
 
@@ -116,20 +121,22 @@ int gnutls_session_get_data2(gnutls_session_t session, gnutls_datum * data)
   * Session id is some data set by the server, that identify the current session. 
   * In TLS 1.0 and SSL 3.0 session id is always less than 32 bytes.
   **/
-int gnutls_session_get_id(gnutls_session_t session,
-			  void *session_id, size_t * session_id_size)
+int
+gnutls_session_get_id (gnutls_session_t session,
+		       void *session_id, size_t * session_id_size)
 {
 
-    *session_id_size = session->security_parameters.session_id_size;
+  *session_id_size = session->security_parameters.session_id_size;
 
-    /* just return the session size */
-    if (session_id == NULL) {
-	return 0;
+  /* just return the session size */
+  if (session_id == NULL)
+    {
+      return 0;
     }
-    memcpy(session_id, &session->security_parameters.session_id,
-	   *session_id_size);
+  memcpy (session_id, &session->security_parameters.session_id,
+	  *session_id_size);
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -149,25 +156,27 @@ int gnutls_session_get_id(gnutls_session_t session,
   * Returns a negative value on error.
   *
   **/
-int gnutls_session_set_data(gnutls_session_t session,
-			    const void *session_data,
-			    size_t session_data_size)
+int
+gnutls_session_set_data (gnutls_session_t session,
+			 const void *session_data, size_t session_data_size)
 {
-    int ret;
-    gnutls_datum_t psession;
+  int ret;
+  gnutls_datum_t psession;
 
-    psession.data = (opaque *) session_data;
-    psession.size = session_data_size;
+  psession.data = (opaque *) session_data;
+  psession.size = session_data_size;
 
-    if (session_data == NULL || session_data_size == 0) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+  if (session_data == NULL || session_data_size == 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
     }
-    ret = _gnutls_session_unpack(session, &psession);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret = _gnutls_session_unpack (session, &psession);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    return 0;
+  return 0;
 }

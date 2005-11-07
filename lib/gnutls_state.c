@@ -49,10 +49,11 @@
 	return ret; \
 	}
 
-void _gnutls_session_cert_type_set(gnutls_session_t session,
-				   gnutls_certificate_type_t ct)
+void
+_gnutls_session_cert_type_set (gnutls_session_t session,
+			       gnutls_certificate_type_t ct)
 {
-    session->security_parameters.cert_type = ct;
+  session->security_parameters.cert_type = ct;
 }
 
 /**
@@ -61,9 +62,10 @@ void _gnutls_session_cert_type_set(gnutls_session_t session,
   *
   * Returns the currently used cipher.
   **/
-gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
+gnutls_cipher_algorithm_t
+gnutls_cipher_get (gnutls_session_t session)
 {
-    return session->security_parameters.read_bulk_cipher_algorithm;
+  return session->security_parameters.read_bulk_cipher_algorithm;
 }
 
 /**
@@ -74,10 +76,10 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
   * is by default X.509, unless it is negotiated as a TLS extension.
   *
   **/
-gnutls_certificate_type_t gnutls_certificate_type_get(gnutls_session_t
-						      session)
+gnutls_certificate_type_t
+gnutls_certificate_type_get (gnutls_session_t session)
 {
-    return session->security_parameters.cert_type;
+  return session->security_parameters.cert_type;
 }
 
 /**
@@ -86,9 +88,10 @@ gnutls_certificate_type_t gnutls_certificate_type_get(gnutls_session_t
   *
   * Returns the key exchange algorithm used in the last handshake.
   **/
-gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
+gnutls_kx_algorithm_t
+gnutls_kx_get (gnutls_session_t session)
 {
-    return session->security_parameters.kx_algorithm;
+  return session->security_parameters.kx_algorithm;
 }
 
 /**
@@ -97,9 +100,10 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
   *
   * Returns the currently used mac algorithm.
   **/
-gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
+gnutls_mac_algorithm_t
+gnutls_mac_get (gnutls_session_t session)
 {
-    return session->security_parameters.read_mac_algorithm;
+  return session->security_parameters.read_mac_algorithm;
 }
 
 /**
@@ -108,107 +112,112 @@ gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
   *
   * Returns the currently used compression method.
   **/
-gnutls_compression_method_t gnutls_compression_get(gnutls_session_t
-						   session)
+gnutls_compression_method_t
+gnutls_compression_get (gnutls_session_t session)
 {
-    return session->security_parameters.read_compression_algorithm;
+  return session->security_parameters.read_compression_algorithm;
 }
 
 /* Check if the given certificate type is supported.
  * This means that it is enabled by the priority functions,
  * and a matching certificate exists.
  */
-int _gnutls_session_cert_type_supported(gnutls_session_t session,
-					gnutls_certificate_type_t
-					cert_type)
+int
+_gnutls_session_cert_type_supported (gnutls_session_t session,
+				     gnutls_certificate_type_t cert_type)
 {
-    uint i;
-    uint cert_found = 0;
-    gnutls_certificate_credentials_t cred;
+  uint i;
+  uint cert_found = 0;
+  gnutls_certificate_credentials_t cred;
 
-    if (session->security_parameters.entity == GNUTLS_SERVER) {
-	cred = (gnutls_certificate_credentials_t)
-	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+  if (session->security_parameters.entity == GNUTLS_SERVER)
+    {
+      cred = (gnutls_certificate_credentials_t)
+	_gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 
-	if (cred == NULL)
-	    return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+      if (cred == NULL)
+	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 
-	for (i = 0; i < cred->ncerts; i++) {
-	    if (cred->cert_list[i][0].cert_type == cert_type) {
-		cert_found = 1;
-		break;
+      for (i = 0; i < cred->ncerts; i++)
+	{
+	  if (cred->cert_list[i][0].cert_type == cert_type)
+	    {
+	      cert_found = 1;
+	      break;
 	    }
 	}
-	if (cert_found == 0)
-	    /* no certificate is of that type.
-	     */
-	    return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+      if (cert_found == 0)
+	/* no certificate is of that type.
+	 */
+	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
     }
 
 
-    if (session->internals.cert_type_priority.algorithms == 0
-	&& cert_type == DEFAULT_CERT_TYPE)
-	return 0;
+  if (session->internals.cert_type_priority.algorithms == 0
+      && cert_type == DEFAULT_CERT_TYPE)
+    return 0;
 
-    for (i = 0; i < session->internals.cert_type_priority.algorithms; i++) {
-	if (session->internals.cert_type_priority.priority[i]
-	    == cert_type) {
-	    return 0;		/* ok */
+  for (i = 0; i < session->internals.cert_type_priority.algorithms; i++)
+    {
+      if (session->internals.cert_type_priority.priority[i] == cert_type)
+	{
+	  return 0;		/* ok */
 	}
     }
 
-    return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+  return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 }
 
 /* this function deinitializes all the internal parameters stored
  * in a session struct.
  */
-inline static void deinit_internal_params(gnutls_session_t session)
+inline static void
+deinit_internal_params (gnutls_session_t session)
 {
-    if (session->internals.params.free_anon_dh_params)
-	gnutls_dh_params_deinit(session->internals.params.anon_dh_params);
+  if (session->internals.params.free_anon_dh_params)
+    gnutls_dh_params_deinit (session->internals.params.anon_dh_params);
 
-    if (session->internals.params.free_cert_dh_params)
-	gnutls_dh_params_deinit(session->internals.params.cert_dh_params);
+  if (session->internals.params.free_cert_dh_params)
+    gnutls_dh_params_deinit (session->internals.params.cert_dh_params);
 
-    if (session->internals.params.free_rsa_params)
-	gnutls_rsa_params_deinit(session->internals.params.rsa_params);
+  if (session->internals.params.free_rsa_params)
+    gnutls_rsa_params_deinit (session->internals.params.rsa_params);
 
-    memset(&session->internals.params, 0,
-	   sizeof(session->internals.params));
+  memset (&session->internals.params, 0, sizeof (session->internals.params));
 }
 
 /* This function will clear all the variables in internals
  * structure within the session, which depend on the current handshake.
  * This is used to allow further handshakes.
  */
-void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
+void
+_gnutls_handshake_internal_state_clear (gnutls_session_t session)
 {
-    session->internals.extensions_sent_size = 0;
+  session->internals.extensions_sent_size = 0;
 
-    /* by default no selected certificate */
-    session->internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
-    session->internals.adv_version_major = 0;
-    session->internals.adv_version_minor = 0;
-    session->internals.v2_hello = 0;
-    memset(&session->internals.handshake_header_buffer, 0,
-	   sizeof(handshake_header_buffer_st));
-    session->internals.adv_version_minor = 0;
-    session->internals.adv_version_minor = 0;
-    session->internals.direction = 0;
+  /* by default no selected certificate */
+  session->internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
+  session->internals.adv_version_major = 0;
+  session->internals.adv_version_minor = 0;
+  session->internals.v2_hello = 0;
+  memset (&session->internals.handshake_header_buffer, 0,
+	  sizeof (handshake_header_buffer_st));
+  session->internals.adv_version_minor = 0;
+  session->internals.adv_version_minor = 0;
+  session->internals.direction = 0;
 
-    /* use out of band data for the last
-     * handshake messages received.
-     */
-    session->internals.last_handshake_in = -1;
-    session->internals.last_handshake_out = -1;
+  /* use out of band data for the last
+   * handshake messages received.
+   */
+  session->internals.last_handshake_in = -1;
+  session->internals.last_handshake_out = -1;
 
-    session->internals.handshake_restarted = 0;
+  session->internals.handshake_restarted = 0;
 
-    session->internals.resumable = RESUME_TRUE;
-    _gnutls_free_datum(&session->internals.recv_buffer);
+  session->internals.resumable = RESUME_TRUE;
+  _gnutls_free_datum (&session->internals.recv_buffer);
 
-    deinit_internal_params(session);
+  deinit_internal_params (session);
 
 }
 
@@ -224,101 +233,101 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
   * This function allocates structures which can only be free'd
   * by calling gnutls_deinit(). Returns zero on success.
   **/
-int gnutls_init(gnutls_session_t * session,
-		gnutls_connection_end_t con_end)
+int
+gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
 {
-    *session = gnutls_calloc(1, sizeof(struct gnutls_session_int));
-    if (*session == NULL)
-	return GNUTLS_E_MEMORY_ERROR;
+  *session = gnutls_calloc (1, sizeof (struct gnutls_session_int));
+  if (*session == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
 
-    (*session)->security_parameters.entity = con_end;
+  (*session)->security_parameters.entity = con_end;
 
-    /* the default certificate type for TLS */
-    (*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
+  /* the default certificate type for TLS */
+  (*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
 
 /* Set the defaults for initial handshake */
-    (*session)->security_parameters.read_bulk_cipher_algorithm =
-	(*session)->security_parameters.write_bulk_cipher_algorithm =
-	GNUTLS_CIPHER_NULL;
+  (*session)->security_parameters.read_bulk_cipher_algorithm =
+    (*session)->security_parameters.write_bulk_cipher_algorithm =
+    GNUTLS_CIPHER_NULL;
 
-    (*session)->security_parameters.read_mac_algorithm =
-	(*session)->security_parameters.write_mac_algorithm =
-	GNUTLS_MAC_NULL;
+  (*session)->security_parameters.read_mac_algorithm =
+    (*session)->security_parameters.write_mac_algorithm = GNUTLS_MAC_NULL;
 
-    (*session)->security_parameters.read_compression_algorithm =
-	GNUTLS_COMP_NULL;
-    (*session)->security_parameters.write_compression_algorithm =
-	GNUTLS_COMP_NULL;
+  (*session)->security_parameters.read_compression_algorithm =
+    GNUTLS_COMP_NULL;
+  (*session)->security_parameters.write_compression_algorithm =
+    GNUTLS_COMP_NULL;
 
-    (*session)->internals.enable_private = 0;
+  (*session)->internals.enable_private = 0;
 
-    /* Initialize buffers */
-    _gnutls_buffer_init(&(*session)->internals.application_data_buffer);
-    _gnutls_buffer_init(&(*session)->internals.handshake_data_buffer);
-    _gnutls_buffer_init(&(*session)->internals.handshake_hash_buffer);
+  /* Initialize buffers */
+  _gnutls_buffer_init (&(*session)->internals.application_data_buffer);
+  _gnutls_buffer_init (&(*session)->internals.handshake_data_buffer);
+  _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
 
-    _gnutls_buffer_init(&(*session)->internals.record_send_buffer);
-    _gnutls_buffer_init(&(*session)->internals.record_recv_buffer);
+  _gnutls_buffer_init (&(*session)->internals.record_send_buffer);
+  _gnutls_buffer_init (&(*session)->internals.record_recv_buffer);
 
-    _gnutls_buffer_init(&(*session)->internals.handshake_send_buffer);
-    _gnutls_buffer_init(&(*session)->internals.handshake_recv_buffer);
+  _gnutls_buffer_init (&(*session)->internals.handshake_send_buffer);
+  _gnutls_buffer_init (&(*session)->internals.handshake_recv_buffer);
 
-    (*session)->key = gnutls_calloc(1, sizeof(struct gnutls_key_st));
-    if ((*session)->key == NULL) {
-      cleanup_session:
-	gnutls_free(*session);
-	*session = NULL;
-	return GNUTLS_E_MEMORY_ERROR;
+  (*session)->key = gnutls_calloc (1, sizeof (struct gnutls_key_st));
+  if ((*session)->key == NULL)
+    {
+    cleanup_session:
+      gnutls_free (*session);
+      *session = NULL;
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
-    (*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;	/* one hour default */
+  (*session)->internals.expire_time = DEFAULT_EXPIRE_TIME;	/* one hour default */
 
-    gnutls_dh_set_prime_bits((*session), MIN_DH_BITS);
+  gnutls_dh_set_prime_bits ((*session), MIN_DH_BITS);
 
-    gnutls_transport_set_lowat((*session), DEFAULT_LOWAT);	/* the default for tcp */
+  gnutls_transport_set_lowat ((*session), DEFAULT_LOWAT);	/* the default for tcp */
 
-    gnutls_handshake_set_max_packet_length((*session),
-					   MAX_HANDSHAKE_PACKET_SIZE);
+  gnutls_handshake_set_max_packet_length ((*session),
+					  MAX_HANDSHAKE_PACKET_SIZE);
 
-    /* Allocate a minimum size for recv_data 
-     * This is allocated in order to avoid small messages, making
-     * the receive procedure slow.
-     */
-    (*session)->internals.record_recv_buffer.data =
-	gnutls_malloc(INITIAL_RECV_BUFFER_SIZE);
-    if ((*session)->internals.record_recv_buffer.data == NULL) {
-	gnutls_free((*session)->key);
-	goto cleanup_session;
+  /* Allocate a minimum size for recv_data 
+   * This is allocated in order to avoid small messages, making
+   * the receive procedure slow.
+   */
+  (*session)->internals.record_recv_buffer.data =
+    gnutls_malloc (INITIAL_RECV_BUFFER_SIZE);
+  if ((*session)->internals.record_recv_buffer.data == NULL)
+    {
+      gnutls_free ((*session)->key);
+      goto cleanup_session;
     }
 
-    /* set the socket pointers to -1;
-     */
-    (*session)->internals.transport_recv_ptr =
-	(gnutls_transport_ptr_t) - 1;
-    (*session)->internals.transport_send_ptr =
-	(gnutls_transport_ptr_t) - 1;
+  /* set the socket pointers to -1;
+   */
+  (*session)->internals.transport_recv_ptr = (gnutls_transport_ptr_t) - 1;
+  (*session)->internals.transport_send_ptr = (gnutls_transport_ptr_t) - 1;
 
-    /* set the default maximum record size for TLS
-     */
-    (*session)->security_parameters.max_record_recv_size =
-	DEFAULT_MAX_RECORD_SIZE;
-    (*session)->security_parameters.max_record_send_size =
-	DEFAULT_MAX_RECORD_SIZE;
+  /* set the default maximum record size for TLS
+   */
+  (*session)->security_parameters.max_record_recv_size =
+    DEFAULT_MAX_RECORD_SIZE;
+  (*session)->security_parameters.max_record_send_size =
+    DEFAULT_MAX_RECORD_SIZE;
 
-    /* everything else not initialized here is initialized
-     * as NULL or 0. This is why calloc is used.
-     */
+  /* everything else not initialized here is initialized
+   * as NULL or 0. This is why calloc is used.
+   */
 
-    _gnutls_handshake_internal_state_clear(*session);
+  _gnutls_handshake_internal_state_clear (*session);
 
-    return 0;
+  return 0;
 }
 
 /* returns RESUME_FALSE or RESUME_TRUE.
  */
-int _gnutls_session_is_resumable(gnutls_session_t session)
+int
+_gnutls_session_is_resumable (gnutls_session_t session)
 {
-    return session->internals.resumable;
+  return session->internals.resumable;
 }
 
 
@@ -331,241 +340,260 @@ int _gnutls_session_is_resumable(gnutls_session_t session)
   * if the session was terminated abnormally.
   *
   **/
-void gnutls_deinit(gnutls_session_t session)
+void
+gnutls_deinit (gnutls_session_t session)
 {
 
-    if (session == NULL)
-	return;
+  if (session == NULL)
+    return;
 
-    /* remove auth info firstly */
-    _gnutls_free_auth_info(session);
+  /* remove auth info firstly */
+  _gnutls_free_auth_info (session);
 
-    _gnutls_handshake_internal_state_clear(session);
-    _gnutls_handshake_io_buffer_clear(session);
+  _gnutls_handshake_internal_state_clear (session);
+  _gnutls_handshake_io_buffer_clear (session);
 
-    _gnutls_free_datum(&session->connection_state.read_mac_secret);
-    _gnutls_free_datum(&session->connection_state.write_mac_secret);
+  _gnutls_free_datum (&session->connection_state.read_mac_secret);
+  _gnutls_free_datum (&session->connection_state.write_mac_secret);
 
-    _gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
-    _gnutls_buffer_clear(&session->internals.handshake_data_buffer);
-    _gnutls_buffer_clear(&session->internals.application_data_buffer);
-    _gnutls_buffer_clear(&session->internals.record_recv_buffer);
-    _gnutls_buffer_clear(&session->internals.record_send_buffer);
+  _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
+  _gnutls_buffer_clear (&session->internals.handshake_data_buffer);
+  _gnutls_buffer_clear (&session->internals.application_data_buffer);
+  _gnutls_buffer_clear (&session->internals.record_recv_buffer);
+  _gnutls_buffer_clear (&session->internals.record_send_buffer);
 
-    gnutls_credentials_clear(session);
-    _gnutls_selected_certs_deinit(session);
+  gnutls_credentials_clear (session);
+  _gnutls_selected_certs_deinit (session);
 
-    if (session->connection_state.read_cipher_state != NULL)
-	_gnutls_cipher_deinit(session->connection_state.read_cipher_state);
-    if (session->connection_state.write_cipher_state != NULL)
-	_gnutls_cipher_deinit(session->connection_state.
-			      write_cipher_state);
+  if (session->connection_state.read_cipher_state != NULL)
+    _gnutls_cipher_deinit (session->connection_state.read_cipher_state);
+  if (session->connection_state.write_cipher_state != NULL)
+    _gnutls_cipher_deinit (session->connection_state.write_cipher_state);
 
-    if (session->connection_state.read_compression_state != NULL)
-	_gnutls_comp_deinit(session->connection_state.
-			    read_compression_state, 1);
-    if (session->connection_state.write_compression_state != NULL)
-	_gnutls_comp_deinit(session->connection_state.
-			    write_compression_state, 0);
+  if (session->connection_state.read_compression_state != NULL)
+    _gnutls_comp_deinit (session->connection_state.read_compression_state, 1);
+  if (session->connection_state.write_compression_state != NULL)
+    _gnutls_comp_deinit (session->connection_state.
+			 write_compression_state, 0);
 
-    _gnutls_free_datum(&session->cipher_specs.server_write_mac_secret);
-    _gnutls_free_datum(&session->cipher_specs.client_write_mac_secret);
-    _gnutls_free_datum(&session->cipher_specs.server_write_IV);
-    _gnutls_free_datum(&session->cipher_specs.client_write_IV);
-    _gnutls_free_datum(&session->cipher_specs.server_write_key);
-    _gnutls_free_datum(&session->cipher_specs.client_write_key);
+  _gnutls_free_datum (&session->cipher_specs.server_write_mac_secret);
+  _gnutls_free_datum (&session->cipher_specs.client_write_mac_secret);
+  _gnutls_free_datum (&session->cipher_specs.server_write_IV);
+  _gnutls_free_datum (&session->cipher_specs.client_write_IV);
+  _gnutls_free_datum (&session->cipher_specs.server_write_key);
+  _gnutls_free_datum (&session->cipher_specs.client_write_key);
 
-    if (session->key != NULL) {
-	_gnutls_mpi_release(&session->key->KEY);
-	_gnutls_mpi_release(&session->key->client_Y);
-	_gnutls_mpi_release(&session->key->client_p);
-	_gnutls_mpi_release(&session->key->client_g);
+  if (session->key != NULL)
+    {
+      _gnutls_mpi_release (&session->key->KEY);
+      _gnutls_mpi_release (&session->key->client_Y);
+      _gnutls_mpi_release (&session->key->client_p);
+      _gnutls_mpi_release (&session->key->client_g);
 
-	_gnutls_mpi_release(&session->key->u);
-	_gnutls_mpi_release(&session->key->a);
-	_gnutls_mpi_release(&session->key->x);
-	_gnutls_mpi_release(&session->key->A);
-	_gnutls_mpi_release(&session->key->B);
-	_gnutls_mpi_release(&session->key->b);
+      _gnutls_mpi_release (&session->key->u);
+      _gnutls_mpi_release (&session->key->a);
+      _gnutls_mpi_release (&session->key->x);
+      _gnutls_mpi_release (&session->key->A);
+      _gnutls_mpi_release (&session->key->B);
+      _gnutls_mpi_release (&session->key->b);
 
-	/* RSA */
-	_gnutls_mpi_release(&session->key->rsa[0]);
-	_gnutls_mpi_release(&session->key->rsa[1]);
+      /* RSA */
+      _gnutls_mpi_release (&session->key->rsa[0]);
+      _gnutls_mpi_release (&session->key->rsa[1]);
 
-	_gnutls_mpi_release(&session->key->dh_secret);
-	gnutls_free(session->key);
+      _gnutls_mpi_release (&session->key->dh_secret);
+      gnutls_free (session->key);
 
-	session->key = NULL;
+      session->key = NULL;
     }
 
-    gnutls_free(session->internals.srp_username);
+  gnutls_free (session->internals.srp_username);
 
-    if (session->internals.srp_password) {
-	memset(session->internals.srp_password, 0,
-	       strlen(session->internals.srp_password));
-	gnutls_free(session->internals.srp_password);
+  if (session->internals.srp_password)
+    {
+      memset (session->internals.srp_password, 0,
+	      strlen (session->internals.srp_password));
+      gnutls_free (session->internals.srp_password);
     }
 
-    memset(session, 0, sizeof(struct gnutls_session_int));
-    gnutls_free(session);
+  memset (session, 0, sizeof (struct gnutls_session_int));
+  gnutls_free (session);
 }
 
 /* Returns the minimum prime bits that are acceptable.
  */
-int _gnutls_dh_get_allowed_prime_bits(gnutls_session_t session)
+int
+_gnutls_dh_get_allowed_prime_bits (gnutls_session_t session)
 {
-    return session->internals.dh_prime_bits;
+  return session->internals.dh_prime_bits;
 }
 
-int _gnutls_dh_set_peer_public(gnutls_session_t session, mpi_t public)
+int
+_gnutls_dh_set_peer_public (gnutls_session_t session, mpi_t public)
 {
-    dh_info_st *dh;
-    int ret;
+  dh_info_st *dh;
+  int ret;
 
-    switch (gnutls_auth_get_type(session)) {
-    case GNUTLS_CRD_ANON:{
-	    anon_server_auth_info_t info;
-	    info = _gnutls_get_auth_info(session);
-	    if (info == NULL)
-		return GNUTLS_E_INTERNAL_ERROR;
+  switch (gnutls_auth_get_type (session))
+    {
+    case GNUTLS_CRD_ANON:
+      {
+	anon_server_auth_info_t info;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
 
-	    dh = &info->dh;
-	    break;
-	}
-    case GNUTLS_CRD_CERTIFICATE:{
-	    cert_auth_info_t info;
+	dh = &info->dh;
+	break;
+      }
+    case GNUTLS_CRD_CERTIFICATE:
+      {
+	cert_auth_info_t info;
 
-	    info = _gnutls_get_auth_info(session);
-	    if (info == NULL)
-		return GNUTLS_E_INTERNAL_ERROR;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
 
-	    dh = &info->dh;
-	    break;
-	}
+	dh = &info->dh;
+	break;
+      }
     default:
-	gnutls_assert();
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  ret = _gnutls_mpi_dprint_lz (&dh->public_key, public);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  return 0;
+}
+
+int
+_gnutls_dh_set_secret_bits (gnutls_session_t session, uint bits)
+{
+  switch (gnutls_auth_get_type (session))
+    {
+    case GNUTLS_CRD_ANON:
+      {
+	anon_server_auth_info_t info;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
+	info->dh.secret_bits = bits;
+	break;
+      }
+    case GNUTLS_CRD_CERTIFICATE:
+      {
+	cert_auth_info_t info;
+
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
+
+	info->dh.secret_bits = bits;
+	break;
+    default:
+	gnutls_assert ();
 	return GNUTLS_E_INTERNAL_ERROR;
+      }
     }
 
-    ret = _gnutls_mpi_dprint_lz(&dh->public_key, public);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
-    }
-
-    return 0;
-}
-
-int _gnutls_dh_set_secret_bits(gnutls_session_t session, uint bits)
-{
-    switch (gnutls_auth_get_type(session)) {
-    case GNUTLS_CRD_ANON:{
-	    anon_server_auth_info_t info;
-	    info = _gnutls_get_auth_info(session);
-	    if (info == NULL)
-		return GNUTLS_E_INTERNAL_ERROR;
-	    info->dh.secret_bits = bits;
-	    break;
-	}
-    case GNUTLS_CRD_CERTIFICATE:{
-	    cert_auth_info_t info;
-
-	    info = _gnutls_get_auth_info(session);
-	    if (info == NULL)
-		return GNUTLS_E_INTERNAL_ERROR;
-
-	    info->dh.secret_bits = bits;
-	    break;
-    default:
-	    gnutls_assert();
-	    return GNUTLS_E_INTERNAL_ERROR;
-	}
-    }
-
-    return 0;
+  return 0;
 }
 
 /* This function will set in the auth info structure the
  * RSA exponent and the modulus.
  */
-int _gnutls_rsa_export_set_pubkey(gnutls_session_t session,
-				  mpi_t exponent,
-				  mpi_t modulus)
+int
+_gnutls_rsa_export_set_pubkey (gnutls_session_t session,
+			       mpi_t exponent, mpi_t modulus)
 {
-    cert_auth_info_t info;
-    int ret;
+  cert_auth_info_t info;
+  int ret;
 
-    info = _gnutls_get_auth_info(session);
-    if (info == NULL)
-	return GNUTLS_E_INTERNAL_ERROR;
+  info = _gnutls_get_auth_info (session);
+  if (info == NULL)
+    return GNUTLS_E_INTERNAL_ERROR;
 
-    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.modulus, modulus);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  ret = _gnutls_mpi_dprint_lz (&info->rsa_export.modulus, modulus);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.exponent, exponent);
-    if (ret < 0) {
-	gnutls_assert();
-	_gnutls_free_datum(&info->rsa_export.modulus);
-	return ret;
+  ret = _gnutls_mpi_dprint_lz (&info->rsa_export.exponent, exponent);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (&info->rsa_export.modulus);
+      return ret;
     }
 
-    return 0;
+  return 0;
 }
 
 
 /* Sets the prime and the generator in the auth info structure.
  */
-int _gnutls_dh_set_group(gnutls_session_t session, mpi_t gen, mpi_t prime)
+int
+_gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
 {
-    dh_info_st *dh;
-    int ret;
+  dh_info_st *dh;
+  int ret;
 
-    switch (gnutls_auth_get_type(session)) {
-    case GNUTLS_CRD_ANON:{
-	    anon_server_auth_info_t info;
-	    info = _gnutls_get_auth_info(session);
-	    if (info == NULL)
-		return GNUTLS_E_INTERNAL_ERROR;
+  switch (gnutls_auth_get_type (session))
+    {
+    case GNUTLS_CRD_ANON:
+      {
+	anon_server_auth_info_t info;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
 
-	    dh = &info->dh;
-	    break;
-	}
-    case GNUTLS_CRD_CERTIFICATE:{
-	    cert_auth_info_t info;
+	dh = &info->dh;
+	break;
+      }
+    case GNUTLS_CRD_CERTIFICATE:
+      {
+	cert_auth_info_t info;
 
-	    info = _gnutls_get_auth_info(session);
-	    if (info == NULL)
-		return GNUTLS_E_INTERNAL_ERROR;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
 
-	    dh = &info->dh;
-	    break;
-	}
+	dh = &info->dh;
+	break;
+      }
     default:
-	gnutls_assert();
-	return GNUTLS_E_INTERNAL_ERROR;
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
-    /* prime
-     */
-    ret = _gnutls_mpi_dprint_lz(&dh->prime, prime);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  /* prime
+   */
+  ret = _gnutls_mpi_dprint_lz (&dh->prime, prime);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    /* generator
-     */
-    ret = _gnutls_mpi_dprint_lz(&dh->generator, gen);
-    if (ret < 0) {
-	gnutls_assert();
-	_gnutls_free_datum(&dh->prime);
-	return ret;
+  /* generator
+   */
+  ret = _gnutls_mpi_dprint_lz (&dh->generator, gen);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (&dh->prime);
+      return ret;
     }
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -579,10 +607,11 @@ int _gnutls_dh_set_group(gnutls_session_t session, mpi_t gen, mpi_t prime)
   * server can obtain the client's key.
   *
   **/
-void gnutls_openpgp_send_key(gnutls_session_t session,
-			     gnutls_openpgp_key_status_t status)
+void
+gnutls_openpgp_send_key (gnutls_session_t session,
+			 gnutls_openpgp_key_status_t status)
 {
-    session->internals.pgp_fingerprint = status;
+  session->internals.pgp_fingerprint = status;
 }
 
 /**
@@ -599,15 +628,17 @@ void gnutls_openpgp_send_key(gnutls_session_t session,
   * certificate with X.509 certificates.
   *
   **/
-void gnutls_certificate_send_x509_rdn_sequence(gnutls_session_t session,
-					       int status)
+void
+gnutls_certificate_send_x509_rdn_sequence (gnutls_session_t session,
+					   int status)
 {
-    session->internals.ignore_rdn_sequence = status;
+  session->internals.ignore_rdn_sequence = status;
 }
 
-int _gnutls_openpgp_send_fingerprint(gnutls_session_t session)
+int
+_gnutls_openpgp_send_fingerprint (gnutls_session_t session)
 {
-    return session->internals.pgp_fingerprint;
+  return session->internals.pgp_fingerprint;
 }
 
 /*-
@@ -621,12 +652,12 @@ int _gnutls_openpgp_send_fingerprint(gnutls_session_t session)
   * that know TLS internals and want to debug other implementations.
   *
   -*/
-void _gnutls_record_set_default_version(gnutls_session_t session,
-					unsigned char major,
-					unsigned char minor)
+void
+_gnutls_record_set_default_version (gnutls_session_t session,
+				    unsigned char major, unsigned char minor)
 {
-    session->internals.default_record_version[0] = major;
-    session->internals.default_record_version[1] = minor;
+  session->internals.default_record_version[0] = major;
+  session->internals.default_record_version[1] = minor;
 }
 
 /**
@@ -647,30 +678,30 @@ void _gnutls_record_set_default_version(gnutls_session_t session,
   * servers and clients may cause interoperability problems.
   *
   **/
-void gnutls_handshake_set_private_extensions(gnutls_session_t session,
-					     int allow)
+void
+gnutls_handshake_set_private_extensions (gnutls_session_t session, int allow)
 {
-    session->internals.enable_private = allow;
+  session->internals.enable_private = allow;
 }
 
-inline
-    static int _gnutls_cal_PRF_A(gnutls_mac_algorithm_t algorithm,
-				 const void *secret, int secret_size,
-				 const void *seed, int seed_size,
-				 void *result)
+inline static int
+_gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
+		   const void *secret, int secret_size,
+		   const void *seed, int seed_size, void *result)
 {
-    mac_hd_t td1;
+  mac_hd_t td1;
 
-    td1 = _gnutls_hmac_init(algorithm, secret, secret_size);
-    if (td1 == GNUTLS_MAC_FAILED) {
-	gnutls_assert();
-	return GNUTLS_E_INTERNAL_ERROR;
+  td1 = _gnutls_hmac_init (algorithm, secret, secret_size);
+  if (td1 == GNUTLS_MAC_FAILED)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
-    _gnutls_hmac(td1, seed, seed_size);
-    _gnutls_hmac_deinit(td1, result);
+  _gnutls_hmac (td1, seed, seed_size);
+  _gnutls_hmac_deinit (td1, result);
 
-    return 0;
+  return 0;
 }
 
 #define MAX_SEED_SIZE 200
@@ -678,80 +709,92 @@ inline
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
-static int _gnutls_P_hash(gnutls_mac_algorithm_t algorithm,
-			  const opaque * secret, int secret_size,
-			  const opaque * seed, int seed_size,
-			  int total_bytes, opaque * ret)
+static int
+_gnutls_P_hash (gnutls_mac_algorithm_t algorithm,
+		const opaque * secret, int secret_size,
+		const opaque * seed, int seed_size,
+		int total_bytes, opaque * ret)
 {
 
-    mac_hd_t td2;
-    int i, times, how, blocksize, A_size;
-    opaque final[20], Atmp[MAX_SEED_SIZE];
-    int output_bytes, result;
+  mac_hd_t td2;
+  int i, times, how, blocksize, A_size;
+  opaque final[20], Atmp[MAX_SEED_SIZE];
+  int output_bytes, result;
 
-    if (seed_size > MAX_SEED_SIZE || total_bytes <= 0) {
-	gnutls_assert();
-	return GNUTLS_E_INTERNAL_ERROR;
+  if (seed_size > MAX_SEED_SIZE || total_bytes <= 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
-    blocksize = _gnutls_hmac_get_algo_len(algorithm);
+  blocksize = _gnutls_hmac_get_algo_len (algorithm);
 
-    output_bytes = 0;
-    do {
-	output_bytes += blocksize;
-    } while (output_bytes < total_bytes);
+  output_bytes = 0;
+  do
+    {
+      output_bytes += blocksize;
+    }
+  while (output_bytes < total_bytes);
 
-    /* calculate A(0) */
+  /* calculate A(0) */
 
-    memcpy(Atmp, seed, seed_size);
-    A_size = seed_size;
+  memcpy (Atmp, seed, seed_size);
+  A_size = seed_size;
 
-    times = output_bytes / blocksize;
+  times = output_bytes / blocksize;
 
-    for (i = 0; i < times; i++) {
-	td2 = _gnutls_hmac_init(algorithm, secret, secret_size);
-	if (td2 == GNUTLS_MAC_FAILED) {
-	    gnutls_assert();
-	    return GNUTLS_E_INTERNAL_ERROR;
+  for (i = 0; i < times; i++)
+    {
+      td2 = _gnutls_hmac_init (algorithm, secret, secret_size);
+      if (td2 == GNUTLS_MAC_FAILED)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	/* here we calculate A(i+1) */
-	if ((result =
-	     _gnutls_cal_PRF_A(algorithm, secret, secret_size, Atmp,
-			       A_size, Atmp)) < 0) {
-	    gnutls_assert();
-	    _gnutls_hmac_deinit(td2, final);
-	    return result;
+      /* here we calculate A(i+1) */
+      if ((result =
+	   _gnutls_cal_PRF_A (algorithm, secret, secret_size, Atmp,
+			      A_size, Atmp)) < 0)
+	{
+	  gnutls_assert ();
+	  _gnutls_hmac_deinit (td2, final);
+	  return result;
 	}
 
-	A_size = blocksize;
+      A_size = blocksize;
 
-	_gnutls_hmac(td2, Atmp, A_size);
-	_gnutls_hmac(td2, seed, seed_size);
-	_gnutls_hmac_deinit(td2, final);
+      _gnutls_hmac (td2, Atmp, A_size);
+      _gnutls_hmac (td2, seed, seed_size);
+      _gnutls_hmac_deinit (td2, final);
 
-	if ((1 + i) * blocksize < total_bytes) {
-	    how = blocksize;
-	} else {
-	    how = total_bytes - (i) * blocksize;
+      if ((1 + i) * blocksize < total_bytes)
+	{
+	  how = blocksize;
+	}
+      else
+	{
+	  how = total_bytes - (i) * blocksize;
 	}
 
-	if (how > 0) {
-	    memcpy(&ret[i * blocksize], final, how);
+      if (how > 0)
+	{
+	  memcpy (&ret[i * blocksize], final, how);
 	}
     }
 
-    return 0;
+  return 0;
 }
 
 /* Xor's two buffers and puts the output in the first one.
  */
-inline static
-void _gnutls_xor(opaque * o1, opaque * o2, int length)
+inline static void
+_gnutls_xor (opaque * o1, opaque * o2, int length)
 {
-    int i;
-    for (i = 0; i < length; i++) {
-	o1[i] ^= o2[i];
+  int i;
+  for (i = 0; i < length; i++)
+    {
+      o1[i] ^= o2[i];
     }
 }
 
@@ -763,61 +806,67 @@ void _gnutls_xor(opaque * o1, opaque * o2, int length)
  * needed by the TLS specification. ret must have a least total_bytes
  * available.
  */
-int _gnutls_PRF(const opaque * secret, int secret_size, const char *label,
-		int label_size, opaque * seed, int seed_size,
-		int total_bytes, void *ret)
+int
+_gnutls_PRF (const opaque * secret, int secret_size, const char *label,
+	     int label_size, opaque * seed, int seed_size,
+	     int total_bytes, void *ret)
 {
-    int l_s, s_seed_size;
-    const opaque *s1, *s2;
-    opaque s_seed[MAX_SEED_SIZE];
-    opaque o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
-    int result;
+  int l_s, s_seed_size;
+  const opaque *s1, *s2;
+  opaque s_seed[MAX_SEED_SIZE];
+  opaque o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
+  int result;
 
-    if (total_bytes > MAX_PRF_BYTES) {
-	gnutls_assert();
-	return GNUTLS_E_INTERNAL_ERROR;
+  if (total_bytes > MAX_PRF_BYTES)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
-    /* label+seed = s_seed */
-    s_seed_size = seed_size + label_size;
+  /* label+seed = s_seed */
+  s_seed_size = seed_size + label_size;
 
-    if (s_seed_size > MAX_SEED_SIZE) {
-	gnutls_assert();
-	return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-    memcpy(s_seed, label, label_size);
-    memcpy(&s_seed[label_size], seed, seed_size);
-
-    l_s = secret_size / 2;
-
-    s1 = &secret[0];
-    s2 = &secret[l_s];
-
-    if (secret_size % 2 != 0) {
-	l_s++;
+  if (s_seed_size > MAX_SEED_SIZE)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
-    result =
-	_gnutls_P_hash(GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size,
-		       total_bytes, o1);
-    if (result < 0) {
-	gnutls_assert();
-	return result;
+  memcpy (s_seed, label, label_size);
+  memcpy (&s_seed[label_size], seed, seed_size);
+
+  l_s = secret_size / 2;
+
+  s1 = &secret[0];
+  s2 = &secret[l_s];
+
+  if (secret_size % 2 != 0)
+    {
+      l_s++;
     }
 
-    result =
-	_gnutls_P_hash(GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
-		       total_bytes, o2);
-    if (result < 0) {
-	gnutls_assert();
-	return result;
+  result =
+    _gnutls_P_hash (GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size,
+		    total_bytes, o1);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
     }
 
-    _gnutls_xor(o1, o2, total_bytes);
+  result =
+    _gnutls_P_hash (GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
+		    total_bytes, o2);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
 
-    memcpy(ret, o1, total_bytes);
+  _gnutls_xor (o1, o2, total_bytes);
 
-    return 0;			/* ok */
+  memcpy (ret, o1, total_bytes);
+
+  return 0;			/* ok */
 
 }
 
@@ -829,23 +878,27 @@ int _gnutls_PRF(const opaque * secret, int secret_size, const char *label,
   * or a zero if this is a new session.
   *
   **/
-int gnutls_session_is_resumed(gnutls_session_t session)
+int
+gnutls_session_is_resumed (gnutls_session_t session)
 {
-    if (session->security_parameters.entity == GNUTLS_CLIENT) {
-	if (session->security_parameters.session_id_size > 0 &&
-	    session->security_parameters.session_id_size ==
-	    session->internals.resumed_security_parameters.session_id_size
-	    && memcmp(session->security_parameters.session_id,
-		      session->internals.resumed_security_parameters.
-		      session_id,
-		      session->security_parameters.session_id_size) == 0)
-	    return 1;
-    } else {
-	if (session->internals.resumed == RESUME_TRUE)
-	    return 1;
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
+      if (session->security_parameters.session_id_size > 0 &&
+	  session->security_parameters.session_id_size ==
+	  session->internals.resumed_security_parameters.session_id_size
+	  && memcmp (session->security_parameters.session_id,
+		     session->internals.resumed_security_parameters.
+		     session_id,
+		     session->security_parameters.session_id_size) == 0)
+	return 1;
+    }
+  else
+    {
+      if (session->internals.resumed == RESUME_TRUE)
+	return 1;
     }
 
-    return 0;
+  return 0;
 }
 
 /*-
@@ -855,18 +908,19 @@ int gnutls_session_is_resumed(gnutls_session_t session)
   * This function will return non zero if this session is of export grade.
   *
   -*/
-int _gnutls_session_is_export(gnutls_session_t session)
+int
+_gnutls_session_is_export (gnutls_session_t session)
 {
-    gnutls_cipher_algorithm_t cipher;
+  gnutls_cipher_algorithm_t cipher;
 
-    cipher =
-	_gnutls_cipher_suite_get_cipher_algo(&session->security_parameters.
-					     current_cipher_suite);
+  cipher =
+    _gnutls_cipher_suite_get_cipher_algo (&session->security_parameters.
+					  current_cipher_suite);
 
-    if (_gnutls_cipher_get_export_flag(cipher) != 0)
-	return 1;
+  if (_gnutls_cipher_get_export_flag (cipher) != 0)
+    return 1;
 
-    return 0;
+  return 0;
 }
 
 /**
@@ -877,9 +931,10 @@ int _gnutls_session_is_export(gnutls_session_t session)
   * This is the pointer set with gnutls_session_set_ptr().
   *
   **/
-void *gnutls_session_get_ptr(gnutls_session_t session)
+void *
+gnutls_session_get_ptr (gnutls_session_t session)
 {
-    return session->internals.user_ptr;
+  return session->internals.user_ptr;
 }
 
 /**
@@ -892,9 +947,10 @@ void *gnutls_session_get_ptr(gnutls_session_t session)
   * gnutls_session_get_ptr().
   *
   **/
-void gnutls_session_set_ptr(gnutls_session_t session, void *ptr)
+void
+gnutls_session_set_ptr (gnutls_session_t session, void *ptr)
 {
-    session->internals.user_ptr = ptr;
+  session->internals.user_ptr = ptr;
 }
 
 
@@ -913,9 +969,10 @@ void gnutls_session_set_ptr(gnutls_session_t session, void *ptr)
   * write data.
   *
   **/
-int gnutls_record_get_direction(gnutls_session_t session)
+int
+gnutls_record_get_direction (gnutls_session_t session)
 {
-    return session->internals.direction;
+  return session->internals.direction;
 }
 
 /*-
@@ -929,9 +986,10 @@ int gnutls_record_get_direction(gnutls_session_t session)
   * test server's capabilities.
   *
   -*/
-void _gnutls_rsa_pms_set_version(gnutls_session_t session,
-				 unsigned char major, unsigned char minor)
+void
+_gnutls_rsa_pms_set_version (gnutls_session_t session,
+			     unsigned char major, unsigned char minor)
 {
-    session->internals.rsa_pms_version[0] = major;
-    session->internals.rsa_pms_version[1] = minor;
+  session->internals.rsa_pms_version[0] = major;
+  session->internals.rsa_pms_version[1] = minor;
 }
