@@ -54,6 +54,8 @@ lib_LTLIBRARIES = libgnutls.la
 SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 	auth_srp_sb64.c auth_srp_rsa.c
 
+PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c
+
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_buffers.c gnutls_handshake.c gnutls_num.c		\
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c	\
@@ -67,7 +69,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_ui.c gnutls_sig.c auth_dhe.c gnutls_dh_primes.c		\
 	ext_max_record.c gnutls_alert.c gnutls_str.c gnutls_state.c	\
 	gnutls_x509.c ext_cert_type.c gnutls_rsa_export.c		\
-	auth_rsa_export.c ext_server_name.c auth_dh_common.c
+	auth_rsa_export.c ext_server_name.c auth_dh_common.c gnutls_helper.c
 
 HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
@@ -82,12 +84,13 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_mem.h io_debug.h ext_max_record.h gnutls_session_pack.h	\
 	gnutls_str.h gnutls_state.h gnutls_x509.h ext_cert_type.h	\
 	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
-	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h
+	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h \
+	gnutls_helper.h auth_psk_passwd.h
 
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
-	gnutls.asn pkix.asn libgnutls.vers
+	$(PSK_COBJECTS) gnutls.asn pkix.asn libgnutls.vers
 
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
@@ -110,9 +113,9 @@ pkix_asn1_tab.c: pkix.asn
 gnutls_asn1_tab.c: gnutls.asn
 	-asn1Parser gnutls.asn gnutls_asn1_tab.c
 
-gnutls-api.texi: $(COBJECTS) $(SRP_COBJECTS)
+gnutls-api.texi: $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS)
 	@echo "" > gnutls-api.texi
-	@for i in $(COBJECTS) $(SRP_COBJECTS); do \
+	@for i in $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
 		../doc/scripts/gdoc -texinfo $$i >> gnutls-api.texi && \
 		echo "ok"; \

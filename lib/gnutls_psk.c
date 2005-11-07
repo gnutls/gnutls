@@ -33,8 +33,6 @@
 #include <auth_srp_passwd.h>
 #include <gnutls_mpi.h>
 #include <gnutls_num.h>
-#include <gnutls_helper.h>
-
 #include "debug.h"
 
 
@@ -480,6 +478,18 @@ int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t
     return 0;
 }
 
+inline static int file_exists(const char *file)
+{
+    FILE *fd;
+
+    fd = fopen(file, "r");
+    if (fd == NULL)
+	return -1;
+
+    fclose(fd);
+    return 0;
+}
+
 /**
   * gnutls_srp_set_server_credentials_file - Used to set the password files, in a gnutls_srp_server_credentials_t structure
   * @res: is an #gnutls_srp_server_credentials_t structure.
@@ -503,12 +513,12 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
     }
 
     /* Check if the files can be opened */
-    if (_gnutls_file_exists(password_file) != 0) {
+    if (file_exists(password_file) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_FILE_ERROR;
     }
 
-    if (_gnutls_file_exists(password_conf_file) != 0) {
+    if (file_exists(password_conf_file) != 0) {
 	gnutls_assert();
 	return GNUTLS_E_FILE_ERROR;
     }

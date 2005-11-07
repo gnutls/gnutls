@@ -44,7 +44,7 @@ typedef struct gnutls_srp_server_credentials_st {
 
 /* these structures should not use allocated data */
 typedef struct srp_server_auth_info_st {
-    char username[MAX_SRP_USERNAME];
+    char username[MAX_SRP_USERNAME+1];
 } *srp_server_auth_info_t;
 
 extern const gnutls_datum_t gnutls_srp_1024_group_prime;

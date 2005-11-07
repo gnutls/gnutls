@@ -32,6 +32,7 @@
 #include <gnutls_db.h>
 #include "debug.h"
 #include <gnutls_session_pack.h>
+#include <gnutls_datum.h>
 
 /**
   * gnutls_db_set_retrieve_function - Sets the function that will be used to get data
@@ -185,31 +186,15 @@ int _gnutls_server_register_current_session(gnutls_session_t session)
 	return GNUTLS_E_INVALID_SESSION;
     }
 
-/* allocate space for data */
-    ret = _gnutls_session_size(session);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
-    }
-    content.size = ret;
-
-    content.data = gnutls_malloc(content.size);
-    if (content.data == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
-    }
-
 /* copy data */
     ret = _gnutls_session_pack(session, &content);
     if (ret < 0) {
-	gnutls_free(content.data);
 	gnutls_assert();
 	return ret;
     }
 
     ret = _gnutls_store_session(session, key, content);
-
-    gnutls_free(content.data);
+    _gnutls_free_datum( &content);
 
     return ret;
 }

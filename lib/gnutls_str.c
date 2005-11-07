@@ -214,3 +214,36 @@ char *_gnutls_bin2hex(const void *_old, size_t oldlen,
 
     return buffer;
 }
+
+/* just a hex2bin function.
+ */
+int _gnutls_hex2bin(const opaque* hex_data, int hex_size, opaque * bin_data,
+        size_t * bin_size)
+{
+int i, j;
+opaque hex2_data[3];
+unsigned long val;
+
+   /* FIXME: we don't handle whitespace.
+    */
+   hex_size /= 2;
+
+   if (*bin_size < (size_t)hex_size) {
+     gnutls_assert();
+     return GNUTLS_E_SHORT_MEMORY_BUFFER;
+   }
+
+   for (i=j=0; j < hex_size;i+=2,j++) {
+      hex2_data[0] = hex_data[i];
+      hex2_data[1] = hex_data[i+1];
+      hex2_data[2] = 0;
+      val = strtoul( (char*)hex2_data, NULL, 16);
+      if (val == ULONG_MAX) {
+         gnutls_assert();
+         return GNUTLS_E_SRP_PWD_PARSING_ERROR;
+      }
+      bin_data[j] = val;
+   }
+
+   return 0;
+}

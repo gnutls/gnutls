@@ -244,7 +244,7 @@ typedef struct {
     server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
     /* limit server_name extensions */
     uint server_names_size;
-    opaque srp_username[MAX_SRP_USERNAME];
+    opaque srp_username[MAX_SRP_USERNAME+1];
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
@@ -272,6 +272,7 @@ typedef struct {
      * there is a time in handshake where the peer has
      * null cipher and we don't
      */
+    /* FIXME: remove the read and write stuff... keep only one version */
     gnutls_cipher_algorithm_t read_bulk_cipher_algorithm;
     gnutls_mac_algorithm_t read_mac_algorithm;
     gnutls_compression_method_t read_compression_algorithm;

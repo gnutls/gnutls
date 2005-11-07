@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2005 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -22,7 +22,17 @@
  *
  */
 
-int _gnutls_session_pack(gnutls_session_t session,
-			 gnutls_datum_t * packed_session);
-int _gnutls_session_unpack(gnutls_session_t session,
-			   const gnutls_datum_t * packed_session);
+#include <gnutls_int.h>
+
+int _gnutls_file_exists(const char *file)
+{
+    FILE *fd;
+
+    fd = fopen(file, "r");
+    if (fd == NULL)
+	return -1;
+
+    fclose(fd);
+    return 0;
+}
+

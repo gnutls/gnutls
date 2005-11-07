@@ -476,6 +476,16 @@ int print_info(gnutls_session session, const char *hostname)
 		   gnutls_srp_server_get_username(session));
 	break;
 #endif
+#ifdef ENABLE_PSK
+    case GNUTLS_CRD_PSK:
+	/* This should be only called in server
+	 * side.
+	 */
+	if (gnutls_psk_server_get_username(session) != NULL)
+	    printf("- PSK authentication. Connected as '%s'\n",
+		   gnutls_psk_server_get_username(session));
+	break;
+#endif
     case GNUTLS_CRD_CERTIFICATE:
 	{
 	    char dns[256];
@@ -567,6 +577,7 @@ void print_list(void)
     printf(", RSA-EXPORT");
     printf(", DHE-DSS");
     printf(", DHE-RSA");
+    printf(", PSK");
     printf(", SRP");
     printf(", SRP-RSA");
     printf(", SRP-DSS");
@@ -688,6 +699,8 @@ void parse_kx(char **kx, int nkx, int *kx_priority)
 		kx_priority[j++] = GNUTLS_KX_SRP_DSS;
 	    else if (strcasecmp(kx[i], "RSA") == 0)
 		kx_priority[j++] = GNUTLS_KX_RSA;
+	    else if (strcasecmp(kx[i], "PSK") == 0)
+		kx_priority[j++] = GNUTLS_KX_PSK;
 	    else if (strcasecmp(kx[i], "RSA-EXPORT") == 0)
 		kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
 	    else if (strncasecmp(kx[i], "DHE-RSA", 7) == 0)

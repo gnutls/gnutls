@@ -78,14 +78,16 @@ typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL = 1,
 
 typedef enum { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
     GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
-    GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS
+    GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS,
+    GNUTLS_KX_PSK
 } gnutls_kx_algorithm_t;
 
 typedef enum { GNUTLS_PARAMS_RSA_EXPORT=1,
     GNUTLS_PARAMS_DH 
 } gnutls_params_type_t;
 
-typedef enum { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type_t;
+typedef enum { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP,
+    GNUTLS_CRD_PSK } gnutls_credentials_type_t;
 
 #define GNUTLS_MAC_SHA GNUTLS_MAC_SHA1
 #define GNUTLS_DIG_SHA GNUTLS_DIG_SHA1
@@ -588,12 +590,50 @@ typedef int gnutls_srp_client_credentials_function(gnutls_session_t, unsigned in
 void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials_t cred,
     gnutls_srp_client_credentials_function *func);
 
-int gnutls_srp_base64_encode( const gnutls_datum_t *data, char* result, int* result_size);
+int gnutls_srp_base64_encode( const gnutls_datum_t *data, char* result, size_t* result_size);
 int gnutls_srp_base64_encode_alloc( const gnutls_datum_t *data, gnutls_datum_t* result);
 
-int gnutls_srp_base64_decode( const gnutls_datum_t *b64_data, char* result, int* result_size);
+int gnutls_srp_base64_decode( const gnutls_datum_t *b64_data, char* result, size_t* result_size);
 int gnutls_srp_base64_decode_alloc( const gnutls_datum_t *b64_data,
 				      gnutls_datum_t* result);
+
+/* PSK stuff */
+typedef struct gnutls_psk_server_credentials_st* gnutls_psk_server_credentials_t;
+typedef struct gnutls_psk_client_credentials_st* gnutls_psk_client_credentials_t;
+
+void gnutls_psk_free_client_credentials( gnutls_psk_client_credentials_t sc);
+int gnutls_psk_allocate_client_credentials( gnutls_psk_client_credentials_t *sc);
+int gnutls_psk_set_client_credentials( gnutls_psk_client_credentials_t res,
+    const char *username, const gnutls_datum* key, unsigned int flags);
+typedef enum gnutls_psk_key_flags {
+    GNUTLS_PSK_KEY_RAW = 0,
+    GNUTLS_PSK_KEY_HEX
+} gnutls_psk_key_flags;
+
+void gnutls_psk_free_server_credentials( gnutls_psk_server_credentials_t sc);
+int gnutls_psk_allocate_server_credentials( gnutls_psk_server_credentials_t *sc);
+int gnutls_psk_set_server_credentials_file( gnutls_psk_server_credentials_t res,
+    const char *password_file);
+
+const char* gnutls_psk_server_get_username( gnutls_session_t session);
+
+typedef int gnutls_psk_server_credentials_function(
+    gnutls_session_t,
+    const char* username, gnutls_datum_t* key
+);
+void gnutls_psk_set_server_credentials_function(
+    gnutls_psk_server_credentials_t cred,
+    gnutls_psk_server_credentials_function *func);
+
+typedef int gnutls_psk_client_credentials_function(gnutls_session_t,
+    char **username, gnutls_datum* key);
+void gnutls_psk_set_client_credentials_function( gnutls_psk_client_credentials_t cred,
+    gnutls_psk_client_credentials_function *func);
+
+int gnutls_hex_encode( const gnutls_datum_t *data, char* result, size_t* result_size);
+int gnutls_hex_decode( const gnutls_datum_t *hex_data, char* result, size_t* result_size);
+
+
 
 #ifndef GNUTLS_UI_H
 # define GNUTLS_UI_H

@@ -6,8 +6,6 @@ Current list:
 * Convert the current sexp stuff to the gcrypt ac API. 
 * Make the current ciphering code a bit more abstract to
   allow easy integration with TLS hardware.
-* Make the session data (used for session resuming) platform
-  independent.
 * Allow adding multiple subject alternative names.
 * Allow verifying of certificates on their reception.
 * Verify added CRLs (is it really needed?)
@@ -31,7 +29,6 @@ Current list:
   - Support critical key usage KeyCertSign and cRLSign.
   - Support path length constraints.
 - RFC 3280 compliant certificate path validation.
-- Add Pre-Shared-Key support.
 - Add progress handler gnutls_{dh,rsa}_params_generate2, to allow
   application to give progress feedback to user.
 - Support non-blocking gnutls_{dh,rsa}_params_generate2 for when there

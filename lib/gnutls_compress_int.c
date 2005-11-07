@@ -162,6 +162,10 @@ int _gnutls_compress(comp_hd_t handle, const opaque * plain,
 
     /* NULL compression is not handled here
      */
+    if (handle == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
 
     switch (handle->algo) {
 #ifdef USE_LZO
@@ -261,6 +265,11 @@ int _gnutls_decompress(comp_hd_t handle, opaque * compressed,
 
     /* NULL compression is not handled here
      */
+
+    if (handle == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
 
     switch (handle->algo) {
 #ifdef USE_LZO

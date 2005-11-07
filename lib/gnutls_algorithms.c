@@ -45,6 +45,7 @@ static const gnutls_cred_map cred_mappings[] = {
     {GNUTLS_KX_RSA_EXPORT, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
     {GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
     {GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
+    {GNUTLS_KX_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
     {GNUTLS_KX_SRP, GNUTLS_CRD_SRP, GNUTLS_CRD_SRP},
     {GNUTLS_KX_SRP_RSA, GNUTLS_CRD_SRP, GNUTLS_CRD_CERTIFICATE},
     {GNUTLS_KX_SRP_DSS, GNUTLS_CRD_SRP, GNUTLS_CRD_CERTIFICATE},
@@ -222,6 +223,7 @@ extern mod_auth_st dhe_rsa_auth_struct;
 extern mod_auth_st dhe_dss_auth_struct;
 extern mod_auth_st anon_auth_struct;
 extern mod_auth_st srp_auth_struct;
+extern mod_auth_st psk_auth_struct;
 extern mod_auth_st srp_rsa_auth_struct;
 extern mod_auth_st srp_dss_auth_struct;
 
@@ -242,6 +244,9 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
     {"SRP DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, 0},
     {"SRP RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, 0},
     {"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0, 0},
+#endif
+#ifdef ENABLE_PSK
+    {"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, 0},
 #endif
     /* other algorithms are appended here by gnutls-extra
      * initialization function.
@@ -288,6 +293,14 @@ typedef struct {
  /* rfc3268: */
 #define GNUTLS_ANON_DH_AES_128_CBC_SHA1 { 0x00, 0x34 }
 #define GNUTLS_ANON_DH_AES_256_CBC_SHA1 { 0x00, 0x3A }
+
+/* PSK (not in TLS 1.0)
+ * draft-ietf-tls-psk:
+ */
+#define GNUTLS_PSK_SHA_ARCFOUR_SHA1 { 0x00, 0x8A }
+#define GNUTLS_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x8B }
+#define GNUTLS_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x8C }
+#define GNUTLS_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x8D }
 
 /* SRP (not in TLS 1.0)
  * draft-ietf-tls-srp-02:
@@ -373,6 +386,21 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
     GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_ANON_DH_AES_256_CBC_SHA1,
 			      GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ANON_DH,
 			      GNUTLS_MAC_SHA1, GNUTLS_SSL3),
+
+    /* PSK */
+    GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_PSK_SHA_ARCFOUR_SHA1,
+			      GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_PSK,
+			      GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+    GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_PSK_SHA_3DES_EDE_CBC_SHA1,
+			      GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_PSK,
+			      GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+    GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_PSK_SHA_AES_128_CBC_SHA1,
+			      GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_PSK,
+			      GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+    GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_PSK_SHA_AES_256_CBC_SHA1,
+			      GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_PSK,
+			      GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+
     /* SRP */
     GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_SHA_3DES_EDE_CBC_SHA1,
 			      GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_SRP,

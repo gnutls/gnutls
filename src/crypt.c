@@ -387,10 +387,9 @@ int main(int argc, char **argv)
 	exit(1);
     }
 
-    if ((ret = gnutls_global_init_extra()) < 0) {
-	fprintf(stderr, "global_init_extra: %s\n", gnutls_strerror(ret));
-	exit(1);
-    }
+#ifdef HAVE_UMASK
+    umask(066);
+#endif
 
     if (gaa(argc, argv, &info) != -1) {
 	fprintf(stderr, "Error in the arguments.\n");

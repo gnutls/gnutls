@@ -76,16 +76,19 @@ static int x509ctype;
 static int disable_extensions;
 static int debug;
 
+char* psk_username;
+gnutls_datum psk_key;
 
-static gnutls_srp_client_credentials srp_cred;
-static gnutls_anon_client_credentials anon_cred;
-static gnutls_certificate_credentials xcred;
+static gnutls_srp_client_credentials_t srp_cred;
+static gnutls_psk_client_credentials_t psk_cred;
+static gnutls_anon_client_credentials_t anon_cred;
+static gnutls_certificate_credentials_t xcred;
 
 int protocol_priority[PRI_MAX] =
     { GNUTLS_TLS1_1, GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA,
-    GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS, GNUTLS_KX_SRP,
+    GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS, GNUTLS_KX_SRP, GNUTLS_KX_PSK,
     /* Do not use anonymous authentication, unless you know what that means */
     GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_ANON_DH, 0
 };
@@ -368,6 +371,7 @@ static gnutls_session init_tls_session(const char *hostname)
 
     gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
     gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
+    gnutls_credentials_set(session, GNUTLS_CRD_PSK, psk_cred);
     gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
     gnutls_certificate_client_set_retrieve_function(xcred, cert_callback);
@@ -674,6 +678,9 @@ int main(int argc, char **argv)
 #ifdef ENABLE_SRP
     gnutls_srp_free_client_credentials(srp_cred);
 #endif
+#ifdef ENABLE_PSK
+    gnutls_psk_free_client_credentials(psk_cred);
+#endif
 
     gnutls_certificate_free_credentials(xcred);
 
@@ -720,6 +727,13 @@ void gaa_parser(int argc, char **argv)
     x509_certfile = info.x509_certfile;
     pgp_keyfile = info.pgp_keyfile;
     pgp_certfile = info.pgp_certfile;
+
+    psk_username = info.psk_username;
+    psk_key.data = (unsigned char*)info.psk_key;
+    if (info.psk_key != NULL)
+      psk_key.size = strlen(info.psk_key);
+    else
+      psk_key.size = 0;
 
     pgp_keyring = info.pgp_keyring;
     pgp_trustdb = info.pgp_trustdb;
@@ -988,6 +1002,16 @@ static void init_global_tls_stuff(void)
 
     gnutls_srp_set_client_credentials_function(srp_cred,
 					       srp_username_callback);
+#endif
+
+#ifdef ENABLE_PSK
+    /* SRP stuff */
+    if (gnutls_psk_allocate_client_credentials(&psk_cred) < 0) {
+	fprintf(stderr, "PSK authentication error\n");
+    }
+
+    gnutls_psk_set_client_credentials(psk_cred,
+		       psk_username, &psk_key, GNUTLS_PSK_KEY_HEX);
 #endif
 
 

@@ -24,7 +24,7 @@ SUBDIRS = srp x509 openpgp cfg
 INCLUDES = -I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes \
 	-I$(top_srcdir)/gl -I$(srcdir)/cfg
 
-bin_PROGRAMS = gnutls-serv gnutls-cli srptool gnutls-cli-debug certtool
+bin_PROGRAMS = gnutls-serv gnutls-cli psktool srptool gnutls-cli-debug certtool
 
 gnutls_serv_SOURCES = serv.gaa serv-gaa.h serv-gaa.c list.h serv.c	\
 	common.h common.c
@@ -33,6 +33,11 @@ gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 
 srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
 srptool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
+	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)		\
+	../gl/libgnu.la
+
+psktool_SOURCES = psk.gaa psk-gaa.h psk-gaa.c psk.c
+psktool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)		\
 	../gl/libgnu.la
 
@@ -66,6 +71,8 @@ errcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS)
 
 
 
+psk-gaa.c: psk.gaa
+	-gaa psk.gaa -o psk-gaa.c -i psk-gaa.h
 crypt-gaa.c: crypt.gaa
 	-gaa crypt.gaa -o crypt-gaa.c -i crypt-gaa.h
 certtool-gaa.c: certtool.gaa

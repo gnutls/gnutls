@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2005 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -22,7 +22,16 @@
  *
  */
 
-int _gnutls_session_pack(gnutls_session_t session,
-			 gnutls_datum_t * packed_session);
-int _gnutls_session_unpack(gnutls_session_t session,
-			   const gnutls_datum_t * packed_session);
+#ifdef ENABLE_PSK
+
+typedef struct {
+    char *username;
+    gnutls_datum_t key;
+} PSK_PWD_ENTRY;
+
+/* this is locally allocated. It should be freed using the provided function */
+int _gnutls_psk_pwd_read_entry(gnutls_session_t state, char *username,
+			       PSK_PWD_ENTRY **);
+void _gnutls_psk_entry_free(SRP_PSK_ENTRY * entry);
+
+#endif				/* ENABLE_SRP */

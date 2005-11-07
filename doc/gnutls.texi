@@ -147,6 +147,8 @@ include:
 
 @item Support for @acronym{SRP} for TLS authentication.
 
+@item Support for @acronym{PSK} for TLS authentication.
+
 @item Support for TLS Extension mechanism.
 
 @item Support for TLS Compression Methods.
@@ -812,12 +814,15 @@ are:
 
 @item @acronym{SRP} authentication
 
+@item @acronym{PSK} authentication
+
 @end itemize
 
 @menu
 * Certificate authentication::
 * Anonymous authentication::
 * Authentication using SRP::
+* Authentication using PSK::
 * Authentication and credentials::
 * Parameters stored in credentials::
 @end menu
@@ -1082,6 +1087,55 @@ maintain @acronym{SRP} verifiers and password files.  A program to
 manipulate the required parameters for @acronym{SRP} authentication is
 also included.  @xref{srptool}, for more information.
 
+
+@node Authentication using PSK
+@section Authentication using @acronym{PSK}
+@cindex @acronym{PSK} authentication
+
+Authentication using Pre-shared keys is a method to authenticate using
+usernames and binary keys. This protocol avoids making use of public key infrastructure
+and expensive calculations, thus it is suitable for constraint clients.
+
+The implementation in @acronym{GnuTLS} is based on paper
+@mybibcite{TLSPSK}.  The supported @acronym{PSK} key exchange methods are:
+
+@table @code
+
+@item PSK:
+Authentication using the @acronym{PSK} protocol.
+
+@end table
+
+Clients supporting @acronym{PSK} should supply the username and key
+before the connection to the client credentials by calling
+the function @ref{gnutls_psk_set_client_credentials}.
+Alternatively they could specify a callback function by using the
+function @ref{gnutls_psk_set_client_credentials_function}.
+This has the advantage that the callback will be called only if @acronym{PSK}
+has been negotiated.
+
+In server side the default behaviour of @acronym{GnuTLS} is to read
+the usernames and @acronym{PSK} keys from a password file. The password file
+should contain usernames and keys in hexadecimal format. The name of the password
+file can be stored to the credentials structure by calling
+@ref{gnutls_psk_set_server_credentials_file}.  If a different
+password file format is to be used, then the function
+@ref{gnutls_psk_set_server_credentials_function}, should be used instead.
+
+Some helper functions such as:
+
+@itemize
+
+@item @ref{gnutls_hex_encode}
+
+@item @ref{gnutls_hex_decode}
+
+@end itemize
+
+are included in @acronym{GnuTLS}, and may be used to generate and
+maintain @acronym{PSK} keys.
+
+
 @node Authentication and credentials
 @section Authentication and credentials
 
@@ -1117,6 +1171,10 @@ Key exchange algorithms and the corresponding credential types:
 @item @code{KX_ANON_DH}
 @tab @code{CRD_ANON}
 @tab @code{CRD_ANON}
+
+@item @code{KX_PSK}
+@tab @code{CRD_PSK}
+@tab @code{CRD_PSK}
 
 @end multitable
 
@@ -2946,6 +3004,22 @@ functions:
 @item @code{TLS_DHE_DSS_ARCFOUR_SHA}
 @tab 0x00 0x66
 @tab draft-ietf-tls-56-bit-ciphersuites
+
+@item @code{TLS_PSK_ARCFOUR_SHA}
+@tab 0x00 0x8A
+@tab draft-ietf-tls-psk
+
+@item @code{TLS_PSK_3DES_EDE_CBC_SHA}
+@tab 0x00 0x8B
+@tab draft-ietf-tls-psk
+
+@item @code{TLS_PSK_AES_128_CBC_SHA}
+@tab 0x00 0x8C
+@tab draft-ietf-tls-psk
+
+@item @code{TLS_PSK_AES_256_CBC_SHA}
+@tab 0x00 0x8D
+@tab draft-ietf-tls-psk
 
 @end multitable
 

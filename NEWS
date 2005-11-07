@@ -3,6 +3,10 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.3.0
+- PSK ciphersuites have been added.
+- The session resumption data are now system independent.
+
 * Version 1.2.9 (2005-11-07)
 - Documentation was updated and improved.
 - RSA-MD2 is now supported for verifying digital signatures.

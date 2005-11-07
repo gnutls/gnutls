@@ -300,7 +300,7 @@ int _gnutls_sbase64_decode(uint8 * data, size_t idata_size,
   * 
   **/
 int gnutls_srp_base64_encode(const gnutls_datum_t * data, char *result,
-			     int *result_size)
+			     size_t *result_size)
 {
     opaque *ret;
     int size;
@@ -370,7 +370,7 @@ int gnutls_srp_base64_encode_alloc(const gnutls_datum_t * data,
   * or 0 on success.
   **/
 int gnutls_srp_base64_decode(const gnutls_datum_t * b64_data, char *result,
-			     int *result_size)
+			     size_t *result_size)
 {
     opaque *ret;
     int size;

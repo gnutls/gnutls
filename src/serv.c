@@ -52,6 +52,7 @@ int verbose;
 static int nodb;
 int require_cert;
 
+char *psk_passwd;
 char *srp_passwd;
 char *srp_passwd_conf;
 char *pgp_keyring;
@@ -100,9 +101,10 @@ char *x509_crlfile = NULL;
 #define RENEGOTIATE
 
 /* These are global */
-gnutls_srp_server_credentials srp_cred = NULL;
-gnutls_anon_server_credentials dh_cred = NULL;
-gnutls_certificate_credentials cert_cred = NULL;
+gnutls_srp_server_credentials_t srp_cred = NULL;
+gnutls_psk_server_credentials_t psk_cred = NULL;
+gnutls_anon_server_credentials_t dh_cred = NULL;
+gnutls_certificate_credentials_t cert_cred = NULL;
 
 const int ssl_session_cache = 128;
 
@@ -206,7 +208,7 @@ static void read_dh_params(void)
     tmpdata[size] = 0;
     fclose(fd);
 
-    params.data = tmpdata;
+    params.data = (unsigned char*)tmpdata;
     params.size = size;
 
     size =
@@ -268,6 +270,7 @@ int protocol_priority[PRI_MAX] =
     { GNUTLS_TLS1_1, GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
+    GNUTLS_KX_PSK,
     /* Do not use anonymous authentication, unless you know what that means */
     GNUTLS_KX_SRP_DSS, GNUTLS_KX_SRP_RSA, GNUTLS_KX_ANON_DH,
     GNUTLS_KX_RSA_EXPORT, 0
@@ -316,6 +319,9 @@ gnutls_session initialize_session(void)
     if (srp_cred != NULL)
 	gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 
+    if (psk_cred != NULL)
+	gnutls_credentials_set(session, GNUTLS_CRD_PSK, psk_cred);
+
     if (cert_cred != NULL)
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
@@ -339,7 +345,7 @@ char *peer_print_info(gnutls_session session, int *ret_length,
 {
     const char *tmp;
     unsigned char sesid[32];
-    int sesid_size, i;
+    size_t i, sesid_size;
     char *http_buffer = malloc(5 * 1024 + strlen(header));
     gnutls_kx_algorithm kx_alg;
 
@@ -391,6 +397,13 @@ char *peer_print_info(gnutls_session session, int *ret_length,
     if (kx_alg == GNUTLS_KX_SRP) {
 	sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
 		gnutls_srp_server_get_username(session));
+    }
+#endif
+
+#ifdef ENABLE_PSK
+    if (kx_alg == GNUTLS_KX_PSK) {
+	sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
+		gnutls_psk_server_get_username(session));
     }
 #endif
 
@@ -726,6 +739,22 @@ int main(int argc, char **argv)
     }
 #endif
 
+    /* this is a password file 
+     */
+#ifdef ENABLE_PSK
+    if (psk_passwd != NULL) {
+	gnutls_psk_allocate_server_credentials(&psk_cred);
+
+	if ((ret =
+	     gnutls_psk_set_server_credentials_file(psk_cred, psk_passwd)) < 0) {
+	    /* only exit is this function is not disabled 
+	     */
+	    fprintf(stderr, "Error while setting PSK parameters\n");
+	    GERR(ret);
+	}
+    }
+#endif
+
 #ifdef ENABLE_ANON
     gnutls_anon_allocate_server_credentials(&dh_cred);
     if (generate != 0)
@@ -1014,6 +1043,10 @@ int main(int argc, char **argv)
     gnutls_srp_free_server_credentials(srp_cred);
 #endif
 
+#ifdef ENABLE_PSK
+    gnutls_psk_free_server_credentials(psk_cred);
+#endif
+
 #ifdef ENABLE_ANON
     gnutls_anon_free_server_credentials(dh_cred);
 #endif
@@ -1069,6 +1102,8 @@ void gaa_parser(int argc, char **argv)
     pgp_keyfile = info.pgp_keyfile;
     srp_passwd = info.srp_passwd;
     srp_passwd_conf = info.srp_passwd_conf;
+
+    psk_passwd = info.psk_passwd;
 
     pgp_keyring = info.pgp_keyring;
     pgp_trustdb = info.pgp_trustdb;

@@ -26,8 +26,6 @@
 #include "debug.h"
 #include <gnutls_session_pack.h>
 
-#define SESSION_SIZE _gnutls_session_size( session)
-
 /**
   * gnutls_session_get_data - Returns all session parameters.
   * @session: is a #gnutls_session_t structure.
@@ -48,17 +46,8 @@ int gnutls_session_get_data(gnutls_session_t session,
     gnutls_datum_t psession;
     int ret;
 
-    if (*session_data_size < SESSION_SIZE || session_data == NULL) {
-	*session_data_size = SESSION_SIZE;
-	session_data = NULL;	/* return with the new session_data_size value */
-    }
-
     if (session->internals.resumable == RESUME_FALSE)
 	return GNUTLS_E_INVALID_SESSION;
-    /* just return the session size */
-    if (session_data == NULL) {
-	return 0;
-    }
 
     psession.data = session_data;
 
@@ -68,6 +57,46 @@ int gnutls_session_get_data(gnutls_session_t session,
 	return ret;
     }
     *session_data_size = psession.size;
+
+    if (psession.size > *session_data_size)
+	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+
+    if (session_data != NULL)
+	memcpy(session_data, psession.data, psession.size);
+
+    return 0;
+}
+
+/**
+  * gnutls_session_get_data2 - Returns all session parameters.
+  * @session: is a #gnutls_session_t structure.
+  * @session_data: is a pointer to a datum that will hold the session.
+  *
+  * Returns all session parameters, in order to support resuming.
+  * The client should call this, and keep the returned session, if he wants to
+  * resume that current version later by calling gnutls_session_set_data()
+  * This function must be called after a successful handshake. The returned
+  * datum must be freed with gnutls_free().
+  *
+  * Resuming sessions is really useful and speedups connections after a succesful one.
+  **/
+int gnutls_session_get_data2(gnutls_session_t session, gnutls_datum * data)
+{
+
+    int ret;
+
+    if (data == NULL) {
+	return GNUTLS_E_INVALID_REQUEST;
+    }
+
+    if (session->internals.resumable == RESUME_FALSE)
+	return GNUTLS_E_INVALID_SESSION;
+
+    ret = _gnutls_session_pack(session, data);
+    if (ret < 0) {
+	gnutls_assert();
+	return ret;
+    }
 
     return 0;
 }

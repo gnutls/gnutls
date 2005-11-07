@@ -67,6 +67,9 @@ option (x509dsacertfile) STR "FILE" { $x509_dsacertfile = $1 } "Alternative X.50
 #int require_cert;
 option (require-cert) { $require_cert = 1 } "Require a valid certificate."
 
+#char *psk_passwd;
+option (pskpasswd) STR "FILE" { $psk_passwd = $1 } "PSK password file to use."
+
 #char *srp_passwd;
 option (srppasswd) STR "FILE" { $srp_passwd = $1 } "SRP password file to use."
 
@@ -114,6 +117,6 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
 	$pgp_trustdb=NULL; $pgp_keyring=NULL; $fmtder = 0; 
-	$dh_params_file=NULL; $debug=0; $require_cert = 0; }
+	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0; }
 
 
