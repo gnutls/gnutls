@@ -6,6 +6,9 @@ See the end for copying conditions.
 * Version 1.3.0
 - PSK ciphersuites have been added.
 - The session resumption data are now system independent.
+- The code has been re-indented to conform to the GNU coding style.
+- API and ABI modifications:
+  ?
 
 * Version 1.2.9 (2005-11-07)
 - Documentation was updated and improved.
