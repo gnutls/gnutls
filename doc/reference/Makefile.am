@@ -60,7 +60,8 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h	\
 	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h		\
 	auth_dh_common.h ext_srp.h gnutls_srp.h auth_srp.h		\
-	auth_srp_passwd.h memmem.h					\
+	auth_srp_passwd.h auth_psk.h auth_psk_passwd.h memmem.h		\
+	gnutls_helper.h							\
 									\
 	der.h errors.h gstr.h parser_aux.h element.h		\
 	errors_int.h int.h mem.h structure.h				\
