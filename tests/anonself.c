@@ -61,7 +61,7 @@ tcp_connect (void)
   sa.sin_port = htons (atoi (PORT));
   inet_pton (AF_INET, SERVER, &sa.sin_addr);
 
-  err = connect (sd, (struct sockaddr *) & sa, sizeof (sa));
+  err = connect (sd, (struct sockaddr *) &sa, sizeof (sa));
   if (err < 0)
     {
       fprintf (stderr, "Connect error\n");
