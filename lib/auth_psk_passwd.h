@@ -24,14 +24,8 @@
 
 #ifdef ENABLE_PSK
 
-typedef struct {
-    char *username;
-    gnutls_datum_t key;
-} PSK_PWD_ENTRY;
-
 /* this is locally allocated. It should be freed using the provided function */
-int _gnutls_psk_pwd_read_entry(gnutls_session_t state, char *username,
-			       PSK_PWD_ENTRY **);
-void _gnutls_psk_entry_free(SRP_PSK_ENTRY * entry);
+int _gnutls_psk_pwd_find_entry(gnutls_session_t, char *username,
+			       gnutls_datum* key);
 
 #endif				/* ENABLE_SRP */
