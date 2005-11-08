@@ -1,20 +1,25 @@
-In this section we will provide some information about digital signatures, how they
-work, and give the rationale for disabling some of the algorithms used. 
+In this section we will provide some information about digital
+signatures, how they work, and give the rationale for disabling some
+of the algorithms used.
 
-Digital signatures work by using somebody's secret key to sign some arbitrary data.
-Then anybody else could use the public key of that person to verify the signature.
-Since the data may be arbitrary it is not suitable input to a cryptographic digital
-signature algorithm. For this reason and also for performance cryptographic hash algorithms are used to
-preprocess the input to the signature algorithm. This works as long as it is difficult enough
-to generate two different messages with the same hash algorithm output. In that case the
-same signature could be used as a proof for both messages. Nobody wants to sign an innocent
-message of donating 1 @euro{} to Greenpeace and find out that he donated 1.000.000 @euro{}
-to Bad Inc. 
+Digital signatures work by using somebody's secret key to sign some
+arbitrary data.  Then anybody else could use the public key of that
+person to verify the signature.  Since the data may be arbitrary it is
+not suitable input to a cryptographic digital signature algorithm. For
+this reason and also for performance cryptographic hash algorithms are
+used to preprocess the input to the signature algorithm. This works as
+long as it is difficult enough to generate two different messages with
+the same hash algorithm output. In that case the same signature could
+be used as a proof for both messages. Nobody wants to sign an innocent
+message of donating 1 @euro{} to Greenpeace and find out that he
+donated 1.000.000 @euro{} to Bad Inc.
 
-For a hash algorithm to be called cryptographic the following three requirements must hold
+For a hash algorithm to be called cryptographic the following three
+requirements must hold
 @enumerate
 @item Preimage resistance. That means the algorithm must be one way and given
-the output of the hash function @math{H(x)}, it is impossible to calculate @math{x}.
+the output of the hash function @math{H(x)}, it is impossible to
+calculate @math{x}.
 
 @item 2nd preimage resistance. That means that given a pair @math{x,y} with @math{y=H(x)} it is impossible
 to calculate an @math{x'} such that @math{y=H(x')}.
@@ -23,10 +28,12 @@ to calculate an @math{x'} such that @math{y=H(x')}.
 @math{H(x')=H(x)}.
 @end enumerate
 
-The last two requirements in the list are the most important in digital signatures. These protect
-against somebody who would like to generate two messages with the same hash output. When an
-algorithm is considered broken usually it means that the Collision resistance of the algorithm is
-less than brute force. Using the birthday paradox the brute force attack takes 
+The last two requirements in the list are the most important in
+digital signatures. These protect against somebody who would like to
+generate two messages with the same hash output. When an algorithm is
+considered broken usually it means that the Collision resistance of
+the algorithm is less than brute force. Using the birthday paradox the
+brute force attack takes
 @iftex
 @math{2^{(\rm{hash\ size}) / 2}} 
 @end iftex
@@ -37,15 +44,17 @@ operations. Today colliding certificates using the MD5 hash algorithm
 have been generated as shown in @mybibcite{WEGER}.
 
 @subsection Supported algorithms
-The available digital signature algorithms in @acronym{GnuTLS} are listed below:
+The available digital signature algorithms in @acronym{GnuTLS} are
+listed below:
 
 @table @code
 @item RSA
-RSA is public key cryptosystem designed by
-Ronald Rivest, Adi Shamir and Leonard Adleman. It can be used with any hash functions.
+RSA is public key cryptosystem designed by Ronald Rivest, Adi Shamir
+and Leonard Adleman. It can be used with any hash functions.
 
 @item DSA
-DSA is the USA's Digital Signature Standard. It uses only the SHA-1 hash algorithm.
+DSA is the USA's Digital Signature Standard. It uses only the SHA-1
+hash algorithm.
 
 @end table
 
@@ -54,13 +63,13 @@ The supported cryptographic hash algorithms are:
 @table @code
 @item MD2
 MD2 is a cryptographic hash algorithm designed by Ron Rivest. It is
-optimized for 8-bit processors. Outputs
-128 bits of data. There are no known weaknesses of this algorithm but since this
-algorithm is rarely used and not really studied it should not be used today.
+optimized for 8-bit processors. Outputs 128 bits of data. There are no
+known weaknesses of this algorithm but since this algorithm is rarely
+used and not really studied it should not be used today.
 
 @item MD5
 MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs
-128 bits of data. It is considered to be broken. 
+128 bits of data. It is considered to be broken.
 
 @item SHA-1
 SHA is a cryptographic hash algorithm designed by NSA. Outputs 160
@@ -69,7 +78,7 @@ attacks have been found.
 
 @item RMD160
 RIPEMD is a cryptographic hash algorithm developed in the framework of
-the EU project RIPE. Outputs 160 bits of data. 
+the EU project RIPE. Outputs 160 bits of data.
 
 @end table
 
