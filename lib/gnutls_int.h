@@ -286,7 +286,6 @@ typedef struct
    * there is a time in handshake where the peer has
    * null cipher and we don't
    */
-  /* FIXME: remove the read and write stuff... keep only one version */
   gnutls_cipher_algorithm_t read_bulk_cipher_algorithm;
   gnutls_mac_algorithm_t read_mac_algorithm;
   gnutls_compression_method_t read_compression_algorithm;
