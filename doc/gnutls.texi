@@ -3025,7 +3025,7 @@ functions:
 @end multitable
 
 @node Internal architecture of GnuTLS
-@section Internal architecture of GnuTLS
+@chapter Internal architecture of GnuTLS
 @cindex Internal architecture
 @include internals.texi
 
