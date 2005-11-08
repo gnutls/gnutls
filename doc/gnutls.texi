@@ -83,6 +83,7 @@ Free Documentation License''.
 * Function reference::
 * Certificate to XML convertion functions::
 * All the supported ciphersuites in GnuTLS::
+* Internal architecture of GnuTLS::
 * Copying This Manual::
 * Concept Index::
 * Function and Data Index::
@@ -3022,6 +3023,11 @@ functions:
 @tab draft-ietf-tls-psk
 
 @end multitable
+
+@node Internal architecture of GnuTLS
+@section Internal architecture of GnuTLS
+@cindex Internal architecture
+@include internals.texi
 
 
 @node Copying This Manual

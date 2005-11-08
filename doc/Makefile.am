@@ -29,7 +29,7 @@ endif
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi error_codes.texi	bibliography.texi \
 	gnutls-api.texi gnutls-extra-api.texi x509-api.texi		\
-	my-bib-macros.texi \
+	my-bib-macros.texi internals.texi \
 	pgp-api.texi examples/ex-client1.c examples/ex-client2.c	\
 	examples/ex-session-info.c examples/ex-verify.c			\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
