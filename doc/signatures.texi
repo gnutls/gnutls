@@ -44,15 +44,17 @@ operations. Today colliding certificates using the MD5 hash algorithm
 have been generated as shown in @mybibcite{WEGER}.
 
 There has been cryptographic results for the SHA-1 hash algorithms as
-well, although they are not yet as critical.  Before 2004, MD5 had a
+well, although they are not yet critical.  Before 2004, MD5 had a
 presumed collision strength of @math{2^64}, but it has been showed to
 have a collision strength well under @math{2^50}.  As of November
 2005, it is believed that SHA-1's collision strength is around
 @math{2^63}.  We consider this sufficiently hard so that we still
-support SHA-1.  We anticipate that SHA-256/386/512 will be used in the
-future.  When, in a few years, @math{2^63} can be considered too weak
-compared to the computer power available then, SHA-1 will be disabled
-as well.
+support SHA-1.  We anticipate that SHA-256/386/512 will be used in
+publicly-distributed certificates in the future.  When @math{2^63} can
+be considered too weak compared to the computer power available
+sometime in the future, SHA-1 will be disabled as well.  The collision
+attacks on SHA-1 may also get better, given the new interest in tools
+for creating them.
 
 @subsection Supported algorithms
 The available digital signature algorithms in @acronym{GnuTLS} are
