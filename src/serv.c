@@ -656,7 +656,7 @@ main (int argc, char **argv)
   if ((ret = gnutls_global_init_extra ()) < 0)
     {
       fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
-      exit (1);
+//      exit (1);
     }
 
   /* Note that servers must generate parameters for

@@ -256,7 +256,7 @@ static int
 pack_certificate_auth_info (gnutls_session_t session,
 			    gnutls_datum_t * packed_session)
 {
-  unsigned int pos, i;
+  unsigned int pos = 0, i;
   int cert_size, pack_size;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
 
@@ -344,7 +344,7 @@ static int
 unpack_certificate_auth_info (gnutls_session_t session,
 			      const gnutls_datum_t * packed_session)
 {
-  int pos, size, ret;
+  int pos = 0, size, ret;
   unsigned int i, j;
   size_t pack_size;
   cert_auth_info_t info;
@@ -607,7 +607,7 @@ static int
 pack_anon_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
 {
   anon_auth_info_t info = _gnutls_get_auth_info (session);
-  int pos;
+  int pos = 0;
   size_t pack_size;
 
   if (info == NULL && session->key->auth_info_size != 0)
@@ -662,7 +662,7 @@ unpack_anon_auth_info (gnutls_session_t session,
 		       const gnutls_datum * packed_session)
 {
   size_t pack_size;
-  int pos, size, ret;
+  int pos = 0, size, ret;
   anon_auth_info_t info;
 
   if (packed_session->data[0] != GNUTLS_CRD_ANON)
@@ -903,7 +903,7 @@ static int
 pack_security_parameters (gnutls_session_t session,
 			  gnutls_datum * packed_session)
 {
-  int pos;
+  int pos = 0;
   size_t len, init, i;
 
   /* move after the auth info stuff.
@@ -1008,7 +1008,7 @@ unpack_security_parameters (gnutls_session_t session,
 			    const gnutls_datum * packed_session)
 {
   size_t pack_size, init, i;
-  int pos, len;
+  int pos = 0, len;
   time_t timestamp = time (0);
 
 

@@ -1037,7 +1037,7 @@ init_global_tls_stuff (void)
   if ((ret = gnutls_global_init_extra ()) < 0)
     {
       fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
-      exit (1);
+//      exit (1);
     }
 
   /* X509 stuff */
