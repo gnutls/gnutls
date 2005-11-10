@@ -7,13 +7,13 @@ happens inside the black box.
 The main needs for the TLS protocol to be used are
 shown in the image below.
 
-@image{client-server-use-case,9cm}
+@image{arch/client-server-use-case,9cm}
 
 This is being accomplished by the following object diagram.
 Note that since @acronym{GnuTLS} is being developed in C
 object are just structures with attributes. The operations listed
 are functions that require the first parameter to be that object.
-@image{objects,15cm}
+@image{arch/objects,15cm}
 
 @section The TLS Handshake protocol
 The @acronym{GnuTLS} handshake protocol is implemented as a state
@@ -21,7 +21,7 @@ machine that waits for input or returns immediately when the non-blocking
 transport layer functions are used. The main idea is shown in the following
 figure.
 
-@image{handshake-state,9cm}
+@image{arch/handshake-state,9cm}
 
 Also the way the input is processed varies per ciphersuite. Several implementations
 of the internal handlers are available and @ref{gnutls_handshake} only multiplexes
@@ -29,10 +29,10 @@ the input to the appropriate handler. For example a @acronym{PSK} ciphersuite ha
 different implementation of the @code{process_client_key_exchange} than a
 certificate ciphersuite.
 
-@image{handshake-sequence,12cm}
+@image{arch/handshake-sequence,12cm}
 
 @section Certificate handling
 What is provided by the certificate handling functions
 is summarized in the following diagram.
 
-@image{certificate-user-use-case,12cm}
+@image{arch/certificate-user-use-case,12cm}
