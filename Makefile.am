@@ -26,7 +26,7 @@ SUBDIRS = gl includes lib libextra src doc tests
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
 ChangeLog:
-	cvs2cl --tags --utc --fsf --FSF --usermap .cvsusers -I ChangeLog -I .cvs
+	cvs2cl --tags --utc --fsf --FSF --usermap .cvsusers -I ChangeLog -I .cvs --window 120 -l "-d"">2005-11-07;today<"""
 	cat .cvscopying >> ChangeLog
 
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
