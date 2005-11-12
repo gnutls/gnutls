@@ -36,6 +36,7 @@ Current list:
 - Implement Datagram-TLS (DTLS).
 - Short-cut the certificate verification algorithm before the
   root if a middle-CA is trusted.
+- Update libgnutls-extra.m4 to use modern autoconf constructs.
 
 (+) Means high priority 
 (*) Means medium priority
