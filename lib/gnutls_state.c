@@ -615,7 +615,7 @@ gnutls_openpgp_send_key (gnutls_session_t session,
 }
 
 /**
-  * gnutls_certificate_send_x509_rdn_sequence - This function will order gnutls to or not to send the x.509 rdn sequence
+  * gnutls_certificate_send_x509_rdn_sequence - This function will order gnutls to send or not the x.509 rdn sequence
   * @session: is a pointer to a #gnutls_session_t structure.
   * @status: is 0 or 1
   *

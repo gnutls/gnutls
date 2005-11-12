@@ -97,7 +97,7 @@ option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key gene
 option (outfile) STR "FILE" { $outfile = $1 } "Output file."
 
 #char *infile;
-option (infile) STR "FILE" { $infile = $1 } "Output file."
+option (infile) STR "FILE" { $infile = $1 } "Input file."
 
 #char *template;
 option (template) STR "FILE" { $template = $1 } "Template file to use for non interactive operation."

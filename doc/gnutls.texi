@@ -671,10 +671,18 @@ may request a certificate from the client --- using the
 @ref{gnutls_certificate_server_set_request} function. If a
 certificate is to be requested from the client during the handshake,
 the server will send a certificate request message that contains a
-list of acceptable certificate signers. The client may then send a
-certificate, signed by one of the server's acceptable signers. In
-@acronym{GnuTLS} the server's acceptable signers list is constructed
-using the trusted CA certificates in the credentials structure.
+list of acceptable certificate signers. In @acronym{GnuTLS} the certificate
+signers list is constructed using the trusted Certificate Authorities by the 
+server. That is the ones set using
+@itemize
+@item @ref{gnutls_certificate_set_x509_trust_file}
+@item @ref{gnutls_certificate_set_x509_trust_mem}
+@end itemize
+
+Sending of the names of the CAs can be controlled using 
+@ref{gnutls_certificate_send_x509_rdn_sequence}. The client, then, 
+may send a certificate, signed by one of the server's acceptable 
+signers. 
 
 @subsection Resuming Sessions
 @anchor{resume}
