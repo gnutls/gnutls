@@ -7,6 +7,8 @@ See the end for copying conditions.
 - PSK ciphersuites have been added.
 - The session resumption data are now system independent.
 - The code has been re-indented to conform to the GNU coding style.
+- Removed the RIPEMD ciphersuites.
+- Added a discussion of the internals of gnutls in manual.
 - API and ABI modifications:
   ?
 

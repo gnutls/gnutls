@@ -2974,42 +2974,6 @@ functions:
 @tab 0x00 0x58
 @tab draft-ietf-tls-srp
 
-@item @code{TLS_DHE_DSS_3DES_EDE_CBC_RMD}
-@tab 0x00 0x72
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_DHE_RSA_3DES_EDE_CBC_RMD}
-@tab 0x00 0x77
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_DHE_DSS_AES_256_CBC_RMD}
-@tab 0x00 0x73
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_DHE_DSS_AES_128_CBC_RMD}
-@tab 0x00 0x74
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_DHE_RSA_AES_128_CBC_RMD}
-@tab 0x00 0x78
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_DHE_RSA_AES_256_CBC_RMD}
-@tab 0x00 0x79
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_RSA_3DES_EDE_CBC_RMD}
-@tab 0x00 0x7C
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_RSA_AES_128_CBC_RMD}
-@tab 0x00 0x7D
-@tab draft-ietf-tls-openpgp-keys
-
-@item @code{TLS_RSA_AES_256_CBC_RMD}
-@tab 0x00 0x7E
-@tab draft-ietf-tls-openpgp-keys
-
 @item @code{TLS_DHE_DSS_ARCFOUR_SHA}
 @tab 0x00 0x66
 @tab draft-ietf-tls-56-bit-ciphersuites
