@@ -24,6 +24,8 @@
  * (which means it is quite unreadable)
  */
 
+#include "common.h"
+#include "serv-gaa.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -31,11 +33,8 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
-#include "common.h"
-#include "serv-gaa.h"
 #include <sys/time.h>
 #include <fcntl.h>
-#include <config.h>
 #include <list.h>
 
 /* konqueror cannot handle sending the page in multiple

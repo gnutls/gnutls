@@ -22,8 +22,8 @@
  *
  */
 
-#include <libtasn1.h>
 #include <gnutls_int.h>
+#include <libtasn1.h>
 
 #ifdef ENABLE_PKI
 

@@ -27,6 +27,8 @@
  * API.
  */
 
+#include <config.h>
+
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <string.h>		/* memset */

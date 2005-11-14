@@ -25,8 +25,8 @@
 /* Functions that relate on PKCS7 certificate lists parsing.
  */
 
-#include <libtasn1.h>
 #include <gnutls_int.h>
+#include <libtasn1.h>
 
 #ifdef ENABLE_PKI
 
