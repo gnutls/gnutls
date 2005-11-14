@@ -749,6 +749,9 @@ read_key_mem (gnutls_certificate_credentials_t res,
 #ifdef HAVE_MMAP
 # include <unistd.h>
 # include <sys/mman.h>
+# ifndef MAP_FAILED
+#  define MAP_FAILED (void *)-1L
+# endif
 #endif
 
 #include <strfile.h>
