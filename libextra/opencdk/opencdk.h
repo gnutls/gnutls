@@ -112,7 +112,7 @@ typedef enum {
     CDK_Wrong_Format = 22,
     CDK_Inv_Packet_Ver = 23,
     CDK_Too_Short = 24,
-    CDK_Unusable_Key = 25,
+    CDK_Unusable_Key = 25
 } cdk_error_t;
 
 
@@ -160,7 +160,7 @@ enum cdk_md_algo_t {
     CDK_MD_RMD160  = 3,
     CDK_MD_MD2     = 5,
     CDK_MD_TIGER   = 6, /* will be removed and thus: reserved */
-    CDK_MD_SHA256  = 8,
+    CDK_MD_SHA256  = 8
 };
 
 enum cdk_cipher_algo_t {
@@ -174,7 +174,7 @@ enum cdk_cipher_algo_t {
     CDK_CIPHER_AES         = 7,
     CDK_CIPHER_AES192      = 8,
     CDK_CIPHER_AES256      = 9,
-    CDK_CIPHER_TWOFISH     = 10,
+    CDK_CIPHER_TWOFISH     = 10
 };
 
 enum cdk_s2k_type_t {
@@ -228,12 +228,12 @@ enum cdk_armor_type_t {
     CDK_ARMOR_PUBKEY    = 1,
     CDK_ARMOR_SECKEY    = 2,
     CDK_ARMOR_SIGNATURE = 3,
-    CDK_ARMOR_CLEARSIG  = 4,
+    CDK_ARMOR_CLEARSIG  = 4
 };
 
 enum cdk_stream_control_t {
     CDK_STREAMCTL_DISABLE    = 2,
-    CDK_STREAMCTL_COMPRESSED = 3,
+    CDK_STREAMCTL_COMPRESSED = 3
 };
 
 enum cdk_keydb_flag_t {
@@ -267,7 +267,7 @@ enum cdk_key_flag_t {
     CDK_KEY_INVALID = 1, /* missing or wrong self signature */
     CDK_KEY_EXPIRED = 2,
     CDK_KEY_REVOKED = 4,
-    CDK_KEY_NOSIGNER= 8,
+    CDK_KEY_NOSIGNER= 8
 };
 
 enum cdk_trust_flag_t {
@@ -316,7 +316,7 @@ enum cdk_attribute_t {
     /* cdk key flags */
     CDK_FLAG_KEY_REVOKED = 256,
     CDK_FLAG_KEY_EXPIRED = 512,
-    CDK_FLAG_SIG_EXPIRED = 1024,  
+    CDK_FLAG_SIG_EXPIRED = 1024
 };
 
 
@@ -345,7 +345,7 @@ typedef enum {
     CDK_PKT_OLD_COMMENT   = 16,
     CDK_PKT_ATTRIBUTE     = 17,
     CDK_PKT_ENCRYPTED_MDC = 18,
-    CDK_PKT_MDC           = 19,
+    CDK_PKT_MDC           = 19
 } cdk_packet_type_t;
 
 #define CDK_PKT_IS_ENCRYPTED(pkttype) (\
