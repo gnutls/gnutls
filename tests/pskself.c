@@ -94,7 +94,8 @@ client (void)
   gnutls_global_init ();
 
   gnutls_psk_allocate_client_credentials (&pskcred);
-  gnutls_psk_set_client_credentials (pskcred, "test", &key, GNUTLS_PSK_KEY_HEX);
+  gnutls_psk_set_client_credentials (pskcred, "test", &key,
+				     GNUTLS_PSK_KEY_HEX);
 
   /* Initialize TLS session
    */
@@ -216,8 +217,7 @@ generate_dh_params (void)
 }
 
 static int
-pskfunc (gnutls_session_t session,
-	 const char* username, gnutls_datum_t* key)
+pskfunc (gnutls_session_t session, const char *username, gnutls_datum_t * key)
 {
   printf ("psk: username %s\n", username);
   key->data = gnutls_malloc (4);
