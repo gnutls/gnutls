@@ -4,13 +4,60 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.3.0
-- PSK ciphersuites have been added.
-- The session resumption data are now system independent.
-- The code has been re-indented to conform to the GNU coding style.
-- Removed the RIPEMD ciphersuites.
-- Added a discussion of the internals of gnutls in manual.
-- API and ABI modifications:
-  ?
+
+** PSK ciphersuites have been added.
+This add several new APIs, see below.  Read the updated manual for
+more information.  A new self test "pskself" has been added, that will
+test this functionality.
+
+** The session resumption data are now system independent.
+
+** The code has been re-indented to conform to the GNU coding style.
+
+** Removed the RIPEMD ciphersuites.
+
+** Added a discussion of the internals of gnutls in manual.
+
+** API and ABI modifications:
+New gnutls_kx_algorithm_t key exchange type:
+  GNUTLS_KX_PSK
+
+New gnutls_credentials_type_t credential type:
+  GNUTLS_CRD_PSK
+
+New credential types:
+  gnutls_psk_server_credentials_t
+  gnutls_psk_client_credentials_t
+
+New functions to allocate PSK credentials:
+  gnutls_psk_allocate_client_credentials
+  gnutls_psk_free_client_credentials
+  gnutls_psk_free_server_credentials
+  gnutls_psk_allocate_server_credentials
+
+New enum type for PSK key flags:
+  gnutls_psk_key_flags
+
+New function prototypes for credential callback:
+  gnutls_psk_client_credentials_function
+  gnutls_psk_server_credentials_function
+
+New function to set PSK username and key:
+  gnutls_psk_set_client_credentials
+
+New function to set PSK passwd file:
+  gnutls_psk_set_server_credentials_file
+
+New function to extract PSK user in server:
+  gnutls_psk_server_get_username
+
+New functions to set PSK callback:
+  gnutls_psk_set_server_credentials_function,
+  gnutls_psk_set_client_credentials_function: 
+
+Use size_t instead of int for output size parameter:
+  gnutls_srp_base64_encode
+  gnutls_srp_base64_decode
 
 * Version 1.2.9 (2005-11-07)
 - Documentation was updated and improved.
