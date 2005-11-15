@@ -29,49 +29,49 @@
 
 #include <gnutls_int.h>
 
-#ifdef ENABLE_ANON
+#ifdef ENABLE_PSK
 
 #include "gnutls_auth_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
-#include "auth_anon.h"
+#include "auth_psk.h"
 #include "gnutls_num.h"
 #include "gnutls_mpi.h"
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
-static int gen_anon_server_kx (gnutls_session_t, opaque **);
-static int proc_anon_client_kx (gnutls_session_t, opaque *, size_t);
-static int proc_anon_server_kx (gnutls_session_t, opaque *, size_t);
+static int gen_psk_server_kx (gnutls_session_t, opaque **);
+static int proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
+static int proc_psk_server_kx (gnutls_session_t, opaque *, size_t);
 
-const mod_auth_st anon_auth_struct = {
-  "ANON",
+const mod_auth_st dhe_psk_auth_struct = {
+  "DHE PSK",
   NULL,
   NULL,
-  gen_anon_server_kx,
+  gen_psk_server_kx,
   _gnutls_gen_dh_common_client_kx,	/* this can be shared */
   NULL,
   NULL,
 
   NULL,
   NULL,				/* certificate */
-  proc_anon_server_kx,
-  proc_anon_client_kx,
+  proc_psk_server_kx,
+  proc_psk_client_kx,
   NULL,
   NULL
 };
 
 static int
-gen_anon_server_kx (gnutls_session_t session, opaque ** data)
+gen_psk_server_kx (gnutls_session_t session, opaque ** data)
 {
   mpi_t g, p;
   const mpi_t *mpis;
   int ret;
   gnutls_dh_params_t dh_params;
-  gnutls_anon_server_credentials_t cred;
+  gnutls_psk_server_credentials_t cred;
 
-  cred = (gnutls_anon_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
+  cred = (gnutls_psk_server_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -90,8 +90,8 @@ gen_anon_server_kx (gnutls_session_t session, opaque ** data)
   g = mpis[1];
 
   if ((ret =
-       _gnutls_auth_info_set (session, GNUTLS_CRD_ANON,
-			      sizeof (anon_server_auth_info_st), 1)) < 0)
+       _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
+			      sizeof (psk_server_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -110,10 +110,10 @@ gen_anon_server_kx (gnutls_session_t session, opaque ** data)
 
 
 static int
-proc_anon_client_kx (gnutls_session_t session, opaque * data,
+proc_psk_client_kx (gnutls_session_t session, opaque * data,
 		     size_t _data_size)
 {
-  gnutls_anon_server_credentials_t cred;
+  gnutls_psk_server_credentials_t cred;
   int bits;
   int ret;
   mpi_t p, g;
@@ -122,8 +122,8 @@ proc_anon_client_kx (gnutls_session_t session, opaque * data,
 
   bits = _gnutls_dh_get_allowed_prime_bits (session);
 
-  cred = (gnutls_anon_server_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
+  cred = (gnutls_psk_server_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -148,7 +148,7 @@ proc_anon_client_kx (gnutls_session_t session, opaque * data,
 }
 
 int
-proc_anon_server_kx (gnutls_session_t session, opaque * data,
+proc_psk_server_kx (gnutls_session_t session, opaque * data,
 		     size_t _data_size)
 {
 
@@ -156,8 +156,8 @@ proc_anon_server_kx (gnutls_session_t session, opaque * data,
 
   /* set auth_info */
   if ((ret =
-       _gnutls_auth_info_set (session, GNUTLS_CRD_ANON,
-			      sizeof (anon_client_auth_info_st), 1)) < 0)
+       _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
+			      sizeof (psk_client_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -173,4 +173,4 @@ proc_anon_server_kx (gnutls_session_t session, opaque * data,
   return 0;
 }
 
-#endif /* ENABLE_ANON */
+#endif /* ENABLE_PSK */

@@ -22,7 +22,7 @@
  *
  */
 
-/* This file was intended to contains functions to be exported in the
+/* This file contains certificate authentication functions to be exported in the
  * API and did not fit elsewhere.
  */
 
@@ -511,22 +511,6 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
   return 0;
 }
 
-/**
-  * gnutls_anon_set_server_dh_params - This function will set the DH parameters for a server to use
-  * @res: is a gnutls_anon_server_credentials_t structure
-  * @dh_params: is a structure that holds diffie hellman parameters.
-  *
-  * This function will set the diffie hellman parameters for an anonymous
-  * server to use. These parameters will be used in Anonymous Diffie Hellman 
-  * cipher suites.
-  *
-  **/
-void
-gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
-				  gnutls_dh_params_t dh_params)
-{
-  res->dh_params = dh_params;
-}
 
 /**
   * gnutls_certificate_set_dh_params - This function will set the DH parameters for a server to use
@@ -561,23 +545,6 @@ gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
 void
 gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
 					gnutls_params_function * func)
-{
-  res->params_func = func;
-}
-
-/**
-  * gnutls_anon_set_params_function - This function will set the DH parameters callback
-  * @res: is a gnutls_certificate_credentials_t structure
-  * @func: is the function to be called
-  *
-  * This function will set a callback in order for the server to get the 
-  * diffie hellman parameters for anonymous authentication. The callback should
-  * return zero on success.
-  *
-  **/
-void
-gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
-				 gnutls_params_function * func)
 {
   res->params_func = func;
 }

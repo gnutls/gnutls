@@ -79,7 +79,7 @@ typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL = 1,
 typedef enum { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
     GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
     GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS,
-    GNUTLS_KX_PSK
+    GNUTLS_KX_PSK, GNUTLS_KX_DHE_PSK
 } gnutls_kx_algorithm_t;
 
 typedef enum { GNUTLS_PARAMS_RSA_EXPORT=1,
@@ -633,6 +633,7 @@ void gnutls_psk_set_client_credentials_function( gnutls_psk_client_credentials_t
 int gnutls_hex_encode( const gnutls_datum_t *data, char* result, size_t* result_size);
 int gnutls_hex_decode( const gnutls_datum_t *hex_data, char* result, size_t* result_size);
 
+void gnutls_psk_set_server_dh_params( gnutls_psk_server_credentials_t res, gnutls_dh_params_t dh_params);
 
 
 #ifndef GNUTLS_UI_H
@@ -770,22 +771,25 @@ int gnutls_hex_decode( const gnutls_datum_t *hex_data, char* result, size_t* res
 #define GNUTLS_KEY_ENCIPHER_ONLY                1
 #define GNUTLS_KEY_DECIPHER_ONLY                32768
 
-  typedef struct gnutls_params_st {
+typedef struct gnutls_params_st {
     gnutls_params_type_t type;
     union params {
       gnutls_dh_params_t dh;
       gnutls_rsa_params_t rsa_export;
     } params;
     int deinit;
-  } gnutls_params_st;
+} gnutls_params_st;
 
-  typedef int gnutls_params_function(gnutls_session_t, gnutls_params_type_t,
+typedef int gnutls_params_function(gnutls_session_t, gnutls_params_type_t,
 				     gnutls_params_st *);
 
-  void
+void
   gnutls_certificate_set_params_function(gnutls_certificate_credentials_t res,
 					 gnutls_params_function * func);
-  void gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
+void gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
+				       gnutls_params_function * func);
+
+void gnutls_psk_set_params_function(gnutls_psk_server_credentials_t res,
 				       gnutls_params_function * func);
 
 

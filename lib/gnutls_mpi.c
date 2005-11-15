@@ -159,6 +159,35 @@ _gnutls_mpi_dprint_lz (gnutls_datum_t * dest, const mpi_t a)
   return GNUTLS_E_MPI_PRINT_FAILED;
 }
 
+int
+_gnutls_mpi_dprint(gnutls_datum_t * dest, const mpi_t a)
+{
+  int ret;
+  opaque *buf = NULL;
+  size_t bytes = 0;
+
+  if (dest == NULL || a == NULL)
+    return GNUTLS_E_INVALID_REQUEST;
+
+  gcry_mpi_print (GCRYMPI_FMT_USG, NULL, 0, &bytes, a);
+
+  if (bytes != 0)
+    buf = gnutls_malloc (bytes);
+  if (buf == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
+
+  ret = gcry_mpi_print (GCRYMPI_FMT_USG, buf, bytes, &bytes, a);
+  if (!ret)
+    {
+      dest->data = buf;
+      dest->size = bytes;
+      return 0;
+    }
+
+  gnutls_free (buf);
+  return GNUTLS_E_MPI_PRINT_FAILED;
+}
+
 
 /* this function reads an integer
  * from asn1 structs. Combines the read and mpi_scan

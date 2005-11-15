@@ -59,17 +59,62 @@ const mod_auth_st psk_auth_struct = {
 
 /* Set the PSK premaster secret.
  */
-static int
-set_psk_session_key (gnutls_session_t session, gnutls_datum * psk)
+int
+_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * psk2)
 {
+  gnutls_datum psk = { NULL, 0 };
+  gnutls_datum *ppsk;
+  size_t psk2_size;
+  int ret;
+
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
+      gnutls_psk_client_credentials_t cred;
+
+      cred = (gnutls_psk_client_credentials_t)
+	_gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+
+      if (cred == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+      ppsk = &cred->key;
+
+    }
+  else
+    {				/* SERVER side */
+      psk_server_auth_info_t info;
+
+      info = _gnutls_get_auth_info (session);
+
+      /* find the key of this username
+       */
+      ret = _gnutls_psk_pwd_find_entry (session, info->username, &psk);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+      ppsk = &psk;
+    }
+
+
+  if (psk2 == NULL)
+    psk2_size = ppsk->size;
+  else
+    psk2_size = psk2->size;
+
   /* set the session key
    */
-  session->key->key.size = 4 + psk->size + psk->size;
+  session->key->key.size = 4 + psk2_size + ppsk->size;
   session->key->key.data = gnutls_malloc (session->key->key.size);
   if (session->key->key.data == NULL)
     {
       gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto error;
     }
 
   /* format of the premaster secret:
@@ -78,11 +123,19 @@ set_psk_session_key (gnutls_session_t session, gnutls_datum * psk)
    * (uint16) psk_size
    * the psk
    */
-  _gnutls_write_uint16 (psk->size, session->key->key.data);
-  memset (&session->key->key.data[2], 0, psk->size);
-  _gnutls_write_datum16 (&session->key->key.data[psk->size + 2], *psk);
+  _gnutls_write_uint16 (psk2_size, session->key->key.data);
+  if (psk2 == NULL)
+    memset (&session->key->key.data[2], 0, psk2_size);
+  else
+    memcpy (&session->key->key.data[2], psk2->data, psk2->size);
 
-  return 0;
+  _gnutls_write_datum16 (&session->key->key.data[psk2_size + 2], *ppsk);
+
+  ret = 0;
+  
+  error:
+    _gnutls_free_datum( &psk);
+    return ret;
 }
 
 
@@ -101,7 +154,6 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
 {
   int ret;
   gnutls_psk_client_credentials_t cred;
-  gnutls_datum *psk;
 
   cred = (gnutls_psk_client_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
@@ -112,15 +164,13 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  psk = &cred->key;
-
-  if (cred->username.data == NULL || psk == NULL)
+  if (cred->username.data == NULL || cred->key.data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  ret = set_psk_session_key (session, psk);
+  ret = _gnutls_set_psk_session_key (session, NULL);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -149,11 +199,10 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
   ssize_t data_size = _data_size;
   int ret;
   gnutls_datum username;
-  gnutls_psk_client_credentials_t cred;
-  gnutls_datum psk;
+  gnutls_psk_server_credentials_t cred;
   psk_server_auth_info_t info;
 
-  cred = (gnutls_psk_client_credentials_t)
+  cred = (gnutls_psk_server_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
@@ -191,26 +240,16 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
   memcpy (info->username, username.data, username.size);
   info->username[username.size] = 0;
 
-  /* find the key of this username
-   */
-  ret = _gnutls_psk_pwd_find_entry (session, info->username, &psk);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = set_psk_session_key (session, &psk);
+  ret = _gnutls_set_psk_session_key (session, NULL);
   if (ret < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
-  return 0;
+  ret = 0;
 
 error:
-  _gnutls_free_datum (&psk);
   return ret;
 }
 

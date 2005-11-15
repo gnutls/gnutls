@@ -41,6 +41,12 @@
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
+
 /* Connects to the peer and returns a socket
  * descriptor.
  */
@@ -88,10 +94,13 @@ client (void)
   char buffer[MAX_BUF + 1];
   gnutls_psk_client_credentials_t pskcred;
   /* Need to enable anonymous KX specifically. */
-  const int kx_prio[] = { GNUTLS_KX_PSK, 0 };
+  const int kx_prio[] = { GNUTLS_KX_DHE_PSK, 0 };
   const gnutls_datum_t key = { "DEADBEEF", 8 };
 
   gnutls_global_init ();
+
+  gnutls_global_set_log_function (tls_log_func);
+//  gnutls_global_set_log_level (99);
 
   gnutls_psk_allocate_client_credentials (&pskcred);
   gnutls_psk_set_client_credentials (pskcred, "test", &key,
@@ -182,7 +191,7 @@ gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;
-  const int kx_prio[] = { GNUTLS_KX_PSK, 0 };
+  const int kx_prio[] = { GNUTLS_KX_DHE_PSK, 0 };
 
   gnutls_init (&session, GNUTLS_SERVER);
 
@@ -195,6 +204,23 @@ initialize_tls_session (void)
   gnutls_credentials_set (session, GNUTLS_CRD_PSK, server_pskcred);
 
   return session;
+}
+
+static gnutls_dh_params_t dh_params;
+
+static int
+generate_dh_params (void)
+{
+
+  /* Generate Diffie Hellman parameters - for use with DHE
+   * kx algorithms. These should be discarded and regenerated
+   * once a day, once a week or once a month. Depending on the
+   * security requirements.
+   */
+  gnutls_dh_params_init (&dh_params);
+  gnutls_dh_params_generate2 (dh_params, DH_BITS);
+
+  return 0;
 }
 
 static int
@@ -227,8 +253,14 @@ server_start (void)
    */
   gnutls_global_init ();
 
+  gnutls_global_set_log_function (tls_log_func);
+//  gnutls_global_set_log_level (99);
+
+  generate_dh_params();
+
   gnutls_psk_allocate_server_credentials (&server_pskcred);
   gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
+  gnutls_psk_set_server_dh_params( server_pskcred, dh_params);
 
   success ("Launched, generating DH parameters...\n");
 

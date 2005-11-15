@@ -410,22 +410,3 @@ _gnutls_auth_info_set (gnutls_session_t session,
   return 0;
 }
 
-/* this function will copy an mpi_t key to 
- * opaque data.
- */
-int
-_gnutls_generate_session_key (gnutls_key_st key)
-{
-  size_t tmp;
-
-  _gnutls_mpi_print (NULL, &tmp, key->KEY);
-  key->key.data = gnutls_secure_malloc (tmp);
-  if (key->key.data == NULL)
-    {
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-  _gnutls_mpi_print (key->key.data, &tmp, key->KEY);
-
-  key->key.size = tmp;
-  return 0;
-}

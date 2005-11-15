@@ -47,6 +47,7 @@ static const gnutls_cred_map cred_mappings[] = {
   {GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
+  {GNUTLS_KX_DHE_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
   {GNUTLS_KX_SRP, GNUTLS_CRD_SRP, GNUTLS_CRD_SRP},
   {GNUTLS_KX_SRP_RSA, GNUTLS_CRD_SRP, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_SRP_DSS, GNUTLS_CRD_SRP, GNUTLS_CRD_CERTIFICATE},
@@ -229,11 +230,12 @@ extern mod_auth_st dhe_dss_auth_struct;
 extern mod_auth_st anon_auth_struct;
 extern mod_auth_st srp_auth_struct;
 extern mod_auth_st psk_auth_struct;
+extern mod_auth_st dhe_psk_auth_struct;
 extern mod_auth_st srp_rsa_auth_struct;
 extern mod_auth_st srp_dss_auth_struct;
 
 
-#define MAX_KX_ALGOS 10
+#define MAX_KX_ALGOS 16
 const int _gnutls_kx_algorithms_size = MAX_KX_ALGOS;
 
 gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
@@ -241,7 +243,7 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
   {"Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
 #endif
   {"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0},
-  {"RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0, 1},
+  {"RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0, 1 /* needs RSA params */},
   {"DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
   {"DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
 
@@ -252,6 +254,7 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 #endif
 #ifdef ENABLE_PSK
   {"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, 0},
+  {"DHE PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct, 1 /* needs DHE params */, 0},
 #endif
   /* other algorithms are appended here by gnutls-extra
    * initialization function.
@@ -307,6 +310,12 @@ typedef struct
 #define GNUTLS_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x8B }
 #define GNUTLS_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x8C }
 #define GNUTLS_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x8D }
+
+#define GNUTLS_DHE_PSK_SHA_ARCFOUR_SHA1 { 0x00, 0x8E }
+#define GNUTLS_DHE_PSK_SHA_3DES_EDE_CBC_SHA1 { 0x00, 0x8F }
+#define GNUTLS_DHE_PSK_SHA_AES_128_CBC_SHA1 { 0x00, 0x90 }
+#define GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x91 }
+
 
 /* SRP (not in TLS 1.0)
  * draft-ietf-tls-srp-02:
@@ -392,6 +401,20 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_PSK_SHA_AES_256_CBC_SHA1,
 			     GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_PSK,
+			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+
+  /* DHE-PSK */
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_SHA_ARCFOUR_SHA1,
+			     GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_DHE_PSK,
+			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_SHA_3DES_EDE_CBC_SHA1,
+			     GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_DHE_PSK,
+			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_SHA_AES_128_CBC_SHA1,
+			     GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_DHE_PSK,
+			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1,
+			     GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_PSK,
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
 
   /* SRP */

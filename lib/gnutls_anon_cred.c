@@ -49,41 +49,6 @@ gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
   gnutls_free (sc);
 }
 
-/*-
-  * _gnutls_anon_get_dh_params - Returns the DH parameters pointer
-  * @sc: is an #gnutls_certificate_credentials_t structure.
-  *
-  * This function will return the dh parameters pointer.
-  *
-  -*/
-gnutls_dh_params_t
-_gnutls_anon_get_dh_params (const
-			    gnutls_anon_server_credentials_t
-			    sc, gnutls_session_t session)
-{
-  gnutls_params_st params;
-  int ret;
-
-  if (session->internals.params.anon_dh_params)
-    return session->internals.params.anon_dh_params;
-
-  if (sc->dh_params)
-    {
-      session->internals.params.anon_dh_params = sc->dh_params;
-    }
-  else if (sc->params_func)
-    {
-      ret = sc->params_func (session, GNUTLS_PARAMS_DH, &params);
-      if (ret == 0 && params.type == GNUTLS_PARAMS_DH)
-	{
-	  session->internals.params.anon_dh_params = params.params.dh;
-	  session->internals.params.free_anon_dh_params = params.deinit;
-	}
-    }
-
-  return session->internals.params.anon_dh_params;
-}
-
 /**
   * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials_t structure
   * @sc: is a pointer to an #gnutls_anon_server_credentials_t structure.
@@ -136,5 +101,41 @@ gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
 
   return 0;
 }
+
+/**
+  * gnutls_anon_set_server_dh_params - This function will set the DH parameters for a server to use
+  * @res: is a gnutls_anon_server_credentials_t structure
+  * @dh_params: is a structure that holds diffie hellman parameters.
+  *
+  * This function will set the diffie hellman parameters for an anonymous
+  * server to use. These parameters will be used in Anonymous Diffie Hellman 
+  * cipher suites.
+  *
+  **/
+void
+gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
+				  gnutls_dh_params_t dh_params)
+{
+  res->dh_params = dh_params;
+}
+
+/**
+  * gnutls_anon_set_params_function - This function will set the DH parameters callback
+  * @res: is a gnutls_certificate_credentials_t structure
+  * @func: is the function to be called
+  *
+  * This function will set a callback in order for the server to get the 
+  * diffie hellman parameters for anonymous authentication. The callback should
+  * return zero on success.
+  *
+  **/
+void
+gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
+				 gnutls_params_function * func)
+{
+  res->params_func = func;
+}
+
+
 
 #endif

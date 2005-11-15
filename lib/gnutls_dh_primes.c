@@ -35,7 +35,7 @@
 /* returns the prime and the generator of DH params.
  */
 const mpi_t *
-_gnutls_get_dh_params (gnutls_dh_params_t dh_primes)
+_gnutls_dh_params_to_mpi (gnutls_dh_params_t dh_primes)
 {
   if (dh_primes == NULL || dh_primes->params[1] == NULL ||
       dh_primes->params[0] == NULL)

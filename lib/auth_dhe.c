@@ -112,8 +112,8 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
       return ret;
     }
 
-  dh_params = _gnutls_certificate_get_dh_params (cred, session);
-  mpis = _gnutls_get_dh_params (dh_params);
+  dh_params = _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+  mpis = _gnutls_dh_params_to_mpi (dh_params);
   if (mpis == NULL)
     {
       gnutls_assert ();
@@ -257,8 +257,8 @@ proc_dhe_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  dh_params = _gnutls_certificate_get_dh_params (cred, session);
-  mpis = _gnutls_get_dh_params (dh_params);
+  dh_params = _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+  mpis = _gnutls_dh_params_to_mpi (dh_params);
   if (mpis == NULL)
     {
       gnutls_assert ();

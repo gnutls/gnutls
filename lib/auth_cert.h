@@ -150,10 +150,5 @@ void _gnutls_selected_certs_set (gnutls_session_t session,
 gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (const
 							gnutls_certificate_credentials_t
 							sc, gnutls_session_t);
-gnutls_dh_params_t _gnutls_certificate_get_dh_params (const
-						      gnutls_certificate_credentials_t
-						      sc,
-						      gnutls_session_t
-						      session);
 
 #endif

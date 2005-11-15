@@ -805,6 +805,8 @@ main (int argc, char **argv)
 	  fprintf (stderr, "Error while setting PSK parameters\n");
 	  GERR (ret);
 	}
+
+      gnutls_psk_set_params_function (psk_cred, get_params);
     }
 #endif
 

@@ -122,3 +122,40 @@ gnutls_calc_dh_key (mpi_t f, mpi_t x, mpi_t prime)
   _gnutls_mpi_powm (k, f, x, prime);
   return k;
 }
+
+/*-
+  * _gnutls_get_dh_params - Returns the DH parameters pointer
+  * @dh_params: is an DH parameters structure, or NULL.
+  * @func: is a callback function to receive the parameters or NULL.
+  * @session: a gnutls session.
+  *
+  * This function will return the dh parameters pointer.
+  *
+  -*/
+gnutls_dh_params_t
+_gnutls_get_dh_params (gnutls_dh_params_t dh_params, gnutls_params_function* func,
+          gnutls_session_t session)
+{
+  gnutls_params_st params;
+  int ret;
+
+  /* if cached return the cached */
+  if (session->internals.params.dh_params)
+    return session->internals.params.dh_params;
+
+  if (dh_params)
+    {
+      session->internals.params.dh_params = dh_params;
+    }
+  else if (func)
+    {
+      ret = func (session, GNUTLS_PARAMS_DH, &params);
+      if (ret == 0 && params.type == GNUTLS_PARAMS_DH)
+	{
+	  session->internals.params.dh_params = params.params.dh;
+	  session->internals.params.free_dh_params = params.deinit;
+	}
+    }
+
+  return session->internals.params.dh_params;
+}

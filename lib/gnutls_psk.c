@@ -357,5 +357,38 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
   return 0;
 }
 
+/**
+  * gnutls_psk_set_server_dh_params - This function will set the DH parameters for a server to use
+  * @res: is a gnutls_psk_server_credentials_t structure
+  * @dh_params: is a structure that holds diffie hellman parameters.
+  *
+  * This function will set the diffie hellman parameters for an anonymous
+  * server to use. These parameters will be used in Diffie Hellman with PSK
+  * cipher suites.
+  *
+  **/
+void
+gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
+				  gnutls_dh_params_t dh_params)
+{
+  res->dh_params = dh_params;
+}
+
+/**
+  * gnutls_psk_set_params_function - This function will set the DH parameters callback
+  * @res: is a gnutls_certificate_credentials_t structure
+  * @func: is the function to be called
+  *
+  * This function will set a callback in order for the server to get the 
+  * diffie hellman parameters for PSK authentication. The callback should
+  * return zero on success.
+  *
+  **/
+void
+gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
+				 gnutls_params_function * func)
+{
+  res->params_func = func;
+}
 
 #endif /* ENABLE_PSK */

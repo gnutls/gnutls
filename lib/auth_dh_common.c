@@ -38,6 +38,8 @@
 #include <gnutls_extra.h>
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
+#include <gnutls_algorithms.h>
+#include <auth_psk.h>
 
 /* Frees the dh_info_st structure.
  */
@@ -86,7 +88,29 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
   _gnutls_mpi_release (&session->key->client_Y);
   _gnutls_mpi_release (&session->key->dh_secret);
 
-  ret = _gnutls_generate_session_key (session->key);
+
+  if (_gnutls_cipher_suite_get_kx_algo
+      (&session->security_parameters.current_cipher_suite)
+      != GNUTLS_KX_DHE_PSK)
+    {
+      ret = _gnutls_mpi_dprint (&session->key->key, session->key->KEY);
+    }
+  else /* In DHE_PSK the key is set differently */
+    {
+      gnutls_datum tmp_dh_key;
+      ret = _gnutls_mpi_dprint (&tmp_dh_key, session->key->KEY);
+      if (ret < 0)
+	{
+	  _gnutls_free_datum (&tmp_dh_key);
+	  gnutls_assert ();
+	  return ret;
+	}
+
+      ret = _gnutls_set_psk_session_key (session, &tmp_dh_key);
+      _gnutls_free_datum (&tmp_dh_key);
+
+    }
+
   _gnutls_mpi_release (&session->key->KEY);
 
   if (ret < 0)
@@ -149,7 +173,28 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
   _gnutls_mpi_release (&session->key->client_p);
   _gnutls_mpi_release (&session->key->client_g);
 
-  ret = _gnutls_generate_session_key (session->key);
+  if (_gnutls_cipher_suite_get_kx_algo
+      (&session->security_parameters.current_cipher_suite)
+      != GNUTLS_KX_DHE_PSK)
+    {
+      ret = _gnutls_mpi_dprint (&session->key->key, session->key->KEY);
+    }
+  else /* In DHE_PSK the key is set differently */
+    {
+      gnutls_datum tmp_dh_key;
+      ret = _gnutls_mpi_dprint (&tmp_dh_key, session->key->KEY);
+      if (ret < 0)
+	{
+	  _gnutls_free_datum (&tmp_dh_key);
+	  gnutls_assert ();
+	  goto error;
+	}
+
+      ret = _gnutls_set_psk_session_key (session, &tmp_dh_key);
+      _gnutls_free_datum (&tmp_dh_key);
+
+    }
+
   _gnutls_mpi_release (&session->key->KEY);
 
   if (ret < 0)

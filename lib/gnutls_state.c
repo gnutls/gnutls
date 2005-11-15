@@ -174,11 +174,8 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
 inline static void
 deinit_internal_params (gnutls_session_t session)
 {
-  if (session->internals.params.free_anon_dh_params)
-    gnutls_dh_params_deinit (session->internals.params.anon_dh_params);
-
-  if (session->internals.params.free_cert_dh_params)
-    gnutls_dh_params_deinit (session->internals.params.cert_dh_params);
+  if (session->internals.params.free_dh_params)
+    gnutls_dh_params_deinit (session->internals.params.dh_params);
 
   if (session->internals.params.free_rsa_params)
     gnutls_rsa_params_deinit (session->internals.params.rsa_params);

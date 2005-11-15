@@ -49,6 +49,7 @@
 #include <ext_srp.h>
 #include <gnutls_rsa_export.h>	/* for gnutls_get_rsa_params() */
 #include <auth_anon.h>		/* for gnutls_anon_server_credentials_t */
+#include <auth_psk.h>		/* for gnutls_psk_server_credentials_t */
 #include <gc.h>
 
 #ifdef HANDSHAKE_DEBUG
@@ -2592,7 +2593,7 @@ check_server_params (gnutls_session_t session,
 
       if (x509_cred != NULL)
 	{
-	  dh_params = _gnutls_certificate_get_dh_params (x509_cred, session);
+	  dh_params = _gnutls_get_dh_params (x509_cred->dh_params, x509_cred->params_func, session);
 	  rsa_params =
 	    _gnutls_certificate_get_rsa_params (x509_cred, session);
 	}
@@ -2623,7 +2624,20 @@ check_server_params (gnutls_session_t session,
 
       if (anon_cred != NULL)
 	{
-	  dh_params = _gnutls_anon_get_dh_params (anon_cred, session);
+	  dh_params = _gnutls_get_dh_params (anon_cred->dh_params, anon_cred->params_func, session);
+	}
+#endif
+#ifdef ENABLE_PSK
+    }
+  else if (cred_type == GNUTLS_CRD_PSK)
+    {
+      gnutls_psk_server_credentials_t psk_cred =
+	(gnutls_psk_server_credentials_t) _gnutls_get_cred (session->key,
+							     cred_type, NULL);
+
+      if (psk_cred != NULL)
+	{
+	  dh_params = _gnutls_get_dh_params (psk_cred->dh_params, psk_cred->params_func, session);
 	}
 #endif
     }
@@ -2637,15 +2651,19 @@ check_server_params (gnutls_session_t session,
   if (_gnutls_kx_needs_rsa_params (kx) != 0)
     {
       /* needs rsa params. */
-      if (_gnutls_get_rsa_params (rsa_params) == NULL)
+      if (_gnutls_rsa_params_to_mpi (rsa_params) == NULL) {
+        gnutls_assert();
 	return 1;
+      }
     }
 
   if (_gnutls_kx_needs_dh_params (kx) != 0)
     {
       /* needs DH params. */
-      if (_gnutls_get_dh_params (dh_params) == NULL)
+      if (_gnutls_dh_params_to_mpi (dh_params) == NULL) {
+        gnutls_assert();
 	return 1;
+      }
     }
 
   return 0;

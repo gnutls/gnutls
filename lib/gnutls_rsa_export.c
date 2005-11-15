@@ -45,7 +45,7 @@
  * We only support limited key sizes.
  */
 const mpi_t *
-_gnutls_get_rsa_params (gnutls_rsa_params_t rsa_params)
+_gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
 {
   if (rsa_params == NULL)
     {

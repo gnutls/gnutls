@@ -335,7 +335,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
   _gnutls_mpi_release (&session->key->u);
   _gnutls_mpi_release (&B);
 
-  ret = _gnutls_generate_session_key (session->key);
+  ret = _gnutls_mpi_dprint( &session->key->key, session->key->KEY);
   _gnutls_mpi_release (&S);
 
   if (ret < 0)
@@ -431,7 +431,7 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
   _gnutls_mpi_release (&session->key->u);
   _gnutls_mpi_release (&B);
 
-  ret = _gnutls_generate_session_key (session->key);
+  ret = _gnutls_mpi_dprint( &session->key->key, session->key->KEY);
   _gnutls_mpi_release (&S);
 
   if (ret < 0)

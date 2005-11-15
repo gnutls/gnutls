@@ -108,7 +108,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
     }
 
   rsa_params = _gnutls_certificate_get_rsa_params (cred, session);
-  rsa_mpis = _gnutls_get_rsa_params (rsa_params);
+  rsa_mpis = _gnutls_rsa_params_to_mpi (rsa_params);
   if (rsa_mpis == NULL)
     {
       gnutls_assert ();

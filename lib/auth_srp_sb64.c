@@ -330,7 +330,7 @@ gnutls_srp_base64_encode (const gnutls_datum_t * data, char *result,
   if (size < 0)
     return size;
 
-  if (result == NULL || *result_size < size)
+  if (result == NULL || *result_size < (size_t)size)
     {
       gnutls_free (ret);
       *result_size = size;
@@ -408,7 +408,7 @@ gnutls_srp_base64_decode (const gnutls_datum_t * b64_data, char *result,
   if (size < 0)
     return size;
 
-  if (result == NULL || *result_size < size)
+  if (result == NULL || *result_size < (size_t)size)
     {
       gnutls_free (ret);
       *result_size = size;
