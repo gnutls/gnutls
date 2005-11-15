@@ -1113,6 +1113,10 @@ The implementation in @acronym{GnuTLS} is based on paper
 @item PSK:
 Authentication using the @acronym{PSK} protocol.
 
+@item DHE-PSK:
+Authentication using the @acronym{PSK} protocol and Diffie Hellman key exchange.
+This method offers perfect forward secrecy.
+
 @end table
 
 Clients supporting @acronym{PSK} should supply the username and key
