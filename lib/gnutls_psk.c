@@ -31,7 +31,6 @@
 
 #ifdef ENABLE_PSK
 
-//#include <gnutls_.h>
 #include <auth_psk_passwd.h>
 #include <gnutls_num.h>
 #include <gnutls_helper.h>
@@ -77,12 +76,14 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
 /**
   * gnutls_psk_set_client_credentials - Used to set the username/password, in a gnutls_psk_client_credentials_t structure
   * @res: is an #gnutls_psk_client_credentials_t structure.
-  * @username: is the user's userid
+  * @username: is the user's zero-terminated userid
   * @key: is the user's key
   *
-  * This function sets the username and password, in a gnutls_psk_client_credentials_t structure.
-  * Those will be used in SRP authentication. @username and @password should be ASCII
-  * strings or UTF-8 strings prepared using the "SASLprep" profile of "stringprep".
+  * This function sets the username and password, in a
+  * gnutls_psk_client_credentials_t structure.  Those will be used in
+  * PSK authentication. @username and @password should be ASCII
+  * strings or UTF-8 strings prepared using the "SASLprep" profile of
+  * "stringprep".
   *
   * Returns 0 on success.
   **/
