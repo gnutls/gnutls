@@ -94,7 +94,7 @@ client (void)
   gnutls_global_init ();
 
   gnutls_psk_allocate_client_credentials (&pskcred);
-  gnutls_psk_set_client_credentials (pskcred, "username", &key, 0);
+  gnutls_psk_set_client_credentials (pskcred, "test", &key, GNUTLS_PSK_KEY_HEX);
 
   /* Initialize TLS session
    */
@@ -175,7 +175,7 @@ end:
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_psk_server_credentials_t pskcred;
+gnutls_psk_server_credentials_t server_pskcred;
 
 gnutls_session_t
 initialize_tls_session (void)
@@ -191,7 +191,7 @@ initialize_tls_session (void)
   gnutls_set_default_priority (session);
   gnutls_kx_set_priority (session, kx_prio);
 
-  gnutls_credentials_set (session, GNUTLS_CRD_PSK, pskcred);
+  gnutls_credentials_set (session, GNUTLS_CRD_PSK, server_pskcred);
 
   gnutls_dh_set_prime_bits (session, DH_BITS);
 
@@ -221,7 +221,10 @@ pskfunc (gnutls_session_t session,
 {
   printf ("psk: username %s\n", username);
   key->data = gnutls_malloc (4);
-  strcpy (key->data, "\xDE\xAD\xBE\xEF");
+  key->data[0] = 0xDE;
+  key->data[1] = 0xAD;
+  key->data[2] = 0xBE;
+  key->data[3] = 0xEF;
   key->size = 4;
   return 0;
 }
@@ -243,8 +246,8 @@ server_start (void)
    */
   gnutls_global_init ();
 
-  gnutls_psk_allocate_server_credentials (&pskcred);
-  gnutls_psk_set_server_credentials_function (pskcred, pskfunc);
+  gnutls_psk_allocate_server_credentials (&server_pskcred);
+  gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
 
   success ("Launched, generating DH parameters...\n");
 
@@ -343,7 +346,7 @@ server (void)
 
   close (listen_sd);
 
-  gnutls_psk_free_server_credentials (pskcred);
+  gnutls_psk_free_server_credentials (server_pskcred);
 
   gnutls_global_deinit ();
 
