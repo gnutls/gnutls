@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.3.0
+* Version 1.3.0 (2005-11-15)
 
 ** Support for TLS Pre-Shared Key (TLS-PSK) ciphersuites have been added.
 This add several new APIs, see below.  Read the updated manual for
