@@ -375,7 +375,7 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
 }
 
 /**
-  * gnutls_psk_set_params_function - This function will set the DH parameters callback
+  * gnutls_psk_set_server_params_function - This function will set the DH parameters callback
   * @res: is a gnutls_certificate_credentials_t structure
   * @func: is the function to be called
   *
@@ -385,7 +385,7 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
   *
   **/
 void
-gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
+gnutls_psk_set_server_params_function (gnutls_psk_server_credentials_t res,
 				 gnutls_params_function * func)
 {
   res->params_func = func;
