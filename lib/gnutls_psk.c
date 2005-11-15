@@ -81,9 +81,10 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
   *
   * This function sets the username and password, in a
   * gnutls_psk_client_credentials_t structure.  Those will be used in
-  * PSK authentication. @username and @password should be ASCII
-  * strings or UTF-8 strings prepared using the "SASLprep" profile of
-  * "stringprep".
+  * PSK authentication. @username should be an ASCII
+  * string or UTF-8 strings prepared using the "SASLprep" profile of
+  * "stringprep". The key can be either in raw byte format or in Hex
+  * (not with the '0x' prefix).
   *
   * Returns 0 on success.
   **/
