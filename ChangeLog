@@ -1,3 +1,154 @@
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.3.0.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* src/prime.c, src/serv.c, tests/pskself.c: Indent.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Use sha1sum instead of md5sum for igloo.linux.gr
+	CHECKSUMS.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Don't use --tags for cvs2cl.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Dist auth_psk.h.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-gaa.c, src/cli-gaa.c, src/crypt-gaa.c,
+	src/psk-gaa.c, src/serv-gaa.c, src/tls_test-gaa.c: Regenerate GAA
+	code, to remove use of C++ // comments.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Add license.  Fix parser error.  Dist
+	and install SRP man pages too.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, doc/examples/Makefile.am, doc/manpages/Makefile.am,
+	src/Makefile.am, src/prime.c: Disable more SRP stuff if
+	--disable-srp, tiny patch from Albert Chin
+	<gnutls-dev@mlists.thewrittenword.com> and tiny patch to src/prime.c
+	from RedHat gnutls-1.2.6 RPM.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Use more verbose NEWS entry format.
+
+2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/pskself.c: updated PSK self test
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-gaa.c: Fix.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add pskself.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pskself.c: Add, based on anonself.c.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Fix error messages; PSK also use the SRP
+	errors.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk.c: Doc fix.
+
+2005-11-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/TODO: [no log message]
+
+2005-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/debug.c, lib/x509/common.c, lib/x509/crl.c, lib/x509/dn.c,
+	lib/x509/pkcs12.c, lib/x509/pkcs7.c, libextra/openssl_compat.c,
+	src/serv.c: Include config.h first.  Tiny patch from Albert Chin
+	<gnutls-dev@mlists.thewrittenword.com>.
+
+2005-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/opencdk.h: Don't use trailing comma in last enum
+	constant, for IBM C v6.  Tiny patch from Albert Chin
+	<gnutls-dev@mlists.thewrittenword.com>.
+
+2005-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c: Tru64 UNIX 4.0D has mmap() but doesn't define
+	MAP_FAILED, tiny patch from Albert Chin
+	<gnutls-dev@mlists.thewrittenword.com>
+
+2005-11-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/gnutls.texi, lib/gnutls_algorithms.c: removed the
+	RIPEMD ciphersuites.
+
+2005-11-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/internals.texi, doc/arch/extensions_st.dia,
+	doc/arch/extensions_st.eps, doc/arch/extensions_st.pdf,
+	doc/arch/extensions_st.png, doc/arch/mod_auth_st.dia,
+	doc/arch/mod_auth_st.eps, doc/arch/mod_auth_st.pdf,
+	doc/arch/mod_auth_st.png: added brief documentation on the
+	extension and auth_method internals.
+
+2005-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-11-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi, lib/gnutls_state.c, lib/gnutls_x509.c,
+	src/certtool.gaa: some documentation updates.
+
+2005-11-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/certificate-user-use-case.pdf,
+	doc/certificate-user-use-case.png, doc/client-server-use-case.pdf,
+	doc/client-server-use-case.png, doc/handshake-sequence.pdf,
+	doc/handshake-sequence.png, doc/handshake-state.pdf,
+	doc/handshake-state.png, doc/internals.texi, doc/objects.pdf,
+	doc/objects.png, doc/arch/certificate-user-use-case.eps,
+	doc/arch/certificate-user-use-case.pdf,
+	doc/arch/certificate-user-use-case.png,
+	doc/arch/client-server-use-case.eps,
+	doc/arch/client-server-use-case.pdf,
+	doc/arch/client-server-use-case.png,
+	doc/arch/handshake-sequence.eps, doc/arch/handshake-sequence.pdf,
+	doc/arch/handshake-sequence.png, doc/arch/handshake-state.eps,
+	doc/arch/handshake-state.pdf, doc/arch/handshake-state.png,
+	doc/arch/objects.eps, doc/arch/objects.pdf, doc/arch/objects.png:
+	moved architecture figures to arch/
+
+2005-11-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* Makefile.am: made ChangeLog more compact by ignoring past
+	changes.
+
 2005-11-10  Simon Josefsson <simon@josefsson.org>
 
 	* gl/inet_ntop.h, gl/readline.c: Update.
@@ -181,7 +332,7 @@
 
 2005-11-07  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS (tags: gnutls_1_2_9): Version 1.2.9.
+	* NEWS: Version 1.2.9.
 
 ----------------------------------------------------------------------
   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
