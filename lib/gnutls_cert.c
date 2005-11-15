@@ -133,14 +133,15 @@ gnutls_certificate_free_ca_names (gnutls_certificate_credentials_t sc)
 
 /*-
   * _gnutls_certificate_get_rsa_params - Returns the RSA parameters pointer
-  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @rsa_params: holds the RSA parameters or NULL.
+  * @func: function to retrieve the parameters or NULL.
+  * @session: The session.
   *
   * This function will return the rsa parameters pointer.
   *
   -*/
 gnutls_rsa_params_t
-_gnutls_certificate_get_rsa_params (const
-				    gnutls_certificate_credentials_t sc,
+_gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params, gnutls_params_function* func,
 				    gnutls_session_t session)
 {
   gnutls_params_st params;
@@ -151,13 +152,13 @@ _gnutls_certificate_get_rsa_params (const
       return session->internals.params.rsa_params;
     }
 
-  if (sc->rsa_params)
+  if (rsa_params)
     {
-      session->internals.params.rsa_params = sc->rsa_params;
+      session->internals.params.rsa_params = rsa_params;
     }
-  else if (sc->params_func)
+  else if (func)
     {
-      ret = sc->params_func (session, GNUTLS_PARAMS_RSA_EXPORT, &params);
+      ret = func (session, GNUTLS_PARAMS_RSA_EXPORT, &params);
       if (ret == 0 && params.type == GNUTLS_PARAMS_RSA_EXPORT)
 	{
 	  session->internals.params.rsa_params = params.params.rsa_export;

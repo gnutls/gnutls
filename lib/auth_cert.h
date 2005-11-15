@@ -147,8 +147,7 @@ void _gnutls_selected_certs_set (gnutls_session_t session,
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 
-gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (const
-							gnutls_certificate_credentials_t
-							sc, gnutls_session_t);
+gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params, gnutls_params_function* func,
+	gnutls_session_t);
 
 #endif

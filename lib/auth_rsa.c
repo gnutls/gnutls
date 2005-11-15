@@ -178,7 +178,7 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
       == GNUTLS_KX_RSA_EXPORT && bits > 512)
     {
 
-      rsa_params = _gnutls_certificate_get_rsa_params (cred, session);
+      rsa_params = _gnutls_certificate_get_rsa_params (cred->rsa_params, cred->params_func, session);
       /* EXPORT case: */
       if (rsa_params == NULL)
 	{

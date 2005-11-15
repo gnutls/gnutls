@@ -2595,7 +2595,7 @@ check_server_params (gnutls_session_t session,
 	{
 	  dh_params = _gnutls_get_dh_params (x509_cred->dh_params, x509_cred->params_func, session);
 	  rsa_params =
-	    _gnutls_certificate_get_rsa_params (x509_cred, session);
+	    _gnutls_certificate_get_rsa_params (x509_cred->rsa_params, x509_cred->params_func, session);
 	}
 
       /* Check also if the certificate supports the
