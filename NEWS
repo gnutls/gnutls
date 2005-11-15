@@ -18,9 +18,19 @@ test this functionality.
 
 ** Added a discussion of the internals of gnutls in manual.
 
+** Fixes for Tru64 UNIX 4.0D that lack MAP_FAILED, from Albert Chin.
+
+** Remove trailing comma in enums, for IBM C v6, from Albert Chin.
+
+** Make sure config.h is included first in a few files, from Albert Chin.
+
+** Don't use C++ comments ("//") as they are invalid, from Albert Chin.
+
+** Don't install SRP programs and man pages if --disable-srp-authentication,
+from Albert Chin.
+
 ** API and ABI modifications:
-New gnutls_kx_algorithm_t key exchange type:
-  GNUTLS_KX_PSK
+New gnutls_kx_algorithm_t key exchange type: GNUTLS_KX_PSK
 
 New gnutls_credentials_type_t credential type:
   GNUTLS_CRD_PSK
