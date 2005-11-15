@@ -64,8 +64,8 @@ New function to extract PSK user in server:
   gnutls_psk_server_get_username
 
 New functions to set PSK callback:
-  gnutls_psk_set_server_credentials_function,
-  gnutls_psk_set_client_credentials_function: 
+  gnutls_psk_set_server_credentials_function
+  gnutls_psk_set_client_credentials_function
 
 Use size_t instead of int for output size parameter:
   gnutls_srp_base64_encode
