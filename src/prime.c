@@ -74,7 +74,8 @@ generate_prime (int bits, int how)
     }
   else
     {
-      if (bits <= 1024)
+#ifdef ENABLE_SRP
+	if (bits <= 1024)
 	{
 	  p = gnutls_srp_1024_group_prime;
 	  g = gnutls_srp_1024_group_generator;
@@ -97,6 +98,9 @@ generate_prime (int bits, int how)
 		   gnutls_strerror (ret));
 	  exit (1);
 	}
+#else
+      fprintf(stderr, "Parameters unavailable as SRP disabled.\n");
+#endif
     }
 
   if (cparams)

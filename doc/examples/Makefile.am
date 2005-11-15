@@ -24,9 +24,12 @@ LDADD = libexamples.la \
 	../../lib/libgnutls.la	\
 	../../libextra/libgnutls-extra.la
 
-noinst_PROGRAMS = ex-cert-select ex-client1 ex-client2			\
-	ex-client-resume ex-client-srp ex-crq ex-serv1 ex-serv-anon	\
-	ex-serv-export ex-serv-pgp ex-serv-srp
+if ENABLE_SRP
+SRP_PROGRAM_FILES = ex-client-srp ex-serv-srp
+endif
+noinst_PROGRAMS = ex-cert-select ex-client1 ex-client2		\
+	ex-client-resume ex-crq ex-serv1 ex-serv-anon		\
+	ex-serv-export ex-serv-pgp $(SRP_PROGRAM_FILES)
 
 noinst_LTLIBRARIES = libexamples.la
 
