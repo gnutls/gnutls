@@ -16,4 +16,5 @@ openssl
 pkcs12
 pkits.ldif
 pkits.schema
+pskself
 smime
