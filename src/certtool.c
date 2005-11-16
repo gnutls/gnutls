@@ -277,7 +277,8 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
 {
   gnutls_x509_crt crt;
   gnutls_x509_privkey key = NULL;
-  int size, serial, client;
+  size_t size;
+  int serial, client;
   int days, result, ca_status;
   const char *str;
   int vers = 3;			/* the default version in the certificate 
