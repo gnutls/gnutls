@@ -37,28 +37,32 @@ void
 _gnutls_write_datum16 (opaque * dest, gnutls_datum_t dat)
 {
   _gnutls_write_uint16 (dat.size, dest);
-  memcpy (&dest[2], dat.data, dat.size);
+  if (dat.data != NULL)
+    memcpy (&dest[2], dat.data, dat.size);
 }
 
 void
 _gnutls_write_datum24 (opaque * dest, gnutls_datum_t dat)
 {
   _gnutls_write_uint24 (dat.size, dest);
-  memcpy (&dest[3], dat.data, dat.size);
+  if (dat.data != NULL)
+    memcpy (&dest[3], dat.data, dat.size);
 }
 
 void
 _gnutls_write_datum32 (opaque * dest, gnutls_datum_t dat)
 {
   _gnutls_write_uint32 (dat.size, dest);
-  memcpy (&dest[4], dat.data, dat.size);
+  if (dat.data != NULL)
+    memcpy (&dest[4], dat.data, dat.size);
 }
 
 void
 _gnutls_write_datum8 (opaque * dest, gnutls_datum_t dat)
 {
   dest[0] = (uint8) dat.size;
-  memcpy (&dest[1], dat.data, dat.size);
+  if (dat.data != NULL)
+    memcpy (&dest[1], dat.data, dat.size);
 }
 
 

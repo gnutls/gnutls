@@ -769,8 +769,10 @@ error:
 static int
 pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
 {
-  psk_auth_info_t info = _gnutls_get_auth_info (session);
-  int pack_size, username_size, pos;
+  psk_auth_info_t info;
+  int pack_size, username_size = 0, pos;
+
+  info = _gnutls_get_auth_info (session);
 
   if (info == NULL && session->key->auth_info_size != 0)
     {
@@ -778,11 +780,11 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  username_size = strlen (info->username) + 1; /* include the terminating null */
-  if (info)
+  if (info) {
+    username_size = strlen (info->username) + 1; /* include the terminating null */
     pack_size = username_size +	
        2 + 4 * 3 + info->dh.prime.size + info->dh.generator.size + info->dh.public_key.size;
-  else
+  } else
     pack_size = 0;
 
   packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32);
