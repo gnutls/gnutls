@@ -40,14 +40,9 @@ typedef struct gnutls_anon_client_credentials_st
   int dummy;
 } anon_client_credentials_st;
 
-typedef struct anon_client_auth_info_st
+typedef struct anon_auth_info_st
 {
   dh_info_st dh;
-} *anon_client_auth_info_t;
+} *anon_auth_info_t;
 
-typedef anon_client_auth_info_t anon_server_auth_info_t;
-typedef anon_client_auth_info_t anon_auth_info_t;
-
-typedef struct anon_client_auth_info_st anon_client_auth_info_st;
-typedef anon_client_auth_info_st anon_server_auth_info_st;
-
+typedef struct anon_auth_info_st anon_auth_info_st;

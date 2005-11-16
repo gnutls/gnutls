@@ -237,11 +237,13 @@ get_params (gnutls_session session, gnutls_params_type type,
 	    gnutls_params_st * st)
 {
 
-  if (type == GNUTLS_PARAMS_RSA_EXPORT)
+  if (type == GNUTLS_PARAMS_RSA_EXPORT) {
+    if (rsa_params == NULL) return -1;
     st->params.rsa_export = rsa_params;
-  else if (type == GNUTLS_PARAMS_DH)
+  } else if (type == GNUTLS_PARAMS_DH) {
+    if (dh_params == NULL) return -1;
     st->params.dh = dh_params;
-  else
+  } else
     return -1;
 
   st->type = type;
@@ -667,7 +669,7 @@ main (int argc, char **argv)
       generate_dh_primes ();
     }
 
-  if (dh_params_file)
+  if (dh_params_file && generate == 0)
     {
       read_dh_params ();
     }
@@ -762,13 +764,10 @@ main (int argc, char **argv)
 	exit (1);
       }
 
-  if (generate != 0 || read_dh_params != NULL)
-    {
       gnutls_certificate_set_params_function (cert_cred, get_params);
 /*     gnutls_certificate_set_dh_params(cert_cred, dh_params);
  *     gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
  */
-    }
 
   /* this is a password file (created with the included srpcrypt utility) 
    * Read README.crypt prior to using SRP.
@@ -806,14 +805,13 @@ main (int argc, char **argv)
 	  GERR (ret);
 	}
 
-      gnutls_psk_set_params_function (psk_cred, get_params);
+      gnutls_psk_set_server_params_function (psk_cred, get_params);
     }
 #endif
 
 #ifdef ENABLE_ANON
   gnutls_anon_allocate_server_credentials (&dh_cred);
-  if (generate != 0)
-    gnutls_anon_set_params_function (dh_cred, get_params);
+  gnutls_anon_set_server_params_function (dh_cred, get_params);
 
 /*      gnutls_anon_set_server_dh_params(dh_cred, dh_params); */
 #endif

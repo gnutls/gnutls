@@ -520,6 +520,13 @@ print_info (gnutls_session session, const char *hostname)
       if (gnutls_psk_server_get_username (session) != NULL)
 	printf ("- PSK authentication. Connected as '%s'\n",
 		gnutls_psk_server_get_username (session));
+      if (kx == GNUTLS_KX_DHE_PSK) {
+      printf ("- DH using prime of %d bits, secret key "
+	      "of %d bits, and peer's public key is %d bits.\n",
+	      gnutls_dh_get_prime_bits (session),
+	      gnutls_dh_get_secret_bits (session),
+	      gnutls_dh_get_peers_public_bits (session));
+      }
       break;
 #endif
     case GNUTLS_CRD_CERTIFICATE:

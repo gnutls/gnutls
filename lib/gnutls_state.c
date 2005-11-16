@@ -41,6 +41,7 @@
 #include <gnutls_state.h>
 #include <auth_cert.h>
 #include <auth_anon.h>
+#include <auth_psk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_rsa_export.h>
 
@@ -435,7 +436,17 @@ _gnutls_dh_set_peer_public (gnutls_session_t session, mpi_t public)
     {
     case GNUTLS_CRD_ANON:
       {
-	anon_server_auth_info_t info;
+	anon_auth_info_t info;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
+
+	dh = &info->dh;
+	break;
+      }
+    case GNUTLS_CRD_PSK:
+      {
+	psk_auth_info_t info;
 	info = _gnutls_get_auth_info (session);
 	if (info == NULL)
 	  return GNUTLS_E_INTERNAL_ERROR;
@@ -476,7 +487,16 @@ _gnutls_dh_set_secret_bits (gnutls_session_t session, uint bits)
     {
     case GNUTLS_CRD_ANON:
       {
-	anon_server_auth_info_t info;
+	anon_auth_info_t info;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
+	info->dh.secret_bits = bits;
+	break;
+      }
+    case GNUTLS_CRD_PSK:
+      {
+	psk_auth_info_t info;
 	info = _gnutls_get_auth_info (session);
 	if (info == NULL)
 	  return GNUTLS_E_INTERNAL_ERROR;
@@ -547,7 +567,17 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
     {
     case GNUTLS_CRD_ANON:
       {
-	anon_server_auth_info_t info;
+	anon_auth_info_t info;
+	info = _gnutls_get_auth_info (session);
+	if (info == NULL)
+	  return GNUTLS_E_INTERNAL_ERROR;
+
+	dh = &info->dh;
+	break;
+      }
+    case GNUTLS_CRD_PSK:
+      {
+	psk_auth_info_t info;
 	info = _gnutls_get_auth_info (session);
 	if (info == NULL)
 	  return GNUTLS_E_INTERNAL_ERROR;

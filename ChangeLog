@@ -1,3 +1,48 @@
+2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_psk.c: some documentation updates
+
+2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_anon_cred.c, lib/gnutls_psk.c:
+	gnutls_anon_set_params_function was renamed to
+	gnutls_anon_set_server_params_function to be more consistent with
+	the other functions. The same for the PSK.
+
+2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.h, lib/auth_rsa.c, lib/auth_rsa_export.c,
+	lib/gnutls_cert.c, lib/gnutls_handshake.c: get_rsa_params was
+	converted to behave similarly to get_dh_params.
+
+2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: [no log message]
+
+2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/Makefile.am,
+	lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.h,
+	lib/auth_dh_common.c, lib/auth_dhe.c, lib/auth_dhe_psk.c,
+	lib/auth_psk.c, lib/auth_psk.h, lib/auth_rsa_export.c,
+	lib/auth_srp.c, lib/auth_srp_sb64.c, lib/gnutls_algorithms.c,
+	lib/gnutls_anon_cred.c, lib/gnutls_auth.c, lib/gnutls_auth_int.h,
+	lib/gnutls_cert.c, lib/gnutls_dh.c, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_mpi.c, lib/gnutls_mpi.h, lib/gnutls_psk.c,
+	lib/gnutls_rsa_export.c, lib/gnutls_rsa_export.h,
+	lib/gnutls_state.c, lib/gnutls_ui.c, src/common.c, src/serv.c,
+	tests/Makefile.am, tests/dhepskself.c, tests/pskself.c: added
+	DHE-PSK ciphersuites and some cleanups.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
 2005-11-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.3.0.

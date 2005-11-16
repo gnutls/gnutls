@@ -91,7 +91,7 @@ gen_anon_server_kx (gnutls_session_t session, opaque ** data)
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_ANON,
-			      sizeof (anon_server_auth_info_st), 1)) < 0)
+			      sizeof (anon_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -99,7 +99,7 @@ gen_anon_server_kx (gnutls_session_t session, opaque ** data)
 
   _gnutls_dh_set_group (session, g, p);
 
-  ret = _gnutls_dh_common_print_server_kx (session, g, p, data);
+  ret = _gnutls_dh_common_print_server_kx (session, g, p, data, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -157,13 +157,13 @@ proc_anon_server_kx (gnutls_session_t session, opaque * data,
   /* set auth_info */
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_ANON,
-			      sizeof (anon_client_auth_info_st), 1)) < 0)
+			      sizeof (anon_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size);
+  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size, 0);
   if (ret < 0)
     {
       gnutls_assert ();

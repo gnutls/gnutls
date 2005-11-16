@@ -60,11 +60,11 @@ const mod_auth_st psk_auth_struct = {
 /* Set the PSK premaster secret.
  */
 int
-_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * psk2)
+_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * dh_secret)
 {
-  gnutls_datum psk = { NULL, 0 };
+  gnutls_datum pwd_psk = { NULL, 0 };
   gnutls_datum *ppsk;
-  size_t psk2_size;
+  size_t dh_secret_size;
   int ret;
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
@@ -85,30 +85,30 @@ _gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * psk2)
     }
   else
     {				/* SERVER side */
-      psk_server_auth_info_t info;
+      psk_auth_info_t info;
 
       info = _gnutls_get_auth_info (session);
 
       /* find the key of this username
        */
-      ret = _gnutls_psk_pwd_find_entry (session, info->username, &psk);
+      ret = _gnutls_psk_pwd_find_entry (session, info->username, &pwd_psk);
       if (ret < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
 	}
-      ppsk = &psk;
+      ppsk = &pwd_psk;
     }
 
 
-  if (psk2 == NULL)
-    psk2_size = ppsk->size;
+  if (dh_secret == NULL)
+    dh_secret_size = ppsk->size;
   else
-    psk2_size = psk2->size;
+    dh_secret_size = dh_secret->size;
 
   /* set the session key
    */
-  session->key->key.size = 4 + psk2_size + ppsk->size;
+  session->key->key.size = 4 + dh_secret_size + ppsk->size;
   session->key->key.data = gnutls_malloc (session->key->key.size);
   if (session->key->key.data == NULL)
     {
@@ -123,18 +123,17 @@ _gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * psk2)
    * (uint16) psk_size
    * the psk
    */
-  _gnutls_write_uint16 (psk2_size, session->key->key.data);
-  if (psk2 == NULL)
-    memset (&session->key->key.data[2], 0, psk2_size);
+  _gnutls_write_uint16 (dh_secret_size, session->key->key.data);
+  if (dh_secret == NULL)
+    memset (&session->key->key.data[2], 0, dh_secret_size);
   else
-    memcpy (&session->key->key.data[2], psk2->data, psk2->size);
-
-  _gnutls_write_datum16 (&session->key->key.data[psk2_size + 2], *ppsk);
+    memcpy (&session->key->key.data[2], dh_secret->data, dh_secret->size);
+  _gnutls_write_datum16 (&session->key->key.data[dh_secret_size + 2], *ppsk);
 
   ret = 0;
   
   error:
-    _gnutls_free_datum( &psk);
+    _gnutls_free_datum( &pwd_psk);
     return ret;
 }
 
@@ -200,7 +199,7 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
   int ret;
   gnutls_datum username;
   gnutls_psk_server_credentials_t cred;
-  psk_server_auth_info_t info;
+  psk_auth_info_t info;
 
   cred = (gnutls_psk_server_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
@@ -213,7 +212,7 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
-			      sizeof (psk_server_auth_info_st), 1)) < 0)
+			      sizeof (psk_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;

@@ -60,7 +60,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 {
   int ret = 0;
   opaque rnd[2 * TLS_RANDOM_SIZE + 1];
-  char buf[64];
+  char buf[512];
 
   memcpy (rnd, session->security_parameters.client_random, TLS_RANDOM_SIZE);
   memcpy (&rnd[TLS_RANDOM_SIZE],

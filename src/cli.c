@@ -76,8 +76,8 @@ static int x509ctype;
 static int disable_extensions;
 static int debug;
 
-char *psk_username;
-gnutls_datum psk_key;
+char *psk_username = NULL;
+gnutls_datum psk_key = { NULL, 0 };
 
 static gnutls_srp_client_credentials_t srp_cred;
 static gnutls_psk_client_credentials_t psk_cred;

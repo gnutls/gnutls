@@ -52,21 +52,16 @@ typedef struct gnutls_psk_server_credentials_st
 } psk_server_cred_st;
 
 /* these structures should not use allocated data */
-typedef struct psk_server_auth_info_st
+typedef struct psk_auth_info_st
 {
   char username[MAX_SRP_USERNAME + 1];
-} *psk_server_auth_info_t;
-
-
-typedef struct psk_client_auth_info_st
-{
   dh_info_st dh;
-} *psk_client_auth_info_t;
+} *psk_auth_info_t;
+
 
 #ifdef ENABLE_PSK
 
-typedef struct psk_server_auth_info_st psk_server_auth_info_st;
-typedef struct psk_client_auth_info_st psk_client_auth_info_st;
+typedef struct psk_auth_info_st psk_auth_info_st;
 
 int
 _gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * psk2);

@@ -96,7 +96,7 @@ gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 {
   int ret;
 
-  if (username == NULL || key == NULL)
+  if (username == NULL || key == NULL || key->data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -292,14 +292,18 @@ gnutls_psk_set_client_credentials_function (gnutls_psk_client_credentials_t
 const char *
 gnutls_psk_server_get_username (gnutls_session_t session)
 {
-  psk_server_auth_info_t info;
+  psk_auth_info_t info;
 
   CHECK_AUTH (GNUTLS_CRD_PSK, NULL);
 
   info = _gnutls_get_auth_info (session);
   if (info == NULL)
     return NULL;
-  return info->username;
+    
+  if (info->username[0] != 0) 
+    return info->username;
+
+  return NULL;
 }
 
 /**
