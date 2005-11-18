@@ -877,7 +877,8 @@ error:
   * encryption schemas, or ASCII for the PKCS12 schemas.
   *
   * If the Certificate is PEM encoded it should have a header of "ENCRYPTED PRIVATE KEY",
-  * or "PRIVATE KEY". You only need to specify the flags if the key is DER encoded.
+  * or "PRIVATE KEY". You only need to specify the flags if the key is DER encoded, since
+  * in that case the encryption status cannot be auto-detected.
   *
   * Returns 0 on success.
   *
