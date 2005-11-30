@@ -269,6 +269,8 @@ pack_certificate_auth_info (gnutls_session_t session,
 
   if (info)
     {
+      cert_size = 0;
+      
       for (i = 0; i < info->ncerts; i++)
 	cert_size += info->raw_certificate_list[i].size;
 

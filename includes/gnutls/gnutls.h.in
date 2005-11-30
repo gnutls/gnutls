@@ -326,6 +326,8 @@ const char *gnutls_protocol_get_name(gnutls_protocol_t version);
  */
 int gnutls_session_set_data( gnutls_session_t session, const void* session_data, size_t session_data_size);
 int gnutls_session_get_data( gnutls_session_t session, void* session_data, size_t *session_data_size);
+int gnutls_session_get_data2( gnutls_session_t session, gnutls_datum* data);
+
 /* returns the session ID */
 #define GNUTLS_MAX_SESSION_ID 32
 int gnutls_session_get_id( gnutls_session_t session, void* session_id, size_t *session_id_size);
@@ -450,11 +452,11 @@ typedef void (*gnutls_free_function)(void*);
 typedef void* (*gnutls_realloc_function)(void*, size_t);
 
 extern void
-gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
-				gnutls_alloc_function secure_alloc_func,
-				gnutls_is_secure_function is_secure_func,
-				gnutls_realloc_function realloc_func,
-				gnutls_free_function free_func);
+gnutls_global_set_mem_functions(gnutls_alloc_function gt_alloc_func,
+				gnutls_alloc_function gt_secure_alloc_func,
+				gnutls_is_secure_function gt_is_secure_func,
+				gnutls_realloc_function gt_realloc_func,
+				gnutls_free_function gt_free_func);
 
 /* For use in callbacks */
 extern gnutls_alloc_function gnutls_malloc;

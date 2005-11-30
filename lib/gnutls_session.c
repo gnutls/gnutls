@@ -120,11 +120,14 @@ gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum * data)
   *
   * Session id is some data set by the server, that identify the current session. 
   * In TLS 1.0 and SSL 3.0 session id is always less than 32 bytes.
+  *
+  * Returns zero on success.
   **/
 int
 gnutls_session_get_id (gnutls_session_t session,
 		       void *session_id, size_t * session_id_size)
 {
+size_t given_session_id_size = *session_id_size;
 
   *session_id_size = session->security_parameters.session_id_size;
 
@@ -133,6 +136,12 @@ gnutls_session_get_id (gnutls_session_t session,
     {
       return 0;
     }
+
+  if ( given_session_id_size < session->security_parameters.session_id_size)
+    {
+       return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
   memcpy (session_id, &session->security_parameters.session_id,
 	  *session_id_size);
 
