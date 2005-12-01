@@ -632,6 +632,26 @@ after_handshake:
 
   for (;;)
     {
+      if (starttls_alarmed)
+	{
+	  if (hd.secure == 0)
+	    {
+	      fprintf (stderr, "*** Starting TLS handshake\n");
+	      ret = do_handshake (&hd);
+	      if (ret < 0)
+		{
+		  fprintf (stderr, "*** Handshake has failed\n");
+		  socket_bye (&hd);
+		  user_term = 1;
+		}
+	    }
+	  else
+	    {
+	      user_term = 1;
+	    }
+	  continue;
+	}
+
       FD_ZERO (&rset);
       FD_SET (fileno (stdin), &rset);
       FD_SET (sd, &rset);
@@ -639,30 +659,10 @@ after_handshake:
       maxfd = MAX (fileno (stdin), sd);
       tv.tv_sec = 3;
       tv.tv_usec = 0;
-      err = select (maxfd + 1, &rset, NULL, NULL, &tv);
 
+      err = select (maxfd + 1, &rset, NULL, NULL, &tv);
       if (err < 0)
-	{
-	  if (errno == EINTR && starttls_alarmed)
-	    {
-	      if (hd.secure == 0)
-		{
-		  fprintf (stderr, "*** Starting TLS handshake\n");
-		  ret = do_handshake (&hd);
-		  if (ret < 0)
-		    {
-		      fprintf (stderr, "*** Handshake has failed\n");
-		      socket_bye (&hd);
-		      user_term = 1;
-		    }
-		}
-	      else
-		{
-		  user_term = 1;
-		}
-	    }
-	  continue;
-	}
+	continue;
 
       if (FD_ISSET (sd, &rset))
 	{
