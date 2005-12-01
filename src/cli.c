@@ -632,24 +632,17 @@ after_handshake:
 
   for (;;)
     {
-      if (starttls_alarmed)
+      if (starttls_alarmed && !hd.secure)
 	{
-	  if (hd.secure == 0)
+	  fprintf (stderr, "*** Starting TLS handshake\n");
+	  ret = do_handshake (&hd);
+	  if (ret < 0)
 	    {
-	      fprintf (stderr, "*** Starting TLS handshake\n");
-	      ret = do_handshake (&hd);
-	      if (ret < 0)
-		{
-		  fprintf (stderr, "*** Handshake has failed\n");
-		  socket_bye (&hd);
-		  user_term = 1;
-		}
-	    }
-	  else
-	    {
+	      fprintf (stderr, "*** Handshake has failed\n");
+	      socket_bye (&hd);
 	      user_term = 1;
+	      break;
 	    }
-	  continue;
 	}
 
       FD_ZERO (&rset);
