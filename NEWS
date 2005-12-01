@@ -7,9 +7,11 @@ See the end for copying conditions.
 
 ** Support for DHE-PSK cipher suites has been added.
 
+** Fix gnutls-cli STARTTLS hang when SIGINT is sent too quickly, thanks to
+Otto Maddox <ottomaddox@fastmail.fm> and Nozomu Ando <nand@mac.com>.
+
 ** Corrected a bug in certtool for 64 bit machines. Reported
 by Max Kellermann <max@duempel.org>.
-
 
 * Version 1.3.0 (2005-11-15)
 
