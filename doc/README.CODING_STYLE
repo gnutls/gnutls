@@ -74,3 +74,7 @@ The rules here are not always used, although we try to stick to them.
  A negative value always indicates failure. All the available
  error codes are defined in gnutls.h and a description
  is available in gnutls_errors.c
+
+*** Indentation style:
+  In general, use the GNU Coding Standard.  You may indent the source
+  using GNU indent, e.g. "indent *.c".
