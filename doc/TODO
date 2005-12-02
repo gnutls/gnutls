@@ -20,7 +20,7 @@ Current list:
    -export-symbols-regex doesn't work.
 - Allow sending V2 Hello messages. It seems that some (old) broken 
   implementations require that.
-- Add Kerberos support
+- Add Kerberos ciphersuites
 - Certificate chain validation improvements:
   - Implement "correct" DN comparison (instead of memcmp).
   - Support critical key usage KeyCertSign and cRLSign.
@@ -34,6 +34,10 @@ Current list:
 - Short-cut the certificate verification algorithm before the
   root if a middle-CA is trusted.
 - Update libgnutls-extra.m4 to use modern autoconf constructs.
+- Support for hardware SSL accelerators
+- Exhaustive test suite, using NIST's PKI Test vectors,
+  see http://csrc.nist.gov/pki/testing/x509paths_old.html
+  and http://csrc.nist.gov/pki/testing/x509paths.html
 
 (+) Means high priority 
 (*) Means medium priority
