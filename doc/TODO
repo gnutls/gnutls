@@ -47,6 +47,8 @@ Current list:
   and http://csrc.nist.gov/pki/testing/x509paths.html
 - Clean up certtool.  Perhaps separate the different functions into
   separate tools.  Probably a rewrite is necessary.
+- Enable certtool's template files to allow arbitrary
+  OIDs to be specified for x509v3's extended key usage attribute.
 
 (+) Means high priority 
 (*) Means medium priority
