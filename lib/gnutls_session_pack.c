@@ -269,15 +269,15 @@ pack_certificate_auth_info (gnutls_session_t session,
 
   if (info)
     {
-      cert_size = 0;
+      cert_size = 4;
       
       for (i = 0; i < info->ncerts; i++)
-	cert_size += info->raw_certificate_list[i].size;
+	cert_size += 4 + info->raw_certificate_list[i].size;
 
-      pack_size = 2 + 4 * 3 + 4 * 2 + info->dh.prime.size +
-	info->dh.generator.size + info->dh.public_key.size +
-	info->rsa_export.modulus.size +
-	info->rsa_export.exponent.size + cert_size;
+      pack_size = 2 + 4 + info->dh.prime.size +
+	4 + info->dh.generator.size + 4 + info->dh.public_key.size +
+	4 + info->rsa_export.modulus.size +
+	4 + info->rsa_export.exponent.size + cert_size;
     }
   else
     pack_size = 0;
@@ -297,7 +297,7 @@ pack_certificate_auth_info (gnutls_session_t session,
 
   packed_session->data[0] = GNUTLS_CRD_CERTIFICATE;
   _gnutls_write_uint32 (pack_size, &packed_session->data[PACK_HEADER_SIZE]);
-  pos += pack_size + PACK_HEADER_SIZE;
+  pos += 4 + PACK_HEADER_SIZE;
 
 
   if (pack_size > 0)
@@ -325,14 +325,9 @@ pack_certificate_auth_info (gnutls_session_t session,
 
       for (i = 0; i < info->ncerts; i++)
 	{
-	  _gnutls_write_uint32 (info->raw_certificate_list[i].size,
-				&packed_session->data[pos]);
-	  pos += sizeof (uint32);
-
-	  memcpy (&packed_session->data[pos],
-		  info->raw_certificate_list[i].data,
-		  info->raw_certificate_list[i].size);
-	  pos += info->raw_certificate_list[i].size;
+          _gnutls_write_datum32 (&packed_session->data[pos],
+			     info->raw_certificate_list[i]);
+	  pos += sizeof (uint32) + info->raw_certificate_list[i].size;
 	}
     }
 
@@ -450,6 +445,18 @@ unpack_certificate_auth_info (gnutls_session_t session,
 
   info->ncerts = _gnutls_read_uint32 (&packed_session->data[pos]);
   pos += 4;
+  
+  if (info->ncerts > 0) 
+    {
+      info->raw_certificate_list = 
+        gnutls_calloc (1, sizeof (gnutls_datum_t) * info->ncerts);
+      if (info->raw_certificate_list == NULL)
+        {
+          gnutls_assert ();
+          ret = GNUTLS_E_MEMORY_ERROR;
+          goto error;
+        }
+    }
 
   for (i = 0; i < info->ncerts; i++)
     {
@@ -639,7 +646,7 @@ pack_anon_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
 
   packed_session->data[0] = GNUTLS_CRD_ANON;
   _gnutls_write_uint32 (pack_size, &packed_session->data[PACK_HEADER_SIZE]);
-  pos += pack_size + PACK_HEADER_SIZE;
+  pos += 4 + PACK_HEADER_SIZE;
 
   if (pack_size > 0)
     {
