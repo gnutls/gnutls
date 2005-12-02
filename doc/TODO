@@ -11,6 +11,8 @@ Current list:
 + Support setting key/cert via PKCS#12 blob containing PKCS#8 key and
   a certificate in a X.509 credential, i.e.,
   gnutls_certificate_set_x509_pkcs12_file().
+- Support OpenSSL encrypted PKCS#1 RSA keys, for compatibility (new
+  applications should use PKCS#8 instead).
 - Allow verifying of certificates on their reception.
 - Add gnutls_certificate_set_openpgp_keyring()
   function, similar to gnutls_certificate_set_openpgp_key().
