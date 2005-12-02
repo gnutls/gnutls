@@ -8,6 +8,9 @@ Current list:
 * Document the format for the supported DN attributes.
 * Audit the code
 + Support DES-MD5 PKCS#8 (1.2.840.113549.1.5.3) encrypted keys.
++ Support setting key/cert via PKCS#12 blob containing PKCS#8 key and
+  a certificate in a X.509 credential, i.e.,
+  gnutls_certificate_set_x509_pkcs12_file().
 - Allow verifying of certificates on their reception.
 - Add gnutls_certificate_set_openpgp_keyring()
   function, similar to gnutls_certificate_set_openpgp_key().
