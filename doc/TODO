@@ -45,6 +45,8 @@ Current list:
 - Exhaustive test suite, using NIST's PKI Test vectors,
   see http://csrc.nist.gov/pki/testing/x509paths_old.html
   and http://csrc.nist.gov/pki/testing/x509paths.html
+- Clean up certtool.  Perhaps separate the different functions into
+  separate tools.  Probably a rewrite is necessary.
 
 (+) Means high priority 
 (*) Means medium priority
