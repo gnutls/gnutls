@@ -22,8 +22,10 @@ based MAC; public-key based signatures for integrity protection are
 not supported.  PKCS#12 bags may be encrypted using password derived
 symmetric keys, public-key based encryption is not supported.  The
 PKCS#8 keys may be encrypted using passwords.  The API use the same
-password for all operations, it is believed that any more flexibility
-just create too much complexity.
+password for all operations.  We believe that any more flexibility
+create too much complexity that would hurt overall security, but may
+add more PKCS#12 related APIs if real-world experience indicate
+otherwise.
 
 ** API and ABI modifications:
 New function to set X.509 credentials from a PKCS#12 file:
