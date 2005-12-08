@@ -1946,6 +1946,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	}
 
       index++;
+      gnutls_pkcs12_bag_deinit (bag);
     }
 
   ret = 0;
