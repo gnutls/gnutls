@@ -113,6 +113,8 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
 
   if (authen_safe)
     *authen_safe = c2;
+  else
+    asn1_delete_structure (&c2);
 
   return 0;
 
@@ -600,7 +602,6 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   char root2[64];
   char oid[128];
   char counter[MAX_INT_DIGITS];
-  gnutls_datum_t tmp = { NULL, 0 };
 
   if (pkcs12 == NULL)
     {
@@ -665,13 +666,12 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   if (result < 0)
     {
       gnutls_assert ();
-      return result;
+      goto cleanup;
     }
 
-  return 0;
+  result = 0;
 
 cleanup:
-  _gnutls_free_datum (&tmp);
   if (c2)
     asn1_delete_structure (&c2);
   return result;
