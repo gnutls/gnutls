@@ -2860,6 +2860,8 @@ print_bag_data (gnutls_pkcs12_bag bag)
 	  exit (1);
 	}
 
+      fprintf (stderr, "\tType: %s\n", BAGTYPE (type));
+
       name = NULL;
       result = gnutls_pkcs12_bag_get_friendly_name (bag, i, (char **) &name);
       if (result < 0)
