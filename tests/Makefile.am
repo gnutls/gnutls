@@ -26,7 +26,11 @@ LDADD = ../lib/libgnutls.la ../gl/libgnu.la libutils.la
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
+# For pkcs12_neon.
 EXTRA_DIST = client.p12 noclient.p12 unclient.p12
+
+# For pkcs8.
+EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 
