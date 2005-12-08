@@ -27,6 +27,10 @@ create too much complexity that would hurt overall security, but may
 add more PKCS#12 related APIs if real-world experience indicate
 otherwise.
 
+** Certtool now generate keys in unencrypted PKCS#8 format for empty passwords.
+Use "certtool -p -8" and press press enter at the prompt.  Earlier,
+certtool would have encrypted the key using an empty password.
+
 ** API and ABI modifications:
 New function to set X.509 credentials from a PKCS#12 file:
   gnutls_certificate_set_x509_simple_pkcs12_file

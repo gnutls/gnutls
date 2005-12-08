@@ -239,7 +239,8 @@ print_private_key (gnutls_x509_privkey key)
 	flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
       else
 	flags = GNUTLS_PKCS_USE_PKCS12_3DES;
-      if ((pass = get_pass ()) == NULL)
+
+      if ((pass = get_pass ()) == NULL || *pass == '\0')
 	flags = GNUTLS_PKCS_PLAIN;
 
       size = sizeof (buffer);
