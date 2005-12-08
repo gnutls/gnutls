@@ -1,3 +1,463 @@
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.3.1.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.c: Fix.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Dist pkcs8 blobs.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Fix.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/enc3pkcs8.pem: add
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/enc3pkcs8.pem: Add.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs8, tests/enc2pkcs8.pem: Add rc2 pkcs#8 blob.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/encpkcs8.pem, tests/unencpkcs8.pem: Fix.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/pkcs8: Add PKCS#8 self test.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Make --password work for PKCS#8 --key-info.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/encpkcs8.pem, tests/unencpkcs8.pem: Add, PKSC#8 blobs.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Remove.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/privkey_pkcs8.c:
+	(gnutls_x509_privkey_import_pkcs8): Handle unencrypted PEM keys.
+	Remove unused "encrypted" variable.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool.c: Generate unencrypted PKCS#8 keys for blank
+	passwords.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/TODO, includes/gnutls/gnutls.h.in, lib/gnutls_x509.c,
+	tests/Makefile.am, tests/set_pkcs12_cred.c: Support reading X.509
+	credentials from PKCS#12 files.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Print PKCS#12 type for each element.
+
+2005-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Add ex-client-tlsia.
+
+2005-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-tlsia.c: Add.
+
+2005-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rfc4279.txt: Add.
+
+2005-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_session_pack.c: Corrected bugs in session resumption.
+	Bugs reported by Yoann Vandoorselare.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix handshake_p.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Use proper resume detection.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Separate verify from receiving.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Fix warning.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix warnings.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Fix API.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Put 1.3.x releases in devel/ directory.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: add
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Fix.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: More informative messages.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Need gnulib -I's.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Need readline.h.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Don't be interactive, by default (use -d to enable
+	it).
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Debug more.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Bug fixes.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Really fix nasty bug.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix nasty bug.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/README.CODING_STYLE: Mention indentation.
+
+2005-12-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* gl/readline.c, gl/stdint_.h, gl/m4/socklen.m4: Update.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Remove.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Check starttls_alarmed earlier, the signal might be
+	sent before select is called.  Report by Otto Maddox
+	<ottomaddox@fastmail.fm> and influenced by tiny patch from Nozomu
+	Ando <nand@mac.com>.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Update.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Simplify API.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Fix.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Don't infloop.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Check starttls_alarmed earlier, the signal might be
+	sent before select is called.  Report by Otto Maddox
+	<ottomaddox@fastmail.fm> and influenced by tiny patch from Nozomu
+	Ando <nand@mac.com>.
+
+2005-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Small fix, from Emile.
+
+2005-11-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2005-11-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_session.c, lib/gnutls_session_pack.c,
+	includes/gnutls/gnutls.h.in: Some fixes in session resumption and
+	prototypes. Based on patches and suggestions by Joe Orton.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c, tests/tlsia.c: Fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h, libextra/gnutls_ia.c: Add.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c, includes/gnutls/extra.h: Add.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Remove bad docs.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix exit codes.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Add.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Permute inner secret too.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Doc fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Add.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Add.  Fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Doc fix.  API Fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Fix API.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_kx.c: Set TLS/IA secret.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Doc fix.  Support re-send/recv, in case of
+	EINTR/EAGAIN.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Remove session_key from recv/send.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Remove.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Use sizeof instead of strlen.
+
+2005-11-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/tls-numbers.txt: From
+	<http://people.nokia.net/~pasi/tls-numbers.txt>.
+
+2005-11-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/privkey_pkcs8.c: added some clarification about the
+	encryption status.
+
+2005-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/certtool.c: Corrected a bug in certtool for 64 bit
+	machines. Reported by Max Kellermann <max@duempel.org>.
+
+2005-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/cli-gaa.c, src/cli.gaa: [no log message]
+
+2005-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_datum.c, lib/gnutls_session_pack.c, src/serv.c: some
+	more fixes for PSK.
+
+2005-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.in: the library version number was bumped to 13 to
+	allow for incompatible changes.
+
+2005-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_anon.c, lib/auth_anon.h, lib/auth_dh_common.c,
+	lib/auth_dh_common.h, lib/auth_dhe.c, lib/auth_dhe_psk.c,
+	lib/auth_psk.c, lib/auth_psk.h, lib/gnutls_kx.c, lib/gnutls_psk.c,
+	lib/gnutls_session_pack.c, lib/gnutls_state.c, lib/gnutls_ui.c,
+	src/Makefile.am, src/cli-gaa.c, src/cli.c, src/cli.gaa,
+	src/common.c, src/gnutls-http-serv, src/params.pem, src/serv.c:
+	Completed the DHE-PSK ciphersuite additions.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Fix.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Indent.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Use new low-level API for client.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Server now uses low level API.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fixes.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add TLS/IA errors.
+
+2005-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Don't use large packet on the stack in recv
+	function.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Fix.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Add TLS/IA low level API.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Fix prototypes.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Reorganize.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Add low-level API.
+
 2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_psk.c: some documentation updates
