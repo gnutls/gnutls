@@ -7,7 +7,7 @@ Current list:
 * Verify added CRLs (is it really needed?)
 * Document the format for the supported DN attributes.
 * Audit the code
-+ Support PKCS#8 AES and DES-MD5 encrypted keys.
++ Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
 - Support OpenSSL encrypted PKCS#1 RSA keys, for compatibility (new
   applications should use PKCS#8 instead).
 - Allow verifying of certificates on their reception.
