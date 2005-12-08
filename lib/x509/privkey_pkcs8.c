@@ -891,7 +891,6 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
 {
   int result = 0, need_free = 0;
   gnutls_datum_t _data;
-  int encrypted;
 
   if (key == NULL)
     {
@@ -915,7 +914,6 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
       result =
 	_gnutls_fbase64_decode (PEM_UNENCRYPTED_PKCS8,
 				data->data, data->size, &out);
-      encrypted = 0;
 
       if (result < 0)
 	{			/* Try the encrypted header 
@@ -930,9 +928,9 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
 	      gnutls_assert ();
 	      return result;
 	    }
-
-	  encrypted = 1;
 	}
+      else if (flags == 0)
+	flags |= GNUTLS_PKCS_PLAIN;
 
       _data.data = out;
       _data.size = result;
