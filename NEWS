@@ -27,6 +27,10 @@ create too much complexity that would hurt overall security, but may
 add more PKCS#12 related APIs if real-world experience indicate
 otherwise.
 
+** gnutls_x509_privkey_import_pkcs8 now accept unencrypted PEM PKCS#8 keys,
+reported by Emile van Bergen <emile@e-advies.nl>.
+This will enable "certtool -k -8" to parse those keys.
+
 ** Certtool now generate keys in unencrypted PKCS#8 format for empty passwords.
 Use "certtool -p -8" and press press enter at the prompt.  Earlier,
 certtool would have encrypted the key using an empty password.
