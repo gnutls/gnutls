@@ -1662,7 +1662,10 @@ privkey_info (void)
     }
   else
     {
-      pass = get_pass ();
+      if (info.pass)
+	pass = info.pass;
+      else
+	pass = get_pass ();
       ret =
 	gnutls_x509_privkey_import_pkcs8 (key, &pem, in_cert_format, pass, 0);
     }
