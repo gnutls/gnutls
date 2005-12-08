@@ -18,4 +18,5 @@ pkcs12
 pkits.ldif
 pkits.schema
 pskself
+set_pkcs12_cred
 smime
