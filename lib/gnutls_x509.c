@@ -1804,6 +1804,284 @@ gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t
   return ret;
 }
 
+#include <gnutls/pkcs12.h>
+
+static int
+parse_pkcs12 (gnutls_certificate_credentials_t res,
+	      gnutls_pkcs12_t p12,
+	      const char *password,
+	      gnutls_x509_privkey *key,
+	      gnutls_x509_crt_t *cert,
+	      gnutls_x509_crl_t *crl)
+{
+  gnutls_pkcs12_bag bag = NULL;
+  int index = 0;
+  int ret;
+
+  for (;;)
+    {
+      int elements_in_bag;
+      int i;
+
+      ret = gnutls_pkcs12_bag_init (&bag);
+      if (ret < 0)
+	{
+	  bag = NULL;
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      ret = gnutls_pkcs12_get_bag (p12, index, bag);
+      if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	break;
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      ret = gnutls_pkcs12_bag_get_type (bag, 0);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      if (ret == GNUTLS_BAG_ENCRYPTED)
+	{
+	  ret = gnutls_pkcs12_bag_decrypt (bag, password);
+	  if (ret < 0)
+	    {
+	      gnutls_assert ();
+	      goto done;
+	    }
+	}
+
+      elements_in_bag = gnutls_pkcs12_bag_get_count (bag);
+      if (elements_in_bag < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      for (i = 0; i < elements_in_bag; i++)
+	{
+	  int type;
+	  gnutls_datum data;
+
+	  type = gnutls_pkcs12_bag_get_type (bag, i);
+	  if (type < 0)
+	    {
+	      gnutls_assert ();
+	      goto done;
+	    }
+
+	  ret = gnutls_pkcs12_bag_get_data (bag, i, &data);
+	  if (ret < 0)
+	    {
+	      gnutls_assert ();
+	      goto done;
+	    }
+
+	  switch (type)
+	    {
+	    case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY:
+	    case GNUTLS_BAG_PKCS8_KEY:
+	      ret = gnutls_x509_privkey_init (key);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  goto done;
+		}
+
+	      ret = gnutls_x509_privkey_import_pkcs8
+		(*key, &data, GNUTLS_X509_FMT_DER, password,
+		 type == GNUTLS_BAG_PKCS8_KEY ? GNUTLS_PKCS_PLAIN : 0);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  goto done;
+		}
+	      break;
+
+	    case GNUTLS_BAG_CERTIFICATE:
+	      ret = gnutls_x509_crt_init (cert);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  goto done;
+		}
+
+	      ret = gnutls_x509_crt_import (*cert, &data, GNUTLS_X509_FMT_DER);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  goto done;
+		}
+	      break;
+
+	    case GNUTLS_BAG_CRL:
+	      ret = gnutls_x509_crl_init (crl);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  goto done;
+		}
+
+	      ret = gnutls_x509_crl_import (*crl, &data, GNUTLS_X509_FMT_DER);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  goto done;
+		}
+	      break;
+
+	    case GNUTLS_BAG_ENCRYPTED:
+	      /* XXX Bother to recurse one level down?  Unlikely to
+		 use the same password anyway. */
+	    case GNUTLS_BAG_EMPTY:
+	    default:
+	      break;
+	    }
+	}
+
+      index++;
+    }
+
+  ret = 0;
+
+ done:
+  if (bag)
+    gnutls_pkcs12_bag_deinit (bag);
+
+  return ret;
+}
+
+/**
+ * gnutls_certificate_set_x509_simple_pkcs12_file:
+ * @res: is an #gnutls_certificate_credentials_t structure.
+ * @pkcs12file: filename of file containing PKCS#12 blob.
+ * @type: is PEM or DER of the @pkcs12file.
+ * @password: optional password used to decrypt PKCS#12 file, bags and keys.
+ *
+ * This function sets a certificate/private key pair and/or a CRL in
+ * the gnutls_certificate_credentials_t structure.  This function may
+ * be called more than once (in case multiple keys/certificates exist
+ * for the server).
+ *
+ * MAC:ed PKCS#12 files are supported.  Encrypted PKCS#12 bags are
+ * supported.  Encrypted PKCS#8 private keys are supported.  However,
+ * only password based security, and the same password for all
+ * operations, are supported.
+ *
+ * The private keys may be RSA PKCS#1 or DSA private keys encoded in
+ * the OpenSSL way.
+ *
+ * PKCS#12 file may contain many keys and/or certificates, and there
+ * is no way to identify which key/certificate pair you want.  You
+ * should make sure the PKCS#12 file only contain one key/certificate
+ * pair and/or one CRL.
+ *
+ * It is believed that the limitations of this function is acceptable
+ * for most usage, and that any more flexibility would introduce
+ * complexity that would make it harder to use this functionality at
+ * all.
+ *
+ * Return value: Returns 0 on success, or an error code.
+ **/
+int
+gnutls_certificate_set_x509_simple_pkcs12_file (gnutls_certificate_credentials_t res,
+						const char *pkcs12file,
+						gnutls_x509_crt_fmt_t type,
+						const char *password)
+{
+  gnutls_pkcs12_t p12;
+  gnutls_datum_t p12blob;
+  gnutls_x509_privkey key = NULL;
+  gnutls_x509_crt_t cert = NULL;
+  gnutls_x509_crl_t crl = NULL;
+  int ret;
+  strfile x;
+
+  ret = gnutls_pkcs12_init (&p12);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  x = _gnutls_file_to_str (pkcs12file);
+  if (x.data == NULL)
+    {
+      gnutls_assert ();
+      gnutls_pkcs12_deinit (p12);
+      return GNUTLS_E_FILE_ERROR;
+    }
+
+  p12blob.data = x.data;
+  p12blob.size = x.size;
+
+  ret = gnutls_pkcs12_import (p12, &p12blob, type, 0);
+  _gnutls_strfile_free (&x);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      gnutls_pkcs12_deinit (p12);
+      return ret;
+    }
+
+  if (password)
+    {
+      ret = gnutls_pkcs12_verify_mac (p12, password);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  gnutls_pkcs12_deinit (p12);
+	  return ret;
+	}
+    }
+
+  ret = parse_pkcs12 (res, p12, password, &key, &cert, &crl);
+  gnutls_pkcs12_deinit (p12);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  if (key && cert)
+    {
+      ret = gnutls_certificate_set_x509_key (res, &cert, 1, key);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+    }
+
+  if (crl)
+    {
+      ret = gnutls_certificate_set_x509_crl (res, &crl, 1);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+    }
+
+  ret = 0;
+
+ done:
+  if (cert)
+    gnutls_x509_crt_deinit (cert);
+  if (key)
+    gnutls_x509_privkey_deinit (key);
+  if (crl)
+    gnutls_x509_crl_deinit (crl);
+
+  return ret;
+}
+
 
 /**
   * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials_t structure

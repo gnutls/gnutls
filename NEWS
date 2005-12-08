@@ -13,6 +13,22 @@ Otto Maddox <ottomaddox@fastmail.fm> and Nozomu Ando <nand@mac.com>.
 ** Corrected a bug in certtool for 64 bit machines. Reported
 by Max Kellermann <max@duempel.org>.
 
+** New function to set a X.509 private key and certificate pairs, and/or
+CRLs, from an PKCS#12 file, suggested by Emile van Bergen
+<emile@e-advies.nl>.
+
+The integrity of the PKCS#12 file is protected through a password
+based MAC; public-key based signatures for integrity protection are
+not supported.  PKCS#12 bags may be encrypted using password derived
+symmetric keys, public-key based encryption is not supported.  The
+PKCS#8 keys may be encrypted using passwords.  The API use the same
+password for all operations, it is believed that any more flexibility
+just create too much complexity.
+
+** API and ABI modifications:
+New function to set X.509 credentials from a PKCS#12 file:
+  gnutls_certificate_set_x509_simple_pkcs12_file
+
 * Version 1.3.0 (2005-11-15)
 
 ** Support for TLS Pre-Shared Key (TLS-PSK) ciphersuites have been added.

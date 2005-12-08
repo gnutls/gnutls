@@ -30,7 +30,11 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 
-ctests = simple anonself pskself openssl gc dhepskself
+ctests = simple anonself pskself openssl gc dhepskself set_pkcs12_cred
 TESTS = pkcs12_neon $(ctests)
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon
+
+TESTS_ENVIRONMENT = \
+	PKCS12FILE=$(srcdir)/client.p12	\
+	PKCS12PASSWORD=foobar
