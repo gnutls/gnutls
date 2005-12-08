@@ -35,6 +35,10 @@ This will enable "certtool -k -8" to parse those keys.
 Use "certtool -p -8" and press press enter at the prompt.  Earlier,
 certtool would have encrypted the key using an empty password.
 
+** Certtool now accept --password for --key-info and encrypted PKCS#8 keys.
+Earlier it would have prompted the user for it, even if --password was
+supplied.
+
 ** API and ABI modifications:
 New function to set X.509 credentials from a PKCS#12 file:
   gnutls_certificate_set_x509_simple_pkcs12_file
