@@ -26,9 +26,6 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <gnutls_str.h>
-/* Solaris 2.9 doesn't have ULONG_MAX in stdlib.h, where it should be,
-   but it is in limits.h. */
-#include <limits.h>
 
 /* These function are like strcat, strcpy. They only
  * do bound checking (they shouldn't cause buffer overruns),

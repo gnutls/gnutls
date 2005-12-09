@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <limits.h>
 
 #ifdef NO_SSIZE_T
 # define HAVE_SSIZE_T
