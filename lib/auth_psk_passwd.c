@@ -122,7 +122,7 @@ _gnutls_psk_pwd_find_entry (gnutls_session_t session, char *username,
   gnutls_psk_server_credentials_t cred;
   FILE *fd;
   char line[2 * 1024];
-  uint i, len;
+  unsigned i, len;
   int ret;
 
   cred = (gnutls_psk_server_credentials_t)

@@ -460,7 +460,7 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
 
 	      if (raw_flag != 0)
 		{
-		  if ((uint) len > *sizeof_buf)
+		  if ((unsigned) len > *sizeof_buf)
 		    {
 		      *sizeof_buf = len;
 		      result = GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -617,7 +617,7 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 
 	      len = strlen (oid) + 1;
 
-	      if (*sizeof_oid < (uint) len)
+	      if (*sizeof_oid < (unsigned) len)
 		{
 		  *sizeof_oid = len;
 		  gnutls_assert ();

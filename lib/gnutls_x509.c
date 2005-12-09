@@ -207,7 +207,7 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 {
   gnutls_datum_t cid;
   gnutls_datum_t kid;
-  uint pk = res->cert_list[res->ncerts - 1][0].subject_pk_algorithm;
+  unsigned pk = res->cert_list[res->ncerts - 1][0].subject_pk_algorithm;
 
   if (res->pkey[res->ncerts - 1].pk_algorithm != pk)
     {
@@ -266,7 +266,7 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
  * returns the number of certificates parsed (1)
  */
 static int
-parse_crt_mem (gnutls_cert ** cert_list, uint * ncerts,
+parse_crt_mem (gnutls_cert ** cert_list, unsigned * ncerts,
 	       gnutls_x509_crt_t cert)
 {
   int i;
@@ -301,7 +301,7 @@ parse_crt_mem (gnutls_cert ** cert_list, uint * ncerts,
  * returns the number of certificates parsed (1)
  */
 static int
-parse_der_cert_mem (gnutls_cert ** cert_list, uint * ncerts,
+parse_der_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts,
 		    const void *input_cert, int input_cert_size)
 {
   gnutls_datum_t tmp;
@@ -340,7 +340,7 @@ parse_der_cert_mem (gnutls_cert ** cert_list, uint * ncerts,
  * returns the number of certificate parsed
  */
 static int
-parse_pkcs7_cert_mem (gnutls_cert ** cert_list, uint * ncerts, const
+parse_pkcs7_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts, const
 		      void *input_cert, int input_cert_size, int flags)
 {
 #ifdef ENABLE_PKI
@@ -463,7 +463,7 @@ parse_pkcs7_cert_mem (gnutls_cert ** cert_list, uint * ncerts, const
  * a gnutls_cert structure. Returns the number of certificate parsed.
  */
 static int
-parse_pem_cert_mem (gnutls_cert ** cert_list, uint * ncerts,
+parse_pem_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts,
 		    const char *input_cert, int input_cert_size)
 {
   int size, siz2, i;
@@ -1092,7 +1092,7 @@ generate_rdn_seq (gnutls_certificate_credentials_t res)
 {
   gnutls_datum_t tmp;
   int ret;
-  uint size, i;
+  unsigned size, i;
   opaque *pdata;
 
   /* Generate the RDN sequence 
@@ -1214,7 +1214,7 @@ _gnutls_check_key_usage (const gnutls_cert * cert, gnutls_kx_algorithm_t alg)
 
 
 static int
-parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, uint * ncerts,
+parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned * ncerts,
 		  const opaque * input_cert, int input_cert_size)
 {
   int i, size;
@@ -1312,7 +1312,7 @@ parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, uint * ncerts,
  * returns the number of certificates parsed (1)
  */
 static int
-parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, uint * ncerts,
+parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned * ncerts,
 		  const void *input_cert, int input_cert_size)
 {
   int i;
@@ -1516,7 +1516,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
 #ifdef ENABLE_PKI
 
 static int
-parse_pem_crl_mem (gnutls_x509_crl_t ** crl_list, uint * ncrls,
+parse_pem_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned * ncrls,
 		   const opaque * input_crl, int input_crl_size)
 {
   int size, i;
@@ -1601,7 +1601,7 @@ parse_pem_crl_mem (gnutls_x509_crl_t ** crl_list, uint * ncrls,
  * returns the number of certificates parsed (1)
  */
 static int
-parse_der_crl_mem (gnutls_x509_crl_t ** crl_list, uint * ncrls,
+parse_der_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned * ncrls,
 		   const void *input_crl, int input_crl_size)
 {
   int i;
@@ -2095,7 +2095,7 @@ gnutls_certificate_set_x509_simple_pkcs12_file (gnutls_certificate_credentials_t
 void
 gnutls_certificate_free_crls (gnutls_certificate_credentials_t sc)
 {
-  uint j;
+  unsigned j;
 
   for (j = 0; j < sc->x509_ncrls; j++)
     {

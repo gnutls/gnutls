@@ -129,7 +129,7 @@ _gnutls_server_name_send_params (gnutls_session_t session,
 {
   uint16_t len;
   opaque *p;
-  uint i;
+  unsigned i;
   ssize_t data_size = _data_size;
   int total_size = 0;
 

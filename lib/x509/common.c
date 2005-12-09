@@ -791,7 +791,7 @@ _gnutls_x509_export_int (ASN1_TYPE asn1_data,
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-      if ((uint) result > *output_data_size)
+      if ((unsigned) result > *output_data_size)
 	{
 	  gnutls_assert ();
 	  gnutls_free (out);

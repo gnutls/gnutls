@@ -57,7 +57,7 @@
 void
 gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 {
-  uint i, j;
+  unsigned i, j;
 
   for (i = 0; i < sc->ncerts; i++)
     {
@@ -99,7 +99,7 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 void
 gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 {
-  uint j;
+  unsigned j;
 
   for (j = 0; j < sc->x509_ncas; j++)
     {

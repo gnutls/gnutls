@@ -341,7 +341,7 @@ gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
 
       end = end - start + 1;
 
-      if ((uint) end > *certificate_size)
+      if ((unsigned) end > *certificate_size)
 	{
 	  *certificate_size = end;
 	  result = GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -785,7 +785,7 @@ gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
 
   end = end - start + 1;
 
-  if ((uint) end > *crl_size)
+  if ((unsigned) end > *crl_size)
     {
       *crl_size = end;
       result = GNUTLS_E_SHORT_MEMORY_BUFFER;

@@ -77,7 +77,7 @@ int
 _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 			 size_t data_size)
 {
-  uint len;
+  unsigned len;
 
   if (_gnutls_kx_priority (session, GNUTLS_KX_SRP) < 0 &&
       _gnutls_kx_priority (session, GNUTLS_KX_SRP_DSS) < 0 &&

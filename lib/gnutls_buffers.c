@@ -233,7 +233,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
   size_t left;
   ssize_t i = 0;
   char *ptr = iptr;
-  uint j, x, sum = 0;
+  unsigned j, x, sum = 0;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 
   session->internals.direction = 0;
@@ -632,7 +632,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 			   const void *iptr, size_t n)
 {
   size_t left;
-  uint j, x, sum = 0;
+  unsigned j, x, sum = 0;
   ssize_t retval, i;
   const opaque *ptr;
   int ret;
@@ -725,7 +725,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 	  _gnutls_write_log
 	    ("WRITE: wrote %d bytes to %d. Left %d bytes. Total %d bytes.\n",
 	     i, fd, left, n);
-	  for (x = 0; x < (uint) ((i) / 16) + 1; x++)
+	  for (x = 0; x < (unsigned) ((i) / 16) + 1; x++)
 	    {
 	      line[0] = 0;
 

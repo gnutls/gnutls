@@ -246,7 +246,7 @@ typedef struct
 typedef struct
 {
   opaque name[MAX_SERVER_NAME_SIZE];
-  uint name_length;
+  unsigned name_length;
   gnutls_server_name_type_t type;
 } server_name_st;
 
@@ -256,7 +256,7 @@ typedef struct
 {
   server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
   /* limit server_name extensions */
-  uint server_names_size;
+  unsigned server_names_size;
   opaque srp_username[MAX_SRP_USERNAME + 1];
 } tls_ext_st;
 

@@ -537,7 +537,7 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
   GNUTLS_HASH_HANDLE td;
   int hash_len = _gnutls_hash_get_algo_len (HASH2MAC (algo));
 
-  if (hash_len < 0 || (uint) hash_len > *result_size || result == NULL)
+  if (hash_len < 0 || (unsigned) hash_len > *result_size || result == NULL)
     {
       *result_size = hash_len;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;

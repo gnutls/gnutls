@@ -47,7 +47,7 @@
 #include "debug.h"
 
 static gnutls_cert *alloc_and_load_x509_certs (gnutls_x509_crt_t * certs,
-					       uint);
+					       unsigned);
 static gnutls_privkey *alloc_and_load_x509_key (gnutls_x509_privkey_t key);
 static gnutls_cert *alloc_and_load_pgp_certs (gnutls_openpgp_key_t cert);
 static gnutls_privkey *alloc_and_load_pgp_key (const gnutls_openpgp_privkey_t
@@ -192,11 +192,11 @@ _find_x509_cert (const gnutls_certificate_credentials_t cred,
 		 const gnutls_pk_algorithm_t * pk_algos,
 		 int pk_algos_length, int *indx)
 {
-  uint size;
+  unsigned size;
   gnutls_datum_t odn;
   opaque *data = _data;
   ssize_t data_size = _data_size;
-  uint i, j;
+  unsigned i, j;
   int result, cert_pk;
 
   *indx = -1;
@@ -262,7 +262,7 @@ _find_openpgp_cert (const gnutls_certificate_credentials_t cred,
 		    gnutls_pk_algorithm_t * pk_algos,
 		    int pk_algos_length, int *indx)
 {
-  uint i, j;
+  unsigned i, j;
 
   *indx = -1;
 
@@ -297,7 +297,7 @@ static int
 get_issuers_num (gnutls_session_t session, opaque * data, ssize_t data_size)
 {
   int issuers_dn_len = 0, result;
-  uint size;
+  unsigned size;
 
   /* Count the number of the given issuers;
    * This is used to allocate the issuers_dn without
@@ -348,7 +348,7 @@ get_issuers (gnutls_session_t session,
 	     opaque * data, size_t data_size)
 {
   int i;
-  uint size;
+  unsigned size;
 
   if (gnutls_certificate_type_get (session) != GNUTLS_CRT_X509)
     return 0;
@@ -393,7 +393,7 @@ call_get_cert_callback (gnutls_session_t session,
 			int issuers_dn_length,
 			gnutls_pk_algorithm_t * pk_algos, int pk_algos_length)
 {
-  uint i;
+  unsigned i;
   gnutls_cert *local_certs = NULL;
   gnutls_privkey *local_key = NULL;
   gnutls_retr_st st;
@@ -1488,11 +1488,11 @@ _gnutls_get_selected_cert (gnutls_session_t session,
  * space for them.
  */
 static gnutls_cert *
-alloc_and_load_x509_certs (gnutls_x509_crt_t * certs, uint ncerts)
+alloc_and_load_x509_certs (gnutls_x509_crt_t * certs, unsigned ncerts)
 {
   gnutls_cert *local_certs;
   int ret = 0;
-  uint i, j;
+  unsigned i, j;
 
   if (certs == NULL)
     return NULL;
@@ -1686,7 +1686,7 @@ int
 _gnutls_server_select_cert (gnutls_session_t session,
 			    gnutls_pk_algorithm_t requested_algo)
 {
-  uint i;
+  unsigned i;
   int idx, ret;
   gnutls_certificate_credentials_t cred;
 

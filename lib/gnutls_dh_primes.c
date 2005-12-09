@@ -547,7 +547,7 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-      if ((uint) result + 1 > *params_data_size)
+      if ((unsigned) result + 1 > *params_data_size)
 	{
 	  gnutls_assert ();
 	  gnutls_free (out);

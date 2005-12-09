@@ -311,7 +311,7 @@ gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
   if (size < 0)
     return size;
 
-  if (result == NULL || *result_size < (uint) size)
+  if (result == NULL || *result_size < (unsigned) size)
     {
       gnutls_free (ret);
       *result_size = size;
@@ -544,7 +544,7 @@ gnutls_pem_base64_decode (const char *header,
   if (size < 0)
     return size;
 
-  if (result == NULL || *result_size < (uint) size)
+  if (result == NULL || *result_size < (unsigned) size)
     {
       gnutls_free (ret);
       *result_size = size;

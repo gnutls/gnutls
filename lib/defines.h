@@ -74,11 +74,6 @@ typedef int ssize_t;
 
 #include "memmem.h"
 
-#ifndef HAVE_UINT
-typedef unsigned int uint;
-typedef signed int sint;
-#endif
-
 #define SIZEOF_UNSIGNED_LONG_INT SIZEOF_UNSIGNED_LONG
 
 /* some systems had problems with long long int, thus,

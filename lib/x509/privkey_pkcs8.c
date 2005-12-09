@@ -1596,7 +1596,7 @@ generate_key (schema_id schema,
 
   if (schema == PBES2)
     kdf_params->salt_size =
-      MIN (sizeof (kdf_params->salt), (uint) (10 + (rnd[1] % 10)));
+      MIN (sizeof (kdf_params->salt), (unsigned) (10 + (rnd[1] % 10)));
   else
     kdf_params->salt_size = 8;
 

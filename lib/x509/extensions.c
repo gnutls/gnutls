@@ -232,7 +232,7 @@ _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
 	    {
 	      len = strlen (extnID) + 1;
 
-	      if (*sizeof_oid < (uint) len)
+	      if (*sizeof_oid < (unsigned) len)
 		{
 		  *sizeof_oid = len;
 		  gnutls_assert ();

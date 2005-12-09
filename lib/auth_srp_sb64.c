@@ -150,7 +150,7 @@ encode (uint8_t * result, const uint8_t * rdata, int left)
 int
 _gnutls_sbase64_encode (uint8_t * data, size_t data_size, uint8_t ** result)
 {
-  uint i, j;
+  unsigned i, j;
   int ret, tmp;
   opaque tmpres[4];
   int mod = data_size % 3;
@@ -251,7 +251,7 @@ decode (uint8_t * result, const uint8_t * data)
 int
 _gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
 {
-  uint i, j;
+  unsigned i, j;
   int ret, left;
   int data_size, tmp;
   uint8_t datrev[4];

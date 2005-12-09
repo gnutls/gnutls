@@ -45,7 +45,7 @@ gnutls_certificate_type_t gnutls_certificate_type_get (gnutls_session_t);
 int _gnutls_session_cert_type_supported (gnutls_session_t,
 					 gnutls_certificate_type_t);
 
-int _gnutls_dh_set_secret_bits (gnutls_session_t session, uint bits);
+int _gnutls_dh_set_secret_bits (gnutls_session_t session, unsigned bits);
 
 int _gnutls_dh_set_peer_public (gnutls_session_t session, mpi_t public);
 int _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime);

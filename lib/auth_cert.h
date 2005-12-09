@@ -48,11 +48,11 @@ typedef struct gnutls_certificate_credentials_st
    * (if more than one, one certificate certifies the one before)
    *       [1] certificate2, certificate22, ...
    */
-  uint *cert_list_length;
+  unsigned *cert_list_length;
   /* contains the number of the certificates in a
    * row (should be 1 for OpenPGP keys).
    */
-  uint ncerts;			/* contains the number of columns in cert_list.
+  unsigned ncerts;			/* contains the number of columns in cert_list.
 				 * This is the same with the number of pkeys.
 				 */
 
@@ -73,11 +73,11 @@ typedef struct gnutls_certificate_credentials_st
   /* X509 specific stuff */
 
   gnutls_x509_crt_t *x509_ca_list;
-  uint x509_ncas;		/* number of CAs in the ca_list 
+  unsigned x509_ncas;		/* number of CAs in the ca_list 
 				 */
 
   gnutls_x509_crl_t *x509_crl_list;
-  uint x509_ncrls;		/* number of CRLs in the crl_list 
+  unsigned x509_ncrls;		/* number of CRLs in the crl_list 
 				 */
 
   unsigned int verify_flags;	/* flags to be used at 

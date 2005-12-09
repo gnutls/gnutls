@@ -127,8 +127,8 @@ int
 _gnutls_session_cert_type_supported (gnutls_session_t session,
 				     gnutls_certificate_type_t cert_type)
 {
-  uint i;
-  uint cert_found = 0;
+  unsigned i;
+  unsigned cert_found = 0;
   gnutls_certificate_credentials_t cred;
 
   if (session->security_parameters.entity == GNUTLS_SERVER)
@@ -481,7 +481,7 @@ _gnutls_dh_set_peer_public (gnutls_session_t session, mpi_t public)
 }
 
 int
-_gnutls_dh_set_secret_bits (gnutls_session_t session, uint bits)
+_gnutls_dh_set_secret_bits (gnutls_session_t session, unsigned bits)
 {
   switch (gnutls_auth_get_type (session))
     {

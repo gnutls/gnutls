@@ -144,7 +144,7 @@ int
 _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
 			       size_t data_size)
 {
-  uint len, i;
+  unsigned len, i;
 
   /* this function sends the client extension data (dnsname) */
   if (session->security_parameters.entity == GNUTLS_CLIENT)
