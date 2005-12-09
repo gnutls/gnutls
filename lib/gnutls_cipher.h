@@ -29,7 +29,7 @@ int _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
 		     int random_pad);
 
 int _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
-		     size_t ciphertext_size, uint8 * data, size_t data_size,
+		     size_t ciphertext_size, uint8_t * data, size_t data_size,
 		     content_type_t type);
 int _gnutls_compressed2ciphertext (gnutls_session_t session,
 				   opaque * cipher_data, int cipher_size,
@@ -38,4 +38,4 @@ int _gnutls_compressed2ciphertext (gnutls_session_t session,
 int _gnutls_ciphertext2compressed (gnutls_session_t session,
 				   opaque * compress_data,
 				   int compress_size,
-				   gnutls_datum_t ciphertext, uint8 type);
+				   gnutls_datum_t ciphertext, uint8_t type);

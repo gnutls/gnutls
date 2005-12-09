@@ -460,7 +460,7 @@ _gnutls_x509_ext_extract_keyUsage (uint16 * keyUsage,
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int len, result;
-  uint8 str[2];
+  uint8_t str[2];
 
   str[0] = str[1] = 0;
   *keyUsage = 0;
@@ -600,7 +600,7 @@ _gnutls_x509_ext_gen_keyUsage (uint16 usage, gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
-  uint8 str[2];
+  uint8_t str[2];
 
   result = asn1_create_element (_gnutls_get_pkix (), "PKIX1.KeyUsage", &ext);
   if (result != ASN1_SUCCESS)
@@ -835,7 +835,7 @@ _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   gnutls_datum_t gnames = { NULL, 0 };
   int result;
-  uint8 reasons[2];
+  uint8_t reasons[2];
 
   reasons[0] = reason_flags & 0xff;
   reasons[1] = reason_flags >> 8;

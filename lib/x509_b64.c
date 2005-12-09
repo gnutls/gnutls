@@ -30,10 +30,10 @@
 #include <gnutls_datum.h>
 #include <x509_b64.h>
 
-static const uint8 b64table[] =
+static const uint8_t b64table[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static const uint8 asciitable[128] = {
+static const uint8_t asciitable[128] = {
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -59,7 +59,7 @@ static const uint8 asciitable[128] = {
 };
 
 inline static int
-encode (char *result, const uint8 * data, int left)
+encode (char *result, const uint8_t * data, int left)
 {
 
   int data_len;
@@ -107,9 +107,9 @@ encode (char *result, const uint8 * data, int left)
  */
 #define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
 inline static int
-decode (uint8 * result, const opaque * data)
+decode (uint8_t * result, const opaque * data)
 {
-  uint8 a1, a2;
+  uint8_t a1, a2;
   int ret = 3;
 
   a1 = TOASCII (data[0]);
@@ -142,7 +142,7 @@ decode (uint8 * result, const opaque * data)
  * The result_size is the return value
  */
 int
-_gnutls_base64_encode (const uint8 * data, size_t data_size, uint8 ** result)
+_gnutls_base64_encode (const uint8_t * data, size_t data_size, uint8_t ** result)
 {
   unsigned int i, j;
   int ret, tmp;
@@ -183,14 +183,14 @@ _gnutls_base64_encode (const uint8 * data, size_t data_size, uint8 ** result)
  * The result_size (including the null terminator) is the return value.
  */
 int
-_gnutls_fbase64_encode (const char *msg, const uint8 * data,
-			int data_size, uint8 ** result)
+_gnutls_fbase64_encode (const char *msg, const uint8_t * data,
+			int data_size, uint8_t ** result)
 {
   int i, ret, tmp, j;
   char tmpres[4];
-  uint8 *ptr;
-  uint8 top[80];
-  uint8 bottom[80];
+  uint8_t *ptr;
+  uint8_t top[80];
+  uint8_t bottom[80];
   int pos, bytes, top_len, bottom_len;
   size_t msglen = strlen (msg);
 
@@ -365,11 +365,11 @@ gnutls_pem_base64_encode_alloc (const char *msg,
  * The result_size is the return value
  */
 int
-_gnutls_base64_decode (const uint8 * data, size_t data_size, uint8 ** result)
+_gnutls_base64_decode (const uint8_t * data, size_t data_size, uint8_t ** result)
 {
   unsigned int i, j;
   int ret, tmp, est;
-  uint8 tmpres[3];
+  uint8_t tmpres[3];
 
   est = ((data_size * 3) / 4) + 1;
   (*result) = gnutls_malloc (est);
@@ -396,7 +396,7 @@ _gnutls_base64_decode (const uint8 * data, size_t data_size, uint8 ** result)
  * returns the size of the data copied.
  */
 inline static int
-cpydata (const uint8 * data, int data_size, uint8 ** result)
+cpydata (const uint8_t * data, int data_size, uint8_t ** result)
 {
   int i, j;
 
@@ -423,14 +423,14 @@ cpydata (const uint8 * data, int data_size, uint8 ** result)
 #define ENDSTR2 "-----\r"
 int
 _gnutls_fbase64_decode (const char *header, const opaque * data,
-			size_t data_size, uint8 ** result)
+			size_t data_size, uint8_t ** result)
 {
   int ret;
   static const char top[] = "-----BEGIN ";
   static const char bottom[] = "\n-----END ";
-  uint8 *rdata;
+  uint8_t *rdata;
   int rdata_size;
-  uint8 *kdata;
+  uint8_t *kdata;
   int kdata_size;
   char pem_header[128];
 

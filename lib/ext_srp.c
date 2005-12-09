@@ -37,7 +37,7 @@ int
 _gnutls_srp_recv_params (gnutls_session_t session, const opaque * data,
 			 size_t _data_size)
 {
-  uint8 len;
+  uint8_t len;
   ssize_t data_size = _data_size;
 
   if (_gnutls_kx_priority (session, GNUTLS_KX_SRP) < 0 &&
@@ -107,7 +107,7 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 	      return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	    }
 
-	  data[0] = (uint8) len;
+	  data[0] = (uint8_t) len;
 	  memcpy (&data[1], cred->username, len);
 	  return len + 1;
 	}
@@ -145,7 +145,7 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 	  session->internals.srp_username = username;
 	  session->internals.srp_password = password;
 
-	  data[0] = (uint8) len;
+	  data[0] = (uint8_t) len;
 	  memcpy (&data[1], username, len);
 	  return len + 1;
 	}

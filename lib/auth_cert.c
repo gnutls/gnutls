@@ -1029,7 +1029,7 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
       p++;
 
       DECR_LEN (dsize, 1);
-      len = (uint8) * p;
+      len = (uint8_t) * p;
       p++;
 
       if (len != 20)

@@ -217,9 +217,9 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
 {
   uint16 n_Y, n_g, n_p;
   size_t _n_Y, _n_g, _n_p;
-  uint8 *data_p;
-  uint8 *data_g;
-  uint8 *data_Y;
+  uint8_t *data_p;
+  uint8_t *data_g;
+  uint8_t *data_Y;
   int i, bits, psk_size, ret;
   ssize_t data_size = _data_size;
 
@@ -311,7 +311,7 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   mpi_t x, X;
   size_t n_X, n_g, n_p;
   int ret, data_size, pos;
-  uint8 *pdata;
+  uint8_t *pdata;
 
   X = gnutls_calc_dh_secret (&x, g, p);
   if (X == NULL || x == NULL)

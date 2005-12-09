@@ -51,7 +51,7 @@ int _gnutls_supported_ciphersuites (gnutls_session_t session,
 int _gnutls_supported_ciphersuites_sorted (gnutls_session_t session,
 					   cipher_suite_st ** ciphers);
 int _gnutls_supported_compression_methods (gnutls_session_t session,
-					   uint8 ** comp);
+					   uint8_t ** comp);
 const char *_gnutls_cipher_suite_get_name (cipher_suite_st * algorithm);
 gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo (const
 								cipher_suite_st

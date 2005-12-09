@@ -50,7 +50,7 @@ xml_add_tag (gnutls_string * xmlkey, const char *tag, const char *val)
 
 
 static int
-xml_add_mpi2 (gnutls_string * xmlkey, const uint8 * data, size_t count,
+xml_add_mpi2 (gnutls_string * xmlkey, const uint8_t * data, size_t count,
 	      const char *tag)
 {
   char *p = NULL;
@@ -84,7 +84,7 @@ static int
 xml_add_mpi (gnutls_string * xmlkey, cdk_pkt_pubkey_t pk, int idx,
 	     const char *tag)
 {
-  uint8 buf[4096];
+  uint8_t buf[4096];
   size_t nbytes;
 
   nbytes = sizeof buf - 1;
@@ -144,7 +144,7 @@ xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
 {
   const char *algo, *s;
   char keyid[16], fpr[41], tmp[32];
-  uint8 fingerpr[20];
+  uint8_t fingerpr[20];
   unsigned int kid[2];
   int i = 0, rc = 0;
 

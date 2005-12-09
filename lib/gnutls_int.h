@@ -209,7 +209,7 @@ struct gnutls_key_st
   gnutls_credentials_type_t auth_info_type;
   int auth_info_size;		/* needed in order to store to db for restoring 
 				 */
-  uint8 crypt_algo;
+  uint8_t crypt_algo;
 
   auth_cred_st *cred;		/* used to specify keys/certificates etc */
 
@@ -235,7 +235,7 @@ typedef struct gnutls_key_st *gnutls_key_st;
 
 typedef struct
 {
-  uint8 suite[2];
+  uint8_t suite[2];
 } cipher_suite_st;
 
 /* This structure holds parameters got from TLS extension
@@ -303,7 +303,7 @@ typedef struct
   opaque client_random[TLS_RANDOM_SIZE];
   opaque server_random[TLS_RANDOM_SIZE];
   opaque session_id[TLS_MAX_SESSION_ID_SIZE];
-  uint8 session_id_size;
+  uint8_t session_id_size;
   time_t timestamp;
   tls_ext_st extensions;
 
@@ -475,8 +475,8 @@ typedef struct
    * This is obtained by the Handshake Client Hello 
    * message. (some implementations read the Record version)
    */
-  uint8 adv_version_major;
-  uint8 adv_version_minor;
+  uint8_t adv_version_major;
+  uint8_t adv_version_minor;
 
   /* if this is non zero a certificate request message
    * will be sent to the client. - only if the ciphersuite

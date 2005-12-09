@@ -60,7 +60,7 @@ _gnutls_write_datum32 (opaque * dest, gnutls_datum_t dat)
 void
 _gnutls_write_datum8 (opaque * dest, gnutls_datum_t dat)
 {
-  dest[0] = (uint8) dat.size;
+  dest[0] = (uint8_t) dat.size;
   if (dat.data != NULL)
     memcpy (&dest[1], dat.data, dat.size);
 }

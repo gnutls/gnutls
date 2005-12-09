@@ -125,7 +125,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
  */
 int
 _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
-		 size_t ciphertext_size, uint8 * data,
+		 size_t ciphertext_size, uint8_t * data,
 		 size_t max_data_size, content_type_t type)
 {
   gnutls_datum_t gtxt;
@@ -221,10 +221,10 @@ mac_deinit (mac_hd_t td, opaque * res, int ver)
 
 inline static int
 calc_enc_length (gnutls_session_t session, int data_size,
-		 int hash_size, uint8 * pad, int random_pad,
+		 int hash_size, uint8_t * pad, int random_pad,
 		 cipher_type_t block_algo, uint16 blocksize)
 {
-  uint8 rnd;
+  uint8_t rnd;
   int length;
 
   *pad = 0;
@@ -260,7 +260,7 @@ calc_enc_length (gnutls_session_t session, int data_size,
 
       length = data_size + hash_size;
 
-      *pad = (uint8) (blocksize - (length % blocksize)) + rnd;
+      *pad = (uint8_t) (blocksize - (length % blocksize)) + rnd;
 
       length += *pad;
       if (session->security_parameters.version >= GNUTLS_TLS1_1)
@@ -286,13 +286,13 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 			       gnutls_datum_t compressed,
 			       content_type_t _type, int random_pad)
 {
-  uint8 MAC[MAX_HASH_SIZE];
+  uint8_t MAC[MAX_HASH_SIZE];
   uint16 c_length;
-  uint8 pad;
+  uint8_t pad;
   int length, ret;
   mac_hd_t td;
-  uint8 type = _type;
-  uint8 major, minor;
+  uint8_t type = _type;
+  uint8_t major, minor;
   int hash_size =
     _gnutls_hash_get_algo_len (session->security_parameters.
 			       write_mac_algorithm);
@@ -410,16 +410,16 @@ int
 _gnutls_ciphertext2compressed (gnutls_session_t session,
 			       opaque * compress_data,
 			       int compress_size,
-			       gnutls_datum_t ciphertext, uint8 type)
+			       gnutls_datum_t ciphertext, uint8_t type)
 {
-  uint8 MAC[MAX_HASH_SIZE];
+  uint8_t MAC[MAX_HASH_SIZE];
   uint16 c_length;
-  uint8 pad;
+  uint8_t pad;
   int length;
   mac_hd_t td;
   uint16 blocksize;
   int ret, i, pad_failed = 0;
-  uint8 major, minor;
+  uint8_t major, minor;
   gnutls_protocol_t ver;
   int hash_size =
     _gnutls_hash_get_algo_len (session->security_parameters.

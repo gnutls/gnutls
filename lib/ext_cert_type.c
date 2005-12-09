@@ -86,7 +86,7 @@ _gnutls_cert_type_recv_params (gnutls_session_t session,
 				 */
       if (data_size > 1)
 	{
-	  uint8 len;
+	  uint8_t len;
 
 	  len = data[0];
 	  DECR_LEN (data_size, len);
@@ -173,7 +173,7 @@ _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
 
 	  /* this is a vector!
 	   */
-	  data[0] = (uint8) len;
+	  data[0] = (uint8_t) len;
 
 	  for (i = 0; i < len; i++)
 	    {

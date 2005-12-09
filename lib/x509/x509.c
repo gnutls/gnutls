@@ -1702,7 +1702,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
   int len;
   char num[MAX_INT_DIGITS];
   gnutls_x509_subject_alt_name_t type;
-  uint8 reasons[2];
+  uint8_t reasons[2];
 
   if (cert == NULL)
     {

@@ -682,7 +682,7 @@ cleanup:
 static int
 create_empty_pfx (ASN1_TYPE pkcs12)
 {
-  uint8 three = 3;
+  uint8_t three = 3;
   int result;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 

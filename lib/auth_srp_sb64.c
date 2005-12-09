@@ -31,10 +31,10 @@
 /* this a modified base64 for srp !!! 
  * It seems that everybody makes an own base64 conversion.
  */
-static const uint8 b64table[] =
+static const uint8_t b64table[] =
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./";
 
-static const uint8 asciitable[128] = {
+static const uint8_t asciitable[128] = {
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
   0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -60,12 +60,12 @@ static const uint8 asciitable[128] = {
 };
 
 inline static int
-encode (uint8 * result, const uint8 * rdata, int left)
+encode (uint8_t * result, const uint8_t * rdata, int left)
 {
 
   int data_len;
   int c, ret = 4;
-  uint8 data[3];
+  uint8_t data[3];
 
   if (left > 3)
     data_len = 3;
@@ -148,7 +148,7 @@ encode (uint8 * result, const uint8 * rdata, int left)
  * The result_size is the return value
  */
 int
-_gnutls_sbase64_encode (uint8 * data, size_t data_size, uint8 ** result)
+_gnutls_sbase64_encode (uint8_t * data, size_t data_size, uint8_t ** result)
 {
   uint i, j;
   int ret, tmp;
@@ -206,9 +206,9 @@ _gnutls_sbase64_encode (uint8 * data, size_t data_size, uint8 ** result)
  */
 #define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
 inline static int
-decode (uint8 * result, const uint8 * data)
+decode (uint8_t * result, const uint8_t * data)
 {
-  uint8 a1, a2;
+  uint8_t a1, a2;
   int ret = 3;
 
   memset (result, 0, 3);
@@ -249,13 +249,13 @@ decode (uint8 * result, const uint8 * data)
  * before calling it.
  */
 int
-_gnutls_sbase64_decode (uint8 * data, size_t idata_size, uint8 ** result)
+_gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
 {
   uint i, j;
   int ret, left;
   int data_size, tmp;
-  uint8 datrev[4];
-  uint8 tmpres[3];
+  uint8_t datrev[4];
+  uint8_t tmpres[3];
 
   data_size = (idata_size / 4) * 4;
   left = idata_size % 4;

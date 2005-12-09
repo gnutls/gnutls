@@ -105,10 +105,4 @@ typedef unsigned short int uint16;
 # error "Cannot find a 16 bit integer in your system, sorry."
 #endif
 
-#if SIZEOF_UNSIGNED_CHAR == 1
-typedef unsigned char uint8;
-#else
-# error "Cannot find an 8 bit char in your system, sorry."
-#endif
-
 #endif /* defines_h */

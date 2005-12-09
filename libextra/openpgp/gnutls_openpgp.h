@@ -13,7 +13,7 @@ typedef struct
   int type;
   int armored;
   size_t size;
-  uint8 *data;
+  uint8_t *data;
 } keybox_blob;
 
 typedef enum

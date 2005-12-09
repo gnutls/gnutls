@@ -138,15 +138,15 @@ int
 _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
 {
   int ret;
-  uint8 *data_n, *data_s;
-  uint8 *data_g;
+  uint8_t *data_n, *data_s;
+  uint8_t *data_g;
   char *username;
   SRP_PWD_ENTRY *pwd_entry;
   srp_server_auth_info_t info;
   ssize_t data_size;
   size_t n_b, tmp_size;
   char buf[64];
-  uint8 *data_b;
+  uint8_t *data_b;
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_SRP,
@@ -260,7 +260,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
 {
   size_t n_a;
   int ret;
-  uint8 *data_a;
+  uint8_t *data_a;
   char *username, *password;
   char buf[64];
   gnutls_srp_client_credentials_t cred;
@@ -691,13 +691,13 @@ int
 _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
 			    size_t _data_size)
 {
-  uint8 n_s;
+  uint8_t n_s;
   uint16 n_g, n_n, n_b;
   size_t _n_s, _n_g, _n_n, _n_b;
-  const uint8 *data_n;
-  const uint8 *data_g;
-  const uint8 *data_s;
-  const uint8 *data_b;
+  const uint8_t *data_n;
+  const uint8_t *data_g;
+  const uint8_t *data_s;
+  const uint8_t *data_b;
   int i, ret;
   opaque hd[SRP_MAX_HASH_SIZE];
   char *username, *password;

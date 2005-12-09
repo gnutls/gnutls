@@ -153,7 +153,7 @@ _gnutls_server_name_send_params (gnutls_session_t session,
 	    session->security_parameters.extensions.server_names[i].
 	    name_length;
 
-	  /* uint8 + uint16 + size 
+	  /* uint8_t + uint16 + size 
 	   */
 	  total_size += 1 + 2 + len;
 	}

@@ -1127,9 +1127,9 @@ _gnutls_partition (gnutls_session_t session, void *_base,
 		   int (*compar) (gnutls_session_t,
 				  const void *, const void *))
 {
-  uint8 *base = _base;
-  uint8 tmp[MAX_ELEM_SIZE];
-  uint8 ptmp[MAX_ELEM_SIZE];
+  uint8_t *base = _base;
+  uint8_t tmp[MAX_ELEM_SIZE];
+  uint8_t ptmp[MAX_ELEM_SIZE];
   unsigned int pivot;
   unsigned int i, j;
   unsigned int full;
@@ -1405,11 +1405,11 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
 #define SUPPORTED_COMPRESSION_METHODS session->internals.compression_method_priority.algorithms
 int
 _gnutls_supported_compression_methods (gnutls_session_t session,
-				       uint8 ** comp)
+				       uint8_t ** comp)
 {
   unsigned int i, j;
 
-  *comp = gnutls_malloc (sizeof (uint8) * SUPPORTED_COMPRESSION_METHODS);
+  *comp = gnutls_malloc (sizeof (uint8_t) * SUPPORTED_COMPRESSION_METHODS);
   if (*comp == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
@@ -1428,7 +1428,7 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 	  continue;
 	}
 
-      (*comp)[j] = (uint8) tmp;
+      (*comp)[j] = (uint8_t) tmp;
       j++;
     }
 

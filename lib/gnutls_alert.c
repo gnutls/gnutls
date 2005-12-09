@@ -114,12 +114,12 @@ int
 gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
 		   gnutls_alert_description_t desc)
 {
-  uint8 data[2];
+  uint8_t data[2];
   int ret;
   const char *name;
 
-  data[0] = (uint8) level;
-  data[1] = (uint8) desc;
+  data[0] = (uint8_t) level;
+  data[1] = (uint8_t) desc;
 
   name = gnutls_alert_get_name ((int) data[1]);
   if (name == NULL)

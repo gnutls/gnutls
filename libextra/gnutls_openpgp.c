@@ -87,7 +87,7 @@ _gnutls_map_cdk_rc (int rc)
 
 
 static unsigned long
-buftou32 (const uint8 * buf)
+buftou32 (const uint8_t * buf)
 {
   unsigned a;
   a = buf[0] << 24;
@@ -213,11 +213,11 @@ kbx_read_blob (const gnutls_datum_t * keyring, size_t pos)
  * 4 octet  size of blob
  * n octets data
  */
-static uint8 *
+static uint8_t *
 kbx_data_to_keyring (int type, int enc, const char *data,
 		     size_t size, size_t * r_size)
 {
-  uint8 *p = NULL;
+  uint8_t *p = NULL;
 
   if (!data)
     return NULL;
@@ -260,7 +260,7 @@ search_packet (const gnutls_datum_t * buf, int pkttype)
 static int
 openpgp_pk_to_gnutls_cert (gnutls_cert * cert, cdk_pkt_pubkey_t pk)
 {
-  uint8 buf[512];
+  uint8_t buf[512];
   size_t nbytes = 0;
   int algo, i;
   int rc = 0;
@@ -325,7 +325,7 @@ _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
   cdk_pkt_seckey_t sk = NULL;
   int pke_algo, i, j;
   size_t nbytes = 0;
-  uint8 buf[512];
+  uint8_t buf[512];
   int rc = 0;
 
   if (!pkey || raw_key->size <= 0)
@@ -525,7 +525,7 @@ leave:
 static int
 stream_to_datum (cdk_stream_t inp, gnutls_datum_t * raw)
 {
-  uint8 buf[4096];
+  uint8_t buf[4096];
   int rc = 0, nread, nbytes = 0;
 
   if (!buf || !raw)
@@ -817,7 +817,7 @@ int
 gnutls_openpgp_add_keyring_file (gnutls_datum_t * keyring, const char *name)
 {
   cdk_stream_t inp = NULL;
-  uint8 *blob;
+  uint8_t *blob;
   size_t nbytes;
   int enc = 0;
   int rc = 0;
@@ -862,7 +862,7 @@ int
 gnutls_openpgp_add_keyring_mem (gnutls_datum_t * keyring,
 				const void *data, size_t len)
 {
-  uint8 *blob;
+  uint8_t *blob;
   size_t nbytes = 0;
 
   if (!keyring || !data || !len)
@@ -934,7 +934,7 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
 {
   cdk_stream_t inp;
   size_t count;
-  uint8 *buf;
+  uint8_t *buf;
   int rc = 0;
 
   if (!c || !data || !dlen)

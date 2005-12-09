@@ -72,7 +72,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
   gnutls_rsa_params_t rsa_params;
   const mpi_t *rsa_mpis;
   size_t n_e, n_m;
-  uint8 *data_e, *data_m;
+  uint8_t *data_e, *data_m;
   int ret = 0, data_size;
   gnutls_cert *apr_cert_list;
   gnutls_privkey *apr_pkey;
@@ -236,8 +236,8 @@ proc_rsa_export_server_kx (gnutls_session_t session,
 {
   uint16 n_m, n_e;
   size_t _n_m, _n_e;
-  uint8 *data_m;
-  uint8 *data_e;
+  uint8_t *data_m;
+  uint8_t *data_e;
   int i, sigsize;
   gnutls_datum_t vparams, signature;
   int ret;

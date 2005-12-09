@@ -309,12 +309,12 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 		  gnutls_handshake_description_t htype, const void *_data,
 		  size_t sizeofdata)
 {
-  uint8 *cipher;
+  uint8_t *cipher;
   int cipher_size;
   int retval, ret;
   int data2send_size;
-  uint8 headers[5];
-  const uint8 *data = _data;
+  uint8_t headers[5];
+  const uint8_t *data = _data;
   int erecord_size = 0;
   opaque *erecord = NULL;
 
@@ -530,7 +530,7 @@ check_buffers (gnutls_session_t session, content_type_t type,
  */
 static int
 record_check_headers (gnutls_session_t session,
-		      uint8 headers[RECORD_HEADER_SIZE], content_type_t type,
+		      uint8_t headers[RECORD_HEADER_SIZE], content_type_t type,
 		      gnutls_handshake_description_t htype,
 		      /*output */ content_type_t * recv_type,
 		      opaque version[2], uint16 * length,
@@ -803,11 +803,11 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
   gnutls_datum_t tmp;
   int decrypted_length;
   opaque version[2];
-  uint8 *headers;
+  uint8_t *headers;
   content_type_t recv_type;
   uint16 length;
-  uint8 *ciphertext;
-  uint8 *recv_data;
+  uint8_t *ciphertext;
+  uint8_t *recv_data;
   int ret, ret2;
   uint16 header_size;
   int empty_packet = 0;

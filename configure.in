@@ -168,7 +168,6 @@ AC_MSG_RESULT([***
 AC_CHECK_SIZEOF(unsigned long, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(unsigned short, 2)
-AC_CHECK_SIZEOF(unsigned char, 1)
 AC_CHECK_SIZEOF(unsigned char*, 4)
 
 # For some systems we know that we have ld_version scripts.

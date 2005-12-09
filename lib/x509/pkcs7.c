@@ -452,7 +452,7 @@ gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
 static int
 create_empty_signed_data (ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 {
-  uint8 one = 1;
+  uint8_t one = 1;
   int result;
 
   *sdata = ASN1_TYPE_EMPTY;

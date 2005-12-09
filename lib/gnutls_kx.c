@@ -117,7 +117,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 int
 _gnutls_send_server_kx_message (gnutls_session_t session, int again)
 {
-  uint8 *data = NULL;
+  uint8_t *data = NULL;
   int data_size = 0;
   int ret = 0;
 
@@ -165,7 +165,7 @@ _gnutls_send_server_kx_message (gnutls_session_t session, int again)
 int
 _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
 {
-  uint8 *data = NULL;
+  uint8_t *data = NULL;
   int data_size = 0;
   int ret = 0;
 
@@ -211,7 +211,7 @@ _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
 int
 _gnutls_send_client_kx_message (gnutls_session_t session, int again)
 {
-  uint8 *data;
+  uint8_t *data;
   int data_size;
   int ret = 0;
 
@@ -254,7 +254,7 @@ _gnutls_send_client_kx_message (gnutls_session_t session, int again)
 int
 _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
 {
-  uint8 *data;
+  uint8_t *data;
   int ret = 0;
   int data_size;
 
@@ -305,7 +305,7 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
 int
 _gnutls_recv_server_kx_message (gnutls_session_t session)
 {
-  uint8 *data = NULL;
+  uint8_t *data = NULL;
   int datasize;
   int ret = 0;
 
@@ -350,7 +350,7 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 int
 _gnutls_recv_server_certificate_request (gnutls_session_t session)
 {
-  uint8 *data;
+  uint8_t *data;
   int datasize;
   int ret = 0;
 
@@ -383,7 +383,7 @@ _gnutls_recv_server_certificate_request (gnutls_session_t session)
 int
 _gnutls_recv_client_kx_message (gnutls_session_t session)
 {
-  uint8 *data;
+  uint8_t *data;
   int datasize;
   int ret = 0;
 
@@ -418,7 +418,7 @@ _gnutls_recv_client_kx_message (gnutls_session_t session)
 int
 _gnutls_send_client_certificate (gnutls_session_t session, int again)
 {
-  uint8 *data = NULL;
+  uint8_t *data = NULL;
   int data_size = 0;
   int ret = 0;
 
@@ -488,7 +488,7 @@ _gnutls_send_client_certificate (gnutls_session_t session, int again)
 int
 _gnutls_send_server_certificate (gnutls_session_t session, int again)
 {
-  uint8 *data = NULL;
+  uint8_t *data = NULL;
   int data_size = 0;
   int ret = 0;
 
@@ -664,7 +664,7 @@ _gnutls_recv_server_certificate (gnutls_session_t session)
 int
 _gnutls_recv_client_certificate_verify_message (gnutls_session_t session)
 {
-  uint8 *data;
+  uint8_t *data;
   int datasize;
   int ret = 0;
 

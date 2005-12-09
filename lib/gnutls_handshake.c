@@ -125,13 +125,13 @@ resume_copy_required_values (gnutls_session_t session)
 }
 
 void
-_gnutls_set_server_random (gnutls_session_t session, uint8 * rnd)
+_gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd)
 {
   memcpy (session->security_parameters.server_random, rnd, TLS_RANDOM_SIZE);
 }
 
 void
-_gnutls_set_client_random (gnutls_session_t session, uint8 * rnd)
+_gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd)
 {
   memcpy (session->security_parameters.client_random, rnd, TLS_RANDOM_SIZE);
 }
@@ -269,7 +269,7 @@ int
 _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 			   int datalen)
 {
-  uint8 session_id_len, z;
+  uint8_t session_id_len, z;
   int pos = 0, ret;
   uint16 suite_size;
   gnutls_protocol_t version;
@@ -445,7 +445,7 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
 int
 _gnutls_send_finished (gnutls_session_t session, int again)
 {
-  uint8 data[36];
+  uint8_t data[36];
   int ret;
   int data_size = 0;
 
@@ -498,7 +498,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 int
 _gnutls_recv_finished (gnutls_session_t session)
 {
-  uint8 data[36], *vrfy;
+  uint8_t data[36], *vrfy;
   int data_size;
   int ret;
   int vrfysize;
@@ -734,7 +734,7 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
 				   opaque * data, int datalen)
 {
   int x, i, j;
-  uint8 *comps;
+  uint8_t *comps;
 
   x = _gnutls_supported_compression_methods (session, &comps);
   if (x < 0)
@@ -837,7 +837,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 			gnutls_handshake_description_t type)
 {
   int ret;
-  uint8 *data;
+  uint8_t *data;
   uint32 datasize;
   int pos = 0;
 
@@ -866,7 +866,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  data[pos++] = (uint8) type;
+  data[pos++] = (uint8_t) type;
   _gnutls_write_uint24 (i_datasize, &data[pos]);
   pos += 3;
 
@@ -913,7 +913,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 {
   int ret;
   uint32 length32 = 0;
-  uint8 *dataptr = NULL;	/* for realloc */
+  uint8_t *dataptr = NULL;	/* for realloc */
   size_t handshake_header_size = HANDSHAKE_HEADER_SIZE;
 
   /* if we have data into the buffer then return them, do not read the next packet.
@@ -1089,7 +1089,7 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
  * passed to _gnutls_recv_hello().
  */
 int
-_gnutls_recv_handshake (gnutls_session_t session, uint8 ** data,
+_gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
 			int *datalen, gnutls_handshake_description_t type,
 			Optional optional)
 {
@@ -1225,7 +1225,7 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8 ** data,
 static int
 _gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
 {
-  uint8 z;
+  uint8_t z;
   cipher_suite_st *cipher_suites;
   int cipher_suite_num;
   int i, err;
@@ -1306,7 +1306,7 @@ static int
 _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
 {
   int comp_methods_num;
-  uint8 *compression_methods;
+  uint8_t *compression_methods;
   int i;
 
   comp_methods_num = _gnutls_supported_compression_methods (session,
@@ -1396,7 +1396,7 @@ static int
 _gnutls_read_server_hello (gnutls_session_t session,
 			   opaque * data, int datalen)
 {
-  uint8 session_id_len = 0;
+  uint8_t session_id_len = 0;
   int pos = 0;
   int ret = 0;
   gnutls_protocol_t version;
@@ -1570,7 +1570,7 @@ _gnutls_copy_comp_methods (gnutls_session_t session,
 			   opaque * ret_data, size_t ret_data_size)
 {
   int ret, i;
-  uint8 *compression_methods, comp_num;
+  uint8_t *compression_methods, comp_num;
   int datalen, pos;
 
   ret = _gnutls_supported_compression_methods (session, &compression_methods);
@@ -1623,7 +1623,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
   opaque *SessionID =
     session->internals.resumed_security_parameters.session_id;
-  uint8 session_id_len =
+  uint8_t session_id_len =
     session->internals.resumed_security_parameters.session_id_size;
 
   if (SessionID == NULL)
@@ -1802,9 +1802,9 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
   int extdatalen;
   int pos = 0;
   int datalen, ret = 0;
-  uint8 comp;
+  uint8_t comp;
   opaque *SessionID = session->security_parameters.session_id;
-  uint8 session_id_len = session->security_parameters.session_id_size;
+  uint8_t session_id_len = session->security_parameters.session_id_size;
   opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
 
   if (SessionID == NULL)
@@ -1886,7 +1886,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
       pos += 2;
 
       comp =
-	(uint8) _gnutls_compression_get_num (session->
+	(uint8_t) _gnutls_compression_get_num (session->
 					     internals.compression_method);
       data[pos++] = comp;
 
@@ -2340,7 +2340,7 @@ static int
 _gnutls_recv_handshake_final (gnutls_session_t session, int init)
 {
   int ret = 0;
-  uint8 ch;
+  uint8_t ch;
 
   switch (STATE)
     {
@@ -2528,7 +2528,7 @@ restart:
 }
 
 int
-_gnutls_generate_session_id (opaque * session_id, uint8 * len)
+_gnutls_generate_session_id (opaque * session_id, uint8_t * len)
 {
   *len = TLS_MAX_SESSION_ID_SIZE;
 
@@ -2545,7 +2545,7 @@ int
 _gnutls_recv_hello_request (gnutls_session_t session, void *data,
 			    uint32 data_size)
 {
-  uint8 type;
+  uint8_t type;
 
   if (session->security_parameters.entity == GNUTLS_SERVER)
     {
@@ -2557,7 +2557,7 @@ _gnutls_recv_hello_request (gnutls_session_t session, void *data,
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
-  type = ((uint8 *) data)[0];
+  type = ((uint8_t *) data)[0];
   if (type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
     return GNUTLS_E_REHANDSHAKE;
   else
