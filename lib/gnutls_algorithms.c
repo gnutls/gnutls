@@ -132,10 +132,10 @@ struct gnutls_cipher_entry
 {
   const char *name;
   gnutls_cipher_algorithm_t id;
-  uint16 blocksize;
-  uint16 keysize;
+  uint16_t blocksize;
+  uint16_t keysize;
   cipher_type_t block;
-  uint16 iv;
+  uint16_t iv;
   int export_flag;		/* 0 non export */
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;

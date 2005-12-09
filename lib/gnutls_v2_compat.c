@@ -92,15 +92,15 @@ int
 _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
 			      int datalen)
 {
-  uint16 session_id_len = 0;
+  uint16_t session_id_len = 0;
   int pos = 0;
   int ret = 0;
-  uint16 sizeOfSuites;
+  uint16_t sizeOfSuites;
   gnutls_protocol_t version;
   opaque rnd[TLS_RANDOM_SIZE];
   int len = datalen;
   int err;
-  uint16 challenge;
+  uint16_t challenge;
   opaque session_id[TLS_MAX_SESSION_ID_SIZE];
   gnutls_protocol_t ver;
 
@@ -133,7 +133,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   pos += 2;
 
 
-  /* Read uint16 cipher_spec_length */
+  /* Read uint16_t cipher_spec_length */
   DECR_LEN (len, 2);
   sizeOfSuites = _gnutls_read_uint16 (&data[pos]);
   pos += 2;

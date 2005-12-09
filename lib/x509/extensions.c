@@ -455,7 +455,7 @@ _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
  * extension.
  */
 int
-_gnutls_x509_ext_extract_keyUsage (uint16 * keyUsage,
+_gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
 				   opaque * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
@@ -596,7 +596,7 @@ _gnutls_x509_ext_gen_basicConstraints (int CA, gnutls_datum_t * der_ext)
  * Use an ORed SEQUENCE of GNUTLS_KEY_* for usage.
  */
 int
-_gnutls_x509_ext_gen_keyUsage (uint16 usage, gnutls_datum_t * der_ext)
+_gnutls_x509_ext_gen_keyUsage (uint16_t usage, gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;

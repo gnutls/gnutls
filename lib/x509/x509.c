@@ -1068,7 +1068,7 @@ gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
 {
   int result;
   gnutls_datum_t keyUsage;
-  uint16 _usage;
+  uint16_t _usage;
 
   if (cert == NULL)
     {

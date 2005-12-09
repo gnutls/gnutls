@@ -137,11 +137,11 @@ _gnutls_write_uint32 (uint32 num, opaque * data)
   memcpy (data, &num, sizeof (uint32));
 }
 
-uint16
+uint16_t
 _gnutls_read_uint16 (const opaque * data)
 {
-  uint16 res;
-  memcpy (&res, data, sizeof (uint16));
+  uint16_t res;
+  memcpy (&res, data, sizeof (uint16_t));
 #ifndef WORDS_BIGENDIAN
   res = byteswap16 (res);
 #endif
@@ -149,13 +149,13 @@ _gnutls_read_uint16 (const opaque * data)
 }
 
 void
-_gnutls_write_uint16 (uint16 num, opaque * data)
+_gnutls_write_uint16 (uint16_t num, opaque * data)
 {
 
 #ifndef WORDS_BIGENDIAN
   num = byteswap16 (num);
 #endif
-  memcpy (data, &num, sizeof (uint16));
+  memcpy (data, &num, sizeof (uint16_t));
 }
 
 uint32
@@ -168,8 +168,8 @@ _gnutls_conv_uint32 (uint32 data)
 #endif
 }
 
-uint16
-_gnutls_conv_uint16 (uint16 data)
+uint16_t
+_gnutls_conv_uint16 (uint16_t data)
 {
 #ifndef WORDS_BIGENDIAN
   return byteswap16 (data);

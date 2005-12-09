@@ -355,7 +355,7 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
 
   /* generate the extension.
    */
-  result = _gnutls_x509_ext_gen_keyUsage ((uint16) usage, &der_data);
+  result = _gnutls_x509_ext_gen_keyUsage ((uint16_t) usage, &der_data);
   if (result < 0)
     {
       gnutls_assert ();

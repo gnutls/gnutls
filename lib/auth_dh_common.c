@@ -57,7 +57,7 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
 				  opaque * data, size_t _data_size,
 				  mpi_t g, mpi_t p)
 {
-  uint16 n_Y;
+  uint16_t n_Y;
   size_t _n_Y;
   int ret;
   ssize_t data_size = _data_size;
@@ -215,7 +215,7 @@ int
 _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
 				  opaque * data, size_t _data_size, int psk)
 {
-  uint16 n_Y, n_g, n_p;
+  uint16_t n_Y, n_g, n_p;
   size_t _n_Y, _n_g, _n_p;
   uint8_t *data_p;
   uint8_t *data_g;

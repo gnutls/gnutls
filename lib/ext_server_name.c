@@ -44,7 +44,7 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
 {
   int i;
   const unsigned char *p;
-  uint16 len, type;
+  uint16_t len, type;
   ssize_t data_size = _data_size;
   int server_names = 0;
 
@@ -127,7 +127,7 @@ int
 _gnutls_server_name_send_params (gnutls_session_t session,
 				 opaque * data, size_t _data_size)
 {
-  uint16 len;
+  uint16_t len;
   opaque *p;
   uint i;
   ssize_t data_size = _data_size;
@@ -141,7 +141,7 @@ _gnutls_server_name_send_params (gnutls_session_t session,
       if (session->security_parameters.extensions.server_names_size == 0)
 	return 0;
 
-      /* uint16 
+      /* uint16_t 
        */
       total_size = 2;
       for (i = 0;
@@ -153,7 +153,7 @@ _gnutls_server_name_send_params (gnutls_session_t session,
 	    session->security_parameters.extensions.server_names[i].
 	    name_length;
 
-	  /* uint8_t + uint16 + size 
+	  /* uint8_t + uint16_t + size 
 	   */
 	  total_size += 1 + 2 + len;
 	}

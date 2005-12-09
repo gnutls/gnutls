@@ -118,9 +118,9 @@ _gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * dh_secret)
     }
 
   /* format of the premaster secret:
-   * (uint16) psk_size
+   * (uint16_t) psk_size
    * psk_size bytes of zeros
-   * (uint16) psk_size
+   * (uint16_t) psk_size
    * the psk
    */
   _gnutls_write_uint16 (dh_secret_size, session->key->key.data);

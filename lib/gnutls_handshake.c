@@ -271,7 +271,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 {
   uint8_t session_id_len, z;
   int pos = 0, ret;
-  uint16 suite_size;
+  uint16_t suite_size;
   gnutls_protocol_t version;
   int len = datalen;
   opaque rnd[TLS_RANDOM_SIZE], *suite_ptr;
@@ -1042,7 +1042,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 static int
 _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 				  gnutls_handshake_description_t recv_type,
-				  opaque * header, uint16 header_size,
+				  opaque * header, uint16_t header_size,
 				  opaque * dataptr, uint32 datalen)
 {
   int ret;
@@ -1502,7 +1502,7 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
 {
   int ret, i;
   cipher_suite_st *cipher_suites;
-  uint16 cipher_num;
+  uint16_t cipher_num;
   int datalen, pos;
 
   ret = _gnutls_supported_ciphersuites_sorted (session, &cipher_suites);
@@ -1536,11 +1536,11 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
 
   cipher_num = ret;
 
-  cipher_num *= sizeof (uint16);	/* in order to get bytes */
+  cipher_num *= sizeof (uint16_t);	/* in order to get bytes */
 
   datalen = pos = 0;
 
-  datalen += sizeof (uint16) + cipher_num;
+  datalen += sizeof (uint16_t) + cipher_num;
 
   if ((size_t) datalen > ret_data_size)
     {

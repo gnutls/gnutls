@@ -533,8 +533,8 @@ record_check_headers (gnutls_session_t session,
 		      uint8_t headers[RECORD_HEADER_SIZE], content_type_t type,
 		      gnutls_handshake_description_t htype,
 		      /*output */ content_type_t * recv_type,
-		      opaque version[2], uint16 * length,
-		      uint16 * header_size)
+		      opaque version[2], uint16_t * length,
+		      uint16_t * header_size)
 {
 
   /* Read the first two bytes to determine if this is a 
@@ -805,11 +805,11 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
   opaque version[2];
   uint8_t *headers;
   content_type_t recv_type;
-  uint16 length;
+  uint16_t length;
   uint8_t *ciphertext;
   uint8_t *recv_data;
   int ret, ret2;
-  uint16 header_size;
+  uint16_t header_size;
   int empty_packet = 0;
 
   if (type != GNUTLS_ALERT && (sizeofdata == 0 || data == NULL))

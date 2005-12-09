@@ -73,7 +73,7 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
 /* EXTENSION functions */
 
 ext_recv_func
-_gnutls_ext_func_recv (uint16 type)
+_gnutls_ext_func_recv (uint16_t type)
 {
   ext_recv_func ret = NULL;
   GNUTLS_EXTENSION_LOOP (ret = p->gnutls_ext_func_recv);
@@ -82,7 +82,7 @@ _gnutls_ext_func_recv (uint16 type)
 }
 
 ext_send_func
-_gnutls_ext_func_send (uint16 type)
+_gnutls_ext_func_send (uint16_t type)
 {
   ext_send_func ret = NULL;
   GNUTLS_EXTENSION_LOOP (ret = p->gnutls_ext_func_send);
@@ -91,7 +91,7 @@ _gnutls_ext_func_send (uint16 type)
 }
 
 const char *
-_gnutls_extension_get_name (uint16 type)
+_gnutls_extension_get_name (uint16_t type)
 {
   const char *ret = NULL;
 
@@ -105,7 +105,7 @@ _gnutls_extension_get_name (uint16 type)
  * requested ones. Otherwise it's a fatal error.
  */
 static int
-_gnutls_extension_list_check (gnutls_session_t session, uint16 type)
+_gnutls_extension_list_check (gnutls_session_t session, uint16_t type)
 {
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
@@ -127,10 +127,10 @@ _gnutls_parse_extensions (gnutls_session_t session, const opaque * data,
 {
   int next, ret;
   int pos = 0;
-  uint16 type;
+  uint16_t type;
   const opaque *sdata;
   ext_recv_func ext_recv;
-  uint16 size;
+  uint16_t size;
 
 #ifdef DEBUG
   int i;
@@ -196,7 +196,7 @@ _gnutls_parse_extensions (gnutls_session_t session, const opaque * data,
  * extensions are the ones we requested.
  */
 static void
-_gnutls_extension_list_add (gnutls_session_t session, uint16 type)
+_gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
 {
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
@@ -219,7 +219,7 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 			size_t data_size)
 {
   int next, size;
-  uint16 pos = 0;
+  uint16_t pos = 0;
   opaque *sdata;
   int sdata_size;
   ext_send_func ext_send;

@@ -97,12 +97,4 @@ typedef unsigned int uint32;
 # error "Cannot find a 32 bit integer in your system, sorry."
 #endif
 
-#if SIZEOF_UNSIGNED_INT == 2
-typedef unsigned int uint16;
-#elif SIZEOF_UNSIGNED_SHORT == 2
-typedef unsigned short int uint16;
-#else
-# error "Cannot find a 16 bit integer in your system, sorry."
-#endif
-
 #endif /* defines_h */

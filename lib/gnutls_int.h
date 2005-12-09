@@ -310,8 +310,8 @@ typedef struct
   /* The send size is the one requested by the programmer.
    * The recv size is the one negotiated with the peer.
    */
-  uint16 max_record_send_size;
-  uint16 max_record_recv_size;
+  uint16_t max_record_send_size;
+  uint16_t max_record_recv_size;
   /* holds the negotiated certificate type */
   gnutls_certificate_type_t cert_type;
   gnutls_protocol_t version;	/* moved here */
@@ -488,7 +488,7 @@ typedef struct
    * use _gnutls_dh_get_prime_bits() and gnutls_dh_set_prime_bits() 
    * to access it.
    */
-  uint16 dh_prime_bits;
+  uint16_t dh_prime_bits;
 
   size_t max_handshake_data_buffer_size;
 
@@ -513,7 +513,7 @@ typedef struct
   /* Holds the record size requested by the
    * user.
    */
-  uint16 proposed_record_size;
+  uint16_t proposed_record_size;
 
   /* holds the selected certificate and key.
    * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
@@ -527,8 +527,8 @@ typedef struct
   /* holds the extensions we sent to the peer
    * (in case of a client)
    */
-  uint16 extensions_sent[MAX_EXT_TYPES];
-  uint16 extensions_sent_size;
+  uint16_t extensions_sent[MAX_EXT_TYPES];
+  uint16_t extensions_sent_size;
 
   /* is 0 if we are to send the whole PGP key, or non zero
    * if the fingerprint is to be sent.

@@ -222,7 +222,7 @@ mac_deinit (mac_hd_t td, opaque * res, int ver)
 inline static int
 calc_enc_length (gnutls_session_t session, int data_size,
 		 int hash_size, uint8_t * pad, int random_pad,
-		 cipher_type_t block_algo, uint16 blocksize)
+		 cipher_type_t block_algo, uint16_t blocksize)
 {
   uint8_t rnd;
   int length;
@@ -287,7 +287,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 			       content_type_t _type, int random_pad)
 {
   uint8_t MAC[MAX_HASH_SIZE];
-  uint16 c_length;
+  uint16_t c_length;
   uint8_t pad;
   int length, ret;
   mac_hd_t td;
@@ -413,11 +413,11 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 			       gnutls_datum_t ciphertext, uint8_t type)
 {
   uint8_t MAC[MAX_HASH_SIZE];
-  uint16 c_length;
+  uint16_t c_length;
   uint8_t pad;
   int length;
   mac_hd_t td;
-  uint16 blocksize;
+  uint16_t blocksize;
   int ret, i, pad_failed = 0;
   uint8_t major, minor;
   gnutls_protocol_t ver;
@@ -524,7 +524,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 
   if (length < 0)
     length = 0;
-  c_length = _gnutls_conv_uint16 ((uint16) length);
+  c_length = _gnutls_conv_uint16 ((uint16_t) length);
 
   /* Pass the type, version, length and compressed through
    * MAC.

@@ -105,7 +105,7 @@ int
 _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
 				size_t data_size)
 {
-  uint16 len;
+  uint16_t len;
   /* this function sends the client extension data (dnsname) */
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
@@ -177,7 +177,7 @@ _gnutls_mre_num2record (int num)
  * extensions draft.
  */
 int
-_gnutls_mre_record2num (uint16 record_size)
+_gnutls_mre_record2num (uint16_t record_size)
 {
   switch (record_size)
     {

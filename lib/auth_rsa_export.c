@@ -234,7 +234,7 @@ static int
 proc_rsa_export_server_kx (gnutls_session_t session,
 			   opaque * data, size_t _data_size)
 {
-  uint16 n_m, n_e;
+  uint16_t n_m, n_e;
   size_t _n_m, _n_e;
   uint8_t *data_m;
   uint8_t *data_e;
