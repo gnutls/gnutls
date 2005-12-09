@@ -3,6 +3,17 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.3.2 (unreleased)
+
+** Internal type cleanups.
+The uint8, uint16, uint32 types have been replaced by uint8_t,
+uint16_t, uint32_t.  Gnulib is used to guarantee the presence of
+correct types on platforms that lack them.  The uint type have been
+replaced by unsigned.
+
+** API and ABI modifications:
+None
+
 * Version 1.3.1 (released 2005-12-08)
 
 ** Support for DHE-PSK cipher suites has been added.
