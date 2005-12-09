@@ -21,7 +21,7 @@ EXTRA_DIST = README README.srptool gnutls-http-serv params.pem
 
 SUBDIRS = srp x509 openpgp cfg
 
-INCLUDES = -I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes \
+INCLUDES = -I../includes -I$(top_srcdir)/includes \
 	-I$(top_srcdir)/gl -I$(srcdir)/cfg
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug certtool
