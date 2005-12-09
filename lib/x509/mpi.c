@@ -609,7 +609,7 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
 /* Writes the specified integer into the specified node.
  */
 int
-_gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value, uint32 num)
+_gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value, uint32_t num)
 {
   opaque tmpstr[4];
   int result;

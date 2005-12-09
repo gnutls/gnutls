@@ -239,7 +239,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
 int
 _gnutls_tls_create_random (opaque * dst)
 {
-  uint32 tim;
+  uint32_t tim;
 
   /* Use weak random numbers for the most of the
    * buffer except for the first 4 that are the
@@ -804,7 +804,7 @@ _gnutls_send_empty_handshake (gnutls_session_t session,
 static int
 _gnutls_handshake_hash_add_sent (gnutls_session_t session,
 				 gnutls_handshake_description_t type,
-				 opaque * dataptr, uint32 datalen)
+				 opaque * dataptr, uint32_t datalen)
 {
   int ret;
 
@@ -833,12 +833,12 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
  */
 int
 _gnutls_send_handshake (gnutls_session_t session, void *i_data,
-			uint32 i_datasize,
+			uint32_t i_datasize,
 			gnutls_handshake_description_t type)
 {
   int ret;
   uint8_t *data;
-  uint32 datasize;
+  uint32_t datasize;
   int pos = 0;
 
   if (i_data == NULL && i_datasize == 0)
@@ -912,7 +912,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 			       gnutls_handshake_description_t * recv_type)
 {
   int ret;
-  uint32 length32 = 0;
+  uint32_t length32 = 0;
   uint8_t *dataptr = NULL;	/* for realloc */
   size_t handshake_header_size = HANDSHAKE_HEADER_SIZE;
 
@@ -1043,7 +1043,7 @@ static int
 _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 				  gnutls_handshake_description_t recv_type,
 				  opaque * header, uint16_t header_size,
-				  opaque * dataptr, uint32 datalen)
+				  opaque * dataptr, uint32_t datalen)
 {
   int ret;
 
@@ -1094,7 +1094,7 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
 			Optional optional)
 {
   int ret;
-  uint32 length32 = 0;
+  uint32_t length32 = 0;
   opaque *dataptr = NULL;
   gnutls_handshake_description_t recv_type;
 
@@ -2543,7 +2543,7 @@ _gnutls_generate_session_id (opaque * session_id, uint8_t * len)
 
 int
 _gnutls_recv_hello_request (gnutls_session_t session, void *data,
-			    uint32 data_size)
+			    uint32_t data_size)
 {
   uint8_t type;
 

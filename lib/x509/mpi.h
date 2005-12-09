@@ -45,7 +45,7 @@ int _gnutls_x509_read_int (ASN1_TYPE node, const char *value,
 			   mpi_t * ret_mpi);
 int _gnutls_x509_write_int (ASN1_TYPE node, const char *value, mpi_t mpi,
 			    int lz);
-int _gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value, uint32 num);
+int _gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value, uint32_t num);
 
 int _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
 				   gnutls_pk_algorithm_t pk_algorithm,

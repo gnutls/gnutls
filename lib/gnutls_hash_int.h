@@ -65,7 +65,7 @@ int _gnutls_ssl3_hash_md5 (void *first, int first_len, void *second,
 			   int second_len, int ret_len, opaque * ret);
 
 void _gnutls_mac_deinit_ssl3_handshake (mac_hd_t handle, void *digest,
-					opaque * key, uint32 key_size);
+					opaque * key, uint32_t key_size);
 
 GNUTLS_HASH_HANDLE _gnutls_hash_copy (GNUTLS_HASH_HANDLE handle);
 

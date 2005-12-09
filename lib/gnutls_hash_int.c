@@ -297,7 +297,7 @@ _gnutls_mac_deinit_ssl3 (mac_hd_t handle, void *digest)
 void
 _gnutls_mac_deinit_ssl3_handshake (mac_hd_t handle,
 				   void *digest, opaque * key,
-				   uint32 key_size)
+				   uint32_t key_size)
 {
   opaque ret[MAX_HASH_SIZE];
   mac_hd_t td;

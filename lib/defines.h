@@ -89,12 +89,4 @@ typedef struct
   unsigned char i[8];
 } uint64;
 
-#if SIZEOF_UNSIGNED_LONG == 4
-typedef unsigned long int uint32;
-#elif SIZEOF_UNSIGNED_INT == 4
-typedef unsigned int uint32;
-#else
-# error "Cannot find a 32 bit integer in your system, sorry."
-#endif
-
 #endif /* defines_h */

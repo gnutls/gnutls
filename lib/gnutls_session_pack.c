@@ -282,7 +282,7 @@ pack_certificate_auth_info (gnutls_session_t session,
   else
     pack_size = 0;
 
-  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32);
+  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32_t);
 
   /* calculate the size and allocate the data.
    */
@@ -327,7 +327,7 @@ pack_certificate_auth_info (gnutls_session_t session,
 	{
           _gnutls_write_datum32 (&packed_session->data[pos],
 			     info->raw_certificate_list[i]);
-	  pos += sizeof (uint32) + info->raw_certificate_list[i].size;
+	  pos += sizeof (uint32_t) + info->raw_certificate_list[i].size;
 	}
     }
 
@@ -461,7 +461,7 @@ unpack_certificate_auth_info (gnutls_session_t session,
   for (i = 0; i < info->ncerts; i++)
     {
       size = _gnutls_read_uint32 (&packed_session->data[pos]);
-      pos += sizeof (uint32);
+      pos += sizeof (uint32_t);
 
       ret =
 	_gnutls_set_datum (&info->raw_certificate_list[i],
@@ -521,7 +521,7 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
   else
     pack_size = 0;
 
-  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32);
+  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32_t);
 
   /* calculate the size and allocate the data.
    */
@@ -538,7 +538,7 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
   _gnutls_write_uint32 (pack_size, &packed_session->data[PACK_HEADER_SIZE]);
 
   if (pack_size > 0)
-    memcpy (&packed_session->data[PACK_HEADER_SIZE + sizeof (uint32)],
+    memcpy (&packed_session->data[PACK_HEADER_SIZE + sizeof (uint32_t)],
 	    info->username, pack_size + 1);
 
   return 0;
@@ -589,7 +589,7 @@ unpack_srp_auth_info (gnutls_session_t session,
     }
 
   memcpy (info->username,
-	  &packed_session->data[PACK_HEADER_SIZE + sizeof (uint32)],
+	  &packed_session->data[PACK_HEADER_SIZE + sizeof (uint32_t)],
 	  username_size);
 
   return 0;
@@ -631,7 +631,7 @@ pack_anon_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
   else
     pack_size = 0;
 
-  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32);
+  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32_t);
 
   /* calculate the size and allocate the data.
    */
@@ -796,7 +796,7 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
   } else
     pack_size = 0;
 
-  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32);
+  packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32_t);
 
   /* calculate the size and allocate the data.
    */

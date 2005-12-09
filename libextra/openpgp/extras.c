@@ -97,7 +97,7 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 {
   int rc;
   cdk_pkt_pubkey_t sig_pk;
-  uint32 id[2];
+  uint32_t id[2];
 
   id[0] = _gnutls_read_uint32 (keyid);
   id[1] = _gnutls_read_uint32 (&keyid[4]);

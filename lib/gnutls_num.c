@@ -59,10 +59,10 @@ _gnutls_uint64pp (uint64 * x)
   return 0;
 }
 
-uint32
+uint32_t
 _gnutls_uint24touint32 (uint24 num)
 {
-  uint32 ret = 0;
+  uint32_t ret = 0;
 
   ((uint8_t *) & ret)[1] = num.pint[0];
   ((uint8_t *) & ret)[2] = num.pint[1];
@@ -71,7 +71,7 @@ _gnutls_uint24touint32 (uint24 num)
 }
 
 uint24
-_gnutls_uint32touint24 (uint32 num)
+_gnutls_uint32touint24 (uint32_t num)
 {
   uint24 ret;
 
@@ -83,10 +83,10 @@ _gnutls_uint32touint24 (uint32 num)
 }
 
 /* data should be at least 3 bytes */
-uint32
+uint32_t
 _gnutls_read_uint24 (const opaque * data)
 {
-  uint32 res;
+  uint32_t res;
   uint24 num;
 
   num.pint[0] = data[0];
@@ -101,7 +101,7 @@ _gnutls_read_uint24 (const opaque * data)
 }
 
 void
-_gnutls_write_uint24 (uint32 num, opaque * data)
+_gnutls_write_uint24 (uint32_t num, opaque * data)
 {
   uint24 tmp;
 
@@ -115,12 +115,12 @@ _gnutls_write_uint24 (uint32 num, opaque * data)
   data[2] = tmp.pint[2];
 }
 
-uint32
+uint32_t
 _gnutls_read_uint32 (const opaque * data)
 {
-  uint32 res;
+  uint32_t res;
 
-  memcpy (&res, data, sizeof (uint32));
+  memcpy (&res, data, sizeof (uint32_t));
 #ifndef WORDS_BIGENDIAN
   res = byteswap32 (res);
 #endif
@@ -128,13 +128,13 @@ _gnutls_read_uint32 (const opaque * data)
 }
 
 void
-_gnutls_write_uint32 (uint32 num, opaque * data)
+_gnutls_write_uint32 (uint32_t num, opaque * data)
 {
 
 #ifndef WORDS_BIGENDIAN
   num = byteswap32 (num);
 #endif
-  memcpy (data, &num, sizeof (uint32));
+  memcpy (data, &num, sizeof (uint32_t));
 }
 
 uint16_t
@@ -158,8 +158,8 @@ _gnutls_write_uint16 (uint16_t num, opaque * data)
   memcpy (data, &num, sizeof (uint16_t));
 }
 
-uint32
-_gnutls_conv_uint32 (uint32 data)
+uint32_t
+_gnutls_conv_uint32 (uint32_t data)
 {
 #ifndef WORDS_BIGENDIAN
   return byteswap32 (data);
@@ -178,10 +178,10 @@ _gnutls_conv_uint16 (uint16_t data)
 #endif
 }
 
-uint32
+uint32_t
 _gnutls_uint64touint32 (const uint64 * num)
 {
-  uint32 ret;
+  uint32_t ret;
 
   memcpy (&ret, &num->i[4], 4);
 #ifndef WORDS_BIGENDIAN

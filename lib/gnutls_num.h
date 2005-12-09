@@ -34,17 +34,17 @@
 #define byteswap16(x)  ((rotl16(x, 8) & 0x00ff) | (rotr16(x, 8) & 0xff00))
 #define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ffUL) | (rotr32(x, 8) & 0xff00ff00UL))
 
-uint32 _gnutls_uint24touint32 (uint24 num);
-uint24 _gnutls_uint32touint24 (uint32 num);
-uint32 _gnutls_read_uint32 (const opaque * data);
+uint32_t _gnutls_uint24touint32 (uint24 num);
+uint24 _gnutls_uint32touint24 (uint32_t num);
+uint32_t _gnutls_read_uint32 (const opaque * data);
 uint16_t _gnutls_read_uint16 (const opaque * data);
-uint32 _gnutls_conv_uint32 (uint32 data);
+uint32_t _gnutls_conv_uint32 (uint32_t data);
 uint16_t _gnutls_conv_uint16 (uint16_t data);
-uint32 _gnutls_read_uint24 (const opaque * data);
-void _gnutls_write_uint24 (uint32 num, opaque * data);
-void _gnutls_write_uint32 (uint32 num, opaque * data);
+uint32_t _gnutls_read_uint24 (const opaque * data);
+void _gnutls_write_uint24 (uint32_t num, opaque * data);
+void _gnutls_write_uint32 (uint32_t num, opaque * data);
 void _gnutls_write_uint16 (uint16_t num, opaque * data);
-uint32 _gnutls_uint64touint32 (const uint64 *);
+uint32_t _gnutls_uint64touint32 (const uint64 *);
 
 int _gnutls_uint64pp (uint64 *);
 # define _gnutls_uint64zero(x) x.i[0] = x.i[1] = x.i[2] = x.i[3] = x.i[4] = x.i[5] = x.i[6] = x.i[7] = 0
