@@ -649,3 +649,39 @@ gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
 {
   res->rsa_params = rsa_params;
 }
+
+/**
+  * gnutls_psk_set_params_function - This function will set the DH or RSA parameters callback
+  * @res: is a gnutls_psk_server_credentials_t structure
+  * @func: is the function to be called
+  *
+  * This function will set a callback in order for the server to get the 
+  * diffie hellman or RSA parameters for psk authentication. The callback
+  * should return zero on success.
+  *
+  **/
+void
+gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
+					gnutls_params_function * func)
+{
+  res->params_func = func;
+}
+
+
+
+/**
+  * gnutls_anon_set_params_function - This function will set the DH or RSA parameters callback
+  * @res: is a gnutls_anon_server_credentials_t structure
+  * @func: is the function to be called
+  *
+  * This function will set a callback in order for the server to get the 
+  * diffie hellman or RSA parameters for anonymous authentication. The callback
+  * should return zero on success.
+  *
+  **/
+void
+gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
+					gnutls_params_function * func)
+{
+  res->params_func = func;
+}
