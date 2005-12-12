@@ -45,6 +45,10 @@ Current list:
   separate tools.  Probably a rewrite is necessary.
 - Enable certtool's template files to allow arbitrary
   OIDs to be specified for x509v3's extended key usage attribute.
+- Make it possible to extract the internal state of a session, to
+  be able to execve a new process that take over the current
+  living socket (using the fcntl close-on-exec flag) and
+  continue the TLS session as well.
 
 (+) Means high priority 
 (*) Means medium priority
