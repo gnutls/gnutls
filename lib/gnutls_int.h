@@ -31,10 +31,6 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 
-struct bar {
-  uint8_t foo;
-};
-
 /*
  * They are not needed any more. You can simply enable
  * the gnutls_log callback to get error descriptions.
