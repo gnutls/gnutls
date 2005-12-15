@@ -270,7 +270,7 @@ pack_certificate_auth_info (gnutls_session_t session,
   if (info)
     {
       cert_size = 4;
-      
+
       for (i = 0; i < info->ncerts; i++)
 	cert_size += 4 + info->raw_certificate_list[i].size;
 
@@ -325,8 +325,8 @@ pack_certificate_auth_info (gnutls_session_t session,
 
       for (i = 0; i < info->ncerts; i++)
 	{
-          _gnutls_write_datum32 (&packed_session->data[pos],
-			     info->raw_certificate_list[i]);
+	  _gnutls_write_datum32 (&packed_session->data[pos],
+				 info->raw_certificate_list[i]);
 	  pos += sizeof (uint32_t) + info->raw_certificate_list[i].size;
 	}
     }
@@ -445,17 +445,17 @@ unpack_certificate_auth_info (gnutls_session_t session,
 
   info->ncerts = _gnutls_read_uint32 (&packed_session->data[pos]);
   pos += 4;
-  
-  if (info->ncerts > 0) 
+
+  if (info->ncerts > 0)
     {
-      info->raw_certificate_list = 
-        gnutls_calloc (1, sizeof (gnutls_datum_t) * info->ncerts);
+      info->raw_certificate_list =
+	gnutls_calloc (1, sizeof (gnutls_datum_t) * info->ncerts);
       if (info->raw_certificate_list == NULL)
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_MEMORY_ERROR;
-          goto error;
-        }
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto error;
+	}
     }
 
   for (i = 0; i < info->ncerts; i++)
@@ -789,11 +789,14 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (info) {
-    username_size = strlen (info->username) + 1; /* include the terminating null */
-    pack_size = username_size +	
-       2 + 4 * 3 + info->dh.prime.size + info->dh.generator.size + info->dh.public_key.size;
-  } else
+  if (info)
+    {
+      username_size = strlen (info->username) + 1;	/* include the terminating null */
+      pack_size = username_size +
+	2 + 4 * 3 + info->dh.prime.size + info->dh.generator.size +
+	info->dh.public_key.size;
+    }
+  else
     pack_size = 0;
 
   packed_session->size = PACK_HEADER_SIZE + pack_size + sizeof (uint32_t);
@@ -810,21 +813,21 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
     }
 
   pos = 0;
-  
+
   packed_session->data[pos] = GNUTLS_CRD_PSK;
   pos++;
 
   _gnutls_write_uint32 (pack_size, &packed_session->data[pos]);
-  pos+=4;
+  pos += 4;
 
 
-  if (pack_size > 0) 
+  if (pack_size > 0)
     {
       _gnutls_write_uint32 (username_size, &packed_session->data[pos]);
-      pos+=4;
+      pos += 4;
 
       memcpy (&packed_session->data[pos], info->username, username_size);
-      pos+=username_size;
+      pos += username_size;
 
       _gnutls_write_uint16 (info->dh.secret_bits, &packed_session->data[pos]);
       pos += 2;
@@ -844,7 +847,7 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
 
 static int
 unpack_psk_auth_info (gnutls_session_t session,
-		       const gnutls_datum * packed_session)
+		      const gnutls_datum * packed_session)
 {
   size_t username_size;
   size_t pack_size;
@@ -889,14 +892,11 @@ unpack_psk_auth_info (gnutls_session_t session,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  username_size =
-    _gnutls_read_uint32 (&packed_session->data[pos]);
-  pos+=4;
-  
-  memcpy (info->username,
-	  &packed_session->data[pos],
-	  username_size);
-  pos+=username_size;
+  username_size = _gnutls_read_uint32 (&packed_session->data[pos]);
+  pos += 4;
+
+  memcpy (info->username, &packed_session->data[pos], username_size);
+  pos += username_size;
 
   info->dh.secret_bits = _gnutls_read_uint16 (&packed_session->data[pos]);
   pos += 2;

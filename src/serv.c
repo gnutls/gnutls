@@ -118,11 +118,12 @@ static int wrap_db_delete (void *dbf, gnutls_datum key);
 #define HTTP_STATE_RESPONSE	2
 #define HTTP_STATE_CLOSING	3
 
-LIST_TYPE_DECLARE (listener_item, char *http_request;
-		   char *http_response; int request_length;
-		   int response_length; int response_written;
-		   int http_state;
-		   int fd; gnutls_session tls_session; int handshake_ok;);
+LIST_TYPE_DECLARE (listener_item, char *http_request; char *http_response;
+		   int request_length; int response_length;
+		   int response_written; int http_state; int fd;
+		   gnutls_session tls_session;
+		   int handshake_ok;
+  );
 
 static const char *
 safe_strerror (int value)
@@ -237,13 +238,19 @@ get_params (gnutls_session session, gnutls_params_type type,
 	    gnutls_params_st * st)
 {
 
-  if (type == GNUTLS_PARAMS_RSA_EXPORT) {
-    if (rsa_params == NULL) return -1;
-    st->params.rsa_export = rsa_params;
-  } else if (type == GNUTLS_PARAMS_DH) {
-    if (dh_params == NULL) return -1;
-    st->params.dh = dh_params;
-  } else
+  if (type == GNUTLS_PARAMS_RSA_EXPORT)
+    {
+      if (rsa_params == NULL)
+	return -1;
+      st->params.rsa_export = rsa_params;
+    }
+  else if (type == GNUTLS_PARAMS_DH)
+    {
+      if (dh_params == NULL)
+	return -1;
+      st->params.dh = dh_params;
+    }
+  else
     return -1;
 
   st->type = type;
@@ -764,7 +771,7 @@ main (int argc, char **argv)
 	exit (1);
       }
 
-      gnutls_certificate_set_params_function (cert_cred, get_params);
+  gnutls_certificate_set_params_function (cert_cred, get_params);
 /*     gnutls_certificate_set_dh_params(cert_cred, dh_params);
  *     gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
  */

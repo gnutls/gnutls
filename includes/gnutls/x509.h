@@ -395,13 +395,13 @@ extern "C"
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
 				    gnutls_x509_crt_t issuer);
 
-  int gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
-				  int cert_list_length,
-				  const gnutls_x509_crt_t * CA_list,
-				  int CA_list_length,
-				  const gnutls_x509_crl_t * CRL_list,
-				  int CRL_list_length,
-				  unsigned int flags, unsigned int *verify);
+  int gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
+				   int cert_list_length,
+				   const gnutls_x509_crt_t * CA_list,
+				   int CA_list_length,
+				   const gnutls_x509_crl_t * CRL_list,
+				   int CRL_list_length,
+				   unsigned int flags, unsigned int *verify);
 
   int gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
 			      const gnutls_x509_crt_t * CA_list,

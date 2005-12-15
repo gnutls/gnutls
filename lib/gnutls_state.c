@@ -262,7 +262,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   _gnutls_buffer_init (&(*session)->internals.application_data_buffer);
   _gnutls_buffer_init (&(*session)->internals.handshake_data_buffer);
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
-  _gnutls_buffer_init(&(*session)->internals.ia_data_buffer);
+  _gnutls_buffer_init (&(*session)->internals.ia_data_buffer);
 
   _gnutls_buffer_init (&(*session)->internals.record_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.record_recv_buffer);
@@ -355,7 +355,7 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_free_datum (&session->connection_state.read_mac_secret);
   _gnutls_free_datum (&session->connection_state.write_mac_secret);
 
-  _gnutls_buffer_clear(&session->internals.ia_data_buffer);
+  _gnutls_buffer_clear (&session->internals.ia_data_buffer);
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
   _gnutls_buffer_clear (&session->internals.handshake_data_buffer);
   _gnutls_buffer_clear (&session->internals.application_data_buffer);
@@ -932,21 +932,14 @@ int
 gnutls_prf_raw (gnutls_session_t session,
 		size_t label_size,
 		const char *label,
-		size_t seed_size,
-		const char *seed,
-		size_t outsize,
-		char *out)
+		size_t seed_size, const char *seed, size_t outsize, char *out)
 {
   int ret;
 
   ret = _gnutls_PRF (session->security_parameters.master_secret,
 		     TLS_MASTER_SIZE,
 		     label,
-		     label_size,
-		     (opaque*) seed,
-		     seed_size,
-		     outsize,
-		     out);
+		     label_size, (opaque *) seed, seed_size, outsize, out);
 
   return ret;
 }
@@ -985,10 +978,7 @@ gnutls_prf (gnutls_session_t session,
 	    size_t label_size,
 	    const char *label,
 	    int server_random_first,
-	    size_t extra_size,
-	    const char *extra,
-	    size_t outsize,
-	    char *out)
+	    size_t extra_size, const char *extra, size_t outsize, char *out)
 {
   int ret;
   opaque *seed;
@@ -997,7 +987,7 @@ gnutls_prf (gnutls_session_t session,
   seed = gnutls_malloc (seedsize);
   if (!seed)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -1006,19 +996,13 @@ gnutls_prf (gnutls_session_t session,
 	  session->security_parameters.client_random, TLS_RANDOM_SIZE);
   memcpy (seed + TLS_RANDOM_SIZE, server_random_first ?
 	  session->security_parameters.client_random :
-	  session->security_parameters.server_random,
-	  TLS_RANDOM_SIZE);
+	  session->security_parameters.server_random, TLS_RANDOM_SIZE);
 
   memcpy (seed + 2 * TLS_RANDOM_SIZE, extra, extra_size);
 
   ret = _gnutls_PRF (session->security_parameters.master_secret,
 		     TLS_MASTER_SIZE,
-		     label,
-		     label_size,
-		     seed,
-		     seedsize,
-		     outsize,
-		     out);
+		     label, label_size, seed, seedsize, outsize, out);
 
   gnutls_free (seed);
 
@@ -1041,7 +1025,7 @@ gnutls_prf (gnutls_session_t session,
 const char *
 gnutls_session_get_client_random (gnutls_session_t session)
 {
-  return (char*) session->security_parameters.client_random;
+  return (char *) session->security_parameters.client_random;
 }
 
 /**
@@ -1060,7 +1044,7 @@ gnutls_session_get_client_random (gnutls_session_t session)
 const char *
 gnutls_session_get_server_random (gnutls_session_t session)
 {
-  return (char*) session->security_parameters.server_random;
+  return (char *) session->security_parameters.server_random;
 }
 
 /**

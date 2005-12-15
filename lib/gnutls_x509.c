@@ -266,7 +266,7 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
  * returns the number of certificates parsed (1)
  */
 static int
-parse_crt_mem (gnutls_cert ** cert_list, unsigned * ncerts,
+parse_crt_mem (gnutls_cert ** cert_list, unsigned *ncerts,
 	       gnutls_x509_crt_t cert)
 {
   int i;
@@ -301,7 +301,7 @@ parse_crt_mem (gnutls_cert ** cert_list, unsigned * ncerts,
  * returns the number of certificates parsed (1)
  */
 static int
-parse_der_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts,
+parse_der_cert_mem (gnutls_cert ** cert_list, unsigned *ncerts,
 		    const void *input_cert, int input_cert_size)
 {
   gnutls_datum_t tmp;
@@ -340,7 +340,7 @@ parse_der_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts,
  * returns the number of certificate parsed
  */
 static int
-parse_pkcs7_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts, const
+parse_pkcs7_cert_mem (gnutls_cert ** cert_list, unsigned *ncerts, const
 		      void *input_cert, int input_cert_size, int flags)
 {
 #ifdef ENABLE_PKI
@@ -463,7 +463,7 @@ parse_pkcs7_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts, const
  * a gnutls_cert structure. Returns the number of certificate parsed.
  */
 static int
-parse_pem_cert_mem (gnutls_cert ** cert_list, unsigned * ncerts,
+parse_pem_cert_mem (gnutls_cert ** cert_list, unsigned *ncerts,
 		    const char *input_cert, int input_cert_size)
 {
   int size, siz2, i;
@@ -1214,7 +1214,7 @@ _gnutls_check_key_usage (const gnutls_cert * cert, gnutls_kx_algorithm_t alg)
 
 
 static int
-parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned * ncerts,
+parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
 		  const opaque * input_cert, int input_cert_size)
 {
   int i, size;
@@ -1312,7 +1312,7 @@ parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned * ncerts,
  * returns the number of certificates parsed (1)
  */
 static int
-parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned * ncerts,
+parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
 		  const void *input_cert, int input_cert_size)
 {
   int i;
@@ -1516,7 +1516,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
 #ifdef ENABLE_PKI
 
 static int
-parse_pem_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned * ncrls,
+parse_pem_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned *ncrls,
 		   const opaque * input_crl, int input_crl_size)
 {
   int size, i;
@@ -1601,7 +1601,7 @@ parse_pem_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned * ncrls,
  * returns the number of certificates parsed (1)
  */
 static int
-parse_der_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned * ncrls,
+parse_der_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned *ncrls,
 		   const void *input_crl, int input_crl_size)
 {
   int i;
@@ -1810,9 +1810,8 @@ static int
 parse_pkcs12 (gnutls_certificate_credentials_t res,
 	      gnutls_pkcs12_t p12,
 	      const char *password,
-	      gnutls_x509_privkey *key,
-	      gnutls_x509_crt_t *cert,
-	      gnutls_x509_crl_t *crl)
+	      gnutls_x509_privkey * key,
+	      gnutls_x509_crt_t * cert, gnutls_x509_crl_t * crl)
 {
   gnutls_pkcs12_bag bag = NULL;
   int index = 0;
@@ -1912,7 +1911,8 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 		  goto done;
 		}
 
-	      ret = gnutls_x509_crt_import (*cert, &data, GNUTLS_X509_FMT_DER);
+	      ret =
+		gnutls_x509_crt_import (*cert, &data, GNUTLS_X509_FMT_DER);
 	      if (ret < 0)
 		{
 		  gnutls_assert ();
@@ -1938,7 +1938,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 
 	    case GNUTLS_BAG_ENCRYPTED:
 	      /* XXX Bother to recurse one level down?  Unlikely to
-		 use the same password anyway. */
+	         use the same password anyway. */
 	    case GNUTLS_BAG_EMPTY:
 	    default:
 	      break;
@@ -1951,7 +1951,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 
   ret = 0;
 
- done:
+done:
   if (bag)
     gnutls_pkcs12_bag_deinit (bag);
 
@@ -1991,10 +1991,9 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
  * Return value: Returns 0 on success, or an error code.
  **/
 int
-gnutls_certificate_set_x509_simple_pkcs12_file (gnutls_certificate_credentials_t res,
-						const char *pkcs12file,
-						gnutls_x509_crt_fmt_t type,
-						const char *password)
+  gnutls_certificate_set_x509_simple_pkcs12_file
+  (gnutls_certificate_credentials_t res, const char *pkcs12file,
+   gnutls_x509_crt_fmt_t type, const char *password)
 {
   gnutls_pkcs12_t p12;
   gnutls_datum_t p12blob;
@@ -2072,7 +2071,7 @@ gnutls_certificate_set_x509_simple_pkcs12_file (gnutls_certificate_credentials_t
 
   ret = 0;
 
- done:
+done:
   if (cert)
     gnutls_x509_crt_deinit (cert);
   if (key)

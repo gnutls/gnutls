@@ -299,8 +299,8 @@ gnutls_psk_server_get_username (gnutls_session_t session)
   info = _gnutls_get_auth_info (session);
   if (info == NULL)
     return NULL;
-    
-  if (info->username[0] != 0) 
+
+  if (info->username[0] != 0)
     return info->username;
 
   return NULL;
@@ -374,7 +374,7 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
   **/
 void
 gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
-				  gnutls_dh_params_t dh_params)
+				 gnutls_dh_params_t dh_params)
 {
   res->dh_params = dh_params;
 }
@@ -391,7 +391,7 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
   **/
 void
 gnutls_psk_set_server_params_function (gnutls_psk_server_credentials_t res,
-				 gnutls_params_function * func)
+				       gnutls_params_function * func)
 {
   res->params_func = func;
 }

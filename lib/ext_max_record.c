@@ -121,7 +121,7 @@ _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
 
 	  data[0] =
 	    (uint8_t) _gnutls_mre_record2num (session->internals.
-					    proposed_record_size);
+					      proposed_record_size);
 	  return len;
 	}
 
@@ -141,8 +141,8 @@ _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
 
 	  data[0] =
 	    (uint8_t) _gnutls_mre_record2num (session->
-					    security_parameters.
-					    max_record_recv_size);
+					      security_parameters.
+					      max_record_recv_size);
 	  return len;
 	}
 

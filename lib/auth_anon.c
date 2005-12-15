@@ -78,7 +78,8 @@ gen_anon_server_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  dh_params = _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+  dh_params =
+    _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
   mpis = _gnutls_dh_params_to_mpi (dh_params);
   if (mpis == NULL)
     {
@@ -130,7 +131,8 @@ proc_anon_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  dh_params = _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+  dh_params =
+    _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
   mpis = _gnutls_dh_params_to_mpi (dh_params);
   if (mpis == NULL)
     {

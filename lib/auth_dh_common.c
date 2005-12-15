@@ -95,7 +95,7 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
     {
       ret = _gnutls_mpi_dprint (&session->key->key, session->key->KEY);
     }
-  else /* In DHE_PSK the key is set differently */
+  else				/* In DHE_PSK the key is set differently */
     {
       gnutls_datum tmp_dh_key;
       ret = _gnutls_mpi_dprint (&tmp_dh_key, session->key->KEY);
@@ -178,7 +178,7 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
     {
       ret = _gnutls_mpi_dprint (&session->key->key, session->key->KEY);
     }
-  else /* In DHE_PSK the key is set differently */
+  else				/* In DHE_PSK the key is set differently */
     {
       gnutls_datum tmp_dh_key;
       ret = _gnutls_mpi_dprint (&tmp_dh_key, session->key->KEY);
@@ -225,12 +225,13 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
 
   i = 0;
 
-  if (psk != 0) {
-    DECR_LEN (data_size, 2);
-    psk_size = _gnutls_read_uint16 (&data[i]);
-    DECR_LEN (data_size, psk_size);
-    i += 2 + psk_size;
-  }
+  if (psk != 0)
+    {
+      DECR_LEN (data_size, 2);
+      psk_size = _gnutls_read_uint16 (&data[i]);
+      DECR_LEN (data_size, psk_size);
+      i += 2 + psk_size;
+    }
 
   DECR_LEN (data_size, 2);
   n_p = _gnutls_read_uint16 (&data[i]);
@@ -297,8 +298,9 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
   _gnutls_dh_set_peer_public (session, session->key->client_Y);
 
   ret = n_Y + n_p + n_g + 6;
-  if (psk != 0) ret += 2;
-  
+  if (psk != 0)
+    ret += 2;
+
   return ret;
 }
 
@@ -326,11 +328,12 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   _gnutls_mpi_print (NULL, &n_g, g);
   _gnutls_mpi_print (NULL, &n_p, p);
   _gnutls_mpi_print (NULL, &n_X, X);
-  
-  data_size = n_g + n_p + n_X + 6;
-  if (psk != 0) data_size += 2;
 
-  (*data) = gnutls_malloc ( data_size);
+  data_size = n_g + n_p + n_X + 6;
+  if (psk != 0)
+    data_size += 2;
+
+  (*data) = gnutls_malloc (data_size);
   if (*data == NULL)
     {
       _gnutls_mpi_release (&X);
@@ -340,14 +343,15 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   pos = 0;
   pdata = *data;
 
-  if (psk != 0) {
-     _gnutls_write_uint16 (0, &pdata[pos]);
-     pos += 2;
-  }
+  if (psk != 0)
+    {
+      _gnutls_write_uint16 (0, &pdata[pos]);
+      pos += 2;
+    }
 
-  _gnutls_mpi_print (&pdata[pos+2], &n_p, p);
+  _gnutls_mpi_print (&pdata[pos + 2], &n_p, p);
   _gnutls_write_uint16 (n_p, &pdata[pos]);
-  
+
   pos += n_p + 2;
 
   _gnutls_mpi_print (&pdata[pos + 2], &n_g, g);

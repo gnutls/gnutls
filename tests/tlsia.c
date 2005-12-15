@@ -64,7 +64,7 @@ tcp_connect (void)
   sa.sin_port = htons (atoi (PORT));
   inet_pton (AF_INET, SERVER, &sa.sin_addr);
 
-  err = connect (sd, (struct sockaddr *) & sa, sizeof (sa));
+  err = connect (sd, (struct sockaddr *) &sa, sizeof (sa));
   if (err < 0)
     {
       fprintf (stderr, "Connect error\n");
@@ -83,9 +83,9 @@ tcp_close (int sd)
   close (sd);
 }
 
-int client_avp (gnutls_session_t session, void *ptr,
-		const char *last, size_t lastlen,
-		char **new, size_t *newlen)
+int
+client_avp (gnutls_session_t session, void *ptr,
+	    const char *last, size_t lastlen, char **new, size_t * newlen)
 {
   static int iter = 0;
   char *p;
@@ -145,10 +145,10 @@ client (void)
   const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
 
   gnutls_global_init ();
-  gnutls_global_init_extra();
+  gnutls_global_init_extra ();
 
   gnutls_anon_allocate_client_credentials (&anoncred);
-  gnutls_ia_allocate_client_credentials(&iacred);
+  gnutls_ia_allocate_client_credentials (&iacred);
 
   /* Initialize TLS session
    */
@@ -188,11 +188,11 @@ client (void)
     }
 
   /*
-    To test TLS/IA alert's (the server will print that a fatal alert
-    was received):
-  gnutls_alert_send(session, GNUTLS_AL_FATAL,
-		    GNUTLS_A_INNER_APPLICATION_FAILURE);
-  */
+     To test TLS/IA alert's (the server will print that a fatal alert
+     was received):
+     gnutls_alert_send(session, GNUTLS_AL_FATAL,
+     GNUTLS_A_INNER_APPLICATION_FAILURE);
+   */
 
   if (!gnutls_ia_handshake_p (session))
     fail ("client: No TLS/IA negotiation\n");
@@ -313,9 +313,9 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
-int server_avp (gnutls_session_t session, void *ptr,
-		const char *last, size_t lastlen,
-		char **new, size_t *newlen)
+int
+server_avp (gnutls_session_t session, void *ptr,
+	    const char *last, size_t lastlen, char **new, size_t * newlen)
 {
   static int iter = 0;
   char *p;
@@ -512,8 +512,8 @@ server (void)
 	    {
 	      gnutls_alert_description_t alert;
 	      const char *err;
-	      alert = gnutls_alert_get(session);
-	      err = gnutls_alert_get_name(alert);
+	      alert = gnutls_alert_get (session);
+	      err = gnutls_alert_get_name (alert);
 	      if (err)
 		printf ("Fatal alert: %s\n", err);
 	    }

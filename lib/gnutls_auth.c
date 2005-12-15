@@ -409,4 +409,3 @@ _gnutls_auth_info_set (gnutls_session_t session,
     }
   return 0;
 }
-

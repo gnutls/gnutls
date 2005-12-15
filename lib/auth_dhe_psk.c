@@ -66,14 +66,14 @@ const mod_auth_st dhe_psk_auth_struct = {
 static int
 gen_psk_client_kx (gnutls_session_t session, opaque ** data)
 {
-int ret;
-opaque * tmp_data = NULL;
-int data_size, tmp_data_size;
-gnutls_psk_client_credentials_t cred;
-  
+  int ret;
+  opaque *tmp_data = NULL;
+  int data_size, tmp_data_size;
+  gnutls_psk_client_credentials_t cred;
+
   cred = (gnutls_psk_client_credentials_t)
-        _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
-        
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+
   if (cred == NULL)
     {
       gnutls_assert ();
@@ -87,32 +87,33 @@ gnutls_psk_client_credentials_t cred;
     }
 
   /* The PSK key is set in there */
-  ret = _gnutls_gen_dh_common_client_kx( session, &tmp_data);
-  if (ret < 0) {
-    gnutls_assert();
-    return ret;
-  }
-  
+  ret = _gnutls_gen_dh_common_client_kx (session, &tmp_data);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
   tmp_data_size = ret;
   data_size = tmp_data_size + cred->username.size + 2;
-  
-  (*data) = gnutls_malloc ( data_size);
+
+  (*data) = gnutls_malloc (data_size);
   if ((*data) == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       ret = GNUTLS_E_MEMORY_ERROR;
       goto error;
     }
-    
+
   _gnutls_write_datum16 (*data, cred->username);
-  memcpy( &(*data)[cred->username.size + 2], tmp_data, tmp_data_size);
+  memcpy (&(*data)[cred->username.size + 2], tmp_data, tmp_data_size);
 
   ret = data_size;
 
 error:
-  gnutls_free( tmp_data);
+  gnutls_free (tmp_data);
   return ret;
-  
+
 }
 
 static int
@@ -132,7 +133,8 @@ gen_psk_server_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  dh_params = _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+  dh_params =
+    _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
   mpis = _gnutls_dh_params_to_mpi (dh_params);
   if (mpis == NULL)
     {
@@ -165,7 +167,7 @@ gen_psk_server_kx (gnutls_session_t session, opaque ** data)
 
 static int
 proc_psk_client_kx (gnutls_session_t session, opaque * data,
-		     size_t _data_size)
+		    size_t _data_size)
 {
   int bits;
   int ret;
@@ -176,27 +178,28 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
   psk_auth_info_t info;
   gnutls_datum username;
   ssize_t data_size = _data_size;
-    
+
   cred = (gnutls_psk_server_credentials_t)
-  _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
-          
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+
   if (cred == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
-                                
+
   bits = _gnutls_dh_get_allowed_prime_bits (session);
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
-                              sizeof (psk_auth_info_st), 1)) < 0)
+			      sizeof (psk_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  dh_params = _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+  dh_params =
+    _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
   mpis = _gnutls_dh_params_to_mpi (dh_params);
   if (mpis == NULL)
     {
@@ -206,7 +209,7 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
 
   p = mpis[0];
   g = mpis[1];
-  
+
   DECR_LEN (data_size, 2);
   username.size = _gnutls_read_uint16 (&data[0]);
 
@@ -238,7 +241,7 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
 
 int
 proc_psk_server_kx (gnutls_session_t session, opaque * data,
-		     size_t _data_size)
+		    size_t _data_size)
 {
 
   int ret;

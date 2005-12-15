@@ -142,7 +142,8 @@ decode (uint8_t * result, const opaque * data)
  * The result_size is the return value
  */
 int
-_gnutls_base64_encode (const uint8_t * data, size_t data_size, uint8_t ** result)
+_gnutls_base64_encode (const uint8_t * data, size_t data_size,
+		       uint8_t ** result)
 {
   unsigned int i, j;
   int ret, tmp;
@@ -365,7 +366,8 @@ gnutls_pem_base64_encode_alloc (const char *msg,
  * The result_size is the return value
  */
 int
-_gnutls_base64_decode (const uint8_t * data, size_t data_size, uint8_t ** result)
+_gnutls_base64_decode (const uint8_t * data, size_t data_size,
+		       uint8_t ** result)
 {
   unsigned int i, j;
   int ret, tmp, est;

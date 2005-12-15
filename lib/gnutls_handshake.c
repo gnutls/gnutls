@@ -1887,7 +1887,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 
       comp =
 	(uint8_t) _gnutls_compression_get_num (session->
-					     internals.compression_method);
+					       internals.compression_method);
       data[pos++] = comp;
 
 
@@ -2593,9 +2593,13 @@ check_server_params (gnutls_session_t session,
 
       if (x509_cred != NULL)
 	{
-	  dh_params = _gnutls_get_dh_params (x509_cred->dh_params, x509_cred->params_func, session);
+	  dh_params =
+	    _gnutls_get_dh_params (x509_cred->dh_params,
+				   x509_cred->params_func, session);
 	  rsa_params =
-	    _gnutls_certificate_get_rsa_params (x509_cred->rsa_params, x509_cred->params_func, session);
+	    _gnutls_certificate_get_rsa_params (x509_cred->rsa_params,
+						x509_cred->params_func,
+						session);
 	}
 
       /* Check also if the certificate supports the
@@ -2624,7 +2628,9 @@ check_server_params (gnutls_session_t session,
 
       if (anon_cred != NULL)
 	{
-	  dh_params = _gnutls_get_dh_params (anon_cred->dh_params, anon_cred->params_func, session);
+	  dh_params =
+	    _gnutls_get_dh_params (anon_cred->dh_params,
+				   anon_cred->params_func, session);
 	}
 #endif
 #ifdef ENABLE_PSK
@@ -2633,11 +2639,13 @@ check_server_params (gnutls_session_t session,
     {
       gnutls_psk_server_credentials_t psk_cred =
 	(gnutls_psk_server_credentials_t) _gnutls_get_cred (session->key,
-							     cred_type, NULL);
+							    cred_type, NULL);
 
       if (psk_cred != NULL)
 	{
-	  dh_params = _gnutls_get_dh_params (psk_cred->dh_params, psk_cred->params_func, session);
+	  dh_params =
+	    _gnutls_get_dh_params (psk_cred->dh_params, psk_cred->params_func,
+				   session);
 	}
 #endif
     }
@@ -2651,19 +2659,21 @@ check_server_params (gnutls_session_t session,
   if (_gnutls_kx_needs_rsa_params (kx) != 0)
     {
       /* needs rsa params. */
-      if (_gnutls_rsa_params_to_mpi (rsa_params) == NULL) {
-        gnutls_assert();
-	return 1;
-      }
+      if (_gnutls_rsa_params_to_mpi (rsa_params) == NULL)
+	{
+	  gnutls_assert ();
+	  return 1;
+	}
     }
 
   if (_gnutls_kx_needs_dh_params (kx) != 0)
     {
       /* needs DH params. */
-      if (_gnutls_dh_params_to_mpi (dh_params) == NULL) {
-        gnutls_assert();
-	return 1;
-      }
+      if (_gnutls_dh_params_to_mpi (dh_params) == NULL)
+	{
+	  gnutls_assert ();
+	  return 1;
+	}
     }
 
   return 0;

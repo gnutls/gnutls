@@ -60,7 +60,8 @@ const mod_auth_st psk_auth_struct = {
 /* Set the PSK premaster secret.
  */
 int
-_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * dh_secret)
+_gnutls_set_psk_session_key (gnutls_session_t session,
+			     gnutls_datum * dh_secret)
 {
   gnutls_datum pwd_psk = { NULL, 0 };
   gnutls_datum *ppsk;
@@ -131,10 +132,10 @@ _gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * dh_secret)
   _gnutls_write_datum16 (&session->key->key.data[dh_secret_size + 2], *ppsk);
 
   ret = 0;
-  
-  error:
-    _gnutls_free_datum( &pwd_psk);
-    return ret;
+
+error:
+  _gnutls_free_datum (&pwd_psk);
+  return ret;
 }
 
 

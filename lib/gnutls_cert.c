@@ -141,7 +141,8 @@ gnutls_certificate_free_ca_names (gnutls_certificate_credentials_t sc)
   *
   -*/
 gnutls_rsa_params_t
-_gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params, gnutls_params_function* func,
+_gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params,
+				    gnutls_params_function * func,
 				    gnutls_session_t session)
 {
   gnutls_params_st params;

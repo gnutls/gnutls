@@ -234,12 +234,12 @@ static gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY ("Failed to acquire random data.", GNUTLS_E_RANDOM_FAILED,
 	       1),
 
-  ERROR_ENTRY("Received a TLS/IA Intermediate Phase Finished message",
-	      GNUTLS_E_WARNING_IA_IPHF_RECEIVED, 0),
-  ERROR_ENTRY("Received a TLS/IA Final Phase Finished message",
-	      GNUTLS_E_WARNING_IA_FPHF_RECEIVED, 0),
-  ERROR_ENTRY("Verifying TLS/IA phase checksum failed",
-	      GNUTLS_E_IA_VERIFY_FAILED, 1),
+  ERROR_ENTRY ("Received a TLS/IA Intermediate Phase Finished message",
+	       GNUTLS_E_WARNING_IA_IPHF_RECEIVED, 0),
+  ERROR_ENTRY ("Received a TLS/IA Final Phase Finished message",
+	       GNUTLS_E_WARNING_IA_FPHF_RECEIVED, 0),
+  ERROR_ENTRY ("Verifying TLS/IA phase checksum failed",
+	       GNUTLS_E_IA_VERIFY_FAILED, 1),
 
   {NULL, NULL, 0, 0}
 };

@@ -131,7 +131,7 @@ gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
   **/
 void
 gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t res,
-				 gnutls_params_function * func)
+					gnutls_params_function * func)
 {
   res->params_func = func;
 }

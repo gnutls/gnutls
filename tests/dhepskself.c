@@ -256,11 +256,11 @@ server_start (void)
   gnutls_global_set_log_function (tls_log_func);
 //  gnutls_global_set_log_level (99);
 
-  generate_dh_params();
+  generate_dh_params ();
 
   gnutls_psk_allocate_server_credentials (&server_pskcred);
   gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
-  gnutls_psk_set_server_dh_params( server_pskcred, dh_params);
+  gnutls_psk_set_server_dh_params (server_pskcred, dh_params);
 
   success ("Launched, generating DH parameters...\n");
 

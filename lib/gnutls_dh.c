@@ -133,8 +133,9 @@ gnutls_calc_dh_key (mpi_t f, mpi_t x, mpi_t prime)
   *
   -*/
 gnutls_dh_params_t
-_gnutls_get_dh_params (gnutls_dh_params_t dh_params, gnutls_params_function* func,
-          gnutls_session_t session)
+_gnutls_get_dh_params (gnutls_dh_params_t dh_params,
+		       gnutls_params_function * func,
+		       gnutls_session_t session)
 {
   gnutls_params_st params;
   int ret;

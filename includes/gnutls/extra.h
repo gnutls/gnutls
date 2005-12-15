@@ -32,7 +32,8 @@
 #include <gnutls/gnutls.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define LIBGNUTLS_EXTRA_VERSION LIBGNUTLS_VERSION
@@ -53,36 +54,46 @@ extern "C" {
  * gnutls_openpgp_set_recv_key_function().
  *
  */
-typedef int (*gnutls_openpgp_recv_key_func) (gnutls_session_t session,
-					     const unsigned char *keyfpr,
-					     unsigned int keyfpr_length,
-					     gnutls_datum_t *key);
+  typedef int (*gnutls_openpgp_recv_key_func) (gnutls_session_t session,
+					       const unsigned char *keyfpr,
+					       unsigned int keyfpr_length,
+					       gnutls_datum_t * key);
 
-void gnutls_openpgp_set_recv_key_function( gnutls_session_t session,
-					   gnutls_openpgp_recv_key_func func);
+  void gnutls_openpgp_set_recv_key_function (gnutls_session_t session,
+					     gnutls_openpgp_recv_key_func
+					     func);
 
-int gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials_t res, 
-    const char *CERTFILE, const char* KEYFILE);
-int gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials_t res,
-    const gnutls_datum_t* CERT, const gnutls_datum_t* KEY);
+  int
+    gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
+					     res, const char *CERTFILE,
+					     const char *KEYFILE);
+  int gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
+					      res,
+					      const gnutls_datum_t * CERT,
+					      const gnutls_datum_t * KEY);
 
-int gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials_t res,
-    const char* keyserver, int port);
+  int
+    gnutls_certificate_set_openpgp_keyserver (gnutls_certificate_credentials_t
+					      res, const char *keyserver,
+					      int port);
 
-int gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials_t res,
-    const char* trustdb);
+  int gnutls_certificate_set_openpgp_trustdb (gnutls_certificate_credentials_t
+					      res, const char *trustdb);
 
-int gnutls_certificate_set_openpgp_keyring_mem(
-    gnutls_certificate_credentials_t c,
-    const unsigned char *data, size_t dlen );
+  int
+    gnutls_certificate_set_openpgp_keyring_mem
+    (gnutls_certificate_credentials_t c, const unsigned char *data,
+     size_t dlen);
 
-int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials_t c,
-    const char *file);
+  int
+    gnutls_certificate_set_openpgp_keyring_file
+    (gnutls_certificate_credentials_t c, const char *file);
 
   /* TLS/IA stuff
    */
 
-  typedef enum {
+  typedef enum
+  {
     GNUTLS_IA_APPLICATION_PAYLOAD = 0,
     GNUTLS_IA_INTERMEDIATE_PHASE_FINISHED = 1,
     GNUTLS_IA_FINAL_PHASE_FINISHED = 2
@@ -93,41 +104,45 @@ int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials_
 
   typedef int (*gnutls_ia_avp_func) (gnutls_session_t session, void *ptr,
 				     const char *last, size_t lastlen,
-				     char **new, size_t *newlen);
+				     char **new, size_t * newlen);
 
-  typedef struct gnutls_ia_server_credentials_st* gnutls_ia_server_credentials_t;
-  typedef struct gnutls_ia_client_credentials_st* gnutls_ia_client_credentials_t;
+  typedef struct gnutls_ia_server_credentials_st
+    *gnutls_ia_server_credentials_t;
+  typedef struct gnutls_ia_client_credentials_st
+    *gnutls_ia_client_credentials_t;
 
   /* Allocate and free TLS/IA credentials. */
   extern void
-  gnutls_ia_free_client_credentials(gnutls_ia_client_credentials_t sc);
+    gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc);
   extern int
-  gnutls_ia_allocate_client_credentials(gnutls_ia_client_credentials_t * sc);
+    gnutls_ia_allocate_client_credentials (gnutls_ia_client_credentials_t *
+					   sc);
 
   extern void
-  gnutls_ia_free_server_credentials(gnutls_ia_server_credentials_t sc);
+    gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc);
   extern int
-  gnutls_ia_allocate_server_credentials(gnutls_ia_server_credentials_t * sc);
+    gnutls_ia_allocate_server_credentials (gnutls_ia_server_credentials_t *
+					   sc);
 
   /* Client TLS/IA credential functions. */
   extern void
-  gnutls_ia_set_client_avp_function(gnutls_ia_client_credentials_t cred,
-				    gnutls_ia_avp_func avp_func);
+    gnutls_ia_set_client_avp_function (gnutls_ia_client_credentials_t cred,
+				       gnutls_ia_avp_func avp_func);
   extern void
-  gnutls_ia_set_client_avp_ptr (gnutls_ia_client_credentials_t cred,
-				void *ptr);
-  extern void *
-  gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t cred);
+    gnutls_ia_set_client_avp_ptr (gnutls_ia_client_credentials_t cred,
+				  void *ptr);
+  extern void *gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t
+					     cred);
 
   /* Server TLS/IA credential functions. */
   extern void
-  gnutls_ia_set_server_avp_function(gnutls_ia_server_credentials_t cred,
-				    gnutls_ia_avp_func avp_func);
+    gnutls_ia_set_server_avp_function (gnutls_ia_server_credentials_t cred,
+				       gnutls_ia_avp_func avp_func);
   extern void
-  gnutls_ia_set_server_avp_ptr (gnutls_ia_server_credentials_t cred,
-				void *ptr);
-  extern void *
-  gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred);
+    gnutls_ia_set_server_avp_ptr (gnutls_ia_server_credentials_t cred,
+				  void *ptr);
+  extern void *gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t
+					     cred);
 
   /* TLS/IA handshake. */
   extern int gnutls_ia_handshake_p (gnutls_session_t session);
@@ -136,35 +151,32 @@ int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials_
 
   /* TLS/IA low level interface. */
   extern int
-  gnutls_ia_permute_inner_secret (gnutls_session_t session,
-				  size_t session_keys_size,
-				  const char *session_keys);
-  extern int
-  gnutls_ia_endphase_send(gnutls_session_t session, int final_p);
+    gnutls_ia_permute_inner_secret (gnutls_session_t session,
+				    size_t session_keys_size,
+				    const char *session_keys);
+  extern int gnutls_ia_endphase_send (gnutls_session_t session, int final_p);
 
   extern ssize_t
-  gnutls_ia_send(gnutls_session_t session, char *data, size_t datal);
+    gnutls_ia_send (gnutls_session_t session, char *data, size_t datal);
   extern ssize_t
-  gnutls_ia_recv(gnutls_session_t session, char *data, size_t datal);
+    gnutls_ia_recv (gnutls_session_t session, char *data, size_t datal);
 
   /* Utility stuff. */
   extern int
-  gnutls_ia_generate_challenge (gnutls_session_t session,
-				size_t buffer_size,
-				char *buffer);
+    gnutls_ia_generate_challenge (gnutls_session_t session,
+				  size_t buffer_size, char *buffer);
   extern void
-  gnutls_ia_extract_inner_secret (gnutls_session_t session,
-				  char *buffer);
+    gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer);
 
   /* Toggle whether inner phases are required. */
   extern void
-  gnutls_ia_require_inner_phase (gnutls_session_t session, int require);
+    gnutls_ia_require_inner_phase (gnutls_session_t session, int require);
 
-int gnutls_global_init_extra(void);
+  int gnutls_global_init_extra (void);
 
 /* returns libgnutls-extra version (call it with a NULL argument) 
  */
-const char* gnutls_extra_check_version( const char *req_version);
+  const char *gnutls_extra_check_version (const char *req_version);
 
 #ifdef __cplusplus
 }

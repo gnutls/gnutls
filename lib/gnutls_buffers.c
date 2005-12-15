@@ -94,30 +94,30 @@ _gnutls_record_buffer_put (content_type_t type,
     {
     case GNUTLS_APPLICATION_DATA:
       buf = &session->internals.application_data_buffer;
-      _gnutls_buffers_log("BUF[REC]: Inserted %d bytes of Data(%d)\n",
-			  length, type);
+      _gnutls_buffers_log ("BUF[REC]: Inserted %d bytes of Data(%d)\n",
+			   length, type);
       break;
 
     case GNUTLS_HANDSHAKE:
       buf = &session->internals.handshake_data_buffer;
-      _gnutls_buffers_log("BUF[HSK]: Inserted %d bytes of Data(%d)\n",
-			  length, type);
+      _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data(%d)\n",
+			   length, type);
       break;
 
     case GNUTLS_INNER_APPLICATION:
       buf = &session->internals.ia_data_buffer;
-      _gnutls_buffers_log("BUF[IA]: Inserted %d bytes of Data(%d)\n",
-			  length, type);
+      _gnutls_buffers_log ("BUF[IA]: Inserted %d bytes of Data(%d)\n",
+			   length, type);
       break;
 
     default:
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
   if (_gnutls_buffer_append (buf, data, length) < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -220,16 +220,16 @@ _gnutls_record_buffer_get (content_type_t type,
       if (length > session->internals.ia_data_buffer.length)
 	length = session->internals.ia_data_buffer.length;
 
-      _gnutls_buffers_log("BUF[REC][IA]: Read %d bytes of Data(%d)\n",
-			  length, type);
+      _gnutls_buffers_log ("BUF[REC][IA]: Read %d bytes of Data(%d)\n",
+			   length, type);
 
       session->internals.ia_data_buffer.length -= length;
-      memcpy(data, session->internals.ia_data_buffer.data, length);
+      memcpy (data, session->internals.ia_data_buffer.data, length);
 
       /* overwrite buffer */
-      memmove(session->internals.ia_data_buffer.data,
-	      &session->internals.ia_data_buffer.data[length],
-	      session->internals.ia_data_buffer.length);
+      memmove (session->internals.ia_data_buffer.data,
+	       &session->internals.ia_data_buffer.data[length],
+	       session->internals.ia_data_buffer.length);
 
       break;
 

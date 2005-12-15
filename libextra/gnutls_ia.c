@@ -111,7 +111,7 @@ _gnutls_send_inner_application (gnutls_session_t session,
 static ssize_t
 _gnutls_recv_inner_application (gnutls_session_t session,
 				gnutls_ia_apptype_t * msg_type,
-				opaque *data, size_t sizeofdata)
+				opaque * data, size_t sizeofdata)
 {
   ssize_t len;
   opaque pkt[4];
@@ -166,9 +166,7 @@ _gnutls_ia_prf (gnutls_session_t session,
 		size_t label_size,
 		const char *label,
 		size_t extra_size,
-		const char *extra,
-		size_t outsize,
-		opaque *out)
+		const char *extra, size_t outsize, opaque * out)
 {
   int ret;
   opaque *seed;
@@ -177,7 +175,7 @@ _gnutls_ia_prf (gnutls_session_t session,
   seed = gnutls_malloc (seedsize);
   if (!seed)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -188,12 +186,7 @@ _gnutls_ia_prf (gnutls_session_t session,
 
   ret = _gnutls_PRF (session->security_parameters.inner_secret,
 		     TLS_MASTER_SIZE,
-		     label,
-		     label_size,
-		     seed,
-		     seedsize,
-		     outsize,
-		     out);
+		     label, label_size, seed, seedsize, outsize, out);
 
   gnutls_free (seed);
 
@@ -241,16 +234,11 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
  **/
 int
 gnutls_ia_generate_challenge (gnutls_session_t session,
-			      size_t buffer_size,
-			      char *buffer)
+			      size_t buffer_size, char *buffer)
 {
   return _gnutls_ia_prf (session,
 			 sizeof (challenge_label) - 1,
-			 challenge_label,
-			 0,
-			 NULL,
-			 buffer_size,
-			 buffer);
+			 challenge_label, 0, NULL, buffer_size, buffer);
 }
 
 /**
@@ -270,8 +258,7 @@ gnutls_ia_generate_challenge (gnutls_session_t session,
  * key from the inner secret.
  **/
 void
-gnutls_ia_extract_inner_secret (gnutls_session_t session,
-				char *buffer)
+gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer)
 {
   memcpy (buffer, session->security_parameters.inner_secret, TLS_MASTER_SIZE);
 }
@@ -292,7 +279,7 @@ gnutls_ia_extract_inner_secret (gnutls_session_t session,
  * Return value: Return 0 on success, or an error code.
  **/
 int
-gnutls_ia_endphase_send(gnutls_session_t session, int final_p)
+gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
 {
   opaque local_checksum[CHECKSUM_SIZE];
   int client = session->security_parameters.entity == GNUTLS_CLIENT;
@@ -303,8 +290,7 @@ gnutls_ia_endphase_send(gnutls_session_t session, int final_p)
   int ret;
 
   ret = _gnutls_PRF (session->security_parameters.inner_secret,
-		     TLS_MASTER_SIZE,
-		     label, size_of_label - 1,
+		     TLS_MASTER_SIZE, label, size_of_label - 1,
 		     /* XXX specification unclear on seed. */
 		     "", 0, CHECKSUM_SIZE, local_checksum);
   if (ret < 0)
@@ -313,8 +299,7 @@ gnutls_ia_endphase_send(gnutls_session_t session, int final_p)
   len = _gnutls_send_inner_application
     (session,
      final_p ? GNUTLS_IA_FINAL_PHASE_FINISHED :
-     GNUTLS_IA_INTERMEDIATE_PHASE_FINISHED,
-     local_checksum, CHECKSUM_SIZE);
+     GNUTLS_IA_INTERMEDIATE_PHASE_FINISHED, local_checksum, CHECKSUM_SIZE);
 
   /* XXX  Instead of calling this function over and over...?
    * while (len == GNUTLS_E_AGAIN || len == GNUTLS_E_INTERRUPTED)
@@ -323,7 +308,7 @@ gnutls_ia_endphase_send(gnutls_session_t session, int final_p)
 
   if (len < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return len;
     }
 
@@ -453,8 +438,7 @@ gnutls_ia_recv (gnutls_session_t session, char *data, size_t sizeofdata)
   gnutls_ia_apptype_t msg_type;
   ssize_t len;
 
-  len = _gnutls_recv_inner_application (session, &msg_type,
-					data, sizeofdata);
+  len = _gnutls_recv_inner_application (session, &msg_type, data, sizeofdata);
 
   if (msg_type == GNUTLS_IA_INTERMEDIATE_PHASE_FINISHED)
     return GNUTLS_E_WARNING_IA_IPHF_RECEIVED;
@@ -476,7 +460,7 @@ _gnutls_ia_client_handshake (gnutls_session_t session)
   char tmp[1024];		/* XXX */
   ssize_t len;
   int ret;
-  const struct gnutls_ia_client_credentials_st * cred =
+  const struct gnutls_ia_client_credentials_st *cred =
     _gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
 
   if (cred == NULL)
@@ -544,7 +528,7 @@ _gnutls_ia_server_handshake (gnutls_session_t session)
   ssize_t len;
   char buf[1024];
   int ret;
-  const struct gnutls_ia_server_credentials_st * cred =
+  const struct gnutls_ia_server_credentials_st *cred =
     _gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
 
   if (cred == NULL)

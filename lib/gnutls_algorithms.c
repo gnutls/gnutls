@@ -243,7 +243,8 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
   {"Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
 #endif
   {"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0},
-  {"RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0, 1 /* needs RSA params */},
+  {"RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0,
+   1 /* needs RSA params */ },
   {"DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
   {"DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
 
@@ -254,7 +255,8 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 #endif
 #ifdef ENABLE_PSK
   {"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, 0},
-  {"DHE PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct, 1 /* needs DHE params */, 0},
+  {"DHE PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
+   1 /* needs DHE params */ , 0},
 #endif
   /* other algorithms are appended here by gnutls-extra
    * initialization function.

@@ -54,7 +54,8 @@ static int _gnutls_pk_decrypt (int algo, mpi_t * resarr, mpi_t data,
 int
 _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
 			   const gnutls_datum_t * plaintext,
-			   mpi_t * params, unsigned params_len, unsigned btype)
+			   mpi_t * params, unsigned params_len,
+			   unsigned btype)
 {
   unsigned int i, pad;
   int ret;
@@ -207,7 +208,8 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
 int
 _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
 			   const gnutls_datum_t * ciphertext,
-			   mpi_t * params, unsigned params_len, unsigned btype)
+			   mpi_t * params, unsigned params_len,
+			   unsigned btype)
 {
   unsigned k, i;
   int ret;

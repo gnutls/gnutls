@@ -42,6 +42,7 @@ int _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
 int _gnutls_dh_common_print_server_kx (gnutls_session_t, mpi_t g, mpi_t p,
 				       opaque ** data, int psk);
 int _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
-				      opaque * data, size_t _data_size, int psk);
+				      opaque * data, size_t _data_size,
+				      int psk);
 
 #endif

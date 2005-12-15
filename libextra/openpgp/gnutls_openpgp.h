@@ -57,7 +57,8 @@ int gnutls_openpgp_get_key (gnutls_datum_t * key,
 			    key_attr_t by, opaque * pattern);
 
 int gnutls_openpgp_recv_key (const char *host,
-			     short port, uint32_t keyid, gnutls_datum_t * key);
+			     short port, uint32_t keyid,
+			     gnutls_datum_t * key);
 
 /* internal */
 int _gnutls_openpgp_raw_key_to_gcert (gnutls_cert * cert,

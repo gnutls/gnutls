@@ -160,7 +160,7 @@ _gnutls_mpi_dprint_lz (gnutls_datum_t * dest, const mpi_t a)
 }
 
 int
-_gnutls_mpi_dprint(gnutls_datum_t * dest, const mpi_t a)
+_gnutls_mpi_dprint (gnutls_datum_t * dest, const mpi_t a)
 {
   int ret;
   opaque *buf = NULL;

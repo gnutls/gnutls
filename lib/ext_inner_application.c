@@ -44,7 +44,7 @@ _gnutls_inner_application_recv_params (gnutls_session_t session,
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 
-  switch ((unsigned char)*data)
+  switch ((unsigned char) *data)
     {
     case NO:
       state = GNUTLS_IA_APP_PHASE_ON_RESUMPTION_NO;
@@ -81,7 +81,7 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       gnutls_ia_client_credentials_t cred = (gnutls_ia_client_credentials_t)
-	_gnutls_get_cred(session->key, GNUTLS_CRD_IA, NULL);
+	_gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
 
       if (cred == NULL)
 	return 0;
@@ -96,7 +96,7 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
   else
     {
       gnutls_ia_server_credentials_t cred = (gnutls_ia_server_credentials_t)
-	_gnutls_get_cred(session->key, GNUTLS_CRD_IA, NULL);
+	_gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
 
       if (cred == NULL)
 	return 0;
@@ -105,12 +105,12 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
          client set app_phase_on_resumption to "yes" or if the server
          does not resume the session. */
       if ((ext->peer_mode == GNUTLS_IA_APP_PHASE_ON_RESUMPTION_YES) ||
-	  !gnutls_session_is_resumed(session))
+	  !gnutls_session_is_resumed (session))
 	*data = YES;
       /* The server MAY set app_phase_on_resumption to "yes" for a
-	 resumed session even if the client set
-	 app_phase_on_resumption to "no", as the server may have
-	 reason to proceed with one or more application phases. */
+         resumed session even if the client set
+         app_phase_on_resumption to "no", as the server may have
+         reason to proceed with one or more application phases. */
       else if (!ext->inner_phase_optional)
 	*data = YES;
       else
