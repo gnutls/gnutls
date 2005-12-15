@@ -9,3 +9,4 @@ libgnutls-extra.la
 libgnutls-openssl.la
 *.lo
 gnutls-extra.pc
+ia-api.texi

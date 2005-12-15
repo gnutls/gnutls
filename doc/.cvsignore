@@ -21,8 +21,9 @@ version.texi
 stamp-*
 gnutls-api.texi
 gnutls-extra-api.texi
-pgp-api.texi
-x509-api.texi
 gnutls.html
 gnutls.fns
 gnutls.pdf
+ia-api.texi
+pgp-api.texi
+x509-api.texi
