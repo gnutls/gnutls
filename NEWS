@@ -43,7 +43,7 @@ New functions, to toggle TLS/IA application phases:
 New function to mix session keys with inner secret:
   gnutls_ia_permute_inner_secret
 
-Low-level API:
+Low-level API (used internally by gnutls_ia_handshake):
   gnutls_ia_endphase_send
   gnutls_ia_send
   gnutls_ia_recv
