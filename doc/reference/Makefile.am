@@ -61,9 +61,9 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h		\
 	auth_dh_common.h ext_srp.h gnutls_srp.h auth_srp.h		\
 	auth_srp_passwd.h auth_psk.h auth_psk_passwd.h memmem.h		\
-	gnutls_helper.h							\
+	gnutls_helper.h ext_inner_application.h				\
 									\
-	der.h errors.h gstr.h parser_aux.h element.h		\
+	der.h errors.h gstr.h parser_aux.h element.h			\
 	errors_int.h int.h mem.h structure.h				\
 									\
 	common.h crq.h dsa.h mpi.h pkcs7.h rfc2818.h verify.h compat.h	\
@@ -71,7 +71,7 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 									\
 	gnutls_extra.h lzoconf.h minilzo.h openssl_compat.h		\
 									\
-	cipher.h context.h filters.h main.h md.h packet.h	\
+	cipher.h context.h filters.h main.h md.h packet.h		\
 	stream.h types.h						\
 									\
 	gnutls_openpgp.h
