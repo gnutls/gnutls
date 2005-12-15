@@ -10,6 +10,19 @@ This is per draft-funk-tls-inner-application-extension-01.  This
 functionality is added to libgnutls-extra, so it is licensed under the
 GNU General Public License.
 
+** New APIs to access the TLS Pseudo-Random-Function (PRF).
+The PRF is used by some protocols building on TLS, such as EAP-PEAP
+and EAP-TTLS.  One function to access the raw PRF and one to access
+the PRF seeded with the client/server random fields are provided.
+Suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
+
+** New APIs to acceess the client and server random fields in a session.
+These fields can be useful by protocols using TLS.  Note that these
+fields are typically used as input to the TLS PRF, and if this is your
+intended use, you should use the TLS PRF API that use the
+client/server random field directly.  Suggested by Jouni Malinen
+<jkmaline@cc.hut.fi>.
+
 ** Internal type cleanups.
 The uint8, uint16, uint32 types have been replaced by uint8_t,
 uint16_t, uint32_t.  Gnulib is used to guarantee the presence of
