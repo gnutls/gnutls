@@ -86,8 +86,13 @@ typedef enum { GNUTLS_PARAMS_RSA_EXPORT=1,
     GNUTLS_PARAMS_DH 
 } gnutls_params_type_t;
 
-typedef enum { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP,
-    GNUTLS_CRD_PSK } gnutls_credentials_type_t;
+typedef enum {
+  GNUTLS_CRD_CERTIFICATE=1,
+  GNUTLS_CRD_ANON,
+  GNUTLS_CRD_SRP,
+  GNUTLS_CRD_PSK,
+  GNUTLS_CRD_IA
+} gnutls_credentials_type_t;
 
 #define GNUTLS_MAC_SHA GNUTLS_MAC_SHA1
 #define GNUTLS_DIG_SHA GNUTLS_DIG_SHA1
@@ -137,7 +142,9 @@ typedef enum { GNUTLS_A_CLOSE_NOTIFY,
     GNUTLS_A_INSUFFICIENT_SECURITY, GNUTLS_A_INTERNAL_ERROR=80, GNUTLS_A_USER_CANCELED=90,
     GNUTLS_A_NO_RENEGOTIATION=100, GNUTLS_A_UNSUPPORTED_EXTENSION=110,
     GNUTLS_A_CERTIFICATE_UNOBTAINABLE=111, GNUTLS_A_UNRECOGNIZED_NAME=112,
-    GNUTLS_A_UNKNOWN_SRP_USERNAME=120, GNUTLS_A_MISSING_SRP_USERNAME=121
+    GNUTLS_A_UNKNOWN_SRP_USERNAME=120, GNUTLS_A_MISSING_SRP_USERNAME=121,
+    GNUTLS_A_INNER_APPLICATION_FAILURE=208,
+    GNUTLS_A_INNER_APPLICATION_VERIFICATION=209
 } gnutls_alert_description_t;
 
 typedef enum { GNUTLS_HANDSHAKE_HELLO_REQUEST, 
@@ -296,6 +303,12 @@ int gnutls_server_name_set(gnutls_session_t session,
 int gnutls_server_name_get(gnutls_session_t session, 
     void *data, size_t *data_length,
     unsigned int * type, unsigned int indx);
+
+typedef enum {
+  GNUTLS_IA_DISABLED = 0,
+  GNUTLS_IA_APP_PHASE_ON_RESUMPTION_NO = 1,
+  GNUTLS_IA_APP_PHASE_ON_RESUMPTION_YES = 2
+} gnutls_ia_mode_t;
 
 /* functions to set priority of cipher suites 
  */
@@ -918,6 +931,11 @@ void gnutls_psk_set_params_function(gnutls_psk_server_credentials_t res,
 #define GNUTLS_E_INVALID_PASSWORD -99
 #define GNUTLS_E_MAC_VERIFY_FAILED -100	/* for PKCS #12 MAC */
 #define GNUTLS_E_CONSTRAINT_ERROR -101
+
+#define GNUTLS_E_WARNING_IA_IPHF_RECEIVED -102
+#define GNUTLS_E_WARNING_IA_FPHF_RECEIVED -103
+
+#define GNUTLS_E_IA_VERIFY_FAILED -104
 
 #define GNUTLS_E_BASE64_ENCODING_ERROR -201
 #define GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY -202	/* obsolete */

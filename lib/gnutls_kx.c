@@ -95,6 +95,10 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 		     session->security_parameters.master_secret);
     }
 
+  /* TLS/IA inner secret is derived from the master secret. */
+  memcpy (session->security_parameters.inner_secret,
+	  session->security_parameters.master_secret, TLS_MASTER_SIZE);
+
   if (!keep_premaster)
     _gnutls_free_datum (&PREMASTER);
 

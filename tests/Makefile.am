@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-AM_CPPFLAGS = -I../includes -I$(top_srcdir)/includes -I$(top_srcdir)/gl
+AM_CPPFLAGS = -I../gl -I$(top_srcdir)/gl -I../includes -I$(top_srcdir)/includes
 AM_LDFLAGS = -no-install
 LDADD = ../lib/libgnutls.la ../gl/libgnu.la libutils.la
 
@@ -33,8 +33,10 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
+tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
+	../gl/libgnu.la @LTLIBREADLINE@
 
-ctests = simple anonself pskself openssl gc dhepskself set_pkcs12_cred
+ctests = simple anonself pskself openssl gc dhepskself set_pkcs12_cred tlsia
 TESTS = pkcs12_neon pkcs8 $(ctests)
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon pkcs8

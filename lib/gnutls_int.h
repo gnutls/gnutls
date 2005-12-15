@@ -31,6 +31,10 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 
+struct bar {
+  uint8_t foo;
+};
+
 /*
  * They are not needed any more. You can simply enable
  * the gnutls_log callback to get error descriptions.
@@ -137,7 +141,8 @@ typedef enum handshake_state_t
 typedef enum extensions_t
 { GNUTLS_EXTENSION_SERVER_NAME = 0,
   GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1, GNUTLS_EXTENSION_SRP = 6,
-  GNUTLS_EXTENSION_CERT_TYPE = 7
+  GNUTLS_EXTENSION_CERT_TYPE = 7,
+  GNUTLS_EXTENSION_INNER_APPLICATION = 37703
 } extensions_t;
 
 typedef enum
@@ -154,7 +159,8 @@ typedef enum resumable_session_t
 typedef enum content_type_t
 {
   GNUTLS_CHANGE_CIPHER_SPEC = 20, GNUTLS_ALERT,
-  GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA
+  GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA,
+  GNUTLS_INNER_APPLICATION = 24
 } content_type_t;
 
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t)-1
@@ -258,6 +264,9 @@ typedef struct
   /* limit server_name extensions */
   unsigned server_names_size;
   opaque srp_username[MAX_SRP_USERNAME + 1];
+  /* 0 = tls/ia not used, 1 = no, 2 = yes */
+  gnutls_ia_mode_t peer_mode;
+  int inner_phase_optional;
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
@@ -315,6 +324,8 @@ typedef struct
   /* holds the negotiated certificate type */
   gnutls_certificate_type_t cert_type;
   gnutls_protocol_t version;	/* moved here */
+  /* For TLS/IA.  XXX: Move to IA credential? */
+  opaque inner_secret[TLS_MASTER_SIZE];
 } security_parameters_st;
 
 /* This structure holds the generated keys
@@ -391,6 +402,7 @@ typedef struct
   mac_hd_t handshake_mac_handle_md5;	/* hash of the handshake messages */
 
   gnutls_buffer handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
+  gnutls_buffer ia_data_buffer;		/* holds inner application data (TLS/IA) */
   resumable_session_t resumable;	/* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;	/* holds
 					 * a number which indicates where

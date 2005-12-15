@@ -442,7 +442,8 @@ _gnutls_set_write_keys (gnutls_session_t session)
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \
 	dst->version = src->version; \
-	memcpy( &dst->extensions, &src->extensions, sizeof(tls_ext_st));
+	memcpy( &dst->extensions, &src->extensions, sizeof(tls_ext_st)); \
+	memcpy( &dst->inner_secret, &src->inner_secret, sizeof(tls_ext_st));
 
 static void
 _gnutls_cpy_read_security_parameters (security_parameters_st *

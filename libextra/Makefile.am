@@ -53,14 +53,13 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls-extra.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
-EXTRA_DIST = gnutls-extra-api.texi
+EXTRA_DIST = gnutls-extra-api.texi ia-api.texi
 
 lib_LTLIBRARIES = libgnutls-extra.la
 
-COBJECTS = gnutls_extra.c
+libgnutls_extra_la_SOURCES = gnutls_extra.c
 
 libgnutls_openssl_la_LDFLAGS =
-libgnutls_extra_la_SOURCES = 
 
 # OpenSSL
 
@@ -95,11 +94,17 @@ libgnutls_extra_la_LDFLAGS += $(LIBOPENCDK_LIBS)
 endif
 endif
 
+# TLS/IA
+
+libgnutls_extra_la_SOURCES += gnutls_ia.c
+
+# Rest
+
 libgnutls_extra_la_LDFLAGS += \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES += $(COBJECTS) gnutls_extra.h libgnutls-extra.vers
+libgnutls_extra_la_SOURCES += gnutls_extra.h libgnutls-extra.vers
 
 libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
 
@@ -115,12 +120,20 @@ SUBDIRS += minilzo
 libgnutls_extra_la_LIBADD += minilzo/libminilzo.la
 endif
 
-gnutls-extra-api.texi: $(COBJECTS)
-	@echo "" > gnutls-extra-api.texi
-	@for i in $(COBJECTS); do \
+gnutls-extra-api.texi: gnutls_extra.c
+	@echo "" > $@
+	@for i in $<; do \
 		echo -n "Creating documentation for file $$i... " && \
-		../doc/scripts/gdoc -texinfo $$i >> gnutls-extra-api.texi && \
+		../doc/scripts/gdoc -texinfo $$i >> $@ && \
 		echo "ok"; \
 	done
 
-dist-hook: gnutls-extra-api.texi
+ia-api.texi: gnutls_ia.c
+	@echo "" > $@
+	@for i in $<; do \
+		echo -n "Creating documentation for file $$i... " && \
+		../doc/scripts/gdoc -texinfo $$i >> $@ && \
+		echo "ok"; \
+	done
+
+dist-hook: gnutls-extra-api.texi ia-api.texi

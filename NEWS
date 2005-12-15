@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.3.2 (unreleased)
 
+** GnuTLS now support TLS Inner application (TLS/IA).
+This is per draft-funk-tls-inner-application-extension-01.  This
+functionality is added to libgnutls-extra, so it is licensed under the
+GPL.
+
 ** Internal type cleanups.
 The uint8, uint16, uint32 types have been replaced by uint8_t,
 uint16_t, uint32_t.  Gnulib is used to guarantee the presence of
@@ -12,7 +17,57 @@ correct types on platforms that lack them.  The uint type have been
 replaced by unsigned.
 
 ** API and ABI modifications:
-None
+New function, to perform TLS/IA handshake:
+  gnutls_ia_handshake
+
+New function to decide whether to do a TLS/IA handshake:
+  gnutls_ia_handshake_p
+
+New functions to allocate a TLS/IA credential:
+  gnutls_ia_allocate_client_credentials
+  gnutls_ia_free_client_credentials
+  gnutls_ia_allocate_server_credentials
+  gnutls_ia_free_server_credentials
+
+New functions to handle the AVP callback:
+  gnutls_ia_set_client_avp_function
+  gnutls_ia_set_client_avp_ptr
+  gnutls_ia_get_client_avp_ptr
+  gnutls_ia_set_server_avp_function
+  gnutls_ia_set_server_avp_ptr
+  gnutls_ia_get_server_avp_ptr
+
+New functions, to toggle TLS/IA application phases:
+  gnutls_ia_require_inner_phase
+
+New function to mix session keys with inner secret:
+  gnutls_ia_permute_inner_secret
+
+Low-level API:
+  gnutls_ia_endphase_send
+  gnutls_ia_send
+  gnutls_ia_recv
+
+New functions that can be used after successful TLS/IA negotiation:
+  gnutls_ia_generate_challenge
+  gnutls_ia_extract_inner_secret
+
+Enum type with TLS/IA modes:
+  gnutls_ia_mode_t
+
+Enum type with TLS/IA packet types:
+  gnutls_ia_apptype_t
+
+Enum values for TLS/IA alerts:
+  GNUTLS_A_INNER_APPLICATION_FAILURE
+  GNUTLS_A_INNER_APPLICATION_VERIFICATION
+
+New error codes, to signal when an application phase has finished:
+  GNUTLS_E_WARNING_IA_IPHF_RECEIVED
+  GNUTLS_E_WARNING_IA_FPHF_RECEIVED
+
+New error code to signal TLS/IA verify failure:
+  GNUTLS_E_IA_VERIFY_FAILED
 
 * Version 1.3.1 (released 2005-12-08)
 

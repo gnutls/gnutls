@@ -34,6 +34,7 @@
 #include <ext_cert_type.h>
 #include <ext_server_name.h>
 #include <ext_srp.h>
+#include <ext_inner_application.h>
 #include <gnutls_num.h>
 
 /* Key Exchange Section */
@@ -59,6 +60,9 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
 			  _gnutls_srp_recv_params,
 			  _gnutls_srp_send_params),
 #endif
+  GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_INNER_APPLICATION,
+			 _gnutls_inner_application_recv_params,
+			 _gnutls_inner_application_send_params),
   {0, 0, 0, 0}
 };
 
@@ -218,12 +222,12 @@ int
 _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 			size_t data_size)
 {
-  int next, size;
+  int size;
   uint16_t pos = 0;
   opaque *sdata;
   int sdata_size;
   ext_send_func ext_send;
-
+  gnutls_extension_entry *p;
 
   if (data_size < 2)
     {
@@ -242,11 +246,9 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
     }
 
   pos += 2;
-  next = MAX_EXT_TYPES;		/* maximum supported extensions */
-  do
+  for(p = _gnutls_extensions; p->name != NULL; p++)
     {
-      next--;
-      ext_send = _gnutls_ext_func_send (next);
+      ext_send = _gnutls_ext_func_send(p->type);
       if (ext_send == NULL)
 	continue;
       size = ext_send (session, sdata, sdata_size);
@@ -260,7 +262,7 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 	    }
 
 	  /* write extension type */
-	  _gnutls_write_uint16 (next, &data[pos]);
+	  _gnutls_write_uint16(p->type, &data[pos]);
 	  pos += 2;
 
 	  /* write size */
@@ -272,10 +274,10 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 
 	  /* add this extension to the extension list
 	   */
-	  _gnutls_extension_list_add (session, next);
+	  _gnutls_extension_list_add(session, p->type);
 
 	  _gnutls_debug_log ("EXT[%x]: Sending extension %s\n", session,
-			     _gnutls_extension_get_name (next));
+			     _gnutls_extension_get_name (p->type));
 	}
       else if (size < 0)
 	{
@@ -283,9 +285,7 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 	  gnutls_free (sdata);
 	  return size;
 	}
-
     }
-  while (next >= 0);
 
   size = pos;
   pos -= 2;			/* remove the size of the size header! */

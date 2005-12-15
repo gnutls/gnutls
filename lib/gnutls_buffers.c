@@ -85,42 +85,43 @@ _gnutls_record_buffer_put (content_type_t type,
 			   gnutls_session_t session, opaque * data,
 			   size_t length)
 {
+  gnutls_buffer *buf;
+
   if (length == 0)
     return 0;
+
   switch (type)
     {
     case GNUTLS_APPLICATION_DATA:
-
-      if (_gnutls_buffer_append
-	  (&session->internals.application_data_buffer, data, length) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-      _gnutls_buffers_log ("BUF[REC]: Inserted %d bytes of Data(%d)\n",
-			   length, type);
-
+      buf = &session->internals.application_data_buffer;
+      _gnutls_buffers_log("BUF[REC]: Inserted %d bytes of Data(%d)\n",
+			  length, type);
       break;
+
     case GNUTLS_HANDSHAKE:
-      if (_gnutls_buffer_append
-	  (&session->internals.handshake_data_buffer, data, length) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+      buf = &session->internals.handshake_data_buffer;
+      _gnutls_buffers_log("BUF[HSK]: Inserted %d bytes of Data(%d)\n",
+			  length, type);
+      break;
 
-      _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data(%d)\n",
-			   length, type);
-
+    case GNUTLS_INNER_APPLICATION:
+      buf = &session->internals.ia_data_buffer;
+      _gnutls_buffers_log("BUF[IA]: Inserted %d bytes of Data(%d)\n",
+			  length, type);
       break;
 
     default:
-      gnutls_assert ();
+      gnutls_assert();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return 0;
+  if (_gnutls_buffer_append (buf, data, length) < 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
 
+  return 0;
 }
 
 int
@@ -133,6 +134,9 @@ _gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
 
     case GNUTLS_HANDSHAKE:
       return session->internals.handshake_data_buffer.length;
+
+    case GNUTLS_INNER_APPLICATION:
+      return session->internals.ia_data_buffer.length;
 
     default:
       return GNUTLS_E_INVALID_REQUEST;
@@ -211,6 +215,24 @@ _gnutls_record_buffer_get (content_type_t type,
 	       session->internals.handshake_data_buffer.length);
 
       break;
+
+    case GNUTLS_INNER_APPLICATION:
+      if (length > session->internals.ia_data_buffer.length)
+	length = session->internals.ia_data_buffer.length;
+
+      _gnutls_buffers_log("BUF[REC][IA]: Read %d bytes of Data(%d)\n",
+			  length, type);
+
+      session->internals.ia_data_buffer.length -= length;
+      memcpy(data, session->internals.ia_data_buffer.data, length);
+
+      /* overwrite buffer */
+      memmove(session->internals.ia_data_buffer.data,
+	      &session->internals.ia_data_buffer.data[length],
+	      session->internals.ia_data_buffer.length);
+
+      break;
+
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
