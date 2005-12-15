@@ -49,14 +49,16 @@ extern "C"
 
 #define LIBGNUTLS_VERSION_NUMBER @NUMBER_VERSION@
 
-  @POSSIBLY_WARN_ABOUT_MISSING_FEATURES @
+  @POSSIBLY_WARN_ABOUT_MISSING_FEATURES@
+
 /* Get size_t. */
 #include <stddef.h>
 /* Get ssize_t. */
 #ifndef HAVE_SSIZE_T
 # define HAVE_SSIZE_T
-  @DEFINE_SSIZE_T @
+  @DEFINE_SSIZE_T@
 #endif
+
 /* Get time_t. */
 #include <time.h>
 #include <gnutls/compat.h>
