@@ -263,7 +263,6 @@ const char *gnutls_compression_get_name( gnutls_compression_method_t algorithm);
 const char *gnutls_kx_get_name( gnutls_kx_algorithm_t algorithm);
 const char *gnutls_certificate_type_get_name( gnutls_certificate_type_t type);
 
-
 /* error functions */
 int gnutls_error_is_fatal( int error);
 int gnutls_error_to_alert( int err, int* level);
@@ -290,6 +289,17 @@ size_t gnutls_record_get_max_size( gnutls_session_t session);
 ssize_t gnutls_record_set_max_size( gnutls_session_t session, size_t size);
 
 size_t gnutls_record_check_pending(gnutls_session_t session);
+
+int gnutls_prf (gnutls_session_t session,
+		size_t label_size, const char *label,
+		int server_random_first,
+		size_t extra_size, const char *extra,
+		size_t outsize, char *out);
+
+int gnutls_prf_raw (gnutls_session_t session,
+		    size_t label_size, const char *label,
+		    size_t seed_size, const char *seed,
+		    size_t outsize, char *out);
 
 /* TLS Extensions */
 
@@ -344,6 +354,10 @@ int gnutls_session_get_data2( gnutls_session_t session, gnutls_datum* data);
 /* returns the session ID */
 #define GNUTLS_MAX_SESSION_ID 32
 int gnutls_session_get_id( gnutls_session_t session, void* session_id, size_t *session_id_size);
+
+/* returns the client/server random fields. */
+const char *gnutls_session_get_server_random (gnutls_session_t session);
+const char *gnutls_session_get_client_random (gnutls_session_t session);
 
 /* checks if this session is a resumed one 
  */

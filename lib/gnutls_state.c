@@ -900,6 +900,170 @@ _gnutls_PRF (const opaque * secret, int secret_size, const char *label,
 }
 
 /**
+ * gnutls_prf_raw - access the TLS PRF directly
+ * @session: is a #gnutls_session_t structure.
+ * @label_size: length of the @label variable.
+ * @label: label used in PRF computation, typically a short string.
+ * @seed_size: length of the @seed variable.
+ * @seed: optional extra data to seed the PRF with.
+ * @outsize: size of pre-allocated output buffer to hold the output.
+ * @out: pre-allocate buffer to hold the generated data.
+ *
+ * Apply the TLS Pseudo-Random-Function (PRF) using the master secret
+ * on some data.
+ *
+ * The @label variable usually contain a string denoting the purpose
+ * for the generated data.  The @seed usually contain data such as the
+ * client and server random, perhaps together with some additional
+ * data that is added to guarantee uniqueness of the output for a
+ * particular purpose.
+ *
+ * Because the output is not guaranteed to be unique for a particular
+ * session unless @seed include the client random and server random
+ * fields (the PRF would output the same data on another connection
+ * resumed from the first one), it is not recommended to use this
+ * function directly.  The gnutls_prf() function seed the PRF with the
+ * client and server random fields directly, and is recommended if you
+ * want to generate pseudo random data unique for each session.
+ *
+ * Return value: Return 0 on success, or an error code.
+ **/
+int
+gnutls_prf_raw (gnutls_session_t session,
+		size_t label_size,
+		const char *label,
+		size_t seed_size,
+		const char *seed,
+		size_t outsize,
+		char *out)
+{
+  int ret;
+
+  ret = _gnutls_PRF (session->security_parameters.master_secret,
+		     TLS_MASTER_SIZE,
+		     label,
+		     label_size,
+		     seed,
+		     seedsize,
+		     outsize,
+		     out);
+
+  return ret;
+}
+
+/**
+ * gnutls_prf - derive pseudo-random data using the TLS PRF
+ * @session: is a #gnutls_session_t structure.
+ * @label_size: length of the @label variable.
+ * @label: label used in PRF computation, typically a short string.
+ * @server_random_first: non-0 if server random field should be first in seed
+ * @extra_size: length of the @extra variable.
+ * @extra: optional extra data to seed the PRF with.
+ * @outsize: size of pre-allocated output buffer to hold the output.
+ * @out: pre-allocate buffer to hold the generated data.
+ *
+ * Apply the TLS Pseudo-Random-Function (PRF) using the master secret
+ * on some data, seeded with the client and server random fields.
+ *
+ * The @label variable usually contain a string denoting the purpose
+ * for the generated data.  The @server_random_first indicate whether
+ * the client random field or the server random field should be first
+ * in the seed.  Non-0 indicate that the server random field is first,
+ * 0 that the client random field is first.
+ *
+ * The @extra variable can be used to add more data to the seed, after
+ * the random variables.  It can be used to tie make sure the
+ * generated output is strongly connected to some additional data
+ * (e.g., a string used in user authentication).
+ *
+ * The output is placed in *@OUT, which must be pre-allocated.
+ *
+ * Return value: Return 0 on success, or an error code.
+ **/
+int
+gnutls_prf (gnutls_session_t session,
+	    size_t label_size,
+	    const char *label,
+	    int server_random_first,
+	    size_t extra_size,
+	    const char *extra,
+	    size_t outsize,
+	    char *out)
+{
+  int ret;
+  opaque *seed;
+  size_t seedsize = 2 * TLS_RANDOM_SIZE + extra_size;
+
+  seed = gnutls_malloc (seedsize);
+  if (!seed)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  memcpy (seed, server_random_first ?
+	  session->security_parameters.server_random :
+	  session->security_parameters.client_random, TLS_RANDOM_SIZE);
+  memcpy (seed + TLS_RANDOM_SIZE, server_random_first ?
+	  session->security_parameters.client_random :
+	  session->security_parameters.server_random,
+	  TLS_RANDOM_SIZE);
+
+  memcpy (seed + 2 * TLS_RANDOM_SIZE, extra, extra_size);
+
+  ret = _gnutls_PRF (session->security_parameters.master_secret,
+		     TLS_MASTER_SIZE,
+		     label,
+		     label_size,
+		     seed,
+		     seedsize,
+		     outsize,
+		     out);
+
+  gnutls_free (seed);
+
+  return ret;
+}
+
+/**
+ * gnutls_session_get_client_random - get the session's client random value
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Return a pointer to the 32-byte client random field used in the
+ * session.  The pointer must not be modified or deallocated.
+ *
+ * If a client random value has not yet been established, the output
+ * will be garbage, and in particular a %NULL return value should not
+ * be expected.
+ *
+ * Return value: pointer to client random.
+ **/
+const char *
+gnutls_session_get_client_random (gnutls_session_t session)
+{
+  return session->security_parameters.client_random;
+}
+
+/**
+ * gnutls_session_get_server_random - get the session's server random value
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Return a pointer to the 32-byte server random field used in the
+ * session.  The pointer must not be modified or deallocated.
+ *
+ * If a server random value has not yet been established, the output
+ * will be garbage, and in particular a %NULL return value should not
+ * be expected.
+ *
+ * Return value: pointer to server random.
+ **/
+const char *
+gnutls_session_get_server_random (gnutls_session_t session)
+{
+  return session->security_parameters.server_random;
+}
+
+/**
   * gnutls_session_is_resumed - Used to check whether this session is a resumed one
   * @session: is a #gnutls_session_t structure.
   *

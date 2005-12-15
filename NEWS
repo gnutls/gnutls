@@ -17,6 +17,14 @@ correct types on platforms that lack them.  The uint type have been
 replaced by unsigned.
 
 ** API and ABI modifications:
+New functions to invoke the TLS Pseudo-Random-Function (PRF):
+  gnutls_prf
+  gnutls_prf_raw
+
+New functions to retrieve the session's client and server random values:
+  gnutls_session_get_server_random
+  gnutls_session_get_client_random
+
 New function, to perform TLS/IA handshake:
   gnutls_ia_handshake
 
