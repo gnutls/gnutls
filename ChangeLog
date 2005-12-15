@@ -1,3 +1,189 @@
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.3.2.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c, lib/gnutls_state.h: Fix warnings.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Remove debug code.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_state.c: Add
+	functions to access the TLS PRF and to extract client/server random
+	fields, suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Ignore more.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/Makefile.am, doc/gnutls.texi,
+	doc/examples/ex-client-tlsia.c, doc/manpages/Makefile.am,
+	includes/gnutls/extra.h, includes/gnutls/gnutls.h.in,
+	lib/Makefile.am, lib/debug.c, lib/defines.h,
+	lib/ext_inner_application.c, lib/ext_inner_application.h,
+	lib/gnutls_alert.c, lib/gnutls_buffers.c, lib/gnutls_constate.c,
+	lib/gnutls_errors.c, lib/gnutls_extensions.c, lib/gnutls_int.h,
+	lib/gnutls_kx.c, lib/gnutls_record.c, lib/gnutls_state.c,
+	libextra/Makefile.am, libextra/gnutls_ia.c, tests/Makefile.am,
+	tests/tlsia.c: Add TLS/IA support.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-comp.m4: Update.
+
+2005-12-14  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Simplify release target.
+
+2005-12-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2005-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Doc fix.
+
+2005-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2005-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-tlsia.c, includes/gnutls/extra.h,
+	lib/ext_inner_application.c, lib/gnutls_int.h,
+	libextra/gnutls_ia.c: Simplify TLS/IA mode API.
+
+2005-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c, doc/gnutls.texi: Use new API.
+
+2005-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Doc fix.
+
+2005-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Reorder.
+
+2005-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_ui.c: added missing set_params_function()
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c, lib/auth_cert.h, lib/auth_psk_passwd.c,
+	lib/auth_srp_passwd.c, lib/auth_srp_sb64.c, lib/defines.h,
+	lib/ext_cert_type.c, lib/ext_server_name.c, lib/ext_srp.c,
+	lib/gnutls_buffers.c, lib/gnutls_cert.c, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_pk.c,
+	lib/gnutls_pk.h, lib/gnutls_state.c, lib/gnutls_state.h,
+	lib/gnutls_ui.c, lib/gnutls_x509.c, lib/x509_b64.c,
+	lib/x509/common.c, lib/x509/dn.c, lib/x509/extensions.c,
+	lib/x509/pkcs7.c, lib/x509/privkey_pkcs8.c: Replace "uint" with
+	"unsigned".  Remove unused "sint".
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/defines.h, lib/gnutls_handshake.c, lib/gnutls_handshake.h,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_num.c,
+	lib/gnutls_num.h, lib/gnutls_session_pack.c, lib/x509/mpi.c,
+	lib/x509/mpi.h, libextra/openpgp/extras.c,
+	libextra/openpgp/gnutls_openpgp.h, libextra/openpgp/pgp.c: Replace
+	uint32 with uint32_t.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_dh_common.c, lib/auth_psk.c, lib/auth_rsa_export.c,
+	lib/auth_srp.c, lib/defines.h, lib/ext_max_record.c,
+	lib/ext_max_record.h, lib/ext_server_name.c,
+	lib/gnutls_algorithms.c, lib/gnutls_cipher.c,
+	lib/gnutls_extensions.c, lib/gnutls_extensions.h,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_num.c,
+	lib/gnutls_num.h, lib/gnutls_record.c, lib/gnutls_v2_compat.c,
+	lib/x509/extensions.c, lib/x509/extensions.h, lib/x509/x509.c,
+	lib/x509/x509_write.c: Replace uint16 with uint16_t.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove unused sizeof checks.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/auth_cert.c, lib/auth_dh_common.c,
+	lib/auth_rsa_export.c, lib/auth_srp.c, lib/auth_srp_passwd.h,
+	lib/auth_srp_sb64.c, lib/defines.h, lib/ext_cert_type.c,
+	lib/ext_max_record.c, lib/ext_server_name.c, lib/ext_srp.c,
+	lib/gnutls_alert.c, lib/gnutls_algorithms.c,
+	lib/gnutls_algorithms.h, lib/gnutls_cipher.c, lib/gnutls_cipher.h,
+	lib/gnutls_datum.c, lib/gnutls_db.c, lib/gnutls_db.h,
+	lib/gnutls_handshake.c, lib/gnutls_handshake.h, lib/gnutls_int.h,
+	lib/gnutls_kx.c, lib/gnutls_num.c, lib/gnutls_record.c,
+	lib/x509_b64.c, lib/x509_b64.h, lib/x509/extensions.c,
+	lib/x509/pkcs12.c, lib/x509/pkcs7.c, lib/x509/x509.c,
+	libextra/gnutls_openpgp.c, libextra/openpgp/gnutls_openpgp.h,
+	libextra/openpgp/xml.c: Replace uint8 with uint8_t.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4: Update.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/defines.h: Remove unused types, to start the transition to
+	the POSIX integer types (uint32_t, uint16_t, uint8_t).
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Remove -I../lib, these tools should only use the
+	external API.
+
+2005-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/defines.h, lib/gnutls_str.c: ULONG_MAX should be in limits.h,
+	so include it at the right place.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/pkcs12.c: Fix mem leaks.  Remove unused variable.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c: Fix mem leak.
+
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.3.1.
