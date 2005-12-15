@@ -65,22 +65,34 @@ extern "C"
 #define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_AES_128_CBC
 #define GNUTLS_CIPHER_ARCFOUR GNUTLS_CIPHER_ARCFOUR_128
     typedef enum gnutls_cipher_algorithm
-  { GNUTLS_CIPHER_NULL = 1,
-    GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_3DES_CBC,
-    GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_AES_256_CBC,
+  {
+    GNUTLS_CIPHER_NULL = 1,
+    GNUTLS_CIPHER_ARCFOUR_128,
+    GNUTLS_CIPHER_3DES_CBC,
+    GNUTLS_CIPHER_AES_128_CBC,
+    GNUTLS_CIPHER_AES_256_CBC,
     GNUTLS_CIPHER_ARCFOUR_40,
-    GNUTLS_CIPHER_RC2_40_CBC = 90, GNUTLS_CIPHER_DES_CBC
+    GNUTLS_CIPHER_RC2_40_CBC = 90,
+    GNUTLS_CIPHER_DES_CBC
   } gnutls_cipher_algorithm_t;
 
   typedef enum
-  { GNUTLS_KX_RSA = 1, GNUTLS_KX_DHE_DSS,
-    GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
-    GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS,
-    GNUTLS_KX_PSK, GNUTLS_KX_DHE_PSK
+  {
+    GNUTLS_KX_RSA = 1,
+    GNUTLS_KX_DHE_DSS,
+    GNUTLS_KX_DHE_RSA,
+    GNUTLS_KX_ANON_DH,
+    GNUTLS_KX_SRP,
+    GNUTLS_KX_RSA_EXPORT,
+    GNUTLS_KX_SRP_RSA,
+    GNUTLS_KX_SRP_DSS,
+    GNUTLS_KX_PSK,
+    GNUTLS_KX_DHE_PSK
   } gnutls_kx_algorithm_t;
 
   typedef enum
-  { GNUTLS_PARAMS_RSA_EXPORT = 1,
+  {
+    GNUTLS_PARAMS_RSA_EXPORT = 1,
     GNUTLS_PARAMS_DH
   } gnutls_params_type_t;
 
@@ -95,6 +107,7 @@ extern "C"
 
 #define GNUTLS_MAC_SHA GNUTLS_MAC_SHA1
 #define GNUTLS_DIG_SHA GNUTLS_DIG_SHA1
+
   typedef enum
   {
     GNUTLS_MAC_UNKNOWN = 0,
@@ -105,8 +118,9 @@ extern "C"
     GNUTLS_MAC_MD2
   } gnutls_mac_algorithm_t;
 
-/* The enumerations here should have the same value with gnutls_mac_algorithm_t.
- */
+  /* The enumerations here should have the same value with
+     gnutls_mac_algorithm_t.
+   */
   typedef enum
   {
     GNUTLS_DIG_NULL = 1,
@@ -116,27 +130,36 @@ extern "C"
     GNUTLS_DIG_MD2
   } gnutls_digest_algorithm_t;
 
-/* exported for other gnutls headers. This is the maximum number
- * of algorithms (ciphers, kx or macs). 
- */
+  /* exported for other gnutls headers. This is the maximum number of
+   * algorithms (ciphers, kx or macs).
+   */
 #define GNUTLS_MAX_ALGORITHM_NUM 16
 
 #define GNUTLS_COMP_ZLIB GNUTLS_COMP_DEFLATE
   typedef enum
-  { GNUTLS_COMP_NULL = 1,
+  {
+    GNUTLS_COMP_NULL = 1,
     GNUTLS_COMP_DEFLATE,
-    GNUTLS_COMP_LZO		/* only available if gnutls-extra has been initialized 
+    GNUTLS_COMP_LZO		/* only available if gnutls-extra has
+				   been initialized
 				 */
   } gnutls_compression_method_t;
 
   typedef enum
-  { GNUTLS_SERVER = 1, GNUTLS_CLIENT } gnutls_connection_end_t;
+  {
+    GNUTLS_SERVER = 1,
+    GNUTLS_CLIENT
+  } gnutls_connection_end_t;
 
   typedef enum
-  { GNUTLS_AL_WARNING = 1, GNUTLS_AL_FATAL } gnutls_alert_level_t;
+  {
+    GNUTLS_AL_WARNING = 1,
+    GNUTLS_AL_FATAL
+  } gnutls_alert_level_t;
 
   typedef enum
-  { GNUTLS_A_CLOSE_NOTIFY,
+  {
+    GNUTLS_A_CLOSE_NOTIFY,
     GNUTLS_A_UNEXPECTED_MESSAGE = 10, GNUTLS_A_BAD_RECORD_MAC = 20,
     GNUTLS_A_DECRYPTION_FAILED, GNUTLS_A_RECORD_OVERFLOW,
     GNUTLS_A_DECOMPRESSION_FAILURE = 30,
@@ -146,10 +169,11 @@ extern "C"
     GNUTLS_A_CERTIFICATE_UNKNOWN,
     GNUTLS_A_ILLEGAL_PARAMETER, GNUTLS_A_UNKNOWN_CA, GNUTLS_A_ACCESS_DENIED,
     GNUTLS_A_DECODE_ERROR = 50,
-    GNUTLS_A_DECRYPT_ERROR, GNUTLS_A_EXPORT_RESTRICTION =
-      60, GNUTLS_A_PROTOCOL_VERSION = 70,
-    GNUTLS_A_INSUFFICIENT_SECURITY, GNUTLS_A_INTERNAL_ERROR =
-      80, GNUTLS_A_USER_CANCELED = 90,
+    GNUTLS_A_DECRYPT_ERROR,
+    GNUTLS_A_EXPORT_RESTRICTION = 60,
+    GNUTLS_A_PROTOCOL_VERSION = 70,
+    GNUTLS_A_INSUFFICIENT_SECURITY,
+    GNUTLS_A_INTERNAL_ERROR = 80, GNUTLS_A_USER_CANCELED = 90,
     GNUTLS_A_NO_RENEGOTIATION = 100, GNUTLS_A_UNSUPPORTED_EXTENSION = 110,
     GNUTLS_A_CERTIFICATE_UNOBTAINABLE = 111, GNUTLS_A_UNRECOGNIZED_NAME = 112,
     GNUTLS_A_UNKNOWN_SRP_USERNAME = 120, GNUTLS_A_MISSING_SRP_USERNAME = 121,
