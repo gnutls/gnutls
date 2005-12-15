@@ -837,7 +837,7 @@ _gnutls_xor (opaque * o1, opaque * o2, int length)
  */
 int
 _gnutls_PRF (const opaque * secret, int secret_size, const char *label,
-	     int label_size, opaque * seed, int seed_size,
+	     int label_size, const opaque * seed, int seed_size,
 	     int total_bytes, void *ret)
 {
   int l_s, s_seed_size;
@@ -943,8 +943,8 @@ gnutls_prf_raw (gnutls_session_t session,
 		     TLS_MASTER_SIZE,
 		     label,
 		     label_size,
-		     seed,
-		     seedsize,
+		     (opaque*) seed,
+		     seed_size,
 		     outsize,
 		     out);
 
@@ -1041,7 +1041,7 @@ gnutls_prf (gnutls_session_t session,
 const char *
 gnutls_session_get_client_random (gnutls_session_t session)
 {
-  return session->security_parameters.client_random;
+  return (char*) session->security_parameters.client_random;
 }
 
 /**
@@ -1060,7 +1060,7 @@ gnutls_session_get_client_random (gnutls_session_t session)
 const char *
 gnutls_session_get_server_random (gnutls_session_t session)
 {
-  return session->security_parameters.server_random;
+  return (char*) session->security_parameters.server_random;
 }
 
 /**
