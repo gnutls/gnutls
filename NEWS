@@ -8,7 +8,7 @@ See the end for copying conditions.
 ** GnuTLS now support TLS Inner application (TLS/IA).
 This is per draft-funk-tls-inner-application-extension-01.  This
 functionality is added to libgnutls-extra, so it is licensed under the
-GPL.
+GNU General Public License.
 
 ** Internal type cleanups.
 The uint8, uint16, uint32 types have been replaced by uint8_t,
