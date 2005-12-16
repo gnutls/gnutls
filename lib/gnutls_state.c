@@ -1017,8 +1017,8 @@ gnutls_prf (gnutls_session_t session,
  * session.  The pointer must not be modified or deallocated.
  *
  * If a client random value has not yet been established, the output
- * will be garbage, and in particular a %NULL return value should not
- * be expected.
+ * will be garbage; in particular, a %NULL return value should not be
+ * expected.
  *
  * Return value: pointer to client random.
  **/
@@ -1036,8 +1036,8 @@ gnutls_session_get_client_random (gnutls_session_t session)
  * session.  The pointer must not be modified or deallocated.
  *
  * If a server random value has not yet been established, the output
- * will be garbage, and in particular a %NULL return value should not
- * be expected.
+ * will be garbage; in particular, a %NULL return value should not be
+ * expected.
  *
  * Return value: pointer to server random.
  **/
@@ -1045,6 +1045,25 @@ const char *
 gnutls_session_get_server_random (gnutls_session_t session)
 {
   return (char *) session->security_parameters.server_random;
+}
+
+/**
+ * gnutls_session_get_master_secret - get the session's master secret value
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Return a pointer to the 48-byte master secret in the session.  The
+ * pointer must not be modified or deallocated.
+ *
+ * If a master secret value has not yet been established, the output
+ * will be garbage; in particular, a %NULL return value should not be
+ * expected.
+ *
+ * Return value: pointer to master secret.
+ **/
+const char *
+gnutls_session_get_master_secret (gnutls_session_t session)
+{
+  return (char *) session->security_parameters.master_secret;
 }
 
 /**
