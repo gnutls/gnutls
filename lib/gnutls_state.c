@@ -1058,6 +1058,9 @@ gnutls_session_get_server_random (gnutls_session_t session)
  * will be garbage; in particular, a %NULL return value should not be
  * expected.
  *
+ * Consider using gnutls_prf() rather than extracting the master
+ * secret and use it to derive further data.
+ *
  * Return value: pointer to master secret.
  **/
 const char *
