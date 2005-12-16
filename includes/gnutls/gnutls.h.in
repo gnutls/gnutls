@@ -429,9 +429,10 @@ extern "C"
   int gnutls_session_get_id (gnutls_session_t session, void *session_id,
 			     size_t * session_id_size);
 
-/* returns the client/server random fields. */
+/* returns security values. */
   const char *gnutls_session_get_server_random (gnutls_session_t session);
   const char *gnutls_session_get_client_random (gnutls_session_t session);
+  const char *gnutls_session_get_master_secret (gnutls_session_t session);
 
 /* checks if this session is a resumed one 
  */

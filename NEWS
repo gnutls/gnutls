@@ -5,10 +5,15 @@ See the end for copying conditions.
 
 * Version 1.3.3 (unreleased)
 
+** New API to access the TLS master secret.
+When possible, you should use the TLS PRF functions instead.
+Suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
+
 ** The code was indented again, including the external header files.
 
 ** API and ABI modifications:
-No changes since last version.
+New functions to retrieve the master secret value:
+  gnutls_session_get_master_secret
 
 * Version 1.3.2 (released 2005-12-15)
 
