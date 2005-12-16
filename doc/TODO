@@ -49,6 +49,7 @@ Current list:
   be able to execve a new process that take over the current
   living socket (using the fcntl close-on-exec flag) and
   continue the TLS session as well.
+- Implement draft-salowey-tls-ticket-05, useful for (e.g.) EAP-FAST.
 
 (+) Means high priority 
 (*) Means medium priority
