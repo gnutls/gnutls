@@ -36,7 +36,8 @@ openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la @LTLIBREADLINE@
 
-ctests = simple anonself pskself openssl gc dhepskself set_pkcs12_cred tlsia
+ctests = simple anonself pskself openssl gc dhepskself set_pkcs12_cred	\
+	tlsia resume
 TESTS = pkcs12_neon pkcs8 $(ctests)
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon pkcs8
