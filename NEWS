@@ -151,8 +151,7 @@ New function to set X.509 credentials from a PKCS#12 file:
 New gnutls_kx_algorithm_t enum type:
   GNUTLS_KX_DHE_PSK
 
-New API to return session data (better data types than
-gnutls_session_get_data):
+New API to return session data (basically same as gnutls_session_get_data):
   gnutls_session_get_data2
 
 New API to set PSK Diffie-Hellman parameters:
