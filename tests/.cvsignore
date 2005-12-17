@@ -18,6 +18,7 @@ pkcs12
 pkits.ldif
 pkits.schema
 pskself
+resume
 set_pkcs12_cred
 smime
 tlsia
