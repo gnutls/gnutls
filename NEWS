@@ -9,6 +9,8 @@ See the end for copying conditions.
 When possible, you should use the TLS PRF functions instead.
 Suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
 
+** Added a self test of TLS resume functionality.
+
 ** The code was indented again, including the external header files.
 
 ** API and ABI modifications:
