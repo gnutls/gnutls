@@ -336,10 +336,7 @@ server_start (void)
 void
 server (void)
 {
-  /* variables used in session resuming
-   */
   int t;
-  gnutls_datum session_data;
 
   for (t = 0; t < 2; t++)
     {
@@ -446,8 +443,8 @@ doit (void)
 
 typedef struct
 {
-  char session_id[MAX_SESSION_ID_SIZE];
-  int session_id_size;
+  unsigned char session_id[MAX_SESSION_ID_SIZE];
+  unsigned int session_id_size;
 
   char session_data[MAX_SESSION_DATA_SIZE];
   int session_data_size;
@@ -473,6 +470,28 @@ wrap_db_deinit (void)
 static int
 wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
+  success ("resume db storing... (%d-%d)\n", key.size, data.size);
+
+  if (debug)
+    {
+      unsigned int i;
+      printf("key:\n");
+      for (i = 0; i < key.size; i++)
+	{
+	  printf ("%02x ", key.data[i] & 0xFF);
+	  if ((i+1)%16 == 0)
+	    printf ("\n");
+	}
+      printf ("\n");
+      printf ("data:\n");
+      for (i = 0; i < data.size; i++)
+	{
+	  printf ("%02x ", data.data[i] & 0xFF);
+	  if ((i+1)%16 == 0)
+	    printf ("\n");
+	}
+      printf ("\n");
+    }
 
   if (cache_db == NULL)
     return -1;
@@ -500,6 +519,20 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
   gnutls_datum_t res = { NULL, 0 };
   int i;
 
+  success ("resume db fetch... (%d)\n", key.size);
+  if (debug)
+    {
+      unsigned int i;
+      printf("key:\n");
+      for (i = 0; i < key.size; i++)
+	{
+	  printf ("%02x ", key.data[i] & 0xFF);
+	  if ((i+1)%16 == 0)
+	    printf ("\n");
+	}
+      printf ("\n");
+    }
+
   if (cache_db == NULL)
     return res;
 
@@ -508,7 +541,7 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
       if (key.size == cache_db[i].session_id_size &&
 	  memcmp (key.data, cache_db[i].session_id, key.size) == 0)
 	{
-
+	  success ("resume db fetch... return info\n");
 
 	  res.size = cache_db[i].session_data_size;
 
@@ -517,6 +550,19 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
 	    return res;
 
 	  memcpy (res.data, cache_db[i].session_data, res.size);
+
+	  if (debug)
+	    {
+	      unsigned int i;
+	      printf ("data:\n");
+	      for (i = 0; i < res.size; i++)
+		{
+		  printf ("%02x ", res.data[i] & 0xFF);
+		  if ((i+1)%16 == 0)
+		    printf ("\n");
+		}
+	      printf ("\n");
+	    }
 
 	  return res;
 	}
