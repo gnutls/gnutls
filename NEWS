@@ -11,6 +11,8 @@ Suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
 
 ** Added a self test of TLS resume functionality.
 
+** Fix crash in TLS resume code, caused by TLS/IA changes.
+
 ** The code was indented again, including the external header files.
 
 ** API and ABI modifications:
