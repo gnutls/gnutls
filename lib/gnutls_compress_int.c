@@ -137,6 +137,9 @@ cleanup_ret:
   return NULL;
 }
 
+/* The flag d is the direction (compress, decompress). Non zero is
+ * decompress.
+ */
 void
 _gnutls_comp_deinit (comp_hd_t handle, int d)
 {
