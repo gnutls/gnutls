@@ -206,8 +206,6 @@ client (void)
     }
 
   gnutls_anon_free_client_credentials (anoncred);
-
-  gnutls_global_deinit ();
 }
 
 /* This is a sample TLS 1.0 echo server, for anonymous authentication only.
@@ -278,9 +276,9 @@ char buffer[MAX_BUF + 1];
 int optval = 1;
 
 void
-server_start (void)
+global_start (void)
 {
-  /* this must be called once in the program
+  /* this must be called once in the program, it is mostly for the server.
    */
   gnutls_global_init ();
 
@@ -331,6 +329,18 @@ server_start (void)
     }
 
   success ("server: ready. Listening to port '%d'.\n", PORT);
+}
+
+void
+global_stop (void)
+{
+  success ("global stop\n");
+
+  gnutls_anon_free_server_credentials (anoncred);
+
+  gnutls_dh_params_deinit (dh_params);
+
+  gnutls_global_deinit ();
 }
 
 void
@@ -398,10 +408,6 @@ server (void)
 
   close (listen_sd);
 
-  gnutls_anon_free_server_credentials (anoncred);
-
-  gnutls_global_deinit ();
-
   success ("server: finished\n");
 }
 
@@ -410,7 +416,7 @@ doit (void)
 {
   pid_t child;
 
-  server_start ();
+  global_start ();
   if (error_count)
     return;
 
@@ -431,6 +437,8 @@ doit (void)
     }
   else
     client ();
+
+  global_stop ();
 }
 
 /* Functions and other stuff needed for session resuming.
