@@ -9,6 +9,11 @@ See the end for copying conditions.
 When possible, you should use the TLS PRF functions instead.
 Suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
 
+** Improved handling when multiple libraries use GnuTLS at the same time.
+Now gnutls_global_init() can be called multiple times, and
+gnutls_global_deinit() will only deallocate the structure when it has
+been called as many times as gnutls_global_init() was called.
+
 ** Added a self test of TLS resume functionality.
 
 ** Fix crash in TLS resume code, caused by TLS/IA changes.
