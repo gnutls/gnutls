@@ -178,9 +178,8 @@ gnutls_global_init (void)
   int result = 0;
   int res;
 
-  if (_gnutls_init)
+  if (_gnutls_init++)
     goto out;
-  _gnutls_init++;
 
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
     {
@@ -271,14 +270,13 @@ out:
 void
 gnutls_global_deinit (void)
 {
-
   if (_gnutls_init == 1)
     {
-      _gnutls_init--;
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);
+      gc_done ();
     }
-
+  _gnutls_init--;
 }
 
 
