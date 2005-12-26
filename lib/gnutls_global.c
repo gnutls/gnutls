@@ -171,6 +171,21 @@ static int _gnutls_init = 0;
   * you must do it before calling this function. This is useful in cases you 
   * want to disable libgcrypt's internal lockings etc.
   *
+  * This function increment a global counter, so that
+  * gnutls_global_deinit() only releases resources when it has been
+  * called as many times as gnutls_global_init().  This is useful when
+  * GnuTLS is used by more than one library in an application.  This
+  * function can be called many times, but will only do something the
+  * first time.
+  *
+  * Note!  This function is not thread safe.  If two threads call this
+  * function simultaneously, they can cause a race between checking
+  * the global counter and incrementing it, causing both threads to
+  * execute the library initialization code.  That would lead to a
+  * memory leak.  To handle this, your application could invoke this
+  * function after aquiring a thread mutex.  To ignore the potential
+  * memory leak is also an option.
+  *
   **/
 int
 gnutls_global_init (void)
@@ -265,8 +280,10 @@ out:
   * This function deinitializes the global data, that were initialized
   * using gnutls_global_init().
   *
+  * Note!  This function is not thread safe.  See the discussion for
+  * gnutls_global_init() for more information.
+  *
   **/
-
 void
 gnutls_global_deinit (void)
 {
