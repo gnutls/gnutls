@@ -156,8 +156,11 @@ extern "C"
 				    const char *session_keys);
   extern int gnutls_ia_endphase_send (gnutls_session_t session, int final_p);
 
+  extern int gnutls_ia_verify_endphase (gnutls_session_t session,
+					const char *checksum);
+
   extern ssize_t
-    gnutls_ia_send (gnutls_session_t session, char *data, size_t datal);
+    gnutls_ia_send (gnutls_session_t session, const char *data, size_t datal);
   extern ssize_t
     gnutls_ia_recv (gnutls_session_t session, char *data, size_t datal);
 

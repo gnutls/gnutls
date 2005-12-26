@@ -333,7 +333,7 @@ gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
  * %GNUTLS_E_IA_VERIFY_FAILED is returned.
  **/
 int
-gnutls_ia_verify_endphase (gnutls_session_t session, char *checksum)
+gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
 {
   char local_checksum[CHECKSUM_SIZE];
   int client = session->security_parameters.entity == GNUTLS_CLIENT;
@@ -394,7 +394,7 @@ gnutls_ia_verify_endphase (gnutls_session_t session, char *checksum)
  * Returns the number of bytes sent, or a negative error code.
  **/
 ssize_t
-gnutls_ia_send (gnutls_session_t session, char *data, size_t sizeofdata)
+gnutls_ia_send (gnutls_session_t session, const char *data, size_t sizeofdata)
 {
   ssize_t len;
 
