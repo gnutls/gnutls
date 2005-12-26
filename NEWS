@@ -18,6 +18,14 @@ been called as many times as gnutls_global_init() was called.
 
 ** Fix crash in TLS resume code, caused by TLS/IA changes.
 
+** Documentation fixes about thread unsafety, prompted by
+** discussion with bryanh@giraffe-data.com (Bryan Henderson).
+In particular, gnutls_global_init() and gnutls_global_deinit() are not
+thread safe.  Careful callers may want to protect the call using a
+mutex.  The problem could also be ignored, which would cause a memory
+leak under rare conditions when two threads invoke the function
+roughly at the same time.
+
 ** The code was indented again, including the external header files.
 
 ** API and ABI modifications:
