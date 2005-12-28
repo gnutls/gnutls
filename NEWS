@@ -26,11 +26,16 @@ mutex.  The problem could also be ignored, which would cause a memory
 leak under rare conditions when two threads invoke the function
 roughly at the same time.
 
+** Add 'const' keywords in various places, from Frediano ZIGLIO.
+
 ** The code was indented again, including the external header files.
 
 ** API and ABI modifications:
 New functions to retrieve the master secret value:
   gnutls_session_get_master_secret
+
+Add a 'const' keyword to existing API:
+  gnutls_x509_crq_get_challenge_password
 
 * Version 1.3.2 (released 2005-12-15)
 

@@ -33,7 +33,7 @@ struct libtasn1_error_entry {
 };
 typedef struct libtasn1_error_entry libtasn1_error_entry;
 
-static libtasn1_error_entry error_algorithms[] = {
+static const libtasn1_error_entry error_algorithms[] = {
 	LIBTASN1_ERROR_ENTRY( ASN1_SUCCESS ),
 	LIBTASN1_ERROR_ENTRY( ASN1_FILE_NOT_FOUND ),
 	LIBTASN1_ERROR_ENTRY( ASN1_ELEMENT_NOT_FOUND ),

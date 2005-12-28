@@ -32,7 +32,7 @@ int gnutls_is_secure_memory (const void *mem);
 extern ASN1_TYPE _gnutls_pkix1_asn;
 extern ASN1_TYPE _gnutls_gnutls_asn;
 
-#define _gnutls_get_gnutls_asn() _gnutls_gnutls_asn
-#define _gnutls_get_pkix() _gnutls_pkix1_asn
+#define _gnutls_get_gnutls_asn() ((const node_asn*) _gnutls_gnutls_asn)
+#define _gnutls_get_pkix() ((const node_asn*) _gnutls_pkix1_asn)
 
 #endif

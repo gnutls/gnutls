@@ -565,7 +565,7 @@ extern "C"
   int gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
 					      const char *pass);
   int gnutls_x509_crq_get_challenge_password (gnutls_x509_crq_t crq,
-					      const char *pass,
+					      char *pass,
 					      size_t * sizeof_pass);
 
   int gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,

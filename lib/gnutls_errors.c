@@ -43,7 +43,7 @@ struct gnutls_error_entry
 };
 typedef struct gnutls_error_entry gnutls_error_entry;
 
-static gnutls_error_entry error_algorithms[] = {
+static const gnutls_error_entry error_algorithms[] = {
   /* "Short Description", Error code define, critical (0,1) -- 1 in most cases */
   ERROR_ENTRY ("Success.", GNUTLS_E_SUCCESS, 0),
   ERROR_ENTRY ("Could not negotiate a supported cipher suite.",
@@ -245,7 +245,7 @@ static gnutls_error_entry error_algorithms[] = {
 };
 
 #define GNUTLS_ERROR_LOOP(b) \
-        gnutls_error_entry *p; \
+        const gnutls_error_entry *p; \
                 for(p = error_algorithms; p->desc != NULL; p++) { b ; }
 
 #define GNUTLS_ERROR_ALG_LOOP(a) \
