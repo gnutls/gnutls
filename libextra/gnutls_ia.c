@@ -698,7 +698,7 @@ gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc)
  * The callback's function form is:
  * int (*avp_func) (gnutls_session_t session, void *ptr,
  *                  const char *last, size_t lastlen,
- *                  char **new, size_t *newlen);
+ *                  char **next, size_t *nextlen);
  *
  * The @session parameter is the #gnutls_session_t structure
  * corresponding to the current session.  The @ptr parameter is the
@@ -706,7 +706,7 @@ gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc)
  * gnutls_ia_set_client_avp_ptr().  The AVP received from the server
  * is present in @last of @lastlen size, which will be %NULL on the
  * first invocation.  The newly allocated output AVP to send to the
- * server should be placed in *@new of *@newlen size.
+ * server should be placed in *@next of *@nextlen size.
  *
  * The callback may invoke gnutls_ia_permute_inner_secret() to mix any
  * generated session keys with the TLS/IA inner secret.
@@ -714,7 +714,7 @@ gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc)
  * Return 0 (%GNUTLS_IA_APPLICATION_PAYLOAD) on success, or a negative
  * error code to abort the TLS/IA handshake.
  *
- * Note that the callback must use allocate the @new parameter using
+ * Note that the callback must use allocate the @next parameter using
  * gnutls_malloc(), because it is released via gnutls_free() by the
  * TLS/IA handshake function.
  *
@@ -804,14 +804,14 @@ gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc)
  * The callback's function form is:
  * int (*avp_func) (gnutls_session_t session, void *ptr,
  *                  const char *last, size_t lastlen,
- *                  char **new, size_t *newlen);
+ *                  char **next, size_t *nextlen);
  *
  * The @session parameter is the #gnutls_session_t structure
  * corresponding to the current session.  The @ptr parameter is the
  * application hook pointer, set through
  * gnutls_ia_set_server_avp_ptr().  The AVP received from the client
  * is present in @last of @lastlen size.  The newly allocated output
- * AVP to send to the client should be placed in *@new of *@newlen
+ * AVP to send to the client should be placed in *@next of *@nextlen
  * size.
  *
  * The AVP callback is called to process incoming AVPs from the
@@ -829,9 +829,9 @@ gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc)
  * IntermediatePhaseFinished message should be sent, and return
  * %GNUTLS_IA_FINAL_PHASE_FINISHED (2) to indicate that an
  * FinalPhaseFinished message should be sent.  In the last two cases,
- * the contents of the @new and @newlen parameter is not used.
+ * the contents of the @next and @nextlen parameter is not used.
  *
- * Note that the callback must use allocate the @new parameter using
+ * Note that the callback must use allocate the @next parameter using
  * gnutls_malloc(), because it is released via gnutls_free() by the
  * TLS/IA handshake function.
  **/
