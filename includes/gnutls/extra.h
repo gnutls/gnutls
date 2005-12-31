@@ -104,7 +104,7 @@ extern "C"
 
   typedef int (*gnutls_ia_avp_func) (gnutls_session_t session, void *ptr,
 				     const char *last, size_t lastlen,
-				     char **new, size_t * newlen);
+				     char **next, size_t * nextlen);
 
   typedef struct gnutls_ia_server_credentials_st
     *gnutls_ia_server_credentials_t;
