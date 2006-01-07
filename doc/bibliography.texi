@@ -80,8 +80,8 @@ Internet draft, work in progress. Available from @url{http://www.normos.org/ietf
 
 @mybibitem{TLSPSK}
 Pasi Eronen and Hannes Tschofenig,
-"PSK Ciphersuites for TLS", June 2005,
-Internet draft, work in progress. Available from @url{http://www.normos.org/ietf/draft/draft-ietf-tls-psk-09.txt}.
+"Pre-shared key Ciphersuites for TLS", December 2005,
+Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4279.txt}.
 
 @mybibitem{TOMSRP}
 Tom Wu, "The Stanford SRP Authentication Project",
