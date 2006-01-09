@@ -1,5 +1,5 @@
-# gnulib-tool.m4 serial 1
-dnl Copyright (C) 2004-2005 Free Software Foundation, Inc.
+# gnulib-tool.m4 serial 2
+dnl Copyright (C) 2004-2006 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -19,6 +19,9 @@ AC_DEFUN([gl_SOURCE_BASE], [])
 
 dnl Usage: gl_M4_BASE([DIR])
 AC_DEFUN([gl_M4_BASE], [])
+
+dnl Usage: gl_AUX_BASE([DIR])
+AC_DEFUN([gl_AUX_BASE], [])
 
 dnl Usage: gl_LIB([LIBNAME])
 AC_DEFUN([gl_LIB], [])
