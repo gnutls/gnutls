@@ -71,6 +71,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/asnprintf.c
   lib/des.c
   lib/des.h
+  lib/dummy.c
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c

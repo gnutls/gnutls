@@ -16,6 +16,7 @@ noinst_LTLIBRARIES = libgnu.la
 
 libgnu_la_SOURCES =
 libgnu_la_LIBADD = @LTLIBOBJS@
+noinst_HEADERS =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
@@ -117,6 +118,12 @@ libgnu_la_SOURCES += printf-args.h printf-parse.h vasnprintf.h
 libgnu_la_SOURCES += xsize.h
 
 ## end   gnulib module xsize
+
+## begin gnulib module dummy
+
+libgnu_la_SOURCES += dummy.c
+
+## end   gnulib module dummy
 
 
 # Makefile.am ends here
