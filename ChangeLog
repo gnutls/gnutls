@@ -1,3 +1,175 @@
+2006-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.3.3.
+
+2006-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2006-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/sha1.c, gl/stdint_.h, gl/m4/gnulib-comp.m4,
+	gl/m4/readline.m4, gl/dummy.c: Update.
+
+2006-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* gl/stdint_.h, gl/m4/gnulib-comp.m4, gl/m4/gnulib-tool.m4,
+	gl/m4/socklen.m4, gl/m4/stdint.m4: Update.
+
+2006-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-santesson-tls-ume-00.txt: Add.
+
+2006-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/bibliography.texi: [no log message]
+
+2005-12-31  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: C++ fix.
+
+2005-12-31  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Doc fix.
+
+2005-12-28  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-openpgp-keys-07.txt: Add.
+
+2005-12-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/x509.h, lib/gnutls_errors.c,
+	lib/gnutls_global.h, lib/minitasn1/coding.c,
+	lib/minitasn1/errors.c, lib/x509/crq.c: Constify, tiny patch from
+	"ZIGLIO, Frediano, VF-IT" <Frediano.Ziglio@vodafone.com>.
+
+2005-12-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Doc fix.
+
+2005-12-26  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h, libextra/gnutls_ia.c: Fix TLS/IA
+	prototypes, suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
+
+2005-12-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Use _gnutls_init as increment/decrement
+	counter for init/deinit, suggested by ZIGLIO, Frediano.
+
+2005-12-18  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Cosmetic changes.
+
+2005-12-18  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Cosmetic changes.
+
+2005-12-18  Simon Josefsson <simon@josefsson.org>
+
+	* tests/resume.c: Fix mem leak.
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/Makefile.am, includes/gnutls/gnutls.h.in,
+	lib/gnutls_compress_int.c, lib/gnutls_constate.c: fixed a memory
+	copy that caused crashes.
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
+	* tests/resume.c: More debug info.
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add resume self test.
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
+	* tests/resume.c: Add, to test resume funtions.
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-salowey-tls-ticket-06.txt: Add.
+
+2005-12-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2005-12-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Doc fix.
+
+2005-12-16  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, NEWS: Add.
+
+2005-12-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Add API to get master secret too.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Fix.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Fix indentation.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, includes/gnutls/extra.h,
+	includes/gnutls/gnutls.h.in, includes/gnutls/openpgp.h,
+	includes/gnutls/openssl.h, includes/gnutls/pkcs12.h,
+	includes/gnutls/x509.h, lib/auth_anon.c, lib/auth_cert.h,
+	lib/auth_dh_common.c, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/auth_dhe_psk.c, lib/auth_psk.c, lib/auth_rsa.c,
+	lib/auth_rsa_export.c, lib/auth_srp.c, lib/auth_srp_passwd.h,
+	lib/auth_srp_sb64.c, lib/ext_inner_application.c,
+	lib/ext_inner_application.h, lib/ext_max_record.c,
+	lib/gnutls_algorithms.c, lib/gnutls_anon_cred.c, lib/gnutls_auth.c,
+	lib/gnutls_buffers.c, lib/gnutls_cert.c, lib/gnutls_db.h,
+	lib/gnutls_dh.c, lib/gnutls_dh.h, lib/gnutls_errors.c,
+	lib/gnutls_extensions.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_mpi.c, lib/gnutls_mpi.h, lib/gnutls_pk.c,
+	lib/gnutls_pk.h, lib/gnutls_psk.c, lib/gnutls_record.c,
+	lib/gnutls_session.c, lib/gnutls_session_pack.c,
+	lib/gnutls_state.c, lib/gnutls_ui.c, lib/gnutls_x509.c,
+	lib/x509_b64.c, lib/x509/mpi.h, libextra/gnutls_ia.c,
+	libextra/openpgp/gnutls_openpgp.h, src/common.c, src/serv.c,
+	tests/dhepskself.c, tests/tlsia.c: Indent more.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Remove igloo, it seem weird.
+
 2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.3.2.
@@ -1026,7 +1198,7 @@
 	* NEWS: Version 1.2.9.
 
 ----------------------------------------------------------------------
-  Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+  Copyright (C) 2005, 2006 Free Software Foundation
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
  notice and this notice are preserved.
