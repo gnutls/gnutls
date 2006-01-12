@@ -1,9 +1,9 @@
 GNU TLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2004, 2005 Simon Josefsson
+Copyright (C) 2004, 2005, 2006 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.3.3 (unreleased)
+* Version 1.3.3 (released 2006-01-12)
 
 ** New API to access the TLS master secret.
 When possible, you should use the TLS PRF functions instead.
