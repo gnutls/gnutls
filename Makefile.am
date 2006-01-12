@@ -42,7 +42,7 @@ release:
 	make dist
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
-	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/
+	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/devel/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.gz *.tar.bz2 > CHECKSUMS'
 	cd doc && ./gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
 	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/
