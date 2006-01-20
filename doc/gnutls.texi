@@ -245,7 +245,7 @@ to be taken. Thus negative error codes may be fatal or not.
 Fatal errors terminate the connection immediately and further sends
 and receives will be disallowed. An example of a fatal error code is
 @code{GNUTLS_E_DECRYPTION_FAILED}. Non-fatal errors may warn about
-something, ie a warning alert was received, or indicate the some
+something, i.e., a warning alert was received, or indicate the some
 action has to be taken. This is the case with the error code
 @code{GNUTLS_E_REHANDSHAKE} returned by @ref{gnutls_record_recv}.
 This error code indicates that the server requests a re-handshake. The
@@ -480,10 +480,6 @@ MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs
 SHA is a cryptographic hash algorithm designed by NSA. Outputs 160
 bits of data.
 
-@item MAC_RMD160
-RIPEMD is a cryptographic hash algorithm developed in the framework of
-the EU project RIPE. Outputs 160 bits of data.
-
 @end table
 
 @node Compression algorithms used in the record layer
@@ -708,7 +704,7 @@ The resuming capability, mostly in the server side, is one of the
 problems of a thread-safe TLS implementations. The problem is that all
 threads must share information in order to be able to resume
 sessions. The gnutls approach is, in case of a client, to leave all
-the burden of resuming to the client. Ie. copy and keep the necessary
+the burden of resuming to the client. I.e., copy and keep the necessary
 parameters. See the functions:
 
 @itemize
@@ -746,8 +742,7 @@ order to remove them, and save space. The function
 @cindex TLS Extensions
 
 A number of extensions to the @acronym{TLS} protocol have been
-proposed mainly in @acronym{RFC} 3546
-(@url{http://www.ietf.org/rfc/rfc3546.txt}). The extensions supported
+proposed mainly in @mybibcite{TLSEXT}. The extensions supported
 in @acronym{GnuTLS} are:
 
 @itemize
@@ -847,7 +842,7 @@ public key algorithm, and an authority's signature, which proves the
 authenticity of the parameters.  @xref{The X.509 trust model}, for
 more information on @acronym{X.509} protocols.
 
-@subsection Authentication using @acronym{OpenPGP}keys
+@subsection Authentication using @acronym{OpenPGP} keys
 @cindex @acronym{OpenPGP} Keys
 
 @acronym{OpenPGP} keys also contain public parameters of a public key
@@ -2251,7 +2246,6 @@ Checking for ARCFOUR 128 cipher support... yes
 Checking for ARCFOUR 40 cipher support... no
 Checking for MD5 MAC support... yes
 Checking for SHA1 MAC support... yes
-Checking for RIPEMD160 MAC support (TLS extension)... yes
 Checking for ZLIB compression support (TLS extension)... yes
 Checking for LZO compression support (GnuTLS extension)... yes
 Checking for max record size (TLS extension)... yes
