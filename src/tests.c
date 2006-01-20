@@ -669,22 +669,6 @@ test_sha (gnutls_session session)
 }
 
 test_code_t
-test_rmd (gnutls_session session)
-{
-  int ret;
-  ADD_ALL_CIPHERS (session);
-  ADD_ALL_COMP (session);
-  ADD_ALL_CERTTYPES (session);
-  ADD_ALL_PROTOCOLS (session);
-  ADD_MAC (session, GNUTLS_MAC_RMD160);
-  ADD_ALL_KX (session);
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-
-  ret = do_handshake (session);
-  return ret;
-}
-
-test_code_t
 test_3des (gnutls_session session)
 {
   int ret;

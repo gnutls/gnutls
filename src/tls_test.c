@@ -135,8 +135,6 @@ static const TLS_TEST tls_tests[] = {
    "dunno"},
   {"for MD5 MAC support", test_md5, "yes", "no", "dunno"},
   {"for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
-  {"for RIPEMD160 MAC support (TLS extension)", test_rmd, "yes", "no",
-   "dunno"},
 #ifdef HAVE_LIBZ
   {"for ZLIB compression support (TLS extension)", test_zlib, "yes",
    "no", "dunno"},

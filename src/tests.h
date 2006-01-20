@@ -14,7 +14,6 @@ test_code_t test_ssl3 (gnutls_session state);
 test_code_t test_aes (gnutls_session state);
 test_code_t test_md5 (gnutls_session state);
 test_code_t test_sha (gnutls_session state);
-test_code_t test_rmd (gnutls_session state);
 test_code_t test_3des (gnutls_session state);
 test_code_t test_arcfour (gnutls_session state);
 test_code_t test_arcfour_40 (gnutls_session state);
