@@ -4,13 +4,12 @@
 #include <config.h>
 #include <gnutls/gnutls.h>
 
+#include <sys/socket.h>
 #ifdef _WIN32
-# include <winsock.h>
 # include <io.h>
 # include <winbase.h>
 # define close closesocket
 #else
-# include <sys/socket.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <unistd.h>
