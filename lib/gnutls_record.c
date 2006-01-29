@@ -178,6 +178,12 @@ gnutls_transport_get_ptr2 (gnutls_session_t session,
   * you should wait for an EOF from the peer.
   * GNUTLS_SHUT_WR sends an alert containing a close request.
   *
+  * Note that not all implementations will properly terminate a TLS connection.
+  * Some of them, usually for performance reasons, will terminate only the 
+  * underlying transport layer, thus causing a transmission error to the peer.
+  * This error cannot be distinguished from a malicious party prematurely terminating
+  * the session, thus this behavior is not recommended.
+  *
   * This function may also return GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED; cf.
   * gnutls_record_get_direction().
   *
