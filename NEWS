@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.3.4 (unreleased)
 
+** Fixed bug in non-blocking gnutls_bye(). gnutls_record_send() will no 
+longer invalidate a session if the underlying send fails, but it will 
+prevent future writes. That is to allow reading the already received data.
+Patches and bug reports by Yoann Vandoorselaere <yoann@prelude-ids.org>
+
 * Version 1.3.3 (released 2006-01-12)
 
 ** New API to access the TLS master secret.
