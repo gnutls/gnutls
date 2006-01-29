@@ -210,6 +210,7 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
 	}
 
     case STATE62:
+      STATE = STATE62;
       if (how == GNUTLS_SHUT_RDWR)
 	{
 	  do
@@ -437,7 +438,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	  ret = GNUTLS_E_INTERNAL_ERROR;
 	}
       session_unresumable (session);
-      session_invalidate (session);
+      session->internals.may_not_write = 1;
       gnutls_assert ();
       return ret;
     }
