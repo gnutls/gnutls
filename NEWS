@@ -10,6 +10,10 @@ longer invalidate a session if the underlying send fails, but it will
 prevent future writes. That is to allow reading the already received data.
 Patches and bug reports by Yoann Vandoorselaere <yoann@prelude-ids.org>
 
+** Corrected bugs in gnutls_certificate_set_x509_crl() and
+gnutls_certificate_set_x509_trust(), that caused memory corruption if 
+more than one certificates were added. Report and patch by Max Kellermann.
+
 * Version 1.3.3 (released 2006-01-12)
 
 ** New API to access the TLS master secret.
