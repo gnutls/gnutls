@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -1433,19 +1433,19 @@ gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
 
   for (i = 0; i < ca_list_size; i++)
     {
-      ret = gnutls_x509_crt_init (&res->x509_ca_list[i + res->x509_ncas]);
+      ret = gnutls_x509_crt_init (&res->x509_ca_list[ res->x509_ncas]);
       if (ret < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
 	}
 
-      ret = _gnutls_x509_crt_cpy (res->x509_ca_list[i + res->x509_ncas],
+      ret = _gnutls_x509_crt_cpy (res->x509_ca_list[ res->x509_ncas],
 				  ca_list[i]);
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  gnutls_x509_crt_deinit (res->x509_ca_list[i + res->x509_ncas]);
+	  gnutls_x509_crt_deinit (res->x509_ca_list[ res->x509_ncas]);
 	  return ret;
 	}
       res->x509_ncas++;
@@ -1743,7 +1743,7 @@ gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
 
   for (i = 0; i < crl_list_size; i++)
     {
-      ret = _gnutls_x509_crl_cpy (res->x509_crl_list[i + res->x509_ncrls],
+      ret = _gnutls_x509_crl_cpy (res->x509_crl_list[ res->x509_ncrls],
 				  crl_list[i]);
       if (ret < 0)
 	{
