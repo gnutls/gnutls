@@ -1,4 +1,5 @@
 /* main.h
+ *       Copyright (C) 2006 Free Software Foundation
  *       Copyright (C) 2002, 2003, 2004 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -112,9 +113,10 @@ void _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node);
 void _cdk_kbnode_clone (cdk_kbnode_t node);
 
 /*-- sesskey.c --*/
-int _cdk_digest_encode_pkcs1( byte ** r_md, size_t * r_mdlen, int pk_algo,
-                              const byte * md, int digest_algo, unsigned nbits );
-int _cdk_sk_unprotect_auto( cdk_ctx_t hd, cdk_pkt_seckey_t sk );
+cdk_error_t _cdk_digest_encode_pkcs1( byte ** r_md, size_t * r_mdlen,
+				      int pk_algo, const byte * md,
+				      int digest_algo, unsigned nbits );
+cdk_error_t _cdk_sk_unprotect_auto( cdk_ctx_t hd, cdk_pkt_seckey_t sk );
 
 /*-- keydb.c --*/
 int _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char * name,

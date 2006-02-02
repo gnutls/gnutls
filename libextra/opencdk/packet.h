@@ -1,5 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * packet.h - Internal packet routines
+ *        Copyright (C) 2006 Free Software Foundation
  *        Copyright (C) 2002, 2003 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -35,12 +36,12 @@ void _cdk_free_signature( cdk_pkt_signature_t sig );
 void _cdk_free_pubkey( cdk_pkt_pubkey_t pk );
 void _cdk_free_seckey( cdk_pkt_seckey_t sk );
 cdk_prefitem_t _cdk_copy_prefs( const cdk_prefitem_t prefs );
-int _cdk_copy_userid( cdk_pkt_userid_t *dst, cdk_pkt_userid_t src );
-int _cdk_copy_pubkey( cdk_pkt_pubkey_t* dst, cdk_pkt_pubkey_t src );
-int _cdk_copy_seckey( cdk_pkt_seckey_t* dst, cdk_pkt_seckey_t src );
-int _cdk_copy_pk_to_sk( cdk_pkt_pubkey_t pk, cdk_pkt_seckey_t sk );
-int _cdk_copy_signature( cdk_pkt_signature_t* dst, cdk_pkt_signature_t src );
-int _cdk_pubkey_compare( cdk_pkt_pubkey_t a, cdk_pkt_pubkey_t b );
+cdk_error_t _cdk_copy_userid( cdk_pkt_userid_t *dst, cdk_pkt_userid_t src );
+cdk_error_t _cdk_copy_pubkey( cdk_pkt_pubkey_t* dst, cdk_pkt_pubkey_t src );
+cdk_error_t _cdk_copy_seckey( cdk_pkt_seckey_t* dst, cdk_pkt_seckey_t src );
+cdk_error_t _cdk_copy_pk_to_sk( cdk_pkt_pubkey_t pk, cdk_pkt_seckey_t sk );
+cdk_error_t _cdk_copy_signature( cdk_pkt_signature_t* dst, cdk_pkt_signature_t src );
+cdk_error_t _cdk_pubkey_compare( cdk_pkt_pubkey_t a, cdk_pkt_pubkey_t b );
 
 #endif /* CDK_PACKET_H */
 
