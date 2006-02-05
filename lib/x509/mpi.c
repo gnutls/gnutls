@@ -581,8 +581,6 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
 
   result = asn1_read_value (node, value, tmpstr, &len);
 
-  gnutls_afree (tmpstr);
-
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -600,8 +598,11 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
   else
     {
       gnutls_assert ();
+      gnutls_afree (tmpstr);
       return GNUTLS_E_INTERNAL_ERROR;
     }
+
+  gnutls_afree (tmpstr);
 
   return 0;
 }
