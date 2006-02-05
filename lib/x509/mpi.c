@@ -584,6 +584,7 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      gnutls_afree (tmpstr);
       return _gnutls_asn2err (result);
     }
 
