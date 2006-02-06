@@ -379,7 +379,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
       if (p->type == TYPE_BIT_STRING)
 	{
 	  len2 = -1;
-	  len = _asn1_get_length_der (p->value, &len2);
+	  len = _asn1_get_length_der (p->value, p->value_len, &len2);
 	  snprintf (tmp, sizeof (tmp), " length=\"%i\"",
 		    (len - 1) * 8 - (p->value[len2]));
 	  STR_APPEND (tmp);
@@ -412,7 +412,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, &len2);
+		  len = _asn1_get_length_der (value, p->value_len, &len2);
 
 		  for (k = 0; k < len; k++)
 		    {
@@ -426,7 +426,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, &len2);
+		  len = _asn1_get_length_der (value, p->value_len, &len2);
 
 		  for (k = 0; k < len; k++)
 		    {
@@ -456,7 +456,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, &len2);
+		  len = _asn1_get_length_der (value, p->value_len, &len2);
 
 		  for (k = 1; k < len; k++)
 		    {
@@ -469,7 +469,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, &len2);
+		  len = _asn1_get_length_der (value, p->value_len, &len2);
 		  for (k = 0; k < len; k++)
 		    {
 		      snprintf (tmp, sizeof (tmp), "%02X", (value)[k + len2]);
@@ -487,7 +487,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		  if (value)
 		    {
 		      len3 = -1;
-		      len2 = _asn1_get_length_der (value, &len3);
+		      len2 = _asn1_get_length_der (value, p->value_len, &len3);
 		      for (k = 0; k < len2; k++)
 			{
 			  snprintf (tmp, sizeof (tmp),
@@ -507,7 +507,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    type_field (up->left->type) == TYPE_OBJECT_ID)
 		  {
 
-		    len2 = _asn1_get_length_der (up->value, &len3);
+		    len2 = _asn1_get_length_der (up->value, up->value_len, &len3);
 
 		    if (len2 > 0 && strcmp (p->name, "type") == 0)
 		      {
