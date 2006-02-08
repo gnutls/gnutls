@@ -914,7 +914,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 	  return ASN1_DER_ERROR;
 	len4=_asn1_get_length_der(der+counter+len2,len-counter-len2,&len3);
 	if(len4 < -1) return ASN1_DER_ERROR;
-	if(len4 > counter+len2+len3) return ASN1_DER_ERROR;
+	if(len4 > len-counter+len2+len3) return ASN1_DER_ERROR;
 	if(len4 != -1){
 	  len2+=len4;
 	  _asn1_length_der(len2+len3,NULL,&len4);
