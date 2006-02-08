@@ -1,6 +1,6 @@
 /*
+ *      Copyright (C) 2004, 2006 Free Software Foundation
  *      Copyright (C) 2002  Fabio Fiorina
- *      Copyright (C) 2004  Simon Josefsson
  *
  * This file is part of LIBASN1.
  *
@@ -196,7 +196,8 @@ _asn1_get_utctime_der(unsigned char *der,int *der_len,unsigned char *str)
   char temp[20];
 
   if(str==NULL) return;
-  str_len=_asn1_get_length_der(der,&len_len);
+  str_len=_asn1_get_length_der(der,*der_len,&len_len);
+  if (str_len<0) return;
   memcpy(temp,der+len_len,str_len);
   *der_len=str_len+len_len;
   switch(str_len){
@@ -576,6 +577,7 @@ _asn1_ordering_set(unsigned char *der, int der_len, node_asn *node)
 
     /* extraction and length */
     len2=_asn1_get_length_der(der+counter,der_len-counter,&len);
+    if (len2<0) return;
     counter+=len+len2;
 
     p_vet->end=counter;
@@ -669,6 +671,7 @@ _asn1_ordering_set_of(unsigned char *der, int der_len, node_asn *node)
        counter+=len;
     
        len2=_asn1_get_length_der(der+counter,der_len-counter,&len);
+       if (len2<0) return;
        counter+=len+len2;
     }
 
@@ -811,6 +814,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	  return ASN1_VALUE_NOT_FOUND;
 	}
 	len2=_asn1_get_length_der(p->value,p->value_len, &len3);
+	if (len2<0) return ASN1_DER_ERROR;
 	max_len -= len2+len3;
 	if(max_len>=0)
 	  memcpy(der+counter,p->value,len3+len2);
@@ -853,6 +857,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	return ASN1_VALUE_NOT_FOUND;
       }
       len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2+len3;
       if(max_len>=0)
 	memcpy(der+counter,p->value,len3+len2);
@@ -865,6 +870,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	return ASN1_VALUE_NOT_FOUND;
       }
       len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2+len3;
       if(max_len>=0)
 	memcpy(der+counter,p->value,len3+len2);
@@ -877,6 +883,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	return ASN1_VALUE_NOT_FOUND;
       }
       len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2+len3;
       if(max_len>=0)
 	memcpy(der+counter,p->value,len3+len2);
@@ -959,6 +966,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	return ASN1_VALUE_NOT_FOUND;
       }
       len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2;
       if(max_len>=0)
 	memcpy(der+counter,p->value+len3,len2);
