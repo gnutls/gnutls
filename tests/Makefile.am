@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2004, 2005 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -37,7 +37,7 @@ tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la @LTLIBREADLINE@
 
 ctests = simple anonself pskself openssl gc dhepskself set_pkcs12_cred	\
-	tlsia resume
+	tlsia resume certder
 TESTS = pkcs12_neon pkcs8 $(ctests)
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon pkcs8
