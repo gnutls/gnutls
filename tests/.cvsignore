@@ -8,6 +8,7 @@ simple
 *.la
 chain*.pem
 ReadMe.txt
+certder
 certpairs
 certs
 crls
