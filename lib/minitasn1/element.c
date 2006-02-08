@@ -725,6 +725,7 @@ asn1_read_value(ASN1_TYPE root,const char *name,void* ivalue, int *len)
   case TYPE_ANY:
     len3=-1;
     len2=_asn1_get_length_der(node->value,node->value_len,&len3);
+    if (len2 < 0) return ASN1_DER_ERROR;
     PUT_VALUE( value, value_size, node->value+len3, len2);
     break;
   default:
