@@ -1,6 +1,6 @@
 /*
+ *      Copyright (C) 2004, 2005, 2006 Free Software Foundation
  *      Copyright (C) 2002 Fabio Fiorina
- *      Copyright (C) 2004, 2005 Simon Josefsson
  *
  * This file is part of LIBTASN1.
  *
@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-#define LIBTASN1_VERSION "0.2.17"
+#define LIBTASN1_VERSION "0.2.18"
 
 #include <sys/types.h>
 #include <time.h>
