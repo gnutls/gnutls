@@ -175,7 +175,7 @@ _asn1_get_objectid_der(const unsigned char *der,int der_len, int *ret_len,unsign
   if(str==NULL || der_len <= 0) return;
   len=_asn1_get_length_der(der,der_len, &len_len);
   
-  if (len < 0 || len_len > der_len) return;
+  if (len < 0 || len > der_len || len_len > der_len) return;
   
   val1=der[len_len]/40;
   val=der[len_len]-val1*40;
