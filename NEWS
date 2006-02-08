@@ -7,7 +7,9 @@ See the end for copying conditions.
 
 ** Fix read out bounds bug in DER parser.
 Reported by Evgeny Legerov <admin@gleg.net>, and debugging help from
-Protover SSL.
+Protover SSL.  Libtasn1 0.2.18 is now required, which contains the
+previous bug fix.  The included libtasn1 version in GnuTLS has been
+updated.
 
 ** Fixed bug in non-blocking gnutls_bye(). gnutls_record_send() will no 
 longer invalidate a session if the underlying send fails, but it will 
