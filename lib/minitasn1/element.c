@@ -1,6 +1,6 @@
 /*
+ *      Copyright (C) 2004, 2006 Free Software Foundation
  *      Copyright (C) 2000, 2001, 2002, 2003 Fabio Fiorina
- *      Copyright (C) 2004 Simon Josefsson
  *
  * This file is part of LIBASN1.
  *
