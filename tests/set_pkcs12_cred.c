@@ -20,6 +20,11 @@ main (int argc, char *argv[])
   file = getenv ("PKCS12FILE");
   password = getenv ("PKCS12PASSWORD");
 
+  if (!file)
+    file = "client.p12";
+  if (!password)
+    password = "foobar";
+
   printf ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
 	  file, password);
   ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
