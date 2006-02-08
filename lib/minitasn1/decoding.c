@@ -104,10 +104,23 @@ _asn1_get_tag_der(const unsigned char *der, int der_len,
     /* Long form */
     punt=1;
     ris=0;
-    while(punt <= der_len && der[punt]&128) ris=ris*128+(der[punt++]&0x7F);
+    while(punt <= der_len && der[punt]&128)
+      {
+	int last = ris;
+	ris=ris*128+(der[punt++]&0x7F);
+	if (ris < last)
+	  /* wrapper around, and no bignums... */
+	  return ASN1_DER_ERROR;
+      }
     if (punt >= der_len)
       return ASN1_DER_ERROR;
-    ris=ris*128+(der[punt++]&0x7F);   
+    {
+      int last = ris;
+      ris=ris*128+(der[punt++]&0x7F);
+      if (ris < last)
+	/* wrapper around, and no bignums... */
+	return ASN1_DER_ERROR;
+    }
     *len=punt;
   }
   if (tag) *tag = ris;
@@ -250,6 +263,8 @@ _asn1_extract_tag_der(node_asn *node,const unsigned char *der, int der_len,int *
 	if(p->type&CONST_EXPLICIT){
 	  if (_asn1_get_tag_der(der+counter, der_len-counter,&class,&len2, &tag)!=ASN1_SUCCESS)
 	     return ASN1_DER_ERROR;
+	  if (counter+len2 > der_len)
+	    return ASN1_DER_ERROR;
 	  counter+=len2;
 	  len3=_asn1_get_length_der(der+counter,der_len-counter, &len2);
 	  if (len3 < 0)
@@ -285,6 +300,8 @@ _asn1_extract_tag_der(node_asn *node,const unsigned char *der, int der_len,int *
   if(is_tag_implicit){
     if (_asn1_get_tag_der(der+counter, der_len-counter,&class,&len2, &tag)!=ASN1_SUCCESS)
 	     return ASN1_DER_ERROR;
+    if (counter+len2 > der_len)
+      return ASN1_DER_ERROR;
 
     if((class!=class_implicit) || (tag!=tag_implicit)){
       if(type_field(node->type)==TYPE_OCTET_STRING){
@@ -305,6 +322,8 @@ _asn1_extract_tag_der(node_asn *node,const unsigned char *der, int der_len,int *
 
     if (_asn1_get_tag_der(der+counter, der_len-counter,&class,&len2,&tag)!=ASN1_SUCCESS)
      return ASN1_DER_ERROR;
+    if (counter+len2 > der_len)
+      return ASN1_DER_ERROR;
 
     switch(type_field(node->type)){
     case TYPE_NULL:
@@ -519,7 +538,8 @@ _asn1_get_indefinite_length_string(const unsigned char* der, int* len)
 
     if(_asn1_get_tag_der(der+counter, *len-counter,&class,&len2,&tag)!=ASN1_SUCCESS)
      return ASN1_DER_ERROR;
-
+    if (counter+len2 > *len)
+      return ASN1_DER_ERROR;
     counter+=len2;
     len2=_asn1_get_length_der(der+counter, *len-counter,&len3);
     if(len2 < -1) return ASN1_DER_ERROR;
@@ -890,9 +910,11 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
       case TYPE_ANY:
 	if(_asn1_get_tag_der(der+counter,len-counter,&class,&len2,&tag)!=ASN1_SUCCESS)
        return ASN1_DER_ERROR;
-
+	if (counter+len2 > len)
+	  return ASN1_DER_ERROR;
 	len4=_asn1_get_length_der(der+counter+len2,len-counter-len2,&len3);
 	if(len4 < -1) return ASN1_DER_ERROR;
+	if(len4 > counter+len2+len3) return ASN1_DER_ERROR;
 	if(len4 != -1){
 	  len2+=len4;
 	  _asn1_length_der(len2+len3,NULL,&len4);
@@ -1415,6 +1437,8 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
       case TYPE_ANY:
 	if(_asn1_get_tag_der(der+counter, len-counter,&class,&len2,&tag)!=ASN1_SUCCESS)
           return ASN1_DER_ERROR;
+	if (counter+len2 > len)
+	  return ASN1_DER_ERROR;
 
 	len4=_asn1_get_length_der(der+counter+len2,len-counter-len2,&len3);
 	if(len4 < -1) return ASN1_DER_ERROR;
@@ -1800,6 +1824,8 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
       case TYPE_ANY:
 	if (_asn1_get_tag_der(der+counter, len-counter,&class,&len2,&tag)!=ASN1_SUCCESS)
         return ASN1_DER_ERROR;
+	if (counter+len2 > len)
+	  return ASN1_DER_ERROR;
 
 	len4=_asn1_get_length_der(der+counter+len2,len-counter-len2,&len3);
 	if(len4 < -1) return ASN1_DER_ERROR;
