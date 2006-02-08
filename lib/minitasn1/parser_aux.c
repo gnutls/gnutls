@@ -187,10 +187,12 @@ _asn1_set_value(node_asn *node,const unsigned char *value,unsigned int len)
   if(node->value){
     _asn1_free(node->value);
     node->value=NULL;  
+    node->value_len = 0;
   }
   if(!len) return node;
   node->value=(unsigned char *) _asn1_malloc(len);
   if (node->value==NULL) return NULL;
+  node->value_len = len;
   
   memcpy(node->value,value,len);
   return node;

@@ -148,7 +148,7 @@ _asn1_octet_der(const unsigned char *str,int str_len,unsigned char *der,int *der
 {
   int len_len;
 
-  if(der==NULL) return;
+  if(der==NULL || str_len <= 0) return;
   _asn1_length_der(str_len,der,&len_len);
   memcpy(der+len_len,str,str_len);
   *der_len=str_len+len_len;
@@ -534,7 +534,7 @@ _asn1_insert_tag_der(node_asn *node,unsigned char *der,int *counter,int *max_len
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_ordering_set(unsigned char *der,node_asn *node)
+_asn1_ordering_set(unsigned char *der, int der_len, node_asn *node)
 {
   struct vet{
     int end;
@@ -569,12 +569,13 @@ _asn1_ordering_set(unsigned char *der,node_asn *node)
     last=p_vet;
 
     /* tag value calculation */
-    tag=_asn1_get_tag_der(der+counter,&class,&len2);
+    if (_asn1_get_tag_der(der+counter, der_len-counter,&class,&len2, &tag)!=ASN1_SUCCESS)
+       return;
     p_vet->value=(class<<24)|tag;
     counter+=len2;
 
     /* extraction and length */
-    len2=_asn1_get_length_der(der+counter,&len);
+    len2=_asn1_get_length_der(der+counter,der_len-counter,&len);
     counter+=len+len2;
 
     p_vet->end=counter;
@@ -626,7 +627,7 @@ _asn1_ordering_set(unsigned char *der,node_asn *node)
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_ordering_set_of(unsigned char *der,node_asn *node)
+_asn1_ordering_set_of(unsigned char *der, int der_len, node_asn *node)
 {
   struct vet{
     int end;
@@ -661,10 +662,15 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
     last=p_vet;
 
     /* extraction of tag and length */
-    _asn1_get_tag_der(der+counter,&class,&len);
-    counter+=len;
-    len2=_asn1_get_length_der(der+counter,&len);
-    counter+=len+len2;
+    if (der_len-counter > 0) {
+
+       if (_asn1_get_tag_der(der+counter, der_len - counter, &class,&len,NULL)!=ASN1_SUCCESS)
+          return;
+       counter+=len;
+    
+       len2=_asn1_get_length_der(der+counter,der_len-counter,&len);
+       counter+=len+len2;
+    }
 
     p_vet->end=counter;
     p=p->right;
@@ -804,7 +810,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	  _asn1_error_description_value_not_found(p,ErrorDescription);
 	  return ASN1_VALUE_NOT_FOUND;
 	}
-	len2=_asn1_get_length_der(p->value,&len3);
+	len2=_asn1_get_length_der(p->value,p->value_len, &len3);
 	max_len -= len2+len3;
 	if(max_len>=0)
 	  memcpy(der+counter,p->value,len3+len2);
@@ -846,7 +852,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,&len3);
+      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
       max_len-=len2+len3;
       if(max_len>=0)
 	memcpy(der+counter,p->value,len3+len2);
@@ -858,7 +864,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,&len3);
+      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
       max_len-=len2+len3;
       if(max_len>=0)
 	memcpy(der+counter,p->value,len3+len2);
@@ -870,7 +876,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,&len3);
+      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
       max_len-=len2+len3;
       if(max_len>=0)
 	memcpy(der+counter,p->value,len3+len2);
@@ -903,7 +909,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	len2=strtol(p->value,NULL,10);
 	_asn1_set_value(p,NULL,0);
 	if((type_field(p->type)==TYPE_SET) && (max_len>=0))
-	  _asn1_ordering_set(der+len2,p);
+	  _asn1_ordering_set(der+len2, max_len-len2,p);
 	_asn1_length_der(counter-len2,temp,&len3);
 	max_len-=len3;
 	if(max_len>=0){
@@ -934,8 +940,9 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
       if(move==UP){
 	len2=strtol(p->value,NULL,10);
 	_asn1_set_value(p,NULL,0);
-	if((type_field(p->type)==TYPE_SET_OF) && (max_len>=0))
-	  _asn1_ordering_set_of(der+len2,p);
+	if((type_field(p->type)==TYPE_SET_OF) && (max_len-len2>0)) {
+	  _asn1_ordering_set_of(der+len2, max_len-len2,p);
+        }
 	_asn1_length_der(counter-len2,temp,&len3);
 	max_len-=len3;
 	if(max_len>=0){
@@ -951,7 +958,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,&len3);
+      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
       max_len-=len2;
       if(max_len>=0)
 	memcpy(der+counter,p->value+len3,len2);
