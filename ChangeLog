@@ -1,3 +1,273 @@
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.3.4.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS, NEWS: Add.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.2.10.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/errors.c,
+	lib/minitasn1/gstr.c, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/structure.c: Sync with libtasn1.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/errors.c,
+	lib/minitasn1/errors.h, lib/minitasn1/errors_int.h,
+	lib/minitasn1/gstr.c, lib/minitasn1/int.h,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/structure.c: Update from libtasn1.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-housley-tls-authz-extns-00.txt: Add.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: Further length fixes.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: Fix typo in last commit.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/set_pkcs12_cred.c: Simplify using under gdb.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: Fix for latest certder bug.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/certder.c: Add more bug trigger.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: Further length fixes.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/certder.c: Add.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: More asn1 length out of bounds
+	checking.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/structure.c: Update
+	_asn1_get_length_der fix.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: Fix asn1_get_length_der usage.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c: Fix asn1_get_length_der usage.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/structure.c: Fix asn1_get_length_der usage.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/element.c: Fix copyright.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/element.c: Fix asn1_get_length_der usage.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: Revert.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c: Fix for cert selftest.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add certder test.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/certder.c: Add.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Backport xml.c fixes by Nikos.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump libtasn1 requred version.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/der.h, lib/minitasn1/element.c,
+	lib/minitasn1/errors.c, lib/minitasn1/libtasn1.h,
+	lib/minitasn1/parser_aux.c, lib/minitasn1/structure.c: Add libtasn1
+	fixes from Nikos, prompted by report from "Evgeny Legerov"
+	<admin@gleg.net>.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/libtasn1.h: Bump version.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Need libtasn1 0.2.18.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/der.h, lib/minitasn1/element.c,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/structure.c: Add libtasn1 fixes from Nikos, prompted
+	by report from "Evgeny Legerov" <admin@gleg.net>.
+
+2006-02-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/xml.c: some fixes for the new libtasn1
+
+2006-02-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/mpi.c: [no log message]
+
+2006-02-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/mpi.c: corrected wrong order of free.
+
+2006-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/main.h, libextra/opencdk/packet.h: Fix
+	prototypes for AIX compiler, reported by "Heiden, John"
+	<JHeiden@UTNet.UToledo.Edu>.
+
+2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: [no log message]
+
+2006-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c: Typo fix, for gdoc.
+
+2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_record.c: backported gnutls_bye() fix
+
+2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c: Corrected bugs in
+	gnutls_certificate_set_x509_crl() and
+	gnutls_certificate_set_x509_trust(), that caused memory corruption
+	if more than one certificates were added. Report and patch by Max
+	Kellermann <max@duempel.org>.
+
+2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: [no log message]
+
+2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c: Corrected bugs in
+	gnutls_certificate_set_x509_crl() and
+	gnutls_certificate_set_x509_trust(), that caused memory corruption
+	if more than one certificates were added. Report and patch by Max
+	Kellermann <max@duempel.org>.
+
+2006-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: [no log message]
+
+2006-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_record.c: added some text about premature termination
+	of sessions.
+
+2006-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_record.c: fixed bug in non-blocking gnutls_bye().
+	gnutls_send will no longer invalidate session if the underlying send
+	fails, but it will set may_not_write to true. That is to allow
+	reading the already received data. Patches and bug reports by Yoann
+	Vandoorselaere <yoann@prelude-ids.org>
+
+2006-01-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/inet_ntop.h, gl/socket_.h, gl/stdbool_.h, gl/vasnprintf.c,
+	gl/m4/gnulib-tool.m4, gl/m4/socklen.m4, gl/m4/stdbool.m4: Update.
+
+2006-01-27  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.h: Mingw32 fixes.
+
+2006-01-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-salowey-tls-ticket-07.txt: Add.
+
+2006-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-santesson-tls-ume-01.txt: Add.
+
+2006-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/tests.c, src/tests.h, src/tls_test.c: removed the RIPEMD test
+	since it is not supported any more.
+
+2006-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: minor updates.
+
+2006-01-19  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/md5.c, gl/md5.h, gl/sha1.c, gl/sha1.h,
+	gl/socket_.h, gl/m4/gnulib-comp.m4, gl/m4/sys_socket_h.m4: Update.
+
+2006-01-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2006-01-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-openpgp-keys-08.txt: Add.
+
+2006-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2006-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix igloo scp.
+
+2006-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Re-add igloo.
+
 2006-01-12  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.3.3.
