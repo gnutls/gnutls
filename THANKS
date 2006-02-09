@@ -1,5 +1,5 @@
 GNU TLS THANKS -- Acknowledgements.
-Copyright (C) 2005  Free Software Foundation
+Copyright (C) 2005, 2006  Free Software Foundation
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
@@ -50,6 +50,7 @@ Ralph Giles                     <giles@onlinegamegroup.com>
 Daniel Stenberg                 <daniel@haxx.se>
 Thomas Klausner                 <tk@giga.or.at>
 Jouni Malinen                   <jkmaline@cc.hut.fi>
+Evgeny Legerov                  <admin@gleg.net>
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
