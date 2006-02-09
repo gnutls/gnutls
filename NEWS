@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 1.3.4 (released 2006-02-09)
 
-** Fix read out bounds bug in DER parser.
+** Fix read of out bounds bug in DER parser.
 Reported by Evgeny Legerov <admin@gleg.net>, and debugging help from
 Protover SSL.  Libtasn1 0.2.18 is now required, which contains the
 previous bug fix.  The included libtasn1 version in GnuTLS has been
