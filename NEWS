@@ -20,6 +20,12 @@ Patches and bug reports by Yoann Vandoorselaere <yoann@prelude-ids.org>
 gnutls_certificate_set_x509_trust(), that caused memory corruption if 
 more than one certificates were added. Report and patch by Max Kellermann.
 
+** Fix build problems of OpenCDK on AIX.
+Thanks to "Heiden, John" <JHeiden@UTNet.UToledo.Edu>.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.3.3 (released 2006-01-12)
 
 ** New API to access the TLS master secret.
