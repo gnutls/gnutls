@@ -1,4 +1,4 @@
-/* libasn1 error codes. The mapping to a TLS alert is also shown in
+/* libtasn1 error codes. The mapping to a TLS alert is also shown in
  * comments.
  */
 

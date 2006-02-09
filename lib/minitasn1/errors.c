@@ -1,20 +1,23 @@
-/*              Copyright (C) 2002, 2005 Fabio Fiorina
+/*
+ *      Copyright (C) 2006 Free Software Foundation, Inc.
+ *      Copyright (C) 2002, 2005 Fabio Fiorina
  *
- * This file is part of LIBASN1.
+ * This file is part of LIBTASN1.
  *
- * The LIBTASN1 library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public   
- * License as published by the Free Software Foundation; either 
+ * The LIBTASN1 library is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA
  */
 
 #include <int.h>
@@ -66,10 +69,10 @@ static const libtasn1_error_entry error_algorithms[] = {
 
 /**
   * libtasn1_perror - prints a string to stderr with a description of an error
-  * @error: is an error returned by a libasn1 function.
+  * @error: is an error returned by a libtasn1 function.
   *
   * This function is like perror(). The only difference is that it
-  * accepts an error returned by a libasn1 function.
+  * accepts an error returned by a libtasn1 function.
   **/
 void libtasn1_perror(asn1_retCode error)
 {
@@ -89,7 +92,7 @@ void libtasn1_perror(asn1_retCode error)
   * @error: is an error returned by a libtasn1 function.
   *
   * This function is similar to strerror(). The only difference is
-  * that it accepts an error (number) returned by a libasn1 function.
+  * that it accepts an error (number) returned by a libtasn1 function.
   *
   * Returns: Pointer to static zero-terminated string describing error
   *   code.
