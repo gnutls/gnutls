@@ -59,7 +59,7 @@ _asn1_error_description_value_not_found(node_asn *node,char *ErrorDescription)
 }
 
 /******************************************************/
-/* Function : _asn1_length_der                        */
+/* Function : asn1_length_der                        */
 /* Description: creates the DER coding for the LEN    */
 /* parameter (only the length).                       */
 /* Parameters:                                        */
@@ -70,7 +70,7 @@ _asn1_error_description_value_not_found(node_asn *node,char *ErrorDescription)
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_length_der(unsigned long len,unsigned char *ans,int *ans_len)
+asn1_length_der(unsigned long len,unsigned char *ans,int *ans_len)
 {
   int k;
   unsigned char temp[SIZEOF_UNSIGNED_LONG_INT];
@@ -145,12 +145,12 @@ _asn1_tag_der(unsigned char class,unsigned int tag_value,unsigned char *ans,int 
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_octet_der(const unsigned char *str,int str_len,unsigned char *der,int *der_len)
+asn1_octet_der(const unsigned char *str,int str_len,unsigned char *der,int *der_len)
 {
   int len_len;
 
   if(der==NULL || str_len <= 0) return;
-  _asn1_length_der(str_len,der,&len_len);
+  asn1_length_der(str_len,der,&len_len);
   memcpy(der+len_len,str,str_len);
   *der_len=str_len+len_len;
 }
@@ -177,7 +177,7 @@ _asn1_time_der(unsigned char *str,unsigned char *der,int *der_len)
 
   max_len=*der_len;
 
-  _asn1_length_der(strlen(str),(max_len>0)?der:NULL,&len_len);
+  asn1_length_der(strlen(str),(max_len>0)?der:NULL,&len_len);
 
   if((len_len+(int)strlen(str))<=max_len)
     memcpy(der+len_len,str,strlen(str));
@@ -197,7 +197,7 @@ _asn1_get_utctime_der(unsigned char *der,int *der_len,unsigned char *str)
   char temp[20];
 
   if(str==NULL) return;
-  str_len=_asn1_get_length_der(der,*der_len,&len_len);
+  str_len=asn1_get_length_der(der,*der_len,&len_len);
   if (str_len<0) return;
   memcpy(temp,der+len_len,str_len);
   *der_len=str_len+len_len;
@@ -285,10 +285,10 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
     n_start=n_end+1;
   }
 
-  _asn1_length_der(*der_len,NULL,&len_len);
+  asn1_length_der(*der_len,NULL,&len_len);
   if(max_len>=(*der_len+len_len)){
     memmove(der+len_len,der,*der_len);
-    _asn1_length_der(*der_len,der,&len_len);
+    asn1_length_der(*der_len,der,&len_len);
   }
   *der_len+=len_len;
 
@@ -303,7 +303,7 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
 const char bit_mask[]={0xFF,0xFE,0xFC,0xF8,0xF0,0xE0,0xC0,0x80};
 
 /******************************************************/
-/* Function : _asn1_bit_der                           */
+/* Function : asn1_bit_der                           */
 /* Description: creates the DER coding for a BIT      */
 /* STRING  type (length and pad included).            */
 /* Parameters:                                        */
@@ -315,7 +315,7 @@ const char bit_mask[]={0xFF,0xFE,0xFC,0xF8,0xF0,0xE0,0xC0,0x80};
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_bit_der(const unsigned char *str,int bit_len,unsigned char *der,int *der_len)
+asn1_bit_der(const unsigned char *str,int bit_len,unsigned char *der,int *der_len)
 {
   int len_len,len_byte,len_pad;
 
@@ -324,7 +324,7 @@ _asn1_bit_der(const unsigned char *str,int bit_len,unsigned char *der,int *der_l
   len_pad=8-(bit_len&7);
   if(len_pad==8) len_pad=0;
   else len_byte++;
-  _asn1_length_der(len_byte+1,der,&len_len);
+  asn1_length_der(len_byte+1,der,&len_len);
   der[len_len]=len_pad;
   memcpy(der+len_len+1,str,len_byte);
   der[len_len+len_byte]&=bit_mask[len_pad];
@@ -369,7 +369,7 @@ _asn1_complete_explicit_tag(node_asn *node,unsigned char *der,int *counter,int *
 	if(p->type&CONST_EXPLICIT){
 	  len2=strtol(p->name,NULL,10);
 	  _asn1_set_name(p,NULL);
-	  _asn1_length_der(*counter-len2,temp,&len3);
+	  asn1_length_der(*counter-len2,temp,&len3);
 	  if(len3<=(*max_len)){ 
 	    memmove(der+len2+len3,der+len2,*counter-len2);
 	    memcpy(der+len2,temp,len3);
@@ -571,13 +571,13 @@ _asn1_ordering_set(unsigned char *der, int der_len, node_asn *node)
     last=p_vet;
 
     /* tag value calculation */
-    if (_asn1_get_tag_der(der+counter, der_len-counter,&class,&len2, &tag)!=ASN1_SUCCESS)
+    if (asn1_get_tag_der(der+counter, der_len-counter,&class,&len2, &tag)!=ASN1_SUCCESS)
        return;
     p_vet->value=(class<<24)|tag;
     counter+=len2;
 
     /* extraction and length */
-    len2=_asn1_get_length_der(der+counter,der_len-counter,&len);
+    len2=asn1_get_length_der(der+counter,der_len-counter,&len);
     if (len2<0) return;
     counter+=len+len2;
 
@@ -667,11 +667,11 @@ _asn1_ordering_set_of(unsigned char *der, int der_len, node_asn *node)
     /* extraction of tag and length */
     if (der_len-counter > 0) {
 
-       if (_asn1_get_tag_der(der+counter, der_len - counter, &class,&len,NULL)!=ASN1_SUCCESS)
+       if (asn1_get_tag_der(der+counter, der_len - counter, &class,&len,NULL)!=ASN1_SUCCESS)
           return;
        counter+=len;
     
-       len2=_asn1_get_length_der(der+counter,der_len-counter,&len);
+       len2=asn1_get_length_der(der+counter,der_len-counter,&len);
        if (len2<0) return;
        counter+=len+len2;
     }
@@ -814,7 +814,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	  _asn1_error_description_value_not_found(p,ErrorDescription);
 	  return ASN1_VALUE_NOT_FOUND;
 	}
-	len2=_asn1_get_length_der(p->value,p->value_len, &len3);
+	len2=asn1_get_length_der(p->value,p->value_len, &len3);
 	if (len2<0) return ASN1_DER_ERROR;
 	max_len -= len2+len3;
 	if(max_len>=0)
@@ -857,7 +857,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      len2=asn1_get_length_der(p->value,p->value_len,&len3);
       if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2+len3;
       if(max_len>=0)
@@ -870,7 +870,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      len2=asn1_get_length_der(p->value,p->value_len,&len3);
       if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2+len3;
       if(max_len>=0)
@@ -883,7 +883,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      len2=asn1_get_length_der(p->value,p->value_len,&len3);
       if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2+len3;
       if(max_len>=0)
@@ -918,7 +918,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_set_value(p,NULL,0);
 	if((type_field(p->type)==TYPE_SET) && (max_len>=0))
 	  _asn1_ordering_set(der+len2, max_len-len2,p);
-	_asn1_length_der(counter-len2,temp,&len3);
+	asn1_length_der(counter-len2,temp,&len3);
 	max_len-=len3;
 	if(max_len>=0){
 	  memmove(der+len2+len3,der+len2,counter-len2);
@@ -951,7 +951,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	if((type_field(p->type)==TYPE_SET_OF) && (max_len-len2>0)) {
 	  _asn1_ordering_set_of(der+len2, max_len-len2,p);
         }
-	_asn1_length_der(counter-len2,temp,&len3);
+	asn1_length_der(counter-len2,temp,&len3);
 	max_len-=len3;
 	if(max_len>=0){
 	  memmove(der+len2+len3,der+len2,counter-len2);
@@ -966,7 +966,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	_asn1_error_description_value_not_found(p,ErrorDescription);
 	return ASN1_VALUE_NOT_FOUND;
       }
-      len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+      len2=asn1_get_length_der(p->value,p->value_len,&len3);
       if (len2<0) return ASN1_DER_ERROR;
       max_len-=len2;
       if(max_len>=0)

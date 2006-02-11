@@ -363,7 +363,7 @@ _asn1_copy_structure3(node_asn *source_node)
 	case TYPE_OCTET_STRING: case TYPE_BIT_STRING: case TYPE_GENERALSTRING:
 	case TYPE_INTEGER:
 	  len2=-1;
-	  len=_asn1_get_length_der(p_s->value,p_s->value_len,&len2);
+	  len=asn1_get_length_der(p_s->value,p_s->value_len,&len2);
 	  if (len < 0) return NULL;
 	  _asn1_set_value(p_d,p_s->value,len+len2);
 	  break;
@@ -728,7 +728,7 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
       case TYPE_INTEGER:
 	if(p->value){
 	  len2=-1;
-	  len=_asn1_get_length_der(p->value,p->value_len,&len2);
+	  len=asn1_get_length_der(p->value,p->value_len,&len2);
 	  fprintf(out,"  value:0x");
 	  if (len > 0)
 	    for(k=0;k<len;k++) fprintf(out,"%02x",(p->value)[k+len2]);
@@ -737,7 +737,7 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
       case TYPE_ENUMERATED:
 	if(p->value){
 	  len2=-1;
-	  len=_asn1_get_length_der(p->value,p->value_len,&len2);
+	  len=asn1_get_length_der(p->value,p->value_len,&len2);
 	  fprintf(out,"  value:0x");
 	  if (len > 0)
 	    for(k=0;k<len;k++) fprintf(out,"%02x",(p->value)[k+len2]);
@@ -755,7 +755,7 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
       case TYPE_BIT_STRING:
 	if(p->value){
 	  len2=-1;
-	  len=_asn1_get_length_der(p->value,p->value_len,&len2);
+	  len=asn1_get_length_der(p->value,p->value_len,&len2);
 	  if (len>0)
 	    {
 	      fprintf(out,"  value(%i):",(len-1)*8-(p->value[len2]));
@@ -766,7 +766,7 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
       case TYPE_OCTET_STRING:
 	if(p->value){
 	  len2=-1;
-	  len=_asn1_get_length_der(p->value,p->value_len,&len2);
+	  len=asn1_get_length_der(p->value,p->value_len,&len2);
 	  fprintf(out,"  value:");
 	  if (len>0)
 	    for(k=0;k<len;k++) fprintf(out,"%02x",(p->value)[k+len2]);
@@ -775,7 +775,7 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
       case TYPE_GENERALSTRING:
 	if(p->value){
 	  len2=-1;
-	  len=_asn1_get_length_der(p->value,p->value_len,&len2);
+	  len=asn1_get_length_der(p->value,p->value_len,&len2);
 	  fprintf(out,"  value:");
 	  if (len>0)
 	    for(k=0;k<len;k++) fprintf(out,"%02x",(p->value)[k+len2]);
@@ -787,7 +787,7 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
       case TYPE_ANY:
 	if(p->value){
 	  len3=-1;
-	  len2=_asn1_get_length_der(p->value,p->value_len,&len3);
+	  len2=asn1_get_length_der(p->value,p->value_len,&len3);
 	  fprintf(out,"  value:");
 	  if (len2>0)
 	    for(k=0;k<len2;k++) fprintf(out,"%02x",(p->value)[k+len3]);

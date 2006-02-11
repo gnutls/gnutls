@@ -1,3 +1,26 @@
+/*
+ *      Copyright (C) 2006 Free Software Foundation
+ *      Copyright (C) 2002 Fabio Fiorina
+ *
+ * This file is part of LIBTASN1.
+ *
+ * LIBTASN1 is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * LIBTASN1 is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with LIBTASN1; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA
+ *
+ */
+
 /*************************************************/
 /* File: der.h                                   */
 /* Description: list of definitions and exported */
@@ -6,7 +29,6 @@
 
 #ifndef _DER_H
 #define _DER_H
-
 
 #define UNIVERSAL        0x00
 #define APPLICATION      0x40
@@ -28,30 +50,4 @@
 #define TAG_NULL             0x05
 #define TAG_GENERALSTRING    0x1B
 
-int _asn1_get_tag_der(const unsigned char *der, int der_len,
-                unsigned char *class,int  *len, unsigned long *tag);
-
-void _asn1_octet_der(const unsigned char *str,int str_len,
-                     unsigned char *der,int *der_len);
-
-asn1_retCode _asn1_get_octet_der(const unsigned char *der, int der_len,
-                int *ret_len,unsigned char *str,int str_size, int *str_len);
-
-void _asn1_bit_der(const unsigned char *str,int bit_len,
-                   unsigned char *der,int *der_len);
-
-asn1_retCode _asn1_get_bit_der(const unsigned char *der, int der_len,
-                int *ret_len,unsigned char *str, int str_size, 
-                int *bit_len);
-
-signed long _asn1_get_length_der(const unsigned char *der,int der_len, int  *len);
-
-void _asn1_length_der(unsigned long len,unsigned char *ans,int *ans_len);
-
-
-#endif
-
-
-
-
-
+#endif /* _DER_H */

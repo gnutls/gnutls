@@ -478,7 +478,7 @@ _asn1_change_integer_value(ASN1_TYPE node)
     if((type_field(p->type)==TYPE_INTEGER) && (p->type&CONST_ASSIGN)){
       if(p->value){
 	_asn1_convert_integer(p->value,val,sizeof(val), &len);	
-	_asn1_octet_der(val,len,val2,&len);
+	asn1_octet_der(val,len,val2,&len);
 	_asn1_set_value(p,val2,len);
       }
     }
