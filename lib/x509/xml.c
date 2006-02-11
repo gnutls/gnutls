@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -35,11 +35,6 @@
 #include <errors.h>
 #include <structure.h>
 #include <parser_aux.h>
-#include <der.h>
-#define LIBASN1_H		/* we use this since this file uses
-				 * libtasn1 internals, and we don't want the
-				 * exported API.
-				 */
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
@@ -48,9 +43,6 @@
 #include <gnutls_x509.h>
 #include <x509.h>
 #include <common.h>
-
-const char *asn1_find_structure_from_oid (ASN1_TYPE definitions,
-					  const char *oidValue);
 
 static int _gnutls_x509_expand_extensions (ASN1_TYPE * rasn);
 
@@ -379,7 +371,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
       if (p->type == TYPE_BIT_STRING)
 	{
 	  len2 = -1;
-	  len = _asn1_get_length_der (p->value, p->value_len, &len2);
+	  len = asn1_get_length_der (p->value, p->value_len, &len2);
 	  snprintf (tmp, sizeof (tmp), " length=\"%i\"",
 		    (len - 1) * 8 - (p->value[len2]));
 	  STR_APPEND (tmp);
@@ -412,7 +404,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, p->value_len, &len2);
+		  len = asn1_get_length_der (value, p->value_len, &len2);
 
 		  for (k = 0; k < len; k++)
 		    {
@@ -426,7 +418,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, p->value_len, &len2);
+		  len = asn1_get_length_der (value, p->value_len, &len2);
 
 		  for (k = 0; k < len; k++)
 		    {
@@ -456,7 +448,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, p->value_len, &len2);
+		  len = asn1_get_length_der (value, p->value_len, &len2);
 
 		  for (k = 1; k < len; k++)
 		    {
@@ -469,7 +461,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      if (value)
 		{
 		  len2 = -1;
-		  len = _asn1_get_length_der (value, p->value_len, &len2);
+		  len = asn1_get_length_der (value, p->value_len, &len2);
 		  for (k = 0; k < len; k++)
 		    {
 		      snprintf (tmp, sizeof (tmp), "%02X", (value)[k + len2]);
@@ -487,7 +479,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		  if (value)
 		    {
 		      len3 = -1;
-		      len2 = _asn1_get_length_der (value, p->value_len, &len3);
+		      len2 = asn1_get_length_der (value, p->value_len, &len3);
 		      for (k = 0; k < len2; k++)
 			{
 			  snprintf (tmp, sizeof (tmp),
@@ -507,7 +499,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    type_field (up->left->type) == TYPE_OBJECT_ID)
 		  {
 
-		    len2 = _asn1_get_length_der (up->value, up->value_len, &len3);
+		    len2 = asn1_get_length_der (up->value, up->value_len, &len3);
 
 		    if (len2 > 0 && strcmp (p->name, "type") == 0)
 		      {
