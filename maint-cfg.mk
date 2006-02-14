@@ -30,10 +30,10 @@ gtk-doc.make:
 autoreconf:
 	test -f ./configure || autoreconf --install
 
-bootstrap: autoreconf gtk-doc.make
+bootstrap: gtk-doc.make autoreconf
 	./configure $(CFGFLAGS)
 
-mingw32: autoreconf gtk-doc.make
+mingw32: gtk-doc.make autoreconf 
 	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess`
 
 .PHONY: bootstrap autoreconf mingw32
