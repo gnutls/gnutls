@@ -34,6 +34,6 @@ bootstrap: gtk-doc.make autoreconf
 	./configure $(CFGFLAGS)
 
 mingw32: gtk-doc.make autoreconf 
-	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess`
+	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess` --with-included-libtasn1 --with-included-opencdk
 
 .PHONY: bootstrap autoreconf mingw32
