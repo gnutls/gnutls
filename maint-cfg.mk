@@ -33,7 +33,9 @@ autoreconf:
 bootstrap: gtk-doc.make autoreconf
 	./configure $(CFGFLAGS)
 
+LIBGCRYPTROOT ?= $(HOME)/w32root
+
 mingw32: gtk-doc.make autoreconf 
-	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess` --with-included-libtasn1 --with-included-opencdk
+	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess` --with-included-libtasn1 --with-included-opencdk --with-libgcrypt-prefix=$(LIBGCRYPTROOT)
 
 .PHONY: bootstrap autoreconf mingw32
