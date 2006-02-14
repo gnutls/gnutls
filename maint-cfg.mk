@@ -35,3 +35,5 @@ bootstrap: autoreconf gtk-doc.make
 
 mingw32: autoreconf gtk-doc.make
 	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess`
+
+.PHONY: bootstrap autoreconf mingw32
