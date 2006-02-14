@@ -27,6 +27,11 @@ endif
 gtk-doc.make:
 	gtkdocize
 
-bootstrap: gtk-doc.make
+autoreconf:
 	test -f ./configure || autoreconf --install
+
+bootstrap: autoreconf gtk-doc.make
 	./configure $(CFGFLAGS)
+
+mingw32: autoreconf gtk-doc.make
+	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess`
