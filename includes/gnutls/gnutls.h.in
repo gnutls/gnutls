@@ -1,5 +1,5 @@
 /* -*- c -*-
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -126,11 +126,11 @@ extern "C"
    */
   typedef enum
   {
-    GNUTLS_DIG_NULL = 1,
-    GNUTLS_DIG_MD5,
-    GNUTLS_DIG_SHA1,
-    GNUTLS_DIG_RMD160,
-    GNUTLS_DIG_MD2
+    GNUTLS_DIG_NULL = GNUTLS_MAC_NULL,
+    GNUTLS_DIG_MD5 = GNUTLS_MAC_MD5,
+    GNUTLS_DIG_SHA1 = GNUTLS_MAC_SHA1,
+    GNUTLS_DIG_RMD160 = GNUTLS_MAC_RMD160,
+    GNUTLS_DIG_MD2 = GNUTLS_MAC_MD2
   } gnutls_digest_algorithm_t;
 
   /* exported for other gnutls headers. This is the maximum number of
