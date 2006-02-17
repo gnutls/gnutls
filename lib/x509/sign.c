@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -56,7 +56,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   int result;
   const char *algo;
 
-  algo = _gnutls_x509_mac_to_oid (hash);
+  algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);
   if (algo == NULL)
     {
       gnutls_assert ();
