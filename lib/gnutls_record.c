@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -1089,6 +1089,12 @@ begin:
   * This function has the similar semantics with send(). The only
   * difference is that is accepts a GNUTLS session, and uses different
   * error codes.
+  *
+  * Note that if the send buffer is full, send() will block this
+  * function.  See the send() documentation for full information.  You
+  * can replace the default push function by using
+  * gnutls_transport_set_ptr2() with a call to send() with a
+  * MSG_DONTWAIT flag if blocking is a problem.
   *
   * If the EINTR is returned by the internal push function (the
   * default is send()} then %GNUTLS_E_INTERRUPTED will be returned. If
