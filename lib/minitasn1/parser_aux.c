@@ -23,7 +23,6 @@
 #include <int.h>
 #include <errors.h>
 #include "parser_aux.h"
-#include "der.h"
 #include "gstr.h"
 #include "structure.h"
 #include "element.h"

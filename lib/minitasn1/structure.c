@@ -32,7 +32,6 @@
 #include <errors.h>
 #include <structure.h>
 #include "parser_aux.h"
-#include "der.h"
 #include <gstr.h>
 
 

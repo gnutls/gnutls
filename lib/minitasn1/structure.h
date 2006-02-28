@@ -8,16 +8,6 @@
 #ifndef _STRUCTURE_H
 #define _STRUCTURE_H
 
-
-/*************************************/
-/* Constants used in asn1_visit_tree */
-/*************************************/
-#define ASN1_PRINT_NAME             1
-#define ASN1_PRINT_NAME_TYPE        2
-#define ASN1_PRINT_NAME_TYPE_VALUE  3
-#define ASN1_PRINT_ALL              4
-
-
 asn1_retCode _asn1_create_static_structure(node_asn *pointer,
        char* output_file_name,char *vector_name);
 
