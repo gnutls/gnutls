@@ -24,18 +24,15 @@ ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
 endif
 
-gtk-doc.make:
-	gtkdocize
-
 autoreconf:
 	test -f ./configure || autoreconf --install
 
-bootstrap: gtk-doc.make autoreconf
+bootstrap: autoreconf
 	./configure $(CFGFLAGS)
 
 LIBGCRYPTROOT ?= $(HOME)/w32root
 
-mingw32: gtk-doc.make autoreconf 
+mingw32: autoreconf 
 	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess` --with-included-libtasn1 --with-included-opencdk --with-libgcrypt-prefix=$(LIBGCRYPTROOT)
 
 .PHONY: bootstrap autoreconf mingw32

@@ -1,4 +1,3 @@
 #!/bin/sh -x
-gtkdocize
 autoreconf --force --install
 : 'Run "./configure --enable-developer-mode --enable-gtk-doc && make" now.'
