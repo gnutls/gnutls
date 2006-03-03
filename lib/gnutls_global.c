@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -26,6 +26,8 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_dh.h>
+
+#include "gettext.h"
 
 #define gnutls_log_func LOG_FUNC
 
@@ -195,6 +197,8 @@ gnutls_global_init (void)
 
   if (_gnutls_init++)
     goto out;
+
+  bindtextdomain (PACKAGE, LOCALEDIR);
 
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
     {
