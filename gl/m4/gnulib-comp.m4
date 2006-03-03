@@ -43,6 +43,8 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
+  dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
+  AM_GNU_GETTEXT_VERSION([0.14.5])
   gl_INET_NTOP
   gl_MD2
   gl_FUNC_MEMMEM
@@ -85,6 +87,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getline.h
   lib/getpass.c
   lib/getpass.h
+  lib/gettext.h
   lib/hmac-md5.c
   lib/hmac-sha1.c
   lib/hmac.h
@@ -126,6 +129,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/alloca.m4
   m4/arcfour.m4
   m4/arctwo.m4
+  m4/codeset.m4
   m4/des.m4
   m4/eoverflow.m4
   m4/gc-arcfour.m4
@@ -143,12 +147,21 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
+  m4/gettext.m4
+  m4/glibc2.m4
+  m4/glibc21.m4
   m4/hmac-md5.m4
   m4/hmac-sha1.m4
+  m4/iconv.m4
   m4/inet_ntop.m4
+  m4/intdiv0.m4
+  m4/intmax.m4
   m4/intmax_t.m4
+  m4/inttypes-pri.m4
   m4/inttypes.m4
   m4/inttypes_h.m4
+  m4/isc-posix.m4
+  m4/lcmessage.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
@@ -161,7 +174,11 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/memmove.m4
   m4/memxor.m4
   m4/minmax.m4
+  m4/nls.m4
   m4/onceonly_2_57.m4
+  m4/po.m4
+  m4/printf-posix.m4
+  m4/progtest.m4
   m4/readline.m4
   m4/restrict.m4
   m4/rijndael.m4
@@ -175,6 +192,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdint.m4
   m4/stdint_h.m4
   m4/sys_socket_h.m4
+  m4/uintmax_t.m4
+  m4/ulonglong.m4
   m4/vasnprintf.m4
   m4/wchar_t.m4
   m4/wint_t.m4
