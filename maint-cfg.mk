@@ -20,6 +20,8 @@
 
 CFGFLAGS ?= --enable-developer-mode --enable-gtk-doc
 
+INDENT_SOURCES = `ls includes/gnutls/*.h{,.in} {lib,lib/x509,libextra,libextra/openpgp,src,tests}/*.{c,h} | grep -v -- -gaa`
+
 ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
 endif
