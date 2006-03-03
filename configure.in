@@ -94,6 +94,8 @@ AC_MSG_RESULT([***
 ])
 
 dnl Checks for programs.
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.14.1])
 AC_PROG_CC
 AC_PROG_LN_S
 GTK_DOC_CHECK(1.1)
@@ -519,7 +521,7 @@ AC_CONFIG_COMMANDS([chmod-config],[[
  chmod +x libextra/libgnutls-extra-config
 ]],[[]])
 
-AC_CONFIG_FILES([Makefile \
+AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile \
 	gl/Makefile tests/Makefile \
