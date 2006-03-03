@@ -51,6 +51,3 @@ release:
 	cp -v doc/reference/html/*.{html,png,css,devhelp} $(htmldir)/reference/
 	cd $(htmldir) && cvs add -kb releases/$(distdir).tar.bz2{,.sig} && \
 		cvs commit -m "Update." manual/ reference/ releases/
-
-indent:
-	indent `ls includes/gnutls/*.h{,.in} {lib,lib/x509,libextra,libextra/openpgp,src,tests}/*.{c,h} | grep -v -- -gaa`
