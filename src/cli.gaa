@@ -38,9 +38,6 @@ option (xml) { $xml = 1 } "Print the certificate information in XML format."
 #int print_cert;
 option (print-cert) { $print_cert = 1 } "Print the certificate in PEM format."
 
-#int port;
-option (p, port) INT "integer" { $port = $1 } "The port to connect to."
-
 #int record_size;
 option (recordsize) INT "integer" { $record_size = $1 } "The maximum record size to advertize."
 
@@ -107,6 +104,9 @@ option (pskusername) STR "NAME" { $psk_username = $1 } "PSK username to use."
 #char *psk_key;
 option (pskkey) STR "KEY" { $psk_key = $1 } "PSK key (in hex) to use."
 
+#char *port;
+option (p, port) STR "PORT" { $port = $1 } "The port to connect to."
+
 #int insecure;
 option (insecure) { $insecure = 1 } "Don't abort program if server certificate can't be validated."
 
@@ -119,7 +119,7 @@ option ( copyright) { print_license(); exit(0); } "prints the program's license"
 #char *rest_args;
 rest STR "hostname" { $rest_args = $1; }
 
-init { $resume=0; $port=443; $rest_args=NULL; $ciphers=NULL;
+init { $resume=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $record_size=0; 
 	$fingerprint=0; $pgp_trustdb=NULL; $pgp_keyring=NULL; $x509_crlfile = NULL;

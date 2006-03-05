@@ -35,6 +35,7 @@ void parse_ciphers (char **ciphers, int nciphers, int *cipher_priority);
 void parse_protocols (char **protocols, int protocols_size,
 		      int *protocol_priority);
 const char *raw_to_string (const unsigned char *raw, size_t raw_size);
+int service_to_port( const char* service);
 
 void sockets_init (void);
 

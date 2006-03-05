@@ -54,7 +54,7 @@
 /* global stuff here */
 int resume, starttls, insecure;
 char *hostname = NULL;
-int port;
+char* service;
 int record_max_size;
 int fingerprint;
 int crlf;
@@ -494,7 +494,7 @@ main (int argc, char **argv)
   fd_set rset;
   int maxfd;
   struct timeval tv;
-  int user_term = 0;
+  int user_term = 0, port;
   struct hostent *server_host;
   socket_st hd;
 
@@ -525,6 +525,12 @@ main (int argc, char **argv)
 
   sd = socket (AF_INET, SOCK_STREAM, 0);
   ERR (sd, "socket");
+
+  port = service_to_port( service);
+  if (port == -1) {
+     fprintf(stderr, "Unknown service\n");
+     return -1;
+  }
 
   memset (&sa, '\0', sizeof (sa));
   sa.sin_family = AF_INET;
@@ -773,7 +779,7 @@ gaa_parser (int argc, char **argv)
   starttls = info.starttls;
   resume = info.resume;
   insecure = info.insecure;
-  port = info.port;
+  service = info.port;
   record_max_size = info.record_size;
   fingerprint = info.fingerprint;
 
