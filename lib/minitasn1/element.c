@@ -51,7 +51,7 @@ _asn1_hierarchical_name(node_asn *node,char *name,int name_size)
       _asn1_str_cat(name,name_size,".");
       _asn1_str_cat(name,name_size,tmp_name);
     }
-    p=asn1_find_up(p);
+    p=_asn1_find_up(p);
   }
 
   if(name[0]==0) _asn1_str_cpy(name,name_size,"ROOT");

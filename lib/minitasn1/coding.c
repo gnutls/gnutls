@@ -937,7 +937,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 	  move=RIGHT;
 	  continue;
 	}
-	else p=asn1_find_up(p);
+	else p=_asn1_find_up(p);
 	move=UP;
       }
       if(move==UP){
@@ -988,7 +988,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
       if(p->right) p=p->right;
       else move=UP;
     }
-   if(move==UP) p=asn1_find_up(p);
+   if(move==UP) p=_asn1_find_up(p);
   }
 
   *len=counter;

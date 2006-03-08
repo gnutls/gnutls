@@ -45,6 +45,8 @@ void _asn1_delete_list_and_nodes(void);
 
 char * _asn1_ltostr(long v,char *str);
 
+node_asn * _asn1_find_up(node_asn *node);
+
 asn1_retCode _asn1_change_integer_value(ASN1_TYPE node);
 
 asn1_retCode _asn1_expand_object_id(ASN1_TYPE node);

@@ -24,7 +24,6 @@
 #define INT_H
 
 #include <libtasn1.h>
-#include <libtasn1-dont.h>
 
 #include <defines.h>
 
@@ -43,53 +42,72 @@
 #define RIGHT  2
 #define DOWN   3
 
-#define type_field(x) ASN1_TYPE_FIELD(x)
+/****************************************/
+/* Returns the first 8 bits.            */
+/* Used with the field type of node_asn */
+/****************************************/
+#define type_field(x)     (x&0xFF)
 
-#define TYPE_CONSTANT ASN1_TYPE_CONSTANT
-#define TYPE_IDENTIFIER ASN1_TYPE_IDENTIFIER
-#define TYPE_INTEGER ASN1_TYPE_INTEGER
-#define TYPE_BOOLEAN ASN1_TYPE_BOOLEAN
-#define TYPE_SEQUENCE ASN1_TYPE_SEQUENCE
-#define TYPE_BIT_STRING ASN1_TYPE_BIT_STRING
-#define TYPE_OCTET_STRING ASN1_TYPE_OCTET_STRING
-#define TYPE_TAG ASN1_TYPE_TAG
-#define TYPE_DEFAULT ASN1_TYPE_DEFAULT
-#define TYPE_SIZE ASN1_TYPE_SIZE
-#define TYPE_SEQUENCE_OF ASN1_TYPE_SEQUENCE_OF
-#define TYPE_OBJECT_ID ASN1_TYPE_OBJECT_ID
-#define TYPE_ANY ASN1_TYPE_ANY
-#define TYPE_SET ASN1_TYPE_SET
-#define TYPE_SET_OF ASN1_TYPE_SET_OF
-#define TYPE_DEFINITIONS ASN1_TYPE_DEFINITIONS
-#define TYPE_TIME ASN1_TYPE_TIME
-#define TYPE_CHOICE ASN1_TYPE_CHOICE
-#define TYPE_IMPORTS ASN1_TYPE_IMPORTS
-#define TYPE_NULL ASN1_TYPE_NULL
-#define TYPE_ENUMERATED ASN1_TYPE_ENUMERATED
-#define TYPE_GENERALSTRING ASN1_TYPE_GENERALSTRING
+/* List of constants for field type of typedef node_asn  */
+#define TYPE_CONSTANT       1
+#define TYPE_IDENTIFIER     2
+#define TYPE_INTEGER        3
+#define TYPE_BOOLEAN        4
+#define TYPE_SEQUENCE       5
+#define TYPE_BIT_STRING     6
+#define TYPE_OCTET_STRING   7
+#define TYPE_TAG            8
+#define TYPE_DEFAULT        9
+#define TYPE_SIZE          10
+#define TYPE_SEQUENCE_OF   11
+#define TYPE_OBJECT_ID     12
+#define TYPE_ANY           13
+#define TYPE_SET           14
+#define TYPE_SET_OF        15
+#define TYPE_DEFINITIONS   16
+#define TYPE_TIME          17
+#define TYPE_CHOICE        18
+#define TYPE_IMPORTS       19
+#define TYPE_NULL          20
+#define TYPE_ENUMERATED    21
+#define TYPE_GENERALSTRING 27
 
-#define CONST_UNIVERSAL ASN1_CONST_UNIVERSAL
-#define CONST_PRIVATE ASN1_CONST_PRIVATE
-#define CONST_APPLICATION ASN1_CONST_APPLICATION
-#define CONST_EXPLICIT ASN1_CONST_EXPLICIT
-#define CONST_IMPLICIT ASN1_CONST_IMPLICIT
-#define CONST_TAG ASN1_CONST_TAG
-#define CONST_OPTION ASN1_CONST_OPTION
-#define CONST_DEFAULT ASN1_CONST_DEFAULT
-#define CONST_TRUE ASN1_CONST_TRUE
-#define CONST_FALSE ASN1_CONST_FALSE
-#define CONST_LIST ASN1_CONST_LIST
-#define CONST_MIN_MAX ASN1_CONST_MIN_MAX
-#define CONST_1_PARAM ASN1_CONST_1_PARAM
-#define CONST_SIZE ASN1_CONST_SIZE
-#define CONST_DEFINED_BY ASN1_CONST_DEFINED_BY
-#define CONST_GENERALIZED ASN1_CONST_GENERALIZED
-#define CONST_UTC ASN1_CONST_UTC
-/* #define CONST_IMPORTS ASN1_CONST_IMPORTS */
-#define CONST_NOT_USED ASN1_CONST_NOT_USED
-#define CONST_SET ASN1_CONST_SET
-#define CONST_ASSIGN ASN1_CONST_ASSIGN
-#define CONST_DOWN ASN1_CONST_DOWN
-#define CONST_RIGHT ASN1_CONST_RIGHT
+
+/***********************************************************************/
+/* List of constants to better specify the type of typedef node_asn.   */
+/***********************************************************************/
+/*  Used with TYPE_TAG  */
+#define CONST_UNIVERSAL   (1<<8)
+#define CONST_PRIVATE     (1<<9)
+#define CONST_APPLICATION (1<<10)
+#define CONST_EXPLICIT    (1<<11)
+#define CONST_IMPLICIT    (1<<12)
+
+#define CONST_TAG         (1<<13)  /*  Used in ASN.1 assignement  */
+#define CONST_OPTION      (1<<14)
+#define CONST_DEFAULT     (1<<15)
+#define CONST_TRUE        (1<<16)
+#define CONST_FALSE       (1<<17)
+
+#define CONST_LIST        (1<<18)  /*  Used with TYPE_INTEGER and TYPE_BIT_STRING  */
+#define CONST_MIN_MAX     (1<<19)
+
+#define CONST_1_PARAM     (1<<20)
+
+#define CONST_SIZE        (1<<21)
+
+#define CONST_DEFINED_BY  (1<<22)
+
+#define CONST_GENERALIZED (1<<23)
+#define CONST_UTC         (1<<24)
+
+/* #define CONST_IMPORTS     (1<<25) */
+
+#define CONST_NOT_USED    (1<<26)
+#define CONST_SET         (1<<27)
+#define CONST_ASSIGN      (1<<28)
+
+#define CONST_DOWN        (1<<29)
+#define CONST_RIGHT       (1<<30)
 
 #endif /* INT_H */

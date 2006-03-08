@@ -447,7 +447,7 @@ _asn1_delete_not_used(node_asn *node)
       p2=NULL;
       if(p!=node){
 	p2=_asn1_find_left(p);
-	if(!p2) p2=asn1_find_up(p);
+	if(!p2) p2=_asn1_find_up(p);
       }
       asn1_delete_structure(&p);
       p=p2;
@@ -463,7 +463,7 @@ _asn1_delete_not_used(node_asn *node)
       else if(p->right) p=p->right;
       else{
 	while(1){
-	  p=asn1_find_up(p);
+	  p=_asn1_find_up(p);
 	  if(p==node){
 	    p=NULL;
 	    break;
@@ -661,7 +661,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
     ris=ASN1_SUCCESS;
     if(move!=UP){
       if(p->type&CONST_SET){
-	p2=asn1_find_up(p);
+	p2=_asn1_find_up(p);
 	len2=strtol(p2->value,NULL,10);
 	if(len2==-1){
 	  if(!der[counter] && !der[counter+1]){
@@ -708,7 +708,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
       }
 
       if((p->type&CONST_OPTION) || (p->type&CONST_DEFAULT)){
-	p2=asn1_find_up(p);
+	p2=_asn1_find_up(p);
 	len2=strtol(p2->value,NULL,10);
 	if(counter==len2){
 	  if(p->right){
@@ -758,7 +758,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
       }
 
       if((p->type&CONST_OPTION) || (p->type&CONST_DEFAULT)){
-	p2=asn1_find_up(p);
+	p2=_asn1_find_up(p);
 	len2=strtol(p2->value,NULL,10);
 	if((len2!=-1) && (counter>len2)) ris=ASN1_TAG_ERROR;
       }
@@ -1035,7 +1035,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
       if(p->right) p=p->right;
       else move=UP;
     }
-    if(move==UP) p=asn1_find_up(p);
+    if(move==UP) p=_asn1_find_up(p);
   }
 
   _asn1_delete_not_used(*element);
@@ -1144,7 +1144,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 
     if(move!=UP){
       if(p->type&CONST_SET){
-	p2=asn1_find_up(p);
+	p2=_asn1_find_up(p);
 	len2=strtol(p2->value,NULL,10);
 	if(counter==len2){
 	  p=p2;
@@ -1183,7 +1183,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
       }
 
       if((p->type&CONST_OPTION) || (p->type&CONST_DEFAULT)){
-	p2=asn1_find_up(p);
+	p2=_asn1_find_up(p);
 	len2=strtol(p2->value,NULL,10);
 	if(counter==len2){
 	  if(p->right){
@@ -1233,7 +1233,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
       }
 
       if((p->type&CONST_OPTION) || (p->type&CONST_DEFAULT)){
-	p2=asn1_find_up(p);
+	p2=_asn1_find_up(p);
       	len2=strtol(p2->value,NULL,10);
 	if(counter>len2) ris=ASN1_TAG_ERROR;
       }
@@ -1628,7 +1628,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
     }
 
     if(move==UP){
-      p=asn1_find_up(p);
+      p=_asn1_find_up(p);
 
       if(state != FOUND){
 	dot_p=char_p=currentName;
@@ -1729,7 +1729,7 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
     
     if(move!=UP){
       if(p->type&CONST_SET){
-	p2=asn1_find_up(p);
+	p2=_asn1_find_up(p);
 	len2=strtol(p2->value,NULL,10);
 	if(len2==-1){
 	  if(!der[counter] && !der[counter+1]){
@@ -1929,7 +1929,7 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
       if(p->right) p=p->right;
       else move=UP;
     }
-    if(move==UP) p=asn1_find_up(p);
+    if(move==UP) p=_asn1_find_up(p);
   }
 
   return ASN1_ELEMENT_NOT_FOUND;
@@ -1989,7 +1989,7 @@ asn1_expand_any_defined_by(ASN1_TYPE definitions,ASN1_TYPE *element)
 	  break;
 	}
 	
-	p3=asn1_find_up(p);
+	p3=_asn1_find_up(p);
 	
 	if(!p3){
 	  retCode=ASN1_ERROR_TYPE_ANY;
@@ -2005,8 +2005,8 @@ asn1_expand_any_defined_by(ASN1_TYPE definitions,ASN1_TYPE *element)
 	if((!p3) || (type_field(p3->type)!=TYPE_OBJECT_ID) ||
 	   (p3->value==NULL)){
 
-	  p3=asn1_find_up(p);
-	  p3=asn1_find_up(p3);
+	  p3=_asn1_find_up(p);
+	  p3=_asn1_find_up(p3);
 
 	  if(!p3){
 	    retCode=ASN1_ERROR_TYPE_ANY;
@@ -2114,7 +2114,7 @@ asn1_expand_any_defined_by(ASN1_TYPE definitions,ASN1_TYPE *element)
     else if(p->right) p=p->right;
     else{
       while(1){
-	p=asn1_find_up(p);
+	p=_asn1_find_up(p);
 	if(p==*element){
 	  p=NULL;
 	  break;

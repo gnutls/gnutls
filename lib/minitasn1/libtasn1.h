@@ -204,6 +204,34 @@ extern "C"
 
   void libtasn1_perror (asn1_retCode error);
 
+  /* DER utility functions. */
+
+  int asn1_get_tag_der (const unsigned char *der, int der_len,
+			unsigned char *class, int *len, unsigned long *tag);
+
+  void asn1_octet_der (const unsigned char *str, int str_len,
+		       unsigned char *der, int *der_len);
+
+  asn1_retCode asn1_get_octet_der (const unsigned char *der, int der_len,
+				   int *ret_len, unsigned char *str,
+				   int str_size, int *str_len);
+
+  void asn1_bit_der (const unsigned char *str, int bit_len,
+		     unsigned char *der, int *der_len);
+
+  asn1_retCode asn1_get_bit_der (const unsigned char *der, int der_len,
+				 int *ret_len, unsigned char *str,
+				 int str_size, int *bit_len);
+
+  signed long asn1_get_length_der (const unsigned char *der, int der_len,
+				   int *len);
+
+  void asn1_length_der (unsigned long len, unsigned char *ans, int *ans_len);
+
+  /* Other utility functions. */
+
+  ASN1_TYPE asn1_find_node (ASN1_TYPE pointer, const char *name);
+
 #ifdef __cplusplus
 }
 #endif

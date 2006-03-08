@@ -365,16 +365,15 @@ _asn1_remove_node(node_asn *node)
   _asn1_free(node);
 }
 
-/**
- * asn1_find_up:
- * @node: NODE_ASN element pointer.
- *
- * Return the father of the NODE_ASN element.
- *
- * Return value: Return the father of the node, or %NULL if not found.
- **/
-ASN1_TYPE
-asn1_find_up(ASN1_TYPE node)
+/******************************************************************/
+/* Function : _asn1_find_up                                       */
+/* Description: return the father of the NODE_ASN element.        */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: Null if not found.                                     */
+/******************************************************************/
+node_asn *
+_asn1_find_up(node_asn *node)
 {
   node_asn *p;
 
@@ -490,7 +489,7 @@ _asn1_change_integer_value(ASN1_TYPE node)
       else if(p->right) p=p->right;
       else{
 	while(1){
-	  p=asn1_find_up(p);
+	  p=_asn1_find_up(p);
 	  if(p==node){
 	    p=NULL;
 	    break;
@@ -586,7 +585,7 @@ _asn1_expand_object_id(ASN1_TYPE node)
       if(p->right) p=p->right;
       else move=UP;
     }
-    if(move==UP) p=asn1_find_up(p);
+    if(move==UP) p=_asn1_find_up(p);
   }
 
 
@@ -637,7 +636,7 @@ _asn1_expand_object_id(ASN1_TYPE node)
       if(p->right) p=p->right;
       else move=UP;
     }
-    if(move==UP) p=asn1_find_up(p);
+    if(move==UP) p=_asn1_find_up(p);
   }
 
   return ASN1_SUCCESS;
@@ -690,7 +689,7 @@ _asn1_type_set_config(ASN1_TYPE node)
       if(p->right) p=p->right;
       else move=UP;
     }
-    if(move==UP) p=asn1_find_up(p);
+    if(move==UP) p=_asn1_find_up(p);
   }
 
   return ASN1_SUCCESS;
@@ -771,7 +770,7 @@ _asn1_check_identifier(ASN1_TYPE node)
     else if(p->right) p=p->right;
     else{
       while(1){
-	p=asn1_find_up(p);
+	p=_asn1_find_up(p);
 	if(p==node){
 	  p=NULL;
 	  break;
@@ -822,7 +821,7 @@ _asn1_set_default_tag(ASN1_TYPE node)
     else if(p->right) p=p->right;
     else{
       while(1){
-	  p=asn1_find_up(p);
+	  p=_asn1_find_up(p);
 	  if(p==node){
 	    p=NULL;
 	    break;
