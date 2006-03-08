@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos
 #
@@ -59,7 +59,7 @@ lib_LTLIBRARIES = libgnutls-extra.la
 
 libgnutls_extra_la_SOURCES = gnutls_extra.c
 
-libgnutls_openssl_la_LDFLAGS =
+libgnutls_openssl_la_LDFLAGS = -no-undefined
 
 # OpenSSL
 
@@ -83,7 +83,7 @@ endif
 # OpenPGP
 
 libgnutls_extra_la_LIBADD =
-libgnutls_extra_la_LDFLAGS =
+libgnutls_extra_la_LDFLAGS = -no-undefined
 if ENABLE_OPENPGP
 libgnutls_extra_la_SOURCES += gnutls_openpgp.c
 libgnutls_extra_la_LIBADD += openpgp/libgnutls_openpgp.la
