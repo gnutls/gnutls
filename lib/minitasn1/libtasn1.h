@@ -232,6 +232,9 @@ extern "C"
 
   ASN1_TYPE asn1_find_node (ASN1_TYPE pointer, const char *name);
 
+  asn1_retCode asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
+			       ASN1_TYPE src, const char *src_name);
+
 #ifdef __cplusplus
 }
 #endif

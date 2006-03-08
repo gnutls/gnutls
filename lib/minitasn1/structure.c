@@ -967,3 +967,53 @@ asn1_find_structure_from_oid (ASN1_TYPE definitions,
 
   return NULL;  /* ASN1_ELEMENT_NOT_FOUND; */
 }
+
+/**
+ * asn1_copy_node:
+ * @dst: Destination ASN1_TYPE node.
+ * @dst_name: Field name in destination node.
+ * @src: Source ASN1_TYPE node.
+ * @src_name: Field name in source node.
+ *
+ * Create a deep copy of a ASN1_TYPE variable.
+ *
+ * Return value: Return ASN1_SUCCESS on success.
+ **/
+asn1_retCode
+asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
+		ASN1_TYPE src, const char *src_name)
+{
+
+  int result;
+  ASN1_TYPE dst_node;
+  void *data = NULL;
+  int size = 0;
+
+  result = asn1_der_coding (src, src_name, NULL, &size, NULL);
+  if (result != ASN1_MEM_ERROR)
+    return result;
+
+  data = _asn1_malloc (size);
+  if (data == NULL)
+    return ASN1_MEM_ERROR;
+
+  result = asn1_der_coding (src, src_name, data, &size, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      _asn1_free (data);
+      return result;
+    }
+
+  dst_node = asn1_find_node (dst, dst_name);
+  if (dst_node == NULL)
+    {
+      _asn1_free (data);
+      return ASN1_ELEMENT_NOT_FOUND;
+    }
+
+  result = asn1_der_decoding (&dst_node, data, size, NULL);
+
+  _asn1_free (data);
+
+  return result;
+}
