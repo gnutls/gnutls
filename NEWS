@@ -20,6 +20,8 @@ approach instead.  As a workaround, you may also modify lib/x509/xml.c
 ** Libraries are now built with libtool's -no-undefined.
 This helps producing libraries for Windows using mingw32.
 
+** Doc fixes to explain that gnutls_record_send can block.
+
 ** API and ABI modifications:
 No changes since last version.
 
