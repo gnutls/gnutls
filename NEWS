@@ -10,11 +10,12 @@ See the end for copying conditions.
 ** The function gnutls_x509_crt_to_xml now return an internal error.
 This means that the code to convert X.509 certificates to XML format
 does not work any more.  The reason is that the function called
-libtasn1 internal functions.  It seems unclean to export just the two
-APIs needed here from libtasn1.  Instead it would be better to
-implement XML support inside libtasn1 properly.  If you need this
-functionality strongly, please consider looking into implementing this
-suggested approach instead.
+libtasn1 internal functions.  It seems unclean for libtasn1 to export
+the APIs needed here.  Instead it would be better to implement XML
+support inside libtasn1 properly.  If you need this functionality
+strongly, please consider looking into implementing this suggested
+approach instead.  As a workaround, you may also modify lib/x509/xml.c
+(change '#if 1' to '#if 0') and build using --with-included-libtasn1.
 
 ** Libraries are now built with libtool's -no-undefined.
 This helps producing libraries for Windows using mingw32.
