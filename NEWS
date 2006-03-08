@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** Error messages are now translated using GNU Gettext.
 
+** Libraries are now built with libtool's -no-undefined.
+This helps producing libraries for Windows using mingw32.
+
 ** API and ABI modifications:
 No changes since last version.
 
