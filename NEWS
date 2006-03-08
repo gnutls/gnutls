@@ -25,6 +25,8 @@ This helps producing libraries for Windows using mingw32.
 ** Libtasn1 0.3.1 or later is now required.
 The include copy has been updated too.
 
+** gnutls-cli can now recognize services and port numbers with the -p option.
+
 ** API and ABI modifications:
 No changes since last version.
 
