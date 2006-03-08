@@ -27,32 +27,8 @@
  * to XML format.
  */
 
-#include <defines.h>
-
-#if 1
-
-#include <gnutls_int.h>
-
-/* The function below rely on some internal libtasn1 functions.  While
-   it would be easy to export them (or copy them) we prefer not to at
-   this point.  If you need the XML functionality, simply build with
-   --with-included-libtasn1 and change the '1' above to '0'. */
-
-int
-gnutls_x509_crt_to_xml (gnutls_x509_crt_t cert, gnutls_datum_t * res,
-			int detail)
-{
-  return GNUTLS_E_INTERNAL_ERROR;
-}
-
-#else
-
 #ifdef ENABLE_PKI
 
-#include <int.h>
-#include <errors.h>
-#include <structure.h>
-#include <parser_aux.h>
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
@@ -109,7 +85,7 @@ is_node_printable (ASN1_TYPE x)
       return 0;
     case TYPE_CONSTANT:
       {
-	ASN1_TYPE up = _asn1_find_up (x);
+	ASN1_TYPE up = asn1_find_up (x);
 
 	if (up != NULL && type_field (up->type) != TYPE_ANY &&
 	    up->value != NULL)
@@ -117,7 +93,7 @@ is_node_printable (ASN1_TYPE x)
       }
       return 1;
     }
-  if (x->name == NULL && _asn1_find_up (x) != NULL)
+  if (x->name == NULL && asn1_find_up (x) != NULL)
     return 0;
   if (x->value == NULL && x->down == NULL)
     return 0;
@@ -186,7 +162,7 @@ normalize_name (ASN1_TYPE p, char *output, int output_size)
 
   if (type_field (p->type) == TYPE_CONSTANT)
     {
-      ASN1_TYPE up = _asn1_find_up (p);
+      ASN1_TYPE up = asn1_find_up (p);
       const char *tmp;
 
       if (up && type_field (up->type) == TYPE_ANY &&
@@ -256,7 +232,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
   STR_APPEND (XML_HEADER);
   indent = 1;
 
-  root = _asn1_find_node (structure, "");
+  root = asn1_find_node (structure, "");
 
   if (root == NULL)
     {
@@ -351,7 +327,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      break;
 	    case TYPE_CONSTANT:
 	      {
-		ASN1_TYPE up = _asn1_find_up (p);
+		ASN1_TYPE up = asn1_find_up (p);
 
 		if (up && type_field (up->type) == TYPE_ANY &&
 		    up->left && up->left->value &&
@@ -509,7 +485,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      break;
 	    case TYPE_CONSTANT:
 	      {
-		ASN1_TYPE up = _asn1_find_up (p);
+		ASN1_TYPE up = asn1_find_up (p);
 
 		if (up && type_field (up->type) == TYPE_ANY &&
 		    up->left && up->left->value &&
@@ -626,7 +602,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 
 		  old_p = p;
 
-		  p = _asn1_find_up (p);
+		  p = asn1_find_up (p);
 		  indent -= 2;
 		  if (is_node_printable (p))
 		    {
