@@ -22,6 +22,9 @@ This helps producing libraries for Windows using mingw32.
 
 ** Doc fixes to explain that gnutls_record_send can block.
 
+** Libtasn1 0.3.1 or later is now required.
+The include copy has been updated too.
+
 ** API and ABI modifications:
 No changes since last version.
 
