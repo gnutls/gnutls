@@ -38,7 +38,8 @@
 #include <gnutls_x509.h>
 #include <x509.h>
 #include <common.h>
-#include "libtasn1.h"
+#include <libtasn1.h>
+#include <libtasn1-dont.h>
 
 static int _gnutls_x509_expand_extensions (ASN1_TYPE * rasn);
 
