@@ -317,12 +317,11 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
   _gnutls_str_cpy (name, sizeof (name), src_name);
   _gnutls_str_cat (name, sizeof (name), ".issuer");
 
-  result = _gnutls_asn1_copy_node (&src, name,
-				   issuer->cert, "tbsCertificate.subject");
-  if (result < 0)
+  result = asn1_copy_node (src, name, issuer->cert, "tbsCertificate.subject");
+  if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return result;
+      return _gnutls_asn2err (result);
     }
 
   /* Step 1.5. Write the signature stuff in the tbsCertificate.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -216,24 +216,21 @@ gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
 
   pk_algorithm = gnutls_x509_crq_get_pk_algorithm (crq, NULL);
 
-  result = _gnutls_asn1_copy_node (&crt->cert, "tbsCertificate.subject",
-				   crq->crq,
-				   "certificationRequestInfo.subject");
-  if (result < 0)
+  result = asn1_copy_node (crt->cert, "tbsCertificate.subject",
+			   crq->crq, "certificationRequestInfo.subject");
+  if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return result;
+      return _gnutls_asn2err (result);
     }
 
   result =
-    _gnutls_asn1_copy_node (&crt->cert,
-			    "tbsCertificate.subjectPublicKeyInfo",
-			    crq->crq,
-			    "certificationRequestInfo.subjectPKInfo");
-  if (result < 0)
+    asn1_copy_node (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
+		    crq->crq, "certificationRequestInfo.subjectPKInfo");
+  if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return result;
+      return _gnutls_asn2err (result);
     }
 
   return 0;
