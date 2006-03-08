@@ -1,0 +1,301 @@
+# Polish translation for gnutls.
+# Copyright (C) 2006 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnutls package.
+# Jakub Bogusz <qboosh@pld-linux.org>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnutls-1.3.5-b20060307\n"
+"Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
+"POT-Creation-Date: 2006-03-07 02:26+0100\n"
+"PO-Revision-Date: 2006-03-08 17:32+0100\n"
+"Last-Translator: Jakub Bogusz <qboosh@pld-linux.org>\n"
+"Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Success."
+msgstr "Sukces."
+
+msgid "Could not negotiate a supported cipher suite."
+msgstr "Nie uda³o siê wynegocjowaæ obs³ugiwanego zestawu certyfikatów."
+
+msgid "The cipher type is unsupported."
+msgstr "Ten typ certyfikatu nie jest obs³ugiwany."
+
+msgid "The certificate and the given key do not match."
+msgstr "Certyfikat i dany klucz nie pasuj± do siebie."
+
+msgid "Could not negotiate a supported compression method."
+msgstr "Nie uda³o siê wynegocjowaæ obs³ugiwanej metody kompresji."
+
+msgid "An unknown public key algorithm was encountered."
+msgstr "Napotkano nieznany algorytm klucza publicznego."
+
+msgid "An algorithm that is not enabled was negotiated."
+msgstr "Wynegocjowano algorytm, który nie zosta³ w³±czony."
+
+msgid "A large TLS record packet was received."
+msgstr "Odebrano du¿y pakiet rekordu TLS."
+
+msgid "A record packet with illegal version was received."
+msgstr "Odebrano pakiet rekordu o niedozwolonej wersji."
+
+msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
+msgstr "Liczba pierwsza Diffie Hellmana wys³ana przez serwer jest nieakceptowalna (zbyt ma³a)."
+
+msgid "A TLS packet with unexpected length was received."
+msgstr "Odebrano pakiet TLS o nieoczekiwanej d³ugo¶ci."
+
+msgid "The specified session has been invalidated for some reason."
+msgstr "Podana sesja zosta³a z jakiego¶ powodu uniewa¿niona."
+
+msgid "GnuTLS internal error."
+msgstr "B³±d wewnêtrzny GnuTLS."
+
+msgid "An illegal TLS extension was received."
+msgstr "Odebrano niedozwolone rozszerzenie TLS."
+
+msgid "A TLS fatal alert has been received."
+msgstr "Odebrano krytyczny alarm TLS."
+
+msgid "An unexpected TLS packet was received."
+msgstr "Odebrano nieoczekiwany pakiet TLS."
+
+msgid "A TLS warning alert has been received."
+msgstr "Odebrano ostrzegawczy alarm TLS."
+
+msgid "An error was encountered at the TLS Finished packet calculation."
+msgstr "Wykryto b³±d przy obliczaniu pakietu TLS Finished."
+
+msgid "The peer did not send any certificate."
+msgstr "Druga strona nie wys³a³a ¿adnego certyfikatu."
+
+msgid "No temporary RSA parameters were found."
+msgstr "Nie znaleziono parametrów tymczasowych RSA."
+
+msgid "No temporary DH parameters were found."
+msgstr "Nie znaleziono parametrów tymczasowych DH."
+
+msgid "An unexpected TLS handshake packet was received."
+msgstr "Odebrano nieoczekiwany pakiet nawi±zania TLS."
+
+msgid "The scanning of a large integer has failed."
+msgstr "Poszukiwanie du¿ej liczby ca³kowitej nie powiod³o siê."
+
+msgid "Could not export a large integer."
+msgstr "Nie uda³o siê wyeksportowaæ du¿ej liczby ca³kowitej."
+
+msgid "Decryption has failed."
+msgstr "Odszyfrowywanie nie powiod³o siê."
+
+msgid "Encryption has failed."
+msgstr "Szyfrowanie nie powiod³o siê."
+
+msgid "Public key decryption has failed."
+msgstr "Odszyfrowywanie z kluczem publicznym nie powiod³o siê."
+
+msgid "Public key encryption has failed."
+msgstr "Szyfrowanie z kluczem publicznym nie powiod³o siê."
+
+msgid "Public key signing has failed."
+msgstr "Podpisywanie z kluczem publicznym nie powiod³o siê."
+
+msgid "Public key signature verification has failed."
+msgstr "Sprawdzenie podpisu z kluczem publicznym nie powiod³o siê."
+
+msgid "Decompression of the TLS record packet has failed."
+msgstr "Dekompresja pakietu rekordu TLS nie powiod³a siê."
+
+msgid "Compression of the TLS record packet has failed."
+msgstr "Kompresja pakietu rekordu TLS nie powiod³a siê."
+
+msgid "Internal error in memory allocation."
+msgstr "B³±d wewnêtrzny przy przydzielaniu pamiêci."
+
+msgid "An unimplemented or disabled feature has been requested."
+msgstr "Za¿±dano niezaimplementowanej lub wy³±czonej opcji."
+
+msgid "Insufficient credentials for that request."
+msgstr "Niewystarczaj±ce uprawnienia dla tego ¿±dania."
+
+msgid "Error in password file."
+msgstr "B³±d w pliku hase³."
+
+msgid "Wrong padding in PKCS1 packet."
+msgstr "B³êdne wyrównanie w pakiecie PKCS1."
+
+msgid "The requested session has expired."
+msgstr "¯±dana sesja wygas³a."
+
+msgid "Hashing has failed."
+msgstr "Funkcja skrótu nie powiod³a siê."
+
+msgid "Base64 decoding error."
+msgstr "B³±d dekodowania base64."
+
+msgid "Base64 encoding error."
+msgstr "B³±d kodowania base64."
+
+msgid "Parsing error in password file."
+msgstr "B³±d przetwarzania pliku hase³."
+
+msgid "The requested data were not available."
+msgstr "¯±dane dane nie by³y dostêpne."
+
+msgid "Error in the pull function."
+msgstr "B³±d w funkcji pull."
+
+msgid "Error in the push function."
+msgstr "B³±d w funkcji push."
+
+msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
+msgstr "Osi±gniêto górne ograniczenie numerów sekwencyjnych pakietów rekordów. Wow!"
+
+msgid "Error in the certificate."
+msgstr "B³±d w certyfikacie."
+
+msgid "Unknown Subject Alternative name in X.509 certificate."
+msgstr "Nieznana nazwa Subject Alternative w certyfikacie X.509."
+
+msgid "Unsupported critical extension in X.509 certificate."
+msgstr "Nieobs³ugiwane rozszerzenie krytyczne w certyfikacie X.509."
+
+msgid "Key usage violation in certificate has been detected."
+msgstr "Wykryto naruszenie u¿ycia klucza w certyfikacie."
+
+msgid "Function was interrupted."
+msgstr "Funkcja zosta³a przerwana."
+
+msgid "Rehandshake was requested by the peer."
+msgstr "Druga strona za¿±da³a ponownego nawi±zania sesji."
+
+msgid "TLS Application data were received, while expecting handshake data."
+msgstr "Odebrano dane aplikacji TLS, ale oczekiwano na nawi±zanie sesji."
+
+msgid "Error in Database backend."
+msgstr "B³±d w backendzie bazy danych."
+
+msgid "The certificate type is not supported."
+msgstr "Ten typ certyfikatu nie jest obs³ugiwany."
+
+msgid "The given memory buffer is too short to hold parameters."
+msgstr "Przekazany bufor pamiêci jest zbyt ma³y do przechowania parametrów."
+
+msgid "The request is invalid."
+msgstr "¯±danie jest nieprawid³owe."
+
+msgid "An illegal parameter has been received."
+msgstr "Odebrano niedozwolony parametr."
+
+msgid "Error while reading file."
+msgstr "B³±d podczas odczytu pliku."
+
+msgid "ASN1 parser: Element was not found."
+msgstr "Analiza ASN1: Nie znaleziono elementu."
+
+msgid "ASN1 parser: Identifier was not found"
+msgstr "Analiza ASN1: Nie znaleziono identyfikatora."
+
+msgid "ASN1 parser: Error in DER parsing."
+msgstr "Analiza ASN1: B³±d przy analizie DER."
+
+msgid "ASN1 parser: Value was not found."
+msgstr "Analiza ASN1: Nie znaleziono warto¶ci."
+
+msgid "ASN1 parser: Generic parsing error."
+msgstr "Analiza ASN1: Ogólny b³±d przetwarzania."
+
+msgid "ASN1 parser: Value is not valid."
+msgstr "Analiza ASN1: Warto¶æ nie jest prawid³owa."
+
+msgid "ASN1 parser: Error in TAG."
+msgstr "Analiza ASN1: B³±d w znaczniku."
+
+msgid "ASN1 parser: error in implicit tag"
+msgstr "Analiza ASN1: b³±d w domy¶lnym znaczniku."
+
+msgid "ASN1 parser: Error in type 'ANY'."
+msgstr "Analiza ASN1: B³±d w typie 'ANY'."
+
+msgid "ASN1 parser: Syntax error."
+msgstr "Analiza ASN1: B³±d sk³adni."
+
+msgid "ASN1 parser: Overflow in DER parsing."
+msgstr "Analiza ASN1: Przepe³nienie przy analizie DER."
+
+msgid "Too many empty record packets have been received."
+msgstr "Odebrano zbyt du¿o pustych pakietów rekordów."
+
+msgid "The initialization of GnuTLS-extra has failed."
+msgstr "Inicjalizacja GnuTLS-extra nie powiod³a siê."
+
+msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
+msgstr "Wersja biblioteki GnuTLS nie zgadza siê z wersj± biblioteki GnuTLS-extra."
+
+msgid "The gcrypt library version is too old."
+msgstr "Wersja biblioteki gcrypt jest zbyt stara."
+
+msgid "The tasn1 library version is too old."
+msgstr "Wersja biblioteki tasn1 jest zbyt stara."
+
+msgid "The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported."
+msgstr "Podana wersja GnuPG TrustDB nie jest obs³ugiwana. Obs³ugiwana jest TrustDB v4."
+
+msgid "Error loading the keyring."
+msgstr "B³±d przy wczytywaniu zbioru kluczy."
+
+msgid "The initialization of LZO has failed."
+msgstr "Inicjalizacja LZO nie powiod³a siê."
+
+msgid "No supported compression algorithms have been found."
+msgstr "Nie znaleziono obs³ugiwanego algorytmu kompresji."
+
+msgid "No supported cipher suites have been found."
+msgstr "Nie znaleziono obs³ugiwanego zestawu certyfikatów."
+
+msgid "Could not get OpenPGP key."
+msgstr "Nie uda³o siê uzyskaæ klucza OpenPGP."
+
+msgid "The SRP username supplied is illegal."
+msgstr "Podana nazwa u¿ytkownika SRP nie jest dozwolona."
+
+msgid "The OpenPGP fingerprint is not supported."
+msgstr "Odcisk klucza OpenPGP nie jest obs³ugiwany."
+
+msgid "The certificate has unsupported attributes."
+msgstr "Certyfikat ma nieobs³ugiwane atrybuty."
+
+msgid "The OID is not supported."
+msgstr "OID nie jest obs³ugiwany."
+
+msgid "The hash algorithm is unknown."
+msgstr "Algorytm skrótu jest nieznany."
+
+msgid "The PKCS structure's content type is unknown."
+msgstr "Typ zawarto¶ci struktury PKCS jest nieznany."
+
+msgid "The PKCS structure's bag type is unknown."
+msgstr "Typ opakowania struktury PKCS jest nieznany."
+
+msgid "The given password contains invalid characters."
+msgstr "Podane has³o zawiera nieprawid³owe znaki."
+
+msgid "The Message Authentication Code verification failed."
+msgstr "Sprawdzenie kodu autentyczno¶ci wiadomo¶ci (MAC) nie powiod³o siê."
+
+msgid "Some constraint limits were reached."
+msgstr "Osi±gniêto niektóre ograniczenia."
+
+msgid "Failed to acquire random data."
+msgstr "Nie uda³o siê pozyskaæ danych losowych."
+
+msgid "Received a TLS/IA Intermediate Phase Finished message"
+msgstr "Odebrano wiadomo¶æ TLS/IA Intermediate Phase Finished"
+
+msgid "Received a TLS/IA Final Phase Finished message"
+msgstr "Odebrano wiadomo¶æ TLS/IA Final Phase Finished"
+
+msgid "Verifying TLS/IA phase checksum failed"
+msgstr "Sprawdzenie sumy kontrolnej frazy TLS/IA nie powiod³o siê"
