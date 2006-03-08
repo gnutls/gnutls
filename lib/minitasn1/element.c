@@ -51,7 +51,7 @@ _asn1_hierarchical_name(node_asn *node,char *name,int name_size)
       _asn1_str_cat(name,name_size,".");
       _asn1_str_cat(name,name_size,tmp_name);
     }
-    p=_asn1_find_up(p);
+    p=asn1_find_up(p);
   }
 
   if(name[0]==0) _asn1_str_cpy(name,name_size,"ROOT");
@@ -268,7 +268,7 @@ asn1_write_value(ASN1_TYPE node_root,const char *name,
   int len2,k,k2,negative;
   const unsigned char* value = ivalue;
 
-  node=_asn1_find_node(node_root,name);
+  node=asn1_find_node(node_root,name);
   if(node==NULL) return  ASN1_ELEMENT_NOT_FOUND;
 
   if((node->type & CONST_OPTION) && (value==NULL) && (len==0)){
@@ -621,7 +621,7 @@ asn1_read_value(ASN1_TYPE root,const char *name,void* ivalue, int *len)
   int value_size = *len;
   unsigned char* value = ivalue;
 
-  node=_asn1_find_node(root,name);
+  node=asn1_find_node(root,name);
   if(node==NULL) return  ASN1_ELEMENT_NOT_FOUND;
 
   if((type_field(node->type)!=TYPE_NULL) && 
@@ -760,7 +760,7 @@ asn1_read_tag(node_asn *root,const char *name,int *tagValue, int *classValue)
 {
   node_asn *node,*p,*pTag;
  
-  node=_asn1_find_node(root,name);
+  node=asn1_find_node(root,name);
   if(node==NULL) return  ASN1_ELEMENT_NOT_FOUND;
 
   p=node->down;
