@@ -67,7 +67,7 @@ _asn1_error_description_value_not_found(node_asn *node,char *ErrorDescription)
  * The @ans buffer is pre-allocated and must have room for the output.
  **/
 void
-asn1_length_der(unsigned long len, unsigned char *ans, int *ans_len)
+asn1_length_der(unsigned long int len, unsigned char *ans, int *ans_len)
 {
   int k;
   unsigned char temp[SIZEOF_UNSIGNED_LONG_INT];
@@ -87,7 +87,7 @@ asn1_length_der(unsigned long len, unsigned char *ans, int *ans_len)
     *ans_len=k+1;
     if(ans!=NULL){
       ans[0]=((unsigned char)k&0x7F)+128;
-      while(k--) ans[*ans_len-1-k]=temp[k];  
+      while(k--) ans[*ans_len-1-k]=temp[k];
     }
   }
 }

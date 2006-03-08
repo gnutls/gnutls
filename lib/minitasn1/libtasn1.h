@@ -104,7 +104,8 @@ extern "C"
 /* Structure definition used for the node of the tree */
 /* that represent an ASN.1 DEFINITION.                */
 /******************************************************/
-  typedef struct node_asn_struct
+
+  struct node_asn_struct
   {
     char *name;			/* Node name */
     unsigned int type;		/* Node type */
@@ -113,7 +114,9 @@ extern "C"
     struct node_asn_struct *down;	/* Pointer to the son node */
     struct node_asn_struct *right;	/* Pointer to the brother node */
     struct node_asn_struct *left;	/* Pointer to the next list element */
-  } node_asn;
+  };
+
+  typedef struct node_asn_struct node_asn;
 
   typedef node_asn *ASN1_TYPE;
 
@@ -226,7 +229,8 @@ extern "C"
   signed long asn1_get_length_der (const unsigned char *der, int der_len,
 				   int *len);
 
-  void asn1_length_der (unsigned long len, unsigned char *ans, int *ans_len);
+  void asn1_length_der (unsigned long int len, unsigned char *ans,
+			int *ans_len);
 
   /* Other utility functions. */
 
