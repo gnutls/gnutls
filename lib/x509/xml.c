@@ -38,6 +38,7 @@
 #include <gnutls_x509.h>
 #include <x509.h>
 #include <common.h>
+#include "libtasn1.h"
 
 static int _gnutls_x509_expand_extensions (ASN1_TYPE * rasn);
 
@@ -46,18 +47,18 @@ find_default_value (ASN1_TYPE x)
 {
   ASN1_TYPE p = x;
 
-  if (x->value == NULL && x->type & CONST_DEFAULT)
+  if (x->value == NULL && x->type & ASN1_CONST_DEFAULT)
     {
       if (x->down)
 	{
 	  x = x->down;
 	  do
 	    {
-	      if (type_field (x->type) == TYPE_DEFAULT)
+	      if (type_field (x->type) == ASN1_TYPE_DEFAULT)
 		{
-		  if (type_field (p->type) == TYPE_BOOLEAN)
+		  if (type_field (p->type) == ASN1_TYPE_BOOLEAN)
 		    {
-		      if (x->type & CONST_TRUE)
+		      if (x->type & ASN1_CONST_TRUE)
 			return "TRUE";
 		      else
 			return "FALSE";
@@ -80,15 +81,15 @@ is_node_printable (ASN1_TYPE x)
 {
   switch (type_field (x->type))
     {
-    case TYPE_TAG:
-    case TYPE_SIZE:
-    case TYPE_DEFAULT:
+    case ASN1_TYPE_TAG:
+    case ASN1_TYPE_SIZE:
+    case ASN1_TYPE_DEFAULT:
       return 0;
-    case TYPE_CONSTANT:
+    case ASN1_TYPE_CONSTANT:
       {
 	ASN1_TYPE up = asn1_find_up (x);
 
-	if (up != NULL && type_field (up->type) != TYPE_ANY &&
+	if (up != NULL && type_field (up->type) != ASN1_TYPE_ANY &&
 	    up->value != NULL)
 	  return 0;
       }
@@ -161,15 +162,15 @@ normalize_name (ASN1_TYPE p, char *output, int output_size)
   if (name == NULL)
     name = ROOT;
 
-  if (type_field (p->type) == TYPE_CONSTANT)
+  if (type_field (p->type) == ASN1_TYPE_CONSTANT)
     {
       ASN1_TYPE up = asn1_find_up (p);
       const char *tmp;
 
-      if (up && type_field (up->type) == TYPE_ANY &&
+      if (up && type_field (up->type) == ASN1_TYPE_ANY &&
 	  up->left && up->left->value &&
-	  up->type & CONST_DEFINED_BY &&
-	  type_field (up->left->type) == TYPE_OBJECT_ID)
+	  up->type & ASN1_CONST_DEFINED_BY &&
+	  type_field (up->left->type) == ASN1_TYPE_OBJECT_ID)
 	{
 
 	  tmp =
@@ -281,59 +282,59 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	{
 	  switch (type_field (p->type))
 	    {
-	    case TYPE_DEFAULT:
+	    case ASN1_TYPE_DEFAULT:
 	      STR_APPEND (" type=\"DEFAULT\"");
 	      break;
-	    case TYPE_NULL:
+	    case ASN1_TYPE_NULL:
 	      STR_APPEND (" type=\"NULL\"");
 	      break;
-	    case TYPE_IDENTIFIER:
+	    case ASN1_TYPE_IDENTIFIER:
 	      STR_APPEND (" type=\"IDENTIFIER\"");
 	      break;
-	    case TYPE_INTEGER:
+	    case ASN1_TYPE_INTEGER:
 	      STR_APPEND (" type=\"INTEGER\"");
 	      STR_APPEND (" encoding=\"HEX\"");
 	      break;
-	    case TYPE_ENUMERATED:
+	    case ASN1_TYPE_ENUMERATED:
 	      STR_APPEND (" type=\"ENUMERATED\"");
 	      STR_APPEND (" encoding=\"HEX\"");
 	      break;
-	    case TYPE_TIME:
+	    case ASN1_TYPE_TIME:
 	      STR_APPEND (" type=\"TIME\"");
 	      break;
-	    case TYPE_BOOLEAN:
+	    case ASN1_TYPE_BOOLEAN:
 	      STR_APPEND (" type=\"BOOLEAN\"");
 	      break;
-	    case TYPE_SEQUENCE:
+	    case ASN1_TYPE_SEQUENCE:
 	      STR_APPEND (" type=\"SEQUENCE\"");
 	      break;
-	    case TYPE_BIT_STRING:
+	    case ASN1_TYPE_BIT_STRING:
 	      STR_APPEND (" type=\"BIT STRING\"");
 	      STR_APPEND (" encoding=\"HEX\"");
 	      break;
-	    case TYPE_OCTET_STRING:
+	    case ASN1_TYPE_OCTET_STRING:
 	      STR_APPEND (" type=\"OCTET STRING\"");
 	      STR_APPEND (" encoding=\"HEX\"");
 	      break;
-	    case TYPE_SEQUENCE_OF:
+	    case ASN1_TYPE_SEQUENCE_OF:
 	      STR_APPEND (" type=\"SEQUENCE OF\"");
 	      break;
-	    case TYPE_OBJECT_ID:
+	    case ASN1_TYPE_OBJECT_ID:
 	      STR_APPEND (" type=\"OBJECT ID\"");
 	      break;
-	    case TYPE_ANY:
+	    case ASN1_TYPE_ANY:
 	      STR_APPEND (" type=\"ANY\"");
 	      if (!p->down)
 		STR_APPEND (" encoding=\"HEX\"");
 	      break;
-	    case TYPE_CONSTANT:
+	    case ASN1_TYPE_CONSTANT:
 	      {
 		ASN1_TYPE up = asn1_find_up (p);
 
-		if (up && type_field (up->type) == TYPE_ANY &&
+		if (up && type_field (up->type) == ASN1_TYPE_ANY &&
 		    up->left && up->left->value &&
-		    up->type & CONST_DEFINED_BY &&
-		    type_field (up->left->type) == TYPE_OBJECT_ID)
+		    up->type & ASN1_CONST_DEFINED_BY &&
+		    type_field (up->left->type) == ASN1_TYPE_OBJECT_ID)
 		  {
 
 		    if (_gnutls_x509_oid_data_printable
@@ -345,16 +346,16 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		  }
 	      }
 	      break;
-	    case TYPE_SET:
+	    case ASN1_TYPE_SET:
 	      STR_APPEND (" type=\"SET\"");
 	      break;
-	    case TYPE_SET_OF:
+	    case ASN1_TYPE_SET_OF:
 	      STR_APPEND (" type=\"SET OF\"");
 	      break;
-	    case TYPE_CHOICE:
+	    case ASN1_TYPE_CHOICE:
 	      STR_APPEND (" type=\"CHOICE\"");
 	      break;
-	    case TYPE_DEFINITIONS:
+	    case ASN1_TYPE_DEFINITIONS:
 	      STR_APPEND (" type=\"DEFINITIONS\"");
 	      break;
 	    default:
@@ -363,7 +364,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	}
 
 
-      if (p->type == TYPE_BIT_STRING)
+      if (p->type == ASN1_TYPE_BIT_STRING)
 	{
 	  len2 = -1;
 	  len = asn1_get_length_der (p->value, p->value_len, &len2);
@@ -387,15 +388,15 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	  switch (type_field (p->type))
 	    {
 
-	    case TYPE_DEFAULT:
+	    case ASN1_TYPE_DEFAULT:
 	      if (value)
 		STR_APPEND (value);
 	      break;
-	    case TYPE_IDENTIFIER:
+	    case ASN1_TYPE_IDENTIFIER:
 	      if (value)
 		STR_APPEND (value);
 	      break;
-	    case TYPE_INTEGER:
+	    case ASN1_TYPE_INTEGER:
 	      if (value)
 		{
 		  len2 = -1;
@@ -409,7 +410,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 
 		}
 	      break;
-	    case TYPE_ENUMERATED:
+	    case ASN1_TYPE_ENUMERATED:
 	      if (value)
 		{
 		  len2 = -1;
@@ -422,11 +423,11 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    }
 		}
 	      break;
-	    case TYPE_TIME:
+	    case ASN1_TYPE_TIME:
 	      if (value)
 		STR_APPEND (value);
 	      break;
-	    case TYPE_BOOLEAN:
+	    case ASN1_TYPE_BOOLEAN:
 	      if (value)
 		{
 		  if (value[0] == 'T')
@@ -439,7 +440,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    }
 		}
 	      break;
-	    case TYPE_BIT_STRING:
+	    case ASN1_TYPE_BIT_STRING:
 	      if (value)
 		{
 		  len2 = -1;
@@ -452,7 +453,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    }
 		}
 	      break;
-	    case TYPE_OCTET_STRING:
+	    case ASN1_TYPE_OCTET_STRING:
 	      if (value)
 		{
 		  len2 = -1;
@@ -464,11 +465,11 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    }
 		}
 	      break;
-	    case TYPE_OBJECT_ID:
+	    case ASN1_TYPE_OBJECT_ID:
 	      if (value)
 		STR_APPEND (value);
 	      break;
-	    case TYPE_ANY:
+	    case ASN1_TYPE_ANY:
 	      if (!p->down)
 		{
 		  if (value)
@@ -484,14 +485,14 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    }
 		}
 	      break;
-	    case TYPE_CONSTANT:
+	    case ASN1_TYPE_CONSTANT:
 	      {
 		ASN1_TYPE up = asn1_find_up (p);
 
-		if (up && type_field (up->type) == TYPE_ANY &&
+		if (up && type_field (up->type) == ASN1_TYPE_ANY &&
 		    up->left && up->left->value &&
-		    up->type & CONST_DEFINED_BY &&
-		    type_field (up->left->type) == TYPE_OBJECT_ID)
+		    up->type & ASN1_CONST_DEFINED_BY &&
+		    type_field (up->left->type) == ASN1_TYPE_OBJECT_ID)
 		  {
 
 		    len2 =
@@ -530,13 +531,13 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 
 	      }
 	      break;
-	    case TYPE_SET:
-	    case TYPE_SET_OF:
-	    case TYPE_CHOICE:
-	    case TYPE_DEFINITIONS:
-	    case TYPE_SEQUENCE_OF:
-	    case TYPE_SEQUENCE:
-	    case TYPE_NULL:
+	    case ASN1_TYPE_SET:
+	    case ASN1_TYPE_SET_OF:
+	    case ASN1_TYPE_CHOICE:
+	    case ASN1_TYPE_DEFINITIONS:
+	    case ASN1_TYPE_SEQUENCE_OF:
+	    case ASN1_TYPE_SEQUENCE:
+	    case ASN1_TYPE_NULL:
 	      break;
 	    default:
 	      break;
