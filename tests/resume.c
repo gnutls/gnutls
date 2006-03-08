@@ -366,7 +366,8 @@ server (void)
 	{
 	  close (sd);
 	  gnutls_deinit (session);
-	  fail ("server: Handshake has failed (%s)\n\n", gnutls_strerror (ret));
+	  fail ("server: Handshake has failed (%s)\n\n",
+		gnutls_strerror (ret));
 	  return;
 	}
       success ("server: Handshake was completed\n");
@@ -483,11 +484,11 @@ wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
   if (debug)
     {
       unsigned int i;
-      printf("key:\n");
+      printf ("key:\n");
       for (i = 0; i < key.size; i++)
 	{
 	  printf ("%02x ", key.data[i] & 0xFF);
-	  if ((i+1)%16 == 0)
+	  if ((i + 1) % 16 == 0)
 	    printf ("\n");
 	}
       printf ("\n");
@@ -495,7 +496,7 @@ wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
       for (i = 0; i < data.size; i++)
 	{
 	  printf ("%02x ", data.data[i] & 0xFF);
-	  if ((i+1)%16 == 0)
+	  if ((i + 1) % 16 == 0)
 	    printf ("\n");
 	}
       printf ("\n");
@@ -531,11 +532,11 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
   if (debug)
     {
       unsigned int i;
-      printf("key:\n");
+      printf ("key:\n");
       for (i = 0; i < key.size; i++)
 	{
 	  printf ("%02x ", key.data[i] & 0xFF);
-	  if ((i+1)%16 == 0)
+	  if ((i + 1) % 16 == 0)
 	    printf ("\n");
 	}
       printf ("\n");
@@ -566,7 +567,7 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
 	      for (i = 0; i < res.size; i++)
 		{
 		  printf ("%02x ", res.data[i] & 0xFF);
-		  if ((i+1)%16 == 0)
+		  if ((i + 1) % 16 == 0)
 		    printf ("\n");
 		}
 	      printf ("\n");

@@ -54,7 +54,7 @@
 /* global stuff here */
 int resume, starttls, insecure;
 char *hostname = NULL;
-char* service;
+char *service;
 int record_max_size;
 int fingerprint;
 int crlf;
@@ -526,11 +526,12 @@ main (int argc, char **argv)
   sd = socket (AF_INET, SOCK_STREAM, 0);
   ERR (sd, "socket");
 
-  port = service_to_port( service);
-  if (port == -1) {
-     fprintf(stderr, "Unknown service\n");
-     return -1;
-  }
+  port = service_to_port (service);
+  if (port == -1)
+    {
+      fprintf (stderr, "Unknown service\n");
+      return -1;
+    }
 
   memset (&sa, '\0', sizeof (sa));
   sa.sin_family = AF_INET;

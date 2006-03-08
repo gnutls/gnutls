@@ -499,7 +499,8 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 		    type_field (up->left->type) == TYPE_OBJECT_ID)
 		  {
 
-		    len2 = asn1_get_length_der (up->value, up->value_len, &len3);
+		    len2 =
+		      asn1_get_length_der (up->value, up->value_len, &len3);
 
 		    if (len2 > 0 && strcmp (p->name, "type") == 0)
 		      {

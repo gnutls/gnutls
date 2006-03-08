@@ -442,8 +442,7 @@ cleanup:
   **/
 int
 gnutls_x509_crq_get_challenge_password (gnutls_x509_crq_t crq,
-					char *pass,
-					size_t * sizeof_pass)
+					char *pass, size_t * sizeof_pass)
 {
   if (crq == NULL)
     {

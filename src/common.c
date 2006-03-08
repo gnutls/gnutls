@@ -823,20 +823,23 @@ sockets_init (void)
  *
  * returns -1 on error;
  */
-int service_to_port( const char* service)
+int
+service_to_port (const char *service)
 {
-int port;
-struct servent *server_port;
+  int port;
+  struct servent *server_port;
 
-  port = atoi(service);
-  if (port!=0) return port;
+  port = atoi (service);
+  if (port != 0)
+    return port;
 
-  server_port = getservbyname( service, "tcp");
-  if (server_port == NULL) {
-     perror("getservbyname()");
-     return(-1);
-  }
-  
-  return ntohs(server_port->s_port);
-  
+  server_port = getservbyname (service, "tcp");
+  if (server_port == NULL)
+    {
+      perror ("getservbyname()");
+      return (-1);
+    }
+
+  return ntohs (server_port->s_port);
+
 }
