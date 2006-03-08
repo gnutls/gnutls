@@ -729,4 +729,3 @@ _gnutls_x509_expand_extensions (ASN1_TYPE * rasn)
 }
 
 #endif
-#endif
