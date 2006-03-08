@@ -54,9 +54,9 @@ find_default_value (ASN1_TYPE x)
 	  x = x->down;
 	  do
 	    {
-	      if (type_field (x->type) == ASN1_TYPE_DEFAULT)
+	      if (ASN1_TYPE_FIELD (x->type) == ASN1_TYPE_DEFAULT)
 		{
-		  if (type_field (p->type) == ASN1_TYPE_BOOLEAN)
+		  if (ASN1_TYPE_FIELD (p->type) == ASN1_TYPE_BOOLEAN)
 		    {
 		      if (x->type & ASN1_CONST_TRUE)
 			return "TRUE";
@@ -79,7 +79,7 @@ find_default_value (ASN1_TYPE x)
 static int
 is_node_printable (ASN1_TYPE x)
 {
-  switch (type_field (x->type))
+  switch (ASN1_TYPE_FIELD (x->type))
     {
     case ASN1_TYPE_TAG:
     case ASN1_TYPE_SIZE:
@@ -89,7 +89,7 @@ is_node_printable (ASN1_TYPE x)
       {
 	ASN1_TYPE up = asn1_find_up (x);
 
-	if (up != NULL && type_field (up->type) != ASN1_TYPE_ANY &&
+	if (up != NULL && ASN1_TYPE_FIELD (up->type) != ASN1_TYPE_ANY &&
 	    up->value != NULL)
 	  return 0;
       }
@@ -162,15 +162,15 @@ normalize_name (ASN1_TYPE p, char *output, int output_size)
   if (name == NULL)
     name = ROOT;
 
-  if (type_field (p->type) == ASN1_TYPE_CONSTANT)
+  if (ASN1_TYPE_FIELD (p->type) == ASN1_TYPE_CONSTANT)
     {
       ASN1_TYPE up = asn1_find_up (p);
       const char *tmp;
 
-      if (up && type_field (up->type) == ASN1_TYPE_ANY &&
+      if (up && ASN1_TYPE_FIELD (up->type) == ASN1_TYPE_ANY &&
 	  up->left && up->left->value &&
 	  up->type & ASN1_CONST_DEFINED_BY &&
-	  type_field (up->left->type) == ASN1_TYPE_OBJECT_ID)
+	  ASN1_TYPE_FIELD (up->left->type) == ASN1_TYPE_OBJECT_ID)
 	{
 
 	  tmp =
@@ -280,7 +280,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 
       if (is_node_printable (p))
 	{
-	  switch (type_field (p->type))
+	  switch (ASN1_TYPE_FIELD (p->type))
 	    {
 	    case ASN1_TYPE_DEFAULT:
 	      STR_APPEND (" type=\"DEFAULT\"");
@@ -331,10 +331,10 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      {
 		ASN1_TYPE up = asn1_find_up (p);
 
-		if (up && type_field (up->type) == ASN1_TYPE_ANY &&
+		if (up && ASN1_TYPE_FIELD (up->type) == ASN1_TYPE_ANY &&
 		    up->left && up->left->value &&
 		    up->type & ASN1_CONST_DEFINED_BY &&
-		    type_field (up->left->type) == ASN1_TYPE_OBJECT_ID)
+		    ASN1_TYPE_FIELD (up->left->type) == ASN1_TYPE_OBJECT_ID)
 		  {
 
 		    if (_gnutls_x509_oid_data_printable
@@ -385,7 +385,7 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	  else
 	    value = p->value;
 
-	  switch (type_field (p->type))
+	  switch (ASN1_TYPE_FIELD (p->type))
 	    {
 
 	    case ASN1_TYPE_DEFAULT:
@@ -489,10 +489,10 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
 	      {
 		ASN1_TYPE up = asn1_find_up (p);
 
-		if (up && type_field (up->type) == ASN1_TYPE_ANY &&
+		if (up && ASN1_TYPE_FIELD (up->type) == ASN1_TYPE_ANY &&
 		    up->left && up->left->value &&
 		    up->type & ASN1_CONST_DEFINED_BY &&
-		    type_field (up->left->type) == ASN1_TYPE_OBJECT_ID)
+		    ASN1_TYPE_FIELD (up->left->type) == ASN1_TYPE_OBJECT_ID)
 		  {
 
 		    len2 =
