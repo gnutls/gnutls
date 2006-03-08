@@ -1,3 +1,300 @@
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.3.5.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/libtasn1.h: Update.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS, po/pl.po: Sync with TP.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Add update-po target.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Doc fix.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c, lib/x509/sign.c, lib/x509/x509_write.c: Use
+	new asn1_copy_node API.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/libtasn1.h, lib/minitasn1/structure.c: Update.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/int.h,
+	lib/minitasn1/libtasn1-dont.h, lib/minitasn1/libtasn1.h,
+	lib/minitasn1/parser_aux.c, lib/minitasn1/parser_aux.h,
+	lib/minitasn1/structure.c: Update.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Use internal error approach again, after
+	discussion with Nikos.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Fix.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/int.h,
+	lib/minitasn1/libtasn1-dont.h, lib/minitasn1/libtasn1.h: Update.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Fix type_field.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Use external API.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/int.h,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/parser_aux.h, lib/minitasn1/structure.c: Update.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Fix.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Use external libtasn1 API.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Fix typo.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Required libtasn1 0.3.1.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Revert, we now use the new exported functions.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Make it build.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Sort.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Disable XML functionality, because it relies on
+	libtasn1 internals.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, libextra/Makefile.am: Add -no-undefined, for
+	mingw32 builds.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c, src/common.c, src/common.h, src/serv.c,
+	tests/resume.c, lib/x509/crq.c, lib/x509/xml.c: Indent.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk, gl/Makefile.am, gl/gc-gnulib.c, gl/gc-libgcrypt.c,
+	gl/m4/gc-random.m4, gl/m4/gc.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/readline.m4: Update.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS: Add.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-funk-tls-inner-application-extension-02.txt:
+	Add.
+
+2006-03-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/cli-gaa.c, src/cli-gaa.h, src/cli.c, src/cli.gaa,
+	src/common.c, src/common.h: gnutls-cli can now recognize services
+	and port numbers with the -p option.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Gettext fixes.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Fix.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c, lib/gnutls_global.c: Error message
+	translations.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Add indent file list.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Remove indent target.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Revert, autoreconf needs it.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove gettext version stuff.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk, gl/Makefile.am, gl/gettext.h, gl/m4/codeset.m4,
+	gl/m4/gettext.m4, gl/m4/glibc2.m4, gl/m4/glibc21.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/iconv.m4,
+	gl/m4/intdiv0.m4, gl/m4/intmax.m4, gl/m4/inttypes-pri.m4,
+	gl/m4/isc-posix.m4, gl/m4/lcmessage.m4, gl/m4/nls.m4, gl/m4/po.m4,
+	gl/m4/printf-posix.m4, gl/m4/progtest.m4, gl/m4/readline.m4,
+	gl/m4/uintmax_t.m4, gl/m4/ulonglong.m4: Update.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, configure.in, po/Makevars, po/POTFILES.in:
+	Gettextize.
+
+2006-03-01  Simon Josefsson <simon@josefsson.org>
+
+	* gtk-doc.make: Add.
+
+2006-03-01  Simon Josefsson <simon@josefsson.org>
+
+	* gl/readline.c, gl/m4/readline.m4, gl/m4/socklen.m4,
+	gl/m4/sys_socket_h.m4, maint.mk: Update.
+
+2006-03-01  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk, buildconf: Don't gtkdocize.
+
+2006-02-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/Makefile.am, lib/minitasn1/coding.c,
+	lib/minitasn1/decoding.c, lib/minitasn1/der.h,
+	lib/minitasn1/element.c, lib/minitasn1/errors.h,
+	lib/minitasn1/errors_int.h, lib/minitasn1/gstr.c,
+	lib/minitasn1/gstr.h, lib/minitasn1/int.h,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/structure.c, lib/minitasn1/structure.h: Update.
+
+2006-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_record.c: gnutls_record_send: Doc fix, suggested by
+	Eric Leblond <regit@inl.fr>.
+
+2006-02-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/sign.c: Fix warning.
+
+2006-02-17  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Make it explicit that GNUTLS_DIG_*
+	has the same values as GNUTLS_MAC_*.
+
+2006-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-santesson-tls-ume-02.txt: Add.
+
+2006-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Fix.
+
+2006-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Fix.
+
+2006-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Fix.
+
+2006-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Add mingw32 target.
+
+2006-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, maint-cfg.mk, maint.mk, gl/Makefile.am,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Add
+	maintainer-makefile module.
+
+2006-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Use external libtasn1 API.
+
+2006-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/der.h, lib/minitasn1/element.c,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/structure.c: Sync with libtasn1 CVS.
+
+2006-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump libtasn1 version.
+
+2006-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/der.h, lib/minitasn1/element.c,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/structure.c, lib/x509/xml.c: Minimal set of patches
+	against gnutls 1.2.9 that fix the security bug (only the *.c
+	changes!).
+
+2006-02-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix typo.
+
 2006-02-09  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.3.4.
@@ -1467,8 +1764,8 @@
 
 	* NEWS: Version 1.2.9.
 
-----------------------------------------------------------------------
-  Copyright (C) 2005, 2006 Free Software Foundation
- Copying and distribution of this file, with or without modification,
- are permitted in any medium without royalty provided the copyright
- notice and this notice are preserved.
+	----------------------------------------------------------------------
+	Copyright (C) 2005, 2006 Free Software Foundation
+	Copying and distribution of this file, with or without modification,
+	are permitted in any medium without royalty provided the copyright
+	notice and this notice are preserved.
