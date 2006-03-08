@@ -29,8 +29,9 @@
 
 #include <defines.h>
 
-
 #if 1
+
+#include <gnutls_int.h>
 
 /* The function below rely on some internal libtasn1 functions.  While
    it would be easy to export them (or copy them) we prefer not to at
