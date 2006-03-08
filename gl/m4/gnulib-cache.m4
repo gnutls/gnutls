@@ -14,10 +14,10 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --aux-dir=. --lgpl --libtool --macro-prefix=gl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-rijndael gc-sha1 getline getpass gettext inet_ntop maintainer-makefile memmem memmove minmax readline snprintf socklen stdint
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --aux-dir=. --lgpl --libtool --macro-prefix=gl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 getline getpass gettext inet_ntop maintainer-makefile memmem memmove minmax readline snprintf socklen stdint
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
-gl_MODULES([gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-rijndael gc-sha1 getline getpass gettext inet_ntop maintainer-makefile memmem memmove minmax readline snprintf socklen stdint])
+gl_MODULES([gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 getline getpass gettext inet_ntop maintainer-makefile memmem memmove minmax readline snprintf socklen stdint])
 gl_AVOID([])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
