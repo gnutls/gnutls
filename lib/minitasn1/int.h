@@ -24,6 +24,7 @@
 #define INT_H
 
 #include <libtasn1.h>
+#include <libtasn1-dont.h>
 
 #include <defines.h>
 
