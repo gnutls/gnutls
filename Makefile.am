@@ -27,6 +27,12 @@ EXTRA_DIST = mkinstalldirs
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
+# Maintainer targets
+
+update-po: refresh-po
+	cvs add `ls po/*.po | grep -v quot.po` || true && \
+	cvs commit -m "Sync with TP." po/LINGUAS `ls po/*.po | grep -v quot.po`
+
 ChangeLog:
 	cvs2cl --utc --fsf --FSF --usermap .cvsusers -I ChangeLog -I .cvs --window 120 -l "-d"">2005-11-07;today<"""
 	cat .cvscopying >> ChangeLog
