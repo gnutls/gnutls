@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -1364,8 +1364,6 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
   return algo;
 }
 
-ASN1_TYPE _asn1_find_node (ASN1_TYPE pointer, const char *name);
-
 int
 _gnutls_asn1_copy_node (ASN1_TYPE * dst, const char *dst_name,
 			ASN1_TYPE src, const char *src_name)
@@ -1382,7 +1380,7 @@ _gnutls_asn1_copy_node (ASN1_TYPE * dst, const char *dst_name,
       return result;
     }
 
-  dst_node = _asn1_find_node (*dst, dst_name);
+  dst_node = asn1_find_node (*dst, dst_name);
   if (dst_node == NULL)
     {
       gnutls_assert ();
