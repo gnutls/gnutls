@@ -27,9 +27,10 @@
  * to XML format.
  */
 
+#include <gnutls_int.h>
+
 #ifdef ENABLE_PKI
 
-#include <gnutls_int.h>
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
