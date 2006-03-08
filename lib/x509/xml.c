@@ -678,8 +678,13 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
   * @res: The datum that will hold the result
   * @detail: The detail level (must be GNUTLS_XML_SHOW_ALL or GNUTLS_XML_NORMAL)
   *
-  * This function will return the XML structures of the given X.509 certificate.
-  * The XML structures are allocated internally (with malloc) and stored into res.
+  * This function will return the XML structures of the given X.509
+  * certificate.  The XML structures are allocated internally (with
+  * malloc) and stored into res.
+  *
+  * NOTE: This function is currently not implemented.  See the NEWS
+  * entry for version 1.3.5.
+  *
   * Returns a negative error code in case of an error.
   *
   **/
