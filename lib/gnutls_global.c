@@ -194,6 +194,7 @@ gnutls_global_init (void)
 {
   int result = 0;
   int res;
+  char c;
 
   if (_gnutls_init++)
     goto out;
@@ -273,6 +274,9 @@ gnutls_global_init (void)
       result = _gnutls_asn2err (res);
       goto out;
     }
+    
+  /* Initialize the gcrypt (if used random generator) */
+  gc_pseudo_random (&c, 1);
 
 out:
   return result;
