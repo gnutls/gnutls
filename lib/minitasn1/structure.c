@@ -338,7 +338,6 @@ asn1_delete_element(ASN1_TYPE structure,const char *element_name)
   return asn1_delete_structure(&source_node);
 }
 
-
 node_asn *
 _asn1_copy_structure3(node_asn *source_node)
 {
@@ -1017,3 +1016,4 @@ asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
 
   return result;
 }
+
