@@ -982,7 +982,9 @@ asn1_retCode
 asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
 		ASN1_TYPE src, const char *src_name)
 {
-
+/* FIXME: rewrite using copy_structure().
+ * It seems quite hard to do.
+ */
   int result;
   ASN1_TYPE dst_node;
   void *data = NULL;
