@@ -10,6 +10,7 @@ following software:
 * automake 1.8 or newer (http://www.gnu.org/software/automake/)
 * libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
 * texinfo (http://www.gnu.org/software/texinfo/)
+* tetex, tetex-extra
 * gtk-doc 1.4 (to generate reference HTML manual in doc/reference/)
 
 Those are optional:
