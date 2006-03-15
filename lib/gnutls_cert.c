@@ -386,24 +386,25 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
  *
  -*/
 static time_t
-_gnutls_x509_get_raw_crt_activation_time(const gnutls_datum_t *cert)
+_gnutls_x509_get_raw_crt_activation_time (const gnutls_datum_t * cert)
 {
   gnutls_x509_crt_t xcert;
   time_t result;
 
-  result = gnutls_x509_crt_init(&xcert);
+  result = gnutls_x509_crt_init (&xcert);
   if (result < 0)
-    return (time_t) -1;
+    return (time_t) - 1;
 
-  result = gnutls_x509_crt_import(xcert, cert, GNUTLS_X509_FMT_DER);
-  if (result < 0) {
-    gnutls_x509_crt_deinit(xcert);
-    return (time_t) -1;
-  }
+  result = gnutls_x509_crt_import (xcert, cert, GNUTLS_X509_FMT_DER);
+  if (result < 0)
+    {
+      gnutls_x509_crt_deinit (xcert);
+      return (time_t) - 1;
+    }
 
-  result = gnutls_x509_crt_get_activation_time(xcert);
+  result = gnutls_x509_crt_get_activation_time (xcert);
 
-  gnutls_x509_crt_deinit(xcert);
+  gnutls_x509_crt_deinit (xcert);
 
   return result;
 }
@@ -419,24 +420,25 @@ _gnutls_x509_get_raw_crt_activation_time(const gnutls_datum_t *cert)
  *
  -*/
 static time_t
-_gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum_t *cert)
+_gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
 {
   gnutls_x509_crt_t xcert;
   time_t result;
 
-  result = gnutls_x509_crt_init(&xcert);
+  result = gnutls_x509_crt_init (&xcert);
   if (result < 0)
-    return (time_t) -1;
+    return (time_t) - 1;
 
-  result = gnutls_x509_crt_import(xcert, cert, GNUTLS_X509_FMT_DER);
-  if (result < 0) {
-    gnutls_x509_crt_deinit(xcert);
-    return (time_t) -1;
-  }
+  result = gnutls_x509_crt_import (xcert, cert, GNUTLS_X509_FMT_DER);
+  if (result < 0)
+    {
+      gnutls_x509_crt_deinit (xcert);
+      return (time_t) - 1;
+    }
 
-  result = gnutls_x509_crt_get_expiration_time(xcert);
+  result = gnutls_x509_crt_get_expiration_time (xcert);
 
-  gnutls_x509_crt_deinit(xcert);
+  gnutls_x509_crt_deinit (xcert);
 
   return result;
 }
