@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -373,6 +373,73 @@ OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_creation_time
 OPENPGP_KEY_EXPIRATION_TIME_FUNC
   _E_gnutls_openpgp_get_raw_key_expiration_time = NULL;
 OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
+
+
+/*-
+ * _gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
+ * @cert: should contain an X.509 DER encoded certificate
+ *
+ * This function will return the certificate's activation time in UNIX time
+ * (ie seconds since 00:00:00 UTC January 1, 1970).
+ *
+ * Returns a (time_t) -1 in case of an error.
+ *
+ -*/
+static time_t
+_gnutls_x509_get_raw_crt_activation_time(const gnutls_datum_t *cert)
+{
+  gnutls_x509_crt_t xcert;
+  time_t result;
+
+  result = gnutls_x509_crt_init(&xcert);
+  if (result < 0)
+    return (time_t) -1;
+
+  result = gnutls_x509_crt_import(xcert, cert, GNUTLS_X509_FMT_DER);
+  if (result < 0) {
+    gnutls_x509_crt_deinit(xcert);
+    return (time_t) -1;
+  }
+
+  result = gnutls_x509_crt_get_activation_time(xcert);
+
+  gnutls_x509_crt_deinit(xcert);
+
+  return result;
+}
+
+/*-
+ * gnutls_x509_extract_certificate_expiration_time - This function returns the certificate's expiration time
+ * @cert: should contain an X.509 DER encoded certificate
+ *
+ * This function will return the certificate's expiration time in UNIX
+ * time (ie seconds since 00:00:00 UTC January 1, 1970).  Returns a
+ *
+ * (time_t) -1 in case of an error.
+ *
+ -*/
+static time_t
+_gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum_t *cert)
+{
+  gnutls_x509_crt_t xcert;
+  time_t result;
+
+  result = gnutls_x509_crt_init(&xcert);
+  if (result < 0)
+    return (time_t) -1;
+
+  result = gnutls_x509_crt_import(xcert, cert, GNUTLS_X509_FMT_DER);
+  if (result < 0) {
+    gnutls_x509_crt_deinit(xcert);
+    return (time_t) -1;
+  }
+
+  result = gnutls_x509_crt_get_expiration_time(xcert);
+
+  gnutls_x509_crt_deinit(xcert);
+
+  return result;
+}
 
 /*-
   * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
