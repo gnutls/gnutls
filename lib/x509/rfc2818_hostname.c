@@ -22,7 +22,6 @@
  */
 
 #include <gnutls_int.h>
-#include <compat.h>
 #include <x509.h>
 #include <dn.h>
 #include <common.h>

@@ -41,7 +41,6 @@
 #include <gnutls_auth_int.h>
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
-#include "x509/compat.h"
 #include "x509/x509.h"
 #include "x509/mpi.h"
 

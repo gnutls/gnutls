@@ -45,7 +45,6 @@
 #include "x509/common.h"
 #include "x509/x509.h"
 #include "x509/verify.h"
-#include "x509/compat.h"
 #include "x509/mpi.h"
 #include "x509/pkcs7.h"
 #include "x509/privkey.h"
