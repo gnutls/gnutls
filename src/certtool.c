@@ -279,6 +279,7 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
   gnutls_x509_crt crt;
   gnutls_x509_privkey key = NULL;
   size_t size;
+  int ret;
   int serial, client;
   int days, result, ca_status;
   const char *str;
@@ -287,10 +288,10 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
   unsigned int usage = 0, server;
   gnutls_x509_crq crq;		/* request */
 
-  size = gnutls_x509_crt_init (&crt);
-  if (size < 0)
+ ret = gnutls_x509_crt_init (&crt);
+  if (ret < 0)
     {
-      fprintf (stderr, "crt_init: %s\n", gnutls_strerror (size));
+      fprintf (stderr, "crt_init: %s\n", gnutls_strerror (ret));
       exit (1);
     }
 
@@ -1055,15 +1056,22 @@ certificate_info (void)
     }
   count = ret;
 
+  if (count > 1 && out_cert_format == GNUTLS_X509_FMT_DER)
+    {
+      fprintf(stderr, "Cannot output multiple certificates in DER format, using PEM instead.\n");
+      out_cert_format = GNUTLS_X509_FMT_PEM;
+    }
+    
   for (i = 0; i < count; i++)
     {
-      print_certificate_info (crt[i], outfile, 1);
+      if (out_cert_format == GNUTLS_X509_FMT_PEM)
+        print_certificate_info (crt[i], outfile, 1);
 
       if (!info.xml)
 	{
 	  size = sizeof (buffer);
 	  ret =
-	    gnutls_x509_crt_export (crt[i], GNUTLS_X509_FMT_PEM, buffer,
+	    gnutls_x509_crt_export (crt[i], out_cert_format, buffer,
 				    &size);
 	  if (ret < 0)
 	    {
@@ -1192,7 +1200,7 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
   if (cprint == NULL)
     cprint = UNKNOWN;
   fprintf (out, "%s", cprint);
-  if (bits)
+  if (ret >= 0 && bits)
     fprintf (out, " (%u bits)", bits);
   fprintf (out, "\n");
 
