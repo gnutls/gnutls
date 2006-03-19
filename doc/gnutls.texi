@@ -321,7 +321,7 @@ the Internet.  It is open to any interested individual.}, described in
 @acronym{RFC} 2246 and also in @mybibcite{RESCOLA}. The protocol provides
 confidentiality, and authentication layers over any reliable transport
 layer. The description, below, refers to @acronym{TLS} 1.0 but also
-applies to @acronym{TLS} 1.1 and @acronym{SSL} 3.0, since the
+applies to @acronym{TLS} 1.1 @mybibcite{RFC4346} and @acronym{SSL} 3.0, since the
 differences of these protocols are minor. Older protocols such as
 @acronym{SSL} 2.0 are not discussed nor implemented in
 @acronym{GnuTLS} since they are not considered secure today.
@@ -540,7 +540,7 @@ encrypted packet.
 
 @end enumerate
 
-Those weaknesses were solved in @acronym{TLS} 1.1 which is implemented
+Those weaknesses were solved in @acronym{TLS} 1.1 @mybibcite{RFC4346} which is implemented
 in @acronym{GnuTLS}. For a detailed discussion see the archives of the
 TLS Working Group mailing list and the paper @mybibcite{CBCATT}.
 
@@ -2976,7 +2976,7 @@ functions:
 @tab 0x00 0x2F
 @tab RFC 3268
 
-@item @code{TLS_RSA_AES_128_CBC_SHA}
+@item @code{TLS_RSA_AES_256_CBC_SHA}
 @tab 0x00 0x35
 @tab RFC 3268
 
