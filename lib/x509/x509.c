@@ -1700,7 +1700,6 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   char name[128];
   int len;
-  char num[MAX_INT_DIGITS];
   gnutls_x509_subject_alt_name_t type;
   uint8_t reasons[2];
 
@@ -1770,9 +1769,9 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
    */
   if (reason_flags)
     {
-      _gnutls_str_cpy (name, sizeof (name), "?");
-      _gnutls_str_cat (name, sizeof (name), num);
-      _gnutls_str_cat (name, sizeof (name), ".reasons");
+      _gnutls_str_cpy (name, sizeof (name), "?1.reasons");
+      
+      reasons[0] = reasons[1] = 0;
 
       len = sizeof (reasons);
       result = asn1_read_value (c2, name, reasons, &len);
