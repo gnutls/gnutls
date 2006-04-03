@@ -49,7 +49,7 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
 				gnutls_datum_t * ret, unsigned int *_critical)
 {
   int k, result, len;
-  char name[128], name2[128], counter[MAX_INT_DIGITS];
+  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
   char str[1024];
   char str_critical[10];
   int critical = 0;
@@ -65,9 +65,7 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
     {
       k++;
 
-      _gnutls_str_cpy (name, sizeof (name), "tbsCertificate.extensions.?");
-      _gnutls_int2str (k, counter);
-      _gnutls_str_cat (name, sizeof (name), counter);
+      snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", k);
 
       len = sizeof (str) - 1;
       result = asn1_read_value (cert->cert, name, str, &len);
@@ -181,7 +179,7 @@ _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
 				    int indx, void *oid, size_t * sizeof_oid)
 {
   int k, result, len;
-  char name[128], name2[128], counter[MAX_INT_DIGITS];
+  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
   char str[1024];
   char extnID[128];
   int indx_counter = 0;
@@ -191,9 +189,7 @@ _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
     {
       k++;
 
-      _gnutls_str_cpy (name, sizeof (name), "tbsCertificate.extensions.?");
-      _gnutls_int2str (k, counter);
-      _gnutls_str_cat (name, sizeof (name), counter);
+      snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", k);
 
       len = sizeof (str) - 1;
       result = asn1_read_value (cert->cert, name, str, &len);
@@ -327,13 +323,11 @@ static int
 overwrite_extension (ASN1_TYPE asn, unsigned int indx,
 		     const gnutls_datum_t * ext_data, unsigned int critical)
 {
-  char name[128], name2[128], counter[MAX_INT_DIGITS];
+  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
   const char *str;
   int result;
 
-  _gnutls_str_cpy (name, sizeof (name), "tbsCertificate.extensions.?");
-  _gnutls_int2str (indx, counter);
-  _gnutls_str_cat (name, sizeof (name), counter);
+  snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", indx);
 
   if (critical == 0)
     str = "FALSE";
@@ -376,7 +370,7 @@ _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
 {
   int result;
   int k, len;
-  char name[128], name2[128], counter[MAX_INT_DIGITS];
+  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
   char extnID[128];
 
   /* Find the index of the given extension.
@@ -386,9 +380,7 @@ _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
     {
       k++;
 
-      _gnutls_str_cpy (name, sizeof (name), "tbsCertificate.extensions.?");
-      _gnutls_int2str (k, counter);
-      _gnutls_str_cat (name, sizeof (name), counter);
+      snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", k);
 
       len = sizeof (extnID) - 1;
       result = asn1_read_value (cert->cert, name, extnID, &len);

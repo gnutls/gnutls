@@ -27,10 +27,6 @@
 
 #include <gnutls_algorithms.h>
 
-/* for int2str */
-#define MAX_INT_DIGITS 4
-void _gnutls_int2str (unsigned int k, char *data);
-
 #define MAX_STRING_LEN 512
 
 #define GNUTLS_XML_SHOW_ALL 1

@@ -292,9 +292,8 @@ parse_attribute (ASN1_TYPE asn1_struct,
 		 int raw, char *buf, size_t * sizeof_buf)
 {
   int k1, result;
-  char tmpbuffer1[64];
-  char tmpbuffer3[64];
-  char counter[MAX_INT_DIGITS];
+  char tmpbuffer1[MAX_NAME_SIZE];
+  char tmpbuffer3[MAX_NAME_SIZE];
   char value[200];
   char oid[128];
   int len, printable;
@@ -314,13 +313,10 @@ parse_attribute (ASN1_TYPE asn1_struct,
       k1++;
       /* create a string like "attribute.?1"
        */
-      _gnutls_int2str (k1, counter);
-      _gnutls_str_cpy (tmpbuffer1, sizeof (tmpbuffer1), attr_name);
-
-      if (strlen (tmpbuffer1) > 0)
-	_gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), ".");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), "?");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), counter);
+      if (attr_name[0] != 0)
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", attr_name, k1);
+      else
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
 
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
@@ -362,12 +358,7 @@ parse_attribute (ASN1_TYPE asn1_struct,
 
 	  /* Read the Value 
 	   */
-	  _gnutls_str_cpy (tmpbuffer3, sizeof (tmpbuffer3), tmpbuffer1);
-
-	  _gnutls_int2str (indx + 1, counter);
-
-	  _gnutls_str_cat (tmpbuffer3, sizeof (tmpbuffer3), ".values.?");
-	  _gnutls_str_cat (tmpbuffer3, sizeof (tmpbuffer3), counter);
+	  snprintf( tmpbuffer3, sizeof (tmpbuffer3), "%s.values.?%u", tmpbuffer1, indx+1);
 
 	  len = sizeof (value) - 1;
 	  result = asn1_read_value (asn1_struct, tmpbuffer3, value, &len);

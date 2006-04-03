@@ -838,22 +838,18 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 		    int seq, void *name, size_t * name_size)
 {
   int len;
-  char num[MAX_INT_DIGITS];
-  char nptr[128];
+  char nptr[MAX_NAME_SIZE];
   int result;
   opaque choice_type[128];
   gnutls_x509_subject_alt_name_t type;
 
   seq++;			/* 0->1, 1->2 etc */
-  _gnutls_int2str (seq, num);
 
-  _gnutls_str_cpy (nptr, sizeof (nptr), src_name);
-  if (src_name[0] != 0)
-    _gnutls_str_cat (nptr, sizeof (nptr), ".");
-
-  _gnutls_str_cat (nptr, sizeof (nptr), "?");
-  _gnutls_str_cat (nptr, sizeof (nptr), num);
-
+  if ( src_name[0] != 0)
+    snprintf( nptr, sizeof(nptr), "%s.?%u", src_name, seq);
+  else
+    snprintf( nptr, sizeof(nptr), "?%u", seq);
+  
   len = sizeof (choice_type);
   result = asn1_read_value (src, nptr, choice_type, &len);
 
@@ -1698,7 +1694,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
   int result;
   gnutls_datum_t dist_points = { NULL, 0 };
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  char name[128];
+  char name[MAX_NAME_SIZE];
   int len;
   gnutls_x509_subject_alt_name_t type;
   uint8_t reasons[2];
@@ -1769,8 +1765,8 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
    */
   if (reason_flags)
     {
-      _gnutls_str_cpy (name, sizeof (name), "?1.reasons");
-      
+      _gnutls_str_cpy( name, sizeof(name), "?1.reasons");
+
       reasons[0] = reasons[1] = 0;
 
       len = sizeof (reasons);
@@ -1813,8 +1809,7 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
 				     int indx, void *oid, size_t * sizeof_oid,
 				     unsigned int *critical)
 {
-  char counter[MAX_INT_DIGITS];
-  char tmpstr[64];
+  char tmpstr[MAX_NAME_SIZE];
   int result, len;
   gnutls_datum_t id;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -1865,9 +1860,7 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
   indx++;
   /* create a string like "?1"
    */
-  _gnutls_int2str (indx, counter);
-  _gnutls_str_cpy (tmpstr, sizeof (tmpstr), "?");
-  _gnutls_str_cat (tmpstr, sizeof (tmpstr), counter);
+  snprintf( tmpstr, sizeof(tmpstr), "?%u", indx);
 
   len = *sizeof_oid;
   result = asn1_read_value (c2, tmpstr, oid, &len);

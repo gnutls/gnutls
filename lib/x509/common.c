@@ -359,19 +359,6 @@ _gnutls_x509_data2hex (const opaque * data, size_t data_size,
 }
 
 
-/* this function will convert up to 3 digit
- * numbers to characters. Use a character string of MAX_INT_DIGITS, in
- * order to have enough space for it.
- */
-void
-_gnutls_int2str (unsigned int k, char *data)
-{
-  if (k > 999)
-    sprintf (data, "%d", 999);
-  else
-    sprintf (data, "%d", k);
-}
-
 /* TIME functions 
  * Convertions between generalized or UTC time to time_t
  *

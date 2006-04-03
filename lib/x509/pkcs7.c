@@ -282,9 +282,8 @@ gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len;
-  char root2[64];
+  char root2[MAX_NAME_SIZE];
   char oid[128];
-  char counter[MAX_INT_DIGITS];
   gnutls_datum_t tmp = { NULL, 0 };
 
   if (certificate_size == NULL || pkcs7 == NULL)
@@ -302,9 +301,7 @@ gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
   /* Step 2. Parse the CertificateSet 
    */
 
-  _gnutls_str_cpy (root2, sizeof (root2), "certificates.?");
-  _gnutls_int2str (indx + 1, counter);
-  _gnutls_str_cat (root2, sizeof (root2), counter);
+  snprintf( root2, sizeof(root2), "certificates.?%u", indx+1);
 
   len = sizeof (oid) - 1;
 
@@ -672,8 +669,7 @@ gnutls_pkcs7_delete_crt (gnutls_pkcs7_t pkcs7, int indx)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result;
-  char counter[MAX_INT_DIGITS];
-  char root2[64];
+  char root2[MAX_NAME_SIZE];
 
   if (pkcs7 == NULL)
     return GNUTLS_E_INVALID_REQUEST;
@@ -690,9 +686,7 @@ gnutls_pkcs7_delete_crt (gnutls_pkcs7_t pkcs7, int indx)
   /* Step 2. Delete the certificate.
    */
 
-  _gnutls_str_cpy (root2, sizeof (root2), "certificates.?");
-  _gnutls_int2str (indx + 1, counter);
-  _gnutls_str_cat (root2, sizeof (root2), counter);
+  snprintf( root2, sizeof(root2), "certificates.?%u", indx+1);
 
   result = asn1_write_value (c2, root2, NULL, 0);
   if (result != ASN1_SUCCESS)
@@ -746,8 +740,7 @@ gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result;
-  char root2[64];
-  char counter[MAX_INT_DIGITS];
+  char root2[MAX_NAME_SIZE];
   gnutls_datum_t tmp = { NULL, 0 };
   int start, end;
 
@@ -766,10 +759,7 @@ gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
   /* Step 2. Parse the CertificateSet 
    */
 
-  _gnutls_str_cpy (root2, sizeof (root2), "crls.?");
-  _gnutls_int2str (indx + 1, counter);
-  _gnutls_str_cat (root2, sizeof (root2), counter);
-
+  snprintf( root2, sizeof(root2), "crls.?%u", indx+1);
 
   /* Get the raw CRL 
    */
@@ -984,8 +974,7 @@ gnutls_pkcs7_delete_crl (gnutls_pkcs7_t pkcs7, int indx)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result;
-  char counter[MAX_INT_DIGITS];
-  char root2[64];
+  char root2[MAX_NAME_SIZE];
 
   if (pkcs7 == NULL)
     return GNUTLS_E_INVALID_REQUEST;
@@ -1002,9 +991,7 @@ gnutls_pkcs7_delete_crl (gnutls_pkcs7_t pkcs7, int indx)
   /* Step 2. Delete the crl.
    */
 
-  _gnutls_str_cpy (root2, sizeof (root2), "crls.?");
-  _gnutls_int2str (indx + 1, counter);
-  _gnutls_str_cat (root2, sizeof (root2), counter);
+  snprintf( root2, sizeof(root2), "crls.?%u", indx+1);
 
   result = asn1_write_value (c2, root2, NULL, 0);
   if (result != ASN1_SUCCESS)

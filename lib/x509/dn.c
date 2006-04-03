@@ -93,10 +93,9 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 {
   gnutls_string out_str;
   int k2, k1, result;
-  char tmpbuffer1[64];
-  char tmpbuffer2[64];
-  char tmpbuffer3[64];
-  char counter[MAX_INT_DIGITS];
+  char tmpbuffer1[MAX_NAME_SIZE];
+  char tmpbuffer2[MAX_NAME_SIZE];
+  char tmpbuffer3[MAX_NAME_SIZE];
   opaque value[MAX_STRING_LEN], *value2 = NULL;
   char *escaped = NULL;
   const char *ldap_desc;
@@ -125,13 +124,11 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
       k1++;
       /* create a string like "tbsCertList.issuer.rdnSequence.?1"
        */
-      _gnutls_int2str (k1, counter);
-      _gnutls_str_cpy (tmpbuffer1, sizeof (tmpbuffer1), asn1_rdn_name);
-      if (strlen (tmpbuffer1) > 0)
-	_gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), ".");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), "?");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), counter);
-
+      if (asn1_rdn_name[0]!=0)
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name, k1);
+      else
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
+      
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
 
@@ -154,12 +151,10 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 				 */
 	  k2++;
 
-	  _gnutls_int2str (k2, counter);
-	  _gnutls_str_cpy (tmpbuffer2, sizeof (tmpbuffer2), tmpbuffer1);
-	  if (strlen (tmpbuffer2) > 0)
-	    _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), ".");
-	  _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), "?");
-	  _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), counter);
+          if (tmpbuffer1[0] != 0)
+  	    snprintf( tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1, k2);
+          else
+  	    snprintf( tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
 
 	  /* Try to read the RelativeDistinguishedName attributes.
 	   */
@@ -343,10 +338,9 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
 			   void *buf, size_t * sizeof_buf)
 {
   int k2, k1, result;
-  char tmpbuffer1[64];
-  char tmpbuffer2[64];
-  char tmpbuffer3[64];
-  char counter[MAX_INT_DIGITS];
+  char tmpbuffer1[MAX_NAME_SIZE];
+  char tmpbuffer2[MAX_NAME_SIZE];
+  char tmpbuffer3[MAX_NAME_SIZE];
   opaque value[256];
   char oid[128];
   int len, printable;
@@ -365,13 +359,10 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
       k1++;
       /* create a string like "tbsCertList.issuer.rdnSequence.?1"
        */
-      _gnutls_int2str (k1, counter);
-      _gnutls_str_cpy (tmpbuffer1, sizeof (tmpbuffer1), asn1_rdn_name);
-
-      if (strlen (tmpbuffer1) > 0)
-	_gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), ".");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), "?");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), counter);
+      if (asn1_rdn_name[0] != 0)
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name, k1);
+      else
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
 
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
@@ -396,13 +387,10 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
 				 */
 	  k2++;
 
-	  _gnutls_int2str (k2, counter);
-	  _gnutls_str_cpy (tmpbuffer2, sizeof (tmpbuffer2), tmpbuffer1);
-
-	  if (strlen (tmpbuffer2) > 0)
-	    _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), ".");
-	  _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), "?");
-	  _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), counter);
+          if (tmpbuffer1[0] != 0)
+            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1, k2);
+          else
+            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
 
 	  /* Try to read the RelativeDistinguishedName attributes.
 	   */
@@ -523,10 +511,9 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 			 int indx, void *_oid, size_t * sizeof_oid)
 {
   int k2, k1, result;
-  char tmpbuffer1[64];
-  char tmpbuffer2[64];
-  char tmpbuffer3[64];
-  char counter[MAX_INT_DIGITS];
+  char tmpbuffer1[MAX_NAME_SIZE];
+  char tmpbuffer2[MAX_NAME_SIZE];
+  char tmpbuffer3[MAX_NAME_SIZE];
   char value[256];
   char oid[128];
   int len;
@@ -539,13 +526,10 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
       k1++;
       /* create a string like "tbsCertList.issuer.rdnSequence.?1"
        */
-      _gnutls_int2str (k1, counter);
-      _gnutls_str_cpy (tmpbuffer1, sizeof (tmpbuffer1), asn1_rdn_name);
-
-      if (strlen (tmpbuffer1) > 0)
-	_gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), ".");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), "?");
-      _gnutls_str_cat (tmpbuffer1, sizeof (tmpbuffer1), counter);
+      if (asn1_rdn_name[0] != 0)
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name, k1);
+      else
+        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
 
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
@@ -570,13 +554,10 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 				 */
 	  k2++;
 
-	  _gnutls_int2str (k2, counter);
-	  _gnutls_str_cpy (tmpbuffer2, sizeof (tmpbuffer2), tmpbuffer1);
-
-	  if (strlen (tmpbuffer2) > 0)
-	    _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), ".");
-	  _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), "?");
-	  _gnutls_str_cat (tmpbuffer2, sizeof (tmpbuffer2), counter);
+          if (tmpbuffer1[0] != 0)
+            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1, k2);
+          else
+            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
 
 	  /* Try to read the RelativeDistinguishedName attributes.
 	   */
@@ -889,7 +870,7 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
 			 int raw_flag, const char *name, int sizeof_name)
 {
   int result;
-  char tmp[64], asn1_rdn_name[64];
+  char tmp[MAX_NAME_SIZE], asn1_rdn_name[MAX_NAME_SIZE];
 
   if (sizeof_name == 0 || name == NULL)
     {

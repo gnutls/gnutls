@@ -445,9 +445,8 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
 {
 
   int result, _serial_size;
-  char str_index[MAX_INT_DIGITS];
-  char serial_name[64];
-  char date_name[64];
+  char serial_name[MAX_NAME_SIZE];
+  char date_name[MAX_NAME_SIZE];
 
   if (crl == NULL)
     {
@@ -455,16 +454,8 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  _gnutls_int2str (indx + 1, str_index);
-  _gnutls_str_cpy (serial_name, sizeof (serial_name),
-		   "tbsCertList.revokedCertificates.?");
-  _gnutls_str_cat (serial_name, sizeof (serial_name), str_index);
-  _gnutls_str_cat (serial_name, sizeof (serial_name), ".userCertificate");
-
-  _gnutls_str_cpy (date_name, sizeof (date_name),
-		   "tbsCertList.revokedCertificates.?");
-  _gnutls_str_cat (date_name, sizeof (date_name), str_index);
-  _gnutls_str_cat (date_name, sizeof (date_name), ".revocationDate");
+  snprintf( serial_name, sizeof(serial_name), "tbsCertList.revokedCertificates.?%u.userCertificate", indx+1);
+  snprintf( date_name, sizeof(date_name), "tbsCertList.revokedCertificates.?%u.revocationDate", indx+1);
 
   _serial_size = *serial_size;
   result = asn1_read_value (crl->crl, serial_name, serial, &_serial_size);

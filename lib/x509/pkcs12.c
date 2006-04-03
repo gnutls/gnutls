@@ -345,13 +345,12 @@ int
 _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 			      gnutls_pkcs12_bag_t bag)
 {
-  char oid[128], root[128];
+  char oid[128], root[MAX_NAME_SIZE];
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int len, result;
   int bag_type;
   gnutls_datum_t attr_val;
   int count = 0, i, attributes, j;
-  char counter[MAX_INT_DIGITS];
   size_t size;
 
   /* Step 1. Extract the SEQUENCE.
@@ -389,10 +388,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
   for (i = 0; i < bag->bag_elements; i++)
     {
 
-      _gnutls_str_cpy (root, sizeof (root), "?");
-      _gnutls_int2str (i + 1, counter);
-      _gnutls_str_cat (root, sizeof (root), counter);
-      _gnutls_str_cat (root, sizeof (root), ".bagId");
+      snprintf( root, sizeof (root), "?%u.bagId", i+1);
 
       len = sizeof (oid);
       result = asn1_read_value (c2, root, oid, &len);
@@ -416,10 +412,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
       /* Read the Bag Value
        */
 
-      _gnutls_str_cpy (root, sizeof (root), "?");
-      _gnutls_int2str (i + 1, counter);
-      _gnutls_str_cat (root, sizeof (root), counter);
-      _gnutls_str_cat (root, sizeof (root), ".bagValue");
+      snprintf( root, sizeof (root), "?%u.bagValue", i+1);
 
       result = _gnutls_x509_read_value (c2, root, &bag->element[i].data, 0);
       if (result < 0)
@@ -445,10 +438,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 
       /* read the bag attributes
        */
-      _gnutls_str_cpy (root, sizeof (root), "?");
-      _gnutls_int2str (i + 1, counter);
-      _gnutls_str_cat (root, sizeof (root), counter);
-      _gnutls_str_cat (root, sizeof (root), ".bagAttributes");
+      snprintf( root, sizeof (root), "?%u.bagAttributes", i+1);
 
       result = asn1_number_of_elements (c2, root, &attributes);
       if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND)
@@ -465,12 +455,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 	for (j = 0; j < attributes; j++)
 	  {
 
-	    _gnutls_str_cpy (root, sizeof (root), "?");
-	    _gnutls_int2str (i + 1, counter);
-	    _gnutls_str_cat (root, sizeof (root), counter);
-	    _gnutls_str_cat (root, sizeof (root), ".bagAttributes.?");
-	    _gnutls_int2str (j + 1, counter);
-	    _gnutls_str_cat (root, sizeof (root), counter);
+            snprintf( root, sizeof (root), "?%u.bagAttributes.?%u", i+1, j+1);
 
 	    result =
 	      _gnutls_x509_decode_and_read_attribute (c2, root, oid,
@@ -599,9 +584,8 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len;
-  char root2[64];
+  char root2[MAX_NAME_SIZE];
   char oid[128];
-  char counter[MAX_INT_DIGITS];
 
   if (pkcs12 == NULL)
     {
@@ -621,13 +605,9 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   /* Step 2. Parse the AuthenticatedSafe
    */
 
-  _gnutls_str_cpy (root2, sizeof (root2), "?");
-  _gnutls_int2str (indx + 1, counter);
-  _gnutls_str_cat (root2, sizeof (root2), counter);
-  _gnutls_str_cat (root2, sizeof (root2), ".contentType");
+  snprintf( root2, sizeof (root2), "?%u.contentType", indx+1);
 
   len = sizeof (oid) - 1;
-
   result = asn1_read_value (c2, root2, oid, &len);
 
   if (result == ASN1_ELEMENT_NOT_FOUND)
@@ -646,10 +626,7 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   /* Not encrypted Bag
    */
 
-  _gnutls_str_cpy (root2, sizeof (root2), "?");
-  _gnutls_int2str (indx + 1, counter);
-  _gnutls_str_cat (root2, sizeof (root2), counter);
-  _gnutls_str_cat (root2, sizeof (root2), ".content");
+  snprintf( root2, sizeof (root2), "?%u.content", indx+1);
 
   if (strcmp (oid, DATA_OID) == 0)
     {
