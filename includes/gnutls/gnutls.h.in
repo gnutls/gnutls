@@ -476,10 +476,14 @@ extern "C"
   int gnutls_session_get_id (gnutls_session_t session, void *session_id,
 			     size_t * session_id_size);
 
-/* returns security values. */
-  const char *gnutls_session_get_server_random (gnutls_session_t session);
-  const char *gnutls_session_get_client_random (gnutls_session_t session);
-  const char *gnutls_session_get_master_secret (gnutls_session_t session);
+/* returns security values. 
+ * Do not use them unless you know what you're doing.
+ */
+#define TLS_MASTER_SIZE 48
+#define TLS_RANDOM_SIZE 32
+  const void *gnutls_session_get_server_random (gnutls_session_t session);
+  const void *gnutls_session_get_client_random (gnutls_session_t session);
+  const void *gnutls_session_get_master_secret (gnutls_session_t session);
 
 /* checks if this session is a resumed one 
  */
@@ -505,7 +509,7 @@ extern "C"
 			     gnutls_datum_t session_entry);
 
   void gnutls_handshake_set_max_packet_length (gnutls_session_t session,
-					       int max);
+					       size_t max);
 
 /* returns libgnutls version (call it with a NULL argument)
  */
@@ -521,7 +525,7 @@ extern "C"
 			      gnutls_credentials_type_t type, void *cred);
 #define gnutls_cred_set	gnutls_credentials_set
 
-/* Credential structures for SRP - used in gnutls_credentials_set(); */
+/* Credential structures - used in gnutls_credentials_set(); */
 
   struct gnutls_certificate_credentials_st;
   typedef struct gnutls_certificate_credentials_st
