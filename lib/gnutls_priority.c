@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -41,6 +41,9 @@
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
+  *
+  * Returns 0 on success.
+  *
   **/
 int
 gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
@@ -72,6 +75,9 @@ gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
+  *
+  * Returns 0 on success.
+  *
  **/
 int
 gnutls_kx_set_priority (gnutls_session_t session, const int *list)
@@ -103,6 +109,9 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
+  *
+  * Returns 0 on success.
+  *
   **/
 int
 gnutls_mac_set_priority (gnutls_session_t session, const int *list)
@@ -139,6 +148,8 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
   * NULL. Other compression algorithms are to be considered
   * as gnutls extensions.
   *
+  * Returns 0 on success.
+  *
   **/
 int
 gnutls_compression_set_priority (gnutls_session_t session, const int *list)
@@ -166,6 +177,8 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
   * Sets the priority on the protocol versions supported by gnutls.
   * This function actually enables or disables protocols. Newer protocol
   * versions always have highest priority.
+  *
+  * Returns 0 on success.
   *
   **/
 int
@@ -204,6 +217,9 @@ gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
   * Note that the certificate type priority is set on the client. 
   * The server does not use the cert type priority except for disabling
   * types that were not specified.
+  *
+  * Returns 0 on success.
+  *
   **/
 int
 gnutls_certificate_type_set_priority (gnutls_session_t session,
@@ -248,6 +264,8 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
   * AES_256_CBC, AES_128_CBC, 3DES_CBC, 
   * and ARCFOUR_128 for ciphers.
   *
+  * Returns 0 on success.
+  *
   **/
 int
 gnutls_set_default_priority (gnutls_session_t session)
@@ -284,6 +302,8 @@ gnutls_set_default_priority (gnutls_session_t session)
   * SHA, MD5, RIPEMD160 for MAC algorithms,
   * AES_256_CBC, AES_128_CBC, 
   * and 3DES_CBC, ARCFOUR_128, ARCFOUR_40 for ciphers.
+  *
+  * Returns 0 on success.
   *
   **/
 int
