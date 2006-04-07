@@ -449,7 +449,7 @@ gnutls_srp_allocate_client_credentials (gnutls_srp_client_credentials_t * sc)
   **/
 int
 gnutls_srp_set_client_credentials (gnutls_srp_client_credentials_t res,
-				   char *username, char *password)
+				   const char *username, const char *password)
 {
 
   if (username == NULL || password == NULL)
