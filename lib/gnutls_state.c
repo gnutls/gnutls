@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -1022,7 +1022,7 @@ gnutls_prf (gnutls_session_t session,
  *
  * Return value: pointer to client random.
  **/
-const char *
+const void *
 gnutls_session_get_client_random (gnutls_session_t session)
 {
   return (char *) session->security_parameters.client_random;
@@ -1041,7 +1041,7 @@ gnutls_session_get_client_random (gnutls_session_t session)
  *
  * Return value: pointer to server random.
  **/
-const char *
+const void *
 gnutls_session_get_server_random (gnutls_session_t session)
 {
   return (char *) session->security_parameters.server_random;
@@ -1063,7 +1063,7 @@ gnutls_session_get_server_random (gnutls_session_t session)
  *
  * Return value: pointer to master secret.
  **/
-const char *
+const void *
 gnutls_session_get_master_secret (gnutls_session_t session)
 {
   return (char *) session->security_parameters.master_secret;
