@@ -25,6 +25,8 @@ CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
+AM_CPPFLAGS =
+
 ## begin gnulib module alloca-opt
 
 BUILT_SOURCES += $(ALLOCA_H)
@@ -48,6 +50,20 @@ libgnu_la_LIBADD += $(LIBGCRYPT)
 endif
 
 ## end   gnulib module gc
+
+## begin gnulib module gettext
+
+# This is for those projects which use "gettextize --intl" to put a source-code
+# copy of libintl into their package. In such projects, every Makefile.am needs
+# -I$(top_builddir)/intl, so that <libintl.h> can be found in this directory.
+# For the Makefile.ams in other directories it is the maintainer's
+# responsibility; for the one from gnulib we do it here.
+# This option has no effect when the user disables NLS (because then the intl
+# directory contains no libintl.h file) or when the project does not use
+# "gettextize --intl".
+AM_CPPFLAGS += -I$(top_builddir)/intl
+
+## end   gnulib module gettext
 
 ## begin gnulib module gettext-h
 
