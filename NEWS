@@ -9,9 +9,16 @@ See the end for copying conditions.
 
 ** The libgcrypt RNG is initialized in gnutls_global_init().
 
+** TLS/IA API changes from Emile van Bergen.
+A dummy credential structure is not needed now, if you wish to use the
+low-level TLS/IA API, simply call gnutls_ia_enable to enable TLS/IA on
+a session.
+
 ** API and ABI modifications:
 _gnutls_x509_get_raw_crt_activation_time,
 _gnutls_x509_get_raw_crt_expiration_time: Removed.
+gnutls_ia_require_inner_phase: Removed, replaced by gnutls_ia_enable.
+gnutls_ia_enable: Added.
 
 * Version 1.3.5 (released 2006-03-08)
 
