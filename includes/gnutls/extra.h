@@ -171,9 +171,9 @@ extern "C"
   extern void
     gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer);
 
-  /* Toggle whether inner phases are required. */
+  /* Define whether inner phases are wanted. */
   extern void
-    gnutls_ia_require_inner_phase (gnutls_session_t session, int require);
+    gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume);
 
   int gnutls_global_init_extra (void);
 

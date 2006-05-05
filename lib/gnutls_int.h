@@ -260,9 +260,8 @@ typedef struct
   /* limit server_name extensions */
   unsigned server_names_size;
   opaque srp_username[MAX_SRP_USERNAME + 1];
-  /* 0 = tls/ia not used, 1 = no, 2 = yes */
-  gnutls_ia_mode_t peer_mode;
-  int inner_phase_optional;
+  int gnutls_ia_enable, gnutls_ia_peer_enable;
+  int gnutls_ia_allowskip, gnutls_ia_peer_allowskip;
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 

@@ -423,13 +423,6 @@ extern "C"
 			      void *data, size_t * data_length,
 			      unsigned int *type, unsigned int indx);
 
-  typedef enum
-  {
-    GNUTLS_IA_DISABLED = 0,
-    GNUTLS_IA_APP_PHASE_ON_RESUMPTION_NO = 1,
-    GNUTLS_IA_APP_PHASE_ON_RESUMPTION_YES = 2
-  } gnutls_ia_mode_t;
-
 /* functions to set priority of cipher suites 
  */
   int gnutls_cipher_set_priority (gnutls_session_t session, const int *list);
