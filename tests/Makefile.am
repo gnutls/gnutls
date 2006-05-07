@@ -44,7 +44,7 @@ dist_check_SCRIPTS = pkcs12_neon pkcs8
 
 VALGRIND=valgrind --leak-check=full --leak-resolution=high \
 	--show-reachable=yes --num-callers=50 \
-	--suppressions=shishi.supp
+	--suppressions=gnutls.supp
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/client.p12	\
 	PKCS12PASSWORD=foobar \
