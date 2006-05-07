@@ -14,6 +14,8 @@ A dummy credential structure is not needed now, if you wish to use the
 low-level TLS/IA API, simply call gnutls_ia_enable to enable TLS/IA on
 a session.
 
+** The self-tests are now run under valgrind, if it is installed.
+
 ** API and ABI modifications:
 _gnutls_x509_get_raw_crt_activation_time,
 _gnutls_x509_get_raw_crt_expiration_time: Removed.
