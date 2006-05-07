@@ -155,18 +155,6 @@ static const TLS_TEST tls_tests[] = {
 static int tt = 0;
 const char *ip;
 
-#define CONNECT() \
-		sd = socket(AF_INET, SOCK_STREAM, 0); \
-		ERR(sd, "socket"); \
-		memset(&sa, '\0', sizeof(sa)); \
-		sa.sin_family = AF_INET; \
-		sa.sin_port = htons(port); \
-		sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr); \
-		ip = inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF); \
-		if (tt++ == 0) printf("Connecting to '%s:%d'...\n", ip, port); \
-		err = connect(sd, (SA *) & sa, sizeof(sa)); \
-		ERR(err, "connect")
-
 static void gaa_parser (int argc, char **argv);
 
 int
@@ -174,10 +162,10 @@ main (int argc, char **argv)
 {
   int err, ret;
   int sd, i;
-  struct sockaddr_in sa;
   gnutls_session state;
   char buffer[MAX_BUF + 1];
-  struct hostent *server_host;
+  char portname[6];
+  struct addrinfo hints, *res, *ptr;
 
   gaa_parser (argc, argv);
 
@@ -204,10 +192,14 @@ main (int argc, char **argv)
 
   printf ("Resolving '%s'...\n", hostname);
   /* get server name */
-  server_host = gethostbyname (hostname);
-  if (server_host == NULL)
+  memset (&hints, 0, sizeof (hints));
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_NUMERICSERV;
+  snprintf (portname, sizeof (portname), "%d", port);
+  if ((err = getaddrinfo (hostname, portname, &hints, &res)) != 0)
     {
-      fprintf (stderr, "Cannot resolve %s\n", hostname);
+      fprintf (stderr, "Cannot resolve %s: %s\n", hostname,
+               gai_strerror (err));
       exit (1);
     }
 
@@ -253,7 +245,27 @@ main (int argc, char **argv)
 	  break;
 	}
 
-      CONNECT ();
+      sd = -1;
+      for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
+        {
+          sd = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+          if (sd == -1)
+            {
+              continue;
+            }
+
+          getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
+                       NULL, 0, NI_NUMERICHOST);
+          if (tt++ == 0) printf("Connecting to '%s:%d'...\n", buffer, port);
+          if ((err = connect(sd, ptr->ai_addr, ptr->ai_addrlen)) != 0)
+            {
+              close (sd);
+              sd = -1;
+              continue;
+            }
+        }
+      ERR(err, "connect")
+
       gnutls_init (&state, GNUTLS_CLIENT);
       gnutls_transport_set_ptr (state, (gnutls_transport_ptr) sd);
 
@@ -285,6 +297,8 @@ main (int argc, char **argv)
       i++;
     }
   while (1);
+
+  freeaddrinfo (res);
 
 #ifdef ENABLE_SRP
   gnutls_srp_free_client_credentials (srp_cred);

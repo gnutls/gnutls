@@ -110,13 +110,20 @@ typedef struct
   int fd;
   gnutls_session session;
   int secure;
-  const char *hostname;
+  char *hostname;
+  char *ip;
+  char* service;
+  struct addrinfo *ptr;
+  struct addrinfo *addr_info;
 } socket_st;
 
-ssize_t socket_recv (socket_st socket, void *buffer, int buffer_size);
-ssize_t socket_send (socket_st socket, const void *buffer, int buffer_size);
+ssize_t socket_recv (const socket_st *socket, void *buffer, int buffer_size);
+ssize_t socket_send (const socket_st *socket, const void *buffer, int buffer_size);
+void socket_open( socket_st* hd, const char* hostname, const char* service);
+void socket_connect( const socket_st* hd);
 void socket_bye (socket_st * socket);
-static void check_rehandshake (socket_st socket, int ret);
+
+static void check_rehandshake (socket_st *socket, int ret);
 static int do_handshake (socket_st * socket);
 static void init_global_tls_stuff (void);
 
@@ -427,7 +434,7 @@ static void gaa_parser (int argc, char **argv);
 /* Returns zero if the error code was successfully handled.
  */
 static int
-handle_error (socket_st hd, int err)
+handle_error (socket_st *hd, int err)
 {
   int alert, ret;
   const char *err_type, *str;
@@ -454,7 +461,7 @@ handle_error (socket_st hd, int err)
   if (err == GNUTLS_E_WARNING_ALERT_RECEIVED
       || err == GNUTLS_E_FATAL_ALERT_RECEIVED)
     {
-      alert = gnutls_alert_get (hd.session);
+      alert = gnutls_alert_get (hd->session);
       str = gnutls_alert_get_name (alert);
       if (str == NULL)
 	str = str_unknown;
@@ -480,12 +487,12 @@ starttls_alarm (int signum)
   starttls_alarmed = 1;
 }
 
+
 int
 main (int argc, char **argv)
 {
   int err, ret;
-  int sd, ii, i;
-  struct sockaddr_in sa;
+  int ii, i;
   char buffer[MAX_BUF + 1];
   char *session_data = NULL;
   char *session_id = NULL;
@@ -494,8 +501,7 @@ main (int argc, char **argv)
   fd_set rset;
   int maxfd;
   struct timeval tv;
-  int user_term = 0, port;
-  struct hostent *server_host;
+  int user_term = 0;
   socket_st hd;
 
   gaa_parser (argc, argv);
@@ -513,45 +519,8 @@ main (int argc, char **argv)
 
   init_global_tls_stuff ();
 
-
-  printf ("Resolving '%s'...\n", hostname);
-  /* get server name */
-  server_host = gethostbyname (hostname);
-  if (server_host == NULL)
-    {
-      fprintf (stderr, "Cannot resolve %s\n", hostname);
-      exit (1);
-    }
-
-  sd = socket (AF_INET, SOCK_STREAM, 0);
-  ERR (sd, "socket");
-
-  port = service_to_port (service);
-  if (port == -1)
-    {
-      fprintf (stderr, "Unknown service\n");
-      return -1;
-    }
-
-  memset (&sa, '\0', sizeof (sa));
-  sa.sin_family = AF_INET;
-  sa.sin_port = htons (port);
-
-  sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr);
-
-  if (inet_ntop (AF_INET, &sa.sin_addr, buffer, MAX_BUF) == NULL)
-    {
-      perror ("inet_ntop()");
-      return (1);
-    }
-  printf ("Connecting to '%s:%d'...\n", buffer, port);
-
-  err = connect (sd, (SA *) & sa, sizeof (sa));
-  ERR (err, "connect");
-
-  hd.secure = 0;
-  hd.fd = sd;
-  hd.hostname = hostname;
+  socket_open( &hd, hostname, service);
+  socket_connect( &hd);
 
   hd.session = init_tls_session (hostname);
   if (starttls)
@@ -608,21 +577,14 @@ main (int argc, char **argv)
 
 	  printf
 	    ("\n\n- Connecting again- trying to resume previous session\n");
-	  sd = socket (AF_INET, SOCK_STREAM, 0);
-	  ERR (sd, "socket");
-
-	  err = connect (sd, (SA *) & sa, sizeof (sa));
-	  ERR (err, "connect");
-
-	  hd.fd = sd;
-	  hd.secure = 0;
+          socket_open( &hd, hostname, service);
+          socket_connect(&hd);
 	}
       else
 	{
 	  break;
 	}
     }
-
 
 after_handshake:
 
@@ -654,9 +616,9 @@ after_handshake:
 
       FD_ZERO (&rset);
       FD_SET (fileno (stdin), &rset);
-      FD_SET (sd, &rset);
+      FD_SET (hd.fd, &rset);
 
-      maxfd = MAX (fileno (stdin), sd);
+      maxfd = MAX (fileno (stdin), hd.fd);
       tv.tv_sec = 3;
       tv.tv_usec = 0;
 
@@ -664,17 +626,17 @@ after_handshake:
       if (err < 0)
 	continue;
 
-      if (FD_ISSET (sd, &rset))
+      if (FD_ISSET (hd.fd, &rset))
 	{
 	  memset (buffer, 0, MAX_BUF + 1);
-	  ret = socket_recv (hd, buffer, MAX_BUF);
+	  ret = socket_recv (&hd, buffer, MAX_BUF);
 
 	  if (ret == 0)
 	    {
 	      printf ("- Peer has closed the GNUTLS connection\n");
 	      break;
 	    }
-	  else if (handle_error (hd, ret) < 0 && user_term == 0)
+	  else if (handle_error (&hd, ret) < 0 && user_term == 0)
 	    {
 	      fprintf (stderr,
 		       "*** Server has terminated the connection abnormally.\n");
@@ -725,7 +687,7 @@ after_handshake:
 		strcpy (b, "\r\n");
 	    }
 
-	  ret = socket_send (hd, buffer, strlen (buffer));
+	  ret = socket_send (&hd, buffer, strlen (buffer));
 
 	  if (ret > 0)
 	    {
@@ -733,7 +695,7 @@ after_handshake:
 		printf ("- Sent: %d bytes\n", ret);
 	    }
 	  else
-	    handle_error (hd, ret);
+	    handle_error (&hd, ret);
 
 	}
     }
@@ -834,83 +796,10 @@ cli_version (void)
 }
 
 
-
-/* Functions to manipulate sockets
- */
-
-ssize_t
-socket_recv (socket_st socket, void *buffer, int buffer_size)
-{
-  int ret;
-
-  if (socket.secure)
-    do
-      {
-	ret = gnutls_record_recv (socket.session, buffer, buffer_size);
-      }
-    while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-  else
-    do
-      {
-	ret = recv (socket.fd, buffer, buffer_size, 0);
-      }
-    while (ret == -1 && errno == EINTR);
-
-  return ret;
-}
-
-ssize_t
-socket_send (socket_st socket, const void *buffer, int buffer_size)
-{
-  int ret;
-
-  if (socket.secure)
-    do
-      {
-	ret = gnutls_record_send (socket.session, buffer, buffer_size);
-      }
-    while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-  else
-    do
-      {
-	ret = send (socket.fd, buffer, buffer_size, 0);
-      }
-    while (ret == -1 && errno == EINTR);
-
-  if (ret > 0 && ret != buffer_size && verbose)
-    fprintf (stderr,
-	     "*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
-
-  return ret;
-}
-
-void
-socket_bye (socket_st * socket)
-{
-  int ret;
-  if (socket->secure)
-    {
-      do
-	ret = gnutls_bye (socket->session, GNUTLS_SHUT_RDWR);
-      while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-      if (ret < 0)
-	fprintf (stderr, "*** gnutls_bye() error: %s\n",
-		 gnutls_strerror (ret));
-      gnutls_deinit (socket->session);
-      socket->session = NULL;
-    }
-
-  shutdown (socket->fd, SHUT_RDWR);	/* no more receptions */
-  close (socket->fd);
-
-  socket->fd = -1;
-  socket->secure = 0;
-}
-
 static void
-check_rehandshake (socket_st socket, int ret)
+check_rehandshake (socket_st *socket, int ret)
 {
-  if (socket.secure && ret == GNUTLS_E_REHANDSHAKE)
+  if (socket->secure && ret == GNUTLS_E_REHANDSHAKE)
     {
       /* There is a race condition here. If application
        * data is sent after the rehandshake request,
@@ -920,7 +809,7 @@ check_rehandshake (socket_st socket, int ret)
       printf ("*** Received rehandshake request\n");
       /* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
 
-      ret = do_handshake (&socket);
+      ret = do_handshake (socket);
 
       if (ret == 0)
 	{
@@ -946,7 +835,7 @@ do_handshake (socket_st * socket)
 
       if (ret < 0)
 	{
-	  handle_error (*socket, ret);
+	  handle_error (socket, ret);
 	}
     }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
@@ -1137,4 +1026,149 @@ init_global_tls_stuff (void)
     }
 #endif
 
+}
+
+/* Functions to manipulate sockets
+ */
+
+ssize_t
+        socket_recv (const socket_st* socket, void *buffer, int buffer_size)
+{
+    int ret;
+
+    if (socket->secure)
+        do
+    {
+        ret = gnutls_record_recv (socket->session, buffer, buffer_size);
+    }
+    while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+    else
+        do
+    {
+        ret = recv (socket->fd, buffer, buffer_size, 0);
+    }
+    while (ret == -1 && errno == EINTR);
+
+    return ret;
+}
+
+ssize_t
+        socket_send (const socket_st *socket, const void *buffer, int buffer_size)
+{
+    int ret;
+
+    if (socket->secure)
+        do
+    {
+        ret = gnutls_record_send (socket->session, buffer, buffer_size);
+    }
+    while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+    else
+        do
+    {
+        ret = send (socket->fd, buffer, buffer_size, 0);
+    }
+    while (ret == -1 && errno == EINTR);
+
+    if (ret > 0 && ret != buffer_size && verbose)
+        fprintf (stderr,
+                 "*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
+
+    return ret;
+}
+
+void
+        socket_bye (socket_st * socket)
+{
+    int ret;
+    if (socket->secure)
+    {
+        do
+            ret = gnutls_bye (socket->session, GNUTLS_SHUT_RDWR);
+        while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+        if (ret < 0)
+            fprintf (stderr, "*** gnutls_bye() error: %s\n",
+                     gnutls_strerror (ret));
+        gnutls_deinit (socket->session);
+        socket->session = NULL;
+    }
+
+    freeaddrinfo( socket->addr_info);
+    socket->addr_info = socket->ptr = NULL;
+    
+    free( socket->ip);
+    free( socket->hostname);
+    free( socket->service);
+    
+    shutdown (socket->fd, SHUT_RDWR);     /* no more receptions */
+    close (socket->fd);
+
+    socket->fd = -1;
+    socket->secure = 0;
+}
+
+void socket_connect( const socket_st* hd)
+{
+    int err;
+
+    printf ("Connecting to '%s:%s'...\n", hd->ip, hd->service);
+
+    err = connect (hd->fd, hd->ptr->ai_addr, hd->ptr->ai_addrlen);
+    if (err < 0)
+    {
+        fprintf (stderr, "Cannot connect to %s:%s: %s\n", hd->hostname, hd->service,
+                 strerror (errno));
+        exit (1);
+    }
+}
+
+void socket_open( socket_st* hd, const char* hostname, const char* service)
+{
+    struct addrinfo hints, *res, *ptr;
+    int sd, err;
+    char buffer[MAX_BUF + 1];
+    char portname[16] = { 0 };
+
+    printf ("Resolving '%s'...\n", hostname);
+    /* get server name */
+    memset (&hints, 0, sizeof (hints));
+    hints.ai_socktype = SOCK_STREAM;
+    if ((err = getaddrinfo (hostname, service, &hints, &res)))
+    {
+        fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,
+                 gai_strerror (err));
+        exit (1);
+    }
+
+    sd = -1;
+    for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
+    {
+        sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+        if (sd == -1) continue;
+
+        if ((err = getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
+             portname, sizeof (portname), NI_NUMERICHOST|NI_NUMERICSERV)) != 0)
+        {
+            fprintf (stderr, "getnameinfo(): %s\n", gai_strerror (err));
+            freeaddrinfo (res);
+            exit (1);
+        }
+
+        break;
+    }
+
+    if (sd==-1) {
+        fprintf (stderr, "socket(): %s\n", strerror (errno));
+        exit (1);
+    }
+    
+    hd->secure = 0;
+    hd->fd = sd;
+    hd->hostname = strdup(hostname);
+    hd->ip = strdup(buffer);
+    hd->service = strdup(portname);
+    hd->ptr = ptr;
+    hd->addr_info = res;
+
+    return;
 }

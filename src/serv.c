@@ -507,41 +507,62 @@ peer_print_info (gnutls_session session, int *ret_length, const char *header)
 static int
 listen_socket (const char *name, int listen_port)
 {
-  struct sockaddr_in a;
+  struct addrinfo hints, *res, *ptr;
+  char portname[6];
   int s;
   int yes;
 
-  if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+  snprintf (portname, sizeof (portname), "%d", listen_port);
+  memset (&hints, 0, sizeof (hints));
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
+
+  if ((s = getaddrinfo (NULL, portname, &hints, &res)) != 0)
     {
-      perror ("socket() failed");
+      fprintf (stderr, "getaddrinfo() failed: %s\n", gai_strerror (s));
       return -1;
     }
-  yes = 1;
+  s = -1;
 
-  if (setsockopt
-      (s, SOL_SOCKET, SO_REUSEADDR, (const void *) &yes, sizeof (yes)) < 0)
+  for (ptr = res; (ptr != NULL) && (s == -1); ptr = ptr->ai_next)
     {
-      perror ("setsockopt() failed");
-    failed:
-      close (s);
+      if ((s = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol)) < 0)
+        {
+          perror ("socket() failed");
+          continue;
+        }
+
+      yes = 1;
+      if (setsockopt
+          (s, SOL_SOCKET, SO_REUSEADDR, (const void *) &yes, sizeof (yes)) < 0)
+        {
+          perror ("setsockopt() failed");
+        failed:
+          close (s);
+          s = -1;
+          continue;
+        }
+
+      if (bind (s, res->ai_addr, res->ai_addrlen) < 0)
+        {
+          perror ("bind() failed");
+          goto failed;
+        }
+
+      if (listen (s, 10) < 0)
+        {
+          perror ("listen() failed");
+          goto failed;
+        }
+    }
+
+  freeaddrinfo (res);
+  if (s == -1)
+    {
       return -1;
     }
-  memset (&a, 0, sizeof (a));
-  a.sin_port = htons (listen_port);
-  a.sin_family = AF_INET;
-  if (bind (s, (struct sockaddr *) &a, sizeof (a)) < 0)
-    {
-      perror ("bind() failed");
-      goto failed;
-    }
 
-  if (listen (s, 10) < 0)
-    {
-      perror ("listen() failed");
-      goto failed;
-    }
-
-  printf ("%s ready. Listening to port '%d'.\n\n", name, listen_port);
+  printf ("%s ready. Listening to port '%s'.\n\n", name, portname);
   return s;
 }
 
@@ -618,6 +639,28 @@ tls_log_func (int level, const char *str)
 
 static void gaa_parser (int argc, char **argv);
 
+static int get_port (const struct sockaddr_storage *addr)
+{
+  switch (addr->ss_family)
+    {
+      case AF_INET6:
+        return ntohs (((const struct sockaddr_in6 *)addr)->sin6_port);
+      case AF_INET:
+        return ntohs (((const struct sockaddr_in *)addr)->sin_port);
+    }
+  return -1;
+}
+
+static const char *addr_ntop (const struct sockaddr *sa, socklen_t salen,
+                              char *buf, size_t buflen)
+{
+  if (getnameinfo (sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) == 0)
+    {
+      return buf;
+    }
+  return NULL;
+}
+
 int
 main (int argc, char **argv)
 {
@@ -625,7 +668,8 @@ main (int argc, char **argv)
   char topbuf[512];
   char name[256];
   int accept_fd;
-  struct sockaddr_in client_address;
+  struct sockaddr_storage client_address;
+  socklen_t calen;
 
 #ifndef _WIN32
   signal (SIGPIPE, SIG_IGN);
@@ -879,14 +923,13 @@ main (int argc, char **argv)
 /* a new connection has arrived */
       if (FD_ISSET (h, &rd))
 	{
-	  unsigned int l;
 	  gnutls_session tls_session;
 
 	  tls_session = initialize_session ();
 
-	  l = sizeof (client_address);
-	  memset (&client_address, 0, l);
-	  accept_fd = accept (h, (struct sockaddr *) &client_address, &l);
+	  calen = sizeof (client_address);
+	  memset (&client_address, 0, calen);
+	  accept_fd = accept (h, (struct sockaddr *) &client_address, &calen);
 
 	  if (accept_fd < 0)
 	    {
@@ -965,10 +1008,9 @@ main (int argc, char **argv)
 		    if (verbose == 0)
 		      {
 			printf ("\n* connection from %s, port %d\n",
-				inet_ntop (AF_INET,
-					   &client_address.sin_addr,
+				addr_ntop ((struct sockaddr *)&client_address, calen,
 					   topbuf, sizeof (topbuf)),
-				ntohs (client_address.sin_port));
+				get_port (&client_address));
 			print_info (j->tls_session, NULL);
 		      }
 		    j->handshake_ok = 1;
@@ -1062,10 +1104,9 @@ main (int argc, char **argv)
 		    if (verbose == 0)
 		      {
 			printf ("- connection from %s, port %d\n",
-				inet_ntop (AF_INET,
-					   &client_address.sin_addr,
+				addr_ntop ((struct sockaddr*) &client_address, calen,
 					   topbuf, sizeof (topbuf)),
-				ntohs (client_address.sin_port));
+				get_port (&client_address));
 
 			print_info (j->tls_session, NULL);
 		      }
