@@ -10,7 +10,7 @@ node_asn *
 _asn1_add_node(unsigned int type);
 
 node_asn *
-_asn1_set_value(node_asn *node,const unsigned char *value,unsigned int len);
+_asn1_set_value(node_asn *node,const void *value,unsigned int len);
 
 node_asn *
 _asn1_set_name(node_asn *node,const char *name);

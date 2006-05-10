@@ -28,29 +28,41 @@
  *
  * They should be used only with null terminated strings.
  */
-void _asn1_str_cat( char* dest, size_t dest_tot_size, const char* src) {
-size_t str_size = strlen(src);
-size_t dest_size = strlen(dest);
+void
+_asn1_str_cat (char *dest, size_t dest_tot_size, const char *src)
+{
+  size_t str_size = strlen (src);
+  size_t dest_size = strlen (dest);
 
-	if ( dest_tot_size - dest_size > str_size) {
-		strcat( dest, src);
-	} else {
-		if ( dest_tot_size - dest_size > 0) {
-			strncat( dest, src, (dest_tot_size - dest_size) -1);
-			dest[dest_tot_size-1] = 0;
-		}
+  if (dest_tot_size - dest_size > str_size)
+    {
+      strcat (dest, src);
+    }
+  else
+    {
+      if (dest_tot_size - dest_size > 0)
+	{
+	  strncat (dest, src, (dest_tot_size - dest_size) - 1);
+	  dest[dest_tot_size - 1] = 0;
 	}
+    }
 }
 
-void _asn1_str_cpy( char* dest, size_t dest_tot_size, const char* src) {
-size_t str_size = strlen(src);
+void
+_asn1_str_cpy (char *dest, size_t dest_tot_size, const char *src)
+{
+  size_t str_size = strlen (src);
 
-	if ( dest_tot_size > str_size) {
-		strcpy( dest, src);
-	} else {
-		if ( dest_tot_size > 0) {
-			strncpy( dest, src, (dest_tot_size) -1);
-			dest[dest_tot_size-1] = 0;
-		}
+  if (dest_tot_size > str_size)
+    {
+      strcpy (dest, src);
+    }
+  else
+    {
+      if (dest_tot_size > 0)
+	{
+	  strncpy (dest, src, (dest_tot_size) - 1);
+	  dest[dest_tot_size - 1] = 0;
 	}
+    }
 }

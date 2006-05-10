@@ -51,16 +51,11 @@ _asn1_add_node_only (unsigned int type)
 {
   node_asn *punt;
 
-  punt = (node_asn *) _asn1_malloc (sizeof (node_asn));
+  punt = (node_asn *) _asn1_calloc (1, sizeof (node_asn));
   if (punt == NULL)
     return NULL;
 
-  punt->left = NULL;
-  punt->name = NULL;
   punt->type = type;
-  punt->value = NULL;
-  punt->down = NULL;
-  punt->right = NULL;
 
   return punt;
 }

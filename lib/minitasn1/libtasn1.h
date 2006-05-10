@@ -31,7 +31,7 @@ extern "C"
 {
 #endif
 
-#define LIBTASN1_VERSION "0.3.2"
+#define LIBTASN1_VERSION "0.3.4"
 
 #include <sys/types.h>
 #include <time.h>
@@ -124,9 +124,9 @@ extern "C"
 
   struct static_struct_asn
   {
-    char *name;			/* Node name */
+    const char *name;			/* Node name */
     unsigned int type;		/* Node type */
-    unsigned char *value;	/* Node value */
+    const void *value;	/* Node value */
   };
 
   typedef struct static_struct_asn ASN1_ARRAY_TYPE;
@@ -210,7 +210,7 @@ extern "C"
   /* DER utility functions. */
 
   int asn1_get_tag_der (const unsigned char *der, int der_len,
-			unsigned char *class, int *len, unsigned long *tag);
+			unsigned char *cls, int *len, unsigned long *tag);
 
   void asn1_octet_der (const unsigned char *str, int str_len,
 		       unsigned char *der, int *der_len);
