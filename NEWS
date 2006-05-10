@@ -16,6 +16,8 @@ a session.
 
 ** The self-tests are now run under valgrind, if it is installed.
 
+** Libtasn1 is updated to 0.3.4, and that version is now required.
+
 ** API and ABI modifications:
 _gnutls_x509_get_raw_crt_activation_time,
 _gnutls_x509_get_raw_crt_expiration_time: Removed.
