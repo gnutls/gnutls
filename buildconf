@@ -1,3 +1,0 @@
-#!/bin/sh -x
-autoreconf --force --install
-: 'Run "./configure --enable-developer-mode --enable-gtk-doc && make" now.'
