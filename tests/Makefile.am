@@ -43,8 +43,7 @@ check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon pkcs8
 
 VALGRIND=valgrind --tool=memcheck --leak-check=full --leak-resolution=high \
-	--show-reachable=yes --num-callers=50 \
-	--suppressions=gnutls.supp
+	--show-reachable=yes --num-callers=50
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/client.p12	\
 	PKCS12PASSWORD=foobar \
