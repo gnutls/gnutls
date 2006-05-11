@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2006 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -48,7 +48,7 @@ _gnutls_inner_application_recv_params (gnutls_session_t session,
 
   switch ((unsigned char) *data)
     {
-    case NO:					/* Peer's ia_on_resume == no */
+    case NO:			/* Peer's ia_on_resume == no */
       ext->gnutls_ia_peer_allowskip = 1;
       break;
 
@@ -71,13 +71,36 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
 {
   tls_ext_st *ext = &session->security_parameters.extensions;
 
-  /* If we don't want gnutls_ia locally, or we are a server and the client
-   * doesn't want it, don't advertise TLS/IA support at all, as required. */
+  /* Set ext->gnutls_ia_enable depending on whether we have a TLS/IA
+     credential in the session. */
 
-  if (!ext->gnutls_ia_enable) return 0;
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
+      gnutls_ia_client_credentials_t cred = (gnutls_ia_client_credentials_t)
+	_gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
+
+      if (cred)
+	ext->gnutls_ia_enable = 1;
+    }
+  else
+    {
+      gnutls_ia_server_credentials_t cred = (gnutls_ia_server_credentials_t)
+	_gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
+
+      if (cred)
+	ext->gnutls_ia_enable = 1;
+    }
+
+  /* If we don't want gnutls_ia locally, or we are a server and the
+   * client doesn't want it, don't advertise TLS/IA support at all, as
+   * required. */
+
+  if (!ext->gnutls_ia_enable)
+    return 0;
 
   if (session->security_parameters.entity == GNUTLS_SERVER &&
-      !ext->gnutls_ia_peer_enable) return 0;
+      !ext->gnutls_ia_peer_enable)
+    return 0;
 
   /* We'll advertise. Check if there's room in the hello buffer. */
 
@@ -91,33 +114,34 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
 
   *data = YES;
 
-  if (session->security_parameters.entity == GNUTLS_CLIENT) {
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
 
-	/* Client: value follows local setting */
+      /* Client: value follows local setting */
 
-	if (ext->gnutls_ia_allowskip) 
-		*data = NO;
-  }
-  else {	
+      if (ext->gnutls_ia_allowskip)
+	*data = NO;
+    }
+  else
+    {
 
-	/* Server: value follows local setting and client's setting, but only
-	 * if we are resuming. 
-	 *
-	 * XXX Can server test for resumption at this stage?  
-	 *
-	 * Ai! It seems that read_client_hello only calls parse_extensions if
-	 * we're NOT resuming! That would make us automatically violate the IA
-	 * draft; if we're resuming, we must first learn what the client wants
-	 * -- IA or no IA -- and then prepare our response. Right now we'll
-	 * always skip IA on resumption, because recv_ext isn't even called
-	 * to record the peer's support for IA at all. Simon? */
+      /* Server: value follows local setting and client's setting, but only
+       * if we are resuming.
+       *
+       * XXX Can server test for resumption at this stage?
+       *
+       * Ai! It seems that read_client_hello only calls parse_extensions if
+       * we're NOT resuming! That would make us automatically violate the IA
+       * draft; if we're resuming, we must first learn what the client wants
+       * -- IA or no IA -- and then prepare our response. Right now we'll
+       * always skip IA on resumption, because recv_ext isn't even called
+       * to record the peer's support for IA at all. Simon? */
 
-	if (ext->gnutls_ia_allowskip &&
-	    ext->gnutls_ia_peer_allowskip &&
-	    session->internals.resumed == RESUME_TRUE) 
-		*data = NO;
-  }
+      if (ext->gnutls_ia_allowskip &&
+	  ext->gnutls_ia_peer_allowskip &&
+	  session->internals.resumed == RESUME_TRUE)
+	*data = NO;
+    }
 
   return 1;
 }
-
