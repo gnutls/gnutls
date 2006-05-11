@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2006 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -383,9 +383,9 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
  *
  * To finish an application phase in the server, use
  * gnutls_ia_endphase_send().  The client cannot end an application
- * phase unilaterally; rather, a client is required to respond with 
- * an endphase of its own if gnutls_ia_recv indicates that the server 
- * has sent one.
+ * phase unilaterally; rather, a client is required to respond with an
+ * endphase of its own if gnutls_ia_recv indicates that the server has
+ * sent one.
  *
  * If the EINTR is returned by the internal push function (the default
  * is send()} then %GNUTLS_E_INTERRUPTED will be returned.  If
@@ -610,15 +610,19 @@ gnutls_ia_handshake_p (gnutls_session_t session)
 {
   tls_ext_st *ext = &session->security_parameters.extensions;
 
+  session->security_parameters.extensions.gnutls_ia_enable = 1;
+  session->security_parameters.extensions.gnutls_ia_allowskip =
+    allow_skip_on_resume;
+
   /* Either local side or peer doesn't do TLS/IA: don't do IA */
 
   if (!ext->gnutls_ia_enable || !ext->gnutls_ia_peer_enable)
-	  return 0;
+    return 0;
 
   /* Not resuming or we don't allow skipping on resumption locally: do IA */
 
   if (!ext->gnutls_ia_allowskip || !gnutls_session_is_resumed (session))
-	  return 1;
+    return 1;
 
   /* If we're resuming and we and the peer both allow skipping on resumption: 
    * don't do IA */
@@ -875,35 +879,36 @@ gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred)
 }
 
 /**
- * gnutls_ia_enable - Call this to indicate the application's willingness 
- * 		      to execute one or more TLS/IA application phases 
- * 		      in the handshake.
+ * gnutls_ia_enable - Call this to indicate the application's willingness
+ *		      to execute one or more TLS/IA application phases
+ *		      in the handshake.
  * @session: is a #gnutls_session_t structure.
- * @allow_skip_on_resume: non-zero if local party allows to skip the 
- * 			  TLS/IA application phases for a resumed session.
+ * @allow_skip_on_resume: non-zero if local party allows to skip the
+ *			  TLS/IA application phases for a resumed session.
  *
  * Specify whether we must advertise support for the TLS/IA extension
- * during the handshake. 
+ * during the handshake.
  *
- * At the client side, we always advertise TLS/IA if gnutls_ia_enable was
- * called before the handshake; at the server side, we also require that
- * the client has advertised that it wants to run TLS/IA before including
- * the advertisement, as required by the protocol.
+ * At the client side, we always advertise TLS/IA if gnutls_ia_enable
+ * was called before the handshake; at the server side, we also
+ * require that the client has advertised that it wants to run TLS/IA
+ * before including the advertisement, as required by the protocol.
  *
- * Similarly, at the client side we always advertise that we allow TLS/IA to be
- * skipped for resumed sessions if @allow_skip_on_resume is non-zero; at the
- * server side, we also require that the session is indeed resumable and that
- * the client has also advertised that it allows TLS/IA to be skipped for
- * resumed sessions.
+ * Similarly, at the client side we always advertise that we allow
+ * TLS/IA to be skipped for resumed sessions if @allow_skip_on_resume
+ * is non-zero; at the server side, we also require that the session
+ * is indeed resumable and that the client has also advertised that it
+ * allows TLS/IA to be skipped for resumed sessions.
  *
  * After the TLS handshake, call gnutls_ia_handshake_p() to find out
- * whether both parties agreed to do a TLS/IA handshake, before calling
- * gnutls_ia_handshake() or one of the lower level gnutls_ia_* functions.
+ * whether both parties agreed to do a TLS/IA handshake, before
+ * calling gnutls_ia_handshake() or one of the lower level gnutls_ia_*
+ * functions.
  **/
 void
 gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume)
 {
   session->security_parameters.extensions.gnutls_ia_enable = 1;
-  session->security_parameters.extensions.gnutls_ia_allowskip = 
-	  allow_skip_on_resume;
+  session->security_parameters.extensions.gnutls_ia_allowskip =
+    allow_skip_on_resume;
 }
