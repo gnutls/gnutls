@@ -610,10 +610,6 @@ gnutls_ia_handshake_p (gnutls_session_t session)
 {
   tls_ext_st *ext = &session->security_parameters.extensions;
 
-  session->security_parameters.extensions.gnutls_ia_enable = 1;
-  session->security_parameters.extensions.gnutls_ia_allowskip =
-    allow_skip_on_resume;
-
   /* Either local side or peer doesn't do TLS/IA: don't do IA */
 
   if (!ext->gnutls_ia_enable || !ext->gnutls_ia_peer_enable)
