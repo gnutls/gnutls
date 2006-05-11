@@ -42,10 +42,10 @@ TESTS = pkcs12_neon pkcs8 $(ctests)
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon pkcs8
 
-VALGRIND=valgrind --leak-check=full --leak-resolution=high \
+VALGRIND=valgrind --tool=memcheck --leak-check=full --leak-resolution=high \
 	--show-reachable=yes --num-callers=50 \
 	--suppressions=gnutls.supp
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/client.p12	\
 	PKCS12PASSWORD=foobar \
-	`if type valgrind > /dev/null 2>&1; then echo $(VALGRIND); else echo $$SHELL -c; fi`
+	`if $(VALGRIND) /bin/true > /dev/null 2>&1; then echo $(VALGRIND); else echo $$SHELL -c; fi`
