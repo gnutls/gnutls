@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -304,7 +304,7 @@ get_issuers_num (gnutls_session_t session, opaque * data, ssize_t data_size)
    * using realloc().
    */
 
-  if (gnutls_certificate_type_get (session) != GNUTLS_CRT_X509)
+  if (data_size == 0 || data == NULL)
     return 0;
 
   if (data_size > 0)
@@ -1250,16 +1250,15 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  if (session->security_parameters.cert_type == GNUTLS_CRT_X509)
+  /* read the certificate authorities */
+  DECR_LEN (dsize, 2);
+  size = _gnutls_read_uint16 (p);
+  p += 2;
+
+  if (session->security_parameters.cert_type == GNUTLS_CRT_OPENPGP && size != 0)
     {
-      DECR_LEN (dsize, 2);
-      size = _gnutls_read_uint16 (p);
-      p += 2;
-    }
-  else
-    {
-      p = NULL;
-      size = 0;
+      gnutls_assert(); // size should be zero
+      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 
   DECR_LEN (dsize, size);
@@ -1431,6 +1430,11 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
     {
       _gnutls_write_datum16 (pdata, cred->x509_rdn_sequence);
       /* pdata += cred->x509_rdn_sequence.size + 2; */
+    }
+  else
+    {
+      _gnutls_write_uint16( pdata, 0);
+      /* pdata+=2; */
     }
 
   return size;
