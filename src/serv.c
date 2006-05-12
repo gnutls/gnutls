@@ -1,7 +1,7 @@
 /*
+ * Copyright (C) 2004, 2006 Free Software Foundation
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -36,6 +36,8 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <list.h>
+
+#include "getaddrinfo.h"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
