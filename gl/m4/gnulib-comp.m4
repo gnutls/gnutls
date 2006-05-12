@@ -42,6 +42,7 @@ AC_DEFUN([gl_INIT],
   gl_GC_RANDOM
   gl_GC_RIJNDAEL
   gl_GC_SHA1
+  gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
@@ -59,6 +60,7 @@ AC_DEFUN([gl_INIT],
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
   gl_STDINT_H
+  gl_FUNC_STRDUP
   gl_HEADER_SYS_SOCKET
   gl_FUNC_VASNPRINTF
   gl_XSIZE
@@ -79,10 +81,13 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/des.c
   lib/des.h
   lib/dummy.c
+  lib/gai_strerror.c
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c
   lib/gc.h
+  lib/getaddrinfo.c
+  lib/getaddrinfo.h
   lib/getdelim.c
   lib/getdelim.h
   lib/getline.c
@@ -125,6 +130,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/socket_.h
   lib/stdbool_.h
   lib/stdint_.h
+  lib/strdup.c
+  lib/strdup.h
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/xsize.h
@@ -147,6 +154,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gc-rijndael.m4
   m4/gc-sha1.m4
   m4/gc.m4
+  m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
@@ -194,6 +202,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdbool.m4
   m4/stdint.m4
   m4/stdint_h.m4
+  m4/strdup.m4
   m4/sys_socket_h.m4
   m4/uintmax_t.m4
   m4/ulonglong.m4
