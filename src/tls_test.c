@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002,2003,2006 Nikos Mavroyanopoulos
  * Copyright (C) 2004,2005 Free Software Foundation
  *
  * This file is part of GNUTLS.
@@ -194,12 +194,12 @@ main (int argc, char **argv)
   /* get server name */
   memset (&hints, 0, sizeof (hints));
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_NUMERICSERV;
+  hints.ai_flags = 0;
   snprintf (portname, sizeof (portname), "%d", port);
   if ((err = getaddrinfo (hostname, portname, &hints, &res)) != 0)
     {
       fprintf (stderr, "Cannot resolve %s: %s\n", hostname,
-               gai_strerror (err));
+	       gai_strerror (err));
       exit (1);
     }
 

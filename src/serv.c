@@ -517,7 +517,7 @@ listen_socket (const char *name, int listen_port)
   snprintf (portname, sizeof (portname), "%d", listen_port);
   memset (&hints, 0, sizeof (hints));
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
+  hints.ai_flags = AI_PASSIVE;
 
   if ((s = getaddrinfo (NULL, portname, &hints, &res)) != 0)
     {
