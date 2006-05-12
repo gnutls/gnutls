@@ -18,6 +18,8 @@ a session.
 
 ** Libtasn1 is updated to 0.3.4, and that version is now required.
 
+** The command line tools now use getaddrinfo and support IPv6.
+
 ** API and ABI modifications:
 _gnutls_x509_get_raw_crt_activation_time,
 _gnutls_x509_get_raw_crt_expiration_time: Removed.
