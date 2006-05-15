@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <certtool-cfg.h>
-#include <getpass.h>
 #include <cfg+.h>
 #include <gnutls/x509.h>
 #include <string.h>
