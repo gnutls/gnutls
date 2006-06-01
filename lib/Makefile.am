@@ -27,6 +27,8 @@ endif
 
 localedir = $(datadir)/locale
 
+AM_CXXFLAGS = -I$(top_srcdir)/includes/
+
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	-I$(top_srcdir)/gl						\
 	-I$(top_srcdir)/includes -I../includes				\
@@ -52,7 +54,7 @@ pkgconfig_DATA = gnutls.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
 EXTRA_DIST = gnutls-api.texi
-lib_LTLIBRARIES = libgnutls.la
+lib_LTLIBRARIES = libgnutls.la libgnutlsxx.la
 
 SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 	auth_srp_sb64.c auth_srp_rsa.c
@@ -92,6 +94,8 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	ext_inner_application.h
 
+CPP_OBJECTS = gnutlsxx.cpp
+
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
@@ -112,6 +116,14 @@ libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
 libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS) 
 endif
+
+libgnutlsxx_la_SOURCES = $(CPP_OBJECTS)
+
+libgnutlsxx_la_LDFLAGS = -no-undefined \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+
+libgnutlsxx_la_LIBADD = libgnutls.la
+
 
 pkix_asn1_tab.c: pkix.asn
 	-asn1Parser pkix.asn pkix_asn1_tab.c

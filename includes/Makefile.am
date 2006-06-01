@@ -20,7 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 nobase_include_HEADERS = gnutls/extra.h gnutls/x509.h gnutls/pkcs12.h	\
-	gnutls/compat.h gnutls/openpgp.h
+	gnutls/compat.h gnutls/openpgp.h gnutls/gnutlsxx.h
 
 if ENABLE_OPENSSL
 nobase_include_HEADERS += gnutls/openssl.h
