@@ -74,7 +74,7 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	cipher.h context.h filters.h main.h md.h packet.h		\
 	stream.h types.h						\
 									\
-	gnutls_openpgp.h
+	gnutls_openpgp.h gnutlsxx.h
 
 
 # Images to copy into HTML directory.
