@@ -53,6 +53,7 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_MEMMEM
   gl_FUNC_MEMMOVE
   gl_MINMAX
+  gl_FUNC_READ_FILE
   gl_FUNC_READLINE
   gl_C_RESTRICT
   gl_SIZE_MAX
@@ -116,6 +117,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/printf-args.h
   lib/printf-parse.c
   lib/printf-parse.h
+  lib/read-file.c
+  lib/read-file.h
   lib/readline.c
   lib/readline.h
   lib/rijndael-alg-fst.c
@@ -190,6 +193,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/po.m4
   m4/printf-posix.m4
   m4/progtest.m4
+  m4/read-file.m4
   m4/readline.m4
   m4/restrict.m4
   m4/rijndael.m4
