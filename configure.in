@@ -49,14 +49,6 @@ AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
 AC_SUBST(PATCH_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\..*\.\(.*\)/\1/g'`)
 AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION $PATCH_VERSION`)
 
-case "${target}" in
-    *-*-mingw32*)
-        LIBS="$LIBS -lwsock32"
-        ;;
-    *)
-      ;;
-esac
-
 dnl In order to use the reentrant libc functions.
 dnl I hope it is portable enough.
 CFLAGS="${CFLAGS} -D_REENTRANT -D_THREAD_SAFE"
