@@ -52,7 +52,7 @@ pkgconfig_DATA = gnutls.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
 EXTRA_DIST = gnutls-api.texi
-lib_LTLIBRARIES = libgnutls.la libgnutlsxx.la
+lib_LTLIBRARIES = libgnutls.la
 
 SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 	auth_srp_sb64.c auth_srp_rsa.c
@@ -92,8 +92,6 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	ext_inner_application.h
 
-CPP_OBJECTS = gnutlsxx.cpp
-
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
@@ -118,9 +116,12 @@ endif
 # C++ library
 
 if ENABLE_CXX
-lib_LTLIBRARIES += libgnutlsxx.la
+CPP_OBJECTS = gnutlsxx.cpp
 
 AM_CXXFLAGS = -I$(top_srcdir)/includes/
+
+lib_LTLIBRARIES += libgnutlsxx.la
+
 libgnutlsxx_la_SOURCES = $(CPP_OBJECTS)
 
 libgnutlsxx_la_LDFLAGS = -no-undefined \
