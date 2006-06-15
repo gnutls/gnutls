@@ -27,8 +27,6 @@ endif
 
 localedir = $(datadir)/locale
 
-AM_CXXFLAGS = -I$(top_srcdir)/includes/
-
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	-I$(top_srcdir)/gl						\
 	-I$(top_srcdir)/includes -I../includes				\
@@ -117,13 +115,19 @@ else
 libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS) 
 endif
 
+# C++ library
+
+if ENABLE_CXX
+lib_LTLIBRARIES += libgnutlsxx.la
+
+AM_CXXFLAGS = -I$(top_srcdir)/includes/
 libgnutlsxx_la_SOURCES = $(CPP_OBJECTS)
 
 libgnutlsxx_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutlsxx_la_LIBADD = libgnutls.la
-
+endif
 
 pkix_asn1_tab.c: pkix.asn
 	-asn1Parser pkix.asn pkix_asn1_tab.c
