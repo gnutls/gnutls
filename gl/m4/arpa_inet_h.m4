@@ -41,4 +41,5 @@ AC_DEFUN([gl_PREREQ_ARPA_INET], [
 # Prerequisites of lib/inet_ntop.c and lib/inet_pton.c.
 AC_DEFUN([gl_PREREQ_INET_NTOP], [
   AC_REQUIRE([gl_SOCKET_FAMILIES])
+  :
 ])
