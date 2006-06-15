@@ -29,6 +29,7 @@ AC_DEFUN([gl_INIT],
 [
   AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_FUNC_ALLOCA
+  gl_HEADER_ARPA_INET
   gl_GC
   gl_GC_ARCFOUR
   gl_GC_ARCTWO
@@ -48,7 +49,6 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETPASS
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.14.5])
-  gl_INET_NTOP
   gl_MD2
   gl_FUNC_MEMMEM
   gl_FUNC_MEMMOVE
@@ -78,6 +78,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/arcfour.h
   lib/arctwo.c
   lib/arctwo.h
+  lib/arpa_inet_.h
   lib/asnprintf.c
   lib/des.c
   lib/des.h
@@ -100,7 +101,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/hmac-sha1.c
   lib/hmac.h
   lib/inet_ntop.c
-  lib/inet_ntop.h
+  lib/inet_pton.c
   lib/md2.c
   lib/md2.h
   lib/md4.c
@@ -141,6 +142,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/alloca.m4
   m4/arcfour.m4
   m4/arctwo.m4
+  m4/arpa_inet_h.m4
   m4/codeset.m4
   m4/des.m4
   m4/eoverflow.m4
@@ -167,7 +169,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/hmac-md5.m4
   m4/hmac-sha1.m4
   m4/iconv.m4
-  m4/inet_ntop.m4
   m4/intdiv0.m4
   m4/intmax.m4
   m4/intmax_t.m4
