@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnutls 1.3.5-b20060307\n"
+"Project-Id-Version: gnutls 1.4.0\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2006-03-07 02:26+0100\n"
-"PO-Revision-Date: 2006-05-14 21:52+0100\n"
+"POT-Creation-Date: 2006-05-12 00:21+0200\n"
+"PO-Revision-Date: 2006-05-23 11:51+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
