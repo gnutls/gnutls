@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2005 Free Software Foundation
+# Copyright (C) 2005, 2006 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -19,8 +19,10 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes
+AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes \
+		-I$(top_srcdir)/gl -I$(top_builddir)/gl
 LDADD = libexamples.la \
+	../../gl/libgnu.la \
 	../../lib/libgnutls.la	\
 	../../libextra/libgnutls-extra.la
 
