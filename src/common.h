@@ -5,13 +5,13 @@
 #include <gnutls/gnutls.h>
 
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #ifdef _WIN32
 # include <io.h>
 # include <winbase.h>
 # define close closesocket
 #else
 # include <netinet/in.h>
-# include <arpa/inet.h>
 # include <unistd.h>
 # include <netdb.h>
 # include <signal.h>
@@ -38,5 +38,3 @@ const char *raw_to_string (const unsigned char *raw, size_t raw_size);
 int service_to_port (const char *service);
 
 void sockets_init (void);
-
-#include "inet_ntop.h"
