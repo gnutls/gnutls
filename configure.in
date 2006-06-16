@@ -145,7 +145,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 	_gcc_cflags_save=$CFLAGS
 	_gcc_ldflags_save=$LDFLAGS
 	CFLAGS="-mms-bitfields"
-	LDFLAGS="--enable-runtime-pseudo-reloc"
+	LDFLAGS="--Wl,-enable-runtime-pseudo-reloc"
 	AC_LINK_IFELSE(AC_LANG_PROGRAM([]),_gcc_mingw=yes,_gcc_mingw=no)
 	AC_MSG_RESULT($_gcc_mingw)
 	if test x"$_gcc_mingw" != xyes ; then
