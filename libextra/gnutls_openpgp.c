@@ -29,7 +29,7 @@
 #include "gnutls_datum.h"
 #include "gnutls_global.h"
 #include <openpgp/gnutls_openpgp.h>
-#include <strfile.h>
+#include "read-file.h"
 #include <gnutls_str.h>
 #include <stdio.h>
 #include <gcrypt.h>
@@ -723,7 +723,6 @@ gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
   struct stat statbuf;
   int rc = 0;
   gnutls_datum_t key, cert;
-  strfile xcert, xkey;
 
   if (!res || !keyfile || !certfile)
     {
@@ -737,31 +736,25 @@ gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
       return GNUTLS_E_FILE_ERROR;
     }
 
-  xcert = _gnutls_file_to_str (certfile);
-  if (xcert.data == NULL)
+  cert.data = read_binary_file (certfile, &cert.size);
+  if (cert.data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
     }
 
-  xkey = _gnutls_file_to_str (keyfile);
-  if (xkey.data == NULL)
+  key.data = read_binary_file (keyfile, &key.size);
+  if (key.data == NULL)
     {
       gnutls_assert ();
-      _gnutls_strfile_free (&xcert);
+      free (cert.data);
       return GNUTLS_E_FILE_ERROR;
     }
-
-  key.data = xkey.data;
-  key.size = xkey.size;
-
-  cert.data = xcert.data;
-  cert.size = xcert.size;
 
   rc = gnutls_certificate_set_openpgp_key_mem (res, &cert, &key);
 
-  _gnutls_strfile_free (&xcert);
-  _gnutls_strfile_free (&xkey);
+  free (cert.data);
+  free (key.data);
 
   if (rc < 0)
     {

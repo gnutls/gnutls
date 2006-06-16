@@ -48,6 +48,7 @@
 #include "x509/mpi.h"
 #include "x509/pkcs7.h"
 #include "x509/privkey.h"
+#include "read-file.h"
 
 /*
  * some x509 certificate parsing functions.
@@ -737,126 +738,6 @@ read_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
-/* Opens a file reads its contents and stores it
- * in allocated memory, which is returned.
- */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
-
-#ifdef HAVE_MMAP
-# include <unistd.h>
-# include <sys/mman.h>
-# ifndef MAP_FAILED
-#  define MAP_FAILED (void *)-1L
-# endif
-#endif
-
-#include <strfile.h>
-
-void
-_gnutls_strfile_free (strfile * x)
-{
-#ifdef HAVE_MMAP
-  if (x->mmaped)
-    {
-      munmap (x->data, x->size);
-      return;
-    }
-#endif
-
-  gnutls_free (x->data);
-  x->data = NULL;
-}
-
-strfile
-_gnutls_file_to_str (const char *file)
-{
-  int fd1 = -1;
-  struct stat stat_st;
-  size_t tot_size;
-  size_t left;
-  opaque *tmp;
-  ssize_t i = 0;
-  strfile null = { NULL, 0, 0 };
-  strfile ret = { NULL, 0, 0 };
-
-  fd1 = open (file, 0);
-  if (fd1 == -1)
-    {
-      gnutls_assert ();
-      return null;
-    }
-
-  if (fstat (fd1, &stat_st) == -1)
-    {
-      gnutls_assert ();
-      goto error;
-    }
-
-  tot_size = stat_st.st_size;
-  if (tot_size == 0)
-    {
-      gnutls_assert ();
-      goto error;
-    }
-#ifdef HAVE_MMAP
-  if ((tmp =
-       mmap (NULL, tot_size, PROT_READ, MAP_SHARED, fd1, 0)) != MAP_FAILED)
-    {
-      ret.mmaped = 1;
-      ret.data = tmp;
-      ret.size = tot_size;
-
-      close (fd1);
-      return ret;
-    }
-#endif
-
-  ret.data = gnutls_malloc (tot_size);
-  if (ret.data == NULL)
-    {
-      gnutls_assert ();
-      goto error;
-    }
-
-  left = tot_size;
-  while (left > 0)
-    {
-      i = read (fd1, &ret.data[tot_size - left], left);
-      if (i == -1)
-	{
-	  if (errno == EAGAIN || errno == EINTR)
-	    continue;
-	  else
-	    {
-	      gnutls_assert ();
-	      goto error;
-	    }
-	}
-      else if (i == 0)
-	break;
-
-      left -= i;
-    }
-
-  ret.size = tot_size - left;
-
-  ret.mmaped = 0;
-
-  close (fd1);
-
-  return ret;
-
-error:
-
-  if (!ret.mmaped)
-    gnutls_free (ret.data);
-  close (fd1);
-  return null;
-}
-
 /* Reads a certificate file
  */
 static int
@@ -864,17 +745,17 @@ read_cert_file (gnutls_certificate_credentials_t res,
 		const char *certfile, gnutls_x509_crt_fmt_t type)
 {
   int ret;
-  strfile x;
+  size_t size;
+  char *data = read_binary_file (certfile, &size);
 
-  x = _gnutls_file_to_str (certfile);
-  if (x.data == NULL)
+  if (data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
     }
 
-  ret = read_cert_mem (res, x.data, x.size, type);
-  _gnutls_strfile_free (&x);
+  ret = read_cert_mem (res, data, size, type);
+  free (data);
 
   return ret;
 
@@ -890,17 +771,17 @@ read_key_file (gnutls_certificate_credentials_t res,
 	       const char *keyfile, gnutls_x509_crt_fmt_t type)
 {
   int ret;
-  strfile x;
+  size_t size;
+  char *data = read_binary_file (keyfile, &size);
 
-  x = _gnutls_file_to_str (keyfile);
-  if (x.data == NULL)
+  if (data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
     }
 
-  ret = read_key_mem (res, x.data, x.size, type);
-  _gnutls_strfile_free (&x);
+  ret = read_key_mem (res, data, size, type);
+  free (data);
 
   return ret;
 }
@@ -1482,10 +1363,10 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
 					gnutls_x509_crt_fmt_t type)
 {
   int ret, ret2;
-  strfile x;
+  size_t size;
+  char *data = read_binary_file (cafile, &size);
 
-  x = _gnutls_file_to_str (cafile);
-  if (x.data == NULL)
+  if (data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
@@ -1493,12 +1374,12 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
 
   if (type == GNUTLS_X509_FMT_DER)
     ret = parse_der_ca_mem (&res->x509_ca_list, &res->x509_ncas,
-			    x.data, x.size);
+			    data, size);
   else
     ret = parse_pem_ca_mem (&res->x509_ca_list, &res->x509_ncas,
-			    x.data, x.size);
+			    data, size);
 
-  _gnutls_strfile_free (&x);
+  free (data);
 
   if (ret < 0)
     {
@@ -1776,10 +1657,10 @@ gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t
 				      gnutls_x509_crt_fmt_t type)
 {
   int ret;
-  strfile x;
+  size_t size;
+  char *data = read_binary_file (crlfile, &size);
 
-  x = _gnutls_file_to_str (crlfile);
-  if (x.data == NULL)
+  if (data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
@@ -1787,12 +1668,12 @@ gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t
 
   if (type == GNUTLS_X509_FMT_DER)
     ret = parse_der_crl_mem (&res->x509_crl_list, &res->x509_ncrls,
-			     x.data, x.size);
+			     data, size);
   else
     ret = parse_pem_crl_mem (&res->x509_crl_list, &res->x509_ncrls,
-			     x.data, x.size);
+			     data, size);
 
-  _gnutls_strfile_free (&x);
+  free (data);
 
   if (ret < 0)
     {
@@ -2000,7 +1881,6 @@ int
   gnutls_x509_crt_t cert = NULL;
   gnutls_x509_crl_t crl = NULL;
   int ret;
-  strfile x;
 
   ret = gnutls_pkcs12_init (&p12);
   if (ret < 0)
@@ -2009,19 +1889,16 @@ int
       return ret;
     }
 
-  x = _gnutls_file_to_str (pkcs12file);
-  if (x.data == NULL)
+  p12blob.data = read_binary_file (pkcs12file, &p12blob.size);
+  if (p12blob.data == NULL)
     {
       gnutls_assert ();
       gnutls_pkcs12_deinit (p12);
       return GNUTLS_E_FILE_ERROR;
     }
 
-  p12blob.data = x.data;
-  p12blob.size = x.size;
-
   ret = gnutls_pkcs12_import (p12, &p12blob, type, 0);
-  _gnutls_strfile_free (&x);
+  free (p12blob.data);
   if (ret < 0)
     {
       gnutls_assert ();
