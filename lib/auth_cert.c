@@ -1433,7 +1433,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
     }
   else
     {
-      _gnutls_write_uint16( pdata, 0);
+      _gnutls_write_uint16( 0, pdata);
       /* pdata+=2; */
     }
 
