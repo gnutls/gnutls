@@ -5,6 +5,17 @@ See the end for copying conditions.
 
 * Version 1.5.0 (unreleased)
 
+** Improvements for building under MinGW.
+Provides internal inet_ntop and inet_pton functions.  Calls
+WSAStartup/WSACleanup in gnutls_global_init/gnutls_global_deinit.
+Builds the library with -mms-bitfields
+-Wl,--enable-runtime-pseudo-reloc.
+
+** The examples now include config.h and link to gnulib.
+No other source changes were necessary, so the examples should
+continue to be possible to use stand-alone without any autoconf or
+gnulib stuff.
+
 ** API and ABI modifications:
 No changes since last version.
 
