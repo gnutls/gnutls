@@ -39,12 +39,17 @@
 /* Specification.  */
 #include <arpa/inet.h>
 
-#include <sys/param.h>
-#include <netinet/in.h>
-#include <arpa/nameser.h>
 #include <ctype.h>
 #include <string.h>
 #include <errno.h>
+
+#ifndef EAFNOSUPPORT
+# define EAFNOSUPPORT EINVAL
+#endif
+
+#define NS_INADDRSZ 4
+#define NS_IN6ADDRSZ 16
+#define NS_INT16SZ 2
 
 /*
  * WARNING: Don't even consider trying to compile this on a system where

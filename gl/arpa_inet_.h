@@ -55,8 +55,8 @@ extern const char *inet_ntop (int af, const void *restrict src,
 
 
 #if !HAVE_DECL_INET_PTON
-extern const char *inet_pton (int af, const char *restrict src,
-			      void *restrict dst);
+extern int inet_pton (int af, const char *restrict src,
+		      void *restrict dst);
 #endif
 
 #endif /* _ARPA_INET_H */
