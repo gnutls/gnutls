@@ -1,9 +1,35 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <gnutls/gnutls.h>
+/*
+ * Copyright (C) 2005, 2006 Free Software Foundation
+ *
+ * Author: Simon Josefsson
+ *
+ * This file is part of GNUTLS.
+ *
+ * GNUTLS is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * GNUTLS is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with GNUTLS; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+ */
 
-int
-main (int argc, char *argv[])
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <stdlib.h>
+
+#include "utils.h"
+
+void
+doit (void)
 {
   gnutls_certificate_credentials_t x509cred;
   char *file, *password;
@@ -11,11 +37,11 @@ main (int argc, char *argv[])
 
   ret = gnutls_global_init ();
   if (ret < 0)
-    return 1;
+    fail ("gnutls_global_init failed %d\n", ret);
 
   ret = gnutls_certificate_allocate_credentials (&x509cred);
   if (ret < 0)
-    return 1;
+    fail ("gnutls_certificate_allocate_credentials failed %d\n", ret);
 
   file = getenv ("PKCS12FILE");
   password = getenv ("PKCS12PASSWORD");
@@ -25,20 +51,18 @@ main (int argc, char *argv[])
   if (!password)
     password = "foobar";
 
-  printf ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
-	  file, password);
+  success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+	   file, password);
   ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
 							file,
 							GNUTLS_X509_FMT_DER,
 							password);
   if (ret < 0)
-    {
-      printf ("x509_pkcs12 (%d): %s\n", ret, gnutls_strerror (ret));
-    }
+    fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
+
+  success ("Read file OK\n");
 
   gnutls_certificate_free_credentials (x509cred);
 
   gnutls_global_deinit ();
-
-  return 0;
 }
