@@ -487,7 +487,7 @@ AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
 AM_CONDITIONAL(ENABLE_INCLUDED_LZO, test "$minilzo_enabled" = "yes")
 
 if test "$minilzo_enabled" = "yes"; then
-  # See libextra/minolzo/README.LZO
+  # See libextra/minilzo/README.LZO
   AC_CHECK_TYPE(ptrdiff_t,long)
   AC_TYPE_SIZE_T
   AC_CHECK_SIZEOF(short)
