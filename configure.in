@@ -149,7 +149,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 	AC_MSG_RESULT($_gcc_mingw)
 	CFLAGS=$_gcc_cflags_save;
 	if test x"$_gcc_mingw" = xyes ; then
-	  CFLAGS="$CFLAGS -mms-bitfields  -Wno-pointer-sign"
+	  CFLAGS="$CFLAGS -mms-bitfields -Wl,--enable-runtime-pseudo-reloc"
 	fi
 
 	if test x$opt_dmalloc_mode = xyes; then
