@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdio.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
