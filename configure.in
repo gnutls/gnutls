@@ -175,7 +175,7 @@ AC_CHECK_HEADERS(errno.h sys/time.h time.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_FUNCS(umask vasprintf isascii memmove memmem mmap gmtime_r,,)
+AC_CHECK_FUNCS(umask vasprintf isascii mmap gmtime_r,,)
 AC_FUNC_ALLOCA
 
 AC_MSG_RESULT([***
@@ -485,6 +485,22 @@ fi
 
 AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
 AM_CONDITIONAL(ENABLE_INCLUDED_LZO, test "$minilzo_enabled" = "yes")
+
+if test "$minilzo_enabled" = "yes"; then
+  # See libextra/minolzo/README.LZO
+  AC_CHECK_TYPE(ptrdiff_t,long)
+  AC_TYPE_SIZE_T
+  AC_CHECK_SIZEOF(short)
+  AC_CHECK_SIZEOF(int)
+  AC_CHECK_SIZEOF(long)
+  AC_CHECK_SIZEOF(long long)
+  AC_CHECK_SIZEOF(__int64)
+  AC_CHECK_SIZEOF(void *)
+  AC_CHECK_SIZEOF(size_t)
+  AC_CHECK_SIZEOF(ptrdiff_t)
+  AC_C_CONST
+  AC_CHECK_FUNCS(memcmp memcpy memmove memset)
+fi
 
 AC_MSG_RESULT([***
 *** Setting up gnulib compatibility files...
