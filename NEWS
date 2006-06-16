@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.5.0 (unreleased)
 
+** Fixed bug in OpenPGP authentication handshake.
+
 ** Improvements for building under MinGW.
 Provides internal inet_ntop and inet_pton functions and arpa/inet.h
 header.  Calls WSAStartup and WSACleanup in gnutls_global_init and
