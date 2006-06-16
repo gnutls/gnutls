@@ -186,8 +186,11 @@ AC_CHECK_HEADERS(errno.h sys/time.h time.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_FUNCS(umask vasprintf isascii gmtime_r,,)
+AC_CHECK_FUNCS(umask vasprintf isascii gmtime_r fork,,)
 AC_FUNC_ALLOCA
+
+# No fork on MinGW, disable some self-tests until we fix them.
+AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 AC_MSG_RESULT([***
 *** Detecting system's parameters...
