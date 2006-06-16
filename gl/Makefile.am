@@ -86,6 +86,12 @@ libgnu_la_SOURCES += getaddrinfo.h
 # directory contains no libintl.h file) or when the project does not use
 # "gettextize --intl".
 AM_CPPFLAGS += -I$(top_builddir)/intl
+# We also need to link to libintl, if needed.
+if GL_COND_LIBTOOL
+libgnu_la_LIBADD += $(LTLIBINTL)
+else
+libgnu_la_LIBADD += $(LIBINTL)
+endif
 
 ## end   gnulib module gettext
 
