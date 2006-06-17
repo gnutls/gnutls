@@ -21,6 +21,7 @@ EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
 MOSTLYCLEANFILES =
+MOSTLYCLEANDIRS =
 CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
@@ -52,9 +53,7 @@ arpa/inet.h:
 	echo '#include <sys/socket.h>' >$@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += arpa/inet.h arpa/inet.h-t
-
-mostlyclean-local:
-	-rmdir arpa 2>/dev/null
+MOSTLYCLEANDIRS += arpa
 
 ## end   gnulib module arpa_inet
 
@@ -259,9 +258,7 @@ sys/socket.h: socket_.h
 	cp $(srcdir)/socket_.h $@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += sys/socket.h sys/socket.h-t
-
-mostlyclean-local:
-	-rmdir sys 2>/dev/null
+MOSTLYCLEANDIRS += sys
 
 ## end   gnulib module sys_socket
 
@@ -283,5 +280,7 @@ libgnu_la_SOURCES += dummy.c
 
 ## end   gnulib module dummy
 
+mostlyclean-local:
+	-test -n "$(MOSTLYCLEANDIRS)" && rmdir $(MOSTLYCLEANDIRS) 2>/dev/null
 
 # Makefile.am ends here
