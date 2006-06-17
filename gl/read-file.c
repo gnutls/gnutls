@@ -36,9 +36,15 @@
 char *
 fread_file (FILE * stream, size_t * length)
 {
-  char *buf = NULL;
-  size_t alloc = 0;
+  char *buf = malloc (1);
+  size_t alloc = 1;
   size_t size = 0;
+
+  if (!buf)
+    return NULL;
+
+  if (ferror (stream))
+    return NULL;
 
   while (!feof (stream))
     {
@@ -76,8 +82,7 @@ fread_file (FILE * stream, size_t * length)
 	}
     }
 
-  if (buf)
-    buf[size] = '\0';
+  buf[size] = '\0';
 
   *length = size;
 
@@ -89,6 +94,7 @@ internal_read_file (const char *filename, size_t * length, const char *mode)
 {
   FILE *stream = fopen (filename, mode);
   char *out;
+  int save_errno;
   int rc;
 
   if (!stream)
@@ -96,20 +102,15 @@ internal_read_file (const char *filename, size_t * length, const char *mode)
 
   out = fread_file (stream, length);
 
-  if (out)
-    rc = fclose (stream);
-  else
-    {
-      /* On failure, preserve the original errno value. */
-      int save_errno = errno;
-      rc = fclose (stream);
-      errno = save_errno;
-    }
+  save_errno = errno;
 
-  if (rc != 0)
+  if (fclose (stream) != 0)
     {
-      int save_errno = errno;
-      free (out);
+      if (out)
+	{
+	  save_errno = errno;
+	  free (out);
+	}
       errno = save_errno;
       return NULL;
     }

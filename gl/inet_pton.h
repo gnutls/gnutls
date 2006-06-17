@@ -1,6 +1,5 @@
-/* size_max.h -- declare SIZE_MAX through system headers
-   Copyright (C) 2005-2006 Free Software Foundation, Inc.
-   Written by Simon Josefsson.
+/* Convert internet address from text to binary format.
+   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -16,16 +15,12 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifndef GNULIB_SIZE_MAX_H
-#define GNULIB_SIZE_MAX_H
+#include <sys/types.h>
+#include <sys/socket.h>
+#ifdef HAVE_ARPA_INET_H
+# include <arpa/inet.h>
+#endif
 
-/* Get SIZE_MAX declaration on systems like Solaris 7/8/9.  */
-# include <limits.h>
-/* Get SIZE_MAX declaration on systems like glibc 2.  */
-# if HAVE_STDINT_H
-#  include <stdint.h>
-# endif
-/* On systems where these include files don't define it, SIZE_MAX is defined
-   in config.h.  */
-
-#endif /* GNULIB_SIZE_MAX_H */
+#if !HAVE_DECL_INET_PTON
+extern int inet_pton (int af, const char *restrict src, void *restrict dst);
+#endif

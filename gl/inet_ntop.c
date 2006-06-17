@@ -37,7 +37,7 @@
 #endif
 
 /* Specification.  */
-#include <arpa/inet.h>
+#include "inet_ntop.h"
 
 #include <stdio.h>
 #include <string.h>

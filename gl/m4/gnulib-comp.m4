@@ -49,6 +49,8 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETPASS
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.14.5])
+  gl_INET_NTOP
+  gl_INET_PTON
   gl_MD2
   gl_FUNC_MEMMEM
   gl_FUNC_MEMMOVE
@@ -78,7 +80,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/arcfour.h
   lib/arctwo.c
   lib/arctwo.h
-  lib/arpa_inet_.h
   lib/asnprintf.c
   lib/des.c
   lib/des.h
@@ -101,7 +102,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/hmac-sha1.c
   lib/hmac.h
   lib/inet_ntop.c
+  lib/inet_ntop.h
   lib/inet_pton.c
+  lib/inet_pton.h
   lib/md2.c
   lib/md2.h
   lib/md4.c
@@ -146,6 +149,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/codeset.m4
   m4/des.m4
   m4/eoverflow.m4
+  m4/full-header-path.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4
   m4/gc-des.m4
@@ -169,6 +173,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/hmac-md5.m4
   m4/hmac-sha1.m4
   m4/iconv.m4
+  m4/inet_ntop.m4
+  m4/inet_pton.m4
   m4/intdiv0.m4
   m4/intmax.m4
   m4/intmax_t.m4

@@ -37,7 +37,7 @@
 #endif
 
 /* Specification.  */
-#include <arpa/inet.h>
+#include "inet_pton.h"
 
 #include <ctype.h>
 #include <string.h>
