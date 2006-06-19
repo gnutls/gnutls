@@ -18,8 +18,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 # USA
 
-INCLUDES = -I$(top_srcdir)/gl -I$(top_srcdir)/libextra			\
-	-I$(top_srcdir)/lib/minitasn1 -I$(top_srcdir)/libextra/openpgp/	\
+INCLUDES = \
+	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
+	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/minitasn1		\
+	-I$(top_srcdir)/libextra/openpgp/				\
 	-I$(top_srcdir)/libextra/opencdk -I$(top_srcdir)/lib		\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
 	$(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
