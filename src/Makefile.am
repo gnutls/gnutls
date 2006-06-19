@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
 #
 # This file is part of GNUTLS.
 #
@@ -22,7 +22,7 @@ EXTRA_DIST = README README.srptool gnutls-http-serv params.pem
 SUBDIRS = srp x509 openpgp cfg
 
 INCLUDES = -I../includes -I$(top_srcdir)/includes \
-	-I$(top_srcdir)/gl -I$(srcdir)/cfg
+	-I$(top_srcdir)/gl -I$(top_builddir)/gl -I$(srcdir)/cfg
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug certtool
 if ENABLE_SRP
