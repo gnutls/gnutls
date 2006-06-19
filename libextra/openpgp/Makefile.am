@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos
 #
@@ -20,8 +20,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl		\
-	-I$(top_srcdir)/lib -I$(top_srcdir)/includes -I../../includes	\
+AM_CPPFLAGS = -I$(top_srcdir)/gl -I$(top_builddir)/gl	\
+	-I$(top_srcdir)/crypto -I$(top_srcdir)/lib	\
+	-I$(top_srcdir)/includes -I../../includes	\
 	-I$(top_srcdir)/libextra/opencdk
 
 if ENABLE_MINITASN1
