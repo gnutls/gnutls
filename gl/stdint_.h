@@ -30,7 +30,7 @@
 #include <limits.h>
 
 /* Get those types that are already defined in other system include files.  */
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) && (__FreeBSD__ >= 3) && (__FreeBSD__ <= 4)
 # include <sys/inttypes.h>
 #endif
 #if defined(__OpenBSD__)
@@ -77,6 +77,7 @@ typedef signed char    int8_t;
 #endif
 #if !@HAVE_UINT8_T@
 typedef unsigned char  uint8_t;
+# define _UINT8_T /* avoid collision with Solaris 2.5.1 <pthread.h> */
 #endif
 
 #if !@HAVE_INT16_T@
@@ -91,6 +92,7 @@ typedef int            int32_t;
 #endif
 #if !@HAVE_UINT32_T@
 typedef unsigned int   uint32_t;
+# define _UINT32_T /* avoid collision with Solaris 2.5.1 <pthread.h> */
 #endif
 
 #if @HAVE_INT64_T@
@@ -115,6 +117,7 @@ typedef unsigned long      uint64_t;
 #  define _STDINT_H_HAVE_UINT64 1
 # elif @HAVE_LONG_LONG_64BIT@
 typedef unsigned long long uint64_t;
+#  define _UINT64_T /* avoid collision with Solaris 2.5.1 <pthread.h> */
 #  define _STDINT_H_HAVE_UINT64 1
 # elif defined _MSC_VER
 typedef unsigned __int64   uint64_t;

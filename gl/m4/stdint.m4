@@ -1,4 +1,4 @@
-# stdint.m4 serial 6
+# stdint.m4 serial 7
 dnl Copyright (C) 2001-2002, 2004-2006 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -14,7 +14,7 @@ AC_DEFUN([gl_STDINT_H],
   if test $gl_cv_header_stdint_h = yes; then
     ac_cv_header_stdint_h=yes; dnl Hack for gl_FULL_HEADER_PATH.
     gl_FULL_HEADER_PATH([stdint.h])
-    FULL_PATH_STDINT_H=$gl_cv_full_path_stdint_h
+    FULL_PATH_STDINT_H='<'$gl_cv_full_path_stdint_h'>'
     AC_SUBST([FULL_PATH_STDINT_H])
     HAVE_STDINT_H=1
   else
@@ -27,7 +27,7 @@ AC_DEFUN([gl_STDINT_H],
   if test $gl_cv_header_inttypes_h = yes; then
     ac_cv_header_inttypes_h=yes; dnl Hack for gl_FULL_HEADER_PATH.
     gl_FULL_HEADER_PATH([inttypes.h])
-    FULL_PATH_INTTYPES_H=$gl_cv_full_path_inttypes_h
+    FULL_PATH_INTTYPES_H='<'$gl_cv_full_path_inttypes_h'>'
     AC_SUBST([FULL_PATH_INTTYPES_H])
     HAVE_INTTYPES_H=1
   else
@@ -87,7 +87,7 @@ typedef int array [2 * (POW63 != 0 && POW64 == 0) - 1];
   dnl created in the build directory.
   other_includes='
 /* Get those types that are already defined in other system include files.  */
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) && (__FreeBSD__ >= 3) && (__FreeBSD__ <= 4)
 # include <sys/inttypes.h>
 #endif
 #if defined(__OpenBSD__)
