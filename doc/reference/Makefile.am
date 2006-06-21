@@ -25,7 +25,9 @@ SCANGOBJ_OPTIONS=
 
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED" 
-SCAN_OPTIONS=--source-dir ../../includes/gnutls \
+SCAN_OPTIONS=\
+	--source-dir ../../includes/gnutls \
+	--source-dir $(top_builddir)/includes/gnutls \
 	--source-dir ../../lib/x509 \
 	--source-dir ../../libextra
 
