@@ -13,6 +13,7 @@ Current list:
   with something else since libgcrypt uses it internally.)
 * Allow adding multiple subject alternative names (certtool + x509 library).
 * Verify added CRLs (is it really needed?)
+* Add support for generating empty CRLs
 * Document the format for the supported DN attributes.
 * Audit the code
 - Support OpenSSL encrypted PKCS#1 RSA keys, for compatibility (new
