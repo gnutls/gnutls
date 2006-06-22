@@ -1,5 +1,5 @@
 /* Get address information (partial implementation).
-   Copyright (C) 1997, 2001, 2002, 2004, 2005 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006 Free Software Foundation, Inc.
    Contributed by Simon Josefsson <simon@josefsson.org>.
 
    This program is free software; you can redistribute it and/or modify
@@ -57,6 +57,61 @@ validate_family (int family)
      return false;
 }
 
+#ifdef _WIN32
+typedef int WSAAPI (*getaddrinfo_func) (const char FAR* nodename,
+					const char FAR* servname,
+					const struct addrinfo FAR* hints,
+					struct addrinfo FAR** res);
+typedef void (*freeaddrinfo_func) (struct addrinfo* ai);
+
+typedef int WSAAPI (*getnameinfo_func) (const struct sockaddr FAR* sa,
+					socklen_t salen,
+					char FAR* host,
+					DWORD hostlen,
+					char FAR* serv,
+					DWORD servlen,
+					int flags);
+
+static getaddrinfo_func getaddrinfo_ptr = NULL;
+static freeaddrinfo_func freeaddrinfo_ptr = NULL;
+static getnameinfo_func getnameinfo_ptr = NULL;
+
+int use_win32_p (void)
+{
+  static int done = 0;
+  HMODULE h;
+
+  if (done)
+    return 0;
+
+  done = 1;
+
+  h = GetModuleHandle ("ws2_32.dll");
+
+  if (h)
+    {
+      getaddrinfo_ptr = GetProcAddress (h, "getaddrinfo");
+      freeaddrinfo_ptr = GetProcAddress (h, "freeaddrinfo");
+      getnameinfo_ptr = GetProcAddress (h, "getnameinfo");
+    }
+
+  /* Make sure we don't mix getaddrinfo and freeaddrinfo
+     implementations. */
+  if ((getaddrinfo_ptr && !freeaddrinfo_ptr) ||
+      (!getaddrinfo_ptr && freeaddrinfo_ptr))
+    {
+      getaddrinfo_ptr = NULL;
+      freeaddrinfo_ptr = NULL;
+    }
+
+  /* If either one is missing, something is odd. */
+  if (!getaddrinfo_ptr || !getnameinfo_ptr)
+    return 0;
+
+  return 1;
+}
+#endif
+
 /* Translate name of a service location and/or a service name to set of
    socket addresses. */
 int
@@ -81,6 +136,11 @@ getaddrinfo (const char *restrict nodename,
     struct addrinfo addrinfo;
     struct sockaddr_in sockaddr_in;
   };
+#endif
+
+#ifdef _WIN32
+  if (use_win32_p ())
+    return getaddrinfo_ptr (nodename, servname, hints, res);
 #endif
 
   if (hints && (hints->ai_flags & ~AI_CANONNAME))
@@ -225,6 +285,11 @@ getaddrinfo (const char *restrict nodename,
 void
 freeaddrinfo (struct addrinfo *ai)
 {
+#ifdef _WIN32
+  if (use_win32_p ())
+    return freeaddrinfo_ptr (ai);
+#endif
+
   while (ai)
     {
       struct addrinfo *cur;
@@ -235,4 +300,18 @@ freeaddrinfo (struct addrinfo *ai)
       if (cur->ai_canonname) free (cur->ai_canonname);
       free (cur);
     }
+}
+
+int getnameinfo(const struct sockaddr *restrict sa, socklen_t salen,
+		char *restrict node, socklen_t nodelen,
+		char *restrict service, socklen_t servicelen,
+		int flags)
+{
+#ifdef _WIN32
+  if (use_win32_p ())
+    return getnameinfo_ptr (sa, salen, node, nodelen,
+			    service, servicelen, flags);
+#endif
+
+  return EAI_FAIL;
 }
