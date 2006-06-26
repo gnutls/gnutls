@@ -280,7 +280,13 @@ libgnu_la_SOURCES += dummy.c
 
 ## end   gnulib module dummy
 
+
 mostlyclean-local:
-	-test -n "$(MOSTLYCLEANDIRS)" && rmdir $(MOSTLYCLEANDIRS) 2>/dev/null
+	@test -z "$(MOSTLYCLEANDIRS)" || \
+	  for dir in $(MOSTLYCLEANDIRS); do \
+	    if test -d $$dir; then \
+	      echo "rmdir $$dir"; rmdir $$dir; \
+	    fi; \
+	  done
 
 # Makefile.am ends here

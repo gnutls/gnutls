@@ -33,11 +33,13 @@
 #if defined(__FreeBSD__) && (__FreeBSD__ >= 3) && (__FreeBSD__ <= 4)
 # include <sys/inttypes.h>
 #endif
-#if defined(__OpenBSD__)
+#if defined(__OpenBSD__) || defined(__sgi)
   /* In OpenBSD 3.8, <sys/types.h> includes <machine/types.h>, which defines
      int{8,16,32,64}_t, uint{8,16,32,64}_t and __BIT_TYPES_DEFINED__.
      <inttypes.h> includes <machine/types.h> and also defines intptr_t and
      uintptr_t.  */
+  /* IRIX 6.5 has <inttypes.h>, and <sys/types.h> defines some of these
+     types as well.  */
 # include <sys/types.h>
 # if @HAVE_INTTYPES_H@
 #  include @FULL_PATH_INTTYPES_H@
@@ -924,21 +926,46 @@ typedef uint32_t uintmax_t;
 #if !defined(__cplusplus) || defined(__STDC_CONSTANT_MACROS)
 
 /* 7.18.4.1. Macros for minimum-width integer constants */
+/* According to ISO C 99 Technical Corrigendum 1 */
 
 #undef INT8_C
 #undef UINT8_C
 #define INT8_C(x) x
-#define UINT8_C(x) x##U
+#if @HAVE_UINT8_T@
+# if @BITSIZEOF_UINT8_T@ < @BITSIZEOF_UNSIGNED_INT@
+#  define UINT8_C(x) x
+# else
+#  define UINT8_C(x) x##U
+# endif
+#else
+# define UINT8_C(x) x
+#endif
 
 #undef INT16_C
 #undef UINT16_C
 #define INT16_C(x) x
-#define UINT16_C(x) x##U
+#if @HAVE_UINT16_T@
+# if @BITSIZEOF_UINT16_T@ < @BITSIZEOF_UNSIGNED_INT@
+#  define UINT16_C(x) x
+# else
+#  define UINT16_C(x) x##U
+# endif
+#else
+# define UINT16_C(x) x
+#endif
 
 #undef INT32_C
 #undef UINT32_C
 #define INT32_C(x) x
-#define UINT32_C(x) x##U
+#if @HAVE_UINT32_T@
+# if @BITSIZEOF_UINT32_T@ < @BITSIZEOF_UNSIGNED_INT@
+#  define UINT32_C(x) x
+# else
+#  define UINT32_C(x) x##U
+# endif
+#else
+# define UINT32_C(x) x
+#endif
 
 #undef INT64_C
 #undef UINT64_C
