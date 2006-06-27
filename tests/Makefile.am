@@ -32,19 +32,18 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 # For pkcs8.
 EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 
+ctests = simple openssl gc set_pkcs12_cred certder
+if HAVE_FORK
+ctests +=  anonself pskself dhepskself tlsia resume
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la @LTLIBREADLINE@
-
-ctests = simple$(EXEEXT) openssl$(EXEEXT) gc$(EXEEXT)	\
-	set_pkcs12_cred$(EXEEXT) certder$(EXEEXT)
-if HAVE_FORK
-ctests +=  anonself$(EXEEXT) pskself$(EXEEXT) dhepskself$(EXEEXT) \
-	tlsia resume$(EXEEXT)
 endif
-TESTS = pkcs12_neon pkcs8 $(ctests)
+
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon pkcs8
+
+TESTS = pkcs12_neon pkcs8 $(ctests)
 
 VALGRIND=valgrind --tool=memcheck --leak-check=full --leak-resolution=high \
 	--show-reachable=yes --num-callers=50
