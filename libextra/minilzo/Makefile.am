@@ -20,6 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+AM_CPPFLAGS = -DLZO_HAVE_CONFIG_H
 LDADD = libminilzo.la
 
 noinst_LTLIBRARIES = libminilzo.la
