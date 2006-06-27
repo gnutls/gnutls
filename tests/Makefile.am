@@ -36,9 +36,11 @@ openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la @LTLIBREADLINE@
 
-ctests = simple openssl gc set_pkcs12_cred certder
+ctests = simple$(EXEEXT) openssl$(EXEEXT) gc$(EXEEXT)	\
+	set_pkcs12_cred$(EXEEXT) certder$(EXEEXT)
 if HAVE_FORK
-ctests +=  anonself pskself dhepskself tlsia resume
+ctests +=  anonself$(EXEEXT) pskself$(EXEEXT) dhepskself$(EXEEXT) \
+	tlsia resume$(EXEEXT)
 endif
 TESTS = pkcs12_neon pkcs8 $(ctests)
 check_PROGRAMS = $(ctests)

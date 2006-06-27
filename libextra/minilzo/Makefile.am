@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2005 Free Software Foundation
+# Copyright (C) 2005, 2006 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -28,5 +28,6 @@ libminilzo_la_SOURCES = lzoconf.h lzodefs.h minilzo.c minilzo.h
 
 EXTRA_DIST = README.LZO
 
-TESTS = testmini
-check_PROGRAMS = testmini
+ctests = testmini$(EXEEXT)
+TESTS = $(ctests)
+check_PROGRAMS = $(ctests)
