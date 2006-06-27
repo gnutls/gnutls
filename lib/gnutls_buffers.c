@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -76,6 +76,8 @@ RET (int err)
 #ifdef IO_DEBUG
 # include <io_debug.h>
 #endif
+
+#define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
@@ -265,7 +267,8 @@ _gnutls_read (gnutls_session_t session, void *iptr,
     {
 
       if (session->internals._gnutls_pull_func == NULL)
-	i = recv ((int) fd, &ptr[sizeOfPtr - left], left, flags);
+	i = recv (GNUTLS_POINTER_TO_INT(fd), &ptr[sizeOfPtr - left],
+		  left, flags);
       else
 	i = session->internals._gnutls_pull_func (fd,
 						  &ptr[sizeOfPtr -
@@ -701,7 +704,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
     {
 
       if (session->internals._gnutls_push_func == NULL)
-	i = send ((int) fd, &ptr[n - left], left, 0);
+	i = send (GNUTLS_POINTER_TO_INT(fd), &ptr[n - left], left, 0);
       else
 	i = session->internals._gnutls_push_func (fd, &ptr[n - left], left);
 
