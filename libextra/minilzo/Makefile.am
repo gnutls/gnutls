@@ -21,6 +21,7 @@
 # 02110-1301, USA.
 
 AM_CPPFLAGS = -DLZO_HAVE_CONFIG_H
+AM_LDFLAGS = -no-install
 LDADD = libminilzo.la
 
 noinst_LTLIBRARIES = libminilzo.la
