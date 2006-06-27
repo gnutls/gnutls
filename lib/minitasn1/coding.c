@@ -158,7 +158,7 @@ asn1_octet_der (const unsigned char *str, int str_len,
 {
   int len_len;
 
-  if (der == NULL || str_len <= 0)
+  if (der == NULL || str_len < 0)
     return;
   asn1_length_der (str_len, der, &len_len);
   memcpy (der + len_len, str, str_len);
