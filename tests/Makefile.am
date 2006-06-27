@@ -33,9 +33,9 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 
 ctests = simple openssl gc set_pkcs12_cred certder
+openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 if HAVE_FORK
 ctests +=  anonself pskself dhepskself tlsia resume
-openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la @LTLIBREADLINE@
 endif
