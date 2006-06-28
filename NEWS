@@ -20,6 +20,11 @@ No other source changes were necessary, so the examples should
 continue to be possible to use stand-alone without any autoconf or
 gnulib stuff.
 
+** Added C++ header "gnutlsxx.h" and library "libgnutlsxx".
+You may unconditionally disable it with --disable-cxx.  See
+includes/gnutls/gnutlsxx.h and lib/gnutlsxx.cpp for the
+implementation.
+
 ** API and ABI modifications:
 No changes since last version.
 
