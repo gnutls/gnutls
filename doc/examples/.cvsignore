@@ -6,6 +6,7 @@ ex-alert.lo
 ex-cert-select
 ex-client-resume
 ex-client-srp
+ex-client-tlsia
 ex-client1
 ex-client2
 ex-crq
