@@ -6,7 +6,7 @@ dnl with or without modifications, as long as this notice is preserved.
 
 AC_DEFUN([gl_GETADDRINFO],
 [
-  AC_MSG_NOTICE([checking how to do getaddrinfo])
+  AC_MSG_NOTICE([checking how to do getaddrinfo, freeaddrinfo and getnameinfo])
 
   AC_SEARCH_LIBS(getaddrinfo, [nsl socket])
   AC_CHECK_FUNCS(getaddrinfo,, [

@@ -26,6 +26,11 @@
 
 /* Get wchar_t, WCHAR_MIN, WCHAR_MAX.  */
 #include <stddef.h>
+/* BSD/OS 4.2 defines WCHAR_MIN, WCHAR_MAX in <wchar.h>, not <stddef.h>.  */
+#if !(defined(WCHAR_MIN) && defined(WCHAR_MAX)) && @HAVE_WCHAR_H@
+# include <wchar.h>
+#endif
+
 /* Get LONG_MIN, LONG_MAX, ULONG_MAX.  */
 #include <limits.h>
 
@@ -33,11 +38,12 @@
 #if defined(__FreeBSD__) && (__FreeBSD__ >= 3) && (__FreeBSD__ <= 4)
 # include <sys/inttypes.h>
 #endif
-#if defined(__OpenBSD__) || defined(__sgi)
+#if defined(__OpenBSD__) || defined(__bsdi__) || defined(__sgi)
   /* In OpenBSD 3.8, <sys/types.h> includes <machine/types.h>, which defines
      int{8,16,32,64}_t, uint{8,16,32,64}_t and __BIT_TYPES_DEFINED__.
      <inttypes.h> includes <machine/types.h> and also defines intptr_t and
      uintptr_t.  */
+  /* BSD/OS 4.2 is similar, but doesn't have <inttypes.h> */
   /* IRIX 6.5 has <inttypes.h>, and <sys/types.h> defines some of these
      types as well.  */
 # include <sys/types.h>
@@ -66,7 +72,17 @@
 #endif
 #if @HAVE_STDINT_H@
   /* Other systems may have an incomplete <stdint.h>.  */
-# include @FULL_PATH_STDINT_H@
+  /* On some versions of IRIX, the SGI C compiler comes with an <stdint.h>,
+     but
+       - in c99 mode, <inttypes.h> includes <stdint.h>,
+       - in c89 mode, <stdint.h> spews warnings and defines nothing.
+         <inttypes.h> defines only a subset of the types and macros that
+         <stdint.h> would define in c99 mode.
+     So we rely only on <inttypes.h> (included above).  It means that in
+     c89 mode, we shadow the contents of warning-spewing <stdint.h>.  */
+# if !(defined(__sgi) && @HAVE_INTTYPES_H@ && !defined(__c99))
+#  include @FULL_PATH_STDINT_H@
+# endif
 #endif
 
 /* 7.18.1.1. Exact-width integer types */
@@ -245,6 +261,8 @@ typedef unsigned long uintptr_t;
    public header files. */
 
 #if !@HAVE_INTMAX_T@
+/* Remove possible redundant definition from gnulib's config.h first.  */
+# undef intmax_t
 # ifdef _STDINT_H_HAVE_INT64
 typedef int64_t  intmax_t;
 # else
@@ -252,6 +270,8 @@ typedef int32_t  intmax_t;
 # endif
 #endif
 #if !@HAVE_UINTMAX_T@
+/* Remove possible redundant definition from gnulib's config.h first.  */
+# undef uintmax_t
 # ifdef _STDINT_H_HAVE_UINT64
 typedef uint64_t uintmax_t;
 # else

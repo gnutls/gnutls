@@ -1,4 +1,4 @@
-# stdint.m4 serial 8
+# stdint.m4 serial 11
 dnl Copyright (C) 2001-2002, 2004-2006 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -9,6 +9,15 @@ dnl Test whether <stdint.h> is supported or must be substituted.
 
 AC_DEFUN([gl_STDINT_H],
 [
+  dnl Check for <wchar.h>.
+  AC_CHECK_HEADERS_ONCE([wchar.h])
+  if test $ac_cv_header_wchar_h = yes; then
+    HAVE_WCHAR_H=1
+  else
+    HAVE_WCHAR_H=0
+  fi
+  AC_SUBST([HAVE_WCHAR_H])
+
   dnl Check for <stdint.h> that doesn't clash with <sys/types.h>.
   gl_HEADER_STDINT_H
   if test $gl_cv_header_stdint_h = yes; then
@@ -90,7 +99,7 @@ typedef int array [2 * (POW63 != 0 && POW64 == 0) - 1];
 #if defined(__FreeBSD__) && (__FreeBSD__ >= 3) && (__FreeBSD__ <= 4)
 # include <sys/inttypes.h>
 #endif
-#if defined(__OpenBSD__) || defined(__sgi)
+#if defined(__OpenBSD__) || defined(__bsdi__) || defined(__sgi)
 # include <sys/types.h>
 # if HAVE_INTTYPES_H
 #  include FULL_PATH_INTTYPES_H
@@ -105,7 +114,7 @@ typedef int array [2 * (POW63 != 0 && POW64 == 0) - 1];
 #if (defined(__hpux) || defined(_AIX)) && HAVE_INTTYPES_H
 # include FULL_PATH_INTTYPES_H
 #endif
-#if HAVE_STDINT_H
+#if HAVE_STDINT_H && !(defined(__sgi) && HAVE_INTTYPES_H && !defined(__c99))
 # include FULL_PATH_STDINT_H
 #endif
 '
@@ -279,7 +288,7 @@ msvc compiler
     gl_STDINT_MISSING_BOUNDS2([SIG_ATOMIC_MIN SIG_ATOMIC_MAX],
       [#include <signal.h>])
     dnl Don't bother defining WCHAR_MIN and WCHAR_MAX, since they should
-    dnl already be defined in <stddef.h>.
+    dnl already be defined in <stddef.h> or <wchar.h>.
     dnl For wint_t we need <wchar.h>.
     dnl Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included
     dnl before <wchar.h>.
@@ -605,10 +614,19 @@ AC_DEFUN([gl_STDINT_BITSIZEOF],
          eval gl_cv_bitsizeof_${gltype}=\$result
         ])
       eval result=\$gl_cv_bitsizeof_${gltype}
-      GLTYPE=`echo "$gltype" | tr 'abcdefghijklmnopqrstuvwxyz ' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`
-      AC_DEFINE_UNQUOTED([BITSIZEOF_${GLTYPE}], [$result])
-      eval BITSIZEOF_${GLTYPE}=\$result
+    else
+      dnl Use a nonempty default, because some compilers, such as IRIX 5 cc,
+      dnl do a syntax check even on unused #if conditions and give an error
+      dnl on valid C code like this:
+      dnl   #if 0
+      dnl   # if  > 32
+      dnl   # endif
+      dnl   #endif
+      result=0
     fi
+    GLTYPE=`echo "$gltype" | tr 'abcdefghijklmnopqrstuvwxyz ' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`
+    AC_DEFINE_UNQUOTED([BITSIZEOF_${GLTYPE}], [$result])
+    eval BITSIZEOF_${GLTYPE}=\$result
   done
   AC_FOREACH([gltype], [$1],
     [AC_SUBST([BITSIZEOF_]translit(gltype,[abcdefghijklmnopqrstuvwxyz ],[ABCDEFGHIJKLMNOPQRSTUVWXYZ_]))])
