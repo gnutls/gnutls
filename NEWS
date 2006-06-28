@@ -10,8 +10,10 @@ See the end for copying conditions.
 ** Improvements for building under MinGW.
 Provides internal inet_ntop and inet_pton functions and arpa/inet.h
 header.  Calls WSAStartup and WSACleanup in gnutls_global_init and
-gnutls_global_deinit, respectively.  Builds the library with
--mms-bitfields -Wl,--enable-runtime-pseudo-reloc.
+gnutls_global_deinit, respectively.  Loads getaddrinfo and getnameinfo
+at run-time from ws2_32.dll, and falls back on a simple replacement if
+it is not available.  Builds the library with -mms-bitfields
+-Wl,--enable-runtime-pseudo-reloc.
 
 ** The examples now include config.h and link to gnulib.
 No other source changes were necessary, so the examples should
