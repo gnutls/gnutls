@@ -1,4 +1,4 @@
-# getaddrinfo.m4 serial 9
+# getaddrinfo.m4 serial 10
 dnl Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,

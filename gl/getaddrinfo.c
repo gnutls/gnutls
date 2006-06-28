@@ -369,7 +369,7 @@ int getnameinfo(const struct sockaddr *restrict sa, socklen_t salen,
 	}
     }
 
-  if (service && servicelen > 0 && flags & NI_NUMERICHOST)
+  if (service && servicelen > 0 && flags & NI_NUMERICSERV)
     switch (sa->sa_family)
       {
 #if HAVE_IPV4
