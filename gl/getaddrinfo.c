@@ -165,6 +165,7 @@ getaddrinfo (const char *restrict nodename,
 	  port = strtoul (servname, &c, 10);
 	  if (*c)
 	    return EAI_NONAME;
+	  port = htons (port);
 	}
       else
 	port = se->s_port;
