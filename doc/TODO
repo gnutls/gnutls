@@ -4,6 +4,8 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
+* Cleanup pkix.asn and remove unused (by the certificate api) structures.
+  That way memory used will be reduced.
 * Improve or rewrite libtasn1 to make it easier to maintain.
 * Make and use by gnutls a flexible interface for algorithms such
   as public key, symmetric, PRNGs to allow for plugins that use other
