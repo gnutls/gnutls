@@ -763,7 +763,7 @@ main (int argc, char **argv)
     }
 #endif
 
-#ifdef USE_OPENPGP
+#ifdef ENABLE_OPENPGP
   if (pgp_keyring != NULL)
     {
       ret =
