@@ -641,7 +641,12 @@ gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
 	      gnutls_assert ();
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
-	  openpgp_pk_to_gnutls_cert (&res->cert_list[n][0], pk);
+	  rc = openpgp_pk_to_gnutls_cert (&res->cert_list[n][0], pk);
+	  if (rc < 0)
+	    {
+	      gnutls_assert ();
+	      return rc;
+	    }
 	  i++;
 	}
     }
