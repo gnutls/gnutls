@@ -1457,7 +1457,7 @@ an applicant of a certificate service.  It usually contains a private
 key, a distinguished name and secondary data such as a challenge
 password. @acronym{GnuTLS} supports the requests defined in
 @acronym{PKCS} #10 @mybibcite{RFC2986}. Other certificate request's format
-such as PKIX's @mybibcite{RFC2511} are not currently supported.
+such as PKIX's @mybibcite{RFC4211} are not currently supported.
 
 In @acronym{GnuTLS} the @acronym{PKCS} #10 structures are handled
 using the @code{gnutls_x509_crq_t} type.  An example of a certificate

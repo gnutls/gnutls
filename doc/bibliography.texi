@@ -24,9 +24,9 @@ Match 2006, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4346.txt
 Jon Callas, Lutz Donnerhacke, Hal Finney and Rodney Thayer,
 "OpenPGP Message Format", November 1998, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2440.txt}.
 
-@mybibitem{RFC2511} 
-Michael Myers, Carlisle Adams, Dave Solo and David Kemp,
-"Internet X.509 Certificate Request Message Format", March 1999, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2511.txt}.
+@mybibitem{RFC4211} 
+J. Schaad,
+"Internet X.509 Public Key Infrastructure Certificate Request Message Format (CRMF)", September 2005, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4211.txt}.
 
 @mybibitem{RFC2817} 
 Rohit Khare and Scott Lawrence, "Upgrading to TLS Within HTTP/1.1",
