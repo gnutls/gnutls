@@ -38,14 +38,20 @@
 #define _(String) gettext (String)
 #define N_(String) String
 
+#include "inet_ntop.h"
+#include "snprintf.h"
 #include "strdup.h"
 
-#ifdef _WIN32
-typedef void WSAAPI (*freeaddrinfo_func) (struct addrinfo*);
-typedef int WSAAPI (*getaddrinfo_func) (const char*, const char*,
+#if defined _WIN32 || defined __WIN32__
+# define WIN32_NATIVE
+#endif
+
+#ifdef WIN32_NATIVE
+typedef int (WSAAPI *getaddrinfo_func) (const char*, const char*,
 					const struct addrinfo*,
 					struct addrinfo**);
-typedef int WSAAPI (*getnameinfo_func) (const struct sockaddr*,
+typedef void (WSAAPI *freeaddrinfo_func) (struct addrinfo*);
+typedef int (WSAAPI *getnameinfo_func) (const struct sockaddr*,
 					socklen_t, char*, DWORD,
 					char*, DWORD, int);
 
@@ -53,7 +59,8 @@ static getaddrinfo_func getaddrinfo_ptr = NULL;
 static freeaddrinfo_func freeaddrinfo_ptr = NULL;
 static getnameinfo_func getnameinfo_ptr = NULL;
 
-int use_win32_p (void)
+static int
+use_win32_p (void)
 {
   static int done = 0;
   HMODULE h;
@@ -67,9 +74,9 @@ int use_win32_p (void)
 
   if (h)
     {
-      getaddrinfo_ptr = GetProcAddress (h, "getaddrinfo");
-      freeaddrinfo_ptr = GetProcAddress (h, "freeaddrinfo");
-      getnameinfo_ptr = GetProcAddress (h, "getnameinfo");
+      getaddrinfo_ptr = (getaddrinfo_func) GetProcAddress (h, "getaddrinfo");
+      freeaddrinfo_ptr = (freeaddrinfo_func) GetProcAddress (h, "freeaddrinfo");
+      getnameinfo_ptr = (getnameinfo_func) GetProcAddress (h, "getnameinfo");
     }
 
   /* If either is missing, something is odd. */
@@ -128,7 +135,7 @@ getaddrinfo (const char *restrict nodename,
   };
 #endif
 
-#ifdef _WIN32
+#ifdef WIN32_NATIVE
   if (use_win32_p ())
     return getaddrinfo_ptr (nodename, servname, hints, res);
 #endif
@@ -162,8 +169,10 @@ getaddrinfo (const char *restrict nodename,
       if (!se)
 	{
 	  char *c;
+	  if (!(*servname >= '0' && *servname <= '9'))
+	    return EAI_NONAME;
 	  port = strtoul (servname, &c, 10);
-	  if (*c)
+	  if (*c || port > 0xffff)
 	    return EAI_NONAME;
 	  port = htons (port);
 	}
@@ -285,9 +294,12 @@ getaddrinfo (const char *restrict nodename,
 void
 freeaddrinfo (struct addrinfo *ai)
 {
-#ifdef _WIN32
+#ifdef WIN32_NATIVE
   if (use_win32_p ())
-    return freeaddrinfo_ptr (ai);
+    {
+      freeaddrinfo_ptr (ai);
+      return;
+    }
 #endif
 
   while (ai)
@@ -307,7 +319,7 @@ int getnameinfo(const struct sockaddr *restrict sa, socklen_t salen,
 		char *restrict service, socklen_t servicelen,
 		int flags)
 {
-#if _WIN32
+#ifdef WIN32_NATIVE
   if (use_win32_p ())
     return getnameinfo_ptr (sa, salen, node, nodelen,
 			    service, servicelen, flags);
@@ -347,7 +359,6 @@ int getnameinfo(const struct sockaddr *restrict sa, socklen_t salen,
 #if HAVE_IPV4
 	case AF_INET:
 	  if (!inet_ntop (AF_INET,
-			  (const void *)
 			  &(((const struct sockaddr_in *) sa)->sin_addr),
 			  node, nodelen))
 	    return EAI_SYSTEM;
@@ -357,7 +368,6 @@ int getnameinfo(const struct sockaddr *restrict sa, socklen_t salen,
 #if HAVE_IPV6
 	case AF_INET6:
 	  if (!inet_ntop (AF_INET6,
-			  (const void *)
 			  &(((const struct sockaddr_in6 *) sa)->sin6_addr),
 			  node, nodelen))
 	    return EAI_SYSTEM;

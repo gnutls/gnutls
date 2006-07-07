@@ -142,6 +142,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/xsize.h
+  m4/absolute-header.m4
   m4/alloca.m4
   m4/arcfour.m4
   m4/arctwo.m4
@@ -149,7 +150,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/codeset.m4
   m4/des.m4
   m4/eoverflow.m4
-  m4/full-header-path.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4
   m4/gc-des.m4
