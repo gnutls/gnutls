@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006 Free Software Foundation
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
@@ -262,7 +262,7 @@ load_keys (void)
 
       unload_file (data);
 
-      data = load_file (x509_keyfile);
+      data = load_file (pgp_keyfile);
       if (data.data == NULL)
 	{
 	  fprintf (stderr, "*** Error loading PGP key file.\n");
