@@ -44,17 +44,22 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi			\
 
 # Internal manual.
 gnutls_TEXINFOS += internals.texi internals.eps internals.png		\
-	certificate-user-use-case.dia client-server-use-case.dia	\
-	objects.dia certificate-user-use-case.eps			\
-	certificate-user-use-case.pdf certificate-user-use-case.png	\
-	client-server-use-case.eps client-server-use-case.pdf		\
-	client-server-use-case.png extensions_st.dia extensions_st.eps	\
-	extensions_st.pdf extensions_st.png handshake-sequence.dia	\
-	handshake-sequence.eps handshake-sequence.pdf			\
-	handshake-sequence.png handshake-state.dia handshake-state.eps	\
-	handshake-state.pdf handshake-state.png mod_auth_st.dia		\
-	mod_auth_st.eps mod_auth_st.pdf mod_auth_st.png objects.eps	\
-	objects.pdf objects.png
+	arch/certificate-user-use-case.dia				\
+	arch/client-server-use-case.dia arch/objects.dia		\
+	arch/certificate-user-use-case.eps				\
+	arch/certificate-user-use-case.pdf				\
+	arch/certificate-user-use-case.png				\
+	arch/client-server-use-case.eps					\
+	arch/client-server-use-case.pdf					\
+	arch/client-server-use-case.png arch/extensions_st.dia		\
+	arch/extensions_st.eps arch/extensions_st.pdf			\
+	arch/extensions_st.png arch/handshake-sequence.dia		\
+	arch/handshake-sequence.eps arch/handshake-sequence.pdf		\
+	arch/handshake-sequence.png arch/handshake-state.dia		\
+	arch/handshake-state.eps arch/handshake-state.pdf		\
+	arch/handshake-state.png arch/mod_auth_st.dia			\
+	arch/mod_auth_st.eps arch/mod_auth_st.pdf arch/mod_auth_st.png	\
+	arch/objects.eps arch/objects.pdf arch/objects.png
 
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
