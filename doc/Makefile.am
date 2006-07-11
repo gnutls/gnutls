@@ -30,7 +30,7 @@ info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi			\
 	error_codes.texi bibliography.texi gnutls-api.texi		\
 	gnutls-extra-api.texi ia-api.texi x509-api.texi pgp-api.texi	\
-	my-bib-macros.texi internals.texi examples/ex-client1.c		\
+	my-bib-macros.texi examples/ex-client1.c		\
 	examples/ex-client2.c examples/ex-session-info.c		\
 	examples/ex-verify.c examples/ex-cert-select.c			\
 	examples/ex-client-resume.c examples/ex-client-srp.c		\
@@ -39,8 +39,22 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi			\
 	examples/ex-serv-anon.c examples/ex-serv-pgp.c			\
 	examples/ex-serv-srp.c examples/ex-alert.c			\
 	examples/ex-x509-info.c examples/ex-crq.c examples/ex-pkcs12.c	\
-	internals.eps internals.png layers.eps layers.png pgp1.eps	\
+	layers.eps layers.png pgp1.eps	\
 	pgp1.png x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png
+
+# Internal manual.
+gnutls_TEXINFOS += internals.texi internals.eps internals.png		\
+	certificate-user-use-case.dia client-server-use-case.dia	\
+	objects.dia certificate-user-use-case.eps			\
+	certificate-user-use-case.pdf certificate-user-use-case.png	\
+	client-server-use-case.eps client-server-use-case.pdf		\
+	client-server-use-case.png extensions_st.dia extensions_st.eps	\
+	extensions_st.pdf extensions_st.png handshake-sequence.dia	\
+	handshake-sequence.eps handshake-sequence.pdf			\
+	handshake-sequence.png handshake-state.dia handshake-state.eps	\
+	handshake-state.pdf handshake-state.png mod_auth_st.dia		\
+	mod_auth_st.eps mod_auth_st.pdf mod_auth_st.png objects.eps	\
+	objects.pdf objects.png
 
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
