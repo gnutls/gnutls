@@ -1,5 +1,5 @@
 /* inet_ntop.c -- convert IPv4 and IPv6 addresses from binary to text form
-   Copyright (c) 2005  Free Software Foundation, Inc.
+   Copyright (c) 2005, 2006  Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -56,9 +56,7 @@
  */
 typedef int verify_int_size[2 * sizeof (int) - 7];
 
-#if HAVE_IPV4
 static const char *inet_ntop4 (const unsigned char *src, char *dst, socklen_t size);
-#endif
 #if HAVE_IPV6
 static const char *inet_ntop6 (const unsigned char *src, char *dst, socklen_t size);
 #endif
@@ -95,8 +93,6 @@ inet_ntop (int af, const void *restrict src,
   /* NOTREACHED */
 }
 
-#if HAVE_IPV4
-
 /* const char *
  * inet_ntop4(src, dst, size)
  *	format an IPv4 address
@@ -126,8 +122,6 @@ inet_ntop4 (const unsigned char *src, char *dst, socklen_t size)
 
   return strcpy (dst, tmp);
 }
-
-#endif
 
 #if HAVE_IPV6
 
