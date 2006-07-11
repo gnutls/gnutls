@@ -75,6 +75,7 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/GNUmakefile
   build-aux/config.rpath
   build-aux/maint.mk
+  doc/fdl.texi
   lib/alloca_.h
   lib/arcfour.c
   lib/arcfour.h
@@ -196,7 +197,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/memxor.m4
   m4/minmax.m4
   m4/nls.m4
-  m4/onceonly_2_57.m4
   m4/po.m4
   m4/printf-posix.m4
   m4/progtest.m4
