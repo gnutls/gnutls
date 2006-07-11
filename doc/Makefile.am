@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos
 #
@@ -40,9 +40,12 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi			\
 	examples/ex-serv-srp.c examples/ex-alert.c			\
 	examples/ex-x509-info.c examples/ex-crq.c examples/ex-pkcs12.c	\
 	internals.eps internals.png layers.eps layers.png pgp1.eps	\
-	pgp1.png x509-1.eps x509-1.png gnutls-logo.eps
+	pgp1.png x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png
 
-AM_MAKEINFOHTMLFLAGS = --no-split
+AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
+TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
+AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
+	--no-split
 
 ../lib/gnutls-api.texi:
 	cd ../lib && make gnutls-api.texi
