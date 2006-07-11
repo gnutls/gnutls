@@ -42,7 +42,10 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi			\
 	internals.eps internals.png layers.eps layers.png pgp1.eps	\
 	pgp1.png x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png
 
-AM_MAKEINFOHTMLFLAGS = --no-split
+AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
+TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
+AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
+	--no-split
 
 ../lib/gnutls-api.texi:
 	cd ../lib && make gnutls-api.texi
