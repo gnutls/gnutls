@@ -6,3 +6,5 @@ alloca.h
 libgnu.la
 *.lo
 sys
+arpa
+stdint.h
