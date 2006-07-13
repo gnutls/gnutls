@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2005 Free Software Foundation
  * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  *
  * This file is part of GNUTLS-EXTRA.
@@ -373,9 +373,7 @@ SSL_connect (SSL * ssl)
 				    ssl->ctx->method->protocol_priority);
     }
 
-  do
-    err = gnutls_handshake (ssl->gnutls_state);
-  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+  err = gnutls_handshake (ssl->gnutls_state);
   ssl->last_error = err;
 
   if (err < 0)
@@ -432,9 +430,7 @@ SSL_accept (SSL * ssl)
 
   /* FIXME: dh params, do we want client cert? */
 
-  do
-    err = gnutls_handshake (ssl->gnutls_state);
-  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
+  err = gnutls_handshake (ssl->gnutls_state);
   ssl->last_error = err;
 
   if (err < 0)
