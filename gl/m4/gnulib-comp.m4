@@ -74,8 +74,10 @@ AC_DEFUN([gl_INIT],
 AC_DEFUN([gl_FILE_LIST], [
   build-aux/GNUmakefile
   build-aux/config.rpath
+  build-aux/gendocs.sh
   build-aux/maint.mk
   doc/fdl.texi
+  doc/gendocs_template
   lib/alloca_.h
   lib/arcfour.c
   lib/arcfour.h

@@ -15,15 +15,15 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=. --lgpl --libtool --macro-prefix=gl arpa_inet fdl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 getaddrinfo getline getpass gettext inet_ntop inet_pton maintainer-makefile memmem memmove minmax read-file readline snprintf socklen stdint
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=. --lgpl --libtool --macro-prefix=gl arpa_inet fdl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 gendocs getaddrinfo getline getpass gettext inet_ntop inet_pton maintainer-makefile memmem memmove minmax read-file readline snprintf socklen stdint
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
-gl_MODULES([arpa_inet fdl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 getaddrinfo getline getpass gettext inet_ntop inet_pton maintainer-makefile memmem memmove minmax read-file readline snprintf socklen stdint])
+gl_MODULES([arpa_inet fdl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 gendocs getaddrinfo getline getpass gettext inet_ntop inet_pton maintainer-makefile memmem memmove minmax read-file readline snprintf socklen stdint])
 gl_AVOID([])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
-gl_TESTS_BASE([gl/tests])
 gl_DOC_BASE([doc])
+gl_TESTS_BASE([gl/tests])
 gl_LIB([libgnu])
 gl_LGPL
 gl_LIBTOOL

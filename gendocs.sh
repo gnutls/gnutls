@@ -3,7 +3,7 @@
 #   mentioned in maintain.texi.  See the help message below for usage details.
 # $Id$
 # 
-# Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@
 # Original author: Mohit Agarwal.
 # Send bug reports and any other correspondence to bug-texinfo@gnu.org.
 
-prog="`basename \"$0\"`"
+prog=`basename "$0"`
 srcdir=`pwd`
 
-scripturl="http://savannah.gnu.org/cgi-bin/viewcvs/texinfo/texinfo/util/gendocs.sh"
-templateurl="http://savannah.gnu.org/cgi-bin/viewcvs/texinfo/texinfo/util/gendocs_template"
+scripturl="http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/texinfo/texinfo/util/gendocs.sh"
+templateurl="http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/texinfo/texinfo/util/gendocs_template"
 
 : ${MAKEINFO="makeinfo"}
 : ${TEXI2DVI="texi2dvi -t @finalout"}
@@ -41,10 +41,10 @@ unset CDPATH
 
 rcs_revision='$Revision$'
 rcs_version=`set - $rcs_revision; echo $2`
-program=`echo $0 | sed -e 's!.*/!!'`
+program=`echo "$0" | sed -e 's!.*/!!'`
 version="gendocs.sh $rcs_version
 
-Copyright (C) 2005 Free Software Foundation, Inc.
+Copyright (C) 2006 Free Software Foundation, Inc.
 There is NO warranty.  You may redistribute this software
 under the terms of the GNU General Public License.
 For more information about these matters, see the files named COPYING."
@@ -94,7 +94,7 @@ Email bug reports or enhancement requests to bug-texinfo@gnu.org.
 
 calcsize()
 {
-  size="`ls -ksl $1 | awk '{print $1}'`"
+  size=`ls -ksl $1 | awk '{print $1}'`
   echo $size
 }
 
@@ -127,11 +127,11 @@ while test $# -gt 0; do
   shift
 done
 
-if test -s $srcdir/$PACKAGE.texinfo; then
+if test -s "$srcdir/$PACKAGE.texinfo"; then
   srcfile=$srcdir/$PACKAGE.texinfo
-elif test -s $srcdir/$PACKAGE.texi; then
+elif test -s "$srcdir/$PACKAGE.texi"; then
   srcfile=$srcdir/$PACKAGE.texi
-elif test -s $srcdir/$PACKAGE.txi; then
+elif test -s "$srcdir/$PACKAGE.txi"; then
   srcfile=$srcdir/$PACKAGE.txi
 else
   echo "$0: cannot find .texinfo or .texi or .txi for $PACKAGE in $srcdir." >&2
@@ -146,63 +146,63 @@ fi
 
 echo Generating output formats for $srcfile
 
-cmd="${MAKEINFO} -o $PACKAGE.info $srcfile"
+cmd="${MAKEINFO} -o $PACKAGE.info \"$srcfile\""
 echo "Generating info files... ($cmd)"
-eval $cmd
+eval "$cmd"
 mkdir -p $outdir/
 tar czf $outdir/$PACKAGE.info.tar.gz $PACKAGE.info*
-info_tgz_size="`calcsize $outdir/$PACKAGE.info.tar.gz`"
+info_tgz_size=`calcsize $outdir/$PACKAGE.info.tar.gz`
 # do not mv the info files, there's no point in having them available
 # separately on the web.
 
-cmd="${TEXI2DVI} $srcfile"
+cmd="${TEXI2DVI} \"$srcfile\""
 echo "Generating dvi ... ($cmd)"
-eval $cmd
+eval "$cmd"
 
 # now, before we compress dvi:
 echo Generating postscript...
 ${DVIPS} $PACKAGE -o
 gzip -f -9 $PACKAGE.ps
-ps_gz_size="`calcsize $PACKAGE.ps.gz`"
+ps_gz_size=`calcsize $PACKAGE.ps.gz`
 mv $PACKAGE.ps.gz $outdir/
 
 # compress/finish dvi:
 gzip -f -9 $PACKAGE.dvi
-dvi_gz_size="`calcsize $PACKAGE.dvi.gz`"
+dvi_gz_size=`calcsize $PACKAGE.dvi.gz`
 mv $PACKAGE.dvi.gz $outdir/
 
-cmd="${TEXI2DVI} --pdf $srcfile"
+cmd="${TEXI2DVI} --pdf \"$srcfile\""
 echo "Generating pdf ... ($cmd)"
-eval $cmd
-pdf_size="`calcsize $PACKAGE.pdf`"
+eval "$cmd"
+pdf_size=`calcsize $PACKAGE.pdf`
 mv $PACKAGE.pdf $outdir/
 
-cmd="${MAKEINFO} -o $PACKAGE.txt --no-split --no-headers $srcfile"
+cmd="${MAKEINFO} -o $PACKAGE.txt --no-split --no-headers \"$srcfile\""
 echo "Generating ASCII... ($cmd)"
-eval $cmd
-ascii_size="`calcsize $PACKAGE.txt`"
+eval "$cmd"
+ascii_size=`calcsize $PACKAGE.txt`
 gzip -f -9 -c $PACKAGE.txt >$outdir/$PACKAGE.txt.gz
-ascii_gz_size="`calcsize $outdir/$PACKAGE.txt.gz`"
+ascii_gz_size=`calcsize $outdir/$PACKAGE.txt.gz`
 mv $PACKAGE.txt $outdir/
 
-cmd="${MAKEINFO} --no-split --html -o $PACKAGE.html $html $srcfile"
+cmd="${MAKEINFO} --no-split --html -o $PACKAGE.html $html \"$srcfile\""
 echo "Generating monolithic html... ($cmd)"
 rm -rf $PACKAGE.html  # in case a directory is left over
-eval $cmd
-html_mono_size="`calcsize $PACKAGE.html`"
+eval "$cmd"
+html_mono_size=`calcsize $PACKAGE.html`
 gzip -f -9 -c $PACKAGE.html >$outdir/$PACKAGE.html.gz
-html_mono_gz_size="`calcsize $outdir/$PACKAGE.html.gz`"
+html_mono_gz_size=`calcsize $outdir/$PACKAGE.html.gz`
 mv $PACKAGE.html $outdir/
 
-cmd="${MAKEINFO} --html -o $PACKAGE.html $html $srcfile"
+cmd="${MAKEINFO} --html -o $PACKAGE.html $html \"$srcfile\""
 echo "Generating html by node... ($cmd)"
-eval $cmd
+eval "$cmd"
 split_html_dir=$PACKAGE.html
 (
   cd ${split_html_dir} || exit 1
   tar -czf ../$outdir/${PACKAGE}.html_node.tar.gz -- *.html
 )
-html_node_tgz_size="`calcsize $outdir/${PACKAGE}.html_node.tar.gz`"
+html_node_tgz_size=`calcsize $outdir/${PACKAGE}.html_node.tar.gz`
 rm -f $outdir/html_node/*.html
 mkdir -p $outdir/html_node/
 mv ${split_html_dir}/*.html $outdir/html_node/
@@ -211,26 +211,26 @@ rmdir ${split_html_dir}
 echo Making .tar.gz for sources...
 srcfiles=`ls *.texinfo *.texi *.txi *.eps 2>/dev/null`
 tar cvzfh $outdir/$PACKAGE.texi.tar.gz $srcfiles
-texi_tgz_size="`calcsize $outdir/$PACKAGE.texi.tar.gz`"
+texi_tgz_size=`calcsize $outdir/$PACKAGE.texi.tar.gz`
 
 if test -n "$docbook"; then
-  cmd="${MAKEINFO} -o - --docbook $srcfile > ${srcdir}/$PACKAGE-db.xml"
+  cmd="${MAKEINFO} -o - --docbook \"$srcfile\" > ${srcdir}/$PACKAGE-db.xml"
   echo "Generating docbook XML... $(cmd)"
-  eval $cmd
-  docbook_xml_size="`calcsize $PACKAGE-db.xml`"
+  eval "$cmd"
+  docbook_xml_size=`calcsize $PACKAGE-db.xml`
   gzip -f -9 -c $PACKAGE-db.xml >$outdir/$PACKAGE-db.xml.gz
-  docbook_xml_gz_size="`calcsize $outdir/$PACKAGE-db.xml.gz`"
+  docbook_xml_gz_size=`calcsize $outdir/$PACKAGE-db.xml.gz`
   mv $PACKAGE-db.xml $outdir/
 
   cmd="${DOCBOOK2HTML} -o $split_html_db_dir ${outdir}/$PACKAGE-db.xml"
   echo "Generating docbook HTML... ($cmd)"
-  eval $cmd
+  eval "$cmd"
   split_html_db_dir=html_node_db
   (
     cd ${split_html_db_dir} || exit 1
     tar -czf ../$outdir/${PACKAGE}.html_node_db.tar.gz -- *.html
   )
-  html_node_db_tgz_size="`calcsize $outdir/${PACKAGE}.html_node_db.tar.gz`"
+  html_node_db_tgz_size=`calcsize $outdir/${PACKAGE}.html_node_db.tar.gz`
   rm -f $outdir/html_node_db/*.html
   mkdir -p $outdir/html_node_db
   mv ${split_html_db_dir}/*.html $outdir/html_node_db/
@@ -238,26 +238,26 @@ if test -n "$docbook"; then
 
   cmd="${DOCBOOK2TXT} ${outdir}/$PACKAGE-db.xml"
   echo "Generating docbook ASCII... ($cmd)"
-  eval $cmd
-  docbook_ascii_size="`calcsize $PACKAGE-db.txt`"
+  eval "$cmd"
+  docbook_ascii_size=`calcsize $PACKAGE-db.txt`
   mv $PACKAGE-db.txt $outdir/
 
   cmd="${DOCBOOK2PS} ${outdir}/$PACKAGE-db.xml"
   echo "Generating docbook PS... $(cmd)"
-  eval $cmd
+  eval "$cmd"
   gzip -f -9 -c $PACKAGE-db.ps >$outdir/$PACKAGE-db.ps.gz
-  docbook_ps_gz_size="`calcsize $outdir/$PACKAGE-db.ps.gz`"
+  docbook_ps_gz_size=`calcsize $outdir/$PACKAGE-db.ps.gz`
   mv $PACKAGE-db.ps $outdir/
 
   cmd="${DOCBOOK2PDF} ${outdir}/$PACKAGE-db.xml"
   echo "Generating docbook PDF... ($cmd)"
-  eval $cmd
-  docbook_pdf_size="`calcsize $PACKAGE-db.pdf`"
+  eval "$cmd"
+  docbook_pdf_size=`calcsize $PACKAGE-db.pdf`
   mv $PACKAGE-db.pdf $outdir/
 fi
 
 echo Writing index file...
-curdate="`date '+%B %d, %Y'`"
+curdate=`date '+%B %d, %Y'`
 sed \
    -e "s!%%TITLE%%!$MANUAL_TITLE!g" \
    -e "s!%%DATE%%!$curdate!g" \
