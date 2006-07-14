@@ -22,8 +22,8 @@ gl_MODULES([fdl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 
 gl_AVOID([])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
-gl_TESTS_BASE([gl/tests])
 gl_DOC_BASE([doc])
+gl_TESTS_BASE([gl/tests])
 gl_LIB([libgnu])
 gl_LGPL
 gl_LIBTOOL
