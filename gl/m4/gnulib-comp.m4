@@ -21,6 +21,7 @@ AC_DEFUN([gl_EARLY],
 [
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
+  AC_REQUIRE([gl_LOCK])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -48,13 +49,14 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.14.5])
+  AM_GNU_GETTEXT_VERSION([0.15])
   gl_INET_NTOP
   gl_INET_PTON
   gl_MD2
   gl_FUNC_MEMMEM
   gl_FUNC_MEMMOVE
   gl_MINMAX
+  gl_HEADER_NETINET_IN
   gl_FUNC_READ_FILE
   gl_FUNC_READLINE
   gl_C_RESTRICT
@@ -181,14 +183,14 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/intdiv0.m4
   m4/intmax.m4
   m4/intmax_t.m4
+  m4/inttypes-h.m4
   m4/inttypes-pri.m4
-  m4/inttypes.m4
   m4/inttypes_h.m4
-  m4/isc-posix.m4
   m4/lcmessage.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/lock.m4
   m4/longdouble.m4
   m4/longlong.m4
   m4/md2.m4
@@ -198,7 +200,9 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/memmove.m4
   m4/memxor.m4
   m4/minmax.m4
+  m4/netinet_in_h.m4
   m4/nls.m4
+  m4/onceonly_2_57.m4
   m4/po.m4
   m4/printf-posix.m4
   m4/progtest.m4
@@ -220,6 +224,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/uintmax_t.m4
   m4/ulonglong.m4
   m4/vasnprintf.m4
+  m4/visibility.m4
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4

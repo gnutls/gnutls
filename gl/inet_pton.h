@@ -17,9 +17,8 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#ifdef HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#endif
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #if !HAVE_DECL_INET_PTON
 extern int inet_pton (int af, const char *restrict src, void *restrict dst);
