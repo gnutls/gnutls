@@ -39,6 +39,7 @@ ctests +=  anonself pskself dhepskself tlsia resume
 tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la @LTLIBREADLINE@
 endif
+gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon pkcs8
