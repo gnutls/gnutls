@@ -35,6 +35,7 @@ EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la @LTLIBREADLINE@
+gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
 ctests = simple anonself pskself openssl gc dhepskself set_pkcs12_cred	\
 	tlsia resume certder
