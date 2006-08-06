@@ -25,6 +25,9 @@ You may unconditionally disable it with --disable-cxx.  See
 includes/gnutls/gnutlsxx.h and lib/gnutlsxx.cpp for the
 implementation.
 
+** Made command line tool '--version' behave according to GNU Standards.
+This enables 'make distcheck' to succeed.
+
 ** OpenCDK updated to 0.5.9 to fix some problems with OpenPGP support.
 
 ** Make --without-included-libtasn1 work.
