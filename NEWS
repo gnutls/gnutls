@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** OpenCDK updated to 0.5.9 to fix some problems with OpenPGP support.
 
+** Make --without-included-libtasn1 work.
+Reported by Daniel Black <dragonheart@gentoo.org>.
+
 ** API and ABI modifications:
 No changes since last version.
 
