@@ -25,6 +25,8 @@ You may unconditionally disable it with --disable-cxx.  See
 includes/gnutls/gnutlsxx.h and lib/gnutlsxx.cpp for the
 implementation.
 
+** OpenCDK updated to 0.5.9 to fix some problems with OpenPGP support.
+
 ** API and ABI modifications:
 No changes since last version.
 
