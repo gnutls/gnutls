@@ -358,7 +358,7 @@ AM_CONDITIONAL(ENABLE_OPENSSL, test "$ac_enable_openssl" = "yes")
 AC_ARG_WITH(included-libtasn1,
 	AS_HELP_STRING([--with-included-libtasn1],
 		[use the included libtasn1]),
-	minitasn1_enabled=yes,
+	minitasn1_enabled=$withval,
 	minitasn1_enabled=no)
 
 if test x$minitasn1_enabled = xno; then
