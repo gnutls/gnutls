@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * kbnode.c -  keyblock node utility functions
- *        Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+ *        Copyright (C) 1998, 1999, 2000, 2001, 2006 Free Software Foundation, Inc.
  *        Copyright (C) 2002, 2003 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -438,7 +438,7 @@ cdk_kbnode_write_to_mem( cdk_kbnode_t node, byte * buf, size_t * r_nbytes )
         if( !buf ) {
             *r_nbytes = len; /* only return the length of the buffer */
             cdk_stream_close( s );
-            return 0;
+            return CDK_Too_Short;
         }
         if( *r_nbytes < len )
             rc = CDK_Too_Short;
