@@ -8,13 +8,13 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 26 "tls_test.gaa"
+#line 29 "tls_test.gaa"
 	char *rest_args;
-#line 20 "tls_test.gaa"
+#line 22 "tls_test.gaa"
 	int more_info;
-#line 17 "tls_test.gaa"
+#line 19 "tls_test.gaa"
 	int debug;
-#line 14 "tls_test.gaa"
+#line 16 "tls_test.gaa"
 	int pp;
 
 #line 114 "gaa.skel"
