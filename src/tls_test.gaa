@@ -7,6 +7,8 @@
 # include <io.h>
 #endif
 
+void tls_test_version(void);
+
 #}
 
 helpnode "GNU TLS debug client\nUsage: gnutls-cli-debug [options] hostname\n\n"
@@ -20,6 +22,7 @@ option (d, debug) INT "integer" { $debug = $1 } "Enable debugging"
 #int more_info;
 option (v, verbose) { $more_info += 1 } "More verbose output"
 
+option (v, version) { tls_test_version(); exit(0); } "prints the program's version number"
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 

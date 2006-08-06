@@ -334,3 +334,13 @@ gaa_parser (int argc, char **argv)
   verbose = info.more_info;
 
 }
+
+void
+tls_test_version (void)
+{
+  const char *v = gnutls_check_version (NULL);
+
+  printf ("gnutls-cli-debug (GnuTLS) %s\n", LIBGNUTLS_VERSION);
+  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
+    printf ("libgnutls %s\n", v);
+}
