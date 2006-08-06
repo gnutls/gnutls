@@ -790,9 +790,11 @@ gaa_parser (int argc, char **argv)
 void
 cli_version (void)
 {
-  fprintf (stderr, "GNU TLS test client, ");
-  fprintf (stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
-	   gnutls_check_version (NULL));
+  const char *v = gnutls_check_version (NULL);
+
+  printf ("gnutls-cli (GnuTLS) %s\n", LIBGNUTLS_VERSION);
+  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
+    printf ("libgnutls %s\n", v);
 }
 
 

@@ -67,9 +67,11 @@ static int write_key (const char *username, const char *key, int key_size,
 void
 psktool_version (void)
 {
-  fprintf (stderr, "GNU TLS psktool, ");
-  fprintf (stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
-	   gnutls_check_version (NULL));
+  const char *v = gnutls_check_version (NULL);
+
+  printf ("psktool (GnuTLS) %s\n", LIBGNUTLS_VERSION);
+  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
+    printf ("libgnutls %s\n", v);
 }
 
 
