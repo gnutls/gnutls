@@ -390,12 +390,12 @@ fi
 
 AM_CONDITIONAL(ENABLE_INCLUDED_OPENCDK, test "$ac_enable_included_opencdk" = "yes")
 
-ac_enable_openssl=yes
 AC_MSG_CHECKING([whether to disable OpenSSL compatibility layer])
 AC_ARG_ENABLE(openssl-compatibility,
 	AS_HELP_STRING([--disable-openssl-compatibility],
 		[disable the OpenSSL compatibility support]),
-	ac_enable_openssl=no)
+	ac_enable_openssl=$withval,
+	ac_enable_openssl=yes)
 if test x$ac_enable_openssl != xno; then
  AC_MSG_RESULT(no)
 else
@@ -408,7 +408,7 @@ AM_CONDITIONAL(ENABLE_OPENSSL, test "$ac_enable_openssl" = "yes")
 AC_ARG_WITH(included-libtasn1,
 	AS_HELP_STRING([--with-included-libtasn1],
 		[use the included libtasn1]),
-	minitasn1_enabled=yes,
+	minitasn1_enabled=$withval,
 	minitasn1_enabled=no)
 
 if test x$minitasn1_enabled = xno; then
@@ -420,30 +420,24 @@ AM_PATH_LIBTASN1($GNUTLS_LIBTASN1_VERSION,,
 ]]))
 fi
 
-SAVED_LIBS=$LIBS
-
 AC_MSG_CHECKING([whether to use the included minitasn1])
 AC_MSG_RESULT($minitasn1_enabled)
 
-dnl CHECK FOR THE LIBTASN1 LIBRARY or use the included one
-dnl
-
 AM_CONDITIONAL(ENABLE_MINITASN1, test "$minitasn1_enabled" = "yes")
-
 
 dnl Check for libcfg+
 
+SAVED_LIBS=$LIBS
 AC_ARG_WITH(included-libcfg,
 	AS_HELP_STRING([--with-included-libcfg],
 		[use the included libcfg+ (certtool only)]),
-libcfg_enabled=$withval, 
-libcfg_enabled=no
-
+	libcfg_enabled=$withval, 
+	libcfg_enabled=no
 dnl We search for libcfg+ which is used by certtool
 dnl
-AC_CHECK_LIB(cfg+, cfg_get_context,:, 
- libcfg_enabled=yes
-AC_MSG_WARN([[
+	AC_CHECK_LIB(cfg+, cfg_get_context,:,
+                     libcfg_enabled=yes
+                     AC_MSG_WARN([[
 *** 
 *** Libcfg+ was not found. Will use the included one.]])))
 
