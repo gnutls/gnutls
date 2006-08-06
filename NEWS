@@ -15,7 +15,7 @@ at run-time from ws2_32.dll, and falls back on a simple replacement if
 it is not available.  Builds the library with -mms-bitfields
 -Wl,--enable-runtime-pseudo-reloc.
 
-** The examples now include config.h and link to gnulib.
+** The examples now (conditionally) include config.h and link to gnulib.
 No other source changes were necessary, so the examples should
 continue to be possible to use stand-alone without any autoconf or
 gnulib stuff.
