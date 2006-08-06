@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004,2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006 Free Software Foundation
  * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2003 Nikos Mavroyanopoulos
  *
@@ -3217,9 +3217,11 @@ main (int argc, char **argv)
 void
 certtool_version (void)
 {
-  fprintf (stderr, "certtool, ");
-  fprintf (stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
-	   gnutls_check_version (NULL));
+  const char *v = gnutls_check_version (NULL);
+
+  printf ("certtool (GnuTLS) %s\n", LIBGNUTLS_VERSION);
+  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
+    printf ("libgnutls %s\n", v);
 }
 
 void

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Simon Josefsson
+ * Copyright (C) 2004, 2005, 2006 Simon Josefsson
  * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -82,9 +82,11 @@ static int _verify_passwd_int (const char *username, const char *passwd,
 void
 srptool_version (void)
 {
-  fprintf (stderr, "GNU TLS srptool, ");
-  fprintf (stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
-	   gnutls_check_version (NULL));
+  const char *v = gnutls_check_version (NULL);
+
+  printf ("srptool (GnuTLS) %s\n", LIBGNUTLS_VERSION);
+  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
+    printf ("libgnutls %s\n", v);
 }
 
 
