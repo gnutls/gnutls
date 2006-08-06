@@ -1,5 +1,6 @@
 /* opencdk.h - Open Crypto Development Kit (OpenCDK)
- *        Copyright (C) 2001, 2002, 2003 Timo Schulz
+ *        Copyright (C) 2006 Free Software Foundation, Inc.
+ *        Copyright (C) 2001, 2002, 2003, 2005 Timo Schulz
  *
  * This file is part of OpenCDK.
  *
@@ -23,7 +24,7 @@
 
 #include <stdarg.h>
 
-#define OPENCDK_VERSION "0.5.5"
+#define OPENCDK_VERSION "0.5.9"
 
 #ifdef __cplusplus
 extern "C" {
