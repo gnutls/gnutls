@@ -225,7 +225,7 @@ class client_session: public session
         void set_server_name (gnutls_server_name_type_t type,
                           const void *name, size_t name_length);
     
-        bool client_session::get_request_status();
+        bool get_request_status();
 };
 
 
