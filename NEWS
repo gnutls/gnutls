@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 1.5.0 (unreleased)
 
+** Fix a crash (strcmp() on a NULL value) in the certificate verification logic.
+This can happen if you call gnutls_certificate_verify_peers2 and have
+a certain mix of local CA certificates and the peer send special
+certificates, that together trigger certain behaviour.  It is not
+known whether the crash can be triggered without the special local CA
+certificate.  Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
+
 ** Fixed bug in OpenPGP authentication handshake.
 
 ** Improvements for building under MinGW.
