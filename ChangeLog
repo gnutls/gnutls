@@ -1,3 +1,140 @@
+2006-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.4.2.
+
+2006-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c:
+	(_gnutls_x509_oid2mac_algorithm): Don't crash trying to strcmp the
+	NULL OID value in the hash_algorithms array, which happens when the
+	input OID doesn't match our OIDs for SHA1, MD5, MD2 or RIPEMD160.
+	Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
+
+2006-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c:
+	(_gnutls_x509_oid2mac_algorithm): Don't crash trying to strcmp the
+	NULL OID value in the hash_algorithms array, which happens when the
+	input OID doesn't match our OIDs for SHA1, MD5, MD2 or RIPEMD160.
+	Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
+
+2006-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Don't overwrite CFLAGS.
+
+2006-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutlsxx.h: Make it compile.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/tls_test-gaa.c, src/tls_test-gaa.h: Update.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/tls_test.gaa: Use -V for --verbose.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/crypt.c: Fix --version to conform to FSF standards, to fix
+	make distcheck.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix --version to conform to FSF standards, to fix
+	make distcheck.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/tls_test.gaa, src/tls_test.c: Support --version.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/psk.c: Fix --version to conform to FSF standards, to fix make
+	distcheck.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c, src/cli.c: Fix --version to conform to FSF standards,
+	to fix make distcheck.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix --without-included-libtasn1, reported by Daniel
+	Black <dragonheart@gentoo.org>.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4: Update.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/kbnode.c, libextra/opencdk/opencdk.h,
+	libextra/opencdk/stream.h: Update to 0.5.9.
+
+2006-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Fix libgcrypt link failure, reported by Brant
+	Gurganus, tiny patch by Daniel Black <dragonheart@gentoo.org>.
+
+2006-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: add
+
+2006-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Fix libgcrypt link failure, reported by Brant
+	Gurganus, tiny patch by Daniel Black <dragonheart@gentoo.org>.
+
+2006-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, NEWS: Bump version.
+
+2006-07-28  Simon Josefsson <simon@josefsson.org>
+
+	* gendocs.sh, gl/Makefile.am, gl/getaddrinfo.c, gl/getaddrinfo.h,
+	gl/gettext.h, gl/inet_ntop.h, gl/inet_pton.h, gl/printf-args.c,
+	gl/stdint_.h, gl/m4/getline.m4, gl/m4/gettext.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4,
+	gl/m4/inet_pton.m4, gl/m4/inttypes-h.m4, gl/m4/inttypes-pri.m4,
+	gl/m4/inttypes.m4, gl/m4/isc-posix.m4, gl/m4/lib-link.m4,
+	gl/m4/lock.m4, gl/m4/netinet_in_h.m4, gl/m4/nls.m4,
+	gl/m4/onceonly_2_57.m4, gl/m4/po.m4, gl/m4/stdint.m4,
+	gl/m4/visibility.m4: Update.
+
+2006-07-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_int.h: cert_type extension was updated to the IANA
+	assigned value
+
 2006-07-14  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.4.1.
