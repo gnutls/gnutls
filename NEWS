@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 1.4.2 (unreleased)
 
+** Fix a crash (strcmp() on a NULL value) in the certificate verification logic.
+This can happen if you call gnutls_certificate_verify_peers2 and have
+a certain mix of local CA certificates and the peer send special
+certificates, that together trigger certain behaviour.  It is not
+known whether the crash can be triggered without the special local CA
+certificate.  Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
+
 ** OpenCDK updated to 0.5.9 to fix some problems with OpenPGP support.
 
 ** Make --without-included-libtasn1 work.
