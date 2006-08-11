@@ -12,6 +12,8 @@ certificates, that together trigger certain behaviour.  It is not
 known whether the crash can be triggered without the special local CA
 certificate.  Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
 
+** Change SRP and Cert-Type extensions to match IANA registry.
+
 ** Fixed bug in OpenPGP authentication handshake.
 
 ** Improvements for building under MinGW.
