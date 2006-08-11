@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -563,7 +563,7 @@ _gnutls_x509_oid2mac_algorithm (const char *oid)
 {
   gnutls_mac_algorithm_t ret = 0;
 
-  GNUTLS_HASH_LOOP (if (strcmp (oid, p->oid) == 0)
+  GNUTLS_HASH_LOOP (if (p->oid && strcmp (oid, p->oid) == 0)
 		    {
 		    ret = p->id; break;}
   );
