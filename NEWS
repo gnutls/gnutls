@@ -12,6 +12,8 @@ certificates, that together trigger certain behaviour.  It is not
 known whether the crash can be triggered without the special local CA
 certificate.  Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
 
+** Change SRP and Cert-Type extensions to match IANA registry.
+
 ** OpenCDK updated to 0.5.9 to fix some problems with OpenPGP support.
 
 ** Make --without-included-libtasn1 work.
