@@ -55,7 +55,7 @@ DISTCLEANFILES = $(pkgconfig_DATA)
 
 EXTRA_DIST = gnutls-extra-api.texi ia-api.texi
 
-defexecdir = $(libdir)
+defexecdir = $(bindir)
 defexec_DATA = 
 
 lib_LTLIBRARIES = libgnutls-extra.la

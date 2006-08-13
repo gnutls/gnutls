@@ -115,7 +115,7 @@ endif
 
 if HAVE_LD_OUTPUT_DEF
 libgnutls_la_LDFLAGS += -Wl,--output-def,libgnutls-$(LT_CURRENT).def
-defexecdir = $(libdir)
+defexecdir = $(bindir)
 defexec_DATA = libgnutls-$(LT_CURRENT).def
 DISTCLEANFILES += $(defexec_DATA)
 endif
