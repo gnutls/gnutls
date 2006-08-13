@@ -55,6 +55,9 @@ DISTCLEANFILES = $(pkgconfig_DATA)
 
 EXTRA_DIST = gnutls-extra-api.texi ia-api.texi
 
+defexecdir = $(libdir)
+defexec_DATA = 
+
 lib_LTLIBRARIES = libgnutls-extra.la
 
 libgnutls_extra_la_SOURCES = gnutls_extra.c
@@ -78,6 +81,11 @@ libgnutls_openssl_la_LIBADD += ../lib/minitasn1/libminitasn1.la
 else
 libgnutls_openssl_la_LDFLAGS += $(LIBTASN1_LIBS) 
 endif
+
+if HAVE_LD_OUTPUT_DEF
+libgnutls_openssl_la_LDFLAGS += -Wl,--output-def,libgnutls-openssl-$(LT_CURRENT).def
+defexec_DATA += libgnutls-openssl-$(LT_CURRENT).def
+endif
 endif
 
 # OpenPGP
@@ -99,6 +107,13 @@ endif
 libgnutls_extra_la_SOURCES += gnutls_ia.c
 
 # Rest
+
+if HAVE_LD_OUTPUT_DEF
+libgnutls_extra_la_LDFLAGS += -Wl,--output-def,libgnutls-extra-$(LT_CURRENT).def
+defexec_DATA += libgnutls-extra-$(LT_CURRENT).def
+endif
+
+DISTCLEANFILES += $(defexec_DATA)
 
 libgnutls_extra_la_LDFLAGS += \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \

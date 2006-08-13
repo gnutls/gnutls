@@ -153,6 +153,14 @@ if test $ac_cv_c_compiler_gnu != no; then
 	  LDFLAGS=$_gcc_ldflags_save;
 	fi
 
+	AC_MSG_CHECKING([if gcc/ld supports -Wl,--output-def])
+	_gcc_ldflags_save=$LDFLAGS
+	LDFLAGS="-Wl,--output-def,foo.def"
+	AC_LINK_IFELSE(AC_LANG_PROGRAM([]),output_def=yes,output_def=no)
+	AC_MSG_RESULT($output_def)
+	LDFLAGS="$_gcc_ldflags_save"
+        AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" != "no")
+
 	if test x$opt_dmalloc_mode = xyes; then
 	  AC_CHECK_LIB(dmalloc, main)
 	  AC_DEFINE(USE_DMALLOC, 1, [enable the use of dmalloc])

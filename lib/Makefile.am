@@ -113,6 +113,13 @@ else
 libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS) 
 endif
 
+if HAVE_LD_OUTPUT_DEF
+libgnutls_la_LDFLAGS += -Wl,--output-def,libgnutls-$(LT_CURRENT).def
+defexecdir = $(libdir)
+defexec_DATA = libgnutls-$(LT_CURRENT).def
+DISTCLEANFILES += $(defexec_DATA)
+endif
+
 # C++ library
 
 if ENABLE_CXX
