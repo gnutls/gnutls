@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006 Free Software Foundation
  * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  *
  * This file is part of GNUTLS-EXTRA.
@@ -280,14 +280,14 @@ SSL_get_error (SSL * ssl, int ret)
 int
 SSL_set_fd (SSL * ssl, int fd)
 {
-  gnutls_transport_set_ptr (ssl->gnutls_state, (gnutls_transport_ptr_t) fd);
+  gnutls_transport_set_ptr (ssl->gnutls_state, GNUTLS_INT_TO_POINTER (fd));
   return 1;
 }
 
 int
 SSL_set_rfd (SSL * ssl, int fd)
 {
-  ssl->rfd = (gnutls_transport_ptr_t) fd;
+  ssl->rfd = GNUTLS_INT_TO_POINTER (fd);
 
   if (ssl->wfd != (gnutls_transport_ptr_t) - 1)
     gnutls_transport_set_ptr2 (ssl->gnutls_state, ssl->rfd, ssl->wfd);
@@ -298,7 +298,7 @@ SSL_set_rfd (SSL * ssl, int fd)
 int
 SSL_set_wfd (SSL * ssl, int fd)
 {
-  ssl->wfd = (gnutls_transport_ptr_t) fd;
+  ssl->wfd = GNUTLS_INT_TO_POINTER (fd);
 
   if (ssl->rfd != (gnutls_transport_ptr_t) - 1)
     gnutls_transport_set_ptr2 (ssl->gnutls_state, ssl->rfd, ssl->wfd);
@@ -877,7 +877,7 @@ X509_free (const X509 * cert)
 void
 BIO_get_fd (gnutls_session_t gnutls_state, int *fd)
 {
-  *fd = (int) gnutls_transport_get_ptr (gnutls_state);
+  *fd = GNUTLS_POINTER_TO_INT (gnutls_transport_get_ptr (gnutls_state));
 }
 
 BIO *
@@ -889,7 +889,7 @@ BIO_new_socket (int sock, int close_flag)
   if (!bio)
     return NULL;
 
-  bio->fd = (gnutls_transport_ptr_t) sock;
+  bio->fd = GNUTLS_INT_TO_POINTER (sock);
 
   return bio;
 }
