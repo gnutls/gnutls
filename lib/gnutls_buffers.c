@@ -77,8 +77,6 @@ RET (int err)
 # include <io_debug.h>
 #endif
 
-#define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
-
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
