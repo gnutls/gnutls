@@ -31,6 +31,10 @@
 #include <string.h>
 #include <gnutls/openssl.h>
 
+/* See lib/gnutls_int.h. */
+#define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
+#define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))
+
 /* WARNING: Error functions aren't currently thread-safe */
 
 static int last_error = 0;
