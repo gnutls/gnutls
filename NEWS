@@ -26,7 +26,8 @@ header.  Calls WSAStartup and WSACleanup in gnutls_global_init and
 gnutls_global_deinit, respectively.  Loads getaddrinfo and getnameinfo
 at run-time from ws2_32.dll, and falls back on a simple replacement if
 it is not available.  Builds the library with -mms-bitfields
--Wl,--enable-runtime-pseudo-reloc.
+-Wl,--enable-runtime-pseudo-reloc.  Links with --output-def, to
+create *.def files, which are installed.
 
 ** The examples now (conditionally) include config.h and link to gnulib.
 No other source changes were necessary, so the examples should
