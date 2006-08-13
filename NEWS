@@ -5,17 +5,6 @@ See the end for copying conditions.
 
 * Version 1.5.0 (unreleased)
 
-** Fix a crash (strcmp() on a NULL value) in the certificate verification logic.
-This can happen if you call gnutls_certificate_verify_peers2 and have
-a certain mix of local CA certificates and the peer send special
-certificates, that together trigger certain behaviour.  It is not
-known at this point whether the crash can be triggered without the
-special local CA certificate, and thus turn this into a remote crash
-of clients that verify server certificates when they talk to a server
-with the special server certificate.  See GNUTLS-SA-2006-2 on
-http://www.gnu.org/software/gnutls/security.html for more up to date
-information.  Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
-
 ** Change SRP and Cert-Type extensions to match IANA registry.
 
 ** Fixed bug in OpenPGP authentication handshake.
@@ -46,6 +35,11 @@ This enables 'make distcheck' to succeed.
 
 ** Make --without-included-libtasn1 work.
 Reported by Daniel Black <dragonheart@gentoo.org>.
+
+** Fix a crash (strcmp() on a NULL value) in the certificate verification logic.
+See http://www.gnu.org/software/gnutls/security.html regardging
+GNUTLS-SA-2006-2 for more up to date information.  Reported by
+satyakumar <satyam_kkd@hyd.hellosoft.com>.
 
 ** API and ABI modifications:
 No changes since last version.
