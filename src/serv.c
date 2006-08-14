@@ -37,6 +37,10 @@
 #include <fcntl.h>
 #include <list.h>
 
+#if defined _WIN32 || defined __WIN32__
+#define select _win_select
+#endif
+
 #include "getaddrinfo.h"
 
 /* konqueror cannot handle sending the page in multiple
