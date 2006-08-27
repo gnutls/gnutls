@@ -463,7 +463,7 @@ gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 {
   int result;
 
-  if (crt == NULL || issuer == NULL)
+  if (crt == NULL || issuer == NULL || issuer_key == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
