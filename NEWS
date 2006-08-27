@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.5.1 (unreleased)
 
+** Fix certtool bug that caused the private key to not be loaded when
+generating a certificate with --load-request, which in turn triggered
+another unrelated bug in gnutls_x509_crt_sign2 (also fixed).  Reported
+by Sascha Ziemann <sascha.ziemann@secunet.com>.
+
 ** gnutls-cli and gnutls-serv works on Windows.
 The problem was the select() call that doesn't work on file
 descriptors (stdin) on Windows.  We borrowed some code from plibc to
