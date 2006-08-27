@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.5.1 (unreleased)
 
+** Fix building of examples on FreeBSD by including netinet/in.h.
+Reported by Roman Bogorodskiy <novel@FreeBSD.org>.
+
 ** Fix certtool bug that caused the private key to not be loaded when
 generating a certificate with --load-request, which in turn triggered
 another unrelated bug in gnutls_x509_crt_sign2 (also fixed).  Reported
