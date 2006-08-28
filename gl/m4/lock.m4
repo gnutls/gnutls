@@ -1,5 +1,5 @@
-# lock.m4 serial 2 (gettext-0.15)
-dnl Copyright (C) 2005 Free Software Foundation, Inc.
+# lock.m4 serial 4 (gettext-0.15.1)
+dnl Copyright (C) 2005-2006 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -19,12 +19,12 @@ dnl symbols, typically LIBTHREAD="" whereas LIBMULTITHREAD="-lpthread".
 dnl Adds to CPPFLAGS the flag -D_REENTRANT or -D_THREAD_SAFE if needed for
 dnl multithread-safe programs.
 
-AC_DEFUN([gl_LOCK],
+AC_DEFUN([gl_LOCK_EARLY],
 [
   AC_REQUIRE([gl_LOCK_BODY])
 ])
 
-dnl The guts of gl_LOCK. Needs to be expanded only once.
+dnl The guts of gl_LOCK_EARLY. Needs to be expanded only once.
 
 AC_DEFUN([gl_LOCK_BODY],
 [
@@ -40,7 +40,15 @@ AC_DEFUN([gl_LOCK_BODY],
   AC_ARG_ENABLE(threads,
 AC_HELP_STRING([--enable-threads={posix|solaris|pth|win32}], [specify multithreading API])
 AC_HELP_STRING([--disable-threads], [build without multithread safety]),
-    gl_use_threads=$enableval, gl_use_threads=yes)
+    [gl_use_threads=$enableval],
+    [case "$host_os" in
+       dnl Disable multithreading by default on OSF/1, because it interferes
+       dnl with fork()/exec(): When msgexec is linked with -lpthread, its child
+       dnl process gets an endless segmentation fault inside execvp().
+       osf*) gl_use_threads=no ;;
+       *)    gl_use_threads=yes ;;
+     esac
+    ])
   gl_threads_api=none
   LIBTHREAD=
   LTLIBTHREAD=
@@ -227,6 +235,11 @@ int x = (int)PTHREAD_MUTEX_RECURSIVE;
   AC_SUBST(LTLIBTHREAD)
   AC_SUBST(LIBMULTITHREAD)
   AC_SUBST(LTLIBMULTITHREAD)
+])
+
+AC_DEFUN([gl_LOCK],
+[
+  AC_REQUIRE([gl_LOCK_EARLY])
   gl_PREREQ_LOCK
 ])
 
