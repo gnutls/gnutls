@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -265,8 +265,13 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
 
   _gnutls_mpi_release (&res);
 
-  /* EB = 00||BT||PS||00||D 
+  /* EB = 00||BT||PS||00||D
    * (use block type 'btype')
+   *
+   * From now on, return GNUTLS_E_DECRYPTION_FAILED on errors, to
+   * avoid attacks similar to the one described by Bleichenbacher in:
+   * "Chosen Ciphertext Attacks against Protocols Based on RSA
+   * Encryption Standard PKCS #1".
    */
 
 
@@ -303,8 +308,8 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
 	    }
 	  if (edata[i] != 0xff)
 	    {
-	      _gnutls_handshake_log ("PKCS #1 padding error");
-	      ret = GNUTLS_E_PKCS1_WRONG_PAD;
+	      /* PKCS #1 padding error.  Don't use
+		 GNUTLS_E_PKCS1_WRONG_PAD here.  */
 	      break;
 	    }
 	}
@@ -312,7 +317,6 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
     default:
       gnutls_assert ();
       gnutls_afree (edata);
-      return GNUTLS_E_INTERNAL_ERROR;
     }
   i++;
 
