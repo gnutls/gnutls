@@ -114,7 +114,7 @@ main (void)
 	}
       fputs ("\n", stdout);
     }
-  gnutls_bye (session, 0);
+  gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
 end:
 
