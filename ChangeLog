@@ -1,3 +1,236 @@
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.4.3.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Make sure the digestAlgorithm.parameters field
+	is empty, which it has to be for the hashes we support.  Otherwise,
+	the field can encode "garbage" that might be used to make the
+	signature be a perfect cube, similar (but not identical) to
+	Bleichenbacher's Crypto 06 rump session attack.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_pk.c: Don't return different errors depending on
+	content of decrypted PKCS#1 token, to avoid Bleichenbacher's
+	Crypto'98 attack, suggested by Werner Koch <wk@gnupg.org>.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-srp.c: Use GNUTLS_SHUT_RDWR, tiny patch
+	from "Robert Millan [ackstorm]" <rmillan@ackstorm.es>.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Revert.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Revert 2.113.2.1 fix, it solved one problem but
+	generated another.
+
+2006-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-openpgp-keys-11.txt: Add.
+
+2006-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/getaddrinfo.c, gl/stdint_.h, gl/m4/arcfour.m4,
+	gl/m4/arctwo.m4, gl/m4/codeset.m4, gl/m4/des.m4,
+	gl/m4/gc-pbkdf2-sha1.m4, gl/m4/gc.m4, gl/m4/getdelim.m4,
+	gl/m4/getline.m4, gl/m4/getpass.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/hmac-md5.m4, gl/m4/hmac-sha1.m4,
+	gl/m4/intmax_t.m4, gl/m4/inttypes-pri.m4, gl/m4/inttypes_h.m4,
+	gl/m4/lock.m4, gl/m4/longlong.m4, gl/m4/md2.m4, gl/m4/md4.m4,
+	gl/m4/md5.m4, gl/m4/memxor.m4, gl/m4/read-file.m4,
+	gl/m4/readline.m4, gl/m4/rijndael.m4, gl/m4/sha1.m4,
+	gl/m4/stdint.m4, gl/m4/stdint_h.m4, gl/m4/strdup.m4: Update.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS: Add.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-serv-anon.c, doc/examples/ex-serv-export.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, doc/examples/tcp.c: Include netinet/in.h
+	for FreeBSD, reported by Roman Bogorodskiy <novel@FreeBSD.org>.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c:
+	(gnutls_x509_crt_sign2): Check to see if ISSUER_KEY is NULL before
+	continuing, based on report from Sascha Ziemann
+	<sascha.ziemann@secunet.com>.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+	(generate_certificate): Load private key when --load-request is
+	used, based on report from Sascha Ziemann
+	<sascha.ziemann@secunet.com>.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+	(generate_certificate): Load private key when --load-request is
+	used, based on report from Sascha Ziemann
+	<sascha.ziemann@secunet.com>.
+
+2006-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c:
+	(gnutls_x509_crt_sign2): Check to see if ISSUER_KEY is NULL before
+	continuing, based on report from Sascha Ziemann
+	<sascha.ziemann@secunet.com>.
+
+2006-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Map select to _win_select on Windows hosts.
+
+2006-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Need select.c in cli.c and serv.c.
+
+2006-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/select.c: Add, moved from cli.c, originally from plibc, see
+
+	<http://plibc.cvs.sourceforge.net/plibc/plibc/src/select.c?view=markup>.
+
+2006-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Move _win_select to select.c.
+
+2006-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Make select() work on Windows, copying code from
+	plibc, see
+
+	<http://plibc.cvs.sourceforge.net/plibc/plibc/src/select.c?view=markup>.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Mark with XXX.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.5.0.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Add (XXX).
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, libextra/Makefile.am: Install *.def to bin/
+	directory.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, libextra/Makefile.am: Create *.def
+	files for libraries, on mingw.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/snprintf.c, gl/m4/gc.m4, gl/m4/getaddrinfo.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4,
+	gl/m4/memxor.m4, gl/m4/restrict.m4: Update.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Use int/void* macros to avoid
+	warnings, suggested by Andreas Metzler
+	<ametzler@downhill.at.eu.org>.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.c: Remove.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Move GNUTLS_POINTER_TO_INT here.  Add
+	GNUTLS_INT_TO_POINTER.  Based on glib macros, and suggestions from
+	Andreas Metzler <ametzler@downhill.at.eu.org>.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Add void*, for GNUTLS_POINTER_TO_INT_CAST macros.
+
 2006-08-11  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.4.2.
