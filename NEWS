@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.5.1 (unreleased)
 
+** Fix PKCS#1 decryption to avoid Bleichenbacher's Crypto 98 attack.
+
 ** Fix building of examples on FreeBSD by including netinet/in.h.
 Reported by Roman Bogorodskiy <novel@FreeBSD.org>.
 
