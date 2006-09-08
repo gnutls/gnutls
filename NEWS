@@ -5,10 +5,8 @@ See the end for copying conditions.
 
 * Version 1.4.3 (unreleased)
 
-** Fix certtool bug that caused the private key to not be loaded when
-generating a certificate with --load-request, which in turn triggered
-another unrelated bug in gnutls_x509_crt_sign2 (also fixed).  Reported
-by Sascha Ziemann <sascha.ziemann@secunet.com>.
+** API and ABI modifications:
+No changes since last version.
 
 * Version 1.4.2 (released 2006-08-12)
 
