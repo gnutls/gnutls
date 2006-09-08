@@ -6,6 +6,7 @@ See the end for copying conditions.
 * Version 1.4.3 (unreleased)
 
 ** Fix PKCS#1 decryption to avoid Bleichenbacher's Crypto 98 attack.
+See <http://www.bell-labs.com/user/bleichen/papers/pkcs.ps.gz>.
 
 ** Fix crash in gnutls_x509_crt_sign2 if passed a NULL issuer_key.
 
