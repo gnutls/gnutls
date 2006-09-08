@@ -5,8 +5,16 @@ See the end for copying conditions.
 
 * Version 1.4.3 (unreleased)
 
+** Fix PKCS#1 verification to avoid a variant of Bleichenbacher's
+** Crypto 06 rump session attack.
+In particular, we check that the digestAlgorithm.parameters field is
+empty, to avoid that it can contain "garbage" that may be used to
+alter the numeric properties of the signature.  Reported by Yutaka
+OIWA <y.oiwa@aist.go.jp>.
+
 ** Fix PKCS#1 decryption to avoid Bleichenbacher's Crypto 98 attack.
 See <http://www.bell-labs.com/user/bleichen/papers/pkcs.ps.gz>.
+Reported by Werner Koch <wk@gnupg.org>.
 
 ** Fix crash in gnutls_x509_crt_sign2 if passed a NULL issuer_key.
 
