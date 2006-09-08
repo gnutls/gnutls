@@ -9,7 +9,9 @@ See the end for copying conditions.
 ** Crypto 06 rump session attack.
 In particular, we check that the digestAlgorithm.parameters field is
 empty, to avoid that it can contain "garbage" that may be used to
-alter the numeric properties of the signature.  Reported by Yutaka
+alter the numeric properties of the signature.  See
+<http://www.imc.org/ietf-openpgp/mail-archive/msg14307.html> (which is
+not exactly the same as the problem we fix here).  Reported by Yutaka
 OIWA <y.oiwa@aist.go.jp>.
 
 ** Fix PKCS#1 decryption to avoid Bleichenbacher's Crypto 98 attack.
