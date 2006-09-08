@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -503,6 +503,15 @@ decode_ber_digest_info (const gnutls_datum_t * info,
       gnutls_assert ();
       asn1_delete_structure (&dinfo);
       return GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
+    }
+
+  len = sizeof (str) - 1;
+  result = asn1_read_value (dinfo, "digestAlgorithm.parameters", NULL, &len);
+  if (result != ASN1_ELEMENT_NOT_FOUND)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
     }
 
   result = asn1_read_value (dinfo, "digest", digest, digest_size);
