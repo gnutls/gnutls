@@ -318,6 +318,7 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
     default:
       gnutls_assert ();
       gnutls_afree (edata);
+      break;
     }
   i++;
 
