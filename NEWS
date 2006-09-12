@@ -5,6 +5,18 @@ See the end for copying conditions.
 
 * Version 1.4.4 (unreleased)
 
+** Relax the test that caught signatures that exploit the variant of
+** Bleichenbacher's Crypto 06 rump session attack on our
+** verification logic flaw.
+In particular, we now permit the digestAlgorithm.parameters field to
+be present but empty, whereas in 1.4.3 we actually checked that the
+field was absent.
+
+** Revert the removal of debug information for the GNUTLS-SA-2006-3 problem.
+The messages are only printed in debug mode, which is not recommended
+for normal use, and thus logging this situation cannot be abused as an
+oracle in typical recommended situations.
+
 ** API and ABI modifications:
 No changes since last version.
 
