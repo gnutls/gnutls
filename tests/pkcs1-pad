@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Copyright (C) 2004, 2005, 2006 Free Software Foundation
+#
+# Author: Simon Josefsson
+#
+# This file is part of GNUTLS.
+#
+# GNUTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# GNUTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GNUTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+srcdir=${srcdir:-.}
+CERTTOOL=../src/certtool
+
+$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1
+$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2
+
+out1oks=`grep 'Verification output: Verified.' out1 | wc -l`
+out2oks=`grep 'Verification output: Verified.' out2 | wc -l`
+out1fails=`grep 'Verification output: Not verified.' out1 | wc -l`
+out2fails=`grep 'Verification output: Not verified.' out2 | wc -l`
+
+rm -f out1 out2
+
+echo out1 oks $out1oks fails $out1fails out2 oks $out2oks fails $out2fails
+
+if test "$out1oks$out2oks$out1fails$out2fails" != "2101"; then
+    echo expected 2-1-0-1
+    echo "PKCS1-PAD FAIL"
+    exit 1
+fi
+
+echo "PKCS1-PAD OK"
+exit 0
