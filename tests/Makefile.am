@@ -32,6 +32,9 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 # For pkcs8.
 EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 
+# For pkcs1-pad
+EXTRA_DIST += pkcs1-pad-ok.pem pkcs1-pad-broken.pem
+
 ctests = simple openssl gc set_pkcs12_cred certder
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 if HAVE_FORK
@@ -42,9 +45,9 @@ endif
 gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = pkcs12_neon pkcs8
+dist_check_SCRIPTS = pkcs12_neon pkcs8 pkcs1-pad
 
-TESTS = pkcs12_neon pkcs8 $(ctests)
+TESTS = pkcs12_neon pkcs8 pkcs1-pad $(ctests)
 
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/client.p12	\
