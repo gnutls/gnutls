@@ -21,7 +21,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir=${srcdir:-.}
-CERTTOOL=../src/certtool
+CERTTOOL=${CERTTOOL:-../src/certtool}
 EXPECT1=2101
 EXPECT2=1001
 
