@@ -17,6 +17,8 @@ OIWA <y.oiwa@aist.go.jp>.
 See GNUTLS-SA-2006-4 on http://www.gnutls.org/security.html for more
 up to date information.
 
+** Add self test to test for above flaw.
+
 ** Fix building of examples on FreeBSD by including netinet/in.h.
 Reported by Roman Bogorodskiy <novel@FreeBSD.org>.
 
