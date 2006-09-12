@@ -22,6 +22,10 @@
 
 srcdir=${srcdir:-.}
 CERTTOOL=../src/certtool
+EXPECT1=2101
+EXPECT2=1001
+
+# Test 1, PKCS#1 pad digestAlgorithm.parameters
 
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2
@@ -35,10 +39,30 @@ rm -f out1 out2
 
 echo out1 oks $out1oks fails $out1fails out2 oks $out2oks fails $out2fails
 
-if test "$out1oks$out2oks$out1fails$out2fails" != "2101"; then
-    echo expected 2-1-0-1
+if test "$out1oks$out2oks$out1fails$out2fails" != "$EXPECT1"; then
+    echo expected $EXPECT1
     echo "PKCS1-PAD FAIL"
-    exit 1
+#    exit 1
+fi
+
+# Test 2, Bleichenbacher's Crypto 06 rump session
+
+$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok2.pem | tee out1
+$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken2.pem | tee out2
+
+out1oks=`grep 'Verification output: Verified.' out1 | wc -l`
+out2oks=`grep 'Verification output: Verified.' out2 | wc -l`
+out1fails=`grep 'Verification output: Not verified.' out1 | wc -l`
+out2fails=`grep 'Verification output: Not verified.' out2 | wc -l`
+
+rm -f out1 out2
+
+echo out1 oks $out1oks fails $out1fails out2 oks $out2oks fails $out2fails
+
+if test "$out1oks$out2oks$out1fails$out2fails" != "$EXPECT2"; then
+    echo expected $EXPECT2
+    echo "PKCS1-PAD FAIL"
+#    exit 1
 fi
 
 echo "PKCS1-PAD OK"
