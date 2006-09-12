@@ -41,9 +41,11 @@ echo out1 oks $out1oks fails $out1fails out2 oks $out2oks fails $out2fails
 
 if test "$out1oks$out2oks$out1fails$out2fails" != "$EXPECT1"; then
     echo expected $EXPECT1
-    echo "PKCS1-PAD FAIL"
-#    exit 1
+    echo "PKCS1-PAD1 FAIL"
+    exit 1
 fi
+
+echo "PKCS1-PAD1 OK"
 
 # Test 2, Bleichenbacher's Crypto 06 rump session
 
@@ -61,9 +63,11 @@ echo out1 oks $out1oks fails $out1fails out2 oks $out2oks fails $out2fails
 
 if test "$out1oks$out2oks$out1fails$out2fails" != "$EXPECT2"; then
     echo expected $EXPECT2
-    echo "PKCS1-PAD FAIL"
-#    exit 1
+    echo "PKCS1-PAD2 FAIL"
+    exit 1
 fi
 
-echo "PKCS1-PAD OK"
+echo "PKCS1-PAD2 OK"
+
+# We're done.
 exit 0
