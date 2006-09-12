@@ -8,20 +8,13 @@ See the end for copying conditions.
 ** Fix PKCS#1 verification to avoid a variant of Bleichenbacher's
 ** Crypto 06 rump session attack.
 In particular, we check that the digestAlgorithm.parameters field is
-empty, to avoid that it can contain "garbage" that may be used to
-alter the numeric properties of the signature.  See
+missing or empty, to avoid that it can contain "garbage" that may be
+used to alter the numeric properties of the signature.  See
 <http://www.imc.org/ietf-openpgp/mail-archive/msg14307.html> (which is
 not exactly the same as the problem we fix here).  Reported by Yutaka
 OIWA <y.oiwa@aist.go.jp>.
 
 See GNUTLS-SA-2006-4 on http://www.gnutls.org/security.html for more
-up to date information.
-
-** Fix PKCS#1 decryption to avoid Bleichenbacher's Crypto 98 attack.
-See <http://www.bell-labs.com/user/bleichen/papers/pkcs.ps.gz>.
-Reported by Werner Koch <wk@gnupg.org>.
-
-See GNUTLS-SA-2006-3 on http://www.gnutls.org/security.html for more
 up to date information.
 
 ** Fix building of examples on FreeBSD by including netinet/in.h.
