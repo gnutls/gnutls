@@ -506,7 +506,7 @@ decode_ber_digest_info (const gnutls_datum_t * info,
     }
 
   len = sizeof (str) - 1;
-  result = asn1_read_value (dinfo, "digestAlgorithm.parameters", NULL, &len);
+  result = asn1_read_value (dinfo, "digestAlgorithm.parameters", str, &len);
   if (result != ASN1_ELEMENT_NOT_FOUND)
     {
       gnutls_assert ();
