@@ -1,3 +1,84 @@
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.4.4.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-pad: Fix.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Permit empty parameters field too, found after
+	adding self tests.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Permit empty parameters field too, found after
+	adding self tests.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-pad: Fix exit code.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-pad-ok2.pem, tests/pkcs1-pad-broken2.pem: Add, from
+	Eric Young in
+	<http://permalink.gmane.org/gmane.comp.encryption.general/9185>.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-pad: Add more tests.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add pkcs1-pad test.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-pad-ok.pem, tests/pkcs1-pad-broken.pem: Add, from
+	Yutaka OIWA <y.oiwa@aist.go.jp>.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-pad: Add.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Fix asn1_read_value() call to fix crash,
+	reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_pk.c: Add 'break' to make logic easier to follow.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_pk.c: Log more; loging is safe and only enabled during
+	debugging.  Add 'break' to make logic easier to follow.
+
+2006-09-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Fix asn1_read_value() call to fix crash,
+	reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
+2006-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_pk.c: Revert part of patch, logging is only enabled in
+	debug mode, which isn't recommended for real use.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2006-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
 2006-09-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.4.3.
