@@ -507,11 +507,15 @@ decode_ber_digest_info (const gnutls_datum_t * info,
 
   len = sizeof (str) - 1;
   result = asn1_read_value (dinfo, "digestAlgorithm.parameters", str, &len);
-  if (result != ASN1_ELEMENT_NOT_FOUND)
+  /* To avoid permitting garbage in the parameters field, either the
+     parameters field is not present, or it contains 0x05 0x00. */
+  if (!(result == ASN1_ELEMENT_NOT_FOUND ||
+	(result == ASN1_SUCCESS && len == 2 &&
+	 str[0] == 0x05 && str[1] == 0x00)))
     {
       gnutls_assert ();
       asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
+      return GNUTLS_E_ASN1_GENERIC_ERROR;
     }
 
   result = asn1_read_value (dinfo, "digest", digest, digest_size);
