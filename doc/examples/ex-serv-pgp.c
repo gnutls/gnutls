@@ -47,9 +47,6 @@ generate_dh_params (void)
   return 0;
 }
 
-/* These are global */
-gnutls_certificate_credentials_t x509_cred;
-
 gnutls_session_t
 initialize_tls_session (void)
 {
@@ -62,7 +59,7 @@ initialize_tls_session (void)
    */
   gnutls_set_default_priority (session);
 
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cred);
 
   /* request client certificate if any.
    */
