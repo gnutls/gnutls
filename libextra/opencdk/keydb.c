@@ -1,5 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * keydb.c - Key database routines
+ *        Copyright (C) 2006 Free Software Foundation, Inc.
  *        Copyright (C) 2002, 2003 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -206,7 +207,7 @@ keydb_idx_search( cdk_stream_t inp, u32 * keyid,
     if( (keyid && fpr) || (!keyid && !fpr) )
         return CDK_Inv_Mode;
 
-    *r_off = 0;
+    *r_off = 0xFFFFFFFF;
     cdk_stream_seek( inp, 0 );
     while( keydb_idx_parse( inp, &idx ) != CDK_EOF ) {
         if( keyid && KEYID_CMP( keyid, idx->keyid ) ) {
@@ -221,7 +222,7 @@ keydb_idx_search( cdk_stream_t inp, u32 * keyid,
         idx = NULL; 
     }
     cdk_free( idx );
-    return *r_off? 0 : CDK_EOF;
+    return *r_off != 0xFFFFFFFF ? 0 : CDK_EOF;
 }
 
 
