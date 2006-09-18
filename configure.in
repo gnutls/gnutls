@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 AC_INIT(gnutls, [1.5.1], [bug-gnutls@gnu.org])
-AC_PREREQ(2.59)
+AC_PREREQ(2.60)
 
 AC_CANONICAL_TARGET
 
