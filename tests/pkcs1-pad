@@ -22,10 +22,10 @@
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../src/certtool}
-EXPECT1=2101
-EXPECT2=1001
 
 # Test 1, PKCS#1 pad digestAlgorithm.parameters
+
+EXPECT1=2101
 
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2
@@ -49,6 +49,8 @@ echo "PKCS1-PAD1 OK"
 
 # Test 2, Bleichenbacher's Crypto 06 rump session
 
+EXPECT2=1001
+
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok2.pem | tee out1
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken2.pem | tee out2
 
@@ -68,6 +70,28 @@ if test "$out1oks$out2oks$out1fails$out2fails" != "$EXPECT2"; then
 fi
 
 echo "PKCS1-PAD2 OK"
+
+# Test 3, forged Starfield certificate,
+# by Andrei Pyshkin, Erik Tews and Ralf-Philipp Weinmann.
+
+EXPECT3=11
+
+$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken3.pem | tee out1
+
+out1oks=`grep 'Verification output: Verified.' out1 | wc -l`
+out1fails=`grep 'Verification output: Not verified.' out1 | wc -l`
+
+rm -f out1
+
+echo out1 oks $out1oks fails $out1fails
+
+if test "$out1oks$out1fails" != "$EXPECT3"; then
+    echo expected $EXPECT3
+    echo "PKCS1-PAD3 FAIL"
+    exit 1
+fi
+
+echo "PKCS1-PAD3 OK"
 
 # We're done.
 exit 0
