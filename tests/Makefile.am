@@ -33,7 +33,9 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 
 # For pkcs1-pad
-EXTRA_DIST += pkcs1-pad-ok.pem pkcs1-pad-broken.pem
+EXTRA_DIST += pkcs1-pad-ok.pem pkcs1-pad-broken.pem \
+	pkcs1-pad-ok2.pem pkcs1-pad-broken2.pem \
+	pkcs1-pad-broken3.pem
 
 ctests = simple openssl gc set_pkcs12_cred certder
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
