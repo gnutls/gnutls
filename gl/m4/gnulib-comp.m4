@@ -31,9 +31,14 @@ AC_DEFUN([gl_EARLY],
 AC_DEFUN([gl_INIT],
 [
   AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
+  gl_cond_libtool=true
   gl_FUNC_ALLOCA
   gl_HEADER_ARPA_INET
   gl_GC
+  if test $gl_cond_libtool = false; then
+    gl_ltlibdeps="$gl_ltlibdeps $LTLIBGCRYPT"
+    gl_libdeps="$gl_libdeps $LIBGCRYPT"
+  fi
   gl_GC_ARCFOUR
   gl_GC_ARCTWO
   gl_GC_DES
@@ -81,6 +86,8 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/maint.mk
   doc/fdl.texi
   doc/gendocs_template
+  doc/gpl.texi
+  doc/lgpl.texi
   lib/alloca_.h
   lib/arcfour.c
   lib/arcfour.h
@@ -203,7 +210,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/minmax.m4
   m4/netinet_in_h.m4
   m4/nls.m4
-  m4/onceonly_2_57.m4
   m4/po.m4
   m4/printf-posix.m4
   m4/progtest.m4

@@ -1,0 +1,15 @@
+Index: lgpl.texi
+===================================================================
+RCS file: /sources/gnulib/gnulib/doc/lgpl.texi,v
+retrieving revision 1.5
+diff -u -p -r1.5 lgpl.texi
+--- lgpl.texi	16 Sep 2006 14:04:29 -0000	1.5
++++ lgpl.texi	21 Sep 2006 13:24:56 -0000
+@@ -1,6 +1,7 @@
+ @node GNU LGPL
+ @appendixsec GNU Lesser General Public License
+ @cindex LGPL, GNU Lesser General Public License
++@cindex License, GNU LGPL
+ @center Version 2.1, February 1999
+ 
+ @display
