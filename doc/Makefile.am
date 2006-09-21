@@ -27,20 +27,19 @@ SUBDIRS += reference
 endif
 
 info_TEXINFOS = gnutls.texi
-gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi			\
-	error_codes.texi bibliography.texi gnutls-api.texi		\
+gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl.texi	\
+	gpl.texi error_codes.texi bibliography.texi gnutls-api.texi	\
 	gnutls-extra-api.texi ia-api.texi x509-api.texi pgp-api.texi	\
-	my-bib-macros.texi examples/ex-client1.c		\
-	examples/ex-client2.c examples/ex-session-info.c		\
-	examples/ex-verify.c examples/ex-cert-select.c			\
-	examples/ex-client-resume.c examples/ex-client-srp.c		\
-	examples/ex-client-tlsia.c examples/ex-rfc2818.c		\
-	examples/ex-serv1.c examples/ex-serv-export.c			\
-	examples/ex-serv-anon.c examples/ex-serv-pgp.c			\
-	examples/ex-serv-srp.c examples/ex-alert.c			\
-	examples/ex-x509-info.c examples/ex-crq.c examples/ex-pkcs12.c	\
-	layers.eps layers.png pgp1.eps	\
-	pgp1.png x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png
+	my-bib-macros.texi examples/ex-client1.c examples/ex-client2.c	\
+	examples/ex-session-info.c examples/ex-verify.c			\
+	examples/ex-cert-select.c examples/ex-client-resume.c		\
+	examples/ex-client-srp.c examples/ex-client-tlsia.c		\
+	examples/ex-rfc2818.c examples/ex-serv1.c			\
+	examples/ex-serv-export.c examples/ex-serv-anon.c		\
+	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
+	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
+	examples/ex-pkcs12.c layers.eps layers.png pgp1.eps pgp1.png	\
+	x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png
 
 # Internal manual.
 gnutls_TEXINFOS += internals.texi internals.eps internals.png		\
