@@ -288,7 +288,7 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
   unsigned int usage = 0, server;
   gnutls_x509_crq crq;		/* request */
 
-  ret = gnutls_x509_crt_init (&crt);
+ ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
     {
       fprintf (stderr, "crt_init: %s\n", gnutls_strerror (ret));
@@ -296,19 +296,12 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
     }
 
 
-  key = load_private_key (1);
-
-  result = gnutls_x509_crt_set_key (crt, key);
-  if (result < 0)
-    {
-      fprintf (stderr, "set_key: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
   crq = load_request ();
 
   if (crq == NULL)
     {
+
+      key = load_private_key (1);
 
       if (!batch)
 	fprintf (stderr,
@@ -331,6 +324,13 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
 		 "This field should not be used in new certificates.\n");
 
       get_pkcs9_email_crt_set (crt);
+
+      result = gnutls_x509_crt_set_key (crt, key);
+      if (result < 0)
+	{
+	  fprintf (stderr, "set_key: %s\n", gnutls_strerror (result));
+	  exit (1);
+	}
 
     }
   else
