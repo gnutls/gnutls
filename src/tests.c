@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004, 2006 Free Software Foundation
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -1027,6 +1027,9 @@ test_session_resume2 (gnutls_session session)
 
   session_id_size = sizeof (session_id);
   gnutls_session_get_id (session, session_id, &session_id_size);
+
+  if (session_id_size == 0)
+    return TEST_FAILED;
 
   if (gnutls_session_is_resumed (session))
     return TEST_SUCCEED;
