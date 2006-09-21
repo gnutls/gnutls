@@ -37,6 +37,8 @@ The problem was the select() call that doesn't work on file
 descriptors (stdin) on Windows.  We borrowed some code from plibc to
 solve this.  It appears to be somewhat unreliable though.
 
+** Autoconf 2.60 is now used.
+
 * Version 1.5.0 (released 2006-08-13)
 
 ** Change SRP and Cert-Type extensions to match IANA registry.
