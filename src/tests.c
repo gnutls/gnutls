@@ -1034,11 +1034,11 @@ test_session_resume2 (gnutls_session session)
   if (gnutls_session_is_resumed (session))
     return TEST_SUCCEED;
 
-  if (memcmp (tmp_session_id, session_id, tmp_session_id_size) == 0)
+  if (tmp_session_id_size == session_id_size &&
+      memcmp (tmp_session_id, session_id, tmp_session_id_size) == 0)
     return TEST_SUCCEED;
   else
     return TEST_FAILED;
-
 }
 
 extern char *hostname;
