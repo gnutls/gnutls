@@ -46,7 +46,7 @@ release:
 	rm -f ChangeLog
 	make ChangeLog
 	cvs commit -m "" ChangeLog
-	cvs rtag -F $(tag) gnutls
+	cvs rtag -F -r gnutls_1_4_x $(tag) gnutls
 	make dist
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
