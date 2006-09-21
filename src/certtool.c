@@ -696,6 +696,9 @@ generate_self_signed (void)
 
   crt = generate_certificate (&key, NULL);
 
+  if (!key)
+    key = load_private_key (1);
+
   uri = get_crl_dist_point_url ();
   if (uri)
     {
