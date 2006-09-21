@@ -21,7 +21,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
-Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 
 @quotation
@@ -84,7 +84,7 @@ Free Documentation License''.
 * Certificate to XML convertion functions::
 * All the supported ciphersuites in GnuTLS::
 * Internal architecture of GnuTLS::
-* Copying This Manual::
+* Copying Information::
 * Concept Index::
 * Function and Data Index::
 @c * @mybibnode{}::
@@ -3060,14 +3060,18 @@ functions:
 @include internals.texi
 
 
-@node Copying This Manual
-@appendix Copying This Manual
+@node Copying Information
+@appendix Copying Information
 
 @menu
-* GNU Free Documentation License::  License for copying this manual.
+* GNU Free Documentation License::   License for copying this manual.
+* GNU LGPL::                     License for copying the core GnuTLS library.
+* GNU GPL::                      License for copying GNUTLS extra and tools.
 @end menu
 
 @include fdl.texi
+@include lgpl.texi
+@include gpl.texi
 
 @node Concept Index
 @unnumbered Concept Index
