@@ -39,6 +39,9 @@ solve this.  It appears to be somewhat unreliable though.
 
 ** Autoconf 2.60 is now used.
 
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.5.0 (released 2006-08-13)
 
 ** Change SRP and Cert-Type extensions to match IANA registry.
