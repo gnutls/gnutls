@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -44,7 +44,7 @@
   * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt_t structure
   * @cert: The structure to be initialized
   *
-  * This function will initialize an X.509 certificate structure. 
+  * This function will initialize an X.509 certificate structure.
   *
   * Returns 0 on success.
   *
@@ -52,22 +52,25 @@
 int
 gnutls_x509_crt_init (gnutls_x509_crt_t * cert)
 {
-  *cert = gnutls_calloc (1, sizeof (gnutls_x509_crt_int));
+  gnutls_x509_crt_t tmp = gnutls_calloc (1, sizeof (gnutls_x509_crt_int));
+  int result;
 
-  if (*cert)
+  if (!tmp)
+    return GNUTLS_E_MEMORY_ERROR;
+
+  result = asn1_create_element (_gnutls_get_pkix (),
+				"PKIX1.Certificate",
+				&tmp->cert);
+  if (result != ASN1_SUCCESS)
     {
-      int result = asn1_create_element (_gnutls_get_pkix (),
-					"PKIX1.Certificate",
-					&(*cert)->cert);
-      if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  gnutls_free (*cert);
-	  return _gnutls_asn2err (result);
-	}
-      return 0;			/* success */
+      gnutls_assert ();
+      gnutls_free (tmp);
+      return _gnutls_asn2err (result);
     }
-  return GNUTLS_E_MEMORY_ERROR;
+
+  *cert = tmp;
+
+  return 0;			/* success */
 }
 
 /*-
