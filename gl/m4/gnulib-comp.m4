@@ -32,6 +32,7 @@ AC_DEFUN([gl_INIT],
 [
   AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_cond_libtool=true
+  gl_source_base='gl'
   gl_FUNC_ALLOCA
   gl_HEADER_ARPA_INET
   gl_GC
