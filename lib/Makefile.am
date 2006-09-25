@@ -129,12 +129,16 @@ AM_CXXFLAGS = -I$(top_srcdir)/includes/
 
 lib_LTLIBRARIES += libgnutlsxx.la
 
-libgnutlsxx_la_SOURCES = $(CPP_OBJECTS)
+libgnutlsxx_la_SOURCES = $(CPP_OBJECTS) libgnutlsxx.vers
 
 libgnutlsxx_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutlsxx_la_LIBADD = libgnutls.la
+
+if HAVE_LD_VERSION_SCRIPT
+libgnutlsxx_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutlsxx.vers
+endif
 endif
 
 pkix_asn1_tab.c: pkix.asn
