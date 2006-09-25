@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** Add version script for the GnuTLS C++ library.
 Suggested by Andreas Metzler <ametzler@downhill.at.eu.org>.
 
+** Fix the C++ compiler detection logic.
+Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
 ** API and ABI modifications:
 No changes since last version.
 
