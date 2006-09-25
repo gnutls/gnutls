@@ -5,8 +5,14 @@ See the end for copying conditions.
 
 * Version 1.5.2 (unreleased)
 
+** Decrement the shared library version back to 13 (as in the 1.4.x branch).
+Note that if you installed 1.5.0 or 1.5.1, they will have a higher
+shared library version than this version, so you'll have to remove
+them and possibly relink your applications.  Reported by Andreas
+Metzler <ametzler@downhill.at.eu.org>.
+
 ** Add version script for the GnuTLS C++ library.
-Suggested by Andreas Metzler <ametzler@downhill.at.eu.org>.
+Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
 
 ** Fix the C++ compiler detection logic.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
