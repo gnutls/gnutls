@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.5.2 (unreleased)
 
+** Add version script for the GnuTLS C++ library.
+Suggested by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
 ** API and ABI modifications:
 No changes since last version.
 
