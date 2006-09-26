@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Timo Schulz <twoaday@freakmail.de>
  *
@@ -222,7 +222,7 @@ kbx_data_to_keyring (int type, int enc, const char *data,
   if (!data)
     return NULL;
 
-  p = gnutls_malloc (1 + 4 + size);
+  p = gnutls_malloc (1 + 1 + 4 + size);
   if (!p)
     return NULL;
   p[0] = type;			/* type: {keyring,name} */
