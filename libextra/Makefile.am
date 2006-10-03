@@ -83,8 +83,10 @@ libgnutls_openssl_la_LDFLAGS += $(LIBTASN1_LIBS)
 endif
 
 if HAVE_LD_OUTPUT_DEF
-libgnutls_openssl_la_LDFLAGS += -Wl,--output-def,libgnutls-openssl-$(LT_CURRENT).def
-defexec_DATA += libgnutls-openssl-$(LT_CURRENT).def
+SOVERSION = `expr $(LT_CURRENT) - $(LT_AGE)`
+libgnutls_openssl_la_LDFLAGS += \
+	-Wl,--output-def,libgnutls-openssl-$(SOVERSION).def
+defexec_DATA += libgnutls-openssl-$(SOVERSION).def
 endif
 endif
 
@@ -109,8 +111,9 @@ libgnutls_extra_la_SOURCES += gnutls_ia.c
 # Rest
 
 if HAVE_LD_OUTPUT_DEF
-libgnutls_extra_la_LDFLAGS += -Wl,--output-def,libgnutls-extra-$(LT_CURRENT).def
-defexec_DATA += libgnutls-extra-$(LT_CURRENT).def
+libgnutls_extra_la_LDFLAGS += \
+	-Wl,--output-def,libgnutls-extra-$(SOVERSION).def
+defexec_DATA += libgnutls-extra-$(SOVERSION).def
 endif
 
 DISTCLEANFILES += $(defexec_DATA)
