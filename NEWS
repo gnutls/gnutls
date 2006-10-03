@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.5.3 (unreleased)
 
+** Fix the filename of the *.def file on Windows after library version bump.
+
 ** API and ABI modifications:
 No changes since last version.
 
