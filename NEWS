@@ -22,6 +22,8 @@ Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
 ** Fix the C++ compiler detection logic.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
 
+** Update of gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
