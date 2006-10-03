@@ -1,3 +1,104 @@
+2006-10-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.5.2.
+
+2006-10-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-10-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-10-03  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/getpass.c, gl/m4/getpass.m4, gl/m4/intmax.m4:
+	Update.
+
+2006-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-psk-null-01.txt: Add.
+
+2006-09-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-26  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openpgp.c:
+	(kbx_data_to_keyring): Fix off-by-one error in call to malloc,
+	reported by "Adam Langley" <agl@imperialviolet.org>.
+
+2006-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Use library shared version 13 instead of 14,
+	incrementing it was a mistake since no API/ABI changes happened.
+	Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
+2006-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Improve the C++ test, to handle CXX env. variables,
+	suggested by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
+2006-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Use version script for libgnutlsxx too.
+
+2006-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutlsxx.vers, NEWS: Add.
+
+2006-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gc-gnulib.c, gl/md4.c, gl/rijndael-api-fst.c,
+	gl/m4/gnulib-comp.m4, gl/m4/lock.m4, gl/m4/signed.m4,
+	gl/m4/sockpfaf.m4: Update.
+
+2006-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, NEWS: Bump versions.
+
+2006-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c:
+	(gnutls_x509_crt_init): Don't set output parameter on failures,
+	reported by Alon Bar-Lev <alon.barlev@gmail.com>.  Also clean up
+	logic.
+
+2006-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2006-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crl.c: Fix prototype of gnutls_x509_crl_get_issuer_dn to
+	match x509.h, for IRIX ido cc builds, reported by Georg Schwarz
+	<georg.schwarz@freenet.de>.
+
+2006-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix gendocs.sh path.
+
+2006-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Revert.
+
+2006-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix gendocs path.
+
+2006-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Don't put in devel/.
+
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.5.1.
