@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.5.3 (unreleased)
 
+** The included copy of OpenCDK is updated to version 0.5.10.
+
 ** Fix the filename of the *.def file on Windows after library version bump.
 
 ** API and ABI modifications:
