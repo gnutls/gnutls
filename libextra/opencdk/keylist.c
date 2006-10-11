@@ -285,6 +285,7 @@ cdk_pklist_encrypt( cdk_keylist_t pk_list, cdk_dek_t dek, cdk_stream_t outp )
             pkt->pkt.pubkey_enc = enc;
             rc = cdk_pkt_write( outp, pkt );
             cdk_pkt_free( pkt );
+	    enc = NULL; /* free'd by cdk_pkt_free() */
             if( rc )
                 break;
 	}

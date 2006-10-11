@@ -24,7 +24,7 @@
 
 #include <stdarg.h>
 
-#define OPENCDK_VERSION "0.5.9"
+#define OPENCDK_VERSION "0.5.10"
 
 #ifdef __cplusplus
 extern "C" {
