@@ -913,7 +913,8 @@ asn1_der_coding (ASN1_TYPE element, const char *name, void *ider, int *len,
 	case TYPE_NULL:
 	  max_len--;
 	  if (max_len >= 0)
-	    der[counter++] = 0;
+	    der[counter] = 0;
+	  counter++;
 	  move = RIGHT;
 	  break;
 	case TYPE_BOOLEAN:

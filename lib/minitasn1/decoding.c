@@ -107,7 +107,7 @@ asn1_get_length_der (const unsigned char *der, int der_len, int *len)
  * asn1_get_tag_der:
  * @der: DER data to decode.
  * @der_len: Length of DER data to decode.
- * @class: Output variable containing decoded class.
+ * @cls: Output variable containing decoded class.
  * @len: Output variable containing the length of the DER TAG data.
  * @tag: Output variable containing the decoded tag.
  *
@@ -117,14 +117,14 @@ asn1_get_length_der (const unsigned char *der, int der_len, int *len)
  **/
 int
 asn1_get_tag_der (const unsigned char *der, int der_len,
-		  unsigned char *class, int *len, unsigned long *tag)
+		  unsigned char *cls, int *len, unsigned long *tag)
 {
   int punt, ris;
 
   if (der == NULL || der_len <= 0 || len == NULL)
     return ASN1_DER_ERROR;
 
-  *class = der[0] & 0xE0;
+  *cls = der[0] & 0xE0;
   if ((der[0] & 0x1F) != 0x1F)
     {
       /* short form */
