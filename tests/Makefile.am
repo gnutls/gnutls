@@ -19,9 +19,11 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-AM_CPPFLAGS = -I../gl -I$(top_srcdir)/gl -I../includes -I$(top_srcdir)/includes
+AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
+	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
+	-I../includes -I$(top_srcdir)/includes
 AM_LDFLAGS = -no-install
-LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/libgnutls.la libutils.la
+LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/libgnu.la libutils.la
 
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
@@ -41,8 +43,7 @@ ctests = simple openssl gc set_pkcs12_cred certder
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 if HAVE_FORK
 ctests +=  anonself pskself dhepskself tlsia resume
-tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la \
-	../gl/libgnu.la @LTLIBREADLINE@
+tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la @LTLIBREADLINE@
 endif
 gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
