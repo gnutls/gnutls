@@ -20,7 +20,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-AM_CPPFLAGS = -I$(top_srcdir)/gl -I$(top_builddir)/gl			\
+AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
+	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
 	-I$(top_srcdir)/lib/minitasn1 -I$(srcdir)/openpgp		\
 	$(LIBGCRYPT_CFLAGS)
@@ -72,7 +73,8 @@ lib_LTLIBRARIES += libgnutls-openssl.la
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la ../gl/libgnu.la
+libgnutls_openssl_la_LIBADD = ../lgl/libgnu.la ../gl/libgnu.la \
+	../lib/libgnutls.la 
 
 libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
@@ -124,7 +126,8 @@ libgnutls_extra_la_LDFLAGS += \
 
 libgnutls_extra_la_SOURCES += gnutls_extra.h libgnutls-extra.vers
 
-libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
+libgnutls_extra_la_LIBADD += ../lgl/libgnu.la ../gl/libgnu.la \
+	../lib/libgnutls.la
 
 if HAVE_LD_VERSION_SCRIPT
 libgnutls_extra_la_LDFLAGS += \
