@@ -1,3 +1,4 @@
+## DO NOT EDIT! GENERATED AUTOMATICALLY!
 ## Process this file with automake to produce Makefile.in.
 # Copyright (C) 2004-2006 Free Software Foundation, Inc.
 #
@@ -15,7 +16,8 @@ AUTOMAKE_OPTIONS = 1.5 gnits
 noinst_LTLIBRARIES = libgnu.la
 
 libgnu_la_SOURCES =
-libgnu_la_LIBADD = $(LTLIBOBJS)
+libgnu_la_LIBADD = $(gl_LTLIBOBJS)
+libgnu_la_DEPENDENCIES = $(gl_LTLIBOBJS)
 libgnu_la_LDFLAGS = $(AM_LDFLAGS)
 noinst_HEADERS =
 EXTRA_DIST =
@@ -32,14 +34,17 @@ AM_CPPFLAGS =
 ## begin gnulib module alloca-opt
 
 BUILT_SOURCES += $(ALLOCA_H)
-EXTRA_DIST += alloca_.h
 
 # We need the following in order to create <alloca.h> when the system
 # doesn't have one that works with the given compiler.
 alloca.h: alloca_.h
-	cp -f $(srcdir)/alloca_.h $@-t
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  cat $(srcdir)/alloca_.h; \
+	} > $@-t
 	mv -f $@-t $@
 MOSTLYCLEANFILES += alloca.h alloca.h-t
+
+EXTRA_DIST += alloca_.h
 
 ## end   gnulib module alloca-opt
 
@@ -52,7 +57,9 @@ BUILT_SOURCES += $(ARPA_INET_H)
 arpa/inet.h:
 	test -d arpa || mkdir arpa
 	rm -f $@-t $@
-	echo '#include <sys/socket.h>' >$@-t
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  echo '#include <sys/socket.h>'; \
+	} > $@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += arpa/inet.h arpa/inet.h-t
 MOSTLYCLEANDIRS += arpa
@@ -61,40 +68,53 @@ MOSTLYCLEANDIRS += arpa
 
 ## begin gnulib module gc
 
-EXTRA_DIST += gc.h
 if GL_COND_LIBTOOL
 libgnu_la_LDFLAGS += $(LTLIBGCRYPT)
 endif
+
+EXTRA_DIST += gc-gnulib.c gc-libgcrypt.c gc.h
 
 ## end   gnulib module gc
 
 ## begin gnulib module gc-arcfour
 
-EXTRA_DIST += arcfour.h
+
+EXTRA_DIST += arcfour.c arcfour.h
 
 ## end   gnulib module gc-arcfour
 
+## begin gnulib module gc-arctwo
+
+
+EXTRA_DIST += arctwo.c arctwo.h
+
+## end   gnulib module gc-arctwo
+
 ## begin gnulib module gc-des
 
-EXTRA_DIST += des.h
+
+EXTRA_DIST += des.c des.h
 
 ## end   gnulib module gc-des
 
 ## begin gnulib module gc-hmac-md5
 
-EXTRA_DIST += memxor.h hmac.h md5.h
+
+EXTRA_DIST += hmac-md5.c hmac.h md5.c md5.h memxor.c memxor.h
 
 ## end   gnulib module gc-hmac-md5
 
 ## begin gnulib module gc-hmac-sha1
 
-EXTRA_DIST += memxor.h hmac.h sha1.h
+
+EXTRA_DIST += hmac-sha1.c hmac.h memxor.c memxor.h sha1.c sha1.h
 
 ## end   gnulib module gc-hmac-sha1
 
 ## begin gnulib module gc-md4
 
-EXTRA_DIST += md4.h
+
+EXTRA_DIST += md4.c md4.h
 
 ## end   gnulib module gc-md4
 
@@ -102,35 +122,56 @@ EXTRA_DIST += md4.h
 
 libgnu_la_SOURCES += md5.h
 
+EXTRA_DIST += md5.c
+
 ## end   gnulib module gc-md5
+
+## begin gnulib module gc-pbkdf2-sha1
+
+
+EXTRA_DIST += gc-pbkdf2-sha1.c
+
+## end   gnulib module gc-pbkdf2-sha1
+
+## begin gnulib module gc-rijndael
+
+
+EXTRA_DIST += rijndael-alg-fst.c rijndael-alg-fst.h rijndael-api-fst.c rijndael-api-fst.h
+
+## end   gnulib module gc-rijndael
 
 ## begin gnulib module gc-sha1
 
-EXTRA_DIST += sha1.h
+
+EXTRA_DIST += sha1.c sha1.h
 
 ## end   gnulib module gc-sha1
 
 ## begin gnulib module getaddrinfo
 
-libgnu_la_SOURCES += getaddrinfo.h
+
+EXTRA_DIST += gai_strerror.c getaddrinfo.c getaddrinfo.h
 
 ## end   gnulib module getaddrinfo
 
 ## begin gnulib module getdelim
 
-EXTRA_DIST += getdelim.h
+
+EXTRA_DIST += getdelim.c getdelim.h
 
 ## end   gnulib module getdelim
 
 ## begin gnulib module getline
 
-EXTRA_DIST += getline.h
+
+EXTRA_DIST += getline.c getline.h
 
 ## end   gnulib module getline
 
 ## begin gnulib module getpass
 
-EXTRA_DIST += getpass.h
+
+EXTRA_DIST += getpass.c getpass.h
 
 ## end   gnulib module getpass
 
@@ -156,27 +197,38 @@ libgnu_la_SOURCES += gettext.h
 
 ## begin gnulib module inet_ntop
 
-libgnu_la_SOURCES += inet_ntop.h
+
+EXTRA_DIST += inet_ntop.c inet_ntop.h
 
 ## end   gnulib module inet_ntop
 
 ## begin gnulib module inet_pton
 
-libgnu_la_SOURCES += inet_pton.h
+
+EXTRA_DIST += inet_pton.c inet_pton.h
 
 ## end   gnulib module inet_pton
 
 ## begin gnulib module md2
 
-EXTRA_DIST += md2.h
+
+EXTRA_DIST += md2.c md2.h
 
 ## end   gnulib module md2
 
 ## begin gnulib module memmem
 
-libgnu_la_SOURCES += memmem.h
+
+EXTRA_DIST += memmem.c memmem.h
 
 ## end   gnulib module memmem
+
+## begin gnulib module memmove
+
+
+EXTRA_DIST += memmove.c
+
+## end   gnulib module memmove
 
 ## begin gnulib module minmax
 
@@ -193,7 +245,9 @@ BUILT_SOURCES += $(NETINET_IN_H)
 netinet/in.h:
 	test -d netinet || mkdir netinet
 	rm -f $@-t $@
-	echo '#include <sys/socket.h>' >$@-t
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  echo '#include <sys/socket.h>'; \
+	} > $@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += netinet/in.h netinet/in.h-t
 MOSTLYCLEANDIRS += netinet
@@ -202,13 +256,15 @@ MOSTLYCLEANDIRS += netinet
 
 ## begin gnulib module read-file
 
-EXTRA_DIST += read-file.h
+
+EXTRA_DIST += read-file.c read-file.h
 
 ## end   gnulib module read-file
 
 ## begin gnulib module readline
 
-EXTRA_DIST += readline.h
+
+EXTRA_DIST += readline.c readline.h
 
 ## end   gnulib module readline
 
@@ -220,86 +276,99 @@ libgnu_la_SOURCES += size_max.h
 
 ## begin gnulib module snprintf
 
-libgnu_la_SOURCES += snprintf.h
+
+EXTRA_DIST += snprintf.c snprintf.h
 
 ## end   gnulib module snprintf
 
 ## begin gnulib module stdbool
 
 BUILT_SOURCES += $(STDBOOL_H)
-EXTRA_DIST += stdbool_.h
 
 # We need the following in order to create <stdbool.h> when the system
 # doesn't have one that works.
 stdbool.h: stdbool_.h
 	rm -f $@-t $@
-	sed -e 's/@''HAVE__BOOL''@/$(HAVE__BOOL)/g' < $(srcdir)/stdbool_.h > $@-t
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's/@''HAVE__BOOL''@/$(HAVE__BOOL)/g' < $(srcdir)/stdbool_.h; \
+	} > $@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += stdbool.h stdbool.h-t
+
+EXTRA_DIST += stdbool_.h
 
 ## end   gnulib module stdbool
 
 ## begin gnulib module stdint
 
 BUILT_SOURCES += $(STDINT_H)
-EXTRA_DIST += stdint_.h
 
 # We need the following in order to create <stdint.h> when the system
 # doesn't have one that works with the given compiler.
 stdint.h: stdint_.h
 	rm -f $@-t $@
-	sed -e 's/@''HAVE_WCHAR_H''@/$(HAVE_WCHAR_H)/g' \
-	    -e 's/@''HAVE_STDINT_H''@/$(HAVE_STDINT_H)/g' \
-	    -e 's|@''ABSOLUTE_STDINT_H''@|$(ABSOLUTE_STDINT_H)|g' \
-	    -e 's/@''HAVE_SYS_TYPES_H''@/$(HAVE_SYS_TYPES_H)/g' \
-	    -e 's/@''HAVE_INTTYPES_H''@/$(HAVE_INTTYPES_H)/g' \
-	    -e 's/@''HAVE_SYS_INTTYPES_H''@/$(HAVE_SYS_INTTYPES_H)/g' \
-	    -e 's/@''HAVE_SYS_BITYPES_H''@/$(HAVE_SYS_BITYPES_H)/g' \
-	    -e 's/@''HAVE_LONG_LONG_INT''@/$(HAVE_LONG_LONG_INT)/g' \
-	    -e 's/@''BITSIZEOF_PTRDIFF_T''@/$(BITSIZEOF_PTRDIFF_T)/g' \
-	    -e 's/@''PTRDIFF_T_SUFFIX''@/$(PTRDIFF_T_SUFFIX)/g' \
-	    -e 's/@''BITSIZEOF_SIG_ATOMIC_T''@/$(BITSIZEOF_SIG_ATOMIC_T)/g' \
-	    -e 's/@''HAVE_SIGNED_SIG_ATOMIC_T''@/$(HAVE_SIGNED_SIG_ATOMIC_T)/g' \
-	    -e 's/@''SIG_ATOMIC_T_SUFFIX''@/$(SIG_ATOMIC_T_SUFFIX)/g' \
-	    -e 's/@''BITSIZEOF_SIZE_T''@/$(BITSIZEOF_SIZE_T)/g' \
-	    -e 's/@''SIZE_T_SUFFIX''@/$(SIZE_T_SUFFIX)/g' \
-	    -e 's/@''BITSIZEOF_WCHAR_T''@/$(BITSIZEOF_WCHAR_T)/g' \
-	    -e 's/@''HAVE_SIGNED_WCHAR_T''@/$(HAVE_SIGNED_WCHAR_T)/g' \
-	    -e 's/@''WCHAR_T_SUFFIX''@/$(WCHAR_T_SUFFIX)/g' \
-	    -e 's/@''BITSIZEOF_WINT_T''@/$(BITSIZEOF_WINT_T)/g' \
-	    -e 's/@''HAVE_SIGNED_WINT_T''@/$(HAVE_SIGNED_WINT_T)/g' \
-	    -e 's/@''WINT_T_SUFFIX''@/$(WINT_T_SUFFIX)/g' \
-	    < $(srcdir)/stdint_.h > $@-t
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's/@''HAVE_WCHAR_H''@/$(HAVE_WCHAR_H)/g' \
+	      -e 's/@''HAVE_STDINT_H''@/$(HAVE_STDINT_H)/g' \
+	      -e 's|@''ABSOLUTE_STDINT_H''@|$(ABSOLUTE_STDINT_H)|g' \
+	      -e 's/@''HAVE_SYS_TYPES_H''@/$(HAVE_SYS_TYPES_H)/g' \
+	      -e 's/@''HAVE_INTTYPES_H''@/$(HAVE_INTTYPES_H)/g' \
+	      -e 's/@''HAVE_SYS_INTTYPES_H''@/$(HAVE_SYS_INTTYPES_H)/g' \
+	      -e 's/@''HAVE_SYS_BITYPES_H''@/$(HAVE_SYS_BITYPES_H)/g' \
+	      -e 's/@''HAVE_LONG_LONG_INT''@/$(HAVE_LONG_LONG_INT)/g' \
+	      -e 's/@''HAVE_UNSIGNED_LONG_LONG_INT''@/$(HAVE_UNSIGNED_LONG_LONG_INT)/g' \
+	      -e 's/@''BITSIZEOF_PTRDIFF_T''@/$(BITSIZEOF_PTRDIFF_T)/g' \
+	      -e 's/@''PTRDIFF_T_SUFFIX''@/$(PTRDIFF_T_SUFFIX)/g' \
+	      -e 's/@''BITSIZEOF_SIG_ATOMIC_T''@/$(BITSIZEOF_SIG_ATOMIC_T)/g' \
+	      -e 's/@''HAVE_SIGNED_SIG_ATOMIC_T''@/$(HAVE_SIGNED_SIG_ATOMIC_T)/g' \
+	      -e 's/@''SIG_ATOMIC_T_SUFFIX''@/$(SIG_ATOMIC_T_SUFFIX)/g' \
+	      -e 's/@''BITSIZEOF_SIZE_T''@/$(BITSIZEOF_SIZE_T)/g' \
+	      -e 's/@''SIZE_T_SUFFIX''@/$(SIZE_T_SUFFIX)/g' \
+	      -e 's/@''BITSIZEOF_WCHAR_T''@/$(BITSIZEOF_WCHAR_T)/g' \
+	      -e 's/@''HAVE_SIGNED_WCHAR_T''@/$(HAVE_SIGNED_WCHAR_T)/g' \
+	      -e 's/@''WCHAR_T_SUFFIX''@/$(WCHAR_T_SUFFIX)/g' \
+	      -e 's/@''BITSIZEOF_WINT_T''@/$(BITSIZEOF_WINT_T)/g' \
+	      -e 's/@''HAVE_SIGNED_WINT_T''@/$(HAVE_SIGNED_WINT_T)/g' \
+	      -e 's/@''WINT_T_SUFFIX''@/$(WINT_T_SUFFIX)/g' \
+	      < $(srcdir)/stdint_.h; \
+	} > $@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += stdint.h stdint.h-t
+
+EXTRA_DIST += stdint_.h
 
 ## end   gnulib module stdint
 
 ## begin gnulib module strdup
 
-EXTRA_DIST += strdup.h
+
+EXTRA_DIST += strdup.c strdup.h
 
 ## end   gnulib module strdup
 
 ## begin gnulib module sys_socket
 
 BUILT_SOURCES += $(SYS_SOCKET_H)
-EXTRA_DIST += socket_.h
 
 # We need the following in order to create <sys/socket.h> when the system
 # doesn't have one that works with the given compiler.
 sys/socket.h: socket_.h
 	test -d sys || mkdir sys
-	cp -f $(srcdir)/socket_.h $@-t
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  cat $(srcdir)/socket_.h; \
+	} > $@-t
 	mv -f $@-t $@
 MOSTLYCLEANFILES += sys/socket.h sys/socket.h-t
 MOSTLYCLEANDIRS += sys
+
+EXTRA_DIST += socket_.h
 
 ## end   gnulib module sys_socket
 
 ## begin gnulib module vasnprintf
 
-libgnu_la_SOURCES += printf-args.h printf-parse.h vasnprintf.h
+
+EXTRA_DIST += asnprintf.c printf-args.c printf-args.h printf-parse.c printf-parse.h vasnprintf.c vasnprintf.h
 
 ## end   gnulib module vasnprintf
 
