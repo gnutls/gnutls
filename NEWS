@@ -11,6 +11,12 @@ See the end for copying conditions.
 
 ** Fix the filename of the *.def file on Windows after library version bump.
 
+** Separated the gnulib directory into one for LGPL modules and one for GPL.
+This allows the GPL'd part of GnuTLS to take advantage of the GPL'd
+gnulib modules.  Earlier we could only use the LGPL'ed module from
+gnulib, because two gnulib directories in the same project didn't
+work.
+
 ** API and ABI modifications:
 No changes since last version.
 
