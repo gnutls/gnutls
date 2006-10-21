@@ -20,7 +20,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-AM_CPPFLAGS = -I$(top_srcdir)/gl -I$(top_builddir)/gl	\
+AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl	\
+	-I$(top_srcdir)/gl -I$(top_builddir)/gl	\
 	-I$(top_srcdir)/crypto -I$(top_srcdir)/lib	\
 	-I$(top_srcdir)/includes -I../../includes	\
 	-I$(top_srcdir)/libextra/opencdk
