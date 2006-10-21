@@ -40,23 +40,6 @@ AC_DEFUN([gl_INIT],
   gl_source_base='gl'
   gl_FUNC_ALLOCA
   gl_HEADER_ARPA_INET
-  gl_GC
-  if test $gl_cond_libtool = false; then
-    gl_ltlibdeps="$gl_ltlibdeps $LTLIBGCRYPT"
-    gl_libdeps="$gl_libdeps $LIBGCRYPT"
-  fi
-  gl_GC_ARCFOUR
-  gl_GC_ARCTWO
-  gl_GC_DES
-  gl_GC_HMAC_MD5
-  gl_GC_HMAC_SHA1
-  gl_GC_MD2
-  gl_GC_MD4
-  gl_GC_MD5
-  gl_GC_PBKDF2_SHA1
-  gl_GC_RANDOM
-  gl_GC_RIJNDAEL
-  gl_GC_SHA1
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
@@ -65,7 +48,6 @@ AC_DEFUN([gl_INIT],
   AM_GNU_GETTEXT_VERSION([0.15])
   gl_INET_NTOP
   gl_INET_PTON
-  gl_MD2
   gl_FUNC_MEMMOVE
   gl_MINMAX
   gl_HEADER_NETINET_IN
@@ -120,19 +102,9 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/gpl.texi
   doc/lgpl.texi
   lib/alloca_.h
-  lib/arcfour.c
-  lib/arcfour.h
-  lib/arctwo.c
-  lib/arctwo.h
   lib/asnprintf.c
-  lib/des.c
-  lib/des.h
   lib/dummy.c
   lib/gai_strerror.c
-  lib/gc-gnulib.c
-  lib/gc-libgcrypt.c
-  lib/gc-pbkdf2-sha1.c
-  lib/gc.h
   lib/getaddrinfo.c
   lib/getaddrinfo.h
   lib/getdelim.c
@@ -142,22 +114,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getpass.c
   lib/getpass.h
   lib/gettext.h
-  lib/hmac-md5.c
-  lib/hmac-sha1.c
-  lib/hmac.h
   lib/inet_ntop.c
   lib/inet_ntop.h
   lib/inet_pton.c
   lib/inet_pton.h
-  lib/md2.c
-  lib/md2.h
-  lib/md4.c
-  lib/md4.h
-  lib/md5.c
-  lib/md5.h
   lib/memmove.c
-  lib/memxor.c
-  lib/memxor.h
   lib/minmax.h
   lib/printf-args.c
   lib/printf-args.h
@@ -167,12 +128,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/read-file.h
   lib/readline.c
   lib/readline.h
-  lib/rijndael-alg-fst.c
-  lib/rijndael-alg-fst.h
-  lib/rijndael-api-fst.c
-  lib/rijndael-api-fst.h
-  lib/sha1.c
-  lib/sha1.h
   lib/size_max.h
   lib/snprintf.c
   lib/snprintf.h
@@ -186,25 +141,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/xsize.h
   m4/absolute-header.m4
   m4/alloca.m4
-  m4/arcfour.m4
-  m4/arctwo.m4
   m4/arpa_inet_h.m4
   m4/codeset.m4
-  m4/des.m4
   m4/eoverflow.m4
-  m4/gc-arcfour.m4
-  m4/gc-arctwo.m4
-  m4/gc-des.m4
-  m4/gc-hmac-md5.m4
-  m4/gc-hmac-sha1.m4
-  m4/gc-md2.m4
-  m4/gc-md4.m4
-  m4/gc-md5.m4
-  m4/gc-pbkdf2-sha1.m4
-  m4/gc-random.m4
-  m4/gc-rijndael.m4
-  m4/gc-sha1.m4
-  m4/gc.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
@@ -212,8 +151,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gettext.m4
   m4/glibc2.m4
   m4/glibc21.m4
-  m4/hmac-md5.m4
-  m4/hmac-sha1.m4
   m4/iconv.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
@@ -230,11 +167,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lock.m4
   m4/longdouble.m4
   m4/longlong.m4
-  m4/md2.m4
-  m4/md4.m4
-  m4/md5.m4
   m4/memmove.m4
-  m4/memxor.m4
   m4/minmax.m4
   m4/netinet_in_h.m4
   m4/nls.m4
@@ -243,8 +176,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/progtest.m4
   m4/read-file.m4
   m4/readline.m4
-  m4/rijndael.m4
-  m4/sha1.m4
   m4/signed.m4
   m4/size_max.m4
   m4/snprintf.m4

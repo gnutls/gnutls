@@ -37,7 +37,27 @@ AC_DEFUN([lgl_INIT],
   AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_cond_libtool=true
   gl_source_base='lgl'
+  gl_GC
+  if test $gl_cond_libtool = false; then
+    gl_ltlibdeps="$gl_ltlibdeps $LTLIBGCRYPT"
+    gl_libdeps="$gl_libdeps $LIBGCRYPT"
+  fi
+  gl_GC_ARCFOUR
+  gl_GC_ARCTWO
+  gl_GC_DES
+  gl_GC_HMAC_MD5
+  gl_GC_HMAC_SHA1
+  gl_GC_MD2
+  gl_GC_MD4
+  gl_GC_MD5
+  gl_GC_PBKDF2_SHA1
+  gl_GC_RANDOM
+  gl_GC_RIJNDAEL
+  gl_GC_SHA1
+  gl_MD2
   gl_FUNC_MEMMEM
+  gl_MINMAX
+  gl_STDINT_H
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
   AC_CONFIG_COMMANDS_PRE([
@@ -69,8 +89,70 @@ AC_DEFUN([lgl_REPLACE_FUNCS],
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([lgl_FILE_LIST], [
+  build-aux/config.rpath
+  lib/arcfour.c
+  lib/arcfour.h
+  lib/arctwo.c
+  lib/arctwo.h
+  lib/des.c
+  lib/des.h
   lib/dummy.c
+  lib/gc-gnulib.c
+  lib/gc-libgcrypt.c
+  lib/gc-pbkdf2-sha1.c
+  lib/gc.h
+  lib/hmac-md5.c
+  lib/hmac-sha1.c
+  lib/hmac.h
+  lib/md2.c
+  lib/md2.h
+  lib/md4.c
+  lib/md4.h
+  lib/md5.c
+  lib/md5.h
   lib/memmem.c
   lib/memmem.h
+  lib/memxor.c
+  lib/memxor.h
+  lib/minmax.h
+  lib/rijndael-alg-fst.c
+  lib/rijndael-alg-fst.h
+  lib/rijndael-api-fst.c
+  lib/rijndael-api-fst.h
+  lib/sha1.c
+  lib/sha1.h
+  lib/stdint_.h
+  m4/absolute-header.m4
+  m4/arcfour.m4
+  m4/arctwo.m4
+  m4/des.m4
+  m4/gc-arcfour.m4
+  m4/gc-arctwo.m4
+  m4/gc-des.m4
+  m4/gc-hmac-md5.m4
+  m4/gc-hmac-sha1.m4
+  m4/gc-md2.m4
+  m4/gc-md4.m4
+  m4/gc-md5.m4
+  m4/gc-pbkdf2-sha1.m4
+  m4/gc-random.m4
+  m4/gc-rijndael.m4
+  m4/gc-sha1.m4
+  m4/gc.m4
+  m4/hmac-md5.m4
+  m4/hmac-sha1.m4
+  m4/lib-ld.m4
+  m4/lib-link.m4
+  m4/lib-prefix.m4
+  m4/longlong.m4
+  m4/md2.m4
+  m4/md4.m4
+  m4/md5.m4
   m4/memmem.m4
+  m4/memxor.m4
+  m4/minmax.m4
+  m4/rijndael.m4
+  m4/sha1.m4
+  m4/stdint.m4
+  m4/ulonglong.m4
 ])
