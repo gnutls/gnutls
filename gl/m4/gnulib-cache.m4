@@ -15,11 +15,11 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=. --libtool --macro-prefix=gl arpa_inet fdl gendocs getaddrinfo getline getpass gettext gpl inet_ntop inet_pton lgpl maintainer-makefile memmove minmax read-file readline snprintf socklen stdint
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=. --libtool --macro-prefix=gl arpa_inet fdl gendocs getaddrinfo getline getpass gpl inet_ntop inet_pton lgpl maintainer-makefile readline
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
-gl_MODULES([arpa_inet fdl gendocs getaddrinfo getline getpass gettext gpl inet_ntop inet_pton lgpl maintainer-makefile memmove minmax read-file readline snprintf socklen stdint])
+gl_MODULES([arpa_inet fdl gendocs getaddrinfo getline getpass gpl inet_ntop inet_pton lgpl maintainer-makefile readline])
 gl_AVOID([])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])

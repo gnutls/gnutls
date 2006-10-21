@@ -1,18 +1,19 @@
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Copyright (C) 2001-2002, 2004-2006 Free Software Foundation, Inc.
    Written by Paul Eggert, Bruno Haible, Sam Steingold, Peter Burwood.
    This file is part of gnulib.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
@@ -32,7 +33,7 @@
    for the "fast" types and macros, which we recommend against using
    in public interfaces due to compiler differences.  */
 
-#if @HAVE_STDINT_H@
+#if 1
 # if defined __sgi && ! defined __c99
    /* Bypass IRIX's <stdint.h> if in C89 mode, since it merely annoys users
       with "This header file is to be used only for c99 mode compilations"
@@ -43,35 +44,35 @@
      Include it before <inttypes.h>, since any "#include <stdint.h>"
      in <inttypes.h> would reinclude us, skipping our contents because
      _GL_STDINT_H is defined.  */
-# include @ABSOLUTE_STDINT_H@
+# include "///usr/include/stdint.h"
 #endif
 
 /* <sys/types.h> defines some of the stdint.h types as well, on glibc,
    IRIX 6.5, and OpenBSD 3.8 (via <machine/types.h>).
    MacOS X 10.4.6 <sys/types.h> includes <stdint.h> (which is us), but
    relies on the system <stdint.h> definitions, so include
-   <sys/types.h> after @ABSOLUTE_STDINT_H@.  */
-#if @HAVE_SYS_TYPES_H@
+   <sys/types.h> after "///usr/include/stdint.h".  */
+#if 1
 # include <sys/types.h>
 #endif
 
 /* Get LONG_MIN, LONG_MAX, ULONG_MAX.  */
 #include <limits.h>
 
-#if @HAVE_INTTYPES_H@
+#if 1
   /* In OpenBSD 3.8, <inttypes.h> includes <machine/types.h>, which defines
      int{8,16,32,64}_t, uint{8,16,32,64}_t and __BIT_TYPES_DEFINED__.
      <inttypes.h> also defines intptr_t and uintptr_t.  */
 # define _GL_JUST_INCLUDE_ABSOLUTE_INTTYPES_H
 # include <inttypes.h>
 # undef _GL_JUST_INCLUDE_ABSOLUTE_INTTYPES_H
-#elif @HAVE_SYS_INTTYPES_H@
+#elif 0
   /* Solaris 7 <sys/inttypes.h> has the types except the *_fast*_t types, and
      the macros except for *_FAST*_*, INTPTR_MIN, PTRDIFF_MIN, PTRDIFF_MAX.  */
 # include <sys/inttypes.h>
 #endif
 
-#if @HAVE_SYS_BITYPES_H@ && ! defined __BIT_TYPES_DEFINED__
+#if 1 && ! defined __BIT_TYPES_DEFINED__
   /* Linux libc4 >= 4.6.7 and libc5 have a <sys/bitypes.h> that defines
      int{8,16,32,64}_t and __BIT_TYPES_DEFINED__.  In libc5 >= 5.2.2 it is
      included by <sys/types.h>.  */
@@ -81,7 +82,7 @@
 #if ! defined __cplusplus || defined __STDC_CONSTANT_MACROS
 
 /* Get WCHAR_MIN, WCHAR_MAX.  */
-# if @HAVE_WCHAR_H@ && ! (defined WCHAR_MIN && defined WCHAR_MAX)
+# if 1 && ! (defined WCHAR_MIN && defined WCHAR_MAX)
    /* BSD/OS 4.1 has a bug: <stdio.h> and <time.h> must be included before
       <wchar.h>.  */
 #  include <stdio.h>
@@ -128,7 +129,7 @@
 # define int64_t long int
 #elif defined _MSC_VER
 # define int64_t __int64
-#elif @HAVE_LONG_LONG_INT@
+#elif 1
 # define int64_t long long int
 #endif
 
@@ -137,7 +138,7 @@
 # define uint64_t unsigned long int
 #elif defined _MSC_VER
 # define uint64_t unsigned __int64
-#elif @HAVE_UNSIGNED_LONG_LONG_INT@
+#elif 1
 # define uint64_t unsigned long long int
 #endif
 
@@ -218,7 +219,7 @@
    public header files. */
 
 #undef intmax_t
-#if @HAVE_LONG_LONG_INT@ && LONG_MAX >> 30 == 1
+#if 1 && LONG_MAX >> 30 == 1
 # define intmax_t long long int
 #elif defined int64_t
 # define intmax_t int64_t
@@ -227,7 +228,7 @@
 #endif
 
 #undef uintmax_t
-#if @HAVE_UNSIGNED_LONG_LONG_INT@ && ULONG_MAX >> 31 == 1
+#if 1 && ULONG_MAX >> 31 == 1
 # define uintmax_t unsigned long long int
 #elif defined int64_t
 # define uintmax_t uint64_t
@@ -388,40 +389,40 @@
 #undef PTRDIFF_MIN
 #undef PTRDIFF_MAX
 #define PTRDIFF_MIN  \
-   _STDINT_MIN (1, @BITSIZEOF_PTRDIFF_T@, 0@PTRDIFF_T_SUFFIX@)
+   _STDINT_MIN (1, 32, 0)
 #define PTRDIFF_MAX  \
-   _STDINT_MAX (1, @BITSIZEOF_PTRDIFF_T@, 0@PTRDIFF_T_SUFFIX@)
+   _STDINT_MAX (1, 32, 0)
 
 /* sig_atomic_t limits */
 #undef SIG_ATOMIC_MIN
 #undef SIG_ATOMIC_MAX
 #define SIG_ATOMIC_MIN  \
-   _STDINT_MIN (@HAVE_SIGNED_SIG_ATOMIC_T@, @BITSIZEOF_SIG_ATOMIC_T@, \
-		0@SIG_ATOMIC_T_SUFFIX@)
+   _STDINT_MIN (1, 32, \
+		0)
 #define SIG_ATOMIC_MAX  \
-   _STDINT_MAX (@HAVE_SIGNED_SIG_ATOMIC_T@, @BITSIZEOF_SIG_ATOMIC_T@, \
-		0@SIG_ATOMIC_T_SUFFIX@)
+   _STDINT_MAX (1, 32, \
+		0)
 
 
 /* size_t limit */
 #undef SIZE_MAX
-#define SIZE_MAX  _STDINT_MAX (0, @BITSIZEOF_SIZE_T@, 0@SIZE_T_SUFFIX@)
+#define SIZE_MAX  _STDINT_MAX (0, 32, 0u)
 
 /* wchar_t limits */
 #undef WCHAR_MIN
 #undef WCHAR_MAX
 #define WCHAR_MIN  \
-   _STDINT_MIN (@HAVE_SIGNED_WCHAR_T@, @BITSIZEOF_WCHAR_T@, 0@WCHAR_T_SUFFIX@)
+   _STDINT_MIN (1, 32, 0)
 #define WCHAR_MAX  \
-   _STDINT_MAX (@HAVE_SIGNED_WCHAR_T@, @BITSIZEOF_WCHAR_T@, 0@WCHAR_T_SUFFIX@)
+   _STDINT_MAX (1, 32, 0)
 
 /* wint_t limits */
 #undef WINT_MIN
 #undef WINT_MAX
 #define WINT_MIN  \
-   _STDINT_MIN (@HAVE_SIGNED_WINT_T@, @BITSIZEOF_WINT_T@, 0@WINT_T_SUFFIX@)
+   _STDINT_MIN (0, 32, 0u)
 #define WINT_MAX  \
-   _STDINT_MAX (@HAVE_SIGNED_WINT_T@, @BITSIZEOF_WINT_T@, 0@WINT_T_SUFFIX@)
+   _STDINT_MAX (0, 32, 0u)
 
 #endif /* !defined __cplusplus || defined __STDC_LIMIT_MACROS */
 
@@ -456,21 +457,21 @@
 # define INT64_C(x) x##L
 #elif defined _MSC_VER
 # define INT64_C(x) x##i64
-#elif @HAVE_LONG_LONG_INT@
+#elif 1
 # define INT64_C(x) x##LL
 #endif
 #if ULONG_MAX >> 31 >> 31 >> 1 == 1
 # define UINT64_C(x) x##UL
 #elif defined _MSC_VER
 # define UINT64_C(x) x##ui64
-#elif @HAVE_UNSIGNED_LONG_LONG_INT@
+#elif 1
 # define UINT64_C(x) x##ULL
 #endif
 
 /* 7.18.4.2. Macros for greatest-width integer constants */
 
 #undef INTMAX_C
-#if @HAVE_LONG_LONG_INT@ && LONG_MAX >> 30 == 1
+#if 1 && LONG_MAX >> 30 == 1
 # define INTMAX_C(x)   x##LL
 #elif defined int64_t
 # define INTMAX_C(x)   INT64_C(x)
@@ -479,7 +480,7 @@
 #endif
 
 #undef UINTMAX_C
-#if @HAVE_UNSIGNED_LONG_LONG_INT@ && ULONG_MAX >> 31 == 1
+#if 1 && ULONG_MAX >> 31 == 1
 # define UINTMAX_C(x)  x##ULL
 #elif defined uint64_t
 # define UINTMAX_C(x)  UINT64_C(x)
