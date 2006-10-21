@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)/gl -I../../gl
+INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)/lgl -I$(top_builddir)/lgl
 
 noinst_LTLIBRARIES = libminitasn1.la
 

@@ -19,7 +19,7 @@
 # USA
 
 INCLUDES = \
-	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
+	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/libextra/openpgp/				\
 	-I$(top_srcdir)/libextra/opencdk -I$(top_srcdir)/lib		\
