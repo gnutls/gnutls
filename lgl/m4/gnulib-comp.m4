@@ -60,9 +60,7 @@ AC_DEFUN([lgl_INIT],
   AM_GNU_GETTEXT_VERSION([0.15])
   gl_MD2
   gl_FUNC_MEMMEM
-  gl_FUNC_MEMMOVE
   gl_MINMAX
-  gl_FUNC_READ_FILE
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
   gl_TYPE_SOCKLEN_T
@@ -127,7 +125,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/md5.h
   lib/memmem.c
   lib/memmem.h
-  lib/memmove.c
   lib/memxor.c
   lib/memxor.h
   lib/minmax.h
@@ -135,8 +132,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/printf-args.h
   lib/printf-parse.c
   lib/printf-parse.h
-  lib/read-file.c
-  lib/read-file.h
   lib/rijndael-alg-fst.c
   lib/rijndael-alg-fst.h
   lib/rijndael-api-fst.c
@@ -194,14 +189,12 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/md4.m4
   m4/md5.m4
   m4/memmem.m4
-  m4/memmove.m4
   m4/memxor.m4
   m4/minmax.m4
   m4/nls.m4
   m4/po.m4
   m4/printf-posix.m4
   m4/progtest.m4
-  m4/read-file.m4
   m4/rijndael.m4
   m4/sha1.m4
   m4/signed.m4

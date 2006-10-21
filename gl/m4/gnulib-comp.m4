@@ -44,9 +44,14 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
+  dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
+  AM_GNU_GETTEXT_VERSION([0.15])
   gl_INET_NTOP
   gl_INET_PTON
+  gl_FUNC_MEMMOVE
+  gl_MINMAX
   gl_HEADER_NETINET_IN
+  gl_FUNC_READ_FILE
   gl_FUNC_READLINE
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
@@ -112,10 +117,14 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/inet_ntop.h
   lib/inet_pton.c
   lib/inet_pton.h
+  lib/memmove.c
+  lib/minmax.h
   lib/printf-args.c
   lib/printf-args.h
   lib/printf-parse.c
   lib/printf-parse.h
+  lib/read-file.c
+  lib/read-file.h
   lib/readline.c
   lib/readline.h
   lib/size_max.h
@@ -130,21 +139,39 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/xsize.h
   m4/alloca.m4
   m4/arpa_inet_h.m4
+  m4/codeset.m4
   m4/eoverflow.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
+  m4/gettext.m4
+  m4/glibc2.m4
+  m4/glibc21.m4
+  m4/iconv.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
+  m4/intdiv0.m4
+  m4/intmax.m4
   m4/intmax_t.m4
+  m4/inttypes-h.m4
+  m4/inttypes-pri.m4
   m4/inttypes_h.m4
+  m4/lcmessage.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/lock.m4
   m4/longdouble.m4
   m4/longlong.m4
+  m4/memmove.m4
+  m4/minmax.m4
   m4/netinet_in_h.m4
+  m4/nls.m4
+  m4/po.m4
+  m4/printf-posix.m4
+  m4/progtest.m4
+  m4/read-file.m4
   m4/readline.m4
   m4/signed.m4
   m4/size_max.m4
@@ -155,7 +182,10 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdint_h.m4
   m4/strdup.m4
   m4/sys_socket_h.m4
+  m4/uintmax_t.m4
+  m4/ulonglong.m4
   m4/vasnprintf.m4
+  m4/visibility.m4
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
