@@ -4,4 +4,5 @@ Makefile
 Makefile.in
 libgnu.la
 *.lo
+alloca.h
 stdint.h
