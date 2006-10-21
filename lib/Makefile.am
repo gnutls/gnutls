@@ -28,7 +28,7 @@ endif
 localedir = $(datadir)/locale
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
-	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
+	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/includes -I../includes				\
 	-I$(srcdir)/x509						\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/libextra/openpgp/	\
@@ -100,7 +100,7 @@ libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
+libgnutls_la_LIBADD = ../lgl/libgnu.la x509/libgnutls_x509.la \
 	@LTLIBZ@ $(LIBGCRYPT_LIBS) @LTLIBINTL@
 
 if HAVE_LD_VERSION_SCRIPT

@@ -15,17 +15,18 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=. --libtool --macro-prefix=gl arpa_inet fdl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 gendocs getaddrinfo getline getpass gettext gpl inet_ntop inet_pton lgpl maintainer-makefile memmove minmax read-file readline snprintf socklen stdint
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=lgl --m4-base=lgl/m4 --doc-base=doc --aux-dir=. --lgpl --libtool --macro-prefix=lgl memmem
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
-gl_LOCAL_DIR([gl/override])
-gl_MODULES([arpa_inet fdl gc gc-arcfour gc-arctwo gc-des gc-hmac-md5 gc-md2 gc-md4 gc-md5 gc-pbkdf2-sha1 gc-random gc-rijndael gc-sha1 gendocs getaddrinfo getline getpass gettext gpl inet_ntop inet_pton lgpl maintainer-makefile memmove minmax read-file readline snprintf socklen stdint])
+gl_LOCAL_DIR([])
+gl_MODULES([memmem])
 gl_AVOID([])
-gl_SOURCE_BASE([gl])
-gl_M4_BASE([gl/m4])
+gl_SOURCE_BASE([lgl])
+gl_M4_BASE([lgl/m4])
 gl_DOC_BASE([doc])
-gl_TESTS_BASE([gl/tests])
+gl_TESTS_BASE([tests])
 gl_LIB([libgnu])
+gl_LGPL
 gl_MAKEFILE_NAME([])
 gl_LIBTOOL
-gl_MACRO_PREFIX([gl])
+gl_MACRO_PREFIX([lgl])

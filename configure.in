@@ -98,6 +98,7 @@ AC_MSG_RESULT([***
 ])
 
 gl_EARLY
+lgl_EARLY
 AC_C_CONST
 AC_C_INLINE
 
@@ -557,6 +558,7 @@ AC_MSG_RESULT([***
 *** Setting up gnulib compatibility files...
 ])
 gl_INIT
+lgl_INIT
 
 AC_TRY_LINK([#include <winsock2.h>], [
   WORD wVersionRequested = MAKEWORD(2, 2);
@@ -617,7 +619,7 @@ AC_CONFIG_COMMANDS([chmod-config],[[
 AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile \
-	gl/Makefile tests/Makefile \
+	gl/Makefile lgl/Makefile tests/Makefile \
 	includes/Makefile includes/gnutls/gnutls.h \
 	lib/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 	libextra/Makefile libextra/openpgp/Makefile libextra/opencdk/Makefile \

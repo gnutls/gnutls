@@ -66,7 +66,6 @@ AC_DEFUN([gl_INIT],
   gl_INET_NTOP
   gl_INET_PTON
   gl_MD2
-  gl_FUNC_MEMMEM
   gl_FUNC_MEMMOVE
   gl_MINMAX
   gl_HEADER_NETINET_IN
@@ -156,8 +155,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/md4.h
   lib/md5.c
   lib/md5.h
-  lib/memmem.c
-  lib/memmem.h
   lib/memmove.c
   lib/memxor.c
   lib/memxor.h
@@ -236,7 +233,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/md2.m4
   m4/md4.m4
   m4/md5.m4
-  m4/memmem.m4
   m4/memmove.m4
   m4/memxor.m4
   m4/minmax.m4
