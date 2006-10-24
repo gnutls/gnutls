@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.5.3 (unreleased)
 
+** Add new self-test for RSA-MD5 signature chains.
+Note that we already, since GnuTLS 1.2.9, reject RSA-MD5 signatures.
+
+** Re-factor self tests.
+
 ** The include copy of Libtasn1 is updated to version 0.3.7.
 
 ** The included copy of OpenCDK is updated to version 0.5.10.
