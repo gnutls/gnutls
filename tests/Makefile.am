@@ -19,19 +19,16 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = rsa-md5-collision pkcs1-padding pkcs8-decode
+SUBDIRS = rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode
 
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
-	-I../includes -I$(top_srcdir)/includes
+	-I$(top_srcdir)/includes -I$(top_builddir)/includes
 AM_LDFLAGS = -no-install
 LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/libgnu.la libutils.la
 
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
-
-# For pkcs12_neon.
-EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 
 ctests = simple openssl gc set_pkcs12_cred certder
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
@@ -42,11 +39,10 @@ endif
 gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = pkcs12_neon
 
-TESTS = pkcs12_neon $(ctests)
+TESTS = $(ctests)
 
 TESTS_ENVIRONMENT = \
-	PKCS12FILE=$(srcdir)/client.p12	\
+	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12	\
 	PKCS12PASSWORD=foobar \
 	$(VALGRIND)

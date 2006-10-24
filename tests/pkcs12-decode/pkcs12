@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -20,7 +20,8 @@
 # along with GNUTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-CERTTOOL=../src/certtool
+srcdir=${srcdir:-.}
+CERTTOOL=${CERTTOOL:-../../src/certtool}
 
 ret=0
 for p12 in 'client.p12 foobar' noclient.p12 unclient.p12; do
@@ -28,7 +29,7 @@ for p12 in 'client.p12 foobar' noclient.p12 unclient.p12; do
     file=$1
     passwd=$2
     $CERTTOOL --p12-info --inder --password "$passwd" \
-		--infile $srcdir/$file > out 2>&1
+		--infile $srcdir/$file | tee out
     rc=$?
     if test $rc != 0; then
 	echo "NEON PKCS12 FATAL $p12"
