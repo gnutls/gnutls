@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -20,7 +20,8 @@
 # along with GNUTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-CERTTOOL=../src/certtool
+srcdir=${srcdir:-.}
+CERTTOOL=${CERTTOOL:-../../src/certtool}
 
 ret=0
 for p8 in 'encpkcs8.pem foobar' unencpkcs8.pem 'enc2pkcs8.pem baz'; do
