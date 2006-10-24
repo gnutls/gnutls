@@ -21,7 +21,8 @@
 
 EXTRA_DIST = MD5CollisionCA.cer \
 	TargetCollidingCertificate1.cer \
-	TargetCollidingCertificate2.cer
+	TargetCollidingCertificate2.cer \
+	chain1-expect.log chain2-expect.log
 
 dist_check_SCRIPTS = rsa-md5-collision
 
