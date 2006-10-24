@@ -19,6 +19,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+SUBDIRS = rsa-md5-collision pkcs1-padding
+
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I../includes -I$(top_srcdir)/includes
@@ -34,11 +36,6 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 # For pkcs8.
 EXTRA_DIST += encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 
-# For pkcs1-pad
-EXTRA_DIST += pkcs1-pad-ok.pem pkcs1-pad-broken.pem \
-	pkcs1-pad-ok2.pem pkcs1-pad-broken2.pem \
-	pkcs1-pad-broken3.pem
-
 ctests = simple openssl gc set_pkcs12_cred certder
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 if HAVE_FORK
@@ -48,9 +45,9 @@ endif
 gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
 check_PROGRAMS = $(ctests)
-dist_check_SCRIPTS = pkcs12_neon pkcs8 pkcs1-pad
+dist_check_SCRIPTS = pkcs12_neon pkcs8
 
-TESTS = pkcs12_neon pkcs8 pkcs1-pad $(ctests)
+TESTS = pkcs12_neon pkcs8 $(ctests)
 
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/client.p12	\
