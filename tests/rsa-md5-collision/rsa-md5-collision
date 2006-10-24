@@ -38,8 +38,8 @@ cat client2.pem ca.pem > chain2.pem
 $CERTTOOL --verify-chain < chain1.pem | tee chain1.log
 $CERTTOOL --verify-chain < chain2.pem | tee chain2.log
 
-diff chain1-expect.log chain1.log
-diff chain2-expect.log chain2.log
+diff $srcdir/chain1-expect.log chain1.log
+diff $srcdir/chain2-expect.log chain2.log
 
 rm -f ca.pem client1.pem client2.pem \
    chain1.pem chain2.pem \
