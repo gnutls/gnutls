@@ -24,7 +24,7 @@
 
 #include <stdarg.h>
 
-#define OPENCDK_VERSION "0.5.10"
+#define OPENCDK_VERSION "0.5.11"
 
 #ifdef __cplusplus
 extern "C" {
@@ -772,6 +772,8 @@ cdk_error_t cdk_sklist_write_onepass( cdk_keylist_t skl, cdk_stream_t outp,
 /*-- encrypt.c --*/
 cdk_error_t cdk_stream_encrypt (cdk_ctx_t hd, cdk_strlist_t remusr,
                                 cdk_stream_t inp, cdk_stream_t out);
+cdk_error_t cdk_stream_decrypt (cdk_ctx_t hd, cdk_stream_t inp,
+				cdk_stream_t out);
 cdk_error_t cdk_file_encrypt (cdk_ctx_t hd, cdk_strlist_t remusr,
                       const char * file, const char * output);
 cdk_error_t cdk_file_decrypt (cdk_ctx_t hd, const char * file,

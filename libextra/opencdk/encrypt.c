@@ -1,5 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * encrypt.c
+ *       Copyright (C) 2006 Free Software Foundation, Inc.
  *       Copyright (C) 2002, 2003 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -992,7 +993,7 @@ cdk_data_transform( cdk_ctx_t hd, enum cdk_crypto_mode_t mode,
             rc = cdk_keydb_import( db, knode, res );
             if( !rc ) {
                 *outbuf = NULL; /* FIXME */
-                *outsize = strlen( *outbuf );
+		*outsize = 0;
             }
             cdk_kbnode_release( knode );
         }
