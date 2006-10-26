@@ -5,8 +5,11 @@ See the end for copying conditions.
 
 * Version 1.5.3 (unreleased)
 
-** Add new self-test for RSA-MD5 signature chains.
-Note that we already, since GnuTLS 1.2.9, reject RSA-MD5 signatures.
+** Add new self-test of RSA-MD5 signature chains.
+Note that we already, since GnuTLS 1.2.9, reject RSA-MD5 signatures
+when verifying X.509 chains.  The code is in tests/rsa-md5-collision/
+and is based on the work by Marc Stevens et al, see
+<http://www.win.tue.nl/hashclash/TargetCollidingCertificates/>.
 
 ** Re-factor self tests.
 

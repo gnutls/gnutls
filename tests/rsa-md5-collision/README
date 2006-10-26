@@ -1,0 +1,21 @@
+rsa-md5-collision README -- Information about rsa-md5-collision self tests.
+Copyright (C) 2006 Simon Josefsson
+See the end for copying conditions.
+
+This directory contains colliding X.509 certificates for different
+identities, from:
+
+http://www.win.tue.nl/hashclash/TargetCollidingCertificates/
+
+The certificates are used by a simple self-test script,
+rsa-md5-collision, that check to make sure that GnuTLS reject both
+certificate chains.
+
+The file mbox contain mail exchanges with the authors where they agree
+to release the certificates under a permissive license, that allow the
+files to be included here.
+
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
