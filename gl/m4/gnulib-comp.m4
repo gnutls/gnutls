@@ -45,10 +45,12 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETPASS
   gl_INET_NTOP
   gl_INET_PTON
+  gl_INTTOSTR
   gl_HEADER_NETINET_IN
   gl_FUNC_READLINE
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
+  gl_STDINT_H
   gl_FUNC_STRDUP
   gl_HEADER_SYS_SOCKET
   m4_popdef([AC_REPLACE_FUNCS])
@@ -101,16 +103,25 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getpass.c
   lib/getpass.h
   lib/gettext.h
+  lib/imaxtostr.c
   lib/inet_ntop.c
   lib/inet_ntop.h
   lib/inet_pton.c
   lib/inet_pton.h
+  lib/intprops.h
+  lib/inttostr.c
+  lib/inttostr.h
+  lib/offtostr.c
   lib/readline.c
   lib/readline.h
   lib/socket_.h
   lib/stdbool_.h
+  lib/stdint_.h
   lib/strdup.c
   lib/strdup.h
+  lib/uinttostr.c
+  lib/umaxtostr.c
+  m4/absolute-header.m4
   m4/arpa_inet_h.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
@@ -118,14 +129,18 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getpass.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
+  m4/inttostr.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/longlong.m4
   m4/netinet_in_h.m4
   m4/readline.m4
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdbool.m4
+  m4/stdint.m4
   m4/strdup.m4
   m4/sys_socket_h.m4
+  m4/ulonglong.m4
 ])
