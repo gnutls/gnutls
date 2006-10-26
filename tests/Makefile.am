@@ -25,7 +25,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes
 AM_LDFLAGS = -no-install
-LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/libgnu.la libutils.la
+LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la libutils.la
 
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c

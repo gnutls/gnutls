@@ -40,13 +40,13 @@ if ENABLE_SRP
 srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
 srptool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)		\
-	../gl/libgnu.la ../lgl/libgnu.la
+	../gl/libgnu.la ../lgl/liblgnu.la
 endif
 
 psktool_SOURCES = psk.gaa psk-gaa.h psk-gaa.c psk.c
 psktool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)		\
-	../gl/libgnu.la ../lgl/libgnu.la
+	../gl/libgnu.la ../lgl/liblgnu.la
 
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
 	common.c select.c

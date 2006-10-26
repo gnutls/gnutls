@@ -100,7 +100,7 @@ libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_la_LIBADD = ../lgl/libgnu.la x509/libgnutls_x509.la \
+libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
 	@LTLIBZ@ $(LIBGCRYPT_LIBS) @LTLIBINTL@
 
 if HAVE_LD_VERSION_SCRIPT
