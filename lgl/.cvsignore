@@ -2,7 +2,7 @@
 .libs
 Makefile
 Makefile.in
-libgnu.la
+liblgnu.la
 *.lo
 alloca.h
 stdint.h
