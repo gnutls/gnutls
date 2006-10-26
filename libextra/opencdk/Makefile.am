@@ -21,7 +21,7 @@
 # 02110-1301, USA.
 
 INCLUDES = -I$(top_srcdir)/lib \
-	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl
+	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl \
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl
 
 noinst_LTLIBRARIES = libminiopencdk.la
