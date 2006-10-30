@@ -216,7 +216,7 @@ gnutls_openpgp_key_export (gnutls_openpgp_key_t key,
 /**
  * gnutls_openpgp_key_get_fingerprint - Gets the fingerprint
  * @key: the raw data that contains the OpenPGP public key.
- * @fpr: the buffer to save the fingerprint.
+ * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
  * @fprlen: the integer to save the length of the fingerprint.
  *
  * Returns the fingerprint of the OpenPGP key. Depends on the algorithm,
