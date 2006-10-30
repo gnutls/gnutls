@@ -181,9 +181,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/hmac-sha1.m4
   m4/iconv.m4
   m4/intdiv0.m4
+  m4/intl.m4
+  m4/intldir.m4
   m4/intmax.m4
   m4/intmax_t.m4
-  m4/inttypes-h.m4
   m4/inttypes-pri.m4
   m4/inttypes_h.m4
   m4/lcmessage.m4
@@ -207,7 +208,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/read-file.m4
   m4/rijndael.m4
   m4/sha1.m4
-  m4/signed.m4
   m4/size_max.m4
   m4/snprintf.m4
   m4/socklen.m4
