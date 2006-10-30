@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 1.5.4 (unreleased)
 
+** Replace old constructs with use of gnulib modules.
+For example, we can now assume unistd.h, sys/stat.h, sys/socket.h in
+the code.  If the headers doesn't exist on the target system, gnulib
+will make sure its replacement header files are used instead.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.5.3 (released 2006-10-26)
 
 ** Add new self-test of RSA-MD5 signature chains.
