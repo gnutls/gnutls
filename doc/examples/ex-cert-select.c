@@ -9,7 +9,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <sys/stat.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <sys/types.h>
