@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -42,21 +42,10 @@
 typedef int ssize_t;
 #endif
 
-#ifdef HAVE_STRINGS_H
-# include <strings.h>
-#endif
-
-#ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-
-#ifdef HAVE_SYS_STAT_H
-# include <sys/stat.h>
-#endif
-
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
 
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -67,10 +56,6 @@ typedef int ssize_t;
 # else
 #  include <time.h>
 # endif
-#endif
-
-#ifdef HAVE_SYS_SOCKET_H
-# include <sys/socket.h>
 #endif
 
 #include "memmem.h"
