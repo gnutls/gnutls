@@ -60,12 +60,16 @@ AC_DEFUN([lgl_INIT],
   AM_GNU_GETTEXT_VERSION([0.15])
   gl_MD2
   gl_FUNC_MEMMEM
+  gl_FUNC_MEMMOVE
   gl_MINMAX
+  gl_FUNC_READ_FILE
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
   gl_TYPE_SOCKLEN_T
   gl_STDINT_H
   gl_HEADER_SYS_SOCKET
+  gl_HEADER_SYS_STAT_H
+  gl_HEADER_UNISTD
   gl_FUNC_VASNPRINTF
   gl_XSIZE
   m4_popdef([AC_REPLACE_FUNCS])
@@ -125,6 +129,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/md5.h
   lib/memmem.c
   lib/memmem.h
+  lib/memmove.c
   lib/memxor.c
   lib/memxor.h
   lib/minmax.h
@@ -132,6 +137,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/printf-args.h
   lib/printf-parse.c
   lib/printf-parse.h
+  lib/read-file.c
+  lib/read-file.h
   lib/rijndael-alg-fst.c
   lib/rijndael-alg-fst.h
   lib/rijndael-api-fst.c
@@ -142,6 +149,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/snprintf.c
   lib/snprintf.h
   lib/socket_.h
+  lib/stat_.h
   lib/stdint_.h
   lib/vasnprintf.c
   lib/vasnprintf.h
@@ -189,12 +197,14 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/md4.m4
   m4/md5.m4
   m4/memmem.m4
+  m4/memmove.m4
   m4/memxor.m4
   m4/minmax.m4
   m4/nls.m4
   m4/po.m4
   m4/printf-posix.m4
   m4/progtest.m4
+  m4/read-file.m4
   m4/rijndael.m4
   m4/sha1.m4
   m4/signed.m4
@@ -205,8 +215,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/stdint.m4
   m4/stdint_h.m4
   m4/sys_socket_h.m4
+  m4/sys_stat_h.m4
   m4/uintmax_t.m4
   m4/ulonglong.m4
+  m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/visibility.m4
   m4/wchar_t.m4
