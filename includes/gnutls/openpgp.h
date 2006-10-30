@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -67,8 +67,9 @@ extern "C"
   int gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
 				   int idx, char *buf, size_t * sizeof_buf);
 
-  int gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_key_t key,
-					   unsigned int *bits);
+  gnutls_pk_algorithm_t
+  gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_key_t key,
+				       unsigned int *bits);
 
   int gnutls_openpgp_key_get_version (gnutls_openpgp_key_t key);
 
@@ -88,8 +89,9 @@ extern "C"
  */
   int gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);
   void gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key);
-  int gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
-					       unsigned int *bits);
+  gnutls_pk_algorithm_t
+  gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
+					   unsigned int *bits);
   int gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 				     const gnutls_datum_t * data,
 				     gnutls_openpgp_key_fmt format,

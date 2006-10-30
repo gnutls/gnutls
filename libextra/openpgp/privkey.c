@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -120,7 +120,7 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
   * or a negative value on error.
   *
   **/
-int
+gnutls_pk_algorithm_t
 gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
 					 unsigned int *bits)
 {

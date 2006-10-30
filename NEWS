@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 1.5.4 (unreleased)
 
+** Fix return value of gnutls_openpgp_privkey_get_pk_algorithm and
+** gnutls_openpgp_key_get_pk_algorithm.
+Before they were 'int', now they are 'gnutls_pk_algorithm_t', which is
+an enum type (and thus API/ABI compatible with 'int').  Reported by
+ludovic.courtes@laas.fr (Ludovic Courtès).
+
 ** When a GnuTLS server receive a SSLv2 Client Hello for an unknown TLS
 ** version, try to negotiate the highest version support by the GnuTLS server,
 ** instead of the lowest.

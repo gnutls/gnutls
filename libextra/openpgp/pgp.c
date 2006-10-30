@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Timo Schulz, Nikos Mavroyanopoulos
  *
@@ -369,7 +369,7 @@ leave:
   * or a negative value on error.
   *
   **/
-int
+gnutls_pk_algorithm_t
 gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_key_t key,
 				     unsigned int *bits)
 {
