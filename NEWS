@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.5.4 (unreleased)
 
+** When a GnuTLS server receive a SSLv2 Client Hello for an unknown TLS
+** version, try to negotiate the highest version support by the GnuTLS server,
+** instead of the lowest.
+Reported by <Pasi.Eronen@nokia.com>.
+
 ** Replace old constructs with use of gnulib modules.
 For example, we can now assume unistd.h, sys/stat.h, sys/socket.h in
 the code.  If the headers doesn't exist on the target system, gnulib
