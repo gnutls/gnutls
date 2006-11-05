@@ -23,6 +23,10 @@ For example, we can now assume unistd.h, sys/stat.h, sys/socket.h in
 the code.  If the headers doesn't exist on the target system, gnulib
 will make sure its replacement header files are used instead.
 
+** Fix SOVERSION computation for *.def files.
+This fixes build errors similar to "No rule to make target
+`libgnutls-`expr', needed by `all-am'.".
+
 ** API and ABI modifications:
 No changes since last version.
 
