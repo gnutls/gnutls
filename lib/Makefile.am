@@ -114,7 +114,6 @@ libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS)
 endif
 
 if HAVE_LD_OUTPUT_DEF
-SOVERSION = `expr $(LT_CURRENT) - $(LT_AGE)`
 libgnutls_la_LDFLAGS += -Wl,--output-def,libgnutls-$(SOVERSION).def
 defexecdir = $(bindir)
 defexec_DATA = libgnutls-$(SOVERSION).def
