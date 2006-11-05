@@ -6,3 +6,4 @@ liblgnu.la
 *.lo
 alloca.h
 stdint.h
+sys
