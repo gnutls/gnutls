@@ -25,7 +25,7 @@ will make sure its replacement header files are used instead.
 
 ** Fix SOVERSION computation for *.def files.
 This fixes build errors similar to "No rule to make target
-`libgnutls-`expr', needed by `all-am'.".
+`libgnutls-`expr', needed by `all-am'." when building for Windows.
 
 ** API and ABI modifications:
 No changes since last version.
