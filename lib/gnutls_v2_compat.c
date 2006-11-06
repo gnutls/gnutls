@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -117,11 +117,21 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
 
   version = _gnutls_version_get (data[pos], data[pos + 1]);
 
-  /* if we do not support that version  
+  /* if we do not support that version
    */
   if (_gnutls_version_is_supported (session, version) == 0)
     {
-      ver = _gnutls_version_lowest (session);
+      /* If he requested something we do not support
+       * then we send him the highest we support.
+       */
+      ver = _gnutls_version_max (session);
+      if (ver == GNUTLS_VERSION_UNKNOWN)
+	{
+	  /* this check is not really needed.
+	   */
+	  gnutls_assert ();
+	  return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
+	}
     }
   else
     {
