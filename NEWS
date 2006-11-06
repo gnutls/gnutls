@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** instead of the lowest.
 Reported by <Pasi.Eronen@nokia.com>.
 
+** Fix typo in doc/examples/ex-serv-pgp.c.
+Reported by Adam Langley" <agl@imperialviolet.org>.
+
 ** API and ABI modifications:
 No changes since last version.
 
