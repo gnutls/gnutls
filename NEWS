@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.4.5 (unreleased)
 
+** When a GnuTLS server receive a SSLv2 Client Hello for an unknown TLS
+** version, try to negotiate the highest version support by the GnuTLS server,
+** instead of the lowest.
+Reported by <Pasi.Eronen@nokia.com>.
+
 ** API and ABI modifications:
 No changes since last version.
 
