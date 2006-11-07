@@ -319,8 +319,31 @@ _gnutls_read (gnutls_session_t session, void *iptr,
       session->internals.errnum = 0;
 
       if (session->internals._gnutls_pull_func == NULL)
-	i = recv (GNUTLS_POINTER_TO_INT(fd), &ptr[sizeOfPtr - left],
-		  left, flags);
+	{
+	  i = recv (GNUTLS_POINTER_TO_INT(fd), &ptr[sizeOfPtr - left],
+		    left, flags);
+#if HAVE_WINSOCK
+	  if (i < 0)
+	    {
+	      int tmperr = WSAGetLastError();
+	      switch (tmperr)
+		{
+		case WSAEWOULDBLOCK:
+		  errno = EAGAIN;
+		  break;
+
+		case WSAEINTR:
+		  errno = EINTR;
+		  break;
+
+		default:
+		  errno = EIO;
+		  break;
+		}
+	      WSASetLastError(tmperr);
+	    }
+#endif
+	}
       else
 	i = session->internals._gnutls_pull_func (fd,
 						  &ptr[sizeOfPtr -
@@ -761,7 +784,29 @@ _gnutls_io_write_buffered (gnutls_session_t session,
       session->internals.errnum = 0;
 
       if (session->internals._gnutls_push_func == NULL)
-	i = send (GNUTLS_POINTER_TO_INT(fd), &ptr[n - left], left, 0);
+	{
+	  i = send (GNUTLS_POINTER_TO_INT(fd), &ptr[n - left], left, 0);
+#if HAVE_WINSOCK
+	  if (i < 0)
+	    {
+	      int tmperr = WSAGetLastError();
+	      switch (tmperr)
+		{
+		case WSAEWOULDBLOCK:
+		  errno = EAGAIN;
+		  break;
+
+		case WSAEINTR:
+		  errno = EINTR;
+		  break;
+
+		default:
+		  errno = EIO;
+		  break;
+		}
+	      WSASetLastError(tmperr);
+	    }
+#endif
       else
 	i = session->internals._gnutls_push_func (fd, &ptr[n - left], left);
 
