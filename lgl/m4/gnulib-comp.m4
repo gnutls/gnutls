@@ -67,6 +67,7 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_SNPRINTF
   gl_TYPE_SOCKLEN_T
   gl_STDINT_H
+  gl_FUNC_STRVERSCMP
   gl_HEADER_SYS_SOCKET
   gl_HEADER_SYS_STAT_H
   gl_HEADER_UNISTD
@@ -151,6 +152,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/socket_.h
   lib/stat_.h
   lib/stdint_.h
+  lib/strverscmp.c
+  lib/strverscmp.h
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/xsize.h
@@ -214,6 +217,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/sockpfaf.m4
   m4/stdint.m4
   m4/stdint_h.m4
+  m4/strverscmp.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
   m4/uintmax_t.m4
