@@ -16,7 +16,8 @@ instead of setting errno in your push/pull function, you will call one
 of these functions.  It is recommended to use
 gnutls_transport_set_errno, but if you don't have the session variable
 easily accessible in the push/pull replacement function, you can use
-gnutls_transport_set_global_errno.
+gnutls_transport_set_global_errno.  Suggested by Tim Kosse
+<tim.kosse@filezilla-project.org>.
 
 void gnutls_transport_set_errno (gnutls_session_t session, int err);
 void gnutls_transport_set_global_errno (int err);
