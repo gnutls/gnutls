@@ -1,3 +1,167 @@
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.5.4.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/strverscmp.c, lgl/strverscmp.h,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/strverscmp.m4, lib/gnutls_global.c: Use strverscmp.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.c: Typo.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, NEWS: Add.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_ia.c: Doc fix.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: More errno discussion regarding push/pull
+	functions.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.c: Don't use errno to avoid thread-safety
+	issues.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.c: Convert to EINTR/EAGAIN errno under
+	Windows, using WSAGetLastError().
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_buffers.c,
+	lib/gnutls_int.h: Add new APIs to set errno for push/pull
+	functions, suggested by tim.kosse@filezilla-project.org.
+
+2006-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2006-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.4.5.
+
+2006-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_v2_compat.c: Have SSLv2 ClientHello's for unknown
+	versions negotiate the highest version we support, instead of the
+	lowest.  Reported by Pasi.Eronen@nokia.com.
+
+2006-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, libextra/Makefile.am: Remove SOVERSION (see
+	configure.in).
+
+2006-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Set SOVERSION here.
+
+2006-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openpgp/openpgp.h:
+	(gnutls_openpgp_key_get_pk_algorithm): Fix prototype.
+
+2006-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/printf-parse.c: Update.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openpgp/pgp.c:
+	(gnutls_openpgp_key_get_fingerprint): Doc fix.  Reported by
+	ludovic.courtes@laas.fr (Ludovic Courtès).
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openpgp/pgp.c:
+	(gnutls_openpgp_key_get_name): Make SIZEOF_BUF contain
+	actual/required buffer size on return.  Suggested by
+	ludovic.courtes@laas.fr (Ludovic Courtès).
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/openpgp.h, libextra/openpgp/pgp.c,
+	libextra/openpgp/privkey.c: Fix return types.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_v2_compat.c: Have SSLv2 ClientHello's for unknown
+	versions negotiate the highest version we support, instead of the
+	lowest.  Reported by Pasi.Eronen@nokia.com.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Simplify ssize_t test.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-cert-select.c: Remove duplicate #include
+	<sys/stat.h>.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/defines.h: Simplify #include's using gnulib
+	modules.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/stat_.h, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/sys_stat_h.m4, lgl/m4/unistd_h.m4,
+	lgl/arcfour.c, lgl/arctwo.c, lgl/des.c, lgl/gc-gnulib.c,
+	lgl/gc-libgcrypt.c, lgl/gc-pbkdf2-sha1.c, lgl/gettext.h,
+	lgl/hmac-md5.c, lgl/hmac-sha1.c, lgl/md2.c, lgl/md4.c,
+	lgl/memxor.c, lgl/read-file.c, lgl/rijndael-alg-fst.c,
+	lgl/rijndael-api-fst.c, lgl/m4/codeset.m4, lgl/m4/gettext.m4,
+	lgl/m4/intmax.m4, lgl/m4/inttypes-h.m4, lgl/m4/inttypes-pri.m4,
+	lgl/m4/lib-link.m4, lgl/m4/lock.m4, lgl/m4/signed.m4,
+	lgl/m4/vasnprintf.m4, gl/getaddrinfo.c, gl/getdelim.c,
+	gl/getline.c, gl/gettext.h, gl/readline.c, gl/m4/lib-link.m4,
+	lgl/m4/intl.m4, lgl/m4/intldir.m4: Update.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.5.3.
