@@ -48,6 +48,8 @@ will make sure its replacement header files are used instead.
 This fixes build errors similar to "No rule to make target
 `libgnutls-`expr', needed by `all-am'." when building for Windows.
 
+** gnutls_check-version uses strverscmp from gnulib.
+
 ** API and ABI modifications:
 gnutls_transport_set_errno: ADD
 gnutls_transport_set_global_errno: ADD
