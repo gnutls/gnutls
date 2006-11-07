@@ -875,9 +875,7 @@ gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred)
 }
 
 /**
- * gnutls_ia_enable - Call this to indicate the application's willingness
- *		      to execute one or more TLS/IA application phases
- *		      in the handshake.
+ * gnutls_ia_enable - Indicate willingness for TLS/IA application phases
  * @session: is a #gnutls_session_t structure.
  * @allow_skip_on_resume: non-zero if local party allows to skip the
  *			  TLS/IA application phases for a resumed session.
