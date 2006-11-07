@@ -50,6 +50,8 @@ This fixes build errors similar to "No rule to make target
 
 ** gnutls_check-version uses strverscmp from gnulib.
 
+** Update of gnulib files.
+
 ** API and ABI modifications:
 gnutls_transport_set_errno: ADD
 gnutls_transport_set_global_errno: ADD
