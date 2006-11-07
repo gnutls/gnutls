@@ -329,15 +329,15 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 	      switch (tmperr)
 		{
 		case WSAEWOULDBLOCK:
-		  errno = EAGAIN;
+		  session->internals.errnum = EAGAIN;
 		  break;
 
 		case WSAEINTR:
-		  errno = EINTR;
+		  session->internals.errnum = EINTR;
 		  break;
 
 		default:
-		  errno = EIO;
+		  session->internals.errnum = EIO;
 		  break;
 		}
 	      WSASetLastError(tmperr);
@@ -793,15 +793,15 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 	      switch (tmperr)
 		{
 		case WSAEWOULDBLOCK:
-		  errno = EAGAIN;
+		  session->internals.errnum = EAGAIN;
 		  break;
 
 		case WSAEINTR:
-		  errno = EINTR;
+		  session->internals.errnum = EINTR;
 		  break;
 
 		default:
-		  errno = EIO;
+		  session->internals.errnum = EIO;
 		  break;
 		}
 	      WSASetLastError(tmperr);
