@@ -21,6 +21,10 @@ gnutls_transport_set_global_errno.
 void gnutls_transport_set_errno (gnutls_session_t session, int err);
 void gnutls_transport_set_global_errno (int err);
 
+** When calling `recv' or `send' Windows errors are handled properly.
+The Windows recv/send functions doesn't use errno, and GnuTLS now use
+WSAGetLastError to access the error condition instead.
+
 ** Several OpenPGP API fixes.
 All suggested by ludovic.courtes@laas.fr (Ludovic Courtès).  The most
 important fix is to change the return value of
