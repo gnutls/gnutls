@@ -807,6 +807,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 	      WSASetLastError(tmperr);
 	    }
 #endif
+	}
       else
 	i = session->internals._gnutls_push_func (fd, &ptr[n - left], left);
 
