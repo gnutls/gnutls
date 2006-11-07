@@ -77,6 +77,58 @@ RET (int err)
 # include <io_debug.h>
 #endif
 
+/**
+ * gnutls_transport_set_errno:
+ * @session: is a #gnutls_session_t structure.
+ * @err: error value to store in session-specific errno variable.
+ *
+ * Store @err in the session-specific errno variable.  Useful values
+ * for @err is EAGAIN and EINTR, other values are treated will be
+ * treated as real errors in the push/pull function.
+ *
+ * This function is useful in replacement push/pull functions set by
+ * gnutls_transport_set_push_function and
+ * gnutls_transport_set_pullpush_function under Windows, where the
+ * replacement push/pull may not have access to the same @errno
+ * variable that is used by GnuTLS (e.g., the application is linked to
+ * msvcr71.dll and gnutls is linked to msvcrt.dll).
+ *
+ * If you don't have the @session variable easily accessible from the
+ * push/pull function, and don't worry about thread conflicts, you can
+ * also use gnutls_transport_set_global_errno().
+ **/
+void
+gnutls_transport_set_errno (gnutls_session_t session, int err)
+{
+  session->internals.errnum = err;
+}
+
+/**
+ * gnutls_transport_set_global_errno:
+ * @err: error value to store in global errno variable.
+ *
+ * Store @err in the global errno variable.  Useful values for @err is
+ * EAGAIN and EINTR, other values are treated will be treated as real
+ * errors in the push/pull function.
+ *
+ * This function is useful in replacement push/pull functions set by
+ * gnutls_transport_set_push_function and
+ * gnutls_transport_set_pullpush_function under Windows, where the
+ * replacement push/pull may not have access to the same @errno
+ * variable that is used by GnuTLS (e.g., the application is linked to
+ * msvcr71.dll and gnutls is linked to msvcrt.dll).
+ *
+ * Whether this function is thread safe or not depends on whether the
+ * global variable errno is thread safe, some system libraries make it
+ * a thread-local variable.  When feasible, using the guaranteed
+ * thread-safe gnutls_transport_set_errno() may be better.
+ **/
+void
+gnutls_transport_set_global_errno (int err)
+{
+  errno = err;
+}
+
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
@@ -264,6 +316,8 @@ _gnutls_read (gnutls_session_t session, void *iptr,
   while (left > 0)
     {
 
+      session->internals.errnum = 0;
+
       if (session->internals._gnutls_pull_func == NULL)
 	i = recv (GNUTLS_POINTER_TO_INT(fd), &ptr[sizeOfPtr - left],
 		  left, flags);
@@ -274,10 +328,13 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 
       if (i < 0)
 	{
-	  _gnutls_read_log ("READ: %d returned from %d, errno=%d\n", i,
-			    fd, errno);
+	  int err = session->internals.errnum ? session->internals.errnum
+	    : errno;
 
-	  if (errno == EAGAIN || errno == EINTR)
+	  _gnutls_read_log ("READ: %d returned from %d, errno=%d gerrno=%d\n",
+			    i, fd, errno, session->internals.errnum);
+
+	  if (err == EAGAIN || err == EINTR)
 	    {
 	      if (sizeOfPtr - left > 0)
 		{
@@ -289,7 +346,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 		}
 	      gnutls_assert ();
 
-	      return RET (errno);
+	      return RET (err);
 	    }
 	  else
 	    {
@@ -701,6 +758,8 @@ _gnutls_io_write_buffered (gnutls_session_t session,
   while (left > 0)
     {
 
+      session->internals.errnum = 0;
+
       if (session->internals._gnutls_push_func == NULL)
 	i = send (GNUTLS_POINTER_TO_INT(fd), &ptr[n - left], left, 0);
       else
@@ -708,7 +767,10 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 
       if (i == -1)
 	{
-	  if (errno == EAGAIN || errno == EINTR)
+	  int err = session->internals.errnum ? session->internals.errnum
+	    : errno;
+
+	  if (err == EAGAIN || err == EINTR)
 	    {
 	      session->internals.record_send_buffer_prev_size += n - left;
 
@@ -726,7 +788,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 		("WRITE: Interrupted. Stored %d bytes to buffer. Already sent %d bytes.\n",
 		 left, n - left);
 
-	      retval = RET (errno);
+	      retval = RET (err);
 
 	      return retval;
 	    }

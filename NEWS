@@ -5,6 +5,22 @@ See the end for copying conditions.
 
 * Version 1.5.4 (unreleased)
 
+** New API functions to set errno in push/pull functions.
+Under Windows, setting the errno variable in a push/pull replacement
+may end up setting the wrong errno variable, and GnuTLS send/recv
+functions become confused about the real errno returned from a failed
+push/pull function.  Therefor, we have added two APIs to set the errno
+variable used by GnuTLS.  The APIs can also help to keep things
+thread-safe, by avoiding potentially global variables.  Typically,
+instead of setting errno in your push/pull function, you will call one
+of these functions.  It is recommended to use
+gnutls_transport_set_errno, but if you don't have the session variable
+easily accessible in the push/pull replacement function, you can use
+gnutls_transport_set_global_errno.
+
+void gnutls_transport_set_errno (gnutls_session_t session, int err);
+void gnutls_transport_set_global_errno (int err);
+
 ** Several OpenPGP API fixes.
 All suggested by ludovic.courtes@laas.fr (Ludovic Courtès).  The most
 important fix is to change the return value of
@@ -28,7 +44,8 @@ This fixes build errors similar to "No rule to make target
 `libgnutls-`expr', needed by `all-am'." when building for Windows.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_transport_set_errno: ADD
+gnutls_transport_set_global_errno: ADD
 
 * Version 1.5.3 (released 2006-10-26)
 

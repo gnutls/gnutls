@@ -598,6 +598,16 @@ typedef struct
    */
   gnutls_datum_t recv_buffer;
 
+  /* To avoid using global variables, and especially on Windows where
+   * the application may use a different errno variable than GnuTLS,
+   * it is possible to use gnutls_transport_set_errno to set a
+   * session-specific errno variable in the user-replaceable push/pull
+   * functions.  This value is used by the send/recv functions.  (The
+   * strange name of this variable is because 'errno' is typically
+   * #define'd.)
+   */
+  int errnum;
+
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
 } internals_st;
