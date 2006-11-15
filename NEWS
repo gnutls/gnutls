@@ -3,6 +3,11 @@ Copyright (C) 2004, 2005, 2006 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.5.5 (unreleased)
+
+** Fix unsigned vs signed problem in ex-x509-info.c example.
+Reported by Tim Kosse <tim.kosse@filezilla-project.org>.
+
 * Version 1.5.4 (released 2006-11-07)
 
 ** New API functions to set errno in push/pull functions.
