@@ -40,7 +40,7 @@ print_x509_certificate_info (gnutls_session_t session)
   unsigned int algo, bits;
   time_t expiration_time, activation_time;
   const gnutls_datum_t *cert_list;
-  int cert_list_size = 0;
+  unsigned int cert_list_size = 0;
   gnutls_x509_crt_t cert;
 
   /* This function only works for X.509 certificates.
