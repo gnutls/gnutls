@@ -1,3 +1,73 @@
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.5.5.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_record.c:
+	(gnutls_record_recv): Fix docstring, suggested by Tim Kosse
+	<tim.kosse@filezilla-project.org>.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-sasl-rfc2831bis-11.txt: Remove, oops
+	wrong project.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-sasl-rfc2831bis-11.txt: Add.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/rsa-md5-collision/Makefile.am: Remove.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/gettext.h, gl/stdint_.h, gl/m4/gnulib-comp.m4,
+	gl/m4/lib-link.m4, gl/m4/longlong.m4, lgl/Makefile.am,
+	lgl/gettext.h, lgl/stdint_.h, lgl/m4/gnulib-comp.m4,
+	lgl/m4/lib-link.m4, lgl/m4/longlong.m4: Update.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/rsa-md5-collision/chain1-expect.log,
+	tests/rsa-md5-collision/chain2-expect.log: Remove.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/rsa-md5-collision/rsa-md5-collision: Remove -x.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/rsa-md5-collision/rsa-md5-collision: Make it work under
+	mingw32.
+
+2006-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions (done incorrectly in the 1.5.4
+	release).
+
+2006-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-x509-info.c: Fix cert_list_size type to match
+	API, reported by Tim Kosse <tim.kosse@filezilla-project.org>.
+
+2006-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-hajjeh-tls-identity-protection-00.txt: Add.
+
+2006-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-hajjeh-tls-sign-02.txt: Add.
+
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.5.4.
