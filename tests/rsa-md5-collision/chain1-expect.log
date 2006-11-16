@@ -1,9 +1,0 @@
-Certificate[0]: CN=Arjen K. Lenstra,O=Collisionairs,L=Eindhoven,C=NL
-	Issued by: CN=Hash Collision CA,L=Eindhoven,C=NL
-	Verifying against certificate[1].
-	Verification output: Not verified, Insecure algorithm.
-
-Certificate[1]: CN=Hash Collision CA,L=Eindhoven,C=NL
-	Issued by: CN=Hash Collision CA,L=Eindhoven,C=NL
-	Verification output: Verified.
-
