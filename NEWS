@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.5.5 (unreleased)
 
+** Correctly bump shared library version after adding new APIs.
+This was forgotten in the last release.
+
 ** Fix unsigned vs signed problem in ex-x509-info.c example.
 Reported by Tim Kosse <tim.kosse@filezilla-project.org>.
 
