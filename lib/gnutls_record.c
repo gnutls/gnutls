@@ -1133,11 +1133,10 @@ gnutls_record_send (gnutls_session_t session, const void *data,
   * the client's will.
   *
   * If EINTR is returned by the internal push function (the default is
-  * @code{recv()}) then GNUTLS_E_INTERRUPTED will be returned. If
-  * GNUTLS_E_INTERRUPTED or GNUTLS_E_AGAIN is returned, you must call
-  * this function again, with the same parameters; alternatively you
-  * could provide a NULL pointer for data, and 0 for
-  * size. cf. @code{gnutls_record_get_direction()}.
+  * @code{recv()}) then %GNUTLS_E_INTERRUPTED will be returned. If
+  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
+  * call this function again to get the data.  See also
+  * @code{gnutls_record_get_direction()}.
   *
   * A server may also receive GNUTLS_E_REHANDSHAKE when a client has
   * initiated a handshake. In that case the server can only initiate a
