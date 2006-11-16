@@ -18,6 +18,7 @@ noinst_LTLIBRARIES = libgnu.la
 libgnu_la_SOURCES =
 libgnu_la_LIBADD = $(gl_LTLIBOBJS)
 libgnu_la_DEPENDENCIES = $(gl_LTLIBOBJS)
+EXTRA_libgnu_la_SOURCES =
 libgnu_la_LDFLAGS = $(AM_LDFLAGS)
 noinst_HEADERS =
 EXTRA_DIST =
@@ -54,12 +55,16 @@ MOSTLYCLEANDIRS += arpa
 
 EXTRA_DIST += gai_strerror.c getaddrinfo.c getaddrinfo.h
 
+EXTRA_libgnu_la_SOURCES += gai_strerror.c getaddrinfo.c
+
 ## end   gnulib module getaddrinfo
 
 ## begin gnulib module getdelim
 
 
 EXTRA_DIST += getdelim.c getdelim.h
+
+EXTRA_libgnu_la_SOURCES += getdelim.c
 
 ## end   gnulib module getdelim
 
@@ -68,12 +73,16 @@ EXTRA_DIST += getdelim.c getdelim.h
 
 EXTRA_DIST += getline.c getline.h
 
+EXTRA_libgnu_la_SOURCES += getline.c
+
 ## end   gnulib module getline
 
 ## begin gnulib module getpass
 
 
 EXTRA_DIST += getpass.c getpass.h
+
+EXTRA_libgnu_la_SOURCES += getpass.c
 
 ## end   gnulib module getpass
 
@@ -88,12 +97,16 @@ libgnu_la_SOURCES += gettext.h
 
 EXTRA_DIST += inet_ntop.c inet_ntop.h
 
+EXTRA_libgnu_la_SOURCES += inet_ntop.c
+
 ## end   gnulib module inet_ntop
 
 ## begin gnulib module inet_pton
 
 
 EXTRA_DIST += inet_pton.c inet_pton.h
+
+EXTRA_libgnu_la_SOURCES += inet_pton.c
 
 ## end   gnulib module inet_pton
 
@@ -108,6 +121,8 @@ EXTRA_DIST += intprops.h
 
 
 EXTRA_DIST += imaxtostr.c inttostr.c inttostr.h offtostr.c uinttostr.c umaxtostr.c
+
+EXTRA_libgnu_la_SOURCES += imaxtostr.c inttostr.c offtostr.c uinttostr.c umaxtostr.c
 
 ## end   gnulib module inttostr
 
@@ -133,6 +148,8 @@ MOSTLYCLEANDIRS += netinet
 
 
 EXTRA_DIST += readline.c readline.h
+
+EXTRA_libgnu_la_SOURCES += readline.c
 
 ## end   gnulib module readline
 
@@ -198,6 +215,8 @@ EXTRA_DIST += stdint_.h
 
 
 EXTRA_DIST += strdup.c strdup.h
+
+EXTRA_libgnu_la_SOURCES += strdup.c
 
 ## end   gnulib module strdup
 

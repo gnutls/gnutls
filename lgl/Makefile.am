@@ -18,6 +18,7 @@ noinst_LTLIBRARIES = liblgnu.la
 liblgnu_la_SOURCES =
 liblgnu_la_LIBADD = $(lgl_LTLIBOBJS)
 liblgnu_la_DEPENDENCIES = $(lgl_LTLIBOBJS)
+EXTRA_liblgnu_la_SOURCES =
 liblgnu_la_LDFLAGS = $(AM_LDFLAGS)
 noinst_HEADERS =
 EXTRA_DIST =
@@ -56,12 +57,16 @@ endif
 
 EXTRA_DIST += gc-gnulib.c gc-libgcrypt.c gc.h
 
+EXTRA_liblgnu_la_SOURCES += gc-gnulib.c gc-libgcrypt.c
+
 ## end   gnulib module gc
 
 ## begin gnulib module gc-arcfour
 
 
 EXTRA_DIST += arcfour.c arcfour.h
+
+EXTRA_liblgnu_la_SOURCES += arcfour.c
 
 ## end   gnulib module gc-arcfour
 
@@ -70,12 +75,16 @@ EXTRA_DIST += arcfour.c arcfour.h
 
 EXTRA_DIST += arctwo.c arctwo.h
 
+EXTRA_liblgnu_la_SOURCES += arctwo.c
+
 ## end   gnulib module gc-arctwo
 
 ## begin gnulib module gc-des
 
 
 EXTRA_DIST += des.c des.h
+
+EXTRA_liblgnu_la_SOURCES += des.c
 
 ## end   gnulib module gc-des
 
@@ -84,6 +93,8 @@ EXTRA_DIST += des.c des.h
 
 EXTRA_DIST += hmac-md5.c hmac.h md5.c md5.h memxor.c memxor.h
 
+EXTRA_liblgnu_la_SOURCES += hmac-md5.c md5.c memxor.c
+
 ## end   gnulib module gc-hmac-md5
 
 ## begin gnulib module gc-hmac-sha1
@@ -91,12 +102,16 @@ EXTRA_DIST += hmac-md5.c hmac.h md5.c md5.h memxor.c memxor.h
 
 EXTRA_DIST += hmac-sha1.c hmac.h memxor.c memxor.h sha1.c sha1.h
 
+EXTRA_liblgnu_la_SOURCES += hmac-sha1.c memxor.c sha1.c
+
 ## end   gnulib module gc-hmac-sha1
 
 ## begin gnulib module gc-md4
 
 
 EXTRA_DIST += md4.c md4.h
+
+EXTRA_liblgnu_la_SOURCES += md4.c
 
 ## end   gnulib module gc-md4
 
@@ -106,12 +121,16 @@ liblgnu_la_SOURCES += md5.h
 
 EXTRA_DIST += md5.c
 
+EXTRA_liblgnu_la_SOURCES += md5.c
+
 ## end   gnulib module gc-md5
 
 ## begin gnulib module gc-pbkdf2-sha1
 
 
 EXTRA_DIST += gc-pbkdf2-sha1.c
+
+EXTRA_liblgnu_la_SOURCES += gc-pbkdf2-sha1.c
 
 ## end   gnulib module gc-pbkdf2-sha1
 
@@ -120,12 +139,16 @@ EXTRA_DIST += gc-pbkdf2-sha1.c
 
 EXTRA_DIST += rijndael-alg-fst.c rijndael-alg-fst.h rijndael-api-fst.c rijndael-api-fst.h
 
+EXTRA_liblgnu_la_SOURCES += rijndael-alg-fst.c rijndael-api-fst.c
+
 ## end   gnulib module gc-rijndael
 
 ## begin gnulib module gc-sha1
 
 
 EXTRA_DIST += sha1.c sha1.h
+
+EXTRA_liblgnu_la_SOURCES += sha1.c
 
 ## end   gnulib module gc-sha1
 
@@ -154,6 +177,8 @@ liblgnu_la_SOURCES += gettext.h
 
 EXTRA_DIST += md2.c md2.h
 
+EXTRA_liblgnu_la_SOURCES += md2.c
+
 ## end   gnulib module md2
 
 ## begin gnulib module memmem
@@ -161,12 +186,16 @@ EXTRA_DIST += md2.c md2.h
 
 EXTRA_DIST += memmem.c memmem.h
 
+EXTRA_liblgnu_la_SOURCES += memmem.c
+
 ## end   gnulib module memmem
 
 ## begin gnulib module memmove
 
 
 EXTRA_DIST += memmove.c
+
+EXTRA_liblgnu_la_SOURCES += memmove.c
 
 ## end   gnulib module memmove
 
@@ -181,6 +210,8 @@ liblgnu_la_SOURCES += minmax.h
 
 EXTRA_DIST += read-file.c read-file.h
 
+EXTRA_liblgnu_la_SOURCES += read-file.c
+
 ## end   gnulib module read-file
 
 ## begin gnulib module size_max
@@ -193,6 +224,8 @@ liblgnu_la_SOURCES += size_max.h
 
 
 EXTRA_DIST += snprintf.c snprintf.h
+
+EXTRA_liblgnu_la_SOURCES += snprintf.c
 
 ## end   gnulib module snprintf
 
@@ -240,6 +273,8 @@ EXTRA_DIST += stdint_.h
 
 
 EXTRA_DIST += strverscmp.c strverscmp.h
+
+EXTRA_liblgnu_la_SOURCES += strverscmp.c
 
 ## end   gnulib module strverscmp
 
@@ -301,6 +336,8 @@ MOSTLYCLEANFILES += unistd.h
 
 
 EXTRA_DIST += asnprintf.c printf-args.c printf-args.h printf-parse.c printf-parse.h vasnprintf.c vasnprintf.h
+
+EXTRA_liblgnu_la_SOURCES += asnprintf.c printf-args.c printf-parse.c vasnprintf.c
 
 ## end   gnulib module vasnprintf
 
