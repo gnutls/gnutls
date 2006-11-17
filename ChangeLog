@@ -1,3 +1,23 @@
+2006-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Release do non-devel directory.
+
+2006-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.6.0.
+
+2006-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Fix copyright years.
+
+2006-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2006-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
 2006-11-16  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.5.5.
