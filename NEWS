@@ -3,6 +3,28 @@ Copyright (C) 2004, 2005, 2006 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.6.0 (unreleased)
+
+** No changes since 1.5.5.
+The major changes compared to the 1.4.x branch are:
+
+*** A GnuTLS C++ library is part of the official distribution.
+Currently there are no examples or documentation, but hopefully this
+will change.  See gnutlsxx.h for the API.
+
+*** Windows is a supported platform.
+There are, however, two know bugs.  One is related to select() in
+command line tools (not, nota bene, in the library), the other is a
+problem with libgcrypt that causes delays.  Help is needed to resolve
+those issues, so we feel we can't delay the release because of this.
+
+*** New APIs for custom push/pull function error reporting.
+The new APIs are gnutls_transport_set_errno and
+gnutls_transport_set_global_errno.  See the release notes for version
+1.5.4 for more information.
+
+*** Self tests are run under valgrind, if available.  See --disable-valgrind.
+
 * Version 1.5.5 (released 2006-11-16)
 
 ** Correctly bump shared library version after adding new APIs.
