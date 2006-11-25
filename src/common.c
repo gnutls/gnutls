@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  * Author: Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
@@ -670,6 +670,8 @@ parse_protocols (char **protocols, int protocols_size, int *protocol_priority)
 	    protocol_priority[j++] = GNUTLS_SSL3;
 	  else if (strncasecmp (protocols[i], "TLS1.1", 6) == 0)
 	    protocol_priority[j++] = GNUTLS_TLS1_1;
+	  else if (strncasecmp (protocols[i], "TLS1.2", 6) == 0)
+	    protocol_priority[j++] = GNUTLS_TLS1_2;
 	  else if (strncasecmp (protocols[i], "TLS", 3) == 0)
 	    protocol_priority[j++] = GNUTLS_TLS1_0;
 	  else
