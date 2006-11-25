@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** Update of gnulib files.
 
 ** Preliminary support for TLS 1.2
+The client has been successfully tested against
+https://www.mikestoolbox.org:4433/.
 
 ** API and ABI modifications:
 GNUTLS_TLS1_2: New gnutls_protocol_t enum member.
