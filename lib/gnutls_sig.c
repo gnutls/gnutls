@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -404,12 +404,22 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   mac_hd_t td_md5;
   mac_hd_t td_sha;
   opaque concat[36];
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
-  td_md5 = _gnutls_hash_init (GNUTLS_MAC_MD5);
-  if (td_md5 == NULL)
+  if (ver < GNUTLS_TLS1_2)
     {
-      gnutls_assert ();
-      return GNUTLS_E_HASH_FAILED;
+      td_md5 = _gnutls_hash_init (GNUTLS_MAC_MD5);
+      if (td_md5 == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_HASH_FAILED;
+	}
+
+      _gnutls_hash (td_md5, session->security_parameters.client_random,
+		    TLS_RANDOM_SIZE);
+      _gnutls_hash (td_md5, session->security_parameters.server_random,
+		    TLS_RANDOM_SIZE);
+      _gnutls_hash (td_md5, params->data, params->size);
     }
 
   td_sha = _gnutls_hash_init (GNUTLS_MAC_SHA1);
@@ -420,23 +430,28 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
       return GNUTLS_E_HASH_FAILED;
     }
 
-  _gnutls_hash (td_md5, session->security_parameters.client_random,
-		TLS_RANDOM_SIZE);
-  _gnutls_hash (td_md5, session->security_parameters.server_random,
-		TLS_RANDOM_SIZE);
-  _gnutls_hash (td_md5, params->data, params->size);
-
   _gnutls_hash (td_sha, session->security_parameters.client_random,
 		TLS_RANDOM_SIZE);
   _gnutls_hash (td_sha, session->security_parameters.server_random,
 		TLS_RANDOM_SIZE);
   _gnutls_hash (td_sha, params->data, params->size);
 
-  _gnutls_hash_deinit (td_md5, concat);
-  _gnutls_hash_deinit (td_sha, &concat[16]);
+  if (ver < GNUTLS_TLS1_2)
+    {
+      _gnutls_hash_deinit (td_md5, concat);
+      _gnutls_hash_deinit (td_sha, &concat[16]);
+      dconcat.size = 36;
+    }
+  else
+    {
+      memcpy (concat,
+	      "\x30\x21\x30\x09\x06\x05\x2b\x0e\x03\x02\x1a\x05\x00\x04\x14",
+	      15);
+      _gnutls_hash_deinit (td_sha, &concat[15]);
+      dconcat.size = 35;
+    }
 
   dconcat.data = concat;
-  dconcat.size = 36;
 
   ret = _gnutls_pkcs1_rsa_verify_sig (cert, &dconcat, signature);
   if (ret < 0)

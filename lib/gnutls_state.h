@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -61,8 +61,10 @@ int _gnutls_session_is_export (gnutls_session_t session);
 
 int _gnutls_openpgp_send_fingerprint (gnutls_session_t session);
 
-int _gnutls_PRF (const opaque * secret, int secret_size, const char *label,
-		 int label_size, const opaque * seed, int seed_size,
+int _gnutls_PRF (gnutls_session_t session,
+		 const opaque * secret, int secret_size,
+		 const char *label, int label_size,
+		 const opaque * seed, int seed_size,
 		 int total_bytes, void *ret);
 
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509

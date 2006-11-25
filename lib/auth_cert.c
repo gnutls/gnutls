@@ -1203,6 +1203,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
   int i, j;
   gnutls_pk_algorithm_t pk_algos[MAX_SIGN_ALGOS];
   int pk_algos_length;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -1248,6 +1249,19 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
     {
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+    }
+
+  if (ver == GNUTLS_TLS1_2)
+    {
+      /* read supported hashes */
+      int hash_num;
+      DECR_LEN (dsize, 1);
+
+      hash_num = p[0] & 0xFF;
+      p++;
+
+      DECR_LEN (dsize, hash_num);
+      p+=hash_num;
     }
 
   /* read the certificate authorities */

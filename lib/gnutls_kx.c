@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2004, 2005  Free Software Foundation
+ * Copyright (C) 2000, 2001, 2004, 2005, 2006  Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -89,7 +89,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
   else
     {
       ret =
-	_gnutls_PRF (PREMASTER.data, PREMASTER.size,
+	_gnutls_PRF (session, PREMASTER.data, PREMASTER.size,
 		     MASTER_SECRET, strlen (MASTER_SECRET),
 		     rnd, 2 * TLS_RANDOM_SIZE, TLS_MASTER_SIZE,
 		     session->security_parameters.master_secret);

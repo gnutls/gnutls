@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005  Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006  Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -109,7 +109,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   else
     {				/* TLS 1.0 */
       ret =
-	_gnutls_PRF (session->security_parameters.master_secret,
+	_gnutls_PRF (session, session->security_parameters.master_secret,
 		     TLS_MASTER_SIZE, keyexp, keyexp_length,
 		     rnd, 2 * TLS_RANDOM_SIZE, block_size, key_block);
     }
@@ -202,7 +202,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  else
 	    {			/* TLS 1.0 */
 	      ret =
-		_gnutls_PRF (&key_block[pos], key_size,
+		_gnutls_PRF (session, &key_block[pos], key_size,
 			     cliwrite, cliwrite_length,
 			     rrnd,
 			     2 * TLS_RANDOM_SIZE,
@@ -232,7 +232,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  else
 	    {			/* TLS 1.0 */
 	      ret =
-		_gnutls_PRF (&key_block[pos], key_size,
+		_gnutls_PRF (session, &key_block[pos], key_size,
 			     servwrite, servwrite_length,
 			     rrnd, 2 * TLS_RANDOM_SIZE,
 			     EXPORT_FINAL_KEY_SIZE, server_write_key);
@@ -325,10 +325,9 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 
       if (session->security_parameters.version == GNUTLS_SSL3)
 	{			/* SSL 3 */
-	  ret =
-	    _gnutls_ssl3_hash_md5 ("", 0,
-				   rrnd, TLS_RANDOM_SIZE * 2,
-				   IV_size, iv_block);
+	  ret = _gnutls_ssl3_hash_md5 ("", 0,
+				       rrnd, TLS_RANDOM_SIZE * 2,
+				       IV_size, iv_block);
 
 	  if (ret < 0)
 	    {
@@ -338,18 +337,16 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	      return ret;
 	    }
 
-	  ret =
-	    _gnutls_ssl3_hash_md5 ("", 0, rnd,
-				   TLS_RANDOM_SIZE * 2,
-				   IV_size, &iv_block[IV_size]);
+	  ret = _gnutls_ssl3_hash_md5 ("", 0, rnd,
+				       TLS_RANDOM_SIZE * 2,
+				       IV_size, &iv_block[IV_size]);
 
 	}
       else
 	{			/* TLS 1.0 */
-	  ret =
-	    _gnutls_PRF ("", 0,
-			 ivblock, ivblock_length, rrnd,
-			 2 * TLS_RANDOM_SIZE, IV_size * 2, iv_block);
+	  ret = _gnutls_PRF (session, "", 0,
+			     ivblock, ivblock_length, rrnd,
+			     2 * TLS_RANDOM_SIZE, IV_size * 2, iv_block);
 	}
 
       if (ret < 0)

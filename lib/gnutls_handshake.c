@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -196,16 +196,20 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
 {
   const int siz = TLS_MSG_LEN;
   opaque concat[36];
+  size_t len;
   const char *mesg;
   mac_hd_t td_md5;
   mac_hd_t td_sha;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
-
-  td_md5 = _gnutls_hash_copy (session->internals.handshake_mac_handle_md5);
-  if (td_md5 == NULL)
+  if (ver < GNUTLS_TLS1_2)
     {
-      gnutls_assert ();
-      return GNUTLS_E_HASH_FAILED;
+      td_md5 = _gnutls_hash_copy (session->internals.handshake_mac_handle_md5);
+      if (td_md5 == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_HASH_FAILED;
+	}
     }
 
   td_sha = _gnutls_hash_copy (session->internals.handshake_mac_handle_sha);
@@ -216,9 +220,17 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
       return GNUTLS_E_HASH_FAILED;
     }
 
-
-  _gnutls_hash_deinit (td_md5, concat);
-  _gnutls_hash_deinit (td_sha, &concat[16]);
+  if (ver < GNUTLS_TLS1_2)
+    {
+      _gnutls_hash_deinit (td_md5, concat);
+      _gnutls_hash_deinit (td_sha, &concat[16]);
+      len = 20 + 16;
+    }
+  else
+    {
+      _gnutls_hash_deinit (td_sha, concat);
+      len = 20;
+    }
 
   if (type == GNUTLS_SERVER)
     {
@@ -229,8 +241,8 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
       mesg = CLIENT_MSG;
     }
 
-  return _gnutls_PRF (session->security_parameters.master_secret,
-		      TLS_MASTER_SIZE, mesg, siz, concat, 36, 12, ret);
+  return _gnutls_PRF (session, session->security_parameters.master_secret,
+		      TLS_MASTER_SIZE, mesg, siz, concat, len, 12, ret);
 }
 
 /* this function will produce TLS_RANDOM_SIZE==32 bytes of random data

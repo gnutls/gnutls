@@ -836,7 +836,8 @@ _gnutls_xor (opaque * o1, opaque * o2, int length)
  * available.
  */
 int
-_gnutls_PRF (const opaque * secret, int secret_size, const char *label,
+_gnutls_PRF (gnutls_session_t session,
+	     const opaque * secret, int secret_size, const char *label,
 	     int label_size, const opaque * seed, int seed_size,
 	     int total_bytes, void *ret)
 {
@@ -845,6 +846,7 @@ _gnutls_PRF (const opaque * secret, int secret_size, const char *label,
   opaque s_seed[MAX_SEED_SIZE];
   opaque o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
   int result;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   if (total_bytes > MAX_PRF_BYTES)
     {
@@ -863,37 +865,52 @@ _gnutls_PRF (const opaque * secret, int secret_size, const char *label,
   memcpy (s_seed, label, label_size);
   memcpy (&s_seed[label_size], seed, seed_size);
 
-  l_s = secret_size / 2;
-
-  s1 = &secret[0];
-  s2 = &secret[l_s];
-
-  if (secret_size % 2 != 0)
+  if (ver >= GNUTLS_TLS1_2)
     {
-      l_s++;
+      result =
+	_gnutls_P_hash (GNUTLS_MAC_SHA1, secret, secret_size,
+			s_seed, s_seed_size,
+			total_bytes, ret);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
     }
-
-  result =
-    _gnutls_P_hash (GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size,
-		    total_bytes, o1);
-  if (result < 0)
+  else
     {
-      gnutls_assert ();
-      return result;
+      l_s = secret_size / 2;
+
+      s1 = &secret[0];
+      s2 = &secret[l_s];
+
+      if (secret_size % 2 != 0)
+	{
+	  l_s++;
+	}
+
+      result =
+	_gnutls_P_hash (GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size,
+			total_bytes, o1);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
+
+      result =
+	_gnutls_P_hash (GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
+			total_bytes, o2);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
+
+      _gnutls_xor (o1, o2, total_bytes);
+
+      memcpy (ret, o1, total_bytes);
     }
-
-  result =
-    _gnutls_P_hash (GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
-		    total_bytes, o2);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  _gnutls_xor (o1, o2, total_bytes);
-
-  memcpy (ret, o1, total_bytes);
 
   return 0;			/* ok */
 
@@ -936,7 +953,8 @@ gnutls_prf_raw (gnutls_session_t session,
 {
   int ret;
 
-  ret = _gnutls_PRF (session->security_parameters.master_secret,
+  ret = _gnutls_PRF (session,
+		     session->security_parameters.master_secret,
 		     TLS_MASTER_SIZE,
 		     label,
 		     label_size, (opaque *) seed, seed_size, outsize, out);
@@ -1000,7 +1018,7 @@ gnutls_prf (gnutls_session_t session,
 
   memcpy (seed + 2 * TLS_RANDOM_SIZE, extra, extra_size);
 
-  ret = _gnutls_PRF (session->security_parameters.master_secret,
+  ret = _gnutls_PRF (session, session->security_parameters.master_secret,
 		     TLS_MASTER_SIZE,
 		     label, label_size, seed, seedsize, outsize, out);
 
