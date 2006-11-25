@@ -117,6 +117,7 @@ static const gnutls_version_entry sup_versions[] = {
   {"SSL 3.0", GNUTLS_SSL3, 3, 0, 1},
   {"TLS 1.0", GNUTLS_TLS1, 3, 1, 1},
   {"TLS 1.1", GNUTLS_TLS1_1, 3, 2, 1},
+  {"TLS 1.2", GNUTLS_TLS1_2, 3, 3, 1},
   {0, 0, 0, 0, 0}
 };
 
