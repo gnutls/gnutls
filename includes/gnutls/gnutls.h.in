@@ -252,6 +252,7 @@ extern "C"
     GNUTLS_SSL3 = 1,
     GNUTLS_TLS1_0,
     GNUTLS_TLS1_1,
+    GNUTLS_TLS1_2,
     GNUTLS_VERSION_UNKNOWN = 0xff
   } gnutls_protocol_t;
 
