@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -37,6 +37,12 @@
 #include <gnutls/gnutls.h>
 
 #include "utils.h"
+
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
 
 /* A very basic TLS client, with anonymous authentication.
  */
@@ -95,6 +101,9 @@ client (void)
 
   gnutls_global_init ();
 
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (4711);
+
   gnutls_anon_allocate_client_credentials (&anoncred);
 
   /* Initialize TLS session
@@ -144,15 +153,12 @@ client (void)
       goto end;
     }
 
-  if (debug)
+  printf ("- Received %d bytes: ", ret);
+  for (ii = 0; ii < ret; ii++)
     {
-      printf ("- Received %d bytes: ", ret);
-      for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
-      fputs ("\n", stdout);
+      fputc (buffer[ii], stdout);
     }
+  fputs ("\n", stdout);
 
   gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
@@ -232,6 +238,9 @@ server_start (void)
   /* this must be called once in the program
    */
   gnutls_global_init ();
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (4711);
 
   gnutls_anon_allocate_server_credentials (&anoncred);
 
