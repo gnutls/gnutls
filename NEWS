@@ -11,6 +11,8 @@ https://www.mikestoolbox.org:4433/.
 
 ** Anonself test now print a lot of debugging info, including TLS version.
 
+** Doc fixes in OpenCDK, to avoid some gtk-doc warnings.
+
 ** Update of gnulib files.
 
 ** API and ABI modifications:
