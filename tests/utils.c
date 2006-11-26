@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -52,8 +52,7 @@ success (const char *format, ...)
   va_list arg_ptr;
 
   va_start (arg_ptr, format);
-  if (debug)
-    vfprintf (stdout, format, arg_ptr);
+  vfprintf (stdout, format, arg_ptr);
   va_end (arg_ptr);
 }
 
@@ -141,8 +140,7 @@ main (int argc, char *argv[])
 
   doit ();
 
-  if (debug)
-    printf ("Self test `%s' finished with %d errors\n", argv[0], error_count);
+  printf ("Self test `%s' finished with %d errors\n", argv[0], error_count);
 
   return error_count ? 1 : 0;
 }
