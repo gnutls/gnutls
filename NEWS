@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.6.1 (unreleased)
 
+** Fix ./configure failure with non-GCC compilers.
+This fixes the following error message:
+configure: error: conditional "HAVE_LD_OUTPUT_DEF" was never defined.
+Reported by "Michael C. Vergallen" <mvergall@telenet.be>.
+
 ** API and ABI modifications:
 No changes since last version.
 
