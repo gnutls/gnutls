@@ -534,7 +534,7 @@ typedef struct cdk_packet_s *cdk_packet_t;
 /* memory routines */
 typedef void (*cdk_log_fnc_t) (void *, int, const char *, va_list);
 void cdk_set_log_level (int lvl);
-void cdk_set_log_handler (cdk_log_fnc_t logfnc, void * opaq);
+void cdk_set_log_handler (cdk_log_fnc_t logfnc, void * opaque);
 const char* cdk_strerror (int ec);
 void cdk_set_malloc_hooks (void *(*new_alloc_func) (size_t n),
                            void *(*new_alloc_secure_func) (size_t n),
@@ -550,7 +550,7 @@ char * cdk_strdup (const char * ptr);
 void cdk_free (void * ptr);
 /* session handle routines */
 int cdk_handle_new (cdk_ctx_t * r_ctx);
-void cdk_handle_free (cdk_ctx_t c);
+void cdk_handle_free (cdk_ctx_t hd);
 void cdk_handle_set_keydb (cdk_ctx_t hd, cdk_keydb_hd_t db);
 cdk_keydb_hd_t cdk_handle_get_keydb( cdk_ctx_t hd, int type );
 int cdk_handle_control( cdk_ctx_t hd, int action, int cmd, ... );
@@ -699,7 +699,7 @@ cdk_error_t cdk_keydb_new( cdk_keydb_hd_t * r_hd, int type, void * data,
                            size_t count);
 cdk_error_t cdk_keydb_open( cdk_keydb_hd_t hd, cdk_stream_t * ret_kr );
 int cdk_keydb_check_sk( cdk_keydb_hd_t hd, unsigned int * keyid );
-cdk_error_t cdk_keydb_search_start( cdk_keydb_hd_t hd, int type, void * desc );
+cdk_error_t cdk_keydb_search_start( cdk_keydb_hd_t db, int type, void * desc );
 cdk_error_t cdk_keydb_search( cdk_keydb_hd_t hd, cdk_kbnode_t * ret_key );
 void cdk_keydb_free( cdk_keydb_hd_t hd );
 cdk_error_t cdk_keydb_get_bykeyid( cdk_keydb_hd_t hd, unsigned int * keyid,
@@ -755,8 +755,8 @@ int cdk_pklist_use_mdc (cdk_keylist_t pkl);
 cdk_error_t cdk_pklist_build( cdk_keylist_t *ret_pkl, cdk_keydb_hd_t hd,
                               cdk_strlist_t remusr, int use );
 void cdk_pklist_release (cdk_keylist_t pkl);
-cdk_error_t cdk_pklist_encrypt (cdk_keylist_t pkl, cdk_dek_t dek,
-                                cdk_stream_t out);
+cdk_error_t cdk_pklist_encrypt (cdk_keylist_t pk_list, cdk_dek_t dek,
+                                cdk_stream_t outp);
 /* secret key list */
 cdk_error_t cdk_sklist_build( cdk_keylist_t * ret_skl,
                               cdk_keydb_hd_t db, cdk_ctx_t hd,
@@ -764,7 +764,7 @@ cdk_error_t cdk_sklist_build( cdk_keylist_t * ret_skl,
                               int unlock, unsigned int use );
 void cdk_sklist_release (cdk_keylist_t skl);
 cdk_error_t cdk_sklist_write (cdk_keylist_t skl, cdk_stream_t outp,
-                              cdk_md_hd_t mdctx,
+                              cdk_md_hd_t hash,
                               int sigclass, int sigver);
 cdk_error_t cdk_sklist_write_onepass( cdk_keylist_t skl, cdk_stream_t outp,
                                       int sigclass, int mdalgo );
@@ -819,7 +819,7 @@ char * cdk_utf8_decode( const char * string, size_t length, int delim );
 /*-- keyserver.c --*/
 cdk_error_t cdk_keyserver_recv_key( const char * host, int port,
                                     const unsigned char * keyid, int kid_type,
-                                    cdk_kbnode_t * r_key );
+                                    cdk_kbnode_t * ret_key );
 
 /*-- keygen.c --*/
 cdk_error_t cdk_keygen_new( cdk_keygen_ctx_t * r_hd );
@@ -833,7 +833,7 @@ void cdk_keygen_set_mdc_feature( cdk_keygen_ctx_t hd, int val );
 void cdk_keygen_set_keyserver_flags( cdk_keygen_ctx_t hd, int no_modify,
                                      const char *pref_url );
 void cdk_keygen_set_expire_date( cdk_keygen_ctx_t hd, int type,
-                                 long timestamp );
+                                 long int timestamp );
 void cdk_keygen_set_name( cdk_keygen_ctx_t hd, const char * name );
 void cdk_keygen_set_passphrase( cdk_keygen_ctx_t hd, const char * pass );
 cdk_error_t cdk_keygen_start( cdk_keygen_ctx_t hd );
