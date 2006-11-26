@@ -1686,7 +1686,7 @@ cdk_listkey_close( cdk_listkey_t ctx )
 /**
  * cdk_listkey_next:
  * @ctx: list key context
- * @r_key: the pointer to the new key node object
+ * @ret_key: the pointer to the new key node object
  *
  * Retrieve the next key from the pattern of the key list context.
  **/
