@@ -444,11 +444,19 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
     }
   else
     {
+#if 1
       memcpy (concat,
 	      "\x30\x21\x30\x09\x06\x05\x2b\x0e\x03\x02\x1a\x05\x00\x04\x14",
 	      15);
       _gnutls_hash_deinit (td_sha, &concat[15]);
       dconcat.size = 35;
+#else
+      memcpy (concat,
+	      "\x30\x1f\x30\x07\x06\x05\x2b\x0e\x03\x02\x1a\x04\x14",
+	      13);
+      _gnutls_hash_deinit (td_sha, &concat[13]);
+      dconcat.size = 33;
+#endif
     }
 
   dconcat.data = concat;
