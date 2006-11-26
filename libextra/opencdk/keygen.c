@@ -1,5 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * keygen.c - OpenPGP key generation
+ *        Copyright (C) 2006 Free Software Foundation, Inc.
  *        Copyright (C) 2002, 2003 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -105,8 +106,9 @@ check_pref_array( const byte * p, size_t n, int type )
 /**
  * cdk_keygen_set_prefs: Set the preferences for the userID
  * @hd: the keygen object
- * @hd: the preference type
+ * @type: the preference type
  * @array: one-octet array with algorithm numers
+ * @n: length of @array.
  *
  **/
 cdk_error_t
@@ -706,8 +708,8 @@ sig_self_create( cdk_keygen_ctx_t hd )
 /**
  * cdk_keygen_save: save the generated keys to disk
  * @hd: the keygen object
- * @pub: name of the file to store the public key
- * @sec: name of the file to store the secret key
+ * @pubf: name of the file to store the public key
+ * @secf: name of the file to store the secret key
  *
  **/
 cdk_error_t

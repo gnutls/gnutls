@@ -1,5 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * sign.c - Signing routines
+ *        Copyright (C) 2006 Free Software Foundation, Inc.
  *        Copyright (C) 2002, 2003 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -301,7 +302,7 @@ cdk_stream_sign( cdk_ctx_t hd, cdk_stream_t inp, cdk_stream_t out,
  * @file: Name of the input file
  * @output: Name of the output file
  * @sigmode: Signature mode
- * @encrypt: enable sign and encrypt
+ * @encryptflag: enable sign and encrypt
  *
  * Sign a file.
  **/

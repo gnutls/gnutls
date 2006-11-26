@@ -532,7 +532,7 @@ cdk_kbnode_get_attr( cdk_kbnode_t node, int pkttype, int attr )
 /**
  * cdk_kbnode_hash:
  * @node: the key node
- * @hashctx: opaque pointer to the hash context
+ * @md: opaque pointer to the hash context
  * @is_v4: OpenPGP signature (yes=1, no=0)
  * @pkttype: packet type to hash (if zero use the packet type from the node)
  * @flags: flags which depend on the operation
