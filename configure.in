@@ -166,7 +166,6 @@ if test $ac_cv_c_compiler_gnu != no; then
 	AC_LINK_IFELSE(AC_LANG_PROGRAM([]),output_def=yes,output_def=no)
 	AC_MSG_RESULT($output_def)
 	LDFLAGS="$_gcc_ldflags_save"
-        AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" != "no")
 
 	if test x$opt_dmalloc_mode = xyes; then
 	  AC_CHECK_LIB(dmalloc, main)
@@ -188,6 +187,8 @@ if test $ac_cv_c_compiler_gnu != no; then
 	fi
 fi
 
+# Needs to be called outside of 'if' clause.
+AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
 
 AC_MSG_RESULT([***
 *** Detecting C library capabilities...
