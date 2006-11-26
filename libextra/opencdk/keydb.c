@@ -758,11 +758,10 @@ keydb_pos_from_cache( cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
 /**
  * cdk_keydb_search:
  * @hd: the keydb object
- * @ks: the keydb search object
  * @ret_key: kbnode object to store the key
  *
- * Search for a key in the given keyring. The search mode is handled
- * via @ks. If the key was found, @ret_key contains the key data.
+ * Search for a key in the given keyring.  If the key was found,
+ * @ret_key contains the key data.
  **/
 cdk_error_t
 cdk_keydb_search( cdk_keydb_hd_t hd, cdk_kbnode_t * ret_key )

@@ -256,7 +256,7 @@ cdk_keygen_set_keyserver_flags( cdk_keygen_ctx_t hd, int no_modify,
  *
  **/
 void
-cdk_keygen_set_expire_date( cdk_keygen_ctx_t hd, int type, long timestamp )
+cdk_keygen_set_expire_date( cdk_keygen_ctx_t hd, int type, long int timestamp )
 {
     if( !hd )
         return;

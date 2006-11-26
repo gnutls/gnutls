@@ -221,7 +221,7 @@ sig_get_version( cdk_ctx_t hd, cdk_keylist_t kl )
  * @inp: input stream
  * @out: output stream
  * @locusr: local user list for signing
- * @remustr: remote user list for encrypting
+ * @remusr: remote user list for encrypting
  * @encryptflag: shall the output be encrypted? (1/0)
  * @sigmode: signature mode
  *

@@ -1,7 +1,7 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * keylist.c - Linked key lists
+ *        Copyright (C) 1998-2002, 2006 Free Software Foundation, Inc.
  *        Copyright (C) 2002, 2003 Timo Schulz
- *        Copyright (C) 1998-2002 Free Software Foundation, Inc.
  *
  * This file is part of OpenCDK.
  *
@@ -235,7 +235,7 @@ cdk_pklist_build( cdk_keylist_t * ret_pkl, cdk_keydb_hd_t hd,
 
 /**
  * cdk_pklist_encrypt:
- * @pkl: the keylist
+ * @pk_list: the keylist
  * @dek: the data encryption key
  * @outp: the stream to write in the data
  *

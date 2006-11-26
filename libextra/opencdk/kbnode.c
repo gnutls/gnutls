@@ -65,7 +65,7 @@ _cdk_kbnode_clone( cdk_kbnode_t node )
 
 /**
  * cdk_kbnode_release:
- * @n: the key node
+ * @node: the key node
  *
  * Release the memory of the node.
  **/
