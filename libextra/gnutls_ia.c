@@ -184,7 +184,7 @@ _gnutls_ia_prf (gnutls_session_t session,
 	  TLS_RANDOM_SIZE);
   memcpy (seed + 2 * TLS_RANDOM_SIZE, extra, extra_size);
 
-  ret = _gnutls_PRF (session->security_parameters.inner_secret,
+  ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
 		     TLS_MASTER_SIZE,
 		     label, label_size, seed, seedsize, outsize, out);
 
@@ -289,7 +289,7 @@ gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
   ssize_t len;
   int ret;
 
-  ret = _gnutls_PRF (session->security_parameters.inner_secret,
+  ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
 		     TLS_MASTER_SIZE, label, size_of_label - 1,
 		     /* XXX specification unclear on seed. */
 		     "", 0, CHECKSUM_SIZE, local_checksum);
@@ -342,7 +342,7 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
     sizeof (client_finished_label);
   int ret;
 
-  ret = _gnutls_PRF (session->security_parameters.inner_secret,
+  ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
 		     TLS_MASTER_SIZE,
 		     label, size_of_label - 1,
 		     "", 0, CHECKSUM_SIZE, local_checksum);
