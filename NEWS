@@ -3,11 +3,13 @@ Copyright (C) 2004, 2005, 2006 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.7.0 (released 2006-11-26)
+* Version 1.7.0 (unreleased)
 
 ** Preliminary support for TLS 1.2
 The client has been successfully tested against
 https://www.mikestoolbox.org:4433/.
+
+** Anonself test now print a lot of debugging info, including TLS version.
 
 ** Update of gnulib files.
 
