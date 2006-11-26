@@ -139,6 +139,9 @@ client (void)
       success ("client: Handshake was completed\n");
     }
 
+  success ("client: TLS version is: %s\n",
+	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
+
   gnutls_record_send (session, MSG, strlen (MSG));
 
   ret = gnutls_record_recv (session, buffer, MAX_BUF);
@@ -309,6 +312,9 @@ server (void)
       return;
     }
   success ("server: Handshake was completed\n");
+
+  success ("server: TLS version is: %s\n",
+	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
   /* print_info(session); */
