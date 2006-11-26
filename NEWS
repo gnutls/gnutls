@@ -11,6 +11,13 @@ See the end for copying conditions.
 The client has been successfully tested against
 https://www.mikestoolbox.org:4433/.
 
+*** Pull up from 1.6.x:
+
+** Fix ./configure failure with non-GCC compilers.
+This fixes the following error message:
+configure: error: conditional "HAVE_LD_OUTPUT_DEF" was never defined.
+Reported by "Michael C. Vergallen" <mvergall@telenet.be>.
+
 ** API and ABI modifications:
 GNUTLS_TLS1_2: New gnutls_protocol_t enum member.
 
