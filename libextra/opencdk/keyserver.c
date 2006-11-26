@@ -1,5 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * keyserver.c - Keyserver support
+ *        Copyright (C) 2006 Free Software Foundation, Inc.
  *        Copyright (C) 2002 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -149,7 +150,7 @@ keyserver_hkp( const char * host, int port, u32 keyid, cdk_kbnode_t * ret_key )
  * @port: The port to use for the connection
  * @keyid: KeyID of the key to retrieve
  * @kid_type: KeyID type (long, short, fingerprint)
- * @r_knode: The key that was found wrapped in a KBNODE struct
+ * @ret_key: The key that was found wrapped in a KBNODE struct
  *
  * Receive a key from a keyserver.
  **/
