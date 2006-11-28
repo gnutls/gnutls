@@ -21,6 +21,7 @@ liblgnu_la_DEPENDENCIES = $(lgl_LTLIBOBJS)
 EXTRA_liblgnu_la_SOURCES =
 liblgnu_la_LDFLAGS = $(AM_LDFLAGS)
 noinst_HEADERS =
+noinst_LTLIBRARIES =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
