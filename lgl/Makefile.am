@@ -13,14 +13,9 @@
 
 AUTOMAKE_OPTIONS = 1.5 gnits
 
-noinst_LTLIBRARIES = liblgnu.la
-
-liblgnu_la_SOURCES =
-liblgnu_la_LIBADD = $(lgl_LTLIBOBJS)
-liblgnu_la_DEPENDENCIES = $(lgl_LTLIBOBJS)
-EXTRA_liblgnu_la_SOURCES =
-liblgnu_la_LDFLAGS = $(AM_LDFLAGS)
 noinst_HEADERS =
+noinst_LIBRARIES =
+noinst_LTLIBRARIES =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
@@ -31,6 +26,14 @@ DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
 AM_CPPFLAGS =
+
+noinst_LTLIBRARIES += liblgnu.la
+
+liblgnu_la_SOURCES =
+liblgnu_la_LIBADD = $(lgl_LTLIBOBJS)
+liblgnu_la_DEPENDENCIES = $(lgl_LTLIBOBJS)
+EXTRA_liblgnu_la_SOURCES =
+liblgnu_la_LDFLAGS = $(AM_LDFLAGS)
 
 ## begin gnulib module alloca-opt
 

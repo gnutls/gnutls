@@ -13,14 +13,9 @@
 
 AUTOMAKE_OPTIONS = 1.5 gnits
 
-noinst_LTLIBRARIES = libgnu.la
-
-libgnu_la_SOURCES =
-libgnu_la_LIBADD = $(gl_LTLIBOBJS)
-libgnu_la_DEPENDENCIES = $(gl_LTLIBOBJS)
-EXTRA_libgnu_la_SOURCES =
-libgnu_la_LDFLAGS = $(AM_LDFLAGS)
 noinst_HEADERS =
+noinst_LIBRARIES =
+noinst_LTLIBRARIES =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
@@ -31,6 +26,14 @@ DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
 AM_CPPFLAGS =
+
+noinst_LTLIBRARIES += libgnu.la
+
+libgnu_la_SOURCES =
+libgnu_la_LIBADD = $(gl_LTLIBOBJS)
+libgnu_la_DEPENDENCIES = $(gl_LTLIBOBJS)
+EXTRA_libgnu_la_SOURCES =
+libgnu_la_LDFLAGS = $(AM_LDFLAGS)
 
 ## begin gnulib module arpa_inet
 
