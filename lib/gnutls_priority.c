@@ -258,7 +258,7 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
   * these defaults are ok. You may override any of the following priorities by calling
   * the appropriate functions.
   *
-  * The order is TLS1, SSL3 for protocols.
+  * The order is TLS 1.2, TLS 1.1, TLS 1.0, SSL3 for protocols.
   * RSA, DHE_DSS, DHE_RSA for key exchange 
   * algorithms. SHA, MD5 and RIPEMD160 for MAC algorithms.
   * AES_128_CBC, 3DES_CBC, 
@@ -270,7 +270,7 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 int
 gnutls_set_default_priority (gnutls_session_t session)
 {
-  static const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+  static const int protocol_priority[] = { GNUTLS_TLS1_2, GNUTLS_TLS1_1, GNUTLS_SSL3, 0 };
   static const int kx_priority[] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, 0 };
   static const int cipher_priority[] = {
