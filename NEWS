@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.7.0 (unreleased)
+* Version 1.7.0 (released 2006-11-29)
 
 ** The default protocol priority try TLS 1.1 and TLS 1.2 too.
 The details is that the protocol priority set by
