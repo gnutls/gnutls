@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.7.0 (unreleased)
 
+** The default protocol priority try TLS 1.1 and TLS 1.2 too.
+The details is that the protocol priority set by
+`gnutls_set_default_priority' has been changed from TLS 1.0 and SSL
+3.0 to TLS 1.2, TLS 1.1, TLS 1.0 and SSL 3.0.
+
 ** Preliminary support for TLS 1.2.
 The client has been successfully tested against
 https://www.mikestoolbox.org:4433/.
