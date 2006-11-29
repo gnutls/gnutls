@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 1.7.0 (unreleased)
 
-** Preliminary support for TLS 1.2
+** Preliminary support for TLS 1.2.
 The client has been successfully tested against
 https://www.mikestoolbox.org:4433/.
 
