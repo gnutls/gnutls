@@ -1,0 +1,306 @@
+# German gnutls translation.
+# Copyright (C) 2006 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnutls package.
+# Jens Seidel <jensseidel@users.sf.net>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnutls 1.4.0\n"
+"Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
+"POT-Creation-Date: 2006-05-12 00:21+0200\n"
+"PO-Revision-Date: 2006-12-12 09:37+0100\n"
+"Last-Translator: Michael Piefel <piefel@informatik.hu-berlin.de>\n"
+"Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Success."
+msgstr "Erfolg."
+
+msgid "Could not negotiate a supported cipher suite."
+msgstr "Konnte keine unterstützte Code-Suite aushandeln."
+
+msgid "The cipher type is unsupported."
+msgstr "Der Code-Typ wird nicht unterstützt."
+
+msgid "The certificate and the given key do not match."
+msgstr "Das Zertifikat und der gegebene Schlüssel passen nicht zueinander."
+
+msgid "Could not negotiate a supported compression method."
+msgstr "Konnte keine unterstützte Kompressionsmethode aushandeln."
+
+msgid "An unknown public key algorithm was encountered."
+msgstr "Ein unbekannter öffentlicher-Schlüssel-Algorithmus trat auf."
+
+msgid "An algorithm that is not enabled was negotiated."
+msgstr "Ein nicht aktivierter Algorithmus wurde ausgehandelt."
+
+msgid "A large TLS record packet was received."
+msgstr "Ein großes TLS-Datensatzpaket wurde empfangen."
+
+msgid "A record packet with illegal version was received."
+msgstr "Ein Datensatzpaket mit illegaler Version wurde empfangen."
+
+msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
+msgstr "Die Diffie-Hellman-Primzahl, die vom Server gesendet wurde, ist nicht akzeptabel (nicht lang genug)."
+
+msgid "A TLS packet with unexpected length was received."
+msgstr "Ein TLS-Paket mit unerwarteter Länge wurde empfangen."
+
+msgid "The specified session has been invalidated for some reason."
+msgstr "Die angegebene Sitzung wurde aus irgendwelchen Gründen ungültig."
+
+msgid "GnuTLS internal error."
+msgstr "Interner GnuTLS-Fehler."
+
+msgid "An illegal TLS extension was received."
+msgstr "Eine illegale TLS-Erweiterung wurde empfangen."
+
+msgid "A TLS fatal alert has been received."
+msgstr "Ein fataler TLS-Alarm wurde empfangen."
+
+msgid "An unexpected TLS packet was received."
+msgstr "Ein unerwartetes TLS-Paket wurde empfangen."
+
+msgid "A TLS warning alert has been received."
+msgstr "Eine TLS-Warnmeldung wurde empfangen."
+
+msgid "An error was encountered at the TLS Finished packet calculation."
+msgstr "Ein Fehler trat bei der fertiggestellten TLS-Paketberechnung auf."
+
+msgid "The peer did not send any certificate."
+msgstr "Die Gegenstelle sendete kein Zertifikat."
+
+msgid "No temporary RSA parameters were found."
+msgstr "Es wurden keine temporären RSA-Parameter gefunden."
+
+msgid "No temporary DH parameters were found."
+msgstr "Es wurden keine temporären DH-Parameter gefunden."
+
+msgid "An unexpected TLS handshake packet was received."
+msgstr "Ein unerwartetes TLS-Handshake-Paket wurde empfangen."
+
+msgid "The scanning of a large integer has failed."
+msgstr "Das Lesen einer großen Ganzzahl schlug fehl."
+
+msgid "Could not export a large integer."
+msgstr "Konnte keine große Ganzzahl exportieren."
+
+msgid "Decryption has failed."
+msgstr "Die Entschlüsselung schlug fehl."
+
+msgid "Encryption has failed."
+msgstr "Die Verschlüsselung schlug fehl."
+
+msgid "Public key decryption has failed."
+msgstr "Die Entschlüsselung mittels öffentlichem Schlüssel schlug fehl."
+
+msgid "Public key encryption has failed."
+msgstr "Die Verschlüsselung mittels öffentlichem Schlüssel schlug fehl."
+
+msgid "Public key signing has failed."
+msgstr "Das Signieren mittels öffentlichem Schlüssel schlug fehl."
+
+msgid "Public key signature verification has failed."
+msgstr "Die Verifizierung der Signatur mittels öffentlichem Schlüssel schlug fehl."
+
+msgid "Decompression of the TLS record packet has failed."
+msgstr "Die Dekomprimierung des TLS-Datensatzpakets schlug fehl."
+
+msgid "Compression of the TLS record packet has failed."
+msgstr "Die Komprimierung des TLS-Datensatzpakets schlug fehl."
+
+msgid "Internal error in memory allocation."
+msgstr "Interner Fehler bei Speicheranfoderung."
+
+msgid "An unimplemented or disabled feature has been requested."
+msgstr "Eine nicht implementierte oder deaktivierte Eigenschaft wurde abgefragt."
+
+msgid "Insufficient credentials for that request."
+msgstr "Unzureichende Berechtigungsnachweise für diese Anfrage."
+
+msgid "Error in password file."
+msgstr "Fehler in Passwortdatei."
+
+msgid "Wrong padding in PKCS1 packet."
+msgstr "Falsche Auffüllung in PKCS1-Paket."
+
+msgid "The requested session has expired."
+msgstr "Die abgefragte Sitzung ist ausgelaufen."
+
+msgid "Hashing has failed."
+msgstr "Hashing schlug fehl."
+
+msgid "Base64 decoding error."
+msgstr "Base64-Entschlüsselungsfehler."
+
+msgid "Base64 encoding error."
+msgstr "Base64-Verschlüsselungsfehler."
+
+msgid "Parsing error in password file."
+msgstr "Lesefehler in Passwortdatei."
+
+msgid "The requested data were not available."
+msgstr "Die abgefragten Daten waren nicht verfügbar."
+
+msgid "Error in the pull function."
+msgstr "Fehler in der Pull-Funktion."
+
+msgid "Error in the push function."
+msgstr "Fehler in der Push-Funktion."
+
+msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
+msgstr "Das obere Limit der Datensatzpaketsequenznummern wurde erreicht. Huch!"
+
+msgid "Error in the certificate."
+msgstr "Fehler im Zertifikat."
+
+msgid "Unknown Subject Alternative name in X.509 certificate."
+msgstr "Unbekannter Betreffalternativenname im X.509-Zertifikat."
+
+msgid "Unsupported critical extension in X.509 certificate."
+msgstr "Nicht unterstützte kritische Erweiterung im X.509-Zertifikat."
+
+msgid "Key usage violation in certificate has been detected."
+msgstr "Schlüsselverwendungsverletzung im Zertifikat wurde entdeckt."
+
+msgid "Function was interrupted."
+msgstr "Funktion wurde unterbrochen."
+
+msgid "Rehandshake was requested by the peer."
+msgstr "Neuer Handshake wurde von der Gegenstelle gefordert."
+
+msgid "TLS Application data were received, while expecting handshake data."
+msgstr "TLS-Anwendungsdaten wurden empfangen, während Handshake-Daten erwartet wurden."
+
+msgid "Error in Database backend."
+msgstr "Fehler im Datenbank-Backend."
+
+msgid "The certificate type is not supported."
+msgstr "Der Zertifikattyp wird nicht unterstützt."
+
+msgid "The given memory buffer is too short to hold parameters."
+msgstr "Der verfügbare Speicherpuffer ist zu kurz, um Parameter aufzunehmen."
+
+msgid "The request is invalid."
+msgstr "Die Anfrage ist ungültig."
+
+msgid "An illegal parameter has been received."
+msgstr "Ein illegaler Parameter wurde empfangen."
+
+msgid "Error while reading file."
+msgstr "Fehler beim Dateilesen."
+
+msgid "ASN1 parser: Element was not found."
+msgstr "ASN1-Parser: Element wurde nicht gefunden."
+
+# FIXME: full stop is missing
+msgid "ASN1 parser: Identifier was not found"
+msgstr "ASN1-Parser: Identifikator wurde nicht gefunden."
+
+msgid "ASN1 parser: Error in DER parsing."
+msgstr "ASN1-Parser: Fehler im DER-Parsen."
+
+msgid "ASN1 parser: Value was not found."
+msgstr "ASN1-Parser: Wert wurde nicht gefunden."
+
+msgid "ASN1 parser: Generic parsing error."
+msgstr "ASN1-Parser: Allgemeiner Verarbeitungsfehler."
+
+msgid "ASN1 parser: Value is not valid."
+msgstr "ASN1-Parser: Wert ist nicht gültig."
+
+msgid "ASN1 parser: Error in TAG."
+msgstr "ASN1-Parser: Fehler in TAG."
+
+# FIXME: capitalisation, full stop
+msgid "ASN1 parser: error in implicit tag"
+msgstr "ASN1-Parser: Fehler in implizitem Tag."
+
+msgid "ASN1 parser: Error in type 'ANY'."
+msgstr "ASN1-Parser: Fehler im Typ 'ANY'."
+
+msgid "ASN1 parser: Syntax error."
+msgstr "ASN1-Parser: Syntaxfehler."
+
+msgid "ASN1 parser: Overflow in DER parsing."
+msgstr "ASN1-Parser: Überlauf beim DER-Parsen."
+
+msgid "Too many empty record packets have been received."
+msgstr "Zu viele leere Datensatzpakete wurden empfangen."
+
+msgid "The initialization of GnuTLS-extra has failed."
+msgstr "Die Initialisierung von GnuTLS-extra schlug fehl."
+
+msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
+msgstr "Die Version der GnuTLS-Bibliothek stimmt nicht mit der Version der GnuTLS-extra-Bibliothek überein."
+
+msgid "The gcrypt library version is too old."
+msgstr "Die Version der Bibliothek gcrypt ist zu alt."
+
+msgid "The tasn1 library version is too old."
+msgstr "Die Version der Bibliothek tasn1 ist zu alt."
+
+msgid "The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported."
+msgstr "Die angegebene Version von GnuPG-TrustDB wird nicht unterstützt. TrustDB Version 4 wird unterstützt."
+
+msgid "Error loading the keyring."
+msgstr "Fehler beim Laden des Schlüsselrings."
+
+msgid "The initialization of LZO has failed."
+msgstr "Die Initialisierung von LZO schlug fehl."
+
+msgid "No supported compression algorithms have been found."
+msgstr "Keine unterstützten Kompressionsalgorithmen wurden gefunden."
+
+msgid "No supported cipher suites have been found."
+msgstr "Keine unterstützten Code-Suites wurden gefunden."
+
+msgid "Could not get OpenPGP key."
+msgstr "Konnte OpenPGP-Schlüssel nicht bekommen."
+
+msgid "The SRP username supplied is illegal."
+msgstr "Der angegebene SRP-Benutzername ist illegal."
+
+msgid "The OpenPGP fingerprint is not supported."
+msgstr "Der OpenPGP-Fingerabdruck wird nicht unterstützt."
+
+msgid "The certificate has unsupported attributes."
+msgstr "Das Zertifikat hat nichtunterstützte Attribute."
+
+# CHECKME
+msgid "The OID is not supported."
+msgstr "OID wird nicht unterstützt."
+
+msgid "The hash algorithm is unknown."
+msgstr "Der Hash-Algorithmus ist unbekannt."
+
+msgid "The PKCS structure's content type is unknown."
+msgstr "Der Inhaltstyp der PKCS-Struktur ist unbekannt."
+
+# CHECKME
+msgid "The PKCS structure's bag type is unknown."
+msgstr "Der Verpackungstyp der PKCS-Struktur ist unbekannt."
+
+msgid "The given password contains invalid characters."
+msgstr "Das angegebene Passwort enthält ungültige Zeichen."
+
+msgid "The Message Authentication Code verification failed."
+msgstr "Die Überprüfung des Authentifizierungscodes der Nachricht schlug fehl."
+
+msgid "Some constraint limits were reached."
+msgstr "Einige beschränkende Limits wurden erreicht."
+
+msgid "Failed to acquire random data."
+msgstr "Konnte keine zufälligen Daten erhalten."
+
+# FIXME: missing fullstops in next three msgid's
+msgid "Received a TLS/IA Intermediate Phase Finished message"
+msgstr "Empfing eine »TLS/IA Intermediate Phase Finished«-Mitteilung"
+
+msgid "Received a TLS/IA Final Phase Finished message"
+msgstr "Empfing eine »TLS/IA Final Phase Finished«-Mitteilung"
+
+msgid "Verifying TLS/IA phase checksum failed"
+msgstr "Verifizierung der TLS/IA-Phasenprüfsumme schlug fehl"
