@@ -74,7 +74,7 @@ static const oid2string _oid2str[] = {
   {"2.5.4.46", "dnQualifier", 0, 1},
 
   {"0.9.2342.19200300.100.1.25", "DC", 0, 1},
-  {"0.9.2342.19200300.100.1.1", "UID", 0, 1},
+  {"0.9.2342.19200300.100.1.1", "UID", 1, 1},
 
   /* PKCS #9
    */
@@ -254,6 +254,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
        * UTF-8 (thus ASCII as well).
        */
       if (strcmp (str, "printableString") != 0 &&
+	  strcmp (str, "ia5String") != 0 &&
 	  strcmp (str, "utf8String") != 0)
 	{
 	  non_printable = 1;
