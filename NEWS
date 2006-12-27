@@ -12,6 +12,13 @@ trusted CAs.  Reported by Max Kellermann <max@duempel.org>.
 ** Fix gnutls_certificate_set_x509_crl.
 Reported by Max Kellermann <max@duempel.org>.
 
+** Encode UID fields in DN's as DirectoryString.
+Before GnuTLS encoded and parsed UID fields as IA5String.  This was
+incorrect, it should have used DirectoryString.  Now it will use
+DirectoryString for the UID field, but for backwards compatibility it
+will also accept IA5String UID's.  Reported by Max Kellermann
+<max@duempel.org>.
+
 ** Fix ./configure failure with non-GCC compilers.
 This fixes the following error message:
 configure: error: conditional "HAVE_LD_OUTPUT_DEF" was never defined.
