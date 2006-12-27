@@ -1403,6 +1403,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   gnutls_certificate_credentials_t cred;
   int size;
   opaque *pdata;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   /* Now we need to generate the RDN sequence. This is
    * already in the CERTIFICATE_CRED structure, to improve
@@ -1438,6 +1439,13 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   pdata[1] = RSA_SIGN;
   pdata[2] = DSA_SIGN;		/* only these for now */
   pdata += CERTTYPE_SIZE;
+
+  if (ver == GNUTLS_TLS1_2)
+    {
+      /* Supported hashes (nothing for now -- FIXME). */
+      *pdata = 0;
+      pdata++, size++;
+    }
 
   if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
       session->internals.ignore_rdn_sequence == 0)
