@@ -23,3 +23,4 @@ resume
 set_pkcs12_cred
 smime
 tlsia
+certificate_set_x509_crl
