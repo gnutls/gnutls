@@ -13,6 +13,13 @@ trusted CAs.  Reported by Max Kellermann <max@duempel.org>.
 Also added a self-test in tests/certificate_set_x509_crl.c to test the
 function.  Reported by Max Kellermann <max@duempel.org>.
 
+** Encode UID fields in DN's as DirectoryString.
+Before GnuTLS encoded and parsed UID fields as IA5String.  This was
+incorrect, it should have used DirectoryString.  Now it will use
+DirectoryString for the UID field, but for backwards compatibility it
+will also accept IA5String UID's.  Reported by Max Kellermann
+<max@duempel.org>.
+
 ** Bootstrap tools changed.
 We now require autoconf 2.61, automake 1.10, and gettext 0.16, when
 building GnuTLS from CVS.  Libtool 1.5.22 is used.
