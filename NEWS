@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.6.1 (unreleased)
 
+** Fix gnutls_certificate_set_x509_crl.
+Reported by Max Kellermann <max@duempel.org>.
+
 ** Fix ./configure failure with non-GCC compilers.
 This fixes the following error message:
 configure: error: conditional "HAVE_LD_OUTPUT_DEF" was never defined.
