@@ -259,9 +259,10 @@ _gnutls_tls_sign (gnutls_cert * cert, gnutls_privkey * pkey,
 
 
 static int
-_gnutls_pkcs1_rsa_verify_sig (gnutls_cert * cert,
-			      const gnutls_datum_t * hash_concat,
-			      gnutls_datum_t * signature)
+_gnutls_verify_sig (gnutls_cert * cert,
+		    const gnutls_datum_t * hash_concat,
+		    gnutls_datum_t * signature,
+		    size_t sha1pos)
 {
   int ret;
   gnutls_datum_t vdata;
@@ -302,7 +303,7 @@ _gnutls_pkcs1_rsa_verify_sig (gnutls_cert * cert,
       break;
     case GNUTLS_PK_DSA:
 
-      vdata.data = &hash_concat->data[16];
+      vdata.data = &hash_concat->data[sha1pos];
       vdata.size = 20;		/* sha1 */
 
       /* verify signature */
@@ -380,7 +381,7 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
   dconcat.data = concat;
   dconcat.size = 20 + 16;	/* md5+ sha */
 
-  ret = _gnutls_pkcs1_rsa_verify_sig (cert, &dconcat, signature);
+  ret = _gnutls_verify_sig (cert, &dconcat, signature, 16);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -461,7 +462,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
 
   dconcat.data = concat;
 
-  ret = _gnutls_pkcs1_rsa_verify_sig (cert, &dconcat, signature);
+  ret = _gnutls_verify_sig (cert, &dconcat, signature, dconcat.size - 20);
   if (ret < 0)
     {
       gnutls_assert ();
