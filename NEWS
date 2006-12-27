@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.7.1 (unreleased)
 
+** TLS 1.2 server side fix.
+The Certificate Request sent did not contain the list of supported
+hashes field, thus violating the protocol.  It will now contain an
+empty list.  Reported by ludovic.courtes@laas.fr (Ludovic Courtès).
+
 ** Fix the list of trusted CAs that server's send to clients.
 Before, the list contained issuer DN's instead of subject DN's of the
 trusted CAs.  Reported by Max Kellermann <max@duempel.org>.
