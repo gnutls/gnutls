@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.7.1 (unreleased)
 
+** Fix gnutls_certificate_set_x509_crl.
+Also added a self-test in tests/certificate_set_x509_crl.c to test the
+function.  Reported by Max Kellermann <max@duempel.org>.
+
 ** Bootstrap tools changed.
 We now require autoconf 2.61, automake 1.10, and gettext 0.16, when
 building GnuTLS from CVS.  Libtool 1.5.22 is used.
