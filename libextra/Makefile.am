@@ -144,7 +144,7 @@ gnutls-extra-api.texi: gnutls_extra.c
 	@echo "" > $@
 	@for i in $<; do \
 		echo -n "Creating documentation for file $$i... " && \
-		../doc/scripts/gdoc -texinfo $$i >> $@ && \
+		$(top_srcdir)/doc/scripts/gdoc -texinfo $$i >> $@ && \
 		echo "ok"; \
 	done
 
@@ -152,7 +152,7 @@ ia-api.texi: gnutls_ia.c
 	@echo "" > $@
 	@for i in $<; do \
 		echo -n "Creating documentation for file $$i... " && \
-		../doc/scripts/gdoc -texinfo $$i >> $@ && \
+		$(top_srcdir)/doc/scripts/gdoc -texinfo $$i >> $@ && \
 		echo "ok"; \
 	done
 

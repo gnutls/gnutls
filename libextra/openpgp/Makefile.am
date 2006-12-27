@@ -44,7 +44,7 @@ pgp-api.texi: $(COBJECTS)
 	@echo "" > pgp-api.texi
 	@for i in ../gnutls_openpgp.c $(COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
-		../../doc/scripts/gdoc -texinfo $$i >> pgp-api.texi && \
+		$(top_srcdir)/doc/scripts/gdoc -texinfo $$i >> pgp-api.texi && \
 		echo "ok"; \
 	done
 

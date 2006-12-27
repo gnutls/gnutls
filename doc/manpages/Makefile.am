@@ -41,7 +41,7 @@ $(APIMANS) $(SRPMANS):
 	make doit
 
 update-makefile:
-	FUNCS=`../scripts/gdoc -listfunc \
+	FUNCS=`$(top_srcdir)/doc/scripts/gdoc -listfunc \
 		$(top_srcdir)/{lib,libextra,lib/x509,libextra/openpgp}/*.c`; \
 	MANS=""; \
 	SRPMANS=""; \
@@ -56,9 +56,9 @@ update-makefile:
 	perl -pi -e "s/^SRPMANS =.*/SRPMANS =$$SRPMANS/" Makefile.am
 
 doit:
-	@for i in `../scripts/gdoc -listfunc $(top_srcdir)/lib/*.c`; do \
+	@for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/lib/*.c`; do \
 		echo -n "Creating man page for $$i... " && \
-		../scripts/gdoc -man \
+		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/gnutls.h" \
@@ -68,9 +68,9 @@ doit:
 			$(top_srcdir)/lib/*.c >> $$i.3 && \
 		echo "ok"; \
 	done; \
-	for i in `../scripts/gdoc -listfunc $(top_srcdir)/libextra/*.c`; do \
+	for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/libextra/*.c`; do \
 		echo -n "Creating man page in extra/ for $$i... " && \
-		../scripts/gdoc -man \
+		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/extra.h" \
@@ -80,9 +80,9 @@ doit:
 			$(top_srcdir)/libextra/*.c >> $$i.3 && \
 		echo "ok"; \
 	done; \
-	for i in `../scripts/gdoc -listfunc $(top_srcdir)/lib/x509/*.c | grep -v gnutls_pkcs12`; do \
+	for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/lib/x509/*.c | grep -v gnutls_pkcs12`; do \
 		echo -n "Creating man page in lib/x509/ for $$i... " && \
-		../scripts/gdoc -man \
+		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/x509.h" \
@@ -92,9 +92,9 @@ doit:
 			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
 		echo "ok"; \
 	done; \
-	for i in `../scripts/gdoc -listfunc $(top_srcdir)/lib/x509/*.c | grep gnutls_pkcs12`; do \
+	for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/lib/x509/*.c | grep gnutls_pkcs12`; do \
 		echo -n "Creating man page in lib/x509/ (pkcs12) for $$i... " && \
-		../scripts/gdoc -man \
+		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/pkcs12.h" \
@@ -104,9 +104,9 @@ doit:
 			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
 		echo "ok"; \
 	done; \
-	for i in `../scripts/gdoc -listfunc $(top_srcdir)/libextra/openpgp/*.c`; do \
+	for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/libextra/openpgp/*.c`; do \
 		echo -n "Creating man page in libextra/openpgp/ for $$i... " && \
-		../scripts/gdoc -man \
+		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/openpgp.h" \

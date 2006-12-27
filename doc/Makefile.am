@@ -81,19 +81,19 @@ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 	cd ../libextra && make ia-api.texi
 
 gnutls-api.texi: ../lib/gnutls-api.texi
-	-scripts/sort2.pl < ../lib/gnutls-api.texi > gnutls-api.texi
+	-$(srcdir)/scripts/sort2.pl < ../lib/gnutls-api.texi > gnutls-api.texi
 
 gnutls-extra-api.texi: ../libextra/gnutls-extra-api.texi
-	-scripts/sort2.pl < ../libextra/gnutls-extra-api.texi > gnutls-extra-api.texi
+	-$(srcdir)/scripts/sort2.pl < ../libextra/gnutls-extra-api.texi > gnutls-extra-api.texi
 
 x509-api.texi: ../lib/x509/x509-api.texi
-	-scripts/sort2.pl < ../lib/x509/x509-api.texi > x509-api.texi
+	-$(srcdir)/scripts/sort2.pl < ../lib/x509/x509-api.texi > x509-api.texi
 
 pgp-api.texi: ../libextra/openpgp/pgp-api.texi
-	-scripts/sort2.pl < ../libextra/openpgp/pgp-api.texi > pgp-api.texi
+	-$(srcdir)/scripts/sort2.pl < ../libextra/openpgp/pgp-api.texi > pgp-api.texi
 
 ia-api.texi: ../libextra/ia-api.texi
-	-scripts/sort2.pl < ../libextra/ia-api.texi > ia-api.texi
+	-$(srcdir)/scripts/sort2.pl < ../libextra/ia-api.texi > ia-api.texi
 
 error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi

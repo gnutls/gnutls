@@ -151,7 +151,7 @@ gnutls-api.texi: $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS)
 	@echo "" > gnutls-api.texi
 	@for i in $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
-		../doc/scripts/gdoc -texinfo $$i >> gnutls-api.texi && \
+		$(top_srcdir)/doc/scripts/gdoc -texinfo $$i >> gnutls-api.texi && \
 		echo "ok"; \
 	done
 
