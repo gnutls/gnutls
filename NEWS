@@ -25,6 +25,9 @@ DirectoryString for the UID field, but for backwards compatibility it
 will also accept IA5String UID's.  Reported by Max Kellermann
 <max@duempel.org>.
 
+** Improve out-of-sourcedir builds from CVS.
+Reported by ludovic.courtes@laas.fr (Ludovic Courtès).
+
 ** Bootstrap tools changed.
 We now require autoconf 2.61, automake 1.10, and gettext 0.16, when
 building GnuTLS from CVS.  Libtool 1.5.22 is used.
