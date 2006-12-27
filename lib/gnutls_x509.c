@@ -1623,6 +1623,13 @@ gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
 
   for (i = 0; i < crl_list_size; i++)
     {
+      ret = gnutls_x509_crl_init (&res->x509_crl_list[res->x509_ncrls]);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+
       ret = _gnutls_x509_crl_cpy (res->x509_crl_list[ res->x509_ncrls],
 				  crl_list[i]);
       if (ret < 0)
