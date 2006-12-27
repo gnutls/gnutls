@@ -9,6 +9,8 @@ See the end for copying conditions.
 We now require autoconf 2.61, automake 1.10, and gettext 0.16, when
 building GnuTLS from CVS.  Libtool 1.5.22 is used.
 
+** Update of gnulib files.
+
 ** API and ABI modifications:
 
 * Version 1.7.0 (released 2006-11-29)
