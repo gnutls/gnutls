@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.6.1 (unreleased)
+* Version 1.6.1 (released 2006-12-28)
 
 ** Fix the list of trusted CAs that server's send to clients.
 Before, the list contained issuer DN's instead of subject DN's of the
