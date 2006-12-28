@@ -9,7 +9,7 @@ See the end for copying conditions.
 Before, the list contained issuer DN's instead of subject DN's of the
 trusted CAs.  Reported by Max Kellermann <max@duempel.org>.
 
-** Fix gnutls_certificate_set_x509_crl.
+** Fix gnutls_certificate_set_x509_crl to initialize the CRL before using it.
 Reported by Max Kellermann <max@duempel.org>.
 
 ** Encode UID fields in DN's as DirectoryString.
