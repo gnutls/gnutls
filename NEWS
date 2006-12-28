@@ -35,7 +35,7 @@ Reported by ludovic.courtes@laas.fr (Ludovic Courtès).
 We now require autoconf 2.61, automake 1.10, and gettext 0.16, when
 building GnuTLS from CVS.  Libtool 1.5.22 is used.
 
-** Fixed a syntax error in lib/pkix.asn.
+** Fixed a syntax error in lib/gnutls.asn.
 Reported by Paul Millar <p.millar@physics.gla.ac.uk>.
 
 ** Update of gnulib files.
