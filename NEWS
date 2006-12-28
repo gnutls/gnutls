@@ -38,6 +38,8 @@ building GnuTLS from CVS.  Libtool 1.5.22 is used.
 ** Fixed a syntax error in lib/gnutls.asn.
 Reported by Paul Millar <p.millar@physics.gla.ac.uk>.
 
+** Added German translation of GnuTLS messages.
+
 ** Update of gnulib files.
 
 ** API and ABI modifications:
