@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2004-2006 Free Software Foundation, Inc.
+# Copyright (C) 2004-2007 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -40,18 +40,60 @@ AC_DEFUN([gl_INIT],
   gl_cond_libtool=true
   gl_source_base='gl'
   gl_HEADER_ARPA_INET
+    AC_DEFINE([GNULIB_ARPA_INET], [1],
+      [Define to 1 when using the gnulib module arpa_inet.])
+    AC_DEFINE([GNULIB_FDL], [1],
+      [Define to 1 when using the gnulib module fdl.])
+    AC_DEFINE([GNULIB_GENDOCS], [1],
+      [Define to 1 when using the gnulib module gendocs.])
   gl_GETADDRINFO
+    AC_DEFINE([GNULIB_GETADDRINFO], [1],
+      [Define to 1 when using the gnulib module getaddrinfo.])
   gl_FUNC_GETDELIM
+    AC_DEFINE([GNULIB_GETDELIM], [1],
+      [Define to 1 when using the gnulib module getdelim.])
   gl_FUNC_GETLINE
+    AC_DEFINE([GNULIB_GETLINE], [1],
+      [Define to 1 when using the gnulib module getline.])
   gl_FUNC_GETPASS
+    AC_DEFINE([GNULIB_GETPASS], [1],
+      [Define to 1 when using the gnulib module getpass.])
+    AC_DEFINE([GNULIB_GETTEXT_H], [1],
+      [Define to 1 when using the gnulib module gettext-h.])
+    AC_DEFINE([GNULIB_GPL], [1],
+      [Define to 1 when using the gnulib module gpl.])
+    AC_DEFINE([GNULIB_HAVELIB], [1],
+      [Define to 1 when using the gnulib module havelib.])
   gl_INET_NTOP
+    AC_DEFINE([GNULIB_INET_NTOP], [1],
+      [Define to 1 when using the gnulib module inet_ntop.])
   gl_INET_PTON
+    AC_DEFINE([GNULIB_INET_PTON], [1],
+      [Define to 1 when using the gnulib module inet_pton.])
+    AC_DEFINE([GNULIB_LGPL], [1],
+      [Define to 1 when using the gnulib module lgpl.])
+    AC_DEFINE([GNULIB_MAINTAINER_MAKEFILE], [1],
+      [Define to 1 when using the gnulib module maintainer-makefile.])
   gl_HEADER_NETINET_IN
+    AC_DEFINE([GNULIB_NETINET_IN], [1],
+      [Define to 1 when using the gnulib module netinet_in.])
   gl_FUNC_READLINE
+    AC_DEFINE([GNULIB_READLINE], [1],
+      [Define to 1 when using the gnulib module readline.])
   gl_TYPE_SOCKLEN_T
+    AC_DEFINE([GNULIB_SOCKLEN], [1],
+      [Define to 1 when using the gnulib module socklen.])
   AM_STDBOOL_H
+    AC_DEFINE([GNULIB_STDBOOL], [1],
+      [Define to 1 when using the gnulib module stdbool.])
   gl_FUNC_STRDUP
+    AC_DEFINE([GNULIB_STRDUP], [1],
+      [Define to 1 when using the gnulib module strdup.])
   gl_HEADER_SYS_SOCKET
+    AC_DEFINE([GNULIB_SYS_SOCKET], [1],
+      [Define to 1 when using the gnulib module sys_socket.])
+    AC_DEFINE([GNULIB_DUMMY], [1],
+      [Define to 1 when using the gnulib module dummy.])
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
