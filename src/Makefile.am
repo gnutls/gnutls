@@ -78,16 +78,16 @@ errcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS)
 
 
 
-psk-gaa.c: psk.gaa
-	-gaa psk.gaa -o psk-gaa.c -i psk-gaa.h
-crypt-gaa.c: crypt.gaa
-	-gaa crypt.gaa -o crypt-gaa.c -i crypt-gaa.h
-certtool-gaa.c: certtool.gaa
-	-gaa certtool.gaa -o certtool-gaa.c -i certtool-gaa.h
-cli-gaa.c: cli.gaa
-	-gaa cli.gaa -o cli-gaa.c -i cli-gaa.h
-tls_test-gaa.c: tls_test.gaa
-	-gaa tls_test.gaa -o tls_test-gaa.c -i tls_test-gaa.h
-serv-gaa.c: serv.gaa
-	-gaa serv.gaa -o serv-gaa.c -i serv-gaa.h
+psk-gaa.c: $(srcdir)/psk.gaa
+	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
+crypt-gaa.c: $(srcdir)/crypt.gaa
+	-$(GAA) $< -o crypt-gaa.c -i crypt-gaa.h
+certtool-gaa.c: $(srcdir)/certtool.gaa
+	-$(GAA) $< -o certtool-gaa.c -i certtool-gaa.h
+cli-gaa.c: $(srcdir)/cli.gaa
+	-$(GAA) $< -o cli-gaa.c -i cli-gaa.h
+tls_test-gaa.c: $(srcdir)/tls_test.gaa
+	-$(GAA) $< -o tls_test-gaa.c -i tls_test-gaa.h
+serv-gaa.c: $(srcdir)/serv.gaa
+	-$(GAA) $< -o serv-gaa.c -i serv-gaa.h
 
