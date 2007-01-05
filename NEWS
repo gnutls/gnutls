@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** Print URL to gaa when missing, and fix srcdir!=builddir for GAA files.
 Reported by ludovic.courtes@laas.fr (Ludovic Courtès).
 
+** Update of gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
