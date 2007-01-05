@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
 #    Free Software Foundation, Inc.
 #
 # Author: Nikos Mavroyanopoulos
@@ -625,7 +625,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile \
 	gl/Makefile lgl/Makefile \
-	tests/Makefile tests/rsa-md5-collision/Makefile \
+	tests/Makefile tests/rsa-md5-collision/Makefile tests/userid/Makefile \
 	tests/pkcs1-padding/Makefile tests/pkcs8-decode/Makefile \
 	tests/pkcs12-decode/Makefile \
 	includes/Makefile includes/gnutls/gnutls.h \
