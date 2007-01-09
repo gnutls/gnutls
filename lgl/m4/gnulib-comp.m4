@@ -39,109 +39,52 @@ AC_DEFUN([lgl_INIT],
   AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_cond_libtool=true
   gl_source_base='lgl'
-    AC_DEFINE([GNULIB_ABSOLUTE_HEADER], [1],
-      [Define to 1 when using the gnulib module absolute-header.])
   gl_FUNC_ALLOCA
-    AC_DEFINE([GNULIB_ALLOCA_OPT], [1],
-      [Define to 1 when using the gnulib module alloca-opt.])
   gl_GC
   if test $gl_cond_libtool = false; then
     gl_ltlibdeps="$gl_ltlibdeps $LTLIBGCRYPT"
     gl_libdeps="$gl_libdeps $LIBGCRYPT"
   fi
-    AC_DEFINE([GNULIB_GC], [1],
-      [Define to 1 when using the gnulib module gc.])
   gl_GC_ARCFOUR
-    AC_DEFINE([GNULIB_GC_ARCFOUR], [1],
-      [Define to 1 when using the gnulib module gc-arcfour.])
+  gl_MODULE_INDICATOR([gc-arcfour])
   gl_GC_ARCTWO
-    AC_DEFINE([GNULIB_GC_ARCTWO], [1],
-      [Define to 1 when using the gnulib module gc-arctwo.])
+  gl_MODULE_INDICATOR([gc-arctwo])
   gl_GC_DES
-    AC_DEFINE([GNULIB_GC_DES], [1],
-      [Define to 1 when using the gnulib module gc-des.])
+  gl_MODULE_INDICATOR([gc-des])
   gl_GC_HMAC_MD5
-    AC_DEFINE([GNULIB_GC_HMAC_MD5], [1],
-      [Define to 1 when using the gnulib module gc-hmac-md5.])
+  gl_MODULE_INDICATOR([gc-hmac-md5])
   gl_GC_HMAC_SHA1
-    AC_DEFINE([GNULIB_GC_HMAC_SHA1], [1],
-      [Define to 1 when using the gnulib module gc-hmac-sha1.])
+  gl_MODULE_INDICATOR([gc-hmac-sha1])
   gl_GC_MD2
-    AC_DEFINE([GNULIB_GC_MD2], [1],
-      [Define to 1 when using the gnulib module gc-md2.])
+  gl_MODULE_INDICATOR([gc-md2])
   gl_GC_MD4
-    AC_DEFINE([GNULIB_GC_MD4], [1],
-      [Define to 1 when using the gnulib module gc-md4.])
+  gl_MODULE_INDICATOR([gc-md4])
   gl_GC_MD5
-    AC_DEFINE([GNULIB_GC_MD5], [1],
-      [Define to 1 when using the gnulib module gc-md5.])
+  gl_MODULE_INDICATOR([gc-md5])
   gl_GC_PBKDF2_SHA1
-    AC_DEFINE([GNULIB_GC_PBKDF2_SHA1], [1],
-      [Define to 1 when using the gnulib module gc-pbkdf2-sha1.])
   gl_GC_RANDOM
-    AC_DEFINE([GNULIB_GC_RANDOM], [1],
-      [Define to 1 when using the gnulib module gc-random.])
+  gl_MODULE_INDICATOR([gc-random])
   gl_GC_RIJNDAEL
-    AC_DEFINE([GNULIB_GC_RIJNDAEL], [1],
-      [Define to 1 when using the gnulib module gc-rijndael.])
+  gl_MODULE_INDICATOR([gc-rijndael])
   gl_GC_SHA1
-    AC_DEFINE([GNULIB_GC_SHA1], [1],
-      [Define to 1 when using the gnulib module gc-sha1.])
+  gl_MODULE_INDICATOR([gc-sha1])
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.15])
-    AC_DEFINE([GNULIB_GETTEXT], [1],
-      [Define to 1 when using the gnulib module gettext.])
-    AC_DEFINE([GNULIB_GETTEXT_H], [1],
-      [Define to 1 when using the gnulib module gettext-h.])
-    AC_DEFINE([GNULIB_HAVELIB], [1],
-      [Define to 1 when using the gnulib module havelib.])
   gl_MD2
-    AC_DEFINE([GNULIB_MD2], [1],
-      [Define to 1 when using the gnulib module md2.])
   gl_FUNC_MEMMEM
-    AC_DEFINE([GNULIB_MEMMEM], [1],
-      [Define to 1 when using the gnulib module memmem.])
   gl_FUNC_MEMMOVE
-    AC_DEFINE([GNULIB_MEMMOVE], [1],
-      [Define to 1 when using the gnulib module memmove.])
   gl_MINMAX
-    AC_DEFINE([GNULIB_MINMAX], [1],
-      [Define to 1 when using the gnulib module minmax.])
   gl_FUNC_READ_FILE
-    AC_DEFINE([GNULIB_READ_FILE], [1],
-      [Define to 1 when using the gnulib module read-file.])
   gl_SIZE_MAX
-    AC_DEFINE([GNULIB_SIZE_MAX], [1],
-      [Define to 1 when using the gnulib module size_max.])
   gl_FUNC_SNPRINTF
-    AC_DEFINE([GNULIB_SNPRINTF], [1],
-      [Define to 1 when using the gnulib module snprintf.])
   gl_TYPE_SOCKLEN_T
-    AC_DEFINE([GNULIB_SOCKLEN], [1],
-      [Define to 1 when using the gnulib module socklen.])
   gl_STDINT_H
-    AC_DEFINE([GNULIB_STDINT], [1],
-      [Define to 1 when using the gnulib module stdint.])
   gl_FUNC_STRVERSCMP
-    AC_DEFINE([GNULIB_STRVERSCMP], [1],
-      [Define to 1 when using the gnulib module strverscmp.])
   gl_HEADER_SYS_SOCKET
-    AC_DEFINE([GNULIB_SYS_SOCKET], [1],
-      [Define to 1 when using the gnulib module sys_socket.])
   gl_HEADER_SYS_STAT_H
-    AC_DEFINE([GNULIB_SYS_STAT], [1],
-      [Define to 1 when using the gnulib module sys_stat.])
   gl_HEADER_UNISTD
-    AC_DEFINE([GNULIB_UNISTD], [1],
-      [Define to 1 when using the gnulib module unistd.])
   gl_FUNC_VASNPRINTF
-    AC_DEFINE([GNULIB_VASNPRINTF], [1],
-      [Define to 1 when using the gnulib module vasnprintf.])
   gl_XSIZE
-    AC_DEFINE([GNULIB_XSIZE], [1],
-      [Define to 1 when using the gnulib module xsize.])
-    AC_DEFINE([GNULIB_DUMMY], [1],
-      [Define to 1 when using the gnulib module dummy.])
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -255,6 +198,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/gettext.m4
   m4/glibc2.m4
   m4/glibc21.m4
+  m4/gnulib-common.m4
   m4/hmac-md5.m4
   m4/hmac-sha1.m4
   m4/iconv.m4
