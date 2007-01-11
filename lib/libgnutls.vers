@@ -1,5 +1,5 @@
 # libgnutls.vers -- Versioning script to control what symbols to export.
-# Copyright (C) 2005 Free Software Foundation
+# Copyright (C) 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -22,6 +22,6 @@
 
 GNUTLS_1_3
 {
-  global: _gnutls*; gnutls*; _E_*;
+  global: _gnutls*; gnutls*;
   local: *;
 };
