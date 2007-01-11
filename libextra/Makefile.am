@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos
 #
@@ -73,8 +73,7 @@ lib_LTLIBRARIES += libgnutls-openssl.la
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = ../gl/libgnu.la ../lgl/liblgnu.la \
-	../lib/libgnutls.la 
+libgnutls_openssl_la_LIBADD = ../gl/libgnu.la ../lib/libgnutls.la 
 
 libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
@@ -125,8 +124,7 @@ libgnutls_extra_la_LDFLAGS += \
 
 libgnutls_extra_la_SOURCES += gnutls_extra.h libgnutls-extra.vers
 
-libgnutls_extra_la_LIBADD += ../gl/libgnu.la ../lgl/liblgnu.la \
-	../lib/libgnutls.la
+libgnutls_extra_la_LIBADD += ../gl/libgnu.la ../lib/libgnutls.la
 
 if HAVE_LD_VERSION_SCRIPT
 libgnutls_extra_la_LDFLAGS += \
