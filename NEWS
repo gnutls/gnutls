@@ -13,9 +13,9 @@ Suggested by Sascha Ziemann <sascha.ziemann@secunet.com>.
 
 ** Add new API to get/set pathLenConstraint in the Basic Constraints.
 The new functions gnutls_x509_crt_get_basic_constraints and
-gnutls_x509_crt_set_basic_constraints are a superset of the
-functionality of the old gnutls_x509_crt_get_ca_status and
-gnutls_x509_crt_set_ca_status (respectively), but the old function
+gnutls_x509_crt_set_basic_constraints provide a superset of the
+functionality in the old gnutls_x509_crt_get_ca_status and
+gnutls_x509_crt_set_ca_status (respectively), but the old functions
 will continue to be supported.
 
 ** Clean up separation of gnutls and gnutls-extra for OpenPGP.
