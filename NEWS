@@ -18,6 +18,11 @@ functionality in the old gnutls_x509_crt_get_ca_status and
 gnutls_x509_crt_set_ca_status (respectively), but the old functions
 will continue to be supported.
 
+** Certtool --to-p12 can now store more than one certificate in the blob.
+Before it could only store one certificate, but now it will read and
+store as many certificate there are from the --load-certificate file.
+Suggested by Sascha Ziemann <sascha.ziemann@secunet.com>.
+
 ** Clean up separation of gnutls and gnutls-extra for OpenPGP.
 In particular, the OpenPGP function variables are no longer part of
 the exported libgnutls interface, and no header files from
