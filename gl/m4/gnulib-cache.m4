@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=. --avoid=snprintf --avoid=vasnprintf --libtool --macro-prefix=gl arpa_inet fdl gendocs getaddrinfo getline getpass gpl inet_ntop inet_pton lgpl maintainer-makefile readline
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=. --avoid=snprintf --avoid=vasnprintf --makefile-name=gnulib.mk --libtool --macro-prefix=gl arpa_inet fdl gendocs getaddrinfo getline getpass gpl inet_ntop inet_pton lgpl maintainer-makefile readline
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
@@ -26,6 +26,6 @@ gl_M4_BASE([gl/m4])
 gl_DOC_BASE([doc])
 gl_TESTS_BASE([gl/tests])
 gl_LIB([libgnu])
-gl_MAKEFILE_NAME([])
+gl_MAKEFILE_NAME([gnulib.mk])
 gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
