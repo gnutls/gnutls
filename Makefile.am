@@ -1,5 +1,6 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software
+# Foundation
 #
 # Author: Nikos Mavroyanopoulos
 #
@@ -21,7 +22,7 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
-SUBDIRS = gl lgl includes lib libextra src doc tests po
+SUBDIRS = lgl gl includes lib libextra src doc tests po
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lgl/m4
 
