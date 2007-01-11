@@ -35,6 +35,7 @@ void get_oid_crt_set (gnutls_x509_crt crt);
 int get_serial (void);
 int get_days (void);
 int get_ca_status (void);
+int get_path_len (void);
 const char *get_pkcs12_key_name (void);
 int get_tls_client_status (void);
 int get_tls_server_status (void);

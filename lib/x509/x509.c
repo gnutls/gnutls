@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -985,27 +985,36 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
   return type;
 }
 
+
 /**
-  * gnutls_x509_crt_get_ca_status - This function returns the certificate CA status
-  * @cert: should contain a gnutls_x509_crt_t structure
-  * @critical: will be non zero if the extension is marked as critical
-  *
-  * This function will return certificates CA status, by reading the
-  * basicConstraints X.509 extension (2.5.29.19). If the certificate is a CA a positive
-  * value will be returned, or zero if the certificate does not have
-  * CA flag set. 
-  *
-  * A negative value may be returned in case of parsing error.
-  * If the certificate does not contain the basicConstraints extension
-  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
-  *
-  **/
+ * gnutls_x509_crt_get_basic_constraints - This function returns the certificate basic constraints
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @critical: will be non zero if the extension is marked as critical
+ * @ca: pointer to output integer indicating CA status, may be NULL,
+ *   value is 1 if the certificate CA flag is set, 0 otherwise.
+ * @pathlen: pointer to output integer indicating path length (may be
+ *   NULL), non-negative values indicate a present pathLenConstraint
+ *   field and the actual value, -1 indicate that the field is absent.
+ *
+ * This function will read the certificate's basic constraints, and
+ * return the certificates CA status.  It reads the basicConstraints
+ * X.509 extension (2.5.29.19).
+ *
+ * Return value: If the certificate is a CA a positive value will be
+ * returned, or zero if the certificate does not have CA flag set.  A
+ * negative value may be returned in case of errors.  If the
+ * certificate does not contain the basicConstraints extension
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ **/
 int
-gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
+gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
+				       unsigned int *critical,
+				       int *ca,
+				       int *pathlen)
 {
   int result;
   gnutls_datum_t basicConstraints;
-  int ca;
+  int tmp_ca;
 
   if (cert == NULL)
     {
@@ -1027,9 +1036,12 @@ gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
     }
 
   result =
-    _gnutls_x509_ext_extract_basicConstraints (&ca,
+    _gnutls_x509_ext_extract_basicConstraints (&tmp_ca,
+					       pathlen,
 					       basicConstraints.data,
 					       basicConstraints.size);
+  if (ca)
+    *ca = tmp_ca;
   _gnutls_free_datum (&basicConstraints);
 
   if (result < 0)
@@ -1038,7 +1050,32 @@ gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
       return result;
     }
 
-  return ca;
+  return tmp_ca;
+}
+
+/**
+ * gnutls_x509_crt_get_ca_status - This function returns the certificate CA status
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @critical: will be non zero if the extension is marked as critical
+ *
+ * This function will return certificates CA status, by reading the
+ * basicConstraints X.509 extension (2.5.29.19). If the certificate is
+ * a CA a positive value will be returned, or zero if the certificate
+ * does not have CA flag set.
+ *
+ * Use gnutls_x509_crt_get_basic_constraints() if you want to read the
+ * pathLenConstraint field too.
+ *
+ * A negative value may be returned in case of parsing error.
+ * If the certificate does not contain the basicConstraints extension
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ **/
+int
+gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
+{
+  int ca, pathlen;
+  return gnutls_x509_crt_get_basic_constraints (cert, critical, &ca, &pathlen);
 }
 
 /**

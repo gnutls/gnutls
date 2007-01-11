@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -281,19 +281,23 @@ gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,
 
 }
 
-
 /**
-  * gnutls_x509_crt_set_ca_status - This function will set the basicConstraints extension
-  * @crt: should contain a gnutls_x509_crt_t structure
-  * @ca: true(1) or false(0). Depending on the Certificate authority status.
-  *
-  * This function will set the basicConstraints certificate extension. 
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_x509_crt_set_ca_status - This function will set the basicConstraints extension
+ * @crt: should contain a gnutls_x509_crt_t structure
+ * @ca: true(1) or false(0). Depending on the Certificate authority status.
+ * @pathLenConstraint: non-negative values indicate maximum length of path,
+ *   and negative values indicate that the pathLenConstraints field should
+ *   not be present.
+ *
+ * This function will set the basicConstraints certificate extension.
+ *
+ * Returns 0 on success.
+ *
+ **/
 int
-gnutls_x509_crt_set_ca_status (gnutls_x509_crt_t crt, unsigned int ca)
+gnutls_x509_crt_set_basic_constraints (gnutls_x509_crt_t crt,
+				       unsigned int ca,
+				       int pathLenConstraint)
 {
   int result;
   gnutls_datum_t der_data;
@@ -306,7 +310,8 @@ gnutls_x509_crt_set_ca_status (gnutls_x509_crt_t crt, unsigned int ca)
 
   /* generate the extension.
    */
-  result = _gnutls_x509_ext_gen_basicConstraints (ca, &der_data);
+  result = _gnutls_x509_ext_gen_basicConstraints (ca, pathLenConstraint,
+						  &der_data);
   if (result < 0)
     {
       gnutls_assert ();
@@ -326,6 +331,24 @@ gnutls_x509_crt_set_ca_status (gnutls_x509_crt_t crt, unsigned int ca)
   crt->use_extensions = 1;
 
   return 0;
+}
+
+/**
+ * gnutls_x509_crt_set_ca_status - This function will set the basicConstraints extension
+ * @crt: should contain a gnutls_x509_crt_t structure
+ * @ca: true(1) or false(0). Depending on the Certificate authority status.
+ *
+ * This function will set the basicConstraints certificate extension.
+ * Use gnutls_x509_crt_set_basic_constraints() if you want to control
+ * the pathLenConstraint field too.
+ *
+ * Returns 0 on success.
+ *
+ **/
+int
+gnutls_x509_crt_set_ca_status (gnutls_x509_crt_t crt, unsigned int ca)
+{
+  return gnutls_x509_crt_set_basic_constraints (crt, ca, -1);
 }
 
 /**

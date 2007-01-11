@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
  * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2003 Nikos Mavroyanopoulos
  *
@@ -281,7 +281,7 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
   size_t size;
   int ret;
   int serial, client;
-  int days, result, ca_status;
+  int days, result, ca_status, path_len;
   const char *str;
   int vers = 3;			/* the default version in the certificate 
 				 */
@@ -379,11 +379,15 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
     fprintf (stderr, "\n\nExtensions.\n");
 
   ca_status = get_ca_status ();
+  if (ca_status)
+    path_len = get_path_len ();
+  else
+    path_len = -1;
 
-  result = gnutls_x509_crt_set_ca_status (crt, ca_status);
+  result = gnutls_x509_crt_set_basic_constraints (crt, ca_status, path_len);
   if (result < 0)
     {
-      fprintf (stderr, "ca_status: %s\n", gnutls_strerror (result));
+      fprintf (stderr, "basic_constraints: %s\n", gnutls_strerror (result));
       exit (1);
     }
 
@@ -1132,6 +1136,7 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
   char dn[256];
   char oid[128] = "";
   char old_oid[128] = "";
+  int pathlen;
 
   fprintf (out, "\n\nX.509 certificate info:\n\n");
 
@@ -1334,7 +1339,7 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 
   /* check for basicConstraints
    */
-  ret = gnutls_x509_crt_get_ca_status (crt, &critical);
+  ret = gnutls_x509_crt_get_basic_constraints (crt, &critical, NULL, &pathlen);
 
   if (ret >= 0)
     {
@@ -1348,6 +1353,8 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
       else
 	fprintf (out, "\t\tCA:TRUE\n");
 
+      if (pathlen >= 0)
+	fprintf (out, "\t\tpathLenConstraint: %d\n", pathlen);
     }
 
   /* Key Usage.

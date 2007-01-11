@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -179,6 +179,10 @@ extern "C"
 					    unsigned int *critical);
   int gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert,
 				     unsigned int *critical);
+  int gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
+					     unsigned int *critical,
+					     int *ca,
+					     int *pathlen);
 
 /* The key_usage flags are defined in gnutls.h. They are the
  * GNUTLS_KEY_* definitions.
@@ -229,6 +233,9 @@ extern "C"
   int gnutls_x509_crt_set_key (gnutls_x509_crt_t crt,
 			       gnutls_x509_privkey_t key);
   int gnutls_x509_crt_set_ca_status (gnutls_x509_crt_t crt, unsigned int ca);
+  int gnutls_x509_crt_set_basic_constraints (gnutls_x509_crt_t crt,
+					     unsigned int ca,
+					     int pathLenConstraint);
   int gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
 						    gnutls_x509_subject_alt_name_t
 						    type,

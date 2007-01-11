@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -32,14 +32,17 @@ int _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
 					size_t * ret_size);
 int _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
 				       opaque * extnValue, int extnValueLen);
-int _gnutls_x509_ext_extract_basicConstraints (int *CA, opaque * extnValue,
+int _gnutls_x509_ext_extract_basicConstraints (int *CA,
+					       int *pathLenConstraint,
+					       opaque * extnValue,
 					       int extnValueLen);
 
 int _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
 				    const char *extension_id,
 				    const gnutls_datum_t * ext_data,
 				    unsigned int critical);
-int _gnutls_x509_ext_gen_basicConstraints (int CA, gnutls_datum_t * der_ext);
+int _gnutls_x509_ext_gen_basicConstraints (int CA, int pathLenConstraint,
+					   gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_keyUsage (uint16_t usage, gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
 					   type, const char *data_string,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -28,6 +28,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_global.h>
+#include <mpi.h>
 #include <libtasn1.h>
 #include <common.h>
 #include <x509.h>
@@ -492,7 +493,9 @@ _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
 /* extract the basicConstraints from the DER encoded extension
  */
 int
-_gnutls_x509_ext_extract_basicConstraints (int *CA, opaque * extnValue,
+_gnutls_x509_ext_extract_basicConstraints (int *CA,
+					   int *pathLenConstraint,
+					   opaque * extnValue,
 					   int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
@@ -527,6 +530,19 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA, opaque * extnValue,
       return 0;
     }
 
+  if (pathLenConstraint)
+    {
+      result = _gnutls_x509_read_uint (ext, "pathLenConstraint",
+				       pathLenConstraint);
+      if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+	*pathLenConstraint = -1;
+      else if (result != GNUTLS_E_SUCCESS)
+	{
+	  asn1_delete_structure (&ext);
+	  return _gnutls_asn2err (result);
+	}
+    }
+
   asn1_delete_structure (&ext);
 
   if (strcmp (str, "TRUE") == 0)
@@ -534,15 +550,18 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA, opaque * extnValue,
   else
     *CA = 0;
 
-
   return 0;
 }
 
 /* generate the basicConstraints in a DER encoded extension
  * Use 0 or 1 (TRUE) for CA.
+ * Use negative values for pathLenConstraint to indicate that the field
+ * should not be present, >= 0 to indicate set values.
  */
 int
-_gnutls_x509_ext_gen_basicConstraints (int CA, gnutls_datum_t * der_ext)
+_gnutls_x509_ext_gen_basicConstraints (int CA,
+				       int pathLenConstraint,
+				       gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   const char *str;
@@ -569,7 +588,21 @@ _gnutls_x509_ext_gen_basicConstraints (int CA, gnutls_datum_t * der_ext)
       return _gnutls_asn2err (result);
     }
 
-  asn1_write_value (ext, "pathLenConstraint", NULL, 0);
+  if (pathLenConstraint < 0)
+    {
+      result = asn1_write_value (ext, "pathLenConstraint", NULL, 0);
+      if (result < 0)
+	result = _gnutls_asn2err (result);
+    }
+  else
+    result = _gnutls_x509_write_uint32 (ext, "pathLenConstraint",
+					pathLenConstraint);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&ext);
+      return result;
+    }
 
   result = _gnutls_x509_der_encode (ext, "", der_ext, 0);
 

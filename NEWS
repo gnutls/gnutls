@@ -5,6 +5,19 @@ See the end for copying conditions.
 
 * Version 1.7.2 (unreleased)
 
+** Certtool now print the value of the pathLenConstraints field for certs.
+
+** Certtool now query for path length constraints when generating CA certs.
+For batch uses, the certtool configuration name is "path_len".
+Suggested by Sascha Ziemann <sascha.ziemann@secunet.com>.
+
+** Add new API to get/set pathLenConstraint in the Basic Constraints.
+The new functions gnutls_x509_crt_get_basic_constraints and
+gnutls_x509_crt_set_basic_constraints are a superset of the
+functionality of the old gnutls_x509_crt_get_ca_status and
+gnutls_x509_crt_set_ca_status (respectively), but the old function
+will continue to be supported.
+
 ** Clean up separation of gnutls and gnutls-extra for OpenPGP.
 In particular, the OpenPGP function variables are no longer part of
 the exported libgnutls interface, and no header files from
@@ -18,7 +31,8 @@ Reported by ludovic.courtes@laas.fr (Ludovic Courtès).
 ** Update of gnulib files.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_get_basic_constraints: ADD.
+gnutls_x509_crt_set_basic_constraints: ADD.
 
 * Version 1.7.1 (released 2006-12-28)
 

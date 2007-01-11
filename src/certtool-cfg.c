@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -58,6 +58,7 @@ typedef struct _cfg_ctx
   int serial;
   int expiration_days;
   int ca;
+  int path_len;
   int tls_www_client;
   int tls_www_server;
   int signing_key;
@@ -123,6 +124,7 @@ template_parse (const char *template)
      (void *) &cfg.crl_next_update, 0},
 
     {NULL, '\0', "ca", CFG_BOOL, (void *) &cfg.ca, 0},
+    {NULL, '\0', "path_len", CFG_INT, (void *) &cfg.path_len, 0},
     {NULL, '\0', "tls_www_client", CFG_BOOL,
      (void *) &cfg.tls_www_client, 0},
     {NULL, '\0', "tls_www_server", CFG_BOOL,
@@ -598,6 +600,20 @@ get_ca_status (void)
     {
       return
 	read_yesno ("Does the certificate belong to an authority? (Y/N): ");
+    }
+}
+
+int
+get_path_len (void)
+{
+  if (batch)
+    {
+      return cfg.path_len;
+    }
+  else
+    {
+      return
+	read_int ("Path length constraint (decimal, -1 for no constraint): ");
     }
 }
 
