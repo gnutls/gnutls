@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.7.2 (unreleased)
 
+** Clean up separation of gnutls and gnutls-extra for OpenPGP.
+In particular, the OpenPGP function variables are no longer part of
+the exported libgnutls interface, and no header files from
+libgnutls-extra (GPL) are needed by libgnutls (LGPL).
+
 ** Print URL to gaa when missing, and fix srcdir!=builddir for GAA files.
 Reported by ludovic.courtes@laas.fr (Ludovic Courtès).
 

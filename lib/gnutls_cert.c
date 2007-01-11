@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -40,7 +40,7 @@
 #include <gnutls_state.h>
 #include <gnutls_auth_int.h>
 #include <gnutls_x509.h>
-#include <gnutls_extra.h>
+#include <gnutls_extra_hooks.h>
 #include "x509/x509.h"
 #include "x509/mpi.h"
 
@@ -363,17 +363,6 @@ void gnutls_certificate_server_set_retrieve_function
   cred->server_get_cert_callback = func;
 }
 
-
-/* These are set by the gnutls_extra library's initialization function.
- */
-
-OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_creation_time
-  = NULL;
-OPENPGP_KEY_EXPIRATION_TIME_FUNC
-  _E_gnutls_openpgp_get_raw_key_expiration_time = NULL;
-OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
-
-
 /*-
  * _gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
  * @cert: should contain an X.509 DER encoded certificate
@@ -689,9 +678,6 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
       return (time_t) - 1;
     }
 }
-
-OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
-OPENPGP_RAW_PRIVKEY_TO_GKEY _E_gnutls_openpgp_raw_privkey_to_gkey;
 
 int
 _gnutls_raw_cert_to_gcert (gnutls_cert * gcert,

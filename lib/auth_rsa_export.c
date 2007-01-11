@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -40,7 +40,6 @@
 #include "debug.h"
 #include <gnutls_sig.h>
 #include <gnutls_x509.h>
-#include <gnutls_extra.h>
 #include <gnutls_rsa_export.h>
 #include <gnutls_state.h>
 

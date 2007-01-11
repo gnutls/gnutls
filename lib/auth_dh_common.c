@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -35,7 +35,6 @@
 #include "gnutls_sig.h"
 #include <gnutls_datum.h>
 #include <gnutls_x509.h>
-#include <gnutls_extra.h>
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 #include <gnutls_algorithms.h>

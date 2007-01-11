@@ -27,6 +27,7 @@
 #include <gnutls_extensions.h>
 #include <gnutls_openpgp.h>
 #include <gnutls_extra.h>
+#include <gnutls_extra_hooks.h>
 #include <gnutls_algorithms.h>
 #ifdef USE_LZO
 # ifdef USE_MINILZO
@@ -86,55 +87,17 @@ _gnutls_add_lzo_comp (void)
 }
 #endif
 
-extern OPENPGP_KEY_CREATION_TIME_FUNC
-  _E_gnutls_openpgp_get_raw_key_creation_time;
-extern OPENPGP_KEY_EXPIRATION_TIME_FUNC
-  _E_gnutls_openpgp_get_raw_key_expiration_time;
-extern OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key;
-extern OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint;
-extern OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key;
-
-extern OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
-extern OPENPGP_RAW_PRIVKEY_TO_GKEY _E_gnutls_openpgp_raw_privkey_to_gkey;
-
-extern OPENPGP_KEY_TO_GCERT _E_gnutls_openpgp_key_to_gcert;
-extern OPENPGP_PRIVKEY_TO_GKEY _E_gnutls_openpgp_privkey_to_gkey;
-extern OPENPGP_KEY_DEINIT _E_gnutls_openpgp_key_deinit;
-extern OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
-
-static void
-_gnutls_add_openpgp_functions (void)
-{
-#ifdef ENABLE_OPENPGP
-  _E_gnutls_openpgp_verify_key = _gnutls_openpgp_verify_key;
-  _E_gnutls_openpgp_get_raw_key_expiration_time =
-    _gnutls_openpgp_get_raw_key_expiration_time;
-  _E_gnutls_openpgp_get_raw_key_creation_time =
-    _gnutls_openpgp_get_raw_key_creation_time;
-  _E_gnutls_openpgp_fingerprint = _gnutls_openpgp_fingerprint;
-  _E_gnutls_openpgp_request_key = _gnutls_openpgp_request_key;
-
-  _E_gnutls_openpgp_raw_key_to_gcert = _gnutls_openpgp_raw_key_to_gcert;
-  _E_gnutls_openpgp_raw_privkey_to_gkey = _gnutls_openpgp_raw_privkey_to_gkey;
-
-  _E_gnutls_openpgp_key_to_gcert = _gnutls_openpgp_key_to_gcert;
-  _E_gnutls_openpgp_privkey_to_gkey = _gnutls_openpgp_privkey_to_gkey;
-  _E_gnutls_openpgp_key_deinit = gnutls_openpgp_key_deinit;
-  _E_gnutls_openpgp_privkey_deinit = gnutls_openpgp_privkey_deinit;
-#endif
-}
-
 static int _gnutls_init_extra = 0;
 
 /**
   * gnutls_global_init_extra - This function initializes the global state of gnutls-extra 
   *
-  * This function initializes the global state of gnutls-extra library to defaults.
-  * Returns zero on success.
+  * This function initializes the global state of gnutls-extra library
+  * to defaults.  Returns zero on success.
   *
-  * Note that gnutls_global_init() has to be called before this function.
-  * If this function is not called then the gnutls-extra library will not
-  * be usable.
+  * Note that gnutls_global_init() has to be called before this
+  * function.  If this function is not called then the gnutls-extra
+  * library will not be usable.
   *
   **/
 int
@@ -180,7 +143,17 @@ gnutls_global_init_extra (void)
   /* Register the openpgp functions. This is because some
    * of them are defined to be NULL in the main library.
    */
-  _gnutls_add_openpgp_functions ();
+  _gnutls_add_openpgp_functions (_gnutls_openpgp_verify_key,
+				 _gnutls_openpgp_get_raw_key_creation_time,
+				 _gnutls_openpgp_get_raw_key_expiration_time,
+				 _gnutls_openpgp_fingerprint,
+				 _gnutls_openpgp_request_key,
+				 _gnutls_openpgp_raw_key_to_gcert,
+				 _gnutls_openpgp_raw_privkey_to_gkey,
+				 _gnutls_openpgp_key_to_gcert,
+				 _gnutls_openpgp_privkey_to_gkey,
+				 gnutls_openpgp_key_deinit,
+				 gnutls_openpgp_privkey_deinit);
 
   return 0;
 }

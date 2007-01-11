@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -43,7 +43,7 @@
 #include <gnutls_state.h>
 #include <gnutls_pk.h>
 #include <gnutls_x509.h>
-#include <gnutls_extra.h>
+#include <gnutls_extra_hooks.h>
 #include "debug.h"
 
 static gnutls_cert *alloc_and_load_x509_certs (gnutls_x509_crt_t * certs,
@@ -380,10 +380,6 @@ get_issuers (gnutls_session_t session,
 
   return 0;
 }
-
-
-OPENPGP_KEY_DEINIT _E_gnutls_openpgp_key_deinit;
-OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
 
 /* Calls the client get callback.
  */
@@ -722,10 +718,6 @@ _gnutls_gen_openpgp_certificate (gnutls_session_t session, opaque ** data)
 
   return ret;
 }
-
-OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint = NULL;
-OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key = NULL;
-extern OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
 
 int
 _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session, opaque ** data)
@@ -1579,10 +1571,6 @@ alloc_and_load_x509_key (gnutls_x509_privkey_t key)
 
   return local_key;
 }
-
-
-OPENPGP_KEY_TO_GCERT _E_gnutls_openpgp_key_to_gcert;
-OPENPGP_PRIVKEY_TO_GKEY _E_gnutls_openpgp_privkey_to_gkey;
 
 /* converts the given pgp certificate to gnutls_cert* and allocates
  * space for them.
