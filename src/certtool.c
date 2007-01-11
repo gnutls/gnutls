@@ -2635,8 +2635,7 @@ void
 generate_pkcs12 (void)
 {
   gnutls_pkcs12 pkcs12;
-  gnutls_pkcs12_bag bag, kbag;
-  gnutls_x509_crt crt;
+  gnutls_x509_crt *crts;
   gnutls_x509_privkey key;
   int result;
   size_t size;
@@ -2647,11 +2646,13 @@ generate_pkcs12 (void)
   gnutls_datum key_id;
   unsigned char _key_id[20];
   int index;
+  int ncrts;
+  int i;
 
   fprintf (stderr, "Generating a PKCS #12 structure...\n");
 
   key = load_private_key (0);
-  crt = load_cert (0);
+  crts = load_cert_list (0, &ncrts);
 
   name = get_pkcs12_key_name ();
 
@@ -2660,20 +2661,28 @@ generate_pkcs12 (void)
   else
     password = get_pass ();
 
-  result = gnutls_pkcs12_bag_init (&bag);
+  result = gnutls_pkcs12_init (&pkcs12);
   if (result < 0)
     {
-      fprintf (stderr, "bag_init: %s\n", gnutls_strerror (result));
+      fprintf (stderr, "pkcs12_init: %s\n", gnutls_strerror (result));
       exit (1);
     }
 
-  if (crt)
-    {				/* add the certificate only if it was specified.
-				 */
-      result = gnutls_pkcs12_bag_set_crt (bag, crt);
+  for (i = 0; i < ncrts; i++)
+    {
+      gnutls_pkcs12_bag bag;
+
+      result = gnutls_pkcs12_bag_init (&bag);
       if (result < 0)
 	{
-	  fprintf (stderr, "set_crt: %s\n", gnutls_strerror (result));
+	  fprintf (stderr, "bag_init: %s\n", gnutls_strerror (result));
+	  exit (1);
+	}
+
+      result = gnutls_pkcs12_bag_set_crt (bag, crts[i]);
+      if (result < 0)
+	{
+	  fprintf (stderr, "set_crt[%d]: %s\n", i, gnutls_strerror (result));
 	  exit (1);
 	}
 
@@ -2688,10 +2697,10 @@ generate_pkcs12 (void)
 	}
 
       size = sizeof (_key_id);
-      result = gnutls_x509_crt_get_key_id (crt, 0, _key_id, &size);
+      result = gnutls_x509_crt_get_key_id (crts[i], 0, _key_id, &size);
       if (result < 0)
 	{
-	  fprintf (stderr, "key_id: %s\n", gnutls_strerror (result));
+	  fprintf (stderr, "key_id[%d]: %s\n", i, gnutls_strerror (result));
 	  exit (1);
 	}
 
@@ -2716,11 +2725,19 @@ generate_pkcs12 (void)
 	  fprintf (stderr, "bag_encrypt: %s\n", gnutls_strerror (result));
 	  exit (1);
 	}
+
+      result = gnutls_pkcs12_set_bag (pkcs12, bag);
+      if (result < 0)
+	{
+	  fprintf (stderr, "set_bag: %s\n", gnutls_strerror (result));
+	  exit (1);
+	}
     }
 
   if (key)
-    {				/* add the key only if it was specified.
-				 */
+    {
+      gnutls_pkcs12_bag kbag;
+
       result = gnutls_pkcs12_bag_init (&kbag);
       if (result < 0)
 	{
@@ -2781,29 +2798,7 @@ generate_pkcs12 (void)
 	  fprintf (stderr, "bag_set_key_id: %s\n", gnutls_strerror (result));
 	  exit (1);
 	}
-    }
 
-  /* write the PKCS #12 structure.
-   */
-  result = gnutls_pkcs12_init (&pkcs12);
-  if (result < 0)
-    {
-      fprintf (stderr, "pkcs12_init: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
-  if (crt)
-    {
-      result = gnutls_pkcs12_set_bag (pkcs12, bag);
-      if (result < 0)
-	{
-	  fprintf (stderr, "set_bag: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
-    }
-
-  if (key)
-    {
       result = gnutls_pkcs12_set_bag (pkcs12, kbag);
       if (result < 0)
 	{
