@@ -33,7 +33,7 @@ CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
-AM_CPPFLAGS = -I../lgl
+AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl
 
 include gnulib.mk
 
