@@ -825,7 +825,9 @@ credentials::credentials(gnutls_credentials_type_t t) : type(t)
 credentials::credentials( credentials& c)
 {
     this->type = c.type;
-    this->set_ptr( c.ptr());
+    // FIXME: The following doesn't work, because set_ptr is virtual.
+    // What was the intention?
+    // this->set_ptr( c.ptr());
 }
 
 gnutls_credentials_type_t credentials::get_type() const
