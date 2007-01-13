@@ -37,6 +37,9 @@ Reported by ludovic.courtes@laas.fr (Ludovic Courtès).
 Before these parameters were set to make GnuTLS build under mingw32,
 however, they appear to no longer be necessary.
 
+** A minor fix to the C++ library to make it build.
+Reported by Pavlov Konstantin <thresh@altlinux.ru>.
+
 ** Update of gnulib files.
 
 ** API and ABI modifications:
