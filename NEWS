@@ -18,6 +18,11 @@ functionality in the old gnutls_x509_crt_get_ca_status and
 gnutls_x509_crt_set_ca_status (respectively), but the old functions
 will continue to be supported.
 
+** Add new API in OpenCDK to extract public/secret OpenPGP key to S-expr.
+The functions are cdk_pubkey_to_sexp and cdk_seckey_to_sexp.  A proper
+OpenCDK release with this patch will be made soon, which should bump
+the OpenCDK version number.  Patch by Mario Lenz <mario.lenz@gmx.net>.
+
 ** Certtool --to-p12 can now store more than one certificate in the blob.
 Before it could only store one certificate, but now it will read and
 store as many certificate there are from the --load-certificate file.
@@ -45,6 +50,8 @@ Reported by Pavlov Konstantin <thresh@altlinux.ru>.
 ** API and ABI modifications:
 gnutls_x509_crt_get_basic_constraints: ADD.
 gnutls_x509_crt_set_basic_constraints: ADD.
+cdk_pubkey_to_sexp: ADD (in opencdk).
+cdk_seckey_to_sexp: ADD (in opencdk).
 
 * Version 1.7.1 (released 2006-12-28)
 
