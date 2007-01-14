@@ -327,11 +327,16 @@ BUILT_SOURCES += $(UNISTD_H)
 
 # We need the following in order to create an empty placeholder for
 # <unistd.h> when the system doesn't have one.
-unistd.h:
+unistd.h: unistd_.h
+	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  echo '/* Empty placeholder for $@.  */'; \
-	} > $@
-MOSTLYCLEANFILES += unistd.h
+	  sed -e 's|@''ABSOLUTE_UNISTD_H''@|$(ABSOLUTE_UNISTD_H)|g' \
+	      < $(srcdir)/unistd_.h; \
+	} > $@-t
+	mv $@-t $@
+MOSTLYCLEANFILES += unistd.h unistd.h-t
+
+EXTRA_DIST += unistd_.h
 
 ## end   gnulib module unistd
 

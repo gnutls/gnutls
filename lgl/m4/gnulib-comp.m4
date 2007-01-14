@@ -172,6 +172,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/stdint_.h
   lib/strverscmp.c
   lib/strverscmp.h
+  lib/unistd_.h
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/xsize.h
