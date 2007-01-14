@@ -1,3 +1,160 @@
+2007-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.2.
+
+2007-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/gc-gnulib.c, lgl/unistd_.h,
+	lgl/m4/gnulib-comp.m4, lgl/m4/unistd_h.m4, lgl/m4/wint_t.m4:
+	Update.
+
+2007-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/pubkey.c: Doc fix.
+
+2007-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/pubkey.c, libextra/opencdk/opencdk.h:
+	(cdk_pubkey_to_sexp, cdk_seckey_to_sexp): New functions, from Mario
+	Lenz <mario.lenz@gmx.net>.
+
+2007-01-13  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS, NEWS: Add.
+
+2007-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp: Make it compile by commenting out call to
+	virtual method (possibly incorrect but I don't know what the
+	intention was).
+
+2007-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Don't use -mms-bitfields
+	--enable-runtime-pseudo-reloc.
+
+2007-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am: Fix objdir!=srcdir.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+	(generate_pkcs12): Read more than one certificate, if there are more
+	available, and store them in the PKCS12 blob.  Suggested by Sascha
+	Ziemann <sascha.ziemann@secunet.com>.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Ignore gnutls_extra_hooks.h.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Add.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Reorder lgl/ and gl/, to make sure lgl is built
+	before gl.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, includes/gnutls/x509.h,
+	lib/x509/extensions.c, lib/x509/extensions.h, lib/x509/x509.c,
+	lib/x509/x509_write.c, src/certtool-cfg.c, src/certtool-cfg.h,
+	src/certtool.c: Support pathLenConstraint.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: libgnu.la depends on liblgnu.la, so don't
+	add it twice.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/gnulib.mk, gl/m4/gnulib-cache.m4: Getaddrinfo
+	needs snprintf from ../lgl/, so make libgnu.la depend on liblgnu.la.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_extra.c: Need strverscmp.h.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutls.vers: Don't export _E_*, they are only needed
+	inside libgnutls now.  Fix copyright years.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/Makefile.am, lib/auth_cert.c, lib/auth_dh_common.c,
+	lib/auth_dhe.c, lib/auth_rsa.c, lib/auth_rsa_export.c,
+	lib/auth_srp_rsa.c, lib/gnutls_cert.c, lib/gnutls_extra_hooks.c,
+	lib/gnutls_extra_hooks.h, libextra/gnutls_extra.c: Cleanup gnutls
+	vs gnutls-extra integration, for OpenPGP certs.
+
+2007-01-11  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_extra.c: Replace libgcrypt version check with
+	strverscmp.  No need to duplicate prototype found in gnutls.h for
+	gnutls_check_version.
+
+2007-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4, gl/m4/lib-link.m4,
+	lgl/gc-gnulib.c, lgl/gc-libgcrypt.c, lgl/m4/gc-arcfour.m4,
+	lgl/m4/gc-arctwo.m4, lgl/m4/gc-des.m4, lgl/m4/gc-hmac-md5.m4,
+	lgl/m4/gc-hmac-sha1.m4, lgl/m4/gc-md2.m4, lgl/m4/gc-md4.m4,
+	lgl/m4/gc-md5.m4, lgl/m4/gc-random.m4, lgl/m4/gc-rijndael.m4,
+	lgl/m4/gc-sha1.m4, lgl/m4/gnulib-common.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/lib-link.m4: Update.
+
+2007-01-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-05  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/lib-link.m4, lgl/Makefile.am, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/lib-link.m4: Update.
+
+2007-01-05  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-01-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-05  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Revert part of patch.
+
+2007-01-05  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am, configure.in: Tiny patch from
+	ludovic.courtes@laas.fr (Ludovic Courtès).
+	* configure.in: Look for `gaa', issuing a warning with the URL if
+	not found.
+	* src/Makefile.am (*-gaa.c): Use `$(GAA)' instead of `gaa'.  Mark
+	`.gaa' files as being in `$(srcdir)', thereby allowing for
+	out-of-source-tree builds.
+
 2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am: Don't dist mkinstalldirs, automake no longer copies
