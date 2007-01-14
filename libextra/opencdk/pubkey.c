@@ -1078,13 +1078,13 @@ _cdk_pkt_get_fingerprint( cdk_packet_t pkt, byte * fpr )
 /**
  * cdk_pubkey_to_sexp:
  * @pk: the public key
- * @sexp: where to store the S- expression
+ * @sexp: where to store the S-expression
  * @len: the length of sexp
  *
- * Convert a public key to an S- expression. sexp is allocated
- * by this function, but you have to cdk_free() it yourself.
- * The S- expression is stored in canonical format as used by
- * libgcrypt (GCRYSEXP_FMT_CANON).
+ * Convert a public key to an S-expression. sexp is allocated by this
+ * function, but you have to cdk_free() it yourself.  The S-expression
+ * is stored in canonical format as used by libgcrypt
+ * (GCRYSEXP_FMT_CANON).
  **/
 
 cdk_error_t
@@ -1136,13 +1136,13 @@ cdk_pubkey_to_sexp (cdk_pkt_pubkey_t pk, char **sexp, size_t * len)
 /**
  * cdk_seckey_to_sexp:
  * @sk: the secret key
- * @sexp: where to store the S- expression
+ * @sexp: where to store the S-expression
  * @len: the length of sexp
  *
- * Convert a public key to an S- expression. sexp is allocated
- * by this function, but you have to cdk_free() it yourself.
- * The S- expression is stored in canonical format as used by
- * libgcrypt (GCRYSEXP_FMT_CANON).
+ * Convert a public key to an S-expression. sexp is allocated by this
+ * function, but you have to cdk_free() it yourself.  The S-expression
+ * is stored in canonical format as used by libgcrypt
+ * (GCRYSEXP_FMT_CANON).
  **/
 
 cdk_error_t
