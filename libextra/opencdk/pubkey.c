@@ -1,5 +1,6 @@
 /* -*- Mode: C; c-file-style: "bsd" -*-
  * pubkey.c - Public key API
+ *        Copyright (C) 2007 Free Software Foundation, Inc.
  *        Copyright (C) 2002, 2003 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -1072,4 +1073,120 @@ _cdk_pkt_get_fingerprint( cdk_packet_t pkt, byte * fpr )
         return CDK_Inv_Packet;
     }
     return 0;
+}
+
+/**
+ * cdk_pubkey_to_sexp:
+ * @pk: the public key
+ * @sexp: where to store the S- expression
+ * @len: the length of sexp
+ *
+ * Convert a public key to an S- expression. sexp is allocated
+ * by this function, but you have to cdk_free() it yourself.
+ * The S- expression is stored in canonical format as used by
+ * libgcrypt (GCRYSEXP_FMT_CANON).
+ **/
+
+cdk_error_t
+cdk_pubkey_to_sexp (cdk_pkt_pubkey_t pk, char **sexp, size_t * len)
+{
+  int rc;
+  char *buf;
+  size_t sexp_len;
+  gcry_sexp_t pk_sexp;
+
+  if (!pk || !sexp)
+    return CDK_Inv_Value;
+
+  rc = pubkey_to_sexp (&pk_sexp, pk);
+  if (rc)
+    return rc;
+
+  sexp_len = gcry_sexp_sprint (pk_sexp, GCRYSEXP_FMT_CANON, NULL, 0);
+  if (!sexp_len)
+    {
+      return CDK_Gcry_Error;
+    }
+
+  buf = (char *) cdk_malloc (sexp_len);
+  if (!buf)
+    {
+      gcry_sexp_release (pk_sexp);
+      return CDK_Out_Of_Core;
+    }
+
+  sexp_len =
+    gcry_sexp_sprint (pk_sexp, GCRYSEXP_FMT_CANON, buf, sexp_len);
+
+  gcry_sexp_release (pk_sexp);
+
+  if (!sexp_len)
+    {
+      cdk_free (buf);
+      return CDK_Gcry_Error;
+    }
+
+  if (len)
+    *len = sexp_len;
+  *sexp = buf;
+
+  return CDK_Success;
+}
+
+/**
+ * cdk_seckey_to_sexp:
+ * @sk: the secret key
+ * @sexp: where to store the S- expression
+ * @len: the length of sexp
+ *
+ * Convert a public key to an S- expression. sexp is allocated
+ * by this function, but you have to cdk_free() it yourself.
+ * The S- expression is stored in canonical format as used by
+ * libgcrypt (GCRYSEXP_FMT_CANON).
+ **/
+
+cdk_error_t
+cdk_seckey_to_sexp (cdk_pkt_seckey_t sk, char **sexp, size_t * len)
+{
+  int rc;
+  char *buf;
+  size_t sexp_len;
+  gcry_sexp_t sk_sexp;
+
+  if (!sk || !sexp)
+    return CDK_Inv_Value;
+
+  rc = seckey_to_sexp (&sk_sexp, sk);
+  if (rc)
+    return rc;
+
+  sexp_len = gcry_sexp_sprint (sk_sexp, GCRYSEXP_FMT_CANON, NULL, 0);
+  if (!sexp_len)
+    {
+      return CDK_Gcry_Error;
+    }
+
+  buf = (char *) cdk_malloc (sexp_len);
+  if (!buf)
+    {
+      gcry_sexp_release (sk_sexp);
+      return CDK_Out_Of_Core;
+    }
+
+  sexp_len =
+    gcry_sexp_sprint (sk_sexp, GCRYSEXP_FMT_CANON, buf, sexp_len);
+
+  gcry_sexp_release (sk_sexp);
+
+  if (!sexp_len)
+    {
+      cdk_free (buf);
+      return CDK_Gcry_Error;
+    }
+
+  if (len)
+    *len = sexp_len;
+  *sexp = buf;
+
+  return CDK_Success;
 }

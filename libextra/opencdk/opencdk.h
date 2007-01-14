@@ -1,5 +1,5 @@
 /* opencdk.h - Open Crypto Development Kit (OpenCDK)
- *        Copyright (C) 2006 Free Software Foundation, Inc.
+ *        Copyright (C) 2006, 2007 Free Software Foundation, Inc.
  *        Copyright (C) 2001, 2002, 2003, 2005 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -632,6 +632,10 @@ cdk_error_t cdk_sk_unprotect( cdk_pkt_seckey_t sk, const char * pw );
 cdk_error_t cdk_sk_protect( cdk_pkt_seckey_t sk, const char * pw );
 cdk_error_t cdk_pk_from_secret_key( cdk_pkt_seckey_t sk,
                                     cdk_pkt_pubkey_t *ret_pk );
+cdk_error_t cdk_pubkey_to_sexp (cdk_pkt_pubkey_t pk,
+				char **sexp, size_t * len);
+cdk_error_t cdk_seckey_to_sexp (cdk_pkt_seckey_t sk,
+				char **sexp, size_t * len);
 
 /*-- seskey.c --*/
 cdk_error_t cdk_sesskey_new( cdk_sesskey_t * r_sk );
