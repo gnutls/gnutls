@@ -309,6 +309,7 @@ openpgp_pk_to_gnutls_cert (gnutls_cert * cert, cdk_pkt_pubkey_t pk)
  * _gnutls_openpgp_raw_privkey_to_gkey - Converts an OpenPGP secret key to GnuTLS
  * @pkey: the GnuTLS private key context to store the key.
  * @raw_key: the raw data which contains the whole key packets.
+ * @format: the format of the key packets.
  *
  * The RFC2440 (OpenPGP Message Format) data is converted into the
  * GnuTLS specific data which is need to perform secret key operations.
@@ -317,9 +318,10 @@ openpgp_pk_to_gnutls_cert (gnutls_cert * cert, cdk_pkt_pubkey_t pk)
  -*/
 int
 _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
-				     const gnutls_datum_t * raw_key)
+				     const gnutls_datum_t * raw_key,
+				     gnutls_openpgp_key_fmt_t format)
 {
-  cdk_kbnode_t snode;
+  cdk_kbnode_t snode = NULL;
   cdk_packet_t pkt;
   cdk_stream_t out;
   cdk_pkt_seckey_t sk = NULL;
@@ -337,6 +339,17 @@ _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
   out = cdk_stream_tmp ();
   if (!out)
     return GNUTLS_E_CERTIFICATE_ERROR;
+
+  if (format == GNUTLS_OPENPGP_FMT_BASE64)
+    {
+      rc = cdk_stream_set_armor_flag (out, 0);
+      if (rc)
+	{
+	  rc = _gnutls_map_cdk_rc (rc);
+	  gnutls_assert ();
+	  goto leave;
+	}
+    }
 
   cdk_stream_write (out, raw_key->data, raw_key->size);
   cdk_stream_seek (out, 0);
@@ -559,7 +572,7 @@ stream_to_datum (cdk_stream_t inp, gnutls_datum_t * raw)
  * @key: the datum that contains the secret key.
  *
  * This funtion is used to load OpenPGP keys into the GnuTLS credential structure.
- * It doesn't matter whether the keys are armored or but, but the files
+ * It doesn't matter whether the keys are armored or not, but the files
  * should only contain one key which should not be encrypted.
  **/
 int
@@ -695,7 +708,8 @@ gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
   cdk_stream_close (inp);
 
   rc = _gnutls_openpgp_raw_privkey_to_gkey (&res->pkey[res->ncerts - 1],
-					    &raw);
+					    &raw,
+					    GNUTLS_OPENPGP_FMT_RAW);
   if (rc)
     {
       gnutls_assert ();
@@ -717,7 +731,7 @@ leave:
  * @keyfile: the file that contains the secret key.
  *
  * This funtion is used to load OpenPGP keys into the GnuTLS credentials structure.
- * It doesn't matter whether the keys are armored or but, but the files
+ * It doesn't matter whether the keys are armored or not, but the files
  * should only contain one key which should not be encrypted.
  **/
 int

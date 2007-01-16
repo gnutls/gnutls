@@ -53,7 +53,8 @@ typedef int (*_gnutls_openpgp_raw_key_to_gcert_func)
  const gnutls_datum_t *);
 typedef int (*_gnutls_openpgp_raw_privkey_to_gkey_func)
 (gnutls_privkey *,
- const gnutls_datum_t *);
+ const gnutls_datum_t *,
+ gnutls_openpgp_key_fmt_t);
 
 typedef int (*_gnutls_openpgp_key_to_gcert_func)
 (gnutls_cert *, gnutls_openpgp_key_t);

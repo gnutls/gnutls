@@ -94,7 +94,8 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 {
   int rc;
 
-  rc = _gnutls_openpgp_raw_privkey_to_gkey (&key->pkey, data);
+  rc = _gnutls_openpgp_raw_privkey_to_gkey (&key->pkey, data,
+					    format);
   if (rc)
     {
       gnutls_assert ();
