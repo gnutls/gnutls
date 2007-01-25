@@ -234,6 +234,9 @@ class credentials
     public:
         credentials(gnutls_credentials_type_t t);
 #if defined(__APPLE__) || defined(__MACOS__)
+	/* FIXME: This #if is due to a compile bug in Mac OS X.  Give
+	   it some time and then remove this cruft.  See also
+	   lib/gnutlsxx.cpp. */
 	credentials( credentials& c) {
 	  type = c.type;
 	  set_ptr( c.ptr());
