@@ -233,7 +233,14 @@ class credentials
 {
     public:
         credentials(gnutls_credentials_type_t t);
-        credentials( credentials& c);
+#if defined(__APPLE__) || defined(__MACOS__)
+	credentials( credentials& c) {
+	  type = c.type;
+	  set_ptr( c.ptr());
+	}
+#else
+	credentials( credentials& c);
+#endif
         virtual ~credentials() { }
         gnutls_credentials_type_t get_type() const;
     protected:

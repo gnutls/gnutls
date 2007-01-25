@@ -822,13 +822,13 @@ credentials::credentials(gnutls_credentials_type_t t) : type(t)
 { 
 }
 
+#if !(defined(__APPLE__) || defined(__MACOS__))
 credentials::credentials( credentials& c)
 {
     this->type = c.type;
-    // FIXME: The following doesn't work, because set_ptr is virtual.
-    // What was the intention?
-    // this->set_ptr( c.ptr());
+    this->set_ptr( c.ptr());
 }
+#endif
 
 gnutls_credentials_type_t credentials::get_type() const
 { 
