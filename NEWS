@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.7.3 (unreleased)
 
+** Add better fix to work around C++ compiler bug on Mac OS X.
+Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
+
 ** Fix import of ASCII armored OpenPGP keys.
 Patch by ludovic.courtes@laas.fr (Ludovic Courtès).
 
