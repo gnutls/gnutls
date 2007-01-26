@@ -502,8 +502,6 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
   char str[128];
   int len, result;
 
-  *CA = 0;
-
   if ((result = asn1_create_element
        (_gnutls_get_pkix (), "PKIX1.BasicConstraints", &ext)) != ASN1_SUCCESS)
     {
@@ -512,22 +510,11 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
     }
 
   result = asn1_der_decoding (&ext, extnValue, extnValueLen, NULL);
-
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       asn1_delete_structure (&ext);
       return _gnutls_asn2err (result);
-    }
-
-  len = sizeof (str) - 1;
-  /* the default value of cA is false.
-   */
-  result = asn1_read_value (ext, "cA", str, &len);
-  if (result != ASN1_SUCCESS)
-    {
-      asn1_delete_structure (&ext);
-      return 0;
     }
 
   if (pathLenConstraint)
@@ -543,12 +530,16 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
 	}
     }
 
-  asn1_delete_structure (&ext);
-
-  if (strcmp (str, "TRUE") == 0)
+  /* the default value of cA is false.
+   */
+  len = sizeof (str) - 1;
+  result = asn1_read_value (ext, "cA", str, &len);
+  if (result == ASN1_SUCCESS && strcmp (str, "TRUE") == 0)
     *CA = 1;
   else
     *CA = 0;
+
+  asn1_delete_structure (&ext);
 
   return 0;
 }
