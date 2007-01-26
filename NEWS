@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 ** Fix parsing of pathLenConstraints in BasicConstraints with missing cA.
 
+** Added self-test to test for regressions of pathLenConstraint bug.
+Incidentally, this also test (some) other regressions or changes in
+the output from certtool --certificate-info.
+
 ** Add better fix to work around C++ compiler bug on Mac OS X.
 Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
 
