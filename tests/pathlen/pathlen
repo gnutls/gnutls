@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Copyright (C) 2006, 2007 Free Software Foundation
+#
+# Author: Simon Josefsson
+#
+# This file is part of GNUTLS.
+#
+# GNUTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# GNUTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GNUTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+set -e
+
+srcdir=${srcdir:-.}
+CERTTOOL=${CERTTOOL:-../../src/certtool}
+
+$CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
+	  --outfile new-ca-no-pathlen.pem
+$CERTTOOL --certificate-info --infile $srcdir/no-ca-or-pathlen.pem \
+	  --outfile new-no-ca-or-pathlen.pem
+
+diff -ur $srcdir/ca-no-pathlen.pem new-ca-no-pathlen.pem
+rc1=$?
+diff -ur $srcdir/no-ca-or-pathlen.pem new-no-ca-or-pathlen.pem
+rc2=$?
+
+rm -f new-ca-no-pathlen.pem new-no-ca-or-pathlen.pem
+
+# We're done.
+if test "$rc1" != "0"; then
+  exit $rc1
+fi
+exit $rc2

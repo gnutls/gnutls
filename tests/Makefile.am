@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -20,7 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 SUBDIRS = rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode	\
-	userid
+	userid pathlen
 
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
