@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.7.3 (unreleased)
 
+** Fix parsing of pathLenConstraints in BasicConstraints with missing cA.
+
 ** Add better fix to work around C++ compiler bug on Mac OS X.
 Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
 
