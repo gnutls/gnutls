@@ -879,8 +879,8 @@ get_proxy_policy (char **policy, size_t *policylen)
   *policy = NULL;
   *policylen = 0;
 
-  if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.1") != 0 &&
-      strcmp (policyLanguage, "1.3.6.1.5.5.7.21.2") != 0)
+  if (strcmp (ret, "1.3.6.1.5.5.7.21.1") != 0 &&
+      strcmp (ret, "1.3.6.1.5.5.7.21.2") != 0)
     {
       fprintf (stderr, "Reading non-standard proxy policy not supported.\n");
     }
