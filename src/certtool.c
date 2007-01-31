@@ -616,7 +616,13 @@ generate_certificate (gnutls_x509_privkey * ret_key,
   if (ca_crt != NULL)
     {
       size = sizeof (buffer);
-      result = gnutls_x509_crt_get_key_id (ca_crt, 0, buffer, &size);
+      result = gnutls_x509_crt_get_subject_key_id (ca_crt, buffer,
+						   &size, NULL);
+      if (result < 0)
+	{
+	  size = sizeof (buffer);
+	  result = gnutls_x509_crt_get_key_id (ca_crt, 0, buffer, &size);
+	}
       if (result >= 0)
 	{
 	  result = gnutls_x509_crt_set_authority_key_id (crt, buffer, size);
