@@ -26,6 +26,7 @@ AC_DEFUN([lgl_EARLY],
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
+  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   AC_REQUIRE([gl_LOCK_EARLY])
 ])
 
@@ -40,6 +41,7 @@ AC_DEFUN([lgl_INIT],
   gl_cond_libtool=true
   gl_source_base='lgl'
   gl_FUNC_ALLOCA
+  dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   gl_GC
   if test $gl_cond_libtool = false; then
     gl_ltlibdeps="$gl_ltlibdeps $LTLIBGCRYPT"
@@ -79,11 +81,15 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_SNPRINTF
   gl_TYPE_SOCKLEN_T
   gl_STDINT_H
+  gl_HEADER_STRING_H
   gl_FUNC_STRVERSCMP
   gl_HEADER_SYS_SOCKET
+  AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
+  AC_PROG_MKDIR_P
   gl_HEADER_UNISTD
   gl_FUNC_VASNPRINTF
+  gl_WCHAR_H
   gl_XSIZE
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
@@ -147,7 +153,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/md5.c
   lib/md5.h
   lib/memmem.c
-  lib/memmem.h
   lib/memmove.c
   lib/memxor.c
   lib/memxor.h
@@ -170,11 +175,13 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/socket_.h
   lib/stat_.h
   lib/stdint_.h
+  lib/string_.h
   lib/strverscmp.c
   lib/strverscmp.h
   lib/unistd_.h
   lib/vasnprintf.c
   lib/vasnprintf.h
+  lib/wchar_.h
   lib/xsize.h
   m4/absolute-header.m4
   m4/alloca.m4
@@ -183,6 +190,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/codeset.m4
   m4/des.m4
   m4/eoverflow.m4
+  m4/extensions.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4
   m4/gc-des.m4
@@ -237,6 +245,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/sockpfaf.m4
   m4/stdint.m4
   m4/stdint_h.m4
+  m4/string_h.m4
   m4/strverscmp.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
@@ -245,6 +254,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/visibility.m4
+  m4/wchar.m4
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4

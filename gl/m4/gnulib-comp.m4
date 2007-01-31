@@ -26,6 +26,7 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
+  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   AC_REQUIRE([gl_LOCK_EARLY])
 ])
 
@@ -40,6 +41,7 @@ AC_DEFUN([gl_INIT],
   gl_cond_libtool=true
   gl_source_base='gl'
   gl_HEADER_ARPA_INET
+  dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
@@ -51,7 +53,9 @@ AC_DEFUN([gl_INIT],
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
   gl_FUNC_STRDUP
+  gl_HEADER_STRING_H
   gl_HEADER_SYS_SOCKET
+  AC_PROG_MKDIR_P
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -117,8 +121,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/socket_.h
   lib/stdbool_.h
   lib/strdup.c
-  lib/strdup.h
+  lib/string_.h
+  m4/absolute-header.m4
   m4/arpa_inet_h.m4
+  m4/extensions.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
@@ -135,5 +141,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sockpfaf.m4
   m4/stdbool.m4
   m4/strdup.m4
+  m4/string_h.m4
   m4/sys_socket_h.m4
 ])
