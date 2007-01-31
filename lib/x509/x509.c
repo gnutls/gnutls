@@ -620,8 +620,8 @@ gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
 /**
   * gnutls_x509_crt_get_subject_key_id - This function returns the certificate's key identifier
   * @cert: should contain a gnutls_x509_crt_t structure
-  * @result: The place where the identifier will be copied
-  * @result_size: Holds the size of the result field.
+  * @ret: The place where the identifier will be copied
+  * @ret_size: Holds the size of the result field.
   * @critical: will be non zero if the extension is marked as critical (may be null)
   *
   * This function will return the X.509v3 certificate's subject key identifier.
