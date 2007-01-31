@@ -141,7 +141,7 @@ gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt,gnutls_x509_crt_t eecrt,
 {
   int result;
 
-  if (sizeof_name == 0 || name == NULL || crt == NULL || eecrt == NULL)
+  if (crt == NULL || eecrt == NULL)
     {
       return GNUTLS_E_INVALID_REQUEST;
     }
