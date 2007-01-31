@@ -257,6 +257,16 @@ extern "C"
   int gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
 					  const void *id, size_t id_size);
 
+  int gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt,
+				    gnutls_x509_crt_t eecrt,
+				    unsigned int raw_flag,
+				    const void *name,
+				    unsigned int sizeof_name);
+  int gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
+				 int pathLenConstraint,
+				 const char *policyLanguage,
+				 const char *policy,
+				 size_t sizeof_policy);
 
 /* RDN handling.
  */

@@ -118,6 +118,47 @@ gnutls_x509_crt_set_issuer_dn_by_oid (gnutls_x509_crt_t crt,
 }
 
 /**
+ * gnutls_x509_crt_set_proxy_dn - Set Proxy Certificate subject's distinguished name 
+ * @crt: a gnutls_x509_crt_t structure with the new proxy cert
+ * @eecrt: the end entity certificate that will be issuing the proxy
+ * @raw_flag: must be 0, or 1 if the CN is DER encoded
+ * @name: a pointer to the CN name
+ * @sizeof_name: holds the size of @name
+ *
+ * This function will set the subject in @crt to the end entity's
+ * @eecrt subject name, and add a single Common Name component @name
+ * of size @sizeof_name.  This corresponds to the required proxy
+ * certificate naming style.
+ *
+ * Returns 0 on success.
+ *
+ **/
+int
+gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt,gnutls_x509_crt_t eecrt,
+			      unsigned int raw_flag, const void *name,
+			      unsigned int sizeof_name)
+{
+  int result;
+
+  if (sizeof_name == 0 || name == NULL || crt == NULL || eecrt == NULL)
+    {
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = asn1_copy_node (crt->cert, "tbsCertificate.subject",
+			   eecrt->cert, "tbsCertificate.subject");
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return _gnutls_x509_set_dn_oid (crt->cert, "tbsCertificate.subject",
+				  GNUTLS_OID_X520_COMMON_NAME,
+				  raw_flag, name, sizeof_name);
+}
+
+/**
   * gnutls_x509_crt_set_version - This function will set the Certificate request version
   * @crt: should contain a gnutls_x509_crt_t structure
   * @version: holds the version number. For X.509v1 certificates must be 1.
@@ -282,7 +323,7 @@ gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_ca_status - This function will set the basicConstraints extension
+ * gnutls_x509_crt_set_basic_constraints - This function will set the basicConstraints extension
  * @crt: should contain a gnutls_x509_crt_t structure
  * @ca: true(1) or false(0). Depending on the Certificate authority status.
  * @pathLenConstraint: non-negative values indicate maximum length of path,
@@ -448,6 +489,65 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
     }
 
   result = _gnutls_x509_crt_set_extension (crt, "2.5.29.17", &der_data, 0);
+
+  _gnutls_free_datum (&der_data);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  crt->use_extensions = 1;
+
+  return 0;
+}
+
+/**
+ * gnutls_x509_crt_set_proxy - Set the proxyCertInfo extension
+ * @crt: should contain a gnutls_x509_crt_t structure
+ * @pathLenConstraint: non-negative values indicate maximum length of path,
+ *   and negative values indicate that the pathLenConstraints field should
+ *   not be present.
+ * @policyLanguage: OID describing the language of @policy.
+ * @policy: opaque byte array with policy language, can be %NULL 
+ * @sizeof_policy: size of @policy.
+ *
+ * This function will set the proxyCertInfo extension.
+ *
+ * Returns 0 on success.
+ *
+ **/
+int
+gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
+			   int pathLenConstraint,
+			   const char *policyLanguage,
+			   const char *policy,
+			   size_t sizeof_policy)
+{
+  int result;
+  gnutls_datum_t der_data;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* generate the extension.
+   */
+  result = _gnutls_x509_ext_gen_proxyCertInfo (pathLenConstraint,
+					       policyLanguage,
+					       policy, sizeof_policy,
+					       &der_data);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result = _gnutls_x509_crt_set_extension (crt, "1.3.6.1.5.5.7.1.14",
+					   &der_data, 1);
 
   _gnutls_free_datum (&der_data);
 

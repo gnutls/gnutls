@@ -55,3 +55,8 @@ int _gnutls_x509_ext_gen_key_id (const void *id, size_t id_size,
 				 gnutls_datum_t * der_data);
 int _gnutls_x509_ext_gen_auth_key_id (const void *id, size_t id_size,
 				      gnutls_datum_t * der_data);
+int _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
+					const char *policyLanguage,
+					const char *policy,
+					size_t sizeof_policy,
+					gnutls_datum_t * der_ext);

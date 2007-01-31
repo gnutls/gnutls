@@ -1215,4 +1215,19 @@ id-pda-countryOfResidence   AttributeType ::= { id-pda 5 }
 CountryOfResidence ::=      PrintableString (SIZE (2))
                             -- ISO 3166 Country Code
 
+-- rfc3820
+
+id-pe-proxyCertInfo OBJECT IDENTIFIER ::= { id-pe 14 }
+
+id-ppl-inheritAll OBJECT IDENTIFIER ::= { id-pkix 21 1 }
+id-ppl-independent OBJECT IDENTIFIER ::= { id-pkix 21 2 }
+
+ProxyCertInfo ::= SEQUENCE {
+	pCPathLenConstraint	INTEGER (0..MAX) OPTIONAL,
+	proxyPolicy		ProxyPolicy }
+
+ProxyPolicy ::= SEQUENCE {
+	policyLanguage	OBJECT IDENTIFIER,
+        policy		OCTET STRING OPTIONAL }
+
 END
