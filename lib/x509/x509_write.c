@@ -122,13 +122,14 @@ gnutls_x509_crt_set_issuer_dn_by_oid (gnutls_x509_crt_t crt,
  * @crt: a gnutls_x509_crt_t structure with the new proxy cert
  * @eecrt: the end entity certificate that will be issuing the proxy
  * @raw_flag: must be 0, or 1 if the CN is DER encoded
- * @name: a pointer to the CN name
+ * @name: a pointer to the CN name, may be NULL (but MUST then be added later)
  * @sizeof_name: holds the size of @name
  *
  * This function will set the subject in @crt to the end entity's
  * @eecrt subject name, and add a single Common Name component @name
  * of size @sizeof_name.  This corresponds to the required proxy
- * certificate naming style.
+ * certificate naming style.  Note that if @name is %NULL, you MUST
+ * set it later by using gnutls_x509_crt_set_dn_by_oid() or similar.
  *
  * Returns 0 on success.
  *
@@ -153,9 +154,14 @@ gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt,gnutls_x509_crt_t eecrt,
       return _gnutls_asn2err (result);
     }
 
-  return _gnutls_x509_set_dn_oid (crt->cert, "tbsCertificate.subject",
-				  GNUTLS_OID_X520_COMMON_NAME,
-				  raw_flag, name, sizeof_name);
+  if (name && sizeof_name)
+    {
+      return _gnutls_x509_set_dn_oid (crt->cert, "tbsCertificate.subject",
+				      GNUTLS_OID_X520_COMMON_NAME,
+				      raw_flag, name, sizeof_name);
+    }
+
+  return 0;
 }
 
 /**
