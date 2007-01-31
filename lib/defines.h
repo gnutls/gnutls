@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -57,8 +57,6 @@ typedef int ssize_t;
 #  include <time.h>
 # endif
 #endif
-
-#include "memmem.h"
 
 #define SIZEOF_UNSIGNED_LONG_INT SIZEOF_UNSIGNED_LONG
 
