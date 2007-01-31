@@ -213,7 +213,7 @@ read_crq_set (gnutls_x509_crq crq, const char *input_str, const char *oid)
 }
 
 int
-read_int (const char *input_str)
+read_int_with_default (const char *input_str, int def)
 {
   char *in;
   char *endptr;
@@ -237,9 +237,18 @@ read_int (const char *input_str)
       return 0;
     }
 
+  if (in == endptr)
+    l = def;
+
   free (in);
 
   return (int) l;
+}
+
+int
+read_int (const char *input_str)
+{
+  return read_int_with_default (input_str, 0);
 }
 
 const char *
@@ -612,8 +621,8 @@ get_path_len (void)
     }
   else
     {
-      return
-	read_int ("Path length constraint (decimal, -1 for no constraint): ");
+      return read_int_with_default
+	("Path length constraint (decimal, -1 for no constraint): ", -1);
     }
 }
 
