@@ -946,6 +946,83 @@ cleanup:
   return result;
 }
 
+/* extract the proxyCertInfo from the DER encoded extension
+ */
+int
+_gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
+					char **policyLanguage,
+					char **policy,
+					size_t *sizeof_policy,
+					opaque * extnValue,
+					int extnValueLen)
+{
+  ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+  char str[128];
+  int len, result;
+  gnutls_datum_t value;
+
+  if ((result = asn1_create_element
+       (_gnutls_get_pkix (), "PKIX1.ProxyCertInfo", &ext)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_der_decoding (&ext, extnValue, extnValueLen, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&ext);
+      return _gnutls_asn2err (result);
+    }
+
+  if (pathLenConstraint)
+    {
+      result = _gnutls_x509_read_uint (ext, "pCPathLenConstraint",
+				       pathLenConstraint);
+      if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+	*pathLenConstraint = -1;
+      else if (result != GNUTLS_E_SUCCESS)
+	{
+	  asn1_delete_structure (&ext);
+	  return _gnutls_asn2err (result);
+	}
+    }
+
+  result = _gnutls_x509_read_value (ext, "proxyPolicy.policyLanguage",
+				    &value, 0);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&ext);
+      return result;
+    }
+
+  *policyLanguage = gnutls_strdup (value.data);
+
+  result = _gnutls_x509_read_value (ext, "proxyPolicy.policy", &value, 0);
+  if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+    {
+      *policy = NULL;
+      *sizeof_policy = 0;
+    }
+  else if (result < 0)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&ext);
+      return result;
+    }
+  else
+    {
+      *policy = value.data;
+      *sizeof_policy = value.size;
+    }
+
+  asn1_delete_structure (&ext);
+
+  return 0;
+}
+
 /* generate the proxyCertInfo in a DER encoded extension
  */
 int

@@ -22,13 +22,14 @@ Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
 ** Fix import of ASCII armored OpenPGP keys.
 Patch by ludovic.courtes@laas.fr (Ludovic Courtès).
 
-** New APIs to set proxy subject names and add proxy cert extension.
-This makes it possible to generate Proxy Certificates according to RFC
-3820 using GnuTLS.
+** New APIs to set proxy subject names and get/set proxy cert extension.
+This makes it possible to generate Proxy Certificates (RFC 3820) using
+GnuTLS's certtool.
 
 ** API and ABI modifications:
 gnutls_x509_crt_set_proxy_dn: ADD.
 gnutls_x509_crt_set_proxy: ADD.
+gnutls_x509_crt_get_proxy: ADD.
 
 * Version 1.7.2 (released 2007-01-14)
 

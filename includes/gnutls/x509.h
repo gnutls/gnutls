@@ -193,6 +193,13 @@ extern "C"
   int gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt,
 				     unsigned int usage);
 
+  int gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
+				 unsigned int *critical,
+				 int *pathlen,
+				 char **policyLanguage,
+				 char **policy,
+				 size_t *sizeof_policy);
+
   int gnutls_x509_dn_oid_known (const char *oid);
 
   int gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,

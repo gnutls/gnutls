@@ -36,7 +36,6 @@ int _gnutls_x509_ext_extract_basicConstraints (int *CA,
 					       int *pathLenConstraint,
 					       opaque * extnValue,
 					       int extnValueLen);
-
 int _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
 				    const char *extension_id,
 				    const gnutls_datum_t * ext_data,
@@ -55,6 +54,13 @@ int _gnutls_x509_ext_gen_key_id (const void *id, size_t id_size,
 				 gnutls_datum_t * der_data);
 int _gnutls_x509_ext_gen_auth_key_id (const void *id, size_t id_size,
 				      gnutls_datum_t * der_data);
+
+int _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
+					    char **policyLanguage,
+					    char **policy,
+					    size_t *sizeof_policy,
+					    opaque * extnValue,
+					    int extnValueLen);
 int _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
 					const char *policyLanguage,
 					const char *policy,
