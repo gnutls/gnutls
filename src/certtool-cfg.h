@@ -60,3 +60,4 @@ void get_unit_crq_set (gnutls_x509_crq crq);
 void get_organization_crq_set (gnutls_x509_crq crq);
 void get_country_crq_set (gnutls_x509_crq crq);
 void get_oid_crq_set (gnutls_x509_crq crq);
+const char *get_proxy_policy (char **policy, size_t *policylen);

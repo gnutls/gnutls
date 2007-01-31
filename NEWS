@@ -22,9 +22,19 @@ Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
 ** Fix import of ASCII armored OpenPGP keys.
 Patch by ludovic.courtes@laas.fr (Ludovic Courtès).
 
+** Certtool --certificate-info now prints information for Proxy Certificates.
+Before the proxy extension was just printed as DER encoded data.
+
+** New option to certtool: --generate-proxy.
+This will generate a Proxy Certificate from an end entity certificate.
+You will need to specify the proxy certificate's private key with
+--load-privkey, the user certificate with --load-certificate and the
+private key used to sign the new proxy certificate with
+--load-ca-privkey.  Certtool will query for proxy path length and the
+policy language OID.  Currently only OIDs that have an empty policy
+are supported (which includes the two OIDs defined by RFC 3820).
+
 ** New APIs to set proxy subject names and get/set proxy cert extension.
-This makes it possible to generate Proxy Certificates (RFC 3820) using
-GnuTLS's certtool.
 
 ** API and ABI modifications:
 gnutls_x509_crt_set_proxy_dn: ADD.

@@ -19,6 +19,8 @@ option (s, generate-self-signed) { $action=0; } "Generate a self-signed certific
 
 option (c, generate-certificate) { $action=4; } "Generate a signed certificate."
 
+option (generate-proxy) { $action=17; } "Generate a proxy certificate."
+
 option (generate-crl) { $action=13; } "Generate a CRL."
 
 option (u, update-certificate) { $action=7; } "Update a signed certificate."

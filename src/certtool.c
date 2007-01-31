@@ -274,21 +274,23 @@ generate_private_key (void)
 
 
 gnutls_x509_crt
-generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
+generate_certificate (gnutls_x509_privkey * ret_key,
+		      gnutls_x509_crt ca_crt,
+		      int proxy)
 {
   gnutls_x509_crt crt;
   gnutls_x509_privkey key = NULL;
   size_t size;
   int ret;
   int serial, client;
-  int days, result, ca_status, path_len;
+  int days, result, ca_status = 0, path_len;
   const char *str;
   int vers = 3;			/* the default version in the certificate 
 				 */
   unsigned int usage = 0, server;
   gnutls_x509_crq crq;		/* request */
 
- ret = gnutls_x509_crt_init (&crt);
+  ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
     {
       fprintf (stderr, "crt_init: %s\n", gnutls_strerror (ret));
@@ -310,20 +312,33 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
 
       /* set the DN.
        */
-      get_country_crt_set (crt);
-      get_organization_crt_set (crt);
-      get_unit_crt_set (crt);
-      get_locality_crt_set (crt);
-      get_state_crt_set (crt);
-      get_cn_crt_set (crt);
-      get_uid_crt_set (crt);
-      get_oid_crt_set (crt);
+      if (proxy)
+	{
+	  result = gnutls_x509_crt_set_proxy_dn (crt, ca_crt, 0, NULL, 0);
+	  if (result < 0)
+	    {
+	      fprintf (stderr, "set_proxy_dn: %s\n", gnutls_strerror (result));
+	      exit (1);
+	    }
+	  get_cn_crt_set (crt);
+	}
+      else
+	{
+	  get_country_crt_set (crt);
+	  get_organization_crt_set (crt);
+	  get_unit_crt_set (crt);
+	  get_locality_crt_set (crt);
+	  get_state_crt_set (crt);
+	  get_cn_crt_set (crt);
+	  get_uid_crt_set (crt);
+	  get_oid_crt_set (crt);
 
-      if (!batch)
-	fprintf (stderr,
-		 "This field should not be used in new certificates.\n");
+	  if (!batch)
+	    fprintf (stderr,
+		     "This field should not be used in new certificates.\n");
 
-      get_pkcs9_email_crt_set (crt);
+	  get_pkcs9_email_crt_set (crt);
+	}
 
       result = gnutls_x509_crt_set_key (crt, key);
       if (result < 0)
@@ -374,11 +389,35 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
       exit (1);
     }
 
-
   if (!batch)
     fprintf (stderr, "\n\nExtensions.\n");
 
-  ca_status = get_ca_status ();
+  if (proxy)
+    {
+      const char *policylanguage;
+      char *policy;
+      size_t policylen;
+      int proxypathlen = get_path_len ();
+
+      if (!batch)
+	{
+	  printf ("1.3.6.1.5.5.7.21.1 ::= id-ppl-inheritALL\n");
+	  printf ("1.3.6.1.5.5.7.21.2 ::= id-ppl-independent\n");
+	}
+
+      policylanguage = get_proxy_policy (&policy, &policylen);
+
+      result = gnutls_x509_crt_set_proxy (crt, proxypathlen, policylanguage,
+					  policy, policylen);
+      if (result < 0)
+	{
+	  fprintf (stderr, "set_proxy: %s\n", gnutls_strerror (result));
+	  exit (1);
+	}
+    }
+
+  if (!proxy)
+    ca_status = get_ca_status ();
   if (ca_status)
     path_len = get_path_len ();
   else
@@ -409,31 +448,30 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
     {
       result = 0;
 
-      str = get_dns_name ();
-      if (str != NULL)
+      if (!proxy)
 	{
-	  result =
-	    gnutls_x509_crt_set_subject_alternative_name (crt,
-							  GNUTLS_SAN_DNSNAME,
-							  str);
-	}
-      else
-	{
-	  str = get_ip_addr ();
+	  str = get_dns_name ();
 	  if (str != NULL)
 	    {
-	      result =
-		gnutls_x509_crt_set_subject_alternative_name (crt,
-							      GNUTLS_SAN_IPADDRESS,
-							      str);
+	      result = gnutls_x509_crt_set_subject_alternative_name
+		(crt, GNUTLS_SAN_DNSNAME, str);
 	    }
-	}
+	  else
+	    {
+	      str = get_ip_addr ();
+	      if (str != NULL)
+		{
+		  result = gnutls_x509_crt_set_subject_alternative_name
+		    (crt, GNUTLS_SAN_IPADDRESS, str);
+		}
+	    }
 
-      if (result < 0)
-	{
-	  fprintf (stderr, "subject_alt_name: %s\n",
-		   gnutls_strerror (result));
-	  exit (1);
+	  if (result < 0)
+	    {
+	      fprintf (stderr, "subject_alt_name: %s\n",
+		       gnutls_strerror (result));
+	      exit (1);
+	    }
 	}
 
       result =
@@ -446,9 +484,8 @@ generate_certificate (gnutls_x509_privkey * ret_key, gnutls_x509_crt ca_crt)
 	}
 
     }
-  else
+  else if (!proxy)
     {
-
       str = get_email ();
 
       if (str != NULL)
@@ -698,7 +735,7 @@ generate_self_signed (void)
 
   fprintf (stderr, "Generating a self signed certificate...\n");
 
-  crt = generate_certificate (&key, NULL);
+  crt = generate_certificate (&key, NULL, 0);
 
   if (!key)
     key = load_private_key (1);
@@ -756,7 +793,7 @@ generate_signed_certificate (void)
   ca_key = load_ca_private_key ();
   ca_crt = load_ca_cert ();
 
-  crt = generate_certificate (&key, ca_crt);
+  crt = generate_certificate (&key, ca_crt, 0);
 
   /* Copy the CRL distribution points.
    */
@@ -769,6 +806,46 @@ generate_signed_certificate (void)
   fprintf (stderr, "\n\nSigning certificate...\n");
 
   result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, dig, 0);
+  if (result < 0)
+    {
+      fprintf (stderr, "crt_sign: %s\n", gnutls_strerror (result));
+      exit (1);
+    }
+
+  size = sizeof (buffer);
+  result = gnutls_x509_crt_export (crt, out_cert_format, buffer, &size);
+  if (result < 0)
+    {
+      fprintf (stderr, "crt_export: %s\n", gnutls_strerror (result));
+      exit (1);
+    }
+
+  fwrite (buffer, 1, size, outfile);
+
+  gnutls_x509_crt_deinit (crt);
+  gnutls_x509_privkey_deinit (key);
+}
+
+void
+generate_proxy_certificate (void)
+{
+  gnutls_x509_crt crt, eecrt;
+  gnutls_x509_privkey key, eekey;
+  size_t size;
+  int result;
+
+  fprintf (stderr, "Generating a proxy certificate...\n");
+
+  eekey = load_ca_private_key ();
+  eecrt = load_cert (1);
+
+  crt = generate_certificate (&key, eecrt, 1);
+
+  print_certificate_info (crt, stderr, 0);
+
+  fprintf (stderr, "\n\nSigning certificate...\n");
+
+  result = gnutls_x509_crt_sign2 (crt, eecrt, eekey, dig, 0);
   if (result < 0)
     {
       fprintf (stderr, "crt_sign: %s\n", gnutls_strerror (result));
@@ -1000,6 +1077,9 @@ gaa_parser (int argc, char **argv)
     case 15:
       smime_to_pkcs7 ();
       break;
+    case 17:
+      generate_proxy_certificate ();
+      break;
     default:
       fprintf (stderr, "GnuTLS' certtool utility.\n");
       fprintf (stderr,
@@ -1020,7 +1100,9 @@ known_oid (const char *oid)
       strcmp (oid, "2.5.29.31") == 0 ||
       strcmp (oid, "2.5.29.37") == 0 ||
       strcmp (oid, "2.5.29.14") == 0 ||
-      strcmp (oid, "2.5.29.35") == 0 || strcmp (oid, "2.5.29.15") == 0)
+      strcmp (oid, "2.5.29.35") == 0 ||
+      strcmp (oid, "2.5.29.15") == 0 ||
+      strcmp (oid, "1.3.6.1.5.5.7.1.14") == 0)
     return 1;
 
   return 0;
@@ -1136,7 +1218,6 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
   char dn[256];
   char oid[128] = "";
   char old_oid[128] = "";
-  int pathlen;
 
   fprintf (out, "\n\nX.509 certificate info:\n\n");
 
@@ -1337,25 +1418,57 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 	  }
     }
 
-  /* check for basicConstraints
-   */
-  ret = gnutls_x509_crt_get_basic_constraints (crt, &critical, NULL, &pathlen);
-
-  if (ret >= 0)
-    {
-      fprintf (out, "\tBasic Constraints:");
-      if (critical)
-	fprintf (out, " (critical)");
+  {
+    int pathlen;
+    char *policyLanguage;
+    char *policy;
+    size_t npolicy;
+    ret = gnutls_x509_crt_get_proxy (crt, &critical,
+				     &pathlen, &policyLanguage,
+				     &policy, &npolicy);
+    if (ret < 0)
+      fprintf (out, "Error getting proxy certificate information: %s\n",
+	       gnutls_strerror (ret));
+    fprintf (out, "\tProxy Certificate Information: ");
+    if (critical)
+      fprintf (out, "(critical)\n");
+    else
       fprintf (out, "\n");
+    if (pathlen >= 0)
+      fprintf (out, "\t\tPath Length Constraint: %d\n", pathlen);
+    fprintf (out, "\t\tPolicy Language: ");
+    if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.1") == 0)
+      fprintf (out, "id-ppl-inheritALL\n");
+    else if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.2") == 0)
+      fprintf (out, "id-ppl-independent\n");
+    else
+      fprintf (out, "%s\n", policyLanguage);
+    if (npolicy)
+      fprintf (out, "\t\tPolicy Language: %.*s\n", npolicy, policy);
+  }
 
-      if (ret == 0)
-	fprintf (out, "\t\tCA:FALSE\n");
-      else
-	fprintf (out, "\t\tCA:TRUE\n");
+  {
+    /* check for basicConstraints
+     */
+    int pathlen;
+    ret = gnutls_x509_crt_get_basic_constraints (crt, &critical, NULL,
+						 &pathlen);
+    if (ret >= 0)
+      {
+	fprintf (out, "\tBasic Constraints:");
+	if (critical)
+	  fprintf (out, " (critical)");
+	fprintf (out, "\n");
 
-      if (pathlen >= 0)
-	fprintf (out, "\t\tpathLenConstraint: %d\n", pathlen);
-    }
+	if (ret == 0)
+	  fprintf (out, "\t\tCA:FALSE\n");
+	else
+	  fprintf (out, "\t\tCA:TRUE\n");
+
+	if (pathlen >= 0)
+	  fprintf (out, "\t\tpathLenConstraint: %d\n", pathlen);
+      }
+  }
 
   /* Key Usage.
    */

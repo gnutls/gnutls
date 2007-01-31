@@ -69,6 +69,7 @@ typedef struct _cfg_ctx
   int ocsp_sign_key;
   int time_stamping_key;
   int crl_next_update;
+  char *proxy_policy_language;
 } cfg_ctx;
 
 cfg_ctx cfg;
@@ -143,6 +144,8 @@ template_parse (const char *template)
      (void *) &cfg.ocsp_sign_key, 0},
     {NULL, '\0', "time_stamping_key", CFG_BOOL,
      (void *) &cfg.time_stamping_key, 0},
+    {NULL, '\0', "proxy_policy_language", CFG_STR,
+     (void *) &cfg.proxy_policy_language, 0},
     CFG_END_OF_LIST
   };
 
@@ -853,6 +856,36 @@ get_crl_next_update (void)
       while (days == 0);
       return days;
     }
+}
+
+const char *
+get_proxy_policy (char **policy, size_t *policylen)
+{
+  const char *ret;
+
+  if (batch)
+    {
+      ret = cfg.proxy_policy_language;
+    }
+  else
+    {
+      do
+	{
+	  ret = read_str ("Enter the OID of the proxy policy language: ");
+	}
+      while (ret == NULL);
+    }
+
+  *policy = NULL;
+  *policylen = 0;
+
+  if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.1") != 0 &&
+      strcmp (policyLanguage, "1.3.6.1.5.5.7.21.2") != 0)
+    {
+      fprintf (stderr, "Reading non-standard proxy policy not supported.\n");
+    }
+
+  return ret;
 }
 
 /* CRQ stuff.
