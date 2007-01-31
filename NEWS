@@ -11,6 +11,11 @@ See the end for copying conditions.
 Incidentally, this also test (some) other regressions or changes in
 the output from certtool --certificate-info.
 
+** When certtool generates CA certificates, pressing enter on the path
+** length constraint query will now remove the field.
+Before it set the path length constraint to 0, which is a rather poor
+default.
+
 ** Add better fix to work around C++ compiler bug on Mac OS X.
 Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
 
