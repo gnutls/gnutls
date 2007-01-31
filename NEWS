@@ -23,7 +23,8 @@ Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
 Patch by ludovic.courtes@laas.fr (Ludovic Courtès).
 
 ** New APIs to set proxy subject names and add proxy cert extension.
-This makes it possible to generate Proxy Certificates using GnuTLS.
+This makes it possible to generate Proxy Certificates according to RFC
+3820 using GnuTLS.
 
 ** API and ABI modifications:
 gnutls_x509_crt_set_proxy_dn: ADD.
