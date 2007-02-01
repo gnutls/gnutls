@@ -1432,25 +1432,25 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
     ret = gnutls_x509_crt_get_proxy (crt, &critical,
 				     &pathlen, &policyLanguage,
 				     &policy, &npolicy);
-    if (ret < 0)
-      fprintf (out, "Error getting proxy certificate information: %s\n",
-	       gnutls_strerror (ret));
-    fprintf (out, "\tProxy Certificate Information: ");
-    if (critical)
-      fprintf (out, "(critical)\n");
-    else
-      fprintf (out, "\n");
-    if (pathlen >= 0)
-      fprintf (out, "\t\tPath Length Constraint: %d\n", pathlen);
-    fprintf (out, "\t\tPolicy Language: ");
-    if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.1") == 0)
-      fprintf (out, "id-ppl-inheritALL\n");
-    else if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.2") == 0)
-      fprintf (out, "id-ppl-independent\n");
-    else
-      fprintf (out, "%s\n", policyLanguage);
-    if (npolicy)
-      fprintf (out, "\t\tPolicy Language: %.*s\n", npolicy, policy);
+    if (!ret)
+      {
+	fprintf (out, "\tProxy Certificate Information: ");
+	if (critical)
+	  fprintf (out, "(critical)\n");
+	else
+	  fprintf (out, "\n");
+	if (pathlen >= 0)
+	  fprintf (out, "\t\tPath Length Constraint: %d\n", pathlen);
+	fprintf (out, "\t\tPolicy Language: ");
+	if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.1") == 0)
+	  fprintf (out, "id-ppl-inheritALL\n");
+	else if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.2") == 0)
+	  fprintf (out, "id-ppl-independent\n");
+	else
+	  fprintf (out, "%s\n", policyLanguage);
+	if (npolicy)
+	  fprintf (out, "\t\tPolicy Language: %.*s\n", npolicy, policy);
+      }
   }
 
   {
