@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Copyright (C) 2007 Free Software Foundation
+#
+# Author: Simon Josefsson
+#
+# This file is part of GNUTLS.
+#
+# GNUTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# GNUTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GNUTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+set -e
+
+srcdir=${srcdir:-.}
+CERTTOOL=${CERTTOOL:-../../src/certtool}
+
+PARAMS="--generate-certificate --load-privkey $srcdir/key-user.pem --load-ca-privkey $srcdir/key-ca.pem --template /dev/null"
+
+#$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-gnutls-keyid.pem \
+#    --outfile user-gnutls-keyid.pem 2> /dev/null
+
+#$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-no-keyid.pem \
+#    --outfile user-no-keyid.pem 2> /dev/null
+
+$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-weird-keyid.pem \
+    --outfile user-weird-keyid.pem 2> /dev/null
+
+if ! $CERTTOOL -i < user-weird-keyid.pem | grep '7A:2C:7A:60:97:46:06:03:CB:FB:28:E8:E2:19:DF:18:DE:EB:4E:0D'; then
+    echo "Could not find CA SKI in user certificate."
+    exit 1;
+fi
+
+rm -f user-gnutls-keyid.pem user-no-keyid.pem user-weird-keyid.pem
+
+# We're done.
+exit 0
