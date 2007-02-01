@@ -1,3 +1,186 @@
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.3.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem: Update.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Print times in UTC.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Reorder.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Typo.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, tests/Makefile.am, tests/key-id/Makefile.am,
+	tests/key-id/README, tests/key-id/ca-gnutls-keyid.pem,
+	tests/key-id/ca-no-keyid.pem, tests/key-id/ca-weird-keyid.pem,
+	tests/key-id/key-ca.pem, tests/key-id/key-id,
+	tests/key-id/key-user.pem: Add key-id self test.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Don't print proxy info if there aren't any proxy
+	extension.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rfc4785.txt: Add.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Use the CA's SKI as the AKI value, if it is
+	present.  Reported by Dale Sedivec
+	<dale-keyword-gnutls.5670f1@codefu.org>.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Doc fix.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Add.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-cfg.c: Fix last commit.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool-cfg.c, src/certtool-cfg.h, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa: Support
+	reading/generating proxy certificates in certtool.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/x509.h, lib/x509/extensions.c,
+	lib/x509/extensions.h, lib/x509/x509.c: Add
+	gnutls_x509_crt_get_proxy.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c: Fix last commit.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c:
+	(gnutls_x509_crt_set_proxy_dn): Permit NULL @name's.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention RFC 3820.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/pkix.asn, lib/pkix_asn1_tab.c, lib/x509/extensions.c,
+	lib/x509/extensions.h, lib/x509/x509_write.c,
+	includes/gnutls/x509.h: Add proxy certificate APIs.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-cfg.c: Have RET for path lengths to mean -1.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/defines.h: String.h from gnulib now makes sure memmem is
+	available.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* gl/strdup.h, lgl/memmem.h: Remove.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* gl/getaddrinfo.c, gl/gnulib.mk, gl/socket_.h, gl/strdup.c,
+	gl/string_.h, gl/m4/absolute-header.m4, gl/m4/extensions.m4,
+	gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4, gl/m4/strdup.m4,
+	gl/m4/string_h.m4, lgl/Makefile.am, lgl/printf-args.c,
+	lgl/printf-args.h, lgl/printf-parse.c, lgl/socket_.h,
+	lgl/stdint_.h, lgl/string_.h, lgl/vasnprintf.c, lgl/wchar_.h,
+	lgl/m4/extensions.m4, lgl/m4/gnulib-common.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/memmem.m4, lgl/m4/stdint.m4,
+	lgl/m4/string_h.m4, lgl/m4/unistd_h.m4, lgl/m4/wchar.m4: Update.
+
+2007-01-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-26  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, tests/Makefile.am, tests/pathlen/Makefile.am,
+	tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem, tests/pathlen/pathlen: Test for
+	pathlen bug (and general certificate parsing).
+
+2007-01-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/extensions.c:
+	(_gnutls_x509_ext_extract_basicConstraints): Make sure
+	pathLenConstraint is read, even if CA reading fails.
+
+2007-01-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-25  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutlsxx.h, lib/gnutlsxx.cpp: Add comment to
+	describe C++ compiler bug problem.
+
+2007-01-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp, includes/gnutls/gnutlsxx.h: Fix C++ compiler
+	bug in a "better" way, tiny patch from Matthias Scheler
+	<tron@NetBSD.org>.
+
+2007-01-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-01-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-01-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c, lib/gnutls_extra_hooks.h,
+	libextra/gnutls_openpgp.c, libextra/openpgp/gnutls_openpgp.h,
+	libextra/openpgp/privkey.c: Fix import of ASCII armored OpenPGP
+	keys, patch from ludovic.courtes@laas.fr (Ludovic Courtès).
+
+2007-01-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-rescorla-tls-extractor-00.txt: Add.
+
 2007-01-14  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.2.
