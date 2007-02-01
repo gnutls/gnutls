@@ -7,12 +7,13 @@ See the end for copying conditions.
 
 ** New option to certtool: --generate-proxy.
 This will generate a Proxy Certificate from an end entity certificate.
-You will need to specify the proxy certificate's private key with
---load-privkey, the user certificate with --load-certificate and the
-private key used to sign the new proxy certificate with
---load-ca-privkey.  Certtool will query for proxy path length and the
-policy language OID.  Currently only OIDs that have an empty policy
-are supported (which includes the two OIDs defined by RFC 3820).
+Proxy Certificates are documented in RFC 3820.  You will need to
+specify the proxy certificate's private key with --load-privkey, the
+user certificate with --load-certificate and the private key used to
+sign the new proxy certificate with --load-ca-privkey.  Certtool will
+query for proxy path length and the policy language OID.  Currently
+only OIDs that have an empty policy are supported (which includes the
+two OIDs defined by RFC 3820).
 
 ** Certtool --certificate-info now prints information for Proxy Certificates.
 Before the proxy extension was just printed as DER encoded data.
