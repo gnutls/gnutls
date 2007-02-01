@@ -1224,6 +1224,7 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
   char dn[256];
   char oid[128] = "";
   char old_oid[128] = "";
+  char *tmp;
 
   fprintf (out, "\n\nX.509 certificate info:\n\n");
 
@@ -1280,10 +1281,14 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
   fprintf (out, "Validity:\n");
 
   tim = gnutls_x509_crt_get_activation_time (crt);
-  fprintf (out, "\tNot Before: %s", ctime (&tim));
+  tmp = asctime (gmtime (&tim));
+  tmp[strlen(tmp)-1] = '\0';
+  fprintf (out, "\tNot Before: %s UTC\n", tmp);
 
   tim = gnutls_x509_crt_get_expiration_time (crt);
-  fprintf (out, "\tNot After: %s", ctime (&tim));
+  tmp = asctime (gmtime (&tim));
+  tmp[strlen(tmp)-1] = '\0';
+  fprintf (out, "\tNot After: %s UTC\n", tmp);
 
   /* Public key algorithm
    */
@@ -1673,6 +1678,7 @@ print_crl_info (gnutls_x509_crl crl, FILE *out, int all)
   size_t serial_size = sizeof (serial), dn_size;
   char dn[256];
   const char *cprint;
+  char *tmp;
 
   fprintf (out, "CRL information:\n");
   fprintf (out, "Version: %d\n", gnutls_x509_crl_get_version (crl));
@@ -1701,10 +1707,14 @@ print_crl_info (gnutls_x509_crl crl, FILE *out, int all)
   fprintf (out, "Update dates:\n");
 
   tim = gnutls_x509_crl_get_this_update (crl);
-  fprintf (out, "\tIssued at: %s", ctime (&tim));
+  tmp = asctime (gmtime (&tim));
+  tmp[strlen(tmp)-1] = '\0';
+  fprintf (out, "\tIssued at: %s UTC\n", tmp);
 
   tim = gnutls_x509_crl_get_next_update (crl);
-  fprintf (out, "\tNext at: %s", ctime (&tim));
+  tmp = asctime (gmtime (&tim));
+  tmp[strlen(tmp)-1] = '\0';
+  fprintf (out, "\tNext at: %s UTC\n", tmp);
 
   fprintf (out, "\n");
 
@@ -1730,7 +1740,9 @@ print_crl_info (gnutls_x509_crl crl, FILE *out, int all)
 	{
 	  fprintf (out, "\tCertificate SN: %s\n",
 		   raw_to_string (serial, serial_size));
-	  fprintf (out, "\tRevoked at: %s\n", ctime (&tim));
+	  tmp = asctime (gmtime (&tim));
+	  tmp[strlen(tmp)-1] = '\0';
+	  fprintf (out, "\tRevoked at: %s UTC\n", tmp);
 	}
     }
 
