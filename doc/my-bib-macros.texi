@@ -211,7 +211,7 @@
 @end macro
 
 @macro mybibmakeref{node, ref}
-[\ref\] (@xref{Bibliography,\ref\})
+[\ref\] (@pxref{Bibliography,\ref\})
 @end macro
 
 @c %% @mybibcite{REF} : Creates a cross referenced citation REF.
