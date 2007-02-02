@@ -5,6 +5,7 @@
 @c % This is modified for use with gnutls. texi2dvi had some problems using
 @c % this, thus some things are hard coded here. (for the sake of a good pdf output)
  
+@c % Copyright (C) 2007  Free Software Foundation, Inc.
 @c % Copyright (C) 2004  Aaron S. Hawley
 
 @c % Author: Aaron S. Hawley <ashawley@gnu.uvm.edu>
@@ -210,7 +211,7 @@
 @end macro
 
 @macro mybibmakeref{node, ref}
-[\ref\] (@xref{Bibliography,\ref\}.)
+[\ref\] (@xref{Bibliography,\ref\})
 @end macro
 
 @c %% @mybibcite{REF} : Creates a cross referenced citation REF.
