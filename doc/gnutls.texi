@@ -3206,8 +3206,9 @@ functions:
 
 @table @asis
 
-@item @anchor{CBCATT}[CBCATT] Bodo Moeller, "Security of CBC Ciphersuites in
-SSL/TLS: Problems and Countermeasures", 2002, available from
+@item @anchor{CBCATT}[CBCATT]
+Bodo Moeller, "Security of CBC Ciphersuites in SSL/TLS: Problems and
+Countermeasures", 2002, available from
 @url{http://www.openssl.org/~bodo/tls-cbc.txt}.
 
 @item @anchor{GPGH}[GPGH]
