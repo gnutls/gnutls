@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos
 #
@@ -28,7 +28,7 @@ endif
 
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl.texi	\
-	gpl.texi error_codes.texi bibliography.texi gnutls-api.texi	\
+	gpl.texi error_codes.texi gnutls-api.texi			\
 	gnutls-extra-api.texi ia-api.texi x509-api.texi pgp-api.texi	\
 	my-bib-macros.texi examples/ex-client1.c examples/ex-client2.c	\
 	examples/ex-session-info.c examples/ex-verify.c			\
