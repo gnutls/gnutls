@@ -21,7 +21,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
-Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
 
 @quotation
@@ -1381,10 +1381,16 @@ Constraints the key's usage of the certificate.
 Constraints the purpose of the certificate.
 
 @item basic constraints (2.5.29.19):
-Indicates whether this is a CA certificate or not.
+Indicates whether this is a CA certificate or not, and specify the
+maximum path lengths of certificate chains.
 
 @item CRL distribution points (2.5.29.31):
 This extension is set by the CA, in order to inform about the issued CRLs.
+
+@item Proxy Certification Information (1.3.6.1.5.5.7.1.14):
+Proxy Certificates includes this extension that contains the OID of
+the proxy policy language used, and can specify limits on the maximum
+lengths of proxy chains.
 
 @end table
 
