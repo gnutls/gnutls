@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -682,10 +682,10 @@ _gnutls_asn1_get_structure_xml (ASN1_TYPE structure,
   * certificate.  The XML structures are allocated internally (with
   * malloc) and stored into res.
   *
-  * NOTE: This function is currently not implemented.  See the NEWS
-  * entry for version 1.3.5.
-  *
   * Returns a negative error code in case of an error.
+  *
+  * Deprecated: This function is currently not implemented.  See the
+  * NEWS entry for GnuTLS version 1.3.5.
   *
   **/
 int
