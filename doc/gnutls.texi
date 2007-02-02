@@ -1390,8 +1390,8 @@ This extension is set by the CA, in order to inform about the issued CRLs.
 @item Proxy Certification Information (1.3.6.1.5.5.7.1.14):
 Proxy Certificates includes this extension that contains the OID of
 the proxy policy language used, and can specify limits on the maximum
-lengths of proxy chains.  Proxy Certificates are specified in RFC
-3820.
+lengths of proxy chains.  Proxy Certificates are specified in
+@mybibcite{RFC3820}.
 
 @end table
 
@@ -2345,9 +2345,76 @@ Usage: gnutls-serv [options]
 @cindex certtool
 
 This is a program to generate @acronym{X.509} certificates, certificate
-requests, CRLs and private keys. The program can be used interactively
-or non interactively by specifying the @code{--template} command line
-option. See below for an example of a template file.
+requests, CRLs and private keys.
+
+@verbatim
+Certtool help
+Usage: certtool [options]
+     -s, --generate-self-signed
+                              Generate a self-signed certificate.
+     -c, --generate-certificate
+                              Generate a signed certificate.
+     --generate-proxy         Generate a proxy certificate.
+     --generate-crl           Generate a CRL.
+     -u, --update-certificate
+                              Update a signed certificate.
+     -p, --generate-privkey   Generate a private key.
+     -q, --generate-request   Generate a PKCS #10 certificate
+                              request.
+     -e, --verify-chain       Verify a PEM encoded certificate chain.
+                              The last certificate in the chain must
+                              be a self signed one.
+     --verify-crl             Verify a CRL.
+     --generate-dh-params     Generate PKCS #3 encoded Diffie Hellman
+                              parameters.
+     --get-dh-params          Get the included PKCS #3 encoded Diffie
+                              Hellman parameters.
+     --load-privkey FILE      Private key file to use.
+     --load-request FILE      Certificate request file to use.
+     --load-certificate FILE
+                              Certificate file to use.
+     --load-ca-privkey FILE   Certificate authority's private key
+                              file to use.
+     --load-ca-certificate FILE
+                              Certificate authority's certificate
+                              file to use.
+     --password PASSWORD      Password to use.
+     -i, --certificate-info   Print information on a certificate.
+     -l, --crl-info           Print information on a CRL.
+     --p12-info               Print information on a PKCS #12
+                              structure.
+     --p7-info                Print information on a PKCS #7
+                              structure.
+     --smime-to-p7            Convert S/MIME to PKCS #7 structure.
+     -k, --key-info           Print information on a private key.
+     --fix-key                Regenerate the parameters in a private
+                              key.
+     --to-p12                 Generate a PKCS #12 structure.
+     -8, --pkcs8              Use PKCS #8 format for private keys.
+     --dsa                    Use DSA keys.
+     --hash STR               Hash algorithm to use for signing
+                              (MD5,SHA1,RMD160).
+     --export-ciphers         Use weak encryption algorithms.
+     --inder                  Use DER format for input certificates
+                              and private keys.
+     --xml                    Use XML format for output certificates.
+     --outder                 Use DER format for output certificates
+                              and private keys.
+     --bits BITS              specify the number of bits for key
+                              generation.
+     --outfile FILE           Output file.
+     --infile FILE            Input file.
+     --template FILE          Template file to use for non
+                              interactive operation.
+     -d, --debug LEVEL        specify the debug level. Default is 1.
+     -h, --help               shows this help text
+     -v, --version            shows the program's version
+     --copyright              shows the program's license
+@end verbatim
+
+The program can be used interactively or non interactively by
+specifying the @code{--template} command line option. See below for an
+example of a template file.
 
 How to use certtool interactively:
 
@@ -2417,6 +2484,19 @@ certificate, use the command:
 @example
 $ certtool --load-certificate cert.pem --load-privkey key.pem \
   --to-p12 --outder --outfile key.p12
+@end example
+
+@item
+Proxy certificate can be used to delegate your credential to a
+temporary, typically short-lived, certificate.  To create one from the
+previously created certificate, first create a temporary key and then
+generate a proxy certificate for it, using the commands:
+
+@example
+$ certtool --generate-privkey > proxy-key.pem
+$ certtool --generate-proxy --load-ca-privkey key.pem \
+  --load-privkey proxy-key.pem --load-certificate cert.pem \
+  --outfile proxy-cert.pem
 @end example
 
 @end itemize
