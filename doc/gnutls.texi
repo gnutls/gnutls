@@ -5,9 +5,6 @@
 @include version.texi
 @settitle GNU TLS @value{VERSION}
 
-@include my-bib-macros.texi
-@mybibusetable{Bibliography}
-
 @c don't indent the paragraphs.
 @paragraphindent 0
 
@@ -23,14 +20,13 @@ This manual is last updated @value{UPDATED} for version
 
 Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
-
 @quotation
 Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.2
-or any later version published by the Free Software Foundation;
-with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
-A copy of the license is included in the section entitled ``GNU
-Free Documentation License''.
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled ``GNU Free
+Documentation License''.
 @end quotation
 @end copying
 
@@ -61,6 +57,10 @@ Free Documentation License''.
 @vskip 0pt plus 1filll
 @insertcopying
 @end titlepage
+
+@macro xcite{ref}
+[\ref\] (@pxref{Bibliography})
+@end macro
 
 @contents
 
@@ -111,9 +111,9 @@ a program or a communication line and @acronym{GnuTLS} only helps with
 some of them.
 
 Although this document tries to be self contained, basic network
-programming and PKI knowlegde is assumed in most of it. A good introduction
-to networking can be found in @mybibcite{STEVENS} and for 
-Public Key Infrastructure in @mybibcite{GUTPKI}.
+programming and PKI knowlegde is assumed in most of it. A good
+introduction to networking can be found in @xcite{STEVENS} and for
+Public Key Infrastructure in @xcite{GUTPKI}.
 
 @anchor{Availability}
 
@@ -312,16 +312,16 @@ should allocate and free memory using the functions shown below.
 @chapter Introduction to @acronym{TLS}
 
 @acronym{TLS} stands for ``Transport Layer Security'' and is the
-successor of SSL, the Secure Sockets Layer protocol @mybibcite{SSL3} designed by Netscape.  @acronym{TLS} is an Internet
+successor of SSL, the Secure Sockets Layer protocol @xcite{SSL3} designed by Netscape.  @acronym{TLS} is an Internet
 protocol, defined by @acronym{IETF}@footnote{IETF, or Internet
 Engineering Task Force, is a large open international community of
 network designers, operators, vendors, and researchers concerned with
 the evolution of the Internet architecture and the smooth operation of
 the Internet.  It is open to any interested individual.}, described in
-@acronym{RFC} 2246 and also in @mybibcite{RESCOLA}. The protocol provides
+@acronym{RFC} 2246 and also in @xcite{RESCOLA}. The protocol provides
 confidentiality, and authentication layers over any reliable transport
 layer. The description, below, refers to @acronym{TLS} 1.0 but also
-applies to @acronym{TLS} 1.1 @mybibcite{RFC4346} and @acronym{SSL} 3.0, since the
+applies to @acronym{TLS} 1.1 @xcite{RFC4346} and @acronym{SSL} 3.0, since the
 differences of these protocols are minor. Older protocols such as
 @acronym{SSL} 2.0 are not discussed nor implemented in
 @acronym{GnuTLS} since they are not considered secure today.
@@ -496,7 +496,7 @@ bits of data.
 The TLS record layer also supports compression.  The algorithms
 implemented in @acronym{GnuTLS} can be found in the table below.
 All the algorithms except for DEFLATE which is
-referenced in @mybibcite{RFC3749}, should be considered as
+referenced in @xcite{RFC3749}, should be considered as
 @acronym{GnuTLS}' extensions@footnote{You should use
 @ref{gnutls_handshake_set_private_extensions} to enable private
 extensions.}, and should be advertised only when the peer is known to
@@ -510,7 +510,7 @@ tunnels, and in cases where network usage has to be minimized. As a
 drawback, compression increases latency.
 
 The record layer compression in @acronym{GnuTLS} is implemented based
-on the proposal @mybibcite{RFC3749}.
+on the proposal @xcite{RFC3749}.
 The supported compression algorithms are:
 
 @table @code
@@ -547,9 +547,9 @@ encrypted packet.
 
 @end enumerate
 
-Those weaknesses were solved in @acronym{TLS} 1.1 @mybibcite{RFC4346} which is implemented
+Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346} which is implemented
 in @acronym{GnuTLS}. For a detailed discussion see the archives of the
-TLS Working Group mailing list and the paper @mybibcite{CBCATT}.
+TLS Working Group mailing list and the paper @xcite{CBCATT}.
 
 @node The TLS Alert Protocol
 @section The TLS Alert Protocol
@@ -749,7 +749,7 @@ order to remove them, and save space. The function
 @cindex TLS Extensions
 
 A number of extensions to the @acronym{TLS} protocol have been
-proposed mainly in @mybibcite{TLSEXT}. The extensions supported
+proposed mainly in @xcite{TLSEXT}. The extensions supported
 in @acronym{GnuTLS} are:
 
 @itemize
@@ -880,11 +880,11 @@ more information on @acronym{X.509} protocols.
 algorithm, and signatures from several other parties. Depending on
 whether a signer is trusted the key is considered trusted or not.
 @acronym{GnuTLS}'s @acronym{OpenPGP} authentication implementation is
-based on the @mybibcite{TLSPGP} proposal.
+based on the @xcite{TLSPGP} proposal.
 
 @xref{The OpenPGP trust model}, for more information about the
 @acronym{OpenPGP} trust model.  For a more detailed introduction to
-@acronym{OpenPGP} and @acronym{GnuPG} see @mybibcite{GPGH}.
+@acronym{OpenPGP} and @acronym{GnuPG} see @xcite{GPGH}.
 
 @subsection Using certificate authentication
 
@@ -1041,7 +1041,7 @@ This algorithm exchanges Diffie Hellman parameters.
 @cindex @acronym{SRP} authentication
 
 Authentication via the Secure Remote Password protocol,
-@acronym{SRP}@footnote{@acronym{SRP} is described in @mybibcite{RFC2945}},
+@acronym{SRP}@footnote{@acronym{SRP} is described in @xcite{RFC2945}},
 is supported.  The @acronym{SRP} key exchange is an extension to the
 @acronym{TLS} protocol, and it is a password based authentication
 (unlike @acronym{X.509} or @acronym{OpenPGP} that use certificates).
@@ -1057,14 +1057,14 @@ protection is similar to the one used traditionally in the @emph{UNIX}
 harm to the system security if they were revealed.  The @acronym{SRP}
 needs instead of the plain password something called a verifier, which
 is calculated using the user's password, and if stolen cannot be used
-to impersonate the user. Check @mybibcite{TOMSRP} for a detailed description
+to impersonate the user. Check @xcite{TOMSRP} for a detailed description
 of the @acronym{SRP} protocol and the Stanford @acronym{SRP}
 libraries, which includes a PAM module that synchronizes the system's
 users passwords with the @acronym{SRP} password files. That way
 @acronym{SRP} authentication could be used for all the system's users.
 
 The implementation in @acronym{GnuTLS} is based on paper
-@mybibcite{TLSSRP}.  The supported @acronym{SRP} key exchange methods are:
+@xcite{TLSSRP}.  The supported @acronym{SRP} key exchange methods are:
 
 @table @code
 
@@ -1132,7 +1132,7 @@ usernames and binary keys. This protocol avoids making use of public key infrast
 and expensive calculations, thus it is suitable for constraint clients.
 
 The implementation in @acronym{GnuTLS} is based on paper
-@mybibcite{TLSPSK}.  The supported @acronym{PSK} key exchange methods are:
+@xcite{TLSPSK}.  The supported @acronym{PSK} key exchange methods are:
 
 @table @code
 
@@ -1317,7 +1317,7 @@ handling @acronym{X.509} certificates is described at section
 
 An @acronym{X.509} certificate usually contains information about the
 certificate holder, the signer, a unique serial number, expiration
-dates and some other fields @mybibcite{RFC3280} as shown in the table
+dates and some other fields @xcite{RFC3280} as shown in the table
 below.
 
 @table @code
@@ -1391,7 +1391,7 @@ This extension is set by the CA, in order to inform about the issued CRLs.
 Proxy Certificates includes this extension that contains the OID of
 the proxy policy language used, and can specify limits on the maximum
 lengths of proxy chains.  Proxy Certificates are specified in
-@mybibcite{RFC3820}.
+@xcite{RFC3820}.
 
 @end table
 
@@ -1482,7 +1482,7 @@ Allow certificates to be signed using the broken MD5 algorithm.
 Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
 about the peer's identity. It is required to verify if the
-certificate's owner is the one you expect. For more information consult @mybibcite{RFC2818} 
+certificate's owner is the one you expect. For more information consult @xcite{RFC2818} 
 and section @ref{ex:verify} for an example.
 
 @node PKCS #10 certificate requests
@@ -1494,8 +1494,8 @@ A certificate request is a structure, which contain information about
 an applicant of a certificate service.  It usually contains a private
 key, a distinguished name and secondary data such as a challenge
 password. @acronym{GnuTLS} supports the requests defined in
-@acronym{PKCS} #10 @mybibcite{RFC2986}. Other certificate request's format
-such as PKIX's @mybibcite{RFC4211} are not currently supported.
+@acronym{PKCS} #10 @xcite{RFC2986}. Other certificate request's format
+such as PKIX's @xcite{RFC4211} are not currently supported.
 
 In @acronym{GnuTLS} the @acronym{PKCS} #10 structures are handled
 using the @code{gnutls_x509_crq_t} type.  An example of a certificate
@@ -1505,7 +1505,7 @@ request generation can be found at section @ref{ex:crq}.
 @subsection @acronym{PKCS} #12 structures
 @cindex @acronym{PKCS} #12
 
-A @acronym{PKCS} #12 structure @mybibcite{PKCS12} usually contains a user's
+A @acronym{PKCS} #12 structure @xcite{PKCS12} usually contains a user's
 private keys and certificates. It is commonly used in browsers to
 export and import the user's identities.
 
@@ -1552,7 +1552,7 @@ belong to the actual owner.
 @subsection @acronym{OpenPGP} keys
 
 In @acronym{GnuTLS} the @acronym{OpenPGP} key structures
-@mybibcite{RFC2440} are handled using the @code{gnutls_openpgp_key_t} type
+@xcite{RFC2440} are handled using the @code{gnutls_openpgp_key_t} type
 and the corresponding private keys with the
 @code{gnutls_openpgp_privkey_t} type. All the prototypes for the key
 handling functions can be found at @file{gnutls/openpgp.h}.
@@ -1626,7 +1626,7 @@ for the secured ones. This has the benefit that if a user requests a
 secure session then the client will try to connect to the secure port
 and fail otherwise. The only possible attack with this method is a
 denial of service one. The most famous example of this method is the
-famous ``HTTP over TLS'' or @acronym{HTTPS} protocol @mybibcite{RFC2818}.
+famous ``HTTP over TLS'' or @acronym{HTTPS} protocol @xcite{RFC2818}.
 
 Despite its wide use, this method is not as good as it seems.  This
 approach starts the @acronym{TLS} Handshake procedure just after the
@@ -1655,7 +1655,7 @@ protocols just after the client requests it.  This is a really neat
 idea and does not require an extra port.
 
 This method is used by almost all modern protocols and there is even
-the @mybibcite{RFC2817} paper which proposes extensions to HTTP to support
+the @xcite{RFC2817} paper which proposes extensions to HTTP to support
 it.
 
 The tricky part, in this method, is that the ``STARTTLS'' request is
@@ -3201,14 +3201,127 @@ functions:
 
 @printindex fn
 
-@c texi2dvi has problem if unnumbered is put there. However makeinfo works great.
-@c STUPID texinfo.
-
-@c @node @mybibnode{}
-@c @unnumbered @mybibnode{}
 @node Bibliography
 @unnumbered Bibliography
-@include bibliography.texi
 
+@table @asis
+
+@item @anchor{CBCATT}[CBCATT] Bodo Moeller, "Security of CBC Ciphersuites in
+SSL/TLS: Problems and Countermeasures", 2002, available from
+@url{http://www.openssl.org/~bodo/tls-cbc.txt}.
+
+@item @anchor{GPGH}[GPGH]
+Mike Ashley, "The GNU Privacy Handbook", 2002, available from
+@url{http://www.gnupg.org/gph/en/manual.pdf}.
+
+@item @anchor{GUTPKI}[GUTPKI]
+Peter Gutmann, "Everything you never wanted to know about PKI but were
+forced to find out", Available from
+@url{http://www.cs.auckland.ac.nz/~pgut001/}.
+
+@item @anchor{RFC2246}[RFC2246]
+Tim Dierks and Christopher Allen, "The TLS Protocol Version 1.0",
+January 1999, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2246.txt}.
+
+@item @anchor{RFC4346}[RFC4346]
+Tim Dierks and Eric Rescorla, "The TLS Protocol Version 1.1", Match
+2006, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4346.txt}.
+
+@item @anchor{RFC2440}[RFC2440]
+Jon Callas, Lutz Donnerhacke, Hal Finney and Rodney Thayer, "OpenPGP
+Message Format", November 1998, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2440.txt}.
+
+@item @anchor{RFC4211}[RFC4211]
+J. Schaad, "Internet X.509 Public Key Infrastructure Certificate
+Request Message Format (CRMF)", September 2005, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4211.txt}.
+
+@item @anchor{RFC2817}[RFC2817]
+Rohit Khare and Scott Lawrence, "Upgrading to TLS Within HTTP/1.1",
+May 2000, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2817.txt}
+
+@item @anchor{RFC2818}[RFC2818]
+Eric Rescola, "HTTP Over TLS", May 2000, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2818.txt}.
+
+@item @anchor{RFC2945}[RFC2945]
+Tom Wu, "The SRP Authentication and Key Exchange System", September
+2000, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2945.txt}.
+
+@item @anchor{RFC2986}[RFC2986]
+Magnus Nystrom and Burt Kaliski, "PKCS 10 v1.7: Certification Request
+Syntax Specification", November 2000, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2986.txt}.
+
+@item @anchor{RFC3280}[RFC3280]
+Russell Housley, Tim Polk, Warwick Ford and David Solo, "Internet
+X.509 Public Key Infrastructure Certificate and Certificate Revocation
+List (CRL) Profile", April 2002, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3280.txt}.
+
+@item @anchor{RFC3749}[RFC3749]
+Scott Hollenbeck, "Transport Layer Security Protocol Compression
+Methods", May 2004, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3749.txt}.
+
+@item @anchor{RFC3820}[RFC3820]
+Steven Tuecke, Von Welch, Doug Engert, Laura Pearlman, and Mary
+Thompson, "Internet X.509 Public Key Infrastructure (PKI) Proxy
+Certificate Profile", June 2004, available from
+@url{http://www.ietf.org/rfc3820}.
+
+@item @anchor{PKCS12}[PKCS12]
+RSA Laboratories, "PKCS 12 v1.0: Personal Information Exchange
+Syntax", June 1999, Available from @url{http://www.rsa.com}.
+
+@item @anchor{RESCOLA}[RESCOLA]
+Eric Rescola, "SSL and TLS: Designing and Building Secure Systems",
+2001
+
+@item @anchor{SSL3}[SSL3]
+Alan Freier, Philip Karlton and Paul Kocher, "The SSL Protocol Version
+3.0", November 1996, Available from
+@url{http://wp.netscape.com/eng/ssl3/draft302.txt}.
+
+@item @anchor{STEVENS}[STEVENS]
+Richard Stevens, "UNIX Network Programming, Volume 1", Prentice Hall
+PTR, January 1998
+
+@item @anchor{TLSEXT}[TLSEXT]
+Simon Blake-Wilson, Magnus Nystrom, David Hopwood, Jan Mikkelsen and
+Tim Wright, "Transport Layer Security (TLS) Extensions", June 2003,
+Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3546.txt}.
+
+@item @anchor{TLSPGP}[TLSPGP]
+Nikos Mavrogiannopoulos, "Using OpenPGP keys for TLS authentication",
+April 2004, Internet draft, work in progress. Available from
+@url{http://www.normos.org/ietf/draft/draft-ietf-tls-openpgp-keys-05.txt}.
+
+@item @anchor{TLSSRP}[TLSSRP]
+David Taylor, Trevor Perrin, Tom Wu and Nikos Mavrogiannopoulos,
+"Using SRP for TLS Authentication", August 2005, Internet draft, work
+in progress. Available from
+@url{http://www.normos.org/ietf/draft/draft-ietf-tls-srp-08.txt}.
+
+@item @anchor{TLSPSK}[TLSPSK]
+Pasi Eronen and Hannes Tschofenig, "Pre-shared key Ciphersuites for
+TLS", December 2005, Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4279.txt}.
+
+@item @anchor{TOMSRP}[TOMSRP]
+Tom Wu, "The Stanford SRP Authentication Project", Available at
+@url{http://srp.stanford.edu/}.
+
+@item @anchor{WEGER}[WEGER]
+Arjen Lenstra and Xiaoyun Wang and Benne de Weger, "Colliding X.509
+Certificates", Cryptology ePrint Archive, Report 2005/067, Available
+at @url{http://eprint.iacr.org/}.
+
+@end table
 
 @bye
