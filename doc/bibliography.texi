@@ -24,11 +24,6 @@ Match 2006, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4346.txt
 Jon Callas, Lutz Donnerhacke, Hal Finney and Rodney Thayer,
 "OpenPGP Message Format", November 1998, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2440.txt}.
 
-@mybibitem{RFC3820} 
-Steven Tuecke, Von Welch, Doug Engert, Laura Pearlman, and Mary Thompson,
-"Internet X.509 Public Key Infrastructure (PKI) Proxy Certificate Profile",
-June 2004, available from @url{http://www.ietf.org/rfc3820}.
-
 @mybibitem{RFC4211} 
 J. Schaad,
 "Internet X.509 Public Key Infrastructure Certificate Request Message Format (CRMF)", September 2005, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4211.txt}.
@@ -57,6 +52,11 @@ April 2002, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3280.txt
 @mybibitem{RFC3749}
 Scott Hollenbeck, "Transport Layer Security Protocol Compression Methods",
 May 2004, Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3749.txt}.
+
+@mybibitem{RFC3820} 
+Steven Tuecke, Von Welch, Doug Engert, Laura Pearlman, and Mary Thompson,
+"Internet X.509 Public Key Infrastructure (PKI) Proxy Certificate Profile",
+June 2004, available from @url{http://www.ietf.org/rfc3820}.
 
 @mybibitem{PKCS12}
 RSA Laboratories, "PKCS 12 v1.0: Personal Information Exchange Syntax",
