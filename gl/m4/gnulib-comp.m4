@@ -41,6 +41,7 @@ AC_DEFUN([gl_INIT],
   gl_cond_libtool=true
   gl_source_base='gl'
   gl_HEADER_ARPA_INET
+  AC_PROG_MKDIR_P
   dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
@@ -49,10 +50,12 @@ AC_DEFUN([gl_INIT],
   gl_INET_NTOP
   gl_INET_PTON
   gl_HEADER_NETINET_IN
+  AC_PROG_MKDIR_P
   gl_FUNC_READLINE
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
   gl_FUNC_STRDUP
+  gl_STRING_MODULE_INDICATOR([strdup])
   gl_HEADER_STRING_H
   gl_HEADER_SYS_SOCKET
   AC_PROG_MKDIR_P
