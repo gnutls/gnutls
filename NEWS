@@ -9,6 +9,8 @@ See the end for copying conditions.
 
 ** Improve bibliographical citations in the manual.
 
+** Update of gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
@@ -47,6 +49,8 @@ Reported and tiny patch provided by Matthias Scheler <tron@NetBSD.org>.
 
 ** Fix import of ASCII armored OpenPGP keys.
 Patch by ludovic.courtes@laas.fr (Ludovic Courtès).
+
+** Update of gnulib files.
 
 ** API and ABI modifications:
 gnutls_x509_crt_set_proxy_dn: ADD.
