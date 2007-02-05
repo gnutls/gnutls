@@ -31,6 +31,9 @@
 #define HASH_OID_MD5 "1.2.840.113549.2.5"
 #define HASH_OID_MD2 "1.2.840.113549.2.2"
 #define HASH_OID_RMD160 "1.3.36.3.2.1"
+#define HASH_OID_SHA256 "2.16.840.1.101.3.4.2.1"
+#define HASH_OID_SHA384 "2.16.840.1.101.3.4.2.2"
+#define HASH_OID_SHA512 "2.16.840.1.101.3.4.2.3"
 
 typedef struct gnutls_x509_crl_int
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -30,6 +30,38 @@
 #include <gnutls_hash_int.h>
 #include <gnutls_errors.h>
 
+static inline Gc_hash _gnutls_mac2gc (gnutls_mac_algorithm_t mac)
+{
+  switch (mac)
+    {
+    case GNUTLS_MAC_SHA1:
+      return GC_SHA1;
+      break;
+    case GNUTLS_MAC_SHA256:
+      return GC_SHA256;
+      break;
+    case GNUTLS_MAC_SHA384:
+      return GC_SHA384;
+      break;
+    case GNUTLS_MAC_SHA512:
+      return GC_SHA512;
+      break;
+    case GNUTLS_MAC_MD5:
+      return GC_MD5;
+      break;
+    case GNUTLS_MAC_RMD160:
+      return GC_RMD160;
+      break;
+    case GNUTLS_MAC_MD2:
+      return GC_MD2;
+      break;
+    default:
+      gnutls_assert ();
+      return -1;
+    }
+  return -1;
+}
+
 GNUTLS_HASH_HANDLE
 _gnutls_hash_init (gnutls_mac_algorithm_t algorithm)
 {
@@ -45,25 +77,7 @@ _gnutls_hash_init (gnutls_mac_algorithm_t algorithm)
 
   ret->algorithm = algorithm;
 
-  switch (algorithm)
-    {
-    case GNUTLS_MAC_SHA1:
-      result = gc_hash_open (GC_SHA1, 0, &ret->handle);
-      break;
-    case GNUTLS_MAC_MD5:
-      result = gc_hash_open (GC_MD5, 0, &ret->handle);
-      break;
-    case GNUTLS_MAC_RMD160:
-      result = gc_hash_open (GC_RMD160, 0, &ret->handle);
-      break;
-    case GNUTLS_MAC_MD2:
-      result = gc_hash_open (GC_MD2, 0, &ret->handle);
-      break;
-    default:
-      gnutls_assert ();
-      result = -1;
-    }
-
+  result = gc_hash_open (_gnutls_mac2gc (algorithm), 0, &ret->handle);
   if (result)
     {
       gnutls_assert ();
@@ -79,24 +93,7 @@ _gnutls_hash_get_algo_len (gnutls_mac_algorithm_t algorithm)
 {
   int ret;
 
-  switch (algorithm)
-    {
-    case GNUTLS_MAC_SHA1:
-      ret = gc_hash_digest_length (GC_SHA1);
-      break;
-    case GNUTLS_MAC_MD5:
-      ret = gc_hash_digest_length (GC_MD5);
-      break;
-    case GNUTLS_MAC_RMD160:
-      ret = gc_hash_digest_length (GC_RMD160);
-      break;
-    case GNUTLS_MAC_MD2:
-      ret = gc_hash_digest_length (GC_MD2);
-      break;
-    default:
-      ret = 0;
-      break;
-    }
+  ret = gc_hash_digest_length (_gnutls_mac2gc (algorithm));
 
   return ret;
 
@@ -165,35 +162,18 @@ _gnutls_hmac_init (gnutls_mac_algorithm_t algorithm,
   if (ret == NULL)
     return GNUTLS_MAC_FAILED;
 
-  switch (algorithm)
-    {
-    case GNUTLS_MAC_SHA1:
-      result = gc_hash_open (GC_SHA1, GC_HMAC, &ret->handle);
-      break;
-    case GNUTLS_MAC_MD5:
-      result = gc_hash_open (GC_MD5, GC_HMAC, &ret->handle);
-      break;
-    case GNUTLS_MAC_RMD160:
-      result = gc_hash_open (GC_RMD160, GC_HMAC, &ret->handle);
-      break;
-    default:
-      result = -1;
-    }
-
+  result = gc_hash_open (_gnutls_mac2gc (algorithm), GC_HMAC, &ret->handle);
   if (result)
     {
       gnutls_free (ret);
-      ret = GNUTLS_MAC_FAILED;
+      return GNUTLS_MAC_FAILED;
     }
 
-  if (ret != GNUTLS_MAC_FAILED)
-    {
-      gc_hash_hmac_setkey (ret->handle, keylen, key);
+  gc_hash_hmac_setkey (ret->handle, keylen, key);
 
-      ret->algorithm = algorithm;
-      ret->key = key;
-      ret->keysize = keylen;
-    }
+  ret->algorithm = algorithm;
+  ret->key = key;
+  ret->keysize = keylen;
 
   return ret;
 }

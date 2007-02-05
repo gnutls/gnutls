@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -59,7 +59,7 @@
 
 /* The maximum digest size of hash algorithms. 
  */
-#define MAX_HASH_SIZE 20
+#define MAX_HASH_SIZE 64
 
 #define MAX_LOG_SIZE 1024	/* maximum size of log message */
 #define MAX_SRP_USERNAME 128
