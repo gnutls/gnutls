@@ -1006,6 +1006,12 @@ gaa_parser (int argc, char **argv)
 	}
       else if (strcasecmp (info.hash, "sha1") == 0)
 	dig = GNUTLS_DIG_SHA1;
+      else if (strcasecmp (info.hash, "sha256") == 0)
+	dig = GNUTLS_DIG_SHA256;
+      else if (strcasecmp (info.hash, "sha384") == 0)
+	dig = GNUTLS_DIG_SHA384;
+      else if (strcasecmp (info.hash, "sha512") == 0)
+	dig = GNUTLS_DIG_SHA512;
       else if (strcasecmp (info.hash, "rmd160") == 0)
 	dig = GNUTLS_DIG_RMD160;
       else
