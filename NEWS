@@ -11,7 +11,7 @@ See the end for copying conditions.
 
 ** Update of gnulib files.
 
-** Support for SHA-256/384/512 added.
+** Support for RSA signing using SHA-256/384/512.
 A new self test "sha2" tries to build a long X.509 certificate chain
 testing all new hashes.
 
