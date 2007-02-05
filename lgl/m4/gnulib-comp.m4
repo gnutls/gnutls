@@ -27,7 +27,6 @@ AC_DEFUN([lgl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
-  AC_REQUIRE([gl_LOCK_EARLY])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -41,7 +40,6 @@ AC_DEFUN([lgl_INIT],
   gl_cond_libtool=true
   gl_source_base='lgl'
   gl_FUNC_ALLOCA
-  dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   gl_GC
   if test $gl_cond_libtool = false; then
     gl_ltlibdeps="$gl_ltlibdeps $LTLIBGCRYPT"

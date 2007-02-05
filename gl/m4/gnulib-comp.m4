@@ -27,7 +27,6 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
-  AC_REQUIRE([gl_LOCK_EARLY])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -42,7 +41,6 @@ AC_DEFUN([gl_INIT],
   gl_source_base='gl'
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
-  dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
