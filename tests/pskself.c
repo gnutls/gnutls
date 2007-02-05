@@ -177,7 +177,6 @@ end:
 #define SA struct sockaddr
 #define MAX_BUF 1024
 #define PORT 5556		/* listen to 5556 port */
-#define DH_BITS 1024
 
 /* These are global */
 gnutls_psk_server_credentials_t server_pskcred;
@@ -234,7 +233,7 @@ server_start (void)
   gnutls_psk_allocate_server_credentials (&server_pskcred);
   gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
 
-  success ("Launched, generating DH parameters...\n");
+  success ("Launched...\n");
 
   /* Socket operations
    */
