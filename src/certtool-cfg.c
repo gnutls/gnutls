@@ -78,6 +78,7 @@ void
 cfg_init (void)
 {
   memset (&cfg, 0, sizeof (cfg));
+  cfg.path_len = -1;
 }
 
 int
