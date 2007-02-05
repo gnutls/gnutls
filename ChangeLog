@@ -1,3 +1,163 @@
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.4.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: use static DH params if none or provided
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/anonself.c, tests/dhepskself.c, tests/resume.c,
+	tests/tlsia.c, tests/utils.c, tests/utils.h: Use static DH.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pskself.c: No dh here.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Reorder.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, tests/Makefile.am: Add SHA-2 self test.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/sha2/Makefile.am, tests/sha2/key-ca.pem,
+	tests/sha2/key-subca.pem, tests/sha2/key-subsubca.pem,
+	tests/sha2/key-user.pem, tests/sha2/sha2: Add.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-cfg.c: Set pathlength to -1 (not present) by
+	default, for templates.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-gaa.c: Generated.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c, src/certtool.gaa: Support --hash SHA-256/384/512.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_hash_int.c, lib/gnutls_int.h,
+	lib/x509/common.h, lib/x509/dn.c, lib/x509/x509.h: Support
+	(RSA-)SHA-256/384/512.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/gc-libgcrypt.c, lgl/gc.h: Update.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c:
+	(GNUTLS_SIGN_ALG_LOOP): Don't match unknown algorithms to GOST.
+	Affects gnutls_sign_algorithm_get_name, and
+	_gnutls_x509_sign_to_oid.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in: Enum types for
+	SHA-256/384/512.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/stdbool_.h, gl/string_.h, gl/m4/gnulib-comp.m4,
+	gl/m4/string_h.m4, lgl/Makefile.am, lgl/memmem.c, lgl/string_.h,
+	lgl/m4/gnulib-comp.m4, lgl/m4/string_h.m4: Update.
+
+2007-02-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-04  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gai_strerror.c, gl/gnulib.mk, gl/string_.h,
+	gl/m4/gnulib-comp.m4, gl/m4/socklen.m4, gl/m4/string_h.m4,
+	lgl/Makefile.am, lgl/string_.h, lgl/m4/gnulib-comp.m4,
+	lgl/m4/socklen.m4, lgl/m4/string_h.m4: Update.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Typo.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, NEWS: Bump versions.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/signatures.texi: Removed the wrong file, re-add this one.
+	Oops.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Remove bibliography.texi.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/signatures.texi, doc/bibliography.texi: Remove.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Don't use my-bib-macros.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/my-bib-macros.texi: use pxref.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/my-bib-macros.texi: Fix.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: proxy and certtool stuff
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/xml.c: Doc fix.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/bibliography.texi: reorder
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/bibliography.texi: Add rfc3820.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Mention RFC 3820.
+
+2007-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Improve extensions stuff.
+
 2007-02-01  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.3.
