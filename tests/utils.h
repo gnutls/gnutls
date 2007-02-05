@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -30,6 +30,8 @@
 extern int debug;
 extern int error_count;
 extern int break_on_error;
+
+extern char *pkcs3;
 
 extern void fail (const char *format, ...);
 extern void success (const char *format, ...);

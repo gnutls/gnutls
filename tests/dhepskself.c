@@ -215,16 +215,14 @@ static gnutls_dh_params_t dh_params;
 static int
 generate_dh_params (void)
 {
-
+  const gnutls_datum_t p3 = { pkcs3, strlen (pkcs3) };
   /* Generate Diffie Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
    * security requirements.
    */
   gnutls_dh_params_init (&dh_params);
-  gnutls_dh_params_generate2 (dh_params, DH_BITS);
-
-  return 0;
+  return gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
 }
 
 static int

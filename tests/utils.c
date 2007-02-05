@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -32,6 +32,13 @@
 int debug = 0;
 int error_count = 0;
 int break_on_error = 0;
+
+char *pkcs3 =
+  "-----BEGIN DH PARAMETERS-----\n"
+  "MIGGAoGAtkxw2jlsVCsrfLqxrN+IrF/3W8vVFvDzYbLmxi2GQv9s/PQGWP1d9i22\n"
+  "P2DprfcJknWt7KhCI1SaYseOQIIIAYP78CfyIpGScW/vS8khrw0rlQiyeCvQgF3O\n"
+  "GeGOEywcw+oQT4SmFOD7H0smJe2CNyjYpexBXQ/A0mbTF9QKm1cCAQU=\n"
+  "-----END DH PARAMETERS-----\n";
 
 void
 fail (const char *format, ...)
