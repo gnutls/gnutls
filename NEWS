@@ -9,6 +9,8 @@ See the end for copying conditions.
 A new self test "sha2" tries to build a long X.509 certificate chain
 testing all new hashes.
 
+** The gnutls-serv tool now use static DH parameters if none are supplied.
+
 ** Discuss proxy certificates in the manual.
 
 ** Improve bibliographical citations in the manual.
