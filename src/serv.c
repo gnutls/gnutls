@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2006, 2007 Free Software Foundation
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavroyanopoulos
  *
@@ -236,6 +236,38 @@ read_dh_params (void)
   printf ("Read Diffie Hellman parameters.\n");
   fflush (stdout);
 
+}
+
+static char pkcs3[] =
+  "-----BEGIN DH PARAMETERS-----\n"
+  "MIGGAoGAtkxw2jlsVCsrfLqxrN+IrF/3W8vVFvDzYbLmxi2GQv9s/PQGWP1d9i22\n"
+  "P2DprfcJknWt7KhCI1SaYseOQIIIAYP78CfyIpGScW/vS8khrw0rlQiyeCvQgF3O\n"
+  "GeGOEywcw+oQT4SmFOD7H0smJe2CNyjYpexBXQ/A0mbTF9QKm1cCAQU=\n"
+  "-----END DH PARAMETERS-----\n";
+
+static int
+static_dh_params (void)
+{
+  gnutls_datum params = { pkcs3, sizeof (pkcs3) };
+  int ret;
+
+  if (gnutls_dh_params_init (&dh_params) < 0)
+    {
+      fprintf (stderr, "Error in dh parameter initialization\n");
+      exit (1);
+    }
+
+  ret = gnutls_dh_params_import_pkcs3 (dh_params, &params, GNUTLS_X509_FMT_PEM);
+
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error parsing dh params: %s\n", safe_strerror (ret));
+      exit (1);
+    }
+
+  printf ("Set static Diffie Hellman parameters, consider --dhparams.\n");
+
+  return 0;
 }
 
 static int
@@ -724,10 +756,13 @@ main (int argc, char **argv)
       generate_rsa_params ();
       generate_dh_primes ();
     }
-
-  if (dh_params_file && generate == 0)
+  else if (dh_params_file)
     {
       read_dh_params ();
+    }
+  else
+    {
+      static_dh_params ();
     }
 
   if (gnutls_certificate_allocate_credentials (&cert_cred) < 0)
