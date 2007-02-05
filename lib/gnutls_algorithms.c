@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -1524,7 +1524,7 @@ static const gnutls_sign_entry sign_algorithms[] = {
   } while (0)
 
 #define GNUTLS_SIGN_ALG_LOOP(a) \
-                        GNUTLS_SIGN_LOOP( if(p->id == sign) { a; break; } )
+  GNUTLS_SIGN_LOOP( if(p->id && p->id == sign) { a; break; } )
 
 
 
