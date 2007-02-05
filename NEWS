@@ -5,15 +5,15 @@ See the end for copying conditions.
 
 * Version 1.7.4 (unreleased)
 
+** Support for RSA signing using SHA-256/384/512.
+A new self test "sha2" tries to build a long X.509 certificate chain
+testing all new hashes.
+
 ** Discuss proxy certificates in the manual.
 
 ** Improve bibliographical citations in the manual.
 
 ** Update of gnulib files.
-
-** Support for RSA signing using SHA-256/384/512.
-A new self test "sha2" tries to build a long X.509 certificate chain
-testing all new hashes.
 
 ** Fix certtool template handling of pathLenConstraints.
 It now defaults to -1 instead of 0, which causes the field to be
