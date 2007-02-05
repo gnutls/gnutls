@@ -157,7 +157,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "to-p12", "", "Generate a PKCS #12 structure.");
 	__gaa_helpsingle('8', "pkcs8", "", "Use PKCS #8 format for private keys.");
 	__gaa_helpsingle(0, "dsa", "", "Use DSA keys.");
-	__gaa_helpsingle(0, "hash", "STR ", "Hash algorithm to use for signing (MD5,SHA1,RMD160).");
+	__gaa_helpsingle(0, "hash", "STR ", "Hash algorithm to use for signing (MD5,SHA1,RMD160,SHA256,SHA384,SHA512).");
 	__gaa_helpsingle(0, "export-ciphers", "", "Use weak encryption algorithms.");
 	__gaa_helpsingle(0, "inder", "", "Use DER format for input certificates and private keys.");
 	__gaa_helpsingle(0, "xml", "", "Use XML format for output certificates.");
