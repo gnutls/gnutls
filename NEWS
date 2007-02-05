@@ -11,8 +11,19 @@ See the end for copying conditions.
 
 ** Update of gnulib files.
 
+** New enum values for SHA-256/384/512.
+
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_MAC_SHA256,
+GNUTLS_MAC_SHA384,
+GNUTLS_MAC_SHA512: New gnutls_mac_algorithm_t values.
+GNUTLS_DIG_SHA256,
+GNUTLS_DIG_SHA384,
+GNUTLS_DIG_SHA512: New gnutls_digest_algorithm_t values.
+GNUTLS_SIGN_RSA_SHA256,
+GNUTLS_SIGN_RSA_SHA384,
+GNUTLS_SIGN_RSA_SHA512: New gnutls_sign_algorithm_t values.
+
 
 * Version 1.7.3 (released 2007-02-01)
 
