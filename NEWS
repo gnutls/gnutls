@@ -13,6 +13,10 @@ See the end for copying conditions.
 
 ** New enum values for SHA-256/384/512.
 
+** Fix certtool template handling of pathLenConstraints.
+It now defaults to -1 instead of 0, which causes the field to be
+missing unless the template specify it.
+
 ** API and ABI modifications:
 GNUTLS_MAC_SHA256,
 GNUTLS_MAC_SHA384,
