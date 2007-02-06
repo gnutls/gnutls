@@ -839,6 +839,23 @@ gaa_parser (int argc, char **argv)
 	    }
 	}
     }
+
+
+  if (!psk_username || !psk_key.data)
+    {
+      size_t i;
+      for (i = 0; kx_priority[i]; i++)
+	{
+	  if (kx_priority[i] == GNUTLS_KX_DHE_PSK ||
+	      kx_priority[i] == GNUTLS_KX_PSK)
+	    {
+	      memmove (&kx_priority[i],
+		       &kx_priority[i+1],
+		       sizeof (*kx_priority) * (PRI_MAX - i - 1));
+	      i--;
+	    }
+	}
+    }
 }
 
 void
