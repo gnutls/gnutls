@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** Fix --list output for gnutls-cli and gnutls-serv.
 Mention TLS1.2, SHA512 etc.
 
+** Don't negotiate SRP RSA/DSS cipher suites if no SRP credential is set.
+
 ** Update of gnulib files.
 
 ** API and ABI modifications:
