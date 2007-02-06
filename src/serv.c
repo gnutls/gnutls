@@ -331,15 +331,15 @@ static int protocol_priority[PRI_MAX] = {
 };
 
 static int kx_priority[PRI_MAX] = {
+  GNUTLS_KX_DHE_PSK,
+  GNUTLS_KX_PSK,
+  GNUTLS_KX_SRP_RSA,
+  GNUTLS_KX_SRP_DSS,
+  GNUTLS_KX_SRP,
+  GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
   GNUTLS_KX_RSA,
-  GNUTLS_KX_DHE_RSA,
-  GNUTLS_KX_SRP,
-  GNUTLS_KX_PSK,
-  GNUTLS_KX_DHE_PSK,
   /* Do not use anonymous authentication, unless you know what that means */
-  GNUTLS_KX_SRP_DSS,
-  GNUTLS_KX_SRP_RSA,
   GNUTLS_KX_ANON_DH,
   GNUTLS_KX_RSA_EXPORT, 0
 };
