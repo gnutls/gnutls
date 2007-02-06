@@ -158,7 +158,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "pskkey", "KEY ", "PSK key (in hex) to use.");
 	__gaa_helpsingle('p', "port", "PORT ", "The port to connect to.");
 	__gaa_helpsingle(0, "insecure", "", "Don't abort program if server certificate can't be validated.");
-	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms  and modes.");
+	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms and modes.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 	__gaa_helpsingle('v', "version", "", "prints the program's version number");
 	__gaa_helpsingle(0, "copyright", "", "prints the program's license");
@@ -1305,7 +1305,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
 
         len++;
         a = fgetc( file);
-        if(a==EOF) return 0; 
+        if(a==EOF) return 0; /* a = ' '; */
     }
 
     len += 1;
