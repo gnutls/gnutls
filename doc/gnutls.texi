@@ -2340,6 +2340,66 @@ Usage: gnutls-serv [options]
      --copyright              prints the program's license
 @end verbatim
 
+@subsection Setting up a test HTTPS server
+@cindex HTTPS server
+@cindex debug server
+
+Running your own TLS server based on GnuTLS can be useful when
+debugging clients and/or GnuTLS itself.  This section describes how to
+use @code{gnutls-serv} as a simple HTTPS server.
+
+The most basic server can be started as:
+
+@example
+$ gnutls-serv --http
+@end example
+
+It will only support anonymous ciphersuites, which many TLS clients
+refuse to use.
+
+The next step is to add support for X.509.  First we generate a CA:
+
+@example
+$ certtool --generate-privkey > key-ca.pem
+Generating a private key...
+Generating a 1024 bit RSA private key...
+$ echo 'cn = GnuTLS test CA' > ca.tmpl
+$ echo 'ca' >> ca.tmpl
+$ echo 'cert_signing_key' >> ca.tmpl
+$ certtool --generate-self-signed --load-privkey key-ca.pem \
+  --template ca.tmpl --outfile ca.pem
+...
+@end example
+
+Then generate a server certificate.  Remember to change the dns_name
+value to the name of your server host, or skip that command to avoid
+the field.
+
+@example
+$ certtool --generate-privkey > key-server.pem
+Generating a private key...
+Generating a 1024 bit RSA private key...
+$ echo 'cn = GnuTLS test server' > server.tmpl
+$ echo 'tls_www_server' >> server.tmpl
+$ echo 'encryption_key' >> server.tmpl
+$ echo 'signing_key' >> server.tmpl
+$ echo 'dns_name = test.gnutls.org' >> server.tmpl
+$ certtool --generate-certificate --load-privkey key-server.pem \
+  --load-ca-certificate ca.pem --load-ca-privkey key-ca.pem \
+  --template server.tmpl --outfile server.pem
+...
+@end example
+
+Then start the server again:
+
+@example
+gnutls-serv --http --x509cafile ca.pem \
+            --x509keyfile key-server.pem --x509certfile server.pem
+@end example
+
+Try connecting to the server using your web browser.  Note that the
+server listens to port 5556 by default.
+
 @node Invoking certtool
 @section Invoking certtool
 @cindex certtool
