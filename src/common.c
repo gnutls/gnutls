@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  * Author: Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
@@ -618,12 +618,12 @@ print_list (void)
   printf (", ARCFOUR-40\n");
 
   printf ("MACs:");
-  printf (" SHA512\n");
-  printf (", SHA384\n");
-  printf (", SHA256\n");
-  printf (", SHA1\n");
+  printf (" SHA512");
+  printf (", SHA384");
+  printf (", SHA256");
+  printf (", SHA1");
   printf (", MD5");
-  printf (", RMD160");
+  printf (", RMD160\n");
 
   printf ("Key exchange algorithms:");
   printf (" RSA");
