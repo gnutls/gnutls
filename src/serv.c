@@ -322,25 +322,56 @@ generate_rsa_params (void)
   return 0;
 }
 
-int protocol_priority[PRI_MAX] =
-  { GNUTLS_TLS1_1, GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-int kx_priority[PRI_MAX] =
-  { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
-  GNUTLS_KX_PSK, GNUTLS_KX_DHE_PSK,
-  /* Do not use anonymous authentication, unless you know what that means */
-  GNUTLS_KX_SRP_DSS, GNUTLS_KX_SRP_RSA, GNUTLS_KX_ANON_DH,
-  GNUTLS_KX_RSA_EXPORT, 0
-};
-int cipher_priority[PRI_MAX] =
-  { GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_ARCFOUR_40, 0
+static const int protocol_priority[PRI_MAX] = {
+  GNUTLS_TLS1_2,
+  GNUTLS_TLS1_1,
+  GNUTLS_TLS1,
+  GNUTLS_SSL3,
+  0
 };
 
-int comp_priority[PRI_MAX] =
-  { GNUTLS_COMP_ZLIB, GNUTLS_COMP_LZO, GNUTLS_COMP_NULL, 0 };
-int mac_priority[PRI_MAX] =
-  { GNUTLS_MAC_SHA1, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
-int cert_type_priority[PRI_MAX] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
+static const int kx_priority[PRI_MAX] = {
+  GNUTLS_KX_DHE_DSS,
+  GNUTLS_KX_RSA,
+  GNUTLS_KX_DHE_RSA,
+  GNUTLS_KX_SRP,
+  GNUTLS_KX_PSK,
+  GNUTLS_KX_DHE_PSK,
+  /* Do not use anonymous authentication, unless you know what that means */
+  GNUTLS_KX_SRP_DSS,
+  GNUTLS_KX_SRP_RSA,
+  GNUTLS_KX_ANON_DH,
+  GNUTLS_KX_RSA_EXPORT, 0
+};
+
+static const int cipher_priority[PRI_MAX] = {
+  GNUTLS_CIPHER_AES_256_CBC,
+  GNUTLS_CIPHER_AES_128_CBC,
+  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_128,
+  GNUTLS_CIPHER_ARCFOUR_40,
+  0
+};
+
+static const int comp_priority[PRI_MAX] = {
+  GNUTLS_COMP_ZLIB,
+  GNUTLS_COMP_LZO,
+  GNUTLS_COMP_NULL,
+  0
+};
+
+static const int mac_priority[PRI_MAX] = {
+  GNUTLS_MAC_SHA1,
+  GNUTLS_MAC_MD5,
+  GNUTLS_MAC_RMD160,
+  0
+};
+
+static const int cert_type_priority[PRI_MAX] = {
+  GNUTLS_CRT_X509,
+  GNUTLS_CRT_OPENPGP,
+  0
+};
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
