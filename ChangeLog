@@ -1,3 +1,141 @@
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.5.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/string_.h, gl/m4/string_h.m4, lgl/Makefile.am,
+	lgl/string_.h, lgl/m4/string_h.m4: Update.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Reorder.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Don't ask for PSK if we don't have credentials for it.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: mention psk
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c:
+	(_gnutls_remove_unwanted_ciphersuites): Remove GNUTLS_KX_SRP_RSA or
+	GNUTLS_KX_SRP_DSS if there is no SRP credential.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: fix
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Don't try to negotiate SRP kx if we don't have SRP
+	username/password.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Modernize priorities.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Prefer PSK.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Modernize priorities.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: more
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Parse new MACs.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Prefer OpenPGP certs from client.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli-gaa.c: Generated.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Typo in last commit.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.gaa: Typo.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Fix --list.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_hash_int.c: Revert, not needed.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_hash_int.c:
+	(_gnutls_hash_get_algo_len): Handle NULL MACs again, broken by last
+	commit.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Fix last commit.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Support TLS 1.2 and AES 256.
+
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.4.
