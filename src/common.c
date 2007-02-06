@@ -605,8 +605,9 @@ print_list (void)
   printf (", OPENPGP\n");
 
   printf ("Protocols:");
-  printf (" TLS1.0");
+  printf (" TLS1.2");
   printf (", TLS1.1");
+  printf (", TLS1.0");
   printf (", SSL3.0\n");
 
   printf ("Ciphers:");
@@ -617,9 +618,12 @@ print_list (void)
   printf (", ARCFOUR-40\n");
 
   printf ("MACs:");
-  printf (" MD5");
-  printf (", RMD160");
+  printf (" SHA512\n");
+  printf (", SHA384\n");
+  printf (", SHA256\n");
   printf (", SHA1\n");
+  printf (", MD5");
+  printf (", RMD160");
 
   printf ("Key exchange algorithms:");
   printf (" RSA");
