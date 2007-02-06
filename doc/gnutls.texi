@@ -2403,18 +2403,18 @@ The next step is to create OpenPGP credentials for the server.
 
 @example
 gpg --gen-key
-...enter whatever details you want...
+...enter whatever details you want, use 'test.gnutls.org' as name...
 @end example
 
 Make a note of the OpenPGP key identifier of the newly generated key,
-here it was @code{F4D2FF5D}.  You will need to export the key for
+here it was @code{5D1D14D8}.  You will need to export the key for
 GnuTLS to be able to use it.
 
 @example
-gpg -a --export F4D2FF5D > openpgp-server.txt
-gpg --export F4D2FF5D > openpgp-server.bin
-gpg --export-secret-keys F4D2FF5D > openpgp-server-key.bin
-gpg -a --export-secret-keys F4D2FF5D > openpgp-server-key.txt
+gpg -a --export 5D1D14D8 > openpgp-server.txt
+gpg --export 5D1D14D8 > openpgp-server.bin
+gpg --export-secret-keys 5D1D14D8 > openpgp-server-key.bin
+gpg -a --export-secret-keys 5D1D14D8 > openpgp-server-key.txt
 @end example
 
 Let's start the server with support for OpenPGP credentials:
