@@ -807,20 +807,20 @@ problems in @acronym{SSL} 2.0 include:
 
 @itemize
 
-@item Message integrity compromised
+@item Message integrity compromised.
 The @acronym{SSLv2} message authentication uses the MD5 function, and
 is insecure.
 
-@item Man-in-the-middle attack
+@item Man-in-the-middle attack.
 There is no protection of the handshake in @acronym{SSLv2}, which
 permits a man-in-the-middle attack.
 
-@item Truncation attack
+@item Truncation attack.
 @acronym{SSLv2} relies on TCP FIN to close the session, so the
 attacker can forge a TCP FIN, and the peer cannot tell if it was a
 legitimate end of data or not.
 
-@item Weak message integrity for export ciphers
+@item Weak message integrity for export ciphers.
 The cryptographic keys in @acronym{SSLv2} are used for both message
 authentication and encryption, so if weak encryption schemes are
 negotiated (say 40-bit keys) the message authentication code use the
