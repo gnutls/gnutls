@@ -2379,7 +2379,8 @@ the field.
 $ certtool --generate-privkey > key-server.pem
 Generating a private key...
 Generating a 1024 bit RSA private key...
-$ echo 'cn = GnuTLS test server' > server.tmpl
+$ echo 'organization = GnuTLS test server' > server.tmpl
+$ echo 'cn = test.gnutls.org' >> server.tmpl
 $ echo 'tls_www_server' >> server.tmpl
 $ echo 'encryption_key' >> server.tmpl
 $ echo 'signing_key' >> server.tmpl
