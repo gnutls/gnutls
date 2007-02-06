@@ -2351,7 +2351,7 @@ use @code{gnutls-serv} as a simple HTTPS server.
 The most basic server can be started as:
 
 @example
-$ gnutls-serv --http
+gnutls-serv --http
 @end example
 
 It will only support anonymous ciphersuites, which many TLS clients
@@ -2360,14 +2360,12 @@ refuse to use.
 The next step is to add support for X.509.  First we generate a CA:
 
 @example
-$ certtool --generate-privkey > key-ca.pem
-Generating a private key...
-Generating a 1024 bit RSA private key...
-$ echo 'cn = GnuTLS test CA' > ca.tmpl
-$ echo 'ca' >> ca.tmpl
-$ echo 'cert_signing_key' >> ca.tmpl
-$ certtool --generate-self-signed --load-privkey key-ca.pem \
-  --template ca.tmpl --outfile ca.pem
+certtool --generate-privkey > x509-ca-key.pem
+echo 'cn = GnuTLS test CA' > ca.tmpl
+echo 'ca' >> ca.tmpl
+echo 'cert_signing_key' >> ca.tmpl
+certtool --generate-self-signed --load-privkey x509-ca-key.pem \
+  --template ca.tmpl --outfile x509-ca.pem
 ...
 @end example
 
@@ -2376,30 +2374,69 @@ value to the name of your server host, or skip that command to avoid
 the field.
 
 @example
-$ certtool --generate-privkey > key-server.pem
-Generating a private key...
-Generating a 1024 bit RSA private key...
-$ echo 'organization = GnuTLS test server' > server.tmpl
-$ echo 'cn = test.gnutls.org' >> server.tmpl
-$ echo 'tls_www_server' >> server.tmpl
-$ echo 'encryption_key' >> server.tmpl
-$ echo 'signing_key' >> server.tmpl
-$ echo 'dns_name = test.gnutls.org' >> server.tmpl
-$ certtool --generate-certificate --load-privkey key-server.pem \
-  --load-ca-certificate ca.pem --load-ca-privkey key-ca.pem \
-  --template server.tmpl --outfile server.pem
+certtool --generate-privkey > x509-server-key.pem
+echo 'organization = GnuTLS test server' > server.tmpl
+echo 'cn = test.gnutls.org' >> server.tmpl
+echo 'tls_www_server' >> server.tmpl
+echo 'encryption_key' >> server.tmpl
+echo 'signing_key' >> server.tmpl
+echo 'dns_name = test.gnutls.org' >> server.tmpl
+certtool --generate-certificate --load-privkey x509-server-key.pem \
+  --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
+  --template server.tmpl --outfile x509-server.pem
 ...
 @end example
 
 Then start the server again:
 
 @example
-gnutls-serv --http --x509cafile ca.pem \
-            --x509keyfile key-server.pem --x509certfile server.pem
+gnutls-serv --http \
+            --x509cafile x509-ca.pem \
+            --x509keyfile x509-server-key.pem \
+            --x509certfile x509-server.pem
 @end example
 
 Try connecting to the server using your web browser.  Note that the
 server listens to port 5556 by default.
+
+The next step is to create OpenPGP credentials for the server.
+
+@example
+gpg --gen-key
+...enter whatever details you want...
+@end example
+
+Make a note of the OpenPGP key identifier of the newly generated key,
+here it was @code{F4D2FF5D}.  You will need to export the key for
+GnuTLS to be able to use it.
+
+@example
+gpg -a --export F4D2FF5D > openpgp-server.txt
+gpg --export F4D2FF5D > openpgp-server.bin
+gpg --export-secret-keys F4D2FF5D > openpgp-server-key.bin
+gpg -a --export-secret-keys F4D2FF5D > openpgp-server-key.txt
+@end example
+
+Let's start the server with support for OpenPGP credentials:
+
+@example
+gnutls-serv --http \
+            --pgpkeyfile openpgp-server-key.txt \
+            --pgpcertfile openpgp-server.txt
+@end example
+
+Starting a server with support for both X.509 and OpenPGP can be done
+by combining the parameters:
+
+@example
+gnutls-serv --http \
+            --x509cafile x509-ca.pem \
+            --x509keyfile x509-server-key.pem \
+            --x509certfile x509-server.pem \
+            --pgpkeyfile openpgp-server-key.txt \
+            --pgpcertfile openpgp-server.txt \
+            --ctypes openpgp,x509
+@end example
 
 @node Invoking certtool
 @section Invoking certtool
