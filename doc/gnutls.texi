@@ -2431,8 +2431,6 @@ The next step is to add support for SRP authentication.
 srptool --create-conf srp-tpasswd.conf
 srptool --passwd-conf srp-tpasswd.conf --username jas --passwd srp-passwd.txt
 Enter password: [TYPE "foo"]
-srptool --passwd-conf srp-tpasswd.conf --username joe --passwd srp-passwd.txt
-Enter password: [TYPE "bar"]
 @end example
 
 Start the server with SRP support:
