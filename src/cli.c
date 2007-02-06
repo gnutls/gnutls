@@ -823,7 +823,22 @@ gaa_parser (int argc, char **argv)
   parse_kx (info.kx, info.nkx, kx_priority);
   parse_comp (info.comp, info.ncomp, comp_priority);
 
-
+  if (!srp_username || !srp_passwd)
+    {
+      size_t i;
+      for (i = 0; kx_priority[i]; i++)
+	{
+	  if (kx_priority[i] == GNUTLS_KX_SRP_RSA ||
+	      kx_priority[i] == GNUTLS_KX_SRP_DSS ||
+	      kx_priority[i] == GNUTLS_KX_SRP)
+	    {
+	      memmove (&kx_priority[i],
+		       &kx_priority[i+1],
+		       sizeof (*kx_priority) * (PRI_MAX - i - 1));
+	      i--;
+	    }
+	}
+    }
 }
 
 void
