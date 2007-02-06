@@ -5,13 +5,13 @@ See the end for copying conditions.
 
 * Version 1.7.5 (unreleased)
 
-** Fix --list output for gnutls-cli and gnutls-serv.
-Mention TLS1.2, SHA512 etc.
-
 ** Servers won't negotiate SRP RSA/DSS cipher suites if no SRP credential
 ** is set.
 
 ** Default behaviour for the gnutls-cli and gnutls-serv tools improved.
+
+** Fix --list output for gnutls-cli and gnutls-serv.
+Mention TLS1.2, SHA512 etc.
 
 ** Update of gnulib files.
 
