@@ -13,6 +13,10 @@ See the end for copying conditions.
 ** Fix --list output for gnutls-cli and gnutls-serv.
 Mention TLS1.2, SHA512 etc.
 
+** Manual contains new section on setting up a test HTTP server.
+A server set up following those descriptions are available online via
+<http://www.gnu.org/software/gnutls/server.html>.
+
 ** Update of gnulib files.
 
 ** API and ABI modifications:
