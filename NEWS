@@ -8,6 +8,11 @@ See the end for copying conditions.
 ** Fix --list output for gnutls-cli and gnutls-serv.
 Mention TLS1.2, SHA512 etc.
 
+** Update of gnulib files.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.7.4 (released 2007-02-05)
 
 ** Support for RSA signing using SHA-256/384/512.
