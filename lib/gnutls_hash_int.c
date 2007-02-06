@@ -95,10 +95,6 @@ _gnutls_hash_get_algo_len (gnutls_mac_algorithm_t algorithm)
 
   ret = gc_hash_digest_length (_gnutls_mac2gc (algorithm));
 
-  /* Handle NULL MAC's. */
-  if (ret < 0)
-    ret = 0;
-
   return ret;
 
 }
