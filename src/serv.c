@@ -368,8 +368,8 @@ static int mac_priority[PRI_MAX] = {
 };
 
 static int cert_type_priority[PRI_MAX] = {
-  GNUTLS_CRT_X509,
   GNUTLS_CRT_OPENPGP,
+  GNUTLS_CRT_X509,
   0
 };
 
