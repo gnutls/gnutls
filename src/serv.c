@@ -322,7 +322,7 @@ generate_rsa_params (void)
   return 0;
 }
 
-static const int protocol_priority[PRI_MAX] = {
+static int protocol_priority[PRI_MAX] = {
   GNUTLS_TLS1_2,
   GNUTLS_TLS1_1,
   GNUTLS_TLS1,
@@ -330,7 +330,7 @@ static const int protocol_priority[PRI_MAX] = {
   0
 };
 
-static const int kx_priority[PRI_MAX] = {
+static int kx_priority[PRI_MAX] = {
   GNUTLS_KX_DHE_DSS,
   GNUTLS_KX_RSA,
   GNUTLS_KX_DHE_RSA,
@@ -344,7 +344,7 @@ static const int kx_priority[PRI_MAX] = {
   GNUTLS_KX_RSA_EXPORT, 0
 };
 
-static const int cipher_priority[PRI_MAX] = {
+static int cipher_priority[PRI_MAX] = {
   GNUTLS_CIPHER_AES_256_CBC,
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_3DES_CBC,
@@ -353,21 +353,21 @@ static const int cipher_priority[PRI_MAX] = {
   0
 };
 
-static const int comp_priority[PRI_MAX] = {
+static int comp_priority[PRI_MAX] = {
   GNUTLS_COMP_ZLIB,
   GNUTLS_COMP_LZO,
   GNUTLS_COMP_NULL,
   0
 };
 
-static const int mac_priority[PRI_MAX] = {
+static int mac_priority[PRI_MAX] = {
   GNUTLS_MAC_SHA1,
   GNUTLS_MAC_MD5,
   GNUTLS_MAC_RMD160,
   0
 };
 
-static const int cert_type_priority[PRI_MAX] = {
+static int cert_type_priority[PRI_MAX] = {
   GNUTLS_CRT_X509,
   GNUTLS_CRT_OPENPGP,
   0
