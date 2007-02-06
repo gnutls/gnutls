@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -402,7 +402,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
 {
   gnutls_datum_t dconcat;
   int ret;
-  mac_hd_t td_md5;
+  mac_hd_t td_md5 = NULL;
   mac_hd_t td_sha;
   opaque concat[36];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
@@ -427,7 +427,8 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   if (td_sha == NULL)
     {
       gnutls_assert ();
-      _gnutls_hash_deinit (td_md5, NULL);
+      if (td_md5)
+	_gnutls_hash_deinit (td_md5, NULL);
       return GNUTLS_E_HASH_FAILED;
     }
 
