@@ -725,6 +725,12 @@ parse_macs (char **macs, int nmacs, int *mac_priority)
 	    mac_priority[j++] = GNUTLS_MAC_MD5;
 	  else if (strncasecmp (macs[i], "RMD", 3) == 0)
 	    mac_priority[j++] = GNUTLS_MAC_RMD160;
+	  else if (strncasecmp (macs[i], "SHA512", 6) == 0)
+	    mac_priority[j++] = GNUTLS_MAC_SHA512;
+	  else if (strncasecmp (macs[i], "SHA384", 6) == 0)
+	    mac_priority[j++] = GNUTLS_MAC_SHA384;
+	  else if (strncasecmp (macs[i], "SHA256", 6) == 0)
+	    mac_priority[j++] = GNUTLS_MAC_SHA256;
 	  else if (strncasecmp (macs[i], "SHA", 3) == 0)
 	    mac_priority[j++] = GNUTLS_MAC_SHA1;
 	  else
