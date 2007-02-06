@@ -15,7 +15,7 @@ Mention TLS1.2, SHA512 etc.
 
 ** Manual contains new section on setting up a test HTTP server.
 A server set up following those descriptions are available online via
-<http://www.gnu.org/software/gnutls/server.html>.
+<http://www.gnutls.org/server.html>.
 
 ** Update of gnulib files.
 
