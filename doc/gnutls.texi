@@ -2434,8 +2434,7 @@ gnutls-serv --http \
             --x509keyfile x509-server-key.pem \
             --x509certfile x509-server.pem \
             --pgpkeyfile openpgp-server-key.txt \
-            --pgpcertfile openpgp-server.txt \
-            --ctypes openpgp,x509
+            --pgpcertfile openpgp-server.txt
 @end example
 
 The next step is to add support for SRP authentication.
@@ -2465,7 +2464,6 @@ gnutls-serv --http \
             --x509certfile x509-server.pem \
             --pgpkeyfile openpgp-server-key.txt \
             --pgpcertfile openpgp-server.txt \
-            --ctypes openpgp,x509 \
             --srppasswdconf srp-tpasswd.conf \
             --srppasswd srp-passwd.txt
 @end example
