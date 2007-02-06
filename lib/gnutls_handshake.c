@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -2782,7 +2782,15 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
 	    delete = check_server_params (session, kx, alg, alg_size);
 	}
 
-
+      /* These two SRP kx's are marked to require a CRD_CERTIFICATE,
+	 (see cred_mappings in gnutls_algorithms.c), but it also
+	 requires a SRP credential.  Don't use SRP kx unless we have a
+	 SRP credential too.  */
+      if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS)
+	{
+	  if (!_gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL))
+	    delete = 1;
+	}
 
       memcpy (&cs.suite, &(*cipherSuites)[i].suite, 2);
 
