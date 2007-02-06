@@ -2425,18 +2425,6 @@ gnutls-serv --http \
             --pgpcertfile openpgp-server.txt
 @end example
 
-Starting a server with support for both X.509 and OpenPGP can be done
-by combining the parameters:
-
-@example
-gnutls-serv --http \
-            --x509cafile x509-ca.pem \
-            --x509keyfile x509-server-key.pem \
-            --x509certfile x509-server.pem \
-            --pgpkeyfile openpgp-server-key.txt \
-            --pgpcertfile openpgp-server.txt
-@end example
-
 The next step is to add support for SRP authentication.
 
 @example
@@ -2455,7 +2443,21 @@ gnutls-serv --http \
             --srppasswd srp-passwd.txt
 @end example
 
-Combine this with the earlier parameters and you get this command:
+Let's also add support for PSK.
+
+@example
+$ psktool --passwd psk-passwd.txt
+@end example
+
+Start the server with PSK support:
+
+@example
+gnutls-serv --http \
+            --pskpasswd psk-passwd.txt
+@end example
+
+Finally, we start the server with all the earlier parameters and you
+get this command:
 
 @example
 gnutls-serv --http \
@@ -2465,7 +2467,8 @@ gnutls-serv --http \
             --pgpkeyfile openpgp-server-key.txt \
             --pgpcertfile openpgp-server.txt \
             --srppasswdconf srp-tpasswd.conf \
-            --srppasswd srp-passwd.txt
+            --srppasswd srp-passwd.txt \
+            --pskpasswd psk-passwd.txt
 @end example
 
 @node Invoking certtool
