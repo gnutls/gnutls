@@ -2438,6 +2438,38 @@ gnutls-serv --http \
             --ctypes openpgp,x509
 @end example
 
+The next step is to add support for SRP authentication.
+
+@example
+srptool --create-conf srp-tpasswd.conf
+srptool --passwd-conf srp-tpasswd.conf --username jas --passwd srp-passwd.txt
+Enter password: [TYPE "foo"]
+srptool --passwd-conf srp-tpasswd.conf --username joe --passwd srp-passwd.txt
+Enter password: [TYPE "bar"]
+@end example
+
+Start the server with SRP support:
+
+@example
+gnutls-serv --http \
+            --srppasswdconf srp-tpasswd.conf \
+            --srppasswd srp-passwd.txt
+@end example
+
+Combine this with the earlier parameters and you get this command:
+
+@example
+gnutls-serv --http \
+            --x509cafile x509-ca.pem \
+            --x509keyfile x509-server-key.pem \
+            --x509certfile x509-server.pem \
+            --pgpkeyfile openpgp-server-key.txt \
+            --pgpcertfile openpgp-server.txt \
+            --ctypes openpgp,x509 \
+            --srppasswdconf srp-tpasswd.conf \
+            --srppasswd srp-passwd.txt
+@end example
+
 @node Invoking certtool
 @section Invoking certtool
 @cindex certtool
