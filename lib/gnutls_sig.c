@@ -192,12 +192,14 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
       dconcat.data = concat;
       break;
     case GNUTLS_PK_DSA:
-      dconcat.data = &concat[16];
+      _gnutls_hash_deinit (td_sha, concat);
+      dconcat.data = concat;
       dconcat.size = 20;
       break;
 
     default:
       gnutls_assert ();
+      _gnutls_hash_deinit (td_sha, NULL);
       return GNUTLS_E_INTERNAL_ERROR;
     }
   ret = _gnutls_tls_sign (cert, pkey, &dconcat, signature);
