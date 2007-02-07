@@ -1997,8 +1997,8 @@ itself using a certificate, and in that case it has to be verified.
 
 @verbatiminclude examples/ex-client-srp.c
 
-@node Simple client example with TLS/IA authentication
-@subsection Simple client example with @acronym{TLS/IA} authentication
+@node Simple client example with TLS/IA support
+@subsection Simple client example with @acronym{TLS/IA} support
 
 The following client is a simple client which uses the
 @acronym{TLS/IA} extension to authenticate with the server.
@@ -2011,7 +2011,7 @@ The following client is a simple client which uses the
 This helper function abstracts away TCP connection handling from the
 other examples.  It is required to build some examples.
 
-@verbatiminclude tcp.c
+@verbatiminclude examples/tcp.c
 
 @node Server examples
 @section Server examples
