@@ -1898,7 +1898,8 @@ int main()
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 clients, using @acronym{GnuTLS}.  Note that these examples contain
-little or no error checking.
+little or no error checking.  Some of the examples require functions
+implemented by another example.
 
 @menu
 * Simple client example with anonymous authentication::
@@ -1908,6 +1909,8 @@ little or no error checking.
 * Using a callback to select the certificate to use::
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
+* Simple client example with TLS/IA support::
+* Helper function for TCP connections::
 @end menu
 
 @node Simple client example with anonymous authentication
@@ -1993,6 +1996,22 @@ client which connects to a server and authenticates using a
 itself using a certificate, and in that case it has to be verified.
 
 @verbatiminclude examples/ex-client-srp.c
+
+@node Simple client example with TLS/IA authentication
+@subsection Simple client example with @acronym{TLS/IA} authentication
+
+The following client is a simple client which uses the
+@acronym{TLS/IA} extension to authenticate with the server.
+
+@verbatiminclude examples/ex-client-tlsia.c
+
+@node Helper function for TCP connections
+@subsection Helper function for TCP connections
+
+This helper function abstracts away TCP connection handling from the
+other examples.  It is required to build some examples.
+
+@verbatiminclude tcp.c
 
 @node Server examples
 @section Server examples
