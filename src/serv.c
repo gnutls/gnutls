@@ -421,9 +421,9 @@ initialize_session (void)
   return session;
 }
 
-static const char DEFAULT_DATA[] = "This is the default message reported "
-  "by GnuTLS TLS version 1.0 implementation. For more information "
-  "please visit http://www.gnutls.org or even http://www.gnu.org/software/gnutls.";
+static const char DEFAULT_DATA[] =
+  "This is the default message reported by the GnuTLS implementation.  For "
+  "more information please visit <http://www.gnutls.org/>.";
 
 /* Creates html with the current session information.
  */
