@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.7.6 (unreleased)
 
+** Fix RSA signing in servers for TLS 1.2.
+Before it used the old-style MD5+SHA1 signature, but the TLS
+signatures should be normal PKCS#1 signatures.  FYI, we use and
+require that DigestInfo parameters are present and NULL for TLS 1.2.
+
 ** Doc fixes.
 
 ** API and ABI modifications:
