@@ -131,10 +131,9 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
 {
   gnutls_datum_t dconcat;
   int ret;
-  mac_hd_t td_md5;
   mac_hd_t td_sha;
   opaque concat[36];
-
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   td_sha = _gnutls_hash_init (GNUTLS_MAC_SHA1);
   if (td_sha == NULL)
@@ -149,28 +148,48 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
 		TLS_RANDOM_SIZE);
   _gnutls_hash (td_sha, params->data, params->size);
 
-  _gnutls_hash_deinit (td_sha, &concat[16]);
-
   switch (cert->subject_pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      td_md5 = _gnutls_hash_init (GNUTLS_MAC_MD5);
-      if (td_md5 == NULL)
+      if (ver < GNUTLS_TLS1_2)
 	{
-	  gnutls_assert ();
-	  return GNUTLS_E_HASH_FAILED;
+	  mac_hd_t td_md5 = _gnutls_hash_init (GNUTLS_MAC_MD5);
+	  if (td_md5 == NULL)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_HASH_FAILED;
+	    }
+
+	  _gnutls_hash (td_md5, session->security_parameters.client_random,
+			TLS_RANDOM_SIZE);
+	  _gnutls_hash (td_md5, session->security_parameters.server_random,
+			TLS_RANDOM_SIZE);
+	  _gnutls_hash (td_md5, params->data, params->size);
+
+	  _gnutls_hash_deinit (td_md5, concat);
+	  _gnutls_hash_deinit (td_sha, &concat[16]);
+
+	  dconcat.size = 36;
 	}
-
-      _gnutls_hash (td_md5, session->security_parameters.client_random,
-		    TLS_RANDOM_SIZE);
-      _gnutls_hash (td_md5, session->security_parameters.server_random,
-		    TLS_RANDOM_SIZE);
-      _gnutls_hash (td_md5, params->data, params->size);
-
-      _gnutls_hash_deinit (td_md5, concat);
-
+      else
+	{
+#if 1
+	  /* Use NULL parameters. */
+	  memcpy (concat,
+		  "\x30\x21\x30\x09\x06\x05\x2b\x0e\x03\x02\x1a\x05\x00\x04\x14",
+		  15);
+	  _gnutls_hash_deinit (td_sha, &concat[15]);
+	  dconcat.size = 35;
+#else
+	  /* No parameters field. */
+	  memcpy (concat,
+		  "\x30\x1f\x30\x07\x06\x05\x2b\x0e\x03\x02\x1a\x04\x14",
+		  13);
+	  _gnutls_hash_deinit (td_sha, &concat[13]);
+	  dconcat.size = 33;
+#endif
+	}
       dconcat.data = concat;
-      dconcat.size = 36;
       break;
     case GNUTLS_PK_DSA:
       dconcat.data = &concat[16];
@@ -447,12 +466,14 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   else
     {
 #if 1
+      /* Use NULL parameters. */
       memcpy (concat,
 	      "\x30\x21\x30\x09\x06\x05\x2b\x0e\x03\x02\x1a\x05\x00\x04\x14",
 	      15);
       _gnutls_hash_deinit (td_sha, &concat[15]);
       dconcat.size = 35;
 #else
+      /* No parameters field. */
       memcpy (concat,
 	      "\x30\x1f\x30\x07\x06\x05\x2b\x0e\x03\x02\x1a\x04\x14",
 	      13);
