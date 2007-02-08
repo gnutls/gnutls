@@ -1388,6 +1388,119 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
 
 }
 
+/**
+ * gnutls_x509_crt_get_extension_info - Get extension id and criticality
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @oid: a pointer to a structure to hold the OID
+ * @sizeof_oid: initially holds the size of @oid
+ * @critical: output variable with critical flag, may be NULL.
+ *
+ * This function will return the requested extension OID in the
+ * certificate, and the critical flag for it.  The extension OID will
+ * be stored as a string in the provided buffer.  Use
+ * gnutls_x509_crt_get_extension_data() to extract the data.
+ *
+ * Return 0 on success.  A negative value may be returned in case of
+ * parsing error.  If you have reached the last extension available
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ **/
+int
+gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
+				    void *oid, size_t * sizeof_oid,
+				    int *critical)
+{
+  int result;
+  char str_critical[10];
+  char name[MAX_NAME_SIZE];
+  int len;
+
+  if (!cert)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  snprintf (name, sizeof(name), "tbsCertificate.extensions.?%u.extnID",
+	    indx + 1);
+  result = asn1_read_value (cert->cert, name, oid, sizeof_oid);
+  if (result == ASN1_ELEMENT_NOT_FOUND)
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  else if (result < 0)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  snprintf (name, sizeof(name), "tbsCertificate.extensions.?%u.critical",
+	    indx + 1);
+  len = sizeof (str_critical);
+  result = asn1_read_value (cert->cert, name, str_critical, &len);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  if (critical)
+    {
+      if (str_critical[0] == 'T')
+	*critical = 1;
+      else
+	*critical = 0;
+    }
+
+  return 0;
+
+}
+
+/**
+ * gnutls_x509_crt_get_extension_data - Get the specified extension data
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @data: a pointer to a structure to hold the data (may be null)
+ * @sizeof_data: initially holds the size of @oid
+ *
+ * This function will return the requested extension data in the
+ * certificate.  The extension data will be stored as a string in the
+ * provided buffer.
+ *
+ * Use gnutls_x509_crt_get_extension_info() to extract the OID and
+ * critical flag.  Use gnutls_x509_crt_get_extension_by_oid() instead,
+ * if you want to get data indexed by the extension OID rather than
+ * sequence.
+ *
+ * Return 0 on success.  A negative value may be returned in case of
+ * parsing error.  If you have reached the last extension available
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ **/
+int
+gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
+				    void *data, size_t * sizeof_data)
+{
+  int result;
+  char name[MAX_NAME_SIZE];
+
+  if (!cert)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  snprintf (name, sizeof(name), "tbsCertificate.extensions.?%u.extnValue",
+	    indx + 1);
+  result = asn1_read_value (cert->cert, name, data, sizeof_data);
+  if (result == ASN1_ELEMENT_NOT_FOUND)
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  else if (result < 0)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return 0;
+}
 
 static int
 _gnutls_x509_crt_get_raw_dn2 (gnutls_x509_crt_t cert,

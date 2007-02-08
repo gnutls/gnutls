@@ -23,9 +23,16 @@ Before it used the old-style MD5+SHA1 signature, but the TLS
 signatures should be normal PKCS#1 signatures.  FYI, we use and
 require that DigestInfo parameters are present and NULL for TLS 1.2.
 
+** Add APIs to access X.509 extensions sequentially.
+The existing APIs gnutls_x509_crt_get_extension_oid() and
+gnutls_x509_crt_get_extension_by_oid() does not permit callers to
+inspect the extensions in the order defined by the certificate.
+
 ** Doc fixes.
 
 ** API and ABI modifications:
+gnutls_x509_crt_get_extension_data: ADD.
+gnutls_x509_crt_get_extension_info: ADD.
 gnutls_x509_crt_get_subject_alt_othername_oid: ADD.
 GNUTLS_SAN_OTHERNAME: ADD, new gnutls_x509_subject_alt_name_t element.
 GNUTLS_SAN_OTHERNAME_XMPP: ADD, new gnutls_x509_subject_alt_name_t element.

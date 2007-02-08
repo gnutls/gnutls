@@ -207,6 +207,7 @@ extern "C"
 
   int gnutls_x509_dn_oid_known (const char *oid);
 
+  /* Read extensions by OID. */
   int gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
 					 void *oid, size_t * sizeof_oid);
   int gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
@@ -214,6 +215,14 @@ extern "C"
 					    void *buf,
 					    size_t * sizeof_buf,
 					    unsigned int *critical);
+
+  /* Read extensions by sequence number. */
+  int gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
+					  void *oid, size_t * sizeof_oid,
+					  int *critical);
+  int gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
+					  void *data, size_t * sizeof_data);
+
   int gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,
 					    const char *oid,
 					    const void *buf,
@@ -279,6 +288,16 @@ extern "C"
 				 const char *policyLanguage,
 				 const char *policy,
 				 size_t sizeof_policy);
+
+  typedef enum gnutls_certificate_print_formats
+    {
+      GNUTLS_X509_CRT_FULL,
+      GNUTLS_X509_CRT_ONELINE,
+    } gnutls_certificate_print_formats_t;
+
+  int gnutls_x509_crt_print (gnutls_x509_crt_t cert,
+			     gnutls_certificate_print_formats_t format,
+			     char **out);
 
 /* RDN handling.
  */
