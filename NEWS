@@ -5,14 +5,14 @@ See the end for copying conditions.
 
 * Version 1.7.6 (unreleased)
 
-** Support for 'othername' Subject Alternative Names.
+** Support for 'otherName' Subject Alternative Names.
 The existing API gnutls_x509_crt_get_subject_alt_name may now return
 the new type GNUTLS_SAN_OTHERNAME together with the otherName value.
 To find out the otherName OID (necessary for proper parsing of the
 value), use the new API gnutls_x509_crt_get_subject_alt_othername_oid.
 For known OIDs, gnutls_x509_crt_get_subject_alt_othername_oid will
 return "virtual" SAN values, e.g., GNUTLS_SAN_OTHERNAME_XMPP to
-simplify OID matching.
+simplify OID matching.  Suggested by Matthias Wimmer <m@tthias.eu>.
 
 ** Certtool can print otherName SAN values for certificates.
 For known otherName OIDs (currently only id-on-xmppAddr as defined by
