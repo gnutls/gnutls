@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -55,6 +55,7 @@ int _gnutls_string_copy_str (gnutls_string * dest, const char *src);
 int _gnutls_string_append_str (gnutls_string *, const char *str);
 int _gnutls_string_append_data (gnutls_string *, const void *data,
 				size_t data_size);
+int _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...);
 
 char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
 		       size_t buffer_size);

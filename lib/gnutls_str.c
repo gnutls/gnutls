@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2004, 2005  Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005, 2007  Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -225,6 +225,29 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
 
       return tot_len;
     }
+}
+
+#include <vasnprintf.h>
+
+int
+_gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
+{
+  va_list args;
+  int len;
+  char *str;
+
+  va_start (args, fmt);
+  len = vasprintf (&str, fmt, args);
+  va_end (args);
+
+  if (len < 0 || !str)
+    return -1;
+
+  len = _gnutls_string_append_str (dest, str);
+
+  free (str);
+
+  return len;
 }
 
 /* Converts the given string (old) to hex. A buffer must be provided
