@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -697,6 +697,8 @@ _gnutls_x509_san_find_type (char *str_type)
     return GNUTLS_SAN_URI;
   if (strcmp (str_type, "iPAddress") == 0)
     return GNUTLS_SAN_IPADDRESS;
+  if (strcmp (str_type, "otherName") == 0)
+    return GNUTLS_SAN_OTHERNAME;
   return (gnutls_x509_subject_alt_name_t) - 1;
 }
 

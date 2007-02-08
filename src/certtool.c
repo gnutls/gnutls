@@ -1392,6 +1392,31 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 	  case GNUTLS_SAN_IPADDRESS:
 	    fprintf (out, "\t\tIPAddress: %s\n", buffer);
 	    break;
+	  case GNUTLS_SAN_OTHERNAME:
+	    fprintf (out, "\t\totherName:\n\t\t\tDER: ");
+	    for (j = 0; j < size; j++)
+	      {
+		fprintf (out, "%.2x", (unsigned char) buffer[j]);
+	      }
+	    fprintf (out, "\n\t\t\tASCII: ");
+	    for (j = 0; j < size; j++)
+	      {
+		if (isprint (buffer[j]))
+		  fprintf (out, "%c", (unsigned char) buffer[j]);
+		else
+		  fprintf (out, ".");
+	      }
+	    fprintf (out, "\n");
+
+	    size = sizeof (buffer);
+	    ret = gnutls_x509_crt_get_subject_alt_othername_oid
+	      (crt, i, buffer, &size);
+	    if (ret < 0)
+	      printf ("\t\t\tError decoding otherName OID: %s\n",
+		      gnutls_strerror (ret));
+	    else
+	      printf ("\t\t\tOID: %.*s\n", size, buffer);
+	    break;
 	  }
     }
 

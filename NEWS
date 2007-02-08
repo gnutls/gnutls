@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 1.7.6 (unreleased)
 
+** Support for 'othername' Subject Alternative Names.
+The existing API gnutls_x509_crt_get_subject_alt_name may now return
+the new type GNUTLS_SAN_OTHERNAME together with the otherName value.
+To find out the otherName OID (necessary for proper parsing of the
+value), use the new API gnutls_x509_crt_get_subject_alt_othername_oid.
+
+** Certtool can print otherName SAN values for certificates.
+
 ** Fix TLS 1.2 RSA signing in servers.
 Before it used the old-style MD5+SHA1 signature, but the TLS
 signatures should be normal PKCS#1 signatures.  FYI, we use and
@@ -13,7 +21,9 @@ require that DigestInfo parameters are present and NULL for TLS 1.2.
 ** Doc fixes.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_get_subject_alt_othername_oid: ADD.
+GNUTLS_SAN_OTHERNAME: ADD, new gnutls_x509_subject_alt_name_t element.
+GNUTLS_SAN_OTHERNAME_XMPP: ADD, new gnutls_x509_subject_alt_name_t element.
 
 * Version 1.7.5 (released 2007-02-06)
 

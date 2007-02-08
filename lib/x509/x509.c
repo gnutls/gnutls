@@ -838,7 +838,8 @@ gnutls_x509_crt_get_pk_algorithm (gnutls_x509_crt_t cert, unsigned int *bits)
  */
 static int
 parse_general_name (ASN1_TYPE src, const char *src_name,
-		    int seq, void *name, size_t * name_size)
+		    int seq, void *name, size_t * name_size,
+		    int othername_oid)
 {
   int len;
   char nptr[MAX_NAME_SIZE];
@@ -875,53 +876,59 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
       return GNUTLS_E_X509_UNKNOWN_SAN;
     }
 
-  _gnutls_str_cat (nptr, sizeof (nptr), ".");
-  _gnutls_str_cat (nptr, sizeof (nptr), choice_type);
-
-  len = *name_size;
-  result = asn1_read_value (src, nptr, name, &len);
-  *name_size = len;
-
-  if (result == ASN1_MEM_ERROR)
-    return GNUTLS_E_SHORT_MEMORY_BUFFER;
-
-  if (result != ASN1_SUCCESS)
+  if (type == GNUTLS_SAN_OTHERNAME)
     {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
+      if (othername_oid)
+	{
+	  _gnutls_str_cat (nptr, sizeof (nptr), ".otherName.type-id");
+	  type = 0;
+	}
+      else
+	_gnutls_str_cat (nptr, sizeof (nptr), ".otherName.value");
+
+      len = *name_size;
+      result = asn1_read_value (src, nptr, name, &len);
+      *name_size = len;
+
+      if (result == ASN1_MEM_ERROR)
+	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+
+      if (result != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  return _gnutls_asn2err (result);
+	}
+    }
+  else if (othername_oid)
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  else
+    {
+      _gnutls_str_cat (nptr, sizeof (nptr), ".");
+      _gnutls_str_cat (nptr, sizeof (nptr), choice_type);
+
+      len = *name_size;
+      result = asn1_read_value (src, nptr, name, &len);
+      *name_size = len;
+
+      if (result == ASN1_MEM_ERROR)
+	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+
+      if (result != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  return _gnutls_asn2err (result);
+	}
     }
 
   return type;
 }
 
-/**
-  * gnutls_x509_crt_get_subject_alt_name - This function returns the certificate's alternative name, if any
-  * @cert: should contain a gnutls_x509_crt_t structure
-  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
-  * @ret: is the place where the alternative name will be copied to
-  * @ret_size: holds the size of ret.
-  * @critical: will be non zero if the extension is marked as critical (may be null)
-  *
-  * This function will return the alternative names, contained in the
-  * given certificate.
-  * 
-  * This is specified in X509v3 Certificate Extensions. 
-  * GNUTLS will return the Alternative name (2.5.29.17), or a negative
-  * error code.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if &ret_size is not enough to hold the alternative 
-  * name. In that case &ret_size will be updated. If everything was ok the type of alternative 
-  * name is returned. The type is one of the enumerated gnutls_x509_subject_alt_name_t.
-  *
-  * If the certificate does not have an Alternative name with the specified 
-  * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-  *
-  **/
-int
-gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
-				      unsigned int seq, void *ret,
-				      size_t * ret_size,
-				      unsigned int *critical)
+static int
+get_subject_alt_name (gnutls_x509_crt_t cert,
+		      unsigned int seq, void *ret,
+		      size_t * ret_size,
+		      unsigned int *critical,
+		      int othername_oid)
 {
   int result;
   gnutls_datum_t dnsname;
@@ -971,7 +978,7 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
       return _gnutls_asn2err (result);
     }
 
-  result = parse_general_name (c2, "", seq, ret, ret_size);
+  result = parse_general_name (c2, "", seq, ret, ret_size, othername_oid);
 
   asn1_delete_structure (&c2);
 
@@ -983,6 +990,77 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
   type = result;
 
   return type;
+}
+
+/**
+  * gnutls_x509_crt_get_subject_alt_name - Get certificate's alternative name, if any
+  * @cert: should contain a gnutls_x509_crt_t structure
+  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+  * @ret: is the place where the alternative name will be copied to
+  * @ret_size: holds the size of ret.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the alternative names, contained in the
+  * given certificate.
+  *
+  * This is specified in X509v3 Certificate Extensions.  GNUTLS will
+  * return the Alternative name (2.5.29.17), or a negative error code.
+  *
+  * When the SAN type is otherName, it will extract the data in the
+  * otherName's value field.  If the otherName OID type is not known,
+  * the type returned will be %GNUTLS_SAN_OTHERNAME.  You may use
+  * gnutls_x509_crt_get_subject_alt_othername_oid() to get the
+  * corresponding OID.  If the otherName OID is known, the type
+  * returned will be one of the virtual SAN types (e.g.,
+  * %GNUTLS_SAN_OTHERNAME_XMPP).
+  *
+  * Returns the alternative subject name type on success.  The type is
+  * one of the enumerated gnutls_x509_subject_alt_name_t.  It will
+  * return %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large
+  * enough to hold the value.  In that case @ret_size will be updated
+  * with the required size.  If the certificate does not have an
+  * Alternative name with the specified sequence number then
+  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+  **/
+int
+gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
+				      unsigned int seq, void *ret,
+				      size_t * ret_size,
+				      unsigned int *critical)
+{
+  return get_subject_alt_name (cert, seq, ret, ret_size, critical, 0);
+}
+
+/**
+ * gnutls_x509_crt_get_subject_alt_othername_oid - Get SAN otherName OID
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+ * @ret: is the place where the otherName OID will be copied to
+ * @ret_size: holds the size of ret.
+ *
+ * This function will return the OID of an otherName type of Subject
+ * Alternative Names, contained in the given certificate.
+ *
+ * This function is only useful if
+ * gnutls_x509_crt_get_subject_alt_name() returned
+ * %GNUTLS_SAN_OTHERNAME, or one of the virtual SAN types (e.g.,
+ * %GNUTLS_SAN_OTHERNAME_XMPP).
+ *
+ * Returns 0 on success.  It will return %GNUTLS_E_SHORT_MEMORY_BUFFER
+ * if @ret_size is not large enough to hold the value.  In that case
+ * @ret_size will be updated with the required size.  If the
+ * certificate does not have an Alternative name with the specified
+ * sequence number and with the otherName type then
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+ *
+ **/
+int
+gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
+					       unsigned int seq,
+					       void *ret,
+					       size_t * ret_size)
+{
+  return get_subject_alt_name (cert, seq, ret, ret_size, NULL, 1);
 }
 
 /**
@@ -1854,7 +1932,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
    */
   _gnutls_str_cpy (name, sizeof (name), "?1.distributionPoint.fullName");
 
-  result = parse_general_name (c2, name, seq, ret, ret_size);
+  result = parse_general_name (c2, name, seq, ret, ret_size, 0);
   if (result < 0)
     {
       asn1_delete_structure (&c2);

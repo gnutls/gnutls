@@ -177,6 +177,11 @@ extern "C"
 					    unsigned int seq, void *ret,
 					    size_t * ret_size,
 					    unsigned int *critical);
+  int gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
+						     unsigned int seq,
+						     void *ret,
+						     size_t * ret_size);
+
   int gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert,
 				     unsigned int *critical);
   int gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
