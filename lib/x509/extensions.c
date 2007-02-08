@@ -957,8 +957,7 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
 					int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-  char str[128];
-  int len, result;
+  int result;
   gnutls_datum_t value;
 
   if ((result = asn1_create_element
@@ -1033,7 +1032,6 @@ _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
 				    gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-  const char *str;
   int result;
 
   result = asn1_create_element (_gnutls_get_pkix (),
