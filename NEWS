@@ -259,6 +259,30 @@ This fixes the following error message:
 configure: error: conditional "HAVE_LD_OUTPUT_DEF" was never defined.
 Reported by "Michael C. Vergallen" <mvergall@telenet.be>.
 
+* Version 1.6.1 (released 2006-12-28)
+
+** Fix the list of trusted CAs that server's send to clients.
+Before, the list contained issuer DN's instead of subject DN's of the
+trusted CAs.  Reported by Max Kellermann <max@duempel.org>.
+
+** Fix gnutls_certificate_set_x509_crl to initialize the CRL before using it.
+Reported by Max Kellermann <max@duempel.org>.
+
+** Encode UID fields in DN's as DirectoryString.
+Before GnuTLS encoded and parsed UID fields as IA5String.  This was
+incorrect, it should have used DirectoryString.  Now it will use
+DirectoryString for the UID field, but for backwards compatibility it
+will also accept IA5String UID's.  Reported by Max Kellermann
+<max@duempel.org>.
+
+** Fix ./configure failure with non-GCC compilers.
+This fixes the following error message:
+configure: error: conditional "HAVE_LD_OUTPUT_DEF" was never defined.
+Reported by "Michael C. Vergallen" <mvergall@telenet.be>.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.6.0 (released 2006-11-17)
 
 ** No changes since 1.5.5.
@@ -476,6 +500,100 @@ Reported by Daniel Black <dragonheart@gentoo.org>.
 See http://www.gnu.org/software/gnutls/security.html regardging
 GNUTLS-SA-2006-2 for more up to date information.  Reported by
 satyakumar <satyam_kkd@hyd.hellosoft.com>.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 1.4.5 (released 2006-11-06)
+
+** When a GnuTLS server receive a SSLv2 Client Hello for an unknown TLS
+** version, try to negotiate the highest version support by the GnuTLS server,
+** instead of the lowest.
+Reported by <Pasi.Eronen@nokia.com>.
+
+** Fix typo in doc/examples/ex-serv-pgp.c.
+Reported by Adam Langley" <agl@imperialviolet.org>.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 1.4.4 (released 2006-09-12)
+
+** Relax the test that caught signatures that exploit the variant of
+** Bleichenbacher's Crypto 06 rump session attack on our
+** verification logic flaw.
+In particular, we now permit the digestAlgorithm.parameters field to
+be present but empty, whereas in 1.4.3 we actually checked that the
+field was absent.
+
+** Revert the removal of debug information for the GNUTLS-SA-2006-3 problem.
+The messages are only printed in debug mode, which is not recommended
+for normal use, and thus logging this situation cannot be abused as an
+oracle in typical recommended situations.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 1.4.3 (released 2006-09-08)
+
+** Fix PKCS#1 verification to avoid a variant of Bleichenbacher's
+** Crypto 06 rump session attack.
+In particular, we check that the digestAlgorithm.parameters field is
+empty, to avoid that it can contain "garbage" that may be used to
+alter the numeric properties of the signature.  See
+<http://www.imc.org/ietf-openpgp/mail-archive/msg14307.html> (which is
+not exactly the same as the problem we fix here).  Reported by Yutaka
+OIWA <y.oiwa@aist.go.jp>.
+
+See GNUTLS-SA-2006-4 on http://www.gnutls.org/security.html for more
+up to date information.
+
+** Fix PKCS#1 decryption to avoid Bleichenbacher's Crypto 98 attack.
+See <http://www.bell-labs.com/user/bleichen/papers/pkcs.ps.gz>.
+Reported by Werner Koch <wk@gnupg.org>.
+
+See GNUTLS-SA-2006-3 on http://www.gnutls.org/security.html for more
+up to date information.
+
+** Fix crash in gnutls_x509_crt_sign2 if passed a NULL issuer_key.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 1.4.2 (released 2006-08-12)
+
+** Fix a crash (strcmp() on a NULL value) in the certificate verification logic.
+This can happen if you call gnutls_certificate_verify_peers2 and have
+a certain mix of local CA certificates and the peer send special
+certificates, that together trigger certain behaviour.  It is not
+known at this point whether the crash can be triggered without the
+special local CA certificate, and thus turn this into a remote crash
+of clients that verify server certificates when they talk to a server
+with the special server certificate.  See GNUTLS-SA-2006-2 on
+http://www.gnu.org/software/gnutls/security.html for more up to date
+information.  Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
+
+** Change SRP and Cert-Type extensions to match IANA registry.
+
+** OpenCDK updated to 0.5.9 to fix some problems with OpenPGP support.
+
+** Make --without-included-libtasn1 work.
+Reported by Daniel Black <dragonheart@gentoo.org>.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 1.4.1 (released 2006-06-14)
+
+** Replaced inactive ifdefs to enable openpgp support in test programs.
+
+** Fixed bug in OpenPGP authentication handshake.
+
+** Fixed typographical in man pages.
+
+** Build fixes of the manual.
+
+** Added Swedish translation.
 
 ** API and ABI modifications:
 No changes since last version.
@@ -794,6 +912,35 @@ New functions to set PSK callback:
 Use size_t instead of int for output size parameter:
   gnutls_srp_base64_encode
   gnutls_srp_base64_decode
+
+* Version 1.2.11 (2006-05-11)
+- The function gnutls_x509_crt_to_xml is not supported any more, and
+  return an internal error.  The reason is that the function called
+  internal libtasn1 functions which are no longer exported from
+  libtasn1.
+- Updated libtasn1 requirement to 0.3.4 and refreshed internal mintiasn1.
+- Updated gnulib compatibility files.
+- Fixed _gnutls_x509_get_raw_crt_expiration_time and
+  _gnutls_x509_get_raw_crt_activation_time to return (time_t)-1 on errors.
+- API and ABI modifications:
+  No changes since last version.
+
+* Version 1.2.10 (2006-02-09)
+- Fix read out bounds bug in DER parser.  Reported by Evgeny Legerov
+  <admin@gleg.net>, and debugging help from Protover SSL.
+- Libtasn1 0.2.18 is now required (contains the previous bug fix).
+  The included version has been updated too.
+- Fix gnutls-cli STARTTLS hang when SIGINT is sent too quickly, thanks to
+  Otto Maddox <ottomaddox@fastmail.fm> and Nozomu Ando <nand@mac.com>.
+- Corrected a bug in certtool for 64 bit machines. Reported
+  by Max Kellermann <max@duempel.org>.
+- Corrected bugs in gnutls_certificate_set_x509_crl() and
+  gnutls_certificate_set_x509_trust(), that caused memory corruption if
+  more than one certificates were added. Report and patch by Max Kellermann.
+- Fixed bug in non-blocking gnutls_bye(). gnutls_record_send() will no 
+  longer invalidate a session if the underlying send fails, but it will 
+  prevent future writes. That is to allow reading the already received data.
+  Patches and bug reports by Yoann Vandoorselaere <yoann@prelude-ids.org>
 
 * Version 1.2.9 (2005-11-07)
 - Documentation was updated and improved.
@@ -1222,6 +1369,188 @@ LIBGNUTLS_VERSION_NUMBER: New CPP symbols, indicating the GnuTLS
 - Added gnutls_x509_crt_set_key_usage() and certtool can now set the
   certificate's key usage.
 - Added gnutls_openpgp_key_get_key_usage().
+
+* Version 1.0.25 (2005-04-27)
+- Corrected bug in record packet parsing that could lead
+  to a denial of service attack.
+- Corrected bug in RSA key export.
+
+* Version 1.0.24 (2005-01-18)
+- Corrected several bugs found by Marcin Garski <mgarski@post.pl>
+
+* Version 1.0.23 (2004-11-13)
+- Replace GNU LD version script with Libtool -export-symbols-regex,
+  from Joe Orton <joe@manyfish.co.uk>.
+- Copy libtasn1 has been updated to version 0.2.11.
+- Corrected the write of CRL distribution points.
+- It is now possible to generate PKCS#12 structures without private
+  keys using "certtool --to-p12", suggested by Fabian Fagerholm
+  <fabbe@paniq.net>.
+
+* Version 1.0.22 (2004-10-28)
+- Print DN of certificates with unknown characters in them, but in hexform
+  only.
+- Corrected bug in _gnutls_x509_get_dn_oid(), and returns the
+  actual OID.
+- Added second precision to the X.509 parsing functions.
+- Add parameter --la-file to libgnutls-config and libgnutls-extra-config,
+  tiny patch contributed by Joe Orton <joe@manyfish.co.uk>.
+- Add pkg-config meta files, suggested by Stéphane LOEUILLET
+  <stephane.loeuillet@tiscali.fr>.
+- Fix memory initializaion bug in gnutls_certificate_set_x509_trust,
+  tiny patch by Aleix Conchillo Flaque <aleix@member.fsf.org>.
+- Fix certtool --password for PKCS #12, back ported from 1.1.x branch.
+- Fix library order in libgnutls*-config --libs output, to permit
+  static linking, reported by Yoann Vandoorselaere
+  <yoann@prelude-ids.org>.
+
+* Version 1.0.21 (2004-10-07)
+- Fix memory leak in gnutls_certificate_verify_peers and
+  gnutls_certificate_free_credentials, report and patch by Simon
+  Posnjak <simon.posnjak@cetrtapot.si>.
+- Fix crash in `certtool --to-p12 --load-privkey foo', i.e. exporting
+  a key and no certificate to PKCS#12.
+- Fix objdir != srcdir builds, reported by "Gerrit P. Haase"
+  <gp@familiehaase.de>.
+- Avoid redefining getpass if system already has it, reported by
+  Yoann Vandoorselaere <yoann@prelude-ids.org>.
+- Add new example "ex-rfc2818" for certificate verification, from Nikos.
+- Known bug: the library require snprintf.
+
+* Version 1.0.20 (2004-08-18)
+- Bug fix of padding string in RSA PKCS#1 v1.5 type 2 encryption,
+  reported by Robey Pointer <robey@danger.com>.
+
+* Version 1.0.19 (2004-08-09)
+- Bug fix of test suite.
+
+* Version 1.0.18 (2004-08-05)
+- Added simple self test suite.
+
+* Version 1.0.17 (2004-08-02)
+- Updated the SRP authentication to conform to the
+  latest (yet unreleased) draft. Unfortunately this breaks
+  compatibility with previous versions.
+- Changed the makefiles to be more portable.
+- Added some default limits in the verification of certificate
+  chains, to avoid denial of service attacks. Also added 
+  gnutls_certificate_set_verify_limits() to override them.
+  Issue pointed out by Patrik Hornik <patrik@hornik.sk>.
+- Added gnutls_certificate_verify_peers2().
+
+* Version 1.0.16 (2004-07-10)
+- Do not free the SRP (prime and generator) parameters obtained from the 
+  callback if they are the static ones defined in extra.h.
+- Eliminated some memory leaks. Reported by Yoann Vandoorselaere.
+- Some fixes in the makefiles.
+
+* Version 1.0.15 (2004-06-29)
+- Fixed bug in RSA encryption, report and patch by Martijn Koster 
+  <mak@greenhills.co.uk>.
+- Corrected a bug in certificate verification. Pointed out by
+  Yoann Vandoorselaere <yoann@prelude-ids.org>.
+
+* Version 1.0.14 (2004-06-12)
+- Automatically disable certificate types that do not have corresponding
+  certificates.
+- Updates in the documentation.
+- certtool can now add ip address SAN extension.
+- certtool has now support for more X.520 DN attribute types.
+- Opencdk library is being included if not found.
+- Added gnutls_openpgp_keyring_check_id().
+- Corrected a serious bug in the included libtasn1 library.
+- Corrected session resuming in SRP ciphersuites.
+- Updated to conform to the latest srp draft (draft-ietf-tls-srp-07)
+- Added the functions gnutls_x509_crt_get_pk_rsa_raw() and
+  gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from certificates.
+- Some fixes in the session resuming code.
+
+* Version 1.0.13 (2004-04-29)
+- Some complilation fixes.
+- Added the --xml parameter to the certtool utility.
+
+* Version 1.0.12 (2004-04-23)
+- Corrected bug in OpenPGP key loading using a callback.
+- Renamed gnutls-srpcrypt to srptool
+- Allow handshake requests by the client.
+* Things backported from the development branch:
+- Added support for authority key identifier and the extended key usage
+  X.509 extension fields. The certtoool was updated to support them.
+- Added batch support to certtool. Now it can use templates.
+- The RC2 cipher is no more included. The one in libgcrypt is now used.
+
+* Version 1.0.11 (2004-04-17)
+- Added gnutls_sign_algorithm_get_name() and gnutls_pk_algorithm_get_name()
+- Corrected bug in TLS renegotiation.
+
+* Version 1.0.10 (2004-04-03)
+- Corrected bug in RSA parameters handling which could cause
+  unexpected crashes.
+- Corrected bug in SSL 3.0 authentication.
+
+* Version 1.0.9 (2004-03-29)
+- Added gnutls_certificate_set_params_function() and 
+  gnutls_anon_set_params_function() that set the RSA or DH
+  parameters using a callback.
+- Added functions gnutls_rsa_params_cpy(), gnutls_dh_params_cpy()
+  and gnutls_x509_privkey_cpy().
+- Corrected a compilation issue when opencdk was installed in a
+  non standard directory.
+- Documented the changes need in multi-threaded application due
+  to the new libgcrypt.
+
+* Version 1.0.8 (2004-02-28)
+- Corrected bug in mutual certificate authentication in SSL 3.0.
+
+* Version 1.0.7 (2004-02-25)
+- Implemented TLS 1.1 (and also obsoleted the TLS 1.0 CBC protection
+  hack).
+- Some updates in the documentation.
+
+* Version 1.0.6 (2004-02-12)
+* Backported things from the development branch (while maintaining
+  backwards compatibility):
+- Improved gnutls-cli's SRP behaviour in SRP ciphersuites.
+  If they are of highest priority then the abbreviated handshake
+  is used.
+- The error codes GNUTLS_E_NO_TEMPORARY_DH_PARAMS and GNUTLS_E_NO_TEMPORARY_RSA_PARAMS
+  are no longer returned by the handshake function. Ciphersuites that
+  require temporary parameters are removed when such parameters do not exist.
+- Added the callbacks gnutls_certificate_client_retrieve_function() and
+  gnutls_certificate_server_retrieve_function(), to allow a client or a server
+  to specify certificates for the handshake without storing them to the
+  credentials structure.
+- Added support for generating and exporting DSA private keys.
+
+* Version 1.0.5 (2004-02-11)
+- Fixed a bug where 'server name' extension was always sent.
+* Backported things from the development branch:
+- Added CRL verification functionality to certtool.
+- Corrected the CRL distribution point extension handling.
+- Added PKCS #7 support to certtool utility.
+- Added support for reading and generating CRL distribution
+  points extensions in certificates.
+- Added support for generating CRLs in the library and the
+  certtool utility.
+- Added support for the Subject Key ID PKIX extension.
+- Added the gnutls_sign_algorithm type.
+
+* Version 1.0.4 (2004-01-04)
+- Changed handshake behaviour to send the lowest TLS version
+  when an unsupported version was advertized. The current behaviour
+  is to send the maximum version we support.
+- certtool no longer asks the password in unencrypted private
+  keys.
+- The source is now compiled to use the reentrant libc functions.
+
+* Version 1.0.3 (2003-12-21)
+- Corrected bug in gnutls_bye() which made it return an error code
+  of INVALID_REQUEST instead of success.
+- Corrected a bug in the GNUTLS_KEY key usage definitions.
+
+* Version 1.0.2 (2003-12-18)
+- Corrected a bug in the RSA key generation. This was
+  generating unusable RSA keys.
 
 * Version 1.0.1 (2003-12-10)
 - Some minor fixes in the makefiles. They now include CFLAGS
