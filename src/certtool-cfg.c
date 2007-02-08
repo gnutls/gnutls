@@ -867,6 +867,8 @@ get_proxy_policy (char **policy, size_t *policylen)
   if (batch)
     {
       ret = cfg.proxy_policy_language;
+      if (!ret)
+	ret = "1.3.6.1.5.5.7.21.1";
     }
   else
     {
