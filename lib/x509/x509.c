@@ -898,6 +898,13 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 	  gnutls_assert ();
 	  return _gnutls_asn2err (result);
 	}
+
+      if (othername_oid)
+	{
+#define XMPP_OID "1.3.6.1.5.5.7.8.5"
+	  if (len > strlen (XMPP_OID) && strcmp (name, XMPP_OID) == 0)
+	    type = GNUTLS_SAN_OTHERNAME_XMPP;
+	}
     }
   else if (othername_oid)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
