@@ -879,10 +879,7 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
   if (type == GNUTLS_SAN_OTHERNAME)
     {
       if (othername_oid)
-	{
-	  _gnutls_str_cat (nptr, sizeof (nptr), ".otherName.type-id");
-	  type = 0;
-	}
+	_gnutls_str_cat (nptr, sizeof (nptr), ".otherName.type-id");
       else
 	_gnutls_str_cat (nptr, sizeof (nptr), ".otherName.value");
 
