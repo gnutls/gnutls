@@ -1007,11 +1007,9 @@ get_subject_alt_name (gnutls_x509_crt_t cert,
   * return the Alternative name (2.5.29.17), or a negative error code.
   *
   * When the SAN type is otherName, it will extract the data in the
-  * otherName's value field.  If the otherName OID type is not known,
-  * the type returned will be %GNUTLS_SAN_OTHERNAME.  You may use
-  * gnutls_x509_crt_get_subject_alt_othername_oid() to get the
-  * corresponding OID.  If the otherName OID is known, the type
-  * returned will be one of the virtual SAN types (e.g.,
+  * otherName's value field, and %GNUTLS_SAN_OTHERNAME is returned.
+  * You may use gnutls_x509_crt_get_subject_alt_othername_oid() to get
+  * the corresponding OID and the "virtual" SAN types (e.g.,
   * %GNUTLS_SAN_OTHERNAME_XMPP).
   *
   * Returns the alternative subject name type on success.  The type is
@@ -1038,21 +1036,24 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
  * @ret: is the place where the otherName OID will be copied to
  * @ret_size: holds the size of ret.
  *
- * This function will return the OID of an otherName type of Subject
- * Alternative Names, contained in the given certificate.
+ * This function will extract the type OID of an otherName Subject
+ * Alternative Name, contained in the given certificate, and return
+ * the type as an enumerated element.
  *
  * This function is only useful if
  * gnutls_x509_crt_get_subject_alt_name() returned
- * %GNUTLS_SAN_OTHERNAME, or one of the virtual SAN types (e.g.,
- * %GNUTLS_SAN_OTHERNAME_XMPP).
+ * %GNUTLS_SAN_OTHERNAME.
  *
- * Returns 0 on success.  It will return %GNUTLS_E_SHORT_MEMORY_BUFFER
- * if @ret_size is not large enough to hold the value.  In that case
- * @ret_size will be updated with the required size.  If the
- * certificate does not have an Alternative name with the specified
- * sequence number and with the otherName type then
- * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
- *
+ * Returns the alternative subject name type on success.  The type is
+ * one of the enumerated gnutls_x509_subject_alt_name_t.  For
+ * supported OIDs, it will return one of the virtual
+ * (GNUTLS_SAN_OTHERNAME_*) types, e.g. %GNUTLS_SAN_OTHERNAME_XMPP,
+ * and %GNUTLS_SAN_OTHERNAME for unknown OIDs.  It will return
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough to
+ * hold the value.  In that case @ret_size will be updated with the
+ * required size.  If the certificate does not have an Alternative
+ * name with the specified sequence number and with the otherName type
+ * then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  **/
 int
 gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
