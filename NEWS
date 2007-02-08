@@ -35,9 +35,13 @@ The function is gnutls_x509_crt_get_signature.
 If you don't specify a proxy policy in batch mode, it will use
 id-ppl-inheritALL.
 
+** Add API to print information about X.509 certificates.
+The function is gnutls_x509_crt_print.
+
 ** Doc fixes.
 
 ** API and ABI modifications:
+gnutls_x509_crt_print: ADD
 gnutls_x509_crt_get_signature: ADD.
 gnutls_x509_crt_get_extension_data: ADD.
 gnutls_x509_crt_get_extension_info: ADD.
