@@ -121,6 +121,8 @@ extern "C"
 				      const char *hostname);
 
   int gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert);
+  int gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
+				     char *sig, size_t *sizeof_sig);
   int gnutls_x509_crt_get_version (gnutls_x509_crt_t cert);
   int gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt,
 				  unsigned int flags,

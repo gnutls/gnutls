@@ -497,6 +497,62 @@ gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert)
 }
 
 /**
+ * gnutls_x509_crt_get_signature - Returns the Certificate's signature
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @sig: a pointer where the signature part will be copied (may be null).
+ * @sizeof_sig: initially holds the size of @sig
+ *
+ * This function will extract the signature field of a certificate.
+ *
+ * Returns 0 on success, and a negative value on error.
+ **/
+int
+gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
+			       char *sig, size_t *sizeof_sig)
+{
+  int result;
+  gnutls_datum_t sa;
+  int bits, len;
+
+  if (cert == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  bits = 0;
+  result = asn1_read_value (cert->cert, "signature", NULL, &bits);
+  if (result != ASN1_MEM_ERROR)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  if (bits % 8 != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CERTIFICATE_ERROR;
+    }
+
+  len = bits / 8;
+
+  if (*sizeof_sig < len)
+    {
+      *sizeof_sig = bits / 8;
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+  result = asn1_read_value (cert->cert, "signature", sig, &len);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return 0;
+}
+
+/**
   * gnutls_x509_crt_get_version - This function returns the Certificate's version number
   * @cert: should contain a gnutls_x509_crt_t structure
   *

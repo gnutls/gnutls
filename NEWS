@@ -28,6 +28,9 @@ The existing APIs gnutls_x509_crt_get_extension_oid() and
 gnutls_x509_crt_get_extension_by_oid() does not permit callers to
 inspect the extensions in the order defined by the certificate.
 
+** Add API to extract signature value from X.509 certificates.
+The function is gnutls_x509_crt_get_signature.
+
 ** Fix crash when generating proxy certificates in batch mode.
 If you don't specify a proxy policy in batch mode, it will use
 id-ppl-inheritALL.
@@ -35,6 +38,7 @@ id-ppl-inheritALL.
 ** Doc fixes.
 
 ** API and ABI modifications:
+gnutls_x509_crt_get_signature: ADD.
 gnutls_x509_crt_get_extension_data: ADD.
 gnutls_x509_crt_get_extension_info: ADD.
 gnutls_x509_crt_get_subject_alt_othername_oid: ADD.
