@@ -1075,7 +1075,12 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
  * @out: Newly allocated zero terminated string with information.
  *
  * This function will pretty print a X.509 certificate, suitable for
- * displaying to a human.
+ * display to a human.
+ *
+ * If the format is %GNUTLS_X509_CRT_FULL then all fields of the
+ * certificate will be output, on multiple lines.  The
+ * %GNUTLS_X509_CRT_ONELINE format will generate one line with some
+ * selected fields, which is useful for logging purposes.
  *
  * Returns 0 on success.
  **/
