@@ -1412,10 +1412,13 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 	    ret = gnutls_x509_crt_get_subject_alt_othername_oid
 	      (crt, i, buffer, &size);
 	    if (ret < 0)
-	      printf ("\t\t\tError decoding otherName OID: %s\n",
-		      gnutls_strerror (ret));
+	      fprintf (out, "\t\t\tError decoding otherName OID: %s\n",
+		       gnutls_strerror (ret));
 	    else
-	      printf ("\t\t\tOID: %.*s\n", size, buffer);
+	      fprintf (out, "\t\t\tOID: %.*s", size, buffer);
+	    if (ret == GNUTLS_SAN_OTHERNAME_XMPP)
+	      fprintf (out, " (id-on-xmppAddr)");
+	    fprintf (out, "\n");
 	    break;
 	  }
     }
