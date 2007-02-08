@@ -2406,6 +2406,33 @@ certtool --generate-certificate --load-privkey x509-server-key.pem \
 ...
 @end example
 
+For use in the client, you may want to generate a client certificate
+as well.
+
+@example
+certtool --generate-privkey > x509-client-key.pem
+echo 'cn = GnuTLS test client' > client.tmpl
+echo 'tls_www_client' >> client.tmpl
+echo 'encryption_key' >> client.tmpl
+echo 'signing_key' >> client.tmpl
+certtool --generate-certificate --load-privkey x509-client-key.pem \
+  --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
+  --template client.tmpl --outfile x509-client.pem
+...
+@end example
+
+For icing, we'll create a proxy certificate for the client too.
+
+@example
+certtool --generate-privkey > x509-proxy-key.pem
+echo 'cn = GnuTLS test client proxy' > proxy.tmpl
+certtool --generate-proxy --load-privkey x509-proxy-key.pem \
+  --load-ca-certificate x509-client.pem --load-ca-privkey x509-client-key.pem \
+  --load-certificate x509-client.pem --template proxy.tmpl \
+  --outfile x509-proxy.pem
+...
+@end example
+
 Then start the server again:
 
 @example
