@@ -815,8 +815,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		}
 	      addf (str, "\n");
 
-	      addf (str, "\t\t\tHexdump:\n");
-	      hexdump (str, buffer, extlen, "\t\t");
+	      addf (str, "\t\t\tHexdump: ");
+	      hexprint (str, buffer, extlen);
+	      adds (str, "\n");
 
 	      gnutls_free (buffer);
 	    }
