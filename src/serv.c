@@ -422,8 +422,9 @@ initialize_session (void)
 }
 
 static const char DEFAULT_DATA[] =
-  "This is the default message reported by the GnuTLS implementation.  For "
-  "more information please visit <http://www.gnutls.org/>.";
+  "This is the default message reported by the GnuTLS implementation. "
+  "For more information please visit "
+  "<a href=\"http://www.gnutls.org/\">http://www.gnutls.org/</a>.";
 
 /* Creates html with the current session information.
  */
@@ -562,7 +563,7 @@ peer_print_info (gnutls_session session, int *ret_length, const char *header)
   sprintf (tmp2, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
 	   tmp);
 
-  strcat (http_buffer, "<hr><P>Your header was:<PRE>");
+  strcat (http_buffer, "<hr><P>Your HTTP header was:<PRE>");
   strcat (http_buffer, header);
   strcat (http_buffer, "</PRE></P>");
 
