@@ -1055,7 +1055,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
  * gnutls_x509_crt_print - Pretty print X.509 certificates
  * @cert: The structure to be initialized
  * @format: Indicate the format to use
- * @out: Newly allocated zero terminated string with information.
+ * @out: Newly allocated datum with zero terminated string.
  *
  * This function will pretty print a X.509 certificate, suitable for
  * display to a human.
@@ -1065,12 +1065,14 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
  * %GNUTLS_X509_CRT_ONELINE format will generate one line with some
  * selected fields, which is useful for logging purposes.
  *
+ * The output @out needs to be deallocate using gnutls_free().
+ *
  * Returns 0 on success.
  **/
 int
 gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 		       gnutls_certificate_print_formats_t format,
-		       char **out)
+		       gnutls_datum_t *out)
 {
   gnutls_string str;
 
@@ -1087,7 +1089,8 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
       print_other (&str, cert);
 
       _gnutls_string_append_data (&str, "\0", 1);
-      *out = str.data;
+      out->data = str.data;
+      out->size = strlen (str.data);
     }
   else if (format == GNUTLS_X509_CRT_ONELINE)
     {
@@ -1096,7 +1099,8 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
       print_oneline (&str, cert);
 
       _gnutls_string_append_data (&str, "\0", 1);
-      *out = str.data;
+      out->data = str.data;
+      out->size = strlen (str.data);
     }
   else
     {
