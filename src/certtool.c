@@ -1220,17 +1220,17 @@ print_hex_datum (gnutls_datum * dat)
 static void
 print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 {
-  gnutls_datum_t out;
+  gnutls_datum_t info;
   int ret;
 
   if (all)
-    ret = gnutls_x509_crt_print (crt, GNUTLS_X509_CRT_FULL, &out);
+    ret = gnutls_x509_crt_print (crt, GNUTLS_X509_CRT_FULL, &info);
   else
-    ret = gnutls_x509_crt_print (crt, GNUTLS_X509_CRT_UNSIGNED_FULL, &out);
+    ret = gnutls_x509_crt_print (crt, GNUTLS_X509_CRT_UNSIGNED_FULL, &info);
   if (ret == 0)
     {
-      fprintf (out, "%s\n", out.data);
-      gnutls_free (out.data);
+      fprintf (out, "%s\n", info.data);
+      gnutls_free (info.data);
     }
 
   if (out == stderr && batch == 0)	/* interactive */
