@@ -89,6 +89,7 @@ AC_DEFUN([lgl_INIT],
   gl_TIME_R
   gl_HEADER_UNISTD
   gl_FUNC_VASNPRINTF
+  gl_FUNC_VASPRINTF
   gl_WCHAR_H
   gl_XSIZE
   m4_popdef([AC_LIBSOURCES])
@@ -135,6 +136,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/arctwo.c
   lib/arctwo.h
   lib/asnprintf.c
+  lib/asprintf.c
   lib/des.c
   lib/des.h
   lib/dummy.c
@@ -183,6 +185,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/unistd_.h
   lib/vasnprintf.c
   lib/vasnprintf.h
+  lib/vasprintf.c
+  lib/vasprintf.h
   lib/wchar_.h
   lib/xsize.h
   m4/absolute-header.m4
@@ -256,6 +260,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/ulonglong.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
+  m4/vasprintf.m4
   m4/visibility.m4
   m4/wchar.m4
   m4/wchar_t.m4
