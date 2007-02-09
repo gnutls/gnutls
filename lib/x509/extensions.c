@@ -997,13 +997,16 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
       return result;
     }
 
-  *policyLanguage = gnutls_strdup (value.data);
+  if (policyLanguage)
+    *policyLanguage = gnutls_strdup (value.data);
 
   result = _gnutls_x509_read_value (ext, "proxyPolicy.policy", &value, 0);
   if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
     {
-      *policy = NULL;
-      *sizeof_policy = 0;
+      if (policy)
+	*policy = NULL;
+      if (sizeof_policy)
+	*sizeof_policy = 0;
     }
   else if (result < 0)
     {
@@ -1013,8 +1016,10 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
     }
   else
     {
-      *policy = value.data;
-      *sizeof_policy = value.size;
+      if (policy)
+	*policy = value.data;
+      if (sizeof_policy)
+	*sizeof_policy = value.size;
     }
 
   asn1_delete_structure (&ext);
