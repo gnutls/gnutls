@@ -258,19 +258,19 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
       switch (err)
 	{
 	case GNUTLS_SAN_DNSNAME:
-	  addf (str, "\t\t\tDNSname: %s\n", buffer);
+	  addf (str, "\t\t\tDNSname: %.*s\n", size, buffer);
 	  break;
 
 	case GNUTLS_SAN_RFC822NAME:
-	  addf (str, "\t\t\tRFC822name: %s\n", buffer);
+	  addf (str, "\t\t\tRFC822name: %.*s\n", size, buffer);
 	  break;
 
 	case GNUTLS_SAN_URI:
-	  addf (str, "\t\t\tURI: %s\n", buffer);
+	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
 	  break;
 
 	case GNUTLS_SAN_IPADDRESS:
-	  addf (str, "\t\t\tIPAddress: %s\n", buffer);
+	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
 	  break;
 
 	default:
@@ -397,19 +397,19 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert, int san_idx)
   switch (err)
     {
     case GNUTLS_SAN_DNSNAME:
-      addf (str, "\t\t\tDNSname: %s\n", buffer);
+      addf (str, "\t\t\tDNSname: %.*s\n", size, buffer);
       break;
 
     case GNUTLS_SAN_RFC822NAME:
-      addf (str, "\t\t\tRFC822name: %s\n", buffer);
+      addf (str, "\t\t\tRFC822name: %.*s\n", size, buffer);
       break;
 
     case GNUTLS_SAN_URI:
-      addf (str, "\t\t\tURI: %s\n", buffer);
+      addf (str, "\t\t\tURI: %.*s\n", size, buffer);
       break;
 
     case GNUTLS_SAN_IPADDRESS:
-      addf (str, "\t\t\tIPAddress: %s\n", buffer);
+      addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
       break;
 
     case GNUTLS_SAN_OTHERNAME:
