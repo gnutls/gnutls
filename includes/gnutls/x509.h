@@ -299,7 +299,7 @@ extern "C"
 
   int gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 			     gnutls_certificate_print_formats_t format,
-			     char **out);
+			     gnutls_datum_t *out);
 
 /* RDN handling.
  */
