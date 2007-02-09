@@ -166,52 +166,6 @@ generate_private_key_int (void)
 }
 
 static void
-print_key_usage (unsigned int x, FILE *out)
-{
-  if (x & GNUTLS_KEY_DIGITAL_SIGNATURE)
-    fprintf (out, "\t\tDigital signature.\n");
-  if (x & GNUTLS_KEY_NON_REPUDIATION)
-    fprintf (out, "\t\tNon repudiation.\n");
-  if (x & GNUTLS_KEY_KEY_ENCIPHERMENT)
-    fprintf (out, "\t\tKey encipherment.\n");
-  if (x & GNUTLS_KEY_DATA_ENCIPHERMENT)
-    fprintf (out, "\t\tData encipherment.\n");
-  if (x & GNUTLS_KEY_KEY_AGREEMENT)
-    fprintf (out, "\t\tKey agreement.\n");
-  if (x & GNUTLS_KEY_KEY_CERT_SIGN)
-    fprintf (out, "\t\tCertificate signing.\n");
-  if (x & GNUTLS_KEY_CRL_SIGN)
-    fprintf (out, "\t\tCRL signing.\n");
-  if (x & GNUTLS_KEY_ENCIPHER_ONLY)
-    fprintf (out, "\t\tKey encipher only.\n");
-  if (x & GNUTLS_KEY_DECIPHER_ONLY)
-    fprintf (out, "\t\tKey decipher only.\n");
-}
-
-static void
-print_key_purpose (const char *x, FILE *out)
-{
-  if (strcasecmp (x, GNUTLS_KP_TLS_WWW_SERVER) == 0)
-    fprintf (out, "\t\tTLS WWW Server.\n");
-  else if (strcasecmp (x, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
-    fprintf (out, "\t\tTLS WWW Client.\n");
-  else if (strcasecmp (x, GNUTLS_KP_CODE_SIGNING) == 0)
-    fprintf (out, "\t\tCode signing.\n");
-  else if (strcasecmp (x, GNUTLS_KP_EMAIL_PROTECTION) == 0)
-    fprintf (out, "\t\tEmail protection.\n");
-  else if (strcasecmp (x, GNUTLS_KP_TIME_STAMPING) == 0)
-    fprintf (out, "\t\tTime stamping.\n");
-  else if (strcasecmp (x, GNUTLS_KP_OCSP_SIGNING) == 0)
-    fprintf (out, "\t\tOCSP signing.\n");
-  else if (strcasecmp (x, GNUTLS_KP_ANY) == 0)
-    fprintf (out, "\t\tAny purpose.\n");
-  else
-    fprintf (out, "\t\t%s\n", x);
-}
-
-
-
-static void
 print_private_key (gnutls_x509_privkey key)
 {
   int ret;
