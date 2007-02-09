@@ -94,7 +94,7 @@ print_proxy (gnutls_string * str, gnutls_x509_crt_t cert)
 				   &policy, &npolicy);
   if (err < 0)
     {
-      addf (str, "error: get proxy: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_proxy: %s\n", gnutls_strerror (err));
       return;
     }
 
@@ -136,7 +136,7 @@ print_ski (gnutls_string * str, gnutls_x509_crt_t cert)
   if (err < 0)
     {
       gnutls_free (buffer);
-      addf (str, "error: get_subject_key_id: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_subject_key_id2: %s\n", gnutls_strerror (err));
       return;
     }
 
@@ -172,7 +172,7 @@ print_aki (gnutls_string * str, gnutls_x509_crt_t cert)
   if (err < 0)
     {
       gnutls_free (buffer);
-      addf (str, "error: get_authority_key_id: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_authority_key_id2: %s\n", gnutls_strerror (err));
       return;
     }
 
@@ -298,7 +298,8 @@ print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
 	return;
       if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	{
-	  addf (str, "error: get_key_purpose: %s\n", gnutls_strerror (err));
+	  addf (str, "error: get_key_purpose_oid: %s\n",
+		gnutls_strerror (err));
 	  return;
 	}
 
@@ -314,7 +315,8 @@ print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
       if (err < 0)
 	{
 	  gnutls_free (buffer);
-	  addf (str, "error: get_key_purpose2: %s\n", gnutls_strerror (err));
+	  addf (str, "error: get_key_purpose_oid2: %s\n",
+		gnutls_strerror (err));
 	  return;
 	}
 
@@ -348,7 +350,7 @@ print_basic (gnutls_string * str, gnutls_x509_crt_t cert)
   err = gnutls_x509_crt_get_basic_constraints (cert, NULL, NULL, &pathlen);
   if (err < 0)
     {
-      addf (str, "error: get basic constraints: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_basic_constraints: %s\n", gnutls_strerror (err));
       return;
     }
 
@@ -372,7 +374,7 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert, int san_idx)
 					      NULL);
   if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
-      addf (str, "error: get subject alt name: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_subject_alt_name: %s\n", gnutls_strerror (err));
       return;
     }
 
@@ -388,7 +390,7 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert, int san_idx)
   if (err < 0)
     {
       gnutls_free (buffer);
-      addf (str, "error: get subject alt name: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_subject_alt_name2: %s\n", gnutls_strerror (err));
       return;
     }
 
@@ -424,7 +426,7 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert, int san_idx)
 	(cert, san_idx, buffer, &size);
       if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	{
-	  addf (str, "error: decoding otherName OID: %s\n",
+	  addf (str, "error: get_subject_alt_othername_oid: %s\n",
 		gnutls_strerror (err));
 	  return;
 	}
@@ -441,7 +443,7 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert, int san_idx)
       if (err < 0)
 	{
 	  gnutls_free (buffer);
-	  addf (str, "error: decoding otherName OID: %s\n",
+	  addf (str, "error: get_subject_alt_othername_oid2: %s\n",
 		gnutls_strerror (err));
 	  return;
 	}
@@ -467,7 +469,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
   {
     int version = gnutls_x509_crt_get_version (cert);
     if (version < 0)
-      addf (str, "error: version: %s\n", gnutls_strerror (version));
+      addf (str, "error: get_version: %s\n", gnutls_strerror (version));
     else
       addf (str, "\tVersion: %d\n", version);
   }
@@ -480,7 +482,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 
     err = gnutls_x509_crt_get_serial (cert, serial, &serial_size);
     if (err < 0)
-      addf (str, "error: serial: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_serial: %s\n", gnutls_strerror (err));
     else if (serial_size == 0)
       addf (str, "\tSerial Number (hex): 00\n");
     else
@@ -501,7 +503,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 
     err = gnutls_x509_crt_get_issuer_dn (cert, dn, &dn_size);
     if (err < 0)
-      addf (str, "error: issuer: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_issuer_dn: %s\n", gnutls_strerror (err));
     else
       addf (str, "\tIssuer: %s\n", dn);
   }
@@ -519,9 +521,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r failed (%d)\n", t);
+	addf (str, "error: gmtime_r (%d)\n", t);
       else if (strftime (s, max, "%a %b %e %H:%M:%S %Z %Y", &t) == 0)
-	addf (str, "error: strftime failed (%d)\n", t);
+	addf (str, "error: strftime (%d)\n", t);
       else
 	addf (str, "\t\tNot Before: %s\n", s);
     }
@@ -533,9 +535,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r failed (%d)\n", t);
+	addf (str, "error: gmtime_r (%d)\n", t);
       else if (strftime (s, max, "%a %b %e %H:%M:%S %Z %Y", &t) == 0)
-	addf (str, "error: strftime failed (%d)\n", t);
+	addf (str, "error: strftime (%d)\n", t);
       else
 	addf (str, "\t\tNot After: %s\n", s);
     }
@@ -549,7 +551,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 
     err = gnutls_x509_crt_get_dn (cert, dn, &dn_size);
     if (err < 0)
-      addf (str, "error: subject: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
     else
       addf (str, "\tSubject: %s\n", dn);
   }
@@ -561,7 +563,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 
     err = gnutls_x509_crt_get_pk_algorithm (cert, &bits);
     if (err < 0)
-      addf (str, "error: public key info: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_pk_algorithm: %s\n", gnutls_strerror (err));
     else
       {
 	const char *name = gnutls_pk_algorithm_get_name (err);
@@ -577,8 +579,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 
 	      err = gnutls_x509_crt_get_pk_rsa_raw (cert, &m, &e);
 	      if (err < 0)
-		addf (str,
-		      "error: RSA public key: %s\n", gnutls_strerror (err));
+		addf (str, "error: get_pk_rsa_raw: %s\n",
+		      gnutls_strerror (err));
 	      else
 		{
 		  addf (str, "\t\tModulus (bits %d):\n", bits);
@@ -595,8 +597,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 
 	      err = gnutls_x509_crt_get_pk_dsa_raw (cert, &p, &q, &g, &y);
 	      if (err < 0)
-		addf (str,
-		      "error: DSA public key: %s\n", gnutls_strerror (err));
+		addf (str, "error: get_pk_dsa_raw: %s\n",
+		      gnutls_strerror (err));
 	      else
 		{
 		  addf (str, "\t\tPublic key (bits %d):\n", bits);
@@ -645,7 +647,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 	    {
 	      if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 		break;
-	      addf (str, "error: get extension: %s\n", gnutls_strerror (err));
+	      addf (str, "error: get_extension_info: %s\n",
+		    gnutls_strerror (err));
 	      continue;
 	    }
 
@@ -779,7 +782,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 							NULL, &extlen);
 	      if (err < 0)
 		{
-		  addf (str, "error: get extension oid: %s\n",
+		  addf (str, "error: get_extension_data: %s\n",
 			gnutls_strerror (err));
 		  continue;
 		}
@@ -796,7 +799,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 	      if (err < 0)
 		{
 		  gnutls_free (buffer);
-		  addf (str, "error: get extension oid: %s\n",
+		  addf (str, "error: get_extension_data2: %s\n",
 			gnutls_strerror (err));
 		  continue;
 		}
@@ -827,7 +830,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
 
     err = gnutls_x509_crt_get_signature_algorithm (cert);
     if (err < 0)
-      addf (str, "error: signature: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_signature_algorithm: %s\n",
+	    gnutls_strerror (err));
     else
       {
 	const char *name = gnutls_sign_algorithm_get_name (err);
@@ -916,7 +920,7 @@ print_keyid (gnutls_string * str, gnutls_x509_crt_t cert)
   if (err < 0)
     {
       gnutls_free (buffer);
-      addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_key_id2: %s\n", gnutls_strerror (err));
       return;
     }
 
