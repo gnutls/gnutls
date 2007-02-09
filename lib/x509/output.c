@@ -521,7 +521,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
       if (gmtime_r (&tim, &t) == NULL)
 	addf (str, "error: gmtime_r failed (%d)\n", t);
       else if (strftime (s, max, "%a %b %e %H:%M:%S %Z %Y", &t) == 0)
-	strcpy (s, "strftime failed (%d)\n", t);
+	addf (str, "error: strftime failed (%d)\n", t);
       else
 	addf (str, "\t\tNot Before: %s\n", s);
     }
@@ -535,7 +535,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert)
       if (gmtime_r (&tim, &t) == NULL)
 	addf (str, "error: gmtime_r failed (%d)\n", t);
       else if (strftime (s, max, "%a %b %e %H:%M:%S %Z %Y", &t) == 0)
-	strcpy (s, "strftime failed (%d)\n", t);
+	addf (str, "error: strftime failed (%d)\n", t);
       else
 	addf (str, "\t\tNot After: %s\n", s);
     }
