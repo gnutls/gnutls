@@ -295,6 +295,7 @@ extern "C"
     {
       GNUTLS_X509_CRT_FULL,
       GNUTLS_X509_CRT_ONELINE,
+      GNUTLS_X509_CRT_UNSIGNED_FULL
     } gnutls_certificate_print_formats_t;
 
   int gnutls_x509_crt_print (gnutls_x509_crt_t cert,

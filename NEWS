@@ -42,6 +42,7 @@ The function is gnutls_x509_crt_print.
 
 ** API and ABI modifications:
 gnutls_x509_crt_print: ADD
+gnutls_certificate_print_formats_t: ADD, new enum.
 gnutls_x509_crt_get_signature: ADD.
 gnutls_x509_crt_get_extension_data: ADD.
 gnutls_x509_crt_get_extension_info: ADD.
