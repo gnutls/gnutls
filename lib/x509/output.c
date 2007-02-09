@@ -871,27 +871,12 @@ print_fingerprint (gnutls_string * str, gnutls_x509_crt_t cert,
 		   gnutls_digest_algorithm_t algo)
 {
   int err;
-  size_t size = 0;
-  char *buffer;
-
-  err = gnutls_x509_crt_get_fingerprint (cert, algo, buffer, &size);
-  if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      addf (str, "error: get_fingerprint: %s\n", gnutls_strerror (err));
-      return;
-    }
-
-  buffer = gnutls_malloc (size);
-  if (!buffer)
-    {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-      return;
-    }
+  char buffer[MAX_HASH_SIZE];
+  size_t size = sizeof(buffer);
 
   err = gnutls_x509_crt_get_fingerprint (cert, algo, buffer, &size);
   if (err < 0)
     {
-      gnutls_free (buffer);
       addf (str, "error: get_fingerprint: %s\n", gnutls_strerror (err));
       return;
     }
@@ -902,8 +887,6 @@ print_fingerprint (gnutls_string * str, gnutls_x509_crt_t cert,
 	  "Unknown")));
   hexprint (str, buffer, size);
   adds (str, "\n");
-
-  gnutls_free (buffer);
 }
 
 static void
