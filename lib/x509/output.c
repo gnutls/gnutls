@@ -30,6 +30,7 @@
 #include <gnutls_x509.h>
 #include <x509.h>
 #include <gnutls_errors.h>
+#include "time_r.h"
 
 #define addf _gnutls_string_append_printf
 #define adds _gnutls_string_append_str
