@@ -38,6 +38,10 @@ id-ppl-inheritALL.
 ** Add API to print information about X.509 certificates.
 The function is gnutls_x509_crt_print.
 
+** Certtool uses the new API gnutls_x509_crt_print to print certificate info.
+One consequence of this is that the output syntax has changed
+slightly.  Some more fields are printed.
+
 ** Doc fixes.
 
 ** API and ABI modifications:
