@@ -1108,8 +1108,15 @@ extern const ASN1_ARRAY_TYPE pkix_asn1_tab[]={
   {"pCPathLenConstraint",1611153411,0},
   {"0",10,"MAX"},
   {"proxyPolicy",2,"ProxyPolicy"},
-  {"ProxyPolicy",536870917,0},
+  {"ProxyPolicy",1610612741,0},
   {"policyLanguage",1073741836,0},
   {"policy",16391,0},
+  {"id-on",1879048204,0},
+  {0,1073741825,"id-pkix"},
+  {0,1,"8"},
+  {"id-on-xmppAddr",1879048204,0},
+  {0,1073741825,"id-on"},
+  {0,1,"5"},
+  {"XmppAddr",2,"UTF8String"},
   {0,0,0}
 };
