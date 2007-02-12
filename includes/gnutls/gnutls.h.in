@@ -904,6 +904,7 @@ extern "C"
     GNUTLS_SAN_URI,
     GNUTLS_SAN_IPADDRESS,
     GNUTLS_SAN_OTHERNAME,
+    GNUTLS_SAN_DN,
     /* The following are "virtual" subject alternative name types, in
        that they are represented by an otherName value and an OID.
        Used by gnutls_x509_crt_get_subject_alt_othername_oid().  */
