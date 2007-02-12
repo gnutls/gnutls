@@ -1,3 +1,327 @@
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.6.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: New APIs, bump libtool library versions.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/string_.h, gl/m4/string_h.m4, lgl/Makefile.am,
+	lgl/string_.h, lgl/m4/string_h.m4: Update.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Use latest docs on web site.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* po/POTFILES.in: Add.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Mark for translation.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pkix_asn1_tab.c: Generated.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Print more than one SAN.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Better printing of XMPP SAN.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pkix.asn: Add XMPP definitions.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Doc fix.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Decode XMPP data.  Suggested by Matthias Wimmer
+	<m@tthias.eu>.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Print X.509 client cert info.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Text fix.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem: Update.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: strftime %Z on mingw32 seems to not understand
+	that gmtime was used and that the time given is in UTC.  Just hard
+	code it to UTC.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.c: Typo.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/asprintf.c, lgl/vasprintf.c,
+	lgl/vasprintf.h, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/vasprintf.m4: Add.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Use gnulib's time_r for systems that lack
+	gmtime_r.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/time_r.c, lgl/time_r.h,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4, lgl/m4/time_r.m4:
+	Add.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/no-ca-or-pathlen.pem: Fix.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Strings not zero terminated.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Hexprint unknown extensions.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/key-id/key-id: Update.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem: Update.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Remove.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Support GNUTLS_X509_CRT_UNSIGNED_FULL.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Use gnutls_x509_crt_print.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/x509.h, NEWS: Add.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Fix error messages.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Really fix.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Fix.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/x509.h: Change signature (ok since no release).
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Use datum for outputs.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-housley-tls-authz-extns-07.txt: Add.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Simplify.
+
+2007-02-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/extensions.c: Don't crash on NULL's.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add, from older branches.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Doc fix.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am: Build output.c.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c, NEWS: Add.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/x509.h, lib/x509/x509.c: Add
+	gnutls_x509_crt_get_signature.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: gnutls-serv: create client & proxy too.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-cfg.c: Default proxy policy is ALL.  Fixes crash.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/extensions.c: Fix warnings.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.h, lib/gnutls_str.c: Add
+	_gnutls_string_append_printf.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c, NEWS, includes/gnutls/x509.h: Add
+	gnutls_x509_crt_get_extension_data and
+	gnutls_x509_crt_get_extension_info.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: XMPP otherName SAN support.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS: Add.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Fix.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Doc fix.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Support XMPP OID.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Doc fix.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, includes/gnutls/x509.h,
+	lib/x509/common.c, lib/x509/x509.c, src/certtool.c: Support
+	otherName SAN's.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: add tcp and tlsia
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Fix.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Don't say TLS 1.0.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_sig.c: Fix DSA sign, broken by last commit.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_sig.c: Fix TLS 1.2 signing (for servers).
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: dsa key
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_sig.c: Fix crash on failures.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-srp-00.txt,
+	doc/protocol/draft-ietf-tls-srp-01.txt,
+	doc/protocol/draft-ietf-tls-srp-02.txt,
+	doc/protocol/draft-ietf-tls-srp-03.txt,
+	doc/protocol/draft-ietf-tls-srp-04.txt,
+	doc/protocol/draft-ietf-tls-srp-05.txt,
+	doc/protocol/draft-ietf-tls-srp-06.txt,
+	doc/protocol/draft-ietf-tls-srp-07.txt: Add.
+
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.5.
