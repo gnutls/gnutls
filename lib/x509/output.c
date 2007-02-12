@@ -32,6 +32,11 @@
 #include <gnutls_errors.h>
 #include "time_r.h"
 
+/* I18n of error codes. */
+#include "gettext.h"
+#define _(String) dgettext (PACKAGE, String)
+#define N_(String) gettext_noop (String)
+
 #define addf _gnutls_string_append_printf
 #define adds _gnutls_string_append_str
 
@@ -100,8 +105,8 @@ print_proxy (gnutls_string * str, gnutls_x509_crt_t cert)
     }
 
   if (pathlen >= 0)
-    addf (str, "\t\t\tPath Length Constraint: %d\n", pathlen);
-  adds (str, "\t\t\tPolicy Language: ");
+    addf (str, _("\t\t\tPath Length Constraint: %d\n"), pathlen);
+  adds (str, _("\t\t\tPolicy Language: "));
   if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.1") == 0)
     addf (str, "id-ppl-inheritALL\n");
   else if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.2") == 0)
@@ -109,7 +114,7 @@ print_proxy (gnutls_string * str, gnutls_x509_crt_t cert)
   else
     addf (str, "%s\n", policyLanguage);
   if (npolicy)
-    addf (str, "\t\t\tPolicy Language: %.*s\n", npolicy, policy);
+    addf (str, _("\t\t\tPolicy Language: %.*s\n"), npolicy, policy);
 }
 
 static void
@@ -198,23 +203,23 @@ print_key_usage (gnutls_string * str, gnutls_x509_crt_t cert)
     }
 
   if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-    addf (str, "\t\t\tDigital signature.\n");
+    addf (str, _("\t\t\tDigital signature.\n"));
   if (key_usage & GNUTLS_KEY_NON_REPUDIATION)
-    addf (str, "\t\t\tNon repudiation.\n");
+    addf (str, _("\t\t\tNon repudiation.\n"));
   if (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-    addf (str, "\t\t\tKey encipherment.\n");
+    addf (str, _("\t\t\tKey encipherment.\n"));
   if (key_usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-    addf (str, "\t\t\tData encipherment.\n");
+    addf (str, _("\t\t\tData encipherment.\n"));
   if (key_usage & GNUTLS_KEY_KEY_AGREEMENT)
-    addf (str, "\t\t\tKey agreement.\n");
+    addf (str, _("\t\t\tKey agreement.\n"));
   if (key_usage & GNUTLS_KEY_KEY_CERT_SIGN)
-    addf (str, "\t\t\tCertificate signing.\n");
+    addf (str, _("\t\t\tCertificate signing.\n"));
   if (key_usage & GNUTLS_KEY_CRL_SIGN)
-    addf (str, "\t\t\tCRL signing.\n");
+    addf (str, _("\t\t\tCRL signing.\n"));
   if (key_usage & GNUTLS_KEY_ENCIPHER_ONLY)
-    addf (str, "\t\t\tKey encipher only.\n");
+    addf (str, _("\t\t\tKey encipher only.\n"));
   if (key_usage & GNUTLS_KEY_DECIPHER_ONLY)
-    addf (str, "\t\t\tKey decipher only.\n");
+    addf (str, _("\t\t\tKey decipher only.\n"));
 }
 
 static void
@@ -322,19 +327,19 @@ print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
 	}
 
       if (strcmp (buffer, GNUTLS_KP_TLS_WWW_SERVER) == 0)
-	addf (str, "\t\t\tTLS WWW Server.\n");
+	addf (str, _("\t\t\tTLS WWW Server.\n"));
       else if (strcmp (buffer, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
-	addf (str, "\t\t\tTLS WWW Client.\n");
+	addf (str, _("\t\t\tTLS WWW Client.\n"));
       else if (strcmp (buffer, GNUTLS_KP_CODE_SIGNING) == 0)
-	addf (str, "\t\t\tCode signing.\n");
+	addf (str, _("\t\t\tCode signing.\n"));
       else if (strcmp (buffer, GNUTLS_KP_EMAIL_PROTECTION) == 0)
-	addf (str, "\t\t\tEmail protection.\n");
+	addf (str, _("\t\t\tEmail protection.\n"));
       else if (strcmp (buffer, GNUTLS_KP_TIME_STAMPING) == 0)
-	addf (str, "\t\t\tTime stamping.\n");
+	addf (str, _("\t\t\tTime stamping.\n"));
       else if (strcmp (buffer, GNUTLS_KP_OCSP_SIGNING) == 0)
-	addf (str, "\t\t\tOCSP signing.\n");
+	addf (str, _("\t\t\tOCSP signing.\n"));
       else if (strcmp (buffer, GNUTLS_KP_ANY) == 0)
-	addf (str, "\t\t\tAny purpose.\n");
+	addf (str, _("\t\t\tAny purpose.\n"));
       else
 	addf (str, "\t\t\t%s\n", buffer);
 
@@ -356,12 +361,12 @@ print_basic (gnutls_string * str, gnutls_x509_crt_t cert)
     }
 
   if (err == 0)
-    addf (str, "\t\t\tCertificate Authority (CA): FALSE\n");
+    addf (str, _("\t\t\tCertificate Authority (CA): FALSE\n"));
   else
-    addf (str, "\t\t\tCertificate Authority (CA): TRUE\n");
+    addf (str, _("\t\t\tCertificate Authority (CA): TRUE\n"));
 
   if (pathlen >= 0)
-    addf (str, "\t\t\tPath Length Constraint: %d\n", pathlen);
+    addf (str, _("\t\t\tPath Length Constraint: %d\n"), pathlen);
 }
 
 static void
@@ -457,13 +462,13 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert)
 	      }
 
 	    if (err == GNUTLS_SAN_OTHERNAME_XMPP)
-	      addf (str, "\t\t\tXMPP Address: %.*s\n", size, buffer);
+	      addf (str, _("\t\t\tXMPP Address: %.*s\n"), size, buffer);
 	    else
 	      {
-		addf (str, "\t\t\totherName OID: %.*s\n", oidsize, oid);
-		addf (str, "\t\t\totherName DER: ");
+		addf (str, _("\t\t\totherName OID: %.*s\n"), oidsize, oid);
+		addf (str, _("\t\t\totherName DER: "));
 		hexprint (str, buffer, size);
-		addf (str, "\n\t\t\totherName ASCII: ");
+		addf (str, _("\n\t\t\totherName ASCII: "));
 		asciiprint (str, buffer, size);
 		addf (str, "\n");
 	      }
@@ -489,7 +494,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
     if (version < 0)
       addf (str, "error: get_version: %s\n", gnutls_strerror (version));
     else
-      addf (str, "\tVersion: %d\n", version);
+      addf (str, _("\tVersion: %d\n"), version);
   }
 
   /* Serial. */
@@ -502,11 +507,11 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
     if (err < 0)
       addf (str, "error: get_serial: %s\n", gnutls_strerror (err));
     else if (serial_size == 0)
-      addf (str, "\tSerial Number (hex): 00\n");
+      addf (str, _("\tSerial Number (hex): 00\n"));
     else
       {
 	size_t i;
-	addf (str, "\tSerial Number (hex): %02x", (unsigned char) serial[0]);
+	addf (str, _("\tSerial Number (hex): %02x"), (unsigned char) serial[0]);
 	for (i = 1; i < serial_size; i++)
 	  addf (str, ":%02x", (unsigned char) serial[i]);
 	addf (str, "\n");
@@ -524,14 +529,14 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       if (err < 0)
 	addf (str, "error: get_issuer_dn: %s\n", gnutls_strerror (err));
       else
-	addf (str, "\tIssuer: %s\n", dn);
+	addf (str, _("\tIssuer: %s\n"), dn);
     }
 
   /* Validity. */
   {
     time_t tim;
 
-    addf (str, "\tValidity:\n");
+    addf (str, _("\tValidity:\n"));
 
     tim = gnutls_x509_crt_get_activation_time (cert);
     {
@@ -544,7 +549,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
 	addf (str, "error: strftime (%d)\n", t);
       else
-	addf (str, "\t\tNot Before: %s\n", s);
+	addf (str, _("\t\tNot Before: %s\n"), s);
     }
 
     tim = gnutls_x509_crt_get_expiration_time (cert);
@@ -558,7 +563,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
 	addf (str, "error: strftime (%d)\n", t);
       else
-	addf (str, "\t\tNot After: %s\n", s);
+	addf (str, _("\t\tNot After: %s\n"), s);
     }
   }
 
@@ -572,7 +577,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
     if (err < 0)
       addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
     else
-      addf (str, "\tSubject: %s\n", dn);
+      addf (str, _("\tSubject: %s\n"), dn);
   }
 
   /* SubjectPublicKeyInfo. */
@@ -589,7 +594,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	if (name == NULL)
 	  name = "Unknown";
 
-	addf (str, "\tSubject Public Key Algorithm: %s\n", name);
+	addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
 	switch (err)
 	  {
 	  case GNUTLS_PK_RSA:
@@ -602,9 +607,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		      gnutls_strerror (err));
 	      else
 		{
-		  addf (str, "\t\tModulus (bits %d):\n", bits);
+		  addf (str, _("\t\tModulus (bits %d):\n"), bits);
 		  hexdump (str, m.data, m.size, "\t\t\t");
-		  addf (str, "\t\tExponent:\n");
+		  addf (str, _("\t\tExponent:\n"));
 		  hexdump (str, e.data, e.size, "\t\t\t");
 		}
 	    }
@@ -620,13 +625,13 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		      gnutls_strerror (err));
 	      else
 		{
-		  addf (str, "\t\tPublic key (bits %d):\n", bits);
+		  addf (str, _("\t\tPublic key (bits %d):\n"), bits);
 		  hexdump (str, y.data, y.size, "\t\t\t");
-		  addf (str, "\t\tP:\n");
+		  addf (str, _("\t\tP:\n"));
 		  hexdump (str, p.data, p.size, "\t\t\t");
-		  addf (str, "\t\tQ:\n");
+		  addf (str, _("\t\tQ:\n"));
 		  hexdump (str, q.data, q.size, "\t\t\t");
-		  addf (str, "\t\tG:\n");
+		  addf (str, _("\t\tG:\n"));
 		  hexdump (str, g.data, g.size, "\t\t\t");
 		}
 	    }
@@ -672,7 +677,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	    }
 
 	  if (i == 0)
-	    addf (str, "\tExtensions:\n");
+	    addf (str, _("\tExtensions:\n"));
 
 	  if (strcmp (oid, "2.5.29.19") == 0)
 	    {
@@ -682,8 +687,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tBasic Constraints (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tBasic Constraints (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_basic (str, cert);
 
@@ -697,8 +702,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tSubject Key Identifier (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tSubject Key Identifier (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_ski (str, cert);
 
@@ -712,8 +717,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tAuthority Key Identifier (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tAuthority Key Identifier (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_aki (str, cert);
 
@@ -727,8 +732,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tKey Usage (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tKey Usage (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_key_usage (str, cert);
 
@@ -742,8 +747,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tKey Purpose (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tKey Purpose (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_key_purpose (str, cert);
 
@@ -757,8 +762,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tSubject Alternative Name (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tSubject Alternative Name (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_san (str, cert);
 
@@ -772,8 +777,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tCRL Distribution points (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tCRL Distribution points (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_crldist (str, cert);
 
@@ -787,8 +792,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\tProxy Certificate Information (%scritical):\n",
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tProxy Certificate Information (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
 
 	      print_proxy (str, cert);
 
@@ -800,8 +805,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	      size_t extlen = 0;
 	      size_t j;
 
-	      addf (str, "\t\tUnknown extension %s (%scritical):\n", oid,
-		    critical ? "" : "not ");
+	      addf (str, _("\t\tUnknown extension %s (%s):\n"), oid,
+		    critical ? _("critical") : _("not critical"));
 
 	      err = gnutls_x509_crt_get_extension_data (cert, i,
 							NULL, &extlen);
@@ -829,7 +834,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  continue;
 		}
 
-	      addf (str, "\t\t\tASCII: ");
+	      addf (str, _("\t\t\tASCII: "));
 	      for (j = 0; j < extlen; j++)
 		{
 		  if (isprint (buffer[j]))
@@ -839,7 +844,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		}
 	      addf (str, "\n");
 
-	      addf (str, "\t\t\tHexdump: ");
+	      addf (str, _("\t\t\tHexdump: "));
 	      hexprint (str, buffer, extlen);
 	      adds (str, "\n");
 
@@ -864,12 +869,12 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  const char *name = gnutls_sign_algorithm_get_name (err);
 	  if (name == NULL)
 	    name = "Unknown";
-	  addf (str, "\tSignature Algorithm: %s\n", name);
+	  addf (str, _("\tSignature Algorithm: %s\n"), name);
 	}
       if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
 	{
-	  addf (str, "warning: Certificate signed using a "
-		"broken signature algorithm that can be forged.");
+	  addf (str, _("warning: Certificate signed using a "
+		       "broken signature algorithm that can be forged."));
 	}
 
       err = gnutls_x509_crt_get_signature (cert, buffer, &size);
@@ -894,7 +899,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  return;
 	}
 
-      addf (str, "\tSignature:\n");
+      addf (str, _("\tSignature:\n"));
       hexdump (str, buffer, size, "\t\t");
     }
 }
@@ -914,10 +919,10 @@ print_fingerprint (gnutls_string * str, gnutls_x509_crt_t cert,
       return;
     }
 
-  addf (str, "\t%s fingerprint:\n\t\t",
-	((algo == GNUTLS_DIG_MD5) ? "MD5" :
-	 ((algo == GNUTLS_DIG_SHA1) ? "SHA-1" :
-	  "Unknown")));
+  if (algo == GNUTLS_DIG_MD5)
+    addf (str, _("\tMD5 fingerprint:\n\t\t"));
+  else
+    addf (str, _("\tSHA-1 fingerprint:\n\t\t"));
   hexprint (str, buffer, size);
   adds (str, "\n");
 }
@@ -951,7 +956,7 @@ print_keyid (gnutls_string * str, gnutls_x509_crt_t cert)
       return;
     }
 
-  addf (str, "\tPublic Key Id:\n\t\t");
+  addf (str, _("\tPublic Key Id:\n\t\t"));
   hexprint (str, buffer, size);
   adds (str, "\n");
 
@@ -1117,11 +1122,11 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
     {
       _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
 
-      _gnutls_string_append_str (&str, "X.509 Certificate Information:\n");
+      _gnutls_string_append_str (&str, _("X.509 Certificate Information:\n"));
 
       print_cert (&str, cert, format == GNUTLS_X509_CRT_UNSIGNED_FULL);
 
-      _gnutls_string_append_str (&str, "Other Information:\n");
+      _gnutls_string_append_str (&str, _("Other Information:\n"));
 
       print_other (&str, cert, format == GNUTLS_X509_CRT_UNSIGNED_FULL);
 
