@@ -1230,4 +1230,12 @@ ProxyPolicy ::= SEQUENCE {
 	policyLanguage	OBJECT IDENTIFIER,
         policy		OCTET STRING OPTIONAL }
 
+-- rfc3920 section 5.1.1
+
+id-on  OBJECT IDENTIFIER ::= { id-pkix 8 }  -- other name forms
+
+id-on-xmppAddr  OBJECT IDENTIFIER ::= { id-on 5 }
+
+XmppAddr ::= UTF8String
+
 END
