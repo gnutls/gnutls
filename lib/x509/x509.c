@@ -1009,6 +1009,18 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 	    }
 	}
     }
+  else if (type == GNUTLS_SAN_DN)
+    {
+      _gnutls_str_cat (nptr, sizeof (nptr), ".directoryName");
+      len = *name_size;
+      result = _gnutls_x509_parse_dn (src, nptr, name, &len);
+      *name_size = len;
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
+    }
   else if (othername_oid)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   else
