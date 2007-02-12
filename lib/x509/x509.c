@@ -1122,6 +1122,11 @@ get_subject_alt_name (gnutls_x509_crt_t cert,
   * the corresponding OID and the "virtual" SAN types (e.g.,
   * %GNUTLS_SAN_OTHERNAME_XMPP).
   *
+  * If an otherName OID is known, the data will be decoded.  Otherwise
+  * the returned data will be DER encoded, and you will have to decode
+  * it yourself.  Currently, only the RFC 3920 id-on-xmppAddr SAN is
+  * recognized.
+  *
   * Returns the alternative subject name type on success.  The type is
   * one of the enumerated gnutls_x509_subject_alt_name_t.  It will
   * return %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large
