@@ -414,45 +414,53 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert, int san_idx)
       break;
 
     case GNUTLS_SAN_OTHERNAME:
-      addf (str, "\t\t\totherName:\n\t\t\tDER: ");
-      hexprint (str, buffer, size);
-      addf (str, "\n\t\t\tASCII: ");
-      asciiprint (str, buffer, size);
-      addf (str, "\n");
+      {
+	char *oid;
+	size_t oidsize;
 
-      gnutls_free (buffer);
+	oidsize = 0;
+	err = gnutls_x509_crt_get_subject_alt_othername_oid
+	  (cert, san_idx, oid, &oidsize);
+	if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	  {
+	    gnutls_free (buffer);
+	    addf (str, "error: get_subject_alt_othername_oid: %s\n",
+		  gnutls_strerror (err));
+	    return;
+	  }
 
-      size = 0;
-      err = gnutls_x509_crt_get_subject_alt_othername_oid
-	(cert, san_idx, buffer, &size);
-      if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-	{
-	  addf (str, "error: get_subject_alt_othername_oid: %s\n",
-		gnutls_strerror (err));
-	  return;
-	}
+	oid = gnutls_malloc (oidsize);
+	if (!oid)
+	  {
+	    gnutls_free (buffer);
+	    addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	    return;
+	  }
 
-      buffer = gnutls_malloc (size);
-      if (!buffer)
-	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-	  return;
-	}
+	err = gnutls_x509_crt_get_subject_alt_othername_oid
+	  (cert, san_idx, oid, &oidsize);
+	if (err < 0)
+	  {
+	    gnutls_free (buffer);
+	    gnutls_free (oid);
+	    addf (str, "error: get_subject_alt_othername_oid2: %s\n",
+		  gnutls_strerror (err));
+	    return;
+	  }
 
-      err = gnutls_x509_crt_get_subject_alt_othername_oid
-	(cert, san_idx, buffer, &size);
-      if (err < 0)
-	{
-	  gnutls_free (buffer);
-	  addf (str, "error: get_subject_alt_othername_oid2: %s\n",
-		gnutls_strerror (err));
-	  return;
-	}
-
-      addf (str, "\t\t\t\tOID: %.*s", size, buffer);
-      if (err == GNUTLS_SAN_OTHERNAME_XMPP)
-	addf (str, " (id-on-xmppAddr)");
-      addf (str, "\n");
+	if (err == GNUTLS_SAN_OTHERNAME_XMPP)
+	  addf (str, "\t\t\tXMPP Address: %.*s\n", size, buffer);
+	else
+	  {
+	    addf (str, "\t\t\totherName OID: %.*s\n", oidsize, oid);
+	    addf (str, "\t\t\totherName DER: ");
+	    hexprint (str, buffer, size);
+	    addf (str, "\n\t\t\totherName ASCII: ");
+	    asciiprint (str, buffer, size);
+	    addf (str, "\n");
+	  }
+	gnutls_free (oid);
+      }
       break;
 
     default:
