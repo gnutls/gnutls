@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.7.7 (unreleased)
 
+** Support for directoryName Subject Alternative Name's.
+The gnutls_x509_crt_get_subject_alt_name function returns the DN as a
+string in the provided buffer.
+
 ** API and ABI modifications:
 GNUTLS_SAN_DN: ADD, new gnutls_x509_subject_alt_name_t element.
 
