@@ -279,6 +279,10 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
 	  break;
 
+	case GNUTLS_SAN_DN:
+	  addf (str, "\t\t\tdirectoryName: %.*s\n", size, buffer);
+	  break;
+
 	default:
 	  addf (str, "error: unknown SAN\n");
 	  break;
@@ -424,6 +428,10 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert)
 
 	case GNUTLS_SAN_IPADDRESS:
 	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
+	  break;
+
+	case GNUTLS_SAN_DN:
+	  addf (str, "\t\t\tdirectoryName: %.*s\n", size, buffer);
 	  break;
 
 	case GNUTLS_SAN_OTHERNAME:
