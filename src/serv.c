@@ -421,6 +421,8 @@ initialize_session (void)
   return session;
 }
 
+#include <gnutls/x509.h>
+
 static const char DEFAULT_DATA[] =
   "This is the default message reported by the GnuTLS implementation. "
   "For more information please visit "
@@ -435,13 +437,17 @@ peer_print_info (gnutls_session session, int *ret_length, const char *header)
   const char *tmp;
   unsigned char sesid[32];
   size_t i, sesid_size;
-  char *http_buffer = malloc (5 * 1024 + strlen (header));
+  char *http_buffer;
   gnutls_kx_algorithm kx_alg;
+  size_t len = 5 * 1024 + strlen (header);
+  char *crtinfo = NULL;
+  size_t ncrtinfo = 0;
 
-  if (http_buffer == NULL)
-    return NULL;
   if (verbose != 0)
     {
+      http_buffer = malloc (len);
+      if (http_buffer == NULL)
+	return NULL;
 
       strcpy (http_buffer, HTTP_BEGIN);
       strcpy (&http_buffer[sizeof (HTTP_BEGIN) - 1], DEFAULT_DATA);
@@ -452,6 +458,44 @@ peer_print_info (gnutls_session session, int *ret_length, const char *header)
       return http_buffer;
 
     }
+
+  if (gnutls_certificate_type_get (session) == GNUTLS_CRT_X509)
+    {
+      const gnutls_datum_t *cert_list;
+      unsigned int cert_list_size = 0;
+      size_t i;
+
+      cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+
+      for (i = 0; i < cert_list_size; i++)
+	{
+	  gnutls_x509_crt_t cert;
+	  gnutls_datum_t info;
+
+	  if (gnutls_x509_crt_init (&cert) == 0 &&
+	      gnutls_x509_crt_import (cert, &cert_list[i],
+				      GNUTLS_X509_FMT_DER) == 0 &&
+	      gnutls_x509_crt_print (cert, GNUTLS_X509_CRT_FULL, &info) == 0)
+	    {
+	      const char *post = "</PRE><P><PRE>";
+
+	      crtinfo = realloc (crtinfo, ncrtinfo + info.size +
+				 strlen (post) + 1);
+	      if (crtinfo == NULL)
+		return NULL;
+	      memcpy (crtinfo + ncrtinfo, info.data, info.size);
+	      ncrtinfo += info.size;
+	      memcpy (crtinfo + ncrtinfo, post, strlen (post));
+	      ncrtinfo += strlen (post);
+	      crtinfo[ncrtinfo] = '\0';
+	      gnutls_free (info.data);
+	    }
+	}
+    }
+
+  http_buffer = malloc (len);
+  if (http_buffer == NULL)
+    return NULL;
 
   strcpy (http_buffer, HTTP_BEGIN);
 
@@ -562,6 +606,13 @@ peer_print_info (gnutls_session session, int *ret_length, const char *header)
     tmp = str_unknown;
   sprintf (tmp2, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
 	   tmp);
+
+  if (crtinfo)
+    {
+      strcat (http_buffer, "<hr><PRE>");
+      strcat (http_buffer, crtinfo);
+      strcat (http_buffer, "\n</PRE>\n");
+    }
 
   strcat (http_buffer, "<hr><P>Your HTTP header was:<PRE>");
   strcat (http_buffer, header);
