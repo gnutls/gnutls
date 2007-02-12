@@ -51,8 +51,8 @@ release:
 	gpg --verify $(distdir).tar.bz2.sig
 	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/devel/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
-	cd doc && : ../gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
+	cd doc && ../gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
 	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/
-	: cp -v doc/reference/html/*.{html,png,css,devhelp} $(htmldir)/reference/
+	cp -v doc/reference/html/*.{html,png,css,devhelp} $(htmldir)/reference/
 	cd $(htmldir) && cvs add -kb releases/$(distdir).tar.bz2{,.sig} && \
 		cvs commit -m "Update." manual/ reference/ releases/
