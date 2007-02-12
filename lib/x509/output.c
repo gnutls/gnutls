@@ -365,110 +365,119 @@ print_basic (gnutls_string * str, gnutls_x509_crt_t cert)
 }
 
 static void
-print_san (gnutls_string * str, gnutls_x509_crt_t cert, int san_idx)
+print_san (gnutls_string * str, gnutls_x509_crt_t cert)
 {
-  char *buffer = NULL;
-  size_t size = 0;
-  int err;
+  unsigned int san_idx;
 
-  err = gnutls_x509_crt_get_subject_alt_name (cert, san_idx, buffer, &size,
-					      NULL);
-  if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+  for (san_idx = 0;; san_idx++)
     {
-      addf (str, "error: get_subject_alt_name: %s\n", gnutls_strerror (err));
-      return;
-    }
+      char *buffer = NULL;
+      size_t size = 0;
+      int err;
 
-  buffer = gnutls_malloc (size);
-  if (!buffer)
-    {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-      return;
-    }
+      err = gnutls_x509_crt_get_subject_alt_name (cert, san_idx, buffer, &size,
+						  NULL);
+      if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	break;
+      if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	{
+	  addf (str, "error: get_subject_alt_name: %s\n",
+		gnutls_strerror (err));
+	  return;
+	}
 
-  err = gnutls_x509_crt_get_subject_alt_name (cert, san_idx,
-					      buffer, &size, NULL);
-  if (err < 0)
-    {
-      gnutls_free (buffer);
-      addf (str, "error: get_subject_alt_name2: %s\n", gnutls_strerror (err));
-      return;
-    }
+      buffer = gnutls_malloc (size);
+      if (!buffer)
+	{
+	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  return;
+	}
 
-  switch (err)
-    {
-    case GNUTLS_SAN_DNSNAME:
-      addf (str, "\t\t\tDNSname: %.*s\n", size, buffer);
-      break;
+      err = gnutls_x509_crt_get_subject_alt_name (cert, san_idx,
+						  buffer, &size, NULL);
+      if (err < 0)
+	{
+	  gnutls_free (buffer);
+	  addf (str, "error: get_subject_alt_name2: %s\n",
+		gnutls_strerror (err));
+	  return;
+	}
 
-    case GNUTLS_SAN_RFC822NAME:
-      addf (str, "\t\t\tRFC822name: %.*s\n", size, buffer);
-      break;
+      switch (err)
+	{
+	case GNUTLS_SAN_DNSNAME:
+	  addf (str, "\t\t\tDNSname: %.*s\n", size, buffer);
+	  break;
 
-    case GNUTLS_SAN_URI:
-      addf (str, "\t\t\tURI: %.*s\n", size, buffer);
-      break;
+	case GNUTLS_SAN_RFC822NAME:
+	  addf (str, "\t\t\tRFC822name: %.*s\n", size, buffer);
+	  break;
 
-    case GNUTLS_SAN_IPADDRESS:
-      addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
-      break;
+	case GNUTLS_SAN_URI:
+	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
+	  break;
 
-    case GNUTLS_SAN_OTHERNAME:
-      {
-	char *oid;
-	size_t oidsize;
+	case GNUTLS_SAN_IPADDRESS:
+	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
+	  break;
 
-	oidsize = 0;
-	err = gnutls_x509_crt_get_subject_alt_othername_oid
-	  (cert, san_idx, oid, &oidsize);
-	if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	case GNUTLS_SAN_OTHERNAME:
 	  {
-	    gnutls_free (buffer);
-	    addf (str, "error: get_subject_alt_othername_oid: %s\n",
-		  gnutls_strerror (err));
-	    return;
-	  }
+	    char *oid;
+	    size_t oidsize;
 
-	oid = gnutls_malloc (oidsize);
-	if (!oid)
-	  {
-	    gnutls_free (buffer);
-	    addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-	    return;
-	  }
+	    oidsize = 0;
+	    err = gnutls_x509_crt_get_subject_alt_othername_oid
+	      (cert, san_idx, oid, &oidsize);
+	    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	      {
+		gnutls_free (buffer);
+		addf (str, "error: get_subject_alt_othername_oid: %s\n",
+		      gnutls_strerror (err));
+		return;
+	      }
 
-	err = gnutls_x509_crt_get_subject_alt_othername_oid
-	  (cert, san_idx, oid, &oidsize);
-	if (err < 0)
-	  {
-	    gnutls_free (buffer);
+	    oid = gnutls_malloc (oidsize);
+	    if (!oid)
+	      {
+		gnutls_free (buffer);
+		addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		return;
+	      }
+
+	    err = gnutls_x509_crt_get_subject_alt_othername_oid
+	      (cert, san_idx, oid, &oidsize);
+	    if (err < 0)
+	      {
+		gnutls_free (buffer);
+		gnutls_free (oid);
+		addf (str, "error: get_subject_alt_othername_oid2: %s\n",
+		      gnutls_strerror (err));
+		return;
+	      }
+
+	    if (err == GNUTLS_SAN_OTHERNAME_XMPP)
+	      addf (str, "\t\t\tXMPP Address: %.*s\n", size, buffer);
+	    else
+	      {
+		addf (str, "\t\t\totherName OID: %.*s\n", oidsize, oid);
+		addf (str, "\t\t\totherName DER: ");
+		hexprint (str, buffer, size);
+		addf (str, "\n\t\t\totherName ASCII: ");
+		asciiprint (str, buffer, size);
+		addf (str, "\n");
+	      }
 	    gnutls_free (oid);
-	    addf (str, "error: get_subject_alt_othername_oid2: %s\n",
-		  gnutls_strerror (err));
-	    return;
 	  }
+	  break;
 
-	if (err == GNUTLS_SAN_OTHERNAME_XMPP)
-	  addf (str, "\t\t\tXMPP Address: %.*s\n", size, buffer);
-	else
-	  {
-	    addf (str, "\t\t\totherName OID: %.*s\n", oidsize, oid);
-	    addf (str, "\t\t\totherName DER: ");
-	    hexprint (str, buffer, size);
-	    addf (str, "\n\t\t\totherName ASCII: ");
-	    asciiprint (str, buffer, size);
-	    addf (str, "\n");
-	  }
-	gnutls_free (oid);
-      }
-      break;
+	default:
+	  addf (str, "error: unknown SAN\n");
+	  break;
+	}
 
-    default:
-      addf (str, "error: unknown SAN\n");
-      break;
+      gnutls_free (buffer);
     }
-
-  gnutls_free (buffer);
 }
 
 static void
@@ -742,10 +751,16 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	    }
 	  else if (strcmp (oid, "2.5.29.17") == 0)
 	    {
+	      if (san_idx)
+		{
+		  addf (str, "error: more than one SKI extension\n");
+		  continue;
+		}
+
 	      addf (str, "\t\tSubject Alternative Name (%scritical):\n",
 		    critical ? "" : "not ");
 
-	      print_san (str, cert, san_idx);
+	      print_san (str, cert);
 
 	      san_idx++;
 	    }
