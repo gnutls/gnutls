@@ -890,6 +890,8 @@ gnutls_x509_crt_get_pk_algorithm (gnutls_x509_crt_t cert, unsigned int *bits)
 
 }
 
+#define XMPP_OID "1.3.6.1.5.5.7.8.5"
+
 /* returns the type and the name.
  */
 static int
@@ -954,9 +956,57 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 
       if (othername_oid)
 	{
-#define XMPP_OID "1.3.6.1.5.5.7.8.5"
 	  if (len > strlen (XMPP_OID) && strcmp (name, XMPP_OID) == 0)
 	    type = GNUTLS_SAN_OTHERNAME_XMPP;
+	}
+      else
+	{
+	  char oid[42];
+
+	  if ( src_name[0] != 0)
+	    snprintf( nptr, sizeof(nptr), "%s.?%u.otherName.type-id",
+		      src_name, seq);
+	  else
+	    snprintf( nptr, sizeof(nptr), "?%u.otherName.type-id", seq);
+
+	  len = sizeof (oid);
+	  result = asn1_read_value (src, nptr, oid, &len);
+	  if (result != ASN1_SUCCESS)
+	    {
+	      gnutls_assert ();
+	      return _gnutls_asn2err (result);
+	    }
+
+	  if (len > strlen (XMPP_OID) && strcmp (oid, XMPP_OID) == 0)
+	    {
+	      ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	      result = asn1_create_element
+		(_gnutls_get_pkix (), "PKIX1.XmppAddr", &c2);
+	      if (result != ASN1_SUCCESS)
+		{
+		  gnutls_assert ();
+		  return _gnutls_asn2err (result);
+		}
+
+	      result = asn1_der_decoding (&c2, name, *name_size, NULL);
+	      if (result != ASN1_SUCCESS)
+		{
+		  gnutls_assert ();
+		  asn1_delete_structure (&c2);
+		  return _gnutls_asn2err (result);
+		}
+
+	      result = asn1_read_value (c2, "", name, &len);
+	      *name_size = len;
+	      if (result != ASN1_SUCCESS)
+		{
+		  gnutls_assert ();
+		  asn1_delete_structure (&c2);
+		  return _gnutls_asn2err (result);
+		}
+	      asn1_delete_structure (&c2);
+	    }
 	}
     }
   else if (othername_oid)
