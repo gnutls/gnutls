@@ -511,7 +511,6 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
 			       char *sig, size_t *sizeof_sig)
 {
   int result;
-  gnutls_datum_t sa;
   int bits, len;
 
   if (cert == NULL)

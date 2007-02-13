@@ -301,6 +301,9 @@ extern "C"
   int gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 			     gnutls_certificate_print_formats_t format,
 			     gnutls_datum_t *out);
+  int gnutls_x509_crl_print (gnutls_x509_crl_t crl,
+			     gnutls_certificate_print_formats_t format,
+			     gnutls_datum_t *out);
 
 /* RDN handling.
  */
@@ -336,6 +339,8 @@ extern "C"
 				  void *oid, size_t * sizeof_oid);
 
   int gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl);
+  int gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
+				     char *sig, size_t *sizeof_sig);
   int gnutls_x509_crl_get_version (gnutls_x509_crl_t crl);
 
   time_t gnutls_x509_crl_get_this_update (gnutls_x509_crl_t crl);

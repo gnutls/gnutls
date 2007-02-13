@@ -69,8 +69,13 @@ hexprint (gnutls_string * str, const char *data, size_t len)
 {
   size_t j;
 
-  for (j = 0; j < len; j++)
-    addf (str, "%.2x", (unsigned char) data[j]);
+  if (len == 0)
+    adds (str, "00");
+  else
+    {
+      for (j = 0; j < len; j++)
+	addf (str, "%.2x", (unsigned char) data[j]);
+    }
 }
 
 
@@ -514,14 +519,10 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
     err = gnutls_x509_crt_get_serial (cert, serial, &serial_size);
     if (err < 0)
       addf (str, "error: get_serial: %s\n", gnutls_strerror (err));
-    else if (serial_size == 0)
-      addf (str, _("\tSerial Number (hex): 00\n"));
     else
       {
-	size_t i;
-	addf (str, _("\tSerial Number (hex): %02x"), (unsigned char) serial[0]);
-	for (i = 1; i < serial_size; i++)
-	  addf (str, ":%02x", (unsigned char) serial[i]);
+	addf (str, _("\tSerial Number (hex): "));
+	hexprint (str, serial, serial_size);
 	addf (str, "\n");
       }
   }
@@ -843,13 +844,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		}
 
 	      addf (str, _("\t\t\tASCII: "));
-	      for (j = 0; j < extlen; j++)
-		{
-		  if (isprint (buffer[j]))
-		    addf (str, "%c", (unsigned char) buffer[j]);
-		  else
-		    addf (str, ".");
-		}
+	      asciiprint (str, buffer, extlen);
 	      addf (str, "\n");
 
 	      addf (str, _("\t\t\tHexdump: "));
@@ -881,8 +876,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	}
       if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
 	{
-	  addf (str, _("warning: Certificate signed using a "
-		       "broken signature algorithm that can be forged."));
+	  addf (str, _("warning: signed using a broken signature algorithm that can be forged.\n"));
 	}
 
       err = gnutls_x509_crt_get_signature (cert, buffer, &size);
@@ -1102,7 +1096,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
 
 /**
  * gnutls_x509_crt_print - Pretty print X.509 certificates
- * @cert: The structure to be initialized
+ * @cert: The structure to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with zero terminated string.
  *
@@ -1157,6 +1151,196 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+
+  return 0;
+}
+
+static void
+print_crl (gnutls_string *str,
+	   gnutls_x509_crl_t crl)
+{
+  /* Version. */
+  {
+    int version = gnutls_x509_crl_get_version (crl);
+    if (version == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+      addf (str, _("\tVersion: 1 (default)\n"));
+    else if (version < 0)
+      addf (str, "error: get_version: %s\n", gnutls_strerror (version));
+    else
+      addf (str, _("\tVersion: %d\n"), version);
+  }
+
+  /* Issuer. */
+  {
+    char dn[1024];
+    size_t dn_size = sizeof (dn);
+    int err;
+
+    err = gnutls_x509_crl_get_issuer_dn (crl, dn, &dn_size);
+    if (err < 0)
+      addf (str, "error: get_issuer_dn: %s\n", gnutls_strerror (err));
+    else
+      addf (str, _("\tIssuer: %s\n"), dn);
+    }
+
+  /* Validity. */
+  {
+    time_t tim;
+
+    addf (str, _("\tUpdate dates:\n"));
+
+    tim = gnutls_x509_crl_get_this_update (crl);
+    {
+      char s[42];
+      size_t max = sizeof (s);
+      struct tm t;
+
+      if (gmtime_r (&tim, &t) == NULL)
+	addf (str, "error: gmtime_r (%d)\n", t);
+      else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+	addf (str, "error: strftime (%d)\n", t);
+      else
+	addf (str, _("\t\tIssued: %s\n"), s);
+    }
+
+    tim = gnutls_x509_crl_get_next_update (crl);
+    {
+      char s[42];
+      size_t max = sizeof (s);
+      struct tm t;
+
+      if (tim == -1)
+	addf (str, "\t\tNo next update time.\n");
+      else if (gmtime_r (&tim, &t) == NULL)
+	addf (str, "error: gmtime_r (%d)\n", t);
+      else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+	addf (str, "error: strftime (%d)\n", t);
+      else
+	addf (str, _("\t\tNext at: %s\n"), s);
+    }
+  }
+
+  /* Revoked certificates. */
+  {
+    int num = gnutls_x509_crl_get_crt_count (crl);
+    int j;
+
+    if (num)
+      addf (str, _("\tRevoked certificates (%d):\n"), num);
+    else
+      addf (str, _("\tNo revoked certificates.\n"));
+
+    for (j = 0; j < num; j++)
+      {
+	char serial[128];
+	size_t serial_size = sizeof (serial);
+	int err;
+	time_t tim;
+
+	err = gnutls_x509_crl_get_crt_serial (crl, j, serial,
+					      &serial_size, &tim);
+	if (err < 0)
+	  addf (str, "error: get_crt_serial: %s\n", gnutls_strerror (err));
+	else
+	  {
+	    char s[42];
+	    size_t max = sizeof (s);
+	    struct tm t;
+	    size_t i;
+
+	    addf (str, _("\t\tSerial Number (hex): "));
+	    hexprint (str, serial, serial_size);
+	    adds (str, "\n");
+
+	    if (gmtime_r (&tim, &t) == NULL)
+	      addf (str, "error: gmtime_r (%d)\n", t);
+	    else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+	      addf (str, "error: strftime (%d)\n", t);
+	    else
+	      addf (str, _("\t\tRevoked at: %s\n"), s);
+	  }
+      }
+  }
+
+  /* Signature. */
+  {
+    int err;
+    size_t size = 0;
+    char *buffer;
+
+    err = gnutls_x509_crl_get_signature_algorithm (crl);
+    if (err < 0)
+      addf (str, "error: get_signature_algorithm: %s\n",
+	    gnutls_strerror (err));
+    else
+      {
+	const char *name = gnutls_sign_algorithm_get_name (err);
+	if (name == NULL)
+	  name = "Unknown";
+	addf (str, _("\tSignature Algorithm: %s\n"), name);
+      }
+    if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
+      {
+	addf (str, _("warning: signed using a broken signature algorithm that can be forged.\n"));
+      }
+
+    err = gnutls_x509_crl_get_signature (crl, buffer, &size);
+    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+      {
+	addf (str, "error: get_signature: %s\n", gnutls_strerror (err));
+	return;
+      }
+
+    buffer = gnutls_malloc (size);
+    if (!buffer)
+      {
+	addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	return;
+      }
+
+    err = gnutls_x509_crl_get_signature (crl, buffer, &size);
+    if (err < 0)
+      {
+	gnutls_free (buffer);
+	addf (str, "error: get_signature2: %s\n", gnutls_strerror (err));
+	return;
+      }
+
+    addf (str, _("\tSignature:\n"));
+    hexdump (str, buffer, size, "\t\t");
+  }
+}
+
+/**
+ * gnutls_x509_crl_print - Pretty print X.509 certificate revocation list
+ * @crl: The structure to be printed
+ * @format: Indicate the format to use
+ * @out: Newly allocated datum with zero terminated string.
+ *
+ * This function will pretty print a X.509 certificate revocation
+ * list, suitable for display to a human.
+ *
+ * The output @out needs to be deallocate using gnutls_free().
+ *
+ * Returns 0 on success.
+ **/
+int
+gnutls_x509_crl_print (gnutls_x509_crl_t crl,
+		       gnutls_certificate_print_formats_t format,
+		       gnutls_datum_t *out)
+{
+  gnutls_string str;
+
+  _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+
+  _gnutls_string_append_str
+    (&str, _("X.509 Certificate Revocation List Information:\n"));
+
+  print_crl (&str, crl);
+
+  _gnutls_string_append_data (&str, "\0", 1);
+  out->data = str.data;
+  out->size = strlen (str.data);
 
   return 0;
 }

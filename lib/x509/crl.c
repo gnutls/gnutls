@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -310,6 +310,61 @@ gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl)
   _gnutls_free_datum (&sa);
 
   return result;
+}
+
+/**
+ * gnutls_x509_crl_get_signature - Returns the CRL's signature
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @sig: a pointer where the signature part will be copied (may be null).
+ * @sizeof_sig: initially holds the size of @sig
+ *
+ * This function will extract the signature field of a CRL.
+ *
+ * Returns 0 on success, and a negative value on error.
+ **/
+int
+gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
+			       char *sig, size_t *sizeof_sig)
+{
+  int result;
+  int bits, len;
+
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  bits = 0;
+  result = asn1_read_value (crl->crl, "signature", NULL, &bits);
+  if (result != ASN1_MEM_ERROR)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  if (bits % 8 != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CERTIFICATE_ERROR;
+    }
+
+  len = bits / 8;
+
+  if (*sizeof_sig < len)
+    {
+      *sizeof_sig = bits / 8;
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+  result = asn1_read_value (crl->crl, "signature", sig, &len);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return 0;
 }
 
 /**
