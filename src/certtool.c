@@ -1543,8 +1543,6 @@ load_ca_cert (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
 
-  fprintf (stderr, "Loading CA certificate...done\n");
-
   return crt;
 }
 
