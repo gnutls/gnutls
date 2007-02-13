@@ -25,8 +25,6 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
-  AC_REQUIRE([AC_GNU_SOURCE])
-  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -38,26 +36,8 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([AC_LIBSOURCES], m4_defn([gl_LIBSOURCES]))
   AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_cond_libtool=true
-  gl_source_base='gl'
-  gl_HEADER_ARPA_INET
-  AC_PROG_MKDIR_P
+  gl_source_base='src/lib'
   gl_ERROR
-  gl_GETADDRINFO
-  gl_FUNC_GETDELIM
-  gl_FUNC_GETLINE
-  gl_FUNC_GETPASS
-  gl_INET_NTOP
-  gl_INET_PTON
-  gl_HEADER_NETINET_IN
-  AC_PROG_MKDIR_P
-  gl_FUNC_READLINE
-  gl_TYPE_SOCKLEN_T
-  AM_STDBOOL_H
-  gl_FUNC_STRDUP
-  gl_STRING_MODULE_INDICATOR([strdup])
-  gl_HEADER_STRING_H
-  gl_HEADER_SYS_SOCKET
-  AC_PROG_MKDIR_P
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -95,57 +75,10 @@ AC_DEFUN([gl_LIBSOURCES],
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
-  build-aux/GNUmakefile
-  build-aux/config.rpath
-  build-aux/gendocs.sh
-  build-aux/maint.mk
-  doc/fdl.texi
-  doc/gendocs_template
-  doc/gpl.texi
-  doc/lgpl.texi
-  lib/dummy.c
   lib/error.c
   lib/error.h
-  lib/gai_strerror.c
-  lib/getaddrinfo.c
-  lib/getaddrinfo.h
-  lib/getdelim.c
-  lib/getdelim.h
-  lib/getline.c
-  lib/getline.h
-  lib/getpass.c
-  lib/getpass.h
-  lib/gettext.h
-  lib/inet_ntop.c
-  lib/inet_ntop.h
-  lib/inet_pton.c
-  lib/inet_pton.h
-  lib/readline.c
-  lib/readline.h
-  lib/socket_.h
-  lib/stdbool_.h
-  lib/strdup.c
-  lib/string_.h
-  m4/absolute-header.m4
-  m4/arpa_inet_h.m4
+  lib/progname.c
+  lib/progname.h
   m4/error.m4
-  m4/extensions.m4
-  m4/getaddrinfo.m4
-  m4/getdelim.m4
-  m4/getline.m4
-  m4/getpass.m4
   m4/gnulib-common.m4
-  m4/inet_ntop.m4
-  m4/inet_pton.m4
-  m4/lib-ld.m4
-  m4/lib-link.m4
-  m4/lib-prefix.m4
-  m4/netinet_in_h.m4
-  m4/readline.m4
-  m4/socklen.m4
-  m4/sockpfaf.m4
-  m4/stdbool.m4
-  m4/strdup.m4
-  m4/string_h.m4
-  m4/sys_socket_h.m4
 ])
