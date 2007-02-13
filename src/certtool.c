@@ -1195,20 +1195,20 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 static void
 print_crl_info (gnutls_x509_crl crl, FILE *out, int all)
 {
-  gnutls_datum_t out;
+  gnutls_datum_t info;
   int ret;
 
   if (all)
-    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_FULL, &out);
+    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_FULL, &info);
   else
-    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_UNSIGNED_FULL, &out);
+    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_UNSIGNED_FULL, &info);
 
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_print: %s", gnutls_strerror (ret));
   else
     {
-      fprintf (out, "%s\n", out.data);
-      gnutls_free (out.data);
+      fprintf (out, "%s\n", info.data);
+      gnutls_free (info.data);
     }
 }
 
