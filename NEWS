@@ -15,6 +15,8 @@ The function is gnutls_x509_crl_get_signature.
 The gnutls_x509_crt_get_subject_alt_name function returns the DN as a
 string in the provided buffer.
 
+** Minor improvements to certtool.
+
 ** API and ABI modifications:
 GNUTLS_SAN_DN: ADD, new gnutls_x509_subject_alt_name_t element.
 gnutls_x509_crl_print: ADD.
