@@ -41,6 +41,7 @@ AC_DEFUN([gl_INIT],
   gl_source_base='gl'
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
+  gl_ERROR
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
@@ -102,7 +103,8 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/gendocs_template
   doc/gpl.texi
   doc/lgpl.texi
-  lib/dummy.c
+  lib/error.c
+  lib/error.h
   lib/gai_strerror.c
   lib/getaddrinfo.c
   lib/getaddrinfo.h
@@ -117,6 +119,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/inet_ntop.h
   lib/inet_pton.c
   lib/inet_pton.h
+  lib/progname.c
+  lib/progname.h
   lib/readline.c
   lib/readline.h
   lib/socket_.h
@@ -125,6 +129,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/string_.h
   m4/absolute-header.m4
   m4/arpa_inet_h.m4
+  m4/error.m4
   m4/extensions.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
