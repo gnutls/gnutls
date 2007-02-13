@@ -21,7 +21,6 @@
 # 02110-1301, USA.
 
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
-	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
 	-I$(top_srcdir)/lib/minitasn1 -I$(srcdir)/openpgp		\
 	$(LIBGCRYPT_CFLAGS)
