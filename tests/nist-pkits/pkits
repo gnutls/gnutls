@@ -20,6 +20,9 @@
 
 set -e
 
+srcdir=${srcdir:-.}
+CERTTOOL=${CERTTOOL:-../../src/certtool}
+
 echo "Running PKITS CRL..."
 ./pkits_crl
 
