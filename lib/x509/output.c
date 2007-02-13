@@ -230,7 +230,7 @@ print_key_usage (gnutls_string * str, gnutls_x509_crt_t cert)
 static void
 print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 {
-  char *buffer;
+  char *buffer = NULL;
   size_t size;
   int err;
   int indx;
