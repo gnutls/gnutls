@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -271,6 +271,11 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
       result = asn1_read_value (cert->cert,
 				"tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
 				str, &len);
+
+      /* FIXME: If the parameters are not included in the certificate
+       * then the issuer's parameters should be used. This is not
+       * done yet.
+       */
 
       if (result != ASN1_SUCCESS)
 	{
