@@ -1182,12 +1182,16 @@ print_crl_info (gnutls_x509_crl crl, FILE *out, int all)
 }
 
 void
-crl_info ()
+crl_info (void)
 {
   gnutls_x509_crl crl;
   int ret;
   size_t size;
   gnutls_datum_t pem;
+
+  ret = gnutls_x509_crl_init (&crl);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crl_init: %s", gnutls_strerror (ret));
 
   pem.data = fread_file (infile, &size);
   pem.size = size;
@@ -1195,13 +1199,6 @@ crl_info ()
   if (!pem.data)
     error (EXIT_FAILURE, errno, "%s", info.infile ? info.infile :
 	   "standard input");
-
-  ret = gnutls_x509_crl_init (&crl);
-  if (ret < 0)
-    {
-      free (pem.data);
-      error (EXIT_FAILURE, 0, "crl_init: %s", gnutls_strerror (ret));
-    }
 
   ret = gnutls_x509_crl_import (crl, &pem, in_cert_format);
   free (pem.data);
