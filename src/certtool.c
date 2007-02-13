@@ -1195,81 +1195,21 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 static void
 print_crl_info (gnutls_x509_crl crl, FILE *out, int all)
 {
-  int ret, rc;
-  time_t tim;
-  unsigned int j;
-  char serial[128];
-  size_t serial_size = sizeof (serial), dn_size;
-  char dn[256];
-  const char *cprint;
-  char *tmp;
+  gnutls_datum_t out;
+  int ret;
 
-  fprintf (out, "CRL information:\n");
-  fprintf (out, "Version: %d\n", gnutls_x509_crl_get_version (crl));
-
-  /* Issuer
-   */
   if (all)
+    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_FULL, &out);
+  else
+    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_UNSIGNED_FULL, &out);
+
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crl_print: %s", gnutls_strerror (ret));
+  else
     {
-      dn_size = sizeof (dn);
-
-      ret = gnutls_x509_crl_get_issuer_dn (crl, dn, &dn_size);
-      if (ret >= 0)
-	fprintf (out, "Issuer: %s\n", dn);
-
-      fprintf (out, "Signature Algorithm: ");
-      ret = gnutls_x509_crl_get_signature_algorithm (crl);
-
-      cprint = gnutls_sign_algorithm_get_name (ret);
-      if (cprint == NULL)
-	cprint = UNKNOWN;
-      fprintf (out, "%s\n", cprint);
+      fprintf (out, "%s\n", out.data);
+      gnutls_free (out.data);
     }
-
-  /* Validity
-   */
-  fprintf (out, "Update dates:\n");
-
-  tim = gnutls_x509_crl_get_this_update (crl);
-  tmp = asctime (gmtime (&tim));
-  tmp[strlen(tmp)-1] = '\0';
-  fprintf (out, "\tIssued at: %s UTC\n", tmp);
-
-  tim = gnutls_x509_crl_get_next_update (crl);
-  tmp = asctime (gmtime (&tim));
-  tmp[strlen(tmp)-1] = '\0';
-  fprintf (out, "\tNext at: %s UTC\n", tmp);
-
-  fprintf (out, "\n");
-
-  /* Count the certificates.
-   */
-
-  rc = gnutls_x509_crl_get_crt_count (crl);
-  fprintf (out, "Revoked certificates: %d\n", rc);
-
-  for (j = 0; j < (unsigned int) rc; j++)
-    {
-      /* serial number
-       */
-      serial_size = sizeof (serial);
-      ret =
-	gnutls_x509_crl_get_crt_serial (crl, j, serial, &serial_size, &tim);
-
-      if (ret < 0)
-	{
-	  fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
-	}
-      else
-	{
-	  fprintf (out, "\tCertificate SN: %s\n",
-		   raw_to_string (serial, serial_size));
-	  tmp = asctime (gmtime (&tim));
-	  tmp[strlen(tmp)-1] = '\0';
-	  fprintf (out, "\tRevoked at: %s UTC\n", tmp);
-	}
-    }
-
 }
 
 void
