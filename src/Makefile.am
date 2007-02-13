@@ -21,7 +21,7 @@ EXTRA_DIST = README README.srptool gnutls-http-serv params.pem
 
 SUBDIRS = srp x509 openpgp cfg
 
-INCLUDES = -I../includes -I$(top_srcdir)/includes \
+AM_CPPFLAGS = -I../includes -I$(top_srcdir)/includes \
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl \
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl \
 	-I$(srcdir)/cfg
