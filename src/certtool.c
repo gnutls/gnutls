@@ -39,6 +39,7 @@
 #include <read-file.h>
 #include <error.h>
 #include <progname.h>
+#include <version-etc.h>
 
 static void print_crl_info (gnutls_x509_crl crl, FILE *out);
 int generate_prime (int bits, int how);
@@ -2611,27 +2612,7 @@ smime_to_pkcs7 (void)
 void
 certtool_version (void)
 {
-  const char *v = gnutls_check_version (NULL);
-
-  printf ("certtool (GnuTLS) %s\n", LIBGNUTLS_VERSION);
-  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
-    printf ("libgnutls %s\n", v);
-}
-
-void
-print_license (void)
-{
-  fputs ("\nCopyright (C) 2004 Free Software Foundation\n"
-	 "This program is free software; you can redistribute it and/or modify \n"
-	 "it under the terms of the GNU General Public License as published by \n"
-	 "the Free Software Foundation; either version 2 of the License, or \n"
-	 "(at your option) any later version. \n" "\n"
-	 "This program is distributed in the hope that it will be useful, \n"
-	 "but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
-	 "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
-	 "GNU General Public License for more details. \n" "\n"
-	 "You should have received a copy of the GNU General Public License \n"
-	 "along with this program; if not, write to the Free Software \n"
-	 "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n",
-	 stdout);
+  version_etc (stdout, program_name, PACKAGE_STRING,
+	       gnutls_check_version (NULL),
+	       "Nikos Mavroyanopoulos", "Simon Josefsson", 0);
 }
