@@ -2262,12 +2262,7 @@ print_bag_data (gnutls_pkcs12_bag bag)
 
   count = gnutls_pkcs12_bag_get_count (bag);
   if (count < 0)
-    {
-      fprintf (stderr, "get_count: %s\n", gnutls_strerror (count));
-      exit (1);
-    }
-
-
+    error (EXIT_FAILURE, 0, "get_count: %s", gnutls_strerror (count));
 
   fprintf (outfile, "\tElements: %d\n", count);
 
@@ -2345,79 +2340,54 @@ pkcs12_info (void)
 {
   gnutls_pkcs12 pkcs12;
   gnutls_pkcs12_bag bag;
-  int result, ret;
+  int result;
   size_t size;
   gnutls_datum data;
   const char *password;
   int index;
 
-  size = fread (buffer, 1, sizeof (buffer) - 1, infile);
-  buffer[size] = 0;
+  result = gnutls_pkcs12_init (&pkcs12);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "p12_init: %s", gnutls_strerror (result));
 
-  data.data = buffer;
+  data.data = fread_file (infile, &size);
   data.size = size;
+
+  result = gnutls_pkcs12_import (pkcs12, &data, info.incert_format, 0);
+  free (data.data);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "p12_import: %s", gnutls_strerror (result));
 
   if (info.pass)
     password = info.pass;
   else
     password = get_pass ();
 
-  result = gnutls_pkcs12_init (&pkcs12);
-  if (result < 0)
-    {
-      fprintf (stderr, "p12_init: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
-  result = gnutls_pkcs12_import (pkcs12, &data, info.incert_format, 0);
-  if (result < 0)
-    {
-      fprintf (stderr, "p12_import: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
   result = gnutls_pkcs12_verify_mac (pkcs12, password);
   if (result < 0)
-    {
-      fprintf (stderr, "verify_mac: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
-
+    error (EXIT_FAILURE, 0, "verify_mac: %s", gnutls_strerror (result));
 
   index = 0;
 
-  do
+  for (index = 0; ; index++)
     {
       result = gnutls_pkcs12_bag_init (&bag);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_init: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_init: %s", gnutls_strerror (result));
 
-      ret = gnutls_pkcs12_get_bag (pkcs12, index, bag);
-      if (ret < 0)
-	{
-	  break;
-	}
+      result = gnutls_pkcs12_get_bag (pkcs12, index, bag);
+      if (result < 0)
+	break;
 
       result = gnutls_pkcs12_bag_get_count (bag);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_init: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_count: %s", gnutls_strerror (result));
 
       fprintf (outfile, "BAG #%d\n", index);
 
       result = gnutls_pkcs12_bag_get_type (bag, 0);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_init: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
-
+	error (EXIT_FAILURE, 0, "bag_init: %s", gnutls_strerror (result));
 
       if (result == GNUTLS_BAG_ENCRYPTED)
 	{
@@ -2427,29 +2397,19 @@ pkcs12_info (void)
 	  result = gnutls_pkcs12_bag_decrypt (bag, password);
 
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "bag_decrypt: %s\n", gnutls_strerror (result));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "bag_decrypt: %s",
+		   gnutls_strerror (result));
 
 	  result = gnutls_pkcs12_bag_get_count (bag);
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "get_count: %s\n", gnutls_strerror (result));
-	      exit (1);
-	    }
-
+	    error (EXIT_FAILURE, 0, "encrypted bag_count: %s",
+		   gnutls_strerror (result));
 	}
 
       print_bag_data (bag);
 
       gnutls_pkcs12_bag_deinit (bag);
-
-      index++;
     }
-  while (ret == 0);
-
-
 }
 
 void
