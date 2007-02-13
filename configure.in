@@ -111,6 +111,7 @@ AC_MSG_RESULT([***
 
 gl_EARLY
 lgl_EARLY
+sgl_EARLY
 AC_C_CONST
 AC_C_INLINE
 
@@ -552,6 +553,7 @@ AC_MSG_RESULT([***
 ])
 gl_INIT
 lgl_INIT
+sgl_INIT
 
 AC_TRY_LINK([#include <winsock2.h>], [
   WORD wVersionRequested = MAKEWORD(2, 2);
