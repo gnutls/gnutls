@@ -193,7 +193,7 @@ AC_MSG_RESULT([***
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS(strings.h alloca.h)
-AC_CHECK_HEADERS(errno.h sys/time.h time.h)
+AC_CHECK_HEADERS(errno.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
