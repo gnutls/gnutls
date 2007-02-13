@@ -191,13 +191,12 @@ AC_MSG_RESULT([***
 ])
 
 AC_HEADER_STDC
-AC_HEADER_TIME
 AC_CHECK_HEADERS(strings.h alloca.h)
 AC_CHECK_HEADERS(errno.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_FUNCS(umask vasprintf isascii gmtime_r fork,,)
+AC_CHECK_FUNCS(umask vasprintf isascii fork,,)
 AC_FUNC_ALLOCA
 
 # No fork on MinGW, disable some self-tests until we fix them.
