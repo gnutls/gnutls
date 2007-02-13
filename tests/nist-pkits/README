@@ -13,3 +13,14 @@ Because of unclear license, they are not distributed with GnuTLS
 currently.
 
 See the PDF for information regarding the self tests.
+
+The script "pkits" will invoke the simple scripts "pkits_crt",
+"pkits_crl", "pkits_pkcs12", "pkits_smime" which will make sure that
+certtool can parse those structures.
+
+The script "pkits_test" will build NIST's tool to generate HTML for
+tests.  It will start a Glade interface, and you should type
+e.g. 'foo.html' and then 'Generate tables'.  Since GnuTLS supports
+DSA, you should typically click on 'DSA signature verification' too.
+The interface invokes "gnutls_test_entry" which verifies certificates
+chains, after building them using "build-chain".
