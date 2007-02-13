@@ -2582,8 +2582,6 @@ smime_to_pkcs7 (void)
       len = getline (&lineptr, &linesize, infile);
       if (len == -1)
 	error (EXIT_FAILURE, 0, "Message has RFC 2822 header but no body");
-	  exit (1);
-	}
     }
   while (strcmp (lineptr, "\r\n") == 0 && strcmp (lineptr, "\n") == 0);
 
