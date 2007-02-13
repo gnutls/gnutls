@@ -36,9 +36,12 @@
 #include <unistd.h>
 #include <certtool-cfg.h>
 
+#include <errno.h>
+
 /* Gnulib portability files. */
 #include <getline.h>
 #include <read-file.h>
+#include <error.h>
 
 static void print_crl_info (gnutls_x509_crl crl, FILE *out, int all);
 int generate_prime (int bits, int how);
@@ -921,10 +924,7 @@ gaa_parser (int argc, char **argv)
     {
       outfile = fopen (info.outfile, "wb");
       if (outfile == NULL)
-	{
-	  fprintf (stderr, "error: could not open '%s'.\n", info.outfile);
-	  exit (1);
-	}
+	error (EXIT_FAILURE, errno, "%s", info.outfile);
     }
   else
     outfile = stdout;
@@ -933,10 +933,7 @@ gaa_parser (int argc, char **argv)
     {
       infile = fopen (info.infile, "rb");
       if (infile == NULL)
-	{
-	  fprintf (stderr, "error: could not open '%s'.\n", info.infile);
-	  exit (1);
-	}
+	error (EXIT_FAILURE, errno, "%s", info.infile);
     }
   else
     infile = stdin;
@@ -1287,36 +1284,27 @@ crl_info ()
   pem.size = size;
 
   if (!pem.data)
-    {
-      fprintf (stderr, "Could not read file\n");
-      exit (1);
-    }
+    error (EXIT_FAILURE, errno, "%s", info.infile ? info.infile :
+	   "standard input");
 
   ret = gnutls_x509_crl_init (&crl);
   if (ret < 0)
     {
       free (pem.data);
-      fprintf (stderr, "crl_init: %s\n", gnutls_strerror (ret));
-      exit (1);
+      error (EXIT_FAILURE, 0, "crl_init: %s", gnutls_strerror (ret));
     }
 
   ret = gnutls_x509_crl_import (crl, &pem, in_cert_format);
   free (pem.data);
   if (ret < 0)
-    {
-      fprintf (stderr, "Decoding error: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
 
   print_crl_info (crl, outfile, 1);
 
   size = sizeof (buffer);
   ret = gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, buffer, &size);
   if (ret < 0)
-    {
-      fprintf (stderr, "Encoding error: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
 
   fprintf (outfile, "\n%s\n", buffer);
 }
