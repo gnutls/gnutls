@@ -1351,64 +1351,45 @@ privkey_info (void)
   fprintf (outfile, "\n%s\n", buffer);
 }
 
-/* mand should be non zero if it is required to read a private key.
+/* Load the private key.
+ * @mand should be non zero if it is required to read a private key.
  */
 gnutls_x509_privkey
 load_private_key (int mand)
 {
-  FILE *fd;
   gnutls_x509_privkey key;
   int ret;
   gnutls_datum dat;
   size_t size;
-  const char *pass;
 
   if (!info.privkey && !mand)
     return NULL;
 
-  if (!info.privkey)
-    {
-      fprintf (stderr, "error: a private key was not specified\n");
-      exit (1);
-    }
-
-  fd = fopen (info.privkey, "r");
-  if (fd == NULL)
-    {
-      fprintf (stderr, "error: could not load key file '%s'.\n",
-	       info.privkey);
-      exit (1);
-    }
-
-  size = fread (buffer, 1, sizeof (buffer) - 1, fd);
-  buffer[size] = 0;
-
-  fclose (fd);
+  if (info.privkey == NULL)
+    error (EXIT_FAILURE, 0, "missing --load-privkey");
 
   ret = gnutls_x509_privkey_init (&key);
   if (ret < 0)
-    {
-      fprintf (stderr, "privkey_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  dat.data = buffer;
+  dat.data = read_binary_file (info.privkey, &size);
   dat.size = size;
 
-  if (!info.pkcs8)
-    ret = gnutls_x509_privkey_import (key, &dat, in_cert_format);
-  else
+  if (!dat.data)
+    error (EXIT_FAILURE, errno, "reading --load-privkey: %s",
+	   info.privkey);
+
+  if (info.pkcs8)
     {
-      pass = get_pass ();
+      const char *pass = get_pass ();
       ret = gnutls_x509_privkey_import_pkcs8 (key, &dat, in_cert_format,
 					      pass, 0);
     }
-
+  else
+    ret = gnutls_x509_privkey_import (key, &dat, in_cert_format);
   if (ret < 0)
-    {
-      fprintf (stderr, "privkey_import: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "importing --load-privkey: %s: %s",
+	   info.privkey, gnutls_strerror (ret));
 
   return key;
 }
