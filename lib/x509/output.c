@@ -1157,7 +1157,8 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 
 static void
 print_crl (gnutls_string *str,
-	   gnutls_x509_crl_t crl)
+	   gnutls_x509_crl_t crl,
+	   int notsigned)
 {
   /* Version. */
   {
@@ -1171,16 +1172,17 @@ print_crl (gnutls_string *str,
   }
 
   /* Issuer. */
-  {
-    char dn[1024];
-    size_t dn_size = sizeof (dn);
-    int err;
+  if (!notsigned)
+    {
+      char dn[1024];
+      size_t dn_size = sizeof (dn);
+      int err;
 
-    err = gnutls_x509_crl_get_issuer_dn (crl, dn, &dn_size);
-    if (err < 0)
-      addf (str, "error: get_issuer_dn: %s\n", gnutls_strerror (err));
-    else
-      addf (str, _("\tIssuer: %s\n"), dn);
+      err = gnutls_x509_crl_get_issuer_dn (crl, dn, &dn_size);
+      if (err < 0)
+	addf (str, "error: get_issuer_dn: %s\n", gnutls_strerror (err));
+      else
+	addf (str, _("\tIssuer: %s\n"), dn);
     }
 
   /* Validity. */
@@ -1263,52 +1265,55 @@ print_crl (gnutls_string *str,
   }
 
   /* Signature. */
-  {
-    int err;
-    size_t size = 0;
-    char *buffer;
+  if (!notsigned)
+    {
+      int err;
+      size_t size = 0;
+      char *buffer;
 
-    err = gnutls_x509_crl_get_signature_algorithm (crl);
-    if (err < 0)
-      addf (str, "error: get_signature_algorithm: %s\n",
-	    gnutls_strerror (err));
-    else
-      {
-	const char *name = gnutls_sign_algorithm_get_name (err);
-	if (name == NULL)
-	  name = "Unknown";
-	addf (str, _("\tSignature Algorithm: %s\n"), name);
-      }
-    if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
-      {
-	addf (str, _("warning: signed using a broken signature algorithm that can be forged.\n"));
-      }
+      err = gnutls_x509_crl_get_signature_algorithm (crl);
+      if (err < 0)
+	addf (str, "error: get_signature_algorithm: %s\n",
+	      gnutls_strerror (err));
+      else
+	{
+	  const char *name = gnutls_sign_algorithm_get_name (err);
+	  if (name == NULL)
+	    name = "Unknown";
+	  addf (str, _("\tSignature Algorithm: %s\n"), name);
+	}
+      if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
+	{
+	  addf (str, _("warning: signed using a broken signature algorithm that can be forged.\n"));
+	}
 
-    err = gnutls_x509_crl_get_signature (crl, buffer, &size);
-    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-      {
-	addf (str, "error: get_signature: %s\n", gnutls_strerror (err));
-	return;
-      }
+      err = gnutls_x509_crl_get_signature (crl, buffer, &size);
+      if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	{
+	  addf (str, "error: get_signature: %s\n", gnutls_strerror (err));
+	  return;
+	}
 
-    buffer = gnutls_malloc (size);
-    if (!buffer)
-      {
-	addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-	return;
-      }
+      buffer = gnutls_malloc (size);
+      if (!buffer)
+	{
+	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  return;
+	}
 
-    err = gnutls_x509_crl_get_signature (crl, buffer, &size);
-    if (err < 0)
-      {
-	gnutls_free (buffer);
-	addf (str, "error: get_signature2: %s\n", gnutls_strerror (err));
-	return;
-      }
+      err = gnutls_x509_crl_get_signature (crl, buffer, &size);
+      if (err < 0)
+	{
+	  gnutls_free (buffer);
+	  addf (str, "error: get_signature2: %s\n", gnutls_strerror (err));
+	  return;
+	}
 
-    addf (str, _("\tSignature:\n"));
-    hexdump (str, buffer, size, "\t\t");
-  }
+      addf (str, _("\tSignature:\n"));
+      hexdump (str, buffer, size, "\t\t");
+
+      gnutls_free (buffer);
+    }
 }
 
 /**
@@ -1336,7 +1341,7 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
   _gnutls_string_append_str
     (&str, _("X.509 Certificate Revocation List Information:\n"));
 
-  print_crl (&str, crl);
+  print_crl (&str, crl, format == GNUTLS_X509_CRT_UNSIGNED_FULL);
 
   _gnutls_string_append_data (&str, "\0", 1);
   out->data = str.data;
