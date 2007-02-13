@@ -1,0 +1,24 @@
+#!/bin/bash
+
+TITLE=$1
+EECERT=$2
+RESULT=$3
+
+./build-chain certs $EECERT > chain.pem
+certtool -e < chain.pem > output.txt
+
+if grep -q 'Verification output:' output.txt; then
+    if grep 'Verification output' output.txt | grep -q -v 'Verification output: Verified.'; then
+	if test "$RESULT" = "0"; then
+	    echo "<font color=red>Unexpected reject</font>"
+	else
+	    echo "<font color=green>Reject</font>"
+	fi
+    else
+	if test "$RESULT" = "1"; then
+	    echo "<font color=red>Unexpected success</font>"
+	else
+	    echo "<font color=green>Success</font>"
+	fi
+    fi
+fi

@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $certdir = $ARGV[0];
+my $certfile = $ARGV[1];
+my $aki;
+my $info;
+my $list;
+
+if (! -f "$certdir/certinfo.txt") {
+    system("for i in $certdir/*.crt; do echo -n \$i:; certtool --inder -i < \$i|grep 'Subject Key Id' -A 1|tail -1; done > $certdir/certinfo.txt");
+}
+
+do {
+    print "Parsing $certdir/$certfile...\n";
+
+    $info = `certtool --inder -i < $certdir/$certfile`;
+
+    print "$info";
+
+    if ($info =~ m,Authority Key Identifier.*:\n[\t]*([a-z0-9]+),m) {
+	$aki = $1;
+    } else {
+	die "Could not find AKI";
+    }
+
+    print "Finding AKI $aki...\n";
+
+    $list = `cat $certdir/certinfo.txt | grep $aki`;
+    if ($list =~m,.*/(.*):.*,) {
+	$list = $1;
+    } else {
+	die "Could not find issuer";
+    }
+    $certfile = $list;
+} while (1);
