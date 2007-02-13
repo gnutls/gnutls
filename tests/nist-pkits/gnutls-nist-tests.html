@@ -1,0 +1,2302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"><title>PKITS Test Matrix</title></head><body>
+<div style="text-align: center;">
+<h1>Enterprise PVM</h1>
+<div style="text-align: left;">In addtion to the minimum requirements
+for an Enterprise Path Validation Module, these tests assume that the
+PWM implements the following features:<br>
+<br>
+<table style="text-align: left; width: 100%;" border="0" cellspacing="2" cellpadding="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">DSA:<br>
+
+      <div style="margin-left: 40px;">DSA signature verification<br>
+<span style="text-decoration: line-through;">DSA parameter inheritance</span><br>
+      </div>
+
+      <br>
+
+Name Constraints:<br>
+
+      <div style="margin-left: 40px;"><span style="text-decoration: line-through;">directoryName</span><br>
+
+<span style="text-decoration: line-through;">rfc822Name</span><br>
+
+<span style="text-decoration: line-through;">dNSname</span><br>
+
+<span style="text-decoration: line-through;">uniformResourceIdentifier</span><br>
+      </div>
+
+      <br>
+
+Distribution Points:<br>
+
+      <div style="margin-left: 40px;"><span style="text-decoration: line-through;">onlySomeReasons</span><br>
+<span style="text-decoration: line-through;">nameRelativeToIssuer</span><br>
+<span style="text-decoration: line-through;">indirect CRLs</span><br>
+      </div>
+
+      </td>
+      <td style="vertical-align: top;">
+      <div style="margin-left: 40px;"><span style="text-decoration: line-through;">delta-CRLs</span><br>
+      <br>
+Policy Processing:<br>
+<div style="margin-left: 40px;"><span style="text-decoration: line-through;">anyPolicy OID</span><br>
+<span style="text-decoration: line-through;">inhibitAnyPolicy</span><br>
+<span style="text-decoration: line-through;">initial-inhibit-any-policy</span><br>
+<span style="text-decoration: line-through;">policyMappings</span><br>
+<span style="text-decoration: line-through;">inhibitPolicyMapping</span><br>
+<span style="text-decoration: line-through;">initial-inhibit-policy-mapping</span><br>
+</div>
+      </div>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+</div>
+<br>
+
+</div>
+<br>
+<table cellpadding="2" cellspacing="2" border="1" style="text-align: left; width: 100%;">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Test</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Expected Result</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-weight: bold;">Actual Result</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.1.1 Valid Signatures Test1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.1.2 Invalid CA Signature Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - Invalid signature on intermediate certificate<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Reject</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.1.3 Invalid EE Signature Test3<br>
+      </td>
+      <td style="vertical-align: top;">Reject - Invalid signature on end entity certificate<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Reject</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.1.4 Valid DSA Signatures Test4<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.1.5 Valid DSA Parameter Inheritance Test5</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.1.6 Invalid DSA Signature Test6<br>
+      </td>
+      <td style="vertical-align: top;">Reject - Invalid signature on end entity certificate<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Reject</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.1 Invalid CA notBefore Date Test1<br>
+      </td>
+      <td style="vertical-align: top;">Reject - notBefore date in intermediate certificate is after the current date<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.2 Invalid EE notBefore Date Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - notBefore date in end entity certificate is after the current date<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.3 Valid pre2000 UTC notBefore Date Test3<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.4 Valid GeneralizedTime notBefore Date Test4<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.5 Invalid CA notAfter Date Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject - notAfter date in intermediate certificate is before the current date<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.6 Invalid EE notAfter Date Test6<br>
+      </td>
+      <td style="vertical-align: top;">Reject - notAfter date in end entity certificate is before the current date<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.7 Invalid pre2000 UTC EE notAfter Date Test7<br>
+      </td>
+      <td style="vertical-align: top;">Reject - notAfter date in end entity certificate is before the current date<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.2.8 Valid GeneralizedTime notAfter Date Test8<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.3.1 Invalid Name Chaining EE Test1<br>
+      </td>
+      <td style="vertical-align: top;">Reject - names do not chain<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.3.2 Invalid Name Chaining Order Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - names do not chain<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.3.3 Valid Name Chaining Whitespace Test3<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.3.4 Valid Name Chaining Whitespace Test4<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.3.5 Valid Name Chaining Capitalization Test5<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.3.6 Valid Name Chaining UIDs Test6<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.3.7 Valid RFC3280 Mandatory Attribute Types Test7</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.3.8 Valid RFC3280 Optional Attribute Types Test8</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.3.9 Valid UTF8String Encoded Names Test9<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.3.10 Valid Rollover from PrintableString to UTF8String Test10</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">The certification path is valid. However, a PVM that implements the minimum name comparison rules in RFC 3280 will reject the certification path since it will not recognize that names chain correctly</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.3.11 Valid UTF8String Case Insensitive Match Test11</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">The certification path is valid. However, a PVM that implements the minimum name comparison rules in RFC 3280 will reject the certification path since it will not recognize that names chain correctly</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.1 Missing CRL Test1<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.2 Invalid Revoked CA Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - an intermediate certificate has been revoked.<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.3 Invalid Revoked EE Test3<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.4. Invalid Bad CRL Signature Test4<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.5 Invalid Bad CRL Issuer Name Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.6 Invalid Wrong CRL Test6<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.7 Valid Two CRLs Test7<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.8 Invalid Unknown CRL Entry Extension Test8<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.9 Invalid Unknown CRL Extension Test9<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.10 Invalid Unknown CRL Extension Test10<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.11 Invalid Old CRL nextUpdate Test11<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.12 Invalid pre2000 CRL nextUpdate Tesst12<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.13 Valid GeneralizedTime CRL nextUpdate Test13<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.14 Valid Negative Serial Number Test14<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.15 Invalid Negative Serial Number Test15<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.16 Valid Long Serial Number Test16<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.17 Valid Long Serial Number Test17<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.18 Invalid Long Serial Number Test18<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.19 Valid Separate Certificate and CRL Keys Test19<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.20 Invalid Separate Certificate and CRL Keys Test20<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.4.21 Invalid Separate Certificate and CRL Keys Test21<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.1 Valid Basic Self-Issued Old With New Test1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.2 Invalid Basic Self-Issued Old With New Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.3 Valid Basic Self-Issued New With Old Test3<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.4 Valid Basic Self-Issued New With Old Test4<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.5 Invalid Basic Self-Issued New With Old Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.6 Valid Basic Self-Issued CRL Signing Key Test6<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.7 Invalid Basic Self-Issued CRL Signing Key Test7<br>
+      </td>
+      <td style="vertical-align: top;">Reject - the end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.5.8 Invalid Basic Self-Issued CRL Signing Key Test8<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Reject</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.1 Invalid Missing basicConstraints Test1<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Reject</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.2 Invalid cA False Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Reject</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.3 Invalid cA False Test3<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Reject</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.4 Valid basicConstraints Not Critical Test4<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.5 Invalid pathLenConstraint Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.6 Invalid pathLenConstraint Test6<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.7 Valid pathLenConstraint Test7<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.8 Valid pathLenConstraint Test8<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.9 Invalid pathLenConstraint Test9<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.10 Invalid pathLenConstraint Test10<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.11 Invalid pathLenConstraint Test11<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.12 Invalid pathLenConstraint Test12<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.13 Valid pathLenConstraint Test13<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.14 Valid pathLenConstraint Test14<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.15 Valid Self-Issued pathLenConstraint Test15<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.16 Invalid Self-Issued pathLenConstraint Test16<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.6.17 Valid Self-Issued pathLenConstraint Test17<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.7.1 Invalid keyUsage Critical keyCertSign False Test1<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.7.2 Invalid keyUsage Not Critical keyCertSign False Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.7.3 Valid keyUsage Not Critical Test3<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.7.4 Invalid keyUsage Critical cRLSign False Test4<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.7.5 Invalid keyUsage Not Critical cRLSign False Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject - invalid certification path<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.1 All Certificates Same Policy Test1, subtest 1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully [Run if application can be configured as specified (i.e., if <i>initial-policy-set</i> can be <i>any-policy</i> when <i>initial-explicit-policy</i> is set). Otherwise indicate that test could not be run.]<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.1 All Certificates Same Policy Test1, subtest 2<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.1 All Certificates Same Policy Test1, subtest 3<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.1 All Certificates Same Policy Test1, subtest 4<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.2 All Certificates No Policies Test2, subtest 1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.2 All Certificates No Policies Test2, subtest 2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy [<i>initial-policy-set</i> may be set to {NIST-test-policy-1, NIST-test-policy-2, NIST-test-policy-3, NIST-test-policy-4, NIST-test-policy-5, NIST-test-policy-6} if it can not be set to <i>any-policy</i>]<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.3 Different Policies Test3, subtest 1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.3 Different Policies Test3, subtest 2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy [Run if application can be configured as specified (i.e., if <i>initial-policy-set</i> can be <i>any-policy</i> when <i>initial-explicit-policy</i> is set). Otherwise indicate that test could not be run.]<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.3 Different Policies Test3, subtest 3<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.4 Different Policies Test4<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.5 Different Policies Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.6 Overlapping Policies Test6, subtest 1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.6 Overlapping Policies Test6, subtest 2<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.6 Overlapping Policies Test6, subtest 3<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.7 Different Policies Test7<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.8 Different Policies Test8<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.9 Different Policies Test9<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.10 All Certificates Same Policies Test10, subtest 1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.10 All Certificates Same Policies Test10, subtest 2<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.10 All Certificates Same Policies Test10, subtest 3<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.11 All Certificates AnyPolicy Test11, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.11 All Certificates AnyPolicy Test11, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - path only valid under anyPolicy OID</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.12 Different Policies Test12<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.13 All Certificates Same Policies Test13, subtest 1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.13 All Certificates Same Policies Test13, subtest 2<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.13 All Certificates Same Policies Test13, subtest 3<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.14 AnyPolicy Test14, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - no acceptable policy</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.14 AnyPolicy Test14, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - no acceptable policy</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.15 User Notice Qualifier Test15</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.16 User Notice Qualifier Test16</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.17 User Notice Qualifier Test17</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.18 User Notice Qualifier Test18, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.18 User Notice Qualifier Test18, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.8.19 User Notice Qualifier Test19</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This certification path may be rejected since the end entity certificate contains a policy qualifier with an explicitText string that is longer than 200 characters.  This certification path may be validated successfully if the length violation is ignored.</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.8.20 CPS Pointer Qualifier Test20<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully [Test should be run with <i>initial-explicit-policy</i> set (<i>initial-policy-set</i> may be set to {NIST-test-policy-1, NIST-test-policy-2, NIST-test-policy-3, NIST-test-policy-4, NIST-test-policy-5, NIST-test-policy-6} if it can not be set to <i>any-policy</i>).]<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.1 Valid RequireExplicitPolicy Test1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.2 Valid RequireExplicitPolicy Test2<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.3 Invalid RequireExplicitPolicy Test3<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.4 Valid RequireExplicitPolicy Test4<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.5 Invalid RequireExplicitPolicy Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.6 Valid Self-Issued requireExplicitPolicy Test6<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.7 Invalid Self-Issued requireExplicitPolicy Test7<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.9.8 Invalid Self-Issued requireExplicitPolicy Test8<br>
+      </td>
+      <td style="vertical-align: top;">Reject - no acceptable policy<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.10.1 Valid Policy Mapping Test1, subtest 1<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension [Test using the default settings (i.e., <i>initial-policy-set</i> = <i>any-policy</i>)<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.1 Valid Policy Mapping Test1, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.1 Valid Policy Mapping Test1, subtest 3</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Test can not be run</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.2 Invalid Policy Mapping Test2, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.2 Invalid Policy Mapping Test2, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Test can not be run</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.3 Valid Policy Mapping Test3, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.3 Valid Policy Mapping Test3, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.4 Invalid Policy Mapping Test4</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.5 Valid Policy Mapping Test5, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.5 Valid Policy Mapping Test5, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.6 Valid Policy Mapping Test6, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.6 Valid Policy Mapping Test6, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.7 Invalid Mapping From anyPolicy Test7</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully if the anyPolicy OID is treated the same as any other policy OID</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.8 Invalid Mapping To anyPolicy Test8</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.9 Valid Policy Mapping Test9</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.10 Invalid Policy Mapping Test10</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.11 Valid Policy Mapping Test11</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.12 Valid Policy Mapping Test12, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.12 Valid Policy Mapping Test12, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.13 Valid Policy Mapping Test13</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.10.14 Valid Policy Mapping Test14</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.1 Invalid inhibitPolicyMapping Test1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.11.2 Valid inhibitPolicyMapping Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.3 Invalid inhibitPolicyMapping Test3</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.4 Valid inhibitPolicyMapping Test4</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.5 Invalid inhibitPolicyMapping Test5</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.6 Invalid inhibitPolicyMapping Test6</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.7 Valid Self-Issued inhibitPolicyMapping Test7</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.8 Invalid Self-Issued inhibitPolicyMapping Test8</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.9 Invalid Self-Issued inhibitPolicyMapping Test9</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.10 Invalid Self-Issued inhibitPolicyMapping Test10</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.11.11 Invalid Self-Issued inhibitPolicyMapping Test11</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.1 Invalid inhibitAnyPolicy Test1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.12.2 Valid inhibitAnyPolicy Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.3 inhibitAnyPolicy Test3, subtest 1</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.3 inhibitAnyPolicy Test3, subtest 2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Test can not be run</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.4 Invalid inhibitAnyPolicy Test4</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.5 Invalid inhibitAnyPolicy Test5</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.6 Invalid inhibitAnyPolicy Test6</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.7 Valid Self-Issued inhibitAnyPolicy Test7</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.8 Invalid Self-Issued inhibitAnyPolicy Test8</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.9 Valid Self-Issued inhibitAnyPolicy Test9</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.12.10 Invalid Self-Issued inhibitAnyPolicy Test10</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.13.1 Valid DN nameConstraints Test1<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.2 Invalid DN nameConstraints Test2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.3 Invalid DN nameConstraints Test3</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.4 Valid DN nameConstraints Test4</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.5 Valid DN nameConstraints Test5</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.6 Valid DN nameConstraints Test6</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.7 Invalid DN nameConstraints Test7</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.8 Invalid DN nameConstraints Test8</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.9 Invalid DN nameConstraints Test9</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.10 Invalid DN nameConstraints Test10</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.11 Valid DN nameConstraints Test11</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.12 Invalid DN nameConstraints Test12</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.13 Invalid DN nameConstraints Test13</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.14 Valid DN nameConstraints Test14</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.15 Invalid DN nameConstraints Test15</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.16 Invalid DN nameConstraints Test16</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.17 Invalid DN nameConstraints Test17</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.18 Valid DN nameConstraints Test18</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.19 Valid Self-Issued DN nameConstraints Test19</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.20 Invalid Self-Issued DN nameConstraints Test20</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.13.21 Valid RFC822 nameConstraints Test21<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.22 Invalid RFC822 nameConstraints Test22</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.23 Valid RFC822 nameConstraints Test23</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.24 Invalid RFC822 nameConstraints Test24</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.25 Valid RFC822 nameConstraints Test25</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.26 Invalid RFC822 nameConstraints Test26</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.27 Valid DN and  RFC822 nameConstraints Test27</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.28 Invalid DN and  RFC822 nameConstraints Test28</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.29 Invalid DN and  RFC822 nameConstraints Test29</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.13.30 Valid DNS nameConstraints Test30<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.31 Invalid DNS nameConstraints Test31</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.32 Valid DNS nameConstraints Test32</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.33 Invalid DNS nameConstraints Test33</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.13.34 Valid URI nameConstraints Test34<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.35 Invalid URI nameConstraints Test35</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.36 Valid URI nameConstraints Test36</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.37 Invalid URI nameConstraints Test37</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.13.38 Invalid DNS nameConstraints Test38</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - unrecognized critical extension</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.1 Valid distributionPoint Test1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.2 Invalid distributionPoint Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - end entity certificate has been revoked<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.3 Invalid distributionPoint Test3<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.4 Valid distributionPoint Test4<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.5 Valid distributionPoint Test5<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.6 Invalid distributionPoint Test6</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.7 Valid distributionPoint Test7</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.8 Invalid distributionPoint Test8</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.9 Invalid distributionPoint Test9<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.10 Valid No issuingDistributionPoint Test10<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.11 Invalid onlyContainsUserCerts CRL Test11<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.12 Invalid onlyContainsCACerts CRL Test12<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.13 Valid onlyContainsCACerts CRL Test13<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.14 Invalid onlyContainsAttributeCerts Test14<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.15 Invalid onlySomeReasons Test15</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.16 Invalid onlySomeReasons Test16</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.17 Invalid onlySomeReasons Test17</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.18 Valid onlySomeReasons Test18<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.19 Valid onlySomeReasons Test19</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.20 Invalid onlySomeReasons Test20</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.21 Invalid onlySomeReasons Test21</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.22 Valid IDP with indirectCRL Test22</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Application may validate successfully. However, if the application treats an issuingDistributionPoint extension with indirectCRL set to TRUE as an unrecognized critical extension then the application should reject the path or issue a warning that the status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.23 Invalid IDP with indirectCRL Test23</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - end entity certificate has been revoked</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.14.24 Valid IDP with indirectCRL Test24<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.25 Valid IDP with indirectCRL Test25</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.26 Invalid IDP with indirectCRL Test26</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.27 Invalid cRLIssuer Test27</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.28 Valid cRLIssuer Test28</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.29 Valid cRLIssuer Test29</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.30 Valid cRLIssuer Test30</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.31 Invalid cRLIssuer Test31</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.32 Invalid cRLIssuer Test32</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.33 Valid cRLIssuer Test33</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.34 Invalid cRLIssuer Test34</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - end entity certificate has been revoked</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.14.35 Invalid cRLIssuer Test35</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.15.1 Invalid deltaCRLIndicator No Base Test1<br>
+      </td>
+      <td style="vertical-align: top;">Reject or Warn - status of end entity certificate can not be determined<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.2 Valid delta-CRL Test2</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.3 Invalid delta-CRL Test3</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - end entity certificate has been revoked</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.4 Invalid delta-CRL Test4</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.5 Valid delta-CRL Test5</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - end entity certificate is on hold</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.6 Invalid delta-CRL Test6</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - end entity certificate is on hold</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.7 Valid delta-CRL Test7</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.8 Valid delta-CRL Test8</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Validate Successfully</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.9 Invalid delta-CRL Test9</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject - end entity certificate has been revoked</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;"><span style="color: rgb(153, 153, 153); font-style: italic;">4.15.10 Invalid delta-CRL Test10</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">Reject or Warn - status of end entity certificate can not be determined</span><br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic; color: rgb(153, 153, 153);">This test does not need to be run</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.16.1 Valid Unknown Not Critical Certificate Extension Test1<br>
+      </td>
+      <td style="vertical-align: top;">Validate Successfully<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=green>Success</font>
+
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">4.16.2 Invalid Unknown Critical Certificate Extension Test2<br>
+      </td>
+      <td style="vertical-align: top;">Reject - unrecognized critical extension<br>
+      </td>
+      <td style="vertical-align: top;"><br>
+<font color=red>Unexpected success</font>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</body></html>
