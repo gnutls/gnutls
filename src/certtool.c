@@ -1458,60 +1458,41 @@ load_request ()
   return crq;
 }
 
+/* Load the CA's private key.
+ */
 gnutls_x509_privkey
-load_ca_private_key ()
+load_ca_private_key (void)
 {
-  FILE *fd;
   gnutls_x509_privkey key;
   int ret;
-  const char *pass;
   gnutls_datum dat;
   size_t size;
 
-  fprintf (stderr, "Loading CA's private key...\n");
-
   if (info.ca_privkey == NULL)
-    {
-      fprintf (stderr, "You must specify a private key of the CA.\n");
-      exit (1);
-    }
-
-  fd = fopen (info.ca_privkey, "r");
-  if (fd == NULL)
-    {
-      fprintf (stderr, "File %s does not exist.\n", info.ca_privkey);
-      exit (1);
-    }
-
-  size = fread (buffer, 1, sizeof (buffer) - 1, fd);
-  buffer[size] = 0;
-
-  fclose (fd);
+    error (EXIT_FAILURE, 0, "missing --load-ca-privkey");
 
   ret = gnutls_x509_privkey_init (&key);
   if (ret < 0)
-    {
-      fprintf (stderr, "privkey_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  dat.data = buffer;
+  dat.data = read_binary_file (info.ca_privkey, &size);
   dat.size = size;
 
-  if (!info.pkcs8)
-    ret = gnutls_x509_privkey_import (key, &dat, in_cert_format);
-  else
+  if (!dat.data)
+    error (EXIT_FAILURE, errno, "reading --load-ca-privkey: %s",
+	   info.ca_privkey);
+
+  if (info.pkcs8)
     {
-      pass = get_pass ();
+      const char *pass = get_pass ();
       ret = gnutls_x509_privkey_import_pkcs8 (key, &dat, in_cert_format,
 					      pass, 0);
     }
-
+  else
+    ret = gnutls_x509_privkey_import (key, &dat, in_cert_format);
   if (ret < 0)
-    {
-      fprintf (stderr, "privkey_import: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "importing --load-ca-privkey: %s: %s",
+	   info.ca_privkey, gnutls_strerror (ret));
 
   return key;
 }
@@ -1527,7 +1508,7 @@ load_ca_cert (void)
   size_t size;
 
   if (info.ca == NULL)
-    error (EXIT_FAILURE, 0, "Missing --load-ca-certificate parameter.");
+    error (EXIT_FAILURE, 0, "missing --load-ca-certificate");
 
   ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
@@ -1537,11 +1518,13 @@ load_ca_cert (void)
   dat.size = size;
 
   if (!dat.data)
-    error (EXIT_FAILURE, errno, "%s", info.ca);
+    error (EXIT_FAILURE, errno, "reading --load-ca-certificate: %s",
+	   info.ca);
 
   ret = gnutls_x509_crt_import (crt, &dat, in_cert_format);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "importing --load-ca-certificate: %s: %s",
+	   info.ca, gnutls_strerror (ret));
 
   return crt;
 }
