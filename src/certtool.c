@@ -114,55 +114,34 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
   return buf;
 }
 
-
-
 static gnutls_x509_privkey
 generate_private_key_int (void)
 {
   gnutls_x509_privkey key;
   int ret, key_type;
-  const char *msg;
 
   if (info.dsa)
     {
-      msg = "DSA";
       key_type = GNUTLS_PK_DSA;
 
       if (info.bits > 1024)
-	{
-	  fprintf (stderr,
-		   "The DSA algorithm cannot be used with primes over 1024 bits.\n");
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "--dsa is incompatible with --bits > 1024");
     }
   else
-    {
-      msg = "RSA";
-      key_type = GNUTLS_PK_RSA;
-    }
-
-
-  if (info.privkey)
-    return load_private_key (1);
+    key_type = GNUTLS_PK_RSA;
 
   ret = gnutls_x509_privkey_init (&key);
   if (ret < 0)
-    {
-      fprintf (stderr, "privkey_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  fprintf (stderr, "Generating a %d bit %s private key...\n", info.bits, msg);
+  fprintf (stderr, "Generating a %d bit %s private key...\n", info.bits,
+	   gnutls_pk_algorithm_get_name (key_type));
 
   ret = gnutls_x509_privkey_generate (key, key_type, info.bits, 0);
   if (ret < 0)
-    {
-      fprintf (stderr, "privkey_generate: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "privkey_generate: %s", gnutls_strerror (ret));
 
   return key;
-
 }
 
 static void
@@ -1618,7 +1597,9 @@ generate_request (void)
 
   /* Load the private key.
    */
-  key = generate_private_key_int ();
+  key = load_private_key (0);
+  if (!key)
+    key = generate_private_key_int ();
 
   /* Set the DN.
    */
