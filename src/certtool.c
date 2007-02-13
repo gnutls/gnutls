@@ -1519,50 +1519,31 @@ load_ca_private_key ()
 /* Loads the CA's certificate
  */
 gnutls_x509_crt
-load_ca_cert ()
+load_ca_cert (void)
 {
-  FILE *fd;
   gnutls_x509_crt crt;
   int ret;
   gnutls_datum dat;
   size_t size;
 
-  fprintf (stderr, "Loading CA's certificate...\n");
-
   if (info.ca == NULL)
-    {
-      fprintf (stderr, "You must specify a certificate of the CA.\n");
-      exit (1);
-    }
-
-  fd = fopen (info.ca, "r");
-  if (fd == NULL)
-    {
-      fprintf (stderr, "File %s does not exist.\n", info.ca);
-      exit (1);
-    }
-
-  size = fread (buffer, 1, sizeof (buffer) - 1, fd);
-  buffer[size] = 0;
-
-  fclose (fd);
+    error (EXIT_FAILURE, 0, "Missing --load-ca-certificate parameter.");
 
   ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
-    {
-      fprintf (stderr, "crt_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-  dat.data = buffer;
+  dat.data = read_binary_file (info.ca, &size);
   dat.size = size;
+
+  if (!dat.data)
+    error (EXIT_FAILURE, errno, "%s", info.ca);
 
   ret = gnutls_x509_crt_import (crt, &dat, in_cert_format);
   if (ret < 0)
-    {
-      fprintf (stderr, "crt_import: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+
+  fprintf (stderr, "Loading CA certificate...done\n");
 
   return crt;
 }
