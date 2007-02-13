@@ -31,7 +31,9 @@ i=1
 while test -d X509tests/test$i; do
     find X509tests/test$i -name *.crl -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --crl-info --inder --infile > chain$i.pem
     find X509tests/test$i -name E*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem
-    find X509tests/test$i -name I*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem
+    if test "$i" -gt 1; then
+	find X509tests/test$i -name I*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem
+    fi
     find X509tests/test$i -name T*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem
     $CERTTOOL -e --infile chain$i.pem > out 2>&1
     rc=$?
