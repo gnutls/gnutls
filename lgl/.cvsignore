@@ -8,3 +8,4 @@ alloca.h
 stdint.h
 string.h
 sys
+time.h
