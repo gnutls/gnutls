@@ -160,10 +160,7 @@ print_private_key (gnutls_x509_privkey key)
       ret = gnutls_x509_privkey_export (key, info.outcert_format,
 					buffer, &size);
       if (ret < 0)
-	{
-	  fprintf (stderr, "privkey_export: %s\n", gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "privkey_export: %s", gnutls_strerror (ret));
     }
   else
     {
@@ -183,11 +180,8 @@ print_private_key (gnutls_x509_privkey key)
 	gnutls_x509_privkey_export_pkcs8 (key, info.outcert_format, pass,
 					  flags, buffer, &size);
       if (ret < 0)
-	{
-	  fprintf (stderr, "privkey_export_pkcs8: %s\n",
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "privkey_export_pkcs8: %s",
+	       gnutls_strerror (ret));
     }
 
   fwrite (buffer, 1, size, outfile);
@@ -225,11 +219,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 
   ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
-    {
-      fprintf (stderr, "crt_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
-
+    error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
   crq = load_request ();
 
@@ -249,10 +239,9 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 	{
 	  result = gnutls_x509_crt_set_proxy_dn (crt, ca_crt, 0, NULL, 0);
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "set_proxy_dn: %s\n", gnutls_strerror (result));
-	      exit (1);
-	    }
+	      error (EXIT_FAILURE, 0, "set_proxy_dn: %s",
+		     gnutls_strerror (result));
+
 	  get_cn_crt_set (crt);
 	}
       else
@@ -275,20 +264,13 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 
       result = gnutls_x509_crt_set_key (crt, key);
       if (result < 0)
-	{
-	  fprintf (stderr, "set_key: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
-
+	error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (result));
     }
   else
     {
       result = gnutls_x509_crt_set_crq (crt, crq);
       if (result < 0)
-	{
-	  fprintf (stderr, "set_crq: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "set_crq: %s", gnutls_strerror (result));
     }
 
 
@@ -300,11 +282,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 
   result = gnutls_x509_crt_set_serial (crt, buffer, 4);
   if (result < 0)
-    {
-      fprintf (stderr, "serial: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
+    error (EXIT_FAILURE, 0, "serial: %s", gnutls_strerror (result));
 
   if (!batch)
     fprintf (stderr, "\n\nActivation/Expiration time.\n");
@@ -317,10 +295,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
     gnutls_x509_crt_set_expiration_time (crt,
 					 time (NULL) + days * 24 * 60 * 60);
   if (result < 0)
-    {
-      fprintf (stderr, "set_expiration: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "set_expiration: %s", gnutls_strerror (result));
 
   if (!batch)
     fprintf (stderr, "\n\nExtensions.\n");
@@ -343,10 +318,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
       result = gnutls_x509_crt_set_proxy (crt, proxypathlen, policylanguage,
 					  policy, policylen);
       if (result < 0)
-	{
-	  fprintf (stderr, "set_proxy: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "set_proxy: %s", gnutls_strerror (result));
     }
 
   if (!proxy)
@@ -358,22 +330,16 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 
   result = gnutls_x509_crt_set_basic_constraints (crt, ca_status, path_len);
   if (result < 0)
-    {
-      fprintf (stderr, "basic_constraints: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "basic_constraints: %s", gnutls_strerror (result));
 
   client = get_tls_client_status ();
   if (client != 0)
     {
-      result =
-	gnutls_x509_crt_set_key_purpose_oid (crt,
-					     GNUTLS_KP_TLS_WWW_CLIENT, 0);
+      result = gnutls_x509_crt_set_key_purpose_oid (crt,
+						    GNUTLS_KP_TLS_WWW_CLIENT,
+						    0);
       if (result < 0)
-	{
-	  fprintf (stderr, "key_kp: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
     }
 
   server = get_tls_server_status ();
@@ -400,22 +366,15 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 	    }
 
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "subject_alt_name: %s\n",
-		       gnutls_strerror (result));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "subject_alt_name: %s",
+		   gnutls_strerror (result));
 	}
 
       result =
 	gnutls_x509_crt_set_key_purpose_oid (crt,
 					     GNUTLS_KP_TLS_WWW_SERVER, 0);
       if (result < 0)
-	{
-	  fprintf (stderr, "key_kp: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
-
+	error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
     }
   else if (!proxy)
     {
@@ -423,16 +382,11 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 
       if (str != NULL)
 	{
-	  result =
-	    gnutls_x509_crt_set_subject_alternative_name (crt,
-							  GNUTLS_SAN_RFC822NAME,
-							  str);
+	  result = gnutls_x509_crt_set_subject_alternative_name
+	    (crt, GNUTLS_SAN_RFC822NAME, str);
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "subject_alt_name: %s\n",
-		       gnutls_strerror (result));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "subject_alt_name: %s",
+		   gnutls_strerror (result));
 	}
     }
 
@@ -477,10 +431,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 	    gnutls_x509_crt_set_key_purpose_oid (crt,
 						 GNUTLS_KP_CODE_SIGNING, 0);
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "key_kp: %s\n", gnutls_strerror (result));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
 	}
 
       result = get_ocsp_sign_status ();
@@ -490,10 +441,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 	    gnutls_x509_crt_set_key_purpose_oid (crt,
 						 GNUTLS_KP_OCSP_SIGNING, 0);
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "key_kp: %s\n", gnutls_strerror (result));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
 	}
 
       result = get_time_stamp_status ();
@@ -503,10 +451,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 	    gnutls_x509_crt_set_key_purpose_oid (crt,
 						 GNUTLS_KP_TIME_STAMPING, 0);
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "key_kp: %s\n", gnutls_strerror (result));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
 	}
     }
 
@@ -514,20 +459,14 @@ generate_certificate (gnutls_x509_privkey * ret_key,
     {
       result = gnutls_x509_crt_set_key_usage (crt, usage);
       if (result < 0)
-	{
-	  fprintf (stderr, "key_usage: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "key_usage: %s", gnutls_strerror (result));
     }
 
   /* Version.
    */
   result = gnutls_x509_crt_set_version (crt, vers);
   if (result < 0)
-    {
-      fprintf (stderr, "set_version: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "set_version: %s", gnutls_strerror (result));
 
   /* Subject Key ID.
    */
@@ -537,11 +476,8 @@ generate_certificate (gnutls_x509_privkey * ret_key,
     {
       result = gnutls_x509_crt_set_subject_key_id (crt, buffer, size);
       if (result < 0)
-	{
-	  fprintf (stderr, "set_subject_key_id: %s\n",
-		   gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "set_subject_key_id: %s",
+	       gnutls_strerror (result));
     }
 
   /* Authority Key ID.
@@ -560,11 +496,8 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 	{
 	  result = gnutls_x509_crt_set_authority_key_id (crt, buffer, size);
 	  if (result < 0)
-	    {
-	      fprintf (stderr, "set_authority_key_id: %s\n",
-		       gnutls_strerror (result));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "set_authority_key_id: %s",
+		   gnutls_strerror (result));
 	}
     }
 
@@ -636,10 +569,8 @@ generate_self_signed (void)
 						    uri,
 						    0 /* all reasons */ );
       if (result < 0)
-	{
-	  fprintf (stderr, "crl_dist_points: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "crl_dist_points: %s",
+	       gnutls_strerror (result));
     }
 
   print_certificate_info (crt, stderr, 0);
@@ -648,18 +579,12 @@ generate_self_signed (void)
 
   result = gnutls_x509_crt_sign2 (crt, crt, key, dig, 0);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_sign: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
   result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_export: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
   fwrite (buffer, 1, size, outfile);
 
@@ -696,18 +621,12 @@ generate_signed_certificate (void)
 
   result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, dig, 0);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_sign: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
   result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_export: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
   fwrite (buffer, 1, size, outfile);
 
@@ -736,18 +655,12 @@ generate_proxy_certificate (void)
 
   result = gnutls_x509_crt_sign2 (crt, eecrt, eekey, dig, 0);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_sign: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
   result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_export: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
   fwrite (buffer, 1, size, outfile);
 
@@ -810,18 +723,12 @@ update_signed_certificate (void)
 
   result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, dig, 0);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_sign: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
   result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
-    {
-      fprintf (stderr, "crt_export: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
   fwrite (buffer, 1, size, outfile);
 
@@ -1027,11 +934,8 @@ certificate_info (void)
 
 	  ret = gnutls_x509_crt_to_xml (crt[i], &xml, GNUTLS_XML_SHOW_ALL);
 	  if (ret < 0)
-	    {
-	      fprintf (stderr, "XML encoding error: %s\n",
-		       gnutls_strerror (ret));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "XML encoding error: %s",
+		   gnutls_strerror (ret));
 
 	  fprintf (outfile, "\n%s\n", xml.data);
 	  gnutls_free (xml.data);
@@ -1157,15 +1061,11 @@ privkey_info (void)
 	pass = info.pass;
       else
 	pass = get_pass ();
-      ret =
-	gnutls_x509_privkey_import_pkcs8 (key, &pem, info.incert_format, pass, 0);
+      ret = gnutls_x509_privkey_import_pkcs8 (key, &pem, info.incert_format,
+					      pass, 0);
     }
-
   if (ret < 0)
-    {
-      fprintf (stderr, "Decoding error: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
 
   /* Public key algorithm
    */
@@ -1245,19 +1145,14 @@ privkey_info (void)
     {
       ret = gnutls_x509_privkey_fix (key);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Encoding error: %s\n", gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "privkey_fix: %s", gnutls_strerror (ret));
     }
 
   size = sizeof (buffer);
   ret = gnutls_x509_privkey_export (key, GNUTLS_X509_FMT_PEM, buffer, &size);
   if (ret < 0)
-    {
-      fprintf (stderr, "Encoding error: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
+
   fprintf (outfile, "\n%s\n", buffer);
 }
 
@@ -1454,10 +1349,7 @@ load_cert_list (int mand, int *crt_size)
 
   fd = fopen (info.cert, "r");
   if (fd == NULL)
-    {
-      fprintf (stderr, "File %s does not exist.\n", info.cert);
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "File %s does not exist", info.cert);
 
   size = fread (buffer, 1, sizeof (buffer) - 1, fd);
   buffer[size] = 0;
@@ -1471,10 +1363,7 @@ load_cert_list (int mand, int *crt_size)
     {
       ret = gnutls_x509_crt_init (&crt[i]);
       if (ret < 0)
-	{
-	  fprintf (stderr, "crt_init: %s\n", gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
       dat.data = ptr;
       dat.size = ptr_size;
@@ -1483,10 +1372,7 @@ load_cert_list (int mand, int *crt_size)
       if (ret < 0 && *crt_size > 0)
 	break;
       if (ret < 0)
-	{
-	  fprintf (stderr, "crt_import: %s\n", gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "crt_import: %s", gnutls_strerror (ret));
 
       ptr = strstr (ptr, "---END");
       if (ptr == NULL)
@@ -1523,10 +1409,7 @@ generate_request (void)
 
   ret = gnutls_x509_crq_init (&crq);
   if (ret < 0)
-    {
-      fprintf (stderr, "crq_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crq_init: %s", gnutls_strerror (ret));
 
   /* Load the private key.
    */
@@ -1547,10 +1430,7 @@ generate_request (void)
 
   ret = gnutls_x509_crq_set_version (crq, 1);
   if (ret < 0)
-    {
-      fprintf (stderr, "set_version: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "set_version: %s", gnutls_strerror (ret));
 
   pass = get_challenge_pass ();
 
@@ -1558,33 +1438,21 @@ generate_request (void)
     {
       ret = gnutls_x509_crq_set_challenge_password (crq, pass);
       if (ret < 0)
-	{
-	  fprintf (stderr, "set_pass: %s\n", gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "set_pass: %s", gnutls_strerror (ret));
     }
 
   ret = gnutls_x509_crq_set_key (crq, key);
   if (ret < 0)
-    {
-      fprintf (stderr, "set_key: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (ret));
 
   ret = gnutls_x509_crq_sign (crq, key);
   if (ret < 0)
-    {
-      fprintf (stderr, "sign: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "sign: %s", gnutls_strerror (ret));
 
   size = sizeof (buffer);
   ret = gnutls_x509_crq_export (crq, info.outcert_format, buffer, &size);
   if (ret < 0)
-    {
-      fprintf (stderr, "export: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "export: %s", gnutls_strerror (ret));
 
   fwrite (buffer, 1, size, outfile);
 
@@ -1633,31 +1501,21 @@ _verify_x509_mem (const void *cert, int cert_size)
 	  (gnutls_x509_crl *) realloc (x509_crl_list,
 				       i * sizeof (gnutls_x509_crl));
 	if (x509_crl_list == NULL)
-	  {
-	    fprintf (stderr, "memory error\n");
-	    exit (1);
-	  }
+	  error (EXIT_FAILURE, 0, "memory error");
 
 	tmp.data = (char *) ptr;
 	tmp.size = siz;
 
 	ret = gnutls_x509_crl_init (&x509_crl_list[i - 1]);
 	if (ret < 0)
-	  {
-	    fprintf (stderr, "Error parsing the CRL[%d]: %s\n", i,
-		     gnutls_strerror (ret));
-	    exit (1);
-	  }
+	  error (EXIT_FAILURE, 0, "Error parsing the CRL[%d]: %s", i,
+		 gnutls_strerror (ret));
 
-	ret =
-	  gnutls_x509_crl_import (x509_crl_list[i - 1], &tmp,
-				  GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crl_import (x509_crl_list[i - 1], &tmp,
+				      GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-	  {
-	    fprintf (stderr, "Error parsing the CRL[%d]: %s\n", i,
-		     gnutls_strerror (ret));
-	    exit (1);
-	  }
+	  error (EXIT_FAILURE, 0, "Error parsing the CRL[%d]: %s", i,
+		 gnutls_strerror (ret));
 
 	/* now we move ptr after the pem header */
 	ptr = strstr (ptr, CRL_SEP);
@@ -1684,31 +1542,22 @@ _verify_x509_mem (const void *cert, int cert_size)
 	(gnutls_x509_crt *) realloc (x509_cert_list,
 				     i * sizeof (gnutls_x509_crt));
       if (x509_cert_list == NULL)
-	{
-	  fprintf (stderr, "memory error\n");
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "memory error");
 
       tmp.data = (char *) ptr;
       tmp.size = siz;
 
       ret = gnutls_x509_crt_init (&x509_cert_list[i - 1]);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error parsing the certificate[%d]: %s\n", i,
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "Error parsing the certificate[%d]: %s", i,
+	       gnutls_strerror (ret));
 
       ret =
 	gnutls_x509_crt_import (x509_cert_list[i - 1], &tmp,
 				GNUTLS_X509_FMT_PEM);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error parsing the certificate[%d]: %s\n", i,
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "Error parsing the certificate[%d]: %s", i,
+	       gnutls_strerror (ret));
 
 
       if (i - 1 != 0)
@@ -1721,10 +1570,7 @@ _verify_x509_mem (const void *cert, int cert_size)
 	  ret =
 	    gnutls_x509_crt_get_dn (x509_cert_list[i - 2], name, &name_size);
 	  if (ret < 0)
-	    {
-	      fprintf (stderr, "get_dn: %s\n", gnutls_strerror (ret));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
 
 	  fprintf (outfile, "Certificate[%d]: %s\n", i - 2, name);
 
@@ -1735,10 +1581,7 @@ _verify_x509_mem (const void *cert, int cert_size)
 	    gnutls_x509_crt_get_issuer_dn (x509_cert_list[i - 2],
 					   issuer_name, &issuer_name_size);
 	  if (ret < 0)
-	    {
-	      fprintf (stderr, "get_issuer_dn: %s\n", gnutls_strerror (ret));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "get_issuer_dn: %s", gnutls_strerror (ret));
 
 	  fprintf (outfile, "\tIssued by: %s\n", issuer_name);
 
@@ -1748,19 +1591,15 @@ _verify_x509_mem (const void *cert, int cert_size)
 	  ret =
 	    gnutls_x509_crt_get_dn (x509_cert_list[i - 1], name, &name_size);
 	  if (ret < 0)
-	    {
-	      fprintf (stderr, "get_dn: %s\n", gnutls_strerror (ret));
-	      exit (1);
-	    }
+	    error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
 
 	  fprintf (outfile, "\tVerifying against certificate[%d].\n", i - 1);
 
 	  if (strcmp (issuer_name, name) != 0)
 	    {
 	      fprintf (stderr, "Error: Issuer's name: %s\n", name);
-	      fprintf (stderr,
-		       "Error: Issuer's name does not match the next certificate.\n");
-	      exit (1);
+	      error (EXIT_FAILURE, 0,
+		     "Issuer's name does not match the next certificate");
 	    }
 
 	  fprintf (outfile, "\tVerification output: ");
@@ -1788,14 +1627,10 @@ _verify_x509_mem (const void *cert, int cert_size)
    * a CA (should be self signed).
    */
   name_size = sizeof (name);
-  ret =
-    gnutls_x509_crt_get_dn (x509_cert_list[x509_ncerts - 1], name,
-			    &name_size);
+  ret = gnutls_x509_crt_get_dn (x509_cert_list[x509_ncerts - 1], name,
+				&name_size);
   if (ret < 0)
-    {
-      fprintf (stderr, "get_dn: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
 
   fprintf (outfile, "Certificate[%d]: %s\n", x509_ncerts - 1, name);
 
@@ -1806,18 +1641,12 @@ _verify_x509_mem (const void *cert, int cert_size)
     gnutls_x509_crt_get_issuer_dn (x509_cert_list[x509_ncerts - 1],
 				   issuer_name, &issuer_name_size);
   if (ret < 0)
-    {
-      fprintf (stderr, "get_issuer_dn: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "get_issuer_dn: %s", gnutls_strerror (ret));
 
   fprintf (outfile, "\tIssued by: %s\n", name);
 
   if (strcmp (issuer_name, name) != 0)
-    {
-      fprintf (stderr, "Error: The last certificate is not self signed.\n");
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Error: The last certificate is not self signed.");
 
   fprintf (outfile, "\tVerification output: ");
   print_verification_res (x509_cert_list[x509_ncerts - 1],
@@ -1827,23 +1656,16 @@ _verify_x509_mem (const void *cert, int cert_size)
   fprintf (outfile, ".\n\n");
 
   for (i = 0; i < x509_ncerts; i++)
-    {
-      gnutls_x509_crt_deinit (x509_cert_list[i]);
-    }
+    gnutls_x509_crt_deinit (x509_cert_list[i]);
 
   for (i = 0; i < x509_ncrls; i++)
-    {
-      gnutls_x509_crl_deinit (x509_crl_list[i]);
-    }
+    gnutls_x509_crl_deinit (x509_crl_list[i]);
 
   free (x509_cert_list);
   free (x509_crl_list);
 
   if (ret < 0)
-    {
-      fprintf (stderr, "Error in verification: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Error in verification: %s", gnutls_strerror (ret));
 
   return 0;
 }
@@ -1860,10 +1682,8 @@ print_verification_res (gnutls_x509_crt crt,
 
   ret = gnutls_x509_crt_verify (crt, &issuer, 1, 0, &output);
   if (ret < 0)
-    {
-      fprintf (stderr, "Error in verification: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Error in verification: %s",
+	   gnutls_strerror (ret));
 
   if (output & GNUTLS_CERT_INVALID)
     {
@@ -1913,10 +1733,7 @@ print_verification_res (gnutls_x509_crt crt,
 
   ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
   if (ret < 0)
-    {
-      fprintf (stderr, "Error in verification: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Revocation check: %s", gnutls_strerror (ret));
 
   if (ret == 1)
     {				/* revoked */
@@ -2059,17 +1876,14 @@ generate_pkcs12 (void)
 
   name = get_pkcs12_key_name ();
 
+  result = gnutls_pkcs12_init (&pkcs12);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "pkcs12_init: %s", gnutls_strerror (result));
+
   if (info.pass)
     password = info.pass;
   else
     password = get_pass ();
-
-  result = gnutls_pkcs12_init (&pkcs12);
-  if (result < 0)
-    {
-      fprintf (stderr, "pkcs12_init: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
 
   for (i = 0; i < ncrts; i++)
     {
@@ -2077,45 +1891,30 @@ generate_pkcs12 (void)
 
       result = gnutls_pkcs12_bag_init (&bag);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_init: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_init: %s", gnutls_strerror (result));
 
       result = gnutls_pkcs12_bag_set_crt (bag, crts[i]);
       if (result < 0)
-	{
-	  fprintf (stderr, "set_crt[%d]: %s\n", i, gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "set_crt[%d]: %s", i, gnutls_strerror (result));
 
       index = result;
 
       result = gnutls_pkcs12_bag_set_friendly_name (bag, index, name);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_set_friendly_name: %s\n",
-		   gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_set_friendly_name: %s",
+	       gnutls_strerror (result));
 
       size = sizeof (_key_id);
       result = gnutls_x509_crt_get_key_id (crts[i], 0, _key_id, &size);
       if (result < 0)
-	{
-	  fprintf (stderr, "key_id[%d]: %s\n", i, gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "key_id[%d]: %s", i, gnutls_strerror (result));
 
       key_id.data = _key_id;
       key_id.size = size;
 
       result = gnutls_pkcs12_bag_set_key_id (bag, index, &key_id);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_set_key_id: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_set_key_id: %s", gnutls_strerror (result));
 
       if (info.export)
 	flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
@@ -2124,17 +1923,11 @@ generate_pkcs12 (void)
 
       result = gnutls_pkcs12_bag_encrypt (bag, password, flags);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_encrypt: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_encrypt: %s", gnutls_strerror (result));
 
       result = gnutls_pkcs12_set_bag (pkcs12, bag);
       if (result < 0)
-	{
-	  fprintf (stderr, "set_bag: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "set_bag: %s", gnutls_strerror (result));
     }
 
   if (key)
@@ -2143,10 +1936,7 @@ generate_pkcs12 (void)
 
       result = gnutls_pkcs12_bag_init (&kbag);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_init: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_init: %s", gnutls_strerror (result));
 
       if (info.export)
 	flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
@@ -2158,10 +1948,7 @@ generate_pkcs12 (void)
 	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER,
 					  password, flags, buffer, &size);
       if (result < 0)
-	{
-	  fprintf (stderr, "key_export: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
 
       data.data = buffer;
       data.size = size;
@@ -2169,61 +1956,40 @@ generate_pkcs12 (void)
 	gnutls_pkcs12_bag_set_data (kbag,
 				    GNUTLS_BAG_PKCS8_ENCRYPTED_KEY, &data);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_set_data: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_set_data: %s", gnutls_strerror (result));
 
       index = result;
 
       result = gnutls_pkcs12_bag_set_friendly_name (kbag, index, name);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_set_friendly_name: %s\n",
-		   gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_set_friendly_name: %s",
+	       gnutls_strerror (result));
 
       size = sizeof (_key_id);
       result = gnutls_x509_privkey_get_key_id (key, 0, _key_id, &size);
       if (result < 0)
-	{
-	  fprintf (stderr, "key_id: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "key_id: %s", gnutls_strerror (result));
 
       key_id.data = _key_id;
       key_id.size = size;
 
       result = gnutls_pkcs12_bag_set_key_id (kbag, index, &key_id);
       if (result < 0)
-	{
-	  fprintf (stderr, "bag_set_key_id: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "bag_set_key_id: %s", gnutls_strerror (result));
 
       result = gnutls_pkcs12_set_bag (pkcs12, kbag);
       if (result < 0)
-	{
-	  fprintf (stderr, "set_bag: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "set_bag: %s", gnutls_strerror (result));
     }
 
   result = gnutls_pkcs12_generate_mac (pkcs12, password);
   if (result < 0)
-    {
-      fprintf (stderr, "generate_mac: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "generate_mac: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
   result = gnutls_pkcs12_export (pkcs12, info.outcert_format, buffer, &size);
   if (result < 0)
-    {
-      fprintf (stderr, "pkcs12_export: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "pkcs12_export: %s", gnutls_strerror (result));
 
   fwrite (buffer, 1, size, outfile);
 
@@ -2270,20 +2036,15 @@ print_bag_data (gnutls_pkcs12_bag bag)
     {
       type = gnutls_pkcs12_bag_get_type (bag, i);
       if (type < 0)
-	{
-	  fprintf (stderr, "get_type: %s\n", gnutls_strerror (type));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "get_type: %s", gnutls_strerror (type));
 
       fprintf (stderr, "\tType: %s\n", BAGTYPE (type));
 
       name = NULL;
       result = gnutls_pkcs12_bag_get_friendly_name (bag, i, (char **) &name);
       if (result < 0)
-	{
-	  fprintf (stderr, "get_friendly_name: %s\n", gnutls_strerror (type));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "get_friendly_name: %s",
+	       gnutls_strerror (type));
       if (name)
 	fprintf (outfile, "\tFriendly name: %s\n", name);
 
@@ -2291,18 +2052,12 @@ print_bag_data (gnutls_pkcs12_bag bag)
       id.size = 0;
       result = gnutls_pkcs12_bag_get_key_id (bag, i, &id);
       if (result < 0)
-	{
-	  fprintf (stderr, "get_key_id: %s\n", gnutls_strerror (type));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "get_key_id: %s", gnutls_strerror (type));
       fprintf (outfile, "\tKey ID: %s\n", raw_to_string (id.data, id.size));
 
       result = gnutls_pkcs12_bag_get_data (bag, i, &cdata);
       if (result < 0)
-	{
-	  fprintf (stderr, "get_data: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "get_data: %s", gnutls_strerror (result));
 
       switch (type)
 	{
