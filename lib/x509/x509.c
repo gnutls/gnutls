@@ -2126,7 +2126,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (ret)
+  if (*ret_size > 0 && ret)
     memset (ret, 0, *ret_size);
   else
     *ret_size = 0;
