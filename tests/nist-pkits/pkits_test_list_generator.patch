@@ -1,6 +1,29 @@
---- pkits_test_list_generator/src/generate_html.c       2004-05-03 19:49:30.000000000 +0200
-+++ pkits_test_list_generator-/src/generate_html.c      2007-02-13 16:18:31.000000000 +0100
-@@ -403,12 +403,40 @@
+--- pkits_test_list_generator/src/Makefile.orig	2007-02-13 16:39:33.000000000 +0100
++++ pkits_test_list_generator/src/Makefile	2007-02-13 16:39:39.000000000 +0100
+@@ -2,16 +2,16 @@
+ CC_FLAGS = -g
+ 
+ PKITS_test_list_generator: interface.o callbacks.o main.o generate_html.o
+-	g++ -Wall interface.o callbacks.o main.o generate_html.o -o PKITS_test_list_generator `gtk-config --libs`
++	g++ -Wall interface.o callbacks.o main.o generate_html.o -o PKITS_test_list_generator `pkg-config --libs gtk+-2.0`
+ 
+ interface.o: interface.c interface.h callbacks.h support.h
+-	$(CC) $(CC_FLAGS) -c -Wall interface.c -o interface.o `gtk-config --cflags`
++	$(CC) $(CC_FLAGS) -c -Wall interface.c -o interface.o `pkg-config --cflags gdk-2.0 atk gtk+-2.0`
+ 
+ main.o: main.c interface.h
+-	$(CC) $(CC_FLAGS) -c -Wall main.c -o main.o `gtk-config --cflags`
++	$(CC) $(CC_FLAGS) -c -Wall main.c -o main.o `pkg-config --cflags gdk-2.0 atk gtk+-2.0`
+ 
+ callbacks.o: callbacks.c generate_html.h interface.h callbacks.h
+-	$(CC) $(CC_FLAGS) -c -Wall callbacks.c -o callbacks.o `gtk-config --cflags`
++	$(CC) $(CC_FLAGS) -c -Wall callbacks.c -o callbacks.o `pkg-config --cflags gdk-2.0 atk gtk+-2.0`
+ 
+ generate_html.o: generate_html.c
+ 	$(CC) $(CC_FLAGS) -c -Wall generate_html.c -o generate_html.o
+--- pkits_test_list_generator/src/generate_html.c.orig	2004-05-03 19:49:30.000000000 +0200
++++ pkits_test_list_generator/src/generate_html.c	2007-02-13 16:44:04.000000000 +0100
+@@ -403,12 +403,39 @@
  void
  print_test_entry(FILE *f, char *title, struct path_validation_input *inputs, int result,  char *expected_result)
  {
@@ -17,50 +40,26 @@
      fprintf(f, "      <td style=\"vertical-align: top;\"><br>\n");
 +
 +    snprintf (cmd, sizeof(cmd),
-+             "../../gnutls_test_entry \"%s\" \"%s\" \"%d\" \"%s\" > out.txt",
-+             title,
-+             inputs->end_entity_certificate,
-+             result,
-+             expected_result);
++	      "./gnutls_test_entry \"%s\" \"%s\" \"%d\" \"%s\" > out.txt",
++	      title,
++	      inputs->end_entity_certificate,
++	      result,
++	      expected_result);
 +    rc = system (cmd);
 +    if (rc == 0)
 +      {
-+       fh = fopen ("out.txt", "r");
-+       if (fh)
-+         {
-+
-+           while (fh && !feof (fh))
-+             {
-+               fread (&buf, 1, 1, fh);
-+               fwrite (&buf, 1, 1, f);
-+             }
-+           fclose (fh);
-+         }
++	fh = fopen ("out.txt", "r");
++	if (fh)
++	  {
++	    while (fh && !feof (fh))
++	      {
++		fread (&buf, 1, 1, fh);
++		fwrite (&buf, 1, 1, f);
++	      }
++	    fclose (fh);
++	  }
 +      }
 +
      fprintf(f, "      </td>\n");
      fprintf(f, "    </tr>\n");
  }
---- pkits_test_list_generator/src/Makefile      2004-03-24 20:11:20.000000000 +0100
-+++ pkits_test_list_generator-/src/Makefile     2007-02-13 13:46:18.000000000 +0100
-@@ -2,16 +2,16 @@
- CC_FLAGS = -g
-
- PKITS_test_list_generator: interface.o callbacks.o main.o generate_html.o
--       g++ -Wall interface.o callbacks.o main.o generate_html.o -o PKITS_test_list_generator `gtk-config --libs`
-+       g++ -Wall interface.o callbacks.o main.o generate_html.o -o PKITS_test_list_generator `pkg-config --libs gtk+-2.0`
-
- interface.o: interface.c interface.h callbacks.h support.h
--       $(CC) $(CC_FLAGS) -c -Wall interface.c -o interface.o `gtk-config --cflags`
-+       $(CC) $(CC_FLAGS) -c -Wall interface.c -o interface.o `pkg-config --cflags gdk-2.0 atk gtk+-2.0`
-
- main.o: main.c interface.h
--       $(CC) $(CC_FLAGS) -c -Wall main.c -o main.o `gtk-config --cflags`
-+       $(CC) $(CC_FLAGS) -c -Wall main.c -o main.o `pkg-config --cflags gdk-2.0 atk gtk+-2.0`
-
- callbacks.o: callbacks.c generate_html.h interface.h callbacks.h
--       $(CC) $(CC_FLAGS) -c -Wall callbacks.c -o callbacks.o `gtk-config --cflags`
-+       $(CC) $(CC_FLAGS) -c -Wall callbacks.c -o callbacks.o `pkg-config --cflags gdk-2.0 atk gtk+-2.0`
-
- generate_html.o: generate_html.c
-        $(CC) $(CC_FLAGS) -c -Wall generate_html.c -o generate_html.o
