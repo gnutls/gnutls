@@ -1413,10 +1413,11 @@ load_private_key (int mand)
   return key;
 }
 
+/* Load the Certificate Request.
+ */
 gnutls_x509_crq
-load_request ()
+load_request (void)
 {
-  FILE *fd;
   gnutls_x509_crq crq;
   int ret;
   gnutls_datum dat;
@@ -1425,35 +1426,21 @@ load_request ()
   if (!info.request)
     return NULL;
 
-  fd = fopen (info.request, "r");
-  if (fd == NULL)
-    {
-      fprintf (stderr, "File %s does not exist.\n", info.request);
-      exit (1);
-    }
-
-  size = fread (buffer, 1, sizeof (buffer) - 1, fd);
-  buffer[size] = 0;
-
-  fclose (fd);
-
   ret = gnutls_x509_crq_init (&crq);
   if (ret < 0)
-    {
-      fprintf (stderr, "crq_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crq_init: %s", gnutls_strerror (ret));
 
-  dat.data = buffer;
+  dat.data = read_binary_file (info.request, &size);
   dat.size = size;
 
-  ret = gnutls_x509_crq_import (crq, &dat, in_cert_format);
+  if (!dat.data)
+    error (EXIT_FAILURE, errno, "reading --load-request: %s",
+	   info.request);
 
+  ret = gnutls_x509_crq_import (crq, &dat, in_cert_format);
   if (ret < 0)
-    {
-      fprintf (stderr, "crq_import: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "importing --load-request: %s: %s",
+	   info.request, gnutls_strerror (ret));
 
   return crq;
 }
