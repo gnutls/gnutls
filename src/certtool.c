@@ -1384,6 +1384,7 @@ load_private_key (int mand)
     }
   else
     ret = gnutls_x509_privkey_import (key, &dat, in_cert_format);
+  free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-privkey: %s: %s",
 	   info.privkey, gnutls_strerror (ret));
@@ -1416,6 +1417,7 @@ load_request (void)
 	   info.request);
 
   ret = gnutls_x509_crq_import (crq, &dat, in_cert_format);
+  free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-request: %s: %s",
 	   info.request, gnutls_strerror (ret));
@@ -1455,6 +1457,7 @@ load_ca_private_key (void)
     }
   else
     ret = gnutls_x509_privkey_import (key, &dat, in_cert_format);
+  free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-ca-privkey: %s: %s",
 	   info.ca_privkey, gnutls_strerror (ret));
@@ -1487,6 +1490,7 @@ load_ca_cert (void)
 	   info.ca);
 
   ret = gnutls_x509_crt_import (crt, &dat, in_cert_format);
+  free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-ca-certificate: %s: %s",
 	   info.ca, gnutls_strerror (ret));
