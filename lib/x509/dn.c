@@ -110,7 +110,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (buf)
+  if (*sizeof_buf > 0 && buf)
     buf[0] = 0;
   else
     *sizeof_buf = 0;
