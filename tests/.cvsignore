@@ -6,8 +6,6 @@ anonself
 simple
 *.lo
 *.la
-chain*.pem
-ReadMe.txt
 certder
 certpairs
 certs
