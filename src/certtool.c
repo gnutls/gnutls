@@ -627,41 +627,6 @@ generate_crl (void)
   return crl;
 }
 
-gnutls_x509_crt
-update_certificate (void)
-{
-  gnutls_x509_crt crt;
-  int size;
-  int days, result;
-
-  size = gnutls_x509_crt_init (&crt);
-  if (size < 0)
-    {
-      fprintf (stderr, "crt_init: %s\n", gnutls_strerror (size));
-      exit (1);
-    }
-
-  crt = load_cert (1);
-
-  fprintf (stderr, "Activation/Expiration time.\n");
-  gnutls_x509_crt_set_activation_time (crt, time (NULL));
-
-  days = get_days ();
-
-  result =
-    gnutls_x509_crt_set_expiration_time (crt,
-					 time (NULL) + days * 24 * 60 * 60);
-  if (result < 0)
-    {
-      fprintf (stderr, "set_expiration: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
-  return crt;
-
-}
-
-
 void
 generate_self_signed (void)
 {
@@ -852,13 +817,23 @@ update_signed_certificate (void)
   int result;
   gnutls_x509_privkey ca_key;
   gnutls_x509_crt ca_crt;
+  int days;
+  time_t tim = time (NULL);
 
   fprintf (stderr, "Generating a signed certificate...\n");
 
   ca_key = load_ca_private_key ();
   ca_crt = load_ca_cert ();
+  crt = load_cert (1);
 
-  crt = update_certificate ();
+  fprintf (stderr, "Activation/Expiration time.\n");
+  gnutls_x509_crt_set_activation_time (crt, tim);
+
+  days = get_days ();
+
+  result = gnutls_x509_crt_set_expiration_time (crt, tim + days * 24 * 60 * 60);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "set_expiration: %s", gnutls_strerror (result));
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
@@ -1504,9 +1479,8 @@ load_cert_list (int mand, int *crt_size)
 
   if (info.cert == NULL)
     {
-      fprintf (stderr, "You must specify a certificate.\n");
       if (mand)
-	exit (1);
+	error (EXIT_FAILURE, 0, "missing --load-certificate");
       else
 	return NULL;
     }
