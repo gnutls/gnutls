@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005 Free Software Foundation
+# Copyright (C) 2004, 2005, 2007 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -20,7 +20,7 @@
 # along with GNUTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-CERTTOOL=../src/certtool
+CERTTOOL=../../src/certtool
 
 SUCCESS=" 1 4 7 12 15 16 17 18 24 26 27 30 33 56 57 62 63 "
 FAILURE=" 2 3 5 6 8 9 10 11 13 14 19 20 21 22 23 25 28 29 31 32 54 55 58 59 60 61 "
