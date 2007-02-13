@@ -27,6 +27,11 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  dnl Some compilers (e.g., AIX 5.3 cc) need to be in c99 mode
+  dnl for the builtin va_copy to work.  With Autoconf 2.60 or later,
+  dnl AC_PROG_CC_STDC arranges for this.  With older Autoconf AC_PROG_CC_STDC
+  dnl shouldn't hurt, though installers are on their own to set c99 mode.
+  AC_REQUIRE([AC_PROG_CC_STDC])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -52,6 +57,7 @@ AC_DEFUN([gl_INIT],
   AC_PROG_MKDIR_P
   gl_FUNC_READLINE
   gl_TYPE_SOCKLEN_T
+  gl_STDARG_H
   AM_STDBOOL_H
   gl_FUNC_STRDUP
   gl_STRING_MODULE_INDICATOR([strdup])
@@ -127,6 +133,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stdbool_.h
   lib/strdup.c
   lib/string_.h
+  lib/version-etc-fsf.c
+  lib/version-etc.c
+  lib/version-etc.h
   m4/absolute-header.m4
   m4/arpa_inet_h.m4
   m4/error.m4
@@ -145,6 +154,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/readline.m4
   m4/socklen.m4
   m4/sockpfaf.m4
+  m4/stdarg.m4
   m4/stdbool.m4
   m4/strdup.m4
   m4/string_h.m4
