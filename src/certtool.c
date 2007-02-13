@@ -1072,7 +1072,7 @@ known_oid (const char *oid)
   return 0;
 }
 
-#define MAX_CRTS 64
+#define MAX_CRTS 500
 void
 certificate_info (void)
 {
@@ -1082,57 +1082,50 @@ certificate_info (void)
   gnutls_datum pem;
   unsigned int crt_num;
 
-  size = fread (buffer, 1, sizeof (buffer) - 1, infile);
-  buffer[size] = 0;
-
-  pem.data = buffer;
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
   crt_num = MAX_CRTS;
-  ret =
-    gnutls_x509_crt_list_import (crt, &crt_num, &pem, in_cert_format,
-				 GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+  ret = gnutls_x509_crt_list_import (crt, &crt_num, &pem, in_cert_format,
+				     GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
   if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
-      fprintf (stderr,
-	       "Too many certificates (%d), will only read the first %d.\n",
-	       crt_num, MAX_CRTS);
+      error (0, 0, "Too many certificates (%d), will only read the first %d.",
+	     crt_num, MAX_CRTS);
       crt_num = MAX_CRTS;
-      ret =
-	gnutls_x509_crt_list_import (crt, &crt_num, &pem, in_cert_format, 0);
+      ret = gnutls_x509_crt_list_import (crt, &crt_num, &pem,
+					 in_cert_format, 0);
     }
-
   if (ret < 0)
-    {
-      fprintf (stderr, "Decoding error: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+
+  free (pem.data);
+
   count = ret;
 
   if (count > 1 && out_cert_format == GNUTLS_X509_FMT_DER)
     {
-      fprintf(stderr, "Cannot output multiple certificates in DER format, using PEM instead.\n");
+      error(0, 0, "Cannot output multiple certificates in DER format, using PEM instead.");
       out_cert_format = GNUTLS_X509_FMT_PEM;
     }
-    
+
   for (i = 0; i < count; i++)
     {
+      if (i > 0)
+	fprintf (outfile, "\n");
+
       if (out_cert_format == GNUTLS_X509_FMT_PEM)
-        print_certificate_info (crt[i], outfile, 1);
+	print_certificate_info (crt[i], outfile, 1);
 
       if (!info.xml)
 	{
 	  size = sizeof (buffer);
-	  ret =
-	    gnutls_x509_crt_export (crt[i], out_cert_format, buffer,
-				    &size);
+	  ret = gnutls_x509_crt_export (crt[i], out_cert_format, buffer,
+					&size);
 	  if (ret < 0)
-	    {
-	      fprintf (stderr, "Encoding error: %s\n", gnutls_strerror (ret));
-	      exit (1);
-	    }
-	  fprintf (outfile, "\n%s\n", buffer);
-
+	    error (EXIT_FAILURE, 0, "Export error: %s",
+		   gnutls_strerror (ret));
+	  fprintf (outfile, "%s", buffer);
 	}
       else
 	{
@@ -1150,7 +1143,6 @@ certificate_info (void)
 	  gnutls_free (xml.data);
 	}
     }
-
 }
 
 static void
