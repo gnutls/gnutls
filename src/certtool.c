@@ -23,8 +23,6 @@
 #include <config.h>
 #include <gnutls/gnutls.h>
 
-#ifdef ENABLE_PKI
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1051,25 +1049,6 @@ gaa_parser (int argc, char **argv)
       exit (0);
     }
   fclose (outfile);
-}
-
-
-/* OIDs that are handled by the gnutls' functions.
- */
-static inline int
-known_oid (const char *oid)
-{
-  if (strcmp (oid, "2.5.29.17") == 0 ||
-      strcmp (oid, "2.5.29.19") == 0 ||
-      strcmp (oid, "2.5.29.31") == 0 ||
-      strcmp (oid, "2.5.29.37") == 0 ||
-      strcmp (oid, "2.5.29.14") == 0 ||
-      strcmp (oid, "2.5.29.35") == 0 ||
-      strcmp (oid, "2.5.29.15") == 0 ||
-      strcmp (oid, "1.3.6.1.5.5.7.1.14") == 0)
-    return 1;
-
-  return 0;
 }
 
 #define MAX_CRTS 500
@@ -2791,19 +2770,6 @@ smime_to_pkcs7 (void)
 
   free (lineptr);
 }
-
-#else /* ENABLE_PKI */
-
-#include <stdio.h>
-
-int
-main (int argc, char **argv)
-{
-  printf ("\nX.509 PKI not supported. This program is a dummy.\n\n");
-  return 1;
-};
-
-#endif
 
 void
 certtool_version (void)
