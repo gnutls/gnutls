@@ -9,3 +9,24 @@ http://csrc.nist.gov/pki/testing/x509paths_old.html
 
 Because of unclear license, they are not distributed with GnuTLS
 currently.
+
+See the PDF for information regarding the self tests.  Particular
+comments on individual tests below.  The 'XXX' marks real bugs.
+
+Chain 13-14,65: We probably should not fail fatally, although this is
+not a real problem.
+
+Chain 15-18: We should succeed, the reason we don't is that we use
+memcmp for DN comparisons.
+
+Chain 19: I don't understand why this test should fail?  The chain
+seems fine to me.
+
+Chain 28-29: We fail to check keyCertSign (non-)critical key usage in
+intermediate certificates.  XXX
+
+Chain 31-32: The CRL is issued by a issuer without CRLSign
+(non-)critical keyCertSign.  We don't check the CRL, so this is not a
+real problem.
+
+Chain 54-63: We don't check path length constraints properly. XXX
