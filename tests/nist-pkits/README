@@ -23,4 +23,5 @@ tests.  It will start a Glade interface, and you should type
 e.g. 'foo.html' and then 'Generate tables'.  Since GnuTLS supports
 DSA, you should typically click on 'DSA signature verification' too.
 The interface invokes "gnutls_test_entry" which verifies certificates
-chains, after building them using "build-chain".
+chains, after building them using "build-chain".  A sample output is
+stored in the file "gnutls-nist-tests.html".
