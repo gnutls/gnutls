@@ -7,6 +7,8 @@ RESULT=$3
 ./build-chain certs $EECERT > chain.pem
 certtool -e < chain.pem > output.txt
 
+rm -f chain.pem
+
 if grep -q 'Verification output:' output.txt; then
     if grep 'Verification output' output.txt | grep -q -v 'Verification output: Verified.'; then
 	if test "$RESULT" = "0"; then
@@ -22,3 +24,5 @@ if grep -q 'Verification output:' output.txt; then
 	fi
     fi
 fi
+
+rm -f output.txt
