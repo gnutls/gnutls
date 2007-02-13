@@ -24,7 +24,7 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 SUBDIRS = lgl gl includes lib libextra src doc tests po
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lgl/m4 -I src/lib/m4
+ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lgl/m4
 
 # Maintainer targets
 
