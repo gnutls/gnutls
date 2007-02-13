@@ -46,17 +46,7 @@ typedef int ssize_t;
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
-
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
+#include <time.h>
 
 #define SIZEOF_UNSIGNED_LONG_INT SIZEOF_UNSIGNED_LONG
 
