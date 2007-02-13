@@ -38,6 +38,7 @@
 
 /* Gnulib portability files. */
 #include <getline.h>
+#include <read-file.h>
 
 static void print_crl_info (gnutls_x509_crl crl, FILE *out, int all);
 int generate_prime (int bits, int how);
@@ -1280,17 +1281,27 @@ crl_info ()
   gnutls_x509_crl crl;
   int ret;
   size_t size;
-  gnutls_datum pem;
+  gnutls_datum_t pem;
 
-  size = fread (buffer, 1, sizeof (buffer) - 1, infile);
-  buffer[size] = 0;
-
-  gnutls_x509_crl_init (&crl);
-
-  pem.data = buffer;
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
+  if (!pem.data)
+    {
+      fprintf (stderr, "Could not read file\n");
+      exit (1);
+    }
+
+  ret = gnutls_x509_crl_init (&crl);
+  if (ret < 0)
+    {
+      free (pem.data);
+      fprintf (stderr, "crl_init: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+
   ret = gnutls_x509_crl_import (crl, &pem, in_cert_format);
+  free (pem.data);
   if (ret < 0)
     {
       fprintf (stderr, "Decoding error: %s\n", gnutls_strerror (ret));
@@ -1308,7 +1319,6 @@ crl_info ()
     }
 
   fprintf (outfile, "\n%s\n", buffer);
-
 }
 
 
