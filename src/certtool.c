@@ -1245,10 +1245,9 @@ crl_info ()
   ret = gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, buffer, &size);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
-
-  fprintf (outfile, "\n%s\n", buffer);
+  else
+    fprintf (outfile, "%s", buffer);
 }
-
 
 void
 privkey_info (void)
