@@ -20,8 +20,6 @@
 
 #include <config.h>
 
-#ifdef ENABLE_PKI
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <certtool-cfg.h>
@@ -1109,6 +1107,3 @@ get_oid_crq_set (gnutls_x509_crq crq)
     }
 
 }
-
-
-#endif
