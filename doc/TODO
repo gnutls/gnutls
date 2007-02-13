@@ -44,8 +44,11 @@ Current list:
 - Support non-blocking gnutls_{dh,rsa}_params_generate2 for when there
   is not enough entropy available. 
 - Implement Datagram-TLS (DTLS).
-- Short-cut the certificate verification algorithm before the
-  root if a middle-CA is trusted.
+- Chain verifications.
+  - Short-cut the certificate verification algorithm before the
+    root if a middle-CA is trusted.
+  - Check path length constraints.
+  - Check keyCertSign key usages.
 - Update libgnutls-extra.m4 to use modern autoconf constructs.
 - Support for hardware SSL accelerators
 - Exhaustive test suite, using NIST's PKI Test vectors,
