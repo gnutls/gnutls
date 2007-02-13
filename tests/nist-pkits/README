@@ -5,6 +5,7 @@ http://csrc.nist.gov/pki/testing/x509paths.html
 
 ada0f267e0ff4eb16a0e19964cf518a833f00093  PKITS_data.zip
 bb1dea2e3a1ef163c94c19d07de506228eac41ad  PKITS.pdf
+eeeeb55657c433b57730288cd5c20daaf27f13fb  pkits_test_list_generator.tgz
 
 The PKCS#12 password is "password".
 
