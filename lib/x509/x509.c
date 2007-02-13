@@ -2466,8 +2466,6 @@ cleanup:
 
 #endif
 
-#define CLEAR_CERTS \
-    for(j=0;j<count;j++) gnutls_x509_crt_deinit( certs[j])
 /**
   * gnutls_x509_crt_list_import - This function will import a PEM encoded certificate list
   * @certs: The structures to store the parsed certificate. Must not be initialized.
@@ -2607,6 +2605,7 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
     return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
 error:
-  CLEAR_CERTS;
+  for (j=0; j < count; j++)
+    gnutls_x509_crt_deinit (certs[j]);
   return ret;
 }
