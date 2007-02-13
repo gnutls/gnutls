@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
 #
 # This file is part of GNUTLS.
 #
@@ -26,7 +26,10 @@ INCLUDES = -I../includes -I$(top_srcdir)/includes \
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl \
 	-I$(srcdir)/cfg
 
-bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug certtool
+bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
+if ENABLE_PKI
+bin_PROGRAMS += certtool
+endif
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
