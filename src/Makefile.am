@@ -37,7 +37,8 @@ endif
 gnutls_serv_SOURCES = serv.gaa serv-gaa.h serv-gaa.c list.h serv.c	\
 	common.h common.c select.c
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
-	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)
+	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)		\
+	../gl/libgnu.la
 
 if ENABLE_SRP
 srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
@@ -54,13 +55,15 @@ psktool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
 	common.c select.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
-	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)
+	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS) 		\
+	../gl/libgnu.la
 
 gnutls_cli_debug_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c	\
 	tls_test.c tests.h tests.c common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la			\
 	../libextra/libgnutls-extra.la $(LIBGCRYPT_LIBS)	\
-	$(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)
+	$(LIBTASN1_LIBS) $(LIBOPENCDK_LIBS)			\
+	../gl/libgnu.la
 
 certtool_SOURCES = certtool.gaa certtool-gaa.h certtool-cfg.h	\
 	certtool-gaa.c certtool.c prime.c certtool-cfg.c
