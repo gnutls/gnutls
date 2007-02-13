@@ -18,7 +18,7 @@
 # This macro should be invoked from ./configure.in, in the section
 # "Checks for programs", right after AC_PROG_CC, and certainly before
 # any checks for libraries, header files, types and library functions.
-AC_DEFUN([gl_EARLY],
+AC_DEFUN([sgl_EARLY],
 [
   m4_pattern_forbid([^gl_[A-Z]])dnl the gnulib macro namespace
   m4_pattern_allow([^gl_ES$])dnl a valid locale name
@@ -29,11 +29,11 @@ AC_DEFUN([gl_EARLY],
 
 # This macro should be invoked from ./configure.in, in the section
 # "Check for header files, types and library functions".
-AC_DEFUN([gl_INIT],
+AC_DEFUN([sgl_INIT],
 [
-  m4_pushdef([AC_LIBOBJ], m4_defn([gl_LIBOBJ]))
-  m4_pushdef([AC_REPLACE_FUNCS], m4_defn([gl_REPLACE_FUNCS]))
-  m4_pushdef([AC_LIBSOURCES], m4_defn([gl_LIBSOURCES]))
+  m4_pushdef([AC_LIBOBJ], m4_defn([sgl_LIBOBJ]))
+  m4_pushdef([AC_REPLACE_FUNCS], m4_defn([sgl_REPLACE_FUNCS]))
+  m4_pushdef([AC_LIBSOURCES], m4_defn([sgl_LIBSOURCES]))
   AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_cond_libtool=true
   gl_source_base='src/lib'
@@ -42,39 +42,39 @@ AC_DEFUN([gl_INIT],
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
   AC_CONFIG_COMMANDS_PRE([
-    gl_libobjs=
-    gl_ltlibobjs=
-    if test -n "$gl_LIBOBJS"; then
+    sgl_libobjs=
+    sgl_ltlibobjs=
+    if test -n "$sgl_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $gl_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
-        gl_libobjs="$gl_libobjs $i.$ac_objext"
-        gl_ltlibobjs="$gl_ltlibobjs $i.lo"
+      for i in `for i in $sgl_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+        sgl_libobjs="$sgl_libobjs $i.$ac_objext"
+        sgl_ltlibobjs="$sgl_ltlibobjs $i.lo"
       done
     fi
-    AC_SUBST([gl_LIBOBJS], [$gl_libobjs])
-    AC_SUBST([gl_LTLIBOBJS], [$gl_ltlibobjs])
+    AC_SUBST([sgl_LIBOBJS], [$sgl_libobjs])
+    AC_SUBST([sgl_LTLIBOBJS], [$sgl_ltlibobjs])
   ])
 ])
 
 # Like AC_LIBOBJ, except that the module name goes
-# into gl_LIBOBJS instead of into LIBOBJS.
-AC_DEFUN([gl_LIBOBJ],
-  [gl_LIBOBJS="$gl_LIBOBJS $1.$ac_objext"])
+# into sgl_LIBOBJS instead of into LIBOBJS.
+AC_DEFUN([sgl_LIBOBJ],
+  [sgl_LIBOBJS="$sgl_LIBOBJS $1.$ac_objext"])
 
 # Like AC_REPLACE_FUNCS, except that the module name goes
-# into gl_LIBOBJS instead of into LIBOBJS.
-AC_DEFUN([gl_REPLACE_FUNCS],
-  [AC_CHECK_FUNCS([$1], , [gl_LIBOBJ($ac_func)])])
+# into sgl_LIBOBJS instead of into LIBOBJS.
+AC_DEFUN([sgl_REPLACE_FUNCS],
+  [AC_CHECK_FUNCS([$1], , [sgl_LIBOBJ($ac_func)])])
 
 # Like AC_LIBSOURCES, except that it does nothing.
 # We rely on EXTRA_lib..._SOURCES instead.
-AC_DEFUN([gl_LIBSOURCES],
+AC_DEFUN([sgl_LIBSOURCES],
   [])
 
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
-AC_DEFUN([gl_FILE_LIST], [
+AC_DEFUN([sgl_FILE_LIST], [
   lib/error.c
   lib/error.h
   lib/progname.c

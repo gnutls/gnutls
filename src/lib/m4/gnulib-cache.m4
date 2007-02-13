@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=src/lib --m4-base=src/lib/m4 --doc-base=doc --aux-dir=. --libtool --macro-prefix=gl error progname
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=src/lib --m4-base=src/lib/m4 --doc-base=doc --aux-dir=. --libtool --macro-prefix=sgl error progname
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
@@ -28,4 +28,4 @@ gl_TESTS_BASE([tests])
 gl_LIB([libgnu])
 gl_MAKEFILE_NAME([])
 gl_LIBTOOL
-gl_MACRO_PREFIX([gl])
+gl_MACRO_PREFIX([sgl])
