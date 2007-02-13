@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006  Free Software Foundation, Inc.
+ * Copyright (C) 2006, 2007  Free Software Foundation, Inc.
  *
  * Author: Simon Josefsson
  *
@@ -21,6 +21,10 @@
  * 02110-1301, USA
  *
  */
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
