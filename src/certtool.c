@@ -40,7 +40,7 @@
 #include <error.h>
 #include <progname.h>
 
-static void print_crl_info (gnutls_x509_crl crl, FILE *out, int all);
+static void print_crl_info (gnutls_x509_crl crl, FILE *out);
 int generate_prime (int bits, int how);
 void pkcs7_info (void);
 void smime_to_pkcs7 (void);
@@ -579,50 +579,35 @@ generate_crl (void)
   gnutls_x509_crt *crts;
   int size;
   int days, result, i;
-  int vers = 2;			/* the default version in the CRL
-				 */
+  time_t now = time (NULL);
 
   result = gnutls_x509_crl_init (&crl);
   if (result < 0)
-    {
-      fprintf (stderr, "crl_init: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crl_init: %s", gnutls_strerror (result));
 
-  crts = load_cert_list (1, &size);
+  crts = load_cert_list (0, &size);
 
   for (i = 0; i < size; i++)
     {
-
-      result = gnutls_x509_crl_set_crt (crl, crts[i], time (0));
+      result = gnutls_x509_crl_set_crt (crl, crts[i], now);
       if (result < 0)
-	{
-	  fprintf (stderr, "crl_set_crt: %s\n", gnutls_strerror (result));
-	  exit (1);
-	}
+	error (EXIT_FAILURE, 0, "crl_set_crt: %s", gnutls_strerror (result));
     }
 
-  fprintf (stderr, "\n\nthisUpdate/nextUpdate time.\n");
-  gnutls_x509_crl_set_this_update (crl, time (NULL));
+  result = gnutls_x509_crl_set_this_update (crl, now);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "this_update: %s", gnutls_strerror (result));
 
+  fprintf (stderr, "Update times.\n");
   days = get_crl_next_update ();
 
-  result =
-    gnutls_x509_crl_set_next_update (crl, time (NULL) + days * 24 * 60 * 60);
+  result = gnutls_x509_crl_set_next_update (crl, now + days * 24 * 60 * 60);
   if (result < 0)
-    {
-      fprintf (stderr, "next_update: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "next_update: %s", gnutls_strerror (result));
 
-  /* Version.
-   */
-  result = gnutls_x509_crl_set_version (crl, vers);
+  result = gnutls_x509_crl_set_version (crl, 2);
   if (result < 0)
-    {
-      fprintf (stderr, "set_version: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "set_version: %s", gnutls_strerror (result));
 
   return crl;
 }
@@ -773,7 +758,6 @@ void
 generate_signed_crl (void)
 {
   gnutls_x509_crl crl;
-  size_t size;
   int result;
   gnutls_x509_privkey ca_key;
   gnutls_x509_crt ca_crt;
@@ -782,29 +766,15 @@ generate_signed_crl (void)
 
   ca_key = load_ca_private_key ();
   ca_crt = load_ca_cert ();
-
   crl = generate_crl ();
 
-  print_crl_info (crl, stderr, 0);
-
-  fprintf (stderr, "\n\nSigning CRL...\n");
+  fprintf (stderr, "\n");
 
   result = gnutls_x509_crl_sign (crl, ca_crt, ca_key);
   if (result < 0)
-    {
-      fprintf (stderr, "crl_sign: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "crl_sign: %s", gnutls_strerror (result));
 
-  size = sizeof (buffer);
-  result = gnutls_x509_crl_export (crl, info.outcert_format, buffer, &size);
-  if (result < 0)
-    {
-      fprintf (stderr, "crl_export: %s\n", gnutls_strerror (result));
-      exit (1);
-    }
-
-  fwrite (buffer, 1, size, outfile);
+  print_crl_info (crl, stderr);
 
   gnutls_x509_crl_deinit (crl);
 }
@@ -1108,23 +1078,26 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 }
 
 static void
-print_crl_info (gnutls_x509_crl crl, FILE *out, int all)
+print_crl_info (gnutls_x509_crl crl, FILE *out)
 {
   gnutls_datum_t info;
   int ret;
+  size_t size;
 
-  if (all)
-    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_FULL, &info);
-  else
-    ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_UNSIGNED_FULL, &info);
-
+  ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_FULL, &info);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_print: %s", gnutls_strerror (ret));
-  else
-    {
-      fprintf (out, "%s\n", info.data);
-      gnutls_free (info.data);
-    }
+
+  fprintf (out, "%s\n", info.data);
+
+  gnutls_free (info.data);
+
+  size = sizeof (buffer);
+  ret = gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, buffer, &size);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crl_export: %s", gnutls_strerror (ret));
+
+  fprintf (outfile, "%s", buffer);
 }
 
 void
@@ -1151,14 +1124,7 @@ crl_info (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
 
-  print_crl_info (crl, outfile, 1);
-
-  size = sizeof (buffer);
-  ret = gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, buffer, &size);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
-  else
-    fprintf (outfile, "%s", buffer);
+  print_crl_info (crl, outfile);
 }
 
 void
@@ -2008,7 +1974,7 @@ verify_crl (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
 
-  print_crl_info (crl, outfile, 1);
+  print_crl_info (crl, outfile);
 
   fprintf (outfile, "Verification output: ");
   ret = gnutls_x509_crl_verify (crl, &issuer, 1, 0, &output);
