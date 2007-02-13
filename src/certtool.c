@@ -2110,36 +2110,32 @@ verify_crl (void)
   issuer = load_ca_cert ();
 
   fprintf (outfile, "\nCA certificate:\n");
+
   dn_size = sizeof (dn);
   ret = gnutls_x509_crt_get_dn (issuer, dn, &dn_size);
-  if (ret >= 0)
-    fprintf (outfile, "\tSubject: %s\n\n", dn);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crt_get_dn: %s", gnutls_strerror (ret));
 
-  size = fread (buffer, 1, sizeof (buffer) - 1, infile);
-  buffer[size] = 0;
+  fprintf (outfile, "\tSubject: %s\n\n", dn);
 
-  pem.data = buffer;
+  ret = gnutls_x509_crl_init (&crl);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crl_init: %s", gnutls_strerror (ret));
+
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
-  gnutls_x509_crl_init (&crl);
-
   ret = gnutls_x509_crl_import (crl, &pem, in_cert_format);
+  free (pem.data);
   if (ret < 0)
-    {
-      fprintf (stderr, "CRL decoding error: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
 
   print_crl_info (crl, outfile, 1);
-
 
   fprintf (outfile, "Verification output: ");
   ret = gnutls_x509_crl_verify (crl, &issuer, 1, 0, &output);
   if (ret < 0)
-    {
-      fprintf (stderr, "Error in verification: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "Verification error: %s", gnutls_strerror (ret));
 
   if (output & GNUTLS_CERT_INVALID)
     {
@@ -2188,7 +2184,6 @@ verify_crl (void)
     }
 
   fprintf (outfile, "\n");
-
 }
 
 #include <gnutls/pkcs12.h>
