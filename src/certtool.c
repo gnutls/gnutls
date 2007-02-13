@@ -38,6 +38,7 @@
 #include <getline.h>
 #include <read-file.h>
 #include <error.h>
+#include <progname.h>
 
 static void print_crl_info (gnutls_x509_crl crl, FILE *out, int all);
 int generate_prime (int bits, int how);
@@ -87,6 +88,7 @@ tls_log_func (int level, const char *str)
 int
 main (int argc, char **argv)
 {
+  set_program_name (argv[0]);
   cfg_init ();
   gaa_parser (argc, argv);
 
@@ -195,8 +197,6 @@ void
 generate_private_key (void)
 {
   gnutls_x509_privkey key;
-
-  fprintf (stderr, "Generating a private key...\n");
 
   key = generate_private_key_int ();
 
@@ -890,8 +890,8 @@ gaa_parser (int argc, char **argv)
 
   if (gaa (argc, argv, &info) != -1)
     {
-      fprintf (stderr,
-	       "Error in the arguments. Use the --help or -h parameters to get more information.\n");
+      fprintf (stderr, "Try `%s --help' for more information.\n",
+	       program_name);
       exit (1);
     }
 
@@ -942,9 +942,7 @@ gaa_parser (int argc, char **argv)
       else if (strcasecmp (info.hash, "rmd160") == 0)
 	dig = GNUTLS_DIG_RMD160;
       else
-	fprintf (stderr,
-		 "Unsupported hash algorithm '%s'. Using the default.\n",
-		 info.hash);
+	error (EXIT_FAILURE, 0, "invalid hash: %s", info.hash);
     }
 
   batch = 0;
@@ -958,10 +956,7 @@ gaa_parser (int argc, char **argv)
   gnutls_global_set_log_level (info.debug);
 
   if ((ret = gnutls_global_init ()) < 0)
-    {
-      fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
+    error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
 
   switch (info.action)
     {
@@ -1020,9 +1015,7 @@ gaa_parser (int argc, char **argv)
       generate_proxy_certificate ();
       break;
     default:
-      fprintf (stderr, "GnuTLS' certtool utility.\n");
-      fprintf (stderr,
-	       "Please use the --help to get help on this program.\n");
+      gaa_help ();
       exit (0);
     }
   fclose (outfile);
