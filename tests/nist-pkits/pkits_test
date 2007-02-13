@@ -2,6 +2,8 @@
 
 set -e
 
+test -d certs || unzip PKITS_data.zip
+
 if ! test -d pkits_test_list_generator; then
    tar xfz pkits_test_list_generator.tgz
    patch -p 0 < pkits_test_list_generator.patch
