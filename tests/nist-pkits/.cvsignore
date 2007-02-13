@@ -6,3 +6,4 @@ pkcs12
 pkits.ldif
 pkits.schema
 smime
+pkits_test_list_generator
