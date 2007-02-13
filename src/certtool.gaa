@@ -7,7 +7,6 @@
 # include <io.h>
 #endif
 
-void print_license(void);
 void certtool_version(void);
 
 #}
@@ -111,7 +110,6 @@ option (d, debug) INT "LEVEL" { $debug = $1 } "specify the debug level. Default 
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
 option (v, version) { certtool_version(); exit(0); } "shows the program's version"
-option ( copyright) { print_license(); exit(0); } "shows the program's license"
 
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
