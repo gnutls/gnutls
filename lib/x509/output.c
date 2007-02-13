@@ -30,7 +30,6 @@
 #include <gnutls_x509.h>
 #include <x509.h>
 #include <gnutls_errors.h>
-#include "time_r.h"
 
 /* I18n of error codes. */
 #include "gettext.h"
