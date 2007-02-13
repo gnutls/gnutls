@@ -86,6 +86,7 @@ AC_DEFUN([lgl_INIT],
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
+  gl_HEADER_TIME_H
   gl_TIME_R
   gl_HEADER_UNISTD
   gl_FUNC_VASNPRINTF
@@ -180,8 +181,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/string_.h
   lib/strverscmp.c
   lib/strverscmp.h
+  lib/time_.h
   lib/time_r.c
-  lib/time_r.h
   lib/unistd_.h
   lib/vasnprintf.c
   lib/vasnprintf.h
@@ -255,6 +256,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/strverscmp.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
+  m4/time_h.m4
   m4/time_r.m4
   m4/uintmax_t.m4
   m4/ulonglong.m4

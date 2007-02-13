@@ -379,10 +379,35 @@ EXTRA_DIST += stat_.h
 
 ## end   gnulib module sys_stat
 
+## begin gnulib module time
+
+BUILT_SOURCES += time.h
+
+# We need the following in order to create <time.h> when the system
+# doesn't have one that works with the given compiler.
+time.h: time_.h
+	rm -f $@-t $@
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
+	  sed -e 's|@ABSOLUTE_TIME_H''@|$(ABSOLUTE_TIME_H)|g' \
+ 	      -e 's|@REPLACE_LOCALTIME_R''@|$(REPLACE_LOCALTIME_R)|g' \
+ 	      -e 's|@REPLACE_NANOSLEEP''@|$(REPLACE_NANOSLEEP)|g' \
+ 	      -e 's|@REPLACE_STRPTIME''@|$(REPLACE_STRPTIME)|g' \
+ 	      -e 's|@REPLACE_TIMEGM''@|$(REPLACE_TIMEGM)|g' \
+ 	      -e 's|@SYS_TIME_H_DEFINES_STRUCT_TIMESPEC''@|$(SYS_TIME_H_DEFINES_STRUCT_TIMESPEC)|g' \
+ 	      -e 's|@TIME_H_DEFINES_STRUCT_TIMESPEC''@|$(TIME_H_DEFINES_STRUCT_TIMESPEC)|g' \
+	      < $(srcdir)/time_.h; \
+	} > $@-t
+	mv $@-t $@
+MOSTLYCLEANFILES += time.h time.h-t
+
+EXTRA_DIST += time_.h
+
+## end   gnulib module time
+
 ## begin gnulib module time_r
 
 
-EXTRA_DIST += time_r.c time_r.h
+EXTRA_DIST += time_r.c
 
 EXTRA_liblgnu_la_SOURCES += time_r.c
 
