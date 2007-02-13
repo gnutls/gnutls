@@ -1,0 +1,12 @@
+#!/bin/sh -x
+
+set -e
+
+if ! test -d pkits_test_list_generator; then
+   tar xfz pkits_test_list_generator.tgz
+   patch -p 0 < pkits_test_list_generator.patch
+fi
+
+make -C pkits_test_list_generator/src
+
+pkits_test_list_generator/src/PKITS_test_list_generator
