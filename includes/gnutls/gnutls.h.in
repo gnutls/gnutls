@@ -442,6 +442,11 @@ extern "C"
       GNUTLS_AUTHZ_SAML_ASSERTION_URL = 3
     } gnutls_authz_data_format_type_t;
 
+  typedef enum
+    {
+      GNUTLS_SUPPLEMENTAL_AUTHZ_DATA = 1
+    } gnutls_supplemental_data_format_type_t;
+
 /* functions to set priority of cipher suites 
  */
   int gnutls_cipher_set_priority (gnutls_session_t session, const int *list);
