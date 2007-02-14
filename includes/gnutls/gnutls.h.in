@@ -436,10 +436,12 @@ extern "C"
 
   typedef enum
     {
-      GNUTLS_AUTHZ_X509_ATTR_CERT = 0,
-      GNUTLS_AUTHZ_SAML_ASSERTION = 1,
-      GNUTLS_AUTHZ_X509_ATTR_CERT_URL = 2,
-      GNUTLS_AUTHZ_SAML_ASSERTION_URL = 3
+      /* Values incremented by one compared to the protocol, to be
+	 able to use zero-terminated format lists.  */
+      GNUTLS_AUTHZ_X509_ATTR_CERT = 1,
+      GNUTLS_AUTHZ_SAML_ASSERTION = 2,
+      GNUTLS_AUTHZ_X509_ATTR_CERT_URL = 3,
+      GNUTLS_AUTHZ_SAML_ASSERTION_URL = 4
     } gnutls_authz_data_format_type_t;
 
   typedef enum
