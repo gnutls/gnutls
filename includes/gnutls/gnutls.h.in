@@ -211,7 +211,8 @@ extern "C"
     GNUTLS_HANDSHAKE_SERVER_HELLO_DONE = 14,
     GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY = 15,
     GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE = 16,
-    GNUTLS_HANDSHAKE_FINISHED = 20
+    GNUTLS_HANDSHAKE_FINISHED = 20,
+    GNUTLS_HANDSHAKE_SUPPLEMENTAL = 23
   } gnutls_handshake_description_t;
 
 /* Note that the status bits have different meanings
