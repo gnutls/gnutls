@@ -20,6 +20,7 @@ It uses gnutls_x509_crl_print to print CRL information.  It uses some
 more gnulib modules to simplify error handling.
 
 ** API and ABI modifications:
+GNUTLS_HANDSHAKE_SUPPLEMENTAL: ADD, new gnutls_handshake_description_t element.
 GNUTLS_SAN_DN: ADD, new gnutls_x509_subject_alt_name_t element.
 gnutls_x509_crl_print: ADD.
 gnutls_x509_crl_get_signature: ADD.
