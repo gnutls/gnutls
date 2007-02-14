@@ -34,6 +34,9 @@ static inline Gc_hash _gnutls_mac2gc (gnutls_mac_algorithm_t mac)
 {
   switch (mac)
     {
+    case GNUTLS_MAC_NULL:
+      return -1;
+      break;
     case GNUTLS_MAC_SHA1:
       return GC_SHA1;
       break;
