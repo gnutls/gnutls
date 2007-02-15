@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a pkg-config metadata file.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
 # Author: Simon Josefsson
 # 
 # This file is free software; as a special exception the author gives
@@ -17,6 +17,7 @@ includedir=@includedir@
 
 Name: GnuTLS
 Description: Transport Security Layer implementation for the GNU system
+Requires: libtasn1
 Version: @VERSION@
 Libs: -L${libdir} -lgnutls
 Libs.private: @LIBGNUTLS_LIBS@ 
