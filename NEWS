@@ -25,6 +25,10 @@ and gnutls_authz_data_format_type_t have been added.  Supplemental
 data is described in RFC 4680 and authorization extensions in
 draft-housley-tls-authz-extns-07.
 
+** The pkg-config script now have a 'Requires: libtasn1' field.
+This makes 'pkg-config --libs gnutls' mention -ltasn1.  Reported by
+Pavlov Konstantin <thresh@altlinux.ru>.
+
 ** API and ABI modifications:
 GNUTLS_HANDSHAKE_SUPPLEMENTAL: ADD, new gnutls_handshake_description_t element.
 gnutls_supplemental_data_format_type_t: ADD.
