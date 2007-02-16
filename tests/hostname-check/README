@@ -1,0 +1,13 @@
+hostname-check README -- Information about hostname-check self test.
+Copyright (C) 2007 Simon Josefsson
+See the end for copying conditions.
+
+This directory contains a self-test of the RFC 2818 hostname matching
+algorithm.  Used to detect regressions of the bug reported in:
+
+http://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
+
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
