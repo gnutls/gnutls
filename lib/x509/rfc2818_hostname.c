@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  * Copyright (C) 2002 Andrew McDonald
  *
  * This file is part of GNUTLS.
@@ -136,7 +136,7 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
 	{
 	  /* got an error, can't find a name 
 	   */
-	  return 1;
+	  return 0;
 	}
 
       if (_gnutls_hostname_compare (dnsname, hostname))
