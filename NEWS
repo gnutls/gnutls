@@ -10,6 +10,12 @@ Before it would have reported that the certificate matched a hostname
 when it did not have any dNSName or any CN field.  Report and tiny
 patch from "Richard W.M. Jones" <rjones@redhat.com>.
 
+** New self test for RFC 2818 comparison in gnutls_x509_crt_check_hostname.
+Tests regressions of the bug, and several other features.
+
+** GnuTLS now matches URI's with IP Addresses against iPAddress SAN's.
+Before there were no support for iPAddress SAN's during comparison.
+
 ** New API to print information about CRL's.
 The function is gnutls_x509_crl_print.
 
