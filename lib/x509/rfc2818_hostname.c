@@ -123,8 +123,9 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
 	      return 1;
 	    }
 	}
-
     }
+
+  /* XXX also check iPAddress. */
 
   if (!found_dnsname)
     {
