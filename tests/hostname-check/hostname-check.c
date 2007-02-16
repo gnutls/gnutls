@@ -115,4 +115,8 @@ doit (void)
     fail ("Hostname match failure (%d)\n", ret);
   else
     success ("gnutls_x509_crt_check_hostname: %d\n", ret);
+
+  gnutls_x509_crt_deinit (cert);
+
+  gnutls_global_deinit ();
 }
