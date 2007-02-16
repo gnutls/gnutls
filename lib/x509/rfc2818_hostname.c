@@ -29,7 +29,7 @@
 #include <gnutls_errors.h>
 
 /* compare hostname against certificate, taking account of wildcards
- * return 1 on success or 0 on error 
+ * return 1 on success or 0 on error
  */
 int
 _gnutls_hostname_compare (const char *certname, const char *hostname)
@@ -111,9 +111,9 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
     {
 
       dnsnamesize = sizeof (dnsname);
-      ret =
-	gnutls_x509_crt_get_subject_alt_name (cert, i,
-					      dnsname, &dnsnamesize, NULL);
+      ret = gnutls_x509_crt_get_subject_alt_name (cert, i,
+						  dnsname, &dnsnamesize,
+						  NULL);
 
       if (ret == GNUTLS_SAN_DNSNAME)
 	{
