@@ -441,13 +441,20 @@ extern "C"
       GNUTLS_AUTHZ_X509_ATTR_CERT = 1,
       GNUTLS_AUTHZ_SAML_ASSERTION = 2,
       GNUTLS_AUTHZ_X509_ATTR_CERT_URL = 3,
-      GNUTLS_AUTHZ_SAML_ASSERTION_URL = 4
+      GNUTLS_AUTHZ_SAML_ASSERTION_URL = 4,
+      /* If you add new values here, make GNUTLS_AUTHZ_LAST have the
+	 same value as the last one.  If you introduce gaps, search
+	 for AUTHZ_LAST in ext_authz.c and modify the logic. */
+      GNUTLS_AUTHZ_LAST = 4
     } gnutls_authz_data_format_type_t;
 
   typedef enum
     {
       GNUTLS_SUPPLEMENTAL_AUTHZ_DATA = 1
     } gnutls_supplemental_data_format_type_t;
+
+  const char *gnutls_supplemental_get_name
+  (gnutls_supplemental_data_format_type_t type);
 
 /* functions to set priority of cipher suites 
  */
