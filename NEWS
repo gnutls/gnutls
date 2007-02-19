@@ -30,10 +30,12 @@ string in the provided buffer.
 It uses gnutls_x509_crl_print to print CRL information.  It uses some
 more gnulib modules to simplify error handling.
 
-** Add new protocol constants related to supplemental data and authorization.
-GNUTLS_HANDSHAKE_SUPPLEMENTAL, gnutls_supplemental_data_format_type_t
-and gnutls_authz_data_format_type_t have been added.  Supplemental
-data is described in RFC 4680 and authorization extensions in
+** Add new functionality related to supplemental data and authorization.
+The types GNUTLS_HANDSHAKE_SUPPLEMENTAL,
+gnutls_supplemental_data_format_type_t and
+gnutls_authz_data_format_type_t have been added.  The function
+gnutls_supplemental_get_name have been added.  Supplemental data is
+described in RFC 4680 and authorization extensions in
 draft-housley-tls-authz-extns-07.
 
 ** The pkg-config script now have a 'Requires: libtasn1' field.
@@ -44,6 +46,7 @@ Pavlov Konstantin <thresh@altlinux.ru>.
 GNUTLS_HANDSHAKE_SUPPLEMENTAL: ADD, new gnutls_handshake_description_t element.
 gnutls_supplemental_data_format_type_t: ADD.
 gnutls_authz_data_format_type_t: ADD.
+gnutls_supplemental_get_name: ADD.
 GNUTLS_SAN_DN: ADD, new gnutls_x509_subject_alt_name_t element.
 gnutls_x509_crl_print: ADD.
 gnutls_x509_crl_get_signature: ADD.
