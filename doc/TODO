@@ -83,6 +83,9 @@ Current list:
 
     This means another 24 kb used by each process that makes use of
     libgnutls.
+- Make gnutls-cli-debug exit with better error messages if the
+  handshake fails, rather than saying that the server doesn't support
+  TLS.
 
 (+) Means high priority 
 (*) Means medium priority
