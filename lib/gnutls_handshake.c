@@ -39,6 +39,7 @@
 #include "gnutls_hash_int.h"
 #include "gnutls_db.h"
 #include "gnutls_extensions.h"
+#include "gnutls_supplemental.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_v2_compat.h"
 #include "auth_cert.h"
@@ -1218,6 +1219,7 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
     case GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE:
     case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
     case GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY:
+    case GNUTLS_HANDSHAKE_SUPPLEMENTAL:
       ret = length32;
       break;
     default:
@@ -2083,6 +2085,67 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
   return 0;
 }
 
+int
+_gnutls_send_supplemental (gnutls_session_t session, int again)
+{
+  int ret = 0;
+
+  _gnutls_debug_log ("EXT[%x]: Sending supplemental data\n", session);
+
+  if (again)
+    ret = _gnutls_send_handshake (session, NULL, 0,
+				  GNUTLS_HANDSHAKE_SUPPLEMENTAL);
+  else
+    {
+      gnutls_buffer *buf = &session->security_parameters.extensions.supp_data;
+
+      _gnutls_buffer_init (buf);
+
+      ret = _gnutls_gen_supplemental (session);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+
+      ret = _gnutls_send_handshake (session, buf->data, buf->length,
+				    GNUTLS_HANDSHAKE_SUPPLEMENTAL);
+      _gnutls_buffer_clear (buf);
+    }
+
+  return ret;
+}
+
+int
+_gnutls_recv_supplemental (gnutls_session_t session)
+{
+  uint8_t *data = NULL;
+  int datalen = 0;
+  int ret;
+
+  _gnutls_debug_log ("EXT[%x]: Expecting supplemental data\n", session);
+
+  ret = _gnutls_recv_handshake (session, &data, &datalen,
+				GNUTLS_HANDSHAKE_SUPPLEMENTAL,
+				OPTIONAL_PACKET);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_parse_supplemental (session, data, datalen);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  gnutls_free (data);
+
+  return ret;
+}
+
 /**
   * gnutls_handshake - This is the main function in the handshake protocol.
   * @session: is a #gnutls_session_t structure.
@@ -2220,6 +2283,14 @@ restart:
       STATE = STATE2;
       IMED_RET ("recv hello", ret);
 
+    case STATE70:
+      if (session->security_parameters.extensions.do_recv_supplemental)
+	{
+	  ret = _gnutls_recv_supplemental (session);
+	  STATE = STATE70;
+	  IMED_RET ("recv supplemental", ret);
+	}
+
     case STATE3:
       /* RECV CERTIFICATE */
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
@@ -2252,6 +2323,14 @@ restart:
 				  MANDATORY_PACKET);
       STATE = STATE6;
       IMED_RET ("recv server hello done", ret);
+
+    case STATE71:
+      if (session->security_parameters.extensions.do_send_supplemental)
+	{
+	  ret = _gnutls_send_supplemental (session, AGAIN (STATE71));
+	  STATE = STATE71;
+	  IMED_RET ("send supplemental", ret);
+	}
 
     case STATE7:
       /* send our certificate - if any and if requested
@@ -2431,6 +2510,14 @@ restart:
       STATE = STATE2;
       IMED_RET ("send hello", ret);
 
+    case STATE70:
+      if (session->security_parameters.extensions.do_send_supplemental)
+	{
+	  ret = _gnutls_send_supplemental (session, AGAIN (STATE70));
+	  STATE = STATE70;
+	  IMED_RET ("send supplemental data", ret);
+	}
+
       /* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
     case STATE3:
       /* NOTE: these should not be send if we are resuming */
@@ -2465,6 +2552,13 @@ restart:
       STATE = STATE6;
       IMED_RET ("send server hello done", ret);
 
+    case STATE71:
+      if (session->security_parameters.extensions.do_recv_supplemental)
+	{
+	  ret = _gnutls_recv_supplemental (session);
+	  STATE = STATE71;
+	  IMED_RET ("recv client supplemental", ret);
+	}
 
       /* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
     case STATE7:
