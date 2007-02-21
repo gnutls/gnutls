@@ -434,20 +434,7 @@ extern "C"
 			      void *data, size_t * data_length,
 			      unsigned int *type, unsigned int indx);
 
-  typedef enum
-    {
-      /* Values incremented by one compared to the protocol, to be
-	 able to use zero-terminated format lists.  */
-      GNUTLS_AUTHZ_X509_ATTR_CERT = 1,
-      GNUTLS_AUTHZ_SAML_ASSERTION = 2,
-      GNUTLS_AUTHZ_X509_ATTR_CERT_URL = 3,
-      GNUTLS_AUTHZ_SAML_ASSERTION_URL = 4,
-      /* If you add new values here, make GNUTLS_AUTHZ_LAST have the
-	 same value as the last one.  If you introduce gaps, search
-	 for AUTHZ_LAST in ext_authz.c and modify the logic. */
-      GNUTLS_AUTHZ_LAST = 4
-    } gnutls_authz_data_format_type_t;
-
+  /* Supplemental data, RFC 4680. */
   typedef enum
     {
       GNUTLS_SUPPLEMENTAL_AUTHZ_DATA = 1
@@ -455,6 +442,47 @@ extern "C"
 
   const char *gnutls_supplemental_get_name
   (gnutls_supplemental_data_format_type_t type);
+
+  /* Authorization extensions, RFC xxxx. */
+  typedef enum
+    {
+      /* Values incremented by one compared to the protocol, to be
+	 able to use zero-terminated format lists.  */
+      GNUTLS_AUTHZ_X509_ATTR_CERT = 1,
+      GNUTLS_AUTHZ_SAML_ASSERTION = 2,
+      GNUTLS_AUTHZ_X509_ATTR_CERT_URL = 3,
+      GNUTLS_AUTHZ_SAML_ASSERTION_URL = 4
+    } gnutls_authz_data_format_type_t;
+
+  typedef int (*gnutls_authz_recv_callback_func) (gnutls_session_t session,
+						  const int *authz_formats,
+						  gnutls_datum_t *datums);
+  typedef int (*gnutls_authz_send_callback_func) (gnutls_session_t session,
+						  const int *client_formats,
+						  const int *server_formats);
+
+  void gnutls_authz_enable (gnutls_session_t session,
+			    const int *client_formats,
+			    const int *server_formats,
+			    gnutls_authz_recv_callback_func recv_callback,
+			    gnutls_authz_send_callback_func send_callback);
+
+  int gnutls_authz_send_x509_attr_cert (gnutls_session_t session,
+					const char *data,
+					size_t len);
+  int gnutls_authz_send_saml_assertion (gnutls_session_t session,
+					const char *data,
+					size_t len);
+  int gnutls_authz_send_x509_attr_cert_url (gnutls_session_t session,
+					    const char *url,
+					    size_t urllen,
+					    gnutls_mac_algorithm_t hash_type,
+					    const char *hash);
+  int gnutls_authz_send_saml_assertion_url (gnutls_session_t session,
+					    const char *url,
+					    size_t urllen,
+					    gnutls_mac_algorithm_t hash_type,
+					    const char *hash);
 
 /* functions to set priority of cipher suites 
  */
