@@ -6,7 +6,7 @@ See the end for copying conditions.
 * Version 1.7.7 (unreleased)
 
 ** Support for supplemental handshake messages and authorization data.
-Supplemental data is described in RFC 4680 and authorization
+Supplemental data is described in RFC 4680 and the authorization
 extensions in draft-housley-tls-authz-extns-07.
 
 ** Fix for gnutls_x509_crt_check_hostname.
