@@ -50,6 +50,12 @@
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
 
+typedef int (*supp_recv_func) (gnutls_session_t session,
+			       const opaque *data,
+			       size_t data_size);
+typedef int (*supp_send_func) (gnutls_session_t session,
+			       gnutls_buffer *buf);
+
 typedef struct
 {
   const char *name;
@@ -87,10 +93,9 @@ get_supp_func_recv (gnutls_supplemental_data_format_type_t type)
 }
 
 int
-_gnutls_gen_supplemental (gnutls_session_t session)
+_gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer *buf)
 {
   gnutls_supplemental_entry *p;
-  gnutls_buffer *buf = &session->security_parameters.extensions.supp_data;
   int ret;
 
   /* Make room for 3 byte length field. */
@@ -104,14 +109,34 @@ _gnutls_gen_supplemental (gnutls_session_t session)
   for(p = _gnutls_supplemental; p->name; p++)
     {
       supp_send_func supp_send = p->supp_send_func;
+      size_t sizepos = buf->length;
       int ret;
 
-      ret = supp_send (session);
+      /* Make room for supplement type and length byte length field. */
+      ret = _gnutls_buffer_append (buf, "\0\0\0\0", 4);
       if (ret < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
 	}
+
+      ret = supp_send (session, buf);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+
+      /* If data were added, store type+length, otherwise reset. */
+      if (buf->length > sizepos + 4)
+	{
+	  buf->data[sizepos] = 0;
+	  buf->data[sizepos + 1] = p->type;
+	  buf->data[sizepos + 2] = ((buf->length - sizepos - 4) >> 8) & 0xFF;
+	  buf->data[sizepos + 3] = (buf->length - sizepos -4) & 0xFF;
+	}
+      else
+	buf->length -= 4;
     }
 
   buf->data[0] = ((buf->length - 3) << 16) & 0xFF;
