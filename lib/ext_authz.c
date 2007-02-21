@@ -336,7 +336,7 @@ _gnutls_authz_supp_send_params (gnutls_session_t session,
   gnutls_authz_send_callback_func callback =
     session->security_parameters.extensions.authz_send_callback;
   gnutls_buffer *authz_buf =
-    &session->security_parameters.extensions.authz_data
+    &session->security_parameters.extensions.authz_data;
   int ret;
 
   if (!callback)
