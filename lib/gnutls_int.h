@@ -125,7 +125,8 @@ typedef enum handshake_state_t
 { STATE0 = 0, STATE1, STATE2,
   STATE3, STATE4, STATE5,
   STATE6, STATE7, STATE8, STATE9, STATE20 = 20, STATE21,
-  STATE30 = 30, STATE31, STATE50 = 50, STATE60 = 60, STATE61, STATE62
+  STATE30 = 30, STATE31, STATE50 = 50, STATE60 = 60, STATE61, STATE62,
+  STATE70, STATE71
 } handshake_state_t;
 
 #include <gnutls_buffer.h>
@@ -265,9 +266,16 @@ typedef struct
   server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
   /* limit server_name extensions */
   unsigned server_names_size;
+
   opaque srp_username[MAX_SRP_USERNAME + 1];
+
+  /* TLS/IA data. */
   int gnutls_ia_enable, gnutls_ia_peer_enable;
   int gnutls_ia_allowskip, gnutls_ia_peer_allowskip;
+
+  /* Used by extensions that enable supplemental data. */
+  int do_recv_supplemental, do_send_supplemental;
+  gnutls_buffer supp_data;
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
