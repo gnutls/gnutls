@@ -456,7 +456,9 @@ extern "C"
 
   typedef int (*gnutls_authz_recv_callback_func) (gnutls_session_t session,
 						  const int *authz_formats,
-						  gnutls_datum_t *datums);
+						  gnutls_datum_t *infos,
+						  const int *hashtypes,
+						  gnutls_datum_t *hash);
   typedef int (*gnutls_authz_send_callback_func) (gnutls_session_t session,
 						  const int *client_formats,
 						  const int *server_formats);
