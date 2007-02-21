@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.7.7 (unreleased)
 
+** Support for supplemental handshake messages and authorization data.
+Supplemental data is described in RFC 4680 and authorization
+extensions in draft-housley-tls-authz-extns-07.
+
 ** Fix for gnutls_x509_crt_check_hostname.
 Before it would have reported that the certificate matched a hostname
 when it did not have any dNSName or any CN field.  Report and tiny
@@ -30,14 +34,6 @@ string in the provided buffer.
 It uses gnutls_x509_crl_print to print CRL information.  It uses some
 more gnulib modules to simplify error handling.
 
-** Add new functionality related to supplemental data and authorization.
-The types GNUTLS_HANDSHAKE_SUPPLEMENTAL,
-gnutls_supplemental_data_format_type_t and
-gnutls_authz_data_format_type_t have been added.  The function
-gnutls_supplemental_get_name have been added.  Supplemental data is
-described in RFC 4680 and authorization extensions in
-draft-housley-tls-authz-extns-07.
-
 ** The pkg-config script now have a 'Requires: libtasn1' field.
 This makes 'pkg-config --libs gnutls' mention -ltasn1.  Reported by
 Pavlov Konstantin <thresh@altlinux.ru>.
@@ -47,6 +43,13 @@ GNUTLS_HANDSHAKE_SUPPLEMENTAL: ADD, new gnutls_handshake_description_t element.
 gnutls_supplemental_data_format_type_t: ADD.
 gnutls_authz_data_format_type_t: ADD.
 gnutls_supplemental_get_name: ADD.
+gnutls_authz_recv_callback_func,
+gnutls_authz_send_callback_func: ADD, callback prototypes.
+gnutls_authz_enable: ADD.
+gnutls_authz_send_x509_attr_cert,
+gnutls_authz_send_saml_assertion,
+gnutls_authz_send_x509_attr_cert_url,
+gnutls_authz_send_saml_assertion_url: ADD.
 GNUTLS_SAN_DN: ADD, new gnutls_x509_subject_alt_name_t element.
 gnutls_x509_crl_print: ADD.
 gnutls_x509_crl_get_signature: ADD.
