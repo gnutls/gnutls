@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.7.7 (unreleased)
+* Version 1.7.7 (released 2007-02-22)
 
 ** Support for supplemental handshake messages and authorization data.
 Supplemental data is described in RFC 4680 and the authorization
