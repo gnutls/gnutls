@@ -17,7 +17,6 @@ includedir=@includedir@
 
 Name: GnuTLS
 Description: Transport Security Layer implementation for the GNU system
-Requires: libtasn1
 Version: @VERSION@
 Libs: -L${libdir} -lgnutls
 Libs.private: @LIBGNUTLS_LIBS@ 
