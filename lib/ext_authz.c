@@ -152,12 +152,16 @@ _gnutls_authz_ext_client_recv_params (gnutls_session_t session,
   if (ret < 0)
     return ret;
 
-  if (session->security_parameters.entity == GNUTLS_CLIENT
-      && *client_formats)
+  if (*client_formats)
     {
-      _gnutls_debug_log ("EXT[%x]: Will send supplemental data\n",
-			 session);
-      session->security_parameters.extensions.do_send_supplemental = 1;
+      if (session->security_parameters.entity == GNUTLS_CLIENT)
+	{
+	  _gnutls_debug_log ("EXT[%x]: Will send supplemental data\n",
+			     session);
+	  session->security_parameters.extensions.do_send_supplemental = 1;
+	}
+      else
+	session->security_parameters.extensions.authz_recvd_client = 1;
     }
 
   return 0;
@@ -173,8 +177,12 @@ _gnutls_authz_ext_client_send_params (gnutls_session_t session,
   int ret;
 
   /* Should we be sending this? */
-  if (!_gnutls_extension_list_check (session, GNUTLS_EXTENSION_AUTHZ_CLIENT))
-    return 0;
+  if (session->security_parameters.entity == GNUTLS_SERVER
+      && !session->security_parameters.extensions.authz_recvd_client)
+    {
+      gnutls_assert ();
+      return 0;
+    }
 
   ret = send_extension (session, data, _data_size, client_formats);
 
@@ -201,12 +209,16 @@ _gnutls_authz_ext_server_recv_params (gnutls_session_t session,
   if (ret < 0)
     return ret;
 
-  if (session->security_parameters.entity == GNUTLS_CLIENT
-      && *server_formats)
+  if (*server_formats)
     {
-      _gnutls_debug_log ("EXT[%x]: Will expect supplemental data\n",
-			 session);
-      session->security_parameters.extensions.do_recv_supplemental = 1;
+      if (session->security_parameters.entity == GNUTLS_CLIENT)
+	{
+	  _gnutls_debug_log ("EXT[%x]: Will expect supplemental data\n",
+			     session);
+	  session->security_parameters.extensions.do_recv_supplemental = 1;
+	}
+      else
+	session->security_parameters.extensions.authz_recvd_server = 1;
     }
 
   return 0;
@@ -222,8 +234,12 @@ _gnutls_authz_ext_server_send_params (gnutls_session_t session,
   int ret;
 
   /* Should we be sending this? */
-  if (!_gnutls_extension_list_check (session, GNUTLS_EXTENSION_AUTHZ_SERVER))
-    return 0;
+  if (session->security_parameters.entity == GNUTLS_SERVER
+      && !session->security_parameters.extensions.authz_recvd_server)
+    {
+      gnutls_assert ();
+      return 0;
+    }
 
   ret = send_extension (session, data, _data_size, server_formats);
 
