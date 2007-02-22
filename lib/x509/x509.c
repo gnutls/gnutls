@@ -1718,6 +1718,67 @@ _gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert, gnutls_datum_t * start)
   return _gnutls_x509_crt_get_raw_dn2 (cert, "subject", start);
 }
 
+int
+_gnutls_x509_crt_get_opaque_dn(gnutls_x509_crt_t cert, char *whom, gnutls_x509_dn_t *dn)
+{
+  *dn = (gnutls_x509_dn_t)asn1_find_node(cert->cert, whom);
+  return *dn ? 0 : -1;
+}
+
+int
+gnutls_x509_crt_get_opaque_subject_dn (gnutls_x509_crt_t cert, gnutls_x509_dn_t *dn)
+{
+  return _gnutls_x509_crt_get_opaque_dn (cert, "tbsCertificate.subject.rdnSequence", dn);
+}
+
+int
+gnutls_x509_crt_get_opaque_issuer_dn (gnutls_x509_crt_t cert, gnutls_x509_dn_t *dn)
+{
+  return _gnutls_x509_crt_get_opaque_dn (cert, "tbsCertificate.issuer.rdnSequence", dn);
+}
+
+int
+gnutls_x509_opaque_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn, int iava,
+		gnutls_x509_ava_st *ava)
+{
+  ASN1_TYPE rdn, elem;
+  long len;
+  int lenlen, remlen, ret;
+  char rbuf[sizeof("rdnSequence.?9999999999.?9999999999")];
+  unsigned char cls, *ptr;
+
+  /* we are zero-based, libtasn1 is 1-based. */
+  snprintf(rbuf, sizeof(rbuf), "rdnSequence.?%d.?%d", irdn+1, iava+1);
+  rdn = asn1_find_node((ASN1_TYPE)dn, rbuf);
+  if (!rdn)
+    return -1;
+  snprintf(rbuf, sizeof(rbuf), "?%d.type", iava+1);
+  elem = asn1_find_node(rdn, rbuf);
+  if (!elem)
+    return -1;
+  ava->oid.data = elem->value;
+  ava->oid.size = elem->value_len;
+  snprintf(rbuf, sizeof(rbuf), "?%d.value", iava+1);
+  elem = asn1_find_node(rdn, rbuf);
+  if (!elem)
+    return -1;
+  /* The value still has the previous tag's length bytes, plus
+   * the current value's tag and length bytes. Decode them.
+   */
+  ptr = elem->value;
+  remlen = elem->value_len;
+  len = asn1_get_length_der(ptr, remlen, &lenlen);
+  ptr += lenlen;
+  remlen -= lenlen;
+  ret = asn1_get_tag_der(ptr, remlen, &cls, &lenlen, &ava->value_tag);
+  if (ret)
+    return ret;
+  ptr += lenlen;
+  remlen -= lenlen;
+  ava->value.size = asn1_get_length_der(ptr, remlen, &lenlen);
+  ava->value.data = ptr + lenlen;
+  return 0;
+}
 
 /**
   * gnutls_x509_crt_get_fingerprint - This function returns the Certificate's fingerprint
