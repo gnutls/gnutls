@@ -9,3 +9,5 @@ stdint.h
 string.h
 sys
 time.h
+stdio.h
+unistd.h
