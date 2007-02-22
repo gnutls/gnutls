@@ -9,6 +9,9 @@ See the end for copying conditions.
 Supplemental data is described in RFC 4680 and the authorization
 extensions in draft-housley-tls-authz-extns-07.
 
+** Support for authorization data in gnutls-cli and gnutls-serv.
+New parameters --authz-x509-attr-cert and --authz-saml-assertion.
+
 ** Fix for gnutls_x509_crt_check_hostname.
 Before it would have reported that the certificate matched a hostname
 when it did not have any dNSName or any CN field.  Report and tiny
