@@ -110,15 +110,21 @@ print_proxy (gnutls_string * str, gnutls_x509_crt_t cert)
 
   if (pathlen >= 0)
     addf (str, _("\t\t\tPath Length Constraint: %d\n"), pathlen);
-  adds (str, _("\t\t\tPolicy Language: "));
+  addf (str, _("\t\t\tPolicy Language: %s"), policyLanguage);
   if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.1") == 0)
-    addf (str, "id-ppl-inheritALL\n");
+    adds (str, " (id-ppl-inheritALL)\n");
   else if (strcmp (policyLanguage, "1.3.6.1.5.5.7.21.2") == 0)
-    addf (str, "id-ppl-independent\n");
+    adds (str, " (id-ppl-independent)\n");
   else
-    addf (str, "%s\n", policyLanguage);
+    adds (str, "\n");
   if (npolicy)
-    addf (str, _("\t\t\tPolicy Language: %.*s\n"), npolicy, policy);
+    {
+      adds (str, _("\t\t\tPolicy:\n\t\t\t\tASCII: "));
+      asciiprint (str, policy, npolicy);
+      adds (str, _("\n\t\t\t\tHexdump: "));
+      hexprint (str, policy, npolicy);
+      adds (str, "\n");
+    }
 }
 
 static void
@@ -811,7 +817,6 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	    {
 	      char *buffer;
 	      size_t extlen = 0;
-	      size_t j;
 
 	      addf (str, _("\t\tUnknown extension %s (%s):\n"), oid,
 		    critical ? _("critical") : _("not critical"));
@@ -1247,7 +1252,6 @@ print_crl (gnutls_string *str,
 	    char s[42];
 	    size_t max = sizeof (s);
 	    struct tm t;
-	    size_t i;
 
 	    addf (str, _("\t\tSerial Number (hex): "));
 	    hexprint (str, serial, serial_size);
