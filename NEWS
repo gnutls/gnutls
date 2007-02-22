@@ -34,10 +34,6 @@ string in the provided buffer.
 It uses gnutls_x509_crl_print to print CRL information.  It uses some
 more gnulib modules to simplify error handling.
 
-** The pkg-config script now have a 'Requires: libtasn1' field.
-This makes 'pkg-config --libs gnutls' mention -ltasn1.  Reported by
-Pavlov Konstantin <thresh@altlinux.ru>.
-
 ** API and ABI modifications:
 GNUTLS_HANDSHAKE_SUPPLEMENTAL: ADD, new gnutls_handshake_description_t element.
 gnutls_supplemental_data_format_type_t: ADD.
