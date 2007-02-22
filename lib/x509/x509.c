@@ -1718,65 +1718,142 @@ _gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert, gnutls_datum_t * start)
   return _gnutls_x509_crt_get_raw_dn2 (cert, "subject", start);
 }
 
-int
-_gnutls_x509_crt_get_opaque_dn(gnutls_x509_crt_t cert, char *whom, gnutls_x509_dn_t *dn)
+static int
+get_dn (gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t *dn)
 {
-  *dn = (gnutls_x509_dn_t)asn1_find_node(cert->cert, whom);
-  return *dn ? 0 : -1;
+  *dn = asn1_find_node(cert->cert, whom);
+  if (!*dn)
+    return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+  return 0;
 }
 
+/**
+ * gnutls_x509_crt_get_subject_dn:
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @dn: output variable with pointer to opaque DN.
+ *
+ * Return the Certificate's Subject DN as an opaque data type.  You
+ * may use gnutls_x509_dn_get_rdn_ava() to decode the DN.
+ *
+ * Returns: Returns 0 on success, or an error code.
+ **/
 int
-gnutls_x509_crt_get_opaque_subject_dn (gnutls_x509_crt_t cert, gnutls_x509_dn_t *dn)
+gnutls_x509_crt_get_subject_dn (gnutls_x509_crt_t cert,
+				gnutls_x509_dn_t *dn)
 {
-  return _gnutls_x509_crt_get_opaque_dn (cert, "tbsCertificate.subject.rdnSequence", dn);
+  return get_dn (cert, "tbsCertificate.subject.rdnSequence", dn);
 }
 
+/**
+ * gnutls_x509_crt_get_issuer_dn:
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @dn: output variable with pointer to opaque DN
+ *
+ * Return the Certificate's Issuer DN as an opaque data type.  You may
+ * use gnutls_x509_dn_get_rdn_ava() to decode the DN.
+ *
+ * Note that @dn points into the @cert object, and thus you may not
+ * deallocate @cert and continue to access @dn.
+ *
+ * Returns: Returns 0 on success, or an error code.
+ **/
 int
-gnutls_x509_crt_get_opaque_issuer_dn (gnutls_x509_crt_t cert, gnutls_x509_dn_t *dn)
+gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert,
+			       gnutls_x509_dn_t *dn)
 {
-  return _gnutls_x509_crt_get_opaque_dn (cert, "tbsCertificate.issuer.rdnSequence", dn);
+  return get_dn (cert, "tbsCertificate.issuer.rdnSequence", dn);
 }
 
+/**
+ * gnutls_x509_dn_get_rdn_ava:
+ * @dn: input variable with opaque DN
+ * @irdn: index of RDN
+ * @iava: index of AVA.
+ * @ava: Pointer to structure which will hold output information.
+ *
+ * Get pointers to data within the DN.
+ *
+ * Note that @ava will contain pointers into the @dn structure, so you
+ * should not modify any data or deallocate it.  Note also that the DN
+ * in turn points into the original certificate structure, and thus
+ * you may not deallocate the certificate and continue to access @dn.
+ *
+ * Returns: Returns 0 on success, or an error code.
+ **/
 int
-gnutls_x509_opaque_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn, int iava,
-		gnutls_x509_ava_st *ava)
+gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
+			    int irdn,
+			    int iava,
+			    gnutls_x509_ava_st *ava)
 {
   ASN1_TYPE rdn, elem;
   long len;
   int lenlen, remlen, ret;
-  char rbuf[sizeof("rdnSequence.?9999999999.?9999999999")];
+  char rbuf[MAX_NAME_SIZE];
   unsigned char cls, *ptr;
 
-  /* we are zero-based, libtasn1 is 1-based. */
-  snprintf(rbuf, sizeof(rbuf), "rdnSequence.?%d.?%d", irdn+1, iava+1);
-  rdn = asn1_find_node((ASN1_TYPE)dn, rbuf);
+  iava++; irdn++;			/* 0->1, 1->2 etc */
+
+  snprintf (rbuf, sizeof(rbuf), "rdnSequence.?%d.?%d", irdn, iava);
+  rdn = asn1_find_node (dn, rbuf);
   if (!rdn)
-    return -1;
-  snprintf(rbuf, sizeof(rbuf), "?%d.type", iava+1);
-  elem = asn1_find_node(rdn, rbuf);
+    {
+      gnutls_assert();
+      return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+    }
+
+  snprintf (rbuf, sizeof(rbuf), "?%d.type", iava);
+  elem = asn1_find_node (rdn, rbuf);
   if (!elem)
-    return -1;
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+    }
+
   ava->oid.data = elem->value;
   ava->oid.size = elem->value_len;
-  snprintf(rbuf, sizeof(rbuf), "?%d.value", iava+1);
+
+  snprintf(rbuf, sizeof(rbuf), "?%d.value", iava);
   elem = asn1_find_node(rdn, rbuf);
   if (!elem)
-    return -1;
-  /* The value still has the previous tag's length bytes, plus
-   * the current value's tag and length bytes. Decode them.
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+    }
+
+  /* The value still has the previous tag's length bytes, plus the
+   * current value's tag and length bytes. Decode them.
    */
+
   ptr = elem->value;
   remlen = elem->value_len;
   len = asn1_get_length_der(ptr, remlen, &lenlen);
+  if (len < 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ASN1_DER_ERROR;
+    }
+
   ptr += lenlen;
   remlen -= lenlen;
   ret = asn1_get_tag_der(ptr, remlen, &cls, &lenlen, &ava->value_tag);
   if (ret)
-    return ret;
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
+    }
+
   ptr += lenlen;
   remlen -= lenlen;
+
   ava->value.size = asn1_get_length_der(ptr, remlen, &lenlen);
+  if (ava->value.size < 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ASN1_DER_ERROR;
+    }
   ava->value.data = ptr + lenlen;
+
   return 0;
 }
 
