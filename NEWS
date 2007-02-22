@@ -5,8 +5,15 @@ See the end for copying conditions.
 
 * Version 1.7.8 (unreleased)
 
+** New APIs to extract Distinguished Name's from X.509 certificates.
+Based on patch from Howard Chu <hyc@symas.com>.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_dn_t: ADD.
+gnutls_x509_ava_st: ADD.
+gnutls_x509_crt_get_subject,
+gnutls_x509_crt_get_issuer: ADD.
+gnutls_x509_dn_get_rdn_ava: ADD.
 
 * Version 1.7.7 (released 2007-02-22)
 
