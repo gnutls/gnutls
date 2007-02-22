@@ -115,7 +115,7 @@ _gnutls_extension_get_name (uint16_t type)
 /* Checks if the extension we just received is one of the 
  * requested ones. Otherwise it's a fatal error.
  */
-int
+static int
 _gnutls_extension_list_check (gnutls_session_t session, uint16_t type)
 {
   if (session->security_parameters.entity == GNUTLS_CLIENT)

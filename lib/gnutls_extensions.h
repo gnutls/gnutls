@@ -28,7 +28,6 @@ const char *_gnutls_extension_get_name (uint16_t type);
 int _gnutls_parse_extensions (gnutls_session_t, const opaque *, int);
 int _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 			    size_t data_size);
-int _gnutls_extension_list_check (gnutls_session_t session, uint16_t type);
 
 typedef int (*ext_recv_func) (gnutls_session_t, const opaque *, size_t);	/* recv data */
 typedef int (*ext_send_func) (gnutls_session_t, opaque *, size_t);	/* send data */
