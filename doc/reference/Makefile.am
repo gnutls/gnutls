@@ -76,8 +76,8 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	cipher.h context.h filters.h main.h md.h packet.h		\
 	stream.h types.h						\
 									\
-	gnutls_openpgp.h gnutlsxx.h \
-	gnutls_extra_hooks.h
+	gnutls_openpgp.h gnutlsxx.h gnutls_extra_hooks.h		\
+	gnutls_supplemental.h ext_authz.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
