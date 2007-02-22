@@ -418,7 +418,7 @@ add_data (gnutls_session_t session,
   str[0] = '\x00';
   str[1] = format - 1;
 
-  str[2] = (len << 8) & 0xFF;
+  str[2] = (len >> 8) & 0xFF;
   str[3] = len & 0xFF;
 
   ret = _gnutls_buffer_append (buffer, str, 4);
