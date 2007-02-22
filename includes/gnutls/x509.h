@@ -317,8 +317,7 @@ extern "C"
 				  unsigned int raw_flag, void *buf,
 				  size_t * sizeof_buf);
 
-  struct gnutls_x509_dn_int;
-  typedef struct gnutls_x509_dn_int *gnutls_x509_dn_t;
+  typedef void *gnutls_x509_dn_t;
 
   typedef struct gnutls_x509_ava_st {
     gnutls_datum_t oid;
@@ -326,12 +325,12 @@ extern "C"
     unsigned long value_tag;
   } gnutls_x509_ava_st;
 
-  int gnutls_x509_crt_get_opaque_subject_dn (gnutls_x509_crt_t cert,
-					     gnutls_x509_dn_t *dn);
-  int gnutls_x509_crt_get_opaque_issuer_dn (gnutls_x509_crt_t cert,
-					    gnutls_x509_dn_t *dn);
-  int gnutls_x509_opaque_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn,
-					 int iava, gnutls_x509_ava_st *avast);
+  int gnutls_x509_crt_get_subject_dn (gnutls_x509_crt_t cert,
+				      gnutls_x509_dn_t *dn);
+  int gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert,
+				     gnutls_x509_dn_t *dn);
+  int gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn,
+				  int iava, gnutls_x509_ava_st *avast);
 
 /* CRL handling functions.
  */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -48,7 +48,7 @@ typedef struct gnutls_x509_crt_int
 
 typedef struct gnutls_x509_dn_int
 {
-  node_asn node;
+  ASN1_TYPE dn;
 } gnutls_x509_dn_int;
 
 #define MAX_PRIV_PARAMS_SIZE 6	/* ok for RSA and DSA */
