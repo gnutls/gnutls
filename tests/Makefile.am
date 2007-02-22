@@ -31,7 +31,8 @@ LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la libutils.la
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
-ctests = simple openssl gc set_pkcs12_cred certder certificate_set_x509_crl
+ctests = simple openssl gc set_pkcs12_cred certder	\
+	certificate_set_x509_crl dn
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 if HAVE_FORK
 ctests +=  anonself pskself dhepskself tlsia resume
