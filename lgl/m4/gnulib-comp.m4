@@ -78,8 +78,10 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_READ_FILE
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
+  gl_STDIO_MODULE_INDICATOR([snprintf])
   gl_TYPE_SOCKLEN_T
   gl_STDINT_H
+  gl_STDIO_H
   gl_HEADER_STRING_H
   gl_FUNC_STRVERSCMP
   gl_HEADER_SYS_SOCKET
@@ -88,7 +90,7 @@ AC_DEFUN([lgl_INIT],
   AC_PROG_MKDIR_P
   gl_HEADER_TIME_H
   gl_TIME_R
-  gl_HEADER_UNISTD
+  gl_UNISTD_H
   gl_FUNC_VASNPRINTF
   gl_FUNC_VASPRINTF
   gl_WCHAR_H
@@ -131,6 +133,7 @@ AC_DEFUN([lgl_LIBSOURCES],
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([lgl_FILE_LIST], [
   build-aux/config.rpath
+  build-aux/link-warning.h
   lib/alloca_.h
   lib/arcfour.c
   lib/arcfour.h
@@ -174,10 +177,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/sha1.h
   lib/size_max.h
   lib/snprintf.c
-  lib/snprintf.h
   lib/socket_.h
   lib/stat_.h
   lib/stdint_.h
+  lib/stdio_.h
   lib/string_.h
   lib/strverscmp.c
   lib/strverscmp.h
@@ -252,6 +255,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/sockpfaf.m4
   m4/stdint.m4
   m4/stdint_h.m4
+  m4/stdio_h.m4
   m4/string_h.m4
   m4/strverscmp.m4
   m4/sys_socket_h.m4

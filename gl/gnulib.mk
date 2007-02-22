@@ -109,6 +109,12 @@ EXTRA_libgnu_la_SOURCES += inet_pton.c
 
 ## end   gnulib module inet_pton
 
+## begin gnulib module link-warning
+
+LINK_WARNING_H=$(top_srcdir)/./link-warning.h
+
+## end   gnulib module link-warning
+
 ## begin gnulib module netinet_in
 
 BUILT_SOURCES += $(NETINET_IN_H)
@@ -184,6 +190,8 @@ string.h: string_.h
 	      -e 's|@''GNULIB_MBSRCHR''@|$(GNULIB_MBSRCHR)|g' \
 	      -e 's|@''GNULIB_MBSSTR''@|$(GNULIB_MBSSTR)|g' \
 	      -e 's|@''GNULIB_MBSCASECMP''@|$(GNULIB_MBSCASECMP)|g' \
+	      -e 's|@''GNULIB_MBSNCASECMP''@|$(GNULIB_MBSNCASECMP)|g' \
+	      -e 's|@''GNULIB_MBSPCASECMP''@|$(GNULIB_MBSPCASECMP)|g' \
 	      -e 's|@''GNULIB_MBSCASESTR''@|$(GNULIB_MBSCASESTR)|g' \
 	      -e 's|@''GNULIB_MBSCSPN''@|$(GNULIB_MBSCSPN)|g' \
 	      -e 's|@''GNULIB_MBSPBRK''@|$(GNULIB_MBSPBRK)|g' \
@@ -219,6 +227,7 @@ string.h: string_.h
 	      -e 's|@''HAVE_STRSEP''@|$(HAVE_STRSEP)|g' \
 	      -e 's|@''HAVE_STRCASESTR''@|$(HAVE_STRCASESTR)|g' \
 	      -e 's|@''HAVE_DECL_STRTOK_R''@|$(HAVE_DECL_STRTOK_R)|g' \
+	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/string_.h; \
 	} > $@-t
 	mv $@-t $@
