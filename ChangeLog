@@ -1,3 +1,717 @@
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.7.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* link-warning.h, gl/getaddrinfo.c, gl/gnulib.mk, gl/string_.h,
+	gl/m4/gnulib-comp.m4, gl/m4/string_h.m4, lgl/Makefile.am,
+	lgl/snprintf.c, lgl/snprintf.h, lgl/stdio_.h, lgl/string_.h,
+	lgl/unistd_.h, lgl/m4/gnulib-comp.m4, lgl/m4/intdiv0.m4,
+	lgl/m4/snprintf.m4, lgl/m4/stdio_h.m4, lgl/m4/string_h.m4,
+	lgl/m4/unistd_h.m4: Update.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_authz.c, lib/gnutls_supplemental.c: Typo.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.h, lib/gnutls_extensions.c: Revert.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: New flags for authz extension.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_authz.c: Use our own logic to determine whether to send
+	extension replies in server.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.h: Add prototype for
+	_gnutls_extension_list_check, we use it in ext_authz.c.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c: Remove static from
+	_gnutls_extension_list_check, we use it in ext_authz.c
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_authz.c: Don't send authz extension when we shouldn't.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli-gaa.c, src/cli-gaa.h: Generated.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c, src/cli.c: Fix #include's.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c, src/cli.gaa: Support gnutls-cli --authz-x509-attr-cert
+	and --authz-saml-assertion.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c, src/serv-gaa.c, src/serv-gaa.h, src/serv.c,
+	src/serv.gaa: Support gnutls-serv --authz-x509-attr-cert and
+	--authz-saml-assertion.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix so version due to added APIs.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Ignore more.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Revert.
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls.pc.in: Revert Requires-change.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c: Add authz extension.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_authz.c: Typo.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_supplemental.c: Add authz hooks.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Fix type (in never released
+	prototypes).
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Add authz stuff.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Build ext_authz.h and ext_authz.c.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_authz.c: New file.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_authz.h: New file.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Sync with gnutls_supplemental.c.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_supplemental.h: Sync with gnutls_supplemental.c.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_supplemental.c: Fill in type+length.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add gnutls_authz_recv_callback_func
+	and gnutls_authz_send_callback_func.  Add gnutls_authz_enable,
+	gnutls_authz_send_x509_attr_cert, gnutls_authz_send_saml_assertion,
+	gnutls_authz_send_x509_attr_cert_url, and
+	gnutls_authz_send_saml_assertion_url.  Remove GNUTLS_AUTHZ_LAST from
+	gnutls_authz_data_format_type_t (never part of any release).
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_supplemental.c: If callbacks failed to provide
+	anything, at least send protocol valid (yet semantically invalid)
+	supplemental message.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Add for supplemental support.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Support supplemental handshake messages.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Add gnutls_supplemental.h and
+	gnutls_supplemental.c.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_supplemental.c: New file.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_supplemental.h: New file.
+
+2007-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2007-02-19  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add gnutls_supplemental_get_name.
+	Fix gnutls_authz_data_format_type_t.
+
+2007-02-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/debug.c: Support SUPPLEMENTAL handshake type.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: update
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check/hostname-check.c: Tests ipAddress SAN's too.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check/hostname-check.c: Test wildcard stuff too.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/rfc2818_hostname.c: Indent.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/rfc2818_hostname.c: Support iPAddress too.  Doc fix.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check/hostname-check.c: Fix mem leak.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/rfc2818_hostname.c: Doc fix.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/rfc2818_hostname.c: Don't treat absence of CN in subject
+	as a successful RFC 2818 hostname comparison match.  Reported by
+	"Richard W.M. Jones" <rjones@redhat.com>.
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, tests/Makefile.am,
+	tests/hostname-check/Makefile.am, tests/hostname-check/README,
+	tests/hostname-check/hostname-check.c: Add self test of rfc2818
+	server identity check.
+
+2007-02-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls.pc.in: Add 'Requires: libtasn1' to make 'pkg-config
+	--libs gnutls' output -ltasn1.  Reported by Pavlov Konstantin
+	<thresh@altlinux.ru>.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_hash_int.c: Avoid assert.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Make sure NULL is a pointer.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Change vararg 0 to NULL.  Tiny change suggested
+	by Joe Orton <joe@manyfish.co.uk>.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Fix gnutls_authz_data_format_type_t.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add
+	gnutls_supplemental_data_format_type_t with member
+	GNUTLS_SUPPLEMENTAL_AUTHZ_DATA.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add gnutls_authz_data_format_type_t,
+	with members GNUTLS_AUTHZ_X509_ATTR_CERT,
+	GNUTLS_AUTHZ_SAML_ASSERTION, GNUTLS_AUTHZ_X509_ATTR_CERT_URL,
+	GNUTLS_AUTHZ_SAML_ASSERTION_URL.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Reorder.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Add GNUTLS_EXTENSION_AUTHZ_CLIENT and
+	GNUTLS_EXTENSION_AUTHZ_SERVER.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add GNUTLS_HANDSHAKE_SUPPLEMENTAL.
+
+2007-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Spell out handshake types.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-gaa.c, src/certtool-gaa.h: Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Use error().
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Cleanup p12 printing.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Cleanup pkcs7_info.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Better errors.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.gaa: Remove --copyright (use --version).
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Use version-etc.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix for version-etc.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/version-etc-fsf.c, gl/version-etc.c,
+	gl/version-etc.h, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/stdarg.m4: Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Cleanup CRL.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Cleanup.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Simplify.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Cleanups.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Rewrite generate_private_key_int.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix mem leak.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix crl_info.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Rewrite load_private_key.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Rewrite load_request.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Rewrite load_ca_private_key.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Remove.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Rewrite load_ca_cert.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: No limit on CRL size during verification.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Simplify.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/certificate_set_x509_crl.c: Need config.h.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Use AM_CPPFLAGS, not obsolete INCLUDES.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Need libgnu.la.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/errcodes.c: Need config.h.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pkix_asn1_tab.c, lib/gnutls_asn1_tab.c: Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove stuff obsoleted by time_r.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Don't check for time.h, not needed.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/defines.h: Only use time.h, from gnulib if needed.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem: UPdate.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Remove.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/string_.h, lgl/time_.h, lgl/time_r.c,
+	lgl/time_r.h, lgl/m4/gnulib-comp.m4, lgl/m4/time_h.m4,
+	lgl/m4/time_r.m4, gl/string_.h: Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/gnutls-nist-tests.html: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/README: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/pkits_test: Unpack.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/pkits_test: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/pkits_test_list_generator.patch: Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/pkits_test_list_generator.patch: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/gnutls_test_entry: Remove.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/build-chain, tests/nist-pkits/gnutls_test_entry:
+	Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/README,
+	tests/nist-pkits/pkits_test_list_generator.tgz: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/README: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/mpi.c: We don't support inherited DSA parameters.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/pkits_crl, tests/nist-pkits/pkits_crt,
+	tests/nist-pkits/pkits_pkcs12, tests/nist-pkits/pkits_smime:
+	Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/pkits: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/PKITS.pdf, tests/PKITS_data.zip, tests/pkits,
+	tests/pkits_crl, tests/pkits_crt, tests/pkits_pkcs12,
+	tests/pkits_smime, tests/nist-pkits/PKITS.pdf,
+	tests/nist-pkits/PKITS_data.zip, tests/nist-pkits/README,
+	tests/nist-pkits/pkits, tests/nist-pkits/pkits_crl,
+	tests/nist-pkits/pkits_crt, tests/nist-pkits/pkits_pkcs12,
+	tests/nist-pkits/pkits_smime: Move PKITS stuff to nist-pkits/.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509paths/README: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509paths/chain: fix for chain 1.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chain, tests/x509tests.tgz, tests/x509paths/Certificate
+	Path Validation Testing.pdf, tests/x509paths/README,
+	tests/x509paths/chain, tests/x509paths/x509tests.tgz: Move old NIST
+	stuff to separate directory.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/dn.c: Don't write to buf if *sizeof_buf==0.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Don't use uninitialized.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Don't access ret unless *ret_size>0.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix PKI test.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Simplify copyright.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-cfg.c: Remove.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Remove unused.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Make certtool conditional on ENABLE_PKI.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Add conditional for PKI stuff.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Handle larger certificate lists.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: crl: Support GNUTLS_X509_CRT_UNSIGNED_FULL.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Use gnutls_x509_crl_print.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/x509.h, lib/x509/crl.c, lib/x509/output.c,
+	lib/x509/x509.c: Add gnutls_x509_crl_get_signature and
+	gnutls_x509_crl_print.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Use error().
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: We do need lgl/ though.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am, libextra/opencdk/Makefile.am: No need for
+	gl/.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openpgp/Makefile.am: Don't include gl/.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/dummy.c: Remove.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/error.c, gl/error.h, gl/gnulib.mk, gl/progname.c,
+	gl/progname.h, gl/m4/error.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, configure.in: Revert.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: No need for gl/.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix src/lib/.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Build src/lib/.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Init src/lib/.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4:
+	Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/error.c, gl/error.h, gl/m4/error.m4: Remove.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/error.c, gl/error.h, gl/m4/error.m4, gl/gnulib.mk,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: No size limit on CRL data.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c:
+	(_gnutls_x509_san_find_type): Support GNUTLS_SAN_DN.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Support GNUTLS_SAN_DN.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c:
+	(parse_general_name): Support GNUTLS_SAN_DN.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, NEWS: Add.
+
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.6.
