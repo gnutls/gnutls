@@ -1728,7 +1728,7 @@ get_dn (gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t *dn)
 }
 
 /**
- * gnutls_x509_crt_get_subject_dn:
+ * gnutls_x509_crt_get_subject: get opaque subject DN pointer
  * @cert: should contain a gnutls_x509_crt_t structure
  * @dn: output variable with pointer to opaque DN.
  *
@@ -1738,14 +1738,14 @@ get_dn (gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t *dn)
  * Returns: Returns 0 on success, or an error code.
  **/
 int
-gnutls_x509_crt_get_subject_dn (gnutls_x509_crt_t cert,
+gnutls_x509_crt_get_subject (gnutls_x509_crt_t cert,
 				gnutls_x509_dn_t *dn)
 {
   return get_dn (cert, "tbsCertificate.subject.rdnSequence", dn);
 }
 
 /**
- * gnutls_x509_crt_get_issuer_dn:
+ * gnutls_x509_crt_get_issuer: get opaque issuer DN pointer
  * @cert: should contain a gnutls_x509_crt_t structure
  * @dn: output variable with pointer to opaque DN
  *
@@ -1758,15 +1758,15 @@ gnutls_x509_crt_get_subject_dn (gnutls_x509_crt_t cert,
  * Returns: Returns 0 on success, or an error code.
  **/
 int
-gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert,
-			       gnutls_x509_dn_t *dn)
+gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert,
+			    gnutls_x509_dn_t *dn)
 {
   return get_dn (cert, "tbsCertificate.issuer.rdnSequence", dn);
 }
 
 /**
  * gnutls_x509_dn_get_rdn_ava:
- * @dn: input variable with opaque DN
+ * @dn: input variable with opaque DN pointer
  * @irdn: index of RDN
  * @iava: index of AVA.
  * @ava: Pointer to structure which will hold output information.
