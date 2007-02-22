@@ -30,7 +30,7 @@ The function is gnutls_x509_crl_get_signature.
 The gnutls_x509_crt_get_subject_alt_name function returns the DN as a
 string in the provided buffer.
 
-** Minor improvements to certtool.
+** Internal improvements to certtool.
 It uses gnutls_x509_crl_print to print CRL information.  It uses some
 more gnulib modules to simplify error handling.
 
