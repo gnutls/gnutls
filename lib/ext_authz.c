@@ -128,7 +128,7 @@ send_extension (gnutls_session_t session,
 
   for (total_size = 0; authz_formats[total_size]; total_size++)
     {
-      _gnutls_debug_log ("EXT[%x]: Sending authz client format %02x\n",
+      _gnutls_debug_log ("EXT[%x]: Sending authz format %02x\n",
 			 session, authz_formats[total_size]);
       DECR_LENGTH_RET (data_size, 1, GNUTLS_E_SHORT_MEMORY_BUFFER);
       *data++ = authz_formats[total_size] - 1;
@@ -171,6 +171,10 @@ _gnutls_authz_ext_client_send_params (gnutls_session_t session,
   int *client_formats =
     session->security_parameters.extensions.authz_client_formats;
   int ret;
+
+  /* Should we be sending this? */
+  if (!_gnutls_extension_list_check (session, GNUTLS_EXTENSION_AUTHZ_CLIENT))
+    return 0;
 
   ret = send_extension (session, data, _data_size, client_formats);
 
@@ -216,6 +220,10 @@ _gnutls_authz_ext_server_send_params (gnutls_session_t session,
   int *server_formats =
     session->security_parameters.extensions.authz_server_formats;
   int ret;
+
+  /* Should we be sending this? */
+  if (!_gnutls_extension_list_check (session, GNUTLS_EXTENSION_AUTHZ_SERVER))
+    return 0;
 
   ret = send_extension (session, data, _data_size, server_formats);
 
