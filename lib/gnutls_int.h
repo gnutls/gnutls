@@ -278,6 +278,7 @@ typedef struct
   int do_recv_supplemental, do_send_supplemental;
 
   /* Authz extension data. */
+  int authz_recvd_client, authz_recvd_server;
   int authz_client_formats[MAX_AUTHZ_FORMATS + 1];
   int authz_server_formats[MAX_AUTHZ_FORMATS + 1];
   gnutls_authz_recv_callback_func authz_recv_callback;
