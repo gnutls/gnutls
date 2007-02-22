@@ -20,7 +20,7 @@ dnl Process this file with autoconf to produce a configure script.
 # along with GNUTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-AC_INIT([GnuTLS], [1.7.7], [bug-gnutls@gnu.org])
+AC_INIT([GnuTLS], [1.7.8], [bug-gnutls@gnu.org])
 AC_PREREQ(2.61)
 
 AC_CANONICAL_TARGET
@@ -34,7 +34,7 @@ AB_INIT
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 AC_SUBST(LT_CURRENT, 19)
-AC_SUBST(LT_REVISION, 0)
+AC_SUBST(LT_REVISION, 1)
 AC_SUBST(LT_AGE, 6)
 ac_full=1
 
