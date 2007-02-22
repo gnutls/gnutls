@@ -76,6 +76,11 @@ option (srppasswd) STR "FILE" { $srp_passwd = $1 } "SRP password file to use."
 #char *srp_passwd_conf;
 option (srppasswdconf) STR "FILE" { $srp_passwd_conf = $1 } "SRP password conf file to use."
 
+#char *authz_x509_attr_cert;
+option (authz-x509-attr-cert) STR "FILE" { $authz_x509_attr_cert = $1 } "Use X.509 Attribute Certificate in FILE as authorization data."
+
+#char *authz_saml_assertion;
+option (authz-saml-assertion) STR "FILE" { $authz_saml_assertion = $1 } "Use SAML Assertion in FILE as authorization data."
 
 #int nciphers;
 #char **ciphers;

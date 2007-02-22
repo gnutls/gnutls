@@ -815,7 +815,6 @@ parse_comp (char **comp, int ncomp, int *comp_priority)
 	}
       comp_priority[j] = 0;
     }
-
 }
 
 void
