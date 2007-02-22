@@ -325,10 +325,10 @@ extern "C"
     unsigned long value_tag;
   } gnutls_x509_ava_st;
 
-  int gnutls_x509_crt_get_subject_dn (gnutls_x509_crt_t cert,
-				      gnutls_x509_dn_t *dn);
-  int gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert,
-				     gnutls_x509_dn_t *dn);
+  int gnutls_x509_crt_get_subject (gnutls_x509_crt_t cert,
+				   gnutls_x509_dn_t *dn);
+  int gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert,
+				  gnutls_x509_dn_t *dn);
   int gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn,
 				  int iava, gnutls_x509_ava_st *avast);
 
