@@ -46,11 +46,6 @@ typedef struct gnutls_x509_crt_int
   int use_extensions;
 } gnutls_x509_crt_int;
 
-typedef struct gnutls_x509_dn_int
-{
-  ASN1_TYPE dn;
-} gnutls_x509_dn_int;
-
 #define MAX_PRIV_PARAMS_SIZE 6	/* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
