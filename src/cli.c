@@ -36,6 +36,9 @@
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 
+#include "error.h"
+#include "read-file.h"
+
 #include "common.h"
 #include "cli-gaa.h"
 
@@ -87,6 +90,8 @@ static gnutls_srp_client_credentials_t srp_cred;
 static gnutls_psk_client_credentials_t psk_cred;
 static gnutls_anon_client_credentials_t anon_cred;
 static gnutls_certificate_credentials_t xcred;
+
+static gaainfo info;
 
 static int protocol_priority[PRI_MAX] = {
   GNUTLS_TLS1_2,
@@ -860,7 +865,6 @@ after_handshake:
   return 0;
 }
 
-static gaainfo info;
 void
 gaa_parser (int argc, char **argv)
 {

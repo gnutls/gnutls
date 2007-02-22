@@ -41,6 +41,9 @@
 #define select _win_select
 #endif
 
+#include "error.h"
+#include "read-file.h"
+
 #include "getaddrinfo.h"
 
 /* konqueror cannot handle sending the page in multiple
