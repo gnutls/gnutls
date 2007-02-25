@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2005, 2006 Free Software Foundation
+# Copyright (C) 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -32,7 +32,8 @@ SRP_PROGRAM_FILES = ex-client-srp ex-serv-srp
 endif
 noinst_PROGRAMS = ex-cert-select ex-client1 ex-client2			\
 	ex-client-resume ex-client-tlsia ex-crq ex-serv1 ex-serv-anon	\
-	ex-serv-export ex-serv-pgp $(SRP_PROGRAM_FILES)
+	ex-serv-export ex-serv-pgp $(SRP_PROGRAM_FILES)			\
+	ex-client-authz ex-serv-authz
 
 noinst_LTLIBRARIES = libexamples.la
 
