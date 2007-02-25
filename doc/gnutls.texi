@@ -1910,6 +1910,7 @@ implemented by another example.
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example with TLS/IA support::
+* Simple client example with authorization support::
 * Helper function for TCP connections::
 @end menu
 
@@ -2004,6 +2005,15 @@ The following client is a simple client which uses the
 @acronym{TLS/IA} extension to authenticate with the server.
 
 @verbatiminclude examples/ex-client-tlsia.c
+
+@node Simple client example with authorization support
+@subsection Simple client example with authorization support
+
+The following client require that the server sends authorization data,
+and the client will send authorization data to the server as well.
+For authentication, X.509 is used.
+
+@verbatiminclude examples/ex-client-authz.c
 
 @node Helper function for TCP connections
 @subsection Helper function for TCP connections
