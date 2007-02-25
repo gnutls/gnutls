@@ -2035,6 +2035,7 @@ servers, using @acronym{GnuTLS}.
 * Echo Server with OpenPGP authentication::
 * Echo Server with SRP authentication::
 * Echo Server with anonymous authentication::
+* Echo Server with authorization support::
 @end menu
 
 @node Echo Server with X.509 authentication
@@ -2082,6 +2083,14 @@ This example server support anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c
+
+@node Echo Server with authorization support
+@subsection Echo Server with authorization support
+
+This example server support authorization data, and can be used to
+serve the example client with authorization support.
+
+@verbatiminclude examples/ex-serv-authz.c
 
 @node Miscellaneous examples
 @section Miscellaneous examples
