@@ -4,6 +4,7 @@ Makefile
 Makefile.in
 ex-alert.lo
 ex-cert-select
+ex-client-authz
 ex-client-resume
 ex-client-srp
 ex-client-tlsia
@@ -13,6 +14,7 @@ ex-crq
 ex-pkcs12.lo
 ex-rfc2818.lo
 ex-serv-anon
+ex-serv-authz
 ex-serv-export
 ex-serv-pgp
 ex-serv-srp
