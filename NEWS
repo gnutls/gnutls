@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.7.8 (unreleased)
 
+** Added examples for the authorization extension.
+See doc/examples/ex-client-authz.c and doc/examples/ex-serv-authz.c.
+
 ** New APIs to extract Distinguished Name's from X.509 certificates.
 Based on patch from Howard Chu <hyc@symas.com>.
 
