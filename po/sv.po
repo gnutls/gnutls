@@ -1,14 +1,14 @@
 # Swedish translation of gnutls.
-# Copyright (C) 2006 Free Software Foundation, Inc.
+# Copyright (C) 2007 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gnutls package.
-# Daniel Nylander <po@danielnylander.se>, 2006.
+# Daniel Nylander <po@danielnylander.se>, 2006, 2007.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnutls 1.4.0\n"
+"Project-Id-Version: gnutls 1.7.7\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2006-05-12 00:21+0200\n"
-"PO-Revision-Date: 2006-05-23 11:51+0100\n"
+"POT-Creation-Date: 2007-02-22 09:18+0100\n"
+"PO-Revision-Date: 2007-02-26 22:08+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -158,7 +158,7 @@ msgid "Error in the certificate."
 msgstr "Fel i certifikatet."
 
 msgid "Unknown Subject Alternative name in X.509 certificate."
-msgstr "Okänt alternativt ämne i X.509-certifikat."
+msgstr "Okänt alternativt namn för innehavare i X.509-certifikat."
 
 msgid "Unsupported critical extension in X.509 certificate."
 msgstr "Icke stödd kritisk utökning i X.509-certifikat."
@@ -301,3 +301,257 @@ msgstr "Tog emot ett TLS/IA Final Phase Finished-meddelande"
 
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Validering av kontrollsumma för TLS/IA-fas misslyckades"
+
+#, c-format
+msgid "\t\t\tPath Length Constraint: %d\n"
+msgstr "\t\t\tRestriktion för sökvägslängd: %d\n"
+
+msgid "\t\t\tPolicy Language: "
+msgstr "\t\t\tPolicyspråk: "
+
+#, c-format
+msgid "\t\t\tPolicy Language: %.*s\n"
+msgstr "\t\t\tPolicyspråk: %.*s\n"
+
+msgid "\t\t\tDigital signature.\n"
+msgstr "\t\t\tDigital signatur.\n"
+
+# Klassisk term inom digitala certifikat.
+msgid "\t\t\tNon repudiation.\n"
+msgstr "\t\t\tOförnekbarhet.\n"
+
+msgid "\t\t\tKey encipherment.\n"
+msgstr "\t\t\tNyckelkryptering.\n"
+
+msgid "\t\t\tData encipherment.\n"
+msgstr "\t\t\tDatakryptering.\n"
+
+msgid "\t\t\tKey agreement.\n"
+msgstr "\t\t\tNyckelförhandling.\n"
+
+msgid "\t\t\tCertificate signing.\n"
+msgstr "\t\t\tCertifikatsignering.\n"
+
+msgid "\t\t\tCRL signing.\n"
+msgstr "\t\t\tCRL-signering.\n"
+
+msgid "\t\t\tKey encipher only.\n"
+msgstr "\t\t\tEndast nyckelkryptering.\n"
+
+msgid "\t\t\tKey decipher only.\n"
+msgstr "\t\t\tEndast nyckeldekryptering.\n"
+
+msgid "\t\t\tTLS WWW Server.\n"
+msgstr "\t\t\tTLS-webbserver.\n"
+
+msgid "\t\t\tTLS WWW Client.\n"
+msgstr "\t\t\tTLS-webbklient.\n"
+
+# Källkodssignering?
+msgid "\t\t\tCode signing.\n"
+msgstr "\t\t\tKodsignering.\n"
+
+msgid "\t\t\tEmail protection.\n"
+msgstr "\t\t\tE-postskydd.\n"
+
+msgid "\t\t\tTime stamping.\n"
+msgstr "\t\t\tTidsstämpling.\n"
+
+msgid "\t\t\tOCSP signing.\n"
+msgstr "\t\t\tOCSP-signering.\n"
+
+msgid "\t\t\tAny purpose.\n"
+msgstr "\t\t\tValfritt syfte.\n"
+
+msgid "\t\t\tCertificate Authority (CA): FALSE\n"
+msgstr "\t\t\tCertifikatutfärdare (CA): FALSKT\n"
+
+msgid "\t\t\tCertificate Authority (CA): TRUE\n"
+msgstr "\t\t\tCertifikatutfärdare (CA): SANT\n"
+
+#, c-format
+msgid "\t\t\tXMPP Address: %.*s\n"
+msgstr "\t\t\tXMPP-adress: %.*s\n"
+
+#, c-format
+msgid "\t\t\totherName OID: %.*s\n"
+msgstr "\t\t\totherName OID: %.*s\n"
+
+msgid "\t\t\totherName DER: "
+msgstr "\t\t\totherName DER: "
+
+msgid ""
+"\n"
+"\t\t\totherName ASCII: "
+msgstr ""
+"\n"
+"\t\t\totherName ASCII: "
+
+#, c-format
+msgid "\tVersion: %d\n"
+msgstr "\tVersion: %d\n"
+
+msgid "\tSerial Number (hex): "
+msgstr "\tSerienummer (hex): "
+
+#, c-format
+msgid "\tIssuer: %s\n"
+msgstr "\tUtfärdare: %s\n"
+
+msgid "\tValidity:\n"
+msgstr "\tGiltighet:\n"
+
+#, c-format
+msgid "\t\tNot Before: %s\n"
+msgstr "\t\tInte före: %s\n"
+
+#, c-format
+msgid "\t\tNot After: %s\n"
+msgstr "\t\tInte efter: %s\n"
+
+#, c-format
+msgid "\tSubject: %s\n"
+msgstr "\tInnehavare: %s\n"
+
+#, c-format
+msgid "\tSubject Public Key Algorithm: %s\n"
+msgstr "\tAlgoritm för innehavarens publika nyckel: %s\n"
+
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr "\t\tModulus (bitar %d):\n"
+
+msgid "\t\tExponent:\n"
+msgstr "\t\tExponent:\n"
+
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr "\t\tPublik nyckel (bitar %d):\n"
+
+msgid "\t\tP:\n"
+msgstr "\t\tP:\n"
+
+msgid "\t\tQ:\n"
+msgstr "\t\tQ:\n"
+
+msgid "\t\tG:\n"
+msgstr "\t\tG:\n"
+
+msgid "\tExtensions:\n"
+msgstr "\tTillägg:\n"
+
+#, c-format
+msgid "\t\tBasic Constraints (%s):\n"
+msgstr "\t\tAllmänna restriktioner (%s):\n"
+
+msgid "critical"
+msgstr "kritisk"
+
+msgid "not critical"
+msgstr "ej kritisk"
+
+#, c-format
+msgid "\t\tSubject Key Identifier (%s):\n"
+msgstr "\t\tInnehavarens nyckelidentifierare (%s):\n"
+
+#, c-format
+msgid "\t\tAuthority Key Identifier (%s):\n"
+msgstr "\t\tUtfärdarens nyckelidentifierare (%s):\n"
+
+#, c-format
+msgid "\t\tKey Usage (%s):\n"
+msgstr "\t\tNyckelanvändning (%s):\n"
+
+#, c-format
+msgid "\t\tKey Purpose (%s):\n"
+msgstr "\t\tNyckelsyfte (%s):\n"
+
+#, c-format
+msgid "\t\tSubject Alternative Name (%s):\n"
+msgstr "\t\tInnehavarens alternativa namn (%s):\n"
+
+#, c-format
+msgid "\t\tCRL Distribution points (%s):\n"
+msgstr "\t\tCRL-distributionspunkter (%s):\n"
+
+#, c-format
+msgid "\t\tProxy Certificate Information (%s):\n"
+msgstr "\t\tInformation om proxycertifikat (%s):\n"
+
+#, c-format
+msgid "\t\tUnknown extension %s (%s):\n"
+msgstr "\t\tOkänt tillägg %s (%s):\n"
+
+msgid "\t\t\tASCII: "
+msgstr "\t\t\tASCII: "
+
+msgid "\t\t\tHexdump: "
+msgstr "\t\t\tHexdump: "
+
+#, c-format
+msgid "\tSignature Algorithm: %s\n"
+msgstr "\tSignaturalgoritm: %s\n"
+
+msgid "warning: signed using a broken signature algorithm that can be forged.\n"
+msgstr "varning: signerad med en trasig signaturalgoritm som kan förfalskas.\n"
+
+msgid "\tSignature:\n"
+msgstr "\tSignatur:\n"
+
+msgid ""
+"\tMD5 fingerprint:\n"
+"\t\t"
+msgstr ""
+"\tMD5-fingeravtryck:\n"
+"\t\t"
+
+msgid ""
+"\tSHA-1 fingerprint:\n"
+"\t\t"
+msgstr ""
+"\tSHA-1-fingeravtryck:\n"
+"\t\t"
+
+msgid ""
+"\tPublic Key Id:\n"
+"\t\t"
+msgstr ""
+"\tPublik nyckel-identitet:\n"
+"\t\t"
+
+msgid "X.509 Certificate Information:\n"
+msgstr "Information om X.509-certifikat:\n"
+
+msgid "Other Information:\n"
+msgstr "Övrig information:\n"
+
+msgid "\tVersion: 1 (default)\n"
+msgstr "\tVersion: 1 (standard)\n"
+
+msgid "\tUpdate dates:\n"
+msgstr "\tUppdateringsdatum:\n"
+
+#, c-format
+msgid "\t\tIssued: %s\n"
+msgstr "\t\tUtfärdat: %s\n"
+
+#, c-format
+msgid "\t\tNext at: %s\n"
+msgstr "\t\tNästa den: %s\n"
+
+#, c-format
+msgid "\tRevoked certificates (%d):\n"
+msgstr "\tSpärrade certifikat (%d):\n"
+
+msgid "\tNo revoked certificates.\n"
+msgstr "\tInga spärrade certifikat.\n"
+
+msgid "\t\tSerial Number (hex): "
+msgstr "\t\tSerienummer (hex): "
+
+#, c-format
+msgid "\t\tRevoked at: %s\n"
+msgstr "\t\tSpärrat den: %s\n"
+
+msgid "X.509 Certificate Revocation List Information:\n"
+msgstr "Information om spärrlista för X.509-certifikat:\n"
