@@ -500,8 +500,10 @@ init_tls_session (const char *hostname)
   gnutls_dh_set_prime_bits (session, 512);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anon_cred);
-  gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
-  gnutls_credentials_set (session, GNUTLS_CRD_PSK, psk_cred);
+  if (srp_cred)
+    gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
+  if (psk_cred)
+    gnutls_credentials_set (session, GNUTLS_CRD_PSK, psk_cred);
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
   gnutls_certificate_client_set_retrieve_function (xcred, cert_callback);
@@ -808,10 +810,12 @@ after_handshake:
     gnutls_deinit (hd.session);
 
 #ifdef ENABLE_SRP
-  gnutls_srp_free_client_credentials (srp_cred);
+  if (srp_cred)
+    gnutls_srp_free_client_credentials (srp_cred);
 #endif
 #ifdef ENABLE_PSK
-  gnutls_psk_free_client_credentials (psk_cred);
+  if (psk_cred)
+    gnutls_psk_free_client_credentials (psk_cred);
 #endif
 
   gnutls_certificate_free_credentials (xcred);
