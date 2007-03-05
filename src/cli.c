@@ -924,40 +924,6 @@ gaa_parser (int argc, char **argv)
   parse_ctypes (info.ctype, info.nctype, cert_type_priority);
   parse_kx (info.kx, info.nkx, kx_priority);
   parse_comp (info.comp, info.ncomp, comp_priority);
-
-  if (!srp_username || !srp_passwd)
-    {
-      size_t i;
-      for (i = 0; kx_priority[i]; i++)
-	{
-	  if (kx_priority[i] == GNUTLS_KX_SRP_RSA ||
-	      kx_priority[i] == GNUTLS_KX_SRP_DSS ||
-	      kx_priority[i] == GNUTLS_KX_SRP)
-	    {
-	      memmove (&kx_priority[i],
-		       &kx_priority[i+1],
-		       sizeof (*kx_priority) * (PRI_MAX - i - 1));
-	      i--;
-	    }
-	}
-    }
-
-
-  if (!psk_username || !psk_key.data)
-    {
-      size_t i;
-      for (i = 0; kx_priority[i]; i++)
-	{
-	  if (kx_priority[i] == GNUTLS_KX_DHE_PSK ||
-	      kx_priority[i] == GNUTLS_KX_PSK)
-	    {
-	      memmove (&kx_priority[i],
-		       &kx_priority[i+1],
-		       sizeof (*kx_priority) * (PRI_MAX - i - 1));
-	      i--;
-	    }
-	}
-    }
 }
 
 void
@@ -1169,29 +1135,33 @@ init_global_tls_stuff (void)
 #endif
 
 #ifdef ENABLE_SRP
-  /* SRP stuff */
-  if (gnutls_srp_allocate_client_credentials (&srp_cred) < 0)
+  if (srp_username && srp_passwd)
     {
-      fprintf (stderr, "SRP authentication error\n");
+      /* SRP stuff */
+      if (gnutls_srp_allocate_client_credentials (&srp_cred) < 0)
+	{
+	  fprintf (stderr, "SRP authentication error\n");
+	}
+
+      gnutls_srp_set_client_credentials_function (srp_cred,
+						  srp_username_callback);
     }
-
-
-  gnutls_srp_set_client_credentials_function (srp_cred,
-					      srp_username_callback);
 #endif
 
 #ifdef ENABLE_PSK
-  /* SRP stuff */
-  if (gnutls_psk_allocate_client_credentials (&psk_cred) < 0)
+  if (psk_username && !psk_key.data)
     {
-      fprintf (stderr, "PSK authentication error\n");
+      /* SRP stuff */
+      if (gnutls_psk_allocate_client_credentials (&psk_cred) < 0)
+	{
+	  fprintf (stderr, "PSK authentication error\n");
+	}
+
+      gnutls_psk_set_client_credentials (psk_cred,
+					 psk_username, &psk_key,
+					 GNUTLS_PSK_KEY_HEX);
     }
-
-  gnutls_psk_set_client_credentials (psk_cred,
-				     psk_username, &psk_key,
-				     GNUTLS_PSK_KEY_HEX);
 #endif
-
 
 #ifdef ENABLE_ANON
   /* ANON stuff */
