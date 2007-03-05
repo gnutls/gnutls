@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -253,16 +253,17 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
   * gnutls_set_default_priority - Sets some default priority on the cipher suites supported by gnutls.
   * @session: is a #gnutls_session_t structure.
   *
-  * Sets some default priority on the ciphers, key exchange methods, macs
-  * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
-  * these defaults are ok. You may override any of the following priorities by calling
-  * the appropriate functions.
+  * Sets some default priority on the ciphers, key exchange methods,
+  * macs and compression methods. This is to avoid using the
+  * gnutls_*_priority() functions, if these defaults are ok.  You may
+  * override any of the following priorities by calling the
+  * appropriate functions.
   *
-  * The order is TLS 1.2, TLS 1.1, TLS 1.0, SSL3 for protocols.
-  * RSA, DHE_DSS, DHE_RSA for key exchange 
-  * algorithms. SHA, MD5 and RIPEMD160 for MAC algorithms.
-  * AES_128_CBC, 3DES_CBC, 
-  * and ARCFOUR_128 for ciphers.
+  * The default order is:
+  * Protocols: TLS 1.2, TLS 1.1, TLS 1.0, and SSL3.
+  * Key exchange algorithm: RSA, DHE_DSS, and DHE_RSA.
+  * MAC algorithm: SHA, MD5 and RIPEMD160.
+  * Cipher: AES_128_CBC, 3DES_CBC, and ARCFOUR_128.
   *
   * Returns 0 on success.
   *
@@ -270,16 +271,33 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 int
 gnutls_set_default_priority (gnutls_session_t session)
 {
-  static const int protocol_priority[] = { GNUTLS_TLS1_2, GNUTLS_TLS1_1, GNUTLS_SSL3, 0 };
-  static const int kx_priority[] =
-    { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, 0 };
+  static const int protocol_priority[] = {
+    GNUTLS_TLS1_2,
+    GNUTLS_TLS1_1,
+    GNUTLS_SSL3,
+    0
+  };
+  static const int kx_priority[] = {
+    GNUTLS_KX_RSA,
+    GNUTLS_KX_DHE_DSS,
+    GNUTLS_KX_DHE_RSA,
+    0
+  };
   static const int cipher_priority[] = {
     GNUTLS_CIPHER_AES_128_CBC,
-    GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, 0
+    GNUTLS_CIPHER_3DES_CBC,
+    GNUTLS_CIPHER_ARCFOUR_128,
+    0
   };
-  static const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };
-  static const int mac_priority[] =
-    { GNUTLS_MAC_SHA1, GNUTLS_MAC_MD5, 0 };
+  static const int comp_priority[] = {
+    GNUTLS_COMP_NULL,
+    0
+  };
+  static const int mac_priority[] = {
+    GNUTLS_MAC_SHA1,
+    GNUTLS_MAC_MD5,
+    0
+  };
 
   gnutls_cipher_set_priority (session, cipher_priority);
   gnutls_compression_set_priority (session, comp_priority);
