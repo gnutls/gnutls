@@ -327,61 +327,16 @@ generate_rsa_params (void)
   return 0;
 }
 
-static int protocol_priority[PRI_MAX] = {
-  GNUTLS_TLS1_2,
-  GNUTLS_TLS1_1,
-  GNUTLS_TLS1,
-  GNUTLS_SSL3,
-  0
-};
-
-static int kx_priority[PRI_MAX] = {
-  GNUTLS_KX_DHE_PSK,
-  GNUTLS_KX_PSK,
-  GNUTLS_KX_SRP_RSA,
-  GNUTLS_KX_SRP_DSS,
-  GNUTLS_KX_SRP,
-  GNUTLS_KX_DHE_RSA,
-  GNUTLS_KX_DHE_DSS,
-  GNUTLS_KX_RSA,
-  /* Do not use anonymous authentication, unless you know what that means */
-  GNUTLS_KX_ANON_DH,
-  GNUTLS_KX_RSA_EXPORT, 0
-};
-
-static int cipher_priority[PRI_MAX] = {
-  GNUTLS_CIPHER_AES_256_CBC,
-  GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128,
-  GNUTLS_CIPHER_ARCFOUR_40,
-  0
-};
-
-static int comp_priority[PRI_MAX] = {
-  GNUTLS_COMP_ZLIB,
-  GNUTLS_COMP_LZO,
-  GNUTLS_COMP_NULL,
-  0
-};
-
-static int mac_priority[PRI_MAX] = {
-  GNUTLS_MAC_SHA1,
-  GNUTLS_MAC_MD5,
-  GNUTLS_MAC_RMD160,
-  0
-};
-
-static int cert_type_priority[PRI_MAX] = {
-  GNUTLS_CRT_OPENPGP,
-  GNUTLS_CRT_X509,
-  0
-};
+static int protocol_priority[PRI_MAX];
+static int kx_priority[PRI_MAX];
+static int cipher_priority[PRI_MAX];
+static int comp_priority[PRI_MAX];
+static int mac_priority[PRI_MAX];
+static int cert_type_priority[PRI_MAX];
 
 static int authz_server_formats[PRI_MAX] = {
   0
 };
-
 static int authz_client_formats[PRI_MAX] = {
   GNUTLS_AUTHZ_X509_ATTR_CERT,
   GNUTLS_AUTHZ_SAML_ASSERTION,
@@ -495,13 +450,20 @@ initialize_session (void)
       gnutls_db_set_ptr (session, NULL);
     }
 
-/*   gnutls_dh_set_prime_bits( session, prime_bits); */
-  gnutls_cipher_set_priority (session, cipher_priority);
-  gnutls_compression_set_priority (session, comp_priority);
-  gnutls_kx_set_priority (session, kx_priority);
-  gnutls_protocol_set_priority (session, protocol_priority);
-  gnutls_mac_set_priority (session, mac_priority);
-  gnutls_certificate_type_set_priority (session, cert_type_priority);
+  gnutls_set_default_priority (session);
+
+  if (cipher_priority[0])
+    gnutls_cipher_set_priority (session, cipher_priority);
+  if (comp_priority[0])
+    gnutls_compression_set_priority (session, comp_priority);
+  if (kx_priority[0])
+    gnutls_kx_set_priority (session, kx_priority);
+  if (protocol_priority[0])
+    gnutls_protocol_set_priority (session, protocol_priority);
+  if (mac_priority[0])
+    gnutls_mac_set_priority (session, mac_priority);
+  if (cert_type_priority[0])
+    gnutls_certificate_type_set_priority (session, cert_type_priority);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, dh_cred);
 
@@ -1413,11 +1375,13 @@ main (int argc, char **argv)
   gnutls_certificate_free_credentials (cert_cred);
 
 #ifdef ENABLE_SRP
-  gnutls_srp_free_server_credentials (srp_cred);
+  if (srp_cred)
+    gnutls_srp_free_server_credentials (srp_cred);
 #endif
 
 #ifdef ENABLE_PSK
-  gnutls_psk_free_server_credentials (psk_cred);
+  if (psk_cred)
+    gnutls_psk_free_server_credentials (psk_cred);
 #endif
 
 #ifdef ENABLE_ANON
