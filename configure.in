@@ -609,6 +609,7 @@ AC_CONFIG_COMMANDS([chmod-config],[[
  chmod +x libextra/libgnutls-extra-config
 ]],[[]])
 
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile \
