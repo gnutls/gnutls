@@ -117,10 +117,7 @@ send_extension (gnutls_session_t session,
   opaque *sizepos;
 
   if (!authz_formats[0])
-    {
-      gnutls_assert ();
-      return 0;
-    }
+    return 0;
 
   /* Make room for size. */
   DECR_LENGTH_RET (data_size, 1, GNUTLS_E_SHORT_MEMORY_BUFFER);
