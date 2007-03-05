@@ -97,8 +97,6 @@ client (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   gnutls_psk_client_credentials_t pskcred;
-  /* Need to enable anonymous KX specifically. */
-  const int kx_prio[] = { GNUTLS_KX_DHE_PSK, 0 };
   const gnutls_datum_t key = { "DEADBEEF", 8 };
 
   gnutls_global_init ();
@@ -116,7 +114,6 @@ client (void)
 
   /* Use default priorities */
   gnutls_set_default_priority (session);
-  gnutls_kx_set_priority (session, kx_prio);
 
   /* put the anonymous credentials to the current session
    */
@@ -157,15 +154,10 @@ client (void)
       goto end;
     }
 
-  if (debug)
-    {
-      printf ("- Received %d bytes: ", ret);
-      for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
-      fputs ("\n", stdout);
-    }
+  printf ("- Received %d bytes: ", ret);
+  for (ii = 0; ii < ret; ii++)
+      fputc (buffer[ii], stdout);
+  fputs ("\n", stdout);
 
   gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
@@ -195,7 +187,6 @@ gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;
-  const int kx_prio[] = { GNUTLS_KX_DHE_PSK, 0 };
 
   gnutls_init (&session, GNUTLS_SERVER);
 
@@ -203,7 +194,6 @@ initialize_tls_session (void)
    * are adequate.
    */
   gnutls_set_default_priority (session);
-  gnutls_kx_set_priority (session, kx_prio);
 
   gnutls_credentials_set (session, GNUTLS_CRD_PSK, server_pskcred);
 
@@ -228,7 +218,7 @@ generate_dh_params (void)
 static int
 pskfunc (gnutls_session_t session, const char *username, gnutls_datum_t * key)
 {
-  printf ("psk: username %s\n", username);
+  printf ("psk callback to get %s's password\n", username);
   key->data = gnutls_malloc (4);
   key->data[0] = 0xDE;
   key->data[1] = 0xAD;
