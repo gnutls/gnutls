@@ -15,8 +15,6 @@ gnutls.ps
 gnutls.toc
 gnutls.tp
 gnutls.vr
-mdate-sh
-texinfo.tex
 version.texi
 stamp-*
 gnutls-api.texi
