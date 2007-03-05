@@ -32,7 +32,6 @@
 
 /* These are global */
 gnutls_certificate_credentials_t cred;
-const int cert_type_priority[2] = { GNUTLS_CRT_OPENPGP, 0 };
 gnutls_dh_params_t dh_params;
 
 static int
@@ -125,7 +124,6 @@ main (void)
   for (;;)
     {
       session = initialize_tls_session ();
-      gnutls_certificate_type_set_priority (session, cert_type_priority);
 
       sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 

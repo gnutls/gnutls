@@ -28,11 +28,6 @@ main (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   gnutls_certificate_credentials_t xcred;
-  /* Allow connections to servers that have OpenPGP keys as well.
-   */
-  const int cert_type_priority[3] = { GNUTLS_CRT_X509,
-    GNUTLS_CRT_OPENPGP, 0
-  };
 
   gnutls_global_init ();
 
@@ -49,7 +44,6 @@ main (void)
 
   /* Use default priorities */
   gnutls_set_default_priority (session);
-  gnutls_certificate_type_set_priority (session, cert_type_priority);
 
   /* put the x509 credentials to the current session
    */

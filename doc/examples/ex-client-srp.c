@@ -21,10 +21,6 @@ extern void tcp_close (int sd);
 #define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
-const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
-  GNUTLS_KX_SRP_RSA, 0
-};
-
 int
 main (void)
 {
@@ -61,7 +57,6 @@ main (void)
   /* Set the priorities.
    */
   gnutls_set_default_priority (session);
-  gnutls_kx_set_priority (session, kx_priority);
 
 
   /* put the SRP credentials to the current session

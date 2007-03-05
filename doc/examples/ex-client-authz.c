@@ -19,10 +19,10 @@
 #define CAFILE "ca.pem"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
-int server_authorized_p = 0;
-
 extern int tcp_connect (void);
 extern void tcp_close (int sd);
+
+int server_authorized_p = 0;
 
 int
 authz_recv_callback (gnutls_session_t session,
@@ -82,11 +82,6 @@ main (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   gnutls_certificate_credentials_t xcred;
-  /* Allow connections to servers that have OpenPGP keys as well.
-   */
-  const int cert_type_priority[3] = { GNUTLS_CRT_X509,
-    GNUTLS_CRT_OPENPGP, 0
-  };
   const int authz_client_formats[] = {
     GNUTLS_AUTHZ_SAML_ASSERTION,
   };
@@ -106,13 +101,12 @@ main (void)
    */
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
 
-  /* Initialize TLS session 
+  /* Initialize TLS session
    */
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
   gnutls_set_default_priority (session);
-  gnutls_certificate_type_set_priority (session, cert_type_priority);
 
   /* put the x509 credentials to the current session
    */
