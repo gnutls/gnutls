@@ -69,7 +69,7 @@ AC_DEFUN([lgl_INIT],
   gl_GC_SHA1
   gl_MODULE_INDICATOR([gc-sha1])
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.15])
+  AM_GNU_GETTEXT_VERSION([0.16.1])
   gl_MD2
   gl_FUNC_MEMMEM
   gl_STRING_MODULE_INDICATOR([memmem])
