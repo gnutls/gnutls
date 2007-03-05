@@ -261,9 +261,10 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
   *
   * The default order is:
   * Protocols: TLS 1.2, TLS 1.1, TLS 1.0, and SSL3.
-  * Key exchange algorithm: RSA, DHE_DSS, and DHE_RSA.
-  * MAC algorithm: SHA, MD5 and RIPEMD160.
-  * Cipher: AES_128_CBC, 3DES_CBC, and ARCFOUR_128.
+  * Key exchange algorithm: PSK, SRP, DHE-RSA, DHE-DSS, RSA.
+  * MAC algorithm: SHA, and MD5.
+  * Cipher: AES_128_CBC, AES_256_CBC, 3DES_CBC, and ARCFOUR_128.
+  * Certificate types: OpenPGP, X.509
   *
   * Returns 0 on success.
   *
@@ -274,22 +275,35 @@ gnutls_set_default_priority (gnutls_session_t session)
   static const int protocol_priority[] = {
     GNUTLS_TLS1_2,
     GNUTLS_TLS1_1,
+    GNUTLS_TLS1_0,
     GNUTLS_SSL3,
     0
   };
   static const int kx_priority[] = {
-    GNUTLS_KX_RSA,
-    GNUTLS_KX_DHE_DSS,
+    GNUTLS_KX_DHE_PSK,
+    GNUTLS_KX_PSK,
+    GNUTLS_KX_SRP_RSA,
+    GNUTLS_KX_SRP_DSS,
+    GNUTLS_KX_SRP,
     GNUTLS_KX_DHE_RSA,
+    GNUTLS_KX_DHE_DSS,
+    GNUTLS_KX_RSA,
+    /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
+     * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
+     */
     0
   };
   static const int cipher_priority[] = {
     GNUTLS_CIPHER_AES_128_CBC,
+    GNUTLS_CIPHER_AES_256_CBC,
     GNUTLS_CIPHER_3DES_CBC,
     GNUTLS_CIPHER_ARCFOUR_128,
+    /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
     0
   };
   static const int comp_priority[] = {
+    /* GNUTLS_COMP_LZO: Not standardized, don't add! */
+    GNUTLS_COMP_DEFLATE,
     GNUTLS_COMP_NULL,
     0
   };
@@ -298,12 +312,18 @@ gnutls_set_default_priority (gnutls_session_t session)
     GNUTLS_MAC_MD5,
     0
   };
+  static int cert_type_priority[] = {
+    GNUTLS_CRT_OPENPGP,
+    GNUTLS_CRT_X509,
+    0
+  };
 
   gnutls_cipher_set_priority (session, cipher_priority);
   gnutls_compression_set_priority (session, comp_priority);
   gnutls_kx_set_priority (session, kx_priority);
   gnutls_protocol_set_priority (session, protocol_priority);
   gnutls_mac_set_priority (session, mac_priority);
+  gnutls_certificate_type_set_priority (session, cert_type_priority);
 
   return 0;
 }
