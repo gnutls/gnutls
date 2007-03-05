@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -30,7 +30,6 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_auth_int.h>
-#include <gnutls_priority.h>
 #include <gnutls_num.h>
 #include <gnutls_datum.h>
 #include <gnutls_db.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -34,7 +34,6 @@
 #include "gnutls_handshake.h"
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
-#include "gnutls_priority.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_db.h"
 #include "gnutls_auth_int.h"
