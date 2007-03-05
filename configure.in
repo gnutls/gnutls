@@ -23,11 +23,12 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT([GnuTLS], [1.7.8], [bug-gnutls@gnu.org])
 AC_PREREQ(2.61)
 
+AC_CANONICAL_TARGET
+
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([1.10 gnits dist-bzip2])
 AM_CONFIG_HEADER(config.h)
 
-AC_CANONICAL_TARGET
 AB_INIT
 
 # Library code modified:                              REVISION++
