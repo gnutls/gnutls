@@ -294,8 +294,8 @@ gnutls_set_default_priority (gnutls_session_t session)
     0
   };
   static const int cipher_priority[] = {
-    GNUTLS_CIPHER_AES_128_CBC,
     GNUTLS_CIPHER_AES_256_CBC,
+    GNUTLS_CIPHER_AES_128_CBC,
     GNUTLS_CIPHER_3DES_CBC,
     GNUTLS_CIPHER_ARCFOUR_128,
     /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
