@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -53,9 +53,7 @@
 #include <gnutls_record.h>
 #include <gnutls_buffers.h>
 
-#ifdef HAVE_ERRNO_H
-# include <errno.h>
-#endif
+#include <errno.h>
 
 #ifdef _WIN32
 # include <winsock2.h>
@@ -64,14 +62,6 @@
 #ifndef EAGAIN
 # define EAGAIN EWOULDBLOCK
 #endif
-
-inline static int
-RET (int err)
-{
-  if (err == EAGAIN)
-    return GNUTLS_E_AGAIN;
-  return GNUTLS_E_INTERRUPTED;
-}
 
 #ifdef IO_DEBUG
 # include <io_debug.h>
@@ -369,7 +359,9 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 		}
 	      gnutls_assert ();
 
-	      return RET (err);
+	      if (err == EAGAIN)
+		return GNUTLS_E_AGAIN;
+	      return GNUTLS_E_INTERRUPTED;
 	    }
 	  else
 	    {
@@ -834,9 +826,9 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 		("WRITE: Interrupted. Stored %d bytes to buffer. Already sent %d bytes.\n",
 		 left, n - left);
 
-	      retval = RET (err);
-
-	      return retval;
+	      if (err == EAGAIN)
+		return GNUTLS_E_AGAIN;
+	      return GNUTLS_E_INTERRUPTED;
 	    }
 	  else
 	    {
