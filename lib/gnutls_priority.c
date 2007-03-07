@@ -261,10 +261,12 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
   *
   * The default order is:
   * Protocols: TLS 1.2, TLS 1.1, TLS 1.0, and SSL3.
-  * Key exchange algorithm: PSK, SRP, DHE-RSA, DHE-DSS, RSA.
+  * Key exchange algorithm: DHE-PSK, PSK, SRP-RSA, SRP-DSS, SRP,
+  * DHE-RSA, DHE-DSS, RSA.
+  * Cipher: AES_256_CBC, AES_128_CBC, 3DES_CBC, and ARCFOUR_128.
   * MAC algorithm: SHA, and MD5.
-  * Cipher: AES_128_CBC, AES_256_CBC, 3DES_CBC, and ARCFOUR_128.
   * Certificate types: OpenPGP, X.509
+  * Compression: DEFLATE, NULL.
   *
   * Returns 0 on success.
   *
