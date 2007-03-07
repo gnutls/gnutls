@@ -8,6 +8,20 @@ See the end for copying conditions.
 ** Added examples for the authorization extension.
 See doc/examples/ex-client-authz.c and doc/examples/ex-serv-authz.c.
 
+** The examples only use gnutls_set_default_priority().
+The exception is when DH_ANON is needed.
+
+** Improve gnutls_set_default_priority() priorities.
+The new approach is for it to try and negotiate all secure and
+standard mechanisms available.  Currently, DH_ANON ciphersuites and
+LZO compressions are not enabled by default.
+
+** gnutls-cli and gnutls-serv now uses the library's default priorities.
+This means that to get DH_ANON and LZO compression, you'll need to
+specify that manually using '--kx anon' or '--comp lzo'.
+
+** Minor fixes to the human display format of X.509 certificates.
+
 ** New APIs to extract Distinguished Name's from X.509 certificates.
 Based on patch from Howard Chu <hyc@symas.com>.
 
