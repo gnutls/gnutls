@@ -80,6 +80,7 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
   gl_TYPE_SOCKLEN_T
+  AM_STDBOOL_H
   gl_STDINT_H
   gl_STDIO_H
   gl_HEADER_STRING_H
@@ -179,6 +180,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/snprintf.c
   lib/socket_.h
   lib/stat_.h
+  lib/stdbool_.h
   lib/stdint_.h
   lib/stdio_.h
   lib/string_.h
@@ -253,6 +255,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/snprintf.m4
   m4/socklen.m4
   m4/sockpfaf.m4
+  m4/stdbool.m4
   m4/stdint.m4
   m4/stdint_h.m4
   m4/stdio_h.m4

@@ -126,6 +126,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/inet_ntop.h
   lib/inet_pton.c
   lib/inet_pton.h
+  lib/netinet_in_.h
   lib/progname.c
   lib/progname.h
   lib/readline.c
