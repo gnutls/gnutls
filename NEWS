@@ -6,9 +6,9 @@ See the end for copying conditions.
 * Version 1.6.2 (unreleased)
 
 ** Regenerate the PKIX ASN.1 syntax tree.
-For some reason, after changing the type of ldap-UID in the last
+For some reason, after changing the ASN.1 type of ldap-UID in the last
 release, the generated C file built from the ASN.1 schema was not
-generated properly.  This can cause problems when reading/writing UID
+refreshed.  This can cause problems when reading/writing UID
 components inside X.500 Distinguished Names.  Reported by devel
 <dev001@pas-world.com>.
 
