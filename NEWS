@@ -1,7 +1,16 @@
 GNU TLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2004, 2005, 2006 Simon Josefsson
+Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
+
+* Version 1.6.2 (unreleased)
+
+** Regenerate the PKIX ASN.1 syntax tree.
+For some reason, after changing the type of ldap-UID in the last
+release, the generated C file built from the ASN.1 schema were not
+generated properly.  This may have caused problems when
+reading/writing UID components inside X.500 Distinguished Names.
+Reported by devel <dev001@pas-world.com>.
 
 * Version 1.6.1 (released 2006-12-28)
 
