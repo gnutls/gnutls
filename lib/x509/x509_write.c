@@ -169,10 +169,15 @@ gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt,gnutls_x509_crt_t eecrt,
   * @crt: should contain a gnutls_x509_crt_t structure
   * @version: holds the version number. For X.509v1 certificates must be 1.
   *
-  * This function will set the version of the certificate. This
-  * must be one for X.509 version 1, and so on. Plain certificates without
+  * This function will set the version of the certificate.  This must
+  * be one for X.509 version 1, and so on.  Plain certificates without
   * extensions must have version set to one.
   *
+  * To create well-formed certificates, you must specify version 3 if
+  * you use any certificate extensions.  Extensions are created by
+  * functions such as gnutls_x509_crt_set_subject_alternative_name or
+  * gnutls_x509_crt_set_key_usage.
+
   * Returns 0 on success.
   *
   **/
