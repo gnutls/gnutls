@@ -49,6 +49,7 @@ Current list:
     root if a middle-CA is trusted.
   - Check path length constraints.
   - Check keyCertSign key usages.
+  - Reject extensions in v1 certificates.
 - Update libgnutls-extra.m4 to use modern autoconf constructs.
 - Support for hardware SSL accelerators
 - Exhaustive test suite, using NIST's PKI Test vectors,
