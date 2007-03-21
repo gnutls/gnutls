@@ -30,10 +30,10 @@ EXPECT1=2101
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2
 
-out1oks=`grep 'Verified.' out1 | wc -l`
-out2oks=`grep 'Verified.' out2 | wc -l`
-out1fails=`grep 'Not verified.' out1 | wc -l`
-out2fails=`grep 'Not verified.' out2 | wc -l`
+out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
+out2oks=`grep 'Verified.' out2 | wc -l | tr -d " "`
+out1fails=`grep 'Not verified.' out1 | wc -l | tr -d " "`
+out2fails=`grep 'Not verified.' out2 | wc -l | tr -d " "`
 
 rm -f out1 out2
 
@@ -54,10 +54,10 @@ EXPECT2=1001
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok2.pem | tee out1
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken2.pem | tee out2
 
-out1oks=`grep 'Verified.' out1 | wc -l`
-out2oks=`grep 'Verified.' out2 | wc -l`
-out1fails=`grep 'Not verified.' out1 | wc -l`
-out2fails=`grep 'Not verified.' out2 | wc -l`
+out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
+out2oks=`grep 'Verified.' out2 | wc -l | tr -d " "`
+out1fails=`grep 'Not verified.' out1 | wc -l | tr -d " "`
+out2fails=`grep 'Not verified.' out2 | wc -l | tr -d " "`
 
 rm -f out1 out2
 
@@ -78,8 +78,8 @@ EXPECT3=11
 
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken3.pem | tee out1
 
-out1oks=`grep 'Verified.' out1 | wc -l`
-out1fails=`grep 'Not verified.' out1 | wc -l`
+out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
+out1fails=`grep 'Not verified.' out1 | wc -l | tr -d " "`
 
 rm -f out1
 
