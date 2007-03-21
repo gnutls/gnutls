@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Simon Josefsson
+ * Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
  * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -187,7 +187,7 @@ _verify_passwd_int (const char *username, const char *passwd,
 {
   char _salt[1024];
   gnutls_datum tmp, raw_salt, new_verifier;
-  int salt_size;
+  size_t salt_size;
   char *pos;
 
   if (salt == NULL || verifier == NULL)

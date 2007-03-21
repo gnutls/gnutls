@@ -19,7 +19,7 @@ main (void)
   gnutls_x509_crq_t crq;
   gnutls_x509_privkey_t key;
   unsigned char buffer[10 * 1024];
-  int buffer_size = sizeof (buffer);
+  size_t buffer_size = sizeof (buffer);
 
   gnutls_global_init ();
 

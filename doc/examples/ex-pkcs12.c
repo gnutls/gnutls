@@ -23,7 +23,7 @@ write_pkcs12 (const gnutls_datum_t * cert,
   int ret, bag_index;
   gnutls_pkcs12_bag_t bag, key_bag;
   char pkcs12_struct[10 * 1024];
-  int pkcs12_struct_size;
+  size_t pkcs12_struct_size;
   FILE *fd;
 
   /* A good idea might be to use gnutls_x509_privkey_get_key_id()

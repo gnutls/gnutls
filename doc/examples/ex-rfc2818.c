@@ -14,7 +14,8 @@ verify_certificate (gnutls_session_t session, const char *hostname)
 {
   unsigned int status;
   const gnutls_datum_t *cert_list;
-  int cert_list_size, ret;
+  unsigned int cert_list_size;
+  int ret;
   gnutls_x509_crt_t cert;
 
 
