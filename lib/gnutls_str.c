@@ -227,8 +227,6 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
     }
 }
 
-#include <vasprintf.h>
-
 int
 _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
 {
