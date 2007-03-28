@@ -60,7 +60,7 @@
  *     ....
  *
  *     // Set up the DES encryption context
- *     des_setkey(&context, key);
+ *     gl_des_setkey(&context, key);
  *
  *     // Encrypt the plaintext
  *     des_ecb_encrypt(&context, plaintext, ciphertext);
@@ -318,10 +318,6 @@ static const unsigned char weak_keys[64][8] = {
   {0xfe, 0xfe, 0xe0, 0xe0, 0xfe, 0xfe, 0xf0, 0xf0},
   {0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe}	/*w */
 };
-static const unsigned char weak_keys_chksum[20] = {
-  0xD0, 0xCF, 0x07, 0x38, 0x93, 0x70, 0x8A, 0x83, 0x7D, 0xD7,
-  0x8A, 0x36, 0x65, 0x29, 0x6C, 0x1F, 0x7C, 0x3F, 0xD3, 0x41
-};
 
 bool
 gl_des_is_weak_key (const char * key)
@@ -541,9 +537,9 @@ gl_des_makekey (gl_des_ctx *ctx, const char * key, size_t keylen)
   if (keylen != 8)
     return false;
 
-  des_setkey (ctx, key);
+  gl_des_setkey (ctx, key);
 
-  return !des_is_weak_key (key);
+  return !gl_des_is_weak_key (key);
 }
 
 void
@@ -667,7 +663,7 @@ gl_3des_makekey (gl_3des_ctx *ctx, const char * key, size_t keylen)
 
   gl_3des_set3keys (ctx, key, key + 8, key + 16);
 
-  return !(des_is_weak_key (key)
-	   || des_is_weak_key (key + 8)
-	   || des_is_weak_key (key + 16));
+  return !(gl_des_is_weak_key (key)
+	   || gl_des_is_weak_key (key + 8)
+	   || gl_des_is_weak_key (key + 16));
 }

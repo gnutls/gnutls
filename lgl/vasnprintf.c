@@ -41,6 +41,9 @@
 #include <errno.h>	/* errno */
 #include <limits.h>	/* CHAR_BIT */
 #include <float.h>	/* DBL_MAX_EXP, LDBL_MAX_EXP */
+#if HAVE_NL_LANGINFO
+# include <langinfo.h>
+#endif
 #if WIDE_CHAR_VERSION
 # include "wprintf-parse.h"
 #else
@@ -51,12 +54,19 @@
 #include "xsize.h"
 
 #if NEED_PRINTF_DIRECTIVE_A && !defined IN_LIBINTL
+# include "float+.h"
 # include "isnan.h"
-# include "isnanl.h"
+# include "printf-frexp.h"
 # if HAVE_LONG_DOUBLE
-#  include "printf-frexp.h"
+#  include "isnanl-nolibm.h"
 #  include "printf-frexpl.h"
+#  include "fpucw.h"
 # endif
+#endif
+
+/* Some systems, like OSF/1 4.0 and Woe32, don't have EOVERFLOW.  */
+#ifndef EOVERFLOW
+# define EOVERFLOW E2BIG
 #endif
 
 #if HAVE_WCHAR_T
@@ -116,6 +126,33 @@ local_wcslen (const wchar_t *s)
 #endif
 /* Here we need to call the native sprintf, not rpl_sprintf.  */
 #undef sprintf
+
+#if NEED_PRINTF_DIRECTIVE_A && !defined IN_LIBINTL
+/* Determine the decimal-point character according to the current locale.  */
+# ifndef decimal_point_char_defined
+#  define decimal_point_char_defined 1
+static char
+decimal_point_char ()
+{
+  const char *point;
+  /* Determine it in a multithread-safe way.  We know nl_langinfo is
+     multithread-safe on glibc systems, but is not required to be multithread-
+     safe by POSIX.  sprintf(), however, is multithread-safe.  localeconv()
+     is rarely multithread-safe.  */
+#  if HAVE_NL_LANGINFO && __GLIBC__
+  point = nl_langinfo (RADIXCHAR);
+#  elif 1
+  char pointbuf[5];
+  sprintf (pointbuf, "%#.0f", 1.0);
+  point = &pointbuf[1];
+#  else
+  point = localeconv () -> decimal_point;
+#  endif
+  /* The decimal point is always a single byte: either '.' or ','.  */
+  return (point[0] != '\0' ? point[0] : '.');
+}
+# endif
+#endif
 
 CHAR_T *
 VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list args)
@@ -409,6 +446,9 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    else
 		      {
 			int sign = 0;
+			DECL_LONG_DOUBLE_ROUNDING
+
+			BEGIN_LONG_DOUBLE_ROUNDING ();
 
 			if (arg < 0.0L)
 			  {
@@ -420,7 +460,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			    /* Distinguish 0.0L and -0.0L.  */
 			    static long double plus_zero = 0.0L;
 			    long double arg_mem = arg;
-			    if (memcmp (&plus_zero, &arg_mem, sizeof (long double)) != 0)
+			    if (memcmp (&plus_zero, &arg_mem, SIZEOF_LDBL) != 0)
 			      {
 				sign = -1;
 				arg = -arg;
@@ -497,11 +537,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			      if ((flags & FLAG_ALT)
 				  || mantissa > 0.0L || precision > 0)
 				{
-				  const char *point =
-				    localeconv () -> decimal_point;
-				  /* The decimal point is always a single byte:
-				     either '.' or ','.  */
-				  *p++ = (point[0] != '\0' ? point[0] : '.');
+				  *p++ = decimal_point_char ();
 				  /* This loop terminates because we assume
 				     that FLT_RADIX is a power of 2.  */
 				  while (mantissa > 0.0L)
@@ -536,6 +572,8 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			      while (*p != '\0')
 				p++;
 			  }
+
+			END_LONG_DOUBLE_ROUNDING ();
 		      }
 		  }
 		else
@@ -568,7 +606,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			    /* Distinguish 0.0 and -0.0.  */
 			    static double plus_zero = 0.0;
 			    double arg_mem = arg;
-			    if (memcmp (&plus_zero, &arg_mem, sizeof (double)) != 0)
+			    if (memcmp (&plus_zero, &arg_mem, SIZEOF_DBL) != 0)
 			      {
 				sign = -1;
 				arg = -arg;
@@ -645,11 +683,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			      if ((flags & FLAG_ALT)
 				  || mantissa > 0.0 || precision > 0)
 				{
-				  const char *point =
-				    localeconv () -> decimal_point;
-				  /* The decimal point is always a single byte:
-				     either '.' or ','.  */
-				  *p++ = (point[0] != '\0' ? point[0] : '.');
+				  *p++ = decimal_point_char ();
 				  /* This loop terminates because we assume
 				     that FLT_RADIX is a power of 2.  */
 				  while (mantissa > 0.0)
@@ -1103,6 +1137,9 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    retcount = 0;
 
 #if USE_SNPRINTF
+		    /* SNPRINTF can fail if maxlen > INT_MAX.  */
+		    if (maxlen > INT_MAX)
+		      goto overflow;
 # define SNPRINTF_BUF(arg) \
 		    switch (prefix_count)				    \
 		      {							    \
@@ -1377,6 +1414,15 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
        that's only because snprintf() returns an 'int'.  This function does
        not have this limitation.  */
     return result;
+
+  overflow:
+    if (!(result == resultbuf || result == NULL))
+      free (result);
+    if (buf_malloced != NULL)
+      free (buf_malloced);
+    CLEANUP ();
+    errno = EOVERFLOW;
+    return NULL;
 
   out_of_memory:
     if (!(result == resultbuf || result == NULL))

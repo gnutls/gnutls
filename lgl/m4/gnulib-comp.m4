@@ -94,6 +94,7 @@ AC_DEFUN([lgl_INIT],
   gl_UNISTD_H
   gl_FUNC_VASNPRINTF
   gl_FUNC_VASPRINTF
+  gl_STDIO_MODULE_INDICATOR([vasprintf])
   gl_WCHAR_H
   gl_XSIZE
   m4_popdef([AC_LIBSOURCES])
@@ -145,6 +146,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/des.c
   lib/des.h
   lib/dummy.c
+  lib/float+.h
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c
@@ -192,7 +194,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
-  lib/vasprintf.h
   lib/wchar_.h
   lib/xsize.h
   m4/absolute-header.m4
