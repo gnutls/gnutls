@@ -1622,15 +1622,6 @@ static const gnutls_pk_entry pk_algorithms[] = {
   {0, 0, 0}
 };
 
-#define GNUTLS_PK_LOOP(b) \
-        const gnutls_pk_entry *p; \
-                for(p = pk_algorithms; p->name != NULL; p++) { b ; }
-
-#define GNUTLS_PK_ALG_LOOP(a) \
-                        GNUTLS_PK_LOOP( if(p->id == algorithm) { a; break; } )
-
-
-
 /**
   * gnutls_pk_algorithm_get_name - Returns a string with the name of the specified public key algorithm
   * @algorithm: is a pk algorithm
@@ -1642,9 +1633,14 @@ const char *
 gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
 {
   const char *ret = NULL;
+  const gnutls_pk_entry *p;
 
-  /* avoid prefix */
-  GNUTLS_PK_ALG_LOOP (ret = p->name);
+  for (p = pk_algorithms; p->name != NULL; p++)
+    if (p->id && p->id == algorithm)
+      {
+	ret = p->name;
+	break;
+      }
 
   return ret;
 }
@@ -1653,11 +1649,15 @@ gnutls_pk_algorithm_t
 _gnutls_x509_oid2pk_algorithm (const char *oid)
 {
   gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
+  const gnutls_pk_entry *p;
 
-  GNUTLS_PK_LOOP (if (strcmp (p->oid, oid) == 0)
-		  {
-		  ret = p->id; break;}
-  );
+  for (p = pk_algorithms; p->name != NULL; p++)
+    if (strcmp (p->oid, oid) == 0)
+      {
+	ret = p->id;
+	break;
+      }
+
   return ret;
 }
 
@@ -1665,7 +1665,14 @@ const char *
 _gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
 {
   const char *ret = NULL;
+  const gnutls_pk_entry *p;
 
-  GNUTLS_PK_ALG_LOOP (ret = p->oid);
+  for (p = pk_algorithms; p->name != NULL; p++)
+    if (p->id == algorithm)
+      {
+	ret = p->oid;
+	break;
+      }
+
   return ret;
 }
