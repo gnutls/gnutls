@@ -652,7 +652,6 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	    break;
 
 	  default:
-	    addf (str, "error: unknown algorithm: %d\n", err);
 	    break;
 	  }
       }
