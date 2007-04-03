@@ -25,6 +25,10 @@ specify that manually using '--kx anon' or '--comp lzo'.
 ** New APIs to extract Distinguished Name's from X.509 certificates.
 Based on patch from Howard Chu <hyc@symas.com>.
 
+** Improved library searching for opencdk.
+It will now add the appropriate -R or -Wl,-rpath flags as necessary.
+The deprecated opencdk.m4 is no longer used.
+
 ** API and ABI modifications:
 gnutls_x509_dn_t: ADD.
 gnutls_x509_ava_st: ADD.
