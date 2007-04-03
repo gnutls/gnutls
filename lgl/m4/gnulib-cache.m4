@@ -15,11 +15,11 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=liblgnu --source-base=lgl --m4-base=lgl/m4 --doc-base=doc --aux-dir=build-aux --lgpl --libtool --macro-prefix=lgl crypto/gc crypto/gc-arcfour crypto/gc-arctwo crypto/gc-des crypto/gc-hmac-md5 crypto/gc-md2 crypto/gc-md4 crypto/gc-md5 crypto/gc-pbkdf2-sha1 crypto/gc-random crypto/gc-rijndael crypto/gc-sha1 gettext memmem memmove minmax read-file snprintf socklen stdint strverscmp sys_socket sys_stat time_r unistd vasprintf
+#   gnulib-tool --import --dir=. --lib=liblgnu --source-base=lgl --m4-base=lgl/m4 --doc-base=doc --aux-dir=build-aux --lgpl --libtool --macro-prefix=lgl crypto/gc crypto/gc-arcfour crypto/gc-arctwo crypto/gc-des crypto/gc-hmac-md5 crypto/gc-md2 crypto/gc-md4 crypto/gc-md5 crypto/gc-pbkdf2-sha1 crypto/gc-random crypto/gc-rijndael crypto/gc-sha1 getpass gettext memmem memmove minmax read-file snprintf socklen stdint strverscmp sys_socket sys_stat time_r unistd vasprintf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
-gl_MODULES([crypto/gc crypto/gc-arcfour crypto/gc-arctwo crypto/gc-des crypto/gc-hmac-md5 crypto/gc-md2 crypto/gc-md4 crypto/gc-md5 crypto/gc-pbkdf2-sha1 crypto/gc-random crypto/gc-rijndael crypto/gc-sha1 gettext memmem memmove minmax read-file snprintf socklen stdint strverscmp sys_socket sys_stat time_r unistd vasprintf])
+gl_MODULES([crypto/gc crypto/gc-arcfour crypto/gc-arctwo crypto/gc-des crypto/gc-hmac-md5 crypto/gc-md2 crypto/gc-md4 crypto/gc-md5 crypto/gc-pbkdf2-sha1 crypto/gc-random crypto/gc-rijndael crypto/gc-sha1 getpass gettext memmem memmove minmax read-file snprintf socklen stdint strverscmp sys_socket sys_stat time_r unistd vasprintf])
 gl_AVOID([])
 gl_SOURCE_BASE([lgl])
 gl_M4_BASE([lgl/m4])

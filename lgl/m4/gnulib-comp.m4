@@ -69,6 +69,9 @@ AC_DEFUN([lgl_INIT],
   gl_GC_SHA1
   gl_MODULE_INDICATOR([gc-sha1])
   gl_MD2
+  gl_FUNC_GETDELIM
+  gl_FUNC_GETLINE
+  gl_FUNC_GETPASS
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.16.1])
   gl_FUNC_MEMMEM
@@ -151,6 +154,12 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c
   lib/gc.h
+  lib/getdelim.c
+  lib/getdelim.h
+  lib/getline.c
+  lib/getline.h
+  lib/getpass.c
+  lib/getpass.h
   lib/gettext.h
   lib/hmac-md5.c
   lib/hmac-sha1.c
@@ -217,6 +226,9 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/gc-rijndael.m4
   m4/gc-sha1.m4
   m4/gc.m4
+  m4/getdelim.m4
+  m4/getline.m4
+  m4/getpass.m4
   m4/gettext.m4
   m4/glibc2.m4
   m4/glibc21.m4

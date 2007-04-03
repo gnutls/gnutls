@@ -50,7 +50,6 @@ AC_DEFUN([gl_INIT],
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
-  gl_FUNC_GETPASS
   gl_INET_NTOP
   gl_INET_PTON
   gl_HEADER_NETINET_IN
@@ -119,8 +118,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getdelim.h
   lib/getline.c
   lib/getline.h
-  lib/getpass.c
-  lib/getpass.h
   lib/gettext.h
   lib/inet_ntop.c
   lib/inet_ntop.h
@@ -145,7 +142,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
-  m4/getpass.m4
   m4/gnulib-common.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
