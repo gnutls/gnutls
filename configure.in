@@ -379,20 +379,22 @@ if test x$ac_enable_openpgp = xyes; then
 	AS_HELP_STRING([--with-included-opencdk], [use the included opencdk]),
 		ac_enable_included_opencdk=$withval, 
 		ac_enable_included_opencdk=no)
-if test x$ac_enable_included_opencdk = xno;then 
-  AM_PATH_LIBOPENCDK(0.5.5, ,
+ if test x$ac_enable_included_opencdk = xno;then 
+  AC_LIB_HAVE_LINKFLAGS(opencdk,, [#include <opencdk.h>], [cdk_check_version (OPENCDK_VERSION);])
+  if test "$ac_cv_libopencdk" != yes; then
    ac_enable_included_opencdk=yes
    AC_MSG_WARN([[
 ***
-*** libopencdk 0.5.5 was not found. You may want to get it from
+*** libopencdk was not found. You may want to get it from
 *** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
 ***
 *** Will use the included opencdk.
 ***
-]]))
-fi
-AC_MSG_CHECKING([whether to use the included opencdk])
-AC_MSG_RESULT($ac_enable_included_opencdk)
+]])
+  fi
+  AC_MSG_CHECKING([whether to use the included opencdk])
+  AC_MSG_RESULT($ac_enable_included_opencdk)
+ fi
 fi
 
 AM_CONDITIONAL(ENABLE_INCLUDED_OPENCDK, test "$ac_enable_included_opencdk" = "yes")
