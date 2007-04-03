@@ -37,8 +37,6 @@ if ENABLE_OPENPGP
 if ENABLE_INCLUDED_OPENCDK
 SUBDIRS += opencdk
 AM_CPPFLAGS += -I$(srcdir)/opencdk
-else
-AM_CPPFLAGS += $(LIBOPENCDK_CFLAGS)
 endif
 SUBDIRS += openpgp
 endif
@@ -99,7 +97,7 @@ libgnutls_extra_la_LIBADD += openpgp/libgnutls_openpgp.la
 if ENABLE_INCLUDED_OPENCDK
 libgnutls_extra_la_LIBADD += opencdk/libminiopencdk.la
 else
-libgnutls_extra_la_LDFLAGS += $(LIBOPENCDK_LIBS) 
+libgnutls_extra_la_LDFLAGS += $(LTLIBOPENCDK) 
 endif
 endif
 
