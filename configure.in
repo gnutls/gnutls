@@ -380,7 +380,9 @@ if test x$ac_enable_openpgp = xyes; then
 		ac_enable_included_opencdk=$withval, 
 		ac_enable_included_opencdk=no)
  if test x$ac_enable_included_opencdk = xno;then 
-  AC_LIB_HAVE_LINKFLAGS(opencdk,, [#include <opencdk.h>], [cdk_check_version (OPENCDK_VERSION);])
+  AC_LIB_HAVE_LINKFLAGS(opencdk,, [
+#include <stddef.h> /* opencdk <= 0.5.13 uses size_t without this include */
+#include <opencdk.h>], [cdk_check_version (OPENCDK_VERSION);])
   if test "$ac_cv_libopencdk" != yes; then
    ac_enable_included_opencdk=yes
    AC_MSG_WARN([[
