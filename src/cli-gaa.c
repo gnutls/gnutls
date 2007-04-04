@@ -869,7 +869,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_list:
 	OK = 0;
 #line 119 "cli.gaa"
-{ print_list(); exit(0); ;};
+{ print_list(gaaval->verbose); exit(0); ;};
 
 		return GAA_OK;
 		break;

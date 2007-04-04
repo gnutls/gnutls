@@ -107,7 +107,7 @@ option (kx) *STR "kx1 kx2..." { $kx = $1; $nkx = @1 } "Key exchange methods to e
 option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Certificate types to enable."
 
 
-option (l, list) { print_list(); exit(0); } "Print a list of the supported algorithms  and modes."
+option (l, list) { print_list(0); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 option (v, version) { serv_version(); exit(0); } "prints the program's version number"

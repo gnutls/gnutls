@@ -590,14 +590,38 @@ print_cert_info (gnutls_session session, const char *hostname)
       break;
 #endif
     }
-
 }
 
 void
-print_list (void)
+print_list (int verbose)
 {
   {
-    const gnutls_protocol_t *p = gnutls_certificate_type_list();
+    size_t i;
+    const char *name;
+    char id[2];
+    gnutls_kx_algorithm_t kx;
+    gnutls_cipher_algorithm_t cipher;
+    gnutls_mac_algorithm_t mac;
+    gnutls_protocol_t version;
+
+    printf ("Cipher suites:\n");
+    for (i = 0; (name = gnutls_cipher_suite_info
+		 (i, id, &kx, &cipher, &mac, &version)); i++)
+      {
+	printf ("%-50s\t0x%02x, 0x%02x\t%s\n",
+		name,
+		(unsigned char) id[0], (unsigned char) id[1],
+		gnutls_protocol_get_name (version));
+	if (verbose)
+	  printf ("\tKey exchange: %s\n\tCipher: %s\n\tMAC: %s\n\n",
+		  gnutls_kx_get_name (kx),
+		  gnutls_cipher_get_name (cipher),
+		  gnutls_mac_get_name (mac));
+      }
+  }
+
+  {
+    const gnutls_certificate_type_t *p = gnutls_certificate_type_list();
 
     printf ("Certificate types: ");
     for (; *p; p++)
@@ -639,7 +663,7 @@ print_list (void)
   }
 
   {
-    const gnutls_cipher_algorithm_t *p = gnutls_mac_list();
+    const gnutls_mac_algorithm_t *p = gnutls_mac_list();
 
     printf ("MACs: ");
     for (; *p; p++)
