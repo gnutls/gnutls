@@ -32,8 +32,8 @@ The deprecated opencdk.m4 is no longer used.
 ** New APIs to list supported algorithms in the library.
 The APIs are gnutls_cipher_list, gnutls_mac_list,
 gnutls_compression_list, gnutls_protocol_list,
-gnutls_certificate_type_list, and gnutls_kx_list.  Suggested by Howard
-Chu <hyc@symas.com>.
+gnutls_certificate_type_list, gnutls_kx_list, and
+gnutls_cipher_suite_info.  Suggested by Howard Chu <hyc@symas.com>.
 
 ** API and ABI modifications:
 gnutls_x509_dn_t: ADD.
@@ -47,6 +47,7 @@ gnutls_compression_list: ADD.
 gnutls_protocol_list: ADD.
 gnutls_certificate_type_list: ADD.
 gnutls_kx_list: ADD.
+gnutls_cipher_suite_info: ADD.
 
 * Version 1.7.7 (released 2007-02-22)
 

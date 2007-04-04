@@ -1258,6 +1258,50 @@ gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t
   return ret;
 }
 
+/**
+ * gnutls_cipher_suite_info:
+ * @idx: index of cipher suite to get information about, starts on 0.
+ * @cs_id: output buffer with room for 2 bytes, indicating cipher suite value
+ * @kx: output variable indicating key exchange algorithm, or %NULL.
+ * @cipher: output variable indicating cipher, or %NULL.
+ * @mac: output variable indicating MAC algorithm, or %NULL.
+ * @version: output variable indicating TLS protocol version, or %NULL.
+ *
+ * Get information about supported cipher suites.  Use the function
+ * iteratively to get information about all supported cipher suites.
+ * Call with idx=0 to get information about first cipher suite, then
+ * idx=1 and so on until the function returns NULL.
+ *
+ * Returns: Returns the name of @idx cipher suite, and set the
+ * information about the cipher suite in the output variables.  If
+ * @idx is out of bounds, %NULL is returned.
+ **/
+const char *
+gnutls_cipher_suite_info (size_t idx,
+			  char *cs_id,
+			  gnutls_kx_algorithm_t *kx,
+			  gnutls_cipher_algorithm_t *cipher,
+			  gnutls_mac_algorithm_t *mac,
+			  gnutls_protocol_t *version)
+{
+  if (idx >= CIPHER_SUITES_COUNT)
+    return NULL;
+
+  if (cs_id)
+    memcpy (cs_id, cs_algorithms[idx].id.suite, 2);
+  if (kx)
+    *kx = cs_algorithms[idx].kx_algorithm;
+  if (cipher)
+    *cipher = cs_algorithms[idx].block_algorithm;
+  if (mac)
+    *mac = cs_algorithms[idx].mac_algorithm;
+  if (version)
+    *version = cs_algorithms[idx].version;
+
+  return cs_algorithms[idx].name + sizeof ("GNU") - 1;
+}
+
+
 inline static int
 _gnutls_cipher_suite_is_ok (cipher_suite_st * suite)
 {

@@ -383,6 +383,12 @@ extern "C"
   const gnutls_protocol_t *gnutls_protocol_list (void);
   const gnutls_certificate_type_t *gnutls_certificate_type_list (void);
   const gnutls_kx_algorithm_t *gnutls_kx_list (void);
+  const char *gnutls_cipher_suite_info (size_t i,
+					char *id,
+					gnutls_kx_algorithm_t *kx,
+					gnutls_cipher_algorithm_t *cipher,
+					gnutls_mac_algorithm_t *mac,
+					gnutls_protocol_t *version);
 
   /* error functions */
   int gnutls_error_is_fatal (int error);
