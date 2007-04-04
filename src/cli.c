@@ -589,6 +589,11 @@ starttls_alarm (int signum)
   starttls_alarmed = 1;
 }
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
 
 int
 main (int argc, char **argv)
@@ -605,6 +610,21 @@ main (int argc, char **argv)
   struct timeval tv;
   int user_term = 0;
   socket_st hd;
+
+  if ((ret = gnutls_global_init ()) < 0)
+    {
+      fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (debug);
+
+  if ((ret = gnutls_global_init_extra ()) < 0)
+    {
+      fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
 
   gaa_parser (argc, argv);
   if (hostname == NULL)
@@ -986,30 +1006,9 @@ srp_username_callback (gnutls_session session,
 }
 
 static void
-tls_log_func (int level, const char *str)
-{
-  fprintf (stderr, "|<%d>| %s", level, str);
-}
-
-static void
 init_global_tls_stuff (void)
 {
   int ret;
-
-  if ((ret = gnutls_global_init ()) < 0)
-    {
-      fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
-
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (debug);
-
-  if ((ret = gnutls_global_init_extra ()) < 0)
-    {
-      fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
-//      exit (1);
-    }
 
   /* X509 stuff */
   if (gnutls_certificate_allocate_credentials (&xcred) < 0)
