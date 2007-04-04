@@ -121,6 +121,15 @@ static const gnutls_version_entry sup_versions[] = {
   {0, 0, 0, 0, 0}
 };
 
+/* Keep the contents of this struct the same as the previous one. */
+static const gnutls_protocol_t supported_protocols[] = {
+  GNUTLS_SSL3,
+  GNUTLS_TLS1,
+  GNUTLS_TLS1_1,
+  GNUTLS_TLS1_2,
+  0
+};
+
 #define GNUTLS_VERSION_LOOP(b) \
         const gnutls_version_entry *p; \
                 for(p = sup_versions; p->name != NULL; p++) { b ; }
@@ -147,17 +156,28 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  */
 static const gnutls_cipher_entry algorithms[] = {
+  {"AES 256 CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
+  {"AES 128 CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
   {"3DES 168 CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0},
-  {"AES 128 CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16,
-   0},
-  {"AES 256 CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16,
-   0},
+  {"DES CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0},
   {"ARCFOUR 128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0},
   {"ARCFOUR 40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1},
   {"RC2 40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 1},
-  {"DES CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0},
   {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0},
   {0, 0, 0, 0, 0, 0, 0}
+};
+
+/* Keep the contents of this struct the same as the previous one. */
+static const gnutls_cipher_algorithm_t supported_ciphers[] = {
+  GNUTLS_CIPHER_AES_256_CBC,
+  GNUTLS_CIPHER_AES_128_CBC,
+  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_128,
+  GNUTLS_CIPHER_ARCFOUR_40,
+  GNUTLS_CIPHER_RC2_40_CBC,
+  GNUTLS_CIPHER_NULL,
+  0
 };
 
 #define GNUTLS_LOOP(b) \
@@ -188,6 +208,19 @@ static const gnutls_hash_entry hash_algorithms[] = {
   {0, 0, 0}
 };
 
+/* Keep the contents of this struct the same as the previous one. */
+static const gnutls_mac_algorithm_t supported_macs[] = {
+  GNUTLS_MAC_SHA1,
+  GNUTLS_MAC_MD5,
+  GNUTLS_MAC_SHA256,
+  GNUTLS_MAC_SHA384,
+  GNUTLS_MAC_SHA512,
+  GNUTLS_MAC_MD2,
+  GNUTLS_MAC_RMD160,
+  GNUTLS_MAC_NULL,
+  0
+};
+
 #define GNUTLS_HASH_LOOP(b) \
         const gnutls_hash_entry *p; \
                 for(p = hash_algorithms; p->name != NULL; p++) { b ; }
@@ -213,6 +246,17 @@ gnutls_compression_entry _gnutls_compression_algorithms[MAX_COMP_METHODS] = {
   GNUTLS_COMPRESSION_ENTRY (GNUTLS_COMP_DEFLATE, 0x01, 15, 8, 3),
 #endif
   {0, 0, 0, 0, 0, 0}
+};
+
+static const gnutls_compression_method_t supported_compressions[] = {
+#ifdef USE_LZO
+  GNUTLS_COMP_LZO,
+#endif
+#ifdef HAVE_LIBZ
+  GNUTLS_COMP_DEFLATE,
+#endif
+  GNUTLS_COMP_NULL,
+  0
 };
 
 #define GNUTLS_COMPRESSION_LOOP(b) \
@@ -248,7 +292,7 @@ struct gnutls_kx_algo_entry
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
-static const gnutls_kx_algo_entry kx_algorithms[] = {
+static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #ifdef ENABLE_ANON
   {"Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
 #endif
@@ -271,9 +315,30 @@ static const gnutls_kx_algo_entry kx_algorithms[] = {
   {0, 0, 0, 0, 0}
 };
 
+/* Keep the contents of this struct the same as the previous one. */
+static const gnutls_kx_algorithm_t supported_kxs[] = {
+#ifdef ENABLE_ANON
+  GNUTLS_KX_ANON_DH,
+#endif
+  GNUTLS_KX_RSA,
+  GNUTLS_KX_RSA_EXPORT,
+  GNUTLS_KX_DHE_RSA,
+  GNUTLS_KX_DHE_DSS,
+#ifdef ENABLE_SRP
+  GNUTLS_KX_SRP_DSS,
+  GNUTLS_KX_SRP_RSA,
+  GNUTLS_KX_SRP,
+#endif
+#ifdef ENABLE_PSK
+  GNUTLS_KX_PSK,
+  GNUTLS_KX_DHE_PSK,
+#endif
+  0
+};
+
 #define GNUTLS_KX_LOOP(b) \
         const gnutls_kx_algo_entry *p; \
-                for(p = kx_algorithms; p->name != NULL; p++) { b ; }
+                for(p = _gnutls_kx_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_KX_ALG_LOOP(a) \
                         GNUTLS_KX_LOOP( if(p->algorithm == algorithm) { a; break; } )
@@ -554,6 +619,24 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
   return ret;
 }
 
+/**
+ * gnutls_mac_list:
+ *
+ * Get a list of hash algorithms for use as MACs.  Note that not
+ * necessarily all MACs are supported in TLS cipher suites.  For
+ * example, MD2 is not supported as a cipher suite, but is supported
+ * for other purposes (e.g., X.509 signature verification or similar).
+ *
+ * Returns: Return a zero-terminated list of %gnutls_mac_algorithm_t
+ * integers indicating the available MACs.
+ *
+ **/
+const gnutls_mac_algorithm_t *
+gnutls_mac_list (void)
+{
+  return supported_macs;
+}
+
 const char *
 _gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t algorithm)
 {
@@ -625,6 +708,23 @@ gnutls_compression_get_name (gnutls_compression_method_t algorithm)
   GNUTLS_COMPRESSION_ALG_LOOP (ret = p->name + sizeof ("GNUTLS_COMP_") - 1);
 
   return ret;
+}
+
+/**
+ * gnutls_compression_list:
+ *
+ * Get a list of compression methods.  Note that to be able to use LZO
+ * compression, you must link to libgnutls-extra and call
+ * gnutls_global_init_extra().
+ *
+ * Returns: Return a zero-terminated list of
+ * %gnutls_compression_method_t integers indicating the available
+ * compression methods.
+ **/
+const gnutls_compression_method_t *
+gnutls_compression_list (void)
+{
+  return supported_compressions;
 }
 
 /* return the tls number of the specified algorithm */
@@ -784,6 +884,25 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
   return ret;
 }
 
+/**
+ * gnutls_cipher_list:
+ *
+ * Get a list of supported cipher algorithms.  Note that not
+ * necessarily all ciphers are supported as TLS cipher suites.  For
+ * example, DES is not supported as a cipher suite, but is supported
+ * for other purposes (e.g., PKCS#8 or similar).
+ *
+ * Returns: Return a zero-terminated list of
+ * %gnutls_cipher_algorithm_t integers indicating the available
+ * ciphers.
+ *
+ **/
+const gnutls_cipher_algorithm_t *
+gnutls_cipher_list (void)
+{
+  return supported_ciphers;
+}
+
 int
 _gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm)
 {
@@ -795,7 +914,6 @@ _gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm)
     ret = 1;
   return ret;
 }
-
 
 /* Key EXCHANGE functions */
 mod_auth_st *
@@ -837,6 +955,21 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
   GNUTLS_KX_ALG_LOOP (ret = p->name);
 
   return ret;
+}
+
+/**
+ * gnutls_kx_list:
+ *
+ * Get a list of supported key exchange algorithms.
+ *
+ * Returns: Return a zero-terminated list of %gnutls_kx_algorithm_t
+ * integers indicating the available key exchange algorithms.
+ *
+ **/
+const gnutls_kx_algorithm_t *
+gnutls_kx_list (void)
+{
+  return supported_kxs;
 }
 
 int
@@ -948,6 +1081,21 @@ gnutls_protocol_get_name (gnutls_protocol_t version)
   /* avoid prefix */
   GNUTLS_VERSION_ALG_LOOP (ret = p->name);
   return ret;
+}
+
+/**
+ * gnutls_protocol_list:
+ *
+ * Get a list of supported protocols, e.g. SSL 3.0, TLS 1.0 etc.
+ *
+ * Returns: Return a zero-terminated list of %gnutls_protocol_t
+ * integers indicating the available protocols.
+ *
+ **/
+const gnutls_protocol_t *
+gnutls_protocol_list (void)
+{
+  return supported_protocols;
 }
 
 int
@@ -1469,6 +1617,30 @@ gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
     ret = "OPENPGP";
 
   return ret;
+}
+
+static const gnutls_certificate_type_t supported_certificate_types[] = {
+  GNUTLS_CRT_X509,
+  GNUTLS_CRT_OPENPGP,
+  0
+};
+
+/**
+ * gnutls_certificate_type_list:
+ *
+ * Get a list of certificate types.  Note that to be able to use
+ * OpenPGP certificates, you must link to libgnutls-extra and call
+ * gnutls_global_init_extra().
+ *
+ * Returns: Return a zero-terminated list of
+ * %gnutls_certificate_type_t integers indicating the available
+ * certificate types.
+ *
+ **/
+const gnutls_certificate_type_t *
+gnutls_certificate_type_list (void)
+{
+  return supported_certificate_types;
 }
 
 /* returns the gnutls_pk_algorithm_t which is compatible with
