@@ -238,11 +238,17 @@ extern mod_auth_st dhe_psk_auth_struct;
 extern mod_auth_st srp_rsa_auth_struct;
 extern mod_auth_st srp_dss_auth_struct;
 
+struct gnutls_kx_algo_entry
+{
+  const char *name;
+  gnutls_kx_algorithm_t algorithm;
+  mod_auth_st *auth_struct;
+  int needs_dh_params;
+  int needs_rsa_params;
+};
+typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
-#define MAX_KX_ALGOS 16
-const int _gnutls_kx_algorithms_size = MAX_KX_ALGOS;
-
-gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
+static const gnutls_kx_algo_entry kx_algorithms[] = {
 #ifdef ENABLE_ANON
   {"Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
 #endif
@@ -262,15 +268,12 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
   {"DHE PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
    1 /* needs DHE params */ , 0},
 #endif
-  /* other algorithms are appended here by gnutls-extra
-   * initialization function.
-   */
   {0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_KX_LOOP(b) \
         const gnutls_kx_algo_entry *p; \
-                for(p = _gnutls_kx_algorithms; p->name != NULL; p++) { b ; }
+                for(p = kx_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_KX_ALG_LOOP(a) \
                         GNUTLS_KX_LOOP( if(p->algorithm == algorithm) { a; break; } )

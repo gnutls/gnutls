@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -110,16 +110,6 @@ enum encipher_type
 { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };
 
 enum encipher_type _gnutls_kx_encipher_type (gnutls_kx_algorithm_t algorithm);
-
-struct gnutls_kx_algo_entry
-{
-  const char *name;
-  gnutls_kx_algorithm_t algorithm;
-  mod_auth_st *auth_struct;
-  int needs_dh_params;
-  int needs_rsa_params;
-};
-typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 struct gnutls_compression_entry
 {
