@@ -596,51 +596,89 @@ print_cert_info (gnutls_session session, const char *hostname)
 void
 print_list (void)
 {
-  /* FIXME: This is hard coded. Make it print all the supported
-   * algorithms.
-   */
-  printf ("\n");
-  printf ("Certificate types:");
-  printf (" X.509");
-  printf (", OPENPGP\n");
+  {
+    const gnutls_protocol_t *p = gnutls_certificate_type_list();
 
-  printf ("Protocols:");
-  printf (" TLS1.2");
-  printf (", TLS1.1");
-  printf (", TLS1.0");
-  printf (", SSL3.0\n");
+    printf ("Certificate types: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_certificate_type_get_name (*p));
+	if (*(p+1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
 
-  printf ("Ciphers:");
-  printf (" AES-256-CBC");
-  printf (", AES-128-CBC");
-  printf (", 3DES-CBC");
-  printf (", ARCFOUR");
-  printf (", ARCFOUR-40\n");
+  {
+    const gnutls_protocol_t *p = gnutls_protocol_list();
 
-  printf ("MACs:");
-  printf (" SHA512");
-  printf (", SHA384");
-  printf (", SHA256");
-  printf (", SHA1");
-  printf (", MD5");
-  printf (", RMD160\n");
+    printf ("Protocols: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_protocol_get_name (*p));
+	if (*(p+1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
 
-  printf ("Key exchange algorithms:");
-  printf (" RSA");
-  printf (", RSA-EXPORT");
-  printf (", DHE-DSS");
-  printf (", DHE-RSA");
-  printf (", DHE-PSK");
-  printf (", PSK");
-  printf (", SRP");
-  printf (", SRP-RSA");
-  printf (", SRP-DSS");
-  printf (", ANON-DH\n");
+  {
+    const gnutls_cipher_algorithm_t *p = gnutls_cipher_list();
 
-  printf ("Compression methods:");
-  printf (" DEFLATE");
-  printf (", LZO");
-  printf (", NULL\n");
+    printf ("Ciphers: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_cipher_get_name (*p));
+	if (*(p+1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
+
+  {
+    const gnutls_cipher_algorithm_t *p = gnutls_mac_list();
+
+    printf ("MACs: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_mac_get_name (*p));
+	if (*(p+1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
+
+  {
+    const gnutls_kx_algorithm_t *p = gnutls_kx_list();
+
+    printf ("Key exchange algorithms: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_kx_get_name (*p));
+	if (*(p+1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
+
+  {
+    const gnutls_compression_method_t *p = gnutls_compression_list();
+
+    printf ("Compression: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_compression_get_name (*p));
+	if (*(p+1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
 }
 
 void
