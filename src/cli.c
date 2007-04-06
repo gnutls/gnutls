@@ -81,7 +81,6 @@ char *x509_cafile;
 char *x509_crlfile = NULL;
 static int x509ctype;
 static int disable_extensions;
-static int debug;
 
 char *psk_username = NULL;
 gnutls_datum psk_key = { NULL, 0 };
@@ -617,9 +616,6 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (debug);
-
   if ((ret = gnutls_global_init_extra ()) < 0)
     {
       fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
@@ -632,6 +628,9 @@ main (int argc, char **argv)
       fprintf (stderr, "No hostname given\n");
       exit (1);
     }
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (info.debug);
 
   sockets_init ();
 
@@ -859,7 +858,6 @@ gaa_parser (int argc, char **argv)
       exit (1);
     }
 
-  debug = info.debug;
   verbose = info.verbose;
   disable_extensions = info.disable_extensions;
   xml = info.xml;
