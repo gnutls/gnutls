@@ -35,6 +35,8 @@ gnutls_compression_list, gnutls_protocol_list,
 gnutls_certificate_type_list, gnutls_kx_list, and
 gnutls_cipher_suite_info.  Suggested by Howard Chu <hyc@symas.com>.
 
+** The gnutls_x509_crt_get_key_id API now handle non-RSA/DSA keys.
+
 ** API and ABI modifications:
 gnutls_x509_dn_t: ADD.
 gnutls_x509_ava_st: ADD.
