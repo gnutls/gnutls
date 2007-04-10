@@ -340,6 +340,19 @@ else
  AC_MSG_RESULT(yes)
 fi
 
+AC_MSG_CHECKING([whether to disable authorization (tls-authz) support])
+AC_ARG_ENABLE(tls-authorization,
+	AS_HELP_STRING([--disable-tls-authorization],
+		[disable tls authorization support]),
+	ac_enable_authz=no)
+if test x$ac_enable_authz != xno; then
+ AC_MSG_RESULT(no)
+ AC_DEFINE(ENABLE_AUTHZ, 1, [enable tls authorization])
+else
+ ac_full=0
+ AC_MSG_RESULT(yes)
+fi
+
 AC_MSG_CHECKING([whether to disable extra PKI stuff])
 AC_ARG_ENABLE(extra-pki,
 	AS_HELP_STRING([--disable-extra-pki],
