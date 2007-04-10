@@ -14,7 +14,8 @@ The exception is when DH_ANON is needed.
 ** Improve gnutls_set_default_priority() priorities.
 The new approach is for it to try and negotiate all secure and
 standard mechanisms available.  Currently, DH_ANON ciphersuites and
-LZO compressions are not enabled by default.
+LZO compressions are not enabled by default, because they are,
+respectively, insecure and non-standardized.
 
 ** gnutls-cli and gnutls-serv now uses the library's default priorities.
 This means that to get DH_ANON and LZO compression, you'll need to
@@ -36,6 +37,8 @@ gnutls_certificate_type_list, gnutls_kx_list, and
 gnutls_cipher_suite_info.  Suggested by Howard Chu <hyc@symas.com>.
 
 ** The gnutls_x509_crt_get_key_id API now handle non-RSA/DSA keys.
+
+** New configure option --disable-tls-authorization to disable tls-authz.
 
 ** API and ABI modifications:
 gnutls_x509_dn_t: ADD.
