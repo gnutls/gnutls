@@ -1257,7 +1257,13 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  res->cert_list[res->ncerts] = NULL;	/* for realloc */
+  res->cert_list[res->ncerts] = gnutls_calloc (1, sizeof (gnutls_cert));
+  if (res->cert_list[res->ncerts] == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
   res->cert_list_length[res->ncerts] = 1;
 
   ret = _gnutls_openpgp_key_to_gcert (res->cert_list[res->ncerts], key);
