@@ -327,6 +327,8 @@ generate_rsa_params (void)
   return 0;
 }
 
+LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
+
 static int protocol_priority[PRI_MAX];
 static int kx_priority[PRI_MAX];
 static int cipher_priority[PRI_MAX];
@@ -334,6 +336,7 @@ static int comp_priority[PRI_MAX];
 static int mac_priority[PRI_MAX];
 static int cert_type_priority[PRI_MAX];
 
+#ifdef ENABLE_AUTHZ
 static int authz_server_formats[PRI_MAX] = {
   0
 };
@@ -344,8 +347,6 @@ static int authz_client_formats[PRI_MAX] = {
   GNUTLS_AUTHZ_SAML_ASSERTION_URL,
   0
 };
-
-LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
 int
 authz_send_callback (gnutls_session_t session,
@@ -430,6 +431,7 @@ authz_recv_callback (gnutls_session_t session,
 
   return 0;
 }
+#endif
 
 gnutls_session
 initialize_session (void)
@@ -481,8 +483,10 @@ initialize_session (void)
   else
     gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
 
+#ifdef ENABLE_AUTHZ
   gnutls_authz_enable (session, authz_client_formats, authz_server_formats,
 		       authz_recv_callback, authz_send_callback);
+#endif
 
   return session;
 }
@@ -1453,6 +1457,7 @@ gaa_parser (int argc, char **argv)
   parse_kx (info.kx, info.nkx, kx_priority);
   parse_comp (info.comp, info.ncomp, comp_priority);
 
+#ifdef ENABLE_AUTHZ
   {
     size_t authz_idx = 0;
     if (info.authz_x509_attr_cert)
@@ -1460,6 +1465,7 @@ gaa_parser (int argc, char **argv)
     if (info.authz_saml_assertion)
       authz_server_formats[authz_idx++] = GNUTLS_AUTHZ_SAML_ASSERTION;
   }
+#endif
 }
 
 void

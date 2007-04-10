@@ -99,6 +99,8 @@ static int comp_priority[PRI_MAX];
 static int mac_priority[PRI_MAX];
 static int cert_type_priority[PRI_MAX];
 
+#ifdef ENABLE_AUTHZ
+
 static int authz_client_formats[PRI_MAX];
 static int authz_server_formats[PRI_MAX] = {
   GNUTLS_AUTHZ_X509_ATTR_CERT,
@@ -107,6 +109,8 @@ static int authz_server_formats[PRI_MAX] = {
   GNUTLS_AUTHZ_SAML_ASSERTION_URL,
   0
 };
+
+#endif
 
 /* end of global stuff */
 
@@ -378,6 +382,7 @@ cert_callback (gnutls_session session,
 
 }
 
+#ifdef ENABLE_AUTHZ
 
 int
 authz_send_callback (gnutls_session_t session,
@@ -463,6 +468,8 @@ authz_recv_callback (gnutls_session_t session,
   return 0;
 }
 
+#endif
+
 /* initializes a gnutls_session with some defaults.
  */
 static gnutls_session
@@ -524,8 +531,10 @@ init_tls_session (const char *hostname)
 	}
     }
 
+#ifdef ENABLE_AUTHZ
   gnutls_authz_enable (session, authz_client_formats, authz_server_formats,
 		       authz_recv_callback, authz_send_callback);
+#endif
 
   return session;
 }

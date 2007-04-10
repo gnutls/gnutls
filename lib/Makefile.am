@@ -74,7 +74,11 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_x509.c ext_cert_type.c gnutls_rsa_export.c		\
 	auth_rsa_export.c ext_server_name.c auth_dh_common.c		\
 	gnutls_helper.c ext_inner_application.c gnutls_extra_hooks.c	\
-	gnutls_supplemental.c ext_authz.c
+	gnutls_supplemental.c
+
+if ENABLE_AUTHZ
+COBJECTS += ext_authz.c
+endif
 
 HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
