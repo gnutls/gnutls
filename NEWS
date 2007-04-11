@@ -40,6 +40,12 @@ gnutls_cipher_suite_info.  Suggested by Howard Chu <hyc@symas.com>.
 
 ** New configure option --disable-tls-authorization to disable tls-authz.
 
+** Fix prototype for `gnutls_psk_set_client_credentials'.
+The last parameter was renamed from 'flags' to 'format' and the type
+changed from 'unsigned int' to 'gnutls_psk_key_flags' (an enum type),
+which shouldn't cause any ABI changes.  Reported by ludo@chbouib.org
+(Ludovic Courtès).
+
 ** API and ABI modifications:
 gnutls_x509_dn_t: ADD.
 gnutls_x509_ava_st: ADD.

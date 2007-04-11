@@ -920,7 +920,7 @@ extern "C"
   int gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 					 const char *username,
 					 const gnutls_datum * key,
-					 unsigned int flags);
+					 gnutls_psk_key_flags format);
   typedef enum gnutls_psk_key_flags
   {
     GNUTLS_PSK_KEY_RAW = 0,

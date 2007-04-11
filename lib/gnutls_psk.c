@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -78,6 +78,8 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
   * @res: is an #gnutls_psk_client_credentials_t structure.
   * @username: is the user's zero-terminated userid
   * @key: is the user's key
+  * @format: indicate the format of the key, either
+  * %GNUTLS_PSK_KEY_RAW or %GNUTLS_PSK_KEY_HEX.
   *
   * This function sets the username and password, in a
   * gnutls_psk_client_credentials_t structure.  Those will be used in
@@ -92,7 +94,7 @@ int
 gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 				   const char *username,
 				   const gnutls_datum * key,
-				   unsigned int flags)
+				   gnutls_psk_key_flags flags)
 {
   int ret;
 
