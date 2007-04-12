@@ -87,7 +87,8 @@ Current list:
 - Make gnutls-cli-debug exit with better error messages if the
   handshake fails, rather than saying that the server doesn't support
   TLS.
-- Make gnutls_certificate_get_out return a zero-terminated array.
+- Make gnutls_certificate_get_out return a zero-terminated array (or
+  add a new API that return the size of the array).
 
 (+) Means high priority 
 (*) Means medium priority
