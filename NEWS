@@ -15,7 +15,9 @@ The exception is when DH_ANON is needed.
 The new approach is for it to try and negotiate all secure and
 standard mechanisms available.  Currently, DH_ANON ciphersuites and
 LZO compressions are not enabled by default, because they are,
-respectively, insecure and non-standardized.
+respectively, insecure and non-standardized.  Note that TLS 1.2 will
+not be enabled by default in non-experimental release until it has
+been approved by the IETF.
 
 ** gnutls-cli and gnutls-serv now uses the library's default priorities.
 This means that to get DH_ANON and LZO compression, you'll need to
