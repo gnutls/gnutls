@@ -913,6 +913,12 @@ extern "C"
   typedef struct gnutls_psk_client_credentials_st
     *gnutls_psk_client_credentials_t;
 
+  typedef enum gnutls_psk_key_flags
+    {
+      GNUTLS_PSK_KEY_RAW = 0,
+      GNUTLS_PSK_KEY_HEX
+    } gnutls_psk_key_flags;
+
   void gnutls_psk_free_client_credentials (gnutls_psk_client_credentials_t
 					   sc);
   int gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t
@@ -921,11 +927,6 @@ extern "C"
 					 const char *username,
 					 const gnutls_datum * key,
 					 gnutls_psk_key_flags format);
-  typedef enum gnutls_psk_key_flags
-  {
-    GNUTLS_PSK_KEY_RAW = 0,
-    GNUTLS_PSK_KEY_HEX
-  } gnutls_psk_key_flags;
 
   void gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t
 					   sc);
