@@ -41,6 +41,9 @@ doit (void)
   char digest[20];
   int err;
 
+  /* XXX: We need this to fix secure memory. */
+  gnutls_global_init();
+
   err = gc_init ();
   if (err)
     fail ("gc_init() failed: %d\n", err);
