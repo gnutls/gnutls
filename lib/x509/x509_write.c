@@ -177,7 +177,7 @@ gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt,gnutls_x509_crt_t eecrt,
   * you use any certificate extensions.  Extensions are created by
   * functions such as gnutls_x509_crt_set_subject_alternative_name or
   * gnutls_x509_crt_set_key_usage.
-
+  *
   * Returns 0 on success.
   *
   **/
