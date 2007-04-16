@@ -23,10 +23,17 @@
 
 #else
 /* Normal invocation convention.  */
+
+#ifdef __DECC
+# include_next <stdio.h>
+#endif
+
 #ifndef _GL_STDIO_H
 #define _GL_STDIO_H
 
-#include @ABSOLUTE_STDIO_H@
+#ifndef __DECC
+# include @ABSOLUTE_STDIO_H@
+#endif
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -198,6 +205,13 @@ extern int vsprintf (char *str, const char *format, va_list args)
   extern int vasprintf (char **result, const char *format, va_list args)
     __attribute__ ((__format__ (__printf__, 2, 0)));
 # endif
+#endif
+
+#if @GNULIB_FFLUSH@ && @REPLACE_FFLUSH@
+# define fflush rpl_fflush
+  /* Flush all pending data on STREAM according to POSIX rules.  Both
+     output and seekable input streams are supported.  */
+  extern int fflush (FILE *gl_stream);
 #endif
 
 #ifdef __cplusplus

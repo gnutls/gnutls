@@ -74,6 +74,8 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_GETPASS
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.16.1])
+  AC_SUBST([LIBINTL])
+  AC_SUBST([LTLIBINTL])
   gl_FUNC_MEMMEM
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
@@ -149,7 +151,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/des.c
   lib/des.h
   lib/dummy.c
-  lib/float+.h
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c
@@ -248,7 +249,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/lib-link.m4
   m4/lib-prefix.m4
   m4/lock.m4
-  m4/longdouble.m4
   m4/longlong.m4
   m4/md2.m4
   m4/md4.m4
