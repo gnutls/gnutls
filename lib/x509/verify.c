@@ -541,7 +541,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
 		       const gnutls_datum_t * signature, mpi_t * params,
 		       int params_len)
 {
-  gnutls_mac_algorithm_t hash;
+  gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
   int ret;
   opaque digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE];
   int digest_size;

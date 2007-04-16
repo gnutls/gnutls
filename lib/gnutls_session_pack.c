@@ -342,7 +342,7 @@ unpack_certificate_auth_info (gnutls_session_t session,
 			      const gnutls_datum_t * packed_session)
 {
   int pos = 0, size, ret;
-  unsigned int i, j;
+  unsigned int i = 0, j;
   size_t pack_size;
   cert_auth_info_t info;
 

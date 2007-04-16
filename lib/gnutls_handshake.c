@@ -199,7 +199,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
   opaque concat[36];
   size_t len;
   const char *mesg;
-  mac_hd_t td_md5;
+  mac_hd_t td_md5 = NULL;
   mac_hd_t td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 

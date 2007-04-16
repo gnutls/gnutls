@@ -305,7 +305,7 @@ static void
 print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
 {
   int indx;
-  char *buffer;
+  char *buffer = NULL;
   size_t size;
   int err;
 
@@ -446,7 +446,7 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert)
 
 	case GNUTLS_SAN_OTHERNAME:
 	  {
-	    char *oid;
+	    char *oid = NULL;
 	    size_t oidsize;
 
 	    oidsize = 0;
@@ -864,7 +864,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
     {
       int err;
       size_t size = 0;
-      char *buffer;
+      char *buffer = NULL;
 
       err = gnutls_x509_crt_get_signature_algorithm (cert);
       if (err < 0)
@@ -937,7 +937,7 @@ print_keyid (gnutls_string * str, gnutls_x509_crt_t cert)
 {
   int err;
   size_t size = 0;
-  char *buffer;
+  char *buffer = NULL;
 
   err = gnutls_x509_crt_get_key_id (cert, 0, buffer, &size);
   if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -1271,7 +1271,7 @@ print_crl (gnutls_string *str,
     {
       int err;
       size_t size = 0;
-      char *buffer;
+      char *buffer = NULL;
 
       err = gnutls_x509_crl_get_signature_algorithm (crl);
       if (err < 0)
