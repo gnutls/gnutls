@@ -53,6 +53,9 @@ changed from 'unsigned int' to 'gnutls_psk_key_flags' (an enum type),
 which shouldn't cause any ABI changes.  Reported by ludo@chbouib.org
 (Ludovic Courtès).
 
+** Fix allocation in gnutls_certificate_set_openpgp_key.
+Tiny patch from ludo@chbouib.org (Ludovic Courtès).
+
 ** API and ABI modifications:
 gnutls_x509_dn_t: ADD.
 gnutls_x509_ava_st: ADD.
