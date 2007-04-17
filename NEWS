@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.7.9 (unreleased)
 
+** Change certtool's default serial number from 0 to a time-based value.
+
 ** API and ABI modifications:
 No changes since last version.
 

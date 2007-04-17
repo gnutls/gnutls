@@ -28,6 +28,7 @@
 #include <string.h>
 #include <limits.h>
 #include <inttypes.h>
+#include <time.h>
 
 /* Gnulib portability files. */
 #include <getpass.h>
@@ -77,6 +78,7 @@ cfg_init (void)
 {
   memset (&cfg, 0, sizeof (cfg));
   cfg.path_len = -1;
+  cfg.serial = -1;
 }
 
 int
@@ -565,15 +567,18 @@ get_pkcs9_email_crt_set (gnutls_x509_crt crt)
 int
 get_serial (void)
 {
+  int default_serial = time (NULL);
+
   if (batch)
     {
       if (cfg.serial < 0)
-	return 0;
+	return default_serial;
       return cfg.serial;
     }
   else
     {
-      return read_int ("Enter the certificate's serial number (decimal): ");
+      return read_int_with_default
+	("Enter the certificate's serial number (decimal): ", default_serial);
     }
 }
 

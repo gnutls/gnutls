@@ -275,12 +275,13 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 
 
   serial = get_serial ();
-  buffer[3] = serial & 0xff;
-  buffer[2] = (serial >> 8) & 0xff;
-  buffer[1] = (serial >> 16) & 0xff;
+  buffer[4] = serial & 0xff;
+  buffer[3] = (serial >> 8) & 0xff;
+  buffer[2] = (serial >> 16) & 0xff;
+  buffer[1] = (serial >> 24) & 0xff;
   buffer[0] = 0;
 
-  result = gnutls_x509_crt_set_serial (crt, buffer, 4);
+  result = gnutls_x509_crt_set_serial (crt, buffer, 5);
   if (result < 0)
     error (EXIT_FAILURE, 0, "serial: %s", gnutls_strerror (result));
 
