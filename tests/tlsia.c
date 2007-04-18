@@ -148,8 +148,12 @@ client (void)
   /* Need to enable anonymous KX specifically. */
   const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
 
-  gnutls_global_init ();
-  gnutls_global_init_extra ();
+  ret = gnutls_global_init ();
+  if (ret)
+    fail ("global_init: %d\n", ret);
+  ret = gnutls_global_init_extra ();
+  if (ret)
+    fail ("global_init_extra: %d\n", ret);
 
   gnutls_anon_allocate_client_credentials (&anoncred);
   gnutls_ia_allocate_client_credentials (&iacred);
