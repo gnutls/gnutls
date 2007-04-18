@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -79,7 +79,13 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
       return _gnutls_asn2err (result);
     }
 
-  result = asn1_write_value (dinfo, "digestAlgorithm.parameters", NULL, 0);
+  /* Write an ASN.1 NULL in the parameters field.  This matches RFC
+     3279 and RFC 4055, although is arguable incorrect from a historic
+     perspective (see those documents for more information).
+     Regardless of what is correct, this appears to be what most
+     implementations do.  */
+  result = asn1_write_value (dinfo, "digestAlgorithm.parameters",
+			     "\x05\x00", 2);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();

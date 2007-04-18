@@ -7,6 +7,14 @@ See the end for copying conditions.
 
 ** Change certtool's default serial number from 0 to a time-based value.
 
+** Fix X.509 signing with RSA-PKCS#1 to set a NULL parameters fields.
+Before, we remove the parameters field, which resulted in a slightly
+different DER encoding which in turn caused signature verification
+failures of GnuTLS-generated RSA certificates in some other
+implementations (e.g., GnuPG 2.x's gpgsm).  Depending on which RFCs
+you read, this may or may not be correct, but our new behaviour appear
+to be consistent with other widely used implementations.
+
 ** API and ABI modifications:
 No changes since last version.
 
