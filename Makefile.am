@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos
 #
@@ -42,18 +42,16 @@ htmldir = ../www-$(PACKAGE)
 
 release:
 	if cvs upd -p -r $(tag) NEWS > /dev/null; then false else true; fi
-	cvs rtag $(tag) gnutls
+	cvs rtag -r gnutls_1_6_x $(tag) gnutls
 	rm -f ChangeLog
 	make ChangeLog
 	cvs commit -m "" ChangeLog
-	cvs rtag -F $(tag) gnutls
+	cvs rtag -F -r gnutls_1_6_x $(tag) gnutls
 	make dist
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
 	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/ && sha1sum *.tar.bz2 > CHECKSUMS'
-	cd doc && ../gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
 	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/
-	cp -v doc/reference/html/*.{html,png,css,devhelp} $(htmldir)/reference/
 	cd $(htmldir) && cvs add -kb releases/$(distdir).tar.bz2{,.sig} && \
 		cvs commit -m "Update." manual/ reference/ releases/
