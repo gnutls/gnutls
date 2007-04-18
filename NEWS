@@ -20,6 +20,8 @@ refreshed.  This can cause problems when reading/writing UID
 components inside X.500 Distinguished Names.  Reported by devel
 <dev001@pas-world.com>.
 
+** Updated translations.
+
 ** API and ABI modifications:
 No changes since last version.
 
