@@ -2440,6 +2440,14 @@ certtool --generate-certificate --load-privkey x509-client-key.pem \
 ...
 @end example
 
+To be able to import the client key/certificate into some
+applications, you will need to convert them into a PKCS#12 structure.
+This also encrypts the security sensitive key with a password.
+
+@example
+certtool --to-p12 --load-privkey x509-client-key.pem --load-certificate x509-client.pem --outder --outfile x509-client.p12
+@end example
+
 For icing, we'll create a proxy certificate for the client too.
 
 @example
