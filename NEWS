@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 1.6.2 (unreleased)
 
+** Fix X.509 signing with RSA-PKCS#1 to set a NULL parameters fields.
+Before, we remove the parameters field, which resulted in a slightly
+different DER encoding which in turn caused signature verification
+failures of GnuTLS-generated RSA certificates in some other
+implementations (e.g., GnuPG 2.x's gpgsm).  Depending on which RFCs
+you read, this may or may not be correct, but our new behaviour appear
+to be consistent with other widely used implementations.
+
 ** Regenerate the PKIX ASN.1 syntax tree.
 For some reason, after changing the ASN.1 type of ldap-UID in the last
 release, the generated C file built from the ASN.1 schema was not
