@@ -1,14 +1,14 @@
 # Polish translation for gnutls.
-# Copyright (C) 2006 Free Software Foundation, Inc.
+# Copyright (C) 2006, 2007 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gnutls package.
-# Jakub Bogusz <qboosh@pld-linux.org>, 2006.
+# Jakub Bogusz <qboosh@pld-linux.org>, 2006-2007.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnutls-1.3.5-b20060307\n"
+"Project-Id-Version: gnutls-1.7.7\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2006-03-07 02:26+0100\n"
-"PO-Revision-Date: 2006-03-08 17:32+0100\n"
+"POT-Creation-Date: 2007-02-22 09:18+0100\n"
+"PO-Revision-Date: 2007-02-26 20:22+0100\n"
 "Last-Translator: Jakub Bogusz <qboosh@pld-linux.org>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -299,3 +299,255 @@ msgstr "Odebrano wiadomo¶æ TLS/IA Final Phase Finished"
 
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Sprawdzenie sumy kontrolnej frazy TLS/IA nie powiod³o siê"
+
+#, c-format
+msgid "\t\t\tPath Length Constraint: %d\n"
+msgstr "\t\t\tOgraniczenie d³ugo¶ci ¶cie¿ki: %d\n"
+
+msgid "\t\t\tPolicy Language: "
+msgstr "\t\t\tJêzyk polityki: "
+
+#, c-format
+msgid "\t\t\tPolicy Language: %.*s\n"
+msgstr "\t\t\tJêzyk polityki: %.*s\n"
+
+msgid "\t\t\tDigital signature.\n"
+msgstr "\t\t\tPodpis cyfrowy.\n"
+
+msgid "\t\t\tNon repudiation.\n"
+msgstr "\t\t\tBez odmowy.\n"
+
+msgid "\t\t\tKey encipherment.\n"
+msgstr "\t\t\tSzyfrowanie klucza.\n"
+
+msgid "\t\t\tData encipherment.\n"
+msgstr "\t\t\tSzyfrowanie danych.\n"
+
+msgid "\t\t\tKey agreement.\n"
+msgstr "\t\t\tUzgodnienie klucza.\n"
+
+msgid "\t\t\tCertificate signing.\n"
+msgstr "\t\t\tPodpisanie certyfikatu.\n"
+
+msgid "\t\t\tCRL signing.\n"
+msgstr "\t\t\tPodpisanie CRL.\n"
+
+msgid "\t\t\tKey encipher only.\n"
+msgstr "\t\t\tTylko szyfrowanie klucza.\n"
+
+msgid "\t\t\tKey decipher only.\n"
+msgstr "\t\t\tTylko deszyfrowanie klucza.\n"
+
+msgid "\t\t\tTLS WWW Server.\n"
+msgstr "\t\t\tSerwer WWW TLS.\n"
+
+msgid "\t\t\tTLS WWW Client.\n"
+msgstr "\t\t\tKlient WWW TLS.\n"
+
+msgid "\t\t\tCode signing.\n"
+msgstr "\t\t\tPodpisywanie kodu.\n"
+
+msgid "\t\t\tEmail protection.\n"
+msgstr "\t\t\tOchrona poczty elektronicznej.\n"
+
+msgid "\t\t\tTime stamping.\n"
+msgstr "\t\t\tOznaczanie czasu.\n"
+
+msgid "\t\t\tOCSP signing.\n"
+msgstr "\t\t\tPodpisywanie OCSP.\n"
+
+msgid "\t\t\tAny purpose.\n"
+msgstr "\t\t\tDowolne zastosowanie.\n"
+
+msgid "\t\t\tCertificate Authority (CA): FALSE\n"
+msgstr "\t\t\tCA: NIE\n"
+
+msgid "\t\t\tCertificate Authority (CA): TRUE\n"
+msgstr "\t\t\tCA: TAK\n"
+
+#, c-format
+msgid "\t\t\tXMPP Address: %.*s\n"
+msgstr "\t\t\tAdres XMPP: %.*s\n"
+
+#, c-format
+msgid "\t\t\totherName OID: %.*s\n"
+msgstr "\t\t\tOID otherName: %.*s\n"
+
+msgid "\t\t\totherName DER: "
+msgstr "\t\t\tDER otherName: "
+
+msgid ""
+"\n"
+"\t\t\totherName ASCII: "
+msgstr ""
+"\n"
+"\t\t\tASCII otherName: "
+
+#, c-format
+msgid "\tVersion: %d\n"
+msgstr "\tWersja: %d\n"
+
+msgid "\tSerial Number (hex): "
+msgstr "\tNumer seryjny (hex): "
+
+#, c-format
+msgid "\tIssuer: %s\n"
+msgstr "\tWystawca: %s\n"
+
+msgid "\tValidity:\n"
+msgstr "\tWa¿no¶æ:\n"
+
+#, c-format
+msgid "\t\tNot Before: %s\n"
+msgstr "\t\tNie wcze¶niej ni¿: %s\n"
+
+#, c-format
+msgid "\t\tNot After: %s\n"
+msgstr "\t\tNie pó¼niej ni¿: %s\n"
+
+#, c-format
+msgid "\tSubject: %s\n"
+msgstr "\tPrzedmiot: %s\n"
+
+#, c-format
+msgid "\tSubject Public Key Algorithm: %s\n"
+msgstr "\tAlgorytm klucza publicznego: %s\n"
+
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr "\t\tReszta (bitów: %d):\n"
+
+msgid "\t\tExponent:\n"
+msgstr "\t\tWyk³adnik:\n"
+
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr "\t\tKlucz publiczny (bitów: %d):\n"
+
+msgid "\t\tP:\n"
+msgstr "\t\tP:\n"
+
+msgid "\t\tQ:\n"
+msgstr "\t\tQ:\n"
+
+msgid "\t\tG:\n"
+msgstr "\t\tG:\n"
+
+msgid "\tExtensions:\n"
+msgstr "\tRozszerzenia:\n"
+
+#, c-format
+msgid "\t\tBasic Constraints (%s):\n"
+msgstr "\t\tOgraniczenia podstawowe (%s):\n"
+
+msgid "critical"
+msgstr "krytyczny"
+
+msgid "not critical"
+msgstr "niekrytyczny"
+
+#, c-format
+msgid "\t\tSubject Key Identifier (%s):\n"
+msgstr "\t\tIdentyfikator klucza przedmiotu (%s):\n"
+
+#, c-format
+msgid "\t\tAuthority Key Identifier (%s):\n"
+msgstr "\t\tIdentyfikator klucza autorytetu (%s):\n"
+
+#, c-format
+msgid "\t\tKey Usage (%s):\n"
+msgstr "\t\tU¿ycie klucza (%s):\n"
+
+#, c-format
+msgid "\t\tKey Purpose (%s):\n"
+msgstr "\t\tPrzeznaczenie klucza (%s):\n"
+
+#, c-format
+msgid "\t\tSubject Alternative Name (%s):\n"
+msgstr "\t\tAlternatywna nazwa przedmiotu (%s):\n"
+
+#, c-format
+msgid "\t\tCRL Distribution points (%s):\n"
+msgstr "\t\tPunkty rozproszenia CRL (%s):\n"
+
+#, c-format
+msgid "\t\tProxy Certificate Information (%s):\n"
+msgstr "\t\tInformacja o certyfikacie proxy (%s):\n"
+
+#, c-format
+msgid "\t\tUnknown extension %s (%s):\n"
+msgstr "\t\tNieznane rozszerzenie %s (%s):\n"
+
+msgid "\t\t\tASCII: "
+msgstr "\t\t\tASCII: "
+
+msgid "\t\t\tHexdump: "
+msgstr "\t\t\tZrzut hex: "
+
+#, c-format
+msgid "\tSignature Algorithm: %s\n"
+msgstr "\tAlgorytm podpisu: %s\n"
+
+msgid "warning: signed using a broken signature algorithm that can be forged.\n"
+msgstr "uwaga: podpisano z³amanym algorytmem podpisu, który mo¿e byæ podrobiony.\n"
+
+msgid "\tSignature:\n"
+msgstr "\tPodpis:\n"
+
+msgid ""
+"\tMD5 fingerprint:\n"
+"\t\t"
+msgstr ""
+"\tOdcisk MD5:\n"
+"\t\t"
+
+msgid ""
+"\tSHA-1 fingerprint:\n"
+"\t\t"
+msgstr ""
+"\tOdcisk SHA-1:\n"
+"\t\t"
+
+msgid ""
+"\tPublic Key Id:\n"
+"\t\t"
+msgstr ""
+"\tIdentyfikator klucza publicznego:\n"
+"\t\t"
+
+msgid "X.509 Certificate Information:\n"
+msgstr "Informacja o certyfikacie X.509:\n"
+
+msgid "Other Information:\n"
+msgstr "Inne informacje:\n"
+
+msgid "\tVersion: 1 (default)\n"
+msgstr "\tWersja: 1 (domy¶lna)\n"
+
+msgid "\tUpdate dates:\n"
+msgstr "\tDaty uaktualnieñ:\n"
+
+#, c-format
+msgid "\t\tIssued: %s\n"
+msgstr "\t\tWystawiono: %s\n"
+
+#, c-format
+msgid "\t\tNext at: %s\n"
+msgstr "\t\tNastêpnie: %s\n"
+
+#, c-format
+msgid "\tRevoked certificates (%d):\n"
+msgstr "\tUniewa¿nione certyfikaty (%d):\n"
+
+msgid "\tNo revoked certificates.\n"
+msgstr "\tBrak uniewa¿nionych certyfikatów.\n"
+
+msgid "\t\tSerial Number (hex): "
+msgstr "\t\tNumer seryjny (hex): "
+
+#, c-format
+msgid "\t\tRevoked at: %s\n"
+msgstr "\t\tUniewa¿niono: %s\n"
+
+msgid "X.509 Certificate Revocation List Information:\n"
+msgstr "Informacja o li¶cie uniewa¿nieñ certyfikatów X.509:\n"
