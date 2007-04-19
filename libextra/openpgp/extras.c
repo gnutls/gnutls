@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -116,7 +116,8 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
   * @format: One of gnutls_openpgp_keyring_fmt elements.
   *
   * This function will convert the given RAW or Base64 encoded keyring
-  * to the native gnutls_openpgp_keyring_t format. The output will be stored in 'keyring'.
+  * to the native gnutls_openpgp_keyring_t format. The output will be
+  * stored in 'keyring'.
   *
   * Returns 0 on success.
   *
@@ -127,18 +128,18 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 			       gnutls_openpgp_key_fmt_t format)
 {
   int rc;
-  keybox_blob *blob = NULL;
+  cdk_error_t err;
 
-
-  blob = kbx_read_blob (data, 0);
-  if (!blob)
+  if (format != GNUTLS_OPENPGP_FMT_RAW)
     {
-      gnutls_assert ();
-      return GNUTLS_E_OPENPGP_KEYRING_ERROR;
+      /* FIXME: `cdk_keydb_new ()' currently only supports raw keyrings.  */
+      rc = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      goto leave;
     }
 
-  keyring->hd = kbx_to_keydb (blob);
-  if (!keyring->hd)
+  err = cdk_keydb_new (&keyring->hd, CDK_DBTYPE_DATA,
+		       data->data, data->size);
+  if (err)
     {
       gnutls_assert ();
       rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
@@ -148,7 +149,6 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
   rc = 0;
 
 leave:
-  kbx_blob_release (blob);
   return rc;
 }
 
