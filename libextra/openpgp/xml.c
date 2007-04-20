@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Timo Schulz, Nikos Mavroyanopoulos
  *
@@ -55,7 +55,7 @@ xml_add_mpi2 (gnutls_string * xmlkey, const uint8_t * data, size_t count,
 {
   char *p = NULL;
   size_t i;
-  int rc = 0;
+  int rc;
 
   if (!xmlkey || !data || !tag)
     {
@@ -84,11 +84,11 @@ static int
 xml_add_mpi (gnutls_string * xmlkey, cdk_pkt_pubkey_t pk, int idx,
 	     const char *tag)
 {
-  uint8_t buf[4096];
+  uint8_t buf[4096]; /* Maximal supported MPI of size 32786 bits */
   size_t nbytes;
 
-  nbytes = sizeof buf - 1;
-  cdk_pk_get_mpi (pk, idx, buf, &nbytes, NULL);
+  nbytes = 4096;
+  cdk_pk_get_mpi (pk, idx, buf, nbytes, &nbytes, NULL);
   return xml_add_mpi2 (xmlkey, buf, nbytes, tag);
 }
 
@@ -126,6 +126,7 @@ xml_add_key_mpi (gnutls_string * xmlkey, cdk_pkt_pubkey_t pk)
     }
   else if (is_ELG (pk->pubkey_algo))
     {
+      /* FIXME: Does GnuTLS supports ElGamal? */
       rc = xml_add_mpi (xmlkey, pk, 0, "ELG-P");
       if (!rc)
 	rc = xml_add_mpi (xmlkey, pk, 1, "ELG-G");
@@ -158,7 +159,8 @@ xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
   _gnutls_string_append_str (xmlkey, s);
 
   cdk_pk_get_keyid (pk, kid);
-  snprintf (keyid, 16, "%08lX%08lX", kid[0], kid[1]);
+  snprintf (keyid, 16, "%08lX%08lX", 
+	    (unsigned long)kid[0], (unsigned long)kid[1]);
   rc = xml_add_tag (xmlkey, "KEYID", keyid);
   if (rc)
     return rc;
@@ -176,7 +178,7 @@ xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
   else if (is_RSA (pk->pubkey_algo))
     algo = "RSA";
   else if (is_ELG (pk->pubkey_algo))
-    algo = "ELG";
+    algo = "ELG"; /* FIXME: Same here is ElGamal supported? */
   else
     algo = "???";
   rc = xml_add_tag (xmlkey, "PKALGO", algo);
@@ -188,7 +190,7 @@ xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
   if (rc)
     return rc;
 
-  sprintf (tmp, "%lu", pk->timestamp);
+  sprintf (tmp, "%lu", (unsigned long)pk->timestamp);
   rc = xml_add_tag (xmlkey, "CREATED", tmp);
   if (rc)
     return rc;
@@ -226,7 +228,7 @@ xml_add_userid (gnutls_string * xmlkey, int ext,
 {
   const char *s;
   char tmp[32];
-  int rc = 0;
+  int rc;
 
   if (!xmlkey || !dn || !id)
     {
@@ -266,7 +268,7 @@ xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
   const char *algo, *s;
   char tmp[32], keyid[16];
   unsigned int kid[2];
-  int rc = 0;
+  int rc;
 
   if (!xmlkey || !sig)
     {
@@ -302,7 +304,7 @@ xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
 	case GCRY_PK_DSA:
 	  algo = "DSA";
 	  break;
-	case GCRY_PK_ELG:
+	case GCRY_PK_ELG: /* FIXME: Is ElGamal needed? */
 	case GCRY_PK_ELG_E:
 	  algo = "ELG";
 	  break;
@@ -329,6 +331,15 @@ xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
 	case GCRY_MD_MD5:
 	  algo = "MD5";
 	  break;
+	case GCRY_MD_SHA256:
+	  algo = "SHA256";
+	  break;
+	case GCRY_MD_SHA384:
+	  algo = "SHA384";
+	  break;
+	case GCRY_MD_SHA512:
+	  algo = "SHA512";
+	  break;
 	default:
 	  algo = "???";
 	}
@@ -337,13 +348,14 @@ xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
 	return rc;
     }
 
-  sprintf (tmp, "%lu", sig->timestamp);
+  sprintf (tmp, "%lu", (unsigned long)sig->timestamp);
   rc = xml_add_tag (xmlkey, "CREATED", tmp);
   if (rc)
     return rc;
 
   cdk_sig_get_keyid (sig, kid);
-  snprintf (keyid, 16, "%08lX%08lX", kid[0], kid[1]);
+  snprintf (keyid, 16, "%08lX%08lX", 
+	    (unsigned long)kid[0], (unsigned long)kid[1]);
   rc = xml_add_tag (xmlkey, "KEYID", keyid);
   if (rc)
     return rc;
@@ -409,7 +421,7 @@ gnutls_openpgp_key_to_xml (gnutls_openpgp_key_t key,
 	  break;
 
 	case CDK_PKT_USER_ID:
-	  name_len = sizeof (name);
+	  name_len = sizeof (name) / sizeof (name[0]);
 	  gnutls_openpgp_key_get_name (key, idx, name, &name_len);
 	  rc = xml_add_userid (&string_xml_key, ext, name, pkt->pkt.user_id);
 	  idx++;

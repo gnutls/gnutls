@@ -82,9 +82,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 
   if (cred->keyring.data && cred->keyring.size != 0)
     {
-
-      /* use the keyring
-       */
+      /* use the keyring */
       ret = gnutls_openpgp_keyring_init (&ring);
       if (ret < 0)
 	{
@@ -98,7 +96,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 	  gnutls_assert ();
 	  goto leave;
 	}
-
+      
       ret = gnutls_openpgp_key_verify_ring (key, ring, 0, &verify_ring);
       if (ret < 0)
 	{
@@ -108,7 +106,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
     }
 
   if (cred->pgp_trustdb)
-    {				/* Use the trustDB */
+    { /* Use the trustDB */
       ret = gnutls_openpgp_trustdb_init (&tdb);
       if (ret < 0)
 	{
@@ -126,8 +124,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
       ret = gnutls_openpgp_key_verify_trustdb (key, tdb, 0, &verify_db);
     }
 
-  /* now try the self signature.
-   */
+  /* Now try the self signature. */
   ret = gnutls_openpgp_key_verify_self (key, 0, &verify_self);
   if (ret < 0)
     {
@@ -137,8 +134,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 
   *status = verify_self | verify_ring | verify_db;
 
-  /* If we only checked the self signature.
-   */
+  /* If we only checked the self signature. */
   if (!cred->pgp_trustdb && !cred->keyring.data)
     *status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
@@ -183,7 +179,6 @@ _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
     }
 
   ret = gnutls_openpgp_key_get_fingerprint (key, fpr, fprlen);
-
   gnutls_openpgp_key_deinit (key);
   if (ret < 0)
     {

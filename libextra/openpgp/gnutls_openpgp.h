@@ -11,7 +11,6 @@
 typedef struct
 {
   int type;
-  int armored;
   size_t size;
   uint8_t *data;
 } keybox_blob;

@@ -5,30 +5,36 @@
 # include <config.h>
 #endif
 
+/* The format the OpenPGP key is stored in. */
 typedef enum gnutls_openpgp_key_fmt_t
 {
-  GNUTLS_OPENPGP_FMT_RAW, GNUTLS_OPENPGP_FMT_BASE64
+  GNUTLS_OPENPGP_FMT_RAW, 
+  GNUTLS_OPENPGP_FMT_BASE64
 } gnutls_openpgp_key_fmt_t;
 
 #ifdef ENABLE_OPENPGP
 
-# include <opencdk.h>
+#include <opencdk.h>
 
+/* Internal context to store the OpenPGP key. */
 typedef struct gnutls_openpgp_key_int
 {
   cdk_kbnode_t knode;
-  cdk_stream_t inp;
 } gnutls_openpgp_key_int;
 
+
+/* Internal context to store the private OpenPGP key. */
 typedef struct gnutls_openpgp_privkey_int
 {
   gnutls_privkey pkey;
 } gnutls_openpgp_privkey_int;
 
+
 typedef struct gnutls_openpgp_keyring_int
 {
-  cdk_keydb_hd_t hd;
+  cdk_keydb_hd_t db;
 } gnutls_openpgp_keyring_int;
+
 
 typedef struct gnutls_openpgp_trustdb_int
 {
@@ -39,9 +45,8 @@ typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
 typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb_t;
 
 int _gnutls_map_cdk_rc (int rc);
-int
-gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
-			     int idx, char *buf, size_t * sizeof_buf);
+int gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
+				 int idx, char *buf, size_t * sizeof_buf);
 int gnutls_openpgp_key_get_fingerprint (gnutls_openpgp_key_t key,
 					void *fpr, size_t * fprlen);
 gnutls_pk_algorithm_t

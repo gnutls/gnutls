@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
- * Author: Nikos Mavroyanopoulos
+ * Author: Nikos Mavroyanopoulos, Timo Schulz
  *
  * This file is part of GNUTLS-EXTRA.
  *
@@ -37,43 +37,42 @@
  */
 
 /**
-  * gnutls_openpgp_keyring_init - This function initializes a gnutls_openpgp_keyring_t structure
-  * @keyring: The structure to be initialized
-  *
-  * This function will initialize an OpenPGP keyring structure. 
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_openpgp_keyring_init - This function initializes a gnutls_openpgp_keyring_t structure
+ * @keyring: The structure to be initialized
+ *
+ * This function will initialize an OpenPGP keyring structure. 
+ *
+ * Returns 0 on success.
+ *
+ **/
 int
 gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring)
 {
   *keyring = gnutls_calloc (1, sizeof (gnutls_openpgp_keyring_int));
 
   if (*keyring)
-    {
-      return 0;			/* success */
-    }
+    return 0; /* success */
   return GNUTLS_E_MEMORY_ERROR;
 }
 
+
 /**
-  * gnutls_openpgp_keyring_deinit - This function deinitializes memory used by a gnutls_openpgp_keyring_t structure
-  * @keyring: The structure to be initialized
-  *
-  * This function will deinitialize a CRL structure. 
-  *
-  **/
+ * gnutls_openpgp_keyring_deinit - This function deinitializes memory used by a gnutls_openpgp_keyring_t structure
+ * @keyring: The structure to be initialized
+ *
+ * This function will deinitialize a keyring structure. 
+ *
+ **/
 void
 gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
 {
   if (!keyring)
     return;
 
-  if (keyring->hd)
+  if (keyring->db)
     {
-      cdk_free (keyring->hd);
-      keyring->hd = NULL;
+      cdk_keydb_free (keyring->db);
+      keyring->db = NULL;
     }
 
   gnutls_free (keyring);
@@ -89,57 +88,57 @@ gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
  *
  * Returns 0 on success (if keyid exists) and a negative error code
  * on failure.
- */
+ **/
 int
 gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 				 const unsigned char keyid[8],
 				 unsigned int flags)
 {
-  int rc;
-  cdk_pkt_pubkey_t sig_pk;
+  cdk_pkt_pubkey_t pk;
   uint32_t id[2];
 
   id[0] = _gnutls_read_uint32 (keyid);
   id[1] = _gnutls_read_uint32 (&keyid[4]);
 
-  rc = cdk_keydb_get_pk (ring->hd, id, &sig_pk);
-  if (!rc)
-    return 0;
-  else
-    return GNUTLS_E_NO_CERTIFICATE_FOUND;
+  if (!cdk_keydb_get_pk (ring->db, id, &pk))
+    {
+      cdk_pk_release (pk);
+      return 0;
+    }
+  
+  return GNUTLS_E_NO_CERTIFICATE_FOUND;
 }
 
 /**
-  * gnutls_openpgp_keyring_import - This function will import a RAW or BASE64 encoded key
-  * @keyring: The structure to store the parsed key.
-  * @data: The RAW or BASE64 encoded keyring.
-  * @format: One of gnutls_openpgp_keyring_fmt elements.
-  *
-  * This function will convert the given RAW or Base64 encoded keyring
-  * to the native gnutls_openpgp_keyring_t format. The output will be
-  * stored in 'keyring'.
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_openpgp_keyring_import - This function will import a RAW or BASE64 encoded key
+ * @keyring: The structure to store the parsed key.
+ * @data: The RAW or BASE64 encoded keyring.
+ * @format: One of gnutls_openpgp_keyring_fmt elements.
+ *
+ * This function will convert the given RAW or Base64 encoded keyring
+ * to the native gnutls_openpgp_keyring_t format. The output will be stored in 'keyring'.
+ *
+ * Returns 0 on success.
+ *
+ **/
 int
 gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
-			       const gnutls_datum_t * data,
+			       const gnutls_datum_t *data,
 			       gnutls_openpgp_key_fmt_t format)
 {
   int rc;
-  cdk_error_t err;
+  keybox_blob *blob = NULL;
 
-  if (format != GNUTLS_OPENPGP_FMT_RAW)
+
+  blob = kbx_read_blob (data, 0);
+  if (!blob)
     {
-      /* FIXME: `cdk_keydb_new ()' currently only supports raw keyrings.  */
-      rc = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-      goto leave;
+      gnutls_assert ();
+      return GNUTLS_E_OPENPGP_KEYRING_ERROR;
     }
 
-  err = cdk_keydb_new (&keyring->hd, CDK_DBTYPE_DATA,
-		       data->data, data->size);
-  if (err)
+  keyring->db = kbx_to_keydb (blob);
+  if (!keyring->db)
     {
       gnutls_assert ();
       rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
@@ -149,6 +148,7 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
   rc = 0;
 
 leave:
+  kbx_blob_release (blob);
   return rc;
 }
 
@@ -171,9 +171,7 @@ gnutls_openpgp_trustdb_init (gnutls_openpgp_trustdb_t * trustdb)
   *trustdb = gnutls_calloc (1, sizeof (gnutls_openpgp_trustdb_int));
 
   if (*trustdb)
-    {
-      return 0;			/* success */
-    }
+    return 0; /* success */
   return GNUTLS_E_MEMORY_ERROR;
 }
 
