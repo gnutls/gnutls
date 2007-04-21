@@ -89,6 +89,8 @@ Current list:
   TLS.
 - Make gnutls_certificate_get_ours return a zero-terminated array (or
   add a new API that return the size of the array).
+- Debug why www-s.uiuc.edu:443 refuse to negotiate sslv3 when we propose
+  sslv3+tls1.
 
 (+) Means high priority 
 (*) Means medium priority
