@@ -35,6 +35,7 @@
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
+#include <gnutls/pkcs11.h>
 
 #include "error.h"
 #include "read-file.h"
@@ -190,6 +191,12 @@ load_keys (void)
   unsigned int crt_num;
   int ret;
   gnutls_datum data;
+
+  ret = gnutls_certificate_set_x509_pkcs11 (xcred);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error setting keys via PKCS#11\n");
+    }
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
