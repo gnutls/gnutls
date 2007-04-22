@@ -192,7 +192,7 @@ load_keys (void)
   int ret;
   gnutls_datum data;
 
-  ret = gnutls_certificate_set_x509_pkcs11 (xcred);
+  ret = gnutls_certificate_set_pkcs11 (xcred);
   if (ret < 0)
     {
       fprintf (stderr, "Error setting keys via PKCS#11\n");
