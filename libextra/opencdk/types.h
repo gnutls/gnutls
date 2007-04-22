@@ -1,5 +1,5 @@
 /* types.h - Some type definitions
- *        Copyright (C) 2002 Timo Schulz
+ *        Copyright (C) 2002, 2003, 2007 Timo Schulz
  *
  * This file is part of OpenCDK.
  *
@@ -12,16 +12,11 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OpenCDK; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
-
 #ifndef CDK_TYPES_H
 #define CDK_TYPES_H
 
-#include <gcrypt.h> /*FIXME!*/
+#include <gcrypt.h>
 
 #ifndef HAVE_BYTE_TYPEDEF
 # undef byte
@@ -45,9 +40,5 @@
 # define DIM(v) (sizeof (v)/sizeof ((v)[0]))
 # define DIMof(type, member)   DIM(((type *)0)->member)
 #endif
-
-
-struct cdk_verify_result_s;
-typedef struct cdk_verify_result_s *_cdk_verify_result_t;
 
 #endif /* CDK_TYPES_H */

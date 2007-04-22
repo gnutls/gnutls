@@ -1,6 +1,5 @@
-/* -*- Mode: C; c-file-style: "bsd" -*-
- * stream.c - provides a STREAM object
- *        Copyright (C) 2002, 2003 Timo Schulz
+/* stream.c - The stream implementation
+ *        Copyright (C) 2002, 2003, 2007 Timo Schulz
  *
  * This file is part of OpenCDK.
  *
@@ -13,14 +12,9 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OpenCDK; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
-
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 #include <assert.h>
 #include <stdio.h>
@@ -38,44 +32,99 @@
 #include "stream.h"
 #include "types.h"
 
+/* This is the maximal amount of bytes we map. */
+#define MAX_MAP_SIZE 16777216
 
-static int stream_flush( cdk_stream_t s );
-static int stream_filter_write( cdk_stream_t s );
-static int stream_cache_flush( cdk_stream_t s, FILE * fp );
+static int stream_flush (cdk_stream_t s);
+static int stream_filter_write (cdk_stream_t s);
+static int stream_cache_flush (cdk_stream_t s, FILE *fp);
 
 
 /**
- * cdk_stream_open: create a new stream based on an existing file.
+ * cdk_stream_open:
  * @file: The file to open
  * @ret_s: The new STREAM object
+ * 
+ * Create a new stream based on an existing file. The stream is
+ * opened in read-only mode.
  **/
 cdk_error_t
-cdk_stream_open( const char * file, cdk_stream_t * ret_s )
+cdk_stream_open (const char *file, cdk_stream_t *ret_s)
 {
-    cdk_stream_t s;
+  return _cdk_stream_open_mode (file, "rb", ret_s);
+}
 
-    if( !file || !ret_s )
-        return CDK_Inv_Value;
 
-    _cdk_log_debug( "open stream `%s'\n", file );
-    *ret_s = NULL;
-    s = cdk_calloc( 1, sizeof *s );
-    if( !s )
-        return CDK_Out_Of_Core;
-    s->fname = cdk_strdup( file );
-    if( !s->fname ) {
-        cdk_free( s );
-        return CDK_Out_Of_Core;
+/* Helper function to allow to open a stream in different modes. */
+cdk_error_t
+_cdk_stream_open_mode (const char *file, const char *mode, cdk_stream_t *ret_s)
+{
+  cdk_stream_t s;
+  
+  if (!file || !ret_s)
+    return CDK_Inv_Value;
+  
+  _cdk_log_debug ("open stream `%s'\n", file);
+  *ret_s = NULL;
+  s = cdk_calloc (1, sizeof *s);
+  if (!s)
+    return CDK_Out_Of_Core;
+  s->fname = cdk_strdup (file);
+  if (!s->fname) 
+    {
+      cdk_free (s);
+      return CDK_Out_Of_Core;
     }
-    s->fp = fopen( file, "rb" );
-    if( !s->fp ) {
-        cdk_free( s->fname );
-        cdk_free( s );
-        return CDK_File_Error;
+  s->fp = fopen (file, mode);
+  if (!s->fp) 
+    {
+      cdk_free (s->fname);
+      cdk_free (s);
+      return CDK_File_Error;
     }
-    s->flags.write = 0;
-    *ret_s = s;
-    return 0;
+  _cdk_log_debug ("open stream fd=%d\n", fileno (s->fp));
+  s->flags.write = 0;
+  *ret_s = s;
+  return 0;
+}
+
+
+/**
+ * cdk_stream_new_from_cbs:
+ * @cbs: the callback context with all user callback functions
+ * @opa: opaque handle which is passed to all callbacks.
+ * @ret_s: the allocated stream
+ * 
+ * This function creates a stream which uses user callback
+ * for the core operations (open, close, read, write, seek).
+ */
+cdk_error_t
+cdk_stream_new_from_cbs (cdk_stream_cbs_t cbs, void *opa,
+			 cdk_stream_t *ret_s)
+{
+  cdk_stream_t s;
+
+  if (!opa)
+    return CDK_Inv_Value;
+    
+  *ret_s = NULL;
+  s = cdk_calloc (1, sizeof *s);
+  if (!s)
+    return CDK_Out_Of_Core;
+  
+  s->cbs.read = cbs->read;
+  s->cbs.write = cbs->write;
+  s->cbs.seek = cbs->seek;
+  s->cbs.release = cbs->release;
+  s->cbs.open = cbs->open;
+  s->cbs_hd = opa;
+  *ret_s = s;
+  
+  /* If there is a user callback for open, we need to call it
+     here because read/write expects an open stream. */
+  if (s->cbs.open)
+    return s->cbs.open (s->cbs_hd);  
+  return 0;
 }
 
 
@@ -85,36 +134,40 @@ cdk_stream_open( const char * file, cdk_stream_t * ret_s )
  * @ret_s: The new STREAM object
  **/
 cdk_error_t
-cdk_stream_new( const char * file, cdk_stream_t * ret_s )
+cdk_stream_new (const char *file, cdk_stream_t *ret_s)
 {
-    cdk_stream_t s;
-
-    if( !ret_s )
-        return CDK_Inv_Value;
-
-    _cdk_log_debug( "new stream `%s'\n", file? file : "[temp]" );
-    *ret_s = NULL;
-    s = cdk_calloc( 1, sizeof *s );
-    if( !s )
-        return CDK_Out_Of_Core;  
-    s->flags.write = 1;
-    if( !file )
-        s->flags.temp = 1;
-    else {
-        s->fname = cdk_strdup( file );
-        if( !s->fname ) {
-            cdk_free( s );
-            return CDK_Out_Of_Core;
-        }
+  cdk_stream_t s;
+  
+  if (!ret_s)
+    return CDK_Inv_Value;
+  
+  _cdk_log_debug ("new stream `%s'\n", file? file : "[temp]");
+  *ret_s = NULL;
+  s = cdk_calloc (1, sizeof *s);
+  if (!s)
+    return CDK_Out_Of_Core;  
+  s->flags.write = 1;
+  if (!file)
+    s->flags.temp = 1;
+  else 
+    {
+      s->fname = cdk_strdup (file);
+      if (!s->fname) 
+	{
+	  cdk_free (s);
+	  return CDK_Out_Of_Core;
+	}
     }
-    s->fp = tmpfile( );
-    if( !s->fp ) {
-        cdk_free( s->fname );
-        cdk_free( s );
-        return CDK_File_Error;
+  s->fp = tmpfile ();
+  if (!s->fp) 
+    {
+      cdk_free (s->fname);
+      cdk_free (s);
+      return CDK_File_Error;
     }
-    *ret_s = s;
-    return 0;
+  _cdk_log_debug ("new stream fd=%d\n", fileno (s->fp));
+  *ret_s = s;
+  return 0;
 }
 
 
@@ -127,161 +180,192 @@ cdk_stream_new( const char * file, cdk_stream_t * ret_s )
  * this kind of stream and everything is written directly to the stream.
  **/
 cdk_error_t
-cdk_stream_create( const char * file, cdk_stream_t * ret_s )
+cdk_stream_create (const char *file, cdk_stream_t *ret_s)
 {
-    cdk_stream_t s;
-
-    if( !file || !ret_s )
-        return CDK_Inv_Value;
-    
-    _cdk_log_debug( "create stream `%s'\n", file );
-    *ret_s = NULL;
-    s = cdk_calloc( 1, sizeof * s );
-    if( !s )
-        return CDK_Out_Of_Core;
-    s->flags.write = 1;
-    s->flags.filtrated = 1;
-    s->fname = cdk_strdup( file );
-    if( !s->fname ) {
-        cdk_free( s );
-        return CDK_Out_Of_Core;
-    }
-    s->fp = fopen( file, "w+b" );
-    if( !s->fp ) {
-        cdk_free( s->fname );
-        cdk_free( s );
-        return CDK_Out_Of_Core;
-    }
-    *ret_s = s;
-    return 0;
-}
-    
-
-cdk_stream_t
-cdk_stream_tmp( void )
-{
-    cdk_stream_t s;
-    int rc = cdk_stream_new( NULL, &s );
-    if( !rc )
-        return s;
-    return NULL;
-}
-
-
-cdk_stream_t
-cdk_stream_tmp_from_mem( const void * buf, size_t count )
-{
-    cdk_stream_t s;
-    int nwritten;
-
-    s = cdk_stream_tmp( );
-    if( !s )
-        return NULL;
+  cdk_stream_t s;
   
-    nwritten = cdk_stream_write( s, buf, count );
-    if( nwritten == EOF ) {
-        cdk_stream_close( s );
-        return NULL;
+  if (!file || !ret_s)
+    return CDK_Inv_Value;
+    
+  _cdk_log_debug ("create stream `%s'\n", file);
+  *ret_s = NULL;
+  s = cdk_calloc (1, sizeof *s);
+  if (!s)
+    return CDK_Out_Of_Core;
+  s->flags.write = 1;
+  s->flags.filtrated = 1;
+  s->fname = cdk_strdup (file);
+  if (!s->fname)
+    {
+      cdk_free (s);
+      return CDK_Out_Of_Core;
     }
-    cdk_stream_seek( s, 0 );
-    return s;
+  s->fp = fopen (file, "w+b");
+  if (!s->fp)
+    {
+      cdk_free (s->fname);
+      cdk_free (s);
+      return CDK_File_Error;
+    }
+  _cdk_log_debug ("stream create fd=%d\n", fileno (s->fp));
+  *ret_s = s;
+  return 0;
+}
+    
+
+/**
+ * cdk_stream_tmp_new:
+ * @r_out: the new temp stream.
+ * 
+ * Allocate a new tempory stream which is not associated with a file.
+ */
+cdk_error_t
+cdk_stream_tmp_new (cdk_stream_t *r_out)
+{
+  return cdk_stream_new (NULL, r_out);
+}
+
+
+
+/**
+ * cdk_stream_tmp_from_mem:
+ * @buf: the buffer which shall be written to the temp stream.
+ * @buflen: how large the buffer is
+ * @r_out: the new stream with the given contents.
+ * 
+ * Create a new tempory stream with the given contests.
+ */
+cdk_error_t
+cdk_stream_tmp_from_mem (const void *buf, size_t buflen, cdk_stream_t *r_out)
+{
+  cdk_stream_t s;
+  cdk_error_t rc;
+  int nwritten;
+  
+  *r_out = NULL;
+  rc = cdk_stream_tmp_new (&s);
+  if (rc)
+    return rc;
+  
+  nwritten = cdk_stream_write (s, buf, buflen);
+  if (nwritten == EOF)
+    {
+      cdk_stream_close (s);
+      return CDK_File_Error;
+    }
+  cdk_stream_seek (s, 0);
+  *r_out = s;
+  return 0;
 }
 
   
-
-cdk_stream_t
-_cdk_stream_fpopen( FILE * fp, unsigned write_mode )
+cdk_error_t
+_cdk_stream_fpopen (FILE *fp, unsigned write_mode, cdk_stream_t *ret_out)
 {
   cdk_stream_t s;
 
-  s = cdk_calloc( 1, sizeof *s );
-  if( !s )
-    return NULL;
+  *ret_out = NULL;
+  s = cdk_calloc (1, sizeof *s);
+  if (!s)
+    return CDK_Out_Of_Core;
   
+  _cdk_log_debug ("stream ref fd=%d\n", fileno (fp));
   s->fp = fp;
+  s->fp_ref = 1;
   s->flags.filtrated = 1;
   s->flags.write = write_mode;
-
-  return s;
-}
-
-
-cdk_error_t
-_cdk_stream_append( const char * file, cdk_stream_t * ret_s )
-{
-    cdk_stream_t s;
-    FILE * fp;
-    int rc;
-
-    if( !ret_s )
-        return CDK_Inv_Value;
-    rc = cdk_stream_open( file, &s );
-    if( rc )
-        return rc;
-    fp = fopen( file, "a+b" );
-    if( !fp ) {
-        cdk_stream_close( s );
-        return CDK_File_Error;
-    }
-    fclose( s->fp );
-    s->fp = fp;
-    s->flags.write = 1;
-    *ret_s = s;
-    return 0;
-}
-
-      
-int
-cdk_stream_control( cdk_stream_t s, int ctl, int val )
-{
-    if( !s )
-        return CDK_Inv_Value;
-
-    if( val == -1 ) {
-        switch( ctl ) {
-        case CDK_STREAMCTL_COMPRESSED: return s->flags.compressed;
-        }
-        return 0;
-    }
-    switch( ctl ) {
-    case CDK_STREAMCTL_DISABLE: s->flags.no_filter = val; break;
-    case CDK_STREAMCTL_COMPRESSED: s->flags.compressed = val; break;
-    default                   : return CDK_Inv_Mode;
-    }
-    return 0;
-}
-
-
-cdk_error_t
-cdk_stream_flush( cdk_stream_t s )
-{
-    int rc = 0;
   
-    if( !s )
-        return CDK_Inv_Value;
+  *ret_out = s;
+  return 0;
+}
 
-    if( !s->flags.filtrated ) {
-        if( !cdk_stream_get_length( s ) )
-            return 0;
-        rc = cdk_stream_seek( s, 0 );
-        if( !rc )
-            rc = stream_flush( s );
-        if( !rc ) {
-            rc = stream_filter_write( s );
-            if( rc )
-                s->error = rc;
-        }
-        s->flags.filtrated = 1;
-    }
+
+cdk_error_t
+_cdk_stream_append (const char *file, cdk_stream_t *ret_s)
+{
+  cdk_stream_t s;
+  cdk_error_t rc;
+
+  if (!ret_s)
+    return CDK_Inv_Value;
+  *ret_s = NULL;
+  
+  rc = _cdk_stream_open_mode (file, "a+b", &s);
+  if (rc)
     return rc;
+  
+  /* In the append mode, we need to write to the flag. */
+  s->flags.write = 1;
+  *ret_s = s;
+  return 0;
+}
+
+
+/**
+ * cdk_stream_is_compressed:
+ * @s: the stream
+ * 
+ * Return 0 if the stream is uncompressed, otherwise the
+ * compression algorithm.
+ */
+int
+cdk_stream_is_compressed (cdk_stream_t s)
+{
+  if (!s)
+    return 0;
+  return s->flags.compressed;
+}
+
+void
+_cdk_stream_set_compress_algo (cdk_stream_t s, int algo)
+{
+  if (!s)
+    return;
+  s->flags.compressed = algo;
+}
+
+
+cdk_error_t
+cdk_stream_flush (cdk_stream_t s)
+{
+  cdk_error_t rc;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  
+  /* The user callback does not support flush */
+  if (s->cbs_hd)
+    return 0;
+  
+  /* For read-only streams, no flush is needed. */
+  if (!s->flags.write)
+    return 0;
+  
+  if (!s->flags.filtrated)
+    {
+      if (!cdk_stream_get_length (s))
+	return 0;
+      rc = cdk_stream_seek (s, 0);
+      if (!rc)
+	rc = stream_flush (s);
+      if (!rc)
+	rc = stream_filter_write (s);
+      s->flags.filtrated = 1;
+      if (rc)
+	{
+	  s->error = rc;
+	  return rc;
+	}      
+    }
+  return 0;
 }
 
 
 void
-cdk_stream_tmp_set_mode( cdk_stream_t s, int val )
+cdk_stream_tmp_set_mode (cdk_stream_t s, int val)
 {
-    if( s && s->flags.temp )
-        s->fmode = val;
+  if (s && s->flags.temp)
+    s->fmode = val;
 }
 
 
@@ -296,38 +380,64 @@ cdk_stream_tmp_set_mode( cdk_stream_t s, int val )
  * filters now. The file is closed in the filter function and not here.
  **/
 cdk_error_t
-cdk_stream_close( cdk_stream_t s )
+cdk_stream_close (cdk_stream_t s)
 {
-    struct stream_filter_s * f, * f2;
-    int rc = 0;
-
-    if( !s )
-        return CDK_Inv_Value;
+  struct stream_filter_s *f, *f2;
+  cdk_error_t rc;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  
+  _cdk_log_debug ("close stream ref=%d `%s'\n", 
+		  s->fp_ref, s->fname? s->fname : "[temp]");
+  
+  /* In the user callback mode, we call the release cb if possible
+     and just free the stream. */
+  if (s->cbs_hd)
+    {
+      if (s->cbs.release)
+	rc = s->cbs.release (s->cbs_hd);
+      else
+	rc = 0;
+      cdk_free (s);
+      return rc;
+    } 
     
-    _cdk_log_debug( "close stream `%s'\n", s->fname? s->fname : "[temp]" );
-    
-    if( !s->flags.filtrated && !s->error )
-        rc = cdk_stream_flush( s );
-    if( s->fname || s->flags.temp ) {
-        rc = fclose( s->fp );
-        s->fp = NULL;
-        if( rc )
-            rc = CDK_File_Error;
+  
+  rc = 0;
+  if (!s->flags.filtrated && !s->error)
+    rc = cdk_stream_flush (s);
+  if (!s->fp_ref && (s->fname || s->flags.temp))
+    {      
+      int err;
+      
+      _cdk_log_debug ("close stream fd=%d\n", fileno (s->fp));
+      err = fclose (s->fp);
+      s->fp = NULL;
+      if (err)
+	rc = CDK_File_Error;
     }
-    f = s->filters;
-    while( f ) {
-        f2 = f->next;
-        if( f->fnct )
-            f->fnct( f->opaque, STREAMCTL_FREE, NULL, NULL );
-        cdk_free( f );
-        f = f2;
+  
+  /* Iterate over the filter list and use the cleanup flag to
+     free the allocated internal structures. */
+  f = s->filters;
+  while (f)
+    {
+      f2 = f->next;
+      if (f->fnct)
+	f->fnct (f->opaque, STREAMCTL_FREE, NULL, NULL);
+      cdk_free (f);
+      f = f2;
     }
-    if( s->fname ) {
-        cdk_free( s->fname );
-        s->fname = NULL;
+  
+  if (s->fname)
+    {
+      cdk_free (s->fname);
+      s->fname = NULL;
     }
-    cdk_free( s );
-    return rc;
+  
+  cdk_free (s);
+  return rc;
 }
 
 
@@ -338,30 +448,32 @@ cdk_stream_close( cdk_stream_t s )
  * This function will only work with read streams.
  **/
 int
-cdk_stream_eof( cdk_stream_t s )
+cdk_stream_eof (cdk_stream_t s)
 {
-    return s? s->flags.eof : -1;
+  return s? s->flags.eof : -1;
 }
 
 
-const char *
-_cdk_stream_get_fname( cdk_stream_t s )
+const char*
+_cdk_stream_get_fname (cdk_stream_t s)
 {
-    return s? s->fname : NULL;
+  return s? s->fname : NULL;
 }
 
 
-FILE *
-_cdk_stream_get_fp( cdk_stream_t s )
+/* Return the underlying FP of the stream.
+   WARNING: This handle should not be closed. */
+FILE*
+_cdk_stream_get_fp (cdk_stream_t s)
 {
-    return s? s->fp : NULL;
+  return s? s->fp : NULL;
 }
 
 
 int
-_cdk_stream_get_errno( cdk_stream_t s )
+_cdk_stream_get_errno (cdk_stream_t s)
 {
-    return s? s->error : CDK_Inv_Value;
+  return s? s->error : CDK_Inv_Value;
 }
 
 
@@ -369,114 +481,127 @@ _cdk_stream_get_errno( cdk_stream_t s )
  * cdk_stream_get_length: Return the length of the associated file handle.
  * @s: The STREAM object.
  *
- * This file only works for read stream because it's likely that the
- * write stream is not flushed or even no data was inserted.
+ * This function should work for both read and write streams. For write
+ * streams an additional flush is used to write possible pending data.
  **/
-unsigned
-cdk_stream_get_length( cdk_stream_t s )
+off_t
+cdk_stream_get_length (cdk_stream_t s)
 {
-    struct stat statbuf;
-    int rc;
-
-    if( !s )
-        return (unsigned)-1;
-    
-    rc = stream_flush( s );
-    if( rc ) {
-        s->error = CDK_File_Error;
-        return (unsigned)-1;
+  struct stat statbuf;
+  cdk_error_t rc;
+  
+  if (!s)
+    return (off_t)-1;
+  
+  /* The user callback does not support stat. */
+  if (s->cbs_hd)
+    return 0; 
+  
+  rc = stream_flush (s);
+  if (rc)
+    {
+      s->error = rc;
+      return (off_t)-1;
     }
-    if( fstat( fileno( s->fp ), &statbuf ) ) {
-        s->error = CDK_File_Error;
-        return (unsigned)-1;
+  
+  if (fstat (fileno (s->fp), &statbuf))
+    {
+      s->error = CDK_File_Error;
+      return (off_t)-1;
     }
-    return statbuf.st_size;
+  
+  return statbuf.st_size;
 }
 
 
-static struct stream_filter_s *
-filter_add2( cdk_stream_t s )
+static struct stream_filter_s*
+filter_add2 (cdk_stream_t s)
 {
-    struct stream_filter_s * f;
-
-    assert( s );
-    
-    f = cdk_calloc( 1, sizeof *f );
-    if( !f )
-        return NULL;
-    f->next = s->filters;
-    s->filters = f;
-    return f;
-}
-
-
-static struct stream_filter_s *
-filter_search( cdk_stream_t s, filter_fnct_t fnc )
-{
-    struct stream_filter_s * f;
-
-    assert( s );
-    
-    for( f = s->filters; f; f = f->next ) {
-        if( f->fnct == fnc )
-            return f;
-    }
+  struct stream_filter_s *f;
+  
+  assert (s);
+  
+  f = cdk_calloc (1, sizeof *f);
+  if (!f)
     return NULL;
+  f->next = s->filters;
+  s->filters = f;
+  return f;
 }
 
 
-struct stream_filter_s *
-filter_add( cdk_stream_t s, filter_fnct_t fnc, int type )
+static struct stream_filter_s *
+filter_search (cdk_stream_t s, filter_fnct_t fnc)
 {
-    struct stream_filter_s * f;
-
-    assert( s );
-    
-    s->flags.filtrated = 0;
-    f = filter_search( s, fnc );
-    if( f )
-        return f;
-    f = filter_add2( s );
-    if( !f )
-        return NULL;
-    f->fnct = fnc;
-    f->flags.enabled = 1;
-    f->tmp = NULL;
-    f->type = type;
-    switch( type ) {
-    case fARMOR    : f->opaque = &f->u.afx; break;
-    case fCIPHER   : f->opaque = &f->u.cfx; break;
-    case fLITERAL: f->opaque = &f->u.pfx; break;
-    case fCOMPRESS : f->opaque = &f->u.zfx; break;
-    case fHASH     : f->opaque = &f->u.mfx; break;
-    case fTEXT     : f->opaque = &f->u.tfx; break;
-    default        : f->opaque = NULL;
+  struct stream_filter_s * f;
+  
+  assert (s);
+  
+  for( f = s->filters; f; f = f->next ) 
+    {
+      if (f->fnct == fnc)
+	return f;
     }
+  
+  return NULL;
+}
+
+
+struct stream_filter_s*
+filter_add (cdk_stream_t s, filter_fnct_t fnc, int type)
+{
+  struct stream_filter_s *f;
+  
+  assert (s);
+    
+  s->flags.filtrated = 0;
+  f = filter_search (s, fnc);
+  if (f)
     return f;
+  f = filter_add2 (s);
+  if (!f)
+    return NULL;
+  f->fnct = fnc;
+  f->flags.enabled = 1;
+  f->tmp = NULL;
+  f->type = type;
+  switch (type) 
+    {    
+    case fARMOR   : f->opaque = &f->u.afx; break;
+    case fCIPHER  : f->opaque = &f->u.cfx; break;
+    case fLITERAL : f->opaque = &f->u.pfx; break;
+    case fCOMPRESS: f->opaque = &f->u.zfx; break;
+    case fHASH    : f->opaque = &f->u.mfx; break;
+    case fTEXT    : f->opaque = &f->u.tfx; break;
+    default       : f->opaque = NULL;
+    }
+  
+  return f;
 }
 
 
 static int
-stream_get_mode( cdk_stream_t s )
+stream_get_mode (cdk_stream_t s)
 {
-    assert( s );
-    
-    if( s->flags.temp )
-        return s->fmode;
-    return s->flags.write;
+  assert (s);
+  
+  if (s->flags.temp)
+    return s->fmode;
+  return s->flags.write;
 }
 
 
 static filter_fnct_t
-stream_id_to_filter( int type )
+stream_id_to_filter (int type)
 {
-    switch( type ) {
-    case fARMOR    : return _cdk_filter_armor;
-    case fLITERAL: return _cdk_filter_literal;
-    case fTEXT     : return _cdk_filter_text;
-    case fCIPHER   : return _cdk_filter_cipher;
-    case fCOMPRESS : return _cdk_filter_compress;
-    default        : return NULL;
+  switch (type) 
+    {
+    case fARMOR   : return _cdk_filter_armor;
+    case fLITERAL : return _cdk_filter_literal;
+    case fTEXT    : return _cdk_filter_text;
+    case fCIPHER  : return _cdk_filter_cipher;
+    case fCOMPRESS: return _cdk_filter_compress;
+    default       : return NULL;
     }
 }
 
@@ -488,47 +613,53 @@ stream_id_to_filter( int type )
  *
  **/
 cdk_error_t
-cdk_stream_filter_disable( cdk_stream_t s, int type )
+cdk_stream_filter_disable (cdk_stream_t s, int type)
 {
-    struct stream_filter_s * f;
-    filter_fnct_t fnc;
-
-    if( !s )
-        return CDK_Inv_Value;
-    fnc = stream_id_to_filter( type  );
-    f = filter_search( s, fnc );
-    if( f )
-        f->flags.enabled = 0;
-    return 0;
+  struct stream_filter_s *f;
+  filter_fnct_t fnc;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  
+  fnc = stream_id_to_filter (type);
+  if (!fnc)
+    return CDK_Inv_Value;
+  f = filter_search (s, fnc);
+  if (f)
+    f->flags.enabled = 0;
+  return 0;
 }
 
 
-static int
-stream_fp_replace( cdk_stream_t s, FILE ** tmp )
+/* WARNING: tmp should not be closed by the caller. */
+static cdk_error_t
+stream_fp_replace (cdk_stream_t s, FILE **tmp)
 {
-    int rc;
-
-    assert( s );
+  int rc;
   
-    rc = fclose( s->fp );
-    if( rc )
-        return CDK_File_Error;
-    s->fp = *tmp;
-    *tmp = NULL;
-    return 0;
+  assert (s);
+  
+  _cdk_log_debug ("replace stream fd=%d with fd=%d\n", 
+		  fileno (s->fp), fileno (*tmp));
+  rc = fclose (s->fp);
+  if (rc)
+    return CDK_File_Error;
+  s->fp = *tmp;
+  *tmp = NULL;
+  return 0;
 }
 
 
 /* This function is exactly like filter_read, except the fact that we can't
    use tmpfile () all the time. That's why we open the real file when there
    is no last filter. */
-static int
-stream_filter_write( cdk_stream_t s )
+static cdk_error_t
+stream_filter_write (cdk_stream_t s)
 {
     struct stream_filter_s * f;
-    int rc = 0;
+    cdk_error_t rc = 0;
 
-    assert( s );
+    assert (s);
     
     if( s->flags.filtrated )
         return CDK_Inv_Value;
@@ -556,12 +687,13 @@ stream_filter_write( cdk_stream_t s )
                 break;
         }
         rc = f->fnct( f->opaque, f->ctl, s->fp, f->tmp );
-        _cdk_log_debug( "filter [write]: type=%d rc=%d\n", f->type, rc );
+        _cdk_log_debug ("filter [write]: type=%d rc=%d\n", f->type, rc);
         if( !rc )
             rc = stream_fp_replace( s, &f->tmp );
         if( !rc )
             rc = cdk_stream_seek( s, 0 );
         if( rc ) {
+	    _cdk_log_debug ("filter [close]: fd=%d\n", fileno (f->tmp));
             fclose( f->tmp );
             break;
         }
@@ -575,69 +707,86 @@ stream_filter_write( cdk_stream_t s )
    Create a tempfile and use it for the output of the filter. Then the
    original file handle will be closed and replace with the temp handle.
    The file pointer will be set to the begin and the game starts again. */
-static int
-stream_filter_read( cdk_stream_t s )
+static cdk_error_t
+stream_filter_read (cdk_stream_t s)
 {
-    struct stream_filter_s * f;
-    int rc = 0;
+  struct stream_filter_s *f;
+  cdk_error_t rc = 0;
 
-    assert( s );
-    
-    if( s->flags.filtrated )
-        return 0;
-
-    for( f = s->filters; f; f = f->next ) {
-        if( !f->flags.enabled )
-            continue;
-        f->tmp = tmpfile( );
-        if( !f->tmp ) {
-            rc = CDK_File_Error;
-            break;
+  assert (s);
+  
+  if (s->flags.filtrated)
+    return 0;
+  
+  for (f = s->filters; f; f = f->next)
+    {
+      if (!f->flags.enabled)
+	continue;
+      if (f->flags.error)
+	{
+	  _cdk_log_debug ("filter %s [read]: has the error flag; skipped\n",
+			  s->fname? s->fname: "[temp]");
+	  continue;
+	}
+     
+      f->tmp = tmpfile ();
+      if (!f->tmp)
+	{
+	  rc = CDK_File_Error;
+	  break;
         }
-        rc = f->fnct( f->opaque, f->ctl, s->fp, f->tmp );
-        _cdk_log_debug( "filter %s [read]: type=%d rc=%d\n",
-                        s->fname? s->fname : "[temp]", f->type, rc );
-        if( rc )
-            break;
+      rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
+      _cdk_log_debug ("filter %s [read]: type=%d rc=%d\n",
+		      s->fname? s->fname : "[temp]", f->type, rc);
+      if (rc)
+	{
+	  f->flags.error = 1;
+	  break;
+	}     
       
-        /* if the filter is read-only, do not replace the FP because
-           the contents were not altered in any way. */
-        if( !f->flags.rdonly ) {
-            rc = stream_fp_replace( s, &f->tmp );
-            if( rc )
-                break;
+      f->flags.error = 0;
+      /* If the filter is read-only, do not replace the FP because
+         the contents were not altered in any way. */
+        if (!f->flags.rdonly)
+	{
+	  rc = stream_fp_replace (s, &f->tmp);
+	  if (rc)
+	    break;
         }
-        else {
-            fclose( f->tmp );
-            f->tmp = NULL;
+      else 
+	{
+	  fclose (f->tmp);
+	  f->tmp = NULL;
         }
-        rc = cdk_stream_seek( s, 0 );
-        if( rc )
-            break;
-        /* Disable the filter after it was successfully used. The idea
-           is the following: let's say the armor filter was pushed and
-           later more filters were added. The second time the filter code
-           will be executed, only the new filter should be started but
-           not the old because we already used it. */
-        f->flags.enabled = 0;
+      rc = cdk_stream_seek (s, 0);
+      if (rc)
+	break;
+      /* Disable the filter after it was successfully used. The idea
+         is the following: let's say the armor filter was pushed and
+         later more filters were added. The second time the filter code
+         will be executed, only the new filter should be started but
+         not the old because we already used it. */
+      f->flags.enabled = 0;
     }
-    return rc;
+  
+  return rc;
 }
 
 
-void *
-_cdk_stream_get_opaque( cdk_stream_t s, int fid )
+void*
+_cdk_stream_get_opaque (cdk_stream_t s, int fid)
 {
-    struct stream_filter_s * f;
-
-    if( !s )
-        return NULL;
-    
-    for( f = s->filters; f; f = f->next ) {
-        if( f->type == fid )
-            return f->opaque;
-    }
+  struct stream_filter_s * f;
+  
+  if (!s)
     return NULL;
+  
+  for (f = s->filters; f; f = f->next)
+    {
+      if (f->type == fid)
+	return f->opaque;
+    }
+  return NULL;
 }
 
 
@@ -652,51 +801,62 @@ _cdk_stream_get_opaque( cdk_stream_t s, int fid )
  * need to add the filters in reserved order.
  **/
 int
-cdk_stream_read( cdk_stream_t s, void * buf, size_t count )
+cdk_stream_read (cdk_stream_t s, void * buf, size_t count)
 {
-    int nread;
-    int rc;
-
-    if( !s )
-        return EOF;
-    
-    if( s->flags.write && !s->flags.temp )
-        return EOF; /* this is a write stream */
+  int nread;
+  int rc;
   
-    if( !s->flags.no_filter && !s->cache.on && !s->flags.filtrated ) {
-        rc = stream_filter_read( s );
-        if( rc ) {
-            s->error = rc;
-            return EOF;
-        }
-        s->flags.filtrated = 1;
+  if (!s)
+    return EOF;
+  
+  if (s->cbs_hd)
+    {
+      if (s->cbs.read)
+	return s->cbs.read (s->cbs_hd, buf, count);
+      return 0;
+    } 
+    
+  if (s->flags.write && !s->flags.temp)
+    return EOF; /* this is a write stream */
+  
+  if (!s->flags.no_filter && !s->cache.on && !s->flags.filtrated)
+    {
+      rc = stream_filter_read (s);
+      if (rc) 
+	{
+	  s->error = rc;
+	  if (feof (s->fp))
+	    s->flags.eof = 1;
+	  return EOF;
+	}
+      s->flags.filtrated = 1;
     }
-    if( !buf && !count )
-        return 0;
-    nread = fread( buf, 1, count, s->fp );  
-    if( !nread )
-        nread = EOF;
-    if( feof( s->fp ) )
-        s->flags.eof = 1;
-    return nread;
+  if (!buf && !count)
+    return 0;
+  nread = fread (buf, 1, count, s->fp);
+  if (!nread)
+    nread = EOF;
+  if (feof (s->fp))
+    s->flags.eof = 1;
+  return nread;
 }
 
       
 int
-cdk_stream_getc( cdk_stream_t s )
+cdk_stream_getc (cdk_stream_t s)
 {
-    unsigned char buf[2];
-    int nread;
-
-    if( !s )
-        return EOF;
-    
-    nread = cdk_stream_read( s, buf, 1 );
-    if( nread == EOF ) {
-        s->error = CDK_File_Error;
-        return EOF;
+  unsigned char buf[2];
+  int nread;
+  
+  if (!s)
+    return EOF;  
+  nread = cdk_stream_read (s, buf, 1);
+  if (nread == EOF) 
+    {
+      s->error = CDK_File_Error;
+      return EOF;
     }
-    return buf[0];
+  return buf[0];
 }
 
 
@@ -711,293 +871,347 @@ cdk_stream_getc( cdk_stream_t s )
  * partial flushing.
  **/
 int
-cdk_stream_write( cdk_stream_t s, const void * buf, size_t count )
+cdk_stream_write (cdk_stream_t s, const void * buf, size_t count)
 {
-    int nwritten;
+  int nwritten;
 
-    if( !s )
-        return CDK_Inv_Value;
-    
-    if( !s->flags.write )
-        return CDK_Inv_Mode; /* this is a read stream */
-
-    if( !buf && !count )
-        return stream_flush( s );
-
-    if( s->cache.on ) {
-        if( s->cache.size + count > sizeof( s->cache.buf ) )
-            return CDK_EOF;
-        memcpy( s->cache.buf + s->cache.size, buf, count  );
-        s->cache.size += count;
-        return 0;
+  if (!s)
+    return EOF;
+  
+  if (s->cbs_hd)
+    {
+      if (s->cbs.write)
+	return s->cbs.write (s->cbs_hd, buf, count);
+      return 0;
+    }  
+  
+  if (!s->flags.write)
+    {
+      s->error = CDK_Inv_Mode; /* this is a read stream */
+      return EOF;
+    } 
+  
+  if (!buf && !count)
+    return stream_flush (s);
+  
+  if (s->cache.on)
+    {
+    if (s->cache.size + count > DIM (s->cache.buf))
+	return EOF;
+      memcpy (s->cache.buf + s->cache.size, buf, count);
+      s->cache.size += count;
+      return count;
     }
   
-    nwritten = fwrite( buf, 1, count, s->fp );
-    if( !nwritten )
-        nwritten = EOF;  
-    return nwritten;
+  nwritten = fwrite (buf, 1, count, s->fp);
+  if (!nwritten)
+    nwritten = EOF;  
+  return nwritten;
 }
 
 
 int
-cdk_stream_putc( cdk_stream_t s, int c )
+cdk_stream_putc (cdk_stream_t s, int c)
 {
-    unsigned char buf[2];
-    int nwritten;
-
-    if( !s )
-        return EOF;
-    buf[0] = c;
-    nwritten = cdk_stream_write( s, buf, 1 );
-    if( nwritten == EOF ) {
-        s->error = CDK_File_Error;
-        return EOF;
-    }
-    return 0;
+  byte buf[2];
+  int nwritten;
+  
+  if (!s)
+    return EOF;
+  buf[0] = c;
+  nwritten = cdk_stream_write (s, buf, 1);
+  if (nwritten == EOF) 
+    return EOF;
+  return 0;
 }
 
 
-long
-cdk_stream_tell( cdk_stream_t s )
-{
-    return s? ftell( s->fp ): (long)-1;
-}
-
-
-cdk_error_t
-cdk_stream_seek( cdk_stream_t s, long offset )
-{
-    int rc;
-
-    if( !s )
-        return CDK_Inv_Value;    
-    if( offset < cdk_stream_get_length( s ) )
-        s->flags.eof = 0;
-    rc = fseek( s->fp, offset, SEEK_SET );
-    if( rc )
-        rc = CDK_File_Error;
-    return rc;
-}
-
-
-static int
-stream_flush( cdk_stream_t s )
-{
-    int rc;
-    
-    assert( s );
-    
-    rc = fflush( s->fp  );
-    if( rc )
-        rc = CDK_File_Error;
-    return rc;
+off_t
+cdk_stream_tell (cdk_stream_t s)
+{  
+  return s? ftell (s->fp): (off_t)-1;
 }
 
 
 cdk_error_t
-cdk_stream_set_armor_flag( cdk_stream_t s, int type )
+cdk_stream_seek (cdk_stream_t s, off_t offset)
 {
-    struct stream_filter_s * f;
+  cdk_error_t rc;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  
+  if (s->cbs_hd)
+    {
+      if (s->cbs.seek)
+	return s->cbs.seek (s->cbs_hd, offset);
+      return 0;
+    }  
+    
+  if (offset < cdk_stream_get_length (s))
+    s->flags.eof = 0;
+  rc = fseek (s->fp, offset, SEEK_SET);
+  if (rc)
+    rc = CDK_File_Error;
+  return rc;
+}
 
-    if( !s )
-        return CDK_Inv_Value;
-    f = filter_add( s, _cdk_filter_armor, fARMOR );
-    if( !f )
-        return CDK_Out_Of_Core;
-    f->u.afx.idx = f->u.afx.idx2 = type;
-    f->ctl = stream_get_mode( s );
-    return 0;
+
+static cdk_error_t
+stream_flush (cdk_stream_t s)
+{
+  assert (s);
+  
+  if (fflush (s->fp))
+    return CDK_File_Error;
+  return 0;
+}
+
+
+cdk_error_t
+cdk_stream_set_armor_flag (cdk_stream_t s, int type)
+{
+  struct stream_filter_s *f;
+
+  if (!s)
+    return CDK_Inv_Value;
+  f = filter_add (s, _cdk_filter_armor, fARMOR);
+  if (!f)
+    return CDK_Out_Of_Core;
+  f->u.afx.idx = f->u.afx.idx2 = type;
+  f->ctl = stream_get_mode (s);
+  return 0;
 }
 
 
 cdk_error_t
 cdk_stream_set_literal_flag( cdk_stream_t s, int mode, const char * fname )
 {
-    struct stream_filter_s * f;
-
-    if( !s )
-        return CDK_Inv_Value;
-    f = filter_add( s, _cdk_filter_literal, fLITERAL );
-    if( !f )
-        return CDK_Out_Of_Core;
-    f->u.pfx.mode = mode;
-    f->u.pfx.filename = fname? cdk_strdup( fname ) : NULL;
-    f->ctl = stream_get_mode( s );
-    if( s->blkmode ) {
-        f->u.pfx.blkmode.on = 1;
-        f->u.pfx.blkmode.size = s->blkmode;
+  struct stream_filter_s * f;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  f = filter_add (s, _cdk_filter_literal, fLITERAL);
+  if (!f)
+    return CDK_Out_Of_Core;
+  f->u.pfx.mode = mode;
+  f->u.pfx.filename = fname? cdk_strdup( fname ) : NULL;
+  f->ctl = stream_get_mode (s);
+  if (s->blkmode)
+    {
+      f->u.pfx.blkmode.on = 1;
+      f->u.pfx.blkmode.size = s->blkmode;
     }
-    return 0;
+  return 0;
 }
 
 
 cdk_error_t
 cdk_stream_set_cipher_flag( cdk_stream_t s, cdk_dek_t dek, int use_mdc )
 {
-    struct stream_filter_s * f;
-
-    if( !s )
-        return CDK_Inv_Value;
-    f = filter_add( s, _cdk_filter_cipher, fCIPHER );
-    if( !f )
-        return CDK_Out_Of_Core;
-    dek->use_mdc = use_mdc;
-    f->ctl = stream_get_mode( s );
-    f->u.cfx.dek = dek;
-    f->u.cfx.mdc_method = use_mdc? GCRY_MD_SHA1 : 0;
-    if( s->blkmode ) {
-        f->u.cfx.blkmode.on = 1;
-        f->u.cfx.blkmode.size = s->blkmode;
+  struct stream_filter_s * f;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  f = filter_add (s, _cdk_filter_cipher, fCIPHER);
+  if( !f )
+    return CDK_Out_Of_Core;
+  dek->use_mdc = use_mdc;
+  f->ctl = stream_get_mode (s);
+  f->u.cfx.dek = dek;
+  f->u.cfx.mdc_method = use_mdc? GCRY_MD_SHA1 : 0;
+  if (s->blkmode)
+    {
+      f->u.cfx.blkmode.on = 1;
+      f->u.cfx.blkmode.size = s->blkmode;
     }
-    return 0;
+  return 0;
 }
 
 
 cdk_error_t
-cdk_stream_set_compress_flag( cdk_stream_t s, int algo, int level )
+cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
 {
-    struct stream_filter_s * f;
-
-    if( !s )
-        return CDK_Inv_Value;
-    f = filter_add( s, _cdk_filter_compress, fCOMPRESS );
-    if( !f )
-        return CDK_Out_Of_Core;
-    f->ctl = stream_get_mode( s );
-    f->u.zfx.algo = algo;
-    f->u.zfx.level = level;
-    return 0;
+  struct stream_filter_s *f;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  f = filter_add (s, _cdk_filter_compress, fCOMPRESS);
+  if (!f)
+    return CDK_Out_Of_Core;
+  f->ctl = stream_get_mode (s);
+  f->u.zfx.algo = algo;
+  f->u.zfx.level = level;
+  return 0;
 }
 
 
 cdk_error_t
-cdk_stream_set_text_flag( cdk_stream_t s, const char * lf )
+cdk_stream_set_text_flag (cdk_stream_t s, const char *lf)
 {
-    struct stream_filter_s * f;
-
-    if( !s )
-        return CDK_Inv_Value;
-    f = filter_add( s, _cdk_filter_text, fTEXT );
-    if( !f )
-        return CDK_Out_Of_Core;
-    f->ctl = stream_get_mode( s );
-    f->u.tfx.lf = lf;
-    return 0;
+  struct stream_filter_s *f;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  f = filter_add (s, _cdk_filter_text, fTEXT);
+  if (!f)
+    return CDK_Out_Of_Core;
+  f->ctl = stream_get_mode( s );
+  f->u.tfx.lf = lf;
+  return 0;
 }
 
 
 cdk_error_t
-cdk_stream_set_hash_flag( cdk_stream_t s, int algo )
+cdk_stream_set_hash_flag (cdk_stream_t s, int algo)
 {
-    struct stream_filter_s * f;
-
-    if( !s )
-        return CDK_Inv_Value;    
-    if( stream_get_mode( s ) )
-        return CDK_Inv_Mode;
-    f = filter_add( s, _cdk_filter_hash, fHASH );
-    if( !f )
-        return CDK_Out_Of_Core;
-    f->ctl = stream_get_mode( s );
-    f->u.mfx.digest_algo = algo;
-    f->flags.rdonly = 1;
-    return 0;
-}
-
-
-cdk_error_t
-cdk_stream_set_cache( cdk_stream_t s, int val )
-{
-    if( !s )
-        return CDK_Inv_Value;
-    if( !s->flags.write )
-        return CDK_Inv_Mode;
-    s->cache.on = val;
-    return 0;
-}
-
-
-static int
-stream_cache_flush( cdk_stream_t s, FILE * fp )
-{
-    int nwritten;
-
-    assert( s );
-    
-    if( s->cache.size > 0 ) {
-        nwritten = fwrite( s->cache.buf, 1, s->cache.size, fp  );
-        if( !nwritten )
-            return CDK_File_Error;
-        s->cache.size = 0;
-        s->cache.on = 0;
-        memset( s->cache.buf, 0, sizeof s->cache.buf  );
-    }
-    return 0;
-}
-
-
-cdk_error_t
-cdk_stream_kick_off( cdk_stream_t inp, cdk_stream_t out )
-{
-    byte buf[8192];
-    int nread, nwritten;
-    int rc = 0;
-
-    if( !inp || !out )
-        return CDK_Inv_Value;
-    while( !cdk_stream_eof( inp ) ) {
-        nread = cdk_stream_read( inp, buf, sizeof buf-1 );
-        if( nread == EOF )
-            break;
-        nwritten = cdk_stream_write( out, buf, nread );
-        if( nwritten == EOF )
-            rc = CDK_File_Error;
-    }
-    wipemem( buf, sizeof buf );
-    return rc;
+  struct stream_filter_s * f;
+  
+  if (!s)
+    return CDK_Inv_Value;    
+  if (stream_get_mode (s))
+    return CDK_Inv_Mode;
+  f = filter_add (s, _cdk_filter_hash, fHASH);
+  if (!f)
+    return CDK_Out_Of_Core;
+  f->ctl = stream_get_mode (s);
+  f->u.mfx.digest_algo = algo;
+  f->flags.rdonly = 1;
+  return 0;
 }
 
 
 /**
- * cdk_stream_mmap:
+ * cdk_stream_enable_cache:
+ * @s: the stream object
+ * @val: 1=on, 0=off
+ *
+ * Enable or disable the cache section of a stream object.
+ **/
+cdk_error_t
+cdk_stream_enable_cache (cdk_stream_t s, int val)
+{
+  if (!s)
+    return CDK_Inv_Value;
+  if (!s->flags.write)
+    return CDK_Inv_Mode;
+  s->cache.on = val;
+  return 0;
+}
+
+
+static int
+stream_cache_flush (cdk_stream_t s, FILE * fp)
+{
+  int nwritten;
+  
+  assert (s);
+  
+  /* FIXME: We should find a way to use cdk_stream_write here. */
+  if (s->cache.size > 0)
+    {
+      nwritten = fwrite (s->cache.buf, 1, s->cache.size, fp);
+      if (!nwritten)
+	return CDK_File_Error;
+      s->cache.size = 0;
+      s->cache.on = 0;
+      wipemem (s->cache.buf, sizeof s->cache.buf);
+    }
+  return 0;
+}
+
+
+/**
+ * cdk_stream_kick_off:
+ * @inp: the input stream
+ * @out: the output stream.
+ * 
+ * Passes the entire data from @inp into the output stream @out
+ * with all the activated filters.
+ */
+cdk_error_t
+cdk_stream_kick_off (cdk_stream_t inp, cdk_stream_t out)
+{
+  byte buf[BUFSIZE];
+  int nread, nwritten;
+  cdk_error_t rc;
+
+  if (!inp || !out)
+    return CDK_Inv_Value;
+  rc = CDK_Success;
+  while (!cdk_stream_eof (inp)) 
+    {
+      nread = cdk_stream_read (inp, buf, DIM (buf));
+      if (!nread || nread == EOF)
+	break;
+      nwritten = cdk_stream_write (out, buf, nread);
+      if (!nwritten || nwritten == EOF)
+	{ /* In case of errors, we leave the loop. */
+	  rc = inp->error;
+	  break;
+	}      
+    }
+  
+  wipemem (buf, sizeof (buf));
+  return rc;
+}
+
+
+/**
+ * cdk_stream_mmap_part:
  * @s: the stream
+ * @off: the offset where to start
+ * @len: how much bytes shall be mapped
  * @ret_buf: the buffer to store the content
- * @ret_count: length of the buffer
+ * @ret_buflen: length of the buffer
  *
  * Map the data of the given stream into a memory section. @ret_count
  * contains the length of the buffer.
  **/
 cdk_error_t
-cdk_stream_mmap( cdk_stream_t s, byte ** ret_buf, size_t * ret_count )
+cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
+		      byte **ret_buf, size_t *ret_buflen)
 {
-    const u32 max_filesize = 16777216;
-    u32 len, oldpos;
-    int n, rc;
-    char * p;
-
-    if( !s || !ret_buf || !ret_count )
-        return CDK_Inv_Value;
-
-    *ret_count = 0;
-    *ret_buf = NULL;
-    oldpos = cdk_stream_tell( s );
-    rc = cdk_stream_flush( s );
-    if( !rc )
-        rc = cdk_stream_seek( s, 0 );
-    if( rc )
-        return rc;
-    len = cdk_stream_get_length( s );
-    if( !len || len > max_filesize )
-        return 0;
-    p = *ret_buf = cdk_calloc( 1, len+1 );
-    if( !p )
-        return 0;
-    *ret_count = len;
-    n = cdk_stream_read( s, p, len );
-    if( n != len )
-        *ret_count = n;
-    rc = cdk_stream_seek( s, oldpos );
+  off_t oldpos;
+  int n;
+  cdk_error_t rc;
+  
+  if (!s || !ret_buf || !ret_buflen)
+    return CDK_Inv_Value;
+  if (s->cbs_hd)
+    return CDK_Inv_Mode;
+  
+  *ret_buflen = 0;
+  *ret_buf = NULL;
+  oldpos = cdk_stream_tell (s);
+  rc = cdk_stream_flush (s);
+  if (!rc)
+    rc = cdk_stream_seek (s, off);
+  if (rc)
     return rc;
+  if (!len)
+    len = cdk_stream_get_length (s);
+  if (!len || len > MAX_MAP_SIZE)
+    return 0;
+  *ret_buf = cdk_calloc (1, len+1);
+  *ret_buflen = len;
+  n = cdk_stream_read (s, *ret_buf, len);
+  if (n != len)
+    *ret_buflen = n;
+  rc = cdk_stream_seek (s, oldpos);
+  return rc;
+}
+
+
+cdk_error_t
+cdk_stream_mmap (cdk_stream_t inp, byte **buf, size_t *buflen)
+{
+  off_t len;
+  
+  /* We need to make sure all data is flushed before we retrieve the size. */
+  cdk_stream_flush (inp);
+  len = cdk_stream_get_length (inp);
+  return cdk_stream_mmap_part (inp, 0, len, buf, buflen);
 }
 
 
@@ -1011,63 +1225,73 @@ cdk_stream_mmap( cdk_stream_t s, byte ** ret_buf, size_t * ret_count )
  * the file pointer is moved to the old position after the bytes were read.
  **/
 int
-cdk_stream_peek( cdk_stream_t inp, byte *s, size_t count )
+cdk_stream_peek (cdk_stream_t inp, byte *s, size_t count)
 {
-    unsigned off;
-    int nbytes, rc;
-
-    if( !inp || !s )
-        return CDK_Inv_Value;
-    off = cdk_stream_tell( inp );
-    nbytes = _cdk_stream_gets( inp, s, count );
-    rc = cdk_stream_seek( inp, off );
-    if( rc )
-        return 0;
-    return nbytes;
-}
-
-
-int
-_cdk_stream_gets( cdk_stream_t s, char * buf, size_t count )
-{
-    int c, i = 0;
-
-    if( !s )
-        return CDK_Inv_Value;
-    while( !cdk_stream_eof( s ) && count > 0 ) {
-        c = cdk_stream_getc( s );
-        if( c == EOF || c == '\r' || c == '\n' ) {
-            buf[i++] = '\0';
-            break;
-        }
-        buf[i++] = c;
-        count--;   
-    }
-    return i;
-}
-
-
-int
-_cdk_stream_puts( cdk_stream_t s, const char * buf )
-{
-    return cdk_stream_write( s, buf, strlen( buf ) );
-}
-
-
-int
-_cdk_stream_set_blockmode( cdk_stream_t s, size_t nbytes )
-{
-    if( !s )
-        return CDK_Inv_Value;
-    _cdk_log_debug( "set block mode for stream (size=%d)\n", nbytes );
-    s->blkmode = nbytes;  
+  off_t off;
+  int nbytes;
+  
+  if (!inp || !s)
     return 0;
+  if (inp->cbs_hd)
+    return 0;
+  
+  off = cdk_stream_tell (inp);
+  nbytes = _cdk_stream_gets (inp, (char*)s, count);
+  if (nbytes == -1)
+    return 0;  
+  if (cdk_stream_seek (inp, off))
+    return 0;
+  return nbytes;
 }
 
 
+/* Try to read a line from the given stream. */
 int
-_cdk_stream_get_blockmode( cdk_stream_t s )
+_cdk_stream_gets (cdk_stream_t s, char * buf, size_t count)
 {
-    return s? s->blkmode : 0;
+  int c, i;
+  
+  assert (s);
+  
+  i = 0;
+  while (!cdk_stream_eof (s) && count > 0)
+    {
+      c = cdk_stream_getc (s);
+      if (c == EOF || c == '\r' || c == '\n' ) 
+	{
+	  buf[i++] = '\0';
+	  break;
+	}
+      buf[i++] = c;
+      count--;
+    }
+  return i;
 }
 
+
+/* Try to write string into the stream @s. */
+int
+_cdk_stream_puts (cdk_stream_t s, const char *buf)
+{
+  return cdk_stream_write (s, buf, strlen (buf));
+}
+
+
+/* Activate the block mode for the given stream. */
+cdk_error_t
+_cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes)
+{
+  assert (s);
+  
+  _cdk_log_debug ("set block mode for stream; blocksize %d\n", nbytes);
+  s->blkmode = nbytes;  
+  return 0;
+}
+
+
+/* Return the block mode state of the given stream. */
+int
+_cdk_stream_get_blockmode (cdk_stream_t s)
+{
+  return s? s->blkmode : 0;
+}

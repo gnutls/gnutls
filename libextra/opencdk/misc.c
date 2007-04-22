@@ -1,7 +1,6 @@
-/* -*- Mode: C; c-file-style: "bsd" -*-
- * misc.c
+/* misc.c
  *        Copyright (C) 2002, 2003 Timo Schulz
- *        Copyright (C) 1998-2002 Free Software Foundation, Inc.
+ *        Copyright (C) 1998-2002, 2007 Free Software Foundation, Inc.
  *
  * This file is part of OpenCDK.
  *
@@ -14,17 +13,11 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OpenCDK; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
-
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
@@ -33,92 +26,92 @@
 #include "main.h"
 
 
-/* return 0 if the file exists. otherwise 1 */
+/* Return 0 if the file exists. otherwise 1 */
 int
-_cdk_check_file( const char * file )
+_cdk_check_file (const char *file)
 {
-    FILE * fp;
-    int check;
-
-    if( !file )
-        return 1;
-    fp = fopen( file, "r" );
-    check = fp? 0 : 1;
-    if( fp )
-        fclose( fp );
-    return check;
+  FILE *fp;
+  int check;
+  
+  if (!file)
+    return 1;
+  fp = fopen (file, "r");
+  check = fp? 0 : 1;
+  if (fp)
+    fclose (fp);
+  return check;
 }
 
 
 u32
 _cdk_timestamp (void)
 {
-    return (u32)time (NULL);
+  return (u32)time (NULL);
 }
 
 
 u32
-_cdk_buftou32 (const byte * buf)
+_cdk_buftou32 (const byte *buf)
 {
-    u32 u = 0;
+  u32 u;
   
-    if (buf) {
-        u  = buf[0] << 24;
-        u |= buf[1] << 16;
-        u |= buf[2] <<  8;
-        u |= buf[3];
-    }
-    return u;
+  if (!buf)
+    return 0;
+  u  = buf[0] << 24;
+  u |= buf[1] << 16;
+  u |= buf[2] <<  8;
+  u |= buf[3];
+  return u;
 }
 
 
 void
-_cdk_u32tobuf (u32 u, byte * buf)
+_cdk_u32tobuf (u32 u, byte *buf)
 {
-    if (buf) {
-        buf[0] = u >> 24;
-        buf[1] = u >> 16;
-        buf[2] = u >>  8;
-        buf[3] = u      ;
-    }
+  if (!buf)
+    return;
+  buf[0] = u >> 24;
+  buf[1] = u >> 16;
+  buf[2] = u >>  8;
+  buf[3] = u      ;
 }
 
 
 int
-_cdk_strcmp (const char * a, const char * b)
+_cdk_strcmp (const char *a, const char *b)
 {
-    int alen, blen;
+  int alen, blen;
   
-    alen = strlen (a);
-    blen = strlen (b);
-    if (alen != blen)
-        return alen > blen? 1 : -1;
-    return strcmp (a, b);
+  alen = strlen( a );
+  blen = strlen( b );
+  if( alen != blen )
+    return alen > blen? 1 : -1;
+  return strcmp( a, b );
 }
     
 
 static const char *
-parse_version_number (const char *s, int *number)
+parse_version_number( const char *s, int *number )
 {
-    int val = 0;
-
-    if (*s == '0' && isdigit(s[1]))
-        return NULL;
-    /* leading zeros are not allowed */
-    for (; isdigit(*s); s++) {
-        val *= 10;
-        val += *s - '0';     
-    }
-    *number = val;
-    return val < 0? NULL : s;      
+  int val = 0;
+  
+  if( *s == '0' && isdigit( s[1] ) )
+    return NULL;
+  /* leading zeros are not allowed */
+  for( ; isdigit(*s); s++ ) {
+    val *= 10;
+    val += *s - '0';     
+  }
+  *number = val;
+  return val < 0? NULL : s;
 }
 
 
 static const char *
-parse_version_string (const char * s, int * major, int * minor, int * micro)
+parse_version_string( const char * s, int * major, int * minor, int * micro )
 {
-    s = parse_version_number (s, major);
-    if (!s || *s != '.')
+    s = parse_version_number( s, major );
+    if( !s || *s != '.' )
         return NULL;
     s++;
     s = parse_version_number (s, minor);
@@ -226,16 +219,16 @@ _cdk_memistr (const char *buf, size_t buflen, const char *sub)
     const byte *t, *s;
     size_t n;
 
-    for (t = buf, n = buflen, s = sub ; n ; t++, n--) {
+    for (t = (byte*)buf, n = buflen, s = (byte*)sub ; n ; t++, n--) {
         if (toupper (*t) == toupper (*s)) {
             for (buf = t++, buflen = n--, s++;
-                 n && toupper (*t) == toupper (*s); t++, s++, n--)
+                 n && toupper (*t) == toupper ((byte)*s); t++, s++, n--)
                 ;
             if (!*s)
                 return buf;
-            t = buf;
+            t = (byte*)buf;
             n = buflen;
-            s = sub ;                        
+            s = (byte*)sub;   
         }
     }
 
@@ -289,7 +282,7 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
   /* 2. pass (p!=NULL): create string */
   for (;;)
     {
-      for (slen = length, nleft = encidx = 0, n = 0, s = string; slen;
+      for (slen = length, nleft = encidx = 0, n = 0, s = (byte*)string; slen;
            s++, slen--)
 	{
           if (resync)
@@ -299,7 +292,7 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
                   /* still invalid */
                   if (p)
 		    {
-                      sprintf (p, "\\x%02x", *s);
+                      sprintf ((char*)p, "\\x%02x", *s);
                       p += 4;
 		    }
                   n += 4;
@@ -353,7 +346,7 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
                           n += 3;
                           if (p)
 			    {
-                              sprintf (p, "x%02x", *s);
+                              sprintf ((char*)p, "x%02x", *s);
                               p += 3;
 			    }
                           break;
@@ -405,7 +398,7 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
 		{		/* invalid encoding: print as \xnn */
                   if (p)
 		    {
-                      sprintf (p, "\\x%02x", *s);
+                      sprintf ((char*)p, "\\x%02x", *s);
                       p += 4;
 		    }
                   n += 4;
@@ -418,10 +411,10 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
 		{
                   for (i = 0; i < encidx; i++)
 		    {
-                      sprintf (p, "\\x%02x", encbuf[i]);
+                      sprintf ((char*)p, "\\x%02x", encbuf[i]);
                       p += 4;
 		    }
-                  sprintf (p, "\\x%02x", *s);
+                  sprintf ((char*)p, "\\x%02x", *s);
                   p += 4;
 		}
               n += 4 + 4 * encidx;
@@ -448,7 +441,7 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
                         {
                           for (i = 0; i < encidx; i++)
                             {
-                              sprintf (p, "\\x%02x", encbuf[i]);
+                              sprintf ((char*)p, "\\x%02x", encbuf[i]);
                               p += 4;
                             }
                         }
@@ -464,107 +457,59 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
       else
         {
           *p = 0; /* make a string */
-          return buffer;
+          return (char*)buffer;
         }
     }
 }
 
 
-#ifndef HAVE_VASPRINTF
-/* 
- * Like vsprintf but provides a pointer to malloc'd storage, which
- * must be freed by the caller (gcry_free).  Taken from libiberty as
- * found in gcc-2.95.2 and a little bit modernized.
- */
-int
-_cdk_vasprintf ( char **result, const char *format, va_list args)
+cdk_error_t
+map_gcry_error (gcry_error_t err)
 {
-    const char *p = format;
-    /* Add one to make sure that it is never zero, which might cause malloc
-       to return NULL.  */
-    int total_width = strlen (format) + 1;
-    va_list ap;
-
-    /* this is not really portable but works under Windows */
-    memcpy ( &ap, &args, sizeof (va_list));
-
-    while (*p != '\0') {
-        if (*p++ == '%') {
-            while (strchr ("-+ #0", *p))
-                ++p;
-            if (*p == '*') {
-                ++p;
-                total_width += abs (va_arg (ap, int));
-	    }
-            else {
-                char *endp;  
-                total_width += strtoul (p, &endp, 10);
-                p = endp;
-            }
-            if (*p == '.') {
-                ++p;
-                if (*p == '*') {
-                    ++p;
-                    total_width += abs (va_arg (ap, int));
-		}
-                else {
-                    char *endp;
-                    total_width += strtoul (p, &endp, 10);
-                    p = endp;
-                }
-	    }
-            while (strchr ("hlL", *p))
-                ++p;
-            /* Should be big enough for any format specifier except %s
-               and floats.  */
-            total_width += 30;
-            switch (*p) {
-	    case 'd':
-	    case 'i':
-	    case 'o':
-	    case 'u':
-	    case 'x':
-	    case 'X':
-	    case 'c':
-                (void) va_arg (ap, int);
-                break;
-	    case 'f':
-	    case 'e':
-	    case 'E':
-	    case 'g':
-	    case 'G':
-                (void) va_arg (ap, double);
-                /* Since an ieee double can have an exponent of 307, we'll
-                   make the buffer wide enough to cover the gross case. */
-                total_width += 307;
-	    
-	    case 's':
-                total_width += strlen (va_arg (ap, char *));
-                break;
-	    case 'p':
-	    case 'n':
-                (void) va_arg (ap, char *);
-                break;
-	    }
-	}
+  /* FIXME: We need to catch them all. */
+  switch (gpg_err_code (err))
+    {
+    case GPG_ERR_NO_ERROR: return CDK_Success;
+    case GPG_ERR_INV_VALUE: return CDK_Inv_Value;
+    case GPG_ERR_GENERAL: return CDK_General_Error;
+    case GPG_ERR_INV_PACKET: return CDK_Inv_Packet;
+    case GPG_ERR_TOO_SHORT: return CDK_Too_Short;
+    case GPG_ERR_TOO_LARGE: return CDK_Inv_Value;
+    case GPG_ERR_NO_PUBKEY:
+    case GPG_ERR_NO_SECKEY: return CDK_Error_No_Key;
+    case GPG_ERR_BAD_SIGNATURE: return CDK_Bad_Sig;
+    case GPG_ERR_NO_DATA: return CDK_No_Data;
+    default:
+      break;
     }
-    *result = gcry_malloc (total_width);
-    if (*result != NULL)
-        return vsprintf (*result, format, args);
-    else
-        return 0;
+  
+  return (cdk_error_t)err;
 }
 
+
 void
-_cdk_vasprintf_free (void * p)
+_cdk_trim_string (char *s, int canon)
 {
-    cdk_free (p);
+  while (s && *s &&
+	 (s[strlen (s)-1] == '\t' ||
+	  s[strlen (s)-1] == '\r' ||
+	  s[strlen (s)-1] == '\n' ||
+	  s[strlen (s)-1] == ' '))
+    s[strlen (s) -1] = '\0';
+  if (canon)
+    strcat (s, "\r\n");
 }
-#else /*!__MINGW32__*/
-void
-_cdk_vasprintf_free (void * p)
-{
-    if (p)
-        free (p);
+
+
+int
+_cdk_check_args (int overwrite, const char *in, const char *out)
+{  
+  if (!in || !out)
+    return CDK_Inv_Value;
+  if (!_cdk_strcmp (in, out))
+    return CDK_Inv_Mode;
+  if (!overwrite && !_cdk_check_file (out))
+    return CDK_Inv_Mode;
+  return 0;
 }
-#endif
+

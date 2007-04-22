@@ -1,6 +1,5 @@
-/* -*- Mode: C; c-file-style: "bsd" -*-
- * armor.c - Armor filters
- *        Copyright (C) 2001, 2002, 2003 Timo Schulz
+/* armor.c - Armor filters
+ *        Copyright (C) 2001, 2002, 2003, 2007 Timo Schulz
  *        Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
  *
  * This file is part of OpenCDK.
@@ -14,18 +13,12 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of 
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
  * GNU General Public License for more details. 
- *  
- * You should have received a copy of the GNU General Public License 
- * along with OpenCDK; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
- *
  *
  * ChangeLog for basic BASE64 code (base64_encode, base64_decode):
  * Original author: Eric S. Raymond (Fetchmail)
  * Heavily modified by Brendan Cully <brendan@kublai.com> (Mutt)
  * Modify the code for generic use by Timo Schulz <twoaday@freakmail.de>
  */
-/* X-TODO-STATUS: OK */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -85,7 +78,7 @@ static u32 crc_table[] = {
 0x42FA2F, 0xC4B6D4, 0xC82F22, 0x4E63D9, 0xD11CCE, 0x575035, 0x5BC9C3, 0xDD8538 
 };
 
-static const char * armor_begin[] = {
+static const char *armor_begin[] = {
     "BEGIN PGP MESSAGE",
     "BEGIN PGP PUBLIC KEY BLOCK",
     "BEGIN PGP PRIVATE KEY BLOCK",
@@ -93,7 +86,7 @@ static const char * armor_begin[] = {
     NULL
 };
 
-static const char * armor_end[] = {
+static const char *armor_end[] = {
     "END PGP MESSAGE",
     "END PGP PUBLIC KEY BLOCK",
     "END PGP PRIVATE KEY BLOCK",
@@ -101,7 +94,7 @@ static const char * armor_end[] = {
     NULL
 };
 
-static const char * valid_headers[] = {
+static const char *valid_headers[] = {
     "Comment",
     "Version",
     "MessageID",
@@ -110,7 +103,7 @@ static const char * valid_headers[] = {
     NULL
 };
 
-static char b64chars[64] =
+static char b64chars[] =
 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 static int index64[128] = {
@@ -127,139 +120,157 @@ static int index64[128] = {
 
 /* encode a raw binary buffer to a null-terminated base64 strings */
 static int
-base64_encode( byte * out, const byte * in, size_t len, size_t olen )
+base64_encode (char *out, const byte *in, size_t len, size_t olen)
 {
-    if( !out || !in )
-        return CDK_Inv_Value;
-
-    while( len >= 3 && olen > 10 ) {
-        *out++ = b64chars[in[0] >> 2];
-        *out++ = b64chars[((in[0] << 4) & 0x30) | (in[1] >> 4)];
-        *out++ = b64chars[((in[1] << 2) & 0x3c) | (in[2] >> 6)];
-        *out++ = b64chars[in[2] & 0x3f];
-        olen -= 4;
-        len -= 3;
-        in += 3;
+  if (!out || !in)
+    return CDK_Inv_Value;
+  
+  while (len >= 3 && olen > 10)
+    {    
+      *out++ = b64chars[in[0] >> 2];
+      *out++ = b64chars[((in[0] << 4) & 0x30) | (in[1] >> 4)];
+      *out++ = b64chars[((in[1] << 2) & 0x3c) | (in[2] >> 6)];
+      *out++ = b64chars[in[2] & 0x3f];
+      olen -= 4;
+      len -= 3;
+      in += 3;
     }
-
-    /* clean up remainder */
-    if( len > 0 && olen > 4 ) {
-        byte fragment = 0;
-        *out++ = b64chars[in[0] >> 2];
-        fragment = (in[0] << 4) & 0x30;
-        if( len > 1 )
-            fragment |= in[1] >> 4;
-        *out++ = b64chars[fragment];
-        *out++ = (len < 2) ? '=' : b64chars[(in[1] << 2) & 0x3c];
-        *out++ = '=';
+  
+  /* clean up remainder */
+  if (len > 0 && olen > 4)
+    {
+      byte fragment = 0;
+      *out++ = b64chars[in[0] >> 2];
+      fragment = (in[0] << 4) & 0x30;
+      if (len > 1)
+	fragment |= in[1] >> 4;
+      *out++ = b64chars[fragment];
+      *out++ = (len < 2) ? '=' : b64chars[(in[1] << 2) & 0x3c];
+      *out++ = '=';
     }
-    *out = '\0';
-    return 0;
+  *out = '\0';
+  return 0;
 }
 
 
 /* Convert '\0'-terminated base64 string to raw byte buffer.
    Returns length of returned buffer, or -1 on error. */
 static int
-base64_decode( char * out, const char * in )
+base64_decode (byte *out, const char *in)
 {
-    int len = 0;
-    byte digit1, digit2, digit3, digit4;
+  size_t len;
+  byte digit1, digit2, digit3, digit4;
+  
+  if (!out || !in)
+    return -1;
 
-    if( !out || !in )
-        return -1;
-
-    do {
-        digit1 = in[0];
-        if( digit1 > 127 || b64val (digit1) == BAD )
-            return -1;
-        digit2 = in[1];
-        if( digit2 > 127 || b64val (digit2) == BAD )
-            return -1;
-        digit3 = in[2];
-        if( digit3 > 127 || ((digit3 != '=') && (b64val (digit3) == BAD)) )
-            return -1;
-        digit4 = in[3];
-        if( digit4 > 127 || ((digit4 != '=') && (b64val (digit4) == BAD)) )
-            return -1;
-        in += 4;
-
-        /* digits are already sanity-checked */
-        *out++ = (b64val (digit1) << 2) | (b64val (digit2) >> 4);
-        len++;
-        if( digit3 != '=' ) {
-            *out++ = ((b64val (digit2) << 4) & 0xf0) | (b64val (digit3) >> 2);
-            len++;
-            if( digit4 != '=' ) {
-                *out++ = ((b64val (digit3) << 6) & 0xc0) | b64val (digit4);
-                len++;
+  len = 0;
+  do 
+    {
+      digit1 = in[0];
+      if (digit1 > 127 || b64val (digit1) == BAD)
+	return -1;
+      digit2 = in[1];
+      if( digit2 > 127 || b64val (digit2) == BAD )
+	return -1;
+      digit3 = in[2];
+      if (digit3 > 127 || ((digit3 != '=') && (b64val (digit3) == BAD)))
+	return -1;
+      digit4 = in[3];
+      if (digit4 > 127 || ((digit4 != '=') && (b64val (digit4) == BAD)))
+	return -1;
+      in += 4;
+      
+      /* digits are already sanity-checked */
+      *out++ = (b64val (digit1) << 2) | (b64val (digit2) >> 4);
+      len++;
+      if (digit3 != '=') 
+	{
+	  *out++ = ((b64val (digit2) << 4) & 0xf0) | (b64val (digit3) >> 2);
+	  len++;
+	  if (digit4 != '=')
+	    {
+	      *out++ = ((b64val (digit3) << 6) & 0xc0) | b64val (digit4);
+	      len++;
 	    }
 	}
-    } while( *in && digit4 != '=' );
-    return len;
+    } 
+  while (*in && digit4 != '=');
+  
+  return len;
 }
 
 
+/* Return the compression algorithm in @r_zipalgo.
+   If the parameter is not set after execution,
+   the stream is not compressed. */
 static int
-is_compressed( cdk_stream_t inp, int *r_zipalgo )
-{
-    char buf[128], plain[256];
-    int nread, check = 0, pkttype;
+compress_get_algo (cdk_stream_t inp, int *r_zipalgo)  
 
-    if( r_zipalgo )
-        *r_zipalgo = 0;
-    cdk_stream_seek( inp, 0 );
-    while( !cdk_stream_eof( inp ) ) {
-        nread = _cdk_stream_gets( inp, buf, sizeof buf-1 );
-        if( !nread )
-            break;
-        if( nread == 1 && !cdk_stream_eof( inp )
-            && (nread = _cdk_stream_gets( inp, buf, sizeof buf-1)) ) {
-            base64_decode( plain, buf );
-            if( !(*plain & 0x80) )
-                break;
-            pkttype = *plain & 0x40 ? (*plain & 0x3f) : ((*plain >> 2) & 0xf);
-            if( pkttype == CDK_PKT_COMPRESSED && r_zipalgo ) {
-                _cdk_log_debug( "armor compressed (algo=%d)\n", *(plain+1) );
-                *r_zipalgo = *(plain + 1);
-            }
-            break;
-        }
+{
+  byte plain[512];
+  char buf[128];
+  int nread, pkttype;
+
+  *r_zipalgo = 0;
+  cdk_stream_seek (inp, 0);
+  while (!cdk_stream_eof (inp)) 
+    {    
+      nread = _cdk_stream_gets (inp, buf, DIM (buf)-1);
+      if (!nread || nread == -1)
+	break;
+      if (nread == 1 && !cdk_stream_eof (inp)
+	  && (nread = _cdk_stream_gets (inp, buf, DIM (buf)-1)) > 0)
+	{
+	  base64_decode (plain, buf);
+	  if (!(*plain & 0x80))
+	    break;
+	  pkttype = *plain & 0x40 ? (*plain & 0x3f) : ((*plain >> 2) & 0xf);
+	  if (pkttype == CDK_PKT_COMPRESSED && r_zipalgo)
+	    {
+	      _cdk_log_debug ("armor compressed (algo=%d)\n", *(plain+1));
+	      *r_zipalgo = *(plain + 1);
+	    }
+	  break;
+	}
     }
-    return check;
+  return 0;
 }
 
 
 static int
-check_armor( cdk_stream_t inp, int *r_zipalgo )
+check_armor (cdk_stream_t inp, int *r_zipalgo)
 {
-    char buf[4096];
-    size_t nread;
-    int check = 0;
+  char buf[4096];
+  size_t nread;
+  int check;
 
-    nread = cdk_stream_read( inp, buf, sizeof buf-1 );
-    if( nread > 0 ) {
-        buf[nread] = '\0';
-        if( strstr( buf, "-----BEGIN PGP" ) ) {
-            is_compressed( inp, r_zipalgo );
-            check = 1;
-        }
-        cdk_stream_seek( inp, 0 );
+  check = 0;
+  nread = cdk_stream_read (inp, buf, DIM (buf)-1);
+  if (nread > 0)
+    {
+      buf[nread] = '\0';
+      if (strstr (buf, "-----BEGIN PGP")) 
+	{
+	  compress_get_algo (inp, r_zipalgo);
+	  check = 1;
+	}
+      cdk_stream_seek (inp, 0);
     }
-    return check;
+  return check;
 }
 
 
 static int
-is_armored( int ctb )
+is_armored (int ctb)
 {
-    int pkttype = 0;
+  int pkttype = 0;
 
-    if( !(ctb & 0x80) )
-        return 1; /* invalid packet: assume it is armored */
-    pkttype = ctb & 0x40 ? (ctb & 0x3f) : ((ctb >> 2) & 0xf);
-
-    switch( pkttype ) {
+  if (!(ctb & 0x80))
+    return 1; /* invalid packet: assume it is armored */
+  pkttype = ctb & 0x40 ? (ctb & 0x3f) : ((ctb >> 2) & 0xf);  
+  switch (pkttype)
+    {
     case CDK_PKT_MARKER:
     case CDK_PKT_SYMKEY_ENC:
     case CDK_PKT_ONEPASS_SIG:
@@ -267,32 +278,32 @@ is_armored( int ctb )
     case CDK_PKT_SECRET_KEY:
     case CDK_PKT_PUBKEY_ENC:
     case CDK_PKT_SIGNATURE:
-    case CDK_PKT_OLD_COMMENT:
     case CDK_PKT_LITERAL:
     case CDK_PKT_COMPRESSED:
     case CDK_PKT_ENCRYPTED:
-        return 0; /* seems to be a regular packet: not armored */
+      return 0; /* seems to be a regular packet: not armored */
     }
-    return 1;
+  return 1;
 }
 
 
-static unsigned
-update_crc( unsigned crc, const byte *buf, size_t count )
+static u32
+update_crc (u32 crc, const byte *buf, size_t buflen)
 {
-    int j;
-
-    if( !crc )
-        crc = CRCINIT;
-    for( j = 0; j < count; j++ )
-        crc = (crc << 8) ^ crc_table[0xff & ((crc >> 16) ^ buf[j])];
-    crc &= 0xffffff;
-    return crc;
+  int j;
+  
+  if (!crc)
+    crc = CRCINIT;
+  
+  for (j = 0; j < buflen; j++)
+    crc = (crc << 8) ^ crc_table[0xff & ((crc >> 16) ^ buf[j])];
+  crc &= 0xffffff;
+  return crc;
 }
 
 
-static int
-armor_encode( void * opaque, FILE * in, FILE * out )
+static cdk_error_t
+armor_encode (void *opaque, FILE *in, FILE *out)
 {
     armor_filter_t * afx = opaque;
     struct stat statbuf;
@@ -300,40 +311,38 @@ armor_encode( void * opaque, FILE * in, FILE * out )
     byte crcbuf2[3];
     size_t nread = 0;
     const char * lf;
-    int rc = 0;
+    cdk_error_t rc = 0;
 
     if( !afx )
         return CDK_Inv_Value;
-
-    afx->crc = 0;
     if( afx->idx < 0 || afx->idx > DIM (armor_begin)
         || afx->idx2 < 0 || afx->idx2 > DIM (armor_end) )
         return CDK_Inv_Value;
 
-    _cdk_log_debug( "armor filter: encode\n" );
+    _cdk_log_debug ("armor filter: encode\n");
   
-    memset( crcbuf, 0, sizeof crcbuf );
+    memset (crcbuf, 0, sizeof (crcbuf));
 
     lf = afx->le ? afx->le : LF;
     fprintf( out, "-----%s-----%s", armor_begin[afx->idx], lf );
     fprintf( out, "Version: OpenPrivacy "PACKAGE_VERSION"%s", lf );
     if( afx->hdrlines)
-        fwrite( afx->hdrlines, 1, strlen( afx->hdrlines), out );
+        fwrite( afx->hdrlines, 1, strlen( afx->hdrlines ), out );
     fprintf( out, "%s", lf );
 
     if( fstat( fileno( in ), &statbuf ) )
         return CDK_General_Error;
 
     while( !feof( in ) ) {
-        nread = fread( raw, 1, sizeof raw-1, in );
+        nread = fread( raw, 1, DIM (raw)-1, in );
         if( !nread )
             break;
         if( ferror( in ) ) {
             rc = CDK_File_Error;
             break;
         }
-        afx->crc = update_crc( afx->crc, raw, nread );
-        base64_encode( buf, raw, nread, sizeof buf-1 );
+        afx->crc = update_crc (afx->crc, (byte*)raw, nread);
+        base64_encode (buf, (byte*)raw, nread, DIM (buf)-1);
         fprintf( out, "%s%s", buf, lf );
     }
 
@@ -359,28 +368,30 @@ armor_encode( void * opaque, FILE * in, FILE * out )
  *
  * Check if the stream contains armored data.
  **/
-cdk_error_t
-cdk_armor_filter_use( cdk_stream_t inp )
+int
+cdk_armor_filter_use (cdk_stream_t inp)
 {
-    int c = 0, check = 0;
-    int zipalgo;
+  int c, check;
+  int zipalgo;
 
-    c = cdk_stream_getc( inp );
-    if( c == EOF )
-        return 0; /* EOF, doesn't matter whether armored or not */
-    cdk_stream_seek( inp, 0 );
-    check = is_armored( c );
-    if( check ) {
-        check = check_armor( inp, &zipalgo );
-        if( zipalgo )
-            cdk_stream_control( inp, CDK_STREAMCTL_COMPRESSED, zipalgo );
+  zipalgo = 0;
+  c = cdk_stream_getc (inp);
+  if (c == EOF)
+    return 0; /* EOF, doesn't matter whether armored or not */
+  cdk_stream_seek (inp, 0);
+  check = is_armored (c);
+  if (check)
+    {
+      check = check_armor (inp, &zipalgo);
+      if (zipalgo)
+	_cdk_stream_set_compress_algo (inp, zipalgo);
     }
-    return check;
+  return check;
 }
 
 
 static int
-search_header( const char *buf, const char **array )
+search_header (const char *buf, const char **array)
 {
     const char *s;
     int i;
@@ -402,111 +413,117 @@ _cdk_armor_get_lineend( void )
 }
 
 
-static int
-armor_decode (void * opaque, FILE *in, FILE *out)
+static cdk_error_t
+armor_decode (void *opaque, FILE *in, FILE *out)
 {
-    armor_filter_t * afx = opaque;
-    const char * s = NULL;
-    unsigned char buf[127], crcbuf[4];
-    byte raw[128];
-    u32 crc2 = 0;
-    size_t nread = 0;
-    int i, pgp_data = 0;
-    int rc = 0;
-
-    if( !afx )
-        return CDK_Inv_Value;
+  armor_filter_t * afx = opaque;
+  const char *s;
+  char buf[127];
+  byte raw[128], crcbuf[4];
+  u32 crc2 = 0;
+  size_t nread = 0;
+  int i, pgp_data = 0;
+  cdk_error_t rc = 0;
   
-    _cdk_log_debug ("armor filter: decode\n");
+  if (!afx)
+    return CDK_Inv_Value;
   
-    fseek( in, 0, SEEK_SET );
-
-    /* Search the begin of the message */
-    while( !feof( in ) && !pgp_data ) {
-        s = fgets( buf, sizeof buf-1, in );
-        if( !s )
-            break;
-        afx->idx = search_header( buf, armor_begin );
-        if( afx->idx >= 0 )
-            pgp_data = 1;
+  _cdk_log_debug ("armor filter: decode\n");
+  
+  fseek (in, 0, SEEK_SET);
+  /* Search the begin of the message */
+  while (!feof (in) && !pgp_data)
+    {
+      s = fgets (buf, DIM (buf)-1, in);
+      if (!s)
+	break;
+      afx->idx = search_header (buf, armor_begin);
+      if (afx->idx >= 0)
+	pgp_data = 1;
     }
-
-    if( feof( in ) || !pgp_data ) {
-        rc = CDK_Armor_Error; /* no data found */
-        goto leave;
-    }
-
-    /* Parse header until the empty line is reached */
-    while( !feof( in ) ) {
-        s = fgets( buf, sizeof buf-1, in );
-        if( !s )
-            goto leave;
-        if( strlen( s ) == strlen( LF ) ) {
-            rc = 0;
-            break; /* empty line */
+  
+  if (feof (in) || !pgp_data) 
+    return CDK_Armor_Error; /* no data found */
+  
+  /* Parse header until the empty line is reached */
+  while (!feof (in)) 
+    {
+      s = fgets (buf, DIM (buf)-1, in);
+      if (!s)
+	return CDK_EOF;
+      if (strlen (s) == strlen (LF)) 
+	{
+	  rc = 0;
+	  break; /* empty line */
 	}
-        /* From RFC2440: OpenPGP should consider improperly formatted Armor
-           Headers to be corruption of the ASCII Armor. A colon and a single
-           space separate the key and value. */
-        if( !strstr( buf, ": " ) ) {
-            rc = CDK_Armor_Error;
-            goto leave;
+      /* From RFC2440: OpenPGP should consider improperly formatted Armor
+         Headers to be corruption of the ASCII Armor. A colon and a single
+         space separate the key and value. */
+      if (!strstr (buf, ": "))
+	return CDK_Armor_Error;
+      rc = CDK_General_Error;
+      for (i = 0; (s = valid_headers[i]); i++)
+	{       
+	  if (!strncmp (s, buf, strlen (s)))
+	    rc = 0;
 	}
-        rc = CDK_General_Error;
-        for( i = 0; (s = valid_headers[i]); i++ ) {
-            if( !strncmp( s, buf, strlen( s ) ) )
-                rc = 0;
-	}
-        if( rc ) {
-            /* From RFC2440: Unknown keys should be reported to the user,
-               but OpenPGP should continue to process the message. */
-            _cdk_log_info ("unknown header: `%s'\n", buf);
-            rc = 0;
-	}
-    }
-
-    /* Read the data body */
-    while( !feof( in ) ) {
-        s = fgets( buf, sizeof buf-1, in );
-        if( !s )
-            break;
-        buf[strlen (buf) - strlen (LF)] = '\0';
-        if( buf[0] == '=' && strlen( s ) == 5 ) { /* CRC */
-            memset( crcbuf, 0, sizeof crcbuf );
-            base64_decode( crcbuf, buf + 1 );
-            crc2 = crcbuf[0] << 16 | crcbuf[1] << 8 | crcbuf[2];
-            break; /* stop here */
-	}
-        else {
-            nread = base64_decode( raw, buf );
-            if( !nread )
-                break;
-            afx->crc = update_crc( afx->crc, raw, nread );
-            fwrite( raw, 1, nread, out );
+      if (rc) 
+	{
+	  /* From RFC2440: Unknown keys should be reported to the user,
+	     but OpenPGP should continue to process the message. */
+	  _cdk_log_info ("unknown header: `%s'\n", buf);
+	  rc = 0;
 	}
     }
 
-    /* Search the tail of the message */
-    s = fgets( buf, sizeof buf-1, in );
-    if( s ) {
-        buf[strlen (buf) - strlen (LF)] = '\0';
-        rc = CDK_General_Error;
-        afx->idx2 = search_header( buf, armor_end );
-        if( afx->idx2 >= 0 )
-            rc = 0;
+  /* Read the data body */
+  while (!feof (in)) 
+    {
+      s = fgets (buf, DIM (buf)-1, in);
+      if (!s)
+	break;
+      buf[strlen (buf) - strlen (LF)] = '\0';
+      if (buf[0] == '=' && strlen (s) == 5) 
+	{ /* CRC */
+	  memset (crcbuf, 0, sizeof (crcbuf));
+	  base64_decode (crcbuf, buf + 1);
+	  crc2 = (crcbuf[0] << 16) | (crcbuf[1] << 8) | crcbuf[2];
+	  break; /* stop here */
+	}
+      else
+	{
+	  nread  = base64_decode(raw, buf);
+	  if (nread == -1 || nread == 0)
+	    break;
+	  afx->crc = update_crc (afx->crc, raw, nread);
+	  fwrite (raw, 1, nread, out);
+	}
     }
-
-    /* this catches error when no tail was found or the header is
-       different then the tail line. */
-    if( rc || afx->idx != afx->idx2 )
-        rc = CDK_Armor_Error;
-
-    afx->crc_okay = (afx->crc == crc2) ? 1 : 0;
-    if( !afx->crc_okay && !rc )
-        rc = CDK_Armor_CRC_Error;
-
- leave:
-    return rc;
+  
+  /* Search the tail of the message */
+  s = fgets (buf, DIM (buf)-1, in);
+  if (s) 
+    {
+      buf[strlen (buf) - strlen (LF)] = '\0';
+      rc = CDK_General_Error;
+      afx->idx2 = search_header (buf, armor_end);
+      if (afx->idx2 >= 0)
+	rc = 0;
+    }
+  
+  /* This catches error when no tail was found or the header is
+     different then the tail line. */
+  if (rc || afx->idx != afx->idx2)
+    rc = CDK_Armor_Error;
+  
+  afx->crc_okay = (afx->crc == crc2) ? 1 : 0;
+  if (!afx->crc_okay && !rc) 
+    {
+      _cdk_log_debug ("file crc=%08lX afx_crc=%08lX\n", crc2, afx->crc);
+      rc = CDK_Armor_CRC_Error;
+    }
+  
+  return rc;
 }
 
 
@@ -519,39 +536,40 @@ armor_decode (void * opaque, FILE *in, FILE *out)
  * Protect a file with ASCII armor.
  **/
 cdk_error_t
-cdk_file_armor( cdk_ctx_t hd, const char * file, const char * output )
+cdk_file_armor (cdk_ctx_t hd, const char * file, const char * output)
 {
-    cdk_stream_t inp, out;
-    int rc;
-
-    rc = _cdk_check_args( hd->opt.overwrite, file, output );
-    if( rc )
-        return rc;
-    
-    rc = cdk_stream_open( file, &inp );
-    if( rc )
-        return rc;
-    
-    rc = cdk_stream_new( output, &out );
-    if( rc ) {
-        cdk_stream_close( inp );
-        return rc;
-    }
-
-    cdk_stream_set_armor_flag( out, CDK_ARMOR_MESSAGE );
-    if( hd->opt.compress )
-        rc = cdk_stream_set_compress_flag( out, hd->compress.algo,
-                                           hd->compress.level );
-    if( !rc )
-        rc = cdk_stream_set_literal_flag( out, 0, file );
-    if( !rc )
-        rc = cdk_stream_kick_off( inp, out );
-    if( !rc )
-        rc = _cdk_stream_get_errno( out );
-
-    cdk_stream_close( out );
-    cdk_stream_close( inp );
+  cdk_stream_t inp, out;
+  cdk_error_t rc;
+  
+  rc = _cdk_check_args (hd->opt.overwrite, file, output);
+  if (rc)
     return rc;
+  
+  rc = cdk_stream_open (file, &inp);
+  if (rc)
+    return rc;
+    
+  rc = cdk_stream_new (output, &out);
+  if (rc) 
+    {
+      cdk_stream_close (inp);
+      return rc;
+    }
+  
+  cdk_stream_set_armor_flag (out, CDK_ARMOR_MESSAGE);
+  if (hd->opt.compress)
+    rc = cdk_stream_set_compress_flag (out, hd->compress.algo,
+				       hd->compress.level);
+  if (!rc)
+    rc = cdk_stream_set_literal_flag (out, 0, file);
+  if (!rc)
+    rc = cdk_stream_kick_off (inp, out);
+  if (!rc)
+    rc = _cdk_stream_get_errno (out);
+  
+  cdk_stream_close (out);
+  cdk_stream_close (inp);
+  return rc;
 }
 
 
@@ -584,7 +602,7 @@ cdk_file_dearmor (const char * file, const char * output)
 
     if( cdk_armor_filter_use( inp ) ) {
         rc = cdk_stream_set_literal_flag( inp, 0, NULL );
-        zipalgo = cdk_stream_control( inp, CDK_STREAMCTL_COMPRESSED, -1 );
+        zipalgo = cdk_stream_is_compressed (inp);
         if( zipalgo )
             rc = cdk_stream_set_compress_flag( inp, zipalgo, 0 );
         if( !rc )
@@ -602,7 +620,7 @@ cdk_file_dearmor (const char * file, const char * output)
 
 
 int
-_cdk_filter_armor( void * opaque, int ctl, FILE * in, FILE * out )
+_cdk_filter_armor (void *opaque, int ctl, FILE * in, FILE *out)
 {
     if( ctl == STREAMCTL_READ )
         return armor_decode( opaque, in, out );
@@ -619,4 +637,79 @@ _cdk_filter_armor( void * opaque, int ctl, FILE * in, FILE * out )
     return CDK_Inv_Mode;
 }
 
-        
+
+/**
+ * cdk_armor_encode_buffer:
+ * @inbuf: the raw input buffer
+ * @inlen: raw buffer len
+ * @outbuf: the destination buffer for the base64 output
+ * @outlen: destination buffer len
+ * @nwritten: actual length of the base64 data
+ * @type: the base64 file type.
+ * 
+ * Encode the given buffer into base64 format.
+ **/
+cdk_error_t
+cdk_armor_encode_buffer (const byte *inbuf, size_t inlen,
+			 char *outbuf, size_t outlen, 
+			 size_t *nwritten, int type)
+{
+  const char *head, *tail, *le;
+  byte tempbuf[48];
+  char tempout[128];
+  size_t pos, off, len, rest;
+  
+  if (type > CDK_ARMOR_SIGNATURE)
+    return CDK_Inv_Mode;
+  
+  head = armor_begin [type];
+  tail = armor_end [type];
+  le = _cdk_armor_get_lineend ();
+  pos = strlen (head) + 10 + 2 + 2 + strlen (tail) + 10 +  2 + 5 + 2;
+  /* The output data is 4/3 times larger, plus a line end for each line. */
+  pos += (4*inlen/3) + 2*(4*inlen/3/64);
+  
+  if (outbuf && outlen < pos)
+    return CDK_Too_Short;
+  
+  /* Only return the size of the output. */
+  if (!outbuf)
+    {
+      *nwritten = pos;
+      return 0;
+    }  
+  
+  pos = 0;
+  memset (outbuf, 0, outlen);
+  memcpy (outbuf+pos, "-----", 5); pos += 5;
+  memcpy (outbuf+pos, head, strlen (head)); pos += strlen (head);
+  memcpy (outbuf+pos, "-----", 5); pos += 5;
+  memcpy (outbuf+pos, le, strlen (le)); pos += strlen (le);
+  memcpy (outbuf+pos, le, strlen (le)); pos += strlen (le);
+  rest = inlen;
+  for (off = 0; off < inlen;)
+    {
+      if (rest > 48)
+	{	  
+	  memcpy (tempbuf, inbuf+off, 48);
+	  off += 48;
+	  len = 48;
+	}
+      else
+	{
+	  memcpy (tempbuf, inbuf+off, rest);
+	  off += rest;
+	  len = rest;
+	}
+      rest -= len;
+      base64_encode (tempout, tempbuf, len, DIM (tempout)-1);
+      memcpy (outbuf+pos, tempout, strlen (tempout)); pos += strlen (tempout);
+      memcpy (outbuf+pos, le, strlen (le)); pos += strlen (le);
+    }
+  memcpy (outbuf+pos, "-----", 5); pos += 5;
+  memcpy (outbuf+pos, tail, strlen (tail)); pos += strlen (tail);
+  memcpy (outbuf+pos, "-----", 5); pos += 5;
+  memcpy (outbuf+pos, le, strlen (le)); pos += strlen (le);
+  *nwritten = pos;
+  return 0;
+}
