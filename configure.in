@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [1.7.9], [bug-gnutls@gnu.org])
+AC_INIT([GnuTLS], [1.7.8], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CANONICAL_TARGET
@@ -36,7 +36,7 @@ AB_INIT
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 AC_SUBST(LT_CURRENT, 20)
-AC_SUBST(LT_REVISION, 1)
+AC_SUBST(LT_REVISION, 0)
 AC_SUBST(LT_AGE, 7)
 ac_full=1
 
@@ -396,7 +396,8 @@ if test x$ac_enable_openpgp = xyes; then
 		ac_enable_included_opencdk=no)
  if test x$ac_enable_included_opencdk = xno;then 
   AC_LIB_HAVE_LINKFLAGS(opencdk,, [
-#include <opencdk.h>], [cdk_armor_encode_buffer (NULL, 0, NULL, 0, NULL, 0);])
+#include <stddef.h> /* opencdk <= 0.5.13 uses size_t without this include */
+#include <opencdk.h>], [cdk_check_version (OPENCDK_VERSION);])
   if test "$ac_cv_libopencdk" != yes; then
    ac_enable_included_opencdk=yes
    AC_MSG_WARN([[
@@ -640,6 +641,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	tests/hostname-check/Makefile \
 	includes/Makefile includes/gnutls/gnutls.h \
 	lib/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
+	pkcs11/Makefile \
 	libextra/Makefile libextra/openpgp/Makefile libextra/opencdk/Makefile \
 	libextra/minilzo/Makefile \
 	src/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
