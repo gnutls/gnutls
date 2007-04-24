@@ -738,7 +738,7 @@ read_key_mem (gnutls_certificate_credentials_t res,
 	}
     }
   else
-    res->pkey[res->ncerts] = NULL;
+    memset (&res->pkey[res->ncerts], 0, sizeof (gnutls_privkey));
 
   return 0;
 }
@@ -828,7 +828,7 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
   /* this should be first 
    */
   if ((ret = read_key_mem (res, key ? key->data : NULL,
-			   key ? key->size : NULL, type)) < 0)
+			   key ? key->size : 0, type)) < 0)
     return ret;
 
   if ((ret = read_cert_mem (res, cert->data, cert->size, type)) < 0)
