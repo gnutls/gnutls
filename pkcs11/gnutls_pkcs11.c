@@ -400,31 +400,34 @@ search_certificates (char *const *pkcs11_keys,
 		  return GNUTLS_E_PKCS11_ERROR;
 		}
 
-	      if (have_key (pkcs11_keys, pValueTemplate[0].pValue))
-		{
-		  _gnutls_debug_log("Adding user certificate %s\n",
-				    pValueTemplate[0].pValue);
-		  /* XXX */
-		}
-	      else
-		{
-		  int ret;
-		  const gnutls_datum_t ca =
-		    { pValueTemplate[1].pValue, pValueTemplate[1].ulValueLen };
+	      {
+		int ret;
+		const gnutls_datum_t cert =
+		  { pValueTemplate[1].pValue, pValueTemplate[1].ulValueLen };
 
-		  _gnutls_debug_log("Adding CA certificate %s (%d/%ld)\n",
-				    pValueTemplate[0].pValue, trusted, cat);
+		if (have_key (pkcs11_keys, pValueTemplate[0].pValue))
+		  {
+		    _gnutls_debug_log("Adding user certificate %s\n",
+				      pValueTemplate[0].pValue);
+		    ret = gnutls_certificate_set_x509_key_mem
+		      (cred,  &cert, NULL, GNUTLS_X509_FMT_DER);
+		  }
+		else
+		  {
+		    _gnutls_debug_log("Adding CA certificate %s (%d/%ld)\n",
+				      pValueTemplate[0].pValue, trusted, cat);
+		    ret = gnutls_certificate_set_x509_trust_mem
+		      (cred, &cert, GNUTLS_X509_FMT_DER);
+		  }
 
-		  ret = gnutls_certificate_set_x509_trust_mem
-		    (cred, &ca, GNUTLS_X509_FMT_DER);
-		  if (ret != GNUTLS_E_SUCCESS)
-		    {
-		      gnutls_assert ();
-		      gnutls_free (pValueTemplate[0].pValue);
-		      gnutls_free (pValueTemplate[1].pValue);
-		      return ret;
-		    }
-		}
+		if (ret != GNUTLS_E_SUCCESS)
+		  {
+		    gnutls_assert ();
+		    gnutls_free (pValueTemplate[0].pValue);
+		    gnutls_free (pValueTemplate[1].pValue);
+		    return ret;
+		  }
+	      }
 	    }
 	}
 
