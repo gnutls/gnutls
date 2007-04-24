@@ -453,16 +453,17 @@ gnutls_certificate_set_pkcs11 (gnutls_certificate_credentials_t cred)
   CK_SLOT_ID_PTR pSlotList;
   CK_RV rv;
   int ret;
+  char **pkcs11_keys;
 
   ret = startup_pkcs11 (&ulSlotCount, &pSlotList);
   if (ret < 0)
     return ret;
 
-  ret = find_keys (&cred->pkcs11_keys, ulSlotCount, pSlotList);
+  ret = find_keys (&pkcs11_keys, ulSlotCount, pSlotList);
   if (ret < 0)
     goto out;
 
-  ret = search_certificates (cred->pkcs11_keys, ulSlotCount, pSlotList, cred);
+  ret = search_certificates (pkcs11_keys, ulSlotCount, pSlotList, cred);
   if (ret < 0)
     goto out;
 
