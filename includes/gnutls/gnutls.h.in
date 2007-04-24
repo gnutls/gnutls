@@ -1246,6 +1246,8 @@ extern "C"
 
 #define GNUTLS_E_RANDOM_FAILED -206
 
+#define GNUTLS_E_PKCS11_ERROR -207
+
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
 #ifdef __cplusplus
