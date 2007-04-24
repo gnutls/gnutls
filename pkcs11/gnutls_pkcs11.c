@@ -278,9 +278,9 @@ find_keys (char ***keys,
 }
 
 int
-have_key (const char **keys, const char *key)
+have_key (char *const*keys, const char *key)
 {
-  const char **p;
+  char *const*p;
   for (p = keys; *p; p++)
     if (strcmp (*p, key) == 0)
       return 1;
@@ -289,7 +289,7 @@ have_key (const char **keys, const char *key)
 
 /* Add certificates appropriately.  */
 int
-search_certificates (const char **pkcs11_keys,
+search_certificates (char *const *pkcs11_keys,
 		     CK_ULONG ulSlotCount,
 		     CK_SLOT_ID_PTR pSlotList,
 		     gnutls_certificate_credentials_t cred)
