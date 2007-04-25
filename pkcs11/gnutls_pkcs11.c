@@ -411,6 +411,13 @@ search_certificates (char *const *pkcs11_keys,
 				      pValueTemplate[0].pValue);
 		    ret = gnutls_certificate_set_x509_key_mem
 		      (cred,  &cert, NULL, GNUTLS_X509_FMT_DER);
+		    if (ret != GNUTLS_E_SUCCESS)
+		      {
+			gnutls_assert ();
+			gnutls_free (pValueTemplate[0].pValue);
+			gnutls_free (pValueTemplate[1].pValue);
+			return ret;
+		      }
 		  }
 		else
 		  {
@@ -418,15 +425,15 @@ search_certificates (char *const *pkcs11_keys,
 				      pValueTemplate[0].pValue, trusted, cat);
 		    ret = gnutls_certificate_set_x509_trust_mem
 		      (cred, &cert, GNUTLS_X509_FMT_DER);
+		    if (ret != 1)
+		      {
+			gnutls_assert ();
+			gnutls_free (pValueTemplate[0].pValue);
+			gnutls_free (pValueTemplate[1].pValue);
+			return ret;
+		      }
 		  }
 
-		if (ret != GNUTLS_E_SUCCESS)
-		  {
-		    gnutls_assert ();
-		    gnutls_free (pValueTemplate[0].pValue);
-		    gnutls_free (pValueTemplate[1].pValue);
-		    return ret;
-		  }
 	      }
 	    }
 	}
