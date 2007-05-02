@@ -29,22 +29,26 @@
 
 #include "pkcs11.h"
 
-/* The logic of PKCS#11 support in GnuTLS is as follows.  Enable debug
- * logging to trace the details.
+/* The logic of PKCS#11 support in GnuTLS is as follows, for the
+ * gnutls_pkcs11_get_ca_certificates() function.  Enable debug logging
+ * to trace the details.
+ *
+ * 1) Initialize the PKCS#11 provider. (startup_pkcs11())
+ *
+ * 2) Iterate through certificates, and if the certificate has the
+ *    CKA_TRUSTED flag, treat the certificate as a trusted CA
+ *    certificate.  (search_certificates())
+ *
+ * The function gnutls_pkcs11_get_user_certificates will behave as
+ * follows.
  *
  * 0) Initialize the PKCS#11 provider. (startup_pkcs11())
  *
  * 1) Enumerate the CKA_ID's of all private keys.  (find_keys())
  *
- * 2) Iterate through certificates, and
- *
- *    a) if the certificate CKA_ID matches a private key CKA_ID,
- *         treat the certificate as a user certificate,
- *
- *   -or-
- *
- *    b) if the certificate has the CKA_TRUSTED flag,
- *         treat the certificate as a trusted CA certificate.
+ * 2) Iterate through certificates, and if the certificate CKA_ID
+ *    matches a private key CKA_ID, treat the certificate as a user
+ *    certificate.  (search_certificates())
  */
 
 static int
