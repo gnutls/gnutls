@@ -35,7 +35,7 @@ doit (void)
 {
   int ret;
   gnutls_x509_crt_t *ca_list;
-  unsigned int ncas;
+  unsigned int ncas, i;
 
   ret = gnutls_global_init ();
   if (ret < 0)
@@ -44,6 +44,16 @@ doit (void)
   ret = gnutls_pkcs11_get_ca_certificates (&ca_list, &ncas);
   if (ret < 0)
     fail ("Error getting CAs from PKCS#11: %d\n", ret);
+  else
+    {
+      for (i = 0; i < ncas; i++)
+	{
+	  success ("Certificate %d\n", i);
+	  gnutls_x509_crt_deinit (ca_list[i]);
+	}
+
+      gnutls_free (ca_list);
+    }
 
   gnutls_global_deinit ();
 }
