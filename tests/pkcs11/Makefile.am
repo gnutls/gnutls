@@ -24,7 +24,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
 	-I$(top_srcdir)/tests
 AM_LDFLAGS = -no-install
-LDADD = ../../lib/libgnutls.la ../../pkcs11/libgnutls_pkcs11.la ../libutils.la
+LDADD = ../../lib/libgnutls.la ../../pkcs11/libgnutls-pkcs11.la ../libutils.la
 
 ctests = pkcs11-ca
 
