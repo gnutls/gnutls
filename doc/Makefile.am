@@ -28,7 +28,7 @@ endif
 
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl.texi	\
-	gpl.texi error_codes.texi gnutls-api.texi			\
+	gpl.texi error_codes.texi gnutls-api.texi p11-api.texi		\
 	gnutls-extra-api.texi ia-api.texi x509-api.texi pgp-api.texi	\
 	my-bib-macros.texi examples/ex-client1.c examples/ex-client2.c	\
 	examples/ex-session-info.c examples/ex-verify.c			\
@@ -80,6 +80,9 @@ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 ../libextra/ia-api.texi:
 	cd ../libextra && make ia-api.texi
 
+../pkcs11/p11-api.texi:
+	cd ../pkcs11 && make p11-api.texi
+
 gnutls-api.texi: ../lib/gnutls-api.texi
 	-$(srcdir)/scripts/sort2.pl < ../lib/gnutls-api.texi > gnutls-api.texi
 
@@ -94,6 +97,9 @@ pgp-api.texi: ../libextra/openpgp/pgp-api.texi
 
 ia-api.texi: ../libextra/ia-api.texi
 	-$(srcdir)/scripts/sort2.pl < ../libextra/ia-api.texi > ia-api.texi
+
+p11-api.texi: ../pkcs11/p11-api.texi
+	-$(srcdir)/scripts/sort2.pl < ../pkcs11/p11-api.texi > p11-api.texi
 
 error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi
