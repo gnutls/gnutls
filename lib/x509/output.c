@@ -626,6 +626,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		  addf (str, _("\t\tExponent:\n"));
 		  hexdump (str, e.data, e.size, "\t\t\t");
 		}
+
+	      gnutls_free (m.data);
+	      gnutls_free (e.data);
 	    }
 	    break;
 
@@ -906,6 +909,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 
       addf (str, _("\tSignature:\n"));
       hexdump (str, buffer, size, "\t\t");
+
+      gnutls_free (buffer);
     }
 }
 
