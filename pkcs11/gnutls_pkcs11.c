@@ -245,7 +245,7 @@ find_keys (char ***keys,
 		  return GNUTLS_E_PKCS11_ERROR;
 		}
 
-	      tmp = gnutls_realloc (*keys, (nkeys + 2) * sizeof (*keys));
+	      tmp = gnutls_realloc (*keys, (nkeys + 2) * sizeof (**keys));
 	      if (!tmp)
 		{
 		  gnutls_assert ();
