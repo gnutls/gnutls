@@ -3,20 +3,12 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.7.9 (unreleased)
+* Version 1.7.8.p11.0 (unreleased)
 
-** Change certtool's default serial number from 0 to a time-based value.
-
-** Fix X.509 signing with RSA-PKCS#1 to set a NULL parameters fields.
-Before, we remove the parameters field, which resulted in a slightly
-different DER encoding which in turn caused signature verification
-failures of GnuTLS-generated RSA certificates in some other
-implementations (e.g., GnuPG 2.x's gpgsm).  Depending on which RFCs
-you read, this may or may not be correct, but our new behaviour appear
-to be consistent with other widely used implementations.
+** New function to get trusted CA certificates from PKCS#11 provider.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_get_ca_certificates: ADD.
 
 * Version 1.7.8 (released 2007-04-16)
 
@@ -62,9 +54,6 @@ The last parameter was renamed from 'flags' to 'format' and the type
 changed from 'unsigned int' to 'gnutls_psk_key_flags' (an enum type),
 which shouldn't cause any ABI changes.  Reported by ludo@chbouib.org
 (Ludovic Courtès).
-
-** Fix allocation in gnutls_certificate_set_openpgp_key.
-Tiny patch from ludo@chbouib.org (Ludovic Courtès).
 
 ** API and ABI modifications:
 gnutls_x509_dn_t: ADD.
