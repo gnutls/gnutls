@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.7.8.p11.0 (unreleased)
+* Version 1.7.8.p11.0 (released 2007-05-02)
 
 ** New function to get trusted CA certificates from PKCS#11 provider.
 
