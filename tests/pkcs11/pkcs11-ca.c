@@ -25,8 +25,10 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <gnutls/pkcs11.h>
+#include <gnutls/x509.h>
 
 #include "utils.h"
 
@@ -48,7 +50,16 @@ doit (void)
     {
       for (i = 0; i < ncas; i++)
 	{
-	  success ("Certificate %d\n", i);
+	  gnutls_datum_t out;
+
+	  success ("Certificate %d:\n", i);
+
+	  ret = gnutls_x509_crt_print (ca_list[i], GNUTLS_X509_CRT_FULL, &out);
+	  if (ret < 0)
+	    fail ("gnutls_x509_crt_print: %d\n", ret);
+
+	  fwrite (out.data, 1, out.size, stdout);
+
 	  gnutls_x509_crt_deinit (ca_list[i]);
 	}
 
