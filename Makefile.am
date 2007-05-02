@@ -44,7 +44,7 @@ release:
 	cvs rtag -r gnutls_1_7_8_with_pkcs11 $(tag) gnutls
 	rm -f ChangeLog
 	make ChangeLog
-	make distcheck
+	make dist
 	cvs commit -m "" ChangeLog
 	cvs rtag -F $(tag) gnutls
 	gpg -b $(distdir).tar.bz2
