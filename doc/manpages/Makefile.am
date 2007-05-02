@@ -42,7 +42,7 @@ $(APIMANS) $(SRPMANS):
 
 update-makefile:
 	FUNCS=`$(top_srcdir)/doc/scripts/gdoc -listfunc \
-		$(top_srcdir)/{lib,libextra,lib/x509,libextra/openpgp}/*.c`; \
+		$(top_srcdir)/{lib,libextra,lib/x509,libextra/openpgp,pkcs11}/*.c`; \
 	MANS=""; \
 	SRPMANS=""; \
 	for i in $$FUNCS; do \
