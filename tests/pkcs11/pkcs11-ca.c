@@ -52,7 +52,7 @@ doit (void)
 	{
 	  gnutls_datum_t out;
 
-	  success ("Certificate %d:\n", i);
+	  success ("Certificate %d - ", i);
 
 	  ret = gnutls_x509_crt_print (ca_list[i], GNUTLS_X509_CRT_FULL, &out);
 	  if (ret < 0)
