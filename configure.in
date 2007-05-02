@@ -26,7 +26,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([1.10 gnits dist-bzip2])
+AM_INIT_AUTOMAKE([1.10 dist-bzip2])
 AM_CONFIG_HEADER(config.h)
 
 AB_INIT
