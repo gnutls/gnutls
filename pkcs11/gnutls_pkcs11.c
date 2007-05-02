@@ -29,23 +29,22 @@
 
 #include "pkcs11.h"
 
-/* The logic of PKCS#11 support in GnuTLS is as follows:
+/* The logic of PKCS#11 support in GnuTLS is as follows.  Enable debug
+ * logging to trace the details.
  *
- * 0) Initialize the PKCS#11 provider, get some info.
- * (startup_pkcs11())
+ * 0) Initialize the PKCS#11 provider. (startup_pkcs11())
  *
  * 1) Enumerate the CKA_ID's of all private keys.  (find_keys())
  *
  * 2) Iterate through certificates, and
  *
- *    2.1) if the certificate CKA_ID matches a private key CKA_ID,
- *         add the certificate as a user certificate,
+ *    a) if the certificate CKA_ID matches a private key CKA_ID,
+ *         treat the certificate as a user certificate,
  *
- *    2.2) if the certificate has the CKA_TRUSTED flag,
- *         add the certificate as a trusted CA certificate.
- *         (XXX until scute is fixed, the CKA_TRUSTED flag is not checked.)
+ *   -or-
  *
- * 3) xxx
+ *    b) if the certificate has the CKA_TRUSTED flag,
+ *         treat the certificate as a trusted CA certificate.
  */
 
 static int
@@ -498,7 +497,7 @@ get_certificates (gnutls_x509_crt_t ** cert_list,
   CK_SLOT_ID_PTR pSlotList;
   CK_RV rv;
   int ret;
-  char **pkcs11_keys;
+  char **pkcs11_keys = NULL;
   size_t i;
 
   ret = startup_pkcs11 (&ulSlotCount, &pSlotList);
@@ -514,24 +513,21 @@ get_certificates (gnutls_x509_crt_t ** cert_list,
   if (ret < 0)
     goto out;
 
+  ret = 0;
+
+ out:
+  rv = C_Finalize (NULL_PTR);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_PKCS11_ERROR;
+    }
   if (pkcs11_keys)
     {
       for (i = 0; pkcs11_keys[i]; i++)
 	gnutls_free (pkcs11_keys[i]);
       gnutls_free (pkcs11_keys);
     }
-
-  rv = C_Finalize (NULL_PTR);
-  if (rv != CKR_OK)
-    {
-      gnutls_assert ();
-      ret = GNUTLS_E_PKCS11_ERROR;
-      goto out;
-    }
-
-  ret = 0;
-
- out:
   gnutls_free (pSlotList);
   return ret;
 }
