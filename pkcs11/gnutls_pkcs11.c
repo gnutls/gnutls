@@ -294,8 +294,7 @@ search_certificates (char *const *pkcs11_keys,
 		     CK_ULONG ulSlotCount,
 		     CK_SLOT_ID_PTR pSlotList,
 		     gnutls_x509_crt_t ** cert_list,
-		     unsigned int *ncerts,
-		     int user_certs)
+		     unsigned int *ncerts)
 {
   CK_SESSION_HANDLE shSession;
   CK_RV rv;
@@ -410,18 +409,18 @@ search_certificates (char *const *pkcs11_keys,
 		int ret;
 		const gnutls_datum_t cert =
 		  { pValueTemplate[1].pValue, pValueTemplate[1].ulValueLen };
-		int keyp = have_key (pkcs11_keys, pValueTemplate[0].pValue);
 		gnutls_x509_crt_t * tmplist;
 
-		if (user_certs && keyp)
-		  {
-		    _gnutls_debug_log("Adding user certificate %s\n",
-				      pValueTemplate[0].pValue);
-		  }
-		else if (!user_certs && !keyp && trusted)
+		if (!pkcs11_keys && trusted)
 		  {
 		    _gnutls_debug_log("Adding CA certificate %s (%ld)\n",
 				      pValueTemplate[0].pValue, cat);
+		  }
+		else if (pkcs11_keys
+			 && have_key (pkcs11_keys, pValueTemplate[0].pValue))
+		  {
+		    _gnutls_debug_log("Adding user certificate %s\n",
+				      pValueTemplate[0].pValue);
 		  }
 		else
 		  {
@@ -504,12 +503,15 @@ get_certificates (gnutls_x509_crt_t ** cert_list,
   if (ret < 0)
     return ret;
 
-  ret = find_keys (&pkcs11_keys, ulSlotCount, pSlotList);
-  if (ret < 0)
-    goto out;
+  if (user_certs)
+    {
+      ret = find_keys (&pkcs11_keys, ulSlotCount, pSlotList);
+      if (ret < 0)
+	goto out;
+    }
 
   ret = search_certificates (pkcs11_keys, ulSlotCount, pSlotList,
-			     cert_list, ncerts, user_certs);
+			     cert_list, ncerts);
   if (ret < 0)
     goto out;
 
