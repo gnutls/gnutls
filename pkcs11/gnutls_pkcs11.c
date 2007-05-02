@@ -419,14 +419,15 @@ search_certificates (char *const *pkcs11_keys,
 		    _gnutls_debug_log("Adding user certificate %s\n",
 				      pValueTemplate[0].pValue);
 		  }
-		else if (!user_certs && !keyp)
+		else if (!user_certs && !keyp && trusted)
 		  {
-		    _gnutls_debug_log("Adding CA certificate %s (%d/%ld)\n",
-				      pValueTemplate[0].pValue, trusted, cat);
+		    _gnutls_debug_log("Adding CA certificate %s (%ld)\n",
+				      pValueTemplate[0].pValue, cat);
 		  }
 		else
 		  {
-		    _gnutls_debug_log("Skipping certificate\n");
+		    _gnutls_debug_log("Skipping certificate %s (%d/%ld)\n",
+				      pValueTemplate[0].pValue, trusted, cat);
 		    gnutls_free (pValueTemplate[0].pValue);
 		    gnutls_free (pValueTemplate[1].pValue);
 		    continue;
