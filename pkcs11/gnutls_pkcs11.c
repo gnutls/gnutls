@@ -427,37 +427,43 @@ search_certificates (char *const *pkcs11_keys,
 		else
 		  {
 		    _gnutls_debug_log("Skipping certificate\n");
+		    gnutls_free (pValueTemplate[0].pValue);
+		    gnutls_free (pValueTemplate[1].pValue);
 		    continue;
 		  }
 
-		tmplist = realloc (*cert_list, *ncerts + 1);
+		gnutls_free (pValueTemplate[0].pValue);
+
+		tmplist = gnutls_realloc (*cert_list, sizeof (**cert_list)
+					  * (*ncerts + 1));
 		if (!tmplist)
 		  {
 		    gnutls_assert ();
-		    gnutls_free (pValueTemplate[0].pValue);
 		    gnutls_free (pValueTemplate[1].pValue);
 		    return GNUTLS_E_MEMORY_ERROR;
 		  }
 		*cert_list = tmplist;
 
-		ret = gnutls_x509_crt_init (&tmplist[*ncerts]);
+		ret = gnutls_x509_crt_init (&(*cert_list)[*ncerts]);
 		if (ret != GNUTLS_E_SUCCESS)
 		  {
 		    gnutls_assert ();
-		    gnutls_free (pValueTemplate[0].pValue);
+		    gnutls_free (*cert_list);
 		    gnutls_free (pValueTemplate[1].pValue);
 		    return ret;
 		  }
 
-		ret = gnutls_x509_crt_import (tmplist[*ncerts],
+		ret = gnutls_x509_crt_import ((*cert_list)[*ncerts],
 					      &cert, GNUTLS_X509_FMT_DER);
 		if (ret != GNUTLS_E_SUCCESS)
 		  {
 		    gnutls_assert ();
-		    gnutls_free (pValueTemplate[0].pValue);
+		    gnutls_free (*cert_list);
 		    gnutls_free (pValueTemplate[1].pValue);
 		    return ret;
 		  }
+
+		gnutls_free (pValueTemplate[1].pValue);
 
 		(*ncerts)++;
 	      }
@@ -492,6 +498,7 @@ get_certificates (gnutls_x509_crt_t ** cert_list,
   CK_RV rv;
   int ret;
   char **pkcs11_keys;
+  size_t i;
 
   ret = startup_pkcs11 (&ulSlotCount, &pSlotList);
   if (ret < 0)
@@ -505,6 +512,13 @@ get_certificates (gnutls_x509_crt_t ** cert_list,
 			     cert_list, ncerts, user_certs);
   if (ret < 0)
     goto out;
+
+  if (pkcs11_keys)
+    {
+      for (i = 0; pkcs11_keys[i]; i++)
+	gnutls_free (pkcs11_keys[i]);
+      gnutls_free (pkcs11_keys);
+    }
 
   rv = C_Finalize (NULL_PTR);
   if (rv != CKR_OK)
