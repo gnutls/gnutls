@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos, Simon Josefsson
 #
@@ -114,6 +114,18 @@ doit:
 			-copyright "2006 Free Software Foundation" \
 			-function $$i \
 			$(top_srcdir)/libextra/openpgp/*.c >> $$i.3 && \
+		echo "ok"; \
+	done; \
+	for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/pkcs11/*.c`; do \
+		echo -n "Creating man page in pkcs11/ for $$i... " && \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-include "gnutls/extra.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2007 Free Software Foundation" \
+			-function $$i \
+			$(top_srcdir)/pkcs11/*.c >> $$i.3 && \
 		echo "ok"; \
 	done
 
