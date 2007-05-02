@@ -25,7 +25,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 
 lib_LTLIBRARIES = libgnutls-pkcs11.la
 
-libgnutls_pkcs11_la_SOURCES = gnutls_pkcs11.c pkcs11.h
+libgnutls_pkcs11_la_SOURCES = gnutls_pkcs11.c cryptoki.h
 libgnutls_pkcs11_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 libgnutls_pkcs11_la_LIBADD = ../lib/libgnutls.la

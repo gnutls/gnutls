@@ -27,7 +27,7 @@
 #include "gnutls_errors.h"
 #include "auth_cert.h"
 
-#include "pkcs11.h"
+#include "cryptoki.h"
 
 /* The logic of PKCS#11 support in GnuTLS is as follows, for the
  * gnutls_pkcs11_get_ca_certificates() function.  Enable debug logging
