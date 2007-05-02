@@ -33,3 +33,13 @@ libgnutls_pkcs11_la_LIBADD = ../lib/libgnutls.la
 # XXX Move into configure.ac a'la --with-pkcs11-library=scute.
 libgnutls_pkcs11_la_LDFLAGS += -L/usr/local/lib -R/usr/local/lib
 libgnutls_pkcs11_la_LIBADD += -lscute
+
+p11-api.texi: gnutls_pkcs11.c
+	@echo "" > $@
+	@for i in $<; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(top_srcdir)/doc/scripts/gdoc -texinfo $$i >> $@ && \
+		echo "ok"; \
+	done
+
+dist-hook: p11-api.texi
