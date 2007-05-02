@@ -39,7 +39,8 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl.texi	\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
 	examples/ex-pkcs12.c layers.eps layers.png pgp1.eps pgp1.png	\
-	x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png
+	x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png		\
+	gnutls-logo.pdf
 
 # Internal manual.
 gnutls_TEXINFOS += internals.texi internals.eps internals.png		\
