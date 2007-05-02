@@ -47,7 +47,7 @@
  * 3) xxx
  */
 
-int
+static int
 startup_pkcs11 (CK_ULONG *ulSlotCount, CK_SLOT_ID_PTR *pSlotList)
 {
   CK_SLOT_INFO slotInfo;
@@ -119,7 +119,7 @@ startup_pkcs11 (CK_ULONG *ulSlotCount, CK_SLOT_ID_PTR *pSlotList)
 /* Used to determine the names of the private keys to use.  *keys is
    allocated as a zero-terminated array of zero-terminated strings
    indicating the private key CKA_ID's. */
-int
+static int
 find_keys (char ***keys,
 	   CK_ULONG ulSlotCount,
 	   CK_SLOT_ID_PTR pSlotList)
@@ -278,7 +278,7 @@ find_keys (char ***keys,
   return 0;
 }
 
-int
+static int
 have_key (char *const*keys, const char *key)
 {
   char *const*p;
@@ -289,7 +289,7 @@ have_key (char *const*keys, const char *key)
 }
 
 /* Add certificates appropriately.  */
-int
+static int
 search_certificates (char *const *pkcs11_keys,
 		     CK_ULONG ulSlotCount,
 		     CK_SLOT_ID_PTR pSlotList,
@@ -525,11 +525,4 @@ gnutls_pkcs11_get_user_certificates (gnutls_x509_crt_t ** cert_list,
 				     unsigned int *ncerts)
 {
   return get_certificates (cert_list, ncerts, 1);
-}
-
-int
-gnutls_pkcs11_get_ca_certificates (gnutls_x509_crt_t ** cert_list,
-				   unsigned int *ncerts)
-{
-  return get_certificates (cert_list, ncerts, 0);
 }
