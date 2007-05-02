@@ -192,12 +192,6 @@ load_keys (void)
   int ret;
   gnutls_datum data;
 
-  ret = gnutls_certificate_set_pkcs11 (xcred);
-  if (ret < 0)
-    {
-      fprintf (stderr, "Error setting keys via PKCS#11\n");
-    }
-
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
       data = load_file (x509_certfile);
@@ -1022,6 +1016,8 @@ srp_username_callback (gnutls_session session,
 static void
 init_global_tls_stuff (void)
 {
+  gnutls_x509_crt_t * ca_list;
+  unsigned int ncas;
   int ret;
 
   /* X509 stuff */
@@ -1035,6 +1031,18 @@ init_global_tls_stuff (void)
    */
   gnutls_certificate_set_verify_flags (xcred,
 				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+
+  ret = gnutls_pkcs11_get_ca_certificates (&ca_list, &ncas);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error getting CAs from PKCS#11\n");
+    }
+
+  ret = gnutls_certificate_set_x509_trust (xcred, ca_list, ncas);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error setting the PKCS#11 x509 trusts\n");
+    }
 
   if (x509_cafile != NULL)
     {

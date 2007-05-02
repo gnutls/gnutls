@@ -22,6 +22,7 @@
  *
  */
 
+#include <gnutls/pkcs11.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "auth_cert.h"
@@ -227,7 +228,7 @@ find_keys (char ***keys,
 		}
 
 	      pValueTemplate[0].pValue =
-		gnutls_malloc (pValueTemplate[0].ulValueLen);
+		gnutls_calloc (1, pValueTemplate[0].ulValueLen + 1);
 	      if (!pValueTemplate[0].pValue)
 		{
 		  gnutls_assert ();
@@ -292,11 +293,16 @@ int
 search_certificates (char *const *pkcs11_keys,
 		     CK_ULONG ulSlotCount,
 		     CK_SLOT_ID_PTR pSlotList,
-		     gnutls_certificate_credentials_t cred)
+		     gnutls_x509_crt_t ** cert_list,
+		     unsigned int *ncerts,
+		     int user_certs)
 {
   CK_SESSION_HANDLE shSession;
   CK_RV rv;
   CK_ULONG i;
+
+  *cert_list = NULL;
+  *ncerts = 0;
 
   for (i = 0; i < ulSlotCount; i++)
     {
@@ -404,36 +410,55 @@ search_certificates (char *const *pkcs11_keys,
 		int ret;
 		const gnutls_datum_t cert =
 		  { pValueTemplate[1].pValue, pValueTemplate[1].ulValueLen };
+		int keyp = have_key (pkcs11_keys, pValueTemplate[0].pValue);
+		gnutls_x509_crt_t * tmplist;
 
-		if (have_key (pkcs11_keys, pValueTemplate[0].pValue))
+		if (user_certs && keyp)
 		  {
 		    _gnutls_debug_log("Adding user certificate %s\n",
 				      pValueTemplate[0].pValue);
-		    ret = gnutls_certificate_set_x509_key_mem
-		      (cred,  &cert, NULL, GNUTLS_X509_FMT_DER);
-		    if (ret != GNUTLS_E_SUCCESS)
-		      {
-			gnutls_assert ();
-			gnutls_free (pValueTemplate[0].pValue);
-			gnutls_free (pValueTemplate[1].pValue);
-			return ret;
-		      }
 		  }
-		else
+		else if (!user_certs && !keyp)
 		  {
 		    _gnutls_debug_log("Adding CA certificate %s (%d/%ld)\n",
 				      pValueTemplate[0].pValue, trusted, cat);
-		    ret = gnutls_certificate_set_x509_trust_mem
-		      (cred, &cert, GNUTLS_X509_FMT_DER);
-		    if (ret != 1)
-		      {
-			gnutls_assert ();
-			gnutls_free (pValueTemplate[0].pValue);
-			gnutls_free (pValueTemplate[1].pValue);
-			return ret;
-		      }
+		  }
+		else
+		  {
+		    _gnutls_debug_log("Skipping certificate\n");
+		    continue;
 		  }
 
+		tmplist = realloc (*cert_list, *ncerts + 1);
+		if (!tmplist)
+		  {
+		    gnutls_assert ();
+		    gnutls_free (pValueTemplate[0].pValue);
+		    gnutls_free (pValueTemplate[1].pValue);
+		    return GNUTLS_E_MEMORY_ERROR;
+		  }
+		*cert_list = tmplist;
+
+		ret = gnutls_x509_crt_init (&tmplist[*ncerts]);
+		if (ret != GNUTLS_E_SUCCESS)
+		  {
+		    gnutls_assert ();
+		    gnutls_free (pValueTemplate[0].pValue);
+		    gnutls_free (pValueTemplate[1].pValue);
+		    return ret;
+		  }
+
+		ret = gnutls_x509_crt_import (tmplist[*ncerts],
+					      &cert, GNUTLS_X509_FMT_DER);
+		if (ret != GNUTLS_E_SUCCESS)
+		  {
+		    gnutls_assert ();
+		    gnutls_free (pValueTemplate[0].pValue);
+		    gnutls_free (pValueTemplate[1].pValue);
+		    return ret;
+		  }
+
+		(*ncerts)++;
 	      }
 	    }
 	}
@@ -456,8 +481,10 @@ search_certificates (char *const *pkcs11_keys,
   return 0;
 }
 
-int
-gnutls_certificate_set_pkcs11 (gnutls_certificate_credentials_t cred)
+static int
+get_certificates (gnutls_x509_crt_t ** cert_list,
+		  unsigned int *ncerts,
+		  int user_certs)
 {
   CK_ULONG ulSlotCount = 0;
   CK_SLOT_ID_PTR pSlotList;
@@ -473,7 +500,8 @@ gnutls_certificate_set_pkcs11 (gnutls_certificate_credentials_t cred)
   if (ret < 0)
     goto out;
 
-  ret = search_certificates (pkcs11_keys, ulSlotCount, pSlotList, cred);
+  ret = search_certificates (pkcs11_keys, ulSlotCount, pSlotList,
+			     cert_list, ncerts, user_certs);
   if (ret < 0)
     goto out;
 
@@ -490,4 +518,18 @@ gnutls_certificate_set_pkcs11 (gnutls_certificate_credentials_t cred)
  out:
   gnutls_free (pSlotList);
   return ret;
+}
+
+int
+gnutls_pkcs11_get_user_certificates (gnutls_x509_crt_t ** cert_list,
+				     unsigned int *ncerts)
+{
+  return get_certificates (cert_list, ncerts, 1);
+}
+
+int
+gnutls_pkcs11_get_ca_certificates (gnutls_x509_crt_t ** cert_list,
+				   unsigned int *ncerts)
+{
+  return get_certificates (cert_list, ncerts, 0);
 }

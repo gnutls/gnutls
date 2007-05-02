@@ -38,7 +38,8 @@ extern "C"
 
 # define LIBGNUTLS_PKCS11_VERSION LIBGNUTLS_VERSION
 
-  int gnutls_certificate_set_pkcs11 (gnutls_certificate_credentials_t res);
+  int gnutls_pkcs11_get_ca_certificates (gnutls_x509_crt_t ** cert_list,
+					 unsigned int *ncerts);
 
 # ifdef __cplusplus
 }
