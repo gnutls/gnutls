@@ -25,3 +25,4 @@ gnutls.pdf
 ia-api.texi
 pgp-api.texi
 x509-api.texi
+p11-api.texi

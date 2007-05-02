@@ -4,3 +4,4 @@ Makefile
 .libs
 *.la
 *.lo
+p11-api.texi
