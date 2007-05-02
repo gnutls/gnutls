@@ -2831,6 +2831,7 @@ signing_key
 * GnuTLS-extra functions::
 * OpenPGP functions::
 * TLS Inner Application (TLS/IA) functions::
+* Crypto provider (PKCS#11) functions::
 * Error codes and descriptions::
 @end menu
 
@@ -2931,16 +2932,18 @@ client functions with the corresponding server functions.
 
 @include ia-api.texi
 
-@node Crypto storage functions
-@section Crypto storage functions
+@node Crypto provider (PKCS#11) functions
+@section Crypto provider (PKCS#11) functions
 @cindex Smart cards
 @cindex PKCS#11
 
-GnuTLS can use the PKCS#11 provider Scute to load trusted CA
-certificates from, e.g., smartcards.  In the future, this
-functionality may be extended to allow off-loading the signing
-operation to the PKCS#11 provider too, and to support other PKCS#11
-providers too.
+GnuTLS can use the PKCS#11 provider Scute
+(@url{http://www.scute.org/}) to load trusted CA certificates from,
+e.g., smartcards.
+
+In the future, this functionality may be extended to allow off-loading
+the signing operation to the PKCS#11 provider too, and to support
+other PKCS#11 providers too.
 
 @include p11-api.texi
 
