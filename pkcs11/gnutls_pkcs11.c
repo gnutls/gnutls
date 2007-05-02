@@ -26,7 +26,8 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "auth_cert.h"
-#include "cryptoki.h"
+
+#include "pkcs11.h"
 
 /* The logic of PKCS#11 support in GnuTLS is as follows:
  *
@@ -520,9 +521,22 @@ get_certificates (gnutls_x509_crt_t ** cert_list,
   return ret;
 }
 
+/**
+ * gnutls_pkcs11_get_ca_certificates:
+ * @cert_list: pointer to output variable containing newly allocated
+ *   array of certificates.
+ * @ncerts: pointer to output variable indicating size of array.
+ *
+ * Get a list of X.509 certificates from the PKCS#11 provider which
+ * are marked as CKA_TRUSTED.  Each certificate must be deallocated,
+ * by the caller, using gnutls_x509_crt_deinit(), and the array itself
+ * must be deallocated using gnutls_free().
+ *
+ * Returns: Returns %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
-gnutls_pkcs11_get_user_certificates (gnutls_x509_crt_t ** cert_list,
-				     unsigned int *ncerts)
+gnutls_pkcs11_get_ca_certificates (gnutls_x509_crt_t ** cert_list,
+				   unsigned int *ncerts)
 {
-  return get_certificates (cert_list, ncerts, 1);
+  return get_certificates (cert_list, ncerts, 0);
 }
