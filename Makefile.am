@@ -41,18 +41,17 @@ htmldir = ../www-$(PACKAGE)
 
 release:
 	if cvs upd -p -r $(tag) NEWS > /dev/null; then false else true; fi
-	cvs rtag $(tag) gnutls
+	cvs rtag -r gnutls_1_7_8_with_pkcs11 $(tag) gnutls
 	rm -f ChangeLog
 	make ChangeLog
+	make distcheck
 	cvs commit -m "" ChangeLog
 	cvs rtag -F $(tag) gnutls
-	make dist
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
 	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/devel/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
-	cd doc && ../gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
-	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/
-	cp -v doc/reference/html/*.{html,png,css,devhelp} $(htmldir)/reference/
-	cd $(htmldir) && cvs add -kb releases/$(distdir).tar.bz2{,.sig} && \
-		cvs commit -m "Update." manual/ reference/ releases/
+	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/pkcs11/
+	cd $(htmldir) && \
+		cvs add -kb releases/pkcs11/$(distdir).tar.bz2{,.sig} && \
+		cvs commit -m "Update." releases/
