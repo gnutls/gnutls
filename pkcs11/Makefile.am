@@ -30,9 +30,7 @@ libgnutls_pkcs11_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 libgnutls_pkcs11_la_LIBADD = ../lib/libgnutls.la
 
-# XXX Move into configure.ac a'la --with-pkcs11-library=scute.
-libgnutls_pkcs11_la_LDFLAGS += -L/usr/local/lib -R/usr/local/lib
-libgnutls_pkcs11_la_LIBADD += -lscute
+libgnutls_pkcs11_la_LDFLAGS += $(LTLIBSCUTE)
 
 p11-api.texi: gnutls_pkcs11.c
 	@echo "" > $@
