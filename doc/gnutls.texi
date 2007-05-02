@@ -2440,14 +2440,6 @@ certtool --generate-certificate --load-privkey x509-client-key.pem \
 ...
 @end example
 
-To be able to import the client key/certificate into some
-applications, you will need to convert them into a PKCS#12 structure.
-This also encrypts the security sensitive key with a password.
-
-@example
-certtool --to-p12 --load-privkey x509-client-key.pem --load-certificate x509-client.pem --outder --outfile x509-client.p12
-@end example
-
 For icing, we'll create a proxy certificate for the client too.
 
 @example
@@ -2938,6 +2930,19 @@ The control flow in a typical server is similar to the above, use
 client functions with the corresponding server functions.
 
 @include ia-api.texi
+
+@node Crypto storage functions
+@section Crypto storage functions
+@cindex Smart cards
+@cindex PKCS#11
+
+GnuTLS can use the PKCS#11 provider Scute to load trusted CA
+certificates from, e.g., smartcards.  In the future, this
+functionality may be extended to allow off-loading the signing
+operation to the PKCS#11 provider too, and to support other PKCS#11
+providers too.
+
+@include p11-api.texi
 
 @node Error codes and descriptions
 @section Error codes and descriptions
