@@ -1,3 +1,369 @@
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.8.p11.0.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Search for Scute at build-time.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/Makefile.am: Use $(LTLIBSCUTE).
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Fix.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/Makefile.am, pkcs11/cryptoki.h, pkcs11/gnutls_pkcs11.c,
+	pkcs11/pkcs11.h: Rename, for GTK-DOC.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Fix.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Ignore pkcs11.h.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls-docs.sgml: Add pkcs11.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Add gnutls-logo.pdf, to fix distcheck.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Fix distcheck.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Scan pkcs11/ too.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Doc fix.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add code snippet.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Generate p11-api.texi.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Look in pkcs11/ too.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generate in pkcs11/ too.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add P11 section.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/Makefile.am: Make documentation.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Optimize, don't list keys when adding CA
+	certs.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs11/pkcs11-ca.c: Fix mem leak.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Fix mem leaks.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Fix mem leak.  Doc fix.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Check CKA_TRUSTED attribute (requires
+	Scute from SVN).
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs11/pkcs11-ca.c: Fix.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs11/pkcs11-ca.c: Print certs.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs11/pkcs11-ca.c: Fix mem leak.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Typo.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Fix mem leaks.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs11/Makefile.am: Typo.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Doc fix.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs11/pkcs11-ca.c: New file.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs11/Makefile.am: Add.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add pkcs11/.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Add tests/pkcs11/.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/Makefile.am: Add pkcs11.h.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/pkcs11.h: Add, from scute.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Use static.  Remove non-supported API.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Don't use gnits (for version name).
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/pkcs11.h, pkcs11/gnutls_pkcs11.c, src/cli.c:
+	Rethink the PKCS#11 APIs.
+
+2007-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-otto-tls-sigma-ciphersuite-00.txt: Add.
+
+2007-04-25  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Fix return values.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c: Make it compile.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Set user cert too.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c:
+	(gnutls_certificate_set_x509_key_mem): Handle NULL keys.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Fix warnings.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Don't require auth_cert.h modifications.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Reading and using the CA cert from the
+	PKCS#11 provider now works.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add GNUTLS_E_PKCS11_ERROR.
+
+2007-04-24  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/opencdk/literal.c: missing file.
+
+2007-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-new-mac-00.txt,
+	doc/protocol/draft-ietf-tls-suiteb-00.txt: Add.
+
+2007-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Fix.
+
+2007-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am, src/cli.c: Support PKCS#11 API.
+
+2007-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/Makefile.am: Link to scute.
+
+2007-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* includes/Makefile.am: Include gnutls/pkcs11.h.
+
+2007-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/pkcs11.h: Add, for PKCS#11.
+
+2007-04-22  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/opencdk/dummy.c: [no log message]
+
+2007-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, configure.in, pkcs11/Makefile.am,
+	pkcs11/gnutls_pkcs11.c: Add PKCS#11 glue.
+
+2007-04-22  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/opencdk/Makefile.am, libextra/opencdk/README,
+	libextra/opencdk/armor.c, libextra/opencdk/cipher.c,
+	libextra/opencdk/cipher.h, libextra/opencdk/compress.c,
+	libextra/opencdk/context.h, libextra/opencdk/encrypt.c,
+	libextra/opencdk/filters.h, libextra/opencdk/kbnode.c,
+	libextra/opencdk/keydb.c, libextra/opencdk/keygen.c,
+	libextra/opencdk/keylist.c, libextra/opencdk/keyserver.c,
+	libextra/opencdk/main.c, libextra/opencdk/main.h,
+	libextra/opencdk/md.c, libextra/opencdk/md.h,
+	libextra/opencdk/misc.c, libextra/opencdk/new-packet.c,
+	libextra/opencdk/opencdk.h, libextra/opencdk/packet.h,
+	libextra/opencdk/plaintext.c, libextra/opencdk/pubkey.c,
+	libextra/opencdk/read-packet.c, libextra/opencdk/seskey.c,
+	libextra/opencdk/sig-check.c, libextra/opencdk/sign.c,
+	libextra/opencdk/stream.c, libextra/opencdk/stream.h,
+	libextra/opencdk/sym-cipher.c, libextra/opencdk/trustdb.c,
+	libextra/opencdk/types.h, libextra/opencdk/verify.c,
+	libextra/opencdk/write-packet.c: replace the old build-in opencdk
+	version with the most recent cvs version.
+
+2007-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Check for OpenCDK function that is only available
+	in OpenCDK 0.6.0.
+
+2007-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2007-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-badra-tls-password-ext-00.txt,
+	doc/protocol/draft-badra-tls-password-00.txt: Add.
+
+2007-04-20  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/gnutls_openpgp.c: Adjustments for the opencdk migration
+	and some cleanups.
+
+2007-04-20  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/openpgp/compat.c, libextra/openpgp/extras.c,
+	libextra/openpgp/gnutls_openpgp.h, libextra/openpgp/openpgp.h,
+	libextra/openpgp/pgp.c, libextra/openpgp/pgpverify.c,
+	libextra/openpgp/privkey.c, libextra/openpgp/xml.c: First bunch of
+	patches for the opencdk migration.
+
+2007-04-19  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openpgp/extras.c:
+	(gnutls_openpgp_keyring_import): Make it work (it seems the old code
+	didn't work).  Patch from ludo@chbouib.org (Ludovic Courtès).
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Mention P12 structure.
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.6.2.
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS, po/de.po, po/pl.po, po/sv.po: Sync with TP.
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Check return codes from init functions.
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix CVS tagging in release target.  Don't update
+	manuals on the website.
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/sign.c: Write NULL in parameters for RSA signing,
+	backported from the 1.7.x branch.
+
+2007-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/sign.c: Write NULL in parameters for RSA signing.
+
+2007-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool-cfg.c, src/certtool.c: Use current time as
+	default serial number.
+
+2007-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-04-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
 2007-04-16  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.8.
