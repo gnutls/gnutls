@@ -2939,7 +2939,24 @@ client functions with the corresponding server functions.
 
 GnuTLS can use the PKCS#11 provider Scute
 (@url{http://www.scute.org/}) to load trusted CA certificates from,
-e.g., smartcards.
+e.g., smartcards.  You'd typically use this functionality together
+with @code{gnutls_certificate_set_x509_trust} as follows:
+
+@example
+#include <gnutls/pkcs11.h>
+...
+  gnutls_x509_crt_t * ca_list;
+  unsigned int ncas;
+  int ret;
+...
+  ret = gnutls_pkcs11_get_ca_certificates (&ca_list, &ncas);
+  if (ret < 0)
+    // Error handling...
+
+  ret = gnutls_certificate_set_x509_trust (xcred, ca_list, ncas);
+  if (ret < 0)
+    // Error handling...
+@end example
 
 In the future, this functionality may be extended to allow off-loading
 the signing operation to the PKCS#11 provider too, and to support
