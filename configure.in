@@ -473,6 +473,23 @@ LIBS=$SAVED_LIBS
 AC_MSG_CHECKING([whether to use the included libcfg])
 AC_MSG_RESULT($libcfg_enabled)
 
+dnl CHECK FOR PKCS#11 PROVIDER
+dnl
+
+AC_MSG_CHECKING([whether to include PKCS11 Scute support])
+AC_ARG_WITH(pkcs11-scute,
+	AS_HELP_STRING([--without-pkcs11-scute],
+			[disable PKCS11 Scute provider]),
+	scute=$withval, scute=yes)
+if test "$scute" != "no"; then
+  AC_MSG_RESULT(yes)
+  AC_LIB_HAVE_LINKFLAGS(scute,,, [C_Initialize (0);])
+  if test "$ac_cv_libscute" != yes; then
+    AC_MSG_ERROR(*** PKCS11 provider Scute was not found.)
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
 
 dnl CHECK FOR ZLIB SUPPORT
 dnl
