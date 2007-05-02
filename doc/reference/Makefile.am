@@ -29,7 +29,8 @@ SCAN_OPTIONS=\
 	--source-dir ../../includes/gnutls \
 	--source-dir $(top_builddir)/includes/gnutls \
 	--source-dir ../../lib/x509 \
-	--source-dir ../../libextra
+	--source-dir ../../libextra \
+	--source-dir ../../pkcs11
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
