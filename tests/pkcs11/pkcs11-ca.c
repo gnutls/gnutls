@@ -60,6 +60,8 @@ doit (void)
 
 	  fwrite (out.data, 1, out.size, stdout);
 
+	  gnutls_free (out.data);
+
 	  gnutls_x509_crt_deinit (ca_list[i]);
 	}
 
