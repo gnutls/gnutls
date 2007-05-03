@@ -6,10 +6,11 @@ See the end for copying conditions.
 * Version 1.7.9 (unreleased)
 
 ** The included copy of OpenCDK has been updated to 0.6.0.
-There has been some API changes, and the GnuTLS layer has been
-modified as well.  Note that while there is an API/ABI break in
-OpenCDK, this does not influence GnuTLS's API/ABI because it has not
-changed.  This version of GnuTLS requires OpenCDK 0.6.0 or later.
+There has been some API changes in OpenCDK, and the GnuTLS layer have
+been modified as well.  Note that while there are API/ABI incompatible
+changes in OpenCDK, this does not influence GnuTLS's API/ABI because
+its API/ABI have not changed.  From this version on, GnuTLS requires
+OpenCDK 0.6.0 or later.
 
 ** Fix build failure caused by missing doc/gnutls-logo.pdf.
 
