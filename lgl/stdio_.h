@@ -24,19 +24,24 @@
 #else
 /* Normal invocation convention.  */
 
-#ifdef __DECC
+#if defined __DECC && __DECC_VER >= 60000000
 # include_next <stdio.h>
 #endif
 
 #ifndef _GL_STDIO_H
 #define _GL_STDIO_H
 
-#ifndef __DECC
+#if !(defined __DECC && __DECC_VER >= 60000000)
 # include @ABSOLUTE_STDIO_H@
 #endif
 
 #include <stdarg.h>
 #include <stddef.h>
+
+#if (@GNULIB_FFLUSH@ && @REPLACE_FFLUSH@) || (@GNULIB_FSEEKO@ && !@HAVE_FSEEKO@) || (@GNULIB_FTELLO@ && !@HAVE_FTELLO@)
+/* Get off_t.  */
+# include <sys/types.h>
+#endif
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
@@ -208,10 +213,72 @@ extern int vsprintf (char *str, const char *format, va_list args)
 #endif
 
 #if @GNULIB_FFLUSH@ && @REPLACE_FFLUSH@
-# define fflush rpl_fflush
+/* Provide fseek, fseeko functions that are aware of a preceding fflush().  */
+# define fseeko rpl_fseeko
+extern int fseeko (FILE *fp, off_t offset, int whence);
+# define fseek(fp, offset, whence) fseeko (fp, (off_t)(offset), whence)
+#elif @GNULIB_FSEEKO@
+# if !@HAVE_FSEEKO@
+/* Assume 'off_t' is the same type as 'long'.  */
+typedef int verify_fseeko_types[2 * (sizeof (off_t) == sizeof (long)) - 1];
+#  define fseeko fseek
+# endif
+#else
+# undef fseeko
+# define fseeko(f,o,w) \
+   (GL_LINK_WARNING ("fseeko is unportable - " \
+                     "use gnulib module fseeko for portability"), \
+    fseeko (f, o, w))
+#endif
+
+#if defined GNULIB_POSIXCHECK
+# ifndef fseek
+#  define fseek(f,o,w) \
+     (GL_LINK_WARNING ("fseek cannot handle files larger than 4 GB " \
+                       "on 32-bit platforms - " \
+                       "use fseeko function for handling of large files"), \
+      fseek (f, o, w))
+# endif
+#endif
+
+#if @GNULIB_FTELLO@
+# if !@HAVE_FTELLO@
+/* Assume 'off_t' is the same type as 'long'.  */
+typedef int verify_ftello_types[2 * (sizeof (off_t) == sizeof (long)) - 1];
+#  define ftello ftell
+# endif
+#else
+# undef ftello
+# define ftello(f) \
+   (GL_LINK_WARNING ("ftello is unportable - " \
+                     "use gnulib module ftello for portability"), \
+    ftello (f))
+#endif
+
+#if defined GNULIB_POSIXCHECK
+# ifndef ftell
+#  define ftell(f) \
+     (GL_LINK_WARNING ("ftell cannot handle files larger than 4 GB " \
+                       "on 32-bit platforms - " \
+                       "use ftello function for handling of large files"), \
+      ftell (f))
+# endif
+#endif
+
+#if @GNULIB_FFLUSH@
+# if @REPLACE_FFLUSH@
+#  define fflush rpl_fflush
   /* Flush all pending data on STREAM according to POSIX rules.  Both
      output and seekable input streams are supported.  */
   extern int fflush (FILE *gl_stream);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fflush
+# define fflush(f) \
+   (GL_LINK_WARNING ("fflush is not always POSIX compliant - " \
+                     "use gnulib module fflush for portable " \
+                     "POSIX compliance"), \
+    fflush (f))
 #endif
 
 #ifdef __cplusplus

@@ -238,20 +238,20 @@ BUILT_SOURCES += $(SYS_SOCKET_H)
 
 # We need the following in order to create <sys/socket.h> when the system
 # doesn't have one that works with the given compiler.
-sys/socket.h: socket_.h
+sys/socket.h: sys_socket_.h
 	@MKDIR_P@ sys
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''ABSOLUTE_SYS_SOCKET_H''@|$(ABSOLUTE_SYS_SOCKET_H)|g' \
 	      -e 's|@''HAVE_SYS_SOCKET_H''@|$(HAVE_SYS_SOCKET_H)|g' \
 	      -e 's|@''HAVE_WINSOCK2_H''@|$(HAVE_WINSOCK2_H)|g' \
 	      -e 's|@''HAVE_WS2TCPIP_H''@|$(HAVE_WS2TCPIP_H)|g' \
-	      < $(srcdir)/socket_.h; \
+	      < $(srcdir)/sys_socket_.h; \
 	} > $@-t
 	mv -f $@-t $@
 MOSTLYCLEANFILES += sys/socket.h sys/socket.h-t
 MOSTLYCLEANDIRS += sys
 
-EXTRA_DIST += socket_.h
+EXTRA_DIST += sys_socket_.h
 
 ## end   gnulib module sys_socket
 

@@ -130,10 +130,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/progname.h
   lib/readline.c
   lib/readline.h
-  lib/socket_.h
   lib/stdbool_.h
   lib/strdup.c
   lib/string_.h
+  lib/sys_socket_.h
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h

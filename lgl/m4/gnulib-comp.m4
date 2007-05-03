@@ -27,6 +27,7 @@ AC_DEFUN([lgl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  AC_REQUIRE([AC_FUNC_FSEEKO])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -69,6 +70,8 @@ AC_DEFUN([lgl_INIT],
   gl_GC_SHA1
   gl_MODULE_INDICATOR([gc-sha1])
   gl_MD2
+  gl_FUNC_FSEEKO
+  gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
   gl_FUNC_GETPASS
@@ -190,14 +193,14 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/sha1.h
   lib/size_max.h
   lib/snprintf.c
-  lib/socket_.h
-  lib/stat_.h
   lib/stdbool_.h
   lib/stdint_.h
   lib/stdio_.h
   lib/string_.h
   lib/strverscmp.c
   lib/strverscmp.h
+  lib/sys_socket_.h
+  lib/sys_stat_.h
   lib/time_.h
   lib/time_r.c
   lib/unistd_.h
@@ -214,6 +217,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/des.m4
   m4/eoverflow.m4
   m4/extensions.m4
+  m4/fseeko.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4
   m4/gc-des.m4
