@@ -438,9 +438,8 @@ call_get_cert_callback (gnutls_session_t session,
   if (type == GNUTLS_CRT_X509)
     {
       local_certs = alloc_and_load_x509_certs (st.cert.x509, st.ncerts);
-      if (local_certs != NULL)
+      if (local_certs != NULL && st.key.x509)
 	local_key = alloc_and_load_x509_key (st.key.x509);
-
     }
   else
     {				/* PGP */
@@ -1307,7 +1306,7 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
       return ret;
     }
 
-  if (apr_pkey != NULL)
+  if (apr_cert_list_length > 0)
     {
       if ((ret =
 	   _gnutls_tls_sign_hdata (session,
@@ -1478,8 +1477,9 @@ _gnutls_get_selected_cert (gnutls_session_t session,
       *apr_pkey = session->internals.selected_key;
       *apr_cert_list_length = session->internals.selected_cert_list_length;
 
-      if (apr_cert_list_length == 0 || apr_pkey == NULL ||
-	  apr_cert_list == NULL)
+      if (apr_cert_list_length == 0
+	  || (apr_pkey == NULL || session->internals.sign_func)
+	  || apr_cert_list == NULL)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
