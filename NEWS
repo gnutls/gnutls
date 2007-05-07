@@ -5,8 +5,22 @@ See the end for copying conditions.
 
 * Version 1.7.8.p11.1 (unreleased)
 
+** Add new API to perform private key operations.
+Use the new API gnutls_set_sign_function to set a callback function
+that is responsible for performing the signing operation.
+
+** Add new APIs to get all user certificates from PKCS#11 provider.
+The gnutls_pkcs11_get_user_certificates looks for private keys, and
+returns the corresponding certificates.
+
+** Add new API to perform signing via the PKCS#11 library.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_get_user_certificates: ADD.
+gnutls_pkcs11_sign: ADD.
+gnutls_sign_func: ADD.
+gnutls_set_sign_function: ADD.
+gnutls_get_sign_function: ADD.
 
 * Version 1.7.8.p11.0 (released 2007-05-02)
 
