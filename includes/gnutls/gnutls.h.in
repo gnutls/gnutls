@@ -816,6 +816,17 @@ extern "C"
   void gnutls_transport_set_errno (gnutls_session_t session, int err);
   void gnutls_transport_set_global_errno (int err);
 
+  typedef int (*gnutls_sign_func) (gnutls_session_t session,
+				   gnutls_datum_t * cert,
+				   const gnutls_datum_t * hash_concat,
+				   gnutls_datum_t * signature);
+
+  void gnutls_set_sign_function (gnutls_session_t session,
+				 gnutls_sign_func sign_func);
+  gnutls_sign_func
+  gnutls_get_sign_function (gnutls_session_t session);
+
+
 /* session specific 
  */
   void gnutls_session_set_ptr (gnutls_session_t session, void *ptr);
