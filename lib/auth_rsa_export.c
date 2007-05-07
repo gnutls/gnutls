@@ -100,7 +100,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
   /* abort sending this message if we have a certificate
    * of 512 bits or less.
    */
-  if (_gnutls_mpi_get_nbits (apr_pkey->params[0]) <= 512)
+  if (apr_pkey && _gnutls_mpi_get_nbits (apr_pkey->params[0]) <= 512)
     {
       gnutls_assert ();
       return GNUTLS_E_INT_RET_0;
@@ -153,7 +153,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
   ddata.data = *data;
   ddata.size = data_size;
 
-  if (apr_pkey != NULL)
+  if (apr_cert_list_length > 0)
     {
       if ((ret =
 	   _gnutls_tls_sign_params (session, &apr_cert_list[0],
