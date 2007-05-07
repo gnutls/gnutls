@@ -627,6 +627,10 @@ typedef struct
    */
   int errnum;
 
+  /* Function used to perform public-key signing operation during
+     handshake. */
+  gnutls_sign_func sign_func;
+
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
 } internals_st;
