@@ -300,6 +300,38 @@ load_keys (void)
 
 }
 
+int
+sign_func (gnutls_session_t session,
+	   gnutls_datum_t * cert,
+	   const gnutls_datum_t * hash_concat,
+	   gnutls_datum_t * signature)
+{
+  if (verbose)
+    {
+      int ret;
+      gnutls_datum_t out;
+      gnutls_x509_crt_t crt;
+
+      ret = gnutls_x509_crt_init (&crt);
+      if (ret < 0)
+	return ret;
+
+      ret = gnutls_x509_crt_import (crt, cert, GNUTLS_X509_FMT_DER);
+      if (ret < 0)
+	return ret;
+
+      ret = gnutls_x509_crt_print (crt, GNUTLS_X509_CRT_ONELINE, &out);
+      if (ret < 0)
+	return ret;
+
+      printf ("*** PKCS#11 signing using credential: %s\n", out.data);
+
+      gnutls_free (out.data);
+      gnutls_x509_crt_deinit (crt);
+    }
+
+  return gnutls_pkcs11_sign (cert, hash_concat, signature);
+}
 
 
 /* This callback should be associated with a session by calling
@@ -361,6 +393,24 @@ cert_callback (gnutls_session session,
 	  st->deinit_all = 0;
 
 	  return 0;
+	}
+      else
+	{
+	  ret = gnutls_pkcs11_get_user_certificates (&st->cert.x509,
+						     &st->ncerts);
+	  if (ret < 0)
+	    {
+	      st->cert.x509 = NULL;
+	      st->ncert = 0;
+	    }
+	  else
+	    {
+	      gnutls_set_sign_function (session, sign_func);
+
+	      st->key.x509 = NULL;
+
+	      st->deinit_all = 1;
+	    }
 	}
     }
   else if (st->type == GNUTLS_CRT_OPENPGP)
