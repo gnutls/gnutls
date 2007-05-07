@@ -557,3 +557,161 @@ gnutls_pkcs11_get_ca_certificates (gnutls_x509_crt_t ** cert_list,
 {
   return get_certificates (cert_list, ncerts, 0);
 }
+
+int
+gnutls_pkcs11_get_user_certificates (gnutls_x509_crt_t ** cert_list,
+				     unsigned int *ncerts)
+{
+  return get_certificates (cert_list, ncerts, 1);
+}
+
+/* Sign. */
+static int
+sign (CK_ULONG ulSlotCount,
+      CK_SLOT_ID_PTR pSlotList,
+      const gnutls_datum_t * hash,
+      gnutls_datum_t * signature)
+
+{
+  CK_SESSION_HANDLE shSession;
+  CK_RV rv;
+  CK_ULONG i;
+
+  for (i = 0; i < ulSlotCount; i++)
+    {
+      rv = C_OpenSession (pSlotList[i], CKF_SERIAL_SESSION,
+			  NULL, NULL, &shSession);
+      if (rv != CKR_OK)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_PKCS11_ERROR;
+	}
+
+      rv = C_FindObjectsInit(shSession, NULL, 0);
+      if (rv != CKR_OK)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_PKCS11_ERROR;
+	}
+
+      while (1)
+	{
+	  CK_ULONG ulNumFound = 0;
+	  CK_ATTRIBUTE pValueTemplate[1];
+	  CK_OBJECT_CLASS ocClass;
+	  CK_OBJECT_HANDLE ohObject;
+
+	  rv = C_FindObjects(shSession, &ohObject, 1, &ulNumFound);
+	  if (rv != CKR_OK)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_PKCS11_ERROR;
+	    }
+
+	  if (ulNumFound == 0)
+	    break;
+
+	  pValueTemplate[0].type = CKA_CLASS;
+	  pValueTemplate[0].pValue = &ocClass;
+	  pValueTemplate[0].ulValueLen = sizeof(ocClass);
+
+	  rv = C_GetAttributeValue(shSession, ohObject, pValueTemplate, 1);
+	  if (rv != CKR_OK)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_PKCS11_ERROR;
+	    }
+
+	  if (ocClass == CKO_PRIVATE_KEY)
+	    {
+	      CK_MECHANISM mech;
+	      unsigned long len;
+
+	      mech.mechanism = CKM_RSA_PKCS;
+	      mech.pParameter = NULL;
+	      mech.ulParameterLen = 0;
+
+	      rv = C_SignInit (shSession, &mech, ohObject);
+	      if (rv != CKR_OK)
+		{
+		  gnutls_assert ();
+		  return GNUTLS_E_PKCS11_ERROR;
+		}
+
+	      len = 0;
+	      rv = C_Sign (shSession, hash->data, hash->size, NULL, &len);
+	      if (rv != CKR_OK)
+		{
+		  gnutls_assert ();
+		  return GNUTLS_E_PKCS11_ERROR;
+		}
+
+	      signature->size = len;
+	      signature->data = gnutls_malloc (len);
+	      if (!signature->data)
+		{
+		  gnutls_assert ();
+		  return GNUTLS_E_MEMORY_ERROR;
+		}
+
+	      rv = C_Sign (shSession, hash->data, hash->size,
+			   signature->data, &len);
+	      if (rv != CKR_OK)
+		{
+		  gnutls_assert ();
+		  gnutls_free (signature->data);
+		  return GNUTLS_E_PKCS11_ERROR;
+		}
+	    }
+	}
+
+      rv = C_FindObjectsFinal(shSession);
+      if (rv != CKR_OK)
+	{
+	  gnutls_assert ();
+	}
+
+      rv = C_CloseSession(shSession);
+      if (rv != CKR_OK)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_PKCS11_ERROR;
+	}
+    }
+
+  return 0;
+}
+
+int
+gnutls_pkcs11_sign (gnutls_datum_t * cert,
+		    const gnutls_datum_t * hash,
+		    gnutls_datum_t * signature)
+
+{
+  CK_ULONG ulSlotCount = 0;
+  CK_SLOT_ID_PTR pSlotList;
+  CK_RV rv;
+  int ret;
+  size_t i;
+
+  ret = startup_pkcs11 (&ulSlotCount, &pSlotList);
+  if (ret < 0)
+    return ret;
+
+  ret = sign (ulSlotCount, pSlotList, hash, signature);
+  if (ret < 0)
+    goto out;
+
+  ret = 0;
+
+ out:
+  rv = C_Finalize (NULL_PTR);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_PKCS11_ERROR;
+    }
+  gnutls_free (pSlotList);
+  return ret;
+
+}
