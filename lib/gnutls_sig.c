@@ -37,14 +37,16 @@
 #include <gnutls_sig.h>
 #include <gnutls_kx.h>
 
-static
-  int _gnutls_tls_sign (gnutls_cert * cert, gnutls_privkey * pkey,
-			const gnutls_datum_t * hash_concat,
-			gnutls_datum_t * signature);
+static int
+_gnutls_tls_sign (gnutls_session_t session,
+		  gnutls_cert * cert, gnutls_privkey * pkey,
+		  const gnutls_datum_t * hash_concat,
+		  gnutls_datum_t * signature);
 
 
 /* Generates a signature of all the previous sent packets in the 
  * handshake procedure. (20040227: now it works for SSL 3.0 as well)
+ * Used to generate the Certificate verify packet.
  */
 int
 _gnutls_tls_sign_hdata (gnutls_session_t session,
@@ -111,7 +113,7 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
-  ret = _gnutls_tls_sign (cert, pkey, &dconcat, signature);
+  ret = _gnutls_tls_sign (session, cert, pkey, &dconcat, signature);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -202,7 +204,7 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
       _gnutls_hash_deinit (td_sha, NULL);
       return GNUTLS_E_INTERNAL_ERROR;
     }
-  ret = _gnutls_tls_sign (cert, pkey, &dconcat, signature);
+  ret = _gnutls_tls_sign (session, cert, pkey, &dconcat, signature);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -257,7 +259,8 @@ _gnutls_sign (gnutls_pk_algorithm_t algo, mpi_t * params,
  * it supports signing.
  */
 static int
-_gnutls_tls_sign (gnutls_cert * cert, gnutls_privkey * pkey,
+_gnutls_tls_sign (gnutls_session_t session,
+		  gnutls_cert * cert, gnutls_privkey * pkey,
 		  const gnutls_datum_t * hash_concat,
 		  gnutls_datum_t * signature)
 {
@@ -273,11 +276,27 @@ _gnutls_tls_sign (gnutls_cert * cert, gnutls_privkey * pkey,
 	  return GNUTLS_E_KEY_USAGE_VIOLATION;
 	}
 
+  if (session->internals.sign_func)
+    return (*session->internals.sign_func) (session, &cert->raw,
+					    hash_concat, signature);
+
   return _gnutls_sign (pkey->pk_algorithm, pkey->params,
 		       pkey->params_size, hash_concat, signature);
 
 }
 
+void
+gnutls_set_sign_function (gnutls_session_t session,
+			  gnutls_sign_func sign_func)
+{
+  session->internals.sign_func = sign_func;
+}
+
+gnutls_sign_func
+gnutls_get_sign_function (gnutls_session_t session)
+{
+  return session->internals.sign_func;
+}
 
 static int
 _gnutls_verify_sig (gnutls_cert * cert,
