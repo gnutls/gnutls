@@ -40,6 +40,12 @@ extern "C"
 
   int gnutls_pkcs11_get_ca_certificates (gnutls_x509_crt_t ** cert_list,
 					 unsigned int *ncerts);
+  int gnutls_pkcs11_get_user_certificates (gnutls_x509_crt_t ** cert_list,
+					   unsigned int *ncerts);
+
+  int gnutls_pkcs11_sign (gnutls_datum_t * cert,
+			  const gnutls_datum_t * hash_concat,
+			  gnutls_datum_t * signature);
 
 # ifdef __cplusplus
 }
