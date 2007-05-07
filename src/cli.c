@@ -401,7 +401,7 @@ cert_callback (gnutls_session session,
 	  if (ret < 0)
 	    {
 	      st->cert.x509 = NULL;
-	      st->ncert = 0;
+	      st->ncerts = 0;
 	    }
 	  else
 	    {
