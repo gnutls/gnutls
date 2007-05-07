@@ -280,6 +280,9 @@ _gnutls_tls_sign (gnutls_session_t session,
     return (*session->internals.sign_func) (session, &cert->raw,
 					    hash_concat, signature);
 
+  if (!pkey)
+    return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+
   return _gnutls_sign (pkey->pk_algorithm, pkey->params,
 		       pkey->params_size, hash_concat, signature);
 
