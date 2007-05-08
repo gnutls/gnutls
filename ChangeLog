@@ -1,3 +1,118 @@
+2007-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.8.p11.1.
+
+2007-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, src/cli.c: Typo.
+
+2007-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_sig.c: Only use signing callback if we don't have a
+	private key.
+
+2007-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c: Don't bother checking private key at all.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_sig.c: Guard against NULL private keys.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_sig.c: Add gnutls_set_sign_function,
+	gnutls_get_sign_function.  Invoke external sign callback if present.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h:
+	(internals_st): Add sign_func.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_rsa_export.c: Allow private keys to be NULL.  (Assume
+	external keys are >=512 bits...)
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c: Allow private keys to be NULL.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* pkcs11/gnutls_pkcs11.c: Add gnutls_pkcs11_get_user_cert.  Add
+	gnutls_pkcs11_sign.  Both works, but needs cleanups.  No support for
+	multiple private keys in provider.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Typo.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Try to get user certs from PKCS#11.  Implement a
+	signer callback using PKCS#11.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_dhe.c: Sign when we have a certificate (the private key
+	may be NULL).
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/pkcs11.h: Add
+	gnutls_pkcs11_get_user_certificates, gnutls_pkcs11_sign.
+
+2007-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Add gnutls_sign_func,
+	gnutls_set_sign_function, gnutls_get_sign_function.
+
+2007-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/doc/gendocs_template,
+	gl/override/doc/gendocs_template.diff, doc/gendocs_template:
+	Update.
+
+2007-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gendocs_template: Revert to upstream gnulib version.
+
+2007-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/socket_.h, gl/string_.h, gl/sys_socket_.h,
+	gl/m4/gnulib-comp.m4, gl/m4/socklen.m4, lgl/Makefile.am,
+	lgl/getpass.c, lgl/socket_.h, lgl/stat_.h, lgl/stdio_.h,
+	lgl/string_.h, lgl/sys_socket_.h, lgl/sys_stat_.h, lgl/time_.h,
+	lgl/unistd_.h, lgl/wchar_.h, lgl/m4/fseeko.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/socklen.m4, lgl/m4/stdint.m4,
+	lgl/m4/stdio_h.m4, lgl/m4/sys_stat_h.m4, lgl/m4/unistd_h.m4:
+	Update.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
 2007-05-02  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.8.p11.0.
