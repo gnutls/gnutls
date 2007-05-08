@@ -1477,9 +1477,7 @@ _gnutls_get_selected_cert (gnutls_session_t session,
       *apr_pkey = session->internals.selected_key;
       *apr_cert_list_length = session->internals.selected_cert_list_length;
 
-      if (apr_cert_list_length == 0
-	  || (apr_pkey == NULL || session->internals.sign_func)
-	  || apr_cert_list == NULL)
+      if (apr_cert_list_length == 0 || apr_cert_list == NULL)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
