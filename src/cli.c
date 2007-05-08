@@ -303,7 +303,7 @@ load_keys (void)
 int
 sign_func (gnutls_session_t session,
 	   gnutls_datum_t * cert,
-	   const gnutls_datum_t * hash_concat,
+	   const gnutls_datum_t * hash,
 	   gnutls_datum_t * signature)
 {
   if (verbose)
@@ -330,7 +330,7 @@ sign_func (gnutls_session_t session,
       gnutls_x509_crt_deinit (crt);
     }
 
-  return gnutls_pkcs11_sign (cert, hash_concat, signature);
+  return gnutls_pkcs11_sign (cert, hash, signature);
 }
 
 
