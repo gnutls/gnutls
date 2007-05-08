@@ -276,7 +276,7 @@ _gnutls_tls_sign (gnutls_session_t session,
 	  return GNUTLS_E_KEY_USAGE_VIOLATION;
 	}
 
-  if (session->internals.sign_func)
+  if (!pkey && session->internals.sign_func)
     return (*session->internals.sign_func) (session, &cert->raw,
 					    hash_concat, signature);
 
