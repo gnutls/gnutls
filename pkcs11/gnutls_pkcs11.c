@@ -189,36 +189,6 @@ find_keys (char ***keys,
 	    {
 	      char **tmp;
 
-#if 0
-	      char buf[1024];
-	      mech.mechanism = CKM_RSA_PKCS;
-	      mech.pParameter = NULL;
-	      mech.ulParameterLen = 0;
-
-	      rv = C_SignInit (shSession, &mech, ohObject);
-	      if (rv != CKR_OK)
-		printf ("si failure %d\n", rv);
-
-	      len = 0;
-	      rv = C_Sign (shSession, "asjidasidjoaisdjoiasjdoiajsdasiodjdata", 20, NULL, &len);
-	      if (rv != CKR_OK)
-		printf ("sig failure %d\n", rv);
-
-	      printf ("len %d\n", len);
-
-	      rv = C_Sign (shSession, "asdasdasdsadsaxzczxczxcxzcxzxzcxzxcz", 20, buf, &len);
-	      if (rv != CKR_OK)
-		printf ("sig failure %d\n", rv);
-
-	      {
-		size_t i;
-		printf ("sig: ");
-		for (i = 0; i < len; i++)
-		  printf ("%02x", buf[i] & 0xFF);
-		printf("\n");
-	      }
-#endif
-
 	      pValueTemplate[0].type = CKA_ID;
 	      pValueTemplate[0].pValue = NULL;
 	      pValueTemplate[0].ulValueLen = 0;
