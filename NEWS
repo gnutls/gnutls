@@ -7,13 +7,29 @@ See the end for copying conditions.
 
 ** Add new API to perform private key operations.
 Use the new API gnutls_set_sign_function to set a callback function
-that is responsible for performing the signing operation.
+that is responsible for performing the signing operation.  The
+callback must follow the gnutls_sign_func prototype:
+
+  typedef int (*gnutls_sign_func) (gnutls_session_t session,
+				   gnutls_datum_t * cert,
+				   const gnutls_datum_t * hash_concat,
+				   gnutls_datum_t * signature);
 
 ** Add new APIs to get all user certificates from PKCS#11 provider.
 The gnutls_pkcs11_get_user_certificates looks for private keys, and
-returns the corresponding certificates.
+returns certificates that have the same CKA_ID attribute.
 
 ** Add new API to perform signing via the PKCS#11 library.
+The function can be used by a gnutls_sign_func callback to off-load
+signing the operation to a PKCS#11 provider.  Currently the limitation
+is that it doesn't support multiple private keys on the smart card (it
+doesn't check whether the certificate used for signing corresponds to
+the private key used).
+
+** Improved PKCS#11 support in gnutls-cli tool.
+It will automatically try to load CA certificates (implemented in the
+last release) and user certificates (new in this release), and
+off-loads the signing operations to the PKCS#11 backend.
 
 ** API and ABI modifications:
 gnutls_pkcs11_get_user_certificates: ADD.
