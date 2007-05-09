@@ -54,8 +54,10 @@ psktool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
 	common.c select.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
-	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) ../gl/libgnu.la \
-	../pkcs11/libgnutls-pkcs11.la
+	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) ../gl/libgnu.la
+if ENABLE_PKCS11_SCUTE
+gnutls_cli_LDADD = ../pkcs11/libgnutls-pkcs11.la
+endif
 
 gnutls_cli_debug_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c	\
 	tls_test.c tests.h tests.c common.h common.c
