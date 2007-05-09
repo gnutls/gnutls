@@ -485,11 +485,12 @@ if test "$scute" != "no"; then
   AC_MSG_RESULT(yes)
   AC_LIB_HAVE_LINKFLAGS(scute,,, [C_Initialize (0);])
   if test "$ac_cv_libscute" != yes; then
-    AC_MSG_ERROR(*** PKCS11 provider Scute was not found.)
+    AC_MSG_WARN(*** PKCS11 provider Scute not found, skipping gnutls-pkcs11.)
   fi
 else
   AC_MSG_RESULT(no)
 fi
+AM_CONDITIONAL(ENABLE_PKCS11_SCUTE, test "$ac_cv_libscute" = yes)
 
 dnl CHECK FOR ZLIB SUPPORT
 dnl
