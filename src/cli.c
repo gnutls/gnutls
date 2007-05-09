@@ -35,7 +35,9 @@
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
-#include <gnutls/pkcs11.h>
+#if HAVE_PKCS11_SCUTE
+# include <gnutls/pkcs11.h>
+#endif
 
 #include "error.h"
 #include "read-file.h"
@@ -300,6 +302,7 @@ load_keys (void)
 
 }
 
+#if HAVE_PKCS11_SCUTE
 int
 sign_func (gnutls_session_t session,
 	   gnutls_datum_t * cert,
@@ -332,7 +335,7 @@ sign_func (gnutls_session_t session,
 
   return gnutls_pkcs11_sign (cert, hash, signature);
 }
-
+#endif
 
 /* This callback should be associated with a session by calling
  * gnutls_certificate_client_set_retrieve_function( session, cert_callback),
@@ -394,6 +397,7 @@ cert_callback (gnutls_session session,
 
 	  return 0;
 	}
+#if HAVE_PKCS11_SCUTE
       else
 	{
 	  ret = gnutls_pkcs11_get_user_certificates (&st->cert.x509,
@@ -412,6 +416,7 @@ cert_callback (gnutls_session session,
 	      st->deinit_all = 1;
 	    }
 	}
+#endif
     }
   else if (st->type == GNUTLS_CRT_OPENPGP)
     {
@@ -1082,6 +1087,7 @@ init_global_tls_stuff (void)
   gnutls_certificate_set_verify_flags (xcred,
 				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
+#if HAVE_PKCS11_SCUTE
   ret = gnutls_pkcs11_get_ca_certificates (&ca_list, &ncas);
   if (ret < 0)
     {
@@ -1093,6 +1099,7 @@ init_global_tls_stuff (void)
     {
       fprintf (stderr, "Error setting the PKCS#11 x509 trusts\n");
     }
+#endif
 
   if (x509_cafile != NULL)
     {
