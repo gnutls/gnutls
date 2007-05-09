@@ -486,6 +486,8 @@ if test "$scute" != "no"; then
   AC_LIB_HAVE_LINKFLAGS(scute,,, [C_Initialize (0);])
   if test "$ac_cv_libscute" != yes; then
     AC_MSG_WARN(*** PKCS11 provider Scute not found, skipping gnutls-pkcs11.)
+  else
+    AC_DEFINE(HAVE_PKCS11_SCUTE, 1, [Use libgnutls-pkcs11.])
   fi
 else
   AC_MSG_RESULT(no)
