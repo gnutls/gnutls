@@ -5,6 +5,22 @@ See the end for copying conditions.
 
 * Version 1.7.8.p11.1 (released 2007-05-08)
 
+** Rename gnutls_set_sign_function to gnutls_x509_sign_callback_set,
+** and gnutls_get_sign_function to gnutls_x509_sign_callback_set.
+The functions are X.509 specific, and the name should reflect that.
+Ideally, these callbacks function should be set in the
+gnutls_certificate_credentials_t structure since there is where the
+private key is set.  However, the implementation to do that is more
+complicated.
+
+** API and ABI modifications:
+gnutls_set_sign_function: REMOVED, renamed to gnutls_x509_sign_callback_set.
+gnutls_x509_sign_callback_set: NEW, renamed from gnutls_set_sign_function.
+gnutls_get_sign_function: REMOVED, renamed to gnutls_x509_sign_callback_get.
+gnutls_x509_sign_callback_get: NEW, renamed from gnutls_get_sign_function.
+
+* Version 1.7.8.p11.1 (released 2007-05-08)
+
 ** Add new API to perform private key operations.
 Use the new API gnutls_set_sign_function to set a callback function
 that is responsible for performing the signing operation.  The
