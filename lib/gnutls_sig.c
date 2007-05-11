@@ -277,8 +277,9 @@ _gnutls_tls_sign (gnutls_session_t session,
 	}
 
   if (!pkey && session->internals.sign_func)
-    return (*session->internals.sign_func) (session, &cert->raw,
-					    hash_concat, signature);
+    return (*session->internals.sign_func)
+      (session->internals.sign_func_userdata, session, &cert->raw,
+       hash_concat, signature);
 
   if (!pkey)
     return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -289,15 +290,20 @@ _gnutls_tls_sign (gnutls_session_t session,
 }
 
 void
-gnutls_set_sign_function (gnutls_session_t session,
-			  gnutls_sign_func sign_func)
+gnutls_x509_sign_callback_set (gnutls_session_t session,
+			       gnutls_sign_func sign_func,
+			       void *userdata)
 {
   session->internals.sign_func = sign_func;
+  session->internals.sign_func_userdata = userdata;
 }
 
 gnutls_sign_func
-gnutls_get_sign_function (gnutls_session_t session)
+gnutls_x509_sign_callback_get (gnutls_session_t session,
+			       void **userdata)
 {
+  if (userdata)
+    *userdata = session->internals.sign_func_userdata;
   return session->internals.sign_func;
 }
 
