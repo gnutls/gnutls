@@ -6,11 +6,11 @@ See the end for copying conditions.
 * Version 1.7.8.p11.2 (unreleased)
 
 ** Make Scute dependency optional.
+Suggested by Alon Bar-Lev.
 
 ** Add void* parameter to sign callbacks.
-This changes the get/set_sign callback APIs added in the last release,
-but since those were renamed in this release, changing them doesn't
-matter.
+Suggested by Ludovic Courtès and Alon Bar-Lev.  This changes the
+get/set_sign callback APIs.
 
 ** Rename gnutls_set_sign_function to gnutls_x509_sign_callback_set,
 ** and gnutls_get_sign_function to gnutls_x509_sign_callback_set.
