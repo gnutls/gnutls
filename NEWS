@@ -6,7 +6,8 @@ See the end for copying conditions.
 * Version 1.7.8.p11.2 (unreleased)
 
 ** Make Scute dependency optional.
-Suggested by Alon Bar-Lev.
+Suggested by Alon Bar-Lev.  When Scute is not found, gnutls-cli will
+not support the PKCS#11 interface.
 
 ** Add void* parameter to sign callbacks.
 Suggested by Ludovic Courtès and Alon Bar-Lev.  This changes the
