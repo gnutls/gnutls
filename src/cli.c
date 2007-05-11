@@ -304,7 +304,8 @@ load_keys (void)
 
 #if HAVE_PKCS11_SCUTE
 int
-sign_func (gnutls_session_t session,
+sign_func (void *userdata,
+	   gnutls_session_t session,
 	   gnutls_datum_t * cert,
 	   const gnutls_datum_t * hash,
 	   gnutls_datum_t * signature)
@@ -409,7 +410,7 @@ cert_callback (gnutls_session session,
 	    }
 	  else
 	    {
-	      gnutls_set_sign_function (session, sign_func);
+	      gnutls_x509_sign_callback_set (session, sign_func, NULL);
 
 	      st->key.x509 = NULL;
 
