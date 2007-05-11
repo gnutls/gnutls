@@ -265,7 +265,7 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
   * DHE-RSA, DHE-DSS, RSA.
   * Cipher: AES_256_CBC, AES_128_CBC, 3DES_CBC, and ARCFOUR_128.
   * MAC algorithm: SHA, and MD5.
-  * Certificate types: OpenPGP, X.509
+  * Certificate types: X.509, OpenPGP
   * Compression: DEFLATE, NULL.
   *
   * Returns 0 on success.
@@ -315,8 +315,8 @@ gnutls_set_default_priority (gnutls_session_t session)
     0
   };
   static int cert_type_priority[] = {
-    GNUTLS_CRT_OPENPGP,
     GNUTLS_CRT_X509,
+    GNUTLS_CRT_OPENPGP,
     0
   };
 
