@@ -44,7 +44,7 @@ extern "C"
 					   unsigned int *ncerts);
 
   int gnutls_pkcs11_sign (gnutls_datum_t * cert,
-			  const gnutls_datum_t * hash_concat,
+			  const gnutls_datum_t * hash,
 			  gnutls_datum_t * signature);
 
 # ifdef __cplusplus
