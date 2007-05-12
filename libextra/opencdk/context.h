@@ -54,8 +54,6 @@ struct cdk_ctx_s {
     unsigned textmode:1;
     unsigned compress:1;
     unsigned mdc:1;
-    unsigned compat:1;
-    unsigned rfc1991:1;
     unsigned overwrite;
     unsigned force_digest:1;
   } opt;
@@ -93,12 +91,6 @@ struct cdk_subpkt_s {
   u32 size;
   byte type;
   byte d[1];  
-};
-
-struct key_idx_s {
-  off_t offset;
-  u32 keyid[2];
-  byte fpr[KEY_FPR_LEN];
 };
 
 
@@ -152,7 +144,6 @@ struct cdk_dek_s {
   int algo;
   int keylen;
   int use_mdc;
-  unsigned rfc1991:1;
   byte key[32]; /* 256-bit */
 };
 

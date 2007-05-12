@@ -95,6 +95,7 @@ cdk_strerror (int ec)
     case CDK_Too_Short:        return "Buffer or object is too short";
     case CDK_Unusable_Key:     return "Unusable public key";
     case CDK_No_Data:          return "No data";
+    case CDK_No_Passphrase:    return "No passphrase supplied";
     default:                   sprintf (buf, "ec=%d", ec); return buf;
     }
   return NULL;
@@ -191,8 +192,8 @@ _secmem_init (size_t size)
 static void
 _secmem_end (void)
 {
-    gcry_control (GCRYCTL_TERM_SECMEM);
-    secmem_init = 0;
+  gcry_control (GCRYCTL_TERM_SECMEM);
+  secmem_init = 0;
 }
 
 
@@ -435,25 +436,6 @@ handle_set_s2k (cdk_ctx_t hd, int mode, int digest, int cipher)
 
 
 static void
-handle_set_compat (cdk_ctx_t hd, int val)
-{
-  if (!hd)
-    return;
-  hd->opt.compat = val;
-  if (!val)
-    return;
-  hd->opt.mdc = 0;
-  hd->opt.rfc1991 = val == -1? 1: 0;
-  hd->compress.algo = CDK_COMPRESS_ZIP;
-  hd->compress.level = -1;
-  hd->cipher_algo = val == -1? GCRY_CIPHER_IDEA : DEFAULT_CIPHER_ALGO;
-  hd->digest_algo = val == -1? GCRY_MD_MD5: DEFAULT_DIGEST_ALGO;
-  if (val == -1)
-    handle_set_s2k (hd, 0, hd->digest_algo, hd->cipher_algo);
-}
-
-
-static void
 handle_set_compress (cdk_ctx_t hd, int algo, int level)
 {
   if (!hd)
@@ -510,22 +492,15 @@ cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...)
       break;
       
     case CDK_CTL_DIGEST:
-      if( set )
+      if (set)
 	handle_set_digest( hd, va_arg( arg_ptr, int ) );
       else
 	val = hd->digest_algo;
       break;
       
-    case CDK_CTL_COMPAT:
-      if( set )
-	handle_set_compat( hd, va_arg( arg_ptr, int ) );
-      else
-	val = hd->opt.compat;
-      break;
-      
     case CDK_CTL_OVERWRITE:
       if (set)
-	hd->opt.overwrite = va_arg( arg_ptr, int );
+	hd->opt.overwrite = va_arg (arg_ptr, int);
       else
 	val = hd->opt.overwrite;
       break;
@@ -552,21 +527,9 @@ cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...)
 	val = hd->_s2k.mode;
       break;
       
-    case CDK_CTL_KEYCACHE_ON:
-      if (set)
-	hd->cache.on = va_arg (arg_ptr, int);
-      else
-	val = hd->cache.on;
-      break;
-      
-    case CDK_CTL_KEYCACHE_FREE:
-      cdk_sk_release (hd->cache.sk);
-      hd->cache.sk = NULL;
-      break;
-      
     case CDK_CTL_FORCE_DIGEST:
-      if( set )
-	hd->opt.force_digest = va_arg( arg_ptr, int );
+      if (set)
+	hd->opt.force_digest = va_arg (arg_ptr, int);
       else
 	val = hd->opt.force_digest;
       break;
@@ -738,7 +701,6 @@ cdk_handle_free (cdk_ctx_t hd)
   if (!hd)
     return;
   _cdk_result_verify_free (hd->result.verify);
-  cdk_sk_release (hd->cache.sk);
 
   /* If cdk_handle_set_keyring() were used, we need to free the key db
      handles here because the handles are not controlled by the user. */

@@ -659,6 +659,8 @@ cdk_armor_encode_buffer (const byte *inbuf, size_t inlen,
   char tempout[128];
   size_t pos, off, len, rest;
   
+  if (!inbuf || !nwritten)
+    return CDK_Inv_Value;
   if (type > CDK_ARMOR_SIGNATURE)
     return CDK_Inv_Mode;
   
@@ -706,6 +708,8 @@ cdk_armor_encode_buffer (const byte *inbuf, size_t inlen,
       memcpy (outbuf+pos, tempout, strlen (tempout)); pos += strlen (tempout);
       memcpy (outbuf+pos, le, strlen (le)); pos += strlen (le);
     }
+  
+  /* FIXME: We do not generate a CRC for the data, which is legal. */
   memcpy (outbuf+pos, "-----", 5); pos += 5;
   memcpy (outbuf+pos, tail, strlen (tail)); pos += strlen (tail);
   memcpy (outbuf+pos, "-----", 5); pos += 5;

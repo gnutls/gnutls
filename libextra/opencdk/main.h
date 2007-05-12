@@ -34,7 +34,7 @@
 #include "context.h"
 
 /* The maximal amount of bits a multi precsion integer can have. */
-#define MAX_MPI_BITS 8192
+#define MAX_MPI_BITS 16384
 #define MAX_MPI_BYTES (MAX_MPI_BITS/8)
 
 
@@ -42,11 +42,14 @@
  that SHA-512 is used and increase the buffer size of the digest. */
 #define MAX_DIGEST_LEN 64
 
+/* Helper to find out if the signature were made over a user ID
+   or if the signature revokes a previous user ID. */
 #define IS_UID_SIG(s) (((s)->sig_class & ~3) == 0x10)
 #define IS_UID_REV(s) ((s)->sig_class == 0x30)
 
 #define DEBUG_PKT (_cdk_get_log_level () == (CDK_LOG_DEBUG+1))
 
+/* Helper to find out if a key has the requested capability. */
 #define KEY_CAN_ENCRYPT(a) (_cdk_pk_algo_usage ((a)) & CDK_KEY_USG_ENCR)
 #define KEY_CAN_SIGN(a)    (_cdk_pk_algo_usage ((a)) & CDK_KEY_USG_SIGN)
 #define KEY_CAN_AUTH(a)    (_cdk_pk_algo_usage ((a)) & CDK_KEY_USG_AUTH)
@@ -72,12 +75,10 @@ void _cdk_log_debug (const char * fmt, ...);
 char * _cdk_passphrase_get (cdk_ctx_t hd, const char *prompt);
 
 /*-- misc.c --*/
-int _cdk_check_file( const char * file );
-u32 _cdk_timestamp( void );
-int _cdk_strcmp( const char * a, const char * b );
-u32 _cdk_buftou32( const byte * buf );
-void _cdk_u32tobuf( u32 u, byte * buf );
-const char * _cdk_memistr( const char * buf, size_t buflen, const char * sub );
+int _cdk_check_args( int overwrite, const char * in, const char * out );
+u32 _cdk_buftou32 (const byte * buf);
+void _cdk_u32tobuf (u32 u, byte * buf);
+const char *_cdk_memistr (const char * buf, size_t buflen, const char * sub);
 cdk_error_t map_gcry_error (gcry_error_t err);
 
 /* Helper to provide case insentensive strstr version. */
@@ -106,7 +107,7 @@ cdk_error_t _cdk_subpkt_copy (cdk_subpkt_t * r_dst, cdk_subpkt_t src);
 int _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
                     gcry_md_hd_t digest, int * r_expired);
 cdk_error_t _cdk_hash_sig_data (cdk_pkt_signature_t sig, gcry_md_hd_t hd);
-void _cdk_hash_userid( cdk_pkt_userid_t uid, int sig_version, gcry_md_hd_t md);
+void _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version, gcry_md_hd_t md);
 int _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, gcry_md_hd_t md, int use_fpr);
 cdk_error_t _cdk_pk_check_sig (cdk_keydb_hd_t hd,
 			       cdk_kbnode_t knode, 
@@ -117,17 +118,17 @@ void _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node);
 void _cdk_kbnode_clone (cdk_kbnode_t node);
 
 /*-- sesskey.c --*/
-int _cdk_digest_encode_pkcs1( byte ** r_md, size_t * r_mdlen, int pk_algo,
+int _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
                               const byte * md,
-                              int digest_algo, unsigned nbits );
-int _cdk_sk_unprotect_auto( cdk_ctx_t hd, cdk_pkt_seckey_t sk );
+                              int digest_algo, unsigned nbits);
+int _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk);
 
 /*-- keydb.c --*/
-int _cdk_keydb_get_pk_byusage( cdk_keydb_hd_t hd, const char * name,
-                               cdk_pkt_pubkey_t * ret_pk, int usage );
-int _cdk_keydb_get_sk_byusage( cdk_keydb_hd_t hd, const char * name,
-                               cdk_pkt_seckey_t * ret_sk, int usage );
-int _cdk_keydb_check_userid( cdk_keydb_hd_t hd, u32 * keyid, const char * id );
+int _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char * name,
+                               cdk_pkt_pubkey_t * ret_pk, int usage);
+int _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char * name,
+                               cdk_pkt_seckey_t * ret_sk, int usage);
+int _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid, const char * id);
 
 /*-- sign.c --*/
 int _cdk_sig_create( cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig );
@@ -156,8 +157,6 @@ cdk_error_t _cdk_stream_fpopen (FILE * fp, unsigned write_mode,
 void _cdk_result_verify_free (cdk_verify_result_t res);
 cdk_verify_result_t _cdk_result_verify_new (void);
 
-/*-- encrypt.c --*/
-int _cdk_check_args( int overwrite, const char * in, const char * out );
 
 /*-- read-packet.c --*/
 size_t _cdk_pkt_read_len (FILE * inp, size_t *ret_partial);

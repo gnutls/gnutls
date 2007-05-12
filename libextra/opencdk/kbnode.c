@@ -396,7 +396,7 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t *ret_node,
   cdk_stream_t inp;
   cdk_error_t rc;
   
-  if (!buflen || !ret_node)
+  if (!buflen || !ret_node || !buf)
     return CDK_Inv_Value;
   
   *ret_node = NULL;
@@ -428,7 +428,10 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
   
   if (!node)
     return CDK_Inv_Value;
-
+  
+  *r_buf = NULL;
+  *r_buflen = 0;
+  
   rc = cdk_stream_tmp_new (&s);
   if (rc)
     return rc;
@@ -436,13 +439,13 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
   for (n = node; n; n = n->next)
     {
       /* Skip all packets which cannot occur in a key composition. */
-      if (n->pkt->pkttype != CDK_PKT_PUBLIC_KEY
-	  && n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY
-	  && n->pkt->pkttype != CDK_PKT_SECRET_KEY
-	  && n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY
-	  && n->pkt->pkttype != CDK_PKT_SIGNATURE
-	  && n->pkt->pkttype != CDK_PKT_USER_ID
-	  && n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
+      if (n->pkt->pkttype != CDK_PKT_PUBLIC_KEY &&
+	  n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY &&
+	  n->pkt->pkttype != CDK_PKT_SECRET_KEY &&
+	  n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY &&
+	  n->pkt->pkttype != CDK_PKT_SIGNATURE &&
+	  n->pkt->pkttype != CDK_PKT_USER_ID &&
+	  n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
 	continue;
       rc = cdk_pkt_write (s, n->pkt);
       if (rc)
@@ -457,7 +460,7 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
   *r_buf = cdk_calloc (1, len);
   *r_buflen = cdk_stream_read (s, *r_buf, len);
   cdk_stream_close (s);
-  return rc;
+  return 0;
 }
   
   
@@ -480,7 +483,6 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
   size_t len;
   cdk_error_t rc;
   
-  /* FIXME: Mark the function as deprecated!. */
   if (!node)
     return CDK_Inv_Value;
   
@@ -491,13 +493,13 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
   for (n = node; n; n = n->next)
     {
       /* Skip all packets which cannot occur in a key composition. */
-      if (n->pkt->pkttype != CDK_PKT_PUBLIC_KEY
-	  && n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY
-	  && n->pkt->pkttype != CDK_PKT_SECRET_KEY
-	  && n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY
-	  && n->pkt->pkttype != CDK_PKT_SIGNATURE
-	  && n->pkt->pkttype != CDK_PKT_USER_ID
-	  && n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
+      if (n->pkt->pkttype != CDK_PKT_PUBLIC_KEY &&
+	  n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY &&
+	  n->pkt->pkttype != CDK_PKT_SECRET_KEY &&
+	  n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY &&
+	  n->pkt->pkttype != CDK_PKT_SIGNATURE &&
+	  n->pkt->pkttype != CDK_PKT_USER_ID &&
+	  n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
 	continue;
       rc = cdk_pkt_write (s, n->pkt);
       if (rc)
@@ -511,10 +513,8 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
   len = cdk_stream_get_length (s);
   if (!buf) 
     {
-      *r_nbytes = len; /* only return the length of the buffer */
+      *r_nbytes = len; /* Only return the length of the buffer */
       cdk_stream_close (s);
-      /* FIXME: A patch from the nmav-0-5-x has set the return
-         to CDK_Too_Short which is clerly wrong! */
       return 0;
     }
   if (*r_nbytes < len)

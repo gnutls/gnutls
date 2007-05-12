@@ -34,6 +34,13 @@
 #define KEYDB_CACHE_ENTRIES 8
 
 typedef struct key_table_s *key_table_t;
+
+struct key_idx_s 
+{
+  off_t offset;
+  u32 keyid[2];
+  byte fpr[KEY_FPR_LEN];
+};
 typedef struct key_idx_s *key_idx_t;
 
 
@@ -47,12 +54,13 @@ static cdk_kbnode_t find_selfsig_node (cdk_kbnode_t key, cdk_pkt_pubkey_t pk);
 static char*
 keydb_idx_mkname (const char *file)
 {
-  char *fname;
+  char *fname, *fmt;
     
-  fname = cdk_calloc (1, strlen (file) + 4 + 1);
+  fmt = "%s.idx";
+  fname = cdk_calloc (1, strlen (file) + strlen (fmt) + 1);
   if (!fname)
     return NULL;
-  sprintf (fname, "%s.idx", file);
+  sprintf (fname, fmt, file);
   return fname;
 }
 
@@ -63,7 +71,7 @@ keydb_idx_mkname (const char *file)
    --------
     4 octets offset of the packet
     8 octets keyid
-   KEY_FPR_LEN (=20) octets fingerprint
+   20 octets fingerprint
    --------
    We store the keyid and the fingerprint due to the fact we can't get
    the keyid from a v3 fingerprint directly.
@@ -73,9 +81,8 @@ keydb_idx_build (const char *file)
 {
   cdk_packet_t pkt;
   cdk_stream_t inp, out = NULL;
-  byte buf[8], fpr[KEY_FPR_LEN];
-  char *fname;
-  off_t pos;
+  byte buf[4+8+KEY_FPR_LEN];
+  char *idx_name;
   u32 keyid[2];
   cdk_error_t rc;
   
@@ -86,43 +93,47 @@ keydb_idx_build (const char *file)
   if (rc)
     return rc;
   
-  fname = keydb_idx_mkname (file);
-  if (!fname)
+  idx_name = keydb_idx_mkname (file);
+  if (!idx_name)
     {
       cdk_stream_close (inp);
       return CDK_Out_Of_Core;
     }  
-  rc = cdk_stream_create (fname, &out);
-  cdk_free (fname);
+  rc = cdk_stream_create (idx_name, &out);
+  cdk_free (idx_name);
   if (rc)
     goto leave;
-  
+
   cdk_pkt_new (&pkt);
   while (!cdk_stream_eof (inp)) 
     {
-      pos = cdk_stream_tell (inp);
+      off_t pos = cdk_stream_tell (inp);
+      
       rc = cdk_pkt_read (inp, pkt);
       if (rc)
-	break;
+	{
+	  _cdk_log_debug ("index build failed packet off=%lu\n", pos);
+	  /* FIXME: The index is incomplete */
+	  break;
+	}     
       if (pkt->pkttype == CDK_PKT_PUBLIC_KEY ||
 	  pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY)
 	{
 	  _cdk_u32tobuf (pos, buf);
-	  cdk_stream_write (out, buf, 4);
 	  cdk_pk_get_keyid (pkt->pkt.public_key, keyid);
-	  _cdk_u32tobuf (keyid[0], buf + 0);
-	  _cdk_u32tobuf (keyid[1], buf + 4);
-	  cdk_stream_write (out, buf, 8);
-	  cdk_pk_get_fingerprint (pkt->pkt.public_key, fpr);
-	  cdk_stream_write (out, fpr, KEY_FPR_LEN);
+	  _cdk_u32tobuf (keyid[0], buf + 4);
+	  _cdk_u32tobuf (keyid[1], buf + 8);
+	  cdk_pk_get_fingerprint (pkt->pkt.public_key, buf+12);
+	  cdk_stream_write (out, buf, 4+8+KEY_FPR_LEN);
         }
       cdk_pkt_free (pkt);
     }
-
+  
+  cdk_pkt_release (pkt);
+  
   leave:
   cdk_stream_close (out);
   cdk_stream_close (inp);
-  cdk_pkt_release (pkt);
   return rc;
 }
 
@@ -176,9 +187,8 @@ keydb_idx_parse (cdk_stream_t inp, key_idx_t *r_idx)
 {
   key_idx_t idx;
   byte buf[4];
-  int i;
   
-  if( !inp || !r_idx )
+  if (!inp || !r_idx)
     return CDK_Inv_Value;
   
   idx = cdk_calloc (1, sizeof *idx);
@@ -187,8 +197,7 @@ keydb_idx_parse (cdk_stream_t inp, key_idx_t *r_idx)
   
   while (!cdk_stream_eof (inp)) 
     {
-      i = cdk_stream_read (inp, buf, 4);
-      if (i == CDK_EOF)
+      if (cdk_stream_read (inp, buf, 4) == CDK_EOF)
 	break;
       idx->offset = _cdk_buftou32 (buf);
       cdk_stream_read (inp, buf, 4);
@@ -204,8 +213,7 @@ keydb_idx_parse (cdk_stream_t inp, key_idx_t *r_idx)
 
 
 static int
-keydb_idx_search (cdk_stream_t inp, u32 *keyid,
-                  const byte *fpr, off_t *r_off)
+keydb_idx_search (cdk_stream_t inp, u32 *keyid, const byte *fpr, off_t *r_off)
 {
   key_idx_t idx;
 
@@ -214,6 +222,9 @@ keydb_idx_search (cdk_stream_t inp, u32 *keyid,
   if ((keyid && fpr) || (!keyid && !fpr))
     return CDK_Inv_Mode;
 
+  /* We need an initialize the offset var with a value
+     because it might be possible the returned offset will
+     be 0 and then we cannot differ between the begin and an EOF. */
   *r_off = 0xFFFFFFFF;
   cdk_stream_seek (inp, 0);
   while (keydb_idx_parse (inp, &idx) != CDK_EOF) 
@@ -449,7 +460,7 @@ _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t *ret_kr)
 		  /* This is no real error, it just means we can't create
 		     the index at the given directory. maybe we've no write
 		     access. in this case, we simply disable the index. */
-		  _cdk_log_debug ("disable key index table\n");
+		  _cdk_log_debug ("disable key index table err=%d\n", rc);
 		  rc = 0;
 		  hd->no_cache = 1;
 		}
@@ -837,43 +848,45 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
                       int *r_cache_hit, off_t *r_off)
 {
   key_table_t c;
-  off_t off;
-  int cache_hit;
 
   if (!hd || !r_cache_hit || !r_off)
     return CDK_Inv_Value;
   
-  /* Reset */
-  off = 0;
-  cache_hit = 0;
+  /* Reset the values. */
+  *r_cache_hit = 0;
+  *r_off = 0;
   
   c = keydb_cache_find (hd->cache, ks);
   if (c != NULL)
     {      
       _cdk_log_debug ("Cache: found entry in cache.\n");
-      cache_hit = 1;
-      off = c->offset;
+      *r_cache_hit = 1;
+      *r_off = c->offset;
+      return 0;
     }
   
-  if (hd->idx && !c)
+  /* No index cache available so we just return here. */
+  if (!hd->idx)
+    return 0;
+  
+  if (hd->idx)
     {
       if (ks->type == CDK_DBSEARCH_KEYID)
 	{
-	  if (keydb_idx_search (hd->idx, ks->u.keyid, NULL, &off))
+	  if (keydb_idx_search (hd->idx, ks->u.keyid, NULL, r_off))
 	    return CDK_Error_No_Key;
 	  _cdk_log_debug ("Cache: found keyid entry in idx table.\n");
-	  cache_hit = 1;
+	  *r_cache_hit = 1;
         }
       else if (ks->type == CDK_DBSEARCH_FPR)
 	{
-	  if (keydb_idx_search (hd->idx, NULL, ks->u.fpr, &off))
+	  if (keydb_idx_search (hd->idx, NULL, ks->u.fpr, r_off))
 	    return CDK_Error_No_Key;
 	  _cdk_log_debug ("Cache: found fpr entry in idx table.\n");
-	  cache_hit = 1;
+	  *r_cache_hit = 1;
 	}
     }
-  *r_off = off;
-  *r_cache_hit = cache_hit;
+
   return 0;
 }
 
@@ -907,12 +920,15 @@ cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
     return rc;
   
   if (!hd->no_cache)
-    {     
-      /* FIXME: pubkey offset seems wrong */
+    {
+      /* It is possible the index is not up-to-date and thus we do
+         not find the requesed key. In this case, we reset cache hit
+         and continue our normal search procedure. */
       rc = keydb_pos_from_cache (hd, hd->dbs, &cache_hit, &off);
       if (rc)
-        return rc;
+	cache_hit = 0;
     }
+  
   ks = hd->dbs;
   while (!key_found && !rc)
     {
@@ -1270,15 +1286,15 @@ cdk_keydb_get_pk (cdk_keydb_hd_t hd, u32 *keyid, cdk_pkt_pubkey_t *r_pk)
 
 
 cdk_error_t
-cdk_keydb_get_sk (cdk_keydb_hd_t hd, u32 *keyid, cdk_pkt_seckey_t *ret_sk)
+cdk_keydb_get_sk (cdk_keydb_hd_t hd, u32 *keyid, cdk_seckey_t *ret_sk)
 {
   cdk_kbnode_t snode, node;
-  cdk_pkt_seckey_t sk;
+  cdk_seckey_t sk;
   cdk_error_t rc;
 
   if (!keyid || !ret_sk)
     return CDK_Inv_Value;
-  if (!hd )
+  if (!hd)
     return CDK_Error_No_Keyring;
 
   *ret_sk = NULL;
@@ -1445,7 +1461,7 @@ keydb_merge_selfsig (cdk_kbnode_t key, u32 *keyid)
       if (key_expire)
 	{
 	  pk->expiredate = pk->timestamp + key_expire;
-	  pk->has_expired = pk->expiredate> _cdk_timestamp ()?0 :1;
+	  pk->has_expired = pk->expiredate> (u32)time (NULL)?0 :1;
 	}
       
       if (key_usage)
@@ -1464,7 +1480,7 @@ keydb_parse_allsigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd, int check)
   cdk_pkt_signature_t sig;
   cdk_pkt_pubkey_t pk;
   cdk_subpkt_t s=NULL;
-  u32 expiredate = 0, curtime = _cdk_timestamp ();
+  u32 expiredate = 0, curtime = (u32)time (NULL);
   u32 keyid[2];
 
   if (!knode)

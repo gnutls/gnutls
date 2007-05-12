@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/stat.h>
 
 #include "opencdk.h"
 #include "main.h"
@@ -75,6 +76,7 @@ cdk_error_t
 cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
 		 const char *output)
 {
+  struct stat stbuf;
   cdk_stream_t inp, data;
   char buf[4096];
   int n;
@@ -82,7 +84,7 @@ cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
   
   if (!hd || !file)
     return CDK_Inv_Value;
-  if (output && !hd->opt.overwrite && !_cdk_check_file (output))
+  if (output && !hd->opt.overwrite && !stat (output, &stbuf))
     return CDK_Inv_Mode;
   
   rc = cdk_stream_open (file, &inp);

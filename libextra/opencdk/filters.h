@@ -23,50 +23,50 @@ enum {
 };
 
 typedef struct {
-    gcry_cipher_hd_t hd;
-    gcry_md_hd_t mdc;
-    int mdc_method;
-    cdk_dek_t dek;
-    u32 datalen;
-    struct {
-      size_t on;
-      off_t size;
-      off_t nleft;
-    } blkmode;
-    cdk_stream_t s;
+  gcry_cipher_hd_t hd;
+  gcry_md_hd_t mdc;
+  int mdc_method;
+  cdk_dek_t dek;
+  u32 datalen;
+  struct {
+    size_t on;
+    off_t size;
+    off_t nleft;
+  } blkmode;
+  cdk_stream_t s;
 } cipher_filter_t;
 
 typedef struct {
-    int digest_algo;
-    gcry_md_hd_t md;
+  int digest_algo;
+  gcry_md_hd_t md;
 } md_filter_t;
 
 typedef struct {
-    const char * le; /* line endings */
-    const char * hdrlines;
-    u32 crc;
-    int crc_okay;
-    int idx, idx2;
+  const char *le; /* line endings */
+  const char *hdrlines;
+  u32 crc;
+  int crc_okay;
+  int idx, idx2;
 } armor_filter_t;
 
 typedef struct {
-    int mode;
-    unsigned rfc1991:1;
-    char * filename;
-    gcry_md_hd_t md;
-    struct {
-      size_t on;
-      off_t size;
-    } blkmode;
+  int mode;
+  char *orig_filename; /* This original name of the input file. */
+  char *filename;
+  gcry_md_hd_t md;
+  struct {
+    size_t on;
+    off_t size;
+  } blkmode;
 } literal_filter_t;
 
 typedef struct {
-    size_t inbufsize;
-    byte inbuf[8192];
-    size_t outbufsize;
-    byte outbuf[8192];
-    int algo; /* compress algo */
-    int level;
+  size_t inbufsize;
+  byte inbuf[8192];
+  size_t outbufsize;
+  byte outbuf[8192];
+  int algo; /* compress algo */
+  int level;
 } compress_filter_t;
 
 typedef struct {

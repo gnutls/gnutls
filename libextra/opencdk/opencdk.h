@@ -23,12 +23,12 @@
 #include <gcrypt.h>
 
 /* The OpenCDK version as a string. */
-#define OPENCDK_VERSION "0.6.0"
+#define OPENCDK_VERSION "0.6.1"
 
 /* The OpenCDK version as integer components major.minor.path */
 #define OPENCDK_VERSION_MAJOR 0
 #define OPENCDK_VERSION_MINOR 6
-#define OPENCDK_VERSION_PATCH 0
+#define OPENCDK_VERSION_PATCH 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -123,7 +123,8 @@ typedef enum {
     CDK_Inv_Packet_Ver = 23,
     CDK_Too_Short = 24,
     CDK_Unusable_Key = 25,
-    CDK_No_Data = 26
+    CDK_No_Data = 26,
+    CDK_No_Passphrase = 27
 } cdk_error_t;
 
 
@@ -137,8 +138,6 @@ enum cdk_control_flags {
     CDK_CTL_COMPAT        = 14, /* Option to switch in compat mode. */
     CDK_CTL_OVERWRITE     = 15, /* Option to enable file overwritting. */
     CDK_CTL_S2K           = 16, /* Option to set S2K values. */
-    CDK_CTL_KEYCACHE_ON   = 17,
-    CDK_CTL_KEYCACHE_FREE = 18,
     CDK_CTL_FORCE_DIGEST  = 19, /* Force the use of a digest algorithm. */
     CDK_CTL_BLOCKMODE_ON  = 20  /* Enable partial body lengths */
 };
@@ -362,6 +361,14 @@ typedef enum {
     CDK_PKT_MDC           = 19
 } cdk_packet_type_t;
 
+/* Define the maximal number of multiprecion integers for
+   a public key. */
+#define MAX_CDK_PK_PARTS 4
+
+/* Define the maximal number of multiprecision integers for
+   a signature/encrypted blob issued by a secret key. */
+#define MAX_CDK_DATA_PARTS 2
+
 
 /* Helper macro to figure out if the packet is encrypted */
 #define CDK_PKT_IS_ENCRYPTED(pkttype) (\
@@ -382,7 +389,7 @@ struct cdk_pkt_signature_s {
     cdk_subpkt_t hashed;
     unsigned short unhashed_size;
     cdk_subpkt_t unhashed;
-    gcry_mpi_t mpi[2];
+    gcry_mpi_t mpi[MAX_CDK_DATA_PARTS];
     cdk_desig_revoker_t revkeys;
     struct {
         unsigned exportable:1;
@@ -422,7 +429,7 @@ struct cdk_pkt_pubkey_s {
     unsigned int main_keyid[2];
     unsigned int timestamp;
     unsigned int expiredate;
-    gcry_mpi_t mpi[4];
+    gcry_mpi_t mpi[MAX_CDK_PK_PARTS];
     unsigned is_revoked:1;
     unsigned is_invalid:1;
     unsigned has_expired:1;
@@ -454,7 +461,7 @@ struct cdk_pkt_seckey_s {
         unsigned char ivlen;
     } protect;
     unsigned short csum;
-    gcry_mpi_t mpi[4];
+    gcry_mpi_t mpi[MAX_CDK_PK_PARTS];
     unsigned char * encdata;
     size_t enclen;
     unsigned char is_protected;
@@ -484,7 +491,7 @@ struct cdk_pkt_pubkey_enc_s {
     unsigned int keyid[2];
     int throw_keyid;
     unsigned char pubkey_algo;
-    gcry_mpi_t mpi[2];
+    gcry_mpi_t mpi[MAX_CDK_DATA_PARTS];
 };
 typedef struct cdk_pkt_pubkey_enc_s * cdk_pkt_pubkey_enc_t;
 
@@ -561,12 +568,21 @@ typedef void (*cdk_log_fnc_t) (void *, int, const char *, va_list);
 void cdk_set_log_level (int lvl);
 void cdk_set_log_handler (cdk_log_fnc_t logfnc, void *opaque);
 const char* cdk_strerror (int ec);
+
+/* Allow the user to set custom hooks for memory allocation.
+   If this function is not used, the standard allocation functions
+   will be used. Extra care must be taken for the 'secure' alloc
+   function. */
 void cdk_set_malloc_hooks (void *(*new_alloc_func) (size_t n),
                            void *(*new_alloc_secure_func) (size_t n),
                            void *(*new_realloc_func) (void *p, size_t n),
                            void *(*new_calloc_func) (size_t m, size_t n),
                            void (*new_free_func) (void *));
+			   
+/* Return 1 if the malloc hooks were already set via the function above. */
 int cdk_malloc_hook_initialized (void);
+
+/* Standard memory wrapper. */
 void *cdk_malloc (size_t size);
 void *cdk_calloc (size_t n, size_t m);
 void *cdk_realloc (void * ptr, size_t size);
@@ -584,8 +600,8 @@ void cdk_lib_startup (void);
    to allow the lib to cleanup its internal structures. */
 void cdk_lib_shutdown (void);
 
-/* session handle routines */
-cdk_error_t cdk_handle_new( cdk_ctx_t * r_ctx );
+/* Session handle routines */
+cdk_error_t cdk_handle_new (cdk_ctx_t *r_ctx);
 void cdk_handle_free (cdk_ctx_t c);
 
 /* Set the key database handle for the given session handle.
@@ -609,12 +625,18 @@ void cdk_handle_set_passphrase_cb (cdk_ctx_t hd,
                                    void *cb_value);
 
 /* shortcuts for some controls */
+
+/* Enable or disable armor output. */
 #define cdk_handle_set_armor(a, val) \
   cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_ARMOR, (val))
 
-#define cdk_handle_set_compress (a, algo, level) \
+/* Set the compression algorithm and level. 0 means disable compression. */
+#define cdk_handle_set_compress(a, algo, level) \
   cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_COMPRESS, (algo), (level))
 
+/* Activate partial bodies for the output. This is needed if the length
+   of the data is not known in advance or for the use with sockets 
+   or pipes. */
 #define cdk_handle_set_blockmode(a, val) \
   cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_BLOCKMODE_ON, (val))
 
@@ -652,6 +674,8 @@ typedef struct cdk_verify_result_s *cdk_verify_result_t;
 cdk_verify_result_t cdk_handle_verify_get_result (cdk_ctx_t hd);
 
 /* Raw packet routines. */
+
+/* Allocate a new packet or a new packet with the given packet type. */
 cdk_error_t cdk_pkt_new (cdk_packet_t *r_pkt);
 cdk_error_t cdk_pkt_alloc (cdk_packet_t *r_pkt, int pkttype);
 
@@ -690,25 +714,42 @@ const unsigned char* cdk_key_desig_revoker_walk (cdk_desig_revoker_t root,
 #define is_ELG(a) ((a) == CDK_PK_ELG_E)
 #define is_DSA(a) ((a) == CDK_PK_DSA)
 
+/* Encrypt the given session key @SK with the public key @PK
+   and write the contents into the packet @PKE. */
 cdk_error_t cdk_pk_encrypt (cdk_pubkey_t pk, cdk_pkt_pubkey_enc_t pke,
-			    gcry_mpi_t esk);
+			    gcry_mpi_t sk);
+			    
+/* Decrypt the given encrypted session key in @PKE with the secret key
+   @SK and store it in @R_SK. */
 cdk_error_t cdk_pk_decrypt (cdk_seckey_t sk, cdk_pkt_pubkey_enc_t pke,
                             gcry_mpi_t *r_sk);
+			    
+/* Sign the given message digest @MD with the secret key @SK and
+   store the signature in the packet @SIG. */
 cdk_error_t cdk_pk_sign (cdk_seckey_t sk, cdk_pkt_signature_t sig,
-                         const unsigned char * md);
+                         const unsigned char *md);
+			 
+/* Verify the given signature in @SIG with the public key @PK
+   and compare it against the message digest @MD. */
 cdk_error_t cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
-			   const unsigned char * md);
+			   const unsigned char *md);
 			   
 /* Use cdk_pk_get_npkey() and cdk_pk_get_nskey to find out how much
    multiprecision integers a key consists of. */
+   
+/* Return a multi precision integer of the public key with the index @IDX
+   in the buffer @BUF. @R_NWRITTEN will contain the length in octets.
+   Optional @R_NBITS may contain the size in bits. */
 cdk_error_t cdk_pk_get_mpi (cdk_pubkey_t pk, size_t idx,
 			    unsigned char *buf, size_t buflen,
 			    size_t *r_nwritten, size_t *r_nbits);
+
+/* Same as the function above but of the secret key. */
 cdk_error_t cdk_sk_get_mpi (cdk_seckey_t sk, size_t idx,
 			    unsigned char * buf, size_t buflen,
 			    size_t *r_nwritten, size_t *r_nbits);
 			    
-/* Helper to get the exact number of multiprecision integers 
+/* Helper to get the exact number of multi precision integers 
    for the given object. */
 int cdk_pk_get_nbits (cdk_pubkey_t pk);
 int cdk_pk_get_npkey (int algo);
@@ -724,7 +765,7 @@ unsigned int cdk_pk_fingerprint_get_keyid (const unsigned char *fpr,
 unsigned int cdk_pk_get_keyid (cdk_pubkey_t pk, unsigned int *keyid);
 unsigned int cdk_sk_get_keyid (cdk_seckey_t sk, unsigned int *keyid);
 unsigned int cdk_sig_get_keyid (cdk_pkt_signature_t sig,
-                                 unsigned int * keyid);
+                                unsigned int *keyid);
 				 
 /* Key release functions. */
 void cdk_pk_release (cdk_pubkey_t pk);
@@ -732,7 +773,9 @@ void cdk_sk_release (cdk_seckey_t sk);
 				 
 /* Secret key related functions. */				 
 cdk_error_t cdk_sk_unprotect (cdk_seckey_t sk, const char *pw);
-cdk_error_t cdk_sk_protect( cdk_seckey_t sk, const char *pw);
+cdk_error_t cdk_sk_protect (cdk_seckey_t sk, const char *pw);
+
+/* Create a public key with the data from the secret key @SK. */
 cdk_error_t cdk_pk_from_secret_key (cdk_seckey_t sk,
                                     cdk_pubkey_t *ret_pk);
 
@@ -838,9 +881,12 @@ int cdk_stream_peek (cdk_stream_t inp, unsigned char *buf, size_t buflen);
    functions should be preferred. */
 cdk_error_t cdk_keydb_new (cdk_keydb_hd_t *r_hd, int type, void *data,
                            size_t count);
-			   
+
+/* Create a new key db handle from a memory buffer. */
 cdk_error_t cdk_keydb_new_from_mem (cdk_keydb_hd_t *r_hd, int secret,
 	    			    const void *data, size_t datlen);
+
+/* Create a new key db which uses an existing file. */
 cdk_error_t cdk_keydb_new_from_file (cdk_keydb_hd_t *r_hd, int secret,
 	    			     const char *fname);
 				     
@@ -853,31 +899,60 @@ cdk_error_t cdk_keydb_new_from_stream (cdk_keydb_hd_t *r_hd, int secret,
 /* Check that a secret key with the given key ID is available. */
 cdk_error_t cdk_keydb_check_sk (cdk_keydb_hd_t hd, unsigned int *keyid);
 
+/* Prepare the key db search. */
 cdk_error_t cdk_keydb_search_start (cdk_keydb_hd_t hd, int type, void *desc);
+
+/* Return a key which matches a valid description given in 
+   cdk_keydb_search_start(). */
 cdk_error_t cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key);
-void cdk_keydb_free( cdk_keydb_hd_t hd );
-cdk_error_t cdk_keydb_get_bykeyid( cdk_keydb_hd_t hd, unsigned int * keyid,
-                                   cdk_kbnode_t * ret_pk );
-cdk_error_t cdk_keydb_get_byfpr( cdk_keydb_hd_t hd, const unsigned char * fpr,
-                                 cdk_kbnode_t * ret_pk );
-cdk_error_t cdk_keydb_get_bypattern( cdk_keydb_hd_t hd, const char * patt,
-                                     cdk_kbnode_t * ret_pk );
-cdk_error_t cdk_keydb_get_pk( cdk_keydb_hd_t khd, unsigned int * keyid,
-                      cdk_pubkey_t* ret_pk );
-cdk_error_t cdk_keydb_get_sk( cdk_keydb_hd_t khd, unsigned int * keyid,
-                              cdk_seckey_t* ret_sk );
+
+/* Release the key db handle and all its resources. */
+void cdk_keydb_free (cdk_keydb_hd_t hd);
+
+/* The following functions will try to find a key in the given key
+   db handle either by keyid, by fingerprint or by some pattern. */
+cdk_error_t cdk_keydb_get_bykeyid (cdk_keydb_hd_t hd, unsigned int *keyid,
+                                   cdk_kbnode_t *ret_pk);
+cdk_error_t cdk_keydb_get_byfpr (cdk_keydb_hd_t hd, const unsigned char *fpr,
+                                 cdk_kbnode_t *ret_pk);
+cdk_error_t cdk_keydb_get_bypattern (cdk_keydb_hd_t hd, const char *patt,
+                                     cdk_kbnode_t *ret_pk);
+
+/* These function, in contrast to most other key db functions, only
+   return the public or secret key packet without the additional
+   signatures and user IDs. */
+cdk_error_t cdk_keydb_get_pk (cdk_keydb_hd_t khd, unsigned int * keyid,
+                      	      cdk_pubkey_t *ret_pk);
+cdk_error_t cdk_keydb_get_sk (cdk_keydb_hd_t khd, unsigned int * keyid,
+                              cdk_seckey_t *ret_sk);
+			      
+/* Try to read the next key block from the given input stream.
+   The key will be returned in @RET_KEY on success. */
 cdk_error_t cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t * ret_key);
+
+/* Rebuild the key db index if possible. */
 cdk_error_t cdk_keydb_idx_rebuild (cdk_keydb_hd_t hd);
+
+/* Export one or more keys from the given key db handle into
+   the stream @OUT. The export is done by substring search and
+   uses the string list @REMUSR for the pattern. */
 cdk_error_t cdk_keydb_export (cdk_keydb_hd_t hd, cdk_stream_t out,
                               cdk_strlist_t remusr);
+
+/* Import the given key node @knode into the key db. */
 cdk_error_t cdk_keydb_import (cdk_keydb_hd_t hd, cdk_kbnode_t knode);
 
 
-/* listing keys */
-cdk_error_t cdk_listkey_start( cdk_listkey_t * r_ctx, cdk_keydb_hd_t db,
-                               const char * patt, cdk_strlist_t fpatt );
-void cdk_listkey_close( cdk_listkey_t ctx );
-cdk_error_t cdk_listkey_next( cdk_listkey_t ctx, cdk_kbnode_t * ret_key );
+/* List or enumerate keys from a given key db handle. */
+
+/* Start the key list process. Either use @PATT for a pattern search
+   or @FPATT for a list of pattern. */
+cdk_error_t cdk_listkey_start (cdk_listkey_t *r_ctx, cdk_keydb_hd_t db,
+                               const char *patt, cdk_strlist_t fpatt);
+void cdk_listkey_close (cdk_listkey_t ctx);
+
+/* Return the next key which matches the pattern. */
+cdk_error_t cdk_listkey_next (cdk_listkey_t ctx, cdk_kbnode_t *ret_key);
 
 /*-- kbnode.c --*/
 cdk_kbnode_t cdk_kbnode_new (cdk_packet_t pkt);
@@ -912,6 +987,8 @@ cdk_error_t cdk_pk_check_sigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd,
 cdk_error_t cdk_pk_check_self_sig (cdk_kbnode_t knode, int *r_status);
 
 /*-- keylist.c --*/
+/* Return a matching  algorithm from the given public key list. 
+   @PREFTYPE can be either sym-cipher/compress/digest. */
 int cdk_pklist_select_algo (cdk_keylist_t pkl, int preftype);
 int cdk_pklist_use_mdc (cdk_keylist_t pkl);
 cdk_error_t cdk_pklist_build (cdk_keylist_t *ret_pkl, cdk_keydb_hd_t hd,
@@ -920,7 +997,7 @@ void cdk_pklist_release (cdk_keylist_t pkl);
 cdk_error_t cdk_pklist_encrypt (cdk_keylist_t pkl, cdk_dek_t dek,
                                 cdk_stream_t out);
 				
-/* secret key list */
+/* Secret key lists */
 cdk_error_t cdk_sklist_build (cdk_keylist_t * ret_skl,
                               cdk_keydb_hd_t db, cdk_ctx_t hd,
                               cdk_strlist_t locusr,
@@ -933,15 +1010,27 @@ cdk_error_t cdk_sklist_write_onepass (cdk_keylist_t skl, cdk_stream_t outp,
                                       int sigclass, int mdalgo);
 
 /*-- encrypt.c --*/
+
+/* Encrypt the given stream @INP with the recipients given in @REMUSR.
+   If @REMUSR is NULL, symmetric encryption will be used. The output
+   will be written to @OUT. */
 cdk_error_t cdk_stream_encrypt (cdk_ctx_t hd, cdk_strlist_t remusr,
                                 cdk_stream_t inp, cdk_stream_t out);
+				
+/* Decrypt the @INP stream into @OUT. */
 cdk_error_t cdk_stream_decrypt (cdk_ctx_t hd, cdk_stream_t inp, 
 				cdk_stream_t out);
-    
+
+/* Same as the function above but it works on files. */
 cdk_error_t cdk_file_encrypt (cdk_ctx_t hd, cdk_strlist_t remusr,
-                      	      const char * file, const char * output);
+                      	      const char *file, const char *output);
 cdk_error_t cdk_file_decrypt (cdk_ctx_t hd, const char * file,
-                              const char * output);
+                              const char *output);
+			      
+/* Generic function to transform data. The mode can be either sign,
+   verify, encrypt, decrypt, import or export. The meanings of the
+   parameters are similar to the functions above.
+   @OUTBUF will contain the output and @OUTSIZE the length of it. */
 cdk_error_t cdk_data_transform (cdk_ctx_t hd, enum cdk_crypto_mode_t mode,
                                 cdk_strlist_t locusr, cdk_strlist_t remusr,
                                 const void * inbuf, size_t insize,
@@ -949,18 +1038,28 @@ cdk_error_t cdk_data_transform (cdk_ctx_t hd, enum cdk_crypto_mode_t mode,
                                 int modval);
 
 /*-- sign.c --*/
+/* Sign the stream @INP. Optionally, the output will be encrypted
+   if @REMUSR is not NULL and the @ENCRYPTFLAG is set. 
+   The output will be written to @OUT.
+   @LOCUSR contains one ore more pattern for the secret key(s) to use. */
 cdk_error_t cdk_stream_sign (cdk_ctx_t hd, cdk_stream_t inp, cdk_stream_t out,
                              cdk_strlist_t locusr, cdk_strlist_t remusr,
-                             int encryptflag, int sigmode );
+                             int encryptflag, int sigmode);
+
+/* Same as the function above but it works on files. */
 cdk_error_t cdk_file_sign (cdk_ctx_t hd, cdk_strlist_t locusr,
                            cdk_strlist_t remusr,
-                           const char * file, const char * output,
+                           const char *file, const char *output,
                            int sigmode, int encryptflag);
 
 /*-- verify.c --*/
 cdk_error_t cdk_stream_verify (cdk_ctx_t hd, cdk_stream_t inp,
 	    		       cdk_stream_t data,
                                cdk_stream_t out);
+			       
+/* Verify the given file @FILE. For a detached signature, @DATA_FILE
+   contains the actual file data and @FILE is only the signature.
+   If the @OUTPUT is not NULL, the plaintext will be written to this file. */
 cdk_error_t cdk_file_verify (cdk_ctx_t hd, const char *file,
 	    		     const char *data_file, const char *output);
 
@@ -968,28 +1067,30 @@ cdk_error_t cdk_file_verify (cdk_ctx_t hd, const char *file,
 int cdk_trustdb_get_validity (cdk_stream_t inp, cdk_pkt_userid_t id,
                               int *r_val);
 int cdk_trustdb_get_ownertrust (cdk_stream_t inp, cdk_pubkey_t pk,
-                                int * r_val, int * r_flags);
+                                int *r_val, int *r_flags);
 
 /*-- misc.c --*/
 void cdk_strlist_free (cdk_strlist_t sl);
 cdk_strlist_t cdk_strlist_add (cdk_strlist_t * list, const char * string);
-const char * cdk_strlist_walk (cdk_strlist_t root, cdk_strlist_t * context);
+cdk_strlist_t cdk_strlist_next (cdk_strlist_t root, const char **r_str);
 const char * cdk_check_version (const char * req_version);
 /* UTF8 */
 char* cdk_utf8_encode (const char * string);
 char* cdk_utf8_decode (const char * string, size_t length, int delim);
 
 /*-- keyserver.c --*/
-cdk_error_t cdk_keyserver_recv_key (const char * host, int port,
-                                    const unsigned char * keyid, int kid_type,
-                                    cdk_kbnode_t * r_key);
+/* Try to receive the key, which has the key ID @KEYID, from the
+   keyserver host @HOST and the port @PORT. */
+cdk_error_t cdk_keyserver_recv_key (const char *host, int port,
+                                    const unsigned char *keyid, int kid_type,
+                                    cdk_kbnode_t *r_key);
 
 /*-- keygen.c --*/
 cdk_error_t cdk_keygen_new (cdk_keygen_ctx_t * r_hd);
 void cdk_keygen_free (cdk_keygen_ctx_t hd);
-cdk_error_t cdk_keygen_set_prefs( cdk_keygen_ctx_t hd,
+cdk_error_t cdk_keygen_set_prefs (cdk_keygen_ctx_t hd,
                                   enum cdk_pref_type_t type,
-                                  const unsigned char * array, size_t n );
+                                  const unsigned char * array, size_t n);
 cdk_error_t cdk_keygen_set_algo_info( cdk_keygen_ctx_t hd, int type,
 	    			      int usage, enum cdk_pubkey_algo_t algo, 
 				      unsigned int bits );

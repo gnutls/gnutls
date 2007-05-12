@@ -17,14 +17,31 @@
 # include <config.h>
 #endif
 #include <stdio.h>
+#include <time.h>
 
 #include "opencdk.h"
 #include "main.h"
 #include "filters.h"
 
 
+/* Duplicate the string @s but strip of possible
+   relative folder names of it. */
+static char*
+dup_trim_filename (const char *s)
+{
+  char *p = NULL;
+  
+  p = strrchr (s, '/');
+  if (!p)
+    p = strrchr (s, '\\');
+  if (!p)
+    return cdk_strdup (s);
+  return cdk_strdup (p + 1);
+}
+
+  
 static cdk_error_t
-literal_decode (void * opaque, FILE * in, FILE * out)
+literal_decode (void *opaque, FILE *in, FILE *out)
 {
   literal_filter_t *pfx = opaque;
   cdk_stream_t si, so;
@@ -35,7 +52,7 @@ literal_decode (void * opaque, FILE * in, FILE * out)
   int bufsize;
   cdk_error_t rc;
 
-  _cdk_log_debug( "literal filter: decode\n" );
+  _cdk_log_debug ("literal filter: decode\n");
   
   if (!pfx || !in || !out)
     return CDK_Inv_Value;
@@ -68,21 +85,43 @@ literal_decode (void * opaque, FILE * in, FILE * out)
   
   pt = pkt->pkt.literal;
   pfx->mode = pt->mode;
-  pfx->filename = cdk_strdup (pt->name? pt->name : " ");
-  if (!pfx->filename)
+
+  if (pfx->filename && pt->namelen > 0)
     {
-      /* FIXME: release streams. */
-      cdk_pkt_release (pkt);
-      return CDK_Out_Of_Core;
+      /* The name in the literal packet is more authorative. */
+      cdk_free (pfx->filename);
+      pfx->filename = dup_trim_filename (pt->name);
     }
+  else if (!pfx->filename && pt->namelen > 0)
+    pfx->filename = dup_trim_filename (pt->name);
+  else if (!pt->namelen && !pfx->filename && pfx->orig_filename)
+    {
+      /* In this case, we need to derrive the output file name
+         from the original name and cut off the OpenPGP extension.
+         If this is not possible, we return an error. */
+      if (!stristr (pfx->orig_filename, ".gpg") &&
+	  !stristr (pfx->orig_filename, ".pgp") &&
+	  !stristr (pfx->orig_filename, ".asc"))
+	{
+	  cdk_pkt_release (pkt);
+	  cdk_stream_close (si);
+	  cdk_stream_close (so);
+	  _cdk_log_debug ("literal filter: no file name and no PGP extension\n");
+	  return CDK_Inv_Mode;
+	}
+      _cdk_log_debug ("literal filter: derrive file name from original\n");
+      pfx->filename = dup_trim_filename (pfx->orig_filename);
+      pfx->filename[strlen (pfx->filename)-4] = '\0';
+    }
+  
   while (!feof (in))
     {    
-      /*_cdk_log_debug( "partial on=%d size=%lu\n",
-         pfx->blkmode.on, pfx->blkmode.size );*/
+      _cdk_log_debug ("literal_decode: part on %d size %lu\n",
+		      pfx->blkmode.on, pfx->blkmode.size);
       if (pfx->blkmode.on)
 	bufsize = pfx->blkmode.size;
       else
-	bufsize = pt->len < DIM (buf)-1? pt->len : DIM (buf)-1;
+	bufsize = pt->len < DIM (buf)? pt->len : DIM (buf);
       nread = cdk_stream_read (pt->buf, buf, bufsize);
       if (nread == EOF) 
 	{
@@ -128,7 +167,7 @@ literal_encode (void *opaque, FILE *in, FILE *out)
     {
       pfx->filename = cdk_strdup ("_CONSOLE");
       if (!pfx->filename)
-      return CDK_Out_Of_Core;
+	return CDK_Out_Of_Core;
   }
 
   rc = _cdk_stream_fpopen (in, STREAMCTL_READ, &si);
@@ -147,11 +186,11 @@ literal_encode (void *opaque, FILE *in, FILE *out)
   memcpy (pt->name, pfx->filename, filelen);
   pt->namelen = filelen;
   pt->name[pt->namelen] = '\0';
-  pt->timestamp = _cdk_timestamp ();
+  pt->timestamp = (u32)time (NULL);
   pt->mode = pfx->mode ? 't' : 'b';
   pt->len = cdk_stream_get_length (si);
   pt->buf = si;
-  pkt->old_ctb = pfx->rfc1991? 1 : 0;
+  pkt->old_ctb = 1;
   pkt->pkttype = CDK_PKT_LITERAL;
   pkt->pkt.literal = pt;
   rc = _cdk_pkt_write_fp (out, pkt);
@@ -163,21 +202,25 @@ literal_encode (void *opaque, FILE *in, FILE *out)
 
 
 int
-_cdk_filter_literal( void * opaque, int ctl, FILE * in, FILE * out )
+_cdk_filter_literal (void * opaque, int ctl, FILE * in, FILE * out)
 {
-    if( ctl == STREAMCTL_READ )
-        return literal_decode( opaque, in, out );
-    else if( ctl == STREAMCTL_WRITE )
-        return literal_encode( opaque, in, out );
-    else if( ctl == STREAMCTL_FREE ) {
-        literal_filter_t * pfx = opaque;
-        if( pfx ) {
-            _cdk_log_debug( "free literal filter\n" );
-            cdk_free( pfx->filename );
-            pfx->filename = NULL;
-        }
+  if (ctl == STREAMCTL_READ)
+    return literal_decode( opaque, in, out );
+  else if (ctl == STREAMCTL_WRITE)
+    return literal_encode (opaque, in, out);
+  else if (ctl == STREAMCTL_FREE)
+    {
+      literal_filter_t *pfx = opaque;
+      if (pfx)
+	{
+	  _cdk_log_debug ("free literal filter\n");
+	  cdk_free (pfx->filename);
+	  pfx->filename = NULL;
+	  cdk_free (pfx->orig_filename);
+	  pfx->orig_filename = NULL;
+	}
     }
-    return CDK_Inv_Mode;
+  return CDK_Inv_Mode;
 }
 
 
@@ -185,11 +228,12 @@ static int
 text_encode (void *opaque, FILE *in, FILE *out)
 {
   const char *s;
-  char buf[1024];
+  char buf[2048];
   
   if (!in || !out)
     return CDK_Inv_Value;
   
+  /* FIXME: This code does not work for very long lines. */
   while (!feof (in)) 
     {
       s = fgets (buf, DIM (buf)-1, in);
@@ -204,41 +248,44 @@ text_encode (void *opaque, FILE *in, FILE *out)
 
       
 static int
-text_decode( void * opaque, FILE * in, FILE * out )
+text_decode (void * opaque, FILE * in, FILE * out)
 {
-    text_filter_t * tfx = opaque;
-    const char * s;
-    char buf[1024];
-
-    if( !tfx || !in || !out )
-        return CDK_Inv_Value;
-
-    while( !feof( in ) ) {
-        s = fgets( buf, DIM (buf)-1, in );
-        if( !s )
-            break;
-        _cdk_trim_string( buf, 0 );
-        fwrite( buf, 1, strlen( buf ), out );
-        fwrite( tfx->lf, 1, strlen( tfx->lf ), out );
+  text_filter_t *tfx = opaque;
+  const char *s;
+  char buf[2048];
+  
+  if (!tfx || !in || !out)
+    return CDK_Inv_Value;
+  
+  while (!feof (in)) 
+    {
+      s = fgets (buf, DIM (buf)-1, in);
+      if (!s)
+	break;
+      _cdk_trim_string (buf, 0);
+      fwrite (buf, 1, strlen (buf), out);
+      fwrite (tfx->lf, 1, strlen (tfx->lf), out);
     }
-    
-    return 0;
+  
+  return 0;
 }
 
 
 int
-_cdk_filter_text( void * opaque, int ctl, FILE * in, FILE * out )
+_cdk_filter_text (void *opaque, int ctl, FILE *in, FILE *out)
 {
-    if( ctl == STREAMCTL_READ )
-        return text_encode( opaque, in, out );
-    else if( ctl == STREAMCTL_WRITE )
-        return text_decode( opaque, in, out );
-    else if( ctl == STREAMCTL_FREE ) {
-        text_filter_t * tfx = opaque;
-        if( tfx ) {
-            _cdk_log_debug( "free text filter\n" );
-            tfx->lf = NULL;
-        }
+  if (ctl == STREAMCTL_READ)
+    return text_encode (opaque, in, out);
+  else if (ctl == STREAMCTL_WRITE)
+    return text_decode (opaque, in, out);
+  else if (ctl == STREAMCTL_FREE)
+    {
+      text_filter_t * tfx = opaque;
+      if (tfx) 
+	{
+	  _cdk_log_debug ("free text filter\n");
+	  tfx->lf = NULL;
+	}
     }
-    return CDK_Inv_Mode;
+  return CDK_Inv_Mode;
 }

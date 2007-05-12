@@ -20,34 +20,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <time.h>
+#include <sys/stat.h>
 
 #include "opencdk.h"
 #include "main.h"
-
-
-/* Return 0 if the file exists. otherwise 1 */
-int
-_cdk_check_file (const char *file)
-{
-  FILE *fp;
-  int check;
-  
-  if (!file)
-    return 1;
-  fp = fopen (file, "r");
-  check = fp? 0 : 1;
-  if (fp)
-    fclose (fp);
-  return check;
-}
-
-
-u32
-_cdk_timestamp (void)
-{
-  return (u32)time (NULL);
-}
 
 
 u32
@@ -76,19 +52,6 @@ _cdk_u32tobuf (u32 u, byte *buf)
   buf[3] = u      ;
 }
 
-
-int
-_cdk_strcmp (const char *a, const char *b)
-{
-  int alen, blen;
-  
-  alen = strlen( a );
-  blen = strlen( b );
-  if( alen != blen )
-    return alen > blen? 1 : -1;
-  return strcmp( a, b );
-}
-    
 
 static const char *
 parse_version_number( const char *s, int *number )
@@ -168,11 +131,12 @@ cdk_check_version (const char *req_version)
 void
 cdk_strlist_free (cdk_strlist_t sl)
 {
-    cdk_strlist_t sl2;
-
-    for(; sl; sl = sl2 ) {
-        sl2 = sl->next;
-        cdk_free (sl);
+  cdk_strlist_t sl2;
+  
+  for(; sl; sl = sl2 ) 
+    {
+      sl2 = sl->next;
+      cdk_free (sl);
     }
 }
 
@@ -180,87 +144,97 @@ cdk_strlist_free (cdk_strlist_t sl)
 cdk_strlist_t
 cdk_strlist_add (cdk_strlist_t *list, const char *string)
 {
-    cdk_strlist_t sl;
-
-    if (!string)
-        return NULL;
+  cdk_strlist_t sl;
   
-    sl = cdk_calloc (1, sizeof *sl + strlen (string) + 1);
-    if (!sl)
-        return NULL;
-    strcpy (sl->d, string);
-    sl->next = *list;
-    *list = sl;
-    return sl;
+  if (!string)
+    return NULL;
+  
+  sl = cdk_calloc (1, sizeof *sl + strlen (string) + 1);
+  if (!sl)
+    return NULL;
+  strcpy (sl->d, string);
+  sl->next = *list;
+  *list = sl;
+  return sl;
 }
 
 
-const char *
-cdk_strlist_walk (cdk_strlist_t root, cdk_strlist_t * context)
+/**
+ * cdk_strlist_next:
+ * @root: the opaque string list.
+ * @r_str: optional argument to store the string data.
+ * 
+ * Return the next string list node from @root. The optional
+ * argument @r_str return the data of the current (!) node.
+ **/
+cdk_strlist_t
+cdk_strlist_next (cdk_strlist_t root, const char **r_str)
 {
-    cdk_strlist_t n;
-  
-    if( ! *context ) {
-        *context = root;
-        n = root;
-    }
-    else {
-        n = (*context)->next;
-        *context = n;
-    }
+  cdk_strlist_t node;
 
-    return n? n->d : NULL;
+  if (root && r_str)
+    *r_str = root->d;
+  for (node = root->next; node; node = node->next)
+    return node;
+
+  return NULL;
 }
 
 
-const char *
+const char*
 _cdk_memistr (const char *buf, size_t buflen, const char *sub)
 {
-    const byte *t, *s;
-    size_t n;
-
-    for (t = (byte*)buf, n = buflen, s = (byte*)sub ; n ; t++, n--) {
-        if (toupper (*t) == toupper (*s)) {
-            for (buf = t++, buflen = n--, s++;
-                 n && toupper (*t) == toupper ((byte)*s); t++, s++, n--)
-                ;
-            if (!*s)
-                return buf;
-            t = (byte*)buf;
-            n = buflen;
-            s = (byte*)sub;   
+  const byte *t, *s;
+  size_t n;
+  
+  for (t = (byte*)buf, n = buflen, s = (byte*)sub ; n ; t++, n--) 
+    {
+      if (toupper (*t) == toupper (*s)) 
+	{
+	  for (buf = t++, buflen = n--, s++;
+	       n && toupper (*t) == toupper ((byte)*s); t++, s++, n--)
+	    ;
+	  if (!*s)
+	    return buf;
+	  t = (byte*)buf;
+	  n = buflen;
+	  s = (byte*)sub;   
         }
     }
-
-    return NULL;
+  
+  return NULL;
 }
 
 
-char *
-cdk_utf8_encode (const char * string)
+char*
+cdk_utf8_encode (const char *string)
 {
-    const byte * s;
-    char * buffer;
-    byte * p;
-    size_t length = 0;
-
-    for (s = string; *s; s++) {
-        length++;
-        if (*s & 0x80)
-            length++;
+  const byte *s;
+  char *buffer;
+  byte *p;
+  size_t length;
+  
+  /* FIXME: We should use iconv if possible for utf8 issues. */
+  for (s = (const byte*)string, length = 0; *s; s++) 
+    {
+      length++;
+      if (*s & 0x80)
+	length++;
     }
 
     buffer = cdk_calloc (1, length + 1);
-    for (p = buffer, s = string; *s; s++) {
-        if (*s & 0x80) {
-            *p++ = 0xc0 | ((*s >> 6) & 3);
-            *p++ = 0x80 | (*s & 0x3f);
+    for (p = (byte*)buffer, s = (byte*)string; *s; s++) 
+    {
+      if (*s & 0x80) 
+	{
+	  *p++ = 0xc0 | ((*s >> 6) & 3);
+	  *p++ = 0x80 | (*s & 0x3f);
         }
-        else
-            *p++ = *s;
+      else
+	*p++ = *s;
     }
-    *p = 0;
-    return buffer;
+  *p = 0;
+  return buffer;
 }
 
 
@@ -503,13 +477,59 @@ _cdk_trim_string (char *s, int canon)
 
 int
 _cdk_check_args (int overwrite, const char *in, const char *out)
-{  
+{
+  struct stat stbuf;
+  
   if (!in || !out)
     return CDK_Inv_Value;
-  if (!_cdk_strcmp (in, out))
+  if (strlen (in) == strlen (out) && strcmp (in, out))
     return CDK_Inv_Mode;
-  if (!overwrite && !_cdk_check_file (out))
+  if (!overwrite && !stat (out, &stbuf))
     return CDK_Inv_Mode;
   return 0;
 }
 
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+
+FILE *
+my_tmpfile (void)
+{
+  /* Because the tmpfile() version of wine is not really useful,
+     we implement our own version to avoid problems with 'make check'. */
+  static const char *letters = "abcdefghijklmnopqrstuvwxyz";
+  char buf[512], rnd[24];
+  FILE *fp;
+  int fd, i;
+  
+  gcry_create_nonce (rnd, DIM (rnd));
+  for (i=0; i < DIM (rnd)-1; i++)
+    {
+      char c = letters[(unsigned char)rnd[i] % 26];
+      rnd[i] = c;
+    }
+  rnd[DIM (rnd)-1]=0;
+  if (!GetTempPath (464, buf))
+    return NULL;
+  strcat (buf, "_cdk_");
+  strcat (buf, rnd);
+  
+  /* We need to make sure the file will be deleted when it is closed. */
+  fd = _open (buf, _O_CREAT | _O_EXCL | _O_TEMPORARY |
+	      _O_RDWR | _O_BINARY, _S_IREAD | _S_IWRITE);
+  if (fd == -1)
+    return NULL;
+  fp = fdopen (fd, "w+b");
+  if (fp != NULL)
+    return fp;
+  _close (fd);
+  return NULL;
+}
+#else
+FILE*
+my_tmpfile (void)
+{
+  return tmpfile ();
+}
+#endif

@@ -27,10 +27,10 @@
 #include "packet.h"
 
 
-/* Hash all multiprecision integers of the key PK with the given
+/* Hash all multi precision integers of the key PK with the given
    message digest context MD. */
 static int
-hash_mpibuf (cdk_pkt_pubkey_t pk, gcry_md_hd_t md, int usefpr)
+hash_mpibuf (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
 {
   byte buf[MAX_MPI_BYTES];
   size_t nbytes;
@@ -60,7 +60,7 @@ hash_mpibuf (cdk_pkt_pubkey_t pk, gcry_md_hd_t md, int usefpr)
    MD. The USEFPR param is only valid for version 3 keys because of
    the different way to calculate the fingerprint. */
 int
-_cdk_hash_pubkey (cdk_pkt_pubkey_t pk, gcry_md_hd_t md, int usefpr)
+_cdk_hash_pubkey (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
 {
   byte buf[12];
   u16 n;
@@ -188,26 +188,28 @@ _cdk_hash_sig_data (cdk_pkt_signature_t sig, gcry_md_hd_t md)
 static void
 cache_sig_result (cdk_pkt_signature_t sig, int res)
 {
-    sig->flags.checked = 0;
-    sig->flags.valid = 0;
-    if (!res) {
-        sig->flags.checked = 1;
-        sig->flags.valid = 1;
+  sig->flags.checked = 0;
+  sig->flags.valid = 0;
+  if (!res) 
+    {
+      sig->flags.checked = 1;
+      sig->flags.valid = 1;
     }
-    else if (res == CDK_Bad_Sig) {
-        sig->flags.checked = 1;
-        sig->flags.valid = 0;
+  else if (res == CDK_Bad_Sig) 
+    {
+      sig->flags.checked = 1;
+      sig->flags.valid = 0;
     }
 }
 
 
 cdk_error_t
-_cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
+_cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
                 gcry_md_hd_t digest, int *r_expired)
 {
   byte md[MAX_DIGEST_LEN];
-  time_t cur_time = _cdk_timestamp ();
-  int rc;
+  time_t cur_time = (u32)time (NULL);
+  cdk_error_t rc;
 
   if (!pk || !sig || !digest)
     return CDK_Inv_Value;
@@ -243,7 +245,7 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
 		   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig)
 {
   gcry_md_hd_t md;
-  cdk_pkt_pubkey_t pk;
+  cdk_pubkey_t pk;
   cdk_pkt_signature_t sig;
   cdk_kbnode_t node;
   int is_expired;
@@ -318,7 +320,7 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
 	}
       else if (keydb != NULL)
 	{
-	  cdk_pkt_pubkey_t sig_pk;
+	  cdk_pubkey_t sig_pk;
 	  
 	  rc = cdk_keydb_get_pk (keydb, sig->keyid, &sig_pk);
 	  if (!rc)

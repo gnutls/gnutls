@@ -26,16 +26,12 @@
 #include "filters.h"
 
 
-/* FIXME: We cannot use a static progress callback because the library
-          might be MT. We need a progress cb per context. */
-
-
 static off_t
 fp_get_length (FILE *fp)
 {
   struct stat statbuf;
     
-  if (fstat( fileno (fp), &statbuf))
+  if (fstat (fileno (fp), &statbuf))
     return (off_t)-1;
   return statbuf.st_size;
 }
@@ -52,7 +48,7 @@ hash_encode (void *opaque, FILE *in, FILE *out)
   if (!mfx)
     return CDK_Inv_Value;
   
-  _cdk_log_debug( "hash filter: encode (algo=%d)\n", mfx->digest_algo );
+  _cdk_log_debug ("hash filter: encode (algo=%d)\n", mfx->digest_algo);
   
   if (!mfx->md)
     {
@@ -106,13 +102,15 @@ write_header (cipher_filter_t *cfx, FILE *out)
   cdk_error_t rc = 0;
   gcry_error_t err;
   
-  blocksize = gcry_cipher_get_algo_blklen( dek->algo );
+  blocksize = gcry_cipher_get_algo_blklen (dek->algo);
   if (blocksize < 8 || blocksize > 16)
     return CDK_Inv_Algo;
   
+  /* It might be possible the receiver does not understand the MDC
+     output and thus we offer to supress the MDC packet. */
   use_mdc = dek->use_mdc;
-  if (blocksize != 8)
-    use_mdc = 1; /* Enabled by default for all 128-bit block cipher */
+  if (blocksize == 8)
+    use_mdc = 0; /* Enabled by default for all 128-bit block cipher */
   
   if (use_mdc && cfx->datalen)
     cfx->datalen += 22;
@@ -125,7 +123,7 @@ write_header (cipher_filter_t *cfx, FILE *out)
       ed->extralen = blocksize + 2;
     }
   else
-    cfx->blkmode.nleft = BUFSIZE;
+    cfx->blkmode.nleft = DEF_BLOCKSIZE;
   
   if (use_mdc)
     {
@@ -135,7 +133,12 @@ write_header (cipher_filter_t *cfx, FILE *out)
 	return map_gcry_error (err);
     }
   
-  pkt->old_ctb = cfx->dek->rfc1991 && !cfx->blkmode.on? 1 : 0;
+  /* When we use partial bodies, the MDC feature or a blocksize
+     larger than 8, we force the use of the new packet format. */
+  if (cfx->blkmode.on || use_mdc || blocksize != 8)
+    pkt->old_ctb = 0;
+  else
+    pkt->old_ctb = 1;
   pkt->pkttype = use_mdc? CDK_PKT_ENCRYPTED_MDC : CDK_PKT_ENCRYPTED;
   rc = _cdk_pkt_write_fp (out, pkt);
   cdk_pkt_release (pkt);
@@ -163,9 +166,9 @@ write_header (cipher_filter_t *cfx, FILE *out)
   fwrite (temp, 1, nprefix+2, out);
   if (cfx->blkmode.on) 
     {
-      cfx->blkmode.nleft -= (blocksize+2);
+      cfx->blkmode.nleft -= (nprefix+2);
       if (use_mdc)
-	cfx->blkmode.nleft -= (22+1); /* 22 mdc packet, 1 byte version */
+	cfx->blkmode.nleft--; /* 1 byte version */
     }
   return rc;
 }
@@ -183,7 +186,7 @@ write_mdc_packet (FILE *out, cipher_filter_t *cfx)
     return CDK_Inv_Algo;
   
   /* We must hash the prefix of the MDC packet here */
-  pktdata[0] = 0xd3;
+  pktdata[0] = 0xD3;
   pktdata[1] = 0x14;
   gcry_md_write (cfx->mdc, pktdata, 2);
   gcry_md_final (cfx->mdc);
@@ -200,87 +203,91 @@ num2bits (size_t n)
 {
   size_t i;
   
-  if (!n)
-    return -1;
   for (i = 0; n > 1; i++)
     n >>= 1;
   return i;
 }
 
 
-static __inline__ size_t
-pow2 (size_t y)
-{
-  size_t x = 1, i;
-  for (i = 0; i < y; i++)
-    x <<= 1;
-  return x; 
-}
-
-
 static cdk_error_t
 write_partial_block (FILE *in, FILE *out, off_t *r_len,
-                     cipher_filter_t *cfx )
+                     cipher_filter_t *cfx)
 {
-    byte buf[BUFSIZE+1];
-    size_t n;
-    int nread;
-    cdk_error_t rc;
+  byte buf[DEF_BLOCKSIZE];
+  size_t n;
+  int nread;
+  gcry_error_t err;
+  
+  if (!out || !cfx)
+    return CDK_Inv_Value;
 
-    if( !out || !cfx )
-        return CDK_Inv_Value;
+  if (!cfx->blkmode.nleft && *r_len > 0)
+    {
+      if (*r_len > DEF_BLOCKSIZE)
+	{
+	  /*_cdk_log_debug ("write_partial_block: size %lu block %d\n",
+			  *r_len, DEF_BLOCKSIZE);*/
+	  fputc ((0xE0|DEF_BLOCKBITS), out);
+	  cfx->blkmode.nleft = DEF_BLOCKSIZE;
+	  (*r_len) -= DEF_BLOCKSIZE;
+	}
+      else if (*r_len > 512)
+	{
+	  n = num2bits (*r_len);
+	  cfx->blkmode.nleft = (1 << n);
+	  /*_cdk_log_debug ("write_partial_block: size %lu bits %d block %d\n",
+			  *r_len, n, (1<<n));*/
+	  fputc ((0xE0|n), out);
+	  (*r_len) -= cfx->blkmode.nleft;
+        }
+      else 
+	{
+	  size_t pktlen = *r_len;
+	  
+	  /* If we use the MDC mode, we need to increase the final
+	     partial body length to hold the mdc packet itself. */
+	  if (cfx->mdc)
+	    pktlen += 22;
 
-    if( !cfx->blkmode.nleft ) {
-        if( *r_len > BUFSIZE ) {
-            fputc( (0xE0|DEF_BLOCKBITS), out );
-            cfx->blkmode.nleft = BUFSIZE;
-            (*r_len) -= BUFSIZE;
-        }
-        else if( *r_len > 512 ) {
-            n = num2bits( *r_len );
-            cfx->blkmode.nleft = pow2( n );
-            fputc( (0xE0|n), out );
-            (*r_len) -= cfx->blkmode.nleft ;
-        }
-        else {
-            size_t pktlen = *r_len;
-            if( pktlen < 192 )
-                fputc( pktlen, out );
-            else if( pktlen < 8384 ) {
-                pktlen -= 192;
-                fputc( (pktlen/256) + 192, out );
-                fputc( (pktlen % 256), out );
-            }
-            cfx->blkmode.nleft = pktlen;
-            (*r_len) -= pktlen;
+	  if (pktlen < 192)
+	    fputc (pktlen, out);
+	  else if (pktlen < 8384)
+	    {
+	      pktlen -= 192;
+	      fputc ((pktlen/256) + 192, out);
+	      fputc ((pktlen % 256), out);
+	    }
+	  cfx->blkmode.nleft = pktlen;
+	  /*_cdk_log_debug ("write_partial_block: end %d block\n", pktlen);*/
+	  (*r_len) -= pktlen;	  
         }
     }
-    else
-        (*r_len) -= cfx->blkmode.nleft;
-
-    n = cfx->blkmode.nleft < DIM (buf)? cfx->blkmode.nleft : DIM (buf);
-    nread = fread( buf, 1, n, in );
-    if( !nread )
-        return CDK_EOF;
-    if( cfx->mdc )
-        gcry_md_write( cfx->mdc, buf, nread );
-    rc = gcry_cipher_encrypt (cfx->hd, buf, nread, NULL, 0);
-    if( !rc ) {
-        fwrite( buf, 1, nread, out );
-        cfx->blkmode.nleft -= nread;
-    }
-    return rc;
+  else
+    (*r_len) -= cfx->blkmode.nleft;
+  
+  n = cfx->blkmode.nleft < DIM (buf)? cfx->blkmode.nleft : DIM (buf);
+  nread = fread (buf, 1, n, in);
+  if (!nread)
+    return CDK_EOF;
+  if (cfx->mdc)
+    gcry_md_write (cfx->mdc, buf, nread);
+  err = gcry_cipher_encrypt (cfx->hd, buf, nread, NULL, 0);
+  if (err)
+    return map_gcry_error (err);
+  fwrite (buf, 1, nread, out);
+  cfx->blkmode.nleft -= nread;
+  return 0;
 }
 
 
 static cdk_error_t
-cipher_encode_file( void * opaque, FILE * in, FILE * out )
+cipher_encode_file (void *opaque, FILE *in, FILE *out)
 {
-  cipher_filter_t * cfx = opaque;
+  cipher_filter_t *cfx = opaque;
   byte buf[BUFSIZE];
   off_t len, len2;
   int nread;
-  cdk_error_t rc = 0;
+  cdk_error_t rc;
 
   if (!cfx || !in || !out)
     return CDK_Inv_Value;
@@ -293,8 +300,13 @@ cipher_encode_file( void * opaque, FILE * in, FILE * out )
       if (cfx->blkmode.on)
 	{
 	  rc = write_partial_block (in, out, &len2, cfx);
-	  if (rc)
+	  if (rc == CDK_EOF)
 	    break;
+	  if (rc)
+	    {
+	      wipemem (buf, sizeof (buf));
+	      return rc;
+	    }	  
 	  continue;
         }
       nread = fread (buf, 1, DIM (buf), in);
@@ -305,12 +317,12 @@ cipher_encode_file( void * opaque, FILE * in, FILE * out )
       gcry_cipher_encrypt (cfx->hd, buf, nread, NULL, 0);
       fwrite (buf, 1, nread, out);
     }
+  if (cfx->mdc)
+    rc = write_mdc_packet (out, cfx);
+  else
+    rc = 0;
+  
   wipemem (buf, sizeof (buf));
-  if (!rc) 
-    {
-      if (cfx->mdc)
-	rc = write_mdc_packet (out, cfx);
-    }
   return rc;
 }
 
@@ -367,10 +379,7 @@ read_header (cipher_filter_t * cfx, FILE * in)
   if (cfx->mdc)
     gcry_md_write (cfx->mdc, temp, nprefix + 2);
   if (cfx->blkmode.on)
-    {
-      cfx->blkmode.size -= (nprefix + 2);
-      /* FIXME: to sub the MDC packet len (23) here seems to be wrong. */
-    }
+    cfx->blkmode.size -= (nprefix + 2);
   return 0;
 }
 
@@ -456,7 +465,7 @@ cipher_decode( void * opaque, FILE * in, FILE * out )
     cipher_filter_t * cfx = opaque;
     cdk_error_t rc;
 
-    _cdk_log_debug( "cipher filter: decode\n" );
+    _cdk_log_debug ("cipher filter: decode\n");
   
     if( !cfx || !in || !out )
         return CDK_Inv_Value;
@@ -469,23 +478,23 @@ cipher_decode( void * opaque, FILE * in, FILE * out )
     
 
 static cdk_error_t
-cipher_encode( void * opaque, FILE * in, FILE * out )
+cipher_encode (void *opaque, FILE *in, FILE *out)
 {
-    cipher_filter_t * cfx = opaque;
-    cdk_error_t rc;
-
-    _cdk_log_debug( "cipher filter: encode\n" );
+  cipher_filter_t * cfx = opaque;
+  cdk_error_t rc;
   
-    if( !cfx || !in || !out )
-        return CDK_Inv_Value;
-
-    cfx->datalen = fp_get_length (in);
-    if (cfx->datalen < BUFSIZE && cfx->blkmode.on)
-        cfx->blkmode.on = 0;
-    rc = write_header (cfx, out);
-    if( !rc )
-        rc = cipher_encode_file (cfx, in, out);
-    return rc;
+  _cdk_log_debug ("cipher filter: encode\n");
+  
+  if (!cfx || !in || !out)
+    return CDK_Inv_Value;
+  
+  cfx->datalen = fp_get_length (in);
+  if (cfx->datalen < BUFSIZE && cfx->blkmode.on)
+    cfx->blkmode.on = 0;
+  rc = write_header (cfx, out);
+  if (!rc)
+    rc = cipher_encode_file (cfx, in, out);
+  return rc;
 }
 
 

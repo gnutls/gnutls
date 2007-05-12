@@ -298,7 +298,8 @@ cdk_pk_encrypt (cdk_pubkey_t pk, cdk_pkt_pubkey_enc_t pke,
                 gcry_mpi_t esk)
 {
   gcry_sexp_t s_data = NULL, s_pkey = NULL, s_ciph = NULL;
-  int rc;
+  gcry_error_t err;
+  cdk_error_t rc;
   
   if (!pk || !esk || !pke)
     return CDK_Inv_Value;
@@ -310,7 +311,11 @@ cdk_pk_encrypt (cdk_pubkey_t pk, cdk_pkt_pubkey_enc_t pke,
   if (!rc)
     rc = pubkey_to_sexp (&s_pkey, pk);
   if (!rc)
-    rc = gcry_pk_encrypt (&s_ciph, s_data, s_pkey);
+    {     
+      err = gcry_pk_encrypt (&s_ciph, s_data, s_pkey);
+      if (err)
+	return map_gcry_error (err);
+    }
   if (!rc)
     rc = sexp_to_pubenc (pke, s_ciph);
   
@@ -595,7 +600,7 @@ mpi_to_buffer (gcry_mpi_t a, byte *buf, size_t buflen,
 
   
 cdk_error_t
-cdk_pk_get_mpi (cdk_pkt_pubkey_t pk, size_t idx,
+cdk_pk_get_mpi (cdk_pubkey_t pk, size_t idx,
                 byte *buf, size_t buflen, size_t *r_nwritten, size_t *r_nbits)
 {
   if (!pk || !r_nwritten)
@@ -859,7 +864,7 @@ cdk_sk_protect (cdk_pkt_seckey_t sk, const char *pass)
  * Create a new public key from a secret key.
  **/
 cdk_error_t
-cdk_pk_from_secret_key (cdk_pkt_seckey_t sk, cdk_pkt_pubkey_t *ret_pk)
+cdk_pk_from_secret_key (cdk_pkt_seckey_t sk, cdk_pubkey_t *ret_pk)
 {
   if (!sk)
     return CDK_Inv_Value;
@@ -939,7 +944,7 @@ _cdk_sk_get_csum (cdk_pkt_seckey_t sk)
 
 
 cdk_error_t
-cdk_pk_get_fingerprint (cdk_pkt_pubkey_t pk, byte *fpr)
+cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte *fpr)
 {
   gcry_md_hd_t hd;
   int md_algo;
@@ -989,7 +994,7 @@ cdk_pk_fingerprint_get_keyid (const byte *fpr, size_t fprlen, u32 *keyid)
 
 
 u32
-cdk_pk_get_keyid (cdk_pkt_pubkey_t pk, u32 *keyid)
+cdk_pk_get_keyid (cdk_pubkey_t pk, u32 *keyid)
 {
   u32 lowbits = 0;
   byte buf[24];
@@ -1120,7 +1125,7 @@ _cdk_pkt_get_fingerprint (cdk_packet_t pkt, byte *fpr)
  * (GCRYSEXP_FMT_CANON).
  **/
 cdk_error_t
-cdk_pubkey_to_sexp (cdk_pkt_pubkey_t pk, char **sexp, size_t * len)
+cdk_pubkey_to_sexp (cdk_pubkey_t pk, char **sexp, size_t * len)
 {
   char *buf;
   size_t sexp_len;
