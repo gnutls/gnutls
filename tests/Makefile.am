@@ -36,7 +36,7 @@ ctests = simple openssl gc set_pkcs12_cred certder	\
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 if HAVE_FORK
 ctests +=  anonself pskself dhepskself tlsia resume
-tlsia_LDADD = $(LDADD) ../libextra/libgnutls-extra.la @LTLIBREADLINE@
+tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) @LTLIBREADLINE@
 endif
 gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
