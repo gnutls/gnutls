@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.7.9 (unreleased)
 
+** The included copy of OpenCDK updated to 0.6.1.
+
 ** X.509 certificates are preferred over OpenPGP keys.
 This is a change in the semantics of gnutls_set_default_priority.
 
