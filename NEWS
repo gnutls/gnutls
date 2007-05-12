@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 1.7.9 (unreleased)
+* Version 1.7.9 (released)
 
 ** X.509 certificates are preferred over OpenPGP keys.
 This is a change in the semantics of gnutls_set_default_priority.
@@ -26,6 +26,8 @@ failures of GnuTLS-generated RSA certificates in some other
 implementations (e.g., GnuPG 2.x's gpgsm).  Depending on which RFCs
 you read, this may or may not be correct, but our new behaviour appear
 to be consistent with other widely used implementations.
+
+** Fix mem leaks in gnutls_x509_crt_print.
 
 ** API and ABI modifications:
 No changes since last version.
