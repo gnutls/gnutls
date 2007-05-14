@@ -641,7 +641,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	includes/Makefile includes/gnutls/gnutls.h \
 	lib/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 	libextra/Makefile libextra/openpgp/Makefile libextra/opencdk/Makefile \
-	libextra/minilzo/Makefile \
+	libextra/minilzo/Makefile tests/openpgp/Makefile \
 	src/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 	lib/libgnutls-config libextra/libgnutls-extra-config \
