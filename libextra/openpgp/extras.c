@@ -110,13 +110,14 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 }
 
 /**
- * gnutls_openpgp_keyring_import - This function will import a RAW or BASE64 encoded key
+ * gnutls_openpgp_keyring_import - Import a raw- or Base64-encoded OpenPGP keyring
  * @keyring: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded keyring.
- * @format: One of gnutls_openpgp_keyring_fmt elements.
+ * @format: One of #gnutls_openpgp_keyring_fmt elements.
  *
- * This function will convert the given RAW or Base64 encoded keyring
- * to the native gnutls_openpgp_keyring_t format. The output will be stored in 'keyring'.
+ * This function will convert the given RAW or Base64 encoded keyring to the
+ * native #gnutls_openpgp_keyring_t format.  The output will be stored in
+ * 'keyring'.
  *
  * Returns 0 on success.
  *
@@ -126,30 +127,33 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 			       const gnutls_datum_t *data,
 			       gnutls_openpgp_key_fmt_t format)
 {
-  int rc;
-  keybox_blob *blob = NULL;
+  cdk_error_t err;
 
-
-  blob = kbx_read_blob (data, 0);
-  if (!blob)
+  if (format == GNUTLS_OPENPGP_FMT_RAW)
     {
-      gnutls_assert ();
-      return GNUTLS_E_OPENPGP_KEYRING_ERROR;
+      err = cdk_keydb_new (&keyring->db, CDK_DBTYPE_DATA,
+			   data->data, data->size);
+      if (err)
+	{
+	  gnutls_assert ();
+	  return _gnutls_map_cdk_rc (err);
+	}
     }
-
-  keyring->db = kbx_to_keydb (blob);
-  if (!keyring->db)
+  else
     {
-      gnutls_assert ();
-      rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
-      goto leave;
+      cdk_stream_t input;
+
+      err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
+      if (!err)
+	err = cdk_stream_set_armor_flag (input, 0);
+      if (!err)
+	err = cdk_keydb_new_from_stream (&keyring->db, 0, input);
+      cdk_stream_close (input);
     }
-
-  rc = 0;
-
-leave:
-  kbx_blob_release (blob);
-  return rc;
+  
+  if (err)
+    gnutls_assert ();
+  return  _gnutls_map_cdk_rc (err);
 }
 
 
