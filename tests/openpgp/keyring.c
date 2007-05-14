@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2007 Free Software Foundation
- * Author: Ludovic Courtès
+ * Author: Ludovic Courtès, Timo Schulz
  *
  * This file is part of GNUTLS.
  *
@@ -31,7 +31,7 @@
 
 #include "utils.h"
 
-/* A raw-encoded OpenPGP keyring.  This is a copy of (`sha1sum' output):
+/* A hex-encoded raw OpenPGP keyring.  This is a copy of (`sha1sum' output):
    5fdce61bff528070dfabdd237d91be618c353b4e  src/openpgp/cli_ring.gpg  */
 static unsigned char raw_keyring[] = {
 0x99, 0x01, 0xA2, 0x04, 0x3C, 0x67, 0x95, 0x8D, 0x11, 0x04, 0x00, 0x80, 
@@ -168,7 +168,8 @@ static const unsigned char id_in_keyring[8] =
     0xa7, 0xd9, 0x3c, 0x3f };
 
 static const unsigned char id2_in_keyring[8] =
-  { 0xbd, 0x57, 0x2c, 0xdc, 
+  /* OpenCDK test key, second key in the keyring */
+  { 0xbd, 0x57, 0x2c, 0xdc,
     0xcc, 0xc0, 0x7c, 0x35 };
 
 static const unsigned char id_not_in_keyring[8] =
@@ -179,9 +180,9 @@ static const unsigned char id_not_in_keyring[8] =
 void
 doit (void)
 {
-  int ret;
   gnutls_openpgp_keyring_t keyring;
   gnutls_datum_t data;
+  int ret;
 
   ret = gnutls_global_init ();
   if (ret < 0)
@@ -196,7 +197,7 @@ doit (void)
     fail ("keyring-init %d\n", ret);
   
   data.data = raw_keyring;
-  data.size = sizeof (raw_keyring);
+  data.size = sizeof (raw_keyring) / sizeof (raw_keyring[0]);
   ret = gnutls_openpgp_keyring_import (keyring, &data,
 				       GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
@@ -208,11 +209,11 @@ doit (void)
 
   ret = gnutls_openpgp_keyring_check_id (keyring, id_in_keyring, 0);
   if (ret != 0)
-    fail ("keyring-check-id %d\n", ret);
+    fail ("keyring-check-id first key %d\n", ret);
   
   ret = gnutls_openpgp_keyring_check_id (keyring, id2_in_keyring, 0);
   if (ret != 0)
-    fail ("keyring-check-id %d\n", ret);
+    fail ("keyring-check-id second key %d\n", ret);
 
   success ("done\n");
 
