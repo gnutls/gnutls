@@ -295,7 +295,10 @@ gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
     }
 
   if (!pkt)
-    return GNUTLS_E_INTERNAL_ERROR;
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }  
 
   uid = pkt->pkt.user_id;
   if (uid->len >= *sizeof_buf)

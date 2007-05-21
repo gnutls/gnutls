@@ -53,7 +53,7 @@ static int
 xml_add_mpi2 (gnutls_string * xmlkey, const uint8_t * data, size_t count,
 	      const char *tag)
 {
-  char *p = NULL;
+  char *p;
   size_t i;
   int rc;
 
@@ -86,9 +86,11 @@ xml_add_mpi (gnutls_string * xmlkey, cdk_pkt_pubkey_t pk, int idx,
 {
   uint8_t buf[4096]; /* Maximal supported MPI of size 32786 bits */
   size_t nbytes;
-
+  
+  /* FIXME: we should not hardcode the buffer size. */
   nbytes = 4096;
-  cdk_pk_get_mpi (pk, idx, buf, nbytes, &nbytes, NULL);
+  if (cdk_pk_get_mpi (pk, idx, buf, nbytes, &nbytes, NULL))
+    return GNUTLS_E_INTERNAL_ERROR;
   return xml_add_mpi2 (xmlkey, buf, nbytes, tag);
 }
 
@@ -123,15 +125,6 @@ xml_add_key_mpi (gnutls_string * xmlkey, cdk_pkt_pubkey_t pk)
 	rc = xml_add_mpi (xmlkey, pk, 2, "DSA-G");
       if (!rc)
 	rc = xml_add_mpi (xmlkey, pk, 3, "DSA-Y");
-    }
-  else if (is_ELG (pk->pubkey_algo))
-    {
-      /* FIXME: Does GnuTLS supports ElGamal? */
-      rc = xml_add_mpi (xmlkey, pk, 0, "ELG-P");
-      if (!rc)
-	rc = xml_add_mpi (xmlkey, pk, 1, "ELG-G");
-      if (!rc)
-	rc = xml_add_mpi (xmlkey, pk, 2, "ELG-Y");
     }
   else
     return GNUTLS_E_UNWANTED_ALGORITHM;
@@ -177,10 +170,8 @@ xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
     algo = "DSA";
   else if (is_RSA (pk->pubkey_algo))
     algo = "RSA";
-  else if (is_ELG (pk->pubkey_algo))
-    algo = "ELG"; /* FIXME: Same here is ElGamal supported? */
   else
-    algo = "???";
+    return GNUTLS_E_UNWANTED_ALGORITHM;
   rc = xml_add_tag (xmlkey, "PKALGO", algo);
   if (rc)
     return rc;
@@ -266,7 +257,7 @@ static int
 xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
 {
   const char *algo, *s;
-  char tmp[32], keyid[16];
+  char tmp[32], keyid[16+1];
   unsigned int kid[2];
   int rc;
 
@@ -303,10 +294,6 @@ xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
 	{
 	case GCRY_PK_DSA:
 	  algo = "DSA";
-	  break;
-	case GCRY_PK_ELG: /* FIXME: Is ElGamal needed? */
-	case GCRY_PK_ELG_E:
-	  algo = "ELG";
 	  break;
 	case GCRY_PK_RSA:
 	case GCRY_PK_RSA_E:
@@ -380,12 +367,13 @@ int
 gnutls_openpgp_key_to_xml (gnutls_openpgp_key_t key,
 			   gnutls_datum_t * xmlkey, int ext)
 {
-  cdk_kbnode_t node, ctx = NULL;
+  cdk_kbnode_t node, ctx;
   cdk_packet_t pkt;
   char name[MAX_CN];
   size_t name_len;
   const char *s;
-  int idx = 0, rc = 0;
+  int idx;
+  int rc = 0;
   gnutls_string string_xml_key;
 
   if (!key || !xmlkey)
@@ -406,6 +394,7 @@ gnutls_openpgp_key_to_xml (gnutls_openpgp_key_t key,
   s = " <OPENPGPKEY>\n";
   _gnutls_string_append_str (&string_xml_key, s);
 
+  ctx = NULL;
   idx = 1;
   while ((node = cdk_kbnode_walk (key->knode, &ctx, 0)))
     {
@@ -415,7 +404,7 @@ gnutls_openpgp_key_to_xml (gnutls_openpgp_key_t key,
 	case CDK_PKT_PUBLIC_KEY:
 	  rc = xml_add_key (&string_xml_key, ext, pkt->pkt.public_key, 0);
 	  break;
-
+	  
 	case CDK_PKT_PUBLIC_SUBKEY:
 	  rc = xml_add_key (&string_xml_key, ext, pkt->pkt.public_key, 1);
 	  break;

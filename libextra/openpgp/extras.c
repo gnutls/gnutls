@@ -74,6 +74,14 @@ gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
       cdk_keydb_free (keyring->db);
       keyring->db = NULL;
     }
+  
+  /* In some cases the stream is also stored outside the keydb context
+     and we need to close it here then. */
+  if (keyring->db_stream)
+    {
+      cdk_stream_close (keyring->db_stream);
+      keyring->db_stream = NULL;
+    }  
 
   gnutls_free (keyring);
 }
@@ -106,6 +114,7 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
       return 0;
     }
   
+  _gnutls_debug_log ("PGP: key not found %08lX\n", (unsigned long)id[1]);
   return GNUTLS_E_NO_CERTIFICATE_FOUND;
 }
 
@@ -130,6 +139,9 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
   cdk_error_t err;
   cdk_stream_t input;
   
+  _gnutls_debug_log ("PGP: keyring import format '%s'\n",
+		     format == 0? "raw" : "base64");
+  
   if (format == GNUTLS_OPENPGP_FMT_RAW)
     {
       err = cdk_keydb_new (&keyring->db, CDK_DBTYPE_DATA,
@@ -139,16 +151,25 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
       return _gnutls_map_cdk_rc (err);
     }
   
+  /* Create a new stream from the given data, which means to
+     allocate a new stream and to write the data in the stream.
+     Then push the armor filter to decode the data and to store
+     it in the raw format. */
   err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
   if (!err)
     err = cdk_stream_set_armor_flag (input, 0);
   if (!err)
     err = cdk_keydb_new_from_stream (&keyring->db, 0, input);  
   if (err)
-    {      
+    {
       cdk_stream_close (input);
       gnutls_assert ();
-    } 
+    }
+  else 
+    /* The keydb function will not close the stream itself, so we need to
+       store it separately to close it later. */
+    keyring->db_stream = input;
+  
   return _gnutls_map_cdk_rc (err);
 }
 

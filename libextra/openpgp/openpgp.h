@@ -33,6 +33,7 @@ typedef struct gnutls_openpgp_privkey_int
 typedef struct gnutls_openpgp_keyring_int
 {
   cdk_keydb_hd_t db;
+  cdk_stream_t   db_stream;
 } gnutls_openpgp_keyring_int;
 
 
