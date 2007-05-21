@@ -128,32 +128,28 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 			       gnutls_openpgp_key_fmt_t format)
 {
   cdk_error_t err;
-
+  cdk_stream_t input;
+  
   if (format == GNUTLS_OPENPGP_FMT_RAW)
     {
       err = cdk_keydb_new (&keyring->db, CDK_DBTYPE_DATA,
 			   data->data, data->size);
       if (err)
-	{
-	  gnutls_assert ();
-	  return _gnutls_map_cdk_rc (err);
-	}
-    }
-  else
-    {
-      cdk_stream_t input;
-
-      err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
-      if (!err)
-	err = cdk_stream_set_armor_flag (input, 0);
-      if (!err)
-	err = cdk_keydb_new_from_stream (&keyring->db, 0, input);
-      cdk_stream_close (input);
+	gnutls_assert ();
+      return _gnutls_map_cdk_rc (err);
     }
   
+  err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
+  if (!err)
+    err = cdk_stream_set_armor_flag (input, 0);
+  if (!err)
+    err = cdk_keydb_new_from_stream (&keyring->db, 0, input);  
   if (err)
-    gnutls_assert ();
-  return  _gnutls_map_cdk_rc (err);
+    {      
+      cdk_stream_close (input);
+      gnutls_assert ();
+    } 
+  return _gnutls_map_cdk_rc (err);
 }
 
 
