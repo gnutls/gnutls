@@ -28,6 +28,7 @@
 #include <openpgp.h>
 #include <x509/rfc2818.h>	/* for MAX_CN */
 
+
 static int
 xml_add_tag (gnutls_string * xmlkey, const char *tag, const char *val)
 {
@@ -46,6 +47,19 @@ xml_add_tag (gnutls_string * xmlkey, const char *tag, const char *val)
   _gnutls_string_append_str (xmlkey, ">\n");
 
   return 0;
+}
+
+
+/* Add a tag to the xml key with an unsigned integer based value.
+   We use the unsigned format, because no key attribute has a
+   negative values. */
+static int
+xml_add_tag_uint_val (gnutls_string *xmlkey, const char *tag, unsigned int val)
+{
+  char tmp[32];
+  
+  sprintf (tmp, "%lu", (unsigned long)val);
+  return xml_add_tag (xmlkey, tag, tmp);
 }
 
 
@@ -129,7 +143,7 @@ xml_add_key_mpi (gnutls_string * xmlkey, cdk_pkt_pubkey_t pk)
   else
     return GNUTLS_E_UNWANTED_ALGORITHM;
 
-  return 0;
+  return rc;
 }
 
 
@@ -137,8 +151,8 @@ static int
 xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
 {
   const char *algo, *s;
-  char keyid[16], fpr[41], tmp[32];
-  uint8_t fingerpr[20];
+  char keyid[32+1], strfpr[40+1];
+  uint8_t keyfpr[20];
   unsigned int kid[2];
   int i = 0, rc = 0;
 
@@ -152,17 +166,17 @@ xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
   _gnutls_string_append_str (xmlkey, s);
 
   cdk_pk_get_keyid (pk, kid);
-  snprintf (keyid, 16, "%08lX%08lX", 
+  snprintf (keyid, 32, "%08lX%08lX", 
 	    (unsigned long)kid[0], (unsigned long)kid[1]);
   rc = xml_add_tag (xmlkey, "KEYID", keyid);
   if (rc)
     return rc;
 
-  cdk_pk_get_fingerprint (pk, fingerpr);
+  cdk_pk_get_fingerprint (pk, keyfpr);
   for (i = 0; i < 20; i++)
-    sprintf (fpr + 2 * i, "%02X", fingerpr[i]);
-  fpr[40] = '\0';
-  rc = xml_add_tag (xmlkey, "FINGERPRINT", fpr);
+    sprintf (strfpr + 2 * i, "%02X", keyfpr[i]);
+  strfpr[40] = '\0';
+  rc = xml_add_tag (xmlkey, "FINGERPRINT", strfpr);
   if (rc)
     return rc;
 
@@ -175,27 +189,23 @@ xml_add_key (gnutls_string * xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub)
   rc = xml_add_tag (xmlkey, "PKALGO", algo);
   if (rc)
     return rc;
-
-  sprintf (tmp, "%d", cdk_pk_get_nbits (pk));
-  rc = xml_add_tag (xmlkey, "KEYLEN", tmp);
+  
+  rc = xml_add_tag_uint_val (xmlkey, "KEYLEN", cdk_pk_get_nbits (pk));
   if (rc)
     return rc;
 
-  sprintf (tmp, "%lu", (unsigned long)pk->timestamp);
-  rc = xml_add_tag (xmlkey, "CREATED", tmp);
+  rc = xml_add_tag_uint_val (xmlkey, "CREATED", pk->timestamp);
   if (rc)
     return rc;
 
   if (pk->expiredate > 0)
     {
-      sprintf (tmp, "%lu", (unsigned long) pk->expiredate);
-      rc = xml_add_tag (xmlkey, "EXPIREDATE", tmp);
+      rc = xml_add_tag_uint_val (xmlkey, "EXPIREDATE", pk->expiredate);
       if (rc)
 	return rc;
     }
 
-  sprintf (tmp, "%d", pk->is_revoked);
-  rc = xml_add_tag (xmlkey, "REVOKED", tmp);
+  rc = xml_add_tag_uint_val (xmlkey, "REVOKED", pk->is_revoked);
   if (rc)
     return rc;
 
@@ -218,7 +228,6 @@ xml_add_userid (gnutls_string * xmlkey, int ext,
 		const char *dn, cdk_pkt_userid_t id)
 {
   const char *s;
-  char tmp[32];
   int rc;
 
   if (!xmlkey || !dn || !id)
@@ -236,12 +245,9 @@ xml_add_userid (gnutls_string * xmlkey, int ext,
 
   if (ext)
     {
-      sprintf (tmp, "%d", id->is_primary);
-      rc = xml_add_tag (xmlkey, "PRIMARY", tmp);
-      if (rc)
-	return rc;
-      sprintf (tmp, "%d", id->is_revoked);
-      rc = xml_add_tag (xmlkey, "REVOKED", tmp);
+      rc = xml_add_tag_uint_val (xmlkey, "PRIMARY", id->is_primary);
+      if (!rc)
+	rc = xml_add_tag_uint_val (xmlkey, "REVOKED", id->is_revoked);
       if (rc)
 	return rc;
     }
@@ -257,7 +263,7 @@ static int
 xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
 {
   const char *algo, *s;
-  char tmp[32], keyid[16+1];
+  char keyid[16+1];
   unsigned int kid[2];
   int rc;
 
@@ -270,21 +276,18 @@ xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
   s = "  <SIGNATURE>\n";
   _gnutls_string_append_str (xmlkey, s);
 
-  sprintf (tmp, "%d", sig->version);
-  rc = xml_add_tag (xmlkey, "VERSION", tmp);
+  rc = xml_add_tag_uint_val (xmlkey, "VERSION", sig->version);
   if (rc)
     return rc;
 
   if (ext)
     {
-      sprintf (tmp, "%d", sig->sig_class);
-      rc = xml_add_tag (xmlkey, "SIGCLASS", tmp);
+      rc = xml_add_tag_uint_val (xmlkey, "SIGCLASS", sig->sig_class);
       if (rc)
 	return rc;
     }
 
-  sprintf (tmp, "%d", sig->flags.expired);
-  rc = xml_add_tag (xmlkey, "EXPIRED", tmp);
+  rc = xml_add_tag_uint_val (xmlkey, "EXPIRED", sig->flags.expired);
   if (rc)
     return rc;
 
@@ -335,8 +338,7 @@ xml_add_sig (gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
 	return rc;
     }
 
-  sprintf (tmp, "%lu", (unsigned long)sig->timestamp);
-  rc = xml_add_tag (xmlkey, "CREATED", tmp);
+  rc = xml_add_tag_uint_val (xmlkey, "CREATED", sig->timestamp);
   if (rc)
     return rc;
 
