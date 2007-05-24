@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** New APIs to extract DER encoded X.509 Subject/Issuer DN.
 Suggested by Nate Nielsen <nielsen-list@memberwebs.com>.
 
+** Update of gnulib files.
+
 ** API and ABI modifications:
 gnutls_x509_crt_get_raw_issuer_dn: ADD.
 gnutls_x509_crt_get_raw_dn: ADD.
