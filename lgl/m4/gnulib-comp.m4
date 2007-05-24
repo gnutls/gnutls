@@ -70,6 +70,7 @@ AC_DEFUN([lgl_INIT],
   gl_GC_SHA1
   gl_MODULE_INDICATOR([gc-sha1])
   gl_MD2
+  gl_FLOAT_H
   gl_FUNC_FSEEKO
   gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_FUNC_GETDELIM
@@ -154,6 +155,9 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/des.c
   lib/des.h
   lib/dummy.c
+  lib/float+.h
+  lib/float_.h
+  lib/fseeko.c
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c
@@ -217,6 +221,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/des.m4
   m4/eoverflow.m4
   m4/extensions.m4
+  m4/float_h.m4
   m4/fseeko.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4

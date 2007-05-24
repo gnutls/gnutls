@@ -18,3 +18,5 @@ getline.c
 getline.h
 getpass.c
 getpass.h
+float_.h
+fseeko.c
