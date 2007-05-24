@@ -305,6 +305,13 @@ extern "C"
 			     gnutls_certificate_print_formats_t format,
 			     gnutls_datum_t *out);
 
+  /* Access to internal Certificate fields.
+   */
+  int gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
+					 gnutls_datum_t * start);
+  int gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert,
+				  gnutls_datum_t * start);
+
 /* RDN handling.
  */
   int gnutls_x509_rdn_get (const gnutls_datum_t * idn,

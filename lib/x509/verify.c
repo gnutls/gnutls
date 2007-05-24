@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -164,14 +164,14 @@ is_issuer (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer_cert)
   NULL, 0};
   int ret;
 
-  ret = _gnutls_x509_crt_get_raw_issuer_dn (cert, &dn1);
+  ret = gnutls_x509_crt_get_raw_issuer_dn (cert, &dn1);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_x509_crt_get_raw_dn (issuer_cert, &dn2);
+  ret = gnutls_x509_crt_get_raw_dn (issuer_cert, &dn2);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -899,7 +899,7 @@ is_crl_issuer (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer_cert)
       goto cleanup;
     }
 
-  ret = _gnutls_x509_crt_get_raw_dn (issuer_cert, &dn2);
+  ret = gnutls_x509_crt_get_raw_dn (issuer_cert, &dn2);
   if (ret < 0)
     {
       gnutls_assert ();
