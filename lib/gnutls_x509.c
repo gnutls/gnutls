@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -989,8 +989,7 @@ generate_rdn_seq (gnutls_certificate_credentials_t res)
   size = 0;
   for (i = 0; i < res->x509_ncas; i++)
     {
-      if ((ret =
-	   _gnutls_x509_crt_get_raw_dn (res->x509_ca_list[i], &tmp)) < 0)
+      if ((ret = gnutls_x509_crt_get_raw_dn (res->x509_ca_list[i], &tmp)) < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
@@ -1014,8 +1013,7 @@ generate_rdn_seq (gnutls_certificate_credentials_t res)
 
   for (i = 0; i < res->x509_ncas; i++)
     {
-      if ((ret =
-	   _gnutls_x509_crt_get_raw_dn (res->x509_ca_list[i], &tmp)) < 0)
+      if ((ret = gnutls_x509_crt_get_raw_dn (res->x509_ca_list[i], &tmp)) < 0)
 	{
 	  _gnutls_free_datum (&res->x509_rdn_sequence);
 	  gnutls_assert ();
