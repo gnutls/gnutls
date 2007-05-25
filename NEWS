@@ -10,6 +10,9 @@ Suggested by Nate Nielsen <nielsen-list@memberwebs.com>.
 
 ** Update of gnulib files.
 
+** GnuTLS is now developed in GIT instead of CVS.
+See <http://repo.or.cz/w/gnutls.git> for a public repository.
+
 ** API and ABI modifications:
 gnutls_x509_crt_get_raw_issuer_dn: ADD.
 gnutls_x509_crt_get_raw_dn: ADD.
