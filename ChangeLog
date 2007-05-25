@@ -1,3 +1,111 @@
+2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: Version 1.7.10.
+
+2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* Makefile.am: Use cg instead of cvs commands, for update-po target.
+
+
+2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* Makefile.am: Change release target from cvs to git.
+
+2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* lgl/lseek.c, lgl/m4/lseek.m4: Update.
+
+2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/gendocs_template, lgl/.cvsignore, lgl/Makefile.am,
+	lgl/fseeko.c, lgl/m4/fseeko.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/unistd_h.m4, lgl/stdio_.h, lgl/unistd_.h: Update.
+
+2007-05-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2007-05-24  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2007-05-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c: Use new API.
+
+2007-05-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-24  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/netinet_in_.h, gl/string_.h, gl/sys_socket_.h,
+	lgl/.cvsignore, lgl/Makefile.am, lgl/float+.h, lgl/float_.h,
+	lgl/fseeko.c, lgl/m4/float_h.m4, lgl/m4/fseeko.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/stdio_h.m4, lgl/m4/vasnprintf.m4,
+	lgl/m4/vasprintf.m4, lgl/m4/wint_t.m4, lgl/stdint_.h, lgl/stdio_.h,
+	lgl/string_.h, lgl/sys_socket_.h, lgl/sys_stat_.h, lgl/time_.h,
+	lgl/unistd_.h, lgl/vasnprintf.c, lgl/wchar_.h: Update.
+
+2007-05-24  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-05-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/x509.h, lib/x509/verify.c, lib/x509/x509.c,
+	lib/x509/x509.h: Export gnutls_x509_crt_get_raw_dn,
+	gnutls_x509_crt_get_raw_issuer_dn.
+
+2007-05-23  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/openpgp/xml.c: fix the key ID representation in the XML
+	code.
+
+2007-05-21  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/openpgp/extras.c, libextra/openpgp/openpgp.h,
+	libextra/openpgp/pgp.c, libextra/openpgp/xml.c: cleanups for the xml
+	code: elgamal keys are not supported. bug fix for the key import
+	(base64) code, store the stream and close it in the deinit function.
+
+
+2007-05-21  Timo Schulz <twoaday@gnutls.org>
+
+	* src/openpgp/Makefile.am, src/openpgp/cli_ring.asc: Add client
+	keyring in base64 format. This is the same file as cli_ring.gpg but
+	armored.
+
+2007-05-21  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/openpgp/extras.c: do not close the input stream in the
+	import code when the base64 is used.
+
+2007-05-14  Timo Schulz <twoaday@gnutls.org>
+
+	* tests/openpgp/keyring.c: few more comments.
+
+2007-05-14  Timo Schulz <twoaday@gnutls.org>
+
+	* configure.in: add makefile for the openpgp test folder
+
+2007-05-14  Timo Schulz <twoaday@gnutls.org>
+
+	* libextra/openpgp/extras.c: patch to support raw keyrings.
+
+2007-05-14  Timo Schulz <twoaday@gnutls.org>
+
+	* tests/Makefile.am, tests/openpgp/Makefile.am,
+	tests/openpgp/keyring.c: Add simple openpgp test.
+
+2007-05-12  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
+
 2007-05-12  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.9.
@@ -20,16 +128,16 @@
 
 2007-05-12  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/opencdk/armor.c, libextra/opencdk/cipher.c,
-	libextra/opencdk/compress.c, libextra/opencdk/context.h,
-	libextra/opencdk/filters.h, libextra/opencdk/kbnode.c,
-	libextra/opencdk/keydb.c, libextra/opencdk/literal.c,
-	libextra/opencdk/main.c, libextra/opencdk/main.h,
-	libextra/opencdk/misc.c, libextra/opencdk/opencdk.h,
-	libextra/opencdk/pubkey.c, libextra/opencdk/read-packet.c,
-	libextra/opencdk/sig-check.c, libextra/opencdk/stream.c,
-	libextra/opencdk/verify.c, libextra/opencdk/write-packet.c,
-	lgl/vasnprintf.c, lgl/m4/vasnprintf.m4: Update.
+	* lgl/m4/vasnprintf.m4, lgl/vasnprintf.c, libextra/opencdk/armor.c,
+	libextra/opencdk/cipher.c, libextra/opencdk/compress.c,
+	libextra/opencdk/context.h, libextra/opencdk/filters.h,
+	libextra/opencdk/kbnode.c, libextra/opencdk/keydb.c,
+	libextra/opencdk/literal.c, libextra/opencdk/main.c,
+	libextra/opencdk/main.h, libextra/opencdk/misc.c,
+	libextra/opencdk/opencdk.h, libextra/opencdk/pubkey.c,
+	libextra/opencdk/read-packet.c, libextra/opencdk/sig-check.c,
+	libextra/opencdk/stream.c, libextra/opencdk/verify.c,
+	libextra/opencdk/write-packet.c: Update.
 
 2007-05-11  Simon Josefsson <simon@josefsson.org>
 
@@ -37,155 +145,13 @@
 
 2007-05-11  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_priority.c:
-	(gnutls_set_default_priority): Change order to prefer X.509 over
+	* lib/gnutls_priority.c: (gnutls_set_default_priority): Change order to prefer X.509 over
 	OpenPGP.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Version 1.7.8.p11.2.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/pkcs11.h: Typo.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* src/cli.c: Fix.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am, src/Makefile.am, src/cli.c: Fix.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Fix.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS, THANKS: Add.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump versions.
-
-2007-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_sig.c: Use userdata.
-
-2007-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/gnutls.h.in: Typos.
-
-2007-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_int.h: Add.
-
-2007-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Fixed.
-
-2007-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2007-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/gnutls.h.in: Add void*userdata to sign_func.
-
-2007-05-09  Simon Josefsson <simon@josefsson.org>
-
-	* src/cli.c: Use PKCS#11 stuff optionally.
-
-2007-05-09  Simon Josefsson <simon@josefsson.org>
-
-	* src/Makefile.am: Make gnutls-pkcs11 optional.
-
-2007-05-09  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Need #define too.
-
-2007-05-09  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am, configure.in: Make scute optional.
-
-2007-05-08  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Version 1.7.8.p11.1.
-
-2007-05-08  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/gnutls.h.in, src/cli.c: Typo.
-
-2007-05-08  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_sig.c: Only use signing callback if we don't have a
-	private key.
-
-2007-05-08  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2007-05-08  Simon Josefsson <simon@josefsson.org>
-
-	* lib/auth_cert.c: Don't bother checking private key at all.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_sig.c: Guard against NULL private keys.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_sig.c: Add gnutls_set_sign_function,
-	gnutls_get_sign_function.  Invoke external sign callback if present.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_int.h:
-	(internals_st): Add sign_func.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* lib/auth_rsa_export.c: Allow private keys to be NULL.  (Assume
-	external keys are >=512 bits...)
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* lib/auth_cert.c: Allow private keys to be NULL.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* src/cli.c: Typo.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* src/cli.c: Try to get user certs from PKCS#11.  Implement a
-	signer callback using PKCS#11.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* lib/auth_dhe.c: Sign when we have a certificate (the private key
-	may be NULL).
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/pkcs11.h: Add
-	gnutls_pkcs11_get_user_certificates, gnutls_pkcs11_sign.
-
-2007-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/gnutls.h.in: Add gnutls_sign_func,
-	gnutls_set_sign_function, gnutls_get_sign_function.
 
 2007-05-03  Simon Josefsson <simon@josefsson.org>
 
-	* gl/override/doc/gendocs_template,
-	gl/override/doc/gendocs_template.diff, doc/gendocs_template:
-	Update.
+	* doc/gendocs_template, gl/override/doc/gendocs_template,
+	gl/override/doc/gendocs_template.diff: Update.
 
 2007-05-03  Simon Josefsson <simon@josefsson.org>
 
@@ -201,54 +167,13 @@
 
 2007-05-03  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gnulib.mk, gl/socket_.h, gl/string_.h, gl/sys_socket_.h,
-	gl/m4/gnulib-comp.m4, gl/m4/socklen.m4, lgl/Makefile.am,
-	lgl/getpass.c, lgl/socket_.h, lgl/stat_.h, lgl/stdio_.h,
-	lgl/string_.h, lgl/sys_socket_.h, lgl/sys_stat_.h, lgl/time_.h,
-	lgl/unistd_.h, lgl/wchar_.h, lgl/m4/fseeko.m4,
-	lgl/m4/gnulib-comp.m4, lgl/m4/socklen.m4, lgl/m4/stdint.m4,
-	lgl/m4/stdio_h.m4, lgl/m4/sys_stat_h.m4, lgl/m4/unistd_h.m4:
-	Update.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump versions.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Version 1.7.8.p11.0.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Fix.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Update.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Search for Scute at build-time.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/reference/Makefile.am: Fix.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/reference/Makefile.am: Fix.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/reference/Makefile.am: Ignore pkcs11.h.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/reference/gnutls-docs.sgml: Add pkcs11.
+	* gl/gnulib.mk, gl/m4/gnulib-comp.m4, gl/m4/socklen.m4,
+	gl/socket_.h, gl/string_.h, gl/sys_socket_.h, lgl/Makefile.am,
+	lgl/getpass.c, lgl/m4/fseeko.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/socklen.m4, lgl/m4/stdint.m4, lgl/m4/stdio_h.m4,
+	lgl/m4/sys_stat_h.m4, lgl/m4/unistd_h.m4, lgl/socket_.h,
+	lgl/stat_.h, lgl/stdio_.h, lgl/string_.h, lgl/sys_socket_.h,
+	lgl/sys_stat_.h, lgl/time_.h, lgl/unistd_.h, lgl/wchar_.h: Update.
 
 2007-05-02  Simon Josefsson <simon@josefsson.org>
 
@@ -256,88 +181,11 @@
 
 2007-05-02  Simon Josefsson <simon@josefsson.org>
 
-	* doc/Makefile.am: Fix distcheck.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/reference/Makefile.am: Scan pkcs11/ too.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Fix release target.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/gnutls.texi: Add code snippet.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/gnutls.texi: Add.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/Makefile.am: Generate p11-api.texi.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Generated.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Look in pkcs11/ too.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Generate in pkcs11/ too.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* doc/gnutls.texi: Add P11 section.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
 	* lib/x509/output.c: Fix mem leaks.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* tests/Makefile.am: Add pkcs11/.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Add tests/pkcs11/.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Don't use gnits (for version name).
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump versions.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2007-05-02  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/pkcs11.h, src/cli.c: Rethink the PKCS#11 APIs.
 
 2007-04-29  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-otto-tls-sigma-ciphersuite-00.txt: Add.
-
-2007-04-24  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_x509.c: Make it compile.
-
-2007-04-24  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_x509.c:
-	(gnutls_certificate_set_x509_key_mem): Handle NULL keys.
-
-2007-04-24  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/gnutls.h.in: Add GNUTLS_E_PKCS11_ERROR.
 
 2007-04-24  Timo Schulz <twoaday@gnutls.org>
 
@@ -348,29 +196,9 @@
 	* doc/protocol/draft-ietf-tls-ecc-new-mac-00.txt,
 	doc/protocol/draft-ietf-tls-suiteb-00.txt: Add.
 
-2007-04-22  Simon Josefsson <simon@josefsson.org>
-
-	* src/cli.c: Fix.
-
-2007-04-22  Simon Josefsson <simon@josefsson.org>
-
-	* src/Makefile.am, src/cli.c: Support PKCS#11 API.
-
-2007-04-22  Simon Josefsson <simon@josefsson.org>
-
-	* includes/Makefile.am: Include gnutls/pkcs11.h.
-
-2007-04-22  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/pkcs11.h: Add, for PKCS#11.
-
 2007-04-22  Timo Schulz <twoaday@gnutls.org>
 
 	* libextra/opencdk/dummy.c: [no log message]
-
-2007-04-22  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am, configure.in: Add PKCS#11 glue.
 
 2007-04-22  Timo Schulz <twoaday@gnutls.org>
 
@@ -396,8 +224,8 @@
 
 2007-04-22  Simon Josefsson <simon@josefsson.org>
 
-	* configure.in: Check for OpenCDK function that is only available
-	in OpenCDK 0.6.0.
+	* configure.in: Check for OpenCDK function that is only available in
+	OpenCDK 0.6.0.
 
 2007-04-21  Simon Josefsson <simon@josefsson.org>
 
@@ -405,8 +233,8 @@
 
 2007-04-21  Simon Josefsson <simon@josefsson.org>
 
-	* doc/protocol/draft-badra-tls-password-ext-00.txt,
-	doc/protocol/draft-badra-tls-password-00.txt: Add.
+	* doc/protocol/draft-badra-tls-password-00.txt,
+	doc/protocol/draft-badra-tls-password-ext-00.txt: Add.
 
 2007-04-20  Timo Schulz <twoaday@gnutls.org>
 
@@ -423,8 +251,7 @@
 
 2007-04-19  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/openpgp/extras.c:
-	(gnutls_openpgp_keyring_import): Make it work (it seems the old code
+	* libextra/openpgp/extras.c: (gnutls_openpgp_keyring_import): Make it work (it seems the old code
 	didn't work).  Patch from ludo@chbouib.org (Ludovic Courtès).
 
 2007-04-18  Simon Josefsson <simon@josefsson.org>
@@ -433,29 +260,7 @@
 
 2007-04-18  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Version 1.6.2.
-
-2007-04-18  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2007-04-18  Simon Josefsson <simon@josefsson.org>
-
-	* po/LINGUAS, po/de.po, po/pl.po, po/sv.po: Sync with TP.
-
-2007-04-18  Simon Josefsson <simon@josefsson.org>
-
 	* tests/tlsia.c: Check return codes from init functions.
-
-2007-04-18  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Fix CVS tagging in release target.  Don't update
-	manuals on the website.
-
-2007-04-18  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS, lib/x509/sign.c: Write NULL in parameters for RSA signing,
-	backported from the 1.7.x branch.
 
 2007-04-18  Simon Josefsson <simon@josefsson.org>
 
@@ -476,6 +281,10 @@
 
 2007-04-16  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2007-04-16  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.7.8.
 
 2007-04-16  Simon Josefsson <simon@josefsson.org>
@@ -488,11 +297,7 @@
 
 2007-04-16  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Add.
-
-2007-04-16  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Add.
+	* NEWS, doc/manpages/Makefile.am: Add.
 
 2007-04-16  Simon Josefsson <simon@josefsson.org>
 
@@ -500,18 +305,18 @@
 
 2007-04-16  Simon Josefsson <simon@josefsson.org>
 
-	* gl/string_.h, gl/m4/gnulib-comp.m4, lgl/Makefile.am,
-	lgl/float+.h, lgl/printf-args.c, lgl/printf-args.h,
+	* gl/m4/gnulib-comp.m4, gl/string_.h, lgl/Makefile.am,
+	lgl/float+.h, lgl/m4/gnulib-comp.m4, lgl/m4/intl.m4,
+	lgl/m4/longdouble.m4, lgl/m4/stdint.m4, lgl/m4/stdio_h.m4,
+	lgl/m4/vasnprintf.m4, lgl/printf-args.c, lgl/printf-args.h,
 	lgl/printf-parse.c, lgl/stdio_.h, lgl/string_.h, lgl/time_.h,
-	lgl/vasnprintf.c, lgl/wchar_.h, lgl/m4/gnulib-comp.m4,
-	lgl/m4/intl.m4, lgl/m4/longdouble.m4, lgl/m4/stdint.m4,
-	lgl/m4/stdio_h.m4, lgl/m4/vasnprintf.m4: Update.
+	lgl/vasnprintf.c, lgl/wchar_.h: Update.
 
 2007-04-16  Simon Josefsson <simon@josefsson.org>
 
 	* lgl/gc-libgcrypt.c, lib/gnutls_handshake.c,
-	lib/gnutls_session_pack.c, lib/x509/output.c, lib/x509/verify.c:
-	Fix warnings, tiny patch from Andreas Metzler
+	lib/gnutls_session_pack.c, lib/x509/output.c, lib/x509/verify.c: Fix
+	warnings, tiny patch from Andreas Metzler
 	<ametzler@downhill.at.eu.org>.
 
 2007-04-12  Simon Josefsson <simon@josefsson.org>
@@ -528,8 +333,7 @@
 
 2007-04-11  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_psk.c:
-	(gnutls_psk_set_client_credentials): Fix prototype.
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_psk.c: (gnutls_psk_set_client_credentials): Fix prototype.
 
 2007-04-10  Simon Josefsson <simon@josefsson.org>
 
@@ -537,15 +341,8 @@
 
 2007-04-10  Simon Josefsson <simon@josefsson.org>
 
-	* lib/Makefile.am: Respect ENABLE_AUTHZ.
-
-2007-04-10  Simon Josefsson <simon@josefsson.org>
-
-	* src/serv.c: Respect ENABLE_AUTHZ.
-
-2007-04-10  Simon Josefsson <simon@josefsson.org>
-
-	* doc/examples/Makefile.am, src/cli.c: Respect ENABLE_AUTHZ.
+	* doc/examples/Makefile.am, lib/Makefile.am, src/cli.c, src/serv.c: 
+	Respect ENABLE_AUTHZ.
 
 2007-04-10  Simon Josefsson <simon@josefsson.org>
 
@@ -566,8 +363,7 @@
 
 2007-04-10  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/gnutls_openpgp.c:
-	(gnutls_certificate_set_openpgp_key): Allocate certificate structure
+	* libextra/gnutls_openpgp.c: (gnutls_certificate_set_openpgp_key): Allocate certificate structure
 	properly.  Tiny patch from ludo@chbouib.org (Ludovic Courtès).
 
 2007-04-06  Simon Josefsson <simon@josefsson.org>
@@ -580,8 +376,8 @@
 
 2007-04-06  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509.c:
-	(gnutls_x509_crt_get_key_id): Don't fail on non-RSA/DSA public keys.
+	* lib/x509/x509.c: (gnutls_x509_crt_get_key_id): Don't fail on non-RSA/DSA public keys.
+
 
 2007-04-04  Simon Josefsson <simon@josefsson.org>
 
@@ -600,7 +396,7 @@
 
 2007-04-04  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_algorithms.c, NEWS, includes/gnutls/gnutls.h.in: Add
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_algorithms.c: Add
 	new APIs to list supported algorithms: gnutls_cipher_list,
 	gnutls_mac_list, gnutls_compression_list, gnutls_protocol_list,
 	gnutls_certificate_type_list, and gnutls_kx_list.  Suggested by
@@ -623,9 +419,9 @@
 
 2007-04-03  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/Makefile.am: Fix LIBOPENCDK_LIBS.  No need for
-	AM_CPPFLAGS += $(LIBOPENCDK_CFLAGS), the new macro add necessary
-	-I's to CPPFLAGS automatically.
+	* libextra/Makefile.am: Fix LIBOPENCDK_LIBS. No need for AM_CPPFLAGS
+	+= $(LIBOPENCDK_CFLAGS), the new macro add necessary -I's to
+	CPPFLAGS automatically.
 
 2007-04-03  Simon Josefsson <simon@josefsson.org>
 
@@ -634,9 +430,9 @@
 2007-04-03  Simon Josefsson <simon@josefsson.org>
 
 	* gl/getpass.c, gl/getpass.h, gl/gnulib.mk, gl/m4/getpass.m4,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, lgl/Makefile.am,
-	lgl/getdelim.c, lgl/getdelim.h, lgl/getline.c, lgl/getline.h,
-	lgl/getpass.c, lgl/getpass.h, lgl/m4/getdelim.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, lgl/.cvsignore,
+	lgl/Makefile.am, lgl/getdelim.c, lgl/getdelim.h, lgl/getline.c,
+	lgl/getline.h, lgl/getpass.c, lgl/getpass.h, lgl/m4/getdelim.m4,
 	lgl/m4/getline.m4, lgl/m4/getpass.m4, lgl/m4/gnulib-cache.m4,
 	lgl/m4/gnulib-comp.m4: Update.
 
@@ -656,9 +452,9 @@
 2007-04-03  Simon Josefsson <simon@josefsson.org>
 
 	* build-aux/gendocs.sh, gl/stdbool_.h, lgl/Makefile.am,
-	lgl/alloca_.h, lgl/asprintf.c, lgl/stat_.h, lgl/stdbool_.h,
-	lgl/vasprintf.c, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
-	lgl/m4/iconv.m4, lgl/m4/intdiv0.m4: Update.
+	lgl/alloca_.h, lgl/asprintf.c, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/iconv.m4, lgl/m4/intdiv0.m4,
+	lgl/stat_.h, lgl/stdbool_.h, lgl/vasprintf.c: Update.
 
 2007-03-28  Simon Josefsson <simon@josefsson.org>
 
@@ -668,9 +464,8 @@
 2007-03-28  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_algorithms.c: Remove #if GNUTLS_PK_LOOP madness that
-	hides problems.
-	(gnutls_pk_algorithm_get_name): Don't return GOST for unsupported
-	algorithms (e.g., ECC).
+	hides problems. (gnutls_pk_algorithm_get_name): Don't return GOST
+	for unsupported algorithms (e.g., ECC).
 
 2007-03-28  Simon Josefsson <simon@josefsson.org>
 
@@ -678,18 +473,18 @@
 
 2007-03-28  Simon Josefsson <simon@josefsson.org>
 
-	* gl/getaddrinfo.c, gl/string_.h, gl/version-etc.c,
+	* gl/getaddrinfo.c, gl/string_.h, gl/version-etc.c, lgl/.cvsignore,
 	lgl/Makefile.am, lgl/asprintf.c, lgl/des.c, lgl/dummy.c,
-	lgl/float+.h, lgl/printf-parse.c, lgl/stdio_.h, lgl/string_.h,
-	lgl/vasnprintf.c, lgl/vasprintf.c, lgl/vasprintf.h,
-	lgl/m4/gnulib-comp.m4, lgl/m4/printf-posix.m4, lgl/m4/stdio_h.m4,
-	lgl/m4/vasnprintf.m4, lgl/m4/vasprintf.m4: Update.
+	lgl/float+.h, lgl/m4/gnulib-comp.m4, lgl/m4/printf-posix.m4,
+	lgl/m4/stdio_h.m4, lgl/m4/vasnprintf.m4, lgl/m4/vasprintf.m4,
+	lgl/printf-parse.c, lgl/stdio_.h, lgl/string_.h, lgl/vasnprintf.c,
+	lgl/vasprintf.c, lgl/vasprintf.h: Update.
 
 2007-03-21  Simon Josefsson <simon@josefsson.org>
 
-	* src/crypt.c, doc/examples/ex-crq.c, doc/examples/ex-pkcs12.c,
-	doc/examples/ex-rfc2818.c: Use size_t at appropriate places.  Tiny
-	patch by Deanna Phillips <deanna@sdf.lonestar.org>.
+	* doc/examples/ex-crq.c, doc/examples/ex-pkcs12.c,
+	doc/examples/ex-rfc2818.c, src/crypt.c: Use size_t at appropriate
+	places.  Tiny patch by Deanna Phillips <deanna@sdf.lonestar.org>.
 
 2007-03-21  Simon Josefsson <simon@josefsson.org>
 
@@ -707,40 +502,19 @@
 
 2007-03-15  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509_write.c:
-	(gnutls_x509_crt_set_version): Doc fix, tiny patch from Florian
+	* lib/x509/x509_write.c: (gnutls_x509_crt_set_version): Doc fix, tiny patch from Florian
 	Weimer <fweimer@bfk.de>.
 
 2007-03-12  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Fix.
-
-2007-03-12  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Fix.
-
-2007-03-12  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump versions.
-
-2007-03-12  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2007-03-12  Simon Josefsson <simon@josefsson.org>
-
-	* lib/pkix_asn1_tab.c: Generated.
-
-2007-03-12  Simon Josefsson <simon@josefsson.org>
-
-	* gl/gnulib.mk, gl/netinet_in_.h, gl/socket_.h,
-	gl/m4/gnulib-comp.m4, gl/m4/netinet_in_h.m4, gl/m4/sys_socket_h.m4,
+	* gl/gnulib.mk, gl/m4/gnulib-comp.m4, gl/m4/netinet_in_h.m4,
+	gl/m4/sys_socket_h.m4, gl/netinet_in_.h, gl/socket_.h,
 	lgl/Makefile.am, lgl/des.c, lgl/des.h, lgl/dummy.c,
-	lgl/gc-gnulib.c, lgl/snprintf.c, lgl/socket_.h, lgl/stdbool_.h,
-	lgl/stdint_.h, lgl/stdio_.h, lgl/vasnprintf.c, lgl/vasnprintf.h,
-	lgl/vasprintf.h, lgl/m4/gnulib-comp.m4, lgl/m4/snprintf.m4,
+	lgl/gc-gnulib.c, lgl/m4/gnulib-comp.m4, lgl/m4/snprintf.m4,
 	lgl/m4/stdbool.m4, lgl/m4/stdio_h.m4, lgl/m4/sys_socket_h.m4,
-	lgl/m4/vasnprintf.m4: Update.
+	lgl/m4/vasnprintf.m4, lgl/snprintf.c, lgl/socket_.h,
+	lgl/stdbool_.h, lgl/stdint_.h, lgl/stdio_.h, lgl/vasnprintf.c,
+	lgl/vasnprintf.h, lgl/vasprintf.h: Update.
 
 2007-03-07  Simon Josefsson <simon@josefsson.org>
 
@@ -788,7 +562,7 @@
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
-	* tests/dhepskself.c: Remove priority setting.  Fix output.
+	* tests/dhepskself.c: Remove priority setting. Fix output.
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
@@ -798,16 +572,19 @@
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
+	* .cvsignore, build-aux/.cvsignore, doc/.cvsignore: [no log message]
+
+2007-03-05  Simon Josefsson <simon@josefsson.org>
+
 	* lib/ext_authz.c: Don't assert when no authz.
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
-	* src/cli.c: Use default ciphers.  Simplify SRP callback.
+	* src/cli.c: Use default ciphers. Simplify SRP callback.
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_priority.c:
-	(gnutls_set_default_priority): Fix defaults.
+	* lib/gnutls_priority.c: (gnutls_set_default_priority): Fix defaults.
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
@@ -832,11 +609,15 @@
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
-	* GNUmakefile, gendocs.sh, link-warning.h, maint.mk,
-	build-aux/GNUmakefile, build-aux/config.rpath,
+	* configure.in: Reorder.
+
+2007-03-05  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, build-aux/GNUmakefile, build-aux/config.rpath,
 	build-aux/gendocs.sh, build-aux/link-warning.h, build-aux/maint.mk,
-	gl/gnulib.mk, gl/m4/gnulib-cache.m4, lgl/Makefile.am,
-	lgl/m4/gnulib-cache.m4: Fixes for build-aux.
+	gendocs.sh, gl/gnulib.mk, gl/m4/gnulib-cache.m4, lgl/Makefile.am,
+	lgl/m4/gnulib-cache.m4, link-warning.h, maint.mk: Fixes for
+	build-aux.
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
@@ -844,10 +625,10 @@
 
 2007-03-05  Simon Josefsson <simon@josefsson.org>
 
-	* doc/protocol/draft-ietf-tls-rfc4346-bis-03.txt, lgl/time_.h,
-	lgl/vasnprintf.c, lgl/vasnprintf.h, lgl/vasprintf.h,
+	* doc/protocol/draft-ietf-tls-rfc4346-bis-03.txt,
 	lgl/m4/gnulib-comp.m4, lgl/m4/time_r.m4, lgl/m4/vasnprintf.m4,
-	lgl/m4/vasprintf.m4: Updaet.
+	lgl/m4/vasprintf.m4, lgl/time_.h, lgl/vasnprintf.c,
+	lgl/vasnprintf.h, lgl/vasprintf.h: Updaet.
 
 2007-02-26  Simon Josefsson <simon@josefsson.org>
 
@@ -864,6 +645,10 @@
 2007-02-26  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-nir-tee-pm-00.txt: Add.
+
+2007-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/.cvsignore: [no log message]
 
 2007-02-25  Simon Josefsson <simon@josefsson.org>
 
@@ -907,6 +692,10 @@
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
+	* tests/.cvsignore: [no log message]
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
 	* tests/dn.c: Other cert.
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
@@ -935,16 +724,12 @@
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
-	* includes/gnutls/x509.h: Fix.
+	* includes/gnutls/x509.h, lib/x509/x509.h: Fix.
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509.h: Fix.
-
-2007-02-22  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/x509.h, lib/x509/x509.c, lib/x509/x509.h: New
-	APIs to deal with DN's.  Patch from Howard Chu <hyc@symas.com>.
+	* includes/gnutls/x509.h, lib/x509/x509.c, lib/x509/x509.h: New APIs
+	to deal with DN's.  Patch from Howard Chu <hyc@symas.com>.
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
@@ -952,16 +737,24 @@
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.7.7.
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
-	* link-warning.h, gl/getaddrinfo.c, gl/gnulib.mk, gl/string_.h,
-	gl/m4/gnulib-comp.m4, gl/m4/string_h.m4, lgl/Makefile.am,
+	* lgl/.cvsignore: [no log message]
+
+2007-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* gl/getaddrinfo.c, gl/gnulib.mk, gl/m4/gnulib-comp.m4,
+	gl/m4/string_h.m4, gl/string_.h, lgl/Makefile.am,
+	lgl/m4/gnulib-comp.m4, lgl/m4/intdiv0.m4, lgl/m4/snprintf.m4,
+	lgl/m4/stdio_h.m4, lgl/m4/string_h.m4, lgl/m4/unistd_h.m4,
 	lgl/snprintf.c, lgl/snprintf.h, lgl/stdio_.h, lgl/string_.h,
-	lgl/unistd_.h, lgl/m4/gnulib-comp.m4, lgl/m4/intdiv0.m4,
-	lgl/m4/snprintf.m4, lgl/m4/stdio_h.m4, lgl/m4/string_h.m4,
-	lgl/m4/unistd_h.m4: Update.
+	lgl/unistd_.h, link-warning.h: Update.
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
@@ -973,7 +766,7 @@
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_extensions.h, lib/gnutls_extensions.c: Revert.
+	* lib/gnutls_extensions.c, lib/gnutls_extensions.h: Revert.
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
@@ -1004,7 +797,7 @@
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
-	* src/serv.c, src/cli.c: Fix #include's.
+	* src/cli.c, src/serv.c: Fix #include's.
 
 2007-02-22  Simon Josefsson <simon@josefsson.org>
 
@@ -1072,19 +865,12 @@
 
 2007-02-21  Simon Josefsson <simon@josefsson.org>
 
-	* lib/ext_authz.c: New file.
+	* lib/ext_authz.c, lib/ext_authz.h: New file.
 
 2007-02-21  Simon Josefsson <simon@josefsson.org>
 
-	* lib/ext_authz.h: New file.
-
-2007-02-21  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_handshake.c: Sync with gnutls_supplemental.c.
-
-2007-02-21  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_supplemental.h: Sync with gnutls_supplemental.c.
+	* lib/gnutls_handshake.c, lib/gnutls_supplemental.h: Sync with
+	gnutls_supplemental.c.
 
 2007-02-21  Simon Josefsson <simon@josefsson.org>
 
@@ -1097,10 +883,10 @@
 2007-02-21  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/gnutls.h.in: Add gnutls_authz_recv_callback_func
-	and gnutls_authz_send_callback_func.  Add gnutls_authz_enable,
+	and gnutls_authz_send_callback_func. Add gnutls_authz_enable,
 	gnutls_authz_send_x509_attr_cert, gnutls_authz_send_saml_assertion,
 	gnutls_authz_send_x509_attr_cert_url, and
-	gnutls_authz_send_saml_assertion_url.  Remove GNUTLS_AUTHZ_LAST from
+	gnutls_authz_send_saml_assertion_url. Remove GNUTLS_AUTHZ_LAST from
 	gnutls_authz_data_format_type_t (never part of any release).
 
 2007-02-21  Simon Josefsson <simon@josefsson.org>
@@ -1124,11 +910,7 @@
 
 2007-02-21  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_supplemental.c: New file.
-
-2007-02-21  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_supplemental.h: New file.
+	* lib/gnutls_supplemental.c, lib/gnutls_supplemental.h: New file.
 
 2007-02-21  Simon Josefsson <simon@josefsson.org>
 
@@ -1136,8 +918,8 @@
 
 2007-02-19  Simon Josefsson <simon@josefsson.org>
 
-	* includes/gnutls/gnutls.h.in: Add gnutls_supplemental_get_name.
-	Fix gnutls_authz_data_format_type_t.
+	* includes/gnutls/gnutls.h.in: Add gnutls_supplemental_get_name. Fix
+	gnutls_authz_data_format_type_t.
 
 2007-02-19  Simon Josefsson <simon@josefsson.org>
 
@@ -1158,6 +940,7 @@
 2007-02-16  Simon Josefsson <simon@josefsson.org>
 
 	* tests/hostname-check/hostname-check.c: Tests ipAddress SAN's too.
+
 
 2007-02-16  Simon Josefsson <simon@josefsson.org>
 
@@ -1191,6 +974,10 @@
 
 2007-02-16  Simon Josefsson <simon@josefsson.org>
 
+	* tests/hostname-check/.cvsignore: [no log message]
+
+2007-02-16  Simon Josefsson <simon@josefsson.org>
+
 	* configure.in, tests/Makefile.am,
 	tests/hostname-check/Makefile.am, tests/hostname-check/README,
 	tests/hostname-check/hostname-check.c: Add self test of rfc2818
@@ -1216,12 +1003,13 @@
 
 2007-02-14  Simon Josefsson <simon@josefsson.org>
 
-	* src/certtool.c: Change vararg 0 to NULL.  Tiny change suggested
-	by Joe Orton <joe@manyfish.co.uk>.
+	* src/certtool.c: Change vararg 0 to NULL.  Tiny change suggested by
+	Joe Orton <joe@manyfish.co.uk>.
 
 2007-02-14  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/gnutls.h.in: Fix gnutls_authz_data_format_type_t.
+
 
 2007-02-14  Simon Josefsson <simon@josefsson.org>
 
@@ -1303,9 +1091,9 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gnulib.mk, gl/version-etc-fsf.c, gl/version-etc.c,
-	gl/version-etc.h, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
-	gl/m4/stdarg.m4: Update.
+	* gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/stdarg.m4, gl/version-etc-fsf.c, gl/version-etc.c,
+	gl/version-etc.h: Update.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1381,7 +1169,7 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* lib/pkix_asn1_tab.c, lib/gnutls_asn1_tab.c: Update.
+	* lib/gnutls_asn1_tab.c, lib/pkix_asn1_tab.c: Update.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1394,6 +1182,10 @@
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
 	* lib/defines.h: Only use time.h, from gnulib if needed.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/.cvsignore: [no log message]
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1410,9 +1202,18 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* lgl/Makefile.am, lgl/string_.h, lgl/time_.h, lgl/time_r.c,
-	lgl/time_r.h, lgl/m4/gnulib-comp.m4, lgl/m4/time_h.m4,
-	lgl/m4/time_r.m4, gl/string_.h: Update.
+	* gl/string_.h, lgl/Makefile.am, lgl/m4/gnulib-comp.m4,
+	lgl/m4/time_h.m4, lgl/m4/time_r.m4, lgl/string_.h, lgl/time_.h,
+	lgl/time_r.c, lgl/time_r.h: Update.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/.cvsignore, tests/x509paths/.cvsignore: [no log
+	message]
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/README: Fix.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1428,6 +1229,10 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
+	* tests/nist-pkits/.cvsignore: [no log message]
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
 	* tests/nist-pkits/pkits_test: Add.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
@@ -1436,16 +1241,16 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* tests/nist-pkits/pkits_test_list_generator.patch: Add.
-
-2007-02-13  Simon Josefsson <simon@josefsson.org>
-
 	* tests/nist-pkits/gnutls_test_entry: Remove.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* tests/nist-pkits/build-chain, tests/nist-pkits/gnutls_test_entry:
-	Add.
+	* tests/nist-pkits/build-chain, tests/nist-pkits/gnutls_test_entry,
+	tests/nist-pkits/pkits_test_list_generator.patch: Add.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/README: Add.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1454,17 +1259,13 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* tests/nist-pkits/README: Add.
-
-2007-02-13  Simon Josefsson <simon@josefsson.org>
-
 	* lib/x509/mpi.c: We don't support inherited DSA parameters.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
 	* tests/nist-pkits/pkits_crl, tests/nist-pkits/pkits_crt,
-	tests/nist-pkits/pkits_pkcs12, tests/nist-pkits/pkits_smime:
-	Update.
+	tests/nist-pkits/pkits_pkcs12, tests/nist-pkits/pkits_smime: Update.
+
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1472,13 +1273,25 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* tests/PKITS.pdf, tests/PKITS_data.zip, tests/pkits,
-	tests/pkits_crl, tests/pkits_crt, tests/pkits_pkcs12,
-	tests/pkits_smime, tests/nist-pkits/PKITS.pdf,
-	tests/nist-pkits/PKITS_data.zip, tests/nist-pkits/README,
-	tests/nist-pkits/pkits, tests/nist-pkits/pkits_crl,
-	tests/nist-pkits/pkits_crt, tests/nist-pkits/pkits_pkcs12,
-	tests/nist-pkits/pkits_smime: Move PKITS stuff to nist-pkits/.
+	* tests/nist-pkits/pkits: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nist-pkits/pkits: Fix.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/.cvsignore, tests/nist-pkits/.cvsignore: [no log message]
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/PKITS.pdf, tests/PKITS_data.zip,
+	tests/nist-pkits/PKITS.pdf, tests/nist-pkits/PKITS_data.zip,
+	tests/nist-pkits/README, tests/nist-pkits/pkits,
+	tests/nist-pkits/pkits_crl, tests/nist-pkits/pkits_crt,
+	tests/nist-pkits/pkits_pkcs12, tests/nist-pkits/pkits_smime,
+	tests/pkits, tests/pkits_crl, tests/pkits_crt, tests/pkits_pkcs12,
+	tests/pkits_smime: Move PKITS stuff to nist-pkits/.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1494,9 +1307,13 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* tests/chain, tests/x509tests.tgz, tests/x509paths/Certificate
-	Path Validation Testing.pdf, tests/x509paths/README,
-	tests/x509paths/chain, tests/x509paths/x509tests.tgz: Move old NIST
+	* tests/.cvsignore: [no log message]
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chain, tests/x509paths/Certificate Path Validation
+	Testing.pdf, tests/x509paths/README, tests/x509paths/chain,
+	tests/x509paths/x509tests.tgz, tests/x509tests.tgz: Move old NIST
 	stuff to separate directory.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
@@ -1588,17 +1405,25 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* gl/dummy.c: Remove.
+	* gl/error.c, gl/error.h, gl/gnulib.mk, gl/m4/error.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/progname.c,
+	gl/progname.h: Add.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* gl/error.c, gl/error.h, gl/gnulib.mk, gl/progname.c,
-	gl/progname.h, gl/m4/error.m4, gl/m4/gnulib-cache.m4,
-	gl/m4/gnulib-comp.m4: Add.
+	* configure.in: Revert.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am, configure.in: Revert.
+
+2007-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/dummy.c, src/lib/Makefile.am, src/lib/error.c,
+	src/lib/error.h, src/lib/m4/error.m4, src/lib/m4/gnulib-cache.m4,
+	src/lib/m4/gnulib-common.m4, src/lib/m4/gnulib-comp.m4,
+	src/lib/m4/gnulib-tool.m4, src/lib/progname.c, src/lib/progname.h: 
+	Remove.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1618,8 +1443,9 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4:
-	Update.
+	* gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	src/lib/Makefile.am, src/lib/m4/gnulib-cache.m4,
+	src/lib/m4/gnulib-comp.m4: Update.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1627,8 +1453,12 @@
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
-	* gl/error.c, gl/error.h, gl/m4/error.m4, gl/gnulib.mk,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Add.
+	* gl/error.c, gl/error.h, gl/gnulib.mk, gl/m4/error.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, src/lib/Makefile.am,
+	src/lib/error.c, src/lib/error.h, src/lib/m4/error.m4,
+	src/lib/m4/gnulib-cache.m4, src/lib/m4/gnulib-common.m4,
+	src/lib/m4/gnulib-comp.m4, src/lib/m4/gnulib-tool.m4,
+	src/lib/progname.c, src/lib/progname.h: Add.
 
 2007-02-13  Simon Josefsson <simon@josefsson.org>
 
@@ -1636,8 +1466,7 @@
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/common.c:
-	(_gnutls_x509_san_find_type): Support GNUTLS_SAN_DN.
+	* lib/x509/common.c: (_gnutls_x509_san_find_type): Support GNUTLS_SAN_DN.
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
@@ -1649,8 +1478,7 @@
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509.c:
-	(parse_general_name): Support GNUTLS_SAN_DN.
+	* lib/x509/x509.c: (parse_general_name): Support GNUTLS_SAN_DN.
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
@@ -1662,7 +1490,11 @@
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
-	* includes/gnutls/gnutls.h.in, NEWS: Add.
+	* NEWS, includes/gnutls/gnutls.h.in: Add.
+
+2007-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
@@ -1674,8 +1506,8 @@
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gnulib.mk, gl/string_.h, gl/m4/string_h.m4, lgl/Makefile.am,
-	lgl/string_.h, lgl/m4/string_h.m4: Update.
+	* gl/gnulib.mk, gl/m4/string_h.m4, gl/string_.h, lgl/Makefile.am,
+	lgl/m4/string_h.m4, lgl/string_.h: Update.
 
 2007-02-12  Simon Josefsson <simon@josefsson.org>
 
@@ -1743,9 +1575,9 @@
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
 
-	* lgl/Makefile.am, lgl/asprintf.c, lgl/vasprintf.c,
-	lgl/vasprintf.h, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
-	lgl/m4/vasprintf.m4: Add.
+	* lgl/Makefile.am, lgl/asprintf.c, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/vasprintf.m4, lgl/vasprintf.c,
+	lgl/vasprintf.h: Add.
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
 
@@ -1754,9 +1586,8 @@
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
 
-	* lgl/Makefile.am, lgl/time_r.c, lgl/time_r.h,
-	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4, lgl/m4/time_r.m4:
-	Add.
+	* lgl/Makefile.am, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/time_r.m4, lgl/time_r.c, lgl/time_r.h: Add.
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
 
@@ -1772,11 +1603,7 @@
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
 
-	* tests/key-id/key-id: Update.
-
-2007-02-09  Simon Josefsson <simon@josefsson.org>
-
-	* tests/pathlen/ca-no-pathlen.pem,
+	* tests/key-id/key-id, tests/pathlen/ca-no-pathlen.pem,
 	tests/pathlen/no-ca-or-pathlen.pem: Update.
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
@@ -1801,7 +1628,7 @@
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
 
-	* includes/gnutls/x509.h, NEWS: Add.
+	* NEWS, includes/gnutls/x509.h: Add.
 
 2007-02-09  Simon Josefsson <simon@josefsson.org>
 
@@ -1849,7 +1676,7 @@
 
 2007-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/output.c, NEWS: Add.
+	* NEWS, lib/x509/output.c: Add.
 
 2007-02-08  Simon Josefsson <simon@josefsson.org>
 
@@ -1874,12 +1701,12 @@
 
 2007-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_str.h, lib/gnutls_str.c: Add
+	* lib/gnutls_str.c, lib/gnutls_str.h: Add
 	_gnutls_string_append_printf.
 
 2007-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509.c, NEWS, includes/gnutls/x509.h: Add
+	* NEWS, includes/gnutls/x509.h, lib/x509/x509.c: Add
 	gnutls_x509_crt_get_extension_data and
 	gnutls_x509_crt_get_extension_info.
 
@@ -1897,15 +1724,15 @@
 
 2007-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Fix.
-
-2007-02-08  Simon Josefsson <simon@josefsson.org>
-
 	* NEWS, THANKS: Add.
 
 2007-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509.c: Fix.
+	* NEWS: Add.
+
+2007-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/x509.c: Fix.
 
 2007-02-08  Simon Josefsson <simon@josefsson.org>
 
@@ -1990,6 +1817,10 @@
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.7.5.
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
@@ -2002,8 +1833,8 @@
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gnulib.mk, gl/string_.h, gl/m4/string_h.m4, lgl/Makefile.am,
-	lgl/string_.h, lgl/m4/string_h.m4: Update.
+	* gl/gnulib.mk, gl/m4/string_h.m4, gl/string_.h, lgl/Makefile.am,
+	lgl/m4/string_h.m4, lgl/string_.h: Update.
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
@@ -2021,6 +1852,7 @@
 
 	* src/cli.c: Don't ask for PSK if we don't have credentials for it.
 
+
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
 	* doc/gnutls.texi: mention psk
@@ -2031,9 +1863,12 @@
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_handshake.c:
-	(_gnutls_remove_unwanted_ciphersuites): Remove GNUTLS_KX_SRP_RSA or
+	* lib/gnutls_handshake.c: (_gnutls_remove_unwanted_ciphersuites): Remove GNUTLS_KX_SRP_RSA or
 	GNUTLS_KX_SRP_DSS if there is no SRP credential.
+
+2007-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: fix
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
@@ -2050,15 +1885,11 @@
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
-	* src/serv.c: Modernize priorities.
-
-2007-02-06  Simon Josefsson <simon@josefsson.org>
-
 	* src/cli.c: Prefer PSK.
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
-	* src/cli.c: Modernize priorities.
+	* src/cli.c, src/serv.c: Modernize priorities.
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
@@ -2114,8 +1945,7 @@
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_hash_int.c:
-	(_gnutls_hash_get_algo_len): Handle NULL MACs again, broken by last
+	* lib/gnutls_hash_int.c: (_gnutls_hash_get_algo_len): Handle NULL MACs again, broken by last
 	commit.
 
 2007-02-06  Simon Josefsson <simon@josefsson.org>
@@ -2125,6 +1955,10 @@
 2007-02-06  Simon Josefsson <simon@josefsson.org>
 
 	* src/serv.c: Support TLS 1.2 and AES 256.
+
+2007-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
@@ -2153,11 +1987,11 @@
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Fix.
+	* tests/sha2/.cvsignore: [no log message]
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Add.
+	* NEWS: Fix.
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
@@ -2165,7 +1999,7 @@
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
-	* tests/sha2/Makefile.am, tests/sha2/key-ca.pem,
+	* NEWS, tests/sha2/Makefile.am, tests/sha2/key-ca.pem,
 	tests/sha2/key-subca.pem, tests/sha2/key-subsubca.pem,
 	tests/sha2/key-user.pem, tests/sha2/sha2: Add.
 
@@ -2175,8 +2009,8 @@
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
-	* src/certtool-cfg.c: Set pathlength to -1 (not present) by
-	default, for templates.
+	* src/certtool-cfg.c: Set pathlength to -1 (not present) by default,
+	for templates.
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
@@ -2185,6 +2019,7 @@
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
 	* src/certtool.c, src/certtool.gaa: Support --hash SHA-256/384/512.
+
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
@@ -2198,21 +2033,21 @@
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_algorithms.c:
-	(GNUTLS_SIGN_ALG_LOOP): Don't match unknown algorithms to GOST.
+	* lib/gnutls_algorithms.c: (GNUTLS_SIGN_ALG_LOOP): Don't match unknown algorithms to GOST.
 	Affects gnutls_sign_algorithm_get_name, and
 	_gnutls_x509_sign_to_oid.
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS, includes/gnutls/gnutls.h.in: Enum types for
-	SHA-256/384/512.
+	* NEWS, includes/gnutls/gnutls.h.in: Enum types for SHA-256/384/512.
+
 
 2007-02-05  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gnulib.mk, gl/stdbool_.h, gl/string_.h, gl/m4/gnulib-comp.m4,
-	gl/m4/string_h.m4, lgl/Makefile.am, lgl/memmem.c, lgl/string_.h,
-	lgl/m4/gnulib-comp.m4, lgl/m4/string_h.m4: Update.
+	* gl/gnulib.mk, gl/m4/gnulib-comp.m4, gl/m4/string_h.m4,
+	gl/stdbool_.h, gl/string_.h, lgl/Makefile.am,
+	lgl/m4/gnulib-comp.m4, lgl/m4/string_h.m4, lgl/memmem.c,
+	lgl/string_.h: Update.
 
 2007-02-04  Simon Josefsson <simon@josefsson.org>
 
@@ -2220,10 +2055,10 @@
 
 2007-02-04  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gai_strerror.c, gl/gnulib.mk, gl/string_.h,
-	gl/m4/gnulib-comp.m4, gl/m4/socklen.m4, gl/m4/string_h.m4,
-	lgl/Makefile.am, lgl/string_.h, lgl/m4/gnulib-comp.m4,
-	lgl/m4/socklen.m4, lgl/m4/string_h.m4: Update.
+	* gl/gai_strerror.c, gl/gnulib.mk, gl/m4/gnulib-comp.m4,
+	gl/m4/socklen.m4, gl/m4/string_h.m4, gl/string_.h, lgl/Makefile.am,
+	lgl/m4/gnulib-comp.m4, lgl/m4/socklen.m4, lgl/m4/string_h.m4,
+	lgl/string_.h: Update.
 
 2007-02-02  Simon Josefsson <simon@josefsson.org>
 
@@ -2235,7 +2070,7 @@
 
 2007-02-02  Simon Josefsson <simon@josefsson.org>
 
-	* configure.in, NEWS: Bump versions.
+	* NEWS, configure.in: Bump versions.
 
 2007-02-02  Simon Josefsson <simon@josefsson.org>
 
@@ -2248,7 +2083,7 @@
 
 2007-02-02  Simon Josefsson <simon@josefsson.org>
 
-	* doc/signatures.texi, doc/bibliography.texi: Remove.
+	* doc/bibliography.texi, doc/signatures.texi: Remove.
 
 2007-02-02  Simon Josefsson <simon@josefsson.org>
 
@@ -2288,6 +2123,10 @@
 
 2007-02-01  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.7.3.
 
 2007-02-01  Simon Josefsson <simon@josefsson.org>
@@ -2310,6 +2149,10 @@
 2007-02-01  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
+
+2007-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* tests/key-id/.cvsignore: [no log message]
 
 2007-02-01  Simon Josefsson <simon@josefsson.org>
 
@@ -2372,8 +2215,7 @@
 
 2007-01-31  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509_write.c:
-	(gnutls_x509_crt_set_proxy_dn): Permit NULL @name's.
+	* lib/x509/x509_write.c: (gnutls_x509_crt_set_proxy_dn): Permit NULL @name's.
 
 2007-01-31  Simon Josefsson <simon@josefsson.org>
 
@@ -2381,9 +2223,9 @@
 
 2007-01-31  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS, lib/pkix.asn, lib/pkix_asn1_tab.c, lib/x509/extensions.c,
-	lib/x509/extensions.h, lib/x509/x509_write.c,
-	includes/gnutls/x509.h: Add proxy certificate APIs.
+	* NEWS, includes/gnutls/x509.h, lib/pkix.asn, lib/pkix_asn1_tab.c,
+	lib/x509/extensions.c, lib/x509/extensions.h, lib/x509/x509_write.c: 
+	Add proxy certificate APIs.
 
 2007-01-31  Simon Josefsson <simon@josefsson.org>
 
@@ -2392,6 +2234,10 @@
 2007-01-31  Simon Josefsson <simon@josefsson.org>
 
 	* src/certtool-cfg.c: Have RET for path lengths to mean -1.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* gl/.cvsignore, lgl/.cvsignore: [no log message]
 
 2007-01-31  Simon Josefsson <simon@josefsson.org>
 
@@ -2404,15 +2250,19 @@
 
 2007-01-31  Simon Josefsson <simon@josefsson.org>
 
-	* gl/getaddrinfo.c, gl/gnulib.mk, gl/socket_.h, gl/strdup.c,
-	gl/string_.h, gl/m4/absolute-header.m4, gl/m4/extensions.m4,
-	gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4, gl/m4/strdup.m4,
-	gl/m4/string_h.m4, lgl/Makefile.am, lgl/printf-args.c,
-	lgl/printf-args.h, lgl/printf-parse.c, lgl/socket_.h,
-	lgl/stdint_.h, lgl/string_.h, lgl/vasnprintf.c, lgl/wchar_.h,
-	lgl/m4/extensions.m4, lgl/m4/gnulib-common.m4,
-	lgl/m4/gnulib-comp.m4, lgl/m4/memmem.m4, lgl/m4/stdint.m4,
-	lgl/m4/string_h.m4, lgl/m4/unistd_h.m4, lgl/m4/wchar.m4: Update.
+	* gl/getaddrinfo.c, gl/gnulib.mk, gl/m4/absolute-header.m4,
+	gl/m4/extensions.m4, gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/strdup.m4, gl/m4/string_h.m4, gl/socket_.h, gl/strdup.c,
+	gl/string_.h, lgl/Makefile.am, lgl/m4/extensions.m4,
+	lgl/m4/gnulib-common.m4, lgl/m4/gnulib-comp.m4, lgl/m4/memmem.m4,
+	lgl/m4/stdint.m4, lgl/m4/string_h.m4, lgl/m4/unistd_h.m4,
+	lgl/m4/wchar.m4, lgl/printf-args.c, lgl/printf-args.h,
+	lgl/printf-parse.c, lgl/socket_.h, lgl/stdint_.h, lgl/string_.h,
+	lgl/vasnprintf.c, lgl/wchar_.h: Update.
+
+2007-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/.cvsignore: Add.
 
 2007-01-26  Simon Josefsson <simon@josefsson.org>
 
@@ -2431,8 +2281,7 @@
 
 2007-01-26  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/extensions.c:
-	(_gnutls_x509_ext_extract_basicConstraints): Make sure
+	* lib/x509/extensions.c: (_gnutls_x509_ext_extract_basicConstraints): Make sure
 	pathLenConstraint is read, even if CA reading fails.
 
 2007-01-25  Simon Josefsson <simon@josefsson.org>
@@ -2446,8 +2295,8 @@
 
 2007-01-25  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutlsxx.cpp, includes/gnutls/gnutlsxx.h: Fix C++ compiler
-	bug in a "better" way, tiny patch from Matthias Scheler
+	* includes/gnutls/gnutlsxx.h, lib/gnutlsxx.cpp: Fix C++ compiler bug
+	in a "better" way, tiny patch from Matthias Scheler
 	<tron@NetBSD.org>.
 
 2007-01-16  Simon Josefsson <simon@josefsson.org>
@@ -2471,13 +2320,16 @@
 
 2007-01-14  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2007-01-14  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.7.2.
 
 2007-01-14  Simon Josefsson <simon@josefsson.org>
 
-	* lgl/Makefile.am, lgl/gc-gnulib.c, lgl/unistd_.h,
-	lgl/m4/gnulib-comp.m4, lgl/m4/unistd_h.m4, lgl/m4/wint_t.m4:
-	Update.
+	* lgl/Makefile.am, lgl/gc-gnulib.c, lgl/m4/gnulib-comp.m4,
+	lgl/m4/unistd_h.m4, lgl/m4/wint_t.m4, lgl/unistd_.h: Update.
 
 2007-01-14  Simon Josefsson <simon@josefsson.org>
 
@@ -2489,13 +2341,12 @@
 
 2007-01-14  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/opencdk/pubkey.c, libextra/opencdk/opencdk.h:
-	(cdk_pubkey_to_sexp, cdk_seckey_to_sexp): New functions, from Mario
+	* libextra/opencdk/opencdk.h, libextra/opencdk/pubkey.c: (cdk_pubkey_to_sexp, cdk_seckey_to_sexp): New functions, from Mario
 	Lenz <mario.lenz@gmx.net>.
 
 2007-01-13  Simon Josefsson <simon@josefsson.org>
 
-	* THANKS, NEWS: Add.
+	* NEWS, THANKS: Add.
 
 2007-01-12  Simon Josefsson <simon@josefsson.org>
 
@@ -2518,8 +2369,7 @@
 
 2007-01-11  Simon Josefsson <simon@josefsson.org>
 
-	* src/certtool.c:
-	(generate_pkcs12): Read more than one certificate, if there are more
+	* src/certtool.c: (generate_pkcs12): Read more than one certificate, if there are more
 	available, and store them in the PKCS12 blob.  Suggested by Sascha
 	Ziemann <sascha.ziemann@secunet.com>.
 
@@ -2557,6 +2407,7 @@
 	* gl/Makefile.am, gl/gnulib.mk, gl/m4/gnulib-cache.m4: Getaddrinfo
 	needs snprintf from ../lgl/, so make libgnu.la depend on liblgnu.la.
 
+
 2007-01-11  Simon Josefsson <simon@josefsson.org>
 
 	* libextra/gnutls_extra.c: Need strverscmp.h.
@@ -2567,21 +2418,21 @@
 
 2007-01-11  Simon Josefsson <simon@josefsson.org>
 
-	* lib/libgnutls.vers: Don't export _E_*, they are only needed
-	inside libgnutls now.  Fix copyright years.
+	* lib/libgnutls.vers: Don't export _E_*, they are only needed inside
+	libgnutls now. Fix copyright years.
 
 2007-01-11  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, lib/Makefile.am, lib/auth_cert.c, lib/auth_dh_common.c,
 	lib/auth_dhe.c, lib/auth_rsa.c, lib/auth_rsa_export.c,
 	lib/auth_srp_rsa.c, lib/gnutls_cert.c, lib/gnutls_extra_hooks.c,
-	lib/gnutls_extra_hooks.h, libextra/gnutls_extra.c: Cleanup gnutls
-	vs gnutls-extra integration, for OpenPGP certs.
+	lib/gnutls_extra_hooks.h, libextra/gnutls_extra.c: Cleanup gnutls vs
+	gnutls-extra integration, for OpenPGP certs.
 
 2007-01-11  Simon Josefsson <simon@josefsson.org>
 
 	* libextra/gnutls_extra.c: Replace libgcrypt version check with
-	strverscmp.  No need to duplicate prototype found in gnutls.h for
+	strverscmp. No need to duplicate prototype found in gnutls.h for
 	gnutls_check_version.
 
 2007-01-09  Simon Josefsson <simon@josefsson.org>
@@ -2618,18 +2469,25 @@
 
 2007-01-05  Simon Josefsson <simon@josefsson.org>
 
-	* src/Makefile.am, configure.in: Tiny patch from
-	ludovic.courtes@laas.fr (Ludovic Courtès).
-	* configure.in: Look for `gaa', issuing a warning with the URL if
-	not found.
-	* src/Makefile.am (*-gaa.c): Use `$(GAA)' instead of `gaa'.  Mark
+	* configure.in, src/Makefile.am: Tiny patch from
+	ludovic.courtes@laas.fr (Ludovic Courtès). * configure.in: Look for
+	`gaa', issuing a warning with the URL if not found. *
+	src/Makefile.am (*-gaa.c): Use `$(GAA)' instead of `gaa'. Mark
 	`.gaa' files as being in `$(srcdir)', thereby allowing for
 	out-of-source-tree builds.
 
 2006-12-28  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-12-28  Simon Josefsson <simon@josefsson.org>
+
 	* Makefile.am: Don't dist mkinstalldirs, automake no longer copies
 	it.
+
+2006-12-28  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
 
 2006-12-28  Simon Josefsson <simon@josefsson.org>
 
@@ -2645,7 +2503,7 @@
 
 2006-12-28  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Version 1.6.1.
+	* NEWS: Fix.
 
 2006-12-28  Simon Josefsson <simon@josefsson.org>
 
@@ -2653,7 +2511,7 @@
 
 2006-12-28  Simon Josefsson <simon@josefsson.org>
 
-	* THANKS, NEWS: Add.
+	* NEWS, THANKS: Add.
 
 2006-12-28  Simon Josefsson <simon@josefsson.org>
 
@@ -2665,17 +2523,20 @@
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
+	* tests/.cvsignore: [no log message]
+
+2006-12-27  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Add.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_sig.c: Fix signature verification for DSA signatures
-	in TLS 1.2, reported by ludovic.courtes@laas.fr (Ludovic Courtès).
+	* lib/gnutls_sig.c: Fix signature verification for DSA signatures in
+	TLS 1.2, reported by ludovic.courtes@laas.fr (Ludovic Courtès).
 	(_gnutls_pkcs1_rsa_verify_sig): Rename to _gnutls_verify_sig, and
 	add new parameter SHA1POS to indicate where in hash_concat the SHA.1
-	hash is stored (for DSA).
-	(_gnutls_verify_sig_hdata): Pass proper SHA1POS.
-	(_gnutls_verify_sig_params): Likewise.
+	hash is stored (for DSA). (_gnutls_verify_sig_hdata): Pass proper
+	SHA1POS. (_gnutls_verify_sig_params): Likewise.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
@@ -2686,15 +2547,13 @@
 	* doc/Makefile.am, doc/manpages/Makefile.am, lib/Makefile.am,
 	lib/x509/Makefile.am, libextra/Makefile.am,
 	libextra/openpgp/Makefile.am: Tiny patch from
-	ludovic.courtes@laas.fr (Ludovic Courtès).
-	* doc/Makefile.am: Refer to `sort2.pl' as
-	  `$(srcdir)/scripts/sort2.pl' instead of `scripts/sort2.pl'.
-	* doc/manpages/Makefile.am: Refer to `gdoc' as
-	  `$(top_srcdir)/doc/scripts/gdoc' instead of `../scripts/gdoc'.
-	* doc/lib/Makefile.am: Likewise.
-	* doc/lib/x509/Makefile.am: Likewise.
-	* doc/libextra/Makefile.am: Likewise.
-	* doc/libextra/openpgp/Makefile.am: Likewise.
+	ludovic.courtes@laas.fr (Ludovic Courtès). * doc/Makefile.am: Refer
+	to `sort2.pl' as `$(srcdir)/scripts/sort2.pl'   instead of
+	`scripts/sort2.pl'. * doc/manpages/Makefile.am: Refer to `gdoc' as
+	`$(top_srcdir)/doc/scripts/gdoc' instead of `../scripts/gdoc'. *
+	doc/lib/Makefile.am: Likewise. * doc/lib/x509/Makefile.am: Likewise.
+	* doc/libextra/Makefile.am: Likewise. *
+	doc/libextra/openpgp/Makefile.am: Likewise.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
@@ -2702,8 +2561,7 @@
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* lib/auth_cert.c:
-	(_gnutls_gen_cert_server_cert_req): For TLS 1.2, generate conforming
+	* lib/auth_cert.c: (_gnutls_gen_cert_server_cert_req): For TLS 1.2, generate conforming
 	cert requests (i.e., include a empty list of supported hashes).
 	Report and tiny patch from ludovic.courtes@laas.fr (Ludovic
 	Courtès).
@@ -2714,28 +2572,12 @@
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/common.c:
-	(_oid2str): Mark UID as a CHOICE-field (i.e., DirectoryString).
-	(_gnutls_x509_oid_data2string): Handle ia5String in CHOICEs.  Fixes
-	problem reported by Max Kellermann <max@duempel.org>.
+	* tests/userid/.cvsignore: [no log message]
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* lib/pkix.asn: Encoded UID DN fields as DirectoryString (e.g.,
-	PrintableString), not as IA5String.  Add IA5String as a CHOICE for
-	DirectoryString, to deal with backwards compatibility if there are
-	IA5String UID fields out there that were generated by older
-	versions.  Reported by Max Kellermann <max@duempel.org>.
-
-2006-12-27  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-12-27  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/common.c:
-	(_oid2str): Mark UID as a CHOICE-field (i.e., DirectoryString).
-	(_gnutls_x509_oid_data2string): Handle ia5String in CHOICEs.  Fixes
+	* lib/x509/common.c: (_oid2str): Mark UID as a CHOICE-field (i.e., DirectoryString).
+	(_gnutls_x509_oid_data2string): Handle ia5String in CHOICEs. Fixes
 	problem reported by Max Kellermann <max@duempel.org>.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
@@ -2764,7 +2606,7 @@
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* tests/userid/userid.pem, tests/userid/Makefile.am: Add.
+	* tests/userid/Makefile.am, tests/userid/userid.pem: Add.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
@@ -2772,29 +2614,20 @@
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_x509.c:
-	(generate_rdn_seq): Store subject DN instead of issuer DN in the
+	* lib/gnutls_x509.c: (generate_rdn_seq): Store subject DN instead of issuer DN in the
 	certificate authority list, to make sure server's send the proper
 	list of expected CAs to the client.  Reported by Max Kellermann
 	<max@duempel.org>.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Add.
-
-2006-12-27  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_x509.c:
-	(gnutls_certificate_set_x509_crl): Initialize before use, reported
+	* lib/gnutls_x509.c: (gnutls_certificate_set_x509_crl): Initialize before use, reported
 	by Max Kellermann <max@duempel.org>.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* THANKS, NEWS: Add.
-
-2006-12-27  Simon Josefsson <simon@josefsson.org>
-
-	* tests/certificate_set_x509_crl.c, tests/Makefile.am: Add.
+	* NEWS, THANKS, tests/Makefile.am, tests/certificate_set_x509_crl.c: 
+	Add.
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
@@ -2802,7 +2635,7 @@
 
 2006-12-27  Simon Josefsson <simon@josefsson.org>
 
-	* gl/strdup.h, gl/m4/lib-link.m4, lgl/m4/lib-link.m4,
+	* gl/m4/lib-link.m4, gl/strdup.h, lgl/m4/lib-link.m4,
 	lgl/m4/stdint.m4: Update.
 
 2006-12-26  Simon Josefsson <simon@josefsson.org>
@@ -2826,6 +2659,10 @@
 
 	* m4/intl.m4, m4/intldir.m4, m4/lock.m4, m4/visibility.m4: Remove
 	(should have just been .cvsignore'd).
+
+2006-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* m4/.cvsignore: [no log message]
 
 2006-12-10  Simon Josefsson <simon@josefsson.org>
 
@@ -2857,7 +2694,11 @@
 
 2006-11-29  Simon Josefsson <simon@josefsson.org>
 
-	* Makefile.am: Put in devel/ directory.  Disable doc generation.
+	* ChangeLog: [no log message]
+
+2006-11-29  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Put in devel/ directory. Disable doc generation.
 
 2006-11-29  Simon Josefsson <simon@josefsson.org>
 
@@ -2919,19 +2760,14 @@
 
 2006-11-26  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/opencdk/keydb.c, libextra/opencdk/keygen.c: Doc fix.
+	* libextra/opencdk/kbnode.c, libextra/opencdk/keydb.c,
+	libextra/opencdk/keygen.c, libextra/opencdk/keylist.c,
+	libextra/opencdk/sign.c: Doc fix.
 
 2006-11-26  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/opencdk/sign.c, libextra/opencdk/kbnode.c: Doc fix.
-
-2006-11-26  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/opencdk/keygen.c, libextra/opencdk/keylist.c: Doc fix.
-
-2006-11-26  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/opencdk/kbnode.c, libextra/opencdk/sign.c: Doc fix.
+	* libextra/opencdk/kbnode.c, libextra/opencdk/keygen.c,
+	libextra/opencdk/sign.c: Doc fix.
 
 2006-11-26  Simon Josefsson <simon@josefsson.org>
 
@@ -2955,13 +2791,7 @@
 
 2006-11-26  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS, THANKS: Add.
-
-2006-11-26  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Move AM_CONDITIONAL outside of 'if gcc' clause,
-	fixes problem reported by "Michael C. Vergallen"
-	<mvergall@telenet.be>.
+	* NEWS: Add.
 
 2006-11-25  Simon Josefsson <simon@josefsson.org>
 
@@ -2984,8 +2814,7 @@
 
 2006-11-25  Simon Josefsson <simon@josefsson.org>
 
-	* includes/gnutls/gnutls.h.in:
-	(gnutls_protocol_t): Add GNUTLS_TLS1_2.
+	* includes/gnutls/gnutls.h.in: (gnutls_protocol_t): Add GNUTLS_TLS1_2.
 
 2006-11-25  Simon Josefsson <simon@josefsson.org>
 
@@ -2998,11 +2827,11 @@
 2006-11-25  Simon Josefsson <simon@josefsson.org>
 
 	* gl/Makefile.am, gl/getaddrinfo.c, gl/imaxtostr.c, gl/intprops.h,
-	gl/inttostr.c, gl/inttostr.h, gl/offtostr.c, gl/stdint_.h,
-	gl/uinttostr.c, gl/umaxtostr.c, gl/m4/absolute-header.m4,
+	gl/inttostr.c, gl/inttostr.h, gl/m4/absolute-header.m4,
 	gl/m4/gnulib-comp.m4, gl/m4/inttostr.m4, gl/m4/longlong.m4,
-	gl/m4/stdint.m4, gl/m4/ulonglong.m4, lgl/m4/alloca.m4,
-	lgl/m4/gettext.m4: Update.
+	gl/m4/stdint.m4, gl/m4/ulonglong.m4, gl/offtostr.c, gl/stdint_.h,
+	gl/uinttostr.c, gl/umaxtostr.c, lgl/m4/alloca.m4, lgl/m4/gettext.m4: 
+	Update.
 
 2006-11-25  Simon Josefsson <simon@josefsson.org>
 
@@ -3011,6 +2840,10 @@
 2006-11-22  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-housley-evidence-extns-01.txt: Add.
+
+2006-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
 
 2006-11-17  Simon Josefsson <simon@josefsson.org>
 
@@ -3034,18 +2867,21 @@
 
 2006-11-16  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.5.5.
 
 2006-11-16  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_record.c:
-	(gnutls_record_recv): Fix docstring, suggested by Tim Kosse
+	* lib/gnutls_record.c: (gnutls_record_recv): Fix docstring, suggested by Tim Kosse
 	<tim.kosse@filezilla-project.org>.
 
 2006-11-16  Simon Josefsson <simon@josefsson.org>
 
-	* doc/protocol/draft-ietf-sasl-rfc2831bis-11.txt: Remove, oops
-	wrong project.
+	* doc/protocol/draft-ietf-sasl-rfc2831bis-11.txt: Remove, oops wrong
+	project.
 
 2006-11-16  Simon Josefsson <simon@josefsson.org>
 
@@ -3061,10 +2897,18 @@
 
 2006-11-16  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/gettext.h, gl/stdint_.h, gl/m4/gnulib-comp.m4,
-	gl/m4/lib-link.m4, gl/m4/longlong.m4, lgl/Makefile.am,
-	lgl/gettext.h, lgl/stdint_.h, lgl/m4/gnulib-comp.m4,
-	lgl/m4/lib-link.m4, lgl/m4/longlong.m4: Update.
+	* NEWS: Add.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/gettext.h, gl/m4/gnulib-comp.m4,
+	gl/m4/lib-link.m4, gl/m4/longlong.m4, gl/stdint_.h,
+	lgl/Makefile.am, lgl/gettext.h, lgl/m4/gnulib-comp.m4,
+	lgl/m4/lib-link.m4, lgl/m4/longlong.m4, lgl/stdint_.h: Update.
 
 2006-11-16  Simon Josefsson <simon@josefsson.org>
 
@@ -3091,8 +2935,8 @@
 
 2006-11-15  Simon Josefsson <simon@josefsson.org>
 
-	* doc/examples/ex-x509-info.c: Fix cert_list_size type to match
-	API, reported by Tim Kosse <tim.kosse@filezilla-project.org>.
+	* doc/examples/ex-x509-info.c: Fix cert_list_size type to match API,
+	reported by Tim Kosse <tim.kosse@filezilla-project.org>.
 
 2006-11-14  Simon Josefsson <simon@josefsson.org>
 
@@ -3104,6 +2948,10 @@
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.5.4.
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
@@ -3112,9 +2960,13 @@
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
-	* lgl/Makefile.am, lgl/strverscmp.c, lgl/strverscmp.h,
-	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
-	lgl/m4/strverscmp.m4, lib/gnutls_global.c: Use strverscmp.
+	* NEWS: Add.
+
+2006-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/strverscmp.m4, lgl/strverscmp.c, lgl/strverscmp.h,
+	lib/gnutls_global.c: Use strverscmp.
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
@@ -3122,7 +2974,7 @@
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
-	* doc/manpages/Makefile.am, NEWS: Add.
+	* NEWS, doc/manpages/Makefile.am: Add.
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
@@ -3144,36 +2996,18 @@
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_buffers.c: Convert to EINTR/EAGAIN errno under
-	Windows, using WSAGetLastError().
+	* lib/gnutls_buffers.c: Convert to EINTR/EAGAIN errno under Windows,
+	using WSAGetLastError().
 
 2006-11-07  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_buffers.c,
-	lib/gnutls_int.h: Add new APIs to set errno for push/pull
-	functions, suggested by tim.kosse@filezilla-project.org.
+	lib/gnutls_int.h: Add new APIs to set errno for push/pull functions,
+	suggested by tim.kosse@filezilla-project.org.
 
 2006-11-06  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
-
-2006-11-06  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Version 1.4.5.
-
-2006-11-06  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-11-06  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-11-06  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_v2_compat.c: Have SSLv2 ClientHello's for unknown
-	versions negotiate the highest version we support, instead of the
-	lowest.  Reported by Pasi.Eronen@nokia.com.
 
 2006-11-05  Simon Josefsson <simon@josefsson.org>
 
@@ -3190,8 +3024,11 @@
 
 2006-11-05  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/openpgp/openpgp.h:
-	(gnutls_openpgp_key_get_pk_algorithm): Fix prototype.
+	* lgl/.cvsignore: [no log message]
+
+2006-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openpgp/openpgp.h: (gnutls_openpgp_key_get_pk_algorithm): Fix prototype.
 
 2006-11-03  Simon Josefsson <simon@josefsson.org>
 
@@ -3203,14 +3040,12 @@
 
 2006-10-30  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/openpgp/pgp.c:
-	(gnutls_openpgp_key_get_fingerprint): Doc fix.  Reported by
+	* libextra/openpgp/pgp.c: (gnutls_openpgp_key_get_fingerprint): Doc fix.  Reported by
 	ludovic.courtes@laas.fr (Ludovic Courtès).
 
 2006-10-30  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/openpgp/pgp.c:
-	(gnutls_openpgp_key_get_name): Make SIZEOF_BUF contain
+	* libextra/openpgp/pgp.c: (gnutls_openpgp_key_get_name): Make SIZEOF_BUF contain
 	actual/required buffer size on return.  Suggested by
 	ludovic.courtes@laas.fr (Ludovic Courtès).
 
@@ -3249,18 +3084,23 @@
 
 2006-10-30  Simon Josefsson <simon@josefsson.org>
 
-	* lgl/Makefile.am, lgl/stat_.h, lgl/m4/gnulib-cache.m4,
-	lgl/m4/gnulib-comp.m4, lgl/m4/sys_stat_h.m4, lgl/m4/unistd_h.m4,
-	lgl/arcfour.c, lgl/arctwo.c, lgl/des.c, lgl/gc-gnulib.c,
-	lgl/gc-libgcrypt.c, lgl/gc-pbkdf2-sha1.c, lgl/gettext.h,
-	lgl/hmac-md5.c, lgl/hmac-sha1.c, lgl/md2.c, lgl/md4.c,
-	lgl/memxor.c, lgl/read-file.c, lgl/rijndael-alg-fst.c,
-	lgl/rijndael-api-fst.c, lgl/m4/codeset.m4, lgl/m4/gettext.m4,
-	lgl/m4/intmax.m4, lgl/m4/inttypes-h.m4, lgl/m4/inttypes-pri.m4,
-	lgl/m4/lib-link.m4, lgl/m4/lock.m4, lgl/m4/signed.m4,
-	lgl/m4/vasnprintf.m4, gl/getaddrinfo.c, gl/getdelim.c,
-	gl/getline.c, gl/gettext.h, gl/readline.c, gl/m4/lib-link.m4,
-	lgl/m4/intl.m4, lgl/m4/intldir.m4: Update.
+	* gl/getaddrinfo.c, gl/getdelim.c, gl/getline.c, gl/gettext.h,
+	gl/m4/lib-link.m4, gl/readline.c, lgl/Makefile.am, lgl/arcfour.c,
+	lgl/arctwo.c, lgl/des.c, lgl/gc-gnulib.c, lgl/gc-libgcrypt.c,
+	lgl/gc-pbkdf2-sha1.c, lgl/gettext.h, lgl/hmac-md5.c,
+	lgl/hmac-sha1.c, lgl/m4/codeset.m4, lgl/m4/gettext.m4,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4, lgl/m4/intl.m4,
+	lgl/m4/intldir.m4, lgl/m4/intmax.m4, lgl/m4/inttypes-h.m4,
+	lgl/m4/inttypes-pri.m4, lgl/m4/lib-link.m4, lgl/m4/lock.m4,
+	lgl/m4/signed.m4, lgl/m4/sys_stat_h.m4, lgl/m4/unistd_h.m4,
+	lgl/m4/vasnprintf.m4, lgl/md2.c, lgl/md4.c, lgl/memxor.c,
+	lgl/read-file.c, lgl/rijndael-alg-fst.c, lgl/rijndael-api-fst.c,
+	lgl/stat_.h: Update.
+
+2006-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/gnulib-comp.m4, lgl/m4/sys_stat_h.m4, lgl/stat_.h: Update.
+
 
 2006-10-30  Simon Josefsson <simon@josefsson.org>
 
@@ -3268,7 +3108,15 @@
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-10-26  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.5.3.
+
+2006-10-26  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/.cvsignore: [no log message]
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
@@ -3276,15 +3124,11 @@
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Add.
-
-2006-10-26  Simon Josefsson <simon@josefsson.org>
-
 	* tests/rsa-md5-collision/Makefile.am: Dist more.
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
-	* tests/rsa-md5-collision/README: Add.
+	* NEWS, tests/rsa-md5-collision/README: Add.
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
@@ -3293,8 +3137,8 @@
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
-	* lgl/Makefile.am, lgl/m4/gnulib-cache.m4: Change lgpl/ library
-	name to liblgnu, to avoid weird libtool errors.
+	* lgl/Makefile.am, lgl/m4/gnulib-cache.m4: Change lgpl/ library name
+	to liblgnu, to avoid weird libtool errors.
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
@@ -3303,10 +3147,10 @@
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
 	* gl/Makefile.am, gl/getaddrinfo.c, gl/imaxtostr.c, gl/intprops.h,
-	gl/inttostr.c, gl/inttostr.h, gl/offtostr.c, gl/stdint_.h,
-	gl/uinttostr.c, gl/umaxtostr.c, gl/m4/absolute-header.m4,
+	gl/inttostr.c, gl/inttostr.h, gl/m4/absolute-header.m4,
 	gl/m4/gnulib-comp.m4, gl/m4/inttostr.m4, gl/m4/longlong.m4,
-	gl/m4/stdint.m4, gl/m4/ulonglong.m4: Add.
+	gl/m4/stdint.m4, gl/m4/ulonglong.m4, gl/offtostr.c, gl/stdint_.h,
+	gl/uinttostr.c, gl/umaxtostr.c: Add.
 
 2006-10-26  Simon Josefsson <simon@josefsson.org>
 
@@ -3335,16 +3179,19 @@
 
 2006-10-24  Simon Josefsson <simon@josefsson.org>
 
+	* tests/pkcs12-decode/.cvsignore: [no log message]
+
+2006-10-24  Simon Josefsson <simon@josefsson.org>
+
 	* configure.in: Add tests.
 
 2006-10-24  Simon Josefsson <simon@josefsson.org>
 
 	* tests/Makefile.am, tests/client.p12, tests/noclient.p12,
-	tests/pkcs12_neon, tests/unclient.p12,
 	tests/pkcs12-decode/Makefile.am, tests/pkcs12-decode/client.p12,
 	tests/pkcs12-decode/noclient.p12, tests/pkcs12-decode/pkcs12,
-	tests/pkcs12-decode/unclient.p12: Move pkcs12 tests to
-	pkcs12-decode/.
+	tests/pkcs12-decode/unclient.p12, tests/pkcs12_neon,
+	tests/unclient.p12: Move pkcs12 tests to pkcs12-decode/.
 
 2006-10-24  Simon Josefsson <simon@josefsson.org>
 
@@ -3352,27 +3199,36 @@
 
 2006-10-24  Simon Josefsson <simon@josefsson.org>
 
-	* tests/Makefile.am, tests/enc2pkcs8.pem, tests/encpkcs8.pem,
-	tests/pkcs8, tests/unencpkcs8.pem, tests/pkcs8-decode/Makefile.am,
-	tests/pkcs8-decode/enc2pkcs8.pem, tests/pkcs8-decode/encpkcs8.pem,
-	tests/pkcs8-decode/pkcs8, tests/pkcs8-decode/unencpkcs8.pem: Move
-	pkcs8 tests to pkcs8-decode/.
+	* tests/pkcs8-decode/.cvsignore: [no log message]
 
 2006-10-24  Simon Josefsson <simon@josefsson.org>
 
-	* tests/Makefile.am: Move pkcs1-pad stuff to pkcs1-padding/.  Add
+	* tests/Makefile.am, tests/enc2pkcs8.pem, tests/encpkcs8.pem,
+	tests/pkcs8, tests/pkcs8-decode/Makefile.am,
+	tests/pkcs8-decode/enc2pkcs8.pem, tests/pkcs8-decode/encpkcs8.pem,
+	tests/pkcs8-decode/pkcs8, tests/pkcs8-decode/unencpkcs8.pem,
+	tests/unencpkcs8.pem: Move pkcs8 tests to pkcs8-decode/.
+
+2006-10-24  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Move pkcs1-pad stuff to pkcs1-padding/. Add
 	rsa-md5-collision/.
 
 2006-10-24  Simon Josefsson <simon@josefsson.org>
 
-	* tests/rsa-md5-collision/rsa-md5-collision,
-	tests/rsa-md5-collision/MD5CollisionCA.cer,
+	* tests/pkcs1-padding/.cvsignore,
+	tests/rsa-md5-collision/.cvsignore: [no log message]
+
+2006-10-24  Simon Josefsson <simon@josefsson.org>
+
+	* tests/rsa-md5-collision/MD5CollisionCA.cer,
 	tests/rsa-md5-collision/Makefile.am,
 	tests/rsa-md5-collision/TargetCollidingCertificate1.cer,
 	tests/rsa-md5-collision/TargetCollidingCertificate2.cer,
 	tests/rsa-md5-collision/chain1-expect.log,
 	tests/rsa-md5-collision/chain2-expect.log,
-	tests/rsa-md5-collision/mbox: Add.
+	tests/rsa-md5-collision/mbox,
+	tests/rsa-md5-collision/rsa-md5-collision: Add.
 
 2006-10-24  Simon Josefsson <simon@josefsson.org>
 
@@ -3401,6 +3257,10 @@
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
+	* lgl/.cvsignore: [no log message]
+
+2006-10-21  Simon Josefsson <simon@josefsson.org>
+
 	* tests/Makefile.am: Need lgpl gnulib.
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
@@ -3426,16 +3286,21 @@
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/snprintf.c, gl/snprintf.h,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/snprintf.m4,
-	gl/alloca_.h, gl/asnprintf.c, gl/printf-args.c, gl/printf-args.h,
-	gl/printf-parse.c, gl/printf-parse.h, gl/size_max.h,
-	gl/vasnprintf.c, gl/vasnprintf.h, gl/xsize.h, gl/m4/alloca.m4,
-	gl/m4/eoverflow.m4, gl/m4/intmax_t.m4, gl/m4/inttypes_h.m4,
-	gl/m4/longdouble.m4, gl/m4/longlong.m4, gl/m4/signed.m4,
-	gl/m4/size_max.m4, gl/m4/stdint_h.m4, gl/m4/vasnprintf.m4,
-	gl/m4/wchar_t.m4, gl/m4/wint_t.m4, gl/m4/xsize.m4: Avoid duplicate
+	* gl/Makefile.am, gl/alloca_.h, gl/asnprintf.c, gl/m4/alloca.m4,
+	gl/m4/eoverflow.m4, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/intmax_t.m4, gl/m4/inttypes_h.m4, gl/m4/longdouble.m4,
+	gl/m4/longlong.m4, gl/m4/signed.m4, gl/m4/size_max.m4,
+	gl/m4/snprintf.m4, gl/m4/stdint_h.m4, gl/m4/vasnprintf.m4,
+	gl/m4/wchar_t.m4, gl/m4/wint_t.m4, gl/m4/xsize.m4,
+	gl/printf-args.c, gl/printf-args.h, gl/printf-parse.c,
+	gl/printf-parse.h, gl/size_max.h, gl/snprintf.c, gl/snprintf.h,
+	gl/vasnprintf.c, gl/vasnprintf.h, gl/xsize.h: Avoid duplicate
 	modules.
+
+2006-10-21  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Avoid
+	duplicate modules.
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
@@ -3447,40 +3312,48 @@
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/memmove.c, gl/minmax.h, gl/read-file.c,
-	gl/read-file.h, gl/m4/codeset.m4, gl/m4/gettext.m4,
-	gl/m4/glibc2.m4, gl/m4/glibc21.m4, gl/m4/gnulib-cache.m4,
-	gl/m4/gnulib-comp.m4, gl/m4/iconv.m4, gl/m4/intdiv0.m4,
-	gl/m4/intmax.m4, gl/m4/inttypes-h.m4, gl/m4/inttypes-pri.m4,
-	gl/m4/lcmessage.m4, gl/m4/lock.m4, gl/m4/memmove.m4,
-	gl/m4/minmax.m4, gl/m4/nls.m4, gl/m4/po.m4, gl/m4/printf-posix.m4,
-	gl/m4/progtest.m4, gl/m4/read-file.m4, gl/m4/uintmax_t.m4,
-	gl/m4/ulonglong.m4, gl/m4/visibility.m4, lgl/Makefile.am,
-	lgl/alloca.h, lgl/memmove.c, lgl/read-file.c, lgl/read-file.h,
-	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4, lgl/m4/memmove.m4,
-	lgl/m4/read-file.m4: Move modules from gl/ to lgl/.
+	* gl/Makefile.am: Move modules from gl/ to lgl/.
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/stdint_.h, gl/m4/absolute-header.m4,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/stdint.m4,
-	lgl/Makefile.am, lgl/alloca_.h, lgl/asnprintf.c, lgl/gettext.h,
-	lgl/printf-args.c, lgl/printf-args.h, lgl/printf-parse.c,
-	lgl/printf-parse.h, lgl/size_max.h, lgl/snprintf.c, lgl/snprintf.h,
-	lgl/socket_.h, lgl/stdint.h, lgl/vasnprintf.c, lgl/vasnprintf.h,
-	lgl/xsize.h, lgl/m4/alloca.m4, lgl/m4/codeset.m4,
-	lgl/m4/eoverflow.m4, lgl/m4/gettext.m4, lgl/m4/glibc2.m4,
-	lgl/m4/glibc21.m4, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
-	lgl/m4/iconv.m4, lgl/m4/intdiv0.m4, lgl/m4/intmax.m4,
-	lgl/m4/intmax_t.m4, lgl/m4/inttypes-h.m4, lgl/m4/inttypes-pri.m4,
-	lgl/m4/inttypes_h.m4, lgl/m4/lcmessage.m4, lgl/m4/lock.m4,
-	lgl/m4/longdouble.m4, lgl/m4/nls.m4, lgl/m4/po.m4,
-	lgl/m4/printf-posix.m4, lgl/m4/progtest.m4, lgl/m4/signed.m4,
+	* gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, lgl/Makefile.am,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4: Move modules from gl/
+	to lgl/.
+
+2006-10-21  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/absolute-header.m4, gl/m4/codeset.m4,
+	gl/m4/gettext.m4, gl/m4/glibc2.m4, gl/m4/glibc21.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/iconv.m4,
+	gl/m4/intdiv0.m4, gl/m4/intmax.m4, gl/m4/inttypes-h.m4,
+	gl/m4/inttypes-pri.m4, gl/m4/lcmessage.m4, gl/m4/lock.m4,
+	gl/m4/memmove.m4, gl/m4/minmax.m4, gl/m4/nls.m4, gl/m4/po.m4,
+	gl/m4/printf-posix.m4, gl/m4/progtest.m4, gl/m4/read-file.m4,
+	gl/m4/stdint.m4, gl/m4/uintmax_t.m4, gl/m4/ulonglong.m4,
+	gl/m4/visibility.m4, gl/memmove.c, gl/minmax.h, gl/read-file.c,
+	gl/read-file.h, gl/stdint_.h, lgl/Makefile.am, lgl/alloca.h,
+	lgl/alloca_.h, lgl/asnprintf.c, lgl/gettext.h, lgl/m4/alloca.m4,
+	lgl/m4/codeset.m4, lgl/m4/eoverflow.m4, lgl/m4/gettext.m4,
+	lgl/m4/glibc2.m4, lgl/m4/glibc21.m4, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/iconv.m4, lgl/m4/intdiv0.m4,
+	lgl/m4/intmax.m4, lgl/m4/intmax_t.m4, lgl/m4/inttypes-h.m4,
+	lgl/m4/inttypes-pri.m4, lgl/m4/inttypes_h.m4, lgl/m4/lcmessage.m4,
+	lgl/m4/lock.m4, lgl/m4/longdouble.m4, lgl/m4/memmove.m4,
+	lgl/m4/nls.m4, lgl/m4/po.m4, lgl/m4/printf-posix.m4,
+	lgl/m4/progtest.m4, lgl/m4/read-file.m4, lgl/m4/signed.m4,
 	lgl/m4/size_max.m4, lgl/m4/snprintf.m4, lgl/m4/socklen.m4,
 	lgl/m4/sockpfaf.m4, lgl/m4/stdint_h.m4, lgl/m4/sys_socket_h.m4,
 	lgl/m4/uintmax_t.m4, lgl/m4/vasnprintf.m4, lgl/m4/visibility.m4,
-	lgl/m4/wchar_t.m4, lgl/m4/wint_t.m4, lgl/m4/xsize.m4: Move modules
-	from gl/ to lgl/.
+	lgl/m4/wchar_t.m4, lgl/m4/wint_t.m4, lgl/m4/xsize.m4,
+	lgl/memmove.c, lgl/printf-args.c, lgl/printf-args.h,
+	lgl/printf-parse.c, lgl/printf-parse.h, lgl/read-file.c,
+	lgl/read-file.h, lgl/size_max.h, lgl/snprintf.c, lgl/snprintf.h,
+	lgl/socket_.h, lgl/stdint.h, lgl/vasnprintf.c, lgl/vasnprintf.h,
+	lgl/xsize.h: Move modules from gl/ to lgl/.
+
+2006-10-21  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/.cvsignore: [no log message]
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
@@ -3491,42 +3364,41 @@
 	* gl/Makefile.am, gl/arcfour.c, gl/arcfour.h, gl/arctwo.c,
 	gl/arctwo.h, gl/des.c, gl/des.h, gl/gc-gnulib.c, gl/gc-libgcrypt.c,
 	gl/gc-pbkdf2-sha1.c, gl/gc.h, gl/hmac-md5.c, gl/hmac-sha1.c,
-	gl/hmac.h, gl/md2.c, gl/md2.h, gl/md4.c, gl/md4.h, gl/md5.c,
-	gl/md5.h, gl/memxor.c, gl/memxor.h, gl/rijndael-alg-fst.c,
+	gl/hmac.h, gl/m4/arcfour.m4, gl/m4/arctwo.m4, gl/m4/des.m4,
+	gl/m4/gc-arcfour.m4, gl/m4/gc-arctwo.m4, gl/m4/gc-des.m4,
+	gl/m4/gc-hmac-md5.m4, gl/m4/gc-hmac-sha1.m4, gl/m4/gc-md2.m4,
+	gl/m4/gc-md4.m4, gl/m4/gc-md5.m4, gl/m4/gc-pbkdf2-sha1.m4,
+	gl/m4/gc-random.m4, gl/m4/gc-rijndael.m4, gl/m4/gc-sha1.m4,
+	gl/m4/gc.m4, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/hmac-md5.m4, gl/m4/hmac-sha1.m4, gl/m4/md2.m4, gl/m4/md4.m4,
+	gl/m4/md5.m4, gl/m4/memxor.m4, gl/m4/rijndael.m4, gl/m4/sha1.m4,
+	gl/md2.c, gl/md2.h, gl/md4.c, gl/md4.h, gl/md5.c, gl/md5.h,
+	gl/memxor.c, gl/memxor.h, gl/rijndael-alg-fst.c,
 	gl/rijndael-alg-fst.h, gl/rijndael-api-fst.c,
-	gl/rijndael-api-fst.h, gl/sha1.c, gl/sha1.h, gl/m4/arcfour.m4,
-	gl/m4/arctwo.m4, gl/m4/des.m4, gl/m4/gc-arcfour.m4,
-	gl/m4/gc-arctwo.m4, gl/m4/gc-des.m4, gl/m4/gc-hmac-md5.m4,
-	gl/m4/gc-hmac-sha1.m4, gl/m4/gc-md2.m4, gl/m4/gc-md4.m4,
-	gl/m4/gc-md5.m4, gl/m4/gc-pbkdf2-sha1.m4, gl/m4/gc-random.m4,
-	gl/m4/gc-rijndael.m4, gl/m4/gc-sha1.m4, gl/m4/gc.m4,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/hmac-md5.m4,
-	gl/m4/hmac-sha1.m4, gl/m4/md2.m4, gl/m4/md4.m4, gl/m4/md5.m4,
-	gl/m4/memxor.m4, gl/m4/rijndael.m4, gl/m4/sha1.m4, lgl/Makefile.am,
+	gl/rijndael-api-fst.h, gl/sha1.c, gl/sha1.h, lgl/Makefile.am,
 	lgl/arcfour.c, lgl/arcfour.h, lgl/arctwo.c, lgl/arctwo.h,
 	lgl/des.c, lgl/des.h, lgl/gc-gnulib.c, lgl/gc-libgcrypt.c,
 	lgl/gc-pbkdf2-sha1.c, lgl/gc.h, lgl/hmac-md5.c, lgl/hmac-sha1.c,
-	lgl/hmac.h, lgl/md2.c, lgl/md2.h, lgl/md4.c, lgl/md4.h, lgl/md5.c,
-	lgl/md5.h, lgl/memxor.c, lgl/memxor.h, lgl/minmax.h,
+	lgl/hmac.h, lgl/m4/absolute-header.m4, lgl/m4/arcfour.m4,
+	lgl/m4/arctwo.m4, lgl/m4/des.m4, lgl/m4/gc-arcfour.m4,
+	lgl/m4/gc-arctwo.m4, lgl/m4/gc-des.m4, lgl/m4/gc-hmac-md5.m4,
+	lgl/m4/gc-hmac-sha1.m4, lgl/m4/gc-md2.m4, lgl/m4/gc-md4.m4,
+	lgl/m4/gc-md5.m4, lgl/m4/gc-pbkdf2-sha1.m4, lgl/m4/gc-random.m4,
+	lgl/m4/gc-rijndael.m4, lgl/m4/gc-sha1.m4, lgl/m4/gc.m4,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4, lgl/m4/hmac-md5.m4,
+	lgl/m4/hmac-sha1.m4, lgl/m4/lib-ld.m4, lgl/m4/lib-link.m4,
+	lgl/m4/lib-prefix.m4, lgl/m4/longlong.m4, lgl/m4/md2.m4,
+	lgl/m4/md4.m4, lgl/m4/md5.m4, lgl/m4/memxor.m4, lgl/m4/minmax.m4,
+	lgl/m4/rijndael.m4, lgl/m4/sha1.m4, lgl/m4/stdint.m4,
+	lgl/m4/ulonglong.m4, lgl/md2.c, lgl/md2.h, lgl/md4.c, lgl/md4.h,
+	lgl/md5.c, lgl/md5.h, lgl/memxor.c, lgl/memxor.h, lgl/minmax.h,
 	lgl/rijndael-alg-fst.c, lgl/rijndael-alg-fst.h,
 	lgl/rijndael-api-fst.c, lgl/rijndael-api-fst.h, lgl/sha1.c,
-	lgl/sha1.h, lgl/stdint_.h, lgl/m4/absolute-header.m4,
-	lgl/m4/arcfour.m4, lgl/m4/arctwo.m4, lgl/m4/des.m4,
-	lgl/m4/gc-arcfour.m4, lgl/m4/gc-arctwo.m4, lgl/m4/gc-des.m4,
-	lgl/m4/gc-hmac-md5.m4, lgl/m4/gc-hmac-sha1.m4, lgl/m4/gc-md2.m4,
-	lgl/m4/gc-md4.m4, lgl/m4/gc-md5.m4, lgl/m4/gc-pbkdf2-sha1.m4,
-	lgl/m4/gc-random.m4, lgl/m4/gc-rijndael.m4, lgl/m4/gc-sha1.m4,
-	lgl/m4/gc.m4, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
-	lgl/m4/hmac-md5.m4, lgl/m4/hmac-sha1.m4, lgl/m4/lib-ld.m4,
-	lgl/m4/lib-link.m4, lgl/m4/lib-prefix.m4, lgl/m4/longlong.m4,
-	lgl/m4/md2.m4, lgl/m4/md4.m4, lgl/m4/md5.m4, lgl/m4/memxor.m4,
-	lgl/m4/minmax.m4, lgl/m4/rijndael.m4, lgl/m4/sha1.m4,
-	lgl/m4/stdint.m4, lgl/m4/ulonglong.m4: Move modules from gl/ to
-	lgl/.
+	lgl/sha1.h, lgl/stdint_.h: Move modules from gl/ to lgl/.
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/Makefile.am, lib/minitasn1/Makefile.am: Use gnulib in
+	* lib/minitasn1/Makefile.am, lib/x509/Makefile.am: Use gnulib in
 	lgl/ instead of gl/.
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
@@ -3538,30 +3410,31 @@
 	gl/getaddrinfo.h, gl/getdelim.c, gl/getdelim.h, gl/getline.c,
 	gl/getline.h, gl/getpass.c, gl/getpass.h, gl/gettext.h,
 	gl/hmac-md5.c, gl/hmac-sha1.c, gl/hmac.h, gl/inet_ntop.c,
-	gl/inet_ntop.h, gl/inet_pton.c, gl/inet_pton.h, gl/md2.c, gl/md2.h,
-	gl/md4.c, gl/md4.h, gl/md5.c, gl/md5.h, gl/memmem.c, gl/memmem.h,
-	gl/memxor.c, gl/memxor.h, gl/minmax.h, gl/printf-args.c,
-	gl/printf-args.h, gl/printf-parse.c, gl/printf-parse.h,
-	gl/read-file.c, gl/read-file.h, gl/readline.c, gl/readline.h,
-	gl/rijndael-alg-fst.c, gl/rijndael-alg-fst.h,
+	gl/inet_ntop.h, gl/inet_pton.c, gl/inet_pton.h,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/memmem.m4,
+	gl/md2.c, gl/md2.h, gl/md4.c, gl/md4.h, gl/md5.c, gl/md5.h,
+	gl/memmem.c, gl/memmem.h, gl/memxor.c, gl/memxor.h, gl/minmax.h,
+	gl/printf-args.c, gl/printf-args.h, gl/printf-parse.c,
+	gl/printf-parse.h, gl/read-file.c, gl/read-file.h, gl/readline.c,
+	gl/readline.h, gl/rijndael-alg-fst.c, gl/rijndael-alg-fst.h,
 	gl/rijndael-api-fst.c, gl/rijndael-api-fst.h, gl/sha1.c, gl/sha1.h,
 	gl/size_max.h, gl/snprintf.c, gl/snprintf.h, gl/socket_.h,
 	gl/stdbool_.h, gl/stdint_.h, gl/strdup.c, gl/strdup.h,
-	gl/vasnprintf.c, gl/vasnprintf.h, gl/xsize.h,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/memmem.m4,
-	lgl/Makefile.am, lgl/dummy.c, lgl/memmem.c, lgl/memmem.h,
-	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
-	lgl/m4/gnulib-tool.m4, lgl/m4/memmem.m4, lib/Makefile.am: Add lgl/
-	for LGPLed gnulib modules (for lib/) and use gl/ for GPL gnulib
-	modules, for use in src/ etc.
+	gl/vasnprintf.c, gl/vasnprintf.h, gl/xsize.h, lgl/Makefile.am,
+	lgl/dummy.c, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/gnulib-tool.m4, lgl/m4/memmem.m4, lgl/memmem.c,
+	lgl/memmem.h, lib/Makefile.am: Add lgl/ for LGPLed gnulib modules
+	(for lib/) and use gl/ for GPL gnulib modules, for use in src/ etc.
+
 
 2006-10-21  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/gettext.h, gl/printf-args.c, gl/printf-args.h,
-	gl/printf-parse.c, gl/stdint_.h, gl/strdup.c, gl/vasnprintf.c,
-	gl/m4/alloca.m4, gl/m4/gnulib-comp.m4, gl/m4/lock.m4,
-	gl/m4/longlong.m4, gl/m4/size_max.m4, gl/m4/stdint.m4,
-	gl/m4/ulonglong.m4, gl/m4/vasnprintf.m4: Update.
+	* gl/Makefile.am, gl/gettext.h, gl/m4/alloca.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/lock.m4, gl/m4/longlong.m4,
+	gl/m4/size_max.m4, gl/m4/stdint.m4, gl/m4/ulonglong.m4,
+	gl/m4/vasnprintf.m4, gl/printf-args.c, gl/printf-args.h,
+	gl/printf-parse.c, gl/stdint_.h, gl/strdup.c, gl/vasnprintf.c: 
+	Update.
 
 2006-10-19  Simon Josefsson <simon@josefsson.org>
 
@@ -3603,6 +3476,10 @@
 
 2006-10-03  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-10-03  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.5.2.
 
 2006-10-03  Simon Josefsson <simon@josefsson.org>
@@ -3615,7 +3492,7 @@
 
 2006-10-03  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/getpass.c, gl/m4/getpass.m4, gl/m4/intmax.m4:
+	* gl/Makefile.am, gl/getpass.c, gl/m4/getpass.m4, gl/m4/intmax.m4: 
 	Update.
 
 2006-09-29  Simon Josefsson <simon@josefsson.org>
@@ -3628,8 +3505,7 @@
 
 2006-09-26  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/gnutls_openpgp.c:
-	(kbx_data_to_keyring): Fix off-by-one error in call to malloc,
+	* libextra/gnutls_openpgp.c: (kbx_data_to_keyring): Fix off-by-one error in call to malloc,
 	reported by "Adam Langley" <agl@imperialviolet.org>.
 
 2006-09-25  Simon Josefsson <simon@josefsson.org>
@@ -3657,22 +3533,21 @@
 
 2006-09-25  Simon Josefsson <simon@josefsson.org>
 
-	* lib/libgnutlsxx.vers, NEWS: Add.
+	* NEWS, lib/libgnutlsxx.vers: Add.
 
 2006-09-24  Simon Josefsson <simon@josefsson.org>
 
-	* gl/gc-gnulib.c, gl/md4.c, gl/rijndael-api-fst.c,
-	gl/m4/gnulib-comp.m4, gl/m4/lock.m4, gl/m4/signed.m4,
-	gl/m4/sockpfaf.m4: Update.
+	* gl/gc-gnulib.c, gl/m4/gnulib-comp.m4, gl/m4/lock.m4,
+	gl/m4/signed.m4, gl/m4/sockpfaf.m4, gl/md4.c, gl/rijndael-api-fst.c: 
+	Update.
 
 2006-09-24  Simon Josefsson <simon@josefsson.org>
 
-	* configure.in, NEWS: Bump versions.
+	* NEWS, configure.in: Bump versions.
 
 2006-09-24  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509.c:
-	(gnutls_x509_crt_init): Don't set output parameter on failures,
+	* lib/x509/x509.c: (gnutls_x509_crt_init): Don't set output parameter on failures,
 	reported by Alon Bar-Lev <alon.barlev@gmail.com>.  Also clean up
 	logic.
 
@@ -3692,15 +3567,7 @@
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
-	* Makefile.am: Revert.
-
-2006-09-21  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Fix gendocs path.
-
-2006-09-21  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Don't put in devel/.
+	* ChangeLog: [no log message]
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
@@ -3708,25 +3575,29 @@
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
-	* gl/override/gpl.diff, gl/override/lgpl.diff,
-	gl/override/doc/gpl.texi.diff, gl/override/doc/lgpl.texi.diff:
-	Rename.
+	* gl/override/gpl.diff: Rename.
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
-	* gl/override/gpl.diff, gl/override/gpl.texi.diff,
+	* gl/override/doc/gpl.texi.diff, gl/override/doc/lgpl.texi.diff,
+	gl/override/gpl.diff, gl/override/gpl.texi.diff,
 	gl/override/lgpl.diff, gl/override/lgpl.texi.diff: Rename.
+
+2006-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/lgpl.diff: Rename.
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
 	* doc/fdl.texi, doc/gpl.texi, doc/lgpl.texi, gl/Makefile.am,
 	gl/asnprintf.c, gl/gai_strerror.c, gl/getaddrinfo.c, gl/getpass.c,
-	gl/inet_ntop.c, gl/inet_pton.c, gl/md5.c, gl/memmove.c,
-	gl/printf-args.c, gl/printf-parse.c, gl/sha1.c, gl/snprintf.c,
-	gl/stdint_.h, gl/strdup.c, gl/vasnprintf.c, gl/m4/gettext.m4,
+	gl/inet_ntop.c, gl/inet_pton.c, gl/m4/gettext.m4,
 	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/inttypes-h.m4,
 	gl/m4/inttypes-pri.m4, gl/m4/lib-link.m4, gl/m4/stdint.m4,
-	gl/override/gpl.texi.diff, gl/override/lgpl.texi.diff: Update.
+	gl/md5.c, gl/memmove.c, gl/override/gpl.texi.diff,
+	gl/override/lgpl.texi.diff, gl/printf-args.c, gl/printf-parse.c,
+	gl/sha1.c, gl/snprintf.c, gl/stdint_.h, gl/strdup.c,
+	gl/vasnprintf.c: Update.
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
@@ -3751,10 +3622,9 @@
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
-	* src/certtool.c:
-	(generate_self_signed): Load key, if generate_certificate() didn't
+	* src/certtool.c: (generate_self_signed): Load key, if generate_certificate() didn't
 	load or generate it, typically because it used a certificate
-	request.  Reported by Sascha Ziemann <sascha.ziemann@secunet.com>.
+	request. Reported by Sascha Ziemann <sascha.ziemann@secunet.com>.
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
@@ -3762,30 +3632,16 @@
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
-	* configure.in, NEWS: Bump versions.
-
-2006-09-21  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Fix 'cvs rtag' to add the tag from the 1.4 branch.
-
-2006-09-21  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-09-21  Simon Josefsson <simon@josefsson.org>
-
-	* src/tests.c:
-	(test_session_resume2): When comparing session id's, also compare
+	* src/tests.c: (test_session_resume2): When comparing session id's, also compare
 	that the lengths are the same.
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
-	* THANKS: Add.
+	* NEWS, THANKS: Add.
 
 2006-09-21  Simon Josefsson <simon@josefsson.org>
 
-	* src/tests.c:
-	(test_session_resume2): If session-id is NULL, resumption isn't
+	* src/tests.c: (test_session_resume2): If session-id is NULL, resumption isn't
 	supported.  Tiny patch from Kataja Kai <kai.kataja@op.fi>.
 
 2006-09-19  Simon Josefsson <simon@josefsson.org>
@@ -3807,14 +3663,8 @@
 
 2006-09-18  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/opencdk/keydb.c:
-	(keydb_idx_search): Don't return CDK_EOF if key is found at offset
-	0.  Suggested by "Adam Langley" <alangley@gmail.com>.
-
-2006-09-18  Simon Josefsson <simon@josefsson.org>
-
-	* doc/examples/ex-serv-pgp.c: Fix typo.  Tiny patch from "Adam
-	Langley" <agl@imperialviolet.org>.
+	* libextra/opencdk/keydb.c: (keydb_idx_search): Don't return CDK_EOF if key is found at offset
+	0. Suggested by "Adam Langley" <alangley@gmail.com>.
 
 2006-09-18  Simon Josefsson <simon@josefsson.org>
 
@@ -3839,20 +3689,7 @@
 
 2006-09-12  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Version 1.4.4.
-
-2006-09-12  Simon Josefsson <simon@josefsson.org>
-
 	* tests/pkcs1-pad: Fix.
-
-2006-09-12  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-09-12  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/verify.c: Permit empty parameters field too, found after
-	adding self tests.
 
 2006-09-12  Simon Josefsson <simon@josefsson.org>
 
@@ -3865,7 +3702,7 @@
 
 2006-09-12  Simon Josefsson <simon@josefsson.org>
 
-	* tests/pkcs1-pad-ok2.pem, tests/pkcs1-pad-broken2.pem: Add, from
+	* tests/pkcs1-pad-broken2.pem, tests/pkcs1-pad-ok2.pem: Add, from
 	Eric Young in
 	<http://permalink.gmane.org/gmane.comp.encryption.general/9185>.
 
@@ -3879,7 +3716,7 @@
 
 2006-09-12  Simon Josefsson <simon@josefsson.org>
 
-	* tests/pkcs1-pad-ok.pem, tests/pkcs1-pad-broken.pem: Add, from
+	* tests/pkcs1-pad-broken.pem, tests/pkcs1-pad-ok.pem: Add, from
 	Yutaka OIWA <y.oiwa@aist.go.jp>.
 
 2006-09-12  Simon Josefsson <simon@josefsson.org>
@@ -3895,32 +3732,10 @@
 
 	* lib/gnutls_pk.c: Add 'break' to make logic easier to follow.
 
-2006-09-12  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_pk.c: Log more; loging is safe and only enabled during
-	debugging.  Add 'break' to make logic easier to follow.
-
-2006-09-12  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/verify.c: Fix asn1_read_value() call to fix crash,
-	reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
-
 2006-09-11  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_pk.c: Revert part of patch, logging is only enabled in
 	debug mode, which isn't recommended for real use.
-
-2006-09-08  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Fix release target.
-
-2006-09-08  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS, configure.in: Bump versions.
-
-2006-09-08  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Version 1.4.3.
 
 2006-09-08  Simon Josefsson <simon@josefsson.org>
 
@@ -3948,10 +3763,6 @@
 
 2006-09-08  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Fix.
-
-2006-09-08  Simon Josefsson <simon@josefsson.org>
-
 	* NEWS: Add.
 
 2006-09-08  Simon Josefsson <simon@josefsson.org>
@@ -3973,19 +3784,6 @@
 	* doc/examples/ex-client-srp.c: Use GNUTLS_SHUT_RDWR, tiny patch
 	from "Robert Millan [ackstorm]" <rmillan@ackstorm.es>.
 
-2006-09-08  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-09-08  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Revert.
-
-2006-09-08  Simon Josefsson <simon@josefsson.org>
-
-	* src/certtool.c: Revert 2.113.2.1 fix, it solved one problem but
-	generated another.
-
 2006-08-29  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-openpgp-keys-11.txt: Add.
@@ -3996,7 +3794,7 @@
 
 2006-08-28  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/getaddrinfo.c, gl/stdint_.h, gl/m4/arcfour.m4,
+	* gl/Makefile.am, gl/getaddrinfo.c, gl/m4/arcfour.m4,
 	gl/m4/arctwo.m4, gl/m4/codeset.m4, gl/m4/des.m4,
 	gl/m4/gc-pbkdf2-sha1.m4, gl/m4/gc.m4, gl/m4/getdelim.m4,
 	gl/m4/getline.m4, gl/m4/getpass.m4, gl/m4/gnulib-cache.m4,
@@ -4006,7 +3804,7 @@
 	gl/m4/md5.m4, gl/m4/memxor.m4, gl/m4/read-file.m4,
 	gl/m4/readline.m4, gl/m4/rijndael.m4, gl/m4/sha1.m4,
 	gl/m4/stdint.m4, gl/m4/stdint_h.m4, gl/m4/strdup.m4,
-	gl/override/doc/gendocs_template: Update.
+	gl/override/doc/gendocs_template, gl/stdint_.h: Update.
 
 2006-08-27  Simon Josefsson <simon@josefsson.org>
 
@@ -4021,25 +3819,7 @@
 
 2006-08-27  Simon Josefsson <simon@josefsson.org>
 
-	* configure.in: Bump versions.
-
-2006-08-27  Simon Josefsson <simon@josefsson.org>
-
 	* NEWS: Add.
-
-2006-08-27  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/x509_write.c:
-	(gnutls_x509_crt_sign2): Check to see if ISSUER_KEY is NULL before
-	continuing, based on report from Sascha Ziemann
-	<sascha.ziemann@secunet.com>.
-
-2006-08-27  Simon Josefsson <simon@josefsson.org>
-
-	* src/certtool.c:
-	(generate_certificate): Load private key when --load-request is
-	used, based on report from Sascha Ziemann
-	<sascha.ziemann@secunet.com>.
 
 2006-08-27  Simon Josefsson <simon@josefsson.org>
 
@@ -4047,15 +3827,13 @@
 
 2006-08-27  Simon Josefsson <simon@josefsson.org>
 
-	* src/certtool.c:
-	(generate_certificate): Load private key when --load-request is
+	* src/certtool.c: (generate_certificate): Load private key when --load-request is
 	used, based on report from Sascha Ziemann
 	<sascha.ziemann@secunet.com>.
 
 2006-08-27  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/x509_write.c:
-	(gnutls_x509_crt_sign2): Check to see if ISSUER_KEY is NULL before
+	* lib/x509/x509_write.c: (gnutls_x509_crt_sign2): Check to see if ISSUER_KEY is NULL before
 	continuing, based on report from Sascha Ziemann
 	<sascha.ziemann@secunet.com>.
 
@@ -4083,8 +3861,8 @@
 
 2006-08-14  Simon Josefsson <simon@josefsson.org>
 
-	* src/cli.c: Make select() work on Windows, copying code from
-	plibc, see
+	* src/cli.c: Make select() work on Windows, copying code from plibc,
+	see
 
 	<http://plibc.cvs.sourceforge.net/plibc/plibc/src/select.c?view=markup>.
 
@@ -4099,6 +3877,10 @@
 2006-08-13  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am: Fix release target.
+
+2006-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
 
 2006-08-13  Simon Josefsson <simon@josefsson.org>
 
@@ -4128,15 +3910,14 @@
 
 2006-08-13  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/snprintf.c, gl/m4/gc.m4, gl/m4/getaddrinfo.m4,
+	* gl/Makefile.am, gl/m4/gc.m4, gl/m4/getaddrinfo.m4,
 	gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4,
-	gl/m4/memxor.m4, gl/m4/restrict.m4: Update.
+	gl/m4/memxor.m4, gl/m4/restrict.m4, gl/snprintf.c: Update.
 
 2006-08-13  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/gnutls_openssl.c: Use int/void* macros to avoid
-	warnings, suggested by Andreas Metzler
-	<ametzler@downhill.at.eu.org>.
+	* libextra/gnutls_openssl.c: Use int/void* macros to avoid warnings,
+	suggested by Andreas Metzler <ametzler@downhill.at.eu.org>.
 
 2006-08-13  Simon Josefsson <simon@josefsson.org>
 
@@ -4144,17 +3925,13 @@
 
 2006-08-13  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_int.h: Move GNUTLS_POINTER_TO_INT here.  Add
-	GNUTLS_INT_TO_POINTER.  Based on glib macros, and suggestions from
+	* lib/gnutls_int.h: Move GNUTLS_POINTER_TO_INT here. Add
+	GNUTLS_INT_TO_POINTER. Based on glib macros, and suggestions from
 	Andreas Metzler <ametzler@downhill.at.eu.org>.
 
 2006-08-13  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Add void*, for GNUTLS_POINTER_TO_INT_CAST macros.
-
-2006-08-11  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Version 1.4.2.
 
 2006-08-11  Simon Josefsson <simon@josefsson.org>
 
@@ -4170,16 +3947,7 @@
 
 2006-08-11  Simon Josefsson <simon@josefsson.org>
 
-	* lib/gnutls_algorithms.c:
-	(_gnutls_x509_oid2mac_algorithm): Don't crash trying to strcmp the
-	NULL OID value in the hash_algorithms array, which happens when the
-	input OID doesn't match our OIDs for SHA1, MD5, MD2 or RIPEMD160.
-	Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
-
-2006-08-11  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_algorithms.c:
-	(_gnutls_x509_oid2mac_algorithm): Don't crash trying to strcmp the
+	* lib/gnutls_algorithms.c: (_gnutls_x509_oid2mac_algorithm): Don't crash trying to strcmp the
 	NULL OID value in the hash_algorithms array, which happens when the
 	input OID doesn't match our OIDs for SHA1, MD5, MD2 or RIPEMD160.
 	Reported by satyakumar <satyam_kkd@hyd.hellosoft.com>.
@@ -4206,27 +3974,17 @@
 
 2006-08-06  Simon Josefsson <simon@josefsson.org>
 
-	* src/crypt.c: Fix --version to conform to FSF standards, to fix
-	make distcheck.
+	* src/certtool.c, src/crypt.c: Fix --version to conform to FSF
+	standards, to fix make distcheck.
 
 2006-08-06  Simon Josefsson <simon@josefsson.org>
 
-	* src/certtool.c: Fix --version to conform to FSF standards, to fix
-	make distcheck.
+	* src/tls_test.c, src/tls_test.gaa: Support --version.
 
 2006-08-06  Simon Josefsson <simon@josefsson.org>
 
-	* src/tls_test.gaa, src/tls_test.c: Support --version.
-
-2006-08-06  Simon Josefsson <simon@josefsson.org>
-
-	* src/psk.c: Fix --version to conform to FSF standards, to fix make
-	distcheck.
-
-2006-08-06  Simon Josefsson <simon@josefsson.org>
-
-	* src/serv.c, src/cli.c: Fix --version to conform to FSF standards,
-	to fix make distcheck.
+	* src/cli.c, src/psk.c, src/serv.c: Fix --version to conform to FSF
+	standards, to fix make distcheck.
 
 2006-08-06  Simon Josefsson <simon@josefsson.org>
 
@@ -4256,11 +4014,6 @@
 
 2006-08-03  Simon Josefsson <simon@josefsson.org>
 
-	* tests/Makefile.am: Fix libgcrypt link failure, reported by Brant
-	Gurganus, tiny patch by Daniel Black <dragonheart@gentoo.org>.
-
-2006-08-03  Simon Josefsson <simon@josefsson.org>
-
 	* THANKS: add
 
 2006-08-03  Simon Josefsson <simon@josefsson.org>
@@ -4268,46 +4021,30 @@
 	* tests/Makefile.am: Fix libgcrypt link failure, reported by Brant
 	Gurganus, tiny patch by Daniel Black <dragonheart@gentoo.org>.
 
-2006-07-29  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in, NEWS: Bump version.
-
 2006-07-28  Simon Josefsson <simon@josefsson.org>
 
 	* gendocs.sh, gl/Makefile.am, gl/getaddrinfo.c, gl/getaddrinfo.h,
-	gl/gettext.h, gl/inet_ntop.h, gl/inet_pton.h, gl/printf-args.c,
-	gl/stdint_.h, gl/m4/getline.m4, gl/m4/gettext.m4,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4,
-	gl/m4/inet_pton.m4, gl/m4/inttypes-h.m4, gl/m4/inttypes-pri.m4,
-	gl/m4/inttypes.m4, gl/m4/isc-posix.m4, gl/m4/lib-link.m4,
-	gl/m4/lock.m4, gl/m4/netinet_in_h.m4, gl/m4/nls.m4,
-	gl/m4/onceonly_2_57.m4, gl/m4/po.m4, gl/m4/stdint.m4,
-	gl/m4/visibility.m4: Update.
+	gl/gettext.h, gl/inet_ntop.h, gl/inet_pton.h, gl/m4/getline.m4,
+	gl/m4/gettext.m4, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4, gl/m4/inttypes-h.m4,
+	gl/m4/inttypes-pri.m4, gl/m4/inttypes.m4, gl/m4/isc-posix.m4,
+	gl/m4/lib-link.m4, gl/m4/lock.m4, gl/m4/netinet_in_h.m4,
+	gl/m4/nls.m4, gl/m4/onceonly_2_57.m4, gl/m4/po.m4, gl/m4/stdint.m4,
+	gl/m4/visibility.m4, gl/printf-args.c, gl/stdint_.h: Update.
 
 2006-07-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_int.h: cert_type extension was updated to the IANA
 	assigned value
 
-2006-07-14  Simon Josefsson <simon@josefsson.org>
+2006-07-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS: Version 1.4.1.
-
-2006-07-14  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Need win32_dll for libtool.
-
-2006-07-14  Simon Josefsson <simon@josefsson.org>
-
-	* gl/m4/gnulib-cache.m4: Update.
+	* lib/gnutls_int.h: cert_type extension was updated to the IANA
+	assigned value
 
 2006-07-13  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Add.
-
-2006-07-13  Simon Josefsson <simon@josefsson.org>
-
-	* gendocs.sh, doc/gendocs.sh, gl/Makefile.am,
+	* doc/gendocs.sh, gendocs.sh, gl/Makefile.am,
 	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Update.
 
 2006-07-13  Simon Josefsson <simon@josefsson.org>
@@ -4320,16 +4057,7 @@
 
 2006-07-13  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/gnutls_openssl.c: Retry handshake on non-fatal errors,
-	tiny patch from Jefferson Ogata <Jefferson.Ogata@noaa.gov>.
-
-2006-07-13  Simon Josefsson <simon@josefsson.org>
-
 	* libextra/gnutls_openssl.c: Retry handshake on non-fatal errors.
-
-2006-07-11  Simon Josefsson <simon@josefsson.org>
-
-	* doc/Makefile.am: Pull up from trunk.
 
 2006-07-11  Simon Josefsson <simon@josefsson.org>
 
@@ -4337,15 +4065,7 @@
 
 2006-07-11  Simon Josefsson <simon@josefsson.org>
 
-	* doc/Makefile.am: Pull up from trunk.
-
-2006-07-11  Simon Josefsson <simon@josefsson.org>
-
 	* doc/Makefile.am: Dist arch/ images.
-
-2006-07-11  Simon Josefsson <simon@josefsson.org>
-
-	* doc/Makefile.am: Pull up from trunk.
 
 2006-07-11  Simon Josefsson <simon@josefsson.org>
 
@@ -4357,18 +4077,8 @@
 
 2006-07-11  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/alloca_.h, gl/getaddrinfo.c, gl/getaddrinfo.h,
-	gl/inet_ntop.c, gl/size_max.h, gl/socket_.h, gl/stdint_.h,
-	gl/m4/getaddrinfo.m4, gl/m4/getpass.m4, gl/m4/gnulib-cache.m4,
-	gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4, gl/m4/longlong.m4,
-	gl/m4/onceonly_2_57.m4, gl/m4/size_max.m4, gl/m4/sockpfaf.m4,
-	gl/m4/stdint.m4, gl/m4/ulonglong.m4, gl/m4/absolute-header.m4:
-	Update.
-
-2006-07-11  Simon Josefsson <simon@josefsson.org>
-
 	* gl/Makefile.am, gl/m4/absolute-header.m4, gl/m4/gnulib-cache.m4,
-	gl/m4/gnulib-comp.m4, gl/m4/stdint.m4, gl/m4/onceonly_2_57.m4:
+	gl/m4/gnulib-comp.m4, gl/m4/onceonly_2_57.m4, gl/m4/stdint.m4: 
 	Update.
 
 2006-07-10  Simon Josefsson <simon@josefsson.org>
@@ -4385,15 +4095,15 @@
 
 2006-07-10  Simon Josefsson <simon@josefsson.org>
 
-	* src/cli.c: Fix load of pgp_keyfile, reported by Mario Lenz.
+	* gl/.cvsignore: [no log message]
 
 2006-07-07  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/getaddrinfo.c, gl/getaddrinfo.h, gl/stdint_.h,
+	* gl/Makefile.am, gl/getaddrinfo.c, gl/getaddrinfo.h,
+	gl/m4/absolute-header.m4, gl/m4/full-header-path.m4,
 	gl/m4/getpass.m4, gl/m4/gnulib-comp.m4, gl/m4/longlong.m4,
 	gl/m4/onceonly_2_57.m4, gl/m4/sockpfaf.m4, gl/m4/stdint.m4,
-	gl/m4/ulonglong.m4, gl/m4/absolute-header.m4,
-	gl/m4/full-header-path.m4: Update.
+	gl/m4/ulonglong.m4, gl/stdint_.h: Update.
 
 2006-07-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -4410,17 +4120,6 @@
 
 2006-07-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS, lib/auth_cert.c: OpenPGP support conforms to the latest
-	draft.
-
-2006-07-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
-	* NEWS, src/cli.c, src/common.c, src/serv.c:
-	- Replaced inactive ifdefs to enable openpgp support in test
-	programs.
-
-2006-07-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
 	* libextra/gnutls_openpgp.c: added an extra error check.
 
 2006-07-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
@@ -4430,7 +4129,7 @@
 
 2006-06-29  Simon Josefsson <simon@josefsson.org>
 
-	* doc/protocol/draft-funk-tls-inner-application-extension-03.txt:
+	* doc/protocol/draft-funk-tls-inner-application-extension-03.txt: 
 	Add.
 
 2006-06-28  Simon Josefsson <simon@josefsson.org>
@@ -4439,15 +4138,7 @@
 
 2006-06-28  Simon Josefsson <simon@josefsson.org>
 
-	* THANKS: Pull up from trunk.
-
-2006-06-28  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-06-28  Simon Josefsson <simon@josefsson.org>
-
-	* po/sv.po: Sync with TP.
+	* doc/examples/.cvsignore: [no log message]
 
 2006-06-28  Simon Josefsson <simon@josefsson.org>
 
@@ -4475,16 +4166,8 @@
 
 2006-06-28  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/getaddrinfo.c, gl/getaddrinfo.h, gl/stdint_.h,
-	gl/m4/getaddrinfo.m4, gl/m4/stdint.m4: Update.
-
-2006-06-28  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-06-28  Simon Josefsson <simon@josefsson.org>
-
-	* doc/scripts/gdoc: Pull up from trunk.
+	* gl/Makefile.am, gl/getaddrinfo.c, gl/getaddrinfo.h,
+	gl/m4/getaddrinfo.m4, gl/m4/stdint.m4, gl/stdint_.h: Update.
 
 2006-06-28  Simon Josefsson <simon@josefsson.org>
 
@@ -4512,7 +4195,7 @@
 
 2006-06-27  Simon Josefsson <simon@josefsson.org>
 
-	* tests/Makefile.am, configure.in: Add --enable-valgrind-tests that
+	* configure.in, tests/Makefile.am: Add --enable-valgrind-tests that
 	make it possible to enable/disable use of valgrind on self tests
 	specifically.  Defaults to enabled if valgrind is installed and we
 	aren't cross-compiling.
@@ -4536,8 +4219,8 @@
 
 2006-06-27  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/minilzo/Makefile.am, tests/Makefile.am: Work under
-	mingw.
+	* libextra/minilzo/Makefile.am, tests/Makefile.am: Work under mingw.
+
 
 2006-06-27  Simon Josefsson <simon@josefsson.org>
 
@@ -4550,7 +4233,7 @@
 
 2006-06-26  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/stdint_.h, gl/m4/stdint.m4: Update.
+	* gl/Makefile.am, gl/m4/stdint.m4, gl/stdint_.h: Update.
 
 2006-06-26  Simon Josefsson <simon@josefsson.org>
 
@@ -4558,19 +4241,19 @@
 
 2006-06-26  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/gnutls-extra.pc.in, lib/gnutls.pc.in: Add Libs.Private
-	to pkg-config files, from Andreas Metzler
+	* lib/gnutls.pc.in, libextra/gnutls-extra.pc.in: Add Libs.Private to
+	pkg-config files, from Andreas Metzler
 	<ametzler@downhill.at.eu.org>.
 
 2006-06-22  Simon Josefsson <simon@josefsson.org>
 
-	* gl/getaddrinfo.c, gl/getaddrinfo.h, gl/socket_.h,
-	gl/m4/getaddrinfo.m4: Try new win32 hooks for getaddrinfo.
+	* gl/getaddrinfo.c, gl/getaddrinfo.h, gl/m4/getaddrinfo.m4,
+	gl/socket_.h: Try new win32 hooks for getaddrinfo.
 
 2006-06-22  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Use AC_LIBTOOL_WIN32_DLL to make OBJDUMP/DLLTOOL
-	work under mingw.  Fix use of deprecated AM_PROG_LIBTOOL.
+	work under mingw. Fix use of deprecated AM_PROG_LIBTOOL.
 
 2006-06-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -4582,9 +4265,9 @@
 
 2006-06-21  Simon Josefsson <simon@josefsson.org>
 
-	* gl/alloca_.h, gl/getaddrinfo.c, gl/inet_ntop.c, gl/read-file.c,
-	gl/socket_.h, gl/stdint_.h, gl/m4/getaddrinfo.m4,
-	gl/m4/sockpfaf.m4, gl/m4/stdint.m4: Update.
+	* gl/alloca_.h, gl/getaddrinfo.c, gl/inet_ntop.c,
+	gl/m4/getaddrinfo.m4, gl/m4/sockpfaf.m4, gl/m4/stdint.m4,
+	gl/read-file.c, gl/socket_.h, gl/stdint_.h: Update.
 
 2006-06-21  Simon Josefsson <simon@josefsson.org>
 
@@ -4596,8 +4279,8 @@
 
 2006-06-19  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/Makefile.am: Need -I$builddir/gl for alloca.h when
-	srcdir != objdir.
+	* libextra/Makefile.am: Need -I$builddir/gl for alloca.h when srcdir
+	!= objdir.
 
 2006-06-19  Simon Josefsson <simon@josefsson.org>
 
@@ -4606,8 +4289,8 @@
 
 2006-06-19  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/Makefile.am: Need -I$builddir/gl for alloca.h when
-	srcdir != objdir.
+	* lib/x509/Makefile.am: Need -I$builddir/gl for alloca.h when srcdir
+	!= objdir.
 
 2006-06-19  Simon Josefsson <simon@josefsson.org>
 
@@ -4626,10 +4309,15 @@
 2006-06-17  Simon Josefsson <simon@josefsson.org>
 
 	* gl/Makefile.am, gl/arpa_inet_.h, gl/inet_ntop.c, gl/inet_ntop.h,
-	gl/inet_pton.c, gl/inet_pton.h, gl/read-file.c, gl/size_max.h,
-	gl/stdint_.h, gl/m4/arpa_inet_h.m4, gl/m4/full-header-path.m4,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4,
-	gl/m4/inet_pton.m4, gl/m4/size_max.m4, gl/m4/stdint.m4: Update.
+	gl/inet_pton.c, gl/inet_pton.h, gl/m4/arpa_inet_h.m4,
+	gl/m4/full-header-path.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4,
+	gl/m4/size_max.m4, gl/m4/stdint.m4, gl/read-file.c, gl/size_max.h,
+	gl/stdint_.h: Update.
+
+2006-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/.cvsignore: [no log message]
 
 2006-06-17  Simon Josefsson <simon@josefsson.org>
 
@@ -4645,20 +4333,20 @@
 
 2006-06-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS: fixed bug
-
-2006-06-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
 	* lib/auth_cert.c: fixed bug
 
 2006-06-16  Simon Josefsson <simon@josefsson.org>
 
-	* tests/Makefile.am: Disable tests that use fork if the host
-	doesn't have fork.
+	* tests/Makefile.am: Disable tests that use fork if the host doesn't
+	have fork.
 
 2006-06-16  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Test for fork.
+
+2006-06-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Typo.
 
 2006-06-16  Simon Josefsson <simon@josefsson.org>
 
@@ -4745,11 +4433,10 @@
 
 2006-06-16  Simon Josefsson <simon@josefsson.org>
 
-	* configure.in: Set -mms-bitfields
-	-Wl,--enable-runtime-pseudo-reloc if supported.  The former is to
-	produce MSVS-compatible DLLs.  The second is needed to link
-	libgnutls-extra at all (only due to _gnutls_compression_algorithms,
-	fix it another way?).
+	* configure.in: Set -mms-bitfields -Wl,--enable-runtime-pseudo-reloc
+	if supported. The former is to produce MSVS-compatible DLLs. The
+	second is needed to link libgnutls-extra at all (only due to
+	_gnutls_compression_algorithms, fix it another way?).
 
 2006-06-16  Simon Josefsson <simon@josefsson.org>
 
@@ -4824,26 +4511,13 @@
 
 2006-06-12  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/gc-gnulib.c, gl/read-file.c, gl/read-file.h,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/read-file.m4:
-	Update.
+	* gl/Makefile.am, gl/gc-gnulib.c, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/read-file.m4, gl/read-file.c,
+	gl/read-file.h: Update.
 
 2006-06-10  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Bump so version.
-
-2006-06-10  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS, configure.in: Bump versions.
-
-2006-06-09  Simon Josefsson <simon@josefsson.org>
-
-	* gl/gc-gnulib.c, gl/getpass.c, gl/printf-args.c, gl/sha1.c,
-	gl/stdint_.h, gl/m4/stdbool.m4: Update.
-
-2006-06-09  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_db.c: Pull up from trunk.
 
 2006-06-08  Simon Josefsson <simon@josefsson.org>
 
@@ -4851,8 +4525,8 @@
 
 2006-06-07  Simon Josefsson <simon@josefsson.org>
 
-	* gl/getpass.c, gl/printf-args.c, gl/sha1.c, gl/stdint_.h,
-	gl/m4/stdbool.m4: Update.
+	* gl/getpass.c, gl/m4/stdbool.m4, gl/printf-args.c, gl/sha1.c,
+	gl/stdint_.h: Update.
 
 2006-06-07  Simon Josefsson <simon@josefsson.org>
 
@@ -4894,6 +4568,10 @@
 
 2006-05-15  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-05-15  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.4.0.
 
 2006-05-15  Simon Josefsson <simon@josefsson.org>
@@ -4906,7 +4584,7 @@
 
 2006-05-12  Simon Josefsson <simon@josefsson.org>
 
-	* src/tls_test.c, src/serv.c: Don't use AI_NUMERICSERV, it doesn't
+	* src/serv.c, src/tls_test.c: Don't use AI_NUMERICSERV, it doesn't
 	exist on most platforms.
 
 2006-05-12  Simon Josefsson <simon@josefsson.org>
@@ -4920,8 +4598,8 @@
 2006-05-12  Simon Josefsson <simon@josefsson.org>
 
 	* gl/Makefile.am, gl/gai_strerror.c, gl/getaddrinfo.c,
-	gl/getaddrinfo.h, gl/strdup.c, gl/strdup.h, gl/m4/getaddrinfo.m4,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/strdup.m4: Add
+	gl/getaddrinfo.h, gl/m4/getaddrinfo.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/strdup.m4, gl/strdup.c, gl/strdup.h: Add
 	getaddrinfo.
 
 2006-05-11  Simon Josefsson <simon@josefsson.org>
@@ -4954,29 +4632,20 @@
 
 2006-05-11  Simon Josefsson <simon@josefsson.org>
 
+	* .cvsignore: [no log message]
+
+2006-05-11  Simon Josefsson <simon@josefsson.org>
+
 	* config.rpath: Not needed, generated by autopoint.
 
 2006-05-11  Simon Josefsson <simon@josefsson.org>
 
-	* config.rpath, gl/Makefile.am, gl/des.c, gl/md4.c, gl/sha1.c,
-	gl/stdint_.h, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Update.
+	* config.rpath, gl/Makefile.am, gl/des.c, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/md4.c, gl/sha1.c, gl/stdint_.h: Update.
 
 2006-05-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_cert.c: updated to reflect the new openpgp draft.
-
-2006-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Typo.
-
-2006-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Version 1.2.11.
-
-2006-05-11  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/errors.c, lib/minitasn1/libtasn1.h,
-	lib/minitasn1/parser_aux.c, lib/minitasn1/structure.c: Update.
 
 2006-05-11  Simon Josefsson <simon@josefsson.org>
 
@@ -4985,19 +4654,7 @@
 
 2006-05-10  Simon Josefsson <simon@josefsson.org>
 
-	* doc/protocol/draft-santesson-tls-ume-07.txt: Add.
-
-2006-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump libtasn1 version.
-
-2006-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Fix.
-
-2006-05-10  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
+	* NEWS, doc/protocol/draft-santesson-tls-ume-07.txt: Add.
 
 2006-05-10  Simon Josefsson <simon@josefsson.org>
 
@@ -5010,45 +4667,6 @@
 	lib/minitasn1/gstr.c, lib/minitasn1/libtasn1.h,
 	lib/minitasn1/parser_aux.c, lib/minitasn1/parser_aux.h,
 	lib/minitasn1/structure.c: Update to 0.3.4.
-
-2006-05-09  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Update.
-
-2006-05-09  Simon Josefsson <simon@josefsson.org>
-
-	* gl/Makefile.am, gl/m4/gc-random.m4, gl/m4/gnulib-cache.m4,
-	gl/m4/gnulib-comp.m4: Update.
-
-2006-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* gl/Makefile.am, gl/gc-gnulib.c, gl/gc-libgcrypt.c,
-	gl/inet_ntop.h, gl/md5.c, gl/md5.h, gl/readline.c, gl/sha1.c,
-	gl/sha1.h, gl/stdbool_.h, gl/stdint_.h, gl/vasnprintf.c,
-	gl/m4/gc.m4, gl/m4/getpass.m4, gl/m4/gnulib-comp.m4,
-	gl/m4/longdouble.m4, gl/m4/readline.m4, gl/m4/socklen.m4,
-	gl/m4/stdbool.m4, gl/m4/stdint.m4, gl/dummy.c, gl/socket_.h,
-	gl/m4/sys_socket_h.m4: Update.
-
-2006-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Bump.
-
-2006-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump required libtasn1 to 0.3.3.
-
-2006-05-07  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
-	lib/minitasn1/element.c, lib/minitasn1/errors.c,
-	lib/minitasn1/gstr.c, lib/minitasn1/libtasn1.h,
-	lib/minitasn1/parser_aux.c, lib/minitasn1/parser_aux.h,
-	lib/minitasn1/structure.c: Update libtasn1 to 0.3.3.
 
 2006-05-07  Simon Josefsson <simon@josefsson.org>
 
@@ -5087,8 +4705,8 @@
 2006-05-05  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/extra.h, includes/gnutls/gnutls.h.in,
-	lib/ext_inner_application.c, lib/gnutls_int.h,
-	libextra/gnutls_ia.c: TLS/IA fixes from Emile.
+	lib/ext_inner_application.c, lib/gnutls_int.h, libextra/gnutls_ia.c: 
+	TLS/IA fixes from Emile.
 
 2006-04-27  Simon Josefsson <simon@josefsson.org>
 
@@ -5113,8 +4731,7 @@
 
 2006-04-19  Simon Josefsson <simon@josefsson.org>
 
-	* tests/Makefile.am:
-	(LDADD): Add libgnutls after libgnu, for libgcrypt transitive
+	* tests/Makefile.am: (LDADD): Add libgnutls after libgnu, for libgcrypt transitive
 	reference, tiny patch from Nix <nix@esperi.org.uk>.
 
 2006-04-19  Simon Josefsson <simon@josefsson.org>
@@ -5123,8 +4740,8 @@
 
 2006-04-17  Simon Josefsson <simon@josefsson.org>
 
-	* doc/protocol/draft-santesson-tls-ume-05.txt,
-	doc/protocol/draft-housley-tls-authz-extns-03.txt: Add.
+	* doc/protocol/draft-housley-tls-authz-extns-03.txt,
+	doc/protocol/draft-santesson-tls-ume-05.txt: Add.
 
 2006-04-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -5134,13 +4751,13 @@
 
 2006-04-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* includes/gnutls/gnutls.h.in, lib/gnutls_srp.c:
+	* includes/gnutls/gnutls.h.in, lib/gnutls_srp.c: 
 	gnutls_srp_set_client_credentials() uses const
 
 2006-04-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* lib/gnutls_priority.c: documented the return value in the
-	priority functions
+	* lib/gnutls_priority.c: documented the return value in the priority
+	functions
 
 2006-04-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -5149,14 +4766,14 @@
 
 2006-04-04  Simon Josefsson <simon@josefsson.org>
 
-	* gl/stdint_.h, gl/m4/gc-random.m4: Update.
+	* gl/m4/gc-random.m4, gl/stdint_.h: Update.
 
 2006-04-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/x509/common.c, lib/x509/common.h, lib/x509/crl.c,
 	lib/x509/crq.c, lib/x509/dn.c, lib/x509/extensions.c,
-	lib/x509/pkcs12.c, lib/x509/pkcs7.c, lib/x509/x509.c: use
-	snprintf() instead of multiple calls to str_cpy() and str_cat().
+	lib/x509/pkcs12.c, lib/x509/pkcs7.c, lib/x509/x509.c: use snprintf()
+	instead of multiple calls to str_cpy() and str_cat().
 
 2006-03-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -5195,12 +4812,8 @@
 
 2006-03-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* lib/gnutls_x509.c: some fixes for compilation
-
-2006-03-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
-	* lib/gnutls_global.h, lib/x509/rfc2818_hostname.c,
-	lib/gnutls_cert.c: some fixes for compilation
+	* lib/gnutls_cert.c, lib/gnutls_global.h, lib/gnutls_x509.c,
+	lib/x509/rfc2818_hostname.c: some fixes for compilation
 
 2006-03-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -5226,61 +4839,6 @@
 2006-03-15  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_cert.c: Move from x509/compat.c.
-
-2006-03-15  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Update.
-
-2006-03-15  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/x509_write.c: Fix libtasn1 internnals, from trunk.
-
-2006-03-15  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/common.c, lib/x509/sign.c: Fix use of libtasn1
-	internals, from trunk.
-
-2006-03-15  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Fix.
-
-2006-03-15  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/xml.c: Disable XML functionality, from trunk.
-
-2006-03-13  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-03-13  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-03-13  Simon Josefsson <simon@josefsson.org>
-
-	* lib/x509/compat.c: Return -1 on errors, suggested by Nikos.
-
-2006-03-13  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2006-03-13  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump versions.
-
-2006-03-13  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
-	lib/minitasn1/element.c, lib/minitasn1/errors.h,
-	lib/minitasn1/gstr.c, lib/minitasn1/gstr.h, lib/minitasn1/int.h,
-	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
-	lib/minitasn1/parser_aux.h, lib/minitasn1/structure.c,
-	lib/minitasn1/structure.h: Update.
-
-2006-03-13  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/Makefile.am, lib/minitasn1/der.h,
-	lib/minitasn1/errors_int.h: Remove.
 
 2006-03-12  Simon Josefsson <simon@josefsson.org>
 
@@ -5312,7 +4870,19 @@
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.3.5.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2006-03-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
@@ -5344,8 +4914,8 @@
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/common.c, lib/x509/sign.c, lib/x509/x509_write.c: Use
-	new asn1_copy_node API.
+	* lib/x509/common.c, lib/x509/sign.c, lib/x509/x509_write.c: Use new
+	asn1_copy_node API.
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
@@ -5436,14 +5006,14 @@
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
-	* src/cli.c, src/common.c, src/common.h, src/serv.c,
-	tests/resume.c, lib/x509/crq.c, lib/x509/xml.c: Indent.
+	* lib/x509/crq.c, lib/x509/xml.c, src/cli.c, src/common.c,
+	src/common.h, src/serv.c, tests/resume.c: Indent.
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
-	* maint.mk, gl/Makefile.am, gl/gc-gnulib.c, gl/gc-libgcrypt.c,
+	* gl/Makefile.am, gl/gc-gnulib.c, gl/gc-libgcrypt.c,
 	gl/m4/gc-random.m4, gl/m4/gc.m4, gl/m4/gnulib-cache.m4,
-	gl/m4/gnulib-comp.m4, gl/m4/readline.m4: Update.
+	gl/m4/gnulib-comp.m4, gl/m4/readline.m4, maint.mk: Update.
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
@@ -5451,7 +5021,7 @@
 
 2006-03-08  Simon Josefsson <simon@josefsson.org>
 
-	* doc/protocol/draft-funk-tls-inner-application-extension-02.txt:
+	* doc/protocol/draft-funk-tls-inner-application-extension-02.txt: 
 	Add.
 
 2006-03-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
@@ -5459,6 +5029,10 @@
 	* src/cli-gaa.c, src/cli-gaa.h, src/cli.c, src/cli.gaa,
 	src/common.c, src/common.h: gnutls-cli can now recognize services
 	and port numbers with the -p option.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* .cvscopying: Fix.
 
 2006-03-03  Simon Josefsson <simon@josefsson.org>
 
@@ -5472,6 +5046,10 @@
 
 	* lib/gnutls_errors.c, lib/gnutls_global.c: Error message
 	translations.
+
+2006-03-03  Simon Josefsson <simon@josefsson.org>
+
+	* .cvsignore, m4/.cvsignore, po/.cvsignore: [no log message]
 
 2006-03-03  Simon Josefsson <simon@josefsson.org>
 
@@ -5495,13 +5073,13 @@
 
 2006-03-03  Simon Josefsson <simon@josefsson.org>
 
-	* maint.mk, gl/Makefile.am, gl/gettext.h, gl/m4/codeset.m4,
-	gl/m4/gettext.m4, gl/m4/glibc2.m4, gl/m4/glibc21.m4,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/iconv.m4,
-	gl/m4/intdiv0.m4, gl/m4/intmax.m4, gl/m4/inttypes-pri.m4,
-	gl/m4/isc-posix.m4, gl/m4/lcmessage.m4, gl/m4/nls.m4, gl/m4/po.m4,
+	* gl/Makefile.am, gl/gettext.h, gl/m4/codeset.m4, gl/m4/gettext.m4,
+	gl/m4/glibc2.m4, gl/m4/glibc21.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/iconv.m4, gl/m4/intdiv0.m4,
+	gl/m4/intmax.m4, gl/m4/inttypes-pri.m4, gl/m4/isc-posix.m4,
+	gl/m4/lcmessage.m4, gl/m4/nls.m4, gl/m4/po.m4,
 	gl/m4/printf-posix.m4, gl/m4/progtest.m4, gl/m4/readline.m4,
-	gl/m4/uintmax_t.m4, gl/m4/ulonglong.m4: Update.
+	gl/m4/uintmax_t.m4, gl/m4/ulonglong.m4, maint.mk: Update.
 
 2006-03-03  Simon Josefsson <simon@josefsson.org>
 
@@ -5509,7 +5087,7 @@
 
 2006-03-03  Simon Josefsson <simon@josefsson.org>
 
-	* Makefile.am, configure.in, po/Makevars, po/POTFILES.in:
+	* Makefile.am, configure.in, po/Makevars, po/POTFILES.in: 
 	Gettextize.
 
 2006-03-01  Simon Josefsson <simon@josefsson.org>
@@ -5518,12 +5096,12 @@
 
 2006-03-01  Simon Josefsson <simon@josefsson.org>
 
-	* gl/readline.c, gl/m4/readline.m4, gl/m4/socklen.m4,
-	gl/m4/sys_socket_h.m4, maint.mk: Update.
+	* gl/m4/readline.m4, gl/m4/socklen.m4, gl/m4/sys_socket_h.m4,
+	gl/readline.c, maint.mk: Update.
 
 2006-03-01  Simon Josefsson <simon@josefsson.org>
 
-	* maint-cfg.mk, buildconf: Don't gtkdocize.
+	* buildconf, maint-cfg.mk: Don't gtkdocize.
 
 2006-02-28  Simon Josefsson <simon@josefsson.org>
 
@@ -5567,12 +5145,16 @@
 
 2006-02-14  Simon Josefsson <simon@josefsson.org>
 
+	* maint-cfg.mk: Fix.
+
+2006-02-14  Simon Josefsson <simon@josefsson.org>
+
 	* maint-cfg.mk: Add mingw32 target.
 
 2006-02-14  Simon Josefsson <simon@josefsson.org>
 
-	* GNUmakefile, maint-cfg.mk, maint.mk, gl/Makefile.am,
-	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Add
+	* GNUmakefile, gl/Makefile.am, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, maint-cfg.mk, maint.mk: Add
 	maintainer-makefile module.
 
 2006-02-11  Simon Josefsson <simon@josefsson.org>
@@ -5590,15 +5172,6 @@
 
 	* configure.in: Bump libtasn1 version.
 
-2006-02-11  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
-	lib/minitasn1/der.h, lib/minitasn1/element.c,
-	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
-	lib/minitasn1/structure.c, lib/x509/xml.c: Minimal set of patches
-	against gnutls 1.2.9 that fix the security bug (only the *.c
-	changes!).
-
 2006-02-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, configure.in: Bump versions.
@@ -5609,22 +5182,19 @@
 
 2006-02-09  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-02-09  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.3.4.
 
 2006-02-09  Simon Josefsson <simon@josefsson.org>
 
-	* THANKS, NEWS: Add.
+	* NEWS: Add.
 
 2006-02-09  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Version 1.2.10.
-
-2006-02-09  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
-	lib/minitasn1/element.c, lib/minitasn1/errors.c,
-	lib/minitasn1/gstr.c, lib/minitasn1/parser_aux.c,
-	lib/minitasn1/structure.c: Sync with libtasn1.
+	* NEWS, THANKS: Add.
 
 2006-02-09  Simon Josefsson <simon@josefsson.org>
 
@@ -5642,10 +5212,6 @@
 2006-02-09  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-housley-tls-authz-extns-00.txt: Add.
-
-2006-02-09  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/decoding.c: Further length fixes.
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
@@ -5665,22 +5231,12 @@
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/minitasn1/decoding.c: Further length fixes.
-
-2006-02-08  Simon Josefsson <simon@josefsson.org>
-
 	* tests/certder.c: Add.
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/minitasn1/decoding.c: More asn1 length out of bounds
-	checking.
+	* lib/minitasn1/decoding.c: More asn1 length out of bounds checking.
 
-2006-02-08  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
-	lib/minitasn1/element.c, lib/minitasn1/structure.c: Update
-	_asn1_get_length_der fix.
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
@@ -5692,19 +5248,20 @@
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/minitasn1/structure.c: Fix asn1_get_length_der usage.
-
-2006-02-08  Simon Josefsson <simon@josefsson.org>
-
 	* lib/minitasn1/element.c: Fix copyright.
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/minitasn1/element.c: Fix asn1_get_length_der usage.
+	* lib/minitasn1/element.c, lib/minitasn1/structure.c: Fix
+	asn1_get_length_der usage.
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
 	* lib/minitasn1/decoding.c: Revert.
+
+2006-02-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/.cvsignore: [no log message]
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
@@ -5720,24 +5277,7 @@
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/xml.c: Backport xml.c fixes by Nikos.
-
-2006-02-08  Simon Josefsson <simon@josefsson.org>
-
 	* NEWS: Add.
-
-2006-02-08  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump libtasn1 requred version.
-
-2006-02-08  Simon Josefsson <simon@josefsson.org>
-
-	* lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
-	lib/minitasn1/der.h, lib/minitasn1/element.c,
-	lib/minitasn1/errors.c, lib/minitasn1/libtasn1.h,
-	lib/minitasn1/parser_aux.c, lib/minitasn1/structure.c: Add libtasn1
-	fixes from Nikos, prompted by report from "Evgeny Legerov"
-	<admin@gleg.net>.
 
 2006-02-08  Simon Josefsson <simon@josefsson.org>
 
@@ -5773,29 +5313,9 @@
 
 2006-02-02  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/opencdk/main.h, libextra/opencdk/packet.h: Fix
-	prototypes for AIX compiler, reported by "Heiden, John"
+	* libextra/opencdk/main.h, libextra/opencdk/packet.h: Fix prototypes
+	for AIX compiler, reported by "Heiden, John"
 	<JHeiden@UTNet.UToledo.Edu>.
-
-2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
-	* NEWS: [no log message]
-
-2006-02-01  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_x509.c: Typo fix, for gdoc.
-
-2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
-	* NEWS, lib/gnutls_record.c: backported gnutls_bye() fix
-
-2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
-	* lib/gnutls_x509.c: Corrected bugs in
-	gnutls_certificate_set_x509_crl() and
-	gnutls_certificate_set_x509_trust(), that caused memory corruption
-	if more than one certificates were added. Report and patch by Max
-	Kellermann <max@duempel.org>.
 
 2006-02-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -5828,8 +5348,13 @@
 
 2006-01-27  Simon Josefsson <simon@josefsson.org>
 
-	* gl/inet_ntop.h, gl/socket_.h, gl/stdbool_.h, gl/vasnprintf.c,
-	gl/m4/gnulib-tool.m4, gl/m4/socklen.m4, gl/m4/stdbool.m4: Update.
+	* gl/.cvsignore: [no log message]
+
+2006-01-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/inet_ntop.h, gl/m4/gnulib-tool.m4, gl/m4/socklen.m4,
+	gl/m4/stdbool.m4, gl/socket_.h, gl/stdbool_.h, gl/vasnprintf.c: 
+	Update.
 
 2006-01-27  Simon Josefsson <simon@josefsson.org>
 
@@ -5854,8 +5379,8 @@
 
 2006-01-19  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/md5.c, gl/md5.h, gl/sha1.c, gl/sha1.h,
-	gl/socket_.h, gl/m4/gnulib-comp.m4, gl/m4/sys_socket_h.m4: Update.
+	* gl/Makefile.am, gl/m4/gnulib-comp.m4, gl/m4/sys_socket_h.m4,
+	gl/md5.c, gl/md5.h, gl/sha1.c, gl/sha1.h, gl/socket_.h: Update.
 
 2006-01-18  Simon Josefsson <simon@josefsson.org>
 
@@ -5879,7 +5404,15 @@
 
 2006-01-12  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2006-01-12  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.3.3.
+
+2006-01-12  Simon Josefsson <simon@josefsson.org>
+
+	* .cvscopying: Fix copyright years.
 
 2006-01-12  Simon Josefsson <simon@josefsson.org>
 
@@ -5887,13 +5420,13 @@
 
 2006-01-11  Simon Josefsson <simon@josefsson.org>
 
-	* gl/Makefile.am, gl/sha1.c, gl/stdint_.h, gl/m4/gnulib-comp.m4,
-	gl/m4/readline.m4, gl/dummy.c: Update.
+	* gl/Makefile.am, gl/dummy.c, gl/m4/gnulib-comp.m4,
+	gl/m4/readline.m4, gl/sha1.c, gl/stdint_.h: Update.
 
 2006-01-09  Simon Josefsson <simon@josefsson.org>
 
-	* gl/stdint_.h, gl/m4/gnulib-comp.m4, gl/m4/gnulib-tool.m4,
-	gl/m4/socklen.m4, gl/m4/stdint.m4: Update.
+	* gl/m4/gnulib-comp.m4, gl/m4/gnulib-tool.m4, gl/m4/socklen.m4,
+	gl/m4/stdint.m4, gl/stdint_.h: Update.
 
 2006-01-09  Simon Josefsson <simon@josefsson.org>
 
@@ -5972,6 +5505,10 @@
 
 2005-12-17  Simon Josefsson <simon@josefsson.org>
 
+	* tests/.cvsignore: [no log message]
+
+2005-12-17  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Add.
 
 2005-12-17  Simon Josefsson <simon@josefsson.org>
@@ -6000,7 +5537,7 @@
 
 2005-12-16  Simon Josefsson <simon@josefsson.org>
 
-	* includes/gnutls/gnutls.h.in, NEWS: Add.
+	* NEWS, includes/gnutls/gnutls.h.in: Add.
 
 2005-12-16  Simon Josefsson <simon@josefsson.org>
 
@@ -6037,7 +5574,7 @@
 	lib/gnutls_pk.h, lib/gnutls_psk.c, lib/gnutls_record.c,
 	lib/gnutls_session.c, lib/gnutls_session_pack.c,
 	lib/gnutls_state.c, lib/gnutls_ui.c, lib/gnutls_x509.c,
-	lib/x509_b64.c, lib/x509/mpi.h, libextra/gnutls_ia.c,
+	lib/x509/mpi.h, lib/x509_b64.c, libextra/gnutls_ia.c,
 	libextra/openpgp/gnutls_openpgp.h, src/common.c, src/serv.c,
 	tests/dhepskself.c, tests/tlsia.c: Indent more.
 
@@ -6048,6 +5585,10 @@
 2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am: Remove igloo, it seem weird.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
 
 2005-12-15  Simon Josefsson <simon@josefsson.org>
 
@@ -6085,58 +5626,33 @@
 
 2005-12-15  Simon Josefsson <simon@josefsson.org>
 
+	* NEWS: Fix.
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
 	* doc/reference/Makefile.am: Ignore more.
 
 2005-12-15  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS, doc/Makefile.am, doc/gnutls.texi,
-	doc/examples/ex-client-tlsia.c, doc/manpages/Makefile.am,
-	includes/gnutls/extra.h, includes/gnutls/gnutls.h.in,
-	lib/Makefile.am, lib/debug.c, lib/defines.h,
-	lib/ext_inner_application.c, lib/ext_inner_application.h,
-	lib/gnutls_alert.c, lib/gnutls_buffers.c, lib/gnutls_constate.c,
-	lib/gnutls_errors.c, lib/gnutls_extensions.c, lib/gnutls_int.h,
-	lib/gnutls_kx.c, lib/gnutls_record.c, lib/gnutls_state.c,
-	libextra/Makefile.am, libextra/gnutls_ia.c, tests/Makefile.am,
-	tests/tlsia.c: Add TLS/IA support.
+	* doc/.cvsignore, libextra/.cvsignore, tests/.cvsignore: [no log
+	message]
+
+2005-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/Makefile.am, doc/examples/ex-client-tlsia.c,
+	doc/gnutls.texi, doc/manpages/Makefile.am, includes/gnutls/extra.h,
+	includes/gnutls/gnutls.h.in, lib/Makefile.am, lib/debug.c,
+	lib/defines.h, lib/ext_inner_application.c,
+	lib/ext_inner_application.h, lib/gnutls_alert.c,
+	lib/gnutls_buffers.c, lib/gnutls_constate.c, lib/gnutls_errors.c,
+	lib/gnutls_extensions.c, lib/gnutls_int.h, lib/gnutls_kx.c,
+	lib/gnutls_record.c, lib/gnutls_state.c, libextra/Makefile.am,
+	libextra/gnutls_ia.c, tests/Makefile.am, tests/tlsia.c: Add TLS/IA
+	support.
 
 2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* gl/m4/gnulib-comp.m4: Update.
-
-2005-12-14  Simon Josefsson <simon@josefsson.org>
-
-	* Makefile.am: Simplify release target.
-
-2005-12-14  Simon Josefsson <simon@josefsson.org>
-
-	* doc/manpages/Makefile.am: Update.
-
-2005-12-12  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Doc fix.
-
-2005-12-12  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Fix.
-
-2005-12-12  Simon Josefsson <simon@josefsson.org>
-
-	* doc/examples/ex-client-tlsia.c, includes/gnutls/extra.h,
-	lib/ext_inner_application.c, lib/gnutls_int.h,
-	libextra/gnutls_ia.c: Simplify TLS/IA mode API.
-
-2005-12-12  Simon Josefsson <simon@josefsson.org>
-
-	* tests/tlsia.c, doc/gnutls.texi: Use new API.
-
-2005-12-12  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Doc fix.
-
-2005-12-12  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Reorder.
 
 2005-12-12  Simon Josefsson <simon@josefsson.org>
 
@@ -6162,9 +5678,9 @@
 	lib/gnutls_buffers.c, lib/gnutls_cert.c, lib/gnutls_dh.h,
 	lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_pk.c,
 	lib/gnutls_pk.h, lib/gnutls_state.c, lib/gnutls_state.h,
-	lib/gnutls_ui.c, lib/gnutls_x509.c, lib/x509_b64.c,
-	lib/x509/common.c, lib/x509/dn.c, lib/x509/extensions.c,
-	lib/x509/pkcs7.c, lib/x509/privkey_pkcs8.c: Replace "uint" with
+	lib/gnutls_ui.c, lib/gnutls_x509.c, lib/x509/common.c,
+	lib/x509/dn.c, lib/x509/extensions.c, lib/x509/pkcs7.c,
+	lib/x509/privkey_pkcs8.c, lib/x509_b64.c: Replace "uint" with
 	"unsigned".  Remove unused "sint".
 
 2005-12-09  Simon Josefsson <simon@josefsson.org>
@@ -6203,8 +5719,8 @@
 	lib/gnutls_datum.c, lib/gnutls_db.c, lib/gnutls_db.h,
 	lib/gnutls_handshake.c, lib/gnutls_handshake.h, lib/gnutls_int.h,
 	lib/gnutls_kx.c, lib/gnutls_num.c, lib/gnutls_record.c,
-	lib/x509_b64.c, lib/x509_b64.h, lib/x509/extensions.c,
-	lib/x509/pkcs12.c, lib/x509/pkcs7.c, lib/x509/x509.c,
+	lib/x509/extensions.c, lib/x509/pkcs12.c, lib/x509/pkcs7.c,
+	lib/x509/x509.c, lib/x509_b64.c, lib/x509_b64.h,
 	libextra/gnutls_openpgp.c, libextra/openpgp/gnutls_openpgp.h,
 	libextra/openpgp/xml.c: Replace uint8 with uint8_t.
 
@@ -6214,8 +5730,8 @@
 
 2005-12-09  Simon Josefsson <simon@josefsson.org>
 
-	* lib/defines.h: Remove unused types, to start the transition to
-	the POSIX integer types (uint32_t, uint16_t, uint8_t).
+	* lib/defines.h: Remove unused types, to start the transition to the
+	POSIX integer types (uint32_t, uint16_t, uint8_t).
 
 2005-12-09  Simon Josefsson <simon@josefsson.org>
 
@@ -6229,11 +5745,15 @@
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/pkcs12.c: Fix mem leaks.  Remove unused variable.
+	* lib/x509/pkcs12.c: Fix mem leaks. Remove unused variable.
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_x509.c: Fix mem leak.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: [no log message]
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
@@ -6246,6 +5766,10 @@
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/Makefile.am: Dist pkcs8 blobs.
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
@@ -6273,7 +5797,7 @@
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
-	* tests/pkcs8, tests/enc2pkcs8.pem: Add rc2 pkcs#8 blob.
+	* tests/enc2pkcs8.pem, tests/pkcs8: Add rc2 pkcs#8 blob.
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
@@ -6305,8 +5829,7 @@
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
-	* lib/x509/privkey_pkcs8.c:
-	(gnutls_x509_privkey_import_pkcs8): Handle unencrypted PEM keys.
+	* lib/x509/privkey_pkcs8.c: (gnutls_x509_privkey_import_pkcs8): Handle unencrypted PEM keys.
 	Remove unused "encrypted" variable.
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
@@ -6320,6 +5843,10 @@
 
 2005-12-08  Simon Josefsson <simon@josefsson.org>
 
+	* tests/.cvsignore: [no log message]
+
+2005-12-08  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS, doc/TODO, includes/gnutls/gnutls.h.in, lib/gnutls_x509.c,
 	tests/Makefile.am, tests/set_pkcs12_cred.c: Support reading X.509
 	credentials from PKCS#12 files.
@@ -6330,44 +5857,12 @@
 
 2005-12-06  Simon Josefsson <simon@josefsson.org>
 
-	* doc/examples/Makefile.am: Add ex-client-tlsia.
-
-2005-12-06  Simon Josefsson <simon@josefsson.org>
-
-	* doc/examples/ex-client-tlsia.c: Add.
-
-2005-12-06  Simon Josefsson <simon@josefsson.org>
-
 	* doc/protocol/rfc4279.txt: Add.
 
 2005-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_session_pack.c: Corrected bugs in session resumption.
 	Bugs reported by Yoann Vandoorselare.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix handshake_p.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Use proper resume detection.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Separate verify from receiving.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* tests/tlsia.c: Fix warning.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix warnings.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Fix API.
 
 2005-12-02  Simon Josefsson <simon@josefsson.org>
 
@@ -6399,36 +5894,7 @@
 
 2005-12-02  Simon Josefsson <simon@josefsson.org>
 
-	* tests/tlsia.c: More informative messages.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* tests/Makefile.am: Need gnulib -I's.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* tests/tlsia.c: Need readline.h.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* tests/tlsia.c: Don't be interactive, by default (use -d to enable
-	it).
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* tests/tlsia.c: Debug more.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Bug fixes.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Really fix nasty bug.
-
-2005-12-02  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix nasty bug.
+	* doc/TODO: Add.
 
 2005-12-02  Simon Josefsson <simon@josefsson.org>
 
@@ -6440,46 +5906,7 @@
 
 2005-12-01  Simon Josefsson <simon@josefsson.org>
 
-	* gl/readline.c, gl/stdint_.h, gl/m4/socklen.m4: Update.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Remove.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump version.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* NEWS: Add.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* src/cli.c: Check starttls_alarmed earlier, the signal might be
-	sent before select is called.  Report by Otto Maddox
-	<ottomaddox@fastmail.fm> and influenced by tiny patch from Nozomu
-	Ando <nand@mac.com>.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Update.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Simplify API.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Fix.
+	* gl/m4/socklen.m4, gl/readline.c, gl/stdint_.h: Update.
 
 2005-12-01  Simon Josefsson <simon@josefsson.org>
 
@@ -6487,10 +5914,6 @@
 
 2005-12-01  Simon Josefsson <simon@josefsson.org>
 
-	* doc/manpages/Makefile.am: Update.
-
-2005-12-01  Simon Josefsson <simon@josefsson.org>
-
 	* NEWS: Add.
 
 2005-12-01  Simon Josefsson <simon@josefsson.org>
@@ -6502,106 +5925,13 @@
 
 2005-12-01  Simon Josefsson <simon@josefsson.org>
 
-	* libextra/gnutls_ia.c: Small fix, from Emile.
-
-2005-11-30  Simon Josefsson <simon@josefsson.org>
-
-	* configure.in: Bump versions.
+	* tests/.cvsignore: [no log message]
 
 2005-11-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* lib/gnutls_session.c, lib/gnutls_session_pack.c,
-	includes/gnutls/gnutls.h.in: Some fixes in session resumption and
+	* includes/gnutls/gnutls.h.in, lib/gnutls_session.c,
+	lib/gnutls_session_pack.c: Some fixes in session resumption and
 	prototypes. Based on patches and suggestions by Joe Orton.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c, tests/tlsia.c: Fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h, libextra/gnutls_ia.c: Add.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c, includes/gnutls/extra.h: Add.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Remove bad docs.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* tests/tlsia.c: Fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix exit codes.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_errors.c: Add.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/gnutls.h.in: Add.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* tests/tlsia.c: Permute inner secret too.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Doc fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Add.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Add.  Fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Doc fix.  API Fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Fix API.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* lib/gnutls_kx.c: Set TLS/IA secret.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Doc fix.  Support re-send/recv, in case of
-	EINTR/EAGAIN.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Remove session_key from recv/send.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Remove.
-
-2005-11-21  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Use sizeof instead of strlen.
 
 2005-11-21  Simon Josefsson <simon@josefsson.org>
 
@@ -6629,71 +5959,19 @@
 
 2005-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* configure.in: the library version number was bumped to 13 to
-	allow for incompatible changes.
+	* configure.in: the library version number was bumped to 13 to allow
+	for incompatible changes.
 
 2005-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* lib/auth_anon.c, lib/auth_anon.h, lib/auth_dh_common.c,
-	lib/auth_dh_common.h, lib/auth_dhe.c, lib/auth_dhe_psk.c,
-	lib/auth_psk.c, lib/auth_psk.h, lib/gnutls_kx.c, lib/gnutls_psk.c,
-	lib/gnutls_session_pack.c, lib/gnutls_state.c, lib/gnutls_ui.c,
-	src/Makefile.am, src/cli-gaa.c, src/cli.c, src/cli.gaa,
-	src/common.c, src/gnutls-http-serv, src/params.pem, src/serv.c:
-	Completed the DHE-PSK ciphersuite additions.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Fix.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Indent.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Use new low-level API for client.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Server now uses low level API.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fixes.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/gnutls.h.in: Add TLS/IA errors.
-
-2005-11-16  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Don't use large packet on the stack in recv
-	function.
-
-2005-11-15  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Fix.
-
-2005-11-15  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Add TLS/IA low level API.
-
-2005-11-15  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Fix prototypes.
-
-2005-11-15  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Reorganize.
-
-2005-11-15  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Add low-level API.
+	* ChangeLog, lib/auth_anon.c, lib/auth_anon.h,
+	lib/auth_dh_common.c, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/auth_dhe_psk.c, lib/auth_psk.c, lib/auth_psk.h,
+	lib/gnutls_kx.c, lib/gnutls_psk.c, lib/gnutls_session_pack.c,
+	lib/gnutls_state.c, lib/gnutls_ui.c, src/Makefile.am,
+	src/cli-gaa.c, src/cli.c, src/cli.gaa, src/common.c,
+	src/gnutls-http-serv, src/params.pem, src/serv.c: Completed the
+	DHE-PSK ciphersuite additions.
 
 2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -6701,7 +5979,7 @@
 
 2005-11-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* lib/gnutls_anon_cred.c, lib/gnutls_psk.c:
+	* lib/gnutls_anon_cred.c, lib/gnutls_psk.c: 
 	gnutls_anon_set_params_function was renamed to
 	gnutls_anon_set_server_params_function to be more consistent with
 	the other functions. The same for the PSK.
@@ -6742,6 +6020,10 @@
 
 2005-11-15  Simon Josefsson <simon@josefsson.org>
 
+	* ChangeLog: [no log message]
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 1.3.0.
 
 2005-11-15  Simon Josefsson <simon@josefsson.org>
@@ -6752,6 +6034,13 @@
 
 	* Makefile.am: Use sha1sum instead of md5sum for igloo.linux.gr
 	CHECKSUMS.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog.1: Add, generated using cvs2cl --utc --fsf --FSF
+	--usermap .cvsusers -I ChangeLog -I .cvs --window 120 -l
+	"-d""<2005-11-08""", and manually adjusting the start and end of the
+	file.
 
 2005-11-15  Simon Josefsson <simon@josefsson.org>
 
@@ -6777,8 +6066,8 @@
 
 2005-11-15  Simon Josefsson <simon@josefsson.org>
 
-	* doc/manpages/Makefile.am: Add license.  Fix parser error.  Dist
-	and install SRP man pages too.
+	* doc/manpages/Makefile.am: Add license. Fix parser error. Dist and
+	install SRP man pages too.
 
 2005-11-15  Simon Josefsson <simon@josefsson.org>
 
@@ -6803,6 +6092,10 @@
 2005-11-15  Simon Josefsson <simon@josefsson.org>
 
 	* doc/manpages/Makefile.am: Generated.
+
+2005-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/.cvsignore: [no log message]
 
 2005-11-15  Simon Josefsson <simon@josefsson.org>
 
@@ -6846,17 +6139,17 @@
 
 2005-11-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS, doc/gnutls.texi, lib/gnutls_algorithms.c: removed the
-	RIPEMD ciphersuites.
+	* NEWS, doc/gnutls.texi, lib/gnutls_algorithms.c: removed the RIPEMD
+	ciphersuites.
 
 2005-11-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* doc/internals.texi, doc/arch/extensions_st.dia,
-	doc/arch/extensions_st.eps, doc/arch/extensions_st.pdf,
-	doc/arch/extensions_st.png, doc/arch/mod_auth_st.dia,
-	doc/arch/mod_auth_st.eps, doc/arch/mod_auth_st.pdf,
-	doc/arch/mod_auth_st.png: added brief documentation on the
-	extension and auth_method internals.
+	* doc/arch/extensions_st.dia, doc/arch/extensions_st.eps,
+	doc/arch/extensions_st.pdf, doc/arch/extensions_st.png,
+	doc/arch/mod_auth_st.dia, doc/arch/mod_auth_st.eps,
+	doc/arch/mod_auth_st.pdf, doc/arch/mod_auth_st.png,
+	doc/internals.texi: added brief documentation on the extension and
+	auth_method internals.
 
 2005-11-12  Simon Josefsson <simon@josefsson.org>
 
@@ -6869,12 +6162,7 @@
 
 2005-11-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* doc/certificate-user-use-case.pdf,
-	doc/certificate-user-use-case.png, doc/client-server-use-case.pdf,
-	doc/client-server-use-case.png, doc/handshake-sequence.pdf,
-	doc/handshake-sequence.png, doc/handshake-state.pdf,
-	doc/handshake-state.png, doc/internals.texi, doc/objects.pdf,
-	doc/objects.png, doc/arch/certificate-user-use-case.eps,
+	* doc/arch/certificate-user-use-case.eps,
 	doc/arch/certificate-user-use-case.pdf,
 	doc/arch/certificate-user-use-case.png,
 	doc/arch/client-server-use-case.eps,
@@ -6883,25 +6171,22 @@
 	doc/arch/handshake-sequence.eps, doc/arch/handshake-sequence.pdf,
 	doc/arch/handshake-sequence.png, doc/arch/handshake-state.eps,
 	doc/arch/handshake-state.pdf, doc/arch/handshake-state.png,
-	doc/arch/objects.eps, doc/arch/objects.pdf, doc/arch/objects.png:
-	moved architecture figures to arch/
+	doc/arch/objects.eps, doc/arch/objects.pdf, doc/arch/objects.png,
+	doc/certificate-user-use-case.pdf,
+	doc/certificate-user-use-case.png, doc/client-server-use-case.pdf,
+	doc/client-server-use-case.png, doc/handshake-sequence.pdf,
+	doc/handshake-sequence.png, doc/handshake-state.pdf,
+	doc/handshake-state.png, doc/internals.texi, doc/objects.pdf,
+	doc/objects.png: moved architecture figures to arch/
 
 2005-11-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* Makefile.am: made ChangeLog more compact by ignoring past
-	changes.
+	* ChangeLog, Makefile.am: made ChangeLog more compact by ignoring
+	past changes.
 
 2005-11-10  Simon Josefsson <simon@josefsson.org>
 
 	* gl/inet_ntop.h, gl/readline.c: Update.
-
-2005-11-10  Simon Josefsson <simon@josefsson.org>
-
-	* libextra/gnutls_ia.c: Add low-level API.  Use it.
-
-2005-11-10  Simon Josefsson <simon@josefsson.org>
-
-	* includes/gnutls/extra.h: Add low-level API.
 
 2005-11-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -6917,15 +6202,15 @@
 
 2005-11-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* doc/Makefile.am, doc/certificate-user-use-case.pdf,
+	* doc/Makefile.am, doc/arch/handshake-sequence.dia,
+	doc/arch/handshake-state.dia, doc/arch/objects.dia,
+	doc/certificate-user-use-case.pdf,
 	doc/certificate-user-use-case.png, doc/client-server-use-case.pdf,
 	doc/client-server-use-case.png, doc/gnutls.texi,
 	doc/handshake-sequence.pdf, doc/handshake-sequence.png,
 	doc/handshake-state.pdf, doc/handshake-state.png,
-	doc/internals.texi, doc/objects.pdf, doc/objects.png,
-	doc/arch/handshake-sequence.dia, doc/arch/handshake-state.dia,
-	doc/arch/objects.dia: added some stuff about the internals of
-	gnutls.
+	doc/internals.texi, doc/objects.pdf, doc/objects.png: added some
+	stuff about the internals of gnutls.
 
 2005-11-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -6957,6 +6242,7 @@
 
 	* doc/manpages/Makefile.am, lib/gnutls_session_pack.c, src/cli.c,
 	src/serv.c: fixed bug in session packing for anonymous connections.
+
 
 2005-11-07  Simon Josefsson <simon@josefsson.org>
 
@@ -7011,29 +6297,29 @@
 	lib/gnutls_str.c, lib/gnutls_str.h, lib/gnutls_ui.c,
 	lib/gnutls_v2_compat.c, lib/gnutls_v2_compat.h, lib/gnutls_x509.c,
 	lib/gnutls_x509.h, lib/io_debug.h, lib/pkix_asn1_tab.c,
-	lib/strfile.h, lib/x509_b64.c, lib/x509_b64.h, lib/x509/common.c,
-	lib/x509/common.h, lib/x509/compat.c, lib/x509/compat.h,
-	lib/x509/crl.c, lib/x509/crl_write.c, lib/x509/crq.c,
-	lib/x509/crq.h, lib/x509/dn.c, lib/x509/dn.h, lib/x509/dsa.c,
-	lib/x509/dsa.h, lib/x509/extensions.c, lib/x509/extensions.h,
-	lib/x509/mpi.c, lib/x509/mpi.h, lib/x509/pkcs12.c,
-	lib/x509/pkcs12.h, lib/x509/pkcs12_bag.c, lib/x509/pkcs12_encr.c,
-	lib/x509/pkcs7.c, lib/x509/pkcs7.h, lib/x509/privkey.c,
-	lib/x509/privkey.h, lib/x509/privkey_pkcs8.c, lib/x509/rfc2818.h,
+	lib/strfile.h, lib/x509/common.c, lib/x509/common.h,
+	lib/x509/compat.c, lib/x509/compat.h, lib/x509/crl.c,
+	lib/x509/crl_write.c, lib/x509/crq.c, lib/x509/crq.h,
+	lib/x509/dn.c, lib/x509/dn.h, lib/x509/dsa.c, lib/x509/dsa.h,
+	lib/x509/extensions.c, lib/x509/extensions.h, lib/x509/mpi.c,
+	lib/x509/mpi.h, lib/x509/pkcs12.c, lib/x509/pkcs12.h,
+	lib/x509/pkcs12_bag.c, lib/x509/pkcs12_encr.c, lib/x509/pkcs7.c,
+	lib/x509/pkcs7.h, lib/x509/privkey.c, lib/x509/privkey.h,
+	lib/x509/privkey_pkcs8.c, lib/x509/rfc2818.h,
 	lib/x509/rfc2818_hostname.c, lib/x509/sign.c, lib/x509/sign.h,
 	lib/x509/verify.c, lib/x509/verify.h, lib/x509/x509.c,
 	lib/x509/x509.h, lib/x509/x509_write.c, lib/x509/xml.c,
-	libextra/gnutls_extra.c, libextra/gnutls_extra.h,
-	libextra/gnutls_openpgp.c, libextra/gnutls_openssl.c,
-	libextra/openssl_compat.c, libextra/openssl_compat.h,
-	libextra/openpgp/compat.c, libextra/openpgp/extras.c,
-	libextra/openpgp/gnutls_openpgp.h, libextra/openpgp/openpgp.h,
-	libextra/openpgp/pgp.c, libextra/openpgp/pgpverify.c,
-	libextra/openpgp/privkey.c, libextra/openpgp/xml.c,
-	src/certtool-cfg.c, src/certtool-cfg.h, src/certtool.c, src/cli.c,
-	src/common.c, src/common.h, src/crypt.c, src/errcodes.c,
-	src/list.h, src/prime.c, src/psk.c, src/serv.c, src/tests.c,
-	src/tests.h, src/tls_test.c: Use GNU coding style.
+	lib/x509_b64.c, lib/x509_b64.h, libextra/gnutls_extra.c,
+	libextra/gnutls_extra.h, libextra/gnutls_openpgp.c,
+	libextra/gnutls_openssl.c, libextra/openpgp/compat.c,
+	libextra/openpgp/extras.c, libextra/openpgp/gnutls_openpgp.h,
+	libextra/openpgp/openpgp.h, libextra/openpgp/pgp.c,
+	libextra/openpgp/pgpverify.c, libextra/openpgp/privkey.c,
+	libextra/openpgp/xml.c, libextra/openssl_compat.c,
+	libextra/openssl_compat.h, src/certtool-cfg.c, src/certtool-cfg.h,
+	src/certtool.c, src/cli.c, src/common.c, src/common.h, src/crypt.c,
+	src/errcodes.c, src/list.h, src/prime.c, src/psk.c, src/serv.c,
+	src/tests.c, src/tests.h, src/tls_test.c: Use GNU coding style.
 
 2005-11-07  Simon Josefsson <simon@josefsson.org>
 
@@ -7046,6 +6332,10 @@
 2005-11-07  Simon Josefsson <simon@josefsson.org>
 
 	* doc/reference/Makefile.am: Ignore more headers.
+
+2005-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* src/.cvsignore: [no log message]
 
 2005-11-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -7067,14 +6357,18 @@
 	lib/libgnutls.vers, src/Makefile.am, src/cli-gaa.c, src/cli-gaa.h,
 	src/cli.c, src/cli.gaa, src/common.c, src/crypt.c,
 	src/gnutls-http-serv, src/psk-gaa.c, src/psk-gaa.h, src/psk.c,
-	src/psk.gaa, src/serv.c, src/serv.gaa: This is the initial commit
-	in the 1.3 branch. Ported from the PSK branch:
-	* PSK ciphersuites have been added.
-	* The session resumption data are now system independent.
+	src/psk.gaa, src/serv.c, src/serv.gaa: This is the initial commit in
+	the 1.3 branch. Ported from the PSK branch: * PSK ciphersuites have
+	been added. * The session resumption data are now system
+	independent.
 
 2005-11-07  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Version 1.2.9.
+	* ChangeLog: [no log message]
+
+2005-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* Version 1.2.9.
 
 	----------------------------------------------------------------------
 	Copyright (C) 2005, 2006 Free Software Foundation
