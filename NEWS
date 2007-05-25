@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 1.7.10 (unreleased)
 
-** New APIs to extract DER encoded X.509 Subject/Issuer DN.
+** New API functions to extract DER encoded X.509 Subject/Issuer DN.
 Suggested by Nate Nielsen <nielsen-list@memberwebs.com>.
 
 ** Update of gnulib files.
