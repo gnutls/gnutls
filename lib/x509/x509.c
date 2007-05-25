@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -1265,37 +1265,37 @@ cleanup:
   return result;
 }
 
-/*-
-  * _gnutls_x509_crt_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
-  * @cert: should contain a gnutls_x509_crt_t structure
-  * @start: will hold the starting point of the DN
-  *
-  * This function will return a pointer to the DER encoded DN structure and
-  * the length.
-  *
-  * Returns 0 on success or a negative value on error.
-  *
-  -*/
+/**
+ * _gnutls_x509_crt_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @start: will hold the starting point of the DN
+ *
+ * This function will return a pointer to the DER encoded DN structure and
+ * the length.
+ *
+ * Returns 0 on success or a negative value on error.
+ *
+ **/
 int
-_gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
-				    gnutls_datum_t * start)
+gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
+				   gnutls_datum_t * start)
 {
   return _gnutls_x509_crt_get_raw_dn2 (cert, "issuer", start);
 }
 
-/*-
-  * _gnutls_x509_crt_get_raw_dn - This function returns the subject's DN DER encoded
-  * @cert: should contain a gnutls_x509_crt_t structure
-  * @start: will hold the starting point of the DN
-  *
-  * This function will return a pointer to the DER encoded DN structure and
-  * the length.
-  *
-  * Returns 0 on success, or a negative value on error.
-  *
-  -*/
+/**
+ * _gnutls_x509_crt_get_raw_dn - This function returns the subject's DN DER encoded
+ * @cert: should contain a gnutls_x509_crt_t structure
+ * @start: will hold the starting point of the DN
+ *
+ * This function will return a pointer to the DER encoded DN structure and
+ * the length.
+ *
+ * Returns 0 on success, or a negative value on error.
+ *
+ **/
 int
-_gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert, gnutls_datum_t * start)
+gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert, gnutls_datum_t * start)
 {
   return _gnutls_x509_crt_get_raw_dn2 (cert, "subject", start);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -108,10 +108,6 @@ int gnutls_x509_crt_get_pk_algorithm (gnutls_x509_crt_t cert,
 				      unsigned int *bits);
 
 int _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src);
-int _gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
-					gnutls_datum_t * start);
-int _gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert,
-				 gnutls_datum_t * start);
 
 int gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
 				size_t * result_size);

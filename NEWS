@@ -3,6 +3,16 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.6.3 (unreleased)
+
+** New APIs to extract DER encoded X.509 Subject/Issuer DN.
+Suggested by Nate Nielsen <nielsen-list@memberwebs.com>.  Backported
+from the 1.7.x branch.
+
+** API and ABI modifications:
+gnutls_x509_crt_get_raw_issuer_dn: ADD.
+gnutls_x509_crt_get_raw_dn: ADD.
+
 * Version 1.6.2 (released 2007-04-18)
 
 ** Fix X.509 signing with RSA-PKCS#1 to set a NULL parameters fields.
