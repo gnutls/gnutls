@@ -80,6 +80,8 @@ AC_DEFUN([lgl_INIT],
   AM_GNU_GETTEXT_VERSION([0.16.1])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
+  gl_FUNC_LSEEK
+  gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_FUNC_MEMMEM
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
@@ -172,6 +174,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/hmac-md5.c
   lib/hmac-sha1.c
   lib/hmac.h
+  lib/lseek.c
   lib/md2.c
   lib/md2.h
   lib/md4.c
@@ -259,6 +262,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/lib-prefix.m4
   m4/lock.m4
   m4/longlong.m4
+  m4/lseek.m4
   m4/md2.m4
   m4/md4.m4
   m4/md5.m4

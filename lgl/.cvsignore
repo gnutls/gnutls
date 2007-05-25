@@ -20,3 +20,4 @@ getpass.c
 getpass.h
 float_.h
 fseeko.c
+lseek.c
