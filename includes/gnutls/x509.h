@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -250,6 +250,12 @@ extern "C"
   int gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
 					  const void *id, size_t id_size);
 
+  /* Access to internal Certificate fields.
+   */
+  int gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
+					 gnutls_datum_t * start);
+  int gnutls_x509_crt_get_raw_dn (gnutls_x509_crt_t cert,
+				  gnutls_datum_t * start);
 
 /* RDN handling.
  */
