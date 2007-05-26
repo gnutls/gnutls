@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -779,6 +779,7 @@ decode_private_key_info (const gnutls_datum_t * der,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      result = _gnutls_asn2err (result);
       goto error;
     }
 
