@@ -5,6 +5,15 @@ See the end for copying conditions.
 
 * Version 1.7.12 (unreleased)
 
+** Have PKCS8 parser return better error codes.
+Reported by Nate Nielsen <nielsen-list@memberwebs.com>, see
+<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001653.html> and
+<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001654.html>.
+
+** Fix mem leak for sessions with client authentication via certificates.
+Reported by Andrew W. Nosenko <andrew.w.nosenko@gmail.com>, see
+<http://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
+
 ** API and ABI modifications:
 No changes since last version.
 
