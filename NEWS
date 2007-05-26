@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 1.6.3 (unreleased)
 
-** New APIs to extract DER encoded X.509 Subject/Issuer DN.
+** New API functions to extract DER encoded X.509 Subject/Issuer DN.
 Suggested by Nate Nielsen <nielsen-list@memberwebs.com>.  Backported
 from the 1.7.x branch.
 
