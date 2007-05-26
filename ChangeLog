@@ -1,3 +1,27 @@
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: Version 1.7.11.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: Fix.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* libextra/opencdk/Makefile.am: Add opencdk.h to sources.
+
+2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-05-25  Simon Josefsson <jas@mocca.josefsson.org>
 
 	* NEWS: Version 1.7.10.
