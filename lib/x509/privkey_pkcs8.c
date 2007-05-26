@@ -739,6 +739,25 @@ decode_pkcs8_key (const gnutls_datum_t * raw_key,
 
   if (result < 0)
     {
+      /* We've gotten this far. In the real world it's almost certain
+       * that we're dealing with a good file, but wrong password.
+       * Sadly like 90% of random data is somehow valid DER for the
+       * a first small number of bytes, so no easy way to guarantee. */
+      if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ||
+	  result == GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND ||
+	  result == GNUTLS_E_ASN1_DER_ERROR ||
+	  result == GNUTLS_E_ASN1_VALUE_NOT_FOUND ||
+	  result == GNUTLS_E_ASN1_GENERIC_ERROR ||
+	  result == GNUTLS_E_ASN1_VALUE_NOT_VALID ||
+	  result == GNUTLS_E_ASN1_TAG_ERROR ||
+	  result == GNUTLS_E_ASN1_TAG_IMPLICIT ||
+	  result == GNUTLS_E_ASN1_TYPE_ANY_ERROR ||
+	  result == GNUTLS_E_ASN1_SYNTAX_ERROR ||
+	  result == GNUTLS_E_ASN1_DER_OVERFLOW)
+	{
+	  result = GNUTLS_E_DECRYPTION_FAILED;
+	}
+
       gnutls_assert ();
       goto error;
     }
