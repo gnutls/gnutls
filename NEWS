@@ -3,6 +3,14 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.7.11 (unreleased)
+
+** Add opencdk.h to archive.
+Reported by Roman Bogorodskiy <novel@FreeBSD.org>.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.7.10 (released 2007-05-25)
 
 ** New API functions to extract DER encoded X.509 Subject/Issuer DN.
