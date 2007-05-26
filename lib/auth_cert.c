@@ -1662,10 +1662,16 @@ _gnutls_selected_certs_deinit (gnutls_session_t session)
 	{
 	  _gnutls_gcert_deinit (&session->internals.selected_cert_list[i]);
 	}
+      gnutls_free (session->internals.selected_cert_list);
       session->internals.selected_cert_list = NULL;
       session->internals.selected_cert_list_length = 0;
 
       _gnutls_gkey_deinit (session->internals.selected_key);
+      if (session->internals.selected_key)
+	{
+	  gnutls_free (session->internals.selected_key);
+	  session->internals.selected_key = NULL;
+	}
     }
 
   return;
