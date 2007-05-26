@@ -1,5 +1,5 @@
 GNU TLS THANKS -- Acknowledgements.
-Copyright (C) 2005, 2006  Free Software Foundation
+Copyright (C) 2005, 2006, 2007  Free Software Foundation
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
@@ -63,6 +63,7 @@ Robert Millan                   <rmillan@ackstorm.es>
 Kataja Kai                      <kai.kataja@op.fi>
 Georg Schwarz                   <georg.schwarz@freenet.de>
 Michael C. Vergallen            <mvergall@telenet.be>
+Andrey Nosenko                  <andrew.w.nosenko@gmail.com>
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,

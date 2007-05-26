@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -1652,10 +1652,16 @@ _gnutls_selected_certs_deinit (gnutls_session_t session)
 	{
 	  _gnutls_gcert_deinit (&session->internals.selected_cert_list[i]);
 	}
+      gnutls_free (session->internals.selected_cert_list);
       session->internals.selected_cert_list = NULL;
       session->internals.selected_cert_list_length = 0;
 
       _gnutls_gkey_deinit (session->internals.selected_key);
+      if (session->internals.selected_key)
+	{
+	  gnutls_free (session->internals.selected_key);
+	  session->internals.selected_key = NULL;
+	}
     }
 
   return;
