@@ -25,10 +25,9 @@ INCLUDES = -I$(top_srcdir)/lib \
 
 noinst_LTLIBRARIES = libminiopencdk.la
 
-libminiopencdk_la_SOURCES = armor.c filters.h main.c seskey.c types.h \
-				cipher.c kbnode.c main.h packet.h dummy.c \
-				sig-check.c verify.c compress.c keydb.c \
-				misc.c pubkey.c stream.c write-packet.c \
-				context.h literal.c new-packet.c read-packet.c  stream.h
+libminiopencdk_la_SOURCES = armor.c filters.h main.c seskey.c types.h	\
+	cipher.c kbnode.c main.h packet.h dummy.c sig-check.c verify.c	\
+	compress.c keydb.c misc.c pubkey.c stream.c write-packet.c	\
+	context.h literal.c new-packet.c read-packet.c stream.h opencdk.h
 
 EXTRA_DIST = README
