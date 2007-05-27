@@ -14,6 +14,8 @@ Reported by Nate Nielsen <nielsen-list@memberwebs.com>, see
 Reported by Andrew W. Nosenko <andrew.w.nosenko@gmail.com>, see
 <http://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
 
+** Fix mem leak.
+
 ** API and ABI modifications:
 No changes since last version.
 
