@@ -1153,10 +1153,9 @@ parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
       /* now we move ptr after the pem header 
        */
       ptr++;
+      size--;
       /* find the next certificate (if any)
        */
-
-      size = input_cert_size - (ptr - input_cert);
 
       if (size > 0)
 	{
@@ -1164,10 +1163,11 @@ parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
 
 	  ptr3 = memmem (ptr, size, PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
 	  if (ptr3 == NULL)
-	    ptr = memmem (ptr, size,
+	    ptr3 = memmem (ptr, size,
 			  PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
 
 	  ptr = ptr3;
+	  size = input_cert_size - (ptr - input_cert);
 	}
       else
 	ptr = NULL;
