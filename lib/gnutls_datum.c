@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -106,7 +106,7 @@ _gnutls_datum_append_m (gnutls_datum_t * dst, const void *data,
 void
 _gnutls_free_datum_m (gnutls_datum_t * dat, gnutls_free_function gfree_func)
 {
-  if (dat->data != NULL && dat->size != 0)
+  if (dat->data != NULL)
     gfree_func (dat->data);
 
   dat->data = NULL;
