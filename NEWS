@@ -14,7 +14,10 @@ Reported by Nate Nielsen <nielsen-list@memberwebs.com>, see
 Reported by Andrew W. Nosenko <andrew.w.nosenko@gmail.com>, see
 <http://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
 
-** Fix mem leak.
+** Fix mem leaks.
+Reported by Dennis Vshivkov <walrus@amur.ru>, see
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333050>.  Added
+self-test tests/parse_ca.c to test regressions.
 
 ** API and ABI modifications:
 No changes since last version.
