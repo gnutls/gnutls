@@ -38,28 +38,38 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl.texi	\
 	examples/ex-serv-export.c examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
-	examples/ex-pkcs12.c layers.eps layers.png pgp1.eps pgp1.png	\
-	x509-1.eps x509-1.png gnutls-logo.eps gnutls-logo.png		\
-	gnutls-logo.pdf
+	examples/ex-pkcs12.c
+
+# Images.  Make sure there are eps + png + pdf of each.
+gnutls_TEXINFOS += layers.eps layers.png layers.pdf
+gnutls_TEXINFOS += pgp1.eps pgp1.png pgp1.pdf
+gnutls_TEXINFOS += x509-1.eps x509-1.png x509-1.pdf
+gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png gnutls-logo.pdf
 
 # Internal manual.
-gnutls_TEXINFOS += internals.texi internals.eps internals.png		\
-	arch/certificate-user-use-case.dia				\
-	arch/client-server-use-case.dia arch/objects.dia		\
-	arch/certificate-user-use-case.eps				\
-	arch/certificate-user-use-case.pdf				\
-	arch/certificate-user-use-case.png				\
-	arch/client-server-use-case.eps					\
-	arch/client-server-use-case.pdf					\
-	arch/client-server-use-case.png arch/extensions_st.dia		\
-	arch/extensions_st.eps arch/extensions_st.pdf			\
-	arch/extensions_st.png arch/handshake-sequence.dia		\
+gnutls_TEXINFOS += internals.texi 	
+
+# Images.  Make sure there are eps + png + pdf of each.
+gnutls_TEXINFOS += internals.eps internals.png internals.pdf
+gnutls_TEXINFOS += arch/certificate-user-use-case.dia	\
+	arch/certificate-user-use-case.eps		\
+	arch/certificate-user-use-case.pdf		\
+	arch/certificate-user-use-case.png
+gnutls_TEXINFOS += arch/client-server-use-case.dia	\
+	arch/client-server-use-case.eps			\
+	arch/client-server-use-case.pdf			\
+	arch/client-server-use-case.png
+gnutls_TEXINFOS += arch/extensions_st.dia arch/extensions_st.eps	\
+	arch/extensions_st.pdf arch/extensions_st.png
+gnutls_TEXINFOS += arch/handshake-sequence.dia				\
 	arch/handshake-sequence.eps arch/handshake-sequence.pdf		\
-	arch/handshake-sequence.png arch/handshake-state.dia		\
-	arch/handshake-state.eps arch/handshake-state.pdf		\
-	arch/handshake-state.png arch/mod_auth_st.dia			\
-	arch/mod_auth_st.eps arch/mod_auth_st.pdf arch/mod_auth_st.png	\
-	arch/objects.eps arch/objects.pdf arch/objects.png
+	arch/handshake-sequence.png
+gnutls_TEXINFOS += arch/handshake-state.dia arch/handshake-state.eps	\
+	arch/handshake-state.pdf arch/handshake-state.png
+gnutls_TEXINFOS += arch/mod_auth_st.dia arch/mod_auth_st.eps		\
+	arch/mod_auth_st.pdf arch/mod_auth_st.png
+gnutls_TEXINFOS += arch/objects.dia arch/objects.eps arch/objects.pdf	\
+	arch/objects.png
 
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
