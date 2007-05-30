@@ -54,6 +54,14 @@ libguile_gnutls_extra_v_0_la_LDFLAGS =		\
 
 AM_CPPFLAGS = -I$(builddir)
 
+if HAVE_GCC
+
+# Generated `.x' files and Guile's `scm_c_define_gsubr ()' require
+# `-Wno-strict-prototypes'.
+libguile_gnutls_v_0_la_CFLAGS += -Wno-strict-prototypes
+libguile_gnutls_extra_v_0_la_CFLAGS += -Wno-strict-prototypes
+
+endif
 
 enums.h: $(srcdir)/make-enum-header.scm
 	$(GUILE_FOR_BUILD) $^ > $@
