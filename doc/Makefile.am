@@ -19,8 +19,9 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = TODO README.CVS README.autoconf certtool.cfg \
-	gnutls.ps gnutls.pdf gnutls.html
+EXTRA_DIST = TODO README.CVS README.autoconf certtool.cfg	\
+	gnutls.ps gnutls.pdf gnutls.html			\
+        extract-guile-c-doc.scm
 SUBDIRS = examples scripts manpages
 if ENABLE_GTK_DOC
 SUBDIRS += reference
@@ -38,7 +39,8 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl.texi	\
 	examples/ex-serv-export.c examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
-	examples/ex-pkcs12.c
+	examples/ex-pkcs12.c						\
+	guile.texi
 
 # Images.  Make sure there are eps + png + pdf of each.
 gnutls_TEXINFOS += layers.eps layers.png layers.pdf
@@ -108,3 +110,29 @@ ia-api.texi: ../libextra/ia-api.texi
 
 error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi
+
+
+if HAVE_GUILE
+
+#
+# Guile documentation extraction from C code.
+#
+
+GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
+
+SNARF_CPPFLAGS = -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
+
+guile_texi     = core.c.texi extra.c.texi
+
+BUILT_SOURCES  = $(guile_texi)
+EXTRA_DIST    += $(guile_texi)
+CLEANFILES     = $(guile_texi)
+
+
+%.c.texi: $(top_srcdir)/guile/src/%.c
+	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
+	   -e '(apply main (cdr (command-line)))'			\
+	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS)"				\
+	   > "$@"
+
+endif
