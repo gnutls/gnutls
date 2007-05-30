@@ -28,16 +28,17 @@
 #else
 /* Normal invocation convention.  */
 
+#ifndef _GL_STDIO_H
+
+/* The include_next requires a split double-inclusion guard.  */
 #if @HAVE_INCLUDE_NEXT@
 # include_next <stdio.h>
+#else
+# include @ABSOLUTE_STDIO_H@
 #endif
 
 #ifndef _GL_STDIO_H
 #define _GL_STDIO_H
-
-#if ! @HAVE_INCLUDE_NEXT@
-# include @ABSOLUTE_STDIO_H@
-#endif
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -232,7 +233,19 @@ extern int fseeko (FILE *fp, off_t offset, int whence);
     fseeko (f, o, w))
 #endif
 
-#if defined GNULIB_POSIXCHECK
+#if @GNULIB_FSEEK@ && @REPLACE_FSEEK@
+extern int rpl_fseek (FILE *fp, long offset, int whence);
+# undef fseek
+# if defined GNULIB_POSIXCHECK
+#  define fseek(f,o,w) \
+     (GL_LINK_WARNING ("fseek cannot handle files larger than 4 GB " \
+                       "on 32-bit platforms - " \
+                       "use fseeko function for handling of large files"), \
+      rpl_fseek (f, o, w))
+# else
+#  define fseek rpl_fseek
+# endif
+#elif defined GNULIB_POSIXCHECK
 # ifndef fseek
 #  define fseek(f,o,w) \
      (GL_LINK_WARNING ("fseek cannot handle files larger than 4 GB " \
@@ -256,7 +269,19 @@ extern off_t ftello (FILE *fp);
     ftello (f))
 #endif
 
-#if defined GNULIB_POSIXCHECK
+#if @GNULIB_FTELL@ && @REPLACE_FTELL@
+extern long rpl_ftell (FILE *fp);
+# undef ftell
+# if GNULIB_POSIXCHECK
+#  define ftell(f) \
+     (GL_LINK_WARNING ("ftell cannot handle files larger than 4 GB " \
+                       "on 32-bit platforms - " \
+                       "use ftello function for handling of large files"), \
+      rpl_ftell (f))
+# else
+#  define ftell rpl_ftell
+# endif
+#elif defined GNULIB_POSIXCHECK
 # ifndef ftell
 #  define ftell(f) \
      (GL_LINK_WARNING ("ftell cannot handle files larger than 4 GB " \
@@ -270,7 +295,11 @@ extern off_t ftello (FILE *fp);
 # if @REPLACE_FFLUSH@
 #  define fflush rpl_fflush
   /* Flush all pending data on STREAM according to POSIX rules.  Both
-     output and seekable input streams are supported.  */
+     output and seekable input streams are supported.
+     Note! LOSS OF DATA can occur if fflush is applied on an input stream
+     that is _not_seekable_ or on an update stream that is _not_seekable_
+     and in which the most recent operation was input.  Seekability can
+     be tested with lseek(fileno(fp),0,SEEK_CUR).  */
   extern int fflush (FILE *gl_stream);
 # endif
 #elif defined GNULIB_POSIXCHECK
@@ -286,5 +315,6 @@ extern off_t ftello (FILE *fp);
 }
 #endif
 
+#endif /* _GL_STDIO_H */
 #endif /* _GL_STDIO_H */
 #endif
