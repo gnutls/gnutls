@@ -118,7 +118,6 @@ if test "x$GAA" = "x"; then
 ***]])
 fi
 
-echo "*** GCC: $GCC"
 AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
 AM_CONDITIONAL(HAVE_GUILE, test "x$opt_guile_bindings" = "xyes")
 
