@@ -112,6 +112,11 @@ error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi
 
 
+guile_texi     = core.c.texi extra.c.texi
+BUILT_SOURCES  = $(guile_texi)
+CLEANFILES     = $(guile_texi)
+EXTRA_DIST    += $(guile_texi)
+
 if HAVE_GUILE
 
 #
@@ -122,12 +127,6 @@ GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
 
 SNARF_CPPFLAGS = -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
 
-guile_texi     = core.c.texi extra.c.texi
-
-BUILT_SOURCES  = $(guile_texi)
-EXTRA_DIST    += $(guile_texi)
-CLEANFILES     = $(guile_texi)
-
 
 %.c.texi: $(top_srcdir)/guile/src/%.c
 	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
@@ -135,4 +134,9 @@ CLEANFILES     = $(guile_texi)
 	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS)"				\
 	   > "$@"
 
-endif
+else !HAVE_GUILE
+
+%.c.texi:
+	echo "(Guile not available, documentation not generated.)" > $@
+
+endif !HAVE_GUILE
