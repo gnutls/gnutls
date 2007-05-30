@@ -9,11 +9,14 @@ assumed to have basic knowledge of the protocol and library.  Details
 missing from this document may be found in @ref{Function reference,
 the C API reference}.
 
+At this stage, not all the C functions are available from Scheme, but
+a large subset thereof is available.
+
 
 @menu
 * Conventions::                 Naming conventions and other idiosyncrasies.
 * Examples::                    Quick start.
-* API Reference::               The Scheme GnuTLS programming interface.
+* Guile Reference::             The Scheme GnuTLS programming interface.
 @end menu
 
 @c *********************************************************************
@@ -286,7 +289,7 @@ as in this example.
 
 
 @c *********************************************************************
-@node Examples, API Reference, Conventions, Guile Bindings
+@node Examples, Guile Reference, Conventions, Guile Bindings
 @section Examples
 
 This chapter lists examples that illustrate common use cases.
@@ -500,8 +503,8 @@ return an OpenPGP public key and private key object, respectively
 
 
 @c *********************************************************************
-@node API Reference,  , Examples, Guile Bindings
-@section API Reference
+@node Guile Reference,  , Examples, Guile Bindings
+@section Guile Reference
 
 This chapter documents GnuTLS Scheme procedures available to Guile
 programmers.
@@ -511,7 +514,7 @@ programmers.
 * Extra Interface::             Bindings for GnuTLS-Extra.
 @end menu
 
-@node Core Interface, Extra Interface, API Reference, API Reference
+@node Core Interface, Extra Interface, Guile Reference, Guile Reference
 @subsection Core Interface
 
 This section lists the Scheme procedures exported by the
@@ -521,7 +524,7 @@ Lesser General Public Licence, version 2.1 or later.
 
 @include core.c.texi
 
-@node Extra Interface,  , Core Interface, API Reference
+@node Extra Interface,  , Core Interface, Guile Reference
 @subsection Extra Interface
 
 This section lists the Scheme procedures exported by the @code{(gnutls
