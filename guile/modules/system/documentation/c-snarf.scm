@@ -45,8 +45,9 @@
 ;;; High-level API.
 ;;;
 
-(define (run-cpp-and-extract-snarfing file cpp cflags)
-  (let ((pipe (apply open-pipe* OPEN_READ cpp file cflags)))
+(define (run-cpp-and-extract-snarfing file cpp cpp-flags)
+  (let ((pipe (apply open-pipe* OPEN_READ
+                     (cons cpp (append cpp-flags (list file))))))
     (parse-snarfing pipe)))
 
 
