@@ -28,7 +28,7 @@ BUILT_SOURCES = enum-map.i.c smob-types.i.c enums.h smobs.h	\
 		priorities.i.c					\
 		extra-smobs.h extra-enums.h			\
 		extra-enum-map.i.c extra-smob-types.i.c		\
-                core.c.x errors.c.x extra.c.x
+                core.x errors.x extra.x
 
 CLEANFILES = $(BUILT_SOURCES)
 
@@ -99,6 +99,5 @@ extra-smob-types.i.c: $(srcdir)/make-smob-types.scm
 snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	       $(CFLAGS) $(AM_CFLAGS)
 
-SUFFIXES = .x
-%.c.x: %.c
+.c.x:
 	$(guile_snarf) -o $@ $< $(snarfcppopts)

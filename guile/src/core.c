@@ -2744,7 +2744,7 @@ SCM_DEFINE (scm_gnutls_set_log_level_x, "set-log-level!", 1, 0, 0,
 void
 scm_init_gnutls (void)
 {
-#include "core.c.x"
+#include "core.x"
 
   (void) gnutls_global_init ();
 

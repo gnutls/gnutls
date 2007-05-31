@@ -46,7 +46,7 @@ scm_gnutls_error (int c_err, const char *c_func)
 void
 scm_init_gnutls_error (void)
 {
-#include "errors.c.x"
+#include "errors.x"
 }
 
 /* arch-tag: 48f07ecf-65c4-480c-b043-a51eab592d6b

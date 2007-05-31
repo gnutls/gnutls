@@ -533,7 +533,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_openpgp_keys_x,
 void
 scm_init_gnutls_extra (void)
 {
-#include "extra.c.x"
+#include "extra.x"
 
   (void) gnutls_global_init_extra ();
 

@@ -128,15 +128,26 @@ GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
 SNARF_CPPFLAGS = -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
 
 
-%.c.texi: $(top_srcdir)/guile/src/%.c
+core.c.texi: $(top_srcdir)/guile/src/core.c
 	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
 	   -e '(apply main (cdr (command-line)))'			\
-	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS)"				\
+	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS) $(CPPFLAGS)"		\
 	   > "$@"
+
+extra.c.texi: $(top_srcdir)/guile/src/extra.c
+	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
+	   -e '(apply main (cdr (command-line)))'			\
+	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS) $(CPPFLAGS)"		\
+	   > "$@"
+
 
 else !HAVE_GUILE
 
-%.c.texi:
+core.c.texi:
 	echo "(Guile not available, documentation not generated.)" > $@
+
+extra.c.texi:
+	echo "(Guile not available, documentation not generated.)" > $@
+
 
 endif !HAVE_GUILE
