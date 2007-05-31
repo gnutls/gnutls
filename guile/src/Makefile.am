@@ -15,7 +15,7 @@
 #  License along with GNUTLS; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/modules
+GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
 
 noinst_HEADERS = errors.h utils.h
 

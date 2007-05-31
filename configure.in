@@ -118,36 +118,37 @@ if test "x$GAA" = "x"; then
 ***]])
 fi
 
-AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
-AM_CONDITIONAL(HAVE_GUILE, test "x$opt_guile_bindings" = "xyes")
-
 if test "x$opt_guile_bindings" = "xyes"; then
    GUILE_PROGS
    GUILE_FLAGS
-   AC_PATH_PROG([guile_snarf], [guile-snarf], [not-found])
-   if test "x$guile_snarf" = "xnot-found"; then
-      AC_MSG_ERROR([`guile-snarf' not found.  Please install Guile 1.8.x or later.])
+   AC_PATH_PROG([guile_snarf], [guile-snarf])
+   if test "x$guile_snarf" = "x"; then
+      AC_MSG_WARN([`guile-snarf' from Guile 1.8 not found.  Guile bindings not built.])
+      opt_guile_bindings=no
+   else
+      case "x$with_guile_site_dir" in 
+	   x|xno)
+	      # Use the default $(GUILE_SITE).
+	      GUILE_SITE_DIR
+	      ;;
+	   xyes)
+	      # Automatically derive $(GUILE_SITE) from $(pkgdatadir).  This
+	      # hack is used to allow `distcheck' to work (see
+	      # `DISTCHECK_CONFIGURE_FLAGS' in the top-level `Makefile.am').
+	      GUILE_SITE="${datadir}/guile/site"
+	      AC_SUBST(GUILE_SITE)
+	      ;;
+	   *)
+	      # Use the user-specified directory as $(GUILE_SITE).
+	      GUILE_SITE="$with_guile_site_dir"
+	      AC_SUBST(GUILE_SITE)
+	      ;;
+      esac
    fi
-
-   case "x$with_guile_site_dir" in 
-	x|xno)
-	   # Use the default $(GUILE_SITE).
-	   GUILE_SITE_DIR
-	   ;;
-	xyes)
-	   # Automatically derive $(GUILE_SITE) from $(pkgdatadir).  This
-	   # hack is used to allow `distcheck' to work (see
-	   # `DISTCHECK_CONFIGURE_FLAGS' in the top-level `Makefile.am').
-	   GUILE_SITE="${datadir}/guile/site"
-	   AC_SUBST(GUILE_SITE)
-	   ;;
-	*)
-	   # Use the user-specified directory as $(GUILE_SITE).
-	   GUILE_SITE="$with_guile_site_dir"
-	   AC_SUBST(GUILE_SITE)
-	   ;;
-   esac
 fi
+
+AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
+AM_CONDITIONAL(HAVE_GUILE, test "x$opt_guile_bindings" = "xyes")
 
 
 AC_MSG_RESULT([***
