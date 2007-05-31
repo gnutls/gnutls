@@ -1,4 +1,4 @@
-# stdio_h.m4 serial 5
+# stdio_h.m4 serial 6
 dnl Copyright (C) 2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -30,7 +30,9 @@ AC_DEFUN([gl_STDIO_H_DEFAULTS],
   GNULIB_VSNPRINTF=0;      AC_SUBST([GNULIB_VSNPRINTF])
   GNULIB_VSPRINTF_POSIX=0; AC_SUBST([GNULIB_VSPRINTF_POSIX])
   GNULIB_VASPRINTF=0;      AC_SUBST([GNULIB_VASPRINTF])
+  GNULIB_FSEEK=0;          AC_SUBST([GNULIB_FSEEK])
   GNULIB_FSEEKO=0;         AC_SUBST([GNULIB_FSEEKO])
+  GNULIB_FTELL=0;          AC_SUBST([GNULIB_FTELL])
   GNULIB_FTELLO=0;         AC_SUBST([GNULIB_FTELLO])
   GNULIB_FFLUSH=0;         AC_SUBST([GNULIB_FFLUSH])
   dnl Assume proper GNU behavior unless another module says otherwise.
@@ -48,8 +50,10 @@ AC_DEFUN([gl_STDIO_H_DEFAULTS],
   REPLACE_VASPRINTF=0;     AC_SUBST([REPLACE_VASPRINTF])
   HAVE_FSEEKO=1;           AC_SUBST([HAVE_FSEEKO])
   REPLACE_FSEEKO=0;        AC_SUBST([REPLACE_FSEEKO])
+  REPLACE_FSEEK=0;         AC_SUBST([REPLACE_FSEEK])
   HAVE_FTELLO=1;           AC_SUBST([HAVE_FTELLO])
   REPLACE_FTELLO=0;        AC_SUBST([REPLACE_FTELLO])
+  REPLACE_FTELL=0;         AC_SUBST([REPLACE_FTELL])
   REPLACE_FFLUSH=0;        AC_SUBST([REPLACE_FFLUSH])
 ])
 
