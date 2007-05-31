@@ -87,6 +87,17 @@ AC_ARG_ENABLE(profile-mode,
 opt_profiler_mode=$enableval)
 AC_MSG_RESULT($opt_profiler_mode)
 
+opt_guile_bindings=yes
+AC_MSG_CHECKING([whether building Guile bindings])
+AC_ARG_ENABLE(guile,
+	AS_HELP_STRING([--enable-guile], [build GNU Guile bindings]),
+opt_guile_bindings=$enableval)
+AC_MSG_RESULT($opt_guile_bindings)
+
+AC_ARG_WITH([--with-guile-site-dir],
+  [AS_HELP_STRING([--with-guile-site-dir],
+     [use the given directory as the Guile site (use with care)])])
+
 AC_MSG_RESULT([***
 *** Checking for compilation programs...
 ])
@@ -106,6 +117,38 @@ if test "x$GAA" = "x"; then
 *** you may want to get it from http://gaa.sourceforge.net/
 ***]])
 fi
+
+AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
+AM_CONDITIONAL(HAVE_GUILE, test "x$opt_guile_bindings" = "xyes")
+
+if test "x$opt_guile_bindings" = "xyes"; then
+   GUILE_PROGS
+   GUILE_FLAGS
+   AC_PATH_PROG([guile_snarf], [guile-snarf], [not-found])
+   if test "x$guile_snarf" = "xnot-found"; then
+      AC_MSG_ERROR([`guile-snarf' not found.  Please install Guile 1.8.x or later.])
+   fi
+
+   case "x$with_guile_site_dir" in 
+	x|xno)
+	   # Use the default $(GUILE_SITE).
+	   GUILE_SITE_DIR
+	   ;;
+	xyes)
+	   # Automatically derive $(GUILE_SITE) from $(pkgdatadir).  This
+	   # hack is used to allow `distcheck' to work (see
+	   # `DISTCHECK_CONFIGURE_FLAGS' in the top-level `Makefile.am').
+	   GUILE_SITE="${datadir}/guile/site"
+	   AC_SUBST(GUILE_SITE)
+	   ;;
+	*)
+	   # Use the user-specified directory as $(GUILE_SITE).
+	   GUILE_SITE="$with_guile_site_dir"
+	   AC_SUBST(GUILE_SITE)
+	   ;;
+   esac
+fi
+
 
 AC_MSG_RESULT([***
 *** Detecting compiler options...
@@ -645,6 +688,11 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	src/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 	lib/libgnutls-config libextra/libgnutls-extra-config \
-	lib/gnutls.pc libextra/gnutls-extra.pc])
+	lib/gnutls.pc libextra/gnutls-extra.pc
+	guile/Makefile guile/modules/Makefile
+	guile/src/Makefile guile/tests/Makefile])
+
+AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
+
 
 AC_OUTPUT
