@@ -125,8 +125,8 @@ if HAVE_GUILE
 
 GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
 
-SNARF_CPPFLAGS = -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
-
+SNARF_CPPFLAGS = -I$(top_srcdir) \
+	-I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
 
 core.c.texi: $(top_srcdir)/guile/src/core.c
 	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
