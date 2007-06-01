@@ -15,12 +15,12 @@ a large subset thereof is available.
 
 @menu
 * Conventions::                 Naming conventions and other idiosyncrasies.
-* Examples::                    Quick start.
+* Guile Examples::              Quick start.
 * Guile Reference::             The Scheme GnuTLS programming interface.
 @end menu
 
 @c *********************************************************************
-@node Conventions, Examples, Guile Bindings, Guile Bindings
+@node Conventions
 @section Conventions
 
 This chapter details the conventions used by Guile API, as well as
@@ -31,10 +31,10 @@ specificities of the mapping of the C API to Scheme.
 * Procedure Names::               Naming conventions.
 * Representation of Binary Data:: Binary data buffers.
 * Input and Output::              Input and output.
-* Error Handling::                Exceptions.
+* Exception Handling::            Exceptions.
 @end menu
 
-@node Enumerates and Constants, Procedure Names, Conventions, Conventions
+@node Enumerates and Constants
 @subsection Enumerates and Constants
 
 @cindex enumerate
@@ -113,7 +113,7 @@ sufficient for use in a user interface since they are fairly concise
 and not internationalized.
 
 
-@node Procedure Names, Representation of Binary Data, Enumerates and Constants, Conventions
+@node Procedure Names
 @subsection Procedure Names
 
 Unlike C functions in GnuTLS, the corresponding Scheme procedures are
@@ -132,7 +132,7 @@ Scheme procedure named @code{set-session-transport-port!} corresponds
 to @code{gnutls_transport_set_ptr}, making it clear that this
 procedure applies to session.
 
-@node Representation of Binary Data, Input and Output, Procedure Names, Conventions
+@node Representation of Binary Data
 @subsection Representation of Binary Data
 
 Many procedures operate on binary data.  For instance,
@@ -164,10 +164,10 @@ format can be done as follows:
 @end example
 
 For an example of OpenPGP key import from a file, see @ref{Importing
-OpenPGP Keys}.
+OpenPGP Keys Guile Example}.
 
 
-@node Input and Output, Error Handling, Representation of Binary Data, Conventions
+@node Input and Output
 @subsection Input and Output
 
 @findex set-session-transport-port!
@@ -231,8 +231,8 @@ data sent or received.  While it might improve performance, it is much
 less convenient than the above and should rarely be needed.
 
 
-@node Error Handling,  , Input and Output, Conventions
-@subsection Error Handling
+@node Exception Handling
+@subsection Exception Handling
 
 @cindex exceptions
 @cindex errors
@@ -289,19 +289,19 @@ as in this example.
 
 
 @c *********************************************************************
-@node Examples, Guile Reference, Conventions, Guile Bindings
-@section Examples
+@node Guile Examples
+@section Guile Examples
 
 This chapter lists examples that illustrate common use cases.
 
 @menu
-* Anonymous Authentication::    Simplest client and server.
-* OpenPGP Authentication::      Using OpenPGP-based authentication.
-* Importing OpenPGP Keys::      Importing keys from files.
+* Anonymous Authentication Guile Example::    Simplest client and server.
+* OpenPGP Authentication Guile Example::      Using OpenPGP-based authentication.
+* Importing OpenPGP Keys Guile Example::      Importing keys from files.
 @end menu
 
-@node Anonymous Authentication, OpenPGP Authentication, Examples, Examples
-@subsection Anonymous Authentication
+@node Anonymous Authentication Guile Example
+@subsection Anonymous Authentication Guile Example
 
 @dfn{Anonymous authentication} is very easy to use.  No certificates
 are needed by the communicating parties.  Yet, it allows them to
@@ -381,8 +381,8 @@ The corresponding server would look like this (again, assuming
 This is it!
 
 
-@node OpenPGP Authentication, Importing OpenPGP Keys, Anonymous Authentication, Examples
-@subsection OpenPGP Authentication
+@node OpenPGP Authentication Guile Example
+@subsection OpenPGP Authentication Guile Example
 
 GnuTLS allows users to authenticate using OpenPGP certificates.  The
 relevant procedures are provided by the @code{(gnutls extra)} module.
@@ -390,7 +390,7 @@ Using OpenPGP-based authentication is not more complicated than using
 anonymous authentication.  It requires a bit of extra work, though, to
 import the OpenPGP public and private key of the client/server.  Key
 import is omitted here and is left as an exercise to the reader
-(@pxref{Importing OpenPGP Keys}).
+(@pxref{Importing OpenPGP Keys Guile Example}).
 
 Assuming @var{some-socket} is bound to an open socket port and
 @var{pub} and @var{sec} are bound to the client's OpenPGP public and
@@ -459,8 +459,8 @@ store them in a file for future re-use (@pxref{Core Interface,
 @code{pkcs1-export-rsa-parameters} and
 @code{pkcs1-import-rsa-parameters}}).
 
-@node Importing OpenPGP Keys,  , OpenPGP Authentication, Examples
-@subsection Importing OpenPGP Keys
+@node Importing OpenPGP Keys Guile Example
+@subsection Importing OpenPGP Keys Guile Example
 
 The following example provides a simple way of importing
 ``ASCII-armored'' OpenPGP keys from files, using the
@@ -503,7 +503,7 @@ return an OpenPGP public key and private key object, respectively
 
 
 @c *********************************************************************
-@node Guile Reference,  , Examples, Guile Bindings
+@node Guile Reference
 @section Guile Reference
 
 This chapter documents GnuTLS Scheme procedures available to Guile
@@ -514,7 +514,7 @@ programmers.
 * Extra Interface::             Bindings for GnuTLS-Extra.
 @end menu
 
-@node Core Interface, Extra Interface, Guile Reference, Guile Reference
+@node Core Interface
 @subsection Core Interface
 
 This section lists the Scheme procedures exported by the
@@ -524,7 +524,7 @@ Lesser General Public Licence, version 2.1 or later.
 
 @include core.c.texi
 
-@node Extra Interface,  , Core Interface, Guile Reference
+@node Extra Interface
 @subsection Extra Interface
 
 This section lists the Scheme procedures exported by the @code{(gnutls
