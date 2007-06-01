@@ -14,14 +14,14 @@ a large subset thereof is available.
 
 
 @menu
-* Conventions::                 Naming conventions and other idiosyncrasies.
+* Guile API Conventions::       Naming conventions and other idiosyncrasies.
 * Guile Examples::              Quick start.
 * Guile Reference::             The Scheme GnuTLS programming interface.
 @end menu
 
 @c *********************************************************************
-@node Conventions
-@section Conventions
+@node Guile API Conventions
+@section Guile API Conventions
 
 This chapter details the conventions used by Guile API, as well as
 specificities of the mapping of the C API to Scheme.
