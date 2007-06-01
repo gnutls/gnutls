@@ -22,11 +22,13 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --with-guile-site-dir
 
-SUBDIRS = lgl gl includes lib libextra src doc tests po
+SUBDIRS = lgl gl includes lib libextra src
 
 if HAVE_GUILE
 SUBDIRS += guile
 endif
+
+SUBDIRS += doc tests po
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lgl/m4
 
