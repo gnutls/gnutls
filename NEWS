@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.7.12 (unreleased)
 
+** Guile bindings for GnuTLS have been included.
+Contributed by Ludovic Courtès <ludovic.courtes@laas.fr>.
+
 ** Have PKCS8 parser return better error codes.
 Reported by Nate Nielsen <nielsen-list@memberwebs.com>, see
 <http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001653.html> and
