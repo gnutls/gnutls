@@ -52,7 +52,7 @@ libguile_gnutls_extra_v_0_la_LDFLAGS =		\
   $(LIBGNUTLS_LIBS) $(LIBGNUTLS_EXTRA_LIBS)	\
   -L$(builddir) -lguile-gnutls-v-0
 
-AM_CPPFLAGS = -I$(builddir)
+AM_CPPFLAGS = -I$(top_builddir) -I$(builddir)
 
 if HAVE_GCC
 
