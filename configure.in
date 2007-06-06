@@ -119,6 +119,10 @@ if test "x$GAA" = "x"; then
 fi
 
 if test "x$opt_guile_bindings" = "xyes"; then
+   AC_MSG_RESULT([***
+*** Detecting GNU Guile...
+])
+
    AC_PATH_PROG([guile_snarf], [guile-snarf])
    if test "x$guile_snarf" = "x"; then
       AC_MSG_WARN([`guile-snarf' from Guile 1.8 not found.  Guile bindings not built.])
