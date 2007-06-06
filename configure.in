@@ -58,6 +58,7 @@ AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION 
 dnl In order to use the reentrant libc functions.
 dnl I hope it is portable enough.
 CFLAGS="${CFLAGS} -D_REENTRANT -D_THREAD_SAFE"
+AM_CFLAGS="${CFLAGS}"
 
 opt_dmalloc_mode=no
 AC_MSG_CHECKING([whether in dmalloc mode])
@@ -194,17 +195,17 @@ return 0;
 
 if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_developer_mode = xyes; then
-	  CFLAGS="${CFLAGS} -g -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wno-unused-parameter"
-#	  CFLAGS="${CFLAGS} -g -W -Wall -Wcast-align -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wshadow -Wno-unused-parameter -Wimplicit -fno-common -Wno-sign-compare -Wbad-function-cast -Wendif-labels -Wmissing-declarations -Wno-missing-format-attribute -Wmissing-prototypes -Wnested-externs -Wpointer-arith -pedantic -Wlong-long -Wcast-qual -Wcast-align -Winline -Wredundant-decls -Wstrict-prototypes -Wwrite-strings -Wparentheses -Wsequence-point -Wpacked -Waggregate-return -Wfloat-equal -Wmultichar -Wunknown-pragmas -Wtrigraphs -Wswitch -Wreturn-type -Wmain -Wchar-subscripts -Wcomment -Wno-missing-noreturn"
+	  AM_CFLAGS="${AM_CFLAGS} -g -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wno-unused-parameter"
+#	  AM_CFLAGS="${AM_CFLAGS} -g -W -Wall -Wcast-align -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wshadow -Wno-unused-parameter -Wimplicit -fno-common -Wno-sign-compare -Wbad-function-cast -Wendif-labels -Wmissing-declarations -Wno-missing-format-attribute -Wmissing-prototypes -Wnested-externs -Wpointer-arith -pedantic -Wlong-long -Wcast-qual -Wcast-align -Winline -Wredundant-decls -Wstrict-prototypes -Wwrite-strings -Wparentheses -Wsequence-point -Wpacked -Waggregate-return -Wfloat-equal -Wmultichar -Wunknown-pragmas -Wtrigraphs -Wswitch -Wreturn-type -Wmain -Wchar-subscripts -Wcomment -Wno-missing-noreturn"
 	fi
 
 	AC_MSG_CHECKING([if gcc supports -Wno-pointer-sign])
-	_gcc_cflags_save=$CFLAGS
-	CFLAGS="${CFLAGS} -Wno-pointer-sign"
+	_gcc_cflags_save=$AM_CFLAGS
+	AM_CFLAGS="${AM_CFLAGS} -Wno-pointer-sign"
 	AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_psign=yes,_gcc_psign=no)
 	AC_MSG_RESULT($_gcc_psign)
 	if test x"$_gcc_psign" != xyes ; then
-	  CFLAGS=$_gcc_cflags_save;
+	  AM_CFLAGS=$_gcc_cflags_save;
 	fi
 
 	AC_MSG_CHECKING([if gcc/ld supports -Wl,--output-def])
@@ -227,7 +228,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 	AC_MSG_CHECKING([whether we have GNU assembler])
 	GAS=`as --version < /dev/null 2>/dev/null | grep GNU`
 	if test "$GAS"; then
-	  CFLAGS="${CFLAGS} -pipe"
+	  AM_CFLAGS="${AM_CFLAGS} -pipe"
 	  AC_MSG_RESULT(yes)
 	else
 	  AC_MSG_RESULT(no)
@@ -650,13 +651,13 @@ AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
 AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 export ac_full
 
-CFLAGS="${CFLAGS} ${LIBGCRYPT_CFLAGS}"
+AM_CFLAGS="${AM_CFLAGS} ${LIBGCRYPT_CFLAGS}"
 
 if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_profiler_mode = xyes; then
 	  AC_CHECK_PROG(FC_OK, fc-config, yes, no)
 	  if test x$FC_OK = xyes; then
-   	        CFLAGS="${CFLAGS} `fc-config --cflags`"
+   	        AM_CFLAGS="${AM_CFLAGS} `fc-config --cflags`"
 		LIBS="$LIBS `fc-config --libs`"
 	  else
 AC_MSG_WARN(***
@@ -672,6 +673,8 @@ if test $ac_full -eq 0; then
 #warning This is not the official GnuTLS library. Several features were disabled at compilation.
 #endif /* __GNUC__ */]])
 fi
+
+AC_SUBST(AM_CFLAGS)
 
 AC_CONFIG_COMMANDS([chmod-config],[[
  chmod +x lib/libgnutls-config
