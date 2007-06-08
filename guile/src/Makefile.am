@@ -39,12 +39,14 @@ GNULIB_CFLAGS  = -I$(top_builddir)/lgl -I$(top_srcdir)/lgl
 
 libguile_gnutls_v_0_la_SOURCES = core.c errors.c utils.c
 libguile_gnutls_v_0_la_CFLAGS =				\
+  $(AM_CFLAGS)						\
   $(GNULIB_CFLAGS) $(GUILE_CFLAGS) $(LIBGNUTLS_CFLAGS)
 libguile_gnutls_v_0_la_LDFLAGS =			\
   $(GNULIB_LDFLAGS) $(GUILE_LDFLAGS) $(LIBGNUTLS_LIBS)
 
 libguile_gnutls_extra_v_0_la_SOURCES = extra.c
 libguile_gnutls_extra_v_0_la_CFLAGS =		\
+  $(AM_CFLAGS)					\
   $(GNULIB_CFLAGS) $(GUILE_CFLAGS)		\
   $(LIBGNUTLS_CFLAGS) $(LIBGNUTLS_EXTRA_CFLAGS)
 libguile_gnutls_extra_v_0_la_LDFLAGS =		\
@@ -57,9 +59,9 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(builddir)
 if HAVE_GCC
 
 # Generated `.x' files and Guile's `scm_c_define_gsubr ()' require
-# `-Wno-strict-prototypes'.
-libguile_gnutls_v_0_la_CFLAGS += -Wno-strict-prototypes
-libguile_gnutls_extra_v_0_la_CFLAGS += -Wno-strict-prototypes
+# `-Wno-strict-prototypes'.  This trick makes sure `-Wno-s-p' appears
+# after `-Ws-p'.
+AM_CFLAGS += -Wno-strict-prototypes
 
 endif
 
