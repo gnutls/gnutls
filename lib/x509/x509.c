@@ -1010,9 +1010,7 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
   else if (type == GNUTLS_SAN_DN)
     {
       _gnutls_str_cat (nptr, sizeof (nptr), ".directoryName");
-      len = *name_size;
-      result = _gnutls_x509_parse_dn (src, nptr, name, &len);
-      *name_size = len;
+      result = _gnutls_x509_parse_dn (src, nptr, name, name_size);
       if (result < 0)
 	{
 	  gnutls_assert ();
@@ -1545,7 +1543,11 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
 
   snprintf (name, sizeof(name), "tbsCertificate.extensions.?%u.extnID",
 	    indx + 1);
-  result = asn1_read_value (cert->cert, name, oid, sizeof_oid);
+
+  len = *sizeof_oid;
+  result = asn1_read_value (cert->cert, name, oid, &len);
+  *sizeof_oid = len;
+  
   if (result == ASN1_ELEMENT_NOT_FOUND)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   else if (result < 0)
@@ -1600,7 +1602,7 @@ int
 gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
 				    void *data, size_t * sizeof_data)
 {
-  int result;
+  int result, len;
   char name[MAX_NAME_SIZE];
 
   if (!cert)
@@ -1611,7 +1613,11 @@ gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
 
   snprintf (name, sizeof(name), "tbsCertificate.extensions.?%u.extnValue",
 	    indx + 1);
-  result = asn1_read_value (cert->cert, name, data, sizeof_data);
+	    
+  len = *sizeof_data;
+  result = asn1_read_value (cert->cert, name, data, &len);
+  *sizeof_data = len;
+  
   if (result == ASN1_ELEMENT_NOT_FOUND)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   else if (result < 0)
