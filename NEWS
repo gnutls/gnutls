@@ -22,6 +22,9 @@ Reported by Dennis Vshivkov <walrus@amur.ru>, see
 <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333050>.  Added
 self-test tests/parse_ca.c to test regressions.
 
+** Fix build failures related to missing images in manual.
+Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
 ** API and ABI modifications:
 No changes since last version.
 
