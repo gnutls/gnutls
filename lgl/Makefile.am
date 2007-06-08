@@ -646,6 +646,7 @@ wchar.h: wchar_.h
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''ABSOLUTE_WCHAR_H''@|$(ABSOLUTE_WCHAR_H)|g' \
 	      -e 's/@''HAVE_INCLUDE_NEXT''@/$(HAVE_INCLUDE_NEXT)/g' \
+	      -e 's/@''HAVE_WCHAR_H''@/$(HAVE_WCHAR_H)/g' \
 	    < $(srcdir)/wchar_.h; \
 	} > $@-t
 	mv $@-t $@
