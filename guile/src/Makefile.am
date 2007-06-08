@@ -34,25 +34,29 @@ CLEANFILES = $(BUILT_SOURCES)
 
 lib_LTLIBRARIES = libguile-gnutls-v-0.la libguile-gnutls-extra-v-0.la
 
-GNULIB_LDFLAGS = -L$(top_builddir)/lgl -llgnu
+# Linking against GnuTLS.
+GNUTLS_CORE_LIBS  = $(top_builddir)/lib/libgnutls.la
+GNUTLS_EXTRA_LIBS = $(top_builddir)/libextra/libgnutls-extra.la
+
+# Linking against Gnulib modules.
+GNULIB_LIBS    = $(top_builddir)/lgl/liblgnu.la
 GNULIB_CFLAGS  = -I$(top_builddir)/lgl -I$(top_srcdir)/lgl
 
+
 libguile_gnutls_v_0_la_SOURCES = core.c errors.c utils.c
-libguile_gnutls_v_0_la_CFLAGS =				\
-  $(AM_CFLAGS)						\
-  $(GNULIB_CFLAGS) $(GUILE_CFLAGS) $(LIBGNUTLS_CFLAGS)
+libguile_gnutls_v_0_la_CFLAGS =			\
+  $(AM_CFLAGS) $(GNULIB_CFLAGS) $(GUILE_CFLAGS)
 libguile_gnutls_v_0_la_LDFLAGS =			\
-  $(GNULIB_LDFLAGS) $(GUILE_LDFLAGS) $(LIBGNUTLS_LIBS)
+  $(GNULIB_LIBS) $(GNUTLS_CORE_LIBS) $(GUILE_LDFLAGS)
 
 libguile_gnutls_extra_v_0_la_SOURCES = extra.c
 libguile_gnutls_extra_v_0_la_CFLAGS =		\
-  $(AM_CFLAGS)					\
-  $(GNULIB_CFLAGS) $(GUILE_CFLAGS)		\
-  $(LIBGNUTLS_CFLAGS) $(LIBGNUTLS_EXTRA_CFLAGS)
+  $(AM_CFLAGS) $(GNULIB_CFLAGS) $(GUILE_CFLAGS)
 libguile_gnutls_extra_v_0_la_LDFLAGS =		\
-  $(GNULIB_LDFLAGS) $(GUILE_LDFLAGS)		\
-  $(LIBGNUTLS_LIBS) $(LIBGNUTLS_EXTRA_LIBS)	\
-  -L$(builddir) -lguile-gnutls-v-0
+  $(GNULIB_LIBS)				\
+  $(builddir)/libguile-gnutls-v-0.la		\
+  $(GNUTLS_CORE_LIBS) $(GNUTLS_EXTRA_LIBS)	\
+  $(GUILE_LDFLAGS)
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(builddir)
 
