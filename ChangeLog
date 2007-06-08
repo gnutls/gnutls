@@ -1,3 +1,267 @@
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.12.
+
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Fix warnings on amd64, from Nikos.
+
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	Merge branch 'guile'
+
+2007-06-08  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/intl.m4, lgl/m4/lseek.m4,
+	lgl/m4/stdint.m4, lgl/m4/vasnprintf.m4, lgl/m4/wchar.m4,
+	lgl/vasnprintf.c, lgl/wchar_.h: Update.
+
+2007-06-08  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* po/Makevars: Try to fix line number collisions.
+
+2007-06-06  Ludovic Courtes <ludo@chbouib.org>
+
+	* configure.in, guile/src/Makefile.am: Fixed the
+	`-Wno-strict-prototypes' issue in Guile code.  * configure.in: Add
+	all custom CFLAGS to `AM_CFLAGS' rather than   `CFLAGS', except for
+	`-D_REENTRANT -D_THREAD_SAFE' which must be   present during feature
+	tests.  Substitute `AM_CFLAGS'.  * src/Makefile.am
+	(libguile_gnutls_v_0_la_CFLAGS): Added `$(AM_CFLAGS)'.
+	(libguile_gnutls_extra_v_0_la_CFLAGS): Likewise.   (AM_CFLAGS): When
+	GCC is used, add `-Wno-strict-prototypes'.
+
+2007-06-06  Ludovic Courtes <ludo@chbouib.org>
+
+	* configure.in: Cosmetic changes in `configure.in'.  * configure.in:
+	Display a heading indicating that Guile stuff are being   detected.
+
+
+2007-06-06  Ludovic Courtes <ludo@chbouib.org>
+
+	* m4/guile.m4: Added `guile.m4', per Simon's request.
+
+2007-06-06  Ludovic Courtes <ludo@chbouib.org>
+
+	* configure.in: Don't look for Guile when `guile-snarf' is not
+	found.  * configure.in: Don't invoke `GUILE_PROGS' and `GUILE_FLAGS'
+	when   `guile-snarf' is not found.
+
+2007-06-04  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/protocol/draft-rescorla-tls-suiteb-01.txt: Add.
+
+2007-06-04  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-new-mac-01.txt: Add.
+
+2007-06-01  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/guile.texi: More @node fixes.
+
+2007-06-01  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/guile.texi: Avoid @node collisions with main manual.
+
+2007-06-01  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/Makefile.am: Need -I for config.h.
+
+2007-06-01  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* Makefile.am: Need to build doc/ after guile/.
+
+2007-06-01  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-01  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* guile/src/Makefile.am: Need -I for config.h.
+
+2007-06-01  Ludovic Courtès <ludo@chbouib.org>
+
+	Merge branch 'master' of git://repo.or.cz/gnutls
+
+2007-06-01  Ludovic Courtes <ludo@chbouib.org>
+
+	* doc/Makefile.am, guile/src/Makefile.am, guile/src/core.c,
+	guile/src/errors.c, guile/src/extra.c: Usage "old-fashion" make
+	suffix rules rather than GNU Make patterns.  * doc/Makefile
+	(%.c.texi): Removed.   (core.c.texi, extra.c.texi): New targets.  *
+	guile/src/Makefile.am: Renamed `FILE.c.x' to `FILE.x'.   (SUFFIXES):
+	Removed.   (%.c.x): Removed.   (.c.x): New target.  *
+	guile/src/core.c: Include "core.x" instead of "core.c.x".  *
+	guile/src/errors.c: Likewise.  * guile/src/extra.c: Likewise.
+
+2007-06-01  Ludovic Courtes <ludo@chbouib.org>
+
+	* doc/extract-guile-c-doc.scm,
+	guile/modules/system/documentation/c-snarf.scm: Tiny bug fixes in
+	Guile's documentation extraction.  * doc/extract-guile-c-doc.scm
+	(main): Use named arguments rather than   a single rest arg.   Fixed
+	the order of arguments as passed to   `run-cpp-and-extract-snarfing'
+	so that `ccache gcc -E' is really   passed as `("ccache" "gcc"
+	"-E")' (in this order).  *
+	guile/modules/system/documentation/c-snarf.scm
+	(run-cpp-and-extract-snarfing): Pass FILE as the last CPP argument.
+
+
+2007-05-31  Ludovic Courtes <ludo@chbouib.org>
+
+	* Makefile.am, configure.in, guile/src/Makefile.am: Build cleanups
+	following Simon's comments.  * Makefile.am (SUBDIRS): Add `guile'
+	when `HAVE_GUILE'.  * configure.in: When `guile-snarf' is not found,
+	set   `opt_guile_bindings' to `no' instead of bailing out.  *
+	src/Makefile.am (GUILE_FOR_BUILD): Fixed `-L' parameter.
+
+2007-05-31  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/gnutls.texi: Revert unnecessary changes.
+
+2007-05-31  Simon Josefsson <jas@mocca.josefsson.org>
+
+	Merge branch 'master' of
+	http://www.laas.fr/~lcourtes/software/gnutls
+
+2007-05-31  Ludovic Courtès <ludo@chbouib.org>
+
+	* configure.in: Tiny cosmetic change in `configure.in'.
+
+2007-05-31  Ludovic Courtès <ludo@chbouib.org>
+
+	* doc/guile.texi: Minor doc fixes.
+
+2007-05-31  Ludovic Courtès <ludo@chbouib.org>
+
+	* doc/Makefile.am: Handle missing Guile when building the
+	documentation.
+
+2007-05-31  Ludovic Courtès <ludo@chbouib.org>
+
+	* doc/Makefile.am, doc/extract-guile-c-doc.scm, doc/gnutls.texi,
+	doc/guile.texi: Integrated documentation of Guile bindings.
+
+2007-05-30  Ludovic Courtès <ludo@chbouib.org>
+
+	* configure.in, guile/src/Makefile.am: Try to handle "function
+	declaration isn't a prototype" warnings.
+
+2007-05-30  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* gl/netinet_in_.h, gl/string_.h, gl/sys_socket_.h,
+	lgl/Makefile.am, lgl/float_.h, lgl/fseeko.c, lgl/lseek.c,
+	lgl/m4/iconv.m4, lgl/m4/lseek.m4, lgl/m4/stdio_h.m4, lgl/stdint_.h,
+	lgl/stdio_.h, lgl/string_.h, lgl/sys_socket_.h, lgl/sys_stat_.h,
+	lgl/time_.h, lgl/unistd_.h, lgl/wchar_.h: Update.
+
+2007-05-30  Ludovic Courtès <ludo@chbouib.org>
+
+	* Makefile.am, configure.in, guile/Makefile.am,
+	guile/modules/Makefile.am, guile/modules/gnutls.scm,
+	guile/modules/gnutls/build/enums.scm,
+	guile/modules/gnutls/build/priorities.scm,
+	guile/modules/gnutls/build/smobs.scm,
+	guile/modules/gnutls/build/utils.scm,
+	guile/modules/gnutls/extra.scm,
+	guile/modules/system/documentation/README,
+	guile/modules/system/documentation/c-snarf.scm,
+	guile/modules/system/documentation/output.scm,
+	guile/pre-inst-guile.in, guile/src/Makefile.am, guile/src/core.c,
+	guile/src/errors.c, guile/src/errors.h, guile/src/extra.c,
+	guile/src/make-enum-header.scm, guile/src/make-enum-map.scm,
+	guile/src/make-session-priorities.scm,
+	guile/src/make-smob-header.scm, guile/src/make-smob-types.scm,
+	guile/src/utils.c, guile/src/utils.h, guile/tests/Makefile.am,
+	guile/tests/anonymous-auth.scm, guile/tests/errors.scm,
+	guile/tests/openpgp-auth.scm, guile/tests/openpgp-keyring.asc,
+	guile/tests/openpgp-keyring.gpg, guile/tests/openpgp-keyring.scm,
+	guile/tests/openpgp-keys.scm, guile/tests/openpgp-pub.asc,
+	guile/tests/openpgp-sec.asc, guile/tests/pkcs-import-export.scm,
+	guile/tests/raw-to-c.scm, guile/tests/rsa-parameters.pem,
+	guile/tests/session-record-port.scm, guile/tests/srp-base64.scm,
+	guile/tests/x509-auth.scm, guile/tests/x509-certificate.pem,
+	guile/tests/x509-certificates.scm, guile/tests/x509-key.pem: Started
+	Guile integration.  Documentation is still missing.  A bit rough on
+	the edges, but `make' and `make check' do work.
+
+2007-05-28  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* doc/Makefile.am: Make sure all images are distributed in all
+	formats.  Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
+
+
+2007-05-27  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* lib/gnutls_x509.c: (parse_pem_ca_mem): Handle reads beyond first certificate properly.
+	Reported by Dennis Vshivkov <walrus@amur.ru> in
+	<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=333050>.
+
+2007-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/parse_ca.c: Add self-test.
+
+2007-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2007-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-05-27  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: [no log message]
+
+2007-05-27  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* lib/gnutls_datum.c: (_gnutls_free_datum_m): Free even if size is 0.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS: Add.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* lib/x509/privkey_pkcs8.c: (decode_pkcs8_key): If ASN.1 decoding fails after decrypting an
+	already properly decoded value, assume it is due to a bad password
+	rather than ASN.1 error.  Reported by Nate Nielsen
+	<nielsen-list@memberwebs.com>.  (From 1.6.x branch.)
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* lib/x509/privkey_pkcs8.c: (decode_private_key_info): Translate asn1 errors properly.  Reported
+	by Nate Nielsen <nielsen-list@memberwebs.com>.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* lib/auth_cert.c: Fix mem leak, reported by Andrey Nosenko
+	<andrew.w.nosenko@gmail.com>. (From 1.6.x branch.)
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* THANKS: Add (from 1.6.x).
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-05-26  Simon Josefsson <jas@mocca.josefsson.org>
 
 	* NEWS: Version 1.7.11.
