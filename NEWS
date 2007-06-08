@@ -26,6 +26,8 @@ self-test tests/parse_ca.c to test regressions.
 ** Fix build failures related to missing images in manual.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org>.
 
+** Update gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
