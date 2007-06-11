@@ -48,10 +48,9 @@ htmldir = ../www-$(PACKAGE)
 release:
 	! git-tag -l $(tag) > /dev/null
 	rm -f ChangeLog
-	make ChangeLog
+	$(MAKE) ChangeLog distcheck
 	git commit -m Generated. ChangeLog
 	git-tag -u b565716f! -m $(VERSION) $(tag)
-	make dist
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
 	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/devel/
