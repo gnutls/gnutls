@@ -22,8 +22,6 @@
 ;;;
 ;;; Exercise the OpenPGP keyring API part of GnuTLS-extra.
 ;;;
-;;; XXX: Keyring import is broken in GnuTLS versions up to and including 1.7.8.
-;;;
 
 (use-modules (gnutls extra) (gnutls)
              (srfi srfi-1)

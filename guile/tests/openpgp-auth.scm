@@ -22,9 +22,6 @@
 ;;;
 ;;; Test session establishment using OpenPGP certificate authentication.
 ;;;
-;;; XXX: `set-certificate-credentials-openpgp-keys!' is broken (i.e.,
-;;; segfaults) in GnuTLS 1.7.2 and earlier.
-;;;
 
 (use-modules (gnutls)
              (gnutls extra)
