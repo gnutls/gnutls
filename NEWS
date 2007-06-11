@@ -7,7 +7,7 @@ See the end for copying conditions.
 
 ** OpenCDK copy updated to version 0.6.3.
 
-** Self-test fixes for GnuTLS Guile bindings.
+** Build fixes for GnuTLS Guile bindings.
 Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
 
 ** Build fix for GTK-DOC manual.
