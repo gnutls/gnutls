@@ -327,11 +327,11 @@ read_mdc (cdk_stream_t inp, cdk_pkt_mdc_t mdc)
   if (DEBUG_PKT)
     _cdk_log_debug ("read_mdc:\n");
   
-  rc = stream_read (inp, mdc->hash, 20, &n);
+  rc = stream_read (inp, mdc->hash, DIM (mdc->hash), &n);
   if (rc)
     return rc;  
   
-  return n != 20? CDK_Inv_Packet : 0;
+  return n != DIM (mdc->hash)? CDK_Inv_Packet : 0;
 }
 
 
@@ -881,7 +881,7 @@ read_literal (cdk_stream_t inp, size_t pktlen,
     _cdk_log_debug ("read_literal: %d octets\n", pktlen);
   
   pt->mode = cdk_stream_getc (inp);
-  if (pt->mode != 0x62 && pt->mode != 0x74)
+  if (pt->mode != 0x62 && pt->mode != 0x74 && pt->mode != 0x75)
     return CDK_Inv_Packet;
   if (cdk_stream_eof (inp))
     return CDK_Inv_Packet;

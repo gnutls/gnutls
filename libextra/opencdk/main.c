@@ -96,6 +96,7 @@ cdk_strerror (int ec)
     case CDK_Unusable_Key:     return "Unusable public key";
     case CDK_No_Data:          return "No data";
     case CDK_No_Passphrase:    return "No passphrase supplied";
+    case CDK_Network_Error:    return "A network error occurred";
     default:                   sprintf (buf, "ec=%d", ec); return buf;
     }
   return NULL;
@@ -105,7 +106,7 @@ cdk_strerror (int ec)
 static void
 out_of_core (size_t n)
 {
-    fprintf (stderr, "\n ** fatal error: out of memory (%d bytes) **\n", n);
+  fprintf (stderr, "\n ** fatal error: out of memory (%d bytes) **\n", n);
 }
 
 
@@ -126,12 +127,12 @@ cdk_set_malloc_hooks (void *(*new_alloc_func) (size_t n),
 		      void *(*new_calloc_func) (size_t m, size_t n),
 		      void (*new_free_func) (void *))
 {
-    alloc_func = new_alloc_func;
-    alloc_secure_func = new_alloc_secure_func;
-    realloc_func = new_realloc_func;
-    calloc_func = new_calloc_func;
-    free_func = new_free_func;
-    malloc_hooks = 1;
+  alloc_func = new_alloc_func;
+  alloc_secure_func = new_alloc_secure_func;
+  realloc_func = new_realloc_func;
+  calloc_func = new_calloc_func;
+  free_func = new_free_func;
+  malloc_hooks = 1;
 }
 
 
@@ -143,28 +144,36 @@ cdk_set_malloc_hooks (void *(*new_alloc_func) (size_t n),
 int
 cdk_malloc_hook_initialized (void)
 {
-    return malloc_hooks;
+  return malloc_hooks;
 }
 
 
 void*
 cdk_malloc (size_t size)
 {
-    void *p = alloc_func (size);
-    if (!p)
-        out_of_core (size);
-    return p;
+  void *p = alloc_func (size);
+  if (!p)
+    out_of_core (size);
+  return p;
 }
 
 
-void *
+/**
+ * cdk_calloc:
+ * @n: amount of elements
+ * @m: size of one element
+ * 
+ * Safe wrapper around the c-function calloc.
+ **/
+void*
 cdk_calloc (size_t n, size_t m)
 {
-    void * p = calloc_func (n, m);
-    if (!p)
-        out_of_core (m);
-    return p;
+  void * p = calloc_func (n, m);
+  if (!p)
+    out_of_core (m);
+  return p;
 }
+
 
 /* Things which need to  be done after the secure memory initialisation. */
 static void
@@ -174,6 +183,7 @@ _secmem_finish (void)
 }
 
 
+/* Initialize the secure memory. */
 static void
 _secmem_init (size_t size)
 {
@@ -181,10 +191,17 @@ _secmem_init (size_t size)
     return;
   if (size >= SECMEM_SIZE)
     size = SECMEM_SIZE;
-  gcry_control (GCRYCTL_INIT_SECMEM, size, 0);
-  gcry_control (GCRYCTL_USE_SECURE_RNDPOOL);
-  gcry_control (GCRYCTL_DISABLE_SECMEM_WARN);
-  secmem_init = 1;
+  
+  /* Check if no other library has already initialized gcrypt. */
+  if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
+    {
+      _cdk_log_debug ("init: libgcrypt initialize.\n");
+      gcry_control (GCRYCTL_INIT_SECMEM, size, 0);
+      gcry_control (GCRYCTL_USE_SECURE_RNDPOOL);
+      gcry_control (GCRYCTL_DISABLE_SECMEM_WARN);      
+      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
+      secmem_init = 1;
+    }  
 }
 
 
@@ -281,31 +298,32 @@ cdk_salloc (size_t size, int clear)
 void *
 cdk_realloc (void *ptr, size_t size)
 {
-    void * p = realloc_func (ptr, size);
-    if (!p)
-        out_of_core (size);
-    return p;
+  void * p = realloc_func (ptr, size);
+  if (!p)
+    out_of_core (size);
+  return p;
 }
 
 
 char *
 cdk_strdup (const char * ptr)
 {
-    char * p = cdk_malloc (strlen (ptr) + 1);
-    if (p)
-        strcpy (p, ptr);
-    return p;
+  char * p = cdk_malloc (strlen (ptr) + 1);
+  if (p)
+    strcpy (p, ptr);
+  return p;
 }
 
 
 void
 cdk_free (void * ptr)
 {
-    if (ptr)
-        free_func (ptr);
+  if (ptr)
+    free_func (ptr);
 }
 
 
+/* Internal logging routine. */
 static void
 _cdk_logv (int level, const char *fmt, va_list arg_ptr)
 {
@@ -328,7 +346,7 @@ _cdk_logv (int level, const char *fmt, va_list arg_ptr)
  * @logfnc: the function pointer
  * @opaque: a private values for the function
  *
- * Set a private handler for logging.
+ * Set a custom handler for logging.
  **/
 void
 cdk_set_log_handler (cdk_log_fnc_t logfnc, void *opaque)
@@ -351,6 +369,7 @@ cdk_set_log_level (int level)
 }
 
 
+/* Return the current log level of the lib. */
 int
 _cdk_get_log_level (void)
 {
@@ -618,7 +637,6 @@ cdk_handle_set_keyring (cdk_ctx_t hd, int type, const char *kringname)
   return 0;
 }
 
-
   
 /**
  * cdk_handle_set_keydb:
@@ -634,7 +652,7 @@ cdk_handle_set_keydb (cdk_ctx_t hd, cdk_keydb_hd_t db)
 {
   if (!hd)
     return;
-  if (db->secret)
+  if (_cdk_keydb_is_secret (db))
     hd->db.sec = db;
   else
     hd->db.pub = db;
@@ -662,7 +680,6 @@ cdk_handle_get_keydb (cdk_ctx_t hd, int type)
 }
 
 
-
 /**
  * cdk_handle_set_passphrase_cb:
  * @hd: session handle
@@ -682,6 +699,13 @@ void cdk_handle_set_passphrase_cb (cdk_ctx_t hd,
 }
 
 
+/**
+ * cdk_handle_verify_get_result:
+ * @hd: the session handle
+ * 
+ * Return the verify result for the current session.
+ * Do not free the pointer.
+ **/
 cdk_verify_result_t 
 cdk_handle_verify_get_result (cdk_ctx_t hd)
 {

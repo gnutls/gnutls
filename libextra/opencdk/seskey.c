@@ -1,6 +1,6 @@
 /* seskey.c - Session key routines
  *        Copyright (C) 2002, 2003, 2007 Timo Schulz
- *        Copyright (C) 1998, 1999, 2000, 2002 Free Software Foundation, Inc.
+ *        Copyright (C) 1998-2000, 2002 Free Software Foundation, Inc.
  *
  * This file is part of OpenCDK.
  *
@@ -37,9 +37,8 @@ do_encode_md (byte **r_frame, size_t *r_flen, const byte *md, int algo,
 	      size_t len, unsigned nbits, const byte *asn, size_t asnlen)
 {
   byte *frame = NULL;
-  size_t n = 0;
   size_t nframe = (nbits + 7) / 8;
-  size_t i;
+  size_t i, n = 0;
 
   if (!asn || !md || !r_frame || !r_flen)
     return CDK_Inv_Value;
@@ -86,16 +85,26 @@ do_encode_md (byte **r_frame, size_t *r_flen, const byte *md, int algo,
  *  DEK - random session key.
  *  CKSUM - algebraic checksum of the DEK.
  */
+
+/**
+ * cdk_dek_encode_pkcs1
+ * @dek: DEK object
+ * @nbits: size of the multi precision integer frame
+ * @r_enc: output of the encoded multiprecision integer
+ * 
+ * Encode the given random session key in the DEK object
+ * into a multiprecision integer.
+ **/
 cdk_error_t
 cdk_dek_encode_pkcs1 (cdk_dek_t dek, size_t nbits, gcry_mpi_t *r_enc)
 {
   gcry_mpi_t a = NULL;
   gcry_error_t err;
   byte *p, *frame;
-  size_t n = 0;
+  size_t n;
   size_t nframe = 0;
-  u16 chksum = 0;
   size_t i;
+  u16 chksum = 0;
   
   if (!r_enc || !dek)
     return CDK_Inv_Value;
@@ -154,6 +163,14 @@ cdk_dek_encode_pkcs1 (cdk_dek_t dek, size_t nbits, gcry_mpi_t *r_enc)
 }
 
 
+/**
+ * cdk_dek_decode_pkcs1:
+ * @ret_dek: the decoded DEK object
+ * @esk: the pkcs#1 encoded session key.
+ * 
+ * Decode the given multi precision integer in pkcs#1 and
+ * store it into the DEK object.
+ **/
 cdk_error_t
 cdk_dek_decode_pkcs1 (cdk_dek_t *ret_dek, gcry_mpi_t esk)
 {
@@ -166,6 +183,7 @@ cdk_dek_decode_pkcs1 (cdk_dek_t *ret_dek, gcry_mpi_t esk)
   if (!ret_dek || !esk)
     return CDK_Inv_Value;
   
+  *ret_dek = NULL; /* reset */
   nframe = DIM (frame)-1;
   err = gcry_mpi_print (GCRYMPI_FMT_USG, frame, nframe, &nframe, esk);
   if (err)
@@ -198,6 +216,7 @@ cdk_dek_decode_pkcs1 (cdk_dek_t *ret_dek, gcry_mpi_t esk)
   dek->algo = frame[n++];
   if (dek->keylen != gcry_cipher_get_algo_keylen (dek->algo))
     {
+      _cdk_log_debug ("pkcs1 decode: invalid cipher keylen\n");
       cdk_free (dek);
       return CDK_Inv_Algo;
     }
@@ -208,6 +227,7 @@ cdk_dek_decode_pkcs1 (cdk_dek_t *ret_dek, gcry_mpi_t esk)
     csum2 += dek->key[n];
   if (csum != csum2)
     {
+      _cdk_log_debug ("pkcs decode: checksum does not match\n");
       cdk_free (dek);
       return CDK_Chksum_Error;
     }
@@ -216,8 +236,7 @@ cdk_dek_decode_pkcs1 (cdk_dek_t *ret_dek, gcry_mpi_t esk)
 }
 
 
-/* Do some tests before it calls do_encode_md that depends on the
-   public key algorithm that is used. */
+/* Encode the given digest into a pkcs#1 compatible format. */
 cdk_error_t
 _cdk_digest_encode_pkcs1 (byte **r_md, size_t *r_mdlen, int pk_algo,
 			  const byte *md, int digest_algo, unsigned nbits)
@@ -300,36 +319,44 @@ _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk)
   char *pw, *p;
   cdk_error_t rc;
   
-  rc = 0;
-  if (sk->is_protected) 
-    {    
-      p = passphrase_prompt (sk);
-      pw = _cdk_passphrase_get (hd, p);
-      if (pw)
-	rc = cdk_sk_unprotect (sk, pw);
-      if (pw)
-	{
-	  wipemem (pw, strlen (pw));
-	  cdk_free (pw);
-	}
-      cdk_free (p);
-    }
+  if (!sk->is_protected)
+    return 0;
+  
+  p = passphrase_prompt (sk);
+  pw = _cdk_passphrase_get (hd, p);
+  cdk_free (p);
+  if (!pw)
+    return CDK_No_Passphrase;
+  
+  rc = cdk_sk_unprotect (sk, pw);
+
+  wipemem (pw, strlen (pw));
+  cdk_free (pw);
   return rc;
 }
 
 
-/* Try to extract the DEK from the public key encrypted packet. */
+/**
+ * cdk_dek_extract:
+ * ret_dek: the raw DEK object
+ * hd: the session handle
+ * @enc: the public key encrypted packet
+ * @sk: the secret key.
+ * 
+ * Try to extract the DEK from the public key encrypted packet. 
+ **/
 cdk_error_t
 cdk_dek_extract (cdk_dek_t *ret_dek, cdk_ctx_t hd,
                  cdk_pkt_pubkey_enc_t enc, cdk_pkt_seckey_t sk)
 {
-  cdk_dek_t dek = NULL;
-  gcry_mpi_t skey =NULL;
+  gcry_mpi_t skey = NULL;
+  cdk_dek_t dek;
   cdk_error_t rc;
 
   if (!enc || !sk || !ret_dek)
     return CDK_Inv_Value;
   
+  /* FIXME: it is not very elegant that we need the session handle here. */  
   if (sk->is_protected)
     {      
       rc = _cdk_sk_unprotect_auto (hd, sk);
@@ -353,6 +380,12 @@ cdk_dek_extract (cdk_dek_t *ret_dek, cdk_ctx_t hd,
 }
 
 
+/**
+ * cdk_dek_new:
+ * @r_dek: the new DEK object
+ * 
+ * Create a new DEK object.
+ **/
 cdk_error_t
 cdk_dek_new (cdk_dek_t *r_dek)
 {
@@ -369,6 +402,13 @@ cdk_dek_new (cdk_dek_t *r_dek)
 }
 
 
+/**
+ * cdk_dek_set_cipher:
+ * @dek: the DEK object
+ * @algo: the cipher algorithm to use
+ * 
+ * Set the cipher for the given DEK object.
+ **/
 cdk_error_t
 cdk_dek_set_cipher (cdk_dek_t dek, int algo)
 {
@@ -384,7 +424,28 @@ cdk_dek_set_cipher (cdk_dek_t dek, int algo)
   return 0;
 }
 
+cdk_error_t
+cdk_dek_get_cipher (cdk_dek_t dek, int *r_algo)
+{
+  if (!dek || !r_algo)
+    return CDK_Inv_Value;
+  
+  
+  *r_algo = dek->algo;
+  return 0;
+}
 
+
+/**
+ * cdk_dek_set_key:
+ * @dek: the DEK object
+ * @key: the random session key
+ * @keylen: the length of the session key.
+ * 
+ * Set the random session key for the given DEK object.
+ * If @key and @keylen is NULL (0) a random key will be generated.
+ * In any case, cdk_dek_set_cipher must be called first. 
+ **/
 cdk_error_t
 cdk_dek_set_key (cdk_dek_t dek, const byte *key, size_t keylen)
 {
@@ -392,8 +453,10 @@ cdk_dek_set_key (cdk_dek_t dek, const byte *key, size_t keylen)
   size_t i;
   
   if (!dek)
-    return CDK_Inv_Value;
-  
+    return CDK_Inv_Value;  
+
+  /* The given key must be compatible with the symmetric
+     cipher algorithm set before. */
   if (keylen > 0 && keylen != dek->keylen)
     return CDK_Inv_Mode;
   
@@ -417,6 +480,7 @@ cdk_dek_set_key (cdk_dek_t dek, const byte *key, size_t keylen)
 	    }
 	  gcry_randomize (dek->key, dek->keylen, GCRY_STRONG_RANDOM);
 	}
+      gcry_cipher_close (hd);
       return CDK_Weak_Key;
     }
   
@@ -425,6 +489,13 @@ cdk_dek_set_key (cdk_dek_t dek, const byte *key, size_t keylen)
 }
 
 
+/**
+ * cdk_dek_set_mdc_flag:
+ * @dek: the DEK object
+ * @val: value to enable or disable the use
+ * 
+ * Enable or disable the MDC flag for the given DEK object.
+ **/
 void
 cdk_dek_set_mdc_flag (cdk_dek_t dek, int val)
 {
@@ -433,11 +504,28 @@ cdk_dek_set_mdc_flag (cdk_dek_t dek, int val)
 }
 
 
+int
+cdk_dek_get_mdc_flag (cdk_dek_t dek)
+{
+  if (!dek)
+    return 0;
+  return dek->use_mdc;
+}
+
+  
+/**
+ * cdk_dek_free:
+ * @dek: the DEK object
+ * 
+ * Release the DEK object.
+ **/
 void
 cdk_dek_free (cdk_dek_t dek)
 {
   if (!dek)
     return;
+  
+  /* Make sure sentensive data is overwritten. */
   wipemem (dek->key, sizeof (dek->key));
   cdk_free (dek);
 }
@@ -445,13 +533,13 @@ cdk_dek_free (cdk_dek_t dek)
 
 /* Hash the passphrase to produce the a DEK.
    If create is set, a random salt will be generated. */
-static int
+static cdk_error_t
 hash_passphrase (cdk_dek_t dek, const char *pw, cdk_s2k_t s2k, int create)
 {
   gcry_md_hd_t md;
   byte zero[1] = {0x00};
   int pass, i;
-  int used = 0, pwlen = 0;
+  int used = 0, pwlen;
   gcry_error_t err;
   
   if (!dek || !pw || !s2k)
@@ -487,7 +575,7 @@ hash_passphrase (cdk_dek_t dek, const char *pw, cdk_s2k_t s2k, int create)
 	  if (s2k->mode == 3) 
 	    {
 	      count = (16ul + (s2k->count & 15)) << ((s2k->count >> 4) + 6);
-	      if( count < len2 )
+	      if (count < len2)
 		count = len2;
 	    }
 	  /* a little bit complicated because we need a ulong for count */
@@ -545,21 +633,31 @@ cdk_dek_from_passphrase (cdk_dek_t *ret_dek, int cipher_algo, cdk_s2k_t s2k,
   if (rc)
     return rc;
   rc = cdk_dek_set_cipher (dek, cipher_algo);
+  if (!rc)
+    rc = hash_passphrase (dek, pw, s2k, rndsalt);
   if (rc) 
     {    
       cdk_dek_free (dek);
       return rc;
     }
-  
-  hash_passphrase (dek, pw, s2k, rndsalt);
 
   *ret_dek = dek;
   return 0;
 }
 
 
+/**
+ * cdk_s2k_new:
+ * @ret_s2k: output for the new S2K object
+ * @mode: the S2K mode (simple, salted, iter+salted)
+ * @digest_algo: the hash algorithm
+ * @salt: random salt
+ * 
+ * Create a new S2K object with the given parameter.
+ * The @salt parameter must be always 8 octets.
+ **/
 cdk_error_t
-cdk_s2k_new (cdk_s2k_t *ret_s2k, int mode, int algo, const byte *salt)
+cdk_s2k_new (cdk_s2k_t *ret_s2k, int mode, int digest_algo, const byte *salt)
 {
   cdk_s2k_t s2k;
 
@@ -569,14 +667,14 @@ cdk_s2k_new (cdk_s2k_t *ret_s2k, int mode, int algo, const byte *salt)
   if (mode != 0x00 && mode != 0x01 && mode != 0x03)
     return CDK_Inv_Mode;
   
-  if (gcry_md_test_algo (algo))
+  if (gcry_md_test_algo (digest_algo))
     return CDK_Inv_Algo;
   
   s2k = cdk_calloc (1, sizeof *s2k);
   if (!s2k)
     return CDK_Out_Of_Core;
   s2k->mode = mode;
-  s2k->hash_algo = algo;
+  s2k->hash_algo = digest_algo;
   if (salt)
     memcpy (s2k->salt, salt, 8);
   *ret_s2k = s2k;
@@ -584,8 +682,31 @@ cdk_s2k_new (cdk_s2k_t *ret_s2k, int mode, int algo, const byte *salt)
 }
 
 
+/**
+ * cdk_s2k_free:
+ * @s2k: the S2K object
+ * 
+ * Release the given S2K object.
+ **/
 void
 cdk_s2k_free (cdk_s2k_t s2k)
 {
   cdk_free (s2k);
+}
+
+
+/* Make a copy of the source s2k into R_DST. */
+cdk_error_t
+_cdk_s2k_copy (cdk_s2k_t *r_dst, cdk_s2k_t src)
+{
+  cdk_s2k_t dst;
+  cdk_error_t err;
+  
+  err = cdk_s2k_new (&dst, src->mode, src->hash_algo, src->salt);
+  if (err)
+    return err;
+  dst->count = src->count;
+  *r_dst = dst;
+  
+  return 0;
 }

@@ -23,12 +23,12 @@
 #include <gcrypt.h>
 
 /* The OpenCDK version as a string. */
-#define OPENCDK_VERSION "0.6.1"
+#define OPENCDK_VERSION "0.6.3"
 
 /* The OpenCDK version as integer components major.minor.path */
 #define OPENCDK_VERSION_MAJOR 0
 #define OPENCDK_VERSION_MINOR 6
-#define OPENCDK_VERSION_PATCH 1
+#define OPENCDK_VERSION_PATCH 3
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +60,7 @@ typedef struct cdk_dek_s *cdk_dek_t;
 struct cdk_s2k_s;
 typedef struct cdk_s2k_s *cdk_s2k_t;
 
+/* Abstract I/O object, a stream, which is used for most operations. */
 struct cdk_stream_s;
 typedef struct cdk_stream_s *cdk_stream_t;
 
@@ -124,7 +125,8 @@ typedef enum {
     CDK_Too_Short = 24,
     CDK_Unusable_Key = 25,
     CDK_No_Data = 26,
-    CDK_No_Passphrase = 27
+    CDK_No_Passphrase = 27,
+    CDK_Network_Error = 28
 } cdk_error_t;
 
 
@@ -337,6 +339,13 @@ typedef enum {
     CDK_FLAG_SIG_EXPIRED = 1024
 } cdk_key_flags_t;
 
+
+/* Possible format for the literal data. */
+typedef enum {
+  CDK_LITFMT_BINARY = 0,
+  CDK_LITFMT_TEXT   = 1,
+  CDK_LITFMT_UNICODE= 2
+} cdk_lit_format_t;	
 
 /* Valid OpenPGP packet types and their IDs */
 typedef enum {
@@ -562,11 +571,16 @@ struct cdk_packet_s {
 };
 typedef struct cdk_packet_s *cdk_packet_t;
 
-/*-- main.c --*/
 /* memory routines */
 typedef void (*cdk_log_fnc_t) (void *, int, const char *, va_list);
+
+/* Set the log level. */
 void cdk_set_log_level (int lvl);
+
+/* Set a custom log handler which is used for logging. */
 void cdk_set_log_handler (cdk_log_fnc_t logfnc, void *opaque);
+
+/* Return a human readable error description of the given error coe. */
 const char* cdk_strerror (int ec);
 
 /* Allow the user to set custom hooks for memory allocation.
@@ -707,7 +721,6 @@ const unsigned char* cdk_key_desig_revoker_walk (cdk_desig_revoker_t root,
                                                  cdk_desig_revoker_t * ctx,
                                                  int *r_class, int *r_algid);
 
-/*-- pubkey.c --*/
 #define is_RSA(a) ((a) == CDK_PK_RSA \
                    || (a) == CDK_PK_RSA_E \
                    || (a) == CDK_PK_RSA_S)
@@ -758,10 +771,23 @@ int cdk_pk_get_nsig (int algo);
 int cdk_pk_get_nenc (int algo);
 
 /* Fingerprint and key ID routines. */
+
+/* Calculate the fingerprint of the given public key.
+   the FPR parameter must be at least 20 octets to hold the SHA1 hash. */
 cdk_error_t cdk_pk_get_fingerprint (cdk_pubkey_t pk, unsigned char *fpr);
+
+/* Same as above, but with additional sanity checks of the buffer size. */
+cdk_error_t cdk_pk_to_fingerprint (cdk_pubkey_t pk,
+		       		   unsigned char *fpr, size_t fprlen, 
+				   size_t *r_nout);
+
+/* Derive the keyid from the fingerprint. This is only possible for
+   modern, version 4 keys. */
 unsigned int cdk_pk_fingerprint_get_keyid (const unsigned char *fpr,
-                                            size_t fprlen,
-                                            unsigned int *keyid);
+                                           size_t fprlen,
+                                           unsigned int *keyid);
+					   
+/* Various functions to get the keyid from the specific packet type. */
 unsigned int cdk_pk_get_keyid (cdk_pubkey_t pk, unsigned int *keyid);
 unsigned int cdk_sk_get_keyid (cdk_seckey_t sk, unsigned int *keyid);
 unsigned int cdk_sig_get_keyid (cdk_pkt_signature_t sig,
@@ -789,10 +815,26 @@ cdk_error_t cdk_seckey_to_sexp (cdk_seckey_t sk,
 /* Data Encryption Key (DEK) routines */
 cdk_error_t cdk_dek_new (cdk_dek_t *r_dek);
 void cdk_dek_free (cdk_dek_t dek);
+
+/* Set the symmetric cipher algorithm which shall be used for this
+   DEK object. */   
 cdk_error_t cdk_dek_set_cipher (cdk_dek_t dek, int cipher_algo);
+
+/* Return the symmetric cipher which is used for this DEK object. */
+cdk_error_t cdk_dek_get_cipher (cdk_dek_t dek, int *r_cipher_algo);
+
+
+/* Set the session key for the given DEK object.
+   If @KEY and @KEYLEN are both NULL/0, a random key will be generated
+   and stored in the DEK object. */
 cdk_error_t cdk_dek_set_key (cdk_dek_t dek, const unsigned char *key,
                              size_t keylen);
+			     
+/* Enable the MDC feature for the current DEK object. */
 void cdk_dek_set_mdc_flag (cdk_dek_t dek, int val);
+
+/* Return if the MDC feature is enabled for the current DEK object.*/
+int cdk_dek_get_mdc_flag (cdk_dek_t dek);
 			     
 /* Transform the given passphrase into a DEK.
    If @rndsalt is set, a random salt will be generated. */
@@ -805,7 +847,6 @@ cdk_error_t cdk_s2k_new (cdk_s2k_t *ret_s2k, int mode, int digest_algo,
                          const unsigned char *salt);
 void cdk_s2k_free (cdk_s2k_t s2k);
 
-/*-- armor.c --*/
 cdk_error_t cdk_file_armor (cdk_ctx_t hd, const char *file,
                             const char *output);
 cdk_error_t cdk_file_dearmor (const char * file, const char *output);
@@ -819,7 +860,6 @@ cdk_error_t cdk_armor_encode_buffer (const unsigned char *inbuf, size_t inlen,
 			             size_t *nwritten, int type);
 						  
 
-/*-- stream.c --*/
 /* This context contain user callbacks for different stream operations.
    Some of these callbacks might be NULL to indicate that the callback
    is not used. */
@@ -835,8 +875,20 @@ typedef struct cdk_stream_cbs_s *cdk_stream_cbs_t;
 
 		
 int cdk_stream_is_compressed (cdk_stream_t s);
+
+/* Return a stream object which is associated to a socket. */
+cdk_error_t cdk_stream_sockopen (const char *host, unsigned short port,
+                                 cdk_stream_t *ret_out);
+				 
+/* Return a stream object which is associated to an existing file. */
 cdk_error_t cdk_stream_open (const char * file, cdk_stream_t * ret_s);
+
+/* Return a stream object which is associated to a file which will
+   be created when the stream is closed. */
 cdk_error_t cdk_stream_new (const char * file, cdk_stream_t * ret_s);
+
+/* Return a stream object with custom callback functions for the
+   various core operations. */
 cdk_error_t cdk_stream_new_from_cbs (cdk_stream_cbs_t cbs, void *opa,
 	    			     cdk_stream_t *ret_s);
 cdk_error_t cdk_stream_create (const char * file, cdk_stream_t * ret_s);
@@ -857,8 +909,12 @@ int cdk_stream_eof (cdk_stream_t s);
 off_t cdk_stream_tell (cdk_stream_t s);
 cdk_error_t cdk_stream_seek (cdk_stream_t s, off_t offset);
 cdk_error_t cdk_stream_set_armor_flag (cdk_stream_t s, int type);
-cdk_error_t cdk_stream_set_literal_flag (cdk_stream_t s, int mode,
+
+/* Push the literal filter for the given stream. */
+cdk_error_t cdk_stream_set_literal_flag (cdk_stream_t s, 
+	    				 cdk_lit_format_t mode,
                                          const char * fname);
+					 
 cdk_error_t cdk_stream_set_cipher_flag (cdk_stream_t s, cdk_dek_t dek,
                                         int use_mdc);
 cdk_error_t cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level);
@@ -873,8 +929,6 @@ cdk_error_t cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
 /* Read from the stream but restore the file pointer after reading
    the requested amount of bytes. */
 int cdk_stream_peek (cdk_stream_t inp, unsigned char *buf, size_t buflen);
-
-/*-- keydb.c --*/
 
 /* A wrapper around the various new_from_XXX functions. Because
    the function does not support all combinations, the dedicated
@@ -954,7 +1008,6 @@ void cdk_listkey_close (cdk_listkey_t ctx);
 /* Return the next key which matches the pattern. */
 cdk_error_t cdk_listkey_next (cdk_listkey_t ctx, cdk_kbnode_t *ret_key);
 
-/*-- kbnode.c --*/
 cdk_kbnode_t cdk_kbnode_new (cdk_packet_t pkt);
 cdk_error_t cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
                                       const unsigned char * buf,
@@ -976,8 +1029,6 @@ cdk_kbnode_t cdk_kbnode_find_next (cdk_kbnode_t node, int pkttype);
 cdk_error_t cdk_kbnode_hash (cdk_kbnode_t node, gcry_md_hd_t md, int is_v4,
                              int pkttype, int flags);
 
-/*-- sig-check.c --*/
-
 /* Check each signature in the key node and return a summary of the
    key status in @r_status. Values of cdk_key_flag_t are used. */
 cdk_error_t cdk_pk_check_sigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd,
@@ -986,14 +1037,19 @@ cdk_error_t cdk_pk_check_sigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd,
 /* Check the self signature of the key to make sure it is valid. */
 cdk_error_t cdk_pk_check_self_sig (cdk_kbnode_t knode, int *r_status);
 
-/*-- keylist.c --*/
 /* Return a matching  algorithm from the given public key list. 
    @PREFTYPE can be either sym-cipher/compress/digest. */
 int cdk_pklist_select_algo (cdk_keylist_t pkl, int preftype);
+
+/* Return 0 or 1 if the given key list is able to understand the
+   MDC feature. */
 int cdk_pklist_use_mdc (cdk_keylist_t pkl);
 cdk_error_t cdk_pklist_build (cdk_keylist_t *ret_pkl, cdk_keydb_hd_t hd,
                               cdk_strlist_t remusr, int use);
 void cdk_pklist_release (cdk_keylist_t pkl);
+
+/* Encrypt the given DEK key with the list of public keys given
+   in @PKL. The result will be written to the stream output @OUT. */
 cdk_error_t cdk_pklist_encrypt (cdk_keylist_t pkl, cdk_dek_t dek,
                                 cdk_stream_t out);
 				
@@ -1008,8 +1064,6 @@ cdk_error_t cdk_sklist_write (cdk_keylist_t skl, cdk_stream_t outp,
                               int sigclass, int sigver);
 cdk_error_t cdk_sklist_write_onepass (cdk_keylist_t skl, cdk_stream_t outp,
                                       int sigclass, int mdalgo);
-
-/*-- encrypt.c --*/
 
 /* Encrypt the given stream @INP with the recipients given in @REMUSR.
    If @REMUSR is NULL, symmetric encryption will be used. The output
@@ -1037,7 +1091,6 @@ cdk_error_t cdk_data_transform (cdk_ctx_t hd, enum cdk_crypto_mode_t mode,
                                 unsigned char ** outbuf, size_t * outsize,
                                 int modval);
 
-/*-- sign.c --*/
 /* Sign the stream @INP. Optionally, the output will be encrypted
    if @REMUSR is not NULL and the @ENCRYPTFLAG is set. 
    The output will be written to @OUT.
@@ -1052,7 +1105,6 @@ cdk_error_t cdk_file_sign (cdk_ctx_t hd, cdk_strlist_t locusr,
                            const char *file, const char *output,
                            int sigmode, int encryptflag);
 
-/*-- verify.c --*/
 cdk_error_t cdk_stream_verify (cdk_ctx_t hd, cdk_stream_t inp,
 	    		       cdk_stream_t data,
                                cdk_stream_t out);
@@ -1063,13 +1115,11 @@ cdk_error_t cdk_stream_verify (cdk_ctx_t hd, cdk_stream_t inp,
 cdk_error_t cdk_file_verify (cdk_ctx_t hd, const char *file,
 	    		     const char *data_file, const char *output);
 
-/*-- trustdb.c --*/
 int cdk_trustdb_get_validity (cdk_stream_t inp, cdk_pkt_userid_t id,
                               int *r_val);
 int cdk_trustdb_get_ownertrust (cdk_stream_t inp, cdk_pubkey_t pk,
                                 int *r_val, int *r_flags);
 
-/*-- misc.c --*/
 void cdk_strlist_free (cdk_strlist_t sl);
 cdk_strlist_t cdk_strlist_add (cdk_strlist_t * list, const char * string);
 cdk_strlist_t cdk_strlist_next (cdk_strlist_t root, const char **r_str);
@@ -1078,32 +1128,37 @@ const char * cdk_check_version (const char * req_version);
 char* cdk_utf8_encode (const char * string);
 char* cdk_utf8_decode (const char * string, size_t length, int delim);
 
-/*-- keyserver.c --*/
 /* Try to receive the key, which has the key ID @KEYID, from the
    keyserver host @HOST and the port @PORT. */
 cdk_error_t cdk_keyserver_recv_key (const char *host, int port,
                                     const unsigned char *keyid, int kid_type,
                                     cdk_kbnode_t *r_key);
 
-/*-- keygen.c --*/
 cdk_error_t cdk_keygen_new (cdk_keygen_ctx_t * r_hd);
 void cdk_keygen_free (cdk_keygen_ctx_t hd);
+
+/* Set the preferences of the given type for the new key.
+   @ARRAY is an array which list of algorithm IDs. */   
 cdk_error_t cdk_keygen_set_prefs (cdk_keygen_ctx_t hd,
                                   enum cdk_pref_type_t type,
                                   const unsigned char * array, size_t n);
-cdk_error_t cdk_keygen_set_algo_info( cdk_keygen_ctx_t hd, int type,
+cdk_error_t cdk_keygen_set_algo_info (cdk_keygen_ctx_t hd, int type,
 	    			      int usage, enum cdk_pubkey_algo_t algo, 
-				      unsigned int bits );
-int cdk_keygen_set_keyserver_flags( cdk_keygen_ctx_t hd, int no_modify,
-                                    const char *pref_url );
-int cdk_keygen_set_expire_date( cdk_keygen_ctx_t hd, int type,
-                                 long timestamp );
-void cdk_keygen_set_name( cdk_keygen_ctx_t hd, const char * name );
-void cdk_keygen_set_passphrase( cdk_keygen_ctx_t hd, const char * pass );
-cdk_error_t cdk_keygen_start( cdk_keygen_ctx_t hd );
-cdk_error_t cdk_keygen_save( cdk_keygen_ctx_t hd,
+				      unsigned int bits);
+int cdk_keygen_set_keyserver_flags (cdk_keygen_ctx_t hd, int no_modify,
+                                    const char *pref_url);
+int cdk_keygen_set_expire_date (cdk_keygen_ctx_t hd, int type,
+                                long timestamp);
+				
+/* Set the user ID specifc parts for the new key.
+   It is suggested to use a name in the form of 
+   'First Name' 'Last Name' <email-address@host.domain> */
+void cdk_keygen_set_name (cdk_keygen_ctx_t hd, const char * name);
+void cdk_keygen_set_passphrase (cdk_keygen_ctx_t hd, const char * pass);
+cdk_error_t cdk_keygen_start (cdk_keygen_ctx_t hd);
+cdk_error_t cdk_keygen_save (cdk_keygen_ctx_t hd,
                              const char * pubf,
-                             const char * secf );
+                             const char * secf);
 
 #ifdef __cplusplus
 }

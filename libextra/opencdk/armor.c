@@ -244,18 +244,18 @@ check_armor (cdk_stream_t inp, int *r_zipalgo)
   char buf[4096];
   size_t nread;
   int check;
-
+  
   check = 0;
   nread = cdk_stream_read (inp, buf, DIM (buf)-1);
   if (nread > 0)
     {
       buf[nread] = '\0';
-      if (strstr (buf, "-----BEGIN PGP")) 
+      if (strstr (buf, "-----BEGIN PGP"))
 	{
 	  compress_get_algo (inp, r_zipalgo);
 	  check = 1;
 	}
-      cdk_stream_seek (inp, 0);
+       cdk_stream_seek (inp, 0);
     }
   return check;
 }
@@ -305,60 +305,56 @@ update_crc (u32 crc, const byte *buf, size_t buflen)
 static cdk_error_t
 armor_encode (void *opaque, FILE *in, FILE *out)
 {
-    armor_filter_t * afx = opaque;
-    struct stat statbuf;
-    char crcbuf[5], buf[128], raw[49];
-    byte crcbuf2[3];
-    size_t nread = 0;
-    const char * lf;
-    cdk_error_t rc = 0;
-
-    if( !afx )
-        return CDK_Inv_Value;
-    if( afx->idx < 0 || afx->idx > DIM (armor_begin)
-        || afx->idx2 < 0 || afx->idx2 > DIM (armor_end) )
-        return CDK_Inv_Value;
-
-    _cdk_log_debug ("armor filter: encode\n");
+  armor_filter_t * afx = opaque;
+  struct stat statbuf;
+  char crcbuf[5], buf[128], raw[49];
+  byte crcbuf2[3];
+  size_t nread = 0;
+  const char * lf;
   
-    memset (crcbuf, 0, sizeof (crcbuf));
+  if (!afx)
+    return CDK_Inv_Value;
+  if (afx->idx < 0 || afx->idx > DIM (armor_begin) ||
+      afx->idx2 < 0 || afx->idx2 > DIM (armor_end))
+        return CDK_Inv_Value;
 
-    lf = afx->le ? afx->le : LF;
-    fprintf( out, "-----%s-----%s", armor_begin[afx->idx], lf );
-    fprintf( out, "Version: OpenPrivacy "PACKAGE_VERSION"%s", lf );
-    if( afx->hdrlines)
-        fwrite( afx->hdrlines, 1, strlen( afx->hdrlines ), out );
-    fprintf( out, "%s", lf );
+  _cdk_log_debug ("armor filter: encode\n");
+  
+  memset (crcbuf, 0, sizeof (crcbuf));
 
-    if( fstat( fileno( in ), &statbuf ) )
-        return CDK_General_Error;
+  lf = afx->le ? afx->le : LF;
+  fprintf (out, "-----%s-----%s", armor_begin[afx->idx], lf);
+  fprintf (out, "Version: OpenPrivacy "PACKAGE_VERSION"%s", lf);
+  if (afx->hdrlines)
+    fwrite (afx->hdrlines, 1, strlen (afx->hdrlines), out);
+  fprintf (out, "%s", lf);
+  
+  if (fstat (fileno (in), &statbuf))
+    return CDK_General_Error;
 
-    while( !feof( in ) ) {
-        nread = fread( raw, 1, DIM (raw)-1, in );
-        if( !nread )
-            break;
-        if( ferror( in ) ) {
-            rc = CDK_File_Error;
-            break;
-        }
-        afx->crc = update_crc (afx->crc, (byte*)raw, nread);
-        base64_encode (buf, (byte*)raw, nread, DIM (buf)-1);
-        fprintf( out, "%s%s", buf, lf );
+  while (!feof (in))
+    {
+      nread = fread (raw, 1, DIM (raw)-1, in);
+      if (!nread)
+	break;
+      if (ferror (in))
+	return CDK_File_Error;
+      afx->crc = update_crc (afx->crc, (byte*)raw, nread);
+      base64_encode (buf, (byte*)raw, nread, DIM (buf)-1);
+      fprintf (out, "%s%s", buf, lf);
     }
 
-    if( !rc ) {
-        crcbuf2[0] = afx->crc >> 16;
-        crcbuf2[1] = afx->crc >> 8;
-        crcbuf2[2] = afx->crc;
-        crcbuf[0] = b64chars[crcbuf2[0] >> 2];
-        crcbuf[1] = b64chars[((crcbuf2[0] << 4) & 0x30) |( crcbuf2[1] >> 4)];
-        crcbuf[2] = b64chars[((crcbuf2[1] << 2) & 0x3c) |( crcbuf2[2] >> 6)];
-        crcbuf[3] = b64chars[crcbuf2[2] & 0x3f];
-        fprintf( out, "=%s%s", crcbuf, lf );
-        fprintf( out, "-----%s-----%s", armor_end[afx->idx2], lf );
-    }
-
-    return rc;
+  crcbuf2[0] = afx->crc >> 16;
+  crcbuf2[1] = afx->crc >> 8;
+  crcbuf2[2] = afx->crc;
+  crcbuf[0] = b64chars[crcbuf2[0] >> 2];
+  crcbuf[1] = b64chars[((crcbuf2[0] << 4) & 0x30) |(crcbuf2[1] >> 4)];
+  crcbuf[2] = b64chars[((crcbuf2[1] << 2) & 0x3c) |(crcbuf2[2] >> 6)];
+  crcbuf[3] = b64chars[crcbuf2[2] & 0x3f];
+  fprintf (out, "=%s%s", crcbuf, lf);
+  fprintf (out, "-----%s-----%s", armor_end[afx->idx2], lf);
+  
+  return 0;
 }
 
 
@@ -393,23 +389,24 @@ cdk_armor_filter_use (cdk_stream_t inp)
 static int
 search_header (const char *buf, const char **array)
 {
-    const char *s;
-    int i;
-
-    if( strlen( buf ) < 5 || strncmp( buf, "-----", 5 ) )
-        return -1;  
-    for( i = 0; (s = array[i]); i++ ) {
-        if( !strncmp( s, buf + 5, strlen( s ) ) )
-            return i;
+  const char *s;
+  int i;
+  
+  if (strlen (buf) < 5 || strncmp (buf, "-----", 5))
+    return -1;  
+  for (i = 0; (s = array[i]); i++)
+    {
+      if (!strncmp (s, buf + 5, strlen (s)))
+	return i;
     }
-    return -1;
+  return -1;
 }
 
 
-const char *
+const char*
 _cdk_armor_get_lineend( void )
 {
-    return LF;
+  return LF;
 }
 
 
@@ -583,58 +580,64 @@ cdk_file_armor (cdk_ctx_t hd, const char * file, const char * output)
 cdk_error_t
 cdk_file_dearmor (const char * file, const char * output)
 {
-    cdk_stream_t inp, out;
-    int rc = 0, zipalgo;
+  cdk_stream_t inp, out;
+  cdk_error_t rc;
+  int zipalgo;
 
-    rc = _cdk_check_args( 1, file, output );
-    if( rc )
-        return rc;
-
-    rc = cdk_stream_open( file, &inp );
-    if( rc )
-        return rc;
-
-    rc = cdk_stream_create( output, &out );
-    if( rc ) {
-        cdk_stream_close( inp );
-        return rc;
-    }
-
-    if( cdk_armor_filter_use( inp ) ) {
-        rc = cdk_stream_set_literal_flag( inp, 0, NULL );
-        zipalgo = cdk_stream_is_compressed (inp);
-        if( zipalgo )
-            rc = cdk_stream_set_compress_flag( inp, zipalgo, 0 );
-        if( !rc )
-            rc = cdk_stream_set_armor_flag( inp, 0 );
-        if( !rc )
-            rc = cdk_stream_kick_off( inp, out );
-        if( !rc )
-            rc = _cdk_stream_get_errno( inp );
-    }
-
-    cdk_stream_close( inp );
-    cdk_stream_close( out );
+  rc = _cdk_check_args (1, file, output);
+  if (rc)
     return rc;
+  
+  rc = cdk_stream_open (file, &inp);
+  if (rc)
+    return rc;
+  
+  rc = cdk_stream_create (output, &out);
+  if (rc)
+    {    
+      cdk_stream_close( inp );
+      return rc;
+    }
+  
+  if (cdk_armor_filter_use (inp))
+    {
+      rc = cdk_stream_set_literal_flag (inp, 0, NULL);
+      zipalgo = cdk_stream_is_compressed (inp);
+      if (zipalgo)
+	rc = cdk_stream_set_compress_flag (inp, zipalgo, 0);
+      if (!rc)
+	rc = cdk_stream_set_armor_flag (inp, 0);
+      if (!rc)
+	rc = cdk_stream_kick_off (inp, out);
+      if (!rc)
+	rc = _cdk_stream_get_errno (inp);
+    }
+  
+  cdk_stream_close (inp);
+  cdk_stream_close (out);
+  return rc;
 }
 
 
 int
 _cdk_filter_armor (void *opaque, int ctl, FILE * in, FILE *out)
 {
-    if( ctl == STREAMCTL_READ )
-        return armor_decode( opaque, in, out );
-    else if( ctl == STREAMCTL_WRITE )
-        return armor_encode( opaque, in, out );
-    else if( ctl == STREAMCTL_FREE ) {
-        armor_filter_t * afx = opaque;
-        if( afx ) {
-            _cdk_log_debug( "free armor filter\n" );
-            afx->idx = afx->idx2 = 0;
-            afx->crc = afx->crc_okay = 0;
-        }
+  if (ctl == STREAMCTL_READ)
+    return armor_decode (opaque, in, out);
+  else if (ctl == STREAMCTL_WRITE)
+    return armor_encode (opaque, in, out);
+  else if (ctl == STREAMCTL_FREE)
+    {
+      armor_filter_t * afx = opaque;
+      if (afx)
+	{
+	  _cdk_log_debug ("free armor filter\n");
+	  afx->idx = afx->idx2 = 0;
+	  afx->crc = afx->crc_okay = 0;
+	  return 0;
+	}
     }
-    return CDK_Inv_Mode;
+  return CDK_Inv_Mode;
 }
 
 
@@ -709,7 +712,6 @@ cdk_armor_encode_buffer (const byte *inbuf, size_t inlen,
       memcpy (outbuf+pos, le, strlen (le)); pos += strlen (le);
     }
   
-  /* FIXME: We do not generate a CRC for the data, which is legal. */
   memcpy (outbuf+pos, "-----", 5); pos += 5;
   memcpy (outbuf+pos, tail, strlen (tail)); pos += strlen (tail);
   memcpy (outbuf+pos, "-----", 5); pos += 5;

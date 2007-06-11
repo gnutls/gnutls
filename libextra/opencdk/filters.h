@@ -50,7 +50,7 @@ typedef struct {
 } armor_filter_t;
 
 typedef struct {
-  int mode;
+  cdk_lit_format_t mode;
   char *orig_filename; /* This original name of the input file. */
   char *filename;
   gcry_md_hd_t md;

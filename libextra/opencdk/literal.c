@@ -63,16 +63,11 @@ literal_decode (void *opaque, FILE *in, FILE *out)
   
   cdk_pkt_new (&pkt);
   rc = cdk_pkt_read (si, pkt);
-  if (rc)
-    {
-      cdk_stream_close (si);
-      return rc;
-    } 
-  if (pkt->pkttype != CDK_PKT_LITERAL)
+  if (rc || pkt->pkttype != CDK_PKT_LITERAL)
     {
       cdk_pkt_release (pkt);
       cdk_stream_close (si);
-      return CDK_Inv_Packet;
+      return !rc? CDK_Inv_Packet: rc;
     }
   
   rc = _cdk_stream_fpopen (out, STREAMCTL_WRITE, &so);
@@ -149,6 +144,21 @@ literal_decode (void *opaque, FILE *in, FILE *out)
 }
 
 
+static char
+intmode_to_char (int mode)
+{
+  switch (mode)
+    {
+    case CDK_LITFMT_BINARY: return 'b';
+    case CDK_LITFMT_TEXT:   return 't';
+    case CDK_LITFMT_UNICODE:return 'u';
+    default:                return 'b';
+    }
+  
+  return 'b';
+}
+  
+  
 static cdk_error_t
 literal_encode (void *opaque, FILE *in, FILE *out)
 {
@@ -187,7 +197,7 @@ literal_encode (void *opaque, FILE *in, FILE *out)
   pt->namelen = filelen;
   pt->name[pt->namelen] = '\0';
   pt->timestamp = (u32)time (NULL);
-  pt->mode = pfx->mode ? 't' : 'b';
+  pt->mode = intmode_to_char (pfx->mode);
   pt->len = cdk_stream_get_length (si);
   pt->buf = si;
   pkt->old_ctb = 1;
@@ -218,6 +228,7 @@ _cdk_filter_literal (void * opaque, int ctl, FILE * in, FILE * out)
 	  pfx->filename = NULL;
 	  cdk_free (pfx->orig_filename);
 	  pfx->orig_filename = NULL;
+	  return 0;
 	}
     }
   return CDK_Inv_Mode;

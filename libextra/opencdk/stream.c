@@ -444,6 +444,9 @@ cdk_stream_close (cdk_stream_t s)
       s->fname = NULL;
     }
   
+  cdk_free (s->cache.buf);
+  s->cache.alloced = 0;
+  
   cdk_free (s);
   return rc;
 }
@@ -927,8 +930,20 @@ cdk_stream_write (cdk_stream_t s, const void * buf, size_t count)
   
   if (s->cache.on)
     {
-    if (s->cache.size + count > DIM (s->cache.buf))
-	return EOF;
+      /* We need to resize the buffer if the additional data wouldn't
+         fit into it. We allocate more memory to avoid to resize it the
+         next time the function is used. */
+      if (s->cache.size + count > s->cache.alloced)
+	{
+	  byte *old = s->cache.buf;
+	  
+	  s->cache.buf = cdk_calloc (1, s->cache.alloced+count+STREAM_BUFSIZE);
+	  s->cache.alloced += (count + STREAM_BUFSIZE);
+	  memcpy (s->cache.buf, old, s->cache.size);
+	  cdk_free (old);
+	  _cdk_log_debug ("stream: enlarge cache to %d octets\n", 
+			  s->cache.alloced);
+	}      
       memcpy (s->cache.buf + s->cache.size, buf, count);
       s->cache.size += count;
       return count;
@@ -1006,8 +1021,19 @@ stream_flush (cdk_stream_t s)
 }
 
 
+/**
+ * cdk_stream_set_armor_flag:
+ * @s: the stream object
+ * @type: the type of armor to use
+ * 
+ * If the file is in read-mode, no armor type needs to be
+ * defined (armor_type=0) because the armor filter will be
+ * used for decoding existing armor data.
+ * For the write mode, @armor_type can be set to any valid
+ * armor type (message, key, sig).
+ **/
 cdk_error_t
-cdk_stream_set_armor_flag (cdk_stream_t s, int type)
+cdk_stream_set_armor_flag (cdk_stream_t s, int armor_type)
 {
   struct stream_filter_s *f;
 
@@ -1016,14 +1042,26 @@ cdk_stream_set_armor_flag (cdk_stream_t s, int type)
   f = filter_add (s, _cdk_filter_armor, fARMOR);
   if (!f)
     return CDK_Out_Of_Core;
-  f->u.afx.idx = f->u.afx.idx2 = type;
+  f->u.afx.idx = f->u.afx.idx2 = armor_type;
   f->ctl = stream_get_mode (s);
   return 0;
 }
 
 
+/**
+ * cdk_stream_set_literal_flag:
+ * @s: the stream object
+ * @mode: the mode to use (binary, text, unicode)
+ * @fname: the file name to store in the packet.
+ *
+ * In read mode it kicks off the literal decoding routine to
+ * unwrap the data from the packet. The @mode parameter is ignored.
+ * In write mode the function can be used to wrap the stream data
+ * into a literal packet with the given mode and file name.
+ **/
 cdk_error_t
-cdk_stream_set_literal_flag (cdk_stream_t s, int mode, const char *fname)
+cdk_stream_set_literal_flag (cdk_stream_t s, cdk_lit_format_t mode, 
+			     const char *fname)
 {
   struct stream_filter_s *f;
   const char *orig_fname;
@@ -1050,6 +1088,17 @@ cdk_stream_set_literal_flag (cdk_stream_t s, int mode, const char *fname)
 }
 
 
+/**
+ * cdk_stream_set_cipher_flag:
+ * @s: the stream object
+ * @dek: the data encryption key
+ * @use_mdc: 1 means to use the MDC mode
+ * 
+ * In read mode it kicks off the cipher filter to decrypt the data
+ * from the stream with the key given in @dek.
+ * In write mode the stream data will be encrypted with the DEK object
+ * and optionally, the @use_mdc parameter can be used to enable the MDC mode.
+ **/
 cdk_error_t
 cdk_stream_set_cipher_flag (cdk_stream_t s, cdk_dek_t dek, int use_mdc)
 {
@@ -1074,6 +1123,17 @@ cdk_stream_set_cipher_flag (cdk_stream_t s, cdk_dek_t dek, int use_mdc)
 }
 
 
+/**
+ * cdk_stream_set_compress_flag:
+ * @s: the stream object
+ * @algo: the compression algo
+ * @level: level of compression (0..9)
+ * 
+ * In read mode it kicks off the decompression filter to retrieve
+ * the uncompressed data.
+ * In write mode the stream data will be compressed with the
+ * given algorithm at the given level.
+ **/
 cdk_error_t
 cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
 {
@@ -1091,6 +1151,13 @@ cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
 }
 
 
+/**
+ * cdk_stream_set_text_flag:
+ * @s: the stream object
+ * @lf: line ending
+ * 
+ * Pushes the text filter to store the stream data in cannoncial format.
+ **/
 cdk_error_t
 cdk_stream_set_text_flag (cdk_stream_t s, const char *lf)
 {
@@ -1107,6 +1174,14 @@ cdk_stream_set_text_flag (cdk_stream_t s, const char *lf)
 }
 
 
+/**
+ * cdk_stream_set_hash_flag:
+ * @s: the stream object
+ * @digest_algo: the digest algorithm to use
+ * 
+ * This is for read-only streams. It pushes a digest filter to
+ * calculate the digest of the given stream data.
+ **/
 cdk_error_t
 cdk_stream_set_hash_flag (cdk_stream_t s, int digest_algo)
 {
@@ -1141,6 +1216,12 @@ cdk_stream_enable_cache (cdk_stream_t s, int val)
   if (!s->flags.write)
     return CDK_Inv_Mode;
   s->cache.on = val;
+  if (!s->cache.buf)
+    {      
+      s->cache.buf = cdk_calloc (1, STREAM_BUFSIZE);
+      s->cache.alloced = STREAM_BUFSIZE;
+      _cdk_log_debug ("stream: allocate cache of %d octets\n", STREAM_BUFSIZE);
+    }  
   return 0;
 }
 
@@ -1160,7 +1241,7 @@ stream_cache_flush (cdk_stream_t s, FILE * fp)
 	return CDK_File_Error;
       s->cache.size = 0;
       s->cache.on = 0;
-      wipemem (s->cache.buf, sizeof s->cache.buf);
+      wipemem (s->cache.buf, s->cache.alloced);
     }
   return 0;
 }
@@ -1328,7 +1409,7 @@ _cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes)
 {
   assert (s);
   
-  _cdk_log_debug ("set block mode for stream; blocksize %d\n", nbytes);
+  _cdk_log_debug ("stream: activate block mode with blocksize %d\n", nbytes);
   s->blkmode = nbytes;  
   return 0;
 }

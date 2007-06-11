@@ -73,9 +73,10 @@ struct cdk_stream_s {
     unsigned compressed:3;
   } flags;
   struct {
-    unsigned char buf[STREAM_BUFSIZE];
+    unsigned char *buf;
     unsigned on:1;
-    off_t size;
+    size_t size;
+    size_t alloced;
   } cache;
   char *fname;
   FILE *fp;

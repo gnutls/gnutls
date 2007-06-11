@@ -102,6 +102,8 @@ _cdk_hash_pubkey (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
 }
 
 
+/* Hash the user ID @uid with the given message digest @md.
+   Use openpgp mode if @is_v4 is 1. */
 void
 _cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, gcry_md_hd_t md)
 {
@@ -130,6 +132,8 @@ _cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, gcry_md_hd_t md)
 }
 
 
+/* Hash all parts of the signature which are needed to derive
+   the correct message digest to verify the sig. */
 cdk_error_t
 _cdk_hash_sig_data (cdk_pkt_signature_t sig, gcry_md_hd_t md)
 {
@@ -185,6 +189,7 @@ _cdk_hash_sig_data (cdk_pkt_signature_t sig, gcry_md_hd_t md)
 }
 
 
+/* Cache the signature result and store it inside the sig. */
 static void
 cache_sig_result (cdk_pkt_signature_t sig, int res)
 {
@@ -203,6 +208,8 @@ cache_sig_result (cdk_pkt_signature_t sig, int res)
 }
 
 
+/* Check the given signature @sig with the public key @pk.
+   Use the digest handle @digest. */
 cdk_error_t
 _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
                 gcry_md_hd_t digest, int *r_expired)
@@ -240,6 +247,8 @@ _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
 }
 
 
+/* Check the given key signature.
+   @knode is the key node and @snode the signature node. */
 cdk_error_t
 _cdk_pk_check_sig (cdk_keydb_hd_t keydb, 
 		   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig)

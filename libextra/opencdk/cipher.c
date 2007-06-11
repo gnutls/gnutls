@@ -40,7 +40,7 @@ fp_get_length (FILE *fp)
 static cdk_error_t
 hash_encode (void *opaque, FILE *in, FILE *out)
 {
-  md_filter_t * mfx = opaque;
+  md_filter_t *mfx = opaque;
   byte buf[BUFSIZE];
   gcry_error_t err;
   int nread;
@@ -48,7 +48,7 @@ hash_encode (void *opaque, FILE *in, FILE *out)
   if (!mfx)
     return CDK_Inv_Value;
   
-  _cdk_log_debug ("hash filter: encode (algo=%d)\n", mfx->digest_algo);
+  _cdk_log_debug ("hash filter: encode algo=%d\n", mfx->digest_algo);
   
   if (!mfx->md)
     {
@@ -86,7 +86,7 @@ _cdk_filter_hash (void *opaque, int ctl, FILE *in, FILE *out)
 	  return 0;
         }   
     }
-    return CDK_Inv_Mode;
+  return CDK_Inv_Mode;
 }
 
 
@@ -110,8 +110,10 @@ write_header (cipher_filter_t *cfx, FILE *out)
      output and thus we offer to supress the MDC packet. */
   use_mdc = dek->use_mdc;
   if (blocksize == 8)
-    use_mdc = 0; /* Enabled by default for all 128-bit block cipher */
+    use_mdc = 0;
   
+  /* We need to increase the data length because the MDC packet will
+     be also included. It has a fixed length of 22 octets. */
   if (use_mdc && cfx->datalen)
     cfx->datalen += 22;
   
@@ -213,10 +215,10 @@ static cdk_error_t
 write_partial_block (FILE *in, FILE *out, off_t *r_len,
                      cipher_filter_t *cfx)
 {
+  gcry_error_t err;
   byte buf[DEF_BLOCKSIZE];
   size_t n;
   int nread;
-  gcry_error_t err;
   
   if (!out || !cfx)
     return CDK_Inv_Value;
@@ -424,8 +426,8 @@ cipher_decode_file (void *opaque, FILE *in, FILE *out)
   
   while (!feof (in)) 
     {
-      _cdk_log_debug ("partial on=%d size=%lu\n",
-		      cfx->blkmode.on, cfx->blkmode.size);
+      /*_cdk_log_debug ("partial on=%d size=%lu\n",
+		      cfx->blkmode.on, cfx->blkmode.size);*/
       nreq = cfx->blkmode.on? cfx->blkmode.size : DIM (buf);
       nread = fread (buf, 1, nreq, in);
       if (!nread)
@@ -460,22 +462,22 @@ cipher_decode_file (void *opaque, FILE *in, FILE *out)
 
 
 static cdk_error_t
-cipher_decode( void * opaque, FILE * in, FILE * out )
+cipher_decode (void * opaque, FILE * in, FILE * out)
 {
-    cipher_filter_t * cfx = opaque;
-    cdk_error_t rc;
-
-    _cdk_log_debug ("cipher filter: decode\n");
+  cipher_filter_t * cfx = opaque;
+  cdk_error_t rc;
   
-    if( !cfx || !in || !out )
-        return CDK_Inv_Value;
+  _cdk_log_debug ("cipher filter: decode\n");
   
-    rc = read_header( cfx, in );
-    if( !rc )
-        rc = cipher_decode_file( cfx, in, out );
-    return rc;
+  if (!cfx || !in || !out)
+    return CDK_Inv_Value;
+  
+  rc = read_header (cfx, in);
+  if (!rc)
+    rc = cipher_decode_file (cfx, in, out);
+  return rc;
 }
-    
+
 
 static cdk_error_t
 cipher_encode (void *opaque, FILE *in, FILE *out)
@@ -499,22 +501,25 @@ cipher_encode (void *opaque, FILE *in, FILE *out)
 
 
 cdk_error_t
-_cdk_filter_cipher( void * opaque, int ctl, FILE * in, FILE * out )
+_cdk_filter_cipher (void * opaque, int ctl, FILE * in, FILE * out)
 {
-    if( ctl == STREAMCTL_READ )
-        return cipher_decode( opaque, in, out );
-    else if( ctl == STREAMCTL_WRITE )
-        return cipher_encode( opaque, in, out );
-    else if( ctl == STREAMCTL_FREE ) {
-        cipher_filter_t * cfx = opaque;
-        if( cfx ) {
-            _cdk_log_debug( "free cipher filter\n" );
-            gcry_md_close( cfx->mdc );
-            cfx->mdc = NULL;
-            gcry_cipher_close( cfx->hd );
-            cfx->hd = NULL;
-        }
+  if (ctl == STREAMCTL_READ)
+    return cipher_decode (opaque, in, out);
+  else if (ctl == STREAMCTL_WRITE)
+    return cipher_encode( opaque, in, out );
+  else if (ctl == STREAMCTL_FREE)
+    {
+      cipher_filter_t * cfx = opaque;
+      if (cfx) 
+	{
+	  _cdk_log_debug( "free cipher filter\n" );
+	  gcry_md_close( cfx->mdc );
+	  cfx->mdc = NULL;
+	  gcry_cipher_close( cfx->hd );
+	  cfx->hd = NULL;
+	  return 0;
+	}
     }
-    return CDK_Inv_Mode;
+  return CDK_Inv_Mode;
 }
 

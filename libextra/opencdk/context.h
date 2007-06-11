@@ -30,12 +30,14 @@ struct cdk_listkey_s {
   cdk_strlist_t t;   
 };
 
+
 struct cdk_s2k_s {
   int mode;
   byte hash_algo;
   byte salt[8];
   u32 count;
 };
+
 
 struct cdk_ctx_s {
   int cipher_algo;
@@ -92,43 +94,6 @@ struct cdk_subpkt_s {
   byte type;
   byte d[1];  
 };
-
-
-struct cdk_dbsearch_s {
-  union {
-    char *pattern;
-    u32 keyid[2];
-    byte fpr[KEY_FPR_LEN];
-  } u;
-  int type;
-};
-typedef struct cdk_dbsearch_s *cdk_dbsearch_t;
-
-
-struct key_table_s {
-  struct key_table_s * next;
-  off_t offset;
-  cdk_dbsearch_t desc;   
-};
-
-
-
-struct cdk_keydb_hd_s {
-  int type;
-  int buf_ref; /* 1=means it is a reference and shall not be closed. */
-  cdk_stream_t buf;  
-  cdk_stream_t idx;
-  cdk_dbsearch_t dbs;
-  char *name;
-  char *idx_name;
-  struct key_table_s *cache;
-  size_t ncache;
-  unsigned int secret:1;
-  unsigned int isopen:1;
-  unsigned int no_cache:1;
-  unsigned int search:1;
-};
-
 
 struct cdk_keylist_s {
   struct cdk_keylist_s * next;

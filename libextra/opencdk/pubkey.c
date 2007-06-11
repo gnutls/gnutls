@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  */
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 #include <stdio.h>
 #include <gcrypt.h>
@@ -25,14 +25,15 @@
 #include "packet.h"
 
 
+/* Convert the given secret key into a gcrypt SEXP object. */
 static int
-seckey_to_sexp (gcry_sexp_t * r_skey, cdk_seckey_t sk)
+seckey_to_sexp (gcry_sexp_t *r_skey, cdk_seckey_t sk)
 {
   gcry_sexp_t sexp = NULL;
-  gcry_mpi_t *mpk = NULL, * msk = NULL;
+  gcry_mpi_t *mpk = NULL, *msk = NULL;
+  gcry_error_t err;
   cdk_pubkey_t pk;
   const char *fmt;
-  gcry_error_t err;
 
   if (!r_skey || !sk || !sk->pk)
     return CDK_Inv_Value;
@@ -69,13 +70,14 @@ seckey_to_sexp (gcry_sexp_t * r_skey, cdk_seckey_t sk)
 }
 
 
+/* Convert the given public key to a gcrypt SEXP object. */
 static cdk_error_t
 pubkey_to_sexp (gcry_sexp_t *r_key_sexp, cdk_pubkey_t pk)
 {
   gcry_mpi_t *m;
-  const char *fmt = NULL;
-  int rc = 0;
   gcry_error_t err;
+  const char *fmt = NULL;
+  cdk_error_t rc = 0;
   
   if (!r_key_sexp || !pk)
     return CDK_Inv_Value;
@@ -123,7 +125,8 @@ enckey_to_sexp (gcry_sexp_t *r_sexp, gcry_mpi_t esk)
 
 
 static cdk_error_t
-digest_to_sexp (gcry_sexp_t *r_md_sexp, int algo, const byte *md, size_t mdlen)
+digest_to_sexp (gcry_sexp_t *r_md_sexp, int digest_algo, 
+		const byte *md, size_t mdlen)
 {
   gcry_mpi_t m;
   gcry_error_t err;
@@ -132,7 +135,7 @@ digest_to_sexp (gcry_sexp_t *r_md_sexp, int algo, const byte *md, size_t mdlen)
     return CDK_Inv_Value;
 
   if (!mdlen)
-    mdlen = gcry_md_get_algo_dlen (algo);
+    mdlen = gcry_md_get_algo_dlen (digest_algo);
   if (!mdlen)
     return CDK_Inv_Algo;
   
@@ -176,7 +179,10 @@ sexp_to_sig (cdk_pkt_signature_t sig, gcry_sexp_t sexp)
 
   /* ElGamal signatures are not supported any longer. */
   if (is_ELG (sig->pubkey_algo))
-    return CDK_Not_Implemented;
+    {
+      _cdk_log_debug ("sexp_to_sig: unsupported signature type (ElGamal)\n");
+      return CDK_Not_Implemented;
+    }  
   
   if (is_RSA (sig->pubkey_algo))
     return sexp_to_mpi (sexp, "s", &sig->mpi[0]);
@@ -196,9 +202,9 @@ sexp_to_sig (cdk_pkt_signature_t sig, gcry_sexp_t sexp)
 static cdk_error_t
 sig_to_sexp (gcry_sexp_t *r_sig_sexp, cdk_pkt_signature_t sig)
 {
-  const char *fmt;
   gcry_error_t err;
   cdk_error_t rc;
+  const char *fmt;
   
   if (!r_sig_sexp || !sig)
     return CDK_Inv_Value;  
@@ -246,11 +252,11 @@ sexp_to_pubenc (cdk_pkt_pubkey_enc_t enc, gcry_sexp_t sexp)
 
 
 static cdk_error_t
-pubenc_to_sexp( gcry_sexp_t * r_sexp, cdk_pkt_pubkey_enc_t enc)
+pubenc_to_sexp (gcry_sexp_t * r_sexp, cdk_pkt_pubkey_enc_t enc)
 {
   gcry_sexp_t sexp = NULL;
-  const char *fmt;
   gcry_error_t err;
+  const char *fmt;
   
   if (!r_sexp || !enc)
     return CDK_Inv_Value;
@@ -485,6 +491,15 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte *md)
 }
 
 
+/**
+ * cdk_pk_get_nbits:
+ * @pk: the public key
+ * 
+ * Return the length of the public key in bits.
+ * The meaning of length is actually the size of the 'prime'
+ * object in the key. For RSA keys the modulus, for ElG/DSA
+ * the size of the public prime.
+ **/
 int
 cdk_pk_get_nbits (cdk_pubkey_t pk)
 {
@@ -514,6 +529,13 @@ cdk_pk_get_npkey (int algo)
 }
 
 
+/**
+ * cdk_pk_get_nskey:
+ * @algo: the public key algorithm
+ * 
+ * Return the number of multiprecision integers forming an
+ * secret key with the given algorithm.
+ **/
 int
 cdk_pk_get_nskey (int algo)
 {  
@@ -526,6 +548,12 @@ cdk_pk_get_nskey (int algo)
 }
 
 
+/**
+ * cdk_pk_get_nbits:
+ * @algo: the public key algorithm
+ * 
+ * Return the number of MPIs a signature consists of.
+ **/
 int
 cdk_pk_get_nsig (int algo)
 {
@@ -537,6 +565,12 @@ cdk_pk_get_nsig (int algo)
 }
 
 
+/**
+ * cdk_pk_get_nenc: 
+ * @algo: the public key algorithm
+ * 
+ * Return the number of MPI's the encrypted data consists of.
+ **/
 int
 cdk_pk_get_nenc (int algo)
 {
@@ -567,17 +601,6 @@ _cdk_pk_algo_usage (int algo)
 }
 
 
-int
-_cdk_pk_test_algo (int algo, unsigned int usage_flags)
-{
-  size_t n = usage_flags;
-  
-  if (algo < 0 || algo > 110)
-    return -1;
-  return gcry_pk_algo_info (algo, GCRYCTL_TEST_ALGO, NULL, &n);
-}
-
-
 static cdk_error_t
 mpi_to_buffer (gcry_mpi_t a, byte *buf, size_t buflen,
 	       size_t *r_nwritten, size_t *r_nbits)
@@ -598,7 +621,17 @@ mpi_to_buffer (gcry_mpi_t a, byte *buf, size_t buflen,
   return 0;
 }
 
-  
+
+/**
+ * cdk_pk_get_mpi:
+ * @pk: public key
+ * @idx: index of the MPI to retrieve
+ * @buf: buffer to hold the raw data
+ * @r_nwritten: output how large the raw data is
+ * @r_nbits: size of the MPI in bits.
+ * 
+ * Return the MPI with the given index of the public key.
+ **/
 cdk_error_t
 cdk_pk_get_mpi (cdk_pubkey_t pk, size_t idx,
                 byte *buf, size_t buflen, size_t *r_nwritten, size_t *r_nbits)
@@ -611,9 +644,21 @@ cdk_pk_get_mpi (cdk_pubkey_t pk, size_t idx,
 }
 
 
+/**
+ * cdk_sk_get_mpi:
+ * @sk: secret key
+ * @idx: index of the MPI to retrieve
+ * @buf: buffer to hold the raw data
+ * @r_nwritten: output length of the raw data
+ * @r_nbits: length of the MPI data in bits.
+ * 
+ * Return the MPI of the given secret key with the
+ * index @idx. It is important to check if the key
+ * is protected and thus no real MPI data will be returned then.
+ **/
 cdk_error_t
 cdk_sk_get_mpi (cdk_pkt_seckey_t sk, size_t idx,
-                byte *buf, size_t buflen, size_t *r_nwritten, size_t * r_nbits)
+                byte *buf, size_t buflen, size_t *r_nwritten, size_t *r_nbits)
 {
   if (!sk || !r_nwritten)
     return CDK_Inv_Value;
@@ -633,7 +678,7 @@ checksum_mpi (gcry_mpi_t m)
 
   if (!m)
     return 0;
-  if (gcry_mpi_print (GCRYMPI_FMT_PGP, buf, 2048, &nread, m))
+  if (gcry_mpi_print (GCRYMPI_FMT_PGP, buf, DIM (buf), &nread, m))
     return 0;
   for (i=0; i < nread; i++)
     chksum += buf[i];
@@ -641,6 +686,13 @@ checksum_mpi (gcry_mpi_t m)
 }
 
 
+/**
+ * cdk_sk_unprotect:
+ * @sk: the secret key
+ * @pw: the passphrase
+ * 
+ * Unprotect the given secret key with the passphrase.
+ **/
 cdk_error_t
 cdk_sk_unprotect (cdk_pkt_seckey_t sk, const char *pw)
 {
@@ -764,8 +816,15 @@ cdk_sk_unprotect (cdk_pkt_seckey_t sk, const char *pw)
 }
 
 
+/**
+ * cdk_sk_protect:
+ * @sk: the secret key
+ * @pw: the passphrase to use
+ * 
+ * Protect the given secret key with a passphrase.
+ **/
 cdk_error_t
-cdk_sk_protect (cdk_pkt_seckey_t sk, const char *pass)
+cdk_sk_protect (cdk_pkt_seckey_t sk, const char *pw)
 {
   gcry_cipher_hd_t hd = NULL;
   cdk_dek_t dek = NULL;
@@ -776,13 +835,13 @@ cdk_sk_protect (cdk_pkt_seckey_t sk, const char *pass)
   gcry_error_t err;
   cdk_error_t rc;
   
-  nskey = cdk_pk_get_nskey (sk->pubkey_algo );
+  nskey = cdk_pk_get_nskey (sk->pubkey_algo);
   if (!nskey)
     return CDK_Inv_Algo;
   
   rc = cdk_s2k_new (&s2k, CDK_S2K_ITERSALTED, GCRY_MD_SHA256, NULL);
   if (!rc)
-    rc = cdk_dek_from_passphrase (&dek, GCRY_CIPHER_AES, s2k, 1, pass);
+    rc = cdk_dek_from_passphrase (&dek, GCRY_CIPHER_AES, s2k, 1, pw);
   if (rc) 
     {
       cdk_s2k_free (s2k);
@@ -943,6 +1002,17 @@ _cdk_sk_get_csum (cdk_pkt_seckey_t sk)
 }
 
 
+/**
+ * cdk_pk_get_fingerprint:
+ * @pk: the public key
+ * @fpr: the buffer to hold the fingerprint
+ * 
+ * Return the fingerprint of the given public key.
+ * The buffer must be at least 20 octets.
+ * This function should be considered deprecated and
+ * the new cdk_pk_to_fingerprint() should be used whenever
+ * possible to avoid overflows.
+ **/
 cdk_error_t
 cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte *fpr)
 {
@@ -972,6 +1042,57 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte *fpr)
 }
 
 
+/**
+ * cdk_pk_to_fingerprint:
+ * @pk: the public key
+ * @fprbuf: buffer to save the fingerprint
+ * @fprbuflen: buffer size
+ * @r_nout: actual length of the fingerprint.
+ * 
+ * Calculate a fingerprint of the given key and
+ * return it in the given byte array.
+ **/
+cdk_error_t
+cdk_pk_to_fingerprint (cdk_pubkey_t pk, 
+		       byte *fprbuf, size_t fprbuflen, size_t *r_nout)
+{
+  size_t key_fprlen;
+  cdk_error_t err;
+  
+  if (!pk)
+    return CDK_Inv_Value;
+    
+  if (pk->version < 4)
+    key_fprlen = 16;
+  else
+    key_fprlen = 20;
+  
+  /* Only return the required buffer size for the fingerprint. */
+  if (!fprbuf && !fprbuflen && r_nout)
+    {      
+      *r_nout = key_fprlen;
+      return 0;
+    }
+  
+  if (!fprbuf || key_fprlen > fprbuflen)
+    return CDK_Too_Short;
+
+  err = cdk_pk_get_fingerprint (pk, fprbuf);
+  if (r_nout)
+    *r_nout = key_fprlen;
+  
+  return err;
+}
+
+
+/**
+ * cdk_pk_fingerprint_get_keyid:
+ * @fpr: the key fingerprint
+ * @fprlen: the length of the fingerprint
+ * 
+ * Derive the key ID from the key fingerprint.
+ * For version 3 keys, this is not working.
+ **/
 u32
 cdk_pk_fingerprint_get_keyid (const byte *fpr, size_t fprlen, u32 *keyid)
 {
@@ -980,7 +1101,11 @@ cdk_pk_fingerprint_get_keyid (const byte *fpr, size_t fprlen, u32 *keyid)
   /* In this case we say the key is a V3 RSA key and we can't
      use the fingerprint to get the keyid. */
   if (fpr && fprlen == 16)
-    return 0;
+    {
+      keyid[0] = 0;
+      keyid[1] = 0;
+      return 0;
+    }
   else if (keyid && fpr)
     {
       keyid[0] = _cdk_buftou32 (fpr + 12);
@@ -993,6 +1118,13 @@ cdk_pk_fingerprint_get_keyid (const byte *fpr, size_t fprlen, u32 *keyid)
 }
 
 
+/**
+ * cdk_pk_get_keyid:
+ * @pk: the public key
+ * @keyid: buffer to store the key ID
+ * 
+ * Calculate the key ID of the given public key.
+ **/
 u32
 cdk_pk_get_keyid (cdk_pubkey_t pk, u32 *keyid)
 {
@@ -1028,6 +1160,13 @@ cdk_pk_get_keyid (cdk_pubkey_t pk, u32 *keyid)
 }
 
 
+/**
+ * cdk_sk_get_keyid:
+ * @sk: the secret key
+ * @keyid: buffer to hold the key ID
+ * 
+ * Calculate the key ID of the secret key, actually the public key.
+ **/
 u32
 cdk_sk_get_keyid (cdk_pkt_seckey_t sk, u32 *keyid)
 {
@@ -1044,8 +1183,15 @@ cdk_sk_get_keyid (cdk_pkt_seckey_t sk, u32 *keyid)
 }
 
 
+/**
+ * cdk_sig_get_keyid:
+ * @sig: the signature
+ * @keyid: buffer to hold the key ID
+ * 
+ * Retrieve the key ID from the given signature.
+ **/
 u32
-cdk_sig_get_keyid( cdk_pkt_signature_t sig, u32 * keyid )
+cdk_sig_get_keyid (cdk_pkt_signature_t sig, u32 *keyid)
 {
   u32 lowbits = sig ? sig->keyid[1] : 0;
   
@@ -1058,6 +1204,8 @@ cdk_sig_get_keyid( cdk_pkt_signature_t sig, u32 * keyid )
 }
 
 
+/* Return the key ID from the given packet.
+   If this is not possible, 0 is returned */
 u32
 _cdk_pkt_get_keyid (cdk_packet_t pkt, u32 *keyid)
 {
@@ -1091,6 +1239,7 @@ _cdk_pkt_get_keyid (cdk_packet_t pkt, u32 *keyid)
 }
 
 
+/* Get the fingerprint of the packet if possible. */
 int
 _cdk_pkt_get_fingerprint (cdk_packet_t pkt, byte *fpr)
 {
@@ -1112,6 +1261,7 @@ _cdk_pkt_get_fingerprint (cdk_packet_t pkt, byte *fpr)
     }
   return 0;
 }
+
 
 /**
  * cdk_pubkey_to_sexp:

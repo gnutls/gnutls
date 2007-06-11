@@ -56,7 +56,7 @@ free_symkey_enc (cdk_pkt_symkey_enc_t enc)
 {
   if (!enc)
     return;
-  cdk_free (enc->s2k);
+  cdk_s2k_free (enc->s2k);
   cdk_free (enc);
 }
 
@@ -170,7 +170,7 @@ cdk_sk_release (cdk_seckey_t sk)
   sk->encdata = NULL;
   cdk_pk_release (sk->pk);
   sk->pk = NULL;
-  cdk_free (sk->protect.s2k);
+  cdk_s2k_free (sk->protect.s2k);
   sk->protect.s2k = NULL;
   cdk_free (sk);
 }
@@ -188,6 +188,38 @@ free_encrypted (cdk_pkt_encrypted_t enc)
   /*cdk_stream_close (enc->buf);*/
   enc->buf = NULL;
   cdk_free (enc);
+}
+
+
+/* Detach the openpgp packet from the packet structure
+   and release the packet structure itself. */
+void
+_cdk_pkt_detach_free (cdk_packet_t pkt, int *r_pkttype, void **ctx)
+{
+  /* For now we just allow this for keys. */
+  switch (pkt->pkttype)
+    {
+    case CDK_PKT_PUBLIC_KEY:
+    case CDK_PKT_PUBLIC_SUBKEY:
+      *ctx = pkt->pkt.public_key;
+      break;
+      
+    case CDK_PKT_SECRET_KEY:
+    case CDK_PKT_SECRET_SUBKEY:
+      *ctx = pkt->pkt.secret_key;
+      break;
+      
+    default:
+      *r_pkttype = 0;
+      return;
+    }
+  
+  /* The caller might expect a specific packet type and
+     is not interested to store it for later use. */
+  if (r_pkttype)
+    *r_pkttype = pkt->pkttype;
+  
+  cdk_free (pkt);
 }
 
 
@@ -222,6 +254,13 @@ cdk_pkt_free (cdk_packet_t pkt)
 }
 
 
+/**
+ * cdk_pkt_release:
+ * @pkt: the packet
+ * 
+ * Free the contents of the given package and
+ * release the memory of the structure.
+ **/
 void
 cdk_pkt_release (cdk_packet_t pkt)
 {
@@ -232,6 +271,13 @@ cdk_pkt_release (cdk_packet_t pkt)
 }
 
 
+/**
+ * cdk_pkt_alloc:
+ * @r_pkt: output is the new packet
+ * @pkttype: the requested packet type
+ * 
+ * Allocate a new packet structure with the given packet type.
+ **/
 cdk_error_t
 cdk_pkt_alloc (cdk_packet_t *r_pkt, int pkttype)
 {
@@ -346,154 +392,154 @@ _cdk_copy_prefs (const cdk_prefitem_t prefs)
 
 
 cdk_error_t
-_cdk_copy_userid( cdk_pkt_userid_t* dst, cdk_pkt_userid_t src )
+_cdk_copy_userid (cdk_pkt_userid_t* dst, cdk_pkt_userid_t src)
 {
-    cdk_pkt_userid_t u;
-
-    if (!dst || !src)
-        return CDK_Inv_Value;
-
-    u = cdk_calloc( 1, sizeof *u + strlen( src->name ) + 1 );
-    if (!u)
-        return CDK_Out_Of_Core;
-    memcpy (u, src, sizeof *u);
-    memcpy (u->name, src->name, strlen (src->name));
-    u->prefs = _cdk_copy_prefs (src->prefs);
-    if( src->selfsig )
-        _cdk_copy_signature( &u->selfsig, src->selfsig );
-    *dst = u;
-
-    return 0;
+  cdk_pkt_userid_t u;
+  
+  if (!dst || !src)
+    return CDK_Inv_Value;
+  
+  *dst = NULL;
+  u = cdk_calloc (1, sizeof *u + strlen (src->name) + 1);
+  if (!u)
+    return CDK_Out_Of_Core;
+  memcpy (u, src, sizeof *u);
+  memcpy (u->name, src->name, strlen (src->name));
+  u->prefs = _cdk_copy_prefs (src->prefs);
+  if (src->selfsig)
+    _cdk_copy_signature (&u->selfsig, src->selfsig);
+  *dst = u;
+  
+  return 0;
 }
 
 
 cdk_error_t
-_cdk_copy_pubkey( cdk_pkt_pubkey_t* dst, cdk_pkt_pubkey_t src )
+_cdk_copy_pubkey (cdk_pkt_pubkey_t* dst, cdk_pkt_pubkey_t src)
 {
-    cdk_pkt_pubkey_t k;
-    int i;
-
-    if (!dst || !src)
-        return CDK_Inv_Value;
-
-    k = cdk_calloc (1, sizeof *k);
-    if (!k)
-        return CDK_Out_Of_Core;
-    memcpy (k, src, sizeof *k);
-    if (src->uid)
-        _cdk_copy_userid (&k->uid, src->uid);
-    if (src->prefs)
-        k->prefs = _cdk_copy_prefs (src->prefs);
-    for (i = 0; i < cdk_pk_get_npkey (src->pubkey_algo); i++)
-	k->mpi[i] = gcry_mpi_copy (src->mpi[i]);
-    *dst = k;
-
-    return 0;
+  cdk_pkt_pubkey_t k;
+  int i;
+  
+  if (!dst || !src)
+    return CDK_Inv_Value;
+  
+  *dst = NULL;
+  k = cdk_calloc (1, sizeof *k);
+  if (!k)
+    return CDK_Out_Of_Core;
+  memcpy (k, src, sizeof *k);
+  if (src->uid)
+    _cdk_copy_userid (&k->uid, src->uid);
+  if (src->prefs)
+    k->prefs = _cdk_copy_prefs (src->prefs);
+  for (i = 0; i < cdk_pk_get_npkey (src->pubkey_algo); i++)
+    k->mpi[i] = gcry_mpi_copy (src->mpi[i]);
+  *dst = k;
+  
+  return 0;
 }
 
 
 cdk_error_t
 _cdk_copy_seckey (cdk_pkt_seckey_t* dst, cdk_pkt_seckey_t src)
 {
-    cdk_pkt_seckey_t k;
-    cdk_s2k_t s2k;
-    int i;
-
-    if (!dst || !src)
-        return CDK_Inv_Value;
-
-    k = cdk_calloc (1, sizeof *k);
-    if (!k)
-        return CDK_Out_Of_Core;
-    memcpy (k, src, sizeof *k);
-    _cdk_copy_pubkey (&k->pk, src->pk);
-
-    if (src->encdata) {
-        k->encdata = cdk_calloc (1, src->enclen + 1);
-        if (!k->encdata)
-            return CDK_Out_Of_Core;
-        memcpy (k->encdata, src->encdata, src->enclen);
+  cdk_pkt_seckey_t k;
+  int i;
+  
+  if (!dst || !src)
+    return CDK_Inv_Value;
+  
+  *dst = NULL;
+  k = cdk_calloc (1, sizeof *k);
+  if (!k)
+    return CDK_Out_Of_Core;
+  memcpy (k, src, sizeof *k);
+  _cdk_copy_pubkey (&k->pk, src->pk);
+  
+  if (src->encdata) 
+    {
+      k->encdata = cdk_calloc (1, src->enclen + 1);
+      if (!k->encdata)
+	return CDK_Out_Of_Core;
+      memcpy (k->encdata, src->encdata, src->enclen);
     }
-
-    s2k = k->protect.s2k = cdk_calloc (1, sizeof *k->protect.s2k);
-    if (!k->protect.s2k)
-        return CDK_Out_Of_Core;
-    s2k->mode = src->protect.s2k->mode;
-    s2k->hash_algo = src->protect.s2k->hash_algo;
-    s2k->count = src->protect.s2k->count;
-    memcpy (s2k->salt, src->protect.s2k->salt, 8);
-
-    for (i = 0; i < cdk_pk_get_nskey (src->pubkey_algo); i++) {	
-	k->mpi[i] = gcry_mpi_copy (src->mpi[i]);
-	gcry_mpi_set_flag (k->mpi[i], GCRYMPI_FLAG_SECURE);
+  
+  _cdk_s2k_copy (&k->protect.s2k, src->protect.s2k);
+  
+  for (i = 0; i < cdk_pk_get_nskey (src->pubkey_algo); i++) 
+    {
+      k->mpi[i] = gcry_mpi_copy (src->mpi[i]);
+      gcry_mpi_set_flag (k->mpi[i], GCRYMPI_FLAG_SECURE);
     }
-    *dst = k;
-
-    return 0;
+  
+  *dst = k;  
+  return 0;
 }
 
 
 cdk_error_t
-_cdk_copy_pk_to_sk( cdk_pkt_pubkey_t pk, cdk_pkt_seckey_t sk )
+_cdk_copy_pk_to_sk (cdk_pkt_pubkey_t pk, cdk_pkt_seckey_t sk)
 {
-    if( !pk || !sk )
-        return CDK_Inv_Value;
-
-    sk->version = pk->version;
-    sk->expiredate = pk->expiredate;
-    sk->pubkey_algo = pk->pubkey_algo;
-    sk->has_expired = pk->has_expired;
-    sk->is_revoked = pk->is_revoked;
-    sk->main_keyid[0] = pk->main_keyid[0];
-    sk->main_keyid[1] = pk->main_keyid[1];
-    sk->keyid[0] = pk->keyid[0];
-    sk->keyid[1] = pk->keyid[1];
-
-    return 0;
+  if (!pk || !sk)
+    return CDK_Inv_Value;
+  
+  sk->version = pk->version;
+  sk->expiredate = pk->expiredate;
+  sk->pubkey_algo = pk->pubkey_algo;
+  sk->has_expired = pk->has_expired;
+  sk->is_revoked = pk->is_revoked;
+  sk->main_keyid[0] = pk->main_keyid[0];
+  sk->main_keyid[1] = pk->main_keyid[1];
+  sk->keyid[0] = pk->keyid[0];
+  sk->keyid[1] = pk->keyid[1];
+  
+  return 0;
 }
 
 
 cdk_error_t
-_cdk_copy_signature( cdk_pkt_signature_t * dst, cdk_pkt_signature_t src )
+_cdk_copy_signature (cdk_pkt_signature_t * dst, cdk_pkt_signature_t src)
 {
-    cdk_pkt_signature_t s;
+  cdk_pkt_signature_t s;
+  
+  if (!dst || !src)
+    return CDK_Inv_Value;
 
-    if( !dst || !src )
-        return CDK_Inv_Value;
-
-    s = cdk_calloc( 1, sizeof *s );
-    if( !s )
-        return CDK_Out_Of_Core;
-    memcpy( s, src, sizeof *src );
-    _cdk_subpkt_copy( &s->hashed, src->hashed );
-    _cdk_subpkt_copy( &s->unhashed, src->unhashed );
-    /* FIXME: Copy MPI parts */
-    *dst = s;
-
-    return 0;
+  *dst = NULL;
+  s = cdk_calloc (1, sizeof *s);
+  if (!s)
+    return CDK_Out_Of_Core;
+  memcpy (s, src, sizeof *src);
+  _cdk_subpkt_copy (&s->hashed, src->hashed);
+  _cdk_subpkt_copy (&s->unhashed, src->unhashed);
+  /* FIXME: Copy MPI parts */
+  *dst = s;
+  
+  return 0;
 }
 
 
 cdk_error_t
 _cdk_pubkey_compare (cdk_pkt_pubkey_t a, cdk_pkt_pubkey_t b)
 {
-    int na, nb, i;
-
-    if (a->timestamp != b->timestamp || a->pubkey_algo != b->pubkey_algo)
-        return -1;
-    if (a->version < 4 && a->expiredate != b->expiredate)
-        return -1;
-    na = cdk_pk_get_npkey (a->pubkey_algo);
-    nb = cdk_pk_get_npkey (b->pubkey_algo);
-    if (na != nb)
-        return -1;
+  int na, nb, i;
   
-    for (i = 0; i < na; i++) {
-	if (gcry_mpi_cmp (a->mpi[i], b->mpi[i]))
-            return -1;
+  if (a->timestamp != b->timestamp || a->pubkey_algo != b->pubkey_algo)
+    return -1;
+  if (a->version < 4 && a->expiredate != b->expiredate)
+    return -1;
+  na = cdk_pk_get_npkey (a->pubkey_algo);
+  nb = cdk_pk_get_npkey (b->pubkey_algo);
+  if (na != nb)
+    return -1;
+  
+  for (i = 0; i < na; i++) 
+    {
+      if (gcry_mpi_cmp (a->mpi[i], b->mpi[i]))
+	return -1;
     }
-
-    return 0;
+  
+  return 0;
 }
 
 
@@ -782,6 +828,7 @@ cdk_key_desig_revoker_walk (cdk_desig_revoker_t root,
   
   return n? n->fpr : NULL;
 }
+
 
 /**
  * cdk_subpkt_find_next:

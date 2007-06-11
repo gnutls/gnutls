@@ -285,9 +285,11 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   cdk_stream_set_armor_flag (tmp, 0);
   cdk_stream_read (tmp, NULL, 0);
   
+  /* the digest handle will be closed there. */
   rc = _cdk_proc_packets (hd, tmp, NULL, NULL, NULL, md);
   
   leave:
+  gcry_md_close (md);
   cdk_stream_close (out);
   cdk_stream_close (tmp);
   cdk_stream_close (inp);

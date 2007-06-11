@@ -222,8 +222,8 @@ _cdk_filter_compress (void *opaque, int ctl, FILE *in, FILE *out)
 	  _cdk_log_debug ("free compress filter\n");
 	  zfx->level = 0;
 	  zfx->algo = 0;
+	  return 0;
         }
-      return 0;
     }
   return CDK_Inv_Mode;
 }

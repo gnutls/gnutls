@@ -79,7 +79,8 @@ int _cdk_check_args( int overwrite, const char * in, const char * out );
 u32 _cdk_buftou32 (const byte * buf);
 void _cdk_u32tobuf (u32 u, byte * buf);
 const char *_cdk_memistr (const char * buf, size_t buflen, const char * sub);
-cdk_error_t map_gcry_error (gcry_error_t err);
+cdk_error_t _cdk_map_gcry_error (gcry_error_t err);
+#define map_gcry_error(err) _cdk_map_gcry_error (err)
 
 /* Helper to provide case insentensive strstr version. */
 #define stristr(haystack, needle) \
@@ -102,6 +103,7 @@ int _cdk_sk_get_csum( cdk_pkt_seckey_t sk );
 /*-- new-packet.c --*/
 byte * _cdk_subpkt_get_array (cdk_subpkt_t s, int count, size_t * r_nbytes);
 cdk_error_t _cdk_subpkt_copy (cdk_subpkt_t * r_dst, cdk_subpkt_t src);
+void _cdk_pkt_detach_free (cdk_packet_t pkt, int *r_pkttype, void **ctx);
 
 /*-- sig-check.c --*/
 int _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
@@ -124,11 +126,13 @@ int _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
 int _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk);
 
 /*-- keydb.c --*/
-int _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char * name,
+int _cdk_keydb_is_secret (cdk_keydb_hd_t db);   
+cdk_error_t _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char * name,
                                cdk_pkt_pubkey_t * ret_pk, int usage);
-int _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char * name,
+cdk_error_t _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char * name,
                                cdk_pkt_seckey_t * ret_sk, int usage);
-int _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid, const char * id);
+cdk_error_t _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid, 
+				     const char * id);
 
 /*-- sign.c --*/
 int _cdk_sig_create( cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig );
@@ -164,7 +168,9 @@ size_t _cdk_pkt_read_len (FILE * inp, size_t *ret_partial);
 /*-- write-packet.c --*/
 cdk_error_t _cdk_pkt_write_fp( FILE * out, cdk_packet_t pkt );
 
-/*-- dek.c --*/
+/*-- seskey.c --*/
+cdk_error_t _cdk_s2k_copy (cdk_s2k_t *r_dst, cdk_s2k_t src);
+    
 cdk_error_t cdk_dek_encode_pkcs1 (cdk_dek_t dek, size_t nbits, 
 				  gcry_mpi_t *r_enc);
 cdk_error_t cdk_dek_decode_pkcs1 (cdk_dek_t * ret_dek, gcry_mpi_t esk);

@@ -54,42 +54,43 @@ _cdk_u32tobuf (u32 u, byte *buf)
 
 
 static const char *
-parse_version_number( const char *s, int *number )
+parse_version_number (const char *s, int *number)
 {
   int val = 0;
   
-  if( *s == '0' && isdigit( s[1] ) )
+  if (*s == '0' && isdigit (s[1]))
     return NULL;
   /* leading zeros are not allowed */
-  for( ; isdigit(*s); s++ ) {
-    val *= 10;
-    val += *s - '0';     
-  }
+  for (; isdigit(*s); s++)
+    {
+      val *= 10;
+      val += *s - '0';     
+    }
   *number = val;
   return val < 0? NULL : s;
 }
 
 
 static const char *
-parse_version_string( const char * s, int * major, int * minor, int * micro )
+parse_version_string (const char * s, int * major, int * minor, int * micro)
 {
-    s = parse_version_number( s, major );
-    if( !s || *s != '.' )
-        return NULL;
-    s++;
-    s = parse_version_number (s, minor);
-    if (!s || *s != '.')
-        return NULL;
-    s++;
-    s = parse_version_number(s, micro);
-    if (!s)
-        return NULL;
-    return s; /* patchlevel */
+  s = parse_version_number( s, major );
+  if( !s || *s != '.' )
+    return NULL;
+  s++;
+  s = parse_version_number (s, minor);
+  if (!s || *s != '.')
+    return NULL;
+  s++;
+  s = parse_version_number(s, micro);
+  if (!s)
+    return NULL;
+  return s; /* patchlevel */
 }
 
 
 /**
- * cdk_check_version - Version control handling.
+ * cdk_check_version:
  * @req_version: The requested version
  *
  * Check that the the version of the library is at minimum the requested
@@ -100,40 +101,45 @@ parse_version_string( const char * s, int * major, int * minor, int * micro )
 const char *
 cdk_check_version (const char *req_version)
 {
-    const char *ver = VERSION;
-    int my_major, my_minor, my_micro;
-    int rq_major, rq_minor, rq_micro;
-    const char *my_plvl, *rq_plvl;
+  const char *ver = VERSION;
+  int my_major, my_minor, my_micro;
+  int rq_major, rq_minor, rq_micro;
+  const char *my_plvl, *rq_plvl;
   
-    if (!req_version)
-        return ver;
-    my_plvl = parse_version_string (ver, &my_major, &my_minor, &my_micro);
-    if (!my_plvl)
-        return NULL;
-    /* very strange our own version is bogus */
-    rq_plvl = parse_version_string (req_version, &rq_major, &rq_minor,
-                                    &rq_micro);
-    if (!rq_plvl)
-        return NULL;  /* req version string is invalid */
-    if (my_major > rq_major
-        || (my_major == rq_major && my_minor > rq_minor)
-        || (my_major == rq_major && my_minor == rq_minor
-            && my_micro > rq_micro)
-        || (my_major == rq_major && my_minor == rq_minor
-            && my_micro == rq_micro
-            && strcmp (my_plvl, rq_plvl) >= 0)) {
-        return ver;
-    }
+  if (!req_version)
+    return ver;
+  my_plvl = parse_version_string (ver, &my_major, &my_minor, &my_micro);
+  if (!my_plvl)
     return NULL;
+  /* very strange our own version is bogus */
+  rq_plvl = parse_version_string (req_version, &rq_major, &rq_minor,
+				  &rq_micro);
+  if (!rq_plvl)
+    return NULL;  /* req version string is invalid */
+  if (my_major > rq_major
+      || (my_major == rq_major && my_minor > rq_minor)
+      || (my_major == rq_major && my_minor == rq_minor
+	  && my_micro > rq_micro)
+      || (my_major == rq_major && my_minor == rq_minor
+	  && my_micro == rq_micro
+	  && strcmp (my_plvl, rq_plvl) >= 0))
+    return ver;
+  return NULL;
 }
 
 
+/**
+ * cdk_strlist_free:
+ * @sl: the string list
+ * 
+ * Release the string list object.
+ **/
 void
 cdk_strlist_free (cdk_strlist_t sl)
 {
   cdk_strlist_t sl2;
   
-  for(; sl; sl = sl2 ) 
+  for(; sl; sl = sl2)
     {
       sl2 = sl->next;
       cdk_free (sl);
@@ -141,6 +147,13 @@ cdk_strlist_free (cdk_strlist_t sl)
 }
 
 
+/**
+ * cdk_strlist_add:
+ * @list: destination string list
+ * @string: the string to add
+ * 
+ * Add the given list to the string list.
+ **/
 cdk_strlist_t
 cdk_strlist_add (cdk_strlist_t *list, const char *string)
 {
@@ -206,6 +219,12 @@ _cdk_memistr (const char *buf, size_t buflen, const char *sub)
 }
 
 
+/**
+ * cdk_utf8_encode:
+ * @string:
+ * 
+ * Encode the given string in utf8 and return it.
+ **/
 char*
 cdk_utf8_encode (const char *string)
 {
@@ -238,6 +257,14 @@ cdk_utf8_encode (const char *string)
 }
 
 
+/**
+ * cdk_utf8_decode:
+ * @string: the string to decode
+ * @length: the length of the string
+ * @delim: the delimiter
+ *
+ * Decode the given utf8 string and return the native representation.
+ **/
 char *
 cdk_utf8_decode (const char * string, size_t length, int delim)
 {
@@ -437,8 +464,9 @@ cdk_utf8_decode (const char * string, size_t length, int delim)
 }
 
 
+/* Map the gcrypt error to a valid opencdk error constant. */
 cdk_error_t
-map_gcry_error (gcry_error_t err)
+_cdk_map_gcry_error (gcry_error_t err)
 {
   /* FIXME: We need to catch them all. */
   switch (gpg_err_code (err))
@@ -461,6 +489,7 @@ map_gcry_error (gcry_error_t err)
 }
 
 
+/* Remove all trailing white spaces from the string. */
 void
 _cdk_trim_string (char *s, int canon)
 {
