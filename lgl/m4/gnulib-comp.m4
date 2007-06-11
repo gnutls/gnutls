@@ -252,6 +252,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/intdiv0.m4
   m4/intl.m4
   m4/intldir.m4
+  m4/intlmacosx.m4
   m4/intmax.m4
   m4/intmax_t.m4
   m4/inttypes-pri.m4
