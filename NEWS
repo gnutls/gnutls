@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.7.13 (unreleased)
 
+** OpenCDK copy updated to version 0.6.3.
+
+** Update gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
