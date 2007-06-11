@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** OpenCDK copy updated to version 0.6.3.
 
+** Self-test fixes for GnuTLS Guile bindings.
+Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
+
 ** Update gnulib files.
 
 ** API and ABI modifications:
