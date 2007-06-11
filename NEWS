@@ -10,6 +10,8 @@ See the end for copying conditions.
 ** Self-test fixes for GnuTLS Guile bindings.
 Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
 
+** Build fix for GTK-DOC manual.
+
 ** Update gnulib files.
 
 ** API and ABI modifications:
