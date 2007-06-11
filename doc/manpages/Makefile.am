@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos, Simon Josefsson
 #
@@ -63,7 +63,7 @@ doit:
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/gnutls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2006 Free Software Foundation" \
+			-copyright "2006, 2007 Free Software Foundation" \
 			-function $$i \
 			$(top_srcdir)/lib/*.c >> $$i.3 && \
 		echo "ok"; \
@@ -75,7 +75,7 @@ doit:
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/extra.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2006 Free Software Foundation" \
+			-copyright "2006, 2007 Free Software Foundation" \
 			-function $$i \
 			$(top_srcdir)/libextra/*.c >> $$i.3 && \
 		echo "ok"; \
@@ -87,7 +87,7 @@ doit:
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/x509.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2006 Free Software Foundation" \
+			-copyright "2006, 2007 Free Software Foundation" \
 			-function $$i \
 			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
 		echo "ok"; \
@@ -99,7 +99,7 @@ doit:
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/pkcs12.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2006 Free Software Foundation" \
+			-copyright "2006, 2007 Free Software Foundation" \
 			-function $$i \
 			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
 		echo "ok"; \
@@ -111,7 +111,7 @@ doit:
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/openpgp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2006 Free Software Foundation" \
+			-copyright "2006, 2007 Free Software Foundation" \
 			-function $$i \
 			$(top_srcdir)/libextra/openpgp/*.c >> $$i.3 && \
 		echo "ok"; \
