@@ -1,3 +1,101 @@
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.13.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix update-po target.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Fix copyright years.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls.types: Add, to work around problems if this
+	file isn't present.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* po/Makevars: Specify MSGFILTER, to fix make distcheck.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Need to put libguile-gnutls-v-0.la before
+	gnulib_libs, to fix rpath issue.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Use _LIBADD for libraries, not _LDFLAGS.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/string_h.m4, gl/string_.h, lgl/Makefile.am,
+	lgl/fseeko.c, lgl/m4/gettext.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/intlmacosx.m4, lgl/m4/string_h.m4, lgl/m4/vasnprintf.m4,
+	lgl/printf-args.c, lgl/printf-args.h, lgl/printf-parse.c,
+	lgl/printf-parse.h, lgl/string_.h, lgl/vasnprintf.c: Update gnulib
+	files.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/armor.c, libextra/opencdk/cipher.c,
+	libextra/opencdk/compress.c, libextra/opencdk/context.h,
+	libextra/opencdk/filters.h, libextra/opencdk/kbnode.c,
+	libextra/opencdk/keydb.c, libextra/opencdk/literal.c,
+	libextra/opencdk/main.c, libextra/opencdk/main.h,
+	libextra/opencdk/misc.c, libextra/opencdk/new-packet.c,
+	libextra/opencdk/opencdk.h, libextra/opencdk/pubkey.c,
+	libextra/opencdk/read-packet.c, libextra/opencdk/seskey.c,
+	libextra/opencdk/sig-check.c, libextra/opencdk/stream.c,
+	libextra/opencdk/stream.h, libextra/opencdk/verify.c: Update to
+	OpenCDK 0.6.3.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-badra-ecdhe-tls-psk-00.txt,
+	doc/protocol/draft-hajjeh-tls-identity-protection-01.txt,
+	doc/protocol/draft-hajjeh-tls-sign-03.txt: Add.
+
+2007-06-08  Ludovic Courtes <ludo@chbouib.org>
+
+	* guile/src/Makefile.am: Fix Guile linking so that the right GnuTLS
+	libs are used.  * guile/src/Makefile.am (GNUTLS_CORE_LIBS,
+	GNUTLS_EXTRA_LIBS): New.   (GNULIB_LDFLAGS): Renamed to
+	`GNULIB_LIBS'.  Explicitly pass the `.la'   path.
+	(libguile_gnutls_v_0_la_LDFLAGS): Pass `$(GUILE_LDFLAGS)' as the
+	last   item so that RPATH is in the right order (i.e., all
+	`$(top_builddir)/...' appear first).
+	(libguile_gnutls_extra_v_0_la_LDFLAGS): Likewise.
+
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-06-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.12.
