@@ -56,8 +56,8 @@ libguile_gnutls_extra_v_0_la_CFLAGS =		\
 libguile_gnutls_extra_v_0_la_LDFLAGS = $(GUILE_LDFLAGS)
 libguile_gnutls_extra_v_0_la_LIBADD =		\
   $(GNUTLS_CORE_LIBS) $(GNUTLS_EXTRA_LIBS)	\
-  $(GNULIB_LIBS)				\
-  $(builddir)/libguile-gnutls-v-0.la
+  $(builddir)/libguile-gnutls-v-0.la		\
+  $(GNULIB_LIBS)
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(builddir)
 
