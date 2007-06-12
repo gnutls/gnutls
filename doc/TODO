@@ -91,6 +91,8 @@ Current list:
   add a new API that return the size of the array).
 - Debug why www-s.uiuc.edu:443 refuse to negotiate sslv3 when we propose
   sslv3+tls1.
+- Investigate why failed client authentication results in weird error
+  messages.  See http://permalink.gmane.org/gmane.network.gnutls.general/875
 
 (+) Means high priority 
 (*) Means medium priority
