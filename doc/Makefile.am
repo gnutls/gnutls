@@ -40,7 +40,7 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl.texi	\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
 	examples/ex-pkcs12.c						\
-	guile.texi
+	guile.texi $(guile_texi)
 
 # Images.  Make sure there are eps + png + pdf of each.
 gnutls_TEXINFOS += layers.eps layers.png layers.pdf
