@@ -528,7 +528,7 @@ stream_to_datum (cdk_stream_t inp, gnutls_datum_t * raw)
   uint8_t *buf;
   size_t buflen;
 
-  if (!buf || !raw)
+  if (!inp || !raw)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
