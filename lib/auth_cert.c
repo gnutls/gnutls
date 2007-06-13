@@ -1417,6 +1417,11 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
       session->internals.ignore_rdn_sequence == 0)
     size += cred->x509_rdn_sequence.size;
 
+  if (ver == GNUTLS_TLS1_2)
+    /* Need at least one byte to announce the number of supported hash
+       functions (see below).  */
+    size += 1;
+
   (*data) = gnutls_malloc (size);
   pdata = (*data);
 
@@ -1436,7 +1441,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
     {
       /* Supported hashes (nothing for now -- FIXME). */
       *pdata = 0;
-      pdata++, size++;
+      pdata++;
     }
 
   if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
