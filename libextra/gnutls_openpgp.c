@@ -533,13 +533,17 @@ stream_to_datum (cdk_stream_t inp, gnutls_datum_t * raw)
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-  
+
   cdk_stream_mmap (inp, &buf, &buflen);
   datum_append (raw, buf, buflen);
   cdk_free (buf);
-  
+
   if (!buflen)
-    return GNUTLS_E_INTERNAL_ERROR;
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
   return 0;
 }
 
