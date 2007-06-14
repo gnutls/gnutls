@@ -22,7 +22,7 @@ Andrew McDonald <andrew@mcdonald.org.uk>
 OpenSSL compatible interface.
 
 Ludovic Courtes <ludovic.courtes@laas.fr>
-Several fixes, several related to OpenPGP support.
+Guile bindings, OpenPGP bug fixes.
 
 Mario Lenz <m@riolenz.de>
 Fixes to OpenCDK.
