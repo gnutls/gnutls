@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.7.14 (unreleased)
 
+** Fix crash in gnutls-cli when TLS handshake fails.
+Reported by Marc Haber <mh+debian-bugs@zugschlus.de> and Andreas
+Metzler <ametzler@downhill.at.eu.org> via Debian BTS #429183, see
+<http://bugs.debian.org/429183>.
+
 ** API and ABI modifications:
 No changes since last version.
 
