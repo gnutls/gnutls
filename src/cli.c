@@ -802,6 +802,7 @@ after_handshake:
 		      fprintf (stderr, "*** Handshake has failed\n");
 		      socket_bye (&hd);
 		      user_term = 1;
+		      break;
 		    }
 		}
 	      else
