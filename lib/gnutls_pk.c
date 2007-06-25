@@ -553,12 +553,16 @@ _gnutls_dsa_verify (const gnutls_datum_t * vdata,
   if (_gnutls_mpi_scan_nz (&mdata, vdata->data, &k) != 0)
     {
       gnutls_assert ();
+      _gnutls_mpi_release (&rs[0]);
+      _gnutls_mpi_release (&rs[1]);
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
   /* decrypt signature */
   ret = _gnutls_pk_verify (GCRY_PK_DSA, mdata, rs, params, params_len);
   _gnutls_mpi_release (&mdata);
+  _gnutls_mpi_release (&rs[0]);
+  _gnutls_mpi_release (&rs[1]);
 
   if (ret < 0)
     {
