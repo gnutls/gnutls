@@ -137,7 +137,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h
-  m4/absolute-header.m4
   m4/arpa_inet_h.m4
   m4/error.m4
   m4/extensions.m4
@@ -145,6 +144,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getdelim.m4
   m4/getline.m4
   m4/gnulib-common.m4
+  m4/include_next.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
   m4/lib-ld.m4

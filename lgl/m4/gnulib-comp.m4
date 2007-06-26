@@ -216,7 +216,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasprintf.c
   lib/wchar_.h
   lib/xsize.h
-  m4/absolute-header.m4
   m4/alloca.m4
   m4/arcfour.m4
   m4/arctwo.m4
@@ -249,6 +248,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/hmac-md5.m4
   m4/hmac-sha1.m4
   m4/iconv.m4
+  m4/include_next.m4
   m4/intdiv0.m4
   m4/intl.m4
   m4/intldir.m4
