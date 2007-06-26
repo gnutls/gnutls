@@ -1,3 +1,139 @@
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.14.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gendocs_template, gl/gnulib.mk, gl/m4/absolute-header.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/include_next.m4, gl/m4/netinet_in_h.m4,
+	gl/m4/string_h.m4, gl/m4/sys_socket_h.m4, gl/netinet_in_.h,
+	gl/string_.h, gl/sys_socket_.h, lgl/Makefile.am, lgl/float_.h,
+	lgl/m4/absolute-header.m4, lgl/m4/float_h.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/include_next.m4, lgl/m4/stdint.m4,
+	lgl/m4/stdio_h.m4, lgl/m4/string_h.m4, lgl/m4/sys_socket_h.m4,
+	lgl/m4/sys_stat_h.m4, lgl/m4/time_h.m4, lgl/m4/unistd_h.m4,
+	lgl/m4/wchar.m4, lgl/printf-args.c, lgl/printf-parse.h,
+	lgl/stdint_.h, lgl/stdio_.h, lgl/string_.h, lgl/sys_socket_.h,
+	lgl/sys_stat_.h, lgl/time_.h, lgl/unistd_.h, lgl/wchar_.h: Update
+	gnulib files.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-17  Ludovic Courtes <ludo@chbouib.org>
+
+	* configure.in: Make sure Guile is 1.8 or later.  * configure.in:
+	Make sure Guile is 1.8 or later, using `GUILE_CHECK'.
+	Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-26  Ludovic Courtes <ludo@chbouib.org>
+
+	* lib/gnutls_pk.c: Fixed memory leak in `_gnutls_dsa_verify ()'.  *
+	lib/gnutls_pk.c (_gnutls_dsa_verify): Release `rs[0]' and `rs[1]'
+	when done.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2007-06-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-20  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2007-06-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Don't crash if TLS handshake fails. Reported by Marc
+	Haber <mh+debian-bugs@zugschlus.de> and Andreas Metzler
+	<ametzler@downhill.at.eu.org> via Debian BTS #429183.
+
+2007-06-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rsa-aes-gcm-00.txt: Add.
+
+2007-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-srp-14.txt: Add.
+
+2007-06-14  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Update PGP key.
+
+2007-06-14  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Change Ludovic' description.
+
+2007-06-14  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openpgp.c: Merge patch from Timo, applied to CVS.
+	(stream_to_datum): Call gnutls_assert() on error.
+
+2007-06-13  Ludovic CourtÃ¨s <ludo@chbouib.org>
+
+	* lib/auth_cert.c: Fix off-by-one in TLS 1.2 handshake.  *
+	lib/auth_cert.c (_gnutls_gen_cert_server_cert_req): Before invoking
+	`gnutls_malloc ()', increment SIZE when using TLS 1.2 so that the
+	allocated buffer is large-enough to contain the list of supported
+	hashes.  Don't change SIZE later on.  Signed-off-by: Simon Josefsson
+	<simon@josefsson.org>
+
+2007-06-13  Ludovic CourtÃ¨s <ludo@chbouib.org>
+
+	* libextra/gnutls_openpgp.c: Fix use of uninitialized variable in
+	`gnutls_certificate_set_openpgp_key_mem ()'  *
+	libextra/gnutls_openpgp.c (stream_to_datum): Check whether INP is
+	NULL   rather than checking BUF (which is not initialized yet).
+	Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2007-06-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-06-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-salowey-tls-rfc4507bis-00.txt: Add.
+
+2007-06-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2007-06-11  Ludovic Courtes <ludo@chbouib.org>
+
+	* guile/tests/openpgp-auth.scm, guile/tests/openpgp-keyring.scm,
+	guile/tests/raw-to-c.scm: Small cleanups in `guile/tests'.
+	Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2007-06-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Clarify that guile.texi dependencies are
+	dependencies of gnutls.texi too.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-nir-tls-eap-00.txt: Add.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS, configure.in: Need to use CFLAGS when checking for
+	-Wno-pointer-sign. Reported by "Kristofer T. Karas"
+	<ktk@enterprise.bidmc.harvard.edu>.
+
+2007-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-06-11  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.13.
