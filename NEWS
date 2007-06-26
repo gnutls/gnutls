@@ -16,6 +16,8 @@ Reported by Marc Haber <mh+debian-bugs@zugschlus.de> and Andreas
 Metzler <ametzler@downhill.at.eu.org> via Debian BTS #429183, see
 <http://bugs.debian.org/429183>.
 
+** Update gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
