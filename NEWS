@@ -16,6 +16,16 @@ Reported by Marc Haber <mh+debian-bugs@zugschlus.de> and Andreas
 Metzler <ametzler@downhill.at.eu.org> via Debian BTS #429183, see
 <http://bugs.debian.org/429183>.
 
+** Minor OpenPGP fixes in stream_to_datum.
+Patch from Timo Schulz <twoaday@freakmail.de> and Ludovic Courtès
+<ludovic.courtes@laas.fr>.
+
+** Fix off-by-one in TLS 1.2 handshake.
+Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
+
+** Minor Guile binding self-test cleanup.
+Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
+
 ** Update gnulib files.
 
 ** API and ABI modifications:
