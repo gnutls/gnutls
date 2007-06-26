@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 1.7.15 (unreleased)
 
+** Test that the Guile header files are recent enough to work.
+Before we just tested that the command line tool 'guile' was recent
+enough, which may not be sufficient if you still have an old
+libguile.h header installed.
+
 ** Guile bindings are now installed under $prefix by default.
 Use --without-guile-site-dir to install it under $pkgdatadir/site/
 where $pkgdatadir is as returned by "guile-config info pkgdatadir".
