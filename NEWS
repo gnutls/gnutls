@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 1.7.15 (unreleased)
 
+** Guile bindings are now installed under $prefix by default.
+Use --without-guile-site-dir to install it under $pkgdatadir/site/
+where $pkgdatadir is as returned by "guile-config info pkgdatadir".
+Use --with-guile-site-dir=/your/own/path to specify the path manually.
+The default, --with-guile-site-dir, will install the Guile bindings
+under $datadir/guile/site.
+
 ** API and ABI modifications:
 No changes since last version.
 
