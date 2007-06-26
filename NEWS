@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 1.7.14 (unreleased)
 
+** Don't enable Guile bindings unless we have Guile 1.8 or later.
+Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
+
 ** Fix memory leak during DSA signature verification.
 Patch from Ludovic Courtès <ludovic.courtes@laas.fr>.
 
