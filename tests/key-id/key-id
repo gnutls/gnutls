@@ -25,7 +25,9 @@ set -e
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool}
 
-PARAMS="--generate-certificate --load-privkey $srcdir/key-user.pem --load-ca-privkey $srcdir/key-ca.pem --template /dev/null"
+PARAMS="--generate-certificate --load-privkey $srcdir/key-user.pem --load-ca-privkey $srcdir/key-ca.pem --template tmpl"
+
+echo > tmpl
 
 #$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-gnutls-keyid.pem \
 #    --outfile user-gnutls-keyid.pem 2> /dev/null
@@ -41,7 +43,7 @@ if ! $CERTTOOL -i < user-weird-keyid.pem | grep '7a2c7a6097460603cbfb28e8e219df1
     exit 1;
 fi
 
-rm -f user-gnutls-keyid.pem user-no-keyid.pem user-weird-keyid.pem
+rm -f tmpl user-gnutls-keyid.pem user-no-keyid.pem user-weird-keyid.pem
 
 # We're done.
 exit 0
