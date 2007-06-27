@@ -19,6 +19,9 @@ Use --with-guile-site-dir=/your/own/path to specify the path manually.
 The default, --with-guile-site-dir, will install the Guile bindings
 under $datadir/guile/site.
 
+** Add Malay message translations.
+Thanks to Sharuzzaman Ahmat Raslan <sharuzzaman@myrealbox.com>.
+
 ** API and ABI modifications:
 No changes since last version.
 
