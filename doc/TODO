@@ -93,6 +93,7 @@ Current list:
   sslv3+tls1.
 - Investigate why failed client authentication results in weird error
   messages.  See http://permalink.gmane.org/gmane.network.gnutls.general/875
+- Print X.509 DN in the proper order.
 
 (+) Means high priority 
 (*) Means medium priority
