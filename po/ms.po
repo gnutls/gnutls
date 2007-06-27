@@ -1,0 +1,301 @@
+# gnutls Bahasa Melayu (Malay) (ms)
+# Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnutls package.
+# Sharuzzaman Ahmat Raslan <sharuzzaman@myrealbox.com>, 2006, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnutls 1.4.0\n"
+"Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
+"POT-Creation-Date: 2006-05-12 00:21+0200\n"
+"PO-Revision-Date: 2007-06-24 19:29+0800\n"
+"Last-Translator: Sharuzzaman Ahmat Raslan <sharuzzaman@myrealbox.com>\n"
+"Language-Team: Malay <translation-team-ms@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Success."
+msgstr "Berjaya."
+
+msgid "Could not negotiate a supported cipher suite."
+msgstr "Tidak dapat merunding sut cipher yang disokong."
+
+msgid "The cipher type is unsupported."
+msgstr "Jenis cipher tidak disokong."
+
+msgid "The certificate and the given key do not match."
+msgstr "Sijil dan kekunci diberi tidak sepadan."
+
+msgid "Could not negotiate a supported compression method."
+msgstr "Tidak dapat merunding kaedah mampatan disokong."
+
+msgid "An unknown public key algorithm was encountered."
+msgstr "Algoritma kekunci awam tidak diketahui dijumpai."
+
+msgid "An algorithm that is not enabled was negotiated."
+msgstr "Algoritma yang tidak dihidupkan telah dirundingkan."
+
+msgid "A large TLS record packet was received."
+msgstr "Paket rekod TLS besar telah diterima."
+
+msgid "A record packet with illegal version was received."
+msgstr "Paket rekod dengan versi tidak sah telah diterima."
+
+msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
+msgstr "Perdana Diffie Hellman yang dihantar oleh pelayan tidak boleh diterima (tidak cukup panjang)."
+
+msgid "A TLS packet with unexpected length was received."
+msgstr "Paket TLS dengan panjang tidak dijangka telah diterima."
+
+msgid "The specified session has been invalidated for some reason."
+msgstr "Sesi yang dinyatakan telah dinyahsahkan atas sebab tertentu."
+
+msgid "GnuTLS internal error."
+msgstr "Ralat dalaman GnuTLS."
+
+msgid "An illegal TLS extension was received."
+msgstr "Sambungan TLS tidak sah telah diterima."
+
+msgid "A TLS fatal alert has been received."
+msgstr "Amaran teruk TLS telah diterima."
+
+msgid "An unexpected TLS packet was received."
+msgstr "Paket TLS tidak dijangka telah diterima."
+
+msgid "A TLS warning alert has been received."
+msgstr "Arahan amaran telah diterima."
+
+msgid "An error was encountered at the TLS Finished packet calculation."
+msgstr "Ralat ditemui pada pengiraan paket Selesai TLS"
+
+msgid "The peer did not send any certificate."
+msgstr "Rakan tidak menghantar sebarang sijil."
+
+msgid "No temporary RSA parameters were found."
+msgstr "Tiada parameter RSA sementara telah dijumpai."
+
+msgid "No temporary DH parameters were found."
+msgstr "Tiada parameter DH sementara telah dijumpai."
+
+msgid "An unexpected TLS handshake packet was received."
+msgstr "Paket handshake TLS tidak dijangka telah diterima."
+
+msgid "The scanning of a large integer has failed."
+msgstr "Pengesanan integer besar telah gagal."
+
+msgid "Could not export a large integer."
+msgstr "Tidak dapat mengeksport integer besar."
+
+msgid "Decryption has failed."
+msgstr "Nyahenkripsi telah gagal."
+
+msgid "Encryption has failed."
+msgstr "Enkripsi telah gagal."
+
+msgid "Public key decryption has failed."
+msgstr "Nyahenkripsi kekunci awam telah gagal."
+
+msgid "Public key encryption has failed."
+msgstr "Enkripsi kekunci awam telah gagal."
+
+msgid "Public key signing has failed."
+msgstr "Tandatangan kekunci awam telah gagal."
+
+msgid "Public key signature verification has failed."
+msgstr "Pengesahan tandatangan kekunci awam telah gagal."
+
+msgid "Decompression of the TLS record packet has failed."
+msgstr "Nyahmampatan paket rekod TLS telah gagal."
+
+msgid "Compression of the TLS record packet has failed."
+msgstr "Mampatan paket rekod TLS telah gagal."
+
+msgid "Internal error in memory allocation."
+msgstr "Ralat dalaman dalam pengumpukan memori."
+
+msgid "An unimplemented or disabled feature has been requested."
+msgstr "Ciri tidak disediakan atau dimatikan telah diminta."
+
+msgid "Insufficient credentials for that request."
+msgstr "Akuan tidak mencukupi untuk permintaan tersebut."
+
+msgid "Error in password file."
+msgstr "Ralat dalam fail katalaluan."
+
+msgid "Wrong padding in PKCS1 packet."
+msgstr "Pelapik salah dalam paket PKCS1."
+
+msgid "The requested session has expired."
+msgstr "Sesi diminta telah tamat tempoh."
+
+msgid "Hashing has failed."
+msgstr "Menghash telah gagal."
+
+msgid "Base64 decoding error."
+msgstr "Ralat menyahkod base64."
+
+msgid "Base64 encoding error."
+msgstr "Ralat mengenkod base64."
+
+msgid "Parsing error in password file."
+msgstr "Ralat huraian dalam fail katalaluan."
+
+msgid "The requested data were not available."
+msgstr "Data yang diminta tiada."
+
+msgid "Error in the pull function."
+msgstr "Ralat dalam fungsi tarik."
+
+msgid "Error in the push function."
+msgstr "Ralat dalam fungsi tolak."
+
+msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
+msgstr "Had atas nombor jujukan paket rakaman telah dicapai. Wow!"
+
+msgid "Error in the certificate."
+msgstr "Ralat dalam sijil."
+
+msgid "Unknown Subject Alternative name in X.509 certificate."
+msgstr "Nama Subjek Alternatif tidak diketahu dalam sijil X.509."
+
+msgid "Unsupported critical extension in X.509 certificate."
+msgstr "Sambungan kritikal tidak disokong dalam sijil X.509."
+
+msgid "Key usage violation in certificate has been detected."
+msgstr "Pelanggaran penggunaan kekunci dalam sijik telah dikesan."
+
+msgid "Function was interrupted."
+msgstr "Fungsi telah dibatalkan."
+
+msgid "Rehandshake was requested by the peer."
+msgstr "Rehandshake diminta oleh peer."
+
+msgid "TLS Application data were received, while expecting handshake data."
+msgstr "Data Aplikasi TLS telah diterima, semasa menjangka data handshake."
+
+msgid "Error in Database backend."
+msgstr "Ralat dalam backend Pengkalan Data."
+
+msgid "The certificate type is not supported."
+msgstr "Jenis sijil tidak disokong."
+
+msgid "The given memory buffer is too short to hold parameters."
+msgstr "Buffer memori yang diberikan terlalu pendek untuk memegang parameter."
+
+msgid "The request is invalid."
+msgstr "Permintaan tidak sah."
+
+msgid "An illegal parameter has been received."
+msgstr "Parameter tidak sah telah diterima."
+
+msgid "Error while reading file."
+msgstr "Ralat apabila membaca fail."
+
+msgid "ASN1 parser: Element was not found."
+msgstr "Penghurai ASN1: Elemen tidak dijumpai."
+
+msgid "ASN1 parser: Identifier was not found"
+msgstr "Penghurai ASN1: Pengenalan tidak dijumpai"
+
+msgid "ASN1 parser: Error in DER parsing."
+msgstr "Penghurai ASN1: Ralat dalam huraian DER."
+
+msgid "ASN1 parser: Value was not found."
+msgstr "Penghurai ASN1: Nilai tidak dijumpai."
+
+msgid "ASN1 parser: Generic parsing error."
+msgstr "Penghurai ASN1: Ralat menghurai generik."
+
+msgid "ASN1 parser: Value is not valid."
+msgstr "Penghurai ASN1: Nilai tidak sah."
+
+msgid "ASN1 parser: Error in TAG."
+msgstr "Penghurai ASN1: Ralat dalam TAG."
+
+msgid "ASN1 parser: error in implicit tag"
+msgstr "Penghurai ASN1: ralat dalam tag tersirat"
+
+msgid "ASN1 parser: Error in type 'ANY'."
+msgstr "Penghurai ASN1: Ralat dalam jenis 'ANY'."
+
+msgid "ASN1 parser: Syntax error."
+msgstr "Penghurai ASN1: Ralat sintaks."
+
+msgid "ASN1 parser: Overflow in DER parsing."
+msgstr "Penghurai ASN1: Limpahan dalam penghuraian DER."
+
+msgid "Too many empty record packets have been received."
+msgstr "Terlalu banyak paket rekod kosong telah diterima."
+
+msgid "The initialization of GnuTLS-extra has failed."
+msgstr "Pemulaan GnuTLS-extra telah gagal."
+
+msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
+msgstr "Versi pustaka GnuTLS tidak sepadan dengan versi pustaka GnuTLS-extra."
+
+msgid "The gcrypt library version is too old."
+msgstr "Versi pustaka gcrypt terlalu lama."
+
+msgid "The tasn1 library version is too old."
+msgstr "Versi pustaka tasn1 terlalu lama."
+
+msgid "The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported."
+msgstr "Versi GnuPG TrustDB yang dinyatakan tidak disokong. TrustDB v4 adalah disokong."
+
+msgid "Error loading the keyring."
+msgstr "Ralat memuatkan cecincin kunci."
+
+msgid "The initialization of LZO has failed."
+msgstr "Pemulaan LZO telah gagal."
+
+msgid "No supported compression algorithms have been found."
+msgstr "Tiada algoritma pemampat yang disokong dijumpai."
+
+msgid "No supported cipher suites have been found."
+msgstr "Tiada sut cipher yang disokong dijumpai."
+
+msgid "Could not get OpenPGP key."
+msgstr "Tidak dapat memperoleh kekunci OpenPGP."
+
+msgid "The SRP username supplied is illegal."
+msgstr "Namapengguna SRP yang diberikan tidak sah."
+
+msgid "The OpenPGP fingerprint is not supported."
+msgstr "Cap jari OpenPGP tidak disokong."
+
+msgid "The certificate has unsupported attributes."
+msgstr "Sijil tidak mempunyai ciri disokong."
+
+msgid "The OID is not supported."
+msgstr "OID tidak disokong."
+
+msgid "The hash algorithm is unknown."
+msgstr "Algoritma hash tidak diketahui."
+
+msgid "The PKCS structure's content type is unknown."
+msgstr "Jenis kandungan struktur PKCS tidak diketahui."
+
+msgid "The PKCS structure's bag type is unknown."
+msgstr "Jenis beg struktur PKCS tidak diketahui."
+
+msgid "The given password contains invalid characters."
+msgstr "Katalaluan diberikan mengandungi aksara tidak sah."
+
+msgid "The Message Authentication Code verification failed."
+msgstr "Pengesahan Message Authentication Code gagal."
+
+msgid "Some constraint limits were reached."
+msgstr "Beberapa had kekangan telah dicapai."
+
+msgid "Failed to acquire random data."
+msgstr "Gagal untuk mendapatkan data rawak."
+
+msgid "Received a TLS/IA Intermediate Phase Finished message"
+msgstr "Menerima mesej TLS/IA Intermediate Phase Finished"
+
+msgid "Received a TLS/IA Final Phase Finished message"
+msgstr "Menerima mesej TLS/IA Final Phase Finished"
+
+msgid "Verifying TLS/IA phase checksum failed"
+msgstr "Pengesahan checksum fasa TLS/IA gagal"
