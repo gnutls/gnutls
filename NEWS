@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.7.15 (unreleased)
 
+** Fix self-tests key-id under mingw32.
+
 ** Test that the Guile header files are recent enough to work.
 Before we just tested that the command line tool 'guile' was recent
 enough, which may not be sufficient if you still have an old
