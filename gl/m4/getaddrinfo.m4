@@ -1,5 +1,5 @@
-# getaddrinfo.m4 serial 11
-dnl Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
+# getaddrinfo.m4 serial 12
+dnl Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -28,7 +28,19 @@ AC_DEFUN([gl_GETADDRINFO],
     fi
     ])
 
-  AC_REPLACE_FUNCS(gai_strerror)
+  # We can't use AC_REPLACE_FUNCS here because gai_strerror may be an
+  # inline function declared in ws2tcpip.h, so we need to get that
+  # header included somehow.
+  AC_MSG_CHECKING([for gai_strerror (possibly via ws2tcpip.h)])
+  AC_TRY_LINK([
+#ifdef HAVE_WS2TCPIP_H
+#include <ws2tcpip.h>
+#endif
+], [gai_strerror (0);],
+  AC_MSG_RESULT([yes]),
+  [AC_MSG_RESULT([no])
+   AC_LIBOBJ(gai_strerror)])
+
   gl_PREREQ_GETADDRINFO
 ])
 
