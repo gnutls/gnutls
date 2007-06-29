@@ -311,13 +311,17 @@ if test "x$opt_guile_bindings" = "xyes"; then
       GUILE_PROGS
       GUILE_FLAGS
 
+      save_CFLAGS="$CFLAGS"
+      save_LDFLAGS="$LDFLAGS"
+      CFLAGS="$CFLAGS $GUILE_CFLAGS"
+      LDFLAGS="$LDFLAGS $GUILE_LDFLAGS"
       AC_MSG_CHECKING([whether GNU Guile is recent enough])
-      AC_COMPILE_IFELSE(AC_LANG_PROGRAM([
-	#include <libguile.h>
-SCM_API scm_t_bits scm_tc16_gnutls_cipher_enum;]),
-	recent_guile=yes,recent_guile=no)
+      AC_LINK_IFELSE(AC_LANG_CALL([], [scm_from_locale_string]),
+        [], [opt_guile_bindings=no])
+      CFLAGS="$save_CFLAGS"
+      LDFLAGS="$save_LDFLAGS"
 
-      if test "$recent_guile" = yes; then
+      if test "x$opt_guile_bindings" = "xyes"; then
         AC_MSG_RESULT([yes])
 	case "x$with_guile_site_dir" in 
 	     xno)
