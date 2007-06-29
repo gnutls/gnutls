@@ -46,18 +46,17 @@ GNULIB_CFLAGS  = -I$(top_builddir)/lgl -I$(top_srcdir)/lgl
 libguile_gnutls_v_0_la_SOURCES = core.c errors.c utils.c
 libguile_gnutls_v_0_la_CFLAGS =			\
   $(AM_CFLAGS) $(GNULIB_CFLAGS) $(GUILE_CFLAGS)
-libguile_gnutls_v_0_la_LDFLAGS = $(GUILE_LDFLAGS)
-libguile_gnutls_v_0_la_LIBADD =			\
-  $(GNUTLS_CORE_LIBS) $(GNULIB_LIBS)
+libguile_gnutls_v_0_la_LIBADD = \
+	$(GNUTLS_CORE_LIBS) $(GNULIB_LIBS) \
+	$(GUILE_LDFLAGS)
 
 libguile_gnutls_extra_v_0_la_SOURCES = extra.c
 libguile_gnutls_extra_v_0_la_CFLAGS =		\
   $(AM_CFLAGS) $(GNULIB_CFLAGS) $(GUILE_CFLAGS)
-libguile_gnutls_extra_v_0_la_LDFLAGS = $(GUILE_LDFLAGS)
 libguile_gnutls_extra_v_0_la_LIBADD =		\
   $(GNUTLS_CORE_LIBS) $(GNUTLS_EXTRA_LIBS)	\
   $(builddir)/libguile-gnutls-v-0.la		\
-  $(GNULIB_LIBS)
+  $(GNULIB_LIBS) $(GUILE_LDFLAGS)
 
 AM_CPPFLAGS = -I$(top_builddir) -I$(builddir)
 
