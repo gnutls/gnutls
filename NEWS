@@ -17,7 +17,8 @@ Use --without-guile-site-dir to install it under $pkgdatadir/site/
 where $pkgdatadir is as returned by "guile-config info pkgdatadir".
 Use --with-guile-site-dir=/your/own/path to specify the path manually.
 The default, --with-guile-site-dir, will install the Guile bindings
-under $datadir/guile/site.
+under $datadir/guile/site.  There is a new section 'Guile
+Preparations' in the manual that discuss these issues.
 
 ** Fix run-time library path ordering in linking the Guile bindings.
 
