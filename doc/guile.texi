@@ -14,10 +14,86 @@ a large subset thereof is available.
 
 
 @menu
+* Guile Preparations::          Note on installation and environment.
 * Guile API Conventions::       Naming conventions and other idiosyncrasies.
 * Guile Examples::              Quick start.
 * Guile Reference::             The Scheme GnuTLS programming interface.
 @end menu
+
+@c *********************************************************************
+@node Guile Preparations
+@section Guile Preparations
+
+The GnuTLS Guile bindings are by default installed under the GnuTLS
+installation directory (e.g., typically
+@file{/usr/local/share/guile/site/}).  Normally Guile will not find
+the module there without help.  You may experience something like
+this:
+
+@example
+$ guile
+guile> (use-modules (gnutls))
+<unnamed port>: no code for module (gnutls)
+guile>
+@end example
+
+There are two ways to solve this.  The first is to make sure that when
+building GnuTLS, the Guile bindings will be installed in the same
+place where Guile looks.  You may do this by using the
+@code{--with-guile-site-dir} parameter as follows:
+
+@example
+$ ./configure --with-guile-site-dir=no
+@end example
+
+This will instruct GnuTLS to attempt to install the Guile bindings
+where Guile will look for them.  It will use @code{guile-config info
+pkgdatadir} to learn the path to use.
+
+If Guile was installed into @code{/usr}, you may also install GnuTLS
+using the same prefix:
+
+@example
+$ ./configure --prefix=/usr
+@end example
+
+If you want to specify the path to install the Guile bindings you can
+also specify the path directly:
+
+@example
+$ ./configure --with-guile-site-dir=/opt/guile/share/guile/site
+@end example
+
+The second solution requires some more work but may be easier to use
+if you do not have system administrator rights to your machine.  You
+need to instruct Guile so that it finds the GnuTLS Guile bindings.
+Either use the @code{GUILE_LOAD_PATH} environment variable as follows:
+
+@example
+$ GUILE_LOAD_PATH=/usr/local/share/guile/site guile
+guile> (use-modules (gnutls))
+guile>
+@end example
+
+If you get an error regarding @file{libguile-gnutls-v-0} similar to:
+
+@example
+gnutls.scm:361:1: In procedure dynamic-link in expression (load-extension "libguile-gnutls-v-0" "scm_init_gnutls"):
+gnutls.scm:361:1: file: "libguile-gnutls-v-0", message: "libguile-gnutls-v-0.so: cannot open shared object file: No such file or directory"
+@end example
+
+You will need to modify the run-time linker path, for example as
+follows.
+
+@example
+$ LD_LIBRARY_PATH=/usr/local/lib GUILE_LOAD_PATH=/usr/local/share/guile/site guile
+guile> (use-modules (gnutls))
+guile>
+@end example
+
+As another solution, it may be possible to modify the
+@code{%load-path} variable.
+
 
 @c *********************************************************************
 @node Guile API Conventions
