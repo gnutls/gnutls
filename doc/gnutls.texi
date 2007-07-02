@@ -190,7 +190,7 @@ GnuTLS is available for download from the following URL:
 @url{http://www.gnutls.org/download.html}
 
 The latest version is stored in a file, e.g.,
-@samp{gsasl-@value{VERSION}.tar.gz} where the @samp{@value{VERSION}}
+@samp{gnutls-@value{VERSION}.tar.gz} where the @samp{@value{VERSION}}
 value is the highest version number in the directory.
 
 GnuTLS uses a Linux-like development cycle: even minor version numbers
