@@ -109,8 +109,8 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/maint.mk
   doc/fdl.texi
   doc/gendocs_template
-  doc/gpl.texi
-  doc/lgpl.texi
+  doc/gpl-2.0.texi
+  doc/lgpl-2.1.texi
   lib/error.c
   lib/error.h
   lib/gai_strerror.c

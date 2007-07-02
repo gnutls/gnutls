@@ -3647,8 +3647,8 @@ functions:
 @end menu
 
 @include fdl.texi
-@include lgpl.texi
-@include gpl.texi
+@include lgpl-2.1.texi
+@include gpl-2.0.texi
 
 @node Concept Index
 @unnumbered Concept Index
