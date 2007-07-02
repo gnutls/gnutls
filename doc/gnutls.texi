@@ -73,6 +73,7 @@ Documentation License''.
 
 @menu
 * Preface::
+* Obtaining and Installing::
 * The Library::
 * Introduction to TLS::
 * Authentication methods::
@@ -121,6 +122,54 @@ Public Key Infrastructure in @xcite{GUTPKI}.
 Updated versions of the @acronym{GnuTLS} software and this document
 will be available from @url{http://www.gnutls.org/} and
 @url{http://www.gnu.org/software/gnutls/}.
+
+@node Obtaining and Installing
+@chapter Obtaining and Installing
+
+GnuTLS is available for download from the following URL:
+
+@url{http://www.gnutls.org/download.html}
+
+GnuTLS depends on Libgcrypt, and you will need to install Libgcrypt
+before installing GnuTLS.  Libgcrypt is available from
+@url{ftp://ftp.gnupg.org/gcrypt/libgcrypt}.  Libgcrypt needs another
+library, libgpg-error, and you need to install libgpg-error before
+installing Libgcrypt.  Libgpg-error is available from
+@url{ftp://ftp.gnupg.org/gcrypt/libgpg-error}.
+
+Don't forget to verify the cryptographic signature after downloading
+source code packages.
+
+Compiling GnuTLS should be straight-forward: just unpack the package,
+invoke @code{./configure} and then @code{make check install}.  There
+are a number of compile-time parameters, as discussed below.
+
+The compression libraries (libz and lzo) are optional dependencies.
+You can get libz from @url{http://www.zlib.net/}.  You can get lzo
+from @url{http://www.oberhumer.com/opensource/lzo/}.  If you do not
+have lzo installed, GnuTLS will enable an internal copy, called
+minilzo.  Use parameter @code{--without-lzo} to disable LZO
+completely.  Use parameter @code{--with-included-lzo} to
+unconditionally use the internal minilzo copy.
+
+The X.509 part of GnuTLS needs ASN.1 functionality, from a library
+called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
+want to install it separately (e.g., to make it possibly to use
+libtasn1 in other programs), you can get it from
+@url{http://www.gnu.org/software/gnutls/download.html}.
+
+The OpenPGP part of GnuTLS-extra needs OpenCDK for parsing OpenPGP
+packets.  A copy of OpenCDK is included in GnuTLS.  If you want to
+install it separately (e.g., to make it possibly to use libtasn1 in
+other programs), you can get it from
+@url{http://www.gnu.org/software/gnutls/download.html}.  Use parameter
+@code{--with-included-opencdk} to unconditionally use the internal
+copy of OpenCDK.  Use parameter
+@code{--disable-openpgp-authentication} to disable the OpenPGP
+functionality in GnuTLS.
+
+Regarding the Guile bindings, there are additional installation
+considerations, see @xref{Guile Preparations}.
 
 @node The Library
 @chapter The Library
