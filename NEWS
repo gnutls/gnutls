@@ -22,6 +22,8 @@ Preparations' in the manual that discuss these issues.
 
 ** Fix run-time library path ordering in linking the Guile bindings.
 
+** Improved manual on downloading, installing, getting help, bug reports etc.
+
 ** Add Malay message translations.
 Thanks to Sharuzzaman Ahmat Raslan <sharuzzaman@myrealbox.com>.
 
