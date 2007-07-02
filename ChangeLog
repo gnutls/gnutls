@@ -1,3 +1,121 @@
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.15.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS: Revert.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS: Sync with TP.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gpl-2.0.texi, doc/gpl.texi, doc/lgpl-2.1.texi, doc/lgpl.texi: 
+	Fix gnulib name changes.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/config.rpath, build-aux/maint.mk, doc/Makefile.am,
+	doc/gnutls.texi, gl/gnulib.mk, gl/m4/getaddrinfo.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/override/doc/gpl-2.0.texi.diff, gl/override/doc/gpl.texi.diff,
+	gl/override/doc/lgpl-2.1.texi.diff, gl/override/doc/lgpl.texi.diff: 
+	Update gnulib files.  Fix GPL renaming.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Typo.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Improve installation instructions.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add 'Obtaining and Installing'. Suggested by
+	ludo@gnu.org (Ludovic Courtès).
+
+2007-06-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/guile.texi: Add 'Guile Preparations' section. Based on
+	discussions with ludo@gnu.org (Ludovic Courtès).
+
+2007-06-29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Check for scm_from_locale_string instead of SCM_API.
+	Patch from ludo@gnu.org (Ludovic Courtès).
+
+2007-06-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-29  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Put $(GUILE_FLAGS) in LIBADD, not LDFLAGS.
+	Reported by ludo@gnu.org (Ludovic Courtès).
+
+2007-06-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2007-06-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-27  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS, po/ms.po: Sync with TP.
+
+2007-06-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-06-27  Simon Josefsson <simon@josefsson.org>
+
+	* tests/key-id/key-id: Can't use /dev/null as template under
+	mingw32, probably really a bug in cfg+.
+
+2007-06-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/getaddrinfo.m4: Fix gai_strerror on mingw32.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Check that the guile header files is recent
+	enough and that it works.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Move Guile setup stuff down under 'External
+	libraries'.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, NEWS, configure.in: Fix installation path of Guile
+	bindings.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-06-26  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-06-26  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.14.
