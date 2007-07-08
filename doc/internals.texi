@@ -3,7 +3,7 @@ way @acronym{GnuTLS} works. The focus is to give an idea
 to potential developers and those who want to know what
 happens inside the black box.
 
-@section The TLS protocol
+@section The TLS Protocol
 The main needs for the TLS protocol to be used are
 shown in the image below.
 
@@ -15,7 +15,7 @@ object are just structures with attributes. The operations listed
 are functions that require the first parameter to be that object.
 @image{arch/objects,15cm}
 
-@section TLS Handshake protocol
+@section TLS Handshake Protocol
 The @acronym{GnuTLS} handshake protocol is implemented as a state
 machine that waits for input or returns immediately when the non-blocking
 transport layer functions are used. The main idea is shown in the following
@@ -32,7 +32,7 @@ certificate ciphersuite.
 
 @image{arch/handshake-sequence,12cm}
 
-@section TLS authentication methods
+@section TLS Authentication Methods
 In @acronym{GnuTLS} authentication methods can be implemented quite easily.
 Since the required changes to add a new authentication method affect only the
 handshake protocol, a simple interface is used. An authentication method needs
@@ -49,7 +49,7 @@ for PSK ciphersuites and @code{auth_srp.c} for SRP ciphersuites. After implement
 the structure holding its pointers has to be registered in @code{gnutls_algorithms.c}
 in the @code{_gnutls_kx_algorithms} structure.
 
-@section TLS Extension handling
+@section TLS Extension Handling
 As with authentication methods, the TLS extensions handlers can be implemented
 using the following interface.
 
@@ -65,7 +65,7 @@ handle, they have to be registered in @code{gnutls_extensions.c} in the
 @code{_gnutls_extensions} structure.
 
 
-@section Certificate handling
+@section Certificate Handling
 What is provided by the certificate handling functions
 is summarized in the following diagram.
 

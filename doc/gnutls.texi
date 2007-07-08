@@ -81,7 +81,7 @@ Documentation License''.
 * How to use GnuTLS in applications::
 * Included programs::
 * Function reference::
-* Certificate to XML convertion functions::
+* Certificate to XML Conversion Functions::
 * All the supported ciphersuites in GnuTLS::
 * Guile Bindings::
 * Internal architecture of GnuTLS::
@@ -131,7 +131,7 @@ will be available from @url{http://www.gnutls.org/} and
 @end menu
 
 @node Getting help
-@section Getting help
+@section Getting Help
 
 A mailing list where users may help each other exists, and you can
 reach it by sending e-mail to @email{help-gnutls@@gnu.org}.  Archives
@@ -472,7 +472,7 @@ the stored session will be retrieved, and the new session will be a
 resumed one, and will share the same session ID with the previous one.
 
 @node Error handling
-@section Error handling
+@section Error Handling
 
 In @acronym{GnuTLS} most functions return an integer type as a result.  In
 almost all cases a zero or a positive number means success, and a
@@ -495,7 +495,7 @@ a function, these error codes will be documented in the function's
 reference.  @xref{Error Codes}, for all the error codes.
 
 @node Memory handling
-@section Memory handling
+@section Memory Handling
 
 @acronym{GnuTLS} internally handles heap allocated objects
 differently, depending on the sensitivity of the data they
@@ -513,7 +513,7 @@ secure. See the documentation of @acronym{Libgcrypt} for more
 information.
 
 @node Callback functions
-@section Callback functions
+@section Callback Functions
 @cindex Callback functions
 
 There are several cases where @acronym{GnuTLS} may need some out of
@@ -574,7 +574,7 @@ differences of these protocols are minor. Older protocols such as
 @end menu
 
 @node TLS layers
-@section TLS layers
+@section TLS Layers
 @cindex TLS Layers
 
 @acronym{TLS} is a layered protocol, and consists of the Record
@@ -596,7 +596,7 @@ protocol.  The protocol layering in TLS is shown in the figure below.
 @image{layers,12cm,8cm}
 
 @node The transport layer
-@section The transport layer
+@section The Transport Layer
 @cindex Transport protocol
 
 @acronym{TLS} is not limited to one transport layer, it can be used
@@ -642,7 +642,7 @@ work, thus making it easy to add @acronym{TLS} support to existing
 TCP/IP servers.
 
 @node The TLS record protocol
-@section The TLS record protocol
+@section The TLS Record Protocol
 @cindex Record protocol
 
 The Record protocol is the secure communications provider. Its purpose
@@ -1024,7 +1024,7 @@ used to enable this extension, or to retrieve the name sent by a
 client.
 
 @node On SSL 2 and older protocols
-@section On SSL 2 and older protocols
+@section On SSL 2 and Older Protocols
 @cindex SSL 2
 
 One of the initial decisions in the @acronym{GnuTLS} development was
@@ -1071,7 +1071,7 @@ Other protocols such as Microsoft's @acronym{PCT} 1 and @acronym{PCT}
 by @acronym{SSL} 3.0 and later @acronym{TLS} 1.0.
 
 @node Authentication methods
-@chapter Authentication methods
+@chapter Authentication Methods
 
 The @acronym{TLS} protocol provides confidentiality and encryption,
 but also offers authentication, which is a prerequisite for a secure
@@ -1100,7 +1100,7 @@ are:
 @end menu
 
 @node Certificate authentication
-@section Certificate authentication
+@section Certificate Authentication
 
 @subsection Authentication using @acronym{X.509} certificates
 @cindex @acronym{X.509} certificates
@@ -1249,7 +1249,7 @@ Signature Standard.
 @end table
 
 @node Anonymous authentication
-@section Anonymous authentication
+@section Anonymous Authentication
 @cindex Anonymous authentication
 
 The anonymous key exchange performs encryption but there is no
@@ -1413,7 +1413,7 @@ maintain @acronym{PSK} keys.
 
 
 @node Authentication and credentials
-@section Authentication and credentials
+@section Authentication and Credentials
 
 In @acronym{GnuTLS} every key exchange method is associated with a
 credentials type. So in order to enable to enable a specific method,
@@ -1455,7 +1455,7 @@ Key exchange algorithms and the corresponding credential types:
 @end multitable
 
 @node Parameters stored in credentials
-@section Parameters stored in credentials
+@section Parameters Stored in Credentials
 
 Several parameters such as the ones used for Diffie-Hellman
 authentication are stored within the credentials structures, so all
@@ -1514,7 +1514,7 @@ int main()
 @end example
 
 @node More on certificate authentication
-@chapter More on certificate authentication
+@chapter More on Certificate Authentication
 @anchor{Certificate Authentication}
 @cindex Certificate authentication
 
@@ -1525,7 +1525,7 @@ int main()
 @end menu
 
 @node The X.509 trust model
-@section The @acronym{X.509} trust model
+@section The @acronym{X.509} Trust Model
 @cindex @acronym{X.509} certificates
 
 The @acronym{X.509} protocols rely on a hierarchical trust model. In
@@ -1757,7 +1757,7 @@ An example of a @acronym{PKCS} #12 structure generation can be found
 at section @ref{ex:pkcs12}.
 
 @node The OpenPGP trust model
-@section The @acronym{OpenPGP} trust model
+@section The @acronym{OpenPGP} Trust Model
 @cindex @acronym{OpenPGP} Keys
 
 The @acronym{OpenPGP} key authentication relies on a distributed trust
@@ -1835,13 +1835,13 @@ These algorithms have been broken and should not be trusted.
 @end table
 
 @node Digital signatures
-@section Digital signatures
+@section Digital Signatures
 @cindex Digital signatures
 @include signatures.texi
 
 
 @node How to use TLS in application protocols
-@chapter How to use @acronym{TLS} in application protocols
+@chapter How To Use @acronym{TLS} in Application Protocols
 
 This chapter is intended to provide some hints on how to use the
 @acronym{TLS} over simple custom made application protocols.  The
@@ -1854,7 +1854,7 @@ but may be extended to other ones too.
 @end menu
 
 @node Separate ports
-@section Separate ports
+@section Separate Ports
 
 Traditionally @acronym{SSL} was used in application protocols by
 assigning a new port number for the secure services. That way two
@@ -1881,7 +1881,7 @@ is a limitation on the available privileged ports, this approach was
 soon obsoleted.
 
 @node Upward negotiation
-@section Upward negotiation
+@section Upward Negotiation
 
 Other application protocols@footnote{See LDAP, IMAP etc.}  use a
 different approach to enable the secure layer.  They use something
@@ -1972,7 +1972,7 @@ password file@footnote{in @acronym{SRP} authentication}, or anything
 else!
 
 @node How to use GnuTLS in applications
-@chapter How to use @acronym{GnuTLS} in applications
+@chapter How To Use @acronym{GnuTLS} in Applications
 @anchor{examples}
 @cindex Example programs
 
@@ -2131,7 +2131,7 @@ int main()
 @end itemize
 
 @node Client examples
-@section Client examples
+@section Client Examples
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 clients, using @acronym{GnuTLS}.  Note that these examples contain
@@ -2261,7 +2261,7 @@ other examples.  It is required to build some examples.
 @verbatiminclude examples/tcp.c
 
 @node Server examples
-@section Server examples
+@section Server Examples
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 servers, using @acronym{GnuTLS}.
@@ -2330,7 +2330,7 @@ serve the example client with authorization support.
 @verbatiminclude examples/ex-serv-authz.c
 
 @node Miscellaneous examples
-@section Miscellaneous examples
+@section Miscellaneous Examples
 
 @menu
 * Checking for an alert::
@@ -2377,7 +2377,7 @@ structure.
 @verbatiminclude examples/ex-pkcs12.c
 
 @node Compatibility with the OpenSSL library
-@section Compatibility with the OpenSSL library
+@section Compatibility with the OpenSSL Library
 @cindex OpenSSL
 
 To ease @acronym{GnuTLS}' integration with existing applications, a
@@ -2400,7 +2400,7 @@ Current limitations imposed by the compatibility layer include:
 @end itemize
 
 @node Included programs
-@chapter Included programs
+@chapter Included Programs
 
 Included with @acronym{GnuTLS} are also a few command line tools that
 let you use the library for common tasks without writing an
@@ -3067,7 +3067,7 @@ signing_key
 @end example
 
 @node Function reference
-@chapter Function reference
+@chapter Function Reference
 @cindex Function reference
 
 @menu
@@ -3080,7 +3080,7 @@ signing_key
 @end menu
 
 @node Core functions
-@section Core functions
+@section Core Functions
 
 The prototypes for the following functions lie in
 @file{gnutls/gnutls.h}.
@@ -3088,7 +3088,7 @@ The prototypes for the following functions lie in
 @include gnutls-api.texi
 
 @node X.509 certificate functions
-@section @acronym{X.509} certificate functions
+@section @acronym{X.509} Certificate Functions
 @anchor{sec:x509api}
 @cindex @acronym{X.509} Functions
 
@@ -3098,7 +3098,7 @@ Their prototypes lie in @file{gnutls/x509.h}.
 @include x509-api.texi
 
 @node GnuTLS-extra functions
-@section @acronym{GnuTLS-extra} functions
+@section @acronym{GnuTLS-extra} Functions
 @cindex @acronym{GnuTLS-extra} functions
 
 These functions are only available in the GPL version of the library
@@ -3108,7 +3108,7 @@ called @code{gnutls-extra}. The prototypes for this library lie in
 @include gnutls-extra-api.texi
 
 @node OpenPGP functions
-@section @acronym{OpenPGP} functions
+@section @acronym{OpenPGP} Functions
 @cindex @acronym{OpenPGP} functions
 @anchor{sec:openpgpapi}
 
@@ -3120,7 +3120,7 @@ to be able to use these functions (@pxref{GnuTLS-extra functions}).
 @include pgp-api.texi
 
 @node TLS Inner Application (TLS/IA) functions
-@section @acronym{TLS} Inner Application (@acronym{TLS/IA}) functions
+@section @acronym{TLS} Inner Application (@acronym{TLS/IA}) Functions
 @cindex @acronym{TLS} Inner Application (@acronym{TLS/IA}) functions
 @cindex Inner Application (@acronym{TLS/IA}) functions
 
@@ -3177,7 +3177,7 @@ client functions with the corresponding server functions.
 @include ia-api.texi
 
 @node Error codes and descriptions
-@section Error codes and descriptions
+@section Error Codes and Descriptions
 @anchor{Error Codes}
 @cindex Error codes
 
@@ -3188,11 +3188,11 @@ expressions.
 
 @include error_codes.texi
 
-@node Certificate to XML convertion functions
-@chapter Certificate to @acronym{XML} convertion functions
-@cindex Certificate to XML convertion
+@node Certificate to XML Conversion Functions
+@chapter Certificate to @acronym{XML} Conversion Functions
+@cindex Certificate to XML conversion
 
-This appendix contains some example output of the XML convertion
+This appendix contains some example output of the XML conversion
 functions:
 
 @itemize
@@ -3209,7 +3209,7 @@ functions:
 @end menu
 
 @node An X.509 certificate
-@section An @acronym{X.509} certificate
+@section An @acronym{X.509} Certificate
 
 @smallexample
 <?xml version="1.0" encoding="UTF-8"?>
@@ -3412,7 +3412,7 @@ functions:
 @end smallexample
 
 @node An OpenPGP key
-@section An @acronym{OpenPGP} key
+@section An @acronym{OpenPGP} Key
 
 @smallexample
 <?xml version="1.0"?>
@@ -3493,7 +3493,7 @@ functions:
 @end smallexample
 
 @node All the supported ciphersuites in GnuTLS
-@chapter All the supported ciphersuites in @acronym{GnuTLS}
+@chapter All the Supported Ciphersuites in @acronym{GnuTLS}
 @anchor{ciphersuites}
 @cindex Ciphersuites
 
@@ -3632,7 +3632,7 @@ functions:
 @include guile.texi
 
 @node Internal architecture of GnuTLS
-@chapter Internal architecture of GnuTLS
+@chapter Internal Architecture of GnuTLS
 @cindex Internal architecture
 @include internals.texi
 
