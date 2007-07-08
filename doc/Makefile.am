@@ -48,9 +48,6 @@ gnutls_TEXINFOS += pgp1.eps pgp1.png pgp1.pdf
 gnutls_TEXINFOS += x509-1.eps x509-1.png x509-1.pdf
 gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png gnutls-logo.pdf
 
-# Internal manual.
-gnutls_TEXINFOS += internals.texi 	
-
 # Images.  Make sure there are eps + png + pdf of each.
 gnutls_TEXINFOS += internals.eps internals.png internals.pdf
 gnutls_TEXINFOS += arch/certificate-user-use-case.dia	\

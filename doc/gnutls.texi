@@ -3634,7 +3634,79 @@ functions:
 @node Internal architecture of GnuTLS
 @chapter Internal Architecture of GnuTLS
 @cindex Internal architecture
-@include internals.texi
+
+This chapter is to give a brief description of the
+way @acronym{GnuTLS} works. The focus is to give an idea
+to potential developers and those who want to know what
+happens inside the black box.
+
+@section The TLS Protocol
+The main needs for the TLS protocol to be used are
+shown in the image below.
+
+@image{arch/client-server-use-case,9cm}
+
+This is being accomplished by the following object diagram.
+Note that since @acronym{GnuTLS} is being developed in C
+object are just structures with attributes. The operations listed
+are functions that require the first parameter to be that object.
+@image{arch/objects,15cm}
+
+@section TLS Handshake Protocol
+The @acronym{GnuTLS} handshake protocol is implemented as a state
+machine that waits for input or returns immediately when the non-blocking
+transport layer functions are used. The main idea is shown in the following
+figure.
+
+@image{arch/handshake-state,9cm}
+
+Also the way the input is processed varies per ciphersuite. Several 
+implementations of the internal handlers are available and 
+@ref{gnutls_handshake} only multiplexes the input to the appropriate 
+handler. For example a @acronym{PSK} ciphersuite has a different 
+implementation of the @code{process_client_key_exchange} than a
+certificate ciphersuite.
+
+@image{arch/handshake-sequence,12cm}
+
+@section TLS Authentication Methods
+In @acronym{GnuTLS} authentication methods can be implemented quite easily.
+Since the required changes to add a new authentication method affect only the
+handshake protocol, a simple interface is used. An authentication method needs
+only to implement the functions as seen in the figure below.
+
+@image{arch/mod_auth_st,12cm}
+
+The functions that need to be implemented are the ones responsible for interpreting
+the handshake protocol messages. It is common for such functions to read data from
+one or more @code{credentials_t} structures@footnote{such as the @code{gnutls_certificate_credentials_t} structures} and write data, such as certificates, usernames etc. to @code{auth_info_t} structures.
+
+Simple examples of existing authentication methods can be seen in @code{auth_psk.c}
+for PSK ciphersuites and @code{auth_srp.c} for SRP ciphersuites. After implementing these functions
+the structure holding its pointers has to be registered in @code{gnutls_algorithms.c}
+in the @code{_gnutls_kx_algorithms} structure.
+
+@section TLS Extension Handling
+As with authentication methods, the TLS extensions handlers can be implemented
+using the following interface.
+
+@image{arch/extensions_st,12cm}
+
+Here there are two functions, one for receiving the extension data
+and one for sending. These functions have to check internally whether
+they operate in client or server side. 
+
+A simple example of an extension handler can be seen in @code{ext_srp.c}
+After implementing these functions, together with the extension number they
+handle, they have to be registered in @code{gnutls_extensions.c} in the 
+@code{_gnutls_extensions} structure.
+
+
+@section Certificate Handling
+What is provided by the certificate handling functions
+is summarized in the following diagram.
+
+@image{arch/certificate-user-use-case,12cm}
 
 
 @node Copying Information
