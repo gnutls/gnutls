@@ -107,3 +107,9 @@ snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 
 .c.x:
 	$(guile_snarf) -o $@ $< $(snarfcppopts)
+
+# Target used by doc/Makefile, to create all built sources necessary
+# for generating the manual.
+
+.PHONY: built-sources
+built-sources: $(BUILT_SOURCES)
