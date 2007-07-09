@@ -56,7 +56,7 @@ sometime in the future, SHA-1 will be disabled as well.  The collision
 attacks on SHA-1 may also get better, given the new interest in tools
 for creating them.
 
-@subsection Supported algorithms
+@subsection Supported Algorithms
 The available digital signature algorithms in @acronym{GnuTLS} are
 listed below:
 
@@ -96,7 +96,7 @@ the EU project RIPE. Outputs 160 bits of data.
 @end table
 
 
-@subsection Trading security for interoperability
+@subsection Trading Security for Interoperability
 
 If you connect to a server and use GnuTLS' functions to verify the
 certificate chain, and get a @ref{GNUTLS_CERT_INSECURE_ALGORITHM}

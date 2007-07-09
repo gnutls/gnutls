@@ -677,7 +677,7 @@ just after the handshake protocol has finished.
 @end menu
 
 @node Encryption algorithms used in the record layer
-@subsection Encryption algorithms used in the record layer
+@subsection Encryption Algorithms Used in the Record Layer
 @cindex Symmetric encryption algorithms
 
 Confidentiality in the record layer is achieved by using symmetric
@@ -727,7 +727,7 @@ bits of data.
 @end table
 
 @node Compression algorithms used in the record layer
-@subsection Compression algorithms used in the record layer
+@subsection Compression Algorithms Used in the Record Layer
 @cindex Compression algorithms
 
 The TLS record layer also supports compression.  The algorithms
@@ -762,7 +762,7 @@ and the private extensions are enabled.
 @end table
 
 @node Weaknesses and countermeasures
-@subsection Weaknesses and countermeasures
+@subsection Weaknesses and Countermeasures
 
 Some weaknesses that may affect the security of the Record layer have
 been found in @acronym{TLS} 1.0 protocol. These weaknesses can be
@@ -870,7 +870,7 @@ To set whether client certificate is required or not.
 To initiate the handshake.
 @end table
 
-@subsection TLS cipher suites
+@subsection TLS Cipher Suites
 
 The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
 the form @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA}.  The usual cipher
@@ -902,7 +902,7 @@ true. For several reasons, not discussed here, some combinations were
 not defined in the @acronym{TLS} protocol.  The supported ciphersuites
 are shown in @ref{ciphersuites}.
 
-@subsection Client authentication
+@subsection Client Authentication
 @cindex Client Certificate authentication
 
 In the case of ciphersuites that use certificate authentication, the
@@ -942,7 +942,7 @@ reasons, thus it may be normal for a server not to resume a session
 even if you requested that.  Also note that you must enable, using the
 priority functions, at least the algorithms used in the last session.
 
-@subsection Resuming internals
+@subsection Resuming Internals
 
 The resuming capability, mostly in the server side, is one of the
 problems of a thread-safe TLS implementations. The problem is that all
@@ -996,7 +996,7 @@ in @acronym{GnuTLS} are:
 
 and they will be discussed in the subsections that follow.
 
-@subsection Maximum fragment length negotiation
+@subsection Maximum Fragment Length Negotiation
 @cindex TLS Extensions
 @cindex Maximum fragment length
 
@@ -1006,7 +1006,7 @@ useful to clients with constrained capabilities. See the
 @ref{gnutls_record_set_max_size} and the
 @ref{gnutls_record_get_max_size} functions.
 
-@subsection Server name indication
+@subsection Server Name Indication
 @anchor{serverind}
 @cindex TLS Extensions
 @cindex Server name indication
@@ -1102,7 +1102,7 @@ are:
 @node Certificate authentication
 @section Certificate Authentication
 
-@subsection Authentication using @acronym{X.509} certificates
+@subsection Authentication Using @acronym{X.509} Certificates
 @cindex @acronym{X.509} certificates
 
 @acronym{X.509} certificates contain the public parameters, of a
@@ -1110,7 +1110,7 @@ public key algorithm, and an authority's signature, which proves the
 authenticity of the parameters.  @xref{The X.509 trust model}, for
 more information on @acronym{X.509} protocols.
 
-@subsection Authentication using @acronym{OpenPGP} keys
+@subsection Authentication Using @acronym{OpenPGP} Keys
 @cindex @acronym{OpenPGP} Keys
 
 @acronym{OpenPGP} keys also contain public parameters of a public key
@@ -1123,7 +1123,7 @@ based on the @xcite{TLSPGP} proposal.
 @acronym{OpenPGP} trust model.  For a more detailed introduction to
 @acronym{OpenPGP} and @acronym{GnuPG} see @xcite{GPGH}.
 
-@subsection Using certificate authentication
+@subsection Using Certificate Authentication
 
 In @acronym{GnuTLS} both the @acronym{OpenPGP} and @acronym{X.509}
 certificates are part of the certificate authentication and thus are
@@ -1550,7 +1550,7 @@ handling @acronym{X.509} certificates is described at section
 @end menu
 
 @node X.509 certificates
-@subsection @acronym{X.509} certificates
+@subsection @acronym{X.509} Certificates
 
 An @acronym{X.509} certificate usually contains information about the
 certificate holder, the signer, a unique serial number, expiration
@@ -1640,7 +1640,7 @@ functions for @acronym{X.509} certificate handling have their prototypes in
 parsing capabilities can be found at section @ref{ex:x509-info}.
 
 @node Verifying X.509 certificate paths
-@subsection Verifying @acronym{X.509} certificate paths
+@subsection Verifying @acronym{X.509} Certificate Paths
 @cindex Verifying certificate paths
 
 Verifying certificate paths is important in @acronym{X.509} authentication. For
@@ -1723,7 +1723,7 @@ certificate's owner is the one you expect. For more information consult @xcite{R
 and section @ref{ex:verify} for an example.
 
 @node PKCS #10 certificate requests
-@subsection @acronym{PKCS} #10 certificate requests
+@subsection @acronym{PKCS} #10 Certificate Requests
 @cindex Certificate requests
 @cindex @acronym{PKCS} #10
 
@@ -1739,7 +1739,7 @@ using the @code{gnutls_x509_crq_t} type.  An example of a certificate
 request generation can be found at section @ref{ex:crq}.
 
 @node PKCS #12 structures
-@subsection @acronym{PKCS} #12 structures
+@subsection @acronym{PKCS} #12 Structures
 @cindex @acronym{PKCS} #12
 
 A @acronym{PKCS} #12 structure @xcite{PKCS12} usually contains a user's
@@ -1786,7 +1786,7 @@ only Kevin, for some reason. A reason could be that Bob is lazy
 enough, and signs other people's keys without being sure that they
 belong to the actual owner.
 
-@subsection @acronym{OpenPGP} keys
+@subsection @acronym{OpenPGP} Keys
 
 In @acronym{GnuTLS} the @acronym{OpenPGP} key structures
 @xcite{RFC2440} are handled using the @code{gnutls_openpgp_key_t} type
@@ -1794,7 +1794,7 @@ and the corresponding private keys with the
 @code{gnutls_openpgp_privkey_t} type. All the prototypes for the key
 handling functions can be found at @file{gnutls/openpgp.h}.
 
-@subsection Verifying an @acronym{OpenPGP} key
+@subsection Verifying an @acronym{OpenPGP} Key
 
 The verification functions of @acronym{OpenPGP} keys, included in
 @acronym{GnuTLS}, are simple ones, and do not use the features of the
@@ -2011,7 +2011,7 @@ available by including the header file @file{gnutls/extra.h} in your
 programs.
 
 @node Version check
-@subsection Version check
+@subsection Version Check
 
 It is often desirable to check that the version of `gnutls' used is
 indeed one which fits all requirements.  Even with binary
@@ -2021,7 +2021,7 @@ want to check that the version is okay right after program startup.
 See the function @ref{gnutls_check_version}.
 
 @node Building the source
-@subsection Building the source
+@subsection Building the Source
 
 If you want to compile a source file including the `gnutls/gnutls.h'
 header file, you must make sure that the compiler can find it in the
@@ -2067,7 +2067,7 @@ gcc -o foo foo.c `libgnutls-config --cflags --libs`
 @end example
 
 @node Multi-threaded applications
-@section Multi-threaded applications
+@section Multi-Threaded Applications
 
 Although the @acronym{GnuTLS} library is thread safe by design, some
 parts of the crypto backend, such as the random generator, are
@@ -2152,7 +2152,7 @@ implemented by another example.
 @end menu
 
 @node Simple client example with anonymous authentication
-@subsection Simple client example with anonymous authentication
+@subsection Simple Client Example with Anonymous Authentication
 
 The simplest client using TLS is the one that doesn't do any
 authentication.  This means no external certificates or passwords are
@@ -2163,7 +2163,7 @@ However, the data is integrity and privacy protected.
 @verbatiminclude examples/ex-client1.c
 
 @node Simple client example with X.509 certificate support
-@subsection Simple client example with @acronym{X.509} certificate support
+@subsection Simple Client Example with @acronym{X.509} Certificate Support
 
 Let's assume now that we want to create a TCP client which
 communicates with servers that use @acronym{X.509} or
@@ -2176,7 +2176,7 @@ redefining them.
 @verbatiminclude examples/ex-client2.c
 
 @node Obtaining session information
-@subsection Obtaining session information
+@subsection Obtaining Session Information
 
 Most of the times it is desirable to know the security properties of
 the current established session.  This includes the underlying ciphers
@@ -2187,7 +2187,7 @@ if called after a successful @ref{gnutls_handshake}.
 @verbatiminclude examples/ex-session-info.c
 
 @node Verifying peer's certificate
-@subsection Verifying peer's certificate
+@subsection Verifying Peer's Certificate
 @anchor{ex:verify}
 
 A @acronym{TLS} session is not secure just after the handshake
@@ -2205,7 +2205,7 @@ verification output.
 @verbatiminclude examples/ex-verify.c
 
 @node Using a callback to select the certificate to use
-@subsection Using a callback to select the certificate to use
+@subsection Using a Callback to Select the Certificate to Use
 
 There are cases where a client holds several certificate and key
 pairs, and may not want to load all of them in the credentials
@@ -2215,7 +2215,7 @@ certificate selection callback.
 @verbatiminclude examples/ex-cert-select.c
 
 @node Client with Resume capability example
-@subsection Client with Resume capability example
+@subsection Client with Resume Capability Example
 @anchor{ex:resume-client}
 
 This is a modification of the simple client example. Here we
@@ -2226,7 +2226,7 @@ establish a new connection using the previously negotiated data.
 @verbatiminclude examples/ex-client-resume.c
 
 @node Simple client example with SRP authentication
-@subsection Simple client example with @acronym{SRP} authentication
+@subsection Simple Client Example with @acronym{SRP} Authentication
 
 The following client is a very simple @acronym{SRP} @acronym{TLS}
 client which connects to a server and authenticates using a
@@ -2236,7 +2236,7 @@ itself using a certificate, and in that case it has to be verified.
 @verbatiminclude examples/ex-client-srp.c
 
 @node Simple client example with TLS/IA support
-@subsection Simple client example with @acronym{TLS/IA} support
+@subsection Simple Client Example with @acronym{TLS/IA} Support
 
 The following client is a simple client which uses the
 @acronym{TLS/IA} extension to authenticate with the server.
@@ -2244,7 +2244,7 @@ The following client is a simple client which uses the
 @verbatiminclude examples/ex-client-tlsia.c
 
 @node Simple client example with authorization support
-@subsection Simple client example with authorization support
+@subsection Simple Client Example with Authorization Support
 
 The following client require that the server sends authorization data,
 and the client will send authorization data to the server as well.
@@ -2253,7 +2253,7 @@ For authentication, X.509 is used.
 @verbatiminclude examples/ex-client-authz.c
 
 @node Helper function for TCP connections
-@subsection Helper function for TCP connections
+@subsection Helper Function for TCP Connections
 
 This helper function abstracts away TCP connection handling from the
 other examples.  It is required to build some examples.
@@ -2276,7 +2276,7 @@ servers, using @acronym{GnuTLS}.
 @end menu
 
 @node Echo Server with X.509 authentication
-@subsection Echo Server with @acronym{X.509} authentication
+@subsection Echo Server with @acronym{X.509} Authentication
 
 This example is a very simple echo server which supports
 @acronym{X.509} authentication, using the RSA ciphersuites.
@@ -2284,7 +2284,7 @@ This example is a very simple echo server which supports
 @verbatiminclude examples/ex-serv1.c
 
 @node Echo Server with X.509 authentication II
-@subsection Echo Server with @acronym{X.509} authentication II
+@subsection Echo Server with @acronym{X.509} Authentication II
 
 The following example is a server which supports @acronym{X.509}
 authentication.  This server supports the export-grade cipher suites,
@@ -2293,7 +2293,7 @@ the DHE ciphersuites and session resuming.
 @verbatiminclude examples/ex-serv-export.c
 
 @node Echo Server with OpenPGP authentication
-@subsection Echo Server with @acronym{OpenPGP} authentication
+@subsection Echo Server with @acronym{OpenPGP} Authentication
 @cindex @acronym{OpenPGP} Server
 
 The following example is an echo server which supports
@@ -2305,7 +2305,7 @@ them to keep these examples as simple as possible.
 @verbatiminclude examples/ex-serv-pgp.c
 
 @node Echo Server with SRP authentication
-@subsection Echo Server with @acronym{SRP} authentication
+@subsection Echo Server with @acronym{SRP} Authentication
 
 This is a server which supports @acronym{SRP} authentication. It is
 also possible to combine this functionality with a certificate
@@ -2314,7 +2314,7 @@ server. Here it is separate for simplicity.
 @verbatiminclude examples/ex-serv-srp.c
 
 @node Echo Server with anonymous authentication
-@subsection Echo Server with anonymous authentication
+@subsection Echo Server with Anonymous Authentication
 
 This example server support anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
@@ -2322,7 +2322,7 @@ used to serve the example client for anonymous authentication.
 @verbatiminclude examples/ex-serv-anon.c
 
 @node Echo Server with authorization support
-@subsection Echo Server with authorization support
+@subsection Echo Server with Authorization Support
 
 This example server support authorization data, and can be used to
 serve the example client with authorization support.
@@ -2340,7 +2340,7 @@ serve the example client with authorization support.
 @end menu
 
 @node Checking for an alert
-@subsection Checking for an alert
+@subsection Checking for an Alert
 
 This is a function that checks if an alert has been received in the
 current session.
@@ -2348,7 +2348,7 @@ current session.
 @verbatiminclude examples/ex-alert.c
 
 @node X.509 certificate parsing example
-@subsection @acronym{X.509} certificate parsing example
+@subsection @acronym{X.509} Certificate Parsing Example
 @anchor{ex:x509-info}
 
 To demonstrate the @acronym{X.509} parsing capabilities an example program is
@@ -2358,7 +2358,7 @@ information about it.
 @verbatiminclude examples/ex-x509-info.c
 
 @node Certificate request generation
-@subsection Certificate request generation
+@subsection Certificate Request Generation
 @anchor{ex:crq}
 
 The following example is about generating a certificate request, and a
@@ -2368,7 +2368,7 @@ which should return a signed certificate.
 @verbatiminclude examples/ex-crq.c
 
 @node PKCS #12 structure generation
-@subsection @acronym{PKCS} #12 structure generation
+@subsection @acronym{PKCS} #12 Structure Generation
 @anchor{ex:pkcs12}
 
 The following example is about generating a @acronym{PKCS} #12
@@ -2615,7 +2615,7 @@ Usage: gnutls-serv [options]
      --copyright              prints the program's license
 @end verbatim
 
-@subsection Setting up a test HTTPS server
+@subsection Setting Up a Test HTTPS Server
 @cindex HTTPS server
 @cindex debug server
 
