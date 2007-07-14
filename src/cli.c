@@ -797,6 +797,7 @@ after_handshake:
 		{
 		  fprintf (stderr, "*** Starting TLS handshake\n");
 		  ret = do_handshake (&hd);
+		  clearerr (stdin);
 		  if (ret < 0)
 		    {
 		      fprintf (stderr, "*** Handshake has failed\n");
