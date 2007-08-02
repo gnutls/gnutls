@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.7.16 (unreleased)
 
+** Fix sanity checks and return values in certificate selection.
+In some cases, GnuTLS omitted to report suitable error codes when no
+suitable certificate was found.
+
 ** Fix gnutls-cli starttls EOF on Mac OS X.
 Thanks to Hal Eden <n.mavrogiannopoulos@gmail.com>.
 
