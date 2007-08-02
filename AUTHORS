@@ -27,6 +27,12 @@ Guile bindings, OpenPGP bug fixes.
 Mario Lenz <m@riolenz.de>
 Fixes to OpenCDK.
 
+Howard Chu <hyc@symas.com>
+APIs to extract X.500 DN's from Certificates.
+
+Ivo Timmermans <ivo@o2w.nl>
+Man pages, OpenCDK, fixes.
+
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.
