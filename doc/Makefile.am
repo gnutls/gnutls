@@ -122,18 +122,19 @@ if HAVE_GUILE
 
 GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
 
-SNARF_CPPFLAGS = -I$(top_srcdir) \
-	-I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
+SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
+		 -I$(top_srcdir)/includes -I$(top_builddir)/includes	\
+	         -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
 
 core.c.texi: $(top_srcdir)/guile/src/core.c
-	make -C ../guile/src built-sources
+	$(MAKE) -C ../guile/src built-sources &&			\
 	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
 	   -e '(apply main (cdr (command-line)))'			\
 	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS) $(CPPFLAGS)"		\
 	   > "$@"
 
 extra.c.texi: $(top_srcdir)/guile/src/extra.c
-	make -C ../guile/src built-sources
+	$(MAKE) -C ../guile/src built-sources &&			\
 	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
 	   -e '(apply main (cdr (command-line)))'			\
 	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS) $(CPPFLAGS)"		\
