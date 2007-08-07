@@ -12,6 +12,10 @@ suitable certificate was found.
 ** Fix gnutls-cli starttls EOF on Mac OS X.
 Thanks to Hal Eden <n.mavrogiannopoulos@gmail.com>.
 
+** Documentation fixes.
+In particular, the section headings were modified for casing.  By
+Ludovic Courtes <ludovic.courtes@laas.fr>.
+
 ** API and ABI modifications:
 No changes since last version.
 
