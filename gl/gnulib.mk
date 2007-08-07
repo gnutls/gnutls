@@ -49,6 +49,13 @@ EXTRA_libgnu_la_SOURCES += error.c
 
 ## end   gnulib module error
 
+## begin gnulib module gendocs
+
+
+EXTRA_DIST += $(top_srcdir)/build-aux/gendocs.sh
+
+## end   gnulib module gendocs
+
 ## begin gnulib module getaddrinfo
 
 
@@ -82,6 +89,13 @@ libgnu_la_SOURCES += gettext.h
 
 ## end   gnulib module gettext-h
 
+## begin gnulib module havelib
+
+
+EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
+
+## end   gnulib module havelib
+
 ## begin gnulib module inet_ntop
 
 
@@ -104,7 +118,15 @@ EXTRA_libgnu_la_SOURCES += inet_pton.c
 
 LINK_WARNING_H=$(top_srcdir)/build-aux/link-warning.h
 
+EXTRA_DIST += $(top_srcdir)/build-aux/link-warning.h
+
 ## end   gnulib module link-warning
+
+## begin gnulib module maintainer-makefile
+
+EXTRA_DIST += $(top_srcdir)/build-aux/GNUmakefile $(top_srcdir)/build-aux/maint.mk
+
+## end   gnulib module maintainer-makefile
 
 ## begin gnulib module netinet_in
 

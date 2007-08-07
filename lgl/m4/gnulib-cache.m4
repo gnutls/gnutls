@@ -23,6 +23,7 @@ gl_MODULES([crypto/gc crypto/gc-arcfour crypto/gc-arctwo crypto/gc-des crypto/gc
 gl_AVOID([])
 gl_SOURCE_BASE([lgl])
 gl_M4_BASE([lgl/m4])
+gl_PO_BASE([])
 gl_DOC_BASE([doc])
 gl_TESTS_BASE([tests])
 gl_LIB([liblgnu])
@@ -30,3 +31,4 @@ gl_LGPL
 gl_MAKEFILE_NAME([])
 gl_LIBTOOL
 gl_MACRO_PREFIX([lgl])
+gl_PO_DOMAIN([])

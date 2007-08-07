@@ -232,6 +232,8 @@ EXTRA_liblgnu_la_SOURCES += getpass.c
 # "gettextize --intl".
 AM_CPPFLAGS += -I$(top_builddir)/intl
 
+EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
+
 ## end   gnulib module gettext
 
 ## begin gnulib module gettext-h
@@ -240,9 +242,18 @@ liblgnu_la_SOURCES += gettext.h
 
 ## end   gnulib module gettext-h
 
+## begin gnulib module havelib
+
+
+EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
+
+## end   gnulib module havelib
+
 ## begin gnulib module link-warning
 
 LINK_WARNING_H=$(top_srcdir)/build-aux/link-warning.h
+
+EXTRA_DIST += $(top_srcdir)/build-aux/link-warning.h
 
 ## end   gnulib module link-warning
 

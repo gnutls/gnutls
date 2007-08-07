@@ -23,9 +23,11 @@ gl_MODULES([arpa_inet error fdl gendocs getaddrinfo getline gpl-2.0 inet_ntop in
 gl_AVOID([snprintf vasnprintf])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
+gl_PO_BASE([])
 gl_DOC_BASE([doc])
 gl_TESTS_BASE([gl/tests])
 gl_LIB([libgnu])
 gl_MAKEFILE_NAME([gnulib.mk])
 gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
+gl_PO_DOMAIN([])

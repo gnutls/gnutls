@@ -3718,8 +3718,25 @@ is summarized in the following diagram.
 * GNU GPL::                      License for copying GNUTLS extra and tools.
 @end menu
 
+@node GNU Free Documentation License
+@appendixsec GNU Free Documentation License
+
+@cindex FDL, GNU Free Documentation License
+
 @include fdl.texi
+
+@node GNU LGPL
+@appendixsec GNU Lesser General Public License
+@cindex LGPL, GNU Lesser General Public License
+@cindex License, GNU LGPL
+
 @include lgpl-2.1.texi
+
+@node GNU GPL
+@appendixsec GNU General Public License
+@cindex GPL, GNU General Public License
+@cindex License, GNU GPL
+
 @include gpl-2.0.texi
 
 @node Concept Index
