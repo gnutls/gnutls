@@ -16,6 +16,8 @@ Thanks to Hal Eden <n.mavrogiannopoulos@gmail.com>.
 In particular, the section headings were modified for casing.  By
 Ludovic Courtes <ludovic.courtes@laas.fr>.
 
+** Update gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
