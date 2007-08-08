@@ -1,3 +1,115 @@
+2007-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.16.
+
+2007-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/GNUmakefile, build-aux/maint.mk, doc/fdl.texi,
+	doc/gnutls.texi, doc/gpl-2.0.texi, doc/lgpl-2.1.texi, gl/error.c,
+	gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/include_next.m4,
+	gl/override/doc/gpl-2.0.texi.diff,
+	gl/override/doc/lgpl-2.1.texi.diff, lgl/Makefile.am,
+	lgl/m4/gnulib-cache.m4, lgl/m4/include_next.m4, lgl/m4/stdint.m4: 
+	Update gnulib files.
+
+2007-08-02  Ludovic Courtès <ludo@gnu.org>
+
+	* NEWS: Updated `NEWS'.  Signed-off-by: Simon Josefsson
+	<simon@josefsson.org>
+
+2007-08-01  Ludovic Courtès <ludo@gnu.org>
+
+	* lib/auth_cert.c: Fixed erroneous checks and sloppy return values
+	in certificate selection.  * lib/auth_cert.c
+	(_gnutls_get_selected_cert): Dereference   APR_CERT_LIST_LENGTH,
+	APR_PKEY and APR_CERT_LIST when validating their   value.
+	(_gnutls_server_select_cert): When IDX < 0, set RET to
+	`GNUTLS_E_INSUFFICIENT_CREDENTIALS'.  Signed-off-by: Simon Josefsson
+	<simon@josefsson.org>
+
+2007-08-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-santesson-tls-gssapi-03.txt: Add.
+
+2007-08-02  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Add.
+
+2007-07-14  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/stdint_.h, lgl/vasnprintf.c: Update gnulib files.
+
+2007-07-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-07-14  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-07-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: On starttls EOF on stdin, clear EOF flag to make future
+	reads work OK. Needed for Mac OS X.  Report and tiny patch by Hal
+	Eden <n.mavrogiannopoulos@gmail.com>.
+
+2007-07-12  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh, gl/override/lib/version-etc.c.diff,
+	lgl/Makefile.am, lgl/m4/wchar.m4, lgl/wchar_.h: Update.
+
+2007-07-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc4346-bis-04.txt,
+	doc/protocol/draft-santesson-tls-gssapi-02.txt: Add.
+
+2007-07-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/gnutls.texi, doc/internals.texi: Avoid make
+	errors regarding internals.texi. See
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2233>.
+
+2007-07-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, guile/src/Makefile.am: Fix build failure in doc/
+	when guile isn't installed built yet.
+
+2007-07-08  Ludovic Courtès <ludo@gnu.org>
+
+	* doc/gnutls.texi, doc/internals.texi: Manual: Capitalized section
+	and chapter titles.  * doc/gnutls.texi: Capitalized section and
+	chapter titles.   (Certificate to XML convertion functions): Fixed
+	typo both in node   name and chapter title.  Updated menu.  *
+	doc/internals.texi: Likewise.  Signed-off-by: Simon Josefsson
+	<simon@josefsson.org>
+
+2007-07-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-nir-tls-eap-01.txt: Add.
+
+2007-07-02  Ludovic Courtès <ludo@gnu.org>
+
+	* doc/guile.texi: Manual: Small Guile fixes.  * doc/guile.texi:
+	Fixed typos, added cross-refs to the Guile manual.  Signed-off-by:
+	Simon Josefsson <simon@josefsson.org>
+
+2007-07-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc4366-bis-00.txt: Add.
+
+2007-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-07-02  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.15.
