@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.7.17 (unreleased)
 
+** gnutls_set_default_priority now disable TLS 1.2 by default.
+The RFC is not released yet, and we're approaching a major release so
+let's not enable it just yet.
+
 ** Build fixes for Guile code.
 Patch from Ludovic Courtes <ludovic.courtes@laas.fr>.
 
