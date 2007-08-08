@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** Build fixes for Guile code.
 Patch from Ludovic Courtes <ludovic.courtes@laas.fr>.
 
+** More documentation fixes.
+In particular, the section headings were modified for casing.  By
+Ludovic Courtes <ludovic.courtes@laas.fr>.
+
 ** API and ABI modifications:
 No changes since last version.
 
