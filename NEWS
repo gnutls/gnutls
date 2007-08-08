@@ -12,6 +12,10 @@ Patch from Ludovic Courtes <ludovic.courtes@laas.fr>.
 In particular, the section headings were modified for casing.  By
 Ludovic Courtes <ludovic.courtes@laas.fr>.
 
+** Updated Polish and Swedish translations.
+Thanks to Jakub Bogusz <qboosh@pld-linux.org> and Daniel Nylander
+<po@danielnylander.se>.
+
 ** API and ABI modifications:
 No changes since last version.
 
