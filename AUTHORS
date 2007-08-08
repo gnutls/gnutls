@@ -33,6 +33,9 @@ APIs to extract X.500 DN's from Certificates.
 Ivo Timmermans <ivo@o2w.nl>
 Man pages, OpenCDK, fixes.
 
+Stefan Walter <stef@memberwebs.com>
+PKCS8 fix.
+
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.
