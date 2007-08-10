@@ -269,7 +269,7 @@ static const gnutls_error_entry error_algorithms[] = {
 int
 gnutls_error_is_fatal (int error)
 {
-  int ret = 0;
+  int ret = 1;
 
   GNUTLS_ERROR_ALG_LOOP (ret = p->fatal);
   return ret;
