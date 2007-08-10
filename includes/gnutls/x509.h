@@ -605,6 +605,10 @@ extern "C"
 				   const gnutls_datum_t * data,
 				   const gnutls_datum_t * signature);
 
+  int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
+				     const gnutls_datum_t hash,
+				     gnutls_datum_t *signature);
+
 
 /* Certificate request stuff.
  */

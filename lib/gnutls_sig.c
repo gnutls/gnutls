@@ -37,10 +37,11 @@
 #include <gnutls_sig.h>
 #include <gnutls_kx.h>
 
-static
-  int _gnutls_tls_sign (gnutls_cert * cert, gnutls_privkey * pkey,
-			const gnutls_datum_t * hash_concat,
-			gnutls_datum_t * signature);
+static int
+_gnutls_tls_sign (gnutls_session_t session,
+		  gnutls_cert * cert, gnutls_privkey * pkey,
+		  const gnutls_datum_t * hash_concat,
+		  gnutls_datum_t * signature);
 
 
 /* Generates a signature of all the previous sent packets in the 
@@ -111,7 +112,7 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
-  ret = _gnutls_tls_sign (cert, pkey, &dconcat, signature);
+  ret = _gnutls_tls_sign (session, cert, pkey, &dconcat, signature);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -202,7 +203,7 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
       _gnutls_hash_deinit (td_sha, NULL);
       return GNUTLS_E_INTERNAL_ERROR;
     }
-  ret = _gnutls_tls_sign (cert, pkey, &dconcat, signature);
+  ret = _gnutls_tls_sign (session, cert, pkey, &dconcat, signature);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -257,7 +258,8 @@ _gnutls_sign (gnutls_pk_algorithm_t algo, mpi_t * params,
  * it supports signing.
  */
 static int
-_gnutls_tls_sign (gnutls_cert * cert, gnutls_privkey * pkey,
+_gnutls_tls_sign (gnutls_session_t session,
+		  gnutls_cert * cert, gnutls_privkey * pkey,
 		  const gnutls_datum_t * hash_concat,
 		  gnutls_datum_t * signature)
 {
@@ -273,11 +275,49 @@ _gnutls_tls_sign (gnutls_cert * cert, gnutls_privkey * pkey,
 	  return GNUTLS_E_KEY_USAGE_VIOLATION;
 	}
 
+  /* External signing. */
+  if (!pkey || pkey->params_size == 0)
+    {
+      if (!session->internals.sign_func)
+	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+
+      return (*session->internals.sign_func)
+	(session, session->internals.sign_func_userdata,
+	 cert->cert_type, cert->raw,
+	 *hash_concat, signature);
+    }
+
   return _gnutls_sign (pkey->pk_algorithm, pkey->params,
 		       pkey->params_size, hash_concat, signature);
-
 }
 
+/**
+ * gnutls_sign_callback_set:
+ * @session:
+ * @sign_func:
+ * @userdata:
+ *
+ * Set the callback function.  The function must have this prototype:
+ *
+ * typedef int (*gnutls_sign_func) (gnutls_session_t session,
+ *                                  void *userdata,
+ *                                  gnutls_certificate_type_t cert_type,
+ *                                  gnutls_datum_t cert,
+ *                                  const gnutls_datum_t hash,
+ *                                  gnutls_datum_t * signature);
+ *
+ * The @userdata parameter is passed to the @sign_func verbatim, and
+ * can be used to store application-specific data needed in the
+ * callback function.
+ **/
+void
+gnutls_sign_callback_set (gnutls_session_t session,
+			  gnutls_sign_func sign_func,
+			  void *userdata)
+{
+  session->internals.sign_func = sign_func;
+  session->internals.sign_func_userdata = userdata;
+}
 
 static int
 _gnutls_verify_sig (gnutls_cert * cert,

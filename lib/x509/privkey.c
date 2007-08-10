@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -27,6 +27,7 @@
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <gnutls_rsa_export.h>
+#include <gnutls_sig.h>
 #include <common.h>
 #include <gnutls_x509.h>
 #include <x509_b64.h>
@@ -1550,6 +1551,41 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
   memcpy (signature, sig.data, sig.size);
 
   _gnutls_free_datum (&sig);
+
+  return 0;
+}
+
+/**
+ * gnutls_x509_privkey_sign_hash - This function will sign the given data using the private key params
+ * @key: Holds the key
+ * @hash: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ *
+ * This function will sign the given hash using the private key.
+ *
+ * Return value: In case of failure a negative value will be returned,
+ * and 0 on success.
+ **/
+int
+gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
+			       const gnutls_datum_t hash,
+			       gnutls_datum_t *signature)
+{
+  int result;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_sign (key->pk_algorithm, key->params,
+			 key->params_size, &hash, signature);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
 
   return 0;
 }

@@ -145,7 +145,7 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   ddata.data = *data;
   ddata.size = data_size;
 
-  if (apr_pkey != NULL)
+  if (apr_cert_list_length > 0)
     {
       if ((ret =
 	   _gnutls_tls_sign_params (session, &apr_cert_list[0],

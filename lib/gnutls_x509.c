@@ -702,9 +702,9 @@ _gnutls_x509_raw_privkey_to_gkey (gnutls_privkey * privkey,
   return 0;
 }
 
-/* Reads a PEM encoded PKCS-1 RSA private key from memory
- * 2002-01-26: Added ability to read DSA keys.
- * type indicates the certificate format.
+/* Reads a PEM encoded PKCS-1 RSA/DSA private key from memory.  Type
+ * indicates the certificate format.  KEY can be NULL, to indicate
+ * that GnuTLS doesn't know the private key.
  */
 static int
 read_key_mem (gnutls_certificate_credentials_t res,
@@ -724,16 +724,21 @@ read_key_mem (gnutls_certificate_credentials_t res,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  tmp.data = (opaque *) key;
-  tmp.size = key_size;
-
-  ret =
-    _gnutls_x509_raw_privkey_to_gkey (&res->pkey[res->ncerts], &tmp, type);
-  if (ret < 0)
+  if (key)
     {
-      gnutls_assert ();
-      return ret;
+      tmp.data = (opaque *) key;
+      tmp.size = key_size;
+
+      ret =
+	_gnutls_x509_raw_privkey_to_gkey (&res->pkey[res->ncerts], &tmp, type);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
     }
+  else
+    memset (&res->pkey[res->ncerts], 0, sizeof (gnutls_privkey));
 
   return 0;
 }
@@ -790,7 +795,7 @@ read_key_file (gnutls_certificate_credentials_t res,
   * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials_t structure
   * @res: is an #gnutls_certificate_credentials_t structure.
   * @cert: contains a certificate list (path) for the specified private key
-  * @key: is the private key
+  * @key: is the private key, or %NULL
   * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
@@ -811,6 +816,9 @@ read_key_file (gnutls_certificate_credentials_t res,
   * If the certificate and the private key are given in PEM encoding
   * then the strings that hold their values must be null terminated.
   *
+  * The @key may be %NULL if you are using a sign callback, see
+  * gnutls_sign_callback_set().
+  *
   **/
 int
 gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
@@ -822,7 +830,8 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
 
   /* this should be first 
    */
-  if ((ret = read_key_mem (res, key->data, key->size, type)) < 0)
+  if ((ret = read_key_mem (res, key ? key->data : NULL,
+			   key ? key->size : 0, type)) < 0)
     return ret;
 
   if ((ret = read_cert_mem (res, cert->data, cert->size, type)) < 0)
@@ -830,7 +839,7 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
 
   res->ncerts++;
 
-  if ((ret = _gnutls_check_key_cert_match (res)) < 0)
+  if (key && (ret = _gnutls_check_key_cert_match (res)) < 0)
     {
       gnutls_assert ();
       return ret;

@@ -5,8 +5,14 @@ See the end for copying conditions.
 
 * Version 1.7.17 (unreleased)
 
+** New functions to perform external signing.
+Set the signing callback function (of the gnutls_sign_func prototype)
+using gnutls_sign_callback_set.  In the callback, you may find the new
+function gnutls_x509_privkey_sign_hash useful.
+
 ** New self test of client and server authenticated X.509 TLS sessions.
-See tests/x509self.c.
+See tests/x509self.c and tests/x509signself.c.  The latter also tests
+the new external signing callback interface.
 
 ** gnutls_set_default_priority now disable TLS 1.2 by default.
 The RFC is not released yet, and we're approaching a major release so
@@ -24,7 +30,9 @@ Thanks to Jakub Bogusz <qboosh@pld-linux.org> and Daniel Nylander
 <po@danielnylander.se>.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_sign_func: ADD, new type for sign callback.
+gnutls_sign_callback_set: ADD, new function to set sign callback.
+gnutls_x509_privkey_sign_hash: ADD, new function useful in sign callback.
 
 * Version 1.7.16 (released 2007-08-07)
 
