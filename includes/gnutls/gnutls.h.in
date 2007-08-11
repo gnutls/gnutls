@@ -1058,6 +1058,9 @@ extern "C"
   void gnutls_sign_callback_set (gnutls_session_t session,
 				 gnutls_sign_func sign_func,
 				 void *userdata);
+  gnutls_sign_func
+  gnutls_sign_callback_get (gnutls_session_t session,
+			    void **userdata);
 
   /* These are set on the credentials structure.
    */

@@ -291,34 +291,6 @@ _gnutls_tls_sign (gnutls_session_t session,
 		       pkey->params_size, hash_concat, signature);
 }
 
-/**
- * gnutls_sign_callback_set:
- * @session:
- * @sign_func:
- * @userdata:
- *
- * Set the callback function.  The function must have this prototype:
- *
- * typedef int (*gnutls_sign_func) (gnutls_session_t session,
- *                                  void *userdata,
- *                                  gnutls_certificate_type_t cert_type,
- *                                  gnutls_datum_t cert,
- *                                  const gnutls_datum_t hash,
- *                                  gnutls_datum_t * signature);
- *
- * The @userdata parameter is passed to the @sign_func verbatim, and
- * can be used to store application-specific data needed in the
- * callback function.
- **/
-void
-gnutls_sign_callback_set (gnutls_session_t session,
-			  gnutls_sign_func sign_func,
-			  void *userdata)
-{
-  session->internals.sign_func = sign_func;
-  session->internals.sign_func_userdata = userdata;
-}
-
 static int
 _gnutls_verify_sig (gnutls_cert * cert,
 		    const gnutls_datum_t * hash_concat,

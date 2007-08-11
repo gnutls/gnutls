@@ -868,3 +868,50 @@ _gnutls_gcert_deinit (gnutls_cert * cert)
 
   _gnutls_free_datum (&cert->raw);
 }
+
+/**
+ * gnutls_sign_callback_set:
+ * @session: is a gnutls session
+ * @sign_func: function pointer to application's sign callback.
+ * @userdata: void pointer that will be passed to sign callback.
+ *
+ * Set the callback function.  The function must have this prototype:
+ *
+ * typedef int (*gnutls_sign_func) (gnutls_session_t session,
+ *                                  void *userdata,
+ *                                  gnutls_certificate_type_t cert_type,
+ *                                  gnutls_datum_t cert,
+ *                                  const gnutls_datum_t hash,
+ *                                  gnutls_datum_t * signature);
+ *
+ * The @userdata parameter is passed to the @sign_func verbatim, and
+ * can be used to store application-specific data needed in the
+ * callback function.  See also gnutls_sign_callback_get().
+ **/
+void
+gnutls_sign_callback_set (gnutls_session_t session,
+			  gnutls_sign_func sign_func,
+			  void *userdata)
+{
+  session->internals.sign_func = sign_func;
+  session->internals.sign_func_userdata = userdata;
+}
+
+/**
+ * gnutls_sign_callback_get:
+ * @session: is a gnutls session
+ * @userdata: if non-%NULL, will be set to abstract callback pointer.
+ *
+ * Retrieve the callback function, and its userdata pointer.
+ *
+ * Return value: The function pointer set by
+ *   gnutls_sign_callback_set(), or if not set, %NULL.
+ **/
+gnutls_sign_func
+gnutls_sign_callback_get (gnutls_session_t session,
+			  void **userdata)
+{
+  if (userdata)
+    *userdata = session->internals.sign_func_userdata;
+  return session->internals.sign_func;
+}
