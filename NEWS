@@ -17,6 +17,16 @@ for comments and testing.
 See tests/x509self.c and tests/x509signself.c.  The latter also tests
 the new external signing callback interface.
 
+** New errors GNUTLS_E_APPLICATION_ERROR_MIN..GNUTLS_E_APPLICATION_ERROR_MAX.
+These two actually describe the outer limits of a range of error codes
+reserved to the application.  All of the errors are treated as fatal
+by the library (it has to since it doesn't know the semantics of the
+error codes).  This can be useful in callbacks, to signal some
+application-specific error condition, which will usually eventually
+cause some gnutls API to return the same error code as the callback,
+which then can be inspected by the application.  Note that error codes
+are negative.
+
 ** gnutls_set_default_priority now disable TLS 1.2 by default.
 The RFC is not released yet, and we're approaching a major release so
 let's not enable it just yet.
@@ -37,6 +47,8 @@ gnutls_sign_func: ADD, new type for sign callback.
 gnutls_sign_callback_set: ADD, new function to set sign callback.
 gnutls_sign_callback_get: ADD, new function to retrieve sign callback.
 gnutls_x509_privkey_sign_hash: ADD, new function useful in sign callback.
+GNUTLS_E_APPLICATION_ERROR_MIN,
+GNUTLS_E_APPLICATION_ERROR_MAX: ADD, new CPP #defines for error codes.
 
 * Version 1.7.16 (released 2007-08-07)
 

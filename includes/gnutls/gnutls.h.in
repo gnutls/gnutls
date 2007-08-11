@@ -1262,6 +1262,9 @@ extern "C"
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 
+#define GNUTLS_E_APPLICATION_ERROR_MAX -65000
+#define GNUTLS_E_APPLICATION_ERROR_MIN -65500
+
 #ifdef __cplusplus
 }
 #endif
