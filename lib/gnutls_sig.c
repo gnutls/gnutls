@@ -283,8 +283,8 @@ _gnutls_tls_sign (gnutls_session_t session,
 
       return (*session->internals.sign_func)
 	(session, session->internals.sign_func_userdata,
-	 cert->cert_type, cert->raw,
-	 *hash_concat, signature);
+	 cert->cert_type, &cert->raw,
+	 hash_concat, signature);
     }
 
   return _gnutls_sign (pkey->pk_algorithm, pkey->params,

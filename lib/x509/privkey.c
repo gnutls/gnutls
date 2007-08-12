@@ -1568,8 +1568,8 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
  **/
 int
 gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
-			       const gnutls_datum_t hash,
-			       gnutls_datum_t *signature)
+			       const gnutls_datum_t * hash,
+			       gnutls_datum_t * signature)
 {
   int result;
 
@@ -1580,7 +1580,7 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
     }
 
   result = _gnutls_sign (key->pk_algorithm, key->params,
-			 key->params_size, &hash, signature);
+			 key->params_size, hash, signature);
   if (result < 0)
     {
       gnutls_assert ();

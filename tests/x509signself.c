@@ -134,8 +134,8 @@ int
 sign_func (gnutls_session_t session,
 	   void *userdata,
 	   gnutls_certificate_type_t cert_type,
-	   gnutls_datum_t cert,
-	   const gnutls_datum_t hash,
+	   const gnutls_datum_t * cert,
+	   const gnutls_datum_t * hash,
 	   gnutls_datum_t * signature)
 {
   gnutls_x509_privkey_t key;
