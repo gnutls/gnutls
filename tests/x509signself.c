@@ -38,6 +38,10 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+#include "ex-session-info.c"
+#include "ex-x509-info.c"
+extern int print_info (gnutls_session_t session);
+
 #include "utils.h"
 
 pid_t child;
@@ -93,7 +97,7 @@ tcp_close (int sd)
   close (sd);
 }
 
-const char ca_pem[] =
+static char ca_pem[] =
   "-----BEGIN CERTIFICATE-----\n"
   "MIIB5zCCAVKgAwIBAgIERiYdJzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTExWhcNMDgwNDE3MTMyOTExWjAZMRcw\n"
@@ -109,7 +113,7 @@ const char ca_pem[] =
   "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca = { ca_pem, sizeof (ca_pem) };
 
-const char cert_pem[] =
+static char cert_pem[] =
   "-----BEGIN CERTIFICATE-----\n"
   "MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
@@ -135,7 +139,7 @@ sign_func (gnutls_session_t session,
 	   gnutls_datum_t * signature)
 {
   gnutls_x509_privkey_t key;
-  const char key_pem[] =
+  char key_pem[] =
     "-----BEGIN RSA PRIVATE KEY-----\n"
     "MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
     "9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
@@ -328,8 +332,7 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
-
-const char server_cert_pem[] =
+static char server_cert_pem[] =
   "-----BEGIN CERTIFICATE-----\n"
   "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
@@ -349,7 +352,7 @@ const char server_cert_pem[] =
 const gnutls_datum_t server_cert = { server_cert_pem,
 				     sizeof (server_cert_pem) };
 
-const char server_key_pem[] =
+static char server_key_pem[] =
   "-----BEGIN RSA PRIVATE KEY-----\n"
   "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
   "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
@@ -426,9 +429,6 @@ server_start (void)
 
   success ("server: ready. Listening to port '%d'.\n", PORT);
 }
-
-#include "ex-session-info.c"
-#include "ex-x509-info.c"
 
 void
 server (void)
