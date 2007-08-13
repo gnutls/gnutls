@@ -32,6 +32,10 @@ are negative.
 The RFC is not released yet, and we're approaching a major release so
 let's not enable it just yet.
 
+** Fix namespace so that gnutls_*_t is used consistently.
+Before, many places in the GnuTLS code used the old deprecated type
+names without the '_t' suffix.
+
 ** Build fixes for Guile code.
 Patch from Ludovic Courtes <ludovic.courtes@laas.fr>.
 
