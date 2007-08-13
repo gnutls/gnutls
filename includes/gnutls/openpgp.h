@@ -98,6 +98,9 @@ extern "C"
 				     const gnutls_datum_t * data,
 				     gnutls_openpgp_key_fmt_t format,
 				     const char *pass, unsigned int flags);
+  int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
+					const gnutls_datum_t * hash,
+					gnutls_datum_t * signature);
 
 /* Keyring stuff.
  */

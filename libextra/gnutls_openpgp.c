@@ -1269,3 +1269,38 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
 
   return 0;
 }
+
+/**
+ * gnutls_openpgp_privkey_sign_hash - This function will sign the given data using the private key params
+ * @key: Holds the key
+ * @hash: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ *
+ * This function will sign the given hash using the private key.
+ *
+ * Return value: In case of failure a negative value will be returned,
+ * and 0 on success.
+ **/
+int
+gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
+				  const gnutls_datum_t * hash,
+				  gnutls_datum_t * signature)
+{
+  int result;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_sign (key->pkey.pk_algorithm, key->pkey.params,
+			 key->pkey.params_size, hash, signature);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  return 0;
+}

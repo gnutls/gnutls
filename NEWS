@@ -8,10 +8,11 @@ See the end for copying conditions.
 ** New functions to perform external signing.
 Set the signing callback function (of the gnutls_sign_func prototype)
 using the gnutls_sign_callback_set function.  In the callback, you may
-find the new function gnutls_x509_privkey_sign_hash useful.  A new
-function gnutls_sign_callback_get is also added, to retrieve the
-function pointer.  Thanks to "Alon Bar-Lev" <alon.barlev@gmail.com>
-for comments and testing.
+find the new functions gnutls_x509_privkey_sign_hash and
+gnutls_openpgp_privkey_sign_hash useful.  A new function
+gnutls_sign_callback_get is also added, to retrieve the function
+pointer.  Thanks to "Alon Bar-Lev" <alon.barlev@gmail.com> for
+comments and testing.
 
 ** New self test of client and server authenticated X.509 TLS sessions.
 See tests/x509self.c and tests/x509signself.c.  The latter also tests
@@ -46,7 +47,8 @@ Thanks to Jakub Bogusz <qboosh@pld-linux.org> and Daniel Nylander
 gnutls_sign_func: ADD, new type for sign callback.
 gnutls_sign_callback_set: ADD, new function to set sign callback.
 gnutls_sign_callback_get: ADD, new function to retrieve sign callback.
-gnutls_x509_privkey_sign_hash: ADD, new function useful in sign callback.
+gnutls_x509_privkey_sign_hash,
+gnutls_openpgp_privkey_sign_hash: ADD, new functions useful in sign callback.
 GNUTLS_E_APPLICATION_ERROR_MIN,
 GNUTLS_E_APPLICATION_ERROR_MAX: ADD, new CPP #defines for error codes.
 
