@@ -613,7 +613,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  {
 	  case GNUTLS_PK_RSA:
 	    {
-	      gnutls_datum m, e;
+	      gnutls_datum_t m, e;
 
 	      err = gnutls_x509_crt_get_pk_rsa_raw (cert, &m, &e);
 	      if (err < 0)
@@ -634,7 +634,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 
 	  case GNUTLS_PK_DSA:
 	    {
-	      gnutls_datum p, q, g, y;
+	      gnutls_datum_t p, q, g, y;
 
 	      err = gnutls_x509_crt_get_pk_dsa_raw (cert, &p, &q, &g, &y);
 	      if (err < 0)

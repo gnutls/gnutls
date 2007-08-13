@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2007 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -85,7 +85,7 @@ main (int argc, char **argv)
   struct passwd *pwd;
   unsigned char key[MAX_KEY_SIZE];
   char hex_key[MAX_KEY_SIZE * 2 + 1];
-  gnutls_datum dkey;
+  gnutls_datum_t dkey;
   size_t hex_key_size = sizeof (hex_key);
 
   if ((ret = gnutls_global_init ()) < 0)

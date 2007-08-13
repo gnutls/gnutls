@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -44,9 +44,11 @@ extern "C"
   void gnutls_pkcs12_deinit (gnutls_pkcs12_t pkcs12);
   int gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
 			    const gnutls_datum_t * data,
-			    gnutls_x509_crt_fmt format, unsigned int flags);
+			    gnutls_x509_crt_fmt_t format,
+			    unsigned int flags);
   int gnutls_pkcs12_export (gnutls_pkcs12_t pkcs12,
-			    gnutls_x509_crt_fmt format, void *output_data,
+			    gnutls_x509_crt_fmt_t format,
+			    void *output_data,
 			    size_t * output_data_size);
 
   int gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,

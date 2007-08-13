@@ -83,7 +83,7 @@ static int x509ctype;
 static int disable_extensions;
 
 char *psk_username = NULL;
-gnutls_datum psk_key = { NULL, 0 };
+gnutls_datum_t psk_key = { NULL, 0 };
 
 static gnutls_srp_client_credentials_t srp_cred;
 static gnutls_psk_client_credentials_t psk_cred;
@@ -118,7 +118,7 @@ static int authz_server_formats[PRI_MAX] = {
 typedef struct
 {
   int fd;
-  gnutls_session session;
+  gnutls_session_t session;
   int secure;
   char *hostname;
   char *ip;
@@ -145,11 +145,11 @@ static void init_global_tls_stuff (void);
 /* Helper functions to load a certificate and key
  * files into memory.
  */
-static gnutls_datum
+static gnutls_datum_t
 load_file (const char *file)
 {
   FILE *f;
-  gnutls_datum loaded_file = { NULL, 0 };
+  gnutls_datum_t loaded_file = { NULL, 0 };
   long filelen;
   void *ptr;
 
@@ -169,18 +169,18 @@ load_file (const char *file)
 }
 
 static void
-unload_file (gnutls_datum data)
+unload_file (gnutls_datum_t data)
 {
   free (data.data);
 }
 
 #define MAX_CRT 6
 static unsigned int x509_crt_size;
-static gnutls_x509_crt x509_crt[MAX_CRT];
-static gnutls_x509_privkey x509_key = NULL;
+static gnutls_x509_crt_t x509_crt[MAX_CRT];
+static gnutls_x509_privkey_t x509_key = NULL;
 
-static gnutls_openpgp_key pgp_crt = NULL;
-static gnutls_openpgp_privkey pgp_key = NULL;
+static gnutls_openpgp_key_t pgp_crt = NULL;
+static gnutls_openpgp_privkey_t pgp_key = NULL;
 
 /* Load the certificate and the private key.
  */
@@ -189,7 +189,7 @@ load_keys (void)
 {
   unsigned int crt_num;
   int ret;
-  gnutls_datum data;
+  gnutls_datum_t data;
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
@@ -307,9 +307,9 @@ load_keys (void)
  */
 
 static int
-cert_callback (gnutls_session session,
-	       const gnutls_datum * req_ca_rdn, int nreqs,
-	       const gnutls_pk_algorithm * sign_algos,
+cert_callback (gnutls_session_t session,
+	       const gnutls_datum_t * req_ca_rdn, int nreqs,
+	       const gnutls_pk_algorithm_t * sign_algos,
 	       int sign_algos_length, gnutls_retr_st * st)
 {
   char issuer_dn[256];
@@ -470,12 +470,12 @@ authz_recv_callback (gnutls_session_t session,
 
 #endif
 
-/* initializes a gnutls_session with some defaults.
+/* initializes a gnutls_session_t with some defaults.
  */
-static gnutls_session
+static gnutls_session_t
 init_tls_session (const char *hostname)
 {
-  gnutls_session session;
+  gnutls_session_t session;
 
   gnutls_init (&session, GNUTLS_CLIENT);
 
@@ -962,7 +962,7 @@ do_handshake (socket_st * socket)
 {
   int ret;
   gnutls_transport_set_ptr (socket->session,
-			    (gnutls_transport_ptr) socket->fd);
+			    (gnutls_transport_ptr_t) socket->fd);
   do
     {
       ret = gnutls_handshake (socket->session);
@@ -1000,7 +1000,7 @@ do_handshake (socket_st * socket)
 }
 
 static int
-srp_username_callback (gnutls_session session,
+srp_username_callback (gnutls_session_t session,
 		       unsigned int times, char **username, char **password)
 {
   if (srp_username == NULL || srp_passwd == NULL)

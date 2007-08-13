@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -26,6 +26,6 @@
 
 /* this is locally allocated. It should be freed using the provided function */
 int _gnutls_psk_pwd_find_entry (gnutls_session_t, char *username,
-				gnutls_datum * key);
+				gnutls_datum_t * key);
 
 #endif /* ENABLE_SRP */

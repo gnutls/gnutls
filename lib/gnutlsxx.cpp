@@ -257,7 +257,7 @@ bool session::get_peers_certificate(const gnutls_datum_t** certs, unsigned int *
     return true;
 }
 
-void session::get_our_certificate(gnutls_datum& cert) const
+void session::get_our_certificate(gnutls_datum_t& cert) const
 {
 const gnutls_datum_t *d;
     
@@ -485,7 +485,7 @@ void session::get_dh_pubkey( gnutls_datum_t & raw_key) const
     RETWRAP(gnutls_dh_get_pubkey( this->s, &raw_key));
 }
 
-void session::get_rsa_export_pubkey( gnutls_datum& exponent, gnutls_datum& modulus) const
+void session::get_rsa_export_pubkey( gnutls_datum_t& exponent, gnutls_datum_t& modulus) const
 {
     RETWRAP( gnutls_rsa_export_get_pubkey( this->s, &exponent, &modulus));
 }
@@ -807,7 +807,7 @@ void psk_client_credentials::set_ptr(void* p)
 }
 
 void psk_client_credentials::set_credentials(const char* username,
-        const gnutls_datum& key, gnutls_psk_key_flags flags) 
+        const gnutls_datum_t& key, gnutls_psk_key_flags flags) 
 { 
     RETWRAP(gnutls_psk_set_client_credentials( this->cred, username, &key, flags));
 }

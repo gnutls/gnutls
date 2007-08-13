@@ -1702,10 +1702,10 @@ static int
 parse_pkcs12 (gnutls_certificate_credentials_t res,
 	      gnutls_pkcs12_t p12,
 	      const char *password,
-	      gnutls_x509_privkey * key,
+	      gnutls_x509_privkey_t * key,
 	      gnutls_x509_crt_t * cert, gnutls_x509_crl_t * crl)
 {
-  gnutls_pkcs12_bag bag = NULL;
+  gnutls_pkcs12_bag_t bag = NULL;
   int index = 0;
   int ret;
 
@@ -1758,7 +1758,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
       for (i = 0; i < elements_in_bag; i++)
 	{
 	  int type;
-	  gnutls_datum data;
+	  gnutls_datum_t data;
 
 	  type = gnutls_pkcs12_bag_get_type (bag, i);
 	  if (type < 0)
@@ -1883,13 +1883,13 @@ done:
  * Return value: Returns 0 on success, or an error code.
  **/
 int
-  gnutls_certificate_set_x509_simple_pkcs12_file
-  (gnutls_certificate_credentials_t res, const char *pkcs12file,
-   gnutls_x509_crt_fmt_t type, const char *password)
+gnutls_certificate_set_x509_simple_pkcs12_file
+(gnutls_certificate_credentials_t res, const char *pkcs12file,
+ gnutls_x509_crt_fmt_t type, const char *password)
 {
   gnutls_pkcs12_t p12;
   gnutls_datum_t p12blob;
-  gnutls_x509_privkey key = NULL;
+  gnutls_x509_privkey_t key = NULL;
   gnutls_x509_crt_t cert = NULL;
   gnutls_x509_crl_t crl = NULL;
   int ret;

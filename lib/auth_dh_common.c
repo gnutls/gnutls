@@ -96,7 +96,7 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
     }
   else				/* In DHE_PSK the key is set differently */
     {
-      gnutls_datum tmp_dh_key;
+      gnutls_datum_t tmp_dh_key;
       ret = _gnutls_mpi_dprint (&tmp_dh_key, session->key->KEY);
       if (ret < 0)
 	{
@@ -179,7 +179,7 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
     }
   else				/* In DHE_PSK the key is set differently */
     {
-      gnutls_datum tmp_dh_key;
+      gnutls_datum_t tmp_dh_key;
       ret = _gnutls_mpi_dprint (&tmp_dh_key, session->key->KEY);
       if (ret < 0)
 	{

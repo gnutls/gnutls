@@ -120,9 +120,9 @@ const int ssl_session_cache = 128;
 
 static void wrap_db_init (void);
 static void wrap_db_deinit (void);
-static int wrap_db_store (void *dbf, gnutls_datum key, gnutls_datum data);
-static gnutls_datum wrap_db_fetch (void *dbf, gnutls_datum key);
-static int wrap_db_delete (void *dbf, gnutls_datum key);
+static int wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data);
+static gnutls_datum_t wrap_db_fetch (void *dbf, gnutls_datum_t key);
+static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 
 
 #define HTTP_STATE_REQUEST	1
@@ -133,7 +133,7 @@ LIST_TYPE_DECLARE (listener_item, char *http_request;
 		   char *http_response; int request_length;
 		   int response_length; int response_written;
 		   int http_state;
-		   int fd; gnutls_session tls_session; int handshake_ok;);
+		   int fd; gnutls_session_t tls_session; int handshake_ok;);
 
 static const char *
 safe_strerror (int value)
@@ -166,8 +166,8 @@ listener_free (listener_item * j)
  * otherwise we should add them here.
  */
 
-gnutls_dh_params dh_params = NULL;
-gnutls_rsa_params rsa_params = NULL;
+gnutls_dh_params_t dh_params = NULL;
+gnutls_rsa_params_t rsa_params = NULL;
 
 static int
 generate_dh_primes (void)
@@ -204,7 +204,7 @@ read_dh_params (void)
 {
   char tmpdata[2048];
   int size;
-  gnutls_datum params;
+  gnutls_datum_t params;
   FILE *fd;
 
   if (gnutls_dh_params_init (&dh_params) < 0)
@@ -253,7 +253,7 @@ static char pkcs3[] =
 static int
 static_dh_params (void)
 {
-  gnutls_datum params = { pkcs3, sizeof (pkcs3) };
+  gnutls_datum_t params = { pkcs3, sizeof (pkcs3) };
   int ret;
 
   if (gnutls_dh_params_init (&dh_params) < 0)
@@ -276,7 +276,7 @@ static_dh_params (void)
 }
 
 static int
-get_params (gnutls_session session, gnutls_params_type type,
+get_params (gnutls_session_t session, gnutls_params_type_t type,
 	    gnutls_params_st * st)
 {
 
@@ -433,10 +433,10 @@ authz_recv_callback (gnutls_session_t session,
 }
 #endif
 
-gnutls_session
+gnutls_session_t
 initialize_session (void)
 {
-  gnutls_session session;
+  gnutls_session_t session;
 
   gnutls_init (&session, GNUTLS_SERVER);
 
@@ -502,13 +502,13 @@ static const char DEFAULT_DATA[] =
  */
 #define tmp2 &http_buffer[strlen(http_buffer)]
 char *
-peer_print_info (gnutls_session session, int *ret_length, const char *header)
+peer_print_info (gnutls_session_t session, int *ret_length, const char *header)
 {
   const char *tmp;
   unsigned char sesid[32];
   size_t i, sesid_size;
   char *http_buffer;
-  gnutls_kx_algorithm kx_alg;
+  gnutls_kx_algorithm_t kx_alg;
   size_t len = 5 * 1024 + strlen (header);
   char *crtinfo = NULL;
   size_t ncrtinfo = 0;
@@ -758,7 +758,7 @@ listen_socket (const char *name, int listen_port)
 }
 
 static void
-get_response (gnutls_session session, char *request,
+get_response (gnutls_session_t session, char *request,
 	      char **response, int *response_length)
 {
   char *p, *h;
@@ -806,7 +806,7 @@ terminate (int sig)
 
 
 static void
-check_alert (gnutls_session session, int ret)
+check_alert (gnutls_session_t session, int ret)
 {
   if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
       || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
@@ -1117,7 +1117,7 @@ main (int argc, char **argv)
 /* a new connection has arrived */
       if (FD_ISSET (h, &rd))
 	{
-	  gnutls_session tls_session;
+	  gnutls_session_t tls_session;
 
 	  tls_session = initialize_session ();
 
@@ -1143,7 +1143,7 @@ main (int argc, char **argv)
 
 	      j->tls_session = tls_session;
 	      gnutls_transport_set_ptr (tls_session,
-					(gnutls_transport_ptr) accept_fd);
+					(gnutls_transport_ptr_t) accept_fd);
 	      j->handshake_ok = 0;
 
 	      if (verbose == 0)
@@ -1509,7 +1509,7 @@ wrap_db_deinit (void)
 }
 
 static int
-wrap_db_store (void *dbf, gnutls_datum key, gnutls_datum data)
+wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
 
   if (cache_db == NULL)
@@ -1532,10 +1532,10 @@ wrap_db_store (void *dbf, gnutls_datum key, gnutls_datum data)
   return 0;
 }
 
-static gnutls_datum
-wrap_db_fetch (void *dbf, gnutls_datum key)
+static gnutls_datum_t
+wrap_db_fetch (void *dbf, gnutls_datum_t key)
 {
-  gnutls_datum res = { NULL, 0 };
+  gnutls_datum_t res = { NULL, 0 };
   int i;
 
   if (cache_db == NULL)
@@ -1563,7 +1563,7 @@ wrap_db_fetch (void *dbf, gnutls_datum key)
 }
 
 static int
-wrap_db_delete (void *dbf, gnutls_datum key)
+wrap_db_delete (void *dbf, gnutls_datum_t key)
 {
   int i;
 

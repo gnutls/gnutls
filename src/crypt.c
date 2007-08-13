@@ -73,11 +73,11 @@ srptool_version (void)
 
 int crypt_int (const char *username, const char *passwd, int salt,
 	       char *tpasswd_conf, char *tpasswd, int uindex);
-static int read_conf_values (gnutls_datum * g, gnutls_datum * n, char *str);
+static int read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n, char *str);
 static int _verify_passwd_int (const char *username, const char *passwd,
 			       char *verifier, char *salt,
-			       const gnutls_datum * g,
-			       const gnutls_datum * n);
+			       const gnutls_datum_t * g,
+			       const gnutls_datum_t * n);
 
 void
 srptool_version (void)
@@ -91,7 +91,7 @@ srptool_version (void)
 
 
 static void
-print_num (const char *msg, const gnutls_datum * num)
+print_num (const char *msg, const gnutls_datum_t * num)
 {
   unsigned int i;
 
@@ -115,8 +115,8 @@ generate_create_conf (char *tpasswd_conf)
   FILE *fd;
   char line[5 * 1024];
   int index = 1;
-  gnutls_datum g, n;
-  gnutls_datum str_g, str_n;
+  gnutls_datum_t g, n;
+  gnutls_datum_t str_g, str_n;
 
   fd = fopen (tpasswd_conf, "w");
   if (fd == NULL)
@@ -183,10 +183,10 @@ generate_create_conf (char *tpasswd_conf)
 static int
 _verify_passwd_int (const char *username, const char *passwd,
 		    char *verifier, char *salt,
-		    const gnutls_datum * g, const gnutls_datum * n)
+		    const gnutls_datum_t * g, const gnutls_datum_t * n)
 {
   char _salt[1024];
-  gnutls_datum tmp, raw_salt, new_verifier;
+  gnutls_datum_t tmp, raw_salt, new_verifier;
   size_t salt_size;
   char *pos;
 
@@ -327,7 +327,7 @@ verify_passwd (char *conffile, char *tpasswd, char *username,
   FILE *fd;
   char line[5 * 1024];
   unsigned int i;
-  gnutls_datum g, n;
+  gnutls_datum_t g, n;
   int iindex;
   char *p, *pos;
 
@@ -498,12 +498,12 @@ main (int argc, char **argv)
 
 char *
 _srp_crypt (const char *username, const char *passwd, int salt_size,
-	    const gnutls_datum * g, const gnutls_datum * n)
+	    const gnutls_datum_t * g, const gnutls_datum_t * n)
 {
   char salt[128];
   static char result[1024];
-  gnutls_datum dat_salt, txt_salt;
-  gnutls_datum verifier, txt_verifier;
+  gnutls_datum_t dat_salt, txt_salt;
+  gnutls_datum_t verifier, txt_verifier;
 
   if ((unsigned) salt_size > sizeof (salt))
     return NULL;
@@ -556,7 +556,7 @@ crypt_int (const char *username, const char *passwd, int salt_size,
 {
   FILE *fd;
   char *cr;
-  gnutls_datum g, n;
+  gnutls_datum_t g, n;
   char line[5 * 1024];
   char *p, *pp;
   int iindex;
@@ -686,12 +686,12 @@ crypt_int (const char *username, const char *passwd, int salt_size,
  * int(index):base64(n):base64(g)
  */
 static int
-read_conf_values (gnutls_datum * g, gnutls_datum * n, char *str)
+read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n, char *str)
 {
   char *p;
   int len;
   int index, ret;
-  gnutls_datum dat;
+  gnutls_datum_t dat;
 
   index = atoi (str);
 

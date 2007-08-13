@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -50,24 +50,24 @@ static int unpack_certificate_auth_info (gnutls_session_t,
 					 packed_session);
 
 static int unpack_srp_auth_info (gnutls_session_t session,
-				 const gnutls_datum * packed_session);
+				 const gnutls_datum_t * packed_session);
 static int pack_srp_auth_info (gnutls_session_t session,
-			       gnutls_datum * packed_session);
+			       gnutls_datum_t * packed_session);
 
 static int unpack_psk_auth_info (gnutls_session_t session,
-				 const gnutls_datum * packed_session);
+				 const gnutls_datum_t * packed_session);
 static int pack_psk_auth_info (gnutls_session_t session,
-			       gnutls_datum * packed_session);
+			       gnutls_datum_t * packed_session);
 
 static int unpack_anon_auth_info (gnutls_session_t session,
-				  const gnutls_datum * packed_session);
+				  const gnutls_datum_t * packed_session);
 static int pack_anon_auth_info (gnutls_session_t session,
-				gnutls_datum * packed_session);
+				gnutls_datum_t * packed_session);
 
 static int unpack_security_parameters (gnutls_session_t session,
-				       const gnutls_datum * packed_session);
+				       const gnutls_datum_t * packed_session);
 static int pack_security_parameters (gnutls_session_t session,
-				     gnutls_datum * packed_session);
+				     gnutls_datum_t * packed_session);
 
 
 /* Since auth_info structures contain malloced data, this function
@@ -505,7 +505,7 @@ error:
  *      x bytes the SRP username
  */
 static int
-pack_srp_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
+pack_srp_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
 {
   srp_server_auth_info_t info = _gnutls_get_auth_info (session);
   int pack_size;
@@ -547,7 +547,7 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
 
 static int
 unpack_srp_auth_info (gnutls_session_t session,
-		      const gnutls_datum * packed_session)
+		      const gnutls_datum_t * packed_session)
 {
   size_t username_size;
   int ret;
@@ -613,7 +613,7 @@ unpack_srp_auth_info (gnutls_session_t session,
  *      x bytes the public key
  */
 static int
-pack_anon_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
+pack_anon_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
 {
   anon_auth_info_t info = _gnutls_get_auth_info (session);
   int pos = 0;
@@ -668,7 +668,7 @@ pack_anon_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
 
 static int
 unpack_anon_auth_info (gnutls_session_t session,
-		       const gnutls_datum * packed_session)
+		       const gnutls_datum_t * packed_session)
 {
   size_t pack_size;
   int pos = 0, size, ret;
@@ -776,7 +776,7 @@ error:
  *      x bytes the public key
  */
 static int
-pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
+pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
 {
   psk_auth_info_t info;
   int pack_size, username_size = 0, pos;
@@ -847,7 +847,7 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum * packed_session)
 
 static int
 unpack_psk_auth_info (gnutls_session_t session,
-		      const gnutls_datum * packed_session)
+		      const gnutls_datum_t * packed_session)
 {
   size_t username_size;
   size_t pack_size;
@@ -995,7 +995,7 @@ error:
  */
 static int
 pack_security_parameters (gnutls_session_t session,
-			  gnutls_datum * packed_session)
+			  gnutls_datum_t * packed_session)
 {
   int pos = 0;
   size_t len, init, i;
@@ -1099,7 +1099,7 @@ pack_security_parameters (gnutls_session_t session,
 
 static int
 unpack_security_parameters (gnutls_session_t session,
-			    const gnutls_datum * packed_session)
+			    const gnutls_datum_t * packed_session)
 {
   size_t pack_size, init, i;
   int pos = 0, len;

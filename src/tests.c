@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2006, 2007 Free Software Foundation
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
@@ -37,9 +37,9 @@
 #include <common.h>
 #include <tests.h>
 
-extern gnutls_srp_client_credentials srp_cred;
-extern gnutls_anon_client_credentials anon_cred;
-extern gnutls_certificate_credentials xcred;
+extern gnutls_srp_client_credentials_t srp_cred;
+extern gnutls_anon_client_credentials_t anon_cred;
+extern gnutls_certificate_credentials_t xcred;
 
 extern int verbose;
 
@@ -55,7 +55,7 @@ static int sfree = 0;
 static int handshake_output = 0;
 
 int
-do_handshake (gnutls_session session)
+do_handshake (gnutls_session_t session)
 {
   int ret, alert;
 
@@ -126,7 +126,7 @@ static const int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
 #define ADD_ALL_CERTTYPES(session) gnutls_certificate_type_set_priority(session, cert_type_priority)
 
 static void
-ADD_KX (gnutls_session session, int kx)
+ADD_KX (gnutls_session_t session, int kx)
 {
   static int _kx_priority[] = { 0, 0 };
   _kx_priority[0] = kx;
@@ -135,7 +135,7 @@ ADD_KX (gnutls_session session, int kx)
 }
 
 static void
-ADD_KX2 (gnutls_session session, int kx1, int kx2)
+ADD_KX2 (gnutls_session_t session, int kx1, int kx2)
 {
   static int _kx_priority[] = { 0, 0, 0 };
   _kx_priority[0] = kx1;
@@ -145,7 +145,7 @@ ADD_KX2 (gnutls_session session, int kx1, int kx2)
 }
 
 static void
-ADD_CIPHER (gnutls_session session, int cipher)
+ADD_CIPHER (gnutls_session_t session, int cipher)
 {
   static int _cipher_priority[] = { 0, 0 };
   _cipher_priority[0] = cipher;
@@ -154,7 +154,7 @@ ADD_CIPHER (gnutls_session session, int cipher)
 }
 
 static void
-ADD_CIPHER3 (gnutls_session session, int cipher1, int cipher2, int cipher3)
+ADD_CIPHER3 (gnutls_session_t session, int cipher1, int cipher2, int cipher3)
 {
   static int _cipher_priority[] = { 0, 0, 0, 0 };
   _cipher_priority[0] = cipher1;
@@ -165,7 +165,7 @@ ADD_CIPHER3 (gnutls_session session, int cipher1, int cipher2, int cipher3)
 }
 
 static void
-ADD_MAC (gnutls_session session, int mac)
+ADD_MAC (gnutls_session_t session, int mac)
 {
   static int _mac_priority[] = { 0, 0 };
   _mac_priority[0] = mac;
@@ -174,7 +174,7 @@ ADD_MAC (gnutls_session session, int mac)
 }
 
 static void
-ADD_COMP (gnutls_session session, int c)
+ADD_COMP (gnutls_session_t session, int c)
 {
   static int _comp_priority[] = { 0, 0 };
   _comp_priority[0] = c;
@@ -183,7 +183,7 @@ ADD_COMP (gnutls_session session, int c)
 }
 
 static void
-ADD_CERTTYPE (gnutls_session session, int ctype)
+ADD_CERTTYPE (gnutls_session_t session, int ctype)
 {
   static int _ct_priority[] = { 0, 0 };
   _ct_priority[0] = ctype;
@@ -192,7 +192,7 @@ ADD_CERTTYPE (gnutls_session session, int ctype)
 }
 
 static void
-ADD_PROTOCOL (gnutls_session session, int protocol)
+ADD_PROTOCOL (gnutls_session_t session, int protocol)
 {
   static int _proto_priority[] = { 0, 0 };
   _proto_priority[0] = protocol;
@@ -201,7 +201,7 @@ ADD_PROTOCOL (gnutls_session session, int protocol)
 }
 
 static void
-ADD_PROTOCOL3 (gnutls_session session, int p1, int p2, int p3)
+ADD_PROTOCOL3 (gnutls_session_t session, int p1, int p2, int p3)
 {
   static int _proto_priority[] = { 0, 0, 0, 0 };
   _proto_priority[0] = p1;
@@ -215,7 +215,7 @@ ADD_PROTOCOL3 (gnutls_session session, int p1, int p2, int p3)
 static int srp_detected;
 
 int
-_test_srp_username_callback (gnutls_session session, unsigned int times,
+_test_srp_username_callback (gnutls_session_t session, unsigned int times,
 			     char **username, char **password)
 {
   if (times == 1)
@@ -227,7 +227,7 @@ _test_srp_username_callback (gnutls_session session, unsigned int times,
 }
 
 test_code_t
-test_srp (gnutls_session session)
+test_srp (gnutls_session_t session)
 {
   int ret;
 
@@ -257,7 +257,7 @@ test_srp (gnutls_session session)
 #endif
 
 test_code_t
-test_server (gnutls_session session)
+test_server (gnutls_session_t session)
 {
   int ret, i = 0;
   char buf[5 * 1024];
@@ -308,13 +308,13 @@ test_server (gnutls_session session)
 
 
 static int export_true = 0;
-static gnutls_datum exp = { NULL, 0 }, mod =
+static gnutls_datum_t exp = { NULL, 0 }, mod =
 
 {
 NULL, 0};
 
 test_code_t
-test_export (gnutls_session session)
+test_export (gnutls_session_t session)
 {
   int ret;
 
@@ -339,10 +339,10 @@ test_export (gnutls_session session)
 }
 
 test_code_t
-test_export_info (gnutls_session session)
+test_export_info (gnutls_session_t session)
 {
   int ret2, ret;
-  gnutls_datum exp2, mod2;
+  gnutls_datum_t exp2, mod2;
   const char *print;
 
   if (verbose == 0 || export_true == 0)
@@ -388,10 +388,10 @@ test_export_info (gnutls_session session)
 
 }
 
-static gnutls_datum pubkey = { NULL, 0 };
+static gnutls_datum_t pubkey = { NULL, 0 };
 
 test_code_t
-test_dhe (gnutls_session session)
+test_dhe (gnutls_session_t session)
 {
   int ret;
 
@@ -412,10 +412,10 @@ test_dhe (gnutls_session session)
 }
 
 test_code_t
-test_dhe_group (gnutls_session session)
+test_dhe_group (gnutls_session_t session)
 {
   int ret, ret2;
-  gnutls_datum gen, prime, pubkey2;
+  gnutls_datum_t gen, prime, pubkey2;
   const char *print;
 
   if (verbose == 0 || pubkey.data == NULL)
@@ -460,7 +460,7 @@ test_dhe_group (gnutls_session session)
 }
 
 test_code_t
-test_ssl3 (gnutls_session session)
+test_ssl3 (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -486,7 +486,7 @@ got_alarm (int k)
 }
 
 test_code_t
-test_bye (gnutls_session session)
+test_bye (gnutls_session_t session)
 {
   int ret;
   char data[20];
@@ -545,7 +545,7 @@ test_bye (gnutls_session session)
 
 
 test_code_t
-test_aes (gnutls_session session)
+test_aes (gnutls_session_t session)
 {
   int ret;
   ADD_CIPHER (session, GNUTLS_CIPHER_AES_128_CBC);
@@ -561,7 +561,7 @@ test_aes (gnutls_session session)
 }
 
 test_code_t
-test_openpgp1 (gnutls_session session)
+test_openpgp1 (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -583,7 +583,7 @@ test_openpgp1 (gnutls_session session)
 }
 
 test_code_t
-test_unknown_ciphersuites (gnutls_session session)
+test_unknown_ciphersuites (gnutls_session_t session)
 {
   int ret;
   ADD_CIPHER3 (session, GNUTLS_CIPHER_AES_128_CBC,
@@ -600,7 +600,7 @@ test_unknown_ciphersuites (gnutls_session session)
 }
 
 test_code_t
-test_md5 (gnutls_session session)
+test_md5 (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -617,7 +617,7 @@ test_md5 (gnutls_session session)
 
 #ifdef HAVE_LIBZ
 test_code_t
-test_zlib (gnutls_session session)
+test_zlib (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -634,7 +634,7 @@ test_zlib (gnutls_session session)
 #endif
 
 test_code_t
-test_lzo (gnutls_session session)
+test_lzo (gnutls_session_t session)
 {
   int ret;
   gnutls_handshake_set_private_extensions (session, 1);
@@ -653,7 +653,7 @@ test_lzo (gnutls_session session)
 }
 
 test_code_t
-test_sha (gnutls_session session)
+test_sha (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -669,7 +669,7 @@ test_sha (gnutls_session session)
 }
 
 test_code_t
-test_3des (gnutls_session session)
+test_3des (gnutls_session_t session)
 {
   int ret;
   ADD_CIPHER (session, GNUTLS_CIPHER_3DES_CBC);
@@ -685,7 +685,7 @@ test_3des (gnutls_session session)
 }
 
 test_code_t
-test_arcfour (gnutls_session session)
+test_arcfour (gnutls_session_t session)
 {
   int ret;
   ADD_CIPHER (session, GNUTLS_CIPHER_ARCFOUR_128);
@@ -701,7 +701,7 @@ test_arcfour (gnutls_session session)
 }
 
 test_code_t
-test_arcfour_40 (gnutls_session session)
+test_arcfour_40 (gnutls_session_t session)
 {
   int ret;
   ADD_CIPHER (session, GNUTLS_CIPHER_ARCFOUR_40);
@@ -717,7 +717,7 @@ test_arcfour_40 (gnutls_session session)
 }
 
 test_code_t
-test_tls1 (gnutls_session session)
+test_tls1 (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -737,7 +737,7 @@ test_tls1 (gnutls_session session)
 }
 
 test_code_t
-test_tls1_1 (gnutls_session session)
+test_tls1_1 (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -757,7 +757,7 @@ test_tls1_1 (gnutls_session session)
 }
 
 test_code_t
-test_tls1_1_fallback (gnutls_session session)
+test_tls1_1_fallback (gnutls_session_t session)
 {
   int ret;
   if (tls1_1_ok)
@@ -788,7 +788,7 @@ test_tls1_1_fallback (gnutls_session session)
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
 test_code_t
-test_tls_disable (gnutls_session session)
+test_tls_disable (gnutls_session_t session)
 {
   int ret;
   if (tls1_ok != 0)
@@ -817,7 +817,7 @@ test_tls_disable (gnutls_session session)
 }
 
 test_code_t
-test_rsa_pms (gnutls_session session)
+test_rsa_pms (gnutls_session_t session)
 {
   int ret;
 
@@ -844,7 +844,7 @@ test_rsa_pms (gnutls_session session)
 }
 
 test_code_t
-test_max_record_size (gnutls_session session)
+test_max_record_size (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -868,7 +868,7 @@ test_max_record_size (gnutls_session session)
 }
 
 test_code_t
-test_hello_extension (gnutls_session session)
+test_hello_extension (gnutls_session_t session)
 {
   int ret;
   ADD_ALL_CIPHERS (session);
@@ -884,12 +884,12 @@ test_hello_extension (gnutls_session session)
   return ret;
 }
 
-void _gnutls_record_set_default_version (gnutls_session session,
+void _gnutls_record_set_default_version (gnutls_session_t session,
 					 unsigned char major,
 					 unsigned char minor);
 
 test_code_t
-test_version_rollback (gnutls_session session)
+test_version_rollback (gnutls_session_t session)
 {
   int ret;
   if (tls1_ok == 0)
@@ -926,7 +926,7 @@ test_version_rollback (gnutls_session session)
  * message.
  */
 test_code_t
-test_version_oob (gnutls_session session)
+test_version_oob (gnutls_session_t session)
 {
   int ret;
   /* here we enable both SSL 3.0 and TLS 1.0
@@ -945,11 +945,11 @@ test_version_oob (gnutls_session session)
   return ret;
 }
 
-void _gnutls_rsa_pms_set_version (gnutls_session session,
+void _gnutls_rsa_pms_set_version (gnutls_session_t session,
 				  unsigned char major, unsigned char minor);
 
 test_code_t
-test_rsa_pms_version_check (gnutls_session session)
+test_rsa_pms_version_check (gnutls_session_t session)
 {
   int ret;
   /* here we use an arbitary version in the RSA PMS
@@ -973,7 +973,7 @@ test_rsa_pms_version_check (gnutls_session session)
 
 #ifdef ENABLE_ANON
 test_code_t
-test_anonymous (gnutls_session session)
+test_anonymous (gnutls_session_t session)
 {
   int ret;
 
@@ -995,7 +995,7 @@ test_anonymous (gnutls_session session)
 #endif
 
 test_code_t
-test_session_resume2 (gnutls_session session)
+test_session_resume2 (gnutls_session_t session)
 {
   int ret;
   char tmp_session_id[32];
@@ -1044,7 +1044,7 @@ test_session_resume2 (gnutls_session session)
 extern char *hostname;
 
 test_code_t
-test_certificate (gnutls_session session)
+test_certificate (gnutls_session_t session)
 {
   int ret;
 
@@ -1073,9 +1073,9 @@ test_certificate (gnutls_session session)
 /* A callback function to be used at the certificate selection time.
  */
 static int
-cert_callback (gnutls_session session,
-	       const gnutls_datum * req_ca_rdn, int nreqs,
-	       const gnutls_pk_algorithm * sign_algos,
+cert_callback (gnutls_session_t session,
+	       const gnutls_datum_t * req_ca_rdn, int nreqs,
+	       const gnutls_pk_algorithm_t * sign_algos,
 	       int sign_algos_length, gnutls_retr_st * st)
 {
   char issuer_dn[256];
@@ -1113,7 +1113,7 @@ cert_callback (gnutls_session session,
  * if the server sends a certificate request packet.
  */
 test_code_t
-test_server_cas (gnutls_session session)
+test_server_cas (gnutls_session_t session)
 {
   int ret;
 

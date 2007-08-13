@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -43,14 +43,16 @@ extern "C"
   typedef enum gnutls_openpgp_key_fmt
   { GNUTLS_OPENPGP_FMT_RAW,
     GNUTLS_OPENPGP_FMT_BASE64
-  } gnutls_openpgp_key_fmt;
+  } gnutls_openpgp_key_fmt_t;
 
-  int gnutls_openpgp_key_init (gnutls_openpgp_key * key);	/* initializes the memory for gnutls_openpgp_key_t struct */
-  void gnutls_openpgp_key_deinit (gnutls_openpgp_key_t key);	/* frees all memory */
+  /* initializes the memory for gnutls_openpgp_key_t struct */
+  int gnutls_openpgp_key_init (gnutls_openpgp_key_t * key);
+  /* frees all memory */
+  void gnutls_openpgp_key_deinit (gnutls_openpgp_key_t key);
 
   int gnutls_openpgp_key_import (gnutls_openpgp_key_t key,
 				 const gnutls_datum_t * data,
-				 gnutls_openpgp_key_fmt format);
+				 gnutls_openpgp_key_fmt_t format);
   int gnutls_openpgp_key_export (gnutls_openpgp_key_t key,
 				 gnutls_openpgp_key_fmt_t format,
 				 void *output_data,
@@ -94,20 +96,20 @@ extern "C"
 					   unsigned int *bits);
   int gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 				     const gnutls_datum_t * data,
-				     gnutls_openpgp_key_fmt format,
+				     gnutls_openpgp_key_fmt_t format,
 				     const char *pass, unsigned int flags);
 
 /* Keyring stuff.
  */
   struct gnutls_openpgp_keyring_int;	/* object to hold (parsed) openpgp keyrings */
-  typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring;
+  typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
 
-  int gnutls_openpgp_keyring_init (gnutls_openpgp_keyring * keyring);
+  int gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring);
   void gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring);
 
   int gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 				     const gnutls_datum_t * data,
-				     gnutls_openpgp_key_fmt format);
+				     gnutls_openpgp_key_fmt_t format);
 
   int gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 				       const unsigned char keyid[8],
@@ -116,9 +118,9 @@ extern "C"
 /* Trustdb functions.
  */
   struct gnutls_openpgp_trustdb_int;	/* object to hold (parsed) openpgp trustdbs */
-  typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb;
+  typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb_t;
 
-  int gnutls_openpgp_trustdb_init (gnutls_openpgp_trustdb * trustdb);
+  int gnutls_openpgp_trustdb_init (gnutls_openpgp_trustdb_t * trustdb);
   void gnutls_openpgp_trustdb_deinit (gnutls_openpgp_trustdb_t trustdb);
 
   int gnutls_openpgp_trustdb_import (gnutls_openpgp_trustdb_t trustdb,

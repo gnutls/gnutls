@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004,2005 Free Software Foundation
+ * Copyright (C) 2004,2005,2007 Free Software Foundation
  * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
@@ -47,8 +47,8 @@ generate_prime (int bits, int how)
 {
   unsigned int i;
   int ret;
-  gnutls_dh_params dh_params;
-  gnutls_datum p, g;
+  gnutls_dh_params_t dh_params;
+  gnutls_datum_t p, g;
 
   gnutls_dh_params_init (&dh_params);
 

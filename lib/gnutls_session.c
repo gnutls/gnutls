@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -83,7 +83,7 @@ gnutls_session_get_data (gnutls_session_t session,
   * Resuming sessions is really useful and speedups connections after a succesful one.
   **/
 int
-gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum * data)
+gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum_t * data)
 {
 
   int ret;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -30,8 +30,8 @@
 
 typedef struct gnutls_psk_client_credentials_st
 {
-  gnutls_datum username;
-  gnutls_datum key;
+  gnutls_datum_t username;
+  gnutls_datum_t key;
   gnutls_psk_client_credentials_function *get_function;
 } psk_client_credentials_st;
 
@@ -64,7 +64,7 @@ typedef struct psk_auth_info_st
 typedef struct psk_auth_info_st psk_auth_info_st;
 
 int
-_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum * psk2);
+_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum_t * psk2);
 #else
 # define _gnutls_set_psk_session_key(x,y) GNUTLS_E_INTERNAL_ERROR
 #endif /* ENABLE_PSK */

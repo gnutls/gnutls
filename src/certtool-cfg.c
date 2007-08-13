@@ -175,7 +175,7 @@ template_parse (const char *template)
 }
 
 void
-read_crt_set (gnutls_x509_crt crt, const char *input_str, const char *oid)
+read_crt_set (gnutls_x509_crt_t crt, const char *input_str, const char *oid)
 {
   char input[128];
   int ret;
@@ -196,7 +196,7 @@ read_crt_set (gnutls_x509_crt crt, const char *input_str, const char *oid)
 }
 
 void
-read_crq_set (gnutls_x509_crq crq, const char *input_str, const char *oid)
+read_crq_set (gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 {
   char input[128];
   int ret;
@@ -322,7 +322,7 @@ get_crl_dist_point_url (void)
 }
 
 void
-get_country_crt_set (gnutls_x509_crt crt)
+get_country_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -349,7 +349,7 @@ get_country_crt_set (gnutls_x509_crt crt)
 }
 
 void
-get_organization_crt_set (gnutls_x509_crt crt)
+get_organization_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -378,7 +378,7 @@ get_organization_crt_set (gnutls_x509_crt crt)
 }
 
 void
-get_unit_crt_set (gnutls_x509_crt crt)
+get_unit_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -406,7 +406,7 @@ get_unit_crt_set (gnutls_x509_crt crt)
 }
 
 void
-get_state_crt_set (gnutls_x509_crt crt)
+get_state_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -433,7 +433,7 @@ get_state_crt_set (gnutls_x509_crt crt)
 }
 
 void
-get_locality_crt_set (gnutls_x509_crt crt)
+get_locality_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -459,7 +459,7 @@ get_locality_crt_set (gnutls_x509_crt crt)
 }
 
 void
-get_cn_crt_set (gnutls_x509_crt crt)
+get_cn_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -484,7 +484,7 @@ get_cn_crt_set (gnutls_x509_crt crt)
 }
 
 void
-get_uid_crt_set (gnutls_x509_crt crt)
+get_uid_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -508,7 +508,7 @@ get_uid_crt_set (gnutls_x509_crt crt)
 }
 
 void
-get_oid_crt_set (gnutls_x509_crt crt)
+get_oid_crt_set (gnutls_x509_crt_t crt)
 {
   int ret, i;
 
@@ -540,7 +540,7 @@ get_oid_crt_set (gnutls_x509_crt crt)
 
 
 void
-get_pkcs9_email_crt_set (gnutls_x509_crt crt)
+get_pkcs9_email_crt_set (gnutls_x509_crt_t crt)
 {
   int ret;
 
@@ -897,7 +897,7 @@ get_proxy_policy (char **policy, size_t *policylen)
 /* CRQ stuff.
  */
 void
-get_country_crq_set (gnutls_x509_crq crq)
+get_country_crq_set (gnutls_x509_crq_t crq)
 {
   int ret;
 
@@ -924,7 +924,7 @@ get_country_crq_set (gnutls_x509_crq crq)
 }
 
 void
-get_organization_crq_set (gnutls_x509_crq crq)
+get_organization_crq_set (gnutls_x509_crq_t crq)
 {
   int ret;
 
@@ -953,7 +953,7 @@ get_organization_crq_set (gnutls_x509_crq crq)
 }
 
 void
-get_unit_crq_set (gnutls_x509_crq crq)
+get_unit_crq_set (gnutls_x509_crq_t crq)
 {
   int ret;
 
@@ -981,7 +981,7 @@ get_unit_crq_set (gnutls_x509_crq crq)
 }
 
 void
-get_state_crq_set (gnutls_x509_crq crq)
+get_state_crq_set (gnutls_x509_crq_t crq)
 {
   int ret;
 
@@ -1008,7 +1008,7 @@ get_state_crq_set (gnutls_x509_crq crq)
 }
 
 void
-get_locality_crq_set (gnutls_x509_crq crq)
+get_locality_crq_set (gnutls_x509_crq_t crq)
 {
   int ret;
 
@@ -1034,7 +1034,7 @@ get_locality_crq_set (gnutls_x509_crq crq)
 }
 
 void
-get_cn_crq_set (gnutls_x509_crq crq)
+get_cn_crq_set (gnutls_x509_crq_t crq)
 {
   int ret;
 
@@ -1059,7 +1059,7 @@ get_cn_crq_set (gnutls_x509_crq crq)
 }
 
 void
-get_uid_crq_set (gnutls_x509_crq crq)
+get_uid_crq_set (gnutls_x509_crq_t crq)
 {
   int ret;
 
@@ -1083,7 +1083,7 @@ get_uid_crq_set (gnutls_x509_crq crq)
 }
 
 void
-get_oid_crq_set (gnutls_x509_crq crq)
+get_oid_crq_set (gnutls_x509_crq_t crq)
 {
   int ret, i;
 

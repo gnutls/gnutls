@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -176,7 +176,7 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
   const mpi_t *mpis;
   gnutls_psk_server_credentials_t cred;
   psk_auth_info_t info;
-  gnutls_datum username;
+  gnutls_datum_t username;
   ssize_t data_size = _data_size;
 
   cred = (gnutls_psk_server_credentials_t)

@@ -172,10 +172,10 @@ class session
         unsigned int get_dh_prime_bits() const;
         void get_dh_group( gnutls_datum_t & gen, gnutls_datum_t & prime) const;
         void get_dh_pubkey( gnutls_datum_t & raw_key) const;
-        void get_rsa_export_pubkey( gnutls_datum& exponent, gnutls_datum& modulus) const;
+        void get_rsa_export_pubkey( gnutls_datum_t& exponent, gnutls_datum_t& modulus) const;
         unsigned int get_rsa_export_modulus_bits() const;
         
-        void get_our_certificate(gnutls_datum & cert) const;
+        void get_our_certificate(gnutls_datum_t & cert) const;
         bool get_peers_certificate(std::vector<gnutls_datum_t> &out_certs) const;
         bool get_peers_certificate(const gnutls_datum_t** certs, unsigned int *certs_size) const;
 
@@ -190,9 +190,9 @@ class DB
 {
     public:
         virtual ~DB()=0;
-        virtual bool store( const gnutls_datum& key, const gnutls_datum& data)=0;
-        virtual bool retrieve( const gnutls_datum& key, gnutls_datum& data)=0;
-        virtual bool remove( const gnutls_datum& key)=0;
+        virtual bool store( const gnutls_datum_t& key, const gnutls_datum_t& data)=0;
+        virtual bool retrieve( const gnutls_datum_t& key, gnutls_datum_t& data)=0;
+        virtual bool remove( const gnutls_datum_t& key)=0;
 };
 
 class server_session: public session

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000,2001,2002,2003,2006 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002,2003,2006,2007 Nikos Mavroyanopoulos
  * Copyright (C) 2004,2005 Free Software Foundation
  *
  * This file is part of GNUTLS.
@@ -52,9 +52,9 @@ int record_max_size;
 int fingerprint;
 static int debug;
 
-gnutls_srp_client_credentials srp_cred;
-gnutls_anon_client_credentials anon_cred;
-gnutls_certificate_credentials xcred;
+gnutls_srp_client_credentials_t srp_cred;
+gnutls_anon_client_credentials_t anon_cred;
+gnutls_certificate_credentials_t xcred;
 
 /* end of global stuff */
 
@@ -71,7 +71,7 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-typedef test_code_t (*TEST_FUNC) (gnutls_session);
+typedef test_code_t (*TEST_FUNC) (gnutls_session_t);
 
 typedef struct
 {
@@ -162,7 +162,7 @@ main (int argc, char **argv)
 {
   int err, ret;
   int sd, i;
-  gnutls_session state;
+  gnutls_session_t state;
   char buffer[MAX_BUF + 1];
   char portname[6];
   struct addrinfo hints, *res, *ptr;
@@ -267,7 +267,7 @@ main (int argc, char **argv)
       ERR(err, "connect")
 
       gnutls_init (&state, GNUTLS_CLIENT);
-      gnutls_transport_set_ptr (state, (gnutls_transport_ptr) sd);
+      gnutls_transport_set_ptr (state, (gnutls_transport_ptr_t) sd);
 
       do
 	{

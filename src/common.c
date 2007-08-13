@@ -84,10 +84,10 @@ my_ctime (const time_t * tv)
 
 
 void
-print_x509_info (gnutls_session session, const char *hostname)
+print_x509_info (gnutls_session_t session, const char *hostname)
 {
-  gnutls_x509_crt crt;
-  const gnutls_datum *cert_list;
+  gnutls_x509_crt_t crt;
+  const gnutls_datum_t *cert_list;
   size_t cert_list_size = 0;
   int ret;
   char digest[20];
@@ -168,7 +168,7 @@ print_x509_info (gnutls_session session, const char *hostname)
       if (xml)
 	{
 #ifdef ENABLE_PKI
-	  gnutls_datum xml_data;
+	  gnutls_datum_t xml_data;
 
 	  ret = gnutls_x509_crt_to_xml (crt, &xml_data, 0);
 	  if (ret < 0)
@@ -238,7 +238,7 @@ print_x509_info (gnutls_session session, const char *hostname)
 #ifdef ENABLE_PKI
 	      if (algo == GNUTLS_PK_RSA)
 		{
-		  gnutls_datum e, m;
+		  gnutls_datum_t e, m;
 
 		  ret = gnutls_x509_crt_get_pk_rsa_raw (crt, &m, &e);
 		  if (ret >= 0)
@@ -255,7 +255,7 @@ print_x509_info (gnutls_session session, const char *hostname)
 		}
 	      else if (algo == GNUTLS_PK_DSA)
 		{
-		  gnutls_datum p, q, g, y;
+		  gnutls_datum_t p, q, g, y;
 
 		  ret = gnutls_x509_crt_get_pk_dsa_raw (crt, &p, &q, &g, &y);
 		  if (ret >= 0)
@@ -303,7 +303,7 @@ print_x509_info (gnutls_session session, const char *hostname)
 #ifdef ENABLE_OPENPGP
 
 void
-print_openpgp_info (gnutls_session session, const char *hostname)
+print_openpgp_info (gnutls_session_t session, const char *hostname)
 {
 
   char digest[20];
@@ -313,8 +313,8 @@ print_openpgp_info (gnutls_session session, const char *hostname)
   const char *cstr;
   char name[256];
   size_t name_len = sizeof (name);
-  gnutls_openpgp_key crt;
-  const gnutls_datum *cert_list;
+  gnutls_openpgp_key_t crt;
+  const gnutls_datum_t *cert_list;
   int cert_list_size = 0;
   time_t expiret;
   time_t activet;
@@ -374,7 +374,7 @@ print_openpgp_info (gnutls_session session, const char *hostname)
 
       if (xml)
 	{
-	  gnutls_datum xml_data;
+	  gnutls_datum_t xml_data;
 
 	  ret = gnutls_openpgp_key_to_xml (crt, &xml_data, 0);
 	  if (ret < 0)
@@ -437,7 +437,7 @@ print_openpgp_info (gnutls_session session, const char *hostname)
 #endif
 
 void
-print_cert_vrfy (gnutls_session session)
+print_cert_vrfy (gnutls_session_t session)
 {
   int rc;
   unsigned int status;
@@ -479,11 +479,11 @@ print_cert_vrfy (gnutls_session session)
 }
 
 int
-print_info (gnutls_session session, const char *hostname)
+print_info (gnutls_session_t session, const char *hostname)
 {
   const char *tmp;
-  gnutls_credentials_type cred;
-  gnutls_kx_algorithm kx;
+  gnutls_credentials_type_t cred;
+  gnutls_kx_algorithm_t kx;
 
 
   /* print the key exchange's algorithm name
@@ -570,7 +570,7 @@ print_info (gnutls_session session, const char *hostname)
 }
 
 void
-print_cert_info (gnutls_session session, const char *hostname)
+print_cert_info (gnutls_session_t session, const char *hostname)
 {
 
   if (gnutls_certificate_client_get_request_status( session) != 0)

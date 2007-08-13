@@ -39,11 +39,11 @@ gnutls_x509_privkey_t key;
 /* Helper functions to load a certificate and key
  * files into memory.
  */
-static gnutls_datum 
+static gnutls_datum_t
 load_file (const char *file)
 {
   FILE *f;
-  gnutls_datum loaded_file = { NULL, 0 };
+  gnutls_datum_t loaded_file = { NULL, 0 };
   long filelen;
   void *ptr;
 
@@ -62,7 +62,7 @@ load_file (const char *file)
   return loaded_file;
 }
 
-static void unload_file(gnutls_datum data)
+static void unload_file(gnutls_datum_t data)
 {
   free(data.data);
 }

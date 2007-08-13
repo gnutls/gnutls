@@ -93,7 +93,7 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
 int
 gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 				   const char *username,
-				   const gnutls_datum * key,
+				   const gnutls_datum_t * key,
 				   gnutls_psk_key_flags flags)
 {
   int ret;
@@ -260,7 +260,7 @@ gnutls_psk_set_server_credentials_function (gnutls_psk_server_credentials_t
   * password for client PSK authentication.
   * The callback's function form is:
   * int (*callback)(gnutls_session_t, char** username,
-  *  gnutls_datum* key);
+  *  gnutls_datum_t* key);
   *
   * The @username and @key must be allocated using gnutls_malloc().
   * @username should be ASCII strings or UTF-8 strings 

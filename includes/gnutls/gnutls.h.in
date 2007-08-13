@@ -539,7 +539,7 @@ extern "C"
   int gnutls_session_get_data (gnutls_session_t session, void *session_data,
 			       size_t * session_data_size);
   int gnutls_session_get_data2 (gnutls_session_t session,
-				gnutls_datum * data);
+				gnutls_datum_t * data);
 
 /* returns the session ID */
 #define GNUTLS_MAX_SESSION_ID 32
@@ -924,7 +924,7 @@ extern "C"
 					      * sc);
   int gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 					 const char *username,
-					 const gnutls_datum * key,
+					 const gnutls_datum_t * key,
 					 gnutls_psk_key_flags format);
 
   void gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t
@@ -946,7 +946,7 @@ extern "C"
 
   typedef int gnutls_psk_client_credentials_function (gnutls_session_t,
 						      char **username,
-						      gnutls_datum * key);
+						      gnutls_datum_t * key);
   void
     gnutls_psk_set_client_credentials_function
     (gnutls_psk_client_credentials_t cred,

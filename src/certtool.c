@@ -41,7 +41,7 @@
 #include <progname.h>
 #include <version-etc.h>
 
-static void print_crl_info (gnutls_x509_crl crl, FILE *out);
+static void print_crl_info (gnutls_x509_crl_t crl, FILE *out);
 int generate_prime (int bits, int how);
 void pkcs7_info (void);
 void smime_to_pkcs7 (void);
@@ -49,20 +49,20 @@ void pkcs12_info (void);
 void generate_pkcs12 (void);
 void verify_chain (void);
 void verify_crl (void);
-gnutls_x509_privkey load_private_key (int mand);
-gnutls_x509_crq load_request (void);
-gnutls_x509_privkey load_ca_private_key (void);
-gnutls_x509_crt load_ca_cert (void);
-gnutls_x509_crt load_cert (int mand);
+gnutls_x509_privkey_t load_private_key (int mand);
+gnutls_x509_crq_t load_request (void);
+gnutls_x509_privkey_t load_ca_private_key (void);
+gnutls_x509_crt_t load_ca_cert (void);
+gnutls_x509_crt_t load_cert (int mand);
 void certificate_info (void);
 void crl_info (void);
 void privkey_info (void);
-static void print_certificate_info (gnutls_x509_crt crt, FILE *out,
+static void print_certificate_info (gnutls_x509_crt_t crt, FILE *out,
 				    unsigned int);
 static void gaa_parser (int argc, char **argv);
 void generate_self_signed (void);
 void generate_request (void);
-gnutls_x509_crt *load_cert_list (int mand, int *size);
+gnutls_x509_crt_t *load_cert_list (int mand, int *size);
 
 static gaainfo info;
 FILE *outfile;
@@ -115,10 +115,10 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
   return buf;
 }
 
-static gnutls_x509_privkey
+static gnutls_x509_privkey_t
 generate_private_key_int (void)
 {
-  gnutls_x509_privkey key;
+  gnutls_x509_privkey_t key;
   int ret, key_type;
 
   if (info.dsa)
@@ -146,7 +146,7 @@ generate_private_key_int (void)
 }
 
 static void
-print_private_key (gnutls_x509_privkey key)
+print_private_key (gnutls_x509_privkey_t key)
 {
   int ret;
   size_t size;
@@ -190,7 +190,7 @@ print_private_key (gnutls_x509_privkey key)
 void
 generate_private_key (void)
 {
-  gnutls_x509_privkey key;
+  gnutls_x509_privkey_t key;
 
   key = generate_private_key_int ();
 
@@ -200,13 +200,13 @@ generate_private_key (void)
 }
 
 
-gnutls_x509_crt
-generate_certificate (gnutls_x509_privkey * ret_key,
-		      gnutls_x509_crt ca_crt,
+gnutls_x509_crt_t
+generate_certificate (gnutls_x509_privkey_t * ret_key,
+		      gnutls_x509_crt_t ca_crt,
 		      int proxy)
 {
-  gnutls_x509_crt crt;
-  gnutls_x509_privkey key = NULL;
+  gnutls_x509_crt_t crt;
+  gnutls_x509_privkey_t key = NULL;
   size_t size;
   int ret;
   int serial, client;
@@ -215,7 +215,7 @@ generate_certificate (gnutls_x509_privkey * ret_key,
   int vers = 3;			/* the default version in the certificate 
 				 */
   unsigned int usage = 0, server;
-  gnutls_x509_crq crq;		/* request */
+  gnutls_x509_crq_t crq;		/* request */
 
   ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
@@ -507,11 +507,11 @@ generate_certificate (gnutls_x509_privkey * ret_key,
 
 }
 
-gnutls_x509_crl
+gnutls_x509_crl_t
 generate_crl (void)
 {
-  gnutls_x509_crl crl;
-  gnutls_x509_crt *crts;
+  gnutls_x509_crl_t crl;
+  gnutls_x509_crt_t *crts;
   int size;
   int days, result, i;
   time_t now = time (NULL);
@@ -550,8 +550,8 @@ generate_crl (void)
 void
 generate_self_signed (void)
 {
-  gnutls_x509_crt crt;
-  gnutls_x509_privkey key;
+  gnutls_x509_crt_t crt;
+  gnutls_x509_privkey_t key;
   size_t size;
   int result;
   const char *uri;
@@ -596,12 +596,12 @@ generate_self_signed (void)
 void
 generate_signed_certificate (void)
 {
-  gnutls_x509_crt crt;
-  gnutls_x509_privkey key;
+  gnutls_x509_crt_t crt;
+  gnutls_x509_privkey_t key;
   size_t size;
   int result;
-  gnutls_x509_privkey ca_key;
-  gnutls_x509_crt ca_crt;
+  gnutls_x509_privkey_t ca_key;
+  gnutls_x509_crt_t ca_crt;
 
   fprintf (stderr, "Generating a signed certificate...\n");
 
@@ -638,8 +638,8 @@ generate_signed_certificate (void)
 void
 generate_proxy_certificate (void)
 {
-  gnutls_x509_crt crt, eecrt;
-  gnutls_x509_privkey key, eekey;
+  gnutls_x509_crt_t crt, eecrt;
+  gnutls_x509_privkey_t key, eekey;
   size_t size;
   int result;
 
@@ -672,10 +672,10 @@ generate_proxy_certificate (void)
 void
 generate_signed_crl (void)
 {
-  gnutls_x509_crl crl;
+  gnutls_x509_crl_t crl;
   int result;
-  gnutls_x509_privkey ca_key;
-  gnutls_x509_crt ca_crt;
+  gnutls_x509_privkey_t ca_key;
+  gnutls_x509_crt_t ca_crt;
 
   fprintf (stderr, "Generating a signed CRL...\n");
 
@@ -697,11 +697,11 @@ generate_signed_crl (void)
 void
 update_signed_certificate (void)
 {
-  gnutls_x509_crt crt;
+  gnutls_x509_crt_t crt;
   size_t size;
   int result;
-  gnutls_x509_privkey ca_key;
-  gnutls_x509_crt ca_crt;
+  gnutls_x509_privkey_t ca_key;
+  gnutls_x509_crt_t ca_crt;
   int days;
   time_t tim = time (NULL);
 
@@ -878,10 +878,10 @@ gaa_parser (int argc, char **argv)
 void
 certificate_info (void)
 {
-  gnutls_x509_crt crt[MAX_CRTS];
+  gnutls_x509_crt_t crt[MAX_CRTS];
   size_t size;
   int ret, i, count;
-  gnutls_datum pem;
+  gnutls_datum_t pem;
   unsigned int crt_num;
 
   pem.data = fread_file (infile, &size);
@@ -931,7 +931,7 @@ certificate_info (void)
 	}
       else
 	{
-	  gnutls_datum xml;
+	  gnutls_datum_t xml;
 
 	  ret = gnutls_x509_crt_to_xml (crt[i], &xml, GNUTLS_XML_SHOW_ALL);
 	  if (ret < 0)
@@ -945,7 +945,7 @@ certificate_info (void)
 }
 
 static void
-print_hex_datum (gnutls_datum * dat)
+print_hex_datum (gnutls_datum_t * dat)
 {
   unsigned int j;
 #define SPACE "\t"
@@ -961,7 +961,7 @@ print_hex_datum (gnutls_datum * dat)
 
 
 static void
-print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
+print_certificate_info (gnutls_x509_crt_t crt, FILE *out, unsigned int all)
 {
   gnutls_datum_t info;
   int ret;
@@ -984,7 +984,7 @@ print_certificate_info (gnutls_x509_crt crt, FILE *out, unsigned int all)
 }
 
 static void
-print_crl_info (gnutls_x509_crl crl, FILE *out)
+print_crl_info (gnutls_x509_crl_t crl, FILE *out)
 {
   gnutls_datum_t info;
   int ret;
@@ -1009,7 +1009,7 @@ print_crl_info (gnutls_x509_crl crl, FILE *out)
 void
 crl_info (void)
 {
-  gnutls_x509_crl crl;
+  gnutls_x509_crl_t crl;
   int ret;
   size_t size;
   gnutls_datum_t pem;
@@ -1036,10 +1036,10 @@ crl_info (void)
 void
 privkey_info (void)
 {
-  gnutls_x509_privkey key;
+  gnutls_x509_privkey_t key;
   size_t size;
   int ret;
-  gnutls_datum pem;
+  gnutls_datum_t pem;
   const char *cprint;
   const char *pass;
 
@@ -1083,7 +1083,7 @@ privkey_info (void)
    */
   if (ret == GNUTLS_PK_RSA)
     {
-      gnutls_datum m, e, d, p, q, u;
+      gnutls_datum_t m, e, d, p, q, u;
 
       ret = gnutls_x509_privkey_export_rsa_raw (key, &m, &e, &d, &p, &q, &u);
       if (ret < 0)
@@ -1108,7 +1108,7 @@ privkey_info (void)
     }
   else if (ret == GNUTLS_PK_DSA)
     {
-      gnutls_datum p, q, g, y, x;
+      gnutls_datum_t p, q, g, y, x;
 
       ret = gnutls_x509_privkey_export_dsa_raw (key, &p, &q, &g, &y, &x);
       if (ret < 0)
@@ -1160,12 +1160,12 @@ privkey_info (void)
 /* Load the private key.
  * @mand should be non zero if it is required to read a private key.
  */
-gnutls_x509_privkey
+gnutls_x509_privkey_t
 load_private_key (int mand)
 {
-  gnutls_x509_privkey key;
+  gnutls_x509_privkey_t key;
   int ret;
-  gnutls_datum dat;
+  gnutls_datum_t dat;
   size_t size;
 
   if (!info.privkey && !mand)
@@ -1203,12 +1203,12 @@ load_private_key (int mand)
 
 /* Load the Certificate Request.
  */
-gnutls_x509_crq
+gnutls_x509_crq_t
 load_request (void)
 {
-  gnutls_x509_crq crq;
+  gnutls_x509_crq_t crq;
   int ret;
-  gnutls_datum dat;
+  gnutls_datum_t dat;
   size_t size;
 
   if (!info.request)
@@ -1236,12 +1236,12 @@ load_request (void)
 
 /* Load the CA's private key.
  */
-gnutls_x509_privkey
+gnutls_x509_privkey_t
 load_ca_private_key (void)
 {
-  gnutls_x509_privkey key;
+  gnutls_x509_privkey_t key;
   int ret;
-  gnutls_datum dat;
+  gnutls_datum_t dat;
   size_t size;
 
   if (info.ca_privkey == NULL)
@@ -1276,12 +1276,12 @@ load_ca_private_key (void)
 
 /* Loads the CA's certificate
  */
-gnutls_x509_crt
+gnutls_x509_crt_t
 load_ca_cert (void)
 {
-  gnutls_x509_crt crt;
+  gnutls_x509_crt_t crt;
   int ret;
-  gnutls_datum dat;
+  gnutls_datum_t dat;
   size_t size;
 
   if (info.ca == NULL)
@@ -1311,10 +1311,10 @@ load_ca_cert (void)
  * If mand is non zero then a certificate is mandatory. Otherwise
  * null will be returned if the certificate loading fails.
  */
-gnutls_x509_crt
+gnutls_x509_crt_t
 load_cert (int mand)
 {
-  gnutls_x509_crt *crt;
+  gnutls_x509_crt_t *crt;
   int size;
 
   crt = load_cert_list (mand, &size);
@@ -1326,14 +1326,14 @@ load_cert (int mand)
 
 /* Loads a certificate list
  */
-gnutls_x509_crt *
+gnutls_x509_crt_t *
 load_cert_list (int mand, int *crt_size)
 {
   FILE *fd;
-  static gnutls_x509_crt crt[MAX_CERTS];
+  static gnutls_x509_crt_t crt[MAX_CERTS];
   char *ptr;
   int ret, i;
-  gnutls_datum dat;
+  gnutls_datum_t dat;
   size_t size;
   int ptr_size;
 
@@ -1400,8 +1400,8 @@ load_cert_list (int mand, int *crt_size)
 void
 generate_request (void)
 {
-  gnutls_x509_crq crq;
-  gnutls_x509_privkey key;
+  gnutls_x509_crq_t crq;
+  gnutls_x509_privkey_t key;
   int ret;
   const char *pass;
   size_t size;
@@ -1462,9 +1462,9 @@ generate_request (void)
 
 }
 
-static void print_verification_res (gnutls_x509_crt crt,
-				    gnutls_x509_crt issuer,
-				    gnutls_x509_crl * crl_list,
+static void print_verification_res (gnutls_x509_crt_t crt,
+				    gnutls_x509_crt_t issuer,
+				    gnutls_x509_crl_t * crl_list,
 				    int crl_list_size);
 
 #define CERT_SEP "-----BEGIN CERT"
@@ -1479,9 +1479,9 @@ _verify_x509_mem (const void *cert, int cert_size)
   char issuer_name[256];
   size_t name_size;
   size_t issuer_name_size;
-  gnutls_datum tmp;
-  gnutls_x509_crt *x509_cert_list = NULL;
-  gnutls_x509_crl *x509_crl_list = NULL;
+  gnutls_datum_t tmp;
+  gnutls_x509_crt_t *x509_cert_list = NULL;
+  gnutls_x509_crl_t *x509_crl_list = NULL;
   int x509_ncerts, x509_ncrls;
 
 
@@ -1499,8 +1499,8 @@ _verify_x509_mem (const void *cert, int cert_size)
     do
       {
 	x509_crl_list =
-	  (gnutls_x509_crl *) realloc (x509_crl_list,
-				       i * sizeof (gnutls_x509_crl));
+	  (gnutls_x509_crl_t *) realloc (x509_crl_list,
+				       i * sizeof (gnutls_x509_crl_t));
 	if (x509_crl_list == NULL)
 	  error (EXIT_FAILURE, 0, "memory error");
 
@@ -1540,8 +1540,8 @@ _verify_x509_mem (const void *cert, int cert_size)
   do
     {
       x509_cert_list =
-	(gnutls_x509_crt *) realloc (x509_cert_list,
-				     i * sizeof (gnutls_x509_crt));
+	(gnutls_x509_crt_t *) realloc (x509_cert_list,
+				     i * sizeof (gnutls_x509_crt_t));
       if (x509_cert_list == NULL)
 	error (EXIT_FAILURE, 0, "memory error");
 
@@ -1672,9 +1672,9 @@ _verify_x509_mem (const void *cert, int cert_size)
 }
 
 static void
-print_verification_res (gnutls_x509_crt crt,
-			gnutls_x509_crt issuer,
-			gnutls_x509_crl * crl_list, int crl_list_size)
+print_verification_res (gnutls_x509_crt_t crt,
+			gnutls_x509_crt_t issuer,
+			gnutls_x509_crl_t * crl_list, int crl_list_size)
 {
   unsigned int output;
   int comma = 0;
@@ -1765,10 +1765,10 @@ verify_crl (void)
   unsigned int output;
   int comma = 0;
   int ret;
-  gnutls_datum pem;
-  gnutls_x509_crl crl;
+  gnutls_datum_t pem;
+  gnutls_x509_crl_t crl;
   time_t now = time (0);
-  gnutls_x509_crt issuer;
+  gnutls_x509_crt_t issuer;
 
   issuer = load_ca_cert ();
 
@@ -1855,16 +1855,16 @@ verify_crl (void)
 void
 generate_pkcs12 (void)
 {
-  gnutls_pkcs12 pkcs12;
-  gnutls_x509_crt *crts;
-  gnutls_x509_privkey key;
+  gnutls_pkcs12_t pkcs12;
+  gnutls_x509_crt_t *crts;
+  gnutls_x509_privkey_t key;
   int result;
   size_t size;
-  gnutls_datum data;
+  gnutls_datum_t data;
   const char *password;
   const char *name;
   unsigned int flags;
-  gnutls_datum key_id;
+  gnutls_datum_t key_id;
   unsigned char _key_id[20];
   int index;
   int ncrts;
@@ -1888,7 +1888,7 @@ generate_pkcs12 (void)
 
   for (i = 0; i < ncrts; i++)
     {
-      gnutls_pkcs12_bag bag;
+      gnutls_pkcs12_bag_t bag;
 
       result = gnutls_pkcs12_bag_init (&bag);
       if (result < 0)
@@ -1933,7 +1933,7 @@ generate_pkcs12 (void)
 
   if (key)
     {
-      gnutls_pkcs12_bag kbag;
+      gnutls_pkcs12_bag_t kbag;
 
       result = gnutls_pkcs12_bag_init (&kbag);
       if (result < 0)
@@ -1997,7 +1997,7 @@ generate_pkcs12 (void)
 }
 
 const char *
-BAGTYPE (gnutls_pkcs12_bag_type x)
+BAGTYPE (gnutls_pkcs12_bag_type_t x)
 {
   switch (x)
     {
@@ -2019,13 +2019,13 @@ BAGTYPE (gnutls_pkcs12_bag_type x)
 }
 
 void
-print_bag_data (gnutls_pkcs12_bag bag)
+print_bag_data (gnutls_pkcs12_bag_t bag)
 {
   int result;
   int count, i, type;
-  gnutls_datum cdata, id;
+  gnutls_datum_t cdata, id;
   const char *str, *name;
-  gnutls_datum out;
+  gnutls_datum_t out;
 
   count = gnutls_pkcs12_bag_get_count (bag);
   if (count < 0)
@@ -2094,11 +2094,11 @@ print_bag_data (gnutls_pkcs12_bag bag)
 void
 pkcs12_info (void)
 {
-  gnutls_pkcs12 pkcs12;
-  gnutls_pkcs12_bag bag;
+  gnutls_pkcs12_t pkcs12;
+  gnutls_pkcs12_bag_t bag;
   int result;
   size_t size;
-  gnutls_datum data;
+  gnutls_datum_t data;
   const char *password;
   int index;
 
@@ -2171,10 +2171,10 @@ pkcs12_info (void)
 void
 pkcs7_info (void)
 {
-  gnutls_pkcs7 pkcs7;
+  gnutls_pkcs7_t pkcs7;
   int result;
   size_t size;
-  gnutls_datum data, b64;
+  gnutls_datum_t data, b64;
   int index, count;
 
   result = gnutls_pkcs7_init (&pkcs7);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -44,7 +44,7 @@
  * string(username):hex(passwd)
  */
 static int
-pwd_put_values (gnutls_datum * psk, char *str)
+pwd_put_values (gnutls_datum_t * psk, char *str)
 {
   char *p;
   int len, ret;
@@ -93,7 +93,7 @@ pwd_put_values (gnutls_datum * psk, char *str)
  * Returns 0 on success.
  */
 static int
-_randomize_psk (gnutls_datum * psk)
+_randomize_psk (gnutls_datum_t * psk)
 {
   psk->data = gnutls_malloc (16);
   if (psk->data == NULL)
@@ -117,7 +117,7 @@ _randomize_psk (gnutls_datum * psk)
  */
 int
 _gnutls_psk_pwd_find_entry (gnutls_session_t session, char *username,
-			    gnutls_datum * psk)
+			    gnutls_datum_t * psk)
 {
   gnutls_psk_server_credentials_t cred;
   FILE *fd;
