@@ -1,3 +1,175 @@
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.17.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2007-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/openpgp.h, libextra/gnutls_openpgp.c: Add
+	gnutls_openpgp_privkey_sign_hash.
+
+2007-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-cert-select.c, includes/gnutls/gnutls.h.in,
+	includes/gnutls/gnutlsxx.h, includes/gnutls/openpgp.h,
+	includes/gnutls/pkcs12.h, lib/auth_dh_common.c, lib/auth_dhe_psk.c,
+	lib/auth_psk.c, lib/auth_psk.h, lib/auth_psk_passwd.c,
+	lib/auth_psk_passwd.h, lib/gnutls_psk.c, lib/gnutls_session.c,
+	lib/gnutls_session_pack.c, lib/gnutls_x509.c, lib/gnutlsxx.cpp,
+	lib/x509/output.c, src/certtool-cfg.c, src/certtool-cfg.h,
+	src/certtool.c, src/cli.c, src/common.c, src/common.h, src/crypt.c,
+	src/prime.c, src/psk.c, src/serv.c, src/tests.c, src/tests.h,
+	src/tls_test.c: Use *_t types consistently.
+
+2007-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, includes/gnutls/x509.h,
+	lib/gnutls_cert.c, lib/gnutls_sig.c, lib/x509/privkey.c,
+	tests/x509signself.c: Use const and pointers to gnutls_datum_t in
+	sign callback.
+
+2007-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509signself.c: Fix warnings.
+
+2007-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2007-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Set shared library version correctly.
+
+2007-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in: New errors
+	GNUTLS_E_APPLICATION_ERROR_MIN..GNUTLS_E_APPLICATION_ERROR_MAX.
+
+2007-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_cert.c,
+	lib/gnutls_sig.c: Add gnutls_sign_callback_get.  	*
+	includes/gnutls/gnutls.h.in (gnutls_sign_callback_get): Add.  	*
+	lib/gnutls_cert.c (gnutls_sign_callback_set): Move here from
+	gnutls_sig.c.  Doc fix. 	(gnutls_sign_callback_get): New function.
+	* lib/gnutls_sig.c (gnutls_sign_callback_set): Removed.
+
+2007-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: (gnutls_error_is_fatal): Return default is 1 for unknown error
+	codes.
+
+2007-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Update.
+
+2007-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, includes/gnutls/x509.h,
+	lib/auth_cert.c, lib/auth_dhe.c, lib/auth_rsa_export.c,
+	lib/gnutls_int.h, lib/gnutls_sig.c, lib/gnutls_x509.c,
+	lib/x509/privkey.c, tests/Makefile.am, tests/x509signself.c: 
+	External signing callback interface. 	* includes/gnutls/gnutls.h.in
+	(gnutls_sign_func): New type. 	(gnutls_sign_callback_set): New
+	function.  	* includes/gnutls/x509.h
+	(gnutls_x509_privkey_sign_hash): New 	function.  	*
+	lib/gnutls_x509.c (gnutls_certificate_set_x509_key_mem): Handle
+	NULL key.  Doc fix.  	* lib/gnutls_sig.c (_gnutls_tls_sign_hdata):
+	Pass session to 	_gnutls_tls_sign. 	(_gnutls_tls_sign_params):
+	Likewise. 	(_gnutls_tls_sign): Add new parameter 'session'.  Call
+	sign 	callback if appropriate. 	(gnutls_sign_callback_set): New
+	function.  	* lib/gnutls_x509.c (read_key_mem): Support a NULL key.
+	* lib/gnutls_int.h (internals_st): Add sign_func,
+	sign_func_userdata.  	* lib/auth_dhe.c (gen_dhe_server_kx): Use
+	length of certificate 	list to decide wheter to sign, not presence
+	of private key. 	* lib/auth_cert.c
+	(_gnutls_gen_cert_client_cert_vrfy): Likewise.  	*
+	lib/auth_rsa_export.c (gen_rsa_export_server_kx): Likewise.  	*
+	lib/auth_cert.c(_gnutls_get_selected_cert): Don't require that
+	private key is present.  	* lib/auth_rsa_export.c
+	(gen_rsa_export_server_kx): Don't check 	key size when key is not
+	present, assume it is > 512 bits.  	* lib/x509/privkey.c
+	(gnutls_x509_privkey_sign_hash): New 	function.  	*
+	tests/Makefile.am: Add x509signself.
+
+2007-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Build x509self.
+
+2007-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509self.c: New file.
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: Disable TLS 1.2 by default, at least until
+	RFC is out and we've done simple interop of it.
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Add.
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* po/pl.po, po/sv.po: Sync with TP.
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-07-09  Ludovic Courtès <ludo@gnu.org>
+
+	* doc/gnutls.texi, doc/signatures.texi: Capitalized subsection
+	titles.  * doc/gnutls.texi: Capitalized subsection titles.  *
+	doc/signatures.texi: Likewise.  Signed-off-by: Simon Josefsson
+	<simon@josefsson.org>
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-03  Ludovic Courtès <ludo@gnu.org>
+
+	* doc/Makefile.am, guile/src/Makefile.am: Fixed CPPFLAGS for Guile
+	code and documentation.  * doc/Makefile.am (SNARF_CPPFLAGS): Added
+	`{top_srcdir,top_builddir}/includes' and `top_builddir'.
+	(core.c.texi): Added `&&' between the `make' command and the
+	`$(GUILE_FOR_BUILD)' command.  Use `$(MAKE)' instead of `make'.
+	(extra.c.texi): Likewise.  * src/Makefile.am (AM_CPPFLAGS): Added
+	`{top_srcdir,top_builddir}/includes'.  Signed-off-by: Simon
+	Josefsson <simon@josefsson.org>
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-08-07  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.16.
