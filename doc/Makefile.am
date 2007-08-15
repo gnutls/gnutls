@@ -75,6 +75,14 @@ gnutls_TEXINFOS += gnutls-mod_auth_st.dia gnutls-mod_auth_st.eps	\
 gnutls_TEXINFOS += gnutls-objects.dia gnutls-objects.eps	\
 	gnutls-objects.pdf gnutls-objects.png
 
+imagesdir = $(infodir)
+images_DATA = gnutls-certificate-user-use-case.png		\
+	gnutls-extensions_st.png gnutls-handshake-state.png	\
+	gnutls-layers.png gnutls-mod_auth_st.png gnutls-pgp.png	\
+	gnutls-client-server-use-case.png			\
+	gnutls-handshake-sequence.png gnutls-internals.png	\
+	gnutls-logo.png gnutls-objects.png gnutls-x509.png
+
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
