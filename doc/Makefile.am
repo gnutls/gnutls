@@ -53,26 +53,27 @@ gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png	\
 gnutls_TEXINFOS += gnutls-logo.dia gnutls-logo.eps gnutls-logo.png	\
                    gnutls-logo.pdf
 
-# Images.  Make sure there are eps + png + pdf of each.
-gnutls_TEXINFOS += arch/certificate-user-use-case.dia	\
-	arch/certificate-user-use-case.eps		\
-	arch/certificate-user-use-case.pdf		\
-	arch/certificate-user-use-case.png
-gnutls_TEXINFOS += arch/client-server-use-case.dia	\
-	arch/client-server-use-case.eps			\
-	arch/client-server-use-case.pdf			\
-	arch/client-server-use-case.png
-gnutls_TEXINFOS += arch/extensions_st.dia arch/extensions_st.eps	\
-	arch/extensions_st.pdf arch/extensions_st.png
-gnutls_TEXINFOS += arch/handshake-sequence.dia				\
-	arch/handshake-sequence.eps arch/handshake-sequence.pdf		\
-	arch/handshake-sequence.png
-gnutls_TEXINFOS += arch/handshake-state.dia arch/handshake-state.eps	\
-	arch/handshake-state.pdf arch/handshake-state.png
-gnutls_TEXINFOS += arch/mod_auth_st.dia arch/mod_auth_st.eps		\
-	arch/mod_auth_st.pdf arch/mod_auth_st.png
-gnutls_TEXINFOS += arch/objects.dia arch/objects.eps arch/objects.pdf	\
-	arch/objects.png
+# Images.  Make sure there are eps + png + pdf of each, plus the source dia.
+gnutls_TEXINFOS += gnutls-certificate-user-use-case.dia	\
+	gnutls-certificate-user-use-case.eps		\
+	gnutls-certificate-user-use-case.pdf		\
+	gnutls-certificate-user-use-case.png
+gnutls_TEXINFOS += gnutls-client-server-use-case.dia	\
+	gnutls-client-server-use-case.eps		\
+	gnutls-client-server-use-case.pdf		\
+	gnutls-client-server-use-case.png
+gnutls_TEXINFOS += gnutls-extensions_st.dia gnutls-extensions_st.eps	\
+	gnutls-extensions_st.pdf gnutls-extensions_st.png
+gnutls_TEXINFOS += gnutls-handshake-sequence.dia			\
+	gnutls-handshake-sequence.eps gnutls-handshake-sequence.pdf	\
+	gnutls-handshake-sequence.png
+gnutls_TEXINFOS += gnutls-handshake-state.dia			\
+	gnutls-handshake-state.eps gnutls-handshake-state.pdf	\
+	gnutls-handshake-state.png
+gnutls_TEXINFOS += gnutls-mod_auth_st.dia gnutls-mod_auth_st.eps	\
+	gnutls-mod_auth_st.pdf gnutls-mod_auth_st.png
+gnutls_TEXINFOS += gnutls-objects.dia gnutls-objects.eps	\
+	gnutls-objects.pdf gnutls-objects.png
 
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)

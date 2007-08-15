@@ -3644,13 +3644,13 @@ happens inside the black box.
 The main needs for the TLS protocol to be used are
 shown in the image below.
 
-@image{arch/client-server-use-case,9cm}
+@image{gnutls-client-server-use-case,9cm}
 
 This is being accomplished by the following object diagram.
 Note that since @acronym{GnuTLS} is being developed in C
 object are just structures with attributes. The operations listed
 are functions that require the first parameter to be that object.
-@image{arch/objects,15cm}
+@image{gnutls-objects,15cm}
 
 @section TLS Handshake Protocol
 The @acronym{GnuTLS} handshake protocol is implemented as a state
@@ -3658,7 +3658,7 @@ machine that waits for input or returns immediately when the non-blocking
 transport layer functions are used. The main idea is shown in the following
 figure.
 
-@image{arch/handshake-state,9cm}
+@image{gnutls-handshake-state,9cm}
 
 Also the way the input is processed varies per ciphersuite. Several 
 implementations of the internal handlers are available and 
@@ -3667,7 +3667,7 @@ handler. For example a @acronym{PSK} ciphersuite has a different
 implementation of the @code{process_client_key_exchange} than a
 certificate ciphersuite.
 
-@image{arch/handshake-sequence,12cm}
+@image{gnutls-handshake-sequence,12cm}
 
 @section TLS Authentication Methods
 In @acronym{GnuTLS} authentication methods can be implemented quite easily.
@@ -3675,7 +3675,7 @@ Since the required changes to add a new authentication method affect only the
 handshake protocol, a simple interface is used. An authentication method needs
 only to implement the functions as seen in the figure below.
 
-@image{arch/mod_auth_st,12cm}
+@image{gnutls-mod_auth_st,12cm}
 
 The functions that need to be implemented are the ones responsible for interpreting
 the handshake protocol messages. It is common for such functions to read data from
@@ -3690,7 +3690,7 @@ in the @code{_gnutls_kx_algorithms} structure.
 As with authentication methods, the TLS extensions handlers can be implemented
 using the following interface.
 
-@image{arch/extensions_st,12cm}
+@image{gnutls-extensions_st,12cm}
 
 Here there are two functions, one for receiving the extension data
 and one for sending. These functions have to check internally whether
@@ -3706,7 +3706,7 @@ handle, they have to be registered in @code{gnutls_extensions.c} in the
 What is provided by the certificate handling functions
 is summarized in the following diagram.
 
-@image{arch/certificate-user-use-case,12cm}
+@image{gnutls-certificate-user-use-case,12cm}
 
 
 @node Copying Information
