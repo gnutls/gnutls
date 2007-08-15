@@ -50,8 +50,7 @@ gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png		\
                    gnutls-pgp.pdf
 gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png	\
                    gnutls-x509.pdf
-gnutls_TEXINFOS += gnutls-logo.dia gnutls-logo.eps gnutls-logo.png	\
-                   gnutls-logo.pdf
+gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png gnutls-logo.pdf
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-certificate-user-use-case.dia	\
