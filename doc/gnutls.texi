@@ -431,7 +431,7 @@ A brief description of how @acronym{GnuTLS} works internally is shown
 at the figure below. This section may be easier to understand after
 having seen the examples (@pxref{examples}).
 
-@image{internals,12cm,8cm}
+@image{gnutls-internals,12cm,8cm}
 
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
@@ -593,7 +593,7 @@ negotiation, the initial key exchange and authentication.  @xref{The
 Handshake Protocol}, for more information about the handshake
 protocol.  The protocol layering in TLS is shown in the figure below.
 
-@image{layers,12cm,8cm}
+@image{gnutls-layers,12cm,8cm}
 
 @node The transport layer
 @section The Transport Layer
@@ -1534,7 +1534,7 @@ entities.  Usually more than one certification authorities exist, and
 certification authorities may certify other authorities to issue
 certificates as well, following a hierarchical model.
 
-@image{x509-1,7cm,9.5cm}
+@image{gnutls-x509,7cm,9.5cm}
 
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
@@ -1768,7 +1768,7 @@ key. When Alice signs Bob's key, she is introducing Bob's key to
 anyone who trusts Alice. If someone trusts Alice to introduce keys,
 then Alice is a trusted introducer in the mind of that observer.
 
-@image{pgp1,11cm,9cm}
+@image{gnutls-pgp,11cm,9cm}
 
 For example: If David trusts Alice to be an introducer, and Alice
 signed Bob's key, Dave also trusts Bob's key to be the real one.

@@ -41,14 +41,19 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl-2.1.texi	\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
 	examples/ex-pkcs12.c guile.texi $(guile_texi)
 
-# Images.  Make sure there are eps + png + pdf of each.
-gnutls_TEXINFOS += layers.eps layers.png layers.pdf
-gnutls_TEXINFOS += pgp1.eps pgp1.png pgp1.pdf
-gnutls_TEXINFOS += x509-1.eps x509-1.png x509-1.pdf
-gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png gnutls-logo.pdf
+# Images.  Make sure there are eps + png + pdf of each, plus the source dia.
+gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\
+                   gnutls-internals.png gnutls-internals.pdf
+gnutls_TEXINFOS += gnutls-layers.dia gnutls-layers.eps			\
+                   gnutls-layers.png gnutls-layers.pdf
+gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png		\
+                   gnutls-pgp.pdf
+gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png	\
+                   gnutls-x509.pdf
+gnutls_TEXINFOS += gnutls-logo.dia gnutls-logo.eps gnutls-logo.png	\
+                   gnutls-logo.pdf
 
 # Images.  Make sure there are eps + png + pdf of each.
-gnutls_TEXINFOS += internals.eps internals.png internals.pdf
 gnutls_TEXINFOS += arch/certificate-user-use-case.dia	\
 	arch/certificate-user-use-case.eps		\
 	arch/certificate-user-use-case.pdf		\
