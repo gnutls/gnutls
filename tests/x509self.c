@@ -39,6 +39,9 @@
 
 #include "utils.h"
 
+#include "ex-session-info.c"
+#include "ex-x509-info.c"
+
 pid_t child;
 
 static void
@@ -393,9 +396,6 @@ server_start (void)
 
   success ("server: ready. Listening to port '%d'.\n", PORT);
 }
-
-#include "ex-session-info.c"
-#include "ex-x509-info.c"
 
 void
 server (void)
