@@ -31,6 +31,7 @@
 #include <openpgp/gnutls_openpgp.h>
 #include "read-file.h"
 #include <gnutls_str.h>
+#include <gnutls_sig.h>
 #include <stdio.h>
 #include <gcrypt.h>
 #include <time.h>
