@@ -17,6 +17,9 @@ Patch extracted from
 ** Fix warnings during build.
 Thanks to Andreas Metzler <ametzler@downhill.at.eu.org>.
 
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.7.17 (released 2007-08-15)
 
 ** New functions to perform external signing.
