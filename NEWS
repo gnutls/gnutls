@@ -3,6 +3,17 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.7.18 (unreleased)
+
+** Install images for the info manual.
+This has a side effect of renaming the images.  See
+<http://thread.gmane.org/gmane.comp.tex.texinfo.bugs/3533> for
+discussions on the approach chosen.
+
+** Fix pointer mix to variables of different size.
+Patch extracted from
+<http://cvs.fedora.redhat.com/viewcvs/devel/gnutls/gnutls-1.6.3-incompat-pointers.patch?rev=1.1&view=auto>.
+
 * Version 1.7.17 (released 2007-08-15)
 
 ** New functions to perform external signing.
