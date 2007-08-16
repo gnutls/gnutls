@@ -119,8 +119,9 @@ gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
     }
   else
     {				/* HEX key */
-      res->key.size = key->size / 2;
-      res->key.data = gnutls_malloc (res->key.size);
+      size_t size;
+      size = res->key.size = key->size / 2;
+      res->key.data = gnutls_malloc (size);
       if (res->key.data == NULL)
 	{
 	  gnutls_assert ();
@@ -128,7 +129,8 @@ gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 	  goto error;
 	}
 
-      ret = gnutls_hex_decode (key, (char *) res->key.data, &res->key.size);
+      ret = gnutls_hex_decode (key, (char *) res->key.data, &size);
+      res->key.size = (unsigned int)size;
       if (ret < 0)
 	{
 	  gnutls_assert ();

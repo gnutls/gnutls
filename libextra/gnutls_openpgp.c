@@ -726,6 +726,7 @@ gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
   struct stat statbuf;
   gnutls_datum_t key, cert;
   int rc;
+  size_t size;
 
   if (!res || !keyfile || !certfile)
     {
@@ -739,14 +740,16 @@ gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
       return GNUTLS_E_FILE_ERROR;
     }
 
-  cert.data = read_binary_file (certfile, &cert.size);
+  cert.data = read_binary_file (certfile, &size);
+  cert.size = (unsigned int)size;
   if (cert.data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
     }
 
-  key.data = read_binary_file (keyfile, &key.size);
+  key.data = read_binary_file (keyfile, &size);
+  key.size = (unsigned int)size;
   if (key.data == NULL)
     {
       gnutls_assert ();

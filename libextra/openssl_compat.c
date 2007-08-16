@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -537,6 +537,7 @@ gnutls_x509_extract_certificate_dn_string (char *buf,
 {
   gnutls_x509_crt_t xcert;
   int result;
+  size_t size;
 
   result = gnutls_x509_crt_init (&xcert);
   if (result < 0)
@@ -549,10 +550,11 @@ gnutls_x509_extract_certificate_dn_string (char *buf,
       return result;
     }
 
+  size = sizeof_buf;
   if (!issuer)
-    result = gnutls_x509_crt_get_dn (xcert, buf, &sizeof_buf);
+    result = gnutls_x509_crt_get_dn (xcert, buf, &size);
   else
-    result = gnutls_x509_crt_get_issuer_dn (xcert, buf, &sizeof_buf);
+    result = gnutls_x509_crt_get_issuer_dn (xcert, buf, &size);
 
   gnutls_x509_crt_deinit (xcert);
 

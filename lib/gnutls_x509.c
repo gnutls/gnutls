@@ -1893,6 +1893,7 @@ gnutls_certificate_set_x509_simple_pkcs12_file
   gnutls_x509_crt_t cert = NULL;
   gnutls_x509_crl_t crl = NULL;
   int ret;
+  size_t size;
 
   ret = gnutls_pkcs12_init (&p12);
   if (ret < 0)
@@ -1901,7 +1902,8 @@ gnutls_certificate_set_x509_simple_pkcs12_file
       return ret;
     }
 
-  p12blob.data = read_binary_file (pkcs12file, &p12blob.size);
+  p12blob.data = read_binary_file (pkcs12file, &size);
+  p12blob.size = (unsigned int)size;
   if (p12blob.data == NULL)
     {
       gnutls_assert ();
