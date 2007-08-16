@@ -1,3 +1,115 @@
+2007-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.18.
+
+2007-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2007-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk_passwd.c, lib/gnutls_psk.c, lib/gnutls_x509.c,
+	libextra/gnutls_openpgp.c, libextra/openssl_compat.c: Fix pointer
+	mix for different sized variables. Tiny patch from
+
+	<http://cvs.fedora.redhat.com/viewcvs/devel/gnutls/gnutls-1.6.3-incompat-pointers.patch?rev=1.1&view=auto>.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Typo.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Install images in info directory.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/arch/certificate-user-use-case.dia,
+	doc/arch/certificate-user-use-case.eps,
+	doc/arch/certificate-user-use-case.pdf,
+	doc/arch/certificate-user-use-case.png,
+	doc/arch/client-server-use-case.dia,
+	doc/arch/client-server-use-case.eps,
+	doc/arch/client-server-use-case.pdf,
+	doc/arch/client-server-use-case.png, doc/arch/extensions_st.dia,
+	doc/arch/extensions_st.eps, doc/arch/extensions_st.pdf,
+	doc/arch/extensions_st.png, doc/arch/handshake-sequence.dia,
+	doc/arch/handshake-sequence.eps, doc/arch/handshake-sequence.pdf,
+	doc/arch/handshake-sequence.png, doc/arch/handshake-state.dia,
+	doc/arch/handshake-state.eps, doc/arch/handshake-state.pdf,
+	doc/arch/handshake-state.png, doc/arch/mod_auth_st.dia,
+	doc/arch/mod_auth_st.eps, doc/arch/mod_auth_st.pdf,
+	doc/arch/mod_auth_st.png, doc/arch/objects.dia,
+	doc/arch/objects.eps, doc/arch/objects.pdf, doc/arch/objects.png,
+	doc/gnutls-certificate-user-use-case.dia,
+	doc/gnutls-certificate-user-use-case.eps,
+	doc/gnutls-certificate-user-use-case.pdf,
+	doc/gnutls-certificate-user-use-case.png,
+	doc/gnutls-client-server-use-case.dia,
+	doc/gnutls-client-server-use-case.eps,
+	doc/gnutls-client-server-use-case.pdf,
+	doc/gnutls-client-server-use-case.png,
+	doc/gnutls-extensions_st.dia, doc/gnutls-extensions_st.eps,
+	doc/gnutls-extensions_st.pdf, doc/gnutls-extensions_st.png,
+	doc/gnutls-handshake-sequence.dia,
+	doc/gnutls-handshake-sequence.eps,
+	doc/gnutls-handshake-sequence.pdf,
+	doc/gnutls-handshake-sequence.png, doc/gnutls-handshake-state.dia,
+	doc/gnutls-handshake-state.eps, doc/gnutls-handshake-state.pdf,
+	doc/gnutls-handshake-state.png, doc/gnutls-mod_auth_st.dia,
+	doc/gnutls-mod_auth_st.eps, doc/gnutls-mod_auth_st.pdf,
+	doc/gnutls-mod_auth_st.png, doc/gnutls-objects.dia,
+	doc/gnutls-objects.eps, doc/gnutls-objects.pdf,
+	doc/gnutls-objects.png, doc/gnutls.texi: More image renaming.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/gnutls-internals.dia,
+	doc/gnutls-internals.eps, doc/gnutls-internals.pdf,
+	doc/gnutls-internals.png, doc/gnutls-layers.dia,
+	doc/gnutls-layers.eps, doc/gnutls-layers.pdf,
+	doc/gnutls-layers.png, doc/gnutls-pgp.dia, doc/gnutls-pgp.eps,
+	doc/gnutls-pgp.pdf, doc/gnutls-pgp.png, doc/gnutls-x509.dia,
+	doc/gnutls-x509.eps, doc/gnutls-x509.pdf, doc/gnutls-x509.png,
+	doc/gnutls.texi, doc/internals.dia, doc/internals.eps,
+	doc/internals.pdf, doc/internals.png, doc/layers.dia,
+	doc/layers.eps, doc/layers.pdf, doc/layers.png, doc/pgp1.dia,
+	doc/pgp1.eps, doc/pgp1.pdf, doc/pgp1.png, doc/x509-1.dia,
+	doc/x509-1.eps, doc/x509-1.pdf, doc/x509-1.png: Rename images to
+	deal with texinfo brokenness. See
+	<http://thread.gmane.org/gmane.comp.tex.texinfo.bugs/3533>.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/my-bib-macros.texi: Remove my-bib-macros, not
+	used.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509self.c: Fix warning.  Tiny patch from Andreas Metzler
+	<ametzler@downhill.at.eu.org>.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openpgp.c: Fix warning.  Tiny patch from Andreas
+	Metzler <ametzler@downhill.at.eu.org>.
+
+2007-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-08-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Typo.
