@@ -14,6 +14,9 @@ discussions on the approach chosen.
 Patch extracted from
 <http://cvs.fedora.redhat.com/viewcvs/devel/gnutls/gnutls-1.6.3-incompat-pointers.patch?rev=1.1&view=auto>.
 
+** Fix warnings during build.
+Thanks to Andreas Metzler <ametzler@downhill.at.eu.org>.
+
 * Version 1.7.17 (released 2007-08-15)
 
 ** New functions to perform external signing.
