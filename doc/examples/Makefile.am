@@ -29,7 +29,11 @@ LDADD = libexamples.la \
 
 noinst_PROGRAMS = ex-cert-select ex-client1 ex-client2			\
 	ex-client-resume ex-client-tlsia ex-crq ex-serv1 ex-serv-anon	\
-	ex-serv-export ex-serv-pgp
+	ex-serv-export
+
+if ENABLE_OPENPGP
+noinst_PROGRAMS += ex-serv-pgp
+endif
 
 if ENABLE_SRP
 noinst_PROGRAMS += ex-client-srp ex-serv-srp
