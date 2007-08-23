@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 1.7.19 (unreleased)
 
+** Update gnulib files.
+In particular, the getpass module -- with its dependencies on getline,
+getdelim, fseeko etc -- where moved from the lgl/ (used by the core
+library) directory to the gl/ directory (only used by the command line
+tools).  The reason is that getpass is now only used by the
+command-line tools, and reducing the number of gnulib modules linked
+to the core library helps portability and reduces size.
+
 ** API and ABI modifications:
 No changes since last version.
 
