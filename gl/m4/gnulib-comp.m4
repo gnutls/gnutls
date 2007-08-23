@@ -27,6 +27,7 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  AC_REQUIRE([AC_FUNC_FSEEKO])
   dnl Some compilers (e.g., AIX 5.3 cc) need to be in c99 mode
   dnl for the builtin va_copy to work.  With Autoconf 2.60 or later,
   dnl AC_PROG_CC_STDC arranges for this.  With older Autoconf AC_PROG_CC_STDC
@@ -47,24 +48,31 @@ AC_DEFUN([gl_INIT],
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
   gl_ERROR
+  gl_FUNC_FSEEKO
+  gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_FUNC_GETLINE
+  gl_FUNC_GETPASS
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_INET_NTOP
   gl_INET_PTON
+  gl_FUNC_LSEEK
+  gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_FUNC_READLINE
   gl_TYPE_SOCKLEN_T
   gl_STDARG_H
   AM_STDBOOL_H
+  gl_STDIO_H
   gl_FUNC_STRDUP
   gl_STRING_MODULE_INDICATOR([strdup])
   gl_HEADER_STRING_H
   gl_HEADER_SYS_SOCKET
   AC_PROG_MKDIR_P
+  gl_UNISTD_H
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -113,6 +121,7 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/lgpl-2.1.texi
   lib/error.c
   lib/error.h
+  lib/fseeko.c
   lib/gai_strerror.c
   lib/getaddrinfo.c
   lib/getaddrinfo.h
@@ -120,29 +129,36 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getdelim.h
   lib/getline.c
   lib/getline.h
+  lib/getpass.c
+  lib/getpass.h
   lib/gettext.h
   lib/inet_ntop.c
   lib/inet_ntop.h
   lib/inet_pton.c
   lib/inet_pton.h
+  lib/lseek.c
   lib/netinet_in_.h
   lib/progname.c
   lib/progname.h
   lib/readline.c
   lib/readline.h
   lib/stdbool_.h
+  lib/stdio_.h
   lib/strdup.c
   lib/string_.h
   lib/sys_socket_.h
+  lib/unistd_.h
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h
   m4/arpa_inet_h.m4
   m4/error.m4
   m4/extensions.m4
+  m4/fseeko.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
+  m4/getpass.m4
   m4/gnulib-common.m4
   m4/include_next.m4
   m4/inet_ntop.m4
@@ -150,13 +166,16 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/lseek.m4
   m4/netinet_in_h.m4
   m4/readline.m4
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdarg.m4
   m4/stdbool.m4
+  m4/stdio_h.m4
   m4/strdup.m4
   m4/string_h.m4
   m4/sys_socket_h.m4
+  m4/unistd_h.m4
 ])

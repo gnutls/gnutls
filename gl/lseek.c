@@ -2,16 +2,16 @@
    Copyright (C) 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2.1, or (at your option)
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License along
+   You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
@@ -20,9 +20,13 @@
 /* Specification.  */
 #include <unistd.h>
 
-/* Get GetFileType.  The replacement lseek is only used on mingw, so
-   this include can be unconditional.  */
-#include <windows.h>
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+/* Windows platforms.  */
+/* Get GetFileType.  */
+# include <windows.h>
+#else
+# include <sys/stat.h>
+#endif
 #include <errno.h>
 
 #undef lseek
@@ -30,6 +34,7 @@
 off_t
 rpl_lseek (int fd, off_t offset, int whence)
 {
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
   /* mingw lseek mistakenly succeeds on pipes, sockets, and terminals.  */
   HANDLE h = (HANDLE) _get_osfhandle (fd);
   if (h == INVALID_HANDLE_VALUE)
@@ -42,5 +47,16 @@ rpl_lseek (int fd, off_t offset, int whence)
       errno = ESPIPE;
       return -1;
     }
+#else
+  /* BeOS lseek mistakenly succeeds on pipes...  */
+  struct stat statbuf;
+  if (fstat (fd, &statbuf) < 0)
+    return -1;
+  if (!S_ISREG (statbuf.st_mode))
+    {
+      errno = ESPIPE;
+      return -1;
+    }
+#endif
   return lseek (fd, offset, whence);
 }
