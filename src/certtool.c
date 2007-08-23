@@ -35,7 +35,6 @@
 #include <errno.h>
 
 /* Gnulib portability files. */
-#include <getline.h>
 #include <read-file.h>
 #include <error.h>
 #include <progname.h>
