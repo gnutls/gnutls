@@ -77,7 +77,7 @@ EXTRA_libgnu_la_SOURCES += gai_strerror.c getaddrinfo.c
 ## begin gnulib module getdelim
 
 
-EXTRA_DIST += getdelim.c getdelim.h
+EXTRA_DIST += getdelim.c
 
 EXTRA_libgnu_la_SOURCES += getdelim.c
 
@@ -86,7 +86,7 @@ EXTRA_libgnu_la_SOURCES += getdelim.c
 ## begin gnulib module getline
 
 
-EXTRA_DIST += getline.c getline.h
+EXTRA_DIST += getline.c
 
 EXTRA_libgnu_la_SOURCES += getline.c
 
@@ -236,6 +236,8 @@ stdio.h: stdio_.h
 	      -e 's|@''GNULIB_FTELL''@|$(GNULIB_FTELL)|g' \
 	      -e 's|@''GNULIB_FTELLO''@|$(GNULIB_FTELLO)|g' \
 	      -e 's|@''GNULIB_FFLUSH''@|$(GNULIB_FFLUSH)|g' \
+	      -e 's|@''GNULIB_GETDELIM''@|$(GNULIB_GETDELIM)|g' \
+	      -e 's|@''GNULIB_GETLINE''@|$(GNULIB_GETLINE)|g' \
 	      -e 's|@''REPLACE_FPRINTF''@|$(REPLACE_FPRINTF)|g' \
 	      -e 's|@''REPLACE_VFPRINTF''@|$(REPLACE_VFPRINTF)|g' \
 	      -e 's|@''REPLACE_PRINTF''@|$(REPLACE_PRINTF)|g' \
@@ -253,6 +255,9 @@ stdio.h: stdio_.h
 	      -e 's|@''REPLACE_FTELLO''@|$(REPLACE_FTELLO)|g' \
 	      -e 's|@''REPLACE_FTELL''@|$(REPLACE_FTELL)|g' \
 	      -e 's|@''REPLACE_FFLUSH''@|$(REPLACE_FFLUSH)|g' \
+	      -e 's|@''HAVE_DECL_GETDELIM''@|$(HAVE_DECL_GETDELIM)|g' \
+	      -e 's|@''HAVE_DECL_GETLINE''@|$(HAVE_DECL_GETLINE)|g' \
+	      -e 's|@''REPLACE_GETLINE''@|$(REPLACE_GETLINE)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/stdio_.h; \
 	} > $@-t
