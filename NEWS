@@ -13,6 +13,8 @@ tools).  The reason is that getpass is now only used by the
 command-line tools, and reducing the number of gnulib modules linked
 to the core library helps portability and reduces size.
 
+** Disable building of PGP examples if PGP is disabled.
+
 ** API and ABI modifications:
 No changes since last version.
 
