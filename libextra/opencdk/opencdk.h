@@ -23,12 +23,12 @@
 #include <gcrypt.h>
 
 /* The OpenCDK version as a string. */
-#define OPENCDK_VERSION "0.6.3"
+#define OPENCDK_VERSION "0.6.4"
 
 /* The OpenCDK version as integer components major.minor.path */
 #define OPENCDK_VERSION_MAJOR 0
 #define OPENCDK_VERSION_MINOR 6
-#define OPENCDK_VERSION_PATCH 3
+#define OPENCDK_VERSION_PATCH 4
 
 #ifdef __cplusplus
 extern "C" {

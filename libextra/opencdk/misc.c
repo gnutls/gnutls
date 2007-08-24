@@ -511,7 +511,7 @@ _cdk_check_args (int overwrite, const char *in, const char *out)
   
   if (!in || !out)
     return CDK_Inv_Value;
-  if (strlen (in) == strlen (out) && strcmp (in, out))
+  if (strlen (in) == strlen (out) && strcmp (in, out) == 0)
     return CDK_Inv_Mode;
   if (!overwrite && !stat (out, &stbuf))
     return CDK_Inv_Mode;
