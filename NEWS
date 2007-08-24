@@ -15,6 +15,8 @@ to the core library helps portability and reduces size.
 
 ** Disable building of PGP examples if PGP is disabled.
 
+** Included copy of OpenCDK upgraded to version 0.6.4.
+
 ** API and ABI modifications:
 No changes since last version.
 
