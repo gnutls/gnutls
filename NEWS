@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 1.7.19 (unreleased)
 
+** Fix gnutls_error_is_fatal so that positive "errors" are non-critical.
+This solves connection problems in mutt, see
+<http://bugs.debian.org/439640>.
+
 ** Update gnulib files.
 In particular, the getpass module -- with its dependencies on getline,
 getdelim, fseeko etc -- where moved from the lgl/ (used by the core
