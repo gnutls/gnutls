@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -271,7 +271,13 @@ gnutls_error_is_fatal (int error)
 {
   int ret = 1;
 
+  /* Input sanitzation.  Positive values are not errors at all, and
+     definitely not fatal. */
+  if (error > 0)
+    return 0;
+
   GNUTLS_ERROR_ALG_LOOP (ret = p->fatal);
+
   return ret;
 }
 
