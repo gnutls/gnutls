@@ -265,6 +265,8 @@ static const gnutls_error_entry error_algorithms[] = {
   * This is only useful if you are dealing with errors from the
   * record layer or the handshake layer.
   *
+  * For positive @error values, 0 is returned.
+  *
   **/
 int
 gnutls_error_is_fatal (int error)
