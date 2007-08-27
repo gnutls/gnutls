@@ -2232,7 +2232,7 @@ gnutls_handshake (gnutls_session_t session)
 			session->internals.handshake_restarted = 1; \
 			goto restart; \
 		} \
-		if (ret < 0 && gnutls_error_is_fatal(ret)==0) return ret; \
+		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
 		_gnutls_handshake_hash_buffers_clear(session); \
