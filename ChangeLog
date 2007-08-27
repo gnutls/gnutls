@@ -1,3 +1,111 @@
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 1.7.19.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-session-info.c: Support GNUTLS_CRD_PSK and
+	GNUTLS_CRD_IA.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Handle GNUTLS_CRD_IA in print_info().
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Doc fix.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Revert "Check that value is negative
+	before using gnutls_error_is_fatal."  This reverts commit
+	9949a4b0b6b62a0ff3c05fee4283928d1a53b675.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Have gnutls_error_is_fatal return 0 on
+	positive "errors". Would fix bug reported by Andreas Metzler
+	<ametzler@downhill.at.eu.org> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2293 see also <http://bugs.debian.org/439640>.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Check that value is negative before using
+	gnutls_error_is_fatal. Fixes bug reported by Andreas Metzler
+	<ametzler@downhill.at.eu.org> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2293> see also <http://bugs.debian.org/439640>.
+
+2007-08-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-24  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/misc.c, libextra/opencdk/opencdk.h: Upgrade to
+	OpenCDK 0.6.4.
+
+2007-08-24  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-babu-serv-cert-trans-from-proxy-00.txt: Add.
+
+2007-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* gl/readline.c: Upgrade gnulib files.
+
+2007-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: No need for getline.h.
+
+2007-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* gl/getdelim.c, gl/getdelim.h, gl/getline.c, gl/getline.h,
+	gl/getpass.c, gl/gnulib.mk, gl/m4/getdelim.m4, gl/m4/getline.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/stdio_h.m4, gl/m4/unistd_h.m4,
+	gl/stdio_.h, gl/unistd_.h, lgl/Makefile.am, lgl/m4/stdio_h.m4,
+	lgl/stdio_.h: Upgrade gnulib files.
+
+2007-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* gl/fseeko.c, gl/getpass.c, gl/getpass.h, gl/gnulib.mk,
+	gl/lseek.c, gl/m4/fseeko.m4, gl/m4/getpass.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/lseek.m4,
+	lgl/Makefile.am, lgl/fseeko.c, lgl/getdelim.c, lgl/getdelim.h,
+	lgl/getline.c, lgl/getline.h, lgl/getpass.c, lgl/getpass.h,
+	lgl/lseek.c, lgl/m4/fseeko.m4, lgl/m4/getdelim.m4,
+	lgl/m4/getline.m4, lgl/m4/getpass.m4, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/lseek.m4: Update gnulib files.
+
+2007-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Don't build pgp example if pgp has been
+	disabled.
+
+2007-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-08-16  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.18.
