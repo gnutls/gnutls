@@ -17,6 +17,8 @@ tools).  The reason is that getpass is now only used by the
 command-line tools, and reducing the number of gnulib modules linked
 to the core library helps portability and reduces size.
 
+** Fix warnings.
+
 ** Disable building of PGP examples if PGP is disabled.
 
 ** Included copy of OpenCDK upgraded to version 0.6.4.
