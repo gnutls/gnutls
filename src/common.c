@@ -530,6 +530,9 @@ print_info (gnutls_session_t session, const char *hostname)
 	}
       break;
 #endif
+    case GNUTLS_CRD_IA:
+      printf ("- TLS/IA authentication\n");
+      break;
     case GNUTLS_CRD_CERTIFICATE:
       {
 	char dns[256];
