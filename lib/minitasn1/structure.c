@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2004, 2006 Free Software Foundation
+ *      Copyright (C) 2004, 2006, 2007 Free Software Foundation
  *      Copyright (C) 2002  Fabio Fiorina
  *
  * This file is part of LIBTASN1.
@@ -92,7 +92,12 @@ _asn1_create_static_structure (ASN1_TYPE pointer, char *output_file_name,
   if (file == NULL)
     return ASN1_FILE_NOT_FOUND;
 
-  fprintf (file, "\n#include <libtasn1.h>\n\n");
+  fprintf (file, "#if HAVE_CONFIG_H\n");
+  fprintf (file, "# include \"config.h\"\n");
+  fprintf (file, "#endif\n\n");
+
+  fprintf (file, "#include <libtasn1.h>\n\n");
+
   fprintf (file, "extern const ASN1_ARRAY_TYPE %s[]={\n", vector_name);
 
   p = pointer;
