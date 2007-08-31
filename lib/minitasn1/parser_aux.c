@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2004, 2006 Free Software Foundation
+ *      Copyright (C) 2004, 2006, 2007 Free Software Foundation
  *      Copyright (C) 2000,2001 Fabio Fiorina
  *
  * This file is part of LIBTASN1.
@@ -1012,8 +1012,13 @@ parse_version_string (const char *s, int *major, int *minor, int *micro)
     return NULL;
   s++;
   s = parse_version_number (s, minor);
-  if (!s || *s != '.')
+  if (!s)
     return NULL;
+  if (*s != '.')
+    {
+      *micro = 0;
+      return s;
+    }
   s++;
   s = parse_version_number (s, micro);
   if (!s)
