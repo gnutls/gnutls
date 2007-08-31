@@ -27,9 +27,12 @@ LDADD = libexamples.la \
 	../../lib/libgnutls.la	\
 	../../libextra/libgnutls-extra.la
 
-noinst_PROGRAMS = ex-cert-select ex-client1 ex-client2			\
-	ex-client-resume ex-client-tlsia ex-crq ex-serv1 ex-serv-anon	\
-	ex-serv-export
+noinst_PROGRAMS = ex-cert-select ex-client2 ex-client-resume		\
+	ex-client-tlsia ex-crq ex-serv1 ex-serv-anon ex-serv-export
+
+if ENABLE_ANON
+noinst_PROGRAMS += ex-client1
+endif
 
 if ENABLE_OPENPGP
 noinst_PROGRAMS += ex-serv-pgp
