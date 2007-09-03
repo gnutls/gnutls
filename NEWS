@@ -642,6 +642,54 @@ This fixes the following error message:
 configure: error: conditional "HAVE_LD_OUTPUT_DEF" was never defined.
 Reported by "Michael C. Vergallen" <mvergall@telenet.be>.
 
+* Version 1.6.3 (released 2007-05-26)
+
+** New API functions to extract DER encoded X.509 Subject/Issuer DN.
+Suggested by Nate Nielsen <nielsen-list@memberwebs.com>.  Backported
+from the 1.7.x branch, see
+<http://lists.gnu.org/archive/html/help-gnutls/2007-05/msg00029.html>.
+
+** Have PKCS8 parser return better error codes.
+Reported by Nate Nielsen <nielsen-list@memberwebs.com>, see
+<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001653.html> and
+<http://lists.gnupg.org/pipermail/gnutls-dev/2007-May/001654.html>.
+
+** Fix mem leak for sessions with client authentication via certificates.
+Reported by Andrew W. Nosenko <andrew.w.nosenko@gmail.com>, see
+<http://lists.gnupg.org/pipermail/gnutls-dev/2007-April/001539.html>.
+
+** Fix building of 'tlsia' self test.
+Earlier some gcc are known to build tlsia linking to
+$prefix/lib/libgnutls-extra.so rather than the libgnutls-extra.so in
+the build directory, even though command line parameters look OK.
+Changing order of some parameters fixes it.
+
+** API and ABI modifications:
+gnutls_x509_crt_get_raw_issuer_dn: ADD.
+gnutls_x509_crt_get_raw_dn: ADD.
+
+* Version 1.6.2 (released 2007-04-18)
+
+** Fix X.509 signing with RSA-PKCS#1 to set a NULL parameters fields.
+Before, we remove the parameters field, which resulted in a slightly
+different DER encoding which in turn caused signature verification
+failures of GnuTLS-generated RSA certificates in some other
+implementations (e.g., GnuPG 2.x's gpgsm).  Depending on which RFCs
+you read, this may or may not be correct, but our new behaviour appear
+to be consistent with other widely used implementations.
+
+** Regenerate the PKIX ASN.1 syntax tree.
+For some reason, after changing the ASN.1 type of ldap-UID in the last
+release, the generated C file built from the ASN.1 schema was not
+refreshed.  This can cause problems when reading/writing UID
+components inside X.500 Distinguished Names.  Reported by devel
+<dev001@pas-world.com>.
+
+** Updated translations.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 1.6.1 (released 2006-12-28)
 
 ** Fix the list of trusted CAs that server's send to clients.
