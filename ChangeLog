@@ -1,3 +1,59 @@
+2007-09-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.0.0.
+
+2007-09-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add 1.6.x entries.
+
+2007-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Use three-digit versions.
+
+2007-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c: Use libtasn1
+	v1.1.
+
+2007-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/libtasn1.h, lib/minitasn1/structure.c: Use libtasn1
+	v1.0.
+
+2007-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Drop gnits mode.
+
+2007-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Also don't build ex-serv-anon when
+	anonymous ciphers are disabled.
+
+2007-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Don't try to build ex-client1 if
+	anonymous ciphers are disabled.
+
+2007-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-08-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.19.
