@@ -9,6 +9,8 @@ See the end for copying conditions.
 
 ** Disable building of some examples if anonymous ciphers are disabled.
 
+** Don't build examples for disabled features.
+
 * Version 1.7.19 (released 2007-08-27)
 
 ** Fix gnutls_error_is_fatal so that positive "errors" are non-critical.
