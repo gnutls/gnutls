@@ -10,6 +10,8 @@ This breaks backwards compatibility with SRP in older versions of
 GnuTLS, but this is intentional to speed up the adoption of the
 official values.  The old values we used were incorrect.
 
+** Guile: Fix `x509-certificate-dn-oid'
+
 ** API and ABI modifications:
 No changes since last version.
 
