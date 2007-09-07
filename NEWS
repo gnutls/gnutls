@@ -8,7 +8,7 @@ See the end for copying conditions.
 ** Update SRP extension type and cipher suite with official IANA values.
 This breaks backwards compatibility with SRP in older versions of
 GnuTLS, but this is intentional to speed up the adoption of the
-official values.  The old values were incorrect.
+official values.  The old values we used were incorrect.
 
 ** API and ABI modifications:
 No changes since last version.
