@@ -26,7 +26,6 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
-  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   AC_REQUIRE([AC_FUNC_FSEEKO])
   dnl Some compilers (e.g., AIX 5.3 cc) need to be in c99 mode
   dnl for the builtin va_copy to work.  With Autoconf 2.60 or later,
@@ -67,7 +66,6 @@ AC_DEFUN([gl_INIT],
   gl_STDARG_H
   gl_FUNC_STRDUP
   gl_STRING_MODULE_INDICATOR([strdup])
-  gl_HEADER_STRING_H
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -108,7 +106,6 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/GNUmakefile
   build-aux/config.rpath
   build-aux/gendocs.sh
-  build-aux/link-warning.h
   build-aux/maint.mk
   doc/fdl.texi
   doc/gendocs_template
@@ -135,13 +132,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/readline.c
   lib/readline.h
   lib/strdup.c
-  lib/string_.h
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h
   m4/arpa_inet_h.m4
   m4/error.m4
-  m4/extensions.m4
   m4/fseeko.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
@@ -160,5 +155,4 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/socklen.m4
   m4/stdarg.m4
   m4/strdup.m4
-  m4/string_h.m4
 ])
