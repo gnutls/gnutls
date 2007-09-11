@@ -56,8 +56,6 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETLINE
   gl_STDIO_MODULE_INDICATOR([getline])
   gl_FUNC_GETPASS
-  AC_SUBST([LIBINTL])
-  AC_SUBST([LTLIBINTL])
   gl_INET_NTOP
   gl_INET_PTON
   gl_FUNC_LSEEK
@@ -67,14 +65,9 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_READLINE
   gl_TYPE_SOCKLEN_T
   gl_STDARG_H
-  AM_STDBOOL_H
-  gl_STDIO_H
   gl_FUNC_STRDUP
   gl_STRING_MODULE_INDICATOR([strdup])
   gl_HEADER_STRING_H
-  gl_HEADER_SYS_SOCKET
-  AC_PROG_MKDIR_P
-  gl_UNISTD_H
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -131,7 +124,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getline.c
   lib/getpass.c
   lib/getpass.h
-  lib/gettext.h
   lib/inet_ntop.c
   lib/inet_ntop.h
   lib/inet_pton.c
@@ -142,12 +134,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/progname.h
   lib/readline.c
   lib/readline.h
-  lib/stdbool_.h
-  lib/stdio_.h
   lib/strdup.c
   lib/string_.h
-  lib/sys_socket_.h
-  lib/unistd_.h
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h
@@ -170,12 +158,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/netinet_in_h.m4
   m4/readline.m4
   m4/socklen.m4
-  m4/sockpfaf.m4
   m4/stdarg.m4
-  m4/stdbool.m4
-  m4/stdio_h.m4
   m4/strdup.m4
   m4/string_h.m4
-  m4/sys_socket_h.m4
-  m4/unistd_h.m4
 ])
