@@ -62,18 +62,13 @@ AC_DEFUN([gl_INIT],
   gl_INET_PTON
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
-  gl_FUNC_MALLOC_POSIX
-  gl_STDLIB_MODULE_INDICATOR([malloc-posix])
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_FUNC_READLINE
-  gl_FUNC_REALLOC_POSIX
-  gl_STDLIB_MODULE_INDICATOR([realloc-posix])
   gl_TYPE_SOCKLEN_T
   gl_STDARG_H
   AM_STDBOOL_H
   gl_STDIO_H
-  gl_STDLIB_H
   gl_FUNC_STRDUP
   gl_STRING_MODULE_INDICATOR([strdup])
   gl_HEADER_STRING_H
@@ -142,16 +137,13 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/inet_pton.c
   lib/inet_pton.h
   lib/lseek.c
-  lib/malloc.c
   lib/netinet_in_.h
   lib/progname.c
   lib/progname.h
   lib/readline.c
   lib/readline.h
-  lib/realloc.c
   lib/stdbool_.h
   lib/stdio_.h
-  lib/stdlib_.h
   lib/strdup.c
   lib/string_.h
   lib/sys_socket_.h
@@ -159,7 +151,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h
-  m4/absolute-header.m4
   m4/arpa_inet_h.m4
   m4/error.m4
   m4/extensions.m4
@@ -176,16 +167,13 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-link.m4
   m4/lib-prefix.m4
   m4/lseek.m4
-  m4/malloc.m4
   m4/netinet_in_h.m4
   m4/readline.m4
-  m4/realloc.m4
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdarg.m4
   m4/stdbool.m4
   m4/stdio_h.m4
-  m4/stdlib_h.m4
   m4/strdup.m4
   m4/string_h.m4
   m4/sys_socket_h.m4
