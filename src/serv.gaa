@@ -65,7 +65,10 @@ option (x509dsakeyfile) STR "FILE" { $x509_dsakeyfile = $1 } "Alternative X.509 
 option (x509dsacertfile) STR "FILE" { $x509_dsacertfile = $1 } "Alternative X.509 certificate file to use."
 
 #int require_cert;
-option (require-cert) { $require_cert = 1 } "Require a valid certificate."
+option (r, require-cert) { $require_cert = 1 } "Require a valid certificate."
+
+#int disable_client_cert;
+option (a, disable-client-cert) { $disable_client_cert = 1 } "Disable request for a client certificate."
 
 #char *psk_passwd;
 option (pskpasswd) STR "FILE" { $psk_passwd = $1 } "PSK password file to use."
@@ -106,13 +109,13 @@ option (kx) *STR "kx1 kx2..." { $kx = $1; $nkx = @1 } "Key exchange methods to e
 #char **ctype;
 option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Certificate types to enable."
 
-
 option (l, list) { print_list(0); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 option (v, version) { serv_version(); exit(0); } "prints the program's version number"
 option ( copyright) { print_serv_license(); exit(0); } "prints the program's license"
 
+INCOMP ra
 
 init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
@@ -121,7 +124,7 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $x509_crlfile = NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
-	$pgp_trustdb=NULL; $pgp_keyring=NULL; $fmtder = 0; 
+	$pgp_trustdb=NULL; $pgp_keyring=NULL; $fmtder = 0; $disable_client_cert = 0;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0; }
 
 

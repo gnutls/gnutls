@@ -59,6 +59,7 @@ static int debug;
 int verbose;
 static int nodb;
 int require_cert;
+int disable_client_cert;
 
 char *psk_passwd;
 char *srp_passwd;
@@ -478,10 +479,14 @@ initialize_session (void)
   if (cert_cred != NULL)
     gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
-  if (require_cert)
-    gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
-  else
-    gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+  if (disable_client_cert)
+    gnutls_certificate_server_set_request (session, GNUTLS_CERT_IGNORE);
+  else {
+    if (require_cert)
+      gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
+    else
+      gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+  }
 
 #ifdef ENABLE_AUTHZ
   gnutls_authz_enable (session, authz_client_formats, authz_server_formats,
@@ -1410,6 +1415,7 @@ gaa_parser (int argc, char **argv)
       exit (1);
     }
 
+  disable_client_cert = info.disable_client_cert;
   require_cert = info.require_cert;
   debug = info.debug;
   verbose = info.quiet;
