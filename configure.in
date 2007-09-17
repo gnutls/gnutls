@@ -702,6 +702,8 @@ AC_CONFIG_COMMANDS([chmod-config],[[
 AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile \
+	doc/credentials/x509/Makefile doc/credentials/srp/Makefile \
+	doc/credentials/openpgp/Makefile \
 	gl/Makefile lgl/Makefile \
 	tests/Makefile tests/rsa-md5-collision/Makefile tests/userid/Makefile \
 	tests/pkcs1-padding/Makefile tests/pkcs8-decode/Makefile \
@@ -712,7 +714,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	lib/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 	libextra/Makefile libextra/openpgp/Makefile libextra/opencdk/Makefile \
 	libextra/minilzo/Makefile tests/openpgp/Makefile \
-	src/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
+	src/Makefile \
 	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 	lib/libgnutls-config libextra/libgnutls-extra-config \
 	lib/gnutls.pc libextra/gnutls-extra.pc
