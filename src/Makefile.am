@@ -17,9 +17,9 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = README README.srptool gnutls-http-serv params.pem
+EXTRA_DIST = README README.srptool
 
-SUBDIRS = srp x509 openpgp cfg
+SUBDIRS = cfg
 
 AM_CPPFLAGS = -I../includes -I$(top_srcdir)/includes \
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl \
