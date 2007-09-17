@@ -79,6 +79,8 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_MEMMOVE
   gl_MINMAX
   gl_FUNC_READ_FILE
+  gl_FUNC_REALLOC_POSIX
+  gl_STDLIB_MODULE_INDICATOR([realloc-posix])
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
@@ -86,6 +88,7 @@ AC_DEFUN([lgl_INIT],
   AM_STDBOOL_H
   gl_STDINT_H
   gl_STDIO_H
+  gl_STDLIB_H
   gl_HEADER_STRING_H
   gl_FUNC_STRVERSCMP
   gl_HEADER_SYS_SOCKET
@@ -176,6 +179,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/printf-parse.h
   lib/read-file.c
   lib/read-file.h
+  lib/realloc.c
   lib/rijndael-alg-fst.c
   lib/rijndael-alg-fst.h
   lib/rijndael-api-fst.c
@@ -187,6 +191,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/stdbool_.h
   lib/stdint_.h
   lib/stdio_.h
+  lib/stdlib_.h
   lib/string_.h
   lib/strverscmp.c
   lib/strverscmp.h
@@ -200,6 +205,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasprintf.c
   lib/wchar_.h
   lib/xsize.h
+  m4/absolute-header.m4
   m4/alloca.m4
   m4/arcfour.m4
   m4/arctwo.m4
@@ -243,6 +249,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/lib-prefix.m4
   m4/lock.m4
   m4/longlong.m4
+  m4/malloc.m4
   m4/md2.m4
   m4/md4.m4
   m4/md5.m4
@@ -255,6 +262,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/printf-posix.m4
   m4/progtest.m4
   m4/read-file.m4
+  m4/realloc.m4
   m4/rijndael.m4
   m4/sha1.m4
   m4/size_max.m4
@@ -265,6 +273,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/stdint.m4
   m4/stdint_h.m4
   m4/stdio_h.m4
+  m4/stdlib_h.m4
   m4/string_h.m4
   m4/strverscmp.m4
   m4/sys_socket_h.m4

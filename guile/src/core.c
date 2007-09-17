@@ -2380,7 +2380,8 @@ SCM_DEFINE (scm_gnutls_x509_certificate_issuer_dn,
       if (c_oid_actual_len < c_oid_len)					\
 	c_oid = scm_realloc (c_oid, c_oid_actual_len);			\
 									\
-      result = scm_take_locale_string (c_oid);				\
+      result = scm_take_locale_stringn (c_oid,				\
+					c_oid_actual_len);		\
     }									\
 									\
   return result;
