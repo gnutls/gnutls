@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.0.1 (unreleased)
 
+** New directory doc/credentials/ with test credentials.
+This collects the test credentials from the web page and from src/.
+The script gnutls-http-serv has also been moved to that directory.
+
 ** Update SRP extension type and cipher suite with official IANA values.
 This breaks backwards compatibility with SRP in older versions of
 GnuTLS, but this is intentional to speed up the adoption of the
