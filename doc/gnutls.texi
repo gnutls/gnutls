@@ -3701,6 +3701,138 @@ After implementing these functions, together with the extension number they
 handle, they have to be registered in @code{gnutls_extensions.c} in the 
 @code{_gnutls_extensions} structure.
 
+@subsection Adding a New TLS Extension
+
+Adding support for a new TLS extension is done from time to time, and
+the process to do so is not difficult.  Here are the steps you need to
+follow if you wish to do this yourself.  For sake of discussion, let's
+consider adding support for the hypothetical TLS extension
+@code{foobar}.
+
+@enumerate
+
+@item Modify @code{configure.in} to add --enable-foobar or --disable-foobar.
+
+Which to chose depends on whether you intend to make the extension be
+enabled by default.  Look at existing checks (i.e., SRP, authz) for
+how to model the code.
+
+@item Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
+
+A good name for the value would be GNUTLS_EXTENSION_FOOBAR.  Check
+with @url{http://www.iana.org/assignments/tls-extensiontype-values}
+for allocated values.  For experiments, you could pick a number but
+remember that some consider it a bad idea to deploy such modified
+version since it will lead to interoperability problems in the future
+when the IANA allocates that number to someone else, or when the
+foobar protocol is allocated another number.
+
+@item Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
+
+A typical entry would be:
+
+@example
+  GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_FOOBAR,
+			  _gnutls_foobar_recv_params,
+			  _gnutls_foobar_send_params),
+@end example
+
+The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
+@code{gnutls_int.h} earlier.  The two functions are new functions that
+you will need to implement.
+
+@item Add a new file @code{ext_foobar.c} that implements the extension.
+
+The functions you are responsible to add are those mentioned in the
+previous step.  As a starter, you could add this:
+
+@example
+int
+_gnutls_foobar_recv_params (gnutls_session_t session,
+                            const opaque * data,
+                            size_t data_size)
+{
+  return 0;
+}
+
+int
+_gnutls_foobar_send_params (gnutls_session_t session,
+                            opaque * data,
+                            size_t _data_size)
+{
+  return 0;
+}
+@end example
+
+The @code{_gnutls_foobar_recv_params} function is responsible for
+parsing incoming extension data (both in the client and server).
+
+The @code{_gnutls_foobar_send_params} function is responsible for
+sending extension data (both in the client and server).
+
+If you receive length fields that doesn't match, return
+@code{GNUTLS_E_UNEXPECTED_PACKET_LENGTH}.  If you receive invalid
+data, return @code{GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER}.  You can use
+other error codes too.  Return 0 on success.
+
+The function typically store some information in the @code{session}
+variable for later usage.  If you need to add new fields there, check
+@code{tls_ext_st} in @code{gnutls_int.h} and compare with existing TLS
+extension specific variables.
+
+Recall that both the client and server both send and receives
+parameters, and your code most likely will need to do different things
+depending on which mode it is in.  It may be useful to make this
+distinction explicit in the code.  Thus, for example, a better
+template than above would be:
+
+
+@example
+int
+_gnutls_foobar_recv_params (gnutls_session_t session,
+                            const opaque * data,
+                            size_t data_size)
+{
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    return foobar_recv_client (session, data, data_size);
+  else
+    return foobar_recv_server (session, data, data_size);
+}
+
+int
+_gnutls_foobar_send_params (gnutls_session_t session,
+                            opaque * data,
+                            size_t data_size)
+{
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    return foobar_send_client (session, data, data_size);
+  else
+    return foobar_send_server (session, data, data_size);
+}
+@end example
+
+The functions used would be declared as @code{static} functions, of
+the appropriate prototype, in the same file.
+
+@item Add API functions to enable/disable the extension.
+
+Normally the client will have one API to request use of the extension,
+and setting some extension specific data.  The server will have one
+API to let the library know that it is willing to accept the
+extension, often this is implemented through a callback but it doesn't
+have to.
+
+The APIs need to be added to @code{includes/gnutls/gnutls.h} or
+@code{includes/gnutls/extra.h} as appropriate.  It is recommended that
+if you don't have a requirement to use the LGPL license for your
+extension, that you place your work under the GPL license and thus in
+the libgnutls-extra library.
+
+You can implement the API function in the @code{ext_foobar.c} file, or
+if that file ends up becoming rather larger, add a
+@code{gnutls_foobar.c} file.
+
+@end enumerate
 
 @section Certificate Handling
 What is provided by the certificate handling functions
