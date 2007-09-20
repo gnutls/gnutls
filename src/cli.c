@@ -536,6 +536,11 @@ init_tls_session (const char *hostname)
 		       authz_recv_callback, authz_send_callback);
 #endif
 
+#ifdef ENABLE_OPRFI
+  gnutls_oprfi_enable_client (session, strlen (info.opaque_prf_input),
+			      info.opaque_prf_input);
+#endif
+
   return session;
 }
 

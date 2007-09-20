@@ -110,6 +110,9 @@ option (authz-x509-attr-cert) STR "FILE" { $authz_x509_attr_cert = $1 } "Use X.5
 #char *authz_saml_assertion;
 option (authz-saml-assertion) STR "FILE" { $authz_saml_assertion = $1 } "Use SAML Assertion in FILE as authorization data."
 
+#char *opaque_prf_input;
+option (opaque-prf-input) STR "DATA" { $opaque_prf_input = $1 } "Use Opaque PRF Input DATA."
+
 #char *port;
 option (p, port) STR "PORT" { $port = $1 } "The port to connect to."
 

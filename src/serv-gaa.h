@@ -8,30 +8,32 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 109 "serv.gaa"
+#line 112 "serv.gaa"
 	char **ctype;
-#line 108 "serv.gaa"
+#line 111 "serv.gaa"
 	int nctype;
-#line 105 "serv.gaa"
+#line 108 "serv.gaa"
 	char **kx;
-#line 104 "serv.gaa"
+#line 107 "serv.gaa"
 	int nkx;
-#line 101 "serv.gaa"
+#line 104 "serv.gaa"
 	char **macs;
-#line 100 "serv.gaa"
+#line 103 "serv.gaa"
 	int nmacs;
-#line 97 "serv.gaa"
+#line 100 "serv.gaa"
 	char **comp;
-#line 96 "serv.gaa"
+#line 99 "serv.gaa"
 	int ncomp;
-#line 93 "serv.gaa"
+#line 96 "serv.gaa"
 	char **proto;
-#line 92 "serv.gaa"
+#line 95 "serv.gaa"
 	int nproto;
-#line 89 "serv.gaa"
+#line 92 "serv.gaa"
 	char **ciphers;
-#line 88 "serv.gaa"
+#line 91 "serv.gaa"
 	int nciphers;
+#line 88 "serv.gaa"
+	char *opaque_prf_input;
 #line 85 "serv.gaa"
 	char *authz_saml_assertion;
 #line 82 "serv.gaa"

@@ -434,6 +434,32 @@ authz_recv_callback (gnutls_session_t session,
 }
 #endif
 
+#if ENABLE_OPRFI
+int
+oprfi_callback (gnutls_session_t session,
+		void *userdata,
+		size_t oprfi_len,
+		const unsigned char *in_oprfi,
+		unsigned char *out_oprfi)
+{
+  size_t ourlen = strlen (info.opaque_prf_input);
+  size_t i;
+
+  printf ("- Received Opaque PRF data of %d bytes\n", oprfi_len);
+  printf ("  data: ");
+  for (i = 0; oprfi_len; i++)
+    {
+      printf ("%02x", in_oprfi[i]);
+    }
+  printf ("\n");
+
+  memset(out_oprfi, 0, oprfi_len);
+  strncpy (out_oprfi, info.opaque_prf_input, oprfi_len);
+
+  return 0;
+}
+#endif
+
 gnutls_session_t
 initialize_session (void)
 {
@@ -491,6 +517,10 @@ initialize_session (void)
 #ifdef ENABLE_AUTHZ
   gnutls_authz_enable (session, authz_client_formats, authz_server_formats,
 		       authz_recv_callback, authz_send_callback);
+#endif
+
+#ifdef ENABLE_OPRFI
+  gnutls_oprfi_enable_server (session, oprfi_callback, NULL);
 #endif
 
   return session;
