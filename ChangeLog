@@ -1,3 +1,195 @@
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target (git-tag no longer exit with
+	failure for non-existing tags).
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.0.1.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Improve TLS ext section.
+
+2007-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc4346-bis-05.txt: Add.
+
+2007-09-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Notes on adding a new TLS extension.
+
+2007-09-17  Simon Josefsson <simon@josefsson.org>
+
+	Merge branch 'master' of git+ssh://repo.or.cz/srv/git/gnutls
+
+2007-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix.
+
+2007-09-17  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	Merge branch 'master' of git://repo.or.cz/gnutls
+
+2007-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Rename.
+
+2007-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/credentials/Makefile.am,
+	doc/credentials/ca.tmpl, doc/credentials/client.tmpl,
+	doc/credentials/gnutls-http-serv,
+	doc/credentials/openpgp-server-key.bin,
+	doc/credentials/openpgp-server-key.txt,
+	doc/credentials/openpgp-server.bin,
+	doc/credentials/openpgp-server.txt,
+	doc/credentials/openpgp/Makefile.am,
+	doc/credentials/openpgp/cli_pub.asc,
+	doc/credentials/openpgp/cli_ring.asc,
+	doc/credentials/openpgp/cli_ring.gpg,
+	doc/credentials/openpgp/cli_sec.asc,
+	doc/credentials/openpgp/pub.asc, doc/credentials/openpgp/sec.asc,
+	doc/credentials/params.pem, doc/credentials/proxy.tmpl,
+	doc/credentials/psk-passwd.txt, doc/credentials/server.tmpl,
+	doc/credentials/srp-passwd.txt, doc/credentials/srp-tpasswd.conf,
+	doc/credentials/srp/Makefile.am, doc/credentials/srp/tpasswd,
+	doc/credentials/srp/tpasswd.conf, doc/credentials/x509-ca-key.pem,
+	doc/credentials/x509-ca.crt, doc/credentials/x509-ca.pem,
+	doc/credentials/x509-client-key.pem,
+	doc/credentials/x509-client.crt, doc/credentials/x509-client.p12,
+	doc/credentials/x509-client.pem, doc/credentials/x509-other-ca.pem,
+	doc/credentials/x509-proxy-key.pem, doc/credentials/x509-proxy.crt,
+	doc/credentials/x509-proxy.pem,
+	doc/credentials/x509-server-dsa.crt,
+	doc/credentials/x509-server-dsa.pem,
+	doc/credentials/x509-server-key-dsa.pem,
+	doc/credentials/x509-server-key.pem,
+	doc/credentials/x509-server.crt, doc/credentials/x509-server.pem,
+	doc/credentials/x509-trust.pem, doc/credentials/x509/Makefile.am,
+	doc/credentials/x509/ca.pem, doc/credentials/x509/cert-dsa.pem,
+	doc/credentials/x509/cert.pem,
+	doc/credentials/x509/clicert-dsa.pem,
+	doc/credentials/x509/clicert.pem,
+	doc/credentials/x509/clikey-dsa.pem,
+	doc/credentials/x509/clikey.pem, doc/credentials/x509/key-dsa.pem,
+	doc/credentials/x509/key.pem, src/Makefile.am,
+	src/gnutls-http-serv, src/openpgp/Makefile.am,
+	src/openpgp/cli_pub.asc, src/openpgp/cli_ring.asc,
+	src/openpgp/cli_ring.gpg, src/openpgp/cli_sec.asc,
+	src/openpgp/pub.asc, src/openpgp/sec.asc, src/params.pem,
+	src/srp/Makefile.am, src/srp/tpasswd, src/srp/tpasswd.conf,
+	src/x509/Makefile.am, src/x509/ca.pem, src/x509/cert-dsa.pem,
+	src/x509/cert.pem, src/x509/clicert-dsa.pem, src/x509/clicert.pem,
+	src/x509/clikey-dsa.pem, src/x509/clikey.pem, src/x509/key-dsa.pem,
+	src/x509/key.pem: Move test credentials from src/ to
+	doc/credentials/.
+
+2007-09-17  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	Merge branch 'master' of git://repo.or.cz/gnutls
+
+2007-09-17  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/serv-gaa.c, src/serv-gaa.h, src/serv.c, src/serv.gaa: Added
+	the --disable-client-cert option, to prevent the server asking the
+	client for a certificate.
+
+2007-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/extensions.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/string_h.m4, gl/string_.h: Remove
+	duplicate gnulib modules.
+
+2007-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gettext.h, gl/gnulib.mk, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/sockpfaf.m4, gl/m4/stdbool.m4,
+	gl/m4/stdio_h.m4, gl/m4/sys_socket_h.m4, gl/m4/unistd_h.m4,
+	gl/stdbool_.h, gl/stdio_.h, gl/sys_socket_.h, gl/unistd_.h: Remove
+	duplicate gnulib modules.
+
+2007-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Update
+	gnulib files.
+
+2007-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/absolute-header.m4: Update gnulib files.
+
+2007-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/malloc.m4, lgl/m4/realloc.m4, lgl/m4/stdlib_h.m4,
+	lgl/realloc.c, lgl/stdlib_.h: Add.
+
+2007-09-04  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/core.c: Guile: Fix `x509-certificate-dn-oid' and related
+	functions.  * guile/src/core.c
+	(X509_CERTIFICATE_DN_OID_FUNCTION_BODY): Use
+	`scm_take_locale_stringn ()' instead of `scm_take_locale_string ()'.
+	* NEWS: Update.  Signed-off-by: Simon Josefsson
+	<simon@josefsson.org>
+
+2007-09-04  Ludovic Courtès <ludo@gnu.org>
+
+	* NEWS: Guile: Fix `x509-certificate-dn-oid' and related functions.
+	* guile/src/core.c (X509_CERTIFICATE_DN_OID_FUNCTION_BODY): Use
+	`scm_take_locale_stringn ()' instead of `scm_take_locale_string ()'.
+	* NEWS: Update.  Signed-off-by: Simon Josefsson
+	<simon@josefsson.org>
+
+2007-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/gnulib-comp.m4, lgl/Makefile.am,
+	lgl/m4/gnulib-comp.m4, lgl/m4/time_h.m4: Update gnulib files.
+
+2007-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* .cvsignore, build-aux/.cvsignore, doc/.cvsignore,
+	doc/examples/.cvsignore, doc/manpages/.cvsignore,
+	doc/reference/.cvsignore, doc/reference/tmpl/.cvsignore,
+	doc/scripts/.cvsignore, gl/.cvsignore, includes/.cvsignore,
+	includes/gnutls/.cvsignore, lgl/.cvsignore, lib/.cvsignore,
+	lib/minitasn1/.cvsignore, lib/x509/.cvsignore, libextra/.cvsignore,
+	libextra/minilzo/.cvsignore, libextra/opencdk/.cvsignore,
+	libextra/openpgp/.cvsignore, m4/.cvsignore, po/.cvsignore,
+	src/.cvsignore, src/cfg/.cvsignore, src/cfg/platon/.cvsignore,
+	src/cfg/platon/str/.cvsignore, src/openpgp/.cvsignore,
+	src/srp/.cvsignore, src/x509/.cvsignore, tests/.cvsignore,
+	tests/hostname-check/.cvsignore, tests/key-id/.cvsignore,
+	tests/nist-pkits/.cvsignore, tests/pathlen/.cvsignore,
+	tests/pkcs1-padding/.cvsignore, tests/pkcs12-decode/.cvsignore,
+	tests/pkcs8-decode/.cvsignore, tests/rsa-md5-collision/.cvsignore,
+	tests/sha2/.cvsignore, tests/userid/.cvsignore,
+	tests/x509paths/.cvsignore: Remove .cvsignore's.
+
+2007-09-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2007-09-07  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-09-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_algorithms.c, lib/gnutls_int.h: Use official IANA
+	values for SRP.
+
+2007-09-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: TLS/IA example uses anonymous ciphers.
+
+2007-09-04  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-09-04  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.0.0.
