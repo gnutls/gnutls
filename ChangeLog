@@ -1,5 +1,104 @@
 2007-09-20  Simon Josefsson <simon@josefsson.org>
 
+	* NEWS: Version 2.1.0.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Move CFLAGS setting further down, to make AC_PROG_CC
+	add -g to it.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli-gaa.c, src/serv-gaa.c: Generated.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.gaa: Set variables to NULL.  Fix oprfi variable.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.gaa: Set variables to NULL.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_oprfi.c: Fix crash.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_oprfi.c: Fix crash.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Fix infloop.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Fix crash.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Fix crash.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli-gaa.c, src/cli-gaa.h, src/cli.c, src/cli.gaa,
+	src/serv-gaa.c, src/serv-gaa.h, src/serv.c, src/serv.gaa: Support
+	Opaque PRF Input in gnutls-cli and gnutls-serv.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention how to enable oprfi support.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Typo.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Document more.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_oprfi.c: Doc fix.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, doc/gnutls.texi, includes/gnutls/gnutls.h.in,
+	lib/Makefile.am, lib/ext_oprfi.c, lib/ext_oprfi.h,
+	lib/gnutls_extensions.c, lib/gnutls_int.h, lib/gnutls_kx.c,
+	tests/Makefile.am, tests/oprfi.c: Support for Opaque PRF Input TLS
+	extension.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add configure.in snippet to TLS ext section.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Typo.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Fix -I's.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
 	* Makefile.am: Fix release target (git-tag no longer exit with
 	failure for non-existing tags).
 
