@@ -520,7 +520,8 @@ initialize_session (void)
 #endif
 
 #ifdef ENABLE_OPRFI
-  gnutls_oprfi_enable_server (session, oprfi_callback, NULL);
+  if (info.opaque_prf_input)
+    gnutls_oprfi_enable_server (session, oprfi_callback, NULL);
 #endif
 
   return session;
