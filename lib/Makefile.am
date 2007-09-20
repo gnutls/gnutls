@@ -59,6 +59,8 @@ SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 
 PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c auth_dhe_psk.c
 
+OPRFI_COBJECTS = ext_oprfi.c
+
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_buffers.c gnutls_handshake.c gnutls_num.c		\
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c	\
@@ -81,7 +83,7 @@ COBJECTS += ext_authz.c
 endif
 
 if ENABLE_OPRFI
-COBJECTS += ext_oprfi.c
+COBJECTS += $(OPRFI_COBJECTS)
 endif
 
 HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
@@ -156,9 +158,9 @@ pkix_asn1_tab.c: pkix.asn
 gnutls_asn1_tab.c: gnutls.asn
 	-asn1Parser gnutls.asn gnutls_asn1_tab.c
 
-gnutls-api.texi: $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS)
+gnutls-api.texi: $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS) $(OPRFI_COBJECTS)
 	@echo "" > gnutls-api.texi
-	@for i in $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS); do \
+	@for i in $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS) $(OPRFI_COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
 		$(top_srcdir)/doc/scripts/gdoc -texinfo $$i >> gnutls-api.texi && \
 		echo "ok"; \
