@@ -33,6 +33,7 @@
 #include "ext_max_record.h"
 #include <ext_cert_type.h>
 #include <ext_server_name.h>
+#include <ext_oprfi.h>
 #include <ext_srp.h>
 #include <ext_inner_application.h>
 #include <ext_authz.h>
@@ -64,6 +65,11 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_SERVER_NAME,
 			  _gnutls_server_name_recv_params,
 			  _gnutls_server_name_send_params),
+#ifdef ENABLE_OPRFI
+  GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_OPAQUE_PRF_INPUT,
+			  _gnutls_oprfi_recv_params,
+			  _gnutls_oprfi_send_params),
+#endif
 #ifdef ENABLE_SRP
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_SRP,
 			  _gnutls_srp_recv_params,

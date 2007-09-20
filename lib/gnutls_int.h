@@ -144,6 +144,9 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_AUTHZ_CLIENT = 7,
   GNUTLS_EXTENSION_AUTHZ_SERVER = 8,
   GNUTLS_EXTENSION_CERT_TYPE = 9,
+#ifdef ENABLE_OPRFI
+  GNUTLS_EXTENSION_OPAQUE_PRF_INPUT = ENABLE_OPRFI,
+#endif
   GNUTLS_EXTENSION_SRP = 12,
   GNUTLS_EXTENSION_INNER_APPLICATION = 37703
 } extensions_t;
@@ -284,6 +287,14 @@ typedef struct
   gnutls_authz_recv_callback_func authz_recv_callback;
   gnutls_authz_send_callback_func authz_send_callback;
   gnutls_buffer authz_data;
+
+  /* Opaque PRF input. */
+  gnutls_oprfi_callback_func oprfi_cb;
+  void *oprfi_userdata;
+  opaque *oprfi_client;
+  uint16_t oprfi_client_len;
+  opaque *oprfi_server;
+  uint16_t oprfi_server_len;
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 

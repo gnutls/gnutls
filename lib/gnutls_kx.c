@@ -59,12 +59,7 @@ static int
 generate_normal_master (gnutls_session_t session, int keep_premaster)
 {
   int ret = 0;
-  opaque rnd[2 * TLS_RANDOM_SIZE + 1];
   char buf[512];
-
-  memcpy (rnd, session->security_parameters.client_random, TLS_RANDOM_SIZE);
-  memcpy (&rnd[TLS_RANDOM_SIZE],
-	  session->security_parameters.server_random, TLS_RANDOM_SIZE);
 
   _gnutls_hard_log ("INT: PREMASTER SECRET[%d]: %s\n", PREMASTER.size,
 		    _gnutls_bin2hex (PREMASTER.data, PREMASTER.size, buf,
@@ -78,6 +73,12 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 
   if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
     {
+      opaque rnd[2 * TLS_RANDOM_SIZE + 1];
+
+      memcpy (rnd, session->security_parameters.client_random, TLS_RANDOM_SIZE);
+      memcpy (&rnd[TLS_RANDOM_SIZE],
+	      session->security_parameters.server_random, TLS_RANDOM_SIZE);
+
       ret =
 	_gnutls_ssl3_generate_random (PREMASTER.data, PREMASTER.size,
 				      rnd, 2 * TLS_RANDOM_SIZE,
@@ -86,8 +87,69 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 				      master_secret);
 
     }
+  else if (session->security_parameters.extensions.oprfi_client_len > 0 &&
+	   session->security_parameters.extensions.oprfi_server_len > 0)
+    {
+      opaque *rnd;
+      size_t rndlen = 2 * TLS_RANDOM_SIZE;
+
+      rndlen += session->security_parameters.extensions.oprfi_client_len;
+      rndlen += session->security_parameters.extensions.oprfi_server_len;
+
+      rnd = gnutls_malloc (rndlen + 1);
+      if (!rnd)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      _gnutls_hard_log ("INT: CLIENT OPRFI[%d]: %s\n",
+			session->security_parameters.
+			extensions.oprfi_server_len,
+			_gnutls_bin2hex (session->security_parameters.
+					 extensions.oprfi_client,
+					 session->security_parameters.
+					 extensions.oprfi_client_len,
+					 buf, sizeof (buf)));
+      _gnutls_hard_log ("INT: SERVER OPRFI[%d]: %s\n",
+			session->security_parameters.
+			extensions.oprfi_server_len,
+			_gnutls_bin2hex (session->security_parameters.
+					 extensions.oprfi_server,
+					 session->security_parameters.
+					 extensions.oprfi_server_len,
+					 buf, sizeof (buf)));
+
+      memcpy (rnd, session->security_parameters.client_random,
+	      TLS_RANDOM_SIZE);
+      memcpy (rnd + TLS_RANDOM_SIZE,
+	      session->security_parameters.extensions.oprfi_client,
+	      session->security_parameters.extensions.oprfi_client_len);
+      memcpy (rnd + TLS_RANDOM_SIZE +
+	      session->security_parameters.extensions.oprfi_client_len,
+	      session->security_parameters.server_random,
+	      TLS_RANDOM_SIZE);
+      memcpy (rnd + TLS_RANDOM_SIZE +
+	      session->security_parameters.extensions.oprfi_client_len +
+	      TLS_RANDOM_SIZE,
+	      session->security_parameters.extensions.oprfi_server,
+	      session->security_parameters.extensions.oprfi_server_len);
+
+      ret = _gnutls_PRF (session, PREMASTER.data, PREMASTER.size,
+			 MASTER_SECRET, strlen (MASTER_SECRET),
+			 rnd, rndlen, TLS_MASTER_SIZE,
+			 session->security_parameters.master_secret);
+
+      gnutls_free (rnd);
+    }
   else
     {
+      opaque rnd[2 * TLS_RANDOM_SIZE + 1];
+
+      memcpy (rnd, session->security_parameters.client_random, TLS_RANDOM_SIZE);
+      memcpy (&rnd[TLS_RANDOM_SIZE],
+	      session->security_parameters.server_random, TLS_RANDOM_SIZE);
+
       ret =
 	_gnutls_PRF (session, PREMASTER.data, PREMASTER.size,
 		     MASTER_SECRET, strlen (MASTER_SECRET),

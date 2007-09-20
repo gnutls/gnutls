@@ -448,6 +448,26 @@ extern "C"
 			      void *data, size_t * data_length,
 			      unsigned int *type, unsigned int indx);
 
+  /* Opaque PRF Input
+   * http://tools.ietf.org/id/draft-rescorla-tls-opaque-prf-input-00.txt
+   */
+
+  void
+  gnutls_oprfi_enable_client (gnutls_session_t session,
+			      size_t len,
+			      unsigned char *data);
+
+  typedef int (*gnutls_oprfi_callback_func) (gnutls_session_t session,
+					     void *userdata,
+					     size_t oprfi_len,
+					     const unsigned char *in_oprfi,
+					     unsigned char *out_oprfi);
+
+  void
+  gnutls_oprfi_enable_server (gnutls_session_t session,
+			      gnutls_oprfi_callback_func cb,
+			      void *userdata);
+
   /* Supplemental data, RFC 4680. */
   typedef enum
     {

@@ -43,6 +43,9 @@ if HAVE_FORK
 ctests +=  x509self x509signself anonself pskself dhepskself tlsia resume
 tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) @LTLIBREADLINE@
 endif
+if ENABLE_OPRFI
+ctests +=  oprfi
+endif
 gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
 check_PROGRAMS = $(ctests)

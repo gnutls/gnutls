@@ -80,6 +80,10 @@ if ENABLE_AUTHZ
 COBJECTS += ext_authz.c
 endif
 
+if ENABLE_OPRFI
+COBJECTS += ext_oprfi.c
+endif
+
 HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
@@ -95,7 +99,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	ext_inner_application.h gnutls_extra_hooks.h			\
-	gnutls_supplemental.h ext_authz.h
+	gnutls_supplemental.h ext_authz.h ext_oprfi.h
 
 # Separate so we can create the documentation
 

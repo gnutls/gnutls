@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.1.0 (unreleased)
 
+** Support for draft-rescorla-tls-opaque-prf-input-00.txt.
+
 ** Example code: Fix compilation flaw under MinGW.
 
 ** API and ABI modifications:
