@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
-* Version 2.1.0 (unreleased)
+* Version 2.1.0 (released 2007-09-20)
 
 ** Support for draft-rescorla-tls-opaque-prf-input-00.txt.
 The support is disabled by default.  Since no value has been allocated
