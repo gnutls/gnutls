@@ -6,6 +6,9 @@ See the end for copying conditions.
 * Version 2.1.0 (unreleased)
 
 ** Support for draft-rescorla-tls-opaque-prf-input-00.txt.
+The support is disabled by default.  Since no value has been allocated
+by the IANA for this extension yet, you will need to provide one
+yourself by invoking './configure --enable-opaque-prf-input=42'.
 
 ** Example code: Fix compilation flaw under MinGW.
 
