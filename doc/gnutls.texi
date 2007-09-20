@@ -3820,9 +3820,9 @@ When adding the files, you'll need to add them to @code{Makefile.am}
 as well, for example:
 
 @example
-if ENABLE_AUTHZ
-COBJECTS += ext_authz.c
-HFILES += ext_authz.h
+if ENABLE_FOOBAR
+COBJECTS += ext_foobar.c
+HFILES += ext_foobar.h
 endif
 @end example
 
