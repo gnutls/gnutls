@@ -537,8 +537,9 @@ init_tls_session (const char *hostname)
 #endif
 
 #ifdef ENABLE_OPRFI
-  gnutls_oprfi_enable_client (session, strlen (info.opaque_prf_input),
-			      info.opaque_prf_input);
+  if (info.opaque_prf_input)
+    gnutls_oprfi_enable_client (session, strlen (info.opaque_prf_input),
+				info.opaque_prf_input);
 #endif
 
   return session;
