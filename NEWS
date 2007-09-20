@@ -3,6 +3,13 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 2.1.0 (unreleased)
+
+** Example code: Fix compilation flaw under MinGW.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.0.1 (released 2007-09-20)
 
 ** New directory doc/credentials/ with test credentials.
