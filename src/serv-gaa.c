@@ -151,7 +151,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "srppasswdconf", "FILE ", "SRP password conf file to use.");
 	__gaa_helpsingle(0, "authz-x509-attr-cert", "FILE ", "Use X.509 Attribute Certificate in FILE as authorization data.");
 	__gaa_helpsingle(0, "authz-saml-assertion", "FILE ", "Use SAML Assertion in FILE as authorization data.");
-	__gaa_helpsingle(0, "opaque_prf_input", "DATA ", "Use Opaque PRF Input DATA.");
+	__gaa_helpsingle(0, "opaque-prf-input", "DATA ", "Use Opaque PRF Input DATA.");
 	__gaa_helpsingle(0, "ciphers", "cipher1 cipher2... ", "Ciphers to enable.");
 	__gaa_helpsingle(0, "protocols", "protocol1 protocol2... ", "Protocols to enable.");
 	__gaa_helpsingle(0, "comp", "comp1 comp2... ", "Compression methods to enable.");
@@ -762,7 +762,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("comp", GAAOPTID_comp);
 			GAA_CHECKSTR("protocols", GAAOPTID_protocols);
 			GAA_CHECKSTR("ciphers", GAAOPTID_ciphers);
-			GAA_CHECKSTR("opaque_prf_input", GAAOPTID_opaque_prf_input);
+			GAA_CHECKSTR("opaque-prf-input", GAAOPTID_opaque_prf_input);
 			GAA_CHECKSTR("authz-saml-assertion", GAAOPTID_authz_saml_assertion);
 			GAA_CHECKSTR("authz-x509-attr-cert", GAAOPTID_authz_x509_attr_cert);
 			GAA_CHECKSTR("srppasswdconf", GAAOPTID_srppasswdconf);
@@ -1200,8 +1200,11 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->x509_keyfile=NULL; gaaval->x509_certfile=NULL; gaaval->x509_crlfile = NULL;
 	gaaval->x509_dsakeyfile=NULL; gaaval->x509_dsacertfile=NULL; 
 	gaaval->srp_passwd=NULL; gaaval->srp_passwd_conf=NULL; gaaval->quiet = 0;
-	gaaval->pgp_trustdb=NULL; gaaval->pgp_keyring=NULL; gaaval->fmtder = 0; gaaval->disable_client_cert = 0;
-	gaaval->dh_params_file=NULL; gaaval->debug=0; gaaval->require_cert = 0; gaaval->psk_passwd = 0; ;};
+	gaaval->pgp_trustdb=NULL; gaaval->pgp_keyring=NULL; gaaval->fmtder = 0;
+	gaaval->disable_client_cert = 0;
+	gaaval->dh_params_file=NULL; gaaval->debug=0; gaaval->require_cert = 0; gaaval->psk_passwd = 0;
+	gaaval->authz_x509_attr_cert = NULL; gaaval->authz_saml_assertion = NULL;
+	gaaval->opaque_prf_input=NULL; ;};
 
     }
     inited = 1;

@@ -1226,7 +1226,9 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->x509_keyfile=NULL; gaaval->x509_certfile=NULL; gaaval->crlf = 0; gaaval->xml = 0;
 	gaaval->srp_username=NULL; gaaval->srp_passwd=NULL; gaaval->fmtder = 0; gaaval->starttls =0; 
 	gaaval->debug = 0; gaaval->print_cert = 0; gaaval->verbose = 0; gaaval->psk_key = NULL; 
-	gaaval->psk_username = NULL; ;};
+	gaaval->psk_username = NULL; 
+	gaaval->authz_x509_attr_cert = NULL; gaaval->authz_saml_assertion = NULL;
+	gaaval->opaque_prf_input = NULL; ;};
 
     }
     inited = 1;
