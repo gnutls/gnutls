@@ -158,6 +158,9 @@ oprfi_send_server (gnutls_session_t session,
   ssize_t data_size = _data_size;
   size_t len;
 
+  if (!session->security_parameters.extensions.oprfi_cb)
+    return 0;
+
   /* Allocate buffer for outgoing data. */
   session->security_parameters.extensions.oprfi_server_len =
     session->security_parameters.extensions.oprfi_client_len;
