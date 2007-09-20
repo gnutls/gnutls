@@ -46,7 +46,7 @@ tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
 htmldir = ../www-$(PACKAGE)
 
 release:
-	! git-tag -l $(tag) > /dev/null
+	! git-tag -l $(tag) | grep $(PACKAGE) > /dev/null
 	rm -f ChangeLog
 	$(MAKE) ChangeLog distcheck
 	git commit -m Generated. ChangeLog
