@@ -20,6 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes \
+		-I$(top_srcdir)/lgl -I$(top_builddir)/lgl \
 		-I$(top_srcdir)/gl -I$(top_builddir)/gl
 AM_LDFLAGS = -no-install
 LDADD = libexamples.la \
