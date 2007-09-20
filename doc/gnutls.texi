@@ -1983,6 +1983,7 @@ else!
 * Server examples::
 * Miscellaneous examples::
 * Compatibility with the OpenSSL library::
+* Opaque PRF Input TLS Extension::
 @end menu
 
 @node Preparation
@@ -2399,8 +2400,8 @@ Current limitations imposed by the compatibility layer include:
 
 @end itemize
 
-@node Support for Opaque PRF Input extension
-@section Support for Opaque PRF Input extension
+@node Opaque PRF Input TLS Extension
+@section Opaque PRF Input TLS Extension
 @cindex Opaque PRF Input
 
 GnuTLS supports the Opaque PRF Input TLS extension
