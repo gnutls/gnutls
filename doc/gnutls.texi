@@ -3711,7 +3711,7 @@ consider adding support for the hypothetical TLS extension
 
 @enumerate
 
-@item Modify @code{configure.in} to add --enable-foobar or --disable-foobar.
+@item Modify @code{configure.in} to add @code{--enable-foobar} or @code{--disable-foobar}.
 
 Which to chose depends on whether you intend to make the extension be
 enabled by default.  Look at existing checks (i.e., SRP, authz) for
@@ -3732,16 +3732,19 @@ foobar protocol is allocated another number.
 A typical entry would be:
 
 @example
+#if ENABLE_FOOBAR
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_FOOBAR,
 			  _gnutls_foobar_recv_params,
 			  _gnutls_foobar_send_params),
+#endif
 @end example
 
 The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
 @code{gnutls_int.h} earlier.  The two functions are new functions that
-you will need to implement.
+you will need to implement, most likely you'll need to add an
+@code{#include "ext_foobar.h"} as well.
 
-@item Add a new file @code{ext_foobar.c} that implements the extension.
+@item Add new files @code{ext_foobar.c} and @code{ext_foobar.h} that implements the extension.
 
 The functions you are responsible to add are those mentioned in the
 previous step.  As a starter, you could add this:
@@ -3751,17 +3754,17 @@ int
 _gnutls_foobar_recv_params (gnutls_session_t session,
                             const opaque * data,
                             size_t data_size)
-{
+@{
   return 0;
-}
+@}
 
 int
 _gnutls_foobar_send_params (gnutls_session_t session,
                             opaque * data,
                             size_t _data_size)
-{
+@{
   return 0;
-}
+@}
 @end example
 
 The @code{_gnutls_foobar_recv_params} function is responsible for
@@ -3786,33 +3789,42 @@ depending on which mode it is in.  It may be useful to make this
 distinction explicit in the code.  Thus, for example, a better
 template than above would be:
 
-
 @example
 int
 _gnutls_foobar_recv_params (gnutls_session_t session,
                             const opaque * data,
                             size_t data_size)
-{
+@{
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     return foobar_recv_client (session, data, data_size);
   else
     return foobar_recv_server (session, data, data_size);
-}
+@}
 
 int
 _gnutls_foobar_send_params (gnutls_session_t session,
                             opaque * data,
                             size_t data_size)
-{
+@{
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     return foobar_send_client (session, data, data_size);
   else
     return foobar_send_server (session, data, data_size);
-}
+@}
 @end example
 
 The functions used would be declared as @code{static} functions, of
 the appropriate prototype, in the same file.
+
+When adding the files, you'll need to add them to @code{Makefile.am}
+as well, for example:
+
+@example
+if ENABLE_AUTHZ
+COBJECTS += ext_authz.c
+HFILES += ext_authz.h
+endif
+@end example
 
 @item Add API functions to enable/disable the extension.
 
