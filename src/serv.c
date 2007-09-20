@@ -447,10 +447,8 @@ oprfi_callback (gnutls_session_t session,
 
   printf ("- Received Opaque PRF data of %d bytes\n", oprfi_len);
   printf ("  data: ");
-  for (i = 0; oprfi_len; i++)
-    {
-      printf ("%02x", in_oprfi[i]);
-    }
+  for (i = 0; i < oprfi_len; i++)
+    printf ("%02x", in_oprfi[i]);
   printf ("\n");
 
   memset(out_oprfi, 0, oprfi_len);
