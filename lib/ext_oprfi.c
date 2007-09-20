@@ -207,6 +207,19 @@ _gnutls_oprfi_send_params (gnutls_session_t session,
     return oprfi_send_server (session, data, data_size);
 }
 
+/**
+ * gnutls_oprfi_enable_client:
+ * @session: is a #gnutls_session_t structure.
+ * @len: length of Opaque PRF data to use in client.
+ * @data: Opaque PRF data to use in client.
+ *
+ * Request that the client should attempt to negotiate the Opaque PRF
+ * Input TLS extension, using the given data as the client's Opaque
+ * PRF input.
+ *
+ * The data is copied into the session context after this call, so you
+ * may de-allocate it immediately after calling this function.
+ **/
 void
 gnutls_oprfi_enable_client (gnutls_session_t session,
 			    size_t len,
@@ -216,7 +229,26 @@ gnutls_oprfi_enable_client (gnutls_session_t session,
   session->security_parameters.extensions.oprfi_client = data;
 }
 
-
+/**
+ * gnutls_oprfi_enable_server:
+ * @session: is a #gnutls_session_t structure.
+ * @cb: function pointer to Opaque PRF extension server callback.
+ * @userdata: hook passed to callback function for passing application state.
+ *
+ * Request that the server should attempt to accept the Opaque PRF
+ * Input TLS extension.  If the client requests the extension, the
+ * provided callback @cb will be invoked.  The callback must have the
+ * following prototype:
+ *
+ * int callback (gnutls_session_t session, void *userdata,
+ *               size_t oprfi_len, const unsigned char *in_oprfi,
+ *               unsigned char *out_oprfi);
+ *
+ * The callback can inspect the client-provided data in the input
+ * parameters, and specify its own opaque prf input data in the output
+ * variable.  The function must return 0 on success, otherwise the
+ * handshake will be aborted.
+ **/
 void
 gnutls_oprfi_enable_server (gnutls_session_t session,
 			    gnutls_oprfi_callback_func cb,
