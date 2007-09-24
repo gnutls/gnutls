@@ -448,21 +448,25 @@ AM_CONDITIONAL(ENABLE_AUTHZ, test "$ac_enable_authz" != "no")
 
 dnl Check for Camellia support
 dnl
-AC_MSG_CHECKING([for Camellia support in libgcrypt])
 AC_ARG_ENABLE(camellia,
 	AS_HELP_STRING([--disable-camellia], [disable Camellia cipher]),
 	ac_enable_camellia=no)
-if test "$ac_enable_authz" != "no" && \
-   test -n "`$LIBGCRYPT_CONFIG --algorithms | grep -i camellia`"; then
-  ac_enable_camellia=yes
-else
-  ac_enable_camellia=no
+if test "$ac_enable_camellia" != "no"; then
+  AC_MSG_CHECKING([for Camellia support in libgcrypt])
+  if test -n "`$LIBGCRYPT_CONFIG --algorithms | grep -i camellia`"; then
+    AC_MSG_RESULT([yes])
+    ac_enable_camellia=yes
+  else
+    AC_MSG_RESULT([no])
+    ac_enable_camellia=no
+  fi
 fi
+AC_MSG_CHECKING([whether to disable Camellia cipher])
 if test "$ac_enable_camellia" = "yes"; then
- AC_MSG_RESULT([yes])
+ AC_MSG_RESULT([no])
  AC_DEFINE(ENABLE_CAMELLIA, 1, [enable camellia block cipher])
 else
- AC_MSG_RESULT([no])
+ AC_MSG_RESULT([yes])
 fi
 
 AC_MSG_CHECKING([whether to disable extra PKI stuff])
