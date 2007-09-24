@@ -458,7 +458,7 @@ if test "$ac_enable_authz" != "no" && \
 else
   ac_enable_camellia=no
 fi
-if test "$ac_enable_camellia = "yes"; then
+if test "$ac_enable_camellia" = "yes"; then
  AC_MSG_RESULT([yes])
  AC_DEFINE(ENABLE_CAMELLIA, 1, [enable camellia block cipher])
 else
