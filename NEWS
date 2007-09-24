@@ -11,6 +11,8 @@ compiled with Camellia support.  See the libgcrypt documentation on
 how to enable it.  Unconditionally disable it using the configure
 option --disable-camellia.  Fixes #1.
 
+** Properly document in the NEWS file the API change in the last release.
+
 ** API and ABI modifications:
 No changes since last version.
 
@@ -25,7 +27,9 @@ Fixes #2.
 ** Example code: Fix compilation flaw under MinGW.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_oprfi_callback_func: ADD, new typedef function prototype.
+gnutls_oprfi_enable_client: ADD, new function.
+gnutls_oprfi_enable_server: ADD, new function.
 
 * Version 2.0.1 (released 2007-09-20)
 
