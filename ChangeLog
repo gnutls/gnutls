@@ -1,3 +1,63 @@
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.1.1.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Rework Camellia configure messages and logic.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add fixes, for trac.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Typo.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Add --disable-camellia.  Remove automake
+	conditional, not used.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Add.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Bump version.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, includes/gnutls/gnutls.h.in, lgl/gc-libgcrypt.c,
+	lgl/gc.h, lib/gnutls_algorithms.c, lib/gnutls_cipher_int.c,
+	lib/gnutls_priority.c, libextra/gnutls_openssl.c,
+	libextra/opencdk/opencdk.h, src/common.c, src/tests.c, src/tests.h,
+	src/tls_test.c: Add patch to support Camellia, contributed by
+	Yoshisato YANAGISAWA.  Fixes #1. See
+
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2331
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-09-20  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.1.0.
