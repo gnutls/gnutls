@@ -6,6 +6,10 @@ See the end for copying conditions.
 * Version 2.1.1 (unreleased)
 
 ** Added support for Camellia cipher, thanks to Yoshisato YANAGISAWA.
+Camellia is only enabled in GnuTLS if the installed libgcrypt has been
+compiled with Camellia support.  See the libgcrypt documentation on
+how to enable it.  Unconditionally disable it using the configure
+option --disable-camellia.
 
 ** API and ABI modifications:
 No changes since last version.
