@@ -154,12 +154,14 @@ ADD_CIPHER (gnutls_session_t session, int cipher)
 }
 
 static void
-ADD_CIPHER3 (gnutls_session_t session, int cipher1, int cipher2, int cipher3)
+ADD_CIPHER4 (gnutls_session_t session, int cipher1, int cipher2, int cipher3,
+	int cipher4)
 {
-  static int _cipher_priority[] = { 0, 0, 0, 0 };
+  static int _cipher_priority[] = { 0, 0, 0, 0, 0 };
   _cipher_priority[0] = cipher1;
   _cipher_priority[1] = cipher2;
   _cipher_priority[2] = cipher3;
+  _cipher_priority[3] = cipher4;
 
   gnutls_cipher_set_priority (session, _cipher_priority);
 }
@@ -560,6 +562,24 @@ test_aes (gnutls_session_t session)
   return ret;
 }
 
+#ifdef	ENABLE_CAMELLIA
+test_code_t
+test_camellia (gnutls_session_t session)
+{
+  int ret;
+  ADD_CIPHER (session, GNUTLS_CIPHER_CAMELLIA_128_CBC);
+  ADD_ALL_COMP (session);
+  ADD_ALL_CERTTYPES (session);
+  ADD_ALL_PROTOCOLS (session);
+  ADD_ALL_MACS (session);
+  ADD_ALL_KX (session);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+  ret = do_handshake (session);
+  return ret;
+}
+#endif
+
 test_code_t
 test_openpgp1 (gnutls_session_t session)
 {
@@ -586,8 +606,13 @@ test_code_t
 test_unknown_ciphersuites (gnutls_session_t session)
 {
   int ret;
-  ADD_CIPHER3 (session, GNUTLS_CIPHER_AES_128_CBC,
-	       GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128);
+#ifdef	ENABLE_CAMELLIA
+  ADD_CIPHER4 (session, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_3DES_CBC,
+	GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_CIPHER_ARCFOUR_128);
+#else
+  ADD_CIPHER4 (session, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_3DES_CBC,
+	GNUTLS_CIPHER_ARCFOUR_128, 0);
+#endif
   ADD_ALL_COMP (session);
   ADD_ALL_CERTTYPES (session);
   ADD_ALL_PROTOCOLS (session);

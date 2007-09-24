@@ -263,7 +263,8 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
   * Protocols: TLS 1.2, TLS 1.1, TLS 1.0, and SSL3.
   * Key exchange algorithm: DHE-PSK, PSK, SRP-RSA, SRP-DSS, SRP,
   * DHE-RSA, DHE-DSS, RSA.
-  * Cipher: AES_256_CBC, AES_128_CBC, 3DES_CBC, and ARCFOUR_128.
+  * Cipher: AES_256_CBC, AES_128_CBC, 3DES_CBC, CAMELLIA_256_CBC, CAMELLIA_128_CBC, 
+  * and ARCFOUR_128.
   * MAC algorithm: SHA, and MD5.
   * Certificate types: X.509, OpenPGP
   * Compression: DEFLATE, NULL.
@@ -299,6 +300,10 @@ gnutls_set_default_priority (gnutls_session_t session)
     GNUTLS_CIPHER_AES_256_CBC,
     GNUTLS_CIPHER_AES_128_CBC,
     GNUTLS_CIPHER_3DES_CBC,
+#ifdef	ENABLE_CAMELLIA
+    GNUTLS_CIPHER_CAMELLIA_256_CBC,
+    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
     GNUTLS_CIPHER_ARCFOUR_128,
     /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
     0
@@ -340,8 +345,8 @@ gnutls_set_default_priority (gnutls_session_t session)
   * The order is TLS1, SSL3 for protocols,  RSA, DHE_DSS, 
   * DHE_RSA, RSA_EXPORT for key exchange algorithms.
   * SHA, MD5, RIPEMD160 for MAC algorithms,
-  * AES_256_CBC, AES_128_CBC, 
-  * and 3DES_CBC, ARCFOUR_128, ARCFOUR_40 for ciphers.
+  * AES_256_CBC, AES_128_CBC, 3DES_CBC, CAMELLIA_256_CBC, CAMELLIA_128_CBC, 
+  * ARCFOUR_128, ARCFOUR_40 for ciphers.
   *
   * Returns 0 on success.
   *
@@ -357,8 +362,14 @@ gnutls_set_default_export_priority (gnutls_session_t session)
     GNUTLS_KX_RSA_EXPORT, 0
   };
   static const int cipher_priority[] = {
+    GNUTLS_CIPHER_AES_256_CBC,
     GNUTLS_CIPHER_AES_128_CBC,
-    GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128,
+    GNUTLS_CIPHER_3DES_CBC,
+#ifdef	ENABLE_CAMELLIA
+    GNUTLS_CIPHER_CAMELLIA_256_CBC,
+    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
+    GNUTLS_CIPHER_ARCFOUR_128,
     GNUTLS_CIPHER_ARCFOUR_40, 0
   };
   static const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };

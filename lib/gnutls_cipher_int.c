@@ -64,6 +64,16 @@ _gnutls_cipher_init (gnutls_cipher_algorithm_t cipher,
       err = gc_cipher_open (GC_ARCTWO40, GC_CBC, &ret);
       break;
 
+#ifdef	ENABLE_CAMELLIA
+    case GNUTLS_CIPHER_CAMELLIA_128_CBC:
+      err = gc_cipher_open (GC_CAMELLIA128, GC_CBC, &ret);
+      break;
+
+    case GNUTLS_CIPHER_CAMELLIA_256_CBC:
+      err = gc_cipher_open (GC_CAMELLIA256, GC_CBC, &ret);
+      break;
+#endif
+
     default:
       return NULL;
     }

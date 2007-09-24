@@ -769,6 +769,12 @@ parse_ciphers (char **ciphers, int nciphers, int *cipher_priority)
 	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
 	  else if (strcasecmp (ciphers[i], "ARCFOUR") == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_128;
+#ifdef	ENABLE_CAMELLIA
+	  else if (strncasecmp (ciphers[i], "CAMELLIA-2", 10) == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_CAMELLIA_256_CBC;
+	  else if (strncasecmp (ciphers[i], "CAM", 3) == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_CAMELLIA_128_CBC;
+#endif
 	  else if (strncasecmp (ciphers[i], "NUL", 3) == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_NULL;
 	  else

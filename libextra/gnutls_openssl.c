@@ -538,8 +538,15 @@ SSLv23_client_method (void)
   m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
   m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
   m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
+#ifdef	ENABLE_CAMELLIA
+  m->cipher_priority[3] = GNUTLS_CIPHER_CAMELLIA_128_CBC;
+  m->cipher_priority[4] = GNUTLS_CIPHER_CAMELLIA_256_CBC;
+  m->cipher_priority[5] = GNUTLS_CIPHER_ARCFOUR_128;
+  m->cipher_priority[6] = 0;
+#else
   m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
   m->cipher_priority[4] = 0;
+#endif
 
   m->comp_priority[0] = GNUTLS_COMP_ZLIB;
   m->comp_priority[1] = GNUTLS_COMP_NULL;
@@ -574,8 +581,15 @@ SSLv23_server_method (void)
   m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
   m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
   m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
+#ifdef	ENABLE_CAMELLIA
+  m->cipher_priority[3] = GNUTLS_CIPHER_CAMELLIA_128_CBC;
+  m->cipher_priority[4] = GNUTLS_CIPHER_CAMELLIA_256_CBC;
+  m->cipher_priority[5] = GNUTLS_CIPHER_ARCFOUR_128;
+  m->cipher_priority[6] = 0;
+#else
   m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
   m->cipher_priority[4] = 0;
+#endif
 
   m->comp_priority[0] = GNUTLS_COMP_ZLIB;
   m->comp_priority[1] = GNUTLS_COMP_NULL;
@@ -675,8 +689,15 @@ TLSv1_client_method (void)
   m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
   m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
   m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
+#ifdef	ENABLE_CAMELLIA
+  m->cipher_priority[3] = GNUTLS_CIPHER_CAMELLIA_128_CBC;
+  m->cipher_priority[4] = GNUTLS_CIPHER_CAMELLIA_256_CBC;
+  m->cipher_priority[5] = GNUTLS_CIPHER_ARCFOUR_128;
+  m->cipher_priority[6] = 0;
+#else
   m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
   m->cipher_priority[4] = 0;
+#endif
 
   m->comp_priority[0] = GNUTLS_COMP_ZLIB;
   m->comp_priority[1] = GNUTLS_COMP_NULL;
@@ -710,8 +731,15 @@ TLSv1_server_method (void)
   m->cipher_priority[0] = GNUTLS_CIPHER_AES_128_CBC;
   m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
   m->cipher_priority[2] = GNUTLS_CIPHER_AES_256_CBC;
+#ifdef	ENABLE_CAMELLIA
+  m->cipher_priority[3] = GNUTLS_CIPHER_CAMELLIA_128_CBC;
+  m->cipher_priority[4] = GNUTLS_CIPHER_CAMELLIA_256_CBC;
+  m->cipher_priority[5] = GNUTLS_CIPHER_ARCFOUR_128;
+  m->cipher_priority[6] = 0;
+#else
   m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
   m->cipher_priority[4] = 0;
+#endif
 
   m->comp_priority[0] = GNUTLS_COMP_ZLIB;
   m->comp_priority[1] = GNUTLS_COMP_NULL;

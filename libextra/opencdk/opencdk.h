@@ -195,7 +195,8 @@ enum cdk_cipher_algo_t {
     CDK_CIPHER_AES         = 7,
     CDK_CIPHER_AES192      = 8,
     CDK_CIPHER_AES256      = 9,
-    CDK_CIPHER_TWOFISH     = 10
+    CDK_CIPHER_TWOFISH     = 10,
+    CDK_CIPHER_CAMELLIA256 = 11 /* experimental use only, upcoming 2440bis */
 };
 
 
