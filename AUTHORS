@@ -36,6 +36,9 @@ Man pages, OpenCDK, fixes.
 Stefan Walter <stef@memberwebs.com>
 PKCS8 fix.
 
+Yoshisato YANAGISAWA <yanagisawa@csg.is.titech.ac.jp>
+Camellia support.
+
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.
