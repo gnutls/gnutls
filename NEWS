@@ -9,7 +9,7 @@ See the end for copying conditions.
 Camellia is only enabled in GnuTLS if the installed libgcrypt has been
 compiled with Camellia support.  See the libgcrypt documentation on
 how to enable it.  Unconditionally disable it using the configure
-option --disable-camellia.
+option --disable-camellia.  Fixes #1.
 
 ** API and ABI modifications:
 No changes since last version.
@@ -20,6 +20,7 @@ No changes since last version.
 The support is disabled by default.  Since no value has been allocated
 by the IANA for this extension yet, you will need to provide one
 yourself by invoking './configure --enable-opaque-prf-input=42'.
+Fixes #2.
 
 ** Example code: Fix compilation flaw under MinGW.
 
