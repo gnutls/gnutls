@@ -55,9 +55,6 @@ option (password) STR "PASSWORD" { $pass = $1 } "Password to use."
 
 option (i, certificate-info) { $action = 2; } "Print information on a certificate."
 
-#int quick_random;
-option (quick-random) { $quick_random = 1; } "Use /dev/urandom for all operation, reducing the quality of randomness used."
-
 option (l, crl-info) { $action = 11; } "Print information on a CRL."
 
 option (p12-info) { $action = 9; } "Print information on a PKCS #12 structure."
@@ -96,6 +93,9 @@ option (outder) { $outcert_format=1 } "Use DER format for output certificates an
 
 #int bits;
 option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key generation."
+
+#int quick_random;
+option (quick-random) { $quick_random = 1; } "Use /dev/urandom for all operation, reducing the quality of randomness used."
 
 #char *outfile;
 option (outfile) STR "FILE" { $outfile = $1 } "Output file."
