@@ -926,7 +926,7 @@ certificate_info (void)
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "Export error: %s",
 		   gnutls_strerror (ret));
-	  fprintf (outfile, "%s", buffer);
+	  fwrite (buffer, 1, size, outfile);
 	}
       else
 	{
@@ -1002,7 +1002,7 @@ print_crl_info (gnutls_x509_crl_t crl, FILE *out)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_export: %s", gnutls_strerror (ret));
 
-  fprintf (outfile, "%s", buffer);
+  fwrite (buffer, 1, size, outfile);
 }
 
 void
@@ -2276,7 +2276,7 @@ smime_to_pkcs7 (void)
     }
   while (strcmp (lineptr, "\r\n") == 0 && strcmp (lineptr, "\n") == 0);
 
-  printf ("-----BEGIN PKCS7-----\n");
+  fprintf (outfile, "%s", "-----BEGIN PKCS7-----\n");
 
   do
     {
@@ -2284,12 +2284,12 @@ smime_to_pkcs7 (void)
 	     && (lineptr[len - 1] == '\r' || lineptr[len - 1] == '\n'))
 	lineptr[--len] = '\0';
       if (strcmp (lineptr, "") != 0)
-	printf ("%s\n", lineptr);
+	fprintf (outfile, "%s\n", lineptr);
       len = getline (&lineptr, &linesize, infile);
     }
   while (len != -1);
 
-  printf ("-----END PKCS7-----\n");
+  fprintf (outfile, "%s", "-----END PKCS7-----\n");
 
   free (lineptr);
 }
