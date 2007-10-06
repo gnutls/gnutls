@@ -17,25 +17,25 @@ struct _gaainfo
 #line 100 "certtool.gaa"
 	char *outfile;
 #line 97 "certtool.gaa"
-	int bits;
-#line 94 "certtool.gaa"
-	int outcert_format;
-#line 91 "certtool.gaa"
-	int xml;
-#line 88 "certtool.gaa"
-	int incert_format;
-#line 85 "certtool.gaa"
-	int export;
-#line 82 "certtool.gaa"
-	char *hash;
-#line 79 "certtool.gaa"
-	int dsa;
-#line 76 "certtool.gaa"
-	int pkcs8;
-#line 71 "certtool.gaa"
-	int fix_key;
-#line 58 "certtool.gaa"
 	int quick_random;
+#line 94 "certtool.gaa"
+	int bits;
+#line 91 "certtool.gaa"
+	int outcert_format;
+#line 88 "certtool.gaa"
+	int xml;
+#line 85 "certtool.gaa"
+	int incert_format;
+#line 82 "certtool.gaa"
+	int export;
+#line 79 "certtool.gaa"
+	char *hash;
+#line 76 "certtool.gaa"
+	int dsa;
+#line 73 "certtool.gaa"
+	int pkcs8;
+#line 68 "certtool.gaa"
+	int fix_key;
 #line 53 "certtool.gaa"
 	char *pass;
 #line 50 "certtool.gaa"
