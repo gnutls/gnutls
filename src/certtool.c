@@ -20,6 +20,7 @@
 
 #include <config.h>
 #include <gnutls/gnutls.h>
+#include <gcrypt.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,6 +137,10 @@ generate_private_key_int (void)
 
   fprintf (stderr, "Generating a %d bit %s private key...\n", info.bits,
 	   gnutls_pk_algorithm_get_name (key_type));
+
+  if (info.quick_random == 0)
+    fprintf (stderr, "This might take several minutes depending on availability of randomness"
+      " in /dev/random. You can consider using --quick-random option but this reduces the quality of randomness used.\n");
 
   ret = gnutls_x509_privkey_generate (key, key_type, info.bits, 0);
   if (ret < 0)
@@ -803,6 +808,9 @@ gaa_parser (int argc, char **argv)
       batch = 1;
       template_parse (info.template);
     }
+
+  if (info.quick_random != 0)
+  	gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (info.debug);

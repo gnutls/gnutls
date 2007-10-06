@@ -55,6 +55,9 @@ option (password) STR "PASSWORD" { $pass = $1 } "Password to use."
 
 option (i, certificate-info) { $action = 2; } "Print information on a certificate."
 
+#int quick_random;
+option (quick-random) { $quick_random = 1; } "Use /dev/urandom for all operation, reducing the quality of randomness used."
+
 option (l, crl-info) { $action = 11; } "Print information on a CRL."
 
 option (p12-info) { $action = 9; } "Print information on a PKCS #12 structure."
@@ -114,5 +117,5 @@ option (v, version) { certtool_version(); exit(0); } "shows the program's versio
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; 
-	$export = 0; $template = NULL; $xml = 0; $hash=NULL; $fix_key = 0;}
+	$export = 0; $template = NULL; $xml = 0; $hash=NULL; $fix_key = 0; $quick_random=0; }
 
