@@ -84,9 +84,6 @@ extern "C"
   int gnutls_openpgp_key_check_hostname (gnutls_openpgp_key_t key,
 					 const char *hostname);
 
-  int gnutls_openpgp_key_to_xml (gnutls_openpgp_key_t key,
-				 gnutls_datum_t * xmlkey, int ext);
-
 /* privkey stuff.
  */
   int gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);

@@ -85,9 +85,6 @@ option (export-ciphers) { $export=1 } "Use weak encryption algorithms."
 #int incert_format;
 option (inder) { $incert_format=1 } "Use DER format for input certificates and private keys."
 
-#int xml;
-option (xml) { $xml=1 } "Use XML format for output certificates."
-
 #int outcert_format;
 option (outder) { $outcert_format=1 } "Use DER format for output certificates and private keys."
 
@@ -117,5 +114,5 @@ option (v, version) { certtool_version(); exit(0); } "shows the program's versio
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; 
-	$export = 0; $template = NULL; $xml = 0; $hash=NULL; $fix_key = 0; $quick_random=0; }
+	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=0; }
 

@@ -66,7 +66,6 @@ int record_max_size;
 int fingerprint;
 int crlf;
 int verbose = 0;
-extern int xml;
 extern int print_cert;
 
 char *srp_passwd = NULL;
@@ -122,18 +121,19 @@ typedef struct
   int secure;
   char *hostname;
   char *ip;
-  char* service;
+  char *service;
   struct addrinfo *ptr;
   struct addrinfo *addr_info;
 } socket_st;
 
-ssize_t socket_recv (const socket_st *socket, void *buffer, int buffer_size);
-ssize_t socket_send (const socket_st *socket, const void *buffer, int buffer_size);
-void socket_open( socket_st* hd, const char* hostname, const char* service);
-void socket_connect( const socket_st* hd);
+ssize_t socket_recv (const socket_st * socket, void *buffer, int buffer_size);
+ssize_t socket_send (const socket_st * socket, const void *buffer,
+		     int buffer_size);
+void socket_open (socket_st * hd, const char *hostname, const char *service);
+void socket_connect (const socket_st * hd);
 void socket_bye (socket_st * socket);
 
-static void check_rehandshake (socket_st *socket, int ret);
+static void check_rehandshake (socket_st * socket, int ret);
 static int do_handshake (socket_st * socket);
 static void init_global_tls_stuff (void);
 
@@ -386,8 +386,7 @@ cert_callback (gnutls_session_t session,
 
 int
 authz_send_callback (gnutls_session_t session,
-		     const int *client_formats,
-		     const int *server_formats)
+		     const int *client_formats, const int *server_formats)
 {
   size_t i;
   int ret;
@@ -440,9 +439,8 @@ authz_send_callback (gnutls_session_t session,
 int
 authz_recv_callback (gnutls_session_t session,
 		     const int *authz_formats,
-		     gnutls_datum_t *infos,
-		     const int *hashtypes,
-		     gnutls_datum_t *hash)
+		     gnutls_datum_t * infos,
+		     const int *hashtypes, gnutls_datum_t * hash)
 {
   size_t i, j;
 
@@ -550,7 +548,7 @@ static void gaa_parser (int argc, char **argv);
 /* Returns zero if the error code was successfully handled.
  */
 static int
-handle_error (socket_st *hd, int err)
+handle_error (socket_st * hd, int err)
 {
   int alert, ret;
   const char *err_type, *str;
@@ -655,8 +653,8 @@ main (int argc, char **argv)
 
   init_global_tls_stuff ();
 
-  socket_open( &hd, hostname, service);
-  socket_connect( &hd);
+  socket_open (&hd, hostname, service);
+  socket_connect (&hd);
 
   hd.session = init_tls_session (hostname);
   if (starttls)
@@ -713,8 +711,8 @@ main (int argc, char **argv)
 
 	  printf
 	    ("\n\n- Connecting again- trying to resume previous session\n");
-          socket_open( &hd, hostname, service);
-          socket_connect(&hd);
+	  socket_open (&hd, hostname, service);
+	  socket_connect (&hd);
 	}
       else
 	{
@@ -877,7 +875,6 @@ gaa_parser (int argc, char **argv)
 
   verbose = info.verbose;
   disable_extensions = info.disable_extensions;
-  xml = info.xml;
   print_cert = info.print_cert;
   starttls = info.starttls;
   resume = info.resume;
@@ -937,7 +934,7 @@ cli_version (void)
 
 
 static void
-check_rehandshake (socket_st *socket, int ret)
+check_rehandshake (socket_st * socket, int ret)
 {
   if (socket->secure && ret == GNUTLS_E_REHANDSHAKE)
     {
@@ -1132,143 +1129,148 @@ init_global_tls_stuff (void)
  */
 
 ssize_t
-        socket_recv (const socket_st* socket, void *buffer, int buffer_size)
+socket_recv (const socket_st * socket, void *buffer, int buffer_size)
 {
-    int ret;
+  int ret;
 
-    if (socket->secure)
-        do
-    {
-        ret = gnutls_record_recv (socket->session, buffer, buffer_size);
-    }
+  if (socket->secure)
+    do
+      {
+	ret = gnutls_record_recv (socket->session, buffer, buffer_size);
+      }
     while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-    else
-        do
-    {
-        ret = recv (socket->fd, buffer, buffer_size, 0);
-    }
+  else
+    do
+      {
+	ret = recv (socket->fd, buffer, buffer_size, 0);
+      }
     while (ret == -1 && errno == EINTR);
 
-    return ret;
+  return ret;
 }
 
 ssize_t
-        socket_send (const socket_st *socket, const void *buffer, int buffer_size)
+socket_send (const socket_st * socket, const void *buffer, int buffer_size)
 {
-    int ret;
+  int ret;
 
-    if (socket->secure)
-        do
-    {
-        ret = gnutls_record_send (socket->session, buffer, buffer_size);
-    }
+  if (socket->secure)
+    do
+      {
+	ret = gnutls_record_send (socket->session, buffer, buffer_size);
+      }
     while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-    else
-        do
-    {
-        ret = send (socket->fd, buffer, buffer_size, 0);
-    }
+  else
+    do
+      {
+	ret = send (socket->fd, buffer, buffer_size, 0);
+      }
     while (ret == -1 && errno == EINTR);
 
-    if (ret > 0 && ret != buffer_size && verbose)
-        fprintf (stderr,
-                 "*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
+  if (ret > 0 && ret != buffer_size && verbose)
+    fprintf (stderr,
+	     "*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
 
-    return ret;
+  return ret;
 }
 
 void
-        socket_bye (socket_st * socket)
+socket_bye (socket_st * socket)
 {
-    int ret;
-    if (socket->secure)
+  int ret;
+  if (socket->secure)
     {
-        do
-            ret = gnutls_bye (socket->session, GNUTLS_SHUT_RDWR);
-        while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-        if (ret < 0)
-            fprintf (stderr, "*** gnutls_bye() error: %s\n",
-                     gnutls_strerror (ret));
-        gnutls_deinit (socket->session);
-        socket->session = NULL;
+      do
+	ret = gnutls_bye (socket->session, GNUTLS_SHUT_RDWR);
+      while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+      if (ret < 0)
+	fprintf (stderr, "*** gnutls_bye() error: %s\n",
+		 gnutls_strerror (ret));
+      gnutls_deinit (socket->session);
+      socket->session = NULL;
     }
 
-    freeaddrinfo( socket->addr_info);
-    socket->addr_info = socket->ptr = NULL;
-    
-    free( socket->ip);
-    free( socket->hostname);
-    free( socket->service);
-    
-    shutdown (socket->fd, SHUT_RDWR);     /* no more receptions */
-    close (socket->fd);
+  freeaddrinfo (socket->addr_info);
+  socket->addr_info = socket->ptr = NULL;
 
-    socket->fd = -1;
-    socket->secure = 0;
+  free (socket->ip);
+  free (socket->hostname);
+  free (socket->service);
+
+  shutdown (socket->fd, SHUT_RDWR);	/* no more receptions */
+  close (socket->fd);
+
+  socket->fd = -1;
+  socket->secure = 0;
 }
 
-void socket_connect( const socket_st* hd)
+void
+socket_connect (const socket_st * hd)
 {
-    int err;
+  int err;
 
-    printf ("Connecting to '%s:%s'...\n", hd->ip, hd->service);
+  printf ("Connecting to '%s:%s'...\n", hd->ip, hd->service);
 
-    err = connect (hd->fd, hd->ptr->ai_addr, hd->ptr->ai_addrlen);
-    if (err < 0)
+  err = connect (hd->fd, hd->ptr->ai_addr, hd->ptr->ai_addrlen);
+  if (err < 0)
     {
-        fprintf (stderr, "Cannot connect to %s:%s: %s\n", hd->hostname, hd->service,
-                 strerror (errno));
-        exit (1);
+      fprintf (stderr, "Cannot connect to %s:%s: %s\n", hd->hostname,
+	       hd->service, strerror (errno));
+      exit (1);
     }
 }
 
-void socket_open( socket_st* hd, const char* hostname, const char* service)
+void
+socket_open (socket_st * hd, const char *hostname, const char *service)
 {
-    struct addrinfo hints, *res, *ptr;
-    int sd, err;
-    char buffer[MAX_BUF + 1];
-    char portname[16] = { 0 };
+  struct addrinfo hints, *res, *ptr;
+  int sd, err;
+  char buffer[MAX_BUF + 1];
+  char portname[16] = { 0 };
 
-    printf ("Resolving '%s'...\n", hostname);
-    /* get server name */
-    memset (&hints, 0, sizeof (hints));
-    hints.ai_socktype = SOCK_STREAM;
-    if ((err = getaddrinfo (hostname, service, &hints, &res)))
+  printf ("Resolving '%s'...\n", hostname);
+  /* get server name */
+  memset (&hints, 0, sizeof (hints));
+  hints.ai_socktype = SOCK_STREAM;
+  if ((err = getaddrinfo (hostname, service, &hints, &res)))
     {
-        fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,
-                 gai_strerror (err));
-        exit (1);
+      fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,
+	       gai_strerror (err));
+      exit (1);
     }
 
-    sd = -1;
-    for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
+  sd = -1;
+  for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
-        sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-        if (sd == -1) continue;
+      sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+      if (sd == -1)
+	continue;
 
-        if ((err = getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
-             portname, sizeof (portname), NI_NUMERICHOST|NI_NUMERICSERV)) != 0)
-        {
-            fprintf (stderr, "getnameinfo(): %s\n", gai_strerror (err));
-            freeaddrinfo (res);
-            exit (1);
-        }
+      if ((err = getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
+			      portname, sizeof (portname),
+			      NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
+	{
+	  fprintf (stderr, "getnameinfo(): %s\n", gai_strerror (err));
+	  freeaddrinfo (res);
+	  exit (1);
+	}
 
-        break;
+      break;
     }
 
-    if (sd==-1) {
-        fprintf (stderr, "socket(): %s\n", strerror (errno));
-        exit (1);
+  if (sd == -1)
+    {
+      fprintf (stderr, "socket(): %s\n", strerror (errno));
+      exit (1);
     }
-    
-    hd->secure = 0;
-    hd->fd = sd;
-    hd->hostname = strdup(hostname);
-    hd->ip = strdup(buffer);
-    hd->service = strdup(portname);
-    hd->ptr = ptr;
-    hd->addr_info = res;
 
-    return;
+  hd->secure = 0;
+  hd->fd = sd;
+  hd->hostname = strdup (hostname);
+  hd->ip = strdup (buffer);
+  hd->service = strdup (portname);
+  hd->ptr = ptr;
+  hd->addr_info = res;
+
+  return;
 }

@@ -926,8 +926,6 @@ certificate_info (void)
       if (info.outcert_format == GNUTLS_X509_FMT_PEM)
 	print_certificate_info (crt[i], outfile, 1);
 
-      if (!info.xml)
-	{
 	  size = sizeof (buffer);
 	  ret = gnutls_x509_crt_export (crt[i], info.outcert_format, buffer,
 					&size);
@@ -935,19 +933,6 @@ certificate_info (void)
 	    error (EXIT_FAILURE, 0, "Export error: %s",
 		   gnutls_strerror (ret));
 	  fwrite (buffer, 1, size, outfile);
-	}
-      else
-	{
-	  gnutls_datum_t xml;
-
-	  ret = gnutls_x509_crt_to_xml (crt[i], &xml, GNUTLS_XML_SHOW_ALL);
-	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "XML encoding error: %s",
-		   gnutls_strerror (ret));
-
-	  fprintf (outfile, "\n%s\n", xml.data);
-	  gnutls_free (xml.data);
-	}
     }
 }
 
