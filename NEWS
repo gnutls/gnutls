@@ -54,6 +54,10 @@ gnutls_oprfi_callback_func: ADD, new typedef function prototype.
 gnutls_oprfi_enable_client: ADD, new function.
 gnutls_oprfi_enable_server: ADD, new function.
 
+* Version 2.0.2 (unreleased)
+
+** Fix configure-time Guile detection.
+
 * Version 2.0.1 (released 2007-09-20)
 
 ** New directory doc/credentials/ with test credentials.
