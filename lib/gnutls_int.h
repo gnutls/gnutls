@@ -549,6 +549,10 @@ typedef struct
   gnutls_db_retr_func db_retrieve_func;
   gnutls_db_remove_func db_remove_func;
   void *db_ptr;
+  
+  /* post client hello callback (server side only)
+   */
+  gnutls_handshake_post_client_hello_func user_hello_func;
 
   /* Holds the record size requested by the
    * user.
@@ -611,11 +615,6 @@ typedef struct
 
   char *srp_username;
   char *srp_password;
-
-  /* This is only set in SRP, when the handshake is
-   * restarted if an username is not found.
-   */
-  int handshake_restarted;
 
   /* Here we cache the DH or RSA parameters got from the
    * credentials structure, or from a callback. That is to

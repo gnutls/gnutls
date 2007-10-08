@@ -209,8 +209,6 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
   session->internals.last_handshake_in = -1;
   session->internals.last_handshake_out = -1;
 
-  session->internals.handshake_restarted = 0;
-
   session->internals.resumable = RESUME_TRUE;
   _gnutls_free_datum (&session->internals.recv_buffer);
 
@@ -1208,4 +1206,27 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
 {
   session->internals.rsa_pms_version[0] = major;
   session->internals.rsa_pms_version[1] = minor;
+}
+
+/**
+  * gnutls_handshake_set_post_client_hello_function - This function will a callback to be called after the client hello is received
+  * @res: is a gnutls_anon_server_credentials_t structure
+  * @func: is the function to be called
+  *
+  * This function will set a callback to be called after the client hello
+  * has been received (callback valid in server side only). This allows the
+  * server to adjust settings based on received extensions.
+  *
+  * Those settings could be ciphersuites, requesting certificate, or anything
+  * else except for version negotiation (this is done before the hello message
+  * is parsed).
+  *
+  * This callback must return 0 on success or a gnutls error code to
+  * terminate the handshake.
+  *
+  **/
+void gnutls_handshake_set_post_client_hello_function( gnutls_session_t session,
+  gnutls_handshake_post_client_hello_func func)
+{
+  session->internals.user_hello_func = func;
 }

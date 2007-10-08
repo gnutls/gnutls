@@ -282,12 +282,12 @@ int
 _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 			   int datalen)
 {
-  uint8_t session_id_len, z;
+  uint8_t session_id_len;
   int pos = 0, ret;
-  uint16_t suite_size;
+  uint16_t suite_size, comp_size;
   gnutls_protocol_t version;
   int len = datalen;
-  opaque rnd[TLS_RANDOM_SIZE], *suite_ptr;
+  opaque rnd[TLS_RANDOM_SIZE], *suite_ptr, *comp_ptr;
   gnutls_protocol_t ver;
 
   if (session->internals.v2_hello != 0)
@@ -376,20 +376,14 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   suite_ptr = &data[pos];
   pos += suite_size;
 
-  /* Select an appropriate compression method
+  /* Point to the compression methods
    */
   DECR_LEN (len, 1);
-  z = data[pos++];		/* z is the number of compression methods */
+  comp_size = data[pos++];		/* z is the number of compression methods */
 
-  DECR_LEN (len, z);
-  ret = _gnutls_server_select_comp_method (session, &data[pos], z);
-  pos += z;
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+  DECR_LEN (len, comp_size);
+  comp_ptr = &data[pos];
+  pos += comp_size;
 
   /* Parse the extensions (if any)
    */
@@ -403,9 +397,27 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 	}
     }
 
+  if (session->internals.user_hello_func != NULL) 
+    {
+      ret = session->internals.user_hello_func( session);
+      if (ret < 0) 
+        {
+          gnutls_assert();
+          return ret;
+        }
+    }
+
   /* select an appropriate cipher suite
    */
   ret = _gnutls_server_select_suite (session, suite_ptr, suite_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  /* select appropriate compression method */
+  ret = _gnutls_server_select_comp_method (session, comp_ptr, comp_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1114,17 +1126,6 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
   ret = _gnutls_recv_handshake_header (session, type, &recv_type);
   if (ret < 0)
     {
-
-      /* In SRP when expecting the server hello we may receive
-       * an alert instead. Do as the draft demands.
-       */
-      if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
-	  gnutls_alert_get (session) == GNUTLS_A_MISSING_SRP_USERNAME &&
-	  type == GNUTLS_HANDSHAKE_SERVER_HELLO)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INT_HANDSHAKE_AGAIN;
-	}
 
       if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET
 	  && optional == OPTIONAL_PACKET)
@@ -1839,19 +1840,19 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	  session->security_parameters.extensions.srp_username[0] == 0)
 	{
 	  /* The peer didn't send a valid SRP extension with the
-	   * SRP username. The draft requires that we send an
-	   * alert and start the handshake again.
+	   * SRP username. The draft requires that we send a fatal
+	   * alert and abort.
 	   */
 	  gnutls_assert ();
-	  ret = gnutls_alert_send (session, GNUTLS_AL_WARNING,
-				   GNUTLS_A_MISSING_SRP_USERNAME);
+	  ret = gnutls_alert_send (session, GNUTLS_AL_FATAL,
+				   GNUTLS_A_UNKNOWN_PSK_IDENTITY);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
 	      return ret;
 	    }
 
-	  return GNUTLS_E_INT_HANDSHAKE_AGAIN;
+	  return GNUTLS_E_ILLEGAL_SRP_USERNAME;
 	}
     }
 #endif
@@ -2217,21 +2218,8 @@ gnutls_handshake (gnutls_session_t session)
   return 0;
 }
 
-/* Here if GNUTLS_E_INT_HANDSHAKE_AGAIN is received we go to
- * restart. This works because this error code may only be
- * received on the first 2 handshake packets. If for some reason
- * this changes we should return GNUTLS_E_AGAIN.
- */
 #define IMED_RET( str, ret) do { \
 	if (ret < 0) { \
-		if (ret == GNUTLS_E_INT_HANDSHAKE_AGAIN && \
-			session->internals.handshake_restarted == 1) \
-			ret = GNUTLS_E_INTERNAL_ERROR; \
-		if (ret == GNUTLS_E_INT_HANDSHAKE_AGAIN) { \
-			STATE = STATE0; \
-			session->internals.handshake_restarted = 1; \
-			goto restart; \
-		} \
 		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
@@ -2263,7 +2251,6 @@ _gnutls_handshake_client (gnutls_session_t session)
 					    session_id_size, buf,
 					    sizeof (buf)));
 #endif
-restart:
 
   switch (STATE)
     {
@@ -2491,8 +2478,6 @@ _gnutls_handshake_server (gnutls_session_t session)
 {
   int ret = 0;
 
-restart:
-
   switch (STATE)
     {
     case STATE0:
@@ -2593,8 +2578,6 @@ int
 _gnutls_handshake_common (gnutls_session_t session)
 {
   int ret = 0;
-
-restart:
 
   /* send and recv the change cipher spec and finished messages */
   if ((session->internals.resumed == RESUME_TRUE
@@ -2801,11 +2784,11 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
   int ret = 0;
   cipher_suite_st *newSuite, cs;
   int newSuiteSize = 0, i;
-  gnutls_certificate_credentials_t x509_cred;
+  gnutls_certificate_credentials_t cert_cred;
   gnutls_kx_algorithm_t kx;
   int server = session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
-  gnutls_kx_algorithm_t *alg;
-  int alg_size;
+  gnutls_kx_algorithm_t *alg = NULL;
+  int alg_size = 0;
 
   /* if we should use a specific certificate, 
    * we should remove all algorithms that are not supported
@@ -2813,22 +2796,23 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
    * method (CERTIFICATE).
    */
 
-  x509_cred =
+  cert_cred =
     (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
 							 GNUTLS_CRD_CERTIFICATE,
 							 NULL);
 
-  /* if x509_cred==NULL we should remove all X509 ciphersuites
+  /* If there are certificate credentials, find an appropriate certificate
+   * or disable them;
    */
-
   if (session->security_parameters.entity == GNUTLS_SERVER
-      && x509_cred != NULL)
+      && cert_cred != NULL)
     {
       ret = _gnutls_server_select_cert (session, requested_pk_algo);
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  return ret;
+	  _gnutls_x509_log("Could not find an appropriate certificate: %s\n", gnutls_strerror(ret));
+	  cert_cred = NULL;
 	}
     }
 

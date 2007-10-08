@@ -177,8 +177,8 @@ _gnutls_parse_extensions (gnutls_session_t session, const opaque * data,
       type = _gnutls_read_uint16 (&data[pos]);
       pos += 2;
 
-      _gnutls_debug_log ("EXT[%x]: Received extension '%s'\n", session,
-			 _gnutls_extension_get_name (type));
+      _gnutls_debug_log ("EXT[%x]: Received extension '%s/%d'\n", session,
+			 _gnutls_extension_get_name (type),type);
 
       if ((ret = _gnutls_extension_list_check (session, type)) < 0)
 	{

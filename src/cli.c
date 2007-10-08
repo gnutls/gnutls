@@ -1004,7 +1004,7 @@ do_handshake (socket_st * socket)
 
 static int
 srp_username_callback (gnutls_session_t session,
-		       unsigned int times, char **username, char **password)
+		       char **username, char **password)
 {
   if (srp_username == NULL || srp_passwd == NULL)
     {

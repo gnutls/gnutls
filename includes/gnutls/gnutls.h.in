@@ -197,8 +197,7 @@ extern "C"
     GNUTLS_A_UNSUPPORTED_EXTENSION = 110,
     GNUTLS_A_CERTIFICATE_UNOBTAINABLE = 111,
     GNUTLS_A_UNRECOGNIZED_NAME = 112,
-    GNUTLS_A_UNKNOWN_SRP_USERNAME = 120,
-    GNUTLS_A_MISSING_SRP_USERNAME = 121,
+    GNUTLS_A_UNKNOWN_PSK_IDENTITY = 115,
     GNUTLS_A_INNER_APPLICATION_FAILURE = 208,
     GNUTLS_A_INNER_APPLICATION_VERIFICATION = 209
   } gnutls_alert_description_t;
@@ -600,6 +599,10 @@ extern "C"
   int gnutls_db_check_entry (gnutls_session_t session,
 			     gnutls_datum_t session_entry);
 
+  typedef int (*gnutls_handshake_post_client_hello_func)(gnutls_session_t);
+  void gnutls_handshake_set_post_client_hello_function(gnutls_session_t,
+      gnutls_handshake_post_client_hello_func);
+  
   void gnutls_handshake_set_max_packet_length (gnutls_session_t session,
 					       size_t max);
 
@@ -911,8 +914,7 @@ extern "C"
      gnutls_srp_server_credentials_function * func);
 
   typedef int gnutls_srp_client_credentials_function (gnutls_session_t,
-						      unsigned int, char **,
-						      char **);
+						      char **, char **);
   void
     gnutls_srp_set_client_credentials_function
     (gnutls_srp_client_credentials_t cred,

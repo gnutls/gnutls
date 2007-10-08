@@ -25,7 +25,6 @@
 #include <defines.h>
 
 #define GNUTLS_E_INT_RET_0 -1251
-#define GNUTLS_E_INT_HANDSHAKE_AGAIN -1252
 
 #ifdef __FILE__
 # ifdef __LINE__
