@@ -612,21 +612,15 @@ gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
   * This function can be used to set a callback to retrieve the username and
   * password for client SRP authentication.
   * The callback's function form is:
-  * int (*callback)(gnutls_session_t, unsigned int times, char** username,
+  * int (*callback)(gnutls_session_t, char** username,
   *  char** password);
   *
   * The @username and @password must be allocated using gnutls_malloc().
-  * @times will be 0 the first time called, and 1 the second.
   * @username and @password should be ASCII strings or UTF-8 strings 
   * prepared using the "SASLprep" profile of "stringprep".
   *
-  * The callback function will be called once or twice per handshake.
-  * The first time called, is before the ciphersuite is negotiated.
-  * At that time if the callback returns a negative error code,
-  * the callback will be called again if SRP has been
-  * negotiated. This uses a special TLS-SRP idiom in order to avoid
-  * asking the user for SRP password and username if the server does
-  * not support SRP.
+  * The callback function will be called once per handshake before the
+  * initial hello message is sent.
   * 
   * The callback should not return a negative error code the second
   * time called, since the handshake procedure will be aborted.

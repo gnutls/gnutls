@@ -62,8 +62,7 @@ static const gnutls_alert_entry sup_alerts[] = {
   {GNUTLS_A_UNSUPPORTED_EXTENSION, "An unsupported extension was sent"},
   {GNUTLS_A_UNRECOGNIZED_NAME,
    "The server name sent was not recognized"},
-  {GNUTLS_A_UNKNOWN_SRP_USERNAME, "The SRP username is not known"},
-  {GNUTLS_A_MISSING_SRP_USERNAME, "The SRP username was not sent"},
+  {GNUTLS_A_UNKNOWN_PSK_IDENTITY, "The SRP/PSK username is missing or not known"},
   {GNUTLS_A_INNER_APPLICATION_FAILURE,
    "Inner application negotiation failed"},
   {GNUTLS_A_INNER_APPLICATION_VERIFICATION,
@@ -148,15 +147,14 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
   * alert should be sent to the peer indicating that no renegotiation will 
   * be performed.
   *
-  * If the return value is GNUTLS_E_INVALID_REQUEST, then there was no
-  * mapping to an alert.
+  * If there is no mapping to a valid alert the alert to indicate internal error 
+  * is returned.
   *
   **/
 int
 gnutls_error_to_alert (int err, int *level)
 {
-  int ret = GNUTLS_E_INVALID_REQUEST;
-  int _level = -1;
+  int ret, _level = -1;
 
   switch (err)
     {				/* send appropriate alert */
@@ -239,6 +237,10 @@ gnutls_error_to_alert (int err, int *level)
     case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
     case GNUTLS_E_NO_CERTIFICATE_FOUND:
       ret = GNUTLS_A_INSUFFICIENT_SECURITY;
+      _level = GNUTLS_AL_FATAL;
+      break;
+    default:
+      ret = GNUTLS_A_INTERNAL_ERROR;
       _level = GNUTLS_AL_FATAL;
       break;
     }

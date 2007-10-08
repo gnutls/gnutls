@@ -34,7 +34,6 @@
 
 #define SU(x) (x!=NULL?x:"Unknown")
 
-int xml = 0;
 int print_cert;
 extern int verbose;
 
@@ -88,7 +87,7 @@ print_x509_info (gnutls_session_t session, const char *hostname)
 {
   gnutls_x509_crt_t crt;
   const gnutls_datum_t *cert_list;
-  size_t cert_list_size = 0;
+  unsigned int cert_list_size = 0;
   int ret;
   char digest[20];
   char serial[40];
@@ -165,132 +164,111 @@ print_x509_info (gnutls_session_t session, const char *hostname)
 	}
 
 
-      if (xml)
+      expiret = gnutls_x509_crt_get_expiration_time (crt);
+      activet = gnutls_x509_crt_get_activation_time (crt);
+
+      printf (" # valid since: %s", my_ctime (&activet));
+      printf (" # expires at: %s", my_ctime (&expiret));
+
+
+      /* Print the serial number of the certificate.
+       */
+      if (verbose
+	  && gnutls_x509_crt_get_serial (crt, serial, &serial_size) >= 0)
 	{
-#ifdef ENABLE_PKI
-	  gnutls_datum_t xml_data;
+	  print = raw_to_string (serial, serial_size);
+	  if (print != NULL)
+	    printf (" # serial number: %s\n", print);
+	}
 
-	  ret = gnutls_x509_crt_to_xml (crt, &xml_data, 0);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr, "XML encoding error: %s\n",
-		       gnutls_strerror (ret));
-	      return;
-	    }
-
-	  printf ("%s", xml_data.data);
-	  gnutls_free (xml_data.data);
-#endif
+      /* Print the fingerprint of the certificate
+       */
+      digest_size = sizeof (digest);
+      if ((ret =
+	   gnutls_x509_crt_get_fingerprint (crt,
+					    GNUTLS_DIG_MD5,
+					    digest, &digest_size)) < 0)
+	{
+	  fprintf (stderr,
+		   "Error in fingerprint calculation: %s\n",
+		   gnutls_strerror (ret));
 	}
       else
 	{
+	  print = raw_to_string (digest, digest_size);
+	  if (print != NULL)
+	    printf (" # fingerprint: %s\n", print);
+	}
 
-	  expiret = gnutls_x509_crt_get_expiration_time (crt);
-	  activet = gnutls_x509_crt_get_activation_time (crt);
+      /* Print the version of the X.509 
+       * certificate.
+       */
+      if (verbose)
+	{
+	  printf (" # version: #%d\n", gnutls_x509_crt_get_version (crt));
 
-	  printf (" # valid since: %s", my_ctime (&activet));
-	  printf (" # expires at: %s", my_ctime (&expiret));
+	  bits = 0;
+	  algo = gnutls_x509_crt_get_pk_algorithm (crt, &bits);
+	  printf (" # public key algorithm: ");
 
-
-	  /* Print the serial number of the certificate.
-	   */
-	  if (verbose
-	      && gnutls_x509_crt_get_serial (crt, serial, &serial_size) >= 0)
-	    {
-	      print = raw_to_string (serial, serial_size);
-	      if (print != NULL)
-		printf (" # serial number: %s\n", print);
-	    }
-
-	  /* Print the fingerprint of the certificate
-	   */
-	  digest_size = sizeof (digest);
-	  if ((ret =
-	       gnutls_x509_crt_get_fingerprint (crt,
-						GNUTLS_DIG_MD5,
-						digest, &digest_size)) < 0)
-	    {
-	      fprintf (stderr,
-		       "Error in fingerprint calculation: %s\n",
-		       gnutls_strerror (ret));
-	    }
-	  else
-	    {
-	      print = raw_to_string (digest, digest_size);
-	      if (print != NULL)
-		printf (" # fingerprint: %s\n", print);
-	    }
-
-	  /* Print the version of the X.509 
-	   * certificate.
-	   */
-	  if (verbose)
-	    {
-	      printf (" # version: #%d\n", gnutls_x509_crt_get_version (crt));
-
-	      bits = 0;
-	      algo = gnutls_x509_crt_get_pk_algorithm (crt, &bits);
-	      printf (" # public key algorithm: ");
-
-	      cstr = SU (gnutls_pk_algorithm_get_name (algo));
-	      printf ("%s (%d bits)\n", cstr, bits);
+	  cstr = SU (gnutls_pk_algorithm_get_name (algo));
+	  printf ("%s (%d bits)\n", cstr, bits);
 
 #ifdef ENABLE_PKI
-	      if (algo == GNUTLS_PK_RSA)
+	  if (algo == GNUTLS_PK_RSA)
+	    {
+	      gnutls_datum_t e, m;
+
+	      ret = gnutls_x509_crt_get_pk_rsa_raw (crt, &m, &e);
+	      if (ret >= 0)
 		{
-		  gnutls_datum_t e, m;
+		  print = SU (raw_to_string (e.data, e.size));
+		  printf (" # e [%d bits]: %s\n", e.size * 8, print);
 
-		  ret = gnutls_x509_crt_get_pk_rsa_raw (crt, &m, &e);
-		  if (ret >= 0)
-		    {
-		      print = SU (raw_to_string (e.data, e.size));
-		      printf (" # e [%d bits]: %s\n", e.size * 8, print);
+		  print = SU (raw_to_string (m.data, m.size));
+		  printf (" # m [%d bits]: %s\n", m.size * 8, print);
 
-		      print = SU (raw_to_string (m.data, m.size));
-		      printf (" # m [%d bits]: %s\n", m.size * 8, print);
-
-		      gnutls_free (e.data);
-		      gnutls_free (m.data);
-		    }
+		  gnutls_free (e.data);
+		  gnutls_free (m.data);
 		}
-	      else if (algo == GNUTLS_PK_DSA)
-		{
-		  gnutls_datum_t p, q, g, y;
-
-		  ret = gnutls_x509_crt_get_pk_dsa_raw (crt, &p, &q, &g, &y);
-		  if (ret >= 0)
-		    {
-		      print = SU (raw_to_string (p.data, p.size));
-		      printf (" # p [%d bits]: %s\n", p.size * 8, print);
-
-		      print = SU (raw_to_string (q.data, q.size));
-		      printf (" # q [%d bits]: %s\n", q.size * 8, print);
-
-		      print = SU (raw_to_string (g.data, g.size));
-		      printf (" # g [%d bits]: %s\n", g.size * 8, print);
-
-		      print = SU (raw_to_string (y.data, y.size));
-		      printf (" # y [%d bits]: %s\n", y.size * 8, print);
-
-		      gnutls_free (p.data);
-		      gnutls_free (q.data);
-		      gnutls_free (g.data);
-		      gnutls_free (y.data);
-		    }
-		}
-#endif
 	    }
+	  else if (algo == GNUTLS_PK_DSA)
+	    {
+	      gnutls_datum_t p, q, g, y;
 
-	  dn_size = sizeof (dn);
-	  ret = gnutls_x509_crt_get_dn (crt, dn, &dn_size);
-	  if (ret >= 0)
-	    printf (" # Subject's DN: %s\n", dn);
+	      ret = gnutls_x509_crt_get_pk_dsa_raw (crt, &p, &q, &g, &y);
+	      if (ret >= 0)
+		{
+		  print = SU (raw_to_string (p.data, p.size));
+		  printf (" # p [%d bits]: %s\n", p.size * 8, print);
 
-	  dn_size = sizeof (dn);
-	  ret = gnutls_x509_crt_get_issuer_dn (crt, dn, &dn_size);
-	  if (ret >= 0)
-	    printf (" # Issuer's DN: %s\n", dn);
+		  print = SU (raw_to_string (q.data, q.size));
+		  printf (" # q [%d bits]: %s\n", q.size * 8, print);
+
+		  print = SU (raw_to_string (g.data, g.size));
+		  printf (" # g [%d bits]: %s\n", g.size * 8, print);
+
+		  print = SU (raw_to_string (y.data, y.size));
+		  printf (" # y [%d bits]: %s\n", y.size * 8, print);
+
+		  gnutls_free (p.data);
+		  gnutls_free (q.data);
+		  gnutls_free (g.data);
+		  gnutls_free (y.data);
+		}
+	    }
+#endif
 	}
+
+      dn_size = sizeof (dn);
+      ret = gnutls_x509_crt_get_dn (crt, dn, &dn_size);
+      if (ret >= 0)
+	printf (" # Subject's DN: %s\n", dn);
+
+      dn_size = sizeof (dn);
+      ret = gnutls_x509_crt_get_issuer_dn (crt, dn, &dn_size);
+      if (ret >= 0)
+	printf (" # Issuer's DN: %s\n", dn);
 
       gnutls_x509_crt_deinit (crt);
 
@@ -370,24 +348,6 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 	    {
 	      printf (" # The hostname in the key matches '%s'.\n", hostname);
 	    }
-	}
-
-      if (xml)
-	{
-	  gnutls_datum_t xml_data;
-
-	  ret = gnutls_openpgp_key_to_xml (crt, &xml_data, 0);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr, "XML encoding error: %s\n",
-		       gnutls_strerror (ret));
-	      return;
-	    }
-
-	  printf ("%s", xml_data.data);
-	  gnutls_free (xml_data.data);
-
-	  return;
 	}
 
       activet = gnutls_openpgp_key_get_creation_time (crt);
@@ -576,8 +536,8 @@ void
 print_cert_info (gnutls_session_t session, const char *hostname)
 {
 
-  if (gnutls_certificate_client_get_request_status( session) != 0)
-    printf("- Server has requested a certificate.\n");
+  if (gnutls_certificate_client_get_request_status (session) != 0)
+    printf ("- Server has requested a certificate.\n");
 
   printf ("- Certificate type: ");
   switch (gnutls_certificate_type_get (session))
@@ -618,19 +578,18 @@ print_list (int verbose)
 	if (verbose)
 	  printf ("\tKey exchange: %s\n\tCipher: %s\n\tMAC: %s\n\n",
 		  gnutls_kx_get_name (kx),
-		  gnutls_cipher_get_name (cipher),
-		  gnutls_mac_get_name (mac));
+		  gnutls_cipher_get_name (cipher), gnutls_mac_get_name (mac));
       }
   }
 
   {
-    const gnutls_certificate_type_t *p = gnutls_certificate_type_list();
+    const gnutls_certificate_type_t *p = gnutls_certificate_type_list ();
 
     printf ("Certificate types: ");
     for (; *p; p++)
       {
 	printf ("%s", gnutls_certificate_type_get_name (*p));
-	if (*(p+1))
+	if (*(p + 1))
 	  printf (", ");
 	else
 	  printf ("\n");
@@ -638,13 +597,13 @@ print_list (int verbose)
   }
 
   {
-    const gnutls_protocol_t *p = gnutls_protocol_list();
+    const gnutls_protocol_t *p = gnutls_protocol_list ();
 
     printf ("Protocols: ");
     for (; *p; p++)
       {
 	printf ("%s", gnutls_protocol_get_name (*p));
-	if (*(p+1))
+	if (*(p + 1))
 	  printf (", ");
 	else
 	  printf ("\n");
@@ -652,13 +611,13 @@ print_list (int verbose)
   }
 
   {
-    const gnutls_cipher_algorithm_t *p = gnutls_cipher_list();
+    const gnutls_cipher_algorithm_t *p = gnutls_cipher_list ();
 
     printf ("Ciphers: ");
     for (; *p; p++)
       {
 	printf ("%s", gnutls_cipher_get_name (*p));
-	if (*(p+1))
+	if (*(p + 1))
 	  printf (", ");
 	else
 	  printf ("\n");
@@ -666,13 +625,13 @@ print_list (int verbose)
   }
 
   {
-    const gnutls_mac_algorithm_t *p = gnutls_mac_list();
+    const gnutls_mac_algorithm_t *p = gnutls_mac_list ();
 
     printf ("MACs: ");
     for (; *p; p++)
       {
 	printf ("%s", gnutls_mac_get_name (*p));
-	if (*(p+1))
+	if (*(p + 1))
 	  printf (", ");
 	else
 	  printf ("\n");
@@ -680,13 +639,13 @@ print_list (int verbose)
   }
 
   {
-    const gnutls_kx_algorithm_t *p = gnutls_kx_list();
+    const gnutls_kx_algorithm_t *p = gnutls_kx_list ();
 
     printf ("Key exchange algorithms: ");
     for (; *p; p++)
       {
 	printf ("%s", gnutls_kx_get_name (*p));
-	if (*(p+1))
+	if (*(p + 1))
 	  printf (", ");
 	else
 	  printf ("\n");
@@ -694,13 +653,13 @@ print_list (int verbose)
   }
 
   {
-    const gnutls_compression_method_t *p = gnutls_compression_list();
+    const gnutls_compression_method_t *p = gnutls_compression_list ();
 
     printf ("Compression: ");
     for (; *p; p++)
       {
 	printf ("%s", gnutls_compression_get_name (*p));
-	if (*(p+1))
+	if (*(p + 1))
 	  printf (", ");
 	else
 	  printf ("\n");

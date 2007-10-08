@@ -33,7 +33,7 @@ endif
 
 noinst_LTLIBRARIES = libgnutls_openpgp.la
 
-COBJECTS = pgp.c xml.c pgpverify.c extras.c compat.c privkey.c
+COBJECTS = pgp.c pgpverify.c extras.c compat.c privkey.c
 
 libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp.h gnutls_openpgp.h
 

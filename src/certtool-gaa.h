@@ -17,11 +17,11 @@ struct _gaainfo
 #line 97 "certtool.gaa"
 	char *outfile;
 #line 94 "certtool.gaa"
-	int bits;
+	int quick_random;
 #line 91 "certtool.gaa"
-	int outcert_format;
+	int bits;
 #line 88 "certtool.gaa"
-	int xml;
+	int outcert_format;
 #line 85 "certtool.gaa"
 	int incert_format;
 #line 82 "certtool.gaa"

@@ -40,15 +40,6 @@ _gnutls_srp_recv_params (gnutls_session_t session, const opaque * data,
   uint8_t len;
   ssize_t data_size = _data_size;
 
-  if (_gnutls_kx_priority (session, GNUTLS_KX_SRP) < 0 &&
-      _gnutls_kx_priority (session, GNUTLS_KX_SRP_DSS) < 0 &&
-      _gnutls_kx_priority (session, GNUTLS_KX_SRP_RSA) < 0)
-    {
-      /* algorithm was not allowed in this session
-       */
-      return 0;
-    }
-
   if (session->security_parameters.entity == GNUTLS_SERVER)
     {
       if (data_size > 0)
@@ -117,19 +108,11 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 	   */
 	  char *username = NULL, *password = NULL;
 
-	  if (cred->get_function (session,
-				  session->internals.handshake_restarted,
-				  &username, &password) < 0
+	  if (cred->get_function (session, &username, &password) < 0
 	      || username == NULL || password == NULL)
 	    {
-
-	      if (session->internals.handshake_restarted)
-		{
-		  gnutls_assert ();
-		  return GNUTLS_E_ILLEGAL_SRP_USERNAME;
-		}
-
-	      return 0;
+                gnutls_assert ();
+                return GNUTLS_E_ILLEGAL_SRP_USERNAME;
 	    }
 
 	  len = MIN (strlen (username), 255);

@@ -8,74 +8,72 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 128 "cli.gaa"
+#line 125 "cli.gaa"
 	char *rest_args;
-#line 119 "cli.gaa"
-	int insecure;
 #line 116 "cli.gaa"
-	char *port;
+	int insecure;
 #line 113 "cli.gaa"
-	char *opaque_prf_input;
+	char *port;
 #line 110 "cli.gaa"
-	char *authz_saml_assertion;
+	char *opaque_prf_input;
 #line 107 "cli.gaa"
-	char *authz_x509_attr_cert;
+	char *authz_saml_assertion;
 #line 104 "cli.gaa"
-	char *psk_key;
+	char *authz_x509_attr_cert;
 #line 101 "cli.gaa"
-	char *psk_username;
+	char *psk_key;
 #line 98 "cli.gaa"
-	char *srp_passwd;
+	char *psk_username;
 #line 95 "cli.gaa"
-	char *srp_username;
+	char *srp_passwd;
 #line 92 "cli.gaa"
-	char *x509_certfile;
+	char *srp_username;
 #line 89 "cli.gaa"
-	char *x509_keyfile;
+	char *x509_certfile;
 #line 86 "cli.gaa"
-	char *pgp_certfile;
+	char *x509_keyfile;
 #line 83 "cli.gaa"
-	char *pgp_trustdb;
+	char *pgp_certfile;
 #line 80 "cli.gaa"
-	char *pgp_keyring;
+	char *pgp_trustdb;
 #line 77 "cli.gaa"
-	char *pgp_keyfile;
+	char *pgp_keyring;
 #line 74 "cli.gaa"
-	char *x509_crlfile;
+	char *pgp_keyfile;
 #line 71 "cli.gaa"
-	char *x509_cafile;
+	char *x509_crlfile;
 #line 68 "cli.gaa"
+	char *x509_cafile;
+#line 65 "cli.gaa"
 	char **ctype;
-#line 67 "cli.gaa"
-	int nctype;
 #line 64 "cli.gaa"
+	int nctype;
+#line 61 "cli.gaa"
 	char **kx;
-#line 63 "cli.gaa"
-	int nkx;
 #line 60 "cli.gaa"
+	int nkx;
+#line 57 "cli.gaa"
 	char **macs;
-#line 59 "cli.gaa"
-	int nmacs;
 #line 56 "cli.gaa"
+	int nmacs;
+#line 53 "cli.gaa"
 	char **comp;
-#line 55 "cli.gaa"
-	int ncomp;
 #line 52 "cli.gaa"
+	int ncomp;
+#line 49 "cli.gaa"
 	char **proto;
-#line 51 "cli.gaa"
-	int nproto;
 #line 48 "cli.gaa"
+	int nproto;
+#line 45 "cli.gaa"
 	char **ciphers;
-#line 47 "cli.gaa"
-	int nciphers;
 #line 44 "cli.gaa"
-	int verbose;
+	int nciphers;
 #line 41 "cli.gaa"
-	int record_size;
+	int verbose;
 #line 38 "cli.gaa"
-	int print_cert;
+	int record_size;
 #line 35 "cli.gaa"
-	int xml;
+	int print_cert;
 #line 32 "cli.gaa"
 	int disable_extensions;
 #line 29 "cli.gaa"

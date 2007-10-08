@@ -171,7 +171,8 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
     }
 
   /* copy from pwd_entry to local variables (actually in session) */
-  if (_gnutls_mpi_scan_nz (&G, pwd_entry->g.data, &pwd_entry->g.size) < 0)
+  tmp_size = pwd_entry->g.size;
+  if (_gnutls_mpi_scan_nz (&G, pwd_entry->g.data, &tmp_size) < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;

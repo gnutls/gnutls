@@ -7,8 +7,24 @@ See the end for copying conditions.
 
 ** certtool: Fixed data corruption when using --outder.
 
+** Removed all the xml related stubs and functions.
+
+** Added capability to set a callback after the client hello is received
+by the server in order to adjust parameters before the handshake.
+
+** SRP was corrected to adhere to the latest draft (published soon as RFC)
+
+** Corrected bug which did not allow a server to run without supporting
+certificates.
+
+** Updated the DN parser which now prints wrongly decoded values as hex
+strings.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_to_xml: REMOVED
+gnutls_openpgp_key_to_xml: REMOVED
+gnutls_srp_set_client_credentials_function: CHANGED
+gnutls_handshake_set_post_client_hello_function: ADDED
 
 * Version 2.1.1 (released 2007-09-24)
 

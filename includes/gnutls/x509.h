@@ -231,14 +231,6 @@ extern "C"
 					    size_t sizeof_buf,
 					    unsigned int critical);
 
-  int gnutls_x509_crt_to_xml (gnutls_x509_crt_t cert,
-			      gnutls_datum_t * res, int detail);
-
-/* Possible values for gnutls_x509_crt_to_xml() detail.
- */
-#define GNUTLS_XML_SHOW_ALL 1
-#define GNUTLS_XML_NORMAL 0
-
 /* X.509 Certificate writing.
  */
   int gnutls_x509_crt_set_dn_by_oid (gnutls_x509_crt_t crt,

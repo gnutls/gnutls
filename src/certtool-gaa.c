@@ -159,9 +159,9 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "hash", "STR ", "Hash algorithm to use for signing (MD5,SHA1,RMD160,SHA256,SHA384,SHA512).");
 	__gaa_helpsingle(0, "export-ciphers", "", "Use weak encryption algorithms.");
 	__gaa_helpsingle(0, "inder", "", "Use DER format for input certificates and private keys.");
-	__gaa_helpsingle(0, "xml", "", "Use XML format for output certificates.");
 	__gaa_helpsingle(0, "outder", "", "Use DER format for output certificates and private keys.");
 	__gaa_helpsingle(0, "bits", "BITS ", "specify the number of bits for key generation.");
+	__gaa_helpsingle(0, "quick-random", "", "Use /dev/urandom for all operation, reducing the quality of randomness used.");
 	__gaa_helpsingle(0, "outfile", "FILE ", "Output file.");
 	__gaa_helpsingle(0, "infile", "FILE ", "Input file.");
 	__gaa_helpsingle(0, "template", "FILE ", "Template file to use for non interactive operation.");
@@ -191,11 +191,11 @@ struct _gaainfo
 #line 97 "certtool.gaa"
 	char *outfile;
 #line 94 "certtool.gaa"
-	int bits;
+	int quick_random;
 #line 91 "certtool.gaa"
-	int outcert_format;
+	int bits;
 #line 88 "certtool.gaa"
-	int xml;
+	int outcert_format;
 #line 85 "certtool.gaa"
 	int incert_format;
 #line 82 "certtool.gaa"
@@ -283,9 +283,9 @@ static int gaa_error = 0;
 #define GAAOPTID_template	4
 #define GAAOPTID_infile	5
 #define GAAOPTID_outfile	6
-#define GAAOPTID_bits	7
-#define GAAOPTID_outder	8
-#define GAAOPTID_xml	9
+#define GAAOPTID_quick_random	7
+#define GAAOPTID_bits	8
+#define GAAOPTID_outder	9
 #define GAAOPTID_inder	10
 #define GAAOPTID_export_ciphers	11
 #define GAAOPTID_hash	12
@@ -619,8 +619,8 @@ static int gaa_get_option_num(char *str, int status)
 #line 375 "gaa.skel"
 			GAA_CHECK1STR("v", GAAOPTID_version);
 			GAA_CHECK1STR("h", GAAOPTID_help);
+			GAA_CHECK1STR("", GAAOPTID_quick_random);
 			GAA_CHECK1STR("", GAAOPTID_outder);
-			GAA_CHECK1STR("", GAAOPTID_xml);
 			GAA_CHECK1STR("", GAAOPTID_inder);
 			GAA_CHECK1STR("", GAAOPTID_export_ciphers);
 			GAA_CHECK1STR("", GAAOPTID_dsa);
@@ -654,9 +654,9 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("template", GAAOPTID_template);
 			GAA_CHECKSTR("infile", GAAOPTID_infile);
 			GAA_CHECKSTR("outfile", GAAOPTID_outfile);
+			GAA_CHECKSTR("quick-random", GAAOPTID_quick_random);
 			GAA_CHECKSTR("bits", GAAOPTID_bits);
 			GAA_CHECKSTR("outder", GAAOPTID_outder);
-			GAA_CHECKSTR("xml", GAAOPTID_xml);
 			GAA_CHECKSTR("inder", GAAOPTID_inder);
 			GAA_CHECKSTR("export-ciphers", GAAOPTID_export_ciphers);
 			GAA_CHECKSTR("hash", GAAOPTID_hash);
@@ -785,27 +785,27 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 
 		return GAA_OK;
 		break;
+	case GAAOPTID_quick_random:
+	OK = 0;
+#line 95 "certtool.gaa"
+{ gaaval->quick_random = 1; ;};
+
+		return GAA_OK;
+		break;
 	case GAAOPTID_bits:
 	OK = 0;
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_bits.arg1, gaa_getint, GAATMP_bits.size1);
 		gaa_index++;
-#line 95 "certtool.gaa"
+#line 92 "certtool.gaa"
 { gaaval->bits = GAATMP_bits.arg1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_outder:
 	OK = 0;
-#line 92 "certtool.gaa"
-{ gaaval->outcert_format=1 ;};
-
-		return GAA_OK;
-		break;
-	case GAAOPTID_xml:
-	OK = 0;
 #line 89 "certtool.gaa"
-{ gaaval->xml=1 ;};
+{ gaaval->outcert_format=1 ;};
 
 		return GAA_OK;
 		break;
@@ -1068,7 +1068,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 { gaaval->bits = 1024; gaaval->pkcs8 = 0; gaaval->privkey = NULL; gaaval->ca=NULL; gaaval->ca_privkey = NULL; 
 	gaaval->debug=1; gaaval->request = NULL; gaaval->infile = NULL; gaaval->outfile = NULL; gaaval->cert = NULL; 
 	gaaval->incert_format = 0; gaaval->outcert_format = 0; gaaval->action=-1; gaaval->pass = NULL; 
-	gaaval->export = 0; gaaval->template = NULL; gaaval->xml = 0; gaaval->hash=NULL; gaaval->fix_key = 0;;};
+	gaaval->export = 0; gaaval->template = NULL; gaaval->hash=NULL; gaaval->fix_key = 0; gaaval->quick_random=0; ;};
 
     }
     inited = 1;
@@ -1216,7 +1216,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
 
         len++;
         a = fgetc( file);
-        if(a==EOF) return 0; /* a = ' '; */
+        if(a==EOF) return 0; //a = ' ';
     }
 
     len += 1;

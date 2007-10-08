@@ -32,9 +32,6 @@ option (f, fingerprint) { $fingerprint = 1 } "Send the openpgp fingerprint, inst
 #int disable_extensions;
 option ( disable-extensions) { $disable_extensions = 1 } "Disable all the TLS extensions."
 
-#int xml;
-option (xml) { $xml = 1 } "Print the certificate information in XML format."
-
 #int print_cert;
 option (print-cert) { $print_cert = 1 } "Print the certificate in PEM format."
 
@@ -133,7 +130,7 @@ init { $resume=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $record_size=0; 
 	$fingerprint=0; $pgp_trustdb=NULL; $pgp_keyring=NULL; $x509_crlfile = NULL;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL; $disable_extensions = 0;
-	$x509_keyfile=NULL; $x509_certfile=NULL; $crlf = 0; $xml = 0;
+	$x509_keyfile=NULL; $x509_certfile=NULL; $crlf = 0; 
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 
 	$debug = 0; $print_cert = 0; $verbose = 0; $psk_key = NULL; 
 	$psk_username = NULL; 

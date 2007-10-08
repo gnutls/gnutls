@@ -261,12 +261,15 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
 	  STR_APPEND (ldap_desc);
 	  STR_APPEND ("=");
+	  result = 0;
+	  
 	  if (printable)
 	    result =
 	      _gnutls_x509_oid_data2string (oid,
 					    value2, len,
 					    string, &sizeof_string);
-	  else
+
+	  if (!printable || result < 0)
 	    result =
 	      _gnutls_x509_data2hex (value2, len, string, &sizeof_string);
 
