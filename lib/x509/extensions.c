@@ -525,6 +525,7 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
 	*pathLenConstraint = -1;
       else if (result != GNUTLS_E_SUCCESS)
 	{
+	  gnutls_assert();
 	  asn1_delete_structure (&ext);
 	  return _gnutls_asn2err (result);
 	}
