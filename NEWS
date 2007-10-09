@@ -20,6 +20,9 @@ certificates.
 ** Updated the DN parser which now prints wrongly decoded values as hex
 strings.
 
+** certtool: Add option --quick-random.
+For generating low security test credentials.
+
 ** API and ABI modifications:
 gnutls_x509_crt_to_xml: REMOVED
 gnutls_openpgp_key_to_xml: REMOVED
