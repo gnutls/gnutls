@@ -643,9 +643,8 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
 
 	  /* certificate was required 
 	   */
-	  if (ret ==
-	      (GNUTLS_E_WARNING_ALERT_RECEIVED
-	       || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
+	  if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED 
+	    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
 	      && optional == MANDATORY_PACKET)
 	    {
 	      gnutls_assert ();
@@ -664,10 +663,10 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
 	  gnutls_assert ();
 	  return 0;
 	}
-
       ret =
 	session->internals.auth_struct->
 	gnutls_process_client_certificate (session, data, datasize);
+
       gnutls_free (data);
       if (ret < 0 && ret != GNUTLS_E_NO_CERTIFICATE_FOUND)
 	{
