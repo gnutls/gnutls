@@ -869,7 +869,10 @@ _gnutls_proc_x509_server_certificate (gnutls_session_t session,
   size = _gnutls_read_uint24 (p);
   p += 3;
 
-  if (size == 0)
+  /* some implementations send 0B 00 00 06 00 00 03 00 00 00
+   * instead of just 0B 00 00 03 00 00 00 as an empty certificate message.
+   */
+  if (size == 0 || size == 3)
     {
       gnutls_assert ();
       /* no certificate was sent */
