@@ -356,7 +356,7 @@ certificate-revoked certificate-expired certificate-unknown illegal-parameter
 unknown-ca access-denied decode-error decrypt-error export-restriction
 protocol-version insufficient-security internal-error user-canceled
 no-renegotiation unsupported-extension certificate-unobtainable
-unrecognized-name unknown-srp-username missing-srp-username
+unrecognized-name unknown-psk-identity
 inner-application-failure inner-application-verification)
                   #f
                   "GNUTLS_A_"))

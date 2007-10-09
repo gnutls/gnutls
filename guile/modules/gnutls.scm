@@ -190,8 +190,7 @@
            alert-description/unsupported-extension
            alert-description/certificate-unobtainable
            alert-description/unrecognized-name
-           alert-description/unknown-srp-username
-           alert-description/missing-srp-username
+           alert-description/unknown-psk-identity
            alert-description/inner-application-failure
            alert-description/inner-application-verification
            handshake-description/hello-request
