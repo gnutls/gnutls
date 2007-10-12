@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.1.2 (unreleased)
 
+** The 256 bit ciphers are not enabled in the default priorities.
+
+** Added support for DSA2 using libgcrypt 1.3.0.
+
 ** certtool: Fixed data corruption when using --outder.
 
 ** Removed all the xml related stubs and functions.
