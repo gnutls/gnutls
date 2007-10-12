@@ -569,6 +569,7 @@ differences of these protocols are minor. Older protocols such as
 * The TLS Alert Protocol::
 * The TLS Handshake Protocol::
 * TLS Extensions::
+* Selecting cryptographic key sizes::
 * On SSL 2 and older protocols::
 @end menu
 
@@ -1032,42 +1033,53 @@ and public key algorithms based on the most conservative values of @xcite{SELKEY
 Those can be used to generate certificates with appropriate key sizes as well
 as parameters for Diffie Hellman and SRP authentication.
 
-@multitable @columnfractions .25 .25 .25
+@multitable @columnfractions .15 .20 .20 .20
 
-@item Symmetric key size
+@item Year
+@tab Symmetric key size
 @tab RSA key size, DH and SRP prime size
 @tab ECC key size
 
-@item 56
+@item 1982
+@tab 56
 @tab 417
 @tab 105
 
-@item 61
+@item 1988
+@tab 61
 @tab 566
 @tab 114
 
-@item 72
+@item 2002
+@tab 72
 @tab 1028
 @tab 139
 
-@item 82
+@item 2015
+@tab 82
 @tab 1613
 @tab 173
 
-@item 92
+@item 2028
+@tab 92
 @tab 2362
 @tab 210
 
-@item 101
+@item 2040
+@tab 101
 @tab 3214
 @tab 244
 
-@item 109
+@item 2050 
+@tab 109
 @tab 4047
 @tab 272
 
 @end multitable
 
+The first column provides an estimation of the year until these parameters
+are considered safe and the rest of the columns list the parameters for the
+various algorithms.
 
 @node On SSL 2 and older protocols
 @section On SSL 2 and Older Protocols
