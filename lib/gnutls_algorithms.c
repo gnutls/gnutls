@@ -202,8 +202,8 @@ struct gnutls_hash_entry
 {
   const char *name;
   const char *oid;
-  size_t key_size; /* in case of mac */
   gnutls_mac_algorithm_t id;
+  size_t key_size; /* in case of mac */
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 

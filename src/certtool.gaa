@@ -111,7 +111,7 @@ option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
 option (v, version) { certtool_version(); exit(0); } "shows the program's version"
 
-init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
+init { $bits = 2048; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; 
 	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=0; }

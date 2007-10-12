@@ -122,12 +122,7 @@ generate_private_key_int (void)
   int ret, key_type;
 
   if (info.dsa)
-    {
-      key_type = GNUTLS_PK_DSA;
-
-      if (info.bits > 1024)
-	error (EXIT_FAILURE, 0, "--dsa is incompatible with --bits > 1024");
-    }
+    key_type = GNUTLS_PK_DSA;
   else
     key_type = GNUTLS_PK_RSA;
 

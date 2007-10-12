@@ -60,6 +60,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   if (algo == NULL)
     {
       gnutls_assert ();
+      _gnutls_x509_log("Hash algorithm: %d\n", hash);
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 

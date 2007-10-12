@@ -39,7 +39,7 @@ _gnutls_dsa_generate_params (mpi_t * resarr, int *resarr_len, int bits)
   int ret;
   gcry_sexp_t parms, key, list;
 
-  if (bits < 512 || bits > 1024)
+  if (bits < 512)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
