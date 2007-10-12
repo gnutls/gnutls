@@ -164,8 +164,10 @@ static const gnutls_cipher_entry algorithms[] = {
   {"ARCFOUR 40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1},
   {"RC2 40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 1},
 #ifdef	ENABLE_CAMELLIA
-  {"CAMELLIA 256 CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
-  {"CAMELLIA 128 CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
+  {"CAMELLIA 256 CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK,
+   16, 0},
+  {"CAMELLIA 128 CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16, CIPHER_BLOCK,
+   16, 0},
 #endif
   {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0},
   {0, 0, 0, 0, 0, 0, 0}
@@ -200,20 +202,21 @@ struct gnutls_hash_entry
 {
   const char *name;
   const char *oid;
+  size_t key_size; /* in case of mac */
   gnutls_mac_algorithm_t id;
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-  {"SHA", HASH_OID_SHA1, GNUTLS_MAC_SHA1},
-  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5},
-  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256},
-  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384},
-  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512},
-  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2},
-  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160},
-  {"NULL", NULL, GNUTLS_MAC_NULL},
-  {0, 0, 0}
+  {"SHA", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20},
+  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16},
+  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32},
+  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48},
+  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64},
+  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0}, /* not used as MAC */
+  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20},
+  {"NULL", NULL, GNUTLS_MAC_NULL, 0},
+  {0, 0, 0, 0}
 };
 
 /* Keep the contents of this struct the same as the previous one. */
@@ -487,10 +490,12 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 			     GNUTLS_MAC_SHA1, GNUTLS_SSL3),
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_CAMELLIA_128_CBC_SHA1,
-			     GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_ANON_DH,
+			     GNUTLS_CIPHER_CAMELLIA_128_CBC,
+			     GNUTLS_KX_ANON_DH,
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_CAMELLIA_256_CBC_SHA1,
-			     GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_ANON_DH,
+			     GNUTLS_CIPHER_CAMELLIA_256_CBC,
+			     GNUTLS_KX_ANON_DH,
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
 #endif
 
@@ -572,10 +577,12 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 			     GNUTLS_MAC_SHA1, GNUTLS_SSL3),
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA1,
-			     GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_DHE_DSS,
+			     GNUTLS_CIPHER_CAMELLIA_128_CBC,
+			     GNUTLS_KX_DHE_DSS,
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA1,
-			     GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_DHE_DSS,
+			     GNUTLS_CIPHER_CAMELLIA_256_CBC,
+			     GNUTLS_KX_DHE_DSS,
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
 #endif
   /* DHE_RSA */
@@ -590,10 +597,12 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 			     GNUTLS_MAC_SHA1, GNUTLS_SSL3),
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA1,
-			     GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_DHE_RSA,
+			     GNUTLS_CIPHER_CAMELLIA_128_CBC,
+			     GNUTLS_KX_DHE_RSA,
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA1,
-			     GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_DHE_RSA,
+			     GNUTLS_CIPHER_CAMELLIA_256_CBC,
+			     GNUTLS_KX_DHE_RSA,
 			     GNUTLS_MAC_SHA1, GNUTLS_TLS1),
 #endif
   /* RSA */
@@ -670,6 +679,25 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 
   /* avoid prefix */
   GNUTLS_HASH_ALG_LOOP (ret = p->name);
+
+  return ret;
+}
+
+/**
+  * gnutls_mac_get_key_size - Returns the length of the MAC's key size
+  * @algorithm: is an encryption algorithm
+  *
+  * Returns the length (in bytes) of the given MAC key size.
+  * Returns 0 if the given MAC algorithm is invalid.
+  *
+  **/
+size_t
+gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
+{
+  size_t ret = 0;
+
+  /* avoid prefix */
+  GNUTLS_HASH_ALG_LOOP (ret = p->key_size);
 
   return ret;
 }
@@ -1334,10 +1362,10 @@ gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t
 const char *
 gnutls_cipher_suite_info (size_t idx,
 			  char *cs_id,
-			  gnutls_kx_algorithm_t *kx,
-			  gnutls_cipher_algorithm_t *cipher,
-			  gnutls_mac_algorithm_t *mac,
-			  gnutls_protocol_t *version)
+			  gnutls_kx_algorithm_t * kx,
+			  gnutls_cipher_algorithm_t * cipher,
+			  gnutls_mac_algorithm_t * mac,
+			  gnutls_protocol_t * version)
 {
   if (idx >= CIPHER_SUITES_COUNT)
     return NULL;
@@ -1950,3 +1978,4 @@ _gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
 
   return ret;
 }
+

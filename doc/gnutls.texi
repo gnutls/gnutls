@@ -1022,6 +1022,53 @@ begins within the first handshake packet.  The functions
 used to enable this extension, or to retrieve the name sent by a
 client.
 
+@node Selecting cryptographic key sizes
+@section Selecting Cryptographic Key Sizes
+@cindex key sizes
+
+In TLS, since a lot of algorithms are involved, it is not easy to set a consistent security level.
+For this reason this section will present some correspondance between key sizes of symmetric algorithms
+and public key algorithms based on the most conservative values of @xcite{SELKEY}. 
+Those can be used to generate certificates with appropriate key sizes as well
+as parameters for Diffie Hellman and SRP authentication.
+
+@multitable @columnfractions .25 .25 .25
+
+@item Symmetric key size
+@tab RSA key size, DH and SRP prime size
+@tab ECC key size
+
+@item 56
+@tab 417
+@tab 105
+
+@item 61
+@tab 566
+@tab 114
+
+@item 72
+@tab 1028
+@tab 139
+
+@item 82
+@tab 1613
+@tab 173
+
+@item 92
+@tab 2362
+@tab 210
+
+@item 101
+@tab 3214
+@tab 244
+
+@item 109
+@tab 4047
+@tab 272
+
+@end multitable
+
+
 @node On SSL 2 and older protocols
 @section On SSL 2 and Older Protocols
 @cindex SSL 2
@@ -3620,6 +3667,10 @@ is summarized in the following diagram.
 @unnumbered Bibliography
 
 @table @asis
+
+@item @anchor{SELKEY}[SELKEY]
+Arjen Lenstra and Eric Verheul, "Selecting Cryptographic Key Sizes", 2003, available from
+@url{http://www.win.tue.nl/~klenstra/key.pdf}.
 
 @item @anchor{CBCATT}[CBCATT]
 Bodo Moeller, "Security of CBC Ciphersuites in SSL/TLS: Problems and

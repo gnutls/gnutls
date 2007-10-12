@@ -55,13 +55,13 @@ _gnutls_dh_generate_prime (mpi_t * ret_g, mpi_t * ret_n, unsigned int bits)
   mpi_t *factors = NULL;
 
   /* Calculate the size of a prime factor of (prime-1)/2.
-   * This is a bad emulation of Michael Wiener's table
+   * This is an emulation of the values in "Selecting Cryptographic Key Sizes" paper.
    */
   if (bits < 256)
     qbits = bits / 2;
   else
     {
-      qbits = 120 + (((bits / 256) - 1) * 20);
+      qbits = (bits/40) + 105;
     }
 
   if (qbits & 1)		/* better have an even number */

@@ -370,6 +370,7 @@ extern "C"
 							 session);
 
   size_t gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm);
+  size_t gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm);
 
 /* the name of the specified algorithms */
   const char *gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm);

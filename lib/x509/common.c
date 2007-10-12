@@ -1326,8 +1326,10 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 
   len /= 8;
 
-  if (algo == GNUTLS_PK_RSA)
+  switch (algo) 
     {
+    case GNUTLS_PK_RSA:
+      {
       if ((result = _gnutls_x509_read_rsa_params (str, len, params)) < 0)
 	{
 	  gnutls_assert ();
@@ -1338,10 +1340,10 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 
       _gnutls_mpi_release (&params[0]);
       _gnutls_mpi_release (&params[1]);
-    }
-
-  if (algo == GNUTLS_PK_DSA)
-    {
+      }
+      break;
+    case GNUTLS_PK_DSA:
+      {
 
       if ((result = _gnutls_x509_read_dsa_pubkey (str, len, params)) < 0)
 	{
@@ -1352,6 +1354,10 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
       bits[0] = _gnutls_mpi_get_nbits (params[3]);
 
       _gnutls_mpi_release (&params[3]);
+      }
+      break;
+    default:
+      _gnutls_x509_log("_gnutls_x509_get_pk_algorithm: unhandled algorithm %d\n", algo);
     }
 
   gnutls_free (str);
