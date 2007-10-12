@@ -28,6 +28,7 @@ gnutls_x509_crt_to_xml: REMOVED
 gnutls_openpgp_key_to_xml: REMOVED
 gnutls_srp_set_client_credentials_function: CHANGED
 gnutls_handshake_set_post_client_hello_function: ADDED
+gnutls_mac_get_key_size: ADDED
 
 * Version 2.1.1 (released 2007-09-24)
 
