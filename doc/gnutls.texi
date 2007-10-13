@@ -1081,6 +1081,10 @@ The first column provides an estimation of the year until these parameters
 are considered safe and the rest of the columns list the parameters for the
 various algorithms.
 
+Note however that the values suggested here are nothing more than an educated
+guess that is valid today. There are no guarrantees that an algorithm will remain unbreakable or that these values will remain constant in time. There could be scientific breakthroughs that cannot be predicted or total failure of the current public key systems by quantum computers. On the other hand though the cryptosystems
+used in TLS are selected in a conservative way and such catastrophic breakthroughs or failures are believed to be unlikely.
+
 @node On SSL 2 and older protocols
 @section On SSL 2 and Older Protocols
 @cindex SSL 2
