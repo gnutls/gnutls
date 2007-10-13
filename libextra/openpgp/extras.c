@@ -22,7 +22,7 @@
  *
  */
 
-/* Functions on OpenPGP keyring and trustdb parsing
+/* Functions on OpenPGP keyring parsing
  */
 
 #include <gnutls_int.h>
@@ -173,75 +173,3 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
   return _gnutls_map_cdk_rc (err);
 }
 
-
-/* TrustDB stuff.
- */
-
-/**
-  * gnutls_openpgp_trustdb_init - This function initializes a gnutls_openpgp_trustdb_t structure
-  * @trustdb: The structure to be initialized
-  *
-  * This function will initialize an OpenPGP trustdb structure. 
-  *
-  * Returns 0 on success.
-  *
-  **/
-int
-gnutls_openpgp_trustdb_init (gnutls_openpgp_trustdb_t * trustdb)
-{
-  *trustdb = gnutls_calloc (1, sizeof (gnutls_openpgp_trustdb_int));
-
-  if (*trustdb)
-    return 0; /* success */
-  return GNUTLS_E_MEMORY_ERROR;
-}
-
-/**
-  * gnutls_openpgp_trustdb_deinit - This function deinitializes memory used by a gnutls_openpgp_trustdb_t structure
-  * @trustdb: The structure to be initialized
-  *
-  * This function will deinitialize a CRL structure. 
-  *
-  **/
-void
-gnutls_openpgp_trustdb_deinit (gnutls_openpgp_trustdb_t trustdb)
-{
-  if (!trustdb)
-    return;
-
-  if (trustdb->st)
-    {
-      cdk_stream_close (trustdb->st);
-      trustdb->st = NULL;
-    }
-
-  gnutls_free (trustdb);
-}
-
-/**
-  * gnutls_openpgp_trustdb_import_file - This function will import a RAW or BASE64 encoded key
-  * @trustdb: The structure to store the parsed key.
-  * @file: The file that holds the trustdb.
-  *
-  * This function will convert the given RAW or Base64 encoded trustdb
-  * to the native gnutls_openpgp_trustdb_t format. The output will be stored in 'trustdb'.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int
-gnutls_openpgp_trustdb_import_file (gnutls_openpgp_trustdb_t trustdb,
-				    const char *file)
-{
-  int rc;
-
-  rc = cdk_stream_open (file, &trustdb->st);
-  if (rc)
-    {
-      rc = _gnutls_map_cdk_rc (rc);
-      gnutls_assert ();
-      return rc;
-    }
-
-  return 0;
-}

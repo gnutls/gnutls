@@ -37,13 +37,7 @@ typedef struct gnutls_openpgp_keyring_int
 } gnutls_openpgp_keyring_int;
 
 
-typedef struct gnutls_openpgp_trustdb_int
-{
-  cdk_stream_t st;
-} gnutls_openpgp_trustdb_int;
-
 typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
-typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb_t;
 
 int _gnutls_map_cdk_rc (int rc);
 int gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
@@ -77,19 +71,9 @@ int gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 				     const unsigned char keyid[8],
 				     unsigned int flags);
 
-void gnutls_openpgp_trustdb_deinit (gnutls_openpgp_trustdb_t trustdb);
-int gnutls_openpgp_trustdb_init (gnutls_openpgp_trustdb_t * trustdb);
-int gnutls_openpgp_trustdb_import_file (gnutls_openpgp_trustdb_t trustdb,
-					const char *file);
-
 int gnutls_openpgp_key_verify_ring (gnutls_openpgp_key_t key,
 				    gnutls_openpgp_keyring_t keyring,
 				    unsigned int flags, unsigned int *verify);
-
-int gnutls_openpgp_key_verify_trustdb (gnutls_openpgp_key_t key,
-				       gnutls_openpgp_trustdb_t trustdb,
-				       unsigned int flags,
-				       unsigned int *verify);
 
 int gnutls_openpgp_key_verify_self (gnutls_openpgp_key_t key,
 				    unsigned int flags, unsigned int *verify);
@@ -104,7 +88,6 @@ void gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key);
 #else /* no opencdk */
 
 typedef void *gnutls_openpgp_keyring_t;
-typedef void *gnutls_openpgp_trustdb_t;
 
 #endif /* ENABLE_OPENPGP */
 

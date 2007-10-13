@@ -1062,35 +1062,6 @@ gnutls_certificate_set_openpgp_keyserver (gnutls_certificate_credentials_t
   return 0;
 }
 
-
-/**
- * gnutls_certificate_set_openpgp_trustdb - Used to set an GnuPG trustdb
- * @res: the destination context to save the data.
- * @trustdb: is the trustdb filename
- *
- * This funtion will set a GnuPG trustdb which will be used in key
- * verification functions. Only version 3 trustdb files are supported.
- *
- **/
-int
-gnutls_certificate_set_openpgp_trustdb (gnutls_certificate_credentials_t
-					res, const char *trustdb)
-{
-  if (!res || !trustdb)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-  
-  /* FIXME: We do not support the trustdb yet. */
-  gnutls_free (res->pgp_trustdb);
-  res->pgp_trustdb = gnutls_strdup (trustdb);
-  if (res->pgp_trustdb == NULL)
-    return GNUTLS_E_MEMORY_ERROR;
-
-  return 0;
-}
-
 /**
  * gnutls_openpgp_set_recv_key_function - Used to set a key retrieval callback for PGP keys
  * @session: a TLS session

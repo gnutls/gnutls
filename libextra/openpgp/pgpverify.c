@@ -32,26 +32,6 @@
 #include <openpgp.h>
 #include <x509/verify.h>	/* lib/x509/verify.h */
 
-static int
-openpgp_get_key_trust (gnutls_openpgp_trustdb_t trustdb,
-		       gnutls_openpgp_key_t key, unsigned int *r_trustval)
-{
-  int rc;
-
-  /* FIXME: This operation is not supported any longer. */
-  
-  if (!trustdb || !key || !r_trustval)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  *r_trustval = 0;
-  rc = 0;
-  
-  return rc;
-}
-
 
 /**
  * gnutls_openpgp_key_verify_ring - Verify all signatures in the key
@@ -163,51 +143,3 @@ gnutls_openpgp_key_verify_self (gnutls_openpgp_key_t key,
   return 0;
 }
 
-
-/**
- * gnutls_openpgp_key_verify_trustdb - Verify all signatures in the key
- * @key: the structure that holds the key.
- * @trustdb: holds the trustdb to check against
- * @flags: unused (should be 0)
- * @verify: will hold the certificate verification output.
- *
- * Checks if the key is revoked or disabled, in the trustdb.
- * The verification output will be put in @verify and will be
- * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
- *
- * GNUTLS_CERT_INVALID: A signature on the key is invalid.
- *
- * GNUTLS_CERT_REVOKED: The key has been revoked.
- *
- * Note that this function does not verify using any "web of
- * trust". You may use GnuPG for that purpose, or any other external
- * PGP application.
- *
- * Returns 0 on success.
- **/
-int
-gnutls_openpgp_key_verify_trustdb (gnutls_openpgp_key_t key,
-				   gnutls_openpgp_trustdb_t trustdb,
-				   unsigned int flags, unsigned int *verify)
-{
-  int rc;
-  
-  /* FIXME: The code currently does nothing. */
-  
-  if (!key)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_NO_CERTIFICATE_FOUND;
-    }
-
-  if (!trustdb)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  rc = openpgp_get_key_trust (trustdb, key, verify);
-  if (rc)
-    gnutls_assert ();
-  return rc;
-}

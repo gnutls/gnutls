@@ -115,17 +115,6 @@ extern "C"
 				       const unsigned char keyid[8],
 				       unsigned int flags);
 
-/* Trustdb functions.
- */
-  struct gnutls_openpgp_trustdb_int;	/* object to hold (parsed) openpgp trustdbs */
-  typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb_t;
-
-  int gnutls_openpgp_trustdb_init (gnutls_openpgp_trustdb_t * trustdb);
-  void gnutls_openpgp_trustdb_deinit (gnutls_openpgp_trustdb_t trustdb);
-
-  int gnutls_openpgp_trustdb_import (gnutls_openpgp_trustdb_t trustdb,
-				     const char *file);
-
 
   int gnutls_openpgp_key_verify_ring (gnutls_openpgp_key_t key,
 				      gnutls_openpgp_keyring_t keyring,
@@ -135,13 +124,6 @@ extern "C"
   int gnutls_openpgp_key_verify_self (gnutls_openpgp_key_t key,
 				      unsigned int flags,
 				      unsigned int *verify);
-
-  int gnutls_openpgp_key_verify_trustdb (gnutls_openpgp_key_t key,
-					 gnutls_openpgp_trustdb_t trustdb,
-					 unsigned int flags,
-					 unsigned int *verify
-					 /* the output of the verification */
-    );
 
 
 /* certificate authentication stuff.

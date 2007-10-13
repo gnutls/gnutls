@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.1.2 (unreleased)
 
+** Removed all the trustdb code from openpgp authentication. We
+now use only the well-specified keyrings.
+
 ** The 256 bit ciphers are not enabled in the default priorities.
 
 ** Added support for DSA2 using libgcrypt 1.3.0.
@@ -30,6 +33,11 @@ For generating low security test credentials.
 ** API and ABI modifications:
 gnutls_x509_crt_to_xml: REMOVED
 gnutls_openpgp_key_to_xml: REMOVED
+gnutls_openpgp_key_verify_trustdb: REMOVED
+gnutls_openpgp_trustdb_init: REMOVED
+gnutls_openpgp_trustdb_deinit: REMOVED
+gnutls_openpgp_trustdb_import: REMOVED
+gnutls_certificate_set_openpgp_trustdb: REMOVED
 gnutls_srp_set_client_credentials_function: CHANGED
 gnutls_handshake_set_post_client_hello_function: ADDED
 gnutls_mac_get_key_size: ADDED

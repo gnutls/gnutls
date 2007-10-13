@@ -1865,18 +1865,14 @@ complex, the assistance of external tools like @acronym{GnuPG} and
 GPGME (@url{http://www.gnupg.org/related_software/gpgme/}) is
 recommended.
 
-There are two verification functions in @acronym{GnuTLS}, The
-@ref{gnutls_openpgp_key_verify_ring} and the
-@ref{gnutls_openpgp_key_verify_trustdb}.  The first one checks an
-@acronym{OpenPGP} key against a given set of public keys (keyring) and
+There is one verification function in @acronym{GnuTLS}, the
+@ref{gnutls_openpgp_key_verify_ring}.
+This checks an @acronym{OpenPGP} key against a given set of public keys (keyring) and
 returns the key status. The key verification status is the same as in
 @acronym{X.509} certificates, although the meaning and interpretation are
 different. For example an @acronym{OpenPGP} key may be valid, if the
 self signature is ok, even if no signers were found.  The meaning of
-verification status is shown in the figure below.  The latter function
-checks a @acronym{GnuPG} trust database for the given key. This
-function does not check the key signatures, only checks for disabled
-and revoked keys.
+verification status is shown in the figure below.  
 
 @table @code
 

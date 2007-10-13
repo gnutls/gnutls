@@ -77,9 +77,6 @@ extern "C"
 					      res, const char *keyserver,
 					      int port);
 
-  int gnutls_certificate_set_openpgp_trustdb (gnutls_certificate_credentials_t
-					      res, const char *trustdb);
-
   int
     gnutls_certificate_set_openpgp_keyring_mem
     (gnutls_certificate_credentials_t c, const unsigned char *data,

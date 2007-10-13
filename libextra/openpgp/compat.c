@@ -39,11 +39,6 @@
  * Verify all signatures in the certificate list. When the key
  * is not available, the signature is skipped.
  *
- * When the trustdb parameter is used, the function checks the
- * ownertrust of the key before the signatures are checked. It
- * is possible that the key was disabled or the owner is not trusted
- * at all. Then we don't check the signatures because it makes no sense.
- *
  * The return value is one of the CertificateStatus entries.
  *
  * NOTE: this function does not verify using any "web of trust". You
@@ -57,7 +52,6 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
   int ret = 0;
   gnutls_openpgp_key_t key = NULL;
   gnutls_openpgp_keyring_t ring = NULL;
-  gnutls_openpgp_trustdb_t tdb = NULL;
   unsigned int verify_ring = 0, verify_db = 0, verify_self = 0;
 
   if (!cert_list || cert_list_length != 1)
@@ -105,25 +99,6 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 	}
     }
 
-  if (cred->pgp_trustdb)
-    { /* Use the trustDB */
-      ret = gnutls_openpgp_trustdb_init (&tdb);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto leave;
-	}
-
-      ret = gnutls_openpgp_trustdb_import_file (tdb, cred->pgp_trustdb);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto leave;
-	}
-
-      ret = gnutls_openpgp_key_verify_trustdb (key, tdb, 0, &verify_db);
-    }
-
   /* Now try the self signature. */
   ret = gnutls_openpgp_key_verify_self (key, 0, &verify_self);
   if (ret < 0)
@@ -135,14 +110,13 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
   *status = verify_self | verify_ring | verify_db;
 
   /* If we only checked the self signature. */
-  if (!cred->pgp_trustdb && !cred->keyring.data)
+  if (!cred->keyring.data)
     *status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
   ret = 0;
 
 leave:
   gnutls_openpgp_key_deinit (key);
-  gnutls_openpgp_trustdb_deinit (tdb);
   gnutls_openpgp_keyring_deinit (ring);
 
   return ret;

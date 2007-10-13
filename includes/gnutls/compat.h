@@ -31,7 +31,6 @@
 #define gnutls_openpgp_key gnutls_openpgp_key_t
 #define gnutls_openpgp_privkey gnutls_openpgp_privkey_t
 #define gnutls_openpgp_keyring gnutls_openpgp_keyring_t
-#define gnutls_openpgp_trustdb gnutls_openpgp_trustdb_t
 #define gnutls_x509_crt gnutls_x509_crt_t
 #define gnutls_x509_privkey gnutls_x509_privkey_t
 #define gnutls_x509_crl gnutls_x509_crl_t
