@@ -8,34 +8,32 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 125 "cli.gaa"
+#line 122 "cli.gaa"
 	char *rest_args;
-#line 116 "cli.gaa"
-	int insecure;
 #line 113 "cli.gaa"
-	char *port;
+	int insecure;
 #line 110 "cli.gaa"
-	char *opaque_prf_input;
+	char *port;
 #line 107 "cli.gaa"
-	char *authz_saml_assertion;
+	char *opaque_prf_input;
 #line 104 "cli.gaa"
-	char *authz_x509_attr_cert;
+	char *authz_saml_assertion;
 #line 101 "cli.gaa"
-	char *psk_key;
+	char *authz_x509_attr_cert;
 #line 98 "cli.gaa"
-	char *psk_username;
+	char *psk_key;
 #line 95 "cli.gaa"
-	char *srp_passwd;
+	char *psk_username;
 #line 92 "cli.gaa"
-	char *srp_username;
+	char *srp_passwd;
 #line 89 "cli.gaa"
-	char *x509_certfile;
+	char *srp_username;
 #line 86 "cli.gaa"
-	char *x509_keyfile;
+	char *x509_certfile;
 #line 83 "cli.gaa"
-	char *pgp_certfile;
+	char *x509_keyfile;
 #line 80 "cli.gaa"
-	char *pgp_trustdb;
+	char *pgp_certfile;
 #line 77 "cli.gaa"
 	char *pgp_keyring;
 #line 74 "cli.gaa"

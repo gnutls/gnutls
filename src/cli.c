@@ -73,7 +73,6 @@ char *srp_username;
 char *pgp_keyfile;
 char *pgp_certfile;
 char *pgp_keyring;
-char *pgp_trustdb;
 char *x509_keyfile;
 char *x509_certfile;
 char *x509_cafile;
@@ -905,7 +904,6 @@ gaa_parser (int argc, char **argv)
     psk_key.size = 0;
 
   pgp_keyring = info.pgp_keyring;
-  pgp_trustdb = info.pgp_trustdb;
 
   crlf = info.crlf;
 
@@ -982,7 +980,7 @@ do_handshake (socket_st * socket)
       /* print some information */
       print_info (socket->session, socket->hostname);
 
-      if ((x509_cafile || pgp_trustdb) && !insecure)
+      if ((x509_cafile || pgp_keyring) && !insecure)
 	{
 	  int rc;
 	  unsigned int status;
@@ -1073,15 +1071,6 @@ init_global_tls_stuff (void)
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error setting the OpenPGP keyring file\n");
-	}
-    }
-
-  if (pgp_trustdb != NULL)
-    {
-      ret = gnutls_certificate_set_openpgp_trustdb (xcred, pgp_trustdb);
-      if (ret < 0)
-	{
-	  fprintf (stderr, "Error setting the OpenPGP trustdb file\n");
 	}
     }
 #endif

@@ -8,60 +8,58 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 112 "serv.gaa"
+#line 109 "serv.gaa"
 	char **ctype;
-#line 111 "serv.gaa"
-	int nctype;
 #line 108 "serv.gaa"
+	int nctype;
+#line 105 "serv.gaa"
 	char **kx;
-#line 107 "serv.gaa"
-	int nkx;
 #line 104 "serv.gaa"
+	int nkx;
+#line 101 "serv.gaa"
 	char **macs;
-#line 103 "serv.gaa"
-	int nmacs;
 #line 100 "serv.gaa"
+	int nmacs;
+#line 97 "serv.gaa"
 	char **comp;
-#line 99 "serv.gaa"
-	int ncomp;
 #line 96 "serv.gaa"
+	int ncomp;
+#line 93 "serv.gaa"
 	char **proto;
-#line 95 "serv.gaa"
-	int nproto;
 #line 92 "serv.gaa"
+	int nproto;
+#line 89 "serv.gaa"
 	char **ciphers;
-#line 91 "serv.gaa"
-	int nciphers;
 #line 88 "serv.gaa"
-	char *opaque_prf_input;
+	int nciphers;
 #line 85 "serv.gaa"
-	char *authz_saml_assertion;
+	char *opaque_prf_input;
 #line 82 "serv.gaa"
-	char *authz_x509_attr_cert;
+	char *authz_saml_assertion;
 #line 79 "serv.gaa"
-	char *srp_passwd_conf;
+	char *authz_x509_attr_cert;
 #line 76 "serv.gaa"
-	char *srp_passwd;
+	char *srp_passwd_conf;
 #line 73 "serv.gaa"
-	char *psk_passwd;
+	char *srp_passwd;
 #line 70 "serv.gaa"
-	int disable_client_cert;
+	char *psk_passwd;
 #line 67 "serv.gaa"
-	int require_cert;
+	int disable_client_cert;
 #line 64 "serv.gaa"
-	char *x509_dsacertfile;
+	int require_cert;
 #line 61 "serv.gaa"
-	char *x509_dsakeyfile;
+	char *x509_dsacertfile;
 #line 58 "serv.gaa"
-	char *x509_certfile;
+	char *x509_dsakeyfile;
 #line 55 "serv.gaa"
-	char *x509_keyfile;
+	char *x509_certfile;
 #line 52 "serv.gaa"
-	char *pgp_certfile;
+	char *x509_keyfile;
 #line 49 "serv.gaa"
-	char *pgp_keyfile;
+	char *pgp_certfile;
 #line 46 "serv.gaa"
-	char *pgp_trustdb;
+	char *pgp_keyfile;
 #line 43 "serv.gaa"
 	char *pgp_keyring;
 #line 40 "serv.gaa"

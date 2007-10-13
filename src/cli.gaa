@@ -77,9 +77,6 @@ option (pgpkeyfile) STR "FILE" { $pgp_keyfile = $1 } "PGP Key file to use."
 #char *pgp_keyring;
 option (pgpkeyring) STR "FILE" { $pgp_keyring = $1 } "PGP Key ring file to use."
 
-#char *pgp_trustdb;
-option (pgptrustdb) STR "FILE" { $pgp_trustdb = $1 } "PGP trustdb file to use."
-
 #char *pgp_certfile;
 option (pgpcertfile) STR "FILE" { $pgp_certfile = $1 } "PGP Public Key (certificate) file to use."
 
@@ -128,7 +125,7 @@ rest STR "hostname" { $rest_args = $1; }
 init { $resume=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $record_size=0; 
-	$fingerprint=0; $pgp_trustdb=NULL; $pgp_keyring=NULL; $x509_crlfile = NULL;
+	$fingerprint=0; $pgp_keyring=NULL; $x509_crlfile = NULL;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL; $disable_extensions = 0;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $crlf = 0; 
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 

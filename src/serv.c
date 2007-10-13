@@ -65,7 +65,6 @@ char *psk_passwd;
 char *srp_passwd;
 char *srp_passwd_conf;
 char *pgp_keyring;
-char *pgp_trustdb;
 char *pgp_keyfile;
 char *pgp_certfile;
 char *x509_keyfile;
@@ -1001,16 +1000,6 @@ main (int argc, char **argv)
 	}
     }
 
-  if (pgp_trustdb != NULL)
-    {
-      ret = gnutls_certificate_set_openpgp_trustdb (cert_cred, pgp_trustdb);
-      if (ret < 0)
-	{
-	  fprintf (stderr, "Error setting the OpenPGP trustdb file\n");
-	  GERR (ret);
-	}
-    }
-
   if (pgp_certfile != NULL)
     if ((ret = gnutls_certificate_set_openpgp_key_file
 	 (cert_cred, pgp_certfile, pgp_keyfile)) < 0)
@@ -1483,7 +1472,6 @@ gaa_parser (int argc, char **argv)
   psk_passwd = info.psk_passwd;
 
   pgp_keyring = info.pgp_keyring;
-  pgp_trustdb = info.pgp_trustdb;
 
   parse_protocols (info.proto, info.nproto, protocol_priority);
   parse_ciphers (info.ciphers, info.nciphers, cipher_priority);

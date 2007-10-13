@@ -43,9 +43,6 @@ option (x509crlfile) STR "FILE" { $x509_crlfile = $1 } "CRL file to use."
 #char *pgp_keyring;
 option (pgpkeyring) STR "FILE" { $pgp_keyring = $1 } "PGP Key ring file to use."
 
-#char *pgp_trustdb;
-option (pgptrustdb) STR "FILE" { $pgp_trustdb = $1 } "PGP trustdb file to use."
-
 #char *pgp_keyfile;
 option (pgpkeyfile) STR "FILE" { $pgp_keyfile = $1 } "PGP Key file to use."
 
@@ -127,7 +124,7 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $x509_crlfile = NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
-	$pgp_trustdb=NULL; $pgp_keyring=NULL; $fmtder = 0;
+	$pgp_keyring=NULL; $fmtder = 0;
 	$disable_client_cert = 0;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0;
 	$authz_x509_attr_cert = NULL; $authz_saml_assertion = NULL;
