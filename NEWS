@@ -41,6 +41,9 @@ gnutls_certificate_set_openpgp_trustdb: REMOVED
 gnutls_srp_set_client_credentials_function: CHANGED
 gnutls_handshake_set_post_client_hello_function: ADDED
 gnutls_mac_get_key_size: ADDED
+GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED: DEPRECATED.
+GNUTLS_A_MISSING_SRP_USERNAME: DEPRECATED
+GNUTLS_A_UNKNOWN_SRP_USERNAME: DEPRECATED
 
 * Version 2.1.1 (released 2007-09-24)
 
