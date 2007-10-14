@@ -57,4 +57,9 @@
    removed in 2.1.x. */
 #define GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED GNUTLS_E_INTERNAL_ERROR
 
+/* Old SRP alerts removed in 2.1.x because the TLS-SRP RFC was
+   modified to use the PSK alert. */
+#define GNUTLS_A_MISSING_SRP_USERNAME GNUTLS_A_UNKNOWN_PSK_IDENTITY
+#define GNUTLS_A_UNKNOWN_SRP_USERNAME GNUTLS_A_UNKNOWN_PSK_IDENTITY
+
 #endif /* GCOMPAT_H */
