@@ -64,11 +64,7 @@ typedef struct gnutls_certificate_credentials_st
 
   /* OpenPGP specific stuff */
 
-  gnutls_datum_t keyring;
-  char *pgp_key_server;
-  int pgp_key_server_port;
-
-  char *pgp_trustdb;
+  gnutls_openpgp_keyring_t keyring;
 
   /* X509 specific stuff */
 

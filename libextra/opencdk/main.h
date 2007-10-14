@@ -94,11 +94,11 @@ cdk_error_t _cdk_proc_packets (cdk_ctx_t hd, cdk_stream_t inp,
 cdk_error_t _cdk_pkt_write2 (cdk_stream_t out, int pkttype, void *pktctx);
 
 /*-- pubkey.c --*/
-u32 _cdk_pkt_get_keyid( cdk_packet_t pkt, u32 * keyid );
-int _cdk_pkt_get_fingerprint( cdk_packet_t pkt, byte * fpr );
-int _cdk_pk_algo_usage( int algo );
-int _cdk_pk_test_algo( int algo, unsigned int usage );
-int _cdk_sk_get_csum( cdk_pkt_seckey_t sk );
+u32 _cdk_pkt_get_keyid (cdk_packet_t pkt, u32 * keyid);
+cdk_error_t _cdk_pkt_get_fingerprint (cdk_packet_t pkt, byte *fpr);
+int _cdk_pk_algo_usage (int algo);
+int _cdk_pk_test_algo (int algo, unsigned int usage);
+int _cdk_sk_get_csum (cdk_pkt_seckey_t sk);
 
 /*-- new-packet.c --*/
 byte * _cdk_subpkt_get_array (cdk_subpkt_t s, int count, size_t * r_nbytes);
@@ -106,11 +106,12 @@ cdk_error_t _cdk_subpkt_copy (cdk_subpkt_t * r_dst, cdk_subpkt_t src);
 void _cdk_pkt_detach_free (cdk_packet_t pkt, int *r_pkttype, void **ctx);
 
 /*-- sig-check.c --*/
-int _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
-                    gcry_md_hd_t digest, int * r_expired);
+cdk_error_t _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
+			    gcry_md_hd_t digest, int * r_expired);
 cdk_error_t _cdk_hash_sig_data (cdk_pkt_signature_t sig, gcry_md_hd_t hd);
-void _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version, gcry_md_hd_t md);
-int _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, gcry_md_hd_t md, int use_fpr);
+cdk_error_t _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version, gcry_md_hd_t md);
+cdk_error_t _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, gcry_md_hd_t md, 
+			      int use_fpr);
 cdk_error_t _cdk_pk_check_sig (cdk_keydb_hd_t hd,
 			       cdk_kbnode_t knode, 
 			       cdk_kbnode_t snode, int *is_selfsig);
@@ -120,10 +121,11 @@ void _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node);
 void _cdk_kbnode_clone (cdk_kbnode_t node);
 
 /*-- sesskey.c --*/
-int _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
-                              const byte * md,
-                              int digest_algo, unsigned nbits);
-int _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk);
+cdk_error_t _cdk_digest_encode_pkcs1 (byte **r_md, size_t *r_mdlen, 
+				      int pk_algo,
+				      const byte * md,
+				      int digest_algo, unsigned nbits);
+cdk_error_t _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk);
 
 /*-- keydb.c --*/
 int _cdk_keydb_is_secret (cdk_keydb_hd_t db);   
@@ -135,11 +137,11 @@ cdk_error_t _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid,
 				     const char * id);
 
 /*-- sign.c --*/
-int _cdk_sig_create( cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig );
 int _cdk_sig_hash_for (cdk_pkt_pubkey_t pk);
-void _cdk_trim_string( char * s, int canon );
-cdk_error_t _cdk_sig_complete( cdk_pkt_signature_t sig, cdk_pkt_seckey_t sk,
-			       gcry_md_hd_t hd );
+void _cdk_trim_string (char * s, int canon);
+cdk_error_t _cdk_sig_create (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig);
+cdk_error_t _cdk_sig_complete (cdk_pkt_signature_t sig, cdk_pkt_seckey_t sk,
+			       gcry_md_hd_t hd);
 
 /*-- stream.c --*/
 void _cdk_stream_set_compress_algo (cdk_stream_t s, int algo);   

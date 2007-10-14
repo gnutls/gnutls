@@ -51,8 +51,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 {
   int ret = 0;
   gnutls_openpgp_key_t key = NULL;
-  gnutls_openpgp_keyring_t ring = NULL;
-  unsigned int verify_ring = 0, verify_db = 0, verify_self = 0;
+  unsigned int verify = 0, verify_self = 0;
 
   if (!cert_list || cert_list_length != 1)
     {
@@ -67,31 +66,16 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
       return ret;
     }
 
-  ret = gnutls_openpgp_key_import (key, &cert_list[0], 0);
+  ret = gnutls_openpgp_key_import (key, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();
       goto leave;
     }
 
-  if (cred->keyring.data && cred->keyring.size != 0)
+  if (cred->keyring != NULL)
     {
-      /* use the keyring */
-      ret = gnutls_openpgp_keyring_init (&ring);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto leave;
-	}
-
-      ret = gnutls_openpgp_keyring_import (ring, &cred->keyring, 0);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto leave;
-	}
-      
-      ret = gnutls_openpgp_key_verify_ring (key, ring, 0, &verify_ring);
+      ret = gnutls_openpgp_key_verify_ring (key, cred->keyring, 0, &verify);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -107,17 +91,16 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
       goto leave;
     }
 
-  *status = verify_self | verify_ring | verify_db;
+  *status = verify_self | verify;
 
   /* If we only checked the self signature. */
-  if (!cred->keyring.data)
+  if (!cred->keyring)
     *status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
   ret = 0;
 
 leave:
   gnutls_openpgp_key_deinit (key);
-  gnutls_openpgp_keyring_deinit (ring);
 
   return ret;
 }
@@ -145,7 +128,7 @@ _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
       return ret;
     }
 
-  ret = gnutls_openpgp_key_import (key, cert, 0);
+  ret = gnutls_openpgp_key_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -183,7 +166,7 @@ _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t * cert)
       return ret;
     }
 
-  ret = gnutls_openpgp_key_import (key, cert, 0);
+  ret = gnutls_openpgp_key_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -219,7 +202,7 @@ _gnutls_openpgp_get_raw_key_expiration_time (const gnutls_datum_t * cert)
       return ret;
     }
 
-  ret = gnutls_openpgp_key_import (key, cert, 0);
+  ret = gnutls_openpgp_key_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();

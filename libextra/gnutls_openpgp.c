@@ -454,11 +454,9 @@ _gnutls_openpgp_raw_key_to_gcert (gnutls_cert * cert,
  -*/
 int
 gnutls_openpgp_get_key (gnutls_datum_t * key,
-			const gnutls_datum_t * keyring, key_attr_t by,
+			gnutls_openpgp_keyring_t keyring, key_attr_t by,
 			opaque * pattern)
 {
-  keybox_blob *blob = NULL;
-  cdk_keydb_hd_t db = NULL;
   cdk_kbnode_t knode = NULL;
   unsigned long keyid[2];
   unsigned char *buf;
@@ -473,10 +471,6 @@ gnutls_openpgp_get_key (gnutls_datum_t * key,
     }
 
   memset (key, 0, sizeof *key);
-  blob = kbx_read_blob (keyring, 0);
-  if (!blob)
-    return GNUTLS_E_MEMORY_ERROR;
-  db = kbx_to_keydb (blob);
 
   if (by == KEY_ATTR_SHORT_KEYID)
     {
@@ -491,9 +485,9 @@ gnutls_openpgp_get_key (gnutls_datum_t * key,
     }
   else
     desc = pattern;
-  rc = cdk_keydb_search_start (db, by, desc);
+  rc = cdk_keydb_search_start (keyring->db, by, desc);
   if (!rc)
-    rc = cdk_keydb_search (db, &knode);
+    rc = cdk_keydb_search (keyring->db, &knode);
   if (rc)
     {
       rc = _gnutls_map_cdk_rc (rc);
@@ -514,9 +508,7 @@ gnutls_openpgp_get_key (gnutls_datum_t * key,
   cdk_free (buf);
 
 leave:
-  cdk_keydb_free (db);
   cdk_kbnode_release (knode);
-  kbx_blob_release (blob);
   return rc;
 }
 
@@ -807,93 +799,8 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
 }
 
 
-
-
-
-/*-
- * gnutls_openpgp_add_keyring_file - Adds a keyring file for OpenPGP
- * @keyring: data buffer to store the file.
- * @name: filename of the keyring.
- *
- * The function is used to set keyrings that will be used internally
- * by various OpenCDK functions. For example to find a key when it
- * is needed for an operations.
- -*/
-int
-gnutls_openpgp_add_keyring_file (gnutls_datum_t * keyring, const char *name)
-{
-  cdk_stream_t inp = NULL;
-  uint8_t *blob;
-  size_t nbytes;
-  int enc = 0;
-  int rc = 0;
-
-  if (!keyring || !name)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  rc = cdk_stream_open (name, &inp);
-  if (rc)
-    return _gnutls_map_cdk_rc (rc);
-  enc = cdk_armor_filter_use (inp);
-  cdk_stream_close (inp);
-
-  blob = kbx_data_to_keyring (KBX_BLOB_FILE, enc, name,
-			      strlen (name), &nbytes);
-  if (blob && nbytes)
-    {
-      if (datum_append (keyring, blob, nbytes) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-      gnutls_free (blob);
-    }
-  return 0;
-}
-
-
-/*-
- * gnutls_openpgp_add_keyring_mem - Adds keyring data for OpenPGP
- * @keyring: data buffer to store the file.
- * @data: the binary data of the keyring.
- * @len: the size of the binary buffer.
- *
- * Same as gnutls_openpgp_add_keyring_mem but now we store the
- * data instead of the filename.
- -*/
-int
-gnutls_openpgp_add_keyring_mem (gnutls_datum_t * keyring,
-				const void *data, size_t len)
-{
-  uint8_t *blob;
-  size_t nbytes = 0;
-
-  if (!keyring || !data || !len)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  blob = kbx_data_to_keyring (KBX_BLOB_DATA, 0, data, len, &nbytes);
-  if (blob && nbytes)
-    {
-      if (datum_append (keyring, blob, nbytes) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-      gnutls_free (blob);
-    }
-
-  return 0;
-}
-
-
 /**
- * gnutls_certificate_set_openpgp_keyring_file - Adds a keyring file for OpenPGP
+ * gnutls_certificate_set_openpgp_keyring_file - Sets a keyring file for OpenPGP
  * @c: A certificate credentials structure
  * @file: filename of the keyring.
  *
@@ -907,7 +814,9 @@ int
   gnutls_certificate_set_openpgp_keyring_file
   (gnutls_certificate_credentials_t c, const char *file)
 {
-  struct stat statbuf;
+gnutls_datum ring;
+size_t size;
+int rc;
 
   if (!c || !file)
     {
@@ -915,10 +824,19 @@ int
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (stat (file, &statbuf))
-    return GNUTLS_E_FILE_ERROR;
+  ring.data = read_binary_file (file, &size);
+  ring.size = (unsigned int)size;
+  if (ring.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_FILE_ERROR;
+    }
 
-  return gnutls_openpgp_add_keyring_file (&c->keyring, file);
+  rc = gnutls_certificate_set_openpgp_keyring_mem (c, ring.data, ring.size);
+  
+  free( ring.data);
+  
+  return rc;
 }
 
 /**
@@ -941,40 +859,32 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
   cdk_stream_t inp;
   size_t count;
   uint8_t *buf;
+  gnutls_datum ddata;
   int rc;
-
+  
+  ddata.data = (void*)data;
+  ddata.size = dlen;
+  
   if (!c || !data || !dlen)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  rc = cdk_stream_tmp_from_mem (data, dlen, &inp);
-  if (rc)
-    return GNUTLS_E_FILE_ERROR;
-
-  /* Maybe it's a little confusing that we check the output..
-     but it's possible, that the data we want to add, is armored
-     and we only want to store plaintext keyring data. */
-  if (cdk_armor_filter_use (inp))
-    cdk_stream_set_armor_flag (inp, 0);
-
-  /* fixme: this is possible the armored length. */
-  count = cdk_stream_get_length (inp);
-  buf = gnutls_malloc (count + 1);
-  if (!buf)
-    {
-      gnutls_assert ();
-      cdk_stream_close (inp);
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  count = cdk_stream_read (inp, buf, count);
-  buf[count] = '\0';
-  rc = gnutls_openpgp_add_keyring_mem (&c->keyring, buf, count);
-  cdk_stream_close (inp);
-
-  return rc;
+  rc = gnutls_openpgp_keyring_init( &c->keyring);
+  if (rc < 0) {
+    gnutls_assert();
+    return rc;
+  }
+  
+  rc = gnutls_openpgp_keyring_import( c->keyring, &ddata, GNUTLS_OPENPGP_FMT_BASE64);
+  if ( rc < 0) {
+    gnutls_assert();
+    gnutls_openpgp_keyring_deinit( c->keyring);
+    return rc;
+  }
+  
+  return 0;
 }
 
 /*-
@@ -1004,7 +914,7 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
   if (key_fpr_size != 16 && key_fpr_size != 20)
     return GNUTLS_E_HASH_FAILED; /* only MD5 and SHA1 are supported */
 
-  rc = gnutls_openpgp_get_key (ret, &cred->keyring, KEY_ATTR_FPR, key_fpr);
+  rc = gnutls_openpgp_get_key (ret, cred->keyring, KEY_ATTR_FPR, key_fpr);
   if (rc >= 0)			/* key was found */
     return rc;
   else
@@ -1024,42 +934,6 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
     }
 
   return rc;
-}
-
-
-/**
- * gnutls_certificate_set_openpgp_keyserver - Used to set an OpenPGP key server
- * @res: the destination context to save the data.
- * @keyserver: is the key server address
- * @port: is the key server port to connect to
- *
- * This funtion will set a key server for use with openpgp keys. This
- * key server will only be used if the peer sends a key fingerprint instead
- * of a key in the handshake. Using a key server may delay the handshake
- * process.
- *
- **/
-int
-gnutls_certificate_set_openpgp_keyserver (gnutls_certificate_credentials_t
-					  res, const char *keyserver,
-					  int port)
-{
-  if (!res || !keyserver)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  if (!port)
-    port = 11371;
-
-  gnutls_free (res->pgp_key_server);
-  res->pgp_key_server = gnutls_strdup (keyserver);
-  if (!res->pgp_key_server)
-    return GNUTLS_E_MEMORY_ERROR;
-  res->pgp_key_server_port = port;
-
-  return 0;
 }
 
 /**

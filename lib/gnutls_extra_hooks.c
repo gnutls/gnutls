@@ -28,19 +28,20 @@
 /* Variables used by libgnutls, set by
    _gnutls_add_openpgp_functions(), typically invoked by
    libgnutls_extra. */
-_gnutls_openpgp_verify_key_func _E_gnutls_openpgp_verify_key;
+_gnutls_openpgp_verify_key_func _E_gnutls_openpgp_verify_key = NULL;
 _gnutls_openpgp_key_creation_time_func
-_E_gnutls_openpgp_get_raw_key_creation_time;
+_E_gnutls_openpgp_get_raw_key_creation_time = NULL;
 _gnutls_openpgp_key_expiration_time_func
-_E_gnutls_openpgp_get_raw_key_expiration_time;
-_gnutls_openpgp_fingerprint_func _E_gnutls_openpgp_fingerprint;
-_gnutls_openpgp_key_request_func _E_gnutls_openpgp_request_key;
-_gnutls_openpgp_raw_key_to_gcert_func _E_gnutls_openpgp_raw_key_to_gcert;
-_gnutls_openpgp_raw_privkey_to_gkey_func _E_gnutls_openpgp_raw_privkey_to_gkey;
-_gnutls_openpgp_key_to_gcert_func _E_gnutls_openpgp_key_to_gcert;
-_gnutls_openpgp_privkey_to_gkey_func _E_gnutls_openpgp_privkey_to_gkey;
-_gnutls_openpgp_key_deinit_func _E_gnutls_openpgp_key_deinit;
-_gnutls_openpgp_privkey_deinit_func _E_gnutls_openpgp_privkey_deinit;
+_E_gnutls_openpgp_get_raw_key_expiration_time = NULL;
+_gnutls_openpgp_fingerprint_func _E_gnutls_openpgp_fingerprint = NULL;
+_gnutls_openpgp_key_request_func _E_gnutls_openpgp_request_key = NULL;
+_gnutls_openpgp_raw_key_to_gcert_func _E_gnutls_openpgp_raw_key_to_gcert = NULL;
+_gnutls_openpgp_raw_privkey_to_gkey_func _E_gnutls_openpgp_raw_privkey_to_gkey = NULL;
+_gnutls_openpgp_key_to_gcert_func _E_gnutls_openpgp_key_to_gcert = NULL;
+_gnutls_openpgp_privkey_to_gkey_func _E_gnutls_openpgp_privkey_to_gkey = NULL;
+_gnutls_openpgp_key_deinit_func _E_gnutls_openpgp_key_deinit = NULL;
+_gnutls_openpgp_keyring_deinit_func _E_gnutls_openpgp_keyring_deinit = NULL;
+_gnutls_openpgp_privkey_deinit_func _E_gnutls_openpgp_privkey_deinit = NULL;
 
 /* Called by libgnutls_extra to set the OpenPGP functions that are
    needed by GnuTLS.  */
@@ -56,6 +57,7 @@ _gnutls_add_openpgp_functions
  _gnutls_openpgp_key_to_gcert_func key_to_gcert,
  _gnutls_openpgp_privkey_to_gkey_func privkey_to_gkey,
  _gnutls_openpgp_key_deinit_func key_deinit,
+ _gnutls_openpgp_keyring_deinit_func keyring_deinit,
  _gnutls_openpgp_privkey_deinit_func privkey_deinit)
 {
   _E_gnutls_openpgp_verify_key = verify_key;
@@ -68,6 +70,7 @@ _gnutls_add_openpgp_functions
   _E_gnutls_openpgp_key_to_gcert = key_to_gcert;
   _E_gnutls_openpgp_privkey_to_gkey = privkey_to_gkey;
   _E_gnutls_openpgp_key_deinit = key_deinit;
+  _E_gnutls_openpgp_keyring_deinit = keyring_deinit;
   _E_gnutls_openpgp_privkey_deinit = privkey_deinit;
 
 }

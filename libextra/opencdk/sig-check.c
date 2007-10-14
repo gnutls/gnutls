@@ -32,9 +32,9 @@
 static int
 hash_mpibuf (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
 {
-  byte buf[MAX_MPI_BYTES];
+  byte buf[MAX_MPI_BYTES]; /* FIXME: do not use hardcoded length. */
   size_t nbytes;
-  int i, npkey;
+  size_t i, npkey;
   gcry_error_t err;
   
   /* We have to differ between two modes for v3 keys. To form the
@@ -57,14 +57,13 @@ hash_mpibuf (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
 
 
 /* Hash an entire public key PK with the given message digest context
-   MD. The USEFPR param is only valid for version 3 keys because of
+   MD. The @usefpr param is only valid for version 3 keys because of
    the different way to calculate the fingerprint. */
-int
+cdk_error_t
 _cdk_hash_pubkey (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
 {
   byte buf[12];
-  u16 n;
-  int i, npkey;
+  size_t i, n, npkey;
   
   if (!pk || !md)
     return CDK_Inv_Value;
@@ -72,7 +71,9 @@ _cdk_hash_pubkey (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
   if (usefpr && pk->version < 4 && is_RSA (pk->pubkey_algo)) 
     return hash_mpibuf (pk, md, 1);
   
-  n = pk->version < 4? 8 : 6;  /* v4: without the expire 'date' */
+  /* The version 4 public key packet does not have the 2 octets for
+     the expiration date. */
+  n = pk->version < 4? 8 : 6;
   npkey = cdk_pk_get_npkey (pk->pubkey_algo);
   for (i = 0; i < npkey; i++) 
     n = n + (gcry_mpi_get_nbits (pk->mpi[i])+7)/8 + 2;
@@ -91,6 +92,7 @@ _cdk_hash_pubkey (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
     {    
       u16 a = 0;
       
+      /* Convert the expiration date into days. */
       if (pk->expiredate)
 	a = (u16)((pk->expiredate - pk->timestamp) / 86400L);
       buf[i++] = a >> 8;
@@ -104,7 +106,7 @@ _cdk_hash_pubkey (cdk_pubkey_t pk, gcry_md_hd_t md, int usefpr)
 
 /* Hash the user ID @uid with the given message digest @md.
    Use openpgp mode if @is_v4 is 1. */
-void
+cdk_error_t
 _cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, gcry_md_hd_t md)
 {
   const byte *data;
@@ -112,12 +114,12 @@ _cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, gcry_md_hd_t md)
   u32 dlen;
   
   if (!uid || !md)
-    return;
+    return CDK_Inv_Value;
 
   if (!is_v4)
     {
       gcry_md_write (md, (byte*)uid->name, uid->len);
-      return;
+      return 0;
     }
   
   dlen = uid->attrib_img? uid->attrib_len : uid->len;
@@ -129,6 +131,7 @@ _cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, gcry_md_hd_t md)
   buf[4] = dlen >>  0;
   gcry_md_write (md, buf, 5);
   gcry_md_write (md, data, dlen);
+  return 0;
 }
 
 
@@ -195,7 +198,7 @@ cache_sig_result (cdk_pkt_signature_t sig, int res)
 {
   sig->flags.checked = 0;
   sig->flags.valid = 0;
-  if (!res) 
+  if (res == 0)
     {
       sig->flags.checked = 1;
       sig->flags.valid = 1;
@@ -214,9 +217,9 @@ cdk_error_t
 _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
                 gcry_md_hd_t digest, int *r_expired)
 {
-  byte md[MAX_DIGEST_LEN];
-  time_t cur_time = (u32)time (NULL);
   cdk_error_t rc;
+  byte md[MAX_DIGEST_LEN];
+  time_t cur_time = (u32)time (NULL);  
 
   if (!pk || !sig || !digest)
     return CDK_Inv_Value;
@@ -254,12 +257,12 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
 		   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig)
 {
   gcry_md_hd_t md;
+  gcry_error_t err;
   cdk_pubkey_t pk;
   cdk_pkt_signature_t sig;
   cdk_kbnode_t node;
-  int is_expired;
-  gcry_error_t err;
   cdk_error_t rc = 0;
+  int is_expired;
 
   if (!knode || !snode)
     return CDK_Inv_Value;
@@ -345,7 +348,7 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
 
 /**
  * cdk_pk_check_sigs:
- * @knode: the key node
+ * @key: the public key
  * @hd: an optinal key database handle
  * @r_status: variable to store the status of the key
  *
@@ -354,41 +357,40 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
  * which are or-ed or zero when there are no flags.
  **/
 cdk_error_t
-cdk_pk_check_sigs (cdk_kbnode_t knode, cdk_keydb_hd_t keydb, int *r_status)
+cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
 {
   cdk_pkt_signature_t sig;
   cdk_kbnode_t node;
+  cdk_error_t rc;
   u32 keyid;
   int key_status, is_selfsig = 0;
-  int no_signer = 0, n_sigs = 0;
-  cdk_error_t rc;
+  int no_signer, n_sigs = 0;  
   
-  if (!knode || !r_status)
+  if (!key || !r_status)
     return CDK_Inv_Value;
   
   *r_status = 0;
-  node = cdk_kbnode_find (knode, CDK_PKT_PUBLIC_KEY);
+  node = cdk_kbnode_find (key, CDK_PKT_PUBLIC_KEY);
   if (!node)
     return CDK_Error_No_Key;
   
   key_status = 0;
+  /* Continue with the signature check but adjust the
+     key status flags accordingly. */
   if (node->pkt->pkt.public_key->is_revoked)
     key_status |= CDK_KEY_REVOKED;
   if (node->pkt->pkt.public_key->has_expired)
     key_status |= CDK_KEY_EXPIRED;
-  if (key_status) 
-    {
-      *r_status = key_status;
-      return CDK_General_Error;
-    }
+  
   rc = 0;
+  no_signer = 0;
   keyid = cdk_pk_get_keyid (node->pkt->pkt.public_key, NULL);
-  for (node = knode; node; node = node->next) 
+  for (node = key; node; node = node->next) 
     {
       if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
 	continue;
       sig = node->pkt->pkt.signature;
-      rc = _cdk_pk_check_sig (keydb, knode, node, &is_selfsig);
+      rc = _cdk_pk_check_sig (keydb, key, node, &is_selfsig);
       if (IS_UID_SIG (sig)) 
 	{
 	  if (is_selfsig == 0)
@@ -396,58 +398,66 @@ cdk_pk_check_sigs (cdk_kbnode_t knode, cdk_keydb_hd_t keydb, int *r_status)
 	}
       if (rc && IS_UID_SIG (sig) && rc == CDK_Error_No_Key)
 	{
+	  /* We do not consider it a problem when the signing key
+	     is not avaiable. We just mark the signature accordingly
+	     and contine.*/
 	  sig->flags.missing_key = 1;
 	  no_signer++;
-	  continue;
         }
       else if (rc && rc != CDK_Error_No_Key)
 	{
-	  /* If there was an error during the verify process and
-	     we checked the self signature, we immediately bail out. */
-	  *r_status = CDK_KEY_INVALID;
-	  if (is_selfsig)
-	    return rc;
-	  break;
+	  /* It might be possible that a single signature has been
+	     corrupted, thus we do not consider it a problem when
+	     one ore more signatures are bad. But at least the self
+	     signature has to be valid. */
+	  if (is_selfsig) 
+	    {
+	      key_status |= CDK_KEY_INVALID;
+	      break;
+	    }	  
         }
       _cdk_log_debug ("signature %s: signer %08lX keyid %08lX\n",
-		      rc==CDK_Bad_Sig? "BAD" : "good", sig->keyid[1],
+		      rc == CDK_Bad_Sig? "BAD" : "good", sig->keyid[1],
 		      keyid);
     }
+  
   if (n_sigs == no_signer)
-    *r_status |= CDK_KEY_NOSIGNER;
-  if (!rc || rc == CDK_Error_No_Key)
-    *r_status = CDK_KEY_VALID;
+    key_status |= CDK_KEY_NOSIGNER;  
+  *r_status = key_status;  
+  if (rc == CDK_Error_No_Key)
+    rc = 0;
   return rc;
 }
 
 
 /**
  * cdk_pk_check_self_sig:
- * @knode: the key node
- * @keydb: an optional handle to the key database
+ * @key: the key node
  * @r_status: output the status of the key.
  * 
  * A convenient function to make sure the key is valid.
  * Valid means the self signature is ok.
  **/
 cdk_error_t
-cdk_pk_check_self_sig (cdk_kbnode_t knode, int *r_status)
+cdk_pk_check_self_sig (cdk_kbnode_t key, int *r_status)
 {
   cdk_pkt_signature_t sig;
   cdk_kbnode_t node;
-  u32 keyid[2], sigid[2];
   cdk_error_t rc;
+  u32 keyid[2], sigid[2];  
   int is_selfsig, sig_ok;
   
-  if (!knode || !r_status)
+  if (!key || !r_status)
     return CDK_Inv_Value;
   
-  node = cdk_kbnode_find (knode, CDK_PKT_PUBLIC_KEY);
+  node = cdk_kbnode_find (key, CDK_PKT_PUBLIC_KEY);
   if (!node)
     return CDK_Error_No_Key;
-  cdk_pk_get_keyid (knode->pkt->pkt.public_key, keyid);
+  /* FIXME: we should set expire/revoke here also but callers
+     expect CDK_KEY_VALID=0 if the key is okay. */
+  cdk_pk_get_keyid (key->pkt->pkt.public_key, keyid);
   sig_ok = 0;
-  for (node = knode; node; node = node->next)
+  for (node = key; node; node = node->next)
     {
       if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
 	continue;
@@ -458,12 +468,12 @@ cdk_pk_check_self_sig (cdk_kbnode_t knode, int *r_status)
       if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
 	continue;
       /* FIXME: Now we check all self signatures. */
-      rc = _cdk_pk_check_sig (NULL, knode, node, &is_selfsig);
+      rc = _cdk_pk_check_sig (NULL, key, node, &is_selfsig);
       if (rc)
 	{
 	  *r_status = CDK_KEY_INVALID;
 	  return rc;
-	}      
+	}
       else /* For each valid self sig we increase this counter. */
 	sig_ok++;
     }
@@ -473,7 +483,8 @@ cdk_pk_check_self_sig (cdk_kbnode_t knode, int *r_status)
     {
       *r_status = CDK_KEY_INVALID;
       return CDK_General_Error;
-    }  
+    }
+  /* No flags indicate a valid key. */
   *r_status = CDK_KEY_VALID;
   return 0;
 }

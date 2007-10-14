@@ -52,7 +52,7 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
 					    size_t dlen);
 
 int gnutls_openpgp_get_key (gnutls_datum_t * key,
-			    const gnutls_datum_t * keyring,
+			    gnutls_openpgp_keyring_t keyring,
 			    key_attr_t by, opaque * pattern);
 
 int gnutls_openpgp_recv_key (const char *host,
