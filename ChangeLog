@@ -1,3 +1,223 @@
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.1.2.
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-nir-tls-eap-02.txt: Add.
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Wrap.
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention enum's.
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h, includes/gnutls/gnutls.h.in: Move
+	deprecated SRP alerts to compat.h.
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h: Add compatibility mapping for
+	GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED.
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Encode in shared library that we aren't backwards
+	compatible.
+
+2007-10-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/cli-gaa.c, src/cli-gaa.h, src/cli.c, src/cli.gaa,
+	src/serv-gaa.c, src/serv-gaa.h, src/serv.c, src/serv.gaa: removed
+	references to trustdb
+
+2007-10-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/gnutls.texi, includes/gnutls/compat.h,
+	includes/gnutls/extra.h, includes/gnutls/gnutls.h.in,
+	includes/gnutls/openpgp.h, libextra/gnutls_openpgp.c,
+	libextra/openpgp/compat.c, libextra/openpgp/extras.c,
+	libextra/openpgp/openpgp.h, libextra/openpgp/pgpverify.c: Removed
+	all the trustdb related code. It wasn't used and trustdbs are not
+	specified anywhere except pgp. Now we use the standard key rings.
+
+2007-10-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: more text
+
+2007-10-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_priority.c: The 256 bit ciphers are not enabled
+	in the default priorities.
+
+2007-10-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_algorithms.c, lib/gnutls_pk.c,
+	lib/x509/dsa.c, lib/x509/sign.c, src/certtool-gaa.c,
+	src/certtool.c, src/certtool.gaa: Added support for DSA2 (key sizes
+	for more than 1024 bits on DSA) via libgcrypt 1.3.0.
+
+2007-10-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: Updated documentation.
+
+2007-10-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 1	0	NEWS
+
+2007-10-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi, includes/gnutls/gnutls.h.in,
+	lib/gnutls_algorithms.c, lib/gnutls_dh_primes.c,
+	lib/gnutls_state.c, lib/x509/common.c: * Added section "Selecting cryptographic key sizes" in gnutls.texi *
+	Added function gnutls_mac_get_key_size() * Updated
+	_gnutls_dh_generate_prime() to consider the size for "q" from
+	"Selecting cryptographic key sizes"
+
+2007-10-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention certtool --quick-random.
+
+2007-10-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* includes/gnutls/gnutls.h.in: Added defines for the deprecated SRP
+	alert numbers.
+
+2007-10-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/extensions.c: added an assertion.
+
+2007-10-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_kx.c: Corrected an error in a parenthesis.
+
+2007-10-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	Merge branch 'master' of
+	ssh://nmav@git.sv.gnu.org/srv/git/gnutls
+
+2007-10-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.c: Changed the certificate reading logic to allow
+	for more buggy implementations that send 0B 00 00 06 00 00 03 00 00
+	00 as an empty certificate message. (we already allow for 0B 00 00
+	00 and 0B 00 00 03 00 00 00)
+
+2007-10-08  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/modules/gnutls.scm, guile/modules/gnutls/build/enums.scm: 
+	Guile: Reflect SRP/PSK changes.  * guile/modules/gnutls.scm
+	(alert-description/unknown-srp-username,
+	alert-description/missing-srp-username): Remove.
+	(alert-description/unknown-psk-identity): New.  *
+	guile/modules/gnutls/build/enums.scm (%alert-description-enum):
+	Likewise.
+
+2007-10-08  Ludovic Courtès <ludo@gnu.org>
+
+	* NEWS: Update `NEWS'.
+
+2007-10-08  Ludovic Courtès <ludo@gnu.org>
+
+	* configure.in: Fix configure-time Guile detection.  * configure.in:
+	Substitute `GUILE_LDFLAGS' into `LIBS', not `LDFLAGS'.   Patch by
+	Nix <nix@esperi.org.uk>.
+
+2007-10-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 1	1	doc/Makefile.am
+
+2007-10-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/README.CVS, doc/README.GIT: Updated the information for
+	developers.
+
+2007-10-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	Merge branch 'master' of
+	ssh://nmav@git.sv.gnu.org/srv/git/gnutls
+
+2007-10-08  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_state.c: Added warning about termination of connection
+	in post_client_hello callback.
+
+2007-10-08  Simon Josefsson <simon@josefsson.org>
+
+	Merge branch 'master' of ssh://git.sv.gnu.org/srv/git/gnutls
+	Conflicts:  	NEWS
+
+2007-10-08  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, doc/credentials/gnutls-http-serv,
+	includes/gnutls/gnutls.h.in, lib/ext_srp.c, lib/gnutls_alert.c,
+	lib/gnutls_errors.h, lib/gnutls_extensions.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_srp.c,
+	lib/gnutls_state.c, lib/x509/common.c, lib/x509/dn.c, src/cli.c: **
+	Added capability to set a callback after the client hello is
+	received by the server in order to adjust parameters before the
+	handshake.  ** SRP was corrected to adhere (more) to the latest
+	draft (published soon as RFC)  ** Corrected bug which did not allow
+	a server to run without supporting certificates.  ** Updated the DN
+	parser which now prints wrongly decoded values as hex strings.
+
+2007-10-07  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/auth_srp.c: corrected possible size issue
+
+2007-10-07  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, build-aux/config.rpath, doc/gnutls.texi,
+	includes/gnutls/openpgp.h, includes/gnutls/x509.h,
+	lib/x509/Makefile.am, lib/x509/xml.c, libextra/openpgp/Makefile.am,
+	libextra/openpgp/xml.c, po/de.po, po/ms.po, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa,
+	src/cli-gaa.c, src/cli-gaa.h, src/cli.c, src/cli.gaa, src/common.c: 
+	Removed all the xml functions and stubs, as well as references in
+	the documentation.
+
+2007-10-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_alert.c: error_to_alert() now always return an alert
+	number. This is to avoid sending illegal values when the return
+	value is not checked (commonplace).
+
+2007-10-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : 51	51	src/certtool-gaa.c 10	10	src/certtool-gaa.h
+
+2007-10-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : 3	3	src/certtool.gaa
+
+2007-10-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.c,
+	src/certtool.gaa: Added the --quick-random option to certtool to
+	improve generation time of private keys. They delay is quite
+	annoying especially when generating test keys.
+
+2007-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-10-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool.c: Corrected output in DER format and corrected
+	output for smime_to_pkcs7 to output in outfile instead of stdout.
+
+2007-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-09-24  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Bump version.
