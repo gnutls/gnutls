@@ -38,7 +38,7 @@ gnutls_openpgp_trustdb_init: REMOVED
 gnutls_openpgp_trustdb_deinit: REMOVED
 gnutls_openpgp_trustdb_import: REMOVED
 gnutls_certificate_set_openpgp_trustdb: REMOVED
-gnutls_srp_set_client_credentials_function: CHANGED
+gnutls_srp_client_credentials_function: CHANGED
 gnutls_handshake_set_post_client_hello_function: ADDED
 gnutls_mac_get_key_size: ADDED
 GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED: DEPRECATED.
