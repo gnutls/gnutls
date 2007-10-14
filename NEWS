@@ -5,8 +5,8 @@ See the end for copying conditions.
 
 * Version 2.1.2 (unreleased)
 
-** Removed all the trustdb code from openpgp authentication. We
-now use only the well-specified keyrings.
+** Removed all the trustdb code from openpgp authentication.
+We now use only the well-specified keyrings.
 
 ** The 256 bit ciphers are not enabled in the default priorities.
 
