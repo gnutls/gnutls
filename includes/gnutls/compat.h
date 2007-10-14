@@ -53,4 +53,8 @@
 #define gnutls_datum gnutls_datum_t
 #define gnutls_transport_ptr gnutls_transport_ptr_t
 
+/* GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED no longer used,
+   removed in 2.1.x. */
+#define GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED GNUTLS_E_INTERNAL_ERROR
+
 #endif /* GCOMPAT_H */
