@@ -121,5 +121,4 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$pgp_keyring=NULL; $fmtder = 0;
 	$disable_client_cert = 0;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0;
-	$authz_x509_attr_cert = NULL; $authz_saml_assertion = NULL;
 	$opaque_prf_input=NULL; }
