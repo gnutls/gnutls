@@ -16,6 +16,10 @@ lead the way with our own actions.
 
 ** Fix configure-time Guile detection.
 
+** API and ABI modifications:
+GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA: ADDED.  To avoid that the
+    gnutls_supplemental_data_format_type_t enum type becomes empty.
+
 * Version 2.0.1 (released 2007-09-20)
 
 ** New directory doc/credentials/ with test credentials.
