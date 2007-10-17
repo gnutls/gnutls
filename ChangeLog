@@ -1,3 +1,67 @@
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.0.2.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, po/de.po, po/ms.po, src/cli-gaa.c,
+	src/cli-gaa.h, src/serv-gaa.c, src/serv-gaa.h: Generated.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Remove authz sections.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Move compat.h #include, to make authz
+	prototypes work.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Remove authz conditional.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, doc/examples/Makefile.am,
+	doc/examples/ex-client-authz.c, doc/examples/ex-serv-authz.c,
+	doc/gnutls.texi, doc/reference/Makefile.am,
+	includes/gnutls/compat.h, includes/gnutls/gnutls.h.in,
+	lib/Makefile.am, lib/ext_authz.c, lib/ext_authz.h,
+	lib/gnutls_extensions.c, lib/gnutls_int.h,
+	lib/gnutls_supplemental.c, src/cli.c, src/cli.gaa, src/serv.c,
+	src/serv.gaa: Remove TLS authorization support.
+
+2007-10-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-10-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool.c: Corrected output in DER format and corrected
+	output for smime_to_pkcs7 to output in outfile instead of stdout.
+
+2007-10-08  Ludovic Courtès <ludo@gnu.org>
+
+	* NEWS: Update `NEWS'.
+
+2007-10-08  Ludovic Courtès <ludo@gnu.org>
+
+	* configure.in: Fix configure-time Guile detection.  * configure.in:
+	Substitute `GUILE_LDFLAGS' into `LIBS', not `LDFLAGS'.   Patch by
+	Nix <nix@esperi.org.uk>.
+
+2007-09-20  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-09-20  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am: Fix release target (git-tag no longer exit with
