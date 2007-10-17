@@ -60,7 +60,6 @@ extern "C"
 #endif
 /* Get time_t. */
 #include <time.h>
-#include <gnutls/compat.h>
 
 #define GNUTLS_CIPHER_RIJNDAEL_128_CBC GNUTLS_CIPHER_AES_128_CBC
 #define GNUTLS_CIPHER_RIJNDAEL_256_CBC GNUTLS_CIPHER_AES_256_CBC
@@ -1221,6 +1220,9 @@ extern "C"
 
 #define GNUTLS_E_APPLICATION_ERROR_MAX -65000
 #define GNUTLS_E_APPLICATION_ERROR_MIN -65500
+
+  /* Backwards compatibility mappings. */
+#include <gnutls/compat.h>
 
 #ifdef __cplusplus
 }
