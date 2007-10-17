@@ -141,8 +141,6 @@ typedef enum handshake_state_t
 typedef enum extensions_t
 { GNUTLS_EXTENSION_SERVER_NAME = 0,
   GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
-  GNUTLS_EXTENSION_AUTHZ_CLIENT = 7,
-  GNUTLS_EXTENSION_AUTHZ_SERVER = 8,
   GNUTLS_EXTENSION_CERT_TYPE = 9,
 #ifdef ENABLE_OPRFI
   GNUTLS_EXTENSION_OPAQUE_PRF_INPUT = ENABLE_OPRFI,
@@ -263,7 +261,6 @@ typedef struct
 } server_name_st;
 
 #define MAX_SERVER_NAME_EXTENSIONS 3
-#define MAX_AUTHZ_FORMATS 5
 
 typedef struct
 {
@@ -279,14 +276,6 @@ typedef struct
 
   /* Used by extensions that enable supplemental data. */
   int do_recv_supplemental, do_send_supplemental;
-
-  /* Authz extension data. */
-  int authz_recvd_client, authz_recvd_server;
-  int authz_client_formats[MAX_AUTHZ_FORMATS + 1];
-  int authz_server_formats[MAX_AUTHZ_FORMATS + 1];
-  gnutls_authz_recv_callback_func authz_recv_callback;
-  gnutls_authz_send_callback_func authz_send_callback;
-  gnutls_buffer authz_data;
 
   /* Opaque PRF input. */
   gnutls_oprfi_callback_func oprfi_cb;

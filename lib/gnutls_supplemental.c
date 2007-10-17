@@ -49,7 +49,6 @@
 #include "gnutls_supplemental.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
-#include "ext_authz.h"
 
 typedef int (*supp_recv_func) (gnutls_session_t session,
 			       const opaque *data,
@@ -66,10 +65,6 @@ typedef struct
 } gnutls_supplemental_entry;
 
 gnutls_supplemental_entry _gnutls_supplemental[] = {
-  { "authz_data",
-    GNUTLS_SUPPLEMENTAL_AUTHZ_DATA,
-    _gnutls_authz_supp_recv_params,
-    _gnutls_authz_supp_send_params },
   { 0, 0, 0, 0 }
 };
 
