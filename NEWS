@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.1.3 (unreleased)
 
+** TLS authorization support removed.
+This technique may be patented in the future, and it is not of crucial
+importance for the Internet community.  After deliberation we have
+concluded that the best thing we can do in this situation is to
+encourage society not to adopt this technique.  We have decided to
+lead the way with our own actions.
+
 ** Re-enabled the 256 bit ciphers in the default priorities.
 
 ** Corrected bugs in openpgp key verification using a keyring (both in
@@ -12,6 +19,16 @@ gnutls and opencdk)
 
 ** API and ABI modifications:
 gnutls_certificate_set_openpgp_keyserver: REMOVED
+gnutls_authz_data_format_type_t,
+gnutls_authz_recv_callback_func,
+gnutls_authz_send_callback_func,
+gnutls_authz_enable,
+gnutls_authz_send_x509_attr_cert,
+gnutls_authz_send_saml_assertion,
+gnutls_authz_send_x509_attr_cert_url,
+gnutls_authz_send_saml_assertion_url: REMOVED.
+GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA: ADDED.  To avoid that the
+    gnutls_supplemental_data_format_type_t enum type becomes empty.
 
 * Version 2.1.2 (released 2007-10-14)
 

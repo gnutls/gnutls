@@ -44,10 +44,6 @@ if ENABLE_SRP
 noinst_PROGRAMS += ex-client-srp ex-serv-srp
 endif
 
-if ENABLE_AUTHZ
-noinst_PROGRAMS += ex-serv-authz ex-client-authz
-endif
-
 noinst_LTLIBRARIES = libexamples.la
 
 libexamples_la_SOURCES = ex-alert.c ex-pkcs12.c ex-rfc2818.c	\
