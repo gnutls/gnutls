@@ -54,4 +54,43 @@
 #define gnutls_datum gnutls_datum_t
 #define gnutls_transport_ptr gnutls_transport_ptr_t
 
+/* Prototypes for removed tls-authz code. */
+#define GNUTLS_SUPPLEMENTAL_AUTHZ_DATA 1
+typedef enum
+  {
+    GNUTLS_AUTHZ_X509_ATTR_CERT = 1,
+    GNUTLS_AUTHZ_SAML_ASSERTION = 2,
+    GNUTLS_AUTHZ_X509_ATTR_CERT_URL = 3,
+    GNUTLS_AUTHZ_SAML_ASSERTION_URL = 4
+  } gnutls_authz_data_format_type_t;
+typedef int (*gnutls_authz_recv_callback_func) (gnutls_session_t session,
+						const int *authz_formats,
+						gnutls_datum_t *infos,
+						const int *hashtypes,
+						gnutls_datum_t *hash);
+typedef int (*gnutls_authz_send_callback_func) (gnutls_session_t session,
+						const int *client_formats,
+						const int *server_formats);
+void gnutls_authz_enable (gnutls_session_t session,
+			  const int *client_formats,
+			  const int *server_formats,
+			  gnutls_authz_recv_callback_func recv_callback,
+			  gnutls_authz_send_callback_func send_callback);
+int gnutls_authz_send_x509_attr_cert (gnutls_session_t session,
+				      const char *data,
+				      size_t len);
+int gnutls_authz_send_saml_assertion (gnutls_session_t session,
+				      const char *data,
+				      size_t len);
+int gnutls_authz_send_x509_attr_cert_url (gnutls_session_t session,
+					  const char *url,
+					  size_t urllen,
+					  gnutls_mac_algorithm_t hash_type,
+					  const char *hash);
+int gnutls_authz_send_saml_assertion_url (gnutls_session_t session,
+					  const char *url,
+					  size_t urllen,
+					  gnutls_mac_algorithm_t hash_type,
+					  const char *hash);
+
 #endif /* GCOMPAT_H */

@@ -104,12 +104,6 @@ option (pskusername) STR "NAME" { $psk_username = $1 } "PSK username to use."
 #char *psk_key;
 option (pskkey) STR "KEY" { $psk_key = $1 } "PSK key (in hex) to use."
 
-#char *authz_x509_attr_cert;
-option (authz-x509-attr-cert) STR "FILE" { $authz_x509_attr_cert = $1 } "Use X.509 Attribute Certificate in FILE as authorization data."
-
-#char *authz_saml_assertion;
-option (authz-saml-assertion) STR "FILE" { $authz_saml_assertion = $1 } "Use SAML Assertion in FILE as authorization data."
-
 #char *port;
 option (p, port) STR "PORT" { $port = $1 } "The port to connect to."
 

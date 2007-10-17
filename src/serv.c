@@ -337,103 +337,6 @@ static int comp_priority[PRI_MAX];
 static int mac_priority[PRI_MAX];
 static int cert_type_priority[PRI_MAX];
 
-#ifdef ENABLE_AUTHZ
-static int authz_server_formats[PRI_MAX] = {
-  0
-};
-static int authz_client_formats[PRI_MAX] = {
-  GNUTLS_AUTHZ_X509_ATTR_CERT,
-  GNUTLS_AUTHZ_SAML_ASSERTION,
-  GNUTLS_AUTHZ_X509_ATTR_CERT_URL,
-  GNUTLS_AUTHZ_SAML_ASSERTION_URL,
-  0
-};
-
-int
-authz_send_callback (gnutls_session_t session,
-		     const int *client_formats,
-		     const int *server_formats)
-{
-  size_t i;
-  int ret;
-
-  printf ("- Client authorization formats: ");
-  for (i = 0; client_formats[i]; i++)
-    printf ("%d ", client_formats[i]);
-  printf ("\n");
-
-  for (i = 0; server_formats[i]; i++)
-    {
-      if (server_formats[i] == GNUTLS_AUTHZ_X509_ATTR_CERT
-	  && info.authz_x509_attr_cert)
-	{
-	  size_t x509ac_len;
-	  const char *x509ac = read_binary_file (info.authz_x509_attr_cert,
-						 &x509ac_len);
-	  if (!x509ac)
-	    error (EXIT_FAILURE, errno, "%s", info.authz_x509_attr_cert);
-
-	  printf ("  Sending X.509 Attribute Certificate\n");
-
-	  ret = gnutls_authz_send_x509_attr_cert (session,
-						  x509ac, x509ac_len);
-	  if (ret < 0)
-	    return ret;
-	}
-
-      if (server_formats[i] == GNUTLS_AUTHZ_SAML_ASSERTION
-	  && info.authz_saml_assertion)
-	{
-	  size_t samlass_len;
-	  const char *samlass = read_binary_file (info.authz_saml_assertion,
-						  &samlass_len);
-	  if (!samlass)
-	    error (EXIT_FAILURE, errno, "%s", info.authz_saml_assertion);
-
-	  printf ("  Sending SAML assertion\n");
-
-	  ret = gnutls_authz_send_saml_assertion (session,
-						  samlass, samlass_len);
-	  if (ret < 0)
-	    return ret;
-	}
-    }
-
-  return 0;
-}
-
-int
-authz_recv_callback (gnutls_session_t session,
-		     const int *authz_formats,
-		     gnutls_datum_t *infos,
-		     const int *hashtypes,
-		     gnutls_datum_t *hash)
-{
-  size_t i, j;
-
-  for (i = 0; authz_formats[i]; i++)
-    {
-      printf ("- Received authorization data, format %02x of %d bytes\n",
-	      authz_formats[i], infos[i].size);
-
-      printf ("  data: ");
-      for (j = 0; j < infos[i].size; j++)
-	printf ("%02x", infos[i].data[j]);
-      printf ("\n");
-
-      if (hash[i].size > 0)
-	{
-	  printf (" hash: ");
-	  for (j = 0; j < hash[i].size; j++)
-	    printf ("%02x", hash[i].data[j]);
-	  printf (" type %02x\n", hashtypes[i]);
-	}
-    }
-
-  return 0;
-}
-#endif
-
 gnutls_session_t
 initialize_session (void)
 {
@@ -487,11 +390,6 @@ initialize_session (void)
     else
       gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
   }
-
-#ifdef ENABLE_AUTHZ
-  gnutls_authz_enable (session, authz_client_formats, authz_server_formats,
-		       authz_recv_callback, authz_send_callback);
-#endif
 
   return session;
 }
@@ -1462,16 +1360,6 @@ gaa_parser (int argc, char **argv)
   parse_ctypes (info.ctype, info.nctype, cert_type_priority);
   parse_kx (info.kx, info.nkx, kx_priority);
   parse_comp (info.comp, info.ncomp, comp_priority);
-
-#ifdef ENABLE_AUTHZ
-  {
-    size_t authz_idx = 0;
-    if (info.authz_x509_attr_cert)
-      authz_server_formats[authz_idx++] = GNUTLS_AUTHZ_X509_ATTR_CERT;
-    if (info.authz_saml_assertion)
-      authz_server_formats[authz_idx++] = GNUTLS_AUTHZ_SAML_ASSERTION;
-  }
-#endif
 }
 
 void

@@ -2243,15 +2243,6 @@ The following client is a simple client which uses the
 
 @verbatiminclude examples/ex-client-tlsia.c
 
-@node Simple client example with authorization support
-@subsection Simple Client Example with Authorization Support
-
-The following client require that the server sends authorization data,
-and the client will send authorization data to the server as well.
-For authentication, X.509 is used.
-
-@verbatiminclude examples/ex-client-authz.c
-
 @node Helper function for TCP connections
 @subsection Helper Function for TCP Connections
 
@@ -2320,14 +2311,6 @@ This example server support anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c
-
-@node Echo Server with authorization support
-@subsection Echo Server with Authorization Support
-
-This example server support authorization data, and can be used to
-serve the example client with authorization support.
-
-@verbatiminclude examples/ex-serv-authz.c
 
 @node Miscellaneous examples
 @section Miscellaneous Examples
@@ -3714,8 +3697,8 @@ consider adding support for the hypothetical TLS extension
 @item Modify @code{configure.in} to add @code{--enable-foobar} or @code{--disable-foobar}.
 
 Which to chose depends on whether you intend to make the extension be
-enabled by default.  Look at existing checks (i.e., SRP, authz) for
-how to model the code.
+enabled by default.  Look at existing checks (i.e., SRP) for how to
+model the code.
 
 @item Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
 
@@ -3820,9 +3803,9 @@ When adding the files, you'll need to add them to @code{Makefile.am}
 as well, for example:
 
 @example
-if ENABLE_AUTHZ
-COBJECTS += ext_authz.c
-HFILES += ext_authz.h
+if ENABLE_FOOBAR
+COBJECTS += ext_foobar.c
+HFILES += ext_foobar.h
 endif
 @end example
 

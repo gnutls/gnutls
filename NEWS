@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.0.2 (unreleased)
 
+** TLS authorization support removed.
+This technique may be patented in the future, and it is not of crucial
+importance for the Internet community.  After deliberation we have
+concluded that the best thing we can do in this situation is to
+encourage society not to adopt this technique.  We have decided to
+lead the way with our own actions.
+
 ** certtool: Fixed data corruption when using --outder.
 
 ** Fix configure-time Guile detection.

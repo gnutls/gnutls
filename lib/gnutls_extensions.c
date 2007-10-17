@@ -35,7 +35,6 @@
 #include <ext_server_name.h>
 #include <ext_srp.h>
 #include <ext_inner_application.h>
-#include <ext_authz.h>
 #include <gnutls_num.h>
 
 /* Key Exchange Section */
@@ -50,14 +49,6 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_MAX_RECORD_SIZE,
 			  _gnutls_max_record_recv_params,
 			  _gnutls_max_record_send_params),
-#ifdef ENABLE_AUTHZ
-  GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_AUTHZ_CLIENT,
-			  _gnutls_authz_ext_client_recv_params,
-			  _gnutls_authz_ext_client_send_params),
-  GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_AUTHZ_SERVER,
-			  _gnutls_authz_ext_server_recv_params,
-			  _gnutls_authz_ext_server_send_params),
-#endif
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_CERT_TYPE,
 			  _gnutls_cert_type_recv_params,
 			  _gnutls_cert_type_send_params),
