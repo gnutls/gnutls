@@ -251,7 +251,6 @@ table.
 @item --disable-srp-authentication
 @itemx --disable-psk-authentication
 @itemx --disable-anon-authentication
-@itemx --disable-tls-authorization
 @itemx --disable-extra-pki
 @itemx --disable-openpgp-authentication
 @itemx --disable-openssl-compatibility
@@ -2147,7 +2146,6 @@ implemented by another example.
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example with TLS/IA support::
-* Simple client example with authorization support::
 * Helper function for TCP connections::
 @end menu
 
@@ -2263,7 +2261,6 @@ servers, using @acronym{GnuTLS}.
 * Echo Server with OpenPGP authentication::
 * Echo Server with SRP authentication::
 * Echo Server with anonymous authentication::
-* Echo Server with authorization support::
 @end menu
 
 @node Echo Server with X.509 authentication
