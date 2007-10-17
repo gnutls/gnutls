@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnutls 1.4.0\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2006-05-12 00:21+0200\n"
+"POT-Creation-Date: 2007-10-17 16:00+0200\n"
 "PO-Revision-Date: 2007-06-24 19:29+0800\n"
 "Last-Translator: Sharuzzaman Ahmat Raslan <sharuzzaman@myrealbox.com>\n"
 "Language-Team: Malay <translation-team-ms@lists.sourceforge.net>\n"
@@ -42,8 +42,12 @@ msgstr "Paket rekod TLS besar telah diterima."
 msgid "A record packet with illegal version was received."
 msgstr "Paket rekod dengan versi tidak sah telah diterima."
 
-msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
-msgstr "Perdana Diffie Hellman yang dihantar oleh pelayan tidak boleh diterima (tidak cukup panjang)."
+msgid ""
+"The Diffie Hellman prime sent by the server is not acceptable (not long "
+"enough)."
+msgstr ""
+"Perdana Diffie Hellman yang dihantar oleh pelayan tidak boleh diterima "
+"(tidak cukup panjang)."
 
 msgid "A TLS packet with unexpected length was received."
 msgstr "Paket TLS dengan panjang tidak dijangka telah diterima."
@@ -150,7 +154,8 @@ msgstr "Ralat dalam fungsi tarik."
 msgid "Error in the push function."
 msgstr "Ralat dalam fungsi tolak."
 
-msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
+msgid ""
+"The upper limit of record packet sequence numbers has been reached. Wow!"
 msgstr "Had atas nombor jujukan paket rakaman telah dicapai. Wow!"
 
 msgid "Error in the certificate."
@@ -231,7 +236,8 @@ msgstr "Terlalu banyak paket rekod kosong telah diterima."
 msgid "The initialization of GnuTLS-extra has failed."
 msgstr "Pemulaan GnuTLS-extra telah gagal."
 
-msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
+msgid ""
+"The GnuTLS library version does not match the GnuTLS-extra library version."
 msgstr "Versi pustaka GnuTLS tidak sepadan dengan versi pustaka GnuTLS-extra."
 
 msgid "The gcrypt library version is too old."
@@ -240,8 +246,12 @@ msgstr "Versi pustaka gcrypt terlalu lama."
 msgid "The tasn1 library version is too old."
 msgstr "Versi pustaka tasn1 terlalu lama."
 
-msgid "The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported."
-msgstr "Versi GnuPG TrustDB yang dinyatakan tidak disokong. TrustDB v4 adalah disokong."
+msgid ""
+"The specified GnuPG TrustDB version is not supported. TrustDB v4 is "
+"supported."
+msgstr ""
+"Versi GnuPG TrustDB yang dinyatakan tidak disokong. TrustDB v4 adalah "
+"disokong."
 
 msgid "Error loading the keyring."
 msgstr "Ralat memuatkan cecincin kunci."
@@ -299,3 +309,256 @@ msgstr "Menerima mesej TLS/IA Final Phase Finished"
 
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Pengesahan checksum fasa TLS/IA gagal"
+
+#, c-format
+msgid "\t\t\tPath Length Constraint: %d\n"
+msgstr ""
+
+#, c-format
+msgid "\t\t\tPolicy Language: %s"
+msgstr ""
+
+msgid ""
+"\t\t\tPolicy:\n"
+"\t\t\t\tASCII: "
+msgstr ""
+
+msgid ""
+"\n"
+"\t\t\t\tHexdump: "
+msgstr ""
+
+msgid "\t\t\tDigital signature.\n"
+msgstr ""
+
+msgid "\t\t\tNon repudiation.\n"
+msgstr ""
+
+msgid "\t\t\tKey encipherment.\n"
+msgstr ""
+
+msgid "\t\t\tData encipherment.\n"
+msgstr ""
+
+msgid "\t\t\tKey agreement.\n"
+msgstr ""
+
+msgid "\t\t\tCertificate signing.\n"
+msgstr ""
+
+msgid "\t\t\tCRL signing.\n"
+msgstr ""
+
+msgid "\t\t\tKey encipher only.\n"
+msgstr ""
+
+msgid "\t\t\tKey decipher only.\n"
+msgstr ""
+
+msgid "\t\t\tTLS WWW Server.\n"
+msgstr ""
+
+msgid "\t\t\tTLS WWW Client.\n"
+msgstr ""
+
+msgid "\t\t\tCode signing.\n"
+msgstr ""
+
+msgid "\t\t\tEmail protection.\n"
+msgstr ""
+
+msgid "\t\t\tTime stamping.\n"
+msgstr ""
+
+msgid "\t\t\tOCSP signing.\n"
+msgstr ""
+
+msgid "\t\t\tAny purpose.\n"
+msgstr ""
+
+msgid "\t\t\tCertificate Authority (CA): FALSE\n"
+msgstr ""
+
+msgid "\t\t\tCertificate Authority (CA): TRUE\n"
+msgstr ""
+
+#, c-format
+msgid "\t\t\tXMPP Address: %.*s\n"
+msgstr ""
+
+#, c-format
+msgid "\t\t\totherName OID: %.*s\n"
+msgstr ""
+
+msgid "\t\t\totherName DER: "
+msgstr ""
+
+msgid ""
+"\n"
+"\t\t\totherName ASCII: "
+msgstr ""
+
+#, c-format
+msgid "\tVersion: %d\n"
+msgstr ""
+
+msgid "\tSerial Number (hex): "
+msgstr ""
+
+#, c-format
+msgid "\tIssuer: %s\n"
+msgstr ""
+
+msgid "\tValidity:\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tNot Before: %s\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tNot After: %s\n"
+msgstr ""
+
+#, c-format
+msgid "\tSubject: %s\n"
+msgstr ""
+
+#, c-format
+msgid "\tSubject Public Key Algorithm: %s\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr ""
+
+msgid "\t\tExponent:\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr ""
+
+msgid "\t\tP:\n"
+msgstr ""
+
+msgid "\t\tQ:\n"
+msgstr ""
+
+msgid "\t\tG:\n"
+msgstr ""
+
+msgid "\tExtensions:\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tBasic Constraints (%s):\n"
+msgstr ""
+
+msgid "critical"
+msgstr ""
+
+msgid "not critical"
+msgstr ""
+
+#, c-format
+msgid "\t\tSubject Key Identifier (%s):\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tAuthority Key Identifier (%s):\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tKey Usage (%s):\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tKey Purpose (%s):\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tSubject Alternative Name (%s):\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tCRL Distribution points (%s):\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tProxy Certificate Information (%s):\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tUnknown extension %s (%s):\n"
+msgstr ""
+
+msgid "\t\t\tASCII: "
+msgstr ""
+
+msgid "\t\t\tHexdump: "
+msgstr ""
+
+#, c-format
+msgid "\tSignature Algorithm: %s\n"
+msgstr ""
+
+msgid ""
+"warning: signed using a broken signature algorithm that can be forged.\n"
+msgstr ""
+
+msgid "\tSignature:\n"
+msgstr ""
+
+msgid ""
+"\tMD5 fingerprint:\n"
+"\t\t"
+msgstr ""
+
+msgid ""
+"\tSHA-1 fingerprint:\n"
+"\t\t"
+msgstr ""
+
+msgid ""
+"\tPublic Key Id:\n"
+"\t\t"
+msgstr ""
+
+msgid "X.509 Certificate Information:\n"
+msgstr ""
+
+msgid "Other Information:\n"
+msgstr ""
+
+msgid "\tVersion: 1 (default)\n"
+msgstr ""
+
+msgid "\tUpdate dates:\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tIssued: %s\n"
+msgstr ""
+
+#, c-format
+msgid "\t\tNext at: %s\n"
+msgstr ""
+
+#, c-format
+msgid "\tRevoked certificates (%d):\n"
+msgstr ""
+
+#, fuzzy
+msgid "\tNo revoked certificates.\n"
+msgstr "Ralat dalam sijil."
+
+msgid "\t\tSerial Number (hex): "
+msgstr ""
+
+#, c-format
+msgid "\t\tRevoked at: %s\n"
+msgstr ""
+
+msgid "X.509 Certificate Revocation List Information:\n"
+msgstr ""
