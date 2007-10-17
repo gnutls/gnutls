@@ -250,7 +250,6 @@ table.
 @item --disable-srp-authentication
 @itemx --disable-psk-authentication
 @itemx --disable-anon-authentication
-@itemx --disable-tls-authorization
 @itemx --disable-extra-pki
 @itemx --disable-openpgp-authentication
 @itemx --disable-openssl-compatibility
@@ -2206,7 +2205,6 @@ implemented by another example.
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example with TLS/IA support::
-* Simple client example with authorization support::
 * Helper function for TCP connections::
 @end menu
 
@@ -2302,15 +2300,6 @@ The following client is a simple client which uses the
 
 @verbatiminclude examples/ex-client-tlsia.c
 
-@node Simple client example with authorization support
-@subsection Simple Client Example with Authorization Support
-
-The following client require that the server sends authorization data,
-and the client will send authorization data to the server as well.
-For authentication, X.509 is used.
-
-@verbatiminclude examples/ex-client-authz.c
-
 @node Helper function for TCP connections
 @subsection Helper Function for TCP Connections
 
@@ -2331,7 +2320,6 @@ servers, using @acronym{GnuTLS}.
 * Echo Server with OpenPGP authentication::
 * Echo Server with SRP authentication::
 * Echo Server with anonymous authentication::
-* Echo Server with authorization support::
 @end menu
 
 @node Echo Server with X.509 authentication
@@ -2379,14 +2367,6 @@ This example server support anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c
-
-@node Echo Server with authorization support
-@subsection Echo Server with Authorization Support
-
-This example server support authorization data, and can be used to
-serve the example client with authorization support.
-
-@verbatiminclude examples/ex-serv-authz.c
 
 @node Miscellaneous examples
 @section Miscellaneous Examples
