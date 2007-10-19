@@ -50,7 +50,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 			    int cert_list_length, unsigned int *status)
 {
   int ret = 0;
-  gnutls_openpgp_key_t key = NULL;
+  gnutls_openpgp_cert_t key = NULL;
   unsigned int verify = 0, verify_self = 0;
 
   if (!cert_list || cert_list_length != 1)
@@ -118,7 +118,7 @@ int
 _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
 			     unsigned char *fpr, size_t * fprlen)
 {
-  gnutls_openpgp_key_t key;
+  gnutls_openpgp_cert_t key;
   int ret;
 
   ret = gnutls_openpgp_key_init (&key);
@@ -155,7 +155,7 @@ _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
 time_t
 _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t * cert)
 {
-  gnutls_openpgp_key_t key;
+  gnutls_openpgp_cert_t key;
   int ret;
   time_t tim;
 
@@ -191,7 +191,7 @@ _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t * cert)
 time_t
 _gnutls_openpgp_get_raw_key_expiration_time (const gnutls_datum_t * cert)
 {
-  gnutls_openpgp_key_t key;
+  gnutls_openpgp_cert_t key;
   int ret;
   time_t tim;
 

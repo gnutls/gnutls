@@ -34,7 +34,7 @@
 
 
 /**
- * gnutls_openpgp_key_init - This function initializes a gnutls_openpgp_key_t structure
+ * gnutls_openpgp_key_init - This function initializes a gnutls_openpgp_cert_t structure
  * @key: The structure to be initialized
  *
  * This function will initialize an OpenPGP key structure. 
@@ -43,9 +43,9 @@
  *
  **/
 int
-gnutls_openpgp_key_init (gnutls_openpgp_key_t * key)
+gnutls_openpgp_key_init (gnutls_openpgp_cert_t * key)
 {
-  *key = gnutls_calloc (1, sizeof (gnutls_openpgp_key_int));
+  *key = gnutls_calloc (1, sizeof (gnutls_openpgp_cert_int));
 
   if (*key)
     return 0; /* success */
@@ -53,13 +53,13 @@ gnutls_openpgp_key_init (gnutls_openpgp_key_t * key)
 }
 
 /**
- * gnutls_openpgp_key_deinit - This function deinitializes memory used by a gnutls_openpgp_key_t structure
+ * gnutls_openpgp_key_deinit - This function deinitializes memory used by a gnutls_openpgp_cert_t structure
  * @key: The structure to be initialized
  *
  * This function will deinitialize a key structure. 
  **/
 void
-gnutls_openpgp_key_deinit (gnutls_openpgp_key_t key)
+gnutls_openpgp_key_deinit (gnutls_openpgp_cert_t key)
 {
   if (!key)
     return;
@@ -80,12 +80,12 @@ gnutls_openpgp_key_deinit (gnutls_openpgp_key_t key)
   * @format: One of gnutls_openpgp_key_fmt_t elements.
   *
   * This function will convert the given RAW or Base64 encoded key
-  * to the native gnutls_openpgp_key_t format. The output will be stored in 'key'.
+  * to the native gnutls_openpgp_cert_t format. The output will be stored in 'key'.
   *
   * Returns 0 on success.
   **/
 int
-gnutls_openpgp_key_import (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_import (gnutls_openpgp_cert_t key,
 			   const gnutls_datum_t * data,
 			   gnutls_openpgp_key_fmt_t format)
 {
@@ -134,7 +134,7 @@ gnutls_openpgp_key_import (gnutls_openpgp_key_t key,
   *
   **/
 int
-gnutls_openpgp_key_export (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_export (gnutls_openpgp_cert_t key,
 			   gnutls_openpgp_key_fmt_t format,
 			   void *output_data, size_t * output_data_size)
 {
@@ -194,7 +194,7 @@ gnutls_openpgp_key_export (gnutls_openpgp_key_t key,
  * the fingerprint can be 16 or 20 bytes.
  **/
 int
-gnutls_openpgp_key_get_fingerprint (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_get_fingerprint (gnutls_openpgp_cert_t key,
 				    void *fpr, size_t * fprlen)
 {
   cdk_packet_t pkt;
@@ -224,7 +224,7 @@ gnutls_openpgp_key_get_fingerprint (gnutls_openpgp_key_t key,
 }
 
 int
-_gnutls_openpgp_count_key_names (gnutls_openpgp_key_t key)
+_gnutls_openpgp_count_key_names (gnutls_openpgp_cert_t key)
 {
   cdk_kbnode_t p, ctx;
   cdk_packet_t pkt;
@@ -264,7 +264,7 @@ _gnutls_openpgp_count_key_names (gnutls_openpgp_key_t key)
  *
  **/
 int
-gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_get_name (gnutls_openpgp_cert_t key,
 			     int idx, char *buf, size_t * sizeof_buf)
 {
   cdk_kbnode_t ctx = NULL, p;
@@ -335,7 +335,7 @@ gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
   *
   **/
 gnutls_pk_algorithm_t
-gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_cert_t key,
 				     unsigned int *bits)
 {
   cdk_packet_t pkt;
@@ -370,7 +370,7 @@ gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_key_t key,
  * Extract the version of the OpenPGP key.
  **/
 int
-gnutls_openpgp_key_get_version (gnutls_openpgp_key_t key)
+gnutls_openpgp_key_get_version (gnutls_openpgp_cert_t key)
 {
   cdk_packet_t pkt;
   int version;
@@ -395,7 +395,7 @@ gnutls_openpgp_key_get_version (gnutls_openpgp_key_t key)
  * Returns the timestamp when the OpenPGP key was created.
  **/
 time_t
-gnutls_openpgp_key_get_creation_time (gnutls_openpgp_key_t key)
+gnutls_openpgp_key_get_creation_time (gnutls_openpgp_cert_t key)
 {
   cdk_packet_t pkt;
   time_t timestamp;
@@ -421,7 +421,7 @@ gnutls_openpgp_key_get_creation_time (gnutls_openpgp_key_t key)
  * that the key doesn't expire at all.
  **/
 time_t
-gnutls_openpgp_key_get_expiration_time (gnutls_openpgp_key_t key)
+gnutls_openpgp_key_get_expiration_time (gnutls_openpgp_cert_t key)
 {
   cdk_packet_t pkt;
   time_t expiredate;
@@ -446,7 +446,7 @@ gnutls_openpgp_key_get_expiration_time (gnutls_openpgp_key_t key)
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_key_get_id (gnutls_openpgp_key_t key, unsigned char keyid[8])
+gnutls_openpgp_key_get_id (gnutls_openpgp_cert_t key, unsigned char keyid[8])
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -476,7 +476,7 @@ gnutls_openpgp_key_get_id (gnutls_openpgp_key_t key, unsigned char keyid[8])
 
 /**
   * gnutls_openpgp_key_check_hostname - This function compares the given hostname with the hostname in the key
-  * @key: should contain an gnutls_openpgp_key_t structure
+  * @key: should contain an gnutls_openpgp_cert_t structure
   * @hostname: A null terminated string that contains a DNS name
   *
   * This function will check if the given key's owner matches
@@ -487,7 +487,7 @@ gnutls_openpgp_key_get_id (gnutls_openpgp_key_t key, unsigned char keyid[8])
   *
   **/
 int
-gnutls_openpgp_key_check_hostname (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_check_hostname (gnutls_openpgp_cert_t key,
 				   const char *hostname)
 {
   char dnsname[MAX_CN];
@@ -511,7 +511,7 @@ gnutls_openpgp_key_check_hostname (gnutls_openpgp_key_t key,
 
 /**
  * gnutls_openpgp_key_get_key_usage - This function returns the key's usage
- * @key: should contain a gnutls_openpgp_key_t structure
+ * @key: should contain a gnutls_openpgp_cert_t structure
  * @key_usage: where the key usage bits will be stored
  *
  * This function will return certificate's key usage, by checking the
@@ -522,7 +522,7 @@ gnutls_openpgp_key_check_hostname (gnutls_openpgp_key_t key,
  *
  */
 int
-gnutls_openpgp_key_get_key_usage (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_get_key_usage (gnutls_openpgp_cert_t key,
 				  unsigned int *key_usage)
 {
   cdk_packet_t pkt;

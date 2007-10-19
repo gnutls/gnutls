@@ -56,15 +56,15 @@ typedef int (*_gnutls_openpgp_raw_privkey_to_gkey_func)
  const gnutls_datum_t *,
  gnutls_openpgp_key_fmt_t);
 
-typedef int (*_gnutls_openpgp_key_to_gcert_func)
-(gnutls_cert *, gnutls_openpgp_key_t);
+typedef int (*_gnutls_openpgp_cert_to_gcert_func)
+(gnutls_cert *, gnutls_openpgp_cert_t);
 
 typedef int (*_gnutls_openpgp_privkey_to_gkey_func)
 (gnutls_privkey *,
  gnutls_openpgp_privkey_t);
 
 typedef void (*_gnutls_openpgp_key_deinit_func)
-(gnutls_openpgp_key_t);
+(gnutls_openpgp_cert_t);
 
 typedef void (*_gnutls_openpgp_keyring_deinit_func)
 (gnutls_openpgp_keyring_t);
@@ -85,7 +85,7 @@ extern _gnutls_openpgp_fingerprint_func _E_gnutls_openpgp_fingerprint;
 extern _gnutls_openpgp_key_request_func _E_gnutls_openpgp_request_key;
 extern _gnutls_openpgp_raw_key_to_gcert_func _E_gnutls_openpgp_raw_key_to_gcert;
 extern _gnutls_openpgp_raw_privkey_to_gkey_func _E_gnutls_openpgp_raw_privkey_to_gkey;
-extern _gnutls_openpgp_key_to_gcert_func _E_gnutls_openpgp_key_to_gcert;
+extern _gnutls_openpgp_cert_to_gcert_func _E_gnutls_openpgp_cert_to_gcert;
 extern _gnutls_openpgp_privkey_to_gkey_func _E_gnutls_openpgp_privkey_to_gkey;
 extern _gnutls_openpgp_key_deinit_func _E_gnutls_openpgp_key_deinit;
 extern _gnutls_openpgp_keyring_deinit_func _E_gnutls_openpgp_keyring_deinit;
@@ -99,7 +99,7 @@ extern void _gnutls_add_openpgp_functions
  _gnutls_openpgp_key_request_func request_key,
  _gnutls_openpgp_raw_key_to_gcert_func raw_key_to_gcert,
  _gnutls_openpgp_raw_privkey_to_gkey_func raw_privkey_to_gkey,
- _gnutls_openpgp_key_to_gcert_func key_to_gcert,
+ _gnutls_openpgp_cert_to_gcert_func key_to_gcert,
  _gnutls_openpgp_privkey_to_gkey_func privkey_to_gkey,
  _gnutls_openpgp_key_deinit_func key_deinit,
  _gnutls_openpgp_keyring_deinit_func keyring_deinit,

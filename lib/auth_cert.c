@@ -49,7 +49,7 @@
 static gnutls_cert *alloc_and_load_x509_certs (gnutls_x509_crt_t * certs,
 					       unsigned);
 static gnutls_privkey *alloc_and_load_x509_key (gnutls_x509_privkey_t key);
-static gnutls_cert *alloc_and_load_pgp_certs (gnutls_openpgp_key_t cert);
+static gnutls_cert *alloc_and_load_pgp_certs (gnutls_openpgp_cert_t cert);
 static gnutls_privkey *alloc_and_load_pgp_key (const gnutls_openpgp_privkey_t
 					       key);
 
@@ -1583,7 +1583,7 @@ alloc_and_load_x509_key (gnutls_x509_privkey_t key)
  * space for them.
  */
 static gnutls_cert *
-alloc_and_load_pgp_certs (gnutls_openpgp_key_t cert)
+alloc_and_load_pgp_certs (gnutls_openpgp_cert_t cert)
 {
   gnutls_cert *local_certs;
   int ret = 0;
@@ -1598,13 +1598,13 @@ alloc_and_load_pgp_certs (gnutls_openpgp_key_t cert)
       return NULL;
     }
 
-  if (_E_gnutls_openpgp_key_to_gcert == NULL)
+  if (_E_gnutls_openpgp_cert_to_gcert == NULL)
     {
       gnutls_assert ();
       return NULL;
     }
 
-  ret = _E_gnutls_openpgp_key_to_gcert (local_certs, cert);
+  ret = _E_gnutls_openpgp_cert_to_gcert (local_certs, cert);
   if (ret < 0)
     {
       gnutls_assert ();

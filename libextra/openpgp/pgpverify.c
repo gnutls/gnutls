@@ -56,7 +56,7 @@
  * Returns 0 on success.
  **/
 int
-gnutls_openpgp_key_verify_ring (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_verify_ring (gnutls_openpgp_cert_t key,
 				gnutls_openpgp_keyring_t keyring,
 				unsigned int flags, unsigned int *verify)
 {
@@ -130,7 +130,7 @@ gnutls_openpgp_key_verify_ring (gnutls_openpgp_key_t key,
  * Returns 0 on success.
  **/
 int
-gnutls_openpgp_key_verify_self (gnutls_openpgp_key_t key,
+gnutls_openpgp_key_verify_self (gnutls_openpgp_cert_t key,
 				unsigned int flags, unsigned int *verify)
 {
   int status;

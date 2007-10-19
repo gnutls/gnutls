@@ -37,7 +37,7 @@ extern "C"
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 
-/* gnutls_openpgp_key_t should be defined in gnutls.h
+/* gnutls_openpgp_cert_t should be defined in gnutls.h
  */
 
   typedef enum gnutls_openpgp_key_fmt
@@ -45,15 +45,15 @@ extern "C"
     GNUTLS_OPENPGP_FMT_BASE64
   } gnutls_openpgp_key_fmt_t;
 
-  /* initializes the memory for gnutls_openpgp_key_t struct */
-  int gnutls_openpgp_key_init (gnutls_openpgp_key_t * key);
+  /* initializes the memory for gnutls_openpgp_cert_t struct */
+  int gnutls_openpgp_key_init (gnutls_openpgp_cert_t * key);
   /* frees all memory */
-  void gnutls_openpgp_key_deinit (gnutls_openpgp_key_t key);
+  void gnutls_openpgp_key_deinit (gnutls_openpgp_cert_t key);
 
-  int gnutls_openpgp_key_import (gnutls_openpgp_key_t key,
+  int gnutls_openpgp_key_import (gnutls_openpgp_cert_t key,
 				 const gnutls_datum_t * data,
 				 gnutls_openpgp_key_fmt_t format);
-  int gnutls_openpgp_key_export (gnutls_openpgp_key_t key,
+  int gnutls_openpgp_key_export (gnutls_openpgp_cert_t key,
 				 gnutls_openpgp_key_fmt_t format,
 				 void *output_data,
 				 size_t * output_data_size);
@@ -61,27 +61,27 @@ extern "C"
 /* The key_usage flags are defined in gnutls.h. They are
  * the GNUTLS_KEY_* definitions.
  */
-  int gnutls_openpgp_key_get_key_usage (gnutls_openpgp_key_t cert,
+  int gnutls_openpgp_key_get_key_usage (gnutls_openpgp_cert_t cert,
 					unsigned int *key_usage);
-  int gnutls_openpgp_key_get_fingerprint (gnutls_openpgp_key_t key, void *fpr,
+  int gnutls_openpgp_key_get_fingerprint (gnutls_openpgp_cert_t key, void *fpr,
 					  size_t * fprlen);
 
-  int gnutls_openpgp_key_get_name (gnutls_openpgp_key_t key,
+  int gnutls_openpgp_key_get_name (gnutls_openpgp_cert_t key,
 				   int idx, char *buf, size_t * sizeof_buf);
 
   gnutls_pk_algorithm_t
-  gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_key_t key,
+  gnutls_openpgp_key_get_pk_algorithm (gnutls_openpgp_cert_t key,
 				       unsigned int *bits);
 
-  int gnutls_openpgp_key_get_version (gnutls_openpgp_key_t key);
+  int gnutls_openpgp_key_get_version (gnutls_openpgp_cert_t key);
 
-  time_t gnutls_openpgp_key_get_creation_time (gnutls_openpgp_key_t key);
-  time_t gnutls_openpgp_key_get_expiration_time (gnutls_openpgp_key_t key);
+  time_t gnutls_openpgp_key_get_creation_time (gnutls_openpgp_cert_t key);
+  time_t gnutls_openpgp_key_get_expiration_time (gnutls_openpgp_cert_t key);
 
-  int gnutls_openpgp_key_get_id (gnutls_openpgp_key_t key,
+  int gnutls_openpgp_key_get_id (gnutls_openpgp_cert_t key,
 				 unsigned char keyid[8]);
 
-  int gnutls_openpgp_key_check_hostname (gnutls_openpgp_key_t key,
+  int gnutls_openpgp_key_check_hostname (gnutls_openpgp_cert_t key,
 					 const char *hostname);
 
 /* privkey stuff.
@@ -116,12 +116,12 @@ extern "C"
 				       unsigned int flags);
 
 
-  int gnutls_openpgp_key_verify_ring (gnutls_openpgp_key_t key,
+  int gnutls_openpgp_key_verify_ring (gnutls_openpgp_cert_t key,
 				      gnutls_openpgp_keyring_t keyring,
 				      unsigned int flags, unsigned int *verify
 				      /* the output of the verification */ );
 
-  int gnutls_openpgp_key_verify_self (gnutls_openpgp_key_t key,
+  int gnutls_openpgp_key_verify_self (gnutls_openpgp_cert_t key,
 				      unsigned int flags,
 				      unsigned int *verify);
 
@@ -129,7 +129,7 @@ extern "C"
 /* certificate authentication stuff.
  */
   int gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
-					  res, gnutls_openpgp_key_t key,
+					  res, gnutls_openpgp_cert_t key,
 					  gnutls_openpgp_privkey_t pkey);
 
 #ifdef __cplusplus

@@ -960,8 +960,9 @@ extern "C"
     GNUTLS_SAN_OTHERNAME_XMPP = 1000
   } gnutls_x509_subject_alt_name_t;
 
-  struct gnutls_openpgp_key_int;
-  typedef struct gnutls_openpgp_key_int *gnutls_openpgp_key_t;
+  struct gnutls_openpgp_cert_int;
+  typedef struct gnutls_openpgp_cert_int *gnutls_openpgp_cert_t;
+#define gnutls_openpgp_key_t gnutls_openpgp_cert_t
 
   struct gnutls_openpgp_privkey_int;
   typedef struct gnutls_openpgp_privkey_int *gnutls_openpgp_privkey_t;
@@ -972,7 +973,7 @@ extern "C"
     union cert
     {
       gnutls_x509_crt_t *x509;
-      gnutls_openpgp_key_t pgp;
+      gnutls_openpgp_cert_t pgp;
     } cert;
     unsigned int ncerts;	/* one for pgp keys */
 

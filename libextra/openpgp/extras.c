@@ -140,7 +140,7 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
   cdk_stream_t input;
   
   _gnutls_debug_log ("PGP: keyring import format '%s'\n",
-		     format == 0? "raw" : "base64");
+		     format == GNUTLS_OPENPGP_FMT_RAW? "raw" : "base64");
   
   if (format == GNUTLS_OPENPGP_FMT_RAW)
     {
