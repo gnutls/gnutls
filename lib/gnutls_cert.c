@@ -719,7 +719,7 @@ _gnutls_raw_privkey_to_gkey (gnutls_privkey * key,
 	  return GNUTLS_E_INIT_LIBEXTRA;
 	}
       return _E_gnutls_openpgp_raw_privkey_to_gkey (key, raw_key,
-						    (gnutls_openpgp_key_fmt_t)
+						    (gnutls_openpgp_cert_fmt_t)
 						    key_enc);
     default:
       gnutls_assert ();

@@ -3,6 +3,28 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 2.1.4 (unreleased)
+
+** API and ABI modifications:
+gnutls_openpgp_key_t: RENAMED to gnutls_openpgp_cert_t
+gnutls_openpgp_key_status_t: RENAMEDS gnutls_openpgp_cert_status_t
+gnutls_openpgp_send_key: RENAMED to gnutls_openpgp_send_cert
+gnutls_openpgp_key_init: RENAMED to gnutls_openpgp_cert_init
+gnutls_openpgp_key_import: RENAMED to gnutls_openpgp_cert_import
+gnutls_openpgp_key_export: RENAMED to gnutls_openpgp_cert_export
+gnutls_openpgp_key_check_hostname: RENAMED to gnutls_openpgp_cert_check_hostname
+gnutls_openpgp_key_get_creation_time: RENAMED to gnutls_openpgp_cert_get_creation_time
+gnutls_openpgp_key_get_expiration_time: RENAMED to gnutls_openpgp_cert_get_expiration_time
+gnutls_openpgp_key_get_fingerprint: RENAMED to gnutls_openpgp_cert_get_fingerprint
+gnutls_openpgp_key_get_version: RENAMED to gnutls_openpgp_cert_get_version
+gnutls_openpgp_key_get_pk_algorithm: RENAMED to gnutls_openpgp_cert_get_pk_algorithm
+gnutls_openpgp_key_get_name: RENAMED to gnutls_openpgp_cert_get_name
+gnutls_openpgp_key_deinit: RENAMED to gnutls_openpgp_cert_deinit
+gnutls_openpgp_key_get_id: RENAMED to gnutls_openpgp_cert_get_id
+gnutls_openpgp_key_get_key_usage: RENAMED to gnutls_openpgp_cert_get_key_usage
+gnutls_openpgp_key_verify_ring: RENAMED to gnutls_openpgp_cert_verify_ring
+gnutls_openpgp_key_verify_self: RENAMED to gnutls_openpgp_cert_verify_self
+
 * Version 2.1.3 (released 2007-10-17)
 
 ** TLS authorization support removed.

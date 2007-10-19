@@ -307,7 +307,7 @@ openpgp_pk_to_gnutls_cert (gnutls_cert * cert, cdk_pkt_pubkey_t pk)
 int
 _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
 				     const gnutls_datum_t * raw_key,
-				     gnutls_openpgp_key_fmt_t format)
+				     gnutls_openpgp_cert_fmt_t format)
 {
   cdk_kbnode_t snode = NULL;
   cdk_packet_t pkt;
@@ -999,7 +999,7 @@ _gnutls_openpgp_cert_to_gcert (gnutls_cert * gcert, gnutls_openpgp_cert_t cert)
   gcert->cert_type = GNUTLS_CRT_OPENPGP;
 
 
-  ret = gnutls_openpgp_key_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
+  ret = gnutls_openpgp_cert_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
 				   NULL, &der_size);
   if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
@@ -1014,7 +1014,7 @@ _gnutls_openpgp_cert_to_gcert (gnutls_cert * gcert, gnutls_openpgp_cert_t cert)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = gnutls_openpgp_key_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
+  ret = gnutls_openpgp_cert_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
 				   der, &der_size);
   if (ret < 0)
     {

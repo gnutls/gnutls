@@ -481,14 +481,14 @@ cleanup:
     {
       if (st.deinit_all)
 	{
-	  if (_E_gnutls_openpgp_key_deinit == NULL ||
+	  if (_E_gnutls_openpgp_cert_deinit == NULL ||
 	      _E_gnutls_openpgp_privkey_deinit == NULL)
 	    {
 	      gnutls_assert ();
 	      return GNUTLS_E_INIT_LIBEXTRA;
 	    }
 
-	  _E_gnutls_openpgp_key_deinit (st.cert.pgp);
+	  _E_gnutls_openpgp_cert_deinit (st.cert.pgp);
 	  _E_gnutls_openpgp_privkey_deinit (st.key.pgp);
 	}
     }

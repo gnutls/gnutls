@@ -134,7 +134,7 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 int
 gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 			       const gnutls_datum_t *data,
-			       gnutls_openpgp_key_fmt_t format)
+			       gnutls_openpgp_cert_fmt_t format)
 {
   cdk_error_t err;
   cdk_stream_t input;

@@ -34,7 +34,7 @@
 
 
 /**
- * gnutls_openpgp_key_verify_ring - Verify all signatures in the key
+ * gnutls_openpgp_cert_verify_ring - Verify all signatures in the key
  * @key: the structure that holds the key.
  * @keyring: holds the keyring to check against
  * @flags: unused (should be 0)
@@ -56,7 +56,7 @@
  * Returns 0 on success.
  **/
 int
-gnutls_openpgp_key_verify_ring (gnutls_openpgp_cert_t key,
+gnutls_openpgp_cert_verify_ring (gnutls_openpgp_cert_t key,
 				gnutls_openpgp_keyring_t keyring,
 				unsigned int flags, unsigned int *verify)
 {
@@ -98,7 +98,7 @@ gnutls_openpgp_key_verify_ring (gnutls_openpgp_cert_t key,
   /* Check if the key is included in the ring. */
   if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
     {
-      rc = gnutls_openpgp_key_get_id (key, id);
+      rc = gnutls_openpgp_cert_get_id (key, id);
       if (rc < 0)
 	{
 	  gnutls_assert ();
@@ -116,7 +116,7 @@ gnutls_openpgp_key_verify_ring (gnutls_openpgp_cert_t key,
 
 
 /**
- * gnutls_openpgp_key_verify_self - Verify the self signature on the key
+ * gnutls_openpgp_cert_verify_self - Verify the self signature on the key
  * @key: the structure that holds the key.
  * @flags: unused (should be 0)
  * @verify: will hold the key verification output.
@@ -130,7 +130,7 @@ gnutls_openpgp_key_verify_ring (gnutls_openpgp_cert_t key,
  * Returns 0 on success.
  **/
 int
-gnutls_openpgp_key_verify_self (gnutls_openpgp_cert_t key,
+gnutls_openpgp_cert_verify_self (gnutls_openpgp_cert_t key,
 				unsigned int flags, unsigned int *verify)
 {
   int status;

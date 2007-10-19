@@ -244,9 +244,11 @@ extern "C"
   } gnutls_certificate_request_t;
 
   typedef enum
-  { GNUTLS_OPENPGP_KEY,
-    GNUTLS_OPENPGP_KEY_FINGERPRINT
-  } gnutls_openpgp_key_status_t;
+  { GNUTLS_OPENPGP_CERT,
+    GNUTLS_OPENPGP_CERT_FINGERPRINT
+  } gnutls_openpgp_cert_status_t;
+#define GNUTLS_OPENPGP_KEY GNUTLS_OPENPGP_CERT
+#define GNUTLS_OPENPGP_KEY_FINGERPRINT GNUTLS_OPENPGP_CERT_FINGERPRINT
 
   typedef enum
   {
@@ -803,8 +805,10 @@ extern "C"
   void gnutls_session_set_ptr (gnutls_session_t session, void *ptr);
   void *gnutls_session_get_ptr (gnutls_session_t session);
 
-  void gnutls_openpgp_send_key (gnutls_session_t session,
-				gnutls_openpgp_key_status_t status);
+#define gnutls_openpgp_send_key gnutls_openpgp_send_cert
+#define gnutls_openpgp_key_status_t gnutls_openpgp_cert_status_t
+  void gnutls_openpgp_send_cert (gnutls_session_t session,
+				gnutls_openpgp_cert_status_t status);
 
 /* fingerprint 
  * Actually this function returns the hash of the given data.
