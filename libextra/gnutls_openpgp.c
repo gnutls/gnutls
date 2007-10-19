@@ -307,7 +307,7 @@ openpgp_pk_to_gnutls_cert (gnutls_cert * cert, cdk_pkt_pubkey_t pk)
 int
 _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
 				     const gnutls_datum_t * raw_key,
-				     gnutls_openpgp_cert_fmt_t format)
+				     gnutls_openpgp_crt_fmt_t format)
 {
   cdk_kbnode_t snode = NULL;
   cdk_packet_t pkt;
@@ -985,10 +985,10 @@ cleanup:
   return ret;
 }
 
-/* Converts a parsed gnutls_openpgp_cert_t to a gnutls_cert structure.
+/* Converts a parsed gnutls_openpgp_crt_t to a gnutls_cert structure.
  */
 int
-_gnutls_openpgp_cert_to_gcert (gnutls_cert * gcert, gnutls_openpgp_cert_t cert)
+_gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 {
   opaque *der;
   size_t der_size = 0;
@@ -999,7 +999,7 @@ _gnutls_openpgp_cert_to_gcert (gnutls_cert * gcert, gnutls_openpgp_cert_t cert)
   gcert->cert_type = GNUTLS_CRT_OPENPGP;
 
 
-  ret = gnutls_openpgp_cert_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
+  ret = gnutls_openpgp_crt_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
 				   NULL, &der_size);
   if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
@@ -1014,7 +1014,7 @@ _gnutls_openpgp_cert_to_gcert (gnutls_cert * gcert, gnutls_openpgp_cert_t cert)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = gnutls_openpgp_cert_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
+  ret = gnutls_openpgp_crt_export (cert, GNUTLS_OPENPGP_FMT_RAW, 
 				   der, &der_size);
   if (ret < 0)
     {
@@ -1054,7 +1054,7 @@ _gnutls_openpgp_cert_to_gcert (gnutls_cert * gcert, gnutls_openpgp_cert_t cert)
   **/
 int
 gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
-				    res, gnutls_openpgp_cert_t key,
+				    res, gnutls_openpgp_crt_t key,
 				    gnutls_openpgp_privkey_t pkey)
 {
   int ret;
@@ -1105,7 +1105,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
 
   res->cert_list_length[res->ncerts] = 1;
 
-  ret = _gnutls_openpgp_cert_to_gcert (res->cert_list[res->ncerts], key);
+  ret = _gnutls_openpgp_crt_to_gcert (res->cert_list[res->ncerts], key);
   if (ret < 0)
     {
       gnutls_assert ();

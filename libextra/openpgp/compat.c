@@ -50,7 +50,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 			    int cert_list_length, unsigned int *status)
 {
   int ret = 0;
-  gnutls_openpgp_cert_t key = NULL;
+  gnutls_openpgp_crt_t key = NULL;
   unsigned int verify = 0, verify_self = 0;
 
   if (!cert_list || cert_list_length != 1)
@@ -59,14 +59,14 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
       return GNUTLS_E_NO_CERTIFICATE_FOUND;
     }
 
-  ret = gnutls_openpgp_cert_init (&key);
+  ret = gnutls_openpgp_crt_init (&key);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = gnutls_openpgp_cert_import (key, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
+  ret = gnutls_openpgp_crt_import (key, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -75,7 +75,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 
   if (cred->keyring != NULL)
     {
-      ret = gnutls_openpgp_cert_verify_ring (key, cred->keyring, 0, &verify);
+      ret = gnutls_openpgp_crt_verify_ring (key, cred->keyring, 0, &verify);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -84,7 +84,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
     }
 
   /* Now try the self signature. */
-  ret = gnutls_openpgp_cert_verify_self (key, 0, &verify_self);
+  ret = gnutls_openpgp_crt_verify_self (key, 0, &verify_self);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -100,7 +100,7 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
   ret = 0;
 
 leave:
-  gnutls_openpgp_cert_deinit (key);
+  gnutls_openpgp_crt_deinit (key);
 
   return ret;
 }
@@ -118,25 +118,25 @@ int
 _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
 			     unsigned char *fpr, size_t * fprlen)
 {
-  gnutls_openpgp_cert_t key;
+  gnutls_openpgp_crt_t key;
   int ret;
 
-  ret = gnutls_openpgp_cert_init (&key);
+  ret = gnutls_openpgp_crt_init (&key);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = gnutls_openpgp_cert_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
+  ret = gnutls_openpgp_crt_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = gnutls_openpgp_cert_get_fingerprint (key, fpr, fprlen);
-  gnutls_openpgp_cert_deinit (key);
+  ret = gnutls_openpgp_crt_get_fingerprint (key, fpr, fprlen);
+  gnutls_openpgp_crt_deinit (key);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -155,27 +155,27 @@ _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
 time_t
 _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t * cert)
 {
-  gnutls_openpgp_cert_t key;
+  gnutls_openpgp_crt_t key;
   int ret;
   time_t tim;
 
-  ret = gnutls_openpgp_cert_init (&key);
+  ret = gnutls_openpgp_crt_init (&key);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = gnutls_openpgp_cert_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
+  ret = gnutls_openpgp_crt_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  tim = gnutls_openpgp_cert_get_creation_time (key);
+  tim = gnutls_openpgp_crt_get_creation_time (key);
 
-  gnutls_openpgp_cert_deinit (key);
+  gnutls_openpgp_crt_deinit (key);
 
   return tim;
 }
@@ -191,27 +191,27 @@ _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t * cert)
 time_t
 _gnutls_openpgp_get_raw_key_expiration_time (const gnutls_datum_t * cert)
 {
-  gnutls_openpgp_cert_t key;
+  gnutls_openpgp_crt_t key;
   int ret;
   time_t tim;
 
-  ret = gnutls_openpgp_cert_init (&key);
+  ret = gnutls_openpgp_crt_init (&key);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = gnutls_openpgp_cert_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
+  ret = gnutls_openpgp_crt_import (key, cert, GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  tim = gnutls_openpgp_cert_get_expiration_time (key);
+  tim = gnutls_openpgp_crt_get_expiration_time (key);
 
-  gnutls_openpgp_cert_deinit (key);
+  gnutls_openpgp_crt_deinit (key);
 
   return tim;
 }

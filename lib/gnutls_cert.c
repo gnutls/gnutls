@@ -432,7 +432,7 @@ _gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
 }
 
 /*-
-  * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
+  * _gnutls_openpgp_crt_verify_peers - This function returns the peer's certificate status
   * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return its status (TRUSTED, INVALID etc.). 
@@ -440,7 +440,7 @@ _gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
   *
   -*/
 int
-_gnutls_openpgp_cert_verify_peers (gnutls_session_t session,
+_gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
 				   unsigned int *status)
 {
   cert_auth_info_t info;
@@ -547,7 +547,7 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
     case GNUTLS_CRT_X509:
       return _gnutls_x509_cert_verify_peers (session, status);
     case GNUTLS_CRT_OPENPGP:
-      return _gnutls_openpgp_cert_verify_peers (session, status);
+      return _gnutls_openpgp_crt_verify_peers (session, status);
     default:
       return GNUTLS_E_INVALID_REQUEST;
     }
@@ -719,7 +719,7 @@ _gnutls_raw_privkey_to_gkey (gnutls_privkey * key,
 	  return GNUTLS_E_INIT_LIBEXTRA;
 	}
       return _E_gnutls_openpgp_raw_privkey_to_gkey (key, raw_key,
-						    (gnutls_openpgp_cert_fmt_t)
+						    (gnutls_openpgp_crt_fmt_t)
 						    key_enc);
     default:
       gnutls_assert ();

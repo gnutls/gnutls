@@ -66,7 +66,7 @@ int _gnutls_openpgp_raw_key_to_gcert (gnutls_cert * cert,
 int
 _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
 				     const gnutls_datum_t * raw_key,
-				     gnutls_openpgp_cert_fmt_t format);
+				     gnutls_openpgp_crt_fmt_t format);
 
 int
 _gnutls_openpgp_request_key (gnutls_session_t,

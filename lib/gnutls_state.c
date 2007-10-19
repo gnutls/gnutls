@@ -630,7 +630,7 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
   **/
 void
 gnutls_openpgp_send_cert (gnutls_session_t session,
-			 gnutls_openpgp_cert_status_t status)
+			 gnutls_openpgp_crt_status_t status)
 {
   session->internals.pgp_fingerprint = status;
 }
