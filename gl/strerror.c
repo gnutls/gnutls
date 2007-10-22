@@ -1,5 +1,6 @@
-/* Convert internet address from text to binary format.
-   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+/* strerror.c --- POSIX compatible system error routine
+
+   Copyright (C) 2007 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,11 +15,35 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <config.h>
 
-#if !HAVE_DECL_INET_PTON
-extern int inet_pton (int af, const char *restrict src, void *restrict dst);
+#include <string.h>
+
+#if REPLACE_STRERROR
+
+# include <stdio.h>
+
+# include "intprops.h"
+
+# undef strerror
+# if ! HAVE_DECL_STRERROR
+#  define strerror(n) NULL
+# endif
+
+char *
+rpl_strerror (int n)
+{
+  char *result = strerror (n);
+
+  if (! result)
+    {
+      static char const fmt[] = "Unknown error (%d)";
+      static char mesg[sizeof fmt + INT_STRLEN_BOUND (n)];
+      sprintf (mesg, fmt, n);
+      return mesg;
+    }
+
+  return result;
+}
+
 #endif

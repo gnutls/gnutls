@@ -3385,9 +3385,21 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 #endif
 		  *fbp = dp->conversion;
 #if USE_SNPRINTF
+# if !(__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3))
 		fbp[1] = '%';
 		fbp[2] = 'n';
 		fbp[3] = '\0';
+# else
+		/* On glibc2 systems from glibc >= 2.3 - probably also older
+		   ones - we know that snprintf's returns value conforms to
+		   ISO C 99: the gl_SNPRINTF_DIRECTIVE_N test passes.
+		   Therefore we can avoid using %n in this situation.
+		   On glibc2 systems from 2004-10-18 or newer, the use of %n
+		   in format strings in writable memory may crash the program
+		   (if compiled with _FORTIFY_SOURCE=2), so we should avoid it
+		   in this situation.  */
+		fbp[1] = '\0';
+# endif
 #else
 		fbp[1] = '\0';
 #endif
@@ -3430,7 +3442,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 		    /* SNPRINTF can fail if its second argument is
 		       > INT_MAX.  */
 		    if (maxlen > INT_MAX / TCHARS_PER_DCHAR)
-		      goto overflow;
+		      maxlen = INT_MAX / TCHARS_PER_DCHAR;
 		    maxlen = maxlen * TCHARS_PER_DCHAR;
 # define SNPRINTF_BUF(arg) \
 		    switch (prefix_count)				    \
@@ -3651,17 +3663,26 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 		    /* Handle overflow of the allocated buffer.  */
 		    if (count >= maxlen)
 		      {
-			/* Need at least count * sizeof (TCHAR_T) bytes.  But
-			   allocate proportionally, to avoid looping eternally
-			   if snprintf() reports a too small count.  */
-			size_t n =
-			  xmax (xsum (length,
-				      (count + TCHARS_PER_DCHAR - 1)
-				      / TCHARS_PER_DCHAR),
-				xtimes (allocated, 2));
+			/* If maxlen already has attained its allowed maximum,
+			   allocating more memory will not increase maxlen.
+			   Instead of looping, bail out.  */
+			if (maxlen == INT_MAX / TCHARS_PER_DCHAR)
+			  goto overflow;
+			else
+			  {
+			    /* Need at least count * sizeof (TCHAR_T) bytes.
+			       But allocate proportionally, to avoid looping
+			       eternally if snprintf() reports a too small
+			       count.  */
+			    size_t n =
+			      xmax (xsum (length,
+					  (count + TCHARS_PER_DCHAR - 1)
+					  / TCHARS_PER_DCHAR),
+				    xtimes (allocated, 2));
 
-			ENSURE_ALLOCATION (n);
-			continue;
+			    ENSURE_ALLOCATION (n);
+			    continue;
+			  }
 		      }
 #endif
 

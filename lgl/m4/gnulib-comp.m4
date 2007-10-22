@@ -124,25 +124,38 @@ AC_DEFUN([lgl_INIT],
 
 # Like AC_LIBOBJ, except that the module name goes
 # into lgl_LIBOBJS instead of into LIBOBJS.
-AC_DEFUN([lgl_LIBOBJ],
-  [lgl_LIBOBJS="$lgl_LIBOBJS $1.$ac_objext"])
+AC_DEFUN([lgl_LIBOBJ], [
+  AS_LITERAL_IF([$1], [lgl_LIBSOURCES([$1.c])])dnl
+  lgl_LIBOBJS="$lgl_LIBOBJS $1.$ac_objext"
+])
 
 # Like AC_REPLACE_FUNCS, except that the module name goes
 # into lgl_LIBOBJS instead of into LIBOBJS.
-AC_DEFUN([lgl_REPLACE_FUNCS],
-  [AC_CHECK_FUNCS([$1], , [lgl_LIBOBJ($ac_func)])])
+AC_DEFUN([lgl_REPLACE_FUNCS], [
+  m4_foreach_w([gl_NAME], [$1], [AC_LIBSOURCES(gl_NAME[.c])])dnl
+  AC_CHECK_FUNCS([$1], , [lgl_LIBOBJ($ac_func)])
+])
 
-# Like AC_LIBSOURCES, except that it does nothing.
-# We rely on EXTRA_lib..._SOURCES instead.
-AC_DEFUN([lgl_LIBSOURCES],
-  [])
+# Like AC_LIBSOURCES, except the directory where the source file is
+# expected is derived from the gnulib-tool parametrization,
+# and alloca is special cased (for the alloca-opt module).
+# We could also entirely rely on EXTRA_lib..._SOURCES.
+AC_DEFUN([lgl_LIBSOURCES], [
+  m4_foreach([_gl_NAME], [$1], [
+    m4_if(_gl_NAME, [alloca.c], [], [
+      m4_syscmd([test -r lgl/]_gl_NAME[ || test ! -d lgl])dnl
+      m4_if(m4_sysval, [0], [],
+        [AC_FATAL([missing lgl/]_gl_NAME)])
+    ])
+  ])
+])
 
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([lgl_FILE_LIST], [
   build-aux/config.rpath
   build-aux/link-warning.h
-  lib/alloca_.h
+  lib/alloca.in.h
   lib/arcfour.c
   lib/arcfour.h
   lib/arctwo.c
@@ -153,7 +166,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/des.h
   lib/dummy.c
   lib/float+.h
-  lib/float_.h
+  lib/float.in.h
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c
@@ -188,22 +201,22 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/sha1.h
   lib/size_max.h
   lib/snprintf.c
-  lib/stdbool_.h
-  lib/stdint_.h
-  lib/stdio_.h
-  lib/stdlib_.h
-  lib/string_.h
+  lib/stdbool.in.h
+  lib/stdint.in.h
+  lib/stdio.in.h
+  lib/stdlib.in.h
+  lib/string.in.h
   lib/strverscmp.c
   lib/strverscmp.h
-  lib/sys_socket_.h
-  lib/sys_stat_.h
-  lib/time_.h
+  lib/sys_socket.in.h
+  lib/sys_stat.in.h
+  lib/time.in.h
   lib/time_r.c
-  lib/unistd_.h
+  lib/unistd.in.h
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
-  lib/wchar_.h
+  lib/wchar.in.h
   lib/xsize.h
   m4/absolute-header.m4
   m4/alloca.m4
