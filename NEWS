@@ -17,12 +17,12 @@ used.
 
 ** API and ABI modifications:
 gnutls_record_disable_padding: ADDED
-gnutls_mac_set_priority2: ADDED
-gnutls_compression_set_priority2: ADDED
-gnutls_protocol_set_priority2: ADDED
-gnutls_kx_set_priority2: ADDED
-gnutls_cipher_set_priority2: ADDED
-gnutls_certificate_type_set_priority2: ADDED
+gnutls_mac_convert_priority: ADDED
+gnutls_compression_convert_priority: ADDED
+gnutls_protocol_convert_priority: ADDED
+gnutls_kx_convert_priority: ADDED
+gnutls_cipher_convert_priority: ADDED
+gnutls_certificate_type_convert_priority: ADDED
 gnutls_openpgp_key_t: RENAMED to gnutls_openpgp_crt_t
 gnutls_openpgp_key_status_t: RENAMEDS gnutls_openpgp_crt_status_t
 gnutls_openpgp_send_key: RENAMED to gnutls_openpgp_send_cert
