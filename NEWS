@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.1.4 (unreleased)
 
+** Added the --v1 option to certtool, to allow generating X.509
+version 1 certificates. 
+
 ** API and ABI modifications:
 gnutls_openpgp_key_t: RENAMED to gnutls_openpgp_crt_t
 gnutls_openpgp_key_status_t: RENAMEDS gnutls_openpgp_crt_status_t
