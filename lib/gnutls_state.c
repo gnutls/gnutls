@@ -618,9 +618,9 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
 }
 
 /**
-  * gnutls_openpgp_send_key - This function will order gnutls to send the openpgp fingerprint instead of the key
+  * gnutls_openpgp_send_cert - This function will order gnutls to send the openpgp fingerprint instead of the key
   * @session: is a pointer to a #gnutls_session_t structure.
-  * @status: is one of OPENPGP_KEY, or OPENPGP_KEY_FINGERPRINT
+  * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
   *
   * This function will order gnutls to send the key fingerprint instead
   * of the key in the initial handshake procedure. This should be used
@@ -629,8 +629,8 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
   *
   **/
 void
-gnutls_openpgp_send_key (gnutls_session_t session,
-			 gnutls_openpgp_key_status_t status)
+gnutls_openpgp_send_cert (gnutls_session_t session,
+			 gnutls_openpgp_crt_status_t status)
 {
   session->internals.pgp_fingerprint = status;
 }

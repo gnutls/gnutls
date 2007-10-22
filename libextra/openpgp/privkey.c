@@ -74,7 +74,7 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
  * gnutls_openpgp_privkey_import - This function will import a RAW or BASE64 encoded key
  * @key: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded key.
- * @format: One of gnutls_openpgp_key_fmt_t elements.
+ * @format: One of gnutls_openpgp_crt_fmt_t elements.
  * @pass: Unused for now
  * @flags: should be zero
  *
@@ -87,7 +87,7 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
 int
 gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 			       const gnutls_datum_t * data,
-			       gnutls_openpgp_key_fmt_t format,
+			       gnutls_openpgp_crt_fmt_t format,
 			       const char *pass, unsigned int flags)
 {
   int rc;

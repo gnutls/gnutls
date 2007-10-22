@@ -150,9 +150,9 @@ gnutls_global_init_extra (void)
 				 _gnutls_openpgp_request_key,
 				 _gnutls_openpgp_raw_key_to_gcert,
 				 _gnutls_openpgp_raw_privkey_to_gkey,
-				 _gnutls_openpgp_key_to_gcert,
+				 _gnutls_openpgp_crt_to_gcert,
 				 _gnutls_openpgp_privkey_to_gkey,
-				 gnutls_openpgp_key_deinit,
+				 gnutls_openpgp_crt_deinit,
 				 gnutls_openpgp_keyring_deinit,
 				 gnutls_openpgp_privkey_deinit);
 

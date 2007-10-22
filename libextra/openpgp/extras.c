@@ -134,13 +134,13 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 int
 gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 			       const gnutls_datum_t *data,
-			       gnutls_openpgp_key_fmt_t format)
+			       gnutls_openpgp_crt_fmt_t format)
 {
   cdk_error_t err;
   cdk_stream_t input;
   
   _gnutls_debug_log ("PGP: keyring import format '%s'\n",
-		     format == 0? "raw" : "base64");
+		     format == GNUTLS_OPENPGP_FMT_RAW? "raw" : "base64");
   
   if (format == GNUTLS_OPENPGP_FMT_RAW)
     {

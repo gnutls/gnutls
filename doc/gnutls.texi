@@ -1850,7 +1850,7 @@ belong to the actual owner.
 @subsection @acronym{OpenPGP} Keys
 
 In @acronym{GnuTLS} the @acronym{OpenPGP} key structures
-@xcite{RFC2440} are handled using the @code{gnutls_openpgp_key_t} type
+@xcite{RFC2440} are handled using the @code{gnutls_openpgp_crt_t} type
 and the corresponding private keys with the
 @code{gnutls_openpgp_privkey_t} type. All the prototypes for the key
 handling functions can be found at @file{gnutls/openpgp.h}.
@@ -1865,7 +1865,7 @@ GPGME (@url{http://www.gnupg.org/related_software/gpgme/}) is
 recommended.
 
 There is one verification function in @acronym{GnuTLS}, the
-@ref{gnutls_openpgp_key_verify_ring}.
+@ref{gnutls_openpgp_crt_verify_ring}.
 This checks an @acronym{OpenPGP} key against a given set of public keys (keyring) and
 returns the key status. The key verification status is the same as in
 @acronym{X.509} certificates, although the meaning and interpretation are

@@ -43,8 +43,8 @@ typedef int (*OPENPGP_RAW_KEY_TO_GCERT) (gnutls_cert *,
 typedef int (*OPENPGP_RAW_PRIVKEY_TO_GKEY) (gnutls_privkey *,
 					    const gnutls_datum_t *);
 
-typedef int (*OPENPGP_KEY_TO_GCERT) (gnutls_cert *, gnutls_openpgp_key_t);
+typedef int (*OPENPGP_KEY_TO_GCERT) (gnutls_cert *, gnutls_openpgp_crt_t);
 typedef int (*OPENPGP_PRIVKEY_TO_GKEY) (gnutls_privkey *,
 					gnutls_openpgp_privkey_t);
-typedef void (*OPENPGP_KEY_DEINIT) (gnutls_openpgp_key_t);
+typedef void (*OPENPGP_KEY_DEINIT) (gnutls_openpgp_crt_t);
 typedef void (*OPENPGP_PRIVKEY_DEINIT) (gnutls_openpgp_privkey_t);

@@ -291,7 +291,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
   const char *cstr;
   char name[256];
   size_t name_len = sizeof (name);
-  gnutls_openpgp_key_t crt;
+  gnutls_openpgp_crt_t crt;
   const gnutls_datum_t *cert_list;
   int cert_list_size = 0;
   time_t expiret;
@@ -303,9 +303,9 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
     {
       unsigned int algo, bits;
 
-      gnutls_openpgp_key_init (&crt);
+      gnutls_openpgp_crt_init (&crt);
       ret =
-	gnutls_openpgp_key_import (crt, &cert_list[0],
+	gnutls_openpgp_crt_import (crt, &cert_list[0],
 				   GNUTLS_OPENPGP_FMT_RAW);
       if (ret < 0)
 	{
@@ -320,7 +320,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 	  size = sizeof (buffer);
 
 	  ret =
-	    gnutls_openpgp_key_export (crt,
+	    gnutls_openpgp_crt_export (crt,
 				       GNUTLS_OPENPGP_FMT_BASE64,
 				       buffer, &size);
 	  if (ret < 0)
@@ -338,7 +338,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 				 * if it matches the name of the host we
 				 * connected to.
 				 */
-	  if (gnutls_openpgp_key_check_hostname (crt, hostname) == 0)
+	  if (gnutls_openpgp_crt_check_hostname (crt, hostname) == 0)
 	    {
 	      printf
 		(" # The hostname in the key does NOT match '%s'.\n",
@@ -350,8 +350,8 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 	    }
 	}
 
-      activet = gnutls_openpgp_key_get_creation_time (crt);
-      expiret = gnutls_openpgp_key_get_expiration_time (crt);
+      activet = gnutls_openpgp_crt_get_creation_time (crt);
+      expiret = gnutls_openpgp_crt_get_expiration_time (crt);
 
       printf (" # Key was created at: %s", my_ctime (&activet));
       printf (" # Key expires: ");
@@ -360,7 +360,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
       else
 	printf ("Never\n");
 
-      if (gnutls_openpgp_key_get_fingerprint (crt, digest, &digest_size) >= 0)
+      if (gnutls_openpgp_crt_get_fingerprint (crt, digest, &digest_size) >= 0)
 	{
 	  print = raw_to_string (digest, digest_size);
 
@@ -368,7 +368,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 		  gnutls_openpgp_key_get_version (crt));
 
 	  bits = 0;
-	  algo = gnutls_openpgp_key_get_pk_algorithm (crt, &bits);
+	  algo = gnutls_openpgp_crt_get_pk_algorithm (crt, &bits);
 
 	  printf (" # PGP Key public key algorithm: ");
 	  cstr = SU (gnutls_pk_algorithm_get_name (algo));
@@ -378,7 +378,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 	    printf (" # PGP Key fingerprint: %s\n", print);
 
 	  name_len = sizeof (name);
-	  if (gnutls_openpgp_key_get_name (crt, 0, name, &name_len) < 0)
+	  if (gnutls_openpgp_crt_get_name (crt, 0, name, &name_len) < 0)
 	    {
 	      fprintf (stderr, "Could not extract name\n");
 	    }
@@ -389,7 +389,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 
 	}
 
-      gnutls_openpgp_key_deinit (crt);
+      gnutls_openpgp_crt_deinit (crt);
 
     }
 }
