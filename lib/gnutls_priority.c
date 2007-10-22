@@ -36,7 +36,7 @@
   * @list: is a 0 terminated list of gnutls_cipher_algorithm_t elements.
   *
   * Sets the priority on the ciphers supported by gnutls.
-  * Priority is higher for ciphers specified before others.
+  * Priority is higher for elements specified before others.
   * After specifying the ciphers you want, you must append a 0.
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
@@ -70,7 +70,7 @@ gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
   * @list: is a 0 terminated list of gnutls_kx_algorithm_t elements.
   *
   * Sets the priority on the key exchange algorithms supported by gnutls.
-  * Priority is higher for algorithms specified before others.
+  * Priority is higher for elements specified before others.
   * After specifying the algorithms you want, you must append a 0.
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
@@ -104,7 +104,7 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
   * @list: is a 0 terminated list of gnutls_mac_algorithm_t elements.
   *
   * Sets the priority on the mac algorithms supported by gnutls.
-  * Priority is higher for algorithms specified before others.
+  * Priority is higher for elements specified before others.
   * After specifying the algorithms you want, you must append a 0.
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
@@ -138,7 +138,7 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
   * @list: is a 0 terminated list of gnutls_compression_method_t elements.
   *
   * Sets the priority on the compression algorithms supported by gnutls.
-  * Priority is higher for algorithms specified before others.
+  * Priority is higher for elements specified before others.
   * After specifying the algorithms you want, you must append a 0.
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
@@ -212,7 +212,7 @@ gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
   * @list: is a 0 terminated list of gnutls_certificate_type_t elements.
   *
   * Sets the priority on the certificate types supported by gnutls.
-  * Priority is higher for types specified before others.
+  * Priority is higher for elements specified before others.
   * After specifying the types you want, you must append a 0.
   * Note that the certificate type priority is set on the client. 
   * The server does not use the cert type priority except for disabling
@@ -381,4 +381,438 @@ gnutls_set_default_export_priority (gnutls_session_t session)
   gnutls_mac_set_priority (session, mac_priority);
 
   return 0;
+}
+
+/* New priority API with strings
+ */
+
+/* Breaks a list of "xxx", "yyy", to a character array, of
+ * MAX_COMMA_SEP_ELEMENTS size; Note that the given string is modified.
+  */
+static void break_comma_list(char *etag,
+		      char *broken_etag[MAX_ALGOS],
+		      int *elements, char sep)
+{
+    char *p = etag;
+    if (sep == 0) sep = ',';
+
+    *elements = 0;
+
+    do {
+	broken_etag[*elements] = p;
+
+	(*elements)++;
+
+	p = strchr(p, sep);
+	if (p) {
+	    *p = 0;
+	    p++;		/* move to next entry and skip white
+				 * space.
+				 */
+	    while (*p == ' ')
+		p++;
+	}
+    } while (p != NULL && *elements < MAX_ALGOS);
+}
+
+/**
+  * gnutls_mac_set_priority2 - Sets the priority on the MAC algorithms supported by gnutls.
+  * @session: is a #gnutls_session_t structure.
+  * @prio: is a separated list of algorithms
+  * @sep: is the separator of the previous list, if zero comma is assumed
+  *
+  * Sets the priority on the MAC algorithms supported by gnutls.
+  * Priority is higher for elements specified before others.
+  * Note that the priority is set on the client. The server does
+  * not use the algorithm's priority except for disabling
+  * algorithms that were not specified.
+  *
+  * The supported algorithms are: MD5, SHA1
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_mac_set_priority2 (gnutls_session_t session, const char *prio, char sep)
+{
+    char *broken_list[MAX_ALGOS];
+    int broken_list_size, i, j;
+    char* darg;
+    
+    darg = gnutls_strdup( prio);
+    if (darg == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    break_comma_list(darg, broken_list, &broken_list_size, sep);
+
+    j = 0;
+    for (i=0;i<broken_list_size;i++) {
+        if (strcasecmp( broken_list[i], "SHA1")==0) {
+    	    session->internals.mac_algorithm_priority.priority[j++] = GNUTLS_MAC_SHA1;
+    	    session->internals.mac_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "MD5")==0) {
+    	    session->internals.mac_algorithm_priority.priority[j++] = GNUTLS_MAC_MD5;
+    	    session->internals.mac_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        
+        _gnutls_debug_log( "MAC algorithm %s is not known\n", broken_list[i]);
+        return GNUTLS_E_UNKNOWN_ALGORITHM;
+    }
+
+    return 0;
+}
+
+/**
+  * gnutls_certificate_type_set_priority2 - Sets the priority on the certificate types supported by gnutls.
+  * @session: is a #gnutls_session_t structure.
+  * @prio: is a separated list of algorithms
+  * @sep: is the separator of the previous list, if zero comma is assumed
+  *
+  * Sets the priority on the Certificate types supported by gnutls.
+  * Priority is higher for elements specified before others.
+  * Note that the priority is set on the client. The server does
+  * not use the algorithm's priority except for disabling
+  * algorithms that were not specified.
+  *
+  * The supported types are: X.509, OPENPGP
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_certificate_type_set_priority2 (gnutls_session_t session, const char *prio, char sep)
+{
+    char *broken_list[MAX_ALGOS];
+    int broken_list_size, i, j;
+    char* darg;
+    
+    darg = gnutls_strdup( prio);
+    if (darg == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    break_comma_list(darg, broken_list, &broken_list_size, sep);
+
+    j = 0;
+    for (i=0;i<broken_list_size;i++) {
+        if (strcasecmp( broken_list[i], "X.509")==0) {
+    	    session->internals.cert_type_priority.priority[j++] = GNUTLS_CRT_X509;
+    	    session->internals.cert_type_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "OPENPGP")==0) {
+    	    session->internals.cert_type_priority.priority[j++] = GNUTLS_CRT_OPENPGP;
+    	    session->internals.cert_type_priority.algorithms++;
+    	    continue;
+        }
+        
+        _gnutls_debug_log("Certificate type %s is not known\n", broken_list[i]);
+        return GNUTLS_E_UNKNOWN_ALGORITHM;
+    }
+
+    return 0;
+}
+
+/**
+  * gnutls_compression_set_priority2 - Sets the priority on the compression methods supported by gnutls.
+  * @session: is a #gnutls_session_t structure.
+  * @prio: is a separated list of algorithms
+  * @sep: is the separator of the previous list, if zero comma is assumed
+  *
+  * Sets the priority on the ciphers supported by gnutls.
+  * Priority is higher for elements specified before others.
+  * Note that the priority is set on the client. The server does
+  * not use the algorithm's priority except for disabling
+  * algorithms that were not specified.
+  *
+  * The supported methods are: NULL, ZLIB, LZO
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_compression_set_priority2 (gnutls_session_t session, const char *prio, char sep)
+{
+    char *broken_list[MAX_ALGOS];
+    int broken_list_size, i, j;
+    char* darg;
+    
+    darg = gnutls_strdup( prio);
+    if (darg == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    break_comma_list(darg, broken_list, &broken_list_size, sep);
+
+    j = 0;
+    for (i=0;i<broken_list_size;i++) {
+        if (strcasecmp( broken_list[i], "ZLIB")==0) {
+    	    session->internals.compression_method_priority.priority[j++] = GNUTLS_COMP_ZLIB;
+    	    session->internals.compression_method_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "LZO")==0) {
+    	    session->internals.compression_method_priority.priority[j++] = GNUTLS_COMP_LZO;
+    	    session->internals.compression_method_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "NULL")==0) {
+    	    session->internals.compression_method_priority.priority[j++] = GNUTLS_COMP_NULL;
+    	    session->internals.compression_method_priority.algorithms++;
+    	    continue;
+        }
+        
+        _gnutls_debug_log( "Compression algorithm %s is not known\n", broken_list[i]);
+        return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
+    }
+
+    return 0;
+}
+
+/**
+  * gnutls_protocol_set_priority2 - Sets the priority on the protocols supported by gnutls.
+  * @session: is a #gnutls_session_t structure.
+  * @prio: is a separated list of algorithms
+  * @sep: is the separator of the previous list, if zero comma is assumed
+  *
+  * Sets the priority on the protocols supported by gnutls.
+  * Priority is higher for elements specified before others.
+  * Note that the priority is set on the client. The server does
+  * not use the algorithm's priority except for disabling
+  * algorithms that were not specified.
+  *
+  * The supported protocols are: TLS1.0, TLS1.1, TLS1.2, SSL3.0
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_protocol_set_priority2 (gnutls_session_t session, const char *prio, char sep)
+{
+    char *broken_list[MAX_ALGOS];
+    int broken_list_size, i, j;
+    char* darg;
+    
+    darg = gnutls_strdup( prio);
+    if (darg == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    break_comma_list(darg, broken_list, &broken_list_size, sep);
+
+    j = 0;
+    for (i=0;i<broken_list_size;i++) {
+        if (strcasecmp( broken_list[i], "TLS1.0")==0) {
+    	    session->internals.protocol_priority.priority[j++] = GNUTLS_TLS1_0;
+    	    session->internals.protocol_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "TLS1.1")==0) {
+    	    session->internals.protocol_priority.priority[j++] = GNUTLS_TLS1_1;
+    	    session->internals.protocol_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "TLS1.2")==0) {
+    	    session->internals.protocol_priority.priority[j++] = GNUTLS_TLS1_2;
+    	    session->internals.protocol_priority.algorithms++;
+    	    continue;
+        }
+        if (strncasecmp( broken_list[i], "SSL3", 4)==0) {
+    	    session->internals.protocol_priority.priority[j++] = GNUTLS_SSL3;
+    	    session->internals.protocol_priority.algorithms++;
+    	    continue;
+        }
+        
+        _gnutls_debug_log( "Protocol %s is not known\n", broken_list[i]);
+        return GNUTLS_E_UNKNOWN_ALGORITHM;
+    }
+
+    return 0;
+}
+
+/**
+  * gnutls_kx_set_priority2 - Sets the priority on the key exchange algorithms supported by gnutls.
+  * @session: is a #gnutls_session_t structure.
+  * @prio: is a separated list of algorithms
+  * @sep: is the separator of the previous list, if zero comma is assumed
+  *
+  * Sets the priority on the key exchange algorithms supported by gnutls.
+  * Priority is higher for elements specified before others.
+  * Note that the priority is set on the client. The server does
+  * not use the algorithm's priority except for disabling
+  * algorithms that were not specified.
+  *
+  * The supported algorithms are: RSA, DHE-DSS, DHE-RSA, ANON-DH, RSA-EXPORT,
+  * SRP, SRP-DSS, SRP-RSA, PSK, DHE-PSK
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_kx_set_priority2 (gnutls_session_t session, const char *prio, char sep)
+{
+    char *broken_list[MAX_ALGOS];
+    int broken_list_size, i, j;
+    char* darg;
+    
+    darg = gnutls_strdup( prio);
+    if (darg == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    break_comma_list(darg, broken_list, &broken_list_size, sep);
+
+    j = 0;
+    for (i=0;i<broken_list_size;i++) {
+        if (strcasecmp( broken_list[i], "RSA")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_RSA;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "DHE-DSS")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_DHE_DSS;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "DHE-RSA")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_DHE_RSA;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "ANON-DH")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_ANON_DH;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "RSA-EXPORT")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_RSA_EXPORT;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "SRP")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_SRP;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "SRP-DSS")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_SRP_DSS;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+
+        if (strcasecmp( broken_list[i], "SRP-RSA")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_SRP_RSA;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "PSK")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_PSK;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "DHE-PSK")==0) {
+    	    session->internals.kx_algorithm_priority.priority[j++] = GNUTLS_KX_DHE_PSK;
+    	    session->internals.kx_algorithm_priority.algorithms++;
+    	    continue;
+        }
+
+        _gnutls_debug_log( "Key exchange algorithm %s is not known\n", broken_list[i]);
+        return GNUTLS_E_UNKNOWN_ALGORITHM;
+    }
+
+    return 0;
+}
+
+/**
+  * gnutls_cipher_set_priority2 - Sets the priority on the ciphers supported by gnutls.
+  * @session: is a #gnutls_session_t structure.
+  * @prio: is a separated list of algorithms
+  * @sep: is the separator of the previous list, if zero comma is assumed
+  *
+  * Sets the priority on the ciphers supported by gnutls.
+  * Priority is higher for ciphers specified before others.
+  * Note that the priority is set on the client. The server does
+  * not use the algorithm's priority except for disabling
+  * algorithms that were not specified.
+  *
+  * The supported algorithms are: NULL, ARCFOUR-128, ARCFOUR-40, 3DES-CBC,
+  * AES-128-CBC, AES-256-CBC, CAMELIA-128-CBC, CAMELIA-256-CBC
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_cipher_set_priority2 (gnutls_session_t session, const char *prio, char sep)
+{
+    char *broken_list[MAX_ALGOS];
+    int broken_list_size, i, j;
+    char* darg;
+    
+    darg = gnutls_strdup( prio);
+    if (darg == NULL) {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    break_comma_list(darg, broken_list, &broken_list_size, sep);
+
+    j = 0;
+    for (i=0;i<broken_list_size;i++) {
+        if (strcasecmp( broken_list[i], "NULL")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_NULL;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "ARCFOUR-128")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_ARCFOUR_128;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "ARCFOUR-40")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "3DES-CBC")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_3DES_CBC;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "AES-128-CBC")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_AES_128_CBC;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "AES-256-CBC")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_AES_256_CBC;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+#ifdef ENABLE_CAMELLIA
+        if (strcasecmp( broken_list[i], "CAMELIA-128-CBC")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_CAMELIA_128_CBC;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+        if (strcasecmp( broken_list[i], "CAMELIA-256-CBC")==0) {
+    	    session->internals.cipher_algorithm_priority.priority[j++] = GNUTLS_CIPHER_CAMELIA_256_CBC;
+    	    session->internals.cipher_algorithm_priority.algorithms++;
+    	    continue;
+        }
+#endif
+
+        _gnutls_debug_log( "Cipher %s is not known\n", broken_list[i]);
+        return GNUTLS_E_UNKNOWN_ALGORITHM;
+    }
+
+    return 0;
 }

@@ -493,6 +493,13 @@ extern "C"
   int gnutls_certificate_type_set_priority (gnutls_session_t session,
 					    const int *list);
 
+  int gnutls_mac_set_priority2 (gnutls_session_t session, const char *prio, char sep);
+  int gnutls_compression_set_priority2 (gnutls_session_t session, const char *prio. char sep);
+  int gnutls_protocol_set_priority2 (gnutls_session_t session, const char *prio, char sep);
+  int gnutls_kx_set_priority2 (gnutls_session_t session, const char *prio, char sep);
+  int gnutls_cipher_set_priority2 (gnutls_session_t session, const char *prio, char sep);
+  int gnutls_certificate_type_set_priority2 (gnutls_session_t session, const char *prio, char sep);
+
 /* if you just want some defaults, use the following.
  */
   int gnutls_set_default_priority (gnutls_session_t session);
@@ -1224,7 +1231,7 @@ extern "C"
 #define GNUTLS_E_X509_UNKNOWN_SAN -62
 #define GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED -94
 #define GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE -95
-#define GNUTLS_E_UNKNOWN_HASH_ALGORITHM -96
+#define GNUTLS_E_UNKNOWN_ALGORITHM -96
 #define GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE -97
 #define GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE -98
 #define GNUTLS_E_INVALID_PASSWORD -99

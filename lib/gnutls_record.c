@@ -389,7 +389,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher_size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, cipher, cipher_size, type, 0);
+			 data2send_size, cipher, cipher_size, type, 1);
       if (cipher_size <= 0)
 	{
 	  gnutls_assert ();
