@@ -882,42 +882,6 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 
 }
 
-/* This is exactly like write_buffered, but will use two buffers to read
- * from.
- */
-ssize_t
-_gnutls_io_write_buffered2 (gnutls_session_t session,
-			    const void *iptr, size_t n,
-			    const void *iptr2, size_t n2)
-{
-
-  if (n == 0)
-    {
-      return _gnutls_io_write_buffered (session, iptr2, n2);
-    }
-  else
-    {
-      opaque *sptr;
-      ssize_t ret;
-
-      sptr = gnutls_alloca (n + n2);
-      if (sptr == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-
-      memcpy (sptr, iptr, n);
-      memcpy (&sptr[n], iptr2, n2);
-
-      ret = _gnutls_io_write_buffered (session, sptr, n + n2);
-      gnutls_afree (sptr);
-
-      return ret;
-    }
-}
-
-
 /* This function writes the data that are left in the
  * TLS write buffer (ie. because the previous write was
  * interrupted.

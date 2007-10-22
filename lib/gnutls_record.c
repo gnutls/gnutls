@@ -321,8 +321,6 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   int data2send_size;
   uint8_t headers[5];
   const uint8_t *data = _data;
-  int erecord_size = 0;
-  opaque *erecord = NULL;
 
   /* Do not allow null pointer if the send buffer is empty.
    * If the previous send was interrupted then a null pointer is
@@ -341,8 +339,6 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	gnutls_assert ();
 	return GNUTLS_E_INVALID_SESSION;
       }
-
-
 
   headers[0] = type;
 
@@ -393,13 +389,12 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher_size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, cipher, cipher_size, type, 1);
+			 data2send_size, cipher, cipher_size, type, 0);
       if (cipher_size <= 0)
 	{
 	  gnutls_assert ();
 	  if (cipher_size == 0)
 	    cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-	  gnutls_afree (erecord);
 	  gnutls_free (cipher);
 	  return cipher_size;	/* error */
 	}
@@ -414,19 +409,16 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	{
 	  session_invalidate (session);
 	  gnutls_assert ();
-	  gnutls_afree (erecord);
 	  gnutls_free (cipher);
 	  return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
       ret =
-	_gnutls_io_write_buffered2 (session, erecord, erecord_size,
-				    cipher, cipher_size);
-      gnutls_afree (erecord);
+	_gnutls_io_write_buffered (session, cipher, cipher_size);
       gnutls_free (cipher);
     }
 
-  if (ret != cipher_size + erecord_size)
+  if (ret != cipher_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
 	{
