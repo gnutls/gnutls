@@ -1,3 +1,72 @@
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Revert mistake removal.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, po/de.po, po/ms.po, po/pl.po, po/sv.po,
+	src/cli-gaa.c, src/cli-gaa.h, src/cli.gaa, src/serv-gaa.c,
+	src/serv-gaa.h, src/serv.gaa: Generated.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.1.3.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump ABI version.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c, lib/gnutls_int.h,
+	lib/gnutls_supplemental.c: Remove tls-authz.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Remove tls-authz.
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, doc/examples/Makefile.am,
+	doc/examples/ex-client-authz.c, doc/examples/ex-serv-authz.c,
+	doc/reference/Makefile.am, includes/gnutls/gnutls.h.in,
+	lib/Makefile.am, lib/ext_authz.c, lib/ext_authz.h, src/cli.c,
+	src/cli.gaa, src/serv.c, src/serv.gaa: Remove TLS-authz.
+
+2007-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2007-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-10-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_priority.c: Reenabled the 256 bit algorithms in the
+	default priorities.
+
+2007-10-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/auth_cert.h, lib/gnutls_cert.c,
+	lib/gnutls_errors.c, lib/gnutls_extra_hooks.c,
+	lib/gnutls_extra_hooks.h, libextra/gnutls_extra.c,
+	libextra/gnutls_openpgp.c, libextra/opencdk/main.h,
+	libextra/opencdk/sig-check.c, libextra/openpgp/compat.c,
+	libextra/openpgp/gnutls_openpgp.h, libextra/openpgp/pgpverify.c: **
+	Corrected bugs in the openpgp certificate verification functions
+	using a keyring. Now it correctly verifies openpgp certificates.  **
+	Removed the ancient pgpkeyserver support (which was not used
+	anywhere)
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2007-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
 2007-10-14  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.1.2.

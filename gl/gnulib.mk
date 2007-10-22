@@ -126,6 +126,13 @@ EXTRA_libgnu_la_SOURCES += inet_pton.c
 
 ## end   gnulib module inet_pton
 
+## begin gnulib module intprops
+
+
+EXTRA_DIST += intprops.h
+
+## end   gnulib module intprops
+
 ## begin gnulib module lseek
 
 
@@ -147,20 +154,20 @@ BUILT_SOURCES += $(NETINET_IN_H)
 
 # We need the following in order to create <netinet/in.h> when the system
 # doesn't have one.
-netinet/in.h:
+netinet/in.h: netinet_in.in.h
 	@MKDIR_P@ netinet
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
 	      -e 's|@''NEXT_NETINET_IN_H''@|$(NEXT_NETINET_IN_H)|g' \
 	      -e 's|@''HAVE_NETINET_IN_H''@|$(HAVE_NETINET_IN_H)|g' \
-	      < $(srcdir)/netinet_in_.h; \
+	      < $(srcdir)/netinet_in.in.h; \
 	} > $@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += netinet/in.h netinet/in.h-t
 MOSTLYCLEANDIRS += netinet
 
-EXTRA_DIST += netinet_in_.h
+EXTRA_DIST += netinet_in.in.h
 
 ## end   gnulib module netinet_in
 
@@ -187,6 +194,15 @@ EXTRA_DIST += strdup.c
 EXTRA_libgnu_la_SOURCES += strdup.c
 
 ## end   gnulib module strdup
+
+## begin gnulib module strerror
+
+
+EXTRA_DIST += strerror.c
+
+EXTRA_libgnu_la_SOURCES += strerror.c
+
+## end   gnulib module strerror
 
 ## begin gnulib module version-etc
 

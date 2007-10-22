@@ -97,7 +97,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	ext_inner_application.h gnutls_extra_hooks.h			\
-	gnutls_supplemental.h
+	gnutls_supplemental.h ext_oprfi.h
 
 # Separate so we can create the documentation
 
