@@ -10,7 +10,13 @@ version 1 certificates.
 
 ** Added priority functions that accept strings.
 
+** Added gnutls_record_disable_padding() to allow servers talking to 
+buggy clients that complain if the TLS 1.0 record protocol padding is
+used.
+
+
 ** API and ABI modifications:
+gnutls_record_disable_padding: ADDED
 gnutls_mac_set_priority2: ADDED
 gnutls_compression_set_priority2: ADDED
 gnutls_protocol_set_priority2: ADDED

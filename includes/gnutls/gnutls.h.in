@@ -419,6 +419,8 @@ extern "C"
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send
 
+  void gnutls_record_disable_padding (gnutls_session_t session);
+
   int gnutls_record_get_direction (gnutls_session_t session);
 
   size_t gnutls_record_get_max_size (gnutls_session_t session);

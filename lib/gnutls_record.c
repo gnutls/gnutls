@@ -84,6 +84,25 @@ gnutls_transport_set_lowat (gnutls_session_t session, int num)
 }
 
 /**
+  * gnutls_record_disable_padding - Used to disabled padding in TLS 1.0 and above
+  * @session: is a #gnutls_session_t structure.
+  *
+  * Used to disabled padding in TLS 1.0 and above. Normally you do not need
+  * to use this function, but there are buggy clients that complain if a
+  * server pads the encrypted data. This of course will disable protection
+  * against statistical attacks on the data.
+  *
+  * Normally only servers that require maximum compatibility with everything
+  * out there, need to call this function.
+  *
+  **/
+void
+gnutls_record_disable_padding (gnutls_session_t session)
+{
+  session->internals.no_padding = 1;
+}
+
+/**
   * gnutls_transport_set_ptr - Used to set first argument of the transport functions
   * @session: is a #gnutls_session_t structure.
   * @ptr: is the value.
@@ -389,7 +408,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher_size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, cipher, cipher_size, type, 1);
+			 data2send_size, cipher, cipher_size, type, session->internals.no_padding);
       if (cipher_size <= 0)
 	{
 	  gnutls_assert ();
