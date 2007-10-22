@@ -49,6 +49,8 @@ AC_DEFUN([lgl_INIT],
   gl_MODULE_INDICATOR([gc-arcfour])
   gl_GC_ARCTWO
   gl_MODULE_INDICATOR([gc-arctwo])
+  gl_GC_CAMELLIA
+  gl_MODULE_INDICATOR([gc-camellia])
   gl_GC_DES
   gl_MODULE_INDICATOR([gc-des])
   gl_GC_HMAC_MD5
@@ -229,6 +231,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/float_h.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4
+  m4/gc-camellia.m4
   m4/gc-des.m4
   m4/gc-hmac-md5.m4
   m4/gc-hmac-sha1.m4
