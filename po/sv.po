@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnutls 1.7.15\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2007-10-17 16:58+0200\n"
+"POT-Creation-Date: 2007-07-02 16:29+0200\n"
 "PO-Revision-Date: 2007-07-24 00:22+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -15,306 +15,399 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: lib/gnutls_errors.c:53
 msgid "Success."
 msgstr "Lyckades."
 
+#: lib/gnutls_errors.c:54
 msgid "Could not negotiate a supported cipher suite."
 msgstr "Kunde inte förhandla fram en stödd krypteringssvit."
 
+#: lib/gnutls_errors.c:56
 msgid "The cipher type is unsupported."
 msgstr "Krypteringstypen stöds inte."
 
+#: lib/gnutls_errors.c:58
 msgid "The certificate and the given key do not match."
 msgstr "Certifikatet och den angivna nyckeln stämmer inte överens."
 
+#: lib/gnutls_errors.c:60
 msgid "Could not negotiate a supported compression method."
 msgstr "Kunde inte förhandla fram en stödd komprimeringsmetod."
 
+#: lib/gnutls_errors.c:62
 msgid "An unknown public key algorithm was encountered."
 msgstr "En okänd publik nyckelalgoritm påträffades."
 
+#: lib/gnutls_errors.c:65
 msgid "An algorithm that is not enabled was negotiated."
 msgstr "En algoritm som inte är aktiverad blev förhandlad."
 
+#: lib/gnutls_errors.c:67
 msgid "A large TLS record packet was received."
 msgstr "Ett stort TLS-journalpaket togs emot."
 
+#: lib/gnutls_errors.c:69
 msgid "A record packet with illegal version was received."
 msgstr "Ett journalpaket med otillåten version togs emot."
 
 # Stort?
-msgid ""
-"The Diffie Hellman prime sent by the server is not acceptable (not long "
-"enough)."
-msgstr ""
-"Diffie Hellman-primtalet som skickades av servern är inte acceptabelt (inte "
-"tillräckligt långt)."
+#: lib/gnutls_errors.c:71
+msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
+msgstr "Diffie Hellman-primtalet som skickades av servern är inte acceptabelt (inte tillräckligt långt)."
 
+#: lib/gnutls_errors.c:73
 msgid "A TLS packet with unexpected length was received."
 msgstr "Ett TLS-paket med oväntad längd togs emot."
 
+#: lib/gnutls_errors.c:75
 msgid "The specified session has been invalidated for some reason."
 msgstr "Angiven session har av någon anledning blivit ogiltigförklarad."
 
+#: lib/gnutls_errors.c:78
 msgid "GnuTLS internal error."
 msgstr "Internt fel i GnuTLS."
 
+#: lib/gnutls_errors.c:79
 msgid "An illegal TLS extension was received."
 msgstr "En otillåten TLS-utökning togs emot."
 
+#: lib/gnutls_errors.c:81
 msgid "A TLS fatal alert has been received."
 msgstr "Ett ödesdigert TLS-larm togs emot."
 
+#: lib/gnutls_errors.c:83
 msgid "An unexpected TLS packet was received."
 msgstr "Ett oväntat TLS-paket togs emot."
 
+#: lib/gnutls_errors.c:85
 msgid "A TLS warning alert has been received."
 msgstr "En TLS-varning har tagits emot."
 
+#: lib/gnutls_errors.c:87
 msgid "An error was encountered at the TLS Finished packet calculation."
 msgstr "Ett fel påträffades vid beräkning av TLS Finished-paketet."
 
+#: lib/gnutls_errors.c:89
 msgid "The peer did not send any certificate."
 msgstr "Motparten skickade inget certifikat."
 
+#: lib/gnutls_errors.c:92
 msgid "No temporary RSA parameters were found."
 msgstr "Inga temporära RSA-parametrar hittades."
 
+#: lib/gnutls_errors.c:94
 msgid "No temporary DH parameters were found."
 msgstr "Inga temporära DH-parametrar hittades."
 
+#: lib/gnutls_errors.c:96
 msgid "An unexpected TLS handshake packet was received."
 msgstr "Ett oväntat TLS-handskakningspaket togs emot."
 
+#: lib/gnutls_errors.c:98
 msgid "The scanning of a large integer has failed."
 msgstr "Avsökningen av ett stort heltal misslyckades."
 
+#: lib/gnutls_errors.c:100
 msgid "Could not export a large integer."
 msgstr "Kunde inte exportera ett stort heltal."
 
+#: lib/gnutls_errors.c:102
 msgid "Decryption has failed."
 msgstr "Dekryptering misslyckades."
 
+#: lib/gnutls_errors.c:103
 msgid "Encryption has failed."
 msgstr "Kryptering misslyckades."
 
+#: lib/gnutls_errors.c:104
 msgid "Public key decryption has failed."
 msgstr "Dekryptering av publik nyckel misslyckades."
 
+#: lib/gnutls_errors.c:106
 msgid "Public key encryption has failed."
 msgstr "Kryptering av publik nyckel misslyckades."
 
+#: lib/gnutls_errors.c:108
 msgid "Public key signing has failed."
 msgstr "Signering av publik nyckel misslyckades."
 
+#: lib/gnutls_errors.c:110
 msgid "Public key signature verification has failed."
 msgstr "Validering av av publika nyckelns signatur misslyckades."
 
+#: lib/gnutls_errors.c:112
 msgid "Decompression of the TLS record packet has failed."
 msgstr "Dekomprimering av TLS-journalpaketet har misslyckades."
 
+#: lib/gnutls_errors.c:114
 msgid "Compression of the TLS record packet has failed."
 msgstr "Komprimering av TLS-journalpaketet har misslyckades."
 
+#: lib/gnutls_errors.c:117
 msgid "Internal error in memory allocation."
 msgstr "Internt fel i minnesallokering."
 
+#: lib/gnutls_errors.c:119
 msgid "An unimplemented or disabled feature has been requested."
 msgstr "En icke implementerad eller inaktiverad funktion begärdes."
 
+#: lib/gnutls_errors.c:121
 msgid "Insufficient credentials for that request."
 msgstr "Otillräckliga rättigheter för begäran."
 
+#: lib/gnutls_errors.c:123
 msgid "Error in password file."
 msgstr "Fel i lösenordsfil."
 
+#: lib/gnutls_errors.c:124
 msgid "Wrong padding in PKCS1 packet."
 msgstr "Fel utfyllnad i PKCS1-paket."
 
+#: lib/gnutls_errors.c:126
 msgid "The requested session has expired."
 msgstr "Den begärda sessionen har tagit slut."
 
+#: lib/gnutls_errors.c:127
 msgid "Hashing has failed."
 msgstr "Hashning misslyckades."
 
+#: lib/gnutls_errors.c:128
 msgid "Base64 decoding error."
 msgstr "Base64-avkodningsfel."
 
+#: lib/gnutls_errors.c:130
 msgid "Base64 encoding error."
 msgstr "Base64-kodningsfel."
 
+#: lib/gnutls_errors.c:132
 msgid "Parsing error in password file."
 msgstr "Tolkningsfel i lösenordsfil."
 
+#: lib/gnutls_errors.c:134
 msgid "The requested data were not available."
 msgstr "Begärt data var inte tillgängligt."
 
+#: lib/gnutls_errors.c:136
 msgid "Error in the pull function."
 msgstr "Fel i inhämtningsfunktionen."
 
+#: lib/gnutls_errors.c:137
 msgid "Error in the push function."
 msgstr "Fel i utsändningsfunktionen."
 
-msgid ""
-"The upper limit of record packet sequence numbers has been reached. Wow!"
+#: lib/gnutls_errors.c:138
+msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
 msgstr "Den övre gränsen för sekvensnummer för journalpaket har nåtts. Wow!"
 
+#: lib/gnutls_errors.c:140
 msgid "Error in the certificate."
 msgstr "Fel i certifikatet."
 
+#: lib/gnutls_errors.c:142
 msgid "Unknown Subject Alternative name in X.509 certificate."
 msgstr "Okänt alternativt namn för innehavare i X.509-certifikat."
 
+#: lib/gnutls_errors.c:145
 msgid "Unsupported critical extension in X.509 certificate."
 msgstr "Icke stödd kritisk utökning i X.509-certifikat."
 
+#: lib/gnutls_errors.c:147
 msgid "Key usage violation in certificate has been detected."
 msgstr "Överträdelse av nyckelanvändning i certifikat har upptäckts."
 
+#: lib/gnutls_errors.c:149 lib/gnutls_errors.c:150
 msgid "Function was interrupted."
 msgstr "Funktionen avbröts."
 
+#: lib/gnutls_errors.c:151
 msgid "Rehandshake was requested by the peer."
 msgstr "Upprepad handskakning begärdes av motparten."
 
+#: lib/gnutls_errors.c:153
 msgid "TLS Application data were received, while expecting handshake data."
 msgstr "TLS-programdata togs emot när handskakningsdata förväntades."
 
+#: lib/gnutls_errors.c:155
 msgid "Error in Database backend."
 msgstr "Fel i databasbakänden."
 
+#: lib/gnutls_errors.c:156
 msgid "The certificate type is not supported."
 msgstr "Certifikattypen stöds inte."
 
+#: lib/gnutls_errors.c:158
 msgid "The given memory buffer is too short to hold parameters."
 msgstr "Den angivna minnesbufferten är för liten för att lagra parametrar."
 
+#: lib/gnutls_errors.c:160
 msgid "The request is invalid."
 msgstr "Begäran är ogiltig."
 
+#: lib/gnutls_errors.c:161
 msgid "An illegal parameter has been received."
 msgstr "En otillåten parameter har tagits emot."
 
+#: lib/gnutls_errors.c:163
 msgid "Error while reading file."
 msgstr "Fel vid läsning av fil."
 
+#: lib/gnutls_errors.c:165
 msgid "ASN1 parser: Element was not found."
 msgstr "ASN1-tolkare: Elementet hittades inte."
 
+#: lib/gnutls_errors.c:167
 msgid "ASN1 parser: Identifier was not found"
 msgstr "ASN1-tolkare: Identifieraren hittades inte"
 
+#: lib/gnutls_errors.c:169
 msgid "ASN1 parser: Error in DER parsing."
 msgstr "ASN1-tolkare: Fel i DER-tolkning."
 
+#: lib/gnutls_errors.c:171
 msgid "ASN1 parser: Value was not found."
 msgstr "ASN1-tolkare: Värdet hittades inte."
 
+#: lib/gnutls_errors.c:173
 msgid "ASN1 parser: Generic parsing error."
 msgstr "ASN1-tolkare: Allmänt tolkningsfel."
 
+#: lib/gnutls_errors.c:175
 msgid "ASN1 parser: Value is not valid."
 msgstr "ASN1-tolkare: Värdet är inte giltigt."
 
+#: lib/gnutls_errors.c:177
 msgid "ASN1 parser: Error in TAG."
 msgstr "ASN1-tolkare: Fel i TAG."
 
+#: lib/gnutls_errors.c:178
 msgid "ASN1 parser: error in implicit tag"
 msgstr "ASN1-tolkare: fel i implicit tag"
 
+#: lib/gnutls_errors.c:180
 msgid "ASN1 parser: Error in type 'ANY'."
 msgstr "ASN1-tolkare: Fel i typen \"ANY\"."
 
+#: lib/gnutls_errors.c:182
 msgid "ASN1 parser: Syntax error."
 msgstr "ASN1-tolkare: Syntaxfel."
 
+#: lib/gnutls_errors.c:184
 msgid "ASN1 parser: Overflow in DER parsing."
 msgstr "ASN1-tolkare: Överflöde i DER-tolkning."
 
+#: lib/gnutls_errors.c:187
 msgid "Too many empty record packets have been received."
 msgstr "För många tom journalpaket har tagits emot."
 
+#: lib/gnutls_errors.c:189
 msgid "The initialization of GnuTLS-extra has failed."
 msgstr "Initieringen av GnuTLS-extra har misslyckats."
 
-msgid ""
-"The GnuTLS library version does not match the GnuTLS-extra library version."
-msgstr ""
-"Versionen av GnuTLS-biblioteket stämmer inte överens med versionen av GnuTLS-"
-"extra-biblioteket."
+#: lib/gnutls_errors.c:191
+msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
+msgstr "Versionen av GnuTLS-biblioteket stämmer inte överens med versionen av GnuTLS-extra-biblioteket."
 
+#: lib/gnutls_errors.c:193
 msgid "The gcrypt library version is too old."
 msgstr "Versionen av gcrypt-biblioteket är för gammal."
 
+#: lib/gnutls_errors.c:196
 msgid "The tasn1 library version is too old."
 msgstr "Versionen av tasn1-biblioteket är för gammal."
 
+#: lib/gnutls_errors.c:198
+msgid "The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported."
+msgstr "Den angivna GnuPG TrustDB-versionen stöds inte. TrustDB v4 stöds."
+
+#: lib/gnutls_errors.c:201
 msgid "Error loading the keyring."
 msgstr "Fel vid inläsning av nyckelringen."
 
+#: lib/gnutls_errors.c:203
 msgid "The initialization of LZO has failed."
 msgstr "Initiering av LZO misslyckades."
 
+#: lib/gnutls_errors.c:205
 msgid "No supported compression algorithms have been found."
 msgstr "Inga stödda komprimeringsalgoritmer har hittats."
 
+#: lib/gnutls_errors.c:207
 msgid "No supported cipher suites have been found."
 msgstr "Inga stödda krypteringssviter har hittats."
 
+#: lib/gnutls_errors.c:209
 msgid "Could not get OpenPGP key."
 msgstr "Kunde inte hämta OpenPGP-nyckel."
 
+#: lib/gnutls_errors.c:212
 msgid "The SRP username supplied is illegal."
 msgstr "Det angivna SRP-användarnamnet är inte tillåtet."
 
+#: lib/gnutls_errors.c:215
 msgid "The OpenPGP fingerprint is not supported."
 msgstr "OpenPGP-fingeravtrycket stöds inte."
 
+#: lib/gnutls_errors.c:217
 msgid "The certificate has unsupported attributes."
 msgstr "Certifikatet har attribut som inte stöds."
 
+#: lib/gnutls_errors.c:219
 msgid "The OID is not supported."
 msgstr "OID:n stöds inte."
 
+#: lib/gnutls_errors.c:221
 msgid "The hash algorithm is unknown."
 msgstr "Hashalgoritmen är okänd."
 
+#: lib/gnutls_errors.c:223
 msgid "The PKCS structure's content type is unknown."
 msgstr "PKCS-strukturens innehållstyp är okänd."
 
 # Hjälp!
+#: lib/gnutls_errors.c:225
 msgid "The PKCS structure's bag type is unknown."
 msgstr "PKCS-strukturens väsktyp är okänd."
 
+#: lib/gnutls_errors.c:227
 msgid "The given password contains invalid characters."
 msgstr "Det angivna lösenordet innehåller ogiltiga tecken."
 
+#: lib/gnutls_errors.c:229
 msgid "The Message Authentication Code verification failed."
 msgstr "Validering av meddelandeautentiseringskoden (MAC) misslyckades."
 
+#: lib/gnutls_errors.c:231
 msgid "Some constraint limits were reached."
 msgstr "Vissa begränsningar nåddes."
 
+#: lib/gnutls_errors.c:233
 msgid "Failed to acquire random data."
 msgstr "Misslyckades med att få tag på slumpmässigt data."
 
+#: lib/gnutls_errors.c:236
 msgid "Received a TLS/IA Intermediate Phase Finished message"
 msgstr "Tog emot ett TLS/IA Intermediate Phase Finished-meddelande"
 
+#: lib/gnutls_errors.c:238
 msgid "Received a TLS/IA Final Phase Finished message"
 msgstr "Tog emot ett TLS/IA Final Phase Finished-meddelande"
 
+#: lib/gnutls_errors.c:240
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Validering av kontrollsumma för TLS/IA-fas misslyckades"
 
+#: lib/x509/output.c:112 lib/x509/output.c:383
 #, c-format
 msgid "\t\t\tPath Length Constraint: %d\n"
 msgstr "\t\t\tRestriktion för sökvägslängd: %d\n"
 
+#: lib/x509/output.c:113
 #, c-format
 msgid "\t\t\tPolicy Language: %s"
 msgstr "\t\t\tPolicyspråk: %s"
 
+#: lib/x509/output.c:122
 msgid ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
@@ -322,6 +415,7 @@ msgstr ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
 
+#: lib/x509/output.c:124
 msgid ""
 "\n"
 "\t\t\t\tHexdump: "
@@ -329,73 +423,95 @@ msgstr ""
 "\n"
 "\t\t\t\tHexdump: "
 
+#: lib/x509/output.c:216
 msgid "\t\t\tDigital signature.\n"
 msgstr "\t\t\tDigital signatur.\n"
 
 # Klassisk term inom digitala certifikat.
+#: lib/x509/output.c:218
 msgid "\t\t\tNon repudiation.\n"
 msgstr "\t\t\tOförnekbarhet.\n"
 
+#: lib/x509/output.c:220
 msgid "\t\t\tKey encipherment.\n"
 msgstr "\t\t\tNyckelkryptering.\n"
 
+#: lib/x509/output.c:222
 msgid "\t\t\tData encipherment.\n"
 msgstr "\t\t\tDatakryptering.\n"
 
+#: lib/x509/output.c:224
 msgid "\t\t\tKey agreement.\n"
 msgstr "\t\t\tNyckelförhandling.\n"
 
+#: lib/x509/output.c:226
 msgid "\t\t\tCertificate signing.\n"
 msgstr "\t\t\tCertifikatsignering.\n"
 
+#: lib/x509/output.c:228
 msgid "\t\t\tCRL signing.\n"
 msgstr "\t\t\tCRL-signering.\n"
 
+#: lib/x509/output.c:230
 msgid "\t\t\tKey encipher only.\n"
 msgstr "\t\t\tEndast nyckelkryptering.\n"
 
+#: lib/x509/output.c:232
 msgid "\t\t\tKey decipher only.\n"
 msgstr "\t\t\tEndast nyckeldekryptering.\n"
 
+#: lib/x509/output.c:344
 msgid "\t\t\tTLS WWW Server.\n"
 msgstr "\t\t\tTLS-webbserver.\n"
 
+#: lib/x509/output.c:346
 msgid "\t\t\tTLS WWW Client.\n"
 msgstr "\t\t\tTLS-webbklient.\n"
 
 # Källkodssignering?
+#: lib/x509/output.c:348
 msgid "\t\t\tCode signing.\n"
 msgstr "\t\t\tKodsignering.\n"
 
+#: lib/x509/output.c:350
 msgid "\t\t\tEmail protection.\n"
 msgstr "\t\t\tE-postskydd.\n"
 
+#: lib/x509/output.c:352
 msgid "\t\t\tTime stamping.\n"
 msgstr "\t\t\tTidsstämpling.\n"
 
+#: lib/x509/output.c:354
 msgid "\t\t\tOCSP signing.\n"
 msgstr "\t\t\tOCSP-signering.\n"
 
+#: lib/x509/output.c:356
 msgid "\t\t\tAny purpose.\n"
 msgstr "\t\t\tValfritt syfte.\n"
 
+#: lib/x509/output.c:378
 msgid "\t\t\tCertificate Authority (CA): FALSE\n"
 msgstr "\t\t\tCertifikatutfärdare (CA): FALSKT\n"
 
+#: lib/x509/output.c:380
 msgid "\t\t\tCertificate Authority (CA): TRUE\n"
 msgstr "\t\t\tCertifikatutfärdare (CA): SANT\n"
 
+#: lib/x509/output.c:483
 #, c-format
 msgid "\t\t\tXMPP Address: %.*s\n"
 msgstr "\t\t\tXMPP-adress: %.*s\n"
 
+#: lib/x509/output.c:486
 #, c-format
 msgid "\t\t\totherName OID: %.*s\n"
 msgstr "\t\t\totherName OID: %.*s\n"
 
+#: lib/x509/output.c:487
 msgid "\t\t\totherName DER: "
 msgstr "\t\t\totherName DER: "
 
+#: lib/x509/output.c:489
 msgid ""
 "\n"
 "\t\t\totherName ASCII: "
@@ -403,118 +519,153 @@ msgstr ""
 "\n"
 "\t\t\totherName ASCII: "
 
+#: lib/x509/output.c:515 lib/x509/output.c:1179
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tVersion: %d\n"
 
+#: lib/x509/output.c:529
 msgid "\tSerial Number (hex): "
 msgstr "\tSerienummer (hex): "
 
+#: lib/x509/output.c:546 lib/x509/output.c:1193
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tUtfärdare: %s\n"
 
+#: lib/x509/output.c:553
 msgid "\tValidity:\n"
 msgstr "\tGiltighet:\n"
 
+#: lib/x509/output.c:566
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tInte före: %s\n"
 
+#: lib/x509/output.c:580
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tInte efter: %s\n"
 
+#: lib/x509/output.c:594
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tInnehavare: %s\n"
 
+#: lib/x509/output.c:611
 #, c-format
 msgid "\tSubject Public Key Algorithm: %s\n"
 msgstr "\tAlgoritm för innehavarens publika nyckel: %s\n"
 
+#: lib/x509/output.c:624
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tModulus (bitar %d):\n"
 
+#: lib/x509/output.c:626
 msgid "\t\tExponent:\n"
 msgstr "\t\tExponent:\n"
 
+#: lib/x509/output.c:645
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tPublik nyckel (bitar %d):\n"
 
+#: lib/x509/output.c:647
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
+#: lib/x509/output.c:649
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
+#: lib/x509/output.c:651
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
+#: lib/x509/output.c:696
 msgid "\tExtensions:\n"
 msgstr "\tTillägg:\n"
 
+#: lib/x509/output.c:706
 #, c-format
 msgid "\t\tBasic Constraints (%s):\n"
 msgstr "\t\tAllmänna restriktioner (%s):\n"
 
+#: lib/x509/output.c:707 lib/x509/output.c:722 lib/x509/output.c:737
+#: lib/x509/output.c:752 lib/x509/output.c:767 lib/x509/output.c:782
+#: lib/x509/output.c:797 lib/x509/output.c:812 lib/x509/output.c:824
 msgid "critical"
 msgstr "kritisk"
 
+#: lib/x509/output.c:707 lib/x509/output.c:722 lib/x509/output.c:737
+#: lib/x509/output.c:752 lib/x509/output.c:767 lib/x509/output.c:782
+#: lib/x509/output.c:797 lib/x509/output.c:812 lib/x509/output.c:824
 msgid "not critical"
 msgstr "ej kritisk"
 
+#: lib/x509/output.c:721
 #, c-format
 msgid "\t\tSubject Key Identifier (%s):\n"
 msgstr "\t\tInnehavarens nyckelidentifierare (%s):\n"
 
+#: lib/x509/output.c:736
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tUtfärdarens nyckelidentifierare (%s):\n"
 
+#: lib/x509/output.c:751
 #, c-format
 msgid "\t\tKey Usage (%s):\n"
 msgstr "\t\tNyckelanvändning (%s):\n"
 
+#: lib/x509/output.c:766
 #, c-format
 msgid "\t\tKey Purpose (%s):\n"
 msgstr "\t\tNyckelsyfte (%s):\n"
 
+#: lib/x509/output.c:781
 #, c-format
 msgid "\t\tSubject Alternative Name (%s):\n"
 msgstr "\t\tInnehavarens alternativa namn (%s):\n"
 
+#: lib/x509/output.c:796
 #, c-format
 msgid "\t\tCRL Distribution points (%s):\n"
 msgstr "\t\tCRL-distributionspunkter (%s):\n"
 
+#: lib/x509/output.c:811
 #, c-format
 msgid "\t\tProxy Certificate Information (%s):\n"
 msgstr "\t\tInformation om proxycertifikat (%s):\n"
 
+#: lib/x509/output.c:823
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tOkänt tillägg %s (%s):\n"
 
+#: lib/x509/output.c:852
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
+#: lib/x509/output.c:856
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tHexdump: "
 
+#: lib/x509/output.c:881 lib/x509/output.c:1290
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tSignaturalgoritm: %s\n"
 
-msgid ""
-"warning: signed using a broken signature algorithm that can be forged.\n"
+#: lib/x509/output.c:885 lib/x509/output.c:1294
+msgid "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr "varning: signerad med en trasig signaturalgoritm som kan förfalskas.\n"
 
+#: lib/x509/output.c:910 lib/x509/output.c:1319
 msgid "\tSignature:\n"
 msgstr "\tSignatur:\n"
 
+#: lib/x509/output.c:933
 msgid ""
 "\tMD5 fingerprint:\n"
 "\t\t"
@@ -522,6 +673,7 @@ msgstr ""
 "\tMD5-fingeravtryck:\n"
 "\t\t"
 
+#: lib/x509/output.c:935
 msgid ""
 "\tSHA-1 fingerprint:\n"
 "\t\t"
@@ -529,6 +681,7 @@ msgstr ""
 "\tSHA-1-fingeravtryck:\n"
 "\t\t"
 
+#: lib/x509/output.c:969
 msgid ""
 "\tPublic Key Id:\n"
 "\t\t"
@@ -536,47 +689,53 @@ msgstr ""
 "\tPublik nyckel-identitet:\n"
 "\t\t"
 
+#: lib/x509/output.c:1135
 msgid "X.509 Certificate Information:\n"
 msgstr "Information om X.509-certifikat:\n"
 
+#: lib/x509/output.c:1139
 msgid "Other Information:\n"
 msgstr "Övrig information:\n"
 
+#: lib/x509/output.c:1175
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tVersion: 1 (standard)\n"
 
+#: lib/x509/output.c:1200
 msgid "\tUpdate dates:\n"
 msgstr "\tUppdateringsdatum:\n"
 
+#: lib/x509/output.c:1213
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tUtfärdat: %s\n"
 
+#: lib/x509/output.c:1229
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tNästa den: %s\n"
 
+#: lib/x509/output.c:1239
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tSpärrade certifikat (%d):\n"
 
+#: lib/x509/output.c:1241
 msgid "\tNo revoked certificates.\n"
 msgstr "\tInga spärrade certifikat.\n"
 
+#: lib/x509/output.c:1260
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tSerienummer (hex): "
 
+#: lib/x509/output.c:1269
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tSpärrat den: %s\n"
 
+#: lib/x509/output.c:1349
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Information om spärrlista för X.509-certifikat:\n"
-
-#~ msgid ""
-#~ "The specified GnuPG TrustDB version is not supported. TrustDB v4 is "
-#~ "supported."
-#~ msgstr "Den angivna GnuPG TrustDB-versionen stöds inte. TrustDB v4 stöds."
 
 #~ msgid "\t\t\tPolicy Language: %.*s\n"
 #~ msgstr "\t\t\tPolicyspråk: %.*s\n"

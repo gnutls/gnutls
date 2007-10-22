@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnutls 1.4.0\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2007-10-17 16:58+0200\n"
+"POT-Creation-Date: 2006-05-12 00:21+0200\n"
 "PO-Revision-Date: 2006-12-12 09:37+0100\n"
 "Last-Translator: Michael Piefel <piefel@informatik.hu-berlin.de>\n"
 "Language-Team: German <translation-team-de@lists.sourceforge.net>\n"
@@ -42,12 +42,8 @@ msgstr "Ein großes TLS-Datensatzpaket wurde empfangen."
 msgid "A record packet with illegal version was received."
 msgstr "Ein Datensatzpaket mit illegaler Version wurde empfangen."
 
-msgid ""
-"The Diffie Hellman prime sent by the server is not acceptable (not long "
-"enough)."
-msgstr ""
-"Die Diffie-Hellman-Primzahl, die vom Server gesendet wurde, ist nicht "
-"akzeptabel (nicht lang genug)."
+msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
+msgstr "Die Diffie-Hellman-Primzahl, die vom Server gesendet wurde, ist nicht akzeptabel (nicht lang genug)."
 
 msgid "A TLS packet with unexpected length was received."
 msgstr "Ein TLS-Paket mit unerwarteter Länge wurde empfangen."
@@ -107,8 +103,7 @@ msgid "Public key signing has failed."
 msgstr "Das Signieren mittels öffentlichem Schlüssel schlug fehl."
 
 msgid "Public key signature verification has failed."
-msgstr ""
-"Die Verifizierung der Signatur mittels öffentlichem Schlüssel schlug fehl."
+msgstr "Die Verifizierung der Signatur mittels öffentlichem Schlüssel schlug fehl."
 
 msgid "Decompression of the TLS record packet has failed."
 msgstr "Die Dekomprimierung des TLS-Datensatzpakets schlug fehl."
@@ -120,8 +115,7 @@ msgid "Internal error in memory allocation."
 msgstr "Interner Fehler bei Speicheranfoderung."
 
 msgid "An unimplemented or disabled feature has been requested."
-msgstr ""
-"Eine nicht implementierte oder deaktivierte Eigenschaft wurde abgefragt."
+msgstr "Eine nicht implementierte oder deaktivierte Eigenschaft wurde abgefragt."
 
 msgid "Insufficient credentials for that request."
 msgstr "Unzureichende Berechtigungsnachweise für diese Anfrage."
@@ -156,8 +150,7 @@ msgstr "Fehler in der Pull-Funktion."
 msgid "Error in the push function."
 msgstr "Fehler in der Push-Funktion."
 
-msgid ""
-"The upper limit of record packet sequence numbers has been reached. Wow!"
+msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
 msgstr "Das obere Limit der Datensatzpaketsequenznummern wurde erreicht. Huch!"
 
 msgid "Error in the certificate."
@@ -179,9 +172,7 @@ msgid "Rehandshake was requested by the peer."
 msgstr "Neuer Handshake wurde von der Gegenstelle gefordert."
 
 msgid "TLS Application data were received, while expecting handshake data."
-msgstr ""
-"TLS-Anwendungsdaten wurden empfangen, während Handshake-Daten erwartet "
-"wurden."
+msgstr "TLS-Anwendungsdaten wurden empfangen, während Handshake-Daten erwartet wurden."
 
 msgid "Error in Database backend."
 msgstr "Fehler im Datenbank-Backend."
@@ -242,17 +233,17 @@ msgstr "Zu viele leere Datensatzpakete wurden empfangen."
 msgid "The initialization of GnuTLS-extra has failed."
 msgstr "Die Initialisierung von GnuTLS-extra schlug fehl."
 
-msgid ""
-"The GnuTLS library version does not match the GnuTLS-extra library version."
-msgstr ""
-"Die Version der GnuTLS-Bibliothek stimmt nicht mit der Version der GnuTLS-"
-"extra-Bibliothek überein."
+msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
+msgstr "Die Version der GnuTLS-Bibliothek stimmt nicht mit der Version der GnuTLS-extra-Bibliothek überein."
 
 msgid "The gcrypt library version is too old."
 msgstr "Die Version der Bibliothek gcrypt ist zu alt."
 
 msgid "The tasn1 library version is too old."
 msgstr "Die Version der Bibliothek tasn1 ist zu alt."
+
+msgid "The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported."
+msgstr "Die angegebene Version von GnuPG-TrustDB wird nicht unterstützt. TrustDB Version 4 wird unterstützt."
 
 msgid "Error loading the keyring."
 msgstr "Fehler beim Laden des Schlüsselrings."
@@ -313,263 +304,3 @@ msgstr "Empfing eine »TLS/IA Final Phase Finished«-Mitteilung"
 
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Verifizierung der TLS/IA-Phasenprüfsumme schlug fehl"
-
-#, c-format
-msgid "\t\t\tPath Length Constraint: %d\n"
-msgstr ""
-
-#, c-format
-msgid "\t\t\tPolicy Language: %s"
-msgstr ""
-
-msgid ""
-"\t\t\tPolicy:\n"
-"\t\t\t\tASCII: "
-msgstr ""
-
-msgid ""
-"\n"
-"\t\t\t\tHexdump: "
-msgstr ""
-
-msgid "\t\t\tDigital signature.\n"
-msgstr ""
-
-msgid "\t\t\tNon repudiation.\n"
-msgstr ""
-
-msgid "\t\t\tKey encipherment.\n"
-msgstr ""
-
-msgid "\t\t\tData encipherment.\n"
-msgstr ""
-
-msgid "\t\t\tKey agreement.\n"
-msgstr ""
-
-msgid "\t\t\tCertificate signing.\n"
-msgstr ""
-
-msgid "\t\t\tCRL signing.\n"
-msgstr ""
-
-msgid "\t\t\tKey encipher only.\n"
-msgstr ""
-
-msgid "\t\t\tKey decipher only.\n"
-msgstr ""
-
-msgid "\t\t\tTLS WWW Server.\n"
-msgstr ""
-
-msgid "\t\t\tTLS WWW Client.\n"
-msgstr ""
-
-msgid "\t\t\tCode signing.\n"
-msgstr ""
-
-msgid "\t\t\tEmail protection.\n"
-msgstr ""
-
-msgid "\t\t\tTime stamping.\n"
-msgstr ""
-
-msgid "\t\t\tOCSP signing.\n"
-msgstr ""
-
-msgid "\t\t\tAny purpose.\n"
-msgstr ""
-
-msgid "\t\t\tCertificate Authority (CA): FALSE\n"
-msgstr ""
-
-msgid "\t\t\tCertificate Authority (CA): TRUE\n"
-msgstr ""
-
-#, c-format
-msgid "\t\t\tXMPP Address: %.*s\n"
-msgstr ""
-
-#, c-format
-msgid "\t\t\totherName OID: %.*s\n"
-msgstr ""
-
-msgid "\t\t\totherName DER: "
-msgstr ""
-
-msgid ""
-"\n"
-"\t\t\totherName ASCII: "
-msgstr ""
-
-#, c-format
-msgid "\tVersion: %d\n"
-msgstr ""
-
-msgid "\tSerial Number (hex): "
-msgstr ""
-
-#, c-format
-msgid "\tIssuer: %s\n"
-msgstr ""
-
-msgid "\tValidity:\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tNot Before: %s\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tNot After: %s\n"
-msgstr ""
-
-#, c-format
-msgid "\tSubject: %s\n"
-msgstr ""
-
-#, c-format
-msgid "\tSubject Public Key Algorithm: %s\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tModulus (bits %d):\n"
-msgstr ""
-
-msgid "\t\tExponent:\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tPublic key (bits %d):\n"
-msgstr ""
-
-msgid "\t\tP:\n"
-msgstr ""
-
-msgid "\t\tQ:\n"
-msgstr ""
-
-msgid "\t\tG:\n"
-msgstr ""
-
-msgid "\tExtensions:\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tBasic Constraints (%s):\n"
-msgstr ""
-
-msgid "critical"
-msgstr ""
-
-msgid "not critical"
-msgstr ""
-
-#, c-format
-msgid "\t\tSubject Key Identifier (%s):\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tAuthority Key Identifier (%s):\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tKey Usage (%s):\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tKey Purpose (%s):\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tSubject Alternative Name (%s):\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tCRL Distribution points (%s):\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tProxy Certificate Information (%s):\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tUnknown extension %s (%s):\n"
-msgstr ""
-
-msgid "\t\t\tASCII: "
-msgstr ""
-
-msgid "\t\t\tHexdump: "
-msgstr ""
-
-#, c-format
-msgid "\tSignature Algorithm: %s\n"
-msgstr ""
-
-msgid ""
-"warning: signed using a broken signature algorithm that can be forged.\n"
-msgstr ""
-
-msgid "\tSignature:\n"
-msgstr ""
-
-msgid ""
-"\tMD5 fingerprint:\n"
-"\t\t"
-msgstr ""
-
-msgid ""
-"\tSHA-1 fingerprint:\n"
-"\t\t"
-msgstr ""
-
-msgid ""
-"\tPublic Key Id:\n"
-"\t\t"
-msgstr ""
-
-msgid "X.509 Certificate Information:\n"
-msgstr ""
-
-msgid "Other Information:\n"
-msgstr ""
-
-msgid "\tVersion: 1 (default)\n"
-msgstr ""
-
-msgid "\tUpdate dates:\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tIssued: %s\n"
-msgstr ""
-
-#, c-format
-msgid "\t\tNext at: %s\n"
-msgstr ""
-
-#, c-format
-msgid "\tRevoked certificates (%d):\n"
-msgstr ""
-
-#, fuzzy
-msgid "\tNo revoked certificates.\n"
-msgstr "Fehler im Zertifikat."
-
-msgid "\t\tSerial Number (hex): "
-msgstr ""
-
-#, c-format
-msgid "\t\tRevoked at: %s\n"
-msgstr ""
-
-msgid "X.509 Certificate Revocation List Information:\n"
-msgstr ""
-
-#~ msgid ""
-#~ "The specified GnuPG TrustDB version is not supported. TrustDB v4 is "
-#~ "supported."
-#~ msgstr ""
-#~ "Die angegebene Version von GnuPG-TrustDB wird nicht unterstützt. TrustDB "
-#~ "Version 4 wird unterstützt."
