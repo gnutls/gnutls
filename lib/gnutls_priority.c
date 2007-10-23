@@ -547,7 +547,7 @@ gnutls_certificate_type_convert_priority (int* out_priority, int out_priority_le
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   *
-  * The supported methods are: NULL, ZLIB, LZO
+  * The supported methods are: NULL, DEFLATE, LZO
   *
   * Returns 0 on success.
   *
