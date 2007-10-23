@@ -160,7 +160,7 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 static const gnutls_cipher_entry algorithms[] = {
   {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
   {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
-  {"3DES-168-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0},
+  {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0},
   {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0},
   {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0},
   {"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1},
@@ -700,7 +700,7 @@ gnutls_mac_get_id (const char* name)
 {
   gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
-  GNUTLS_KX_LOOP( if (strcasecmp( p->name, name)==0) ret = p->algorithm);
+  GNUTLS_HASH_LOOP( if (strcasecmp( p->name, name)==0) ret = p->algorithm);
 
   return ret;
 }
