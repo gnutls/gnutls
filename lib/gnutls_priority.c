@@ -415,10 +415,12 @@ static void break_comma_list(char *etag,
     } while (p != NULL && *elements < max_elements);
 }
 
-#ifdef C99_MACROS
+#if defined(__STDC_VERSION__) && __STD_VERSION__ > 199901L
 #define _GNUTLS_MAX_PRIO (out_priority_len-1)
+#define _GNUTLS_MAX_PRIO_CHECK(x)
 #else
 #define _GNUTLS_MAX_PRIO 256
+#define _GNUTLS_MAX_PRIO_CHECK(x) if (x>255) return GNUTLS_E_INVALID_REQUEST
 #endif
 
 /**
@@ -446,6 +448,9 @@ gnutls_mac_convert_priority (int* out_priority, int out_priority_len, const char
     char *broken_list[_GNUTLS_MAX_PRIO];
     int broken_list_size, i, j;
     char* darg;
+    int ret;
+    
+    _GNUTLS_MAX_PRIO_CHECK(out_priority_len);
     
     darg = gnutls_strdup( prio);
     if (darg == NULL) {
@@ -457,15 +462,12 @@ gnutls_mac_convert_priority (int* out_priority, int out_priority_len, const char
 
     j = 0;
     for (i=0;i<broken_list_size;i++) {
-        if (strcasecmp( broken_list[i], "SHA1")==0) {
-    	    out_priority[j++] = GNUTLS_MAC_SHA1;
-    	    continue;
+        ret = gnutls_mac_get_id( broken_list[i]);
+        if (ret != GNUTLS_MAC_UNKNOWN) {
+          out_priority[j++] = ret;
+          continue;
         }
-        if (strcasecmp( broken_list[i], "MD5")==0) {
-    	    out_priority[j++] = GNUTLS_MAC_MD5;
-    	    continue;
-        }
-        
+          
         _gnutls_debug_log( "MAC algorithm %s is not known\n", broken_list[i]);
 
         gnutls_free(darg);
@@ -500,8 +502,10 @@ int
 gnutls_certificate_type_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep)
 {
     char *broken_list[_GNUTLS_MAX_PRIO];
-    int broken_list_size, i, j;
+    int broken_list_size, i, j, ret;
     char* darg;
+
+    _GNUTLS_MAX_PRIO_CHECK(out_priority_len);
     
     darg = gnutls_strdup( prio);
     if (darg == NULL) {
@@ -513,13 +517,10 @@ gnutls_certificate_type_convert_priority (int* out_priority, int out_priority_le
 
     j = 0;
     for (i=0;i<broken_list_size;i++) {
-        if (strcasecmp( broken_list[i], "X.509")==0) {
-    	    out_priority[j++] = GNUTLS_CRT_X509;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "OPENPGP")==0) {
-    	    out_priority[j++] = GNUTLS_CRT_OPENPGP;
-    	    continue;
+        ret = gnutls_certificate_type_get_id( broken_list[i]);
+        if (ret != GNUTLS_CRT_UNKNOWN) {
+          out_priority[j++] = ret;
+          continue;
         }
         
         _gnutls_debug_log("Certificate type %s is not known\n", broken_list[i]);
@@ -557,6 +558,9 @@ gnutls_compression_convert_priority (int* out_priority, int out_priority_len, co
     char *broken_list[_GNUTLS_MAX_PRIO];
     int broken_list_size, i, j;
     char* darg;
+    int ret;
+
+    _GNUTLS_MAX_PRIO_CHECK(out_priority_len);
     
     darg = gnutls_strdup( prio);
     if (darg == NULL) {
@@ -568,19 +572,12 @@ gnutls_compression_convert_priority (int* out_priority, int out_priority_len, co
 
     j = 0;
     for (i=0;i<broken_list_size;i++) {
-        if (strcasecmp( broken_list[i], "ZLIB")==0) {
-    	    out_priority[j++] = GNUTLS_COMP_ZLIB;
-    	    continue;
+        ret = gnutls_compression_get_id( broken_list[i]);
+        if (ret != GNUTLS_COMP_UNKNOWN) {
+          out_priority[j++] = ret;
+          continue;
         }
-        if (strcasecmp( broken_list[i], "LZO")==0) {
-    	    out_priority[j++] = GNUTLS_COMP_LZO;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "NULL")==0) {
-    	    out_priority[j++] = GNUTLS_COMP_NULL;
-    	    continue;
-        }
-        
+
         _gnutls_debug_log( "Compression algorithm %s is not known\n", broken_list[i]);
         gnutls_free(darg);
         return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
@@ -616,6 +613,9 @@ gnutls_protocol_convert_priority (int* out_priority, int out_priority_len, const
     char *broken_list[_GNUTLS_MAX_PRIO];
     int broken_list_size, i, j;
     char* darg;
+    int ret;
+
+    _GNUTLS_MAX_PRIO_CHECK(out_priority_len);
     
     darg = gnutls_strdup( prio);
     if (darg == NULL) {
@@ -627,21 +627,10 @@ gnutls_protocol_convert_priority (int* out_priority, int out_priority_len, const
 
     j = 0;
     for (i=0;i<broken_list_size;i++) {
-        if (strcasecmp( broken_list[i], "TLS1.0")==0) {
-    	    out_priority[j++] = GNUTLS_TLS1_0;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "TLS1.1")==0) {
-    	    out_priority[j++] = GNUTLS_TLS1_1;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "TLS1.2")==0) {
-    	    out_priority[j++] = GNUTLS_TLS1_2;
-    	    continue;
-        }
-        if (strncasecmp( broken_list[i], "SSL3", 4)==0) {
-    	    out_priority[j++] = GNUTLS_SSL3;
-    	    continue;
+        ret = gnutls_compression_get_id( broken_list[i]);
+        if (ret != GNUTLS_VERSION_UNKNOWN) {
+          out_priority[j++] = ret;
+          continue;
         }
         
         _gnutls_debug_log( "Protocol %s is not known\n", broken_list[i]);
@@ -680,6 +669,9 @@ gnutls_kx_convert_priority (int* out_priority, int out_priority_len, const char 
     char *broken_list[_GNUTLS_MAX_PRIO];
     int broken_list_size, i, j;
     char* darg;
+    int ret;
+
+    _GNUTLS_MAX_PRIO_CHECK(out_priority_len);
     
     darg = gnutls_strdup( prio);
     if (darg == NULL) {
@@ -691,46 +683,10 @@ gnutls_kx_convert_priority (int* out_priority, int out_priority_len, const char 
 
     j = 0;
     for (i=0;i<broken_list_size;i++) {
-        if (strcasecmp( broken_list[i], "RSA")==0) {
-    	    out_priority[j++] = GNUTLS_KX_RSA;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "DHE-DSS")==0) {
-    	    out_priority[j++] = GNUTLS_KX_DHE_DSS;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "DHE-RSA")==0) {
-    	    out_priority[j++] = GNUTLS_KX_DHE_RSA;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "ANON-DH")==0) {
-    	    out_priority[j++] = GNUTLS_KX_ANON_DH;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "RSA-EXPORT")==0) {
-    	    out_priority[j++] = GNUTLS_KX_RSA_EXPORT;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "SRP")==0) {
-    	    out_priority[j++] = GNUTLS_KX_SRP;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "SRP-DSS")==0) {
-    	    out_priority[j++] = GNUTLS_KX_SRP_DSS;
-    	    continue;
-        }
-
-        if (strcasecmp( broken_list[i], "SRP-RSA")==0) {
-    	    out_priority[j++] = GNUTLS_KX_SRP_RSA;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "PSK")==0) {
-    	    out_priority[j++] = GNUTLS_KX_PSK;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "DHE-PSK")==0) {
-    	    out_priority[j++] = GNUTLS_KX_DHE_PSK;
-    	    continue;
+        ret = gnutls_kx_get_id( broken_list[i]);
+        if (ret != GNUTLS_KX_UNKNOWN) {
+          out_priority[j++] = ret;
+          continue;
         }
 
         _gnutls_debug_log( "Key exchange algorithm %s is not known\n", broken_list[i]);
@@ -769,6 +725,9 @@ gnutls_cipher_convert_priority (int* out_priority, int out_priority_len, const c
     char *broken_list[_GNUTLS_MAX_PRIO];
     int broken_list_size, i, j;
     char* darg;
+    int ret;
+
+    _GNUTLS_MAX_PRIO_CHECK(out_priority_len);
     
     darg = gnutls_strdup( prio);
     if (darg == NULL) {
@@ -780,40 +739,11 @@ gnutls_cipher_convert_priority (int* out_priority, int out_priority_len, const c
 
     j = 0;
     for (i=0;i<broken_list_size;i++) {
-        if (strcasecmp( broken_list[i], "NULL")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_NULL;
-    	    continue;
+        ret = gnutls_cipher_get_id( broken_list[i]);
+        if (ret != GNUTLS_CIPHER_UNKNOWN) {
+          out_priority[j++] = ret;
+          continue;
         }
-        if (strcasecmp( broken_list[i], "ARCFOUR-128")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_ARCFOUR_128;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "ARCFOUR-40")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "3DES-CBC")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "AES-128-CBC")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_AES_128_CBC;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "AES-256-CBC")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_AES_256_CBC;
-    	    continue;
-        }
-#ifdef ENABLE_CAMELLIA
-        if (strcasecmp( broken_list[i], "CAMELIA-128-CBC")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_CAMELIA_128_CBC;
-    	    continue;
-        }
-        if (strcasecmp( broken_list[i], "CAMELIA-256-CBC")==0) {
-    	    out_priority[j++] = GNUTLS_CIPHER_CAMELIA_256_CBC;
-    	    continue;
-        }
-#endif
 
         _gnutls_debug_log( "Cipher %s is not known\n", broken_list[i]);
         gnutls_free(darg);

@@ -69,6 +69,7 @@ extern "C"
 
   typedef enum gnutls_cipher_algorithm
   {
+    GNUTLS_CIPHER_UNKNOWN = 0,
     GNUTLS_CIPHER_NULL = 1,
     GNUTLS_CIPHER_ARCFOUR_128,
     GNUTLS_CIPHER_3DES_CBC,
@@ -83,6 +84,7 @@ extern "C"
 
   typedef enum
   {
+    GNUTLS_KX_UNKNOWN = 0,
     GNUTLS_KX_RSA = 1,
     GNUTLS_KX_DHE_DSS,
     GNUTLS_KX_DHE_RSA,
@@ -149,6 +151,7 @@ extern "C"
 #define GNUTLS_COMP_ZLIB GNUTLS_COMP_DEFLATE
   typedef enum
   {
+    GNUTLS_COMP_UNKNOWN = 0,
     GNUTLS_COMP_NULL = 1,
     GNUTLS_COMP_DEFLATE,
     GNUTLS_COMP_LZO		/* only available if gnutls-extra has
@@ -268,6 +271,7 @@ extern "C"
 
   typedef enum
   {
+    GNUTLS_CRT_UNKNOWN = 0,
     GNUTLS_CRT_X509 = 1,
     GNUTLS_CRT_OPENPGP
   } gnutls_certificate_type_t;
@@ -379,6 +383,14 @@ extern "C"
   const char *gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm);
   const char *gnutls_certificate_type_get_name (gnutls_certificate_type_t
 						type);
+
+  gnutls_mac_algorithm_t gnutls_mac_get_id (const char* name);
+  gnutls_compression_method_t gnutls_compression_get_id (const char* name);
+  gnutls_cipher_algorithm_t gnutls_cipher_get_id (const char* name);
+  gnutls_kx_algorithm_t gnutls_kx_get_id (const char* name);
+  gnutls_protocol_t gnutls_protocol_get_id (const char* name);
+  gnutls_certificate_type_t gnutls_certificate_type_get_id (const char* name);
+
 
   /* list supported algorithms */
   const gnutls_cipher_algorithm_t *gnutls_cipher_list (void);
