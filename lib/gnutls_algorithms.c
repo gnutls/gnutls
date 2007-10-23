@@ -700,7 +700,7 @@ gnutls_mac_get_id (const char* name)
 {
   gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
-  GNUTLS_HASH_LOOP( if (strcasecmp( p->name, name)==0) ret = p->algorithm);
+  GNUTLS_HASH_LOOP( if (strcasecmp( p->name, name)==0) ret = p->id);
 
   return ret;
 }
@@ -830,7 +830,7 @@ gnutls_compression_get_id (const char* name)
 {
   gnutls_compression_method_t ret = GNUTLS_COMP_UNKNOWN;
 
-  GNUTLS_COMPRESSION_LOOP( if (strcasecmp( p->name+sizeof("GNUTLS_COMP_"), name)==0) ret = p->id);
+  GNUTLS_COMPRESSION_LOOP( if (strcasecmp( p->name+sizeof("GNUTLS_COMP_")-1, name)==0) ret = p->id);
 
   return ret;
 }
