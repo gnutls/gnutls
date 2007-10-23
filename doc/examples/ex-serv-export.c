@@ -1,3 +1,10 @@
+/* Copyright 2007 Free Software Foundation
+ *
+ * Copying and distribution of this file, with or without modification,
+ * are permitted in any medium without royalty provided the copyright
+ * notice and this notice are preserved.
+ */
+
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
