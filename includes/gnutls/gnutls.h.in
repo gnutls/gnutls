@@ -495,12 +495,12 @@ extern "C"
   int gnutls_certificate_type_set_priority (gnutls_session_t session,
 					    const int *list);
 
-  int gnutls_mac_convert_priority (gnutls_session_t session, const char *prio, char sep);
-  int gnutls_compression_convert_priority (gnutls_session_t session, const char *prio, char sep);
-  int gnutls_protocol_convert_priority (gnutls_session_t session, const char *prio, char sep);
-  int gnutls_kx_convert_priority (gnutls_session_t session, const char *prio, char sep);
-  int gnutls_cipher_convert_priority (gnutls_session_t session, const char *prio, char sep);
-  int gnutls_certificate_type_convert_priority (gnutls_session_t session, const char *prio, char sep);
+  int gnutls_mac_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_compression_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_protocol_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_kx_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_cipher_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_certificate_type_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
 
 /* if you just want some defaults, use the following.
  */
