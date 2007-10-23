@@ -28,6 +28,8 @@ extern void tcp_close (int sd);
 #define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
+#define MAX_PRIORITIES 3
+
 int
 main (void)
 {
@@ -37,6 +39,7 @@ main (void)
   char buffer[MAX_BUF + 1];
   gnutls_srp_client_credentials_t srp_cred;
   gnutls_certificate_credentials_t cert_cred;
+  int kx_priorities[MAX_PRIORITIES];
 
   gnutls_global_init ();
 
@@ -44,6 +47,9 @@ main (void)
    * SRP stuff. 
    */
   gnutls_global_init_extra ();
+
+  gnutls_kx_convert_priority( kx_priorities, MAX_PRIORITIES, 
+    "SRP, SRP-RSA, SRP-DSS", ',');
 
   gnutls_srp_allocate_client_credentials (&srp_cred);
   gnutls_certificate_allocate_credentials (&cert_cred);
@@ -64,7 +70,7 @@ main (void)
   /* Set the priorities.
    */
   gnutls_set_default_priority (session);
-
+  gnutls_kx_set_priority( session, kx_priorities);
 
   /* put the SRP credentials to the current session
    */
