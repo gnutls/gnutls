@@ -40,12 +40,6 @@ extern "C"
 /* gnutls_openpgp_cert_t should be defined in gnutls.h
  */
 
-  typedef enum gnutls_openpgp_crt_fmt
-  { GNUTLS_OPENPGP_FMT_RAW,
-    GNUTLS_OPENPGP_FMT_BASE64
-  } gnutls_openpgp_crt_fmt_t;
-#define gnutls_openpgp_key_fmt_t gnutls_openpgp_crt_fmt_t
-
 #define gnutls_openpgp_key_init gnutls_openpgp_crt_init
 #define gnutls_openpgp_key_deinit gnutls_openpgp_crt_deinit
 #define gnutls_openpgp_key_import gnutls_openpgp_crt_import

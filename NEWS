@@ -23,7 +23,15 @@ used.
 ** Introduced gnutls_session_enable_compatibility_mode() to allow enabling
 all supported compatibility options (like disabling padding).
 
+** The gnutls_certificate_set_openpgp_* functions were modified to include
+the format. This makes the interface consistent with the x509 functions.
+
+
 ** API and ABI modifications:
+gnutls_certificate_set_openpgp_key_mem: MODIFIED
+gnutls_certificate_set_openpgp_key_file: MODIFIED
+gnutls_certificate_set_openpgp_keyring_mem: MODIFIED
+gnutls_certificate_set_openpgp_keyring_file: MODIFIED
 gnutls_set_default_priority: DEPRECATED
 gnutls_set_default_priority_export: DEPRECATED
 gnutls_set_default_priority2: ADDED

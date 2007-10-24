@@ -898,7 +898,7 @@ main (int argc, char **argv)
   if (pgp_keyring != NULL)
     {
       ret =
-	gnutls_certificate_set_openpgp_keyring_file (cert_cred, pgp_keyring);
+	gnutls_certificate_set_openpgp_keyring_file (cert_cred, pgp_keyring, GNUTLS_OPENPGP_FMT_BASE64);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error setting the OpenPGP keyring file\n");
@@ -908,7 +908,7 @@ main (int argc, char **argv)
 
   if (pgp_certfile != NULL)
     if ((ret = gnutls_certificate_set_openpgp_key_file
-	 (cert_cred, pgp_certfile, pgp_keyfile)) < 0)
+	 (cert_cred, pgp_certfile, pgp_keyfile, GNUTLS_OPENPGP_FMT_BASE64)) < 0)
       {
 	fprintf (stderr,
 		 "Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",

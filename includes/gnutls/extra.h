@@ -41,6 +41,12 @@ extern "C"
 /* Openpgp certificate stuff 
  */
 
+  typedef enum gnutls_openpgp_crt_fmt
+  { GNUTLS_OPENPGP_FMT_RAW,
+    GNUTLS_OPENPGP_FMT_BASE64
+  } gnutls_openpgp_crt_fmt_t;
+#define gnutls_openpgp_key_fmt_t gnutls_openpgp_crt_fmt_t
+
 /**
  * gnutls_openpgp_recv_key_func - Callback prototype to get OpenPGP keys
  * @session: a TLS session
@@ -66,25 +72,20 @@ extern "C"
   int
     gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
 					     res, const char *CERTFILE,
-					     const char *KEYFILE);
+					     const char *KEYFILE, gnutls_openpgp_crt_fmt_t);
   int gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
 					      res,
 					      const gnutls_datum_t * CERT,
-					      const gnutls_datum_t * KEY);
-
-  int
-    gnutls_certificate_set_openpgp_keyserver (gnutls_certificate_credentials_t
-					      res, const char *keyserver,
-					      int port);
+					      const gnutls_datum_t * KEY, gnutls_openpgp_crt_fmt_t);
 
   int
     gnutls_certificate_set_openpgp_keyring_mem
     (gnutls_certificate_credentials_t c, const unsigned char *data,
-     size_t dlen);
+     size_t dlen, gnutls_openpgp_crt_fmt_t);
 
   int
     gnutls_certificate_set_openpgp_keyring_file
-    (gnutls_certificate_credentials_t c, const char *file);
+    (gnutls_certificate_credentials_t c, const char *file, gnutls_openpgp_crt_fmt_t);
 
   /* TLS/IA stuff
    */
