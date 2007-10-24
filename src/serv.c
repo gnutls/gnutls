@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
+#include <gcrypt.h>
 #include <gnutls/extra.h>
 #include <sys/time.h>
 #include <fcntl.h>

@@ -35,6 +35,7 @@
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
+#include <gcrypt.h>
 
 #include "error.h"
 #include "read-file.h"
