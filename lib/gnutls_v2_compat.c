@@ -170,6 +170,18 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
       return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
     }
 
+  /* call the user hello callback
+   */
+  if (session->internals.user_hello_func != NULL) 
+    {
+      ret = session->internals.user_hello_func( session);
+      if (ret < 0) 
+        {
+          gnutls_assert();
+          return ret;
+        }
+    }
+
   /* find an appropriate cipher suite */
 
   DECR_LEN (len, sizeOfSuites);
