@@ -36,7 +36,7 @@ gnutls_kx_convert_priority: ADDED
 gnutls_cipher_convert_priority: ADDED
 gnutls_certificate_type_convert_priority: ADDED
 gnutls_openpgp_key_t: RENAMED to gnutls_openpgp_crt_t
-gnutls_openpgp_key_status_t: RENAMEDS gnutls_openpgp_crt_status_t
+gnutls_openpgp_key_status_t: RENAMED to gnutls_openpgp_crt_status_t
 gnutls_openpgp_send_key: RENAMED to gnutls_openpgp_send_cert
 gnutls_openpgp_key_init: RENAMED to gnutls_openpgp_crt_init
 gnutls_openpgp_key_import: RENAMED to gnutls_openpgp_crt_import
