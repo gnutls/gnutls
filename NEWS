@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** Added the --v1 option to certtool, to allow generating X.509
 version 1 certificates. 
 
+** certtool: Add option --disable-quick-random to enable the old behaviour
+of using /dev/random to generate keys.
+
 ** Added priority functions that accept strings.
 
 ** Added gnutls_record_disable_padding() to allow servers talking to 
