@@ -100,9 +100,9 @@ main (void)
   gnutls_global_init ();
 
   gnutls_certificate_allocate_credentials (&cred);
-  gnutls_certificate_set_openpgp_keyring_file (cred, RINGFILE);
+  gnutls_certificate_set_openpgp_keyring_file (cred, RINGFILE, GNUTLS_OPENPGP_FMT_BASE64);
 
-  gnutls_certificate_set_openpgp_key_file (cred, CERTFILE, KEYFILE);
+  gnutls_certificate_set_openpgp_key_file (cred, CERTFILE, KEYFILE, GNUTLS_OPENPGP_FMT_BASE64);
 
   generate_dh_params ();
 
