@@ -249,38 +249,6 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 #endif
 }
 
-/**
-  * gnutls_set_default_priority - Sets some default priority on the cipher suites supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Sets some default priority on the ciphers, key exchange methods,
-  * macs and compression methods. This is to avoid using the
-  * gnutls_*_priority() functions, if these defaults are ok.  You may
-  * override any of the following priorities by calling the
-  * appropriate functions.
-  *
-  * The default order is:
-  * Protocols: TLS 1.2, TLS 1.1, TLS 1.0, and SSL3.
-  * Key exchange algorithm: DHE-PSK, PSK, SRP-RSA, SRP-DSS, SRP,
-  * DHE-RSA, DHE-DSS, RSA.
-  * Cipher: AES_256_CBC, AES_128_CBC, 3DES_CBC, CAMELLIA_128_CBC, 
-  * and ARCFOUR_128.
-  * MAC algorithm: SHA, and MD5.
-  * Certificate types: X.509, OpenPGP
-  * Compression: DEFLATE, NULL.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int
-gnutls_set_default_priority (gnutls_session_t session)
-{
-
-  gnutls_set_default_priority2( session, GNUTLS_PRIORITIES_SECURITY);
-
-  return 0;
-}
-
 static const int protocol_priority[] = {
  /* GNUTLS_TLS1_2, -- not finalized yet! */
  GNUTLS_TLS1_1,
@@ -423,7 +391,7 @@ static int cert_type_priority[] = {
   *
   **/
 void
-gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_t flag)
+gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_flag_t flag)
 {
 
   if (flag == GNUTLS_PRIORITIES_PERFORMANCE) {
@@ -445,31 +413,6 @@ gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_t flag)
   gnutls_certificate_type_set_priority (session, cert_type_priority);
 
   return;
-}
-
-
-/**
-  * gnutls_set_default_export_priority - Sets some default priority on the cipher suites supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Sets some default priority on the ciphers, key exchange methods, macs
-  * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
-  * these defaults are ok. This function also includes weak algorithms.
-  * The order is TLS1, SSL3 for protocols,  RSA, DHE_DSS, 
-  * DHE_RSA, RSA_EXPORT for key exchange algorithms.
-  * SHA, MD5, RIPEMD160 for MAC algorithms,
-  * AES_256_CBC, AES_128_CBC, 3DES_CBC, CAMELLIA_128_CBC, 
-  * ARCFOUR_128, ARCFOUR_40 for ciphers.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int
-gnutls_set_default_export_priority (gnutls_session_t session)
-{
-  gnutls_set_default_priority2( session, GNUTLS_PRIORITIES_EXPORT);
-
-  return 0;
 }
 
 /* New priority API with strings
