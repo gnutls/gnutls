@@ -822,6 +822,8 @@ main (int argc, char **argv)
       strcpy (name, "Echo Server");
     }
 
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
+
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));

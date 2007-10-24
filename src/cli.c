@@ -518,6 +518,8 @@ main (int argc, char **argv)
   int user_term = 0;
   socket_st hd;
 
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
+
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));

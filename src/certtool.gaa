@@ -96,6 +96,7 @@ option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key gene
 
 #int quick_random;
 option (quick-random) { $quick_random = 1; } "Use /dev/urandom for all operation, reducing the quality of randomness used."
+option (disable-quick-random) { $quick_random = 0; } "Use /dev/random for key generationg, thus increasing the quality of randomness used."
 
 #char *outfile;
 option (outfile) STR "FILE" { $outfile = $1 } "Output file."
@@ -117,5 +118,5 @@ option (v, version) { certtool_version(); exit(0); } "shows the program's versio
 init { $bits = 2048; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; $v1_cert = 0;
-	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=0; }
+	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=1; }
 
