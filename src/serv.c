@@ -414,6 +414,11 @@ initialize_session (void)
       gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
   }
 
+  /* Set maximum compatibility mode. This is only suggested on public webservers
+   * that need to trade security for compatibility
+   */
+   gnutls_session_enable_compatibility_mode( session);
+
 #ifdef ENABLE_OPRFI
   if (info.opaque_prf_input)
     gnutls_oprfi_enable_server (session, oprfi_callback, NULL);

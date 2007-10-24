@@ -55,8 +55,11 @@ initialize_tls_session (void)
   /* request client certificate if any.
    */
   gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
-
-  gnutls_dh_set_prime_bits (session, DH_BITS);
+  
+  /* Set maximum compatibility mode. This is only suggested on public webservers
+   * that need to trade security for compatibility
+   */
+  gnutls_session_enable_compatibility_mode( session);
 
   return session;
 }
