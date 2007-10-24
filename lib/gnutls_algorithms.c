@@ -28,6 +28,8 @@
 #include "gnutls_cert.h"
 #include <x509/common.h>
 
+
+
 /* Cred type mappings to KX algorithms 
  * FIXME: The mappings are not 1-1. Some KX such as SRP_RSA require
  * more than one credentials type.
@@ -114,10 +116,10 @@ typedef struct
 } gnutls_version_entry;
 
 static const gnutls_version_entry sup_versions[] = {
-  {"SSL 3.0", GNUTLS_SSL3, 3, 0, 1},
-  {"TLS 1.0", GNUTLS_TLS1, 3, 1, 1},
-  {"TLS 1.1", GNUTLS_TLS1_1, 3, 2, 1},
-  {"TLS 1.2", GNUTLS_TLS1_2, 3, 3, 1},
+  {"SSL3.0", GNUTLS_SSL3, 3, 0, 1},
+  {"TLS1.0", GNUTLS_TLS1, 3, 1, 1},
+  {"TLS1.1", GNUTLS_TLS1_1, 3, 2, 1},
+  {"TLS1.2", GNUTLS_TLS1_2, 3, 3, 1},
   {0, 0, 0, 0, 0}
 };
 
@@ -156,17 +158,17 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  */
 static const gnutls_cipher_entry algorithms[] = {
-  {"AES 256 CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
-  {"AES 128 CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
-  {"3DES 168 CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0},
-  {"DES CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0},
-  {"ARCFOUR 128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0},
-  {"ARCFOUR 40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1},
-  {"RC2 40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 1},
+  {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
+  {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
+  {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0},
+  {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0},
+  {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0},
+  {"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1},
+  {"RC2-40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 1},
 #ifdef	ENABLE_CAMELLIA
-  {"CAMELLIA 256 CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK,
+  {"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK,
    16, 0},
-  {"CAMELLIA 128 CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16, CIPHER_BLOCK,
+  {"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16, CIPHER_BLOCK,
    16, 0},
 #endif
   {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0},
@@ -208,7 +210,7 @@ struct gnutls_hash_entry
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-  {"SHA", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20},
+  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20},
   {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16},
   {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32},
   {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48},
@@ -305,22 +307,22 @@ typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #ifdef ENABLE_ANON
-  {"Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
+  {"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
 #endif
   {"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0},
-  {"RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0,
+  {"RSA-EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0,
    1 /* needs RSA params */ },
-  {"DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
-  {"DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
+  {"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
+  {"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
 
 #ifdef ENABLE_SRP
-  {"SRP DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, 0},
-  {"SRP RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, 0},
+  {"SRP-DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, 0},
+  {"SRP-RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, 0},
   {"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0, 0},
 #endif
 #ifdef ENABLE_PSK
   {"PSK", GNUTLS_KX_PSK, &psk_auth_struct, 0, 0},
-  {"DHE PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
+  {"DHE-PSK", GNUTLS_KX_DHE_PSK, &dhe_psk_auth_struct,
    1 /* needs DHE params */ , 0},
 #endif
   {0, 0, 0, 0, 0}
@@ -652,7 +654,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 
 /* Generic Functions */
 
-inline int
+int
 _gnutls_mac_priority (gnutls_session_t session,
 		      gnutls_mac_algorithm_t algorithm)
 {				/* actually returns the priority */
@@ -679,6 +681,26 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 
   /* avoid prefix */
   GNUTLS_HASH_ALG_LOOP (ret = p->name);
+
+  return ret;
+}
+
+/**
+  * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
+  * @algorithm: is a MAC algorithm name
+  *
+  * Returns an id of the specified in a string MAC algorithm. The names are
+  * compared in a case insensitive way.
+  *
+  * Returns GNUTLS_MAC_UNKNOWN on error.
+  *
+  **/
+gnutls_mac_algorithm_t
+gnutls_mac_get_id (const char* name)
+{
+  gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
+
+  GNUTLS_HASH_LOOP( if (strcasecmp( p->name, name)==0) ret = p->id);
 
   return ret;
 }
@@ -760,7 +782,7 @@ _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm)
 }
 
 /* Compression Functions */
-inline int
+int
 _gnutls_compression_priority (gnutls_session_t session,
 			      gnutls_compression_method_t algorithm)
 {				/* actually returns the priority */
@@ -789,6 +811,26 @@ gnutls_compression_get_name (gnutls_compression_method_t algorithm)
 
   /* avoid prefix */
   GNUTLS_COMPRESSION_ALG_LOOP (ret = p->name + sizeof ("GNUTLS_COMP_") - 1);
+
+  return ret;
+}
+
+/**
+  * gnutls_compression_get_id - Returns the gnutls id of the specified in string algorithm
+  * @algorithm: is a compression method name
+  *
+  * Returns an id of the specified in a string compression method. The names are
+  * compared in a case insensitive way.
+  *
+  * Returns GNUTLS_COMP_UNKNOWN on error.
+  *
+  **/
+gnutls_compression_method_t
+gnutls_compression_get_id (const char* name)
+{
+  gnutls_compression_method_t ret = GNUTLS_COMP_UNKNOWN;
+
+  GNUTLS_COMPRESSION_LOOP( if (strcasecmp( p->name+sizeof("GNUTLS_COMP_")-1, name)==0) ret = p->id);
 
   return ret;
 }
@@ -888,7 +930,7 @@ _gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
 }
 
  /* returns the priority */
-inline int
+int
 _gnutls_cipher_priority (gnutls_session_t session,
 			 gnutls_cipher_algorithm_t algorithm)
 {
@@ -968,6 +1010,26 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
+  * gnutls_cipher_get_id - Returns the gnutls id of the specified in string algorithm
+  * @algorithm: is a MAC algorithm name
+  *
+  * Returns an id of the specified cipher. The names are
+  * compared in a case insensitive way.
+  *
+  * Returns GNUTLS_CIPHER_UNKNOWN on error.
+  *
+  **/
+gnutls_cipher_algorithm_t
+gnutls_cipher_get_id (const char* name)
+{
+  gnutls_cipher_algorithm_t ret = GNUTLS_CIPHER_UNKNOWN;
+
+  GNUTLS_LOOP( if (strcasecmp( p->name, name)==0) ret = p->id);
+
+  return ret;
+}
+
+/**
  * gnutls_cipher_list:
  *
  * Get a list of supported cipher algorithms.  Note that not
@@ -1009,7 +1071,7 @@ _gnutls_kx_auth_struct (gnutls_kx_algorithm_t algorithm)
 }
 
 
-inline int
+int
 _gnutls_kx_priority (gnutls_session_t session,
 		     gnutls_kx_algorithm_t algorithm)
 {
@@ -1036,6 +1098,26 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 
   /* avoid prefix */
   GNUTLS_KX_ALG_LOOP (ret = p->name);
+
+  return ret;
+}
+
+/**
+  * gnutls_kx_get_id - Returns the gnutls id of the specified in string algorithm
+  * @algorithm: is a KX name
+  *
+  * Returns an id of the specified KX algorithm. The names are
+  * compared in a case insensitive way.
+  *
+  * Returns GNUTLS_KX_UNKNOWN on error.
+  *
+  **/
+gnutls_kx_algorithm_t
+gnutls_kx_get_id (const char* name)
+{
+  gnutls_cipher_algorithm_t ret = GNUTLS_KX_UNKNOWN;
+
+  GNUTLS_KX_LOOP( if (strcasecmp( p->name, name)==0) ret = p->algorithm);
 
   return ret;
 }
@@ -1163,6 +1245,26 @@ gnutls_protocol_get_name (gnutls_protocol_t version)
 
   /* avoid prefix */
   GNUTLS_VERSION_ALG_LOOP (ret = p->name);
+  return ret;
+}
+
+/**
+  * gnutls_protocol_get_id - Returns the gnutls id of the specified in string protocol
+  * @algorithm: is a protocol name
+  *
+  * Returns an id of the specified protocol. The names are
+  * compared in a case insensitive way.
+  *
+  * Returns GNUTLS_VERSION_UNKNOWN on error.
+  *
+  **/
+gnutls_protocol_t
+gnutls_protocol_get_id (const char* name)
+{
+  gnutls_protocol_t ret = GNUTLS_VERSION_UNKNOWN;
+
+  GNUTLS_VERSION_LOOP( if (strcasecmp( p->name, name)==0) ret = p->id);
+
   return ret;
 }
 
@@ -1385,7 +1487,7 @@ gnutls_cipher_suite_info (size_t idx,
 }
 
 
-inline static int
+static inline int
 _gnutls_cipher_suite_is_ok (cipher_suite_st * suite)
 {
   size_t ret;
@@ -1405,7 +1507,7 @@ _gnutls_cipher_suite_is_ok (cipher_suite_st * suite)
 		   memcpy(y,tmp,size);
 
 #define MAX_ELEM_SIZE 4
-inline static int
+static inline int
 _gnutls_partition (gnutls_session_t session, void *_base,
 		   size_t nmemb, size_t size,
 		   int (*compar) (gnutls_session_t,
@@ -1743,6 +1845,29 @@ gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
   if (type == GNUTLS_CRT_OPENPGP)
     ret = "OPENPGP";
 
+  return ret;
+}
+
+/**
+  * gnutls_certificate_type_get_id - Returns the gnutls id of the specified in string type
+  * @name: is a certificate type name
+  *
+  * Returns an id of the specified in a string certificate type. The names are
+  * compared in a case insensitive way.
+  *
+  * Returns GNUTLS_CRT_UNKNOWN on error.
+  *
+  **/
+gnutls_certificate_type_t
+gnutls_certificate_type_get_id (const char* name)
+{
+  gnutls_certificate_type_t ret = GNUTLS_CRT_UNKNOWN;
+
+  if (strcasecmp( name, "X.509")==0 || strcasecmp( name, "X509")==0)
+    return GNUTLS_CRT_X509;
+  if (strcasecmp( name, "OPENPGP")==0)
+    return GNUTLS_CRT_OPENPGP;
+  
   return ret;
 }
 

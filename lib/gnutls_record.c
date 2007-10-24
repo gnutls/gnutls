@@ -84,6 +84,25 @@ gnutls_transport_set_lowat (gnutls_session_t session, int num)
 }
 
 /**
+  * gnutls_record_disable_padding - Used to disabled padding in TLS 1.0 and above
+  * @session: is a #gnutls_session_t structure.
+  *
+  * Used to disabled padding in TLS 1.0 and above. Normally you do not need
+  * to use this function, but there are buggy clients that complain if a
+  * server pads the encrypted data. This of course will disable protection
+  * against statistical attacks on the data.
+  *
+  * Normally only servers that require maximum compatibility with everything
+  * out there, need to call this function.
+  *
+  **/
+void
+gnutls_record_disable_padding (gnutls_session_t session)
+{
+  session->internals.no_padding = 1;
+}
+
+/**
   * gnutls_transport_set_ptr - Used to set first argument of the transport functions
   * @session: is a #gnutls_session_t structure.
   * @ptr: is the value.
@@ -321,8 +340,6 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   int data2send_size;
   uint8_t headers[5];
   const uint8_t *data = _data;
-  int erecord_size = 0;
-  opaque *erecord = NULL;
 
   /* Do not allow null pointer if the send buffer is empty.
    * If the previous send was interrupted then a null pointer is
@@ -341,8 +358,6 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	gnutls_assert ();
 	return GNUTLS_E_INVALID_SESSION;
       }
-
-
 
   headers[0] = type;
 
@@ -393,13 +408,12 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher_size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, cipher, cipher_size, type, 1);
+			 data2send_size, cipher, cipher_size, type, (session->internals.no_padding==0)?1:0);
       if (cipher_size <= 0)
 	{
 	  gnutls_assert ();
 	  if (cipher_size == 0)
 	    cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-	  gnutls_afree (erecord);
 	  gnutls_free (cipher);
 	  return cipher_size;	/* error */
 	}
@@ -414,19 +428,16 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	{
 	  session_invalidate (session);
 	  gnutls_assert ();
-	  gnutls_afree (erecord);
 	  gnutls_free (cipher);
 	  return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
       ret =
-	_gnutls_io_write_buffered2 (session, erecord, erecord_size,
-				    cipher, cipher_size);
-      gnutls_afree (erecord);
+	_gnutls_io_write_buffered (session, cipher, cipher_size);
       gnutls_free (cipher);
     }
 
-  if (ret != cipher_size + erecord_size)
+  if (ret != cipher_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
 	{

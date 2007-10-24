@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
+#include <gcrypt.h>
 #include <gnutls/extra.h>
 #include <sys/time.h>
 #include <fcntl.h>
@@ -379,7 +380,7 @@ initialize_session (void)
       gnutls_db_set_ptr (session, NULL);
     }
 
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
 
   if (cipher_priority[0])
     gnutls_cipher_set_priority (session, cipher_priority);
@@ -413,6 +414,11 @@ initialize_session (void)
     else
       gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
   }
+
+  /* Set maximum compatibility mode. This is only suggested on public webservers
+   * that need to trade security for compatibility
+   */
+   gnutls_session_enable_compatibility_mode( session);
 
 #ifdef ENABLE_OPRFI
   if (info.opaque_prf_input)
@@ -816,6 +822,8 @@ main (int argc, char **argv)
     {
       strcpy (name, "Echo Server");
     }
+
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   if ((ret = gnutls_global_init ()) < 0)
     {

@@ -1,3 +1,10 @@
+/* Copyright 2007 Free Software Foundation
+ *
+ * Copying and distribution of this file, with or without modification,
+ * are permitted in any medium without royalty provided the copyright
+ * notice and this notice are preserved.
+ */
+
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -12,6 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gcrypt.h> /* for gcry_control */
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -48,7 +56,7 @@ initialize_tls_session (void)
 
   /* Use the default priorities, plus, export cipher suites.
    */
-  gnutls_set_default_export_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_EXPORT);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
@@ -75,16 +83,25 @@ gnutls_dh_params_t dh_params;
  */
 gnutls_rsa_params_t rsa_params;
 
+static char srp_dh_group2048[] =
+  "-----BEGIN DH PARAMETERS-----\n"
+  "MIIBBwKCAQCsa9tBMkqam/Fm3l4TiVgvr3K2ZRmH7gf8MZKUPbVgUKNzKcu0oJnt\n"
+  "gZPgdXdnoT3VIxKrSwMxDc1/SKnaBP1Q6Ag5ae23Z7DPYJUXmhY6s2YaBfvV+qro\n"
+  "KRipli8Lk7hV+XmT7Jde6qgNdArb9P90c1nQQdXDPqcdKB5EaxR3O8qXtDoj+4AW\n"
+  "dr0gekNsZIHx0rkHhxdGGludMuaI+HdIVEUjtSSw1X1ep3onddLs+gMs+9v1L7N4\n"
+  "YWAnkATleuavh05zA85TKZzMBBx7wwjYKlaY86jQw4JxrjX46dv7tpS1yAPYn3rk\n"
+  "Nd4jbVJfVHWbZeNy/NaO8g+nER+eSv9zAgEC\n"
+  "-----END DH PARAMETERS-----\n";
+  
 int
 generate_dh_params (void)
 {
-  /* Generate Diffie Hellman parameters - for use with DHE
-   * kx algorithms. These should be discarded and regenerated
-   * once a day, once a week or once a month. Depends on the
-   * security requirements.
+gnutls_datum dparams = { srp_dh_group2048, sizeof( srp_dh_group2048) };
+  /* Here instead of generating Diffie Hellman parameters (for use with DHE
+   * kx algorithms) we import them.
    */
   gnutls_dh_params_init (&dh_params);
-  gnutls_dh_params_generate2 (dh_params, DH_BITS);
+  gnutls_dh_params_import_pkcs3 (dh_params, &dparams, GNUTLS_X509_FMT_PEM);
 
   return 0;
 }
@@ -95,9 +112,9 @@ generate_rsa_params (void)
   gnutls_rsa_params_init (&rsa_params);
 
   /* Generate RSA parameters - for use with RSA-export
-   * cipher suites. These should be discarded and regenerated
-   * once a day, once every 500 transactions etc. Depends on the
-   * security requirements.
+   * cipher suites. This is an RSA private key and should be 
+   * discarded and regenerated once a day, once every 500 
+   * transactions etc. Depends on the security requirements.
    */
 
   gnutls_rsa_params_generate2 (rsa_params, 512);
@@ -121,9 +138,14 @@ main (void)
 
   strcpy (name, "Echo Server");
 
+  /* to disallow usage of the blocking /dev/random 
+   */
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
+
   /* this must be called once in the program
    */
   gnutls_global_init ();
+
 
   gnutls_certificate_allocate_credentials (&cert_cred);
 

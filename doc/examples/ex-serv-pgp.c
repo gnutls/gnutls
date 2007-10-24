@@ -1,3 +1,10 @@
+/* Copyright 2007 Free Software Foundation
+ *
+ * Copying and distribution of this file, with or without modification,
+ * are permitted in any medium without royalty provided the copyright
+ * notice and this notice are preserved.
+ */
+
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -61,7 +68,7 @@ initialize_tls_session (void)
    */
   gnutls_set_default_priority (session);
 
-  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cred);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY);
 
   /* request client certificate if any.
    */

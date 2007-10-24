@@ -35,6 +35,7 @@
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
+#include <gcrypt.h>
 
 #include "error.h"
 #include "read-file.h"
@@ -377,7 +378,7 @@ init_tls_session (const char *hostname)
 
   gnutls_init (&session, GNUTLS_CLIENT);
 
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
 
   /* allow the use of private ciphersuites.
    */
@@ -517,6 +518,8 @@ main (int argc, char **argv)
   struct timeval tv;
   int user_term = 0;
   socket_st hd;
+
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   if ((ret = gnutls_global_init ()) < 0)
     {

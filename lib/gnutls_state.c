@@ -1230,3 +1230,22 @@ void gnutls_handshake_set_post_client_hello_function( gnutls_session_t session,
 {
   session->internals.user_hello_func = func;
 }
+
+/**
+  * gnutls_session_enable_compatibility_mode - Used to disable certain features in TLS in order to honour compatibility
+  * @session: is a #gnutls_session_t structure.
+  *
+  * This function can be used to disable certain (security) features in TLS
+  * in order to maintain maximum compatibility with buggy clients. It is
+  * equivalent to calling:
+  * gnutls_record_disable_padding()
+
+  * Normally only servers that require maximum compatibility with everything
+  * out there, need to call this function.
+  *
+  **/
+void
+gnutls_session_enable_compatibility_mode (gnutls_session_t session)
+{
+  gnutls_record_disable_padding( session);
+}

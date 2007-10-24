@@ -38,5 +38,5 @@ test_code_t test_rsa_pms_version_check (gnutls_session_t session);
 test_code_t test_version_oob (gnutls_session_t session);
 test_code_t test_zlib (gnutls_session_t session);
 test_code_t test_lzo (gnutls_session_t session);
-int _test_srp_username_callback (gnutls_session_t session, unsigned int times,
+int _test_srp_username_callback (gnutls_session_t session,
 				 char **username, char **password);

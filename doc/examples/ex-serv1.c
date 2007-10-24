@@ -1,3 +1,10 @@
+/* Copyright 2007 Free Software Foundation
+ *
+ * Copying and distribution of this file, with or without modification,
+ * are permitted in any medium without royalty provided the copyright
+ * notice and this notice are preserved.
+ */
+
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -12,6 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gcrypt.h> /* for gcry_control */
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -39,17 +47,21 @@ initialize_tls_session (void)
   gnutls_init (&session, GNUTLS_SERVER);
 
   /* avoid calling all the priority functions, since the defaults
-   * are adequate.
+   * are adequate. Depending on the needs it could also be 
+   * GNUTLS_PRIORITIES_PERFORMANCE.
    */
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
   /* request client certificate if any.
    */
   gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
-
-  gnutls_dh_set_prime_bits (session, DH_BITS);
+  
+  /* Set maximum compatibility mode. This is only suggested on public webservers
+   * that need to trade security for compatibility
+   */
+  gnutls_session_enable_compatibility_mode( session);
 
   return session;
 }
@@ -61,9 +73,11 @@ generate_dh_params (void)
 {
 
   /* Generate Diffie Hellman parameters - for use with DHE
-   * kx algorithms. These should be discarded and regenerated
-   * once a day, once a week or once a month. Depending on the
-   * security requirements.
+   * kx algorithms. When short bit length is used, it might
+   * be wise to regenerate parameters.
+   *
+   * Check the ex-serv-export.c example for using static
+   * parameters.
    */
   gnutls_dh_params_init (&dh_params);
   gnutls_dh_params_generate2 (dh_params, DH_BITS);
@@ -83,6 +97,10 @@ main (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   int optval = 1;
+
+  /* to disallow usage of the blocking /dev/random 
+   */
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   /* this must be called once in the program
    */

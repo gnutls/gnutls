@@ -458,6 +458,9 @@ typedef struct
 
   /* sockets internals */
   int lowat;
+  
+  /* to disable record padding */
+  int no_padding;
 
   /* These buffers are used in the handshake
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();

@@ -69,6 +69,7 @@ extern "C"
 
   typedef enum gnutls_cipher_algorithm
   {
+    GNUTLS_CIPHER_UNKNOWN = 0,
     GNUTLS_CIPHER_NULL = 1,
     GNUTLS_CIPHER_ARCFOUR_128,
     GNUTLS_CIPHER_3DES_CBC,
@@ -83,6 +84,7 @@ extern "C"
 
   typedef enum
   {
+    GNUTLS_KX_UNKNOWN = 0,
     GNUTLS_KX_RSA = 1,
     GNUTLS_KX_DHE_DSS,
     GNUTLS_KX_DHE_RSA,
@@ -149,6 +151,7 @@ extern "C"
 #define GNUTLS_COMP_ZLIB GNUTLS_COMP_DEFLATE
   typedef enum
   {
+    GNUTLS_COMP_UNKNOWN = 0,
     GNUTLS_COMP_NULL = 1,
     GNUTLS_COMP_DEFLATE,
     GNUTLS_COMP_LZO		/* only available if gnutls-extra has
@@ -161,6 +164,13 @@ extern "C"
     GNUTLS_SERVER = 1,
     GNUTLS_CLIENT
   } gnutls_connection_end_t;
+
+  typedef enum 
+  {
+    GNUTLS_PRIORITIES_PERFORMANCE=1,
+    GNUTLS_PRIORITIES_SECURITY=2,
+    GNUTLS_PRIORITIES_EXPORT=4
+  } gnutls_priority_flag_t;
 
   typedef enum
   {
@@ -268,6 +278,7 @@ extern "C"
 
   typedef enum
   {
+    GNUTLS_CRT_UNKNOWN = 0,
     GNUTLS_CRT_X509 = 1,
     GNUTLS_CRT_OPENPGP
   } gnutls_certificate_type_t;
@@ -380,6 +391,14 @@ extern "C"
   const char *gnutls_certificate_type_get_name (gnutls_certificate_type_t
 						type);
 
+  gnutls_mac_algorithm_t gnutls_mac_get_id (const char* name);
+  gnutls_compression_method_t gnutls_compression_get_id (const char* name);
+  gnutls_cipher_algorithm_t gnutls_cipher_get_id (const char* name);
+  gnutls_kx_algorithm_t gnutls_kx_get_id (const char* name);
+  gnutls_protocol_t gnutls_protocol_get_id (const char* name);
+  gnutls_certificate_type_t gnutls_certificate_type_get_id (const char* name);
+
+
   /* list supported algorithms */
   const gnutls_cipher_algorithm_t *gnutls_cipher_list (void);
   const gnutls_mac_algorithm_t *gnutls_mac_list (void);
@@ -418,6 +437,10 @@ extern "C"
 			      size_t sizeofdata);
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send
+
+  void gnutls_session_enable_compatibility_mode (gnutls_session_t session);
+
+  void gnutls_record_disable_padding (gnutls_session_t session);
 
   int gnutls_record_get_direction (gnutls_session_t session);
 
@@ -493,10 +516,33 @@ extern "C"
   int gnutls_certificate_type_set_priority (gnutls_session_t session,
 					    const int *list);
 
+  int gnutls_mac_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_compression_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_protocol_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_kx_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_cipher_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+  int gnutls_certificate_type_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
+
+#ifdef __GNUC__
+
+#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  
+                                                          
+#if _GNUTLS_GCC_VERSION >= 30100
+#define _GNUTLS_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
+#endif
+
+#endif /* __GNUC__ */
+
+#ifndef _GNUTLS_GCC_ATTR_DEPRECATED
+#define _GNUTLS_GCC_ATTR_DEPRECATED
+#endif
+                                                          
+                                                          
 /* if you just want some defaults, use the following.
  */
-  int gnutls_set_default_priority (gnutls_session_t session);
-  int gnutls_set_default_export_priority (gnutls_session_t session);
+  void gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_flag_t flag);
+  #define gnutls_set_default_priority(x) gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_SECURITY)
+  #define gnutls_set_default_export_priority(x) gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_EXPORT)
 
 /* Returns the name of a cipher suite */
   const char *gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t
@@ -1224,7 +1270,7 @@ extern "C"
 #define GNUTLS_E_X509_UNKNOWN_SAN -62
 #define GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED -94
 #define GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE -95
-#define GNUTLS_E_UNKNOWN_HASH_ALGORITHM -96
+#define GNUTLS_E_UNKNOWN_ALGORITHM -96
 #define GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE -97
 #define GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE -98
 #define GNUTLS_E_INVALID_PASSWORD -99

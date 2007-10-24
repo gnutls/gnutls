@@ -5,7 +5,36 @@ See the end for copying conditions.
 
 * Version 2.1.4 (unreleased)
 
+** Added the --v1 option to certtool, to allow generating X.509
+version 1 certificates. 
+
+** certtool: Add option --disable-quick-random to enable the old behaviour
+of using /dev/random to generate keys.
+
+** Added priority functions that accept strings.
+
+** Added gnutls_set_default_priority2() which accepts a flag to indicate
+priorities preferences.
+
+** Added gnutls_record_disable_padding() to allow servers talking to 
+buggy clients that complain if the TLS 1.0 record protocol padding is
+used.
+
+** Introduced gnutls_session_enable_compatibility_mode() to allow enabling
+all supported compatibility options (like disabling padding).
+
 ** API and ABI modifications:
+gnutls_set_default_priority: DEPRECATED
+gnutls_set_default_priority_export: DEPRECATED
+gnutls_set_default_priority2: ADDED
+gnutls_session_enable_compatibility_mode: ADDED
+gnutls_record_disable_padding: ADDED
+gnutls_mac_convert_priority: ADDED
+gnutls_compression_convert_priority: ADDED
+gnutls_protocol_convert_priority: ADDED
+gnutls_kx_convert_priority: ADDED
+gnutls_cipher_convert_priority: ADDED
+gnutls_certificate_type_convert_priority: ADDED
 gnutls_openpgp_key_t: RENAMED to gnutls_openpgp_crt_t
 gnutls_openpgp_key_status_t: RENAMEDS gnutls_openpgp_crt_status_t
 gnutls_openpgp_send_key: RENAMED to gnutls_openpgp_send_cert

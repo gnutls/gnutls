@@ -40,8 +40,6 @@ gnutls_protocol_t _gnutls_version_get (int major, int minor);
 
 /* Functions for MACs. */
 int _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm);
-int _gnutls_mac_priority (gnutls_session_t session,
-			  gnutls_mac_algorithm_t algorithm);
 gnutls_mac_algorithm_t _gnutls_x509_oid2mac_algorithm (const char *oid);
 const char *_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t mac);
 
@@ -67,8 +65,6 @@ cipher_suite_st _gnutls_cipher_suite_get_suite_name (cipher_suite_st *
 						     algorithm);
 
 /* Functions for ciphers. */
-int _gnutls_cipher_priority (gnutls_session_t session,
-			     gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm);
@@ -76,16 +72,12 @@ int _gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm);
 
 /* Functions for key exchange. */
-int _gnutls_kx_priority (gnutls_session_t session,
-			 gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_needs_dh_params (gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_needs_rsa_params (gnutls_kx_algorithm_t algorithm);
 mod_auth_st *_gnutls_kx_auth_struct (gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_is_ok (gnutls_kx_algorithm_t algorithm);
 
 /* Functions for compression. */
-int _gnutls_compression_priority (gnutls_session_t session,
-				  gnutls_compression_method_t algorithm);
 int _gnutls_compression_is_ok (gnutls_compression_method_t algorithm);
 int _gnutls_compression_get_num (gnutls_compression_method_t algorithm);
 gnutls_compression_method_t _gnutls_compression_get_id (int num);
@@ -130,5 +122,14 @@ gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk,
 						 gnutls_mac_algorithm_t mac);
 const char *_gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t,
 				      gnutls_mac_algorithm_t mac);
+
+int _gnutls_mac_priority (gnutls_session_t session,
+			  gnutls_mac_algorithm_t algorithm);
+int _gnutls_cipher_priority (gnutls_session_t session,
+			     gnutls_cipher_algorithm_t algorithm);
+int _gnutls_kx_priority (gnutls_session_t session,
+			 gnutls_kx_algorithm_t algorithm);
+int _gnutls_compression_priority (gnutls_session_t session,
+				  gnutls_compression_method_t algorithm);
 
 #endif

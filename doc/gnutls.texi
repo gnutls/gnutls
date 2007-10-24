@@ -869,6 +869,10 @@ To set whether client certificate is required or not.
 To initiate the handshake.
 @end table
 
+Other functions include the @ref{gnutls_protocol_convert_priority}, 
+@ref{gnutls_cipher_convert_priority}, etc., that allow converting 
+priorities given in text format to the internal integer format.
+
 @subsection TLS Cipher Suites
 
 The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
@@ -2289,6 +2293,7 @@ The following client is a very simple @acronym{SRP} @acronym{TLS}
 client which connects to a server and authenticates using a
 @emph{username} and a @emph{password}. The server may authenticate
 itself using a certificate, and in that case it has to be verified.
+In this example we also show the usage of @ref{gnutls_kx_convert_priority}.
 
 @verbatiminclude examples/ex-client-srp.c
 

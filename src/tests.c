@@ -50,7 +50,7 @@ int tls1_1_ok = 0;
 /* keep session info */
 static char *session_data = NULL;
 static char session_id[32];
-static int session_data_size = 0, session_id_size = 0;
+static size_t session_data_size = 0, session_id_size = 0;
 static int sfree = 0;
 static int handshake_output = 0;
 
@@ -217,13 +217,10 @@ ADD_PROTOCOL3 (gnutls_session_t session, int p1, int p2, int p3)
 static int srp_detected;
 
 int
-_test_srp_username_callback (gnutls_session_t session, unsigned int times,
-			     char **username, char **password)
+_test_srp_username_callback (gnutls_session_t session, 
+    char **username, char **password)
 {
-  if (times == 1)
-    {
-      srp_detected = 1;
-    }
+  srp_detected = 1;
 
   return -1;
 }
