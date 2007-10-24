@@ -50,7 +50,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY);
   gnutls_kx_set_priority (session, kx_priority);
 
   gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);

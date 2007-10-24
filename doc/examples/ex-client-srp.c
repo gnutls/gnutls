@@ -69,7 +69,7 @@ main (void)
 
   /* Set the priorities.
    */
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY);
   gnutls_kx_set_priority( session, kx_priorities);
 
   /* put the SRP credentials to the current session

@@ -275,64 +275,178 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 int
 gnutls_set_default_priority (gnutls_session_t session)
 {
-  static const int protocol_priority[] = {
-    /* GNUTLS_TLS1_2, -- not finalized yet! */
-    GNUTLS_TLS1_1,
-    GNUTLS_TLS1_0,
-    GNUTLS_SSL3,
-    0
-  };
-  static const int kx_priority[] = {
-    GNUTLS_KX_DHE_PSK,
-    GNUTLS_KX_PSK,
-    GNUTLS_KX_SRP_RSA,
-    GNUTLS_KX_SRP_DSS,
-    GNUTLS_KX_SRP,
-    GNUTLS_KX_DHE_RSA,
-    GNUTLS_KX_DHE_DSS,
-    GNUTLS_KX_RSA,
-    /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
-     * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
-     */
-    0
-  };
-  static const int cipher_priority[] = {
-    GNUTLS_CIPHER_AES_256_CBC,
-    GNUTLS_CIPHER_AES_128_CBC,
-    GNUTLS_CIPHER_3DES_CBC,
-#ifdef	ENABLE_CAMELLIA
-    GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
-    GNUTLS_CIPHER_ARCFOUR_128,
-    /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
-    0
-  };
-  static const int comp_priority[] = {
-    /* GNUTLS_COMP_LZO: Not standardized, don't add! */
-    GNUTLS_COMP_DEFLATE,
-    GNUTLS_COMP_NULL,
-    0
-  };
-  static const int mac_priority[] = {
-    GNUTLS_MAC_SHA1,
-    GNUTLS_MAC_MD5,
-    0
-  };
-  static int cert_type_priority[] = {
-    GNUTLS_CRT_X509,
-    GNUTLS_CRT_OPENPGP,
-    0
-  };
 
-  gnutls_cipher_set_priority (session, cipher_priority);
-  gnutls_compression_set_priority (session, comp_priority);
-  gnutls_kx_set_priority (session, kx_priority);
-  gnutls_protocol_set_priority (session, protocol_priority);
-  gnutls_mac_set_priority (session, mac_priority);
-  gnutls_certificate_type_set_priority (session, cert_type_priority);
+  gnutls_set_default_priority2( session, GNUTLS_PRIORITIES_SECURITY);
 
   return 0;
 }
+
+static const int protocol_priority[] = {
+ /* GNUTLS_TLS1_2, -- not finalized yet! */
+ GNUTLS_TLS1_1,
+ GNUTLS_TLS1_0,
+ GNUTLS_SSL3,
+ 0
+};
+
+static const int kx_priority_performance[] = {
+  GNUTLS_KX_RSA,
+  GNUTLS_KX_DHE_RSA,
+  GNUTLS_KX_DHE_DSS,
+  GNUTLS_KX_PSK,
+  GNUTLS_KX_DHE_PSK,
+  GNUTLS_KX_SRP_RSA,
+  GNUTLS_KX_SRP_DSS,
+  GNUTLS_KX_SRP,
+  /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
+   * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
+   */
+  0
+};
+
+static const int kx_priority_export[] = {
+  GNUTLS_KX_RSA,
+  GNUTLS_KX_DHE_RSA,
+  GNUTLS_KX_DHE_DSS,
+  GNUTLS_KX_PSK,
+  GNUTLS_KX_DHE_PSK,
+  GNUTLS_KX_SRP_RSA,
+  GNUTLS_KX_SRP_DSS,
+  GNUTLS_KX_SRP,
+  GNUTLS_KX_RSA_EXPORT,
+  0
+};
+
+static const int kx_priority_security[] = {
+  /* The ciphersuites that offer forward secrecy take
+   * precendance
+   */
+  GNUTLS_KX_DHE_RSA,
+  GNUTLS_KX_DHE_DSS,
+  GNUTLS_KX_DHE_PSK,
+  GNUTLS_KX_SRP_RSA,
+  GNUTLS_KX_SRP_DSS,
+  GNUTLS_KX_RSA,
+  GNUTLS_KX_PSK,
+  GNUTLS_KX_SRP,
+  /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
+   * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
+   */
+  0
+};
+
+static const int cipher_priority_performance[] = {
+  GNUTLS_CIPHER_ARCFOUR_128,
+  GNUTLS_CIPHER_AES_128_CBC,
+#ifdef	ENABLE_CAMELLIA
+    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
+  GNUTLS_CIPHER_AES_256_CBC,
+  GNUTLS_CIPHER_3DES_CBC,
+  /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
+  0
+};
+
+
+static const int cipher_priority_security[] = {
+  GNUTLS_CIPHER_AES_256_CBC,
+  GNUTLS_CIPHER_AES_128_CBC,
+#ifdef	ENABLE_CAMELLIA
+    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
+  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_128,
+  /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
+  0
+};
+
+static const int cipher_priority_export[] = {
+  GNUTLS_CIPHER_ARCFOUR_128,
+  GNUTLS_CIPHER_AES_128_CBC,
+#ifdef	ENABLE_CAMELLIA
+    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
+  GNUTLS_CIPHER_AES_256_CBC,
+  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_40,
+  0
+};
+
+static const int comp_priority[] = {
+  /* compression should be explicitely requested to be enabled */
+  GNUTLS_COMP_NULL,
+  0
+};
+
+
+static const int mac_priority_performance[] = {
+  GNUTLS_MAC_MD5,
+  GNUTLS_MAC_SHA1,
+  0
+};
+
+static const int mac_priority_security[] = {
+  GNUTLS_MAC_SHA1,
+  GNUTLS_MAC_MD5,
+  0
+};
+
+#define mac_priority_export mac_priority_security
+
+static int cert_type_priority[] = {
+  GNUTLS_CRT_X509,
+  GNUTLS_CRT_OPENPGP,
+  0
+};
+
+
+/**
+  * gnutls_set_default_priority2 - Sets some default priority on the cipher suites supported by gnutls.
+  * @session: is a #gnutls_session_t structure.
+  *
+  * Sets some default priority on the ciphers, key exchange methods,
+  * macs and compression methods. This is to avoid using the
+  * gnutls_*_priority() functions, if these defaults are ok.  You may
+  * override any of the following priorities by calling the
+  * appropriate functions.
+  *
+  * The default order is:
+  * Protocols: TLS 1.1, TLS 1.0, and SSL3.
+  * Compression: NULL.
+  * Certificate types: X.509, OpenPGP
+  *
+  * When performance is requested the fastest ciphers and key exchange
+  * methods are used, whilst in security, the most conservative options
+  * are set.
+  *
+  * Returns 0 on success.
+  *
+  **/
+void
+gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_t flag)
+{
+
+  if (flag == GNUTLS_PRIORITIES_PERFORMANCE) {
+    gnutls_cipher_set_priority (session, cipher_priority_performance);
+    gnutls_kx_set_priority (session, kx_priority_performance);
+    gnutls_mac_set_priority (session, mac_priority_performance);
+  } else if (flag == GNUTLS_PRIORITIES_SECURITY) {
+    gnutls_cipher_set_priority (session, cipher_priority_security);
+    gnutls_kx_set_priority (session, kx_priority_security);
+    gnutls_mac_set_priority (session, mac_priority_security);
+  } else if (flag == GNUTLS_PRIORITIES_EXPORT) {
+    gnutls_cipher_set_priority (session, cipher_priority_export);
+    gnutls_kx_set_priority (session, kx_priority_export);
+    gnutls_mac_set_priority (session, mac_priority_export);
+  }
+
+  gnutls_protocol_set_priority (session, protocol_priority);
+  gnutls_compression_set_priority (session, comp_priority);
+  gnutls_certificate_type_set_priority (session, cert_type_priority);
+
+  return;
+}
+
 
 /**
   * gnutls_set_default_export_priority - Sets some default priority on the cipher suites supported by gnutls.
@@ -353,32 +467,7 @@ gnutls_set_default_priority (gnutls_session_t session)
 int
 gnutls_set_default_export_priority (gnutls_session_t session)
 {
-  static const int protocol_priority[] = {
-    GNUTLS_TLS1, GNUTLS_SSL3, 0
-  };
-  static const int kx_priority[] = {
-    GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA,
-    GNUTLS_KX_RSA_EXPORT, 0
-  };
-  static const int cipher_priority[] = {
-    GNUTLS_CIPHER_AES_256_CBC,
-    GNUTLS_CIPHER_AES_128_CBC,
-    GNUTLS_CIPHER_3DES_CBC,
-#ifdef	ENABLE_CAMELLIA
-    GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
-    GNUTLS_CIPHER_ARCFOUR_128,
-    GNUTLS_CIPHER_ARCFOUR_40, 0
-  };
-  static const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };
-  static const int mac_priority[] =
-    { GNUTLS_MAC_SHA1, GNUTLS_MAC_MD5, 0 };
-
-  gnutls_cipher_set_priority (session, cipher_priority);
-  gnutls_compression_set_priority (session, comp_priority);
-  gnutls_kx_set_priority (session, kx_priority);
-  gnutls_protocol_set_priority (session, protocol_priority);
-  gnutls_mac_set_priority (session, mac_priority);
+  gnutls_set_default_priority2( session, GNUTLS_PRIORITIES_EXPORT);
 
   return 0;
 }

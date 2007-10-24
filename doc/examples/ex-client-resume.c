@@ -54,7 +54,7 @@ main (void)
 
       gnutls_init (&session, GNUTLS_CLIENT);
 
-      gnutls_set_default_priority (session);
+      gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
 
       gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 

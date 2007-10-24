@@ -380,7 +380,7 @@ initialize_session (void)
       gnutls_db_set_ptr (session, NULL);
     }
 
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
 
   if (cipher_priority[0])
     gnutls_cipher_set_priority (session, cipher_priority);

@@ -378,7 +378,7 @@ init_tls_session (const char *hostname)
 
   gnutls_init (&session, GNUTLS_CLIENT);
 
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
 
   /* allow the use of private ciphersuites.
    */

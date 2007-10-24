@@ -50,7 +50,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
 
   /* put the x509 credentials to the current session
    */

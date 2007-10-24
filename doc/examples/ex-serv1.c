@@ -47,9 +47,10 @@ initialize_tls_session (void)
   gnutls_init (&session, GNUTLS_SERVER);
 
   /* avoid calling all the priority functions, since the defaults
-   * are adequate.
+   * are adequate. Depending on the needs it could also be 
+   * GNUTLS_PRIORITIES_PERFORMANCE.
    */
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 

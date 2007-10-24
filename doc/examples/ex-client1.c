@@ -47,7 +47,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_default_priority (session);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
   gnutls_kx_set_priority (session, kx_prio);
 
   /* put the anonymous credentials to the current session

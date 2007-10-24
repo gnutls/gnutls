@@ -13,6 +13,9 @@ of using /dev/random to generate keys.
 
 ** Added priority functions that accept strings.
 
+** Added gnutls_set_default_priority2() which accepts a flag to indicate
+priorities preferences.
+
 ** Added gnutls_record_disable_padding() to allow servers talking to 
 buggy clients that complain if the TLS 1.0 record protocol padding is
 used.
@@ -21,6 +24,9 @@ used.
 all supported compatibility options (like disabling padding).
 
 ** API and ABI modifications:
+gnutls_set_default_priority: DEPRECATED
+gnutls_set_default_priority_export: DEPRECATED
+gnutls_set_default_priority2: ADDED
 gnutls_session_enable_compatibility_mode: ADDED
 gnutls_record_disable_padding: ADDED
 gnutls_mac_convert_priority: ADDED
