@@ -81,6 +81,10 @@ Some previous versions of certtool generated wrongly the
 optional parameters in a private key. This may affect
 programs that used them. To fix an old private key use
 \-\-key\-info in combination with this parameter.
+.IP "\-\-v1"
+When generating a certificate use the X.509 version 1 format.
+This does not add any extensions (such as indication for a CA)
+but some programs do need these.
 
 .SH EXAMPLES
 To create a private key, run:
