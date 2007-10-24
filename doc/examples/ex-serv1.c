@@ -19,6 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gcrypt.h> /* for gcry_control */
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -71,9 +72,11 @@ generate_dh_params (void)
 {
 
   /* Generate Diffie Hellman parameters - for use with DHE
-   * kx algorithms. These should be discarded and regenerated
-   * once a day, once a week or once a month. Depending on the
-   * security requirements.
+   * kx algorithms. When short bit length is used, it might
+   * be wise to regenerate parameters.
+   *
+   * Check the ex-serv-export.c example for using static
+   * parameters.
    */
   gnutls_dh_params_init (&dh_params);
   gnutls_dh_params_generate2 (dh_params, DH_BITS);
@@ -93,6 +96,10 @@ main (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   int optval = 1;
+
+  /* to disallow usage of the blocking /dev/random 
+   */
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   /* this must be called once in the program
    */
