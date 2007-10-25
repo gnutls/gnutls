@@ -854,7 +854,7 @@ To set the priority of certificate types (e.g., @acronym{OpenPGP},
 To set the priority of protocol versions (e.g., @acronym{SSL} 3.0,
 @acronym{TLS} 1.0).
 
-@item @ref{gnutls_set_default_priority}:
+@item @ref{gnutls_set_default_priority2}:
 To set some defaults in the current session.  That way you don't have
 to call each priority function, independently, but you have to live
 with the defaults.
