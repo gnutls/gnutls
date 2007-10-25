@@ -190,8 +190,13 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 #ifdef ENABLE_PKI
   gnutls_certificate_free_crls (sc);
 #endif
+
+#ifndef KEYRING_HACK
   if (_E_gnutls_openpgp_keyring_deinit)
     _E_gnutls_openpgp_keyring_deinit( sc->keyring);
+#else
+  _gnutls_free_datum( &sc->keyring);
+#endif
 
   gnutls_free (sc);
 }

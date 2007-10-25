@@ -5,13 +5,6 @@
 # include <config.h>
 #endif
 
-/* The format the OpenPGP key is stored in. */
-typedef enum gnutls_openpgp_crt_fmt_t
-{
-  GNUTLS_OPENPGP_FMT_RAW, 
-  GNUTLS_OPENPGP_FMT_BASE64
-} gnutls_openpgp_crt_fmt_t;
-
 #ifdef ENABLE_OPENPGP
 
 #include <opencdk.h>

@@ -189,10 +189,7 @@ void session::set_certificate_type_priority (const int *list)
  */
 void session::set_default_priority(priority_flag flag)
 {
-    if (flag == EXPORT_CIPHERS)
-        RETWRAP( gnutls_set_default_export_priority( this->s));
-    else
-        RETWRAP( gnutls_set_default_priority( this->s));
+    gnutls_set_default_priority2( this->s, flag);
 }
 
 gnutls_protocol_t session::get_protocol_version() const

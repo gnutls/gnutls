@@ -966,7 +966,7 @@ init_global_tls_stuff (void)
 #ifdef ENABLE_OPENPGP
   if (pgp_keyring != NULL)
     {
-      ret = gnutls_certificate_set_openpgp_keyring_file (xcred, pgp_keyring);
+      ret = gnutls_certificate_set_openpgp_keyring_file (xcred, pgp_keyring, GNUTLS_OPENPGP_FMT_BASE64);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error setting the OpenPGP keyring file\n");

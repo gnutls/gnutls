@@ -64,7 +64,7 @@ class rsa_params
         gnutls_rsa_params_t params;
 };
 
-enum priority_flag { ALL_CIPHERS, EXPORT_CIPHERS };
+typedef gnutls_priority_flag_t priority_flag;
 
 class session
 {

@@ -28,7 +28,7 @@
 #include "gnutls_cert.h"
 #include "gnutls_datum.h"
 #include "gnutls_global.h"
-#include <openpgp/gnutls_openpgp.h>
+#include "openpgp/gnutls_openpgp.h"
 #include "read-file.h"
 #include <gnutls_str.h>
 #include <gnutls_sig.h>
@@ -98,144 +98,6 @@ buftou32 (const uint8_t * buf)
   a |= buf[3];
   return a;
 }
-
-
-static int
-kbx_blob_new (keybox_blob ** r_ctx)
-{
-  keybox_blob *c;
-
-  if (!r_ctx)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  c = cdk_calloc (1, sizeof *c);
-  if (!c)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-  *r_ctx = c;
-
-  return 0;
-}
-
-
-void
-kbx_blob_release (keybox_blob * ctx)
-{
-  if (!ctx)
-    return;
-  cdk_free (ctx->data);
-  cdk_free (ctx);
-}
-
-
-cdk_keydb_hd_t
-kbx_to_keydb (keybox_blob * blob)
-{
-  cdk_keydb_hd_t db;
-  cdk_error_t rc;
-
-  if (!blob)
-    {
-      gnutls_assert ();
-      return NULL;
-    }
-
-  switch (blob->type)
-    {
-    case KBX_BLOB_FILE:
-      rc = cdk_keydb_new_from_file (&db, 0, (const char*)blob->data);
-      break;
-
-    case KBX_BLOB_DATA:
-      rc = cdk_keydb_new_from_mem (&db, 0, blob->data, blob->size);
-      break;
-
-    default:
-      gnutls_assert ();
-      db = NULL;
-      break;
-    }
-  
-  return db;
-}
-
-
-/* Extract a keybox blob from the given position. */
-keybox_blob *
-kbx_read_blob (const gnutls_datum_t * keyring, size_t pos)
-{
-  keybox_blob *blob = NULL;
-  int rc;
-
-  if (!keyring || !keyring->data || pos > keyring->size)
-    {
-      gnutls_assert ();
-      return NULL;
-    }
-
-  rc = kbx_blob_new (&blob);
-  if (rc)
-    return NULL;
-
-  blob->type = keyring->data[pos];
-  if (blob->type != KBX_BLOB_FILE && blob->type != KBX_BLOB_DATA)
-    {
-      kbx_blob_release (blob);
-      return NULL;
-    }
-  blob->size = buftou32 (keyring->data + pos + 2);
-  if (!blob->size)
-    {
-      kbx_blob_release (blob);
-      return NULL;
-    }
-  blob->data = cdk_calloc (1, blob->size + 1);
-  if (!blob->data)
-    return NULL;
-  memcpy (blob->data, keyring->data + (pos + 6), blob->size);
-  blob->data[blob->size] = '\0';
-
-  return blob;
-}
-
-
-/* Creates a keyring blob from raw data
- *
- * Format:
- * 1 octet  type
- * 1 octet  armored
- * 4 octet  size of blob
- * n octets data
- */
-static uint8_t *
-kbx_data_to_keyring (int type, int enc, const char *data,
-		     size_t size, size_t * r_size)
-{
-  uint8_t *p = NULL;
-
-  if (!data)
-    return NULL;
-
-  p = gnutls_malloc (1 + 1 + 4 + size);
-  if (!p)
-    return NULL;
-  p[0] = type;			/* type: {keyring,name} */
-  p[1] = enc;			/* encoded: {plain, armored} */
-  p[2] = size >> 24;
-  p[3] = size >> 16;
-  p[4] = size >> 8;
-  p[5] = size;
-  memcpy (p + 6, data, size);
-  if (r_size)
-    *r_size = 6 + size;
-  return p;
-}
-
 
 static int
 openpgp_pk_to_gnutls_cert (gnutls_cert * cert, cdk_pkt_pubkey_t pk)
@@ -441,6 +303,85 @@ _gnutls_openpgp_raw_key_to_gcert (gnutls_cert * cert,
   return rc;
 }
 
+/**
+  * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials_t structure
+  * @res: is an #gnutls_certificate_credentials_t structure.
+  * @key: contains an openpgp public key
+  * @pkey: is an openpgp private key
+  *
+  * This function sets a certificate/private key pair in the 
+  * gnutls_certificate_credentials_t structure. This function may be called
+  * more than once (in case multiple keys/certificates exist for the
+  * server).
+  *
+  **/
+int
+gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
+				    res, gnutls_openpgp_crt_t crt,
+				    gnutls_openpgp_privkey_t pkey)
+{
+  int ret;
+
+  /* this should be first */
+
+  res->pkey = gnutls_realloc_fast (res->pkey,
+				   (res->ncerts + 1) * 
+				   sizeof (gnutls_privkey));
+  if (res->pkey == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ret = _gnutls_openpgp_privkey_to_gkey (&res->pkey[res->ncerts], pkey);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  res->cert_list = gnutls_realloc_fast (res->cert_list,
+					(1 +
+					 res->ncerts) *
+					sizeof (gnutls_cert *));
+  if (res->cert_list == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  res->cert_list_length = gnutls_realloc_fast (res->cert_list_length,
+					       (1 +
+						res->ncerts) * sizeof (int));
+  if (res->cert_list_length == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  res->cert_list[res->ncerts] = gnutls_calloc (1, sizeof (gnutls_cert));
+  if (res->cert_list[res->ncerts] == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  res->cert_list_length[res->ncerts] = 1;
+
+  ret = _gnutls_openpgp_crt_to_gcert (res->cert_list[res->ncerts], crt);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  res->ncerts++;
+
+  /* FIXME: Check if the keys match. */
+
+  return 0;
+}
+
 
 /*-
  * gnutls_openpgp_get_key - Retrieve a key from the keyring.
@@ -555,148 +496,49 @@ stream_to_datum (cdk_stream_t inp, gnutls_datum_t * raw)
  **/
 int
 gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
-					res, const gnutls_datum_t * cert,
-					const gnutls_datum_t * key)
+					res, const gnutls_datum_t * icert,
+					const gnutls_datum_t * ikey,
+					gnutls_openpgp_crt_fmt_t format)
 {
-  gnutls_datum_t raw;
-  cdk_kbnode_t knode = NULL, ctx = NULL, p;
-  cdk_packet_t pkt;
-  int i = 0;
-  int rc = 0;
-  cdk_stream_t inp = NULL;
+  gnutls_openpgp_privkey_t key;
+  gnutls_openpgp_crt_t cert;
+  int ret;
+  
+  ret = gnutls_openpgp_privkey_init( &key);
+  if (ret < 0) {
+    gnutls_assert();
+    return ret;
+  }
 
-  if (!res || !key || !cert)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+  ret = gnutls_openpgp_privkey_import( key, ikey, format, NULL, 0);
+  if (ret < 0) {
+    gnutls_assert();
+    gnutls_openpgp_privkey_deinit( key);
+    return ret;
+  }
 
-  rc = cdk_stream_tmp_from_mem (cert->data, cert->size, &inp);
-  if (rc)
-    {
-      rc = _gnutls_map_cdk_rc (rc);
-      gnutls_assert ();
-      return rc;
-    }
+  ret = gnutls_openpgp_crt_init( &cert);
+  if (ret < 0) {
+    gnutls_assert();
+    gnutls_openpgp_privkey_deinit( key);
+    return ret;
+  }
 
-  if (cdk_armor_filter_use (inp))
-    cdk_stream_set_armor_flag (inp, 0);
+  ret = gnutls_openpgp_crt_import( cert, icert, format);
+  if (ret < 0) {
+    gnutls_assert();
+    gnutls_openpgp_privkey_deinit( key);
+    gnutls_openpgp_crt_deinit( cert);
+    return ret;
+  }
 
-  res->cert_list = gnutls_realloc_fast (res->cert_list,
-					(1 + res->ncerts) *
-					sizeof (gnutls_cert *));
-  if (res->cert_list == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
 
-  res->cert_list_length = gnutls_realloc_fast (res->cert_list_length,
-					       (1 +
-						res->ncerts) * sizeof (int));
-  if (res->cert_list_length == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+  ret = gnutls_certificate_set_openpgp_key( res, cert, key);
 
-  res->cert_list[res->ncerts] = gnutls_calloc (1, sizeof (gnutls_cert));
-  if (res->cert_list[res->ncerts] == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  i = 1;
-  rc = cdk_keydb_get_keyblock (inp, &knode);
-
-  while (knode && (p = cdk_kbnode_walk (knode, &ctx, 0)))
-    {
-      pkt = cdk_kbnode_get_packet (p);
-      if (i > MAX_PUBLIC_PARAMS_SIZE)
-	{
-	  gnutls_assert ();
-	  break;
-	}
-      if (pkt->pkttype == CDK_PKT_PUBLIC_KEY)
-	{
-	  int n = res->ncerts;
-
-	  cdk_pkt_pubkey_t pk = pkt->pkt.public_key;
-	  res->cert_list_length[n] = 1;
-
-	  if (stream_to_datum (inp, &res->cert_list[n][0].raw))
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
-	  rc = openpgp_pk_to_gnutls_cert (&res->cert_list[n][0], pk);
-	  if (rc < 0)
-	    {
-	      gnutls_assert ();
-	      return rc;
-	    }
-	  i++;
-	}
-    }
-
-  if (rc == CDK_EOF && i > 1)
-    rc = 0;
-
-  cdk_stream_close (inp);
-
-  if (rc)
-    {
-      cdk_kbnode_release (knode);
-      gnutls_assert ();
-      rc = _gnutls_map_cdk_rc (rc);
-      goto leave;
-    }
-
-  res->ncerts++;
-  res->pkey = gnutls_realloc_fast (res->pkey,
-				   (res->ncerts) * sizeof (gnutls_privkey));
-  if (!res->pkey)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  /* ncerts has been incremented before */
-
-  rc = cdk_stream_tmp_from_mem (key->data, key->size, &inp);
-  if (rc)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  if (cdk_armor_filter_use (inp))
-    cdk_stream_set_armor_flag (inp, 0);
-
-  memset (&raw, 0, sizeof raw);
-
-  if (stream_to_datum (inp, &raw))
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-  cdk_stream_close (inp);
-
-  rc = _gnutls_openpgp_raw_privkey_to_gkey (&res->pkey[res->ncerts - 1],
-					    &raw,
-					    GNUTLS_OPENPGP_FMT_RAW);
-  if (rc)
-    {
-      gnutls_assert ();
-    }
-
-  _gnutls_free_datum (&raw);
-
-leave:
-  cdk_kbnode_release (knode);
-
-  return rc;
+  gnutls_openpgp_privkey_deinit( key);
+  gnutls_openpgp_crt_deinit( cert);
+  
+  return ret;
 }
 
 
@@ -713,7 +555,8 @@ leave:
 int
 gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
 					 res, const char *certfile,
-					 const char *keyfile)
+					 const char *keyfile,
+					 gnutls_openpgp_crt_fmt_t format)
 {
   struct stat statbuf;
   gnutls_datum_t key, cert;
@@ -749,7 +592,7 @@ gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
       return GNUTLS_E_FILE_ERROR;
     }
 
-  rc = gnutls_certificate_set_openpgp_key_mem (res, &cert, &key);
+  rc = gnutls_certificate_set_openpgp_key_mem (res, &cert, &key, format);
 
   free (cert.data);
   free (key.data);
@@ -812,7 +655,7 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
  **/
 int
   gnutls_certificate_set_openpgp_keyring_file
-  (gnutls_certificate_credentials_t c, const char *file)
+  (gnutls_certificate_credentials_t c, const char *file, gnutls_openpgp_crt_fmt_t format)
 {
 gnutls_datum ring;
 size_t size;
@@ -832,7 +675,7 @@ int rc;
       return GNUTLS_E_FILE_ERROR;
     }
 
-  rc = gnutls_certificate_set_openpgp_keyring_mem (c, ring.data, ring.size);
+  rc = gnutls_certificate_set_openpgp_keyring_mem (c, ring.data, ring.size, format);
   
   free( ring.data);
   
@@ -854,8 +697,9 @@ int rc;
 int
 gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
 					    c, const opaque * data,
-					    size_t dlen)
+					    size_t dlen, gnutls_openpgp_crt_fmt_t format)
 {
+#ifndef KEYRING_HACK
   cdk_stream_t inp;
   size_t count;
   uint8_t *buf;
@@ -877,7 +721,7 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
     return rc;
   }
   
-  rc = gnutls_openpgp_keyring_import( c->keyring, &ddata, GNUTLS_OPENPGP_FMT_BASE64);
+  rc = gnutls_openpgp_keyring_import( c->keyring, &ddata, format);
   if ( rc < 0) {
     gnutls_assert();
     gnutls_openpgp_keyring_deinit( c->keyring);
@@ -885,6 +729,21 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
   }
   
   return 0;
+#else
+
+  c->keyring_format = format;
+
+  c->keyring.data = gnutls_malloc( dlen+1);
+  if (c->keyring.data == NULL)
+  {
+    gnutls_assert();
+    return GNUTLS_E_MEMORY_ERROR;
+  }
+  memcpy(c->keyring.data, data, dlen);
+  c->keyring.data[dlen]=0;
+  c->keyring.size = dlen;
+
+#endif
 }
 
 /*-
@@ -904,6 +763,9 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
 			     opaque * key_fpr, int key_fpr_size)
 {
   int rc = 0;
+#ifdef KEYRING_HACK
+  gnutls_openpgp_keyring_t kring;
+#endif
 
   if (!ret || !cred || !key_fpr)
     {
@@ -914,9 +776,27 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
   if (key_fpr_size != 16 && key_fpr_size != 20)
     return GNUTLS_E_HASH_FAILED; /* only MD5 and SHA1 are supported */
 
+#ifndef KEYRING_HACK
   rc = gnutls_openpgp_get_key (ret, cred->keyring, KEY_ATTR_FPR, key_fpr);
-  if (rc >= 0)			/* key was found */
+#else
+  rc = gnutls_openpgp_keyring_init( &kring);
+  if ( rc < 0) {
+    gnutls_assert();
     return rc;
+  }
+  
+  rc = gnutls_openpgp_keyring_import( kring, &cred->keyring, cred->keyring_format);
+  if ( rc < 0) {
+    gnutls_assert();
+    gnutls_openpgp_keyring_deinit( kring);
+    return rc;
+  }
+#endif
+  if (rc >= 0) /* key was found */
+    {
+      rc = 0;
+      goto error;
+    }
   else
     rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
@@ -929,10 +809,15 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
       if (rc < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+	  rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
+	  goto error;
 	}
     }
 
+  error:
+#ifdef KEYRING_HACK
+  gnutls_openpgp_keyring_deinit( kring);
+#endif
   return rc;
 }
 
@@ -1040,84 +925,6 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
 }
 
-/**
-  * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an #gnutls_certificate_credentials_t structure.
-  * @key: contains an openpgp public key
-  * @pkey: is an openpgp private key
-  *
-  * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials_t structure. This function may be called
-  * more than once (in case multiple keys/certificates exist for the
-  * server).
-  *
-  **/
-int
-gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
-				    res, gnutls_openpgp_crt_t key,
-				    gnutls_openpgp_privkey_t pkey)
-{
-  int ret;
-
-  /* this should be first */
-
-  res->pkey = gnutls_realloc_fast (res->pkey,
-				   (res->ncerts + 1) * 
-				   sizeof (gnutls_privkey));
-  if (res->pkey == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ret = _gnutls_openpgp_privkey_to_gkey (&res->pkey[res->ncerts], pkey);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  res->cert_list = gnutls_realloc_fast (res->cert_list,
-					(1 +
-					 res->ncerts) *
-					sizeof (gnutls_cert *));
-  if (res->cert_list == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  res->cert_list_length = gnutls_realloc_fast (res->cert_list_length,
-					       (1 +
-						res->ncerts) * sizeof (int));
-  if (res->cert_list_length == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  res->cert_list[res->ncerts] = gnutls_calloc (1, sizeof (gnutls_cert));
-  if (res->cert_list[res->ncerts] == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  res->cert_list_length[res->ncerts] = 1;
-
-  ret = _gnutls_openpgp_crt_to_gcert (res->cert_list[res->ncerts], key);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  res->ncerts++;
-
-  /* FIXME: Check if the keys match. */
-
-  return 0;
-}
 
 /**
  * gnutls_openpgp_privkey_sign_hash - This function will sign the given data using the private key params

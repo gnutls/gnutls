@@ -50,7 +50,7 @@ initialize_tls_session (void)
    * are adequate. Depending on the needs it could also be 
    * GNUTLS_PRIORITIES_PERFORMANCE.
    */
-  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY);
+  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY_NORMAL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 

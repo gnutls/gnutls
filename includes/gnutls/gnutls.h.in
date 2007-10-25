@@ -167,9 +167,10 @@ extern "C"
 
   typedef enum 
   {
-    GNUTLS_PRIORITIES_PERFORMANCE=1,
-    GNUTLS_PRIORITIES_SECURITY=2,
-    GNUTLS_PRIORITIES_EXPORT=4
+    GNUTLS_PRIORITIES_EXPORT,
+    GNUTLS_PRIORITIES_PERFORMANCE,
+    GNUTLS_PRIORITIES_SECURITY_NORMAL,
+    GNUTLS_PRIORITIES_SECURITY_HIGH
   } gnutls_priority_flag_t;
 
   typedef enum
@@ -541,7 +542,7 @@ extern "C"
 /* if you just want some defaults, use the following.
  */
   void gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_flag_t flag);
-  #define gnutls_set_default_priority(x) gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_SECURITY)
+  #define gnutls_set_default_priority(x) gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_SECURITY_NORMAL)
   #define gnutls_set_default_export_priority(x) gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_EXPORT)
 
 /* Returns the name of a cipher suite */

@@ -33,23 +33,17 @@ typedef enum
 int
 gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
 					 res, const char *CERTFILE,
-					 const char *KEYFILE);
+					 const char *KEYFILE, gnutls_openpgp_crt_fmt_t);
 
 int gnutls_openpgp_count_key_names (const gnutls_datum_t * cert);
 
-int gnutls_openpgp_add_keyring_mem (gnutls_datum_t * keyring,
-				    const void *data, size_t len);
-
-int gnutls_openpgp_add_keyring_file (gnutls_datum_t * keyring,
-				     const char *name);
-
 int gnutls_certificate_set_openpgp_keyring_file
-  (gnutls_certificate_credentials_t c, const char *file);
+  (gnutls_certificate_credentials_t c, const char *file, gnutls_openpgp_crt_fmt_t);
 
 int
 gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
 					    c, const opaque * data,
-					    size_t dlen);
+					    size_t dlen, gnutls_openpgp_crt_fmt_t);
 
 int gnutls_openpgp_get_key (gnutls_datum_t * key,
 			    gnutls_openpgp_keyring_t keyring,
@@ -74,10 +68,6 @@ _gnutls_openpgp_request_key (gnutls_session_t,
 			     const gnutls_certificate_credentials_t cred,
 			     opaque * key_fpr, int key_fpr_size);
 
-keybox_blob *kbx_read_blob (const gnutls_datum_t * keyring, size_t pos);
-cdk_keydb_hd_t kbx_to_keydb (keybox_blob * blob);
-void kbx_blob_release (keybox_blob * ctx);
-
 int _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t,
 				const gnutls_datum_t * cert_list,
 				int cert_list_length, unsigned int *status);
@@ -87,6 +77,21 @@ time_t _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t *
 						  cert);
 time_t _gnutls_openpgp_get_raw_key_expiration_time (const gnutls_datum_t *
 						    cert);
+
+int
+gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);
+
+int
+gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);
+
+void
+gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key);
+
+int
+gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
+			       const gnutls_datum_t * data,
+			       gnutls_openpgp_crt_fmt_t format,
+			       const char *pass, unsigned int flags);
 
 #endif /*GNUTLS_OPENPGP_H */
 

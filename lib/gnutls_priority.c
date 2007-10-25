@@ -305,19 +305,31 @@ static const int kx_priority_security[] = {
 
 static const int cipher_priority_performance[] = {
   GNUTLS_CIPHER_ARCFOUR_128,
-  GNUTLS_CIPHER_AES_128_CBC,
 #ifdef	ENABLE_CAMELLIA
-    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+  GNUTLS_CIPHER_CAMELLIA_128_CBC,
 #endif
-  GNUTLS_CIPHER_AES_256_CBC,
+  GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_3DES_CBC,
   /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
   0
 };
 
+static const int cipher_priority_security_normal[] = {
+  GNUTLS_CIPHER_AES_128_CBC,
+#ifdef	ENABLE_CAMELLIA
+    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
+  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_128,
+  /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
+  0
+};
 
-static const int cipher_priority_security[] = {
+static const int cipher_priority_security_high[] = {
   GNUTLS_CIPHER_AES_256_CBC,
+#ifdef	ENABLE_CAMELLIA
+    GNUTLS_CIPHER_CAMELLIA_256_CBC,
+#endif
   GNUTLS_CIPHER_AES_128_CBC,
 #ifdef	ENABLE_CAMELLIA
     GNUTLS_CIPHER_CAMELLIA_128_CBC,
@@ -329,13 +341,12 @@ static const int cipher_priority_security[] = {
 };
 
 static const int cipher_priority_export[] = {
-  GNUTLS_CIPHER_ARCFOUR_128,
   GNUTLS_CIPHER_AES_128_CBC,
 #ifdef	ENABLE_CAMELLIA
-    GNUTLS_CIPHER_CAMELLIA_128_CBC,
+  GNUTLS_CIPHER_CAMELLIA_128_CBC,
 #endif
-  GNUTLS_CIPHER_AES_256_CBC,
   GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_128,
   GNUTLS_CIPHER_ARCFOUR_40,
   0
 };
@@ -381,11 +392,25 @@ static int cert_type_priority[] = {
   * The default order is:
   * Protocols: TLS 1.1, TLS 1.0, and SSL3.
   * Compression: NULL.
-  * Certificate types: X.509, OpenPGP
+  * Certificate types: X.509, OpenPGP.
   *
-  * When performance is requested the fastest ciphers and key exchange
-  * methods are used, whilst in security, the most conservative options
-  * are set.
+  * In GNUTLS_PRIORITIES_PERFORMANCE all the "secure" ciphersuites are enabled, 
+  * limited to 128 bit ciphers and sorted by terms of speed performance.
+  * The GNUTLS_PRIORITIES_SECURITY_NORMAL flag enables all "secure" ciphersuites 
+  * limited to 128 bit ciphers and sorted by security margin.
+  * The GNUTLS_PRIORITIES_SECURITY_HIGH flag enables all "secure" ciphersuites 
+  * including 256 bit ciphers and sorted by security margin.
+  * In GNUTLS_PRIORITIES_EXPORT all the ciphersuites are enabled, including
+  * the low-security 40 bit ciphers.
+  *
+  * For key exchange algorithms when in SECURITY_NORMAL or SECURITY_HIGH levels
+  * the perfect forward secrecy algorithms take precendence of the other protocols.
+  * In all cases all the supported key exchange algorithms are enabled (except for the
+  * RSA-EXPORT which is only enabled in EXPORT level).
+  *
+  * Note that although one can select very long key sizes for symmetric algorithms, 
+  * to actually increase security the public key algorithms have to use longer key 
+  * sizes as well.
   *
   * Returns 0 on success.
   *
@@ -398,8 +423,12 @@ gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_flag_t f
     gnutls_cipher_set_priority (session, cipher_priority_performance);
     gnutls_kx_set_priority (session, kx_priority_performance);
     gnutls_mac_set_priority (session, mac_priority_performance);
-  } else if (flag == GNUTLS_PRIORITIES_SECURITY) {
-    gnutls_cipher_set_priority (session, cipher_priority_security);
+  } else if (flag == GNUTLS_PRIORITIES_SECURITY_NORMAL) {
+    gnutls_cipher_set_priority (session, cipher_priority_security_normal);
+    gnutls_kx_set_priority (session, kx_priority_security);
+    gnutls_mac_set_priority (session, mac_priority_security);
+  } else if (flag == GNUTLS_PRIORITIES_SECURITY_HIGH) {
+    gnutls_cipher_set_priority (session, cipher_priority_security_high);
     gnutls_kx_set_priority (session, kx_priority_security);
     gnutls_mac_set_priority (session, mac_priority_security);
   } else if (flag == GNUTLS_PRIORITIES_EXPORT) {
