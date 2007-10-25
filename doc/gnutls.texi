@@ -2057,6 +2057,7 @@ the following subsections.
 @menu
 * Headers::
 * Version check::
+* Debugging
 * Building the source::
 @end menu
 
@@ -2081,6 +2082,15 @@ compatibility new features may have been introduced but due to problem
 with the dynamic linker an old version is actually used.  So you may
 want to check that the version is okay right after program startup.
 See the function @ref{gnutls_check_version}.
+
+@node Debugging
+@subsection Debugging
+
+In many cases things may not go as expected and further information,
+to assist debugging, from @acronym{GnuTLS} is desired. Those are the
+case where the @ref{gnutls_global_set_log_level} and
+@ref{gnutls_global_set_log_function} are to be used. Those will print
+verbose information on the @acronym{GnuTLS} functions internal flow.
 
 @node Building the source
 @subsection Building the Source
