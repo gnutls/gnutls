@@ -78,3 +78,26 @@ The rules here are not always used, although we try to stick to them.
 *** Indentation style:
   In general, use the GNU Coding Standard.  You may indent the source
   using GNU indent, e.g. "indent *.c".
+
+*** Guile bindings:
+
+ Parts of the Guile bindings, such as types (aka. "SMOBs"), enum values,
+ constants, are automatically generated.  This is handled by the modules
+ under `guile/modules/gnutls/build/'; these modules are only used at
+ build-time and are not installed.
+
+ The Scheme variables they generate (e.g., constants, type predicates,
+ etc.) are exported to user programs through `gnutls.scm' and
+ `gnutls/extra.scm', both of which are installed.
+
+ For instance, when adding/removing/renaming enumerates or constants,
+ two things must be done:
+
+  1. Update the enum list in `build/enums.scm' (currently dependencies
+     are not tracked, so you have to run "make clean all" in `guile/'
+     after).
+
+  2. Update the export list of `gnutls.scm' (or `extra.scm').
+
+ Note that, for constants and enums, "schemefied" names are used, as
+ noted under the "Guile API Conventions" node of the manual.
