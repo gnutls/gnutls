@@ -408,8 +408,7 @@ typedef struct
 #define GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1 { 0x00, 0x91 }
 
 
-/* SRP (not in TLS 1.0)
- * draft-ietf-tls-srp-14:
+/* SRP (rfc5054)
  */
 #define GNUTLS_SRP_SHA_3DES_EDE_CBC_SHA1 { 0xC0, 0x1A }
 #define GNUTLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA1 { 0xC0, 0x1B }
