@@ -1,0 +1,7 @@
+*.x
+*.i.c
+smobs.h
+enums.h
+extra-smobs.h
+extra-enums.h
+pre-inst-guile
