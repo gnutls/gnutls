@@ -1,3 +1,366 @@
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.1.4.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h: Add for backwards compatibility.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix typo.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/config.rpath, gl/m4/gnulib-common.m4, gl/strerror.c,
+	lgl/m4/gnulib-common.m4, lgl/m4/ulonglong.m4, lgl/stdbool.in.h,
+	lgl/stdint.in.h: Update gnulib files.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-10-27  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/cipher.c, libextra/opencdk/keydb.c,
+	libextra/opencdk/new-packet.c, libextra/opencdk/opencdk.h,
+	libextra/opencdk/seskey.c: Sync with OpenCDK 0.6.5.
+
+2007-10-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.c,
+	src/certtool.gaa: quick-random option was removed since it is now
+	the default.
+
+2007-10-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 1	2	lib/gnutls_algorithms.c
+
+2007-10-26  Ludovic Courtès <ludo@gnu.org>
+
+	* .gitignore, doc/.gitignore, gl/.gitignore, guile/.gitignore,
+	lgl/.gitignore, libextra/.gitignore, po/.gitignore: Add
+	`.gitignore'.
+
+2007-10-26  Ludovic Courtès <ludo@gnu.org>
+
+	* doc/README.CODING_STYLE: Add doc about maintenance of the Guile
+	bindings.
+
+2007-10-25  Simon Josefsson <simon@josefsson.org>
+
+	Merge branch 'master' of ssh://git.sv.gnu.org/srv/git/gnutls
+
+2007-10-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-badra-hajjeh-mtls-03.txt: Add.
+
+2007-10-25  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: added some text for the debugging functions.
+
+2007-10-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Typo.
+
+2007-10-25  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Reorder and simplify.
+
+2007-10-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Doc fix.
+
+2007-10-25  Simon Josefsson <simon@josefsson.org>
+
+	Merge branch 'master' of ssh://git.sv.gnu.org/srv/git/gnutls
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* libextra/gnutls_openpgp.c: removed unused code.
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 2	2	doc/examples/ex-serv-pgp.c
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, includes/gnutls/extra.h, includes/gnutls/gnutls.h.in,
+	includes/gnutls/gnutlsxx.h, includes/gnutls/openpgp.h,
+	lib/auth_cert.h, lib/gnutls_cert.c, lib/gnutls_int.h,
+	lib/gnutlsxx.cpp, libextra/gnutls_openpgp.c,
+	libextra/openpgp/compat.c, libextra/openpgp/gnutls_openpgp.h,
+	libextra/openpgp/openpgp.h, src/cli.c, src/serv.c: Several changes
+	to openpgp code: * gnutls_certificate_set_openpgp_* functions were
+	modified to include format * KEYRING_HACK is defined to overcome a
+	bug in opencdk which makes keyrings reentrant. Once fixed, the
+	KEYRING_HACK code should be removed.
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/examples/ex-client-srp.c,
+	doc/examples/ex-client-tlsia.c, doc/examples/ex-serv-anon.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, includes/gnutls/gnutls.h.in,
+	lib/gnutls_priority.c: Introduced GNUTLS_PRIORITIES_SECURITY_NORMAL
+	and GNUTLS_PRIORITIES_SECURITY_HIGH
+
+2007-10-24  Simon Josefsson <simon@josefsson.org>
+
+	Merge branch 'master' of ssh://git.sv.gnu.org/srv/git/gnutls
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* includes/gnutls/gnutls.h.in, lib/gnutls_priority.c: further
+	deprecated the set_default_priority() functions. now implemented as
+	macros.
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_v2_compat.c: The user handshake callback function is
+	now called on SSLv2 hello messages.
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/examples/ex-client-resume.c,
+	doc/examples/ex-client-srp.c, doc/examples/ex-client-tlsia.c,
+	doc/examples/ex-client1.c, doc/examples/ex-client2.c,
+	doc/examples/ex-serv-anon.c, doc/examples/ex-serv-export.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, includes/gnutls/gnutls.h.in,
+	lib/gnutls_priority.c, src/cli.c, src/serv.c: Added
+	gnutls_set_default_priority2() and deprecated
+	gnutls_set_default_priority().
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 4	0	doc/manpages/certtool.1
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 1	0	src/cli.c 1	0	src/serv.c
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: added news entry for --disable-quick-random
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.gaa,
+	src/cli.c, src/serv.c: /dev/urandom is used now by default for key
+	generation. The option --disable-quick-random was introduced.
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-serv-export.c, doc/examples/ex-serv1.c: updated
+	some examples.
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.in: The library version is now 14 instead of 24. (14 is
+	greater than our current 13).
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/examples/ex-serv1.c, includes/gnutls/gnutls.h.in,
+	lib/gnutls_state.c, src/serv.c, src/tests.c, src/tests.h: Introduced
+	gnutls_session_enable_compatibility_mode() to allow enabling all
+	supported compatibility options (like disabling padding). Some other
+	bug fixes in tls-test.c.
+
+2007-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-client-srp.c, doc/gnutls.texi: Added some
+	documentation for the new convert functions.
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_priority.c: renamed zlib to deflate
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_algorithms.c, lib/libgnutls.vers: Updata gnutls.vers
+	since we changed our interfaces and some other fixes.
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 2	2	lib/gnutls_algorithms.c
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* includes/gnutls/gnutls.h.in, lib/gnutls_algorithms.c,
+	lib/gnutls_algorithms.h, lib/gnutls_priority.c: The text names used
+	in the gnutls_*_convert_priority functions are the names defined for
+	the algorithms in gnutls_algorithms.c.
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-alert.c, doc/examples/ex-cert-select.c,
+	doc/examples/ex-client-resume.c, doc/examples/ex-client-srp.c,
+	doc/examples/ex-client-tlsia.c, doc/examples/ex-client1.c,
+	doc/examples/ex-client2.c, doc/examples/ex-crq.c,
+	doc/examples/ex-pkcs12.c, doc/examples/ex-rfc2818.c,
+	doc/examples/ex-serv-anon.c, doc/examples/ex-serv-export.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, doc/examples/ex-session-info.c,
+	doc/examples/ex-verify.c, doc/examples/ex-x509-info.c,
+	doc/examples/tcp.c: Added copyright notices to examples
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* includes/gnutls/gnutls.h.in: corrected the prototypes
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/verify.c: replaced UNKNOWN_HASH_ALGORITHM WITH
+	UNKNOWN_ALGORITHM
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* includes/gnutls/gnutls.h.in: corrected typo.
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 1	1	lib/gnutls_record.c
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 4	0	doc/gnutls.texi
+
+2007-10-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_priority.c: Updated
+	the priority functions to be more compatible to our interface and
+	avoid parsing on every session generation. The current approach
+	stores parsed data to our integer format.CG:
+
+	-----------------------------------------------------------------------
+
+2007-10-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_int.h,
+	lib/gnutls_record.c: Added gnutls_record_disable_padding() to allow
+	servers talk to buggy clients that complain if TLS 1.0 padding is
+	used.
+
+2007-10-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_errors.c,
+	lib/gnutls_priority.c, lib/gnutls_record.c: Added new priority
+	functions that accept text instead of integers.
+
+2007-10-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* build-aux/config.rpath, lib/gnutls_buffers.c, lib/gnutls_record.c: 
+	Removed some ancient non-used functions.
+
+2007-10-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	Merge branch 'master' of
+	ssh://nmav@git.sv.gnu.org/srv/git/gnutls
+
+2007-10-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.c,
+	src/certtool.gaa: Added the --v1 option to certtool to allow
+	generating version 1 certificates.
+
+2007-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* po/de.po, po/ms.po, po/pl.po, po/sv.po: Sync with TP.
+
+2007-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/gc-camellia.m4: Add.
+
+2007-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/gc-libgcrypt.c, lgl/gc.h,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4: Update gnulib files.
+
+
+2007-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/config.rpath, build-aux/maint.mk, gl/error.c,
+	gl/error.h, gl/fseeko.c, gl/gnulib.mk, gl/inet_pton.c,
+	gl/inet_pton.h, gl/intprops.h, gl/m4/extensions.m4,
+	gl/m4/getaddrinfo.m4, gl/m4/getdelim.m4, gl/m4/getline.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/socklen.m4, gl/m4/strerror.m4,
+	gl/netinet_in.in.h, gl/netinet_in_.h, gl/progname.c, gl/progname.h,
+	gl/readline.c, gl/readline.h, gl/strerror.c, gl/version-etc-fsf.c,
+	gl/version-etc.c, gl/version-etc.h, lgl/Makefile.am,
+	lgl/alloca.in.h, lgl/alloca_.h, lgl/dummy.c, lgl/float.in.h,
+	lgl/float_.h, lgl/gc-gnulib.c, lgl/gc-libgcrypt.c, lgl/gc.h,
+	lgl/m4/extensions.m4, lgl/m4/gnulib-comp.m4, lgl/m4/lock.m4,
+	lgl/m4/longlong.m4, lgl/m4/memmem.m4, lgl/m4/socklen.m4,
+	lgl/m4/stdint.m4, lgl/m4/stdio_h.m4, lgl/m4/string_h.m4,
+	lgl/m4/strverscmp.m4, lgl/m4/ulonglong.m4, lgl/m4/vasprintf.m4,
+	lgl/printf-parse.c, lgl/realloc.c, lgl/stdbool.in.h,
+	lgl/stdbool_.h, lgl/stdint.in.h, lgl/stdint_.h, lgl/stdio.in.h,
+	lgl/stdio_.h, lgl/stdlib.in.h, lgl/stdlib_.h, lgl/string.in.h,
+	lgl/string_.h, lgl/sys_socket.in.h, lgl/sys_socket_.h,
+	lgl/sys_stat.in.h, lgl/sys_stat_.h, lgl/time.in.h, lgl/time_.h,
+	lgl/unistd.in.h, lgl/unistd_.h, lgl/vasnprintf.c, lgl/wchar.in.h,
+	lgl/wchar_.h: Update gnulib files.
+
+2007-10-22  Simon Josefsson <simon@josefsson.org>
+
+	Merge branch 'master' of ssh://git.sv.gnu.org/srv/git/gnutls
+
+2007-10-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/gnutls.texi, doc/manpages/Makefile.am,
+	includes/gnutls/gnutls.h.in, includes/gnutls/openpgp.h,
+	lib/auth_cert.c, lib/gnutls_cert.c, lib/gnutls_extra_hooks.c,
+	lib/gnutls_extra_hooks.h, lib/gnutls_state.c,
+	libextra/gnutls_extra.c, libextra/gnutls_extra.h,
+	libextra/gnutls_openpgp.c, libextra/openpgp/compat.c,
+	libextra/openpgp/extras.c, libextra/openpgp/gnutls_openpgp.h,
+	libextra/openpgp/openpgp.h, libextra/openpgp/pgp.c,
+	libextra/openpgp/pgpverify.c, libextra/openpgp/privkey.c,
+	src/common.c: Renamed openpgp_cert to openpgp_crt to be consistent
+	with x509.
+
+2007-10-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/gnutls.texi, includes/gnutls/gnutls.h.in,
+	includes/gnutls/openpgp.h, lib/auth_cert.c, lib/gnutls_cert.c,
+	lib/gnutls_extra_hooks.c, lib/gnutls_extra_hooks.h,
+	lib/gnutls_state.c, libextra/gnutls_extra.c,
+	libextra/gnutls_openpgp.c, libextra/openpgp/compat.c,
+	libextra/openpgp/extras.c, libextra/openpgp/gnutls_openpgp.h,
+	libextra/openpgp/openpgp.h, libextra/openpgp/pgp.c,
+	libextra/openpgp/pgpverify.c, libextra/openpgp/privkey.c,
+	src/common.c: Occurences of gnutls_openpgp_key were renamed to
+	gnutls_openpgp_cert, leaving an API compatibility layer.
+
+2007-10-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* includes/gnutls/gnutls.h.in, includes/gnutls/openpgp.h,
+	lib/auth_cert.c, lib/gnutls_extra_hooks.c,
+	lib/gnutls_extra_hooks.h, libextra/gnutls_extra.c,
+	libextra/gnutls_extra.h, libextra/gnutls_openpgp.c,
+	libextra/openpgp/compat.c, libextra/openpgp/extras.c,
+	libextra/openpgp/openpgp.h, libextra/openpgp/pgp.c,
+	libextra/openpgp/pgpverify.c: Renamed gnutls_openpgp_key_t to
+	gnutls_openpgp_cert_t
+
+2007-10-17  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-10-17  Simon Josefsson <simon@josefsson.org>
 
 	* lib/Makefile.am: Revert mistake removal.
