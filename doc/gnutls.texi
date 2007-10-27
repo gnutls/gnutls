@@ -2057,7 +2057,7 @@ the following subsections.
 @menu
 * Headers::
 * Version check::
-* Debugging
+* Debugging::
 * Building the source::
 @end menu
 
