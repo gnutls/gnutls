@@ -26,6 +26,10 @@
 #include "filters.h"
 
 
+/* The maximal cipher block size in octets. */
+#define MAX_CIPHER_BLKSIZE 16
+
+
 static off_t
 fp_get_length (FILE *fp)
 {
@@ -95,11 +99,11 @@ write_header (cipher_filter_t *cfx, FILE *out)
 {
   cdk_pkt_encrypted_t ed;
   cdk_packet_t pkt;
+  cdk_error_t rc;
   cdk_dek_t dek = cfx->dek;
-  byte temp[18];
+  byte temp[MAX_CIPHER_BLKSIZE+2];
   size_t blocksize;
-  int use_mdc, nprefix;
-  cdk_error_t rc = 0;
+  int use_mdc, nprefix;  
   gcry_error_t err;
   
   blocksize = gcry_cipher_get_algo_blklen (dek->algo);
@@ -415,11 +419,11 @@ finalize_mdc (gcry_md_hd_t md, const byte *buf, size_t nread)
   
 static cdk_error_t
 cipher_decode_file (void *opaque, FILE *in, FILE *out)
-{
+{  
   cipher_filter_t *cfx = opaque;
-  byte buf[BUFSIZE];
-  int nread, nreq;
   cdk_error_t rc;
+  byte buf[BUFSIZE];
+  int nread, nreq;  
 
   if (!cfx || !in || !out)
     return CDK_Inv_Value;
@@ -464,7 +468,7 @@ cipher_decode_file (void *opaque, FILE *in, FILE *out)
 static cdk_error_t
 cipher_decode (void * opaque, FILE * in, FILE * out)
 {
-  cipher_filter_t * cfx = opaque;
+  cipher_filter_t *cfx = opaque;
   cdk_error_t rc;
   
   _cdk_log_debug ("cipher filter: decode\n");
@@ -482,7 +486,7 @@ cipher_decode (void * opaque, FILE * in, FILE * out)
 static cdk_error_t
 cipher_encode (void *opaque, FILE *in, FILE *out)
 {
-  cipher_filter_t * cfx = opaque;
+  cipher_filter_t *cfx = opaque;
   cdk_error_t rc;
   
   _cdk_log_debug ("cipher filter: encode\n");

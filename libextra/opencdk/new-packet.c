@@ -25,6 +25,7 @@
 #include "packet.h"
 
 
+/* Release an array of MPI values. */
 void
 _cdk_free_mpibuf (size_t n, gcry_mpi_t *array)
 {
@@ -36,6 +37,12 @@ _cdk_free_mpibuf (size_t n, gcry_mpi_t *array)
 }
 
 
+/**
+ * cdk_pkt_new:
+ * @r_pkt: the new packet
+ * 
+ * Allocate a new packet.
+ **/
 cdk_error_t
 cdk_pkt_new (cdk_packet_t *r_pkt)
 {
@@ -70,11 +77,7 @@ free_pubkey_enc (cdk_pkt_pubkey_enc_t enc)
     return;
   
   nenc = cdk_pk_get_nenc (enc->pubkey_algo);
-  while (nenc--) 
-    {
-      gcry_mpi_release (enc->mpi[nenc]);
-      enc->mpi[nenc] = NULL;
-    }
+  _cdk_free_mpibuf (nenc, enc->mpi);
   cdk_free (enc);
 }
 
@@ -114,11 +117,8 @@ _cdk_free_signature (cdk_pkt_signature_t sig)
     return;
   
   nsig = cdk_pk_get_nsig (sig->pubkey_algo);
-  while (nsig--) 
-    {      
-      gcry_mpi_release (sig->mpi[nsig]);
-      sig->mpi[nsig] = NULL;
-    }
+  _cdk_free_mpibuf (nsig, sig->mpi);
+
   cdk_subpkt_free (sig->hashed);
   sig->hashed = NULL;
   cdk_subpkt_free (sig->unhashed);
@@ -146,11 +146,7 @@ cdk_pk_release (cdk_pubkey_t pk)
   pk->uid = NULL;
   cdk_free (pk->prefs);
   pk->prefs = NULL;
-  while (npkey--) 
-    {
-      gcry_mpi_release (pk->mpi[npkey]);
-      pk->mpi[npkey] = NULL; 
-    }
+  _cdk_free_mpibuf (npkey, pk->mpi);
   cdk_free (pk);
 }
 
@@ -164,8 +160,7 @@ cdk_sk_release (cdk_seckey_t sk)
     return;
   
   nskey = cdk_pk_get_nskey (sk->pubkey_algo);
-  while (nskey--)
-    gcry_mpi_release (sk->mpi[nskey]);
+  _cdk_free_mpibuf (nskey, sk->mpi);
   cdk_free (sk->encdata);
   sk->encdata = NULL;
   cdk_pk_release (sk->pk);
@@ -248,6 +243,7 @@ cdk_pkt_free (cdk_packet_t pkt)
     case CDK_PKT_COMPRESSED   : cdk_free (pkt->pkt.compressed); break;
     default                   : break;
     }
+  
   /* Reset the packet type to avoid, when cdk_pkt_release() will be
      used, that the second cdk_pkt_free() call will double free the data. */
   pkt->pkttype = 0;

@@ -23,12 +23,12 @@
 #include <gcrypt.h>
 
 /* The OpenCDK version as a string. */
-#define OPENCDK_VERSION "0.6.4"
+#define OPENCDK_VERSION "0.6.5"
 
 /* The OpenCDK version as integer components major.minor.path */
 #define OPENCDK_VERSION_MAJOR 0
 #define OPENCDK_VERSION_MINOR 6
-#define OPENCDK_VERSION_PATCH 4
+#define OPENCDK_VERSION_PATCH 5
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,7 +149,8 @@ enum cdk_control_flags {
 enum cdk_log_level_t {
     CDK_LOG_NONE  = 0, /* No log message will be shown. */
     CDK_LOG_INFO  = 1,
-    CDK_LOG_DEBUG = 2
+    CDK_LOG_DEBUG = 2,
+    CDK_LOG_DEBUG_PKT = 3
 };
 
 
@@ -195,8 +196,7 @@ enum cdk_cipher_algo_t {
     CDK_CIPHER_AES         = 7,
     CDK_CIPHER_AES192      = 8,
     CDK_CIPHER_AES256      = 9,
-    CDK_CIPHER_TWOFISH     = 10,
-    CDK_CIPHER_CAMELLIA256 = 11 /* experimental use only, upcoming 2440bis */
+    CDK_CIPHER_TWOFISH     = 10
 };
 
 

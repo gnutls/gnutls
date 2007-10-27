@@ -102,14 +102,15 @@ cdk_dek_encode_pkcs1 (cdk_dek_t dek, size_t nbits, gcry_mpi_t *r_enc)
   gcry_error_t err;
   byte *p, *frame;
   size_t n;
-  size_t nframe = 0;
+  size_t nframe;
   size_t i;
-  u16 chksum = 0;
+  u16 chksum;
   
   if (!r_enc || !dek)
     return CDK_Inv_Value;
   
   *r_enc = NULL;
+  chksum = 0;
   for (i = 0; i < dek->keylen; i++)
     chksum += dek->key[i];
   nframe = (nbits + 7) / 8;
@@ -157,8 +158,7 @@ cdk_dek_encode_pkcs1 (cdk_dek_t dek, size_t nbits, gcry_mpi_t *r_enc)
   cdk_free (frame);
   if (err)
     return map_gcry_error (err);
-  else
-    *r_enc = a;
+  *r_enc = a;
   return 0;
 }
 
@@ -177,7 +177,7 @@ cdk_dek_decode_pkcs1 (cdk_dek_t *ret_dek, gcry_mpi_t esk)
   cdk_dek_t dek;
   byte frame[MAX_MPI_BYTES+2+1];
   size_t nframe, n;
-  u16 csum = 0, csum2 = 0;
+  u16 csum, csum2;
   gcry_error_t err;
   
   if (!ret_dek || !esk)
@@ -216,13 +216,14 @@ cdk_dek_decode_pkcs1 (cdk_dek_t *ret_dek, gcry_mpi_t esk)
   dek->algo = frame[n++];
   if (dek->keylen != gcry_cipher_get_algo_keylen (dek->algo))
     {
-      _cdk_log_debug ("pkcs1 decode: invalid cipher keylen\n");
+      _cdk_log_debug ("pkcs1 decode: invalid cipher keylen %d\n", dek->keylen);
       cdk_free (dek);
       return CDK_Inv_Algo;
     }
   csum =  frame[nframe-2] << 8;
   csum |= frame[nframe-1];
   memcpy (dek->key, frame + n, dek->keylen);
+  csum2 = 0;
   for (n = 0; n < dek->keylen; n++)
     csum2 += dek->key[n];
   if (csum != csum2)
@@ -242,7 +243,7 @@ _cdk_digest_encode_pkcs1 (byte **r_md, size_t *r_mdlen, int pk_algo,
 			  const byte *md, int digest_algo, unsigned nbits)
 {
   gcry_error_t err;
-  int dlen;
+  size_t dlen;
 
   if (!md || !r_md || !r_mdlen)
     return CDK_Inv_Value;
@@ -250,7 +251,7 @@ _cdk_digest_encode_pkcs1 (byte **r_md, size_t *r_mdlen, int pk_algo,
   dlen = gcry_md_get_algo_dlen (digest_algo);
   if (!dlen)
     return CDK_Inv_Algo;
-  if (is_DSA (pk_algo)) 
+  if (is_DSA (pk_algo)) /* DSS does not use a special encoding. */
     {
       *r_md = cdk_malloc (dlen + 1);
       if (!*r_md)
@@ -286,6 +287,8 @@ _cdk_digest_encode_pkcs1 (byte **r_md, size_t *r_mdlen, int pk_algo,
 }
 
 
+/* FIXME: The prompt should be provided in a more generic way.
+   Like: (keyid, algorithm, [user-id]) */
 static char*
 passphrase_prompt (cdk_pkt_seckey_t sk)
 {

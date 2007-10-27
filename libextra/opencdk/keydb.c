@@ -45,12 +45,14 @@ typedef struct key_idx_s *key_idx_t;
 
 
 /* Internal handle for the search operation. */
-struct cdk_dbsearch_s  {
-  union {
-    char *pattern;
-    u32 keyid[2];
-    byte fpr[KEY_FPR_LEN];
-  } u;
+struct cdk_dbsearch_s  
+{
+  union 
+    {    
+      char *pattern; /* A search is performed by pattern. */
+      u32 keyid[2];  /* A search by keyid. */
+      byte fpr[KEY_FPR_LEN]; /* A search by fingerprint. */
+    } u;
   int type;
 };
 typedef struct cdk_dbsearch_s *cdk_dbsearch_t;
@@ -58,7 +60,7 @@ typedef struct cdk_dbsearch_s *cdk_dbsearch_t;
 /* Internal key cache to associate a key with an file offset. */
 struct key_table_s 
 {
-  struct key_table_s * next;
+  struct key_table_s *next;
   off_t offset;
   cdk_dbsearch_t desc;
 };
@@ -67,19 +69,24 @@ typedef struct key_table_s *key_table_t;
 /* Internal key database handle. */
 struct cdk_keydb_hd_s 
 {
-  int type;
-  int buf_ref; /* 1=means it is a reference and shall not be closed. */
-  cdk_stream_t buf;
+  int type;   /* type of the key db handle. */
+  int fp_ref; /* 1=means it is a reference and shall not be closed. */
+  cdk_stream_t fp;
   cdk_stream_t idx;
   cdk_dbsearch_t dbs;
-  char *name;
-  char *idx_name;
+  char *name;            /* name of the underlying file or NULL. */
+  char *idx_name;        /* name of the index file or NULL. */
   struct key_table_s *cache;
   size_t ncache;
-  unsigned int secret:1;
-  unsigned int isopen:1;
-  unsigned int no_cache:1;
-  unsigned int search:1;
+  unsigned int secret:1;   /* contain secret keys. */
+  unsigned int isopen:1;   /* the underlying stream is opened. */
+  unsigned int no_cache:1; /* disable the index cache. */
+  unsigned int search:1;   /* handle is in search mode. */
+  
+  /* structure to store some stats about the keydb. */
+  struct {
+    size_t new_keys; /* amount of new keys that were imported. */
+  } stats;
 };
 
 
@@ -141,7 +148,10 @@ keydb_idx_build (const char *file)
   rc = cdk_stream_create (idx_name, &out);
   cdk_free (idx_name);
   if (rc)
-    goto leave;
+    {
+      cdk_stream_close (inp);
+      return rc;
+    }
 
   cdk_pkt_new (&pkt);
   while (!cdk_stream_eof (inp)) 
@@ -170,7 +180,6 @@ keydb_idx_build (const char *file)
   
   cdk_pkt_release (pkt);
   
-  leave:
   cdk_stream_close (out);
   cdk_stream_close (inp);
   return rc;
@@ -305,14 +314,14 @@ cdk_keydb_new_from_mem (cdk_keydb_hd_t *r_db, int secret,
     return CDK_Inv_Value;
   *r_db = NULL;
   db = calloc (1, sizeof *db);
-  rc = cdk_stream_tmp_from_mem (data, datlen, &db->buf);
-  if (!db->buf)
+  rc = cdk_stream_tmp_from_mem (data, datlen, &db->fp);
+  if (!db->fp)
     {      
       cdk_free (db);
       return rc;
     }
-  if (cdk_armor_filter_use (db->buf))
-    cdk_stream_set_armor_flag (db->buf, 0);
+  if (cdk_armor_filter_use (db->fp))
+    cdk_stream_set_armor_flag (db->fp, 0);
   db->type = CDK_DBTYPE_DATA;
   db->secret = secret;
   *r_db = db;
@@ -341,8 +350,8 @@ cdk_keydb_new_from_stream (cdk_keydb_hd_t *r_hd, int secret,
   *r_hd = NULL;
   
   hd = calloc (1, sizeof *hd);
-  hd->buf = in;
-  hd->buf_ref = 1;
+  hd->fp = in;
+  hd->fp_ref = 1;
   hd->type = CDK_DBTYPE_STREAM;
   hd->secret = secret;
   *r_hd = hd;
@@ -427,10 +436,10 @@ cdk_keydb_free (cdk_keydb_hd_t hd)
       hd->name = NULL;
     }
   
-  if (hd->buf && !hd->buf_ref)
+  if (hd->fp && !hd->fp_ref)
     {
-      cdk_stream_close (hd->buf);
-      hd->buf = NULL;
+      cdk_stream_close (hd->fp);
+      hd->fp = NULL;
     }
   
   if (hd->idx)
@@ -460,25 +469,25 @@ _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t *ret_kr)
   
   rc = 0;
   if ((hd->type == CDK_DBTYPE_DATA || hd->type == CDK_DBTYPE_STREAM) 
-      && hd->buf)
-    cdk_stream_seek (hd->buf, 0);
+      && hd->fp)
+    cdk_stream_seek (hd->fp, 0);
   else if (hd->type == CDK_DBTYPE_PK_KEYRING ||
 	   hd->type == CDK_DBTYPE_SK_KEYRING)
     {
       if (!hd->isopen && hd->name)
 	{
-	  rc = cdk_stream_open (hd->name, &hd->buf);
+	  rc = cdk_stream_open (hd->name, &hd->fp);
 	  if (rc)
 	    goto leave;
-	  if (cdk_armor_filter_use (hd->buf))
-	    cdk_stream_set_armor_flag (hd->buf, 0);
+	  if (cdk_armor_filter_use (hd->fp))
+	    cdk_stream_set_armor_flag (hd->fp, 0);
 	  hd->isopen = 1;
 	  /* We disable the index cache for smaller keyrings. */
-	  if (cdk_stream_get_length (hd->buf) < 524288)
+	  if (cdk_stream_get_length (hd->fp) < 524288)
 	    {
 	      hd->no_cache = 1;
 	      goto leave;
-	    }	  
+	    }
 	  cdk_free (hd->idx_name);	  
 	  hd->idx_name = keydb_idx_mkname (hd->name);
 	  if (!hd->idx_name)
@@ -512,7 +521,7 @@ _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t *ret_kr)
 	     this mode is an enumeration and no seeking is needed. */
 	  if (!hd->search ||
 	      (hd->search && hd->dbs->type != CDK_DBSEARCH_NEXT))
-	    cdk_stream_seek (hd->buf, 0);
+	    cdk_stream_seek (hd->fp, 0);
         }
     }
   else
@@ -521,10 +530,10 @@ _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t *ret_kr)
   leave:
   if (rc) 
     {
-      cdk_stream_close (hd->buf);
-      hd->buf = NULL;
+      cdk_stream_close (hd->fp);
+      hd->fp = NULL;
     }
-  *ret_kr = hd->buf;
+  *ret_kr = hd->fp;
   return rc;
 }
 
@@ -555,7 +564,8 @@ find_by_keyid (cdk_kbnode_t knode, cdk_dbsearch_t ks)
 		return 1;
 	      break;
 	      
-	    default: /* Invalid mode */
+	    default:
+	      _cdk_log_debug ("find_by_keyid: invalid mode = %d\n", ks->type);
 	      return 0;
             }
         }
@@ -639,7 +649,7 @@ keydb_search_free (cdk_dbsearch_t dbs)
     return;
   if (dbs->type == CDK_DBSEARCH_EXACT || 
       dbs->type == CDK_DBSEARCH_SUBSTR)
-    cdk_free( dbs->u.pattern );
+    cdk_free (dbs->u.pattern);
   dbs->type = 0;
   cdk_free (dbs);    
 }
@@ -793,7 +803,7 @@ cdk_keydb_search_start (cdk_keydb_hd_t db, int type, void *desc)
       dbs->u.pattern = cdk_strdup (desc);
       if (!dbs->u.pattern)
 	{
-	  cdk_free( dbs );
+	  cdk_free (dbs);
 	  return CDK_Out_Of_Core;
 	}
       break;
@@ -837,12 +847,12 @@ cdk_keydb_search_start (cdk_keydb_hd_t db, int type, void *desc)
 	  p = desc;
 	  if (!strncmp (p, "0x", 2))
 	    p += 2;
-	  if (strlen (p) == 8 ) 
+	  if (strlen (p) == 8)
 	    {
 	      dbs->u.keyid[0] = 0;
 	      dbs->u.keyid[1] = strtoul (p, NULL, 16);
 	    }
-	  else if (strlen (p) == 16 ) 
+	  else if (strlen (p) == 16)
 	    {
 	      dbs->u.keyid[0] = strtoul (p    , NULL, 16);
 	      dbs->u.keyid[1] = strtoul (p + 8, NULL, 16);
@@ -874,6 +884,7 @@ cdk_keydb_search_start (cdk_keydb_hd_t db, int type, void *desc)
       
     default:
       cdk_free (dbs);
+      _cdk_log_debug ("cdk_keydb_search_start: invalid mode = %d\n", type);
       return CDK_Inv_Mode;
     }
   
@@ -943,18 +954,19 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
 cdk_error_t
 cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
 {
-  cdk_stream_t kr = NULL;
-  cdk_kbnode_t knode = NULL;
+  cdk_stream_t kr;
+  cdk_kbnode_t knode;
   cdk_dbsearch_t ks;
-  off_t pos = 0, off = 0;
-  int key_found = 0, cache_hit = 0;
   cdk_error_t rc = 0;
+  off_t pos = 0, off = 0;
+  int key_found = 0, cache_hit = 0;  
   
   if (!hd || !ret_key)
     return CDK_Inv_Value;
   
   *ret_key = NULL;
-  hd->search = 1;
+  kr = NULL;
+  hd->search = 1;  
   rc = _cdk_keydb_open (hd, &kr);
   if (rc)
     return rc;
@@ -969,6 +981,7 @@ cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
 	cache_hit = 0;
     }
   
+  knode = NULL;
   ks = hd->dbs;
   while (!key_found && !rc)
     {
@@ -1076,11 +1089,14 @@ static int
 keydb_check_key (cdk_packet_t pkt)
 {
   cdk_pkt_pubkey_t pk;
-  int is_sk = 0, valid = 0;
+  int is_sk, valid;
   
   if (pkt->pkttype == CDK_PKT_PUBLIC_KEY ||
       pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY)
-    pk = pkt->pkt.public_key;
+    {      
+      pk = pkt->pkt.public_key;
+      is_sk = 0;
+    }  
   else if (pkt->pkttype == CDK_PKT_SECRET_KEY ||
 	   pkt->pkttype == CDK_PKT_SECRET_SUBKEY)
     {
@@ -1118,7 +1134,7 @@ kbnode_find_valid (cdk_kbnode_t root, int pkttype)
 static cdk_kbnode_t
 keydb_find_byusage (cdk_kbnode_t root, int req_usage, int is_pk)
 {
-  cdk_kbnode_t node, key = NULL;
+  cdk_kbnode_t node, key;
   int req_type;
   long timestamp;
   
@@ -1129,7 +1145,8 @@ keydb_find_byusage (cdk_kbnode_t root, int req_usage, int is_pk)
   node = cdk_kbnode_find (root, req_type);
   if (node && !keydb_check_key (node->pkt))
     return NULL;
-
+  
+  key = NULL;
   timestamp = 0;
   /* We iteratre over the all nodes and search for keys or
      subkeys which match the usage and which are not invalid.
@@ -1171,7 +1188,7 @@ keydb_find_bykeyid (cdk_kbnode_t root, const u32 *keyid, int search_mode)
       if (search_mode == CDK_DBSEARCH_SHORT_KEYID &&
 	  kid[1] == keyid[1])
 	return node;
-      if (kid[0] == keyid[0] && kid[1] == keyid[1])
+      else if (kid[0] == keyid[0] && kid[1] == keyid[1])
 	return node;
     }
   return NULL;
@@ -1183,7 +1200,7 @@ _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char *name,
                            cdk_seckey_t* ret_sk, int usage)
 {
   cdk_kbnode_t knode = NULL;
-  cdk_kbnode_t node, sk_node;
+  cdk_kbnode_t node, sk_node, pk_node;
   cdk_pkt_seckey_t sk;
   cdk_error_t rc;
   const char *s;
@@ -1227,12 +1244,20 @@ _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char *name,
             }
 	}
     }
-  
-  node = find_selfsig_node (knode, sk->pk);
+
+  /* To find the self signature, we need the primary public key because
+     the selected secret key might be different from the primary key. */
+  pk_node = cdk_kbnode_find (knode, CDK_PKT_SECRET_KEY);
+  if (!pk_node)
+    {
+      cdk_kbnode_release (knode);
+      return CDK_Unusable_Key;
+    }    
+  node = find_selfsig_node (knode, pk_node->pkt->pkt.secret_key->pk);
   if (sk->pk->uid && node)
     _cdk_copy_signature (&sk->pk->uid->selfsig, node->pkt->pkt.signature);
 
-  /* We release the outer packet. */
+  /* We only release the outer packet. */
   _cdk_pkt_detach_free (sk_node->pkt, &pkttype, (void*)&sk);
   cdk_kbnode_release (knode);
   *ret_sk = sk;
@@ -1244,8 +1269,8 @@ cdk_error_t
 _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
                            cdk_pubkey_t *ret_pk, int usage)
 {
-  cdk_kbnode_t knode, node = NULL;
-  cdk_pkt_pubkey_t pk = NULL;
+  cdk_kbnode_t knode, node, pk_node;
+  cdk_pkt_pubkey_t pk;
   const char *s;
   cdk_error_t rc;
 
@@ -1268,6 +1293,7 @@ _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
       return CDK_Unusable_Key;
     } 
   
+  pk = NULL;
   _cdk_copy_pubkey (&pk, node->pkt->pkt.public_key);
   for (node = knode; node; node = node->next) 
     {
@@ -1282,7 +1308,15 @@ _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
 	}
     }
   
-  node = find_selfsig_node (knode, pk);
+  /* Same as in the sk code, the selected key can be a sub key 
+     and thus we need the primary key to find the self sig. */
+  pk_node = cdk_kbnode_find (knode, CDK_PKT_PUBLIC_KEY);
+  if (!pk_node)
+    {
+      cdk_kbnode_release (knode);
+      return CDK_Unusable_Key;
+    }
+  node = find_selfsig_node (knode, pk_node->pkt->pkt.public_key);
   if (pk->uid && node)
     _cdk_copy_signature (&pk->uid->selfsig, node->pkt->pkt.signature);
   cdk_kbnode_release (knode);
@@ -1292,6 +1326,15 @@ _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
 }
 
 
+/**
+ * cdk_keydb_get_pk:
+ * @hd: key db handle
+ * @keyid: keyid of the key
+ * @r_pk: the allocated public key
+ * 
+ * Perform a key database search by keyid and return the raw public
+ * key without any signatures or user id's.
+ **/
 cdk_error_t
 cdk_keydb_get_pk (cdk_keydb_hd_t hd, u32 *keyid, cdk_pubkey_t *r_pk)
 {
@@ -1332,6 +1375,16 @@ cdk_keydb_get_pk (cdk_keydb_hd_t hd, u32 *keyid, cdk_pubkey_t *r_pk)
 }
 
 
+/**
+ * cdk_keydb_get_sk:
+ * @hd: key db handle
+ * @keyid: the keyid of the key
+ * @ret_sk: the allocated secret key
+ * 
+ * Perform a key database search by keyid and return
+ * only the raw secret key without the additional nodes,
+ * like the user id or the signatures.
+ **/
 cdk_error_t
 cdk_keydb_get_sk (cdk_keydb_hd_t hd, u32 *keyid, cdk_seckey_t *ret_sk)
 {
@@ -1376,27 +1429,37 @@ is_selfsig (cdk_kbnode_t node, const u32 *keyid)
   if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
     return 0;
   sig = node->pkt->pkt.signature;
-  if ((sig->sig_class == 0x13 || sig->sig_class == 0x10) &&
+  if ((sig->sig_class >= 0x10 && sig->sig_class <= 0x13) &&
       sig->keyid[0] == keyid[0] && sig->keyid[1] == keyid[1])
     return 1;
+  
   return 0;
 }
 
 
+/* Find the newest self signature for the public key @pk
+   and return the signature node. */
 static cdk_kbnode_t
 find_selfsig_node (cdk_kbnode_t key, cdk_pkt_pubkey_t pk)
 {
-  cdk_kbnode_t n;
+  cdk_kbnode_t n, sig;
+  unsigned int ts;
   u32 keyid[2];
   
   cdk_pk_get_keyid (pk, keyid);
+  sig = NULL;
+  ts = 0;
   for (n = key; n; n = n->next)
     {
-      if (is_selfsig (n, keyid))
-	break;
+      if (is_selfsig (n, keyid) &&
+	  n->pkt->pkt.signature->timestamp > ts)
+	{
+	  ts = n->pkt->pkt.signature->timestamp;
+	  sig = n;
+	}
     }
   
-  return n;
+  return sig;
 }
 
 
@@ -1686,18 +1749,20 @@ cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
   cdk_packet_t pkt;
   cdk_kbnode_t knode, node;
   cdk_desig_revoker_t revkeys;
+  cdk_error_t rc;
   u32 keyid[2], main_keyid[2];
   off_t old_off;
-  int key_seen = 0, got_key = 0;
-  cdk_error_t rc;
+  int key_seen, got_key;  
   
   if (!inp || !r_knode)
     return CDK_Inv_Value;
   
+  /* Reset all values. */
   keyid[0] = keyid[1] = 0;
   main_keyid[0] = main_keyid[1] = 0;
   revkeys = NULL;  
   knode = NULL;
+  key_seen = got_key = 0;
   
   *r_knode = NULL;
   rc = CDK_EOF;
@@ -1797,6 +1862,8 @@ cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
 }
 
 
+/* Return the type of the given data. In case it cannot be classified,
+   a substring search will be performed. */
 static int
 classify_data (const byte *buf, size_t len)
 {
@@ -1809,6 +1876,7 @@ classify_data (const byte *buf, size_t len)
       len -= 2;
     }
   
+  /* The length of the data does not match either a keyid or a fingerprint. */
   if (len != 8 && len != 16 && len != 40)
     return CDK_DBSEARCH_SUBSTR;
   
@@ -1831,13 +1899,23 @@ classify_data (const byte *buf, size_t len)
 }
 
 
+/**
+ * cdk_keydb_export:
+ * hd: the keydb handle
+ * @out: the output stream
+ * @remusr: the list of key pattern to export
+ * 
+ * Export a list of keys to the given output stream.
+ * Use string list with names for pattering searching.
+ * This procedure strips local signatures.
+ **/
 cdk_error_t
 cdk_keydb_export (cdk_keydb_hd_t hd, cdk_stream_t out, cdk_strlist_t remusr)
 {
   cdk_kbnode_t knode, node;
   cdk_strlist_t r;
-  int old_ctb = 0;
   cdk_error_t rc;
+  int old_ctb;
   
   for (r = remusr; r; r = r->next)
     {
@@ -1847,6 +1925,17 @@ cdk_keydb_export (cdk_keydb_hd_t hd, cdk_stream_t out, cdk_strlist_t remusr)
       rc = cdk_keydb_search (hd, &knode);
       if (rc)
 	return rc;
+      node = cdk_kbnode_find (knode, CDK_PKT_PUBLIC_KEY);
+      if (!node)
+	return CDK_Error_No_Key;
+      
+      /* If the key is a version 3 key, use the old packet
+         format for the output. */
+      if (node->pkt->pkt.public_key->version == 3)
+	old_ctb = 1;
+      else
+	old_ctb = 0;
+      
       for (node = knode; node; node = node->next) 
 	{
 	  /* No specified format; skip them */
@@ -1860,9 +1949,8 @@ cdk_keydb_export (cdk_keydb_hd_t hd, cdk_stream_t out, cdk_strlist_t remusr)
 	  if (node->pkt->pkttype == CDK_PKT_SIGNATURE &&
 	      !KEY_CAN_SIGN (node->pkt->pkt.signature->pubkey_algo))
 	    continue;
-	  if (node->pkt->pkttype == CDK_PKT_PUBLIC_KEY
-	      && node->pkt->pkt.public_key->version == 3)
-	    old_ctb = 1;
+
+	  /* Adjust the ctb flag if needed. */
 	  node->pkt->old_ctb = old_ctb;
 	  rc = cdk_pkt_write (out, node->pkt);
 	  if (rc)
@@ -1894,26 +1982,47 @@ find_key_packet (cdk_kbnode_t knode, int *r_is_sk)
 }
 
 
+/* Return 1 if the is allowd in a key node. */
+static int
+is_key_node (cdk_kbnode_t node)
+{
+  switch (node->pkt->pkttype)
+    {
+    case CDK_PKT_SIGNATURE:
+    case CDK_PKT_SECRET_KEY:
+    case CDK_PKT_PUBLIC_KEY:
+    case CDK_PKT_SECRET_SUBKEY:
+    case CDK_PKT_PUBLIC_SUBKEY:
+    case CDK_PKT_USER_ID:
+    case CDK_PKT_ATTRIBUTE:
+      return 1;
+      
+    default:
+      return 0;
+    }
+  
+  return 0;
+}
+
+
 cdk_error_t
 cdk_keydb_import (cdk_keydb_hd_t hd, cdk_kbnode_t knode)
 {
-  cdk_kbnode_t node, chk = NULL;
+  cdk_kbnode_t node, chk;
   cdk_packet_t pkt;
-  cdk_stream_t out;
-  u32 keyid[2];
-  int is_sk = 0;
+  cdk_stream_t out;  
   cdk_error_t rc;
+  u32 keyid[2];
   
-  /* FIXME: as a feedback we might have an additional function
-     like cdk_keydb_get_import_stats () */
   if (!hd || !knode)
     return CDK_Inv_Value;
   
-  pkt = find_key_packet (knode, &is_sk);
+  pkt = find_key_packet (knode, NULL);
   if (!pkt)
     return CDK_Inv_Packet;
   
   _cdk_pkt_get_keyid (pkt, keyid);
+  chk = NULL;
   cdk_keydb_get_bykeyid (hd, keyid, &chk);
   if (chk)
     { /* FIXME: search for new signatures */
@@ -1921,10 +2030,12 @@ cdk_keydb_import (cdk_keydb_hd_t hd, cdk_kbnode_t knode)
       return 0;
     }
   
-  if (hd->buf)
+  /* We append data to the stream so we need to close
+     the stream here to re-open it later. */
+  if (hd->fp)
     {
-      cdk_stream_close (hd->buf);
-      hd->buf = NULL;
+      cdk_stream_close (hd->fp);
+      hd->fp = NULL;
     }
   
   rc = _cdk_stream_append (hd->name, &out);
@@ -1938,9 +2049,17 @@ cdk_keydb_import (cdk_keydb_hd_t hd, cdk_kbnode_t knode)
       if (node->pkt->pkttype == CDK_PKT_SIGNATURE &&
 	  !node->pkt->pkt.signature->flags.exportable)
 	{
-	  _cdk_log_debug ("Key import: skip local signature\n");
+	  _cdk_log_debug ("key db import: skip local signature\n");
 	  continue;
 	}
+      
+      if (!is_key_node (node))
+	{
+	  _cdk_log_debug ("key db import: skip invalid node of type %d\n",
+			  node->pkt->pkttype);
+	  continue;
+	}
+      
       rc = cdk_pkt_write (out, node->pkt);
       if (rc)
 	{
@@ -1952,16 +2071,18 @@ cdk_keydb_import (cdk_keydb_hd_t hd, cdk_kbnode_t knode)
   cdk_stream_close (out);
   if (!hd->no_cache)
     cdk_keydb_idx_rebuild (hd);
+  hd->stats.new_keys++;
+  
   return 0;
 }
 
 
 cdk_error_t
-_cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid, const char *id)
+_cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 *keyid, const char *id)
 {
-  cdk_kbnode_t knode = NULL, unode = NULL;
-  int check = 0;
+  cdk_kbnode_t knode = NULL, unode = NULL; 
   cdk_error_t rc;
+  int check;
     
   if (!hd)
     return CDK_Inv_Value;
@@ -1982,6 +2103,7 @@ _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid, const char *id)
       return rc;
     }
  
+  check = 0;
   cdk_keydb_search_start (hd, CDK_DBSEARCH_KEYID, keyid);
   if (unode && find_by_keyid (unode, hd->dbs))
     check++;
@@ -1996,13 +2118,21 @@ _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid, const char *id)
 }
 
 
+/**
+ * cdk_keydb_check_sk:
+ * @hd: the key db handle
+ * @keyid: the 64-bit keyid
+ * 
+ * Check if a secret key with the given key ID is available
+ * in the key database.
+ **/
 cdk_error_t
 cdk_keydb_check_sk (cdk_keydb_hd_t hd, u32 *keyid)
 {
   cdk_stream_t db;
-  cdk_packet_t pkt;
-  u32 kid[2];
+  cdk_packet_t pkt;  
   cdk_error_t rc;
+  u32 kid[2];
   
   if (!hd || !keyid)
     return CDK_Inv_Value;
@@ -2120,8 +2250,8 @@ cdk_listkey_next (cdk_listkey_t ctx, cdk_kbnode_t *ret_key)
   if (!ctx->init)
     return CDK_Inv_Mode;
   
-  if (ctx->type && ctx->u.patt[0] == '*' )
-    return cdk_keydb_get_keyblock( ctx->inp, ret_key );
+  if (ctx->type && ctx->u.patt[0] == '*')
+    return cdk_keydb_get_keyblock (ctx->inp, ret_key);
   else if (ctx->type)
     {
       cdk_kbnode_t node;
@@ -2157,6 +2287,7 @@ cdk_listkey_next (cdk_listkey_t ctx, cdk_kbnode_t *ret_key)
     }
   return CDK_General_Error;
 }
+
 
 int
 _cdk_keydb_is_secret (cdk_keydb_hd_t db)
