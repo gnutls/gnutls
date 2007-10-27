@@ -95,7 +95,6 @@ option (outder) { $outcert_format=1 } "Use DER format for output certificates an
 option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key generation."
 
 #int quick_random;
-option (quick-random) { $quick_random = 1; } "Use /dev/urandom for all operation, reducing the quality of randomness used."
 option (disable-quick-random) { $quick_random = 0; } "Use /dev/random for key generationg, thus increasing the quality of randomness used."
 
 #char *outfile;

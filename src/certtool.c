@@ -136,7 +136,7 @@ generate_private_key_int (void)
   if (info.quick_random == 0)
     fprintf (stderr,
 	     "This might take several minutes depending on availability of randomness"
-	     " in /dev/random. You can consider using --quick-random option but this reduces the quality of randomness used.\n");
+	     " in /dev/random.\n");
 
   ret = gnutls_x509_privkey_generate (key, key_type, info.bits, 0);
   if (ret < 0)

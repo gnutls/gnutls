@@ -8,13 +8,13 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 111 "certtool.gaa"
+#line 110 "certtool.gaa"
 	int debug;
-#line 107 "certtool.gaa"
+#line 106 "certtool.gaa"
 	char *template;
-#line 104 "certtool.gaa"
+#line 103 "certtool.gaa"
 	char *infile;
-#line 101 "certtool.gaa"
+#line 100 "certtool.gaa"
 	char *outfile;
 #line 97 "certtool.gaa"
 	int quick_random;
