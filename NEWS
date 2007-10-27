@@ -28,6 +28,8 @@ the format. This makes the interface consistent with the x509 functions.
 
 ** Internal copy of OpenCDK upgraded to version 0.6.5.
 
+** Update gnulib files.
+
 ** API and ABI modifications:
 gnutls_certificate_set_openpgp_key_mem: MODIFIED
 gnutls_certificate_set_openpgp_key_file: MODIFIED
