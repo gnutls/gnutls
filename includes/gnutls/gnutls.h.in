@@ -541,9 +541,14 @@ extern "C"
                                                           
 /* if you just want some defaults, use the following.
  */
-  void gnutls_set_default_priority2 (gnutls_session_t session, gnutls_priority_flag_t flag);
-  #define gnutls_set_default_priority(x) gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_SECURITY_NORMAL)
-  #define gnutls_set_default_export_priority(x) gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_EXPORT)
+  void gnutls_set_default_priority2 (gnutls_session_t session,
+				     gnutls_priority_flag_t flag);
+#define gnutls_set_default_priority(x)					\
+  (gnutls_set_default_priority2 (x, GNUTLS_PRIORITIES_SECURITY_NORMAL), \
+   GNUTLS_E_SUCCESS)
+#define gnutls_set_default_export_priority(x)				\
+  (gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_EXPORT),		\
+   GNUTLS_E_SUCCESS)
 
 /* Returns the name of a cipher suite */
   const char *gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t
