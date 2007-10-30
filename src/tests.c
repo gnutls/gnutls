@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004, 2006, 2007 Free Software Foundation
- * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
  *

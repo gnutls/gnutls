@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004, 2006, 2007 Free Software Foundation
  * Copyright (C) 2001,2002 Paul Sheer
- * Portions Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ * Portions Copyright (C) 2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* This server is heavily modified for GNUTLS by Nikos Mavroyanopoulos
+/* This server is heavily modified for GNUTLS by Nikos Mavrogiannopoulos
  * (which means it is quite unreadable)
  */
 
@@ -1509,7 +1509,7 @@ wrap_db_delete (void *dbf, gnutls_datum_t key)
 void
 print_serv_license (void)
 {
-  fputs ("\nCopyright (C) 2001-2003 Paul Sheer, Nikos Mavroyanopoulos\n"
+  fputs ("\nCopyright (C) 2001-2003 Paul Sheer, Nikos Mavrogiannopoulos\n"
 	 "\nCopyright (C) 2004 Free Software Foundation\n"
 	 "This program is free software; you can redistribute it and/or modify \n"
 	 "it under the terms of the GNU General Public License as published by \n"

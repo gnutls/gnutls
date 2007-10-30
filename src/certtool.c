@@ -2310,6 +2310,6 @@ void
 certtool_version (void)
 {
   version_etc (stdout, program_name, PACKAGE_STRING,
-	       gnutls_check_version (NULL), "Nikos Mavroyanopoulos",
+	       gnutls_check_version (NULL), "Nikos Mavrogiannopoulos",
 	       "Simon Josefsson", (char *) NULL);
 }

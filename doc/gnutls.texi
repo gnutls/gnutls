@@ -51,7 +51,7 @@ Documentation License''.
 @subtitle for version @value{VERSION}, @value{UPDATED}
 @sp 7
 @image{gnutls-logo,6cm,6cm}
-@author Nikos Mavroyanopoulos
+@author Nikos Mavrogiannopoulos
 @author Simon Josefsson (@email{bug-gnutls@@gnu.org})
 @page
 @vskip 0pt plus 1filll

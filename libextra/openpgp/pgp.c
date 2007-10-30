@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
  *
- * Author: Timo Schulz, Nikos Mavroyanopoulos
+ * Author: Timo Schulz, Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS-EXTRA.
  *
