@@ -20,7 +20,7 @@ option (u,username) STR "username" { $username = $1 } "specify username."
 option (p, passwd) STR "FILE" { $passwd = $1 } "specify a password file."
 
 #int index;
-option (i, index) INT "INDEX" { $index = $1 } "specify the index of the parameters in tpasswd.conf to use."
+option (i, index) INT "INDEX" { $index = $1 } "specify the index of the group parameters in tpasswd.conf to use."
 
 #int salt;
 option (s, salt) INT "SALT" { $salt = $1 } "specify salt size for crypt algorithm."
