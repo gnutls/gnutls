@@ -5,6 +5,27 @@
 #ifndef GCOMPAT_H
 # define GCOMPAT_H
 
+#ifdef __GNUC__
+
+#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  
+
+#if _GNUTLS_GCC_VERSION >= 30100
+#define _GNUTLS_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
+#endif
+
+#endif /* __GNUC__ */
+
+#ifndef _GNUTLS_GCC_ATTR_DEPRECATED
+#define _GNUTLS_GCC_ATTR_DEPRECATED
+#endif
+
+#define gnutls_set_default_priority(x)					\
+  (gnutls_set_default_priority2 (x, GNUTLS_PRIORITIES_SECURITY_NORMAL), \
+   GNUTLS_E_SUCCESS)
+#define gnutls_set_default_export_priority(x)				\
+  (gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_EXPORT),		\
+   GNUTLS_E_SUCCESS)
+
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
 #define gnutls_paramsype gnutls_paramsype_t

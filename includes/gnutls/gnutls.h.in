@@ -524,31 +524,10 @@ extern "C"
   int gnutls_cipher_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
   int gnutls_certificate_type_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
 
-#ifdef __GNUC__
-
-#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  
-                                                          
-#if _GNUTLS_GCC_VERSION >= 30100
-#define _GNUTLS_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
-#endif
-
-#endif /* __GNUC__ */
-
-#ifndef _GNUTLS_GCC_ATTR_DEPRECATED
-#define _GNUTLS_GCC_ATTR_DEPRECATED
-#endif
-                                                          
-                                                          
 /* if you just want some defaults, use the following.
  */
   void gnutls_set_default_priority2 (gnutls_session_t session,
 				     gnutls_priority_flag_t flag);
-#define gnutls_set_default_priority(x)					\
-  (gnutls_set_default_priority2 (x, GNUTLS_PRIORITIES_SECURITY_NORMAL), \
-   GNUTLS_E_SUCCESS)
-#define gnutls_set_default_export_priority(x)				\
-  (gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_EXPORT),		\
-   GNUTLS_E_SUCCESS)
 
 /* Returns the name of a cipher suite */
   const char *gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t
