@@ -131,7 +131,7 @@ void gaa_help(void)
 	printf("Srptool help\nUsage : srptool [options]\n");
 	__gaa_helpsingle('u', "username", "username ", "specify username.");
 	__gaa_helpsingle('p', "passwd", "FILE ", "specify a password file.");
-	__gaa_helpsingle('i', "index", "INDEX ", "specify the index of the parameters in tpasswd.conf to use.");
+	__gaa_helpsingle('i', "index", "INDEX ", "specify the index of the group parameters in tpasswd.conf to use.");
 	__gaa_helpsingle('s', "salt", "SALT ", "specify salt size for crypt algorithm.");
 	__gaa_helpsingle(0, "verify", "", "just verify password.");
 	__gaa_helpsingle('c', "passwd-conf", "FILE ", "specify a password conf file.");
@@ -799,7 +799,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
 
         len++;
         a = fgetc( file);
-        if(a==EOF) return 0; /* a = ' '; */
+        if(a==EOF) return 0; //a = ' ';
     }
 
     len += 1;

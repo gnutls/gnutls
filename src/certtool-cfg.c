@@ -216,6 +216,8 @@ read_crq_set (gnutls_x509_crq_t crq, const char *input_str, const char *oid)
     }
 }
 
+/* The input_str should contain %d or %u to print the default.
+ */
 int
 read_int_with_default (const char *input_str, int def)
 {
@@ -223,7 +225,8 @@ read_int_with_default (const char *input_str, int def)
   char *endptr;
   long l;
 
-  in = readline (input_str);
+  printf(input_str, def);
+  in = readline ("");
 
   l = strtol (in, &endptr, 0);
 
@@ -274,6 +277,8 @@ read_str (const char *input_str)
   return input;
 }
 
+/* Default is no
+ */
 int
 read_yesno (const char *input_str)
 {
@@ -578,7 +583,7 @@ get_serial (void)
   else
     {
       return read_int_with_default
-	("Enter the certificate's serial number (decimal): ", default_serial);
+	("Enter the certificate's serial number in decimal (default: %u): ", default_serial);
     }
 }
 
@@ -615,7 +620,7 @@ get_ca_status (void)
   else
     {
       return
-	read_yesno ("Does the certificate belong to an authority? (Y/N): ");
+	read_yesno ("Does the certificate belong to an authority? (y/N): ");
     }
 }
 
@@ -629,7 +634,7 @@ get_path_len (void)
   else
     {
       return read_int_with_default
-	("Path length constraint (decimal, -1 for no constraint): ", -1);
+	("Path length constraint (decimal, %d for no constraint): ", -1);
     }
 }
 
@@ -664,7 +669,7 @@ get_tls_client_status (void)
     }
   else
     {
-      return read_yesno ("Is this a TLS web client certificate? (Y/N): ");
+      return read_yesno ("Is this a TLS web client certificate? (y/N): ");
     }
 }
 
@@ -678,7 +683,7 @@ get_tls_server_status (void)
   else
     {
       return
-	read_yesno ("Is this also a TLS web server certificate? (Y/N): ");
+	read_yesno ("Is this also a TLS web server certificate? (y/N): ");
     }
 }
 
@@ -737,10 +742,10 @@ get_sign_status (int server)
     {
       if (server)
 	msg =
-	  "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (Y/N): ";
+	  "Will the certificate be used for signing (DHE and RSA-EXPORT ciphersuites)? (y/N): ";
       else
 	msg =
-	  "Will the certificate be used for signing (required for TLS)? (Y/N): ";
+	  "Will the certificate be used for signing (required for TLS)? (y/N): ";
       return read_yesno (msg);
     }
 }
@@ -758,10 +763,10 @@ get_encrypt_status (int server)
     {
       if (server)
 	msg =
-	  "Will the certificate be used for encryption (RSA ciphersuites)? (Y/N): ";
+	  "Will the certificate be used for encryption (RSA ciphersuites)? (y/N): ";
       else
 	msg =
-	  "Will the certificate be used for encryption (not required for TLS)? (Y/N): ";
+	  "Will the certificate be used for encryption (not required for TLS)? (y/N): ";
       return read_yesno (msg);
     }
 }
@@ -777,7 +782,7 @@ get_cert_sign_status (void)
     {
       return
 	read_yesno
-	("Will the certificate be used to sign other certificates? (Y/N): ");
+	("Will the certificate be used to sign other certificates? (y/N): ");
     }
 }
 
@@ -791,7 +796,7 @@ get_crl_sign_status (void)
   else
     {
       return
-	read_yesno ("Will the certificate be used to sign CRLs? (Y/N): ");
+	read_yesno ("Will the certificate be used to sign CRLs? (y/N): ");
     }
 }
 
@@ -805,7 +810,7 @@ get_code_sign_status (void)
   else
     {
       return
-	read_yesno ("Will the certificate be used to sign code? (Y/N): ");
+	read_yesno ("Will the certificate be used to sign code? (y/N): ");
     }
 }
 
@@ -820,7 +825,7 @@ get_ocsp_sign_status (void)
     {
       return
 	read_yesno
-	("Will the certificate be used to sign OCSP requests? (Y/N): ");
+	("Will the certificate be used to sign OCSP requests? (y/N): ");
     }
 }
 
@@ -835,7 +840,7 @@ get_time_stamp_status (void)
     {
       return
 	read_yesno
-	("Will the certificate be used for time stamping? (Y/N): ");
+	("Will the certificate be used for time stamping? (y/N): ");
     }
 }
 
