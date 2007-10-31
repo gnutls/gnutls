@@ -421,8 +421,8 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
   opaque *p_data, *g_data;
   opaque *all_data;
 
-  _gnutls_mpi_print (NULL, &g_size, params->params[1]);
-  _gnutls_mpi_print (NULL, &p_size, params->params[0]);
+  _gnutls_mpi_print_lz (NULL, &g_size, params->params[1]);
+  _gnutls_mpi_print_lz (NULL, &p_size, params->params[0]);
 
   all_data = gnutls_malloc (g_size + p_size);
   if (all_data == NULL)
@@ -434,8 +434,8 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
   p_data = &all_data[0];
   g_data = &all_data[p_size];
 
-  _gnutls_mpi_print (p_data, &p_size, params->params[0]);
-  _gnutls_mpi_print (g_data, &g_size, params->params[1]);
+  _gnutls_mpi_print_lz (p_data, &p_size, params->params[0]);
+  _gnutls_mpi_print_lz (g_data, &g_size, params->params[1]);
 
   /* Ok. Now we have the data. Create the asn1 structures
    */
