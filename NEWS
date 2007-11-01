@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.1.5 (unreleased)
 
+** Fix PKCS#3 parameter export problem.
+
 ** Update gnulib files.
 
 ** API and ABI modifications:
