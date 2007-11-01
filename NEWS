@@ -7,6 +7,8 @@ See the end for copying conditions.
 
 ** Fix PKCS#3 parameter export problem.
 
+** Fix ABI version.
+
 ** Update gnulib files.
 
 ** API and ABI modifications:
