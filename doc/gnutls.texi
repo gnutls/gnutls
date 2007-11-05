@@ -3773,8 +3773,8 @@ Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3546.txt}.
 
 @item @anchor{TLSPGP}[TLSPGP]
 Nikos Mavrogiannopoulos, "Using OpenPGP keys for TLS authentication",
-April 2004, Internet draft, work in progress. Available from
-@url{http://www.normos.org/ietf/draft/draft-ietf-tls-openpgp-keys-05.txt}.
+April 2004, November 2007. Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc5081.txt}.
 
 @item @anchor{TLSSRP}[TLSSRP]
 David Taylor, Trevor Perrin, Tom Wu and Nikos Mavrogiannopoulos,
