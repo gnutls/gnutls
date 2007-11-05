@@ -620,6 +620,8 @@ main (int argc, char **argv)
 
 after_handshake:
 
+  /* Warning!  Do not touch this text string, it is used by external
+     programs to search for when gnutls-cli has reached this point. */
   printf ("\n- Simple Client Mode:\n\n");
 
 #ifndef _WIN32
@@ -637,6 +639,9 @@ after_handshake:
     {
       if (starttls_alarmed && !hd.secure)
 	{
+	  /* Warning!  Do not touch this text string, it is used by
+	     external programs to search for when gnutls-cli has
+	     reached this point. */
 	  fprintf (stderr, "*** Starting TLS handshake\n");
 	  ret = do_handshake (&hd);
 	  if (ret < 0)
@@ -697,6 +702,9 @@ after_handshake:
 	    {
 	      if (hd.secure == 0)
 		{
+		  /* Warning!  Do not touch this text string, it is
+		     used by external programs to search for when
+		     gnutls-cli has reached this point. */
 		  fprintf (stderr, "*** Starting TLS handshake\n");
 		  ret = do_handshake (&hd);
 		  clearerr (stdin);
