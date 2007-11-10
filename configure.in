@@ -36,7 +36,7 @@ AB_INIT
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 AC_SUBST(LT_CURRENT, 22)
-AC_SUBST(LT_REVISION, 6)
+AC_SUBST(LT_REVISION, 0)
 AC_SUBST(LT_AGE, 9)
 ac_full=1
 
