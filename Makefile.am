@@ -53,8 +53,8 @@ release:
 	git-tag -u b565716f! -m $(VERSION) $(tag)
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
-	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/devel/
-	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
+	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/
+	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/ && sha1sum *.tar.bz2 > CHECKSUMS'
 	cd doc && ../build-aux/gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
 	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/
 	cp -v doc/reference/html/*.{html,png,css,devhelp} $(htmldir)/reference/
