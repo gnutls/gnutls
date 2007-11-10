@@ -1219,7 +1219,7 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
   * in order to maintain maximum compatibility with buggy clients. It is
   * equivalent to calling:
   * gnutls_record_disable_padding()
-
+  *
   * Normally only servers that require maximum compatibility with everything
   * out there, need to call this function.
   *
