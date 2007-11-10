@@ -366,6 +366,9 @@ extern "C"
 
   size_t gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm);
 
+  void gnutls_session_enable_compatibility_mode (gnutls_session_t session);
+  void gnutls_record_disable_padding (gnutls_session_t session);
+
 /* the name of the specified algorithms */
   const char *gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm);
   const char *gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm);

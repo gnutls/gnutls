@@ -2801,11 +2801,11 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
   int ret = 0;
   cipher_suite_st *newSuite, cs;
   int newSuiteSize = 0, i;
-  gnutls_certificate_credentials_t x509_cred;
+  gnutls_certificate_credentials_t cert_cred;
   gnutls_kx_algorithm_t kx;
   int server = session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
-  gnutls_kx_algorithm_t *alg;
-  int alg_size;
+  gnutls_kx_algorithm_t *alg = NULL;
+  int alg_size = 0;
 
   /* if we should use a specific certificate, 
    * we should remove all algorithms that are not supported
@@ -2813,29 +2813,30 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
    * method (CERTIFICATE).
    */
 
-  x509_cred =
+  cert_cred =
     (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key,
 							 GNUTLS_CRD_CERTIFICATE,
 							 NULL);
 
-  /* if x509_cred==NULL we should remove all X509 ciphersuites
+  /* If there are certificate credentials, find an appropriate certificate
+   * or disable them;
    */
-
   if (session->security_parameters.entity == GNUTLS_SERVER
-      && x509_cred != NULL)
+      && cert_cred != NULL)
     {
       ret = _gnutls_server_select_cert (session, requested_pk_algo);
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  return ret;
+	  _gnutls_x509_log("Could not find an appropriate certificate: %s\n", gnutls_strerror(ret));
+	  cert_cred = NULL;
 	}
     }
 
   /* get all the key exchange algorithms that are 
    * supported by the X509 certificate parameters.
    */
-  if ((ret =
+  if (cert_cred != NULL && (ret =
        _gnutls_selected_cert_supported_kx (session, &alg, &alg_size)) < 0)
     {
       gnutls_assert ();

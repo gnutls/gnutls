@@ -3,6 +3,26 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 2.0.3 (unreleased)
+
+** This version backports several fixes from the 2.1.x branch.
+
+** Fixed PKCS #3 parameter export.
+
+** Added gnutls_record_disable_padding() to allow servers talking to
+buggy clients that complain if the TLS 1.0 record protocol padding is
+used.
+
+** Introduced gnutls_session_enable_compatibility_mode() to allow enabling
+all supported compatibility options (like disabling padding).
+
+** Corrected bug which did not allow a server to run without supporting
+certificates.
+
+** API and ABI modifications:
+gnutls_session_enable_compatibility_mode: ADDED
+gnutls_record_disable_padding: ADDED
+
 * Version 2.0.2 (released 2007-10-17)
 
 ** TLS authorization support removed.
