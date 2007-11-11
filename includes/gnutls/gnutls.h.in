@@ -692,6 +692,10 @@ extern "C"
 					   const gnutls_datum_t * KEY,
 					   gnutls_x509_crt_fmt_t type);
 
+  void gnutls_certificate_send_x509_rdn_sequence (gnutls_session_t session,
+                                             int status);
+                                             
+
   extern int
     gnutls_certificate_set_x509_simple_pkcs12_file
     (gnutls_certificate_credentials_t res, const char *pkcs12file,

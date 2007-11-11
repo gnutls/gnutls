@@ -314,18 +314,18 @@ gnutls_certificate_server_set_request (gnutls_session_t session,
   * to be used in the handshake.
   * The callback's function prototype is:
   * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs, 
-  * gnutls_pk_algorithm_t* pk_algos, int pk_algos_length, gnutls_retr_st* st);
+  * const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length, gnutls_retr_st* st);
   *
-  * @st should contain the certificates and private keys.
-  *
-  * @req_ca_cert, is only used in X.509 certificates. 
+  * @req_ca_cert is only used in X.509 certificates. 
   * Contains a list with the CA names that the server considers trusted. 
   * Normally we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
   * meaningful value use the function gnutls_x509_rdn_get().
   *
-  * @pk_algos, contains a list with server's acceptable signature algorithms.
+  * @pk_algos contains a list with server's acceptable signature algorithms.
   * The certificate returned should support the server's given algorithms.
+  *
+  * @st should contain the certificates and private keys.
   *
   * If the callback function is provided then gnutls will call it, in the
   * handshake, after the certificate request message has been received.
@@ -522,7 +522,7 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
   *
   * Returns a negative error code on error and zero on success.
   *
-  * This is the same as gnutls_x509_verify_certificate() and uses the
+  * This is the same as gnutls_x509_crt_list_verify() and uses the
   * loaded CAs in the credentials as trusted CAs.
   *
   * Note that some commonly used X.509 Certificate Authorities are
@@ -571,7 +571,7 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
   * gnutls_certificate_status_t enumerated elements bitwise or'd, or a
   * negative value on error.
   *
-  * This is the same as gnutls_x509_verify_certificate().
+  * This is the same as gnutls_x509_crt_list_verify().
   *
   * Deprecated: Use gnutls_certificate_verify_peers2() instead.
   *

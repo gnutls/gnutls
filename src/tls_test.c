@@ -245,7 +245,7 @@ main (int argc, char **argv)
       if (i > 3 && tls1_1_ok == 0 && tls1_ok == 0 && ssl3_ok == 0)
 	{
 	  fprintf (stderr,
-		   "\nServer does not support none of SSL 3.0, TLS 1.0 and TLS 1.1\n");
+		   "\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1\n");
 	  break;
 	}
 
