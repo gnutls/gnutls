@@ -73,7 +73,7 @@ option (v1) { $v1_cert = 1; } "Generate an X.509 version 1 certificate (no exten
 
 option (to-p12) { $action = 8; } "Generate a PKCS #12 structure."
 
-option (to-p8) { $action = 18; } "Generate a PKCS #8 structure."
+option (to-p8) { $action = 18; } "Generate a PKCS #8 key structure."
 
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
