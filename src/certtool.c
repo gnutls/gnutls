@@ -47,6 +47,7 @@ void pkcs7_info (void);
 void smime_to_pkcs7 (void);
 void pkcs12_info (void);
 void generate_pkcs12 (void);
+void generate_pkcs8 (void);
 void verify_chain (void);
 void verify_crl (void);
 gnutls_x509_privkey_t load_private_key (int mand);
@@ -889,6 +890,9 @@ gaa_parser (int argc, char **argv)
     case 17:
       generate_proxy_certificate ();
       break;
+    case 18:
+      generate_pkcs8 ();
+      break;
     default:
       gaa_help ();
       exit (0);
@@ -1033,6 +1037,7 @@ crl_info (void)
 	   "standard input");
 
   ret = gnutls_x509_crl_import (crl, &pem, info.incert_format);
+
   free (pem.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
@@ -1058,12 +1063,12 @@ privkey_info (void)
   pem.data = buffer;
   pem.size = size;
 
-
+  ret = 0;
   if (!info.pkcs8)
-    {
       ret = gnutls_x509_privkey_import (key, &pem, info.incert_format);
-    }
-  else
+
+  /* If we failed to import the certificate previously try PKCS #8 */
+  if (info.pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       if (info.pass)
 	pass = info.pass;
@@ -1199,7 +1204,13 @@ load_private_key (int mand)
     }
   else
     ret = gnutls_x509_privkey_import (key, &dat, info.incert_format);
+
   free (dat.data);
+
+  if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
+    error (EXIT_FAILURE, 0, "Import error: Could not find a valid PEM header. Check if your key is PKCS #8 or PKCS #12 encoded.");
+  }
+
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-privkey: %s: %s",
 	   info.privkey, gnutls_strerror (ret));
@@ -1231,6 +1242,10 @@ load_request (void)
     error (EXIT_FAILURE, errno, "reading --load-request: %s", info.request);
 
   ret = gnutls_x509_crq_import (crq, &dat, info.incert_format);
+  if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR) {
+    error (EXIT_FAILURE, 0, "Import error: Could not find a valid PEM header.");
+  }
+
   free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-request: %s: %s",
@@ -1855,6 +1870,47 @@ verify_crl (void)
 
   fprintf (outfile, "\n");
 }
+
+void
+generate_pkcs8 (void)
+{
+  gnutls_x509_privkey_t key;
+  int result;
+  size_t size;
+  int flags = 0;
+  const char* password;
+
+  fprintf (stderr, "Generating a PKCS #8 key structure...\n");
+
+  key = load_private_key (1);
+
+  if (info.pass)
+    password = info.pass;
+  else
+    password = get_pass ();
+
+  if (info.export)
+    flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+  else
+    flags = GNUTLS_PKCS_USE_PKCS12_3DES;
+    
+  if (password == NULL || password[0] == 0) {
+  	flags = GNUTLS_PKCS_PLAIN;
+  }
+
+
+  size = sizeof (buffer);
+  result =
+  	gnutls_x509_privkey_export_pkcs8 (key, info.outcert_format,
+					  password, flags, buffer, &size);
+
+  if (result < 0)
+  	error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
+
+  fwrite (buffer, 1, size, outfile);
+
+}
+
 
 #include <gnutls/pkcs12.h>
 #include <unistd.h>

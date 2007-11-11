@@ -682,6 +682,11 @@ _gnutls_x509_raw_privkey_to_gkey (gnutls_privkey * privkey,
     }
 
   ret = gnutls_x509_privkey_import (tmpkey, raw_key, type);
+
+  /* If normal key decoding doesn't work try decoding a plain PKCS #8 key */
+  if (ret < 0)
+    ret = gnutls_x509_privkey_import_pkcs8( tmpkey, raw_key, type, NULL, GNUTLS_PKCS_PLAIN);
+
   if (ret < 0)
     {
       gnutls_assert ();

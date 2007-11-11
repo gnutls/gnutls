@@ -383,7 +383,7 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
 	_gnutls_fbase64_decode (PEM_KEY_RSA, data->data, data->size, &out);
       key->pk_algorithm = GNUTLS_PK_RSA;
 
-      if (result <= 0)
+      if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
 	{
 	  /* try for the second header */
 	  result =
@@ -409,42 +409,34 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
   if (key->pk_algorithm == GNUTLS_PK_RSA)
     {
       key->key = _gnutls_privkey_decode_pkcs1_rsa_key (&_data, key);
-      if (key->key == NULL)
-	{
-	  gnutls_assert ();
-	  result = GNUTLS_E_ASN1_DER_ERROR;
-	  goto cleanup;
-	}
+      if (key->key == NULL) gnutls_assert();
     }
   else if (key->pk_algorithm == GNUTLS_PK_DSA)
     {
       key->key = decode_dsa_key (&_data, key);
-      if (key->key == NULL)
-	{
-	  gnutls_assert ();
-	  result = GNUTLS_E_ASN1_DER_ERROR;
-	  goto cleanup;
-	}
+      if (key->key == NULL) gnutls_assert();
     }
   else
     {
       /* Try decoding with both, and accept the one that 
        * succeeds.
        */
-      key->pk_algorithm = GNUTLS_PK_DSA;
-      key->key = decode_dsa_key (&_data, key);
+      key->pk_algorithm = GNUTLS_PK_RSA;
+      key->key = _gnutls_privkey_decode_pkcs1_rsa_key (&_data, key);
 
       if (key->key == NULL)
 	{
-	  key->pk_algorithm = GNUTLS_PK_RSA;
-	  key->key = _gnutls_privkey_decode_pkcs1_rsa_key (&_data, key);
-	  if (key->key == NULL)
-	    {
-	      gnutls_assert ();
-	      result = GNUTLS_E_ASN1_DER_ERROR;
-	      goto cleanup;
-	    }
+          key->pk_algorithm = GNUTLS_PK_DSA;
+          key->key = decode_dsa_key (&_data, key);
+          if (key->key == NULL) gnutls_assert();
 	}
+    }
+
+  if (key->key == NULL)
+    {
+      gnutls_assert ();
+      result = GNUTLS_E_ASN1_DER_ERROR;
+      goto cleanup;
     }
 
   if (need_free)

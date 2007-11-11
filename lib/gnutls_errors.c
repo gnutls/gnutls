@@ -127,6 +127,8 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("Hashing has failed."), GNUTLS_E_HASH_FAILED, 1),
   ERROR_ENTRY (N_("Base64 decoding error."), GNUTLS_E_BASE64_DECODING_ERROR,
 	       1),
+  ERROR_ENTRY (N_("Base64 unexpected header error."), GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR,
+	       1),
   ERROR_ENTRY (N_("Base64 encoding error."), GNUTLS_E_BASE64_ENCODING_ERROR,
 	       1),
   ERROR_ENTRY (N_("Parsing error in password file."),

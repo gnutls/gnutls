@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 2.1.6 (unreleased)
 
+** Added the --to-p8 option to certtool to convert private keys
+to PKCS #8 keys.
+
+** Introduced the GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR error code.
+
+** gnutls_certificate_set_x509_key_* can now read PKCS #8 unencrypted
+private keys.
+
 ** API and ABI modifications:
 No changes since last version.
 

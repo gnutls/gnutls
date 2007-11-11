@@ -446,7 +446,7 @@ _gnutls_fbase64_decode (const char *header, const opaque * data,
     {
       gnutls_assert ();
       _gnutls_debug_log ("Could not find '%s'\n", pem_header);
-      return GNUTLS_E_BASE64_DECODING_ERROR;
+      return GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR;
     }
 
   data_size -= (unsigned long int) rdata - (unsigned long int) data;
