@@ -568,7 +568,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   if (compress_size < length)
     {
       gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      return GNUTLS_E_DECOMPRESSION_FAILED;
     }
   memcpy (compress_data, ciphertext.data, length);
 
