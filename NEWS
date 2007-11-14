@@ -3,6 +3,10 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 2.0.4 (unreleased)
+
+** Corrected bug in decompression of expanded compression data.           
+
 * Version 2.0.3 (released 2007-11-10)
 
 ** This version backports several fixes from the 2.1.x branch.

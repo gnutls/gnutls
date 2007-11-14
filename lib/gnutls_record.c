@@ -777,13 +777,19 @@ record_check_type (gnutls_session_t session,
 inline static int
 get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
 {
+size_t max_record_size;
+
+  if (gnutls_compression_get(session) != GNUTLS_COMP_NULL)
+    max_record_size = MAX_RECORD_RECV_SIZE + EXTRA_COMP_SIZE;
+  else
+    max_record_size = MAX_RECORD_RECV_SIZE;
 
   /* We allocate MAX_RECORD_RECV_SIZE length
    * because we cannot predict the output data by the record
    * packet length (due to compression).
    */
 
-  if (MAX_RECORD_RECV_SIZE > session->internals.recv_buffer.size ||
+  if (max_record_size > session->internals.recv_buffer.size ||
       session->internals.recv_buffer.data == NULL)
     {
 
@@ -791,7 +797,7 @@ get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
        */
       session->internals.recv_buffer.data =
 	gnutls_realloc (session->internals.recv_buffer.data,
-			MAX_RECORD_RECV_SIZE);
+			max_record_size);
 
       if (session->internals.recv_buffer.data == NULL)
 	{
@@ -799,7 +805,7 @@ get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
-      session->internals.recv_buffer.size = MAX_RECORD_RECV_SIZE;
+      session->internals.recv_buffer.size = max_record_size;
     }
 
   tmp->data = session->internals.recv_buffer.data;

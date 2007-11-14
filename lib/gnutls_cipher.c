@@ -91,7 +91,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
       /* Here comp is allocated and must be 
        * freed.
        */
-      ret = _gnutls_m_plaintext2compressed (session, &comp, plain);
+      ret = _gnutls_m_plaintext2compressed (session, &comp, &plain);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -160,20 +160,20 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
 
       gcomp.data = data;
       gcomp.size = ret;
-      ret = _gnutls_m_compressed2plaintext (session, &gtxt, gcomp);
+      ret = _gnutls_m_compressed2plaintext (session, &gtxt, &gcomp);
       if (ret < 0)
 	{
 	  return ret;
 	}
 
-      if (gtxt.size > max_data_size)
+      if (gtxt.size > MAX_RECORD_RECV_SIZE)
 	{
 	  gnutls_assert ();
 	  _gnutls_free_datum (&gtxt);
 	  /* This shouldn't have happen and
 	   * is a TLS fatal error.
 	   */
-	  return GNUTLS_E_INTERNAL_ERROR;
+	  return GNUTLS_E_DECOMPRESSION_FAILED;
 	}
 
       memcpy (data, gtxt.data, gtxt.size);
