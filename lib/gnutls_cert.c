@@ -206,10 +206,10 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
   * gnutls_certificate_allocate_credentials - Used to allocate a gnutls_certificate_credentials_t structure
   * @res: is a pointer to an #gnutls_certificate_credentials_t structure.
   *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate it.
+  * This structure is complex enough to manipulate directly thus this
+  * helper function is provided in order to allocate it.
   *
-  * Returns 0 on success.
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_certificate_allocate_credentials (gnutls_certificate_credentials_t *
@@ -520,8 +520,6 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
   * Note that you must also check the peer's name in order to check if
   * the verified certificate belongs to the actual peer.
   *
-  * Returns a negative error code on error and zero on success.
-  *
   * This is the same as gnutls_x509_crt_list_verify() and uses the
   * loaded CAs in the credentials as trusted CAs.
   *
@@ -529,6 +527,8 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
   * still using Version 1 certificates.  If you want to accept them,
   * you need to call gnutls_certificate_set_verify_flags() with, e.g.,
   * %GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT parameter.
+  *
+  * Returns: a negative error code on error and zero on success.
   **/
 int
 gnutls_certificate_verify_peers2 (gnutls_session_t session,
@@ -574,7 +574,6 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
   * This is the same as gnutls_x509_crt_list_verify().
   *
   * Deprecated: Use gnutls_certificate_verify_peers2() instead.
-  *
   **/
 int
 gnutls_certificate_verify_peers (gnutls_session_t session)
@@ -599,8 +598,7 @@ gnutls_certificate_verify_peers (gnutls_session_t session)
   *
   * This function will return the peer's certificate expiration time.
   *
-  * Returns (time_t) -1 on error.
-  *
+  * Returns: (time_t)-1 on error.
   **/
 time_t
 gnutls_certificate_expiration_time_peers (gnutls_session_t session)
@@ -645,8 +643,7 @@ gnutls_certificate_expiration_time_peers (gnutls_session_t session)
   * This function will return the peer's certificate activation time.
   * This is the creation time for openpgp keys.
   *
-  * Returns (time_t) -1 on error.
-  *
+  * Returns: (time_t)-1 on error.
   **/
 time_t
 gnutls_certificate_activation_time_peers (gnutls_session_t session)
@@ -909,8 +906,8 @@ gnutls_sign_callback_set (gnutls_session_t session,
  *
  * Retrieve the callback function, and its userdata pointer.
  *
- * Return value: The function pointer set by
- *   gnutls_sign_callback_set(), or if not set, %NULL.
+ * Returns: The function pointer set by gnutls_sign_callback_set(), or
+ *   if not set, %NULL.
  **/
 gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session,
