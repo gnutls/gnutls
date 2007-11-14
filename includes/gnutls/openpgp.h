@@ -40,20 +40,6 @@ extern "C"
 /* gnutls_openpgp_cert_t should be defined in gnutls.h
  */
 
-#define gnutls_openpgp_key_init gnutls_openpgp_crt_init
-#define gnutls_openpgp_key_deinit gnutls_openpgp_crt_deinit
-#define gnutls_openpgp_key_import gnutls_openpgp_crt_import
-#define gnutls_openpgp_key_export gnutls_openpgp_crt_export
-#define gnutls_openpgp_key_get_key_usage gnutls_openpgp_crt_get_key_usage
-#define gnutls_openpgp_key_get_fingerprint gnutls_openpgp_crt_get_fingerprint
-#define gnutls_openpgp_key_get_pk_algorithm gnutls_openpgp_crt_get_pk_algorithm
-#define gnutls_openpgp_key_get_name gnutls_openpgp_crt_get_name
-#define gnutls_openpgp_key_get_version gnutls_openpgp_crt_get_version
-#define gnutls_openpgp_key_get_creation_time gnutls_openpgp_crt_get_creation_time
-#define gnutls_openpgp_key_get_expiration_time gnutls_openpgp_crt_get_expiration_time
-#define gnutls_openpgp_key_get_id gnutls_openpgp_crt_get_id
-#define gnutls_openpgp_key_check_hostname gnutls_openpgp_crt_check_hostname
-
   /* initializes the memory for gnutls_openpgp_crt_t struct */
   int gnutls_openpgp_crt_init (gnutls_openpgp_crt_t * key);
   /* frees all memory */
