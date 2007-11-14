@@ -566,7 +566,7 @@ unimplemented-feature)
 
 
 (define %openpgp-key-format-enum
-  (make-enum-type 'openpgp-key-format "gnutls_openpgp_crt_fmt"
+  (make-enum-type 'openpgp-key-format "gnutls_openpgp_crt_fmt_t"
                   '(raw base64)
                   #f
                   "GNUTLS_OPENPGP_FMT_"))
