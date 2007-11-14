@@ -543,6 +543,7 @@ unsupported-certificate-type
 x509-unknown-san
 openpgp-fingerprint-unsupported
 x509-unsupported-attribute
+unknown-algorithm
 unknown-hash-algorithm
 unknown-pkcs-content-type
 unknown-pkcs-bag-type
