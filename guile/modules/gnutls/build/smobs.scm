@@ -202,8 +202,8 @@
                   "gnutls_x509_privkey_deinit"))
 
 (define %openpgp-public-key-smob
-  (make-smob-type "gnutls_openpgp_key_t" 'openpgp-public-key
-                  "gnutls_openpgp_key_deinit"))
+  (make-smob-type "gnutls_openpgp_crt_t" 'openpgp-public-key
+                  "gnutls_openpgp_crt_deinit"))
 
 (define %openpgp-private-key-smob
   (make-smob-type "gnutls_openpgp_privkey_t" 'openpgp-private-key
