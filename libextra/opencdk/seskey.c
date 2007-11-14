@@ -341,11 +341,11 @@ _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk)
 
 /**
  * cdk_dek_extract:
- * ret_dek: the raw DEK object
- * hd: the session handle
+ * @ret_dek: the raw DEK object
+ * @hd: the session handle
  * @enc: the public key encrypted packet
  * @sk: the secret key.
- * 
+ *
  * Try to extract the DEK from the public key encrypted packet. 
  **/
 cdk_error_t
