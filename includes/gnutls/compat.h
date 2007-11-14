@@ -83,6 +83,8 @@
 #define GNUTLS_E_UNKNOWN_HASH_ALGORITHM GNUTLS_E_UNKNOWN_ALGORITHM
 
 /* OpenPGP stuff renamed in 2.1.x. */
+#define GNUTLS_OPENPGP_KEY GNUTLS_OPENPGP_CERT
+#define GNUTLS_OPENPGP_KEY_FINGERPRINT GNUTLS_OPENPGP_CERT_FINGERPRINT
 #define gnutls_openpgp_send_key gnutls_openpgp_send_cert
 #define gnutls_openpgp_key_status_t gnutls_openpgp_crt_status_t
 #define gnutls_openpgp_key_t gnutls_openpgp_crt_t
