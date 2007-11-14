@@ -159,7 +159,7 @@ class session
         void set_user_ptr( void* ptr);
         void *get_user_ptr() const;
         
-        void send_openpgp_key( gnutls_openpgp_key_status_t status);
+        void send_openpgp_cert( gnutls_openpgp_crt_status_t status);
 
         gnutls_credentials_type_t get_auth_type() const;
         gnutls_credentials_type_t get_server_auth_type() const;

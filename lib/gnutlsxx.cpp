@@ -446,9 +446,9 @@ void* session::get_user_ptr( ) const
     return gnutls_session_get_ptr(this->s);
 }
   
-void session::send_openpgp_key( gnutls_openpgp_key_status_t status)
+void session::send_openpgp_cert( gnutls_openpgp_crt_status_t status)
 {
-    gnutls_openpgp_send_key(this->s, status);
+    gnutls_openpgp_send_cert(this->s, status);
 }
 
 
