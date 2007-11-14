@@ -96,7 +96,7 @@ static char srp_dh_group2048[] =
 int
 generate_dh_params (void)
 {
-gnutls_datum dparams = { srp_dh_group2048, sizeof( srp_dh_group2048) };
+gnutls_datum_t dparams = { srp_dh_group2048, sizeof( srp_dh_group2048) };
   /* Here instead of generating Diffie Hellman parameters (for use with DHE
    * kx algorithms) we import them.
    */

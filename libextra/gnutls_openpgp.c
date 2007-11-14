@@ -652,12 +652,13 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
  *
  **/
 int
-  gnutls_certificate_set_openpgp_keyring_file
-  (gnutls_certificate_credentials_t c, const char *file, gnutls_openpgp_crt_fmt_t format)
+gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
+					     const char *file,
+					     gnutls_openpgp_crt_fmt_t format)
 {
-gnutls_datum ring;
-size_t size;
-int rc;
+  gnutls_datum_t ring;
+  size_t size;
+  int rc;
 
   if (!c || !file)
     {

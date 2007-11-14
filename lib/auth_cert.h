@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -67,7 +67,7 @@ typedef struct gnutls_certificate_credentials_st
 #ifndef KEYRING_HACK
   gnutls_openpgp_keyring_t keyring;
 #else
-  gnutls_datum keyring;
+  gnutls_datum_t keyring;
   int keyring_format;
 #endif
 
