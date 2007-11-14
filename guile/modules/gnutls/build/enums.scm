@@ -535,7 +535,6 @@ asn1-tag-implicit
 asn1-type-any-error
 asn1-syntax-error
 asn1-der-overflow
-openpgp-trustdb-version-unsupported
 openpgp-uid-revoked
 certificate-error
 x509-certificate-error
