@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,7 +45,6 @@ extern "C"
   { GNUTLS_OPENPGP_FMT_RAW,
     GNUTLS_OPENPGP_FMT_BASE64
   } gnutls_openpgp_crt_fmt_t;
-#define gnutls_openpgp_key_fmt_t gnutls_openpgp_crt_fmt_t
 
 /**
  * gnutls_openpgp_recv_key_func - Callback prototype to get OpenPGP keys
