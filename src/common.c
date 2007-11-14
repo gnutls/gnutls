@@ -365,7 +365,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 	  print = raw_to_string (digest, digest_size);
 
 	  printf (" # PGP Key version: %d\n",
-		  gnutls_openpgp_key_get_version (crt));
+		  gnutls_openpgp_crt_get_version (crt));
 
 	  bits = 0;
 	  algo = gnutls_openpgp_crt_get_pk_algorithm (crt, &bits);

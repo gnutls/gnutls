@@ -166,7 +166,7 @@ static unsigned int x509_crt_size;
 static gnutls_x509_crt_t x509_crt[MAX_CRT];
 static gnutls_x509_privkey_t x509_key = NULL;
 
-static gnutls_openpgp_key_t pgp_crt = NULL;
+static gnutls_openpgp_crt_t pgp_crt = NULL;
 static gnutls_openpgp_privkey_t pgp_key = NULL;
 
 /* Load the certificate and the private key.
@@ -245,10 +245,10 @@ load_keys (void)
 	  fprintf (stderr, "*** Error loading PGP cert file.\n");
 	  exit (1);
 	}
-      gnutls_openpgp_key_init (&pgp_crt);
+      gnutls_openpgp_crt_init (&pgp_crt);
 
       ret =
-	gnutls_openpgp_key_import (pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64);
+	gnutls_openpgp_crt_import (pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64);
       if (ret < 0)
 	{
 	  fprintf (stderr,
