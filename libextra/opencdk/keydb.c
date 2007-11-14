@@ -1901,10 +1901,10 @@ classify_data (const byte *buf, size_t len)
 
 /**
  * cdk_keydb_export:
- * hd: the keydb handle
+ * @hd: the keydb handle
  * @out: the output stream
  * @remusr: the list of key pattern to export
- * 
+ *
  * Export a list of keys to the given output stream.
  * Use string list with names for pattering searching.
  * This procedure strips local signatures.
