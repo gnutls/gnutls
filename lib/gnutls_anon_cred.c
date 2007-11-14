@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -39,8 +39,8 @@ static const int anon_dummy;
   * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials_t structure
   * @sc: is an #gnutls_anon_server_credentials_t structure.
   *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate) it.
+  * This structure is complex enough to manipulate directly thus this
+  * helper function is provided in order to free (deallocate) it.
   **/
 void
 gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
@@ -53,14 +53,13 @@ gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
   * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials_t structure
   * @sc: is a pointer to an #gnutls_anon_server_credentials_t structure.
   *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate it.
+  * This structure is complex enough to manipulate directly thus this
+  * helper function is provided in order to allocate it.
   *
-  * Returns a negative value in case of an error.
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
-gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
-					 sc)
+gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *sc)
 {
 
   *sc = gnutls_calloc (1, sizeof (anon_server_credentials_st));
@@ -73,8 +72,8 @@ gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
   * gnutls_anon_free_client_credentials - Used to free an allocated gnutls_anon_client_credentials_t structure
   * @sc: is an #gnutls_anon_client_credentials_t structure.
   *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate) it.
+  * This structure is complex enough to manipulate directly thus this
+  * helper function is provided in order to free (deallocate) it.
   **/
 void
 gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc)
@@ -88,11 +87,10 @@ gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc)
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to allocate it.
  *
- * Returns a negative value in case of an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
-					 sc)
+gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *sc)
 {
   /* anon_dummy is only there for *sc not to be null.
    * it is not used at all;
@@ -107,10 +105,9 @@ gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
   * @res: is a gnutls_anon_server_credentials_t structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
-  * This function will set the diffie hellman parameters for an anonymous
-  * server to use. These parameters will be used in Anonymous Diffie Hellman 
-  * cipher suites.
-  *
+  * This function will set the diffie hellman parameters for an
+  * anonymous server to use.  These parameters will be used in
+  * Anonymous Diffie Hellman cipher suites.
   **/
 void
 gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
@@ -124,10 +121,9 @@ gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
   * @res: is a gnutls_certificate_credentials_t structure
   * @func: is the function to be called
   *
-  * This function will set a callback in order for the server to get the 
-  * diffie hellman parameters for anonymous authentication. The callback should
-  * return zero on success.
-  *
+  * This function will set a callback in order for the server to get
+  * the diffie hellman parameters for anonymous authentication.  The
+  * callback should return zero on success.
   **/
 void
 gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t res,
@@ -135,7 +131,5 @@ gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t res,
 {
   res->params_func = func;
 }
-
-
 
 #endif
