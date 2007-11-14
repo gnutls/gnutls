@@ -59,8 +59,8 @@ SCM_DEFINE (scm_gnutls_import_openpgp_public_key, "import-openpgp-public-key",
 #define FUNC_NAME s_scm_gnutls_import_openpgp_public_key
 {
   int err;
-  gnutls_openpgp_key_t c_key;
-  gnutls_openpgp_key_fmt c_format;
+  gnutls_openpgp_crt_t c_key;
+  gnutls_openpgp_crt_fmt_t c_format;
   gnutls_datum_t c_data_d;
   scm_t_array_handle c_data_handle;
   const char *c_data;
@@ -74,19 +74,19 @@ SCM_DEFINE (scm_gnutls_import_openpgp_public_key, "import-openpgp-public-key",
   c_data_d.data = (unsigned char *) c_data;
   c_data_d.size = c_data_len;
 
-  err = gnutls_openpgp_key_init (&c_key);
+  err = gnutls_openpgp_crt_init (&c_key);
   if (EXPECT_FALSE (err))
     {
       scm_gnutls_release_array (&c_data_handle);
       scm_gnutls_error (err, FUNC_NAME);
     }
 
-  err = gnutls_openpgp_key_import (c_key, &c_data_d, c_format);
+  err = gnutls_openpgp_crt_import (c_key, &c_data_d, c_format);
   scm_gnutls_release_array (&c_data_handle);
 
   if (EXPECT_FALSE (err))
     {
-      gnutls_openpgp_key_deinit (c_key);
+      gnutls_openpgp_crt_deinit (c_key);
       scm_gnutls_error (err, FUNC_NAME);
     }
 
@@ -104,7 +104,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key, "import-openpgp-private-key",
 {
   int err;
   gnutls_openpgp_privkey_t c_key;
-  gnutls_openpgp_key_fmt c_format;
+  gnutls_openpgp_crt_fmt_t c_format;
   gnutls_datum_t c_data_d;
   scm_t_array_handle c_data_handle;
   const char *c_data;
@@ -158,7 +158,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_id, "openpgp-public-key-id",
 {
   int err;
   unsigned char *c_id;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
 
   c_key = scm_to_gnutls_openpgp_public_key (key, 1, FUNC_NAME);
 
@@ -166,7 +166,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_id, "openpgp-public-key-id",
   if (c_id == NULL)
     scm_gnutls_error (GNUTLS_E_MEMORY_ERROR, FUNC_NAME);
 
-  err = gnutls_openpgp_key_get_id (c_key, c_id);
+  err = gnutls_openpgp_crt_get_id (c_key, c_id);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
 
@@ -185,7 +185,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_id_x, "openpgp-public-key-id!",
   char *c_id;
   scm_t_array_handle c_id_handle;
   size_t c_id_size;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
 
   c_key = scm_to_gnutls_openpgp_public_key (key, 1, FUNC_NAME);
   c_id = scm_gnutls_get_writable_array (id, &c_id_handle, &c_id_size,
@@ -198,7 +198,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_id_x, "openpgp-public-key-id!",
 		      scm_list_1 (id));
     }
 
-  err = gnutls_openpgp_key_get_id (c_key, (unsigned char *) c_id);
+  err = gnutls_openpgp_crt_get_id (c_key, (unsigned char *) c_id);
   scm_gnutls_release_array (&c_id_handle);
 
   if (EXPECT_FALSE (err))
@@ -217,7 +217,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_fingerpint_x,
 #define FUNC_NAME s_scm_gnutls_openpgp_public_key_fingerpint_x
 {
   int err;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
   char *c_fpr;
   scm_t_array_handle c_fpr_handle;
   size_t c_fpr_len, c_actual_len = 0;
@@ -228,7 +228,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_fingerpint_x,
   c_fpr = scm_gnutls_get_writable_array (fpr, &c_fpr_handle, &c_fpr_len,
 					 FUNC_NAME);
 
-  err = gnutls_openpgp_key_get_fingerprint (c_key, c_fpr, &c_actual_len);
+  err = gnutls_openpgp_crt_get_fingerprint (c_key, c_fpr, &c_actual_len);
   scm_gnutls_release_array (&c_fpr_handle);
 
   if (EXPECT_FALSE (err))
@@ -247,7 +247,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_fingerprint,
 #define FUNC_NAME s_scm_gnutls_openpgp_public_key_fingerprint
 {
   int err;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
   unsigned char *c_fpr;
   size_t c_fpr_len, c_actual_len;
 
@@ -262,7 +262,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_fingerprint,
   do
     {
       c_actual_len = 0;
-      err = gnutls_openpgp_key_get_fingerprint (c_key, c_fpr,
+      err = gnutls_openpgp_crt_get_fingerprint (c_key, c_fpr,
 						&c_actual_len);
       if (err == GNUTLS_E_SHORT_MEMORY_BUFFER)
 	{
@@ -305,7 +305,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_name, "openpgp-public-key-name",
 #define FUNC_NAME s_scm_gnutls_openpgp_public_key_name
 {
   int err;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
   int c_index;
   char c_name[GUILE_GNUTLS_MAX_OPENPGP_NAME_LENGTH];
   size_t c_name_len = sizeof (c_name);
@@ -313,7 +313,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_name, "openpgp-public-key-name",
   c_key = scm_to_gnutls_openpgp_public_key (key, 1, FUNC_NAME);
   c_index = scm_to_int (index);
 
-  err = gnutls_openpgp_key_get_name (c_key, c_index, c_name,
+  err = gnutls_openpgp_crt_get_name (c_key, c_index, c_name,
 				     &c_name_len);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
@@ -331,7 +331,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_names, "openpgp-public-key-names",
 {
   int err;
   SCM result = SCM_EOL;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
   int c_index = 0;
   char c_name[GUILE_GNUTLS_MAX_OPENPGP_NAME_LENGTH];
   size_t c_name_len = sizeof (c_name);
@@ -340,7 +340,7 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_names, "openpgp-public-key-names",
 
   do
     {
-      err = gnutls_openpgp_key_get_name (c_key, c_index, c_name,
+      err = gnutls_openpgp_crt_get_name (c_key, c_index, c_name,
 					 &c_name_len);
       if (!err)
 	{
@@ -366,12 +366,12 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_algorithm,
 	    "@var{key} and the number of bits used.")
 #define FUNC_NAME s_scm_gnutls_openpgp_public_key_algorithm
 {
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
   unsigned int c_bits;
   gnutls_pk_algorithm_t c_algo;
 
   c_key = scm_to_gnutls_openpgp_public_key (key, 1, FUNC_NAME);
-  c_algo = gnutls_openpgp_key_get_pk_algorithm (c_key, &c_bits);
+  c_algo = gnutls_openpgp_crt_get_pk_algorithm (c_key, &c_bits);
 
   return (scm_values (scm_list_2 (scm_from_gnutls_pk_algorithm (c_algo),
 				  scm_from_uint (c_bits))));
@@ -387,10 +387,10 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_version,
 #define FUNC_NAME s_scm_gnutls_openpgp_public_key_version
 {
   int c_version;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
 
   c_key = scm_to_gnutls_openpgp_public_key (key, 1, FUNC_NAME);
-  c_version = gnutls_openpgp_key_get_version (c_key);
+  c_version = gnutls_openpgp_crt_get_version (c_key);
 
   return (scm_from_int (c_version));
 }
@@ -404,11 +404,11 @@ SCM_DEFINE (scm_gnutls_openpgp_public_key_usage, "openpgp-public-key-usage",
 {
   int err;
   unsigned int c_usage = 0;
-  gnutls_openpgp_key_t c_key;
+  gnutls_openpgp_crt_t c_key;
 
   c_key = scm_to_gnutls_openpgp_public_key (key, 1, FUNC_NAME);
 
-  err = gnutls_openpgp_key_get_key_usage (c_key, &c_usage);
+  err = gnutls_openpgp_crt_get_key_usage (c_key, &c_usage);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
 
@@ -429,7 +429,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
 {
   int err;
   gnutls_openpgp_keyring_t c_keyring;
-  gnutls_openpgp_key_fmt c_format;
+  gnutls_openpgp_crt_fmt_t c_format;
   gnutls_datum_t c_data_d;
   scm_t_array_handle c_data_handle;
   const char *c_data;
@@ -512,7 +512,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_openpgp_keys_x,
 {
   int err;
   gnutls_certificate_credentials_t c_cred;
-  gnutls_openpgp_key_t c_pub;
+  gnutls_openpgp_crt_t c_pub;
   gnutls_openpgp_privkey_t c_sec;
 
   c_cred = scm_to_gnutls_certificate_credentials (cred, 1, FUNC_NAME);
