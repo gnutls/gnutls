@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.1.6 (unreleased)
 
+** Corrected bug in decompression of expanded compression data.
+
 ** Added the --to-p8 option to certtool to convert private keys
 to PKCS #8 keys.
 
