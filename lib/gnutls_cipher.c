@@ -176,6 +176,14 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
 	  return GNUTLS_E_DECOMPRESSION_FAILED;
 	}
 
+      /* This check is not really needed */
+      if (max_data_size < MAX_RECORD_RECV_SIZE) 
+        {
+          gnutls_assert();
+          _gnutls_free_datum (&gtxt);
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
+
       memcpy (data, gtxt.data, gtxt.size);
       ret = gtxt.size;
 

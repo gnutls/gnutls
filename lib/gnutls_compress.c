@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2004, 2005, 2007 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -44,7 +44,7 @@ _gnutls_m_plaintext2compressed (gnutls_session_t session,
   size =
     _gnutls_compress (session->connection_state.write_compression_state,
 		      plaintext->data, plaintext->size, &data,
-		      MAX_RECORD_SEND_SIZE + 1024);
+		      MAX_RECORD_SEND_SIZE + EXTRA_COMP_SIZE);
   if (size < 0)
     {
       gnutls_assert ();
