@@ -824,6 +824,7 @@ read_key_file (gnutls_certificate_credentials_t res,
   * The @key may be %NULL if you are using a sign callback, see
   * gnutls_sign_callback_set().
   *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
@@ -860,11 +861,12 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
   * @cert_list_size: holds the size of the certificate list
   * @key: is a gnutls_x509_privkey_t key
   *
-  * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials_t structure. This function may be called
-  * more than once (in case multiple keys/certificates exist for the
-  * server).
+  * This function sets a certificate/private key pair in the
+  * gnutls_certificate_credentials_t structure.  This function may be
+  * called more than once (in case multiple keys/certificates exist
+  * for the server).
   *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
@@ -945,14 +947,15 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
   * @KEYFILE: is a file that contains the private key
   * @type: is PEM or DER
   *
-  * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials_t structure. This function may be called
-  * more than once (in case multiple keys/certificates exist for the
-  * server).
+  * This function sets a certificate/private key pair in the
+  * gnutls_certificate_credentials_t structure.  This function may be
+  * called more than once (in case multiple keys/certificates exist
+  * for the server).
   *
   * Currently only PKCS-1 encoded RSA and DSA private keys are accepted by
   * this function.
   *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t
@@ -1251,19 +1254,18 @@ parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
   * @ca: is a list of trusted CAs or a DER certificate
   * @type: is DER or PEM
   *
-  * This function adds the trusted CAs in order to verify client
-  * or server certificates. In case of a client this is not required
-  * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().
-  * This function may be called multiple times.
+  * This function adds the trusted CAs in order to verify client or
+  * server certificates. In case of a client this is not required to
+  * be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers2().  This function may be called
+  * multiple times.
   *
   * In case of a server the CAs set here will be sent to the client if
   * a certificate request is sent. This can be disabled using
   * gnutls_certificate_send_x509_rdn_sequence().
   *
-  * Returns the number of certificates processed or a negative
-  * value on error.
-  *
+  * Returns: the number of certificates processed or a negative value
+  * on error.
   **/
 int
 gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t
@@ -1301,8 +1303,7 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t
   * a certificate request is sent. This can be disabled using
   * gnutls_certificate_send_x509_rdn_sequence().
   *
-  * Returns 0 on success.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
@@ -1365,7 +1366,6 @@ gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
   *
   * Returns the number of certificates processed or a negative
   * value on error.
-  *
   **/
 int
 gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
@@ -1584,7 +1584,6 @@ read_crl_mem (gnutls_certificate_credentials_t res, const void *crl,
   * This function may be called multiple times.
   *
   * Returns the number of CRLs processed or a negative value on error.
-  *
   **/
 int
 gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t
@@ -1605,14 +1604,13 @@ gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t
   * @crl_list: is a list of trusted CRLs. They should have been verified before.
   * @crl_list_size: holds the size of the crl_list
   *
-  * This function adds the trusted CRLs in order to verify client or server
-  * certificates.  In case of a client this is not required
-  * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().
-  * This function may be called multiple times.
+  * This function adds the trusted CRLs in order to verify client or
+  * server certificates.  In case of a client this is not required to
+  * be called if the certificates are not verified using
+  * gnutls_certificate_verify_peers2().  This function may be called
+  * multiple times.
   *
-  * Returns 0 on success.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
@@ -1665,8 +1663,7 @@ gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
   * gnutls_certificate_verify_peers2().
   * This function may be called multiple times.
   *
-  * Returns the number of CRLs processed or a negative value on error.
-  *
+  * Returns: number of CRLs processed or a negative value on error.
   **/
 int
 gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t
@@ -1885,7 +1882,7 @@ done:
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Return value: Returns 0 on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_certificate_set_x509_simple_pkcs12_file
