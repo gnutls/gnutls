@@ -415,7 +415,7 @@ init_tls_session (const char *hostname)
 
   /* send the fingerprint */
   if (fingerprint != 0)
-    gnutls_openpgp_send_key (session, GNUTLS_OPENPGP_KEY_FINGERPRINT);
+    gnutls_openpgp_send_cert (session, GNUTLS_OPENPGP_CERT_FINGERPRINT);
 
   /* use the max record size extension */
   if (record_max_size > 0 && disable_extensions == 0)
