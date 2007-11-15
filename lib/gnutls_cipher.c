@@ -143,6 +143,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
 				   gcipher, type);
   if (ret < 0)
     {
+      gnutls_assert ();
       return ret;
     }
 
@@ -163,6 +164,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
       ret = _gnutls_m_compressed2plaintext (session, &gtxt, &gcomp);
       if (ret < 0)
 	{
+	  gnutls_assert ();
 	  return ret;
 	}
 
@@ -553,7 +555,10 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
    * 1.0 protocol.
    */
   if (pad_failed != 0)
-    return pad_failed;
+    {
+      gnutls_assert ();
+      return pad_failed;
+    }
 
   /* HMAC was not the same. 
    */

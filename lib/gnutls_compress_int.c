@@ -308,7 +308,10 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
 	lzo_uint new_size;
 
 	if (_gnutls_lzo1x_decompress_safe == NULL)
-	  return GNUTLS_E_DECOMPRESSION_FAILED;
+	  {
+	    gnutls_assert ();
+	    return GNUTLS_E_DECOMPRESSION_FAILED;
+	  }
 
 	*plain = NULL;
 	out_size = compressed_size + compressed_size;
