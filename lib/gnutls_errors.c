@@ -218,8 +218,8 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE, 1),
   ERROR_ENTRY (N_("The OID is not supported."), GNUTLS_E_X509_UNSUPPORTED_OID,
 	       1),
-  ERROR_ENTRY (N_("The specified algorithm or protocol is unknown."),
-	       GNUTLS_E_UNKNOWN_ALGORITHM, 1),
+  ERROR_ENTRY (N_("The hash algorithm is unknown."),
+	       GNUTLS_E_UNKNOWN_HASH_ALGORITHM, 1),
   ERROR_ENTRY (N_("The PKCS structure's content type is unknown."),
 	       GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE, 1),
   ERROR_ENTRY (N_("The PKCS structure's bag type is unknown."),
@@ -239,6 +239,9 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_WARNING_IA_FPHF_RECEIVED, 0),
   ERROR_ENTRY (N_("Verifying TLS/IA phase checksum failed"),
 	       GNUTLS_E_IA_VERIFY_FAILED, 1),
+
+  ERROR_ENTRY (N_("The specified algorithm or protocol is unknown."),
+	       GNUTLS_E_UNKNOWN_ALGORITHM, 1),
 
   {NULL, NULL, 0, 0}
 };
