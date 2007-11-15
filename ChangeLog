@@ -1,3 +1,196 @@
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.1.6.
+
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h: Revert rename of
+	GNUTLS_E_UNKNOWN_HASH_ALGORITHM.  Instead we add a new
+	GNUTLS_E_UNKNOWN_ALGORITHM.
+
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Revert rename of
+	GNUTLS_E_UNKNOWN_HASH_ALGORITHM.  Instead we add a new
+	GNUTLS_E_UNKNOWN_ALGORITHM.
+
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Revert rename of
+	GNUTLS_E_UNKNOWN_HASH_ALGORITHM.  Instead we add a new
+	GNUTLS_E_UNKNOWN_ALGORITHM.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/seskey.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/opencdk/keydb.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_record.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_anon_cred.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Doc fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Doc fixes.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h, includes/gnutls/extra.h: Move compat
+	stuff to compat.h.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/extra.c: Use new APIs.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* guile/modules/gnutls/build/enums.scm: Typo.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* guile/modules/gnutls/build/enums.scm,
+	guile/modules/gnutls/build/smobs.scm: Update API.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* guile/modules/gnutls/build/enums.scm: Add unknown-algorithm (new
+	name of unknown-hash-algorithm).
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* guile/modules/gnutls/build/enums.scm: Remove openpgp trustdb
+	error.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h, includes/gnutls/gnutls.h.in: Move compat
+	mappings to compat.h.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c, src/common.c: Use new API.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-serv-export.c, lib/auth_cert.h,
+	libextra/gnutls_openpgp.c: Use new API.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openpgp.c: Don't use trustdb error code.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutlsxx.h, lib/gnutlsxx.cpp: Use new API in C++
+	library.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Use new API.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h, includes/gnutls/gnutls.h.in,
+	includes/gnutls/openpgp.h: Move compat mappings to compat.h.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h: Fix.
+
+2007-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h: Remove trustdb error code, since we
+	removed all functions.
+
+2007-11-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_cipher.c, lib/gnutls_compress.c,
+	lib/gnutls_compress_int.c: some updates in the compression code
+
+2007-11-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cipher.c, lib/gnutls_compress.c,
+	lib/gnutls_compress.h, lib/gnutls_record.c: Corrected bug in
+	decompression of expanded compression data.
+
+2007-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_cipher.c: When decompressed data are more than the
+	record max size warn using GNUTLS_E_DECOMPRESSION_FAILED.
+
+2007-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : 1	1	src/certtool.gaa
+
+2007-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* includes/gnutls/gnutls.h.in, lib/gnutls_cert.c, src/tls_test.c: 
+	Applied documentation and prototype fixes reported by Evan Martin
+	<martine@danga.com>.
+
+2007-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: updated the links to openpgp draft
+
+2007-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Add warnings about messages used by Emacs tls.el.
+
+2007-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2007-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rfc5081.txt: Add.
+
+2007-11-01  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-11-01  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.1.5.
