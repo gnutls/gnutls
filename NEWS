@@ -15,8 +15,18 @@ to PKCS #8 keys.
 ** gnutls_certificate_set_x509_key_* can now read PKCS #8 unencrypted
 private keys.
 
+** Fixed GNUTLS_E_UNKNOWN_ALGORITHM vs GNUTLS_E_UNKNOWN_HASH_ALGORITHM.
+During the 2.1.x series the GNUTLS_E_UNKNOWN_HASH_ALGORITHM error code
+was renamed to GNUTLS_E_UNKNOWN_ALGORITHM, unfortunately without being
+documented.  This caused some problems (e.g., debian #450854).  To
+avoid backwards compatibility problems, this release revert this
+change, so that GNUTLS_E_UNKNOWN_HASH_ALGORITHM works just like it has
+done in GnuTLS 2.0.x and earlier, and add a new error code
+GNUTLS_E_UNKNOWN_ALGORITHM.
+
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_E_UNKNOWN_ALGORITHM: CHANGED.
+GNUTLS_E_UNKNOWN_HASH_ALGORITHM: CHANGED.
 
 * Version 2.1.5 (released 2007-11-01)
 
