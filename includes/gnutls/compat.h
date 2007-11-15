@@ -79,9 +79,6 @@
 #define GNUTLS_A_MISSING_SRP_USERNAME GNUTLS_A_UNKNOWN_PSK_IDENTITY
 #define GNUTLS_A_UNKNOWN_SRP_USERNAME GNUTLS_A_UNKNOWN_PSK_IDENTITY
 
-/* Renamed in 2.1.x. */
-#define GNUTLS_E_UNKNOWN_HASH_ALGORITHM GNUTLS_E_UNKNOWN_ALGORITHM
-
 /* OpenPGP stuff renamed in 2.1.x. */
 #define gnutls_openpgp_key_fmt_t gnutls_openpgp_crt_fmt_t
 #define GNUTLS_OPENPGP_KEY GNUTLS_OPENPGP_CERT
