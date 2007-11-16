@@ -1,3 +1,41 @@
+2007-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2007-11-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.0.4.
+
+2007-11-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-11-15  Ludovic Courtès <ludo@gnu.org>
+
+	* lib/gnutls_cipher.c, lib/gnutls_compress_int.c: Add more
+	`gnutls assert ()'.
+
+2007-10-26  Ludovic Courtès <ludo@gnu.org>
+
+	* .gitignore, doc/.gitignore, gl/.gitignore, guile/.gitignore,
+	lgl/.gitignore, libextra/.gitignore, po/.gitignore: Add
+	`.gitignore'.
+
+2007-11-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_cipher.c, lib/gnutls_compress.c: some updates in the
+	compression code
+
+2007-11-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cipher.c, lib/gnutls_compress.c,
+	lib/gnutls_compress.h, lib/gnutls_record.c: Corrected bug in
+	decompression of expanded compression data.
+
+2007-11-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-11-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.0.3.
