@@ -1015,8 +1015,9 @@ stream_flush (cdk_stream_t s)
 {
   assert (s);
   
-  if (fflush (s->fp))
-    return CDK_File_Error;
+  /* For some constellations it cannot be assured that the
+     return value is defined, thus we ignore it for now. */
+  (void)fflush (s->fp);
   return 0;
 }
 

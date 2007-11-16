@@ -204,7 +204,7 @@ write_mdc_packet (FILE *out, cipher_filter_t *cfx)
 }
   
 
-static __inline__ int
+static inline int
 num2bits (size_t n)
 {
   size_t i;
