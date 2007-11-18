@@ -5,10 +5,17 @@ See the end for copying conditions.
 
 * Version 2.1.7 (unreleased)
 
+** Updated gnutls_set_default_priority2() now renamed to
+gnutls_set_priority() which now accepts a string to indicate 
+preferences of ciphersuite parameters.
+
+** gnutls-cli and gnutls-serv now have a --priority option to set
+the priority string.
+
 ** Internal copy of OpenCDK upgraded to version 0.6.6.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_set_default_priority2: RENAMED to gnutls_set_priority()
 
 * Version 2.1.6 (released 2007-11-15)
 

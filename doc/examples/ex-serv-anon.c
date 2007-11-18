@@ -37,15 +37,13 @@ gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;
-  const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
 
   gnutls_init (&session, GNUTLS_SERVER);
 
   /* avoid calling all the priority functions, since the defaults
    * are adequate.
    */
-  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY_NORMAL);
-  gnutls_kx_set_priority (session, kx_prio);
+  gnutls_set_priority (session, "NORMAL:+ANON-DH", NULL, 0);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 

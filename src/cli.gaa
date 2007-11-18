@@ -65,6 +65,9 @@ option (kx) *STR "kx1 kx2..." { $kx = $1; $nkx = @1 } "Key exchange methods to e
 #char **ctype;
 option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Certificate types to enable."
 
+#char *priorities;
+option (priority) STR "PRIORITY STRING" { $priorities = $1 } "Priorities string."
+
 #char *x509_cafile;
 option (x509cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
 
@@ -124,5 +127,5 @@ init { $resume=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $crlf = 0; 
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 
 	$debug = 0; $print_cert = 0; $verbose = 0; $psk_key = NULL; 
-	$psk_username = NULL; 
+	$psk_username = NULL; $priorities = NULL;
 	$opaque_prf_input = NULL; }

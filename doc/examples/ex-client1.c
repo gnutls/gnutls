@@ -36,7 +36,6 @@ main (void)
   char buffer[MAX_BUF + 1];
   gnutls_anon_client_credentials_t anoncred;
   /* Need to enable anonymous KX specifically. */
-  const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
 
   gnutls_global_init ();
 
@@ -47,8 +46,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
-  gnutls_kx_set_priority (session, kx_prio);
+  gnutls_set_priority (session, "PERFORMANCE:+ANON-DH:!ARCFOUR-128", NULL, 0);
 
   /* put the anonymous credentials to the current session
    */

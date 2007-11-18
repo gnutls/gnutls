@@ -103,6 +103,9 @@ option (kx) *STR "kx1 kx2..." { $kx = $1; $nkx = @1 } "Key exchange methods to e
 #char **ctype;
 option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Certificate types to enable."
 
+#char *priorities;
+option (priority) STR "PRIORITY STRING" { $priorities = $1 } "Priorities string."
+
 option (l, list) { print_list(0); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
@@ -119,6 +122,6 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
 	$pgp_keyring=NULL; $fmtder = 0;
-	$disable_client_cert = 0;
+	$disable_client_cert = 0; $priorities = NULL;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0;
 	$opaque_prf_input=NULL; }

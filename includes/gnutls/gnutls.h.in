@@ -165,14 +165,6 @@ extern "C"
     GNUTLS_CLIENT
   } gnutls_connection_end_t;
 
-  typedef enum 
-  {
-    GNUTLS_PRIORITIES_EXPORT,
-    GNUTLS_PRIORITIES_PERFORMANCE,
-    GNUTLS_PRIORITIES_SECURITY_NORMAL,
-    GNUTLS_PRIORITIES_SECURITY_HIGH
-  } gnutls_priority_flag_t;
-
   typedef enum
   {
     GNUTLS_AL_WARNING = 1,
@@ -524,8 +516,7 @@ extern "C"
 
 /* if you just want some defaults, use the following.
  */
-  void gnutls_set_default_priority2 (gnutls_session_t session,
-				     gnutls_priority_flag_t flag);
+  int gnutls_set_priority(gnutls_session_t session, const char *priority, char* syntax_error, size_t syntax_error_size);
 
 /* Returns the name of a cipher suite */
   const char *gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t

@@ -365,6 +365,7 @@ gnutls_session_t
 initialize_session (void)
 {
   gnutls_session_t session;
+  char err[128];
 
   gnutls_init (&session, GNUTLS_SERVER);
 
@@ -380,7 +381,11 @@ initialize_session (void)
       gnutls_db_set_ptr (session, NULL);
     }
 
-  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
+  if (gnutls_set_priority (session, info.priorities, err, sizeof(err)-1) < 0)
+    {
+      fprintf(stderr, "%s\n", err);
+      exit(1);
+    }
 
   if (cipher_priority[0])
     gnutls_cipher_set_priority (session, cipher_priority);

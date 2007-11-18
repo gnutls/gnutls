@@ -8,36 +8,38 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 116 "cli.gaa"
+#line 119 "cli.gaa"
 	char *rest_args;
-#line 107 "cli.gaa"
+#line 110 "cli.gaa"
 	int insecure;
-#line 104 "cli.gaa"
+#line 107 "cli.gaa"
 	char *port;
-#line 101 "cli.gaa"
+#line 104 "cli.gaa"
 	char *opaque_prf_input;
-#line 98 "cli.gaa"
+#line 101 "cli.gaa"
 	char *psk_key;
-#line 95 "cli.gaa"
+#line 98 "cli.gaa"
 	char *psk_username;
-#line 92 "cli.gaa"
+#line 95 "cli.gaa"
 	char *srp_passwd;
-#line 89 "cli.gaa"
+#line 92 "cli.gaa"
 	char *srp_username;
-#line 86 "cli.gaa"
+#line 89 "cli.gaa"
 	char *x509_certfile;
-#line 83 "cli.gaa"
+#line 86 "cli.gaa"
 	char *x509_keyfile;
-#line 80 "cli.gaa"
+#line 83 "cli.gaa"
 	char *pgp_certfile;
-#line 77 "cli.gaa"
+#line 80 "cli.gaa"
 	char *pgp_keyring;
-#line 74 "cli.gaa"
+#line 77 "cli.gaa"
 	char *pgp_keyfile;
-#line 71 "cli.gaa"
+#line 74 "cli.gaa"
 	char *x509_crlfile;
-#line 68 "cli.gaa"
+#line 71 "cli.gaa"
 	char *x509_cafile;
+#line 68 "cli.gaa"
+	char *priorities;
 #line 65 "cli.gaa"
 	char **ctype;
 #line 64 "cli.gaa"

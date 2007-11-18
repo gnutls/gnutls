@@ -20,10 +20,10 @@
 #endif
 
 #define gnutls_set_default_priority(x)					\
-  (gnutls_set_default_priority2 (x, GNUTLS_PRIORITIES_SECURITY_NORMAL), \
+  (gnutls_set_default_priority2 (x, "NORMAL", NULL, 0), \
    GNUTLS_E_SUCCESS)
 #define gnutls_set_default_export_priority(x)				\
-  (gnutls_set_default_priority2( x, GNUTLS_PRIORITIES_EXPORT),		\
+  (gnutls_set_default_priority2( x, "EXPORT", NULL, 0),		\
    GNUTLS_E_SUCCESS)
 
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t

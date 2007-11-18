@@ -132,4 +132,10 @@ int _gnutls_kx_priority (gnutls_session_t session,
 int _gnutls_compression_priority (gnutls_session_t session,
 				  gnutls_compression_method_t algorithm);
 
+gnutls_mac_algorithm_t gnutls_mac_get_id (const char* name);
+gnutls_cipher_algorithm_t gnutls_cipher_get_id (const char* name);
+gnutls_kx_algorithm_t gnutls_kx_get_id (const char* name);
+gnutls_protocol_t gnutls_protocol_get_id (const char* name);
+gnutls_certificate_type_t gnutls_certificate_type_get_id (const char* name);
+
 #endif

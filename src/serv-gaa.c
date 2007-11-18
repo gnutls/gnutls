@@ -155,6 +155,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "macs", "mac1 mac2... ", "MACs to enable.");
 	__gaa_helpsingle(0, "kx", "kx1 kx2... ", "Key exchange methods to enable.");
 	__gaa_helpsingle(0, "ctypes", "certType1 certType2... ", "Certificate types to enable.");
+	__gaa_helpsingle(0, "priority", "PRIORITY STRING ", "Priorities string.");
 	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms  and modes.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 	__gaa_helpsingle('v', "version", "", "prints the program's version number");
@@ -173,6 +174,8 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
+#line 106 "serv.gaa"
+	char *priorities;
 #line 103 "serv.gaa"
 	char **ctype;
 #line 102 "serv.gaa"
@@ -297,41 +300,42 @@ static int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           34
+#define GAA_NB_OPTION           35
 #define GAAOPTID_copyright	1
 #define GAAOPTID_version	2
 #define GAAOPTID_help	3
 #define GAAOPTID_list	4
-#define GAAOPTID_ctypes	5
-#define GAAOPTID_kx	6
-#define GAAOPTID_macs	7
-#define GAAOPTID_comp	8
-#define GAAOPTID_protocols	9
-#define GAAOPTID_ciphers	10
-#define GAAOPTID_opaque_prf_input	11
-#define GAAOPTID_srppasswdconf	12
-#define GAAOPTID_srppasswd	13
-#define GAAOPTID_pskpasswd	14
-#define GAAOPTID_disable_client_cert	15
-#define GAAOPTID_require_cert	16
-#define GAAOPTID_x509dsacertfile	17
-#define GAAOPTID_x509dsakeyfile	18
-#define GAAOPTID_x509certfile	19
-#define GAAOPTID_x509keyfile	20
-#define GAAOPTID_pgpcertfile	21
-#define GAAOPTID_pgpkeyfile	22
-#define GAAOPTID_pgpkeyring	23
-#define GAAOPTID_x509crlfile	24
-#define GAAOPTID_x509cafile	25
-#define GAAOPTID_x509fmtder	26
-#define GAAOPTID_dhparams	27
-#define GAAOPTID_echo	28
-#define GAAOPTID_http	29
-#define GAAOPTID_nodb	30
-#define GAAOPTID_quiet	31
-#define GAAOPTID_port	32
-#define GAAOPTID_generate	33
-#define GAAOPTID_debug	34
+#define GAAOPTID_priority	5
+#define GAAOPTID_ctypes	6
+#define GAAOPTID_kx	7
+#define GAAOPTID_macs	8
+#define GAAOPTID_comp	9
+#define GAAOPTID_protocols	10
+#define GAAOPTID_ciphers	11
+#define GAAOPTID_opaque_prf_input	12
+#define GAAOPTID_srppasswdconf	13
+#define GAAOPTID_srppasswd	14
+#define GAAOPTID_pskpasswd	15
+#define GAAOPTID_disable_client_cert	16
+#define GAAOPTID_require_cert	17
+#define GAAOPTID_x509dsacertfile	18
+#define GAAOPTID_x509dsakeyfile	19
+#define GAAOPTID_x509certfile	20
+#define GAAOPTID_x509keyfile	21
+#define GAAOPTID_pgpcertfile	22
+#define GAAOPTID_pgpkeyfile	23
+#define GAAOPTID_pgpkeyring	24
+#define GAAOPTID_x509crlfile	25
+#define GAAOPTID_x509cafile	26
+#define GAAOPTID_x509fmtder	27
+#define GAAOPTID_dhparams	28
+#define GAAOPTID_echo	29
+#define GAAOPTID_http	30
+#define GAAOPTID_nodb	31
+#define GAAOPTID_quiet	32
+#define GAAOPTID_port	33
+#define GAAOPTID_generate	34
+#define GAAOPTID_debug	35
 
 #line 168 "gaa.skel"
 
@@ -518,6 +522,12 @@ static float gaa_getfloat(char *arg)
 }
 /* option structures */
 
+struct GAAOPTION_priority 
+{
+	char* arg1;
+	int size1;
+};
+
 struct GAAOPTION_ctypes 
 {
 	char** arg1;
@@ -679,6 +689,7 @@ static int gaa_get_option_num(char *str, int status)
     switch(status)
         {
         case GAA_LETTER_OPTION:
+			GAA_CHECK1STR("", GAAOPTID_priority);
 			GAA_CHECK1STR("", GAAOPTID_ctypes);
 			GAA_CHECK1STR("", GAAOPTID_kx);
 			GAA_CHECK1STR("", GAAOPTID_macs);
@@ -723,6 +734,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("version", GAAOPTID_version);
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("list", GAAOPTID_list);
+			GAA_CHECKSTR("priority", GAAOPTID_priority);
 			GAA_CHECKSTR("ctypes", GAAOPTID_ctypes);
 			GAA_CHECKSTR("kx", GAAOPTID_kx);
 			GAA_CHECKSTR("macs", GAAOPTID_macs);
@@ -765,6 +777,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 {
     int OK = 0;
     int gaa_last_non_option;
+	struct GAAOPTION_priority GAATMP_priority;
 	struct GAAOPTION_ctypes GAATMP_ctypes;
 	struct GAAOPTION_kx GAATMP_kx;
 	struct GAAOPTION_macs GAATMP_macs;
@@ -809,29 +822,39 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_copyright:
 	OK = 0;
-#line 110 "serv.gaa"
+#line 113 "serv.gaa"
 { print_serv_license(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_version:
 	OK = 0;
-#line 109 "serv.gaa"
+#line 112 "serv.gaa"
 { serv_version(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_help:
 	OK = 0;
-#line 107 "serv.gaa"
+#line 110 "serv.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list:
 	OK = 0;
-#line 106 "serv.gaa"
+#line 109 "serv.gaa"
 { print_list(0); exit(0); ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_priority:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_priority.arg1, gaa_getstr, GAATMP_priority.size1);
+		gaa_index++;
+#line 107 "serv.gaa"
+{ gaaval->priorities = GAATMP_priority.arg1 ;};
 
 		return GAA_OK;
 		break;
@@ -1123,7 +1146,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 114 "serv.gaa"
+#line 117 "serv.gaa"
 { gaaval->generate=0; gaaval->port=5556; gaaval->http=0; gaaval->ciphers=NULL;
 	gaaval->kx=NULL; gaaval->comp=NULL; gaaval->macs=NULL; gaaval->ctype=NULL; gaaval->nciphers=0;
 	gaaval->nkx=0; gaaval->ncomp=0; gaaval->nmacs=0; gaaval->nctype = 0; gaaval->nodb = 0;
@@ -1132,7 +1155,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->x509_dsakeyfile=NULL; gaaval->x509_dsacertfile=NULL; 
 	gaaval->srp_passwd=NULL; gaaval->srp_passwd_conf=NULL; gaaval->quiet = 0;
 	gaaval->pgp_keyring=NULL; gaaval->fmtder = 0;
-	gaaval->disable_client_cert = 0;
+	gaaval->disable_client_cert = 0; gaaval->priorities = NULL;
 	gaaval->dh_params_file=NULL; gaaval->debug=0; gaaval->require_cert = 0; gaaval->psk_passwd = 0;
 	gaaval->opaque_prf_input=NULL; ;};
 
@@ -1283,7 +1306,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
 
         len++;
         a = fgetc( file);
-        if(a==EOF) return 0; /* a = ' '; */
+        if(a==EOF) return 0; //a = ' ';
     }
 
     len += 1;

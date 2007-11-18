@@ -374,11 +374,17 @@ cert_callback (gnutls_session_t session,
 static gnutls_session_t
 init_tls_session (const char *hostname)
 {
+char err[128];
+
   gnutls_session_t session;
 
   gnutls_init (&session, GNUTLS_CLIENT);
 
-  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
+  if (gnutls_set_priority (session, info.priorities, err, sizeof(err)-1) < 0)
+    {
+      fprintf(stderr, "%s\n", err);
+      exit(1);
+    }
 
   /* allow the use of private ciphersuites.
    */
@@ -530,7 +536,7 @@ main (int argc, char **argv)
   if ((ret = gnutls_global_init_extra ()) < 0)
     {
       fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
-      exit (1);
+//      exit (1);
     }
 
   gaa_parser (argc, argv);

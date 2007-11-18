@@ -64,8 +64,6 @@ class rsa_params
         gnutls_rsa_params_t params;
 };
 
-typedef gnutls_priority_flag_t priority_flag;
-
 class session
 {
     protected:
@@ -125,7 +123,7 @@ class session
 
 /* if you just want some defaults, use the following.
  */
-        void set_default_priority (priority_flag flag);
+        void set_default_priority (const char* prio);
 
         gnutls_protocol_t get_protocol_version() const;
 

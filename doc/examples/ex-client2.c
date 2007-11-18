@@ -34,6 +34,7 @@ main (void)
   int ret, sd, ii;
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
+  char err[128];
   gnutls_certificate_credentials_t xcred;
 
   gnutls_global_init ();
@@ -50,7 +51,13 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_PERFORMANCE);
+  ret = gnutls_set_priority (session, "PERFORMANCE", err, sizeof(err));
+  if (ret < 0) {
+    if (ret == GNUTLS_E_INVALID_REQUEST) {
+      fprintf(stderr, "%s\n", err);
+    }
+    exit(1);
+  }
 
   /* put the x509 credentials to the current session
    */

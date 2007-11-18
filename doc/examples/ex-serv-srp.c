@@ -44,14 +44,10 @@ gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;
-  const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
-    GNUTLS_KX_SRP_RSA, 0
-  };
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  gnutls_set_default_priority2 (session, GNUTLS_PRIORITIES_SECURITY_NORMAL);
-  gnutls_kx_set_priority (session, kx_priority);
+  gnutls_set_priority (session, "NORMAL:+SRP:+SRP-DSS:+SRP-RSA", NULL, 0);
 
   gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
   /* for the certificate authenticated ciphersuites.

@@ -8,6 +8,8 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
+#line 106 "serv.gaa"
+	char *priorities;
 #line 103 "serv.gaa"
 	char **ctype;
 #line 102 "serv.gaa"
