@@ -610,6 +610,32 @@ error:
 
 }
 
+/**
+  * gnutls_check_priority - Checks for syntax errors the given priority string
+  * @priority: is a string describing priorities
+  * @syntax_error: In case of an error an error string will be copied there.
+  * @syntax_error_size: the length of the previous string.
+  *
+  * Checks for syntax errors the given priority string. The rules are
+  * described in gnutls_set_priority().
+  *
+  * On syntax error GNUTLS_E_INVALID_REQUEST is returned and 0 on success.
+  *
+  **/
+int
+gnutls_check_priority(const char *priority, char *syntax_error, size_t syntax_error_size)
+{
+gnutls_session t;
+int ret;
+
+  gnutls_init(&t, GNUTLS_SERVER);
+  ret = gnutls_set_priority( t, priority, syntax_error, syntax_error_size);
+  gnutls_deinit(t);
+
+  return ret;
+}
+
+
 /* New priority API with strings
  */
 

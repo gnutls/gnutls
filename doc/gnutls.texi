@@ -2298,7 +2298,6 @@ The following client is a very simple @acronym{SRP} @acronym{TLS}
 client which connects to a server and authenticates using a
 @emph{username} and a @emph{password}. The server may authenticate
 itself using a certificate, and in that case it has to be verified.
-In this example we also show the usage of @ref{gnutls_kx_convert_priority}.
 
 @verbatiminclude examples/ex-client-srp.c
 

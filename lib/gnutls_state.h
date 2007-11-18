@@ -67,4 +67,6 @@ int _gnutls_PRF (gnutls_session_t session,
 		 const opaque * seed, int seed_size,
 		 int total_bytes, void *ret);
 
+int gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end);
+
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509
