@@ -96,13 +96,12 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   int pos = 0;
   int ret = 0;
   uint16_t sizeOfSuites;
-  gnutls_protocol_t version;
+  gnutls_protocol_t adv_version;
   opaque rnd[TLS_RANDOM_SIZE];
   int len = datalen;
   int err;
   uint16_t challenge;
   opaque session_id[TLS_MAX_SESSION_ID_SIZE];
-  gnutls_protocol_t ver;
 
   /* we only want to get here once - only in client hello */
   session->internals.v2_hello = 0;
@@ -115,33 +114,16 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
 
   set_adv_version (session, data[pos], data[pos + 1]);
 
-  version = _gnutls_version_get (data[pos], data[pos + 1]);
+  adv_version = _gnutls_version_get (data[pos], data[pos + 1]);
 
-  /* if we do not support that version
-   */
-  if (_gnutls_version_is_supported (session, version) == 0)
+  ret = _gnutls_negotiate_version( session, adv_version);
+  if (ret < 0) 
     {
-      /* If he requested something we do not support
-       * then we send him the highest we support.
-       */
-      ver = _gnutls_version_max (session);
-      if (ver == GNUTLS_VERSION_UNKNOWN)
-	{
-	  /* this check is not really needed.
-	   */
-	  gnutls_assert ();
-	  return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
-	}
+      gnutls_assert ();
+      return ret;
     }
-  else
-    {
-      ver = version;
-    }
-
-  _gnutls_set_current_version (session, ver);
 
   pos += 2;
-
 
   /* Read uint16_t cipher_spec_length */
   DECR_LEN (len, 2);
@@ -180,6 +162,13 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
           gnutls_assert();
           return ret;
         }
+
+    ret = _gnutls_negotiate_version( session, adv_version);
+    if (ret < 0) 
+      {
+        gnutls_assert ();
+        return ret;
+      }
     }
 
   /* find an appropriate cipher suite */

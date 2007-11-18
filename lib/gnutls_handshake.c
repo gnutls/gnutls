@@ -272,6 +272,37 @@ _gnutls_tls_create_random (opaque * dst)
   return 0;
 }
 
+/* returns the 0 on success or a negative value.
+ */
+int _gnutls_negotiate_version( gnutls_session_t session, gnutls_protocol_t adv_version)
+{
+int ret;
+
+  /* if we do not support that version  */
+  if (_gnutls_version_is_supported (session, adv_version) == 0)
+    {
+      /* If he requested something we do not support
+       * then we send him the highest we support.
+       */
+      ret = _gnutls_version_max (session);
+      if (ret == GNUTLS_VERSION_UNKNOWN)
+	{
+	  /* this check is not really needed.
+	   */
+	  gnutls_assert ();
+	  return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
+	}
+    }
+  else
+    {
+      ret = adv_version;
+    }
+
+  _gnutls_set_current_version (session, ret);
+    
+  return ret;
+}
+
 
 /* Read a client hello packet. 
  * A client hello must be a known version client hello
@@ -285,10 +316,10 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   uint8_t session_id_len;
   int pos = 0, ret;
   uint16_t suite_size, comp_size;
-  gnutls_protocol_t version;
+  gnutls_protocol_t adv_version;
+  int neg_version;
   int len = datalen;
   opaque rnd[TLS_RANDOM_SIZE], *suite_ptr, *comp_ptr;
-  gnutls_protocol_t ver;
 
   if (session->internals.v2_hello != 0)
     {				/* version 2.0 */
@@ -299,31 +330,15 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   _gnutls_handshake_log ("HSK[%x]: Client's version: %d.%d\n", session,
 			 data[pos], data[pos + 1]);
 
-  version = _gnutls_version_get (data[pos], data[pos + 1]);
+  adv_version = _gnutls_version_get (data[pos], data[pos + 1]);
   set_adv_version (session, data[pos], data[pos + 1]);
   pos += 2;
 
-  /* if we do not support that version  */
-  if (_gnutls_version_is_supported (session, version) == 0)
-    {
-      /* If he requested something we do not support
-       * then we send him the highest we support.
-       */
-      ver = _gnutls_version_max (session);
-      if (ver == GNUTLS_VERSION_UNKNOWN)
-	{
-	  /* this check is not really needed.
-	   */
-	  gnutls_assert ();
-	  return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
-	}
-    }
-  else
-    {
-      ver = version;
-    }
-
-  _gnutls_set_current_version (session, ver);
+  neg_version = _gnutls_negotiate_version( session, adv_version);
+  if (neg_version < 0) {
+    gnutls_assert();
+    return ret;
+  }
 
   /* Read client random value.
    */
@@ -387,7 +402,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 
   /* Parse the extensions (if any)
    */
-  if (ver >= GNUTLS_TLS1)
+  if (neg_version >= GNUTLS_TLS1)
     {
       ret = _gnutls_parse_extensions (session, &data[pos], len);	/* len is the rest of the parsed length */
       if (ret < 0)
@@ -405,6 +420,14 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
           gnutls_assert();
           return ret;
         }
+      /* Here we need to renegotiate the version since the callee might
+       * have disable some TLS versions.
+       */
+      ret = _gnutls_negotiate_version( session, adv_version);
+      if (ret < 0) {
+        gnutls_assert();
+        return ret;
+      }
     }
 
   /* select an appropriate cipher suite
