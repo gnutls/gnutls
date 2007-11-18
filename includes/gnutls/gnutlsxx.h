@@ -123,7 +123,7 @@ class session
 
 /* if you just want some defaults, use the following.
  */
-        void set_default_priority (const char* prio);
+        void set_priority (const char* prio, char* syntax_error, size_t syntax_error_size);
 
         gnutls_protocol_t get_protocol_version() const;
 

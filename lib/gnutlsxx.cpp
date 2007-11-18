@@ -187,9 +187,9 @@ void session::set_certificate_type_priority (const int *list)
 
 /* if you just want some defaults, use the following.
  */
-void session::set_default_priority(const char* prio)
+void session::set_priority(const char* prio, char* syntax_error, size_t syntax_error_size)
 {
-    gnutls_set_default_priority2( this->s, prio, NULL, 0);
+    RETWRAP(gnutls_set_priority( this->s, prio, syntax_error, syntax_error_size));
 }
 
 gnutls_protocol_t session::get_protocol_version() const

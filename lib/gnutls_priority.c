@@ -379,6 +379,7 @@ static const int mac_priority_security[] = {
 
 static int cert_type_priority[] = {
   GNUTLS_CRT_X509,
+  GNUTLS_CRT_OPENPGP,
   0
 };
 
