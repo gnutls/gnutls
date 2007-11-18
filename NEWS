@@ -12,10 +12,19 @@ preferences of ciphersuite parameters.
 ** gnutls-cli and gnutls-serv now have a --priority option to set
 the priority string.
 
+** The gnutls_*_convert_priority() functions were deprecated by
+the gnutls_set_priority().
+
 ** Internal copy of OpenCDK upgraded to version 0.6.6.
 
 ** API and ABI modifications:
 gnutls_set_default_priority2: RENAMED to gnutls_set_priority()
+gnutls_mac_convert_priority: REMOVED
+gnutls_compression_convert_priority: REMOVED
+gnutls_protocol_convert_priority: REMOVED
+gnutls_kx_convert_priority: REMOVED
+gnutls_cipher_convert_priority: REMOVED
+gnutls_certificate_type_convert_priority: REMOVED
 
 * Version 2.1.6 (released 2007-11-15)
 
