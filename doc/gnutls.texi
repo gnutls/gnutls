@@ -868,10 +868,6 @@ To set whether client certificate is required or not.
 To initiate the handshake.
 @end table
 
-Other functions include the @ref{gnutls_protocol_convert_priority}, 
-@ref{gnutls_cipher_convert_priority}, etc., that allow converting 
-priorities given in text format to the internal integer format.
-
 @subsection TLS Cipher Suites
 
 The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
