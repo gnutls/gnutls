@@ -3324,39 +3324,39 @@ expressions.
 
 @item @code{TLS_SRP_SHA_3DES_EDE_CBC_SHA}
 @tab 0x00 0x50
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_AES_128_CBC_SHA}
 @tab 0x00 0x53
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_AES_256_CBC_SHA}
 @tab 0x00 0x56
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA}
 @tab 0x00 0x51
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_DSS_3DES_EDE_CBC_SHA}
 @tab 0x00 0x52
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_RSA_AES_128_CBC_SHA}
 @tab 0x00 0x54
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_DSS_AES_128_CBC_SHA}
 @tab 0x00 0x55
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_RSA_AES_256_CBC_SHA}
 @tab 0x00 0x57
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_SRP_SHA_DSS_AES_256_CBC_SHA}
 @tab 0x00 0x58
-@tab draft-ietf-tls-srp
+@tab RFC 5054
 
 @item @code{TLS_DHE_DSS_ARCFOUR_SHA}
 @tab 0x00 0x66
@@ -3772,9 +3772,8 @@ April 2004, November 2007. Available from
 
 @item @anchor{TLSSRP}[TLSSRP]
 David Taylor, Trevor Perrin, Tom Wu and Nikos Mavrogiannopoulos,
-"Using SRP for TLS Authentication", August 2005, Internet draft, work
-in progress. Available from
-@url{http://www.normos.org/ietf/draft/draft-ietf-tls-srp-08.txt}.
+"Using SRP for TLS Authentication", November 2007. Available from
+@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc5054.txt}.
 
 @item @anchor{TLSPSK}[TLSPSK]
 Pasi Eronen and Hannes Tschofenig, "Pre-shared key Ciphersuites for
