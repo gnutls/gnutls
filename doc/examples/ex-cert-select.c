@@ -140,7 +140,7 @@ main (void)
   gnutls_certificate_allocate_credentials (&xcred);
 
   /* priorities */
-  gnutls_priority_init( &priority_cache, "NORMAL", NULL, 0);
+  gnutls_priority_init( &priorities_cache, "NORMAL", NULL, 0);
 
 
   /* sets the trusted cas file
@@ -154,7 +154,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_priority (session, priority_cache);
+  gnutls_set_priority (session, priorities_cache);
 
   /* put the x509 credentials to the current session
    */
@@ -211,7 +211,7 @@ end:
   gnutls_deinit (session);
 
   gnutls_certificate_free_credentials (xcred);
-  gnutls_priority_deinit( priority_cache);
+  gnutls_priority_deinit( priorities_cache);
 
   gnutls_global_deinit ();
 
