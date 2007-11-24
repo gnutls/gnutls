@@ -385,7 +385,7 @@ typedef struct
 } priority_st;
 
 /* For the external api */
-typedef struct gnutls_priority_st
+struct gnutls_priority_st
 {
   priority_st cipher;
   priority_st mac;
@@ -396,7 +396,7 @@ typedef struct gnutls_priority_st
 
   /* to disable record padding */
   int no_padding;
-} *gnutls_priority_t;
+};
 
 
 /* DH and RSA parameters types.

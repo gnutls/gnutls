@@ -40,10 +40,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  /* avoid calling all the priority functions, since the defaults
-   * are adequate.
-   */
-  gnutls_set_priority (session, "NORMAL:+ANON-DH", NULL, 0);
+  gnutls_priority_set_direct (session, "NORMAL:+ANON-DH", NULL, 0);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 

@@ -834,29 +834,17 @@ has to set up the required parameters. Available functions to control
 the handshake protocol include:
 
 @table @asis
-@item @ref{gnutls_cipher_set_priority}:
-To set the priority of bulk cipher algorithms.
+@item @ref{gnutls_priority_init}:
+To initialize a priority set of ciphers.
 
-@item @ref{gnutls_mac_set_priority}:
-To set the priority of MAC algorithms.
+@item @ref{gnutls_priority_deinit}:
+To deinitialize a priority set of ciphers.
 
-@item @ref{gnutls_kx_set_priority}:
-To set the priority of key exchange algorithms.
+@item @ref{gnutls_priority_set}:
+To associate a priority set with a @acronym{TLS} session.
 
-@item @ref{gnutls_compression_set_priority}:
-To set the priority of compression methods.
-
-@item @ref{gnutls_certificate_type_set_priority}:
-To set the priority of certificate types (e.g., @acronym{OpenPGP},
-@acronym{X.509}).
-
-@item @ref{gnutls_protocol_set_priority}:
-To set the priority of protocol versions (e.g., @acronym{SSL} 3.0,
-@acronym{TLS} 1.0).
-
-@item @ref{gnutls_set_priority}:
-To set some defaults in the current session. That way you don't have
-to call each priority function, independently.
+@item @ref{gnutls_priority_set_direct}:
+To directly associate a session with a given priority string.
 
 @item @ref{gnutls_credentials_set}:
 To set the appropriate credentials structures.

@@ -321,6 +321,9 @@ extern "C"
   struct gnutls_x509_privkey_int;	/* XXX ugly. */
   typedef struct gnutls_x509_privkey_int *gnutls_rsa_params_t;	/* XXX ugly. */
 
+  struct gnutls_priority_st;
+  typedef struct gnutls_priority_st *gnutls_priority_t;
+
   typedef struct
   {
     unsigned char *data;
@@ -507,17 +510,13 @@ extern "C"
   int gnutls_certificate_type_set_priority (gnutls_session_t session,
 					    const int *list);
 
-  int gnutls_mac_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
-  int gnutls_compression_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
-  int gnutls_protocol_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
-  int gnutls_kx_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
-  int gnutls_cipher_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
-  int gnutls_certificate_type_convert_priority (int* out_priority, int out_priority_len, const char *prio, char sep);
-
 /* if you just want some defaults, use the following.
  */
-  int gnutls_set_priority(gnutls_session_t session, const char *priority, char* syntax_error, size_t syntax_error_size);
-  int gnutls_check_priority(const char *priority, char *syntax_error, size_t syntax_error_size);
+  int gnutls_priority_init( gnutls_priority_t*, const char *priority, char* syntax_error, size_t syntax_error_size);
+  void gnutls_priority_deinit( gnutls_priority_t);
+  
+  int gnutls_priority_set(gnutls_session_t session, gnutls_priority_t);
+  int gnutls_priority_set_direct(gnutls_session_t session, const char *priority, char* syntax_error, size_t syntax_error_size);
 
 /* Returns the name of a cipher suite */
   const char *gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t

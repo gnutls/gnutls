@@ -78,7 +78,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_priority (session, "NORMAL:+ANON-DH", NULL, 0);
+  gnutls_priority_set_direct (session, "NORMAL:+ANON-DH", NULL, 0);
 
   /* put the anonymous and TLS/IA credentials to the current session
    */

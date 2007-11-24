@@ -189,7 +189,12 @@ void session::set_certificate_type_priority (const int *list)
  */
 void session::set_priority(const char* prio, char* syntax_error, size_t syntax_error_size)
 {
-    RETWRAP(gnutls_set_priority( this->s, prio, syntax_error, syntax_error_size));
+    RETWRAP(gnutls_priority_set_direct( this->s, prio, syntax_error, syntax_error_size));
+}
+
+void session::set_priority(gnutls_priority_t p)
+{
+    RETWRAP(gnutls_priority_set( this->s, p));
 }
 
 gnutls_protocol_t session::get_protocol_version() const

@@ -54,7 +54,7 @@ main (void)
 
       gnutls_init (&session, GNUTLS_CLIENT);
 
-      gnutls_set_priority (session, "PERFORMANCE", NULL, 0);
+      gnutls_priority_set_direct (session, "PERFORMANCE:!ARCFOUR-128", NULL, 0);
 
       gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 

@@ -126,6 +126,7 @@ main (void)
 {
   int ret, sd, ii;
   gnutls_session_t session;
+  gnutls_priority_t priorities_cache;
   char buffer[MAX_BUF + 1];
   gnutls_certificate_credentials_t xcred;
   /* Allow connections to servers that have OpenPGP keys as well.
@@ -138,6 +139,10 @@ main (void)
   /* X509 stuff */
   gnutls_certificate_allocate_credentials (&xcred);
 
+  /* priorities */
+  gnutls_priority_init( &priority_cache, "NORMAL", NULL, 0);
+
+
   /* sets the trusted cas file
    */
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
@@ -149,7 +154,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_priority (session, "NORMAL", NULL, 0);
+  gnutls_set_priority (session, priority_cache);
 
   /* put the x509 credentials to the current session
    */
@@ -206,6 +211,7 @@ end:
   gnutls_deinit (session);
 
   gnutls_certificate_free_credentials (xcred);
+  gnutls_priority_deinit( priority_cache);
 
   gnutls_global_deinit ();
 

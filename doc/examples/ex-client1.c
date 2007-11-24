@@ -46,7 +46,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_priority (session, "PERFORMANCE:+ANON-DH:!ARCFOUR-128", NULL, 0);
+  gnutls_priority_set_direct (session, "PERFORMANCE:+ANON-DH:!ARCFOUR-128", NULL, 0);
 
   /* put the anonymous credentials to the current session
    */

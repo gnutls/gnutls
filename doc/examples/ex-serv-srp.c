@@ -47,7 +47,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  gnutls_set_priority (session, "NORMAL:+SRP:+SRP-DSS:+SRP-RSA", NULL, 0);
+  gnutls_priority_set_direct (session, "NORMAL:+SRP:+SRP-DSS:+SRP-RSA", NULL, 0);
 
   gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
   /* for the certificate authenticated ciphersuites.

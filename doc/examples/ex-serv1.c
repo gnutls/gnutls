@@ -38,6 +38,7 @@
 
 /* These are global */
 gnutls_certificate_credentials_t x509_cred;
+gnutls_priority_t priority_cache;
 
 gnutls_session_t
 initialize_tls_session (void)
@@ -46,11 +47,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  /* avoid calling all the priority functions, since the defaults
-   * are adequate. Depending on the needs it could also be 
-   * "PERFORMANCE".
-   */
-  gnutls_set_priority (session, "NORMAL", NULL, 0);
+  gnutls_set_priority (session, priority_cache);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
@@ -117,6 +114,9 @@ main (void)
 					GNUTLS_X509_FMT_PEM);
 
   generate_dh_params ();
+
+  gnutls_priority_init( &priority_cache, "NORMAL", NULL, 0);
+
 
   gnutls_certificate_set_dh_params (x509_cred, dh_params);
 
@@ -201,6 +201,7 @@ main (void)
   close (listen_sd);
 
   gnutls_certificate_free_credentials (x509_cred);
+  gnutls_priority_deinit(priority_cache);
 
   gnutls_global_deinit ();
 

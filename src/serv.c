@@ -381,7 +381,7 @@ initialize_session (void)
       gnutls_db_set_ptr (session, NULL);
     }
 
-  if (gnutls_set_priority (session, info.priorities, err, sizeof(err)-1) < 0)
+  if (gnutls_priority_set_direct (session, info.priorities, err, sizeof(err)-1) < 0)
     {
       fprintf(stderr, "%s\n", err);
       exit(1);

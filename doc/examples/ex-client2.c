@@ -51,7 +51,7 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  ret = gnutls_set_priority (session, "PERFORMANCE", err, sizeof(err));
+  ret = gnutls_priority_set_direct (session, "PERFORMANCE", err, sizeof(err));
   if (ret < 0) {
     if (ret == GNUTLS_E_INVALID_REQUEST) {
       fprintf(stderr, "%s\n", err);

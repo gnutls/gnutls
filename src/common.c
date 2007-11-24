@@ -670,7 +670,7 @@ print_list (int verbose)
 void
 print_license (void)
 {
-  fputs ("\nCopyright (C) 2004 Free Software Foundation\n"
+  fputs ("\nCopyright (C) 2004,2005,2006,2007 Free Software Foundation\n"
 	 "This program is free software; you can redistribute it and/or modify \n"
 	 "it under the terms of the GNU General Public License as published by \n"
 	 "the Free Software Foundation; either version 2 of the License, or \n"
@@ -685,13 +685,21 @@ print_license (void)
 	 stdout);
 }
 
+static int depr_printed = 0;
+#define DEPRECATED if (depr_printed==0) { \
+  fprintf(stderr, "This method of specifying algorithms is deprecated. Please use the --priority option.\n"); \
+  depr_printed = 1; \
+  }
+
 void
 parse_protocols (char **protocols, int protocols_size, int *protocol_priority)
 {
   int i, j;
-
+  
   if (protocols != NULL && protocols_size > 0)
     {
+      DEPRECATED;
+
       for (j = i = 0; i < protocols_size; i++)
 	{
 	  if (strncasecmp (protocols[i], "SSL", 3) == 0)
@@ -714,8 +722,10 @@ parse_ciphers (char **ciphers, int nciphers, int *cipher_priority)
 {
   int j, i;
 
+
   if (ciphers != NULL && nciphers > 0)
     {
+      DEPRECATED;
       for (j = i = 0; i < nciphers; i++)
 	{
 	  if (strncasecmp (ciphers[i], "AES-2", 5) == 0)
@@ -747,8 +757,11 @@ void
 parse_macs (char **macs, int nmacs, int *mac_priority)
 {
   int i, j;
+
+
   if (macs != NULL && nmacs > 0)
     {
+      DEPRECATED;
       for (j = i = 0; i < nmacs; i++)
 	{
 	  if (strncasecmp (macs[i], "MD5", 3) == 0)
@@ -774,8 +787,10 @@ void
 parse_ctypes (char **ctype, int nctype, int *cert_type_priority)
 {
   int i, j;
+
   if (ctype != NULL && nctype > 0)
     {
+      DEPRECATED;
       for (j = i = 0; i < nctype; i++)
 	{
 	  if (strncasecmp (ctype[i], "OPE", 3) == 0)
@@ -793,8 +808,11 @@ void
 parse_kx (char **kx, int nkx, int *kx_priority)
 {
   int i, j;
+
+
   if (kx != NULL && nkx > 0)
     {
+      DEPRECATED;
       for (j = i = 0; i < nkx; i++)
 	{
 	  if (strcasecmp (kx[i], "SRP") == 0)
@@ -828,8 +846,10 @@ void
 parse_comp (char **comp, int ncomp, int *comp_priority)
 {
   int i, j;
+
   if (comp != NULL && ncomp > 0)
     {
+      DEPRECATED;
       for (j = i = 0; i < ncomp; i++)
 	{
 	  if (strncasecmp (comp[i], "NUL", 3) == 0)
