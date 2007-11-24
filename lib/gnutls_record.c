@@ -489,25 +489,6 @@ _gnutls_send_change_cipher_spec (gnutls_session_t session, int again)
     }
 }
 
-inline static int
-check_recv_type (content_type_t recv_type)
-{
-  switch (recv_type)
-    {
-    case GNUTLS_CHANGE_CIPHER_SPEC:
-    case GNUTLS_ALERT:
-    case GNUTLS_HANDSHAKE:
-    case GNUTLS_APPLICATION_DATA:
-    case GNUTLS_INNER_APPLICATION:
-      return 0;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-    }
-
-}
-
-
 /* Checks if there are pending data in the record buffers. If there are
  * then it copies the data.
  */
@@ -766,13 +747,14 @@ record_check_type (gnutls_session_t session,
 	  return GNUTLS_E_UNEXPECTED_PACKET;
 	  break;
 	default:
-
+	  /* an unknown content type was received. Just ignore it. */
 	  _gnutls_record_log
 	    ("REC[%x]: Received Unknown packet %d expecting %d\n",
 	     session, recv_type, type);
 
 	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
+	  /* call again to receive actual data */
+	  return GNUTLS_E_AGAIN;
 	}
     }
 
@@ -916,14 +898,10 @@ begin:
       return ret;
     }
 
-/* Here we check if the Type of the received packet is
- * ok. 
+/* Here we no longer check if the Type of the received packet is
+ * ok. According to TLS 1.0 we should just ignore unknown content types.
+ * So we proceed as normal.
  */
-  if ((ret = check_recv_type (recv_type)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
 
 /* Here we check if the advertized version is the one we
  * negotiated in the handshake.
@@ -1035,6 +1013,8 @@ begin:
       return GNUTLS_E_RECORD_LIMIT_REACHED;
     }
 
+  /* Check if the received type is the one we expect.
+   */
   ret =
     record_check_type (session, recv_type, type, htype, tmp.data,
 		       decrypted_length);

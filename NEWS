@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.1.7 (unreleased)
 
+** We now ignore received packets with unknown content types
+to follow the TLS spec.
+
 ** Updated gnutls_set_default_priority2() now renamed to
 gnutls_priority_set() and gnutls_priority_set_direct() which
 accept a string to indicate preferences of ciphersuite parameters.
