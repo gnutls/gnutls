@@ -150,13 +150,13 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
     }
 
 
-  if (session->internals.cert_type_priority.algorithms == 0
+  if (session->internals.priorities.cert_type.algorithms == 0
       && cert_type == DEFAULT_CERT_TYPE)
     return 0;
 
-  for (i = 0; i < session->internals.cert_type_priority.algorithms; i++)
+  for (i = 0; i < session->internals.priorities.cert_type.algorithms; i++)
     {
-      if (session->internals.cert_type_priority.priority[i] == cert_type)
+      if (session->internals.priorities.cert_type.priority[i] == cert_type)
 	{
 	  return 0;		/* ok */
 	}

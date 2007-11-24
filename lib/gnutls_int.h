@@ -378,12 +378,26 @@ typedef struct
   uint64 write_sequence_number;
 } conn_stat_st;
 
-
 typedef struct
 {
   unsigned int priority[MAX_ALGOS];
   unsigned int algorithms;
 } priority_st;
+
+/* For the external api */
+typedef struct gnutls_priority_st
+{
+  priority_st cipher;
+  priority_st mac;
+  priority_st kx;
+  priority_st compression;
+  priority_st protocol;
+  priority_st cert_type;
+
+  /* to disable record padding */
+  int no_padding;
+} *gnutls_priority_t;
+
 
 /* DH and RSA parameters types.
  */
@@ -448,13 +462,9 @@ typedef struct
 
   /* this is the compression method we are going to use */
   gnutls_compression_method_t compression_method;
+
   /* priorities */
-  priority_st cipher_algorithm_priority;
-  priority_st mac_algorithm_priority;
-  priority_st kx_algorithm_priority;
-  priority_st compression_method_priority;
-  priority_st protocol_priority;
-  priority_st cert_type_priority;
+  struct gnutls_priority_st priorities;
 
   /* resumed session */
   resumable_session_t resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */
@@ -463,9 +473,6 @@ typedef struct
   /* sockets internals */
   int lowat;
   
-  /* to disable record padding */
-  int no_padding;
-
   /* These buffers are used in the handshake
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();
    */

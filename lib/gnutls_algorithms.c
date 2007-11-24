@@ -658,9 +658,9 @@ _gnutls_mac_priority (gnutls_session_t session,
 		      gnutls_mac_algorithm_t algorithm)
 {				/* actually returns the priority */
   unsigned int i;
-  for (i = 0; i < session->internals.mac_algorithm_priority.algorithms; i++)
+  for (i = 0; i < session->internals.priorities.mac.algorithms; i++)
     {
-      if (session->internals.mac_algorithm_priority.priority[i] == algorithm)
+      if (session->internals.priorities.mac.priority[i] == algorithm)
 	return i;
     }
   return -1;
@@ -784,10 +784,10 @@ _gnutls_compression_priority (gnutls_session_t session,
 {				/* actually returns the priority */
   unsigned int i;
   for (i = 0;
-       i < session->internals.compression_method_priority.algorithms; i++)
+       i < session->internals.priorities.compression.algorithms; i++)
     {
-      if (session->internals.
-	  compression_method_priority.priority[i] == algorithm)
+      if (session->internals.priorities.
+	  compression.priority[i] == algorithm)
 	return i;
     }
   return -1;
@@ -931,10 +931,10 @@ _gnutls_cipher_priority (gnutls_session_t session,
 {
   unsigned int i;
   for (i = 0;
-       i < session->internals.cipher_algorithm_priority.algorithms; i++)
+       i < session->internals.priorities.cipher.algorithms; i++)
     {
-      if (session->internals.
-	  cipher_algorithm_priority.priority[i] == algorithm)
+      if (session->internals.priorities.
+	  cipher.priority[i] == algorithm)
 	return i;
     }
   return -1;
@@ -1069,9 +1069,9 @@ _gnutls_kx_priority (gnutls_session_t session,
 		     gnutls_kx_algorithm_t algorithm)
 {
   unsigned int i;
-  for (i = 0; i < session->internals.kx_algorithm_priority.algorithms; i++)
+  for (i = 0; i < session->internals.priorities.kx.algorithms; i++)
     {
-      if (session->internals.kx_algorithm_priority.priority[i] == algorithm)
+      if (session->internals.priorities.kx.priority[i] == algorithm)
 	return i;
     }
   return -1;
@@ -1163,15 +1163,15 @@ _gnutls_version_priority (gnutls_session_t session, gnutls_protocol_t version)
 {				/* actually returns the priority */
   unsigned int i;
 
-  if (session->internals.protocol_priority.priority == NULL)
+  if (session->internals.priorities.protocol.priority == NULL)
     {
       gnutls_assert ();
       return -1;
     }
 
-  for (i = 0; i < session->internals.protocol_priority.algorithms; i++)
+  for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
     {
-      if (session->internals.protocol_priority.priority[i] == version)
+      if (session->internals.priorities.protocol.priority[i] == version)
 	return i;
     }
   return -1;
@@ -1182,15 +1182,15 @@ _gnutls_version_lowest (gnutls_session_t session)
 {				/* returns the lowest version supported */
   unsigned int i, min = 0xff;
 
-  if (session->internals.protocol_priority.priority == NULL)
+  if (session->internals.priorities.protocol.priority == NULL)
     {
       return GNUTLS_VERSION_UNKNOWN;
     }
   else
-    for (i = 0; i < session->internals.protocol_priority.algorithms; i++)
+    for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
       {
-	if (session->internals.protocol_priority.priority[i] < min)
-	  min = session->internals.protocol_priority.priority[i];
+	if (session->internals.priorities.protocol.priority[i] < min)
+	  min = session->internals.priorities.protocol.priority[i];
       }
 
   if (min == 0xff)
@@ -1204,15 +1204,15 @@ _gnutls_version_max (gnutls_session_t session)
 {				/* returns the maximum version supported */
   unsigned int i, max = 0x00;
 
-  if (session->internals.protocol_priority.priority == NULL)
+  if (session->internals.priorities.protocol.priority == NULL)
     {
       return GNUTLS_VERSION_UNKNOWN;
     }
   else
-    for (i = 0; i < session->internals.protocol_priority.algorithms; i++)
+    for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
       {
-	if (session->internals.protocol_priority.priority[i] > max)
-	  max = session->internals.protocol_priority.priority[i];
+	if (session->internals.priorities.protocol.priority[i] > max)
+	  max = session->internals.priorities.protocol.priority[i];
       }
 
   if (max == 0x00)
@@ -1775,7 +1775,7 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
 
 /* returns the TLS numbers of the compression methods we support 
  */
-#define SUPPORTED_COMPRESSION_METHODS session->internals.compression_method_priority.algorithms
+#define SUPPORTED_COMPRESSION_METHODS session->internals.priorities.compression.algorithms
 int
 _gnutls_supported_compression_methods (gnutls_session_t session,
 				       uint8_t ** comp)
@@ -1788,9 +1788,8 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 
   for (i = j = 0; i < SUPPORTED_COMPRESSION_METHODS; i++)
     {
-      int tmp = _gnutls_compression_get_num (session->internals.
-					     compression_method_priority.
-					     priority[i]);
+      int tmp = _gnutls_compression_get_num (session->internals.priorities.
+					     compression.priority[i]);
 
       /* remove private compression algorithms, if requested.
        */

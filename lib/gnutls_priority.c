@@ -59,11 +59,11 @@ gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
     num++;
   if (num > MAX_ALGOS)
     num = MAX_ALGOS;
-  session->internals.cipher_algorithm_priority.algorithms = num;
+  session->internals.priorities.cipher.algorithms = num;
 
   for (i = 0; i < num; i++)
     {
-      session->internals.cipher_algorithm_priority.priority[i] = list[i];
+      session->internals.priorities.cipher.priority[i] = list[i];
     }
 
   return 0;
@@ -93,11 +93,11 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
     num++;
   if (num > MAX_ALGOS)
     num = MAX_ALGOS;
-  session->internals.kx_algorithm_priority.algorithms = num;
+  session->internals.priorities.kx.algorithms = num;
 
   for (i = 0; i < num; i++)
     {
-      session->internals.kx_algorithm_priority.priority[i] = list[i];
+      session->internals.priorities.kx.priority[i] = list[i];
     }
 
   return 0;
@@ -127,11 +127,11 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
     num++;
   if (num > MAX_ALGOS)
     num = MAX_ALGOS;
-  session->internals.mac_algorithm_priority.algorithms = num;
+  session->internals.priorities.mac.algorithms = num;
 
   for (i = 0; i < num; i++)
     {
-      session->internals.mac_algorithm_priority.priority[i] = list[i];
+      session->internals.priorities.mac.priority[i] = list[i];
     }
 
   return 0;
@@ -165,11 +165,11 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
     num++;
   if (num > MAX_ALGOS)
     num = MAX_ALGOS;
-  session->internals.compression_method_priority.algorithms = num;
+  session->internals.priorities.compression.algorithms = num;
 
   for (i = 0; i < num; i++)
     {
-      session->internals.compression_method_priority.priority[i] = list[i];
+      session->internals.priorities.compression.priority[i] = list[i];
     }
   return 0;
 }
@@ -195,11 +195,11 @@ gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
     num++;
   if (num > MAX_ALGOS)
     num = MAX_ALGOS;
-  session->internals.protocol_priority.algorithms = num;
+  session->internals.priorities.protocol.algorithms = num;
 
   for (i = 0; i < num; i++)
     {
-      session->internals.protocol_priority.priority[i] = list[i];
+      session->internals.priorities.protocol.priority[i] = list[i];
     }
 
   /* set the current version to the first in the chain.
@@ -238,11 +238,11 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
     num++;
   if (num > MAX_ALGOS)
     num = MAX_ALGOS;
-  session->internals.cert_type_priority.algorithms = num;
+  session->internals.priorities.cert_type.algorithms = num;
 
   for (i = 0; i < num; i++)
     {
-      session->internals.cert_type_priority.priority[i] = list[i];
+      session->internals.priorities.cert_type.priority[i] = list[i];
     }
 
   return 0;
@@ -556,33 +556,33 @@ gnutls_set_priority(gnutls_session_t session, const char *priority,
 
 	  if ((algo =
 	       gnutls_mac_get_id (&broken_list[i][1])) != GNUTLS_MAC_UNKNOWN)
-	    fn(&session->internals.mac_algorithm_priority, algo);
+	    fn(&session->internals.priorities.mac, algo);
 	  else if ((algo = gnutls_cipher_get_id (&broken_list[i][1])) !=
 		   GNUTLS_CIPHER_UNKNOWN)
-	    fn (&session->internals.cipher_algorithm_priority, algo);
+	    fn (&session->internals.priorities.cipher, algo);
 	  else if ((algo = gnutls_kx_get_id (&broken_list[i][1])) !=
 		   GNUTLS_KX_UNKNOWN)
-	    fn(&session->internals.kx_algorithm_priority, algo);
+	    fn(&session->internals.priorities.kx, algo);
 	  else if (strncasecmp (&broken_list[i][1], "VERS-", 5) == 0)
 	    {
 	      if ((algo =
 		   gnutls_protocol_get_id (&broken_list[i][6])) !=
 		  GNUTLS_VERSION_UNKNOWN)
-		fn(&session->internals.protocol_priority, algo);
+		fn(&session->internals.priorities.protocol, algo);
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "COMP-", 5) == 0)
 	    {
 	      if ((algo =
 		   gnutls_compression_get_id (&broken_list[i][6])) !=
 		  GNUTLS_COMP_UNKNOWN)
-		fn(&session->internals.compression_method_priority, algo);
+		fn(&session->internals.priorities.compression, algo);
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "CTYPE-", 6) == 0)
 	    {
 	      if ((algo =
 		   gnutls_certificate_type_get_id (&broken_list[i][7])) !=
 		  GNUTLS_CRT_UNKNOWN)
-		fn(&session->internals.cert_type_priority, algo);
+		fn(&session->internals.priorities.cert_type, algo);
 	    }			/* now check if the element is something like -ALGO */
 	  else
 	    goto error;
