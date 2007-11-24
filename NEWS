@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.1.7 (unreleased)
 
+** PKCS #8 parser can now encode/decode DSA keys.
+
 ** We now ignore received packets with unknown content types
 to follow the TLS spec.
 

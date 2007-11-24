@@ -39,8 +39,8 @@
 #include <dsa.h>
 #include <verify.h>
 
-static int _encode_rsa (ASN1_TYPE * c2, mpi_t * params);
-static int _encode_dsa (ASN1_TYPE * c2, mpi_t * params);
+static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, mpi_t * params);
+int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, mpi_t * params);
 
 /* remove this when libgcrypt can handle the PKCS #1 coefficients from
  * rsa keys
@@ -127,7 +127,7 @@ gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst, gnutls_x509_privkey_t src)
       switch (dst->pk_algorithm)
 	{
 	case GNUTLS_PK_DSA:
-	  ret = _encode_dsa (&dst->key, dst->params);
+	  ret = _gnutls_asn1_encode_dsa (&dst->key, dst->params);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -135,7 +135,7 @@ gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst, gnutls_x509_privkey_t src)
 	    }
 	  break;
 	case GNUTLS_PK_RSA:
-	  ret = _encode_rsa (&dst->key, dst->params);
+	  ret = _gnutls_asn1_encode_rsa (&dst->key, dst->params);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -554,7 +554,7 @@ gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
 
   if (!key->crippled)
     {
-      ret = _encode_rsa (&key->key, key->params);
+      ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -642,7 +642,7 @@ gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
 
   if (!key->crippled)
     {
-      ret = _encode_dsa (&key->key, key->params);
+      ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -733,7 +733,7 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
       switch (key->pk_algorithm)
 	{
 	case GNUTLS_PK_DSA:
-	  ret = _encode_dsa (&key->key, key->params);
+	  ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -741,7 +741,7 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
 	    }
 	  break;
 	case GNUTLS_PK_RSA:
-	  ret = _encode_rsa (&key->key, key->params);
+	  ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -961,7 +961,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
 /* Encodes the RSA parameters into an ASN.1 RSA private key structure.
  */
 static int
-_encode_rsa (ASN1_TYPE * c2, mpi_t * params)
+_gnutls_asn1_encode_rsa (ASN1_TYPE * c2, mpi_t * params)
 {
   int result, i;
   size_t size[8], total;
@@ -1193,8 +1193,8 @@ cleanup:
 
 /* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
  */
-static int
-_encode_dsa (ASN1_TYPE * c2, mpi_t * params)
+int
+_gnutls_asn1_encode_dsa (ASN1_TYPE * c2, mpi_t * params)
 {
   int result, i;
   size_t size[DSA_PRIVATE_PARAMS], total;
@@ -1346,7 +1346,7 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
 
       if (!key->crippled)
 	{
-	  ret = _encode_dsa (&key->key, key->params);
+	  ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -1367,7 +1367,7 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
 
       if (!key->crippled)
 	{
-	  ret = _encode_rsa (&key->key, key->params);
+	  ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -1647,7 +1647,7 @@ gnutls_x509_privkey_fix (gnutls_x509_privkey_t key)
   switch (key->pk_algorithm)
     {
     case GNUTLS_PK_DSA:
-      ret = _encode_dsa (&key->key, key->params);
+      ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1655,7 +1655,7 @@ gnutls_x509_privkey_fix (gnutls_x509_privkey_t key)
 	}
       break;
     case GNUTLS_PK_RSA:
-      ret = _encode_rsa (&key->key, key->params);
+      ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
       if (ret < 0)
 	{
 	  gnutls_assert ();

@@ -151,16 +151,16 @@ _gnutls_x509_read_dsa_params (opaque * der, int dersize, mpi_t * params)
 
 }
 
-/* reads DSA's Y
- * from the certificate 
- * only sets params[3]
+/* Reads an Integer from the DER encoded data
  */
+
 int
-_gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params)
+_gnutls_x509_read_der_int  (opaque * der, int dersize, mpi_t * out)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
+  /* == INTEGER */
   if ((result = asn1_create_element
        (_gnutls_get_gnutls_asn (), "GNUTLS.DSAPublicKey",
 	&spk)) != ASN1_SUCCESS)
@@ -180,7 +180,7 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params)
 
   /* Read Y */
 
-  if ((result = _gnutls_x509_read_int (spk, "", &params[3])) < 0)
+  if ((result = _gnutls_x509_read_int (spk, "", out)) < 0)
     {
       gnutls_assert ();
       asn1_delete_structure (&spk);
@@ -191,6 +191,16 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params)
 
   return 0;
 
+}
+
+/* reads DSA's Y
+ * from the certificate 
+ * only sets params[3]
+ */
+int
+_gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params)
+{
+  return _gnutls_x509_read_der_int( der, dersize, &params[3]);
 }
 
 

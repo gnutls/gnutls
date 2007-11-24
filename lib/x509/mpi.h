@@ -41,6 +41,9 @@ int _gnutls_x509_write_dsa_public_key (mpi_t * params, int params_size,
 int _gnutls_x509_read_uint (ASN1_TYPE node, const char *value,
 			    unsigned int *ret);
 
+int  
+_gnutls_x509_read_der_int  (opaque * der, int dersize, mpi_t* out);
+
 int _gnutls_x509_read_int (ASN1_TYPE node, const char *value,
 			   mpi_t * ret_mpi);
 int _gnutls_x509_write_int (ASN1_TYPE node, const char *value, mpi_t mpi,
