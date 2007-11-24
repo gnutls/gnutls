@@ -127,6 +127,89 @@ check_schema (const char *oid)
   return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 }
 
+/* Encodes a private key to the raw format PKCS #8 needs.
+ * For RSA it is a PKCS #1 DER private key and for DSA it is
+ * an ASN.1 INTEGER of the x value.
+ */
+inline static int
+_encode_privkey (gnutls_x509_privkey pkey, gnutls_datum * raw)
+{
+  size_t size = 0;
+  opaque *data = NULL;
+  int ret;
+  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+  switch (pkey->pk_algorithm)
+    {
+    case GNUTLS_PK_RSA:
+      ret =
+	gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_DER, NULL, &size);
+      if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	{
+	  gnutls_assert ();
+	  goto error;
+	}
+
+      data = gnutls_malloc (size);
+      if (data == NULL)
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto error;
+	}
+
+
+      ret =
+	gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_DER, data, &size);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto error;
+	}
+
+      raw->data = data;
+      raw->size = size;
+      break;
+    case GNUTLS_PK_DSA:
+      /* DSAPublicKey == INTEGER */
+      if ((ret = asn1_create_element
+	   (_gnutls_get_gnutls_asn (), "GNUTLS.DSAPublicKey", &spk))
+	  != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  return _gnutls_asn2err (ret);
+	}
+
+      ret = _gnutls_x509_write_int (spk, "", pkey->params[4], 0);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto error;
+	}
+      ret = _gnutls_x509_der_encode (spk, "", raw, 0);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto error;
+	}
+
+      asn1_delete_structure (&spk);
+      break;
+
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return 0;
+  
+  error:
+    gnutls_free(data);
+    asn1_delete_structure (&spk);
+    return ret;
+
+}
+
 /* 
  * Encodes a PKCS #1 private key to a PKCS #8 private key
  * info. The output will be allocated and stored into der. Also
@@ -137,14 +220,35 @@ encode_to_private_key_info (gnutls_x509_privkey_t pkey,
 			    gnutls_datum_t * der, ASN1_TYPE * pkey_info)
 {
   int result, len;
-  size_t size;
-  opaque *data = NULL;
   opaque null = 0;
+  const char *oid;
+  gnutls_datum algo_params = { NULL, 0 };
+  gnutls_datum algo_privkey = { NULL, 0 };
 
-  if (pkey->pk_algorithm != GNUTLS_PK_RSA)
+  if (pkey->pk_algorithm != GNUTLS_PK_RSA
+      && pkey->pk_algorithm != GNUTLS_PK_DSA)
     {
       gnutls_assert ();
       return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
+  if (pkey->pk_algorithm == GNUTLS_PK_RSA)
+    {
+      oid = PK_PKIX1_RSA_OID;
+      /* parameters are null 
+       */
+    }
+  else
+    {
+      oid = PK_DSA_OID;
+      result =
+	_gnutls_x509_write_dsa_params (pkey->params, pkey->params_size,
+				       &algo_params);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
     }
 
   if ((result =
@@ -171,8 +275,7 @@ encode_to_private_key_info (gnutls_x509_privkey_t pkey,
    * fields. (OID+NULL data)
    */
   result =
-    asn1_write_value (*pkey_info, "privateKeyAlgorithm.algorithm",
-		      PK_PKIX1_RSA_OID, 1);
+    asn1_write_value (*pkey_info, "privateKeyAlgorithm.algorithm", oid, 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -181,46 +284,30 @@ encode_to_private_key_info (gnutls_x509_privkey_t pkey,
     }
 
   result =
-    asn1_write_value (*pkey_info, "privateKeyAlgorithm.parameters", NULL, 0);
+    asn1_write_value (*pkey_info, "privateKeyAlgorithm.parameters",
+		      algo_params.data, algo_params.size);
+  _gnutls_free_datum (&algo_params);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
       goto error;
     }
+
 
   /* Write the raw private key
    */
-  size = 0;
-  result =
-    gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_DER, NULL, &size);
-  if (result != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      gnutls_assert ();
-      goto error;
-    }
-
-  data = gnutls_alloca (size);
-  if (data == NULL)
-    {
-      gnutls_assert ();
-      result = GNUTLS_E_MEMORY_ERROR;
-      goto error;
-    }
-
-
-  result =
-    gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_DER, data, &size);
+  result = _encode_privkey (pkey, &algo_privkey);
   if (result < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
-  result = asn1_write_value (*pkey_info, "privateKey", data, size);
-
-  gnutls_afree (data);
-  data = NULL;
+  result =
+    asn1_write_value (*pkey_info, "privateKey", algo_privkey.data,
+		      algo_privkey.size);
+  _gnutls_free_datum (&algo_privkey);
 
   if (result != ASN1_SUCCESS)
     {
@@ -272,10 +359,8 @@ encode_to_private_key_info (gnutls_x509_privkey_t pkey,
 
 error:
   asn1_delete_structure (pkey_info);
-  if (data != NULL)
-    {
-      gnutls_afree (data);
-    }
+  _gnutls_free_datum (&algo_params);
+  _gnutls_free_datum (&algo_privkey);
   return result;
 
 }
