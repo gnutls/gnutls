@@ -489,10 +489,9 @@ error:
   *   replaced by the actual size of parameters)
   *
   * This function will export the private key to a PKCS8 structure.
-  * Currently only RSA keys can be exported since there is no documented
-  * standard for other keys. If the flags do not
-  * specify the encryption cipher, then the default 3DES (PBES2) will
-  * be used.
+  * Currently RSA and DSA keys can be exported. For DSA keys we use
+  * PKCS #11 definitions. If the flags do not specify the encryption 
+  * cipher, then the default 3DES (PBES2) will be used.
   *
   * The @password can be either ASCII or UTF-8 in the default PBES2
   * encryption schemas, or ASCII for the PKCS12 schemas.
@@ -1039,7 +1038,7 @@ error:
   *
   * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
   * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
-  * Currently only RSA keys can be imported, and flags can only be used to indicate
+  * Currently RSA and DSA keys can be imported, and flags can only be used to indicate
   * an unencrypted key.
   *
   * The @password can be either ASCII or UTF-8 in the default PBES2
