@@ -599,12 +599,12 @@ _gnutls_x509_generalTime2gtime (const char *ttime)
 /* Extracts the time in time_t from the ASN1_TYPE given. When should
  * be something like "tbsCertList.thisUpdate".
  */
-#define MAX_TIME 1024
+#define MAX_TIME 64
 time_t
 _gnutls_x509_get_time (ASN1_TYPE c2, const char *when)
 {
   char ttime[MAX_TIME];
-  char name[1024];
+  char name[128];
   time_t c_time = (time_t) - 1;
   int len, result;
 
@@ -656,7 +656,7 @@ int
 _gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim)
 {
   char str_time[MAX_TIME];
-  char name[1024];
+  char name[128];
   int result, len;
 
   _gnutls_str_cpy (name, sizeof (name), where);
@@ -716,6 +716,10 @@ _gnutls_x509_export_int (ASN1_TYPE asn1_data,
 			 size_t * output_data_size)
 {
   int result, len;
+
+  /* In PEM encoding we need a buffer in order to store exported DER
+   * and encode it. FIXME: return an estimation instead?
+   */
   if (tmp_buf_size == 0)
     tmp_buf_size = 16 * 1024;
 
