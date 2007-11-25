@@ -873,7 +873,7 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       return result;
     }
 
-  if (flags==2) len/=8;
+  if (flags==2) len /= 8;
 
   tmp = gnutls_malloc (len);
   if (tmp == NULL)
@@ -890,6 +890,8 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       result = _gnutls_asn2err (result);
       goto cleanup;
     }
+
+  if (flags==2) len /= 8;
 
   /* Extract the OCTET STRING.
    */
