@@ -18,7 +18,7 @@ accept a string to indicate preferences of ciphersuite parameters.
 the priority string.
 
 ** The gnutls_*_convert_priority() functions were deprecated by
-the gnutls_set_priority().
+the gnutls_priority_set() and gnutls_priority_set_direct().
 
 ** Internal copy of OpenCDK upgraded to version 0.6.6.
 
