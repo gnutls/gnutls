@@ -641,7 +641,7 @@ gnutls_x509_crl_export (gnutls_x509_crl_t crl,
     }
 
   return _gnutls_x509_export_int (crl->crl, format, PEM_CRL,
-				  *output_data_size, output_data,
+				  output_data,
 				  output_data_size);
 }
 

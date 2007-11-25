@@ -1955,7 +1955,7 @@ gnutls_x509_crt_export (gnutls_x509_crt_t cert,
     }
 
   return _gnutls_x509_export_int (cert->cert, format, "CERTIFICATE",
-				  *output_data_size, output_data,
+				  output_data,
 				  output_data_size);
 }
 

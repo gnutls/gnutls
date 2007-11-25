@@ -840,7 +840,7 @@ gnutls_x509_crq_export (gnutls_x509_crq_t crq,
     }
 
   return _gnutls_x509_export_int (crq->crq, format, PEM_CRQ,
-				  *output_data_size, output_data,
+				  output_data,
 				  output_data_size);
 }
 

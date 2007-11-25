@@ -712,16 +712,9 @@ _gnutls_x509_san_find_type (char *str_type)
 int
 _gnutls_x509_export_int (ASN1_TYPE asn1_data,
 			 gnutls_x509_crt_fmt_t format, char *pem_header,
-			 int tmp_buf_size, unsigned char *output_data,
-			 size_t * output_data_size)
+			 unsigned char *output_data, size_t * output_data_size)
 {
   int result, len;
-
-  /* In PEM encoding we need a buffer in order to store exported DER
-   * and encode it. FIXME: return an estimation instead?
-   */
-  if (tmp_buf_size == 0)
-    tmp_buf_size = 16 * 1024;
 
   if (format == GNUTLS_X509_FMT_DER)
     {
@@ -749,33 +742,19 @@ _gnutls_x509_export_int (ASN1_TYPE asn1_data,
     }
   else
     {				/* PEM */
-      opaque *tmp;
       opaque *out;
+      gnutls_datum tmp;
 
-      len = tmp_buf_size;
+      result = _gnutls_x509_der_encode( asn1_data, "", &tmp, 0);
+      if (result < 0)
+        {
+          gnutls_assert();
+          return result;
+        }
 
-      tmp = gnutls_alloca (len);
-      if (tmp == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+      result = _gnutls_fbase64_encode (pem_header, tmp.data, tmp.size, &out);
 
-      if ((result =
-	   asn1_der_coding (asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  if (result == ASN1_MEM_ERROR)
-	    {
-	      *output_data_size = B64FSIZE (strlen (pem_header), len) + 1;
-	    }
-	  gnutls_afree (tmp);
-	  return _gnutls_asn2err (result);
-	}
-
-      result = _gnutls_fbase64_encode (pem_header, tmp, len, &out);
-
-      gnutls_afree (tmp);
+      _gnutls_free_datum (&tmp);
 
       if (result < 0)
 	{

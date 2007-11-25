@@ -554,7 +554,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
       ret =
 	_gnutls_x509_export_int (pkey_info, format,
 				 PEM_UNENCRYPTED_PKCS8,
-				 *output_data_size, output_data,
+				 output_data,
 				 output_data_size);
 
       asn1_delete_structure (&pkey_info);
@@ -574,7 +574,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
 
       ret =
 	_gnutls_x509_export_int (pkcs8_asn, format, PEM_PKCS8,
-				 *output_data_size, output_data,
+				 output_data,
 				 output_data_size);
 
       asn1_delete_structure (&pkcs8_asn);

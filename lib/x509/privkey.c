@@ -755,7 +755,7 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
     }
 
   return _gnutls_x509_export_int (key->key, format, msg,
-				  *output_data_size, output_data,
+				  output_data,
 				  output_data_size);
 }
 

@@ -439,7 +439,7 @@ gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
     return GNUTLS_E_INVALID_REQUEST;
 
   return _gnutls_x509_export_int (pkcs7->pkcs7, format, PEM_PKCS7,
-				  *output_data_size, output_data,
+				  output_data,
 				  output_data_size);
 }
 

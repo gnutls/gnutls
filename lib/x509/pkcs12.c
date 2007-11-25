@@ -284,7 +284,7 @@ gnutls_pkcs12_export (gnutls_pkcs12_t pkcs12,
     }
 
   return _gnutls_x509_export_int (pkcs12->pkcs12, format, PEM_PKCS12,
-				  *output_data_size, output_data,
+				  output_data,
 				  output_data_size);
 }
 
