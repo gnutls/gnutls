@@ -870,12 +870,13 @@ cleanup:
 
 /* Reads a value from an ASN1 tree, and puts the output
  * in an allocated variable in the given datum.
- * If str is non zero, then the output will be treated as
- * an octet string.
+ * flags == 0 do nothing  with the DER output
+ * flags == 1 parse the DER output as OCTET STRING
+ * flags == 2 the value is a BIT STRING
  */
 int
 _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
-			 gnutls_datum_t * ret, int str)
+			 gnutls_datum_t * ret, int flags)
 {
   int len = 0, result;
   size_t slen;
@@ -888,6 +889,8 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       result = _gnutls_asn2err (result);
       return result;
     }
+
+  if (flags==2) len/=8;
 
   tmp = gnutls_malloc (len);
   if (tmp == NULL)
@@ -908,7 +911,7 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
   /* Extract the OCTET STRING.
    */
 
-  if (str)
+  if (flags==1)
     {
       slen = len;
       result = _gnutls_x509_decode_octet_string (NULL, tmp, slen, tmp, &slen);

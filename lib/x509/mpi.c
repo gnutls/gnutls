@@ -210,9 +210,9 @@ int
 _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 			   mpi_t * params, int *params_size)
 {
-  int len, result;
-  opaque str[5 * 1024];
+  int result;
   int pk_algorithm;
+  gnutls_datum tmp = { NULL, 0 };
 
   /* Read the algorithm's OID
    */
@@ -220,16 +220,13 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 
   /* Read the algorithm's parameters
    */
-  len = sizeof (str);
-  result = asn1_read_value (cert->cert,
-			    "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-			    str, &len);
-  len /= 8;
+  result = _gnutls_x509_read_value( cert->cert,
+    "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey", &tmp, 2);
 
-  if (result != ASN1_SUCCESS)
+  if (result < 0)
     {
       gnutls_assert ();
-      return _gnutls_asn2err (result);
+      return result;
     }
 
   switch (pk_algorithm)
@@ -242,17 +239,17 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 	{
 	  gnutls_assert ();
 	  /* internal error. Increase the mpi_ts in params */
-	  return GNUTLS_E_INTERNAL_ERROR;
+	  result = GNUTLS_E_INTERNAL_ERROR;
+	  goto error;
 	}
 
-      if ((result = _gnutls_x509_read_rsa_params (str, len, params)) < 0)
+      if ((result = _gnutls_x509_read_rsa_params (tmp.data, tmp.size, params)) < 0)
 	{
 	  gnutls_assert ();
-	  return result;
+	  goto error;
 	}
       *params_size = RSA_PUBLIC_PARAMS;
 
-      return 0;
       break;
     case GNUTLS_PK_DSA:
       /* params[0] is p,
@@ -265,42 +262,42 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 	{
 	  gnutls_assert ();
 	  /* internal error. Increase the mpi_ts in params */
-	  return GNUTLS_E_INTERNAL_ERROR;
+	  result = GNUTLS_E_INTERNAL_ERROR;
+	  goto error;
 	}
 
-      if ((result = _gnutls_x509_read_dsa_pubkey (str, len, params)) < 0)
+      if ((result = _gnutls_x509_read_dsa_pubkey (tmp.data, tmp.size, params)) < 0)
 	{
 	  gnutls_assert ();
-	  return result;
+	  goto error;
 	}
 
       /* Now read the parameters
        */
+      _gnutls_free_datum( &tmp);
 
-      len = sizeof (str);
-      result = asn1_read_value (cert->cert,
+      result = _gnutls_x509_read_value (cert->cert,
 				"tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
-				str, &len);
+				&tmp, 0);
 
       /* FIXME: If the parameters are not included in the certificate
        * then the issuer's parameters should be used. This is not
        * done yet.
        */
 
-      if (result != ASN1_SUCCESS)
+      if (result < 0)
 	{
 	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
+	  goto error;
 	}
 
-      if ((result = _gnutls_x509_read_dsa_params (str, len, params)) < 0)
+      if ((result = _gnutls_x509_read_dsa_params (tmp.data, tmp.size, params)) < 0)
 	{
 	  gnutls_assert ();
-	  return result;
+	  goto error;
 	}
       *params_size = DSA_PUBLIC_PARAMS;
 
-      return 0;
       break;
 
     default:
@@ -308,9 +305,15 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
        * currently not supported
        */
       gnutls_assert ();
-
-      return GNUTLS_E_X509_CERTIFICATE_ERROR;
+      result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+      goto error;
     }
+
+  result = 0;
+  
+error:
+  _gnutls_free_datum( &tmp);
+  return result;
 }
 
 /*
