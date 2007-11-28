@@ -343,8 +343,11 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
   ret = _gnutls_mpi_dprint (&session->key->key, session->key->KEY);
   _gnutls_mpi_release (&S);
 
-  if (ret < 0)
-    return ret;
+  if (ret < 0) 
+    {
+      gnutls_assert();
+      return ret;
+    }
 
   if (_gnutls_mpi_print (NULL, &n_a, A) != 0)
     {
@@ -562,7 +565,10 @@ check_g_n (const opaque * g, size_t n_g, const opaque * n, size_t n_n)
 {
 
   if (n_g != 1 || g[0] != srp_generator)
-    return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+    {
+      gnutls_assert();
+      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+    }
 
   if (n_n == sizeof (srp_params_1024) &&
       memcmp (srp_params_1024, n, n_n) == 0)
@@ -582,6 +588,7 @@ check_g_n (const opaque * g, size_t n_g, const opaque * n, size_t n_n)
       return 0;
     }
 
+  gnutls_assert();
   return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 }
 
