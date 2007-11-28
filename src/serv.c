@@ -381,7 +381,7 @@ initialize_session (void)
       gnutls_db_set_ptr (session, NULL);
     }
 
-  if (gnutls_priority_set_direct (session, info.priorities, err) < 0)
+  if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
     {
       fprintf(stderr, "Syntax error at: %s\n", err);
       exit(1);
