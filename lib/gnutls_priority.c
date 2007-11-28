@@ -249,7 +249,7 @@ static const int kx_priority_export[] = {
   0
 };
 
-static const int kx_priority_security[] = {
+static const int kx_priority_secure[] = {
   /* The ciphersuites that offer forward secrecy take
    * precendance
    */
