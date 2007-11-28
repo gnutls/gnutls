@@ -417,58 +417,60 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * @syntax_error: In case of an error an error string will be copied there.
   * @syntax_error_size: the length of the previous string.
   *
-  * Sets priorities for the ciphers, key exchange methods,
-  * macs and compression methods. This is to avoid using the
-  * gnutls_*_priority() functions. 
+  * Sets priorities for the ciphers, key exchange methods, macs and
+  * compression methods. This is to avoid using the
+  * gnutls_*_priority() functions.
   *
-  * The #priorities option allows you to specify a semi-colon separated
-  * list of the cipher priorities to enable.
+  * The #priorities option allows you to specify a semi-colon
+  * separated list of the cipher priorities to enable.
   *
   * Unless the first keyword is "NONE" the defaults are:
   * Protocols: TLS1.1, TLS1.0, and SSL3.0.
   * Compression: NULL.
   * Certificate types: X.509.
   *
-  * You can also use predefined sets of ciphersuites:
-  * "PERFORMANCE" all the "secure" ciphersuites are enabled, 
-  * limited to 128 bit ciphers and sorted by terms of speed performance.
+  * You can also use predefined sets of ciphersuites: "PERFORMANCE"
+  * all the "secure" ciphersuites are enabled, limited to 128 bit
+  * ciphers and sorted by terms of speed performance.
   *
-  * "NORMAL" option enables all "secure" ciphersuites 
-  * limited to 128 bit ciphers and sorted by security margin.
+  * "NORMAL" option enables all "secure" ciphersuites limited to 128
+  * bit ciphers and sorted by security margin.
   *
-  * "HIGH" flag enables all "secure" ciphersuites 
-  * including 256 bit ciphers and sorted by security margin.
+  * "HIGH" flag enables all "secure" ciphersuites including 256 bit
+  * ciphers and sorted by security margin.
   *
-  * "EXPORT" all the ciphersuites are enabled, including
-  * the low-security 40 bit ciphers.
+  * "EXPORT" all the ciphersuites are enabled, including the
+  * low-security 40 bit ciphers.
   *
-  * "NONE" nothing is enabled. This disables even protocols and compression
-  * methods.
+  * "NONE" nothing is enabled. This disables even protocols and
+  * compression methods.
   *
   * Special keywords:
   * '!' or '-' appended with an algorithm will remove this algorithm.
   * '+' appended with an algorithm will add this algorithm.
   * '%COMPAT' will enable compatibility features for a server.
   *
-  * To avoid collisions in order to specify a compression algorithm
-  * in this string you have to prefix it with "COMP-", protocol versions with
-  * "VERS-" and certificate types with "CTYPE-". All other algorithms don't need
-  * a prefix.
+  * To avoid collisions in order to specify a compression algorithm in
+  * this string you have to prefix it with "COMP-", protocol versions
+  * with "VERS-" and certificate types with "CTYPE-". All other
+  * algorithms don't need a prefix.
   *
-  * For key exchange algorithms when in NORMAL or HIGH levels
-  * the perfect forward secrecy algorithms take precendence of the other protocols.
-  * In all cases all the supported key exchange algorithms are enabled (except for the
-  * RSA-EXPORT which is only enabled in EXPORT level).
+  * For key exchange algorithms when in NORMAL or HIGH levels the
+  * perfect forward secrecy algorithms take precendence of the other
+  * protocols.  In all cases all the supported key exchange algorithms
+  * are enabled (except for the RSA-EXPORT which is only enabled in
+  * EXPORT level).
   *
-  * Note that although one can select very long key sizes for symmetric algorithms, 
-  * to actually increase security the public key algorithms have to use longer key 
-  * sizes as well.
+  * Note that although one can select very long key sizes for
+  * symmetric algorithms, to actually increase security the public key
+  * algorithms have to use longer key sizes as well.
   *
-  * Examples: "NORMAL:!AES-128-CBC", "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE:+CTYPE-OPENPGP",
+  * Examples: "NORMAL:!AES-128-CBC",
+  * "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE:+CTYPE-OPENPGP",
   * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL".
   *
-  * On syntax error GNUTLS_E_INVALID_REQUEST is returned and 0 on success.
-  *
+  * Returns: On syntax error GNUTLS_E_INVALID_REQUEST is returned and
+  * 0 on success.
   **/
 int
 gnutls_priority_init (gnutls_priority_t * priority_cache,
@@ -476,9 +478,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 		      size_t syntax_error_size)
 {
   char *broken_list[MAX_ELEMENTS];
-  int broken_list_size, i, j;
+  int broken_list_size, i;
   char *darg;
-  int ret, algo;
+  int algo;
   rmadd_func *fn;
 
   *priority_cache = gnutls_calloc (1, sizeof (struct gnutls_priority_st));
@@ -625,9 +627,9 @@ gnutls_priority_deinit (gnutls_priority_t priority_cache)
   * @syntax_error_size: the length of the previous string.
   *
   * Sets the priorities to use on the ciphers, key exchange methods,
-  * macs and compression methods. This function avoids keeping a priority
-  * cache and is used to directly set string priorities to a TLS session. 
-  * For documentation check the gnutls_priority_init().
+  * macs and compression methods. This function avoids keeping a
+  * priority cache and is used to directly set string priorities to a
+  * TLS session.  For documentation check the gnutls_priority_init().
   *
   * On syntax error GNUTLS_E_INVALID_REQUEST is returned and 0 on success.
   *
