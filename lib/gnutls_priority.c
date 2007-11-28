@@ -274,14 +274,20 @@ static const int cipher_priority_performance[] = {
 #endif
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_AES_256_CBC,
+#ifdef	ENABLE_CAMELLIA
+  GNUTLS_CIPHER_CAMELLIA_256_CBC,
+#endif
   /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
   0
 };
 
 static const int cipher_priority_security_normal[] = {
   GNUTLS_CIPHER_AES_128_CBC,
+  GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
+  GNUTLS_CIPHER_CAMELLIA_256_CBC,
 #endif
   GNUTLS_CIPHER_3DES_CBC,
   GNUTLS_CIPHER_ARCFOUR_128,
@@ -304,10 +310,13 @@ static const int cipher_priority_security_high[] = {
   0
 };
 
+/* The same as cipher_priority_security_normal + arcfour-40. */
 static const int cipher_priority_export[] = {
   GNUTLS_CIPHER_AES_128_CBC,
+  GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
+  GNUTLS_CIPHER_CAMELLIA_256_CBC,
 #endif
   GNUTLS_CIPHER_3DES_CBC,
   GNUTLS_CIPHER_ARCFOUR_128,
@@ -427,7 +436,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * Unless the first keyword is "NONE" the defaults are:
   * Protocols: TLS1.1, TLS1.0, and SSL3.0.
   * Compression: NULL.
-  * Certificate types: X.509.
+  * Certificate types: X.509, OpenPGP.
   *
   * You can also use predefined sets of ciphersuites: "PERFORMANCE"
   * all the "secure" ciphersuites are enabled, limited to 128 bit
