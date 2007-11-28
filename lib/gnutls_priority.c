@@ -680,3 +680,52 @@ break_comma_list (char *etag,
   while (p != NULL && *elements < max_elements);
 }
 
+/**
+ * gnutls_set_default_priority - Sets some default priority on the cipher suites supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Sets some default priority on the ciphers, key exchange methods,
+ * macs and compression methods.
+ *
+ * This is the same as calling:
+ *
+ * gnutls_priority_set_direct (session, "EXPORT", NULL, 0);
+ *
+ * This function is kept around for backwards compatibility, but
+ * because of its wide use it is still fully supported.  If you wish
+ * to allow users to provide a string that specify which ciphers to
+ * use (which is recommended), you should use
+ * gnutls_priority_set_direct() or gnutls_priority_set() instead.
+ *
+ * Returns 0 on success.
+ **/
+int
+gnutls_set_default_priority (gnutls_session_t session)
+{
+  return gnutls_priority_set_direct (session, "NORMAL", NULL, 0);
+}
+
+/**
+ * gnutls_set_default_export_priority - Sets some default priority on the cipher suites supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Sets some default priority on the ciphers, key exchange methods, macs
+ * and compression methods.  This function also includes weak algorithms.
+ *
+ * This is the same as calling:
+ *
+ * gnutls_priority_set_direct (session, "EXPORT", NULL, 0);
+ *
+ * This function is kept around for backwards compatibility, but
+ * because of its wide use it is still fully supported.  If you wish
+ * to allow users to provide a string that specify which ciphers to
+ * use (which is recommended), you should use
+ * gnutls_priority_set_direct() or gnutls_priority_set() instead.
+ *
+ * Returns 0 on success.
+ **/
+int
+gnutls_set_default_export_priority (gnutls_session_t session)
+{
+  return gnutls_priority_set_direct (session, "EXPORT", NULL, 0);
+}

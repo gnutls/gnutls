@@ -19,13 +19,6 @@
 #define _GNUTLS_GCC_ATTR_DEPRECATED
 #endif
 
-#define gnutls_set_default_priority(x)					\
-  (gnutls_priority_set_direct (x, "NORMAL", NULL, 0), \
-   GNUTLS_E_SUCCESS)
-#define gnutls_set_default_export_priority(x)				\
-  (gnutls_priority_set_direct ( x, "EXPORT", NULL, 0),		\
-   GNUTLS_E_SUCCESS)
-
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
 #define gnutls_paramsype gnutls_paramsype_t
