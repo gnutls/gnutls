@@ -69,7 +69,8 @@ gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
   return 0;
 }
 
-inline static int _set_priority( priority_st* st, const int *list)
+inline static int
+_set_priority (priority_st * st, const int *list)
 {
   int num = 0, i;
 
@@ -106,7 +107,7 @@ inline static int _set_priority( priority_st* st, const int *list)
 int
 gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 {
-  return _set_priority( &session->internals.priorities.kx, list);
+  return _set_priority (&session->internals.priorities.kx, list);
 }
 
 /**
@@ -127,7 +128,7 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 int
 gnutls_mac_set_priority (gnutls_session_t session, const int *list)
 {
-  return _set_priority( &session->internals.priorities.mac, list);
+  return _set_priority (&session->internals.priorities.mac, list);
 }
 
 /**
@@ -152,7 +153,7 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
 int
 gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 {
-  return _set_priority( &session->internals.priorities.compression, list);
+  return _set_priority (&session->internals.priorities.compression, list);
 }
 
 /**
@@ -170,9 +171,9 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 int
 gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
 {
-int ret;
+  int ret;
 
-  ret = _set_priority( &session->internals.priorities.protocol, list);
+  ret = _set_priority (&session->internals.priorities.protocol, list);
 
   /* set the current version to the first in the chain.
    * This will be overridden later.
@@ -203,7 +204,7 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 				      const int *list)
 {
 #ifdef ENABLE_OPENPGP
-  return _set_priority( &session->internals.priorities.cert_type, list);
+  return _set_priority (&session->internals.priorities.cert_type, list);
 
 #else
 
@@ -341,10 +342,10 @@ static int cert_type_priority[] = {
   0
 };
 
-typedef void (rmadd_func)(priority_st* priority_list, int alg);
+typedef void (rmadd_func) (priority_st * priority_list, int alg);
 
 static void
-prio_remove (priority_st* priority_list, int algo)
+prio_remove (priority_st * priority_list, int algo)
 {
   int i = 0;
   int pos = -1;			/* the position of the cipher to remove */
@@ -358,8 +359,7 @@ prio_remove (priority_st* priority_list, int algo)
 
   if (pos >= 0)
     {
-      priority_list->priority[pos] =
-	priority_list->priority[i - 1];
+      priority_list->priority[pos] = priority_list->priority[i - 1];
       priority_list->priority[i - 1] = 0;
       priority_list->algorithms--;
     }
@@ -368,18 +368,21 @@ prio_remove (priority_st* priority_list, int algo)
 }
 
 static void
-prio_add (priority_st* priority_list, int algo)
+prio_add (priority_st * priority_list, int algo)
 {
   register int i = 0;
-  while (priority_list->priority[i] != 0) {
-    if (algo == priority_list->priority[i]) return; /* if it exists */
-    i++;
-  }
+  while (priority_list->priority[i] != 0)
+    {
+      if (algo == priority_list->priority[i])
+	return;			/* if it exists */
+      i++;
+    }
 
-  if (i < MAX_ALGOS) {
-    priority_list->priority[i] = algo;
-    priority_list->algorithms++;
-  }
+  if (i < MAX_ALGOS)
+    {
+      priority_list->priority[i] = algo;
+      priority_list->algorithms++;
+    }
 
   return;
 }
@@ -397,9 +400,10 @@ prio_add (priority_st* priority_list, int algo)
   *
   **/
 int
-gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
+gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 {
-  memcpy( &session->internals.priorities, priority, sizeof(struct gnutls_priority_st));
+  memcpy (&session->internals.priorities, priority,
+	  sizeof (struct gnutls_priority_st));
   return 0;
 }
 
@@ -467,19 +471,20 @@ gnutls_priority_set(gnutls_session_t session, gnutls_priority_t priority)
   *
   **/
 int
-gnutls_priority_init(gnutls_priority_t* priority_cache, const char *priorities,
-			      char *syntax_error, size_t syntax_error_size)
+gnutls_priority_init (gnutls_priority_t * priority_cache,
+		      const char *priorities, char *syntax_error,
+		      size_t syntax_error_size)
 {
   char *broken_list[MAX_ELEMENTS];
   int broken_list_size, i, j;
   char *darg;
   int ret, algo;
-  rmadd_func* fn;
+  rmadd_func *fn;
 
-  *priority_cache = gnutls_calloc( 1, sizeof(struct gnutls_priority_st));
-  if (*priority_cache == NULL) 
+  *priority_cache = gnutls_calloc (1, sizeof (struct gnutls_priority_st));
+  if (*priority_cache == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -498,7 +503,7 @@ gnutls_priority_init(gnutls_priority_t* priority_cache, const char *priorities,
   /* This is our default set of protocol version, certificate types and
    * compression methods.
    */
-  if (strcasecmp (broken_list[0], "NONE") != 0) 
+  if (strcasecmp (broken_list[0], "NONE") != 0)
     {
       _set_priority (&(*priority_cache)->protocol, protocol_priority);
       _set_priority (&(*priority_cache)->compression, comp_priority);
@@ -509,20 +514,22 @@ gnutls_priority_init(gnutls_priority_t* priority_cache, const char *priorities,
     {
       if (strcasecmp (broken_list[i], "PERFORMANCE") == 0)
 	{
-	  _set_priority (&(*priority_cache)->cipher, cipher_priority_performance);
+	  _set_priority (&(*priority_cache)->cipher,
+			 cipher_priority_performance);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_performance);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_performance);
 	}
       else if (strcasecmp (broken_list[i], "NORMAL") == 0)
 	{
 	  _set_priority (&(*priority_cache)->cipher,
-				      cipher_priority_security_normal);
+			 cipher_priority_security_normal);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_security);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_security);
 	}
       else if (strcasecmp (broken_list[i], "HIGH") == 0)
 	{
-	  _set_priority (&(*priority_cache)->cipher,cipher_priority_security_high);
+	  _set_priority (&(*priority_cache)->cipher,
+			 cipher_priority_security_high);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_security);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_security);
 	}
@@ -532,40 +539,43 @@ gnutls_priority_init(gnutls_priority_t* priority_cache, const char *priorities,
 	  _set_priority (&(*priority_cache)->kx, kx_priority_export);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_export);
 	}			/* now check if the element is something like -ALGO */
-      else if (broken_list[i][0] == '!' || broken_list[i][0] == '+' || broken_list[i][0] == '-')
+      else if (broken_list[i][0] == '!' || broken_list[i][0] == '+'
+	       || broken_list[i][0] == '-')
 	{
-	  if (broken_list[i][0] == '+') fn = prio_add;
-	  else fn = prio_remove;
+	  if (broken_list[i][0] == '+')
+	    fn = prio_add;
+	  else
+	    fn = prio_remove;
 
 	  if ((algo =
 	       gnutls_mac_get_id (&broken_list[i][1])) != GNUTLS_MAC_UNKNOWN)
-	    fn(&(*priority_cache)->mac, algo);
+	    fn (&(*priority_cache)->mac, algo);
 	  else if ((algo = gnutls_cipher_get_id (&broken_list[i][1])) !=
 		   GNUTLS_CIPHER_UNKNOWN)
 	    fn (&(*priority_cache)->cipher, algo);
 	  else if ((algo = gnutls_kx_get_id (&broken_list[i][1])) !=
 		   GNUTLS_KX_UNKNOWN)
-	    fn(&(*priority_cache)->kx, algo);
+	    fn (&(*priority_cache)->kx, algo);
 	  else if (strncasecmp (&broken_list[i][1], "VERS-", 5) == 0)
 	    {
 	      if ((algo =
 		   gnutls_protocol_get_id (&broken_list[i][6])) !=
 		  GNUTLS_VERSION_UNKNOWN)
-		fn(&(*priority_cache)->protocol, algo);
+		fn (&(*priority_cache)->protocol, algo);
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "COMP-", 5) == 0)
 	    {
 	      if ((algo =
 		   gnutls_compression_get_id (&broken_list[i][6])) !=
 		  GNUTLS_COMP_UNKNOWN)
-		fn(&(*priority_cache)->compression, algo);
+		fn (&(*priority_cache)->compression, algo);
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "CTYPE-", 6) == 0)
 	    {
 	      if ((algo =
 		   gnutls_certificate_type_get_id (&broken_list[i][7])) !=
 		  GNUTLS_CRT_UNKNOWN)
-		fn(&(*priority_cache)->cert_type, algo);
+		fn (&(*priority_cache)->cert_type, algo);
 	    }			/* now check if the element is something like -ALGO */
 	  else
 	    goto error;
@@ -601,9 +611,9 @@ error:
   *
   **/
 void
-gnutls_priority_deinit(gnutls_priority_t priority_cache)
+gnutls_priority_deinit (gnutls_priority_t priority_cache)
 {
-  gnutls_free( priority_cache);
+  gnutls_free (priority_cache);
 }
 
 
@@ -623,26 +633,29 @@ gnutls_priority_deinit(gnutls_priority_t priority_cache)
   *
   **/
 int
-gnutls_priority_set_direct(gnutls_session_t session, const char *priorities,
-      char *syntax_error, size_t syntax_error_size)
+gnutls_priority_set_direct (gnutls_session_t session, const char *priorities,
+			    char *syntax_error, size_t syntax_error_size)
 {
-gnutls_priority_t prio;
-int ret;
+  gnutls_priority_t prio;
+  int ret;
 
-  ret = gnutls_priority_init( &prio, priorities, syntax_error, syntax_error_size);
-  if (ret < 0) {
-    gnutls_assert();
-    return ret;
-  }
+  ret =
+    gnutls_priority_init (&prio, priorities, syntax_error, syntax_error_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
 
-  ret = gnutls_priority_set( session, prio);
-  if (ret < 0) {
-    gnutls_assert();
-    return ret;
-  }
+  ret = gnutls_priority_set (session, prio);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
 
-  gnutls_priority_deinit( prio);
-  
+  gnutls_priority_deinit (prio);
+
   return 0;
 }
 
