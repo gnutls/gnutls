@@ -474,7 +474,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   *
   * Examples: "NORMAL:!AES-128-CBC",
   * "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE:+CTYPE-OPENPGP",
-  * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL".
+  * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL",
+  * "NORMAL:%COMPAT".
   *
   * Returns: On syntax error GNUTLS_E_INVALID_REQUEST is returned and
   * 0 on success.
