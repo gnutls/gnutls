@@ -282,7 +282,7 @@ static const int cipher_priority_performance[] = {
   0
 };
 
-static const int cipher_priority_security_normal[] = {
+static const int cipher_priority_normal[] = {
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
@@ -295,7 +295,7 @@ static const int cipher_priority_security_normal[] = {
   0
 };
 
-static const int cipher_priority_security_high[] = {
+static const int cipher_priority_secure[] = {
   GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
@@ -337,13 +337,11 @@ static const int mac_priority_performance[] = {
   0
 };
 
-static const int mac_priority_security[] = {
+static const int mac_priority_secure[] = {
   GNUTLS_MAC_SHA1,
   GNUTLS_MAC_MD5,
   0
 };
-
-#define mac_priority_export mac_priority_security
 
 static int cert_type_priority[] = {
   GNUTLS_CRT_X509,
@@ -442,11 +440,11 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * all the "secure" ciphersuites are enabled, limited to 128 bit
   * ciphers and sorted by terms of speed performance.
   *
-  * "NORMAL" option enables all "secure" ciphersuites limited to 128
-  * bit ciphers and sorted by security margin.
+  * "NORMAL" option enables all "secure" ciphersuites and prefer 128
+  * bit ciphers over 256 bit bit ciphers, sorted by security margin.
   *
-  * "HIGH" flag enables all "secure" ciphersuites including 256 bit
-  * ciphers and sorted by security margin.
+  * "SECURE" flag enables all "secure" ciphersuites and prefer 256 bit
+  * ciphers over 128 bit ciphers, sorted by security margin.
   *
   * "EXPORT" all the ciphersuites are enabled, including the
   * low-security 40 bit ciphers.
@@ -464,7 +462,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * with "VERS-" and certificate types with "CTYPE-". All other
   * algorithms don't need a prefix.
   *
-  * For key exchange algorithms when in NORMAL or HIGH levels the
+  * For key exchange algorithms when in NORMAL or SECURE levels the
   * perfect forward secrecy algorithms take precendence of the other
   * protocols.  In all cases all the supported key exchange algorithms
   * are enabled (except for the RSA-EXPORT which is only enabled in
@@ -532,23 +530,21 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	}
       else if (strcasecmp (broken_list[i], "NORMAL") == 0)
 	{
-	  _set_priority (&(*priority_cache)->cipher,
-			 cipher_priority_security_normal);
-	  _set_priority (&(*priority_cache)->kx, kx_priority_security);
-	  _set_priority (&(*priority_cache)->mac, mac_priority_security);
+	  _set_priority (&(*priority_cache)->cipher, cipher_priority_normal);
+	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
+	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}
-      else if (strcasecmp (broken_list[i], "HIGH") == 0)
+      else if (strcasecmp (broken_list[i], "SECURE") == 0)
 	{
-	  _set_priority (&(*priority_cache)->cipher,
-			 cipher_priority_security_high);
-	  _set_priority (&(*priority_cache)->kx, kx_priority_security);
-	  _set_priority (&(*priority_cache)->mac, mac_priority_security);
+	  _set_priority (&(*priority_cache)->cipher, cipher_priority_secure);
+	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
+	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}
       else if (strcasecmp (broken_list[i], "EXPORT") == 0)
 	{
 	  _set_priority (&(*priority_cache)->cipher, cipher_priority_export);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_export);
-	  _set_priority (&(*priority_cache)->mac, mac_priority_export);
+	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}			/* now check if the element is something like -ALGO */
       else if (broken_list[i][0] == '!' || broken_list[i][0] == '+'
 	       || broken_list[i][0] == '-')
