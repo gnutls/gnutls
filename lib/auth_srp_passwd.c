@@ -286,6 +286,7 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
 	      ret = _randomize_pwd_entry (entry);
 	      if (ret < 0)
 		{
+		  gnutls_assert();
 		  _gnutls_srp_entry_free (entry);
 		  return ret;
 		}
