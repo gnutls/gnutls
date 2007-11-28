@@ -23,10 +23,10 @@ the gnutls_priority_set() and gnutls_priority_set_direct().
 ** Internal copy of OpenCDK upgraded to version 0.6.6.
 
 ** API and ABI modifications:
-gnutls_priority_init: ADDED
-gnutls_priority_deinit: ADDED
-gnutls_priority_set: ADDED
-gnutls_priority_set_direct: ADDED
+gnutls_priority_init: ADD.
+gnutls_priority_deinit: ADD.
+gnutls_priority_set: ADD.
+gnutls_priority_set_direct: ADD.
 gnutls_set_default_priority2: RENAMED to gnutls_priority_set_direct()
 gnutls_mac_convert_priority: REMOVED
 gnutls_compression_convert_priority: REMOVED
@@ -36,6 +36,22 @@ gnutls_cipher_convert_priority: REMOVED
 gnutls_certificate_type_convert_priority: REMOVED
 gnutls_set_default_priority: UNDEPRECATED
 gnutls_set_default_priority_export: UNDEPRECATED
+
+** Undocumented API and ABI modifications earlier in the 2.1.x series:
+GNUTLS_CIPHER_UNKNOWN: ADD.
+GNUTLS_CIPHER_CAMELLIA_128_CBC: ADD.
+GNUTLS_CIPHER_CAMELLIA_256_CBC: ADD.
+GNUTLS_KX_UNKNOWN: ADD.
+GNUTLS_COMP_UNKNOWN: ADD.
+GNUTLS_CRT_UNKNOWN: ADD.
+gnutls_mac_get_id: ADD.
+gnutls_compression_get_id: ADD.
+gnutls_cipher_get_id: ADD.
+gnutls_kx_get_id: ADD.
+gnutls_protocol_get_id: ADD.
+gnutls_certificate_type_get_id: ADD.
+gnutls_handshake_post_client_hello_func: ADD.
+gnutls_certificate_send_x509_rdn_sequence: ADD prototype to gnutls.h.in.
 
 * Version 2.1.6 (released 2007-11-15)
 
