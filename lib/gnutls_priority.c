@@ -484,7 +484,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 		      const char *priorities, const char **err_pos)
 {
   char *broken_list[MAX_ELEMENTS];
-  int broken_list_size, i;
+  int broken_list_size, i, j;
   char *darg;
   int algo;
   rmadd_func *fn;
@@ -712,7 +712,7 @@ break_comma_list (char *etag,
  *
  * This is the same as calling:
  *
- * gnutls_priority_set_direct (session, "EXPORT", NULL, 0);
+ * gnutls_priority_set_direct (session, "EXPORT", NULL);
  *
  * This function is kept around for backwards compatibility, but
  * because of its wide use it is still fully supported.  If you wish
@@ -725,7 +725,7 @@ break_comma_list (char *etag,
 int
 gnutls_set_default_priority (gnutls_session_t session)
 {
-  return gnutls_priority_set_direct (session, "NORMAL", NULL, 0);
+  return gnutls_priority_set_direct (session, "NORMAL", NULL);
 }
 
 /**
@@ -737,7 +737,7 @@ gnutls_set_default_priority (gnutls_session_t session)
  *
  * This is the same as calling:
  *
- * gnutls_priority_set_direct (session, "EXPORT", NULL, 0);
+ * gnutls_priority_set_direct (session, "EXPORT", NULL);
  *
  * This function is kept around for backwards compatibility, but
  * because of its wide use it is still fully supported.  If you wish
@@ -750,5 +750,5 @@ gnutls_set_default_priority (gnutls_session_t session)
 int
 gnutls_set_default_export_priority (gnutls_session_t session)
 {
-  return gnutls_priority_set_direct (session, "EXPORT", NULL, 0);
+  return gnutls_priority_set_direct (session, "EXPORT", NULL);
 }

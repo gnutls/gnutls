@@ -512,11 +512,11 @@ extern "C"
 
 /* if you just want some defaults, use the following.
  */
-  int gnutls_priority_init( gnutls_priority_t*, const char *priority, char* syntax_error, size_t syntax_error_size);
+  int gnutls_priority_init( gnutls_priority_t*, const char *priority, const char** err_pos);
   void gnutls_priority_deinit( gnutls_priority_t);
   
   int gnutls_priority_set(gnutls_session_t session, gnutls_priority_t);
-  int gnutls_priority_set_direct(gnutls_session_t session, const char *priority, char* syntax_error, size_t syntax_error_size);
+  int gnutls_priority_set_direct(gnutls_session_t session, const char *priority, const char** err_pos);
 
   /* for compatibility
    */
