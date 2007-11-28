@@ -34,6 +34,8 @@ gnutls_protocol_convert_priority: REMOVED
 gnutls_kx_convert_priority: REMOVED
 gnutls_cipher_convert_priority: REMOVED
 gnutls_certificate_type_convert_priority: REMOVED
+gnutls_set_default_priority: UNDEPRECATED
+gnutls_set_default_priority_export: UNDEPRECATED
 
 * Version 2.1.6 (released 2007-11-15)
 
