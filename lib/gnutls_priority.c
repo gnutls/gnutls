@@ -467,8 +467,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * are enabled (except for the RSA-EXPORT which is only enabled in
   * EXPORT level).
   *
-  * Note that although one can select very long key sizes for
-  * symmetric algorithms, to actually increase security the public key
+  * Note that although one can select very long key sizes (such as 256 bits) 
+  * for symmetric algorithms, to actually increase security the public key
   * algorithms have to use longer key sizes as well.
   *
   * Examples: "NORMAL:!AES-128-CBC",
