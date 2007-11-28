@@ -712,7 +712,7 @@ break_comma_list (char *etag,
  *
  * This is the same as calling:
  *
- * gnutls_priority_set_direct (session, "EXPORT", NULL);
+ * gnutls_priority_set_direct (session, "NORMAL", NULL);
  *
  * This function is kept around for backwards compatibility, but
  * because of its wide use it is still fully supported.  If you wish
