@@ -410,7 +410,7 @@ msgid ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
 msgstr ""
-"\t\t\tASCII: \t\t\tPolisi:\n"
+"\t\t\tPolisi:\n"
 "\t\t\t\tASCII: "
 
 #: lib/x509/output.c:124
