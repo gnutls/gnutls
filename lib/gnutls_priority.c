@@ -421,8 +421,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * gnutls_priority_init - Sets priorities for the cipher suites supported by gnutls.
   * @priority_cache: is a #gnutls_prioritity_t structure.
   * @priorities: is a string describing priorities
-  * @syntax_error: In case of an error an error string will be copied there.
-  * @syntax_error_size: the length of the previous string.
+  * @err_pos: In case of an error this will have the position in the string the error occured
   *
   * Sets priorities for the ciphers, key exchange methods, macs and
   * compression methods. This is to avoid using the
@@ -482,8 +481,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   **/
 int
 gnutls_priority_init (gnutls_priority_t * priority_cache,
-		      const char *priorities, char *syntax_error,
-		      size_t syntax_error_size)
+		      const char *priorities, const char **err_pos)
 {
   char *broken_list[MAX_ELEMENTS];
   int broken_list_size, i;
@@ -603,10 +601,16 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   return 0;
 
 error:
+  if (err_pos != NULL && i < broken_list_size)
+    {
+      *err_pos = priorities;
+      for (j = 0; j < i; j++)
+	{
+	  (*err_pos) += strlen (broken_list[j]) + 1;
+	}
+    }
   gnutls_free (darg);
-  if (syntax_error != NULL)
-    snprintf (syntax_error, syntax_error_size, "Unknown element: %s",
-	      broken_list[i]);
+
   return GNUTLS_E_INVALID_REQUEST;
 
 }
@@ -629,8 +633,7 @@ gnutls_priority_deinit (gnutls_priority_t priority_cache)
   * gnutls_priority_set_direct - Sets priorities for the cipher suites supported by gnutls.
   * @session: is a #gnutls_session_t structure.
   * @priorities: is a string describing priorities
-  * @syntax_error: In case of an error an error string will be copied there.
-  * @syntax_error_size: the length of the previous string.
+  * @err_pos: In case of an error this will have the position in the string the error occured
   *
   * Sets the priorities to use on the ciphers, key exchange methods,
   * macs and compression methods. This function avoids keeping a
@@ -642,13 +645,12 @@ gnutls_priority_deinit (gnutls_priority_t priority_cache)
   **/
 int
 gnutls_priority_set_direct (gnutls_session_t session, const char *priorities,
-			    char *syntax_error, size_t syntax_error_size)
+			    const char **err_pos)
 {
   gnutls_priority_t prio;
   int ret;
 
-  ret =
-    gnutls_priority_init (&prio, priorities, syntax_error, syntax_error_size);
+  ret = gnutls_priority_init (&prio, priorities, err_pos);
   if (ret < 0)
     {
       gnutls_assert ();

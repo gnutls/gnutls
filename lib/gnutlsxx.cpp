@@ -187,9 +187,9 @@ void session::set_certificate_type_priority (const int *list)
 
 /* if you just want some defaults, use the following.
  */
-void session::set_priority(const char* prio, char* syntax_error, size_t syntax_error_size)
+void session::set_priority(const char* prio, const char** err_pos)
 {
-    RETWRAP(gnutls_priority_set_direct( this->s, prio, syntax_error, syntax_error_size));
+    RETWRAP(gnutls_priority_set_direct( this->s, prio, err_pos));
 }
 
 void session::set_priority(gnutls_priority_t p)

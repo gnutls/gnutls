@@ -140,7 +140,7 @@ main (void)
   gnutls_certificate_allocate_credentials (&xcred);
 
   /* priorities */
-  gnutls_priority_init( &priorities_cache, "NORMAL", NULL, 0);
+  gnutls_priority_init( &priorities_cache, "NORMAL", NULL);
 
 
   /* sets the trusted cas file

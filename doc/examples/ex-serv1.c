@@ -115,7 +115,7 @@ main (void)
 
   generate_dh_params ();
 
-  gnutls_priority_init( &priority_cache, "NORMAL", NULL, 0);
+  gnutls_priority_init( &priority_cache, "NORMAL", NULL);
 
 
   gnutls_certificate_set_dh_params (x509_cred, dh_params);

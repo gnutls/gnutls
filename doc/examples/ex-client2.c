@@ -34,7 +34,7 @@ main (void)
   int ret, sd, ii;
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
-  char err[128];
+  const char *err;
   gnutls_certificate_credentials_t xcred;
 
   gnutls_global_init ();
@@ -51,10 +51,10 @@ main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  ret = gnutls_priority_set_direct (session, "PERFORMANCE", err, sizeof(err));
+  ret = gnutls_priority_set_direct (session, "PERFORMANCE", &err);
   if (ret < 0) {
     if (ret == GNUTLS_E_INVALID_REQUEST) {
-      fprintf(stderr, "%s\n", err);
+      fprintf(stderr, "Syntax error at: %s\n", err);
     }
     exit(1);
   }

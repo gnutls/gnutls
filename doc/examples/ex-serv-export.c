@@ -56,7 +56,7 @@ initialize_tls_session (void)
 
   /* Use the default priorities, plus, export cipher suites.
    */
-  gnutls_priority_set_direct( session, "EXPORT", NULL, 0);
+  gnutls_priority_set_direct( session, "EXPORT", NULL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 

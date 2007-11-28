@@ -365,7 +365,7 @@ gnutls_session_t
 initialize_session (void)
 {
   gnutls_session_t session;
-  char err[128];
+  const char *err;
 
   gnutls_init (&session, GNUTLS_SERVER);
 
@@ -381,9 +381,9 @@ initialize_session (void)
       gnutls_db_set_ptr (session, NULL);
     }
 
-  if (gnutls_priority_set_direct (session, info.priorities, err, sizeof(err)-1) < 0)
+  if (gnutls_priority_set_direct (session, info.priorities, err) < 0)
     {
-      fprintf(stderr, "%s\n", err);
+      fprintf(stderr, "Syntax error at: %s\n", err);
       exit(1);
     }
 

@@ -374,15 +374,15 @@ cert_callback (gnutls_session_t session,
 static gnutls_session_t
 init_tls_session (const char *hostname)
 {
-char err[128];
+const char *err;
 
   gnutls_session_t session;
 
   gnutls_init (&session, GNUTLS_CLIENT);
 
-  if (gnutls_priority_set_direct (session, info.priorities, err, sizeof(err)-1) < 0)
+  if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
     {
-      fprintf(stderr, "%s\n", err);
+      fprintf(stderr, "Syntax error at: %s\n", err);
       exit(1);
     }
 
