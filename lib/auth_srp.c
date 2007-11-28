@@ -243,8 +243,12 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
    */
 
   data_b = &data_s[1 + pwd_entry->salt.size];
-  if (_gnutls_mpi_print (&data_b[2], &n_b, B) != 0)
-    return GNUTLS_E_MPI_PRINT_FAILED;
+  if (_gnutls_mpi_print (&data_b[2], &n_b, B) != 0) 
+    {
+      gnutls_assert();
+      return GNUTLS_E_MPI_PRINT_FAILED;
+    }
+
   _gnutls_write_uint16 (n_b, data_b);
 
   _gnutls_hard_log ("INT: SRP B[%d]: %s\n", n_b,
@@ -362,6 +366,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
       gnutls_free (*data);
       return GNUTLS_E_MPI_PRINT_FAILED;
     }
+
   _gnutls_hard_log ("INT: SRP A[%d]: %s\n", n_a,
 		    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf)));
 
