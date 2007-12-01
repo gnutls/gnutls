@@ -32,7 +32,7 @@
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
 #include <certtool-cfg.h>
-
+#include <gcrypt.h>
 #include <errno.h>
 
 /* Gnulib portability files. */
@@ -123,7 +123,12 @@ generate_private_key_int (void)
   int ret, key_type;
 
   if (info.dsa)
-    key_type = GNUTLS_PK_DSA;
+    {
+      key_type = GNUTLS_PK_DSA;
+      /* FIXME: Remove me once we depend on 1.3.x */
+      if (info.bits > 1024 && gcry_check_version("1.3.1")==NULL)
+        info.bits = 1024;
+    }
   else
     key_type = GNUTLS_PK_RSA;
 

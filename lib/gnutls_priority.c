@@ -284,9 +284,11 @@ static const int cipher_priority_performance[] = {
 
 static const int cipher_priority_normal[] = {
   GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
+  GNUTLS_CIPHER_AES_256_CBC,
+#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
 #endif
   GNUTLS_CIPHER_3DES_CBC,
@@ -295,7 +297,19 @@ static const int cipher_priority_normal[] = {
   0
 };
 
-static const int cipher_priority_secure[] = {
+static const int cipher_priority_secure128[] = {
+  GNUTLS_CIPHER_AES_128_CBC,
+#ifdef	ENABLE_CAMELLIA
+  GNUTLS_CIPHER_CAMELLIA_128_CBC,
+#endif
+  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_ARCFOUR_128,
+  /* GNUTLS_CIPHER_ARCFOUR_40: Insecure, don't add! */
+  0
+};
+
+
+static const int cipher_priority_secure256[] = {
   GNUTLS_CIPHER_AES_256_CBC,
 #ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
@@ -439,11 +453,14 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * all the "secure" ciphersuites are enabled, limited to 128 bit
   * ciphers and sorted by terms of speed performance.
   *
-  * "NORMAL" option enables all "secure" ciphersuites and prefer 128
-  * bit ciphers over 256 bit bit ciphers, sorted by security margin.
+  * "NORMAL" option enables all "secure" ciphersuites. The 256-bit ciphers
+  * are included as a fallback only. The ciphers are sorted by security margin.
   *
-  * "SECURE" flag enables all "secure" ciphersuites and prefer 256 bit
-  * ciphers over 128 bit ciphers, sorted by security margin.
+  * "SECURE128" flag enables all "secure" ciphersuites with ciphers up to 
+  * 128 bits, sorted by security margin.
+  *
+  * "SECURE256" flag enables all "secure" ciphersuites including the 256 bit
+  * ciphers, sorted by security margin.
   *
   * "EXPORT" all the ciphersuites are enabled, including the
   * low-security 40 bit ciphers.
@@ -533,9 +550,15 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}
-      else if (strcasecmp (broken_list[i], "SECURE") == 0)
+      else if (strcasecmp (broken_list[i], "SECURE256") == 0 || strcasecmp (broken_list[i], "SECURE") == 0)
 	{
-	  _set_priority (&(*priority_cache)->cipher, cipher_priority_secure);
+	  _set_priority (&(*priority_cache)->cipher, cipher_priority_secure256);
+	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
+	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
+	}
+      else if (strcasecmp (broken_list[i], "SECURE128") == 0)
+	{
+	  _set_priority (&(*priority_cache)->cipher, cipher_priority_secure128);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}
