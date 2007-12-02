@@ -890,12 +890,13 @@ gnutls_x509_crt_get_pk_algorithm (gnutls_x509_crt_t cert, unsigned int *bits)
 
 #define XMPP_OID "1.3.6.1.5.5.7.8.5"
 
-/* returns the type and the name.
+/* returns the type and the name on success.
+ * Type is also returned as a parameter in case of an error.
  */
 static int
 parse_general_name (ASN1_TYPE src, const char *src_name,
-		    int seq, void *name, size_t * name_size,
-		    int othername_oid)
+		    int seq, void *name, size_t * name_size, 
+		    unsigned int* ret_type, int othername_oid)
 {
   int len;
   char nptr[MAX_NAME_SIZE];
@@ -931,6 +932,9 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
       gnutls_assert ();
       return GNUTLS_E_X509_UNKNOWN_SAN;
     }
+  
+  if (ret_type)
+    *ret_type = type;
 
   if (type == GNUTLS_SAN_OTHERNAME)
     {
@@ -1046,7 +1050,7 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 static int
 get_subject_alt_name (gnutls_x509_crt_t cert,
 		      unsigned int seq, void *ret,
-		      size_t * ret_size,
+		      size_t * ret_size, unsigned int *ret_type,
 		      unsigned int *critical,
 		      int othername_oid)
 {
@@ -1098,7 +1102,7 @@ get_subject_alt_name (gnutls_x509_crt_t cert,
       return _gnutls_asn2err (result);
     }
 
-  result = parse_general_name (c2, "", seq, ret, ret_size, othername_oid);
+  result = parse_general_name (c2, "", seq, ret, ret_size, ret_type, othername_oid);
 
   asn1_delete_structure (&c2);
 
@@ -1152,7 +1156,35 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
 				      size_t * ret_size,
 				      unsigned int *critical)
 {
-  return get_subject_alt_name (cert, seq, ret, ret_size, critical, 0);
+  return get_subject_alt_name (cert, seq, ret, ret_size, NULL, critical, 0);
+}
+
+/**
+  * gnutls_x509_crt_get_subject_alt_name2 - Get certificate's alternative name, if any
+  * @cert: should contain a gnutls_x509_crt_t structure
+  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+  * @ret: is the place where the alternative name will be copied to
+  * @ret_size: holds the size of ret.
+  * @ret_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the alternative names, contained in the
+  * given certificate. It is the same as gnutls_x509_crt_get_subject_alt_name()
+  * except for the fact that it will return the type of the alternative
+  * name in @ret_type even if the function fails for some reason (i.e.
+  * the buffer provided is not enough).
+  *
+  * The return values are the same as with gnutls_x509_crt_get_subject_alt_name().
+  *
+  **/
+int
+gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
+				      unsigned int seq, void *ret,
+				      size_t * ret_size, 
+                                      unsigned int* ret_type,
+				      unsigned int *critical)
+{
+  return get_subject_alt_name (cert, seq, ret, ret_size, ret_type, critical, 0);
 }
 
 /**
@@ -1187,7 +1219,7 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
 					       void *ret,
 					       size_t * ret_size)
 {
-  return get_subject_alt_name (cert, seq, ret, ret_size, NULL, 1);
+  return get_subject_alt_name (cert, seq, ret, ret_size, NULL, NULL, 1);
 }
 
 /**
@@ -2367,7 +2399,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
    */
   _gnutls_str_cpy (name, sizeof (name), "?1.distributionPoint.fullName");
 
-  result = parse_general_name (c2, name, seq, ret, ret_size, 0);
+  result = parse_general_name (c2, name, seq, ret, ret_size, NULL, 0);
   if (result < 0)
     {
       asn1_delete_structure (&c2);

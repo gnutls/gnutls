@@ -3,6 +3,13 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 2.x.x
+
+** Added gnutls_x509_crt_get_subject_alt_name2().
+
+** API and ABI modifications:
+gnutls_x509_crt_get_subject_alt_name2: ADD.
+
 * Version 2.1.7 (released 2007-11-29)
 
 ** PKCS #8 parser can now encode/decode DSA keys.
