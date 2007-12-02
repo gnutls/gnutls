@@ -1037,7 +1037,7 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 	  return _gnutls_asn2err (result);
 	}
       
-      name[len] = 0;
+      ((char*)name)[len] = 0;
     }
 
   return type;
