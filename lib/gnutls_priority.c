@@ -423,8 +423,15 @@ prio_add (priority_st * priority_list, int algo)
 int
 gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 {
+  if (priority == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_NO_CIPHER_SUITES;
+    }
+
   memcpy (&session->internals.priorities, priority,
 	  sizeof (struct gnutls_priority_st));
+
   return 0;
 }
 
