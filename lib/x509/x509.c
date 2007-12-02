@@ -1026,16 +1026,18 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 
       len = *name_size;
       result = asn1_read_value (src, nptr, name, &len);
-      *name_size = len;
+      *name_size = len + 1;
 
       if (result == ASN1_MEM_ERROR)
 	return GNUTLS_E_SHORT_MEMORY_BUFFER;
-
+      
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();
 	  return _gnutls_asn2err (result);
 	}
+      
+      name[len] = 0;
     }
 
   return type;
@@ -1142,6 +1144,7 @@ get_subject_alt_name (gnutls_x509_crt_t cert,
   * with the required size.  If the certificate does not have an
   * Alternative name with the specified sequence number then
   * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+  *
   **/
 int
 gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
