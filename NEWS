@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** Added gnutls_x509_crt_get_subject_alt_name2().
 
+** Corrected a segfault when setting an empty gnutls_priority_t
+at gnutls_priority_set().
+
 ** API and ABI modifications:
 gnutls_x509_crt_get_subject_alt_name2: ADD.
 
