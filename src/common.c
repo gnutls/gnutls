@@ -506,6 +506,15 @@ print_info (gnutls_session_t session, const char *hostname)
 	  }
       }
 
+      if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) 
+        {
+          printf ("- Ephemeral DH using prime of %d bits, secret key "
+	      "of %d bits, and peer's public key is %d bits.\n",
+	      gnutls_dh_get_prime_bits (session),
+	      gnutls_dh_get_secret_bits (session),
+	      gnutls_dh_get_peers_public_bits (session));
+        }
+
       print_cert_info (session, hostname);
 
       print_cert_vrfy (session);
