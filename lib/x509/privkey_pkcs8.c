@@ -201,11 +201,11 @@ _encode_privkey (gnutls_x509_privkey pkey, gnutls_datum * raw)
     }
 
   return 0;
-  
-  error:
-    gnutls_free(data);
-    asn1_delete_structure (&spk);
-    return ret;
+
+error:
+  gnutls_free (data);
+  asn1_delete_structure (&spk);
+  return ret;
 
 }
 
@@ -554,8 +554,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
       ret =
 	_gnutls_x509_export_int (pkey_info, format,
 				 PEM_UNENCRYPTED_PKCS8,
-				 output_data,
-				 output_data_size);
+				 output_data, output_data_size);
 
       asn1_delete_structure (&pkey_info);
     }
@@ -574,8 +573,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
 
       ret =
 	_gnutls_x509_export_int (pkcs8_asn, format, PEM_PKCS8,
-				 output_data,
-				 output_data_size);
+				 output_data, output_data_size);
 
       asn1_delete_structure (&pkcs8_asn);
     }
@@ -731,8 +729,7 @@ error:
  */
 static int
 decode_pkcs8_key (const gnutls_datum_t * raw_key,
-		  const char *password,
-		  gnutls_x509_privkey_t pkey)
+		  const char *password, gnutls_x509_privkey_t pkey)
 {
   int result, len;
   char enc_oid[64];
@@ -854,12 +851,13 @@ error:
 
 /* Decodes an RSA privateKey from a PKCS8 structure.
  */
-static int _decode_pkcs8_rsa_key( ASN1_TYPE pkcs8_asn, gnutls_x509_privkey pkey)
+static int
+_decode_pkcs8_rsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey pkey)
 {
-int ret;
-gnutls_datum tmp;
+  int ret;
+  gnutls_datum tmp;
 
-  ret = _gnutls_x509_read_value(pkcs8_asn, "privateKey", &tmp, 0);
+  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -867,7 +865,7 @@ gnutls_datum tmp;
     }
 
   pkey->key = _gnutls_privkey_decode_pkcs1_rsa_key (&tmp, pkey);
-  _gnutls_free_datum( &tmp);
+  _gnutls_free_datum (&tmp);
   if (pkey->key == NULL)
     {
       gnutls_assert ();
@@ -877,58 +875,61 @@ gnutls_datum tmp;
   return 0;
 
 error:
-  gnutls_x509_privkey_deinit(pkey);
+  gnutls_x509_privkey_deinit (pkey);
   return ret;
 }
 
 /* Decodes an DSA privateKey and params from a PKCS8 structure.
  */
-static int _decode_pkcs8_dsa_key( ASN1_TYPE pkcs8_asn, gnutls_x509_privkey pkey)
+static int
+_decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey pkey)
 {
-int ret;
-gnutls_datum tmp;
-mpi_t y;
+  int ret;
+  gnutls_datum tmp;
 
-  ret = _gnutls_x509_read_value(pkcs8_asn, "privateKey", &tmp, 0);
+  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
   if (ret < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
-  ret = _gnutls_x509_read_der_int( tmp.data, tmp.size, &pkey->params[4]);
-  _gnutls_free_datum( &tmp);
-  
+  ret = _gnutls_x509_read_der_int (tmp.data, tmp.size, &pkey->params[4]);
+  _gnutls_free_datum (&tmp);
+
   if (ret < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
-  ret = _gnutls_x509_read_value( pkcs8_asn, "privateKeyAlgorithm.parameters", &tmp, 0);
-  if (ret < 0) 
+  ret =
+    _gnutls_x509_read_value (pkcs8_asn, "privateKeyAlgorithm.parameters",
+			     &tmp, 0);
+  if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       goto error;
     }
-  
+
   ret = _gnutls_x509_read_dsa_params (tmp.data, tmp.size, pkey->params);
-  _gnutls_free_datum( &tmp);
+  _gnutls_free_datum (&tmp);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       goto error;
     }
-  
+
   /* the public key can be generated as g^x mod p */
   pkey->params[3] = _gnutls_mpi_alloc_like (pkey->params[0]);
   if (pkey->params[3] == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       goto error;
     }
-  
-  _gnutls_mpi_powm (pkey->params[3], pkey->params[2], pkey->params[4], pkey->params[0]);
+
+  _gnutls_mpi_powm (pkey->params[3], pkey->params[2], pkey->params[4],
+		    pkey->params[0]);
 
   if (!pkey->crippled)
     {
@@ -945,7 +946,7 @@ mpi_t y;
   return 0;
 
 error:
-  gnutls_x509_privkey_deinit(pkey);
+  gnutls_x509_privkey_deinit (pkey);
   return ret;
 }
 
@@ -1008,13 +1009,13 @@ decode_private_key_info (const gnutls_datum_t * der,
    */
 
   if (pkey->pk_algorithm == GNUTLS_PK_RSA)
-    result = _decode_pkcs8_rsa_key( pkcs8_asn, pkey);
+    result = _decode_pkcs8_rsa_key (pkcs8_asn, pkey);
   else if (pkey->pk_algorithm == GNUTLS_PK_DSA)
-    result = _decode_pkcs8_dsa_key( pkcs8_asn, pkey);
-  
+    result = _decode_pkcs8_dsa_key (pkcs8_asn, pkey);
+
   if (result < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return result;
     }
 
