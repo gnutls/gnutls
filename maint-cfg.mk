@@ -29,7 +29,7 @@ endif
 autoreconf:
 	test -f ./configure || autoreconf --install
 	mv build-aux/config.rpath{-,}
-	rm -f m4/lib-ld.m4 m4/lib-link.m4 m4/lib-prefix.m4
+	cp gl/m4/lib-{ld,link,prefix}.m4 m4/
 
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
