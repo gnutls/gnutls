@@ -20,9 +20,6 @@ gnutls_x509_crt_get_subject_alt_name2: ADD.
 
 ** PKCS #8 parser can now encode/decode DSA keys.
 
-** We now ignore received packets with unknown content types
-to follow the TLS spec.
-
 ** Updated gnutls_set_default_priority2() now renamed to
 gnutls_priority_set() and gnutls_priority_set_direct() which
 accept a string to indicate preferences of ciphersuite parameters.
