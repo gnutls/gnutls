@@ -2537,7 +2537,7 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
   * @m: will hold the modulus
   * @e: will hold the public exponent
   *
-  * This function will export the RSA private key's parameters found in the given
+  * This function will export the RSA public key's parameters found in the given
   * structure. The new parameters will be allocated using
   * gnutls_malloc() and will be stored in the appropriate datum.
   * 
