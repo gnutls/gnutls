@@ -502,7 +502,7 @@ check_recv_type (content_type_t recv_type)
       return 0;
     default:
       gnutls_assert ();
-      return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+      return GNUTLS_A_UNEXPECTED_MESSAGE;
     }
 
 }
