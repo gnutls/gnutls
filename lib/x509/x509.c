@@ -1909,10 +1909,9 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
   *
   * If the buffer is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
-  * long enough, and in that case the *sizeof_buf will be updated with
-  * the required size.  On success 0 is returned.
-  *
+  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
+  * not long enough, and in that case the *sizeof_buf will be updated
+  * with the required size.  On success 0 is returned.
   **/
 int
 gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
@@ -1976,7 +1975,6 @@ gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
   *
   * Return value: In case of failure a negative value will be
   *   returned, and 0 on success.
-  *
   **/
 int
 gnutls_x509_crt_export (gnutls_x509_crt_t cert,
@@ -2081,7 +2079,6 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
   *
   * Return value: In case of failure a negative value will be
   *   returned, and 0 on success.
-  *
   **/
 int
 gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
@@ -2163,12 +2160,11 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
   * @crl_list: should contain a list of gnutls_x509_crl_t structures
   * @crl_list_length: the length of the crl_list
   *
-  * This function will return check if the given certificate is revoked.
-  * It is assumed that the CRLs have been verified before.
+  * This function will return check if the given certificate is
+  * revoked.  It is assumed that the CRLs have been verified before.
   *
-  * Returns 0 if the certificate is NOT revoked, and 1 if it is.
-  * A negative value is returned on error. 
-  *
+  * Returns: 0 if the certificate is NOT revoked, and 1 if it is.  A
+  * negative value is returned on error.
   **/
 int
 gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
@@ -2272,12 +2268,11 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
   * @data: holds the data to be signed
   * @signature: contains the signature
   *
-  * This function will verify the given signed data, using the parameters from the
-  * certificate.
+  * This function will verify the given signed data, using the
+  * parameters from the certificate.
   *
-  * In case of a verification failure 0 is returned, and
-  * 1 on success.
-  *
+  * Returns: In case of a verification failure 0 is returned, and 1 on
+  * success.
   **/
 int
 gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
@@ -2311,26 +2306,30 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
   * @reason_flags: Revocation reasons flags.
   * @critical: will be non zero if the extension is marked as critical (may be null)
   *
-  * This function will return the CRL distribution points (2.5.29.31), contained in the
-  * given certificate.
+  * This function will return the CRL distribution points (2.5.29.31),
+  * contained in the given certificate.
   *
-  * @reason_flags should be an ORed sequence of GNUTLS_CRL_REASON_UNUSED,
-  * GNUTLS_CRL_REASON_KEY_COMPROMISE, GNUTLS_CRL_REASON_CA_COMPROMISE,
-  * GNUTLS_CRL_REASON_AFFILIATION_CHANGED, GNUTLS_CRL_REASON_SUPERSEEDED,
-  * GNUTLS_CRL_REASON_CESSATION_OF_OPERATION, GNUTLS_CRL_REASON_CERTIFICATE_HOLD,
-  * GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN, GNUTLS_CRL_REASON_AA_COMPROMISE,
-  * or zero for all possible reasons.
-  * 
-  * This is specified in X509v3 Certificate Extensions. GNUTLS will return the 
-  * distribution point type, or a negative error code on error.
+  * @reason_flags should be an ORed sequence of
+  * GNUTLS_CRL_REASON_UNUSED, GNUTLS_CRL_REASON_KEY_COMPROMISE,
+  * GNUTLS_CRL_REASON_CA_COMPROMISE,
+  * GNUTLS_CRL_REASON_AFFILIATION_CHANGED,
+  * GNUTLS_CRL_REASON_SUPERSEEDED,
+  * GNUTLS_CRL_REASON_CESSATION_OF_OPERATION,
+  * GNUTLS_CRL_REASON_CERTIFICATE_HOLD,
+  * GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN,
+  * GNUTLS_CRL_REASON_AA_COMPROMISE, or zero for all possible reasons.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates &ret_size if &ret_size is not enough to hold the distribution
-  * point, or the type of the distribution point if everything was ok. The type is 
-  * one of the enumerated gnutls_x509_subject_alt_name_t.
+  * This is specified in X509v3 Certificate Extensions. GNUTLS will
+  * return the distribution point type, or a negative error code on
+  * error.
   *
-  * If the certificate does not have an Alternative name with the specified 
-  * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-  *
+  * Returns %GNUTLS_E_SHORT_MEMORY_BUFFER and updates &@ret_size if
+  * &@ret_size is not enough to hold the distribution point, or the
+  * type of the distribution point if everything was ok. The type is
+  * one of the enumerated %gnutls_x509_subject_alt_name_t.  If the
+  * certificate does not have an Alternative name with the specified
+  * sequence number then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is
+  * returned.
   **/
 int
 gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
@@ -2447,10 +2446,9 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
   *
   * If @oid is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
-  * long enough, and in that case the *sizeof_oid will be updated with
-  * the required size.  On success 0 is returned.
-  *
+  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
+  * not long enough, and in that case the *sizeof_oid will be updated
+  * with the required size.  On success 0 is returned.
   **/
 int
 gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
@@ -2537,10 +2535,11 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
   * @m: will hold the modulus
   * @e: will hold the public exponent
   *
-  * This function will export the RSA public key's parameters found in the given
-  * structure. The new parameters will be allocated using
+  * This function will export the RSA public key's parameters found in
+  * the given structure.  The new parameters will be allocated using
   * gnutls_malloc() and will be stored in the appropriate datum.
-  * 
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   **/
 int
 gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
@@ -2597,17 +2596,18 @@ cleanup:
 }
 
 /**
-  * gnutls_x509_crt_get_pk_dsa_raw - This function will export the DSA private key
+  * gnutls_x509_crt_get_pk_dsa_raw - This function will export the DSA public key
   * @crt: Holds the certificate
   * @p: will hold the p
   * @q: will hold the q
   * @g: will hold the g
   * @y: will hold the y
   *
-  * This function will export the DSA private key's parameters found in the given
-  * certificate. The new parameters will be allocated using
+  * This function will export the DSA public key's parameters found in
+  * the given certificate.  The new parameters will be allocated using
   * gnutls_malloc() and will be stored in the appropriate datum.
-  * 
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   **/
 int
 gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
@@ -2702,14 +2702,13 @@ cleanup:
   * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
   *
   * This function will convert the given PEM encoded certificate list
-  * to the native gnutls_x509_crt_t format. The output will be stored in @certs.
-  * They will be automatically initialized.
+  * to the native gnutls_x509_crt_t format. The output will be stored
+  * in @certs.  They will be automatically initialized.
   *
-  * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
-  * "CERTIFICATE".
+  * If the Certificate is PEM encoded it should have a header of "X509
+  * CERTIFICATE", or "CERTIFICATE".
   *
-  * Returns the number of certificates read or a negative error value.
-  *
+  * Returns: the number of certificates read or a negative error value.
   **/
 int
 gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
