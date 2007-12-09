@@ -51,6 +51,7 @@ int _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 				 int datalen);
 
 int _gnutls_negotiate_version( gnutls_session_t session, gnutls_protocol_t adv_version);
+int _gnutls_user_hello_func( gnutls_session, gnutls_protocol_t adv_version);
 
 #define STATE session->internals.handshake_state
 /* This returns true if we have got there

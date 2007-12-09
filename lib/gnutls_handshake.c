@@ -303,6 +303,29 @@ int ret;
   return ret;
 }
 
+int _gnutls_user_hello_func( gnutls_session session, gnutls_protocol_t adv_version)
+{
+int ret;
+
+  if (session->internals.user_hello_func != NULL) 
+    {
+      ret = session->internals.user_hello_func( session);
+      if (ret < 0) 
+        {
+          gnutls_assert();
+          return ret;
+        }
+      /* Here we need to renegotiate the version since the callee might
+       * have disabled some TLS versions.
+       */
+      ret = _gnutls_negotiate_version( session, adv_version);
+      if (ret < 0) {
+        gnutls_assert();
+        return ret;
+      }
+    }
+  return 0;
+}
 
 /* Read a client hello packet. 
  * A client hello must be a known version client hello
@@ -335,10 +358,11 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   pos += 2;
 
   neg_version = _gnutls_negotiate_version( session, adv_version);
-  if (neg_version < 0) {
-    gnutls_assert();
-    return ret;
-  }
+  if (neg_version < 0) 
+    {
+      gnutls_assert();
+      return ret;
+    }
 
   /* Read client random value.
    */
@@ -362,6 +386,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
   DECR_LEN (len, session_id_len);
+  
   ret = _gnutls_server_restore_session (session, &data[pos], session_id_len);
   pos += session_id_len;
 
@@ -369,7 +394,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
     {				/* resumed! */
       resume_copy_required_values (session);
       session->internals.resumed = RESUME_TRUE;
-      return 0;
+      return _gnutls_user_hello_func( session, adv_version);
     }
   else
     {
@@ -412,23 +437,13 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 	}
     }
 
-  if (session->internals.user_hello_func != NULL) 
+  ret = _gnutls_user_hello_func( session, adv_version);
+  if (ret < 0) 
     {
-      ret = session->internals.user_hello_func( session);
-      if (ret < 0) 
-        {
-          gnutls_assert();
-          return ret;
-        }
-      /* Here we need to renegotiate the version since the callee might
-       * have disable some TLS versions.
-       */
-      ret = _gnutls_negotiate_version( session, adv_version);
-      if (ret < 0) {
-        gnutls_assert();
-        return ret;
-      }
+      gnutls_assert();
+      return ret;
     }
+  
 
   /* select an appropriate cipher suite
    */

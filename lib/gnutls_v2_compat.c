@@ -154,21 +154,11 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
 
   /* call the user hello callback
    */
-  if (session->internals.user_hello_func != NULL) 
+  ret = _gnutls_user_hello_func( session, adv_version);
+  if (ret < 0) 
     {
-      ret = session->internals.user_hello_func( session);
-      if (ret < 0) 
-        {
-          gnutls_assert();
-          return ret;
-        }
-
-    ret = _gnutls_negotiate_version( session, adv_version);
-    if (ret < 0) 
-      {
-        gnutls_assert ();
-        return ret;
-      }
+      gnutls_assert();
+      return ret;
     }
 
   /* find an appropriate cipher suite */
@@ -242,7 +232,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   ret = _gnutls_server_restore_session (session, session_id, session_id_len);
 
   if (ret == 0)
-    {				/* resumed! */
+    { /* resumed! */
       /* get the new random values */
       memcpy (session->internals.resumed_security_parameters.
 	      server_random, session->security_parameters.server_random,
