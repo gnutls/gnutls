@@ -167,6 +167,15 @@ extern int mkstemp (char * /*template*/);
 #endif
 
 
+#if @GNULIB_PUTENV@
+# if @REPLACE_PUTENV@
+#  undef putenv
+#  define putenv rpl_putenv
+extern int putenv (char *string);
+# endif
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif

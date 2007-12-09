@@ -1,4 +1,4 @@
-# stdio_h.m4 serial 8
+# stdio_h.m4 serial 9
 dnl Copyright (C) 2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -73,13 +73,12 @@ AC_DEFUN([gl_STDIN_LARGE_OFFSET],
       [AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <stdio.h>],
 [#if defined __SL64 && defined __SCLE /* cygwin */
   /* Cygwin 1.5.24 and earlier fail to put stdin in 64-bit mode, making
-     fseeko/ftello needlessly fail.  This bug was fixed at the same time
-     that cygwin started exporting asnprintf (cygwin 1.7.0), so we use
-     that as a link-time test for cross-compiles rather than building
-     a runtime test.  */
-  size_t s;
-  if (asnprintf (NULL, &s, ""))
-    return 0;
+     fseeko/ftello needlessly fail.  This bug was fixed in 1.5.25, and
+     it is easier to do a version check than building a runtime test.  */
+# include <cygwin/version.h>
+# if CYGWIN_VERSION_DLL_COMBINED < CYGWIN_VERSION_DLL_MAKE_COMBINED (1005, 25)
+  choke me
+# endif
 #endif])],
 	[gl_cv_var_stdin_large_offset=yes],
 	[gl_cv_var_stdin_large_offset=no])])

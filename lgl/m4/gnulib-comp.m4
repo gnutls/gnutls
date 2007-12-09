@@ -73,7 +73,7 @@ AC_DEFUN([lgl_INIT],
   gl_MD2
   gl_FLOAT_H
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.16.1])
+  AM_GNU_GETTEXT_VERSION([0.17])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_FUNC_MEMMEM
@@ -300,7 +300,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/time_h.m4
   m4/time_r.m4
   m4/uintmax_t.m4
-  m4/ulonglong.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/vasprintf.m4

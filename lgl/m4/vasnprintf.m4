@@ -1,4 +1,4 @@
-# vasnprintf.m4 serial 20
+# vasnprintf.m4 serial 23
 dnl Copyright (C) 2002-2004, 2006-2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -45,7 +45,10 @@ AC_DEFUN([gl_PREREQ_PRINTF_PARSE],
   AC_REQUIRE([gt_TYPE_WCHAR_T])
   AC_REQUIRE([gt_TYPE_WINT_T])
   AC_REQUIRE([AC_TYPE_SIZE_T])
-  AC_CHECK_TYPES(ptrdiff_t)
+  AC_CHECK_TYPE([ptrdiff_t], ,
+    [AC_DEFINE([ptrdiff_t], [long],
+       [Define as the type of the result of subtracting two pointers, if the system doesn't define it.])
+    ])
   AC_REQUIRE([gt_AC_TYPE_INTMAX_T])
 ])
 
@@ -178,6 +181,49 @@ AC_DEFUN([gl_PREREQ_VASNPRINTF_FLAG_ZERO],
   esac
 ])
 
+# Extra prerequisites of lib/vasnprintf.c for supporting large precisions.
+AC_DEFUN([gl_PREREQ_VASNPRINTF_PRECISION],
+[
+  AC_REQUIRE([gl_PRINTF_PRECISION])
+  case "$gl_cv_func_printf_precision" in
+    *yes)
+      ;;
+    *)
+      AC_DEFINE([NEED_PRINTF_UNBOUNDED_PRECISION], 1,
+        [Define if the vasnprintf implementation needs special code for
+         supporting large precisions without arbitrary bounds.])
+      AC_DEFINE([NEED_PRINTF_DOUBLE], 1,
+        [Define if the vasnprintf implementation needs special code for
+         'double' arguments.])
+      AC_DEFINE([NEED_PRINTF_LONG_DOUBLE], 1,
+        [Define if the vasnprintf implementation needs special code for
+         'long double' arguments.])
+      ;;
+  esac
+])
+
+# Extra prerequisites of lib/vasnprintf.c for surviving out-of-memory
+# conditions.
+AC_DEFUN([gl_PREREQ_VASNPRINTF_ENOMEM],
+[
+  AC_REQUIRE([gl_PRINTF_ENOMEM])
+  case "$gl_cv_func_printf_enomem" in
+    *yes)
+      ;;
+    *)
+      AC_DEFINE([NEED_PRINTF_ENOMEM], 1,
+        [Define if the vasnprintf implementation needs special code for
+         surviving out-of-memory conditions.])
+      AC_DEFINE([NEED_PRINTF_DOUBLE], 1,
+        [Define if the vasnprintf implementation needs special code for
+         'double' arguments.])
+      AC_DEFINE([NEED_PRINTF_LONG_DOUBLE], 1,
+        [Define if the vasnprintf implementation needs special code for
+         'long double' arguments.])
+      ;;
+  esac
+])
+
 # Prerequisites of lib/vasnprintf.c including all extras for POSIX compliance.
 AC_DEFUN([gl_PREREQ_VASNPRINTF_WITH_EXTRAS],
 [
@@ -189,6 +235,8 @@ AC_DEFUN([gl_PREREQ_VASNPRINTF_WITH_EXTRAS],
   gl_PREREQ_VASNPRINTF_DIRECTIVE_F
   gl_PREREQ_VASNPRINTF_FLAG_GROUPING
   gl_PREREQ_VASNPRINTF_FLAG_ZERO
+  gl_PREREQ_VASNPRINTF_PRECISION
+  gl_PREREQ_VASNPRINTF_ENOMEM
 ])
 
 # Prerequisites of lib/asnprintf.c.
