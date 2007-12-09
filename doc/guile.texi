@@ -607,7 +607,7 @@ Lesser General Public Licence, version 2.1 or later.
 
 This section lists the Scheme procedures exported by the @code{(gnutls
 extra)} module.  This module is licenced under the GNU General Public
-Licence, version 2 or later.
+Licence, version 3 or later.
 
 @include extra.c.texi
 
