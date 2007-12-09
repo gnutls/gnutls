@@ -3640,7 +3640,7 @@ is summarized in the following diagram.
 @cindex GPL, GNU General Public License
 @cindex License, GNU GPL
 
-@include gpl-2.0.texi
+@include gpl-3.0.texi
 
 @node Concept Index
 @unnumbered Concept Index
