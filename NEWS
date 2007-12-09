@@ -12,7 +12,7 @@ See the end for copying conditions.
 ** Corrected a segfault when setting an empty gnutls_priority_t
 at gnutls_priority_set().
 
-** Update version of m4/lib-*.m4 macros.
+** Use gettext 0.17 which updates m4/lib-*.m4 macros.
 Fixes a problem with spurious -L/usr/lib additions.
 
 ** API and ABI modifications:
