@@ -5,7 +5,9 @@ See the end for copying conditions.
 
 * Version 2.1.x (unreleased)
 
-** The GPL programs and libextra are under GPLv3
+** The GPL version has been changed from version 2 to version 3.
+This affects the self-tests, command-line tools, the libgnutls-extra
+library, the relevant guile parts, and the build environment.
 
 ** Added gnutls_x509_crt_get_subject_alt_name2().
 
