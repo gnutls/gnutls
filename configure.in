@@ -91,8 +91,6 @@ AC_MSG_RESULT([***
 ])
 
 dnl Checks for programs.
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LN_S
@@ -116,6 +114,9 @@ gl_EARLY
 lgl_EARLY
 AC_C_CONST
 AC_C_INLINE
+
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
 
 dnl In order to use the reentrant libc functions.
 dnl I hope it is portable enough.
