@@ -1528,7 +1528,9 @@ _verify_x509_mem (const void *cert, int cert_size)
 	  error (EXIT_FAILURE, 0, "memory error");
 
 	tmp.data = (char *) ptr;
-	tmp.size = siz;
+	tmp.size = cert_size;
+	tmp.size -=
+	  (unsigned int) ((unsigned char *) ptr - (unsigned char *) cert);
 
 	ret = gnutls_x509_crl_init (&x509_crl_list[i - 1]);
 	if (ret < 0)
@@ -1568,8 +1570,11 @@ _verify_x509_mem (const void *cert, int cert_size)
       if (x509_cert_list == NULL)
 	error (EXIT_FAILURE, 0, "memory error");
 
+
       tmp.data = (char *) ptr;
-      tmp.size = siz;
+      tmp.size = cert_size;
+      tmp.size -=
+	(unsigned int) ((unsigned char *) ptr - (unsigned char *) cert);
 
       ret = gnutls_x509_crt_init (&x509_cert_list[i - 1]);
       if (ret < 0)
@@ -1774,9 +1779,13 @@ print_verification_res (gnutls_x509_crt_t crt,
 void
 verify_chain (void)
 {
+  char *buffer;
   size_t size;
 
-  size = fread (buffer, 1, sizeof (buffer) - 1, infile);
+  buffer = fread_file (infile, &size);
+  if (buffer == NULL)
+    error (EXIT_FAILURE, errno, "reading chain");
+
   buffer[size] = 0;
 
   _verify_x509_mem (buffer, size);
