@@ -40,6 +40,121 @@ disabling padding.
 
 *** Other minor improvements and bug fixes.
 
+*** Backwards incompatible API/ABI changes in GnuTLS 2.2
+To adapt to changes in the TLS extension specifications for OpenPGP
+and SRP, the GnuTLS API had to be modified.  This means breaking the
+API and ABI backwards compatibility.  That is something we try to
+avoid unless it is necessary.  We decided to also remove the already
+deprecated stub functions for X.509 to XML conversion and TLS
+authorization (see below) when we had the opportunity.
+
+Generally, most applications does not need to be modified.  Just
+re-compile them against the latest GnuTLS release, and it should work
+fine.
+
+Applications that use the OpenPGP or SRP features needs to be
+modified.  Below is a list of the modified APIs and discussion of what
+the minimal things you need to modify in your application to make it
+work with GnuTLS 2.2.
+
+Note that GnuTLS 2.2 also introduces new APIs -- such as
+gnutls_set_priority() that is superior to
+gnutls_set_default_priority() -- that you may want to start using.
+However, using those new APIs is not required to use GnuTLS 2.2 since
+the old functions continue are still supported.  This text only
+discuss what you minimally have to modify.
+
+**** XML related changes
+The function `gnutls_x509_crt_to_xml' has been removed.  It has been
+deprecated and only returned an error code since GnuTLS version
+1.2.11.  Nobody has complained, so users doesn't seem to miss the
+functionality.  We don't know of any other library to convert X.509
+certificates into XML format, but we decided (long ago) that GnuTLS
+isn't the right place for this kind of functionality.  If you want
+help to find some other library to use here, please explain and
+discuss your use case on help-gnutls@gnu.org.
+
+**** TLS Authorization related changes
+Everything related to TLS authorizations have been removed, they were
+only stub functions that returned an error code:
+
+ GNUTLS_SUPPLEMENTAL_AUTHZ_DATA
+ gnutls_authz_data_format_type_t
+ gnutls_authz_recv_callback_func
+ gnutls_authz_send_callback_func
+ gnutls_authz_enable
+ gnutls_authz_send_x509_attr_cert
+ gnutls_authz_send_saml_assertion
+ gnutls_authz_send_x509_attr_cert_url
+ gnutls_authz_send_saml_assertion_url
+
+**** SRP related changes
+The callback gnutls_srp_client_credentials_function has a new
+prototype, and its semantic has changed.  You need to rewrite the
+callback, see the updated function documentation and SRP example code
+(doc/examples/ex-client-srp.c and doc/examples/ex-serv-srp.c) for more
+information.
+
+The alert codes GNUTLS_A_MISSING_SRP_USERNAME and
+GNUTLS_A_UNKNOWN_SRP_USERNAME are no longer used by the SRP
+specification, instead the GNUTLS_A_UNKNOWN_PSK_IDENTITY alert is
+used.  There are #define's to map the old names to the new.  You may
+run into problems if you have a switch-case with cases for both SRP
+alerts, since they are now mapped to the same value.  The solution is
+to drop the SRP alerts from such switch cases, as they are now
+deprecated in favor of GNUTLS_A_UNKNOWN_PSK_IDENTITY.
+
+**** OpenPGP related changes
+The function `gnutls_certificate_set_openpgp_keyserver' have been
+removed.  There is no replacement functionality inside GnuTLS.  If you
+need keyserver functionality, consider using the GnuPG tools.
+
+All functions, types, and error codes related to OpenPGP trustdb
+format have been removed.  The trustdb format is a non-standard
+GnuPG-specific format, and we recommend you to use key rings instead.
+The following have been removed:
+
+ gnutls_certificate_set_openpgp_trustdb
+ gnutls_openpgp_trustdb_init
+ gnutls_openpgp_trustdb_deinit
+ gnutls_openpgp_trustdb_import
+ gnutls_openpgp_key_verify_trustdb
+ gnutls_openpgp_trustdb_t
+ GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED
+
+The following functions has an added parameter of the (new) type
+`gnutls_openpgp_crt_fmt_t'.  The type specify the format of the data
+(binary or base64).  The functions are:
+ gnutls_certificate_set_openpgp_key_file
+ gnutls_certificate_set_openpgp_key_mem
+ gnutls_certificate_set_openpgp_keyring_mem
+ gnutls_certificate_set_openpgp_keyring_file
+
+To improve terminology and align with the X.509 interface, some
+functions have been renamed.  Compatibility mappings exists.  The old
+and new names of the affected functions and types are:
+
+        Old name                                New name
+ gnutls_openpgp_key_t                    gnutls_openpgp_crt_t
+ gnutls_openpgp_key_fmt_t                gnutls_openpgp_crt_fmt_t
+ gnutls_openpgp_key_status_t             gnutls_openpgp_crt_status_t
+ GNUTLS_OPENPGP_KEY                      GNUTLS_OPENPGP_CERT
+ GNUTLS_OPENPGP_KEY_FINGERPRINT          GNUTLS_OPENPGP_CERT_FINGERPRINT
+ gnutls_openpgp_key_init                 gnutls_openpgp_crt_init
+ gnutls_openpgp_key_deinit               gnutls_openpgp_crt_deinit
+ gnutls_openpgp_key_import               gnutls_openpgp_crt_import
+ gnutls_openpgp_key_export               gnutls_openpgp_crt_export
+ gnutls_openpgp_key_get_key_usage        gnutls_openpgp_crt_get_key_usage
+ gnutls_openpgp_key_get_fingerprint      gnutls_openpgp_crt_get_fingerprint
+ gnutls_openpgp_key_get_pk_algorithm     gnutls_openpgp_crt_get_pk_algorithm
+ gnutls_openpgp_key_get_name             gnutls_openpgp_crt_get_name
+ gnutls_openpgp_key_get_version          gnutls_openpgp_crt_get_version
+ gnutls_openpgp_key_get_creation_time    gnutls_openpgp_crt_get_creation_time
+ gnutls_openpgp_key_get_expiration_time  gnutls_openpgp_crt_get_expiration_time
+ gnutls_openpgp_key_get_id               gnutls_openpgp_crt_get_id
+ gnutls_openpgp_key_check_hostname       gnutls_openpgp_crt_check_hostname
+ gnutls_openpgp_send_key                 gnutls_openpgp_send_cert
+
 ** API and ABI modifications:
 No changes since last version.
 
