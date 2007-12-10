@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** Update internal copy of libtasn1 to version 1.2.
 
 ** Certtool --verify-chain now handle inputs larger than 64kb.
+This fixes the self-test "rsa-md5-collision" under MinGW+Wine with
+recent versions of libgcrypt.  The problem was that Wine with the
+libgcrypt RNG generates huge amounts of debugging output.
 
 ** Changes compared to the v2.0 branch:
 
