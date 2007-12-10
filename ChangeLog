@@ -1,3 +1,226 @@
+2008-01-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.1.8.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: GPLv3 typo.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Doc fix.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, maint-cfg.mk: Gettext 0.17 to solve -L
+	problem.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: GPLv3.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* gl/version-etc.c: Revert local gnulib override regarding GPLv3.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/credentials/Makefile.am,
+	doc/extract-guile-c-doc.scm, doc/guile.texi, gl/Makefile.am,
+	guile/modules/gnutls/extra.scm,
+	guile/modules/system/documentation/c-snarf.scm,
+	guile/modules/system/documentation/output.scm,
+	guile/pre-inst-guile.in, guile/src/extra.c,
+	guile/tests/openpgp-auth.scm, guile/tests/openpgp-keyring.scm,
+	guile/tests/openpgp-keys.scm, includes/Makefile.am: More GPLv3
+	fixes.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/lib/version-etc.c.diff: More GPLv3 fixes.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gpl-3.0.texi: Use GPLv3 in manual.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi, doc/gpl-2.0.texi, gl/gnulib.mk,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Use GPLv3 in manual.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, doc/examples/Makefile.am, doc/manpages/Makefile.am,
+	includes/gnutls/extra.h, includes/gnutls/openssl.h,
+	libextra/Makefile.am, libextra/gnutls_extra.h,
+	libextra/libgnutls-extra.vers, libextra/openpgp/Makefile.am,
+	libextra/openssl_compat.h, maint-cfg.mk: GPLv3 fixes.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am, src/common.c, src/list.h, src/serv.c: Use GPLv3
+	in src/.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/anonself.c, tests/certder.c,
+	tests/certificate_set_x509_crl.c, tests/dhepskself.c, tests/dn.c,
+	tests/gc.c, tests/hostname-check/Makefile.am,
+	tests/hostname-check/hostname-check.c, tests/key-id/Makefile.am,
+	tests/key-id/key-id, tests/nist-pkits/pkits,
+	tests/nist-pkits/pkits_crl, tests/nist-pkits/pkits_crt,
+	tests/nist-pkits/pkits_pkcs12, tests/nist-pkits/pkits_smime,
+	tests/openpgp/Makefile.am, tests/openpgp/keyring.c,
+	tests/openssl.c, tests/oprfi.c, tests/parse_ca.c,
+	tests/pathlen/Makefile.am, tests/pathlen/pathlen,
+	tests/pkcs1-padding/Makefile.am, tests/pkcs1-padding/pkcs1-pad,
+	tests/pkcs12-decode/Makefile.am, tests/pkcs12-decode/pkcs12,
+	tests/pkcs8-decode/Makefile.am, tests/pkcs8-decode/pkcs8,
+	tests/pskself.c, tests/resume.c,
+	tests/rsa-md5-collision/Makefile.am,
+	tests/rsa-md5-collision/rsa-md5-collision, tests/set_pkcs12_cred.c,
+	tests/sha2/Makefile.am, tests/sha2/sha2, tests/simple.c,
+	tests/tlsia.c, tests/userid/Makefile.am, tests/userid/userid,
+	tests/utils.c, tests/utils.h, tests/x509paths/chain,
+	tests/x509self.c, tests/x509signself.c: Use GPLv3 for self-tests.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/config.rpath, build-aux/gendocs.sh, doc/fdl.texi,
+	doc/gendocs_template, gl/fseeko.c, gl/gai_strerror.c,
+	gl/getaddrinfo.c, gl/getaddrinfo.h, gl/getdelim.c, gl/getline.c,
+	gl/getpass.c, gl/getpass.h, gl/inet_ntop.c, gl/inet_ntop.h,
+	gl/lseek.c, gl/m4/getdelim.m4, gl/m4/getline.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/lib-link.m4, gl/m4/strerror.m4,
+	gl/netinet_in.in.h, gl/strdup.c, gl/strerror.c, gl/version-etc.c,
+	lgl/Makefile.am, lgl/m4/gettext.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/iconv.m4, lgl/m4/intdiv0.m4, lgl/m4/intl.m4,
+	lgl/m4/intlmacosx.m4, lgl/m4/intmax_t.m4, lgl/m4/lib-link.m4,
+	lgl/m4/lock.m4, lgl/m4/longlong.m4, lgl/m4/po.m4,
+	lgl/m4/printf-posix.m4, lgl/m4/stdio_h.m4, lgl/m4/stdlib_h.m4,
+	lgl/m4/string_h.m4, lgl/m4/uintmax_t.m4, lgl/m4/ulonglong.m4,
+	lgl/m4/unistd_h.m4, lgl/m4/vasnprintf.m4, lgl/m4/wint_t.m4,
+	lgl/printf-parse.c, lgl/realloc.c, lgl/stdlib.in.h,
+	lgl/string.in.h, lgl/unistd.in.h, lgl/vasnprintf.c: Update gnulib.
+
+2008-01-09  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_handshake.c, lib/gnutls_handshake.h,
+	lib/gnutls_v2_compat.c: user_hello_func is call always. Even when
+	resuming a session.
+
+2008-01-09  Nikos <nmav@crystal.(none)>
+
+	* src/common.c: print session ID
+
+2008-01-07  System User <nmav@crystal.(none)>
+
+	* NEWS: license update
+
+2008-01-07  System User <nmav@crystal.(none)>
+
+	* COPYING, libextra/gnutls_extra.c, libextra/gnutls_ia.c,
+	libextra/gnutls_openpgp.c, libextra/gnutls_openssl.c,
+	libextra/openpgp/compat.c, libextra/openpgp/extras.c,
+	libextra/openpgp/pgp.c, libextra/openpgp/pgpverify.c,
+	libextra/openpgp/privkey.c, libextra/openssl_compat.c,
+	src/certtool-cfg.c, src/certtool.c, src/cli.c, src/common.c,
+	src/crypt.c, src/prime.c, src/psk.c, src/serv.c, src/tests.c,
+	src/tls_test.c: GPL parts under GPLv3
+
+2008-01-06  System User <nmav@crystal.(none)>
+
+	* lib/gnutls_record.c: It seems we were ahead of our time.
+
+2008-01-06  System User <nmav@crystal.(none)>
+
+	* NEWS, lib/gnutls_record.c: Revert "We now ignore received packets
+	with unknown content types" This reverts commit 4a19fd59da474b3de977a925fd91578db7e3d4a1.
+
+2008-01-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Doc fix.es
+
+2008-01-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Typo fix.  Tiny patch from Daniel Kahn Gillmor
+	<dkg-debian.org@fifthhorseman.net>.
+
+2008-01-04  Nikos <nmav@crystal.(none)>
+
+	* : commit bd3b0f49c966277e91f57c64cfcc720cbebb4a73 Author: Nikos
+	<nmav@crystal.(none)> Date:   Tue Dec 4 22:05:25 2007 +0200
+
+2008-01-04  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Overwrite autopoint files with gnulib files.
+
+2008-01-03  Nikos <nmav@crystal.(none)>
+
+	* : commit dac01d7279eb28e7c5909d53bf346206f10319b5 Author: Nikos
+	<nmav@crystal.(none)> Date:   Mon Dec 3 20:05:32 2007 +0200
+
+2008-01-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-01-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-01-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2008-01-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump to indicate added ABI.
+
+2008-01-03  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Copy, don't remove...  to fix Makefile.in hard-coded
+	links to m4 filenames.
+
+2008-01-03  Simon Josefsson <simon@josefsson.org>
+
+	* maint-cfg.mk: Remove gettext havelib files.
+
+2008-01-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/privkey_pkcs8.c: Indent.
+
+2008-01-03  Nikos <nmav@crystal.(none)>
+
+	* : 3	0	NEWS
+
+2008-01-02  Nikos <nmav@crystal.(none)>
+
+	* NEWS, includes/gnutls/x509.h, lib/x509/x509.c: added
+	gnutls_x509_crt_get_subject_alt_name2 to overcome some limitations
+	of the original function.
+
+2008-01-02  Nikos <nmav@crystal.(none)>
+
+	* : 1	1	lib/x509/x509.c
+
+2008-01-01  Simon Josefsson <simon@josefsson.org>
+
+	* : commit b6e4b1ff3f7ef8a8d26f2e89c0bc50d2fc9d23f4 Author: Nikos
+	<nmav@crystal.(none)> Date:   Sat Dec 1 08:25:34 2007 +0200
+
+2007-11-30  Nikos <nmav@crystal.(none)>
+
+	* configure.in, lib/x509/dsa.c, src/certtool.c: Depend on libgcrypt
+	1.2.4 again (lose DSA2 functionality).
+
+2007-11-30  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_priority.c: Added SECURE256 and SECURE128 level.
+
+2007-11-29  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2007-11-29  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.1.7.
