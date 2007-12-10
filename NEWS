@@ -24,6 +24,12 @@ See the end for copying conditions.
 *** PKCS#8 parser now handle DSA keys.
 
 *** Change from GPLv2 to GPLv3 for command-line tools, libgnutls-extra, etc.
+Notice that liblzo2 2.02 is licensed under GPLv2 only.  Earlier
+versions, such as 2.01 which is included with GnuTLS, is available
+under GPLv2 or later.  If this incompatibility causes problems, we
+recommend you to disable LZO using --without-lzo.  LZO compression is
+not a standard TLS compression algorithm, so the impact should be
+minimal.
 
 *** Functions for disabling record protocol padding.
 Works around bugs on Nokia/Ericsson phones.
