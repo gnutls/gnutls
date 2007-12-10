@@ -9,6 +9,31 @@ See the end for copying conditions.
 
 ** Certtool --verify-chain now handle inputs larger than 64kb.
 
+** Changes compared to the v2.0 branch:
+
+*** SRP support aligned with newly published RFC 5054.
+
+*** OpenPGP support aligned with newly published RFC 5081.
+
+*** Support for DSA2 keys.
+
+*** Support for Camellia cipher.
+
+*** Support for Opaque PRF Input extension.
+
+*** PKCS#8 parser now handle DSA keys.
+
+*** Change from GPLv2 to GPLv3 for command-line tools, libgnutls-extra, etc.
+
+*** Functions for disabling record protocol padding.
+Works around bugs on Nokia/Ericsson phones.
+
+*** New functions gnutls_priority_set() for setting cipher priorities easily.
+Priorities like "COMPAT" also enables other work arounds, such as
+disabling padding.
+
+*** Other minor improvements and bug fixes.
+
 ** API and ABI modifications:
 No changes since last version.
 
