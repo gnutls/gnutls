@@ -357,7 +357,7 @@
            error/random-failed
            error/unimplemented-feature))
 
-(load-extension "libguile-gnutls-v-0" "scm_init_gnutls")
+(load-extension "libguile-gnutls-v-1" "scm_init_gnutls")
 
 ;; Renaming.
 (define protocol/ssl-3 protocol/ssl3)

@@ -49,7 +49,7 @@
            openpgp-certificate-format/base64))
 
 
-(load-extension "libguile-gnutls-extra-v-0" "scm_init_gnutls_extra")
+(load-extension "libguile-gnutls-extra-v-1" "scm_init_gnutls_extra")
 
 
 ;;;
