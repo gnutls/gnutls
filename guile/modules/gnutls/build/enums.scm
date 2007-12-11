@@ -565,8 +565,8 @@ unimplemented-feature)
                   "GNUTLS_E_"))
 
 
-(define %openpgp-key-format-enum
-  (make-enum-type 'openpgp-key-format "gnutls_openpgp_crt_fmt_t"
+(define %openpgp-certificate-format-enum
+  (make-enum-type 'openpgp-certificate-format "gnutls_openpgp_crt_fmt_t"
                   '(raw base64)
                   #f
                   "GNUTLS_OPENPGP_FMT_"))
@@ -586,7 +586,7 @@ unimplemented-feature)
 
 (define %gnutls-extra-enums
   ;; All enums for GnuTLS-extra (GPL).
-  (list %openpgp-key-format-enum))
+  (list %openpgp-certificate-format-enum))
 
 ;;; Local Variables:
 ;;; mode: scheme
