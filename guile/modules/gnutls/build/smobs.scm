@@ -201,8 +201,8 @@
   (make-smob-type "gnutls_x509_privkey_t" 'x509-private-key
                   "gnutls_x509_privkey_deinit"))
 
-(define %openpgp-public-key-smob
-  (make-smob-type "gnutls_openpgp_crt_t" 'openpgp-public-key
+(define %openpgp-certificate-smob
+  (make-smob-type "gnutls_openpgp_crt_t" 'openpgp-certificate
                   "gnutls_openpgp_crt_deinit"))
 
 (define %openpgp-private-key-smob
@@ -226,7 +226,7 @@
 
 (define %gnutls-extra-smobs
   ;; All SMOB types for GnuTLS-extra (GPL).
-  (list %openpgp-public-key-smob %openpgp-private-key-smob
+  (list %openpgp-certificate-smob %openpgp-private-key-smob
         %openpgp-keyring-smob))
 
 
