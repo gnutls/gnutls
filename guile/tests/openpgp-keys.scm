@@ -29,7 +29,7 @@
              (srfi srfi-4)
              (srfi srfi-11))
 
-(define %public-key-file
+(define %certificate-file
   (search-path %load-path "openpgp-pub.asc"))
 
 (define %private-key-file
@@ -49,26 +49,26 @@
       #t)
 
     (lambda ()
-      (let ((raw-pubkey  (make-u8vector (file-size %public-key-file)))
+      (let ((raw-pubkey  (make-u8vector (file-size %certificate-file)))
             (raw-privkey (make-u8vector (file-size %private-key-file))))
 
-        (uniform-vector-read! raw-pubkey (open-input-file %public-key-file))
+        (uniform-vector-read! raw-pubkey (open-input-file %certificate-file))
         (uniform-vector-read! raw-privkey (open-input-file %private-key-file))
 
-        (let ((pub (import-openpgp-public-key raw-pubkey
-                                              openpgp-key-format/base64))
+        (let ((pub (import-openpgp-certificate raw-pubkey
+                                           openpgp-certificate-format/base64))
               (sec (import-openpgp-private-key raw-privkey
-                                               openpgp-key-format/base64)))
+                                           openpgp-certificate-format/base64)))
 
-          (exit (and (openpgp-public-key? pub)
+          (exit (and (openpgp-certificate? pub)
                      (openpgp-private-key? sec)
-                     (equal? (openpgp-public-key-id pub) %key-id)
-                     (u8vector? (openpgp-public-key-fingerprint pub))
-                     (every string? (openpgp-public-key-names pub))
-                     (member (openpgp-public-key-version pub) '(3 4))
-                     (list? (openpgp-public-key-usage pub))
+                     (equal? (openpgp-certificate-id pub) %key-id)
+                     (u8vector? (openpgp-certificate-fingerprint pub))
+                     (every string? (openpgp-certificate-names pub))
+                     (member (openpgp-certificate-version pub) '(3 4))
+                     (list? (openpgp-certificate-usage pub))
                      (let-values (((pk bits)
-                                   (openpgp-public-key-algorithm pub)))
+                                   (openpgp-certificate-algorithm pub)))
                        (and (string? (pk-algorithm->string pk))
                             (number? bits))))))))
 
