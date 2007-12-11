@@ -542,11 +542,11 @@ store them in a file for future re-use (@pxref{Core Interface,
 
 The following example provides a simple way of importing
 ``ASCII-armored'' OpenPGP keys from files, using the
-@code{import-openpgp-public-key} and @code{import-openpgp-private-key}
+@code{import-openpgp-certificate} and @code{import-openpgp-private-key}
 procedures provided by the @code{(gnutls extra)} module.
 
-@vindex openpgp-key-format/base64
-@vindex openpgp-key-format/raw
+@vindex openpgp-certificate-format/base64
+@vindex openpgp-certificate-format/raw
 
 @example
 (use-modules (srfi srfi-4)
@@ -564,11 +564,11 @@ procedures provided by the @code{(gnutls extra)} module.
     (uniform-vector-read! raw (open-input-file file))
 
     ;; Pass the u8vector to the import procedure.
-    (import-proc raw openpgp-key-format/base64)))
+    (import-proc raw openpgp-certificate-format/base64)))
 
 
 (define (import-public-key-from-file file)
-  (import-key-from-file import-openpgp-public-key file))
+  (import-key-from-file import-openpgp-certificate file))
 
 (define (import-private-key-from-file file)
   (import-key-from-file import-openpgp-private-key file))
