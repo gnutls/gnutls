@@ -110,7 +110,8 @@
            mac->string digest->string compression-method->string
            connection-end->string alert-level->string
            alert-description->string handshake-description->string
-           certificate-status->string close-request->string
+           certificate-status->string certificate-request->string
+           close-request->string
            protocol->string certificate-type->string
            x509-certificate-format->string
            x509-subject-alternative-name->string pk-algorithm->string
@@ -330,7 +331,6 @@
            error/asn1-type-any-error
            error/asn1-syntax-error
            error/asn1-der-overflow
-           error/openpgp-trustdb-version-unsupported
            error/openpgp-uid-revoked
            error/certificate-error
            error/x509-certificate-error
@@ -339,6 +339,7 @@
            error/x509-unknown-san
            error/openpgp-fingerprint-unsupported
            error/x509-unsupported-attribute
+           error/unknown-algorithm
            error/unknown-hash-algorithm
            error/unknown-pkcs-content-type
            error/unknown-pkcs-bag-type
