@@ -67,8 +67,10 @@
     (lambda ()
       (exit
        (every valid-keyring?
-              (list %raw-keyring-file      %ascii-keyring-file)
-              (list openpgp-key-format/raw openpgp-key-format/base64))))
+              (list %raw-keyring-file
+                    %ascii-keyring-file)
+              (list openpgp-certificate-format/raw
+                    openpgp-certificate-format/base64))))
 
     (lambda ()
       ;; failure

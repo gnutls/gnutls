@@ -48,7 +48,7 @@
     (import-proc raw fmt)))
 
 (define (import-key import-proc file)
-  (import-something import-proc file openpgp-key-format/base64))
+  (import-something import-proc file openpgp-certificate-format/base64))
 
 (define (import-rsa-params file)
   (import-something pkcs1-import-rsa-parameters file
@@ -65,7 +65,7 @@
 
     (lambda ()
       (let ((socket-pair (socketpair PF_UNIX SOCK_STREAM 0))
-            (pub         (import-key import-openpgp-public-key
+            (pub         (import-key import-openpgp-certificate
                                      "openpgp-pub.asc"))
             (sec         (import-key import-openpgp-private-key
                                      "openpgp-sec.asc")))
