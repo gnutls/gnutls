@@ -12,7 +12,7 @@ This fixes the self-test "rsa-md5-collision" under MinGW+Wine with
 recent versions of libgcrypt.  The problem was that Wine with the
 libgcrypt RNG generates huge amounts of debugging output.
 
-** Changes compared to the v2.0 branch:
+** Major changes compared to the v2.0 branch:
 
 *** SRP support aligned with newly published RFC 5054.
 
@@ -43,7 +43,7 @@ disabling padding.
 
 *** Other minor improvements and bug fixes.
 
-*** Backwards incompatible API/ABI changes in GnuTLS 2.2
+** Backwards incompatible API/ABI changes in GnuTLS 2.2
 To adapt to changes in the TLS extension specifications for OpenPGP
 and SRP, the GnuTLS API had to be modified.  This means breaking the
 API and ABI backwards compatibility.  That is something we try to
@@ -67,7 +67,7 @@ However, using those new APIs is not required to use GnuTLS 2.2 since
 the old functions continue are still supported.  This text only
 discuss what you minimally have to modify.
 
-**** XML related changes
+*** XML related changes
 The function `gnutls_x509_crt_to_xml' has been removed.  It has been
 deprecated and only returned an error code since GnuTLS version
 1.2.11.  Nobody has complained, so users doesn't seem to miss the
@@ -77,7 +77,7 @@ isn't the right place for this kind of functionality.  If you want
 help to find some other library to use here, please explain and
 discuss your use case on help-gnutls@gnu.org.
 
-**** TLS Authorization related changes
+*** TLS Authorization related changes
 Everything related to TLS authorizations have been removed, they were
 only stub functions that returned an error code:
 
@@ -91,7 +91,7 @@ only stub functions that returned an error code:
  gnutls_authz_send_x509_attr_cert_url
  gnutls_authz_send_saml_assertion_url
 
-**** SRP related changes
+*** SRP related changes
 The callback gnutls_srp_client_credentials_function has a new
 prototype, and its semantic has changed.  You need to rewrite the
 callback, see the updated function documentation and SRP example code
@@ -107,7 +107,7 @@ alerts, since they are now mapped to the same value.  The solution is
 to drop the SRP alerts from such switch cases, as they are now
 deprecated in favor of GNUTLS_A_UNKNOWN_PSK_IDENTITY.
 
-**** OpenPGP related changes
+*** OpenPGP related changes
 The function `gnutls_certificate_set_openpgp_keyserver' have been
 removed.  There is no replacement functionality inside GnuTLS.  If you
 need keyserver functionality, consider using the GnuPG tools.
