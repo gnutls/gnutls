@@ -12,6 +12,8 @@ This fixes the self-test "rsa-md5-collision" under MinGW+Wine with
 recent versions of libgcrypt.  The problem was that Wine with the
 libgcrypt RNG generates huge amounts of debugging output.
 
+** Fix for certificate selection in servers with certificate callbacks.
+
 ** Major changes compared to the v2.0 branch:
 
 *** SRP support aligned with newly published RFC 5054.
