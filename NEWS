@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.3.0 (unreleased)
 
+** Fix for certificate selection in servers with certificate callbacks.
+
 ** Certtool --verify-chain now handle inputs larger than 64kb.
 
 ** API and ABI modifications:
