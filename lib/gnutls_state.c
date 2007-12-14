@@ -127,8 +127,7 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
   unsigned cert_found = 0;
   gnutls_certificate_credentials_t cred;
 
-  if (session->security_parameters.entity == GNUTLS_SERVER &&
-    session->server_get_cert_callback == NULL)
+  if (session->security_parameters.entity == GNUTLS_SERVER)
     {
       cred = (gnutls_certificate_credentials_t)
 	_gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
