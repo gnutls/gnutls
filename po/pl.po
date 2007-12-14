@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnutls-1.7.15\n"
+"Project-Id-Version: gnutls-2.1.8\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2007-07-02 16:29+0200\n"
-"PO-Revision-Date: 2007-07-23 23:37+0200\n"
+"POT-Creation-Date: 2007-12-10 00:35+0100\n"
+"PO-Revision-Date: 2007-12-11 17:55+0100\n"
 "Last-Translator: Jakub Bogusz <qboosh@pld-linux.org>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -176,148 +176,148 @@ msgid "Base64 decoding error."
 msgstr "B³±d dekodowania base64."
 
 #: lib/gnutls_errors.c:130
+msgid "Base64 unexpected header error."
+msgstr "Nieoczekiwany b³±d nag³ówka base64."
+
+#: lib/gnutls_errors.c:132
 msgid "Base64 encoding error."
 msgstr "B³±d kodowania base64."
 
-#: lib/gnutls_errors.c:132
+#: lib/gnutls_errors.c:134
 msgid "Parsing error in password file."
 msgstr "B³±d przetwarzania pliku hase³."
 
-#: lib/gnutls_errors.c:134
+#: lib/gnutls_errors.c:136
 msgid "The requested data were not available."
 msgstr "¯±dane dane nie by³y dostêpne."
 
-#: lib/gnutls_errors.c:136
+#: lib/gnutls_errors.c:138
 msgid "Error in the pull function."
 msgstr "B³±d w funkcji pull."
 
-#: lib/gnutls_errors.c:137
+#: lib/gnutls_errors.c:139
 msgid "Error in the push function."
 msgstr "B³±d w funkcji push."
 
-#: lib/gnutls_errors.c:138
+#: lib/gnutls_errors.c:140
 msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
 msgstr "Osi±gniêto górne ograniczenie numerów sekwencyjnych pakietów rekordów. Wow!"
 
-#: lib/gnutls_errors.c:140
+#: lib/gnutls_errors.c:142
 msgid "Error in the certificate."
 msgstr "B³±d w certyfikacie."
 
-#: lib/gnutls_errors.c:142
+#: lib/gnutls_errors.c:144
 msgid "Unknown Subject Alternative name in X.509 certificate."
 msgstr "Nieznana nazwa Subject Alternative w certyfikacie X.509."
 
-#: lib/gnutls_errors.c:145
+#: lib/gnutls_errors.c:147
 msgid "Unsupported critical extension in X.509 certificate."
 msgstr "Nieobs³ugiwane rozszerzenie krytyczne w certyfikacie X.509."
 
-#: lib/gnutls_errors.c:147
+#: lib/gnutls_errors.c:149
 msgid "Key usage violation in certificate has been detected."
 msgstr "Wykryto naruszenie u¿ycia klucza w certyfikacie."
 
-#: lib/gnutls_errors.c:149 lib/gnutls_errors.c:150
+#: lib/gnutls_errors.c:151 lib/gnutls_errors.c:152
 msgid "Function was interrupted."
 msgstr "Funkcja zosta³a przerwana."
 
-#: lib/gnutls_errors.c:151
+#: lib/gnutls_errors.c:153
 msgid "Rehandshake was requested by the peer."
 msgstr "Druga strona za¿±da³a ponownego nawi±zania sesji."
 
-#: lib/gnutls_errors.c:153
+#: lib/gnutls_errors.c:155
 msgid "TLS Application data were received, while expecting handshake data."
 msgstr "Odebrano dane aplikacji TLS, ale oczekiwano na nawi±zanie sesji."
 
-#: lib/gnutls_errors.c:155
+#: lib/gnutls_errors.c:157
 msgid "Error in Database backend."
 msgstr "B³±d w backendzie bazy danych."
 
-#: lib/gnutls_errors.c:156
+#: lib/gnutls_errors.c:158
 msgid "The certificate type is not supported."
 msgstr "Ten typ certyfikatu nie jest obs³ugiwany."
 
-#: lib/gnutls_errors.c:158
+#: lib/gnutls_errors.c:160
 msgid "The given memory buffer is too short to hold parameters."
 msgstr "Przekazany bufor pamiêci jest zbyt ma³y do przechowania parametrów."
 
-#: lib/gnutls_errors.c:160
+#: lib/gnutls_errors.c:162
 msgid "The request is invalid."
 msgstr "¯±danie jest nieprawid³owe."
 
-#: lib/gnutls_errors.c:161
+#: lib/gnutls_errors.c:163
 msgid "An illegal parameter has been received."
 msgstr "Odebrano niedozwolony parametr."
 
-#: lib/gnutls_errors.c:163
+#: lib/gnutls_errors.c:165
 msgid "Error while reading file."
 msgstr "B³±d podczas odczytu pliku."
 
-#: lib/gnutls_errors.c:165
+#: lib/gnutls_errors.c:167
 msgid "ASN1 parser: Element was not found."
 msgstr "Analiza ASN1: Nie znaleziono elementu."
 
-#: lib/gnutls_errors.c:167
+#: lib/gnutls_errors.c:169
 msgid "ASN1 parser: Identifier was not found"
 msgstr "Analiza ASN1: Nie znaleziono identyfikatora."
 
-#: lib/gnutls_errors.c:169
+#: lib/gnutls_errors.c:171
 msgid "ASN1 parser: Error in DER parsing."
 msgstr "Analiza ASN1: B³±d przy analizie DER."
 
-#: lib/gnutls_errors.c:171
+#: lib/gnutls_errors.c:173
 msgid "ASN1 parser: Value was not found."
 msgstr "Analiza ASN1: Nie znaleziono warto¶ci."
 
-#: lib/gnutls_errors.c:173
+#: lib/gnutls_errors.c:175
 msgid "ASN1 parser: Generic parsing error."
 msgstr "Analiza ASN1: Ogólny b³±d przetwarzania."
 
-#: lib/gnutls_errors.c:175
+#: lib/gnutls_errors.c:177
 msgid "ASN1 parser: Value is not valid."
 msgstr "Analiza ASN1: Warto¶æ nie jest prawid³owa."
 
-#: lib/gnutls_errors.c:177
+#: lib/gnutls_errors.c:179
 msgid "ASN1 parser: Error in TAG."
 msgstr "Analiza ASN1: B³±d w znaczniku."
 
-#: lib/gnutls_errors.c:178
+#: lib/gnutls_errors.c:180
 msgid "ASN1 parser: error in implicit tag"
 msgstr "Analiza ASN1: b³±d w domy¶lnym znaczniku."
 
-#: lib/gnutls_errors.c:180
+#: lib/gnutls_errors.c:182
 msgid "ASN1 parser: Error in type 'ANY'."
 msgstr "Analiza ASN1: B³±d w typie 'ANY'."
 
-#: lib/gnutls_errors.c:182
+#: lib/gnutls_errors.c:184
 msgid "ASN1 parser: Syntax error."
 msgstr "Analiza ASN1: B³±d sk³adni."
 
-#: lib/gnutls_errors.c:184
+#: lib/gnutls_errors.c:186
 msgid "ASN1 parser: Overflow in DER parsing."
 msgstr "Analiza ASN1: Przepe³nienie przy analizie DER."
 
-#: lib/gnutls_errors.c:187
+#: lib/gnutls_errors.c:189
 msgid "Too many empty record packets have been received."
 msgstr "Odebrano zbyt du¿o pustych pakietów rekordów."
 
-#: lib/gnutls_errors.c:189
+#: lib/gnutls_errors.c:191
 msgid "The initialization of GnuTLS-extra has failed."
 msgstr "Inicjalizacja GnuTLS-extra nie powiod³a siê."
 
-#: lib/gnutls_errors.c:191
+#: lib/gnutls_errors.c:193
 msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
 msgstr "Wersja biblioteki GnuTLS nie zgadza siê z wersj± biblioteki GnuTLS-extra."
 
-#: lib/gnutls_errors.c:193
+#: lib/gnutls_errors.c:195
 msgid "The gcrypt library version is too old."
 msgstr "Wersja biblioteki gcrypt jest zbyt stara."
 
-#: lib/gnutls_errors.c:196
+#: lib/gnutls_errors.c:198
 msgid "The tasn1 library version is too old."
 msgstr "Wersja biblioteki tasn1 jest zbyt stara."
-
-#: lib/gnutls_errors.c:198
-msgid "The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported."
-msgstr "Podana wersja GnuPG TrustDB nie jest obs³ugiwana. Obs³ugiwana jest TrustDB v4."
 
 #: lib/gnutls_errors.c:201
 msgid "Error loading the keyring."
@@ -394,6 +394,10 @@ msgstr "Odebrano wiadomo¶æ TLS/IA Final Phase Finished"
 #: lib/gnutls_errors.c:240
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Sprawdzenie sumy kontrolnej frazy TLS/IA nie powiod³o siê"
+
+#: lib/gnutls_errors.c:243
+msgid "The specified algorithm or protocol is unknown."
+msgstr "Podany algorytm lub protokó³ jest nieznany."
 
 #: lib/x509/output.c:112 lib/x509/output.c:383
 #, c-format
