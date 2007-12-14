@@ -1,29 +1,158 @@
-2008-01-10  Simon Josefsson <simon@josefsson.org>
+2007-12-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.2.0.
+
+2007-12-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-12-14  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS, po/nl.po, po/pl.po, po/sv.po: Sync with TP.
+
+2007-12-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Revert "Add." This reverts commit 2edf069e2b03d10f7d713de17771e8a7c8352432.
+
+2007-12-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Revert "If the server has a callback, the
+	search for a valid certificate will fail." This reverts commit 0420cc1ec5dd8c4c18268abb9f769c1641098925.
+
+2007-12-13  Simon Josefsson <simon@josefsson.org>
+
+	* .cvscopying: Add 2007.
+
+2007-12-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-12-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: If the server has a callback, the search for a
+	valid certificate will fail.  Patch from Nikos.
+
+2007-12-12  Ludovic Court�s <ludo@gnu.org>
+
+	* : commit 3ba1e6fc605a9cae783e1b3a7bfb28359441ab8e Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Wed Dec 12 12:08:34 2007
+	+0100
+
+2007-12-11  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/modules/gnutls.scm: Fix dangling/unused bindings in
+	`(gnutls)'.  * guile/modules/gnutls.scm (certificate-request->string,   error/unknown-algorithm): Add.    (error/openpgp-trustdb-version-unsupported): Remove.
+
+2007-12-11  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/tests/openpgp-auth.scm, guile/tests/openpgp-keyring.scm,
+	guile/tests/openpgp-keys.scm: Update Guile OpenPGP test cases to use
+	the new names.  * guile/tests/*.scm: Substitute `certificate' to `public-key' in
+	  tests using the OpenPGP API.
+
+2007-12-11  Ludovic Courtès <ludo@gnu.org>
+
+	* doc/guile.texi: Update OpenPGP names in Guile examples.  * doc/guile.texi (Guile Examples): Substitute `certificate' to   `public-key' in OpenPGP examples.
+
+2007-12-11  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/modules/gnutls.scm, guile/modules/gnutls/extra.scm,
+	guile/pre-inst-guile.in, guile/src/Makefile.am: Bump Guile glue
+	libraries version number.  * guile/modules/gnutls.scm: Load `libguile-gnutls-v-1'.  * guile/modules/gnutls/extra.scm: Load `libguile-gnutls-extra-v-1'.  * guile/pre-inst-guile.in: Load `v-1' libraries.  * guile/src/Makefile.am (lib_LTLIBRARIES): Bump libraries from `v-0'
+	  to `v-1'.  Update all variables.
+
+2007-12-11  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/modules/gnutls/build/enums.scm,
+	guile/modules/gnutls/build/smobs.scm,
+	guile/modules/gnutls/extra.scm, guile/src/extra.c: Substitute
+	`certificate' to `public-key' in `(gnutls extra)'.  * guile/modules/gnutls/build/enums.scm (%openpgp-key-format-enum):   Rename to...    (%openpgp-certificate-format-enum): This.    (%gnutls-extra-enums): Update.  * guile/modules/gnutls/build/smobs.scm (%openpgp-public-key-smob):   Rename to...    (%openpgp-certificate-smob): This.    (%gnutls-extra-smobs): Update.  * guile/modules/gnutls/extra.scm: Substitute all `certificate' in
+	  all `public-key' names.  Add backward-compatible bindings.  * guile/src/extra.c: Substitute `certificate' to `public-key'.
+
+2007-12-11  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, maint-cfg.mk: Remove config.rpath hack.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add API/ABI docs.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Note about LZO2.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Make --verify-chain support larger inputs than
+	64kb.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Re-order gettext invocation to avoid autoconf
+	warnings.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add v2.0 NEWS entries.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Drop devel/ in release target.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/libtasn1.h: Bump versions.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2007-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.1.8.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* doc/Makefile.am: GPLv3 typo.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Doc fix.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, configure.in, maint-cfg.mk: Gettext 0.17 to solve -L
 	problem.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: GPLv3.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* gl/version-etc.c: Revert local gnulib override regarding GPLv3.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* doc/Makefile.am, doc/credentials/Makefile.am,
 	doc/extract-guile-c-doc.scm, doc/guile.texi, gl/Makefile.am,
@@ -35,20 +164,20 @@
 	guile/tests/openpgp-keys.scm, includes/Makefile.am: More GPLv3
 	fixes.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* gl/override/lib/version-etc.c.diff: More GPLv3 fixes.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* doc/gpl-3.0.texi: Use GPLv3 in manual.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* doc/gnutls.texi, doc/gpl-2.0.texi, gl/gnulib.mk,
 	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Use GPLv3 in manual.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am, doc/examples/Makefile.am, doc/manpages/Makefile.am,
 	includes/gnutls/extra.h, includes/gnutls/openssl.h,
@@ -56,12 +185,12 @@
 	libextra/libgnutls-extra.vers, libextra/openpgp/Makefile.am,
 	libextra/openssl_compat.h, maint-cfg.mk: GPLv3 fixes.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* src/Makefile.am, src/common.c, src/list.h, src/serv.c: Use GPLv3
 	in src/.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* tests/Makefile.am, tests/anonself.c, tests/certder.c,
 	tests/certificate_set_x509_crl.c, tests/dhepskself.c, tests/dn.c,
@@ -84,7 +213,7 @@
 	tests/utils.c, tests/utils.h, tests/x509paths/chain,
 	tests/x509self.c, tests/x509signself.c: Use GPLv3 for self-tests.
 
-2008-01-09  Simon Josefsson <simon@josefsson.org>
+2007-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* build-aux/config.rpath, build-aux/gendocs.sh, doc/fdl.texi,
 	doc/gendocs_template, gl/fseeko.c, gl/gai_strerror.c,
@@ -103,21 +232,21 @@
 	lgl/printf-parse.c, lgl/realloc.c, lgl/stdlib.in.h,
 	lgl/string.in.h, lgl/unistd.in.h, lgl/vasnprintf.c: Update gnulib.
 
-2008-01-09  Nikos <nmav@crystal.(none)>
+2007-12-09  Nikos <nmav@crystal.(none)>
 
 	* lib/gnutls_handshake.c, lib/gnutls_handshake.h,
 	lib/gnutls_v2_compat.c: user_hello_func is call always. Even when
 	resuming a session.
 
-2008-01-09  Nikos <nmav@crystal.(none)>
+2007-12-09  Nikos <nmav@crystal.(none)>
 
 	* src/common.c: print session ID
 
-2008-01-07  System User <nmav@crystal.(none)>
+2007-12-07  System User <nmav@crystal.(none)>
 
 	* NEWS: license update
 
-2008-01-07  System User <nmav@crystal.(none)>
+2007-12-07  System User <nmav@crystal.(none)>
 
 	* COPYING, libextra/gnutls_extra.c, libextra/gnutls_ia.c,
 	libextra/gnutls_openpgp.c, libextra/gnutls_openssl.c,
@@ -128,82 +257,82 @@
 	src/crypt.c, src/prime.c, src/psk.c, src/serv.c, src/tests.c,
 	src/tls_test.c: GPL parts under GPLv3
 
-2008-01-06  System User <nmav@crystal.(none)>
+2007-12-06  System User <nmav@crystal.(none)>
 
 	* lib/gnutls_record.c: It seems we were ahead of our time.
 
-2008-01-06  System User <nmav@crystal.(none)>
+2007-12-06  System User <nmav@crystal.(none)>
 
 	* NEWS, lib/gnutls_record.c: Revert "We now ignore received packets
 	with unknown content types" This reverts commit 4a19fd59da474b3de977a925fd91578db7e3d4a1.
 
-2008-01-06  Simon Josefsson <simon@josefsson.org>
+2007-12-06  Simon Josefsson <simon@josefsson.org>
 
 	* lib/x509/x509.c: Doc fix.es
 
-2008-01-06  Simon Josefsson <simon@josefsson.org>
+2007-12-06  Simon Josefsson <simon@josefsson.org>
 
 	* lib/x509/x509.c: Typo fix.  Tiny patch from Daniel Kahn Gillmor
 	<dkg-debian.org@fifthhorseman.net>.
 
-2008-01-04  Nikos <nmav@crystal.(none)>
+2007-12-04  Nikos <nmav@crystal.(none)>
 
 	* : commit bd3b0f49c966277e91f57c64cfcc720cbebb4a73 Author: Nikos
 	<nmav@crystal.(none)> Date:   Tue Dec 4 22:05:25 2007 +0200
 
-2008-01-04  Simon Josefsson <simon@josefsson.org>
+2007-12-04  Simon Josefsson <simon@josefsson.org>
 
 	* maint-cfg.mk: Overwrite autopoint files with gnulib files.
 
-2008-01-03  Nikos <nmav@crystal.(none)>
+2007-12-03  Nikos <nmav@crystal.(none)>
 
 	* : commit dac01d7279eb28e7c5909d53bf346206f10319b5 Author: Nikos
 	<nmav@crystal.(none)> Date:   Mon Dec 3 20:05:32 2007 +0200
 
-2008-01-03  Simon Josefsson <simon@josefsson.org>
+2007-12-03  Simon Josefsson <simon@josefsson.org>
 
 	* doc/manpages/Makefile.am: Generated.
 
-2008-01-03  Simon Josefsson <simon@josefsson.org>
+2007-12-03  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2008-01-03  Simon Josefsson <simon@josefsson.org>
+2007-12-03  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Bump version.
 
-2008-01-03  Simon Josefsson <simon@josefsson.org>
+2007-12-03  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Bump to indicate added ABI.
 
-2008-01-03  Simon Josefsson <simon@josefsson.org>
+2007-12-03  Simon Josefsson <simon@josefsson.org>
 
 	* maint-cfg.mk: Copy, don't remove...  to fix Makefile.in hard-coded
 	links to m4 filenames.
 
-2008-01-03  Simon Josefsson <simon@josefsson.org>
+2007-12-03  Simon Josefsson <simon@josefsson.org>
 
 	* maint-cfg.mk: Remove gettext havelib files.
 
-2008-01-03  Simon Josefsson <simon@josefsson.org>
+2007-12-03  Simon Josefsson <simon@josefsson.org>
 
 	* lib/x509/privkey_pkcs8.c: Indent.
 
-2008-01-03  Nikos <nmav@crystal.(none)>
+2007-12-03  Nikos <nmav@crystal.(none)>
 
 	* : 3	0	NEWS
 
-2008-01-02  Nikos <nmav@crystal.(none)>
+2007-12-02  Nikos <nmav@crystal.(none)>
 
 	* NEWS, includes/gnutls/x509.h, lib/x509/x509.c: added
 	gnutls_x509_crt_get_subject_alt_name2 to overcome some limitations
 	of the original function.
 
-2008-01-02  Nikos <nmav@crystal.(none)>
+2007-12-02  Nikos <nmav@crystal.(none)>
 
 	* : 1	1	lib/x509/x509.c
 
-2008-01-01  Simon Josefsson <simon@josefsson.org>
+2007-12-01  Simon Josefsson <simon@josefsson.org>
 
 	* : commit b6e4b1ff3f7ef8a8d26f2e89c0bc50d2fc9d23f4 Author: Nikos
 	<nmav@crystal.(none)> Date:   Sat Dec 1 08:25:34 2007 +0200
@@ -5211,71 +5340,71 @@
 	`.gaa' files as being in `$(srcdir)', thereby allowing for
 	out-of-source-tree builds.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* ChangeLog: [no log message]
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am: Don't dist mkinstalldirs, automake no longer copies
 	it.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* ChangeLog: [no log message]
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.7.1.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, THANKS: Add.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_asn1_tab.c: Generate.
 
-2007-01-28  Simon Josefsson <simon@josefsson.org>
+2006-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls.asn: Fix comment to make it parse correctly.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* tests/.cvsignore: [no log message]
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_sig.c: Fix signature verification for DSA signatures in
 	TLS 1.2, reported by ludovic.courtes@laas.fr (Ludovic Courtès).  (_gnutls_pkcs1_rsa_verify_sig): Rename to _gnutls_verify_sig, and
 	add new parameter SHA1POS to indicate where in hash_concat the SHA.1
 	hash is stored (for DSA).  (_gnutls_verify_sig_hdata): Pass proper SHA1POS.  (_gnutls_verify_sig_params): Likewise.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* doc/Makefile.am, doc/manpages/Makefile.am, lib/Makefile.am,
 	lib/x509/Makefile.am, libextra/Makefile.am,
@@ -5283,35 +5412,35 @@
 	ludovic.courtes@laas.fr (Ludovic Courtès).  * doc/Makefile.am: Refer to `sort2.pl' as
 	  `$(srcdir)/scripts/sort2.pl' instead of `scripts/sort2.pl'.  * doc/manpages/Makefile.am: Refer to `gdoc' as   `$(top_srcdir)/doc/scripts/gdoc' instead of `../scripts/gdoc'.  * doc/lib/Makefile.am: Likewise.  * doc/lib/x509/Makefile.am: Likewise.  * doc/libextra/Makefile.am: Likewise.  * doc/libextra/openpgp/Makefile.am: Likewise.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, THANKS: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* lib/auth_cert.c: (_gnutls_gen_cert_server_cert_req): For TLS 1.2, generate conforming
 	cert requests (i.e., include a empty list of supported hashes).
 	Report and tiny patch from ludovic.courtes@laas.fr (Ludovic
 	Courtès).
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* tests/userid/.cvsignore: [no log message]
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* lib/x509/common.c: (_oid2str): Mark UID as a CHOICE-field (i.e., DirectoryString).  (_gnutls_x509_oid_data2string): Handle ia5String in CHOICEs.  Fixes
 	problem reported by Max Kellermann <max@duempel.org>.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* lib/pkix_asn1_tab.c: Generated.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* lib/pkix.asn: Encoded UID DN fields as DirectoryString (e.g.,
 	PrintableString), not as IA5String.  Add IA5String as a CHOICE for
@@ -5319,99 +5448,99 @@
 	IA5String UID fields out there that were generated by older
 	versions.  Reported by Max Kellermann <max@duempel.org>.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* tests/userid/userid: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Add tests/userid/.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* tests/Makefile.am: Add userid/.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* tests/userid/Makefile.am, tests/userid/userid.pem: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_x509.c: (generate_rdn_seq): Store subject DN instead of issuer DN in the
 	certificate authority list, to make sure server's send the proper
 	list of expected CAs to the client.  Reported by Max Kellermann
 	<max@duempel.org>.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_x509.c: (gnutls_certificate_set_x509_crl): Initialize before use, reported
 	by Max Kellermann <max@duempel.org>.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, THANKS, tests/Makefile.am, tests/certificate_set_x509_crl.c: 
 	Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-27  Simon Josefsson <simon@josefsson.org>
+2006-12-27  Simon Josefsson <simon@josefsson.org>
 
 	* gl/m4/lib-link.m4, gl/strdup.h, lgl/m4/lib-link.m4,
 	lgl/m4/stdint.m4: Update.
 
-2007-01-26  Simon Josefsson <simon@josefsson.org>
+2006-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-srp-13.txt: Add.
 
-2007-01-26  Simon Josefsson <simon@josefsson.org>
+2006-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-santesson-tls-gssapi-01.txt: Add.
 
-2007-01-26  Simon Josefsson <simon@josefsson.org>
+2006-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-rescorla-tls-opaque-prf-input-00.txt,
 	doc/protocol/draft-rescorla-tls-suiteb-00.txt: Add.
 
-2007-01-26  Simon Josefsson <simon@josefsson.org>
+2006-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* po/LINGUAS, po/de.po: Sync with TP.
 
-2007-01-10  Simon Josefsson <simon@josefsson.org>
+2006-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* m4/intl.m4, m4/intldir.m4, m4/lock.m4, m4/visibility.m4: Remove
 	(should have just been .cvsignore'd).
 
-2007-01-10  Simon Josefsson <simon@josefsson.org>
+2006-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* m4/.cvsignore: [no log message]
 
-2007-01-10  Simon Josefsson <simon@josefsson.org>
+2006-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* m4/intl.m4, m4/intldir.m4, m4/lock.m4, m4/visibility.m4: Add.
 
-2007-01-10  Simon Josefsson <simon@josefsson.org>
+2006-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
 
-2007-01-10  Simon Josefsson <simon@josefsson.org>
+2006-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2007-01-10  Simon Josefsson <simon@josefsson.org>
+2006-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Bump versions.
 
-2007-01-10  Simon Josefsson <simon@josefsson.org>
+2006-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, configure.in: Bump versions.
 
-2007-01-01  Simon Josefsson <simon@josefsson.org>
+2006-12-01  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_record.c: Doc fix.
 
@@ -8154,126 +8283,126 @@
 
 	* doc/bibliography.texi: [no log message]
 
-2006-01-31  Simon Josefsson <simon@josefsson.org>
+2005-12-31  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/extra.h: C++ fix.
 
-2006-01-31  Simon Josefsson <simon@josefsson.org>
+2005-12-31  Simon Josefsson <simon@josefsson.org>
 
 	* libextra/gnutls_ia.c: Doc fix.
 
-2006-01-28  Simon Josefsson <simon@josefsson.org>
+2005-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-openpgp-keys-07.txt: Add.
 
-2006-01-28  Simon Josefsson <simon@josefsson.org>
+2005-12-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, includes/gnutls/x509.h, lib/gnutls_errors.c,
 	lib/gnutls_global.h, lib/minitasn1/coding.c,
 	lib/minitasn1/errors.c, lib/x509/crq.c: Constify, tiny patch from
 	"ZIGLIO, Frediano, VF-IT" <Frediano.Ziglio@vodafone.com>.
 
-2006-01-26  Simon Josefsson <simon@josefsson.org>
+2005-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-26  Simon Josefsson <simon@josefsson.org>
+2005-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_global.c: Doc fix.
 
-2006-01-26  Simon Josefsson <simon@josefsson.org>
+2005-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/extra.h, libextra/gnutls_ia.c: Fix TLS/IA
 	prototypes, suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
 
-2006-01-23  Simon Josefsson <simon@josefsson.org>
+2005-12-23  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-23  Simon Josefsson <simon@josefsson.org>
+2005-12-23  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_global.c: Use _gnutls_init as increment/decrement
 	counter for init/deinit, suggested by ZIGLIO, Frediano.
 
-2006-01-18  Simon Josefsson <simon@josefsson.org>
+2005-12-18  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/gnutls.h.in: Cosmetic changes.
 
-2006-01-18  Simon Josefsson <simon@josefsson.org>
+2005-12-18  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/gnutls.h.in: Cosmetic changes.
 
-2006-01-18  Simon Josefsson <simon@josefsson.org>
+2005-12-18  Simon Josefsson <simon@josefsson.org>
 
 	* tests/resume.c: Fix mem leak.
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2005-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/manpages/Makefile.am, includes/gnutls/gnutls.h.in,
 	lib/gnutls_compress_int.c, lib/gnutls_constate.c: fixed a memory
 	copy that caused crashes.
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* tests/resume.c: More debug info.
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* tests/.cvsignore: [no log message]
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* tests/Makefile.am: Add resume self test.
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* tests/resume.c: Add, to test resume funtions.
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
 
-2006-01-17  Simon Josefsson <simon@josefsson.org>
+2005-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-salowey-tls-ticket-06.txt: Add.
 
-2006-01-16  Simon Josefsson <simon@josefsson.org>
+2005-12-16  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-16  Simon Josefsson <simon@josefsson.org>
+2005-12-16  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_state.c: Doc fix.
 
-2006-01-16  Simon Josefsson <simon@josefsson.org>
+2005-12-16  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, includes/gnutls/gnutls.h.in: Add.
 
-2006-01-16  Simon Josefsson <simon@josefsson.org>
+2005-12-16  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_state.c: Add API to get master secret too.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/gnutls.h.in: Fix.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* includes/gnutls/gnutls.h.in: Fix indentation.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am, includes/gnutls/extra.h,
 	includes/gnutls/gnutls.h.in, includes/gnutls/openpgp.h,
@@ -8296,66 +8425,66 @@
 	libextra/openpgp/gnutls_openpgp.h, src/common.c, src/serv.c,
 	tests/dhepskself.c, tests/tlsia.c: Indent more.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, configure.in: Bump versions.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am: Remove igloo, it seem weird.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* ChangeLog: [no log message]
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.3.2.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* doc/manpages/Makefile.am: Update.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_state.c, lib/gnutls_state.h: Fix warnings.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_int.h: Remove debug code.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* THANKS: Add.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_state.c: Add
 	functions to access the TLS PRF and to extract client/server random
 	fields, suggested by Jouni Malinen <jkmaline@cc.hut.fi>.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* doc/reference/Makefile.am: Ignore more.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* doc/.cvsignore, libextra/.cvsignore, tests/.cvsignore: [no log
 	message]
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, doc/Makefile.am, doc/examples/ex-client-tlsia.c,
 	doc/gnutls.texi, doc/manpages/Makefile.am, includes/gnutls/extra.h,
@@ -8368,27 +8497,27 @@
 	libextra/gnutls_ia.c, tests/Makefile.am, tests/tlsia.c: Add TLS/IA
 	support.
 
-2006-01-15  Simon Josefsson <simon@josefsson.org>
+2005-12-15  Simon Josefsson <simon@josefsson.org>
 
 	* gl/m4/gnulib-comp.m4: Update.
 
-2006-01-12  Simon Josefsson <simon@josefsson.org>
+2005-12-12  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2005-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_ui.c: added missing set_params_function()
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Bump versions.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* lib/auth_cert.c, lib/auth_cert.h, lib/auth_psk_passwd.c,
 	lib/auth_srp_passwd.c, lib/auth_srp_sb64.c, lib/defines.h,
@@ -8401,7 +8530,7 @@
 	lib/x509/privkey_pkcs8.c, lib/x509_b64.c: Replace "uint" with
 	"unsigned".  Remove unused "sint".
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* lib/defines.h, lib/gnutls_handshake.c, lib/gnutls_handshake.h,
 	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_num.c,
@@ -8410,7 +8539,7 @@
 	libextra/openpgp/gnutls_openpgp.h, libextra/openpgp/pgp.c: Replace
 	uint32 with uint32_t.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* lib/auth_dh_common.c, lib/auth_psk.c, lib/auth_rsa_export.c,
 	lib/auth_srp.c, lib/defines.h, lib/ext_max_record.c,
@@ -8422,11 +8551,11 @@
 	lib/x509/extensions.c, lib/x509/extensions.h, lib/x509/x509.c,
 	lib/x509/x509_write.c: Replace uint16 with uint16_t.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in: Remove unused sizeof checks.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in, lib/auth_cert.c, lib/auth_dh_common.c,
 	lib/auth_rsa_export.c, lib/auth_srp.c, lib/auth_srp_passwd.h,
@@ -8442,206 +8571,206 @@
 	libextra/gnutls_openpgp.c, libextra/openpgp/gnutls_openpgp.h,
 	libextra/openpgp/xml.c: Replace uint8 with uint8_t.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* gl/Makefile.am, gl/m4/gnulib-cache.m4: Update.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* lib/defines.h: Remove unused types, to start the transition to the
 	POSIX integer types (uint32_t, uint16_t, uint8_t).
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* src/Makefile.am: Remove -I../lib, these tools should only use the
 	external API.
 
-2006-01-09  Simon Josefsson <simon@josefsson.org>
+2005-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* lib/defines.h, lib/gnutls_str.c: ULONG_MAX should be in limits.h,
 	so include it at the right place.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* lib/x509/pkcs12.c: Fix mem leaks.  Remove unused variable.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_x509.c: Fix mem leak.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* ChangeLog: [no log message]
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 1.3.1.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_str.c: Fix.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/Makefile.am: Dist pkcs8 blobs.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* doc/manpages/Makefile.am: Update.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Fix.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/enc3pkcs8.pem: add
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/enc3pkcs8.pem: Add.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/enc2pkcs8.pem, tests/pkcs8: Add rc2 pkcs#8 blob.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/encpkcs8.pem, tests/unencpkcs8.pem: Fix.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/Makefile.am, tests/pkcs8: Add PKCS#8 self test.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* src/certtool.c: Make --password work for PKCS#8 --key-info.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/encpkcs8.pem, tests/unencpkcs8.pem: Add, PKSC#8 blobs.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Remove.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* lib/x509/privkey_pkcs8.c: (gnutls_x509_privkey_import_pkcs8): Handle unencrypted PEM keys.
 	Remove unused "encrypted" variable.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, src/certtool.c: Generate unencrypted PKCS#8 keys for blank
 	passwords.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Fix.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* tests/.cvsignore: [no log message]
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, doc/TODO, includes/gnutls/gnutls.h.in, lib/gnutls_x509.c,
 	tests/Makefile.am, tests/set_pkcs12_cred.c: Support reading X.509
 	credentials from PKCS#12 files.
 
-2006-01-08  Simon Josefsson <simon@josefsson.org>
+2005-12-08  Simon Josefsson <simon@josefsson.org>
 
 	* src/certtool.c: Print PKCS#12 type for each element.
 
-2006-01-06  Simon Josefsson <simon@josefsson.org>
+2005-12-06  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/rfc4279.txt: Add.
 
-2006-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2005-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_session_pack.c: Corrected bugs in session resumption.
 	Bugs reported by Yoann Vandoorselare.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* Makefile.am: Put 1.3.x releases in devel/ directory.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: add
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Fix.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/README.CODING_STYLE: Mention indentation.
 
-2006-01-02  Simon Josefsson <simon@josefsson.org>
+2005-12-02  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
 
-2006-01-01  Simon Josefsson <simon@josefsson.org>
+2005-12-01  Simon Josefsson <simon@josefsson.org>
 
 	* gl/m4/socklen.m4, gl/readline.c, gl/stdint_.h: Update.
 
-2006-01-01  Simon Josefsson <simon@josefsson.org>
+2005-12-01  Simon Josefsson <simon@josefsson.org>
 
 	* src/cli.c: Don't infloop.
 
-2006-01-01  Simon Josefsson <simon@josefsson.org>
+2005-12-01  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add.
 
-2006-01-01  Simon Josefsson <simon@josefsson.org>
+2005-12-01  Simon Josefsson <simon@josefsson.org>
 
 	* src/cli.c: Check starttls_alarmed earlier, the signal might be
 	sent before select is called.  Report by Otto Maddox
 	<ottomaddox@fastmail.fm> and influenced by tiny patch from Nozomu
 	Ando <nand@mac.com>.
 
-2006-01-01  Simon Josefsson <simon@josefsson.org>
+2005-12-01  Simon Josefsson <simon@josefsson.org>
 
 	* tests/.cvsignore: [no log message]
 
@@ -11949,134 +12078,134 @@
 
 	* doc/README.CVS: Fix gtk-doc stuff.
 
-2005-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-30  Simon Josefsson <simon@josefsson.org>
+2004-12-30  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-rfc3546bis-00.txt: Add.
 
-2005-01-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO: [no log message]
 
-2005-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* doc/README.CVS: Update.
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* nettle/tests/.cvsignore: [no log message]
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* nettle/Makefile.am, nettle/tests/md2-test.c: Add MD2.
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* nettle/Makefile.am, nettle/md2-meta.c, nettle/md2.c,
 	nettle/md2.h, nettle/md5-compat.c, nettle/md5-compat.h,
 	nettle/tests/Makefile.am, nettle/tests/md5-compat-test.c: Remove
 	md5-compat (not used).
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* THANKS: Add.
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* crypto/gc-libgcrypt.c, crypto/gc.h: Add MD2 support, tiny patch
 	from Martin Kostner.
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* lib/minitasn1/.cvsignore: [no log message]
 
-2005-01-26  Simon Josefsson <simon@josefsson.org>
+2004-12-26  Simon Josefsson <simon@josefsson.org>
 
 	* gl/alloca_.h, gl/progname.c, gl/progname.h: Update.
 
-2005-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-17  Simon Josefsson <simon@josefsson.org>
+2004-12-17  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-psk-05.txt: Add.
 
-2005-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* THANKS: [no log message]
 
-2005-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/x509/pkcs12.c: [no log message]
 
-2005-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/x509/common.c: [no log message]
 
-2005-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/x509/common.c: corrected bug in gnutls_x509_set_time()
 
-2005-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/gnutls.texi: some additions for certtool
 
-2005-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/gnutls.texi: added documentation for the export/import to
 	pkcs3 and pkcs1 formats for RSA and DH parameters.
 
-2005-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_x509.c, lib/x509/verify.c, libextra/gnutls_openssl.c,
 	src/certtool.c: Corrected bugs found by Marcin Garski
 	<mgarski@post.pl>
 
-2005-01-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-14  Simon Josefsson <simon@josefsson.org>
+2004-12-14  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Fix.
 
-2005-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-09  Simon Josefsson <simon@josefsson.org>
+2004-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-kerb-01.txt: Add.
 
-2005-01-09  Simon Josefsson <simon@josefsson.org>
+2004-12-09  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-rfc2246-bis-09.txt: Add.
 
-2005-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-07  Simon Josefsson <simon@josefsson.org>
+2004-12-07  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-ecc-07.txt: Add.
 
-2005-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2005-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2004-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/pkix_asn1_tab.c, lib/x509/verify.c: The certificate
 	chain verification function now checks certificates in the reverse
@@ -15918,58 +16047,58 @@
 	* lib/x509/compat.h, lib/x509/rfc2818_hostname.c, src/cli.c: Updated
 	gnutls-cli's SRP behaviour. Some other fixes.
 
-2004-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/certtool.c: [no log message]
 
-2004-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_ui.h, src/certtool.c, src/common.c: [no log message]
 
-2004-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/auth.tex, lib/gnutls_algorithms.c, lib/gnutls_ui.h,
 	lib/x509/rfc2818_hostname.c, lib/x509/x509.c, src/certtool.c: [no
 	log message]
 
-2004-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_errors.c, lib/gnutls_errors_int.h,
 	lib/x509/rfc2818_hostname.c, libextra/openpgp/openpgp.c: [no log
 	message]
 
-2004-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, lib/gnutls_cipher.c: [no log message]
 
-2004-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/tests.c, src/tests.h, src/tls_test.c: added TLS 1.1 protocol
 	detection.
 
-2004-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.h.in.in, lib/x509/rfc2818_hostname.c: [no log message]
 
-2004-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/tests.c, src/tests.h, src/tls_test.c: added arcfour 40 cipher
 	detection.
 
-2004-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/tex/library.tex, lib/pkix.asn,
 	lib/pkix_asn1_tab.c, lib/x509/extensions.c: [no log message]
 
-2004-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex-cert-select.tex, doc/tex/macros.tex,
 	doc/tex/record_weaknesses.tex, lib/gnutls.h.in.in,
@@ -15977,28 +16106,28 @@
 	lib/gnutls_record.c, lib/gnutls_state.c, src/common.c, src/serv.c: 
 	Added support for TLS 1.1
 
-2004-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS: [no log message]
 
-2004-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_cert.c, lib/auth_cert.h, lib/gnutls_cert.c,
 	lib/gnutls_random.c, lib/gnutls_ui.h: updated the client retrieval
 	certificate callback.
 
-2004-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/cert_auth.tex, doc/tex/certificate.tex,
 	doc/tex/ex-x509-info.tex, includes/gnutls/x509.h, lib/x509/x509.c,
 	lib/x509/x509_write.c, src/certtool.c: Added
 	gnutls_x509_crt_cpy_crl_dist_points()
 
-2004-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/certificate.tex, doc/tex/gnutls.bib,
 	includes/gnutls/extra.h, includes/gnutls/x509.h,
@@ -16007,17 +16136,17 @@
 	src/certtool.c: Corrected the CRL distribution point extension
 	handling.
 
-2004-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_cert.c, lib/x509/compat.h, libextra/gnutls_extra.c,
 	libextra/openpgp/compat.c, libextra/openpgp/gnutls_openpgp.h: [no
 	log message]
 
-2004-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* AUTHORS, NEWS, configure.in, doc/tex/cover.tex.in,
 	includes/Makefile.am, includes/gnutls/Makefile.am,
@@ -16059,16 +16188,16 @@
 	src/certtool.c, src/certtool.gaa, src/cli.c, src/crypt.c,
 	src/prime.c, src/serv.c, src/tests.c, src/tls_test.c: * Added CRL verification functionality to certtool.  * Added the FSF copyright notices.  * Moved all the compatibility interface to the openssl   compatibility library.
 
-2004-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS: [no log message]
 
-2004-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/x509/crq.c, lib/x509/mpi.c, lib/x509/mpi.h, lib/x509/sign.c,
 	lib/x509/verify.c: corrected signing and verifying with DSA keys.
 
-2004-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, doc/tex/certificate.tex, includes/gnutls/x509.h,
 	lib/Makefile.am, lib/x509/Makefile.am, lib/x509/crl.c,
@@ -16077,7 +16206,7 @@
 	src/certtool.gaa: Added support for generating CRLs in the library
 	and the certtool utility.
 
-2004-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, includes/gnutls/x509.h, lib/gnutls_mpi.h, lib/pkix.asn,
 	lib/pkix_asn1_tab.c, lib/x509/extensions.c, lib/x509/extensions.h,
@@ -16085,15 +16214,15 @@
 	lib/x509/x509_write.c, src/certtool.c: Added support for the Subject
 	Key ID PKIX extension.
 
-2004-01-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/ext_server_name.c, libextra/gnutls_srp.c: [no log message]
 
-2004-01-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, includes/gnutls/x509.h, lib/pkix.asn,
 	lib/pkix_asn1_tab.c, lib/x509/common.c, lib/x509/dsa.c,
@@ -16102,26 +16231,26 @@
 	generating CRL distribution points extensions in certificates (not
 	working yet).
 
-2004-01-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_mpi.h, libextra/auth_srp.c: Added checks (in SRP) for
 	A%n==0,1,-1 in server side.
 
-2004-01-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/TODO, src/certtool-gaa.c,
 	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa: Added PKCS #7
 	support to certtool utility.
 
-2004-01-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/examples/Makefile.am, doc/manpages/certtool.1,
 	doc/tex/ex-cert-select.tex, doc/tex/examples.tex, lib/auth_cert.c,
@@ -16129,11 +16258,11 @@
 	lib/gnutls_ui.h, lib/x509/compat.c, libextra/gnutls_openssl.c: [no
 	log message]
 
-2004-01-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_cert.c: [no log message]
 
-2004-01-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, includes/Makefile.am,
 	includes/gnutls/Makefile.am, includes/gnutls/compat4.h,
@@ -16144,11 +16273,11 @@
 	libextra/openpgp/xml.c: Added gnutls_openpgp_key_get_key_usage(),
 	and removed several compatibility functions.
 
-2004-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* includes/gnutls/openpgp.h, lib/Makefile.am, lib/auth_cert.c,
 	lib/auth_dhe.c, lib/auth_rsa.c, lib/auth_rsa_export.c,
@@ -16160,16 +16289,16 @@
 	libextra/openpgp/gnutls_openpgp.h, libextra/openpgp/openpgp.h,
 	libextra/openpgp/privkey.c: several cleanups.
 
-2004-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_handshake.c: Corrected bug which disallowed
 	ciphersuites other than the CERTIFICATE ones to work.
 
-2004-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/openpgp/privkey.c: [no log message]
 
-2004-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO, includes/gnutls/compat8.h, includes/gnutls/openpgp.h,
 	lib/auth_cert.c, lib/gnutls_cert.c, lib/gnutls_int.h,
@@ -16183,16 +16312,16 @@
 	time spent within them is minimized. Also added
 	gnutls_openpgp_privkey struct. No testing yet.
 
-2004-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* includes/gnutls/x509.h, lib/gnutls_cert.h, lib/x509/extensions.c,
 	lib/x509/x509_write.c: [no log message]
 
-2004-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, includes/gnutls/x509.h, lib/gnutls_cert.h,
 	lib/x509/extensions.c, lib/x509/extensions.h,
@@ -16200,17 +16329,17 @@
 	src/tls_test.c: Added gnutls_x509_crt_set_key_usage() and certtool
 	can now set the certificate's key usage.
 
-2004-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, doc/protocol/draft-ietf-tls-emailaddr-00.txt,
 	doc/tex/auth.tex: [no log message]
 
-2004-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/cert_auth.tex, doc/tex/ciphersuites.tex, src/serv.c: [no
 	log message]
 
-2004-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/Makefile.am, doc/tex/auth.tex, doc/tex/cert_auth.tex,
 	doc/tex/certificate.tex, doc/tex/ciphers.tex,
@@ -16220,17 +16349,17 @@
 	doc/tex/tls_extensions.tex, doc/tex/x509.tex: some updated in
 	documentation
 
-2004-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_cert.c, lib/gnutls_int.h, lib/gnutls_record.c,
 	src/cli.c, src/serv.c: Corrected bug in gnutls_bye() which made it
 	return an error code of INVALID_REQUEST instead of success.
 
-2004-01-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, includes/gnutls/x509.h, lib/Makefile.am,
 	lib/gnutls_pk.c, lib/gnutls_rsa_export.c, lib/gnutls_rsa_export.h,
@@ -16243,7 +16372,7 @@
 	exporting DSA private keys. Exporting to PKCS #8 is still not
 	supported due to lack of standards.
 
-2004-01-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/auth_cert.c, lib/auth_cert.h, lib/auth_dhe.c,
 	lib/auth_rsa.c, lib/auth_rsa_export.c, lib/gnutls_cert.c,
@@ -16257,11 +16386,11 @@
 	a server to specify certificates for the handshake without storing
 	them to the credentials structure.
 
-2004-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/auth_anon.c, lib/auth_cert.c,
 	lib/auth_cert.h, lib/auth_dhe.c, lib/auth_rsa.c,
@@ -16277,58 +16406,58 @@
 	are removed when such parameters do not exist.  * Several internal changes to allow adding the callback function to
 	  retrieve the certificate and the private key.
 
-2004-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/gnutls.h.in.in, lib/gnutls_dh_primes.c,
 	lib/gnutls_rsa_export.c, lib/gnutls_state.c: Included
 	gnutls_1_0_0_patches.
 
-2004-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, THANKS, lib/Makefile.am, lib/gnutls_handshake.c,
 	lib/gnutls_record.c, libextra/Makefile.am,
 	libextra/openpgp/Makefile.am, src/cli.c, src/tests.c, src/tests.h,
 	src/tls_test.c: Included gnutls_1_0_0_patches.
 
-2004-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO: [no log message]
 
-2004-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO, doc/tex/ciphers.tex, lib/gnutls_dh_primes.c,
 	lib/gnutls_mpi.c, src/prime.c: some minor fixes and cleanups.
 
-2004-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, src/common.c: [no log message]
 
-2004-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_cipher.c, lib/gnutls_cipher_int.c: some cleanups in the
 	record protocol processing.
 
-2004-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, doc/tex/srp.tex, includes/gnutls/extra.h,
 	lib/gnutls.h.in.in, lib/gnutls_errors.c, lib/gnutls_handshake.c,
@@ -16339,28 +16468,28 @@
 	supported without any interaction with the application layer (except
 	for a callback).
 
-2004-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/manpages/Makefile.am, doc/manpages/certtool.1,
 	doc/manpages/gnutls-cli-debug.1, doc/manpages/gnutls-cli.1,
 	doc/manpages/gnutls-serv.1, doc/manpages/gnutls-srpcrypt.1: Added
 	new manpages by Ivo.
 
-2004-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2004-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ciphersuites.tex: [no log message]
 
-2004-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, lib/gnutls_hash_int.c, lib/gnutls_random.c,
 	lib/x509/dn.c, src/common.c: eliminated some memory leaks and other
 	fixes.
 
-2004-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2003-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex-serv-export.tex, doc/tex/ex-serv-srp.tex,
 	doc/tex/preface.tex: [no log message]
@@ -19836,42 +19965,42 @@
 	in the system then libgnutls-extra will depend on it, instead of
 	including minilzo.
 
-2003-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_mpi.c: Added a test for null (zero) integers in MPI
 	scanning.
 
-2003-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/tests.c, src/tls_test.c: some fixes in the gnutls-cli-debug
 	program
 
-2003-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/gnutls_openpgp.c: Added missing stub function.
 
-2003-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* tests/Makefile: [no log message]
 
-2003-01-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, lib/minitasn1/Makefile.am, lib/minitasn1/README: [no
 	log message]
 
-2003-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/Makefile.am: [no log message]
 
-2003-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* Makefile.am, NEWS, configure.in, doc/README.CVS, lib/Makefile.am,
 	lib/defines.h, lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
@@ -19884,19 +20013,19 @@
 	lib/minitasn1/structure.c, lib/minitasn1/structure.h: [no log
 	message]
 
-2003-01-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in: depends on libgcrypt 1.1.11
 
-2003-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_anon.c, lib/auth_dhe.c, lib/auth_rsa.c,
 	lib/auth_rsa_export.c, lib/gnutls_auth.h, lib/gnutls_handshake.c,
@@ -19905,20 +20034,20 @@
 	Dropped the support for the client key exchange message 0, and
 	server key exchange message 2.
 
-2003-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/debug.c, lib/gnutls_mpi.h,
 	lib/gnutls_record.c, libextra/auth_srp.c: Finished SRP-6 stuff. It
 	should work fine now.
 
-2003-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/auth_srp.c, libextra/auth_srp_rsa.c, libextra/ext_srp.c,
 	libextra/gnutls_srp.c, libextra/gnutls_srp.h: First part of SRP-6
 	support. Follows draft-ietf-tls-srp-04 and does not need the second
 	key exchange part. Does not work yet.
 
-2003-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/protocol/draft-ietf-tls-compression-03.txt,
 	doc/protocol/draft-ietf-tls-compression-04.txt,
@@ -19926,92 +20055,92 @@
 	doc/protocol/draft-ietf-tls-srp-04.txt, doc/tex/gnutls.bib,
 	doc/tex/programs.tex: [no log message]
 
-2003-01-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, includes/gnutls/extra.h, libextra/gnutls_openpgp.c: Added
 	gnutls_openpgp_extract_key_name_string() which returns a single
 	string for a pgp user id.
 
-2003-01-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex-serv-export.tex, src/serv.c: updated some example and
 	the server to use the new gnutls_malloc() in callbacks.
 
-2003-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_ui.h, lib/gnutls_x509.c: Added the
 	gnutls_x509_extract_dn_string() function.
 
-2003-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/README.CODING_STYLE: [no log message]
 
-2003-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_errors.c: [no log message]
 
-2003-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* README, doc/TODO: [no log message]
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog, lib/gnutls_mem.c, libextra/gnutls_openpgp.c: [no log
 	message]
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS: [no log message]
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in: [no log message]
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/serv.c: updated to include a callback for receiving openpgp
 	keys, using libopencdk.
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/ext_cert_type.c, lib/gnutls_errors.c,
 	lib/gnutls_errors_int.h, lib/gnutls_sig.c, lib/x509_b64.c,
 	libextra/auth_srp_sb64.c: some cleanups
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/gnutls_openpgp.c: minor cleanups
 
-2003-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex-pgp-keyserver.tex: [no log message]
 
-2003-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/ext_server_name.c: some fixes in server_name extension
 
-2003-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex-pgp-keyserver.tex, src/serv-gaa.c, src/serv-gaa.h,
 	src/serv.c, src/serv.gaa: [no log message]
 
-2003-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/callbacks.tex, lib/gnutls.h.in.in, lib/gnutls_db.c,
 	lib/gnutls_global.c, lib/gnutls_mem.c, lib/x509_b64.c,
@@ -20019,27 +20148,27 @@
 	convenient gnutls_malloc() and gnutls_free() functions. Actually
 	pointers to functions.
 
-2003-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.h.in.in, lib/gnutls_global.c: [no log message]
 
-2003-01-07  Timo Schulz <twoaday@gnutls.org>
+2002-12-07  Timo Schulz <twoaday@gnutls.org>
 
 	* libextra/gnutls_openpgp.c: Some bug fixes for the OpenPGP code.
 
-2003-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO: [no log message]
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_db.c, libextra/gnutls_srp.c: [no log message]
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/x509_b64.c, libextra/auth_srp_sb64.c: Changed the
 	semantics of gnutls_pem_base64_encode_alloc() and
@@ -20048,13 +20177,13 @@
 	compatible.  They now require the returned data to be freed using the
 	gnutls_global_get_free_function().
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* includes/gnutls/extra.h, lib/gnutls_int.h, lib/gnutls_ui.h,
 	libextra/auth_srp_passwd.c, libextra/gnutls_srp.c,
 	libextra/gnutls_srp.h: some cleanups.
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, doc/tex/Makefile.am, doc/tex/callbacks.tex,
 	doc/tex/library.tex, lib/gnutls.h.in.in, lib/gnutls_datum.c,
@@ -20067,96 +20196,96 @@
 	must allocate data. They now need to use these functions, instead of
 	just calling malloc().
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/auth_srp.c, libextra/auth_srp_passwd.c,
 	libextra/auth_srp_passwd.h, libextra/gnutls_srp.c: more updates in
 	the SRP parameter callback.
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, includes/gnutls/extra.h: [no log message]
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/ext_srp.c, libextra/gnutls_srp.c: Some updates in the srp
 	codebase, to detect illegal usernames etc.
 
-2003-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_errors.c, lib/gnutls_errors_int.h,
 	lib/gnutls_extensions.c, lib/gnutls_handshake.c: added error code to
 	report illegal srp usernames. Some fixes in the extension parsing to
 	report fatal errors.
 
-2003-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/x509_extensions.c, lib/x509_verify.c: some optimizations in
 	string handling of the x.509 asn.1 parsers.
 
-2003-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* tests/openpgp_test.c: [no log message]
 
-2003-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog, doc/tex/ex-pgp-keyserver.tex: [no log message]
 
-2003-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_global.c: [no log message]
 
-2003-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/Makefile.am, doc/tex/ex-pgp-keyserver.tex,
 	doc/tex/examples.tex, doc/tex/macros.tex, doc/tex/preparation.tex: 
 	Added a chapter for sources preparation. Based on the documenation
 	of libksba.
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, doc/tex/ex-pgp-keyserver.tex: depends on opencdk
 	0.3.5
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex-pgp-keyserver.tex, doc/tex/gnutls.bib,
 	doc/tex/srp.tex, doc/tex/x509.tex: [no log message]
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_extensions.c: Corrected bug in extension parsing.
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/gnutls_extra.c: [no log message]
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/Makefile.am, doc/tex/srp.tex: [no log message]
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/auth.tex, includes/gnutls/extra.h, libextra/gnutls_srp.c: 
 	some updates on srp documentation.
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex-pgp-keyserver.tex: [no log message]
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex-pgp-keyserver.tex: [no log message]
 
-2003-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_cert.c, lib/auth_dhe.c, lib/auth_rsa.c,
 	lib/auth_rsa_export.c, lib/ext_cert_type.c, lib/ext_server_name.c,
@@ -20179,20 +20308,20 @@
 	libextra/gnutls_srp.c: Cleanups. Prefixed some internal function
 	with underscore.
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* ChangeLog: [no log message]
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_x509.c: more fixes in
 	gnutls_x509_extract_certificate_dn_string()
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO, lib/gnutls_dh_primes.c: [no log message]
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex-pgp-keyserver.tex, includes/gnutls/extra.h,
 	lib/gnutls_dh.h, lib/gnutls_dh_primes.c, libextra/auth_srp.c,
@@ -20203,24 +20332,24 @@
 	retrieving SRP parameters from an external backend - other than
 	password files.
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex-pgp-keyserver.tex, lib/auth_cert.c,
 	libextra/gnutls_extra.h, libextra/gnutls_openpgp.c,
 	libextra/gnutls_openpgp.h: Enabled the OpenPGP key retrieval
 	callback function (untested yet).
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* libextra/Makefile.am, libextra/crypt.c, libextra/crypt.h,
 	libextra/crypt_srpsha1.c, libextra/crypt_srpsha1.h: removed all
 	files related to srpsha1 encoding. The are not needed any more.
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO: [no log message]
 
-2003-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2002-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, includes/gnutls/extra.h, lib/x509_b64.c,
 	libextra/auth_srp_sb64.c, libextra/crypt.c,
@@ -20228,16 +20357,16 @@
 	libextra/gnutls_srp.h, src/common.c, src/crypt-gaa.c, src/crypt.c,
 	src/crypt.gaa: Added the functions:    gnutls_srp_verifier()    gnutls_srp_base64_encode()    gnutls_srp_base64_decode() and modified the gnutls-srpcrypt, to use the exported functions.
 
-2003-01-01  Timo Schulz <twoaday@gnutls.org>
+2002-12-01  Timo Schulz <twoaday@gnutls.org>
 
 	* tests/openpgp_test.c: Some enhancements for the OpenPGP test
 	program.
 
-2003-01-01  Timo Schulz <twoaday@gnutls.org>
+2002-12-01  Timo Schulz <twoaday@gnutls.org>
 
 	* libextra/gnutls_openpgp.c: Some new code for the OpenPGP lib.
 
-2003-01-01  Timo Schulz <twoaday@gnutls.org>
+2002-12-01  Timo Schulz <twoaday@gnutls.org>
 
 	* tests/openpgp_test.c: Some enhancements for the OpenPGP test
 	program.
@@ -25422,50 +25551,50 @@
 	(separated from HMAC).  Added gnutls_fingerprint_calc(), which
 	calculates a fingerprint.
 
-2002-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* Makefile.am: added PGPKEYS
 
-2002-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/README.CVS: updated
 
-2002-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/auth_x509.c: corrected bug which did not allow a client
 	to accept multiple CA distinguished names.
 
-2002-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/README.srpcrypt: updated
 
-2002-01-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO, lib/gnutls_buffers.c: [no log message]
 
-2002-01-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_cert.c: some corrections in documentation
 
-2002-01-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS: releasing 0.3.0
 
-2002-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/x509_ASN.y, lib/x509_asn1.c, lib/x509_der.c: cleaned up and
 	fixed ASN.1 documentation.
 
-2002-01-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/scripts/gdoc: corrected in order not to complain if func(void)
 	is used.
 
-2002-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/gnutls.h.in.in: cleanups
 
-2002-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO, doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/serv1.tex,
 	doc/tex/srp1.tex, lib/auth_anon.h, lib/auth_srp.c, lib/auth_srp.h,
@@ -25477,33 +25606,33 @@
 	renamed to GNUTLS_*_CREDENTIALS.  Added defines to keep source
 	compatibility.
 
-2002-01-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_anon.c: corrected bugs in AUTH_INFO allocation
 
-2002-01-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.h.in.in, lib/gnutls_algorithms.c, lib/gnutls_int.h: 
 	cleanups
 
-2002-01-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, THANKS, configure.in, lib/Makefile.am, lib/gnutls.h.in,
 	lib/gnutls.h.in.in, lib/gnutls_buffers.c, lib/gnutls_int.h: 
 	corrections in the configuration files.
 
-2002-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in: some corrections in assembler detection. Also chmod
 	-w gnutls.h was removed.
 
-2002-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_srp.c, lib/gnutls_extensions.c, lib/gnutls_handshake.c,
 	lib/gnutls_record.c: Corrections for big endian machines. Pointed
 	out by Mike Siers <mikes@poliac.com>
 
-2002-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ciphersuites.tex, doc/tex/ex1.tex, doc/tex/ex2.tex,
 	doc/tex/serv1.tex, doc/tex/srp1.tex, lib/gnutls.h.in,
@@ -25512,25 +25641,25 @@
 	lib/gnutls_record.c, lib/gnutls_session.c, src/cli.c, src/serv.c: 
 	cleanups and documentation updates
 
-2002-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_int.h: [no log message]
 
-2002-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_anon.c, lib/auth_srp.c, lib/gnutls_record.c,
 	lib/gnutls_session_pack.c, src/cli.c: corrections in SRP and ANON
 	authentication.  Also corrections in the session packing for
 	anonymous auth info.
 
-2002-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/serv1.tex,
 	doc/tex/srp1.tex, lib/gnutls.h.in, lib/gnutls_kx.c,
 	lib/gnutls_record.c, lib/gnutls_record.h, src/cli.c, src/serv.c: 
 	*_alert -> alert_*
 
-2002-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/ex3.tex,
 	doc/tex/serv1.tex, doc/tex/srp1.tex, lib/auth_anon.c,
@@ -25543,37 +25672,37 @@
 	gnutls_record_get_max_size gnutls_set_cred	-> gnutls_cred_set
 	gnutls_get_auth_type -> gnutls_auth_get_type
 
-2002-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/auth.tex, doc/tex/ciphers.tex, doc/tex/ciphersuites.tex,
 	doc/tex/errors.tex, doc/tex/gnutls.tex, doc/tex/macros.tex,
 	doc/tex/resumedb.tex, doc/tex/translayer.tex,
 	lib/gnutls_handshake.c: documentation updated
 
-2002-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.h.in, lib/gnutls_db.c, lib/gnutls_record.c: changed
 	function names
 
-2002-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/gnutls.tex, doc/tex/macros.tex, doc/tex/resumedb.tex,
 	doc/tex/translayer.tex: fixes in documentation
 
-2002-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/ASN1.readme.txt, doc/Makefile.am: removed ASN1.readme.txt
 
-2002-01-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO: [no log message]
 
-2002-01-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* .cvsusers, lib/gnutls.h.in, lib/gnutls_srp.c, src/serv.c: [no log
 	message]
 
-2002-01-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, buildconf, doc/README.autoconf, doc/tex/ex1.tex,
 	doc/tex/ex2.tex, doc/tex/gnutls.tex, doc/tex/serv1.tex,
@@ -25581,54 +25710,54 @@
 	src/serv.c: renamed  gnutls_x509pki_set_trust/key to
 	gnutls_x509pki_set_trust_file/key_file
 
-2002-01-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_x509.c, lib/gnutls.h.in, lib/gnutls_errors.c,
 	lib/gnutls_extensions.c, lib/gnutls_int.h: some corrections in the
 	DECR_LEN stuff added recently.
 
-2002-01-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, doc/README.autoconf, doc/tex/Makefile.am,
 	doc/tex/errors.tex, doc/tex/gnutls.tex, lib/auth_x509.c: updated
 	documentation
 
-2002-01-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_anon.c, lib/auth_dhe_rsa.c, lib/auth_srp.c,
 	lib/auth_x509.c, lib/gnutls_extensions.c, lib/gnutls_handshake.c: 
 	More carefull parsing of incoming packets.
 
-2002-01-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, doc/tex/translayer.tex: [no log message]
 
-2002-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, THANKS, lib/gnutls_int.h, lib/gnutls_pk.c: [no log message]
 
-2002-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_handshake.c: several cleanups
 
-2002-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_gcry.c, lib/gnutls_gcry.h: corrected bugs in STD
 	formating (back to USG).
 
-2002-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* COPYING: [no log message]
 
-2002-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in: [no log message]
 
-2002-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_int.h: last commits for 0.2.91
 
-2002-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/TODO, lib/auth_anon.c, lib/auth_rsa.c, lib/gnutls_constate.c,
 	lib/gnutls_datum.c, lib/gnutls_datum.h, lib/gnutls_errors.c,
@@ -25639,59 +25768,59 @@
 	optimizations and fixes in the TLS PRF calculation (and the SSL3
 	equivalent)
 
-2002-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/cli.c: [no log message]
 
-2002-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/auth.tex: [no log message]
 
-2002-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ciphers.tex: updated documentation
 
-2002-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_anon_cred.c: fixed gnutls_anon_free_client_sc()
 
-2002-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/auth.tex, lib/auth_anon.h, lib/gnutls.h.in,
 	lib/gnutls_anon_cred.c, lib/gnutls_auth.c, lib/gnutls_handshake.c,
 	lib/gnutls_int.h, src/cli.c: Fixes in anonymous authentication.
 	Fixes in client ciphersuite selection.
 
-2002-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/debug.c, lib/gnutls_cert.c: GET_CN() now works. (affects debug
 	mode only)
 
-2002-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/.cvsignore, src/Makefile.am, src/README.crypt,
 	src/README.srpcrypt: crypt -> srpcrypt
 
-2002-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/auth_x509.c, lib/auth_x509.h, lib/gnutls_cert.c,
 	lib/gnutls_errors_int.h, lib/gnutls_handshake.c, lib/gnutls_int.h: 
 	Optimizations in server certificate callback.
 
-2002-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls.h.in, lib/gnutls_db.c, lib/gnutls_int.h,
 	lib/gnutls_record.c: added gnutls_transport_get_ptr() and
 	gnutls_db_get_ptr() functions.
 
-2002-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/Makefile.am, lib/auth_x509.c, lib/ext_dnsname.c,
 	lib/ext_dnsname.h, lib/gnutls.h.in, lib/gnutls_extensions.c,
 	lib/gnutls_handshake.c, src/cli.c, src/serv.c: remove dnsname
 	(name_ind) extension
 
-2002-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_anon.c, lib/auth_dhe_dss.c, lib/auth_dhe_rsa.c,
 	lib/auth_srp.c, lib/auth_srp_passwd.c, lib/gnutls_buffers.c,
@@ -25700,30 +25829,30 @@
 	lib/gnutls_privkey.c, lib/gnutls_srp.c, lib/x509_extensions.c: 
 	Cleanups. Now use GCRYMPI_FMT_STD instead of USG.
 
-2002-01-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_record.c: [no log message]
 
-2002-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/.cvsignore: [no log message]
 
-2002-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/auth.tex, doc/tex/ciphers.tex: added missing files
 
-2002-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/Makefile.am, doc/tex/ciphersuites.tex,
 	doc/tex/gnutls.tex, doc/tex/resumedb.tex, doc/tex/translayer.tex,
 	lib/.cvsignore: updated documentation
 
-2002-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_x509.c, lib/gnutls_int.h, lib/gnutls_ui.h: callbacks now
 	get a GNUTLS_STATE argument.
 
-2002-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ciphersuites.tex, doc/tex/ex1.tex, doc/tex/ex2.tex,
 	doc/tex/ex3.tex, doc/tex/serv1.tex, doc/tex/srp1.tex,
@@ -25732,7 +25861,7 @@
 	GNUTLS_KX_RSA renamed to GNUTLS_KX_X509PKI_RSA (and the other X509
 	key exchange methods). This will allow GNUTLS_KX_PGP_RSA etc.
 
-2002-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, doc/tex/ex1.tex, doc/tex/ex2.tex,
 	doc/tex/serv1.tex, doc/tex/srp1.tex, lib/defines.h,
@@ -25740,7 +25869,7 @@
 	lib/gnutls_priority.c, lib/gnutls_record.c, src/cli.c, src/serv.c: 
 	GNUTLS_LIST is now int*
 
-2002-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/serv1.tex,
 	doc/tex/srp1.tex, lib/debug.c, lib/gnutls.h.in,
@@ -25751,12 +25880,12 @@
 	lib/gnutls_record.c, lib/gnutls_v2_compat.c, src/cli.c, src/serv.c: 
 	cleanups again
 
-2002-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/x509_ASN.y, lib/x509_asn1.c, lib/x509_asn1.h, lib/x509_der.c,
 	lib/x509_der.h: some changes to keep gcc -Wall happy
 
-2002-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/ex3.tex,
 	doc/tex/serv1.tex, doc/tex/srp1.tex, lib/auth_rsa.c,
@@ -25766,7 +25895,7 @@
 	lib/gnutls_priority.c, lib/gnutls_priority.h, lib/gnutls_record.c,
 	lib/gnutls_record.h, src/cli.c, src/serv.c: Several cleanups.
 
-2002-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/tex/ex1.tex, doc/tex/serv1.tex,
 	lib/gnutls.h.in, lib/gnutls_db.c, lib/gnutls_db.h,
@@ -25774,7 +25903,7 @@
 	Changes in function names concerning _db_ handling and _session_
 	handling.
 
-2002-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, doc/tex/ex1.tex, doc/tex/ex2.tex,
 	doc/tex/ex3.tex, doc/tex/serv1.tex, lib/auth_dhe_rsa.c,
@@ -25784,26 +25913,26 @@
 	lib/gnutls_ui.h, src/cli.c, src/serv.c: Added callback to select the
 	server certificate.
 
-2002-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/ex3.tex,
 	lib/auth_x509.c, lib/gnutls_record.c, lib/gnutls_ui.c,
 	lib/gnutls_ui.h, src/cli.c, src/common.h, src/serv.c: optimized
 	certificate handling API
 
-2002-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_dhe_rsa.c, lib/auth_x509.c, lib/auth_x509.h,
 	lib/gnutls_cert.h, lib/gnutls_ui.h, src/serv.c: several cleanups.
 	Removed old unneeded functions.  certificate verification was moved
 	out of the handshake procedure.
 
-2002-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.h.in, lib/gnutls_buffers.c, lib/gnutls_global.c,
 	lib/gnutls_int.h, lib/gnutls_record.c: some cleanups
 
-2002-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, lib/auth_dhe_rsa.c, lib/auth_x509.c,
 	lib/auth_x509.h, lib/gnutls.h.in, lib/gnutls_auth.c,
@@ -25815,7 +25944,7 @@
 	now the peer's certificate list is stored into auth info structure
 	(instead of the certificate).  several other cleanups.
 
-2002-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/auth_x509.c, lib/auth_x509.h, lib/debug.c, lib/debug.h,
 	lib/gnutls_cert.c, lib/gnutls_cert.h, lib/gnutls_handshake.c,
@@ -25824,12 +25953,12 @@
 	moving gnutls_DN structures out of gnutls_cert and auth_info
 	structures.  Now they are generated upon request.
 
-2002-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* acconfig.h, configure.in, lib/defines.h, lib/gnutls.h.in: fixes in
 	autoconf scripts
 
-2002-01-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2001-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* AUTHORS, Makefile.am, NEWS, acconfig.h, configure.in,
 	lib/auth_x509.c, lib/defines.h, lib/gnutls_random.c: updated
@@ -28401,24 +28530,24 @@
 
 	* lib/gnutls.c: added a check in read return value
 
-2001-01-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_compress_int.c: more checks for zlib
 
-2001-01-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/API: [no log message]
 
-2001-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/API, lib/gnutls.c, lib/gnutls.h, lib/gnutls_int.h: added a
 	function to control the lowat size (the RCVLOWAT in socket)
 
-2001-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/Makefile.am: removed file
 
-2001-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/API, doc/TODO, lib/gnutls.c,
 	lib/gnutls.h, lib/gnutls_algorithms.c, lib/gnutls_buffers.c,
@@ -28427,20 +28556,20 @@
 	support for non blocking IO and socket flags. Some function names
 	have been changed.
 
-2001-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_algorithms.c: qsort seems to work now
 
-2001-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_compress_int.c: added check for zlib.h
 
-2001-01-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_algorithms.c: updated sorting algorithm - it was a mess
 	- it is more than a mess now
 
-2001-01-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, doc/API, doc/TODO, lib/gnutls.c, lib/gnutls.h,
 	lib/gnutls_algorithms.c, lib/gnutls_cipher.c,
@@ -28448,38 +28577,38 @@
 	lib/gnutls_hash_int.c, lib/gnutls_int.h, src/cli.c, src/port.h,
 	src/serv.c: some minor updates
 
-2001-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c: added a better(?) - not sure - xor function.
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_priority.h: added missing file
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in: added option for profiling
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
 	lib/gnutls_handshake.c, lib/gnutls_kx.c: improved some things found
 	from gcov
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c, lib/gnutls_int.h: improved peek data handling - now
 	keeps only 1 byte in kernel buffer
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, lib/.cvsignore, lib/gnutls.c: more changes
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_int.h: removed debug definitions
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/Makefile.am, lib/debug.h, lib/gnutls.c,
 	lib/gnutls_cipher.c, lib/gnutls_cipher.h, lib/gnutls_errors.h,
@@ -28487,25 +28616,25 @@
 	lib/gnutls_hash_int.c, lib/gnutls_int.h, lib/gnutls_kx.c,
 	src/cli.c, src/serv.c: cleanups for gcc -Wall
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/HACKING: removed file. replaced by API
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/API, lib/gnutls.c, lib/gnutls.h, lib/gnutls_buffers.c,
 	lib/gnutls_int.h, lib/gnutls_session.c, src/cli.c: added some new
 	functions in the API. documentation updated.
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/API, doc/TODO: updated documentation
 
-2001-01-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c: corrected peek data handling
 
-2001-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in, doc/TODO, lib/defines.h, lib/gnutls.c,
 	lib/gnutls_buffers.c, lib/gnutls_buffers.h, lib/gnutls_int.h,
@@ -28514,70 +28643,70 @@
 	read even if we have read and localy buffered all data - but the
 	user hasn't call gnutls_recv() to get that data.
 
-2001-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/cli.c: [no log message]
 
-2001-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* src/cli.c, src/serv.c: updated client
 
-2001-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/debug.c, lib/gnutls.c, lib/gnutls_buffers.c,
 	lib/gnutls_cipher.c, lib/gnutls_handshake.c, lib/gnutls_int.h: 
 	changes in close notify- alert handling
 
-2001-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_compress_int.c: changes in compression handling
 
-2001-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS: [no log message]
 
-2001-01-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* : moved to r2
 
-2001-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_session.c, lib/gnutls_session.h: added support for
 	session resuming
 
-2001-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/Makefile.am, lib/gnutls.c, lib/gnutls.h, lib/gnutls_cipher.c,
 	lib/gnutls_handshake.c, lib/gnutls_handshake.h, lib/gnutls_int.h: 
 	added some support for session resuming (in client) It does not seem
 	to work yet
 
-2001-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/debug.c, lib/gnutls.h, lib/gnutls_cipher.c, lib/gnutls_int.h: 
 	removed all things about exportable algorithms
 
-2001-01-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_handshake.c: gnutls_handshake was broken to
 	gnutls_handshake_begin and gnutls_handshake_finish. This will help
 	the use of certificate API to check received certificates
 
-2001-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in: added a warning if zlib was not found
 
-2001-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c: Added default algorithm priorities so it can work
 	even if the user hasn't specified any
 
-2001-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_compress_int.c, lib/gnutls_compress_int.h: added
 	compression (ZLIB)
 
-2001-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* .cvsignore, configure.in, lib/Makefile.am, lib/gnutls.c,
 	lib/gnutls.h, lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
@@ -28586,23 +28715,23 @@
 	lib/gnutls_priority.c, src/cli.c, src/port.h, src/serv.c: Added
 	compression support (ZLIB)
 
-2001-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_handshake.c, lib/gnutls_hash_int.c,
 	lib/gnutls_hash_int.h, src/cli.c, src/port.h: SSL3 support was added
 
-2001-01-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c, lib/gnutls_buffers.c, lib/gnutls_buffers.h,
 	lib/gnutls_handshake.c, lib/gnutls_int.h: major cleanups
 
-2001-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c, lib/gnutls_buffers.c, lib/gnutls_buffers.h,
 	lib/gnutls_cipher.c, lib/gnutls_handshake.c, lib/gnutls_hash_int.c,
 	lib/gnutls_hash_int.h, lib/gnutls_int.h: more ssl3 fixes
 
-2001-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c, lib/gnutls.h, lib/gnutls_algorithms.c,
 	lib/gnutls_buffers.c, lib/gnutls_buffers.h, lib/gnutls_cipher.c,
@@ -28610,20 +28739,20 @@
 	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_int.h,
 	lib/gnutls_kx.c: A lot of fixes for SSL3
 
-2001-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/Makefile.am: added API
 
-2001-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/API, doc/TODO: documentation update
 
-2001-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c, lib/gnutls_priority.c, src/cli.c, src/serv.c: 
 	Bugfixes mainly for the priority (which was moved to the state)
 
-2001-01-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+2000-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls.c, lib/gnutls.h, lib/gnutls_algorithms.c,
 	lib/gnutls_algorithms.h, lib/gnutls_cipher.c,
@@ -29312,7 +29441,7 @@
 	* Initialized repository for GNU TLS
 
 	----------------------------------------------------------------------
-	Copyright (C) 2005, 2006 Free Software Foundation
+	Copyright (C) 2005, 2006, 2007 Free Software Foundation
 	Copying and distribution of this file, with or without modification,
 	are permitted in any medium without royalty provided the copyright
 	notice and this notice are preserved.
