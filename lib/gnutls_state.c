@@ -135,20 +135,23 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
       if (cred == NULL)
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 
-      for (i = 0; i < cred->ncerts; i++)
-	{
-	  if (cred->cert_list[i][0].cert_type == cert_type)
-	    {
-	      cert_found = 1;
-	      break;
-	    }
-	}
-      if (cert_found == 0)
-	/* no certificate is of that type.
-	 */
-	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
-    }
+      if( cred->server_get_cert_callback == NULL)
+        {
+          for (i = 0; i < cred->ncerts; i++)
+    	    {
+	      if (cred->cert_list[i][0].cert_type == cert_type)
+	        {
+	          cert_found = 1;
+	          break;
+	        }
+              }
 
+          if (cert_found == 0)
+	    /* no certificate is of that type.
+	     */
+	    return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+          }
+        }
 
   if (session->internals.priorities.cert_type.algorithms == 0
       && cert_type == DEFAULT_CERT_TYPE)
