@@ -39,8 +39,8 @@
 #include <gnutls_num.h>
 
 /* Key Exchange Section */
-#define GNUTLS_EXTENSION_ENTRY(type, ext_func_recv, ext_func_send) \
-	{ #type, type, ext_func_recv, ext_func_send }
+#define GNUTLS_EXTENSION_ENTRY(type, parse_type, ext_func_recv, ext_func_send) \
+	{ #type, type, parse_type, ext_func_recv, ext_func_send }
 
 
 #define MAX_EXT_SIZE 10
@@ -48,25 +48,31 @@ const int _gnutls_extensions_size = MAX_EXT_SIZE;
 
 gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_MAX_RECORD_SIZE,
+                          EXTENSION_TLS,
 			  _gnutls_max_record_recv_params,
 			  _gnutls_max_record_send_params),
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_CERT_TYPE,
+                          EXTENSION_TLS,
 			  _gnutls_cert_type_recv_params,
 			  _gnutls_cert_type_send_params),
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_SERVER_NAME,
+                          EXTENSION_APPLICATION,
 			  _gnutls_server_name_recv_params,
 			  _gnutls_server_name_send_params),
 #ifdef ENABLE_OPRFI
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_OPAQUE_PRF_INPUT,
+                          EXTENSION_TLS,
 			  _gnutls_oprfi_recv_params,
 			  _gnutls_oprfi_send_params),
 #endif
 #ifdef ENABLE_SRP
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_SRP,
+                          EXTENSION_TLS,
 			  _gnutls_srp_recv_params,
 			  _gnutls_srp_send_params),
 #endif
   GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_INNER_APPLICATION,
+                          EXTENSION_TLS,
 			  _gnutls_inner_application_recv_params,
 			  _gnutls_inner_application_send_params),
   {0, 0, 0, 0}
@@ -83,10 +89,10 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
 /* EXTENSION functions */
 
 ext_recv_func
-_gnutls_ext_func_recv (uint16_t type)
+_gnutls_ext_func_recv (uint16_t type, tls_ext_parse_type_t parse_type)
 {
   ext_recv_func ret = NULL;
-  GNUTLS_EXTENSION_LOOP (ret = p->gnutls_ext_func_recv);
+  GNUTLS_EXTENSION_LOOP (if (parse_type == EXTENSION_ANY || p->parse_type == parse_type) ret = p->gnutls_ext_func_recv);
   return ret;
 
 }
@@ -132,8 +138,8 @@ _gnutls_extension_list_check (gnutls_session_t session, uint16_t type)
 }
 
 int
-_gnutls_parse_extensions (gnutls_session_t session, const opaque * data,
-			  int data_size)
+_gnutls_parse_extensions (gnutls_session_t session, tls_ext_parse_type_t parse_type, 
+    const opaque * data, int data_size)
 {
   int next, ret;
   int pos = 0;
@@ -185,7 +191,7 @@ _gnutls_parse_extensions (gnutls_session_t session, const opaque * data,
       sdata = &data[pos];
       pos += size;
 
-      ext_recv = _gnutls_ext_func_recv (type);
+      ext_recv = _gnutls_ext_func_recv (type, parse_type);
       if (ext_recv == NULL)
 	continue;
       if ((ret = ext_recv (session, sdata, size)) < 0)
