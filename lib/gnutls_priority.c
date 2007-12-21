@@ -47,8 +47,7 @@ break_comma_list (char *etag,
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   *
-  * Returns 0 on success.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
@@ -101,9 +100,8 @@ _set_priority (priority_st * st, const int *list)
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   *
-  * Returns 0 on success.
-  *
- **/
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+  **/
 int
 gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 {
@@ -122,8 +120,7 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   *
-  * Returns 0 on success.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_mac_set_priority (gnutls_session_t session, const int *list)
@@ -147,8 +144,7 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
   * NULL. Other compression algorithms are to be considered
   * as gnutls extensions.
   *
-  * Returns 0 on success.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_compression_set_priority (gnutls_session_t session, const int *list)
@@ -165,8 +161,7 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
   * This function actually enables or disables protocols. Newer protocol
   * versions always have highest priority.
   *
-  * Returns 0 on success.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
@@ -196,8 +191,7 @@ gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
   * The server does not use the cert type priority except for disabling
   * types that were not specified.
   *
-  * Returns 0 on success.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_certificate_type_set_priority (gnutls_session_t session,
@@ -417,8 +411,7 @@ prio_add (priority_st * priority_list, int algo)
   * Sets the priorities to use on the ciphers, key exchange methods,
   * macs and compression methods. 
   *
-  * On success 0 is returned.
-  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
@@ -500,8 +493,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL",
   * "NORMAL:%COMPAT".
   *
-  * Returns: On syntax error GNUTLS_E_INVALID_REQUEST is returned and
-  * 0 on success.
+  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
+  * %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_priority_init (gnutls_priority_t * priority_cache,
@@ -670,8 +663,8 @@ gnutls_priority_deinit (gnutls_priority_t priority_cache)
   * priority cache and is used to directly set string priorities to a
   * TLS session.  For documentation check the gnutls_priority_init().
   *
-  * On syntax error GNUTLS_E_INVALID_REQUEST is returned and 0 on success.
-  *
+  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
+  * %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
 gnutls_priority_set_direct (gnutls_session_t session, const char *priorities,
@@ -750,7 +743,7 @@ break_comma_list (char *etag,
  * use (which is recommended), you should use
  * gnutls_priority_set_direct() or gnutls_priority_set() instead.
  *
- * Returns 0 on success.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_set_default_priority (gnutls_session_t session)
@@ -775,7 +768,7 @@ gnutls_set_default_priority (gnutls_session_t session)
  * use (which is recommended), you should use
  * gnutls_priority_set_direct() or gnutls_priority_set() instead.
  *
- * Returns 0 on success.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_set_default_export_priority (gnutls_session_t session)
