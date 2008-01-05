@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
 #    Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
@@ -117,11 +117,6 @@ AC_C_INLINE
 
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.17])
-
-dnl In order to use the reentrant libc functions.
-dnl I hope it is portable enough.
-CFLAGS="${CFLAGS} -D_REENTRANT -D_THREAD_SAFE"
-AM_CFLAGS="${CFLAGS}"
 
 AC_ARG_ENABLE(cxx,
        AS_HELP_STRING([--disable-cxx],
