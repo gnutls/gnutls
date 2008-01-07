@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -196,7 +196,7 @@ _gnutls_server_name_send_params (gnutls_session_t session,
 
 	      memcpy (p,
 		      session->security_parameters.extensions.
-		      server_names[0].name, len);
+		      server_names[i].name, len);
 	      p += len;
 	      break;
 	    default:
