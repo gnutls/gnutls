@@ -71,7 +71,7 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	common.h crq.h dsa.h mpi.h pkcs7.h rfc2818.h verify.h compat.h	\
 	dn.h extensions.h privkey.h sign.h				\
 									\
-	gnutls_extra.h lzoconf.h minilzo.h openssl_compat.h		\
+	gnutls_extra.h openssl_compat.h					\
 									\
 	cipher.h context.h filters.h main.h md.h packet.h		\
 	stream.h types.h						\
