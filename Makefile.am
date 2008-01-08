@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software
-# Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
+#               2006, 2007, 2008 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -51,6 +51,7 @@ release:
 	git commit -m Generated. ChangeLog
 	git-tag -u b565716f! -m $(VERSION) $(tag)
 	git-push --tags
+	git-push
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
 	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/devel/
