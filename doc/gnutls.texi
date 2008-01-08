@@ -18,7 +18,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
-Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -217,11 +217,7 @@ parameters, as discussed below.
 
 The compression libraries (libz and lzo) are optional dependencies.
 You can get libz from @url{http://www.zlib.net/}.  You can get lzo
-from @url{http://www.oberhumer.com/opensource/lzo/}.  If you do not
-have lzo installed, GnuTLS will enable an internal copy, called
-minilzo.  Use parameter @code{--without-lzo} to disable LZO
-completely.  Use parameter @code{--with-included-lzo} to
-unconditionally use the internal minilzo copy.
+from @url{http://www.oberhumer.com/opensource/lzo/}.
 
 The X.509 part of GnuTLS needs ASN.1 functionality, from a library
 called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
@@ -754,9 +750,10 @@ The supported compression algorithms are:
 Zlib compression, using the deflate algorithm.
 
 @item LZO
-LZO is a very fast compression algorithm. This algorithm is only
+LZO is a very fast compression algorithm.  This algorithm is only
 available if the @acronym{GnuTLS-extra} library has been initialized
-and the private extensions are enabled.
+and the private extensions are enabled, and if GnuTLS was built with
+LZO support.
 
 @end table
 

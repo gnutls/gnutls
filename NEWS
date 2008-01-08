@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.3.0 (unreleased)
 
+** LZO compression is now disabled by default.
+The reason is that LZO compression is not standardized in TLS.  If you
+wish to experiment with it, you will have to supply --with-lzo when
+invoking ./configure.  The internal copy of minilzo is no longer
+included with GnuTLS, so you will need to install liblzo or liblzo2 on
+your system to have --with-lzo to be effective.
+
 ** More than one server name field is now sent to the server properly.
 Thanks to mark.phillips@virgin.net.
 

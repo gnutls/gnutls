@@ -128,13 +128,6 @@ libgnutls_extra_la_LDFLAGS += \
 	-Wl,--version-script=$(srcdir)/libgnutls-extra.vers
 endif
 
-# LZO
-
-if ENABLE_INCLUDED_LZO
-SUBDIRS += minilzo
-libgnutls_extra_la_LIBADD += minilzo/libminilzo.la
-endif
-
 gnutls-extra-api.texi: gnutls_extra.c
 	@echo "" > $@
 	@for i in $<; do \
