@@ -230,14 +230,6 @@ EXTRA_DIST += $(top_srcdir)/build-aux/link-warning.h
 
 ## end   gnulib module link-warning
 
-## begin gnulib module malloca
-
-liblgnu_la_SOURCES += malloca.c
-
-EXTRA_DIST += malloca.h malloca.valgrind
-
-## end   gnulib module malloca
-
 ## begin gnulib module memchr
 
 
@@ -725,6 +717,12 @@ EXTRA_DIST += wchar.in.h
 liblgnu_la_SOURCES += xsize.h
 
 ## end   gnulib module xsize
+
+## begin gnulib module dummy
+
+liblgnu_la_SOURCES += dummy.c
+
+## end   gnulib module dummy
 
 
 mostlyclean-local: mostlyclean-generic

@@ -76,7 +76,6 @@ AC_DEFUN([lgl_INIT],
   AM_GNU_GETTEXT_VERSION([0.17])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
-  gl_MALLOCA
   gl_FUNC_MEMCHR
   gl_FUNC_MEMCMP
   gl_FUNC_MEMMEM
@@ -237,6 +236,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/asprintf.c
   lib/des.c
   lib/des.h
+  lib/dummy.c
   lib/float+.h
   lib/float.in.h
   lib/gc-gnulib.c
@@ -247,9 +247,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/hmac-md5.c
   lib/hmac-sha1.c
   lib/hmac.h
-  lib/malloca.c
-  lib/malloca.h
-  lib/malloca.valgrind
   lib/md2.c
   lib/md2.h
   lib/md4.c
@@ -301,7 +298,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/arctwo.m4
   m4/codeset.m4
   m4/des.m4
-  m4/eealloc.m4
   m4/eoverflow.m4
   m4/extensions.m4
   m4/float_h.m4
@@ -342,7 +338,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/lock.m4
   m4/longlong.m4
   m4/malloc.m4
-  m4/malloca.m4
   m4/md2.m4
   m4/md4.m4
   m4/md5.m4
