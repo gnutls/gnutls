@@ -1,4 +1,4 @@
-# Copyright (C) 2006, 2007 Free Software Foundation
+# Copyright (C) 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -28,6 +28,7 @@ endif
 
 autoreconf:
 	test -f ./configure || autoreconf --install
+	mv build-aux/config.rpath{-,}
 
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
