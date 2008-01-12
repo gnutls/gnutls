@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.2.1 (unreleased)
 
+** Prevent linking libextra against previously installed libgnutls.
+
+** Use the first openpgp subkey instead of the main key, if available.
+
 ** Fixes the post_client_hello_function(). The extensions are now parsed
 in a callback friendly way.
 
