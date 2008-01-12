@@ -60,7 +60,7 @@ lib_LTLIBRARIES = libgnutls-extra.la
 
 libgnutls_extra_la_SOURCES = gnutls_extra.c
 
-libgnutls_openssl_la_LDFLAGS = -no-undefined
+libgnutls_openssl_la_LDFLAGS = -no-undefined -L$(top_srcdir)/lib/.libs
 
 # OpenSSL
 
@@ -90,7 +90,7 @@ endif
 # OpenPGP
 
 libgnutls_extra_la_LIBADD =
-libgnutls_extra_la_LDFLAGS = -no-undefined
+libgnutls_extra_la_LDFLAGS = -no-undefined -L$(top_srcdir)/lib/.libs
 if ENABLE_OPENPGP
 libgnutls_extra_la_SOURCES += gnutls_openpgp.c
 libgnutls_extra_la_LIBADD += openpgp/libgnutls_openpgp.la
