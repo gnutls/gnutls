@@ -87,6 +87,7 @@ int _gnutls_openpgp_find_valid_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_
 {
   int ret, subkeys, i;
   unsigned int usage;
+  unsigned int keyid_init = 0;
 
   subkeys = gnutls_openpgp_crt_get_subkey_count( crt);
   if (subkeys <= 0)
@@ -105,12 +106,19 @@ int _gnutls_openpgp_find_valid_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_
       if (ret != 0) /* it is revoked. ignore it */
         continue;
 
-      ret = gnutls_openpgp_crt_get_subkey_id( crt, i, keyid);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          return ret;
+      if (keyid_init == 0)
+        { /* keep the first valid subkey */
+          ret = gnutls_openpgp_crt_get_subkey_id( crt, i, keyid);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              return ret;
+            }
+          
+          keyid_init = 1;
         }
+      
+      
 
       ret = gnutls_openpgp_crt_get_subkey_usage( crt, i, &usage);
       if (ret < 0)
@@ -120,7 +128,16 @@ int _gnutls_openpgp_find_valid_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_
         }
 
       if (usage & GNUTLS_KEY_KEY_AGREEMENT)
-        break;
+        {
+          ret = gnutls_openpgp_crt_get_subkey_id( crt, i, keyid);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              return ret;
+            }
+
+          break;
+        }
     }
 
   return 0;
