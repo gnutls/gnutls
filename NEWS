@@ -8,12 +8,13 @@ See the end for copying conditions.
 ** Several improvements in the OpenPGP authentication. The authentication
 subkey is used if present.
 
-** certtool can print information on openpgp certificates.
+** certtool can print information on OpenPGP certificates and keys.
 
 ** Included the LGPL version of opencdk
 
 ** API and ABI modifications:
 gnutls_openpgp_privkey_sign_hash: MODIFIED to account for keyid
+gnutls_openpgp_privkey_get_id: RENAMED to gnutls_openpgp_privkey_get_key_id
 gnutls_openpgp_crt_get_revoked_status: ADDED
 gnutls_openpgp_crt_get_subkey_count: ADDED
 gnutls_openpgp_crt_get_subkey_idx: ADDED
@@ -33,6 +34,15 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm: ADDED
 gnutls_openpgp_privkey_get_subkey_expiration_time: ADDED
 gnutls_openpgp_privkey_get_subkey_id: ADDED
 gnutls_openpgp_privkey_get_subkey_creation_time: ADDED
+gnutls_openpgp_crt_get_subkey_pk_dsa_raw: ADDED
+gnutls_openpgp_crt_get_subkey_pk_rsa_raw: ADDED
+gnutls_openpgp_crt_get_pk_dsa_raw: ADDED
+gnutls_openpgp_crt_get_pk_rsa_raw: ADDED
+gnutls_openpgp_privkey_export_subkey_dsa_raw: ADDED
+gnutls_openpgp_privkey_export_subkey_rsa_raw: ADDED
+gnutls_openpgp_privkey_export_dsa_raw: ADDED
+gnutls_openpgp_privkey_export_rsa_raw: ADDED
+gnutls_openpgp_privkey_export: ADDED
 
 * Version 2.3.0 (released 2008-01-08)
 

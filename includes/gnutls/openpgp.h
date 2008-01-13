@@ -82,7 +82,7 @@ extern "C"
   time_t gnutls_openpgp_crt_get_creation_time (gnutls_openpgp_crt_t key);
   time_t gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key);
 
-  int gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key,
+  int gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key,
 				 gnutls_openpgp_keyid_t* keyid);
 
   int gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
@@ -100,6 +100,17 @@ extern "C"
   int gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key, unsigned int idx, gnutls_openpgp_keyid_t* keyid);
   int gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key, unsigned int idx,
 				  unsigned int *key_usage);
+
+  int gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt, unsigned int idx,
+				gnutls_datum_t * p, gnutls_datum_t * q,
+				gnutls_datum_t * g, gnutls_datum_t * y);
+  int gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt, unsigned int idx,
+				gnutls_datum_t * m, gnutls_datum_t * e);
+  int gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt, 
+				gnutls_datum_t * p, gnutls_datum_t * q,
+				gnutls_datum_t * g, gnutls_datum_t * y);
+  int gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt, 
+				gnutls_datum_t * m, gnutls_datum_t * e);
 
 /* privkey stuff.
  */
@@ -134,6 +145,28 @@ extern "C"
   int gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int idx, gnutls_openpgp_keyid_t* keyid);
 
   time_t gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key, unsigned int idx);
+
+  int gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t crt, unsigned int idx,
+				    gnutls_datum_t * p, gnutls_datum_t * q,
+				    gnutls_datum_t * g, gnutls_datum_t * y,
+				    gnutls_datum_t * x);
+  int gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t crt, unsigned int idx,
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u);
+
+  int gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t crt, 
+				    gnutls_datum_t * p, gnutls_datum_t * q,
+				    gnutls_datum_t * g, gnutls_datum_t * y,
+				    gnutls_datum_t * x);
+  int gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t crt, 
+				    gnutls_datum_t * m, gnutls_datum_t * e,
+				    gnutls_datum_t * d, gnutls_datum_t * p,
+				    gnutls_datum_t * q, gnutls_datum_t * u);
+
+  int gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
+			   gnutls_openpgp_crt_fmt_t format,
+			   void *output_data, size_t * output_data_size);
 
 /* Keyring stuff.
  */

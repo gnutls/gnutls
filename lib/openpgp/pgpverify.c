@@ -95,7 +95,7 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
   /* Check if the key is included in the ring. */
   if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
     {
-      rc = gnutls_openpgp_crt_get_id (key, &id);
+      rc = gnutls_openpgp_crt_get_key_id (key, &id);
       if (rc < 0)
 	{
 	  gnutls_assert ();

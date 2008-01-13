@@ -67,6 +67,8 @@ option (smime-to-p7) { $action = 15; } "Convert S/MIME to PKCS #7 structure."
 
 option (k, key-info) { $action = 6; } "Print information on a private key."
 
+option (pgp-key-info) { $action = 20; } "Print information on a OpenPGP private key."
+
 #int fix_key;
 option (fix-key) { $fix_key = 1; } "Regenerate the parameters in a private key."
 

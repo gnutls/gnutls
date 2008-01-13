@@ -52,7 +52,7 @@ void gnutls_openpgp_crt_deinit (gnutls_openpgp_crt_t key);
 int gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
 			       const gnutls_datum_t * data,
 			       gnutls_openpgp_crt_fmt_t format);
-int gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
+int _gnutls_openpgp_export (cdk_kbnode_t node,
 			       gnutls_openpgp_crt_fmt_t format,
 			       void *output_data, size_t * output_data_size);
 
@@ -97,6 +97,8 @@ int _gnutls_read_pgp_mpi( cdk_packet_t pkt, unsigned int priv, size_t idx, mpi_t
 
 int _gnutls_openpgp_find_subkey_idx( cdk_kbnode_t knode, uint32_t keyid[2], 
   unsigned int priv);
+
+int _gnutls_openpgp_get_algo( int cdk_algo);
 
 #else /* no opencdk */
 

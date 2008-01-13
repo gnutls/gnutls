@@ -116,30 +116,17 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
   return 0;
 }
 
-/**
-  * gnutls_openpgp_crt_export - This function will export a RAW or BASE64 encoded key
-  * @key: Holds the key.
-  * @format: One of gnutls_openpgp_crt_fmt_t elements.
-  * @output_data: will contain the key base64 encoded or raw
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
-  *
-  * This function will convert the given key to RAW or Base64 format.
-  * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int
-gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
-			   gnutls_openpgp_crt_fmt_t format,
-			   void *output_data, size_t * output_data_size)
+/* internal version of export
+ */
+int _gnutls_openpgp_export (cdk_kbnode_t node,
+			       gnutls_openpgp_crt_fmt_t format,
+			       void *output_data, size_t * output_data_size)
 {
   size_t input_data_size = *output_data_size;
   size_t calc_size;
   int rc;
 
-  rc = cdk_kbnode_write_to_mem (key->knode, output_data, output_data_size);
+  rc = cdk_kbnode_write_to_mem (node, output_data, output_data_size);
   if (rc)
     {
       rc = _gnutls_map_cdk_rc (rc);
@@ -180,6 +167,29 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
     }
 
   return 0;
+
+}
+
+/**
+  * gnutls_openpgp_crt_export - This function will export a RAW or BASE64 encoded key
+  * @key: Holds the key.
+  * @format: One of gnutls_openpgp_crt_fmt_t elements.
+  * @output_data: will contain the key base64 encoded or raw
+  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will convert the given key to RAW or Base64 format.
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
+			   gnutls_openpgp_crt_fmt_t format,
+			   void *output_data, size_t * output_data_size)
+{
+  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size);
 }
 
 
@@ -349,13 +359,7 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
     {
       if (bits)
 	*bits = cdk_pk_get_nbits (pkt->pkt.public_key);
-      algo = pkt->pkt.public_key->pubkey_algo;
-      if (is_RSA (algo))
-	algo = GNUTLS_PK_RSA;
-      else if (is_DSA (algo))
-	algo = GNUTLS_PK_DSA;
-      else
-	algo = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+      algo = _gnutls_openpgp_get_algo(pkt->pkt.public_key->pubkey_algo);
     }
   
   return algo;
@@ -438,14 +442,14 @@ gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key)
 }
 
 /**
- * gnutls_openpgp_crt_get_id - Gets the keyID
+ * gnutls_openpgp_crt_get_key_id - Gets the keyID
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the buffer to save the keyid.
  *
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t* keyid)
+gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t* keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -640,7 +644,7 @@ static cdk_packet_t _get_public_subkey(gnutls_openpgp_crt_t key, unsigned int in
   return NULL;
 }
 
-/* returns the key with the given keyid
+/* returns the key with the given keyid. It can be either key or subkey.
  * depending on what requested:
  *   pkt->pkt.secret_key;
  *   pkt->pkt.public_key;
@@ -675,6 +679,7 @@ cdk_packet_t _gnutls_openpgp_find_key( cdk_kbnode_t knode, uint32_t keyid[2],
         }
     }
 
+  gnutls_assert();
   return NULL;
 }
 
@@ -995,7 +1000,6 @@ int max_pub_params;
     
   if (err != CDK_Success) 
     {
-_gnutls_x509_log( "err: %d/%d\n", err, idx);
       gnutls_assert();
       gnutls_free( buf);
       return _gnutls_map_cdk_rc( err);
@@ -1020,13 +1024,18 @@ int
 _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert, uint32_t keyid[2],
 			   mpi_t * params, int *params_size)
 {
-  int result, i;
+  int result, i, idx;
   int pk_algorithm, local_params;
   cdk_packet_t pkt;
   
-  /* Read the algorithm's OID
-   */
-  pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm (cert, NULL);
+  pkt = _gnutls_openpgp_find_key( cert->knode, keyid, 0);
+  if (pkt == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+    }
+
+  pk_algorithm = _gnutls_openpgp_get_algo( pkt->pkt.public_key->pubkey_algo);
 
   switch (pk_algorithm)
     {
@@ -1049,13 +1058,6 @@ _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert, uint32_t keyid[2],
     
   *params_size = local_params;
 
-  pkt = _gnutls_openpgp_find_key( cert->knode, keyid, 0);
-  if (pkt == NULL)
-    {
-      gnutls_assert();
-      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
-    }
-
   for (i = 0; i < local_params; i++)
     {
        result = _gnutls_read_pgp_mpi( pkt, 0, i, &params[i]);
@@ -1076,4 +1078,287 @@ error:
   }
 
   return result;
+}
+
+/* The internal version of export
+ */
+static
+int _get_pk_rsa_raw(gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
+  gnutls_datum_t * m, gnutls_datum_t * e)
+{
+  int pk_algorithm, ret, i;
+  cdk_packet_t pkt;
+  uint32_t kid32[2];
+  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+  
+  KEYID_IMPORT(kid32, keyid);
+  
+  pkt = _gnutls_openpgp_find_key( crt->knode, kid32, 0);
+  if (pkt == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+    }
+
+  pk_algorithm = _gnutls_openpgp_get_algo( pkt->pkt.public_key->pubkey_algo);
+  
+  if (pk_algorithm != GNUTLS_PK_RSA)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = _gnutls_openpgp_crt_get_mpis (crt, kid32, params, &params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_mpi_dprint (m, params[0]);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = _gnutls_mpi_dprint (e, params[1]);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (m);
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  for (i = 0; i < params_size; i++)
+    {
+      _gnutls_mpi_release (&params[i]);
+    }
+  return ret;
+}
+
+static
+int _get_pk_dsa_raw(gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
+				gnutls_datum_t * p, gnutls_datum_t * q,
+				gnutls_datum_t * g, gnutls_datum_t * y)
+{
+  int pk_algorithm, ret, i;
+  cdk_packet_t pkt;
+  uint32_t kid32[2];
+  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+  
+  KEYID_IMPORT(kid32, keyid);
+  
+  pkt = _gnutls_openpgp_find_key( crt->knode, kid32, 0);
+  if (pkt == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+    }
+
+  pk_algorithm = _gnutls_openpgp_get_algo( pkt->pkt.public_key->pubkey_algo);
+  
+  if (pk_algorithm != GNUTLS_PK_DSA)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = _gnutls_openpgp_crt_get_mpis (crt, kid32, params, &params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  /* P */
+  ret = _gnutls_mpi_dprint (p, params[0]);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  /* Q */
+  ret = _gnutls_mpi_dprint (q, params[1]);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (p);
+      goto cleanup;
+    }
+
+
+  /* G */
+  ret = _gnutls_mpi_dprint (g, params[2]);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (p);
+      _gnutls_free_datum (q);
+      goto cleanup;
+    }
+
+
+  /* Y */
+  ret = _gnutls_mpi_dprint (y, params[3]);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (p);
+      _gnutls_free_datum (g);
+      _gnutls_free_datum (q);
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  for (i = 0; i < params_size; i++)
+    {
+      _gnutls_mpi_release (&params[i]);
+    }
+  return ret;
+}
+
+
+/**
+  * gnutls_openpgp_crt_get_pk_rsa_raw - This function will export the RSA public key
+  * @crt: Holds the certificate
+  * @m: will hold the modulus
+  * @e: will hold the public exponent
+  *
+  * This function will export the RSA public key's parameters found in
+  * the given structure.  The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  **/
+int
+gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt, 
+				gnutls_datum_t * m, gnutls_datum_t * e)
+{
+gnutls_openpgp_keyid_t keyid;
+int ret;
+
+  ret = gnutls_openpgp_crt_get_key_id( crt, &keyid);  
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+    
+  return _get_pk_rsa_raw( crt, keyid, m, e);
+}
+
+/**
+  * gnutls_openpgp_crt_get_pk_dsa_raw - This function will export the DSA public key
+  * @crt: Holds the certificate
+  * @p: will hold the p
+  * @q: will hold the q
+  * @g: will hold the g
+  * @y: will hold the y
+  *
+  * This function will export the DSA public key's parameters found in
+  * the given certificate.  The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  **/
+int
+gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt, 
+				gnutls_datum_t * p, gnutls_datum_t * q,
+				gnutls_datum_t * g, gnutls_datum_t * y)
+{
+gnutls_openpgp_keyid_t keyid;
+int ret;
+
+  ret = gnutls_openpgp_crt_get_key_id( crt, &keyid);  
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+    
+  return _get_pk_dsa_raw( crt, keyid, p, q, g, y);
+}
+
+/**
+  * gnutls_openpgp_crt_get_subkey_pk_rsa_raw - This function will export the RSA public key
+  * @crt: Holds the certificate
+  * @idx: Is the subkey index
+  * @m: will hold the modulus
+  * @e: will hold the public exponent
+  *
+  * This function will export the RSA public key's parameters found in
+  * the given structure.  The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  **/
+int
+gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt, unsigned int idx,
+				gnutls_datum_t * m, gnutls_datum_t * e)
+{
+gnutls_openpgp_keyid_t keyid;
+int ret;
+
+  ret = gnutls_openpgp_crt_get_subkey_id( crt, idx, &keyid);  
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+    
+  return _get_pk_rsa_raw( crt, keyid, m, e);
+}
+
+/**
+  * gnutls_openpgp_crt_get_subkey_pk_dsa_raw - This function will export the DSA public key
+  * @crt: Holds the certificate
+  * @idx: Is the subkey index
+  * @p: will hold the p
+  * @q: will hold the q
+  * @g: will hold the g
+  * @y: will hold the y
+  *
+  * This function will export the DSA public key's parameters found in
+  * the given certificate.  The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  **/
+int
+gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt, unsigned int idx,
+				gnutls_datum_t * p, gnutls_datum_t * q,
+				gnutls_datum_t * g, gnutls_datum_t * y)
+{
+gnutls_openpgp_keyid_t keyid;
+int ret;
+
+  ret = gnutls_openpgp_crt_get_subkey_id( crt, idx, &keyid);  
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+    
+  return _get_pk_dsa_raw( crt, keyid, p, q, g, y);
 }

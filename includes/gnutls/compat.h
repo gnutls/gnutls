@@ -19,6 +19,8 @@
 #define _GNUTLS_GCC_ATTR_DEPRECATED
 #endif
 
+#define gnutls_openpgp_crt_get_id gnutls_openpgp_crt_get_key_id
+
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
 #define gnutls_paramsype gnutls_paramsype_t

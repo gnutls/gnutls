@@ -108,23 +108,15 @@ print_key_usage (gnutls_string * str, gnutls_openpgp_crt_t cert, unsigned int id
     }
 
   if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-    addf (str, _("\t\t\tDigital signature.\n"));
-  if (key_usage & GNUTLS_KEY_NON_REPUDIATION)
-    addf (str, _("\t\t\tNon repudiation.\n"));
+    addf (str, _("\t\t\tDigital signatures.\n"));
   if (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-    addf (str, _("\t\t\tKey encipherment.\n"));
+    addf (str, _("\t\t\tCommunications encipherment.\n"));
   if (key_usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-    addf (str, _("\t\t\tData encipherment.\n"));
+    addf (str, _("\t\t\tStorage data encipherment.\n"));
   if (key_usage & GNUTLS_KEY_KEY_AGREEMENT)
-    addf (str, _("\t\t\tKey agreement.\n"));
+    addf (str, _("\t\t\tAuthentication.\n"));
   if (key_usage & GNUTLS_KEY_KEY_CERT_SIGN)
     addf (str, _("\t\t\tCertificate signing.\n"));
-  if (key_usage & GNUTLS_KEY_CRL_SIGN)
-    addf (str, _("\t\t\tCRL signing.\n"));
-  if (key_usage & GNUTLS_KEY_ENCIPHER_ONLY)
-    addf (str, _("\t\t\tKey encipher only.\n"));
-  if (key_usage & GNUTLS_KEY_DECIPHER_ONLY)
-    addf (str, _("\t\t\tKey decipher only.\n"));
 }
 
 /* idx == -1 indicates main key
@@ -137,12 +129,12 @@ print_key_id (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
     int err;
 
     if (idx < 0)
-      err = gnutls_openpgp_crt_get_id (cert, &id);
+      err = gnutls_openpgp_crt_get_key_id (cert, &id);
     else
       err = gnutls_openpgp_crt_get_subkey_id( cert, idx, &id);
 
     if (err < 0)
-      addf (str, "error: get_id: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
     else
       {
 	addf (str, _("\tID (hex): "));
@@ -251,14 +243,17 @@ print_key_info(gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 	  name = "Unknown";
 
 	addf (str, _("\tPublic Key Algorithm: %s\n"), name);
-#if 0
 	switch (err)
 	  {
 	  case GNUTLS_PK_RSA:
 	    {
 	      gnutls_datum_t m, e;
 
-	      err = gnutls_openpgp_crt_get_pk_rsa_raw (cert, &m, &e);
+              if (idx == -1)
+	        err = gnutls_openpgp_crt_get_pk_rsa_raw (cert, &m, &e);
+              else
+	        err = gnutls_openpgp_crt_get_subkey_pk_rsa_raw (cert, idx, &m, &e);
+	        
 	      if (err < 0)
 		addf (str, "error: get_pk_rsa_raw: %s\n",
 		      gnutls_strerror (err));
@@ -279,7 +274,10 @@ print_key_info(gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 	    {
 	      gnutls_datum_t p, q, g, y;
 
-	      err = gnutls_openpgp_crt_get_pk_dsa_raw (cert, &p, &q, &g, &y);
+              if (idx == -1)
+	        err = gnutls_openpgp_crt_get_pk_dsa_raw (cert, &p, &q, &g, &y);
+              else
+	        err = gnutls_openpgp_crt_get_subkey_pk_dsa_raw (cert, idx, &p, &q, &g, &y);
 	      if (err < 0)
 		addf (str, "error: get_pk_dsa_raw: %s\n",
 		      gnutls_strerror (err));
@@ -300,7 +298,6 @@ print_key_info(gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 	  default:
 	    break;
 	  }
-#endif
       }
 }
 
