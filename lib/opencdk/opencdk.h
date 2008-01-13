@@ -281,12 +281,17 @@ enum cdk_crypto_mode_t {
     CDK_CRYPTYPE_IMPORT  = 6
 };
 
-
+#define CDK_KEY_USG_ENCR CDK_KEY_USG_COMM_ENCR|CDK_KEY_USG_STORAGE_ENCR
+#define CDK_KEY_USG_SIGN CDK_KEY_USG_DATA_SIGN|CDK_KEY_USG_CERT_SIGN
 /* A list of valid public key usages. */
 enum cdk_key_usage_t {
-    CDK_KEY_USG_ENCR = 1, /* Key can be used for encryption. */
-    CDK_KEY_USG_SIGN = 2, /* Key can be used for signing and certifying. */
-    CDK_KEY_USG_AUTH = 4  /* Key can be used for authentication. */
+    CDK_KEY_USG_CERT_SIGN = 1, 
+    CDK_KEY_USG_DATA_SIGN = 2, 
+    CDK_KEY_USG_COMM_ENCR = 4,
+    CDK_KEY_USG_STORAGE_ENCR = 8,
+    CDK_KEY_USG_SPLIT_KEY = 16,
+    CDK_KEY_USG_AUTH = 32,
+    CDK_KEY_USG_SHARED_KEY = 128
 };
 
 

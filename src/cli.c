@@ -419,8 +419,10 @@ const char *err;
   gnutls_certificate_client_set_retrieve_function (xcred, cert_callback);
 
   /* send the fingerprint */
+#ifdef ENABLE_OPENPGP
   if (fingerprint != 0)
     gnutls_openpgp_send_cert (session, GNUTLS_OPENPGP_CERT_FINGERPRINT);
+#endif
 
   /* use the max record size extension */
   if (record_max_size > 0 && disable_extensions == 0)
@@ -530,12 +532,6 @@ main (int argc, char **argv)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
       exit (1);
-    }
-
-  if ((ret = gnutls_global_init_extra ()) < 0)
-    {
-      fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
-//      exit (1);
     }
 
   gaa_parser (argc, argv);

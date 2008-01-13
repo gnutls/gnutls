@@ -624,6 +624,7 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
   return 0;
 }
 
+#ifdef ENABLE_OPENPGP
 /**
   * gnutls_openpgp_send_cert - This function will order gnutls to send the openpgp fingerprint instead of the key
   * @session: is a pointer to a #gnutls_session_t structure.
@@ -640,6 +641,7 @@ gnutls_openpgp_send_cert (gnutls_session_t session,
 {
   session->internals.pgp_fingerprint = status;
 }
+#endif
 
 /**
   * gnutls_certificate_send_x509_rdn_sequence - This function will order gnutls to send or not the x.509 rdn sequence
@@ -662,11 +664,13 @@ gnutls_certificate_send_x509_rdn_sequence (gnutls_session_t session,
   session->internals.ignore_rdn_sequence = status;
 }
 
+#ifdef ENABLE_OPENPGP
 int
 _gnutls_openpgp_send_fingerprint (gnutls_session_t session)
 {
   return session->internals.pgp_fingerprint;
 }
+#endif
 
 /*-
   * _gnutls_record_set_default_version - Used to set the default version for the first record packet

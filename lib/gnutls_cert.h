@@ -124,9 +124,5 @@ int _gnutls_raw_cert_to_gcert (gnutls_cert * gcert,
 			       gnutls_certificate_type_t type,
 			       const gnutls_datum_t * raw_cert,
 			       int flags /* OR of ConvFlags */ );
-int _gnutls_raw_privkey_to_gkey (gnutls_privkey * key,
-				 gnutls_certificate_type_t type,
-				 const gnutls_datum_t * raw_key,
-				 int key_enc /* DER or PEM */ );
 
 #endif

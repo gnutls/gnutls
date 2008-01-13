@@ -67,7 +67,7 @@ see http://www.gnu.org/philosophy/why-not-lgpl.html.
 
 The GNU Lesser GPL license applies to the main gnutls library, while the
 gnutls-extra library is under the GPL. The gnutls-extra library contains
-the code for the "OpenPGP key" support and the OpenSSL compatibility layer. 
+the code for "GnuTLS Inner Application" support and the OpenSSL compatibility layer. 
 The gnutls library is located in the lib/ directory, while the gnutls-extra 
 library is at libextra/.
 

@@ -198,7 +198,6 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(strings.h alloca.h)
 AC_CHECK_HEADERS(errno.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
-dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
 AC_CHECK_FUNCS(umask vasprintf isascii fork,,)
 AC_FUNC_ALLOCA
@@ -488,35 +487,38 @@ AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
 
 dnl Test whether to use the included opencdk library
 dnl 
-if test x$ac_enable_openpgp = xyes; then
- AC_ARG_WITH(included-opencdk,
-	AS_HELP_STRING([--with-included-opencdk], [use the included opencdk]),
-		ac_enable_included_opencdk=$withval, 
-		ac_enable_included_opencdk=no)
- if test x$ac_enable_included_opencdk = xno;then 
-  AC_LIB_HAVE_LINKFLAGS(opencdk,, [
-#include <opencdk.h>], [
-#if OPENCDK_VERSION_MINOR < 6 || OPENCDK_VERSION_PATCH < 5
-# error "OpenCDK 0.6.5 is required"
-#else
-cdk_check_version( NULL);
-#endif
-])
-  if test "$ac_cv_libopencdk" != yes; then
-   ac_enable_included_opencdk=yes
-   AC_MSG_WARN([[
-***
-*** libopencdk was not found. You may want to get it from
-*** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
-***
-*** Will use the included opencdk.
-***
-]])
-  fi
-  AC_MSG_CHECKING([whether to use the included opencdk])
-  AC_MSG_RESULT($ac_enable_included_opencdk)
- fi
-fi
+dnl We no longer test for it. We use the LGPL parts of this library internally
+dnl if test x$ac_enable_openpgp = xyes; then
+dnl AC_ARG_WITH(included-opencdk,
+dnl	AS_HELP_STRING([--with-included-opencdk], [use the included opencdk]),
+dnl		ac_enable_included_opencdk=$withval, 
+dnl		ac_enable_included_opencdk=no)
+dnl if test x$ac_enable_included_opencdk = xno;then 
+dnl  AC_LIB_HAVE_LINKFLAGS(opencdk,, [
+dnl #include <opencdk.h>], [
+dnl #if OPENCDK_VERSION_MINOR < 6 || OPENCDK_VERSION_PATCH < 5
+dnl # error "OpenCDK 0.6.5 is required"
+dnl #else
+dnl cdk_check_version( NULL);
+dnl #endif
+dnl ])
+dnl  if test "$ac_cv_libopencdk" != yes; then
+dnl    ac_enable_included_opencdk=yes
+dnl    AC_MSG_WARN([[
+dnl ***
+dnl *** libopencdk was not found. You may want to get it from
+dnl *** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
+dnl ***
+dnl *** Will use the included opencdk.
+dnl ***
+dnl ]])
+dnl   fi
+dnl   AC_MSG_CHECKING([whether to use the included opencdk])
+dnl   AC_MSG_RESULT($ac_enable_included_opencdk)
+dnl  fi
+dnl fi
+
+ac_enable_included_opencdk=yes
 
 AM_CONDITIONAL(ENABLE_INCLUDED_OPENCDK, test "$ac_enable_included_opencdk" = "yes")
 
@@ -717,8 +719,8 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	tests/hostname-check/Makefile \
 	includes/Makefile includes/gnutls/gnutls.h \
 	lib/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
-	libextra/Makefile libextra/openpgp/Makefile libextra/opencdk/Makefile \
-	tests/openpgp/Makefile \
+	libextra/Makefile lib/openpgp/Makefile lib/opencdk/Makefile \
+	libextra/minilzo/Makefile tests/openpgp/Makefile \
 	src/Makefile \
 	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 	lib/libgnutls-config libextra/libgnutls-extra-config \

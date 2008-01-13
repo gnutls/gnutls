@@ -4,15 +4,20 @@
  *
  * This file is part of OpenCDK.
  *
- * OpenCDK is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * The OpenCDK library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * OpenCDK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
  */
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -345,7 +350,7 @@ _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk)
  * @hd: the session handle
  * @enc: the public key encrypted packet
  * @sk: the secret key.
- * 
+ *
  * Try to extract the DEK from the public key encrypted packet. 
  **/
 cdk_error_t

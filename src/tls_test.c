@@ -187,12 +187,6 @@ main (int argc, char **argv)
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
 
-  if (gnutls_global_init_extra () < 0)
-    {
-      fprintf (stderr, "global state initialization error\n");
-      exit (1);
-    }
-
   printf ("Resolving '%s'...\n", hostname);
   /* get server name */
   memset (&hints, 0, sizeof (hints));

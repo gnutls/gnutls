@@ -26,6 +26,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <gnutls/x509.h>
+#include <gnutls/openpgp.h>
 #include <time.h>
 #include "certtool-gaa.h"
 #include <gnutls/pkcs12.h>
@@ -55,6 +56,7 @@ gnutls_x509_privkey_t load_ca_private_key (void);
 gnutls_x509_crt_t load_ca_cert (void);
 gnutls_x509_crt_t load_cert (int mand);
 void certificate_info (void);
+void pgp_certificate_info (void);
 void crl_info (void);
 void privkey_info (void);
 static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
@@ -897,6 +899,9 @@ gaa_parser (int argc, char **argv)
     case 18:
       generate_pkcs8 ();
       break;
+    case 19:
+      pgp_certificate_info();
+      break;
     default:
       gaa_help ();
       exit (0);
@@ -957,6 +962,52 @@ certificate_info (void)
 	error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
       fwrite (buffer, 1, size, outfile);
     }
+}
+
+void
+pgp_certificate_info (void)
+{
+  gnutls_openpgp_crt_t crt;
+  size_t size;
+  int ret, i, count;
+  gnutls_datum_t pem, out_data;
+
+  pem.data = fread_file (infile, &size);
+  pem.size = size;
+ 
+  ret = gnutls_openpgp_crt_init( &crt);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "openpgp_crt_init: %s", gnutls_strerror (ret));
+
+  ret = gnutls_openpgp_crt_import (crt, &pem, info.incert_format);
+
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+
+  free (pem.data);
+
+  if (info.outcert_format == GNUTLS_OPENPGP_FMT_BASE64)
+    {
+      ret = gnutls_openpgp_crt_print (crt, 0, &out_data);
+
+      if (ret == 0)
+        {
+          fprintf (outfile, "%s\n", out_data.data);
+          gnutls_free (out_data.data);
+        }
+    }
+
+  size = sizeof (buffer);
+  ret = gnutls_openpgp_crt_export (crt, info.outcert_format, buffer,
+				    &size);
+  if (ret < 0) {
+    error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
+    fwrite (buffer, 1, size, outfile);
+  }
+
+  fprintf (outfile, "%s\n", buffer);
+
+  gnutls_openpgp_crt_deinit( crt);
 }
 
 static void

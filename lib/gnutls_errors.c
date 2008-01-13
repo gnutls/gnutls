@@ -208,6 +208,8 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_NO_CIPHER_SUITES, 1),
   ERROR_ENTRY (N_("Could not get OpenPGP key."),
 	       GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
+  ERROR_ENTRY (N_("Could not find OpenPGP subkey."),
+	       GNUTLS_E_OPENPGP_SUBKEY_ERROR, 1),
 
   ERROR_ENTRY (N_("The SRP username supplied is illegal."),
 	       GNUTLS_E_ILLEGAL_SRP_USERNAME, 1),

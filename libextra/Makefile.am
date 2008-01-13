@@ -22,7 +22,7 @@
 
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
-	-I$(top_srcdir)/lib/minitasn1 -I$(srcdir)/openpgp		\
+	-I$(top_srcdir)/lib/minitasn1 \
 	$(LIBGCRYPT_CFLAGS)
 
 if ENABLE_MINITASN1
@@ -32,14 +32,6 @@ AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 SUBDIRS = 
-
-if ENABLE_OPENPGP
-if ENABLE_INCLUDED_OPENCDK
-SUBDIRS += opencdk
-AM_CPPFLAGS += -I$(srcdir)/opencdk
-endif
-SUBDIRS += openpgp
-endif
 
 bin_SCRIPTS = libgnutls-extra-config
 
@@ -91,15 +83,6 @@ endif
 
 libgnutls_extra_la_LIBADD =
 libgnutls_extra_la_LDFLAGS = -no-undefined -L$(top_srcdir)/lib/.libs
-if ENABLE_OPENPGP
-libgnutls_extra_la_SOURCES += gnutls_openpgp.c
-libgnutls_extra_la_LIBADD += openpgp/libgnutls_openpgp.la
-if ENABLE_INCLUDED_OPENCDK
-libgnutls_extra_la_LIBADD += opencdk/libminiopencdk.la
-else
-libgnutls_extra_la_LDFLAGS += $(LTLIBOPENCDK) 
-endif
-endif
 
 # TLS/IA
 

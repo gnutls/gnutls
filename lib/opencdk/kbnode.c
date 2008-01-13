@@ -4,15 +4,20 @@
  *
  * This file is part of OpenCDK.
  *
- * OpenCDK is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * The OpenCDK library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * OpenCDK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
  */
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -31,7 +36,7 @@
  * cdk_kbnode_new:
  * @pkt: the packet to add
  *
- * Allocate a new key node and add the packet.
+ * Allocates a new key node and adds a packet.
  **/
 cdk_kbnode_t
 cdk_kbnode_new (cdk_packet_t pkt)
@@ -60,7 +65,7 @@ _cdk_kbnode_clone (cdk_kbnode_t node)
  * cdk_kbnode_release:
  * @n: the key node
  *
- * Release the memory of the node.
+ * Releases the memory of the node.
  **/
 void
 cdk_kbnode_release (cdk_kbnode_t node)
@@ -82,7 +87,7 @@ cdk_kbnode_release (cdk_kbnode_t node)
  * cdk_kbnode_delete:
  * @node: the key node
  *
- * Mark the given node as deleted.
+ * Marks the given node as deleted.
  **/
 void
 cdk_kbnode_delete (cdk_kbnode_t node)
@@ -110,7 +115,7 @@ _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node)
  * @node: the node to add
  * @pkttype: packet type
  *
- * Insert @node into the list after @root but before a packet which is not of
+ * Inserts @node into the list after @root but before a packet which is not of
  * type @pkttype (only if @pkttype != 0).
  **/
 void
@@ -145,7 +150,7 @@ cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node, int pkttype)
  * @node: the key node
  * @pkttype: packet type
  *
- * Find the previous node (if @pkttype = 0) or the previous node
+ * Finds the previous node (if @pkttype = 0) or the previous node
  * with pkttype @pkttype in the list starting with @root of @node.
  **/
 cdk_kbnode_t
@@ -202,7 +207,7 @@ cdk_kbnode_find_next (cdk_kbnode_t node, int pkttype)
  * @node: the key node
  * @pkttype: packet type
  *
- * Try to find the next node with the packettype @pkttype.
+ * Tries to find the next node with the packettype @pkttype.
  **/
 cdk_kbnode_t
 cdk_kbnode_find (cdk_kbnode_t node, int pkttype)
@@ -233,28 +238,30 @@ cdk_kbnode_find_packet (cdk_kbnode_t node, int pkttype)
 }
 
 
-/****************
- * Walk through a list of kbnodes. This function returns
+/**
+ * cdk_kbnode_walk:
+ * 
+ * Walks through a list of kbnodes. This function returns
  * the next kbnode for each call; before using the function the first
  * time, the caller must set CONTEXT to NULL (This has simply the effect
  * to start with ROOT).
  */
 cdk_kbnode_t
-cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t * context, int all)
+cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t *ctx, int all)
 {
   cdk_kbnode_t n;
   
   do 
     {
-      if(! *context ) 
+      if (! *ctx)
 	{
-	  *context = root;
+	  *ctx = root;
 	  n = root;
 	}
       else 
 	{
-	  n = (*context)->next;
-	  *context = n;
+	  n = (*ctx)->next;
+	  *ctx = n;
 	}
     }
   while (!all && n && n->is_deleted);
@@ -266,13 +273,13 @@ cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t * context, int all)
  * cdk_kbnode_commit:
  * @root: the nodes
  * 
- * Commit changes made to the kblist at ROOT. Note that ROOT my change,
+ * Commits changes made to the kblist at ROOT. Note that ROOT my change,
  * and it is therefore passed by reference.
  * The function has the effect of removing all nodes marked as deleted.
  * returns true if any node has been changed 
  */
 int
-cdk_kbnode_commit (cdk_kbnode_t * root)
+cdk_kbnode_commit (cdk_kbnode_t *root)
 {
   cdk_kbnode_t n, nl;
   int changed = 0;
@@ -302,7 +309,7 @@ cdk_kbnode_commit (cdk_kbnode_t * root)
  * @root: the root node
  * @node: the node to delete
  * 
- * Remove a node from the root node.
+ * Removes a node from the root node.
  */
 void
 cdk_kbnode_remove (cdk_kbnode_t *root, cdk_kbnode_t node)
@@ -334,7 +341,7 @@ cdk_kbnode_remove (cdk_kbnode_t *root, cdk_kbnode_t node)
  * @node: the node to move
  * @where: destination place where to move the node.
  * 
- * Move NODE behind right after WHERE or to the beginning if WHERE is NULL.
+ * Moves NODE behind right after WHERE or to the beginning if WHERE is NULL.
  */
 void
 cdk_kbnode_move (cdk_kbnode_t * root, cdk_kbnode_t node, cdk_kbnode_t where)
@@ -370,7 +377,7 @@ cdk_kbnode_move (cdk_kbnode_t * root, cdk_kbnode_t node, cdk_kbnode_t where)
  * cdk_kbnode_get_packet:
  * @node: the key node
  *
- * Return the packet which is stored inside the node in @node.
+ * Returns the packet which is stored inside the node in @node.
  **/
 cdk_packet_t
 cdk_kbnode_get_packet (cdk_kbnode_t node)
@@ -387,7 +394,7 @@ cdk_kbnode_get_packet (cdk_kbnode_t node)
  * @buf: the buffer which stores the key sequence
  * @buflen: the length of the buffer
  *
- * Try to read a key node from the memory buffer @buf.
+ * Tries to read a key node from the memory buffer @buf.
  **/
 cdk_error_t
 cdk_kbnode_read_from_mem (cdk_kbnode_t *ret_node,
@@ -396,10 +403,13 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t *ret_node,
   cdk_stream_t inp;
   cdk_error_t rc;
   
-  if (!buflen || !ret_node || !buf)
+  if (!ret_node || !buf)
     return CDK_Inv_Value;
   
   *ret_node = NULL;
+  if (!buflen)
+    return CDK_Too_Short;  
+  
   rc = cdk_stream_tmp_from_mem (buf, buflen, &inp);
   if (rc)
     return rc;
@@ -407,6 +417,7 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t *ret_node,
   cdk_stream_close (inp);
   return rc;
 }
+
 
 /**
  * cdk_kbnode_write_to_mem_alloc:
@@ -426,7 +437,7 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
   cdk_error_t rc;
   size_t len;
   
-  if (!node)
+  if (!node || !r_buf || !r_buflen)
     return CDK_Inv_Value;
   
   *r_buf = NULL;
@@ -470,7 +481,7 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
  * @buf: the buffer to store the node data
  * @r_nbytes: the new length of the buffer.
  *
- * Try to write the contents of the key node to the buffer @buf and
+ * Tries to write the contents of the key node to the buffer @buf and
  * return the length of it in @r_nbytes. If buf is zero, only the
  * length of the node is calculated and returned in @r_nbytes.
  * Whenever it is possible, the cdk_kbnode_write_to_mem_alloc should be used.
@@ -479,11 +490,11 @@ cdk_error_t
 cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
 {
   cdk_kbnode_t n;
-  cdk_stream_t s;
-  size_t len;
+  cdk_stream_t s;  
   cdk_error_t rc;
+  size_t len;
   
-  if (!node)
+  if (!node || !r_nbytes)
     return CDK_Inv_Value;
   
   rc = cdk_stream_tmp_new (&s);
@@ -518,7 +529,10 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
       return 0;
     }
   if (*r_nbytes < len)
-    rc = CDK_Too_Short;
+    { 
+      *r_nbytes = len;
+      rc = CDK_Too_Short;
+    }
   if (!rc)
     *r_nbytes = cdk_stream_read (s, buf, len);
   cdk_stream_close (s);
@@ -534,7 +548,7 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
  * @pkttype: packet type to hash (if zero use the packet type from the node)
  * @flags: flags which depend on the operation
  *
- * Hash the key node contents. Two modes are supported. If the packet
+ * Hashes the key node contents. Two modes are supported. If the packet
  * type is used (!= 0) then the function searches the first node with
  * this type. Otherwise the node is seen as a single node and the type
  * is extracted from it.

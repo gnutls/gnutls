@@ -4,15 +4,20 @@
  *
  * This file is part of OpenCDK.
  *
- * OpenCDK is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * The OpenCDK library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * OpenCDK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
  */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -600,14 +605,15 @@ _cdk_pk_algo_usage (int algo)
   return usage;  
 }
 
-
+/* You can use a NULL buf to get the output size only
+ */
 static cdk_error_t
 mpi_to_buffer (gcry_mpi_t a, byte *buf, size_t buflen,
 	       size_t *r_nwritten, size_t *r_nbits)
 {
   size_t nbits;
   
-  if (!a || !buf || !r_nwritten)
+  if (!a || !r_nwritten)
     return CDK_Inv_Value;
   
   nbits = gcry_mpi_get_nbits (a);
@@ -616,6 +622,7 @@ mpi_to_buffer (gcry_mpi_t a, byte *buf, size_t buflen,
   if ((nbits+7)/8+2 > buflen)
     return CDK_Too_Short;
   *r_nwritten = (nbits+7)/8+2;
+
   if (gcry_mpi_print (GCRYMPI_FMT_PGP, buf, buflen, r_nwritten, a))
     return CDK_Wrong_Format;
   return 0;

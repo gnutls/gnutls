@@ -37,6 +37,11 @@ extern "C"
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 
+  typedef struct 
+  {
+    unsigned char keyid[8];
+  } gnutls_openpgp_keyid_t;
+    
 /* gnutls_openpgp_cert_t should be defined in gnutls.h
  */
 
@@ -52,6 +57,10 @@ extern "C"
 				 gnutls_openpgp_crt_fmt_t format,
 				 void *output_data,
 				 size_t * output_data_size);
+
+  int gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
+		       gnutls_certificate_print_formats_t format,
+		       gnutls_datum_t *out);
 
 /* The key_usage flags are defined in gnutls.h. They are
  * the GNUTLS_KEY_* definitions.
@@ -74,10 +83,23 @@ extern "C"
   time_t gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key);
 
   int gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key,
-				 unsigned char keyid[8]);
+				 gnutls_openpgp_keyid_t* keyid);
 
   int gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
 					 const char *hostname);
+
+  int gnutls_openpgp_crt_get_revoked_status (gnutls_openpgp_crt_t key);
+
+  int gnutls_openpgp_crt_get_subkey_count (gnutls_openpgp_crt_t key);
+  int gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t keyid);
+  int gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key, unsigned int idx);
+  gnutls_pk_algorithm_t gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
+    unsigned int idx, unsigned int *bits);
+  time_t gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key, unsigned int idx);
+  time_t gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key, unsigned int idx);
+  int gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key, unsigned int idx, gnutls_openpgp_keyid_t* keyid);
+  int gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key, unsigned int idx,
+				  unsigned int *key_usage);
 
 /* privkey stuff.
  */
@@ -91,14 +113,33 @@ extern "C"
 				     gnutls_openpgp_crt_fmt_t format,
 				     const char *pass, unsigned int flags);
   int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
-					const gnutls_datum_t * hash,
-					gnutls_datum_t * signature);
+                                  gnutls_openpgp_keyid_t subkeyid,
+				  const gnutls_datum_t * hash,
+				  gnutls_datum_t * signature);
+  int gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
+				    void *fpr, size_t * fprlen);
+  int gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t* keyid);
+  int gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key);
+  int gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid);
+
+  int gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key, unsigned int idx);
+
+  int gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key);
+
+  gnutls_pk_algorithm_t gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
+    unsigned int idx, unsigned int *bits);
+
+  time_t gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key, unsigned int idx);
+
+  int gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int idx, gnutls_openpgp_keyid_t* keyid);
+
+  time_t gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key, unsigned int idx);
 
 /* Keyring stuff.
  */
   struct gnutls_openpgp_keyring_int;	/* object to hold (parsed) openpgp keyrings */
   typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
-
+  
   int gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring);
   void gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring);
 
@@ -107,7 +148,7 @@ extern "C"
 				     gnutls_openpgp_crt_fmt_t format);
 
   int gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
-				       const unsigned char keyid[8],
+				       gnutls_openpgp_keyid_t keyid,
 				       unsigned int flags);
 
 

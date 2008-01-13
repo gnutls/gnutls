@@ -22,9 +22,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
-#include <gnutls_openpgp.h>
 #include <gnutls_extra.h>
-#include <gnutls_extra_hooks.h>
 #include <gnutls_algorithms.h>
 #ifdef USE_LZO
 # ifdef USE_MINILZO
@@ -136,22 +134,6 @@ gnutls_global_init_extra (void)
       return ret;
     }
 #endif
-
-  /* Register the openpgp functions. This is because some
-   * of them are defined to be NULL in the main library.
-   */
-  _gnutls_add_openpgp_functions (_gnutls_openpgp_verify_key,
-				 _gnutls_openpgp_get_raw_key_creation_time,
-				 _gnutls_openpgp_get_raw_key_expiration_time,
-				 _gnutls_openpgp_fingerprint,
-				 _gnutls_openpgp_request_key,
-				 _gnutls_openpgp_raw_key_to_gcert,
-				 _gnutls_openpgp_raw_privkey_to_gkey,
-				 _gnutls_openpgp_crt_to_gcert,
-				 _gnutls_openpgp_privkey_to_gkey,
-				 gnutls_openpgp_crt_deinit,
-				 gnutls_openpgp_keyring_deinit,
-				 gnutls_openpgp_privkey_deinit);
 
   return 0;
 }

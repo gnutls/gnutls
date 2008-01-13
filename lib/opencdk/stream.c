@@ -3,15 +3,20 @@
  *
  * This file is part of OpenCDK.
  *
- * OpenCDK is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * The OpenCDK library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * OpenCDK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
  */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -53,7 +58,7 @@ FILE *my_tmpfile (void);
  * @file: The file to open
  * @ret_s: The new STREAM object
  * 
- * Create a new stream based on an existing file. The stream is
+ * Creates a new stream based on an existing file. The stream is
  * opened in read-only mode.
  **/
 cdk_error_t
@@ -137,9 +142,11 @@ cdk_stream_new_from_cbs (cdk_stream_cbs_t cbs, void *opa,
 
 
 /**
- * cdk_stream_new: Create a new stream into into the given file.
+ * cdk_stream_new: 
  * @file: The name of the new file
  * @ret_s: The new STREAM object
+ * 
+ * Create a new stream into into the given file.
  **/
 cdk_error_t
 cdk_stream_new (const char *file, cdk_stream_t *ret_s)
@@ -180,10 +187,11 @@ cdk_stream_new (const char *file, cdk_stream_t *ret_s)
 
 
 /**
- * cdk_stream_create: create a new stream.
+ * cdk_stream_create: 
  * @file: the filename
  * @ret_s: the object
  *
+ * Creates a new stream.
  * The difference to cdk_stream_new is, that no filtering can be used with
  * this kind of stream and everything is written directly to the stream.
  **/
@@ -225,7 +233,7 @@ cdk_stream_create (const char *file, cdk_stream_t *ret_s)
  * cdk_stream_tmp_new:
  * @r_out: the new temp stream.
  * 
- * Allocate a new tempory stream which is not associated with a file.
+ * Allocates a new tempory stream which is not associated with a file.
  */
 cdk_error_t
 cdk_stream_tmp_new (cdk_stream_t *r_out)
@@ -241,7 +249,7 @@ cdk_stream_tmp_new (cdk_stream_t *r_out)
  * @buflen: how large the buffer is
  * @r_out: the new stream with the given contents.
  * 
- * Create a new tempory stream with the given contests.
+ * Creates a new tempory stream with the given contests.
  */
 cdk_error_t
 cdk_stream_tmp_from_mem (const void *buf, size_t buflen, cdk_stream_t *r_out)
@@ -313,7 +321,7 @@ _cdk_stream_append (const char *file, cdk_stream_t *ret_s)
  * cdk_stream_is_compressed:
  * @s: the stream
  * 
- * Return 0 if the stream is uncompressed, otherwise the
+ * Returns 0 if the stream is uncompressed, otherwise the
  * compression algorithm.
  */
 int
@@ -614,18 +622,19 @@ stream_id_to_filter (int type)
     case fARMOR   : return _cdk_filter_armor;
     case fLITERAL : return _cdk_filter_literal;
     case fTEXT    : return _cdk_filter_text;
-    case fCIPHER  : return _cdk_filter_cipher;
-    case fCOMPRESS: return _cdk_filter_compress;
+/*    case fCIPHER  : return _cdk_filter_cipher; */
+/*    case fCOMPRESS: return _cdk_filter_compress; */
     default       : return NULL;
     }
 }
 
 
 /**
- * cdk_stream_filter_disable: Disable the filter with the type 'type'
+ * cdk_stream_filter_disable: 
  * @s: The STREAM object
  * @type: The numberic filter ID.
  *
+ * Disables the filter with the type 'type'.
  **/
 cdk_error_t
 cdk_stream_filter_disable (cdk_stream_t s, int type)
@@ -810,11 +819,12 @@ _cdk_stream_get_opaque (cdk_stream_t s, int fid)
 
 
 /**
- * cdk_stream_read: Try to read count bytes from the STREAM object.
+ * cdk_stream_read: 
  * @s: The STREAM object.
  * @buf: The buffer to insert the readed bytes.
  * @count: Request so much bytes.
  *
+ * Tries to read count bytes from the STREAM object.
  * When this function is called the first time, it can take a while
  * because all filters need to be processed. Please remember that you
  * need to add the filters in reserved order.
@@ -892,11 +902,12 @@ cdk_stream_getc (cdk_stream_t s)
 
 
 /**
- * cdk_stream_write: Try to write count bytes into the stream.
+ * cdk_stream_write: 
  * @s: The STREAM object
  * @buf: The buffer with the values to write.
  * @count: The size of the buffer.
  *
+ * Tries to write count bytes into the stream.
  * In this function we simply write the bytes to the stream. We can't
  * use the filters here because it would mean they have to support
  * partial flushing.
@@ -1108,6 +1119,8 @@ cdk_stream_set_cipher_flag (cdk_stream_t s, cdk_dek_t dek, int use_mdc)
   _cdk_log_debug ("stream: enable cipher mode\n");
   if (!s)
     return CDK_Inv_Value;
+
+#if 0
   f = filter_add (s, _cdk_filter_cipher, fCIPHER);
   if (!f)
     return CDK_Out_Of_Core;
@@ -1121,6 +1134,9 @@ cdk_stream_set_cipher_flag (cdk_stream_t s, cdk_dek_t dek, int use_mdc)
       f->u.cfx.blkmode.size = s->blkmode;
     }
   return 0;
+#endif
+
+  return CDK_Not_Implemented;
 }
 
 
@@ -1140,6 +1156,9 @@ cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
 {
   struct stream_filter_s *f;
   
+  return CDK_Not_Implemented;
+
+#if 0
   if (!s)
     return CDK_Inv_Value;
   f = filter_add (s, _cdk_filter_compress, fCOMPRESS);
@@ -1149,6 +1168,7 @@ cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
   f->u.zfx.algo = algo;
   f->u.zfx.level = level;
   return 0;
+#endif
 }
 
 
@@ -1207,7 +1227,7 @@ cdk_stream_set_hash_flag (cdk_stream_t s, int digest_algo)
  * @s: the stream object
  * @val: 1=on, 0=off
  *
- * Enable or disable the cache section of a stream object.
+ * Enables or disable the cache section of a stream object.
  **/
 cdk_error_t
 cdk_stream_enable_cache (cdk_stream_t s, int val)
@@ -1292,34 +1312,49 @@ cdk_stream_kick_off (cdk_stream_t inp, cdk_stream_t out)
  * @ret_buf: the buffer to store the content
  * @ret_buflen: length of the buffer
  *
- * Map the data of the given stream into a memory section. @ret_count
+ * Maps the data of the given stream into a memory section. @ret_count
  * contains the length of the buffer.
  **/
 cdk_error_t
 cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
 		      byte **ret_buf, size_t *ret_buflen)
 {
-  off_t oldpos;
-  int n;
   cdk_error_t rc;
+  off_t oldpos;
+  int n;  
   
-  if (!s || !ret_buf || !ret_buflen)
+  if (!ret_buf || !ret_buflen)
     return CDK_Inv_Value;
-  if (s->cbs_hd)
-    return CDK_Inv_Mode;
-  
-  *ret_buflen = 0;
   *ret_buf = NULL;
+  *ret_buflen = 0;
+  
+  if (!s)
+    return CDK_Inv_Value;
+  
+  /* Memory mapping is not supported on custom I/O objects. */
+  if (s->cbs_hd)
+    {
+      _cdk_log_debug ("cdk_stream_mmap_part: not supported on callbacks\n");
+      return CDK_Inv_Mode;
+    }  
+  
   oldpos = cdk_stream_tell (s);
   rc = cdk_stream_flush (s);
-  if (!rc)
-    rc = cdk_stream_seek (s, off);
+  if (rc)
+    return rc;
+  rc = cdk_stream_seek (s, off);
   if (rc)
     return rc;
   if (!len)
     len = cdk_stream_get_length (s);
-  if (!len || len > MAX_MAP_SIZE)
-    return 0;
+  if (!len)
+    {
+      _cdk_log_debug ("cdk_stream_mmap_part: invalid file size %lu\n", len);
+      return s->error;
+    }
+  if (len > MAX_MAP_SIZE)
+    return CDK_Too_Short;
+  
   *ret_buf = cdk_calloc (1, len+1);
   *ret_buflen = len;
   n = cdk_stream_read (s, *ret_buf, len);

@@ -55,6 +55,8 @@ option (password) STR "PASSWORD" { $pass = $1 } "Password to use."
 
 option (i, certificate-info) { $action = 2; } "Print information on a certificate."
 
+option (pgp-certificate-info) { $action = 19; } "Print information on a OpenPGP certificate."
+
 option (l, crl-info) { $action = 11; } "Print information on a CRL."
 
 option (p12-info) { $action = 9; } "Print information on a PKCS #12 structure."

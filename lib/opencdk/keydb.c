@@ -3,15 +3,20 @@
  *
  * This file is part of OpenCDK.
  *
- * OpenCDK is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * The OpenCDK library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * OpenCDK is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
  */
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -1499,12 +1504,20 @@ keydb_merge_selfsig (cdk_kbnode_t key, u32 *keyid)
       s = cdk_subpkt_find (sig->hashed, CDK_SIGSUBPKT_KEY_FLAGS);
       if (s) 
 	{
-	  if (s->d[0] & 0x03) /* cert + sign data */
-	    key_usage |= CDK_KEY_USG_SIGN;
-	  if (s->d[0] & 0x0C) /* encrypt comm. + storage */
-	    key_usage |= CDK_KEY_USG_ENCR;
+	  if (s->d[0] & 0x01) /* cert + sign data */
+	    key_usage |= CDK_KEY_USG_CERT_SIGN;
+	  if (s->d[0] & 0x02) /* cert + sign data */
+	    key_usage |= CDK_KEY_USG_DATA_SIGN;
+	  if (s->d[0] & 0x04) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_COMM_ENCR;
+	  if (s->d[0] & 0x08) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_STORAGE_ENCR;
+	  if (s->d[0] & 0x10) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_SPLIT_KEY;
 	  if (s->d[0] & 0x20)
 	    key_usage |= CDK_KEY_USG_AUTH;
+	  if (s->d[0] & 0x80) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_SHARED_KEY;
         }
       s = cdk_subpkt_find (sig->hashed, CDK_SIGSUBPKT_PREFS_SYM);
       if (s) 

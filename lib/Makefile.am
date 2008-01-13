@@ -25,15 +25,24 @@ if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
 
+
 localedir = $(datadir)/locale
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/includes -I../includes				\
 	-I$(srcdir)/x509						\
-	-I$(top_srcdir)/libextra -I$(top_srcdir)/libextra/openpgp/	\
-	-I$(top_srcdir)/libextra/opencdk 				\
+	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/openpgp/	\
+	-I$(top_srcdir)/lib/opencdk 				\
 	$(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
+
+if ENABLE_OPENPGP
+if ENABLE_INCLUDED_OPENCDK
+SUBDIRS += opencdk
+AM_CPPFLAGS += -I$(srcdir)/opencdk
+endif
+SUBDIRS += openpgp
+endif
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/minitasn1
@@ -75,7 +84,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	ext_max_record.c gnutls_alert.c gnutls_str.c gnutls_state.c	\
 	gnutls_x509.c ext_cert_type.c gnutls_rsa_export.c		\
 	auth_rsa_export.c ext_server_name.c auth_dh_common.c		\
-	gnutls_helper.c ext_inner_application.c gnutls_extra_hooks.c	\
+	gnutls_helper.c ext_inner_application.c \
 	gnutls_supplemental.c
 
 if ENABLE_OPRFI
@@ -96,7 +105,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
-	ext_inner_application.h gnutls_extra_hooks.h			\
+	ext_inner_application.h 			\
 	gnutls_supplemental.h ext_oprfi.h
 
 # Separate so we can create the documentation
@@ -109,6 +118,16 @@ libgnutls_la_LDFLAGS = -no-undefined \
 
 libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
 	@LTLIBZ@ $(LIBGCRYPT_LIBS) @LTLIBINTL@
+
+if ENABLE_OPENPGP
+libgnutls_la_SOURCES += gnutls_openpgp.c
+libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
+if ENABLE_INCLUDED_OPENCDK
+libgnutls_la_LIBADD += opencdk/libminiopencdk.la
+else
+libgnutls_la_LDFLAGS += $(LTLIBOPENCDK) 
+endif
+endif
 
 if HAVE_LD_VERSION_SCRIPT
 libgnutls_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutls.vers

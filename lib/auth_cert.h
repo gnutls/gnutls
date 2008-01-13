@@ -28,7 +28,7 @@
 # include "gnutls_auth.h"
 # include "auth_dh_common.h"
 # include "x509/x509.h"
-# include "../libextra/openpgp/openpgp.h"
+# include "openpgp/openpgp.h"
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates

@@ -837,12 +837,6 @@ main (int argc, char **argv)
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
 
-  if ((ret = gnutls_global_init_extra ()) < 0)
-    {
-      fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
-
   /* Note that servers must generate parameters for
    * Diffie Hellman. See gnutls_dh_params_generate(), and
    * gnutls_dh_params_set().
