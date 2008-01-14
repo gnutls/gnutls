@@ -280,6 +280,13 @@ extern "C"
     GNUTLS_X509_FMT_PEM
   } gnutls_x509_crt_fmt_t;
 
+  typedef enum gnutls_certificate_print_formats
+    {
+      GNUTLS_X509_CRT_FULL,
+      GNUTLS_X509_CRT_ONELINE,
+      GNUTLS_X509_CRT_UNSIGNED_FULL
+    } gnutls_certificate_print_formats_t;
+
   typedef enum
   {
     GNUTLS_PK_UNKNOWN = 0,
