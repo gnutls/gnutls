@@ -436,14 +436,14 @@ gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key)
 }
 
 /**
- * gnutls_openpgp_crt_get_id - Gets the keyID
+ * gnutls_openpgp_crt_get_key_id - Gets the keyID
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the buffer to save the keyid.
  *
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key, unsigned char keyid[8])
+gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key, unsigned char keyid[8])
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -470,6 +470,13 @@ gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key, unsigned char keyid[8])
 
   return 0;
 }
+
+int
+gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key, unsigned char keyid[8])
+{
+  return gnutls_openpgp_crt_get_key_id( key, keyid);
+}
+
 
 /**
   * gnutls_openpgp_crt_check_hostname - This function compares the given hostname with the hostname in the key
