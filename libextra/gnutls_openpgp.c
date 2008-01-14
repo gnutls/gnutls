@@ -210,8 +210,7 @@ _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
       goto leave;
     }
 
-  pkt = cdk_kbnode_find_packet (snode, CDK_PKT_SECRET_SUBKEY);
-  if (!pkt) pkt = cdk_kbnode_find_packet (snode, CDK_PKT_SECRET_KEY);
+  pkt = cdk_kbnode_find_packet (snode, CDK_PKT_SECRET_KEY);
   if (!pkt)
     {
       rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
@@ -286,8 +285,7 @@ _gnutls_openpgp_raw_key_to_gcert (gnutls_cert * cert,
 
   rc = cdk_kbnode_read_from_mem (&knode, raw->data, raw->size);
   if (!(rc = _gnutls_map_cdk_rc (rc))) {
-    pkt = cdk_kbnode_find_packet (knode, CDK_PKT_PUBLIC_SUBKEY);
-    if (!pkt) pkt = cdk_kbnode_find_packet (knode, CDK_PKT_PUBLIC_KEY);
+    pkt = cdk_kbnode_find_packet (knode, CDK_PKT_PUBLIC_KEY);
   }
   if (!pkt)
     {
