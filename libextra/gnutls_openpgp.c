@@ -82,7 +82,6 @@ _gnutls_map_cdk_rc (int rc)
     }
 }
 
-
 static unsigned long
 buftou32 (const uint8_t * buf)
 {
@@ -110,7 +109,10 @@ openpgp_pk_to_gnutls_cert (gnutls_cert * cert, cdk_pkt_pubkey_t pk)
 
   /* GnuTLS OpenPGP does not support ELG keys */
   if (is_ELG (pk->pubkey_algo))
-    return GNUTLS_E_UNWANTED_ALGORITHM;
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNWANTED_ALGORITHM;
+    }
 
   algo = is_DSA (pk->pubkey_algo) ? GNUTLS_PK_DSA : GNUTLS_PK_RSA;
   cert->subject_pk_algorithm = algo;
