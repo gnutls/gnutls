@@ -166,6 +166,7 @@ extern "C"
 
   int gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
 			   gnutls_openpgp_crt_fmt_t format,
+			   const char* password, unsigned int flags,
 			   void *output_data, size_t * output_data_size);
 
 /* Keyring stuff.

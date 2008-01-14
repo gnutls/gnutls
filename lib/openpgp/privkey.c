@@ -127,6 +127,8 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
   * gnutls_openpgp_privkey_export - This function will export a RAW or BASE64 encoded key
   * @key: Holds the key.
   * @format: One of gnutls_openpgp_crt_fmt_t elements.
+  * @password: the password that will be used to encrypt the key. 
+  * @flags: zero for future compatibility
   * @output_data: will contain the key base64 encoded or raw
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
@@ -140,8 +142,10 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 int
 gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
 			   gnutls_openpgp_crt_fmt_t format,
+			   const char* password, unsigned int flags,
 			   void *output_data, size_t * output_data_size)
 {
+  /* FIXME for now we do not export encrypted keys */
   return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size);
 }
 

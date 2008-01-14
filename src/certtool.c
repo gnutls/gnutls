@@ -1191,7 +1191,7 @@ pgp_privkey_info (void)
   size = sizeof (buffer);
   ret =
       gnutls_openpgp_privkey_export (key, GNUTLS_OPENPGP_FMT_BASE64,
-				     buffer, &size);
+				     NULL, 0, buffer, &size);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
 
