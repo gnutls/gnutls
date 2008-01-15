@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -96,8 +96,8 @@ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 ../lib/x509/x509-api.texi:
 	cd ../lib/x509 && make x509-api.texi
 
-../libextra/openpgp/pgp-api.texi:
-	cd ../libextra/openpgp && make pgp-api.texi
+../lib/openpgp/pgp-api.texi:
+	cd ../lib/openpgp && make pgp-api.texi
 
 ../libextra/ia-api.texi:
 	cd ../libextra && make ia-api.texi
@@ -111,8 +111,8 @@ gnutls-extra-api.texi: ../libextra/gnutls-extra-api.texi
 x509-api.texi: ../lib/x509/x509-api.texi
 	-$(srcdir)/scripts/sort2.pl < ../lib/x509/x509-api.texi > x509-api.texi
 
-pgp-api.texi: ../libextra/openpgp/pgp-api.texi
-	-$(srcdir)/scripts/sort2.pl < ../libextra/openpgp/pgp-api.texi > pgp-api.texi
+pgp-api.texi: ../lib/openpgp/pgp-api.texi
+	-$(srcdir)/scripts/sort2.pl < ../lib/openpgp/pgp-api.texi > pgp-api.texi
 
 ia-api.texi: ../libextra/ia-api.texi
 	-$(srcdir)/scripts/sort2.pl < ../libextra/ia-api.texi > ia-api.texi
