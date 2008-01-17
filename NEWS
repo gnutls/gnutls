@@ -6,6 +6,8 @@ See the end for copying conditions.
 * Version 2.2.1 (unreleased)
 
 ** Prevent linking libextra against previously installed libgnutls.
+Tiny patch from "Alon Bar-Lev" <alon.barlev@gmail.com>, see
+<http://bugs.gentoo.org/show_bug.cgi?id=202269>.
 
 ** Fixes the post_client_hello_function(). The extensions are now parsed
 in a callback friendly way.
