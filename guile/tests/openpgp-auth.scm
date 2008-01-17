@@ -1,5 +1,5 @@
 ;;; GNUTLS-EXTRA --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007  Free Software Foundation
+;;; Copyright (C) 2007, 2008  Free Software Foundation
 ;;;
 ;;; GNUTLS-EXTRA is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 (define %certs   (list certificate-type/openpgp))
 (define %ciphers (list cipher/null cipher/arcfour cipher/aes-128-cbc
                        cipher/aes-256-cbc))
-(define %kx      (list kx/rsa kx/rsa-export kx/dhe-dss kx/dhe-dss))
+(define %kx      (list kx/rsa kx/rsa-export kx/dhe-rsa kx/dhe-dss))
 (define %macs    (list mac/sha1 mac/rmd160 mac/md5))
 
 ;; Message sent by the client.
