@@ -36,9 +36,9 @@ AB_INIT
 # Interfaces changed/added/removed:   CURRENT++       REVISION=0
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
-AC_SUBST(LT_CURRENT, 27)
-AC_SUBST(LT_REVISION, 2)
-AC_SUBST(LT_AGE, 1)
+AC_SUBST(LT_CURRENT, 28)
+AC_SUBST(LT_REVISION, 0)
+AC_SUBST(LT_AGE, 2)
 ac_full=1
 
 # Used when creating the Windows libgnutls-XX.def files.
