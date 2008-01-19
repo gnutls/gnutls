@@ -279,6 +279,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/stdint.in.h
   lib/stdio.in.h
   lib/stdlib.in.h
+  lib/str-two-way.h
   lib/string.in.h
   lib/strverscmp.c
   lib/strverscmp.h

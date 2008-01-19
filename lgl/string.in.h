@@ -27,7 +27,7 @@
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5) || __STRICT_ANSI__
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
 #  define __attribute__(Spec) /* empty */
 # endif
 /* The attribute __pure__ was added in gcc 2.96.  */
@@ -58,8 +58,9 @@ extern void *memmem (void const *__haystack, size_t __haystack_len,
 #elif defined GNULIB_POSIXCHECK
 # undef memmem
 # define memmem(a,al,b,bl) \
-    (GL_LINK_WARNING ("memmem is unportable - " \
-                      "use gnulib module memmem for portability"), \
+    (GL_LINK_WARNING ("memmem is unportable and often quadratic - " \
+                      "use gnulib module memmem-simple for portability, " \
+                      "and module memmem for speed" ), \
      memmem (a, al, b, bl))
 #endif
 
@@ -289,26 +290,38 @@ extern char *strsep (char **restrict __stringp, char const *restrict __delim);
      strsep (s, d))
 #endif
 
-#if defined GNULIB_POSIXCHECK
+#if @GNULIB_STRSTR@
+# if @REPLACE_STRSTR@
+#  define strstr rpl_strstr
+char *strstr (const char *haystack, const char *needle)
+  __attribute__ ((__pure__));
+# endif
+#elif defined GNULIB_POSIXCHECK
 /* strstr() does not work with multibyte strings if the locale encoding is
    different from UTF-8:
    POSIX says that it operates on "strings", and "string" in POSIX is defined
    as a sequence of bytes, not of characters.  */
 # undef strstr
 # define strstr(a,b) \
-    (GL_LINK_WARNING ("strstr cannot work correctly on character strings " \
-                      "in most multibyte locales - " \
-                      "use mbsstr if you care about internationalization"), \
+    (GL_LINK_WARNING ("strstr is quadratic on many systems, and cannot " \
+                      "work correctly on character strings in most "    \
+                      "multibyte locales - " \
+                      "use mbsstr if you care about internationalization, " \
+                      "or use strstr if you care about speed"), \
      strstr (a, b))
 #endif
 
 /* Find the first occurrence of NEEDLE in HAYSTACK, using case-insensitive
    comparison.  */
-#if ! @HAVE_STRCASESTR@
+#if @GNULIB_STRCASESTR@
+# if @REPLACE_STRCASESTR@
+#  define strcasestr rpl_strcasestr
+# endif
+# if ! @HAVE_STRCASESTR@ || @REPLACE_STRCASESTR@
 extern char *strcasestr (const char *haystack, const char *needle)
   __attribute__ ((__pure__));
-#endif
-#if defined GNULIB_POSIXCHECK
+# endif
+#elif defined GNULIB_POSIXCHECK
 /* strcasestr() does not work with multibyte strings:
    It is a glibc extension, and glibc implements it only for unibyte
    locales.  */
@@ -530,6 +543,21 @@ extern char *strerror (int);
     (GL_LINK_WARNING ("strerror is unportable - " \
                       "use gnulib module strerror to guarantee non-NULL result"), \
      strerror (e))
+#endif
+
+#if @GNULIB_STRSIGNAL@
+# if @REPLACE_STRSIGNAL@
+#  define strsignal rpl_strsignal
+# endif
+# if ! @HAVE_DECL_STRSIGNAL@ || @REPLACE_STRSIGNAL@
+extern char *strsignal (int __sig);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef strsignal
+# define strsignal(a) \
+    (GL_LINK_WARNING ("strsignal is unportable - " \
+                      "use gnulib module strsignal for portability"), \
+     strsignal (a))
 #endif
 
 
