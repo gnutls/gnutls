@@ -42,7 +42,7 @@ $(APIMANS) $(SRPMANS):
 
 update-makefile:
 	FUNCS=`$(top_srcdir)/doc/scripts/gdoc -listfunc \
-		$(top_srcdir)/{lib,libextra,lib/x509,libextra/openpgp}/*.c`; \
+		$(top_srcdir)/{lib,libextra,lib/x509,lib/openpgp}/*.c`; \
 	MANS=""; \
 	SRPMANS=""; \
 	for i in $$FUNCS; do \
@@ -104,8 +104,8 @@ doit:
 			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
 		echo "ok"; \
 	done; \
-	for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/libextra/openpgp/*.c`; do \
-		echo -n "Creating man page in libextra/openpgp/ for $$i... " && \
+	for i in `$(top_srcdir)/doc/scripts/gdoc -listfunc $(top_srcdir)/lib/openpgp/*.c`; do \
+		echo -n "Creating man page in lib/openpgp/ for $$i... " && \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
@@ -113,7 +113,7 @@ doit:
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2008 Free Software Foundation" \
 			-function $$i \
-			$(top_srcdir)/libextra/openpgp/*.c >> $$i.3 && \
+			$(top_srcdir)/lib/openpgp/*.c >> $$i.3 && \
 		echo "ok"; \
 	done
 
