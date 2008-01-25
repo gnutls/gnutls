@@ -298,6 +298,7 @@ gnutls_openpgp_get_key (gnutls_datum_t * key,
   void *desc;
   size_t len;
   int rc = 0;
+  cdk_keydb_search_t st;
 
   if (!key || !keyring || by == KEY_ATTR_NONE)
     {
@@ -320,9 +321,12 @@ gnutls_openpgp_get_key (gnutls_datum_t * key,
     }
   else
     desc = pattern;
-  rc = cdk_keydb_search_start (keyring->db, by, desc);
+  rc = cdk_keydb_search_start (&st, keyring->db, by, desc);
   if (!rc)
-    rc = cdk_keydb_search (keyring->db, &knode);
+    rc = cdk_keydb_search (st, keyring->db, &knode);
+    
+  cdk_keydb_search_release( st);
+
   if (rc)
     {
       rc = _gnutls_map_cdk_rc (rc);

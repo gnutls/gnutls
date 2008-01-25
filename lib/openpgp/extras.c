@@ -19,16 +19,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Functions on OpenPGP keyring parsing
+/* Functions on keyring parsing
  */
 
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
+#include <openpgp.h>
 #include <gnutls_openpgp.h>
 #include <gnutls_num.h>
-#include <openpgp.h>
 
 /* Keyring stuff.
  */
@@ -37,7 +37,7 @@
  * gnutls_openpgp_keyring_init - This function initializes a gnutls_openpgp_keyring_t structure
  * @keyring: The structure to be initialized
  *
- * This function will initialize an OpenPGP keyring structure. 
+ * This function will initialize an keyring structure. 
  *
  * Returns 0 on success.
  *
@@ -116,7 +116,7 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 }
 
 /**
- * gnutls_openpgp_keyring_import - Import a raw- or Base64-encoded OpenPGP keyring
+ * gnutls_openpgp_keyring_import - Import a raw- or Base64-encoded keyring
  * @keyring: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded keyring.
  * @format: One of #gnutls_openpgp_keyring_fmt elements.
@@ -168,5 +168,111 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
     keyring->db_stream = input;
   
   return _gnutls_map_cdk_rc (err);
+}
+
+#define knode_is_pkey(node) \
+  cdk_kbnode_find_packet (node, CDK_PKT_PUBLIC_KEY)!=NULL
+
+/**
+  * gnutls_openpgp_keyring_get_crt_count - This function returns the number of certificates
+  * @ring: is an OpenPGP key ring
+  *
+  * This function will return the number of OpenPGP certificates present in the given 
+  * keyring.
+  *
+  * Returns then number of subkeys or a negative value on error.
+  *
+  **/
+int
+gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
+{
+  cdk_kbnode_t knode;
+  cdk_error_t err;
+  cdk_keydb_search_t st;
+  int ret = 0;
+  
+  err = cdk_keydb_search_start( &st, ring->db, CDK_DBSEARCH_NEXT, NULL);
+  if (err != CDK_Success) 
+    {
+      gnutls_assert();
+      return _gnutls_map_cdk_rc(err);
+    }
+
+  do { 
+    err = cdk_keydb_search( st, ring->db, &knode);
+    if (err != CDK_Error_No_Key && err != CDK_Success)
+      {
+        gnutls_assert();
+        cdk_keydb_search_release(st);
+        return _gnutls_map_cdk_rc(err);
+      }
+    
+    if (knode_is_pkey( knode))
+      ret++;
+
+    cdk_kbnode_release(knode);
+    
+  } while( err != CDK_Error_No_Key);
+
+  cdk_keydb_search_release(st);
+  return ret;
+}
+
+/**
+  * gnutls_openpgp_keyring_get_crt - This function will export an openpgp certificate from a keyring
+  * @key: Holds the key.
+  * @idx: the index of the certificate to export
+  * @crt: An uninitialized &gnutls_openpgp_crt_t structure
+  *
+  * This function will extract an OpenPGP certificate from the given keyring.
+  * If the index given is out of range GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be
+  * returned. The returned structure needs to be deinited.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int
+gnutls_openpgp_keyring_get_crt (gnutls_openpgp_keyring_t ring, unsigned int idx, 
+  gnutls_openpgp_crt_t* cert)
+{
+  cdk_kbnode_t knode;
+  cdk_error_t err;
+  int ret = 0;
+  cdk_keydb_search_t st;
+
+  err = cdk_keydb_search_start( &st, ring->db, CDK_DBSEARCH_NEXT, NULL);
+  if (err != CDK_Success) 
+    {
+      gnutls_assert();
+      return _gnutls_map_cdk_rc(err);
+    }
+  
+  do { 
+    err = cdk_keydb_search( st, ring->db, &knode);
+    if (err != CDK_EOF && err != CDK_Success)
+      {
+        gnutls_assert();
+        cdk_keydb_search_release(st);
+        return _gnutls_map_cdk_rc(err);
+      }
+    
+    if (idx == ret) 
+      {
+        ret = gnutls_openpgp_crt_init( cert);
+        if (ret == 0)
+          (*cert)->knode = knode;
+        cdk_keydb_search_release(st);
+        return ret;
+      }
+    
+    if (knode_is_pkey( knode))
+      ret++;
+
+    cdk_kbnode_release(knode);
+    
+  } while( err != CDK_EOF);
+
+  cdk_keydb_search_release(st);
+  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
