@@ -33,7 +33,7 @@
 #include "packet.h"
 #include "filters.h"
 #include "stream.h"
-
+#include "keydb.h"
 
 #define KEYID_CMP(a, b) ((a[0]) == (b[0]) && (a[1]) == (b[1]))
 #define KEYDB_CACHE_ENTRIES 8
@@ -777,6 +777,7 @@ keydb_search_copy (cdk_dbsearch_t *r_dst, cdk_dbsearch_t src)
 
 /**
  * cdk_keydb_search_start:
+ * @st: search handle
  * @db: key database handle
  * @type: specifies the search type
  * @desc: description which depends on the type
@@ -784,7 +785,7 @@ keydb_search_copy (cdk_dbsearch_t *r_dst, cdk_dbsearch_t src)
  * Create a new keydb search object.
  **/
 cdk_error_t
-cdk_keydb_search_start (cdk_keydb_hd_t db, int type, void *desc)
+cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, void *desc)
 {
   cdk_dbsearch_t dbs;
   u32 *keyid;
@@ -796,6 +797,10 @@ cdk_keydb_search_start (cdk_keydb_hd_t db, int type, void *desc)
   if (type != CDK_DBSEARCH_NEXT && !desc)
     return CDK_Inv_Mode;
   
+  *st = cdk_calloc (1, sizeof(cdk_keydb_search_s));
+  if (!(*st))
+    return CDK_Out_Of_Core;
+
   dbs = cdk_calloc (1, sizeof *dbs);
   if (!dbs)
     return CDK_Out_Of_Core;
@@ -946,9 +951,14 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
   return 0;
 }
 
+void cdk_keydb_search_release( cdk_keydb_search_t st)
+{
+  free( st);
+}
 
 /**
  * cdk_keydb_search:
+ * @st: the search handle
  * @hd: the keydb object
  * @ks: the keydb search object
  * @ret_key: kbnode object to store the key
@@ -957,7 +967,7 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
  * via @ks. If the key was found, @ret_key contains the key data.
  **/
 cdk_error_t
-cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
+cdk_keydb_search (cdk_keydb_search_t st, cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
 {
   cdk_stream_t kr;
   cdk_kbnode_t knode;
@@ -966,7 +976,7 @@ cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
   off_t pos = 0, off = 0;
   int key_found = 0, cache_hit = 0;  
   
-  if (!hd || !ret_key)
+  if (!hd || !ret_key || !st)
     return CDK_Inv_Value;
   
   *ret_key = NULL;
@@ -992,7 +1002,11 @@ cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
     {
       if (cache_hit && ks->type != CDK_DBSEARCH_NEXT)
 	cdk_stream_seek (kr, off);
+      else if ( ks->type == CDK_DBSEARCH_NEXT)
+        cdk_stream_seek (kr, st->off);
+
       pos = cdk_stream_tell (kr);
+
       rc = cdk_keydb_get_keyblock (kr, &knode);
       if (rc) 
 	{
@@ -1019,6 +1033,7 @@ cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
 	  break;
 	  
 	case CDK_DBSEARCH_NEXT:
+	  st->off = cdk_stream_tell (kr);
 	  key_found = knode? 1 : 0;
 	  break;
 	}
@@ -1043,18 +1058,20 @@ cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key)
   return rc;
 }
 
-
 cdk_error_t
 cdk_keydb_get_bykeyid (cdk_keydb_hd_t hd, u32 *keyid, cdk_kbnode_t *ret_key)
 {
   cdk_error_t rc;
+  cdk_keydb_search_t st;
   
   if (!hd || !keyid || !ret_key)
     return CDK_Inv_Value;
   
-  rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_KEYID, keyid);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_KEYID, keyid);
   if (!rc)
-    rc = cdk_keydb_search (hd, ret_key);
+    rc = cdk_keydb_search (st, hd, ret_key);
+  
+  cdk_keydb_search_release( st);
   return rc;
 }
 
@@ -1063,13 +1080,16 @@ cdk_error_t
 cdk_keydb_get_byfpr (cdk_keydb_hd_t hd, const byte *fpr, cdk_kbnode_t *r_key)
 {
   cdk_error_t rc;
-  
+  cdk_keydb_search_t st;
+
   if (!hd || !fpr || !r_key)
     return CDK_Inv_Value;
   
-  rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_FPR, (byte *)fpr);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_FPR, (byte *)fpr);
   if (!rc)
-    rc = cdk_keydb_search (hd, r_key);
+    rc = cdk_keydb_search (st, hd, r_key);
+  
+  cdk_keydb_search_release( st);
   return rc;
 }
 
@@ -1079,13 +1099,16 @@ cdk_keydb_get_bypattern (cdk_keydb_hd_t hd, const char *patt,
 			 cdk_kbnode_t * ret_key)
 {
   cdk_error_t rc;
-  
+  cdk_keydb_search_t st;
+
   if (!hd || !patt || !ret_key)
     return CDK_Inv_Value;
   
-  rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_SUBSTR, (char *)patt);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_SUBSTR, (char *)patt);
   if (!rc)
-    rc = cdk_keydb_search (hd, ret_key);
+    rc = cdk_keydb_search (st, hd, ret_key);
+  
+  cdk_keydb_search_release( st);
   return rc;
 }
 
@@ -1210,6 +1233,7 @@ _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char *name,
   cdk_error_t rc;
   const char *s;
   int pkttype;
+  cdk_keydb_search_t st;
 
   if (!ret_sk || !usage)
     return CDK_Inv_Value;
@@ -1217,14 +1241,16 @@ _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char *name,
     return CDK_Error_No_Keyring;
   
   *ret_sk = NULL;
-  rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_AUTO, (char *)name);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_AUTO, (char *)name);
   if (rc)
     return rc;
   
-  rc = cdk_keydb_search (hd, &knode);
+  rc = cdk_keydb_search (st, hd, &knode);
   if (rc)
     return rc;
 
+  cdk_keydb_search_release( st);
+  
   sk_node = keydb_find_byusage (knode, usage, 0);
   if (!sk_node)
     {
@@ -1278,6 +1304,7 @@ _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
   cdk_pkt_pubkey_t pk;
   const char *s;
   cdk_error_t rc;
+  cdk_keydb_search_t st;
 
   if (!ret_pk || !usage)
     return CDK_Inv_Value;
@@ -1285,11 +1312,13 @@ _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
     return CDK_Error_No_Keyring;
   
   *ret_pk = NULL;
-  rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_AUTO, (char *)name);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_AUTO, (char *)name);
   if (!rc)
-    rc = cdk_keydb_search (hd, &knode);
+    rc = cdk_keydb_search (st, hd, &knode);
   if (rc)
     return rc;
+  
+  cdk_keydb_search_release( st);
   
   node = keydb_find_byusage (knode, usage, 1);
   if (!node) 
@@ -1348,7 +1377,8 @@ cdk_keydb_get_pk (cdk_keydb_hd_t hd, u32 *keyid, cdk_pubkey_t *r_pk)
   cdk_error_t rc;
   size_t s_type;
   int pkttype;
-  
+  cdk_keydb_search_t st;
+
   if (!keyid || !r_pk)
     return CDK_Inv_Value;
   if (!hd)
@@ -1356,12 +1386,14 @@ cdk_keydb_get_pk (cdk_keydb_hd_t hd, u32 *keyid, cdk_pubkey_t *r_pk)
   
   *r_pk = NULL;
   s_type = !keyid[0]? CDK_DBSEARCH_SHORT_KEYID : CDK_DBSEARCH_KEYID;
-  rc = cdk_keydb_search_start (hd, s_type, keyid);
+  rc = cdk_keydb_search_start (&st, hd, s_type, keyid);
   if (rc)
     return rc;
-  rc = cdk_keydb_search (hd, &knode);
+  rc = cdk_keydb_search (st, hd, &knode);
   if (rc)
     return rc;
+  
+  cdk_keydb_search_release( st);
   
   node = keydb_find_bykeyid (knode, keyid, s_type);
   if (!node) 
@@ -1929,15 +1961,19 @@ cdk_keydb_export (cdk_keydb_hd_t hd, cdk_stream_t out, cdk_strlist_t remusr)
   cdk_strlist_t r;
   cdk_error_t rc;
   int old_ctb;
-  
+  cdk_keydb_search_t st;
+
   for (r = remusr; r; r = r->next)
     {
-      rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_AUTO, r->d);
+      rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_AUTO, r->d);
       if (rc)
 	return rc;
-      rc = cdk_keydb_search (hd, &knode);
+      rc = cdk_keydb_search (st, hd, &knode);
+      cdk_keydb_search_release( st);
+      
       if (rc)
 	return rc;
+
       node = cdk_kbnode_find (knode, CDK_PKT_PUBLIC_KEY);
       if (!node)
 	return CDK_Error_No_Key;
@@ -2096,20 +2132,26 @@ _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 *keyid, const char *id)
   cdk_kbnode_t knode = NULL, unode = NULL; 
   cdk_error_t rc;
   int check;
-    
+  cdk_keydb_search_t st;
+
   if (!hd)
     return CDK_Inv_Value;
   
-  rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_KEYID, keyid);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_KEYID, keyid);
   if (rc)
     return rc;
-  rc = cdk_keydb_search (hd, &knode);
+  rc = cdk_keydb_search (st, hd, &knode);
+  cdk_keydb_search_release( st);
+  
   if (rc)
     return rc;
 
-  rc = cdk_keydb_search_start (hd, CDK_DBSEARCH_EXACT, (char *)id);
-  if (!rc)
-    rc = cdk_keydb_search (hd, &unode);
+  rc = cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_EXACT, (char *)id);
+  if (!rc) 
+    {
+      rc = cdk_keydb_search (st, hd, &unode);
+      cdk_keydb_search_release( st);
+    }
   if (rc)
     {
       cdk_kbnode_release (knode);
@@ -2117,14 +2159,16 @@ _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 *keyid, const char *id)
     }
  
   check = 0;
-  cdk_keydb_search_start (hd, CDK_DBSEARCH_KEYID, keyid);
+  cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_KEYID, keyid);
   if (unode && find_by_keyid (unode, hd->dbs))
     check++;
+  cdk_keydb_search_release( st);
   cdk_kbnode_release (unode);
   
-  cdk_keydb_search_start (hd, CDK_DBSEARCH_EXACT, (char *)id);
+  cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_EXACT, (char *)id);
   if (knode && find_by_pattern (knode, hd->dbs))
     check++;
+  cdk_keydb_search_release( st);
   cdk_kbnode_release (knode);
   
   return check==2 ? 0 : CDK_Inv_Value;

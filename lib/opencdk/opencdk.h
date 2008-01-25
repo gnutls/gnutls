@@ -76,6 +76,9 @@ typedef struct cdk_kbnode_s *cdk_kbnode_t;
 struct cdk_keydb_hd_s;
 typedef struct cdk_keydb_hd_s *cdk_keydb_hd_t;
 
+struct cdk_keydb_search_s;
+typedef struct cdk_keydb_search_s *cdk_keydb_search_t;
+
 /* Context to store a list of recipient keys. */
 struct cdk_keylist_s;
 typedef struct cdk_keylist_s *cdk_keylist_t;
@@ -960,11 +963,13 @@ cdk_error_t cdk_keydb_new_from_stream (cdk_keydb_hd_t *r_hd, int secret,
 cdk_error_t cdk_keydb_check_sk (cdk_keydb_hd_t hd, unsigned int *keyid);
 
 /* Prepare the key db search. */
-cdk_error_t cdk_keydb_search_start (cdk_keydb_hd_t hd, int type, void *desc);
+cdk_error_t cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, void *desc);
+
+void cdk_keydb_search_release( cdk_keydb_search_t st);
 
 /* Return a key which matches a valid description given in 
    cdk_keydb_search_start(). */
-cdk_error_t cdk_keydb_search (cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key);
+cdk_error_t cdk_keydb_search (cdk_keydb_search_t st, cdk_keydb_hd_t hd, cdk_kbnode_t *ret_key);
 
 /* Release the key db handle and all its resources. */
 void cdk_keydb_free (cdk_keydb_hd_t hd);
