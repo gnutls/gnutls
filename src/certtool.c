@@ -51,6 +51,7 @@ void generate_pkcs8 (void);
 void verify_chain (void);
 void verify_crl (void);
 void pgp_privkey_info (void);
+void pgp_ring_info (void);
 gnutls_x509_privkey_t load_private_key (int mand);
 gnutls_x509_crq_t load_request (void);
 gnutls_x509_privkey_t load_ca_private_key (void);
@@ -121,7 +122,8 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
   return buf;
 }
 
-void print_dsa_pkey (gnutls_datum * x, gnutls_datum * y, gnutls_datum * p,
+void
+print_dsa_pkey (gnutls_datum * x, gnutls_datum * y, gnutls_datum * p,
 		gnutls_datum * q, gnutls_datum * g)
 {
   fprintf (outfile, "private key:");
@@ -136,7 +138,8 @@ void print_dsa_pkey (gnutls_datum * x, gnutls_datum * y, gnutls_datum * p,
   print_hex_datum (g);
 }
 
-void print_rsa_pkey (gnutls_datum * m, gnutls_datum * e, gnutls_datum * d,
+void
+print_rsa_pkey (gnutls_datum * m, gnutls_datum * e, gnutls_datum * d,
 		gnutls_datum * p, gnutls_datum * q, gnutls_datum * u)
 {
   fprintf (outfile, "modulus:");
@@ -956,6 +959,9 @@ gaa_parser (int argc, char **argv)
     case 20:
       pgp_privkey_info ();
       break;
+    case 21:
+      pgp_ring_info ();
+      break;
 #endif
     default:
       gaa_help ();
@@ -1197,6 +1203,63 @@ pgp_privkey_info (void)
 
   fprintf (outfile, "\n%s\n", buffer);
 }
+
+void
+pgp_ring_info (void)
+{
+  gnutls_openpgp_keyring_t ring;
+  gnutls_openpgp_crt_t crt;
+  size_t size;
+  int ret, i, count;
+  gnutls_datum_t pem, out_data;
+
+  pem.data = fread_file (infile, &size);
+  pem.size = size;
+
+  ret = gnutls_openpgp_keyring_init (&ring);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "openpgp_keyring_init: %s",
+	   gnutls_strerror (ret));
+
+  ret = gnutls_openpgp_keyring_import (ring, &pem, info.incert_format);
+
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+
+  free (pem.data);
+
+  count = gnutls_openpgp_keyring_get_crt_count (ring);
+  if (count > 0)
+    fprintf (outfile, "Keyring contains %d OpenPGP certificates\n\n",
+	     count);
+  else
+    error (EXIT_FAILURE, 0, "Keyring error: %s", gnutls_strerror (count));
+
+  for (i = 0; i < count; i++)
+    {
+      ret = gnutls_openpgp_keyring_get_crt (ring, i, &crt);
+
+      size = sizeof (buffer);
+      ret =
+	  gnutls_openpgp_crt_export (crt, info.outcert_format, buffer,
+				     &size);
+      if (ret < 0)
+	{
+	  error (EXIT_FAILURE, 0, "Export error: %s",
+		 gnutls_strerror (ret));
+	  fwrite (buffer, 1, size, outfile);
+	}
+
+      fprintf (outfile, "%s\n\n", buffer);
+
+      gnutls_openpgp_crt_deinit (crt);
+
+
+    }
+
+  gnutls_openpgp_keyring_deinit (ring);
+}
+
 
 #endif
 
