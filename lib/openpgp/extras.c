@@ -48,7 +48,7 @@ gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring)
   *keyring = gnutls_calloc (1, sizeof (gnutls_openpgp_keyring_int));
 
   if (*keyring)
-    return 0; /* success */
+    return 0;			/* success */
   return GNUTLS_E_MEMORY_ERROR;
 }
 
@@ -71,14 +71,6 @@ gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
       cdk_keydb_free (keyring->db);
       keyring->db = NULL;
     }
-  
-  /* In some cases the stream is also stored outside the keydb context
-     and we need to close it here then. */
-  if (keyring->db_stream)
-    {
-      cdk_stream_close (keyring->db_stream);
-      keyring->db_stream = NULL;
-    }  
 
   gnutls_free (keyring);
 }
@@ -110,8 +102,8 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
       cdk_pk_release (pk);
       return 0;
     }
-  
-  _gnutls_debug_log ("PGP: key not found %08lX\n", (unsigned long)id[1]);
+
+  _gnutls_debug_log ("PGP: key not found %08lX\n", (unsigned long) id[1]);
   return GNUTLS_E_NO_CERTIFICATE_FOUND;
 }
 
@@ -130,44 +122,88 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
  **/
 int
 gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
-			       const gnutls_datum_t *data,
+			       const gnutls_datum_t * data,
 			       gnutls_openpgp_crt_fmt_t format)
 {
   cdk_error_t err;
-  cdk_stream_t input;
-  
+  cdk_stream_t input = NULL;
+  size_t raw_len = 0, i;
+  opaque *raw_data = NULL;
+
   _gnutls_debug_log ("PGP: keyring import format '%s'\n",
-		     format == GNUTLS_OPENPGP_FMT_RAW? "raw" : "base64");
-  
-  if (format == GNUTLS_OPENPGP_FMT_RAW)
+		     format == GNUTLS_OPENPGP_FMT_RAW ? "raw" : "base64");
+
+  /* Create a new stream from the given data, decode it, and import
+   * the raw database. This to avoid using opencdk streams which are
+   * not thread safe.
+   */
+  if (format == GNUTLS_OPENPGP_FMT_BASE64)
     {
-      err = cdk_keydb_new (&keyring->db, CDK_DBTYPE_DATA,
-			   data->data, data->size);
+      err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
+      if (!err)
+	err = cdk_stream_set_armor_flag (input, 0);
       if (err)
-	gnutls_assert ();
-      return _gnutls_map_cdk_rc (err);
+	{
+	  gnutls_assert ();
+	  err = _gnutls_map_cdk_rc (err);
+	  goto error;
+	}
+
+      raw_len = cdk_stream_get_length (input);
+      if (raw_len == 0)
+	{
+	  gnutls_assert ();
+	  err = GNUTLS_E_BASE64_DECODING_ERROR;
+	  goto error;
+	}
+
+      raw_data = gnutls_malloc (raw_len);
+      if (raw_data == NULL)
+	{
+	  gnutls_assert ();
+	  err = GNUTLS_E_MEMORY_ERROR;
+	  goto error;
+	}
+
+#if 0
+      i = 0;
+      do {
+          err = cdk_stream_getc( input);
+          if (err != EOF) raw_data[i++] = err;
+      } while( err != EOF);
+
+      raw_len = i;
+#else
+      ssize_t written=0;
+      do 
+        {
+          err = cdk_stream_read (input, raw_data+written, raw_len-written);
+
+          if (err > 0) written += err;
+        }
+      while( written < raw_len && err != EOF && err > 0);
+      
+      raw_len = written;
+#endif
+      
     }
-  
-  /* Create a new stream from the given data, which means to
-     allocate a new stream and to write the data in the stream.
-     Then push the armor filter to decode the data and to store
-     it in the raw format. */
-  err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
-  if (!err)
-    err = cdk_stream_set_armor_flag (input, 0);
-  if (!err)
-    err = cdk_keydb_new_from_stream (&keyring->db, 0, input);  
+  else
+    {				/* RAW */
+      raw_len = data->size;
+      raw_data = data->data;
+    }
+
+  err = cdk_keydb_new (&keyring->db, CDK_DBTYPE_DATA, raw_data, raw_len);
   if (err)
-    {
-      cdk_stream_close (input);
-      gnutls_assert ();
-    }
-  else 
-    /* The keydb function will not close the stream itself, so we need to
-       store it separately to close it later. */
-    keyring->db_stream = input;
-  
+    gnutls_assert ();
+
   return _gnutls_map_cdk_rc (err);
+
+error:
+  gnutls_free (raw_data);
+  cdk_stream_close (input);
+
+  return err;
 }
 
 #define knode_is_pkey(node) \
@@ -190,31 +226,33 @@ gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
   cdk_error_t err;
   cdk_keydb_search_t st;
   int ret = 0;
-  
-  err = cdk_keydb_search_start( &st, ring->db, CDK_DBSEARCH_NEXT, NULL);
-  if (err != CDK_Success) 
+
+  err = cdk_keydb_search_start (&st, ring->db, CDK_DBSEARCH_NEXT, NULL);
+  if (err != CDK_Success)
     {
-      gnutls_assert();
-      return _gnutls_map_cdk_rc(err);
+      gnutls_assert ();
+      return _gnutls_map_cdk_rc (err);
     }
 
-  do { 
-    err = cdk_keydb_search( st, ring->db, &knode);
-    if (err != CDK_Error_No_Key && err != CDK_Success)
-      {
-        gnutls_assert();
-        cdk_keydb_search_release(st);
-        return _gnutls_map_cdk_rc(err);
-      }
-    
-    if (knode_is_pkey( knode))
-      ret++;
+  do
+    {
+      err = cdk_keydb_search (st, ring->db, &knode);
+      if (err != CDK_Error_No_Key && err != CDK_Success)
+	{
+	  gnutls_assert ();
+	  cdk_keydb_search_release (st);
+	  return _gnutls_map_cdk_rc (err);
+	}
 
-    cdk_kbnode_release(knode);
-    
-  } while( err != CDK_Error_No_Key);
+      if (knode_is_pkey (knode))
+	ret++;
 
-  cdk_keydb_search_release(st);
+      cdk_kbnode_release (knode);
+
+    }
+  while (err != CDK_Error_No_Key);
+
+  cdk_keydb_search_release (st);
   return ret;
 }
 
@@ -232,47 +270,49 @@ gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
   *
   **/
 int
-gnutls_openpgp_keyring_get_crt (gnutls_openpgp_keyring_t ring, unsigned int idx, 
-  gnutls_openpgp_crt_t* cert)
+gnutls_openpgp_keyring_get_crt (gnutls_openpgp_keyring_t ring,
+				unsigned int idx,
+				gnutls_openpgp_crt_t * cert)
 {
   cdk_kbnode_t knode;
   cdk_error_t err;
-  int ret = 0;
+  int ret = 0, count = 0;
   cdk_keydb_search_t st;
 
-  err = cdk_keydb_search_start( &st, ring->db, CDK_DBSEARCH_NEXT, NULL);
-  if (err != CDK_Success) 
+  err = cdk_keydb_search_start (&st, ring->db, CDK_DBSEARCH_NEXT, NULL);
+  if (err != CDK_Success)
     {
-      gnutls_assert();
-      return _gnutls_map_cdk_rc(err);
+      gnutls_assert ();
+      return _gnutls_map_cdk_rc (err);
     }
-  
-  do { 
-    err = cdk_keydb_search( st, ring->db, &knode);
-    if (err != CDK_EOF && err != CDK_Success)
-      {
-        gnutls_assert();
-        cdk_keydb_search_release(st);
-        return _gnutls_map_cdk_rc(err);
-      }
-    
-    if (idx == ret) 
-      {
-        ret = gnutls_openpgp_crt_init( cert);
-        if (ret == 0)
-          (*cert)->knode = knode;
-        cdk_keydb_search_release(st);
-        return ret;
-      }
-    
-    if (knode_is_pkey( knode))
-      ret++;
 
-    cdk_kbnode_release(knode);
-    
-  } while( err != CDK_EOF);
+  do
+    {
+      err = cdk_keydb_search (st, ring->db, &knode);
+      if (err != CDK_EOF && err != CDK_Success)
+	{
+	  gnutls_assert ();
+	  cdk_keydb_search_release (st);
+	  return _gnutls_map_cdk_rc (err);
+	}
 
-  cdk_keydb_search_release(st);
+      if (idx == count && err == CDK_Success)
+	{
+	  ret = gnutls_openpgp_crt_init (cert);
+	  if (ret == 0)
+	    (*cert)->knode = knode;
+	  cdk_keydb_search_release (st);
+	  return ret;
+	}
+
+      if (knode_is_pkey (knode))
+	count++;
+
+      cdk_kbnode_release (knode);
+
+    }
+  while (err != CDK_EOF);
+
+  cdk_keydb_search_release (st);
   return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
-

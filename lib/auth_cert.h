@@ -64,12 +64,7 @@ typedef struct gnutls_certificate_credentials_st
 
   /* OpenPGP specific stuff */
 
-#ifndef KEYRING_HACK
   gnutls_openpgp_keyring_t keyring;
-#else
-  gnutls_datum_t keyring;
-  int keyring_format;
-#endif
 
   /* X509 specific stuff */
 

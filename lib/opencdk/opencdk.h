@@ -996,7 +996,7 @@ cdk_error_t cdk_keydb_get_sk (cdk_keydb_hd_t khd, unsigned int * keyid,
 cdk_error_t cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t * ret_key);
 
 /* Rebuild the key db index if possible. */
-cdk_error_t cdk_keydb_idx_rebuild (cdk_keydb_hd_t hd);
+cdk_error_t cdk_keydb_idx_rebuild (cdk_keydb_hd_t db, cdk_keydb_search_t dbs);
 
 /* Export one or more keys from the given key db handle into
    the stream @OUT. The export is done by substring search and

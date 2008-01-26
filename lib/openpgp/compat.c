@@ -70,7 +70,6 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
       goto leave;
     }
 
-#ifndef KEYRING_HACK
   if (cred->keyring != NULL)
     {
       ret = gnutls_openpgp_crt_verify_ring (key, cred->keyring, 0, &verify);
@@ -80,33 +79,6 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 	  goto leave;
 	}
     }
-#else
-  {
-  gnutls_openpgp_keyring_t kring;
-  
-  ret = gnutls_openpgp_keyring_init( &kring);
-  if ( ret < 0) {
-    gnutls_assert();
-    return ret;
-  }
-
-  ret = gnutls_openpgp_keyring_import( kring, &cred->keyring, cred->keyring_format);
-  if ( ret < 0) {
-    gnutls_assert();
-    gnutls_openpgp_keyring_deinit( kring);
-    return ret;
-  }
-
-  ret = gnutls_openpgp_crt_verify_ring (key, kring, 0, &verify);
-  if (ret < 0)
-  {
-    gnutls_assert ();
-    gnutls_openpgp_keyring_deinit( kring);
-    return ret;
-  }
-  gnutls_openpgp_keyring_deinit( kring);
-  }
-#endif
 
   /* Now try the self signature. */
   ret = gnutls_openpgp_crt_verify_self (key, 0, &verify_self);
@@ -118,14 +90,9 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
 
   *status = verify_self | verify;
 
-#ifndef KEYRING_HACK
   /* If we only checked the self signature. */
   if (!cred->keyring)
-#else
-  if (!cred->keyring.data || !cred->keyring.size)
-#endif
     *status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
-
 
   ret = 0;
 

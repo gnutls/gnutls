@@ -194,12 +194,8 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 #endif
 
 #ifdef ENABLE_OPENPGP
-#ifndef KEYRING_HACK
   if (_E_gnutls_openpgp_keyring_deinit)
     _E_gnutls_openpgp_keyring_deinit( sc->keyring);
-#else
-  _gnutls_free_datum( &sc->keyring);
-#endif
 #endif
 
   gnutls_free (sc);

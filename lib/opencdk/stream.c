@@ -43,6 +43,7 @@
 static int stream_flush (cdk_stream_t s);
 static int stream_filter_write (cdk_stream_t s);
 static int stream_cache_flush (cdk_stream_t s, FILE *fp);
+struct stream_filter_s* filter_add (cdk_stream_t s, filter_fnct_t fnc, int type);
 
 /* Customized tmpfile() version from misc.c */
 FILE *my_tmpfile (void);
@@ -146,7 +147,7 @@ cdk_stream_new_from_cbs (cdk_stream_cbs_t cbs, void *opa,
  * @file: The name of the new file
  * @ret_s: The new STREAM object
  * 
- * Create a new stream into into the given file.
+ * Create a new stream into the given file.
  **/
 cdk_error_t
 cdk_stream_new (const char *file, cdk_stream_t *ret_s)
@@ -184,7 +185,6 @@ cdk_stream_new (const char *file, cdk_stream_t *ret_s)
   *ret_s = s;
   return 0;
 }
-
 
 /**
  * cdk_stream_create: 
@@ -569,6 +569,21 @@ filter_search (cdk_stream_t s, filter_fnct_t fnc)
   return NULL;
 }
 
+static inline
+void set_opaque( struct stream_filter_s* f)
+{
+  switch (f->type) 
+    {    
+    case fARMOR   : f->opaque = &f->u.afx; break;
+    case fCIPHER  : f->opaque = &f->u.cfx; break;
+    case fLITERAL : f->opaque = &f->u.pfx; break;
+    case fCOMPRESS: f->opaque = &f->u.zfx; break;
+    case fHASH    : f->opaque = &f->u.mfx; break;
+    case fTEXT    : f->opaque = &f->u.tfx; break;
+    default       : f->opaque = NULL;
+    }
+
+}
 
 struct stream_filter_s*
 filter_add (cdk_stream_t s, filter_fnct_t fnc, int type)
@@ -588,20 +603,11 @@ filter_add (cdk_stream_t s, filter_fnct_t fnc, int type)
   f->flags.enabled = 1;
   f->tmp = NULL;
   f->type = type;
-  switch (type) 
-    {    
-    case fARMOR   : f->opaque = &f->u.afx; break;
-    case fCIPHER  : f->opaque = &f->u.cfx; break;
-    case fLITERAL : f->opaque = &f->u.pfx; break;
-    case fCOMPRESS: f->opaque = &f->u.zfx; break;
-    case fHASH    : f->opaque = &f->u.mfx; break;
-    case fTEXT    : f->opaque = &f->u.tfx; break;
-    default       : f->opaque = NULL;
-    }
-  
+
+  set_opaque(f);
+
   return f;
 }
-
 
 static int
 stream_get_mode (cdk_stream_t s)
@@ -866,11 +872,14 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
 	}
       s->flags.filtrated = 1;
     }
+
   if (!buf && !buflen)
     return 0;
+
   nread = fread (buf, 1, buflen, s->fp);
   if (!nread)
     nread = EOF;
+
   if (feof (s->fp))
     {
       s->error = 0;

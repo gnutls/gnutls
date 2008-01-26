@@ -598,7 +598,6 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
 					    c, const opaque * data,
 					    size_t dlen, gnutls_openpgp_crt_fmt_t format)
 {
-#ifndef KEYRING_HACK
   cdk_stream_t inp;
   size_t count;
   uint8_t *buf;
@@ -628,21 +627,6 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
   }
   
   return 0;
-#else
-
-  c->keyring_format = format;
-
-  c->keyring.data = gnutls_malloc( dlen+1);
-  if (c->keyring.data == NULL)
-  {
-    gnutls_assert();
-    return GNUTLS_E_MEMORY_ERROR;
-  }
-  memcpy(c->keyring.data, data, dlen);
-  c->keyring.data[dlen]=0;
-  c->keyring.size = dlen;
-
-#endif
 }
 
 /*-
@@ -662,9 +646,6 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
 			     opaque * key_fpr, int key_fpr_size)
 {
   int rc = 0;
-#ifdef KEYRING_HACK
-  gnutls_openpgp_keyring_t kring;
-#endif
 
   if (!ret || !cred || !key_fpr)
     {
@@ -675,22 +656,8 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
   if (key_fpr_size != 16 && key_fpr_size != 20)
     return GNUTLS_E_HASH_FAILED; /* only MD5 and SHA1 are supported */
 
-#ifndef KEYRING_HACK
   rc = gnutls_openpgp_get_key (ret, cred->keyring, KEY_ATTR_FPR, key_fpr);
-#else
-  rc = gnutls_openpgp_keyring_init( &kring);
-  if ( rc < 0) {
-    gnutls_assert();
-    return rc;
-  }
-  
-  rc = gnutls_openpgp_keyring_import( kring, &cred->keyring, cred->keyring_format);
-  if ( rc < 0) {
-    gnutls_assert();
-    gnutls_openpgp_keyring_deinit( kring);
-    return rc;
-  }
-#endif
+
   if (rc >= 0) /* key was found */
     {
       rc = 0;
@@ -714,9 +681,7 @@ _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
     }
 
   error:
-#ifdef KEYRING_HACK
-  gnutls_openpgp_keyring_deinit( kring);
-#endif
+
   return rc;
 }
 

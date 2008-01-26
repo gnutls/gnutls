@@ -38,69 +38,10 @@
 #define KEYID_CMP(a, b) ((a[0]) == (b[0]) && (a[1]) == (b[1]))
 #define KEYDB_CACHE_ENTRIES 8
 
-
-/* Internal key index structure. */
-struct key_idx_s 
-{
-  off_t offset;
-  u32 keyid[2];
-  byte fpr[KEY_FPR_LEN];
-};
-typedef struct key_idx_s *key_idx_t;
-
-
-/* Internal handle for the search operation. */
-struct cdk_dbsearch_s  
-{
-  union 
-    {    
-      char *pattern; /* A search is performed by pattern. */
-      u32 keyid[2];  /* A search by keyid. */
-      byte fpr[KEY_FPR_LEN]; /* A search by fingerprint. */
-    } u;
-  int type;
-};
-typedef struct cdk_dbsearch_s *cdk_dbsearch_t;
-
-/* Internal key cache to associate a key with an file offset. */
-struct key_table_s 
-{
-  struct key_table_s *next;
-  off_t offset;
-  cdk_dbsearch_t desc;
-};
-typedef struct key_table_s *key_table_t;
-
-/* Internal key database handle. */
-struct cdk_keydb_hd_s 
-{
-  int type;   /* type of the key db handle. */
-  int fp_ref; /* 1=means it is a reference and shall not be closed. */
-  cdk_stream_t fp;
-  cdk_stream_t idx;
-  cdk_dbsearch_t dbs;
-  char *name;            /* name of the underlying file or NULL. */
-  char *idx_name;        /* name of the index file or NULL. */
-  struct key_table_s *cache;
-  size_t ncache;
-  unsigned int secret:1;   /* contain secret keys. */
-  unsigned int isopen:1;   /* the underlying stream is opened. */
-  unsigned int no_cache:1; /* disable the index cache. */
-  unsigned int search:1;   /* handle is in search mode. */
-  
-  /* structure to store some stats about the keydb. */
-  struct {
-    size_t new_keys; /* amount of new keys that were imported. */
-  } stats;
-};
-
-
 static void keydb_cache_free (key_table_t cache);
-static int keydb_search_copy (cdk_dbsearch_t *r_dst, cdk_dbsearch_t src);
-static void keydb_search_free (cdk_dbsearch_t dbs);
+static int keydb_search_copy (cdk_keydb_search_t *r_dst, cdk_keydb_search_t src);
 static int classify_data (const byte * buf, size_t len);
 static cdk_kbnode_t find_selfsig_node (cdk_kbnode_t key, cdk_pkt_pubkey_t pk);
-
      
 static char*
 keydb_idx_mkname (const char *file)
@@ -198,14 +139,14 @@ keydb_idx_build (const char *file)
  * Rebuild the key index files for the given key database.
  **/
 cdk_error_t
-cdk_keydb_idx_rebuild (cdk_keydb_hd_t db)
+cdk_keydb_idx_rebuild (cdk_keydb_hd_t db, cdk_keydb_search_t dbs)
 {
   struct stat stbuf;
   char *tmp_idx_name;
   cdk_error_t rc;
   int err;
   
-  if (!db || !db->name)
+  if (!db || !db->name|| !dbs)
     return CDK_Inv_Value;
   if (db->secret)
     return 0;
@@ -220,17 +161,17 @@ cdk_keydb_idx_rebuild (cdk_keydb_hd_t db)
   if (err)
     return 0;  
   
-  cdk_stream_close (db->idx);
-  db->idx = NULL;
-  if (!db->idx_name) 
+  cdk_stream_close (dbs->idx);
+  dbs->idx = NULL;
+  if (!dbs->idx_name) 
     {
-      db->idx_name = keydb_idx_mkname (db->name);
-      if (!db->idx_name)
+      dbs->idx_name = keydb_idx_mkname (db->name);
+      if (!dbs->idx_name)
 	return CDK_Out_Of_Core;
     }
   rc = keydb_idx_build (db->name);
   if (!rc)
-    rc = cdk_stream_open (db->idx_name, &db->idx);
+    rc = cdk_stream_open (dbs->idx_name, &dbs->idx);
   return rc;
 }
 
@@ -447,19 +388,9 @@ cdk_keydb_free (cdk_keydb_hd_t hd)
       hd->fp = NULL;
     }
   
-  if (hd->idx)
-    {
-      cdk_stream_close (hd->idx);
-      hd->idx = NULL;
-    }
   
   hd->isopen = 0;
-  hd->no_cache = 0;
   hd->secret = 0;
-  keydb_cache_free (hd->cache);
-  hd->cache = NULL;
-  keydb_search_free (hd->dbs);
-  hd->dbs = NULL;
   cdk_free (hd);
 }
 
@@ -468,6 +399,7 @@ cdk_error_t
 _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t *ret_kr)
 {
   cdk_error_t rc, ec;
+  cdk_stream_t kr;
 
   if (!hd || !ret_kr)
     return CDK_Inv_Value;
@@ -475,76 +407,33 @@ _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t *ret_kr)
   rc = 0;
   if ((hd->type == CDK_DBTYPE_DATA || hd->type == CDK_DBTYPE_STREAM) 
       && hd->fp)
-    cdk_stream_seek (hd->fp, 0);
+    {
+      kr =  hd->fp;
+      cdk_stream_seek (kr, 0);
+    }
   else if (hd->type == CDK_DBTYPE_PK_KEYRING ||
 	   hd->type == CDK_DBTYPE_SK_KEYRING)
     {
-      if (!hd->isopen && hd->name)
-	{
-	  rc = cdk_stream_open (hd->name, &hd->fp);
-	  if (rc)
-	    goto leave;
-	  if (cdk_armor_filter_use (hd->fp))
-	    cdk_stream_set_armor_flag (hd->fp, 0);
-	  hd->isopen = 1;
-	  /* We disable the index cache for smaller keyrings. */
-	  if (cdk_stream_get_length (hd->fp) < 524288)
-	    {
-	      hd->no_cache = 1;
-	      goto leave;
-	    }
-	  cdk_free (hd->idx_name);	  
-	  hd->idx_name = keydb_idx_mkname (hd->name);
-	  if (!hd->idx_name)
-	    {
-	      rc = CDK_Out_Of_Core;
-	      goto leave;
-            }
-	  ec = cdk_stream_open (hd->idx_name, &hd->idx);
-	  if (ec && !hd->secret)
-	    {
-	      rc = keydb_idx_build (hd->name);
-	      if (!rc)
-		rc = cdk_stream_open (hd->idx_name, &hd->idx);
-	      if (!rc)
-		_cdk_log_debug ("create key index table\n");
-	      else
-		{
-		  /* This is no real error, it just means we can't create
-		     the index at the given directory. maybe we've no write
-		     access. in this case, we simply disable the index. */
-		  _cdk_log_debug ("disable key index table err=%d\n", rc);
-		  rc = 0;
-		  hd->no_cache = 1;
-		}
-            }
-        }
-      else 
-	{
-	  /* We use the cache to search keys, so we always rewind the
-	     STREAM. Except when the _NEXT search mode is used because
-	     this mode is an enumeration and no seeking is needed. */
-	  if (!hd->search ||
-	      (hd->search && hd->dbs->type != CDK_DBSEARCH_NEXT))
-	    cdk_stream_seek (hd->fp, 0);
-        }
+      rc = cdk_stream_open (hd->name, &kr);
+
+      if (rc)
+        goto leave;
+
+      if (cdk_armor_filter_use (kr))
+        cdk_stream_set_armor_flag (kr, 0);
     }
   else
     return CDK_Inv_Mode;
   
   leave:
-  if (rc) 
-    {
-      cdk_stream_close (hd->fp);
-      hd->fp = NULL;
-    }
-  *ret_kr = hd->fp;
+
+  *ret_kr = kr;
   return rc;
 }
 
 
 static int
-find_by_keyid (cdk_kbnode_t knode, cdk_dbsearch_t ks)
+find_by_keyid (cdk_kbnode_t knode, cdk_keydb_search_t ks)
 {
   cdk_kbnode_t node;
   u32 keyid[2];
@@ -580,7 +469,7 @@ find_by_keyid (cdk_kbnode_t knode, cdk_dbsearch_t ks)
 
 
 static int
-find_by_fpr (cdk_kbnode_t knode, cdk_dbsearch_t ks)
+find_by_fpr (cdk_kbnode_t knode, cdk_keydb_search_t ks)
 {
   cdk_kbnode_t node;
   byte fpr[KEY_FPR_LEN];
@@ -607,7 +496,7 @@ find_by_fpr (cdk_kbnode_t knode, cdk_dbsearch_t ks)
 
 
 static int
-find_by_pattern (cdk_kbnode_t knode, cdk_dbsearch_t ks)
+find_by_pattern (cdk_kbnode_t knode, cdk_keydb_search_t ks)
 {
   cdk_kbnode_t node;
   size_t uidlen;
@@ -648,19 +537,6 @@ find_by_pattern (cdk_kbnode_t knode, cdk_dbsearch_t ks)
 
 
 static void
-keydb_search_free (cdk_dbsearch_t dbs)
-{
-  if (!dbs)
-    return;
-  if (dbs->type == CDK_DBSEARCH_EXACT || 
-      dbs->type == CDK_DBSEARCH_SUBSTR)
-    cdk_free (dbs->u.pattern);
-  dbs->type = 0;
-  cdk_free (dbs);    
-}
-
-
-static void
 keydb_cache_free (key_table_t cache)
 {
   key_table_t c2;
@@ -669,7 +545,6 @@ keydb_cache_free (key_table_t cache)
     {
       c2 = cache->next;
       cache->offset = 0;
-      keydb_search_free (cache->desc);
       cdk_free (cache);
       cache = c2;
     }
@@ -677,35 +552,34 @@ keydb_cache_free (key_table_t cache)
 
 
 static key_table_t
-keydb_cache_find (key_table_t cache, cdk_dbsearch_t desc)
+keydb_cache_find ( cdk_keydb_search_t desc)
 {
+  key_table_t cache = desc->cache;
   key_table_t t;
   
   for (t = cache; t; t = t->next)
     {
-      if (t->desc->type != desc->type)
-	continue;
-      switch (t->desc->type)
+      switch (desc->type)
 	{
 	case CDK_DBSEARCH_SHORT_KEYID:
 	case CDK_DBSEARCH_KEYID:
-	  if (KEYID_CMP (t->desc->u.keyid, desc->u.keyid))
+	  if (KEYID_CMP (desc->u.keyid, desc->u.keyid))
 	    return t;
 	  break;
 
 	case CDK_DBSEARCH_EXACT:
-	  if (strlen (t->desc->u.pattern) == strlen (desc->u.pattern) &&
-	      !strcmp (t->desc->u.pattern, desc->u.pattern))
+	  if (strlen (desc->u.pattern) == strlen (desc->u.pattern) &&
+	      !strcmp (desc->u.pattern, desc->u.pattern))
 	    return t;
 	  break;
 
 	case CDK_DBSEARCH_SUBSTR:
-	  if (strstr (t->desc->u.pattern, desc->u.pattern))
+	  if (strstr (desc->u.pattern, desc->u.pattern))
 	    return t;
 	  break;
 	  
 	case CDK_DBSEARCH_FPR:
-	  if (!memcmp (t->desc->u.fpr, desc->u.fpr, KEY_FPR_LEN))
+	  if (!memcmp (desc->u.fpr, desc->u.fpr, KEY_FPR_LEN))
 	    return t;
 	  break;
         }
@@ -716,32 +590,30 @@ keydb_cache_find (key_table_t cache, cdk_dbsearch_t desc)
   
 
 static cdk_error_t
-keydb_cache_add (cdk_keydb_hd_t hd, cdk_dbsearch_t dbs, off_t offset)
+keydb_cache_add ( cdk_keydb_search_t dbs, off_t offset)
 {
   key_table_t k;
 
-  if (!hd)
-    return CDK_Inv_Value;
-  
-  if (hd->ncache > KEYDB_CACHE_ENTRIES)
+  if (dbs->ncache > KEYDB_CACHE_ENTRIES)
     return 0; /* FIXME: we should replace the last entry. */
   k = cdk_calloc (1, sizeof *k);
   if (!k)
     return CDK_Out_Of_Core;
+
   k->offset = offset;
-  keydb_search_copy (&k->desc, dbs);
-  k->next = hd->cache;
-  hd->cache = k;
-  hd->ncache++;
+
+  k->next = dbs->cache;
+  dbs->cache = k;
+  dbs->ncache++;
   _cdk_log_debug ("cache: add entry off=%d type=%d\n", offset, dbs->type);
   return 0;
 }
 
       
 static cdk_error_t
-keydb_search_copy (cdk_dbsearch_t *r_dst, cdk_dbsearch_t src)
+keydb_search_copy (cdk_keydb_search_t *r_dst, cdk_keydb_search_t src)
 {
-  cdk_dbsearch_t dst;
+  cdk_keydb_search_t dst;
   
   if (!r_dst || !src)
     return CDK_Inv_Value;
@@ -750,6 +622,8 @@ keydb_search_copy (cdk_dbsearch_t *r_dst, cdk_dbsearch_t src)
   dst = cdk_calloc (1, sizeof *dst);
   if (!dst)
     return CDK_Out_Of_Core;
+    
+  dst->off = src->off;
   dst->type = src->type;
   switch (src->type)
     {
@@ -774,6 +648,46 @@ keydb_search_copy (cdk_dbsearch_t *r_dst, cdk_dbsearch_t src)
   return 0;
 }
 
+static cdk_error_t idx_init( cdk_keydb_hd_t db, cdk_keydb_search_t dbs)
+{
+cdk_error_t ec, rc = 0;
+
+	  if (cdk_stream_get_length (db->fp) < 524288)
+	    {
+	      dbs->no_cache = 1;
+	      goto leave;
+	    }
+
+	  dbs->idx_name = keydb_idx_mkname (db->name);
+	  if (!dbs->idx_name)
+	    {
+	      rc = CDK_Out_Of_Core;
+	      goto leave;
+            }
+	  ec = cdk_stream_open (dbs->idx_name, &dbs->idx);
+
+	  if (ec && !db->secret)
+	    {
+	      rc = keydb_idx_build (db->name);
+	      if (!rc)
+		rc = cdk_stream_open (dbs->idx_name, &dbs->idx);
+	      if (!rc)
+		_cdk_log_debug ("create key index table\n");
+	      else
+		{
+		  /* This is no real error, it just means we can't create
+		     the index at the given directory. maybe we've no write
+		     access. in this case, we simply disable the index. */
+		  _cdk_log_debug ("disable key index table err=%d\n", rc);
+		  rc = 0;
+		  dbs->no_cache = 1;
+		}
+            }
+
+leave:
+
+  return rc;
+}
 
 /**
  * cdk_keydb_search_start:
@@ -787,10 +701,10 @@ keydb_search_copy (cdk_dbsearch_t *r_dst, cdk_dbsearch_t src)
 cdk_error_t
 cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, void *desc)
 {
-  cdk_dbsearch_t dbs;
   u32 *keyid;
   char *p, tmp[3];
   int i;
+  cdk_error_t rc;
   
   if (!db)
     return CDK_Inv_Value;
@@ -801,36 +715,40 @@ cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, voi
   if (!(*st))
     return CDK_Out_Of_Core;
 
-  dbs = cdk_calloc (1, sizeof *dbs);
-  if (!dbs)
-    return CDK_Out_Of_Core;
-  dbs->type = type;
+  rc = idx_init( db, *st);
+  if (rc != CDK_Success)
+    {
+      free(*st);
+      return rc;
+    }
+
+  (*st)->type = type;
   switch (type) 
     {
     case CDK_DBSEARCH_EXACT:
     case CDK_DBSEARCH_SUBSTR:
-      cdk_free (dbs->u.pattern);
-      dbs->u.pattern = cdk_strdup (desc);
-      if (!dbs->u.pattern)
+      cdk_free ((*st)->u.pattern);
+      (*st)->u.pattern = cdk_strdup (desc);
+      if (!(*st)->u.pattern)
 	{
-	  cdk_free (dbs);
+	  cdk_free (*st);
 	  return CDK_Out_Of_Core;
 	}
       break;
       
     case CDK_DBSEARCH_SHORT_KEYID:
       keyid = desc;
-      dbs->u.keyid[1] = keyid[0];
+      (*st)->u.keyid[1] = keyid[0];
       break;
       
     case CDK_DBSEARCH_KEYID:
       keyid = desc;
-      dbs->u.keyid[0] = keyid[0];
-      dbs->u.keyid[1] = keyid[1];
+      (*st)->u.keyid[0] = keyid[0];
+      (*st)->u.keyid[1] = keyid[1];
       break;
       
     case CDK_DBSEARCH_FPR:
-      memcpy (dbs->u.fpr, desc, KEY_FPR_LEN);
+      memcpy ((*st)->u.fpr, desc, KEY_FPR_LEN);
       break;
       
     case CDK_DBSEARCH_NEXT:
@@ -838,16 +756,16 @@ cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, voi
       
     case CDK_DBSEARCH_AUTO:
       /* Override the type with the actual db search type. */
-      dbs->type = classify_data (desc, strlen (desc));
-      switch (dbs->type)
+      (*st)->type = classify_data (desc, strlen (desc));
+      switch ((*st)->type)
 	{
 	case CDK_DBSEARCH_SUBSTR:
 	case CDK_DBSEARCH_EXACT:
-	  cdk_free (dbs->u.pattern);
-	  p = dbs->u.pattern = cdk_strdup (desc);
+	  cdk_free ((*st)->u.pattern);
+	  p = (*st)->u.pattern = cdk_strdup (desc);
 	  if (!p) 
 	    {
-	      cdk_free (dbs);
+	      cdk_free (*st);
 	      return CDK_Out_Of_Core;
 	    }
 	  break;
@@ -859,17 +777,17 @@ cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, voi
 	    p += 2;
 	  if (strlen (p) == 8)
 	    {
-	      dbs->u.keyid[0] = 0;
-	      dbs->u.keyid[1] = strtoul (p, NULL, 16);
+	      (*st)->u.keyid[0] = 0;
+	      (*st)->u.keyid[1] = strtoul (p, NULL, 16);
 	    }
 	  else if (strlen (p) == 16)
 	    {
-	      dbs->u.keyid[0] = strtoul (p    , NULL, 16);
-	      dbs->u.keyid[1] = strtoul (p + 8, NULL, 16);
+	      (*st)->u.keyid[0] = strtoul (p    , NULL, 16);
+	      (*st)->u.keyid[1] = strtoul (p + 8, NULL, 16);
 	    }
 	  else 
 	    { /* Invalid key ID object. */
-	      cdk_free (dbs);
+	      cdk_free (*st);
 	      return CDK_Inv_Mode;
 	  }
 	  break;
@@ -878,7 +796,7 @@ cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, voi
 	  p = desc;
 	  if (strlen (p) != 2*KEY_FPR_LEN)
 	    {
-	      cdk_free (dbs);
+	      cdk_free (*st);
 	      return CDK_Inv_Mode;
 	    }
 	  for (i = 0; i < KEY_FPR_LEN; i++)
@@ -886,26 +804,24 @@ cdk_keydb_search_start (cdk_keydb_search_t* st, cdk_keydb_hd_t db, int type, voi
 	      tmp[0] = p[2*i];
 	      tmp[1] = p[2*i+1];
 	      tmp[2] = 0x00;
-	      dbs->u.fpr[i] = strtoul (tmp, NULL, 16);
+	      (*st)->u.fpr[i] = strtoul (tmp, NULL, 16);
 	    }
 	  break;
 	}
       break;
       
     default:
-      cdk_free (dbs);
+      cdk_free (*st);
       _cdk_log_debug ("cdk_keydb_search_start: invalid mode = %d\n", type);
       return CDK_Inv_Mode;
     }
   
-  keydb_search_free (db->dbs);
-  db->dbs = dbs;
   return 0;
 }
 
 
 static cdk_error_t
-keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
+keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_keydb_search_t ks,
                       int *r_cache_hit, off_t *r_off)
 {
   key_table_t c;
@@ -917,7 +833,7 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
   *r_cache_hit = 0;
   *r_off = 0;
   
-  c = keydb_cache_find (hd->cache, ks);
+  c = keydb_cache_find ( ks);
   if (c != NULL)
     {      
       _cdk_log_debug ("cache: found entry in cache.\n");
@@ -927,21 +843,21 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
     }
   
   /* No index cache available so we just return here. */
-  if (!hd->idx)
+  if (!ks->idx)
     return 0;
   
-  if (hd->idx)
+  if (ks->idx)
     {
       if (ks->type == CDK_DBSEARCH_KEYID)
 	{
-	  if (keydb_idx_search (hd->idx, ks->u.keyid, NULL, r_off))
+	  if (keydb_idx_search (ks->idx, ks->u.keyid, NULL, r_off))
 	    return CDK_Error_No_Key;
 	  _cdk_log_debug ("cache: found keyid entry in idx table.\n");
 	  *r_cache_hit = 1;
         }
       else if (ks->type == CDK_DBSEARCH_FPR)
 	{
-	  if (keydb_idx_search (hd->idx, NULL, ks->u.fpr, r_off))
+	  if (keydb_idx_search (ks->idx, NULL, ks->u.fpr, r_off))
 	    return CDK_Error_No_Key;
 	  _cdk_log_debug ("cache: found fpr entry in idx table.\n");
 	  *r_cache_hit = 1;
@@ -953,14 +869,24 @@ keydb_pos_from_cache (cdk_keydb_hd_t hd, cdk_dbsearch_t ks,
 
 void cdk_keydb_search_release( cdk_keydb_search_t st)
 {
-  free( st);
+  keydb_cache_free ( st->cache);
+
+  if (st->idx)
+    cdk_stream_close (st->idx);
+
+  if (!st)
+    return;
+  if (st->type == CDK_DBSEARCH_EXACT || 
+      st->type == CDK_DBSEARCH_SUBSTR)
+    cdk_free (st->u.pattern);
+
+  cdk_free (st);
 }
 
 /**
  * cdk_keydb_search:
  * @st: the search handle
  * @hd: the keydb object
- * @ks: the keydb search object
  * @ret_key: kbnode object to store the key
  *
  * Search for a key in the given keyring. The search mode is handled
@@ -971,7 +897,6 @@ cdk_keydb_search (cdk_keydb_search_t st, cdk_keydb_hd_t hd, cdk_kbnode_t *ret_ke
 {
   cdk_stream_t kr;
   cdk_kbnode_t knode;
-  cdk_dbsearch_t ks;
   cdk_error_t rc = 0;
   off_t pos = 0, off = 0;
   int key_found = 0, cache_hit = 0;  
@@ -981,33 +906,34 @@ cdk_keydb_search (cdk_keydb_search_t st, cdk_keydb_hd_t hd, cdk_kbnode_t *ret_ke
   
   *ret_key = NULL;
   kr = NULL;
-  hd->search = 1;  
+
   rc = _cdk_keydb_open (hd, &kr);
   if (rc)
     return rc;
   
-  if (!hd->no_cache)
+  if (!st->no_cache)
     {
       /* It is possible the index is not up-to-date and thus we do
          not find the requesed key. In this case, we reset cache hit
          and continue our normal search procedure. */
-      rc = keydb_pos_from_cache (hd, hd->dbs, &cache_hit, &off);
+      rc = keydb_pos_from_cache (hd, st, &cache_hit, &off);
       if (rc)
 	cache_hit = 0;
     }
   
   knode = NULL;
-  ks = hd->dbs;
+
   while (!key_found && !rc)
     {
-      if (cache_hit && ks->type != CDK_DBSEARCH_NEXT)
+      if (cache_hit && st->type != CDK_DBSEARCH_NEXT)
 	cdk_stream_seek (kr, off);
-      else if ( ks->type == CDK_DBSEARCH_NEXT)
+      else if ( st->type == CDK_DBSEARCH_NEXT)
         cdk_stream_seek (kr, st->off);
 
       pos = cdk_stream_tell (kr);
 
       rc = cdk_keydb_get_keyblock (kr, &knode);
+
       if (rc) 
 	{
 	  if (rc == CDK_EOF)
@@ -1016,20 +942,20 @@ cdk_keydb_search (cdk_keydb_search_t st, cdk_keydb_hd_t hd, cdk_kbnode_t *ret_ke
 	    return rc;
 	}
       
-      switch (ks->type)
+      switch (st->type)
 	{
 	case CDK_DBSEARCH_SHORT_KEYID:
 	case CDK_DBSEARCH_KEYID:
-	  key_found = find_by_keyid (knode, ks);
+	  key_found = find_by_keyid (knode, st);
 	  break;
 	  
 	case CDK_DBSEARCH_FPR:
-	  key_found = find_by_fpr (knode, ks);
+	  key_found = find_by_fpr (knode, st);
 	  break;
           
 	case CDK_DBSEARCH_EXACT:
 	case CDK_DBSEARCH_SUBSTR:
-	  key_found = find_by_pattern (knode, ks);
+	  key_found = find_by_pattern (knode, st);
 	  break;
 	  
 	case CDK_DBSEARCH_NEXT:
@@ -1040,8 +966,8 @@ cdk_keydb_search (cdk_keydb_search_t st, cdk_keydb_hd_t hd, cdk_kbnode_t *ret_ke
       
       if (key_found)
 	{
-	  if (!keydb_cache_find (hd->cache, ks))
-	    keydb_cache_add (hd, ks, pos);
+	  if (!keydb_cache_find ( st))
+	    keydb_cache_add ( st, pos);
 	  break;
         }
       
@@ -1049,7 +975,6 @@ cdk_keydb_search (cdk_keydb_search_t st, cdk_keydb_hd_t hd, cdk_kbnode_t *ret_ke
       knode = NULL;
     }
 
-  hd->search = 0;
   if (key_found && rc == CDK_EOF)
     rc = 0;
   else if (rc == CDK_EOF && !key_found)
@@ -1798,10 +1723,10 @@ cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
   u32 keyid[2], main_keyid[2];
   off_t old_off;
   int key_seen, got_key;  
-  
+
   if (!inp || !r_knode)
     return CDK_Inv_Value;
-  
+
   /* Reset all values. */
   keyid[0] = keyid[1] = 0;
   main_keyid[0] = main_keyid[1] = 0;
@@ -1812,7 +1737,7 @@ cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
   *r_knode = NULL;
   rc = CDK_EOF;
   while (!cdk_stream_eof (inp))
-    {      
+    {
       cdk_pkt_new (&pkt);
       old_off = cdk_stream_tell (inp);
       rc = cdk_pkt_read (inp, pkt);
@@ -1828,6 +1753,7 @@ cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
 	      return rc;
 	    }
 	}
+
       if (pkt->pkttype == CDK_PKT_PUBLIC_KEY || 
 	  pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY ||
 	  pkt->pkttype == CDK_PKT_SECRET_KEY || 
@@ -1882,7 +1808,7 @@ cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
       else
 	_cdk_kbnode_add (knode, node);
     }
-  
+
   if (got_key)
     {
       keydb_merge_selfsig (knode, main_keyid);
@@ -2118,8 +2044,6 @@ cdk_keydb_import (cdk_keydb_hd_t hd, cdk_kbnode_t knode)
     }
   
   cdk_stream_close (out);
-  if (!hd->no_cache)
-    cdk_keydb_idx_rebuild (hd);
   hd->stats.new_keys++;
   
   return 0;
@@ -2160,13 +2084,13 @@ _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 *keyid, const char *id)
  
   check = 0;
   cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_KEYID, keyid);
-  if (unode && find_by_keyid (unode, hd->dbs))
+  if (unode && find_by_keyid (unode, st))
     check++;
   cdk_keydb_search_release( st);
   cdk_kbnode_release (unode);
   
   cdk_keydb_search_start (&st, hd, CDK_DBSEARCH_EXACT, (char *)id);
-  if (knode && find_by_pattern (knode, hd->dbs))
+  if (knode && find_by_pattern (knode, st))
     check++;
   cdk_keydb_search_release( st);
   cdk_kbnode_release (knode);
@@ -2312,7 +2236,7 @@ cdk_listkey_next (cdk_listkey_t ctx, cdk_kbnode_t *ret_key)
   else if (ctx->type)
     {
       cdk_kbnode_t node;
-      struct cdk_dbsearch_s ks;
+      struct cdk_keydb_search_s ks;
       cdk_error_t rc;
       
       for (;;)

@@ -31,10 +31,6 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 
-/* FIXME: delete this once opencdk has reentrant keyring functions
- */
-#define KEYRING_HACK
-
 /*
  * They are not needed any more. You can simply enable
  * the gnutls_log callback to get error descriptions.
