@@ -195,6 +195,11 @@ extern "C"
 				      unsigned int flags,
 				      unsigned int *verify);
 
+  int gnutls_openpgp_keyring_get_crt (gnutls_openpgp_keyring_t ring, unsigned int idx, 
+    gnutls_openpgp_crt_t* cert);
+
+  int gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring);
+
 
 /* certificate authentication stuff.
  */
