@@ -1238,6 +1238,11 @@ pgp_ring_info (void)
   for (i = 0; i < count; i++)
     {
       ret = gnutls_openpgp_keyring_get_crt (ring, i, &crt);
+      
+      if (ret < 0)
+        {
+	  error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
+        }
 
       size = sizeof (buffer);
       ret =
@@ -1245,12 +1250,11 @@ pgp_ring_info (void)
 				     &size);
       if (ret < 0)
 	{
-	  error (EXIT_FAILURE, 0, "Export error: %s",
-		 gnutls_strerror (ret));
-	  fwrite (buffer, 1, size, outfile);
+	  error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
 	}
 
-      fprintf (outfile, "%s\n\n", buffer);
+      fwrite (buffer, 1, size, outfile);
+      fprintf (outfile, "\n\n", buffer);
 
       gnutls_openpgp_crt_deinit (crt);
 
