@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2004, 2006 Free Software Foundation, Inc.
+ *      Copyright (C) 2004, 2006, 2008 Free Software Foundation, Inc.
  *      Copyright (C) 2002 Fabio Fiorina
  *
  * This file is part of LIBTASN1.
@@ -23,9 +23,21 @@
 #ifndef INT_H
 #define INT_H
 
-#include <libtasn1.h>
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-#include <defines.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <stdint.h>
+
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+
+#include <libtasn1.h>
 
 /*
 #define LIBTASN1_DEBUG
