@@ -1,5 +1,5 @@
 /* Substitute for and wrapper around <unistd.h>.
-   Copyright (C) 2004-2008 Free Software Foundation, Inc.
+   Copyright (C) 2004-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -156,18 +156,6 @@ extern char * getcwd (char *buf, size_t size);
      getcwd (b, s))
 #endif
 
-#if @GNULIB_GETHOSTNAME@
-# if !@HAVE_DECL_GETHOSTNAME@
-#  include <stddef.h>
-  extern int gethostname (char *name, size_t size);
-# endif
-#elif defined GNULIB_POSIXCHECK
-# undef gethostname
-# define gethostname(n,s)			    \
-  (GL_LINK_WARNING ("gethostname is unportable - "		       \
-		    "use gnulib module gethostname for portability"),   \
-   gethostname (n, s))
-#endif
 
 #if @GNULIB_GETLOGIN_R@
 /* Copies the user's login name to NAME.

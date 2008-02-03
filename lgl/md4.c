@@ -1,6 +1,6 @@
 /* Functions to compute MD4 message digest of files or memory blocks.
    according to the definition of MD4 in RFC 1320 from April 1992.
-   Copyright (C) 1995,1996,1997,1999,2000,2001,2002,2003,2005,2006
+   Copyright (C) 1995,1996,1997,1999,2000,2001,2002,2003,2005,2006,2008
    Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
@@ -64,27 +64,31 @@ md4_init_ctx (struct md4_ctx *ctx)
   ctx->buflen = 0;
 }
 
-/* Put result from CTX in first 16 bytes following RESBUF.  The result
-   must be in little endian byte order.
+/* Copy the 4 byte value from v into the memory location pointed to by *cp,
+   If your architecture allows unaligned access this is equivalent to
+   * (uint32_t *) cp = v  */
+static inline void
+set_uint32 (char *cp, uint32_t v)
+{
+  memcpy (cp, &v, sizeof v);
+}
 
-   IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32 bits value.  */
+/* Put result from CTX in first 16 bytes following RESBUF.  The result
+   must be in little endian byte order.  */
 void *
 md4_read_ctx (const struct md4_ctx *ctx, void *resbuf)
 {
-  ((uint32_t *) resbuf)[0] = SWAP (ctx->A);
-  ((uint32_t *) resbuf)[1] = SWAP (ctx->B);
-  ((uint32_t *) resbuf)[2] = SWAP (ctx->C);
-  ((uint32_t *) resbuf)[3] = SWAP (ctx->D);
+  char *r = resbuf;
+  set_uint32 (r + 0 * sizeof ctx->A, SWAP (ctx->A));
+  set_uint32 (r + 1 * sizeof ctx->B, SWAP (ctx->B));
+  set_uint32 (r + 2 * sizeof ctx->C, SWAP (ctx->C));
+  set_uint32 (r + 3 * sizeof ctx->D, SWAP (ctx->D));
 
   return resbuf;
 }
 
 /* Process the remaining bytes in the internal buffer and the usual
-   prolog according to the standard and write the result to RESBUF.
-
-   IMPORTANT: On some systems it is required that RESBUF is correctly
-   aligned for a 32 bits value.  */
+   prolog according to the standard and write the result to RESBUF.  */
 void *
 md4_finish_ctx (struct md4_ctx *ctx, void *resbuf)
 {
