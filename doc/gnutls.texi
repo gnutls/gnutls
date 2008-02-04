@@ -3639,16 +3639,6 @@ is summarized in the following diagram.
 
 @include gpl-3.0.texi
 
-@node Concept Index
-@unnumbered Concept Index
-
-@printindex cp
-
-@node Function and Data Index
-@unnumbered Function and Data Index
-
-@printindex fn
-
 @node Bibliography
 @unnumbered Bibliography
 
@@ -3775,5 +3765,15 @@ Certificates", Cryptology ePrint Archive, Report 2005/067, Available
 at @url{http://eprint.iacr.org/}.
 
 @end table
+
+@node Function and Data Index
+@unnumbered Function and Data Index
+
+@printindex fn
+
+@node Concept Index
+@unnumbered Concept Index
+
+@printindex cp
 
 @bye
