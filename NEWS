@@ -70,6 +70,20 @@ in a callback friendly way.
 ** API and ABI modifications:
 No changes since last version.
 
+* Version 2.2.1 (released 2008-01-17)
+
+** Prevent linking libextra against previously installed libgnutls.
+Tiny patch from "Alon Bar-Lev" <alon.barlev@gmail.com>, see
+<http://bugs.gentoo.org/show_bug.cgi?id=202269>.
+
+** Fixes the post_client_hello_function(). The extensions are now parsed
+in a callback friendly way.
+
+** Fix for certificate selection in servers with certificate callbacks.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.2.0 (released 2007-12-14)
 
 ** Update internal copy of libtasn1 to version 1.2.
