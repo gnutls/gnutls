@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.3.1 (unreleased)
 
+** gnutls-cli: When -d is used, also prints RNG information from libgcrypt.
+
 ** Add section 'On Record Padding' to the manual.
 This collects all problems related to record padding with
 Nokia/Sony-Ericsson phones that we know about.
