@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.3.1 (unreleased)
 
+** Add section 'On Record Padding' to the manual.
+This collects all problems related to record padding with
+Nokia/Sony-Ericsson phones that we know about.
+
 ** Several improvements in the OpenPGP authentication. The authentication
 subkey is used if present.
 
