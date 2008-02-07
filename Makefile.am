@@ -54,9 +54,11 @@ release:
 	git-push
 	gpg -b $(distdir).tar.bz2
 	gpg --verify $(distdir).tar.bz2.sig
-	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:~ftp/pub/gnutls/devel/
+	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/devel/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
-	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/
-	cp -v doc/reference/html/*.{html,png,css,devhelp} $(htmldir)/reference/
-	cd $(htmldir) && cvs add -kb releases/$(distdir).tar.bz2{,.sig} && \
+	cp -v $(distdir).tar.bz2 $(distdir).tar.bz2.sig $(htmldir)/releases/
+	cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.css doc/reference/html/*.devhelp $(htmldir)/reference/
+	cd $(htmldir) && \
+		cvs add -kb releases/$(distdir).tar.bz2 \
+			releases/$(distdir).tar.bz2.sig && \
 		cvs commit -m "Update." manual/ reference/ releases/

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -194,8 +194,7 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 #endif
 
 #ifdef ENABLE_OPENPGP
-  if (_E_gnutls_openpgp_keyring_deinit)
-    _E_gnutls_openpgp_keyring_deinit( sc->keyring);
+  gnutls_openpgp_keyring_deinit( sc->keyring);
 #endif
 
   gnutls_free (sc);

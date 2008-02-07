@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -47,8 +47,6 @@ typedef int ssize_t;
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <time.h>
-
-#define SIZEOF_UNSIGNED_LONG_INT SIZEOF_UNSIGNED_LONG
 
 /* some systems had problems with long long int, thus,
  * it is not used.

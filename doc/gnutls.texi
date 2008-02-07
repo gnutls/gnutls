@@ -566,6 +566,7 @@ differences of these protocols are minor. Older protocols such as
 * TLS Extensions::
 * Selecting cryptographic key sizes::
 * On SSL 2 and older protocols::
+* On Record Padding::
 @end menu
 
 @node TLS layers
@@ -1114,6 +1115,55 @@ same weak key, which isn't necessary.
 Other protocols such as Microsoft's @acronym{PCT} 1 and @acronym{PCT}
 2 were not implemented because they were also abandoned and deprecated
 by @acronym{SSL} 3.0 and later @acronym{TLS} 1.0.
+
+@node On Record Padding
+@section On Record Padding
+@cindex Record padding
+@cindex Bad record MAC
+
+The TLS protocol allows for random padding of records, to make it more
+difficult to perform analysis on the length of exchanged messages.
+(In RFC 4346 this is specified in section 6.2.3.2.)  GnuTLS appears to
+be one of few implementation that take advantage of this text, and pad
+records by a random length.
+
+The TLS implementation in the Symbian operating system, frequently
+used by Nokia and Sony-Ericsson mobile phones, cannot handle
+non-minimal record padding.  What happens when one of these clients
+handshake with a GnuTLS server is that the client will fail to compute
+the correct MAC for the record.  The client sends a TLS alert
+(@code{bad_record_mac}) and disconnects.  Typically this will result
+in error messages such as 'A TLS fatal alert has been received', 'Bad
+record MAC', or both, on the GnuTLS server side.
+
+GnuTLS implements a work around for this problem.  However, it has to
+be enabled specifically.  It can be enabled by using
+@ref{gnutls_record_disable_padding}, or @ref{gnutls_priority_set} with
+the @code{%COMPAT} priority string.
+
+If you implement an application that have a configuration file, we
+recommend that you make it possible for users or administrators to
+specify a GnuTLS protocol priority string, which is used by your
+application via @ref{gnutls_priority_set}.  To allow the best
+flexibility, make it possible to have a different priority string for
+different incoming IP addresses.
+
+To enable the workaround in the @code{gnutls-cli} client or the
+@code{gnutls-serv} server, for testing of other implementations, use
+the following parameter: @code{--priority "%COMPAT"}.
+
+This problem has been discussed on mailing lists and in bug reports.
+This section tries to collect all pieces of information that we know
+about the problem.  If you wish to go back to the old discussions,
+here are some links:
+
+@url{http://bugs.debian.org/390712}
+
+@url{http://bugs.debian.org/402861}
+
+@url{http://bugs.debian.org/438137}
+
+@url{http://thread.gmane.org/gmane.ietf.tls/3079}
 
 @node Authentication methods
 @chapter Authentication Methods
@@ -3639,16 +3689,6 @@ is summarized in the following diagram.
 
 @include gpl-3.0.texi
 
-@node Concept Index
-@unnumbered Concept Index
-
-@printindex cp
-
-@node Function and Data Index
-@unnumbered Function and Data Index
-
-@printindex fn
-
 @node Bibliography
 @unnumbered Bibliography
 
@@ -3775,5 +3815,15 @@ Certificates", Cryptology ePrint Archive, Report 2005/067, Available
 at @url{http://eprint.iacr.org/}.
 
 @end table
+
+@node Function and Data Index
+@unnumbered Function and Data Index
+
+@printindex fn
+
+@node Concept Index
+@unnumbered Concept Index
+
+@printindex cp
 
 @bye
