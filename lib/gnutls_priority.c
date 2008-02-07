@@ -533,9 +533,14 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       _set_priority (&(*priority_cache)->protocol, protocol_priority);
       _set_priority (&(*priority_cache)->compression, comp_priority);
       _set_priority (&(*priority_cache)->cert_type, cert_type_priority);
+      i = 1;
+    } 
+    else 
+    {
+      i = 0;
     }
 
-  for (i = 0; i < broken_list_size; i++)
+  for (; i < broken_list_size; i++)
     {
       if (strcasecmp (broken_list[i], "PERFORMANCE") == 0)
 	{
