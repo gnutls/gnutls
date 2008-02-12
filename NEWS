@@ -18,6 +18,9 @@ subkey is used if present.
 
 ** Included the LGPL version of opencdk
 
+** Doc fixes.
+Clarify that srp_base64 is not the same as normal base64.
+
 ** API and ABI modifications:
 gnutls_openpgp_privkey_sign_hash: MODIFIED to account for keyid
 gnutls_openpgp_keyring_check_id: MODIFIED to account for new keyid type
