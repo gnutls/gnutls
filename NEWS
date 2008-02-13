@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.1 (unreleased)
 
+** Cipher priority string handling now handle strings that starts with NULL.
+Thanks to Laurence Withers <l@lwithers.me.uk>.
+
 ** gnutls-cli: When -d is used, also prints RNG information from libgcrypt.
 
 ** Add section 'On Record Padding' to the manual.
