@@ -888,6 +888,15 @@ gnutls_x509_crt_get_pk_algorithm (gnutls_x509_crt_t cert, unsigned int *bits)
 
 }
 
+inline static int is_type_printable(int type)
+{
+      if (type == GNUTLS_SAN_DNSNAME || type == GNUTLS_SAN_RFC822NAME ||
+        type == GNUTLS_SAN_URI) 
+        return 1;
+      else
+        return 0;
+}
+
 #define XMPP_OID "1.3.6.1.5.5.7.8.5"
 
 /* returns the type and the name on success.
@@ -1025,23 +1034,38 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   else
     {
+      size_t orig_name_size = *name_size;
+      
       _gnutls_str_cat (nptr, sizeof (nptr), ".");
       _gnutls_str_cat (nptr, sizeof (nptr), choice_type);
 
       len = *name_size;
       result = asn1_read_value (src, nptr, name, &len);
-      *name_size = len + 1;
+      *name_size = len;
 
       if (result == ASN1_MEM_ERROR)
-	return GNUTLS_E_SHORT_MEMORY_BUFFER;
-      
+  	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
+
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();
 	  return _gnutls_asn2err (result);
 	}
-      
-      ((char*)name)[len] = 0;
+
+      if (is_type_printable(type))
+        {
+    
+          if (len+1 > orig_name_size)
+            {
+              gnutls_assert();
+              (*name_size)++;
+              return GNUTLS_E_SHORT_MEMORY_BUFFER;
+            }
+
+          /* null terminate it */
+          ((char*)name)[*name_size] = 0; 
+        }
+
     }
 
   return type;
