@@ -10,6 +10,10 @@ Thanks to Laurence Withers <l@lwithers.me.uk>.
 
 ** gnutls-cli: When -d is used, also prints RNG information from libgcrypt.
 
+** Corrected the behaviour of gnutls_x509_crt_get_subject_alt_name()
+and gnutls_x509_crt_get_subject_alt_name() to not null terminate binary
+strings and return the proper size.
+
 ** Add section 'On Record Padding' to the manual.
 This collects all problems related to record padding with
 Nokia/Sony-Ericsson phones that we know about.
