@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** Cipher priority string handling now handle strings that starts with NULL.
 Thanks to Laurence Withers <l@lwithers.me.uk>.
 
+** Corrected the behaviour of gnutls_x509_crt_get_subject_alt_name()
+and gnutls_x509_crt_get_subject_alt_name() to not null terminate binary
+strings and return the proper size.
+
 ** API and ABI modifications:
 No changes since last version.
 
