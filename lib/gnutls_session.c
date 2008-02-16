@@ -25,6 +25,7 @@
 #include "gnutls_errors.h"
 #include "debug.h"
 #include <gnutls_session_pack.h>
+#include <gnutls_datum.h>
 
 /**
   * gnutls_session_get_data - Returns all session parameters.
@@ -61,12 +62,19 @@ gnutls_session_get_data (gnutls_session_t session,
   *session_data_size = psession.size;
 
   if (psession.size > *session_data_size)
-    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    {
+      ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+      goto error;
+    }
 
   if (session_data != NULL)
     memcpy (session_data, psession.data, psession.size);
 
-  return 0;
+  ret = 0;
+
+error:
+  _gnutls_free_datum( &psession);
+  return ret;
 }
 
 /**
