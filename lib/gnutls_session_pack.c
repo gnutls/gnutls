@@ -165,7 +165,7 @@ _gnutls_session_unpack (gnutls_session_t session,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  if (session->key->auth_info != NULL)
+  if (_gnutls_get_auth_info(session) != NULL)
     {
       _gnutls_free_auth_info (session);
     }
@@ -259,13 +259,6 @@ pack_certificate_auth_info (gnutls_session_t session,
   unsigned int pos = 0, i;
   int cert_size, pack_size;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
-
-
-  if (info == NULL && session->key->auth_info_size != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 
   if (info)
     {
@@ -510,12 +503,6 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
   srp_server_auth_info_t info = _gnutls_get_auth_info (session);
   int pack_size;
 
-  if (info == NULL && session->key->auth_info_size != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
   if (info && info->username)
     pack_size = strlen (info->username) + 1;	/* include the terminating null */
   else
@@ -618,12 +605,6 @@ pack_anon_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
   anon_auth_info_t info = _gnutls_get_auth_info (session);
   int pos = 0;
   size_t pack_size;
-
-  if (info == NULL && session->key->auth_info_size != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 
   if (info)
     pack_size = 2 + 4 * 3 + info->dh.prime.size +
@@ -782,12 +763,6 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
   int pack_size, username_size = 0, pos;
 
   info = _gnutls_get_auth_info (session);
-
-  if (info == NULL && session->key->auth_info_size != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 
   if (info)
     {
