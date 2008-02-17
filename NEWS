@@ -11,6 +11,9 @@ Thanks to Laurence Withers <l@lwithers.me.uk>.
 ** Corrected memory leaks in session resuming and DHE ciphersuites. Reported
 by Daniel Stenberg.
 
+** Increased the default certificate verification chain limits and allowed
+for checks without limitation.
+
 ** Corrected the behaviour of gnutls_x509_crt_get_subject_alt_name()
 and gnutls_x509_crt_get_subject_alt_name() to not null terminate binary
 strings and return the proper size.

@@ -622,6 +622,7 @@ gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
   *
   * This function will set some upper limits for the default verification function,
   * gnutls_certificate_verify_peers2(), to avoid denial of service attacks.
+  * You can set them to zero to disable limits.
   *
   **/
 void
