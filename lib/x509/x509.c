@@ -1043,8 +1043,10 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
       result = asn1_read_value (src, nptr, name, &len);
       *name_size = len;
 
-      if (result == ASN1_MEM_ERROR)
+      if (result == ASN1_MEM_ERROR) {
+          if (is_type_printable(type)) (*name_size)++;
   	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
+      }
 
       if (result != ASN1_SUCCESS)
 	{
