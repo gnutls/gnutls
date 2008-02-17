@@ -70,7 +70,7 @@ check_bits (gnutls_x509_crt_t crt, unsigned int max_bits)
       return ret;
     }
 
-  if (bits > max_bits)
+  if (bits > max_bits && max_bits > 0)
     {
       gnutls_assert ();
       return GNUTLS_E_CONSTRAINT_ERROR;
@@ -125,7 +125,7 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
   if (info->raw_certificate_list == NULL || info->ncerts == 0)
     return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-  if (info->ncerts > cred->verify_depth)
+  if (info->ncerts > cred->verify_depth && cred->verify_depth > 0)
     {
       gnutls_assert ();
       return GNUTLS_E_CONSTRAINT_ERROR;
