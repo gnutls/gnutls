@@ -524,7 +524,6 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
     }
 
   break_comma_list (darg, broken_list, &broken_list_size, MAX_ELEMENTS, ':');
-
   /* This is our default set of protocol version, certificate types and
    * compression methods.
    */
@@ -533,11 +532,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       _set_priority (&(*priority_cache)->protocol, protocol_priority);
       _set_priority (&(*priority_cache)->compression, comp_priority);
       _set_priority (&(*priority_cache)->cert_type, cert_type_priority);
-      i = 1;
+      i = 0;
     } 
     else 
     {
-      i = 0;
+      i = 1;
     }
 
   for (; i < broken_list_size; i++)
