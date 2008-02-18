@@ -1,34 +1,30 @@
 GNU TLS README -- Important introductory notes.
-Copyright (C) 2004, 2005 Simon Josefsson
+Copyright (C) 2004, 2005, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-This is the GNU TLS library. More up to date information can be found
-at http://www.gnu.org/software/gnutls/ and http://www.gnutls.org/
+This is the GNUTLS library.  GNUTLS implements the TLS/SSL (Transport
+Layer Security aka Secure Sockets Layer) protocol.  GnuTLS is a GNU
+project.  More up to date information can be found at
+<http://www.gnu.org/software/gnutls/> and <http://www.gnutls.org/>.
 
-This is a TLS (Transport Layer Security) 1.0 and SSL (Secure Sockets Layer) 3.0
-implementation for the GNU project. 
+See the documentation in doc/ and examples in doc/examples/.
 
-- The library needs libgcrypt. You can find libgcrypt at
- ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/
+COMPILATION ISSUES
+------------------
 
- Note that by compiling libgcrypt with CPU optimizations gnutls' speed
- will increase.
+The library needs libgcrypt. You can find libgcrypt at
+<ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/>.  Note that by
+compiling libgcrypt with CPU optimizations gnutls' speed will
+increase.
 
-- For OpenPGP key support the OpenCDK library is required. You can find
- libopencdk at:
- ftp://ftp.gnutls.org/pub/gnutls/opencdk/
+For OpenPGP key support, the OpenCDK library can be used.  You can
+find libopencdk at: <ftp://ftp.gnutls.org/pub/gnutls/opencdk/>.  A
+copy of libopencdk is also included with GnuTLS.
 
-- Documentation:
- view the doc/ directory and the examples in the doc/examples directory.
-
-
-****************************
-COMPILATION ISSUES:
-
-Nothing special here. In case you are compiling for embedded systems
-you should check the configure options (that is run: 'configure --help'),
-and disable unneeded features of gnutls.
+In case you are compiling for embedded systems you should check the
+configure options (that is run: 'configure --help'), and disable
+unneeded features of gnutls.
 
 Experimental:
 
@@ -50,11 +46,12 @@ The goal here is to make GnuTLS build standalone, in case Libgcrypt is
 not available, but also to allow easy use of other crypto libraries or
 crypto hardware.
 
-****************************
-LICENSE ISSUES:
+LICENSE ISSUES
+--------------
 
-Since the 0.4.2 version the gnutls library is covered under the GNU 
-Lesser GPL. Previously released versions were licensed under the GNU GPL.
+Since the 0.4.2 version the gnutls library is covered under the GNU
+Lesser GPL. Previously released versions were licensed under the GNU
+GPL.
 
 We changed the license for most of GNUTLS because other free libraries
 already exist that do the same jobs and have lax licenses.  We want
@@ -65,21 +62,21 @@ our help) an advantage over non-free projects (which do not deserve
 our help, since they refuse to share with us).  For more explanation,
 see http://www.gnu.org/philosophy/why-not-lgpl.html.
 
-The GNU Lesser GPL license applies to the main gnutls library, while the
-gnutls-extra library is under the GPL. The gnutls-extra library contains
-the code for "GnuTLS Inner Application" support and the OpenSSL compatibility layer. 
-The gnutls library is located in the lib/ directory, while the gnutls-extra 
-library is at libextra/.
+The GNU Lesser GPL license applies to the main gnutls library, while
+the gnutls-extra library is under the GPL. The gnutls-extra library
+contains the code for "GnuTLS Inner Application" support and the
+OpenSSL compatibility layer.  The gnutls library is located in the
+lib/ directory, while the gnutls-extra library is at libextra/.
 
 
-****************************
-BUGS:
+BUGS
+----
 
-Currently gnuTLS needs testing. By notifying the developers
-about a possible bug you may help a lot, since testing is really
-important and expensive. If you think you found a bug,
-report it to bug-gnutls@gnu.org together with the needed information,
-in order for developers to reproduce it. 
+Currently GnuTLS needs testing.  By notifying the developers about a
+possible bug you may help a lot, since testing is really important and
+expensive.  If you think you found a bug, report it to
+bug-gnutls@gnu.org together with the needed information, in order for
+developers to reproduce it.
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,

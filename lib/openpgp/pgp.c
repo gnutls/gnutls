@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Timo Schulz, Nikos Mavrogiannopoulos
  *
@@ -469,6 +469,24 @@ gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t*
   _gnutls_write_uint32( kid[1], keyid->keyid+4);
 
   return 0;
+}
+
+/**
+ * gnutls_openpgp_crt_get_id - Gets the keyID
+ * @key: the structure that contains the OpenPGP public key.
+ * @keyid: the buffer to save the keyid.
+ *
+ * Returns the 64-bit keyID of the OpenPGP key.
+ *
+ * Deprecated: Use gnutls_openpgp_crt_get_key_id() instead.
+ **/
+int
+gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key, unsigned char keyid[8])
+{
+  gnutls_openpgp_keyid_t tmp;
+  int ret = gnutls_openpgp_crt_get_key_id (key, &tmp);
+  memcpy (keyid, tmp.keyid, sizeof (tmp.keyid));
+  return ret;
 }
 
 /**
