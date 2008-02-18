@@ -35,6 +35,7 @@ subkey is used if present.
 Clarify that srp_base64 is not the same as normal base64.
 
 ** API and ABI modifications:
+gnutls_openpgp_keyid_t: ADDED, instead of hard-coded 'unsigned char[8]'.
 gnutls_openpgp_privkey_sign_hash: MODIFIED to account for keyid
 gnutls_openpgp_keyring_check_id: MODIFIED to account for new keyid type
 gnutls_openpgp_crt_get_key_id: MODIFIED to account for new keyid type
