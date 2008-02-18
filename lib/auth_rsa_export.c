@@ -204,10 +204,9 @@ _gnutls_peers_cert_less_512 (gnutls_session_t session)
     }
 
   if ((ret =
-       _gnutls_raw_cert_to_gcert (&peer_cert,
+       _gnutls_get_auth_info_gcert (&peer_cert,
 				  session->security_parameters.cert_type,
-				  &info->raw_certificate_list[0],
-				  CERT_NO_COPY)) < 0)
+				  info, CERT_NO_COPY)) < 0)
     {
       gnutls_assert ();
       return 0;
@@ -304,10 +303,9 @@ proc_rsa_export_server_kx (gnutls_session_t session,
   signature.size = sigsize;
 
   if ((ret =
-       _gnutls_raw_cert_to_gcert (&peer_cert,
+       _gnutls_get_auth_info_gcert (&peer_cert,
 				  session->security_parameters.cert_type,
-				  &info->raw_certificate_list[0],
-				  CERT_NO_COPY)) < 0)
+				  info, CERT_NO_COPY)) < 0)
     {
       gnutls_assert ();
       return ret;

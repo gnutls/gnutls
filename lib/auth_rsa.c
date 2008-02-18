@@ -85,10 +85,9 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
     }
 
   ret =
-    _gnutls_raw_cert_to_gcert (&peer_cert,
+    _gnutls_get_auth_info_gcert (&peer_cert,
 			       session->security_parameters.cert_type,
-			       &info->raw_certificate_list[0],
-			       CERT_ONLY_PUBKEY | CERT_NO_COPY);
+			       info, CERT_ONLY_PUBKEY | CERT_NO_COPY);
 
   if (ret < 0)
     {

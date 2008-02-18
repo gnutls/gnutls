@@ -35,7 +35,14 @@ extern "C"
 #endif
 
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
+
+/* Openpgp certificate stuff 
+ */
+
+  typedef enum gnutls_openpgp_crt_fmt
+  { GNUTLS_OPENPGP_FMT_RAW,
+    GNUTLS_OPENPGP_FMT_BASE64
+  } gnutls_openpgp_crt_fmt_t;
 
   typedef struct 
   {
@@ -112,6 +119,9 @@ extern "C"
   int gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt, 
 				gnutls_datum_t * m, gnutls_datum_t * e);
 
+  int gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t* keyid);
+  int gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t keyid);
+
 /* privkey stuff.
  */
   int gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);
@@ -124,7 +134,6 @@ extern "C"
 				     gnutls_openpgp_crt_fmt_t format,
 				     const char *pass, unsigned int flags);
   int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
-                                  gnutls_openpgp_keyid_t subkeyid,
 				  const gnutls_datum_t * hash,
 				  gnutls_datum_t * signature);
   int gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
@@ -169,6 +178,11 @@ extern "C"
 			   const char* password, unsigned int flags,
 			   void *output_data, size_t * output_data_size);
 
+  int gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid);
+  int gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t* keyid);
+  
+  int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t* keyid);
+
 /* Keyring stuff.
  */
   struct gnutls_openpgp_keyring_int;	/* object to hold (parsed) openpgp keyrings */
@@ -201,11 +215,65 @@ extern "C"
   int gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring);
 
 
+
+/**
+ * gnutls_openpgp_recv_key_func - Callback prototype to get OpenPGP keys
+ * @session: a TLS session
+ * @keyfpr: key fingerprint
+ * @keyfpr_length: length of key fingerprint
+ * @key: output key.
+ *
+ * A callback of this type is used to retrieve OpenPGP keys.  Only
+ * useful on the server, and will only be used if the peer send a key
+ * fingerprint instead of a full key.  See also
+ * gnutls_openpgp_set_recv_key_function().
+ *
+ */
+  typedef int (*gnutls_openpgp_recv_key_func) (gnutls_session_t session,
+					       const unsigned char *keyfpr,
+					       unsigned int keyfpr_length,
+					       gnutls_datum_t * key);
+
+  void gnutls_openpgp_set_recv_key_function (gnutls_session_t session,
+					     gnutls_openpgp_recv_key_func
+					     func);
+
+
+
 /* certificate authentication stuff.
  */
   int gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
 					  res, gnutls_openpgp_crt_t key,
 					  gnutls_openpgp_privkey_t pkey);
+
+  int
+    gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
+					     res, const char *CERTFILE,
+					     const char *KEYFILE, gnutls_openpgp_crt_fmt_t);
+  int gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
+					      res,
+					      const gnutls_datum_t * CERT,
+					      const gnutls_datum_t * KEY, gnutls_openpgp_crt_fmt_t);
+
+  int gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
+					     res, const char *CERTFILE,
+					     const char *KEYFILE, const char* keyid, 
+					     gnutls_openpgp_crt_fmt_t);
+  int gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
+					      res,
+					      const gnutls_datum_t * CERT,
+					      const gnutls_datum_t * KEY, 
+					      const char* keyid, 
+					      gnutls_openpgp_crt_fmt_t);
+
+  int
+    gnutls_certificate_set_openpgp_keyring_mem
+    (gnutls_certificate_credentials_t c, const unsigned char *data,
+     size_t dlen, gnutls_openpgp_crt_fmt_t);
+
+  int
+    gnutls_certificate_set_openpgp_keyring_file
+    (gnutls_certificate_credentials_t c, const char *file, gnutls_openpgp_crt_fmt_t);
 
 #ifdef __cplusplus
 }

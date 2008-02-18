@@ -49,6 +49,9 @@ option (pgpkeyfile) STR "FILE" { $pgp_keyfile = $1 } "PGP Key file to use."
 #char *pgp_certfile;
 option (pgpcertfile) STR "FILE" { $pgp_certfile = $1 } "PGP Public Key (certificate) file to use."
 
+#char *pgp_subkey;
+option (pgpsubkey) STR "HEX|auto" { $pgp_subkey = $1 } "PGP subkey to use."
+
 #char *x509_keyfile;
 option (x509keyfile) STR "FILE" { $x509_keyfile = $1 } "X.509 key file to use."
 
@@ -124,4 +127,4 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$pgp_keyring=NULL; $fmtder = 0;
 	$disable_client_cert = 0; $priorities = NULL;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0;
-	$opaque_prf_input=NULL; }
+	$opaque_prf_input=NULL; $pgp_subkey = NULL;}

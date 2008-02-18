@@ -38,54 +38,6 @@ extern "C"
 
 #define LIBGNUTLS_EXTRA_VERSION LIBGNUTLS_VERSION
 
-/* Openpgp certificate stuff 
- */
-
-  typedef enum gnutls_openpgp_crt_fmt
-  { GNUTLS_OPENPGP_FMT_RAW,
-    GNUTLS_OPENPGP_FMT_BASE64
-  } gnutls_openpgp_crt_fmt_t;
-
-/**
- * gnutls_openpgp_recv_key_func - Callback prototype to get OpenPGP keys
- * @session: a TLS session
- * @keyfpr: key fingerprint
- * @keyfpr_length: length of key fingerprint
- * @key: output key.
- *
- * A callback of this type is used to retrieve OpenPGP keys.  Only
- * useful on the server, and will only be used if the peer send a key
- * fingerprint instead of a full key.  See also
- * gnutls_openpgp_set_recv_key_function().
- *
- */
-  typedef int (*gnutls_openpgp_recv_key_func) (gnutls_session_t session,
-					       const unsigned char *keyfpr,
-					       unsigned int keyfpr_length,
-					       gnutls_datum_t * key);
-
-  void gnutls_openpgp_set_recv_key_function (gnutls_session_t session,
-					     gnutls_openpgp_recv_key_func
-					     func);
-
-  int
-    gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
-					     res, const char *CERTFILE,
-					     const char *KEYFILE, gnutls_openpgp_crt_fmt_t);
-  int gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
-					      res,
-					      const gnutls_datum_t * CERT,
-					      const gnutls_datum_t * KEY, gnutls_openpgp_crt_fmt_t);
-
-  int
-    gnutls_certificate_set_openpgp_keyring_mem
-    (gnutls_certificate_credentials_t c, const unsigned char *data,
-     size_t dlen, gnutls_openpgp_crt_fmt_t);
-
-  int
-    gnutls_certificate_set_openpgp_keyring_file
-    (gnutls_certificate_credentials_t c, const char *file, gnutls_openpgp_crt_fmt_t);
-
   /* TLS/IA stuff
    */
 

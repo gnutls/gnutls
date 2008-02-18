@@ -24,8 +24,8 @@ strings and return the proper size.
 This collects all problems related to record padding with
 Nokia/Sony-Ericsson phones that we know about.
 
-** Several improvements in the OpenPGP authentication. The authentication
-subkey is used if present.
+** Several improvements in the OpenPGP authentication. Now subkeys
+can be used for authentication.
 
 ** certtool can print information on OpenPGP certificates and keys.
 

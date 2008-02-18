@@ -99,6 +99,9 @@ typedef struct rsa_info_st
   gnutls_datum_t exponent;
 } rsa_info_st;
 
+/* This is the information we keep for the peer
+ * certificate.
+ */
 typedef struct cert_auth_info_st
 {
   int certificate_requested;	/* if the peer requested certificate
@@ -115,6 +118,12 @@ typedef struct cert_auth_info_st
 					 * peer.
 					 */
   unsigned int ncerts;		/* holds the size of the list above */
+
+  gnutls_certificate_type_t cert_type;
+#ifdef ENABLE_OPENPGP
+  int use_subkey;
+  gnutls_openpgp_keyid_t subkey_id;
+#endif
 } *cert_auth_info_t;
 
 typedef struct cert_auth_info_st cert_auth_info_st;
@@ -148,5 +157,10 @@ gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t
 							gnutls_params_function
 							* func,
 							gnutls_session_t);
+
+int _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
+			       gnutls_certificate_type_t type,
+			       cert_auth_info_t info,
+			       int flags /* OR of ConvFlags */ );
 
 #endif

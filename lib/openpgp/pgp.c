@@ -1021,14 +1021,18 @@ int max_pub_params;
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
-_gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert, uint32_t keyid[2],
+_gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert, uint32_t *keyid /* [2] */,
 			   mpi_t * params, int *params_size)
 {
   int result, i, idx;
   int pk_algorithm, local_params;
   cdk_packet_t pkt;
-  
-  pkt = _gnutls_openpgp_find_key( cert->knode, keyid, 0);
+
+  if (keyid == NULL)
+    pkt = cdk_kbnode_find_packet (cert->knode, CDK_PKT_PUBLIC_KEY);
+  else
+    pkt = _gnutls_openpgp_find_key( cert->knode, keyid, 0);
+
   if (pkt == NULL)
     {
       gnutls_assert();
@@ -1181,7 +1185,7 @@ int _get_pk_dsa_raw(gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_openpgp_crt_get_mpis (crt, kid32, params, &params_size);
+  ret = _gnutls_openpgp_crt_get_mpis(crt, kid32, params, &params_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1361,4 +1365,128 @@ int ret;
     }
     
   return _get_pk_dsa_raw( crt, keyid, p, q, g, y);
+}
+
+/**
+ * gnutls_openpgp_crt_get_preferred_key_id - Gets the preferred keyID
+ * @key: the structure that contains the OpenPGP public key.
+ * @keyid: the struct to save the keyid.
+ *
+ * Returns the 64-bit preferred keyID of the OpenPGP key. If it hasn't
+ * been set it returns GNUTLS_E_INVALID_REQUEST.
+ **/
+int
+gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t* keyid)
+{
+  if (!key || !keyid || !key->preferred_set)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  memcpy( keyid->keyid, key->preferred_keyid.keyid, sizeof(keyid->keyid));
+
+  return 0;
+}
+
+/**
+ * gnutls_openpgp_crt_set_preferred_key_id - Sets the prefered keyID
+ * @key: the structure that contains the OpenPGP public key.
+ * @keyid: the selected keyid
+ *
+ * This allows setting a preferred key id for the given certificate.
+ * This key will be used by functions that involve key handling.
+ *
+ **/
+int
+gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t keyid)
+{
+int ret;
+
+  if (!key)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* check if the id is valid */
+  ret = gnutls_openpgp_crt_get_subkey_idx ( key, keyid);
+  if (ret < 0)
+    {
+      _gnutls_x509_log("the requested subkey does not exist\n");
+      gnutls_assert();
+      return ret;
+    }
+
+  key->preferred_set = 1;
+  memcpy( key->preferred_keyid.keyid, keyid.keyid, sizeof(keyid.keyid));
+
+  return 0;
+}
+
+/**
+ * gnutls_openpgp_crt_get_auth_subkey - Gets the keyID of an authentication subkey
+ * @key: the structure that contains the OpenPGP public key.
+ * @keyid: the struct to save the keyid.
+ *
+ * Returns the 64-bit keyID of the first valid OpenPGP subkey marked for authentication. 
+ * 
+ * Returns zero on success.
+ **/
+int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t* keyid)
+{
+  int ret, subkeys, i;
+  unsigned int usage;
+  unsigned int keyid_init = 0;
+
+  subkeys = gnutls_openpgp_crt_get_subkey_count( crt);
+  if (subkeys <= 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_SUBKEY_ERROR;
+    }
+
+  /* Try to find a subkey with the authentication flag set.
+   * if none exists use the last one found
+   */  
+  for (i=0;i<subkeys;i++)
+    {
+
+      ret = gnutls_openpgp_crt_get_subkey_revoked_status(crt, i);
+      if (ret != 0) /* it is revoked. ignore it */
+        continue;
+
+      if (keyid_init == 0)
+        { /* keep the first valid subkey */
+          ret = gnutls_openpgp_crt_get_subkey_id( crt, i, keyid);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              return ret;
+            }
+          
+          keyid_init = 1;
+        }
+      
+      ret = gnutls_openpgp_crt_get_subkey_usage( crt, i, &usage);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          return ret;
+        }
+
+      if (usage & GNUTLS_KEY_KEY_AGREEMENT)
+        {
+          ret = gnutls_openpgp_crt_get_subkey_id( crt, i, keyid);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              return ret;
+            }
+
+          break;
+        }
+    }
+
+  return 0;
 }

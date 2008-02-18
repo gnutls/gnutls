@@ -678,19 +678,25 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
     }
 }
 
+/* Converts the first certificate for the cert_auth_info structure
+ * to a gcert.
+ */
 int
-_gnutls_raw_cert_to_gcert (gnutls_cert * gcert,
+_gnutls_get_auth_info_gcert (gnutls_cert * gcert,
 			   gnutls_certificate_type_t type,
-			   const gnutls_datum_t * raw_cert,
+			   cert_auth_info_t info,
 			   int flags /* OR of ConvFlags */ )
 {
   switch (type)
     {
     case GNUTLS_CRT_X509:
-      return _gnutls_x509_raw_cert_to_gcert (gcert, raw_cert, flags);
+      return _gnutls_x509_raw_cert_to_gcert (gcert,  &info->raw_certificate_list[0], flags);
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
-      return _gnutls_openpgp_raw_crt_to_gcert (gcert, raw_cert);
+      if (info->use_subkey)
+        return _gnutls_openpgp_raw_crt_to_gcert (gcert,  &info->raw_certificate_list[0], &info->subkey_id);
+      else
+        return _gnutls_openpgp_raw_crt_to_gcert (gcert,  &info->raw_certificate_list[0], NULL);
 #endif
     default:
       gnutls_assert ();

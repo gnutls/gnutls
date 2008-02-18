@@ -83,6 +83,9 @@ option (pgpkeyring) STR "FILE" { $pgp_keyring = $1 } "PGP Key ring file to use."
 #char *pgp_certfile;
 option (pgpcertfile) STR "FILE" { $pgp_certfile = $1 } "PGP Public Key (certificate) file to use."
 
+#char *pgp_subkey;
+option (pgpsubkey) STR "HEX|auto" { $pgp_subkey = $1 } "PGP subkey to use."
+
 #char *x509_keyfile;
 option (x509keyfile) STR "FILE" { $x509_keyfile = $1 } "X.509 key file to use."
 
@@ -128,4 +131,4 @@ init { $resume=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 
 	$debug = 0; $print_cert = 0; $verbose = 0; $psk_key = NULL; 
 	$psk_username = NULL; $priorities = NULL;
-	$opaque_prf_input = NULL; }
+	$opaque_prf_input = NULL; $pgp_subkey = NULL; }

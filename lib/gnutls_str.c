@@ -272,6 +272,14 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
 
 /* just a hex2bin function.
  */
+
+int
+gnutls_hex2bin (const char * hex_data, int hex_size, void * bin_data,
+		 size_t * bin_size)
+{
+  return _gnutls_hex2bin( hex_data, hex_size, bin_data, bin_size);
+}
+ 
 int
 _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 		 size_t * bin_size)

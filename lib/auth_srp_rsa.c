@@ -181,9 +181,9 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
   signature.size = sigsize;
 
   ret =
-    _gnutls_raw_cert_to_gcert (&peer_cert,
+    _gnutls_get_auth_info_gcert (&peer_cert,
 			       session->security_parameters.cert_type,
-			       &info->raw_certificate_list[0], CERT_NO_COPY);
+			       info, CERT_NO_COPY);
 
   if (ret < 0)
     {

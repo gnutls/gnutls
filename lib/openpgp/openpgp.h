@@ -14,16 +14,24 @@
 	dst[0] = _gnutls_read_uint32( src.keyid); \
 	dst[1] = _gnutls_read_uint32( src.keyid+4)
 
+#define KEYID_IMPORT2(dst, src) \
+	dst[0] = _gnutls_read_uint32( src->keyid); \
+	dst[1] = _gnutls_read_uint32( src->keyid+4)
+
 /* Internal context to store the OpenPGP key. */
 typedef struct gnutls_openpgp_crt_int
 {
   cdk_kbnode_t knode;
+  gnutls_openpgp_keyid_t preferred_keyid;
+  int preferred_set;
 } gnutls_openpgp_crt_int;
 
 /* Internal context to store the private OpenPGP key. */
 typedef struct gnutls_openpgp_privkey_int
 {
   cdk_kbnode_t knode;
+  gnutls_openpgp_keyid_t preferred_keyid;
+  int preferred_set;
 } gnutls_openpgp_privkey_int;
 
 
@@ -72,9 +80,9 @@ int gnutls_openpgp_crt_verify_self (gnutls_openpgp_crt_t key,
 				    unsigned int flags, unsigned int *verify);
 
 int _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert,
-				  gnutls_openpgp_crt_t cert, gnutls_openpgp_keyid_t keyid);
+				  gnutls_openpgp_crt_t cert);
 int _gnutls_openpgp_privkey_to_gkey (gnutls_privkey * dest,
-				     gnutls_openpgp_privkey_t src, gnutls_openpgp_keyid_t);
+				     gnutls_openpgp_privkey_t src);
 
 void gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key);
 

@@ -28,6 +28,7 @@
 #include <gnutls_pk.h>
 #include <libtasn1.h>
 #include "x509/x509.h"
+#include <gnutls/openpgp.h>
 
 #define MAX_PUBLIC_PARAMS_SIZE 4	/* ok for RSA and DSA */
 
@@ -73,6 +74,10 @@ typedef struct gnutls_cert
 
   gnutls_datum_t raw;
 
+#ifdef ENABLE_OPENPGP
+  int use_subkey;
+  gnutls_openpgp_keyid_t subkey_id;
+#endif
 } gnutls_cert;
 
 typedef struct gnutls_privkey_int
@@ -119,10 +124,5 @@ void _gnutls_gcert_deinit (gnutls_cert * cert);
 int _gnutls_selected_cert_supported_kx (struct gnutls_session_int *session,
 					gnutls_kx_algorithm_t ** alg,
 					int *alg_size);
-
-int _gnutls_raw_cert_to_gcert (gnutls_cert * gcert,
-			       gnutls_certificate_type_t type,
-			       const gnutls_datum_t * raw_cert,
-			       int flags /* OR of ConvFlags */ );
 
 #endif

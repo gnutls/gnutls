@@ -149,6 +149,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "pgpkeyfile", "FILE ", "PGP Key file to use.");
 	__gaa_helpsingle(0, "pgpkeyring", "FILE ", "PGP Key ring file to use.");
 	__gaa_helpsingle(0, "pgpcertfile", "FILE ", "PGP Public Key (certificate) file to use.");
+	__gaa_helpsingle(0, "pgpsubkey", "HEX ", "PGP subkey to use.");
 	__gaa_helpsingle(0, "x509keyfile", "FILE ", "X.509 key file to use.");
 	__gaa_helpsingle(0, "x509certfile", "FILE ", "X.509 Certificate file to use.");
 	__gaa_helpsingle(0, "srpusername", "NAME ", "SRP username to use.");
@@ -176,26 +177,28 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 119 "cli.gaa"
+#line 122 "cli.gaa"
 	char *rest_args;
-#line 110 "cli.gaa"
+#line 113 "cli.gaa"
 	int insecure;
-#line 107 "cli.gaa"
+#line 110 "cli.gaa"
 	char *port;
-#line 104 "cli.gaa"
+#line 107 "cli.gaa"
 	char *opaque_prf_input;
-#line 101 "cli.gaa"
+#line 104 "cli.gaa"
 	char *psk_key;
-#line 98 "cli.gaa"
+#line 101 "cli.gaa"
 	char *psk_username;
-#line 95 "cli.gaa"
+#line 98 "cli.gaa"
 	char *srp_passwd;
-#line 92 "cli.gaa"
+#line 95 "cli.gaa"
 	char *srp_username;
-#line 89 "cli.gaa"
+#line 92 "cli.gaa"
 	char *x509_certfile;
-#line 86 "cli.gaa"
+#line 89 "cli.gaa"
 	char *x509_keyfile;
+#line 86 "cli.gaa"
+	char *pgp_subkey;
 #line 83 "cli.gaa"
 	char *pgp_certfile;
 #line 80 "cli.gaa"
@@ -306,7 +309,7 @@ static int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           35
+#define GAA_NB_OPTION           36
 #define GAAOPTID_copyright	1
 #define GAAOPTID_version	2
 #define GAAOPTID_help	3
@@ -320,28 +323,29 @@ static int gaa_error = 0;
 #define GAAOPTID_srpusername	11
 #define GAAOPTID_x509certfile	12
 #define GAAOPTID_x509keyfile	13
-#define GAAOPTID_pgpcertfile	14
-#define GAAOPTID_pgpkeyring	15
-#define GAAOPTID_pgpkeyfile	16
-#define GAAOPTID_x509crlfile	17
-#define GAAOPTID_x509cafile	18
-#define GAAOPTID_priority	19
-#define GAAOPTID_ctypes	20
-#define GAAOPTID_kx	21
-#define GAAOPTID_macs	22
-#define GAAOPTID_comp	23
-#define GAAOPTID_protocols	24
-#define GAAOPTID_ciphers	25
-#define GAAOPTID_verbose	26
-#define GAAOPTID_recordsize	27
-#define GAAOPTID_print_cert	28
-#define GAAOPTID_disable_extensions	29
-#define GAAOPTID_fingerprint	30
-#define GAAOPTID_x509fmtder	31
-#define GAAOPTID_crlf	32
-#define GAAOPTID_starttls	33
-#define GAAOPTID_resume	34
-#define GAAOPTID_debug	35
+#define GAAOPTID_pgpsubkey	14
+#define GAAOPTID_pgpcertfile	15
+#define GAAOPTID_pgpkeyring	16
+#define GAAOPTID_pgpkeyfile	17
+#define GAAOPTID_x509crlfile	18
+#define GAAOPTID_x509cafile	19
+#define GAAOPTID_priority	20
+#define GAAOPTID_ctypes	21
+#define GAAOPTID_kx	22
+#define GAAOPTID_macs	23
+#define GAAOPTID_comp	24
+#define GAAOPTID_protocols	25
+#define GAAOPTID_ciphers	26
+#define GAAOPTID_verbose	27
+#define GAAOPTID_recordsize	28
+#define GAAOPTID_print_cert	29
+#define GAAOPTID_disable_extensions	30
+#define GAAOPTID_fingerprint	31
+#define GAAOPTID_x509fmtder	32
+#define GAAOPTID_crlf	33
+#define GAAOPTID_starttls	34
+#define GAAOPTID_resume	35
+#define GAAOPTID_debug	36
 
 #line 168 "gaa.skel"
 
@@ -576,6 +580,12 @@ struct GAAOPTION_x509keyfile
 	int size1;
 };
 
+struct GAAOPTION_pgpsubkey 
+{
+	char* arg1;
+	int size1;
+};
+
 struct GAAOPTION_pgpcertfile 
 {
 	char* arg1;
@@ -704,6 +714,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("", GAAOPTID_srpusername);
 			GAA_CHECK1STR("", GAAOPTID_x509certfile);
 			GAA_CHECK1STR("", GAAOPTID_x509keyfile);
+			GAA_CHECK1STR("", GAAOPTID_pgpsubkey);
 			GAA_CHECK1STR("", GAAOPTID_pgpcertfile);
 			GAA_CHECK1STR("", GAAOPTID_pgpkeyring);
 			GAA_CHECK1STR("", GAAOPTID_pgpkeyfile);
@@ -750,6 +761,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("srpusername", GAAOPTID_srpusername);
 			GAA_CHECKSTR("x509certfile", GAAOPTID_x509certfile);
 			GAA_CHECKSTR("x509keyfile", GAAOPTID_x509keyfile);
+			GAA_CHECKSTR("pgpsubkey", GAAOPTID_pgpsubkey);
 			GAA_CHECKSTR("pgpcertfile", GAAOPTID_pgpcertfile);
 			GAA_CHECKSTR("pgpkeyring", GAAOPTID_pgpkeyring);
 			GAA_CHECKSTR("pgpkeyfile", GAAOPTID_pgpkeyfile);
@@ -792,6 +804,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	struct GAAOPTION_srpusername GAATMP_srpusername;
 	struct GAAOPTION_x509certfile GAATMP_x509certfile;
 	struct GAAOPTION_x509keyfile GAATMP_x509keyfile;
+	struct GAAOPTION_pgpsubkey GAATMP_pgpsubkey;
 	struct GAAOPTION_pgpcertfile GAATMP_pgpcertfile;
 	struct GAAOPTION_pgpkeyring GAATMP_pgpkeyring;
 	struct GAAOPTION_pgpkeyfile GAATMP_pgpkeyfile;
@@ -828,35 +841,35 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_copyright:
 	OK = 0;
-#line 117 "cli.gaa"
+#line 120 "cli.gaa"
 { print_license(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_version:
 	OK = 0;
-#line 116 "cli.gaa"
+#line 119 "cli.gaa"
 { cli_version(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_help:
 	OK = 0;
-#line 114 "cli.gaa"
+#line 117 "cli.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list:
 	OK = 0;
-#line 113 "cli.gaa"
+#line 116 "cli.gaa"
 { print_list(gaaval->verbose); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_insecure:
 	OK = 0;
-#line 111 "cli.gaa"
+#line 114 "cli.gaa"
 { gaaval->insecure = 1 ;};
 
 		return GAA_OK;
@@ -866,7 +879,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_port.arg1, gaa_getstr, GAATMP_port.size1);
 		gaa_index++;
-#line 108 "cli.gaa"
+#line 111 "cli.gaa"
 { gaaval->port = GAATMP_port.arg1 ;};
 
 		return GAA_OK;
@@ -876,7 +889,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_opaque_prf_input.arg1, gaa_getstr, GAATMP_opaque_prf_input.size1);
 		gaa_index++;
-#line 105 "cli.gaa"
+#line 108 "cli.gaa"
 { gaaval->opaque_prf_input = GAATMP_opaque_prf_input.arg1 ;};
 
 		return GAA_OK;
@@ -886,7 +899,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_pskkey.arg1, gaa_getstr, GAATMP_pskkey.size1);
 		gaa_index++;
-#line 102 "cli.gaa"
+#line 105 "cli.gaa"
 { gaaval->psk_key = GAATMP_pskkey.arg1 ;};
 
 		return GAA_OK;
@@ -896,7 +909,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_pskusername.arg1, gaa_getstr, GAATMP_pskusername.size1);
 		gaa_index++;
-#line 99 "cli.gaa"
+#line 102 "cli.gaa"
 { gaaval->psk_username = GAATMP_pskusername.arg1 ;};
 
 		return GAA_OK;
@@ -906,7 +919,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_srppasswd.arg1, gaa_getstr, GAATMP_srppasswd.size1);
 		gaa_index++;
-#line 96 "cli.gaa"
+#line 99 "cli.gaa"
 { gaaval->srp_passwd = GAATMP_srppasswd.arg1 ;};
 
 		return GAA_OK;
@@ -916,7 +929,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_srpusername.arg1, gaa_getstr, GAATMP_srpusername.size1);
 		gaa_index++;
-#line 93 "cli.gaa"
+#line 96 "cli.gaa"
 { gaaval->srp_username = GAATMP_srpusername.arg1 ;};
 
 		return GAA_OK;
@@ -926,7 +939,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_x509certfile.arg1, gaa_getstr, GAATMP_x509certfile.size1);
 		gaa_index++;
-#line 90 "cli.gaa"
+#line 93 "cli.gaa"
 { gaaval->x509_certfile = GAATMP_x509certfile.arg1 ;};
 
 		return GAA_OK;
@@ -936,8 +949,18 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_x509keyfile.arg1, gaa_getstr, GAATMP_x509keyfile.size1);
 		gaa_index++;
-#line 87 "cli.gaa"
+#line 90 "cli.gaa"
 { gaaval->x509_keyfile = GAATMP_x509keyfile.arg1 ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_pgpsubkey:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_pgpsubkey.arg1, gaa_getstr, GAATMP_pgpsubkey.size1);
+		gaa_index++;
+#line 87 "cli.gaa"
+{ gaaval->pgp_subkey = GAATMP_pgpsubkey.arg1 ;};
 
 		return GAA_OK;
 		break;
@@ -1129,7 +1152,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAAREST_tmp.arg1, gaa_getstr, GAAREST_tmp.size1);
 		gaa_index++;
-#line 120 "cli.gaa"
+#line 123 "cli.gaa"
 { gaaval->rest_args = GAAREST_tmp.arg1; ;};
 
 		return GAA_OK;
@@ -1158,7 +1181,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 122 "cli.gaa"
+#line 125 "cli.gaa"
 { gaaval->resume=0; gaaval->port="443"; gaaval->rest_args=NULL; gaaval->ciphers=NULL;
 	gaaval->kx=NULL; gaaval->comp=NULL; gaaval->macs=NULL; gaaval->ctype=NULL; gaaval->nciphers=0;
 	gaaval->nkx=0; gaaval->ncomp=0; gaaval->nmacs=0; gaaval->nctype = 0; gaaval->record_size=0; 
@@ -1168,7 +1191,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->srp_username=NULL; gaaval->srp_passwd=NULL; gaaval->fmtder = 0; gaaval->starttls =0; 
 	gaaval->debug = 0; gaaval->print_cert = 0; gaaval->verbose = 0; gaaval->psk_key = NULL; 
 	gaaval->psk_username = NULL; gaaval->priorities = NULL;
-	gaaval->opaque_prf_input = NULL; ;};
+	gaaval->opaque_prf_input = NULL; gaaval->pgp_subkey = NULL; ;};
 
     }
     inited = 1;

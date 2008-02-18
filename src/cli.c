@@ -168,6 +168,25 @@ static gnutls_x509_privkey_t x509_key = NULL;
 static gnutls_openpgp_crt_t pgp_crt = NULL;
 static gnutls_openpgp_privkey_t pgp_key = NULL;
 
+static void get_keyid( gnutls_openpgp_keyid_t* keyid, const char* str)
+{
+    size_t keyid_size = sizeof(keyid->keyid);
+
+    if (strlen(str) != 16)
+      {
+        fprintf(stderr, "The OpenPGP subkey ID has to be 16 hexadecimal characters.\n");
+        exit(1);
+      }  
+
+    if (gnutls_hex2bin (str, strlen(str), keyid->keyid, &keyid_size) < 0)
+      {
+        fprintf(stderr, "Error converting hex string: %s.\n", str);
+        exit(1);
+      }
+          
+    return;
+}
+
 /* Load the certificate and the private key.
  */
 static void
@@ -256,6 +275,7 @@ load_keys (void)
 	  exit (1);
 	}
 
+
       unload_file (data);
 
       data = load_file (pgp_keyfile);
@@ -279,6 +299,37 @@ load_keys (void)
 	}
 
       unload_file (data);
+
+      if (info.pgp_subkey != NULL)
+        {
+          gnutls_openpgp_keyid_t keyid;
+
+          if (strcasecmp(info.pgp_subkey, "auto")==0)
+            {
+              ret = gnutls_openpgp_crt_get_auth_subkey( pgp_crt, keyid);
+              if (ret < 0)
+                {
+    	          fprintf (stderr,
+		      "*** Error setting preferred sub key id (%s): %s\n", info.pgp_subkey,
+		      gnutls_strerror (ret));
+                  exit (1);
+                }
+            }
+          else
+            get_keyid( &keyid, info.pgp_subkey);
+
+          ret = gnutls_openpgp_crt_set_preferred_key_id( pgp_crt, keyid);
+          if (ret >= 0)
+            ret = gnutls_openpgp_privkey_set_preferred_key_id( pgp_key, keyid);
+          if (ret < 0)
+            {
+    	      fprintf (stderr,
+		   "*** Error setting preferred sub key id (%s): %s\n", info.pgp_subkey,
+		   gnutls_strerror (ret));
+              exit (1);
+            } 
+        }
+
       fprintf (stderr, "Processed 1 client PGP certificate...\n");
     }
 #endif

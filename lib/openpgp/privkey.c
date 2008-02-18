@@ -547,14 +547,18 @@ gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
-_gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey, uint32_t keyid[2],
+_gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey, uint32_t *keyid /*[2]*/,
 			   mpi_t * params, int *params_size)
 {
   int result, i;
   int pk_algorithm, local_params;
   cdk_packet_t pkt;
+
+  if (keyid == NULL)
+    pkt = cdk_kbnode_find_packet (pkey->knode, CDK_PKT_SECRET_KEY);
+  else
+    pkt = _gnutls_openpgp_find_key( pkey->knode, keyid, 1);
   
-  pkt = _gnutls_openpgp_find_key( pkey->knode, keyid, 1);
   if (pkt == NULL)
     {
       gnutls_assert();
@@ -960,4 +964,61 @@ int ret;
     }
     
   return _get_sk_dsa_raw( pkey, keyid, p, q, g, y, x);
+}
+
+/**
+ * gnutls_openpgp_privkey_get_preferred_key_id - Gets the preferred keyID
+ * @key: the structure that contains the OpenPGP public key.
+ * @keyid: the struct to save the keyid.
+ *
+ * Returns the 64-bit preferred keyID of the OpenPGP key. If it hasn't
+ * been set it returns GNUTLS_E_INVALID_REQUEST.
+ **/
+int
+gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t* keyid)
+{
+  if (!key || !keyid || !key->preferred_set)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  memcpy( keyid->keyid, key->preferred_keyid.keyid, sizeof(keyid->keyid));
+
+  return 0;
+}
+
+/**
+ * gnutls_openpgp_privkey_set_preferred_key_id - Sets the prefered keyID
+ * @key: the structure that contains the OpenPGP public key.
+ * @keyid: the selected keyid
+ *
+ * This allows setting a preferred key id for the given certificate.
+ * This key will be used by functions that involve key handling.
+ *
+ **/
+int
+gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid)
+{
+int ret;
+
+  if (!key)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* check if the id is valid */
+  ret = gnutls_openpgp_privkey_get_subkey_idx ( key, keyid);
+  if (ret < 0)
+    {
+      _gnutls_x509_log("the requested subkey does not exist\n");
+      gnutls_assert();
+      return ret;
+    }
+
+  key->preferred_set = 1;
+  memcpy( key->preferred_keyid.keyid, keyid.keyid, sizeof(keyid.keyid));
+
+  return 0;
 }
