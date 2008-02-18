@@ -8,19 +8,6 @@
 #include <auth_cert.h>
 #include <opencdk.h>
 
-typedef struct
-{
-  int type;
-  size_t size;
-  uint8_t *data;
-} keybox_blob;
-
-typedef enum
-{
-  KBX_BLOB_FILE = 0x00,
-  KBX_BLOB_DATA = 0x01
-} keyring_blob_types;
-
 /* OpenCDK compatible */
 typedef enum
 {
@@ -91,8 +78,6 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 			       const gnutls_datum_t * data,
 			       gnutls_openpgp_crt_fmt_t format,
 			       const char *pass, unsigned int flags);
-
-int _gnutls_openpgp_find_valid_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t* keyid);
 
 #endif /*GNUTLS_OPENPGP_LOCAL_H */
 

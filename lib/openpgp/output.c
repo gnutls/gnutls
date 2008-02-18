@@ -129,16 +129,16 @@ print_key_id (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
     int err;
 
     if (idx < 0)
-      err = gnutls_openpgp_crt_get_key_id (cert, &id);
+      err = gnutls_openpgp_crt_get_key_id (cert, id);
     else
-      err = gnutls_openpgp_crt_get_subkey_id( cert, idx, &id);
+      err = gnutls_openpgp_crt_get_subkey_id( cert, idx, id);
 
     if (err < 0)
       addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
     else
       {
 	addf (str, _("\tID (hex): "));
-	hexprint (str, id.keyid, sizeof(id.keyid));
+	hexprint (str, id, sizeof(id));
 	addf (str, "\n");
       }
 }

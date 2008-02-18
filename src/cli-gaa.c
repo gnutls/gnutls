@@ -149,7 +149,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "pgpkeyfile", "FILE ", "PGP Key file to use.");
 	__gaa_helpsingle(0, "pgpkeyring", "FILE ", "PGP Key ring file to use.");
 	__gaa_helpsingle(0, "pgpcertfile", "FILE ", "PGP Public Key (certificate) file to use.");
-	__gaa_helpsingle(0, "pgpsubkey", "HEX ", "PGP subkey to use.");
+	__gaa_helpsingle(0, "pgpsubkey", "HEX|auto ", "PGP subkey to use.");
 	__gaa_helpsingle(0, "x509keyfile", "FILE ", "X.509 key file to use.");
 	__gaa_helpsingle(0, "x509certfile", "FILE ", "X.509 Certificate file to use.");
 	__gaa_helpsingle(0, "srpusername", "NAME ", "SRP username to use.");

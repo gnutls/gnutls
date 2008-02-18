@@ -19,9 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-/* Must be linked against gnutls-extra.
- */
-#include <gnutls/extra.h>
+#include <gnutls/openpgp.h>
 
 #define KEYFILE "secret.asc"
 #define CERTFILE "public.asc"

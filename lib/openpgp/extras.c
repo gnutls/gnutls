@@ -88,14 +88,14 @@ gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
  **/
 int
 gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
-				 gnutls_openpgp_keyid_t keyid,
+				 const gnutls_openpgp_keyid_t keyid,
 				 unsigned int flags)
 {
   cdk_pkt_pubkey_t pk;
   uint32_t id[2];
 
-  id[0] = _gnutls_read_uint32 (keyid.keyid);
-  id[1] = _gnutls_read_uint32 (&keyid.keyid[4]);
+  id[0] = _gnutls_read_uint32 (keyid);
+  id[1] = _gnutls_read_uint32 (&keyid[4]);
 
   if (!cdk_keydb_get_pk (ring->db, id, &pk))
     {

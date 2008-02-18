@@ -279,7 +279,7 @@ gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t* keyid)
+gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -295,8 +295,8 @@ gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
   cdk_sk_get_keyid (pkt->pkt.secret_key, kid);
-  _gnutls_write_uint32( kid[0], keyid->keyid);
-  _gnutls_write_uint32( kid[1], keyid->keyid+4);
+  _gnutls_write_uint32( kid[0], keyid);
+  _gnutls_write_uint32( kid[1], keyid+4);
 
   return 0;
 }
@@ -439,7 +439,7 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
  *
  **/
 int
-gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key, const gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   int ret;
@@ -522,7 +522,7 @@ gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int idx, gnutls_openpgp_keyid_t* keyid)
+gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int idx, gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -538,8 +538,8 @@ gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
   cdk_sk_get_keyid (pkt->pkt.secret_key, kid);
-  _gnutls_write_uint32( kid[0], keyid->keyid);
-  _gnutls_write_uint32( kid[1], keyid->keyid+4);
+  _gnutls_write_uint32( kid[0], keyid);
+  _gnutls_write_uint32( kid[1], keyid+4);
 
   return 0;
 }
@@ -851,7 +851,7 @@ gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey,
 gnutls_openpgp_keyid_t keyid;
 int ret;
 
-  ret = gnutls_openpgp_privkey_get_key_id( pkey, &keyid);  
+  ret = gnutls_openpgp_privkey_get_key_id( pkey, keyid);  
   if (ret < 0)
     {
       gnutls_assert ();
@@ -885,7 +885,7 @@ gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey,
 gnutls_openpgp_keyid_t keyid;
 int ret;
 
-  ret = gnutls_openpgp_privkey_get_key_id( pkey, &keyid);  
+  ret = gnutls_openpgp_privkey_get_key_id( pkey, keyid);  
   if (ret < 0)
     {
       gnutls_assert ();
@@ -921,7 +921,7 @@ gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey, uns
 gnutls_openpgp_keyid_t keyid;
 int ret;
 
-  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, &keyid);  
+  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, keyid);  
   if (ret < 0)
     {
       gnutls_assert ();
@@ -956,7 +956,7 @@ gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey, uns
 gnutls_openpgp_keyid_t keyid;
 int ret;
 
-  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, &keyid);  
+  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, keyid);  
   if (ret < 0)
     {
       gnutls_assert ();
@@ -975,7 +975,7 @@ int ret;
  * been set it returns GNUTLS_E_INVALID_REQUEST.
  **/
 int
-gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t* keyid)
+gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid)
 {
   if (!key || !keyid || !key->preferred_set)
     {
@@ -983,7 +983,7 @@ gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutl
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  memcpy( keyid->keyid, key->preferred_keyid.keyid, sizeof(keyid->keyid));
+  memcpy( keyid, key->preferred_keyid, sizeof(keyid));
 
   return 0;
 }
@@ -998,7 +998,8 @@ gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutl
  *
  **/
 int
-gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key, 
+  const gnutls_openpgp_keyid_t keyid)
 {
 int ret;
 
@@ -1018,7 +1019,7 @@ int ret;
     }
 
   key->preferred_set = 1;
-  memcpy( key->preferred_keyid.keyid, keyid.keyid, sizeof(keyid.keyid));
+  memcpy( key->preferred_keyid, keyid, sizeof(keyid));
 
   return 0;
 }

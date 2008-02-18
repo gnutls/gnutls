@@ -1177,9 +1177,9 @@ pgp_privkey_info (void)
 
       size = sizeof (buffer);
       if (i == -1)
-	ret = gnutls_openpgp_privkey_get_key_id (key, &keyid);
+	ret = gnutls_openpgp_privkey_get_key_id (key, keyid);
       else
-	ret = gnutls_openpgp_privkey_get_subkey_id (key, i, &keyid);
+	ret = gnutls_openpgp_privkey_get_subkey_id (key, i, keyid);
 
       if (ret < 0)
 	{
@@ -1189,7 +1189,7 @@ pgp_privkey_info (void)
       else
 	{
 	  fprintf (outfile, "Public Key ID: %s\n",
-		   raw_to_string (keyid.keyid, 8));
+		   raw_to_string (keyid, 8));
 	}
 
     }

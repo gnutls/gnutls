@@ -170,7 +170,7 @@ static gnutls_openpgp_privkey_t pgp_key = NULL;
 
 static void get_keyid( gnutls_openpgp_keyid_t* keyid, const char* str)
 {
-    size_t keyid_size = sizeof(keyid->keyid);
+    size_t keyid_size = sizeof(keyid);
 
     if (strlen(str) != 16)
       {
@@ -178,7 +178,7 @@ static void get_keyid( gnutls_openpgp_keyid_t* keyid, const char* str)
         exit(1);
       }  
 
-    if (gnutls_hex2bin (str, strlen(str), keyid->keyid, &keyid_size) < 0)
+    if (gnutls_hex2bin (str, strlen(str), keyid, &keyid_size) < 0)
       {
         fprintf(stderr, "Error converting hex string: %s.\n", str);
         exit(1);
