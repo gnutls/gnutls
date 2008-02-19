@@ -335,10 +335,10 @@ size_t dn_size = sizeof (dn);
 	break;
       }
 
-      if (err > 0)
-	addf (str, _("\tName[%d]: %s\n"), i, dn);
+      if (err >= 0)
+	addf (str, _("\tName[%d]: %s\n"), i-1, dn);
 
-  } while( err > 0);
+  } while( err >= 0);
 
   print_key_times( str, cert, -1);
 
