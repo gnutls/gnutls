@@ -693,10 +693,7 @@ _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
       return _gnutls_x509_raw_cert_to_gcert (gcert,  &info->raw_certificate_list[0], flags);
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
-      if (info->use_subkey)
-        return _gnutls_openpgp_raw_crt_to_gcert (gcert,  &info->raw_certificate_list[0], info->subkey_id);
-      else
-        return _gnutls_openpgp_raw_crt_to_gcert (gcert,  &info->raw_certificate_list[0], NULL);
+      return _gnutls_openpgp_raw_crt_to_gcert (gcert,  &info->raw_certificate_list[0], info->use_subkey?info->subkey_id:NULL);
 #endif
     default:
       gnutls_assert ();

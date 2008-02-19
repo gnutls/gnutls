@@ -91,7 +91,7 @@ _gnutls_map_cdk_rc (int rc)
  -*/
 int
 _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * gcert,
-				  const gnutls_datum_t * raw, const gnutls_openpgp_keyid_t *keyid)
+				  const gnutls_datum_t * raw, const gnutls_openpgp_keyid_t keyid)
 {
   gnutls_openpgp_crt_t pcrt;
   int ret;
@@ -113,7 +113,7 @@ _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * gcert,
 
   if (keyid != NULL)
     {
-      ret = gnutls_openpgp_crt_set_preferred_key_id( pcrt, *keyid);
+      ret = gnutls_openpgp_crt_set_preferred_key_id( pcrt, keyid);
       if (ret < 0)
         {
           gnutls_assert();

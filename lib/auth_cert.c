@@ -1051,7 +1051,7 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
   int peer_certificate_list_size = 0;
   gnutls_datum_t tmp, akey = { NULL, 0 };
   gnutls_openpgp_keyid_t subkey_id;
-  void* selected_subkey = NULL;
+  unsigned int subkey_id_set = 0;
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -1106,11 +1106,11 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
       p++;
       DECR_LEN (dsize, 1);
       memcpy( subkey_id, p, sizeof( subkey_id));
+      
+      subkey_id_set = 1;
 
       p+= sizeof( subkey_id);
       DECR_LEN (dsize, sizeof( subkey_id));
-      
-      selected_subkey = &subkey_id;
     }
 
   /* read the actual key or fingerprint */  
@@ -1192,7 +1192,7 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
 
   if ((ret =
        _gnutls_openpgp_raw_crt_to_gcert (&peer_certificate_list[0],
-					   &tmp, selected_subkey)) < 0)
+					   &tmp, subkey_id_set?subkey_id:NULL)) < 0)
     {
       gnutls_assert ();
       goto cleanup;
