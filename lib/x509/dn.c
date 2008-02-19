@@ -943,6 +943,85 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
   return 0;
 }
 
+/**
+  * gnutls_x509_dn_init: initialize an opaque DN object
+  *
+  * @odn: the object to be initialized
+  *
+  * This function initializes a #gnutls_x509_dn_t structure.
+  *
+  * The object returned must be deallocated using
+  * gnutls_x509_dn_deinit().
+  *
+  * Returns: 0 on success, or an error code.
+  **/
+int gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
+{
+  int result;
+  ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+
+  if ((result =
+       asn1_create_element (_gnutls_get_pkix (),
+			    "PKIX1.Name", &dn)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  *odn = dn;
+
+  return 0;
+}
+
+
+/**
+  * gnutls_x509_dn_import: get opaque DN object from DER RDN sequence
+  *
+  * @odn: the structure that will hold the imported DN
+  * @data: should contain a DER encoded RDN sequence
+  *
+  * This function parses an RDN sequence and stores the result to a
+  * #gnutls_x509_dn_t structure. The structure must have been initialized
+  * with gnutls_x509_dn_init(). You may use gnutls_x509_dn_get_rdn_ava() to 
+  * decode the DN.
+  *
+  * Returns: 0 on success, or an error code.
+  **/
+int
+gnutls_x509_dn_import (gnutls_x509_dn_t odn,
+                       const gnutls_datum_t * data)
+{
+  int result;
+  char err[MAX_ERROR_DESCRIPTION_SIZE];
+  ASN1_TYPE dn = odn;
+
+  result = asn1_der_decoding (&dn, data->data, data->size, err);
+  if (result != ASN1_SUCCESS)
+    {
+      /* couldn't decode DER */
+      _gnutls_x509_log("ASN.1 Decoding error: %s\n", err);
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return 0;
+}
+
+/**
+  * gnutls_x509_dn_deinit: deallocate a DN object
+  * @idn: a DN opaque object pointer.
+  *
+  * This function deallocates the DN object as returned by
+  * gnutls_x509_dn_import().
+  *
+  **/
+void 
+gnutls_x509_dn_deinit (gnutls_x509_dn_t idn)
+{
+  ASN1_TYPE dn = idn;
+
+  asn1_delete_structure(&dn);
+}
 
 /**
   * gnutls_x509_rdn_get - This function parses an RDN sequence and returns a string

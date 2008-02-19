@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -40,7 +40,7 @@ ctests = simple openssl gc set_pkcs12_cred certder	\
 	certificate_set_x509_crl dn parse_ca
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 if HAVE_FORK
-ctests +=  x509self x509signself anonself pskself dhepskself tlsia resume
+ctests +=  x509self x509signself x509dn anonself pskself dhepskself tlsia resume
 tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) @LTLIBREADLINE@
 endif
 if ENABLE_OPRFI

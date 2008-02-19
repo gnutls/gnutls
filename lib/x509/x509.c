@@ -1799,7 +1799,11 @@ get_dn (gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t *dn)
  * @dn: output variable with pointer to opaque DN.
  *
  * Return the Certificate's Subject DN as an opaque data type.  You
- * may use gnutls_x509_dn_get_rdn_ava() to decode the DN.
+ * may use gnutls_x509_dn_get_rdn_ava() to decode the DN. 
+ *
+ * Note that @dn should be treated as constant. Because points 
+ * into the @cert object, you may not deallocate @cert 
+ * and continue to access @dn.
  *
  * Returns: Returns 0 on success, or an error code.
  **/
@@ -1818,8 +1822,9 @@ gnutls_x509_crt_get_subject (gnutls_x509_crt_t cert,
  * Return the Certificate's Issuer DN as an opaque data type.  You may
  * use gnutls_x509_dn_get_rdn_ava() to decode the DN.
  *
- * Note that @dn points into the @cert object, and thus you may not
- * deallocate @cert and continue to access @dn.
+ * Note that @dn should be treated as constant. Because points 
+ * into the @cert object, you may not deallocate @cert 
+ * and continue to access @dn.
  *
  * Returns: Returns 0 on success, or an error code.
  **/

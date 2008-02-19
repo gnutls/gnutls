@@ -328,6 +328,14 @@ extern "C"
   int gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn,
 				  int iava, gnutls_x509_ava_st *avast);
 
+  int gnutls_x509_dn_init (gnutls_x509_dn_t * dn);
+
+  int gnutls_x509_dn_import (gnutls_x509_dn_t odn,
+                             const gnutls_datum_t * data);
+
+  void gnutls_x509_dn_deinit (gnutls_x509_dn_t idn);
+
+
 /* CRL handling functions.
  */
   int gnutls_x509_crl_init (gnutls_x509_crl_t * crl);

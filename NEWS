@@ -29,6 +29,9 @@ can be used for authentication.
 
 ** certtool can print information on OpenPGP certificates and keys.
 
+** Added gnutls_x509_dn_import/init/deinit() to access raw DER DN. Patch
+by Joe Orton.
+
 ** Included the LGPL version of opencdk
 
 ** Doc fixes.
@@ -36,8 +39,6 @@ Clarify that srp_base64 is not the same as normal base64.
 
 ** API and ABI modifications:
 gnutls_openpgp_keyid_t: ADDED, instead of hard-coded 'unsigned char[8]'.
-gnutls_openpgp_privkey_sign_hash: MODIFIED to account for keyid
-gnutls_openpgp_keyring_check_id: MODIFIED to account for new keyid type
 gnutls_openpgp_crt_get_key_id: ADDED to account for new keyid type,
                                obsoletes gnutls_openpgp_crt_get_id().
 gnutls_openpgp_privkey_get_id: RENAMED to gnutls_openpgp_privkey_get_key_id
@@ -69,6 +70,11 @@ gnutls_openpgp_privkey_export_subkey_rsa_raw: ADDED
 gnutls_openpgp_privkey_export_dsa_raw: ADDED
 gnutls_openpgp_privkey_export_rsa_raw: ADDED
 gnutls_openpgp_privkey_export: ADDED
+gnutls_certificate_set_openpgp_key_file2: ADDED
+gnutls_certificate_set_openpgp_key_mem2: ADDED
+gnutls_x509_dn_init: ADDED
+gnutls_x509_dn_import: ADDED
+gnutls_x509_dn_deinit: ADDED
 
 * Version 2.3.0 (released 2008-01-08)
 
