@@ -116,9 +116,9 @@ client (void)
    */
   success ("Setting key files...\n");
 
-  pubkey = "../doc/credentials/openpgp/pub.asc";
-  seckey = "../doc/credentials/openpgp/sec.asc";
-  ret = gnutls_certificate_set_openpgp_key_file2 (xcred, pubkey, seckey, "auto", GNUTLS_OPENPGP_FMT_BASE64);
+  pubkey = "../doc/credentials/openpgp/cli_pub.asc";
+  seckey = "../doc/credentials/openpgp/cli_sec.asc";
+  ret = gnutls_certificate_set_openpgp_key_file (xcred, pubkey, seckey, GNUTLS_OPENPGP_FMT_BASE64);
   if (ret < 0)
     {
       fail ("Could not set key files...\n");

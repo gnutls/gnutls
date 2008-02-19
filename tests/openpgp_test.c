@@ -69,12 +69,12 @@ main (int argc, char **argv)
   rc = gnutls_certificate_allocate_credentials (&ctx);
   assert (rc == 0);
 
-  s = "../src/openpgp/cli_ring.gpg";
+  s = "../doc/credentials/openpgp/cli_ring.gpg";
   rc = gnutls_certificate_set_openpgp_keyring_file (ctx, s);
   assert (rc == 0);
 
-  s = "../src/openpgp/pub.asc";
-  t = "../src/openpgp/sec.asc";
+  s = "../doc/credentials/openpgp/pub.asc";
+  t = "../doc/credentials/openpgp/sec.asc";
   rc = gnutls_certificate_set_openpgp_key_file (ctx, s, t);
   assert (rc == 0);
 
