@@ -62,9 +62,10 @@ typedef struct gnutls_certificate_credentials_st
    * cert_list[i][0].
    */
 
+#ifdef ENABLE_OPENPGP
   /* OpenPGP specific stuff */
-
   gnutls_openpgp_keyring_t keyring;
+#endif
 
   /* X509 specific stuff */
 

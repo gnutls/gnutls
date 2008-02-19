@@ -68,10 +68,6 @@ int _gnutls_openpgp_find_subkey_idx( cdk_kbnode_t knode, uint32_t keyid[2],
 
 int _gnutls_openpgp_get_algo( int cdk_algo);
 
-#else /* no opencdk */
-
-typedef void *gnutls_openpgp_keyring_t;
-
 #endif /* ENABLE_OPENPGP */
 
 #endif /* OPENPGP_LOCAL_H */
