@@ -287,7 +287,7 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (idx < 0 || idx > _gnutls_openpgp_count_key_names (key))
+  if (idx < 0 || idx >= _gnutls_openpgp_count_key_names (key))
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
   if (!idx)
