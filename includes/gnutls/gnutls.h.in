@@ -658,6 +658,15 @@ extern "C"
   void gnutls_certificate_free_ca_names (gnutls_certificate_credentials_t sc);
   void gnutls_certificate_free_crls (gnutls_certificate_credentials_t sc);
 
+  void gnutls_certificate_export_x509_cas (gnutls_certificate_credentials_t sc, 
+    gnutls_x509_crt_t **x509_ca_list, unsigned int* ncas);
+
+  void gnutls_certificate_export_x509_crls (gnutls_certificate_credentials_t sc, 
+    gnutls_x509_crl_t **x509_crl_list, unsigned int* ncrls);
+
+  void gnutls_certificate_export_openpgp_keyring (gnutls_certificate_credentials_t sc, 
+    gnutls_openpgp_keyring_t *keyring)
+
   void gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
 					 gnutls_dh_params_t dh_params);
   void

@@ -32,12 +32,19 @@ can be used for authentication.
 ** Added gnutls_x509_dn_import/init/deinit() to access raw DER DN. Patch
 by Joe Orton.
 
+** Added gnutls_certificate_export_x509_cas and other functions to
+export elements from the certificate credentials structure.
+
 ** Included the LGPL version of opencdk
 
 ** Doc fixes.
 Clarify that srp_base64 is not the same as normal base64.
 
 ** API and ABI modifications:
+gnutls_certificate_export_x509_cas: ADDED
+gnutls_certificate_export_x509_crls: ADDED
+gnutls_certificate_export_openpgp_keyring: ADDED
+gnutls_certificate_find_issuer: ADDED
 gnutls_openpgp_keyid_t: ADDED, instead of hard-coded 'unsigned char[8]'.
 gnutls_openpgp_crt_get_key_id: ADDED to account for new keyid type,
                                obsoletes gnutls_openpgp_crt_get_id().

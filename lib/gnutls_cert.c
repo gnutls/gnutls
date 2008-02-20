@@ -115,6 +115,62 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 }
 
 /**
+  * gnutls_certificate_export_x509_cas - Used to export all the CAs from a gnutls_certificate_credentials_t structure
+  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @x509_ca_list: the exported CA list. Should be treated as constant
+  * @ncas: the number of exported CAs
+  *
+  * This function will export all the CAs associated
+  * with the given credentials. 
+  *
+  **/
+void
+gnutls_certificate_export_x509_cas (gnutls_certificate_credentials_t sc, 
+  gnutls_x509_crt_t **x509_ca_list, unsigned int* ncas)
+{
+  *x509_ca_list = sc->x509_ca_list;
+  *ncas = sc->x509_ncas;
+}
+
+/**
+  * gnutls_certificate_export_x509_crls - Used to export all the CRLs from a gnutls_certificate_credentials_t structure
+  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @ring: the exported keyring. Should be treated as constant
+  *
+  * This function will export the OpenPGP keyring associated
+  * with the given credentials. 
+  *
+  **/
+void
+gnutls_certificate_export_x509_crls (gnutls_certificate_credentials_t sc, 
+  gnutls_x509_crl_t **x509_crl_list, unsigned int* ncrls)
+{
+  *x509_crl_list = sc->x509_crl_list;
+  *ncrls = sc->x509_ncrls;
+}
+
+#ifdef ENABLE_OPENPGP
+
+/**
+  * gnutls_certificate_export_openpgp_keyring - Used to export the keyring from a gnutls_certificate_credentials_t structure
+  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @x509_crl_list: the exported CRL list. Should be treated as constant
+  * @ncrls: the number of exported CRLs
+  *
+  * This function will export all the CRLs associated
+  * with the given credentials. 
+  *
+  **/
+void
+gnutls_certificate_export_openpgp_keyring (gnutls_certificate_credentials_t sc, 
+  gnutls_openpgp_keyring_t *keyring)
+{
+  *keyring = sc->keyring;
+}
+
+#endif
+
+/**
   * gnutls_certificate_free_ca_names - Used to free all the CA names from a gnutls_certificate_credentials_t structure
   * @sc: is an #gnutls_certificate_credentials_t structure.
   *
