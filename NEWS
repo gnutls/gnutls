@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.3.2 (unreleased)
 
+** Fix srcdir!=objdir failure in openpgpself test.
+
 ** API and ABI modifications:
 No changes since last version.
 
