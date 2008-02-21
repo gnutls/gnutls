@@ -34,7 +34,7 @@ by Joe Orton.
 
 ** Added gnutls_certificate_export_x509_cas and other functions to
 export elements from the certificate credentials structure.  Based on
-suggestion from Joe orton.
+suggestion from Joe Orton.
 
 ** Included the LGPL version of opencdk
 
