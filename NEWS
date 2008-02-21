@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.3.1 (unreleased)
 
+** OpenPGP support merged into libgnutls and is now licensed under LGPL.
+The included copy of OpenCDK has been stripped down and re-licensed
+under the LGPL.
+
 ** Cipher priority string handling now handle strings that starts with NULL.
 Thanks to Laurence Withers <l@lwithers.me.uk>.
 
@@ -24,19 +28,18 @@ strings and return the proper size.
 This collects all problems related to record padding with
 Nokia/Sony-Ericsson phones that we know about.
 
-** Several improvements in the OpenPGP authentication. Now subkeys
-can be used for authentication.
+** Several improvements in the OpenPGP authentication.
+Now subkeys can be used for authentication, according to
+draft-mavrogiannopoulos-rfc5081bis-00.txt.
 
 ** certtool can print information on OpenPGP certificates and keys.
 
-** Added gnutls_x509_dn_import/init/deinit() to access raw DER DN. Patch
-by Joe Orton.
+** Added gnutls_x509_dn_import/init/deinit() to access raw DER DN.
+Patch by Joe Orton.
 
 ** Added gnutls_certificate_export_x509_cas and other functions to
 export elements from the certificate credentials structure.  Based on
 suggestion from Joe Orton.
-
-** Included the LGPL version of opencdk
 
 ** Doc fixes.
 Clarify that srp_base64 is not the same as normal base64.
