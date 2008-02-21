@@ -80,6 +80,8 @@ gnutls_certificate_set_openpgp_key_mem2: ADDED
 gnutls_x509_dn_init: ADDED
 gnutls_x509_dn_import: ADDED
 gnutls_x509_dn_deinit: ADDED
+GNUTLS_E_OPENPGP_SUBKEY_ERROR: ADDED
+gnutls_hex2bin: ADDED
 
 * Version 2.3.0 (released 2008-01-08)
 
