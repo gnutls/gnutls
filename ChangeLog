@@ -1,3 +1,481 @@
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.1.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fixes.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/compat.h, includes/gnutls/gnutls.h.in,
+	lib/x509/output.c, src/certtool.c, src/serv.c: Use better names in
+	gnutls_certificate_print_formats_t.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention new APIs.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/openpgp.h: Drop gnutls_openpgp_crt_get_id (handled
+	by compat.h).
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Credit.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/compat.h, lib/openpgp/pgp.c: Cleanup
+	gnutls_openpgp_crt_get_id vs gnutls_openpgp_crt_get_key_id.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Typo.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, includes/gnutls/openpgp.h: Make it
+	build.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-extractor-01.txt,
+	doc/protocol/draft-mavrogiannopoulos-rfc5081bis-00.txt: Add.
+
+2008-02-20  Nikos <nmav@crystal.(none)>
+
+	* NEWS: removed function
+
+2008-02-20  Nikos <nmav@crystal.(none)>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_cert.c: Added
+	gnutls_certificate_export_x509_cas and other functions to export
+	elements from the certificate credentials structure.
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* lib/auth_cert.h, lib/openpgp/openpgp.h: changes to compile with
+	ENABLE_OPENPGP undef.
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/pgp.c: do not return more than the available names.
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/output.c: corrected bug that prevented printing the
+	names.
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* tests/openpgp_test.c, tests/openpgpself.c: some updates
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* tests/Makefile.am, tests/openpgpself.c: added self test for
+	openpgp connection
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* NEWS, includes/gnutls/x509.h, lib/x509/dn.c, lib/x509/x509.c,
+	tests/Makefile.am, tests/x509dn.c: Added
+	gnutls_x509_dn_import/init/deinit() to access raw DER DN. Patch by
+	Joe Orton.
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* lib/auth_cert.c, lib/gnutls_cert.c, lib/gnutls_openpgp.c,
+	lib/openpgp/gnutls_openpgp.h: better usage of gnutls_openpgp_keyid_t
+
+2008-02-19  Nikos <nmav@crystal.(none)>
+
+	* lib/auth_cert.c, lib/gnutls_openpgp.c, lib/openpgp/extras.c,
+	lib/openpgp/output.c, lib/openpgp/pgpverify.c,
+	lib/openpgp/privkey.c: copyright 2008
+
+2008-02-18  Nikos <nmav@crystal.(none)>
+
+	* doc/examples/ex-serv-pgp.c, includes/gnutls/gnutls.h.in,
+	includes/gnutls/openpgp.h, lib/auth_cert.c, lib/gnutls_cert.c,
+	lib/gnutls_openpgp.c, lib/openpgp/extras.c,
+	lib/openpgp/gnutls_openpgp.h, lib/openpgp/openpgp.h,
+	lib/openpgp/output.c, lib/openpgp/pgp.c, lib/openpgp/pgpverify.c,
+	lib/openpgp/privkey.c, src/certtool.c, src/cli-gaa.c, src/cli.c,
+	src/serv-gaa.c, tests/openpgp/keyring.c: pgp_keyid_t is now
+	compatible with the 2.2 key id.
+
+2008-02-18  Nikos <nmav@crystal.(none)>
+
+	* : commit 8784572575208f8755087125b168bb0a8832cee4 Author: Nikos
+	<nmav@crystal.(none)> Date:   Mon Feb 18 17:58:24 2008 +0200
+
+2008-02-18  Simon Josefsson <simon@josefsson.org>
+
+	* README: Don't mention SSL/TLS versions here.  Some minor other
+	fixes.
+
+2008-02-18  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/openpgp.h: For compatibility.
+
+2008-02-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/openpgp.h: Remove all external APIs already declared
+	in includes/gnutls/openpgp.h.
+
+2008-02-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/compat.h, lib/openpgp/pgp.c: Re-add
+	gnutls_openpgp_crt_get_id to avoid breaking ABI.
+
+2008-02-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention gnutls_openpgp_keyid_t.
+
+2008-02-18  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/vasnprintf.m4, lgl/vasnprintf.c: Update gnulib files.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* lib/x509/x509.c: corrected string handling in parse_general_name.
+	Thanks to Andreas Metzler for pointing out.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* NEWS, lib/gnutls_int.h, lib/gnutls_ui.c, lib/gnutls_x509.c: 
+	Increased the default certificate verification chain limits and
+	allowed for checks without limitation.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_priority.c: corrected previous fix in priorities
+	handling.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* NEWS, lib/auth_dh_common.c, lib/gnutls_auth.c,
+	lib/gnutls_session.c, lib/gnutls_session_pack.c: Corrected memory
+	leaks in session resuming and DHE ciphersuites. Reported by Daniel
+	Stenberg.
+
+2008-02-15  Nikos <nmav@crystal.(none)>
+
+	* NEWS: documented the gnutls_x509_crt_get_subject_alt_name fix.
+
+2008-02-15  Nikos <nmav@crystal.(none)>
+
+	* lib/x509/x509.c: null terminate only printable strings.
+
+2008-02-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-des-idea-00.txt: Add.
+
+2008-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-new-mac-04.txt: Add.
+
+2008-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_srp_sb64.c: Doc fixes, to clarify that srp_base64 !=
+	base64.  Based on discussion in
+
+	<http://thread.gmane.org/gmane.network.gnutls.general/1039/focus=1042>.
+
+2008-02-10  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-new-mac-03.txt,
+	doc/protocol/draft-ietf-tls-rfc4346-bis-09.txt,
+	doc/protocol/draft-ietf-tls-rsa-aes-gcm-02.txt: Add.
+
+2008-02-07  Nikos <nmav@crystal.(none)>
+
+	* : commit 5178625a7e120fdf7b859f52848aa9cc69574268 Author: Nikos
+	<nmav@crystal.(none)> Date:   Thu Feb 7 18:15:26 2008 +0200
+
+2008-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, Makefile.am, maint-cfg.mk: Brace expansion is not
+	POSIX portable.
+
+2008-02-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-04  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: When --debug is given, also print libgcrypt RNG
+	information.
+
+2008-02-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/gnutls.texi: Add 'On Record Padding' section.
+
+2008-02-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Re-order indices so they are last in the PDF.
+
+2008-02-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Merge in 2.2.1 release notes.
+
+2008-02-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c: Make it compile.
+
+2008-02-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/defines.h: Drop SIZEOF_UNSIGNED_LONG_INT, it's done in
+	configure.in now.
+
+2008-02-03  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/md4.m4, lgl/m4/md5.m4, lgl/m4/sha1.m4,
+	lgl/m4/unistd_h.m4, lgl/md2.c, lgl/md2.h, lgl/md4.c, lgl/md4.h,
+	lgl/md5.c, lgl/md5.h, lgl/sha1.c, lgl/sha1.h, lgl/unistd.in.h: 
+	Update gnulib files.
+
+2008-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/minitasn1/int.h, lib/minitasn1/libtasn1.h,
+	lib/minitasn1/structure.c: Update libtasn1 to 1.3.
+
+2008-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/unistd_h.m4, lgl/unistd.in.h,
+	lgl/vasnprintf.c: Update gnulib files.
+
+2008-01-27  Nikos <nmav@crystal.(none)>
+
+	* src/certtool.c: some updates
+
+2008-01-27  Nikos <nmav@crystal.(none)>
+
+	* includes/gnutls/openpgp.h: new definitions
+
+2008-01-26  Nikos <nmav@crystal.(none)>
+
+	* : commit 2d73da902a2a983cf146d32e7528f8d5d3efc287 Author: Nikos
+	<nmav@crystal.(none)> Date:   Sat Jan 26 23:08:18 2008 +0200
+
+2008-01-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rfc5077.txt: Add.
+
+2008-01-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc4346-bis-08.txt: Add.
+
+2008-01-25  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_openpgp.c, lib/openpgp/extras.c: updates in openpgp
+	keyring handling.
+
+2008-01-25  Nikos <nmav@crystal.(none)>
+
+	* lib/opencdk/Makefile.am, lib/opencdk/keydb.c,
+	lib/opencdk/keydb.h, lib/opencdk/opencdk.h: Modified the search to
+	include a state.
+
+2008-01-25  Nikos <nmav@crystal.(none)>
+
+	* src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.c,
+	src/certtool.gaa: print keyrings
+
+2008-01-23  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Simplify output.
+
+2008-01-23  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Fix paths.
+
+2008-01-19  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version so we are higher than gnutls 2.2.x but
+	remain compatible.  This will avoid shared library name conflicts
+	with 2.2.x, and also that any 2.3.x libraries will always be
+	prefered over 2.2.x.
+
+2008-01-19  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh, gl/error.h, lgl/Makefile.am,
+	lgl/gc-libgcrypt.c, lgl/m4/gnulib-comp.m4, lgl/m4/string_h.m4,
+	lgl/memmem.c, lgl/stdio.in.h, lgl/str-two-way.h, lgl/string.in.h,
+	lgl/vasnprintf.h: Update gnulib files.
+
+2008-01-17  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Update Ludovic's e-mail.
+
+2008-01-17  Simon Josefsson <simon@josefsson.org>
+
+	* guile/tests/openpgp-auth.scm: Also test dhe-rsa.
+
+2008-01-15  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openpgp/Makefile.am, libextra/openpgp/compat.c,
+	libextra/openpgp/extras.c, libextra/openpgp/gnutls_openpgp.h,
+	libextra/openpgp/openpgp.h, libextra/openpgp/pgp.c,
+	libextra/openpgp/pgpverify.c, libextra/openpgp/privkey.c: Remove
+	openpgp files moved to lib/openpgp/.
+
+2008-01-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Fix pgp-api.texi move.
+
+2008-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rfc2440.txt: Fix chmod.
+
+2008-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc4366-bis-01.txt: Add.
+
+2008-01-14  Nikos <nmav@crystal.(none)>
+
+	* : commit c6093b9df165dfbfbce8922e2192eedba5303f08 Author: Nikos
+	<nmav@crystal.(none)> Date:   Mon Jan 14 21:08:18 2008 +0200
+
+2008-01-14  Nikos <nmav@crystal.(none)>
+
+	* NEWS: documented more changes.
+
+2008-01-14  Nikos <nmav@crystal.(none)>
+
+	* tests/openpgp/keyring.c: changes for the new api
+
+2008-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/alloca.m4, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/memmem.m4, lgl/string.in.h: Use
+	gnulib's memmem-simple instead.
+
+2008-01-14  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove libextra/minilozo/Makefile.
+
+2008-01-14  Nikos <nmav@crystal.(none)>
+
+	* includes/gnutls/openpgp.h, lib/openpgp/privkey.c, src/certtool.c: 
+	openpgp_privkey_export() has parameters to export encrypted secret
+	keys. Added for future compatibility.
+
+2008-01-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rsa-aes-gcm-01.txt: Add.
+
+2008-01-13  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_openpgp.c: use the first valid subkey if an
+	authentication subkey is not found.
+
+2008-01-13  Nikos <nmav@crystal.(none)>
+
+	* NEWS, includes/gnutls/compat.h, includes/gnutls/openpgp.h,
+	lib/openpgp/openpgp.h, lib/openpgp/output.c, lib/openpgp/pgp.c,
+	lib/openpgp/pgpverify.c, lib/openpgp/privkey.c, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa: Additions to
+	make certtool print information on openpgp keys.
+
+2008-01-13  Nikos <nmav@crystal.(none)>
+
+	* NEWS: documented changes.
+
+2008-01-13  Nikos <nmav@crystal.(none)>
+
+	* README, configure.in, includes/gnutls/gnutls.h.in,
+	includes/gnutls/openpgp.h, lib/Makefile.am, lib/auth_cert.c,
+	lib/auth_cert.h, lib/gnutls_cert.c, lib/gnutls_cert.h,
+	lib/gnutls_errors.c, lib/gnutls_extra_hooks.c,
+	lib/gnutls_extra_hooks.h, lib/gnutls_openpgp.c, lib/gnutls_state.c,
+	lib/opencdk/Makefile.am, lib/opencdk/README, lib/opencdk/armor.c,
+	lib/opencdk/context.h, lib/opencdk/dummy.c, lib/opencdk/filters.h,
+	lib/opencdk/hash.c, lib/opencdk/kbnode.c, lib/opencdk/keydb.c,
+	lib/opencdk/literal.c, lib/opencdk/main.c, lib/opencdk/main.h,
+	lib/opencdk/misc.c, lib/opencdk/new-packet.c,
+	lib/opencdk/opencdk.h, lib/opencdk/packet.h, lib/opencdk/pubkey.c,
+	lib/opencdk/read-packet.c, lib/opencdk/seskey.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c,
+	lib/opencdk/stream.h, lib/opencdk/types.h, lib/opencdk/verify.c,
+	lib/opencdk/write-packet.c, lib/openpgp/Makefile.am,
+	lib/openpgp/compat.c, lib/openpgp/extras.c,
+	lib/openpgp/gnutls_openpgp.h, lib/openpgp/openpgp.h,
+	lib/openpgp/output.c, lib/openpgp/pgp.c, lib/openpgp/pgpverify.c,
+	lib/openpgp/privkey.c, libextra/Makefile.am,
+	libextra/gnutls_extra.c, libextra/gnutls_openpgp.c,
+	libextra/opencdk/Makefile.am, libextra/opencdk/README,
+	libextra/opencdk/armor.c, libextra/opencdk/cipher.c,
+	libextra/opencdk/compress.c, libextra/opencdk/context.h,
+	libextra/opencdk/dummy.c, libextra/opencdk/filters.h,
+	libextra/opencdk/kbnode.c, libextra/opencdk/keydb.c,
+	libextra/opencdk/literal.c, libextra/opencdk/main.c,
+	libextra/opencdk/main.h, libextra/opencdk/misc.c,
+	libextra/opencdk/new-packet.c, libextra/opencdk/opencdk.h,
+	libextra/opencdk/packet.h, libextra/opencdk/pubkey.c,
+	libextra/opencdk/read-packet.c, libextra/opencdk/seskey.c,
+	libextra/opencdk/sig-check.c, libextra/opencdk/stream.c,
+	libextra/opencdk/stream.h, libextra/opencdk/types.h,
+	libextra/opencdk/verify.c, libextra/opencdk/write-packet.c,
+	src/Makefile.am, src/certtool-gaa.c, src/certtool-gaa.h,
+	src/certtool.c, src/certtool.gaa, src/cli.c, src/serv.c,
+	src/tls_test.c: merged the openpgp branch to head\!
+
+2008-01-12  Nikos <nmav@crystal.(none)>
+
+	* libextra/Makefile.am: Added fix by Alon to avoid linking against
+	/usr/lib/libgnutls.so.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, maint-cfg.mk: Re-add config.rpath hack, since gnulib
+	updated config.rpath.
+
+2008-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/config.rpath, lgl/Makefile.am, lgl/dummy.c,
+	lgl/m4/eealloc.m4, lgl/m4/gnulib-comp.m4, lgl/m4/malloca.m4,
+	lgl/malloca.c, lgl/malloca.h, lgl/malloca.valgrind, lgl/memmem.c,
+	lgl/printf-parse.c: Update gnulib files.
+
+2008-01-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-01-08  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-01-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.0.
