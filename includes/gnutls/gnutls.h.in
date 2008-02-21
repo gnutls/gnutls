@@ -1,5 +1,5 @@
 /* -*- c -*-
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -658,15 +658,6 @@ extern "C"
   void gnutls_certificate_free_ca_names (gnutls_certificate_credentials_t sc);
   void gnutls_certificate_free_crls (gnutls_certificate_credentials_t sc);
 
-  void gnutls_certificate_export_x509_cas (gnutls_certificate_credentials_t sc, 
-    gnutls_x509_crt_t **x509_ca_list, unsigned int* ncas);
-
-  void gnutls_certificate_export_x509_crls (gnutls_certificate_credentials_t sc, 
-    gnutls_x509_crl_t **x509_crl_list, unsigned int* ncrls);
-
-  void gnutls_certificate_export_openpgp_keyring (gnutls_certificate_credentials_t sc, 
-    gnutls_openpgp_keyring_t *keyring)
-
   void gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
 					 gnutls_dh_params_t dh_params);
   void
@@ -722,6 +713,9 @@ extern "C"
   struct gnutls_x509_crt_int;
   typedef struct gnutls_x509_crt_int *gnutls_x509_crt_t;
 
+  struct gnutls_openpgp_keyring_int;
+  typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
+
   int gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
 				       gnutls_x509_crt_t * cert_list,
 				       int cert_list_size,
@@ -732,6 +726,17 @@ extern "C"
   int gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
 				       gnutls_x509_crl_t * crl_list,
 				       int crl_list_size);
+
+  void gnutls_certificate_export_x509_cas (gnutls_certificate_credentials_t sc,
+					   gnutls_x509_crt_t **x509_ca_list,
+					   unsigned int* ncas);
+
+  void gnutls_certificate_export_x509_crls (gnutls_certificate_credentials_t sc,
+					    gnutls_x509_crl_t **x509_crl_list,
+					    unsigned int* ncrls);
+
+  void gnutls_certificate_export_openpgp_keyring (gnutls_certificate_credentials_t sc,
+						  gnutls_openpgp_keyring_t *keyring)
 
 /* global state functions
  */

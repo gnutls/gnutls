@@ -185,9 +185,7 @@ extern "C"
 
 /* Keyring stuff.
  */
-  struct gnutls_openpgp_keyring_int;	/* object to hold (parsed) openpgp keyrings */
-  typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
-  
+
   int gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring);
   void gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring);
 
