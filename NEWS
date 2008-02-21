@@ -33,8 +33,8 @@ can be used for authentication.
 by Joe Orton.
 
 ** Added gnutls_certificate_export_x509_cas and other functions to
-export elements from the certificate credentials structure.  Suggested
-by Joe orton.
+export elements from the certificate credentials structure.  Based on
+suggestion from Joe orton.
 
 ** Included the LGPL version of opencdk
 
