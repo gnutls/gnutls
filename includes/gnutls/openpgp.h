@@ -89,9 +89,6 @@ extern "C"
   int gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key,
 				 gnutls_openpgp_keyid_t keyid);
 
-  int gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key,
-				 unsigned char keyid[8]);
-
   int gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
 					 const char *hostname);
 
