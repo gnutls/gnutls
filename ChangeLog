@@ -1,3 +1,56 @@
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.2.2.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* lib/x509/x509.c: corrected string handling in parse_general_name.
+	Thanks to Andreas Metzler for pointing out.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* NEWS, lib/gnutls_int.h, lib/gnutls_ui.c, lib/gnutls_x509.c: 
+	Increased the default certificate verification chain limits and
+	allowed for checks without limitation.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_priority.c: corrected previous fix in priorities
+	handling.
+
+2008-02-17  Nikos <nmav@crystal.(none)>
+
+	* NEWS, lib/auth_dh_common.c, lib/gnutls_auth.c,
+	lib/gnutls_session.c, lib/gnutls_session_pack.c: Corrected memory
+	leaks in session resuming and DHE ciphersuites. Reported by Daniel
+	Stenberg.
+
+2008-02-15  Nikos <nmav@crystal.(none)>
+
+	* NEWS: documented the fix in
+	gnutls_x509_crt_get_subject_alt_name().
+
+2008-02-15  Nikos <nmav@crystal.(none)>
+
+	* lib/x509/x509.c: null terminate only printable strings.
+
+2008-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2008-02-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-07  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_priority.c: Applied patch to fix the NONE parameters.
+	By Laurence Withers <l@lwithers.me.uk>
+
+2008-01-17  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-01-17  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.2.1.
