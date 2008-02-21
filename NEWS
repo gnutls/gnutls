@@ -44,6 +44,8 @@ suggestion from Joe Orton.
 ** Doc fixes.
 Clarify that srp_base64 is not the same as normal base64.
 
+** Fix non-portable use of brace expansion in makefiles.
+
 ** API and ABI modifications:
 gnutls_certificate_export_x509_cas: ADDED
 gnutls_certificate_export_x509_crls: ADDED
@@ -110,6 +112,24 @@ in a callback friendly way.
 ** Updated translations.
 
 ** Update gnulib files.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.2.2 (released 2008-02-21)
+
+** Cipher priority string handling now handle strings that starts with NULL.
+Thanks to Laurence Withers <l@lwithers.me.uk>.
+
+** Corrected memory leaks in session resuming and DHE ciphersuites. Reported
+by Daniel Stenberg.
+
+** Increased the default certificate verification chain limits and allowed
+for checks without limitation.
+
+** Corrected the behaviour of gnutls_x509_crt_get_subject_alt_name()
+and gnutls_x509_crt_get_subject_alt_name() to not null terminate binary
+strings and return the proper size.
 
 ** API and ABI modifications:
 No changes since last version.
