@@ -736,7 +736,7 @@ extern "C"
 					    unsigned int* ncrls);
 
   void gnutls_certificate_export_openpgp_keyring (gnutls_certificate_credentials_t sc,
-						  gnutls_openpgp_keyring_t *keyring)
+						  gnutls_openpgp_keyring_t *keyring);
 
 /* global state functions
  */
