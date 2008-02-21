@@ -93,7 +93,13 @@
 #define gnutls_openpgp_key_get_id gnutls_openpgp_crt_get_id
 #define gnutls_openpgp_key_check_hostname gnutls_openpgp_crt_check_hostname
 
-/* OpenPGP stuff renamed in 2.2.x. */
+/* OpenPGP stuff renamed in 2.3.x. */
 #define gnutls_openpgp_crt_get_id gnutls_openpgp_crt_get_key_id
+
+/* New better names renamed in 2.3.x, add these for backwards
+   compatibility with old poor names.*/
+#define GNUTLS_X509_CRT_FULL GNUTLS_CRT_PRINT_FULL
+#define GNUTLS_X509_CRT_ONELINE GNUTLS_CRT_PRINT_ONELINE
+#define GNUTLS_X509_CRT_UNSIGNED_FULL GNUTLS_CRT_PRINT_UNSIGNED_FULL
 
 #endif /* GCOMPAT_H */

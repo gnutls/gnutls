@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -1291,10 +1291,10 @@ print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
   int ret;
 
   if (all)
-    ret = gnutls_x509_crt_print (crt, GNUTLS_X509_CRT_FULL, &info);
+    ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &info);
   else
     ret =
-	gnutls_x509_crt_print (crt, GNUTLS_X509_CRT_UNSIGNED_FULL, &info);
+	gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_UNSIGNED_FULL, &info);
   if (ret == 0)
     {
       fprintf (out, "%s\n", info.data);
@@ -1315,7 +1315,7 @@ print_crl_info (gnutls_x509_crl_t crl, FILE * out)
   int ret;
   size_t size;
 
-  ret = gnutls_x509_crl_print (crl, GNUTLS_X509_CRT_FULL, &info);
+  ret = gnutls_x509_crl_print (crl, GNUTLS_CRT_PRINT_FULL, &info);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_print: %s", gnutls_strerror (ret));
 

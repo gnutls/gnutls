@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Free Software Foundation
+ * Copyright (C) 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -1111,9 +1111,9 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
  * This function will pretty print a X.509 certificate, suitable for
  * display to a human.
  *
- * If the format is %GNUTLS_X509_CRT_FULL then all fields of the
+ * If the format is %GNUTLS_CRT_PRINT_FULL then all fields of the
  * certificate will be output, on multiple lines.  The
- * %GNUTLS_X509_CRT_ONELINE format will generate one line with some
+ * %GNUTLS_CRT_PRINT_ONELINE format will generate one line with some
  * selected fields, which is useful for logging purposes.
  *
  * The output @out needs to be deallocate using gnutls_free().
@@ -1127,24 +1127,24 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 {
   gnutls_string str;
 
-  if (format == GNUTLS_X509_CRT_FULL
-      || format == GNUTLS_X509_CRT_UNSIGNED_FULL)
+  if (format == GNUTLS_CRT_PRINT_FULL
+      || format == GNUTLS_CRT_PRINT_UNSIGNED_FULL)
     {
       _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
 
       _gnutls_string_append_str (&str, _("X.509 Certificate Information:\n"));
 
-      print_cert (&str, cert, format == GNUTLS_X509_CRT_UNSIGNED_FULL);
+      print_cert (&str, cert, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
       _gnutls_string_append_str (&str, _("Other Information:\n"));
 
-      print_other (&str, cert, format == GNUTLS_X509_CRT_UNSIGNED_FULL);
+      print_other (&str, cert, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
       _gnutls_string_append_data (&str, "\0", 1);
       out->data = str.data;
       out->size = strlen (str.data);
     }
-  else if (format == GNUTLS_X509_CRT_ONELINE)
+  else if (format == GNUTLS_CRT_PRINT_ONELINE)
     {
       _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
 
@@ -1348,7 +1348,7 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
   _gnutls_string_append_str
     (&str, _("X.509 Certificate Revocation List Information:\n"));
 
-  print_crl (&str, crl, format == GNUTLS_X509_CRT_UNSIGNED_FULL);
+  print_crl (&str, crl, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
   _gnutls_string_append_data (&str, "\0", 1);
   out->data = str.data;

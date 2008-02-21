@@ -82,6 +82,10 @@ gnutls_x509_dn_import: ADDED
 gnutls_x509_dn_deinit: ADDED
 GNUTLS_E_OPENPGP_SUBKEY_ERROR: ADDED
 gnutls_hex2bin: ADDED
+GNUTLS_CRT_PRINT_FULL: ADDED, same as old GNUTLS_X509_CRT_FULL.
+GNUTLS_CRT_PRINT_ONELINE: ADDED, same as old GNUTLS_X509_CRT_ONELINE.
+GNUTLS_CRT_PRINT_UNSIGNED_FULL: ADDED, same as
+                                old GNUTLS_X509_CRT_UNSIGNED_FULL.
 
 * Version 2.3.0 (released 2008-01-08)
 

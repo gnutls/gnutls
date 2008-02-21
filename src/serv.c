@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2006, 2007, 2008 Free Software Foundation
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavrogiannopoulos
  *
@@ -487,7 +487,7 @@ peer_print_info (gnutls_session_t session, int *ret_length, const char *header)
 	  if (gnutls_x509_crt_init (&cert) == 0 &&
 	      gnutls_x509_crt_import (cert, &cert_list[i],
 				      GNUTLS_X509_FMT_DER) == 0 &&
-	      gnutls_x509_crt_print (cert, GNUTLS_X509_CRT_FULL, &info) == 0)
+	      gnutls_x509_crt_print (cert, GNUTLS_CRT_PRINT_FULL, &info) == 0)
 	    {
 	      const char *post = "</PRE><P><PRE>";
 
