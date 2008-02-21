@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -96,6 +96,51 @@ tcp_close (int sd)
   close (sd);
 }
 
+const char cert_txt[] =
+  "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
+  "Version: GnuPG v1.0.6 (GNU/Linux)\n"
+  "Comment: For info see http://www.gnupg.org\n"
+  "\n"
+  "mQGiBDxnlY0RBACAsWUhi/goBvpvTBgL8fFPwBAuD04VYFEtC7+4pBp6kFsHjUR7\n"
+  "TTUkBsOk2PvMHrDdv0+C4x2CH8YGP1e+O0f2yLWk8Uu+kkF12yiqbbvDEiCdeJT6\n"
+  "c3vIstY8vJ9Jso5g/LB8Xggq88R7jXFS3hH+WC5v/6P6SARfzXl457cVewCgvxSf\n"
+  "Gsm9mFospJ0B3RGyg5MB0d8D/RQQryJCGdR2nLe4VfctPL2QBD/1XhtubqEbetaV\n"
+  "PxssqrJdA+eplBRT7UHokSBahM8gmSmNuSrLDujPfEtaMg6YIkB+Kq0VeJLE0cXT\n"
+  "ZIH29KJlI/qk1xG4K7D6B0cKaHC/L4BIoKcQLJzfTIPw3frS4jVeNaQZNHSVqZ8/\n"
+  "VmOMA/9rkNtccQ4RVd9WTFoHKvT4vfiISEOIzKGmcBY9Hymq7MCci3mNe4CDImkv\n"
+  "ZgnjDlJAM91CX1ODthPLBqvyhnMhhxDnaDl4Nh42uPMSr9JEW2IwoIbFne10ihGT\n"
+  "O4lBS1C28UfSGEMm/8JBMtxAjbYy3BYzUtCMA+bGBG6Voe5i5LQlRHIuIFdobyAo\n"
+  "Tm8gY29tbWVudHMpIDx3aG9Ad2hvaXMub3JnPohdBBMRAgAdBQI8Z5WNBQkDwmcA\n"
+  "BQsHCgMEAxUDAgMWAgECF4AACgkQNRRc6qfZPD+WWACfeJnLyfbpTDB7mDh3aATb\n"
+  "+0PXz28AoKRdApBVM6Bty+vWyXH6HfF6ZTj+\n"
+  "=m8dH\n"
+  "-----END PGP PUBLIC KEY BLOCK-----\n";
+const gnutls_datum_t cert = { cert_txt, sizeof (cert_txt) };
+
+const char key_txt[] =
+  "-----BEGIN PGP PRIVATE KEY BLOCK-----\n"
+  "Version: GnuPG v1.0.6 (GNU/Linux)\n"
+  "Comment: For info see http://www.gnupg.org\n"
+  "\n"
+  "lQG7BDxnlY0RBACAsWUhi/goBvpvTBgL8fFPwBAuD04VYFEtC7+4pBp6kFsHjUR7\n"
+  "TTUkBsOk2PvMHrDdv0+C4x2CH8YGP1e+O0f2yLWk8Uu+kkF12yiqbbvDEiCdeJT6\n"
+  "c3vIstY8vJ9Jso5g/LB8Xggq88R7jXFS3hH+WC5v/6P6SARfzXl457cVewCgvxSf\n"
+  "Gsm9mFospJ0B3RGyg5MB0d8D/RQQryJCGdR2nLe4VfctPL2QBD/1XhtubqEbetaV\n"
+  "PxssqrJdA+eplBRT7UHokSBahM8gmSmNuSrLDujPfEtaMg6YIkB+Kq0VeJLE0cXT\n"
+  "ZIH29KJlI/qk1xG4K7D6B0cKaHC/L4BIoKcQLJzfTIPw3frS4jVeNaQZNHSVqZ8/\n"
+  "VmOMA/9rkNtccQ4RVd9WTFoHKvT4vfiISEOIzKGmcBY9Hymq7MCci3mNe4CDImkv\n"
+  "ZgnjDlJAM91CX1ODthPLBqvyhnMhhxDnaDl4Nh42uPMSr9JEW2IwoIbFne10ihGT\n"
+  "O4lBS1C28UfSGEMm/8JBMtxAjbYy3BYzUtCMA+bGBG6Voe5i5AAAnjMCLPrxGdgE\n"
+  "I0xXdwCQ4Sh2diNECAj9JiM6RFNBX2ZhY3RvcjoAAK9cun7/j4AUMmdvIy5UMJph\n"
+  "A6eq6atP/SYjOkRTQV9mYWN0b3I6AACvVjUuomodmmyCggPHWdeVSzpX3ODEHf0m\n"
+  "IzpEU0FfZmFjdG9yOgAAr2Iv9H2aSH+vJKGYW/BO4ehQwwFck7u0JURyLiBXaG8g\n"
+  "KE5vIGNvbW1lbnRzKSA8d2hvQHdob2lzLm9yZz6IXQQTEQIAHQUCPGeVjQUJA8Jn\n"
+  "AAULBwoDBAMVAwIDFgIBAheAAAoJEDUUXOqn2Tw/llgAnjBPQdWxIqBCQGlcI2K/\n"
+  "gLkZR1ARAJ9kaAeJYERc0bV/vlm0ot7UDdr+bQ==\n"
+  "=4M0W\n"
+  "-----END PGP PRIVATE KEY BLOCK-----\n";
+const gnutls_datum_t key = { key_txt, sizeof (key_txt) };
+
 void
 client (void)
 {
@@ -103,7 +148,6 @@ client (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   gnutls_certificate_credentials_t xcred;
-  const char* seckey, *pubkey;
 
   gnutls_global_init ();
 
@@ -116,9 +160,8 @@ client (void)
    */
   success ("Setting key files...\n");
 
-  pubkey = "../doc/credentials/openpgp/cli_pub.asc";
-  seckey = "../doc/credentials/openpgp/cli_sec.asc";
-  ret = gnutls_certificate_set_openpgp_key_file (xcred, pubkey, seckey, GNUTLS_OPENPGP_FMT_BASE64);
+  ret = gnutls_certificate_set_openpgp_key_mem (xcred, &cert, &key,
+						GNUTLS_OPENPGP_FMT_BASE64);
   if (ret < 0)
     {
       fail ("Could not set key files...\n");
@@ -256,10 +299,86 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
+const char server_crt_txt[] =
+  "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
+  "Version: GnuPG v1.4.6 (GNU/Linux)\n"
+  "\n"
+  "mNEER2PogwEGINdIR4u5PR4SwADWwj/ztgtoi7XVbmlfbQTHpBYFxTSC88pISSNy\n"
+  "V/rgnlqunYP77F7aHL4KUReN3v9sKw01xSGEfox/JmlqUUg6CVvTjdeLfkuVIBnH\n"
+  "j+2KMlaxezp7IxtPaTXpXcSf8iOuVq7UX7p6tKbppKXO5GgmfA88VUVvGBs1/PQp\n"
+  "WKQdGrj+6I3RRmDN/hna1jGU/N23230Hbx+bu7g9cviiSh10ri7rdDhVJ67tRkRG\n"
+  "Usy3XO6dWC7EmzZlEO8AEQEAAbQQdGVzdDMuZ251dGxzLm9yZ4kBAAQTAQIAJgUC\n"
+  "R2PogwIbAwUJCWYBgAYLCQgHAwIEFQIIAwQWAgMBAh4BAheAAAoJEKAh4/gImZBR\n"
+  "96QGH3E3zynETuQS3++hGMvMXq2mDJeT2e8964y/ifIOBpr2K2isuLYnrtGKyxi+\n"
+  "ZptyHv6ymR3bDvio50cjnoT/WK1onosOJvtijGBS+U/ooq3im7ExpeQYXc/zpYsX\n"
+  "OmB5m6BvdomUp2PMqdxsmOPoaRkSYx5R2Rlo/z3csodl6sp3k465Y/jg7L4gkxDz\n"
+  "XJM+CS1xMhcOF0gBhppqLnG67x0ow847Pydstzkw0sOqedkLPuScaHNnlAWQ7QH6\n"
+  "mbbpqHJwekS4jQRHiKV8AQQA0iZ81WXypLI4ZE2+hYfBCnfMVfQF/vPgvASxhwri\n"
+  "GDa9Zc2f/VfakfNiwZgHH6iCeppHBiP2jljnbuOsL6f1R+0FsnyTVwHbuEU7IU2y\n"
+  "+J0/s0z3wcx9sx8T7brP5z5F2hdagBsD9YFGCifHDAEew4mmAisY0i2QHVIuXJFj\n"
+  "4RMAEQEAAYkBhwQYAQIADwUCR4ilfAIbAgUJEOrPgACoCRCgIeP4CJmQUZ0gBBkB\n"
+  "AgAGBQJHiKV8AAoJEIN7b7QuD+F2AEcEAKAjhO9kSOE8UuwEOKlwsWL9LUUSkHJj\n"
+  "c/ca0asLAerzrHsldRAcwCbWkVxBBHySw2CLFjzpgdXhwRtsytMgHaapfAPbinAW\n"
+  "jCPIEJx2gDZeZnTgi4DVbZn5E3UzHGyL69MEoXr5t+vpiemQFd/nGD+h/Q2A76od\n"
+  "gvAryRvS1Soj8bcGHjUflayXGOSvaD8P2V5Vz0hS82QZcqWxD8qUBqbcB8atokmO\n"
+  "IYxhKyRmO58T5Ma+iaxBTUIwee+pBYDgdH6E2dh9xLlwwzZKaCcIRCQcObkLsMVo\n"
+  "fZJo+m0Xf8zI57NeQF+hXJhW7lIrWgQVr8IVp/lgo76acLHfL/t1n0Nhg4r2srz2\n"
+  "fpP2w5laQ0qImYLnZhGFHU+rJUyFaHfhD8/svN2LuZkO570pjV/K68EaHnEfk5b8\n"
+  "jWu/euohwcCwf20M1kTo3Bg=\n"
+  "=Xjon\n"
+  "-----END PGP PUBLIC KEY BLOCK-----\n";
+const gnutls_datum_t server_crt = { server_crt_txt, sizeof (server_crt_txt) };
+
+const char server_key_txt[] =
+  "-----BEGIN PGP PRIVATE KEY BLOCK-----\n"
+  "Version: GnuPG v1.4.6 (GNU/Linux)\n"
+  "\n"
+  "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\n"
+  "=mZnW\n"
+  "-----END PGP PRIVATE KEY BLOCK-----\n";
+const gnutls_datum_t server_key = { server_key_txt, sizeof (server_key_txt) };
+
 void
 server_start (void)
 {
-  const char* pubkey, *seckey;
   /* this must be called once in the program
    */
   gnutls_global_init ();
@@ -269,12 +388,12 @@ server_start (void)
 
   gnutls_certificate_allocate_credentials (&pgp_cred);
 
-  pubkey = "../doc/credentials/openpgp/pub.asc";
-  seckey = "../doc/credentials/openpgp/sec.asc";
-  err = gnutls_certificate_set_openpgp_key_file2 (pgp_cred, pubkey, seckey, "auto", GNUTLS_OPENPGP_FMT_BASE64);
+  ret = gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &server_crt,
+						 &server_key, "auto",
+						 GNUTLS_OPENPGP_FMT_BASE64);
   if (err < 0)
     {
-      fail ("Could not set key files...\n");
+      fail ("Could not set server key files...\n");
     }
 
   success ("Launched, setting DH parameters...\n");
