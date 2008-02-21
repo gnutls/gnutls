@@ -471,21 +471,6 @@ gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t 
   return 0;
 }
 
-/*-
- * gnutls_openpgp_crt_get_id - Gets the keyID
- * @key: the structure that contains the OpenPGP public key.
- * @keyid: the buffer to save the keyid.
- *
- * Returns the 64-bit keyID of the OpenPGP key.
- *
- * Deprecated: Use gnutls_openpgp_crt_get_key_id() instead.
- -*/
-int
-gnutls_openpgp_crt_get_id (gnutls_openpgp_crt_t key, unsigned char keyid[8])
-{
-  return gnutls_openpgp_crt_get_key_id( key, keyid);
-}
-
 /**
  * gnutls_openpgp_crt_get_revoked_status - Gets the revoked status of the key
  * @key: the structure that contains the OpenPGP public key.

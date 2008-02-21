@@ -93,4 +93,7 @@
 #define gnutls_openpgp_key_get_id gnutls_openpgp_crt_get_id
 #define gnutls_openpgp_key_check_hostname gnutls_openpgp_crt_check_hostname
 
+/* OpenPGP stuff renamed in 2.2.x. */
+#define gnutls_openpgp_crt_get_id gnutls_openpgp_crt_get_key_id
+
 #endif /* GCOMPAT_H */
