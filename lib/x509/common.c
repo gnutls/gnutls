@@ -710,9 +710,9 @@ _gnutls_x509_san_find_type (char *str_type)
  * to PEM or DER raw data.
  */
 int
-_gnutls_x509_export_int (ASN1_TYPE asn1_data,
-			 gnutls_x509_crt_fmt_t format, char *pem_header,
-			 unsigned char *output_data, size_t * output_data_size)
+_gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
+                               gnutls_x509_crt_fmt_t format, char *pem_header,
+                               unsigned char *output_data, size_t * output_data_size)
 {
   int result, len;
 
@@ -725,7 +725,7 @@ _gnutls_x509_export_int (ASN1_TYPE asn1_data,
       len = *output_data_size;
 
       if ((result =
-	   asn1_der_coding (asn1_data, "", output_data, &len,
+	   asn1_der_coding (asn1_data, name, output_data, &len,
 			    NULL)) != ASN1_SUCCESS)
 	{
 	  *output_data_size = len;
@@ -745,7 +745,7 @@ _gnutls_x509_export_int (ASN1_TYPE asn1_data,
       opaque *out;
       gnutls_datum tmp;
 
-      result = _gnutls_x509_der_encode( asn1_data, "", &tmp, 0);
+      result = _gnutls_x509_der_encode( asn1_data, name, &tmp, 0);
       if (result < 0)
         {
           gnutls_assert();
@@ -791,6 +791,16 @@ _gnutls_x509_export_int (ASN1_TYPE asn1_data,
     }
 
   return 0;
+}
+
+int
+_gnutls_x509_export_int (ASN1_TYPE asn1_data,
+                         gnutls_x509_crt_fmt_t format, char *pem_header,
+                         unsigned char *output_data, size_t * output_data_size)
+{
+    return _gnutls_x509_export_int_named (asn1_data, "", 
+                                          format, pem_header, output_data,
+                                          output_data_size);
 }
 
 /* Decodes an octet string. Leave string_type null for a normal

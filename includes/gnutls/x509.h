@@ -333,6 +333,10 @@ extern "C"
   int gnutls_x509_dn_import (gnutls_x509_dn_t odn,
                              const gnutls_datum_t * data);
 
+  int gnutls_x509_dn_export (gnutls_x509_dn_t dn,
+                             gnutls_x509_crt_fmt_t format, void *output_data,
+                             size_t * output_data_size);
+
   void gnutls_x509_dn_deinit (gnutls_x509_dn_t idn);
 
 

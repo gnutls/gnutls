@@ -1211,3 +1211,42 @@ _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
     }
   return 1;			/* they match */
 }
+
+/**
+  * gnutls_x509_dn_export - This function will export the DN
+  * @dn: Holds the opaque DN object
+  * @format: the format of output params. One of PEM or DER.
+  * @output_data: will contain a DN PEM or DER encoded
+  * @output_data_size: holds the size of output_data (and will be
+  *   replaced by the actual size of parameters)
+  *
+  * This function will export the DN to DER or PEM format.
+  *
+  * If the buffer provided is not long enough to hold the output, then
+  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.
+  *
+  * If the structure is PEM encoded, it will have a header
+  * of "BEGIN NAME".
+  *
+  * Return value: In case of failure a negative value will be
+  * returned, and 0 on success.
+  **/
+int
+gnutls_x509_dn_export (gnutls_x509_dn_t dn,
+                       gnutls_x509_crt_fmt_t format, void *output_data,
+                       size_t * output_data_size)
+{
+  ASN1_TYPE asn1 = dn;
+  
+  if (asn1 == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_export_int_named (asn1, "rdnSequence",
+                                        format, "NAME",
+                                        output_data,
+                                        output_data_size);
+}
