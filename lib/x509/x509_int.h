@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,6 +45,11 @@ typedef struct gnutls_x509_crt_int
   ASN1_TYPE cert;
   int use_extensions;
 } gnutls_x509_crt_int;
+
+typedef struct gnutls_x509_crq_int
+{
+  ASN1_TYPE crq;
+} gnutls_x509_crq_int;
 
 #define MAX_PRIV_PARAMS_SIZE 6	/* ok for RSA and DSA */
 
