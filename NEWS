@@ -7,7 +7,12 @@ See the end for copying conditions.
 
 ** Fix srcdir!=objdir failure in openpgpself test.
 
+** Improved API documentation output from GTK-DOC.
+
 ** Added gnutls_x509_dn_export(). Patch by Joe Orton.
+
+** Renamed gnutls_certificate_export_x509_cas and friends.
+See <http://lists.gnu.org/archive/html/gnutls-devel/2008-02/msg00043.html>.
 
 ** API and ABI modifications:
 gnutls_certificate_export_x509_cas: RENAMED to gnutls_certificate_get_x509_cas
