@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,7 +22,7 @@
  *
  */
 
-#include "x509.h"
+#include "x509_int.h"
 
 int gnutls_x509_crt_is_issuer (gnutls_x509_crt_t cert,
 			       gnutls_x509_crt_t issuer);

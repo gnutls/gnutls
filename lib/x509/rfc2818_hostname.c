@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  * Copyright (C) 2002 Andrew McDonald
  *
  * This file is part of GNUTLS.
@@ -22,7 +22,7 @@
  */
 
 #include <gnutls_int.h>
-#include <x509.h>
+#include <x509_int.h>
 #include <dn.h>
 #include <common.h>
 #include <rfc2818.h>

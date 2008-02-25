@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -30,7 +30,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
-#include "x509/x509.h"
+#include "x509/x509_int.h"
 #include "x509/privkey.h"
 #include "debug.h"
 

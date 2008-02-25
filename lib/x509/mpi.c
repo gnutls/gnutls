@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,7 +28,7 @@
 #include <libtasn1.h>
 #include <gnutls_datum.h>
 #include "common.h"
-#include "x509.h"
+#include "x509_int.h"
 #include <gnutls_num.h>
 #include "mpi.h"
 

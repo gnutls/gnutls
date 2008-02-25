@@ -27,7 +27,7 @@
 # include "gnutls_cert.h"
 # include "gnutls_auth.h"
 # include "auth_dh_common.h"
-# include "x509/x509.h"
+# include "x509/x509_int.h"
 # include "openpgp/openpgp_int.h"
 
 /* This structure may be complex, but it's the only way to

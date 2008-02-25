@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -23,7 +23,7 @@
  */
 
 #include <gnutls_int.h>
-#include "x509.h"
+#include "x509_int.h"
 
 int _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 			       mpi_t * params, int *params_size);
