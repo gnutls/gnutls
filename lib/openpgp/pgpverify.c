@@ -23,7 +23,7 @@
  */
 
 #include <gnutls_int.h>
-#include <openpgp.h>
+#include <openpgp_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_openpgp.h>
 #include <gnutls_num.h>
