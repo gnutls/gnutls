@@ -44,10 +44,6 @@
 #define DEBUG
 */
 
-#define MAX32 4294967295
-#define MAX24 16777215
-#define MAX16 65535
-
 /* The size of a handshake message should not
  * be larger than this value.
  */
