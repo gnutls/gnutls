@@ -18,18 +18,14 @@ DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 # gtk-doc will search all .c & .h files beneath here for inline comments
 # documenting the functions and macros.
 # e.g. DOC_SOURCE_DIR=../../../gtk
-DOC_SOURCE_DIR=../../lib
+DOC_SOURCE_DIR=../../
 
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
 SCANGOBJ_OPTIONS=
 
 # Extra options to supply to gtkdoc-scan.
 # e.g. SCAN_OPTIONS=--deprecated-guards="GTK_DISABLE_DEPRECATED" 
-SCAN_OPTIONS=\
-	--source-dir ../../includes/gnutls \
-	--source-dir $(top_builddir)/includes/gnutls \
-	--source-dir ../../lib/x509 \
-	--source-dir ../../libextra
+SCAN_OPTIONS=
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
@@ -42,8 +38,12 @@ FIXXREF_OPTIONS=
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/gtk/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/gtk/*.c
-HFILE_GLOB=$(top_srcdir)/lib/*.h
-CFILE_GLOB=$(top_srcdir)/lib/*.c
+HFILE_GLOB=$(top_srcdir)/includes/gnutls/*.h $(top_builddir)/includes/gnutls/*.h
+CFILE_GLOB=$(top_srcdir)/lib/*.c \
+	$(top_srcdir)/lib/x509/*.c \
+	$(top_srcdir)/lib/openpgp/*.c \
+	$(top_srcdir)/libextra/*.c \
+	$(top_srcdir)/lib/minitasn1/*.c
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
