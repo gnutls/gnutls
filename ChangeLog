@@ -1,3 +1,232 @@
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.2.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgpself.c: Force success.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/Makefile.am, lib/gnutls_db.c,
+	lib/gnutls_session.h: Remove empty gnutls_session.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_int.h: align comments
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_int.h: Pull in gnutls/pkcs12.h instead of
+	duplicating stuff.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am, lib/x509/pkcs12.c, lib/x509/pkcs12.h,
+	lib/x509/pkcs12_bag.c, lib/x509/privkey_pkcs8.c,
+	lib/x509/x509_int.h: Move lib/x509/pkcs12.h stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/gnutls_cert.c,
+	lib/gnutls_dh_primes.c, lib/gnutls_pk.c, lib/gnutls_x509.c,
+	lib/x509/Makefile.am, lib/x509/common.c, lib/x509/crl_write.c,
+	lib/x509/crq.c, lib/x509/extensions.c, lib/x509/mpi.c,
+	lib/x509/mpi.h, lib/x509/pkcs12.c, lib/x509/privkey.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/sign.c, lib/x509/verify.c,
+	lib/x509/x509.c, lib/x509/x509_int.h, lib/x509/x509_write.c: Move
+	mpi.h stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/gnutls_str.c, lib/gnutls_str.h,
+	lib/openpgp/pgp.c, lib/x509/Makefile.am, lib/x509/rfc2818.h,
+	lib/x509/rfc2818_hostname.c: Move rfc2818.h hostname comparison to
+	gnutls_str.h and update callers.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openssl_compat.c: gnutls_int includes config.h, no need
+	to do it twice.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openssl_compat.c: Need gnutls_int.h for mpi_t and stuff
+	(now in lib/x509/x509_int.h).
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/x509/Makefile.am,
+	lib/x509/crl_write.c, lib/x509/crq.c, lib/x509/extensions.c,
+	lib/x509/extensions.h, lib/x509/privkey.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/x509.c, lib/x509/x509_int.h,
+	lib/x509/x509_write.c: Move extensions.h stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/gnutls_rsa_export.c,
+	lib/gnutls_x509.c, lib/x509/Makefile.am, lib/x509/pkcs12_bag.c,
+	lib/x509/privkey.h, lib/x509/privkey_pkcs8.c, lib/x509/x509.c,
+	lib/x509/x509_int.h: Move privkey.h stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/gnutls_x509.c,
+	lib/openpgp/pgpverify.c, lib/x509/Makefile.am, lib/x509/privkey.c,
+	lib/x509/sign.c, lib/x509/verify.c, lib/x509/verify.h,
+	lib/x509/x509.c, lib/x509/x509_int.h: Move verify.h stuff to
+	x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/gnutls_x509.c,
+	lib/x509/Makefile.am, lib/x509/pkcs7.c, lib/x509/pkcs7.h,
+	lib/x509/x509_int.h: Move pkcs7.h stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/x509/Makefile.am, lib/x509/dsa.c,
+	lib/x509/dsa.h, lib/x509/privkey.c, lib/x509/x509_int.h: Move dsa.h
+	stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/x509/Makefile.am, lib/x509/crl.c,
+	lib/x509/crl_write.c, lib/x509/crq.c, lib/x509/dn.c, lib/x509/dn.h,
+	lib/x509/pkcs12.c, lib/x509/pkcs7.c, lib/x509/privkey.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/rfc2818_hostname.c,
+	lib/x509/sign.c, lib/x509/verify.c, lib/x509/x509.c,
+	lib/x509/x509_int.h, lib/x509/x509_write.c,
+	libextra/openssl_compat.c: Move dn.h stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/x509/Makefile.am,
+	lib/x509/crl_write.c, lib/x509/crq.c, lib/x509/privkey.c,
+	lib/x509/sign.c, lib/x509/sign.h, lib/x509/x509_int.h,
+	lib/x509/x509_write.c: Move sign.h stuff to x509_int.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/privkey.c: No need for rfc2818.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_int.h: Doc fixes.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_int.h: Remove stuff already in
+	includes/gnutls/x509.h.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: [no log message]
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, build-aux/gnupload, gl/gnulib.mk,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Use gnupload.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc4366-bis-02.txt: Add.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/x509/Makefile.am,
+	lib/x509/crl_write.c, lib/x509/crq.c, lib/x509/crq.h,
+	lib/x509/x509_int.h, lib/x509/x509_write.c: Merge crq.h into
+	x509_int.h, avoid one trivial header file.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am: Rename x509.h to x509_int.h.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.h, lib/gnutls_cert.c, lib/gnutls_cert.h,
+	lib/gnutls_rsa_export.c, lib/gnutls_x509.c, lib/x509/crl.c,
+	lib/x509/extensions.c, lib/x509/mpi.c, lib/x509/mpi.h,
+	lib/x509/output.c, lib/x509/privkey.c, lib/x509/privkey_pkcs8.c,
+	lib/x509/rfc2818_hostname.c, lib/x509/sign.c, lib/x509/verify.c,
+	lib/x509/verify.h, lib/x509/x509.c, lib/x509/x509.h,
+	lib/x509/x509_int.h: Rename lib/x509/x509.h to x509_int.h.  Fixes
+	name-space collision that confuses GTK-DOC with
+	includes/gnutls/x509.h.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.h, lib/openpgp/Makefile.am, lib/openpgp/compat.c,
+	lib/openpgp/extras.c, lib/openpgp/openpgp.h,
+	lib/openpgp/openpgp_int.h, lib/openpgp/pgp.c,
+	lib/openpgp/pgpverify.c, lib/openpgp/privkey.c: Rename
+	lib/openpgp/openpgp.h to openpgp_int.h.  Fixes name-space collision
+	that confuses GTK-DOC with includes/gnutls/openpgp.h.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Change DOC_SOURCE_DIR, needed for
+	GTK-DOC to have comments for variables.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Remove unused defines.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* tests/moredn.c: Added, lost part of Joe's original
+	gnutls_x509_dn_export patch.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/time_r.m4, lgl/m4/unistd_h.m4,
+	lgl/unistd.in.h: Update gnulib files.
+
+2008-02-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-badra-tls-password-ext-01.txt: Add.
+
+2008-02-24  Nikos <nmav@crystal.(none)>
+
+	* NEWS, doc/manpages/Makefile.am, includes/gnutls/x509.h,
+	lib/x509/common.c, lib/x509/common.h, lib/x509/dn.c,
+	tests/Makefile.am: Added gnutls_x509_dn_export(). Patch by Joe
+	Orton.
+
+2008-02-21  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_cert.c: _export_ -> _get_
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgpself.c: Don't use credentials from files (causes
+	problems with srcdir!=builddir).
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump version.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-02-21  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.1.
