@@ -33,7 +33,7 @@
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <common.h>
-#include <pkcs12.h>
+#include "x509_int.h"
 
 /**
   * gnutls_pkcs12_bag_init - This function initializes a gnutls_pkcs12_bag_t  structure
