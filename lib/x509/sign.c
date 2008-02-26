@@ -41,7 +41,6 @@
 #include <dn.h>
 #include <x509_int.h>
 #include <mpi.h>
-#include <sign.h>
 #include <common.h>
 #include <verify.h>
 

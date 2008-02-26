@@ -38,7 +38,6 @@
 #include <x509_int.h>
 #include <dn.h>
 #include <mpi.h>
-#include <sign.h>
 #include <extensions.h>
 #include <libtasn1.h>
 

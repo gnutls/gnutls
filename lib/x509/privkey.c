@@ -35,7 +35,6 @@
 #include <dn.h>
 #include <mpi.h>
 #include <extensions.h>
-#include <sign.h>
 #include <dsa.h>
 #include <verify.h>
 
