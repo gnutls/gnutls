@@ -174,4 +174,9 @@ int _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
 					   const gnutls_datum_t * signature,
 					   gnutls_x509_privkey_t issuer);
 
+/* privkey.h */
+ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *raw_key,
+						gnutls_x509_privkey_t pkey);
+int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, mpi_t * params);
+
 #endif

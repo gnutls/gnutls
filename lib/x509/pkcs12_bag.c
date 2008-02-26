@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -34,7 +34,6 @@
 #include <gnutls_errors.h>
 #include <common.h>
 #include <pkcs12.h>
-#include <privkey.h>
 
 /**
   * gnutls_pkcs12_bag_init - This function initializes a gnutls_pkcs12_bag_t  structure

@@ -35,7 +35,6 @@
 #include <x509_b64.h>
 #include <x509_int.h>
 #include <pkcs12.h>
-#include <privkey.h>
 #include <extensions.h>
 #include <mpi.h>
 #include <gnutls_algorithms.h>

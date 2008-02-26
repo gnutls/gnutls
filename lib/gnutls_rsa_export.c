@@ -31,7 +31,6 @@
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
 #include "x509/x509_int.h"
-#include "x509/privkey.h"
 #include "debug.h"
 
 /* This function takes a number of bits and returns a supported
