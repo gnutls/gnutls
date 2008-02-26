@@ -35,7 +35,6 @@
 #include <gnutls_errors.h>
 #include <common.h>
 #include <x509_b64.h>
-#include <pkcs7.h>
 
 #define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
 
