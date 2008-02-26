@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -95,18 +95,17 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
 	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
-	gnutls_db.h gnutls_compress_int.h gnutls_session.h		\
-	gnutls_auth.h auth_anon.h gnutls_extensions.h gnutls_buffer.h	\
-	gnutls_auth_int.h x509_b64.h gnutls_v2_compat.h gnutls_datum.h	\
-	auth_cert.h gnutls_mpi.h gnutls_pk.h gnutls_record.h		\
-	gnutls_cert.h gnutls_constate.h gnutls_global.h gnutls_sig.h	\
-	gnutls_mem.h io_debug.h ext_max_record.h gnutls_session_pack.h	\
-	gnutls_str.h gnutls_state.h gnutls_x509.h ext_cert_type.h	\
+	gnutls_db.h gnutls_compress_int.h gnutls_auth.h auth_anon.h	\
+	gnutls_extensions.h gnutls_buffer.h gnutls_auth_int.h		\
+	x509_b64.h gnutls_v2_compat.h gnutls_datum.h auth_cert.h	\
+	gnutls_mpi.h gnutls_pk.h gnutls_record.h gnutls_cert.h		\
+	gnutls_constate.h gnutls_global.h gnutls_sig.h gnutls_mem.h	\
+	io_debug.h ext_max_record.h gnutls_session_pack.h gnutls_str.h	\
+	gnutls_state.h gnutls_x509.h ext_cert_type.h			\
 	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
-	ext_inner_application.h 			\
-	gnutls_supplemental.h ext_oprfi.h
+	ext_inner_application.h gnutls_supplemental.h ext_oprfi.h
 
 # Separate so we can create the documentation
 

@@ -51,19 +51,19 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
 	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
-	gnutls_db.h gnutls_compress_int.h gnutls_session.h		\
-	gnutls_priority.h gnutls_auth.h auth_anon.h			\
-	gnutls_extensions.h gnutls_buffer.h gnutls_auth_int.h		\
-	gnutls_random.h x509_b64.h gnutls_v2_compat.h			\
-	gnutls_errors_int.h gnutls_datum.h auth_cert.h gnutls_mpi.h	\
-	gnutls_pk.h gnutls_record.h gnutls_cert.h gnutls_constate.h	\
-	gnutls_global.h strfile.h gnutls_sig.h gnutls_mem.h		\
-	gnutls_ui.h io_debug.h ext_max_record.h gnutls_session_pack.h	\
-	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h	\
-	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h		\
-	auth_dh_common.h ext_srp.h gnutls_srp.h auth_srp.h		\
-	auth_srp_passwd.h auth_psk.h auth_psk_passwd.h memmem.h		\
-	gnutls_helper.h ext_inner_application.h				\
+	gnutls_db.h gnutls_compress_int.h gnutls_priority.h		\
+	gnutls_auth.h auth_anon.h gnutls_extensions.h gnutls_buffer.h	\
+	gnutls_auth_int.h gnutls_random.h x509_b64.h			\
+	gnutls_v2_compat.h gnutls_errors_int.h gnutls_datum.h		\
+	auth_cert.h gnutls_mpi.h gnutls_pk.h gnutls_record.h		\
+	gnutls_cert.h gnutls_constate.h gnutls_global.h strfile.h	\
+	gnutls_sig.h gnutls_mem.h gnutls_ui.h io_debug.h		\
+	ext_max_record.h gnutls_session_pack.h gnutls_alert.h		\
+	gnutls_str.h gnutls_state.h gnutls_x509.h ext_cert_type.h	\
+	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
+	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h auth_psk.h	\
+	auth_psk_passwd.h memmem.h gnutls_helper.h			\
+	ext_inner_application.h						\
 									\
 	der.h errors.h gstr.h parser_aux.h element.h			\
 	errors_int.h int.h mem.h structure.h				\
