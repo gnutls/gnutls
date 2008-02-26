@@ -27,7 +27,7 @@
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <openpgp_int.h>
-#include <x509/rfc2818.h>
+#include <gnutls_str.h>
 #include <gnutls_num.h>
 
 /**
