@@ -33,7 +33,6 @@
 #include <common.h>
 #include <x509_b64.h>
 #include <x509_int.h>
-#include <dn.h>
 
 /**
   * gnutls_x509_crl_init - This function initializes a gnutls_x509_crl_t structure

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -29,7 +29,7 @@
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <string.h>		/* memset */
-#include <x509/dn.h>
+#include <x509/x509_int.h>
 #include <libtasn1.h>
 #include <gnutls/x509.h>
 #include <openssl_compat.h>

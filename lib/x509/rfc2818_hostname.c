@@ -23,7 +23,6 @@
 
 #include <gnutls_int.h>
 #include <x509_int.h>
-#include <dn.h>
 #include <common.h>
 #include <rfc2818.h>
 #include <gnutls_errors.h>

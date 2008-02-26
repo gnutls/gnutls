@@ -127,4 +127,32 @@ int _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 			    gnutls_x509_crt_t issuer,
 			    gnutls_x509_privkey_t issuer_key);
 
+/* dn.c */
+#define OID_X520_COUNTRY_NAME		"2.5.4.6"
+#define OID_X520_ORGANIZATION_NAME	"2.5.4.10"
+#define OID_X520_ORGANIZATIONAL_UNIT_NAME "2.5.4.11"
+#define OID_X520_COMMON_NAME 		"2.5.4.3"
+#define OID_X520_LOCALITY_NAME 		"2.5.4.7"
+#define OID_X520_STATE_OR_PROVINCE_NAME 	"2.5.4.8"
+#define OID_LDAP_DC			"0.9.2342.19200300.100.1.25"
+#define OID_LDAP_UID			"0.9.2342.19200300.100.1.1"
+#define OID_PKCS9_EMAIL 			"1.2.840.113549.1.9.1"
+
+int _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
+			   const char *asn1_rdn_name, char *buf,
+			   size_t * sizeof_buf);
+
+int _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
+			       const char *asn1_rdn_name, const char *oid,
+			       int indx, unsigned int raw_flag, void *buf,
+			       size_t * sizeof_buf);
+
+int _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
+			     const char *asn1_rdn_name, const char *oid,
+			     int raw_flag, const char *name, int sizeof_name);
+
+int _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
+			     const char *asn1_rdn_name,
+			     int indx, void *_oid, size_t * sizeof_oid);
+
 #endif

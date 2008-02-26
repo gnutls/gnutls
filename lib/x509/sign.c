@@ -38,7 +38,6 @@
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <dn.h>
 #include <x509_int.h>
 #include <mpi.h>
 #include <common.h>
