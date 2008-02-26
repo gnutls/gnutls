@@ -39,6 +39,9 @@ PKCS8 fix.
 Yoshisato YANAGISAWA <yanagisawa@csg.is.titech.ac.jp>
 Camellia support.
 
+Emile Van Bergen <emile@e-advies.nl>
+TLS/IA fixes.
+
 Joe Orton <jorton@redhat.com>
 Certificate name import/export, build fixes, test vectors.
 
