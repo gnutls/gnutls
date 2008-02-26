@@ -155,4 +155,7 @@ int _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 			     const char *asn1_rdn_name,
 			     int indx, void *_oid, size_t * sizeof_oid);
 
+/* dsa.c */
+int _gnutls_dsa_generate_params (mpi_t * resarr, int *resarr_len, int bits);
+
 #endif
