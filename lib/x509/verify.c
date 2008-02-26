@@ -38,7 +38,6 @@
 #include <x509_int.h>
 #include <mpi.h>
 #include <common.h>
-#include <verify.h>
 
 static int _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
 					const gnutls_x509_crt_t * trusted_cas,

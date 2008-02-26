@@ -44,7 +44,6 @@
 #include <gnutls_x509.h>
 #include "x509/common.h"
 #include "x509/x509_int.h"
-#include "x509/verify.h"
 #include "x509/mpi.h"
 #include "x509/privkey.h"
 #include "read-file.h"

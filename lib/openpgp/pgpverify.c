@@ -27,7 +27,6 @@
 #include <gnutls_errors.h>
 #include <gnutls_openpgp.h>
 #include <gnutls_num.h>
-#include <x509/verify.h>	/* lib/x509/verify.h */
 
 
 /**

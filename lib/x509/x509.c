@@ -36,7 +36,6 @@
 #include <libtasn1.h>
 #include <mpi.h>
 #include <privkey.h>
-#include <verify.h>
 
 /**
   * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt_t structure

@@ -163,4 +163,15 @@ int _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 /* dsa.c */
 int _gnutls_dsa_generate_params (mpi_t * resarr, int *resarr_len, int bits);
 
+
+/* verify.c */
+int gnutls_x509_crt_is_issuer (gnutls_x509_crt_t cert,
+			       gnutls_x509_crt_t issuer);
+int _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
+				   const gnutls_datum_t * signature,
+				   gnutls_x509_crt_t issuer);
+int _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
+					   const gnutls_datum_t * signature,
+					   gnutls_x509_privkey_t issuer);
+
 #endif

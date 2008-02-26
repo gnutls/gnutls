@@ -34,7 +34,6 @@
 #include <x509_int.h>
 #include <mpi.h>
 #include <extensions.h>
-#include <verify.h>
 
 static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, mpi_t * params);
 int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, mpi_t * params);

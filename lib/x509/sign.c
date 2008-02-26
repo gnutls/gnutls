@@ -41,7 +41,6 @@
 #include <x509_int.h>
 #include <mpi.h>
 #include <common.h>
-#include <verify.h>
 
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.
