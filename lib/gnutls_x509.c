@@ -981,14 +981,15 @@ gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t
 }
 
 static int
-generate_rdn_seq (gnutls_certificate_credentials_t res)
+add_new_crt_to_rdn_seq (gnutls_certificate_credentials_t res, int new)
 {
   gnutls_datum_t tmp;
   int ret;
-  unsigned size, i;
-  opaque *pdata;
+  size_t newsize;
+  unsigned char *newdata;
+  unsigned i;
 
-  /* Generate the RDN sequence 
+  /* Add DN of the last added CAs to the RDN sequence
    * This will be sent to clients when a certificate
    * request message is sent.
    */
@@ -997,52 +998,43 @@ generate_rdn_seq (gnutls_certificate_credentials_t res)
    * to do that. This would save time and memory.
    * However we don't have that information available
    * here.
+   * Further, this function is now much more efficient,
+   * so optimizing that is less important.
    */
 
-  size = 0;
-  for (i = 0; i < res->x509_ncas; i++)
+  for (i = res->x509_ncas - new; i < res->x509_ncas; i++)
     {
       if ((ret = gnutls_x509_crt_get_raw_dn (res->x509_ca_list[i], &tmp)) < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
 	}
-      size += (2 + tmp.size);
-      _gnutls_free_datum (&tmp);
-    }
 
-  if (res->x509_rdn_sequence.data != NULL)
-    gnutls_free (res->x509_rdn_sequence.data);
-
-  res->x509_rdn_sequence.data = gnutls_malloc (size);
-  if (res->x509_rdn_sequence.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-  res->x509_rdn_sequence.size = size;
-
-  pdata = res->x509_rdn_sequence.data;
-
-  for (i = 0; i < res->x509_ncas; i++)
-    {
-      if ((ret = gnutls_x509_crt_get_raw_dn (res->x509_ca_list[i], &tmp)) < 0)
+      newsize = res->x509_rdn_sequence.size + 2 + tmp.size;
+      if (newsize < res->x509_rdn_sequence.size)
 	{
-	  _gnutls_free_datum (&res->x509_rdn_sequence);
 	  gnutls_assert ();
-	  return ret;
+	  _gnutls_free_datum (&tmp);
+	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-      _gnutls_write_datum16 (pdata, tmp);
-      pdata += (2 + tmp.size);
+      newdata = gnutls_realloc (res->x509_rdn_sequence.data, newsize);
+      if (newdata == NULL)
+	{
+	  gnutls_assert ();
+	  _gnutls_free_datum (&tmp);
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      _gnutls_write_datum16 (newdata + res->x509_rdn_sequence.size, tmp);
       _gnutls_free_datum (&tmp);
+
+      res->x509_rdn_sequence.size = newsize;
+      res->x509_rdn_sequence.data = newdata;
     }
 
   return 0;
 }
-
-
-
 
 /* Returns 0 if it's ok to use the gnutls_kx_algorithm_t with this 
  * certificate (uses the KeyUsage field). 
@@ -1277,7 +1269,7 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t
     ret = parse_pem_ca_mem (&res->x509_ca_list, &res->x509_ncas,
 			    ca->data, ca->size);
 
-  if ((ret2 = generate_rdn_seq (res)) < 0)
+  if ((ret2 = add_new_crt_to_rdn_seq (res, ret)) < 0)
     return ret2;
 
   return ret;
@@ -1338,7 +1330,7 @@ gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
       res->x509_ncas++;
     }
 
-  if ((ret2 = generate_rdn_seq (res)) < 0)
+  if ((ret2 = add_new_crt_to_rdn_seq (res, ca_list_size)) < 0)
     return ret2;
 
   return 0;
@@ -1393,7 +1385,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
       return ret;
     }
 
-  if ((ret2 = generate_rdn_seq (res)) < 0)
+  if ((ret2 = add_new_crt_to_rdn_seq (res, ret)) < 0)
     return ret2;
 
   return ret;

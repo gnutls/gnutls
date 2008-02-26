@@ -5,6 +5,16 @@ See the end for copying conditions.
 
 * Version 2.3.3 (unreleased)
 
+** Importing many CA certificates are now considerably faster.
+This affect gnutls_certificate_set_x509_trust_mem,
+gnutls_certificate_set_x509_trust, and
+gnutls_certificate_set_x509_trust_file.  The complexity was reduced
+from O(2*n^2) to O(n).  When adding 206 files containing 408
+certificates, using gnutls_certificate_set_x509_trust_file, the time
+dropped from 40 seconds to 0.3 seconds.  Thanks to Edgar Fuß for code
+to trigger the problem.  See also
+<http://blog.josefsson.org/2008/02/27/real-world-performance-tuning-with-callgrind/>.
+
 ** API and ABI modifications:
 No changes since last version.
 
