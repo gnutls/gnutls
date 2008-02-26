@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,7 +28,7 @@
 #include <x509_b64.h>		/* for PKCS3 PEM decoding */
 #include <gnutls_global.h>
 #include <gnutls_dh.h>
-#include <x509/mpi.h>
+#include "x509/x509_int.h"
 #include "debug.h"
 
 

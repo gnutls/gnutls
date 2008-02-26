@@ -28,7 +28,6 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_global.h>
-#include <mpi.h>
 #include <libtasn1.h>
 #include <common.h>
 #include <x509_int.h>

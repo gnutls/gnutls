@@ -33,7 +33,6 @@
 #include <x509_b64.h>
 #include <x509_int.h>
 #include <libtasn1.h>
-#include <mpi.h>
 
 /**
   * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt_t structure

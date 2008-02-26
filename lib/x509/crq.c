@@ -35,8 +35,7 @@
 #include <common.h>
 #include <gnutls_x509.h>
 #include <x509_b64.h>
-#include <x509_int.h>
-#include <mpi.h>
+#include "x509_int.h"
 #include <libtasn1.h>
 
 /**

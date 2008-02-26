@@ -35,8 +35,7 @@
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <x509_int.h>
-#include <mpi.h>
+#include "x509_int.h"
 #include <common.h>
 
 static int _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,

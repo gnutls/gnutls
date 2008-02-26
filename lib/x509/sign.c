@@ -39,7 +39,6 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 #include <x509_int.h>
-#include <mpi.h>
 #include <common.h>
 
 /* Writes the digest information and the digest in a DER encoded

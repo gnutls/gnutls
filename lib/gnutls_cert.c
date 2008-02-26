@@ -41,7 +41,6 @@
 #include <gnutls_auth_int.h>
 #include <gnutls_x509.h>
 #include "x509/x509_int.h"
-#include "x509/mpi.h"
 #ifdef ENABLE_OPENPGP
 # include "openpgp/gnutls_openpgp.h"
 #endif

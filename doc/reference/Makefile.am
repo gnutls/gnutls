@@ -68,7 +68,7 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	der.h errors.h gstr.h parser_aux.h element.h			\
 	errors_int.h int.h mem.h structure.h				\
 									\
-	common.h mpi.h compat.h						\
+	common.h compat.h						\
 									\
 	gnutls_extra.h openssl_compat.h					\
 									\

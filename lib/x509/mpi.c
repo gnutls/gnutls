@@ -30,7 +30,6 @@
 #include "common.h"
 #include "x509_int.h"
 #include <gnutls_num.h>
-#include "mpi.h"
 
 /*
  * some x509 certificate parsing functions that relate to MPI parameter
