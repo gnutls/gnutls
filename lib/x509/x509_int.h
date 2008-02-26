@@ -255,22 +255,12 @@ int _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
 				   gnutls_digest_algorithm_t, mpi_t * params,
 				   int params_size);
 /* pkcs12.h */
+#include <gnutls/pkcs12.h>
+
 typedef struct gnutls_pkcs12_int
 {
   ASN1_TYPE pkcs12;
 } gnutls_pkcs12_int;
-
-typedef enum gnutls_pkcs12_bag_type_t
-  {
-    GNUTLS_BAG_EMPTY = 0,
-
-    GNUTLS_BAG_PKCS8_ENCRYPTED_KEY = 1,
-    GNUTLS_BAG_PKCS8_KEY,
-    GNUTLS_BAG_CERTIFICATE,
-    GNUTLS_BAG_CRL,
-    GNUTLS_BAG_ENCRYPTED = 10,
-    GNUTLS_BAG_UNKNOWN = 20
-  } gnutls_pkcs12_bag_type_t;
 
 #define MAX_BAG_ELEMENTS 32
 
@@ -302,21 +292,6 @@ typedef struct gnutls_pkcs12_bag_int
  */
 #define FRIENDLY_NAME_OID "1.2.840.113549.1.9.20"
 #define KEY_ID_OID "1.2.840.113549.1.9.21"
-
-typedef struct gnutls_pkcs12_int *gnutls_pkcs12_t;
-typedef struct gnutls_pkcs12_bag_int *gnutls_pkcs12_bag_t;
-
-int gnutls_pkcs12_init (gnutls_pkcs12_t * pkcs12);
-void gnutls_pkcs12_deinit (gnutls_pkcs12_t pkcs12);
-int gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
-			  const gnutls_datum_t * data,
-			  gnutls_x509_crt_fmt_t format, unsigned int flags);
-
-int gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
-			   int indx, gnutls_pkcs12_bag_t bag);
-
-int gnutls_pkcs12_bag_init (gnutls_pkcs12_bag_t * bag);
-void gnutls_pkcs12_bag_deinit (gnutls_pkcs12_bag_t bag);
 
 int
 _pkcs12_string_to_key (unsigned int id, const opaque * salt,
