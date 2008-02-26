@@ -32,7 +32,6 @@
 #include <libtasn1.h>
 #include <common.h>
 #include <x509_int.h>
-#include <extensions.h>
 #include <gnutls_datum.h>
 
 /* This function will attempt to return the requested extension found in
