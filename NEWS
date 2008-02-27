@@ -15,6 +15,9 @@ dropped from 40 seconds to 0.3 seconds.  Thanks to Edgar Fuß for code
 to trigger the problem.  See also
 <http://blog.josefsson.org/2008/02/27/real-world-performance-tuning-with-callgrind/>.
 
+** Clarify documentation for gnutls_x509_crt_set_subject_alternative_name
+** to be explicit that it takes zero terminated data.
+
 ** API and ABI modifications:
 No changes since last version.
 
