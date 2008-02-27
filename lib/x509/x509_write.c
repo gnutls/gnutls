@@ -446,7 +446,7 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
  * gnutls_x509_crt_set_subject_alternative_name - Set the subject Alternative Name
  * @crt: should contain a gnutls_x509_crt_t structure
  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
- * @data_string: The data to be set
+ * @data_string: The data to be set, a zero terminated string
  *
  * This function will set the subject alternative name certificate
  * extension.
