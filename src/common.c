@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
@@ -437,6 +437,85 @@ print_cert_vrfy (gnutls_session_t session)
     }
 }
 
+void
+print_dh_info (gnutls_session_t session, const char *str)
+{
+  printf ("- %sDiffie-Hellman parameters\n", str);
+  printf (" - Using prime: %d bits\n",
+	  gnutls_dh_get_prime_bits (session));
+  printf (" - Secret key: %d bits\n",
+	  gnutls_dh_get_secret_bits (session));
+  printf (" - Peer's public key: %d bits\n",
+	  gnutls_dh_get_peers_public_bits (session));
+
+  if (print_cert)
+    {
+      int ret;
+      gnutls_datum_t raw_gen = { NULL, 0 };
+      gnutls_datum_t raw_prime = { NULL, 0 };
+      gnutls_dh_params_t dh_params = NULL;
+      unsigned char *params_data = NULL;
+      size_t params_data_size = 0;
+
+      ret = gnutls_dh_get_group (session, &raw_gen, &raw_prime);
+      if (ret)
+	{
+	  fprintf (stderr, "gnutls_dh_get_group %d\n", ret);
+	  goto out;
+	}
+
+      ret = gnutls_dh_params_init (&dh_params);
+      if (ret)
+	{
+	  fprintf (stderr, "gnutls_dh_params_init %d\n", ret);
+	  goto out;
+	}
+
+      ret = gnutls_dh_params_import_raw (dh_params, &raw_prime,
+					 &raw_gen);
+      if (ret)
+	{
+	  fprintf (stderr, "gnutls_dh_params_import_raw %d\n", ret);
+	  goto out;
+	}
+
+      ret = gnutls_dh_params_export_pkcs3 (dh_params,
+					   GNUTLS_X509_FMT_PEM,
+					   params_data,
+					   &params_data_size);
+      if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	{
+	  fprintf (stderr, "gnutls_dh_params_export_pkcs3 %d\n", ret);
+	  goto out;
+	}
+
+      params_data = gnutls_malloc (params_data_size);
+      if (!params_data)
+	{
+	  fprintf (stderr, "gnutls_malloc %d\n", ret);
+	  goto out;
+	}
+
+      ret = gnutls_dh_params_export_pkcs3 (dh_params,
+					   GNUTLS_X509_FMT_PEM,
+					   params_data,
+					   &params_data_size);
+      if (ret)
+	{
+	  fprintf (stderr, "gnutls_dh_params_export_pkcs3-2 %d\n", ret);
+	  goto out;
+	}
+
+      printf (" - PKCS#3 format:\n\n%.*s\n", params_data_size, params_data);
+
+    out:
+      gnutls_free (params_data);
+      gnutls_free (raw_prime.data);
+      gnutls_free (raw_gen.data);
+      gnutls_dh_params_deinit (dh_params);
+    }
+}
+
 int
 print_info (gnutls_session_t session, const char *hostname)
 {
@@ -454,11 +533,7 @@ print_info (gnutls_session_t session, const char *hostname)
     {
 #ifdef ENABLE_ANON
     case GNUTLS_CRD_ANON:
-      printf ("- Anonymous DH using prime of %d bits, secret key "
-	      "of %d bits, and peer's public key is %d bits.\n",
-	      gnutls_dh_get_prime_bits (session),
-	      gnutls_dh_get_secret_bits (session),
-	      gnutls_dh_get_peers_public_bits (session));
+      print_dh_info (session, "Anonymous ");
       break;
 #endif
 #ifdef ENABLE_SRP
@@ -480,13 +555,7 @@ print_info (gnutls_session_t session, const char *hostname)
 	printf ("- PSK authentication. Connected as '%s'\n",
 		gnutls_psk_server_get_username (session));
       if (kx == GNUTLS_KX_DHE_PSK)
-	{
-	  printf ("- DH using prime of %d bits, secret key "
-		  "of %d bits, and peer's public key is %d bits.\n",
-		  gnutls_dh_get_prime_bits (session),
-		  gnutls_dh_get_secret_bits (session),
-		  gnutls_dh_get_peers_public_bits (session));
-	}
+	print_dh_info (session, "Ephemeral ");
       break;
 #endif
     case GNUTLS_CRD_IA:
@@ -505,14 +574,8 @@ print_info (gnutls_session_t session, const char *hostname)
 	  }
       }
 
-      if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) 
-        {
-          printf ("- Ephemeral DH using prime of %d bits, secret key "
-	      "of %d bits, and peer's public key is %d bits.\n",
-	      gnutls_dh_get_prime_bits (session),
-	      gnutls_dh_get_secret_bits (session),
-	      gnutls_dh_get_peers_public_bits (session));
-        }
+      if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
+	print_dh_info (session, "Ephemeral ");
 
       print_cert_info (session, hostname);
 
@@ -558,6 +621,9 @@ print_cert_info (gnutls_session_t session, const char *hostname)
   printf ("- Certificate type: ");
   switch (gnutls_certificate_type_get (session))
     {
+    case GNUTLS_CRT_UNKNOWN:
+      printf ("Unknown\n");
+      break;
     case GNUTLS_CRT_X509:
       printf ("X.509\n");
       print_x509_info (session, hostname);

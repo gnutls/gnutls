@@ -18,6 +18,8 @@ to trigger the problem.  See also
 ** Clarify documentation for gnutls_x509_crt_set_subject_alternative_name
 ** to be explicit that it takes zero terminated data.
 
+** gnutls-cli --print-cert now print PKCS#3 format Diffie-Hellman parameters.
+
 ** API and ABI modifications:
 No changes since last version.
 
