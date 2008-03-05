@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.3.3 (unreleased)
 
+** No longer compiled using -D_REENTRANT -D_THREAD_SAFE.
+We could not find any modern justification for enabling these flags by
+default.  If you know of some platform that needs one of the flags to
+work properly, please let us know.
+
 ** Importing many CA certificates are now considerably faster.
 This affect gnutls_certificate_set_x509_trust_mem,
 gnutls_certificate_set_x509_trust, and
