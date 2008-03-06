@@ -202,11 +202,13 @@ int algo;
 }
 
 /**
- * gnutls_openpgp_privkey_get_revoked_ status - Gets the revoked status of the key
+ * gnutls_openpgp_privkey_get_revoked_ status - Get the revoked status of the key
  * @key: the structure that contains the OpenPGP private key.
  *
- * Returns the true (1) or false (0) based on whether this key has been revoked
- * or not. A negative value indicates an error.
+ * Get revocation status of key.
+ *
+ * Returns: true (1) if the key has been revoked, or false (0) if it
+ *   has not, or a negative value indicates an error.
  *
  **/
 int
@@ -234,8 +236,10 @@ gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key)
  * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
  * @fprlen: the integer to save the length of the fingerprint.
  *
- * Returns the fingerprint of the OpenPGP key. Depends on the algorithm,
- * the fingerprint can be 16 or 20 bytes.
+ * Get the fingerprint of the OpenPGP key. Depends on the
+ * algorithm, the fingerprint can be 16 or 20 bytes.
+ *
+ * Returns: On success, 0 is returned, or an error code.
  **/
 int
 gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
@@ -275,10 +279,13 @@ gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
  * @key: the structure that contains the OpenPGP secret key.
  * @keyid: the buffer to save the keyid.
  *
- * Returns the 64-bit keyID of the OpenPGP key.
+ * Get key-id.
+ *
+ * Returns: the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
+				   gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -288,7 +295,7 @@ gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
- 
+
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_SECRET_KEY);
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
@@ -302,15 +309,14 @@ gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_
 
 
 /**
-  * gnutls_openpgp_privkey_get_subkey_count - This function returns the number of subkeys
-  * @key: is an OpenPGP key
-  *
-  * This function will return the number of subkeys present in the given 
-  * OpenPGP certificate.
-  *
-  * Returns then number of subkeys or a negative value on error.
-  *
-  **/
+ * gnutls_openpgp_privkey_get_subkey_count - return the number of subkeys
+ * @key: is an OpenPGP key
+ *
+ * This function will return the number of subkeys present in the
+ * given OpenPGP certificate.
+ *
+ * Returns: the number of subkeys, or a negative value on error.
+ **/
 int
 gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key)
 {
@@ -323,7 +329,7 @@ gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key)
       gnutls_assert ();
       return 0;
     }
-  
+
   ctx = NULL;
   subkeys = 0;
   while ((p = cdk_kbnode_walk (key->knode, &ctx, 0)))
@@ -356,13 +362,14 @@ static cdk_packet_t _get_secret_subkey(gnutls_openpgp_privkey_t key, unsigned in
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_revoked_ status - Gets the revoked status of the key
+ * gnutls_openpgp_privkey_get_subkey_revoked_ status - Get the revoked status of the key
  * @key: the structure that contains the OpenPGP private key.
  * @idx: is the subkey index
  *
- * Returns the true (1) or false (0) based on whether this key has been revoked
- * or not. A negative value indicates an error.
+ * Get revocation status of key.
  *
+ * Returns: true (1) if the key has been revoked, or false (0) if it
+ *   has not, or a negative value indicates an error.
  **/
 int
 gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key, unsigned int idx)
@@ -425,7 +432,7 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
       else
 	algo = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
-  
+
   return algo;
 }
 
@@ -434,11 +441,13 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
  * @key: the structure that contains the OpenPGP private key.
  * @keyid: the keyid.
  *
- * Returns the index of the subkey or a negative error value.
+ * Get index of subkey.
  *
+ * Returns: the index of the subkey or a negative error value.
  **/
 int
-gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key, const gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key,
+				       const gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   int ret;
@@ -466,17 +475,20 @@ gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key, const gnutl
  * @key: the structure that contains the OpenPGP private key.
  * @idx: the subkey index
  *
- * Returns the timestamp when the OpenPGP key was created.
+ * Get subkey creation time.
+ *
+ * Returns: the timestamp when the OpenPGP key was created.
  **/
 time_t
-gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key, unsigned int idx)
+gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key,
+						 unsigned int idx)
 {
   cdk_packet_t pkt;
   time_t timestamp;
 
   if (!key)
     return (time_t) - 1;
-    
+
   pkt = _get_secret_subkey( key, idx);
   if (pkt)
     timestamp = pkt->pkt.secret_key->pk->timestamp;
@@ -491,11 +503,14 @@ gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key, u
  * @key: the structure that contains the OpenPGP private key.
  * @idx: the subkey index
  *
- * Returns the time when the OpenPGP key expires. A value of '0' means
- * that the key doesn't expire at all.
+ * Get subkey expiration time.  A value of '0' means that the key
+ * doesn't expire at all.
+ *
+ * Returns: the time when the OpenPGP key expires.
  **/
 time_t
-gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key, unsigned int idx)
+gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
+						   unsigned int idx)
 {
   cdk_packet_t pkt;
   time_t expiredate;
@@ -518,10 +533,14 @@ gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
  * @idx: the subkey index
  * @keyid: the buffer to save the keyid.
  *
- * Returns the 64-bit keyID of the OpenPGP key.
+ * Get the key-id for the subkey.
+ *
+ * Returns: the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int idx, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key,
+				      unsigned int idx,
+				      gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -531,7 +550,7 @@ gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key, unsigned int
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
- 
+
   pkt = _get_secret_subkey( key, idx);
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;

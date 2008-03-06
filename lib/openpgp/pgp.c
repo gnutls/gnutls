@@ -199,8 +199,10 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
  * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
  * @fprlen: the integer to save the length of the fingerprint.
  *
- * Returns the fingerprint of the OpenPGP key. Depends on the algorithm,
- * the fingerprint can be 16 or 20 bytes.
+ * Get key fingerprint.  Depending on the algorithm, the fingerprint
+ * can be 16 or 20 bytes.
+ *
+ * Returns: the fingerprint of the OpenPGP key.
  **/
 int
 gnutls_openpgp_crt_get_fingerprint (gnutls_openpgp_crt_t key,
@@ -395,7 +397,9 @@ gnutls_openpgp_crt_get_version (gnutls_openpgp_crt_t key)
  * gnutls_openpgp_crt_get_creation_time - Extract the timestamp
  * @key: the structure that contains the OpenPGP public key.
  *
- * Returns the timestamp when the OpenPGP key was created.
+ * Get key creation time.
+ *
+ * Returns: the timestamp when the OpenPGP key was created.
  **/
 time_t
 gnutls_openpgp_crt_get_creation_time (gnutls_openpgp_crt_t key)
@@ -420,8 +424,10 @@ gnutls_openpgp_crt_get_creation_time (gnutls_openpgp_crt_t key)
  * gnutls_openpgp_crt_get_expiration_time - Extract the expire date
  * @key: the structure that contains the OpenPGP public key.
  *
- * Returns the time when the OpenPGP key expires. A value of '0' means
- * that the key doesn't expire at all.
+ * Get key expiration time.  A value of '0' means that the key doesn't
+ * expire at all.
+ *
+ * Returns: the time when the OpenPGP key expires.
  **/
 time_t
 gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key)
@@ -446,10 +452,13 @@ gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key)
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the buffer to save the keyid.
  *
- * Returns the 64-bit keyID of the OpenPGP key.
+ * Get key id string.
+ *
+ * Returns: the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key,
+			       gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -475,9 +484,10 @@ gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t 
  * gnutls_openpgp_crt_get_revoked_status - Gets the revoked status of the key
  * @key: the structure that contains the OpenPGP public key.
  *
- * Returns the true (1) or false (0) based on whether this key has been revoked
- * or not.
+ * Get revocation status of key.
  *
+ * Returns: true (1) if the key has been revoked, or false (0) if it
+ *   has not.
  **/
 int
 gnutls_openpgp_crt_get_revoked_status (gnutls_openpgp_crt_t key)
@@ -728,12 +738,14 @@ int _gnutls_openpgp_find_subkey_idx( cdk_kbnode_t knode, uint32_t keyid[2],
  * @key: the structure that contains the OpenPGP public key.
  * @idx: is the subkey index
  *
- * Returns the true (1) or false (0) based on whether this key has been revoked
- * or not. A negative value indicates an error.
+ * Get subkey revocation status.  A negative value indicates an error.
  *
+ * Returns: true (1) if the key has been revoked, or false (0) if it
+ *   has not.
  **/
 int
-gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key, unsigned int idx)
+gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
+					      unsigned int idx)
 {
   cdk_packet_t pkt;
 
@@ -802,17 +814,20 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
  * @key: the structure that contains the OpenPGP public key.
  * @idx: the subkey index
  *
- * Returns the timestamp when the OpenPGP key was created.
+ * Get subkey creation time.
+ *
+ * Returns: the timestamp when the OpenPGP sub-key was created.
  **/
 time_t
-gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key, unsigned int idx)
+gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
+					     unsigned int idx)
 {
   cdk_packet_t pkt;
   time_t timestamp;
 
   if (!key)
     return (time_t) - 1;
-    
+
   pkt = _get_public_subkey( key, idx);
   if (pkt)
     timestamp = pkt->pkt.public_key->timestamp;
@@ -828,11 +843,14 @@ gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key, unsigned 
  * @key: the structure that contains the OpenPGP public key.
  * @idx: the subkey index
  *
- * Returns the time when the OpenPGP key expires. A value of '0' means
- * that the key doesn't expire at all.
+ * Get subkey expiration time.  A value of '0' means that the key
+ * doesn't expire at all.
+ *
+ * Returns: the time when the OpenPGP key expires.
  **/
 time_t
-gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key, unsigned int idx)
+gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key,
+					       unsigned int idx)
 {
   cdk_packet_t pkt;
   time_t expiredate;
@@ -855,10 +873,14 @@ gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key, unsigne
  * @idx: the subkey index
  * @keyid: the buffer to save the keyid.
  *
- * Returns the 64-bit keyID of the OpenPGP key.
+ * Get the subkey's key-id.
+ *
+ * Returns: the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key, unsigned int idx, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
+				  unsigned int idx,
+				  gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -868,7 +890,7 @@ gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key, unsigned int idx, gn
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
- 
+
   pkt = _get_public_subkey( key, idx);
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
@@ -885,11 +907,13 @@ gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key, unsigned int idx, gn
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the keyid.
  *
- * Returns the index of the subkey or a negative error value.
+ * Get subkey's index.
  *
+ * Returns: the index of the subkey or a negative error value.
  **/
 int
-gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key, const gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
+				   const gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   int ret;
@@ -902,7 +926,7 @@ gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key, const gnutls_openpg
     }
 
   KEYID_IMPORT( kid, keyid);
-  ret = _gnutls_openpgp_find_subkey_idx( key->knode, kid, 0); 
+  ret = _gnutls_openpgp_find_subkey_idx( key->knode, kid, 0);
 
   if (ret < 0)
     {
@@ -913,21 +937,23 @@ gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key, const gnutls_openpg
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_usage - This function returns the key's usage
+ * gnutls_openpgp_crt_get_subkey_usage - returns the key's usage
  * @key: should contain a gnutls_openpgp_crt_t structure
  * @idx: the subkey index
  * @key_usage: where the key usage bits will be stored
  *
  * This function will return certificate's key usage, by checking the
- * key algorithm. The key usage value will ORed values of the:
- * GNUTLS_KEY_DIGITAL_SIGNATURE, GNUTLS_KEY_KEY_ENCIPHERMENT.
+ * key algorithm.  The key usage value will ORed values of
+ * %GNUTLS_KEY_DIGITAL_SIGNATURE or %GNUTLS_KEY_KEY_ENCIPHERMENT.
  *
  * A negative value may be returned in case of parsing error.
  *
+ * Returns: key usage value.
  */
 int
-gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key, unsigned int idx,
-				  unsigned int *key_usage)
+gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key,
+				     unsigned int idx,
+				     unsigned int *key_usage)
 {
   cdk_packet_t pkt;
 
@@ -1372,11 +1398,14 @@ int ret;
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
  *
- * Returns the 64-bit preferred keyID of the OpenPGP key. If it hasn't
- * been set it returns GNUTLS_E_INVALID_REQUEST.
+ * Get preferred key id.  If it hasn't been set it returns
+ * %GNUTLS_E_INVALID_REQUEST.
+ *
+ * Returns: the 64-bit preferred keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
+					 gnutls_openpgp_keyid_t keyid)
 {
   if (!key || !keyid || !key->preferred_set)
     {
