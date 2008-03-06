@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -45,11 +45,13 @@
 #include <gnutls_dh.h>
 
 /**
-  * gnutls_protocol_get_version - Returns the version of the currently used protocol
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns: the version of the currently used protocol.
-  **/
+ * gnutls_protocol_get_version - Returns the version of the currently used protocol
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get TLS version, a #gnutls_protocol_t value.
+ *
+ * Returns: the version of the currently used protocol.
+ **/
 gnutls_protocol_t
 gnutls_protocol_get_version (gnutls_session_t session)
 {

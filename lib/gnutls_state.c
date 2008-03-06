@@ -52,11 +52,14 @@ _gnutls_session_cert_type_set (gnutls_session_t session,
 }
 
 /**
-  * gnutls_cipher_get - Returns the currently used cipher.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns: the currently used cipher.
-  **/
+ * gnutls_cipher_get - Returns the currently used cipher.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get currently used cipher.
+ *
+ * Returns: the currently used cipher, an #gnutls_cipher_algorithm_t
+ *   type.
+ **/
 gnutls_cipher_algorithm_t
 gnutls_cipher_get (gnutls_session_t session)
 {
@@ -64,15 +67,15 @@ gnutls_cipher_get (gnutls_session_t session)
 }
 
 /**
-  * gnutls_certificate_type_get - Returns the currently used certificate type.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * The certificate type is by default X.509, unless it is negotiated
-  * as a TLS extension.
-  *
-  * Returns: the currently used %gnutls_certificate_type_t certificate
-  *   type.
-  **/
+ * gnutls_certificate_type_get - Returns the currently used certificate type.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * The certificate type is by default X.509, unless it is negotiated
+ * as a TLS extension.
+ *
+ * Returns: the currently used #gnutls_certificate_type_t certificate
+ *   type.
+ **/
 gnutls_certificate_type_t
 gnutls_certificate_type_get (gnutls_session_t session)
 {
@@ -80,11 +83,14 @@ gnutls_certificate_type_get (gnutls_session_t session)
 }
 
 /**
-  * gnutls_kx_get - Returns the key exchange algorithm.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns: the key exchange algorithm used in the last handshake.
-  **/
+ * gnutls_kx_get - Returns the key exchange algorithm.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get currently used key exchange algorithm.
+ *
+ * Returns: the key exchange algorithm used in the last handshake, a
+ *   #gnutls_kx_algorithm_t value.
+ **/
 gnutls_kx_algorithm_t
 gnutls_kx_get (gnutls_session_t session)
 {
@@ -92,11 +98,14 @@ gnutls_kx_get (gnutls_session_t session)
 }
 
 /**
-  * gnutls_mac_get - Returns the currently used mac algorithm.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns: the currently used mac algorithm.
-  **/
+ * gnutls_mac_get - Returns the currently used mac algorithm.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get currently used MAC algorithm.
+ *
+ * Returns: the currently used mac algorithm, a
+ *   #gnutls_mac_algorithm_t value.
+ **/
 gnutls_mac_algorithm_t
 gnutls_mac_get (gnutls_session_t session)
 {
@@ -104,11 +113,14 @@ gnutls_mac_get (gnutls_session_t session)
 }
 
 /**
-  * gnutls_compression_get - Returns the currently used compression algorithm.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns: the currently used compression method.
-  **/
+ * gnutls_compression_get - Returns the currently used compression algorithm.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get currently used compression algorithm.
+ *
+ * Returns: the currently used compression method, a
+ *   #gnutls_compression_method_t value.
+ **/
 gnutls_compression_method_t
 gnutls_compression_get (gnutls_session_t session)
 {
@@ -1140,12 +1152,15 @@ _gnutls_session_is_export (gnutls_session_t session)
 }
 
 /**
-  * gnutls_session_get_ptr - Used to get the user pointer from the session structure
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns: the user given pointer from the session structure.  This
-  * is the pointer set with gnutls_session_set_ptr().
-  **/
+ * gnutls_session_get_ptr - Get the user pointer from the session structure
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get user pointer for session.  Useful in callbacks.  This is the
+ *   pointer set with gnutls_session_set_ptr().
+ *
+ * Returns: the user given pointer from the session structure, or
+ *   %NULL if it was never set.
+ **/
 void *
 gnutls_session_get_ptr (gnutls_session_t session)
 {
@@ -1153,14 +1168,14 @@ gnutls_session_get_ptr (gnutls_session_t session)
 }
 
 /**
-  * gnutls_session_set_ptr - Used to set the user pointer to the session structure
-  * @session: is a #gnutls_session_t structure.
-  * @ptr: is the user pointer
-  *
-  * This function will set (associate) the user given pointer to the
-  * session structure.  This is pointer can be accessed with
-  * gnutls_session_get_ptr().
-  **/
+ * gnutls_session_set_ptr - Used to set the user pointer to the session structure
+ * @session: is a #gnutls_session_t structure.
+ * @ptr: is the user pointer
+ *
+ * This function will set (associate) the user given pointer @ptr to
+ * the session structure.  This is pointer can be accessed with
+ * gnutls_session_get_ptr().
+ **/
 void
 gnutls_session_set_ptr (gnutls_session_t session, void *ptr)
 {
@@ -1169,22 +1184,22 @@ gnutls_session_set_ptr (gnutls_session_t session, void *ptr)
 
 
 /**
-  * gnutls_record_get_direction - return the direction of the last interrupted function call
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function provides information about the internals of the
-  * record protocol and is only useful if a prior gnutls function call
-  * (e.g.  gnutls_handshake()) was interrupted for some reason, that
-  * is, if a function returned %GNUTLS_E_INTERRUPTED or
-  * %GNUTLS_E_AGAIN.  In such a case, you might want to call select()
-  * or poll() before calling the interrupted gnutls function again.
-  * To tell you whether a file descriptor should be selected for
-  * either reading or writing, gnutls_record_get_direction() returns 0
-  * if the interrupted function was trying to read data, and 1 if it
-  * was trying to write data.
-  *
-  * Returns: 0 if trying to read data, 1 if trying to write data.
-  **/
+ * gnutls_record_get_direction - return the direction of the last interrupted function call
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function provides information about the internals of the
+ * record protocol and is only useful if a prior gnutls function call
+ * (e.g.  gnutls_handshake()) was interrupted for some reason, that
+ * is, if a function returned %GNUTLS_E_INTERRUPTED or
+ * %GNUTLS_E_AGAIN.  In such a case, you might want to call select()
+ * or poll() before calling the interrupted gnutls function again.  To
+ * tell you whether a file descriptor should be selected for either
+ * reading or writing, gnutls_record_get_direction() returns 0 if the
+ * interrupted function was trying to read data, and 1 if it was
+ * trying to write data.
+ *
+ * Returns: 0 if trying to read data, 1 if trying to write data.
+ **/
 int
 gnutls_record_get_direction (gnutls_session_t session)
 {
@@ -1211,27 +1226,26 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
 }
 
 /**
-  * gnutls_handshake_set_post_client_hello_function - set callback to be called after the client hello is received
-  * @res: is a gnutls_anon_server_credentials_t structure
-  * @func: is the function to be called
-  *
-  * This function will set a callback to be called after the client
-  * hello has been received (callback valid in server side only). This
-  * allows the server to adjust settings based on received extensions.
-  *
-  * Those settings could be ciphersuites, requesting certificate, or
-  * anything else except for version negotiation (this is done before
-  * the hello message is parsed).
-  *
-  * This callback must return 0 on success or a gnutls error code to
-  * terminate the handshake.
-  *
-  * NOTE: You should not use this function to terminate the handshake
-  * based on client input unless you know what you are doing. Before
-  * the handshake is finished there is no way to know if there is a
-  * man-in-the-middle attack being performed.
-  *
-  **/
+ * gnutls_handshake_set_post_client_hello_function - set callback to be called after the client hello is received
+ * @res: is a gnutls_anon_server_credentials_t structure
+ * @func: is the function to be called
+ *
+ * This function will set a callback to be called after the client
+ * hello has been received (callback valid in server side only). This
+ * allows the server to adjust settings based on received extensions.
+ *
+ * Those settings could be ciphersuites, requesting certificate, or
+ * anything else except for version negotiation (this is done before
+ * the hello message is parsed).
+ *
+ * This callback must return 0 on success or a gnutls error code to
+ * terminate the handshake.
+ *
+ * NOTE: You should not use this function to terminate the handshake
+ * based on client input unless you know what you are doing. Before
+ * the handshake is finished there is no way to know if there is a
+ * man-in-the-middle attack being performed.
+ **/
 void
 gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
 						 gnutls_handshake_post_client_hello_func func)
@@ -1240,17 +1254,17 @@ gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_session_enable_compatibility_mode - Used to disable certain features in TLS in order to honour compatibility
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function can be used to disable certain (security) features
-  * in TLS in order to maintain maximum compatibility with buggy
-  * clients. It is equivalent to calling:
-  * gnutls_record_disable_padding()
-  *
-  * Normally only servers that require maximum compatibility with
-  * everything out there, need to call this function.
-  **/
+ * gnutls_session_enable_compatibility_mode - disable certain features in TLS in order to honour compatibility
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function can be used to disable certain (security) features in
+ * TLS in order to maintain maximum compatibility with buggy
+ * clients. It is equivalent to calling:
+ * gnutls_record_disable_padding()
+ *
+ * Normally only servers that require maximum compatibility with
+ * everything out there, need to call this function.
+ **/
 void
 gnutls_session_enable_compatibility_mode (gnutls_session_t session)
 {

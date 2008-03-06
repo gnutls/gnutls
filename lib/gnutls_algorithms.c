@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -667,12 +667,14 @@ _gnutls_mac_priority (gnutls_session_t session,
 }
 
 /**
-  * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
-  * @algorithm: is a MAC algorithm
-  *
-  * Returns: a string that contains the name of the specified MAC
-  * algorithm, or %NULL.
-  **/
+ * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
+ * @algorithm: is a MAC algorithm
+ *
+ * Convert a #gnutls_mac_algorithm_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified MAC
+ *   algorithm, or %NULL.
+ **/
 const char *
 gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 {
@@ -685,13 +687,15 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a MAC algorithm name
-  *
-  * Returns: an %gnutls_mac_algorithm_tid of the specified in a string
-  * MAC algorithm, or %GNUTLS_MAC_UNKNOWN on failures.  The names are
-  * compared in a case insensitive way.
-  **/
+ * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a MAC algorithm name
+ *
+ * Convert a string to a #gnutls_mac_algorithm_t value.  The names are
+ * compared in a case insensitive way.
+ *
+ * Returns: an %gnutls_mac_algorithm_tid of the specified in a string
+ *   MAC algorithm, or %GNUTLS_MAC_UNKNOWN on failures.
+ **/
 gnutls_mac_algorithm_t
 gnutls_mac_get_id (const char* name)
 {
@@ -703,13 +707,14 @@ gnutls_mac_get_id (const char* name)
 }
 
 /**
-  * gnutls_mac_get_key_size - Returns the length of the MAC's key size
-  * @algorithm: is an encryption algorithm
-  *
-  * Returns: length (in bytes) of the given MAC key size, or 0 if the
-  * given MAC algorithm is invalid.
-  *
-  **/
+ * gnutls_mac_get_key_size - Returns the length of the MAC's key size
+ * @algorithm: is an encryption algorithm
+ *
+ * Get size of MAC key.
+ *
+ * Returns: length (in bytes) of the given MAC key size, or 0 if the
+ *   given MAC algorithm is invalid.
+ **/
 size_t
 gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 {
@@ -794,12 +799,14 @@ _gnutls_compression_priority (gnutls_session_t session,
 }
 
 /**
-  * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
-  * @algorithm: is a Compression algorithm
-  *
-  * Returns: a pointer to a string that contains the name of the
-  * specified compression algorithm, or %NULL.
-  **/
+ * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
+ * @algorithm: is a Compression algorithm
+ *
+ * Convert a #gnutls_compression_method_t value to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified compression algorithm, or %NULL.
+ **/
 const char *
 gnutls_compression_get_name (gnutls_compression_method_t algorithm)
 {
@@ -812,15 +819,14 @@ gnutls_compression_get_name (gnutls_compression_method_t algorithm)
 }
 
 /**
-  * gnutls_compression_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a compression method name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified in a string compression method, or
-  * %GNUTLS_COMP_UNKNOWN on error.
-  *
-  **/
+ * gnutls_compression_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a compression method name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: an id of the specified in a string compression method, or
+ *   %GNUTLS_COMP_UNKNOWN on error.
+ **/
 gnutls_compression_method_t
 gnutls_compression_get_id (const char* name)
 {
@@ -952,12 +958,14 @@ _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_cipher_get_key_size - Returns the length of the cipher's key size
-  * @algorithm: is an encryption algorithm
-  *
-  * Returns: length (in bytes) of the given cipher's key size, o 0 if
-  *   the given cipher is invalid.
-  **/
+ * gnutls_cipher_get_key_size - Returns the length of the cipher's key size
+ * @algorithm: is an encryption algorithm
+ *
+ * Get key size for cipher.
+ *
+ * Returns: length (in bytes) of the given cipher's key size, or 0 if
+ *   the given cipher is invalid.
+ **/
 size_t
 gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm)
 {				/* In bytes */
@@ -986,12 +994,14 @@ _gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
-  * @algorithm: is an encryption algorithm
-  *
-  * Returns: a pointer to a string that contains the name of the
-  *   specified cipher, or %NULL.
-  **/
+ * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
+ * @algorithm: is an encryption algorithm
+ *
+ * Convert a #gnutls_cipher_algorithm_t type to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified cipher, or %NULL.
+ **/
 const char *
 gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 {
@@ -1004,15 +1014,14 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_cipher_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a MAC algorithm name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified cipher, or %GNUTLS_CIPHER_UNKNOWN
-  * on error.
-  *
-  **/
+ * gnutls_cipher_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a MAC algorithm name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: return a #gnutls_cipher_algorithm_t value corresponding to
+ *   the specified cipher, or %GNUTLS_CIPHER_UNKNOWN on error.
+ **/
 gnutls_cipher_algorithm_t
 gnutls_cipher_get_id (const char* name)
 {
@@ -1078,12 +1087,14 @@ _gnutls_kx_priority (gnutls_session_t session,
 }
 
 /**
-  * gnutls_kx_get_name - Returns a string with the name of the specified key exchange algorithm
-  * @algorithm: is a key exchange algorithm
-  *
-  * Returns: a pointer to a string that contains the name of the
-  * specified key exchange algorithm, or %NULL.
-  **/
+ * gnutls_kx_get_name - Returns a string with the name of the specified key exchange algorithm
+ * @algorithm: is a key exchange algorithm
+ *
+ * Convert a #gnutls_kx_algorithm_t value to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified key exchange algorithm, or %NULL.
+ **/
 const char *
 gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 {
@@ -1096,14 +1107,15 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_kx_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a KX name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified KX algorithm, or
-  * %GNUTLS_KX_UNKNOWN on error.
-  **/
+ * gnutls_kx_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a KX name
+ *
+ * Convert a string to a #gnutls_kx_algorithm_t value.  The names are
+ * compared in a case insensitive way.
+ *
+ * Returns: an id of the specified KX algorithm, or %GNUTLS_KX_UNKNOWN
+ *   on error.
+ **/
 gnutls_kx_algorithm_t
 gnutls_kx_get_id (const char* name)
 {
@@ -1223,12 +1235,14 @@ _gnutls_version_max (gnutls_session_t session)
 
 
 /**
-  * gnutls_protocol_get_name - Returns a string with the name of the specified SSL/TLS version
-  * @version: is a (gnutls) version number
-  *
-  * Returns: a string that contains the name of the specified TLS
-  * version (e.g., "TLS 1.0"), or %NULL.
-  **/
+ * gnutls_protocol_get_name - Returns a string with the name of the specified SSL/TLS version
+ * @version: is a (gnutls) version number
+ *
+ * Convert a #gnutls_protocol_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified TLS
+ *   version (e.g., "TLS1.0"), or %NULL.
+ **/
 const char *
 gnutls_protocol_get_name (gnutls_protocol_t version)
 {
@@ -1815,12 +1829,14 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 }
 
 /**
-  * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
-  * @type: is a certificate type
-  *
-  * Returns: a string (or %NULL) that contains the name of the
-  * specified certificate type.
-  **/
+ * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
+ * @type: is a certificate type
+ *
+ * Convert a #gnutls_certificate_type_t type to a string.
+ *
+ * Returns: a string that contains the name of the specified
+ *   certificate type, or %NULL in case of unknown types.
+ **/
 const char *
 gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
 {
@@ -2037,8 +2053,10 @@ static const gnutls_pk_entry pk_algorithms[] = {
   * gnutls_pk_algorithm_get_name - Returns a string with the name of the specified public key algorithm
   * @algorithm: is a pk algorithm
   *
+  * Convert a #gnutls_pk_algorithm_t value to a string.
+  *
   * Returns: a string that contains the name of the specified public
-  * key algorithm, or %NULL.
+  *   key algorithm, or %NULL.
   **/
 const char *
 gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)

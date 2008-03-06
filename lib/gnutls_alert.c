@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -137,20 +137,21 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
 }
 
 /**
-  * gnutls_error_to_alert - return an alert code based on the given error code
-  * @err: is a negative integer
-  * @level: the alert level will be stored there
-  *
-  * Returns an alert depending on the error code returned by a gnutls
-  * function. All alerts sent by this function should be considered fatal.
-  * The only exception is when err == GNUTLS_E_REHANDSHAKE, where a warning 
-  * alert should be sent to the peer indicating that no renegotiation will 
-  * be performed.
-  *
-  * If there is no mapping to a valid alert the alert to indicate internal error 
-  * is returned.
-  *
-  **/
+ * gnutls_error_to_alert - return an alert code based on the given error code
+ * @err: is a negative integer
+ * @level: the alert level will be stored there
+ *
+ * Get an alert depending on the error code returned by a gnutls
+ * function.  All alerts sent by this function should be considered
+ * fatal.  The only exception is when @err is %GNUTLS_E_REHANDSHAKE,
+ * where a warning alert should be sent to the peer indicating that no
+ * renegotiation will be performed.
+ *
+ * If there is no mapping to a valid alert the alert to indicate
+ * internal error is returned.
+ *
+ * Returns: the alert code to use for a particular error code.
+ **/
 int
 gnutls_error_to_alert (int err, int *level)
 {
