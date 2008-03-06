@@ -34,7 +34,7 @@
 	   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-/**
+/*
  * Code originally written by Wez Furlong <wez@thebrainroom.com>
  * who originally placed it under the PHP License Version 3.0.
  * Adapted for GNUnet by Nils Durner <durner@gnunet.org>.
@@ -47,7 +47,7 @@
  * @author Nils Durner (GNUnet extensions)
  */
 
-/**
+/*
  * Win32 select() will only work with sockets, so we roll our own
  * implementation here.
  * - If you supply only sockets, this simply passes through to winsock select().
