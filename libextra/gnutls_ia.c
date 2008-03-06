@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 Free Software Foundation
+ * Copyright (C) 2005, 2006, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -390,7 +390,7 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
  * this function again, with the same parameters; alternatively you
  * could provide a %NULL pointer for data, and 0 for size.
  *
- * Returns the number of bytes sent, or a negative error code.
+ * Returns: The number of bytes sent, or a negative error code.
  **/
 ssize_t
 gnutls_ia_send (gnutls_session_t session, const char *data, size_t sizeofdata)
@@ -426,7 +426,7 @@ gnutls_ia_send (gnutls_session_t session, const char *data, size_t sizeofdata)
  * this function again, with the same parameters; alternatively you
  * could provide a NULL pointer for data, and 0 for size.
  *
- * Returns the number of bytes received.  A negative error code is
+ * Returns: The number of bytes received.  A negative error code is
  * returned in case of an error.  The
  * %GNUTLS_E_WARNING_IA_IPHF_RECEIVED and
  * %GNUTLS_E_WARNING_IA_FPHF_RECEIVED errors are returned when an
@@ -658,7 +658,8 @@ gnutls_ia_handshake (gnutls_session_t session)
  * support TLS/IA).  Use gnutls_ia_require_inner_phase() to toggle the
  * TLS/IA mode.
  *
- * Returns 0 on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  **/
 int
 gnutls_ia_allocate_client_credentials (gnutls_ia_client_credentials_t * sc)
@@ -733,7 +734,6 @@ gnutls_ia_set_client_avp_function (gnutls_ia_client_credentials_t cred,
  *
  * Sets the pointer that will be provided to the TLS/IA callback
  * function as the first argument.
- *
  **/
 void
 gnutls_ia_set_client_avp_ptr (gnutls_ia_client_credentials_t cred, void *ptr)
@@ -748,6 +748,7 @@ gnutls_ia_set_client_avp_ptr (gnutls_ia_client_credentials_t cred, void *ptr)
  * Returns the pointer that will be provided to the TLS/IA callback
  * function as the first argument.
  *
+ * Returns: The client callback data pointer.
  **/
 void *
 gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t cred)
@@ -767,7 +768,8 @@ gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t cred)
  * support TLS/IA).  Use gnutls_ia_require_inner_phase() to toggle the
  * TLS/IA mode.
  *
- * Returns 0 on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  **/
 int
 gnutls_ia_allocate_server_credentials (gnutls_ia_server_credentials_t * sc)
@@ -849,7 +851,6 @@ gnutls_ia_set_server_avp_function (gnutls_ia_server_credentials_t cred,
  *
  * Sets the pointer that will be provided to the TLS/IA callback
  * function as the first argument.
- *
  **/
 void
 gnutls_ia_set_server_avp_ptr (gnutls_ia_server_credentials_t cred, void *ptr)
@@ -864,6 +865,7 @@ gnutls_ia_set_server_avp_ptr (gnutls_ia_server_credentials_t cred, void *ptr)
  * Returns the pointer that will be provided to the TLS/IA callback
  * function as the first argument.
  *
+ * Returns: The server callback data pointer.
  **/
 void *
 gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred)
