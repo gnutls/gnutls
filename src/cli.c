@@ -168,7 +168,7 @@ static gnutls_x509_privkey_t x509_key = NULL;
 static gnutls_openpgp_crt_t pgp_crt = NULL;
 static gnutls_openpgp_privkey_t pgp_key = NULL;
 
-static void get_keyid( gnutls_openpgp_keyid_t* keyid, const char* str)
+static void get_keyid( gnutls_openpgp_keyid_t keyid, const char* str)
 {
     size_t keyid_size = sizeof(keyid);
 
@@ -316,7 +316,7 @@ load_keys (void)
                 }
             }
           else
-            get_keyid( &keyid, info.pgp_subkey);
+            get_keyid( keyid, info.pgp_subkey);
 
           ret = gnutls_openpgp_crt_set_preferred_key_id( pgp_crt, keyid);
           if (ret >= 0)
