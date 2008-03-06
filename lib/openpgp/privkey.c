@@ -32,13 +32,12 @@
 #include <gnutls_cert.h>
 
 /**
- * gnutls_openpgp_privkey_init - This function initializes a gnutls_openpgp_privkey_t structure
+ * gnutls_openpgp_privkey_init - initializes a #gnutls_openpgp_privkey_t structure
  * @key: The structure to be initialized
  *
- * This function will initialize an OpenPGP key structure. 
+ * This function will initialize an OpenPGP key structure.
  *
  * Returns 0 on success.
- *
  **/
 int
 gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key)
@@ -51,11 +50,10 @@ gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key)
 }
 
 /**
- * gnutls_openpgp_privkey_deinit - This function deinitializes memory used by a gnutls_openpgp_privkey_t structure
+ * gnutls_openpgp_privkey_deinit - deinitializes memory used by a #gnutls_openpgp_privkey_t structure
  * @key: The structure to be initialized
  *
- * This function will deinitialize a key structure. 
- *
+ * This function will deinitialize a key structure.
  **/
 void
 gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
@@ -68,23 +66,23 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
       cdk_kbnode_release (key->knode);
       key->knode = NULL;
     }
-  
+
   gnutls_free (key);
 }
 
 /**
- * gnutls_openpgp_privkey_import - This function will import a RAW or BASE64 encoded key
+ * gnutls_openpgp_privkey_import - import a RAW or BASE64 encoded key
  * @key: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded key.
  * @format: One of gnutls_openpgp_crt_fmt_t elements.
  * @pass: Unused for now
  * @flags: should be zero
  *
- * This function will convert the given RAW or Base64 encoded key
- * to the native gnutls_openpgp_privkey_t format. The output will be stored in 'key'.
+ * This function will convert the given RAW or Base64 encoded key to
+ * the native gnutls_openpgp_privkey_t format.  The output will be
+ * stored in 'key'.
  *
  * Returns 0 on success.
- *
  **/
 int
 gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
@@ -950,7 +948,7 @@ int ret;
 }
 
 /**
-  * gnutls_openpgp_privkey_export_subkey_dsa_raw - This function will export the DSA private key
+  * gnutls_openpgp_privkey_export_subkey_dsa_raw - export the DSA private key
   * @pkey: Holds the certificate
   * @idx: Is the subkey index
   * @p: will hold the p
@@ -959,28 +957,31 @@ int ret;
   * @y: will hold the y
   * @x: will hold the x
   *
-  * This function will export the DSA private key's parameters found in
-  * the given certificate.  The new parameters will be allocated using
-  * gnutls_malloc() and will be stored in the appropriate datum.
+  * This function will export the DSA private key's parameters found
+  * in the given certificate.  The new parameters will be allocated
+  * using gnutls_malloc() and will be stored in the appropriate datum.
   *
   * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   **/
 int
-gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey, unsigned int idx,
-				    gnutls_datum_t * p, gnutls_datum_t * q,
-				    gnutls_datum_t * g, gnutls_datum_t * y,
-				    gnutls_datum_t * x)
+gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey,
+					      unsigned int idx,
+					      gnutls_datum_t * p,
+					      gnutls_datum_t * q,
+					      gnutls_datum_t * g,
+					      gnutls_datum_t * y,
+					      gnutls_datum_t * x)
 {
-gnutls_openpgp_keyid_t keyid;
-int ret;
+  gnutls_openpgp_keyid_t keyid;
+  int ret;
 
-  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, keyid);  
+  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, keyid);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
-    
+
   return _get_sk_dsa_raw( pkey, keyid, p, q, g, y, x);
 }
 
@@ -989,11 +990,14 @@ int ret;
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
  *
- * Returns the 64-bit preferred keyID of the OpenPGP key. If it hasn't
- * been set it returns GNUTLS_E_INVALID_REQUEST.
+ * Get the preferred key-id for the key.
+ *
+ * Returns: the 64-bit preferred keyID of the OpenPGP key, or if it
+ *   hasn't been set it returns %GNUTLS_E_INVALID_REQUEST.
  **/
 int
-gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key,
+					     gnutls_openpgp_keyid_t keyid)
 {
   if (!key || !keyid || !key->preferred_set)
     {
@@ -1007,19 +1011,20 @@ gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutl
 }
 
 /**
- * gnutls_openpgp_privkey_set_preferred_key_id - Sets the prefered keyID
+ * gnutls_openpgp_privkey_set_preferred_key_id - Set the prefered keyID
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the selected keyid
  *
  * This allows setting a preferred key id for the given certificate.
  * This key will be used by functions that involve key handling.
  *
+ * Returns: On success, 0 is returned, or an error code.
  **/
 int
-gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key, 
-  const gnutls_openpgp_keyid_t keyid)
+gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
+					     const gnutls_openpgp_keyid_t keyid)
 {
-int ret;
+  int ret;
 
   if (!key)
     {
