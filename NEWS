@@ -26,7 +26,8 @@ to trigger the problem.  See also
 ** gnutls-cli --print-cert now print PKCS#3 format Diffie-Hellman parameters.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_hex2bin: MODIFIED, uses size_t instead of int for string length,
+		and char* instead of void* for output buffer.
 
 * Version 2.3.2 (released 2008-02-26)
 

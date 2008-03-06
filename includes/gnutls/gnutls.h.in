@@ -1164,8 +1164,8 @@ extern "C"
   void gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
 				       gnutls_params_function * func);
 
-  int gnutls_hex2bin (const char * hex_data, int hex_size, void * bin_data,
-		 size_t * bin_size);
+  int gnutls_hex2bin (const char * hex_data, size_t hex_size,
+		      char * bin_data, size_t * bin_size);
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.

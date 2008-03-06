@@ -270,16 +270,27 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
   return buffer;
 }
 
-/* just a hex2bin function.
- */
-
+/**
+ * gnutls_hex2bin - convert hex string into binary buffer.
+ * @hex_data: string with data in hex format
+ * @hex_size: size of hex data
+ * @bin_data: output array with binary data
+ * @bin_size: when calling *@bin_size should hold size of @bin_data,
+ *            on return will hold actual size of @bin_data.
+ *
+ * Convert a buffer with hex data to binary data.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
 int
-gnutls_hex2bin (const char * hex_data, int hex_size, void * bin_data,
-		 size_t * bin_size)
+gnutls_hex2bin (const char * hex_data,
+		size_t hex_size,
+		char * bin_data,
+		size_t * bin_size)
 {
-  return _gnutls_hex2bin( hex_data, hex_size, bin_data, bin_size);
+  return _gnutls_hex2bin (hex_data, (int)hex_size, bin_data, bin_size);
 }
- 
+
 int
 _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 		 size_t * bin_size)
