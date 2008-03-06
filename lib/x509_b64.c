@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -287,20 +287,22 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
 }
 
 /**
-  * gnutls_pem_base64_encode - convert raw data to Base64 encoded
-  * @msg: is a message to be put in the header
-  * @data: contain the raw data
-  * @result: the place where base64 data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will convert the given data to printable data, using the base64 
-  * encoding. This is the encoding used in PEM messages. If the provided
-  * buffer is not long enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
-  *
-  * The output string will be null terminated, although the size will not include
-  * the terminating null.
-  * 
-  **/
+ * gnutls_pem_base64_encode - convert raw data to Base64 encoded
+ * @msg: is a message to be put in the header
+ * @data: contain the raw data
+ * @result: the place where base64 data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will convert the given data to printable data, using
+ * the base64 encoding. This is the encoding used in PEM messages.
+ *
+ * The output string will be null terminated, although the size will
+ * not include the terminating null.
+ *
+ * Returns: On success %GNUTLS_E_SUCCESS (0) is returned,
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned if the buffer given is
+ *   not long enough, or 0 on success.
+ **/
 int
 gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
 			  char *result, size_t * result_size)
@@ -329,18 +331,21 @@ gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
 }
 
 /**
-  * gnutls_pem_base64_encode_alloc - convert raw data to Base64 encoded
-  * @msg: is a message to be put in the encoded header
-  * @data: contains the raw data
-  * @result: will hold the newly allocated encoded data
-  *
-  * This function will convert the given data to printable data, using the base64 
-  * encoding. This is the encoding used in PEM messages. This function will
-  * allocate the required memory to hold the encoded data.
-  *
-  * You should use gnutls_free() to free the returned data.
-  * 
-  **/
+ * gnutls_pem_base64_encode_alloc - convert raw data to Base64 encoded
+ * @msg: is a message to be put in the encoded header
+ * @data: contains the raw data
+ * @result: will hold the newly allocated encoded data
+ *
+ * This function will convert the given data to printable data, using
+ * the base64 encoding.  This is the encoding used in PEM messages.
+ * This function will allocate the required memory to hold the encoded
+ * data.
+ *
+ * You should use gnutls_free() to free the returned data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
 int
 gnutls_pem_base64_encode_alloc (const char *msg,
 				const gnutls_datum_t * data,
@@ -520,19 +525,21 @@ _gnutls_fbase64_decode (const char *header, const opaque * data,
 }
 
 /**
-  * gnutls_pem_base64_decode - decode base64 encoded data
-  * @header: A null terminated string with the PEM header (eg. CERTIFICATE)
-  * @b64_data: contain the encoded data
-  * @result: the place where decoded data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will decode the given encoded data. If the header given
-  * is non null this function will search for "-----BEGIN header" and decode
-  * only this part. Otherwise it will decode the first PEM packet found.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
-  * or 0 on success.
-  **/
+ * gnutls_pem_base64_decode - decode base64 encoded data
+ * @header: A null terminated string with the PEM header (eg. CERTIFICATE)
+ * @b64_data: contain the encoded data
+ * @result: the place where decoded data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will decode the given encoded data.  If the header
+ * given is non null this function will search for "-----BEGIN header"
+ * and decode only this part.  Otherwise it will decode the first PEM
+ * packet found.
+ *
+ * Returns: On success %GNUTLS_E_SUCCESS (0) is returned,
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned if the buffer given is
+ *   not long enough, or 0 on success.
+ **/
 int
 gnutls_pem_base64_decode (const char *header,
 			  const gnutls_datum_t * b64_data,
@@ -563,20 +570,22 @@ gnutls_pem_base64_decode (const char *header,
 }
 
 /**
-  * gnutls_pem_base64_decode_alloc - decode base64 encoded data
-  * @header: The PEM header (eg. CERTIFICATE)
-  * @b64_data: contains the encoded data
-  * @result: the place where decoded data lie
-  *
-  * This function will decode the given encoded data. The decoded data
-  * will be allocated, and stored into result.
-  * If the header given is non null this function will search for 
-  * "-----BEGIN header" and decode only this part. Otherwise it will decode the 
-  * first PEM packet found.
-  *
-  * You should use gnutls_free() to free the returned data.
-  *
-  **/
+ * gnutls_pem_base64_decode_alloc - decode base64 encoded data
+ * @header: The PEM header (eg. CERTIFICATE)
+ * @b64_data: contains the encoded data
+ * @result: the place where decoded data lie
+ *
+ * This function will decode the given encoded data. The decoded data
+ * will be allocated, and stored into result.  If the header given is
+ * non null this function will search for "-----BEGIN header" and
+ * decode only this part. Otherwise it will decode the first PEM
+ * packet found.
+ *
+ * You should use gnutls_free() to free the returned data.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
 int
 gnutls_pem_base64_decode_alloc (const char *header,
 				const gnutls_datum_t * b64_data,
