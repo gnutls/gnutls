@@ -693,7 +693,7 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
  * Convert a string to a #gnutls_mac_algorithm_t value.  The names are
  * compared in a case insensitive way.
  *
- * Returns: an %gnutls_mac_algorithm_tid of the specified in a string
+ * Returns: an #gnutls_mac_algorithm_tid of the specified in a string
  *   MAC algorithm, or %GNUTLS_MAC_UNKNOWN on failures.
  **/
 gnutls_mac_algorithm_t
@@ -727,15 +727,15 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 }
 
 /**
- * gnutls_mac_list:
+ * gnutls_mac_list - Get a list of supported MAC algorithms
  *
  * Get a list of hash algorithms for use as MACs.  Note that not
  * necessarily all MACs are supported in TLS cipher suites.  For
  * example, MD2 is not supported as a cipher suite, but is supported
  * for other purposes (e.g., X.509 signature verification or similar).
  *
- * Returns: Return a zero-terminated list of %gnutls_mac_algorithm_t
- * integers indicating the available MACs.
+ * Returns: Return a zero-terminated list of #gnutls_mac_algorithm_t
+ *   integers indicating the available MACs.
  **/
 const gnutls_mac_algorithm_t *
 gnutls_mac_list (void)
@@ -838,14 +838,14 @@ gnutls_compression_get_id (const char* name)
 }
 
 /**
- * gnutls_compression_list:
+ * gnutls_compression_list - Get a list of supported compression methods
  *
  * Get a list of compression methods.  Note that to be able to use LZO
  * compression, you must link to libgnutls-extra and call
  * gnutls_global_init_extra().
  *
- * Returns: a zero-terminated list of %gnutls_compression_method_t
- * integers indicating the available compression methods.
+ * Returns: a zero-terminated list of #gnutls_compression_method_t
+ *   integers indicating the available compression methods.
  **/
 const gnutls_compression_method_t *
 gnutls_compression_list (void)
@@ -1033,15 +1033,15 @@ gnutls_cipher_get_id (const char* name)
 }
 
 /**
- * gnutls_cipher_list:
+ * gnutls_cipher_list - Get a list of supported ciphers
  *
  * Get a list of supported cipher algorithms.  Note that not
  * necessarily all ciphers are supported as TLS cipher suites.  For
  * example, DES is not supported as a cipher suite, but is supported
  * for other purposes (e.g., PKCS#8 or similar).
  *
- * Returns: a zero-terminated list of %gnutls_cipher_algorithm_t
- * integers indicating the available ciphers.
+ * Returns: a zero-terminated list of #gnutls_cipher_algorithm_t
+ *   integers indicating the available ciphers.
  *
  **/
 const gnutls_cipher_algorithm_t *
@@ -1127,11 +1127,11 @@ gnutls_kx_get_id (const char* name)
 }
 
 /**
- * gnutls_kx_list:
+ * gnutls_kx_list - Get a list of supported key exchange methods
  *
  * Get a list of supported key exchange algorithms.
  *
- * Returns: a zero-terminated list of %gnutls_kx_algorithm_t integers
+ * Returns: a zero-terminated list of #gnutls_kx_algorithm_t integers
  * indicating the available key exchange algorithms.
  **/
 const gnutls_kx_algorithm_t *
@@ -1273,11 +1273,11 @@ gnutls_protocol_get_id (const char* name)
 }
 
 /**
- * gnutls_protocol_list:
+ * gnutls_protocol_list - Get a list of supported protocols
  *
  * Get a list of supported protocols, e.g. SSL 3.0, TLS 1.0 etc.
  *
- * Returns: a zero-terminated list of %gnutls_protocol_t integers
+ * Returns: a zero-terminated list of #gnutls_protocol_t integers
  * indicating the available protocols.
  *
  **/
@@ -1879,15 +1879,14 @@ static const gnutls_certificate_type_t supported_certificate_types[] = {
 };
 
 /**
- * gnutls_certificate_type_list:
+ * gnutls_certificate_type_list - Get a list of supported certificate types
  *
  * Get a list of certificate types.  Note that to be able to use
  * OpenPGP certificates, you must link to libgnutls-extra and call
  * gnutls_global_init_extra().
  *
- * Returns: a zero-terminated list of %gnutls_certificate_type_t
- * integers indicating the available certificate types.
- *
+ * Returns: a zero-terminated list of #gnutls_certificate_type_t
+ *   integers indicating the available certificate types.
  **/
 const gnutls_certificate_type_t *
 gnutls_certificate_type_list (void)
@@ -1962,15 +1961,15 @@ static const gnutls_sign_entry sign_algorithms[] = {
 #define GNUTLS_SIGN_ALG_LOOP(a) \
   GNUTLS_SIGN_LOOP( if(p->id && p->id == sign) { a; break; } )
 
-
-
 /**
-  * gnutls_sign_algorithm_get_name - Returns a string with the name of the specified sign algorithm
-  * @algorithm: is a sign algorithm
-  *
-  * Returns: a string that contains the name of the specified sign
-  * algorithm, or %NULL.
-  **/
+ * gnutls_sign_algorithm_get_name - Returns a string with the name of the specified sign algorithm
+ * @algorithm: is a sign algorithm
+ *
+ * Convert a #gnutls_sign_algorithm_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified sign
+ *   algorithm, or %NULL.
+ **/
 const char *
 gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign)
 {

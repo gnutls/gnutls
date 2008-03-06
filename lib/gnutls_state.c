@@ -1100,12 +1100,14 @@ gnutls_session_get_master_secret (gnutls_session_t session)
 }
 
 /**
-  * gnutls_session_is_resumed - Used to check whether this session is a resumed one
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns: non zero if this session is resumed, or a zero if this is
-  * a new session.
-  **/
+ * gnutls_session_is_resumed - check whether this session is a resumed one
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Check whether session is resumed or not.
+ *
+ * Returns: non zero if this session is resumed, or a zero if this is
+ *   a new session.
+ **/
 int
 gnutls_session_is_resumed (gnutls_session_t session)
 {
