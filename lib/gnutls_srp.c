@@ -618,29 +618,28 @@ gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
   *
   * This function can be used to set a callback to retrieve the username and
   * password for client SRP authentication.
-  * The callback's function form is:
-  * int (*callback)(gnutls_session_t, char** username,
-  *  char** password);
   *
-  * The @username and @password must be allocated using gnutls_malloc().
-  * @username and @password should be ASCII strings or UTF-8 strings 
-  * prepared using the "SASLprep" profile of "stringprep".
+  * The callback's function form is:
+  *
+  * int (*callback)(gnutls_session_t, char** username, char**password);
+  *
+  * The @username and @password must be allocated using
+  * gnutls_malloc().  @username and @password should be ASCII strings
+  * or UTF-8 strings prepared using the "SASLprep" profile of
+  * "stringprep".
   *
   * The callback function will be called once per handshake before the
   * initial hello message is sent.
-  * 
+  *
   * The callback should not return a negative error code the second
   * time called, since the handshake procedure will be aborted.
   *
   * The callback function should return 0 on success.
   * -1 indicates an error.
-  *
   **/
 void
-gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t
-					    cred,
-					    gnutls_srp_client_credentials_function
-					    * func)
+gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t cred,
+					    gnutls_srp_client_credentials_function * func)
 {
   cred->get_function = func;
 }
@@ -678,13 +677,17 @@ gnutls_srp_server_get_username (gnutls_session_t session)
   * @prime: is the group's prime
   * @res: where the verifier will be stored.
   *
-  * This function will create an SRP verifier, as specified in RFC2945.
-  * The @prime and @generator should be one of the static parameters defined
-  * in gnutls/extra.h or may be generated using the GCRYPT functions
-  * gcry_prime_generate() and gcry_prime_group_generator().
-  * The verifier will be allocated with @malloc and will be stored in @res using 
-  * binary format.
+  * This function will create an SRP verifier, as specified in
+  * RFC2945.  The @prime and @generator should be one of the static
+  * parameters defined in gnutls/extra.h or may be generated using the
+  * libgcrypt functions gcry_prime_generate() and
+  * gcry_prime_group_generator().
   *
+  * The verifier will be allocated with @malloc and will be stored in
+  * @res using binary format.
+  *
+  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
+  *   error code.
   **/
 int
 gnutls_srp_verifier (const char *username, const char *password,
