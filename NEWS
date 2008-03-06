@@ -25,6 +25,8 @@ to trigger the problem.  See also
 
 ** gnutls-cli --print-cert now print PKCS#3 format Diffie-Hellman parameters.
 
+** Documentation fixes for the GTK-DOC manual.
+
 ** API and ABI modifications:
 gnutls_hex2bin: MODIFIED, uses size_t instead of int for string length,
 		and char* instead of void* for output buffer.
