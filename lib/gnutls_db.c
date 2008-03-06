@@ -22,8 +22,8 @@
  *
  */
 
-/* This file contains functions that manipulate a database backend
- * for resumed sessions. 
+/* This file contains functions that manipulate a database backend for
+ * resumed sessions.
  */
 
 #include "gnutls_int.h"
@@ -34,20 +34,20 @@
 #include <gnutls_datum.h>
 
 /**
-  * gnutls_db_set_retrieve_function - Sets the function that will be used to get data
+  * gnutls_db_set_retrieve_function - Set the function that will be used to get data
   * @session: is a #gnutls_session_t structure.
   * @retr_func: is the function.
   *
-  * Sets the function that will be used to retrieve data from the resumed
-  * sessions database. This function must return a gnutls_datum_t containing the
-  * data on success, or a gnutls_datum_t containing null and 0 on failure.
+  * Sets the function that will be used to retrieve data from the
+  * resumed sessions database.  This function must return a
+  * gnutls_datum_t containing the data on success, or a gnutls_datum_t
+  * containing null and 0 on failure.
   *
   * The datum's data must be allocated using the function
   * gnutls_malloc().
   *
-  * The first argument to retr_func() will be null unless gnutls_db_set_ptr() 
-  * has been called.
-  *
+  * The first argument to retr_func() will be null unless
+  * gnutls_db_set_ptr() has been called.
   **/
 void
 gnutls_db_set_retrieve_function (gnutls_session_t session,
@@ -57,16 +57,15 @@ gnutls_db_set_retrieve_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_db_set_remove_function - Sets the function that will be used to remove data
+  * gnutls_db_set_remove_function - Set the function that will be used to remove data
   * @session: is a #gnutls_session_t structure.
   * @rem_func: is the function.
   *
-  * Sets the function that will be used to remove data from the resumed
-  * sessions database. This function must return 0 on success.
+  * Sets the function that will be used to remove data from the
+  * resumed sessions database. This function must return 0 on success.
   *
-  * The first argument to rem_func() will be null unless gnutls_db_set_ptr() 
-  * has been called.
-  *
+  * The first argument to rem_func() will be null unless
+  * gnutls_db_set_ptr() has been called.
   **/
 void
 gnutls_db_set_remove_function (gnutls_session_t session,
@@ -76,16 +75,15 @@ gnutls_db_set_remove_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_db_set_store_function - Sets the function that will be used to put data
+  * gnutls_db_set_store_function - Set the function that will be used to put data
   * @session: is a #gnutls_session_t structure.
   * @store_func: is the function
   *
   * Sets the function that will be used to store data from the resumed
-  * sessions database. This function must remove 0 on success. 
+  * sessions database. This function must remove 0 on success.
   *
-  * The first argument to store_func() will be null unless gnutls_db_set_ptr() 
-  * has been called.
-  *
+  * The first argument to store_func() will be null unless
+  * gnutls_db_set_ptr() has been called.
   **/
 void
 gnutls_db_set_store_function (gnutls_session_t session,
@@ -95,12 +93,12 @@ gnutls_db_set_store_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_db_set_ptr - Sets a pointer to be sent to db functions
+  * gnutls_db_set_ptr - Set a pointer to be sent to db functions
   * @session: is a #gnutls_session_t structure.
   * @ptr: is the pointer
   *
-  * Sets the pointer that will be provided to db store, retrieve and delete functions, as
-  * the first argument. 
+  * Sets the pointer that will be provided to db store, retrieve and
+  * delete functions, as the first argument.
   *
   **/
 void
@@ -113,9 +111,10 @@ gnutls_db_set_ptr (gnutls_session_t session, void *ptr)
   * gnutls_db_get_ptr - Returns the pointer which is sent to db functions
   * @session: is a #gnutls_session_t structure.
   *
-  * Returns the pointer that will be sent to db store, retrieve and delete functions, as
-  * the first argument. 
+  * Get db function pointer.
   *
+  * Returns: the pointer that will be sent to db store, retrieve and
+  *   delete functions, as the first argument.
   **/
 void *
 gnutls_db_get_ptr (gnutls_session_t session)
@@ -124,13 +123,13 @@ gnutls_db_get_ptr (gnutls_session_t session)
 }
 
 /**
-  * gnutls_db_set_cache_expiration - Sets the expiration time for resumed sessions.
-  * @session: is a #gnutls_session_t structure.
-  * @seconds: is the number of seconds.
-  *
-  * Sets the expiration time for resumed sessions. The default is 3600 (one hour)
-  * at the time writing this.
-  **/
+ * gnutls_db_set_cache_expiration - Set the expiration time for resumed sessions.
+ * @session: is a #gnutls_session_t structure.
+ * @seconds: is the number of seconds.
+ *
+ * Set the expiration time for resumed sessions. The default is 3600
+ * (one hour) at the time writing this.
+ **/
 void
 gnutls_db_set_cache_expiration (gnutls_session_t session, int seconds)
 {
@@ -138,16 +137,17 @@ gnutls_db_set_cache_expiration (gnutls_session_t session, int seconds)
 }
 
 /**
-  * gnutls_db_check_entry - checks if the given db entry has expired
-  * @session: is a #gnutls_session_t structure.
-  * @session_entry: is the session data (not key)
-  *
-  * This function returns GNUTLS_E_EXPIRED, if the database entry
-  * has expired or 0 otherwise. This function is to be used when
-  * you want to clear unnesessary session which occupy space in your
-  * backend.
-  *
-  **/
+ * gnutls_db_check_entry - check if the given db entry has expired
+ * @session: is a #gnutls_session_t structure.
+ * @session_entry: is the session data (not key)
+ *
+ * Check if database entry has expired.  This function is to be used
+ * when you want to clear unnesessary session which occupy space in
+ * your backend.
+ *
+ * Returns: Returns %GNUTLS_E_EXPIRED, if the database entry has
+ *   expired or 0 otherwise.
+ **/
 int
 gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
 {
@@ -362,23 +362,20 @@ _gnutls_remove_session (gnutls_session_t session, gnutls_datum_t session_id)
 }
 
 /**
-  * gnutls_db_remove_session - remove the current session data from the database
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function will remove the current session data from the session
-  * database. This will prevent future handshakes reusing these session
-  * data. This function should be called if a session was terminated
-  * abnormally, and before gnutls_deinit() is called.
-  *
-  * Normally gnutls_deinit() will remove abnormally terminated sessions.
-  *
-  **/
+ * gnutls_db_remove_session - remove the current session data from the database
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will remove the current session data from the
+ * session database.  This will prevent future handshakes reusing
+ * these session data.  This function should be called if a session
+ * was terminated abnormally, and before gnutls_deinit() is called.
+ *
+ * Normally gnutls_deinit() will remove abnormally terminated
+ * sessions.
+ **/
 void
 gnutls_db_remove_session (gnutls_session_t session)
 {
-  /* if the session has failed abnormally it has 
-   * to be removed from the db 
-   */
   _gnutls_db_remove_session (session,
 			     session->security_parameters.session_id,
 			     session->security_parameters.session_id_size);
