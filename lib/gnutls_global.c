@@ -166,16 +166,16 @@ static int _gnutls_init = 0;
 /**
   * gnutls_global_init - initialize the global data to defaults.
   *
-  * This function initializes the global data to defaults.
-  * Every gnutls application has a global data which holds common parameters
-  * shared by gnutls session structures.
-  * You must call gnutls_global_deinit() when gnutls usage is no longer needed
-  * Returns zero on success.
+  * This function initializes the global data to defaults.  Every
+  * gnutls application has a global data which holds common parameters
+  * shared by gnutls session structures.  You should call
+  * gnutls_global_deinit() when gnutls usage is no longer needed
   *
-  * Note that this function will also initialize libgcrypt, if it has not
-  * been initialized before. Thus if you want to manually initialize libgcrypt
-  * you must do it before calling this function. This is useful in cases you 
-  * want to disable libgcrypt's internal lockings etc.
+  * Note that this function will also initialize libgcrypt, if it has
+  * not been initialized before.  Thus if you want to manually
+  * initialize libgcrypt you must do it before calling this function.
+  * This is useful in cases you want to disable libgcrypt's internal
+  * lockings etc.
   *
   * This function increment a global counter, so that
   * gnutls_global_deinit() only releases resources when it has been
@@ -192,6 +192,8 @@ static int _gnutls_init = 0;
   * function after aquiring a thread mutex.  To ignore the potential
   * memory leak is also an option.
   *
+  * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+  *   otherwise an error code is returned.
   **/
 int
 gnutls_global_init (void)
