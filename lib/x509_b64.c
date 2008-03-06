@@ -287,7 +287,7 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
 }
 
 /**
-  * gnutls_pem_base64_encode - This function will convert raw data to Base64 encoded
+  * gnutls_pem_base64_encode - convert raw data to Base64 encoded
   * @msg: is a message to be put in the header
   * @data: contain the raw data
   * @result: the place where base64 data will be copied
@@ -329,7 +329,7 @@ gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
 }
 
 /**
-  * gnutls_pem_base64_encode_alloc - This function will convert raw data to Base64 encoded
+  * gnutls_pem_base64_encode_alloc - convert raw data to Base64 encoded
   * @msg: is a message to be put in the encoded header
   * @data: contains the raw data
   * @result: will hold the newly allocated encoded data
@@ -520,7 +520,7 @@ _gnutls_fbase64_decode (const char *header, const opaque * data,
 }
 
 /**
-  * gnutls_pem_base64_decode - This function will decode base64 encoded data
+  * gnutls_pem_base64_decode - decode base64 encoded data
   * @header: A null terminated string with the PEM header (eg. CERTIFICATE)
   * @b64_data: contain the encoded data
   * @result: the place where decoded data will be copied
@@ -563,7 +563,7 @@ gnutls_pem_base64_decode (const char *header,
 }
 
 /**
-  * gnutls_pem_base64_decode_alloc - This function will decode base64 encoded data
+  * gnutls_pem_base64_decode_alloc - decode base64 encoded data
   * @header: The PEM header (eg. CERTIFICATE)
   * @b64_data: contains the encoded data
   * @result: the place where decoded data lie

@@ -307,7 +307,7 @@ gnutls_psk_server_get_username (gnutls_session_t session)
 }
 
 /**
-  * gnutls_hex_decode - This function will decode hex encoded data
+  * gnutls_hex_decode - decode hex encoded data
   * @hex_data: contain the encoded data
   * @result: the place where decoded data will be copied
   * @result_size: holds the size of the result
@@ -336,7 +336,7 @@ gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
 }
 
 /**
-  * gnutls_hex_encode - This function will convert raw data to hex encoded
+  * gnutls_hex_encode - convert raw data to hex encoded
   * @data: contain the raw data
   * @result: the place where hex data will be copied
   * @result_size: holds the size of the result
@@ -363,7 +363,7 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
 }
 
 /**
-  * gnutls_psk_set_server_dh_params - This function will set the DH parameters for a server to use
+  * gnutls_psk_set_server_dh_params - set the DH parameters for a server to use
   * @res: is a gnutls_psk_server_credentials_t structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
@@ -379,7 +379,7 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
 }
 
 /**
-  * gnutls_psk_set_server_params_function - This function will set the DH parameters callback
+  * gnutls_psk_set_server_params_function - set the DH parameters callback
   * @res: is a gnutls_certificate_credentials_t structure
   * @func: is the function to be called
   *

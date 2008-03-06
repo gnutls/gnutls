@@ -362,7 +362,7 @@ _gnutls_remove_session (gnutls_session_t session, gnutls_datum_t session_id)
 }
 
 /**
-  * gnutls_db_remove_session - This function will remove the current session data from the database
+  * gnutls_db_remove_session - remove the current session data from the database
   * @session: is a #gnutls_session_t structure.
   *
   * This function will remove the current session data from the session

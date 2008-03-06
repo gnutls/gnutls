@@ -913,7 +913,7 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
 
 /**
- * gnutls_openpgp_privkey_sign_hash - This function will sign the given data using the private key params
+ * gnutls_openpgp_privkey_sign_hash - sign the given data using the private key params
  * @key: Holds the key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature

@@ -167,7 +167,7 @@ _gnutls_rsa_generate_params (mpi_t * resarr, int *resarr_len, int bits)
 
 
 /**
-  * gnutls_rsa_params_import_raw - This function will replace the old RSA parameters
+  * gnutls_rsa_params_import_raw - set the RSA parameters
   * @rsa_params: Is a structure will hold the parameters
   * @m: holds the modulus
   * @e: holds the public exponent
@@ -193,7 +193,7 @@ gnutls_rsa_params_import_raw (gnutls_rsa_params_t rsa_params,
 }
 
 /**
-  * gnutls_rsa_params_init - This function will initialize the temporary RSA parameters
+  * gnutls_rsa_params_init - initialize the temporary RSA parameters
   * @rsa_params: Is a structure that will hold the parameters
   *
   * This function will initialize the temporary RSA parameters structure.
@@ -217,7 +217,7 @@ gnutls_rsa_params_init (gnutls_rsa_params_t * rsa_params)
 }
 
 /**
-  * gnutls_rsa_params_deinit - This function will deinitialize the RSA parameters
+  * gnutls_rsa_params_deinit - deinitialize the RSA parameters
   * @rsa_params: Is a structure that holds the parameters
   *
   * This function will deinitialize the RSA parameters structure.
@@ -230,7 +230,7 @@ gnutls_rsa_params_deinit (gnutls_rsa_params_t rsa_params)
 }
 
 /**
-  * gnutls_rsa_params_cpy - This function will copy an RSA parameters structure
+  * gnutls_rsa_params_cpy - copy an RSA parameters structure
   * @dst: Is the destination structure, which should be initialized.
   * @src: Is the source structure
   *
@@ -245,7 +245,7 @@ gnutls_rsa_params_cpy (gnutls_rsa_params_t dst, gnutls_rsa_params_t src)
 }
 
 /**
-  * gnutls_rsa_params_generate2 - This function will generate temporary RSA parameters
+  * gnutls_rsa_params_generate2 - generate temporary RSA parameters
   * @params: The structure where the parameters will be stored
   * @bits: is the prime's number of bits
   *
@@ -266,7 +266,7 @@ gnutls_rsa_params_generate2 (gnutls_rsa_params_t params, unsigned int bits)
 }
 
 /**
-  * gnutls_rsa_params_import_pkcs1 - This function will import RSA params from a pkcs1 structure
+  * gnutls_rsa_params_import_pkcs1 - import RSA params from a pkcs1 structure
   * @params: A structure where the parameters will be copied to
   * @pkcs1_params: should contain a PKCS1 RSAPublicKey structure PEM or DER encoded
   * @format: the format of params. PEM or DER.
@@ -291,7 +291,7 @@ gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
 
 
 /**
-  * gnutls_rsa_params_export_pkcs1 - This function will export RSA params to a pkcs1 structure
+  * gnutls_rsa_params_export_pkcs1 - export RSA params to a pkcs1 structure
   * @params: Holds the RSA parameters
   * @format: the format of output params. One of PEM or DER.
   * @params_data: will contain a PKCS1 RSAPublicKey structure PEM or DER encoded
@@ -320,7 +320,7 @@ gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
 
 
 /**
-  * gnutls_rsa_params_export_raw - This function will export the RSA parameters
+  * gnutls_rsa_params_export_raw - export the RSA parameters
   * @params: a structure that holds the rsa parameters
   * @m: will hold the modulus
   * @e: will hold the public exponent

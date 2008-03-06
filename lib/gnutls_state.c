@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -626,7 +626,7 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
 
 #ifdef ENABLE_OPENPGP
 /**
-  * gnutls_openpgp_send_cert - This function will order gnutls to send the openpgp fingerprint instead of the key
+  * gnutls_openpgp_send_cert - order gnutls to send the openpgp fingerprint instead of the key
   * @session: is a pointer to a #gnutls_session_t structure.
   * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
   *
@@ -644,7 +644,7 @@ gnutls_openpgp_send_cert (gnutls_session_t session,
 #endif
 
 /**
-  * gnutls_certificate_send_x509_rdn_sequence - This function will order gnutls to send or not the x.509 rdn sequence
+  * gnutls_certificate_send_x509_rdn_sequence - order gnutls to send or not the x.509 rdn sequence
   * @session: is a pointer to a #gnutls_session_t structure.
   * @status: is 0 or 1
   *
@@ -1169,7 +1169,7 @@ gnutls_session_set_ptr (gnutls_session_t session, void *ptr)
 
 
 /**
-  * gnutls_record_get_direction - This function will return the direction of the last interrupted function call
+  * gnutls_record_get_direction - return the direction of the last interrupted function call
   * @session: is a #gnutls_session_t structure.
   *
   * This function provides information about the internals of the
@@ -1211,7 +1211,7 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
 }
 
 /**
-  * gnutls_handshake_set_post_client_hello_function - This function will a callback to be called after the client hello is received
+  * gnutls_handshake_set_post_client_hello_function - set callback to be called after the client hello is received
   * @res: is a gnutls_anon_server_credentials_t structure
   * @func: is the function to be called
   *

@@ -101,7 +101,7 @@ gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *sc)
 }
 
 /**
-  * gnutls_anon_set_server_dh_params - This function will set the DH parameters for a server to use
+  * gnutls_anon_set_server_dh_params - set the DH parameters for a server to use
   * @res: is a gnutls_anon_server_credentials_t structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
@@ -117,7 +117,7 @@ gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
 }
 
 /**
-  * gnutls_anon_set_server_params_function - This function will set the DH parameters callback
+  * gnutls_anon_set_server_params_function - set the DH parameters callback
   * @res: is a gnutls_certificate_credentials_t structure
   * @func: is the function to be called
   *

@@ -560,7 +560,7 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
 
 
 /**
-  * gnutls_certificate_set_dh_params - This function will set the DH parameters for a server to use
+  * gnutls_certificate_set_dh_params - set the DH parameters for a server to use
   * @res: is a gnutls_certificate_credentials_t structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
@@ -580,7 +580,7 @@ gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_params_function - This function will set the DH or RSA parameters callback
+  * gnutls_certificate_set_params_function - set the DH or RSA parameters callback
   * @res: is a gnutls_certificate_credentials_t structure
   * @func: is the function to be called
   *
@@ -598,7 +598,7 @@ gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
 
 
 /**
-  * gnutls_certificate_set_verify_flags - This function will set the flags to be used at certificate verification
+  * gnutls_certificate_set_verify_flags - set the flags to be used at certificate verification
   * @res: is a gnutls_certificate_credentials_t structure
   * @flags: are the flags
   *
@@ -615,7 +615,7 @@ gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
 }
 
 /**
-  * gnutls_certificate_set_verify_limits - This function will set the upper limits to be used at certificate verification
+  * gnutls_certificate_set_verify_limits - set the upper limits to be used at certificate verification
   * @res: is a gnutls_certificate_credentials structure
   * @max_bits: is the number of bits of an acceptable certificate (default 8200)
   * @max_depth: is maximum depth of the verification of a certificate chain (default 5)
@@ -635,7 +635,7 @@ gnutls_certificate_set_verify_limits (gnutls_certificate_credentials_t
 }
 
 /**
-  * gnutls_certificate_set_rsa_export_params - This function will set the RSA parameters for a server to use
+  * gnutls_certificate_set_rsa_export_params - set the RSA parameters for a server to use
   * @res: is a gnutls_certificate_credentials_t structure
   * @rsa_params: is a structure that holds temporary RSA parameters.
   *
@@ -652,7 +652,7 @@ gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
 }
 
 /**
-  * gnutls_psk_set_params_function - This function will set the DH or RSA parameters callback
+  * gnutls_psk_set_params_function - set the DH or RSA parameters callback
   * @res: is a gnutls_psk_server_credentials_t structure
   * @func: is the function to be called
   *
@@ -671,7 +671,7 @@ gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
 
 
 /**
-  * gnutls_anon_set_params_function - This function will set the DH or RSA parameters callback
+  * gnutls_anon_set_params_function - set the DH or RSA parameters callback
   * @res: is a gnutls_anon_server_credentials_t structure
   * @func: is the function to be called
   *
