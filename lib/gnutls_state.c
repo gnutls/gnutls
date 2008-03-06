@@ -218,7 +218,7 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 
 #define MIN_DH_BITS 727
 /**
-  * gnutls_init - This function initializes the session to null (null encryption etc...).
+  * gnutls_init - initialize the session to null (null encryption etc...).
   * @con_end: indicate if this session is to be used for server or client.
   * @session: is a pointer to a #gnutls_session_t structure.
   *
@@ -331,7 +331,7 @@ _gnutls_session_is_resumable (gnutls_session_t session)
 
 
 /**
-  * gnutls_deinit - This function clears all buffers associated with a session
+  * gnutls_deinit - clear all buffers associated with a session
   * @session: is a #gnutls_session_t structure.
   *
   * This function clears all buffers associated with the @session.

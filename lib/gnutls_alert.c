@@ -97,7 +97,7 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
 }
 
 /**
-  * gnutls_alert_send - This function sends an alert message to the peer
+  * gnutls_alert_send - send an alert message to the peer
   * @session: is a #gnutls_session_t structure.
   * @level: is the level of the alert
   * @desc: is the alert description
@@ -137,7 +137,7 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
 }
 
 /**
-  * gnutls_error_to_alert - This function returns an alert code based on the given error code
+  * gnutls_error_to_alert - return an alert code based on the given error code
   * @err: is a negative integer
   * @level: the alert level will be stored there
   *
@@ -253,7 +253,7 @@ gnutls_error_to_alert (int err, int *level)
 
 
 /**
- * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
+ * gnutls_alert_send_appropriate - send an alert to the peer depending on the error code
  * @session: is a #gnutls_session_t structure.
  * @err: is an integer
  *

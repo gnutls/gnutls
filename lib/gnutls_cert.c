@@ -423,7 +423,7 @@ void gnutls_certificate_server_set_retrieve_function
 }
 
 /*-
- * _gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
+ * _gnutls_x509_extract_certificate_activation_time - return the peer's certificate activation time
  * @cert: should contain an X.509 DER encoded certificate
  *
  * This function will return the certificate's activation time in UNIX time
@@ -457,7 +457,7 @@ _gnutls_x509_get_raw_crt_activation_time (const gnutls_datum_t * cert)
 }
 
 /*-
- * gnutls_x509_extract_certificate_expiration_time - This function returns the certificate's expiration time
+ * gnutls_x509_extract_certificate_expiration_time - return the certificate's expiration time
  * @cert: should contain an X.509 DER encoded certificate
  *
  * This function will return the certificate's expiration time in UNIX
@@ -492,7 +492,7 @@ _gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
 
 #ifdef ENABLE_OPENPGP
 /*-
-  * _gnutls_openpgp_crt_verify_peers - This function returns the peer's certificate status
+  * _gnutls_openpgp_crt_verify_peers - return the peer's certificate status
   * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return its status (TRUSTED, INVALID etc.). 
@@ -555,7 +555,7 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
 #endif
 
 /**
-  * gnutls_certificate_verify_peers2 - This function returns the peer's certificate verification status
+  * gnutls_certificate_verify_peers2 - return the peer's certificate verification status
   * @session: is a gnutls session
   * @status: is the output of the verification
   *
@@ -611,7 +611,7 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
 }
 
 /**
-  * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
+  * gnutls_certificate_verify_peers - return the peer's certificate verification status
   * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return
@@ -645,7 +645,7 @@ gnutls_certificate_verify_peers (gnutls_session_t session)
 }
 
 /**
-  * gnutls_certificate_expiration_time_peers - This function returns the peer's certificate expiration time
+  * gnutls_certificate_expiration_time_peers - return the peer's certificate expiration time
   * @session: is a gnutls session
   *
   * This function will return the peer's certificate expiration time.
@@ -689,7 +689,7 @@ gnutls_certificate_expiration_time_peers (gnutls_session_t session)
 }
 
 /**
-  * gnutls_certificate_activation_time_peers - This function returns the peer's certificate activation time
+  * gnutls_certificate_activation_time_peers - return the peer's certificate activation time
   * @session: is a gnutls session
   *
   * This function will return the peer's certificate activation time.

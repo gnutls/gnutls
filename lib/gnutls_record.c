@@ -174,7 +174,7 @@ gnutls_transport_get_ptr2 (gnutls_session_t session,
 }
 
 /**
-  * gnutls_bye - This function terminates the current TLS/SSL connection.
+  * gnutls_bye - terminate the current TLS/SSL connection.
   * @session: is a #gnutls_session_t structure.
   * @how: is an integer
   *

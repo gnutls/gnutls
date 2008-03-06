@@ -281,7 +281,7 @@ gnutls_psk_set_client_credentials_function (gnutls_psk_client_credentials_t
 
 
 /**
-  * gnutls_psk_server_get_username - This function returns the username of the peer
+  * gnutls_psk_server_get_username - return the username of the peer
   * @session: is a gnutls session
   *
   * This should only be called in case of PSK authentication and in

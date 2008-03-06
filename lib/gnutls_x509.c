@@ -83,7 +83,7 @@ check_bits (gnutls_x509_crt_t crt, unsigned int max_bits)
 	gnutls_free( peer_certificate_list)
 
 /*-
-  * _gnutls_x509_cert_verify_peers - This function returns the peer's certificate status
+  * _gnutls_x509_cert_verify_peers - return the peer's certificate status
   * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return its status (TRUSTED, REVOKED etc.). 

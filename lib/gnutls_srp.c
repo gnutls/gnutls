@@ -640,7 +640,7 @@ gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t
 
 
 /**
-  * gnutls_srp_server_get_username - This function returns the username of the peer
+  * gnutls_srp_server_get_username - return the username of the peer
   * @session: is a gnutls session
   *
   * This function will return the username of the peer. This should only be

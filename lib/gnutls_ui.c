@@ -62,7 +62,7 @@ gnutls_dh_set_prime_bits (gnutls_session_t session, unsigned int bits)
 
 
 /**
-  * gnutls_dh_get_group - This function returns the group of the DH authentication
+  * gnutls_dh_get_group - return the group of the DH authentication
   * @session: is a gnutls session
   * @raw_gen: will hold the generator.
   * @raw_prime: will hold the prime.
@@ -129,7 +129,7 @@ gnutls_dh_get_group (gnutls_session_t session,
 }
 
 /**
-  * gnutls_dh_get_pubkey - This function returns the peer's public key used in DH authentication
+  * gnutls_dh_get_pubkey - return the peer's public key used in DH authentication
   * @session: is a gnutls session
   * @raw_key: will hold the public key.
   *
@@ -185,7 +185,7 @@ gnutls_dh_get_pubkey (gnutls_session_t session, gnutls_datum_t * raw_key)
 }
 
 /**
-  * gnutls_rsa_export_get_pubkey - This function returns the peer's public key used in RSA-EXPORT authentication
+  * gnutls_rsa_export_get_pubkey - return the peer's public key used in RSA-EXPORT authentication
   * @session: is a gnutls session
   * @exponent: will hold the exponent.
   * @modulus: will hold the modulus.
@@ -236,7 +236,7 @@ gnutls_rsa_export_get_pubkey (gnutls_session_t session,
 
 
 /**
-  * gnutls_dh_get_secret_bits - This function returns the bits used in DH authentication
+  * gnutls_dh_get_secret_bits - return the bits used in DH authentication
   * @session: is a gnutls session
   *
   * This function will return the bits used in the last Diffie Hellman authentication
@@ -285,7 +285,7 @@ gnutls_dh_get_secret_bits (gnutls_session_t session)
 
 
 /**
-  * gnutls_dh_get_prime_bits - This function returns the bits used in DH authentication
+  * gnutls_dh_get_prime_bits - return the bits used in DH authentication
   * @session: is a gnutls session
   *
   * This function will return the bits of the prime used in the last Diffie Hellman authentication
@@ -341,7 +341,7 @@ gnutls_dh_get_prime_bits (gnutls_session_t session)
 }
 
 /**
-  * gnutls_rsa_export_get_modulus_bits - This function returns the bits used in RSA-export key exchange
+  * gnutls_rsa_export_get_modulus_bits - return the bits used in RSA-export key exchange
   * @session: is a gnutls session
   *
   * This function will return the bits used in the last RSA-EXPORT key exchange
@@ -362,7 +362,7 @@ gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
 }
 
 /**
-  * gnutls_dh_get_peers_public_bits - This function returns the bits used in DH authentication
+  * gnutls_dh_get_peers_public_bits - return the bits used in DH authentication
   * @session: is a gnutls session
   *
   * This function will return the bits used in the last Diffie Hellman authentication
@@ -422,7 +422,7 @@ gnutls_dh_get_peers_public_bits (gnutls_session_t session)
 /* CERTIFICATE STUFF */
 
 /**
-  * gnutls_certificate_get_ours - This function returns the raw certificate sent in the last handshake
+  * gnutls_certificate_get_ours - return the raw certificate sent in the last handshake
   * @session: is a gnutls session
   *
   * This function will return the certificate as sent to the peer,
@@ -454,7 +454,7 @@ gnutls_certificate_get_ours (gnutls_session_t session)
 }
 
 /**
-  * gnutls_certificate_get_peers - This function returns the peer's raw certificate
+  * gnutls_certificate_get_peers - return the peer's raw certificate
   * @session: is a gnutls session
   * @list_size: is the length of the certificate list
   *
@@ -488,7 +488,7 @@ gnutls_certificate_get_peers (gnutls_session_t
 
 
 /**
-  * gnutls_certificate_client_get_request_status - This function returns the certificate request status
+  * gnutls_certificate_client_get_request_status - return the certificate request status
   * @session: is a gnutls session
   *
   * This function will return 0 if the peer (server) did not request client
@@ -510,7 +510,7 @@ gnutls_certificate_client_get_request_status (gnutls_session_t session)
 }
 
 /**
-  * gnutls_fingerprint - This function calculates the fingerprint of the given data
+  * gnutls_fingerprint - calculate the fingerprint of the given data
   * @algo: is a digest algorithm
   * @data: is the data
   * @result: is the place where the result will be copied (may be null). 
