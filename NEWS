@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.2.3 (unreleased)
 
+** Fix compilation error related to __FUNCTION__ on some systems.
+Reported by Tim Mooney, see
+<https://savannah.gnu.org/support/?106267>.
+
 ** API and ABI modifications:
 No changes since last version.
 
