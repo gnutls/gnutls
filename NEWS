@@ -27,6 +27,10 @@ to trigger the problem.  See also
 
 ** Documentation fixes for the GTK-DOC manual.
 
+** Fix compilation error related to __FUNCTION__ on some systems.
+Reported by Tim Mooney, see
+<https://savannah.gnu.org/support/?106267>.
+
 ** API and ABI modifications:
 gnutls_hex2bin: MODIFIED, uses size_t instead of int for string length,
 		and char* instead of void* for output buffer.
