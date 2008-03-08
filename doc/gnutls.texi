@@ -3001,7 +3001,17 @@ $ certtool --generate-privkey --outfile key.pem
 @end example
 
 @item
-To create a certificate request, run:
+To generate a certificate using the private key, use the command:
+
+@example
+$ certtool --generate-certificate --load-privkey key.pem \
+   --outfile cert.pem --load-ca-certificate ca-cert.pem \
+   --load-ca-privkey ca-key.pem
+@end example
+
+@item
+To create a certificate request (needed when the certificate is issued by
+another party), run:
 
 @example
 $ certtool --generate-request --load-privkey key.pem \

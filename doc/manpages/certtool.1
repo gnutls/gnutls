@@ -95,7 +95,8 @@ $ certtool \-\-generate\-privkey \-\-outfile key.pem
 .fi
 .RE
 
-To create a certificate request, run:
+To create a certificate request (needed when the certificate is issued by
+another party), run:
 
 .RS
 .nf
@@ -109,6 +110,16 @@ To generate a certificate using the previous request, use the command:
 .RS
 .nf
 $ certtool \-\-generate\-certificate \-\-load\-request request.pem \\
+   \-\-outfile cert.pem \-\-load\-ca\-certificate ca\-cert.pem \\
+   \-\-load\-ca\-privkey ca\-key.pem
+.fi
+.RE
+
+To generate a certificate using the private key only, use the command:
+
+.RS
+.nf
+$ certtool \-\-generate\-certificate \-\-load\-privkey key.pem \\
    \-\-outfile cert.pem \-\-load\-ca\-certificate ca\-cert.pem \\
    \-\-load\-ca\-privkey ca\-key.pem
 .fi
