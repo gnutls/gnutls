@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -667,12 +667,14 @@ _gnutls_mac_priority (gnutls_session_t session,
 }
 
 /**
-  * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
-  * @algorithm: is a MAC algorithm
-  *
-  * Returns: a string that contains the name of the specified MAC
-  * algorithm, or %NULL.
-  **/
+ * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
+ * @algorithm: is a MAC algorithm
+ *
+ * Convert a #gnutls_mac_algorithm_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified MAC
+ *   algorithm, or %NULL.
+ **/
 const char *
 gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 {
@@ -685,13 +687,15 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a MAC algorithm name
-  *
-  * Returns: an %gnutls_mac_algorithm_tid of the specified in a string
-  * MAC algorithm, or %GNUTLS_MAC_UNKNOWN on failures.  The names are
-  * compared in a case insensitive way.
-  **/
+ * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a MAC algorithm name
+ *
+ * Convert a string to a #gnutls_mac_algorithm_t value.  The names are
+ * compared in a case insensitive way.
+ *
+ * Returns: an #gnutls_mac_algorithm_tid of the specified in a string
+ *   MAC algorithm, or %GNUTLS_MAC_UNKNOWN on failures.
+ **/
 gnutls_mac_algorithm_t
 gnutls_mac_get_id (const char* name)
 {
@@ -703,13 +707,14 @@ gnutls_mac_get_id (const char* name)
 }
 
 /**
-  * gnutls_mac_get_key_size - Returns the length of the MAC's key size
-  * @algorithm: is an encryption algorithm
-  *
-  * Returns: length (in bytes) of the given MAC key size, or 0 if the
-  * given MAC algorithm is invalid.
-  *
-  **/
+ * gnutls_mac_get_key_size - Returns the length of the MAC's key size
+ * @algorithm: is an encryption algorithm
+ *
+ * Get size of MAC key.
+ *
+ * Returns: length (in bytes) of the given MAC key size, or 0 if the
+ *   given MAC algorithm is invalid.
+ **/
 size_t
 gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 {
@@ -722,15 +727,15 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 }
 
 /**
- * gnutls_mac_list:
+ * gnutls_mac_list - Get a list of supported MAC algorithms
  *
  * Get a list of hash algorithms for use as MACs.  Note that not
  * necessarily all MACs are supported in TLS cipher suites.  For
  * example, MD2 is not supported as a cipher suite, but is supported
  * for other purposes (e.g., X.509 signature verification or similar).
  *
- * Returns: Return a zero-terminated list of %gnutls_mac_algorithm_t
- * integers indicating the available MACs.
+ * Returns: Return a zero-terminated list of #gnutls_mac_algorithm_t
+ *   integers indicating the available MACs.
  **/
 const gnutls_mac_algorithm_t *
 gnutls_mac_list (void)
@@ -794,12 +799,14 @@ _gnutls_compression_priority (gnutls_session_t session,
 }
 
 /**
-  * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
-  * @algorithm: is a Compression algorithm
-  *
-  * Returns: a pointer to a string that contains the name of the
-  * specified compression algorithm, or %NULL.
-  **/
+ * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
+ * @algorithm: is a Compression algorithm
+ *
+ * Convert a #gnutls_compression_method_t value to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified compression algorithm, or %NULL.
+ **/
 const char *
 gnutls_compression_get_name (gnutls_compression_method_t algorithm)
 {
@@ -812,15 +819,14 @@ gnutls_compression_get_name (gnutls_compression_method_t algorithm)
 }
 
 /**
-  * gnutls_compression_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a compression method name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified in a string compression method, or
-  * %GNUTLS_COMP_UNKNOWN on error.
-  *
-  **/
+ * gnutls_compression_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a compression method name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: an id of the specified in a string compression method, or
+ *   %GNUTLS_COMP_UNKNOWN on error.
+ **/
 gnutls_compression_method_t
 gnutls_compression_get_id (const char* name)
 {
@@ -832,14 +838,14 @@ gnutls_compression_get_id (const char* name)
 }
 
 /**
- * gnutls_compression_list:
+ * gnutls_compression_list - Get a list of supported compression methods
  *
  * Get a list of compression methods.  Note that to be able to use LZO
  * compression, you must link to libgnutls-extra and call
  * gnutls_global_init_extra().
  *
- * Returns: a zero-terminated list of %gnutls_compression_method_t
- * integers indicating the available compression methods.
+ * Returns: a zero-terminated list of #gnutls_compression_method_t
+ *   integers indicating the available compression methods.
  **/
 const gnutls_compression_method_t *
 gnutls_compression_list (void)
@@ -952,12 +958,14 @@ _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_cipher_get_key_size - Returns the length of the cipher's key size
-  * @algorithm: is an encryption algorithm
-  *
-  * Returns: length (in bytes) of the given cipher's key size, o 0 if
-  *   the given cipher is invalid.
-  **/
+ * gnutls_cipher_get_key_size - Returns the length of the cipher's key size
+ * @algorithm: is an encryption algorithm
+ *
+ * Get key size for cipher.
+ *
+ * Returns: length (in bytes) of the given cipher's key size, or 0 if
+ *   the given cipher is invalid.
+ **/
 size_t
 gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm)
 {				/* In bytes */
@@ -986,12 +994,14 @@ _gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
-  * @algorithm: is an encryption algorithm
-  *
-  * Returns: a pointer to a string that contains the name of the
-  *   specified cipher, or %NULL.
-  **/
+ * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
+ * @algorithm: is an encryption algorithm
+ *
+ * Convert a #gnutls_cipher_algorithm_t type to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified cipher, or %NULL.
+ **/
 const char *
 gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 {
@@ -1004,15 +1014,14 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_cipher_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a MAC algorithm name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified cipher, or %GNUTLS_CIPHER_UNKNOWN
-  * on error.
-  *
-  **/
+ * gnutls_cipher_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a MAC algorithm name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: return a #gnutls_cipher_algorithm_t value corresponding to
+ *   the specified cipher, or %GNUTLS_CIPHER_UNKNOWN on error.
+ **/
 gnutls_cipher_algorithm_t
 gnutls_cipher_get_id (const char* name)
 {
@@ -1024,15 +1033,15 @@ gnutls_cipher_get_id (const char* name)
 }
 
 /**
- * gnutls_cipher_list:
+ * gnutls_cipher_list - Get a list of supported ciphers
  *
  * Get a list of supported cipher algorithms.  Note that not
  * necessarily all ciphers are supported as TLS cipher suites.  For
  * example, DES is not supported as a cipher suite, but is supported
  * for other purposes (e.g., PKCS#8 or similar).
  *
- * Returns: a zero-terminated list of %gnutls_cipher_algorithm_t
- * integers indicating the available ciphers.
+ * Returns: a zero-terminated list of #gnutls_cipher_algorithm_t
+ *   integers indicating the available ciphers.
  *
  **/
 const gnutls_cipher_algorithm_t *
@@ -1078,12 +1087,14 @@ _gnutls_kx_priority (gnutls_session_t session,
 }
 
 /**
-  * gnutls_kx_get_name - Returns a string with the name of the specified key exchange algorithm
-  * @algorithm: is a key exchange algorithm
-  *
-  * Returns: a pointer to a string that contains the name of the
-  * specified key exchange algorithm, or %NULL.
-  **/
+ * gnutls_kx_get_name - Returns a string with the name of the specified key exchange algorithm
+ * @algorithm: is a key exchange algorithm
+ *
+ * Convert a #gnutls_kx_algorithm_t value to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified key exchange algorithm, or %NULL.
+ **/
 const char *
 gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 {
@@ -1096,14 +1107,15 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 }
 
 /**
-  * gnutls_kx_get_id - Returns the gnutls id of the specified in string algorithm
-  * @algorithm: is a KX name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified KX algorithm, or
-  * %GNUTLS_KX_UNKNOWN on error.
-  **/
+ * gnutls_kx_get_id - Returns the gnutls id of the specified in string algorithm
+ * @algorithm: is a KX name
+ *
+ * Convert a string to a #gnutls_kx_algorithm_t value.  The names are
+ * compared in a case insensitive way.
+ *
+ * Returns: an id of the specified KX algorithm, or %GNUTLS_KX_UNKNOWN
+ *   on error.
+ **/
 gnutls_kx_algorithm_t
 gnutls_kx_get_id (const char* name)
 {
@@ -1115,11 +1127,11 @@ gnutls_kx_get_id (const char* name)
 }
 
 /**
- * gnutls_kx_list:
+ * gnutls_kx_list - Get a list of supported key exchange methods
  *
  * Get a list of supported key exchange algorithms.
  *
- * Returns: a zero-terminated list of %gnutls_kx_algorithm_t integers
+ * Returns: a zero-terminated list of #gnutls_kx_algorithm_t integers
  * indicating the available key exchange algorithms.
  **/
 const gnutls_kx_algorithm_t *
@@ -1223,12 +1235,14 @@ _gnutls_version_max (gnutls_session_t session)
 
 
 /**
-  * gnutls_protocol_get_name - Returns a string with the name of the specified SSL/TLS version
-  * @version: is a (gnutls) version number
-  *
-  * Returns: a string that contains the name of the specified TLS
-  * version (e.g., "TLS 1.0"), or %NULL.
-  **/
+ * gnutls_protocol_get_name - Returns a string with the name of the specified SSL/TLS version
+ * @version: is a (gnutls) version number
+ *
+ * Convert a #gnutls_protocol_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified TLS
+ *   version (e.g., "TLS1.0"), or %NULL.
+ **/
 const char *
 gnutls_protocol_get_name (gnutls_protocol_t version)
 {
@@ -1259,11 +1273,11 @@ gnutls_protocol_get_id (const char* name)
 }
 
 /**
- * gnutls_protocol_list:
+ * gnutls_protocol_list - Get a list of supported protocols
  *
  * Get a list of supported protocols, e.g. SSL 3.0, TLS 1.0 etc.
  *
- * Returns: a zero-terminated list of %gnutls_protocol_t integers
+ * Returns: a zero-terminated list of #gnutls_protocol_t integers
  * indicating the available protocols.
  *
  **/
@@ -1815,12 +1829,14 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 }
 
 /**
-  * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
-  * @type: is a certificate type
-  *
-  * Returns: a string (or %NULL) that contains the name of the
-  * specified certificate type.
-  **/
+ * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
+ * @type: is a certificate type
+ *
+ * Convert a #gnutls_certificate_type_t type to a string.
+ *
+ * Returns: a string that contains the name of the specified
+ *   certificate type, or %NULL in case of unknown types.
+ **/
 const char *
 gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
 {
@@ -1863,15 +1879,14 @@ static const gnutls_certificate_type_t supported_certificate_types[] = {
 };
 
 /**
- * gnutls_certificate_type_list:
+ * gnutls_certificate_type_list - Get a list of supported certificate types
  *
  * Get a list of certificate types.  Note that to be able to use
  * OpenPGP certificates, you must link to libgnutls-extra and call
  * gnutls_global_init_extra().
  *
- * Returns: a zero-terminated list of %gnutls_certificate_type_t
- * integers indicating the available certificate types.
- *
+ * Returns: a zero-terminated list of #gnutls_certificate_type_t
+ *   integers indicating the available certificate types.
  **/
 const gnutls_certificate_type_t *
 gnutls_certificate_type_list (void)
@@ -1946,15 +1961,15 @@ static const gnutls_sign_entry sign_algorithms[] = {
 #define GNUTLS_SIGN_ALG_LOOP(a) \
   GNUTLS_SIGN_LOOP( if(p->id && p->id == sign) { a; break; } )
 
-
-
 /**
-  * gnutls_sign_algorithm_get_name - Returns a string with the name of the specified sign algorithm
-  * @algorithm: is a sign algorithm
-  *
-  * Returns: a string that contains the name of the specified sign
-  * algorithm, or %NULL.
-  **/
+ * gnutls_sign_algorithm_get_name - Returns a string with the name of the specified sign algorithm
+ * @algorithm: is a sign algorithm
+ *
+ * Convert a #gnutls_sign_algorithm_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified sign
+ *   algorithm, or %NULL.
+ **/
 const char *
 gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign)
 {
@@ -2037,8 +2052,10 @@ static const gnutls_pk_entry pk_algorithms[] = {
   * gnutls_pk_algorithm_get_name - Returns a string with the name of the specified public key algorithm
   * @algorithm: is a pk algorithm
   *
+  * Convert a #gnutls_pk_algorithm_t value to a string.
+  *
   * Returns: a string that contains the name of the specified public
-  * key algorithm, or %NULL.
+  *   key algorithm, or %NULL.
   **/
 const char *
 gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)

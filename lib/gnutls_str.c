@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2004, 2005, 2007  Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005, 2007, 2008  Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -270,16 +270,27 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
   return buffer;
 }
 
-/* just a hex2bin function.
- */
-
+/**
+ * gnutls_hex2bin - convert hex string into binary buffer.
+ * @hex_data: string with data in hex format
+ * @hex_size: size of hex data
+ * @bin_data: output array with binary data
+ * @bin_size: when calling *@bin_size should hold size of @bin_data,
+ *            on return will hold actual size of @bin_data.
+ *
+ * Convert a buffer with hex data to binary data.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
 int
-gnutls_hex2bin (const char * hex_data, int hex_size, void * bin_data,
-		 size_t * bin_size)
+gnutls_hex2bin (const char * hex_data,
+		size_t hex_size,
+		char * bin_data,
+		size_t * bin_size)
 {
-  return _gnutls_hex2bin( hex_data, hex_size, bin_data, bin_size);
+  return _gnutls_hex2bin (hex_data, (int)hex_size, bin_data, bin_size);
 }
- 
+
 int
 _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 		 size_t * bin_size)
@@ -310,6 +321,49 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 	  return GNUTLS_E_SRP_PWD_PARSING_ERROR;
 	}
       bin_data[j] = val;
+    }
+
+  return 0;
+}
+
+
+/* compare hostname against certificate, taking account of wildcards
+ * return 1 on success or 0 on error
+ */
+int
+_gnutls_hostname_compare (const char *certname, const char *hostname)
+{
+  const char *cmpstr1, *cmpstr2;
+
+  if (strlen (certname) == 0 || strlen (hostname) == 0)
+    return 0;
+
+  if (strlen (certname) > 2 && strncmp (certname, "*.", 2) == 0)
+    {
+      /* a wildcard certificate */
+
+      cmpstr1 = certname + 1;
+
+      /* find the first dot in hostname, compare from there on */
+      cmpstr2 = strchr (hostname, '.');
+
+      if (cmpstr2 == NULL)
+	{
+	  /* error, the hostname we're connecting to is only a local part */
+	  return 0;
+	}
+
+      if (strcasecmp (cmpstr1, cmpstr2) == 0)
+	{
+	  return 1;
+	}
+
+      return 0;
+    }
+
+  if (strcasecmp (certname, hostname) == 0)
+    {
+      return 1;
     }
 
   return 0;

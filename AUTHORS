@@ -39,6 +39,12 @@ PKCS8 fix.
 Yoshisato YANAGISAWA <yanagisawa@csg.is.titech.ac.jp>
 Camellia support.
 
+Emile Van Bergen <emile@e-advies.nl>
+TLS/IA fixes.
+
+Joe Orton <jorton@redhat.com>
+Certificate name import/export, build fixes, test vectors.
+
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.

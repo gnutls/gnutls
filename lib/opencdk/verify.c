@@ -1,5 +1,5 @@
 /* verify.c - Verify signatures
- *        Copyright (C) 2001, 2002, 2003, 2007 Timo Schulz
+ *        Copyright (C) 2001, 2002, 2003, 2007, 2008 Timo Schulz
  *
  * This file is part of OpenCDK.
  *
@@ -56,6 +56,8 @@ static int file_verify_clearsign (cdk_ctx_t, const char *, const char *);
  * @inp: the input stream
  * @data: for detached signatures, this is the data stream @inp is the sig
  * @out: where the output shall be written.
+ *
+ * Verify a signature in stream.
  */
 cdk_error_t
 cdk_stream_verify (cdk_ctx_t hd, cdk_stream_t inp, cdk_stream_t data,
@@ -66,7 +68,6 @@ cdk_stream_verify (cdk_ctx_t hd, cdk_stream_t inp, cdk_stream_t data,
     cdk_stream_set_armor_flag (inp, 0);
   return _cdk_proc_packets (hd, inp, data, NULL, NULL, NULL);
 }
-
 
 /**
  * cdk_file_verify:

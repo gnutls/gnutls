@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -46,7 +46,7 @@ ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
 
 /**
-  * gnutls_global_set_log_function - This function sets the logging function
+  * gnutls_global_set_log_function - set the logging function
   * @log_func: it's a log function
   *
   * This is the function where you set the logging function gnutls
@@ -64,7 +64,7 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
 }
 
 /**
-  * gnutls_global_set_log_level - This function sets the logging level
+  * gnutls_global_set_log_level - set the logging level
   * @level: it's an integer from 0 to 9. 
   *
   * This is the function that allows you to set the log level.
@@ -102,7 +102,7 @@ extern void *(*gnutls_calloc) (size_t, size_t);
 int _gnutls_is_secure_mem_null (const void *);
 
 /**
-  * gnutls_global_set_mem_functions - This function sets the memory allocation functions
+  * gnutls_global_set_mem_functions - set the memory allocation functions
   * @alloc_func: it's the default memory allocation function. Like malloc().
   * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
   * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
@@ -164,18 +164,18 @@ _gnutls_gcry_log_handler (void *dummy, int level,
 static int _gnutls_init = 0;
 
 /**
-  * gnutls_global_init - This function initializes the global data to defaults.
+  * gnutls_global_init - initialize the global data to defaults.
   *
-  * This function initializes the global data to defaults.
-  * Every gnutls application has a global data which holds common parameters
-  * shared by gnutls session structures.
-  * You must call gnutls_global_deinit() when gnutls usage is no longer needed
-  * Returns zero on success.
+  * This function initializes the global data to defaults.  Every
+  * gnutls application has a global data which holds common parameters
+  * shared by gnutls session structures.  You should call
+  * gnutls_global_deinit() when gnutls usage is no longer needed
   *
-  * Note that this function will also initialize libgcrypt, if it has not
-  * been initialized before. Thus if you want to manually initialize libgcrypt
-  * you must do it before calling this function. This is useful in cases you 
-  * want to disable libgcrypt's internal lockings etc.
+  * Note that this function will also initialize libgcrypt, if it has
+  * not been initialized before.  Thus if you want to manually
+  * initialize libgcrypt you must do it before calling this function.
+  * This is useful in cases you want to disable libgcrypt's internal
+  * lockings etc.
   *
   * This function increment a global counter, so that
   * gnutls_global_deinit() only releases resources when it has been
@@ -192,6 +192,8 @@ static int _gnutls_init = 0;
   * function after aquiring a thread mutex.  To ignore the potential
   * memory leak is also an option.
   *
+  * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+  *   otherwise an error code is returned.
   **/
 int
 gnutls_global_init (void)
@@ -311,7 +313,7 @@ out:
 }
 
 /**
-  * gnutls_global_deinit - This function deinitializes the global data 
+  * gnutls_global_deinit - deinitialize the global data
   *
   * This function deinitializes the global data, that were initialized
   * using gnutls_global_init().
@@ -341,7 +343,7 @@ gnutls_global_deinit (void)
  */
 
 /**
-  * gnutls_transport_set_pull_function - This function sets a read like function
+  * gnutls_transport_set_pull_function - set a read like function
   * @pull_func: a callback function similar to read()
   * @session: gnutls session
   *
@@ -361,7 +363,7 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_transport_set_push_function - This function sets the function to send data
+  * gnutls_transport_set_push_function - set the function to send data
   * @push_func: a callback function similar to write()
   * @session: gnutls session
   *
@@ -384,7 +386,7 @@ gnutls_transport_set_push_function (gnutls_session_t session,
 #include <strverscmp.h>
 
 /**
-  * gnutls_check_version - This function checks the library's version
+  * gnutls_check_version - check the library's version
   * @req_version: the version to check
   *
   * Check that the version of the library is at minimum the requested one

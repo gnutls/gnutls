@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,6 +28,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
+#include <x509_int.h>
 #include <debug.h>
 
 /* resarr will contain: p(0), q(1), g(2), y(3), x(4).

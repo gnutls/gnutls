@@ -1,5 +1,5 @@
 /* kbnode.c -  keyblock node utility functions
- *        Copyright (C) 1998-2001 Free Software Foundation, Inc.
+ *        Copyright (C) 1998-2001, 2008 Free Software Foundation, Inc.
  *        Copyright (C) 2002, 2003, 2007 Timo Schulz
  *
  * This file is part of OpenCDK.
@@ -377,7 +377,9 @@ cdk_kbnode_move (cdk_kbnode_t * root, cdk_kbnode_t node, cdk_kbnode_t where)
  * cdk_kbnode_get_packet:
  * @node: the key node
  *
- * Returns the packet which is stored inside the node in @node.
+ * Get packet in node.
+ *
+ * Returns: the packet which is stored inside the node in @node.
  **/
 cdk_packet_t
 cdk_kbnode_get_packet (cdk_kbnode_t node)

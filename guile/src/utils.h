@@ -1,5 +1,5 @@
 /* GNUTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007  Free Software Foundation
+   Copyright (C) 2007, 2008  Free Software Foundation
 
    GNUTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,10 @@
 
 /* Common utilities.  */
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <libguile.h>
 
 

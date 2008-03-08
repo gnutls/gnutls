@@ -1,5 +1,5 @@
 /* stream.c - The stream implementation
- *        Copyright (C) 2002, 2003, 2007 Timo Schulz
+ *        Copyright (C) 2002, 2003, 2007, 2008 Timo Schulz
  *
  * This file is part of OpenCDK.
  *
@@ -316,13 +316,14 @@ _cdk_stream_append (const char *file, cdk_stream_t *ret_s)
   return 0;
 }
 
-
 /**
  * cdk_stream_is_compressed:
  * @s: the stream
- * 
- * Returns 0 if the stream is uncompressed, otherwise the
- * compression algorithm.
+ *
+ * Check whether stream is compressed.
+ *
+ * Returns: 0 if the stream is uncompressed, otherwise the compression
+ *   algorithm.
  */
 int
 cdk_stream_is_compressed (cdk_stream_t s)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  * Copyright (C) 2002 Andrew McDonald
  *
  * This file is part of GNUTLS.
@@ -22,53 +22,10 @@
  */
 
 #include <gnutls_int.h>
-#include <x509.h>
-#include <dn.h>
+#include <gnutls_str.h>
+#include <x509_int.h>
 #include <common.h>
-#include <rfc2818.h>
 #include <gnutls_errors.h>
-
-/* compare hostname against certificate, taking account of wildcards
- * return 1 on success or 0 on error
- */
-int
-_gnutls_hostname_compare (const char *certname, const char *hostname)
-{
-  const char *cmpstr1, *cmpstr2;
-
-  if (strlen (certname) == 0 || strlen (hostname) == 0)
-    return 0;
-
-  if (strlen (certname) > 2 && strncmp (certname, "*.", 2) == 0)
-    {
-      /* a wildcard certificate */
-
-      cmpstr1 = certname + 1;
-
-      /* find the first dot in hostname, compare from there on */
-      cmpstr2 = strchr (hostname, '.');
-
-      if (cmpstr2 == NULL)
-	{
-	  /* error, the hostname we're connecting to is only a local part */
-	  return 0;
-	}
-
-      if (strcasecmp (cmpstr1, cmpstr2) == 0)
-	{
-	  return 1;
-	}
-
-      return 0;
-    }
-
-  if (strcasecmp (certname, hostname) == 0)
-    {
-      return 1;
-    }
-
-  return 0;
-}
 
 /**
   * gnutls_x509_crt_check_hostname - This function compares the given hostname with the hostname in the certificate

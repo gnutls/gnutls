@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -38,12 +38,8 @@
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <dn.h>
-#include <x509.h>
-#include <mpi.h>
-#include <sign.h>
+#include <x509_int.h>
 #include <common.h>
-#include <verify.h>
 
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.

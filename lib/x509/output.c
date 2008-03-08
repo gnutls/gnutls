@@ -28,7 +28,7 @@
 #include <gnutls_int.h>
 #include <common.h>
 #include <gnutls_x509.h>
-#include <x509.h>
+#include <x509_int.h>
 #include <gnutls_errors.h>
 
 /* I18n of error codes. */

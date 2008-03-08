@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,11 +28,9 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_global.h>
-#include <mpi.h>
 #include <libtasn1.h>
 #include <common.h>
-#include <x509.h>
-#include <extensions.h>
+#include <x509_int.h>
 #include <gnutls_datum.h>
 
 /* This function will attempt to return the requested extension found in

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -31,8 +31,8 @@
 #include <gnutls_x509.h>
 #include <gnutls_num.h>
 #include <x509_b64.h>
+#include "x509_int.h"
 #include <common.h>
-#include <mpi.h>
 #include <time.h>
 
 typedef struct _oid2string

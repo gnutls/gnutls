@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -156,9 +156,13 @@ gnutls_credentials_set (gnutls_session_t session,
   * Returns type of credentials for the current authentication schema.
   * The returned information is to be used to distinguish the function used
   * to access authentication data.
-  * 
-  * Eg. for CERTIFICATE ciphersuites (key exchange algorithms: KX_RSA, KX_DHE_RSA),
-  * the same function are to be used to access the authentication data.
+  *
+  * Eg. for CERTIFICATE ciphersuites (key exchange algorithms: KX_RSA,
+  * KX_DHE_RSA), the same function are to be used to access the
+  * authentication data.
+  *
+  * Returns: The type of credentials for the current authentication
+  *   schema, an #gnutls_credentials_type_t type.
   **/
 gnutls_credentials_type_t
 gnutls_auth_get_type (gnutls_session_t session)
@@ -181,7 +185,9 @@ gnutls_auth_get_type (gnutls_session_t session)
   * Returns the type of credentials that were used for server authentication.
   * The returned information is to be used to distinguish the function used
   * to access authentication data.
-  * 
+  *
+  * Returns: The type of credentials for the server authentication
+  *   schema, an #gnutls_credentials_type_t type.
   **/
 gnutls_credentials_type_t
 gnutls_auth_server_get_type (gnutls_session_t session)
@@ -199,7 +205,9 @@ gnutls_auth_server_get_type (gnutls_session_t session)
   * Returns the type of credentials that were used for client authentication.
   * The returned information is to be used to distinguish the function used
   * to access authentication data.
-  * 
+  *
+  * Returns: The type of credentials for the client authentication
+  *   schema, an #gnutls_credentials_type_t type.
   **/
 gnutls_credentials_type_t
 gnutls_auth_client_get_type (gnutls_session_t session)

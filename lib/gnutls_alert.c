@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -77,14 +77,14 @@ static const gnutls_alert_entry sup_alerts[] = {
 #define GNUTLS_ALERT_ID_LOOP(a) \
                         GNUTLS_ALERT_LOOP( if(p->alert == alert) { a; break; })
 
-
 /**
   * gnutls_alert_get_name - Returns a string describing the alert number given
   * @alert: is an alert number #gnutls_session_t structure.
   *
   * This function will return a string that describes the given alert
-  * number or NULL.  See gnutls_alert_get().
+  * number, or %NULL.  See gnutls_alert_get().
   *
+  * Returns: string corresponding to #gnutls_alert_description_t value.
   **/
 const char *
 gnutls_alert_get_name (gnutls_alert_description_t alert)
@@ -97,22 +97,23 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
 }
 
 /**
-  * gnutls_alert_send - This function sends an alert message to the peer
-  * @session: is a #gnutls_session_t structure.
-  * @level: is the level of the alert
-  * @desc: is the alert description
-  *
-  * This function will send an alert to the peer in order to inform
-  * him of something important (eg. his Certificate could not be verified).
-  * If the alert level is Fatal then the peer is expected to close the
-  * connection, otherwise he may ignore the alert and continue.
-  *
-  * The error code of the underlying record send function will be returned,
-  * so you may also receive GNUTLS_E_INTERRUPTED or GNUTLS_E_AGAIN as well.
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_alert_send - send an alert message to the peer
+ * @session: is a #gnutls_session_t structure.
+ * @level: is the level of the alert
+ * @desc: is the alert description
+ *
+ * This function will send an alert to the peer in order to inform
+ * him of something important (eg. his Certificate could not be verified).
+ * If the alert level is Fatal then the peer is expected to close the
+ * connection, otherwise he may ignore the alert and continue.
+ *
+ * The error code of the underlying record send function will be
+ * returned, so you may also receive %GNUTLS_E_INTERRUPTED or
+ * %GNUTLS_E_AGAIN as well.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
 int
 gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
 		   gnutls_alert_description_t desc)
@@ -137,20 +138,21 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
 }
 
 /**
-  * gnutls_error_to_alert - This function returns an alert code based on the given error code
-  * @err: is a negative integer
-  * @level: the alert level will be stored there
-  *
-  * Returns an alert depending on the error code returned by a gnutls
-  * function. All alerts sent by this function should be considered fatal.
-  * The only exception is when err == GNUTLS_E_REHANDSHAKE, where a warning 
-  * alert should be sent to the peer indicating that no renegotiation will 
-  * be performed.
-  *
-  * If there is no mapping to a valid alert the alert to indicate internal error 
-  * is returned.
-  *
-  **/
+ * gnutls_error_to_alert - return an alert code based on the given error code
+ * @err: is a negative integer
+ * @level: the alert level will be stored there
+ *
+ * Get an alert depending on the error code returned by a gnutls
+ * function.  All alerts sent by this function should be considered
+ * fatal.  The only exception is when @err is %GNUTLS_E_REHANDSHAKE,
+ * where a warning alert should be sent to the peer indicating that no
+ * renegotiation will be performed.
+ *
+ * If there is no mapping to a valid alert the alert to indicate
+ * internal error is returned.
+ *
+ * Returns: the alert code to use for a particular error code.
+ **/
 int
 gnutls_error_to_alert (int err, int *level)
 {
@@ -251,22 +253,23 @@ gnutls_error_to_alert (int err, int *level)
   return ret;
 }
 
-
 /**
- * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
+ * gnutls_alert_send_appropriate - send an alert to the peer depending on the error code
  * @session: is a #gnutls_session_t structure.
  * @err: is an integer
  *
- * Sends an alert to the peer depending on the error code returned by a gnutls
- * function. This function will call gnutls_error_to_alert() to determine
- * the appropriate alert to send.
+ * Sends an alert to the peer depending on the error code returned by
+ * a gnutls function. This function will call gnutls_error_to_alert()
+ * to determine the appropriate alert to send.
  *
- * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
+ * This function may also return %GNUTLS_E_AGAIN, or
+ * %GNUTLS_E_INTERRUPTED.
  *
- * If the return value is GNUTLS_E_INVALID_REQUEST, then no alert has
+ * If the return value is %GNUTLS_E_INVALID_REQUEST, then no alert has
  * been sent to the peer.
  *
- * Returns zero on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  */
 int
 gnutls_alert_send_appropriate (gnutls_session_t session, int err)
@@ -284,18 +287,20 @@ gnutls_alert_send_appropriate (gnutls_session_t session, int err)
 }
 
 /**
-  * gnutls_alert_get - Returns the last alert number received.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function will return the last alert number received. This
-  * function should be called if GNUTLS_E_WARNING_ALERT_RECEIVED or
-  * GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls
-  * function.  The peer may send alerts if he thinks some things were
-  * not right. Check gnutls.h for the available alert descriptions.
-  *
-  * If no alert has been received the returned value is undefined.
-  *
-  **/
+ * gnutls_alert_get - Returns the last alert number received.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return the last alert number received.  This
+ * function should be called if %GNUTLS_E_WARNING_ALERT_RECEIVED or
+ * %GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls
+ * function.  The peer may send alerts if he thinks some things were
+ * not right. Check gnutls.h for the available alert descriptions.
+ *
+ * If no alert has been received the returned value is undefined.
+ *
+ * Returns: returns the last alert received, a
+ *   #gnutls_alert_description_t value.
+ **/
 gnutls_alert_description_t
 gnutls_alert_get (gnutls_session_t session)
 {

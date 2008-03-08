@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007  Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008  Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -30,7 +30,6 @@
 #include <gnutls_str.h>
 #include <common.h>
 #include <gnutls_num.h>
-#include <dn.h>
 
 /* This file includes all the required to parse an X.509 Distriguished
  * Name (you need a parser just to read a name in the X.509 protoocols!!!)

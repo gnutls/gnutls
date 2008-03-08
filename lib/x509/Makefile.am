@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # This file is part of GNUTLS.
 #
@@ -30,10 +30,9 @@ noinst_LTLIBRARIES = libgnutls_x509.la
 
 libgnutls_x509_la_SOURCES = crl.c dn.c common.c x509.c extensions.c	\
 	dsa.c rfc2818_hostname.c verify.c mpi.c privkey.c pkcs7.c	\
-	crq.c sign.c privkey_pkcs8.c pkcs12.c pkcs12_bag.c	\
-	pkcs12_encr.c x509_write.c crl_write.c dn.h common.h x509.h	\
-	extensions.h pkcs7.h verify.h mpi.h crq.h sign.h privkey.h	\
-	pkcs12.h rfc2818.h dsa.h output.c
+	crq.c sign.c privkey_pkcs8.c pkcs12.c pkcs12_bag.c		\
+	pkcs12_encr.c x509_write.c crl_write.c common.h x509_int.h	\
+	output.c
 
 EXTRA_DIST = x509-api.texi
 

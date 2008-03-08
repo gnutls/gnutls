@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -36,9 +36,7 @@
 #include <gnutls_num.h>
 #include <common.h>
 #include <x509_b64.h>
-#include <pkcs12.h>
-#include <dn.h>
-#include <mpi.h>
+#include "x509_int.h"
 #include <gc.h>
 
 

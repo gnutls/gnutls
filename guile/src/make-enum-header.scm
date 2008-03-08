@@ -1,7 +1,7 @@
 ;;; Help produce Guile wrappers for GnuTLS types.
 ;;;
 ;;; GNUTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007  Free Software Foundation
+;;; Copyright (C) 2007, 2008  Free Software Foundation
 ;;;
 ;;; GNUTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
 ;;; License along with GNUTLS; if not, write to the Free Software
 ;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-;;; Written by Ludovic Courtès <ludo@chbouib.org>.
+;;; Written by Ludovic Courtès <ludo@gnu.org>.
 
 
 (use-modules (gnutls build enums))
@@ -40,7 +40,9 @@
     (format port "#define GUILE_GNUTLS_~aENUMS_H~%"
             (if extra? "EXTRA_" ""))
 
-    (format port "#include \"config.h\"~%")
+    (format port "#ifdef HAVE_CONFIG_H~%")
+    (format port "# include <config.h>~%")
+    (format port "#endif~%~%")
     (format port "#include <gnutls/gnutls.h>~%")
     (format port "#include <gnutls/x509.h>~%")
 

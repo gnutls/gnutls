@@ -1,5 +1,5 @@
 #  GNUTLS -- Guile bindings for GnuTLS.
-#  Copyright (C) 2007  Free Software Foundation
+#  Copyright (C) 2007, 2008  Free Software Foundation
 #
 #  GNUTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -103,8 +103,10 @@ extra-smob-types.i.c: $(srcdir)/make-smob-types.scm
 
 # C file snarfing.
 
+# `$(GUILE_CFLAGS)' may contain a series of `-I' switches so it must be
+# included here, even though we'd really want `$(GUILE_CPPFLAGS)'.
 snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	       $(CFLAGS) $(AM_CFLAGS)
+	       $(CFLAGS) $(AM_CFLAGS) $(GUILE_CFLAGS)
 
 .c.x:
 	$(guile_snarf) -o $@ $< $(snarfcppopts)

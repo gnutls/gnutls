@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -61,5 +61,8 @@ char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
 		       size_t buffer_size);
 int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 		     size_t * bin_size);
+
+int _gnutls_hostname_compare (const char *certname, const char *hostname);
+#define MAX_CN 256
 
 #endif

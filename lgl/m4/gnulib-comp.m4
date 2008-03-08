@@ -72,6 +72,7 @@ AC_DEFUN([lgl_INIT],
   gl_MODULE_INDICATOR([gc-sha1])
   gl_MD2
   gl_FLOAT_H
+  gl_FUNC
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.17])
   AC_SUBST([LIBINTL])
@@ -302,6 +303,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/eoverflow.m4
   m4/extensions.m4
   m4/float_h.m4
+  m4/func.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4
   m4/gc-camellia.m4

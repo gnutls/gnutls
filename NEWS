@@ -3,11 +3,50 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.3.2 (unreleased)
+* Version 2.3.3 (unreleased)
+
+** No longer compiled using -D_REENTRANT -D_THREAD_SAFE.
+We could not find any modern justification for enabling these flags by
+default.  If you know of some platform that needs one of the flags to
+work properly, please let us know.
+
+** Importing many CA certificates are now considerably faster.
+This affect gnutls_certificate_set_x509_trust_mem,
+gnutls_certificate_set_x509_trust, and
+gnutls_certificate_set_x509_trust_file.  The complexity was reduced
+from O(2*n^2) to O(n).  When adding 206 files containing 408
+certificates, using gnutls_certificate_set_x509_trust_file, the time
+dropped from 40 seconds to 0.3 seconds.  Thanks to Edgar Fuß for code
+to trigger the problem.  See also
+<http://blog.josefsson.org/2008/02/27/real-world-performance-tuning-with-callgrind/>.
+
+** Clarify documentation for gnutls_x509_crt_set_subject_alternative_name
+** to be explicit that it takes zero terminated data.
+
+** gnutls-cli --print-cert now print PKCS#3 format Diffie-Hellman parameters.
+
+** Documentation fixes for the GTK-DOC manual.
+
+** Fix compilation error related to __FUNCTION__ on some systems.
+Reported by Tim Mooney, see
+<https://savannah.gnu.org/support/?106267>.
+
+** API and ABI modifications:
+gnutls_hex2bin: MODIFIED, uses size_t instead of int for string length,
+		and char* instead of void* for output buffer.
+
+* Version 2.3.2 (released 2008-02-26)
 
 ** Fix srcdir!=objdir failure in openpgpself test.
 
+** Improved API documentation output from GTK-DOC.
+
 ** Added gnutls_x509_dn_export(). Patch by Joe Orton.
+
+** Renamed gnutls_certificate_export_x509_cas and friends.
+See <http://lists.gnu.org/archive/html/gnutls-devel/2008-02/msg00043.html>.
+
+** Internal header files cleanup.
 
 ** API and ABI modifications:
 gnutls_certificate_export_x509_cas: RENAMED to gnutls_certificate_get_x509_cas

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -35,8 +35,6 @@
 #include <gnutls_errors.h>
 #include <common.h>
 #include <x509_b64.h>
-#include <pkcs7.h>
-#include <dn.h>
 
 #define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
 

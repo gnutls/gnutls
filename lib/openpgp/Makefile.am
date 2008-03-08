@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -35,7 +35,7 @@ noinst_LTLIBRARIES = libgnutls_openpgp.la
 
 COBJECTS = pgp.c pgpverify.c extras.c compat.c privkey.c output.c
 
-libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp.h gnutls_openpgp.h
+libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp_int.h gnutls_openpgp.h
 
 EXTRA_DIST = pgp-api.texi
 

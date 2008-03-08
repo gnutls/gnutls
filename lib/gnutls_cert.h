@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -27,7 +27,7 @@
 
 #include <gnutls_pk.h>
 #include <libtasn1.h>
-#include "x509/x509.h"
+#include "x509/x509_int.h"
 #include <gnutls/openpgp.h>
 
 #define MAX_PUBLIC_PARAMS_SIZE 4	/* ok for RSA and DSA */

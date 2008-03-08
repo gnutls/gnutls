@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Timo Schulz, Nikos Mavrogiannopoulos
  *
@@ -25,7 +25,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_openpgp.h>
-#include <openpgp.h>
+#include <openpgp_int.h>
 
 /*-
  * gnutls_openpgp_verify_key - Verify all signatures on the key

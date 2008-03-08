@@ -1,5 +1,5 @@
 /* GNUTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007  Free Software Foundation
+   Copyright (C) 2007, 2008  Free Software Foundation
 
    GNUTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,7 @@ scm_from_gnutls_key_usage_flags (unsigned int c_usage)
 
   if (EXPECT_FALSE (c_usage != 0))
     /* XXX: We failed to interpret one of the usage flags.  */
-    scm_gnutls_error (GNUTLS_E_UNIMPLEMENTED_FEATURE, __FUNCTION__);
+    scm_gnutls_error (GNUTLS_E_UNIMPLEMENTED_FEATURE, __func__);
 
 #undef MATCH_USAGE
 
