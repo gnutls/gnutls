@@ -1,3 +1,234 @@
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Revert
+	a3e4759117cee5d756475215437a440dc12fcc6c because it breaks libtool
+	v2.2.  ../libtool: line 4398: cd: ../../lib/.libs: No such file or
+	directory libtool: link: cannot determine absolute directory name of
+	`../../lib/.libs'
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.3.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/reference/Makefile.am, libextra/Makefile.am,
+	libextra/gnutls_extra.c, libextra/gnutls_extra.h: Remove
+	gnutls_extra.h, not needed anymore.  Fixes build failure in libextra
+	that looked for opencdk.h (via auth_cert.h).  Reported by Roman
+	Bogorodskiy <novel@FreeBSD.org>.
+
+2008-03-08  Nikos <nmav@crystal.(none)>
+
+	* : commit cf8fb4bca34ec865959f1544e395b5566f2449ac Author: Nikos
+	<nmav@crystal.(none)> Date:   Sat Mar 8 02:06:25 2008 +0200
+
+2008-03-07  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/Makefile.am: guile: Propagate Guile's CPPFLAGS to
+	`guile-snarf'.
+
+2008-03-07  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/make-enum-header.scm, guile/src/utils.h: guile: Include
+	<config.h>, not "config.h".
+
+2008-03-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-07  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls-docs.sgml: Add index.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509_b64.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_alert.c: Doc fix.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_str.c: Fix
+	gnutls_hex2bin prototype.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Fix warnings.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/select.c: Avoid confusing gtk-doc.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/kbnode.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/stream.c, lib/opencdk/verify.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/privkey.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/pgp.c, lib/openpgp/privkey.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_state.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_alert.c, lib/gnutls_algorithms.c, lib/gnutls_record.c,
+	lib/gnutls_state.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.c: Doc fix.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_db.c: Doc fix.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_session.c: Doc fix.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Doc fix.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_srp.c: Doc fix.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_auth.c, lib/gnutls_openpgp.c, lib/gnutls_srp.c,
+	libextra/gnutls_ia.c: Doc fixes.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* m4/pkg.m4: Added, needed by new gtk-doc.m4.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Update gtk-doc Makefile.am to latest
+	examples.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/tmpl/gnutls-unused.sgml, gtk-doc.make: Update
+	gtk-doc makefile, this version allows us to get rid of tmpl/.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* m4/gtk-doc.m4: Update gtk-doc.m4.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_alert.c, lib/gnutls_cert.c, lib/gnutls_global.c,
+	lib/gnutls_psk.c, lib/gnutls_record.c, lib/gnutls_srp.c,
+	lib/gnutls_state.c, lib/gnutls_ui.c, lib/gnutls_x509.c: Doc fix,
+	remove verbose 'This function ...' Improves looks in 'apropos'
+	output.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_anon_cred.c, lib/gnutls_db.c, lib/gnutls_dh_primes.c,
+	lib/gnutls_handshake.c, lib/gnutls_openpgp.c, lib/gnutls_psk.c,
+	lib/gnutls_rsa_export.c, lib/gnutls_state.c, lib/gnutls_ui.c,
+	lib/x509_b64.c: Doc fix, remove verbose 'This function will' stuff.
+	Improves man page look in 'apropos'.
+
+2008-03-06  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/func.m4, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4: Use func module, to get __func__.
+
+2008-03-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/common.c: Print DH parameters of session.
+
+2008-03-05  Simon Josefsson <simon@josefsson.org>
+
+	* gl/getaddrinfo.c, gl/getdelim.c, lgl/alloca.in.h,
+	lgl/gc-gnulib.c, lgl/xsize.h: Update gnulib files.
+
+2008-02-28  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/utils.c: Use __func__ instead of __FUNCTION__.  Reported
+	by Tim Mooney, see <https://savannah.gnu.org/support/?106267>.  A
+	gnulib module to make sure __func__ is available would be nice.
+
+2008-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c: Doc fix.
+
+2008-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_x509.c: Optimize adding many trusted
+	certificates.  See
+
+	<http://blog.josefsson.org/2008/02/27/real-world-performance-tuning-with-callgrind/>.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c: Doc fixes.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Add.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Add.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2008-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-02-26  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.2.
