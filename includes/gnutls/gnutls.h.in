@@ -727,16 +727,16 @@ extern "C"
 				       gnutls_x509_crl_t * crl_list,
 				       int crl_list_size);
 
-  void gnutls_certificate_export_x509_cas (gnutls_certificate_credentials_t sc,
-					   gnutls_x509_crt_t **x509_ca_list,
-					   unsigned int* ncas);
+  void gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
+					gnutls_x509_crt_t **x509_ca_list,
+					unsigned int* ncas);
 
-  void gnutls_certificate_export_x509_crls (gnutls_certificate_credentials_t sc,
-					    gnutls_x509_crl_t **x509_crl_list,
-					    unsigned int* ncrls);
+  void gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
+					 gnutls_x509_crl_t **x509_crl_list,
+					 unsigned int* ncrls);
 
-  void gnutls_certificate_export_openpgp_keyring (gnutls_certificate_credentials_t sc,
-						  gnutls_openpgp_keyring_t *keyring);
+  void gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc,
+					       gnutls_openpgp_keyring_t *keyring);
 
 /* global state functions
  */
