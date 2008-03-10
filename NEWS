@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.4 (unreleased)
 
+** Finish renaming of gnutls_certificate_export_x509_cas etc.
+They weren't renamed in the public header file.
+
 ** API and ABI modifications:
 No changes since last version.
 
