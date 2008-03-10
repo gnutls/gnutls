@@ -35,6 +35,10 @@ to trigger the problem.  See also
 Reported by Tim Mooney, see
 <https://savannah.gnu.org/support/?106267>.
 
+** Updated translations.
+
+** Update gnulib files.
+
 ** API and ABI modifications:
 gnutls_hex2bin: MODIFIED, uses size_t instead of int for string length,
 		and char* instead of void* for output buffer.
