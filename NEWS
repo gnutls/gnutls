@@ -11,7 +11,8 @@ Reported by Roman Bogorodskiy <novel@FreeBSD.org>.
 ** No longer compiled using -D_REENTRANT -D_THREAD_SAFE.
 We could not find any modern justification for enabling these flags by
 default.  If you know of some platform that needs one of the flags to
-work properly, please let us know.
+work properly, please let us know.  (Actually introduced in v2.3.0 but
+not documented until now.)
 
 ** Importing many CA certificates are now considerably faster.
 This affect gnutls_certificate_set_x509_trust_mem,
