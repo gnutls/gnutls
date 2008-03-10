@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -102,7 +102,7 @@ libgnutls_extra_la_LDFLAGS += \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES += gnutls_extra.h libgnutls-extra.vers
+libgnutls_extra_la_SOURCES += libgnutls-extra.vers
 
 libgnutls_extra_la_LIBADD += ../lgl/liblgnu.la ../lib/libgnutls.la
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,7 +22,6 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
-#include <gnutls_extra.h>
 #include <gnutls_algorithms.h>
 #ifdef USE_LZO
 # ifdef USE_MINILZO

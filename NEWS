@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.3 (unreleased)
 
+** Fix build failure in libextra/gnutls_extra.c that needed opencdk.h.
+Reported by Roman Bogorodskiy <novel@FreeBSD.org>.
+
 ** No longer compiled using -D_REENTRANT -D_THREAD_SAFE.
 We could not find any modern justification for enabling these flags by
 default.  If you know of some platform that needs one of the flags to
