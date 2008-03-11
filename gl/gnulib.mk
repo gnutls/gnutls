@@ -193,6 +193,26 @@ EXTRA_libgnu_la_SOURCES += readline.c
 
 ## end   gnulib module readline
 
+## begin gnulib module stdarg
+
+BUILT_SOURCES += $(STDARG_H)
+
+# We need the following in order to create <stdarg.h> when the system
+# doesn't have one that works with the given compiler.
+stdarg.h: stdarg.in.h
+	rm -f $@-t $@
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
+	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	      -e 's|@''NEXT_STDARG_H''@|$(NEXT_STDARG_H)|g' \
+	      < $(srcdir)/stdarg.in.h; \
+	} > $@-t
+	mv $@-t $@
+MOSTLYCLEANFILES += stdarg.h stdarg.h-t
+
+EXTRA_DIST += stdarg.in.h
+
+## end   gnulib module stdarg
+
 ## begin gnulib module strdup
 
 

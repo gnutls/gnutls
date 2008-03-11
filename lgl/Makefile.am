@@ -35,15 +35,6 @@ liblgnu_la_DEPENDENCIES = $(lgl_LTLIBOBJS)
 EXTRA_liblgnu_la_SOURCES =
 liblgnu_la_LDFLAGS = $(AM_LDFLAGS)
 
-## begin gnulib module absolute-header
-
-# Use this preprocessor expression to decide whether #include_next works.
-# Do not rely on a 'configure'-time test for this, since the expression
-# might appear in an installed header, which is used by some other compiler.
-HAVE_INCLUDE_NEXT = (__GNUC__ || 60000000 <= __DECC_VER)
-
-## end   gnulib module absolute-header
-
 ## begin gnulib module alloca-opt
 
 BUILT_SOURCES += $(ALLOCA_H)

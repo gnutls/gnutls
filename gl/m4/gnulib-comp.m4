@@ -217,6 +217,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/progname.h
   lib/readline.c
   lib/readline.h
+  lib/stdarg.in.h
   lib/strdup.c
   lib/strerror.c
   lib/version-etc-fsf.c
