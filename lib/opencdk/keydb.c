@@ -1,5 +1,7 @@
 /* keydb.c - Key database routines
- *        Copyright (C) 2002, 2003, 2007 Timo Schulz
+ * Copyright (C) 2002, 2003, 2007, 2008 Free Software Foundation, Inc.
+ *
+ * Author: Timo Schulz
  *
  * This file is part of OpenCDK.
  *
@@ -17,6 +19,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
  * USA
+ *
  */
 #ifdef HAVE_CONFIG_H
 # include <config.h>
