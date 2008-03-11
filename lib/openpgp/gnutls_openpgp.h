@@ -17,28 +17,11 @@ typedef enum
   KEY_ATTR_FPR = 5
 } key_attr_t;
 
-int
-gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
-					 res, const char *CERTFILE,
-					 const char *KEYFILE, gnutls_openpgp_crt_fmt_t);
-
 int gnutls_openpgp_count_key_names (const gnutls_datum_t * cert);
-
-int gnutls_certificate_set_openpgp_keyring_file
-  (gnutls_certificate_credentials_t c, const char *file, gnutls_openpgp_crt_fmt_t);
-
-int
-gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
-					    c, const opaque * data,
-					    size_t dlen, gnutls_openpgp_crt_fmt_t);
 
 int gnutls_openpgp_get_key (gnutls_datum_t * key,
 			    gnutls_openpgp_keyring_t keyring,
 			    key_attr_t by, opaque * pattern);
-
-int gnutls_openpgp_recv_key (const char *host,
-			     short port, uint32_t keyid,
-			     gnutls_datum_t * key);
 
 /* internal */
 int _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * cert,
@@ -64,20 +47,6 @@ time_t _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t *
 time_t _gnutls_openpgp_get_raw_key_expiration_time (const gnutls_datum_t *
 						    cert);
 
-int
-gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);
-
-int
-gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);
-
-void
-gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key);
-
-int
-gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
-			       const gnutls_datum_t * data,
-			       gnutls_openpgp_crt_fmt_t format,
-			       const char *pass, unsigned int flags);
 
 #endif /*GNUTLS_OPENPGP_LOCAL_H */
 
