@@ -88,7 +88,6 @@ _gnutls_hash_init (digest_hd_st* dig, gnutls_mac_algorithm_t algorithm)
 
   dig->registered = 0;  
 
-
   result = gc_hash_open (_gnutls_mac2gc (algorithm), 0, &dig->hd.gc);
   if (result)
     {
@@ -129,6 +128,7 @@ int _gnutls_hash_copy (digest_hd_st* dst, digest_hd_st* src)
   dst->algorithm = src->algorithm;
   dst->key = NULL;		/* it's a hash anyway */
   dst->keysize = 0;
+  dst->registered = src->registered;
 
   if (src->registered) {
     return src->hd.rh.cc->copy( &dst->hd.rh.ctx, src->hd.rh.ctx);

@@ -48,9 +48,6 @@ typedef struct
   int keysize;
 } digest_hd_st;
 
-#define GNUTLS_HASH_FAILED NULL
-#define GNUTLS_MAC_FAILED NULL
-
 int _gnutls_hmac_init (digest_hd_st*, gnutls_mac_algorithm_t algorithm,
 			    const void *key, int keylen);
 #define _gnutls_hmac_get_algo_len _gnutls_hash_get_algo_len

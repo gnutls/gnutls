@@ -130,11 +130,14 @@ cc_cleanup:
 int
 _gnutls_cipher_encrypt (const cipher_hd_st* handle, void *text, int textlen)
 {
-  if (handle != GNUTLS_CIPHER_FAILED)
+  if (handle != NULL)
     {
       if (handle->registered) {
+        if (handle->hd.rh.ctx == NULL) return 0;
         return handle->hd.rh.cc->encrypt( handle->hd.rh.ctx, text, textlen, text, textlen);
       }
+      
+      if (handle->hd.gc == NULL) return 0;
       if (gc_cipher_encrypt_inline (handle->hd.gc, textlen, text) != 0)
 	{
 	  gnutls_assert ();
@@ -148,11 +151,14 @@ int
 _gnutls_cipher_decrypt (const cipher_hd_st *handle, void *ciphertext,
 			int ciphertextlen)
 {
-  if (handle != GNUTLS_CIPHER_FAILED)
+  if (handle != NULL)
     {
       if (handle->registered) {
+        if (handle->hd.rh.ctx == NULL) return 0;
         return handle->hd.rh.cc->decrypt( handle->hd.rh.ctx, ciphertext, ciphertextlen, ciphertext, ciphertextlen);
       }
+
+      if (handle->hd.gc == NULL) return 0;
       if (gc_cipher_decrypt_inline (handle->hd.gc, ciphertextlen, ciphertext) != 0)
 	{
 	  gnutls_assert ();
@@ -165,11 +171,11 @@ _gnutls_cipher_decrypt (const cipher_hd_st *handle, void *ciphertext,
 void
 _gnutls_cipher_deinit (cipher_hd_st* handle)
 {
-  if (handle != GNUTLS_CIPHER_FAILED)
+  if (handle != NULL)
     {
       if (handle->registered && handle->hd.rh.ctx != NULL) {
         return handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
       }
-      gc_cipher_close (handle);
+      gc_cipher_close (handle->hd.gc);
     }
 }

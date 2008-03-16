@@ -39,7 +39,6 @@ typedef struct {
 		reg_hd rh; /* when registered */
 	} hd;
 } cipher_hd_st;
-#define GNUTLS_CIPHER_FAILED NULL
 
 int _gnutls_cipher_init (cipher_hd_st*, gnutls_cipher_algorithm_t cipher,
 				 const gnutls_datum_t * key,
