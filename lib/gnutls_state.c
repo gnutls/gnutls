@@ -377,9 +377,9 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_selected_certs_deinit (session);
 
   if (session->connection_state.read_cipher_state != NULL)
-    _gnutls_cipher_deinit (session->connection_state.read_cipher_state);
+    _gnutls_cipher_deinit (&session->connection_state.read_cipher_state);
   if (session->connection_state.write_cipher_state != NULL)
-    _gnutls_cipher_deinit (session->connection_state.write_cipher_state);
+    _gnutls_cipher_deinit (&session->connection_state.write_cipher_state);
 
   if (session->connection_state.read_compression_state != NULL)
     _gnutls_comp_deinit (session->connection_state.read_compression_state, 1);

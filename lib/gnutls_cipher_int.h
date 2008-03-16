@@ -25,15 +25,28 @@
 #ifndef GNUTLS_CIPHER_INT
 # define GNUTLS_CIPHER_INT
 
-#define cipher_hd_t gc_cipher_handle
+#include <gnutls/crypto.h>
+
+typedef struct {
+  gnutls_crypto_cipher_st* cc;
+  void* ctx;
+} reg_hd;
+
+typedef struct {
+	int registered; /* true or false(0) */
+	union {
+		gc_cipher_handle gc; /* when not registered */
+		reg_hd rh; /* when registered */
+	} hd;
+} cipher_hd_st;
 #define GNUTLS_CIPHER_FAILED NULL
 
-cipher_hd_t _gnutls_cipher_init (gnutls_cipher_algorithm_t cipher,
+int _gnutls_cipher_init (cipher_hd_st*, gnutls_cipher_algorithm_t cipher,
 				 const gnutls_datum_t * key,
 				 const gnutls_datum_t * iv);
-int _gnutls_cipher_encrypt (cipher_hd_t handle, void *text, int textlen);
-int _gnutls_cipher_decrypt (cipher_hd_t handle, void *ciphertext,
+int _gnutls_cipher_encrypt (const cipher_hd_st *handle, void *text, int textlen);
+int _gnutls_cipher_decrypt (const cipher_hd_st *handle, void *ciphertext,
 			    int ciphertextlen);
-void _gnutls_cipher_deinit (cipher_hd_t handle);
+void _gnutls_cipher_deinit (cipher_hd_st* handle);
 
 #endif /* GNUTLS_CIPHER_INT */

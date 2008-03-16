@@ -400,7 +400,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 
   /* Actual encryption (inplace).
    */
-  ret = _gnutls_cipher_encrypt (session->connection_state.
+  ret = _gnutls_cipher_encrypt (&session->connection_state.
 				write_cipher_state, cipher_data, length);
   if (ret < 0)
     {
@@ -460,7 +460,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 	  (session->security_parameters.read_bulk_cipher_algorithm))
     {
     case CIPHER_STREAM:
-      if ((ret = _gnutls_cipher_decrypt (session->connection_state.
+      if ((ret = _gnutls_cipher_decrypt (&session->connection_state.
 					 read_cipher_state,
 					 ciphertext.data,
 					 ciphertext.size)) < 0)
@@ -479,7 +479,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 	  return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
-      if ((ret = _gnutls_cipher_decrypt (session->connection_state.
+      if ((ret = _gnutls_cipher_decrypt (&session->connection_state.
 					 read_cipher_state,
 					 ciphertext.data,
 					 ciphertext.size)) < 0)

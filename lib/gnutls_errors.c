@@ -89,6 +89,9 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("The peer did not send any certificate."),
 	       GNUTLS_E_NO_CERTIFICATE_FOUND, 1),
 
+  ERROR_ENTRY (N_("There is already a crypto algorithm with lower priority."),
+	       GNUTLS_E_CRYPTO_ALREADY_REGISTERED, 0),
+
   ERROR_ENTRY (N_("No temporary RSA parameters were found."),
 	       GNUTLS_E_NO_TEMPORARY_RSA_PARAMS, 1),
   ERROR_ENTRY (N_("No temporary DH parameters were found."),

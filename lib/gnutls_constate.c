@@ -569,7 +569,7 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
     _gnutls_free_datum (&session->connection_state.read_mac_secret);
 
   if (session->connection_state.read_cipher_state != NULL)
-    _gnutls_cipher_deinit (session->connection_state.read_cipher_state);
+    _gnutls_cipher_deinit (&session->connection_state.read_cipher_state);
 
   if (session->connection_state.read_compression_state != NULL)
     _gnutls_comp_deinit (session->connection_state.read_compression_state, 1);
@@ -587,19 +587,15 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
     case GNUTLS_SERVER:
       /* initialize cipher session
        */
-      session->connection_state.read_cipher_state =
-	_gnutls_cipher_init (session->security_parameters.
-			     read_bulk_cipher_algorithm,
-			     &session->cipher_specs.
-			     client_write_key,
-			     &session->cipher_specs.client_write_IV);
-      if (session->connection_state.read_cipher_state ==
-	  GNUTLS_CIPHER_FAILED
-	  && session->security_parameters.
+      rc = _gnutls_cipher_init (&session->connection_state.read_cipher_state,
+             session->security_parameters.read_bulk_cipher_algorithm,
+   	     &session->cipher_specs.client_write_key,
+	     &session->cipher_specs.client_write_IV);
+      if (rc < 0)  && session->security_parameters.
 	  read_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
+	  return rc;
 	}
 
       /* copy mac secrets from cipherspecs, to connection
@@ -623,16 +619,12 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
       break;
 
     case GNUTLS_CLIENT:
-      session->connection_state.read_cipher_state =
-	_gnutls_cipher_init (session->security_parameters.
-			     read_bulk_cipher_algorithm,
-			     &session->cipher_specs.
-			     server_write_key,
-			     &session->cipher_specs.server_write_IV);
+	rc = _gnutls_cipher_init (&session->connection_state.read_cipher_state,
+              session->security_parameters.read_bulk_cipher_algorithm,
+ 	      &session->cipher_specs.server_write_key,
+              &session->cipher_specs.server_write_IV);
 
-      if (session->connection_state.read_cipher_state ==
-	  GNUTLS_CIPHER_FAILED
-	  && session->security_parameters.
+      if (rc < 0 && session->security_parameters.
 	  read_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL)
 	{
 	  gnutls_assert ();
@@ -760,7 +752,7 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
     _gnutls_free_datum (&session->connection_state.write_mac_secret);
 
   if (session->connection_state.write_cipher_state != NULL)
-    _gnutls_cipher_deinit (session->connection_state.write_cipher_state);
+    _gnutls_cipher_deinit (&session->connection_state.write_cipher_state);
 
   if (session->connection_state.write_compression_state != NULL)
     _gnutls_comp_deinit (session->connection_state.
@@ -778,16 +770,15 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
     case GNUTLS_SERVER:
       /* initialize cipher session
        */
-      session->connection_state.write_cipher_state =
-	_gnutls_cipher_init (session->security_parameters.
+      rc = _gnutls_cipher_init (
+	                     &connection_state.write_cipher_state,
+	                     session->security_parameters.
 			     write_bulk_cipher_algorithm,
 			     &session->cipher_specs.
 			     server_write_key,
 			     &session->cipher_specs.server_write_IV);
 
-      if (session->connection_state.write_cipher_state ==
-	  GNUTLS_CIPHER_FAILED
-	  && session->security_parameters.
+      if (rc < 0 && session->security_parameters.
 	  write_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL)
 	{
 	  gnutls_assert ();
@@ -817,16 +808,14 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
       break;
 
     case GNUTLS_CLIENT:
-      session->connection_state.write_cipher_state =
-	_gnutls_cipher_init (session->security_parameters.
+	rc = _gnutls_cipher_init (&connection_state.write_cipher_state,
+                             session->security_parameters.
 			     write_bulk_cipher_algorithm,
 			     &session->cipher_specs.
 			     client_write_key,
 			     &session->cipher_specs.client_write_IV);
 
-      if (session->connection_state.write_cipher_state ==
-	  GNUTLS_CIPHER_FAILED
-	  && session->security_parameters.
+      if (rc < 0 && session->security_parameters.
 	  write_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL)
 	{
 	  gnutls_assert ();

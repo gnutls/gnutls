@@ -8,8 +8,13 @@ See the end for copying conditions.
 ** Finish renaming of gnutls_certificate_export_x509_cas etc.
 They weren't renamed in the public header file.
 
+** Added functions to register a cipher/mac/digest. This allows to 
+override the included ones.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_crypto_cipher_register: ADDED
+gnutls_crypto_mac_register: ADDED
+gnutls_crypto_digest_register: ADDED
 
 * Version 2.3.3 (released 2008-03-10)
 
