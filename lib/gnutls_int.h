@@ -437,8 +437,9 @@ typedef struct
   gnutls_buffer application_data_buffer;	/* holds data to be delivered to application layer */
   gnutls_buffer handshake_hash_buffer;	/* used to keep the last received handshake 
 					 * message */
-  mac_hd_t handshake_mac_handle_sha;	/* hash of the handshake messages */
-  mac_hd_t handshake_mac_handle_md5;	/* hash of the handshake messages */
+  digest_hd_st handshake_mac_handle_sha;	/* hash of the handshake messages */
+  digest_hd_st handshake_mac_handle_md5;	/* hash of the handshake messages */
+  int handshake_mac_handle_init; /* 1 when the previous two were initialized */
 
   gnutls_buffer handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
   gnutls_buffer ia_data_buffer;	/* holds inner application data (TLS/IA) */

@@ -543,7 +543,7 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
 		    const gnutls_datum_t * data, void *result,
 		    size_t * result_size)
 {
-  GNUTLS_HASH_HANDLE td;
+  digest_hd_st td;
   int hash_len = _gnutls_hash_get_algo_len (HASH2MAC (algo));
 
   if (hash_len < 0 || (unsigned) hash_len > *result_size || result == NULL)
@@ -555,13 +555,15 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
 
   if (result)
     {
-      td = _gnutls_hash_init (HASH2MAC (algo));
-      if (td == NULL)
-	return GNUTLS_E_HASH_FAILED;
+      int ret = _gnutls_hash_init (&td, HASH2MAC (algo));
+      if (ret < 0) {
+        gnutls_assert();
+	return ret;
+      }
 
-      _gnutls_hash (td, data->data, data->size);
+      _gnutls_hash (&td, data->data, data->size);
 
-      _gnutls_hash_deinit (td, result);
+      _gnutls_hash_deinit (&td, result);
     }
 
   return 0;

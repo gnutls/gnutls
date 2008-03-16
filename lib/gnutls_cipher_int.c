@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -29,10 +29,10 @@
 #include <gnutls/crypto.h>
 #include <crypto.h>
 
-#define SR(x) if ( (x)<0 ) { \
+#define SR(x, cleanup) if ( (x)<0 ) { \
   gnutls_assert(); \
   err = GNUTLS_E_INTERNAL_ERROR; \
-  goto cc_cleanup; \
+  goto cleanup; \
   }
 
 int
@@ -44,14 +44,14 @@ _gnutls_cipher_init (cipher_hd_st* handle, gnutls_cipher_algorithm_t cipher,
 
   /* check if a cipher has been registered 
    */
-  cc = _gnutls_get_registered_cipher( cipher);
+  cc = _gnutls_get_crypto_cipher( cipher);
   if (cc != NULL) {
     handle->registered = 1;
     handle->hd.rh.cc = cc;
-    SR( cc->init(&handle->hd.rh.ctx) );
-    SR(cc->setkey( handle->hd.rh.ctx, key->data, key->size));
+    SR( cc->init(&handle->hd.rh.ctx), cc_cleanup );
+    SR(cc->setkey( handle->hd.rh.ctx, key->data, key->size), cc_cleanup);
     if (iv->data && iv->size && cc->setiv)
-      SR(cc->setiv( handle->hd.rh.ctx, iv->data, iv->size));
+      SR(cc->setiv( handle->hd.rh.ctx, iv->data, iv->size), cc_cleanup);
     return 0;
   }
 
@@ -167,7 +167,7 @@ _gnutls_cipher_deinit (cipher_hd_st* handle)
 {
   if (handle != GNUTLS_CIPHER_FAILED)
     {
-      if (handle->registered) {
+      if (handle->registered && handle->hd.rh.ctx != NULL) {
         return handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
       }
       gc_cipher_close (handle);

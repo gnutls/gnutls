@@ -1417,7 +1417,7 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
 				size_t * output_data_size)
 {
   int result;
-  GNUTLS_HASH_HANDLE hd;
+  digest_hd_st hd;
   gnutls_datum_t der = { NULL, 0 };
 
   if (key == NULL || key->crippled)
@@ -1457,17 +1457,16 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
   else
     return GNUTLS_E_INTERNAL_ERROR;
 
-  hd = _gnutls_hash_init (GNUTLS_MAC_SHA1);
-  if (hd == GNUTLS_HASH_FAILED)
+  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
+  if (result < 0)
     {
       gnutls_assert ();
-      result = GNUTLS_E_INTERNAL_ERROR;
       goto cleanup;
     }
 
-  _gnutls_hash (hd, der.data, der.size);
+  _gnutls_hash (&hd, der.data, der.size);
 
-  _gnutls_hash_deinit (hd, output_data);
+  _gnutls_hash_deinit (&hd, output_data);
   *output_data_size = 20;
 
   result = 0;

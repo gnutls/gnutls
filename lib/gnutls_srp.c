@@ -172,7 +172,7 @@ _gnutls_calc_srp_u (mpi_t A, mpi_t B, mpi_t n)
   size_t b_size, a_size;
   opaque *holder, hd[MAX_HASH_SIZE];
   size_t holder_size, hash_size, n_size;
-  GNUTLS_HASH_HANDLE td;
+  digest_hd_st td;
   int ret;
   mpi_t res;
 
@@ -197,15 +197,15 @@ _gnutls_calc_srp_u (mpi_t A, mpi_t B, mpi_t n)
   _gnutls_mpi_print (&holder[n_size - a_size], &a_size, A);
   _gnutls_mpi_print (&holder[n_size + n_size - b_size], &b_size, B);
 
-  td = _gnutls_hash_init (GNUTLS_MAC_SHA1);
-  if (td == NULL)
+  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
+  if (ret < 0)
     {
       gnutls_free (holder);
       gnutls_assert ();
       return NULL;
     }
-  _gnutls_hash (td, holder, holder_size);
-  _gnutls_hash_deinit (td, hd);
+  _gnutls_hash (&td, holder, holder_size);
+  _gnutls_hash_deinit (&td, hd);
 
   /* convert the bytes of hd to integer
    */
@@ -301,32 +301,33 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
 		      opaque * salt, int salt_size, size_t * size,
 		      void *digest)
 {
-  GNUTLS_HASH_HANDLE td;
+  digest_hd_st td;
   opaque res[MAX_HASH_SIZE];
-
+  int ret;
+  
   *size = 20;
 
-  td = _gnutls_hash_init (GNUTLS_MAC_SHA1);
-  if (td == NULL)
+  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
+  if (ret < 0)
     {
       return GNUTLS_E_MEMORY_ERROR;
     }
-  _gnutls_hash (td, username, strlen (username));
-  _gnutls_hash (td, ":", 1);
-  _gnutls_hash (td, password, strlen (password));
+  _gnutls_hash (&td, username, strlen (username));
+  _gnutls_hash (&td, ":", 1);
+  _gnutls_hash (&td, password, strlen (password));
 
-  _gnutls_hash_deinit (td, res);
+  _gnutls_hash_deinit (&td, res);
 
-  td = _gnutls_hash_init (GNUTLS_MAC_SHA1);
-  if (td == NULL)
+  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
+  if (ret < 0)
     {
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_hash (td, salt, salt_size);
-  _gnutls_hash (td, res, 20);	/* 20 bytes is the output of sha1 */
+  _gnutls_hash (&td, salt, salt_size);
+  _gnutls_hash (&td, res, 20);	/* 20 bytes is the output of sha1 */
 
-  _gnutls_hash_deinit (td, digest);
+  _gnutls_hash_deinit (&td, digest);
 
   return 0;
 }

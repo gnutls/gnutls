@@ -2028,7 +2028,7 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int i, result = 0;
   gnutls_datum_t der = { NULL, 0 };
-  GNUTLS_HASH_HANDLE hd;
+  digest_hd_st hd;
 
   result = _gnutls_x509_crt_get_mpis (crt, params, &params_size);
   if (result < 0)
@@ -2058,17 +2058,16 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
   else
     return GNUTLS_E_INTERNAL_ERROR;
 
-  hd = _gnutls_hash_init (GNUTLS_MAC_SHA1);
-  if (hd == GNUTLS_HASH_FAILED)
+  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
+  if (result < 0)
     {
       gnutls_assert ();
-      result = GNUTLS_E_INTERNAL_ERROR;
       goto cleanup;
     }
 
-  _gnutls_hash (hd, der.data, der.size);
+  _gnutls_hash (&hd, der.data, der.size);
 
-  _gnutls_hash_deinit (hd, output_data);
+  _gnutls_hash_deinit (&hd, output_data);
   *output_data_size = 20;
 
   result = 0;

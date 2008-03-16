@@ -133,18 +133,18 @@ pkcs1_rsa_sign (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];
-  GNUTLS_HASH_HANDLE hd;
+  digest_hd_st hd;
   gnutls_datum_t digest, info;
 
-  hd = _gnutls_hash_init (HASH2MAC (hash));
-  if (hd == NULL)
+  ret = _gnutls_hash_init (&hd, HASH2MAC (hash));
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_HASH_FAILED;
+      return ret;
     }
 
-  _gnutls_hash (hd, text->data, text->size);
-  _gnutls_hash_deinit (hd, _digest);
+  _gnutls_hash (&hd, text->data, text->size);
+  _gnutls_hash_deinit (&hd, _digest);
 
   digest.data = _digest;
   digest.size = _gnutls_hash_get_algo_len (HASH2MAC (hash));
@@ -177,18 +177,18 @@ dsa_sign (const gnutls_datum_t * text,
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];
-  GNUTLS_HASH_HANDLE hd;
+  digest_hd_st hd;
   gnutls_datum_t digest;
 
-  hd = _gnutls_hash_init (GNUTLS_MAC_SHA1);
-  if (hd == NULL)
+  ret = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_HASH_FAILED;
+      return ret;
     }
 
-  _gnutls_hash (hd, text->data, text->size);
-  _gnutls_hash_deinit (hd, _digest);
+  _gnutls_hash (&hd, text->data, text->size);
+  _gnutls_hash_deinit (&hd, _digest);
 
   digest.data = _digest;
   digest.size = 20;

@@ -71,10 +71,8 @@ int _gnutls_server_select_comp_method (gnutls_session_t session,
 inline static void
 _gnutls_handshake_hash_buffers_clear (gnutls_session_t session)
 {
-  _gnutls_hash_deinit (session->internals.handshake_mac_handle_md5, NULL);
-  _gnutls_hash_deinit (session->internals.handshake_mac_handle_sha, NULL);
-  session->internals.handshake_mac_handle_md5 = NULL;
-  session->internals.handshake_mac_handle_sha = NULL;
+  _gnutls_hash_deinit (&session->internals.handshake_mac_handle_md5, NULL);
+  _gnutls_hash_deinit (&session->internals.handshake_mac_handle_sha, NULL);
   _gnutls_handshake_buffer_clear (session);
 }
 
@@ -146,23 +144,24 @@ static int
 _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
 {
   const int siz = SSL_MSG_LEN;
-  mac_hd_t td_md5;
-  mac_hd_t td_sha;
+  digest_hd_st td_md5;
+  digest_hd_st td_sha;
   const char *mesg;
+  int rc;
 
-  td_md5 = _gnutls_hash_copy (session->internals.handshake_mac_handle_md5);
-  if (td_md5 == NULL)
+  rc = _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle_md5);
+  if (rc < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_HASH_FAILED;
+      return rc;
     }
 
-  td_sha = _gnutls_hash_copy (session->internals.handshake_mac_handle_sha);
-  if (td_sha == NULL)
+  rc = _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
+  if (rc < 0)
     {
       gnutls_assert ();
-      _gnutls_hash_deinit (td_md5, NULL);
-      return GNUTLS_E_HASH_FAILED;
+      _gnutls_hash_deinit (&td_md5, NULL);
+      return rc;
     }
 
   if (type == GNUTLS_SERVER)
@@ -174,13 +173,13 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
       mesg = SSL3_CLIENT_MSG;
     }
 
-  _gnutls_hash (td_md5, mesg, siz);
-  _gnutls_hash (td_sha, mesg, siz);
+  _gnutls_hash (&td_md5, mesg, siz);
+  _gnutls_hash (&td_sha, mesg, siz);
 
-  _gnutls_mac_deinit_ssl3_handshake (td_md5, ret,
+  _gnutls_mac_deinit_ssl3_handshake (&td_md5, ret,
 				     session->security_parameters.
 				     master_secret, TLS_MASTER_SIZE);
-  _gnutls_mac_deinit_ssl3_handshake (td_sha, &ret[16],
+  _gnutls_mac_deinit_ssl3_handshake (&td_sha, &ret[16],
 				     session->security_parameters.
 				     master_secret, TLS_MASTER_SIZE);
 
@@ -199,37 +198,38 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
   opaque concat[36];
   size_t len;
   const char *mesg;
-  mac_hd_t td_md5 = NULL;
-  mac_hd_t td_sha;
+  digest_hd_st td_md5;
+  digest_hd_st td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  int rc;
 
   if (ver < GNUTLS_TLS1_2)
     {
-      td_md5 = _gnutls_hash_copy (session->internals.handshake_mac_handle_md5);
-      if (td_md5 == NULL)
+      rc = _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle_md5);
+      if (rc < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_HASH_FAILED;
+	  return rc;
 	}
     }
 
-  td_sha = _gnutls_hash_copy (session->internals.handshake_mac_handle_sha);
-  if (td_sha == NULL)
+  rc = _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
+  if (rc < 0)
     {
       gnutls_assert ();
-      _gnutls_hash_deinit (td_md5, NULL);
-      return GNUTLS_E_HASH_FAILED;
+      _gnutls_hash_deinit (&td_md5, NULL);
+      return rc;
     }
 
   if (ver < GNUTLS_TLS1_2)
     {
-      _gnutls_hash_deinit (td_md5, concat);
-      _gnutls_hash_deinit (td_sha, &concat[16]);
+      _gnutls_hash_deinit (&td_md5, concat);
+      _gnutls_hash_deinit (&td_sha, &concat[16]);
       len = 20 + 16;
     }
   else
     {
-      _gnutls_hash_deinit (td_sha, concat);
+      _gnutls_hash_deinit (&td_sha, concat);
       len = 20;
     }
 
@@ -483,8 +483,7 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
   int ret;
   opaque *data;
 
-  if (session->internals.handshake_mac_handle_sha == NULL ||
-      session->internals.handshake_mac_handle_md5 == NULL)
+  if (session->internals.handshake_mac_handle_init == 0)
     {
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
@@ -500,8 +499,8 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
 
   if (siz > 0)
     {
-      _gnutls_hash (session->internals.handshake_mac_handle_sha, data, siz);
-      _gnutls_hash (session->internals.handshake_mac_handle_md5, data, siz);
+      _gnutls_hash (&session->internals.handshake_mac_handle_sha, data, siz);
+      _gnutls_hash (&session->internals.handshake_mac_handle_md5, data, siz);
     }
 
   _gnutls_handshake_buffer_empty (session);
@@ -888,9 +887,9 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
 
   if (type != GNUTLS_HANDSHAKE_HELLO_REQUEST)
     {
-      _gnutls_hash (session->internals.handshake_mac_handle_sha, dataptr,
+      _gnutls_hash (&session->internals.handshake_mac_handle_sha, dataptr,
 		    datalen);
-      _gnutls_hash (session->internals.handshake_mac_handle_md5, dataptr,
+      _gnutls_hash (&session->internals.handshake_mac_handle_md5, dataptr,
 		    datalen);
     }
 
@@ -2109,27 +2108,25 @@ inline static int
 _gnutls_handshake_hash_init (gnutls_session_t session)
 {
 
-  if (session->internals.handshake_mac_handle_md5 == NULL)
+  if (session->internals.handshake_mac_handle_init == 0)
     {
-      session->internals.handshake_mac_handle_md5 =
-	_gnutls_hash_init (GNUTLS_MAC_MD5);
+      int ret =
+	_gnutls_hash_init (&session->internals.handshake_mac_handle_md5, GNUTLS_MAC_MD5);
 
-      if (session->internals.handshake_mac_handle_md5 == GNUTLS_HASH_FAILED)
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+
+      ret = _gnutls_hash_init(&session->internals.handshake_mac_handle_sha, GNUTLS_MAC_SHA1);
+      if (ret < 0)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
-    }
-
-  if (session->internals.handshake_mac_handle_sha == NULL)
-    {
-      session->internals.handshake_mac_handle_sha =
-	_gnutls_hash_init (GNUTLS_MAC_SHA1);
-      if (session->internals.handshake_mac_handle_sha == GNUTLS_HASH_FAILED)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	
+      session->internals.handshake_mac_handle_init = 1;
     }
 
   return 0;

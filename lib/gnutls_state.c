@@ -376,10 +376,8 @@ gnutls_deinit (gnutls_session_t session)
   gnutls_credentials_clear (session);
   _gnutls_selected_certs_deinit (session);
 
-  if (session->connection_state.read_cipher_state != NULL)
-    _gnutls_cipher_deinit (&session->connection_state.read_cipher_state);
-  if (session->connection_state.write_cipher_state != NULL)
-    _gnutls_cipher_deinit (&session->connection_state.write_cipher_state);
+  _gnutls_cipher_deinit (&session->connection_state.read_cipher_state);
+  _gnutls_cipher_deinit (&session->connection_state.write_cipher_state);
 
   if (session->connection_state.read_compression_state != NULL)
     _gnutls_comp_deinit (session->connection_state.read_compression_state, 1);
@@ -730,17 +728,18 @@ _gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
 		   const void *secret, int secret_size,
 		   const void *seed, int seed_size, void *result)
 {
-  mac_hd_t td1;
+  digest_hd_st td1;
+  int ret;
 
-  td1 = _gnutls_hmac_init (algorithm, secret, secret_size);
-  if (td1 == GNUTLS_MAC_FAILED)
+  ret = _gnutls_hmac_init (&td1, algorithm, secret, secret_size);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      return ret;
     }
 
-  _gnutls_hmac (td1, seed, seed_size);
-  _gnutls_hmac_deinit (td1, result);
+  _gnutls_hmac (&td1, seed, seed_size);
+  _gnutls_hmac_deinit (&td1, result);
 
   return 0;
 }
@@ -757,7 +756,7 @@ _gnutls_P_hash (gnutls_mac_algorithm_t algorithm,
 		int total_bytes, opaque * ret)
 {
 
-  mac_hd_t td2;
+  digest_hd_st td2;
   int i, times, how, blocksize, A_size;
   opaque final[20], Atmp[MAX_SEED_SIZE];
   int output_bytes, result;
@@ -786,11 +785,11 @@ _gnutls_P_hash (gnutls_mac_algorithm_t algorithm,
 
   for (i = 0; i < times; i++)
     {
-      td2 = _gnutls_hmac_init (algorithm, secret, secret_size);
-      if (td2 == GNUTLS_MAC_FAILED)
+      result = _gnutls_hmac_init (&td2, algorithm, secret, secret_size);
+      if (result < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
+	  return result;
 	}
 
       /* here we calculate A(i+1) */
@@ -799,15 +798,15 @@ _gnutls_P_hash (gnutls_mac_algorithm_t algorithm,
 			      A_size, Atmp)) < 0)
 	{
 	  gnutls_assert ();
-	  _gnutls_hmac_deinit (td2, final);
+	  _gnutls_hmac_deinit (&td2, final);
 	  return result;
 	}
 
       A_size = blocksize;
 
-      _gnutls_hmac (td2, Atmp, A_size);
-      _gnutls_hmac (td2, seed, seed_size);
-      _gnutls_hmac_deinit (td2, final);
+      _gnutls_hmac (&td2, Atmp, A_size);
+      _gnutls_hmac (&td2, seed, seed_size);
+      _gnutls_hmac_deinit (&td2, final);
 
       if ((1 + i) * blocksize < total_bytes)
 	{

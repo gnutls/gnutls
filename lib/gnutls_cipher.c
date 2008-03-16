@@ -193,29 +193,32 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
   return ret;
 }
 
-inline static mac_hd_t
-mac_init (gnutls_mac_algorithm_t mac, opaque * secret, int secret_size,
+inline static int
+mac_init (digest_hd_st* td, gnutls_mac_algorithm_t mac, opaque * secret, int secret_size,
 	  int ver)
 {
-  mac_hd_t td;
+int ret =  0;
 
   if (mac == GNUTLS_MAC_NULL)
-    return GNUTLS_MAC_FAILED;
+    {
+      gnutls_assert();
+      return GNUTLS_E_HASH_FAILED;
+    }
 
   if (ver == GNUTLS_SSL3)
     {				/* SSL 3.0 */
-      td = _gnutls_mac_init_ssl3 (mac, secret, secret_size);
+      ret = _gnutls_mac_init_ssl3 (td, mac, secret, secret_size);
     }
   else
     {				/* TLS 1.x */
-      td = _gnutls_hmac_init (mac, secret, secret_size);
+      ret = _gnutls_hmac_init (td, mac, secret, secret_size);
     }
 
-  return td;
+  return ret;
 }
 
 inline static void
-mac_deinit (mac_hd_t td, opaque * res, int ver)
+mac_deinit (digest_hd_st *td, opaque * res, int ver)
 {
   if (ver == GNUTLS_SSL3)
     {				/* SSL 3.0 */
@@ -298,7 +301,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   uint16_t c_length;
   uint8_t pad;
   int length, ret;
-  mac_hd_t td;
+  digest_hd_st td;
   uint8_t type = _type;
   uint8_t major, minor;
   int hash_size =
@@ -320,34 +323,33 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 
 
   /* Initialize MAC */
-  td = mac_init (session->security_parameters.write_mac_algorithm,
+  ret = mac_init (&td, session->security_parameters.write_mac_algorithm,
 		 session->connection_state.write_mac_secret.data,
 		 session->connection_state.write_mac_secret.size, ver);
 
-  if (td == GNUTLS_MAC_FAILED
-      && session->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL)
+  if (ret < 0 && session->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL)
     {
       gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      return ret;
     }
 
   c_length = _gnutls_conv_uint16 (compressed.size);
 
-  if (td != GNUTLS_MAC_FAILED)
+  if (session->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL)
     {				/* actually when the algorithm in not the NULL one */
-      _gnutls_hmac (td,
+      _gnutls_hmac (&td,
 		    UINT64DATA (session->connection_state.
 				write_sequence_number), 8);
 
-      _gnutls_hmac (td, &type, 1);
+      _gnutls_hmac (&td, &type, 1);
       if (ver >= GNUTLS_TLS1)
 	{			/* TLS 1.0 or higher */
-	  _gnutls_hmac (td, &major, 1);
-	  _gnutls_hmac (td, &minor, 1);
+	  _gnutls_hmac (&td, &major, 1);
+	  _gnutls_hmac (&td, &minor, 1);
 	}
-      _gnutls_hmac (td, &c_length, 2);
-      _gnutls_hmac (td, compressed.data, compressed.size);
-      mac_deinit (td, MAC, ver);
+      _gnutls_hmac (&td, &c_length, 2);
+      _gnutls_hmac (&td, compressed.data, compressed.size);
+      mac_deinit (&td, MAC, ver);
     }
 
 
@@ -424,7 +426,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   uint16_t c_length;
   uint8_t pad;
   int length;
-  mac_hd_t td;
+  digest_hd_st td;
   uint16_t blocksize;
   int ret, i, pad_failed = 0;
   uint8_t major, minor;
@@ -442,11 +444,11 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 
   /* initialize MAC 
    */
-  td = mac_init (session->security_parameters.read_mac_algorithm,
+  ret = mac_init (&td, session->security_parameters.read_mac_algorithm,
 		 session->connection_state.read_mac_secret.data,
 		 session->connection_state.read_mac_secret.size, ver);
 
-  if (td == GNUTLS_MAC_FAILED
+  if (ret < 0
       && session->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL)
     {
       gnutls_assert ();
@@ -537,24 +539,24 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   /* Pass the type, version, length and compressed through
    * MAC.
    */
-  if (td != GNUTLS_MAC_FAILED)
+  if (session->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL)
     {
-      _gnutls_hmac (td,
+      _gnutls_hmac (&td,
 		    UINT64DATA (session->connection_state.
 				read_sequence_number), 8);
 
-      _gnutls_hmac (td, &type, 1);
+      _gnutls_hmac (&td, &type, 1);
       if (ver >= GNUTLS_TLS1)
 	{			/* TLS 1.x */
-	  _gnutls_hmac (td, &major, 1);
-	  _gnutls_hmac (td, &minor, 1);
+	  _gnutls_hmac (&td, &major, 1);
+	  _gnutls_hmac (&td, &minor, 1);
 	}
-      _gnutls_hmac (td, &c_length, 2);
+      _gnutls_hmac (&td, &c_length, 2);
 
       if (length > 0)
-	_gnutls_hmac (td, ciphertext.data, length);
+	_gnutls_hmac (&td, ciphertext.data, length);
 
-      mac_deinit (td, MAC, ver);
+      mac_deinit (&td, MAC, ver);
     }
 
   /* This one was introduced to avoid a timing attack against the TLS

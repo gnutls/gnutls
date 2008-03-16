@@ -1442,7 +1442,8 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   int data_size;
   opaque *data = NULL, *key = NULL;
   gnutls_datum_t dkey, d_iv;
-  cipher_hd_t ch = NULL;
+  cipher_hd_st ch;
+  int ch_init = 0;
   int key_size;
 
   data_size = 0;
@@ -1520,19 +1521,20 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
 
   d_iv.data = (opaque *) enc_params->iv;
   d_iv.size = enc_params->iv_size;
-  ch = _gnutls_cipher_init (enc_params->cipher, &dkey, &d_iv);
+  result = _gnutls_cipher_init (&ch, enc_params->cipher, &dkey, &d_iv);
 
   gnutls_afree (key);
   key = NULL;
 
-  if (ch == NULL)
+  if (result < 0)
     {
       gnutls_assert ();
-      result = GNUTLS_E_DECRYPTION_FAILED;
       goto error;
     }
+    
+  ch_init = 1;
 
-  result = _gnutls_cipher_decrypt (ch, data, data_size);
+  result = _gnutls_cipher_decrypt (&ch, data, data_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1546,15 +1548,15 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   else
     decrypted_data->size = data_size;
 
-  _gnutls_cipher_deinit (ch);
+  _gnutls_cipher_deinit (&ch);
 
   return 0;
 
 error:
   gnutls_free (data);
   gnutls_afree (key);
-  if (ch != NULL)
-    _gnutls_cipher_deinit (ch);
+  if (ch_init != 0)
+    _gnutls_cipher_deinit (&ch);
   return result;
 }
 
@@ -1937,7 +1939,8 @@ encrypt_data (const gnutls_datum_t * plain,
   int data_size;
   opaque *data = NULL;
   gnutls_datum_t d_iv;
-  cipher_hd_t ch = NULL;
+  cipher_hd_st ch;
+  int ch_init = 0;
   opaque pad, pad_size;
 
   pad_size = _gnutls_cipher_get_block_size (enc_params->cipher);
@@ -1968,16 +1971,17 @@ encrypt_data (const gnutls_datum_t * plain,
 
   d_iv.data = (opaque *) enc_params->iv;
   d_iv.size = enc_params->iv_size;
-  ch = _gnutls_cipher_init (enc_params->cipher, key, &d_iv);
+  result = _gnutls_cipher_init (&ch, enc_params->cipher, key, &d_iv);
 
-  if (ch == GNUTLS_CIPHER_FAILED)
+  if (result < 0)
     {
       gnutls_assert ();
-      result = GNUTLS_E_ENCRYPTION_FAILED;
       goto error;
     }
 
-  result = _gnutls_cipher_encrypt (ch, data, data_size);
+  ch_init = 1;
+
+  result = _gnutls_cipher_encrypt (&ch, data, data_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1987,14 +1991,14 @@ encrypt_data (const gnutls_datum_t * plain,
   encrypted->data = data;
   encrypted->size = data_size;
 
-  _gnutls_cipher_deinit (ch);
+  _gnutls_cipher_deinit (&ch);
 
   return 0;
 
 error:
   gnutls_free (data);
-  if (ch != NULL)
-    _gnutls_cipher_deinit (ch);
+  if (ch_init != 0)
+    _gnutls_cipher_deinit (&ch);
   return result;
 }
 
