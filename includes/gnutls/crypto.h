@@ -36,19 +36,15 @@ typedef struct gnutls_crypto_cipher {
 
 typedef struct gnutls_crypto_mac {
   int (*init)( void** ctx);
-  int (*mac)( void* ctx, const void * text, int textsize);
-  int (*copy)( void* src_ctx, void* dst_ctx);
+  int (*setkey)( void* ctx, const void * key, int keysize);
+  int (*hash)( void* ctx, const void * text, int textsize);
+  int (*copy)( void** dst_ctx, void* src_ctx);
   int (*output) ( void* src_ctx, void* digest, int digestsize);
   void (*deinit)( void* ctx);
 } gnutls_crypto_mac_st;
 
-typedef struct gnutls_crypto_digest {
-  int (*init)( void** ctx);
-  int (*digest)( void* ctx, const void * text, int textsize);
-  int (*copy)( void* src_ctx, void* dst_ctx);
-  int (*output) ( void* src_ctx, void* digest, int digestsize);
-  void (*deinit)( void* ctx);
-} gnutls_crypto_digest_st;
+/* the same... setkey should be null */
+typedef gnutls_crypto_mac_st gnutls_crypto_digest_st;
 
 /* priority: infinity for backend algorithms, 90 for kernel algorithms - lowest wins 
  */
