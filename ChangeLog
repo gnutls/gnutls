@@ -1,3 +1,124 @@
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* includes/Makefile.am: Dist gnutls/crypto.h.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.4.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-resume.c, lib/crypto.c,
+	lib/gnutls_compress_int.c, lib/gnutls_extensions.c,
+	lib/gnutls_handshake.c, lib/gnutls_openpgp.c, lib/openpgp/extras.c,
+	lib/openpgp/output.c, lib/openpgp/pgp.c, lib/openpgp/privkey.c,
+	libextra/gnutls_extra.c, libextra/gnutls_ia.c, src/certtool.c,
+	src/serv.c: Fix gcc warnings.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Fix warning.
+
+2008-03-16  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_cipher_int.c, lib/gnutls_cipher_int.h,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h: fixes for all tests to
+	succeed.
+
+2008-03-16  Nikos <nmav@crystal.(none)>
+
+	* includes/gnutls/crypto.h: updated
+
+2008-03-16  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_cipher.c, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_constate.c,
+	lib/gnutls_handshake.c, lib/gnutls_hash_int.c,
+	lib/gnutls_hash_int.h, lib/gnutls_int.h, lib/gnutls_sig.c,
+	lib/gnutls_srp.c, lib/gnutls_state.c, lib/gnutls_ui.c,
+	lib/x509/pkcs12.c, lib/x509/privkey.c, lib/x509/privkey_pkcs8.c,
+	lib/x509/sign.c, lib/x509/verify.c, lib/x509/x509.c: several fixes
+	in the cipher (register) interface and added hash.
+
+2008-03-16  Nikos <nmav@crystal.(none)>
+
+	* NEWS, includes/gnutls/crypto.h, includes/gnutls/gnutls.h.in,
+	lib/Makefile.am, lib/crypto.c, lib/crypto.h, lib/gnutls_cipher.c,
+	lib/gnutls_cipher_int.c, lib/gnutls_cipher_int.h,
+	lib/gnutls_constate.c, lib/gnutls_errors.c, lib/gnutls_int.h,
+	lib/gnutls_state.c: Added functionality to override (register) a
+	cipher. Initial functionality for MAC and digest algorithms.
+
+2008-03-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/gnutls_openpgp.h: Remove things already in
+	includes/gnutls/openpgp.h.
+
+2008-03-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_openpgp.c, lib/opencdk/Makefile.am,
+	lib/opencdk/armor.c, lib/opencdk/context.h, lib/opencdk/filters.h,
+	lib/opencdk/hash.c, lib/opencdk/kbnode.c, lib/opencdk/keydb.c,
+	lib/opencdk/literal.c, lib/opencdk/main.c, lib/opencdk/main.h,
+	lib/opencdk/misc.c, lib/opencdk/new-packet.c,
+	lib/opencdk/opencdk.h, lib/opencdk/packet.h, lib/opencdk/pubkey.c,
+	lib/opencdk/read-packet.c, lib/opencdk/seskey.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c,
+	lib/opencdk/stream.h, lib/opencdk/types.h, lib/opencdk/verify.c,
+	lib/opencdk/write-packet.c, lib/openpgp/Makefile.am,
+	lib/openpgp/compat.c, lib/openpgp/extras.c, lib/openpgp/pgp.c,
+	lib/openpgp/pgpverify.c, lib/openpgp/privkey.c: Clean up license
+	headers for OpenPGP code.  According to Nikos they are now licensed
+	under the LGPL, see:
+
+	http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2658/focus=2659
+
+2008-03-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Typo.
+
+2008-03-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/gnulib-comp.m4, gl/m4/include_next.m4,
+	gl/m4/stdarg.m4, gl/stdarg.in.h, lgl/Makefile.am,
+	lgl/m4/absolute-header.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/include_next.m4: Update gnulib files.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh, gl/m4/fseeko.m4: Update gnulib files.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Finish renaming of export
+	x509/openpgp functions.  In particular,
+	gnutls_certificate_get_x509_cas, gnutls_certificate_get_x509_crls,
+	and gnutls_certificate_get_openpgp_keyring.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-03-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-03-10  Simon Josefsson <simon@josefsson.org>
 
 	* libextra/Makefile.am: Revert
