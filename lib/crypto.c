@@ -41,7 +41,7 @@ typedef struct algo_list {
 static int _algo_register( algo_list* al, int algorithm, int priority, void* s)
 {
 algo_list* cl;
-algo_list* last_cl;
+algo_list* last_cl = NULL;
 
   /* look if there is any cipher with lowest priority. In that case do not add.
    */

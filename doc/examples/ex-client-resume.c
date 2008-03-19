@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -37,8 +37,8 @@ main (void)
   /* variables used in session resuming 
    */
   int t;
-  char *session_data;
-  size_t session_data_size;
+  char *session_data = NULL;
+  size_t session_data_size = 0;
 
   gnutls_global_init ();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -358,10 +358,10 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   pos += 2;
 
   neg_version = _gnutls_negotiate_version( session, adv_version);
-  if (neg_version < 0) 
+  if (neg_version < 0)
     {
       gnutls_assert();
-      return ret;
+      return neg_version;
     }
 
   /* Read client random value.

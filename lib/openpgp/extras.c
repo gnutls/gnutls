@@ -130,7 +130,7 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 {
   cdk_error_t err;
   cdk_stream_t input = NULL;
-  size_t raw_len = 0, i;
+  size_t raw_len = 0;
   opaque *raw_data = NULL;
 
   _gnutls_debug_log ("PGP: keyring import format '%s'\n",

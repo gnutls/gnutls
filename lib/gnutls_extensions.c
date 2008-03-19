@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -75,7 +75,7 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
                           EXTENSION_TLS,
 			  _gnutls_inner_application_recv_params,
 			  _gnutls_inner_application_send_params),
-  {0, 0, 0, 0}
+  {NULL, 0, 0, NULL, NULL}
 };
 
 #define GNUTLS_EXTENSION_LOOP2(b) \

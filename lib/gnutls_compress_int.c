@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -109,8 +109,8 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
 	break;
       }
 #endif
-#ifdef USE_LZO
     case GNUTLS_COMP_LZO:
+#ifdef USE_LZO
       if (d)
 	{			/* LZO does not use memory on decompressor *//* ret->handle = NULL; */
 	}
@@ -124,10 +124,10 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
 	      goto cleanup_ret;
 	    }
 	}
-
-      break;
 #endif
+      break;
     case GNUTLS_COMP_NULL:
+    case GNUTLS_COMP_UNKNOWN:
       break;
     }
   return ret;

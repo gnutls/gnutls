@@ -97,8 +97,6 @@ static int _gnutls_init_extra = 0;
 int
 gnutls_global_init_extra (void)
 {
-  int ret;
-
   /* If the version of libgnutls != version of
    * libextra, then do not initialize the library.
    * This is because it may break things.
