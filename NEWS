@@ -12,6 +12,9 @@ They weren't renamed in the public header file.
 override the included ones.
 
 ** API and ABI modifications:
+gnutls_crypto_cipher_st: ADDED
+gnutls_crypto_mac_st: ADDED
+gnutls_crypto_digest_st: ADDED
 gnutls_crypto_cipher_register: ADDED
 gnutls_crypto_mac_register: ADDED
 gnutls_crypto_digest_register: ADDED
