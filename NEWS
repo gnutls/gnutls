@@ -11,6 +11,8 @@ They weren't renamed in the public header file.
 ** Added functions to register a cipher/mac/digest. This allows to 
 override the included ones.
 
+** Fix a bunch of compiler warnings.
+
 ** API and ABI modifications:
 gnutls_crypto_cipher_st: ADDED
 gnutls_crypto_mac_st: ADDED
