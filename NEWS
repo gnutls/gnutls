@@ -15,6 +15,7 @@ override the included ones.
 gnutls_crypto_cipher_register: ADDED
 gnutls_crypto_mac_register: ADDED
 gnutls_crypto_digest_register: ADDED
+GNUTLS_E_CRYPTO_ALREADY_REGISTERED: ADDED
 
 * Version 2.3.3 (released 2008-03-10)
 
