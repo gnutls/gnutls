@@ -1,5 +1,5 @@
 #  GNUTLS -- Guile bindings for GnuTLS.
-#  Copyright (C) 2007  Free Software Foundation
+#  Copyright (C) 2007, 2008  Free Software Foundation
 #
 #  GNUTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -68,7 +68,16 @@ if HAVE_GCC
 # after `-Ws-p'.
 AM_CFLAGS += -Wno-strict-prototypes
 
-endif
+# The `-fgnu89-inline' option appeared in GCC 4.1.3.
+if HAVE_GCC_GNU89_INLINE_OPTION
+
+# Guile and GMP currently rely on GNU inline semantics, not C99 inline.
+AM_CFLAGS += -fgnu89-inline
+
+endif HAVE_GCC_GNU89_INLINE_OPTION
+
+endif HAVE_GCC
+
 
 enums.h: $(srcdir)/make-enum-header.scm
 	$(GUILE_FOR_BUILD) $^ > $@
@@ -103,8 +112,10 @@ extra-smob-types.i.c: $(srcdir)/make-smob-types.scm
 
 # C file snarfing.
 
+# `$(GUILE_CFLAGS)' may contain a series of `-I' switches so it must be
+# included here, even though we'd really want `$(GUILE_CPPFLAGS)'.
 snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	       $(CFLAGS) $(AM_CFLAGS)
+	       $(CFLAGS) $(AM_CFLAGS) $(GUILE_CFLAGS)
 
 .c.x:
 	$(guile_snarf) -o $@ $< $(snarfcppopts)
