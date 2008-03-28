@@ -6,7 +6,8 @@ See the end for copying conditions.
 * Version 2.3.5 (unreleased)
 
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_DIG_SHA224: ADDED
+GNUTLS_SIGN_RSA_SHA224: ADDED
 
 * Version 2.3.4 (released 2008-03-19)
 
@@ -26,8 +27,6 @@ gnutls_crypto_cipher_register: ADDED
 gnutls_crypto_mac_register: ADDED
 gnutls_crypto_digest_register: ADDED
 GNUTLS_E_CRYPTO_ALREADY_REGISTERED: ADDED
-GNUTLS_DIG_SHA224: ADDED
-GNUTLS_SIGN_RSA_SHA224: ADDED
 
 * Version 2.3.3 (released 2008-03-10)
 
