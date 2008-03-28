@@ -105,7 +105,7 @@ EXTRA_libgnu_la_SOURCES += getpass.c
 
 distclean-local: clean-GNUmakefile
 clean-GNUmakefile:
-	if test x"$(VPATH)" != x ; then rm -f $(top_srcdir)/GNUmakefile ; fi
+	test x'$(VPATH)' != x && rm -f $(top_builddir)/GNUmakefile || :
 
 EXTRA_DIST += $(top_srcdir)/GNUmakefile
 
