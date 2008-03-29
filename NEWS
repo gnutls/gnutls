@@ -9,6 +9,8 @@ See the end for copying conditions.
 Reported by Tim Mooney, see
 <https://savannah.gnu.org/support/?106267>.
 
+** Documented the --priority option to gnutls-cli and gnutls-serv.
+
 ** API and ABI modifications:
 No changes since last version.
 
