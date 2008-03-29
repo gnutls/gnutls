@@ -435,7 +435,7 @@ gnutls_ia_send (gnutls_session_t session, const char *data, size_t sizeofdata)
 ssize_t
 gnutls_ia_recv (gnutls_session_t session, char *data, size_t sizeofdata)
 {
-  gnutls_ia_apptype_t msg_type;
+  gnutls_ia_apptype_t msg_type = 0;
   ssize_t len;
 
   len = _gnutls_recv_inner_application (session, &msg_type, data, sizeofdata);

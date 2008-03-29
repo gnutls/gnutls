@@ -906,21 +906,22 @@ main (int argc, char **argv)
     }
 
   if (pgp_certfile != NULL)
+    {
+      if (info.pgp_subkey != NULL)
+	ret = gnutls_certificate_set_openpgp_key_file2
+	  (cert_cred, pgp_certfile, pgp_keyfile, info.pgp_subkey, GNUTLS_OPENPGP_FMT_BASE64);
+      else
+	ret = gnutls_certificate_set_openpgp_key_file
+	  (cert_cred, pgp_certfile, pgp_keyfile, GNUTLS_OPENPGP_FMT_BASE64);
 
-    if (info.pgp_subkey != NULL)
-      ret = gnutls_certificate_set_openpgp_key_file2
-	 (cert_cred, pgp_certfile, pgp_keyfile, info.pgp_subkey, GNUTLS_OPENPGP_FMT_BASE64);
-    else
-      ret = gnutls_certificate_set_openpgp_key_file
-	 (cert_cred, pgp_certfile, pgp_keyfile, GNUTLS_OPENPGP_FMT_BASE64);
-
-    if (ret < 0)
-      {
-	fprintf (stderr,
-		 "Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
-		 ret, pgp_certfile, pgp_keyfile);
-	GERR (ret);
-      }
+      if (ret < 0)
+	{
+	  fprintf (stderr,
+		   "Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
+		   ret, pgp_certfile, pgp_keyfile);
+	  GERR (ret);
+	}
+    }
 #endif
 
   if (x509_certfile != NULL)

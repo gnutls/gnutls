@@ -68,6 +68,9 @@ if HAVE_GCC
 # after `-Ws-p'.
 AM_CFLAGS += -Wno-strict-prototypes
 
+# Guile and GMP currently rely on GNU inline semantics, not C99 inline.
+AM_CFLAGS += -fgnu89-inline
+
 endif
 
 enums.h: $(srcdir)/make-enum-header.scm

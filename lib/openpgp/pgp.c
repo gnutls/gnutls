@@ -529,7 +529,7 @@ gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
 {
   char dnsname[MAX_CN];
   size_t dnsnamesize;
-  int ret;
+  int ret = 0;
   int i;
 
   /* Check through all included names. */
@@ -665,10 +665,8 @@ static cdk_packet_t _get_public_subkey(gnutls_openpgp_crt_t key, unsigned int in
 cdk_packet_t _gnutls_openpgp_find_key( cdk_kbnode_t knode, uint32_t keyid[2], 
   unsigned int priv)
 {
-  cdk_pkt_pubkey_t ret;
   cdk_kbnode_t p, ctx;
   cdk_packet_t pkt;
-  int subkeys;
   uint32_t local_keyid[2];
 
   ctx = NULL;
@@ -704,10 +702,9 @@ cdk_packet_t _gnutls_openpgp_find_key( cdk_kbnode_t knode, uint32_t keyid[2],
 int _gnutls_openpgp_find_subkey_idx( cdk_kbnode_t knode, uint32_t keyid[2], 
   unsigned int priv)
 {
-  cdk_pkt_pubkey_t ret;
   cdk_kbnode_t p, ctx;
   cdk_packet_t pkt;
-  int subkeys, i=0;
+  int i=0;
   uint32_t local_keyid[2];
 
   ctx = NULL;
@@ -918,7 +915,6 @@ int
 gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
 				   const gnutls_openpgp_keyid_t keyid)
 {
-  cdk_packet_t pkt;
   int ret;
   uint32_t kid[2];
 
@@ -980,7 +976,7 @@ int _gnutls_read_pgp_mpi( cdk_packet_t pkt, unsigned int priv, size_t idx, mpi_t
 size_t buf_size = 512;
 opaque * buf = gnutls_malloc( buf_size);
 int err;
-int max_pub_params;
+int max_pub_params = 0;
 
   if (priv !=0)
      max_pub_params = cdk_pk_get_npkey(pkt->pkt.secret_key->pk->pubkey_algo);
@@ -1053,7 +1049,7 @@ int
 _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert, uint32_t *keyid /* [2] */,
 			   mpi_t * params, int *params_size)
 {
-  int result, i, idx;
+  int result, i;
   int pk_algorithm, local_params;
   cdk_packet_t pkt;
 

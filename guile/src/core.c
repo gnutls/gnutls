@@ -1,5 +1,5 @@
 /* GNUTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007  Free Software Foundation
+   Copyright (C) 2007, 2008  Free Software Foundation
 
    GNUTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,7 @@
    License along with GNUTLS; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA  */
 
-/* Written by Ludovic Courtès <ludo@chbouib.org>.  */
+/* Written by Ludovic Courtès <ludo@gnu.org>.  */
 
 #include <stdio.h>
 #include <string.h>
@@ -1327,7 +1327,7 @@ typedef int (* certificate_set_data_function_t) (gnutls_certificate_credentials_
 						 gnutls_x509_crt_fmt_t);
 
 /* Helper function to implement the `set-file!' functions.  */
-static inline unsigned int
+static unsigned int
 set_certificate_file (certificate_set_file_function_t set_file,
 		      SCM cred, SCM file, SCM format,
 		      const char *func_name)

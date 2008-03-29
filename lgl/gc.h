@@ -1,9 +1,9 @@
 /* gc.h --- Header file for implementation agnostic crypto wrapper API.
- * Copyright (C) 2002, 2003, 2004, 2005, 2007  Simon Josefsson
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008  Simon Josefsson
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1, or (at your
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your
  * option) any later version.
  *
  * This file is distributed in the hope that it will be useful, but
@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU General Public License
  * along with this file; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
@@ -48,7 +48,8 @@ enum Gc_hash
   GC_RMD160,
   GC_SHA256,
   GC_SHA384,
-  GC_SHA512
+  GC_SHA512,
+  GC_SHA224
 };
 typedef enum Gc_hash Gc_hash;
 
@@ -68,6 +69,7 @@ typedef void *gc_hash_handle;
 #define GC_SHA256_DIGEST_SIZE 32
 #define GC_SHA384_DIGEST_SIZE 48
 #define GC_SHA512_DIGEST_SIZE 64
+#define GC_SHA224_DIGEST_SIZE 24
 
 /* Cipher types. */
 enum Gc_cipher

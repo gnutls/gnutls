@@ -2,8 +2,8 @@
  * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008  Simon Josefsson
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 2.1, or (at your
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your
  * option) any later version.
  *
  * This file is distributed in the hope that it will be useful, but
@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU General Public License
  * along with this file; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
@@ -294,6 +294,10 @@ gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
       gcryalg = GCRY_MD_SHA512;
       break;
 
+    case GC_SHA224:
+      gcryalg = GCRY_MD_SHA224;
+      break;
+
     case GC_RMD160:
       gcryalg = GCRY_MD_RMD160;
       break;
@@ -391,6 +395,10 @@ gc_hash_digest_length (Gc_hash hash)
 
     case GC_SHA512:
       len = GC_SHA512_DIGEST_SIZE;
+      break;
+
+    case GC_SHA224:
+      len = GC_SHA224_DIGEST_SIZE;
       break;
 
     default:
@@ -505,6 +513,12 @@ gc_hash_buffer (Gc_hash hash, const void *in, size_t inlen, char *resbuf)
 #ifdef GNULIB_GC_SHA512
     case GC_SHA512:
       gcryalg = GCRY_MD_SHA512;
+      break;
+#endif
+
+#ifdef GNULIB_GC_SHA224
+    case GC_SHA224:
+      gcryalg = GCRY_MD_SHA224;
       break;
 #endif
 

@@ -75,19 +75,6 @@ hexprint (gnutls_string * str, const char *data, size_t len)
     }
 }
 
-
-static void
-asciiprint (gnutls_string * str, const char *data, size_t len)
-{
-  size_t j;
-
-  for (j = 0; j < len; j++)
-    if (isprint (data[j]))
-      addf (str, "%c", (unsigned char) data[j]);
-    else
-      addf (str, ".");
-}
-
 static void
 print_key_usage (gnutls_string * str, gnutls_openpgp_crt_t cert, unsigned int idx)
 {
@@ -167,8 +154,6 @@ print_key_fingerprint (gnutls_string * str, gnutls_openpgp_crt_t cert)
 static void
 print_key_revoked (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 {
-    char fpr[128];
-    size_t fpr_size = sizeof (fpr);
     int err;
 
     if (idx < 0)

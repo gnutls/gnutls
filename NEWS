@@ -3,7 +3,13 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.3.4 (unreleased)
+* Version 2.3.5 (unreleased)
+
+** API and ABI modifications:
+GNUTLS_DIG_SHA224: ADDED
+GNUTLS_SIGN_RSA_SHA224: ADDED
+
+* Version 2.3.4 (released 2008-03-19)
 
 ** Finish renaming of gnutls_certificate_export_x509_cas etc.
 They weren't renamed in the public header file.
@@ -11,10 +17,16 @@ They weren't renamed in the public header file.
 ** Added functions to register a cipher/mac/digest. This allows to 
 override the included ones.
 
+** Fix a bunch of compiler warnings.
+
 ** API and ABI modifications:
+gnutls_crypto_cipher_st: ADDED
+gnutls_crypto_mac_st: ADDED
+gnutls_crypto_digest_st: ADDED
 gnutls_crypto_cipher_register: ADDED
 gnutls_crypto_mac_register: ADDED
 gnutls_crypto_digest_register: ADDED
+GNUTLS_E_CRYPTO_ALREADY_REGISTERED: ADDED
 
 * Version 2.3.3 (released 2008-03-10)
 

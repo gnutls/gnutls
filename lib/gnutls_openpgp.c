@@ -40,23 +40,6 @@
 
 #define datum_append(x, y, z) _gnutls_datum_append_m (x, y, z, gnutls_realloc)
 
-
-
-static void
-release_mpi_array (mpi_t * arr, size_t n)
-{
-  mpi_t x;
-
-  while (arr && n--)
-    {
-      x = *arr;
-      _gnutls_mpi_release (&x);
-      *arr = NULL;
-      arr++;
-    }
-}
-
-
 /* Map an OpenCDK error type to a GnuTLS error type. */
 int
 _gnutls_map_cdk_rc (int rc)
@@ -285,36 +268,6 @@ leave:
   cdk_kbnode_release (knode);
   return rc;
 }
-
-
-/* Convert the stream to a datum. In this case we use the mmap
-   function to map the entire stream to a buffer. */
-static int
-stream_to_datum (cdk_stream_t inp, gnutls_datum_t * raw)
-{
-  uint8_t *buf;
-  size_t buflen;
-
-  if (!inp || !raw)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  cdk_stream_mmap (inp, &buf, &buflen);
-  datum_append (raw, buf, buflen);
-  cdk_free (buf);
-
-  if (!buflen)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  return 0;
-}
-
-
 
 /**
  * gnutls_certificate_set_openpgp_key_mem - Used to set OpenPGP keys
@@ -645,9 +598,6 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
 					    c, const opaque * data,
 					    size_t dlen, gnutls_openpgp_crt_fmt_t format)
 {
-  cdk_stream_t inp;
-  size_t count;
-  uint8_t *buf;
   gnutls_datum ddata;
   int rc;
   

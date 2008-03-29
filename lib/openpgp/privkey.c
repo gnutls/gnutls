@@ -450,7 +450,6 @@ int
 gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key,
 				       const gnutls_openpgp_keyid_t keyid)
 {
-  cdk_packet_t pkt;
   int ret;
   uint32_t kid[2];
 

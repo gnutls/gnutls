@@ -97,8 +97,6 @@ static int _gnutls_init_extra = 0;
 int
 gnutls_global_init_extra (void)
 {
-  int ret;
-
   /* If the version of libgnutls != version of
    * libextra, then do not initialize the library.
    * This is because it may break things.
@@ -118,20 +116,24 @@ gnutls_global_init_extra (void)
   /* Initialize the LZO library
    */
 #ifdef USE_LZO
-  if (lzo_init () != LZO_E_OK)
-    {
-      return GNUTLS_E_LZO_INIT_FAILED;
-    }
+  {
+    int ret;
 
-  /* Add the LZO compression method in the list of compression
-   * methods.
-   */
-  ret = _gnutls_add_lzo_comp ();
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    if (lzo_init () != LZO_E_OK)
+      {
+	return GNUTLS_E_LZO_INIT_FAILED;
+      }
+
+    /* Add the LZO compression method in the list of compression
+     * methods.
+     */
+    ret = _gnutls_add_lzo_comp ();
+    if (ret < 0)
+      {
+	gnutls_assert ();
+	return ret;
+      }
+  }
 #endif
 
   return 0;

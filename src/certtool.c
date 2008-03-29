@@ -1034,7 +1034,7 @@ pgp_certificate_info (void)
 {
   gnutls_openpgp_crt_t crt;
   size_t size;
-  int ret, i, count;
+  int ret;
   gnutls_datum_t pem, out_data;
 
   pem.data = fread_file (infile, &size);
@@ -1085,7 +1085,6 @@ pgp_privkey_info (void)
   int ret, i, subkeys;
   gnutls_datum_t pem;
   const char *cprint;
-  const char *pass;
 
   size = fread (buffer, 1, sizeof (buffer) - 1, infile);
   buffer[size] = 0;
@@ -1211,7 +1210,7 @@ pgp_ring_info (void)
   gnutls_openpgp_crt_t crt;
   size_t size;
   int ret, i, count;
-  gnutls_datum_t pem, out_data;
+  gnutls_datum_t pem;
 
   pem.data = fread_file (infile, &size);
   pem.size = size;
@@ -1254,7 +1253,7 @@ pgp_ring_info (void)
 	}
 
       fwrite (buffer, 1, size, outfile);
-      fprintf (outfile, "\n\n", buffer);
+      fprintf (outfile, "\n\n");
 
       gnutls_openpgp_crt_deinit (crt);
 
