@@ -39,7 +39,7 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 #include <gnutls_num.h>
-#include <gc.h>
+#include <random.h>
 
 static int _randomize_pwd_entry (SRP_PWD_ENTRY * entry);
 
@@ -397,6 +397,7 @@ static int
 _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
 {
   unsigned char rnd;
+  int ret;
 
   if (entry->g.size == 0 || entry->n.size == 0)
     {
@@ -404,11 +405,13 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  if (gc_nonce (&rnd, 1) != GC_OK)
+  ret = _gnutls_rnd (RND_NONCE, &rnd, 1);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
+
   entry->salt.size = (rnd % 10) + 9;
 
   entry->v.data = gnutls_malloc (20);
@@ -419,10 +422,11 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  if (gc_nonce (entry->v.data, 20) != GC_OK)
+  ret = _gnutls_rnd (RND_RANDOM, entry->v.data, 20);
+  if ( ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   entry->salt.data = gnutls_malloc (entry->salt.size);
@@ -432,12 +436,13 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  if (gc_nonce (entry->salt.data, entry->salt.size) != GC_OK)
+  ret = _gnutls_rnd (RND_NONCE, entry->salt.data, entry->salt.size);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      gnutls_assert();
+      return ret;
     }
-
+    
   return 0;
 }
 

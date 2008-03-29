@@ -26,6 +26,7 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_dh.h>
+#include <random.h>
 
 #ifdef HAVE_WINSOCK
 # include <winsock2.h>
@@ -304,9 +305,14 @@ gnutls_global_init (void)
       result = _gnutls_asn2err (res);
       goto out;
     }
-    
-  /* Initialize the gcrypt (if used random generator) */
-  gc_pseudo_random (&c, 1);
+
+  /* Initialize the random generator */
+  result = _gnutls_rnd_init();
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto out;
+    }
 
 out:
   return result;
@@ -330,6 +336,7 @@ gnutls_global_deinit (void)
 #if HAVE_WINSOCK
       WSACleanup ();
 #endif
+      _gnutls_rnd_deinit();
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);
       gc_done ();

@@ -39,6 +39,7 @@
 #include "gnutls_kx.h"
 #include "gnutls_record.h"
 #include "gnutls_constate.h"
+#include <random.h>
 #include <gc.h>
 
 inline static int
@@ -236,7 +237,7 @@ calc_enc_length (gnutls_session_t session, int data_size,
 		 cipher_type_t block_algo, uint16_t blocksize)
 {
   uint8_t rnd;
-  int length;
+  int length, ret;
 
   *pad = 0;
 
@@ -247,10 +248,11 @@ calc_enc_length (gnutls_session_t session, int data_size,
 
       break;
     case CIPHER_BLOCK:
-      if (gc_nonce (&rnd, 1) != GC_OK)
+      ret =_gnutls_rnd (RND_NONCE, &rnd, 1);
+      if ( ret < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_RANDOM_FAILED;
+	  return ret;
 	}
 
       /* make rnd a multiple of blocksize */
@@ -378,11 +380,13 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
     {
       /* copy the random IV.
        */
-      if (gc_nonce (data_ptr, blocksize) != GC_OK)
+      ret = _gnutls_rnd (RND_NONCE, data_ptr, blocksize);
+      if (ret < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_RANDOM_FAILED;
+	  return ret;
 	}
+
       data_ptr += blocksize;
     }
 

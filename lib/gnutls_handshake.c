@@ -52,6 +52,7 @@
 #include <auth_anon.h>		/* for gnutls_anon_server_credentials_t */
 #include <auth_psk.h>		/* for gnutls_psk_server_credentials_t */
 #include <gc.h>
+#include <random.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_handshake_log( "HSK[%x]: %s (%d)\n", session, x,y)
@@ -253,6 +254,7 @@ int
 _gnutls_tls_create_random (opaque * dst)
 {
   uint32_t tim;
+  int ret;
 
   /* Use weak random numbers for the most of the
    * buffer except for the first 4 that are the
@@ -263,10 +265,11 @@ _gnutls_tls_create_random (opaque * dst)
   /* generate server random value */
   _gnutls_write_uint32 (tim, dst);
 
-  if (gc_nonce (&dst[4], TLS_RANDOM_SIZE - 4) != GC_OK)
+  ret = _gnutls_rnd (RND_NONCE, &dst[4], TLS_RANDOM_SIZE - 4);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   return 0;
@@ -2668,11 +2671,13 @@ int
 _gnutls_generate_session_id (opaque * session_id, uint8_t * len)
 {
   *len = TLS_MAX_SESSION_ID_SIZE;
+  int ret;
 
-  if (gc_nonce (session_id, *len) != GC_OK)
+  ret = _gnutls_rnd (RND_NONCE, session_id, *len);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   return 0;

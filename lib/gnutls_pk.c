@@ -36,7 +36,7 @@
 #include "debug.h"
 #include <x509/x509_int.h>
 #include <x509/common.h>
-#include <gc.h>
+#include <random.h>
 
 static int _gnutls_pk_encrypt (int algo, mpi_t * resarr, mpi_t data,
 			       mpi_t * pkey, int pkey_len);
@@ -102,20 +102,22 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-      if (gc_pseudo_random (ps, psize) != GC_OK)
+      ret = _gnutls_rnd (RND_RANDOM, ps, psize);
+      if ( ret < 0)
 	{
 	  gnutls_assert ();
 	  gnutls_afree (edata);
-	  return GNUTLS_E_RANDOM_FAILED;
+	  return ret;
 	}
       for (i = 0; i < psize; i++)
 	while (ps[i] == 0)
 	  {
-	    if (gc_pseudo_random (&ps[i], 1) != GC_OK)
+	    ret = _gnutls_rnd (RND_RANDOM, &ps[i], 1);
+	    if (ret < 0)
 	      {
 		gnutls_assert ();
 		gnutls_afree (edata);
-		return GNUTLS_E_RANDOM_FAILED;
+		return ret;
 	      }
 	  }
       break;

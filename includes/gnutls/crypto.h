@@ -43,6 +43,19 @@ typedef struct gnutls_crypto_mac {
   void (*deinit)( void* ctx);
 } gnutls_crypto_mac_st;
 
+typedef enum gnutls_rnd_level
+{
+  GNUTLS_RND_KEY = 0,
+  GNUTLS_RND_RANDOM = 1, /* unpredictable */
+  GNUTLS_RND_NONCE = 2,
+} gnutls_rnd_level_t;
+
+typedef struct gnutls_crypto_rnd {
+  int (*init)( void** ctx);
+  int (*rnd) ( void* ctx, int /* gnutls_rnd_level_t */ level, void* data, int datasize);
+  void (*deinit)( void* ctx);
+} gnutls_crypto_rnd_st;
+
 /* the same... setkey should be null */
 typedef gnutls_crypto_mac_st gnutls_crypto_digest_st;
 
@@ -51,5 +64,6 @@ typedef gnutls_crypto_mac_st gnutls_crypto_digest_st;
 int gnutls_crypto_cipher_register( gnutls_cipher_algorithm_t algorithm, int priority, gnutls_crypto_cipher_st* s);
 int gnutls_crypto_mac_register( gnutls_mac_algorithm_t algorithm, int priority, gnutls_crypto_mac_st* s);
 int gnutls_crypto_digest_register( gnutls_digest_algorithm_t algorithm, int priority, gnutls_crypto_digest_st* s);
+int gnutls_crypto_rnd_register( int priority, gnutls_crypto_rnd_st* s);
 
 #endif

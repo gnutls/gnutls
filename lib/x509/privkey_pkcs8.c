@@ -37,6 +37,7 @@
 #include <gnutls_algorithms.h>
 #include <gnutls_num.h>
 #include <gc.h>
+#include <random.h>
 
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
@@ -1752,10 +1753,11 @@ generate_key (schema_id schema,
   else if (schema == PKCS12_RC2_40_SHA1)
     enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
 
-  if (gc_pseudo_random (rnd, 2) != GC_OK)
+  ret = _gnutls_rnd( RND_RANDOM, rnd, 2);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   /* generate salt */
@@ -1766,7 +1768,8 @@ generate_key (schema_id schema,
   else
     kdf_params->salt_size = 8;
 
-  if (gc_pseudo_random (kdf_params->salt, kdf_params->salt_size) != GC_OK)
+  ret = _gnutls_rnd ( RND_RANDOM, kdf_params->salt, kdf_params->salt_size);
+  if ( ret < 0) 
     {
       gnutls_assert ();
       return GNUTLS_E_RANDOM_FAILED;
@@ -1801,12 +1804,15 @@ generate_key (schema_id schema,
 	  return GNUTLS_E_ENCRYPTION_FAILED;
 	}
 
-      if (enc_params->iv_size &&
-	  gc_nonce (enc_params->iv, enc_params->iv_size) != GC_OK)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_RANDOM_FAILED;
-	}
+      if (enc_params->iv_size)
+        {
+	  ret = _gnutls_rnd (RND_NONCE, enc_params->iv, enc_params->iv_size);
+	  if (ret < 0)
+  	    {
+	      gnutls_assert ();
+	      return ret;
+	    }
+        }
     }
   else
     {				/* PKCS12 schemas */
