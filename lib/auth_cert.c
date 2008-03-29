@@ -456,7 +456,7 @@ call_get_cert_callback (gnutls_session_t session,
   if (type == GNUTLS_CRT_X509)
     {
       local_certs = alloc_and_load_x509_certs (st.cert.x509, st.ncerts);
-      if (local_certs != NULL) 
+      if (local_certs != NULL && st.key.x509 != NULL) 
         {
 	  local_key = alloc_and_load_x509_key (st.key.x509);
  	  if (local_key == NULL)
@@ -480,7 +480,7 @@ call_get_cert_callback (gnutls_session_t session,
 #ifdef ENABLE_OPENPGP
       {
         local_certs = alloc_and_load_pgp_certs (st.cert.pgp);
-        if (local_certs != NULL)
+        if (local_certs != NULL && st.key.pgp != NULL)
           {
  	    local_key = alloc_and_load_pgp_key (st.key.pgp);
  	    if (local_key == NULL)
