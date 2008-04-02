@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** Documented the --priority option to gnutls-cli and gnutls-serv.
 
+** Several minor fixes in the OpenPGP interface. Thanks to Daniel Kahn
+Gillmor.
+
 ** API and ABI modifications:
 gnutls_crypto_rnd_register: ADDED
 GNUTLS_DIG_SHA224: ADDED
