@@ -174,7 +174,10 @@ gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
   int algo;
 
   if (!key)
-    return GNUTLS_PK_UNKNOWN;
+    {
+      gnutls_assert();
+      return GNUTLS_PK_UNKNOWN;
+    }
   
   algo = 0;
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_SECRET_KEY);
@@ -418,7 +421,10 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
   int algo;
 
   if (!key)
-    return GNUTLS_PK_UNKNOWN;
+    {
+      gnutls_assert();
+      return GNUTLS_PK_UNKNOWN;
+    }
   
   pkt = _get_secret_subkey( key, idx);
 

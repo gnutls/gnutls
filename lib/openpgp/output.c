@@ -162,7 +162,9 @@ print_key_revoked (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
       err = gnutls_openpgp_crt_get_subkey_revoked_status( cert, idx);
 
     if (err != 0)
-      addf (str, "Revoked: True");
+      addf (str, "\tRevoked: True\n");
+    else
+      addf (str, "\tRevoked: False\n");
 }
 
 static void
@@ -295,6 +297,8 @@ int err;
 char dn[1024];
 size_t dn_size;
 
+  print_key_revoked( str, cert, -1);
+
   /* Version. */
   {
     int version = gnutls_openpgp_crt_get_version (cert);
@@ -332,7 +336,6 @@ size_t dn_size;
 
   print_key_info( str, cert, -1);
   print_key_usage( str, cert, -1);
-  print_key_revoked( str, cert, -1);
 
   subkeys = gnutls_openpgp_crt_get_subkey_count( cert);
   if (subkeys < 0)
@@ -341,11 +344,11 @@ size_t dn_size;
   for (i=0;i<subkeys;i++) {
     addf( str, _("\n\tSubkey[%d]:\n"), i);
     
+    print_key_revoked( str, cert, i);
     print_key_id( str, cert, i);
     print_key_times( str, cert, i);
     print_key_info( str, cert, i);
     print_key_usage( str, cert, i);
-    print_key_revoked( str, cert, i);
   }
 
 }
