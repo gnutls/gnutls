@@ -146,7 +146,7 @@ gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
 			   void *output_data, size_t * output_data_size)
 {
   /* FIXME for now we do not export encrypted keys */
-  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size);
+  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size, 1);
 }
 
 
