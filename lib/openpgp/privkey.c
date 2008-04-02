@@ -767,8 +767,8 @@ int _get_sk_dsa_raw(gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
     }
   
   KEYID_IMPORT(kid32, keyid);
-  
-  pkt = _gnutls_openpgp_find_key( pkey->knode, kid32, 0);
+
+  pkt = _gnutls_openpgp_find_key( pkey->knode, kid32, 1);
   if (pkt == NULL)
     {
       gnutls_assert();
