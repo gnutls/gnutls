@@ -196,8 +196,10 @@ int algo;
 	algo = GNUTLS_PK_RSA;
       else if (is_DSA (cdk_algo))
 	algo = GNUTLS_PK_DSA;
-      else
+      else {
+        _gnutls_x509_log("Unknown OpenPGP algorithm %d\n", cdk_algo);
 	algo = GNUTLS_PK_UNKNOWN;
+      }
       
       return algo;
 }

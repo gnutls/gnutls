@@ -293,7 +293,7 @@ print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert, unsigned int format)
 int i, subkeys;
 int err;
 char dn[1024];
-size_t dn_size = sizeof (dn);
+size_t dn_size;
 
   /* Version. */
   {
@@ -312,16 +312,19 @@ size_t dn_size = sizeof (dn);
   /* Names. */
   i = 0;
   do {
-
+      dn_size = sizeof(dn);
       err = gnutls_openpgp_crt_get_name (cert, i++, dn, &dn_size);
 
-      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-	addf (str, "error: get_name: %s\n", gnutls_strerror (err));
+      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && err != GNUTLS_E_OPENPGP_UID_REVOKED) {
+	addf (str, "error: get_name: %s %d\n", gnutls_strerror (err), err);
 	break;
       }
 
       if (err >= 0)
 	addf (str, _("\tName[%d]: %s\n"), i-1, dn);
+      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED) {
+        addf (str, _("\tRevoked Name[%d]: %s\n"), i-1, dn);
+      }
 
   } while( err >= 0);
 
