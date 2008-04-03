@@ -123,7 +123,7 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
  */
 int _gnutls_openpgp_export (cdk_kbnode_t node,
 			       gnutls_openpgp_crt_fmt_t format,
-			       void *output_data, size_t * output_data_size)
+			       void *output_data, size_t * output_data_size, int private)
 {
   size_t input_data_size = *output_data_size;
   size_t calc_size;
@@ -153,7 +153,7 @@ int _gnutls_openpgp_export (cdk_kbnode_t node,
       /* Calculate the size of the encoded data and check if the provided
          buffer is large enough. */
       rc = cdk_armor_encode_buffer (in, *output_data_size,
-				    NULL, 0, &calc_size, CDK_ARMOR_PUBKEY);
+				    NULL, 0, &calc_size, private?CDK_ARMOR_SECKEY:CDK_ARMOR_PUBKEY);
       if (rc || calc_size > input_data_size)
 	{
 	  cdk_free (in);
@@ -164,7 +164,7 @@ int _gnutls_openpgp_export (cdk_kbnode_t node,
       
       rc = cdk_armor_encode_buffer (in, *output_data_size,
 				    output_data, input_data_size, &calc_size,
-				    CDK_ARMOR_PUBKEY);
+				    private?CDK_ARMOR_SECKEY:CDK_ARMOR_PUBKEY);
       cdk_free (in);
       *output_data_size = calc_size;
     }
@@ -192,7 +192,7 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
 			   gnutls_openpgp_crt_fmt_t format,
 			   void *output_data, size_t * output_data_size)
 {
-  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size);
+  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size, 0);
 }
 
 
@@ -356,8 +356,11 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
   int algo;
 
   if (!key)
-    return GNUTLS_PK_UNKNOWN;
-  
+    {
+      gnutls_assert();
+      return GNUTLS_PK_UNKNOWN;
+    }  
+
   algo = 0;
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_PUBLIC_KEY);
   if (pkt)
@@ -788,7 +791,10 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
   int algo;
 
   if (!key)
-    return GNUTLS_PK_UNKNOWN;
+    {
+      gnutls_assert();
+      return GNUTLS_PK_UNKNOWN;
+    }
   
   pkt = _get_public_subkey( key, idx);
 
@@ -797,13 +803,7 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
     {
       if (bits)
 	*bits = cdk_pk_get_nbits (pkt->pkt.public_key);
-      algo = pkt->pkt.public_key->pubkey_algo;
-      if (is_RSA (algo))
-	algo = GNUTLS_PK_RSA;
-      else if (is_DSA (algo))
-	algo = GNUTLS_PK_DSA;
-      else
-	algo = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+      algo = _gnutls_openpgp_get_algo(pkt->pkt.public_key->pubkey_algo);
     }
   
   return algo;

@@ -146,7 +146,7 @@ gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
 			   void *output_data, size_t * output_data_size)
 {
   /* FIXME for now we do not export encrypted keys */
-  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size);
+  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size, 1);
 }
 
 
@@ -174,7 +174,10 @@ gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
   int algo;
 
   if (!key)
-    return GNUTLS_PK_UNKNOWN;
+    {
+      gnutls_assert();
+      return GNUTLS_PK_UNKNOWN;
+    }
   
   algo = 0;
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_SECRET_KEY);
@@ -196,8 +199,10 @@ int algo;
 	algo = GNUTLS_PK_RSA;
       else if (is_DSA (cdk_algo))
 	algo = GNUTLS_PK_DSA;
-      else
+      else {
+        _gnutls_x509_log("Unknown OpenPGP algorithm %d\n", cdk_algo);
 	algo = GNUTLS_PK_UNKNOWN;
+      }
       
       return algo;
 }
@@ -416,7 +421,10 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
   int algo;
 
   if (!key)
-    return GNUTLS_PK_UNKNOWN;
+    {
+      gnutls_assert();
+      return GNUTLS_PK_UNKNOWN;
+    }
   
   pkt = _get_secret_subkey( key, idx);
 
@@ -759,8 +767,8 @@ int _get_sk_dsa_raw(gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
     }
   
   KEYID_IMPORT(kid32, keyid);
-  
-  pkt = _gnutls_openpgp_find_key( pkey->knode, kid32, 0);
+
+  pkt = _gnutls_openpgp_find_key( pkey->knode, kid32, 1);
   if (pkt == NULL)
     {
       gnutls_assert();

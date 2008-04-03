@@ -162,7 +162,9 @@ print_key_revoked (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
       err = gnutls_openpgp_crt_get_subkey_revoked_status( cert, idx);
 
     if (err != 0)
-      addf (str, "Revoked: True");
+      addf (str, "\tRevoked: True\n");
+    else
+      addf (str, "\tRevoked: False\n");
 }
 
 static void
@@ -293,7 +295,9 @@ print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert, unsigned int format)
 int i, subkeys;
 int err;
 char dn[1024];
-size_t dn_size = sizeof (dn);
+size_t dn_size;
+
+  print_key_revoked( str, cert, -1);
 
   /* Version. */
   {
@@ -312,16 +316,19 @@ size_t dn_size = sizeof (dn);
   /* Names. */
   i = 0;
   do {
-
+      dn_size = sizeof(dn);
       err = gnutls_openpgp_crt_get_name (cert, i++, dn, &dn_size);
 
-      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-	addf (str, "error: get_name: %s\n", gnutls_strerror (err));
+      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && err != GNUTLS_E_OPENPGP_UID_REVOKED) {
+	addf (str, "error: get_name: %s %d\n", gnutls_strerror (err), err);
 	break;
       }
 
       if (err >= 0)
 	addf (str, _("\tName[%d]: %s\n"), i-1, dn);
+      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED) {
+        addf (str, _("\tRevoked Name[%d]: %s\n"), i-1, dn);
+      }
 
   } while( err >= 0);
 
@@ -329,7 +336,6 @@ size_t dn_size = sizeof (dn);
 
   print_key_info( str, cert, -1);
   print_key_usage( str, cert, -1);
-  print_key_revoked( str, cert, -1);
 
   subkeys = gnutls_openpgp_crt_get_subkey_count( cert);
   if (subkeys < 0)
@@ -338,11 +344,11 @@ size_t dn_size = sizeof (dn);
   for (i=0;i<subkeys;i++) {
     addf( str, _("\n\tSubkey[%d]:\n"), i);
     
+    print_key_revoked( str, cert, i);
     print_key_id( str, cert, i);
     print_key_times( str, cert, i);
     print_key_info( str, cert, i);
     print_key_usage( str, cert, i);
-    print_key_revoked( str, cert, i);
   }
 
 }
