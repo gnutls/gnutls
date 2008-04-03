@@ -11,6 +11,10 @@ Reported by Tim Mooney, see
 
 ** Documented the --priority option to gnutls-cli and gnutls-serv.
 
+** Fix fopen file descriptor leak in PSK server code.
+Thanks to Laurence Withers <l@lwithers.me.uk>, see
+<http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+
 ** API and ABI modifications:
 No changes since last version.
 
