@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -192,6 +192,7 @@ _gnutls_psk_pwd_find_entry (gnutls_session_t session, char *username,
       if (strncmp (username, line, MAX (i, len)) == 0)
 	{
 	  ret = pwd_put_values (psk, line);
+	  fclose (fd);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -200,6 +201,7 @@ _gnutls_psk_pwd_find_entry (gnutls_session_t session, char *username,
 	  return 0;
 	}
     }
+  fclose (fd);
 
   /* user was not found. Fake him. 
    * the last index found and randomize the entry.
