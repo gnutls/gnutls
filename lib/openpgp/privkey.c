@@ -93,7 +93,8 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 			       gnutls_openpgp_crt_fmt_t format,
 			       const char *pass, unsigned int flags)
 {
-  cdk_stream_t inp;  
+  cdk_stream_t inp;
+  cdk_packet_t pkt;
   int rc;
   
   if (format == GNUTLS_OPENPGP_FMT_RAW)
@@ -118,6 +119,14 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 	  gnutls_assert ();
 	  return rc;
 	}
+    }
+
+  /* Test if the import was successful. */
+  pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_SECRET_KEY);
+  if (pkt == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
   
   return 0;

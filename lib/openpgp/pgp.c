@@ -89,7 +89,8 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
 			   const gnutls_datum_t * data,
 			   gnutls_openpgp_crt_fmt_t format)
 {
-  cdk_stream_t inp;  
+  cdk_stream_t inp;
+  cdk_packet_t pkt;
   int rc;
   
   if (format == GNUTLS_OPENPGP_FMT_RAW)
@@ -115,7 +116,15 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
 	  return rc;
 	}
     }
-  
+
+  /* Test if the import was successful. */
+  pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_PUBLIC_KEY);
+  if (pkt == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+    }
+
   return 0;
 }
 
