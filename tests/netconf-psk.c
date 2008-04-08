@@ -37,9 +37,10 @@
 void
 doit (void)
 {
-  gnutls_datum_t key;
-  char *known = "foobarfoobarfoobarfoobar";
-  int rc;
+  const char *known =
+    "\xd6\xa9\x41\x0e\x55\x17\x42\x69\x16\x09"
+    "\x1f\xe0\xdc\xab\x7d\x3e\x60\x1b\xf5\x0a";
+  gnutls_datum_t key = { NULL, 0 };
 
   gnutls_global_init ();
 
@@ -49,12 +50,15 @@ doit (void)
   else
     fail ("gnutls_psk_netconf_derive_key failure\n");
 
-  if (key->size == 20 && memcmp (key->data, known, 20) == 0)
+  if (debug)
+    hexprint (key.data, key.size);
+
+  if (key.size == 20 && memcmp (key.data, known, 20) == 0)
     success ("success: match.\n");
   else
     fail ("FAIL: key differ.\n");
 
-  gnutls_free (key->data);
+  gnutls_free (key.data);
 
   gnutls_global_deinit ();
 }
