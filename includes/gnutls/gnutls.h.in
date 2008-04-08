@@ -998,6 +998,12 @@ extern "C"
 					      res,
 					      gnutls_params_function * func);
 
+  int gnutls_psk_netconf_derive_key (const char *password,
+				     const char *psk_identity,
+				     const char *psk_identity_hint,
+				     gnutls_datum *output_key);
+
+
   typedef enum gnutls_x509_subject_alt_name_t
   {
     GNUTLS_SAN_DNSNAME = 1,

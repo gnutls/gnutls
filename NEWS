@@ -3,6 +3,15 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 2.3.4.netconf.0 (unreleased)
+
+** Support Netconf PSK key derivation.
+The function gnutls_psk_netconf_derive_key supports the PSK key
+derivation as specified in draft-ietf-netconf-tls-01.txt.
+
+** API and ABI modifications:
+gnutls_psk_netconf_derive_key: ADDED
+
 * Version 2.3.4 (released 2008-03-19)
 
 ** Finish renaming of gnutls_certificate_export_x509_cas etc.
