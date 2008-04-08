@@ -25,6 +25,8 @@
 /* Functions to support draft-ietf-netconf-tls-01.txt. */
 
 #include <gnutls_int.h>
+#include <gnutls_hash_int.h>
+#include <gnutls_errors.h>
 
 #ifdef ENABLE_PSK
 
@@ -62,36 +64,36 @@ gnutls_psk_netconf_derive_key (const char *password,
    */
 
   innerlen = sha1len + hintlen;
-  inner = gnutls_malloc (len);
-  if (!inner)
+  inner = gnutls_malloc (innerlen);
+  if (inner == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
   rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1);
-  if (!rc)
+  if (rc)
     {
       gnutls_assert ();
       return rc;
     }
 
   rc = _gnutls_hash (&dig, password, strlen (password));
-  if (!rc)
+  if (rc)
     {
       gnutls_assert ();
       return rc;
     }
 
   rc = _gnutls_hash (&dig, psk_identity, strlen (psk_identity));
-  if (!rc)
+  if (rc)
     {
       gnutls_assert ();
       return rc;
     }
 
   rc = _gnutls_hash (&dig, netconf_key_pad, strlen (netconf_key_pad));
-  if (!rc)
+  if (rc)
     {
       gnutls_assert ();
       return rc;
@@ -102,21 +104,21 @@ gnutls_psk_netconf_derive_key (const char *password,
   memcpy (inner + sha1len, psk_identity_hint, hintlen);
 
   rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1);
-  if (!rc)
+  if (rc)
     {
       gnutls_assert ();
       return rc;
     }
 
   rc = _gnutls_hash (&dig, inner, innerlen);
-  if (!rc)
+  if (rc)
     {
       gnutls_assert ();
       return rc;
     }
 
   output_key->data = gnutls_malloc (sha1len);
-  if (!output_key->data)
+  if (output_key->data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
@@ -125,7 +127,7 @@ gnutls_psk_netconf_derive_key (const char *password,
 
   _gnutls_hash_deinit (&dig, output_key->data);
 
-  return 0
+  return 0;
 }
 
 #endif /* ENABLE_PSK */
