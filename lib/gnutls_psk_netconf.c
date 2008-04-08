@@ -63,14 +63,6 @@ gnutls_psk_netconf_derive_key (const char *password,
    *
    */
 
-  innerlen = sha1len + hintlen;
-  inner = gnutls_malloc (innerlen);
-  if (inner == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
   rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1);
   if (rc)
     {
@@ -82,6 +74,7 @@ gnutls_psk_netconf_derive_key (const char *password,
   if (rc)
     {
       gnutls_assert ();
+      _gnutls_hash_deinit (&dig, NULL);
       return rc;
     }
 
@@ -89,6 +82,7 @@ gnutls_psk_netconf_derive_key (const char *password,
   if (rc)
     {
       gnutls_assert ();
+      _gnutls_hash_deinit (&dig, NULL);
       return rc;
     }
 
@@ -96,10 +90,18 @@ gnutls_psk_netconf_derive_key (const char *password,
   if (rc)
     {
       gnutls_assert ();
+      _gnutls_hash_deinit (&dig, NULL);
       return rc;
     }
 
+  innerlen = sha1len + hintlen;
+  inner = gnutls_malloc (innerlen);
   _gnutls_hash_deinit (&dig, inner);
+  if (inner == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
 
   memcpy (inner + sha1len, psk_identity_hint, hintlen);
 
@@ -107,25 +109,27 @@ gnutls_psk_netconf_derive_key (const char *password,
   if (rc)
     {
       gnutls_assert ();
+      gnutls_free (inner);
       return rc;
     }
 
   rc = _gnutls_hash (&dig, inner, innerlen);
+  gnutls_free (inner);
   if (rc)
     {
       gnutls_assert ();
+      gnutls_hash_deinit (&dig, NULL);
       return rc;
     }
 
   output_key->data = gnutls_malloc (sha1len);
+  _gnutls_hash_deinit (&dig, output_key->data);
   if (output_key->data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
   output_key->size = sha1len;
-
-  _gnutls_hash_deinit (&dig, output_key->data);
 
   return 0;
 }
