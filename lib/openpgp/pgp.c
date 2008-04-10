@@ -1531,5 +1531,5 @@ int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp
         }
     }
 
-  return 0;
+  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
