@@ -92,7 +92,13 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
   cdk_stream_t inp;
   cdk_packet_t pkt;
   int rc;
-  
+
+  if (data->data == NULL || data->size == 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+    }
+
   if (format == GNUTLS_OPENPGP_FMT_RAW)
     rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
   else
