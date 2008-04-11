@@ -250,10 +250,11 @@ print_key_info(gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 		  hexdump (str, m.data, m.size, "\t\t\t");
 		  addf (str, _("\t\tExponent:\n"));
 		  hexdump (str, e.data, e.size, "\t\t\t");
+
+                  gnutls_free (m.data);
+                  gnutls_free (e.data);
 		}
 
-	      gnutls_free (m.data);
-	      gnutls_free (e.data);
 	    }
 	    break;
 
@@ -278,6 +279,11 @@ print_key_info(gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 		  hexdump (str, q.data, q.size, "\t\t\t");
 		  addf (str, _("\t\tG:\n"));
 		  hexdump (str, g.data, g.size, "\t\t\t");
+
+                  gnutls_free (p.data);
+                  gnutls_free (q.data);
+                  gnutls_free (g.data);
+                  gnutls_free (y.data);
 		}
 	    }
 	    break;
