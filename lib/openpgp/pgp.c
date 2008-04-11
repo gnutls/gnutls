@@ -1471,12 +1471,14 @@ int ret;
  * gnutls_openpgp_crt_get_auth_subkey - Gets the keyID of an authentication subkey
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
+ * @flag: Non zero indicates that a valid subkey is always returned.
  *
  * Returns the 64-bit keyID of the first valid OpenPGP subkey marked for authentication. 
+ * If flag is non zero then a valid subkey will be returned even if it is not marked for authentication.
  * 
  * Returns zero on success.
  **/
-int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid)
+int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid, unsigned int flag)
 {
   int ret, subkeys, i;
   unsigned int usage;
@@ -1527,9 +1529,10 @@ int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp
               return ret;
             }
 
-          break;
+          return 0;;\
         }
     }
 
-  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  if (flag && keyid_init) return 0;
+  else return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }

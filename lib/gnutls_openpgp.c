@@ -399,7 +399,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
       gnutls_openpgp_keyid_t keyid;
       
       if (strcasecmp( subkey_id, "auto")==0)
-        ret = gnutls_openpgp_crt_get_auth_subkey( cert, keyid);
+        ret = gnutls_openpgp_crt_get_auth_subkey( cert, keyid, 1);
       else
         ret = get_keyid( keyid, subkey_id);
 
