@@ -306,7 +306,7 @@ load_keys (void)
 
           if (strcasecmp(info.pgp_subkey, "auto")==0)
             {
-              ret = gnutls_openpgp_crt_get_auth_subkey( pgp_crt, keyid);
+              ret = gnutls_openpgp_crt_get_auth_subkey( pgp_crt, keyid, 1);
               if (ret < 0)
                 {
     	          fprintf (stderr,
