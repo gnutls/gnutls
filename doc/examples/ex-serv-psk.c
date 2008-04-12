@@ -26,7 +26,8 @@
 #define CAFILE "ca.pem"
 #define CRLFILE "crl.pem"
 
-/* This is a sample TLS 1.0 echo server, using PSK authentication.
+/* This is a sample TLS echo server, supporting X.509 and PSK
+   authentication.
  */
 
 
