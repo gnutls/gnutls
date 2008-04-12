@@ -118,7 +118,7 @@ gnutls_psk_netconf_derive_key (const char *password,
   if (rc)
     {
       gnutls_assert ();
-      gnutls_hash_deinit (&dig, NULL);
+      _gnutls_hash_deinit (&dig, NULL);
       return rc;
     }
 
