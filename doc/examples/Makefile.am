@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -28,8 +28,9 @@ LDADD = libexamples.la \
 	../../lib/libgnutls.la	\
 	../../libextra/libgnutls-extra.la
 
-noinst_PROGRAMS = ex-cert-select ex-client2 ex-client-resume	\
-	ex-crq ex-serv1 ex-serv-export
+noinst_PROGRAMS = ex-client2 ex-client-resume ex-client-psk
+noinst_PROGRAMS += ex-cert-select ex-crq
+noinst_PROGRAMS += ex-serv1 ex-serv-export ex-serv-psk
 
 if ENABLE_ANON
 noinst_PROGRAMS += ex-client1 ex-serv-anon
