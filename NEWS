@@ -23,8 +23,13 @@ Thanks to Laurence Withers <l@lwithers.me.uk>, see
 
 ** Translations files not stored directly in git to avoid merge conflicts.
 
+** New APIs to let applications replace the RNG used.
+Update all RNG callers in the code to use the new interface.
+
 ** API and ABI modifications:
 gnutls_crypto_rnd_register: ADDED
+gnutls_rnd_level_t: ADDED
+gnutls_crypto_rnd_st: ADDED
 GNUTLS_DIG_SHA224: ADDED
 GNUTLS_SIGN_RSA_SHA224: ADDED
 
