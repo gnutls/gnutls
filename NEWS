@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.3.5 (unreleased)
 
+** Build fix for MinGW and --disable-shared.
+Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1145>.
+
 ** Document how to generate CRLs.
 Suggested by "Rainer Gerhards" <rgerhards@gmail.com>.
 
