@@ -500,8 +500,6 @@ APIMANS += gnutls_openpgp_privkey_export_subkey_dsa_raw.3
 APIMANS += gnutls_openpgp_privkey_get_preferred_key_id.3
 APIMANS += gnutls_openpgp_privkey_set_preferred_key_id.3
 
-
-
 SRPMANS =
 SRPMANS += gnutls_srp_base64_encode.3
 SRPMANS += gnutls_srp_base64_encode_alloc.3
@@ -517,8 +515,6 @@ SRPMANS += gnutls_srp_set_server_credentials_function.3
 SRPMANS += gnutls_srp_set_client_credentials_function.3
 SRPMANS += gnutls_srp_server_get_username.3
 SRPMANS += gnutls_srp_verifier.3
-
-
 
 dist_man_MANS += $(APIMANS)
 if ENABLE_SRP
