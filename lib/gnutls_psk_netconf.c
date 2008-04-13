@@ -47,7 +47,7 @@ int
 gnutls_psk_netconf_derive_key (const char *password,
 			       const char *psk_identity,
 			       const char *psk_identity_hint,
-			       gnutls_datum *output_key)
+			       gnutls_datum_t *output_key)
 {
   const char netconf_key_pad[] = "Key Pad for Netconf";
   size_t sha1len = _gnutls_hash_get_algo_len (GNUTLS_DIG_SHA1);
