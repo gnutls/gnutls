@@ -8,7 +8,7 @@
 #define RND_KEY GNUTLS_RND_KEY
 
 int _gnutls_rnd (int level, void *data, int len);
-void _gnutls_rnd_deinit ();
-int _gnutls_rnd_init ();
+void _gnutls_rnd_deinit (void);
+int _gnutls_rnd_init (void);
 
 #endif
