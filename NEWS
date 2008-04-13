@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.5 (unreleased)
 
+** Document how to generate CRLs.
+Suggested by "Rainer Gerhards" <rgerhards@gmail.com>.
+
 ** Documented the --priority option to gnutls-cli and gnutls-serv.
 
 ** Several minor fixes in the OpenPGP interface. Thanks to Daniel Kahn

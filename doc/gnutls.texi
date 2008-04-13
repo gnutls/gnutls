@@ -3056,6 +3056,27 @@ $ certtool --generate-proxy --load-ca-privkey key.pem \
   --outfile proxy-cert.pem
 @end example
 
+@item
+To create an empty Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem
+@end example
+
+To create a CRL that contains some revoked certificates, place the
+certificates in a file and use @code{--load-certificate} as follows:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
+@end example
+
+@item
+To verify a Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
+@end example
+
 @end itemize
 
 Certtool's template file format:
