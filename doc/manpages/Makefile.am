@@ -27,7 +27,6 @@ dist_man_MANS += srptool.1
 endif
 
 APIMANS =
-
 APIMANS += gnutls_crypto_cipher_register.3
 APIMANS += gnutls_crypto_rnd_register.3
 APIMANS += gnutls_crypto_mac_register.3
@@ -502,8 +501,8 @@ APIMANS += gnutls_openpgp_privkey_get_preferred_key_id.3
 APIMANS += gnutls_openpgp_privkey_set_preferred_key_id.3
 
 
-SRPMANS =
 
+SRPMANS =
 SRPMANS += gnutls_srp_base64_encode.3
 SRPMANS += gnutls_srp_base64_encode_alloc.3
 SRPMANS += gnutls_srp_base64_decode.3
@@ -518,6 +517,8 @@ SRPMANS += gnutls_srp_set_server_credentials_function.3
 SRPMANS += gnutls_srp_set_client_credentials_function.3
 SRPMANS += gnutls_srp_server_get_username.3
 SRPMANS += gnutls_srp_verifier.3
+
+
 
 dist_man_MANS += $(APIMANS)
 if ENABLE_SRP
@@ -542,8 +543,8 @@ update-makefile:
 		fi \
 	done; \
 	grep -v -e '^APIMANS += ' -e '^SRPMANS += ' Makefile.am | \
-		perl -p -e "s/^APIMANS =/APIMANS =\n$$MANS/" | \
-		perl -p -e "s/^SRPMANS =/SRPMANS =\n$$SRPMANS/" > foo; \
+		perl -p -e "s/^APIMANS =/APIMANS =$$MANS/" | \
+		perl -p -e "s/^SRPMANS =/SRPMANS =$$SRPMANS/" > foo; \
 	mv foo Makefile.am
 
 doit:
