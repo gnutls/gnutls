@@ -1,3 +1,82 @@
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.4.netconf.0.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-psk.c: Typo.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Typo.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Typo.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-serv-psk.c: Doc fix.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-psk.c, doc/examples/ex-serv-psk.c: Add, PSK
+	self test.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Typo.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Add ex-serv-psk.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Fix mem leak on errors.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/netconf-psk.c: Fix bugs.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Fix bugs.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/netconf-psk.c: Starting pointer for NETCONF-PSK support.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/Makefile.am,
+	lib/gnutls_psk_netconf.c, tests/Makefile.am: Starting pointer for
+	NETCONF-PSK support.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-03-19  Simon Josefsson <simon@josefsson.org>
 
 	* includes/Makefile.am: Dist gnutls/crypto.h.
