@@ -27,6 +27,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -44,14 +45,6 @@
 
 #if defined _WIN32 || defined __WIN32__
 #define select _win_select
-#endif
-
-#ifndef SHUT_WR
-# define SHUT_WR 1
-#endif
-
-#ifndef SHUT_RDWR
-# define SHUT_RDWR 2
 #endif
 
 #define SA struct sockaddr

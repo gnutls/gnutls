@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000,2001,2002,2003,2006,2007 Nikos Mavrogiannopoulos
- * Copyright (C) 2004,2005 Free Software Foundation
+ * Copyright (C) 2004,2005, 2008 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -27,17 +27,10 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <sys/time.h>
+#include <sys/socket.h>
 #include <tests.h>
 #include <common.h>
 #include <tls_test-gaa.h>
-
-#ifndef SHUT_WR
-# define SHUT_WR 1
-#endif
-
-#ifndef SHUT_RDWR
-# define SHUT_RDWR 2
-#endif
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
