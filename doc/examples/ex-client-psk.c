@@ -44,7 +44,7 @@ main (void)
   gnutls_psk_set_client_credentials (pskcred, "test", &key,
 				     GNUTLS_PSK_KEY_HEX);
 
-  /* Initialize TLS session 
+  /* Initialize TLS session
    */
   gnutls_init (&session, GNUTLS_CLIENT);
 
