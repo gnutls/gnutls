@@ -27,8 +27,8 @@ ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 endif
 
 autoreconf:
-	for f in po/*.po.in; do; \
-		cp $f `echo $f | sed 's/.in//'`; \
+	for f in po/*.po.in; do \
+		cp $$f `echo $$f | sed 's/.in//'`; \
 	done
 	mv build-aux/config.rpath build-aux/config.rpath-
 	test -f ./configure || autoreconf --install
