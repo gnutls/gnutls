@@ -54,13 +54,14 @@ _have-git-version-gen := \
   $(shell test -f $(srcdir)/$(_build-aux)/git-version-gen && echo yes)
 ifeq ($(_have-git-version-gen)0,yes$(MAKELEVEL))
   _is-dist-target = $(filter-out %clean, \
-    $(filter dist% alpha beta major,$(MAKECMDGOALS)))
+    $(filter maintainer-% dist% alpha beta major,$(MAKECMDGOALS)))
   ifneq (,$(_is-dist-target))
     _curr-ver := $(shell cd $(srcdir) && ./$(_build-aux)/git-version-gen \
                    $(srcdir)/.tarball-version)
     ifneq ($(_curr-ver),$(VERSION))
       $(info INFO: running autoreconf for new version string: $(_curr-ver))
-      _dummy := $(shell cd $(srcdir) && rm -rf autom4te.cache && $(_autoreconf)))
+      _dummy := $(shell cd $(srcdir) && rm -rf autom4te.cache .version \
+        && $(_autoreconf))
     endif
   endif
 endif
@@ -68,10 +69,15 @@ endif
 else
 
 .DEFAULT_GOAL := abort-due-to-no-makefile
+srcdir = .
 
 # The package can override .DEFAULT_GOAL to run actions like autoreconf.
 -include ./cfg.mk
 include ./maint.mk
+
+ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
+$(MAKECMDGOALS): abort-due-to-no-makefile
+endif
 
 abort-due-to-no-makefile:
 	@echo There seems to be no Makefile in this directory.   1>&2
