@@ -14,12 +14,14 @@ Suggested by "Rainer Gerhards" <rgerhards@gmail.com>.
 
 ** Documented the --priority option to gnutls-cli and gnutls-serv.
 
-** Several minor fixes in the OpenPGP interface. Thanks to Daniel Kahn
-Gillmor.
+** Several minor fixes in the OpenPGP interface.
+Thanks to Daniel Kahn Gillmor.
 
 ** Fix fopen file descriptor leak in PSK server code.
 Thanks to Laurence Withers <l@lwithers.me.uk>, see
 <http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+
+** Translations files not stored directly in git to avoid merge conflicts.
 
 ** API and ABI modifications:
 gnutls_crypto_rnd_register: ADDED
