@@ -7,7 +7,8 @@ See the end for copying conditions.
 
 ** Support Netconf PSK key derivation.
 The function gnutls_psk_netconf_derive_key supports the PSK key
-derivation as specified in draft-ietf-netconf-tls-01.txt.
+derivation as specified in draft-ietf-netconf-tls-01.txt.  New self
+test netconf-psk.c.
 
 ** New PSK example client and server.
 See doc/examples/ex-client-psk.c and doc/examples/ex-serv-psk.c.
