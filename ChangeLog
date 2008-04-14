@@ -1,3 +1,311 @@
+2008-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.5.
+
+2008-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c, src/tls_test.c: Rely on sys/socket.h for SHUT_*.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/sys_socket_h.m4, lgl/sys_socket.in.h: Update gnulib files.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/gc-libgcrypt.c, lgl/m4/gnulib-cache.m4: 
+	Update gnulib files.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/gnulib-cache.m4, lgl/override/lib/gc-libgcrypt.c.diff: 
+	Quick fix for SHA-224 and old libgcrypt's.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/random.h: Fix warnings.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Typo.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* po/Makevars: We don't need --no-location any more, git stores
+	*.po.in's.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, cfg.mk: Translation fixes.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* po/de.po, po/de.po.in, po/ms.po, po/ms.po.in, po/nl.po,
+	po/nl.po.in, po/pl.po, po/pl.po.in, po/sv.po, po/sv.po.in: Improve
+	translation handling to avoid git conflicts.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, build-aux/gnupload, gl/fseeko.c, gl/getdelim.c,
+	gl/m4/eoverflow.m4, gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/include_next.m4, lgl/gc-gnulib.c, lgl/m4/gc-random.m4,
+	lgl/m4/gnulib-common.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/include_next.m4, lgl/m4/stdint.m4, lgl/m4/vasnprintf.m4,
+	lgl/snprintf.c, lgl/vasnprintf.c, lgl/vasprintf.c, lgl/wchar.in.h: 
+	Update gnulib files.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Cosmetic.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Whitespace fix.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Improve APIMANS/SRPMANS, to make it
+	easier to understand changes.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix test.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Don't bother checking for --output-def if shared
+	libraries are disabled.  Based on report from Massimo Gaspari
+	<massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1145>.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, doc/gnutls.texi: Document how to generate CRLs.
+
+2008-04-13  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* includes/gnutls/openpgp.h: changed api.
+
+2008-04-12  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/cli.c: get_auth_subkey has one more parameter.
+
+2008-04-12  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/pubkey.c: return the size of the required buffer to
+	hold the data
+
+2008-04-12  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/openpgp/output.c: Deallocate memory from parameters only when
+	function run was successful.
+
+2008-04-12  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_openpgp.c, lib/openpgp/pgp.c: Added a flag in
+	get_auth_subkey() to work for all use cases
+
+2008-04-10  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/pgp.c: do not return any subkey if an authentication
+	subkey is not found
+
+2008-04-10  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/extras.c, lib/openpgp/pgp.c, lib/openpgp/privkey.c: 
+	corrected bug in openpgp import when data is of size zero. Reported
+	by Daniel Kahn
+
+2008-04-04  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/pgp.c, lib/openpgp/privkey.c: Fail at import stage if
+	a non proper certificate is loaded.
+
+2008-04-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-nir-tls-eap-03.txt: Add.
+
+2008-04-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-netconf-tls-01.txt: Add.
+
+2008-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk_passwd.c: (_gnutls_psk_pwd_find_entry): Call fclose after fopen.  Tiny patch
+	from Laurence Withers <l@lwithers.me.uk>, see
+
+	<http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+
+2008-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* : commit 117152d4c91e1c01055eedada1412ec763e5196b Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Thu Apr 3 09:40:01 2008
+	+0200
+
+2008-04-02  Nikos <nmav@crystal.(none)>
+
+	* NEWS: documented the openpgp updates.
+
+2008-04-02  Nikos <nmav@crystal.(none)>
+
+	* doc/manpages/certtool.1: added the openpgp functionality to the
+	manpage.
+
+2008-04-02  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/privkey.c: Corrected exporting the DSA secret key
+	parameters.
+
+2008-04-02  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/openpgp_int.h, lib/openpgp/pgp.c,
+	lib/openpgp/privkey.c: Add proper ARMOR header in private keys.
+
+2008-04-02  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/output.c, lib/openpgp/pgp.c, lib/openpgp/privkey.c: 
+	Consistent printing of revoked status.  Consistent printing of key
+	algorithm.
+
+2008-04-02  Nikos <nmav@crystal.(none)>
+
+	* lib/gnutls_errors.c: Added revoked UID error string.
+
+2008-04-02  Nikos <nmav@crystal.(none)>
+
+	* lib/openpgp/output.c, lib/openpgp/privkey.c: Print revoked names.
+
+2008-04-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecdhe-psk-01.txt: Add.
+
+2008-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/crypto.h: Fix warnings.
+
+2008-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/gc-libgcrypt.c, lgl/gc.h,
+	lgl/m4/stdlib_h.m4, lgl/stdlib.in.h: Update gnulib files.
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* NEWS: Documented the --priority option to gnutls-cli and
+	gnutls-serv.
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* doc/manpages/gnutls-cli.1, doc/manpages/gnutls-serv.1: documented
+	the --priority option.
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* NEWS: corrected the news entry.
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* lib/auth_cert.c: Reverted to gnutls 2.2 behaviour of allowing an
+	empty key (for PKCS #11).  Reported by Joe Orton.
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* NEWS: gnutls_crypto_rnd_register: ADDED
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* : commit 0b37eef0f6b6626d5e4b5936bbc6f012416ef61a Author: Nikos
+	<nmav@crystal.(none)> Date:   Sat Mar 29 12:01:27 2008 +0200
+
+2008-03-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-badra-tls-psk-new-mac-aes-gcm-00.txt,
+	doc/protocol/draft-badra-tls-psk-new-mac-aes-gcm-01.txt: Add.
+
+2008-03-28  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/gc-libgcrypt.c, lgl/gc.h: Update gnulib files.
+
+2008-03-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Entries added at wrong place, move them.
+
+2008-03-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in: Avoid defining SHA-224 MAC
+	since it isn't specified in TLS 1.2.
+
+2008-03-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in: Add SHA-224 enum types.
+
+2008-03-28  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk: Update gnulib files.
+
+2008-03-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc4346-bis-10.txt: Add.
+
+2008-03-25  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, build-aux/GNUmakefile, build-aux/maint.mk, cfg.mk,
+	gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/lib-link.m4, lgl/Makefile.am, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/lib-link.m4, maint-cfg.mk, maint.mk: 
+	Update gnulib files.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_extra.c: Fix LZO build failure.
+
+2008-03-19  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/Makefile.am: guile: Compile with `-fgnu89-inline'.  * guile/src/Makefile.am (AM_CFLAGS): Add `-fgnu89-inline' when   `HAVE_GCC' is true.  This works around the fact that GnuTLS is   compiled with `-std=c99', while Guile and GMP expect GNU inline   semantics, which defer from C99 inline semantics.
+
+2008-03-19  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/core.c: guile: Don't declare `inline' functions that use
+	`alloca ()'.  * guile/src/core.c (set_certificate_file): Remove `inline' keyword.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-03-19  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-03-19  Simon Josefsson <simon@josefsson.org>
 
 	* includes/Makefile.am: Dist gnutls/crypto.h.
