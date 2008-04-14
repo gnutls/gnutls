@@ -28,6 +28,8 @@ Update all RNG callers in the code to use the new interface.
 
 ** Guile code now built with -fgnu89-inline to fix inline semantic problem.
 
+** Update gnulib files.
+
 ** API and ABI modifications:
 gnutls_crypto_rnd_register: ADDED
 gnutls_rnd_level_t: ADDED
