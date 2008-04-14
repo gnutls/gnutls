@@ -31,9 +31,13 @@ Update all RNG callers in the code to use the new interface.
 ** API and ABI modifications:
 gnutls_crypto_rnd_register: ADDED
 gnutls_rnd_level_t: ADDED
+GNUTLS_RND_KEY: ADDED, gnutls_rnd_level_t member
+GNUTLS_RND_RANDOM: ADDED, gnutls_rnd_level_t member
+GNUTLS_RND_NONCE: ADDED, gnutls_rnd_level_t member
 gnutls_crypto_rnd_st: ADDED
 GNUTLS_DIG_SHA224: ADDED
 GNUTLS_SIGN_RSA_SHA224: ADDED
+gnutls_openpgp_crt_get_auth_subkey: MODIFIED
 
 * Version 2.3.4 (released 2008-03-19)
 
