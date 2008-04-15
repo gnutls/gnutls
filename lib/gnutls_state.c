@@ -1242,10 +1242,10 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
  * This callback must return 0 on success or a gnutls error code to
  * terminate the handshake.
  *
- * NOTE: You should not use this function to terminate the handshake
- * based on client input unless you know what you are doing. Before
- * the handshake is finished there is no way to know if there is a
- * man-in-the-middle attack being performed.
+ * Warning: You should not use this function to terminate the
+ * handshake based on client input unless you know what you are
+ * doing. Before the handshake is finished there is no way to know if
+ * there is a man-in-the-middle attack being performed.
  **/
 void
 gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
