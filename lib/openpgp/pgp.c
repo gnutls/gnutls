@@ -117,7 +117,10 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
       cdk_stream_close (inp);
       if (rc)
 	{
-	  rc = _gnutls_map_cdk_rc (rc);
+	  if (rc == CDK_Inv_Packet)
+	    rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
+	  else
+	    rc = _gnutls_map_cdk_rc (rc);
 	  gnutls_assert ();
 	  return rc;
 	}
