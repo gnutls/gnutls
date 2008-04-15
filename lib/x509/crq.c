@@ -750,6 +750,17 @@ gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+  /* Make sure version field is set. */
+  if (gnutls_x509_crq_get_version (crq) == GNUTLS_E_ASN1_VALUE_NOT_FOUND)
+    {
+      result = gnutls_x509_crq_set_version (crq, 1);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
+    }
+
   /* Step 1. Self sign the request.
    */
   result =
