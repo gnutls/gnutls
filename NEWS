@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.3.6 (unreleased)
 
+** Improve documentation for gnutls_x509_crq_sign2.
+Based on report from "John Brooks" <aspecialj@gmail.com> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1154>.
+
 ** API and ABI modifications:
 No changes since last version.
 
