@@ -1701,14 +1701,14 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
       return 0;
     }
 
-  tmp_ciphers = gnutls_alloca (count * sizeof (cipher_suite_st));
+  tmp_ciphers = gnutls_malloc (count * sizeof (cipher_suite_st));
   if (tmp_ciphers == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
   ciphers = gnutls_malloc (count * sizeof (cipher_suite_st));
   if (ciphers == NULL)
     {
-      gnutls_afree (tmp_ciphers);
+      gnutls_free (tmp_ciphers);
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -1767,7 +1767,7 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
     }
 #endif
 
-  gnutls_afree (tmp_ciphers);
+  gnutls_free (tmp_ciphers);
 
   /* This function can no longer return 0 cipher suites.
    * It returns an error code instead.

@@ -18,6 +18,13 @@ Based on HPUX build hints in
 Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
 <http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
 
+** Remove all uses of gnutls_alloca/gnutls_afree.
+Use normal gnutls_malloc instead.  One reason is increased portability
+to Windows, the other is that several of the uses may be unsafe
+because the size of data allocated could be large.  Reported by
+Massimo Gaspari <massimo.gaspari@alice.it> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
+
 ** API and ABI modifications:
 No changes since last version.
 

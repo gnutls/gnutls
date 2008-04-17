@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -30,30 +30,6 @@
 #endif
 
 typedef void svoid;		/* for functions that allocate using gnutls_secure_malloc */
-
-/* Use gnutls_afree() when calling alloca, or
- * memory leaks may occur in systems which do not
- * support alloca.
- */
-#ifdef USE_EFENCE
-# define gnutls_alloca gnutls_malloc
-# define gnutls_afree gnutls_free
-#endif
-
-#ifdef HAVE_ALLOCA
-# ifdef HAVE_ALLOCA_H
-#  include <alloca.h>
-# endif
-# ifndef gnutls_alloca
-#  define gnutls_alloca alloca
-#  define gnutls_afree(x)
-# endif
-#else
-# ifndef gnutls_alloca
-#  define gnutls_alloca gnutls_malloc
-#  define gnutls_afree gnutls_free
-# endif
-#endif /* HAVE_ALLOCA */
 
 extern int (*_gnutls_is_secure_memory) (const void *);
 

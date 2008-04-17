@@ -933,7 +933,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 
   /* first run */
   datasize = i_datasize + HANDSHAKE_HEADER_SIZE;
-  data = gnutls_alloca (datasize);
+  data = gnutls_malloc (datasize);
   if (data == NULL)
     {
       gnutls_assert ();
@@ -958,7 +958,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 	 _gnutls_handshake_hash_add_sent (session, type, data, datasize)) < 0)
       {
 	gnutls_assert ();
-	gnutls_afree (data);
+	gnutls_free (data);
 	return ret;
       }
 
@@ -968,7 +968,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
     _gnutls_handshake_io_send_int (session, GNUTLS_HANDSHAKE, type,
 				   data, datasize);
 
-  gnutls_afree (data);
+  gnutls_free (data);
 
   return ret;
 }
@@ -1918,7 +1918,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	  return extdatalen;
 	}
 
-      data = gnutls_alloca (datalen + extdatalen);
+      data = gnutls_malloc (datalen + extdatalen);
       if (data == NULL)
 	{
 	  gnutls_assert ();
@@ -1966,7 +1966,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
   ret =
     _gnutls_send_handshake (session, data, datalen,
 			    GNUTLS_HANDSHAKE_SERVER_HELLO);
-  gnutls_afree (data);
+  gnutls_free (data);
 
   return ret;
 }

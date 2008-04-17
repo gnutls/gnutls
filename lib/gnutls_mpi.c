@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -209,7 +209,7 @@ _gnutls_x509_read_int (ASN1_TYPE node, const char *value, mpi_t * ret_mpi)
       return _gnutls_asn2err (result);
     }
 
-  tmpstr = gnutls_alloca (tmpstr_size);
+  tmpstr = gnutls_malloc (tmpstr_size);
   if (tmpstr == NULL)
     {
       gnutls_assert ();
@@ -220,7 +220,7 @@ _gnutls_x509_read_int (ASN1_TYPE node, const char *value, mpi_t * ret_mpi)
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      gnutls_afree (tmpstr);
+      gnutls_free (tmpstr);
       return _gnutls_asn2err (result);
     }
 
@@ -228,11 +228,11 @@ _gnutls_x509_read_int (ASN1_TYPE node, const char *value, mpi_t * ret_mpi)
   if (_gnutls_mpi_scan (ret_mpi, tmpstr, &s_len) != 0)
     {
       gnutls_assert ();
-      gnutls_afree (tmpstr);
+      gnutls_free (tmpstr);
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  gnutls_afree (tmpstr);
+  gnutls_free (tmpstr);
 
   return 0;
 }
@@ -252,7 +252,7 @@ _gnutls_x509_write_int (ASN1_TYPE node, const char *value, mpi_t mpi, int lz)
   else
     result = _gnutls_mpi_print (NULL, &s_len, mpi);
 
-  tmpstr = gnutls_alloca (s_len);
+  tmpstr = gnutls_malloc (s_len);
   if (tmpstr == NULL)
     {
       gnutls_assert ();
@@ -267,13 +267,13 @@ _gnutls_x509_write_int (ASN1_TYPE node, const char *value, mpi_t mpi, int lz)
   if (result != 0)
     {
       gnutls_assert ();
-      gnutls_afree (tmpstr);
+      gnutls_free (tmpstr);
       return GNUTLS_E_MPI_PRINT_FAILED;
     }
 
   result = asn1_write_value (node, value, tmpstr, s_len);
 
-  gnutls_afree (tmpstr);
+  gnutls_free (tmpstr);
 
   if (result != ASN1_SUCCESS)
     {

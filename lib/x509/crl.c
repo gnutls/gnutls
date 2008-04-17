@@ -669,7 +669,7 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
       return ret;
     }
 
-  der = gnutls_alloca (der_size);
+  der = gnutls_malloc (der_size);
   if (der == NULL)
     {
       gnutls_assert ();
@@ -680,7 +680,7 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_afree (der);
+      gnutls_free (der);
       return ret;
     }
 
@@ -688,7 +688,7 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
   tmp.size = der_size;
   ret = gnutls_x509_crl_import (dest, &tmp, GNUTLS_X509_FMT_DER);
 
-  gnutls_afree (der);
+  gnutls_free (der);
 
   if (ret < 0)
     {

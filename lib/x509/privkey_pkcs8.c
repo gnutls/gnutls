@@ -1477,7 +1477,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   else
     key_size = kdf_params->key_size;
 
-  key = gnutls_alloca (key_size);
+  key = gnutls_malloc (key_size);
   if (key == NULL)
     {
       gnutls_assert ();
@@ -1524,7 +1524,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   d_iv.size = enc_params->iv_size;
   result = _gnutls_cipher_init (&ch, enc_params->cipher, &dkey, &d_iv);
 
-  gnutls_afree (key);
+  gnutls_free (key);
   key = NULL;
 
   if (result < 0)
@@ -1555,7 +1555,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
 
 error:
   gnutls_free (data);
-  gnutls_afree (key);
+  gnutls_free (key);
   if (ch_init != 0)
     _gnutls_cipher_deinit (&ch);
   return result;
