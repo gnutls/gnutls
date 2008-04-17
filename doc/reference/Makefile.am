@@ -46,6 +46,7 @@ HFILE_GLOB=$(top_srcdir)/includes/gnutls/*.h $(top_builddir)/includes/gnutls/*.h
 CFILE_GLOB=$(top_srcdir)/lib/*.c \
 	$(top_srcdir)/lib/x509/*.c \
 	$(top_srcdir)/lib/openpgp/*.c \
+	$(top_srcdir)/lib/opencdk/*.c \
 	$(top_srcdir)/libextra/*.c \
 	$(top_srcdir)/lib/minitasn1/*.c
 
