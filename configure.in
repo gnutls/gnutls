@@ -149,7 +149,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 #	  AM_CFLAGS="${AM_CFLAGS} -g -W -Wall -Wcast-align -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wshadow -Wno-unused-parameter -Wimplicit -fno-common -Wno-sign-compare -Wbad-function-cast -Wendif-labels -Wmissing-declarations -Wno-missing-format-attribute -Wmissing-prototypes -Wnested-externs -Wpointer-arith -pedantic -Wlong-long -Wcast-qual -Wcast-align -Winline -Wredundant-decls -Wstrict-prototypes -Wwrite-strings -Wparentheses -Wsequence-point -Wpacked -Waggregate-return -Wfloat-equal -Wmultichar -Wunknown-pragmas -Wtrigraphs -Wswitch -Wreturn-type -Wmain -Wchar-subscripts -Wcomment -Wno-missing-noreturn"
 	fi
 
-	AC_MSG_CHECKING([if gcc supports -Wno-pointer-sign])
+	AC_MSG_CHECKING([whether gcc supports -Wno-pointer-sign])
 	_gcc_cflags_save=$CFLAGS
 	CFLAGS="${CFLAGS} -Wno-pointer-sign"
 	AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_psign=yes,_gcc_psign=no)
@@ -157,6 +157,16 @@ if test $ac_cv_c_compiler_gnu != no; then
 	if test x"$_gcc_psign" != xyes ; then
 	  CFLAGS=$_gcc_cflags_save;
 	fi
+
+	AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
+	_gcc_cflags_save="$CFLAGS"
+	CFLAGS="${CFLAGS} -fgnu89-inline"
+	AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),
+	  _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
+	AC_MSG_RESULT($_gcc_gnu89_inline)
+	AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
+	  [test "x$_gcc_gnu89_inline" = "xyes"])
+	CFLAGS=$_gcc_cflags_save;
 
 	AC_MSG_CHECKING([if gcc/ld supports -Wl,--output-def])
 	if test "$enable_shared" = no; then

@@ -68,10 +68,16 @@ if HAVE_GCC
 # after `-Ws-p'.
 AM_CFLAGS += -Wno-strict-prototypes
 
+# The `-fgnu89-inline' option appeared in GCC 4.1.3.
+if HAVE_GCC_GNU89_INLINE_OPTION
+
 # Guile and GMP currently rely on GNU inline semantics, not C99 inline.
 AM_CFLAGS += -fgnu89-inline
 
-endif
+endif HAVE_GCC_GNU89_INLINE_OPTION
+
+endif HAVE_GCC
+
 
 enums.h: $(srcdir)/make-enum-header.scm
 	$(GUILE_FOR_BUILD) $^ > $@
