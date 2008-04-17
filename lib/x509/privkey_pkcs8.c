@@ -37,6 +37,7 @@
 #include <gnutls_algorithms.h>
 #include <gnutls_num.h>
 #include <gc.h>
+#include <random.h>
 
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
@@ -1476,7 +1477,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   else
     key_size = kdf_params->key_size;
 
-  key = gnutls_alloca (key_size);
+  key = gnutls_malloc (key_size);
   if (key == NULL)
     {
       gnutls_assert ();
@@ -1523,7 +1524,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   d_iv.size = enc_params->iv_size;
   result = _gnutls_cipher_init (&ch, enc_params->cipher, &dkey, &d_iv);
 
-  gnutls_afree (key);
+  gnutls_free (key);
   key = NULL;
 
   if (result < 0)
@@ -1554,7 +1555,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
 
 error:
   gnutls_free (data);
-  gnutls_afree (key);
+  gnutls_free (key);
   if (ch_init != 0)
     _gnutls_cipher_deinit (&ch);
   return result;
@@ -1752,10 +1753,11 @@ generate_key (schema_id schema,
   else if (schema == PKCS12_RC2_40_SHA1)
     enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
 
-  if (gc_pseudo_random (rnd, 2) != GC_OK)
+  ret = _gnutls_rnd( RND_RANDOM, rnd, 2);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   /* generate salt */
@@ -1766,7 +1768,8 @@ generate_key (schema_id schema,
   else
     kdf_params->salt_size = 8;
 
-  if (gc_pseudo_random (kdf_params->salt, kdf_params->salt_size) != GC_OK)
+  ret = _gnutls_rnd ( RND_RANDOM, kdf_params->salt, kdf_params->salt_size);
+  if ( ret < 0) 
     {
       gnutls_assert ();
       return GNUTLS_E_RANDOM_FAILED;
@@ -1801,12 +1804,15 @@ generate_key (schema_id schema,
 	  return GNUTLS_E_ENCRYPTION_FAILED;
 	}
 
-      if (enc_params->iv_size &&
-	  gc_nonce (enc_params->iv, enc_params->iv_size) != GC_OK)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_RANDOM_FAILED;
-	}
+      if (enc_params->iv_size)
+        {
+	  ret = _gnutls_rnd (RND_NONCE, enc_params->iv, enc_params->iv_size);
+	  if (ret < 0)
+  	    {
+	      gnutls_assert ();
+	      return ret;
+	    }
+        }
     }
   else
     {				/* PKCS12 schemas */

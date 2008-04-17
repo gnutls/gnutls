@@ -16,7 +16,7 @@ Shows this help text
 .IP "\-v, \-\-version"
 Shows the program's version
 
-.SS Getting information
+.SS Getting information on X.509 certificates
 .IP "\-i, \-\-certificate\-info"
 Print information on a certificate.
 .IP "\-k, \-\-key\-info"
@@ -26,7 +26,15 @@ Print information on a CRL.
 .IP "\-\-p12\-info"
 Print information on a PKCS #12 structure.
 
-.SS Generating/verifying certificates/keys
+.SS Getting information on Openpgp certificates
+.IP "\-\-pgp\-\-certificate\-info"
+Print information on an OpenPGP certificate.
+.IP "\-\-pgp\-\-key\-info"
+Print information on an OpenPGP private key.
+.IP "\-\-pgp\-\-ring\-info"
+Print information on a keyring.
+
+.SS Generating/verifying X.509 certificates/keys
 .IP "\-c, \-\-generate\-certificate"
 Generate a signed certificate.
 .IP "\-e, \-\-verify\-chain"

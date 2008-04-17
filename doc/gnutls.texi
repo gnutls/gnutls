@@ -225,15 +225,11 @@ want to install it separately (e.g., to make it possibly to use
 libtasn1 in other programs), you can get it from
 @url{http://www.gnu.org/software/gnutls/download.html}.
 
-The OpenPGP part of GnuTLS-extra needs OpenCDK for parsing OpenPGP
-packets.  A copy of OpenCDK is included in GnuTLS.  If you want to
-install it separately (e.g., to make it possibly to use libtasn1 in
-other programs), you can get it from
-@url{http://www.gnu.org/software/gnutls/download.html}.  Use parameter
-@code{--with-included-opencdk} to unconditionally use the internal
-copy of OpenCDK.  Use parameter
+The OpenPGP part of GnuTLS uses a stripped down version of OpenCDK for
+parsing OpenPGP packets.  It is included GnuTLS.  Use parameter
 @code{--disable-openpgp-authentication} to disable the OpenPGP
-functionality in GnuTLS.
+functionality in GnuTLS.  Unfortunately, we didn't have resources to
+maintain the code in a separate library.
 
 Regarding the Guile bindings, there are additional installation
 considerations, see @xref{Guile Preparations}.
@@ -400,8 +396,9 @@ verification functions which is partially implemented in the
 @acronym{GnuTLS} library.  The
 @acronym{Libtasn1}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/libtasn1/}},
 a library which offers @acronym{ASN.1} parsing capabilities, is used
-for the @acronym{X.509} certificate parsing functions, and
-@acronym{Opencdk}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}}
+for the @acronym{X.509} certificate parsing functions.  A smaller
+version of
+@acronym{OpenCDK}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}}
 is used for the @acronym{OpenPGP} key support in @acronym{GnuTLS}.
 The ``Crypto backend'' is provided by the
 @acronym{Libgcrypt}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}}
@@ -543,19 +540,21 @@ should allocate and free memory using the functions shown below.
 @chapter Introduction to @acronym{TLS}
 
 @acronym{TLS} stands for ``Transport Layer Security'' and is the
-successor of SSL, the Secure Sockets Layer protocol @xcite{SSL3} designed by Netscape.  @acronym{TLS} is an Internet
-protocol, defined by @acronym{IETF}@footnote{IETF, or Internet
-Engineering Task Force, is a large open international community of
-network designers, operators, vendors, and researchers concerned with
-the evolution of the Internet architecture and the smooth operation of
-the Internet.  It is open to any interested individual.}, described in
-@acronym{RFC} 2246 and also in @xcite{RESCOLA}. The protocol provides
+successor of SSL, the Secure Sockets Layer protocol @xcite{SSL3}
+designed by Netscape.  @acronym{TLS} is an Internet protocol, defined
+by @acronym{IETF}@footnote{IETF, or Internet Engineering Task Force,
+is a large open international community of network designers,
+operators, vendors, and researchers concerned with the evolution of
+the Internet architecture and the smooth operation of the Internet.
+It is open to any interested individual.}, described in @acronym{RFC}
+4346 and also in @xcite{RESCORLA}.  The protocol provides
 confidentiality, and authentication layers over any reliable transport
-layer. The description, below, refers to @acronym{TLS} 1.0 but also
-applies to @acronym{TLS} 1.1 @xcite{RFC4346} and @acronym{SSL} 3.0, since the
-differences of these protocols are minor. Older protocols such as
-@acronym{SSL} 2.0 are not discussed nor implemented in
-@acronym{GnuTLS} since they are not considered secure today.
+layer.  The description, below, refers to @acronym{TLS} 1.0 but also
+applies to @acronym{TLS} 1.1 @xcite{RFC4346} and @acronym{SSL} 3.0,
+since the differences of these protocols are minor.  Older protocols
+such as @acronym{SSL} 2.0 are not discussed nor implemented in
+@acronym{GnuTLS} since they are not considered secure today.  GnuTLS
+also supports @acronym{X.509} and @acronym{OpenPGP} @xcite{RFC4880}.
 
 @menu
 * TLS layers::
@@ -3056,6 +3055,27 @@ $ certtool --generate-proxy --load-ca-privkey key.pem \
   --outfile proxy-cert.pem
 @end example
 
+@item
+To create an empty Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem
+@end example
+
+To create a CRL that contains some revoked certificates, place the
+certificates in a file and use @code{--load-certificate} as follows:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
+@end example
+
+@item
+To verify a Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
+@end example
+
 @end itemize
 
 Certtool's template file format:
@@ -3704,10 +3724,6 @@ is summarized in the following diagram.
 
 @table @asis
 
-@item @anchor{SELKEY}[SELKEY]
-Arjen Lenstra and Eric Verheul, "Selecting Cryptographic Key Sizes", 2003, available from
-@url{http://www.win.tue.nl/~klenstra/key.pdf}.
-
 @item @anchor{CBCATT}[CBCATT]
 Bodo Moeller, "Security of CBC Ciphersuites in SSL/TLS: Problems and
 Countermeasures", 2002, available from
@@ -3725,52 +3741,54 @@ forced to find out", Available from
 @item @anchor{RFC2246}[RFC2246]
 Tim Dierks and Christopher Allen, "The TLS Protocol Version 1.0",
 January 1999, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2246.txt}.
+@url{http://www.ietf.org/rfc/rfc2246.txt}.
 
 @item @anchor{RFC4346}[RFC4346]
 Tim Dierks and Eric Rescorla, "The TLS Protocol Version 1.1", Match
-2006, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4346.txt}.
+2006, Available from @url{http://www.ietf.org/rfc/rfc4346.txt}.
 
 @item @anchor{RFC2440}[RFC2440]
 Jon Callas, Lutz Donnerhacke, Hal Finney and Rodney Thayer, "OpenPGP
 Message Format", November 1998, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2440.txt}.
+@url{http://www.ietf.org/rfc/rfc2440.txt}.
+
+@item @anchor{RFC4880}[RFC4880]
+Jon Callas, Lutz Donnerhacke, Hal Finney, David Shaw and Rodney
+Thayer, "OpenPGP Message Format", November 2007, Available from
+@url{http://www.ietf.org/rfc/rfc4880.txt}.
 
 @item @anchor{RFC4211}[RFC4211]
 J. Schaad, "Internet X.509 Public Key Infrastructure Certificate
 Request Message Format (CRMF)", September 2005, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4211.txt}.
+@url{http://www.ietf.org/rfc/rfc4211.txt}.
 
 @item @anchor{RFC2817}[RFC2817]
 Rohit Khare and Scott Lawrence, "Upgrading to TLS Within HTTP/1.1",
-May 2000, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2817.txt}
+May 2000, Available from @url{http://www.ietf.org/rfc/rfc2817.txt}
 
 @item @anchor{RFC2818}[RFC2818]
-Eric Rescola, "HTTP Over TLS", May 2000, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2818.txt}.
+Eric Rescorla, "HTTP Over TLS", May 2000, Available from
+@url{http://www.ietf/rfc/rfc2818.txt}.
 
 @item @anchor{RFC2945}[RFC2945]
 Tom Wu, "The SRP Authentication and Key Exchange System", September
-2000, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2945.txt}.
+2000, Available from @url{http://www.ietf.org/rfc/rfc2945.txt}.
 
 @item @anchor{RFC2986}[RFC2986]
 Magnus Nystrom and Burt Kaliski, "PKCS 10 v1.7: Certification Request
 Syntax Specification", November 2000, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2986.txt}.
+@url{http://www.ietf.org/rfc/rfc2986.txt}.
 
 @item @anchor{RFC3280}[RFC3280]
 Russell Housley, Tim Polk, Warwick Ford and David Solo, "Internet
 X.509 Public Key Infrastructure Certificate and Certificate Revocation
 List (CRL) Profile", April 2002, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3280.txt}.
+@url{http://www.ietf.org/rfc/rfc3280.txt}.
 
 @item @anchor{RFC3749}[RFC3749]
 Scott Hollenbeck, "Transport Layer Security Protocol Compression
 Methods", May 2004, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3749.txt}.
+@url{http://www.ietf.org/rfc/rfc3749.txt}.
 
 @item @anchor{RFC3820}[RFC3820]
 Steven Tuecke, Von Welch, Doug Engert, Laura Pearlman, and Mary
@@ -3782,9 +3800,13 @@ Certificate Profile", June 2004, available from
 RSA Laboratories, "PKCS 12 v1.0: Personal Information Exchange
 Syntax", June 1999, Available from @url{http://www.rsa.com}.
 
-@item @anchor{RESCOLA}[RESCOLA]
-Eric Rescola, "SSL and TLS: Designing and Building Secure Systems",
+@item @anchor{RESCORLA}[RESCORLA]
+Eric Rescorla, "SSL and TLS: Designing and Building Secure Systems",
 2001
+
+@item @anchor{SELKEY}[SELKEY]
+Arjen Lenstra and Eric Verheul, "Selecting Cryptographic Key Sizes",
+2003, available from @url{http://www.win.tue.nl/~klenstra/key.pdf}.
 
 @item @anchor{SSL3}[SSL3]
 Alan Freier, Philip Karlton and Paul Kocher, "The SSL Protocol Version
@@ -3798,22 +3820,22 @@ PTR, January 1998
 @item @anchor{TLSEXT}[TLSEXT]
 Simon Blake-Wilson, Magnus Nystrom, David Hopwood, Jan Mikkelsen and
 Tim Wright, "Transport Layer Security (TLS) Extensions", June 2003,
-Available from @url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3546.txt}.
+Available from @url{http://www.ietf.org/rfc/rfc3546.txt}.
 
 @item @anchor{TLSPGP}[TLSPGP]
 Nikos Mavrogiannopoulos, "Using OpenPGP keys for TLS authentication",
 April 2004, November 2007. Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc5081.txt}.
+@url{http://www.ietf.org/rfc/rfc5081.txt}.
 
 @item @anchor{TLSSRP}[TLSSRP]
 David Taylor, Trevor Perrin, Tom Wu and Nikos Mavrogiannopoulos,
 "Using SRP for TLS Authentication", November 2007. Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc5054.txt}.
+@url{http://www.ietf.org/rfc/rfc5054.txt}.
 
 @item @anchor{TLSPSK}[TLSPSK]
 Pasi Eronen and Hannes Tschofenig, "Pre-shared key Ciphersuites for
 TLS", December 2005, Available from
-@url{http://kaizi.viagenie.qc.ca/ietf/rfc/rfc4279.txt}.
+@url{http://www.ietf.org/rfc/rfc4279.txt}.
 
 @item @anchor{TOMSRP}[TOMSRP]
 Tom Wu, "The Stanford SRP Authentication Project", Available at

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -430,7 +430,7 @@ _gnutls_io_clear_peeked_data (gnutls_session_t session)
   if (session->internals.have_peeked_data == 0 || RCVLOWAT == 0)
     return 0;
 
-  peekdata = gnutls_alloca (RCVLOWAT);
+  peekdata = gnutls_malloc (RCVLOWAT);
   if (peekdata == NULL)
     {
       gnutls_assert ();
@@ -448,7 +448,7 @@ _gnutls_io_clear_peeked_data (gnutls_session_t session)
   while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN
 	 || sum < RCVLOWAT);
 
-  gnutls_afree (peekdata);
+  gnutls_free (peekdata);
 
   if (ret < 0)
     {

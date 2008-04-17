@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2005, 2006, 2007 Free Software Foundation
+# Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -24,9 +24,9 @@ AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes \
 		-I$(top_srcdir)/gl -I$(top_builddir)/gl
 AM_LDFLAGS = -no-install
 LDADD = libexamples.la \
-	../../gl/libgnu.la \
 	../../lib/libgnutls.la	\
-	../../libextra/libgnutls-extra.la
+	../../libextra/libgnutls-extra.la \
+	../../gl/libgnu.la
 
 noinst_PROGRAMS = ex-cert-select ex-client2 ex-client-resume	\
 	ex-crq ex-serv1 ex-serv-export

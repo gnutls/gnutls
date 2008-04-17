@@ -588,7 +588,7 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
       return _gnutls_asn2err (result);
     }
 
-  tmpstr = gnutls_alloca (len);
+  tmpstr = gnutls_malloc (len);
   if (tmpstr == NULL)
     {
       gnutls_assert ();
@@ -600,7 +600,7 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      gnutls_afree (tmpstr);
+      gnutls_free (tmpstr);
       return _gnutls_asn2err (result);
     }
 
@@ -615,11 +615,11 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
   else
     {
       gnutls_assert ();
-      gnutls_afree (tmpstr);
+      gnutls_free (tmpstr);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  gnutls_afree (tmpstr);
+  gnutls_free (tmpstr);
 
   return 0;
 }

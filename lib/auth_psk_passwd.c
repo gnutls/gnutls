@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -38,6 +38,7 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 #include <gnutls_num.h>
+#include <random.h>
 
 
 /* this function parses passwd.psk file. Format is:
@@ -97,6 +98,8 @@ pwd_put_values (gnutls_datum_t * psk, char *str)
 static int
 _randomize_psk (gnutls_datum_t * psk)
 {
+  int ret;
+  
   psk->data = gnutls_malloc (16);
   if (psk->data == NULL)
     {
@@ -105,12 +108,14 @@ _randomize_psk (gnutls_datum_t * psk)
     }
 
   psk->size = 16;
-  if (gc_nonce ((char *) psk->data, 16) != GC_OK)
+  
+  ret = _gnutls_rnd (RND_NONCE, (char *) psk->data, 16);
+  if ( ret < 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      gnutls_assert();
+      return ret;
     }
-
+    
   return 0;
 }
 
@@ -192,6 +197,7 @@ _gnutls_psk_pwd_find_entry (gnutls_session_t session, char *username,
       if (strncmp (username, line, MAX (i, len)) == 0)
 	{
 	  ret = pwd_put_values (psk, line);
+	  fclose (fd);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -200,6 +206,7 @@ _gnutls_psk_pwd_find_entry (gnutls_session_t session, char *username,
 	  return 0;
 	}
     }
+  fclose (fd);
 
   /* user was not found. Fake him. 
    * the last index found and randomize the entry.

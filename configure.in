@@ -22,7 +22,7 @@ dnl Process this file with autoconf to produce a configure script.
 # USA
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [2.3.5], [bug-gnutls@gnu.org])
+AC_INIT([GnuTLS], [2.3.6], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CANONICAL_TARGET
@@ -37,7 +37,7 @@ AB_INIT
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 AC_SUBST(LT_CURRENT, 29)
-AC_SUBST(LT_REVISION, 0)
+AC_SUBST(LT_REVISION, 1)
 AC_SUBST(LT_AGE, 3)
 ac_full=1
 
@@ -45,8 +45,6 @@ ac_full=1
 SOVERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
 AC_SUBST(SOVERSION)
 
-dnl for opencdk needs also change in the test
-GNUTLS_OPENCDK_VERSION=0.6.5
 GNUTLS_GCRYPT_VERSION=1:1.2.4
 GNUTLS_LIBTASN1_VERSION=0.3.4
 AC_DEFINE_UNQUOTED(GNUTLS_GCRYPT_VERSION, "$GNUTLS_GCRYPT_VERSION", [version of gcrypt])
@@ -170,12 +168,17 @@ if test $ac_cv_c_compiler_gnu != no; then
 	  [test "x$_gcc_gnu89_inline" = "xyes"])
 	CFLAGS=$_gcc_cflags_save;
 
-	AC_MSG_CHECKING([whether gcc/ld supports -Wl,--output-def])
-	_gcc_ldflags_save=$LDFLAGS
-	LDFLAGS="-Wl,--output-def,foo.def"
-	AC_LINK_IFELSE(AC_LANG_PROGRAM([]),output_def=yes,output_def=no)
-	AC_MSG_RESULT($output_def)
-	LDFLAGS="$_gcc_ldflags_save"
+	AC_MSG_CHECKING([if gcc/ld supports -Wl,--output-def])
+	if test "$enable_shared" = no; then
+	  output_def=no
+	  AC_MSG_RESULT([no need, since shared libraries are disabled])
+	else
+	  _gcc_ldflags_save=$LDFLAGS
+	  LDFLAGS="-Wl,--output-def,foo.def"
+	  AC_LINK_IFELSE(AC_LANG_PROGRAM([]),output_def=yes,output_def=no)
+	  AC_MSG_RESULT($output_def)
+	  LDFLAGS="$_gcc_ldflags_save"
+	fi
 
 	if test x$opt_dmalloc_mode = xyes; then
 	  AC_CHECK_LIB(dmalloc, main)
@@ -205,12 +208,11 @@ AC_MSG_RESULT([***
 ])
 
 AC_HEADER_STDC
-AC_CHECK_HEADERS(strings.h alloca.h)
+AC_CHECK_HEADERS(strings.h)
 AC_CHECK_HEADERS(errno.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 AC_CHECK_HEADERS(netdb.h)
 AC_CHECK_FUNCS(umask vasprintf isascii fork,,)
-AC_FUNC_ALLOCA
 
 # No fork on MinGW, disable some self-tests until we fix them.
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
@@ -495,43 +497,6 @@ else
 fi
 AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
 
-dnl Test whether to use the included opencdk library
-dnl 
-dnl We no longer test for it. We use the LGPL parts of this library internally
-dnl if test x$ac_enable_openpgp = xyes; then
-dnl AC_ARG_WITH(included-opencdk,
-dnl	AS_HELP_STRING([--with-included-opencdk], [use the included opencdk]),
-dnl		ac_enable_included_opencdk=$withval, 
-dnl		ac_enable_included_opencdk=no)
-dnl if test x$ac_enable_included_opencdk = xno;then 
-dnl  AC_LIB_HAVE_LINKFLAGS(opencdk,, [
-dnl #include <opencdk.h>], [
-dnl #if OPENCDK_VERSION_MINOR < 6 || OPENCDK_VERSION_PATCH < 5
-dnl # error "OpenCDK 0.6.5 is required"
-dnl #else
-dnl cdk_check_version( NULL);
-dnl #endif
-dnl ])
-dnl  if test "$ac_cv_libopencdk" != yes; then
-dnl    ac_enable_included_opencdk=yes
-dnl    AC_MSG_WARN([[
-dnl ***
-dnl *** libopencdk was not found. You may want to get it from
-dnl *** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
-dnl ***
-dnl *** Will use the included opencdk.
-dnl ***
-dnl ]])
-dnl   fi
-dnl   AC_MSG_CHECKING([whether to use the included opencdk])
-dnl   AC_MSG_RESULT($ac_enable_included_opencdk)
-dnl  fi
-dnl fi
-
-ac_enable_included_opencdk=yes
-
-AM_CONDITIONAL(ENABLE_INCLUDED_OPENCDK, test "$ac_enable_included_opencdk" = "yes")
-
 AC_MSG_CHECKING([whether to disable OpenSSL compatibility layer])
 AC_ARG_ENABLE(openssl-compatibility,
 	AS_HELP_STRING([--disable-openssl-compatibility],
@@ -680,8 +645,8 @@ LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS $LIBTASN1_CFLAGS -I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
-LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LTLIBOPENCDK $LZO_LIBS $LIBGNUTLS_LIBS"
-LIBGNUTLS_EXTRA_CFLAGS="$INCOPENCDK -I${includedir}"
+LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LZO_LIBS $LIBGNUTLS_LIBS"
+LIBGNUTLS_EXTRA_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
 AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 export ac_full

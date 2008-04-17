@@ -40,7 +40,7 @@
 #include "debug.h"
 #include <gnutls_sig.h>
 #include <gnutls_x509.h>
-#include <gc.h>
+#include <random.h>
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, opaque **);
 int _gnutls_proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
@@ -290,10 +290,11 @@ _gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 
       /* we do not need strong random numbers here.
        */
-      if (gc_nonce (session->key->key.data, session->key->key.size) != GC_OK)
+      ret = _gnutls_rnd (RND_NONCE, session->key->key.data, session->key->key.size);
+      if (ret < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_RANDOM_FAILED;
+	  return ret;
 	}
 
     }
@@ -344,11 +345,11 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  if (gc_pseudo_random (session->key->key.data,
-			session->key->key.size) != GC_OK)
+  ret = _gnutls_rnd( RND_RANDOM, session->key->key.data, session->key->key.size);
+  if ( ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   ver = _gnutls_get_adv_version (session);

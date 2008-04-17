@@ -294,6 +294,12 @@ gc_hash_open (Gc_hash hash, Gc_hash_mode mode, gc_hash_handle * outhandle)
       gcryalg = GCRY_MD_SHA512;
       break;
 
+#ifdef ENABLE_CAMELLIA
+    case GC_SHA224:
+      gcryalg = GCRY_MD_SHA224;
+      break;
+#endif
+
     case GC_RMD160:
       gcryalg = GCRY_MD_RMD160;
       break;
@@ -392,6 +398,12 @@ gc_hash_digest_length (Gc_hash hash)
     case GC_SHA512:
       len = GC_SHA512_DIGEST_SIZE;
       break;
+
+#ifdef ENABLE_CAMELLIA
+    case GC_SHA224:
+      len = GC_SHA224_DIGEST_SIZE;
+      break;
+#endif
 
     default:
       return 0;
@@ -505,6 +517,12 @@ gc_hash_buffer (Gc_hash hash, const void *in, size_t inlen, char *resbuf)
 #ifdef GNULIB_GC_SHA512
     case GC_SHA512:
       gcryalg = GCRY_MD_SHA512;
+      break;
+#endif
+
+#ifdef GNULIB_GC_SHA224
+    case GC_SHA224:
+      gcryalg = GCRY_MD_SHA224;
       break;
 #endif
 

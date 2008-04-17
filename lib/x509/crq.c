@@ -717,22 +717,26 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
 }
 
 /**
-  * gnutls_x509_crq_sign2 - This function will sign a Certificate request with a key
-  * @crq: should contain a gnutls_x509_crq_t structure
-  * @key: holds a private key
-  * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
-  * @flags: must be 0
-  *
-  * This function will sign the certificate request with a private key.
-  * This must be the same key as the one used in gnutls_x509_crt_set_key() since a
-  * certificate request is self signed.
-  *
-  * This must be the last step in a certificate request generation since all
-  * the previously set parameters are now signed.
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_x509_crq_sign2 - Sign a Certificate request with a key
+ * @crq: should contain a #gnutls_x509_crq_t structure
+ * @key: holds a private key
+ * @dig: The message digest to use, %GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
+ * @flags: must be 0
+ *
+ * This function will sign the certificate request with a private key.
+ * This must be the same key as the one used in
+ * gnutls_x509_crt_set_key() since a certificate request is self
+ * signed.
+ *
+ * This must be the last step in a certificate request generation
+ * since all the previously set parameters are now signed.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
+ * information in the certificate request (e.g., the version using
+ * gnutls_x509_crq_set_version()).
+ *
+ **/
 int
 gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
 		       gnutls_digest_algorithm_t dig, unsigned int flags)
@@ -744,6 +748,17 @@ gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* Make sure version field is set. */
+  if (gnutls_x509_crq_get_version (crq) == GNUTLS_E_ASN1_VALUE_NOT_FOUND)
+    {
+      result = gnutls_x509_crq_set_version (crq, 1);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
     }
 
   /* Step 1. Self sign the request.

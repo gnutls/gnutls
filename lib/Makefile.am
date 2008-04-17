@@ -33,15 +33,12 @@ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	-I$(top_srcdir)/includes -I../includes				\
 	-I$(srcdir)/x509						\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/openpgp/	\
-	-I$(top_srcdir)/lib/opencdk 				\
-	$(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
+	$(LIBGCRYPT_CFLAGS)
 
 if ENABLE_OPENPGP
-if ENABLE_INCLUDED_OPENCDK
 SUBDIRS += opencdk
-AM_CPPFLAGS += -I$(srcdir)/opencdk
-endif
 SUBDIRS += openpgp
+AM_CPPFLAGS += -I$(srcdir)/opencdk -I$(top_srcdir)/lib/opencdk
 endif
 
 if ENABLE_MINITASN1
@@ -85,7 +82,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_x509.c ext_cert_type.c gnutls_rsa_export.c		\
 	auth_rsa_export.c ext_server_name.c auth_dh_common.c		\
 	gnutls_helper.c ext_inner_application.c \
-	gnutls_supplemental.c crypto.c
+	gnutls_supplemental.c crypto.c random.c
 
 if ENABLE_OPRFI
 COBJECTS += $(OPRFI_COBJECTS)
@@ -106,7 +103,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	ext_inner_application.h gnutls_supplemental.h ext_oprfi.h       \
-	crypto.h
+	crypto.h random.h
 
 # Separate so we can create the documentation
 
@@ -122,11 +119,7 @@ libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
 if ENABLE_OPENPGP
 libgnutls_la_SOURCES += gnutls_openpgp.c
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
-if ENABLE_INCLUDED_OPENCDK
 libgnutls_la_LIBADD += opencdk/libminiopencdk.la
-else
-libgnutls_la_LDFLAGS += $(LTLIBOPENCDK) 
-endif
 endif
 
 if HAVE_LD_VERSION_SCRIPT

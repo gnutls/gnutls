@@ -3,10 +3,68 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.3.5 (unreleased)
+* Version 2.3.6 (unreleased)
+
+** Make gnutls_x509_crq_sign2 set certificate request version if not set.
+** Improve documentation for gnutls_x509_crq_sign2.
+Based on report from "John Brooks" <aspecialj@gmail.com> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1154>.
+
+** tests/pathlen: run diff without parameters to improve portability.
+Based on HPUX build hints in
+<http://hpux.cs.utah.edu/hppd/cgi-bin/wwwtar?/hpux/Gnu/gnutls-2.3.4/gnutls-2.3.4-src-11.11.tar.gz+gnutls-2.3.4/HPUX.Install+text>.
+
+** Don't use %e specifier with strftime, it doesn't work under Windows.
+Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
+
+** Remove all uses of gnutls_alloca/gnutls_afree.
+Use normal gnutls_malloc instead.  One reason is increased portability
+to Windows, the other is that several of the uses may be unsafe
+because the size of data allocated could be large.  Reported by
+Massimo Gaspari <massimo.gaspari@alice.it> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
 
 ** API and ABI modifications:
 No changes since last version.
+
+* Version 2.3.5 (released 2008-04-14)
+
+** Build fix for MinGW and --disable-shared.
+Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1145>.
+
+** Document how to generate CRLs.
+Suggested by "Rainer Gerhards" <rgerhards@gmail.com>.
+
+** Documented the --priority option to gnutls-cli and gnutls-serv.
+
+** Several minor fixes in the OpenPGP interface.
+Thanks to Daniel Kahn Gillmor.
+
+** Fix fopen file descriptor leak in PSK server code.
+Thanks to Laurence Withers <l@lwithers.me.uk>, see
+<http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+
+** Translations files not stored directly in git to avoid merge conflicts.
+
+** New APIs to let applications replace the RNG used.
+Update all RNG callers in the code to use the new interface.
+
+** Guile code now built with -fgnu89-inline to fix inline semantic problem.
+
+** Update gnulib files.
+
+** API and ABI modifications:
+gnutls_crypto_rnd_register: ADDED
+gnutls_rnd_level_t: ADDED
+GNUTLS_RND_KEY: ADDED, gnutls_rnd_level_t member
+GNUTLS_RND_RANDOM: ADDED, gnutls_rnd_level_t member
+GNUTLS_RND_NONCE: ADDED, gnutls_rnd_level_t member
+gnutls_crypto_rnd_st: ADDED
+GNUTLS_DIG_SHA224: ADDED
+GNUTLS_SIGN_RSA_SHA224: ADDED
+gnutls_openpgp_crt_get_auth_subkey: MODIFIED
 
 * Version 2.3.4 (released 2008-03-19)
 

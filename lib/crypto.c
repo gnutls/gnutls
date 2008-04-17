@@ -37,6 +37,7 @@ typedef struct algo_list {
 #define cipher_list algo_list
 #define mac_list algo_list
 #define digest_list algo_list
+#define rnd_list algo_list
 
 static int _algo_register( algo_list* al, int algorithm, int priority, void* s)
 {
@@ -101,8 +102,24 @@ cipher_list* cl;
 static cipher_list glob_cl = { GNUTLS_CIPHER_NULL, 0, NULL, NULL };
 static mac_list glob_ml = { GNUTLS_MAC_NULL, 0, NULL, NULL };
 static digest_list glob_dl = { GNUTLS_MAC_NULL, 0, NULL, NULL };
+static rnd_list glob_rnd = { 0, 0, NULL, NULL };
 
 
+/**
+  * gnutls_crypto_cipher_register - register a cipher algorithm
+  * @algorithm: is the gnutls algorithm identifier
+  * @priority: is the priority of the algorithm
+  * @s: is a structure holding new cipher's data
+  *
+  * This function will register a cipher algorithm to be used
+  * by gnutls. Any algorithm registered will override
+  * the included algorithms and by convention kernel implemented
+  * algorithms have priority of 90. The algorithm with the lowest
+  * priority will be used by gnutls.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
 int gnutls_crypto_cipher_register( gnutls_cipher_algorithm_t algorithm, int priority, gnutls_crypto_cipher_st* s)
 {
   return _algo_register( &glob_cl, algorithm, priority, s);
@@ -113,6 +130,45 @@ gnutls_crypto_cipher_st *_gnutls_get_crypto_cipher( gnutls_cipher_algorithm_t al
   return _get_algo( &glob_cl, algo);
 }
 
+/**
+  * gnutls_crypto_rnd_register - register a random generator
+  * @priority: is the priority of the generator
+  * @s: is a structure holding new generator's data
+  *
+  * This function will register a random generator to be used
+  * by gnutls. Any generator registered will override
+  * the included generator and by convention kernel implemented
+  * generators have priority of 90. The generator with the lowest
+  * priority will be used by gnutls.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
+int gnutls_crypto_rnd_register( int priority, gnutls_crypto_rnd_st* s)
+{
+  return _algo_register( &glob_rnd, 1, priority, s);
+}
+
+gnutls_crypto_rnd_st *_gnutls_get_crypto_rnd()
+{
+  return _get_algo( &glob_rnd, 1);
+}
+
+/**
+  * gnutls_crypto_mac_register - register a MAC algorithm
+  * @algorithm: is the gnutls algorithm identifier
+  * @priority: is the priority of the algorithm
+  * @s: is a structure holding new algorithms's data
+  *
+  * This function will register a MAC algorithm to be used
+  * by gnutls. Any algorithm registered will override
+  * the included algorithms and by convention kernel implemented
+  * algorithms have priority of 90. The algorithm with the lowest
+  * priority will be used by gnutls.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
 int gnutls_crypto_mac_register( gnutls_mac_algorithm_t algorithm, int priority, gnutls_crypto_mac_st* s)
 {
   return _algo_register( &glob_ml, algorithm, priority, s);
@@ -123,7 +179,21 @@ gnutls_crypto_mac_st *_gnutls_get_crypto_mac( gnutls_mac_algorithm_t algo)
   return _get_algo( &glob_ml, algo);
 }
 
-
+/**
+  * gnutls_crypto_digest_register - register a digest algorithm
+  * @algorithm: is the gnutls algorithm identifier
+  * @priority: is the priority of the algorithm
+  * @s: is a structure holding new algorithms's data
+  *
+  * This function will register a digest (hash) algorithm to be used
+  * by gnutls. Any algorithm registered will override
+  * the included algorithms and by convention kernel implemented
+  * algorithms have priority of 90. The algorithm with the lowest
+  * priority will be used by gnutls.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
 int gnutls_crypto_digest_register( gnutls_digest_algorithm_t algorithm, int priority, gnutls_crypto_digest_st* s)
 {
   return _algo_register( &glob_dl, algorithm, priority, s);

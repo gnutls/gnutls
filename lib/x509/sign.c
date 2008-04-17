@@ -268,7 +268,7 @@ _gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
   buf_size = 0;
   asn1_der_coding (cert, tbs_name, NULL, &buf_size, NULL);
 
-  buf = gnutls_alloca (buf_size);
+  buf = gnutls_malloc (buf_size);
   if (buf == NULL)
     {
       gnutls_assert ();
@@ -280,7 +280,7 @@ _gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      gnutls_afree (buf);
+      gnutls_free (buf);
       return _gnutls_asn2err (result);
     }
 
@@ -288,7 +288,7 @@ _gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
   tbs.size = buf_size;
 
   result = _gnutls_x509_sign (&tbs, hash, signer, signature);
-  gnutls_afree (buf);
+  gnutls_free (buf);
 
   return result;
 }

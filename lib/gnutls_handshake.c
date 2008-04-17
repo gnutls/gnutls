@@ -52,6 +52,7 @@
 #include <auth_anon.h>		/* for gnutls_anon_server_credentials_t */
 #include <auth_psk.h>		/* for gnutls_psk_server_credentials_t */
 #include <gc.h>
+#include <random.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_handshake_log( "HSK[%x]: %s (%d)\n", session, x,y)
@@ -253,6 +254,7 @@ int
 _gnutls_tls_create_random (opaque * dst)
 {
   uint32_t tim;
+  int ret;
 
   /* Use weak random numbers for the most of the
    * buffer except for the first 4 that are the
@@ -263,10 +265,11 @@ _gnutls_tls_create_random (opaque * dst)
   /* generate server random value */
   _gnutls_write_uint32 (tim, dst);
 
-  if (gc_nonce (&dst[4], TLS_RANDOM_SIZE - 4) != GC_OK)
+  ret = _gnutls_rnd (RND_NONCE, &dst[4], TLS_RANDOM_SIZE - 4);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   return 0;
@@ -930,7 +933,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 
   /* first run */
   datasize = i_datasize + HANDSHAKE_HEADER_SIZE;
-  data = gnutls_alloca (datasize);
+  data = gnutls_malloc (datasize);
   if (data == NULL)
     {
       gnutls_assert ();
@@ -955,7 +958,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 	 _gnutls_handshake_hash_add_sent (session, type, data, datasize)) < 0)
       {
 	gnutls_assert ();
-	gnutls_afree (data);
+	gnutls_free (data);
 	return ret;
       }
 
@@ -965,7 +968,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
     _gnutls_handshake_io_send_int (session, GNUTLS_HANDSHAKE, type,
 				   data, datasize);
 
-  gnutls_afree (data);
+  gnutls_free (data);
 
   return ret;
 }
@@ -1915,7 +1918,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	  return extdatalen;
 	}
 
-      data = gnutls_alloca (datalen + extdatalen);
+      data = gnutls_malloc (datalen + extdatalen);
       if (data == NULL)
 	{
 	  gnutls_assert ();
@@ -1963,7 +1966,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
   ret =
     _gnutls_send_handshake (session, data, datalen,
 			    GNUTLS_HANDSHAKE_SERVER_HELLO);
-  gnutls_afree (data);
+  gnutls_free (data);
 
   return ret;
 }
@@ -2668,11 +2671,13 @@ int
 _gnutls_generate_session_id (opaque * session_id, uint8_t * len)
 {
   *len = TLS_MAX_SESSION_ID_SIZE;
+  int ret;
 
-  if (gc_nonce (session_id, *len) != GC_OK)
+  ret = _gnutls_rnd (RND_NONCE, session_id, *len);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_RANDOM_FAILED;
+      return ret;
     }
 
   return 0;

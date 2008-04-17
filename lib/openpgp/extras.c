@@ -133,6 +133,12 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
   size_t raw_len = 0;
   opaque *raw_data = NULL;
 
+  if (data->data == NULL || data->size == 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+    }
+
   _gnutls_debug_log ("PGP: keyring import format '%s'\n",
 		     format == GNUTLS_OPENPGP_FMT_RAW ? "raw" : "base64");
 

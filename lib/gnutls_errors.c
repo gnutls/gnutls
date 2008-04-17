@@ -200,7 +200,8 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("The tasn1 library version is too old."),
 	       GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY, 1),
-
+  ERROR_ENTRY (N_("The OpenPGP User ID is revoked."),
+	       GNUTLS_E_OPENPGP_UID_REVOKED, 1),
   ERROR_ENTRY (N_("Error loading the keyring."),
 	       GNUTLS_E_OPENPGP_KEYRING_ERROR, 1),
   ERROR_ENTRY (N_("The initialization of LZO has failed."),

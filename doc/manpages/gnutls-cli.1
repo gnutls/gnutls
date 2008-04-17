@@ -26,25 +26,71 @@ is received.
 Prints the program's version number.
 
 .SS TLS/SSL control options
-.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
-Ciphers to enable (use \fBgnutls\-cli \-\-list\fR to show the
-supported ciphers).
-.IP "\-\-comp \fIcomp1 comp2...\fR"
-Compression methods to enable (use \fBgnutls\-cli \-\-list\fR to show
-the supported compression methods).
+.IP "\-\-priority \fIPRIORITY STRING\fR"
+TLS algorithms and protocols to enable.
+Unless the first keyword is "NONE" the defaults are:
+.IP 
+Protocols: TLS1.1, TLS1.0, and SSL3.0.
+.IP 
+Compression: NULL.
+.IP 
+Certificate types: X.509, OpenPGP.
+.IP
+You can also use predefined sets of ciphersuites such as: 
+.IP
+.B "PERFORMANCE"
+all the "secure" ciphersuites are enabled, limited to 128 bit
+ciphers and sorted by terms of speed performance.
+.IP 
+.B "NORMAL" 
+option enables all "secure" ciphersuites. The 256-bit ciphers
+are included as a fallback only. The ciphers are sorted by security
+margin.
+.IP 
+.B "SECURE128" 
+flag enables all "secure" ciphersuites with ciphers up to
+128 bits, sorted by security margin.
+.IP 
+.B "SECURE256" 
+flag enables all "secure" ciphersuites including the 256 bit
+ciphers, sorted by security margin.
+.IP 
+.B "EXPORT" 
+all the ciphersuites are enabled, including the
+low-security 40 bit ciphers.
+.IP 
+.B "NONE" 
+nothing is enabled. This disables even protocols and
+compression methods.
+.IP
+.IP 
+Special keywords:
+.IP
+'!' or '-' appended with an algorithm will remove this algorithm.
+.IP
+'+' appended with an algorithm will add this algorithm.
+.IP
+'%COMPAT' will enable compatibility features for a server.
+.IP
+To avoid collisions in order to specify a compression algorithm in
+this string you have to prefix it with "COMP-", protocol versions
+with "VERS-" and certificate types with "CTYPE-". All other
+algorithms don't need a prefix.
+.IP 
+.B Examples:
+.IP 
+"NORMAL"
+.IP 
+"NORMAL:%COMPAT"
+.IP 
+"NORMAL:!AES-128-CBC"
+.IP 
+"NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL"
+
 .IP "\-\-crlf"
 Send CR LF instead of LF.
-.IP "\-\-ctypes \fIcertType1 certType2...\fR"
-Certificate types to enable (use \fBgnutls\-cli \-\-list\fR to show
-the supported certificate types).
 .IP "\-f, \-\-fingerprint"
 Send the openpgp fingerprint, instead of the key.
-.IP "\-\-kx \fIkx1 kx2...\fR"
-Key exchange methods to enable (use \fBgnutls\-cli \-\-list\fR to show
-the supported key exchange methods).
-.IP "\-\-macs \fImac1 mac2...\fR"
-MACs (Message Authentication Codes) to enable (use \fBgnutls\-cli
-\-\-list\fR to show the supported MACs).
 .IP "\-p, \-\-port \fIinteger\fR"
 The port to connect to.
 .IP "\-\-protocols \fIprotocol1 protocol2...\fR"

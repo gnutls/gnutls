@@ -178,7 +178,7 @@ extern "C"
   int gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key, const gnutls_openpgp_keyid_t keyid);
   int gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid);
   
-  int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid);
+  int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid, unsigned int flag);
 
 /* Keyring stuff.
  */

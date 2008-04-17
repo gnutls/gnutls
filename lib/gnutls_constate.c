@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006  Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008  Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -315,7 +315,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
     }
   else if (IV_size > 0 && export_flag != 0)
     {
-      opaque *iv_block = gnutls_alloca (IV_size * 2);
+      opaque *iv_block = gnutls_malloc (IV_size * 2);
       if (iv_block == NULL)
 	{
 	  gnutls_assert ();
@@ -333,7 +333,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	    {
 	      gnutls_assert ();
 	      gnutls_free (key_block);
-	      gnutls_afree (iv_block);
+	      gnutls_free (iv_block);
 	      return ret;
 	    }
 
@@ -352,7 +352,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  gnutls_afree (iv_block);
+	  gnutls_free (iv_block);
 	  gnutls_free (key_block);
 	  return ret;
 	}
@@ -360,7 +360,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_IV, iv_block, IV_size) < 0)
 	{
-	  gnutls_afree (iv_block);
+	  gnutls_free (iv_block);
 	  gnutls_free (key_block);
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -369,12 +369,12 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  (&session->cipher_specs.server_write_IV,
 	   &iv_block[IV_size], IV_size) < 0)
 	{
-	  gnutls_afree (iv_block);
+	  gnutls_free (iv_block);
 	  gnutls_free (key_block);
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
-      gnutls_afree (iv_block);
+      gnutls_free (iv_block);
     }
 
   gnutls_free (key_block);

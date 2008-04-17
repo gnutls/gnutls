@@ -40,7 +40,7 @@ int _gnutls_map_cdk_rc (int rc);
 
 int _gnutls_openpgp_export (cdk_kbnode_t node,
 			       gnutls_openpgp_crt_fmt_t format,
-			       void *output_data, size_t * output_data_size);
+			       void *output_data, size_t * output_data_size, int private);
 
 int _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert,
 				  gnutls_openpgp_crt_t cert);
