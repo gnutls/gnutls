@@ -209,7 +209,7 @@ _find_x509_cert (const gnutls_certificate_credentials_t cred,
 		 int pk_algos_length, int *indx)
 {
   unsigned size;
-  gnutls_datum_t odn;
+  gnutls_datum_t odn = { NULL, 0 };
   opaque *data = _data;
   ssize_t data_size = _data_size;
   unsigned i, j;
