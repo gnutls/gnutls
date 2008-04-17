@@ -329,8 +329,9 @@ extern "C"
   struct gnutls_dh_params_int;
   typedef struct gnutls_dh_params_int *gnutls_dh_params_t;
 
-  struct gnutls_x509_privkey_int;	/* XXX ugly. */
-  typedef struct gnutls_x509_privkey_int *gnutls_rsa_params_t;	/* XXX ugly. */
+  /* XXX ugly. */
+  struct gnutls_x509_privkey_int;
+  typedef struct gnutls_x509_privkey_int *gnutls_rsa_params_t;
 
   struct gnutls_priority_st;
   typedef struct gnutls_priority_st *gnutls_priority_t;
