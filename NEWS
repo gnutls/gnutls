@@ -25,6 +25,10 @@ because the size of data allocated could be large.  Reported by
 Massimo Gaspari <massimo.gaspari@alice.it> in
 <http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
 
+** Build Guile code with -fgnu89-inline only when supported.
+Reported by Kris Karas <ktk@enterprise.bidmc.harvard.edu> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2708>.
+
 ** API and ABI modifications:
 No changes since last version.
 
