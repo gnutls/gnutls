@@ -173,8 +173,8 @@ extern "C"
     void *handle;
   } MD_CTX;
 
-  struct RSA;
-  typedef struct RSA RSA;
+  struct rsa_st;
+  typedef struct rsa_st RSA;
 
 #define MD5_CTX MD_CTX
 #define RIPEMD160_CTX MD_CTX
