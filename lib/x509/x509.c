@@ -1336,22 +1336,22 @@ gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
 }
 
 /**
-  * gnutls_x509_crt_get_key_usage - This function returns the certificate's key usage
+  * gnutls_x509_crt_get_key_usage - return the certificate's key usage
   * @cert: should contain a gnutls_x509_crt_t structure
   * @key_usage: where the key usage bits will be stored
   * @critical: will be non zero if the extension is marked as critical
   *
-  * This function will return certificate's key usage, by reading the 
-  * keyUsage X.509 extension (2.5.29.15). The key usage value will ORed values of the:
-  * GNUTLS_KEY_DIGITAL_SIGNATURE, GNUTLS_KEY_NON_REPUDIATION,
-  * GNUTLS_KEY_KEY_ENCIPHERMENT, GNUTLS_KEY_DATA_ENCIPHERMENT,
-  * GNUTLS_KEY_KEY_AGREEMENT, GNUTLS_KEY_KEY_CERT_SIGN,
-  * GNUTLS_KEY_CRL_SIGN, GNUTLS_KEY_ENCIPHER_ONLY,
-  * GNUTLS_KEY_DECIPHER_ONLY.
+  * This function will return certificate's key usage, by reading the
+  * keyUsage X.509 extension (2.5.29.15). The key usage value will
+  * ORed values of the: %GNUTLS_KEY_DIGITAL_SIGNATURE,
+  * %GNUTLS_KEY_NON_REPUDIATION, %GNUTLS_KEY_KEY_ENCIPHERMENT,
+  * %GNUTLS_KEY_DATA_ENCIPHERMENT, %GNUTLS_KEY_KEY_AGREEMENT,
+  * %GNUTLS_KEY_KEY_CERT_SIGN, %GNUTLS_KEY_CRL_SIGN,
+  * %GNUTLS_KEY_ENCIPHER_ONLY, %GNUTLS_KEY_DECIPHER_ONLY.
   *
-  * A negative value may be returned in case of parsing error.
-  * If the certificate does not contain the keyUsage extension
-  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+  * Returns: the certificate key usage, or a negative value in case of
+  * parsing error.  If the certificate does not contain the keyUsage
+  * extension %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
 int
