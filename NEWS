@@ -29,6 +29,13 @@ Massimo Gaspari <massimo.gaspari@alice.it> in
 Reported by Kris Karas <ktk@enterprise.bidmc.harvard.edu> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2708>.
 
+** Several GTK-DOC related fixes.
+
+** Clean up OpenCDK related code.
+GnuTLS now requires its internal OpenCDK code rather than the external
+GPL library OpenCDK.  Unfortunately, we don't have resources to
+maintain an external library (help welcome).
+
 ** API and ABI modifications:
 No changes since last version.
 
