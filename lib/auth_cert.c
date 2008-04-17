@@ -1180,7 +1180,7 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
     }
 
   peer_certificate_list =
-    gnutls_alloca (sizeof (gnutls_cert) * (peer_certificate_list_size));
+    gnutls_malloc (sizeof (gnutls_cert) * (peer_certificate_list_size));
   if (peer_certificate_list == NULL)
     {
       gnutls_assert ();
@@ -1221,7 +1221,7 @@ cleanup:
 
   _gnutls_free_datum (&akey);
   CLEAR_CERTS;
-  gnutls_afree (peer_certificate_list);
+  gnutls_free (peer_certificate_list);
   return ret;
 
 }
