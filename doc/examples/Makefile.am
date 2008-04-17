@@ -25,8 +25,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes \
 AM_LDFLAGS = -no-install
 LDADD = libexamples.la \
 	../../lib/libgnutls.la	\
-	../../libextra/libgnutls-extra.la
-	../../gl/libgnu.la \
+	../../libextra/libgnutls-extra.la \
+	../../gl/libgnu.la
 
 noinst_PROGRAMS = ex-cert-select ex-client2 ex-client-resume	\
 	ex-crq ex-serv1 ex-serv-export
