@@ -1,3 +1,177 @@
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.6.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Link errcodes with gnulib.  Possibly fixes
+	rpl_strerror problem when linking on HPUX, see:
+
+	<http://hpux.cs.utah.edu/hppd/cgi-bin/wwwtar?/hpux/Gnu/gnutls-2.3.4/gnutls-2.3.4-src-11.11.tar.gz+gnutls-2.3.4/HPUX.Install+text>.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* : commit 01a64fe6798a4ba82df9accf67c7c8f657abd9f5 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Thu Apr 17 14:27:03 2008
+	+0200
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/kbnode.c: Doc fix (gtk-doc warning).
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/openssl.h: Fix gtk-doc warning about duplicate RSA
+	namespace.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c: Fix warning.
+
+2008-04-17  Ludovic Courtès <ludo@gnu.org>
+
+	* : commit 2b4f4e3fd2b0df0b77b283928154b5f3e9139fe8 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Thu Apr 17 14:15:49 2008
+	+0200
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Fix --source-dir to only cover lib/,
+	libextra/ and includes/.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Simplify cdk handling.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Discuss OpenCDK better.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* README: No need for external opencdk.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/opencdk/misc.c: Remove code to
+	link with external opencdk.  It seems we now don't have resources to
+	maintain the LGPL opencdk code externally, since making it use
+	GnuTLS's crypto code will be complicated.  See discussion in:
+
+	http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2672/focus=2711
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: No need for alloca checks.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_algorithms.c, lib/gnutls_buffers.c,
+	lib/gnutls_constate.c, lib/gnutls_handshake.c, lib/gnutls_mem.h,
+	lib/gnutls_mpi.c, lib/gnutls_pk.c, lib/x509/crl.c, lib/x509/mpi.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/sign.c, lib/x509/x509.c: Remove
+	all uses of gnutls_alloca/gnutls_afree.  Use normal gnutls_malloc
+	instead.  One reason is increased portability to Windows, the other
+	is that several of the uses may be unsafe because the size of data
+	allocated could be large.  Reported by Massimo Gaspari
+	<massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c: Don't use alloca, the certificate list can be
+	larger than stack size.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/output.c: Don't use %e specifier with strftime, it
+	doesn't work under Windows.  Reported by Massimo Gaspari
+	<massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_asn1_tab.c, lib/pkix_asn1_tab.c: Re-generate using
+	modern libtasn1.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Fix typo.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/pathlen/pathlen: Run diff without parameters, to
+	improve portability.  Based on HPUX recommendations in
+
+	<http://hpux.cs.utah.edu/hppd/cgi-bin/wwwtar?/hpux/Gnu/gnutls-2.3.4/gnutls-2.3.4-src-11.11.tar.gz+gnutls-2.3.4/HPUX.Install+text>.
+
+2008-04-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Reorder libgnu.la last.  Possibly fix
+	rpl_fseeko problem reported in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1166>.
+
+2008-04-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Update bibliography.
+
+2008-04-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Doc fix (silence texinfo warning).
+
+2008-04-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/pgp.c: Improve error messages.  See
+	<http://trac.gnutls.org/cgi-bin/trac.cgi/ticket/26>.
+
+2008-04-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rsa-aes-gcm-03.txt: Add.
+
+2008-04-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/crq.c, src/certtool.c: Make gnutls_x509_crq_sign2
+	set certificate request version if not set.
+
+2008-04-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, lib/x509/crq.c: Improve documentation for
+	gnutls_x509_crq_sign2.  Based on report from "John Brooks"
+	<aspecialj@gmail.com> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1154>.
+
+2008-04-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-rescorla-tls-suiteb-02.txt: Add.
+
+2008-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-new-mac-05.txt: Add.
+
+2008-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-04-14  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.5.
@@ -284,6 +458,12 @@
 	gl/m4/lib-link.m4, lgl/Makefile.am, lgl/m4/gnulib-cache.m4,
 	lgl/m4/gnulib-comp.m4, lgl/m4/lib-link.m4, maint-cfg.mk, maint.mk: 
 	Update gnulib files.
+
+2008-03-20  Ludovic Courtès <ludo@gnu.org>
+
+	* configure.in, guile/src/Makefile.am: Check whether
+	`-fgnu89-inline' is supported before using it.  * configure.in: Check for `-fgnu89-inline', define Automake
+	  conditional `HAVE_GCC_GNU89_INLINE_OPTION'.  * guile/src/Makefile.am (AM_CFLAGS): Only use `-fgnu89-inline' when   `HAVE_GCC_GNU89_INLINE_OPTION' is true.
 
 2008-03-19  Simon Josefsson <simon@josefsson.org>
 
