@@ -33,13 +33,12 @@ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	-I$(top_srcdir)/includes -I../includes				\
 	-I$(srcdir)/x509						\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/openpgp/	\
-	-I$(top_srcdir)/lib/opencdk 				\
-	$(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
+	$(LIBGCRYPT_CFLAGS)
 
 if ENABLE_OPENPGP
 SUBDIRS += opencdk
-AM_CPPFLAGS += -I$(srcdir)/opencdk
 SUBDIRS += openpgp
+AM_CPPFLAGS += -I$(srcdir)/opencdk -I$(top_srcdir)/lib/opencdk
 endif
 
 if ENABLE_MINITASN1
