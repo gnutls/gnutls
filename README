@@ -18,10 +18,6 @@ The library needs libgcrypt. You can find libgcrypt at
 compiling libgcrypt with CPU optimizations gnutls' speed will
 increase.
 
-For OpenPGP key support, the OpenCDK library can be used.  You can
-find libopencdk at: <ftp://ftp.gnutls.org/pub/gnutls/opencdk/>.  A
-copy of libopencdk is also included with GnuTLS.
-
 In case you are compiling for embedded systems you should check the
 configure options (that is run: 'configure --help'), and disable
 unneeded features of gnutls.
