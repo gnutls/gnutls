@@ -37,10 +37,8 @@ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	$(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
 
 if ENABLE_OPENPGP
-if ENABLE_INCLUDED_OPENCDK
 SUBDIRS += opencdk
 AM_CPPFLAGS += -I$(srcdir)/opencdk
-endif
 SUBDIRS += openpgp
 endif
 
@@ -122,11 +120,7 @@ libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
 if ENABLE_OPENPGP
 libgnutls_la_SOURCES += gnutls_openpgp.c
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
-if ENABLE_INCLUDED_OPENCDK
 libgnutls_la_LIBADD += opencdk/libminiopencdk.la
-else
-libgnutls_la_LDFLAGS += $(LTLIBOPENCDK) 
-endif
 endif
 
 if HAVE_LD_VERSION_SCRIPT
