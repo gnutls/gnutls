@@ -278,7 +278,8 @@ cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t *ctx, int all)
  * Commits changes made to the kblist at ROOT. Note that ROOT my change,
  * and it is therefore passed by reference.
  * The function has the effect of removing all nodes marked as deleted.
- * returns true if any node has been changed 
+ *
+ * Returns: true if any node has been changed
  */
 int
 cdk_kbnode_commit (cdk_kbnode_t *root)
