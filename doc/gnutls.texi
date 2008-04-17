@@ -225,15 +225,11 @@ want to install it separately (e.g., to make it possibly to use
 libtasn1 in other programs), you can get it from
 @url{http://www.gnu.org/software/gnutls/download.html}.
 
-The OpenPGP part of GnuTLS-extra needs OpenCDK for parsing OpenPGP
-packets.  A copy of OpenCDK is included in GnuTLS.  If you want to
-install it separately (e.g., to make it possibly to use libtasn1 in
-other programs), you can get it from
-@url{http://www.gnu.org/software/gnutls/download.html}.  Use parameter
-@code{--with-included-opencdk} to unconditionally use the internal
-copy of OpenCDK.  Use parameter
+The OpenPGP part of GnuTLS uses a stripped down version of OpenCDK for
+parsing OpenPGP packets.  It is included GnuTLS.  Use parameter
 @code{--disable-openpgp-authentication} to disable the OpenPGP
-functionality in GnuTLS.
+functionality in GnuTLS.  Unfortunately, we didn't have resources to
+maintain the code in a separate library.
 
 Regarding the Guile bindings, there are additional installation
 considerations, see @xref{Guile Preparations}.
@@ -400,8 +396,9 @@ verification functions which is partially implemented in the
 @acronym{GnuTLS} library.  The
 @acronym{Libtasn1}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/libtasn1/}},
 a library which offers @acronym{ASN.1} parsing capabilities, is used
-for the @acronym{X.509} certificate parsing functions, and
-@acronym{Opencdk}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}}
+for the @acronym{X.509} certificate parsing functions.  A smaller
+version of
+@acronym{OpenCDK}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}}
 is used for the @acronym{OpenPGP} key support in @acronym{GnuTLS}.
 The ``Crypto backend'' is provided by the
 @acronym{Libgcrypt}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}}
