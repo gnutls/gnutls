@@ -1477,7 +1477,8 @@ int ret;
  * @flag: Non zero indicates that a valid subkey is always returned.
  *
  * Returns the 64-bit keyID of the first valid OpenPGP subkey marked for authentication. 
- * If flag is non zero then a valid subkey will be returned even if it is not marked for authentication.
+ * If flag is non zero and no authentication subkey exists, then a valid subkey will 
+ * be returned even if it is not marked for authentication.
  * 
  * Returns zero on success.
  **/
@@ -1532,7 +1533,7 @@ int gnutls_openpgp_crt_get_auth_subkey( gnutls_openpgp_crt_t crt, gnutls_openpgp
               return ret;
             }
 
-          return 0;;\
+          return 0;
         }
     }
 
