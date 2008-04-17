@@ -14,6 +14,10 @@ Based on report from "John Brooks" <aspecialj@gmail.com> in
 Based on HPUX build hints in
 <http://hpux.cs.utah.edu/hppd/cgi-bin/wwwtar?/hpux/Gnu/gnutls-2.3.4/gnutls-2.3.4-src-11.11.tar.gz+gnutls-2.3.4/HPUX.Install+text>.
 
+** Don't use %e specifier with strftime, it doesn't work under Windows.
+Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1170>.
+
 ** API and ABI modifications:
 No changes since last version.
 

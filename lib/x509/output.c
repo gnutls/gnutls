@@ -560,7 +560,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 
       if (gmtime_r (&tim, &t) == NULL)
 	addf (str, "error: gmtime_r (%d)\n", t);
-      else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+      else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
 	addf (str, "error: strftime (%d)\n", t);
       else
 	addf (str, _("\t\tNot Before: %s\n"), s);
@@ -574,7 +574,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 
       if (gmtime_r (&tim, &t) == NULL)
 	addf (str, "error: gmtime_r (%d)\n", t);
-      else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+      else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
 	addf (str, "error: strftime (%d)\n", t);
       else
 	addf (str, _("\t\tNot After: %s\n"), s);
@@ -1207,7 +1207,7 @@ print_crl (gnutls_string *str,
 
       if (gmtime_r (&tim, &t) == NULL)
 	addf (str, "error: gmtime_r (%d)\n", t);
-      else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+      else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
 	addf (str, "error: strftime (%d)\n", t);
       else
 	addf (str, _("\t\tIssued: %s\n"), s);
@@ -1223,7 +1223,7 @@ print_crl (gnutls_string *str,
 	addf (str, "\t\tNo next update time.\n");
       else if (gmtime_r (&tim, &t) == NULL)
 	addf (str, "error: gmtime_r (%d)\n", t);
-      else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+      else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
 	addf (str, "error: strftime (%d)\n", t);
       else
 	addf (str, _("\t\tNext at: %s\n"), s);
@@ -1263,7 +1263,7 @@ print_crl (gnutls_string *str,
 
 	    if (gmtime_r (&tim, &t) == NULL)
 	      addf (str, "error: gmtime_r (%d)\n", t);
-	    else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+	    else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
 	      addf (str, "error: strftime (%d)\n", t);
 	    else
 	      addf (str, _("\t\tRevoked at: %s\n"), s);
