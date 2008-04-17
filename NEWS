@@ -10,6 +10,10 @@ See the end for copying conditions.
 Based on report from "John Brooks" <aspecialj@gmail.com> in
 <http://permalink.gmane.org/gmane.network.gnutls.general/1154>.
 
+** tests/pathlen: run diff without parameters to improve portability.
+Based on HPUX build hints in
+<http://hpux.cs.utah.edu/hppd/cgi-bin/wwwtar?/hpux/Gnu/gnutls-2.3.4/gnutls-2.3.4-src-11.11.tar.gz+gnutls-2.3.4/HPUX.Install+text>.
+
 ** API and ABI modifications:
 No changes since last version.
 
