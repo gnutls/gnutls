@@ -7,7 +7,9 @@ See the end for copying conditions.
 
 ** Build fixes for MinGW.
 Missing rpl_fseeko symbol in lib/opencdk/.  Better checks for linking
-with -lws2_32 when needed.
+with -lws2_32 when needed.  Use ASCII only isprint() when printing
+X.509 certificate information, to avoid non-ASCII but printable
+characters.
 
 ** API and ABI modifications:
 No changes since last version.
