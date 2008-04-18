@@ -116,6 +116,10 @@ libgnutls_la_LDFLAGS = -no-undefined \
 libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
 	@LTLIBZ@ $(LIBGCRYPT_LIBS) @LTLIBINTL@
 
+if NEED_WS2_32
+libgnutls_la_LIBADD += -lws2_32
+endif
+
 if ENABLE_OPENPGP
 libgnutls_la_SOURCES += gnutls_openpgp.c
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
