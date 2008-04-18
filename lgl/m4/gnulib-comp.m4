@@ -243,9 +243,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/arctwo.h
   lib/asnprintf.c
   lib/asprintf.c
+  lib/c-ctype.c
+  lib/c-ctype.h
   lib/des.c
   lib/des.h
-  lib/dummy.c
   lib/float+.h
   lib/float.in.h
   lib/fseeko.c
