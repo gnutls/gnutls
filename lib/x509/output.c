@@ -30,6 +30,7 @@
 #include <gnutls_x509.h>
 #include <x509_int.h>
 #include <gnutls_errors.h>
+#include <c-ctype.h>
 
 /* I18n of error codes. */
 #include "gettext.h"
@@ -84,7 +85,7 @@ asciiprint (gnutls_string * str, const char *data, size_t len)
   size_t j;
 
   for (j = 0; j < len; j++)
-    if (isprint (data[j]))
+    if (c_isprint (data[j]))
       addf (str, "%c", (unsigned char) data[j]);
     else
       addf (str, ".");
