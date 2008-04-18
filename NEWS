@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.3.7 (unreleased)
 
+** gnutls-cli: Fix crash on TLS handshake failures.
+Reported by "Marc F. Clemente" <marc@mclemente.net> in Debian BTS #466477.
+This is similar to <http://bugs.debian.org/429183>.
+
 ** certtool: with --generate-request and newly generated keys, print the key.
 
 ** Build fixes for MinGW.
