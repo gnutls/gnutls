@@ -27,7 +27,6 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
-  AC_REQUIRE([AC_FUNC_FSEEKO])
   dnl Some compilers (e.g., AIX 5.3 cc) need to be in c99 mode
   dnl for the builtin va_copy to work.  With Autoconf 2.60 or later,
   dnl AC_PROG_CC_STDC arranges for this.  With older Autoconf AC_PROG_CC_STDC
@@ -53,8 +52,6 @@ AC_DEFUN([gl_INIT],
   m4_ifdef([AM_XGETTEXT_OPTION],
     [AM_XGETTEXT_OPTION([--flag=error:3:c-format])
      AM_XGETTEXT_OPTION([--flag=error_at_line:5:c-format])])
-  gl_FUNC_FSEEKO
-  gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_GETADDRINFO
   gl_FUNC_GETDELIM
   gl_STDIO_MODULE_INDICATOR([getdelim])
@@ -73,8 +70,6 @@ AC_DEFUN([gl_INIT],
   	[GNUmakefile=$GNUmakefile])])
   gl_INET_NTOP
   gl_INET_PTON
-  gl_FUNC_LSEEK
-  gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_FUNC_READLINE
@@ -209,7 +204,6 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/lgpl-2.1.texi
   lib/error.c
   lib/error.h
-  lib/fseeko.c
   lib/gai_strerror.c
   lib/getaddrinfo.c
   lib/getaddrinfo.h
@@ -222,7 +216,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/inet_pton.c
   lib/inet_pton.h
   lib/intprops.h
-  lib/lseek.c
   lib/netinet_in.in.h
   lib/progname.c
   lib/progname.h
@@ -238,7 +231,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/eoverflow.m4
   m4/error.m4
   m4/extensions.m4
-  m4/fseeko.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
@@ -250,7 +242,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
-  m4/lseek.m4
   m4/netinet_in_h.m4
   m4/readline.m4
   m4/socklen.m4

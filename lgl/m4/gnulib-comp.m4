@@ -27,6 +27,7 @@ AC_DEFUN([lgl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  AC_REQUIRE([AC_FUNC_FSEEKO])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -74,11 +75,15 @@ AC_DEFUN([lgl_INIT],
   gl_MODULE_INDICATOR([gc-sha1])
   gl_MD2
   gl_FLOAT_H
+  gl_FUNC_FSEEKO
+  gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_FUNC
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.17])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
+  gl_FUNC_LSEEK
+  gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_FUNC_MEMCHR
   gl_FUNC_MEMCMP
   gl_FUNC_MEMMEM_SIMPLE
@@ -243,6 +248,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/dummy.c
   lib/float+.h
   lib/float.in.h
+  lib/fseeko.c
   lib/gc-gnulib.c
   lib/gc-libgcrypt.c
   lib/gc-pbkdf2-sha1.c
@@ -251,6 +257,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/hmac-md5.c
   lib/hmac-sha1.c
   lib/hmac.h
+  lib/lseek.c
   lib/md2.c
   lib/md2.h
   lib/md4.c
@@ -305,6 +312,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/eoverflow.m4
   m4/extensions.m4
   m4/float_h.m4
+  m4/fseeko.m4
   m4/func.m4
   m4/gc-arcfour.m4
   m4/gc-arctwo.m4
@@ -342,6 +350,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/lib-prefix.m4
   m4/lock.m4
   m4/longlong.m4
+  m4/lseek.m4
   m4/malloc.m4
   m4/md2.m4
   m4/md4.m4
