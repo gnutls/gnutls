@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.7 (unreleased)
 
+** Build fixes for MinGW.
+Missing rpl_fseeko symbol in lib/opencdk/.
+
 ** API and ABI modifications:
 No changes since last version.
 
