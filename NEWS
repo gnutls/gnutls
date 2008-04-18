@@ -6,7 +6,8 @@ See the end for copying conditions.
 * Version 2.3.7 (unreleased)
 
 ** Build fixes for MinGW.
-Missing rpl_fseeko symbol in lib/opencdk/.
+Missing rpl_fseeko symbol in lib/opencdk/.  Better checks for linking
+with -lws2_32 when needed.
 
 ** API and ABI modifications:
 No changes since last version.
