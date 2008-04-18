@@ -1739,7 +1739,11 @@ generate_request (void)
    */
   key = load_private_key (0);
   if (!key)
-    key = generate_private_key_int ();
+    {
+      key = generate_private_key_int ();
+
+      print_private_key (key);
+    }
 
   /* Set the DN.
    */
