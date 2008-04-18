@@ -212,7 +212,7 @@ AC_CHECK_HEADERS(strings.h)
 AC_CHECK_HEADERS(errno.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_FUNCS(umask vasprintf isascii fork,,)
+AC_CHECK_FUNCS(umask isascii fork,,)
 
 # No fork on MinGW, disable some self-tests until we fix them.
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
