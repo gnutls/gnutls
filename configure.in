@@ -614,6 +614,24 @@ fi
 
 AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
 
+# Windows hacks.
+
+AC_DEFINE(WINVER, 0x0501)  # Windows 2000 or before not supported.
+save_LIBS="$LIBS"
+LIBS="$LIBS -lws2_32"
+AC_TRY_LINK([#include <winsock2.h>], [
+  WORD wVersionRequested = MAKEWORD(2, 2);
+  WSADATA wsaData;
+  int err = WSAStartup(wVersionRequested, &wsaData);
+  WSACleanup ();], wsastartup=yes, wsastartup=no)
+LIBS="$save_LIBS"
+if test "$wsastartup" = "yes"; then
+  AC_DEFINE(HAVE_WINSOCK, 1, [Call WSAStartup in gnutls_global_init])
+fi
+AM_CONDITIONAL(NEED_WS2_32, test "$wsastartup" = "yes")
+AC_MSG_CHECKING([if we have Windows and WSAStartup/WSACleanup in -lws2_32])
+AC_MSG_RESULT($wsastartup)
+
 dnl Gnulib files
 dnl
 
@@ -625,17 +643,6 @@ LIBS="$LIBS $LIBGCRYPT_LIBS"
 gl_INIT
 lgl_INIT
 LIBS="$save_LIBS"
-
-AC_TRY_LINK([#include <winsock2.h>], [
-  WORD wVersionRequested = MAKEWORD(2, 2);
-  WSADATA wsaData;
-  int err = WSAStartup(wVersionRequested, &wsaData);
-  WSACleanup ();], wsastartup=yes, wsastartup=no)
-if test x$wsastartup = xyes; then
-  AC_DEFINE(HAVE_WINSOCK, 1, [Call WSAStartup in gnutls_global_init])
-fi
-AC_MSG_CHECKING([if we have Windows sockets and WSAStartup/WSACleanup])
-AC_MSG_RESULT($wsastartup)
 
 AC_MSG_RESULT([***
 *** Detecting options for shared libraries...
