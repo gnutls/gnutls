@@ -27,7 +27,6 @@
     <xi:include href="xml/pkcs12.xml"/>
     <xi:include href="xml/openpgp.xml"/>
     <xi:include href="xml/openssl.xml"/>
-    <xi:include href="xml/opencdk.xml"/>
     <xi:include href="xml/libtasn1.xml"/>
   </chapter>
 

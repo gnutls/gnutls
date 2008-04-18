@@ -46,7 +46,6 @@ HFILE_GLOB=$(top_srcdir)/includes/gnutls/*.h $(top_builddir)/includes/gnutls/*.h
 CFILE_GLOB=$(top_srcdir)/lib/*.c \
 	$(top_srcdir)/lib/x509/*.c \
 	$(top_srcdir)/lib/openpgp/*.c \
-	$(top_srcdir)/lib/opencdk/*.c \
 	$(top_srcdir)/libextra/*.c \
 	$(top_srcdir)/lib/minitasn1/*.c
 
@@ -81,7 +80,8 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	stream.h types.h						\
 									\
 	gnutls_openpgp.h gnutlsxx.h gnutls_extra_hooks.h		\
-	gnutls_supplemental.h
+	gnutls_supplemental.h 						\
+	opencdk.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
