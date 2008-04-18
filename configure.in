@@ -616,7 +616,7 @@ AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
 
 # Windows hacks.
 
-AC_DEFINE(WINVER, 0x0501)  # Windows 2000 or before not supported.
+AC_DEFINE([WINVER], [0x0501], [Windows 2000 or before not supported.])
 save_LIBS="$LIBS"
 LIBS="$LIBS -lws2_32"
 AC_TRY_LINK([#include <winsock2.h>], [
