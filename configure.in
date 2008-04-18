@@ -620,8 +620,11 @@ dnl
 AC_MSG_RESULT([***
 *** Setting up gnulib compatibility files...
 ])
+save_LIBS="$LIBS"
+LIBS="$LIBS $LIBGCRYPT_LIBS"
 gl_INIT
 lgl_INIT
+LIBS="$save_LIBS"
 
 AC_TRY_LINK([#include <winsock2.h>], [
   WORD wVersionRequested = MAKEWORD(2, 2);
