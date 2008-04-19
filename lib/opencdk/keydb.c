@@ -1427,8 +1427,29 @@ find_selfsig_node (cdk_kbnode_t key, cdk_pkt_pubkey_t pk)
   return sig;
 }
 
+static
+unsigned int key_usage_to_cdk_usage( unsigned int usage)
+{
+unsigned key_usage = 0;
 
-    
+	  if (usage & 0x01) /* cert + sign data */
+	    key_usage |= CDK_KEY_USG_CERT_SIGN;
+	  if (usage & 0x02) /* cert + sign data */
+	    key_usage |= CDK_KEY_USG_DATA_SIGN;
+	  if (usage & 0x04) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_COMM_ENCR;
+	  if (usage & 0x08) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_STORAGE_ENCR;
+	  if (usage & 0x10) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_SPLIT_KEY;
+	  if (usage & 0x20)
+	    key_usage |= CDK_KEY_USG_AUTH;
+	  if (usage & 0x80) /* encrypt comm. + storage */
+	    key_usage |= CDK_KEY_USG_SHARED_KEY;
+
+	return key_usage;
+}
+
 static cdk_error_t
 keydb_merge_selfsig (cdk_kbnode_t key, u32 *keyid)
 {
@@ -1438,7 +1459,7 @@ keydb_merge_selfsig (cdk_kbnode_t key, u32 *keyid)
   cdk_pkt_userid_t uid = NULL;
   const byte *symalg = NULL, *hashalg = NULL, *compalg = NULL;
   size_t nsymalg = 0, nhashalg = 0, ncompalg = 0, n = 0;
-  size_t key_usage = 0, key_expire = 0;
+  size_t key_expire = 0;
 
   if (!key)
     return CDK_Inv_Value;
@@ -1461,24 +1482,6 @@ keydb_merge_selfsig (cdk_kbnode_t key, u32 *keyid)
       s = cdk_subpkt_find (sig->hashed, CDK_SIGSUBPKT_KEY_EXPIRE);
       if (s && s->size == 4)
 	key_expire = _cdk_buftou32 (s->d);
-      s = cdk_subpkt_find (sig->hashed, CDK_SIGSUBPKT_KEY_FLAGS);
-      if (s) 
-	{
-	  if (s->d[0] & 0x01) /* cert + sign data */
-	    key_usage |= CDK_KEY_USG_CERT_SIGN;
-	  if (s->d[0] & 0x02) /* cert + sign data */
-	    key_usage |= CDK_KEY_USG_DATA_SIGN;
-	  if (s->d[0] & 0x04) /* encrypt comm. + storage */
-	    key_usage |= CDK_KEY_USG_COMM_ENCR;
-	  if (s->d[0] & 0x08) /* encrypt comm. + storage */
-	    key_usage |= CDK_KEY_USG_STORAGE_ENCR;
-	  if (s->d[0] & 0x10) /* encrypt comm. + storage */
-	    key_usage |= CDK_KEY_USG_SPLIT_KEY;
-	  if (s->d[0] & 0x20)
-	    key_usage |= CDK_KEY_USG_AUTH;
-	  if (s->d[0] & 0x80) /* encrypt comm. + storage */
-	    key_usage |= CDK_KEY_USG_SHARED_KEY;
-        }
       s = cdk_subpkt_find (sig->hashed, CDK_SIGSUBPKT_PREFS_SYM);
       if (s) 
 	{
@@ -1550,8 +1553,6 @@ keydb_merge_selfsig (cdk_kbnode_t key, u32 *keyid)
 	  pk->has_expired = pk->expiredate> (u32)time (NULL)?0 :1;
 	}
       
-      if (key_usage)
-	pk->pubkey_usage = key_usage;
       pk->is_invalid = 0;
     }
   
@@ -1715,6 +1716,25 @@ keydb_parse_allsigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd, int check)
   return 0;
 }
 
+void add_key_usage( cdk_kbnode_t knode, u32 keyid[2], unsigned int usage)
+{
+ cdk_kbnode_t p, ctx;
+ cdk_packet_t pkt;
+
+  ctx = NULL;
+  while ((p = cdk_kbnode_walk (knode, &ctx, 0)))
+    {
+      pkt = cdk_kbnode_get_packet (p);
+      if ((pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY || pkt->pkttype == CDK_PKT_PUBLIC_KEY) && \
+	pkt->pkt.public_key->keyid[0] == keyid[0] && \
+	pkt->pkt.public_key->keyid[1] == keyid[1]) 
+	{
+	  pkt->pkt.public_key->pubkey_usage = usage;
+	  return;
+	}
+    }
+  return;
+}
 
 cdk_error_t
 cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
@@ -1799,11 +1819,20 @@ cdk_keydb_get_keyblock (cdk_stream_t inp, cdk_kbnode_t *r_knode)
 	;
       else if (pkt->pkttype == CDK_PKT_SIGNATURE)
 	{
+	  cdk_subpkt_t s;
+
 	  pkt->pkt.signature->key[0] = keyid[0];
 	  pkt->pkt.signature->key[1] = keyid[1];
 	  if (pkt->pkt.signature->sig_class == 0x1F &&
 	      pkt->pkt.signature->revkeys)
 	    revkeys = pkt->pkt.signature->revkeys;
+
+ 	  s = cdk_subpkt_find (pkt->pkt.signature->hashed, CDK_SIGSUBPKT_KEY_FLAGS);
+	  if (s)
+	    {
+	      unsigned int key_usage = key_usage_to_cdk_usage( s->d[0]);
+	      add_key_usage( knode, pkt->pkt.signature->key, key_usage);
+	    }
 	}
       node = cdk_kbnode_new (pkt);
       if (!knode)

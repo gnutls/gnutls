@@ -375,9 +375,9 @@ read_public_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_t pk)
 	return rc;
     }
   
-  /* These values are just for the first run and should be
+  /* This value is just for the first run and will be
      replaced with the actual key flags from the self signature. */
-  pk->pubkey_usage = _cdk_pk_algo_usage (pk->pubkey_algo);
+  pk->pubkey_usage = 0;
   return 0;
 }
 
