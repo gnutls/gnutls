@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2004, 2006 Free Software Foundation
+ *      Copyright (C) 2004, 2006, 2008 Free Software Foundation
  *      Copyright (C) 2000, 2001, 2002, 2003 Fabio Fiorina
  *
  * This file is part of LIBTASN1.
@@ -350,7 +350,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	  if ((isdigit (value[0])) || (value[0] == '-'))
 	    {
 	      value_temp =
-		(unsigned char *) _asn1_alloca (SIZEOF_UNSIGNED_LONG_INT);
+		(unsigned char *) _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
 	      if (value_temp == NULL)
 		return ASN1_MEM_ALLOC_ERROR;
 
@@ -370,7 +370,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 			{
 			  value_temp =
 			    (unsigned char *)
-			    _asn1_alloca (SIZEOF_UNSIGNED_LONG_INT);
+			    _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
 			  if (value_temp == NULL)
 			    return ASN1_MEM_ALLOC_ERROR;
 
@@ -389,7 +389,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	}
       else
 	{			/* len != 0 */
-	  value_temp = (unsigned char *) _asn1_alloca (len);
+	  value_temp = (unsigned char *) _asn1_malloc (len);
 	  if (value_temp == NULL)
 	    return ASN1_MEM_ALLOC_ERROR;
 	  memcpy (value_temp, value, len);
@@ -403,7 +403,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 
       if (negative && (type_field (node->type) == TYPE_ENUMERATED))
 	{
-	  _asn1_afree (value_temp);
+	  _asn1_free (value_temp);
 	  return ASN1_VALUE_NOT_VALID;
 	}
 
@@ -418,14 +418,14 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	k--;
 
       asn1_length_der (len - k, NULL, &len2);
-      temp = (unsigned char *) _asn1_alloca (len - k + len2);
+      temp = (unsigned char *) _asn1_malloc (len - k + len2);
       if (temp == NULL)
 	return ASN1_MEM_ALLOC_ERROR;
 
       asn1_octet_der (value_temp + k, len - k, temp, &len2);
       _asn1_set_value (node, temp, len2);
 
-      _asn1_afree (temp);
+      _asn1_free (temp);
 
 
       if (node->type & CONST_DEFAULT)
@@ -436,7 +436,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	  if ((isdigit (p->value[0])) || (p->value[0] == '-'))
 	    {
 	      default_temp =
-		(unsigned char *) _asn1_alloca (SIZEOF_UNSIGNED_LONG_INT);
+		(unsigned char *) _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
 	      if (default_temp == NULL)
 		return ASN1_MEM_ALLOC_ERROR;
 
@@ -456,7 +456,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 			{
 			  default_temp =
 			    (unsigned char *)
-			    _asn1_alloca (SIZEOF_UNSIGNED_LONG_INT);
+			    _asn1_malloc (SIZEOF_UNSIGNED_LONG_INT);
 			  if (default_temp == NULL)
 			    return ASN1_MEM_ALLOC_ERROR;
 
@@ -484,9 +484,9 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	      if (k2 == len2)
 		_asn1_set_value (node, NULL, 0);
 	    }
-	  _asn1_afree (default_temp);
+	  _asn1_free (default_temp);
 	}
-      _asn1_afree (value_temp);
+      _asn1_free (value_temp);
       break;
     case TYPE_OBJECT_ID:
       for (k = 0; k < strlen (value); k++)
@@ -555,37 +555,37 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
       if (len == 0)
 	len = strlen (value);
       asn1_length_der (len, NULL, &len2);
-      temp = (unsigned char *) _asn1_alloca (len + len2);
+      temp = (unsigned char *) _asn1_malloc (len + len2);
       if (temp == NULL)
 	return ASN1_MEM_ALLOC_ERROR;
 
       asn1_octet_der (value, len, temp, &len2);
       _asn1_set_value (node, temp, len2);
-      _asn1_afree (temp);
+      _asn1_free (temp);
       break;
     case TYPE_GENERALSTRING:
       if (len == 0)
 	len = strlen (value);
       asn1_length_der (len, NULL, &len2);
-      temp = (unsigned char *) _asn1_alloca (len + len2);
+      temp = (unsigned char *) _asn1_malloc (len + len2);
       if (temp == NULL)
 	return ASN1_MEM_ALLOC_ERROR;
 
       asn1_octet_der (value, len, temp, &len2);
       _asn1_set_value (node, temp, len2);
-      _asn1_afree (temp);
+      _asn1_free (temp);
       break;
     case TYPE_BIT_STRING:
       if (len == 0)
 	len = strlen (value);
       asn1_length_der ((len >> 3) + 2, NULL, &len2);
-      temp = (unsigned char *) _asn1_alloca ((len >> 3) + 2 + len2);
+      temp = (unsigned char *) _asn1_malloc ((len >> 3) + 2 + len2);
       if (temp == NULL)
 	return ASN1_MEM_ALLOC_ERROR;
 
       asn1_bit_der (value, len, temp, &len2);
       _asn1_set_value (node, temp, len2);
-      _asn1_afree (temp);
+      _asn1_free (temp);
       break;
     case TYPE_CHOICE:
       p = node->down;
@@ -613,13 +613,13 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
       break;
     case TYPE_ANY:
       asn1_length_der (len, NULL, &len2);
-      temp = (unsigned char *) _asn1_alloca (len + len2);
+      temp = (unsigned char *) _asn1_malloc (len + len2);
       if (temp == NULL)
 	return ASN1_MEM_ALLOC_ERROR;
 
       asn1_octet_der (value, len, temp, &len2);
       _asn1_set_value (node, temp, len2);
-      _asn1_afree (temp);
+      _asn1_free (temp);
       break;
     case TYPE_SEQUENCE_OF:
     case TYPE_SET_OF:
