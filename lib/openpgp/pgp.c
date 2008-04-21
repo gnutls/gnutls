@@ -558,9 +558,12 @@ gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
     {
       dnsnamesize = sizeof (dnsname);
       ret = gnutls_openpgp_crt_get_name (key, i, dnsname, &dnsnamesize);
-      /* FIXME: ret is not used */
-      if (_gnutls_hostname_compare (dnsname, hostname))
-	return 1;
+      
+      if (ret == 0)
+        {
+          if (_gnutls_hostname_compare (dnsname, hostname))
+            return 1;
+        }
     }
 
   /* not found a matching name */
