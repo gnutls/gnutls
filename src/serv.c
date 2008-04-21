@@ -39,6 +39,8 @@
 #include <list.h>
 
 #if defined _WIN32 || defined __WIN32__
+int _win_select(int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
+		const struct timeval *tv);
 #define select _win_select
 #endif
 

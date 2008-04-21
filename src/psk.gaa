@@ -25,5 +25,5 @@ option (s, keysize) INT "SIZE" { $key_size = $1 } "specify the key size in bytes
 option (v, version) { psktool_version(); exit(0); } "prints the program's version number"
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
-init { $username=NULL; $passwd=NULL; $key_size = NULL; }
+init { $username=NULL; $passwd=NULL; $key_size = 0; }
 
