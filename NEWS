@@ -17,7 +17,8 @@ This is similar to <http://bugs.debian.org/429183>.
 Missing rpl_fseeko symbol in lib/opencdk/.  Better checks for linking
 with -lws2_32 when needed.  Use ASCII only isprint() when printing
 X.509 certificate information, to avoid non-ASCII but printable
-characters.
+characters.  Thanks to Massimo Gaspari <massimo.gaspari@alice.it> for
+reports.
 
 ** Update internal copy of libtasn1 to version 1.4.
 
