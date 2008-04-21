@@ -1,3 +1,143 @@
+2008-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.7.
+
+2008-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Don't clean Guile documentations on make clean.
+
+2008-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c, src/psk-gaa.c, src/psk.gaa, src/serv.c, src/tests.c: 
+	Fix warnings.
+
+2008-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/reference/Makefile.am, lib/minitasn1/Makefile.am,
+	lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/int.h,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/mem.h: Update to libtasn1
+	1.4.
+
+2008-04-19  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: opencdk now properly sets the key usage bits into openpgp
+	keys.
+
+2008-04-19  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/keydb.c, lib/opencdk/read-packet.c: save key usage
+	while reading public keys.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS: Add.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Don't crash on TLS handshake failures.  Reported by
+	"Marc F. Clemente" <marc@mclemente.net> in Debian BTS #466477.  This
+	is related to the 5e5f086e124d8d90829fc8e22f34044161da5f80 fix, this
+	part is necessary too.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool.c: certtool: with --generate-request and newly
+	generated keys, print the key.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Explain libgcrypt around gnulib.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, doc/reference/gnutls-docs.sgml: Don't
+	document opencdk API.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Typo fix.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Link to -lws2_32 if needed.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Define WINVER to get modern features.  Test for
+	ws2_32.  Add conditional.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Use ASCII-only isprint function to get
+	consistent outputs.  Reported by Massimo Gaspari
+	<massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1184>.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/c-ctype.c, lgl/c-ctype.h, lgl/dummy.c,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4: Add c-ctype module,
+	for lib/x509/output.c.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* gl/fseeko.c, gl/gnulib.mk, gl/lseek.c, gl/m4/extensions.m4,
+	gl/m4/fseeko.m4, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/lseek.m4, gl/m4/netinet_in_h.m4, gl/m4/strerror.m4,
+	lgl/Makefile.am, lgl/fseeko.c, lgl/lseek.c, lgl/m4/extensions.m4,
+	lgl/m4/fseeko.m4, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/lseek.m4, lgl/m4/memmem.m4, lgl/m4/stdint.m4,
+	lgl/m4/stdio_h.m4, lgl/m4/sys_socket_h.m4: Move fseeko to lgl/ from
+	gl/ for opencdk.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Link to libgcrypt when running gnulib checks, to get
+	their vasprintf on MinGW.
+
+2008-04-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Don't check for vasprintf, already checked for by
+	gnulib.
+
+2008-04-17  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/openpgp/pgp.c: corrected typo.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* .clcopying, .cvscopying, .cvsusers, Makefile.am, src/pkcs1.asn: 
+	Fix some obsolete stuff.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: (gnutls_x509_crt_get_key_usage): Doc fix.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-04-17  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.6.

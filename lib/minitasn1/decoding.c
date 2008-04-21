@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2004, 2006 Free Software Foundation
+ *      Copyright (C) 2004, 2006, 2008 Free Software Foundation
  *      Copyright (C) 2002 Fabio Fiorina
  *
  * This file is part of LIBTASN1.
@@ -618,7 +618,7 @@ _asn1_get_octet_string (const unsigned char *der, node_asn * node, int *len)
       if (node)
 	{
 	  asn1_length_der (tot_len, NULL, &len2);
-	  temp = _asn1_alloca (len2 + tot_len);
+	  temp = _asn1_malloc (len2 + tot_len);
 	  if (temp == NULL)
 	    {
 	      return ASN1_MEM_ALLOC_ERROR;
@@ -653,7 +653,7 @@ _asn1_get_octet_string (const unsigned char *der, node_asn * node, int *len)
 	    }
 
 	  _asn1_set_value (node, temp, tot_len);
-	  _asn1_afree (temp);
+	  _asn1_free (temp);
 	}
     }
   else
@@ -1193,7 +1193,7 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 		{
 		  len2 += len4;
 		  asn1_length_der (len2 + len3, NULL, &len4);
-		  temp2 = (unsigned char *) _asn1_alloca (len2 + len3 + len4);
+		  temp2 = (unsigned char *) _asn1_malloc (len2 + len3 + len4);
 		  if (temp2 == NULL)
 		    {
 		      asn1_delete_structure (element);
@@ -1202,7 +1202,7 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 
 		  asn1_octet_der (der + counter, len2 + len3, temp2, &len4);
 		  _asn1_set_value (p, temp2, len4);
-		  _asn1_afree (temp2);
+		  _asn1_free (temp2);
 		  counter += len2 + len3;
 		}
 	      else
@@ -1222,7 +1222,7 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 		      return ris;
 		    }
 		  asn1_length_der (len2, NULL, &len4);
-		  temp2 = (unsigned char *) _asn1_alloca (len2 + len4);
+		  temp2 = (unsigned char *) _asn1_malloc (len2 + len4);
 		  if (temp2 == NULL)
 		    {
 		      asn1_delete_structure (element);
@@ -1231,7 +1231,7 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 
 		  asn1_octet_der (der + counter, len2, temp2, &len4);
 		  _asn1_set_value (p, temp2, len4);
-		  _asn1_afree (temp2);
+		  _asn1_free (temp2);
 		  counter += len2;
 
 		  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
@@ -1879,7 +1879,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 		    {
 		      asn1_length_der (len2 + len3, NULL, &len4);
 		      temp2 =
-			(unsigned char *) _asn1_alloca (len2 + len3 + len4);
+			(unsigned char *) _asn1_malloc (len2 + len3 + len4);
 		      if (temp2 == NULL)
 			{
 			  asn1_delete_structure (structure);
@@ -1889,7 +1889,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 		      asn1_octet_der (der + counter, len2 + len3, temp2,
 				      &len4);
 		      _asn1_set_value (p, temp2, len4);
-		      _asn1_afree (temp2);
+		      _asn1_free (temp2);
 
 		      if (p == nodeFound)
 			state = EXIT;
@@ -1916,7 +1916,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 		  if (state == FOUND)
 		    {
 		      asn1_length_der (len2, NULL, &len4);
-		      temp2 = (unsigned char *) _asn1_alloca (len2 + len4);
+		      temp2 = (unsigned char *) _asn1_malloc (len2 + len4);
 		      if (temp2 == NULL)
 			{
 			  asn1_delete_structure (structure);
@@ -1925,7 +1925,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 
 		      asn1_octet_der (der + counter, len2, temp2, &len4);
 		      _asn1_set_value (p, temp2, len4);
-		      _asn1_afree (temp2);
+		      _asn1_free (temp2);
 
 		      if (p == nodeFound)
 			state = EXIT;

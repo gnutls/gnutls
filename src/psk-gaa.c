@@ -567,7 +567,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     {
 
 #line 28 "psk.gaa"
-{ gaaval->username=NULL; gaaval->passwd=NULL; gaaval->key_size = NULL; ;};
+{ gaaval->username=NULL; gaaval->passwd=NULL; gaaval->key_size = 0; ;};
 
     }
     inited = 1;

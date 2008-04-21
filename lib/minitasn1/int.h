@@ -45,7 +45,11 @@
 #define LIBTASN1_DEBUG_INTEGER
 */
 
-#include <mem.h>
+#define _asn1_malloc malloc
+#define _asn1_free free
+#define _asn1_calloc calloc
+#define _asn1_realloc realloc
+#define _asn1_strdup strdup
 
 #define MAX_LOG_SIZE 1024 /* maximum number of characters of a log message */
 

@@ -121,10 +121,10 @@ error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi
 
 
-guile_texi     = core.c.texi extra.c.texi
-BUILT_SOURCES  = $(guile_texi)
-CLEANFILES     = $(guile_texi)
-EXTRA_DIST    += $(guile_texi)
+guile_texi           = core.c.texi extra.c.texi
+BUILT_SOURCES        = $(guile_texi)
+MAINTAINERCLEANFILES = $(guile_texi)
+EXTRA_DIST           += $(guile_texi)
 
 if HAVE_GUILE
 

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2004, 2006 Free Software Foundation
+ *      Copyright (C) 2004, 2006, 2008 Free Software Foundation
  *      Copyright (C) 2002  Fabio Fiorina
  *
  * This file is part of LIBTASN1.
@@ -260,7 +260,7 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
 
   max_len = *der_len;
 
-  temp = (char *) _asn1_alloca (strlen (str) + 2);
+  temp = (char *) _asn1_malloc (strlen (str) + 2);
   if (temp == NULL)
     return ASN1_MEM_ALLOC_ERROR;
 
@@ -312,7 +312,7 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
     }
   *der_len += len_len;
 
-  _asn1_afree (temp);
+  _asn1_free (temp);
 
   if (max_len < (*der_len))
     return ASN1_MEM_ERROR;
@@ -636,7 +636,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, node_asn * node)
   first = last = NULL;
   while (p)
     {
-      p_vet = (struct vet *) _asn1_alloca (sizeof (struct vet));
+      p_vet = (struct vet *) _asn1_malloc (sizeof (struct vet));
       if (p_vet == NULL)
 	return;
 
@@ -677,7 +677,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, node_asn * node)
 	  if (p_vet->value > p2_vet->value)
 	    {
 	      /* change position */
-	      temp = (unsigned char *) _asn1_alloca (p_vet->end - counter);
+	      temp = (unsigned char *) _asn1_malloc (p_vet->end - counter);
 	      if (temp == NULL)
 		return;
 
@@ -686,7 +686,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, node_asn * node)
 		      p2_vet->end - p_vet->end);
 	      memcpy (der + counter + p2_vet->end - p_vet->end, temp,
 		      p_vet->end - counter);
-	      _asn1_afree (temp);
+	      _asn1_free (temp);
 
 	      tag = p_vet->value;
 	      p_vet->value = p2_vet->value;
@@ -704,7 +704,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, node_asn * node)
 	p_vet->prev->next = NULL;
       else
 	first = NULL;
-      _asn1_afree (p_vet);
+      _asn1_free (p_vet);
       p_vet = first;
     }
 }
@@ -750,7 +750,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, node_asn * node)
   first = last = NULL;
   while (p)
     {
-      p_vet = (struct vet *) _asn1_alloca (sizeof (struct vet));
+      p_vet = (struct vet *) _asn1_malloc (sizeof (struct vet));
       if (p_vet == NULL)
 	return;
 
@@ -815,7 +815,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, node_asn * node)
 	  if (change == 1)
 	    {
 	      /* change position */
-	      temp = (unsigned char *) _asn1_alloca (p_vet->end - counter);
+	      temp = (unsigned char *) _asn1_malloc (p_vet->end - counter);
 	      if (temp == NULL)
 		return;
 
@@ -824,7 +824,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, node_asn * node)
 		      (p2_vet->end) - (p_vet->end));
 	      memcpy (der + counter + (p2_vet->end) - (p_vet->end), temp,
 		      (p_vet->end) - counter);
-	      _asn1_afree (temp);
+	      _asn1_free (temp);
 
 	      p_vet->end = counter + (p2_vet->end - p_vet->end);
 	    }
@@ -838,7 +838,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, node_asn * node)
 	p_vet->prev->next = NULL;
       else
 	first = NULL;
-      _asn1_afree (p_vet);
+      _asn1_free (p_vet);
       p_vet = first;
     }
 }
