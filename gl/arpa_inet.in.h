@@ -18,6 +18,10 @@
 #ifndef _GL_ARPA_INET_H
 #define _GL_ARPA_INET_H
 
+/* Gnulib's sys/socket.h is responsible for pulling in winsock2.h etc
+   under MinGW. */
+#include <sys/socket.h>
+
 #if @GNULIB_INET_NTOP@
 # include <inet_ntop.h>
 #elif defined GNULIB_POSIXCHECK
