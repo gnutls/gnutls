@@ -365,6 +365,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/nls.m4
   m4/po.m4
   m4/printf-posix.m4
+  m4/printf.m4
   m4/progtest.m4
   m4/read-file.m4
   m4/realloc.m4

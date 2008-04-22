@@ -33,6 +33,8 @@ arpa/inet.h:
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  echo '#include <sys/socket.h>'; \
+	  echo '#include <inet_ntop.h>'; \
+	  echo '#include <inet_pton.h>'; \
 	} > $@-t
 	mv $@-t $@
 MOSTLYCLEANFILES += arpa/inet.h arpa/inet.h-t
