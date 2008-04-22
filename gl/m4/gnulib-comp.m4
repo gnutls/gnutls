@@ -69,7 +69,9 @@ AC_DEFUN([gl_INIT],
         [AC_CONFIG_LINKS([$GNUmakefile:$GNUmakefile], [],
   	[GNUmakefile=$GNUmakefile])])
   gl_INET_NTOP
+  gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
   gl_INET_PTON
+  gl_ARPA_INET_MODULE_INDICATOR([inet_pton])
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_FUNC_READLINE
@@ -202,6 +204,7 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/gendocs_template
   doc/gpl-3.0.texi
   doc/lgpl-2.1.texi
+  lib/arpa_inet.in.h
   lib/error.c
   lib/error.h
   lib/gai_strerror.c
