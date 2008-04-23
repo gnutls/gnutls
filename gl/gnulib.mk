@@ -30,6 +30,7 @@ BUILT_SOURCES += $(ARPA_INET_H)
 # doesn't have one.
 arpa/inet.h:
 	@MKDIR_P@ arpa
+	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed \
 	      -e 's|@''GNULIB_INET_NTOP''@|$(GNULIB_INET_NTOP)|g' \
