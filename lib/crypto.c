@@ -104,6 +104,29 @@ static mac_list glob_ml = { GNUTLS_MAC_NULL, 0, NULL, NULL };
 static digest_list glob_dl = { GNUTLS_MAC_NULL, 0, NULL, NULL };
 static rnd_list glob_rnd = { 0, 0, NULL, NULL };
 
+static void _deregister(algo_list* cl)
+{
+algo_list* next;
+
+  next = cl->next;
+  cl->next = NULL;
+  cl = next;
+
+  while( cl) 
+    {
+      next = cl->next;
+      gnutls_free(cl);
+      cl = next;
+    }
+}
+
+void _gnutls_crypto_deregister(void)
+{
+  _deregister( &glob_cl);
+  _deregister( &glob_ml);
+  _deregister( &glob_dl);
+  _deregister( &glob_rnd);
+}
 
 /**
   * gnutls_crypto_cipher_register - register a cipher algorithm

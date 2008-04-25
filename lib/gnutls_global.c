@@ -339,6 +339,7 @@ gnutls_global_deinit (void)
       _gnutls_rnd_deinit();
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);
+      _gnutls_crypto_deregister();
       gc_done ();
     }
   _gnutls_init--;
