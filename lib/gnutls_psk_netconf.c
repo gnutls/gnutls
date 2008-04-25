@@ -58,7 +58,7 @@ gnutls_psk_netconf_derive_key (const char *password,
   int rc;
 
   /*
-   * PSK = SHA-1(SHA-1(password + psk_identity + "Key Pad for Netconf") +
+   * PSK = SHA-1(SHA-1(psk_identity + "Key Pad for Netconf" + password) +
    *             psk_identity_hint)
    *
    */
@@ -67,14 +67,6 @@ gnutls_psk_netconf_derive_key (const char *password,
   if (rc)
     {
       gnutls_assert ();
-      return rc;
-    }
-
-  rc = _gnutls_hash (&dig, password, strlen (password));
-  if (rc)
-    {
-      gnutls_assert ();
-      _gnutls_hash_deinit (&dig, NULL);
       return rc;
     }
 
@@ -87,6 +79,14 @@ gnutls_psk_netconf_derive_key (const char *password,
     }
 
   rc = _gnutls_hash (&dig, netconf_key_pad, strlen (netconf_key_pad));
+  if (rc)
+    {
+      gnutls_assert ();
+      _gnutls_hash_deinit (&dig, NULL);
+      return rc;
+    }
+
+  rc = _gnutls_hash (&dig, password, strlen (password));
   if (rc)
     {
       gnutls_assert ();

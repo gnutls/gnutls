@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.3.4.netconf.1 (unreleased)
 
+** Change PSK key derivation logic.
+
 ** API and ABI modifications:
 No changes since last version.
 
