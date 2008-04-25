@@ -95,9 +95,11 @@ option (export-ciphers) { $export=1 } "Use weak encryption algorithms."
 
 #int incert_format;
 option (inder) { $incert_format=1 } "Use DER format for input certificates and private keys."
+option (inraw) { $incert_format=1 } "Use RAW/DER format for input certificates and private keys."
 
 #int outcert_format;
 option (outder) { $outcert_format=1 } "Use DER format for output certificates and private keys."
+option (outraw) { $outcert_format=1 } "Use RAW/DER format for output certificates and private keys."
 
 #int bits;
 option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key generation."
