@@ -77,7 +77,6 @@ algo_list* last_cl = al;
   cl->next = NULL;
 
   last_cl->next = cl;
-  
   return 0;
 
 }
@@ -88,7 +87,7 @@ cipher_list* cl;
 
   /* look if there is any cipher with lowest priority. In that case do not add.
    */
-  cl = al;
+  cl = al->next;
   while( cl && cl->alg_data) {
     if (cl->algorithm == algo) {
       return cl->alg_data;
