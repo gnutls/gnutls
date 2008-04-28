@@ -258,7 +258,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/hmac-md5.c
   lib/hmac-sha1.c
   lib/hmac.h
-  lib/intprops.h
   lib/lseek.c
   lib/md2.c
   lib/md2.h

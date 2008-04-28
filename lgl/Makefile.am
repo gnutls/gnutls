@@ -228,13 +228,6 @@ EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
 
 ## end   gnulib module havelib
 
-## begin gnulib module intprops
-
-
-EXTRA_DIST += intprops.h
-
-## end   gnulib module intprops
-
 ## begin gnulib module link-warning
 
 LINK_WARNING_H=$(top_srcdir)/build-aux/link-warning.h
