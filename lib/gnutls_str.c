@@ -281,6 +281,8 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
  * Convert a buffer with hex data to binary data.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_hex2bin (const char * hex_data,

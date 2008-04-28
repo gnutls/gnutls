@@ -483,6 +483,8 @@ gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key)
  * Get key id string.
  *
  * Returns: the 64-bit keyID of the OpenPGP key.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key,
@@ -516,6 +518,8 @@ gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key,
  *
  * Returns: true (1) if the key has been revoked, or false (0) if it
  *   has not.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_revoked_status (gnutls_openpgp_crt_t key)
@@ -631,6 +635,8 @@ gnutls_openpgp_crt_get_key_usage (gnutls_openpgp_crt_t key,
  * given OpenPGP certificate.
  *
  * Returns: the number of subkeys, or a negative value on error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_subkey_count (gnutls_openpgp_crt_t key)
@@ -767,6 +773,8 @@ int _gnutls_openpgp_find_subkey_idx( cdk_kbnode_t knode, uint32_t keyid[2],
  *
  * Returns: true (1) if the key has been revoked, or false (0) if it
  *   has not.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
@@ -803,6 +811,8 @@ gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  *   success, or a negative value on error.
+ *
+ * Since: 2.4.0
  **/
 gnutls_pk_algorithm_t
 gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
@@ -838,6 +848,8 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
  * Get subkey creation time.
  *
  * Returns: the timestamp when the OpenPGP sub-key was created.
+ *
+ * Since: 2.4.0
  **/
 time_t
 gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
@@ -868,6 +880,8 @@ gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
  * doesn't expire at all.
  *
  * Returns: the time when the OpenPGP key expires.
+ *
+ * Since: 2.4.0
  **/
 time_t
 gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key,
@@ -931,6 +945,8 @@ gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
  * Get subkey's index.
  *
  * Returns: the index of the subkey or a negative error value.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
@@ -969,6 +985,8 @@ gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
  * A negative value may be returned in case of parsing error.
  *
  * Returns: key usage value.
+ *
+ * Since: 2.4.0
  */
 int
 gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key,
@@ -1300,6 +1318,8 @@ cleanup:
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt, 
@@ -1331,6 +1351,8 @@ int ret;
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt, 
@@ -1362,6 +1384,8 @@ int ret;
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt, unsigned int idx,
@@ -1394,6 +1418,8 @@ int ret;
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt,

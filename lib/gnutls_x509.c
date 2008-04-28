@@ -863,6 +863,8 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
   * for the server).
   *
   * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+  *
+  * Since: 2.4.0
   **/
 int
 gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
@@ -1292,6 +1294,8 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t
   * gnutls_certificate_send_x509_rdn_sequence().
   *
   * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+  *
+  * Since: 2.4.0
   **/
 int
 gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
@@ -1599,6 +1603,8 @@ gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t
   * multiple times.
   *
   * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+  *
+  * Since: 2.4.0
   **/
 int
 gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,

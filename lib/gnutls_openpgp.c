@@ -354,6 +354,8 @@ static int get_keyid( gnutls_openpgp_keyid_t keyid, const char* str)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
@@ -444,6 +446,8 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t

@@ -122,6 +122,7 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
   * This function will export all the CAs associated
   * with the given credentials. 
   *
+  * Since: 2.4.0
   **/
 void
 gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc, 
@@ -140,6 +141,7 @@ gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
   * This function will export the OpenPGP keyring associated
   * with the given credentials. 
   *
+  * Since: 2.4.0
   **/
 void
 gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc, 
@@ -159,6 +161,7 @@ gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
   * This function will export all the CRLs associated
   * with the given credentials. 
   *
+  * Since: 2.4.0
   **/
 void
 gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc, 

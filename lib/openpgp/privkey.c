@@ -153,6 +153,8 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
@@ -179,6 +181,8 @@ gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  *   success, or a negative value on error.
+ *
+ * Since: 2.4.0
  **/
 gnutls_pk_algorithm_t
 gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
@@ -229,6 +233,8 @@ int algo;
  *
  * Returns: true (1) if the key has been revoked, or false (0) if it
  *   has not, or a negative value indicates an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key)
@@ -259,6 +265,8 @@ gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key)
  * algorithm, the fingerprint can be 16 or 20 bytes.
  *
  * Returns: On success, 0 is returned, or an error code.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
@@ -301,6 +309,8 @@ gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
  * Get key-id.
  *
  * Returns: the 64-bit keyID of the OpenPGP key.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
@@ -335,6 +345,8 @@ gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
  * given OpenPGP certificate.
  *
  * Returns: the number of subkeys, or a negative value on error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key)
@@ -389,6 +401,8 @@ static cdk_packet_t _get_secret_subkey(gnutls_openpgp_privkey_t key, unsigned in
  *
  * Returns: true (1) if the key has been revoked, or false (0) if it
  *   has not, or a negative value indicates an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key, unsigned int idx)
@@ -424,6 +438,8 @@ gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key, 
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  *   success, or a negative value on error.
+ *
+ * Since: 2.4.0
  **/
 gnutls_pk_algorithm_t
 gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
@@ -465,6 +481,8 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
  * Get index of subkey.
  *
  * Returns: the index of the subkey or a negative error value.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key,
@@ -498,6 +516,8 @@ gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key,
  * Get subkey creation time.
  *
  * Returns: the timestamp when the OpenPGP key was created.
+ *
+ * Since: 2.4.0
  **/
 time_t
 gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key,
@@ -527,6 +547,8 @@ gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key,
  * doesn't expire at all.
  *
  * Returns: the time when the OpenPGP key expires.
+ *
+ * Since: 2.4.0
  **/
 time_t
 gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
@@ -556,6 +578,8 @@ gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
  * Get the key-id for the subkey.
  *
  * Returns: the 64-bit keyID of the OpenPGP key.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key,
@@ -879,6 +903,8 @@ cleanup:
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey, 
@@ -913,6 +939,8 @@ int ret;
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey, 
@@ -949,6 +977,8 @@ int ret;
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey, unsigned int idx,
@@ -984,6 +1014,8 @@ int ret;
  * using gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey,

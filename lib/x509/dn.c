@@ -953,6 +953,8 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.4.0
  **/
 int gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
 {
@@ -985,6 +987,8 @@ int gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_x509_dn_import (gnutls_x509_dn_t odn,
@@ -1012,6 +1016,8 @@ gnutls_x509_dn_import (gnutls_x509_dn_t odn,
  *
  * This function deallocates the DN object as returned by
  * gnutls_x509_dn_import().
+ *
+ * Since: 2.4.0
  **/
 void
 gnutls_x509_dn_deinit (gnutls_x509_dn_t idn)
@@ -1149,6 +1155,8 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
  * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
  * updated if the provided buffer is not long enough, otherwise a
  * negative error value.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_x509_rdn_get_oid (const gnutls_datum_t * idn,
