@@ -35,19 +35,18 @@
 #include <x509_int.h>
 
 /**
-  * gnutls_x509_crl_init - This function initializes a gnutls_x509_crl_t structure
-  * @crl: The structure to be initialized
-  *
-  * This function will initialize a CRL structure. CRL stands for
-  * Certificate Revocation List. A revocation list usually contains
-  * lists of certificate serial numbers that have been revoked
-  * by an Authority. The revocation lists are always signed with
-  * the authority's private key.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_init - initializes a #gnutls_x509_crl_t structure
+ * @crl: The structure to be initialized
+ *
+ * This function will initialize a CRL structure. CRL stands for
+ * Certificate Revocation List. A revocation list usually contains
+ * lists of certificate serial numbers that have been revoked by an
+ * Authority. The revocation lists are always signed with the
+ * authority's private key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_init (gnutls_x509_crl_t * crl)
 {
@@ -70,12 +69,11 @@ gnutls_x509_crl_init (gnutls_x509_crl_t * crl)
 }
 
 /**
-  * gnutls_x509_crl_deinit - This function deinitializes memory used by a gnutls_x509_crl_t structure
-  * @crl: The structure to be initialized
-  *
-  * This function will deinitialize a CRL structure. 
-  *
-  **/
+ * gnutls_x509_crl_deinit - deinitializes a #gnutls_x509_crl_t structure
+ * @crl: The structure to be initialized
+ *
+ * This function will deinitialize a CRL structure.
+ **/
 void
 gnutls_x509_crl_deinit (gnutls_x509_crl_t crl)
 {
@@ -89,20 +87,19 @@ gnutls_x509_crl_deinit (gnutls_x509_crl_t crl)
 }
 
 /**
-  * gnutls_x509_crl_import - This function will import a DER or PEM encoded CRL
-  * @crl: The structure to store the parsed CRL.
-  * @data: The DER or PEM encoded CRL.
-  * @format: One of DER or PEM
-  *
-  * This function will convert the given DER or PEM encoded CRL
-  * to the native gnutls_x509_crl_t format. The output will be stored in 'crl'.
-  *
-  * If the CRL is PEM encoded it should have a header of "X509 CRL".
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_import - import a DER or PEM encoded CRL
+ * @crl: The structure to store the parsed CRL.
+ * @data: The DER or PEM encoded CRL.
+ * @format: One of DER or PEM
+ *
+ * This function will convert the given DER or PEM encoded CRL
+ * to the native #gnutls_x509_crl_t format. The output will be stored in 'crl'.
+ *
+ * If the CRL is PEM encoded it should have a header of "X509 CRL".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_import (gnutls_x509_crl_t crl,
 			const gnutls_datum_t * data,
@@ -164,22 +161,23 @@ cleanup:
 
 
 /**
-  * gnutls_x509_crl_get_issuer_dn - This function returns the CRL's issuer distinguished name
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @buf: a pointer to a structure to hold the peer's name (may be null)
-  * @sizeof_buf: initially holds the size of @buf
-  *
-  * This function will copy the name of the CRL issuer in the provided buffer. The name 
-  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
-  *
-  * If buf is null then only the size will be filled.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size, and
-  * 0 on success.
-  *
-  **/
+ * gnutls_x509_crl_get_issuer_dn - returns the CRL's issuer distinguished name
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @buf: a pointer to a structure to hold the peer's name (may be null)
+ * @sizeof_buf: initially holds the size of @buf
+ *
+ * This function will copy the name of the CRL issuer in the provided
+ * buffer. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+ * described in RFC2253. The output string will be ASCII or UTF-8
+ * encoded, depending on the certificate data.
+ *
+ * If buf is %NULL then only the size will be filled.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
+ * not long enough, and in that case the sizeof_buf will be updated
+ * with the required size, and 0 on success.
+ *
+ **/
 int
 gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl, char *buf,
 			       size_t * sizeof_buf)
@@ -196,30 +194,31 @@ gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl, char *buf,
 }
 
 /**
-  * gnutls_x509_crl_get_issuer_dn_by_oid - This function returns the CRL's issuer distinguished name
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @oid: holds an Object Identified in null terminated string
-  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
-  * @raw_flag: If non zero returns the raw DER data of the DN part.
-  * @buf: a pointer to a structure to hold the peer's name (may be null)
-  * @sizeof_buf: initially holds the size of @buf
-  *
-  * This function will extract the part of the name of the CRL issuer specified
-  * by the given OID. The output will be encoded as described in RFC2253. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
-  *
-  * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * If raw flag is zero, this function will only return known OIDs as text. Other OIDs 
-  * will be DER encoded, as described in RFC2253 -- in hex format with a '\#' prefix.
-  * You can check about known OIDs using gnutls_x509_dn_oid_known().
-  *
-  * If buf is null then only the size will be filled.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size,
-  * and 0 on success.
-  *
-  **/
+ * gnutls_x509_crl_get_issuer_dn_by_oid - return the CRL's issuer distinguished name
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @oid: holds an Object Identified in null terminated string
+ * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
+ * @raw_flag: If non zero returns the raw DER data of the DN part.
+ * @buf: a pointer to a structure to hold the peer's name (may be null)
+ * @sizeof_buf: initially holds the size of @buf
+ *
+ * This function will extract the part of the name of the CRL issuer
+ * specified by the given OID. The output will be encoded as described
+ * in RFC2253. The output string will be ASCII or UTF-8 encoded,
+ * depending on the certificate data.
+ *
+ * Some helper macros with popular OIDs can be found in gnutls/x509.h
+ * If raw flag is zero, this function will only return known OIDs as
+ * text. Other OIDs will be DER encoded, as described in RFC2253 -- in
+ * hex format with a '\#' prefix.  You can check about known OIDs
+ * using gnutls_x509_dn_oid_known().
+ *
+ * If buf is null then only the size will be filled.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
+ * not long enough, and in that case the sizeof_buf will be updated
+ * with the required size, and 0 on success.
+ **/
 int
 gnutls_x509_crl_get_issuer_dn_by_oid (gnutls_x509_crl_t crl,
 				      const char *oid, int indx,
@@ -238,22 +237,21 @@ gnutls_x509_crl_get_issuer_dn_by_oid (gnutls_x509_crl_t crl,
 }
 
 /**
-  * gnutls_x509_crl_get_dn_oid - This function returns the Certificate request issuer's distinguished name OIDs
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @indx: Specifies which DN OID to send. Use zero to get the first one.
-  * @oid: a pointer to a structure to hold the name (may be null)
-  * @sizeof_oid: initially holds the size of 'oid'
-  *
-  * This function will extract the requested OID of the name of the CRL issuer, specified
-  * by the given index. 
-  *
-  * If oid is null then only the size will be filled.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_oid will be updated with the required size.
-  * On success 0 is returned.
-  *
-  **/
+ * gnutls_x509_crl_get_dn_oid - returns the Certificate request issuer's distinguished name OIDs
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @indx: Specifies which DN OID to send. Use zero to get the first one.
+ * @oid: a pointer to a structure to hold the name (may be null)
+ * @sizeof_oid: initially holds the size of 'oid'
+ *
+ * This function will extract the requested OID of the name of the CRL
+ * issuer, specified by the given index.
+ *
+ * If oid is null then only the size will be filled.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
+ * not long enough, and in that case the sizeof_oid will be updated
+ * with the required size.  On success 0 is returned.
+ **/
 int
 gnutls_x509_crl_get_dn_oid (gnutls_x509_crl_t crl,
 			    int indx, void *oid, size_t * sizeof_oid)
@@ -271,15 +269,15 @@ gnutls_x509_crl_get_dn_oid (gnutls_x509_crl_t crl,
 
 
 /**
-  * gnutls_x509_crl_get_signature_algorithm - This function returns the CRL's signature algorithm
-  * @crl: should contain a gnutls_x509_crl_t structure
-  *
-  * This function will return a value of the gnutls_sign_algorithm_t enumeration that 
-  * is the signature algorithm. 
-  *
-  * Returns a negative value on error.
-  *
-  **/
+ * gnutls_x509_crl_get_signature_algorithm - returns the CRL's signature algorithm
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ *
+ * This function will return a value of the #gnutls_sign_algorithm_t
+ * enumeration that is the signature algorithm.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl)
 {
@@ -370,14 +368,13 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
 }
 
 /**
-  * gnutls_x509_crl_get_version - This function returns the CRL's version number
-  * @crl: should contain a gnutls_x509_crl_t structure
-  *
-  * This function will return the version of the specified CRL.
-  *
-  * Returns a negative value on error.
-  *
-  **/
+ * gnutls_x509_crl_get_version - returns the CRL's version number
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ *
+ * This function will return the version of the specified CRL.
+ *
+ * Returns: The version number, or a negative value on error.
+ **/
 int
 gnutls_x509_crl_get_version (gnutls_x509_crl_t crl)
 {
@@ -403,14 +400,13 @@ gnutls_x509_crl_get_version (gnutls_x509_crl_t crl)
 }
 
 /**
-  * gnutls_x509_crl_get_this_update - This function returns the CRL's thisUpdate time
-  * @crl: should contain a gnutls_x509_crl_t structure
-  *
-  * This function will return the time this CRL was issued.
-  *
-  * Returns (time_t)-1 on error.
-  *
-  **/
+ * gnutls_x509_crl_get_this_update - return the CRL's thisUpdate time
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ *
+ * This function will return the time this CRL was issued.
+ *
+ * Returns: when the CRL was issued, or (time_t)-1 on error.
+ **/
 time_t
 gnutls_x509_crl_get_this_update (gnutls_x509_crl_t crl)
 {
@@ -424,16 +420,15 @@ gnutls_x509_crl_get_this_update (gnutls_x509_crl_t crl)
 }
 
 /**
-  * gnutls_x509_crl_get_next_update - This function returns the CRL's nextUpdate time
-  * @crl: should contain a gnutls_x509_crl_t structure
-  *
-  * This function will return the time the next CRL will be issued.
-  * This field is optional in a CRL so it might be normal to get
-  * an error instead.
-  *
-  * Returns (time_t)-1 on error.
-  *
-  **/
+ * gnutls_x509_crl_get_next_update - return the CRL's nextUpdate time
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ *
+ * This function will return the time the next CRL will be issued.
+ * This field is optional in a CRL so it might be normal to get an
+ * error instead.
+ *
+ * Returns: when the next CRL will be issued, or (time_t)-1 on error.
+ **/
 time_t
 gnutls_x509_crl_get_next_update (gnutls_x509_crl_t crl)
 {
@@ -447,15 +442,14 @@ gnutls_x509_crl_get_next_update (gnutls_x509_crl_t crl)
 }
 
 /**
-  * gnutls_x509_crl_get_crt_count - This function returns the number of revoked certificates in a CRL
-  * @crl: should contain a gnutls_x509_crl_t structure
-  *
-  * This function will return the number of revoked certificates in the
-  * given CRL.
-  *
-  * Returns a negative value on failure.
-  *
-  **/
+ * gnutls_x509_crl_get_crt_count - get number of revoked certificates in a CRL
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ *
+ * This function will return the number of revoked certificates in the
+ * given CRL.
+ *
+ * Returns: number of certificates, a negative value on failure.
+ **/
 int
 gnutls_x509_crl_get_crt_count (gnutls_x509_crl_t crl)
 {
@@ -482,19 +476,19 @@ gnutls_x509_crl_get_crt_count (gnutls_x509_crl_t crl)
 }
 
 /**
-  * gnutls_x509_crl_get_crt_serial - This function returns the serial number of a revoked certificate
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @indx: the index of the certificate to extract (starting from 0)
-  * @serial: where the serial number will be copied
-  * @serial_size: initially holds the size of serial
-  * @t: if non null, will hold the time this certificate was revoked
-  *
-  * This function will return the serial number of the specified, by
-  * the index, revoked certificate.
-  *
-  * Returns a negative value on failure.
-  *
-  **/
+ * gnutls_x509_crl_get_crt_serial - get the serial number of a revoked certificate
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @indx: the index of the certificate to extract (starting from 0)
+ * @serial: where the serial number will be copied
+ * @serial_size: initially holds the size of serial
+ * @t: if non null, will hold the time this certificate was revoked
+ *
+ * This function will retrieve the serial number of the specified, by
+ * the index, revoked certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. and a negative value on error.
+ **/
 int
 gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
 				unsigned char *serial,
@@ -614,24 +608,24 @@ cleanup:
 }
 
 /**
-  * gnutls_x509_crl_export - This function will export the CRL
-  * @crl: Holds the revocation list
-  * @format: the format of output params. One of PEM or DER.
-  * @output_data: will contain a private key PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
-  *
-  * This function will export the revocation list to DER or PEM format.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN X509 CRL".
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. and a negative value on failure.
-  *
-  **/
+ * gnutls_x509_crl_export - export the CRL
+ * @crl: Holds the revocation list
+ * @format: the format of output params. One of PEM or DER.
+ * @output_data: will contain a private key PEM or DER encoded
+ * @output_data_size: holds the size of output_data (and will
+ *   be replaced by the actual size of parameters)
+ *
+ * This function will export the revocation list to DER or PEM format.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * ¤GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN X509 CRL".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. and a negative value on failure.
+ **/
 int
 gnutls_x509_crl_export (gnutls_x509_crl_t crl,
 			gnutls_x509_crt_fmt_t format, void *output_data,

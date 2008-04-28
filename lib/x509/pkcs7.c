@@ -138,17 +138,16 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_init - This function initializes a gnutls_pkcs7_t structure
-  * @pkcs7: The structure to be initialized
-  *
-  * This function will initialize a PKCS7 structure. PKCS7 structures
-  * usually contain lists of X.509 Certificates and X.509 Certificate
-  * revocation lists.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs7_init - initialize a #gnutls_pkcs7_t structure
+ * @pkcs7: The structure to be initialized
+ *
+ * This function will initialize a PKCS7 structure. PKCS7 structures
+ * usually contain lists of X.509 Certificates and X.509 Certificate
+ * revocation lists.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_init (gnutls_pkcs7_t * pkcs7)
 {
@@ -171,12 +170,11 @@ gnutls_pkcs7_init (gnutls_pkcs7_t * pkcs7)
 }
 
 /**
-  * gnutls_pkcs7_deinit - This function deinitializes memory used by a gnutls_pkcs7_t structure
-  * @pkcs7: The structure to be initialized
-  *
-  * This function will deinitialize a PKCS7 structure. 
-  *
-  **/
+ * gnutls_pkcs7_deinit - deinitializes a #gnutls_pkcs7_t structure
+ * @pkcs7: The structure to be initialized
+ *
+ * This function will deinitialize a PKCS7 structure.
+ **/
 void
 gnutls_pkcs7_deinit (gnutls_pkcs7_t pkcs7)
 {
@@ -190,20 +188,20 @@ gnutls_pkcs7_deinit (gnutls_pkcs7_t pkcs7)
 }
 
 /**
-  * gnutls_pkcs7_import - This function will import a DER or PEM encoded PKCS7
-  * @pkcs7: The structure to store the parsed PKCS7.
-  * @data: The DER or PEM encoded PKCS7.
-  * @format: One of DER or PEM
-  *
-  * This function will convert the given DER or PEM encoded PKCS7
-  * to the native gnutls_pkcs7_t format. The output will be stored in 'pkcs7'.
-  *
-  * If the PKCS7 is PEM encoded it should have a header of "PKCS7".
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs7_import - import a DER or PEM encoded PKCS7
+ * @pkcs7: The structure to store the parsed PKCS7.
+ * @data: The DER or PEM encoded PKCS7.
+ * @format: One of DER or PEM
+ *
+ * This function will convert the given DER or PEM encoded PKCS7 to
+ * the native #gnutls_pkcs7_t format.  The output will be stored in
+ * 'pkcs7'.
+ *
+ * If the PKCS7 is PEM encoded it should have a header of "PKCS7".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_import (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
 		     gnutls_x509_crt_fmt_t format)
@@ -261,21 +259,24 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_get_crt_raw - This function returns a certificate in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  * @indx: contains the index of the certificate to extract
-  * @certificate: the contents of the certificate will be copied there (may be null)
-  * @certificate_size: should hold the size of the certificate
-  *
-  * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. If the provided buffer is not long enough,
-  * then @certificate_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
-  *
-  * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-  * will be returned.
-  *
-  **/
+ * gnutls_pkcs7_get_crt_raw - get a certificate from a PKCS7 certificate set
+ * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @indx: contains the index of the certificate to extract
+ * @certificate: the contents of the certificate will be copied
+ *   there (may be null)
+ * @certificate_size: should hold the size of the certificate
+ *
+ * This function will return a certificate of the PKCS7 or RFC2630
+ * certificate set.
+ *
+ * After the last certificate has been read
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.  If the provided buffer is not long enough,
+ *   then @certificate_size is updated and
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+ **/
 int
 gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
 			  int indx, void *certificate,
@@ -367,15 +368,15 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_get_crt_count - This function returns the number of certificates in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  *
-  * This function will return the number of certifcates in the PKCS7 or 
-  * RFC2630 certificate set.
-  *
-  * Returns a negative value on failure.
-  *
-  **/
+ * gnutls_pkcs7_get_crt_count - return the number of certificates in a PKCS7 certificate set
+ * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ *
+ * This function will return the number of certifcates in the PKCS7
+ * or RFC2630 certificate set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7)
 {
@@ -411,25 +412,24 @@ gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7)
 }
 
 /**
-  * gnutls_pkcs7_export - This function will export the pkcs7 structure
-  * @pkcs7: Holds the pkcs7 structure
-  * @format: the format of output params. One of PEM or DER.
-  * @output_data: will contain a structure PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be
-  *   replaced by the actual size of parameters)
-  *
-  * This function will export the pkcs7 structure to DER or PEM format.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
-  * be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN PKCS7".
-  *
-  * Return value: In case of failure a negative value will be
-  *   returned, and 0 on success.
-  *
+ * gnutls_pkcs7_export - export the pkcs7 structure
+ * @pkcs7: Holds the pkcs7 structure
+ * @format: the format of output params. One of PEM or DER.
+ * @output_data: will contain a structure PEM or DER encoded
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ *
+ * This function will export the pkcs7 structure to DER or PEM format.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER
+ * will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN PKCS7".
+ *
+ * Return value: In case of failure a negative value will be
+ *   returned, and 0 on success.
   **/
 int
 gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
@@ -524,15 +524,16 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_set_crt_raw - This function adds a certificate in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  * @crt: the DER encoded certificate to be added
-  *
-  * This function will add a certificate to the PKCS7 or RFC2630 certificate set.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs7_set_crt_raw - add a certificate in a PKCS7 certificate set
+ * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @crt: the DER encoded certificate to be added
+ *
+ * This function will add a certificate to the PKCS7 or RFC2630
+ * certificate set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_set_crt_raw (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crt)
 {
@@ -617,16 +618,16 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_set_crt - This function adds a parsed certificate in a PKCS7 certificate set
+  * gnutls_pkcs7_set_crt - add a parsed certificate in a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
   * @crt: the certificate to be copied.
   *
-  * This function will add a parsed certificate to the PKCS7 or RFC2630 certificate set.
-  * This is a wrapper function over gnutls_pkcs7_set_crt_raw() .
+  * This function will add a parsed certificate to the PKCS7 or
+  * RFC2630 certificate set.  This is a wrapper function over
+  * gnutls_pkcs7_set_crt_raw() .
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
   *   negative error value.
-  *
   **/
 int
 gnutls_pkcs7_set_crt (gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
@@ -659,14 +660,16 @@ gnutls_pkcs7_set_crt (gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
 
 
 /**
-  * gnutls_pkcs7_delete_crt - This function deletes a certificate from a PKCS7 certificate set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  * @indx: the index of the certificate to delete
-  *
-  * This function will delete a certificate from a PKCS7 or RFC2630 certificate set.
-  * Index starts from 0. Returns 0 on success.
-  *
-  **/
+ * gnutls_pkcs7_delete_crt - deletes a certificate from a PKCS7 certificate set
+ * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @indx: the index of the certificate to delete
+ *
+ * This function will delete a certificate from a PKCS7 or RFC2630
+ * certificate set.  Index starts from 0. Returns 0 on success.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_delete_crt (gnutls_pkcs7_t pkcs7, int indx)
 {
@@ -723,21 +726,20 @@ cleanup:
  */
 
 /**
-  * gnutls_pkcs7_get_crl_raw - This function returns a crl in a PKCS7 crl set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  * @indx: contains the index of the crl to extract
-  * @crl: the contents of the crl will be copied there (may be null)
-  * @crl_size: should hold the size of the crl
-  *
-  * This function will return a crl of the PKCS7 or RFC2630 crl set.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. If the provided buffer is not long enough,
-  * then @crl_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
-  *
-  * After the last crl has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-  * will be returned.
-  *
-  **/
+ * gnutls_pkcs7_get_crl_raw - This function returns a crl in a PKCS7 crl set
+ * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @indx: contains the index of the crl to extract
+ * @crl: the contents of the crl will be copied there (may be null)
+ * @crl_size: should hold the size of the crl
+ *
+ * This function will return a crl of the PKCS7 or RFC2630 crl set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.  If the provided buffer is not long enough,
+ *   then @crl_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER is
+ *   returned.  After the last crl has been read
+ *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ **/
 int
 gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
 			  int indx, void *crl, size_t * crl_size)
@@ -801,15 +803,15 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_get_crl_count - This function returns the number of crls in a PKCS7 crl set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  *
-  * This function will return the number of certifcates in the PKCS7 or 
-  * RFC2630 crl set.
-  *
-  * Returns a negative value on failure.
-  *
-  **/
+ * gnutls_pkcs7_get_crl_count - returns the number of CRLs in a PKCS7 crl set
+ * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ *
+ * This function will return the number of certifcates in the PKCS7
+ * or RFC2630 crl set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7)
 {
@@ -845,15 +847,15 @@ gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7)
 }
 
 /**
-  * gnutls_pkcs7_set_crl_raw - This function adds a crl in a PKCS7 crl set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  * @crl: the DER encoded crl to be added
-  *
-  * This function will add a crl to the PKCS7 or RFC2630 crl set.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs7_set_crl_raw - add a crl in a PKCS7 crl set
+ * @pkcs7_struct: should contain #a gnutls_pkcs7_t structure
+ * @crl: the DER encoded crl to be added
+ *
+ * This function will add a crl to the PKCS7 or RFC2630 crl set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_set_crl_raw (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crl)
 {
@@ -928,15 +930,16 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_set_crl - This function adds a parsed crl in a PKCS7 crl set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  * @crl: the DER encoded crl to be added
-  *
-  * This function will add a parsed crl to the PKCS7 or RFC2630 crl set.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs7_set_crl - add a parsed crl in a PKCS7 crl set
+ * @pkcs7_struct: should contain a #gnutls_pkcs7_t structure
+ * @crl: the DER encoded crl to be added
+ *
+ * This function will add a parsed CRL to the PKCS7 or RFC2630 crl
+ * set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_set_crl (gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl)
 {
@@ -967,14 +970,16 @@ gnutls_pkcs7_set_crl (gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl)
 }
 
 /**
-  * gnutls_pkcs7_delete_crl - This function deletes a crl from a PKCS7 crl set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
-  * @indx: the index of the crl to delete
-  *
-  * This function will delete a crl from a PKCS7 or RFC2630 crl set.
-  * Index starts from 0. Returns 0 on success.
-  *
-  **/
+ * gnutls_pkcs7_delete_crl - deletes a CRL from a PKCS7 crl set
+ * @pkcs7_struct: should contain a #gnutls_pkcs7_t structure
+ * @indx: the index of the crl to delete
+ *
+ * This function will delete a crl from a PKCS7 or RFC2630 crl set.
+ * Index starts from 0. Returns 0 on success.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_delete_crl (gnutls_pkcs7_t pkcs7, int indx)
 {

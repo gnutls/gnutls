@@ -327,18 +327,17 @@ cleanup:
 
 
 /**
-  * gnutls_pkcs12_bag_set_data - This function inserts data into the bag
-  * @bag: The bag
-  * @type: The data's type
-  * @data: the data to be copied.
-  *
-  * This function will insert the given data of the given type into the
-  * bag. 
-  *
-  * Returns the index of the added bag on success, or a negative
-  * value on error.
-  *
-  **/
+ * gnutls_pkcs12_bag_set_data - This function inserts data into the bag
+ * @bag: The bag
+ * @type: The data's type
+ * @data: the data to be copied.
+ *
+ * This function will insert the given data of the given type into
+ * the bag.
+ *
+ * Returns: the index of the added bag on success, or a negative
+ * value on error.
+ **/
 int
 gnutls_pkcs12_bag_set_data (gnutls_pkcs12_bag_t bag,
 			    gnutls_pkcs12_bag_type_t type,
@@ -391,17 +390,16 @@ gnutls_pkcs12_bag_set_data (gnutls_pkcs12_bag_t bag,
 }
 
 /**
-  * gnutls_pkcs12_bag_set_crt - This function inserts a certificate into the bag
-  * @bag: The bag
-  * @crt: the certificate to be copied.
-  *
-  * This function will insert the given certificate into the
-  * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
-  *
-  * Returns the index of the added bag on success, or a negative
-  * value on failure.
-  *
-  **/
+ * gnutls_pkcs12_bag_set_crt - This function inserts a certificate into the bag
+ * @bag: The bag
+ * @crt: the certificate to be copied.
+ *
+ * This function will insert the given certificate into the
+ * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
+ *
+ * Returns: the index of the added bag on success, or a negative
+ * value on failure.
+ **/
 int
 gnutls_pkcs12_bag_set_crt (gnutls_pkcs12_bag_t bag, gnutls_x509_crt_t crt)
 {
@@ -429,17 +427,16 @@ gnutls_pkcs12_bag_set_crt (gnutls_pkcs12_bag_t bag, gnutls_x509_crt_t crt)
 }
 
 /**
-  * gnutls_pkcs12_bag_set_crl - This function inserts the CRL into the bag
-  * @bag: The bag
-  * @crl: the CRL to be copied.
-  *
-  * This function will insert the given CRL into the
-  * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
-  *
-  * Returns the index of the added bag on success, or a negative
-  * value on failure.
-  *
-  **/
+ * gnutls_pkcs12_bag_set_crl - insert the CRL into the bag
+ * @bag: The bag
+ * @crl: the CRL to be copied.
+ *
+ * This function will insert the given CRL into the
+ * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
+ *
+ * Returns: the index of the added bag on success, or a negative value
+ * on failure.
+ **/
 int
 gnutls_pkcs12_bag_set_crl (gnutls_pkcs12_bag_t bag, gnutls_x509_crl_t crl)
 {

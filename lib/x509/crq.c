@@ -181,7 +181,7 @@ cleanup:
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
   * long enough, and in that case the *sizeof_buf will be updated with
   * the required size.  On success 0 is returned.
   *
@@ -223,7 +223,7 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
   * long enough, and in that case the *sizeof_buf will be updated with
   * the required size.  On success 0 is returned.
   *
@@ -256,7 +256,7 @@ gnutls_x509_crq_get_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
   *
   * If oid is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
   * long enough, and in that case the *sizeof_oid will be updated with
   * the required size.  On success 0 is returned.
   *
@@ -608,8 +608,8 @@ gnutls_x509_crq_set_version (gnutls_x509_crq_t crq, unsigned int version)
   *
   * This function will return the version of the specified Certificate request.
   *
-  * Returns a negative value on error.
-  *
+  * Returns: version of certificate request, or a negative value on
+  *   error.
   **/
 int
 gnutls_x509_crq_get_version (gnutls_x509_crq_t crq)
@@ -878,9 +878,8 @@ gnutls_x509_crq_export (gnutls_x509_crq_t crq,
   * For DSA the bits returned are of the public
   * exponent.
   *
-  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
-  * or a negative value on error.
-  *
+  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
+  *   success, or a negative value on error.
   **/
 int
 gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
