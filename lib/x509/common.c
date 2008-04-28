@@ -105,19 +105,19 @@ _gnutls_x509_oid_data_printable (const char *oid)
 }
 
 /**
-  * gnutls_x509_dn_oid_known - This function will return true if the given OID is known
-  * @oid: holds an Object Identifier in a null terminated string
-  *
-  * This function will inform about known DN OIDs. This is useful since functions
-  * like gnutls_x509_crt_set_dn_by_oid() use the information on known
-  * OIDs to properly encode their input. Object Identifiers that are not
-  * known are not encoded by these functions, and their input is stored directly
-  * into the ASN.1 structure. In that case of unknown OIDs, you have
-  * the responsibility of DER encoding your data.
-  *
-  * Returns 1 on known OIDs and 0 otherwise.
-  *
-  **/
+ * gnutls_x509_dn_oid_known - return true if the given OID is known
+ * @oid: holds an Object Identifier in a null terminated string
+ *
+ * This function will inform about known DN OIDs. This is useful since
+ * functions like gnutls_x509_crt_set_dn_by_oid() use the information
+ * on known OIDs to properly encode their input. Object Identifiers
+ * that are not known are not encoded by these functions, and their
+ * input is stored directly into the ASN.1 structure. In that case of
+ * unknown OIDs, you have the responsibility of DER encoding your
+ * data.
+ *
+ * Returns: 1 on known OIDs and 0 otherwise.
+ **/
 int
 gnutls_x509_dn_oid_known (const char *oid)
 {

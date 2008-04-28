@@ -943,17 +943,17 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
 }
 
 /**
-  * gnutls_x509_dn_init: initialize an opaque DN object
-  *
-  * @odn: the object to be initialized
-  *
-  * This function initializes a #gnutls_x509_dn_t structure.
-  *
-  * The object returned must be deallocated using
-  * gnutls_x509_dn_deinit().
-  *
-  * Returns: 0 on success, or an error code.
-  **/
+ * gnutls_x509_dn_init: initialize an opaque DN object
+ * @odn: the object to be initialized
+ *
+ * This function initializes a #gnutls_x509_dn_t structure.
+ *
+ * The object returned must be deallocated using
+ * gnutls_x509_dn_deinit().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
 {
   int result;
@@ -972,23 +972,23 @@ int gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
   return 0;
 }
 
-
 /**
-  * gnutls_x509_dn_import: get opaque DN object from DER RDN sequence
-  *
-  * @odn: the structure that will hold the imported DN
-  * @data: should contain a DER encoded RDN sequence
-  *
-  * This function parses an RDN sequence and stores the result to a
-  * #gnutls_x509_dn_t structure. The structure must have been initialized
-  * with gnutls_x509_dn_init(). You may use gnutls_x509_dn_get_rdn_ava() to 
-  * decode the DN.
-  *
-  * Returns: 0 on success, or an error code.
-  **/
+ * gnutls_x509_dn_import: get opaque DN object from DER RDN sequence
+ *
+ * @odn: the structure that will hold the imported DN
+ * @data: should contain a DER encoded RDN sequence
+ *
+ * This function parses an RDN sequence and stores the result to a
+ * #gnutls_x509_dn_t structure. The structure must have been initialized
+ * with gnutls_x509_dn_init(). You may use gnutls_x509_dn_get_rdn_ava() to
+ * decode the DN.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_dn_import (gnutls_x509_dn_t odn,
-                       const gnutls_datum_t * data)
+		       const gnutls_datum_t * data)
 {
   int result;
   char err[MAX_ERROR_DESCRIPTION_SIZE];
@@ -1007,14 +1007,13 @@ gnutls_x509_dn_import (gnutls_x509_dn_t odn,
 }
 
 /**
-  * gnutls_x509_dn_deinit: deallocate a DN object
-  * @idn: a DN opaque object pointer.
-  *
-  * This function deallocates the DN object as returned by
-  * gnutls_x509_dn_import().
-  *
-  **/
-void 
+ * gnutls_x509_dn_deinit: deallocate a DN object
+ * @idn: a DN opaque object pointer.
+ *
+ * This function deallocates the DN object as returned by
+ * gnutls_x509_dn_import().
+ **/
+void
 gnutls_x509_dn_deinit (gnutls_x509_dn_t idn)
 {
   ASN1_TYPE dn = idn;
@@ -1023,20 +1022,20 @@ gnutls_x509_dn_deinit (gnutls_x509_dn_t idn)
 }
 
 /**
-  * gnutls_x509_rdn_get - This function parses an RDN sequence and returns a string
-  * @idn: should contain a DER encoded RDN sequence
-  * @buf: a pointer to a structure to hold the peer's name
-  * @sizeof_buf: holds the size of @buf
-  *
-  * This function will return the name of the given RDN sequence.  The
-  * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
-  * RFC2253.
-  *
-  * If the provided buffer is not long enough, returns
-  * GNUTLS_E_SHORT_MEMORY_BUFFER and *sizeof_buf will be updated.  On
-  * success 0 is returned.
-  *
-  **/
+ * gnutls_x509_rdn_get - parse an RDN sequence and returns a string
+ * @idn: should contain a DER encoded RDN sequence
+ * @buf: a pointer to a structure to hold the peer's name
+ * @sizeof_buf: holds the size of @buf
+ *
+ * This function will return the name of the given RDN sequence.  The
+ * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
+ * RFC2253.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, or
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
+ * updated if the provided buffer is not long enough, otherwise a
+ * negative error value.
+ **/
 int
 gnutls_x509_rdn_get (const gnutls_datum_t * idn,
 		     char *buf, size_t * sizeof_buf)
@@ -1079,23 +1078,24 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
 }
 
 /**
-  * gnutls_x509_rdn_get_by_oid - This function parses an RDN sequence and returns a string
-  * @idn: should contain a DER encoded RDN sequence
-  * @oid: an Object Identifier
-  * @indx: In case multiple same OIDs exist in the RDN indicates which
-  *   to send. Use 0 for the first one.
-  * @raw_flag: If non zero then the raw DER data are returned.
-  * @buf: a pointer to a structure to hold the peer's name
-  * @sizeof_buf: holds the size of @buf
-  *
-  * This function will return the name of the given Object identifier,
-  * of the RDN sequence.  The name will be encoded using the rules
-  * from RFC2253.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates *sizeof_buf if
-  * the provided buffer is not long enough, and 0 on success.
-  *
-  **/
+ * gnutls_x509_rdn_get_by_oid - parse an RDN sequence and returns a string
+ * @idn: should contain a DER encoded RDN sequence
+ * @oid: an Object Identifier
+ * @indx: In case multiple same OIDs exist in the RDN indicates which
+ *   to send. Use 0 for the first one.
+ * @raw_flag: If non zero then the raw DER data are returned.
+ * @buf: a pointer to a structure to hold the peer's name
+ * @sizeof_buf: holds the size of @buf
+ *
+ * This function will return the name of the given Object identifier,
+ * of the RDN sequence.  The name will be encoded using the rules
+ * from RFC2253.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, or
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
+ * updated if the provided buffer is not long enough, otherwise a
+ * negative error value.
+ **/
 int
 gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
 			    int indx, unsigned int raw_flag,
@@ -1136,19 +1136,20 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
 }
 
 /**
-  * gnutls_x509_rdn_get_oid - This function parses an RDN sequence and returns an OID.
-  * @idn: should contain a DER encoded RDN sequence
-  * @indx: Indicates which OID to return. Use 0 for the first one.
-  * @oid: a pointer to a structure to hold the peer's name OID
-  * @sizeof_oid: holds the size of @oid
-  *
-  * This function will return the specified Object identifier, of the
-  * RDN sequence.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates *sizeof_buf if
-  * the provided buffer is not long enough, and 0 on success.
-  *
-  **/
+ * gnutls_x509_rdn_get_oid - parse an RDN sequence and returns an OID.
+ * @idn: should contain a DER encoded RDN sequence
+ * @indx: Indicates which OID to return. Use 0 for the first one.
+ * @oid: a pointer to a structure to hold the peer's name OID
+ * @sizeof_oid: holds the size of @oid
+ *
+ * This function will return the specified Object identifier, of the
+ * RDN sequence.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, or
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
+ * updated if the provided buffer is not long enough, otherwise a
+ * negative error value.
+ **/
 int
 gnutls_x509_rdn_get_oid (const gnutls_datum_t * idn,
 			 int indx, void *buf, size_t * sizeof_buf)
@@ -1212,29 +1213,29 @@ _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
 }
 
 /**
-  * gnutls_x509_dn_export - This function will export the DN
-  * @dn: Holds the opaque DN object
-  * @format: the format of output params. One of PEM or DER.
-  * @output_data: will contain a DN PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be
-  *   replaced by the actual size of parameters)
-  *
-  * This function will export the DN to DER or PEM format.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
-  * be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN NAME".
-  *
-  * Return value: In case of failure a negative value will be
-  * returned, and 0 on success.
-  **/
+ * gnutls_x509_dn_export - This function will export the DN
+ * @dn: Holds the opaque DN object
+ * @format: the format of output params. One of PEM or DER.
+ * @output_data: will contain a DN PEM or DER encoded
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ *
+ * This function will export the DN to DER or PEM format.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER
+ * will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN NAME".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_dn_export (gnutls_x509_dn_t dn,
-                       gnutls_x509_crt_fmt_t format, void *output_data,
-                       size_t * output_data_size)
+		       gnutls_x509_crt_fmt_t format, void *output_data,
+		       size_t * output_data_size)
 {
   ASN1_TYPE asn1 = dn;
   

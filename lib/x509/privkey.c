@@ -42,14 +42,14 @@ int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, mpi_t * params);
 #define CALC_COEFF 1
 
 /**
-  * gnutls_x509_privkey_init - This function initializes a gnutls_crl structure
-  * @key: The structure to be initialized
-  *
-  * This function will initialize an private key structure. 
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_x509_privkey_init - initialize a #gnutls_privkey_t structure
+ * @key: The structure to be initialized
+ *
+ * This function will initialize an private key structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_init (gnutls_x509_privkey_t * key)
 {
@@ -66,12 +66,11 @@ gnutls_x509_privkey_init (gnutls_x509_privkey_t * key)
 }
 
 /**
-  * gnutls_x509_privkey_deinit - This function deinitializes memory used by a gnutls_x509_privkey_t structure
-  * @key: The structure to be initialized
-  *
-  * This function will deinitialize a private key structure. 
-  *
-  **/
+ * gnutls_x509_privkey_deinit - deinitializes a #gnutls_x509_privkey_t structure
+ * @key: The structure to be initialized
+ *
+ * This function will deinitialize a private key structure.
+ **/
 void
 gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
 {
@@ -90,13 +89,16 @@ gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
 }
 
 /**
-  * gnutls_x509_privkey_cpy - This function copies a private key
-  * @dst: The destination key, which should be initialized.
-  * @src: The source key
-  *
-  * This function will copy a private key from source to destination key.
-  *
-  **/
+ * gnutls_x509_privkey_cpy - copy a private key
+ * @dst: The destination key, which should be initialized.
+ * @src: The source key
+ *
+ * This function will copy a private key from source to destination
+ * key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst, gnutls_x509_privkey_t src)
 {
@@ -333,20 +335,21 @@ error:
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
 
 /**
-  * gnutls_x509_privkey_import - This function will import a DER or PEM encoded key
-  * @key: The structure to store the parsed key
-  * @data: The DER or PEM encoded certificate.
-  * @format: One of DER or PEM
-  *
-  * This function will convert the given DER or PEM encoded key
-  * to the native gnutls_x509_privkey_t format. The output will be stored in @key .
-  *
-  * If the key is PEM encoded it should have a header of "RSA PRIVATE KEY", or
-  * "DSA PRIVATE KEY".
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_x509_privkey_import - import a DER or PEM encoded key
+ * @key: The structure to store the parsed key
+ * @data: The DER or PEM encoded certificate.
+ * @format: One of DER or PEM
+ *
+ * This function will convert the given DER or PEM encoded key to the
+ * native #gnutls_x509_privkey_t format. The output will be stored in
+ * @key .
+ *
+ * If the key is PEM encoded it should have a header of "RSA PRIVATE
+ * KEY", or "DSA PRIVATE KEY".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
 			    const gnutls_datum_t * data,
@@ -412,7 +415,7 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
     }
   else
     {
-      /* Try decoding with both, and accept the one that 
+      /* Try decoding with both, and accept the one that
        * succeeds.
        */
       key->pk_algorithm = GNUTLS_PK_RSA;
@@ -454,19 +457,22 @@ cleanup:
 		_gnutls_mpi_release(&key->params[i])
 
 /**
-  * gnutls_x509_privkey_import_rsa_raw - This function will import a raw RSA key
-  * @key: The structure to store the parsed key
-  * @m: holds the modulus
-  * @e: holds the public exponent
-  * @d: holds the private exponent
-  * @p: holds the first prime (p)
-  * @q: holds the second prime (q)
-  * @u: holds the coefficient
-  *
-  * This function will convert the given RSA raw parameters
-  * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
-  * 
-  **/
+ * gnutls_x509_privkey_import_rsa_raw - import a raw RSA key
+ * @key: The structure to store the parsed key
+ * @m: holds the modulus
+ * @e: holds the public exponent
+ * @d: holds the private exponent
+ * @p: holds the first prime (p)
+ * @q: holds the second prime (q)
+ * @u: holds the coefficient
+ *
+ * This function will convert the given RSA raw parameters to the
+ * native #gnutls_x509_privkey_t format.  The output will be stored in
+ * @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
 				    const gnutls_datum_t * m,
@@ -565,18 +571,21 @@ gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
 }
 
 /**
-  * gnutls_x509_privkey_import_dsa_raw - This function will import a raw DSA key
-  * @key: The structure to store the parsed key
-  * @p: holds the p
-  * @q: holds the q
-  * @g: holds the g
-  * @y: holds the y
-  * @x: holds the x
-  *
-  * This function will convert the given DSA raw parameters
-  * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
-  * 
-  **/
+ * gnutls_x509_privkey_import_dsa_raw - import a raw DSA key
+ * @key: The structure to store the parsed key
+ * @p: holds the p
+ * @q: holds the q
+ * @g: holds the g
+ * @y: holds the y
+ * @x: holds the x
+ *
+ * This function will convert the given DSA raw parameters to the
+ * native #gnutls_x509_privkey_t format.  The output will be stored
+ * in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
 				    const gnutls_datum_t * p,
@@ -654,16 +663,15 @@ gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
 
 
 /**
-  * gnutls_x509_privkey_get_pk_algorithm - This function returns the key's PublicKey algorithm
-  * @key: should contain a gnutls_x509_privkey_t structure
-  *
-  * This function will return the public key algorithm of a private
-  * key.
-  *
-  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
-  * or a negative value on error.
-  *
-  **/
+ * gnutls_x509_privkey_get_pk_algorithm - returns the key's PublicKey algorithm
+ * @key: should contain a #gnutls_x509_privkey_t structure
+ *
+ * This function will return the public key algorithm of a private
+ * key.
+ *
+ * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
+ *   success, or a negative value on error.
+ **/
 int
 gnutls_x509_privkey_get_pk_algorithm (gnutls_x509_privkey_t key)
 {
@@ -676,30 +684,28 @@ gnutls_x509_privkey_get_pk_algorithm (gnutls_x509_privkey_t key)
   return key->pk_algorithm;
 }
 
-
 /**
-  * gnutls_x509_privkey_export - This function will export the private key
-  * @key: Holds the key
-  * @format: the format of output params. One of PEM or DER.
-  * @output_data: will contain a private key PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be
-  *   replaced by the actual size of parameters)
-  *
-  * This function will export the private key to a PKCS1 structure for
-  * RSA keys, or an integer sequence for DSA keys. The DSA keys are in
-  * the same format with the parameters used by openssl.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
-  * be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN RSA PRIVATE KEY".
-  *
-  * Return value: In case of failure a negative value will be
-  *   returned, and 0 on success.
-  *
-  **/
+ * gnutls_x509_privkey_export - export the private key
+ * @key: Holds the key
+ * @format: the format of output params. One of PEM or DER.
+ * @output_data: will contain a private key PEM or DER encoded
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ *
+ * This function will export the private key to a PKCS1 structure for
+ * RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
+ * the same format with the parameters used by openssl.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER
+ * will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN RSA PRIVATE KEY".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
 			    gnutls_x509_crt_fmt_t format, void *output_data,
@@ -753,22 +759,23 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
 				  output_data_size);
 }
 
-
 /**
-  * gnutls_x509_privkey_export_rsa_raw - This function will export the RSA private key
-  * @key: a structure that holds the rsa parameters
-  * @m: will hold the modulus
-  * @e: will hold the public exponent
-  * @d: will hold the private exponent
-  * @p: will hold the first prime (p)
-  * @q: will hold the second prime (q)
-  * @u: will hold the coefficient
-  *
-  * This function will export the RSA private key's parameters found in the given
-  * structure. The new parameters will be allocated using
-  * gnutls_malloc() and will be stored in the appropriate datum.
-  * 
-  **/
+ * gnutls_x509_privkey_export_rsa_raw - export the RSA private key
+ * @key: a structure that holds the rsa parameters
+ * @m: will hold the modulus
+ * @e: will hold the public exponent
+ * @d: will hold the private exponent
+ * @p: will hold the first prime (p)
+ * @q: will hold the second prime (q)
+ * @u: will hold the coefficient
+ *
+ * This function will export the RSA private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_export_rsa_raw (gnutls_x509_privkey_t key,
 				    gnutls_datum_t * m, gnutls_datum_t * e,
@@ -869,19 +876,21 @@ error:
 }
 
 /**
-  * gnutls_x509_privkey_export_dsa_raw - This function will export the DSA private key
-  * @params: a structure that holds the DSA parameters
-  * @p: will hold the p
-  * @q: will hold the q
-  * @g: will hold the g
-  * @y: will hold the y
-  * @x: will hold the x
-  *
-  * This function will export the DSA private key's parameters found in the given
-  * structure. The new parameters will be allocated using
-  * gnutls_malloc() and will be stored in the appropriate datum.
-  * 
-  **/
+ * gnutls_x509_privkey_export_dsa_raw - export the DSA private key
+ * @params: a structure that holds the DSA parameters
+ * @p: will hold the p
+ * @q: will hold the q
+ * @g: will hold the g
+ * @y: will hold the y
+ * @x: will hold the x
+ *
+ * This function will export the DSA private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
 				    gnutls_datum_t * p, gnutls_datum_t * q,
@@ -1302,18 +1311,18 @@ cleanup:
 
 
 /**
-  * gnutls_x509_privkey_generate - This function will generate a private key
-  * @key: should contain a gnutls_x509_privkey_t structure
-  * @algo: is one of RSA or DSA.
-  * @bits: the size of the modulus
-  * @flags: unused for now. Must be 0.
-  *
-  * This function will generate a random private key. Note that
-  * this function must be called on an empty private key. 
-  *
-  * Returns 0 on success or a negative value on error.
-  *
-  **/
+ * gnutls_x509_privkey_generate - generate a private key
+ * @key: should contain a #gnutls_x509_privkey_t structure
+ * @algo: is one of RSA or DSA.
+ * @bits: the size of the modulus
+ * @flags: unused for now.  Must be 0.
+ *
+ * This function will generate a random private key. Note that this
+ * function must be called on an empty private key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
 			      gnutls_pk_algorithm_t algo, unsigned int bits,
@@ -1390,26 +1399,25 @@ cleanup:
 }
 
 /**
-  * gnutls_x509_privkey_get_key_id - Return unique ID of the key's parameters
-  * @key: Holds the key
-  * @flags: should be 0 for now
-  * @output_data: will contain the key ID
-  * @output_data_size: holds the size of output_data (and will be
-  *   replaced by the actual size of parameters)
-  *
-  * This function will return a unique ID the depends on the public key
-  * parameters. This ID can be used in checking whether a certificate
-  * corresponds to the given key.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
-  * be returned.  The output will normally be a SHA-1 hash output,
-  * which is 20 bytes.
-  *
-  * Return value: In case of failure a negative value will be
-  *   returned, and 0 on success.
-  *
-  **/
+ * gnutls_x509_privkey_get_key_id - Return unique ID of the key's parameters
+ * @key: Holds the key
+ * @flags: should be 0 for now
+ * @output_data: will contain the key ID
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ *
+ * This function will return a unique ID the depends on the public key
+ * parameters. This ID can be used in checking whether a certificate
+ * corresponds to the given key.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * be returned.  The output will normally be a SHA-1 hash output,
+ * which is 20 bytes.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
 				unsigned int flags,
@@ -1480,28 +1488,27 @@ cleanup:
 #ifdef ENABLE_PKI
 
 /**
-  * gnutls_x509_privkey_sign_data - This function will sign the given data using the private key params
-  * @key: Holds the key
-  * @digest: should be MD5 or SHA1
-  * @flags: should be 0 for now
-  * @data: holds the data to be signed
-  * @signature: will contain the signature
-  * @signature_size: holds the size of signature (and will be replaced
-  *   by the new size)
-  *
-  * This function will sign the given data using a signature algorithm
-  * supported by the private key. Signature algorithms are always used
-  * together with a hash functions.  Different hash functions may be
-  * used for the RSA algorithm, but only SHA-1 for the DSA keys.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * *signature_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
-  * be returned.
-  *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
-  *
-  **/
+ * gnutls_x509_privkey_sign_data - sign data using the private key
+ * @key: Holds the key
+ * @digest: should be MD5 or SHA1
+ * @flags: should be 0 for now
+ * @data: holds the data to be signed
+ * @signature: will contain the signature
+ * @signature_size: holds the size of signature (and will be replaced
+ *   by the new size)
+ *
+ * This function will sign the given data using a signature algorithm
+ * supported by the private key. Signature algorithms are always used
+ * together with a hash functions.  Different hash functions may be
+ * used for the RSA algorithm, but only SHA-1 for the DSA keys.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@signature_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * be returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
 			       gnutls_digest_algorithm_t digest,
@@ -1541,15 +1548,15 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_privkey_sign_hash - This function will sign the given data using the private key params
+ * gnutls_x509_privkey_sign_hash - sign hash using the private key
  * @key: Holds the key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature
  *
  * This function will sign the given hash using the private key.
  *
- * Return value: In case of failure a negative value will be returned,
- * and 0 on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
  **/
 int
 gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
@@ -1576,18 +1583,17 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
 }
 
 /**
-  * gnutls_x509_privkey_verify_data - This function will verify the given signed data.
+  * gnutls_x509_privkey_verify_data - Verify the signed data using private key
   * @key: Holds the key
   * @flags: should be 0 for now
   * @data: holds the data to be signed
   * @signature: contains the signature
   *
-  * This function will verify the given signed data, using the parameters in the
-  * private key.
+  * This function will verify the given signed data, using the
+  * parameters in the private key.
   *
-  * In case of a verification failure 0 is returned, and
-  * 1 on success.
-  *
+  * Returns: In case of a verification failure 0 is returned, and 1 on
+  * success.
   **/
 int
 gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
@@ -1614,16 +1620,15 @@ gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
 }
 
 /**
-  * gnutls_x509_privkey_fix - This function will recalculate some parameters of the key.
-  * @key: Holds the key
-  *
-  * This function will recalculate the secondary parameters in a key.
-  * In RSA keys, this can be the coefficient and exponent1,2.
-  *
-  * Return value: In case of failure a negative value will be
-  *   returned, and 0 on success.
-  *
-  **/
+ * gnutls_x509_privkey_fix - recalculate some parameters of the key.
+ * @key: Holds the key
+ *
+ * This function will recalculate the secondary parameters in a key.
+ * In RSA keys, this can be the coefficient and exponent1,2.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_fix (gnutls_x509_privkey_t key)
 {
