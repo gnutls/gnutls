@@ -650,7 +650,7 @@ gnutls_x509_crt_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
  * activated.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_set_activation_time (gnutls_x509_crt_t cert, time_t act_time)
@@ -674,7 +674,7 @@ gnutls_x509_crt_set_activation_time (gnutls_x509_crt_t cert, time_t act_time)
  * This function will set the time this Certificate will expire.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert, time_t exp_time)
@@ -700,7 +700,7 @@ gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert, time_t exp_time)
  * opaque.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_set_serial (gnutls_x509_crt_t cert, const void *serial,
@@ -877,7 +877,7 @@ gnutls_x509_crt_cpy_crl_dist_points (gnutls_x509_crt_t dst,
  * extension.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
@@ -940,7 +940,7 @@ gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
  * Only the keyIdentifier field can be set with this function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,

@@ -153,7 +153,7 @@ gnutls_x509_crl_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
   * This function will set the time this CRL was issued.
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int
@@ -176,7 +176,7 @@ gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl, time_t act_time)
   * This function will set the time this CRL will be updated.
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int
@@ -200,7 +200,7 @@ gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl, time_t exp_time)
   * This function will set a revoked certificate's serial number to the CRL. 
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int
@@ -266,7 +266,7 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
   * This function will set a revoked certificate's serial number to the CRL. 
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int
