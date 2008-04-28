@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.3.8 (unreleased)
 
+** Hide definitions in crypto.h.
+We have decided that the APIs defined in crypto.h are not stable
+enough for v2.4, so don't use any of those functions.
+
 ** API and ABI modifications:
 No changes since last version.
 
