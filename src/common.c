@@ -82,7 +82,7 @@ my_ctime (const time_t * tv)
 
 
 void
-print_x509_info (gnutls_session_t session, const char *hostname)
+print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 {
   gnutls_x509_crt_t crt;
   const gnutls_datum_t *cert_list;
@@ -153,6 +153,8 @@ print_x509_info (gnutls_session_t session, const char *hostname)
 	      printf
 		(" # The hostname in the certificate does NOT match '%s'.\n",
 		 hostname);
+              if (!insecure)
+                exit(1);
 	    }
 	  else
 	    {
@@ -280,7 +282,7 @@ print_x509_info (gnutls_session_t session, const char *hostname)
 #ifdef ENABLE_OPENPGP
 
 void
-print_openpgp_info (gnutls_session_t session, const char *hostname)
+print_openpgp_info (gnutls_session_t session, const char *hostname, int insecure)
 {
 
   char digest[20];
@@ -340,12 +342,14 @@ print_openpgp_info (gnutls_session_t session, const char *hostname)
 	  if (gnutls_openpgp_crt_check_hostname (crt, hostname) == 0)
 	    {
 	      printf
-		(" # The hostname in the key does NOT match '%s'.\n",
+		(" # The hostname in the certificate does NOT match '%s'.\n",
 		 hostname);
+              if (!insecure)
+                exit(1);
 	    }
 	  else
 	    {
-	      printf (" # The hostname in the key matches '%s'.\n", hostname);
+	      printf (" # The hostname in the certificate matches '%s'.\n", hostname);
 	    }
 	}
 
@@ -517,7 +521,7 @@ print_dh_info (gnutls_session_t session, const char *str)
 }
 
 int
-print_info (gnutls_session_t session, const char *hostname)
+print_info (gnutls_session_t session, const char *hostname, int insecure)
 {
   const char *tmp;
   gnutls_credentials_type_t cred;
@@ -577,7 +581,7 @@ print_info (gnutls_session_t session, const char *hostname)
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
 	print_dh_info (session, "Ephemeral ");
 
-      print_cert_info (session, hostname);
+      print_cert_info (session, hostname, insecure);
 
       print_cert_vrfy (session);
 
@@ -612,7 +616,7 @@ print_info (gnutls_session_t session, const char *hostname)
 }
 
 void
-print_cert_info (gnutls_session_t session, const char *hostname)
+print_cert_info (gnutls_session_t session, const char *hostname, int insecure)
 {
 
   if (gnutls_certificate_client_get_request_status (session) != 0)
@@ -623,15 +627,18 @@ print_cert_info (gnutls_session_t session, const char *hostname)
     {
     case GNUTLS_CRT_UNKNOWN:
       printf ("Unknown\n");
+      
+      if (!insecure)
+        exit(1);
       break;
     case GNUTLS_CRT_X509:
       printf ("X.509\n");
-      print_x509_info (session, hostname);
+      print_x509_info (session, hostname, insecure);
       break;
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
       printf ("OpenPGP\n");
-      print_openpgp_info (session, hostname);
+      print_openpgp_info (session, hostname, insecure);
       break;
 #endif
     }

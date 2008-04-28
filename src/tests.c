@@ -1086,7 +1086,7 @@ test_certificate (gnutls_session_t session)
     return ret;
 
   printf ("\n");
-  print_cert_info (session, hostname);
+  print_cert_info (session, hostname, 1);
 
   return TEST_SUCCEED;
 }

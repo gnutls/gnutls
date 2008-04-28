@@ -1143,7 +1143,7 @@ main (int argc, char **argv)
 				addr_ntop ((struct sockaddr *)&client_address, calen,
 					   topbuf, sizeof (topbuf)),
 				get_port (&client_address));
-			print_info (j->tls_session, NULL);
+			print_info (j->tls_session, NULL, 1);
 		      }
 		    j->handshake_ok = 1;
 		  }
@@ -1240,7 +1240,7 @@ main (int argc, char **argv)
 					   topbuf, sizeof (topbuf)),
 				get_port (&client_address));
 
-			print_info (j->tls_session, NULL);
+			print_info (j->tls_session, NULL, 1);
 		      }
 		    j->handshake_ok = 1;
 		  }

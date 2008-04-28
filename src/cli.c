@@ -649,7 +649,7 @@ main (int argc, char **argv)
 	  gnutls_session_get_id (hd.session, session_id, &session_id_size);
 
 	  /* print some information */
-	  print_info (hd.session, hostname);
+	  print_info (hd.session, hostname, info.insecure);
 
 	  printf ("- Disconnecting\n");
 	  socket_bye (&hd);
@@ -933,7 +933,7 @@ do_handshake (socket_st * socket)
   if (ret == 0)
     {
       /* print some information */
-      print_info (socket->session, socket->hostname);
+      print_info (socket->session, socket->hostname, info.insecure);
 
       if ((x509_cafile || pgp_keyring) && !insecure)
 	{
