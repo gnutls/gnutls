@@ -689,8 +689,8 @@ AC_CONFIG_COMMANDS([chmod-config],[[
 ]],[[]])
 
 
-AC_DEFIN([INTERNAL_GNUTLS_CRYPTO_H_ENABLE_UNSUPPORTED_API], 1,
-         [Enable prototypes in includes/crypto.h.])
+AC_DEFINE([INTERNAL_GNUTLS_CRYPTO_H_ENABLE_UNSUPPORTED_API], 1,
+          [Enable prototypes in includes/crypto.h.])
 
 AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
