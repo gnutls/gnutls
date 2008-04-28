@@ -325,15 +325,17 @@ size_t dn_size;
       dn_size = sizeof(dn);
       err = gnutls_openpgp_crt_get_name (cert, i++, dn, &dn_size);
 
-      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && err != GNUTLS_E_OPENPGP_UID_REVOKED) {
-	addf (str, "error: get_name: %s %d\n", gnutls_strerror (err), err);
-	break;
-      }
+      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
+	  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+	{
+	  addf (str, "error: get_name: %s %d\n", gnutls_strerror (err), err);
+	  break;
+	}
 
       if (err >= 0)
 	addf (str, _("\tName[%d]: %s\n"), i-1, dn);
       else if (err == GNUTLS_E_OPENPGP_UID_REVOKED) {
-        addf (str, _("\tRevoked Name[%d]: %s\n"), i-1, dn);
+	addf (str, _("\tRevoked Name[%d]: %s\n"), i-1, dn);
       }
 
   } while( err >= 0);
@@ -346,10 +348,10 @@ size_t dn_size;
   subkeys = gnutls_openpgp_crt_get_subkey_count( cert);
   if (subkeys < 0)
     return;
-    
+
   for (i=0;i<subkeys;i++) {
     addf( str, _("\n\tSubkey[%d]:\n"), i);
-    
+
     print_key_revoked( str, cert, i);
     print_key_id( str, cert, i);
     print_key_times( str, cert, i);
@@ -365,14 +367,14 @@ size_t dn_size;
  * @format: Indicate the format to use
  * @out: Newly allocated datum with zero terminated string.
  *
- * This function will pretty print an OpenPGP certificate, suitable for
- * display to a human.
+ * This function will pretty print an OpenPGP certificate, suitable
+ * for display to a human.
  *
  * The format should be zero for future compatibility.
  *
  * The output @out needs to be deallocate using gnutls_free().
  *
- * Returns 0 on success.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,

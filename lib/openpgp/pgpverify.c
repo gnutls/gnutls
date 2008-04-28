@@ -31,7 +31,6 @@
 #include <gnutls_openpgp.h>
 #include <gnutls_num.h>
 
-
 /**
  * gnutls_openpgp_crt_verify_ring - Verify all signatures in the key
  * @key: the structure that holds the key.
@@ -39,20 +38,22 @@
  * @flags: unused (should be 0)
  * @verify: will hold the certificate verification output.
  *
- * Verify all signatures in the key, using the given set of keys (keyring). 
+ * Verify all signatures in the key, using the given set of keys
+ * (keyring).
  *
- * The key verification output will be put in @verify and will be
- * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
+ * The key verification output will be put in @verify and will be one
+ * or more of the #gnutls_certificate_status_t enumerated elements
+ * bitwise or'd.
  *
- * GNUTLS_CERT_INVALID: A signature on the key is invalid.
+ * %GNUTLS_CERT_INVALID: A signature on the key is invalid.
  *
- * GNUTLS_CERT_REVOKED: The key has been revoked.
+ * %GNUTLS_CERT_REVOKED: The key has been revoked.
  *
- * Note that this function does not verify using any "web of
- * trust". You may use GnuPG for that purpose, or any other external
- * PGP application.
+ * Note that this function does not verify using any "web of trust".
+ * You may use GnuPG for that purpose, or any other external PGP
+ * application.
  *
- * Returns 0 on success.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
@@ -70,7 +71,7 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
     }
 
   *verify = 0;
-  
+
   rc = cdk_pk_check_sigs (key->knode, keyring->db, &status);
   if (rc == CDK_Error_No_Key)
     {
@@ -109,7 +110,7 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
       if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
 	*verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
     }
-  
+
   return 0;
 }
 
@@ -120,13 +121,13 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
  * @flags: unused (should be 0)
  * @verify: will hold the key verification output.
  *
- * Verifies the self signature in the key.
- * The key verification output will be put in @verify and will be
- * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
+ * Verifies the self signature in the key.  The key verification
+ * output will be put in @verify and will be one or more of the
+ * gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
- * GNUTLS_CERT_INVALID: The self signature on the key is invalid.
+ * %GNUTLS_CERT_INVALID: The self signature on the key is invalid.
  *
- * Returns 0 on success.
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_openpgp_crt_verify_self (gnutls_openpgp_crt_t key,

@@ -28,18 +28,17 @@
 #include <gnutls_errors.h>
 
 /**
-  * gnutls_x509_crt_check_hostname - This function compares the given hostname with the hostname in the certificate
-  * @cert: should contain an gnutls_x509_crt_t structure
-  * @hostname: A null terminated string that contains a DNS name
-  *
-  * This function will check if the given certificate's subject
-  * matches the given hostname.  This is a basic implementation of the
-  * matching described in RFC2818 (HTTPS), which takes into account
-  * wildcards, and the DNSName/IPAddress subject alternative name PKIX
-  * extension.
-  *
-  * Returns non zero for a successful match, and zero on failure.
-  **/
+ * gnutls_x509_crt_check_hostname - compares the hostname with certificate's hostname
+ * @cert: should contain an gnutls_x509_crt_t structure
+ * @hostname: A null terminated string that contains a DNS name
+ *
+ * This function will check if the given certificate's subject matches
+ * the given hostname.  This is a basic implementation of the matching
+ * described in RFC2818 (HTTPS), which takes into account wildcards,
+ * and the DNSName/IPAddress subject alternative name PKIX extension.
+ *
+ * Returns: non zero for a successful match, and zero on failure.
+ **/
 int
 gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
 {

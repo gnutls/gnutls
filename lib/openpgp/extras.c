@@ -37,13 +37,12 @@
  */
 
 /**
- * gnutls_openpgp_keyring_init - This function initializes a gnutls_openpgp_keyring_t structure
+ * gnutls_openpgp_keyring_init - initializes a #gnutls_openpgp_keyring_t structure
  * @keyring: The structure to be initialized
  *
- * This function will initialize an keyring structure. 
+ * This function will initialize an keyring structure.
  *
- * Returns 0 on success.
- *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring)
@@ -57,11 +56,10 @@ gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring)
 
 
 /**
- * gnutls_openpgp_keyring_deinit - This function deinitializes memory used by a gnutls_openpgp_keyring_t structure
+ * gnutls_openpgp_keyring_deinit - deinitializes memory used by a #gnutls_openpgp_keyring_t structure
  * @keyring: The structure to be initialized
  *
- * This function will deinitialize a keyring structure. 
- *
+ * This function will deinitialize a keyring structure.
  **/
 void
 gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
@@ -86,8 +84,8 @@ gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
  *
  * Check if a given key ID exists in the keyring.
  *
- * Returns 0 on success (if keyid exists) and a negative error code
- * on failure.
+ * Returns: %GNUTLS_E_SUCCESS on success (if keyid exists) and a
+ *   negative error code on failure.
  **/
 int
 gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
@@ -116,12 +114,11 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
  * @data: The RAW or BASE64 encoded keyring.
  * @format: One of #gnutls_openpgp_keyring_fmt elements.
  *
- * This function will convert the given RAW or Base64 encoded keyring to the
- * native #gnutls_openpgp_keyring_t format.  The output will be stored in
- * 'keyring'.
+ * This function will convert the given RAW or Base64 encoded keyring
+ * to the native #gnutls_openpgp_keyring_t format.  The output will be
+ * stored in 'keyring'.
  *
- * Returns 0 on success.
- *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
@@ -219,15 +216,14 @@ error:
   cdk_kbnode_find_packet (node, CDK_PKT_PUBLIC_KEY)!=NULL
 
 /**
-  * gnutls_openpgp_keyring_get_crt_count - This function returns the number of certificates
-  * @ring: is an OpenPGP key ring
-  *
-  * This function will return the number of OpenPGP certificates present in the given 
-  * keyring.
-  *
-  * Returns then number of subkeys or a negative value on error.
-  *
-  **/
+ * gnutls_openpgp_keyring_get_crt_count - return the number of certificates
+ * @ring: is an OpenPGP key ring
+ *
+ * This function will return the number of OpenPGP certificates
+ * present in the given keyring.
+ *
+ * Returns: the number of subkeys, or a negative value on error.
+ **/
 int
 gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
 {
@@ -266,18 +262,18 @@ gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
 }
 
 /**
-  * gnutls_openpgp_keyring_get_crt - This function will export an openpgp certificate from a keyring
-  * @key: Holds the key.
-  * @idx: the index of the certificate to export
-  * @crt: An uninitialized &gnutls_openpgp_crt_t structure
-  *
-  * This function will extract an OpenPGP certificate from the given keyring.
-  * If the index given is out of range GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be
-  * returned. The returned structure needs to be deinited.
-  *
-  * Returns 0 on success.
-  *
-  **/
+ * gnutls_openpgp_keyring_get_crt - export an openpgp certificate from a keyring
+ * @key: Holds the key.
+ * @idx: the index of the certificate to export
+ * @crt: An uninitialized &gnutls_openpgp_crt_t structure
+ *
+ * This function will extract an OpenPGP certificate from the given
+ * keyring.  If the index given is out of range
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned. The
+ * returned structure needs to be deinited.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_openpgp_keyring_get_crt (gnutls_openpgp_keyring_t ring,
 				unsigned int idx,
