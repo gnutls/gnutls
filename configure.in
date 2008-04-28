@@ -688,6 +688,10 @@ AC_CONFIG_COMMANDS([chmod-config],[[
  chmod +x libextra/libgnutls-extra-config
 ]],[[]])
 
+
+AC_DEFIN([INTERNAL_GNUTLS_CRYPTO_H_ENABLE_UNSUPPORTED_API], 1,
+         [Enable prototypes in includes/crypto.h.])
+
 AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile \

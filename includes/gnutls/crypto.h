@@ -22,6 +22,8 @@
  *
  */
 
+#if INTERNAL_GNUTLS_CRYPTO_H_ENABLE_UNSUPPORTED_API
+
 #ifndef GNUTLS_CRYPTO_H
 # define GNUTLS_CRYPTO_H
 
@@ -65,5 +67,7 @@ int gnutls_crypto_cipher_register( gnutls_cipher_algorithm_t algorithm, int prio
 int gnutls_crypto_mac_register( gnutls_mac_algorithm_t algorithm, int priority, gnutls_crypto_mac_st* s);
 int gnutls_crypto_digest_register( gnutls_digest_algorithm_t algorithm, int priority, gnutls_crypto_digest_st* s);
 int gnutls_crypto_rnd_register( int priority, gnutls_crypto_rnd_st* s);
+
+#endif
 
 #endif
