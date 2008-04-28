@@ -193,7 +193,7 @@ EXTRA_DIST += float.in.h
 ## begin gnulib module fseeko
 
 
-EXTRA_DIST += fseeko.c
+EXTRA_DIST += fseeko.c stdio-impl.h
 
 EXTRA_liblgnu_la_SOURCES += fseeko.c
 
@@ -227,6 +227,13 @@ liblgnu_la_SOURCES += gettext.h
 EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
 
 ## end   gnulib module havelib
+
+## begin gnulib module intprops
+
+
+EXTRA_DIST += intprops.h
+
+## end   gnulib module intprops
 
 ## begin gnulib module link-warning
 

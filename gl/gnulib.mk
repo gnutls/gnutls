@@ -124,7 +124,7 @@ EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
 ## begin gnulib module inet_ntop
 
 
-EXTRA_DIST += inet_ntop.c inet_ntop.h
+EXTRA_DIST += inet_ntop.c
 
 EXTRA_libgnu_la_SOURCES += inet_ntop.c
 
@@ -133,7 +133,7 @@ EXTRA_libgnu_la_SOURCES += inet_ntop.c
 ## begin gnulib module inet_pton
 
 
-EXTRA_DIST += inet_pton.c inet_pton.h
+EXTRA_DIST += inet_pton.c
 
 EXTRA_libgnu_la_SOURCES += inet_pton.c
 

@@ -215,9 +215,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getpass.c
   lib/getpass.h
   lib/inet_ntop.c
-  lib/inet_ntop.h
   lib/inet_pton.c
-  lib/inet_pton.h
   lib/intprops.h
   lib/netinet_in.in.h
   lib/progname.c

@@ -258,6 +258,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/hmac-md5.c
   lib/hmac-sha1.c
   lib/hmac.h
+  lib/intprops.h
   lib/lseek.c
   lib/md2.c
   lib/md2.h
@@ -289,6 +290,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/snprintf.c
   lib/stdbool.in.h
   lib/stdint.in.h
+  lib/stdio-impl.h
   lib/stdio.in.h
   lib/stdlib.in.h
   lib/str-two-way.h
