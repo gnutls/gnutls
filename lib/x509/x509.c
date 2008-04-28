@@ -40,7 +40,8 @@
   *
   * This function will initialize an X.509 certificate structure.
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -74,7 +75,8 @@ gnutls_x509_crt_init (gnutls_x509_crt_t * cert)
   *
   * This function will copy an X.509 certificate structure. 
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   -*/
 int
@@ -154,7 +156,8 @@ gnutls_x509_crt_deinit (gnutls_x509_crt_t cert)
   * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
   * "CERTIFICATE".
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -498,7 +501,8 @@ gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert)
  *
  * This function will extract the signature field of a certificate.
  *
- * Returns 0 on success, and a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. and a negative value on error.
  **/
 int
 gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
@@ -637,7 +641,8 @@ gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert)
   * large serial numbers, thus it may be wise to handle it as something
   * opaque. 
   *
-  * Returns 0 on success and a negative value in case of an error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.and a negative value in case of an error.
   *
   **/
 int
@@ -677,7 +682,8 @@ gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
   * This is obtained by the X.509 Subject Key identifier extension
   * field (2.5.29.14). 
   *
-  * Returns 0 on success and a negative value in case of an error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.and a negative value in case of an error.
   *
   **/
 int
@@ -764,7 +770,8 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
   * field (2.5.29.35). Note that this function only returns the keyIdentifier
   * field of the extension.
   *
-  * Returns 0 on success and a negative value in case of an error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.and a negative value in case of an error.
   *
   **/
 int
@@ -1752,7 +1759,8 @@ cleanup:
  * This function will return a pointer to the DER encoded DN structure
  * and the length.
  *
- * Returns 0 on success or a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.or a negative value on error.
  *
  **/
 int
@@ -1770,7 +1778,8 @@ gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
  * This function will return a pointer to the DER encoded DN structure and
  * the length.
  *
- * Returns 0 on success, or a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. or a negative value on error.
  *
  **/
 int

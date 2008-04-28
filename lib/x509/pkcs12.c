@@ -131,7 +131,8 @@ cleanup:
   * usually contain lists of X.509 Certificates and X.509 Certificate
   * revocation lists.
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -186,7 +187,8 @@ gnutls_pkcs12_deinit (gnutls_pkcs12_t pkcs12)
   *
   * If the PKCS12 is PEM encoded it should have a header of "PKCS12".
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -570,7 +572,8 @@ cleanup:
   * @bag: An initialized bag, where the contents of the bag will be copied
   *
   * This function will return a Bag from the PKCS12 structure.
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   * After the last Bag has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
   * will be returned.
@@ -717,7 +720,8 @@ cleanup:
   * @bag: An initialized bag
   *
   * This function will insert a Bag into the PKCS12 structure.
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -848,7 +852,8 @@ cleanup:
   * @pass: The password for the MAC
   *
   * This function will generate a MAC for the PKCS12 structure.
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -980,7 +985,8 @@ cleanup:
   * @pass: The password for the MAC
   *
   * This function will verify the MAC for the PKCS12 structure.
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int

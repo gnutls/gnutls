@@ -43,7 +43,8 @@
   * usually contain private keys, lists of X.509 Certificates and X.509 Certificate
   * revocation lists.
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -145,7 +146,8 @@ gnutls_pkcs12_bag_get_count (gnutls_pkcs12_bag_t bag)
   * that is stored into the bag. Should not be accessed after the bag
   * is deleted.
   *
-  * Returns 0 on success and a negative error code on error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.and a negative error code on error.
   *
   **/
 int
@@ -475,7 +477,8 @@ gnutls_pkcs12_bag_set_crl (gnutls_pkcs12_bag_t bag, gnutls_x509_crl_t crl)
   * element. The key ID will be encoded as a 'Local key identifier' bag attribute,
   * which is usually used to distinguish the local private key and the certificate pair.
   * 
-  * Returns 0 on success, or a negative value on error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value. or a negative value on error.
   *
   **/
 int
@@ -518,7 +521,8 @@ gnutls_pkcs12_bag_set_key_id (gnutls_pkcs12_bag_t bag, int indx,
   * This function will return the key ID, of the specified bag element.
   * The key ID is usually used to distinguish the local private key and the certificate pair.
   * 
-  * Returns 0 on success, or a negative value on error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value. or a negative value on error.
   *
   **/
 int
@@ -552,7 +556,8 @@ gnutls_pkcs12_bag_get_key_id (gnutls_pkcs12_bag_t bag, int indx,
   * This function will return the friendly name, of the specified bag element.
   * The key ID is usually used to distinguish the local private key and the certificate pair.
   * 
-  * Returns 0 on success, or a negative value on error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value. or a negative value on error.
   *
   **/
 int
@@ -587,7 +592,8 @@ gnutls_pkcs12_bag_get_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
   * element. The name will be encoded as a 'Friendly name' bag attribute,
   * which is usually used to set a user name to the local private key and the certificate pair.
   * 
-  * Returns 0 on success, or a negative value on error.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value. or a negative value on error.
   *
   **/
 int

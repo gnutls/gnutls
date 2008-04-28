@@ -44,7 +44,8 @@
   * by an Authority. The revocation lists are always signed with
   * the authority's private key.
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -98,7 +99,8 @@ gnutls_x509_crl_deinit (gnutls_x509_crl_t crl)
   *
   * If the CRL is PEM encoded it should have a header of "X509 CRL".
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -319,7 +321,8 @@ gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl)
  *
  * This function will extract the signature field of a CRL.
  *
- * Returns 0 on success, and a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. and a negative value on error.
  **/
 int
 gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
@@ -625,7 +628,8 @@ cleanup:
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN X509 CRL".
   *
-  * Returns 0 on success, and a negative value on failure.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value. and a negative value on failure.
   *
   **/
 int
@@ -651,7 +655,8 @@ gnutls_x509_crl_export (gnutls_x509_crl_t crl,
   *
   * This function will copy an X.509 certificate structure. 
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   -*/
 int

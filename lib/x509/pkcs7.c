@@ -145,7 +145,8 @@ cleanup:
   * usually contain lists of X.509 Certificates and X.509 Certificate
   * revocation lists.
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -199,7 +200,8 @@ gnutls_pkcs7_deinit (gnutls_pkcs7_t pkcs7)
   *
   * If the PKCS7 is PEM encoded it should have a header of "PKCS7".
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -266,7 +268,8 @@ cleanup:
   * @certificate_size: should hold the size of the certificate
   *
   * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
-  * Returns 0 on success. If the provided buffer is not long enough,
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value. If the provided buffer is not long enough,
   * then @certificate_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
   *
   * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
@@ -526,7 +529,8 @@ cleanup:
   * @crt: the DER encoded certificate to be added
   *
   * This function will add a certificate to the PKCS7 or RFC2630 certificate set.
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -620,7 +624,8 @@ cleanup:
   * This function will add a parsed certificate to the PKCS7 or RFC2630 certificate set.
   * This is a wrapper function over gnutls_pkcs7_set_crt_raw() .
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -725,7 +730,8 @@ cleanup:
   * @crl_size: should hold the size of the crl
   *
   * This function will return a crl of the PKCS7 or RFC2630 crl set.
-  * Returns 0 on success. If the provided buffer is not long enough,
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value. If the provided buffer is not long enough,
   * then @crl_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
   *
   * After the last crl has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
@@ -844,7 +850,8 @@ gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7)
   * @crl: the DER encoded crl to be added
   *
   * This function will add a crl to the PKCS7 or RFC2630 crl set.
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
@@ -926,7 +933,8 @@ cleanup:
   * @crl: the DER encoded crl to be added
   *
   * This function will add a parsed crl to the PKCS7 or RFC2630 crl set.
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int

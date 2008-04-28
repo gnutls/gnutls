@@ -1045,7 +1045,8 @@ error:
   * or "PRIVATE KEY". You only need to specify the flags if the key is DER encoded, since
   * in that case the encryption status cannot be auto-detected.
   *
-  * Returns 0 on success.
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
   *
   **/
 int
