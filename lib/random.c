@@ -40,6 +40,7 @@ _gnutls_rnd_init ()
   /* check if a digest has been registered 
    */
   cc = _gnutls_get_crypto_rnd();
+
   if (cc != NULL) {
     if (cc->init(& rnd_ctx) < 0) {
       gnutls_assert();
@@ -69,6 +70,7 @@ _gnutls_rnd (int level, void *data, int len)
 int ret = GC_OK;
 
   if (len > 0) {
+  
     if (cc != NULL) {
       return cc->rnd( rnd_ctx, level, data, len);
     }
@@ -77,7 +79,6 @@ int ret = GC_OK;
       ret = gc_nonce (data, len);
     else
       ret = gc_pseudo_random( data, len);
-
   }
 
   if (ret == GC_OK) return 0;
