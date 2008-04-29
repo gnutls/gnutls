@@ -1,0 +1,740 @@
+# Vietnamese translation for GnuTLS.
+# Copyright © 2008 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnutls-2.1.8 package.
+# Clytie Siddall <clytie@riverland.net.au>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnutls 2.1.8\n"
+"Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
+"POT-Creation-Date: 2007-12-10 00:35+0100\n"
+"PO-Revision-Date: 2008-04-24 22:30+0930\n"
+"Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
+"Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: LocFactoryEditor 1.7b3\n"
+
+#: lib/gnutls_errors.c:53
+msgid "Success."
+msgstr "Thành công."
+
+#: lib/gnutls_errors.c:54
+msgid "Could not negotiate a supported cipher suite."
+msgstr "Không thể thỏa thuận một bộ ứng dụng mật mã được hỗ trợ."
+
+#: lib/gnutls_errors.c:56
+msgid "The cipher type is unsupported."
+msgstr "Không hỗ trợ kiểu mật mã."
+
+#: lib/gnutls_errors.c:58
+msgid "The certificate and the given key do not match."
+msgstr "Dãy chứng nhận và khoá đã cho không tương ứng với nhau."
+
+#: lib/gnutls_errors.c:60
+msgid "Could not negotiate a supported compression method."
+msgstr "Không thể thỏa thuận một phương pháp nén được hỗ trợ."
+
+#: lib/gnutls_errors.c:62
+msgid "An unknown public key algorithm was encountered."
+msgstr "Gặp một thuật toán khoá công không rõ."
+
+#: lib/gnutls_errors.c:65
+msgid "An algorithm that is not enabled was negotiated."
+msgstr "Đã thỏa thuận một thuật toán chưa được hiệu lực."
+
+#: lib/gnutls_errors.c:67
+msgid "A large TLS record packet was received."
+msgstr "Nhận được một gói tin mục ghi TLS lớn."
+
+#: lib/gnutls_errors.c:69
+msgid "A record packet with illegal version was received."
+msgstr "Nhận được một gói tin mục ghi có phiên bản cấm."
+
+#: lib/gnutls_errors.c:71
+msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
+msgstr "Máy phục vụ đã gửi một nguyên tố Diffie Hellman không thích hợp (quá ngắn)."
+
+#: lib/gnutls_errors.c:73
+msgid "A TLS packet with unexpected length was received."
+msgstr "Nhận được một gói tin TLS lớn có chiều dài bất thường."
+
+#: lib/gnutls_errors.c:75
+msgid "The specified session has been invalidated for some reason."
+msgstr "Phiên chạy đã ghi rõ cũng bị tắt vì lý do nào."
+
+#: lib/gnutls_errors.c:78
+msgid "GnuTLS internal error."
+msgstr "Lỗi nội bộ GnuTLS."
+
+#: lib/gnutls_errors.c:79
+msgid "An illegal TLS extension was received."
+msgstr "Nhận được một phần mở rộng TLS cấm."
+
+#: lib/gnutls_errors.c:81
+msgid "A TLS fatal alert has been received."
+msgstr "Nhận được một cảnh giác nghiêm trọng TLS cấm."
+
+#: lib/gnutls_errors.c:83
+msgid "An unexpected TLS packet was received."
+msgstr "Nhận được một gói tin TLS bất thường."
+
+#: lib/gnutls_errors.c:85
+msgid "A TLS warning alert has been received."
+msgstr "Nhận được một cảnh giác báo trước TLS cấm."
+
+#: lib/gnutls_errors.c:87
+msgid "An error was encountered at the TLS Finished packet calculation."
+msgstr "Gặp lỗi trong phép tính gói tin đã kết thúc TLS."
+
+#: lib/gnutls_errors.c:89
+msgid "The peer did not send any certificate."
+msgstr "Đồng đẳng chưa gửi chứng nhận."
+
+#: lib/gnutls_errors.c:92
+msgid "No temporary RSA parameters were found."
+msgstr "Không tìm thấy tham số RSA tạm thời."
+
+#: lib/gnutls_errors.c:94
+msgid "No temporary DH parameters were found."
+msgstr "Không tìm thấy tham số DH tạm thời."
+
+#: lib/gnutls_errors.c:96
+msgid "An unexpected TLS handshake packet was received."
+msgstr "Nhận được một gói tin thiết lập quan hệ TLS bất thường."
+
+#: lib/gnutls_errors.c:98
+msgid "The scanning of a large integer has failed."
+msgstr "Lỗi quét một số nguyên lớn."
+
+#: lib/gnutls_errors.c:100
+msgid "Could not export a large integer."
+msgstr "Không thể xuất một số nguyên lớn."
+
+#: lib/gnutls_errors.c:102
+msgid "Decryption has failed."
+msgstr "Lỗi giải mã."
+
+#: lib/gnutls_errors.c:103
+msgid "Encryption has failed."
+msgstr "Lỗi mã hoá."
+
+#: lib/gnutls_errors.c:104
+msgid "Public key decryption has failed."
+msgstr "Lỗi giải mã khoá công."
+
+#: lib/gnutls_errors.c:106
+msgid "Public key encryption has failed."
+msgstr "Lỗi mã hoá khoá công."
+
+#: lib/gnutls_errors.c:108
+msgid "Public key signing has failed."
+msgstr "Lỗi ký khoá công."
+
+#: lib/gnutls_errors.c:110
+msgid "Public key signature verification has failed."
+msgstr "Lỗi thẩm tra chữ ký khoá công."
+
+#: lib/gnutls_errors.c:112
+msgid "Decompression of the TLS record packet has failed."
+msgstr "Lỗi giải nén gói tin mục ghi TLS."
+
+#: lib/gnutls_errors.c:114
+msgid "Compression of the TLS record packet has failed."
+msgstr "Lỗi nén gói tin mục ghi TLS."
+
+#: lib/gnutls_errors.c:117
+msgid "Internal error in memory allocation."
+msgstr "Gặp lỗi nội bộ trong khi cấp phát bộ nhớ."
+
+#: lib/gnutls_errors.c:119
+msgid "An unimplemented or disabled feature has been requested."
+msgstr "Đã yêu cầu một tính năng bị tắt hoặc chưa được thực hiện."
+
+#: lib/gnutls_errors.c:121
+msgid "Insufficient credentials for that request."
+msgstr "Không đủ thông tin xác thực cho yêu cầu đó."
+
+#: lib/gnutls_errors.c:123
+msgid "Error in password file."
+msgstr "Gặp lỗi trong tập tin mật khẩu."
+
+#: lib/gnutls_errors.c:124
+msgid "Wrong padding in PKCS1 packet."
+msgstr "Sai đệm gói tin PKCS1."
+
+#: lib/gnutls_errors.c:126
+msgid "The requested session has expired."
+msgstr "Đã yêu cầu một hiên chạy đã hết hạn."
+
+#: lib/gnutls_errors.c:127
+msgid "Hashing has failed."
+msgstr "Lỗi chuyển đổi chuỗi sang một mẫu duy nhất."
+
+#: lib/gnutls_errors.c:128
+msgid "Base64 decoding error."
+msgstr "Lỗi giải mã Base64."
+
+#: lib/gnutls_errors.c:130
+msgid "Base64 unexpected header error."
+msgstr "Lỗi phần đầu bất thường Base64."
+
+#: lib/gnutls_errors.c:132
+msgid "Base64 encoding error."
+msgstr "Lỗi mã hoá Base64."
+
+#: lib/gnutls_errors.c:134
+msgid "Parsing error in password file."
+msgstr "Lỗi phân tích ngữ pháp trong tập tin mật khẩu."
+
+#: lib/gnutls_errors.c:136
+msgid "The requested data were not available."
+msgstr "Đã yêu cầu dữ liệu không sẵn sàng."
+
+#: lib/gnutls_errors.c:138
+msgid "Error in the pull function."
+msgstr "Gặp lỗi trong hàm pull."
+
+#: lib/gnutls_errors.c:139
+msgid "Error in the push function."
+msgstr "Gặp lỗi trong hàm push."
+
+#: lib/gnutls_errors.c:140
+msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
+msgstr "Mới tới giới hạn trên của số thứ tự gói tin mục ghi."
+
+#: lib/gnutls_errors.c:142
+msgid "Error in the certificate."
+msgstr "Gặp lỗi trong chứng nhận."
+
+#: lib/gnutls_errors.c:144
+msgid "Unknown Subject Alternative name in X.509 certificate."
+msgstr "Gặp tên Người dân Xen kẽ không rõ trong chứng nhận X.509."
+
+#: lib/gnutls_errors.c:147
+msgid "Unsupported critical extension in X.509 certificate."
+msgstr "Gặp phần mở rộng nghiêm trọng không được hỗ trợ trong chứng nhận X.509."
+
+#: lib/gnutls_errors.c:149
+msgid "Key usage violation in certificate has been detected."
+msgstr "Đã phát hiện sự vi phạm cách sử dụng khoá trong chứng nhận."
+
+#: lib/gnutls_errors.c:151 lib/gnutls_errors.c:152
+msgid "Function was interrupted."
+msgstr "Hàm đã bị gián đoạn."
+
+#: lib/gnutls_errors.c:153
+msgid "Rehandshake was requested by the peer."
+msgstr "Đồng đẳng đã yêu cầu thiết lập lại quan hệ."
+
+#: lib/gnutls_errors.c:155
+msgid "TLS Application data were received, while expecting handshake data."
+msgstr "Nhận được dữ liệu Ứng dụng TLS, còn đợi dữ liệu thiết lập quan hệ."
+
+#: lib/gnutls_errors.c:157
+msgid "Error in Database backend."
+msgstr "Gặp lỗi trong hậu phương cơ sở dữ liệu."
+
+#: lib/gnutls_errors.c:158
+msgid "The certificate type is not supported."
+msgstr "Kiểu chứng nhận không được hỗ trợ."
+
+#: lib/gnutls_errors.c:160
+msgid "The given memory buffer is too short to hold parameters."
+msgstr "Đã đưa ra một vùng đệm bộ nhớ quá ngắn để chứa các tham số."
+
+#: lib/gnutls_errors.c:162
+msgid "The request is invalid."
+msgstr "Yêu cầu không hợp lệ."
+
+#: lib/gnutls_errors.c:163
+msgid "An illegal parameter has been received."
+msgstr "Nhận được một tham số cấm."
+
+#: lib/gnutls_errors.c:165
+msgid "Error while reading file."
+msgstr "Gặp lỗi khi đọc tập tin."
+
+#: lib/gnutls_errors.c:167
+msgid "ASN1 parser: Element was not found."
+msgstr "Bộ phân tích ASN1: không tìm thấy phần tử."
+
+#: lib/gnutls_errors.c:169
+msgid "ASN1 parser: Identifier was not found"
+msgstr "Bộ phân tích ASN1: không tìm thấy đồ nhận diện."
+
+#: lib/gnutls_errors.c:171
+msgid "ASN1 parser: Error in DER parsing."
+msgstr "Bộ phân tích ASN1: gặp lỗi trong sự phân tích ngữ cảnh DER."
+
+#: lib/gnutls_errors.c:173
+msgid "ASN1 parser: Value was not found."
+msgstr "Bộ phân tích ASN1: không tìm thấy giá trị."
+
+#: lib/gnutls_errors.c:175
+msgid "ASN1 parser: Generic parsing error."
+msgstr "Bộ phân tích ASN1: lỗi phân tích ngữ cảnh chung."
+
+#: lib/gnutls_errors.c:177
+msgid "ASN1 parser: Value is not valid."
+msgstr "Bộ phân tích ASN1: giá trị không hợp lệ."
+
+#: lib/gnutls_errors.c:179
+msgid "ASN1 parser: Error in TAG."
+msgstr "Bộ phân tích ASN1: gặp lỗi trong TAG (thẻ)."
+
+#: lib/gnutls_errors.c:180
+msgid "ASN1 parser: error in implicit tag"
+msgstr "Bộ phân tích ASN1: gặp lỗi trong thẻ dứt khoát."
+
+#: lib/gnutls_errors.c:182
+msgid "ASN1 parser: Error in type 'ANY'."
+msgstr "Bộ phân tích ASN1: gặp lỗi trong kiểu « ANY » (bất kỳ)."
+
+#: lib/gnutls_errors.c:184
+msgid "ASN1 parser: Syntax error."
+msgstr "Bộ phân tích ASN1: lỗi cú pháp."
+
+#: lib/gnutls_errors.c:186
+msgid "ASN1 parser: Overflow in DER parsing."
+msgstr "Bộ phân tích ASN1: tràn sự phân tích ngữ cảnh DER."
+
+#: lib/gnutls_errors.c:189
+msgid "Too many empty record packets have been received."
+msgstr "Nhận được quá nhiều gói tin mục ghi rỗng."
+
+#: lib/gnutls_errors.c:191
+msgid "The initialization of GnuTLS-extra has failed."
+msgstr "Lỗi sơ khởi GnuTLS-extra."
+
+#: lib/gnutls_errors.c:193
+msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
+msgstr "Phiên bản thư viện GnuTLS không tương ứng với phiên bản thư viện GnuTLS-extra."
+
+#: lib/gnutls_errors.c:195
+msgid "The gcrypt library version is too old."
+msgstr "Phiên bản thư viện gcrypt là quá cũ."
+
+#: lib/gnutls_errors.c:198
+msgid "The tasn1 library version is too old."
+msgstr "Phiên bản thư viện tasn1 là quá cũ."
+
+#: lib/gnutls_errors.c:201
+msgid "Error loading the keyring."
+msgstr "Gặp lỗi khi nạp vòng khoá."
+
+#: lib/gnutls_errors.c:203
+msgid "The initialization of LZO has failed."
+msgstr "Lỗi sơ khởi LZO."
+
+#: lib/gnutls_errors.c:205
+msgid "No supported compression algorithms have been found."
+msgstr "Không tìm thấy thuật toán nén được hỗ trợ."
+
+#: lib/gnutls_errors.c:207
+msgid "No supported cipher suites have been found."
+msgstr "Không tìm thấy bộ ứng dụng mật mã được hỗ trợ."
+
+#: lib/gnutls_errors.c:209
+msgid "Could not get OpenPGP key."
+msgstr "Không thể lấy khoá OpenPGP."
+
+#: lib/gnutls_errors.c:212
+msgid "The SRP username supplied is illegal."
+msgstr "Đã cung cấp một tên người dùng SRP cấm."
+
+#: lib/gnutls_errors.c:215
+msgid "The OpenPGP fingerprint is not supported."
+msgstr "Dấu tay OpenPGP không phải được hỗ trợ."
+
+#: lib/gnutls_errors.c:217
+msgid "The certificate has unsupported attributes."
+msgstr "Chứng nhận có thuộc tính không được hỗ trợ."
+
+#: lib/gnutls_errors.c:219
+msgid "The OID is not supported."
+msgstr "IOD không được hỗ trợ."
+
+#: lib/gnutls_errors.c:221
+msgid "The hash algorithm is unknown."
+msgstr "Không rõ thuật toán chuyển đổi chuỗi sang mẫu duy nhất."
+
+#: lib/gnutls_errors.c:223
+msgid "The PKCS structure's content type is unknown."
+msgstr "Không rõ kiểu nội dung của cấu trúc PKCS."
+
+#: lib/gnutls_errors.c:225
+msgid "The PKCS structure's bag type is unknown."
+msgstr "Không rõ kiểu bao của cấu trúc PKC"
+
+#: lib/gnutls_errors.c:227
+msgid "The given password contains invalid characters."
+msgstr "Đã đưa ra một mật khẩu chứa ký tự không hợp lệ."
+
+#: lib/gnutls_errors.c:229
+msgid "The Message Authentication Code verification failed."
+msgstr "Lỗi thẩm tra Mã Xác Thực Thông Điệp."
+
+#: lib/gnutls_errors.c:231
+msgid "Some constraint limits were reached."
+msgstr "Đã tới một số giới hạn ràng buộc."
+
+#: lib/gnutls_errors.c:233
+msgid "Failed to acquire random data."
+msgstr "Lỗi lấy dữ liệu ngẫu nhiên. "
+
+#: lib/gnutls_errors.c:236
+msgid "Received a TLS/IA Intermediate Phase Finished message"
+msgstr "Nhận được một thông điệp Giải đoạn Trung gian đã Kết thúc TLS/IA."
+
+#: lib/gnutls_errors.c:238
+msgid "Received a TLS/IA Final Phase Finished message"
+msgstr "Nhận được một thông điệp Giải đoạn Cuối cùng đã Kết thúc TLS/IA."
+
+#: lib/gnutls_errors.c:240
+msgid "Verifying TLS/IA phase checksum failed"
+msgstr "Lỗi thẩm tra tổng kiểm của giải đoạn TLS/IA."
+
+#: lib/gnutls_errors.c:243
+msgid "The specified algorithm or protocol is unknown."
+msgstr "Không rõ thuật toán hoặc giao thức đã ghi rõ."
+
+#: lib/x509/output.c:112 lib/x509/output.c:383
+#, c-format
+msgid "\t\t\tPath Length Constraint: %d\n"
+msgstr "\t\t\tRàng buộc chiều dài đường dẫn: %d\n"
+
+#: lib/x509/output.c:113
+#, c-format
+msgid "\t\t\tPolicy Language: %s"
+msgstr "\t\t\tNgôn ngữ chính sách: %s"
+
+#: lib/x509/output.c:122
+msgid ""
+"\t\t\tPolicy:\n"
+"\t\t\t\tASCII: "
+msgstr ""
+"\t\t\tChính sách:\n"
+"\t\t\t\tASCII: "
+
+#: lib/x509/output.c:124
+msgid ""
+"\n"
+"\t\t\t\tHexdump: "
+msgstr ""
+"\n"
+"\t\t\t\tĐổ thập lục: "
+
+#: lib/x509/output.c:216
+msgid "\t\t\tDigital signature.\n"
+msgstr "\t\t\tChữ ký dạng số.\n"
+
+#: lib/x509/output.c:218
+msgid "\t\t\tNon repudiation.\n"
+msgstr "\t\t\tKhông từ chối.\n"
+
+#: lib/x509/output.c:220
+msgid "\t\t\tKey encipherment.\n"
+msgstr "\t\t\tMã hoá khoá.\n"
+
+#: lib/x509/output.c:222
+msgid "\t\t\tData encipherment.\n"
+msgstr "\t\t\tMã hoá dữ liệu.\n"
+
+#: lib/x509/output.c:224
+msgid "\t\t\tKey agreement.\n"
+msgstr "\t\t\tChấp thuận khoá.\n"
+
+#: lib/x509/output.c:226
+msgid "\t\t\tCertificate signing.\n"
+msgstr "\t\t\tKý chứng nhận.\n"
+
+#: lib/x509/output.c:228
+msgid "\t\t\tCRL signing.\n"
+msgstr "\t\t\tKý CRL.\n"
+
+#: lib/x509/output.c:230
+msgid "\t\t\tKey encipher only.\n"
+msgstr "\t\t\tChỉ mã hoá khoá.\n"
+
+#: lib/x509/output.c:232
+msgid "\t\t\tKey decipher only.\n"
+msgstr "\t\t\tChỉ giải mã khoá.\n"
+
+#: lib/x509/output.c:344
+msgid "\t\t\tTLS WWW Server.\n"
+msgstr "\t\t\tMáy phục vụ WWW TLS.\n"
+
+#: lib/x509/output.c:346
+msgid "\t\t\tTLS WWW Client.\n"
+msgstr "\t\t\tỨng dụng khách WWW TLS.\n"
+
+#: lib/x509/output.c:348
+msgid "\t\t\tCode signing.\n"
+msgstr "\t\t\tKý mã.\n"
+
+#: lib/x509/output.c:350
+msgid "\t\t\tEmail protection.\n"
+msgstr "\t\t\tBảo vệ thư điện tử.\n"
+
+#: lib/x509/output.c:352
+msgid "\t\t\tTime stamping.\n"
+msgstr "\t\t\tGhi thời gian.\n"
+
+#: lib/x509/output.c:354
+msgid "\t\t\tOCSP signing.\n"
+msgstr "\t\t\tKý OCSP.\n"
+
+#: lib/x509/output.c:356
+msgid "\t\t\tAny purpose.\n"
+msgstr "\t\t\tBất cứ mục đích nào.\n"
+
+#: lib/x509/output.c:378
+msgid "\t\t\tCertificate Authority (CA): FALSE\n"
+msgstr "\t\t\tNhà cầm quyền chứng nhận (CA): SAI\n"
+
+#: lib/x509/output.c:380
+msgid "\t\t\tCertificate Authority (CA): TRUE\n"
+msgstr "\t\t\tNhà cầm quyền chứng nhận (CA): ĐÚNG\n"
+
+#: lib/x509/output.c:483
+#, c-format
+msgid "\t\t\tXMPP Address: %.*s\n"
+msgstr "\t\t\tĐịa chỉ XMPP: %.*s\n"
+
+#: lib/x509/output.c:486
+#, c-format
+msgid "\t\t\totherName OID: %.*s\n"
+msgstr "\t\t\tOID tên khác: %.*s\n"
+
+#: lib/x509/output.c:487
+msgid "\t\t\totherName DER: "
+msgstr "\t\t\tDER tên khác: "
+
+#: lib/x509/output.c:489
+msgid ""
+"\n"
+"\t\t\totherName ASCII: "
+msgstr ""
+"\n"
+"\t\t\tASCII tên khác: "
+
+#: lib/x509/output.c:515 lib/x509/output.c:1179
+#, c-format
+msgid "\tVersion: %d\n"
+msgstr "\tPhiên bản %d\n"
+
+#: lib/x509/output.c:529
+msgid "\tSerial Number (hex): "
+msgstr "\tSố sản xuất (thập lục): "
+
+#: lib/x509/output.c:546 lib/x509/output.c:1193
+#, c-format
+msgid "\tIssuer: %s\n"
+msgstr "\tNhà cấp: %s\n"
+
+#: lib/x509/output.c:553
+msgid "\tValidity:\n"
+msgstr "\tHợp lệ:\n"
+
+#: lib/x509/output.c:566
+#, c-format
+msgid "\t\tNot Before: %s\n"
+msgstr "\t\tKhông phải trước: %s\n"
+
+#: lib/x509/output.c:580
+#, c-format
+msgid "\t\tNot After: %s\n"
+msgstr "\t\tKhông phải sau : %s\n"
+
+#: lib/x509/output.c:594
+#, c-format
+msgid "\tSubject: %s\n"
+msgstr "\tNgười dân: %s\n"
+
+#: lib/x509/output.c:611
+#, c-format
+msgid "\tSubject Public Key Algorithm: %s\n"
+msgstr "\tThuật toán khoá công người dân: %s\n"
+
+#: lib/x509/output.c:624
+#, c-format
+msgid "\t\tModulus (bits %d):\n"
+msgstr "\t\tGiá trị tuyệt đối (%d bit):\n"
+
+#: lib/x509/output.c:626
+msgid "\t\tExponent:\n"
+msgstr "\t\tMũ :\n"
+
+#: lib/x509/output.c:645
+#, c-format
+msgid "\t\tPublic key (bits %d):\n"
+msgstr "\t\tKhoá công (%d bit):\n"
+
+#: lib/x509/output.c:647
+msgid "\t\tP:\n"
+msgstr "\t\tP:\n"
+
+#: lib/x509/output.c:649
+msgid "\t\tQ:\n"
+msgstr "\t\tQ:\n"
+
+#: lib/x509/output.c:651
+msgid "\t\tG:\n"
+msgstr "\t\tG:\n"
+
+#: lib/x509/output.c:696
+msgid "\tExtensions:\n"
+msgstr "\tPhần mở rộng:\n"
+
+#: lib/x509/output.c:706
+#, c-format
+msgid "\t\tBasic Constraints (%s):\n"
+msgstr "\t\tRàng buộc cơ bản (%s):\n"
+
+#: lib/x509/output.c:707 lib/x509/output.c:722 lib/x509/output.c:737
+#: lib/x509/output.c:752 lib/x509/output.c:767 lib/x509/output.c:782
+#: lib/x509/output.c:797 lib/x509/output.c:812 lib/x509/output.c:824
+msgid "critical"
+msgstr "tới hạn"
+
+#: lib/x509/output.c:707 lib/x509/output.c:722 lib/x509/output.c:737
+#: lib/x509/output.c:752 lib/x509/output.c:767 lib/x509/output.c:782
+#: lib/x509/output.c:797 lib/x509/output.c:812 lib/x509/output.c:824
+msgid "not critical"
+msgstr "không tới hạn"
+
+#: lib/x509/output.c:721
+#, c-format
+msgid "\t\tSubject Key Identifier (%s):\n"
+msgstr "\tĐồ nhận diện khoá người dân (%s):\n"
+
+#: lib/x509/output.c:736
+#, c-format
+msgid "\t\tAuthority Key Identifier (%s):\n"
+msgstr "\t\tĐồ nhận diện khoá nhà cầm quyền (%s):\n"
+
+#: lib/x509/output.c:751
+#, c-format
+msgid "\t\tKey Usage (%s):\n"
+msgstr "\t\tSử dụng khoá (%s):\n"
+
+#: lib/x509/output.c:766
+#, c-format
+msgid "\t\tKey Purpose (%s):\n"
+msgstr "\t\tMục đích khoá (%s):\n"
+
+#: lib/x509/output.c:781
+#, c-format
+msgid "\t\tSubject Alternative Name (%s):\n"
+msgstr "\t\tTên xen kẽ người dân (%s):\n"
+
+#: lib/x509/output.c:796
+#, c-format
+msgid "\t\tCRL Distribution points (%s):\n"
+msgstr "\t\tĐiểm phân phối CRL (%s):\n"
+
+#: lib/x509/output.c:811
+#, c-format
+msgid "\t\tProxy Certificate Information (%s):\n"
+msgstr "\t\tThông tin chứng nhận ủy nhiệm (%s):\n"
+
+#: lib/x509/output.c:823
+#, c-format
+msgid "\t\tUnknown extension %s (%s):\n"
+msgstr "\t\tPhần mở rộng lạ %s (%s):\n"
+
+#: lib/x509/output.c:852
+msgid "\t\t\tASCII: "
+msgstr "\t\t\tASCII: "
+
+#: lib/x509/output.c:856
+msgid "\t\t\tHexdump: "
+msgstr "\t\t\tĐổ thập lục: "
+
+#: lib/x509/output.c:881 lib/x509/output.c:1290
+#, c-format
+msgid "\tSignature Algorithm: %s\n"
+msgstr "\tThuật toán chữ ký: %s\n"
+
+#: lib/x509/output.c:885 lib/x509/output.c:1294
+msgid "warning: signed using a broken signature algorithm that can be forged.\n"
+msgstr "cảnh báo : đã ký dùng một thuật toán chữ ký bị hỏng có thể bị giả mạo.\n"
+
+#: lib/x509/output.c:910 lib/x509/output.c:1319
+msgid "\tSignature:\n"
+msgstr "\tChữ ký:\n"
+
+#: lib/x509/output.c:933
+msgid ""
+"\tMD5 fingerprint:\n"
+"\t\t"
+msgstr ""
+"\tDấu tay MD5:\n"
+"\t\t"
+
+#: lib/x509/output.c:935
+msgid ""
+"\tSHA-1 fingerprint:\n"
+"\t\t"
+msgstr ""
+"\tDấu tay SHA1:\n"
+"\t\t"
+
+#: lib/x509/output.c:969
+msgid ""
+"\tPublic Key Id:\n"
+"\t\t"
+msgstr ""
+"\tMã số khoá công:\n"
+"\t\t"
+
+#: lib/x509/output.c:1135
+msgid "X.509 Certificate Information:\n"
+msgstr "Thông tin chứng nhận X.509:\n"
+
+#: lib/x509/output.c:1139
+msgid "Other Information:\n"
+msgstr "Thông tin khác:\n"
+
+#: lib/x509/output.c:1175
+msgid "\tVersion: 1 (default)\n"
+msgstr "\tPhiên bản: 1 (mặc định)\n"
+
+#: lib/x509/output.c:1200
+msgid "\tUpdate dates:\n"
+msgstr "\tNgày cập nhật:\n"
+
+#: lib/x509/output.c:1213
+#, c-format
+msgid "\t\tIssued: %s\n"
+msgstr "\t\tCấp: %s\n"
+
+#: lib/x509/output.c:1229
+#, c-format
+msgid "\t\tNext at: %s\n"
+msgstr "\t\tLần sau vào : %s\n"
+
+#: lib/x509/output.c:1239
+#, c-format
+msgid "\tRevoked certificates (%d):\n"
+msgstr "\tChứng nhận bị thu hồi (%d):\n"
+
+#: lib/x509/output.c:1241
+msgid "\tNo revoked certificates.\n"
+msgstr "\tKhông có chứng nhận bị thu hồi.\n"
+
+#: lib/x509/output.c:1260
+msgid "\t\tSerial Number (hex): "
+msgstr "\t\tSố sản xuất (thập lục): "
+
+#: lib/x509/output.c:1269
+#, c-format
+msgid "\t\tRevoked at: %s\n"
+msgstr "\t\tThu hồi vào : %s\n"
+
+#: lib/x509/output.c:1349
+msgid "X.509 Certificate Revocation List Information:\n"
+msgstr "Danh sách Thu hồi Chứng nhận X.509:\n"
