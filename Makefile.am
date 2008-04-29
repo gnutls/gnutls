@@ -30,7 +30,7 @@ endif
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lgl/m4
 
-EXTRA_DIST = cfg.mk .clcopying
+EXTRA_DIST = cfg.mk maint.mk .clcopying
 
 # Maintainer targets
 
