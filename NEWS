@@ -27,6 +27,10 @@ correct name is found.
 
 ** Update of gnulib files.
 
+** Mingw32: Revert libgcrypt vasprintf work-around added in last release.
+Use libgcrypt 1.4.1 or later when building on MinGW32, it removes the
+vasprintf symbol from the libgcrypt library which caused problems.
+
 ** API and ABI modifications:
 GNUTLS_E_HANDSHAKE_TOO_LARGE: ADDED.
 
