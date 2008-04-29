@@ -24,6 +24,10 @@ enough for v2.4, so don't use any of those functions.
 ** gnutls-cli: exit when hostname doesn't match certificate.
 Use --insecure to avoid hostname comparison.
 
+** certtool: --inder and --outder replaced by --inraw and --outraw.
+The reason is to align terminology with OpenPGP, which doesn't use
+DER.  The old parameters will continue to work for some time.
+
 ** doc: Add section 'Index of new symbols in 2.4.0' to the GTK-DOC manual.
 
 ** Mingw32: Revert libgcrypt vasprintf work-around added in last release.
