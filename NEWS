@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.2.3 (unreleased)
 
+** Increase default handshake packet size limit to 48kb.
+The old limit was 16kb and some servers send huge list of trusted CAs,
+thus running into the limit.  FYI, applications can further increase
+this limit using gnutls_handshake_set_max_packet_length.  Thanks to
+Marc Haber <mh+debian-bugs@zugschlus.de> and "Marc F. Clemente"
+<marc@mclemente.net> for reporting and providing test servers.
+
 ** Fix compilation error related to __FUNCTION__ on some systems.
 Reported by Tim Mooney, see
 <https://savannah.gnu.org/support/?106267>.
