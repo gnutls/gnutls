@@ -5,31 +5,32 @@ See the end for copying conditions.
 
 * Version 2.3.8 (unreleased)
 
-** Increase default handshake packet size limit to 48kb.
+** libgnutls: Increase default handshake packet size limit to 48kb.
 The old limit was 16kb and some servers send huge list of trusted CAs,
 thus running into the limit.  FYI, applications can further increase
 this limit using gnutls_handshake_set_max_packet_length.  Thanks to
 Marc Haber <mh+debian-bugs@zugschlus.de> and "Marc F. Clemente"
 <marc@mclemente.net> for reporting and providing test servers.
 
-** Add new error code when handshake is too large: GNUTLS_E_HANDSHAKE_TOO_LARGE
-Before GNUTLS_E_MEMORY_ERROR was used, which could be confused with
-other error situations.
+** libgnutls: Add new error code: GNUTLS_E_HANDSHAKE_TOO_LARGE
+Returned when the handshake data size is too large.  Before
+GNUTLS_E_MEMORY_ERROR was used, which could be confused with other
+error situations.
 
-** Hide definitions in crypto.h.
+** libgnutls: Hide definitions in crypto.h.
 We have decided that the APIs defined in crypto.h are not stable
 enough for v2.4, so don't use any of those functions.
 
-** gnutls-cli will exit once a certificate that doesn't have the
-correct name is found.
+** gnutls-cli: exit when hostname doesn't match certificate.
+Use --insecure to avoid hostname comparison.
 
-** Add section 'Index of new symbols in 2.4.0' to the GTK-DOC manual.
-
-** Update of gnulib files.
+** doc: Add section 'Index of new symbols in 2.4.0' to the GTK-DOC manual.
 
 ** Mingw32: Revert libgcrypt vasprintf work-around added in last release.
 Use libgcrypt 1.4.1 or later when building on MinGW32, it removes the
 vasprintf symbol from the libgcrypt library which caused problems.
+
+** Update of gnulib files.
 
 ** API and ABI modifications:
 GNUTLS_E_HANDSHAKE_TOO_LARGE: ADDED.
