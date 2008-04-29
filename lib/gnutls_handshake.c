@@ -2955,18 +2955,19 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
 }
 
 /**
-  * gnutls_handshake_set_max_packet_length - set the maximum length of a handshake message
-  * @session: is a #gnutls_session_t structure.
-  * @max: is the maximum number.
-  *
-  * This function will set the maximum size of a handshake message.
-  * Handshake messages over this size are rejected.  The default value
-  * is 48kb which is typically large enough. Set this to 0 if you do
-  * not want to set an upper limit.
-  *
-  * The reason for restricting the handshake message sizes are to
-  * limit Denial of Service attacks.
-  **/
+ * gnutls_handshake_set_max_packet_length - set the maximum size of the handshake
+ * @session: is a #gnutls_session_t structure.
+ * @max: is the maximum number.
+ *
+ * This function will set the maximum size of all handshake messages.
+ * Handshakes over this size are rejected with
+ * %GNUTLS_E_HANDSHAKE_TOO_LARGE error code.  The default value is
+ * 48kb which is typically large enough.  Set this to 0 if you do not
+ * want to set an upper limit.
+ *
+ * The reason for restricting the handshake message sizes are to
+ * limit Denial of Service attacks.
+ **/
 void
 gnutls_handshake_set_max_packet_length (gnutls_session_t session, size_t max)
 {
