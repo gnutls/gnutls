@@ -30,6 +30,8 @@ DER.  The old parameters will continue to work for some time.
 
 ** doc: Add section 'Index of new symbols in 2.4.0' to the GTK-DOC manual.
 
+** doc: Many cosmetic fixes, to silence (most) gtk-doc warnings.
+
 ** Mingw32: Revert libgcrypt vasprintf work-around added in last release.
 Use libgcrypt 1.4.1 or later when building on MinGW32, it removes the
 vasprintf symbol from the libgcrypt library which caused problems.
