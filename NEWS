@@ -23,6 +23,8 @@ enough for v2.4, so don't use any of those functions.
 ** gnutls-cli will exit once a certificate that doesn't have the
 correct name is found.
 
+** Add section 'Index of new symbols in 2.4.0' to the GTK-DOC manual.
+
 ** Update of gnulib files.
 
 ** API and ABI modifications:
