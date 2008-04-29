@@ -2961,9 +2961,11 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
   *
   * This function will set the maximum size of a handshake message.
   * Handshake messages over this size are rejected.  The default value
-  * is 16kb which is large enough. Set this to 0 if you do not want to
-  * set an upper limit.
+  * is 48kb which is typically large enough. Set this to 0 if you do
+  * not want to set an upper limit.
   *
+  * The reason for restricting the handshake message sizes are to
+  * limit Denial of Service attacks.
   **/
 void
 gnutls_handshake_set_max_packet_length (gnutls_session_t session, size_t max)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -47,7 +47,7 @@
 /* The size of a handshake message should not
  * be larger than this value.
  */
-#define MAX_HANDSHAKE_PACKET_SIZE 16*1024
+#define MAX_HANDSHAKE_PACKET_SIZE 48*1024
 
 #define TLS_RANDOM_SIZE 32
 #define TLS_MAX_SESSION_ID_SIZE 32

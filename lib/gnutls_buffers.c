@@ -1185,7 +1185,7 @@ _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
        session->internals.max_handshake_data_buffer_size))
     {
       gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
+      return GNUTLS_E_HANDSHAKE_TOO_LARGE;
     }
 
   _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data\n", length);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -248,6 +248,10 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("The specified algorithm or protocol is unknown."),
 	       GNUTLS_E_UNKNOWN_ALGORITHM, 1),
+
+  ERROR_ENTRY (N_("The handshake data size is too large (DoS?), "
+		  "check gnutls_handshake_set_max_packet_length()."),
+	       GNUTLS_E_HANDSHAKE_TOO_LARGE, 1),
 
   {NULL, NULL, 0, 0}
 };

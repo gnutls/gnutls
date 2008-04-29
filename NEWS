@@ -5,6 +5,17 @@ See the end for copying conditions.
 
 * Version 2.3.8 (unreleased)
 
+** Increase default handshake packet size limit to 48kb.
+The old limit was 16kb and some servers send huge list of trusted CAs,
+thus running into the limit.  FYI, applications can further increase
+this limit using gnutls_handshake_set_max_packet_length.  Thanks to
+Marc Haber <mh+debian-bugs@zugschlus.de> and "Marc F. Clemente"
+<marc@mclemente.net> for reporting and providing test servers.
+
+** Add new error code when handshake is too large: GNUTLS_E_HANDSHAKE_TOO_LARGE
+Before GNUTLS_E_MEMORY_ERROR was used, which could be confused with
+other error situations.
+
 ** Hide definitions in crypto.h.
 We have decided that the APIs defined in crypto.h are not stable
 enough for v2.4, so don't use any of those functions.
@@ -15,7 +26,7 @@ correct name is found.
 ** Update of gnulib files.
 
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_E_HANDSHAKE_TOO_LARGE: ADDED.
 
 * Version 2.3.7 (released 2008-04-21)
 
