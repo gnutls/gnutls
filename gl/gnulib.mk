@@ -32,7 +32,9 @@ arpa/inet.h:
 	@MKDIR_P@ arpa
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed \
+	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	      -e 's|@''NEXT_ARPA_INET_H''@|$(NEXT_ARPA_INET_H)|g' \
+	      -e 's|@''HAVE_ARPA_INET_H''@|$(HAVE_ARPA_INET_H)|g' \
 	      -e 's|@''GNULIB_INET_NTOP''@|$(GNULIB_INET_NTOP)|g' \
 	      -e 's|@''GNULIB_INET_PTON''@|$(GNULIB_INET_PTON)|g' \
 	      -e 's|@''HAVE_DECL_INET_NTOP''@|$(HAVE_DECL_INET_NTOP)|g' \
