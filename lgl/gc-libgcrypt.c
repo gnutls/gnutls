@@ -142,7 +142,7 @@ gc_cipher_open (Gc_cipher alg, Gc_cipher_mode mode,
       gcryalg = GCRY_CIPHER_RFC2268_40;
       break;
 
-#ifdef HAVE_CAMELLIA
+#ifdef ENABLE_CAMELLIA
     case GC_CAMELLIA128:
       gcryalg = GCRY_CIPHER_CAMELLIA128;
       break;
