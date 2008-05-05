@@ -335,37 +335,34 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 int
 _gnutls_hostname_compare (const char *certname, const char *hostname)
 {
-  const char *cmpstr1, *cmpstr2;
-
-  if (strlen (certname) == 0 || strlen (hostname) == 0)
-    return 0;
-
-  if (strlen (certname) > 2 && strncmp (certname, "*.", 2) == 0)
+   /* find the first different character */
+  for (; *certname && *hostname && toupper(*certname) == toupper(*hostname); certname++, hostname++)
+    ;
+ 
+   /* the strings are the same */
+  if (strlen (certname) == 0 && strlen (hostname) == 0)
+    return 1;
+  
+  if (*certname == '*')
     {
       /* a wildcard certificate */
 
-      cmpstr1 = certname + 1;
-
-      /* find the first dot in hostname, compare from there on */
-      cmpstr2 = strchr (hostname, '.');
-
-      if (cmpstr2 == NULL)
-	{
-	  /* error, the hostname we're connecting to is only a local part */
-	  return 0;
-	}
-
-      if (strcasecmp (cmpstr1, cmpstr2) == 0)
-	{
-	  return 1;
+      certname++;
+  
+      while (1)
+       	{
+	  /* Use a recursive call to allow multiple wildcards */
+	  if (_gnutls_hostname_compare (certname, hostname))
+ 	    {
+ 	      return 1;
+ 	    }
+ 	  /* wildcards are only allowed to match a single domain component or component fragment */
+ 	  if (*hostname == '\0' || *hostname == '.')
+ 	    break;
+ 	  hostname++;
 	}
 
       return 0;
-    }
-
-  if (strcasecmp (certname, hostname) == 0)
-    {
-      return 1;
     }
 
   return 0;
