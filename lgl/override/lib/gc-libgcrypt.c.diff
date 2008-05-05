@@ -1,5 +1,14 @@
---- lgl/gc-libgcrypt.c.orig	2008-04-13 14:51:05.000000000 +0200
-+++ lgl/gc-libgcrypt.c	2008-04-13 14:52:04.000000000 +0200
+--- lgl/gc-libgcrypt.c.orig	2008-05-05 13:26:28.000000000 +0200
++++ lgl/gc-libgcrypt.c	2008-05-05 13:26:43.000000000 +0200
+@@ -145,7 +145,7 @@
+       gcryalg = GCRY_CIPHER_RFC2268_40;
+       break;
+ 
+-#ifdef HAVE_CAMELLIA
++#ifdef ENABLE_CAMELLIA
+     case GC_CAMELLIA128:
+       gcryalg = GCRY_CIPHER_CAMELLIA128;
+       break;
 @@ -294,9 +294,11 @@
        gcryalg = GCRY_MD_SHA512;
        break;
