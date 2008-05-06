@@ -162,9 +162,9 @@ print_key_revoked (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
       err = gnutls_openpgp_crt_get_subkey_revoked_status( cert, idx);
 
     if (err != 0)
-      addf (str, "\tRevoked: True\n");
+      addf (str, _("\tRevoked: True\n"));
     else
-      addf (str, "\tRevoked: False\n");
+      addf (str, _("\tRevoked: False\n"));
 }
 
 static void
@@ -227,7 +227,7 @@ print_key_info(gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
       {
 	const char *name = gnutls_pk_algorithm_get_name (err);
 	if (name == NULL)
-	  name = "Unknown";
+	  name = _("unknown");
 
 	addf (str, _("\tPublic Key Algorithm: %s\n"), name);
 	switch (err)
