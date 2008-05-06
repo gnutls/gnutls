@@ -9,6 +9,8 @@ See the end for copying conditions.
 
 ** guile: Fix -fgnu89-inline test.
 
+** Update of gnulib files.
+
 ** API and ABI modifications:
 No changes since last version.
 
