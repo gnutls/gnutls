@@ -26,6 +26,10 @@ Thanks to Laurence Withers <l@lwithers.me.uk>, see
 Reported by Kris Karas <ktk@enterprise.bidmc.harvard.edu> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2708>.
 
+** Make Camellia encryption work.
+Reported by Yoshisato YANAGISAWA <yanagisawa@csg.is.titech.ac.jp> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2746>.
+
 ** API and ABI modifications:
 No changes since last version.
 
