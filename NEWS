@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 2.3.9 (unreleased)
 
-** libgnutls: Translation improvements for OpenPGP certificate printing.
+** libgnutls: Translation fixes.
 
 ** guile: Fix -fgnu89-inline test.
 
