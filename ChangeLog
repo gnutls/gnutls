@@ -1,3 +1,75 @@
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.2.3.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-01  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lgl/gc-libgcrypt.c: USE_CAMELLIA -> ENABLE_CAMELLIA
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Call AM_CONDITIONAL at top-level.
+
+2008-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-20  Ludovic Courtès <ludo@gnu.org>
+
+	* configure.in, guile/src/Makefile.am: Check whether
+	`-fgnu89-inline' is supported before using it.  * configure.in: Check for `-fgnu89-inline', define Automake
+	  conditional `HAVE_GCC_GNU89_INLINE_OPTION'.  * guile/src/Makefile.am (AM_CFLAGS): Only use `-fgnu89-inline' when   `HAVE_GCC_GNU89_INLINE_OPTION' is true.
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_int.h: Increase max handshake packet size.
+	Thanks to Marc Haber <mh+debian-bugs@zugschlus.de> and "Marc F.
+	Clemente" <marc@mclemente.net> for reporting and providing test
+	servers.
+
+2008-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk_passwd.c: (_gnutls_psk_pwd_find_entry): Call fclose after fopen.  Tiny patch
+	from Laurence Withers <l@lwithers.me.uk>, see
+
+	<http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* NEWS: Documented the --priority option to gnutls-cli and
+	gnutls-serv.
+
+2008-03-29  Nikos <nmav@crystal.(none)>
+
+	* doc/manpages/gnutls-cli.1, doc/manpages/gnutls-serv.1: documented
+	the --priority option.
+
+2008-03-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-03-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-02-28  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/utils.c: Use __func__ instead of __FUNCTION__.  Reported
+	by Tim Mooney, see <https://savannah.gnu.org/support/?106267>.  A
+	gnulib module to make sure __func__ is available would be nice.
+
+2008-02-21  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-02-21  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.2.2.
