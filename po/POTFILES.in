@@ -1,3 +1,4 @@
 # List of source files which contain translatable strings.
 lib/gnutls_errors.c
 lib/x509/output.c
+lib/openpgp/output.c
