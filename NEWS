@@ -5,8 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.9 (unreleased)
 
-** libgnutls: Compile if SRP is disabled.
-Report and tiny patches from <jared.jennings.ctr@eglin.af.mil>, see
+** libgnutls: Fix build failures if SRP/OpenPGP is disabled.
+Based on report and tiny patches from
+<jared.jennings.ctr@eglin.af.mil>, see
 <https://savannah.gnu.org/support/index.php?106342>.
 
 ** libgnutls: Translation fixes.
