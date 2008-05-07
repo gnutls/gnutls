@@ -39,13 +39,21 @@ libutils_la_SOURCES = utils.h utils.c
 ctests = simple openssl gc set_pkcs12_cred certder	\
 	certificate_set_x509_crl dn parse_ca moredn crypto_rng
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
+
 if HAVE_FORK
-ctests +=  openpgpself x509self x509signself x509dn anonself pskself dhepskself tlsia resume
+ctests += x509self x509signself x509dn anonself pskself dhepskself tlsia resume
+
+if ENABLE_OPENPGP
+ctests += openpgpself 
+endif
+
 tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) @LTLIBREADLINE@
 endif
+
 if ENABLE_OPRFI
 ctests +=  oprfi
 endif
+
 gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
 
 check_PROGRAMS = $(ctests)
