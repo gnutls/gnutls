@@ -17,9 +17,12 @@
 
 TESTS = anonymous-auth.scm session-record-port.scm		\
         pkcs-import-export.scm					\
-	openpgp-keys.scm openpgp-keyring.scm openpgp-auth.scm	\
         errors.scm						\
 	x509-certificates.scm x509-auth.scm
+
+if ENABLE_OPENPGP
+TESTS += openpgp-keys.scm openpgp-keyring.scm openpgp-auth.scm
+endif
 
 if ENABLE_SRP
 TESTS += srp-base64.scm
