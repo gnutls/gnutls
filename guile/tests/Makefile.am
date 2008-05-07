@@ -1,5 +1,5 @@
 #  GNUTLS -- Guile bindings for GnuTLS.
-#  Copyright (C) 2007  Free Software Foundation
+#  Copyright (C) 2007, 2008  Free Software Foundation
 #
 #  GNUTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -18,8 +18,12 @@
 TESTS = anonymous-auth.scm session-record-port.scm		\
         pkcs-import-export.scm					\
 	openpgp-keys.scm openpgp-keyring.scm openpgp-auth.scm	\
-        srp-base64.scm errors.scm				\
+        errors.scm						\
 	x509-certificates.scm x509-auth.scm
+
+if ENABLE_SRP
+TESTS += srp-base64.scm
+endif
 
 TESTS_ENVIRONMENT = $(top_builddir)/guile/pre-inst-guile -L $(srcdir)
 

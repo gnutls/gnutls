@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -43,10 +43,12 @@ print_info (gnutls_session_t session)
       break;
 
 
+#ifdef ENABLE_SRP
     case GNUTLS_CRD_SRP:
       printf ("- SRP session with username %s\n",
 	      gnutls_srp_server_get_username (session));
       break;
+#endif
 
     case GNUTLS_CRD_PSK:
       if (gnutls_psk_server_get_username (session) != NULL)

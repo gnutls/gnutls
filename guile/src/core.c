@@ -578,6 +578,7 @@ SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
 							   FUNC_NAME);
       err = gnutls_credentials_set (c_session, GNUTLS_CRD_ANON, c_cred);
     }
+#ifdef ENABLE_SRP
   else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_srp_client_credentials,
 			       cred))
     {
@@ -596,6 +597,7 @@ SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
 						     FUNC_NAME);
       err = gnutls_credentials_set (c_session, GNUTLS_CRD_SRP, c_cred);
     }
+#endif
   else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_psk_client_credentials,
 			       cred))
     {
@@ -1751,6 +1753,7 @@ SCM_DEFINE (scm_gnutls_peer_certificate_status, "peer-certificate-status",
 
 /* SRP credentials.  */
 
+#ifdef ENABLE_SRP
 SCM_DEFINE (scm_gnutls_make_srp_server_credentials,
 	    "make-srp-server-credentials",
 	    0, 0, 0,
@@ -1990,6 +1993,7 @@ SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
   return (scm_from_locale_string (c_result));
 }
 #undef FUNC_NAME
+#endif /* ENABLE_SRP */
 
 
 /* PSK credentials.  */
