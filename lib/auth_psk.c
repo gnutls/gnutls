@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -40,6 +40,9 @@ int _gnutls_gen_psk_client_kx (gnutls_session_t, opaque **);
 
 int _gnutls_proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
 
+int _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
+				size_t _data_size);
+
 const mod_auth_st psk_auth_struct = {
   "PSK",
   NULL,
@@ -51,7 +54,7 @@ const mod_auth_st psk_auth_struct = {
 
   NULL,
   NULL,				/* certificate */
-  NULL,
+  _gnutls_proc_psk_server_kx,
   _gnutls_proc_psk_client_kx,
   NULL,
   NULL
@@ -253,5 +256,78 @@ error:
   return ret;
 }
 
+/*
+ *
+ * struct {
+ *     select (KeyExchangeAlgorithm) {
+ *         // other cases for rsa, diffie_hellman, etc.
+ *         case psk:  // NEW
+ *             opaque psk_identity_hint<0..2^16-1>;
+ *     };
+ * } ServerKeyExchange;
+ *
+ */
+
+/* just read the hint from the server key exchange.
+ */
+int
+_gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
+			    size_t _data_size)
+{
+  ssize_t data_size = _data_size;
+  int ret;
+  gnutls_datum_t hint;
+  gnutls_psk_server_credentials_t cred;
+  psk_auth_info_t info;
+
+  cred = (gnutls_psk_server_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    }
+
+  if ((ret =
+       _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
+			      sizeof (psk_auth_info_st), 1)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  DECR_LEN (data_size, 2);
+  hint.size = _gnutls_read_uint16 (&data[0]);
+
+  DECR_LEN (data_size, hint.size);
+
+  hint.data = &data[2];
+
+  /* copy the hint to the auth info structures
+   */
+  info = _gnutls_get_auth_info (session);
+
+  if (hint.size > MAX_SRP_USERNAME)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+    }
+
+  memcpy (info->hint, hint.data, hint.size);
+  info->hint[hint.size] = 0;
+
+  ret = _gnutls_set_psk_session_key (session, NULL);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  ret = 0;
+
+ error:
+  return ret;
+}
 
 #endif /* ENABLE_SRP */
