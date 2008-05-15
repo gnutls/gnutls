@@ -297,7 +297,7 @@ _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  DECR_LEN (data_size, 2);
+  DECR_LENGTH_RET (data_size, 2, 0);
   hint.size = _gnutls_read_uint16 (&data[0]);
 
   DECR_LEN (data_size, hint.size);
