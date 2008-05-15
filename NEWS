@@ -12,6 +12,9 @@ Based on report and tiny patches from
 
 ** libgnutls: Translation fixes.
 
+** gnutls-cli: Fix so that PSK authentication works.
+Also improve manual to give example for gnutls-cli PSK authentication.
+
 ** guile: Fix -fgnu89-inline test.
 
 ** Update of gnulib files.

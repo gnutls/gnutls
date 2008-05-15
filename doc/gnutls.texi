@@ -2612,6 +2612,13 @@ Usage:  gnutls-cli [options] hostname
      --copyright              prints the program's license
 @end verbatim
 
+To connect to a server using PSK authentication, you may use something
+like:
+
+@smallexample
+$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas --pskkey 9e32cf7786321a828ef7668f09fb35db --priority NORMAL:+PSK:-RSA:-DHE-RSA -d 4711
+@end smallexample
+
 @node Invoking gnutls-cli-debug
 @section Invoking gnutls-cli-debug
 @cindex gnutls-cli-debug
