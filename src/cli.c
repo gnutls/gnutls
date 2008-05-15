@@ -1045,7 +1045,7 @@ init_global_tls_stuff (void)
 #endif
 
 #ifdef ENABLE_PSK
-  if (psk_username && !psk_key.data)
+  if (psk_username && psk_key.data)
     {
       /* SRP stuff */
       if (gnutls_psk_allocate_client_credentials (&psk_cred) < 0)
