@@ -9,6 +9,9 @@ See the end for copying conditions.
 
 ** Change PSK key derivation logic.
 
+** gnutls-cli: Fix so that PSK authentication works.
+Back-ported from trunk.
+
 ** API and ABI modifications:
 No changes since last version.
 
