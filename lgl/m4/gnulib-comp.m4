@@ -39,6 +39,8 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([AC_LIBOBJ], m4_defn([lgl_LIBOBJ]))
   m4_pushdef([AC_REPLACE_FUNCS], m4_defn([lgl_REPLACE_FUNCS]))
   m4_pushdef([AC_LIBSOURCES], m4_defn([lgl_LIBSOURCES]))
+  m4_pushdef([lgl_LIBSOURCES_LIST], [])
+  m4_pushdef([lgl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='lgl'
   gl_EOVERFLOW
@@ -118,6 +120,19 @@ AC_DEFUN([lgl_INIT],
      AM_XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
   gl_WCHAR_H
   gl_XSIZE
+  m4_ifval(lgl_LIBSOURCES_LIST, [
+    m4_syscmd([test ! -d ]lgl_LIBSOURCES_DIR[ ||
+      for gl_file in ]lgl_LIBSOURCES_LIST[ ; do
+        if test ! -r ]lgl_LIBSOURCES_DIR[/$gl_file ; then
+          echo "missing file ]lgl_LIBSOURCES_DIR[/$gl_file" >&2
+          exit 1
+        fi
+      done])dnl
+      m4_if(m4_sysval, [0], [],
+        [AC_FATAL([expected source file, required through AC_LIBSOURCES, not found])])
+  ])
+  m4_popdef([lgl_LIBSOURCES_DIR])
+  m4_popdef([lgl_LIBSOURCES_LIST])
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -140,8 +155,23 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([AC_LIBOBJ], m4_defn([lgltests_LIBOBJ]))
   m4_pushdef([AC_REPLACE_FUNCS], m4_defn([lgltests_REPLACE_FUNCS]))
   m4_pushdef([AC_LIBSOURCES], m4_defn([lgltests_LIBSOURCES]))
+  m4_pushdef([lgltests_LIBSOURCES_LIST], [])
+  m4_pushdef([lgltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='tests'
+  m4_ifval(lgltests_LIBSOURCES_LIST, [
+    m4_syscmd([test ! -d ]lgltests_LIBSOURCES_DIR[ ||
+      for gl_file in ]lgltests_LIBSOURCES_LIST[ ; do
+        if test ! -r ]lgltests_LIBSOURCES_DIR[/$gl_file ; then
+          echo "missing file ]lgltests_LIBSOURCES_DIR[/$gl_file" >&2
+          exit 1
+        fi
+      done])dnl
+      m4_if(m4_sysval, [0], [],
+        [AC_FATAL([expected source file, required through AC_LIBSOURCES, not found])])
+  ])
+  m4_popdef([lgltests_LIBSOURCES_DIR])
+  m4_popdef([lgltests_LIBSOURCES_LIST])
   m4_popdef([AC_LIBSOURCES])
   m4_popdef([AC_REPLACE_FUNCS])
   m4_popdef([AC_LIBOBJ])
@@ -168,13 +198,6 @@ AC_DEFUN([lgl_LIBOBJ], [
   lgl_LIBOBJS="$lgl_LIBOBJS $1.$ac_objext"
 ])
 
-# m4_foreach_w is provided by autoconf-2.59c and later.
-# This definition is to accommodate developers using versions
-# of autoconf older than that.
-m4_ifndef([m4_foreach_w],
-  [m4_define([m4_foreach_w],
-    [m4_foreach([$1], m4_split(m4_normalize([$2]), [ ]), [$3])])])
-
 # Like AC_REPLACE_FUNCS, except that the module name goes
 # into lgl_LIBOBJS instead of into LIBOBJS.
 AC_DEFUN([lgl_REPLACE_FUNCS], [
@@ -183,15 +206,14 @@ AC_DEFUN([lgl_REPLACE_FUNCS], [
 ])
 
 # Like AC_LIBSOURCES, except the directory where the source file is
-# expected is derived from the gnulib-tool parametrization,
+# expected is derived from the gnulib-tool parameterization,
 # and alloca is special cased (for the alloca-opt module).
 # We could also entirely rely on EXTRA_lib..._SOURCES.
 AC_DEFUN([lgl_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_syscmd([test -r lgl/]_gl_NAME[ || test ! -d lgl])dnl
-      m4_if(m4_sysval, [0], [],
-        [AC_FATAL([missing lgl/]_gl_NAME)])
+      m4_define([lgl_LIBSOURCES_DIR], [lgl])
+      m4_append([lgl_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
 ])
@@ -203,13 +225,6 @@ AC_DEFUN([lgltests_LIBOBJ], [
   lgltests_LIBOBJS="$lgltests_LIBOBJS $1.$ac_objext"
 ])
 
-# m4_foreach_w is provided by autoconf-2.59c and later.
-# This definition is to accommodate developers using versions
-# of autoconf older than that.
-m4_ifndef([m4_foreach_w],
-  [m4_define([m4_foreach_w],
-    [m4_foreach([$1], m4_split(m4_normalize([$2]), [ ]), [$3])])])
-
 # Like AC_REPLACE_FUNCS, except that the module name goes
 # into lgltests_LIBOBJS instead of into LIBOBJS.
 AC_DEFUN([lgltests_REPLACE_FUNCS], [
@@ -218,15 +233,14 @@ AC_DEFUN([lgltests_REPLACE_FUNCS], [
 ])
 
 # Like AC_LIBSOURCES, except the directory where the source file is
-# expected is derived from the gnulib-tool parametrization,
+# expected is derived from the gnulib-tool parameterization,
 # and alloca is special cased (for the alloca-opt module).
 # We could also entirely rely on EXTRA_lib..._SOURCES.
 AC_DEFUN([lgltests_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_syscmd([test -r tests/]_gl_NAME[ || test ! -d tests])dnl
-      m4_if(m4_sysval, [0], [],
-        [AC_FATAL([missing tests/]_gl_NAME)])
+      m4_define([lgltests_LIBSOURCES_DIR], [tests])
+      m4_append([lgltests_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
 ])
