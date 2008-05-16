@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -305,6 +305,36 @@ get_pass (void)
     return cfg.password;
   else
     return getpass ("Enter password: ");
+}
+
+const char *
+get_confirmed_pass (bool empty_ok)
+{
+  if (batch)
+    return cfg.password;
+  else
+    {
+      const char *pass = NULL;
+      char *copy = NULL;
+
+      do
+	{
+	  if (pass)
+	    printf ("Password missmatch, try again.\n");
+
+	  if (copy)
+	    free (copy);
+
+	  pass = getpass ("Enter password: ");
+	  copy = strdup (pass);
+	  pass = getpass ("Confirm password: ");
+	}
+      while (strcmp (pass, copy) != 0 && !(empty_ok && *pass == '\0'));
+
+      free (copy);
+
+      return pass;
+    }
 }
 
 const char *

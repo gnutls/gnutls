@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <gnutls/x509.h>
 
 extern char *organization, *unit, *locality, *state;
@@ -21,6 +22,7 @@ const char *read_str (const char *input_str);
 int read_yesno (const char *input_str);
 
 const char *get_pass (void);
+const char *get_confirmed_pass (bool empty_ok);
 const char *get_challenge_pass (void);
 const char *get_crl_dist_point_url (void);
 void get_country_crt_set (gnutls_x509_crt_t crt);

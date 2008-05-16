@@ -15,6 +15,12 @@ Based on report and tiny patches from
 ** gnutls-cli: Fix so that PSK authentication works.
 Also improve manual to give example for gnutls-cli PSK authentication.
 
+** certtool: Encrypting a private key now require a confirmed password.
+Before './certtool -k -8' would merely ask for a password once.
+Reported by Daniel 'NebuchadnezzaR' Dehennin
+<nebuchadnezzar@asgardr.info> see
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=364287>.
+
 ** guile: Fix -fgnu89-inline test.
 
 ** Removed --enable-profile-mode.
