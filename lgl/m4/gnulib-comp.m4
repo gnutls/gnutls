@@ -103,7 +103,9 @@ AC_DEFUN([lgl_INIT],
   gl_STDINT_H
   gl_STDIO_H
   gl_STDLIB_H
+  gl_STRCASE
   gl_HEADER_STRING_H
+  gl_HEADER_STRINGS_H
   gl_FUNC_STRVERSCMP
   gl_HEADER_SYS_SOCKET
   AC_PROG_MKDIR_P
@@ -307,7 +309,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/stdio.in.h
   lib/stdlib.in.h
   lib/str-two-way.h
+  lib/strcasecmp.c
   lib/string.in.h
+  lib/strings.in.h
+  lib/strncasecmp.c
   lib/strverscmp.c
   lib/strverscmp.h
   lib/sys_socket.in.h
@@ -395,7 +400,9 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/stdint_h.m4
   m4/stdio_h.m4
   m4/stdlib_h.m4
+  m4/strcase.m4
   m4/string_h.m4
+  m4/strings_h.m4
   m4/strverscmp.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
