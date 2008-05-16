@@ -203,12 +203,12 @@ AC_MSG_RESULT([***
 AC_HEADER_STDC
 AC_CHECK_HEADERS(netdb.h)
 AC_CHECK_FUNCS(umask fork,,)
-AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.]
-AC_DEFINE([HAVE_FLOAT_H], 1, [Hard-code for src/cfg/.]
-AC_DEFINE([HAVE_LIMITS_H], 1, [Hard-code for src/cfg/.]
-AC_DEFINE([HAVE_MATH_H], 1, [Hard-code for src/cfg/.]
-AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.]
-AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.]
+AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_FLOAT_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_LIMITS_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_MATH_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 
 # No fork on MinGW, disable some self-tests until we fix them.
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
