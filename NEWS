@@ -17,6 +17,10 @@ Also improve manual to give example for gnutls-cli PSK authentication.
 
 ** guile: Fix -fgnu89-inline test.
 
+** Removed --enable-profile-mode.
+The code linked gnutls with the libfc project (Function Check) which
+appears to have been stalled since around 2002.
+
 ** Update of gnulib files.
 
 ** API and ABI modifications:

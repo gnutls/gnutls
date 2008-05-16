@@ -77,13 +77,6 @@ AC_ARG_ENABLE(developer-mode,
 opt_developer_mode=$enableval)
 AC_MSG_RESULT($opt_developer_mode)
 
-opt_profiler_mode=no
-AC_MSG_CHECKING([whether in profile mode])
-AC_ARG_ENABLE(profile-mode,
-	AS_HELP_STRING([--enable-profile-mode], [enable profiler]),
-opt_profiler_mode=$enableval)
-AC_MSG_RESULT($opt_profiler_mode)
-
 AC_MSG_RESULT([***
 *** Checking for compilation programs...
 ])
@@ -659,20 +652,6 @@ AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 export ac_full
 
 AM_CFLAGS="${AM_CFLAGS} ${LIBGCRYPT_CFLAGS}"
-
-if test $ac_cv_c_compiler_gnu != no; then
-	if test x$opt_profiler_mode = xyes; then
-	  AC_CHECK_PROG(FC_OK, fc-config, yes, no)
-	  if test x$FC_OK = xyes; then
-   	        AM_CFLAGS="${AM_CFLAGS} `fc-config --cflags`"
-		LIBS="$LIBS `fc-config --libs`"
-	  else
-AC_MSG_WARN(***
-*** You must install libfc in order to enable profiling. http://www710.univ-lyon1.fr/~yperret/fnccheck/profiler.html
-)
-	  fi
-	fi
-fi
 
 if test $ac_full -eq 0; then
   AC_SUBST(POSSIBLY_WARN_ABOUT_MISSING_FEATURES, [[
