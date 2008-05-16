@@ -1,3 +1,179 @@
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.9.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove obsolete comment.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Typo.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Don't check for present headers, hard code checks
+	for silly src/cfg/.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lgl/Makefile.am, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4: Replace strings.h check with gnulib module.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/strcase.m4, lgl/m4/strings_h.m4, lgl/strcasecmp.c,
+	lgl/strings.in.h, lgl/strncasecmp.c: Replace strings.h check with
+	gnulib module.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, src/certtool.c: certtool: When writing private keys
+	to files, change permissions of file.  Now the file which the
+	private key is saved to is chmod'ed 0600.  Reported by martin f
+	krafft <madduck@debian.org> see
+	<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=373169>.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, src/certtool-cfg.c, src/certtool-cfg.h,
+	src/certtool.c: certtool: Encrypting a private key now require a
+	confirmed password.  Before, './certtool -k -8' would merely ask for
+	a password once.  Reported by Daniel 'NebuchadnezzaR' Dehennin
+	<nebuchadnezzar@asgardr.info> see
+	<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=364287>.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4: Update
+	gnulib files.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Remove --enable-profile-mode.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/memmem.m4, lgl/str-two-way.h: Update gnulib files.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/gnutls.texi: Document gnutls-cli PSK fix.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Fix so that PSK authentication works.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4,
+	lgl/m4/gnulib-common.m4, lgl/m4/gnulib-comp.m4: Update gnulib files.
+
+2008-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-new-mac-07.txt: Add.
+
+2008-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* guile/tests/Makefile.am: Don't run guile openpgp self tests if
+	openpgp is disabled.
+
+2008-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Don't run openpgpself if openpgp stuff wasn't
+	built.
+
+2008-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/examples/ex-session-info.c, guile/src/core.c,
+	guile/tests/Makefile.am: libgnutls: Compile if SRP is disabled.
+	Report and tiny patches from <jared.jennings.ctr@eglin.af.mil>, see
+	<https://savannah.gnu.org/support/index.php?106342>.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Fix warning.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, gl/getaddrinfo.h: Update gnulib files.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/output.c: More translation markups.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* po/POTFILES.in: Add translations from openpgp output functions
+	too.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Translation fixes, tiny patch from Benno
+	Schulenberg <bensberg@justemail.net>.
+
+2008-05-05  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4,
+	lgl/override/lib/gc-libgcrypt.c.diff: Update gnulib files.
+
+2008-05-02  Simon Josefsson <simon@josefsson.org>
+
+	* : commit 382e242d6ab440749f44f53020a928c09a4c4765 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Thu May 1 11:06:19
+	2008 +0300
+
+2008-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-badra-tls-psk-new-mac-aes-gcm-02.txt: Add.
+
+2008-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/arpa_inet.in.h, gl/getaddrinfo.c, gl/gnulib.mk,
+	gl/m4/arpa_inet_h.m4, gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4: Update
+	gnulib files.
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-new-mac-06.txt,
+	doc/protocol/draft-rescorla-tls-extended-random-00.txt: Add.
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Call AM_CONDITIONAL at top-level.
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Dist maint.mk.
+
+2008-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-04-29  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.8.
