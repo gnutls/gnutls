@@ -34,6 +34,7 @@
 #include <certtool-cfg.h>
 #include <gcrypt.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -230,6 +231,10 @@ print_private_key (gnutls_x509_privkey_t key)
 	error (EXIT_FAILURE, 0, "privkey_export_pkcs8: %s",
 	       gnutls_strerror (ret));
     }
+
+  ret = fchmod (fileno (outfile), S_IRUSR | S_IWUSR);
+  if (ret < 0)
+    error (EXIT_FAILURE, errno, "Cannot chmod private key file");
 
   fwrite (buffer, 1, size, outfile);
 }
@@ -2218,7 +2223,6 @@ generate_pkcs8 (void)
       flags = GNUTLS_PKCS_PLAIN;
     }
 
-
   size = sizeof (buffer);
   result =
       gnutls_x509_privkey_export_pkcs8 (key, info.outcert_format,
@@ -2226,6 +2230,10 @@ generate_pkcs8 (void)
 
   if (result < 0)
     error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
+
+  result = fchmod (fileno (outfile), S_IRUSR | S_IWUSR);
+  if (result < 0)
+    error (EXIT_FAILURE, errno, "Cannot chmod private key file");
 
   fwrite (buffer, 1, size, outfile);
 

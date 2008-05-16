@@ -21,6 +21,11 @@ Reported by Daniel 'NebuchadnezzaR' Dehennin
 <nebuchadnezzar@asgardr.info> see
 <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=364287>.
 
+** certtool: When writing private keys to files, change permissions of file.
+Now the file which the private key is saved to is chmod'ed 0600.
+Reported by martin f krafft <madduck@debian.org> see
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=373169>.
+
 ** guile: Fix -fgnu89-inline test.
 
 ** Removed --enable-profile-mode.
