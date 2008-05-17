@@ -2248,6 +2248,7 @@ implemented by another example.
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example with TLS/IA support::
+* Simple client example in @acronym{C++}::
 * Helper function for TCP connections::
 @end menu
 
@@ -2342,6 +2343,14 @@ The following client is a simple client which uses the
 @acronym{TLS/IA} extension to authenticate with the server.
 
 @verbatiminclude examples/ex-client-tlsia.c
+
+@node Simple client example in @acronym{C++}
+@subsection Simple Client Example using the @acronym{C++} API
+
+The following client is a simple example of a client
+client utilizing the GnuTLS @acronym{C++} API. 
+
+@verbatiminclude examples/ex-cxx.cpp
 
 @node Helper function for TCP connections
 @subsection Helper Function for TCP Connections
