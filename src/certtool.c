@@ -34,7 +34,9 @@
 #include <certtool-cfg.h>
 #include <gcrypt.h>
 #include <errno.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
@@ -232,9 +234,6 @@ print_private_key (gnutls_x509_privkey_t key)
 	       gnutls_strerror (ret));
     }
 
-  ret = fchmod (fileno (outfile), S_IRUSR | S_IWUSR);
-  if (ret < 0)
-    error (EXIT_FAILURE, errno, "Cannot chmod private key file");
 
   fwrite (buffer, 1, size, outfile);
 }
@@ -820,6 +819,18 @@ update_signed_certificate (void)
   gnutls_x509_crt_deinit (crt);
 }
 
+FILE* safe_open_rw(const char* file)
+{
+#ifdef HAVE_UMASK
+      if (info.privkey_op != 0) 
+        {
+	  umask(S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+        }
+#endif
+
+      return fopen (file, "wb");
+}
+
 void
 gaa_parser (int argc, char **argv)
 {
@@ -834,7 +845,7 @@ gaa_parser (int argc, char **argv)
 
   if (info.outfile)
     {
-      outfile = fopen (info.outfile, "wb");
+      outfile = safe_open_rw (info.outfile);
       if (outfile == NULL)
 	error (EXIT_FAILURE, errno, "%s", info.outfile);
     }
@@ -2230,10 +2241,6 @@ generate_pkcs8 (void)
 
   if (result < 0)
     error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
-
-  result = fchmod (fileno (outfile), S_IRUSR | S_IWUSR);
-  if (result < 0)
-    error (EXIT_FAILURE, errno, "Cannot chmod private key file");
 
   fwrite (buffer, 1, size, outfile);
 
