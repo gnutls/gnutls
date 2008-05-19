@@ -459,15 +459,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  if (ciphertext.size < (unsigned) blocksize + hash_size)
-    {
-      _gnutls_record_log
-	("REC[%x]: Short record length %d < %d + %d (under attack?)\n",
-	 session, ciphertext.size, blocksize, hash_size);
-      gnutls_assert ();
-      return GNUTLS_E_DECRYPTION_FAILED;
-    }
-
   /* actual decryption (inplace)
    */
   switch (_gnutls_cipher_is_block
@@ -521,6 +512,9 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       if ((int)pad > (int)ciphertext.size - hash_size)
 	{
 	  gnutls_assert ();
+	  _gnutls_record_log
+	    ("REC[%x]: Short record length %d > %d - %d (under attack?)\n",
+	     session, pad, ciphertext.size, hash_size);
 	  /* We do not fail here. We check below for the
 	   * the pad_failed. If zero means success.
 	   */
