@@ -1,3 +1,26 @@
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.2.4.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_server_name.c, lib/gnutls_cipher.c,
+	lib/gnutls_handshake.c: Fix GNUTLS-SA-2008-1 security
+	vulnerabilities.  See
+	http://www.gnu.org/software/gnutls/security.html for updates.
+
+2008-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-05-06  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.2.3.
