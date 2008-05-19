@@ -1,3 +1,65 @@
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.10.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_str.c, tests/hostname-check/hostname-check.c: added
+	wide wildcard hostname matching. Patch by Jean-Philippe Garcia
+	Ballester.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Disable ftp.gnutls.org for now.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/vasnprintf.c: Update gnulib files.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_server_name.c, lib/gnutls_cipher.c,
+	lib/gnutls_handshake.c: Fix GNUTLS-SA-2008-1 security
+	vulnerabilities.  See
+	http://www.gnu.org/software/gnutls/security.html for updates.
+
+2008-05-18  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: Use umask to restrict permissions to owner before creating a
+	file.
+
+2008-05-18  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.c,
+	src/certtool.gaa: Use umask to restrict the newly created file's
+	permissions if operating on a private key.  This effectively fixes
+	the issue reported at
+	<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=373169> and the
+	followups.
+
+2008-05-17  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, doc/examples/Makefile.am, doc/examples/ex-cxx.cpp,
+	doc/gnutls.texi, includes/gnutls/gnutlsxx.h, lib/gnutlsxx.cpp: 
+	Updated the C++ API with patch from Eduardo Villanueva Che.
+	Suggested by Benjamin Herr.
+
+2008-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-05-16  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.9.
