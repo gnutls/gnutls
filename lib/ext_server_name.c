@@ -74,10 +74,27 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
 	  len = _gnutls_read_uint16 (p);
 	  p += 2;
 
-	  DECR_LENGTH_RET (data_size, len, 0);
-	  server_names++;
+	  if (len > 0)
+	    {
+	      DECR_LENGTH_RET (data_size, len, 0);
+	      server_names++;
+	      p += len;
+	    }
+	  else
+	    _gnutls_handshake_log
+	      ("HSK[%x]: Received zero size server name (under attack?)\n",
+	       session);
 
-	  p += len;
+	}
+
+      /* we cannot accept more server names.
+       */
+      if (server_names > MAX_SERVER_NAME_EXTENSIONS)
+	{
+	  _gnutls_handshake_log
+	    ("HSK[%x]: Too many server names received (under attack?)\n",
+	     session);
+	  server_names = MAX_SERVER_NAME_EXTENSIONS;
 	}
 
       session->security_parameters.extensions.server_names_size =
@@ -85,10 +102,6 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
       if (server_names == 0)
 	return 0;		/* no names found */
 
-      /* we cannot accept more server names.
-       */
-      if (server_names > MAX_SERVER_NAME_EXTENSIONS)
-	server_names = MAX_SERVER_NAME_EXTENSIONS;
 
       p = data + 2;
       for (i = 0; i < server_names; i++)

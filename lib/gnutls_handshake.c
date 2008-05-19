@@ -1003,6 +1003,14 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 
       *recv_type = session->internals.handshake_header_buffer.recv_type;
 
+      if (*recv_type != type)
+	{
+	  gnutls_assert ();
+	  _gnutls_handshake_log
+	    ("HSK[%x]: Handshake type mismatch (under attack?)\n", session);
+	  return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+	}
+
       return session->internals.handshake_header_buffer.packet_length;
     }
 
