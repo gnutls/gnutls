@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.11 (unreleased)
 
+** Don't use gnulib headers when building C++ library.
+Fixes builds under Windows.
+
 ** API and ABI modifications:
 No changes since last version.
 
