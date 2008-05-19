@@ -821,12 +821,10 @@ update_signed_certificate (void)
 
 FILE* safe_open_rw(const char* file)
 {
-#ifdef HAVE_UMASK
       if (info.privkey_op != 0) 
         {
 	  umask(S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
         }
-#endif
 
       return fopen (file, "wb");
 }

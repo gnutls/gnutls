@@ -15,6 +15,10 @@ error "Decryption has failed" when the server sends a small packet
 ** Don't use gnulib headers when building C++ library.
 Fixes builds under Windows.
 
+** Make umask a requirement.
+We don't know of any system that lacks it, even GNU CoreUtils use it
+unconditionally.
+
 ** API and ABI modifications:
 No changes since last version.
 

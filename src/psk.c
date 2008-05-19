@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -93,9 +93,7 @@ main (int argc, char **argv)
       exit (1);
     }
 
-#ifdef HAVE_UMASK
   umask (066);
-#endif
 
   if (gaa (argc, argv, &info) != -1)
     {
