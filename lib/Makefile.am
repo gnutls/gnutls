@@ -146,13 +146,13 @@ endif
 # C++ library
 
 if ENABLE_CXX
-CPP_OBJECTS = gnutlsxx.cpp
+libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I../includes
 
 AM_CXXFLAGS = -I$(top_srcdir)/includes/
 
 lib_LTLIBRARIES += libgnutlsxx.la
 
-libgnutlsxx_la_SOURCES = $(CPP_OBJECTS) libgnutlsxx.vers
+libgnutlsxx_la_SOURCES = gnutlsxx.cpp libgnutlsxx.vers
 
 libgnutlsxx_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
