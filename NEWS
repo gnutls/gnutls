@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.10 (unreleased)
 
+** Added wide wildcard hostname matching.
+Tiny patch by Jean-Philippe Garcia Ballester.
+
 ** Fix three security vulnerabilities.  [GNUTLS-SA-2008-1]
 Thanks to CERT-FI for finding the bugs and providing detailed reports,
 which allowed the bugs to be reproduced and fixed easily.  Patches
