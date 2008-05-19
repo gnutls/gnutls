@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.3.11 (unreleased)
 
+** Fix flaw in fix for GNUTLS-SA-2008-1-3.
+The flaw would result in incorrectly terminated sessions with the
+error "Decryption has failed" when the server sends a small packet
+(typically when the session is closed).  Reported by Andreas Metzler
+<ametzler@downhill.at.eu.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2807>.
+
 ** Don't use gnulib headers when building C++ library.
 Fixes builds under Windows.
 
