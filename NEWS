@@ -5,6 +5,32 @@ See the end for copying conditions.
 
 * Version 2.2.4 (unreleased)
 
+** Fix three security vulnerabilities.  [GNUTLS-SA-2008-1]
+Thanks to CERT-FI for finding the bugs and providing detailed reports,
+which allowed the bugs to be reproduced and fixed easily.  Patches
+developed by Simon Josefsson and Nikos Mavrogiannopoulos.  Any updates
+with more details about these vulnerabilities will be added to
+<http://www.gnu.org/software/gnutls/security.html>
+
+*** [GNUTLS-SA-2008-1-1]
+*** libgnutls: Fix crash when sending invalid server name.
+The crash can be triggered remotely before authentication, which can
+lead to a Daniel of Service attack to disable the server.  The bug
+cause gnutls to store more session resumption data than what was
+allocated for, thus overwriting unallocated memory.
+
+*** [GNUTLS-SA-2008-1-2]
+*** libgnutls: Fix crash when sending repeated client hellos.
+The crash can be triggered remotely before authentication, which can
+lead to a Daniel of Service attack to disable the server.  The bug
+triggers a null-pointer dereference.
+
+*** [GNUTLS-SA-2008-1-3]
+*** libgnutls: Fix crash in cipher padding decoding for invalid record lengths.
+The crash can be triggered remotely before authentication, which can
+lead to a Daniel of Service attack to disable the server.  The bug
+cause gnutls to read memory beyond the end of the received record.
+
 ** API and ABI modifications:
 No changes since last version.
 
