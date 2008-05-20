@@ -821,12 +821,22 @@ update_signed_certificate (void)
 
 FILE* safe_open_rw(const char* file)
 {
-      if (info.privkey_op != 0) 
-        {
-	  umask(S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
-        }
+  mode_t oldmask;
+  FILE *fh;
 
-      return fopen (file, "wb");
+  if (info.privkey_op != 0)
+    {
+      oldmask = umask (S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+    }
+
+  fh = fopen (file, "wb");
+
+  if (info.privkey_op != 0)
+    {
+      umask (oldmask);
+    }
+
+  return fh;
 }
 
 void
