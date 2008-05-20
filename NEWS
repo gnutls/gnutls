@@ -19,6 +19,10 @@ Fixes builds under Windows.
 We don't know of any system that lacks it, even GNU CoreUtils use it
 unconditionally.
 
+** Update gnulib files.
+Fixes a problem where it pulled in a replacement for memcmp under
+MinGW, which caused the C++ example to fail to build.
+
 ** API and ABI modifications:
 No changes since last version.
 
