@@ -28,19 +28,16 @@ LDADD = libexamples.la \
 	../../libextra/libgnutls-extra.la \
 	../../gl/libgnu.la
 
-CXX_LDADD = libexamples.la \
-	../../gl/libgnu.la \
-	../../lib/libgnutls.la	\
-	../../lib/libgnutlsxx.la	\
-	../../libextra/libgnutls-extra.la
+CXX_LDADD = $(LDADD) \
+	../../lib/libgnutlsxx.la
 
 noinst_PROGRAMS = ex-cert-select ex-client2 ex-client-resume	\
 	ex-crq ex-serv1 ex-serv-export 
 
 if ENABLE_CXX
-excxx_SOURCES = ex-cxx.cpp
-excxx_LDADD = $(CXX_LDADD)
-noinst_PROGRAMS += excxx
+ex_cxx_SOURCES = ex-cxx.cpp
+ex_cxx_LDADD = $(CXX_LDADD)
+noinst_PROGRAMS += ex-cxx
 endif
 
 if ENABLE_ANON
