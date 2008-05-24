@@ -388,7 +388,7 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
     key_status |= CDK_KEY_REVOKED;
   if (node->pkt->pkt.public_key->has_expired)
     key_status |= CDK_KEY_EXPIRED;
-  
+
   rc = 0;
   no_signer = 0;
   keyid = cdk_pk_get_keyid (node->pkt->pkt.public_key, NULL);
@@ -398,7 +398,7 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
 	continue;
       sig = node->pkt->pkt.signature;
       rc = _cdk_pk_check_sig (keydb, key, node, &is_selfsig);
-      if (IS_UID_SIG (sig)) 
+      if (rc == CDK_Success && IS_UID_SIG (sig)) 
 	{
 	  if (is_selfsig == 0)
 	    n_sigs++;
