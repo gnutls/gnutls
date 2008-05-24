@@ -201,12 +201,19 @@ print_key_times(gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
       size_t max = sizeof (s);
       struct tm t;
 
-      if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r (%d)\n", t);
-      else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
-	addf (str, "error: strftime (%d)\n", t);
+      if (tim == 0)
+        {
+          addf (str, _("\t\tExpiration: Never\n"), s);
+        }
       else
-	addf (str, _("\t\tExpiration: %s\n"), s);
+        {
+          if (gmtime_r (&tim, &t) == NULL)
+  	    addf (str, "error: gmtime_r (%d)\n", t);
+          else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+	    addf (str, "error: strftime (%d)\n", t);
+          else
+	    addf (str, _("\t\tExpiration: %s\n"), s);
+	}
     }
 }
 
