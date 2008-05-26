@@ -57,7 +57,7 @@ int
 gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
 {
   int result;
-  char null = version;
+  uint8_t null = version & 0xFF;
 
   if (crl == NULL)
     {
@@ -65,9 +65,8 @@ gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  null -= 1;
-  if (null < 0)
-    null = 0;
+  if (null > 0)
+    null -= 1;
 
   result = asn1_write_value (crl->crl, "tbsCertList.version", &null, 1);
   if (result != ASN1_SUCCESS)
