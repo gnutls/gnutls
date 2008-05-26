@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -140,6 +140,7 @@ gnutls_global_init_extra (void)
   /* Register the openpgp functions. This is because some
    * of them are defined to be NULL in the main library.
    */
+#ifdef ENABLE_OPENPGP
   _gnutls_add_openpgp_functions (_gnutls_openpgp_verify_key,
 				 _gnutls_openpgp_get_raw_key_creation_time,
 				 _gnutls_openpgp_get_raw_key_expiration_time,
@@ -152,6 +153,7 @@ gnutls_global_init_extra (void)
 				 gnutls_openpgp_crt_deinit,
 				 gnutls_openpgp_keyring_deinit,
 				 gnutls_openpgp_privkey_deinit);
+#endif
 
   return 0;
 }
