@@ -36,19 +36,14 @@ AB_INIT
 # Interfaces changed/added/removed:   CURRENT++       REVISION=0
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
-AC_SUBST(LT_CURRENT, 29)
-AC_SUBST(LT_REVISION, 6)
-AC_SUBST(LT_AGE, 3)
-AC_SUBST(EXTRA_LT_CURRENT, 27)
-AC_SUBST(EXTRA_LT_REVISION, 0)
-AC_SUBST(EXTRA_LT_AGE, 0)
+AC_SUBST(LT_CURRENT, 27)
+AC_SUBST(LT_REVISION, 0)
+AC_SUBST(LT_AGE, 0)
 ac_full=1
 
 # Used when creating the Windows libgnutls-XX.def files.
 SOVERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
 AC_SUBST(SOVERSION)
-EXTRA_SOVERSION=`expr ${EXTRA_LT_CURRENT} - ${EXTRA_LT_AGE}`
-AC_SUBST(EXTRA_SOVERSION)
 
 GNUTLS_GCRYPT_VERSION=1:1.2.4
 GNUTLS_LIBTASN1_VERSION=0.3.4
