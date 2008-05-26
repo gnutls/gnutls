@@ -64,7 +64,7 @@ libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 
 libgnutls_openssl_la_LIBADD = ../lgl/liblgnu.la ../lib/libgnutls.la 
 
-libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+libgnutls_openssl_la_LDFLAGS += -version-info $(EXTRA_LT_CURRENT):$(EXTRA_LT_REVISION):$(EXTRA_LT_AGE)
 
 if ENABLE_MINITASN1
 libgnutls_openssl_la_LIBADD += ../lib/minitasn1/libminitasn1.la
@@ -74,8 +74,8 @@ endif
 
 if HAVE_LD_OUTPUT_DEF
 libgnutls_openssl_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-openssl-$(SOVERSION).def
-defexec_DATA += libgnutls-openssl-$(SOVERSION).def
+	-Wl,--output-def,libgnutls-openssl-$(EXTRA_SOVERSION).def
+defexec_DATA += libgnutls-openssl-$(EXTRA_SOVERSION).def
 endif
 endif
 
@@ -92,14 +92,14 @@ libgnutls_extra_la_SOURCES += gnutls_ia.c
 
 if HAVE_LD_OUTPUT_DEF
 libgnutls_extra_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-extra-$(SOVERSION).def
-defexec_DATA += libgnutls-extra-$(SOVERSION).def
+	-Wl,--output-def,libgnutls-extra-$(EXTRA_SOVERSION).def
+defexec_DATA += libgnutls-extra-$(EXTRA_SOVERSION).def
 endif
 
 DISTCLEANFILES += $(defexec_DATA)
 
 libgnutls_extra_la_LDFLAGS += \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+	-version-info $(EXTRA_LT_CURRENT):$(EXTRA_LT_REVISION):$(EXTRA_LT_AGE) \
 	$(LZO_LIBS)
 
 libgnutls_extra_la_SOURCES += libgnutls-extra.vers
