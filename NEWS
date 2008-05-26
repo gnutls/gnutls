@@ -443,6 +443,79 @@ in a callback friendly way.
 ** API and ABI modifications:
 No changes since last version.
 
+* Version 2.2.5 (released 2008-05-19)
+
+** Fix flaw in fix for GNUTLS-SA-2008-1-3.
+The flaw would result in incorrectly terminated sessions with the
+error "Decryption has failed" when the server sends a small packet
+(typically when the session is closed).  Reported by Andreas Metzler
+<ametzler@downhill.at.eu.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2807>.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.2.4 (released 2008-05-19)
+
+** Fix three security vulnerabilities.  [GNUTLS-SA-2008-1]
+Thanks to CERT-FI for finding the bugs and providing detailed reports,
+which allowed the bugs to be reproduced and fixed easily.  Patches
+developed by Simon Josefsson and Nikos Mavrogiannopoulos.  Any updates
+with more details about these vulnerabilities will be added to
+<http://www.gnu.org/software/gnutls/security.html>
+
+*** [GNUTLS-SA-2008-1-1]
+*** libgnutls: Fix crash when sending invalid server name.
+The crash can be triggered remotely before authentication, which can
+lead to a Daniel of Service attack to disable the server.  The bug
+cause gnutls to store more session resumption data than what was
+allocated for, thus overwriting unallocated memory.
+
+*** [GNUTLS-SA-2008-1-2]
+*** libgnutls: Fix crash when sending repeated client hellos.
+The crash can be triggered remotely before authentication, which can
+lead to a Daniel of Service attack to disable the server.  The bug
+triggers a null-pointer dereference.
+
+*** [GNUTLS-SA-2008-1-3]
+*** libgnutls: Fix crash in cipher padding decoding for invalid record lengths.
+The crash can be triggered remotely before authentication, which can
+lead to a Daniel of Service attack to disable the server.  The bug
+cause gnutls to read memory beyond the end of the received record.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.2.3 (released 2008-05-06)
+
+** Increase default handshake packet size limit to 48kb.
+The old limit was 16kb and some servers send huge list of trusted CAs,
+thus running into the limit.  FYI, applications can further increase
+this limit using gnutls_handshake_set_max_packet_length.  Thanks to
+Marc Haber <mh+debian-bugs@zugschlus.de> and "Marc F. Clemente"
+<marc@mclemente.net> for reporting and providing test servers.
+
+** Fix compilation error related to __FUNCTION__ on some systems.
+Reported by Tim Mooney, see
+<https://savannah.gnu.org/support/?106267>.
+
+** Documented the --priority option to gnutls-cli and gnutls-serv.
+
+** Fix fopen file descriptor leak in PSK server code.
+Thanks to Laurence Withers <l@lwithers.me.uk>, see
+<http://lists.gnu.org/archive/html/gnutls-devel/2008-04/msg00002.html>.
+
+** Build Guile code with -fgnu89-inline only when supported.
+Reported by Kris Karas <ktk@enterprise.bidmc.harvard.edu> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2708>.
+
+** Make Camellia encryption work.
+Reported by Yoshisato YANAGISAWA <yanagisawa@csg.is.titech.ac.jp> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2746>.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.2.2 (released 2008-02-21)
 
 ** Cipher priority string handling now handle strings that starts with NULL.
