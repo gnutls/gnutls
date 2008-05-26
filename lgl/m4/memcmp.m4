@@ -14,7 +14,7 @@ AC_DEFUN([gl_FUNC_MEMCMP],
                    [ac_cv_func_memcmp_working],
                    [AC_LINK_IFELSE([
 			AC_LANG_PROGRAM([[#include <string.h>
-				]], [[int ret = memcmp ("foo", "bar", 0)]])],
+				]], [[int ret = memcmp ("foo", "bar", 0);]])],
 			[ac_cv_func_memcmp_working=yes],
 			[ac_cv_func_memcmp_working=no])])
   fi 

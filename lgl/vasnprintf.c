@@ -200,6 +200,14 @@ local_wcslen (const wchar_t *s)
 /* Here we need to call the native sprintf, not rpl_sprintf.  */
 #undef sprintf
 
+/* GCC >= 4.0 with -Wall emits unjustified "... may be used uninitialized"
+   warnings in this file.  Use -Dlint to suppress them.  */
+#ifdef lint
+# define IF_LINT(Code) Code
+#else
+# define IF_LINT(Code) /* empty */
+#endif
+
 /* Avoid some warnings from "gcc -Wshadow".
    This file doesn't use the exp() and remainder() functions.  */
 #undef exp
@@ -1205,7 +1213,7 @@ scale10_round_decimal_decoded (int e, mpn_t m, void *memory, int n)
 static char *
 scale10_round_decimal_long_double (long double x, int n)
 {
-  int e;
+  int e IF_LINT(= 0);
   mpn_t m;
   void *memory = decode_long_double (x, &e, &m);
   return scale10_round_decimal_decoded (e, m, memory, n);
@@ -1223,7 +1231,7 @@ scale10_round_decimal_long_double (long double x, int n)
 static char *
 scale10_round_decimal_double (double x, int n)
 {
-  int e;
+  int e IF_LINT(= 0);
   mpn_t m;
   void *memory = decode_double (x, &e, &m);
   return scale10_round_decimal_decoded (e, m, memory, n);
@@ -3700,7 +3708,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 #endif
 		TCHAR_T *fbp;
 		unsigned int prefix_count;
-		int prefixes[2];
+		int prefixes[2] IF_LINT (= { 0 });
 #if !USE_SNPRINTF
 		size_t tmp_length;
 		TCHAR_T tmpbuf[700];
