@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.3.12 (unreleased)
 
+** libgnutls: Fix gnutls_x509_crl_set_version on arm platforms.
+The code didn't work properly on platforms where 'char' is unsigned,
+when you set version 0.  Reported by Laurence Withers
+<l@lwithers.me.uk> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2825>.
+
 ** libgnutls-openssl: added RAND_pseudo_bytes API.
 Patch from Robert Millan <rmh@aybabtu.com>.
 
