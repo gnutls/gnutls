@@ -964,6 +964,13 @@ RAND_bytes (unsigned char *buf, int num)
   return 1;
 }
 
+int
+RAND_pseudo_bytes (unsigned char *buf, int num)
+{
+  gc_pseudo_random (buf, num);
+  return 1;
+}
+
 const char *
 RAND_file_name (char *buf, size_t len)
 {

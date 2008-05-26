@@ -305,6 +305,7 @@ extern "C"
   int RAND_status (void);
   void RAND_seed (const void *buf, int num);
   int RAND_bytes (unsigned char *buf, int num);
+  int RAND_pseudo_bytes (unsigned char *buf, int num);
   const char *RAND_file_name (char *buf, size_t len);
   int RAND_load_file (const char *name, long maxbytes);
   int RAND_write_file (const char *name);

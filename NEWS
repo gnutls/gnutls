@@ -5,8 +5,11 @@ See the end for copying conditions.
 
 * Version 2.3.12 (unreleased)
 
+** libgnutls-openssl: added RAND_pseudo_bytes API.
+Patch from Robert Millan <rmh@aybabtu.com>.
+
 ** API and ABI modifications:
-No changes since last version.
+RAND_pseudo_bytes: ADDED to libgnutls-openssl.
 
 * Version 2.3.11 (released 2008-05-20)
 
