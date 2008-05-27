@@ -1,5 +1,5 @@
-# libgnutls.vers -- Versioning script to control what symbols to export.
-# Copyright (C) 2005, 2006, 2007 Free Software Foundation
+# libgnutls.vers -- linker script for libgnutls.              -*- ld-script -*-
+# Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
