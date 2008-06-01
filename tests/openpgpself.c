@@ -152,7 +152,7 @@ client (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  gnutls_global_set_log_level (2);
 
   gnutls_certificate_allocate_credentials (&xcred);
 
@@ -384,7 +384,7 @@ server_start (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  gnutls_global_set_log_level (2);
 
   gnutls_certificate_allocate_credentials (&pgp_cred);
 
