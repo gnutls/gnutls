@@ -1103,14 +1103,16 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
           gnutls_assert();
           return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
         }
-      p++;
+
       DECR_LEN (dsize, 1);
+      p++;
+
+      DECR_LEN (dsize, sizeof( subkey_id));
       memcpy( subkey_id, p, sizeof( subkey_id));
+      p+= sizeof( subkey_id);
       
       subkey_id_set = 1;
 
-      p+= sizeof( subkey_id);
-      DECR_LEN (dsize, sizeof( subkey_id));
     }
 
   /* read the actual key or fingerprint */  
