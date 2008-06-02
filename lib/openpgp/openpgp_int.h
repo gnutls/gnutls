@@ -10,9 +10,9 @@
 #include <opencdk.h>
 #include <gnutls/openpgp.h>
 
-#define KEYID_IMPORT(dst, src) \
+#define KEYID_IMPORT(dst, src) { \
 	dst[0] = _gnutls_read_uint32( src); \
-	dst[1] = _gnutls_read_uint32( src+4)
+	dst[1] = _gnutls_read_uint32( src+4); }
 
 /* Internal context to store the OpenPGP key. */
 typedef struct gnutls_openpgp_crt_int
