@@ -131,6 +131,7 @@ void gaa_help(void)
 	printf("PSKtool help\nUsage : psktool [options]\n");
 	__gaa_helpsingle('u', "username", "username ", "specify username.");
 	__gaa_helpsingle('p', "passwd", "FILE ", "specify a password file.");
+	__gaa_helpsingle('n', "netconf-hint", "HINT ", "derive key from Netconf password, using HINT as the psk_identity_hint.");
 	__gaa_helpsingle('s', "keysize", "SIZE ", "specify the key size in bytes.");
 	__gaa_helpsingle('v', "version", "", "prints the program's version number");
 	__gaa_helpsingle('h', "help", "", "shows this help text");
@@ -148,8 +149,10 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 22 "psk.gaa"
+#line 25 "psk.gaa"
 	int key_size;
+#line 22 "psk.gaa"
+	char *netconf_hint;
 #line 19 "psk.gaa"
 	char *passwd;
 #line 16 "psk.gaa"
@@ -208,12 +211,13 @@ static int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           5
+#define GAA_NB_OPTION           6
 #define GAAOPTID_help	1
 #define GAAOPTID_version	2
 #define GAAOPTID_keysize	3
-#define GAAOPTID_passwd	4
-#define GAAOPTID_username	5
+#define GAAOPTID_netconf_hint	4
+#define GAAOPTID_passwd	5
+#define GAAOPTID_username	6
 
 #line 168 "gaa.skel"
 
@@ -406,6 +410,12 @@ struct GAAOPTION_keysize
 	int size1;
 };
 
+struct GAAOPTION_netconf_hint 
+{
+	char* arg1;
+	int size1;
+};
+
 struct GAAOPTION_passwd 
 {
 	char* arg1;
@@ -448,6 +458,7 @@ static int gaa_get_option_num(char *str, int status)
         {
         case GAA_LETTER_OPTION:
 			GAA_CHECK1STR("s", GAAOPTID_keysize);
+			GAA_CHECK1STR("n", GAAOPTID_netconf_hint);
 			GAA_CHECK1STR("p", GAAOPTID_passwd);
 			GAA_CHECK1STR("u", GAAOPTID_username);
         case GAA_MULTIPLE_OPTION:
@@ -461,6 +472,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("version", GAAOPTID_version);
 			GAA_CHECKSTR("keysize", GAAOPTID_keysize);
+			GAA_CHECKSTR("netconf-hint", GAAOPTID_netconf_hint);
 			GAA_CHECKSTR("passwd", GAAOPTID_passwd);
 			GAA_CHECKSTR("username", GAAOPTID_username);
 
@@ -476,6 +488,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     int OK = 0;
     int gaa_last_non_option;
 	struct GAAOPTION_keysize GAATMP_keysize;
+	struct GAAOPTION_netconf_hint GAATMP_netconf_hint;
 	struct GAAOPTION_passwd GAATMP_passwd;
 	struct GAAOPTION_username GAATMP_username;
 
@@ -500,14 +513,14 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 26 "psk.gaa"
+#line 29 "psk.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_version:
 	OK = 0;
-#line 25 "psk.gaa"
+#line 28 "psk.gaa"
 { psktool_version(); exit(0); ;};
 
 		return GAA_OK;
@@ -517,8 +530,18 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_keysize.arg1, gaa_getint, GAATMP_keysize.size1);
 		gaa_index++;
-#line 23 "psk.gaa"
+#line 26 "psk.gaa"
 { gaaval->key_size = GAATMP_keysize.arg1 ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_netconf_hint:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_netconf_hint.arg1, gaa_getstr, GAATMP_netconf_hint.size1);
+		gaa_index++;
+#line 23 "psk.gaa"
+{ gaaval->netconf_hint = GAATMP_netconf_hint.arg1 ;};
 
 		return GAA_OK;
 		break;
@@ -566,8 +589,8 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 28 "psk.gaa"
-{ gaaval->username=NULL; gaaval->passwd=NULL; gaaval->key_size = NULL; ;};
+#line 31 "psk.gaa"
+{ gaaval->username=NULL; gaaval->passwd=NULL; gaaval->key_size = NULL; gaaval->netconf_hint = NULL; ;};
 
     }
     inited = 1;

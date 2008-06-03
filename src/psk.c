@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -130,21 +130,49 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  if (info.key_size < 1)
-    info.key_size = 16;
-
-  ret = gc_pseudo_random ((char *) key, info.key_size);
-  if (ret != GC_OK)
+  if (info.netconf_hint)
     {
-      fprintf (stderr, "Not enough randomness\n");
-      exit (1);
+      char *passwd;
+
+      if (info.key_size != 0 && info.key_size != 20)
+	{
+	  fprintf (stderr, "For netconf, key size must always be 20.\n");
+	  exit (1);
+	}
+
+      passwd = getpass ("Enter password: ");
+      if (passwd == NULL)
+	{
+	  fprintf (stderr, "Please specify a password\n");
+	  exit (1);
+	}
+
+      ret = gnutls_psk_netconf_derive_key (passwd,
+					   info.username,
+					   info.netconf_hint,
+					   &dkey);
+    }
+  else
+    {
+      if (info.key_size < 1)
+	info.key_size = 16;
+
+      printf ("Generating a random key for user '%s'\n", info.username);
+
+      ret = gc_pseudo_random ((char *) key, info.key_size);
+      if (ret != GC_OK)
+	{
+	  fprintf (stderr, "Not enough randomness\n");
+	  exit (1);
+	}
+
+      dkey.data = key;
+      dkey.size = info.key_size;
     }
 
-  printf ("Generating a random key for user '%s'\n", info.username);
-
-  dkey.data = key;
-  dkey.size = info.key_size;
   ret = gnutls_hex_encode (&dkey, hex_key, &hex_key_size);
+  if (info.netconf_hint)
+    gnutls_free (dkey.data);
   if (ret < 0)
     {
       fprintf (stderr, "HEX encoding error\n");

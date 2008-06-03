@@ -8,8 +8,10 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 22 "psk.gaa"
+#line 25 "psk.gaa"
 	int key_size;
+#line 22 "psk.gaa"
+	char *netconf_hint;
 #line 19 "psk.gaa"
 	char *passwd;
 #line 16 "psk.gaa"

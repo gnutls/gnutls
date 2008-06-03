@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.4.netconf.2 (unreleased)
 
+** psktool: Support new --netconf-hint to generate PSK key from password.
+Uses the Netconf algorithm to derive PSK key from password.
+
 * Version 2.3.4.netconf.1 (released 2008-05-15)
 
 ** Handle psk_identity_hint field in client.
