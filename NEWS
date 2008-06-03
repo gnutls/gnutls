@@ -5,8 +5,14 @@ See the end for copying conditions.
 
 * Version 2.3.4.netconf.2 (unreleased)
 
+** libgnutls [PSK]: New API to retrieve PSK identity hint in client.
+The function is gnutls_psk_client_get_hint.
+
 ** psktool: Support new --netconf-hint to generate PSK key from password.
 Uses the Netconf algorithm to derive PSK key from password.
+
+** API and ABI modifications:
+gnutls_psk_client_get_hint: ADDED.
 
 * Version 2.3.4.netconf.1 (released 2008-05-15)
 

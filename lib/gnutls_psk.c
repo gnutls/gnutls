@@ -307,6 +307,33 @@ gnutls_psk_server_get_username (gnutls_session_t session)
 }
 
 /**
+ * gnutls_psk_client_get_hint - return the PSK identity hint of the peer
+ * @session: is a gnutls session
+ *
+ * The PSK identity hint may give the client help in deciding which
+ * username to use.  This should only be called in case of PSK
+ * authentication and in case of a client.
+ *
+ * Returns: the identity hint of the peer, or %NULL in case of an error.
+ **/
+const char *
+gnutls_psk_client_get_hint (gnutls_session_t session)
+{
+  psk_auth_info_t info;
+
+  CHECK_AUTH (GNUTLS_CRD_PSK, NULL);
+
+  info = _gnutls_get_auth_info (session);
+  if (info == NULL)
+    return NULL;
+
+  if (info->hint[0] != 0)
+    return info->hint;
+
+  return NULL;
+}
+
+/**
   * gnutls_hex_decode - decode hex encoded data
   * @hex_data: contain the encoded data
   * @result: the place where decoded data will be copied
