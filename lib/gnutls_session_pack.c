@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -760,14 +760,15 @@ static int
 pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
 {
   psk_auth_info_t info;
-  int pack_size, username_size = 0, pos;
+  int pack_size, username_size = 0, hint_size = 0, pos;
 
   info = _gnutls_get_auth_info (session);
 
   if (info)
     {
-      username_size = strlen (info->username) + 1;	/* include the terminating null */
-      pack_size = username_size +
+      username_size = strlen (info->username) + 1; /* include the terminating null */
+      hint_size = strlen (info->hint) + 1; /* include the terminating null */
+      pack_size = username_size + hint_size +
 	2 + 4 * 3 + info->dh.prime.size + info->dh.generator.size +
 	info->dh.public_key.size;
     }
@@ -804,6 +805,12 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
       memcpy (&packed_session->data[pos], info->username, username_size);
       pos += username_size;
 
+      _gnutls_write_uint32 (hint_size, &packed_session->data[pos]);
+      pos += 4;
+
+      memcpy (&packed_session->data[pos], info->hint, hint_size);
+      pos += hint_size;
+
       _gnutls_write_uint16 (info->dh.secret_bits, &packed_session->data[pos]);
       pos += 2;
 
@@ -813,7 +820,6 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
       pos += 4 + info->dh.generator.size;
       _gnutls_write_datum32 (&packed_session->data[pos], info->dh.public_key);
       pos += 4 + info->dh.public_key.size;
-
     }
 
 
@@ -824,7 +830,7 @@ static int
 unpack_psk_auth_info (gnutls_session_t session,
 		      const gnutls_datum_t * packed_session)
 {
-  size_t username_size;
+  size_t username_size, hint_size;
   size_t pack_size;
   int pos = 0, size, ret;
   psk_auth_info_t info;
@@ -872,6 +878,12 @@ unpack_psk_auth_info (gnutls_session_t session,
 
   memcpy (info->username, &packed_session->data[pos], username_size);
   pos += username_size;
+
+  hint_size = _gnutls_read_uint32 (&packed_session->data[pos]);
+  pos += 4;
+
+  memcpy (info->hint, &packed_session->data[pos], hint_size);
+  pos += hint_size;
 
   info->dh.secret_bits = _gnutls_read_uint16 (&packed_session->data[pos]);
   pos += 2;
