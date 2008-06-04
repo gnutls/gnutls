@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -49,6 +49,9 @@ typedef struct gnutls_psk_server_credentials_st
    * parameters.
    */
   gnutls_params_function *params_func;
+
+  /* Identity hint. */
+  char *hint;
 } psk_server_cred_st;
 
 /* these structures should not use allocated data */
@@ -56,6 +59,7 @@ typedef struct psk_auth_info_st
 {
   char username[MAX_SRP_USERNAME + 1];
   dh_info_st dh;
+  char hint[MAX_SRP_USERNAME + 1];
 } *psk_auth_info_t;
 
 

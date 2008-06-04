@@ -987,6 +987,17 @@ main (int argc, char **argv)
 	  GERR (ret);
 	}
 
+      if (info.psk_hint)
+	{
+	  ret = gnutls_psk_set_server_credentials_hint (psk_cred,
+							info.psk_hint);
+	  if (ret)
+	    {
+	      fprintf (stderr, "Error setting PSK identity hint.\n");
+	      GERR (ret);
+	    }
+	}
+
       gnutls_psk_set_server_params_function (psk_cred, get_params);
     }
 #endif

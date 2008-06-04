@@ -970,6 +970,79 @@ srp_username_callback (gnutls_session_t session,
   return 0;
 }
 
+static int psk_callback (gnutls_session_t session,
+			 char **username,
+			 gnutls_datum_t * key)
+{
+  const char *hint = gnutls_psk_client_get_hint (session);
+  char *passwd;
+  int ret;
+
+  printf ("- PSK client callback. ");
+  if (hint)
+    printf ("PSK hint '%s'\n", hint);
+  else
+    printf ("No PSK hint\n");
+
+  if (info.psk_username)
+    *username = gnutls_strdup (info.psk_username);
+  else
+    {
+      char *tmp = NULL;
+      ssize_t n, len;
+
+      printf ("Enter PSK identity: ");
+      fflush (stdout);
+      len = getline (&tmp, &n, stdin);
+
+      if (tmp == NULL)
+	{
+	  fprintf (stderr, "No username given, aborting...\n");
+	  return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+      if (tmp[strlen (tmp) - 1] == '\n')
+	tmp[strlen (tmp) - 1] = '\0';
+      if (tmp[strlen (tmp) - 1] == '\r')
+	tmp[strlen (tmp) - 1] = '\0';
+
+      *username = gnutls_strdup (tmp);
+      free (tmp);
+    }
+  if (!*username)
+    return GNUTLS_E_MEMORY_ERROR;
+
+  passwd = getpass ("Enter password: ");
+  if (passwd == NULL)
+    {
+      fprintf (stderr, "No password given, aborting...\n");
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    }
+
+  ret = gnutls_psk_netconf_derive_key (passwd,
+				       *username,
+				       hint ? hint : "",
+				       key);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error deriving password: %s\n", gnutls_strerror (ret));
+      gnutls_free (*username);
+      return ret;
+    }
+
+  if (info.debug)
+    {
+      char hexkey[41];
+      size_t res_size = sizeof (hexkey);
+      gnutls_hex_encode (key, hexkey, &res_size);
+      fprintf (stderr, "PSK username: %s\n", *username);
+      fprintf (stderr, "PSK hint: %s\n", hint);
+      fprintf (stderr, "PSK key: %s\n", hexkey);
+    }
+
+  return 0;
+}
+
 static void
 init_global_tls_stuff (void)
 {
@@ -1045,18 +1118,24 @@ init_global_tls_stuff (void)
 #endif
 
 #ifdef ENABLE_PSK
+  /* PSK stuff */
+  if (gnutls_psk_allocate_client_credentials (&psk_cred) < 0)
+    {
+      fprintf (stderr, "PSK authentication error\n");
+    }
+
   if (psk_username && psk_key.data)
     {
-      /* SRP stuff */
-      if (gnutls_psk_allocate_client_credentials (&psk_cred) < 0)
+      ret = gnutls_psk_set_client_credentials (psk_cred,
+					       psk_username, &psk_key,
+					       GNUTLS_PSK_KEY_HEX);
+      if (ret < 0)
 	{
-	  fprintf (stderr, "PSK authentication error\n");
+	  fprintf (stderr, "Error setting the PSK credentials: %s\n",
+		   gnutls_strerror (ret));
 	}
-
-      gnutls_psk_set_client_credentials (psk_cred,
-					 psk_username, &psk_key,
-					 GNUTLS_PSK_KEY_HEX);
     }
+  gnutls_psk_set_client_credentials_function (psk_cred, psk_callback);
 #endif
 
 #ifdef ENABLE_ANON

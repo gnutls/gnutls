@@ -19,11 +19,13 @@ option (u,username) STR "username" { $username = $1 } "specify username."
 #char *passwd;
 option (p, passwd) STR "FILE" { $passwd = $1 } "specify a password file."
 
+#char *netconf_hint;
+option (n, netconf-hint) STR "HINT" { $netconf_hint = $1 } "derive key from Netconf password, using HINT as the psk_identity_hint."
+
 #int key_size;
 option (s, keysize) INT "SIZE" { $key_size = $1 } "specify the key size in bytes."
 
 option (v, version) { psktool_version(); exit(0); } "prints the program's version number"
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
-init { $username=NULL; $passwd=NULL; $key_size = 0; }
-
+init { $username=NULL; $passwd=NULL; $key_size = 0; $netconf_hint = NULL; }

@@ -73,6 +73,9 @@ option (a, disable-client-cert) { $disable_client_cert = 1 } "Disable request fo
 #char *psk_passwd;
 option (pskpasswd) STR "FILE" { $psk_passwd = $1 } "PSK password file to use."
 
+#char *psk_hint;
+option (pskhint) STR "HINT" { $psk_hint = $1 } "PSK identity hint to use."
+
 #char *srp_passwd;
 option (srppasswd) STR "FILE" { $srp_passwd = $1 } "SRP password file to use."
 

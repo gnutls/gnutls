@@ -552,8 +552,12 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
 #endif
 #ifdef ENABLE_PSK
     case GNUTLS_CRD_PSK:
-      /* This should be only called in server
-       * side.
+      /* This returns NULL in server side.
+       */
+      if (gnutls_psk_client_get_hint (session) != NULL)
+	printf ("- PSK authentication. PSK hint '%s'\n",
+		gnutls_psk_client_get_hint (session));
+      /* This returns NULL in client side.
        */
       if (gnutls_psk_server_get_username (session) != NULL)
 	printf ("- PSK authentication. Connected as '%s'\n",

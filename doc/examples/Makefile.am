@@ -31,8 +31,9 @@ LDADD = libexamples.la \
 CXX_LDADD = $(LDADD) \
 	../../lib/libgnutlsxx.la
 
-noinst_PROGRAMS = ex-cert-select ex-client2 ex-client-resume	\
-	ex-crq ex-serv1 ex-serv-export 
+noinst_PROGRAMS = ex-client2 ex-client-resume ex-client-psk
+noinst_PROGRAMS += ex-cert-select ex-crq
+noinst_PROGRAMS += ex-serv1 ex-serv-export ex-serv-psk
 
 if ENABLE_CXX
 ex_cxx_SOURCES = ex-cxx.cpp

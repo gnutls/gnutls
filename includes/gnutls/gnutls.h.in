@@ -973,7 +973,12 @@ extern "C"
   int gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
 					      res, const char *password_file);
 
+  int
+  gnutls_psk_set_server_credentials_hint (gnutls_psk_server_credentials_t res,
+					  const char *hint);
+
   const char *gnutls_psk_server_get_username (gnutls_session_t session);
+  const char *gnutls_psk_client_get_hint (gnutls_session_t session);
 
   typedef int gnutls_psk_server_credentials_function (gnutls_session_t,
 						      const char *username,
@@ -1002,6 +1007,12 @@ extern "C"
   void gnutls_psk_set_server_params_function (gnutls_psk_server_credentials_t
 					      res,
 					      gnutls_params_function * func);
+
+  int gnutls_psk_netconf_derive_key (const char *password,
+				     const char *psk_identity,
+				     const char *psk_identity_hint,
+				     gnutls_datum_t *output_key);
+
 
   typedef enum gnutls_x509_subject_alt_name_t
   {

@@ -41,7 +41,8 @@ ctests = simple openssl gc set_pkcs12_cred certder	\
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 
 if HAVE_FORK
-ctests += x509self x509signself x509dn anonself pskself dhepskself tlsia resume
+ctests += x509self x509signself x509dn anonself pskself dhepskself	\
+	tlsia resume netconf-psk
 
 if ENABLE_OPENPGP
 ctests += openpgpself 

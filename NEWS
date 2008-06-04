@@ -5,6 +5,37 @@ See the end for copying conditions.
 
 * Version 2.3.12 (unreleased)
 
+** Merge gnutls_with_netconf branch.
+
+*** libgnutls [PSK]: New API to retrieve PSK identity hint in client.
+The function is gnutls_psk_client_get_hint.
+
+*** libgnutls [PSK]: New API to set PSK identity hint in server.
+The function is gnutls_psk_set_server_credentials_hint.
+
+*** libgnutls [PSK]: Support server key exchange with PSK identity hint.
+In the client, the message is parsed and the application can use
+gnutls_psk_client_get_hint to retrieve the hint.  In the server, the
+message is sent if the application has specified a PSK identity hint
+using gnutls_psk_set_server_credentials_hint.
+
+*** libgnutls [PSK]: Support Netconf PSK key derivation.
+The function gnutls_psk_netconf_derive_key supports the PSK key
+derivation as specified in draft-ietf-netconf-tls-02.txt.  New self
+test netconf-psk.c.
+
+*** psktool: Support new --netconf-hint to generate PSK key from password.
+Uses the Netconf algorithm to derive PSK key from password.
+
+*** gnutls-serv: Support new --pskhint parameter to set PSK identity hint.
+
+*** gnutls-cli: Always support PSK modes, through a callback.
+The callback will derive a PSK key using Netconf algorithm.  It will
+print the PSK identity hint to help the user.
+
+*** New PSK example client and server.
+See doc/examples/ex-client-psk.c and doc/examples/ex-serv-psk.c.
+
 ** libgnutls: Fix gnutls_x509_crl_set_version on arm platforms.
 The code didn't work properly on platforms where 'char' is unsigned,
 when you set version 0.  Reported by Laurence Withers
@@ -20,6 +51,9 @@ bump the version to avoid problems.
 
 ** API and ABI modifications:
 RAND_pseudo_bytes: ADDED to libgnutls-openssl.
+gnutls_psk_client_get_hint: ADDED.
+gnutls_psk_set_server_credentials_hint: ADDED.
+gnutls_psk_netconf_derive_key: ADDED
 
 * Version 2.3.11 (released 2008-05-20)
 

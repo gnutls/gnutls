@@ -1152,6 +1152,27 @@ _gnutls_session_is_export (gnutls_session_t session)
   return 0;
 }
 
+/*-
+ * _gnutls_session_is_psk - Used to check whether this session uses PSK kx
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return non zero if this session uses a PSK key
+ * exchange algorithm.
+ *
+ -*/
+int
+_gnutls_session_is_psk (gnutls_session_t session)
+{
+  gnutls_kx_algorithm_t kx;
+
+  kx = _gnutls_cipher_suite_get_kx_algo (&session->security_parameters.
+					 current_cipher_suite);
+  if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK)
+    return 1;
+
+  return 0;
+}
+
 /**
  * gnutls_session_get_ptr - Get the user pointer from the session structure
  * @session: is a #gnutls_session_t structure.

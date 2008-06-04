@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2004, 2005, 2006  Free Software Foundation
+ * Copyright (C) 2000, 2001, 2004, 2005, 2006, 2008  Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -374,6 +374,7 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
   uint8_t *data = NULL;
   int datasize;
   int ret = 0;
+  Optional optflag = MANDATORY_PACKET;
 
   if (session->internals.auth_struct->gnutls_process_server_kx != NULL)
     {
@@ -387,11 +388,15 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 	  return 0;
 	}
 
+      /* Server key exchange packet is optional for PSK. */
+      if (_gnutls_session_is_psk (session))
+	optflag = OPTIONAL_PACKET;
+
       ret =
 	_gnutls_recv_handshake (session, &data,
 				&datasize,
 				GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE,
-				MANDATORY_PACKET);
+				optflag);
       if (ret < 0)
 	{
 	  gnutls_assert ();

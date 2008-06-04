@@ -63,7 +63,8 @@ lib_LTLIBRARIES = libgnutls.la
 SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 	auth_srp_sb64.c auth_srp_rsa.c
 
-PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c auth_dhe_psk.c
+PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c	\
+	auth_dhe_psk.c gnutls_psk_netconf.c
 
 OPRFI_COBJECTS = ext_oprfi.c
 
