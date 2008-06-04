@@ -13,6 +13,9 @@ Uses the Netconf algorithm to derive PSK key from password.
 
 ** gnutls-serv: Support new --pskhint parameter to set PSK identity hint.
 
+** gnutls-cli: Always support PSK modes, through a callback.
+The callback will derive a PSK key using Netconf algorithm.
+
 ** API and ABI modifications:
 gnutls_psk_client_get_hint: ADDED.
 
