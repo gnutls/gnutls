@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -220,6 +220,31 @@ gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
   return 0;
 }
 
+/**
+ * gnutls_psk_set_server_credentials_hint - Set a identity hint, in a %gnutls_psk_server_credentials_t structure
+ * @res: is an #gnutls_psk_server_credentials_t structure.
+ * @hint: is the PSK identity hint string
+ *
+ * This function sets the identity hint, in a
+ * %gnutls_psk_server_credentials_t structure.  This hint is sent to
+ * the client to help it chose a good PSK credential (i.e., username
+ * and password).
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
+int
+gnutls_psk_set_server_credentials_hint (gnutls_psk_server_credentials_t res,
+					const char *hint)
+{
+  res->hint = gnutls_strdup (hint);
+  if (res->hint == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  return 0;
+}
 
 /**
   * gnutls_psk_set_server_credentials_function - Used to set a callback to retrieve the user's PSK credentials
@@ -261,7 +286,7 @@ gnutls_psk_set_server_credentials_function (gnutls_psk_server_credentials_t
   * int (*callback)(gnutls_session_t, char** username,
   *  gnutls_datum_t* key);
   *
-  * The @username and @key must be allocated using gnutls_malloc().
+  * The @username and @key->data must be allocated using gnutls_malloc().
   * @username should be ASCII strings or UTF-8 strings prepared using
   * the "SASLprep" profile of "stringprep".
   *

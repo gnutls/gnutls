@@ -49,6 +49,9 @@ typedef struct gnutls_psk_server_credentials_st
    * parameters.
    */
   gnutls_params_function *params_func;
+
+  /* Identity hint. */
+  char *hint;
 } psk_server_cred_st;
 
 /* these structures should not use allocated data */
