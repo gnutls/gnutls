@@ -983,8 +983,6 @@ static int psk_callback (gnutls_session_t session,
 {
   const char *hint = gnutls_psk_client_get_hint (session);
   char *passwd;
-  char *tmp = NULL;
-  ssize_t n, len;
   int ret;
 
   printf ("- PSK client callback. ");
@@ -993,23 +991,31 @@ static int psk_callback (gnutls_session_t session,
   else
     printf ("No PSK hint\n");
 
-  printf ("Enter PSK identity: ");
-  fflush (stdout);
-  len = getline (&tmp, &n, stdin);
-
-  if (tmp == NULL)
+  if (info.psk_username)
+    *username = gnutls_strdup (info.psk_username);
+  else
     {
-      fprintf (stderr, "No username given, aborting...\n");
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+      char *tmp = NULL;
+      ssize_t n, len;
+
+      printf ("Enter PSK identity: ");
+      fflush (stdout);
+      len = getline (&tmp, &n, stdin);
+
+      if (tmp == NULL)
+	{
+	  fprintf (stderr, "No username given, aborting...\n");
+	  return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
+
+      if (tmp[strlen (tmp) - 1] == '\n')
+	tmp[strlen (tmp) - 1] = '\0';
+      if (tmp[strlen (tmp) - 1] == '\r')
+	tmp[strlen (tmp) - 1] = '\0';
+
+      *username = gnutls_strdup (tmp);
+      free (tmp);
     }
-
-  if (tmp[strlen (tmp) - 1] == '\n')
-    tmp[strlen (tmp) - 1] = '\0';
-  if (tmp[strlen (tmp) - 1] == '\r')
-    tmp[strlen (tmp) - 1] = '\0';
-
-  *username = gnutls_strdup (tmp);
-  free (tmp);
   if (!*username)
     return GNUTLS_E_MEMORY_ERROR;
 
