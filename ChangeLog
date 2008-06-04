@@ -1,3 +1,68 @@
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.4.netconf.2.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Document PSK stuff.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Allow --pskusername to be specified to avoid query in
+	PSK callback.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv-gaa.c, src/serv-gaa.h: Generated.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/cli.c: gnutls-cli: Implement PSK callback.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/serv.c, src/serv.gaa: Add gnutls-serv --pskhint.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk.c: Generate server key exchange (psk identity hint).
+	Invoke client callback.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, lib/auth_psk.h, lib/gnutls_psk.c: Add
+	gnutls_psk_set_server_credentials_hint.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_psk.c, src/common.c: 
+	Add gnutls_psk_client_get_hint function.  Use it.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_session_pack.c: Pack/unpack psk identity hint too.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/psk-gaa.c, src/psk-gaa.h, src/psk.c, src/psk.gaa: 
+	psktool: Support --netconf-hint.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-05-15  Simon Josefsson <simon@josefsson.org>
 
 	* lib/auth_psk.c, lib/gnutls_kx.c, lib/gnutls_state.c: Allow for
