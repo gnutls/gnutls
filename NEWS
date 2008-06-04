@@ -45,10 +45,6 @@ when you set version 0.  Reported by Laurence Withers
 ** libgnutls-openssl: added RAND_pseudo_bytes API.
 Patch from Robert Millan <rmh@aybabtu.com>.
 
-** libgnutls: Bump shared library version.
-The 2.3.x branch has removed several symbols from libgnutls-extra, so
-bump the version to avoid problems.
-
 ** API and ABI modifications:
 RAND_pseudo_bytes: ADDED to libgnutls-openssl.
 gnutls_psk_client_get_hint: ADDED.
