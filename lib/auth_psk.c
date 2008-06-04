@@ -36,6 +36,7 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 
+int _gnutls_gen_psk_server_kx (gnutls_session_t session, opaque ** data);
 int _gnutls_gen_psk_client_kx (gnutls_session_t, opaque **);
 
 int _gnutls_proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
@@ -47,7 +48,7 @@ const mod_auth_st psk_auth_struct = {
   "PSK",
   NULL,
   NULL,
-  NULL,
+  _gnutls_gen_psk_server_kx,
   _gnutls_gen_psk_client_kx,
   NULL,
   NULL,
@@ -167,7 +168,37 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  if (cred->username.data == NULL || cred->key.data == NULL)
+  if (cred->username.data == NULL && cred->key.data == NULL &&
+      cred->get_function != NULL)
+    {
+      char *username;
+      gnutls_datum_t key;
+
+      ret = cred->get_function (session, &username, &key);
+      if (ret)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+
+      ret = _gnutls_set_datum (&cred->username, username, strlen (username));
+      gnutls_free (username);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  _gnutls_free_datum (&key);
+	  return ret;
+	}
+
+      ret = _gnutls_set_datum (&cred->key, key.data, key.size);
+      _gnutls_free_datum (&key);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+    }
+  else if (cred->username.data == NULL || cred->key.data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -256,7 +287,8 @@ error:
   return ret;
 }
 
-/*
+
+/* Generates the PSK server key exchange
  *
  * struct {
  *     select (KeyExchangeAlgorithm) {
@@ -267,6 +299,43 @@ error:
  * } ServerKeyExchange;
  *
  */
+int
+_gnutls_gen_psk_server_kx (gnutls_session_t session, opaque ** data)
+{
+  gnutls_psk_server_credentials_t cred;
+  gnutls_datum_t hint;
+
+  cred = (gnutls_psk_server_credentials_t)
+    _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+
+  if (cred == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    }
+
+  /* Abort sending this message if there is no PSK identity hint. */
+  if (cred->hint == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INT_RET_0;
+    }
+
+  hint.data = cred->hint;
+  hint.size = strlen (cred->hint);
+
+  (*data) = gnutls_malloc (2 + hint.size);
+  if ((*data) == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  _gnutls_write_datum16 (*data, hint);
+
+  return hint.size + 2;
+}
+
 
 /* just read the hint from the server key exchange.
  */
