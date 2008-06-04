@@ -1,3 +1,207 @@
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.12.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-netconf-tls-02.txt: Add.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: We reverted the ABI bump.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Doc fix.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk.c: Doc fix.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, src/psk-gaa.c: Generated.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump ABI version due to added symbols.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* : commit aa2c7264a52b993aca39c613e5fe1aed7511c972 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Wed Jun 4 08:11:34 2008
+	+0200
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-session-info.c: Update example with more PSK
+	printing.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.4.netconf.2.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Document PSK stuff.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Allow --pskusername to be specified to avoid query in
+	PSK callback.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv-gaa.c, src/serv-gaa.h: Generated.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/cli.c: gnutls-cli: Implement PSK callback.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/serv.c, src/serv.gaa: Add gnutls-serv --pskhint.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk.c: Generate server key exchange (psk identity hint).
+	Invoke client callback.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, lib/auth_psk.h, lib/gnutls_psk.c: Add
+	gnutls_psk_set_server_credentials_hint.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_psk.c, src/common.c: 
+	Add gnutls_psk_client_get_hint function.  Use it.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_session_pack.c: Pack/unpack psk identity hint too.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/psk-gaa.c, src/psk-gaa.h, src/psk.c, src/psk.gaa: 
+	psktool: Support --netconf-hint.
+
+2008-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-06-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/openpgp/openpgp_int.h: safer use of KEYID_IMPORT().
+
+2008-06-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/auth_cert.c: Corrected usage of DECR_LEN()
+
+2008-06-01  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* tests/openpgpself.c: reduced logging level
+
+2008-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* m4/libgcrypt.m4: Update to latest version.
+
+2008-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutls.vers, libextra/libgnutls-extra.vers: Add emacs mode
+	markers.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Revert "Revert ABI version, make libgnutls-extra use
+	another ABI version." This reverts commit 1a0f4dbf5a79ac61c7d10257221d851a4a12d814.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Revert "Use libtool EXTRA_ version symbols." This reverts commit 4e6bc87a35ed471022019265f7b5628e480f7e38.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention ABI bump.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Use libtool EXTRA_ version symbols.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Revert ABI version, make libgnutls-extra use another
+	ABI version.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump ABI version.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c: Doc fix.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Merge 2.2.x branch NEWS entries.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crl_write.c: (gnutls_x509_crl_set_version): Fix on platform where 'char' can be
+	unsigned.  Based on report from Laurence Withers <l@lwithers.me.uk>,
+	see:
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2825>.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/memcmp.m4, lgl/stdbool.in.h, lgl/vasnprintf.c: Update
+	gnulib files.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/openssl.h, libextra/gnutls_openssl.c: 
+	libgnutls-openssl: added RAND_pseudo_bytes API.  Tiny patch from
+	Robert Millan <rmh@aybabtu.com>.
+
+2008-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-05-24  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/sig-check.c: added error check.
+
+2008-05-24  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/openpgp/output.c: Print Never when a certificate never
+	expires.
+
+2008-05-24  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/openpgp/pgp.c: Corrected bug gnutls_openpgp_crt_get_name()
+	which returned the same value for index==0 or 1.
+
+2008-05-20  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-05-20  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.11.
@@ -175,6 +379,35 @@
 2008-05-16  Simon Josefsson <simon@josefsson.org>
 
 	* lgl/m4/memmem.m4, lgl/str-two-way.h: Update gnulib files.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk.c, lib/gnutls_kx.c, lib/gnutls_state.c: Allow for
+	server key exchange message to be optional for PSK ciphers.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.4.netconf.1.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk.c, lib/auth_psk.h: Parse psk_identity_hint field.
+
+2008-05-15  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Fix so that PSK authentication works.
 
 2008-05-15  Simon Josefsson <simon@josefsson.org>
 
@@ -434,6 +667,15 @@
 2008-04-26  Nikos Mavrogiannopoulos <nmav@turtle.(none)>
 
 	* lib/crypto.c, lib/random.c: faster seek into the list.
+
+2008-04-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_psk_netconf.c, tests/netconf-psk.c: Change PSK
+	key derivation algorithm.
+
+2008-04-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
 
 2008-04-25  Nikos Mavrogiannopoulos <nmav@turtle.(none)>
 
@@ -913,9 +1155,62 @@
 
 	* NEWS, THANKS, doc/gnutls.texi: Document how to generate CRLs.
 
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.4.netconf.0.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump version.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-psk.c: Typo.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Typo.
+
+2008-04-13  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Typo.
+
 2008-04-13  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
 
 	* includes/gnutls/openpgp.h: changed api.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-serv-psk.c: Doc fix.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-psk.c, doc/examples/ex-serv-psk.c: Add, PSK
+	self test.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Typo.
+
+2008-04-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Add ex-serv-psk.
 
 2008-04-12  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
 
@@ -946,6 +1241,32 @@
 	* lib/openpgp/extras.c, lib/openpgp/pgp.c, lib/openpgp/privkey.c: 
 	corrected bug in openpgp import when data is of size zero. Reported
 	by Daniel Kahn
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Fix mem leak on errors.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/netconf-psk.c: Fix bugs.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Fix bugs.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/netconf-psk.c: Starting pointer for NETCONF-PSK support.
+
+2008-04-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/Makefile.am,
+	lib/gnutls_psk_netconf.c, tests/Makefile.am: Starting pointer for
+	NETCONF-PSK support.
 
 2008-04-04  Nikos <nmav@crystal.(none)>
 
