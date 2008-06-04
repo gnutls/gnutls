@@ -1493,6 +1493,17 @@ file can be stored to the credentials structure by calling
 password file format is to be used, then the function
 @ref{gnutls_psk_set_server_credentials_function}, should be used instead.
 
+The server can help the client chose a suitable username and password,
+by sending a hint.  In the server, specify the hint by calling
+@ref{gnutls_psk_set_server_credentials_hint}.  The client can retrieve
+the hint, for example in the callback function, using
+@ref{gnutls_psk_client_get_hint}.
+
+There is no standard mechanism to derive a PSK key from a password
+specified by the TLS PSK document.  However, GnuTLS provides
+@ref{gnutls_psk_netconf_derive_key} which follows the algorithm
+specified in @file{draft-ietf-netconf-tls-02.txt}.
+
 Some helper functions such as:
 
 @itemize
@@ -2509,6 +2520,7 @@ application.  The applications are discussed in this chapter.
 * Invoking gnutls-cli-debug::
 * Invoking gnutls-serv::
 * Invoking certtool::
+* Invoking psktool::
 @end menu
 
 @node Invoking srptool
@@ -2612,6 +2624,63 @@ Usage:  gnutls-cli [options] hostname
      -v, --version            prints the program's version number
      --copyright              prints the program's license
 @end verbatim
+
+@menu
+* Example client PSK connection::
+@end menu
+
+@node Example client PSK connection
+@subsection Example client PSK connection
+@cindex PSK client
+
+If your server only supports the PSK ciphersuite, connecting to it
+should be as simple as connecting to the server:
+
+@smallexample
+$ ./gnutls-cli -p 5556 localhost
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- PSK client callback. PSK hint 'psk_identity_hint'
+Enter PSK identity: psk_identity
+Enter password: 
+- PSK authentication. PSK hint 'psk_identity_hint'
+- Version: TLS1.1
+- Key Exchange: PSK
+- Cipher: AES-128-CBC
+- MAC: SHA1
+- Compression: NULL
+- Handshake was completed
+
+- Simple Client Mode:
+@end smallexample
+
+If the server supports several cipher suites, you may need to force it
+to chose PSK by using a cipher priority parameter such as
+@code{--priority NORMAL:+PSK:-RSA:-DHE-RSA:-DHE-PSK}.
+
+@cindex Netconf
+Instead of using the Netconf-way to derive the PSK key from a
+password, you can also give the PSK username and key directly on the
+command line:
+
+@smallexample
+$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- PSK authentication. PSK hint 'psk_identity_hint'
+- Version: TLS1.1
+- Key Exchange: PSK
+- Cipher: AES-128-CBC
+- MAC: SHA1
+- Compression: NULL
+- Handshake was completed
+
+- Simple Client Mode:
+@end smallexample
+
+By keeping the @code{--pskusername} parameter and removing the
+@code{--pskkey} parameter, it will query only for the password during
+the handshake.
 
 @node Invoking gnutls-cli-debug
 @section Invoking gnutls-cli-debug
@@ -2887,6 +2956,39 @@ gnutls-serv --http \
             --srppasswd srp-passwd.txt \
             --pskpasswd psk-passwd.txt
 @end example
+
+@menu
+* Example server PSK connection::
+@end menu
+
+@node Example server PSK connection
+@subsection Example server PSK connection
+@cindex PSK server
+
+To set up a PSK server with @code{gnutls-serv} you need to create PSK
+password file (@pxref{Invoking psktool}).  In the example below, I
+type @code{password} at the prompt.
+
+@smallexample
+$ ./psktool -u psk_identity -p psks.txt -n psk_identity_hint
+Enter password:
+Key stored to psks.txt
+$ cat psks.txt
+psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
+$
+@end smallexample
+
+After this, start the server pointing to the password file.  We
+disable DHE-PSK.
+
+@smallexample
+$ ./gnutls-serv --pskpasswd psks.txt  --pskhint psk_identity_hint --priority NORMAL:-DHE-PSK
+Set static Diffie Hellman parameters, consider --dhparams.
+Echo Server ready. Listening to port '5556'.
+@end smallexample
+
+You can now connect to the server using a PSK client (@pxref{Example
+client PSK connection}).
 
 @node Invoking certtool
 @section Invoking certtool
@@ -3169,6 +3271,33 @@ signing_key
 # Whether this key will be used for time stamping.
 #time_stamping_key
 @end example
+
+@node Invoking psktool
+@section Invoking psktool
+@cindex psktool
+
+This is a program to manage @acronym{PSK} username and keys.
+
+@verbatim
+PSKtool help
+Usage : psktool [options]
+     -u, --username username
+                              specify username.
+     -p, --passwd FILE        specify a password file.
+     -n, --netconf-hint HINT
+                              derive key from Netconf password, using 
+                              HINT as the psk_identity_hint.
+     -s, --keysize SIZE       specify the key size in bytes.
+     -v, --version            prints the program's version number
+     -h, --help               shows this help text
+@end verbatim
+
+Normally the file will generate random keys for the indicate username.
+You may also derive PSK keys from passwords, using the algorithm
+specified in @file{draft-ietf-netconf-tls-02.txt}.  The algorithm
+needs a PSK identity hint, which you specify using
+@code{--netconf-hint}.  To derive a PSK key from a password with an
+empty PSK identity hint, using @code{--netconf-hint ""}.
 
 @node Function reference
 @chapter Function Reference
