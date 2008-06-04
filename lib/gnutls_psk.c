@@ -147,12 +147,12 @@ error:
 }
 
 /**
-  * gnutls_psk_free_server_credentials - Used to free an allocated gnutls_psk_server_credentials_t structure
-  * @sc: is an #gnutls_psk_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to free (deallocate) it.
-  **/
+ * gnutls_psk_free_server_credentials - Used to free an allocated gnutls_psk_server_credentials_t structure
+ * @sc: is an #gnutls_psk_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to free (deallocate) it.
+ **/
 void
 gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t sc)
 {
@@ -161,14 +161,14 @@ gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t sc)
 }
 
 /**
-  * gnutls_psk_allocate_server_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
-  * @sc: is a pointer to an #gnutls_psk_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to allocate it.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_psk_allocate_server_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
+ * @sc: is a pointer to an #gnutls_psk_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to allocate it.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
 {
@@ -182,16 +182,16 @@ gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
 
 
 /**
-  * gnutls_psk_set_server_credentials_file - Used to set the password files, in a gnutls_psk_server_credentials_t structure
-  * @res: is an #gnutls_psk_server_credentials_t structure.
-  * @password_file: is the PSK password file (passwd.psk)
-  *
-  * This function sets the password file, in a
-  * %gnutls_psk_server_credentials_t structure.  This password file
-  * holds usernames and keys and will be used for PSK authentication.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_psk_set_server_credentials_file - Used to set the password files, in a gnutls_psk_server_credentials_t structure
+ * @res: is an #gnutls_psk_server_credentials_t structure.
+ * @password_file: is the PSK password file (passwd.psk)
+ *
+ * This function sets the password file, in a
+ * %gnutls_psk_server_credentials_t structure.  This password file
+ * holds usernames and keys and will be used for PSK authentication.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
 					res, const char *password_file)
@@ -231,6 +231,8 @@ gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
  * and password).
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.4.0
  **/
 int
 gnutls_psk_set_server_credentials_hint (gnutls_psk_server_credentials_t res,
@@ -247,25 +249,25 @@ gnutls_psk_set_server_credentials_hint (gnutls_psk_server_credentials_t res,
 }
 
 /**
-  * gnutls_psk_set_server_credentials_function - Used to set a callback to retrieve the user's PSK credentials
-  * @cred: is a #gnutls_psk_server_credentials_t structure.
-  * @func: is the callback function
-  *
-  * This function can be used to set a callback to retrieve the user's PSK credentials.
-  * The callback's function form is:
-  * int (*callback)(gnutls_session_t, const char* username,
-  *  gnutls_datum_t* key);
-  *
-  * @username contains the actual username. 
-  * The @key must be filled in using the gnutls_malloc(). 
-  *
-  * In case the callback returned a negative number then gnutls will
-  * assume that the username does not exist.
-  *
-  * The callback function will only be called once per handshake.  The
-  * callback function should return 0 on success, while -1 indicates
-  * an error.
-  **/
+ * gnutls_psk_set_server_credentials_function - Used to set a callback to retrieve the user's PSK credentials
+ * @cred: is a #gnutls_psk_server_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function can be used to set a callback to retrieve the user's PSK credentials.
+ * The callback's function form is:
+ * int (*callback)(gnutls_session_t, const char* username,
+ *  gnutls_datum_t* key);
+ *
+ * @username contains the actual username.
+ * The @key must be filled in using the gnutls_malloc().
+ *
+ * In case the callback returned a negative number then gnutls will
+ * assume that the username does not exist.
+ *
+ * The callback function will only be called once per handshake.  The
+ * callback function should return 0 on success, while -1 indicates
+ * an error.
+ **/
 void
 gnutls_psk_set_server_credentials_function (gnutls_psk_server_credentials_t
 					    cred,
@@ -276,25 +278,25 @@ gnutls_psk_set_server_credentials_function (gnutls_psk_server_credentials_t
 }
 
 /**
-  * gnutls_psk_set_client_credentials_function - Used to set a callback to retrieve the username and key
-  * @cred: is a #gnutls_psk_server_credentials_t structure.
-  * @func: is the callback function
-  *
-  * This function can be used to set a callback to retrieve the username and
-  * password for client PSK authentication.
-  * The callback's function form is:
-  * int (*callback)(gnutls_session_t, char** username,
-  *  gnutls_datum_t* key);
-  *
-  * The @username and @key->data must be allocated using gnutls_malloc().
-  * @username should be ASCII strings or UTF-8 strings prepared using
-  * the "SASLprep" profile of "stringprep".
-  *
-  * The callback function will be called once per handshake.
-  *
-  * The callback function should return 0 on success.
-  * -1 indicates an error.
-  **/
+ * gnutls_psk_set_client_credentials_function - Used to set a callback to retrieve the username and key
+ * @cred: is a #gnutls_psk_server_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function can be used to set a callback to retrieve the username and
+ * password for client PSK authentication.
+ * The callback's function form is:
+ * int (*callback)(gnutls_session_t, char** username,
+ *  gnutls_datum_t* key);
+ *
+ * The @username and @key->data must be allocated using gnutls_malloc().
+ * @username should be ASCII strings or UTF-8 strings prepared using
+ * the "SASLprep" profile of "stringprep".
+ *
+ * The callback function will be called once per handshake.
+ *
+ * The callback function should return 0 on success.
+ * -1 indicates an error.
+ **/
 void
 gnutls_psk_set_client_credentials_function (gnutls_psk_client_credentials_t
 					    cred,
@@ -306,14 +308,14 @@ gnutls_psk_set_client_credentials_function (gnutls_psk_client_credentials_t
 
 
 /**
-  * gnutls_psk_server_get_username - return the username of the peer
-  * @session: is a gnutls session
-  *
-  * This should only be called in case of PSK authentication and in
-  * case of a server.
-  *
-  * Returns: the username of the peer, or %NULL in case of an error.
-  **/
+ * gnutls_psk_server_get_username - return the username of the peer
+ * @session: is a gnutls session
+ *
+ * This should only be called in case of PSK authentication and in
+ * case of a server.
+ *
+ * Returns: the username of the peer, or %NULL in case of an error.
+ **/
 const char *
 gnutls_psk_server_get_username (gnutls_session_t session)
 {
@@ -340,6 +342,8 @@ gnutls_psk_server_get_username (gnutls_session_t session)
  * authentication and in case of a client.
  *
  * Returns: the identity hint of the peer, or %NULL in case of an error.
+ *
+ * Since: 2.4.0
  **/
 const char *
 gnutls_psk_client_get_hint (gnutls_session_t session)
