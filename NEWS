@@ -11,6 +11,8 @@ The function is gnutls_psk_client_get_hint.
 ** psktool: Support new --netconf-hint to generate PSK key from password.
 Uses the Netconf algorithm to derive PSK key from password.
 
+** gnutls-serv: Support new --pskhint parameter to set PSK identity hint.
+
 ** API and ABI modifications:
 gnutls_psk_client_get_hint: ADDED.
 
