@@ -2524,58 +2524,316 @@ let you use the library for common tasks without writing an
 application.  The applications are discussed in this chapter.
 
 @menu
-* Invoking srptool::
+* Invoking certtool::
 * Invoking gnutls-cli::
 * Invoking gnutls-cli-debug::
 * Invoking gnutls-serv::
-* Invoking certtool::
 * Invoking psktool::
+* Invoking srptool::
 @end menu
 
-@node Invoking srptool
-@section Invoking srptool
-@anchor{srptool}
-@cindex srptool
+@node Invoking certtool
+@section Invoking certtool
+@cindex certtool
 
-The @file{srptool} is a very simple program that emulates the programs
-in the @emph{Stanford SRP libraries}.  It is intended for use in
-places where you don't expect @acronym{SRP} authentication to be the
-used for system users.  Traditionally @emph{libsrp} used two
-files. One called 'tpasswd' which holds usernames and verifiers, and
-'tpasswd.conf' which holds generators and primes.
+This is a program to generate @acronym{X.509} certificates, certificate
+requests, CRLs and private keys.
 
-How to use srptool:
+@verbatim
+Certtool help
+Usage: certtool [options]
+     -s, --generate-self-signed
+                              Generate a self-signed certificate.
+     -c, --generate-certificate
+                              Generate a signed certificate.
+     --generate-proxy         Generate a proxy certificate.
+     --generate-crl           Generate a CRL.
+     -u, --update-certificate
+                              Update a signed certificate.
+     -p, --generate-privkey   Generate a private key.
+     -q, --generate-request   Generate a PKCS #10 certificate
+                              request.
+     -e, --verify-chain       Verify a PEM encoded certificate chain.
+                              The last certificate in the chain must
+                              be a self signed one.
+     --verify-crl             Verify a CRL.
+     --generate-dh-params     Generate PKCS #3 encoded Diffie Hellman
+                              parameters.
+     --get-dh-params          Get the included PKCS #3 encoded Diffie
+                              Hellman parameters.
+     --load-privkey FILE      Private key file to use.
+     --load-request FILE      Certificate request file to use.
+     --load-certificate FILE
+                              Certificate file to use.
+     --load-ca-privkey FILE   Certificate authority's private key
+                              file to use.
+     --load-ca-certificate FILE
+                              Certificate authority's certificate
+                              file to use.
+     --password PASSWORD      Password to use.
+     -i, --certificate-info   Print information on a certificate.
+     -l, --crl-info           Print information on a CRL.
+     --p12-info               Print information on a PKCS #12
+                              structure.
+     --p7-info                Print information on a PKCS #7
+                              structure.
+     --smime-to-p7            Convert S/MIME to PKCS #7 structure.
+     -k, --key-info           Print information on a private key.
+     --fix-key                Regenerate the parameters in a private
+                              key.
+     --to-p12                 Generate a PKCS #12 structure.
+     -8, --pkcs8              Use PKCS #8 format for private keys.
+     --dsa                    Use DSA keys.
+     --hash STR               Hash algorithm to use for signing
+                              (MD5,SHA1,RMD160).
+     --export-ciphers         Use weak encryption algorithms.
+     --inder                  Use DER format for input certificates
+                              and private keys.
+     --outder                 Use DER format for output certificates
+                              and private keys.
+     --bits BITS              specify the number of bits for key
+                              generation.
+     --outfile FILE           Output file.
+     --infile FILE            Input file.
+     --template FILE          Template file to use for non
+                              interactive operation.
+     -d, --debug LEVEL        specify the debug level. Default is 1.
+     -h, --help               shows this help text
+     -v, --version            shows the program's version
+     --copyright              shows the program's license
+@end verbatim
+
+The program can be used interactively or non interactively by
+specifying the @code{--template} command line option. See below for an
+example of a template file.
+
+How to use certtool interactively:
+
+@itemize
+@item
+To generate parameters for Diffie Hellman key exchange, use the command:
+@example
+$ certtool --generate-dh-params --outfile dh.pem
+@end example
+
+@item
+To generate parameters for the RSA-EXPORT key exchange, use the command:
+@example
+$ certtool --generate-privkey --bits 512 --outfile rsa.pem
+@end example
+
+@end itemize
 
 @itemize
 
 @item
-To create tpasswd.conf which holds the g and n values for
-@acronym{SRP} protocol (generator and a large prime), run:
+To create a self signed certificate, use the command:
+@example
+$ certtool --generate-privkey --outfile ca-key.pem
+$ certtool --generate-self-signed --load-privkey ca-key.pem \
+   --outfile ca-cert.pem
+@end example
+
+Note that a self-signed certificate usually belongs to a certificate
+authority, that signs other certificates.
+
+@item
+To create a private key, run:
 
 @example
-$ srptool --create-conf /etc/tpasswd.conf
+$ certtool --generate-privkey --outfile key.pem
 @end example
 
 @item
-This command will create /etc/tpasswd and will add user 'test' (you
-will also be prompted for a password). Verifiers are stored by default
-in the way libsrp expects.
+To generate a certificate using the private key, use the command:
 
 @example
-$ srptool --passwd /etc/tpasswd \
-    --passwd-conf /etc/tpasswd.conf -u test
+$ certtool --generate-certificate --load-privkey key.pem \
+   --outfile cert.pem --load-ca-certificate ca-cert.pem \
+   --load-ca-privkey ca-key.pem
 @end example
 
 @item
-This command will check against a password. If the password matches
-the one in /etc/tpasswd you will get an ok.
+To create a certificate request (needed when the certificate is issued by
+another party), run:
 
 @example
-$ srptool --passwd /etc/tpasswd \
-    --passwd-conf /etc/tpasswd.conf --verify -u test
+$ certtool --generate-request --load-privkey key.pem \
+  --outfile request.pem
+@end example
+
+@item
+To generate a certificate using the previous request, use the command:
+
+@example
+$ certtool --generate-certificate --load-request request.pem \
+   --outfile cert.pem \
+   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
+@end example
+
+@item
+To view the certificate information, use:
+
+@example
+$ certtool --certificate-info --infile cert.pem
+@end example
+
+@item
+To generate a @acronym{PKCS} #12 structure using the previous key and
+certificate, use the command:
+
+@example
+$ certtool --load-certificate cert.pem --load-privkey key.pem \
+  --to-p12 --outder --outfile key.p12
+@end example
+
+@item
+Proxy certificate can be used to delegate your credential to a
+temporary, typically short-lived, certificate.  To create one from the
+previously created certificate, first create a temporary key and then
+generate a proxy certificate for it, using the commands:
+
+@example
+$ certtool --generate-privkey > proxy-key.pem
+$ certtool --generate-proxy --load-ca-privkey key.pem \
+  --load-privkey proxy-key.pem --load-certificate cert.pem \
+  --outfile proxy-cert.pem
+@end example
+
+@item
+To create an empty Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem
+@end example
+
+To create a CRL that contains some revoked certificates, place the
+certificates in a file and use @code{--load-certificate} as follows:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
+@end example
+
+@item
+To verify a Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
 @end example
 
 @end itemize
+
+Certtool's template file format:
+
+@itemize
+
+@item
+Firstly create a file named 'cert.cfg' that contains the information
+about the certificate. An example file is listed below.
+
+@item
+Then execute:
+
+@example
+$ certtool --generate-certificate cert.pem --load-privkey key.pem  \
+   --template cert.cfg \
+   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
+@end example
+
+@end itemize
+
+An example certtool template file:
+
+@example
+# X.509 Certificate options
+#
+# DN options
+
+# The organization of the subject.
+organization = "Koko inc."
+
+# The organizational unit of the subject.
+unit = "sleeping dept."
+
+# The locality of the subject.
+# locality =
+
+# The state of the certificate owner.
+state = "Attiki"
+
+# The country of the subject. Two letter code.
+country = GR
+
+# The common name of the certificate owner.
+cn = "Cindy Lauper"
+
+# A user id of the certificate owner.
+#uid = "clauper"
+
+# If the supported DN OIDs are not adequate you can set
+# any OID here.
+# For example set the X.520 Title and the X.520 Pseudonym
+# by using OID and string pairs.
+#dn_oid = "2.5.4.12" "Dr." "2.5.4.65" "jackal"
+
+# This is deprecated and should not be used in new
+# certificates.
+# pkcs9_email = "none@@none.org"
+
+# The serial number of the certificate
+serial = 007
+
+# In how many days, counting from today, this certificate will expire.
+expiration_days = 700
+
+# X.509 v3 extensions
+
+# A dnsname in case of a WWW server.
+#dns_name = "www.none.org"
+
+# An IP address in case of a server.
+#ip_address = "192.168.1.1"
+
+# An email in case of a person
+email = "none@@none.org"
+
+# An URL that has CRLs (certificate revocation lists)
+# available. Needed in CA certificates.
+#crl_dist_points = "http://www.getcrl.crl/getcrl/"
+
+# Whether this is a CA certificate or not
+#ca
+
+# Whether this certificate will be used for a TLS client
+#tls_www_client
+
+# Whether this certificate will be used for a TLS server
+#tls_www_server
+
+# Whether this certificate will be used to sign data (needed
+# in TLS DHE ciphersuites).
+signing_key
+
+# Whether this certificate will be used to encrypt data (needed
+# in TLS RSA ciphersuites). Note that it is prefered to use different
+# keys for encryption and signing.
+#encryption_key
+
+# Whether this key will be used to sign other certificates.
+#cert_signing_key
+
+# Whether this key will be used to sign CRLs.
+#crl_signing_key
+
+# Whether this key will be used to sign code.
+#code_signing_key
+
+# Whether this key will be used to sign OCSP data.
+#ocsp_signing_key
+
+# Whether this key will be used for time stamping.
+#time_stamping_key
+@end example
 
 @node Invoking gnutls-cli
 @section Invoking gnutls-cli
@@ -3006,309 +3264,6 @@ Echo Server ready. Listening to port '5556'.
 You can now connect to the server using a PSK client (@pxref{Example
 client PSK connection}).
 
-@node Invoking certtool
-@section Invoking certtool
-@cindex certtool
-
-This is a program to generate @acronym{X.509} certificates, certificate
-requests, CRLs and private keys.
-
-@verbatim
-Certtool help
-Usage: certtool [options]
-     -s, --generate-self-signed
-                              Generate a self-signed certificate.
-     -c, --generate-certificate
-                              Generate a signed certificate.
-     --generate-proxy         Generate a proxy certificate.
-     --generate-crl           Generate a CRL.
-     -u, --update-certificate
-                              Update a signed certificate.
-     -p, --generate-privkey   Generate a private key.
-     -q, --generate-request   Generate a PKCS #10 certificate
-                              request.
-     -e, --verify-chain       Verify a PEM encoded certificate chain.
-                              The last certificate in the chain must
-                              be a self signed one.
-     --verify-crl             Verify a CRL.
-     --generate-dh-params     Generate PKCS #3 encoded Diffie Hellman
-                              parameters.
-     --get-dh-params          Get the included PKCS #3 encoded Diffie
-                              Hellman parameters.
-     --load-privkey FILE      Private key file to use.
-     --load-request FILE      Certificate request file to use.
-     --load-certificate FILE
-                              Certificate file to use.
-     --load-ca-privkey FILE   Certificate authority's private key
-                              file to use.
-     --load-ca-certificate FILE
-                              Certificate authority's certificate
-                              file to use.
-     --password PASSWORD      Password to use.
-     -i, --certificate-info   Print information on a certificate.
-     -l, --crl-info           Print information on a CRL.
-     --p12-info               Print information on a PKCS #12
-                              structure.
-     --p7-info                Print information on a PKCS #7
-                              structure.
-     --smime-to-p7            Convert S/MIME to PKCS #7 structure.
-     -k, --key-info           Print information on a private key.
-     --fix-key                Regenerate the parameters in a private
-                              key.
-     --to-p12                 Generate a PKCS #12 structure.
-     -8, --pkcs8              Use PKCS #8 format for private keys.
-     --dsa                    Use DSA keys.
-     --hash STR               Hash algorithm to use for signing
-                              (MD5,SHA1,RMD160).
-     --export-ciphers         Use weak encryption algorithms.
-     --inder                  Use DER format for input certificates
-                              and private keys.
-     --outder                 Use DER format for output certificates
-                              and private keys.
-     --bits BITS              specify the number of bits for key
-                              generation.
-     --outfile FILE           Output file.
-     --infile FILE            Input file.
-     --template FILE          Template file to use for non
-                              interactive operation.
-     -d, --debug LEVEL        specify the debug level. Default is 1.
-     -h, --help               shows this help text
-     -v, --version            shows the program's version
-     --copyright              shows the program's license
-@end verbatim
-
-The program can be used interactively or non interactively by
-specifying the @code{--template} command line option. See below for an
-example of a template file.
-
-How to use certtool interactively:
-
-@itemize
-@item
-To generate parameters for Diffie Hellman key exchange, use the command:
-@example
-$ certtool --generate-dh-params --outfile dh.pem
-@end example
-
-@item
-To generate parameters for the RSA-EXPORT key exchange, use the command:
-@example
-$ certtool --generate-privkey --bits 512 --outfile rsa.pem
-@end example
-
-@end itemize
-
-@itemize
-
-@item
-To create a self signed certificate, use the command:
-@example
-$ certtool --generate-privkey --outfile ca-key.pem
-$ certtool --generate-self-signed --load-privkey ca-key.pem \
-   --outfile ca-cert.pem
-@end example
-
-Note that a self-signed certificate usually belongs to a certificate
-authority, that signs other certificates.
-
-@item
-To create a private key, run:
-
-@example
-$ certtool --generate-privkey --outfile key.pem
-@end example
-
-@item
-To generate a certificate using the private key, use the command:
-
-@example
-$ certtool --generate-certificate --load-privkey key.pem \
-   --outfile cert.pem --load-ca-certificate ca-cert.pem \
-   --load-ca-privkey ca-key.pem
-@end example
-
-@item
-To create a certificate request (needed when the certificate is issued by
-another party), run:
-
-@example
-$ certtool --generate-request --load-privkey key.pem \
-  --outfile request.pem
-@end example
-
-@item
-To generate a certificate using the previous request, use the command:
-
-@example
-$ certtool --generate-certificate --load-request request.pem \
-   --outfile cert.pem \
-   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
-@end example
-
-@item
-To view the certificate information, use:
-
-@example
-$ certtool --certificate-info --infile cert.pem
-@end example
-
-@item
-To generate a @acronym{PKCS} #12 structure using the previous key and
-certificate, use the command:
-
-@example
-$ certtool --load-certificate cert.pem --load-privkey key.pem \
-  --to-p12 --outder --outfile key.p12
-@end example
-
-@item
-Proxy certificate can be used to delegate your credential to a
-temporary, typically short-lived, certificate.  To create one from the
-previously created certificate, first create a temporary key and then
-generate a proxy certificate for it, using the commands:
-
-@example
-$ certtool --generate-privkey > proxy-key.pem
-$ certtool --generate-proxy --load-ca-privkey key.pem \
-  --load-privkey proxy-key.pem --load-certificate cert.pem \
-  --outfile proxy-cert.pem
-@end example
-
-@item
-To create an empty Certificate Revocation List (CRL) do:
-
-@example
-$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem
-@end example
-
-To create a CRL that contains some revoked certificates, place the
-certificates in a file and use @code{--load-certificate} as follows:
-
-@example
-$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
-@end example
-
-@item
-To verify a Certificate Revocation List (CRL) do:
-
-@example
-$ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
-@end example
-
-@end itemize
-
-Certtool's template file format:
-
-@itemize
-
-@item
-Firstly create a file named 'cert.cfg' that contains the information
-about the certificate. An example file is listed below.
-
-@item
-Then execute:
-
-@example
-$ certtool --generate-certificate cert.pem --load-privkey key.pem  \
-   --template cert.cfg \
-   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
-@end example
-
-@end itemize
-
-An example certtool template file:
-
-@example
-# X.509 Certificate options
-#
-# DN options
-
-# The organization of the subject.
-organization = "Koko inc."
-
-# The organizational unit of the subject.
-unit = "sleeping dept."
-
-# The locality of the subject.
-# locality =
-
-# The state of the certificate owner.
-state = "Attiki"
-
-# The country of the subject. Two letter code.
-country = GR
-
-# The common name of the certificate owner.
-cn = "Cindy Lauper"
-
-# A user id of the certificate owner.
-#uid = "clauper"
-
-# If the supported DN OIDs are not adequate you can set
-# any OID here.
-# For example set the X.520 Title and the X.520 Pseudonym
-# by using OID and string pairs.
-#dn_oid = "2.5.4.12" "Dr." "2.5.4.65" "jackal"
-
-# This is deprecated and should not be used in new
-# certificates.
-# pkcs9_email = "none@@none.org"
-
-# The serial number of the certificate
-serial = 007
-
-# In how many days, counting from today, this certificate will expire.
-expiration_days = 700
-
-# X.509 v3 extensions
-
-# A dnsname in case of a WWW server.
-#dns_name = "www.none.org"
-
-# An IP address in case of a server.
-#ip_address = "192.168.1.1"
-
-# An email in case of a person
-email = "none@@none.org"
-
-# An URL that has CRLs (certificate revocation lists)
-# available. Needed in CA certificates.
-#crl_dist_points = "http://www.getcrl.crl/getcrl/"
-
-# Whether this is a CA certificate or not
-#ca
-
-# Whether this certificate will be used for a TLS client
-#tls_www_client
-
-# Whether this certificate will be used for a TLS server
-#tls_www_server
-
-# Whether this certificate will be used to sign data (needed
-# in TLS DHE ciphersuites).
-signing_key
-
-# Whether this certificate will be used to encrypt data (needed
-# in TLS RSA ciphersuites). Note that it is prefered to use different
-# keys for encryption and signing.
-#encryption_key
-
-# Whether this key will be used to sign other certificates.
-#cert_signing_key
-
-# Whether this key will be used to sign CRLs.
-#crl_signing_key
-
-# Whether this key will be used to sign code.
-#code_signing_key
-
-# Whether this key will be used to sign OCSP data.
-#ocsp_signing_key
-
-# Whether this key will be used for time stamping.
-#time_stamping_key
-@end example
-
 @node Invoking psktool
 @section Invoking psktool
 @cindex psktool
@@ -3335,6 +3290,51 @@ specified in @file{draft-ietf-netconf-tls-02.txt}.  The algorithm
 needs a PSK identity hint, which you specify using
 @code{--netconf-hint}.  To derive a PSK key from a password with an
 empty PSK identity hint, using @code{--netconf-hint ""}.
+
+@node Invoking srptool
+@section Invoking srptool
+@anchor{srptool}
+@cindex srptool
+
+The @file{srptool} is a very simple program that emulates the programs
+in the @emph{Stanford SRP libraries}.  It is intended for use in
+places where you don't expect @acronym{SRP} authentication to be the
+used for system users.  Traditionally @emph{libsrp} used two
+files. One called 'tpasswd' which holds usernames and verifiers, and
+'tpasswd.conf' which holds generators and primes.
+
+How to use srptool:
+
+@itemize
+
+@item
+To create tpasswd.conf which holds the g and n values for
+@acronym{SRP} protocol (generator and a large prime), run:
+
+@example
+$ srptool --create-conf /etc/tpasswd.conf
+@end example
+
+@item
+This command will create /etc/tpasswd and will add user 'test' (you
+will also be prompted for a password). Verifiers are stored by default
+in the way libsrp expects.
+
+@example
+$ srptool --passwd /etc/tpasswd \
+    --passwd-conf /etc/tpasswd.conf -u test
+@end example
+
+@item
+This command will check against a password. If the password matches
+the one in /etc/tpasswd you will get an ok.
+
+@example
+$ srptool --passwd /etc/tpasswd \
+    --passwd-conf /etc/tpasswd.conf --verify -u test
+@end example
+
+@end itemize
 
 @node Function reference
 @chapter Function Reference
