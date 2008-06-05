@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -280,23 +280,6 @@ int optval = 1;
 void
 global_start (void)
 {
-  /* this must be called once in the program, it is mostly for the server.
-   */
-  gnutls_global_init ();
-
-  gnutls_anon_allocate_server_credentials (&anoncred);
-
-  success ("Launched, generating DH parameters...\n");
-
-  generate_dh_params ();
-
-  gnutls_anon_set_server_dh_params (anoncred, dh_params);
-
-  if (TLS_SESSION_CACHE != 0)
-    {
-      wrap_db_init ();
-    }
-
   /* Socket operations
    */
   listen_sd = socket (AF_INET, SOCK_STREAM, 0);
@@ -348,6 +331,23 @@ global_stop (void)
 void
 server (void)
 {
+  /* this must be called once in the program, it is mostly for the server.
+   */
+  gnutls_global_init ();
+
+  gnutls_anon_allocate_server_credentials (&anoncred);
+
+  success ("Launched, generating DH parameters...\n");
+
+  generate_dh_params ();
+
+  gnutls_anon_set_server_dh_params (anoncred, dh_params);
+
+  if (TLS_SESSION_CACHE != 0)
+    {
+      wrap_db_init ();
+    }
+
   int t;
 
   for (t = 0; t < 2; t++)
