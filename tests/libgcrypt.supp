@@ -20,8 +20,6 @@
    fun:_gcry_check_version
    fun:gcry_check_version
    fun:gnutls_global_init
-   fun:doit
-   fun:main
 }
 
 {
@@ -38,8 +36,6 @@
    fun:_gcry_check_version
    fun:gcry_check_version
    fun:gnutls_global_init
-   fun:doit
-   fun:main
 }
 
 {
@@ -56,8 +52,6 @@
    fun:_gcry_check_version
    fun:gcry_check_version
    fun:gnutls_global_init
-   fun:doit
-   fun:main
 }
 
 {
@@ -74,8 +68,6 @@
    fun:gc_pseudo_random
    fun:_gnutls_rnd_init
    fun:gnutls_global_init
-   fun:doit
-   fun:main
 }
 
 {
@@ -92,6 +84,4 @@
    fun:gc_pseudo_random
    fun:_gnutls_rnd_init
    fun:gnutls_global_init
-   fun:doit
-   fun:main
 }
