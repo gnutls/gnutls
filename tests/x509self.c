@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -461,6 +461,8 @@ server (void)
 
   gnutls_certificate_free_credentials (x509_cred);
 
+  gnutls_dh_params_deinit (dh_params);
+
   gnutls_global_deinit ();
 
   success ("server: finished\n");
@@ -470,10 +472,6 @@ server (void)
 void
 doit (void)
 {
-  server_start ();
-  if (error_count)
-    return;
-
   child = fork ();
   if (child < 0)
     {
@@ -486,6 +484,10 @@ doit (void)
     {
       int status;
       /* parent */
+      server_start ();
+      if (error_count)
+	return;
+
       server ();
       wait (&status);
     }
