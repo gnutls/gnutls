@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -81,7 +81,6 @@ print_x509_certificate_info (gnutls_session_t session)
       size = sizeof (serial);
       gnutls_x509_crt_get_serial (cert, serial, &size);
 
-      size = sizeof (serial);
       printf ("\tCertificate serial number: %s\n", bin2hex (serial, size));
 
       /* Extract some of the public key algorithm's parameters
