@@ -9,7 +9,7 @@ See the end for copying conditions.
 
 ** doc/: Add psktool to info index.  Some minor cleanups.
 
-** tests/: New non-forking TLS handshake test.
+** tests/: Added non-forking TLS handshake test, see tests/mini.c.
 
 ** tests/: Added libgcrypt.supp which can be used with valgrind.
 The file suppresses the known libgcrypt memory leaks, so they aren't
