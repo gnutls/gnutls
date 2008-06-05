@@ -68,7 +68,6 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
   size_t newlen = to_server_len + len;
   char *tmp;
-  size_t i;
 
   success ("client_push len %d has %d\n", len, to_server_len);
   hexprint (data, len);
@@ -111,7 +110,6 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
   size_t newlen = to_client_len + len;
   char *tmp;
-  size_t i;
 
   success ("server_push len %d has %d\n", len, to_client_len);
 
@@ -146,12 +144,11 @@ doit (void)
   /* Client stuff. */
   gnutls_anon_client_credentials_t c_anoncred;
   gnutls_session_t client;
-  int cret = GNUTLS_E_AGAIN;
+  int n, cret = GNUTLS_E_AGAIN;
   /* Need to enable anonymous KX specifically. */
   const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
   char buffer[MAX_BUF + 1];
   ssize_t ns;
-  size_t n;
   int ret;
 
   /* General init. */
@@ -230,10 +227,8 @@ doit (void)
   else
     {
       printf ("client: received %d: ", ret);
-      for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
+      for (n = 0; n < ret; n++)
+	fputc (buffer[n], stdout);
       fputs ("\n", stdout);
     }
 
