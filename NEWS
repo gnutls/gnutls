@@ -13,7 +13,8 @@ See the end for copying conditions.
 
 ** tests/: Added libgcrypt.supp which can be used with valgrind.
 The file suppresses the known libgcrypt memory leaks, so they aren't
-printed when you run valgrind on the gnutls self-tests.
+printed when you run valgrind on the gnutls self-tests.  Use it as
+follows: valgrind --suppressions=libgcrypt.supp ./x509self
 
 ** API and ABI modifications:
 No changes since last version.
