@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -226,13 +226,6 @@ int optval = 1;
 void
 server_start (void)
 {
-  /* this must be called once in the program
-   */
-  gnutls_global_init ();
-
-  gnutls_psk_allocate_server_credentials (&server_pskcred);
-  gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
-
   success ("Launched...\n");
 
   /* Socket operations
@@ -274,6 +267,13 @@ server_start (void)
 void
 server (void)
 {
+  /* this must be called once in the program
+   */
+  gnutls_global_init ();
+
+  gnutls_psk_allocate_server_credentials (&server_pskcred);
+  gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
+
   client_len = sizeof (sa_cli);
 
   session = initialize_tls_session ();
