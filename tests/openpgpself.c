@@ -379,29 +379,6 @@ const gnutls_datum_t server_key = { server_key_txt, sizeof (server_key_txt) };
 void
 server_start (void)
 {
-  /* this must be called once in the program
-   */
-  gnutls_global_init ();
-
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (2);
-
-  gnutls_certificate_allocate_credentials (&pgp_cred);
-
-  ret = gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &server_crt,
-						 &server_key, "auto",
-						 GNUTLS_OPENPGP_FMT_BASE64);
-  if (err < 0)
-    {
-      fail ("Could not set server key files...\n");
-    }
-
-  success ("Launched, setting DH parameters...\n");
-
-  generate_dh_params ();
-
-  gnutls_certificate_set_dh_params (pgp_cred, dh_params);
-
   /* Socket operations
    */
   listen_sd = socket (AF_INET, SOCK_STREAM, 0);
@@ -441,6 +418,29 @@ server_start (void)
 void
 server (void)
 {
+  /* this must be called once in the program
+   */
+  gnutls_global_init ();
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (2);
+
+  gnutls_certificate_allocate_credentials (&pgp_cred);
+
+  ret = gnutls_certificate_set_openpgp_key_mem2 (pgp_cred, &server_crt,
+						 &server_key, "auto",
+						 GNUTLS_OPENPGP_FMT_BASE64);
+  if (err < 0)
+    {
+      fail ("Could not set server key files...\n");
+    }
+
+  success ("Launched, setting DH parameters...\n");
+
+  generate_dh_params ();
+
+  gnutls_certificate_set_dh_params (pgp_cred, dh_params);
+
   client_len = sizeof (sa_cli);
 
   session = initialize_tls_session ();
@@ -501,6 +501,8 @@ server (void)
   close (listen_sd);
 
   gnutls_certificate_free_credentials (pgp_cred);
+
+  gnutls_dh_params_deinit (dh_params);
 
   gnutls_global_deinit ();
 
