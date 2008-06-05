@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -241,19 +241,6 @@ int optval = 1;
 void
 server_start (void)
 {
-  /* this must be called once in the program
-   */
-  gnutls_global_init ();
-
-  gnutls_global_set_log_function (tls_log_func);
-//  gnutls_global_set_log_level (99);
-
-  generate_dh_params ();
-
-  gnutls_psk_allocate_server_credentials (&server_pskcred);
-  gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
-  gnutls_psk_set_server_dh_params (server_pskcred, dh_params);
-
   success ("Launched, generating DH parameters...\n");
 
   /* Socket operations
@@ -295,6 +282,19 @@ server_start (void)
 void
 server (void)
 {
+  /* this must be called once in the program
+   */
+  gnutls_global_init ();
+
+  gnutls_global_set_log_function (tls_log_func);
+  //  gnutls_global_set_log_level (99);
+
+  generate_dh_params ();
+
+  gnutls_psk_allocate_server_credentials (&server_pskcred);
+  gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);
+  gnutls_psk_set_server_dh_params (server_pskcred, dh_params);
+
   client_len = sizeof (sa_cli);
 
   session = initialize_tls_session ();
@@ -352,6 +352,8 @@ server (void)
   close (listen_sd);
 
   gnutls_psk_free_server_credentials (server_pskcred);
+
+  gnutls_dh_params_deinit (dh_params);
 
   gnutls_global_deinit ();
 
