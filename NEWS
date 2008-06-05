@@ -7,6 +7,8 @@ See the end for copying conditions.
 
 ** libgnutls [OpenPGP]: Make OpenPGP handshakes work again.
 
+** doc/: Add psktool to info index.  Some minor cleanups.
+
 ** API and ABI modifications:
 No changes since last version.
 
