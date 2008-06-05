@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 Free Software Foundation
+ * Copyright (C) 2006, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -305,6 +305,8 @@ doit (void)
   if (ret != GNUTLS_E_ASN1_DER_ERROR)
     fail ("crt_import %d\n", ret);
 
+  gnutls_x509_crt_deinit (cert);
+
   ret = gnutls_x509_crt_init (&cert);
   if (ret < 0)
     fail ("crt_init %d\n", ret);
@@ -312,6 +314,8 @@ doit (void)
   ret = gnutls_x509_crt_import (cert, &der2Cert, GNUTLS_X509_FMT_DER);
   if (ret != GNUTLS_E_ASN1_DER_ERROR)
     fail ("crt2_import %d\n", ret);
+
+  gnutls_x509_crt_deinit (cert);
 
   ret = gnutls_x509_crt_init (&cert);
   if (ret < 0)
@@ -324,4 +328,6 @@ doit (void)
   success ("done\n");
 
   gnutls_x509_crt_deinit (cert);
+
+  gnutls_global_deinit ();
 }
