@@ -58,14 +58,14 @@ static const gnutls_datum_t cert_datum = { (char *)cert_pem,
 void
 doit (void)
 {
-
-  gnutls_global_init ();
   gnutls_x509_crt_t cert;
   gnutls_x509_dn_t sdn, dn2;
   unsigned char buf[8192], buf2[8192];
   size_t buflen, buf2len;
   gnutls_datum_t datum;
   int rv;
+
+  gnutls_global_init ();
 
   if (gnutls_x509_crt_init(&cert) == 0)
     success ("success: cert init\n");
@@ -119,4 +119,6 @@ doit (void)
   gnutls_x509_dn_deinit (dn2);
 
   gnutls_x509_crt_deinit (cert);
+
+  gnutls_global_deinit ();
 }
