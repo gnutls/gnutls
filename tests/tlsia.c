@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -400,19 +400,6 @@ server_avp (gnutls_session_t session, void *ptr,
 void
 server_start (void)
 {
-  /* this must be called once in the program
-   */
-  gnutls_global_init ();
-
-  gnutls_anon_allocate_server_credentials (&anoncred);
-  gnutls_ia_allocate_server_credentials (&iacred);
-
-  success ("Launched, generating DH parameters...\n");
-
-  generate_dh_params ();
-
-  gnutls_anon_set_server_dh_params (anoncred, dh_params);
-
   /* Socket operations
    */
   listen_sd = socket (AF_INET, SOCK_STREAM, 0);
@@ -452,6 +439,19 @@ server_start (void)
 void
 server (void)
 {
+  /* this must be called once in the program
+   */
+  gnutls_global_init ();
+
+  gnutls_anon_allocate_server_credentials (&anoncred);
+  gnutls_ia_allocate_server_credentials (&iacred);
+
+  success ("Launched, generating DH parameters...\n");
+
+  generate_dh_params ();
+
+  gnutls_anon_set_server_dh_params (anoncred, dh_params);
+
   client_len = sizeof (sa_cli);
 
   session = initialize_tls_session ();
@@ -546,6 +546,8 @@ server (void)
   gnutls_ia_free_server_credentials (iacred);
 
   gnutls_anon_free_server_credentials (anoncred);
+
+  gnutls_dh_params_deinit (dh_params);
 
   gnutls_global_deinit ();
 
