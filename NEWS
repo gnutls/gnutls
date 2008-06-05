@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 2.3.13 (unreleased)
 
-** Make OpenPGP handshakes work again.
+** libgnutls [OpenPGP]: Make OpenPGP handshakes work again.
 
 ** API and ABI modifications:
 No changes since last version.
