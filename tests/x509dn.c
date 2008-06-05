@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -408,25 +408,6 @@ const gnutls_datum_t server_key = { server_key_pem,
 void
 server_start (void)
 {
-  /* this must be called once in the program
-   */
-  gnutls_global_init ();
-
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
-
-  gnutls_certificate_allocate_credentials (&x509_cred);
-  gnutls_certificate_set_x509_trust_mem (x509_cred, &ca, GNUTLS_X509_FMT_PEM);
-
-  gnutls_certificate_set_x509_key_mem (x509_cred, &server_cert, &server_key,
-				       GNUTLS_X509_FMT_PEM);
-
-  success ("Launched, generating DH parameters...\n");
-
-  generate_dh_params ();
-
-  gnutls_certificate_set_dh_params (x509_cred, dh_params);
-
   /* Socket operations
    */
   listen_sd = socket (AF_INET, SOCK_STREAM, 0);
@@ -466,6 +447,25 @@ server_start (void)
 void
 server (void)
 {
+  /* this must be called once in the program
+   */
+  gnutls_global_init ();
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (4711);
+
+  gnutls_certificate_allocate_credentials (&x509_cred);
+  gnutls_certificate_set_x509_trust_mem (x509_cred, &ca, GNUTLS_X509_FMT_PEM);
+
+  gnutls_certificate_set_x509_key_mem (x509_cred, &server_cert, &server_key,
+				       GNUTLS_X509_FMT_PEM);
+
+  success ("Launched, generating DH parameters...\n");
+
+  generate_dh_params ();
+
+  gnutls_certificate_set_dh_params (x509_cred, dh_params);
+
   client_len = sizeof (sa_cli);
 
   session = initialize_tls_session ();
@@ -526,6 +526,8 @@ server (void)
   close (listen_sd);
 
   gnutls_certificate_free_credentials (x509_cred);
+
+  gnutls_dh_params_deinit (dh_params);
 
   gnutls_global_deinit ();
 
