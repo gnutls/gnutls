@@ -3,6 +3,11 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 2.3.13 (unreleased)
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.3.12 (released 2008-06-04)
 
 ** Merge gnutls_with_netconf branch.
