@@ -22,26 +22,6 @@ In case you are compiling for embedded systems you should check the
 configure options (that is run: 'configure --help'), and disable
 unneeded features of gnutls.
 
-Experimental:
-
-If you specify --with-builtin-crypto, you will use gnulib instead of
-libgcrypt for (some) crypto routines.
-
-Currently the generic crypto interface only support secret key
-ciphering, hashing and gathering of random data.  Supporting
-RSA/DSA/DH/SEXP/MPI in the generic crypto interface is pending.
-
-If --with-builtin-crypto is specified, random data will be read from
-system device files (e.g., /dev/random) directly.  The files used are
-printed when running configure, you can override them using
---enable-random-device, --enable-pseudo-random-device, and
---enable-nonce-device.  Please let us know if the defaults for some
-systems are wrong.
-
-The goal here is to make GnuTLS build standalone, in case Libgcrypt is
-not available, but also to allow easy use of other crypto libraries or
-crypto hardware.
-
 LICENSE ISSUES
 --------------
 
