@@ -26,6 +26,8 @@ if ENABLE_OPENPGP
 SUBDIRS += openpgp
 endif
 
+EXTRA_DIST = libgcrypt.supp
+
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
