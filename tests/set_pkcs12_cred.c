@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006 Free Software Foundation
+ * Copyright (C) 2005, 2006, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -47,7 +47,7 @@ doit (void)
   password = getenv ("PKCS12PASSWORD");
 
   if (!file)
-    file = "client.p12";
+    file = "pkcs12-decode/client.p12";
   if (!password)
     password = "foobar";
 
