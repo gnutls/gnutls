@@ -103,7 +103,8 @@ client (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   gnutls_anon_allocate_client_credentials (&anoncred);
 
@@ -281,7 +282,8 @@ server (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   gnutls_anon_allocate_server_credentials (&anoncred);
 

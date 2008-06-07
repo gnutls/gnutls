@@ -154,7 +154,8 @@ doit (void)
   /* General init. */
   gnutls_global_init ();
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (1);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   /* Init server */
   gnutls_anon_allocate_server_credentials (&s_anoncred);

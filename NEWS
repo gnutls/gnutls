@@ -16,6 +16,9 @@ The file suppresses the known libgcrypt memory leaks, so they aren't
 printed when you run valgrind on the gnutls self-tests.  Use it as
 follows: valgrind --suppressions=libgcrypt.supp ./x509self
 
+** tests/: Reduce amount of debugging output by default.
+Use --verbose for each test to get the full output.
+
 ** API and ABI modifications:
 No changes since last version.
 

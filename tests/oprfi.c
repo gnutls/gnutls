@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -103,7 +103,8 @@ client (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   gnutls_anon_allocate_client_credentials (&anoncred);
 
@@ -266,7 +267,8 @@ server_start (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   gnutls_anon_allocate_server_credentials (&anoncred);
 
