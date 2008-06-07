@@ -1,3 +1,178 @@
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.13.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-serv-export.c: Fix memory leak.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/resume.c: Fix memory leak.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile: Update gnulib files.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/anonself.c, tests/dhepskself.c, tests/mini.c,
+	tests/openpgpself.c, tests/oprfi.c, tests/x509dn.c,
+	tests/x509self.c, tests/x509signself.c: tests/: Reduce amount of
+	debugging output.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/set_pkcs12_cred.c: Make it run without PKCS12FILE for
+	typical scenarios.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/resume.c: Fix memory leak.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Fix memory leak.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509dn.c: Fix memory leaks.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pskself.c: Fix most memory leaks.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/dhepskself.c: Fix memory leaks.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509signself.c: Fix memory leaks.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/anonself.c: Fix memory leaks.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509self.c: Revert last commit, fix memory leak the right
+	way.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgpself.c: Fix memory leak.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509self.c: Fix memory leaks.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-x509-info.c: Fix printing of serial number.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/libgcrypt.supp: Drop non-generic stuff.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/gc.c: Fix memory leak.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/certder.c: Fix memory leaks.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/moredn.c: Fix memory leak.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Dist libgcrypt.supp.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/libgcrypt.supp: Add.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/mini.c: Fix warnings.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/Makefile.am, tests/mini.c: Add mini self-test, to
+	avoid having to fork to test TLS handshakes.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* po/ms.po.in: Sync with TP.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Reorder.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add psktool to @direntry.  Alphasort @direntry.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* README: Drop experimental stuff.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgpself.c: The test now works.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/stdio-impl.h: Update gnulib files.
+
+2008-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-06-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/openpgp/pgp.c, lib/openpgp/privkey.c: safer copying of keyid
+	type.
+
+2008-06-04  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-06-04  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.12.
