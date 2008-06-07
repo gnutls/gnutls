@@ -19,6 +19,12 @@ follows: valgrind --suppressions=libgcrypt.supp ./x509self
 ** tests/: Reduce amount of debugging output by default.
 Use --verbose for each test to get the full output.
 
+** tests/: Fix memory leaks in several self-tests.
+None of the self tests should be leaking memory when running valgrind
+or similar tools.  (Known exceptions are dhepskself, pskself, and
+set_pkcs12_cred, which appear likely to be due to memory leaks in the
+library.)
+
 ** API and ABI modifications:
 No changes since last version.
 
