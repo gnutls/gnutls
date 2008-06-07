@@ -7,6 +7,8 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/gnutlsxx.h>
 
+#include <string.h> /* for strlen */
+
 /* A very basic TLS client, with anonymous authentication.
  * written by Eduardo Villanueva Che.
  */

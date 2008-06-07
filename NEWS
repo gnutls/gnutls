@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.14 (unreleased)
 
+** Make C++ example compile.
+Earlier it may have failed with an unresolved reference to strlen.
+
 ** API and ABI modifications:
 No changes since last version.
 
