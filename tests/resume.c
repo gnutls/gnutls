@@ -411,6 +411,11 @@ server (void)
 
   close (listen_sd);
 
+  if (TLS_SESSION_CACHE != 0)
+    {
+      wrap_db_deinit ();
+    }
+
   success ("server: finished\n");
 }
 
@@ -475,6 +480,9 @@ wrap_db_init (void)
 static void
 wrap_db_deinit (void)
 {
+  if (cache_db)
+    free (cache_db);
+  cache_db = NULL;
   return;
 }
 
