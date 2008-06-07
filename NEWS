@@ -14,7 +14,9 @@ See the end for copying conditions.
 ** tests/: Added libgcrypt.supp which can be used with valgrind.
 The file suppresses the known libgcrypt memory leaks, so they aren't
 printed when you run valgrind on the gnutls self-tests.  Use it as
-follows: valgrind --suppressions=libgcrypt.supp ./x509self
+follows: valgrind --suppressions=libgcrypt.supp ./x509self or add
+'--suppressions=/home/you/src/gnutls/tests/libgcrypt.supp' to your
+~/.valgrindrc file.
 
 ** tests/: Reduce amount of debugging output by default.
 Use --verbose for each test to get the full output.
