@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -248,6 +248,11 @@ main (void)
     }
   close (listen_sd);
 
+  if (TLS_SESSION_CACHE != 0)
+    {
+      wrap_db_deinit ();
+    }
+
   gnutls_certificate_free_credentials (cert_cred);
 
   gnutls_global_deinit ();
@@ -288,6 +293,9 @@ wrap_db_init (void)
 static void
 wrap_db_deinit (void)
 {
+  if (cache_db)
+    free (cache_db);
+  cache_db = NULL;
   return;
 }
 
