@@ -23,7 +23,7 @@ SUBDIRS = rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode	\
 	userid pathlen key-id sha2 hostname-check
 
 if ENABLE_OPENPGP
-SUBDIRS += openpgp
+SUBDIRS += openpgp openpgp-certs
 endif
 
 EXTRA_DIST = libgcrypt.supp

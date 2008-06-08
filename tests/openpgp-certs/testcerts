@@ -1,0 +1,62 @@
+#!/bin/bash
+
+SERV="../../src/gnutls-serv -q"
+CLI="../../src/gnutls-cli"
+unset RETCODE
+
+fail() {
+   echo "Failure: $1" >&2
+   RETCODE=${RETCODE:-${2:-1}}
+}
+
+echo "Checking OpenPGP certificate verification"
+
+$SERV -p 5556 --pgpcertfile srv-public-127.0.0.1-signed.gpg --pgpkeyfile srv-secret.gpg >/dev/null 2>&1 &
+
+# give the server a chance to initialize
+sleep 2
+
+#gnutls currently only considers PGP certificates verified only if
+#all user IDs in the certificate were signed.
+
+#$CLI -p 5556 127.0.0.1 --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
+#  fail "Connection to verified IP address should have succeeded! (error code $?)" $?
+
+$CLI -p 5556 127.0.0.2 --pgpkeyring ca-public.gpg </dev/null >/dev/null && \
+  fail "Connection to unrecognized IP address should have failed!"
+
+$CLI -p 5556 localhost --pgpkeyring ca-public.gpg </dev/null >/dev/null && \
+  fail "Connection to unverified (but present) 'localhost' should have failed!"
+
+kill %1
+wait
+
+$SERV -p 5556 --pgpcertfile srv-public-localhost-signed.gpg --pgpkeyfile srv-secret.gpg >/dev/null 2>&1 &
+# give the server a chance to initialize
+sleep 2
+echo | $CLI -p 5556 127.0.0.1 --pgpkeyring ca-public.gpg </dev/null >/dev/null && \
+  fail "Connection to unverified IP address should have failed! (error code $?)" $?
+
+$CLI -p 5556 127.0.0.2 --pgpkeyring ca-public.gpg </dev/null >/dev/null && \
+  fail "Connection to unrecognized IP address should have failed!"
+
+#see reason above
+#$CLI -p 5556 localhost --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
+#  fail "Connection to verified 'localhost' should have succeded! (error code $?)" $?
+
+kill %1 >/dev/null 2>&1
+wait
+
+$SERV -p 5556 --pgpcertfile srv-public-all-signed.gpg --pgpkeyfile srv-secret.gpg >/dev/null 2>&1 &
+# give the server a chance to initialize
+sleep 2
+echo | $CLI -p 5556 127.0.0.1 --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
+  fail "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
+
+$CLI -p 5556 127.0.0.2 --pgpkeyring ca-public.gpg </dev/null >/dev/null && \
+  fail "Connection to unrecognized IP address should have failed!"
+
+kill %1 >/dev/null 2>&1
+wait
+
+exit ${RETCODE:-0}
