@@ -417,11 +417,15 @@ struct verify_uid* p, *p1;
 }
 
 /* returns non zero if all UIDs in the list have at least one
- * signature.
+ * signature. If the list is empty or no signatures are present
+ * a zero value is returned.
  */
 static int uid_list_all_signed( struct verify_uid * list)
 {
 struct verify_uid* p, *p1;
+
+    if (list == NULL)
+      return 0;
 
     p = list;
     while(p != NULL) {
@@ -496,7 +500,7 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
 		      rc == CDK_Bad_Sig? "BAD" : "good", sig->keyid[1],
 		      keyid);
 
-      if (IS_UID_SIG (sig)) 
+      if (IS_UID_SIG (sig) && uid_name != NULL)
 	{
 	  /* add every uid in the uid list. Only consider valid:
 	   * - verification was ok
