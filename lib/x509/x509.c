@@ -1574,7 +1574,8 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
- * @sizeof_oid: initially holds the size of @oid
+ * @sizeof_oid: initially holds the maximum size of @oid, on return
+ *   holds actual size of @oid.
  * @critical: output variable with critical flag, may be NULL.
  *
  * This function will return the requested extension OID in the
@@ -1582,6 +1583,10 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  * be stored as a string in the provided buffer.  Use
  * gnutls_x509_crt_get_extension_data() to extract the data.
  *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
+ * returned.
+
  * Return 0 on success.  A negative value may be returned in case of
  * parsing error.  If you have reached the last extension available
  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
