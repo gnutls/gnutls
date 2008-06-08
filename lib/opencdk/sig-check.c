@@ -261,7 +261,7 @@ _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
    @knode is the key node and @snode the signature node. */
 cdk_error_t
 _cdk_pk_check_sig (cdk_keydb_hd_t keydb, 
-		   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig)
+		   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig, char** ret_uid)
 {
   gcry_md_hd_t md;
   gcry_error_t err;
@@ -323,12 +323,17 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
     }
   else 
     { /* all other classes */
+      cdk_pkt_userid_t uid;
       node = cdk_kbnode_find_prev (knode, snode, CDK_PKT_USER_ID);
       if (!node)
 	{ /* no user ID for key signature packet */
 	  rc = CDK_Error_No_Key;
 	  goto fail;
 	}
+      uid = node->pkt->pkt.user_id;
+      if (ret_uid) {
+          *ret_uid = uid->name;
+      }
       cdk_kbnode_hash (knode, md, 0, 0, 0);
       cdk_kbnode_hash (node, md, sig->version==4, 0, 0);
       if (pk->keyid[0] == sig->keyid[0] && pk->keyid[1] == sig->keyid[1])
@@ -352,6 +357,81 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
   return rc;
 }
 
+struct verify_uid {
+  const char* name;
+  int nsigs;
+  struct verify_uid* next;
+};
+
+static int uid_list_add_sig( struct verify_uid **list, const char* uid, unsigned int flag)
+{
+    if (*list == NULL) {
+        *list = cdk_calloc( 1, sizeof(struct verify_uid));
+        if (*list == NULL)
+          return CDK_Out_Of_Core;
+        (*list)->name = uid;
+        
+        if (flag != 0)
+          (*list)->nsigs++;
+    } else {
+      struct verify_uid* p, *prev_p = NULL;
+      int found = 0;
+
+      p = *list;
+    
+      while(p != NULL) {
+        if (strcmp( uid, p->name) == 0) {
+            found = 1;
+            break;
+        }
+        prev_p = p;
+        p = p->next;
+      }
+    
+      if (found == 0) { /* not found add to the last */
+          prev_p->next = cdk_calloc( 1, sizeof(struct verify_uid));
+          if (prev_p->next==NULL)
+            return CDK_Out_Of_Core;
+          prev_p->next->name = uid;
+          if (flag != 0)
+            prev_p->next->nsigs++;
+      } else { /* found... increase sigs */
+          if (flag != 0)
+            p->nsigs++;
+      }
+    }
+    
+    return CDK_Success;
+}
+
+static void uid_list_free( struct verify_uid * list)
+{
+struct verify_uid* p, *p1;
+
+    p = list;
+    while(p != NULL) {
+        p1 = p->next;
+        cdk_free (p);
+        p = p1;
+    }
+}
+
+/* returns non zero if all UIDs in the list have at least one
+ * signature.
+ */
+static int uid_list_all_signed( struct verify_uid * list)
+{
+struct verify_uid* p, *p1;
+
+    p = list;
+    while(p != NULL) {
+        if (p->nsigs == 0) {
+          return 0;
+        }
+        p = p->next;
+    }
+    return 1; /* all signed */
+}
 
 /**
  * cdk_pk_check_sigs:
@@ -371,7 +451,8 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
   cdk_error_t rc;
   u32 keyid;
   int key_status, is_selfsig = 0;
-  int no_signer, n_sigs = 0;  
+  struct verify_uid* uid_list = NULL;
+  char* uid_name;
   
   if (!key || !r_status)
     return CDK_Inv_Value;
@@ -380,7 +461,7 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
   node = cdk_kbnode_find (key, CDK_PKT_PUBLIC_KEY);
   if (!node)
     return CDK_Error_No_Key;
-  
+
   key_status = 0;
   /* Continue with the signature check but adjust the
      key status flags accordingly. */
@@ -388,30 +469,17 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
     key_status |= CDK_KEY_REVOKED;
   if (node->pkt->pkt.public_key->has_expired)
     key_status |= CDK_KEY_EXPIRED;
-
   rc = 0;
-  no_signer = 0;
+
   keyid = cdk_pk_get_keyid (node->pkt->pkt.public_key, NULL);
   for (node = key; node; node = node->next) 
     {
       if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
 	continue;
       sig = node->pkt->pkt.signature;
-      rc = _cdk_pk_check_sig (keydb, key, node, &is_selfsig);
-      if (rc == CDK_Success && IS_UID_SIG (sig)) 
-	{
-	  if (is_selfsig == 0)
-	    n_sigs++;
-	}
-      if (rc && IS_UID_SIG (sig) && rc == CDK_Error_No_Key)
-	{
-	  /* We do not consider it a problem when the signing key
-	     is not avaiable. We just mark the signature accordingly
-	     and contine.*/
-	  sig->flags.missing_key = 1;
-	  no_signer++;
-        }
-      else if (rc && rc != CDK_Error_No_Key)
+      rc = _cdk_pk_check_sig (keydb, key, node, &is_selfsig, &uid_name);
+
+      if (rc && rc != CDK_Error_No_Key)
 	{
 	  /* It might be possible that a single signature has been
 	     corrupted, thus we do not consider it a problem when
@@ -423,16 +491,32 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
 	      break;
 	    }	  
         }
+
       _cdk_log_debug ("signature %s: signer %08lX keyid %08lX\n",
 		      rc == CDK_Bad_Sig? "BAD" : "good", sig->keyid[1],
 		      keyid);
+
+      if (IS_UID_SIG (sig)) 
+	{
+	  /* add every uid in the uid list. Only consider valid:
+	   * - verification was ok
+	   * - not a selfsig 
+	   */
+          rc = uid_list_add_sig( &uid_list, uid_name, (rc == CDK_Success && is_selfsig==0)?1:0);
+          if (rc != CDK_Success)
+            goto exit;
+	}
+
     }
   
-  if (n_sigs == no_signer)
+  if (uid_list_all_signed(uid_list) == 0)
     key_status |= CDK_KEY_NOSIGNER;  
   *r_status = key_status;  
   if (rc == CDK_Error_No_Key)
     rc = 0;
+
+exit:
+  uid_list_free(uid_list);
   return rc;
 }
 
@@ -475,7 +559,7 @@ cdk_pk_check_self_sig (cdk_kbnode_t key, int *r_status)
       if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
 	continue;
       /* FIXME: Now we check all self signatures. */
-      rc = _cdk_pk_check_sig (NULL, key, node, &is_selfsig);
+      rc = _cdk_pk_check_sig (NULL, key, node, &is_selfsig, NULL);
       if (rc)
 	{
 	  *r_status = CDK_KEY_INVALID;

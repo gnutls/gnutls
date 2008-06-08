@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** Make C++ example compile.
 Earlier it may have failed with an unresolved reference to strlen.
 
+** Changed OpenPGP verification behaviour. An OpenPGP certificate
+is now only considered verified if all the user IDs are verified.
+
 ** API and ABI modifications:
 No changes since last version.
 
