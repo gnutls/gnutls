@@ -30,8 +30,6 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([1.10 dist-bzip2])
 AM_CONFIG_HEADER(config.h)
 
-AB_INIT
-
 # Library code modified:                              REVISION++
 # Interfaces changed/added/removed:   CURRENT++       REVISION=0
 # Interfaces added:                             AGE++
