@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2007 Free Software Foundation
-#
-# Author: Ludovic Courtès.
+# Copyright (C) 2007, 2008 Free Software Foundation
 #
 # This file is part of GNUTLS.
 #
@@ -23,7 +21,10 @@ if ENABLE_OPENPGP
 
 dist_check_SCRIPTS = testcerts
 
+EXTRA_DIST = ca-public.gpg srv-public-all-signed.gpg srv-secret.gpg	\
+	ca-secret.gpg srv-public.gpg srv-public-127.0.0.1-signed.gpg	\
+	srv-public-localhost-signed.gpg
+
 TESTS = testcerts
 
 endif
-
