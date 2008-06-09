@@ -1586,7 +1586,7 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  * If the buffer provided is not long enough to hold the output, then
  * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned.
-
+ *
  * Return 0 on success.  A negative value may be returned in case of
  * parsing error.  If you have reached the last extension available
  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
