@@ -5,13 +5,14 @@ See the end for copying conditions.
 
 * Version 2.3.14 (unreleased)
 
-** Make C++ example compile.
+** libgnutls [OpenPGP]: Changed OpenPGP verification behaviour.
+An OpenPGP certificate is now only considered verified if all the user
+IDs are verified.
+
+** Examples: Make C++ example compile.
 Earlier it may have failed with an unresolved reference to strlen.
 
-** Changed OpenPGP verification behaviour. An OpenPGP certificate
-is now only considered verified if all the user IDs are verified.
-
-** Doc fix for gnutls_x509_crt_get_extension_oid.
+** Documentation: Doc fix for gnutls_x509_crt_get_extension_oid.
 Reported by Sam Varshavchik <mrsam@courier-mta.com>.
 
 ** API and ABI modifications:
