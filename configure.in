@@ -35,7 +35,6 @@ AM_CONFIG_HEADER(config.h)
 AC_SUBST(LT_CURRENT, 30)
 AC_SUBST(LT_REVISION, 2)
 AC_SUBST(LT_AGE, 4)
-ac_full=1
 
 # Used when creating the Windows libgnutls-XX.def files.
 SOVERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
@@ -361,6 +360,10 @@ dnl Can't disable - gnutls depends on gcrypt
 ***
 ]]))
 libgcrypt=yes
+
+# If this ever changes to 0, the user disabled some officially enabled
+# stuff so we will print a warning.
+ac_full=1
 
 # Hard-wire the gl/m4/gc.m4 test.
 AC_ARG_WITH(builtin-crypto,
