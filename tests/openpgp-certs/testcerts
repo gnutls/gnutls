@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/bash -x
 
-srcdir=${srcdir:-.}
-SERV=${SERV:-../../src/gnutls-serv} -q
-CLI=${CLI:-../../src/gnutls-cli}
+srcdir="${srcdir:-.}"
+SERV="${SERV:-../../src/gnutls-serv} -q"
+CLI="${CLI:-../../src/gnutls-cli}"
 unset RETCODE
 
 fail() {
