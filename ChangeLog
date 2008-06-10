@@ -1,3 +1,115 @@
+2008-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.14.
+
+2008-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/memmem.m4: Update gnulib files.
+
+2008-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-certs/testcerts: Use port 5557.
+
+2008-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Unrelease it.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-certs/testcerts: Fix.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-certs/testcerts: Deal with objdir != srcdir builds.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-certs/Makefile.am: Dist *.gpg's.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Reorder.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Drop AC_CANONICAL_TARGET, unused.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, gl/gnulib.mk, gl/m4/autobuild.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, m4/autobuild.m4: Import
+	autobuild from gnulib.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.14.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Doc fix.
+
+2008-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/x509.c: gnutls_x509_crt_get_extension_oid: Doc fix.
+	Reported by Sam Varshavchik <mrsam@courier-mta.com>.
+
+2008-06-08  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/sig-check.c: added check for empty UID list.
+
+2008-06-08  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* configure.in, tests/Makefile.am, tests/openpgp-certs/Makefile.am,
+	tests/openpgp-certs/ca-public.gpg,
+	tests/openpgp-certs/ca-secret.gpg,
+	tests/openpgp-certs/srv-public-127.0.0.1-signed.gpg,
+	tests/openpgp-certs/srv-public-all-signed.gpg,
+	tests/openpgp-certs/srv-public-localhost-signed.gpg,
+	tests/openpgp-certs/srv-public.gpg,
+	tests/openpgp-certs/srv-secret.gpg, tests/openpgp-certs/testcerts: 
+	Added OpenPGP certificate verification test.
+
+2008-06-08  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, lib/opencdk/keydb.c, lib/opencdk/main.h,
+	lib/opencdk/sig-check.c: Changed OpenPGP verification behaviour. An
+	OpenPGP certificate is now only considered verified if all the user
+	IDs are verified.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/examples/ex-cxx.cpp: Make it find strlen.  Problem
+	reported by Rainer Gerhards <rgerhards@gmail.com> and suggested fix
+	by "John Brooks" <aspecialj@gmail.com>.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS: Sync with TP.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS: Sync with TP.
+
+2008-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-06-07  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.13.
