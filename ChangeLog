@@ -1,3 +1,29 @@
+2008-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.3.15.
+
+2008-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/openpgp-certs/Makefile.am: Disable
+	openpgp-certs properly.
+
+2008-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gendocs_template, lgl/Makefile.am, lgl/m4/stdio_h.m4,
+	lgl/stdio.in.h: Update gnulib files.
+
+2008-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/Makefile.am: Disable openpgp-certs self-test.
+
+2008-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-06-11  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-06-11  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.14.
