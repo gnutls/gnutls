@@ -23,9 +23,7 @@ SUBDIRS = rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode	\
 	userid pathlen key-id sha2 hostname-check
 
 if ENABLE_OPENPGP
-SUBDIRS += openpgp
-# The 'openpgp-certs' sub-directory is disabled until we can make it
-# work under Wine and under Debian buildds (problem with 127.0.0.2?).
+SUBDIRS += openpgp openpgp-certs
 endif
 
 EXTRA_DIST = libgcrypt.supp
