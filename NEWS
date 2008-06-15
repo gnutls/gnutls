@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.3.15 (unreleased)
 
+** Disable the openpgp-certs self-tests.
+It results in failure under Wine and doesn't work on Debian buildds.
+
 ** API and ABI modifications:
 No changes since last version.
 
