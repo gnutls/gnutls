@@ -216,7 +216,6 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
 				 output_data_size, 0);
 }
 
-
 /**
  * gnutls_openpgp_crt_get_fingerprint - Gets the fingerprint
  * @key: the raw data that contains the OpenPGP public key.
@@ -226,7 +225,7 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
  * Get key fingerprint.  Depending on the algorithm, the fingerprint
  * can be 16 or 20 bytes.
  *
- * Returns: the fingerprint of the OpenPGP key.
+ * Returns: On success, 0 is returned.  Otherwise, an error code.
  **/
 int
 gnutls_openpgp_crt_get_fingerprint (gnutls_openpgp_crt_t key,
