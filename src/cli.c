@@ -39,6 +39,7 @@
 
 #include "error.h"
 #include "read-file.h"
+#include "getpass.h"
 
 #include "common.h"
 #include "cli-gaa.h"
