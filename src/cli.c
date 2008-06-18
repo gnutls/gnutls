@@ -989,7 +989,8 @@ static int psk_callback (gnutls_session_t session,
   else
     {
       char *tmp = NULL;
-      ssize_t n, len;
+      size_t n;
+      ssize_t len;
 
       printf ("Enter PSK identity: ");
       fflush (stdout);
