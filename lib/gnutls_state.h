@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -58,6 +58,8 @@ int _gnutls_rsa_export_set_pubkey (gnutls_session_t session,
 
 int _gnutls_session_is_resumable (gnutls_session_t session);
 int _gnutls_session_is_export (gnutls_session_t session);
+
+int _gnutls_session_is_psk (gnutls_session_t session);
 
 int _gnutls_openpgp_send_fingerprint (gnutls_session_t session);
 
