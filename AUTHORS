@@ -45,6 +45,9 @@ TLS/IA fixes.
 Joe Orton <jorton@redhat.com>
 Certificate name import/export, build fixes, test vectors.
 
+Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>
+OpenPGP discussion and improvements.
+
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.

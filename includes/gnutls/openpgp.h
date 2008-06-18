@@ -73,6 +73,9 @@ extern "C"
 					unsigned int *key_usage);
   int gnutls_openpgp_crt_get_fingerprint (gnutls_openpgp_crt_t key, void *fpr,
 					  size_t * fprlen);
+  int gnutls_openpgp_crt_get_subkey_fingerprint (gnutls_openpgp_crt_t key,
+						 unsigned int idx,
+						 void *fpr, size_t * fprlen);
 
   int gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
 				   int idx, char *buf, size_t * sizeof_buf);
@@ -135,6 +138,10 @@ extern "C"
 				  gnutls_datum_t * signature);
   int gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
 				    void *fpr, size_t * fprlen);
+  int
+  gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t key,
+						 unsigned int idx,
+						 void *fpr, size_t * fprlen);
   int gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key, gnutls_openpgp_keyid_t keyid);
   int gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key);
   int gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key, const gnutls_openpgp_keyid_t keyid);

@@ -5,8 +5,12 @@ See the end for copying conditions.
 
 * Version 2.4.0 (unreleased)
 
+** libgnutls [OpenPGP]: New APIs to retrieve fingerprint from OpenPGP subkeys.
+Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_openpgp_crt_get_subkey_fingerprint: ADDED.
+gnutls_openpgp_privkey_get_subkey_fingerprint: ADDED.
 
 * Version 2.3.15 (released 2008-06-15)
 

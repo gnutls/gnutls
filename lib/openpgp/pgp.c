@@ -936,6 +936,51 @@ gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
 }
 
 /**
+ * gnutls_openpgp_crt_get_subkey_fingerprint - Gets the fingerprint of a subkey
+ * @key: the raw data that contains the OpenPGP public key.
+ * @idx: the subkey index
+ * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
+ * @fprlen: the integer to save the length of the fingerprint.
+ *
+ * Get key fingerprint of a subkey.  Depending on the algorithm, the
+ * fingerprint can be 16 or 20 bytes.
+ *
+ * Returns: On success, 0 is returned.  Otherwise, an error code.
+ *
+ * Since: 2.4.0
+ **/
+int
+gnutls_openpgp_crt_get_subkey_fingerprint (gnutls_openpgp_crt_t key,
+					   unsigned int idx,
+					   void *fpr, size_t * fprlen)
+{
+  cdk_packet_t pkt;
+  cdk_pkt_pubkey_t pk = NULL;
+
+  if (!fpr || !fprlen)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  *fprlen = 0;
+
+  pkt = _get_public_subkey( key, idx);
+  if (!pkt)
+    return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+
+  pk = pkt->pkt.public_key;
+  *fprlen = 20;
+
+  /* FIXME: Check if the draft allows old PGP keys. */
+  if (is_RSA (pk->pubkey_algo) && pk->version < 4)
+    *fprlen = 16;
+  cdk_pk_get_fingerprint (pk, fpr);
+
+  return 0;
+}
+
+/**
  * gnutls_openpgp_crt_get_subkey_idx - Returns the subkey's index
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the keyid.

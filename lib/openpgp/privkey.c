@@ -606,6 +606,52 @@ gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key,
   return 0;
 }
 
+/**
+ * gnutls_openpgp_privkey_get_subkey_fingerprint - Gets the fingerprint of a subkey
+ * @key: the raw data that contains the OpenPGP secret key.
+ * @idx: the subkey index
+ * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
+ * @fprlen: the integer to save the length of the fingerprint.
+ *
+ * Get the fingerprint of an OpenPGP subkey.  Depends on the
+ * algorithm, the fingerprint can be 16 or 20 bytes.
+ *
+ * Returns: On success, 0 is returned, or an error code.
+ *
+ * Since: 2.4.0
+ **/
+int
+gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t key,
+					       unsigned int idx,
+					       void *fpr, size_t * fprlen)
+{
+  cdk_packet_t pkt;
+  cdk_pkt_pubkey_t pk = NULL;
+
+  if (!fpr || !fprlen)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  *fprlen = 0;
+
+  pkt = _get_secret_subkey( key, idx);
+  if (!pkt)
+    return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+
+
+  pk = pkt->pkt.secret_key->pk;
+  *fprlen = 20;
+
+  if (is_RSA (pk->pubkey_algo) && pk->version < 4)
+    *fprlen = 16;
+
+  cdk_pk_get_fingerprint (pk, fpr);
+
+  return 0;
+}
+
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
