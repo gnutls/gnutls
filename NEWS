@@ -5,6 +5,154 @@ See the end for copying conditions.
 
 * Version 2.4.0 (released 2008-06-19)
 
+** Major changes compared to the v2.2 branch:
+
+*** The OpenPGP sub-system has been improved and now supports subkeys.
+
+*** The PSK sub-system has been improved and now supports password
+*** derivation and PSK identity hints.
+The password derivation algorithms support is documented in
+draft-ietf-netconf-tls-02.txt.
+
+*** The certtool --inder and --outder has been replaced by --inraw and --outraw.
+This aligns terminology with OpenPGP, which doesn't use DER encoding.
+The old parameters will continue to work for some time.
+
+*** Certtool now confirm passwords and changes permissions of private key files.
+
+*** The default handshake size limit has been increased to 48kb.
+It appears as if some valid handshakes are large due to sending many
+CA certificates.  (The earlier limit was 16kb.)
+
+*** LZO compression is now disabled by default.
+The main reason is that LZO compression in TLS is not standardized,
+but license compatiblity issues with minilzo triggered us to make this
+decision now.
+
+*** Improvements for cross-compilation to Windows and OpenWRT.
+
+*** The look of the GTK-DOC manual has been improved.
+Major developer visible changes compared to the v2.2 branch:
+
+*** Full OpenPGP support is part of libgnutls, licensed under the LGPL.
+
+*** New APIs to access the raw X.509 Subject and Issuer DN's and
+*** elements from the certificate credentials structure.
+Thanks to Joe Orton.
+
+*** New APIs to improve working with username/passwords and PSK.
+
+*** Names of constants to affect certificate printing changed.
+The constants are used for OpenPGP too, which the names didn't
+reflect, so the following name change has been made:
+
+            Old name                         New name
+     GNUTLS_X509_CRT_FULL            GNUTLS_CRT_PRINT_FULL
+     GNUTLS_X509_CRT_ONELINE         GNUTLS_CRT_PRINT_ONELINE
+     GNUTLS_X509_CRT_UNSIGNED_FULL   GNUTLS_CRT_PRINT_UNSIGNED_FULL
+
+The old names will be mapped to the new names for some time.
+
+*** The function gnutls_openpgp_privkey_get_id has been renamed to
+*** gnutls_openpgp_privkey_get_key_id.
+A compatibility mapping exists to avoid breaking API backwards
+compatibility.
+
+*** Replaced all uses of alloca with malloc and free.
+
+*** We no longer build with -D_REENTRANT -D_THREAD_SAFE.
+We have been unable to find a documented rationale for this practice.
+
+*** Of course, many smaller fixes have been made, see the ChangeLog file.
+
+*** API/ABI changes in GnuTLS 2.4
+All OpenPGP related functions have been moved from libgnutls-extra to
+libgnutls, and several new functions have been added (see below).
+Before making the release, we discussed whether moving functions from
+libgnutls-extra to libgnutls would require us to increment the ABI
+version, but the general opinion was that this would not be required.
+All older functions continue to work the same.  We are open to the
+possibility that this decision will lead to problem on some platform,
+and if it turns out that the Right Thing should have been to increment
+the shared library version, we would need to release an update within
+the 2.4.x branch that increments the shared library version.
+
+This release adds the following functions:
+
+  gnutls_psk_client_get_hint
+  gnutls_psk_set_server_credentials_hint
+  gnutls_psk_netconf_derive_key
+
+    Used to get/set the PSK identity hint, and derive PSK keys from
+    passwords a'la netconf.
+
+  gnutls_x509_dn_deinit
+  gnutls_x509_dn_export
+  gnutls_x509_dn_import
+  gnutls_x509_dn_init
+
+    Used to handle X.509 Certificate DN's directly.
+
+  gnutls_hex2bin
+
+    Converts a data buffer to hex.  Useful for handling PSK/SRP shared
+    secrets.
+
+  gnutls_certificate_get_x509_cas
+  gnutls_certificate_get_x509_crls
+  gnutls_certificate_get_openpgp_keyring
+
+    Functions for direct access to credential elements.
+
+  gnutls_openpgp_crt_get_auth_subkey
+  gnutls_openpgp_crt_get_key_id
+  gnutls_openpgp_crt_get_pk_dsa_raw
+  gnutls_openpgp_crt_get_pk_rsa_raw
+  gnutls_openpgp_crt_get_preferred_key_id
+  gnutls_openpgp_crt_get_revoked_status
+  gnutls_openpgp_crt_get_subkey_count
+  gnutls_openpgp_crt_get_subkey_creation_time
+  gnutls_openpgp_crt_get_subkey_expiration_time
+  gnutls_openpgp_crt_get_subkey_fingerprint
+  gnutls_openpgp_crt_get_subkey_id
+  gnutls_openpgp_crt_get_subkey_idx
+  gnutls_openpgp_crt_get_subkey_pk_algorithm
+  gnutls_openpgp_crt_get_subkey_pk_dsa_raw
+  gnutls_openpgp_crt_get_subkey_pk_rsa_raw
+  gnutls_openpgp_crt_get_subkey_revoked_status
+  gnutls_openpgp_crt_get_subkey_usage
+  gnutls_openpgp_crt_print
+  gnutls_openpgp_crt_set_preferred_key_id
+  gnutls_openpgp_keyring_get_crt
+  gnutls_openpgp_keyring_get_crt_count
+  gnutls_openpgp_privkey_export
+  gnutls_openpgp_privkey_export_dsa_raw
+  gnutls_openpgp_privkey_export_rsa_raw
+  gnutls_openpgp_privkey_export_subkey_dsa_raw
+  gnutls_openpgp_privkey_export_subkey_rsa_raw
+  gnutls_openpgp_privkey_get_fingerprint
+  gnutls_openpgp_privkey_get_key_id
+  gnutls_openpgp_privkey_get_pk_algorithm
+  gnutls_openpgp_privkey_get_preferred_key_id
+  gnutls_openpgp_privkey_get_revoked_status
+  gnutls_openpgp_privkey_get_subkey_count
+  gnutls_openpgp_privkey_get_subkey_creation_time
+  gnutls_openpgp_privkey_get_subkey_expiration_time
+  gnutls_openpgp_privkey_get_subkey_fingerprint
+  gnutls_openpgp_privkey_get_subkey_id
+  gnutls_openpgp_privkey_get_subkey_idx
+  gnutls_openpgp_privkey_get_subkey_pk_algorithm
+  gnutls_openpgp_privkey_get_subkey_revoked_status
+  gnutls_openpgp_privkey_set_preferred_key_id
+
+    New OpenPGP related functions.
+
+    The function gnutls_openpgp_crt_get_key_id is the same as the old
+    from gnutls_openpgp_crt_get_id, see above.
+
+The release also adds a new header file 'gnutls/crypto.h', however it
+is currently not used.
+
 ** libgnutls [OpenPGP]: New APIs to retrieve fingerprint from OpenPGP subkeys.
 Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
