@@ -1,3 +1,39 @@
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add v2.4.0 release notes.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Fix release target.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.4.0.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS, NEWS, includes/gnutls/openpgp.h, lib/openpgp/pgp.c,
+	lib/openpgp/privkey.c: libgnutls [OpenPGP]: New APIs to retrieve
+	fingerprint from OpenPGP subkeys.  Contributed by Daniel Kahn
+	Gillmor <dkg-debian.org@fifthhorseman.net>.
+
+2008-06-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-06-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/pgp.c: Fix typo in documentation.  Tiny patch from
+	Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
+
+2008-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-06-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.3.15.
