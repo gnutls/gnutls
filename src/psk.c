@@ -49,6 +49,7 @@ psktool_version (void)
 #include <psk-gaa.h>
 
 #include <gc.h>			/* for randomize */
+#include "getpass.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
