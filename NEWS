@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.5.0 (unreleased)
 
+** Fix compiler warnings.
+Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+
 ** API and ABI modifications:
 No changes since last version.
 
