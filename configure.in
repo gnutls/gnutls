@@ -113,9 +113,6 @@ if test "$use_cxx" != "no"; then
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])], use_cxx=yes, use_cxx=no)
   AC_LANG_POP(C++)
 fi
-AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
-AC_MSG_CHECKING([whether to build C++ library])
-AC_MSG_RESULT($use_cxx)
 
 AC_MSG_CHECKING([whether C99 macros are supported])
 AC_TRY_COMPILE(,[ 
@@ -524,6 +521,17 @@ AC_MSG_CHECKING([whether to use the included minitasn1])
 AC_MSG_RESULT($minitasn1_enabled)
 
 AM_CONDITIONAL(ENABLE_MINITASN1, test "$minitasn1_enabled" = "yes")
+
+if test "$ac_full" != 1; then
+ AC_MSG_WARN([[
+*** 
+*** C++ library disabled because some parts of GnuTLS has been disabled.
+]]))
+  use_cxx=no
+fi
+AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+AC_MSG_CHECKING([whether to build C++ library])
+AC_MSG_RESULT($use_cxx)
 
 dnl Check for libcfg+
 
