@@ -526,7 +526,7 @@ if test "$ac_full" != 1; then
  AC_MSG_WARN([[
 *** 
 *** C++ library disabled because some parts of GnuTLS has been disabled.
-]]))
+]])
   use_cxx=no
 fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
