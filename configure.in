@@ -422,6 +422,7 @@ else
  ac_full=0
  AC_MSG_RESULT(yes)
 fi
+AM_CONDITIONAL(ENABLE_PSK, test "$ac_enable_psk" != "no")
 
 AC_MSG_CHECKING([whether to disable anonymous authentication support])
 AC_ARG_ENABLE(anon-authentication,
