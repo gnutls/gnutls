@@ -9,6 +9,10 @@ See the end for copying conditions.
 Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
 <http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
 
+** Fix ordering of -I's to avoid opencdk.h conflict with system headers.
+Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2930>.
+
 ** API and ABI modifications:
 No changes since last version.
 
