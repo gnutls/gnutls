@@ -25,15 +25,13 @@ if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
 
-
 localedir = $(datadir)/locale
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/includes -I../includes				\
 	-I$(srcdir)/x509						\
-	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/openpgp/	\
-	$(LIBGCRYPT_CFLAGS)
+	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/openpgp/
 
 if ENABLE_OPENPGP
 SUBDIRS += opencdk
@@ -46,6 +44,9 @@ AM_CPPFLAGS += -I$(srcdir)/minitasn1
 else
 AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
+
+# Make sure this comes after any -I's for internal headers.
+AM_CPPFLAGS += $(LIBGCRYPT_CFLAGS)
 
 bin_SCRIPTS = libgnutls-config
 
