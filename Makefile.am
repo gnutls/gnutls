@@ -56,7 +56,7 @@ release:
 	git-push
 	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/ && sha1sum *.tar.bz2 > CHECKSUMS'
-	build-aux/gnupload --to alpha.gnu.org:gnutls $(distdir).tar.bz2
+	build-aux/gnupload --to ftp.gnu.org:gnutls $(distdir).tar.bz2
 	cd $(htmldir) && \
 		cvs add -kb releases/$(distdir).tar.bz2 \
 			releases/$(distdir).tar.bz2.sig && \
