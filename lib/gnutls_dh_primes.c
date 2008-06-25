@@ -547,21 +547,19 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-      if ((unsigned) result + 1 > *params_data_size)
+      if ((unsigned) result > *params_data_size)
 	{
 	  gnutls_assert ();
 	  gnutls_free (out);
-	  *params_data_size = result + 1;
+	  *params_data_size = result;
 	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 
-      *params_data_size = result;
+      *params_data_size = result - 1;
 
       if (params_data)
-	{
-	  memcpy (params_data, out, result);
-	  params_data[result] = 0;
-	}
+        memcpy (params_data, out, result);
+
       gnutls_free (out);
 
     }
