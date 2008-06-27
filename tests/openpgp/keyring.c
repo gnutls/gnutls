@@ -177,6 +177,12 @@ static const gnutls_openpgp_keyid_t id_not_in_keyring =
     0x00, 0x00, 0x00, 0x00 };
 
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "%d| %s", level, str);
+}
+
 void
 doit (void)
 {
@@ -187,6 +193,9 @@ doit (void)
   ret = gnutls_global_init ();
   if (ret < 0)
     fail ("init %d\n", ret);
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (2);
 
   ret = gnutls_global_init_extra ();
   if (ret < 0)

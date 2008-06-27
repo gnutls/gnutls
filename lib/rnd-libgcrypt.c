@@ -22,43 +22,40 @@
  *
  */
 
-/* This file handles all the internal functions that cope with random data.
+/* Here is the libgcrypt random generator layer.
  */
 
 #include <gnutls_int.h>
+#include <libtasn1.h>
 #include <gnutls_errors.h>
-#include <random.h>
+#include <gnutls_num.h>
+#include <gnutls_mpi.h>
+#include <gcrypt.h>
 
-static void * rnd_ctx;
-
-int _gnutls_rnd_init ()
+static int wrap_gcry_rnd_init( void** ctx)
 {
-  if (_gnutls_rnd_ops.init != NULL) {
-    if (_gnutls_rnd_ops.init(& rnd_ctx) < 0) {
-      gnutls_assert();
-      return GNUTLS_E_RANDOM_FAILED;
-    }
-  }
+char c;
+
+  gcry_create_nonce ( &c, 1);
+  gcry_randomize(&c, 1, GCRY_STRONG_RANDOM);
   
   return 0;
 }
 
-void
-_gnutls_rnd_deinit ()
+static int wrap_gcry_rnd( void* ctx, int level, void* data, int datasize)
 {
-  if (_gnutls_rnd_ops.deinit != NULL) {
-    _gnutls_rnd_ops.deinit( rnd_ctx);
-  }
-  
-  return;
-}
+  if (level == GNUTLS_RND_NONCE)
+     gcry_create_nonce ( data, datasize);
+  else
+     gcry_randomize( data, datasize, level);
 
-int
-_gnutls_rnd (int level, void *data, int len)
-{
-  if (len > 0) {
-    return _gnutls_rnd_ops.rnd( rnd_ctx, level, data, len);
-  }
   return 0;
 }
 
+int crypto_rnd_prio = INT_MAX;
+
+gnutls_crypto_rnd_st _gnutls_rnd_ops = {
+  .init = wrap_gcry_rnd_init,
+  .deinit = NULL,
+  .rnd = wrap_gcry_rnd,
+};

@@ -37,7 +37,7 @@
  * Returns 2 parameters (m,e).
  */
 int
-_gnutls_x509_read_rsa_params (opaque * der, int dersize, mpi_t * params)
+_gnutls_x509_read_rsa_params (opaque * der, int dersize, bigint_t * params)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -88,7 +88,7 @@ _gnutls_x509_read_rsa_params (opaque * der, int dersize, mpi_t * params)
  * params[0-2]
  */
 int
-_gnutls_x509_read_dsa_params (opaque * der, int dersize, mpi_t * params)
+_gnutls_x509_read_dsa_params (opaque * der, int dersize, bigint_t * params)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -154,7 +154,7 @@ _gnutls_x509_read_dsa_params (opaque * der, int dersize, mpi_t * params)
  */
 
 int
-_gnutls_x509_read_der_int  (opaque * der, int dersize, mpi_t * out)
+_gnutls_x509_read_der_int  (opaque * der, int dersize, bigint_t * out)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -197,7 +197,7 @@ _gnutls_x509_read_der_int  (opaque * der, int dersize, mpi_t * out)
  * only sets params[3]
  */
 int
-_gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params)
+_gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
 {
   return _gnutls_x509_read_der_int( der, dersize, &params[3]);
 }
@@ -207,7 +207,7 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params)
  */
 int
 _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
-			   mpi_t * params, int *params_size)
+			   bigint_t * params, int *params_size)
 {
   int result;
   int pk_algorithm;
@@ -237,7 +237,7 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
       if (*params_size < RSA_PUBLIC_PARAMS)
 	{
 	  gnutls_assert ();
-	  /* internal error. Increase the mpi_ts in params */
+	  /* internal error. Increase the bigint_ts in params */
 	  result = GNUTLS_E_INTERNAL_ERROR;
 	  goto error;
 	}
@@ -260,7 +260,7 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
       if (*params_size < DSA_PUBLIC_PARAMS)
 	{
 	  gnutls_assert ();
-	  /* internal error. Increase the mpi_ts in params */
+	  /* internal error. Increase the bigint_ts in params */
 	  result = GNUTLS_E_INTERNAL_ERROR;
 	  goto error;
 	}
@@ -323,7 +323,7 @@ error:
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_rsa_params (mpi_t * params, int params_size,
+_gnutls_x509_write_rsa_params (bigint_t * params, int params_size,
 			       gnutls_datum_t * der)
 {
   int result;
@@ -384,7 +384,7 @@ cleanup:
 int
 _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
 			       gnutls_pk_algorithm_t pk_algorithm,
-			       gnutls_digest_algorithm_t dig, mpi_t * params,
+			       gnutls_digest_algorithm_t dig, bigint_t * params,
 			       int params_size)
 {
   gnutls_datum_t der;
@@ -457,7 +457,7 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_dsa_params (mpi_t * params, int params_size,
+_gnutls_x509_write_dsa_params (bigint_t * params, int params_size,
 			       gnutls_datum_t * der)
 {
   int result;
@@ -523,7 +523,7 @@ cleanup:
  * Allocates the space used to store the DER data.
  */
 int
-_gnutls_x509_write_dsa_public_key (mpi_t * params, int params_size,
+_gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
 				   gnutls_datum_t * der)
 {
   int result;

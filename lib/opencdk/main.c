@@ -41,27 +41,7 @@
 /* Set a default cipher algorithm and a digest algorithm.
    Even if AES and SHA-256 are not 'MUST' in the latest
    OpenPGP draft, AES seems to be a good choice. */
-#define DEFAULT_CIPHER_ALGO GCRY_CIPHER_AES
-#define DEFAULT_DIGEST_ALGO GCRY_MD_SHA256
-
-/* The site of the secure memory which is allocated in gcrypt. */
-#define SECMEM_SIZE 16384
-
-
-/* Hooks to custom memory allocation functions. */
-static void *(*alloc_func) (size_t n) = gcry_xmalloc;
-static void *(*alloc_secure_func) (size_t n) = gcry_malloc_secure;
-static void *(*realloc_func) (void *p, size_t n) = gcry_realloc;
-static void *(*calloc_func) (size_t m, size_t n) = gcry_calloc;
-static void (*free_func) (void *) = gcry_free;
-static int malloc_hooks = 0;
-static int secmem_init = 0;
-
-/* Global settings for the logging. */
-static cdk_log_fnc_t log_handler = NULL;
-static void *log_handler_value = NULL;
-static int log_level = CDK_LOG_NONE;
-
+#define DEFAULT_DIGEST_ALGO GNUTLS_DIG_SHA256
 
 /**
  * cdk_strerror:
@@ -110,307 +90,6 @@ cdk_strerror (int ec)
   return NULL;
 }
 
-
-static void
-out_of_core (size_t n)
-{
-  fprintf (stderr, "\n ** fatal error: out of memory (%d bytes) **\n", n);
-}
-
-
-/**
- * cdk_set_malloc_hooks: 
- * @new_alloc_func: malloc replacement
- * @new_alloc_secure_func: secure malloc replacement
- * @new_realloc_func: realloc replacement
- * @new_calloc_func: calloc replacement
- * @new_free_func: free replacement
- *
- * Set private memory hooks for the library.
- */
-void
-cdk_set_malloc_hooks (void *(*new_alloc_func) (size_t n),
-		      void *(*new_alloc_secure_func) (size_t n),
-		      void *(*new_realloc_func) (void *p, size_t n),
-		      void *(*new_calloc_func) (size_t m, size_t n),
-		      void (*new_free_func) (void *))
-{
-  alloc_func = new_alloc_func;
-  alloc_secure_func = new_alloc_secure_func;
-  realloc_func = new_realloc_func;
-  calloc_func = new_calloc_func;
-  free_func = new_free_func;
-  malloc_hooks = 1;
-}
-
-
-/**
- * cdk_malloc_hook_initialized:
- *
- * Return if the malloc hooks are already initialized.
- **/
-int
-cdk_malloc_hook_initialized (void)
-{
-  return malloc_hooks;
-}
-
-
-void*
-cdk_malloc (size_t size)
-{
-  void *p = alloc_func (size);
-  if (!p)
-    out_of_core (size);
-  return p;
-}
-
-
-/**
- * cdk_calloc:
- * @n: amount of elements
- * @m: size of one element
- * 
- * Safe wrapper around the c-function calloc.
- **/
-void*
-cdk_calloc (size_t n, size_t m)
-{
-  void * p = calloc_func (n, m);
-  if (!p)
-    out_of_core (m);
-  return p;
-}
-
-
-/* Things which need to  be done after the secure memory initialisation. */
-static void
-_secmem_finish (void)
-{
-  gcry_control (GCRYCTL_DROP_PRIVS);
-}
-
-
-/* Initialize the secure memory. */
-static void
-_secmem_init (size_t size)
-{
-  if (secmem_init == 1)
-    return;
-  if (size >= SECMEM_SIZE)
-    size = SECMEM_SIZE;
-  
-  /* Check if no other library has already initialized gcrypt. */
-  if (!gcry_control (GCRYCTL_ANY_INITIALIZATION_P))
-    {
-      _cdk_log_debug ("init: libgcrypt initialize.\n");
-      gcry_control (GCRYCTL_INIT_SECMEM, size, 0);
-      gcry_control (GCRYCTL_USE_SECURE_RNDPOOL);
-      gcry_control (GCRYCTL_DISABLE_SECMEM_WARN);      
-      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
-      secmem_init = 1;
-    }  
-}
-
-
-/* Things which needs to be done to deinit the secure memory. */
-static void
-_secmem_end (void)
-{
-  gcry_control (GCRYCTL_TERM_SECMEM);
-  secmem_init = 0;
-}
-
-
-/* The Windows system needs to startup the Winsock interface first
-   before we can use any socket related function. */
-#ifdef _WIN32
-static void
-init_sockets (void)
-{
-  static int initialized = 0;
-  WSADATA wsdata;
-  
-  if (initialized)
-    return;
-  if (WSAStartup (0x202, &wsdata))
-    _cdk_log_debug ("winsock init failed.\n");
-  
-  initialized = 1;
-}
-
-static void
-deinit_sockets (void)
-{
-  WSACleanup ();
-}
-#else
-void init_sockets (void)  {}
-void deinit_sockets (void)  {}
-#endif
-
-
-/**
- * cdk_lib_startup:
- * 
- * Prepare the internal structures of the library.
- * This function should be called before any other CDK function.
- */
-void
-cdk_lib_startup (void)
-{
-  _secmem_init (SECMEM_SIZE);
-  _secmem_finish ();
-  init_sockets ();
-}
-
-
-/**
- * cdk_lib_shutdown:
- * 
- * Shutdown the library and free all internal and globally used
- * memory and structures. This function should be called in the
- * exit handler of the calling program.
- */
-void
-cdk_lib_shutdown (void)
-{
-  deinit_sockets ();
-  _secmem_end ();
-}
-
-/**
- * cdk_salloc:
- * @size: how much bytes should be allocated.
- * @clear: shall the buffer cleared after the allocation?
- * 
- * Allocated the requested amount of bytes in 'secure' memory.
- */
-void*
-cdk_salloc (size_t size, int clear)
-{
-  void *p;
-  
-  if (!secmem_init)
-    _secmem_init (SECMEM_SIZE);
-  
-  p = alloc_secure_func (size);
-  if (!p)
-    out_of_core (size);
-  if (clear)
-    memset (p, 0, size);
-  return p;
-}
-
-
-void *
-cdk_realloc (void *ptr, size_t size)
-{
-  void * p = realloc_func (ptr, size);
-  if (!p)
-    out_of_core (size);
-  return p;
-}
-
-
-char *
-cdk_strdup (const char * ptr)
-{
-  char * p = cdk_malloc (strlen (ptr) + 1);
-  if (p)
-    strcpy (p, ptr);
-  return p;
-}
-
-
-void
-cdk_free (void * ptr)
-{
-  if (ptr)
-    free_func (ptr);
-}
-
-
-/* Internal logging routine. */
-static void
-_cdk_logv (int level, const char *fmt, va_list arg_ptr)
-{
-
-  if (log_handler)
-    log_handler (log_handler_value, level, fmt, arg_ptr);
-  else 
-    {
-      if (level == CDK_LOG_NONE)
-	return;
-      if (level == CDK_LOG_DEBUG)
-	fputs ("DBG: ", stderr);
-      vfprintf (stderr, fmt, arg_ptr); 
-    }
-}
-
-
-/**
- * cdk_set_log_handler: 
- * @logfnc: the function pointer
- * @opaque: a private values for the function
- *
- * Set a custom handler for logging.
- **/
-void
-cdk_set_log_handler (cdk_log_fnc_t logfnc, void *opaque)
-{
-  log_handler = logfnc;
-  log_handler_value = opaque; 
-}
-
-
-/**
- * cdk_set_log_level: 
- * @lvl: the level
- *
- * Set the verbosity level.
- **/
-void
-cdk_set_log_level (int level)
-{
-  log_level = level;
-}
-
-
-/* Return the current log level of the lib. */
-int
-_cdk_get_log_level (void)
-{
-  return log_level;
-}
-
-
-void
-_cdk_log_info (const char *fmt, ...)
-{
-  va_list arg;
-  
-  if (log_level == CDK_LOG_NONE)
-    return;
-  va_start (arg, fmt);
-  _cdk_logv (CDK_LOG_INFO, fmt, arg);
-  va_end (arg);
-}
-
-
-void
-_cdk_log_debug (const char *fmt, ...)
-{
-  va_list arg;
-  
-  if (log_level < CDK_LOG_DEBUG)
-    return;
-  va_start (arg, fmt);
-  _cdk_logv (CDK_LOG_DEBUG, fmt, arg);
-  va_end (arg);
-}
-
-
 /* Use the passphrase callback in the handle HD or
    return NULL if there is no valid callback. */
 char*
@@ -423,35 +102,22 @@ _cdk_passphrase_get (cdk_ctx_t hd, const char *prompt)
 
 
 static void
-handle_set_cipher (cdk_ctx_t hd, int cipher)
-{
-  if (!hd)
-    return;
-  if (gcry_cipher_test_algo (cipher))
-    cipher = DEFAULT_CIPHER_ALGO;
-  hd->cipher_algo = cipher;   
-}
-
-
-static void
 handle_set_digest (cdk_ctx_t hd, int digest)
 {
   if (!hd)
     return;
-  if (gcry_md_test_algo (digest))
+  if (_gnutls_hash_get_algo_len (digest) <= 0)
     digest = DEFAULT_DIGEST_ALGO;
   hd->digest_algo = digest;   
 }
 
 
 static void
-handle_set_s2k (cdk_ctx_t hd, int mode, int digest, int cipher)
+handle_set_s2k (cdk_ctx_t hd, int mode, int digest)
 {
   if (!hd)
     return;
-  if (gcry_cipher_test_algo (cipher))
-    cipher = DEFAULT_CIPHER_ALGO;
-  if (gcry_md_test_algo (digest))
+  if (_gnutls_hash_get_algo_len (digest) <= 0)
     digest = DEFAULT_DIGEST_ALGO;
   if (mode != CDK_S2K_SIMPLE &&
       mode != CDK_S2K_SALTED &&
@@ -511,13 +177,6 @@ cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...)
 	val = hd->opt.armor;
       break;
 
-    case CDK_CTL_CIPHER:
-      if (set)
-	handle_set_cipher (hd, va_arg (arg_ptr, int));
-      else
-	val = hd->cipher_algo;
-      break;
-      
     case CDK_CTL_DIGEST:
       if (set)
 	handle_set_digest( hd, va_arg( arg_ptr, int ) );
@@ -547,8 +206,7 @@ cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...)
       if( set ) {
 	int mode = va_arg( arg_ptr, int );
 	int digest = va_arg( arg_ptr, int );
-	int cipher = va_arg( arg_ptr, int );
-	handle_set_s2k( hd, mode, digest, cipher );
+	handle_set_s2k( hd, mode, digest);
       }
       else
 	val = hd->_s2k.mode;
@@ -609,7 +267,6 @@ cdk_handle_new (cdk_ctx_t *r_ctx)
   c->opt.textmode = 0;
   
   c->digest_algo = DEFAULT_DIGEST_ALGO;
-  c->cipher_algo = DEFAULT_CIPHER_ALGO;
   
   c->compress.algo = CDK_COMPRESS_ZIP;
   c->compress.level = 6;
@@ -744,6 +401,5 @@ cdk_handle_free (cdk_ctx_t hd)
 	cdk_keydb_free (hd->db.sec);
       hd->db.pub = hd->db.sec = NULL;
     }  
-  cdk_free (hd->dek);
   cdk_free (hd);
 }

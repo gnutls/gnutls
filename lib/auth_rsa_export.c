@@ -69,7 +69,7 @@ static int
 gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
 {
   gnutls_rsa_params_t rsa_params;
-  const mpi_t *rsa_mpis;
+  const bigint_t *rsa_mpis;
   size_t n_e, n_m;
   uint8_t *data_e, *data_m;
   int ret = 0, data_size;
@@ -126,8 +126,8 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
   info = _gnutls_get_auth_info (session);
   _gnutls_rsa_export_set_pubkey (session, rsa_mpis[1], rsa_mpis[0]);
 
-  _gnutls_mpi_print (NULL, &n_m, rsa_mpis[0]);
-  _gnutls_mpi_print (NULL, &n_e, rsa_mpis[1]);
+  _gnutls_mpi_print (rsa_mpis[0], NULL, &n_m);
+  _gnutls_mpi_print (rsa_mpis[1], NULL, &n_e);
 
   (*data) = gnutls_malloc (n_e + n_m + 4);
   if (*data == NULL)
@@ -136,12 +136,12 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
     }
 
   data_m = &(*data)[0];
-  _gnutls_mpi_print (&data_m[2], &n_m, rsa_mpis[0]);
+  _gnutls_mpi_print (rsa_mpis[0], &data_m[2], &n_m);
 
   _gnutls_write_uint16 (n_m, data_m);
 
   data_e = &data_m[2 + n_m];
-  _gnutls_mpi_print (&data_e[2], &n_e, rsa_mpis[1]);
+  _gnutls_mpi_print (rsa_mpis[1], &data_e[2], &n_e);
 
   _gnutls_write_uint16 (n_e, data_e);
 
@@ -275,13 +275,13 @@ proc_rsa_export_server_kx (gnutls_session_t session,
   _n_e = n_e;
   _n_m = n_m;
 
-  if (_gnutls_mpi_scan_nz (&session->key->rsa[0], data_m, &_n_m) != 0)
+  if (_gnutls_mpi_scan_nz (&session->key->rsa[0], data_m, _n_m) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  if (_gnutls_mpi_scan_nz (&session->key->rsa[1], data_e, &_n_e) != 0)
+  if (_gnutls_mpi_scan_nz (&session->key->rsa[1], data_e, _n_e) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;

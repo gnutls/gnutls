@@ -33,7 +33,7 @@ struct cdk_kbnode_s
 };
 
 /*-- new-packet.c --*/
-void _cdk_free_mpibuf (size_t n, gcry_mpi_t *array);
+void _cdk_free_mpibuf (size_t n, bigint_t *array);
 void _cdk_free_userid (cdk_pkt_userid_t uid);
 void _cdk_free_signature( cdk_pkt_signature_t sig );
 cdk_prefitem_t _cdk_copy_prefs( const cdk_prefitem_t prefs );

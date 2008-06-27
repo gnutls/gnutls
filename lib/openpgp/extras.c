@@ -171,16 +171,7 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 	  goto error;
 	}
 
-#if 0
-      i = 0;
-      do {
-          err = cdk_stream_getc( input);
-          if (err != EOF) raw_data[i++] = err;
-      } while( err != EOF);
-
-      raw_len = i;
-#else
-      ssize_t written=0;
+      size_t written=0;
       do 
         {
           err = cdk_stream_read (input, raw_data+written, raw_len-written);
@@ -190,7 +181,6 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
       while( written < raw_len && err != EOF && err > 0);
       
       raw_len = written;
-#endif
       
     }
   else
@@ -281,7 +271,8 @@ gnutls_openpgp_keyring_get_crt (gnutls_openpgp_keyring_t ring,
 {
   cdk_kbnode_t knode;
   cdk_error_t err;
-  int ret = 0, count = 0;
+  int ret = 0;
+  unsigned int count = 0;
   cdk_keydb_search_t st;
 
   err = cdk_keydb_search_start (&st, ring->db, CDK_DBSEARCH_NEXT, NULL);

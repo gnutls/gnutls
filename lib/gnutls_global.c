@@ -27,6 +27,7 @@
 #include <libtasn1.h>
 #include <gnutls_dh.h>
 #include <random.h>
+#include <gcrypt.h>
 
 #ifdef HAVE_WINSOCK
 # include <winsock2.h>
@@ -264,17 +265,6 @@ gnutls_global_init (void)
 #endif
     }
 
-  if (gc_init () != GC_OK)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Initializing crypto backend failed\n");
-      return GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY;
-    }
-
-  /* for gcrypt in order to be able to allocate memory */
-  gc_set_allocators (gnutls_malloc, gnutls_secure_malloc,
-		     _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
-
 #ifdef DEBUG
   gnutls_global_set_log_function (dlog);
 #endif
@@ -339,7 +329,6 @@ gnutls_global_deinit (void)
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);
       _gnutls_crypto_deregister();
-      gc_done ();
     }
   _gnutls_init--;
 }

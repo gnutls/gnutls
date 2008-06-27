@@ -41,6 +41,7 @@
 #include <gnutls_sig.h>
 #include <gnutls_x509.h>
 #include <random.h>
+#include <gnutls_mpi.h>
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, opaque **);
 int _gnutls_proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
@@ -66,7 +67,7 @@ const mod_auth_st rsa_auth_struct = {
  */
 int
 _gnutls_get_public_rsa_params (gnutls_session_t session,
-			       mpi_t params[MAX_PUBLIC_PARAMS_SIZE],
+			       bigint_t params[MAX_PUBLIC_PARAMS_SIZE],
 			       int *params_len)
 {
   int ret;
@@ -98,8 +99,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
   /* EXPORT case: */
   if (_gnutls_cipher_suite_get_kx_algo
-      (&session->security_parameters.current_cipher_suite)
-      == GNUTLS_KX_RSA_EXPORT
+      (&session->security_parameters.current_cipher_suite) == GNUTLS_KX_RSA_EXPORT
       && _gnutls_mpi_get_nbits (peer_cert.params[0]) > 512)
     {
 
@@ -147,7 +147,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
  */
 int
 _gnutls_get_private_rsa_params (gnutls_session_t session,
-				mpi_t ** params, int *params_size)
+				bigint_t ** params, int *params_size)
 {
   int bits;
   gnutls_certificate_credentials_t cred;
@@ -211,7 +211,7 @@ _gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
   int ret, dsize;
-  mpi_t *params;
+  bigint_t *params;
   int params_len;
   int randomize_key = 0;
   ssize_t data_size = _data_size;
@@ -322,7 +322,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
 {
   cert_auth_info_t auth = session->key->auth_info;
   gnutls_datum_t sdata;		/* data to send */
-  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_len = MAX_PUBLIC_PARAMS_SIZE;
   int ret, i;
   gnutls_protocol_t ver;

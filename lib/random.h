@@ -3,6 +3,9 @@
 
 #include <gnutls/crypto.h>
 
+extern int crypto_rnd_prio;
+extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
+
 #define RND_RANDOM GNUTLS_RND_RANDOM
 #define RND_NONCE GNUTLS_RND_NONCE
 #define RND_KEY GNUTLS_RND_KEY

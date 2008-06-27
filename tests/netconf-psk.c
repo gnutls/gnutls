@@ -34,6 +34,12 @@
 
 #include "utils.h"
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "<%d>| %s", level, str);
+}
+
 void
 doit (void)
 {
@@ -43,6 +49,9 @@ doit (void)
   gnutls_datum_t key = { NULL, 0 };
 
   gnutls_global_init ();
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (2);
 
   if (gnutls_psk_netconf_derive_key ("password", "psk_identity",
 				     "psk_identity_hint", &key) == 0)

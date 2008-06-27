@@ -77,7 +77,7 @@ typedef struct gnutls_x509_privkey_int
   /* the size of params depends on the public
    * key algorithm
    */
-  mpi_t params[MAX_PRIV_PARAMS_SIZE];
+  bigint_t params[MAX_PRIV_PARAMS_SIZE];
 
   /*
    * RSA: [0] is modulus
@@ -161,7 +161,6 @@ int _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 			     int indx, void *_oid, size_t * sizeof_oid);
 
 /* dsa.c */
-int _gnutls_dsa_generate_params (mpi_t * resarr, int *resarr_len, int bits);
 
 
 /* verify.c */
@@ -177,7 +176,7 @@ int _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
 /* privkey.h */
 ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *raw_key,
 						gnutls_x509_privkey_t pkey);
-int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, mpi_t * params);
+int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, bigint_t * params);
 
 /* extensions.c */
 int _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
@@ -226,33 +225,33 @@ int _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
 /* mpi.c */
 
 int _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
-			       mpi_t * params, int *params_size);
-int _gnutls_x509_read_rsa_params (opaque * der, int dersize, mpi_t * params);
-int _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params);
-int _gnutls_x509_read_dsa_params (opaque * der, int dersize, mpi_t * params);
+			       bigint_t * params, int *params_size);
+int _gnutls_x509_read_rsa_params (opaque * der, int dersize, bigint_t * params);
+int _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params);
+int _gnutls_x509_read_dsa_params (opaque * der, int dersize, bigint_t * params);
 
-int _gnutls_x509_write_rsa_params (mpi_t * params, int params_size,
+int _gnutls_x509_write_rsa_params (bigint_t * params, int params_size,
 				   gnutls_datum_t * der);
-int _gnutls_x509_write_dsa_params (mpi_t * params, int params_size,
+int _gnutls_x509_write_dsa_params (bigint_t * params, int params_size,
 				   gnutls_datum_t * der);
-int _gnutls_x509_write_dsa_public_key (mpi_t * params, int params_size,
+int _gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
 				       gnutls_datum_t * der);
 
 int _gnutls_x509_read_uint (ASN1_TYPE node, const char *value,
 			    unsigned int *ret);
 
-int _gnutls_x509_read_der_int  (opaque * der, int dersize, mpi_t* out);
+int _gnutls_x509_read_der_int  (opaque * der, int dersize, bigint_t* out);
 
 int _gnutls_x509_read_int (ASN1_TYPE node, const char *value,
-			   mpi_t * ret_mpi);
-int _gnutls_x509_write_int (ASN1_TYPE node, const char *value, mpi_t mpi,
+			   bigint_t * ret_mpi);
+int _gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi,
 			    int lz);
 int _gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value,
 			       uint32_t num);
 
 int _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
 				   gnutls_pk_algorithm_t pk_algorithm,
-				   gnutls_digest_algorithm_t, mpi_t * params,
+				   gnutls_digest_algorithm_t, bigint_t * params,
 				   int params_size);
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>
@@ -294,7 +293,7 @@ typedef struct gnutls_pkcs12_bag_int
 #define KEY_ID_OID "1.2.840.113549.1.9.21"
 
 int
-_pkcs12_string_to_key (unsigned int id, const opaque * salt,
+_gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
 		       unsigned int salt_size, unsigned int iter,
 		       const char *pw, unsigned int req_keylen,
 		       opaque * keybuf);

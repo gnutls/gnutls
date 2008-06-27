@@ -162,7 +162,7 @@ _gnutls_parse_supplemental (gnutls_session_t session,
   total_size = _gnutls_read_uint24 (p);
   p += 3;
 
-  if (dsize != total_size)
+  if (dsize != (ssize_t)total_size)
     {
       gnutls_assert();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;

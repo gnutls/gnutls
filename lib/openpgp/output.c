@@ -84,7 +84,7 @@ print_key_usage (gnutls_string * str, gnutls_openpgp_crt_t cert, unsigned int id
   addf (str, _("\t\tKey Usage:\n"));
 
 
-  if (idx == -1)
+  if (idx == (unsigned int)-1)
     err = gnutls_openpgp_crt_get_key_usage (cert, &key_usage);
   else
     err = gnutls_openpgp_crt_get_subkey_usage (cert, idx, &key_usage);

@@ -357,10 +357,10 @@ static int cert_type_priority[] = {
   0
 };
 
-typedef void (rmadd_func) (priority_st * priority_list, int alg);
+typedef void (rmadd_func) (priority_st * priority_list, unsigned int alg);
 
 static void
-prio_remove (priority_st * priority_list, int algo)
+prio_remove (priority_st * priority_list, unsigned int algo)
 {
   int i = 0;
   int pos = -1;			/* the position of the cipher to remove */
@@ -383,7 +383,7 @@ prio_remove (priority_st * priority_list, int algo)
 }
 
 static void
-prio_add (priority_st * priority_list, int algo)
+prio_add (priority_st * priority_list, unsigned int algo)
 {
   register int i = 0;
   while (priority_list->priority[i] != 0)

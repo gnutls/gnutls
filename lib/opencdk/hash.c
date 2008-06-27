@@ -37,7 +37,7 @@ hash_encode (void *opaque, FILE *in, FILE *out)
 {
   md_filter_t *mfx = opaque;
   byte buf[BUFSIZE];
-  gcry_error_t err;
+  int err;
   int nread;
   
   if (!mfx)
@@ -45,11 +45,13 @@ hash_encode (void *opaque, FILE *in, FILE *out)
   
   _cdk_log_debug ("hash filter: encode algo=%d\n", mfx->digest_algo);
   
-  if (!mfx->md)
+  if (!mfx->md_initialized)
     {
-      err = gcry_md_open (&mfx->md, mfx->digest_algo, 0);
-      if (err)
-	return map_gcry_error (err);
+      err = _gnutls_hash_init (&mfx->md, mfx->digest_algo);
+      if (err < 0)
+	return map_gnutls_error (err);
+      
+      mfx->md_initialized = 1;
     }
   
   while (!feof (in))
@@ -57,7 +59,7 @@ hash_encode (void *opaque, FILE *in, FILE *out)
       nread = fread (buf, 1, BUFSIZE, in);
       if (!nread)
 	break;
-      gcry_md_write (mfx->md, buf, nread);
+      _gnutls_hash (&mfx->md, buf, nread);
     }
   
   wipemem (buf, sizeof (buf));
@@ -75,8 +77,8 @@ _cdk_filter_hash (void *opaque, int ctl, FILE *in, FILE *out)
       if (mfx) 
 	{
 	  _cdk_log_debug ("free hash filter\n");
-	  gcry_md_close (mfx->md);
-	  mfx->md = NULL;
+	  _gnutls_hash_deinit (&mfx->md, NULL);
+	  mfx->md_initialized = 0;
 	  return 0;
         }   
     }

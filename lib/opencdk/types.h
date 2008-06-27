@@ -24,8 +24,6 @@
 #ifndef CDK_TYPES_H
 #define CDK_TYPES_H
 
-#include <gcrypt.h>
-
 #ifndef HAVE_BYTE_TYPEDEF
 # undef byte
   typedef unsigned char byte;

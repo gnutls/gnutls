@@ -31,6 +31,7 @@
 
 #include "opencdk.h"
 #include "main.h"
+#include "../random.h"
 
 
 u32
@@ -149,29 +150,16 @@ _cdk_memistr (const char *buf, size_t buflen, const char *sub)
   return NULL;
 }
 
-
-/* Map the gcrypt error to a valid opencdk error constant. */
 cdk_error_t
-_cdk_map_gcry_error (gcry_error_t err)
+_cdk_map_gnutls_error (int err)
 {
-  /* FIXME: We need to catch them all. */
-  switch (gpg_err_code (err))
+  switch (err)
     {
-    case GPG_ERR_NO_ERROR: return CDK_Success;
-    case GPG_ERR_INV_VALUE: return CDK_Inv_Value;
-    case GPG_ERR_GENERAL: return CDK_General_Error;
-    case GPG_ERR_INV_PACKET: return CDK_Inv_Packet;
-    case GPG_ERR_TOO_SHORT: return CDK_Too_Short;
-    case GPG_ERR_TOO_LARGE: return CDK_Inv_Value;
-    case GPG_ERR_NO_PUBKEY:
-    case GPG_ERR_NO_SECKEY: return CDK_Error_No_Key;
-    case GPG_ERR_BAD_SIGNATURE: return CDK_Bad_Sig;
-    case GPG_ERR_NO_DATA: return CDK_No_Data;
+    case 0: return CDK_Success;
+    case GNUTLS_E_INVALID_REQUEST: return CDK_Inv_Value;
     default:
-      break;
+      return CDK_General_Error;
     }
-  
-  return (cdk_error_t)err;
 }
 
 
@@ -209,7 +197,7 @@ _cdk_check_args (int overwrite, const char *in, const char *out)
 #include <fcntl.h>
 
 FILE *
-my_tmpfile (void)
+_cdk_tmpfile (void)
 {
   /* Because the tmpfile() version of wine is not really useful,
      we implement our own version to avoid problems with 'make check'. */
@@ -218,7 +206,7 @@ my_tmpfile (void)
   FILE *fp;
   int fd, i;
   
-  gcry_create_nonce (rnd, DIM (rnd));
+  _gnutls_rnd( GNUTLS_RND_NONCE, rnd, DIM(rnd));
   for (i=0; i < DIM (rnd)-1; i++)
     {
       char c = letters[(unsigned char)rnd[i] % 26];
@@ -243,8 +231,114 @@ my_tmpfile (void)
 }
 #else
 FILE*
-my_tmpfile (void)
+_cdk_tmpfile (void)
 {
   return tmpfile ();
 }
 #endif
+
+int _gnutls_hash_algo_to_pgp(int algo)
+{
+    switch(algo) {
+        case GNUTLS_DIG_MD5:
+            return 0x01;
+        case GNUTLS_DIG_MD2:
+            return 0x05;
+        case GNUTLS_DIG_SHA1:
+            return 0x02;
+        case GNUTLS_DIG_RMD160:
+            return 0x03;
+        case GNUTLS_DIG_SHA256:
+            return 0x08;
+        case GNUTLS_DIG_SHA384:
+            return 0x09;
+        case GNUTLS_DIG_SHA512:
+            return 0x0A;
+        case GNUTLS_DIG_SHA224:
+            return 0x0B;
+        default:
+            gnutls_assert();
+            return 0x00;
+    }
+}
+
+int _pgp_hash_algo_to_gnutls(int algo)
+{
+    switch(algo) {
+        case 0x01:
+            return GNUTLS_DIG_MD5;
+        case 0x02:
+            return GNUTLS_DIG_SHA1;
+        case 0x03:
+            return GNUTLS_DIG_RMD160;
+        case 0x05:
+            return GNUTLS_DIG_MD2;
+        case 0x08:
+            return GNUTLS_DIG_SHA256;
+        case 0x09:
+            return GNUTLS_DIG_SHA384;
+        case 0x0A:
+            return GNUTLS_DIG_SHA512;
+        case 0x0B:
+            return GNUTLS_DIG_SHA224;
+        default:
+            gnutls_assert();
+            return GNUTLS_DIG_NULL;
+    }
+}
+
+int _pgp_cipher_to_gnutls(int cipher)
+{
+  switch (cipher) {
+    case 1:
+      return GNUTLS_CIPHER_IDEA_PGP_CFB;
+    case 2:
+      return GNUTLS_CIPHER_3DES_PGP_CFB;
+    case 3:
+      return GNUTLS_CIPHER_CAST5_PGP_CFB;
+    case 4:
+      return GNUTLS_CIPHER_BLOWFISH_PGP_CFB;
+    case 5:
+      return GNUTLS_CIPHER_SAFER_SK128_PGP_CFB;
+    case 7:
+      return GNUTLS_CIPHER_AES128_PGP_CFB;
+    case 8:
+      return GNUTLS_CIPHER_AES192_PGP_CFB;
+    case 9:
+      return GNUTLS_CIPHER_AES256_PGP_CFB;
+    case 10:
+      return GNUTLS_CIPHER_TWOFISH_PGP_CFB;
+    
+    default:
+      gnutls_assert();
+      return GNUTLS_CIPHER_NULL;
+  }
+}
+
+int _gnutls_cipher_to_pgp(int cipher)
+{
+  switch (cipher) {
+    
+    case GNUTLS_CIPHER_IDEA_PGP_CFB:
+        return 1;
+    case GNUTLS_CIPHER_3DES_PGP_CFB:
+        return 2;
+    case GNUTLS_CIPHER_CAST5_PGP_CFB:
+        return 3;
+    case GNUTLS_CIPHER_BLOWFISH_PGP_CFB:
+        return 4;
+    case GNUTLS_CIPHER_SAFER_SK128_PGP_CFB:
+        return 5;
+    case GNUTLS_CIPHER_AES128_PGP_CFB:
+        return 7;
+    case GNUTLS_CIPHER_AES192_PGP_CFB:
+        return 8;
+    case GNUTLS_CIPHER_AES256_PGP_CFB:
+        return 9;
+    case GNUTLS_CIPHER_TWOFISH_PGP_CFB:
+        return 10;
+    default:
+      gnutls_assert();
+      return 0;
+  }
+}

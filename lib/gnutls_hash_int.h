@@ -31,8 +31,14 @@
 
 /* for message digests */
 
+extern int crypto_mac_prio;
+extern gnutls_crypto_mac_st _gnutls_mac_ops;
+
+extern int crypto_digest_prio;
+extern gnutls_crypto_digest_st _gnutls_digest_ops;
+
 typedef struct {
-  gnutls_crypto_mac_st* cc;
+  gnutls_crypto_single_mac_st* cc;
   void* ctx;
 } digest_reg_hd;
 
@@ -40,7 +46,7 @@ typedef struct
 {
   int registered; /* true or false(0) */
   union {
-    gc_hash_handle gc; /* when not registered */
+    void* gc; /* when not registered */
     digest_reg_hd rh; /* when registered */
   } hd;
   gnutls_mac_algorithm_t algorithm;
@@ -50,19 +56,23 @@ typedef struct
 
 int _gnutls_hmac_init (digest_hd_st*, gnutls_mac_algorithm_t algorithm,
 			    const void *key, int keylen);
-#define _gnutls_hmac_get_algo_len _gnutls_hash_get_algo_len
-#define _gnutls_hmac _gnutls_hash
+int _gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm);
+int _gnutls_hmac (const digest_hd_st* handle, const void *text,
+		  size_t textlen);
+
 void _gnutls_hmac_deinit (digest_hd_st* handle, void *digest);
+void _gnutls_hmac_output (digest_hd_st* handle, void *digest);
 
 int _gnutls_mac_init_ssl3 (digest_hd_st*, gnutls_mac_algorithm_t algorithm, void *key,
 				int keylen);
 void _gnutls_mac_deinit_ssl3 (digest_hd_st* handle, void *digest);
 
-int _gnutls_hash_init (digest_hd_st*, gnutls_mac_algorithm_t algorithm);
-int _gnutls_hash_get_algo_len (gnutls_mac_algorithm_t algorithm);
+int _gnutls_hash_init (digest_hd_st*, gnutls_digest_algorithm_t algorithm);
+int _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);
 int _gnutls_hash (const digest_hd_st* handle, const void *text,
 		  size_t textlen);
 void _gnutls_hash_deinit (digest_hd_st* handle, void *digest);
+void _gnutls_hash_output (digest_hd_st* handle, void *digest);
 
 int _gnutls_ssl3_generate_random (void *secret, int secret_len,
 				  void *rnd, int random_len, int bytes,

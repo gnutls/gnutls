@@ -121,7 +121,7 @@ _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node)
  * type @pkttype (only if @pkttype != 0).
  **/
 void
-cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node, int pkttype)
+cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node, cdk_packet_type_t pkttype)
 {
   if (!pkttype)
     {
@@ -156,7 +156,7 @@ cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node, int pkttype)
  * with pkttype @pkttype in the list starting with @root of @node.
  **/
 cdk_kbnode_t
-cdk_kbnode_find_prev (cdk_kbnode_t root, cdk_kbnode_t node, int pkttype)
+cdk_kbnode_find_prev (cdk_kbnode_t root, cdk_kbnode_t node, cdk_packet_type_t pkttype)
 {
   cdk_kbnode_t n1;
   
@@ -182,7 +182,7 @@ cdk_kbnode_find_prev (cdk_kbnode_t root, cdk_kbnode_t node, int pkttype)
  * a user-id.
  **/
 cdk_kbnode_t
-cdk_kbnode_find_next (cdk_kbnode_t node, int pkttype)
+cdk_kbnode_find_next (cdk_kbnode_t node, cdk_packet_type_t pkttype)
 {
   for (node = node->next; node; node = node->next)
     {
@@ -212,7 +212,7 @@ cdk_kbnode_find_next (cdk_kbnode_t node, int pkttype)
  * Tries to find the next node with the packettype @pkttype.
  **/
 cdk_kbnode_t
-cdk_kbnode_find (cdk_kbnode_t node, int pkttype)
+cdk_kbnode_find (cdk_kbnode_t node, cdk_packet_type_t pkttype)
 {
   for (; node; node = node->next)
     {
@@ -231,7 +231,7 @@ cdk_kbnode_find (cdk_kbnode_t node, int pkttype)
  * Same as cdk_kbnode_find but it returns the packet instead of the node.
  **/
 cdk_packet_t
-cdk_kbnode_find_packet (cdk_kbnode_t node, int pkttype)
+cdk_kbnode_find_packet (cdk_kbnode_t node, cdk_packet_type_t pkttype)
 {
   cdk_kbnode_t res;
   
@@ -419,6 +419,8 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t *ret_node,
   if (rc)
     return rc;
   rc = cdk_keydb_get_keyblock (inp, ret_node);
+  if (rc)
+    gnutls_assert();
   cdk_stream_close (inp);
   return rc;
 }
@@ -559,8 +561,8 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
  * is extracted from it.
  **/
 cdk_error_t
-cdk_kbnode_hash (cdk_kbnode_t node, gcry_md_hd_t md, int is_v4,
-                 int pkttype, int flags)
+cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st* md, int is_v4,
+                 cdk_packet_type_t pkttype, int flags)
 {
   cdk_packet_t pkt;
   

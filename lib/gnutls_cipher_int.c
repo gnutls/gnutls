@@ -31,7 +31,7 @@
 
 #define SR(x, cleanup) if ( (x)<0 ) { \
   gnutls_assert(); \
-  err = GNUTLS_E_INTERNAL_ERROR; \
+  ret = GNUTLS_E_INTERNAL_ERROR; \
   goto cleanup; \
   }
 
@@ -39,8 +39,8 @@ int
 _gnutls_cipher_init (cipher_hd_st* handle, gnutls_cipher_algorithm_t cipher,
 		     const gnutls_datum_t * key, const gnutls_datum_t * iv)
 {
-  int err = GC_INVALID_CIPHER;	/* doesn't matter */
-  gnutls_crypto_cipher_st * cc = NULL;
+  int ret = GNUTLS_E_INTERNAL_ERROR;
+  gnutls_crypto_single_cipher_st * cc = NULL;
 
   /* check if a cipher has been registered 
    */
@@ -48,75 +48,33 @@ _gnutls_cipher_init (cipher_hd_st* handle, gnutls_cipher_algorithm_t cipher,
   if (cc != NULL) {
     handle->registered = 1;
     handle->hd.rh.cc = cc;
-    SR( cc->init(&handle->hd.rh.ctx), cc_cleanup );
+    SR(cc->init(&handle->hd.rh.ctx), cc_cleanup);
     SR(cc->setkey( handle->hd.rh.ctx, key->data, key->size), cc_cleanup);
     if (iv->data && iv->size && cc->setiv)
       SR(cc->setiv( handle->hd.rh.ctx, iv->data, iv->size), cc_cleanup);
     return 0;
   }
 
-  handle->registered = 0;  
-  /* otherwise use included ciphers 
+  handle->registered = 0;
+  
+  /* otherwise use generic cipher interface
    */
-  switch (cipher)
-    {
-    case GNUTLS_CIPHER_AES_128_CBC:
-      err = gc_cipher_open (GC_AES128, GC_CBC, &handle->hd.gc);
-      break;
+  ret = _gnutls_cipher_ops.init( cipher, &handle->hd.gc);
+  if (ret < 0) {
+    gnutls_assert();
+    return ret;
+  }
 
-    case GNUTLS_CIPHER_AES_256_CBC:
-      err = gc_cipher_open (GC_AES256, GC_CBC, &handle->hd.gc);
-      break;
+  ret = _gnutls_cipher_ops.setkey (handle->hd.gc, key->data, key->size);
+  if (ret < 0) {
+    _gnutls_cipher_ops.deinit( handle->hd.gc);
+    gnutls_assert();
+    return ret;
+  }
 
-    case GNUTLS_CIPHER_3DES_CBC:
-      err = gc_cipher_open (GC_3DES, GC_CBC, &handle->hd.gc);
-      break;
-
-    case GNUTLS_CIPHER_DES_CBC:
-      err = gc_cipher_open (GC_DES, GC_CBC, &handle->hd.gc);
-      break;
-
-    case GNUTLS_CIPHER_ARCFOUR_128:
-      err = gc_cipher_open (GC_ARCFOUR128, GC_STREAM, &handle->hd.gc);
-      break;
-
-    case GNUTLS_CIPHER_ARCFOUR_40:
-      err = gc_cipher_open (GC_ARCFOUR40, GC_STREAM, &handle->hd.gc);
-      break;
-
-    case GNUTLS_CIPHER_RC2_40_CBC:
-      err = gc_cipher_open (GC_ARCTWO40, GC_CBC, &handle->hd.gc);
-      break;
-
-#ifdef	ENABLE_CAMELLIA
-    case GNUTLS_CIPHER_CAMELLIA_128_CBC:
-      err = gc_cipher_open (GC_CAMELLIA128, GC_CBC, &handle->hd.gc);
-      break;
-
-    case GNUTLS_CIPHER_CAMELLIA_256_CBC:
-      err = gc_cipher_open (GC_CAMELLIA256, GC_CBC, &handle->hd.gc);
-      break;
-#endif
-
-    default:
-      gnutls_assert();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  if (err == 0)
-    {
-      gc_cipher_setkey (handle->hd.gc, key->size, key->data);
-      if (iv->data != NULL && iv->size > 0)
-	gc_cipher_setiv (handle->hd.gc, iv->size, iv->data);
-    }
-  else if (cipher != GNUTLS_CIPHER_NULL)
-    {
-      gnutls_assert ();
-      _gnutls_x509_log ("Crypto cipher[%d] error: %d\n", cipher, err);
-      return GNUTLS_E_INTERNAL_ERROR;
-      /* FIXME: gc_strerror */
-    }
-
+  if (iv->data != NULL && iv->size > 0)
+    _gnutls_cipher_ops.setiv (handle->hd.gc, iv->data, iv->size);
+    
   return 0;
 
 cc_cleanup:
@@ -124,7 +82,7 @@ cc_cleanup:
   if (handle->hd.rh.cc)
     cc->deinit(handle->hd.rh.ctx);
   
-  return err;
+  return ret;
 }
 
 int
@@ -138,11 +96,7 @@ _gnutls_cipher_encrypt (const cipher_hd_st* handle, void *text, int textlen)
       }
       
       if (handle->hd.gc == NULL) return 0;
-      if (gc_cipher_encrypt_inline (handle->hd.gc, textlen, text) != 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+      return _gnutls_cipher_ops.encrypt( handle->hd.gc, text, textlen, text, textlen);
     }
   return 0;
 }
@@ -159,11 +113,7 @@ _gnutls_cipher_decrypt (const cipher_hd_st *handle, void *ciphertext,
       }
 
       if (handle->hd.gc == NULL) return 0;
-      if (gc_cipher_decrypt_inline (handle->hd.gc, ciphertextlen, ciphertext) != 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+      return _gnutls_cipher_ops.decrypt (handle->hd.gc, ciphertext, ciphertextlen, ciphertext, ciphertextlen);
     }
   return 0;
 }
@@ -176,6 +126,6 @@ _gnutls_cipher_deinit (cipher_hd_st* handle)
       if (handle->registered && handle->hd.rh.ctx != NULL) {
         return handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
       }
-      gc_cipher_close (handle->hd.gc);
+      _gnutls_cipher_ops.deinit (handle->hd.gc);
     }
 }

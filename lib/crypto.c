@@ -26,6 +26,10 @@
 #include <gnutls_int.h>
 #include <gnutls/crypto.h>
 #include <crypto.h>
+#include <gnutls_mpi.h>
+#include <gnutls_pk.h>
+#include <random.h>
+#include <gnutls_cipher_int.h>
 
 typedef struct algo_list {
   int algorithm;
@@ -37,7 +41,6 @@ typedef struct algo_list {
 #define cipher_list algo_list
 #define mac_list algo_list
 #define digest_list algo_list
-#define rnd_list algo_list
 
 static int _algo_register( algo_list* al, int algorithm, int priority, void* s)
 {
@@ -101,7 +104,6 @@ cipher_list* cl;
 static cipher_list glob_cl = { GNUTLS_CIPHER_NULL, 0, NULL, NULL };
 static mac_list glob_ml = { GNUTLS_MAC_NULL, 0, NULL, NULL };
 static digest_list glob_dl = { GNUTLS_MAC_NULL, 0, NULL, NULL };
-static rnd_list glob_rnd = { 0, 0, NULL, NULL };
 
 static void _deregister(algo_list* cl)
 {
@@ -124,13 +126,13 @@ void _gnutls_crypto_deregister(void)
   _deregister( &glob_cl);
   _deregister( &glob_ml);
   _deregister( &glob_dl);
-  _deregister( &glob_rnd);
 }
 
 /**
-  * gnutls_crypto_cipher_register - register a cipher algorithm
+  * gnutls_crypto_single_cipher_register2 - register a cipher algorithm
   * @algorithm: is the gnutls algorithm identifier
   * @priority: is the priority of the algorithm
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
   * @s: is a structure holding new cipher's data
   *
   * This function will register a cipher algorithm to be used
@@ -141,22 +143,31 @@ void _gnutls_crypto_deregister(void)
   *
   * This function should be called before gnutls_global_init().
   *
+  * For simplicity you can use the convenience gnutls_crypto_single_cipher_register()
+  * macro.
+  *
   * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   *
   **/
-int gnutls_crypto_cipher_register( gnutls_cipher_algorithm_t algorithm, int priority, gnutls_crypto_cipher_st* s)
+int gnutls_crypto_single_cipher_register2( gnutls_cipher_algorithm_t algorithm, int priority, int version, gnutls_crypto_single_cipher_st* s)
 {
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
   return _algo_register( &glob_cl, algorithm, priority, s);
 }
 
-gnutls_crypto_cipher_st *_gnutls_get_crypto_cipher( gnutls_cipher_algorithm_t algo)
+gnutls_crypto_single_cipher_st *_gnutls_get_crypto_cipher( gnutls_cipher_algorithm_t algo)
 {
   return _get_algo( &glob_cl, algo);
 }
 
 /**
-  * gnutls_crypto_rnd_register - register a random generator
+  * gnutls_crypto_rnd_register2 - register a random generator
   * @priority: is the priority of the generator
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
   * @s: is a structure holding new generator's data
   *
   * This function will register a random generator to be used
@@ -167,23 +178,33 @@ gnutls_crypto_cipher_st *_gnutls_get_crypto_cipher( gnutls_cipher_algorithm_t al
   *
   * This function should be called before gnutls_global_init().
   *
+  * For simplicity you can use the convenience gnutls_crypto_rnd_register()
+  * macro.
+  *
   * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   *
   **/
-int gnutls_crypto_rnd_register( int priority, gnutls_crypto_rnd_st* s)
+int gnutls_crypto_rnd_register2( int priority, int version, gnutls_crypto_rnd_st* s)
 {
-  return _algo_register( &glob_rnd, 1, priority, s);
-}
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
 
-gnutls_crypto_rnd_st *_gnutls_get_crypto_rnd()
-{
-  return _get_algo( &glob_rnd, 1);
+  if (crypto_rnd_prio > priority) {
+        memcpy( &_gnutls_rnd_ops, s, sizeof(*s));
+	crypto_rnd_prio = priority;
+        return 0;
+  }
+  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /**
-  * gnutls_crypto_mac_register - register a MAC algorithm
+  * gnutls_crypto_single_mac_register2 - register a MAC algorithm
   * @algorithm: is the gnutls algorithm identifier
   * @priority: is the priority of the algorithm
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
   * @s: is a structure holding new algorithms's data
   *
   * This function will register a MAC algorithm to be used
@@ -194,23 +215,33 @@ gnutls_crypto_rnd_st *_gnutls_get_crypto_rnd()
   *
   * This function should be called before gnutls_global_init().
   *
+  * For simplicity you can use the convenience gnutls_crypto_single_mac_register()
+  * macro.
+  *
   * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   *
   **/
-int gnutls_crypto_mac_register( gnutls_mac_algorithm_t algorithm, int priority, gnutls_crypto_mac_st* s)
+int gnutls_crypto_single_mac_register2( gnutls_mac_algorithm_t algorithm, int priority, int version, gnutls_crypto_single_mac_st* s)
 {
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
   return _algo_register( &glob_ml, algorithm, priority, s);
 }
 
-gnutls_crypto_mac_st *_gnutls_get_crypto_mac( gnutls_mac_algorithm_t algo)
+gnutls_crypto_single_mac_st *_gnutls_get_crypto_mac( gnutls_mac_algorithm_t algo)
 {
   return _get_algo( &glob_ml, algo);
 }
 
 /**
-  * gnutls_crypto_digest_register - register a digest algorithm
+  * gnutls_crypto_single_digest_register2 - register a digest algorithm
   * @algorithm: is the gnutls algorithm identifier
   * @priority: is the priority of the algorithm
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
   * @s: is a structure holding new algorithms's data
   *
   * This function will register a digest (hash) algorithm to be used
@@ -221,15 +252,208 @@ gnutls_crypto_mac_st *_gnutls_get_crypto_mac( gnutls_mac_algorithm_t algo)
   *
   * This function should be called before gnutls_global_init().
   *
+  * For simplicity you can use the convenience gnutls_crypto_single_digest_register()
+  * macro.
+  *
   * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   *
   **/
-int gnutls_crypto_digest_register( gnutls_digest_algorithm_t algorithm, int priority, gnutls_crypto_digest_st* s)
+int gnutls_crypto_single_digest_register2( gnutls_digest_algorithm_t algorithm, int priority, int version, gnutls_crypto_single_digest_st* s)
 {
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
   return _algo_register( &glob_dl, algorithm, priority, s);
 }
 
-gnutls_crypto_digest_st *_gnutls_get_crypto_digest( gnutls_digest_algorithm_t algo)
+gnutls_crypto_single_digest_st *_gnutls_get_crypto_digest( gnutls_digest_algorithm_t algo)
 {
   return _get_algo( &glob_dl, algo);
+}
+
+/**
+  * gnutls_crypto_bigint_register2 - register a bigint interface
+  * @priority: is the priority of the interface
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+  * @s: is a structure holding new interface's data
+  *
+  * This function will register an interface for gnutls to operate
+  * on big integers. Any interface registered will override
+  * the included interface. The interface with the lowest
+  * priority will be used by gnutls.
+  *
+  * Note that the bigint interface must interoperate with the public
+  * key interface. Thus if this interface is updated the
+  * gnutls_crypto_pk_register() should also be used.
+  *
+  * This function should be called before gnutls_global_init().
+  *
+  * For simplicity you can use the convenience gnutls_crypto_bigint_register()
+  * macro.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
+int gnutls_crypto_bigint_register2( int priority, int version, gnutls_crypto_bigint_st* s)
+{
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
+  if (crypto_bigint_prio > priority) {
+        memcpy( &_gnutls_mpi_ops, s, sizeof(*s));
+	crypto_bigint_prio = priority;
+        return 0;
+  }
+  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+}
+
+/**
+  * gnutls_crypto_pk_register2 - register a public key interface
+  * @priority: is the priority of the interface
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+  * @s: is a structure holding new interface's data
+  *
+  * This function will register an interface for gnutls to operate
+  * on public key operations. Any interface registered will override
+  * the included interface. The interface with the lowest
+  * priority will be used by gnutls.
+  *
+  * Note that the bigint interface must interoperate with the bigint
+  * interface. Thus if this interface is updated the
+  * gnutls_crypto_bigint_register() should also be used.
+  *
+  * This function should be called before gnutls_global_init().
+  *
+  * For simplicity you can use the convenience gnutls_crypto_pk_register()
+  * macro.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
+int gnutls_crypto_pk_register2( int priority, int version, gnutls_crypto_pk_st* s)
+{
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+  if (crypto_pk_prio > priority) {
+        memcpy( &_gnutls_pk_ops, s, sizeof(*s));
+	crypto_pk_prio = priority;
+        return 0;
+  }
+  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+}
+
+/**
+  * gnutls_crypto_cipher_register2 - register a cipher interface
+  * @priority: is the priority of the cipher interface
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+  * @s: is a structure holding new interface's data
+  *
+  * This function will register a cipher interface to be used
+  * by gnutls. Any interface registered will override
+  * the included engine and by convention kernel implemented
+  * interfaces should have priority of 90. The interface with the lowest
+  * priority will be used by gnutls.
+  *
+  * This function should be called before gnutls_global_init().
+  *
+  * For simplicity you can use the convenience gnutls_crypto_cipher_register()
+  * macro.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
+int gnutls_crypto_cipher_register2( int priority, int version, gnutls_crypto_cipher_st* s)
+{
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
+  if (crypto_cipher_prio > priority) {
+        memcpy( &_gnutls_cipher_ops, s, sizeof(*s));
+	crypto_cipher_prio = priority;
+        return 0;
+  }
+  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+}
+
+/**
+  * gnutls_crypto_mac_register2 - register a mac interface
+  * @priority: is the priority of the mac interface
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+  * @s: is a structure holding new interface's data
+  *
+  * This function will register a mac interface to be used
+  * by gnutls. Any interface registered will override
+  * the included engine and by convention kernel implemented
+  * interfaces should have priority of 90. The interface with the lowest
+  * priority will be used by gnutls.
+  *
+  * This function should be called before gnutls_global_init().
+  *
+  * For simplicity you can use the convenience gnutls_crypto_mac_register()
+  * macro.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
+int gnutls_crypto_mac_register2( int priority, int version, gnutls_crypto_mac_st* s)
+{
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
+  if (crypto_mac_prio > priority) {
+        memcpy( &_gnutls_mac_ops, s, sizeof(*s));
+	crypto_mac_prio = priority;
+        return 0;
+  }
+  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
+}
+
+/**
+  * gnutls_crypto_digest_register2 - register a digest interface
+  * @priority: is the priority of the digest interface
+  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+  * @s: is a structure holding new interface's data
+  *
+  * This function will register a digest interface to be used
+  * by gnutls. Any interface registered will override
+  * the included engine and by convention kernel implemented
+  * interfaces should have priority of 90. The interface with the lowest
+  * priority will be used by gnutls.
+  *
+  * This function should be called before gnutls_global_init().
+  *
+  * For simplicity you can use the convenience gnutls_crypto_digest_register()
+  * macro.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
+int gnutls_crypto_digest_register2( int priority, int version, gnutls_crypto_digest_st* s)
+{
+  if (version != GNUTLS_CRYPTO_API_VERSION)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
+  if (crypto_digest_prio > priority) {
+        memcpy( &_gnutls_digest_ops, s, sizeof(*s));
+	crypto_digest_prio = priority;
+        return 0;
+  }
+  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }

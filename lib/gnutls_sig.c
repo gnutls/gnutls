@@ -219,7 +219,7 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
  * given data. The output will be allocated and be put in signature.
  */
 int
-_gnutls_sign (gnutls_pk_algorithm_t algo, mpi_t * params,
+_gnutls_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
 	      int params_size, const gnutls_datum_t * data,
 	      gnutls_datum_t * signature)
 {

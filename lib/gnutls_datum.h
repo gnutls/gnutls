@@ -22,6 +22,9 @@
  *
  */
 
+#ifndef GNUTLS_DATUM_H
+# define GNUTLS_DATUM_H
+
 void _gnutls_write_datum16 (opaque * dest, gnutls_datum_t dat);
 void _gnutls_write_datum24 (opaque * dest, gnutls_datum_t dat);
 void _gnutls_write_datum32 (opaque * dest, gnutls_datum_t dat);
@@ -38,3 +41,5 @@ int _gnutls_datum_append_m (gnutls_datum_t * dat, const void *data,
 
 void _gnutls_free_datum_m (gnutls_datum_t * dat, gnutls_free_function);
 #define _gnutls_free_datum(x) _gnutls_free_datum_m(x, gnutls_free)
+
+#endif

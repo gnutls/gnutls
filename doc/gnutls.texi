@@ -199,7 +199,8 @@ development release.  For example, GnuTLS 1.6.3 denote a stable
 release since 6 is even, and GnuTLS 1.7.11 denote a development
 release since 7 is odd.
 
-GnuTLS depends on Libgcrypt, and you will need to install Libgcrypt
+GnuTLS depends on Libgcrypt,
+and you will need to install Libgcrypt
 before installing GnuTLS.  Libgcrypt is available from
 @url{ftp://ftp.gnupg.org/gcrypt/libgcrypt}.  Libgcrypt needs another
 library, libgpg-error, and you need to install libgpg-error before
@@ -389,7 +390,7 @@ widely used OpenSSL@footnote{@url{http://www.openssl.org/}} library,
 to ease integration with existing applications.
 
 @acronym{GnuTLS} consists of three independent parts, namely the ``TLS
-protocol part'', the ``Certificate part'', and the ``Crypto backend''
+protocol part'', the ``Certificate part'', and the ``Cryptographic backend''
 part.  The `TLS protocol part' is the actual protocol implementation,
 and is entirely implemented within the @acronym{GnuTLS} library.  The
 `Certificate part' consists of the certificate parsing, and
@@ -401,9 +402,10 @@ for the @acronym{X.509} certificate parsing functions.  A smaller
 version of
 @acronym{OpenCDK}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}}
 is used for the @acronym{OpenPGP} key support in @acronym{GnuTLS}.
-The ``Crypto backend'' is provided by the
+The ``Cryptographic backend'' is provided by the
 @acronym{Libgcrypt}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}}
-library.
+library@footnote{On current versions of GnuTLS it is possible
+to override the default crypto backend. Check @pxref{Cryptographic Backend} for details}.
 
 In order to ease integration in embedded systems, parts of the
 @acronym{GnuTLS} library can be disabled at compile time. That way a
@@ -3597,6 +3599,7 @@ expressions.
 
 @include guile.texi
 
+
 @node Internal architecture of GnuTLS
 @chapter Internal Architecture of GnuTLS
 @cindex Internal architecture
@@ -3606,6 +3609,15 @@ way @acronym{GnuTLS} works. The focus is to give an idea
 to potential developers and those who want to know what
 happens inside the black box.
 
+@menu
+* The TLS Protocol::
+* TLS Handshake Protocol::
+* TLS Authentication Methods::
+* TLS Extension Handling::
+* Cryptographic Backend::
+@end menu
+
+@node The TLS Protocol
 @section The TLS Protocol
 The main needs for the TLS protocol to be used are
 shown in the image below.
@@ -3618,6 +3630,7 @@ object are just structures with attributes. The operations listed
 are functions that require the first parameter to be that object.
 @image{gnutls-objects,15cm}
 
+@node TLS Handshake Protocol
 @section TLS Handshake Protocol
 The @acronym{GnuTLS} handshake protocol is implemented as a state
 machine that waits for input or returns immediately when the non-blocking
@@ -3635,6 +3648,7 @@ certificate ciphersuite.
 
 @image{gnutls-handshake-sequence,12cm}
 
+@node TLS Authentication Methods
 @section TLS Authentication Methods
 In @acronym{GnuTLS} authentication methods can be implemented quite easily.
 Since the required changes to add a new authentication method affect only the
@@ -3652,6 +3666,7 @@ for PSK ciphersuites and @code{auth_srp.c} for SRP ciphersuites. After implement
 the structure holding its pointers has to be registered in @code{gnutls_algorithms.c}
 in the @code{_gnutls_kx_algorithms} structure.
 
+@node TLS Extension Handling
 @section TLS Extension Handling
 As with authentication methods, the TLS extensions handlers can be implemented
 using the following interface.
@@ -3834,6 +3849,66 @@ is summarized in the following diagram.
 
 @image{gnutls-certificate-user-use-case,12cm}
 
+@node Cryptographic Backend
+@section Cryptographic Backend
+Several new systems provide hardware assisted cryptographic algorithm implementations
+that offer implementations some orders of magnitude faster than the software. For this
+reason in current releases of GnuTLS it is possible to override parts of the crypto
+backend or the whole. It is possible to override them both at runtime and compile time, however
+here we will discuss the runtime possibility. The API available for this functionality
+is in @code{gnutls/crypto.h} header file.
+
+@subsection Override specific algorithms
+When an optimized implementation of a single algorithm is available, say a
+hardware assisted version of @acronym{AES-CBC} then the following functions
+can be used to register those algorithms.
+
+@itemize
+
+@item @ref{gnutls_crypto_single_cipher_register2}
+To register a cipher algorithm.
+
+@item @ref{gnutls_crypto_single_mac_register2}
+To register a MAC algorithm.
+
+@ref{gnutls_crypto_single_digest_register2}
+To register a digest (hash) algorithm.
+
+@end itemize
+
+Those registration functions will only replace the specified algorithm and leave the
+rest of subsystem intact.
+
+@subsection Override parts of the backend
+In some systems, such as embedded ones, it might be desirable to override big parts
+of the cryptographic backend, or even all of them. For this reason the following
+functions are provided.
+
+@itemize
+
+@item @ref{gnutls_crypto_cipher_register2}
+To override the cryptographic algorithms backend.
+
+@item @ref{gnutls_crypto_mac_register2}
+To override the MAC algorithms backend.
+
+@item @ref{gnutls_crypto_digest_register2}
+To override the digest algorithms backend.
+
+@item @ref{gnutls_crypto_rnd_register2}
+To override the random number generator backend.
+
+@item @ref{gnutls_crypto_bigint_register2}
+To override the big number number operations backend.
+
+@item @ref{gnutls_crypto_pk_register2}
+To override the public key encryption backend. This is tight to the big number
+operations so either both of them should be updated or care must be taken to
+use the same format.
+
+@end itemize
+
+If all of them are used then GnuTLS will no longer use libgcrypt.
 
 @node Copying Information
 @appendix Copying Information

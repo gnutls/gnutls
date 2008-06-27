@@ -66,22 +66,23 @@ gnutls_psk_netconf_derive_key (const char *password,
    */
 
   rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1);
-  if (rc)
+  if (rc < 0)
     {
       gnutls_assert ();
       return rc;
     }
 
   rc = _gnutls_hash (&dig, psk_identity, strlen (psk_identity));
-  if (rc)
+  if (rc < 0)
     {
       gnutls_assert ();
       _gnutls_hash_deinit (&dig, NULL);
+      fprintf(stderr, "rc: %d\n", rc);
       return rc;
     }
 
   rc = _gnutls_hash (&dig, netconf_key_pad, strlen (netconf_key_pad));
-  if (rc)
+  if (rc < 0)
     {
       gnutls_assert ();
       _gnutls_hash_deinit (&dig, NULL);
@@ -89,7 +90,7 @@ gnutls_psk_netconf_derive_key (const char *password,
     }
 
   rc = _gnutls_hash (&dig, password, strlen (password));
-  if (rc)
+  if (rc < 0)
     {
       gnutls_assert ();
       _gnutls_hash_deinit (&dig, NULL);
@@ -108,7 +109,7 @@ gnutls_psk_netconf_derive_key (const char *password,
   memcpy (inner + sha1len, psk_identity_hint, hintlen);
 
   rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1);
-  if (rc)
+  if (rc < 0)
     {
       gnutls_assert ();
       gnutls_free (inner);
@@ -117,7 +118,7 @@ gnutls_psk_netconf_derive_key (const char *password,
 
   rc = _gnutls_hash (&dig, inner, innerlen);
   gnutls_free (inner);
-  if (rc)
+  if (rc < 0)
     {
       gnutls_assert ();
       _gnutls_hash_deinit (&dig, NULL);

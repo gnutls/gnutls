@@ -20,7 +20,7 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
-INCLUDES = -I$(top_srcdir)/lib \
+INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)/includes \
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl
 
 noinst_LTLIBRARIES = libminiopencdk.la

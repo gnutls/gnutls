@@ -51,7 +51,7 @@
 
 typedef struct gnutls_cert
 {
-  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 
 					 * key algorithm 
 					 * RSA: [0] is modulus
 					 *      [1] is public exponent
@@ -82,7 +82,7 @@ typedef struct gnutls_cert
 
 typedef struct gnutls_privkey_int
 {
-  mpi_t params[MAX_PRIV_PARAMS_SIZE];	/* the size of params depends on the public 
+  bigint_t params[MAX_PRIV_PARAMS_SIZE];	/* the size of params depends on the public 
 					 * key algorithm 
 					 */
   /*

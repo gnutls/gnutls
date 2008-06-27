@@ -39,8 +39,8 @@ int _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 int _gnutls_check_key_usage (const gnutls_cert * cert,
 			     gnutls_kx_algorithm_t alg);
 
-int _gnutls_x509_read_rsa_params (opaque * der, int dersize, mpi_t * params);
-int _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, mpi_t * params);
+int _gnutls_x509_read_rsa_params (opaque * der, int dersize, bigint_t * params);
+int _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params);
 
 int _gnutls_x509_raw_privkey_to_gkey (gnutls_privkey * privkey,
 				      const gnutls_datum_t * raw_key,

@@ -1137,7 +1137,7 @@ int
 _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 					 const char *dst_name,
 					 gnutls_pk_algorithm_t
-					 pk_algorithm, mpi_t * params,
+					 pk_algorithm, bigint_t * params,
 					 int params_size)
 {
   const char *pk;
@@ -1259,7 +1259,7 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
   int algo;
   char oid[64];
   int len;
-  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   char name[128];
 
   _gnutls_str_cpy (name, sizeof (name), src_name);

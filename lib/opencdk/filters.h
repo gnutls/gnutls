@@ -31,10 +31,9 @@ enum {
 };
 
 typedef struct {
-  gcry_cipher_hd_t hd;
-  gcry_md_hd_t mdc;
+  cipher_hd_st hd;
+  digest_hd_st mdc;
   int mdc_method;
-  cdk_dek_t dek;
   u32 datalen;
   struct {
     size_t on;
@@ -46,7 +45,8 @@ typedef struct {
 
 typedef struct {
   int digest_algo;
-  gcry_md_hd_t md;
+  digest_hd_st md;
+  int md_initialized;
 } md_filter_t;
 
 typedef struct {
@@ -61,7 +61,8 @@ typedef struct {
   cdk_lit_format_t mode;
   char *orig_filename; /* This original name of the input file. */
   char *filename;
-  gcry_md_hd_t md;
+  digest_hd_st md;
+  int md_initialized;
   struct {
     size_t on;
     off_t size;

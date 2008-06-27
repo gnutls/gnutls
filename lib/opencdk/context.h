@@ -74,7 +74,6 @@ struct cdk_ctx_s {
     cdk_pkt_seckey_t sk;
     unsigned on:1;
   } cache;
-  cdk_dek_t dek;
   struct {
     cdk_keydb_hd_t sec;
     cdk_keydb_hd_t pub;

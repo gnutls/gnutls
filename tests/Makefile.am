@@ -31,6 +31,7 @@ EXTRA_DIST = libgcrypt.supp
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
+	-I$(top_srcdir)/lib 						\
 	-I$(top_srcdir)/doc/examples
 AM_LDFLAGS = -no-install
 LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la libutils.la
@@ -38,7 +39,7 @@ LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la libutils.la
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
-ctests = simple openssl gc set_pkcs12_cred certder			\
+ctests = simple openssl gc set_pkcs12_cred certder mpi			\
 	certificate_set_x509_crl dn parse_ca moredn crypto_rng mini
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 

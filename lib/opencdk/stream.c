@@ -49,7 +49,7 @@ static int stream_cache_flush (cdk_stream_t s, FILE *fp);
 struct stream_filter_s* filter_add (cdk_stream_t s, filter_fnct_t fnc, int type);
 
 /* Customized tmpfile() version from misc.c */
-FILE *my_tmpfile (void);
+FILE *_cdk_tmpfile (void);
     
 
 /* FIXME: The read/write/putc/getc function cannot directly
@@ -177,7 +177,7 @@ cdk_stream_new (const char *file, cdk_stream_t *ret_s)
 	  return CDK_Out_Of_Core;
 	}
     }
-  s->fp = my_tmpfile ();
+  s->fp = _cdk_tmpfile ();
   if (!s->fp) 
     {
       cdk_free (s->fname);
@@ -708,7 +708,7 @@ stream_filter_write (cdk_stream_t s)
       if (!f->next && s->fname)
 	f->tmp = fopen (s->fname, "w+b");
       else
-	f->tmp = my_tmpfile ();
+	f->tmp = _cdk_tmpfile ();
       if (!f->tmp)
 	{
 	  rc = CDK_File_Error;
@@ -767,7 +767,7 @@ stream_filter_read (cdk_stream_t s)
 	  continue;
 	}
      
-      f->tmp = my_tmpfile ();
+      f->tmp = _cdk_tmpfile ();
       if (!f->tmp)
 	{
 	  rc = CDK_File_Error;
@@ -821,7 +821,7 @@ _cdk_stream_get_opaque (cdk_stream_t s, int fid)
   
   for (f = s->filters; f; f = f->next)
     {
-      if (f->type == fid)
+      if ((int)f->type == fid)
 	return f->opaque;
     }
   return NULL;
@@ -1114,46 +1114,6 @@ cdk_stream_set_literal_flag (cdk_stream_t s, cdk_lit_format_t mode,
 
 
 /**
- * cdk_stream_set_cipher_flag:
- * @s: the stream object
- * @dek: the data encryption key
- * @use_mdc: 1 means to use the MDC mode
- * 
- * In read mode it kicks off the cipher filter to decrypt the data
- * from the stream with the key given in @dek.
- * In write mode the stream data will be encrypted with the DEK object
- * and optionally, the @use_mdc parameter can be used to enable the MDC mode.
- **/
-cdk_error_t
-cdk_stream_set_cipher_flag (cdk_stream_t s, cdk_dek_t dek, int use_mdc)
-{
-  struct stream_filter_s * f;
-  
-  _cdk_log_debug ("stream: enable cipher mode\n");
-  if (!s)
-    return CDK_Inv_Value;
-
-#if 0
-  f = filter_add (s, _cdk_filter_cipher, fCIPHER);
-  if (!f)
-    return CDK_Out_Of_Core;
-  dek->use_mdc = use_mdc;
-  f->ctl = stream_get_mode (s);
-  f->u.cfx.dek = dek;
-  f->u.cfx.mdc_method = use_mdc? GCRY_MD_SHA1 : 0;
-  if (s->blkmode > 0)
-    {
-      f->u.cfx.blkmode.on = 1;
-      f->u.cfx.blkmode.size = s->blkmode;
-    }
-  return 0;
-#endif
-
-  return CDK_Not_Implemented;
-}
-
-
-/**
  * cdk_stream_set_compress_flag:
  * @s: the stream object
  * @algo: the compression algo
@@ -1167,11 +1127,12 @@ cdk_stream_set_cipher_flag (cdk_stream_t s, cdk_dek_t dek, int use_mdc)
 cdk_error_t
 cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
 {
-  struct stream_filter_s *f;
   
   return CDK_Not_Implemented;
 
 #if 0
+  struct stream_filter_s *f;
+
   if (!s)
     return CDK_Inv_Value;
   f = filter_add (s, _cdk_filter_compress, fCOMPRESS);
@@ -1334,7 +1295,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
 {
   cdk_error_t rc;
   off_t oldpos;
-  int n;  
+  unsigned int n;  
   
   if (!ret_buf || !ret_buflen)
     return CDK_Inv_Value;

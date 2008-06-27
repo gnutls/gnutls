@@ -35,12 +35,11 @@
 
 /* Release an array of MPI values. */
 void
-_cdk_free_mpibuf (size_t n, gcry_mpi_t *array)
+_cdk_free_mpibuf (size_t n, bigint_t *array)
 {
   while (n--) 
     {
-      gcry_mpi_release (array[n]);
-      array[n] = NULL;
+      _gnutls_mpi_release (&array[n]);
     }
 }
 
@@ -63,16 +62,6 @@ cdk_pkt_new (cdk_packet_t *r_pkt)
     return CDK_Out_Of_Core;
   *r_pkt = pkt;
   return 0;
-}
-
-
-static void
-free_symkey_enc (cdk_pkt_symkey_enc_t enc)
-{
-  if (!enc)
-    return;
-  cdk_s2k_free (enc->s2k);
-  cdk_free (enc);
 }
 
 
@@ -179,21 +168,6 @@ cdk_sk_release (cdk_seckey_t sk)
 }
 
 
-static void
-free_encrypted (cdk_pkt_encrypted_t enc)
-{
-  if (!enc)
-    return;
-  
-  /* This is just a reference for the filters to know where
-     the encrypted data starts and to read from the sream. It
-     us closed elsewhere and to close it here would double close it. */
-  /*cdk_stream_close (enc->buf);*/
-  enc->buf = NULL;
-  cdk_free (enc);
-}
-
-
 /* Detach the openpgp packet from the packet structure
    and release the packet structure itself. */
 void
@@ -242,10 +216,7 @@ cdk_pkt_free (cdk_packet_t pkt)
     case CDK_PKT_SECRET_SUBKEY: cdk_sk_release (pkt->pkt.secret_key); break;
     case CDK_PKT_SIGNATURE    : _cdk_free_signature (pkt->pkt.signature);break;
     case CDK_PKT_PUBKEY_ENC   : free_pubkey_enc (pkt->pkt.pubkey_enc); break;
-    case CDK_PKT_SYMKEY_ENC   : free_symkey_enc (pkt->pkt.symkey_enc); break;
     case CDK_PKT_MDC          : cdk_free (pkt->pkt.mdc); break;
-    case CDK_PKT_ENCRYPTED    :
-    case CDK_PKT_ENCRYPTED_MDC: free_encrypted (pkt->pkt.encrypted); break;
     case CDK_PKT_ONEPASS_SIG  : cdk_free (pkt->pkt.onepass_sig); break;
     case CDK_PKT_LITERAL      : free_literal (pkt->pkt.literal); break;
     case CDK_PKT_COMPRESSED   : cdk_free (pkt->pkt.compressed); break;
@@ -283,7 +254,7 @@ cdk_pkt_release (cdk_packet_t pkt)
  * Allocate a new packet structure with the given packet type.
  **/
 cdk_error_t
-cdk_pkt_alloc (cdk_packet_t *r_pkt, int pkttype)
+cdk_pkt_alloc (cdk_packet_t *r_pkt, cdk_packet_type_t pkttype)
 {
   cdk_packet_t pkt;
   int rc;
@@ -325,12 +296,6 @@ cdk_pkt_alloc (cdk_packet_t *r_pkt, int pkttype)
 	return CDK_Out_Of_Core;
       break;
       
-    case CDK_PKT_SYMKEY_ENC:
-      pkt->pkt.symkey_enc = cdk_calloc (1, sizeof *pkt->pkt.symkey_enc);
-      if (!pkt->pkt.symkey_enc)
-	return CDK_Out_Of_Core;
-      break;
-      
     case CDK_PKT_PUBKEY_ENC:
       pkt->pkt.pubkey_enc = cdk_calloc (1, sizeof *pkt->pkt.pubkey_enc);
       if (!pkt->pkt.pubkey_enc)
@@ -340,13 +305,6 @@ cdk_pkt_alloc (cdk_packet_t *r_pkt, int pkttype)
     case CDK_PKT_MDC:
       pkt->pkt.mdc = cdk_calloc (1, sizeof *pkt->pkt.mdc);
       if (!pkt->pkt.mdc)
-	return CDK_Out_Of_Core;
-      break;
-      
-    case CDK_PKT_ENCRYPTED_MDC:
-    case CDK_PKT_ENCRYPTED:
-      pkt->pkt.symkey_enc = cdk_calloc (1, sizeof *pkt->pkt.symkey_enc);
-      if (!pkt->pkt.symkey_enc)
 	return CDK_Out_Of_Core;
       break;
       
@@ -437,7 +395,7 @@ _cdk_copy_pubkey (cdk_pkt_pubkey_t* dst, cdk_pkt_pubkey_t src)
   if (src->prefs)
     k->prefs = _cdk_copy_prefs (src->prefs);
   for (i = 0; i < cdk_pk_get_npkey (src->pubkey_algo); i++)
-    k->mpi[i] = gcry_mpi_copy (src->mpi[i]);
+    k->mpi[i] = _gnutls_mpi_copy (src->mpi[i]);
   *dst = k;
   
   return 0;
@@ -469,11 +427,9 @@ _cdk_copy_seckey (cdk_pkt_seckey_t* dst, cdk_pkt_seckey_t src)
     }
   
   _cdk_s2k_copy (&k->protect.s2k, src->protect.s2k);
-  
   for (i = 0; i < cdk_pk_get_nskey (src->pubkey_algo); i++) 
     {
-      k->mpi[i] = gcry_mpi_copy (src->mpi[i]);
-      gcry_mpi_set_flag (k->mpi[i], GCRYMPI_FLAG_SECURE);
+      k->mpi[i] = _gnutls_mpi_copy (src->mpi[i]);
     }
   
   *dst = k;  
@@ -489,7 +445,7 @@ _cdk_copy_pk_to_sk (cdk_pkt_pubkey_t pk, cdk_pkt_seckey_t sk)
   
   sk->version = pk->version;
   sk->expiredate = pk->expiredate;
-  sk->pubkey_algo = pk->pubkey_algo;
+  sk->pubkey_algo = _pgp_pub_algo_to_cdk(pk->pubkey_algo);
   sk->has_expired = pk->has_expired;
   sk->is_revoked = pk->is_revoked;
   sk->main_keyid[0] = pk->main_keyid[0];
@@ -539,7 +495,7 @@ _cdk_pubkey_compare (cdk_pkt_pubkey_t a, cdk_pkt_pubkey_t b)
   
   for (i = 0; i < na; i++) 
     {
-      if (gcry_mpi_cmp (a->mpi[i], b->mpi[i]))
+      if (_gnutls_mpi_cmp (a->mpi[i], b->mpi[i]))
 	return -1;
     }
   

@@ -23,4 +23,15 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 
 dist_check_SCRIPTS = pkcs12
 
-TESTS = pkcs12
+TESTS = pkcs12 pkcs12_s2k
+
+check_PROGRAMS = pkcs12_s2k
+
+AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl -I..		\
+	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
+	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
+	-I$(top_srcdir)/lib 						\
+	-I$(top_srcdir)/doc/examples
+AM_LDFLAGS = -no-install
+LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la ../../lgl/liblgnu.la ../libutils.la
+

@@ -75,10 +75,12 @@ const mod_auth_st srp_auth_struct = {
  * all are ok.
  */
 inline static int
-check_b_mod_n (mpi_t b, mpi_t n)
+check_b_mod_n (bigint_t b, bigint_t n)
 {
   int ret;
-  mpi_t r = _gnutls_mpi_alloc_like (b);
+  bigint_t r;
+
+  r = _gnutls_mpi_mod (b, n);
 
   if (r == NULL)
     {
@@ -86,7 +88,6 @@ check_b_mod_n (mpi_t b, mpi_t n)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_mpi_mod (r, b, n);
   ret = _gnutls_mpi_cmp_ui (r, 0);
 
   _gnutls_mpi_release (&r);
@@ -105,18 +106,18 @@ check_b_mod_n (mpi_t b, mpi_t n)
  * all are ok.
  */
 inline static int
-check_a_mod_n (mpi_t a, mpi_t n)
+check_a_mod_n (bigint_t a, bigint_t n)
 {
   int ret;
-  mpi_t r = _gnutls_mpi_alloc_like (a);
+  bigint_t r;
 
+  r = _gnutls_mpi_mod (a, n);
   if (r == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_mpi_mod (r, a, n);
   ret = _gnutls_mpi_cmp_ui (r, 0);
 
   _gnutls_mpi_release (&r);
@@ -172,21 +173,21 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
 
   /* copy from pwd_entry to local variables (actually in session) */
   tmp_size = pwd_entry->g.size;
-  if (_gnutls_mpi_scan_nz (&G, pwd_entry->g.data, &tmp_size) < 0)
+  if (_gnutls_mpi_scan_nz (&G, pwd_entry->g.data, tmp_size) < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
   tmp_size = pwd_entry->n.size;
-  if (_gnutls_mpi_scan_nz (&N, pwd_entry->n.data, &tmp_size) < 0)
+  if (_gnutls_mpi_scan_nz (&N, pwd_entry->n.data, tmp_size) < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
   tmp_size = pwd_entry->v.size;
-  if (_gnutls_mpi_scan_nz (&V, pwd_entry->v.data, &tmp_size) < 0)
+  if (_gnutls_mpi_scan_nz (&V, pwd_entry->v.data, tmp_size) < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
@@ -201,7 +202,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  if (_gnutls_mpi_print (NULL, &n_b, B) != 0)
+  if (_gnutls_mpi_print (B, NULL, &n_b) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_PRINT_FAILED;
@@ -243,7 +244,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
    */
 
   data_b = &data_s[1 + pwd_entry->salt.size];
-  if (_gnutls_mpi_print (&data_b[2], &n_b, B) != 0) 
+  if (_gnutls_mpi_print (B, &data_b[2], &n_b) != 0) 
     {
       gnutls_assert();
       return GNUTLS_E_MPI_PRINT_FAILED;
@@ -340,7 +341,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
   _gnutls_mpi_release (&session->key->u);
   _gnutls_mpi_release (&B);
 
-  ret = _gnutls_mpi_dprint (&session->key->key, session->key->KEY);
+  ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
   _gnutls_mpi_release (&S);
 
   if (ret < 0) 
@@ -349,7 +350,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
       return ret;
     }
 
-  if (_gnutls_mpi_print (NULL, &n_a, A) != 0)
+  if (_gnutls_mpi_print (A, NULL, &n_a) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_PRINT_FAILED;
@@ -364,7 +365,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
 
   /* copy A */
   data_a = (*data);
-  if (_gnutls_mpi_print (&data_a[2], &n_a, A) != 0)
+  if (_gnutls_mpi_print (A, &data_a[2], &n_a) != 0)
     {
       gnutls_free (*data);
       return GNUTLS_E_MPI_PRINT_FAILED;
@@ -394,7 +395,7 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
   _n_A = _gnutls_read_uint16 (&data[0]);
 
   DECR_LEN (data_size, _n_A);
-  if (_gnutls_mpi_scan_nz (&A, &data[2], &_n_A) || A == NULL)
+  if (_gnutls_mpi_scan_nz (&A, &data[2], _n_A) || A == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
@@ -440,7 +441,7 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
   _gnutls_mpi_release (&session->key->u);
   _gnutls_mpi_release (&B);
 
-  ret = _gnutls_mpi_dprint (&session->key->key, session->key->KEY);
+  ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
   _gnutls_mpi_release (&S);
 
   if (ret < 0)
@@ -597,9 +598,9 @@ check_g_n (const opaque * g, size_t n_g, const opaque * n, size_t n_n)
  * Otherwise only the included parameters must be used.
  */
 static int
-group_check_g_n (mpi_t g, mpi_t n)
+group_check_g_n (bigint_t g, bigint_t n)
 {
-  mpi_t q = NULL, two = NULL, w = NULL;
+  bigint_t q = NULL, two = NULL, w = NULL;
   int ret;
 
   if (_gnutls_mpi_get_nbits (n) < 2048)
@@ -611,7 +612,7 @@ group_check_g_n (mpi_t g, mpi_t n)
   /* N must be of the form N=2q+1
    * where q is also a prime.
    */
-  if (_gnutls_prime_check (n, 0) != 0)
+  if (_gnutls_prime_check (n) != 0)
     {
       _gnutls_dump_mpi ("no prime N: ", n);
       gnutls_assert ();
@@ -640,9 +641,9 @@ group_check_g_n (mpi_t g, mpi_t n)
   /* q = q/2, remember that q is divisible by 2 (prime - 1)
    */
   _gnutls_mpi_set_ui (two, 2);
-  _gnutls_mpi_div (q, NULL, q, two, 0);
+  _gnutls_mpi_div (q, q, two);
 
-  if (_gnutls_prime_check (q, 0) != 0)
+  if (_gnutls_prime_check (q) != 0)
     {
       /* N was not on the form N=2q+1, where q = prime
        */
@@ -790,19 +791,19 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
   _n_n = n_n;
   _n_b = n_b;
 
-  if (_gnutls_mpi_scan_nz (&N, data_n, &_n_n) != 0)
+  if (_gnutls_mpi_scan_nz (&N, data_n, _n_n) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  if (_gnutls_mpi_scan_nz (&G, data_g, &_n_g) != 0)
+  if (_gnutls_mpi_scan_nz (&G, data_g, _n_g) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  if (_gnutls_mpi_scan_nz (&B, data_b, &_n_b) != 0)
+  if (_gnutls_mpi_scan_nz (&B, data_b, _n_b) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
@@ -843,7 +844,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  if (_gnutls_mpi_scan_nz (&session->key->x, hd, &_n_g) != 0)
+  if (_gnutls_mpi_scan_nz (&session->key->x, hd, _n_g) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;

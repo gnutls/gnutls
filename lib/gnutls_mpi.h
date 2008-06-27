@@ -26,52 +26,50 @@
 # define GNUTLS_MPI_H
 
 # include <gnutls_int.h>
-# include <gcrypt.h>
-# include <gc.h>
 # include <libtasn1.h>
 
-typedef gcry_mpi_t mpi_t;
+# include <gnutls/crypto.h>
 
-#define _gnutls_mpi_cmp gcry_mpi_cmp
-#define _gnutls_mpi_cmp_ui gcry_mpi_cmp_ui
-#define _gnutls_mpi_mod gcry_mpi_mod
-#define _gnutls_mpi_new gcry_mpi_new
-#define _gnutls_mpi_snew gcry_mpi_snew
-#define _gnutls_mpi_copy gcry_mpi_copy
-#define _gnutls_mpi_set_ui gcry_mpi_set_ui
-#define _gnutls_mpi_set gcry_mpi_set
-#define _gnutls_mpi_randomize gcry_mpi_randomize
-#define _gnutls_mpi_get_nbits gcry_mpi_get_nbits
-#define _gnutls_mpi_powm gcry_mpi_powm
-#define _gnutls_mpi_invm gcry_mpi_invm
-#define _gnutls_mpi_addm gcry_mpi_addm
-#define _gnutls_mpi_subm gcry_mpi_subm
-#define _gnutls_mpi_sub_ui gcry_mpi_sub_ui
-#define _gnutls_mpi_mulm gcry_mpi_mulm
-#define _gnutls_mpi_mul gcry_mpi_mul
-#define _gnutls_mpi_add gcry_mpi_add
-#define _gnutls_mpi_add_ui gcry_mpi_add_ui
-#define _gnutls_mpi_sub_ui gcry_mpi_sub_ui
-#define _gnutls_mpi_mul_ui gcry_mpi_mul_ui
-#define _gnutls_prime_check gcry_prime_check
-#define _gnutls_mpi_div gcry_mpi_div
+extern int crypto_bigint_prio;
+extern gnutls_crypto_bigint_st _gnutls_mpi_ops;
 
-# define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x))
-# define _gnutls_mpi_salloc_like(x) _gnutls_mpi_snew(_gnutls_mpi_get_nbits(x))
+bigint_t _gnutls_mpi_randomize( bigint_t, unsigned int bits, gnutls_rnd_level_t level);
 
-void _gnutls_mpi_release (mpi_t * x);
+#define _gnutls_mpi_new(x) _gnutls_mpi_ops.bigint_new(x)
+#define _gnutls_mpi_cmp(x,y) _gnutls_mpi_ops.bigint_cmp(x,y)
+#define _gnutls_mpi_cmp_ui(x,y) _gnutls_mpi_ops.bigint_cmp_ui(x,y) 
+#define _gnutls_mpi_mod(x,y) _gnutls_mpi_ops.bigint_mod(x,y)
+#define _gnutls_mpi_set(x,y) _gnutls_mpi_ops.bigint_set(x,y)
+#define _gnutls_mpi_set_ui(x,y) _gnutls_mpi_ops.bigint_set_ui(x,y)
+#define _gnutls_mpi_get_nbits(x) _gnutls_mpi_ops.bigint_get_nbits(x)
+#define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x))
+#define _gnutls_mpi_powm(x,y,z,w) _gnutls_mpi_ops.bigint_powm(x,y,z,w)
+#define _gnutls_mpi_addm(x,y,z,w) _gnutls_mpi_ops.bigint_addm(x,y,z,w)
+#define _gnutls_mpi_subm(x,y,z,w) _gnutls_mpi_ops.bigint_subm(x,y,z,w)
+#define _gnutls_mpi_mulm(x,y,z,w) _gnutls_mpi_ops.bigint_mulm(x,y,z,w)
+#define _gnutls_mpi_add(x,y,z) _gnutls_mpi_ops.bigint_add(x,y,z)
+#define _gnutls_mpi_sub(x,y,z) _gnutls_mpi_ops.bigint_sub(x,y,z)
+#define _gnutls_mpi_mul(x,y,z) _gnutls_mpi_ops.bigint_mul(x,y,z)
+#define _gnutls_mpi_div(x,y,z) _gnutls_mpi_ops.bigint_div(x,y,z)
+#define _gnutls_mpi_add_ui(x,y,z) _gnutls_mpi_ops.bigint_add_ui(x,y,z)
+#define _gnutls_mpi_sub_ui(x,y,z) _gnutls_mpi_ops.bigint_sub_ui(x,y,z)
+#define _gnutls_mpi_mul_ui(x,y,z) _gnutls_mpi_ops.bigint_mul_ui(x,y,z)
+#define _gnutls_prime_check(z) _gnutls_mpi_ops.bigint_prime_check(z)
+#define _gnutls_mpi_print(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_USG)
+#define _gnutls_mpi_print_lz(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_STD)
+#define _gnutls_mpi_print_pgp(x,y,z) _gnutls_mpi_ops.bigint_print(x,y,z,GNUTLS_MPI_FORMAT_PGP)
+#define _gnutls_mpi_copy( a) _gnutls_mpi_set( NULL, a)
 
-int _gnutls_mpi_scan_nz (mpi_t * ret_mpi, const opaque * buffer,
-			 size_t * nbytes);
-int _gnutls_mpi_scan (mpi_t * ret_mpi, const opaque * buffer,
-		      size_t * nbytes);
-int _gnutls_mpi_scan_pgp (mpi_t * ret_mpi, const opaque * buffer,
-			  size_t * nbytes);
+void _gnutls_mpi_release (bigint_t * x);
 
-int _gnutls_mpi_print (void *buffer, size_t * nbytes, const mpi_t a);
-int _gnutls_mpi_print_lz (void *buffer, size_t * nbytes, const mpi_t a);
+int _gnutls_mpi_scan (bigint_t * ret_mpi, const void * buffer, size_t nbytes);
+int _gnutls_mpi_scan_nz (bigint_t * ret_mpi, const void * buffer, size_t nbytes);
+int _gnutls_mpi_scan_pgp (bigint_t * ret_mpi, const void * buffer, size_t nbytes);
 
-int _gnutls_mpi_dprint_lz (gnutls_datum_t * dest, const mpi_t a);
-int _gnutls_mpi_dprint (gnutls_datum_t * dest, const mpi_t a);
+int _gnutls_mpi_dprint_lz ( const bigint_t a, gnutls_datum_t * dest);
+int _gnutls_mpi_dprint ( const bigint_t a, gnutls_datum_t * dest);
+int _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest, size_t size);
+
+#define _gnutls_mpi_generate_group( gg, bits) _gnutls_mpi_ops.bigint_generate_group( gg, bits)
 
 #endif

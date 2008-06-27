@@ -53,15 +53,15 @@ unsigned int _gnutls_get_pgp_key_usage(unsigned int pgp_usage);
 
 int
 _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert, uint32_t keyid[2],
-			   mpi_t * params, int *params_size);
+			   bigint_t * params, int *params_size);
 
 int
 _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey, uint32_t keyid[2],
-			   mpi_t * params, int *params_size);
+			   bigint_t * params, int *params_size);
 
 cdk_packet_t _gnutls_openpgp_find_key( cdk_kbnode_t knode, uint32_t keyid[2], unsigned int priv);
 
-int _gnutls_read_pgp_mpi( cdk_packet_t pkt, unsigned int priv, size_t idx, mpi_t* m);
+int _gnutls_read_pgp_mpi( cdk_packet_t pkt, unsigned int priv, size_t idx, bigint_t* m);
 
 int _gnutls_openpgp_find_subkey_idx( cdk_kbnode_t knode, uint32_t keyid[2], 
   unsigned int priv);

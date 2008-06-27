@@ -9,7 +9,7 @@
 cdk_error_t
 _cdk_proc_packets (cdk_ctx_t hd, cdk_stream_t inp, cdk_stream_t data,
 		   const char *output, cdk_stream_t outstream,
-		   gcry_md_hd_t md)
+		   digest_hd_st* md)
 {
   return 0;
 }

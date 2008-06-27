@@ -27,15 +27,18 @@
 
 #include <gnutls/crypto.h>
 
+extern int crypto_cipher_prio;
+extern gnutls_crypto_cipher_st _gnutls_cipher_ops;
+
 typedef struct {
-  gnutls_crypto_cipher_st* cc;
+  gnutls_crypto_single_cipher_st* cc;
   void* ctx;
 } reg_hd;
 
 typedef struct {
 	int registered; /* true or false(0) */
 	union {
-		gc_cipher_handle gc; /* when not registered */
+		void* gc; /* when not registered */
 		reg_hd rh; /* when registered */
 	} hd;
 } cipher_hd_st;

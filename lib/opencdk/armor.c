@@ -278,7 +278,6 @@ is_armored (int ctb)
   switch (pkttype)
     {
     case CDK_PKT_MARKER:
-    case CDK_PKT_SYMKEY_ENC:
     case CDK_PKT_ONEPASS_SIG:
     case CDK_PKT_PUBLIC_KEY:
     case CDK_PKT_SECRET_KEY:
@@ -286,7 +285,6 @@ is_armored (int ctb)
     case CDK_PKT_SIGNATURE:
     case CDK_PKT_LITERAL:
     case CDK_PKT_COMPRESSED:
-    case CDK_PKT_ENCRYPTED:
       return 0; /* seems to be a regular packet: not armored */
     }
   return 1;
@@ -296,7 +294,7 @@ is_armored (int ctb)
 static u32
 update_crc (u32 crc, const byte *buf, size_t buflen)
 {
-  int j;
+  unsigned int j;
   
   if (!crc)
     crc = CRCINIT;
@@ -320,8 +318,8 @@ armor_encode (void *opaque, FILE *in, FILE *out)
   
   if (!afx)
     return CDK_Inv_Value;
-  if (afx->idx < 0 || afx->idx > DIM (armor_begin) ||
-      afx->idx2 < 0 || afx->idx2 > DIM (armor_end))
+  if (afx->idx < 0 || afx->idx > (int)DIM (armor_begin) ||
+      afx->idx2 < 0 || afx->idx2 > (int)DIM (armor_end))
         return CDK_Inv_Value;
 
   _cdk_log_debug ("armor filter: encode\n");
@@ -424,7 +422,7 @@ armor_decode (void *opaque, FILE *in, FILE *out)
   char buf[127];
   byte raw[128], crcbuf[4];
   u32 crc2 = 0;
-  size_t nread = 0;
+  ssize_t nread = 0;
   int i, pgp_data = 0;
   cdk_error_t rc = 0;
   

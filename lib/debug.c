@@ -117,12 +117,14 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
 }
 
 void
-_gnutls_dump_mpi (const char *prefix, mpi_t a)
+_gnutls_dump_mpi (const char *prefix, bigint_t a)
 {
+  opaque mpi_buf[1024];
   opaque buf[1024];
   size_t n = sizeof buf;
 
-  if (gcry_mpi_print (GCRYMPI_FMT_HEX, buf, n, &n, a))
+  if (_gnutls_mpi_print (a, mpi_buf, &n) < 0)
     strcpy (buf, "[can't print value]");	/* Flawfinder: ignore */
-  _gnutls_hard_log ("MPI: length: %d\n\t%s%s\n", (n - 1) / 2, prefix, buf);
+  else _gnutls_bin2hex (mpi_buf, n, buf, sizeof(buf));
+  _gnutls_hard_log ("MPI: length: %d\n\t%s%s\n", n, prefix, buf);
 }

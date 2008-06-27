@@ -24,8 +24,22 @@
 #ifndef CDK_MAIN_H
 #define CDK_MAIN_H
 
-#include <gcrypt.h>
 #include "types.h"
+
+#define _cdk_log_debug _gnutls_debug_log
+#define _cdk_log_info _gnutls_x509_log
+#define _cdk_get_log_level() _gnutls_log_level
+
+#define cdk_malloc gnutls_malloc
+#define cdk_free gnutls_free
+#define cdk_calloc gnutls_calloc
+#define cdk_realloc gnutls_realloc_fast
+#define cdk_strdup gnutls_strdup
+#define cdk_salloc gnutls_secure_calloc
+
+#define map_gnutls_error _cdk_map_gnutls_error
+
+cdk_error_t map_gnutls_error(int err);
 
 /* The general size of a buffer for the variou modules. */
 #define BUFSIZE 8192
@@ -58,9 +72,9 @@
 #define DEBUG_PKT (_cdk_get_log_level () == (CDK_LOG_DEBUG+1))
 
 /* Helper to find out if a key has the requested capability. */
-#define KEY_CAN_ENCRYPT(a) (_cdk_pk_algo_usage ((a)) & CDK_KEY_USG_ENCR)
-#define KEY_CAN_SIGN(a)    (_cdk_pk_algo_usage ((a)) & CDK_KEY_USG_SIGN)
-#define KEY_CAN_AUTH(a)    (_cdk_pk_algo_usage ((a)) & CDK_KEY_USG_AUTH)
+#define KEY_CAN_ENCRYPT(a) ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_ENCR)
+#define KEY_CAN_SIGN(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_SIGN)
+#define KEY_CAN_AUTH(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_AUTH)
 
 /* Helper macro to make sure the buffer is overwritten. */
 #define wipemem(_ptr,_len) do { \
@@ -77,9 +91,6 @@
 const char * _cdk_armor_get_lineend (void);
      
 /*-- main.c --*/
-int _cdk_get_log_level (void);
-void _cdk_log_info (const char * fmt, ...);
-void _cdk_log_debug (const char * fmt, ...);
 char * _cdk_passphrase_get (cdk_ctx_t hd, const char *prompt);
 
 /*-- misc.c --*/
@@ -87,8 +98,6 @@ int _cdk_check_args( int overwrite, const char * in, const char * out );
 u32 _cdk_buftou32 (const byte * buf);
 void _cdk_u32tobuf (u32 u, byte * buf);
 const char *_cdk_memistr (const char * buf, size_t buflen, const char * sub);
-cdk_error_t _cdk_map_gcry_error (gcry_error_t err);
-#define map_gcry_error(err) _cdk_map_gcry_error (err)
 
 /* Helper to provide case insentensive strstr version. */
 #define stristr(haystack, needle) \
@@ -98,7 +107,7 @@ cdk_error_t _cdk_map_gcry_error (gcry_error_t err);
 cdk_error_t _cdk_proc_packets (cdk_ctx_t hd, cdk_stream_t inp,
 			       cdk_stream_t data,
 			       const char *output, cdk_stream_t outstream,
-			       gcry_md_hd_t md);
+			       digest_hd_st*md);
 cdk_error_t _cdk_pkt_write2 (cdk_stream_t out, int pkttype, void *pktctx);
 
 /*-- pubkey.c --*/
@@ -115,10 +124,10 @@ void _cdk_pkt_detach_free (cdk_packet_t pkt, int *r_pkttype, void **ctx);
 
 /*-- sig-check.c --*/
 cdk_error_t _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
-			    gcry_md_hd_t digest, int * r_expired);
-cdk_error_t _cdk_hash_sig_data (cdk_pkt_signature_t sig, gcry_md_hd_t hd);
-cdk_error_t _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version, gcry_md_hd_t md);
-cdk_error_t _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, gcry_md_hd_t md, 
+			    digest_hd_st*digest, int * r_expired);
+cdk_error_t _cdk_hash_sig_data (cdk_pkt_signature_t sig, digest_hd_st*hd);
+cdk_error_t _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version, digest_hd_st*md);
+cdk_error_t _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, digest_hd_st *md, 
 			      int use_fpr);
 cdk_error_t _cdk_pk_check_sig (cdk_keydb_hd_t hd,
 			       cdk_kbnode_t knode, 
@@ -149,7 +158,7 @@ int _cdk_sig_hash_for (cdk_pkt_pubkey_t pk);
 void _cdk_trim_string (char * s, int canon);
 cdk_error_t _cdk_sig_create (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig);
 cdk_error_t _cdk_sig_complete (cdk_pkt_signature_t sig, cdk_pkt_seckey_t sk,
-			       gcry_md_hd_t hd);
+			       digest_hd_st *hd);
 
 /*-- stream.c --*/
 void _cdk_stream_set_compress_algo (cdk_stream_t s, int algo);   
@@ -180,12 +189,12 @@ cdk_error_t _cdk_pkt_write_fp( FILE * out, cdk_packet_t pkt );
 
 /*-- seskey.c --*/
 cdk_error_t _cdk_s2k_copy (cdk_s2k_t *r_dst, cdk_s2k_t src);
-    
-cdk_error_t cdk_dek_encode_pkcs1 (cdk_dek_t dek, size_t nbits, 
-				  gcry_mpi_t *r_enc);
-cdk_error_t cdk_dek_decode_pkcs1 (cdk_dek_t * ret_dek, gcry_mpi_t esk);
-cdk_error_t cdk_dek_extract (cdk_dek_t * ret_dek, cdk_ctx_t hd,
-			     cdk_pkt_pubkey_enc_t enc,
-			     cdk_pkt_seckey_t sk );
 
+#define _cdk_pub_algo_to_pgp(algo) (algo)
+#define _pgp_pub_algo_to_cdk(algo) (algo)
+int _gnutls_hash_algo_to_pgp(int algo);
+int _pgp_hash_algo_to_gnutls(int algo);
+int _gnutls_cipher_to_pgp(int cipher);
+int _pgp_cipher_to_gnutls(int cipher);
+    
 #endif /* CDK_MAIN_H */

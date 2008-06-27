@@ -34,7 +34,6 @@
 #include <gnutls_str.h>
 #include <gnutls_sig.h>
 #include <stdio.h>
-#include <gcrypt.h>
 #include <time.h>
 #include <sys/stat.h>
 
@@ -262,7 +261,7 @@ gnutls_openpgp_get_key (gnutls_datum_t * key,
   rc = cdk_kbnode_write_to_mem_alloc (knode, &buf, &len);
   if (!rc)
     datum_append (key, buf, len);
-  cdk_free (buf);
+  gnutls_free (buf);
 
 leave:
   cdk_kbnode_release (knode);
@@ -893,7 +892,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 				  gnutls_datum_t * signature)
 {
   int result, i;
-  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int pk_algorithm;
   gnutls_openpgp_keyid_t keyid;

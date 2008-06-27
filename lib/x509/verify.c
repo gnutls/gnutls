@@ -535,7 +535,7 @@ decode_ber_digest_info (const gnutls_datum_t * info,
  */
 static int
 _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
-		       const gnutls_datum_t * signature, mpi_t * params,
+		       const gnutls_datum_t * signature, bigint_t * params,
 		       int params_len)
 {
   gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
@@ -596,7 +596,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
  */
 static int
 dsa_verify_sig (const gnutls_datum_t * text,
-		const gnutls_datum_t * signature, mpi_t * params,
+		const gnutls_datum_t * signature, bigint_t * params,
 		int params_len)
 {
   int ret;
@@ -628,7 +628,7 @@ dsa_verify_sig (const gnutls_datum_t * text,
 static int
 verify_sig (const gnutls_datum_t * tbs,
 	    const gnutls_datum_t * signature,
-	    gnutls_pk_algorithm_t pk, mpi_t * issuer_params,
+	    gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
 	    int issuer_params_size)
 {
 
@@ -674,7 +674,7 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
 			       const gnutls_datum_t * signature,
 			       gnutls_x509_crt_t issuer)
 {
-  mpi_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
+  bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
   int ret, issuer_params_size, i;
 
   /* Read the MPI parameters from the issuer's certificate.

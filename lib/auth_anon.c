@@ -64,8 +64,8 @@ const mod_auth_st anon_auth_struct = {
 static int
 gen_anon_server_kx (gnutls_session_t session, opaque ** data)
 {
-  mpi_t g, p;
-  const mpi_t *mpis;
+  bigint_t g, p;
+  const bigint_t *mpis;
   int ret;
   gnutls_dh_params_t dh_params;
   gnutls_anon_server_credentials_t cred;
@@ -117,9 +117,9 @@ proc_anon_client_kx (gnutls_session_t session, opaque * data,
   gnutls_anon_server_credentials_t cred;
   int bits;
   int ret;
-  mpi_t p, g;
+  bigint_t p, g;
   gnutls_dh_params_t dh_params;
-  const mpi_t *mpis;
+  const bigint_t *mpis;
 
   bits = _gnutls_dh_get_allowed_prime_bits (session);
 

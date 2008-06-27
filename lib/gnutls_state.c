@@ -438,7 +438,7 @@ _gnutls_dh_get_allowed_prime_bits (gnutls_session_t session)
 }
 
 int
-_gnutls_dh_set_peer_public (gnutls_session_t session, mpi_t public)
+_gnutls_dh_set_peer_public (gnutls_session_t session, bigint_t public)
 {
   dh_info_st *dh;
   int ret;
@@ -481,7 +481,7 @@ _gnutls_dh_set_peer_public (gnutls_session_t session, mpi_t public)
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ret = _gnutls_mpi_dprint_lz (&dh->public_key, public);
+  ret = _gnutls_mpi_dprint_lz (public, &dh->public_key);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -538,7 +538,7 @@ _gnutls_dh_set_secret_bits (gnutls_session_t session, unsigned bits)
  */
 int
 _gnutls_rsa_export_set_pubkey (gnutls_session_t session,
-			       mpi_t exponent, mpi_t modulus)
+			       bigint_t exponent, bigint_t modulus)
 {
   cert_auth_info_t info;
   int ret;
@@ -547,14 +547,14 @@ _gnutls_rsa_export_set_pubkey (gnutls_session_t session,
   if (info == NULL)
     return GNUTLS_E_INTERNAL_ERROR;
 
-  ret = _gnutls_mpi_dprint_lz (&info->rsa_export.modulus, modulus);
+  ret = _gnutls_mpi_dprint_lz (modulus, &info->rsa_export.modulus);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint_lz (&info->rsa_export.exponent, exponent);
+  ret = _gnutls_mpi_dprint_lz (exponent, &info->rsa_export.exponent);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -569,7 +569,7 @@ _gnutls_rsa_export_set_pubkey (gnutls_session_t session,
 /* Sets the prime and the generator in the auth info structure.
  */
 int
-_gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
+_gnutls_dh_set_group (gnutls_session_t session, bigint_t gen, bigint_t prime)
 {
   dh_info_st *dh;
   int ret;
@@ -614,7 +614,7 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
 
   /* prime
    */
-  ret = _gnutls_mpi_dprint_lz (&dh->prime, prime);
+  ret = _gnutls_mpi_dprint_lz (prime, &dh->prime);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -623,7 +623,7 @@ _gnutls_dh_set_group (gnutls_session_t session, mpi_t gen, mpi_t prime)
 
   /* generator
    */
-  ret = _gnutls_mpi_dprint_lz (&dh->generator, gen);
+  ret = _gnutls_mpi_dprint_lz (gen, &dh->generator);
   if (ret < 0)
     {
       gnutls_assert ();

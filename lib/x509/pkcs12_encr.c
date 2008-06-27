@@ -25,8 +25,7 @@
 
 #ifdef ENABLE_PKI
 
-#include <gcrypt.h>
-#include <gc.h>
+#include <gnutls_mpi.h>
 #include <gnutls_errors.h>
 
 /* Returns 0 if the password is ok, or a negative error
@@ -54,19 +53,27 @@ _pkcs12_check_pass (const char *pass, size_t plen)
  * 1 for encryption key
  */
 int
-_pkcs12_string_to_key (unsigned int id, const opaque * salt,
+_gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
 		       unsigned int salt_size, unsigned int iter,
 		       const char *pw, unsigned int req_keylen,
 		       opaque * keybuf)
 {
   int rc;
   unsigned int i, j;
-  gc_hash_handle md;
-  mpi_t num_b1 = NULL;
+  digest_hd_st md;
+  bigint_t num_b1 = NULL, num_ij = NULL;
+  bigint_t mpi512 = NULL;
   unsigned int pwlen;
   opaque hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
   size_t n;
+  const opaque buf_512[] = /* 2^64 */
+  { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
   cur_keylen = 0;
 
@@ -87,6 +94,13 @@ _pkcs12_string_to_key (unsigned int id, const opaque * salt,
       return rc;
     }
 
+  rc = _gnutls_mpi_scan (&mpi512, buf_512, sizeof(buf_512));
+  if (rc < 0)
+    {
+      gnutls_assert();
+      return rc;
+    } 
+
   /* Store salt and password in BUF_I */
   p = buf_i;
   for (i = 0; i < 64; i++)
@@ -106,64 +120,75 @@ _pkcs12_string_to_key (unsigned int id, const opaque * salt,
 
   for (;;)
     {
-      rc = gc_hash_open (GC_SHA1, 0, &md);
-      if (rc)
+      rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
+      if (rc < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_DECRYPTION_FAILED;
+	  goto cleanup;
 	}
       for (i = 0; i < 64; i++)
 	{
 	  unsigned char lid = id & 0xFF;
-	  gc_hash_write (md, 1, &lid);
+	  _gnutls_hash (&md, &lid, 1);
 	}
-      gc_hash_write (md, pw ? 128 : 64, buf_i);
-      memcpy (hash, gc_hash_read (md), 20);
-      gc_hash_close (md);
+      _gnutls_hash( &md, buf_i, pw ? 128 : 64);
+      _gnutls_hash_deinit( &md, hash);
       for (i = 1; i < iter; i++)
-	gc_hash_buffer (GC_SHA1, hash, 20, hash);
+        {
+          rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
+          if (rc < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+          _gnutls_hash( &md, hash, 20);
+          _gnutls_hash_deinit( &md, hash);
+        }
       for (i = 0; i < 20 && cur_keylen < req_keylen; i++)
 	keybuf[cur_keylen++] = hash[i];
       if (cur_keylen == req_keylen)
 	{
-	  gcry_mpi_release (num_b1);
-	  return 0;		/* ready */
+	  rc = 0;		/* ready */
+	  goto cleanup;
 	}
 
       /* need more bytes. */
       for (i = 0; i < 64; i++)
 	buf_b[i] = hash[i % 20];
       n = 64;
-      rc = _gnutls_mpi_scan (&num_b1, buf_b, &n);
+      rc = _gnutls_mpi_scan (&num_b1, buf_b, n);
       if (rc < 0)
 	{
 	  gnutls_assert ();
-	  return rc;
+	  goto cleanup;
 	}
-      gcry_mpi_add_ui (num_b1, num_b1, 1);
+      _gnutls_mpi_add_ui (num_b1, num_b1, 1);
       for (i = 0; i < 128; i += 64)
 	{
-	  mpi_t num_ij;
-
 	  n = 64;
-	  rc = _gnutls_mpi_scan (&num_ij, buf_i + i, &n);
+	  rc = _gnutls_mpi_scan (&num_ij, buf_i + i, n);
 	  if (rc < 0)
 	    {
 	      gnutls_assert ();
-	      return rc;
+	      goto cleanup;
 	    }
-	  gcry_mpi_add (num_ij, num_ij, num_b1);
-	  gcry_mpi_clear_highbit (num_ij, 64 * 8);
+	  _gnutls_mpi_addm (num_ij, num_ij, num_b1, mpi512);
 	  n = 64;
-	  rc = _gnutls_mpi_print (buf_i + i, &n, num_ij);
+	  rc = _gnutls_mpi_print (num_ij, buf_i + i, &n);
 	  if (rc < 0)
 	    {
 	      gnutls_assert ();
-	      return rc;
+	      goto cleanup;
 	    }
-	  gcry_mpi_release (num_ij);
+	  _gnutls_mpi_release (&num_ij);
 	}
     }
+cleanup:
+  _gnutls_mpi_release (&num_ij);
+  _gnutls_mpi_release (&num_b1);
+  _gnutls_mpi_release (&mpi512);
+  
+  return rc;
 }
 
 #endif /* ENABLE_PKI */

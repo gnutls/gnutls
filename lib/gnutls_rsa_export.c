@@ -43,7 +43,7 @@
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.
  */
-const mpi_t *
+const bigint_t *
 _gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
 {
   if (rsa_params == NULL)
@@ -52,116 +52,6 @@ _gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
     }
 
   return rsa_params->params;
-
-}
-
-/* resarr will contain: modulus(0), public exponent(1), private exponent(2),
- * prime1 - p (3), prime2 - q(4), u (5).
- */
-int
-_gnutls_rsa_generate_params (mpi_t * resarr, int *resarr_len, int bits)
-{
-
-  int ret;
-  gcry_sexp_t parms, key, list;
-
-  ret = gcry_sexp_build (&parms, NULL, "(genkey(rsa(nbits %d)))", bits);
-  if (ret != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  /* generate the RSA key */
-  ret = gcry_pk_genkey (&key, parms);
-  gcry_sexp_release (parms);
-
-  if (ret != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  list = gcry_sexp_find_token (key, "n", 0);
-  if (list == NULL)
-    {
-      gnutls_assert ();
-      gcry_sexp_release (key);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  resarr[0] = gcry_sexp_nth_mpi (list, 1, 0);
-  gcry_sexp_release (list);
-
-  list = gcry_sexp_find_token (key, "e", 0);
-  if (list == NULL)
-    {
-      gnutls_assert ();
-      gcry_sexp_release (key);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  resarr[1] = gcry_sexp_nth_mpi (list, 1, 0);
-  gcry_sexp_release (list);
-
-  list = gcry_sexp_find_token (key, "d", 0);
-  if (list == NULL)
-    {
-      gnutls_assert ();
-      gcry_sexp_release (key);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  resarr[2] = gcry_sexp_nth_mpi (list, 1, 0);
-  gcry_sexp_release (list);
-
-  list = gcry_sexp_find_token (key, "p", 0);
-  if (list == NULL)
-    {
-      gnutls_assert ();
-      gcry_sexp_release (key);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  resarr[3] = gcry_sexp_nth_mpi (list, 1, 0);
-  gcry_sexp_release (list);
-
-
-  list = gcry_sexp_find_token (key, "q", 0);
-  if (list == NULL)
-    {
-      gnutls_assert ();
-      gcry_sexp_release (key);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  resarr[4] = gcry_sexp_nth_mpi (list, 1, 0);
-  gcry_sexp_release (list);
-
-
-  list = gcry_sexp_find_token (key, "u", 0);
-  if (list == NULL)
-    {
-      gnutls_assert ();
-      gcry_sexp_release (key);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  resarr[5] = gcry_sexp_nth_mpi (list, 1, 0);
-  gcry_sexp_release (list);
-
-  gcry_sexp_release (key);
-
-  _gnutls_dump_mpi ("n: ", resarr[0]);
-  _gnutls_dump_mpi ("e: ", resarr[1]);
-  _gnutls_dump_mpi ("d: ", resarr[2]);
-  _gnutls_dump_mpi ("p: ", resarr[3]);
-  _gnutls_dump_mpi ("q: ", resarr[4]);
-  _gnutls_dump_mpi ("u: ", resarr[5]);
-
-  *resarr_len = 6;
-
-  return 0;
 
 }
 

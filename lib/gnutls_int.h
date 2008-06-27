@@ -189,21 +189,21 @@ struct gnutls_key_st
 {
   /* For DH KX */
   gnutls_datum_t key;
-  mpi_t KEY;
-  mpi_t client_Y;
-  mpi_t client_g;
-  mpi_t client_p;
-  mpi_t dh_secret;
+  bigint_t KEY;
+  bigint_t client_Y;
+  bigint_t client_g;
+  bigint_t client_p;
+  bigint_t dh_secret;
   /* for SRP */
-  mpi_t A;
-  mpi_t B;
-  mpi_t u;
-  mpi_t b;
-  mpi_t a;
-  mpi_t x;
+  bigint_t A;
+  bigint_t B;
+  bigint_t u;
+  bigint_t b;
+  bigint_t a;
+  bigint_t x;
   /* RSA: e, m
    */
-  mpi_t rsa[2];
+  bigint_t rsa[2];
 
   /* this is used to hold the peers authentication data 
    */
@@ -409,7 +409,7 @@ typedef struct gnutls_dh_params_int
 {
   /* [0] is the prime, [1] is the generator.
    */
-  mpi_t params[2];
+  bigint_t params[2];
 } dh_params_st;
 
 typedef struct

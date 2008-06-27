@@ -81,8 +81,8 @@ const mod_auth_st dhe_dss_auth_struct = {
 static int
 gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
 {
-  mpi_t g, p;
-  const mpi_t *mpis;
+  bigint_t g, p;
+  const bigint_t *mpis;
   int ret = 0, data_size;
   int bits;
   gnutls_cert *apr_cert_list;
@@ -245,8 +245,8 @@ proc_dhe_client_kx (gnutls_session_t session, opaque * data,
 {
   gnutls_certificate_credentials_t cred;
   int ret;
-  mpi_t p, g;
-  const mpi_t *mpis;
+  bigint_t p, g;
+  const bigint_t *mpis;
   gnutls_dh_params_t dh_params;
 
   cred = (gnutls_certificate_credentials_t)

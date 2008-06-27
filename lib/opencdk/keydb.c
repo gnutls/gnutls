@@ -42,7 +42,6 @@
 #define KEYDB_CACHE_ENTRIES 8
 
 static void keydb_cache_free (key_table_t cache);
-static int keydb_search_copy (cdk_keydb_search_t *r_dst, cdk_keydb_search_t src);
 static int classify_data (const byte * buf, size_t len);
 static cdk_kbnode_t find_selfsig_node (cdk_kbnode_t key, cdk_pkt_pubkey_t pk);
      
@@ -401,7 +400,7 @@ cdk_keydb_free (cdk_keydb_hd_t hd)
 cdk_error_t
 _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t *ret_kr)
 {
-  cdk_error_t rc, ec;
+  cdk_error_t rc;
   cdk_stream_t kr;
 
   if (!hd || !ret_kr)
@@ -612,45 +611,6 @@ keydb_cache_add ( cdk_keydb_search_t dbs, off_t offset)
   return 0;
 }
 
-      
-static cdk_error_t
-keydb_search_copy (cdk_keydb_search_t *r_dst, cdk_keydb_search_t src)
-{
-  cdk_keydb_search_t dst;
-  
-  if (!r_dst || !src)
-    return CDK_Inv_Value;
-  
-  *r_dst = NULL;
-  dst = cdk_calloc (1, sizeof *dst);
-  if (!dst)
-    return CDK_Out_Of_Core;
-    
-  dst->off = src->off;
-  dst->type = src->type;
-  switch (src->type)
-    {
-    case CDK_DBSEARCH_EXACT:
-    case CDK_DBSEARCH_SUBSTR:
-      dst->u.pattern = cdk_strdup (src->u.pattern);
-      if (!dst->u.pattern)
-	return CDK_Out_Of_Core;
-      break;
-      
-    case CDK_DBSEARCH_SHORT_KEYID:
-    case CDK_DBSEARCH_KEYID:
-      dst->u.keyid[0] = src->u.keyid[0];
-      dst->u.keyid[1] = src->u.keyid[1];
-      break;
-      
-    case CDK_DBSEARCH_FPR:
-      memcpy (dst->u.fpr, src->u.fpr, KEY_FPR_LEN);
-      break;
-    }
-  *r_dst = dst;
-  return 0;
-}
-
 static cdk_error_t idx_init( cdk_keydb_hd_t db, cdk_keydb_search_t dbs)
 {
 cdk_error_t ec, rc = 0;
@@ -675,7 +635,9 @@ cdk_error_t ec, rc = 0;
 	      if (!rc)
 		rc = cdk_stream_open (dbs->idx_name, &dbs->idx);
 	      if (!rc)
+	        {
 		_cdk_log_debug ("create key index table\n");
+                }
 	      else
 		{
 		  /* This is no real error, it just means we can't create
@@ -1071,7 +1033,7 @@ keydb_check_key (cdk_packet_t pkt)
 /* Find the first kbnode with the requested packet type
    that represents a valid key. */
 static cdk_kbnode_t
-kbnode_find_valid (cdk_kbnode_t root, int pkttype)
+kbnode_find_valid (cdk_kbnode_t root, cdk_packet_type_t pkttype)
 {
   cdk_kbnode_t n;
   
@@ -1871,7 +1833,7 @@ static int
 classify_data (const byte *buf, size_t len)
 {
   int type;
-  int i;
+  unsigned int i;
   
   if (buf[0] == '0' && (buf[1] == 'x' || buf[1] == 'X'))
     { /* Skip hex prefix. */
@@ -1954,7 +1916,7 @@ cdk_keydb_export (cdk_keydb_hd_t hd, cdk_stream_t out, cdk_strlist_t remusr)
 	    continue;
 	  /* Filter out invalid signatures */
 	  if (node->pkt->pkttype == CDK_PKT_SIGNATURE &&
-	      !KEY_CAN_SIGN (node->pkt->pkt.signature->pubkey_algo))
+	      (!KEY_CAN_SIGN (node->pkt->pkt.signature->pubkey_algo)))
 	    continue;
 
 	  /* Adjust the ctb flag if needed. */

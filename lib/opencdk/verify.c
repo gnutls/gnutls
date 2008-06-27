@@ -40,12 +40,12 @@ struct {
     const char *name;
     int algo;
 } digest_table[] = {
-    {"MD5",       GCRY_MD_MD5},
-    {"SHA1",      GCRY_MD_SHA1},
-    {"RIPEMD160", GCRY_MD_RMD160},
-    {"SHA256",    GCRY_MD_SHA256},
-    {"SHA384",    GCRY_MD_SHA384},
-    {"SHA512",    GCRY_MD_SHA512},
+    {"MD5",       GNUTLS_DIG_MD5},
+    {"SHA1",      GNUTLS_DIG_SHA1},
+    {"RIPEMD160", GNUTLS_DIG_RMD160},
+    {"SHA256",    GNUTLS_DIG_SHA256},
+    {"SHA384",    GNUTLS_DIG_SHA384},
+    {"SHA512",    GNUTLS_DIG_SHA512},
     {NULL, 0}
 };
 
@@ -161,12 +161,12 @@ static cdk_error_t
 file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
 {
   cdk_stream_t inp = NULL, out = NULL, tmp = NULL;
-  gcry_md_hd_t md = NULL;
+  digest_hd_st md;
   char buf[512], chk[512];
   const char *s;
   int i, is_signed = 0, nbytes;
   int digest_algo = 0;
-  gcry_error_t err;
+  int err;
   cdk_error_t rc;
   
   if (output)
@@ -223,19 +223,19 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
         }
     }
   
-  if (digest_algo && gcry_md_test_algo (digest_algo))
+  if (digest_algo && _gnutls_hash_get_algo_len(digest_algo) <= 0)
     {
       rc = CDK_Inv_Algo;
       goto leave;
     }
   
   if (!digest_algo)
-    digest_algo = GCRY_MD_MD5;
+    digest_algo = GNUTLS_DIG_MD5;
   
-  err = gcry_md_open (&md, digest_algo, 0);
-  if (err)
+  err = _gnutls_hash_init (&md, digest_algo);
+  if (err < 0)
     {
-      rc = map_gcry_error (err);
+      rc = map_gnutls_error (err);
       goto leave;
     } 
 
@@ -254,7 +254,7 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
 	  if (strlen (buf) == 0 && i == 0)
 	    continue; /* skip last '\n' */
 	  _cdk_trim_string (buf, i == 0? 0 : 1);
-	  gcry_md_write (md, buf, strlen (buf));
+	  _gnutls_hash (&md, buf, strlen (buf));
         }
       if (!strncmp (buf, "- ", 2)) /* FIXME: handle it recursive. */
 	memmove (buf, buf + 2, nbytes - 2);
@@ -280,7 +280,7 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
       nbytes = _cdk_stream_gets (inp, buf, DIM (buf)-1);
       if (!nbytes || nbytes == -1)
 	break;
-      if (nbytes < (DIM (buf) -3))
+      if (nbytes < (int)(DIM (buf) -3))
 	{
 	  buf[nbytes-1] = '\n';
 	  buf[nbytes] = '\0';
@@ -295,10 +295,10 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   cdk_stream_read (tmp, NULL, 0);
   
   /* the digest handle will be closed there. */
-  rc = _cdk_proc_packets (hd, tmp, NULL, NULL, NULL, md);
+  rc = _cdk_proc_packets (hd, tmp, NULL, NULL, NULL, &md);
   
   leave:
-  gcry_md_close (md);
+  _gnutls_hash_deinit (&md, NULL);
   cdk_stream_close (out);
   cdk_stream_close (tmp);
   cdk_stream_close (inp);

@@ -49,7 +49,7 @@ doit (void)
 
  memset(buf2, 1, sizeof(buf2));
  
- _gnutls_rnd(GNUTLS_RND_KEY, buf1, sizeof(buf1));
+ _gnutls_rnd(GNUTLS_RND_RANDOM, buf1, sizeof(buf1));
 
  if (memcmp( buf1, buf2, sizeof(buf1))!=0)
     failed = 1;

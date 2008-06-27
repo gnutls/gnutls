@@ -119,8 +119,8 @@ error:
 static int
 gen_psk_server_kx (gnutls_session_t session, opaque ** data)
 {
-  mpi_t g, p;
-  const mpi_t *mpis;
+  bigint_t g, p;
+  const bigint_t *mpis;
   int ret;
   gnutls_dh_params_t dh_params;
   gnutls_psk_server_credentials_t cred;
@@ -171,9 +171,9 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
 {
   int bits;
   int ret;
-  mpi_t p, g;
+  bigint_t p, g;
   gnutls_dh_params_t dh_params;
-  const mpi_t *mpis;
+  const bigint_t *mpis;
   gnutls_psk_server_credentials_t cred;
   psk_auth_info_t info;
   gnutls_datum_t username;

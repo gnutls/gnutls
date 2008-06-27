@@ -45,7 +45,7 @@ int _gnutls_verify_sig_params (gnutls_session_t session,
 			       gnutls_datum_t * signature);
 
 int _gnutls_sign (gnutls_pk_algorithm_t algo,
-		  mpi_t * params, int params_size,
+		  bigint_t * params, int params_size,
 		  const gnutls_datum_t * data, gnutls_datum_t * signature);
 
 #endif

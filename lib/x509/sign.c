@@ -129,7 +129,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
  */
 static int
 pkcs1_rsa_sign (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
-		mpi_t * params, int params_len, gnutls_datum_t * signature)
+		bigint_t * params, int params_len, gnutls_datum_t * signature)
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];
@@ -173,7 +173,7 @@ pkcs1_rsa_sign (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
 
 static int
 dsa_sign (const gnutls_datum_t * text,
-	  mpi_t * params, int params_len, gnutls_datum_t * signature)
+	  bigint_t * params, int params_len, gnutls_datum_t * signature)
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];

@@ -533,7 +533,7 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
 
   len = bits / 8;
 
-  if (*sizeof_sig < len)
+  if (*sizeof_sig < (unsigned int)len)
     {
       *sizeof_sig = bits / 8;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -909,7 +909,7 @@ parse_general_name (ASN1_TYPE src, const char *src_name,
 		    int seq, void *name, size_t * name_size, 
 		    unsigned int* ret_type, int othername_oid)
 {
-  int len;
+  unsigned int len;
   char nptr[MAX_NAME_SIZE];
   int result;
   opaque choice_type[128];
@@ -2042,7 +2042,7 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
 		   unsigned char *output_data,
 		   size_t * output_data_size)
 {
-  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int i, result = 0;
   gnutls_datum_t der = { NULL, 0 };
@@ -2589,7 +2589,7 @@ gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
 				gnutls_datum_t * m, gnutls_datum_t * e)
 {
   int ret;
-  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int i;
 
@@ -2613,14 +2613,14 @@ gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint (m, params[0]);
+  ret = _gnutls_mpi_dprint (params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (e, params[1]);
+  ret = _gnutls_mpi_dprint (params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2658,7 +2658,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 				gnutls_datum_t * g, gnutls_datum_t * y)
 {
   int ret;
-  mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int i;
 
@@ -2684,7 +2684,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* P */
-  ret = _gnutls_mpi_dprint (p, params[0]);
+  ret = _gnutls_mpi_dprint (params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2692,7 +2692,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint (q, params[1]);
+  ret = _gnutls_mpi_dprint (params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2702,7 +2702,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint (g, params[2]);
+  ret = _gnutls_mpi_dprint (params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2713,7 +2713,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint (y, params[3]);
+  ret = _gnutls_mpi_dprint (params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();

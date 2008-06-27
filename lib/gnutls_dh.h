@@ -25,10 +25,9 @@
 #ifndef GNUTLS_DH_H
 # define GNUTLS_DH_H
 
-const mpi_t *_gnutls_dh_params_to_mpi (gnutls_dh_params_t);
-mpi_t gnutls_calc_dh_secret (mpi_t * ret_x, mpi_t g, mpi_t prime);
-mpi_t gnutls_calc_dh_key (mpi_t f, mpi_t x, mpi_t prime);
-int _gnutls_dh_generate_prime (mpi_t * ret_g, mpi_t * ret_n, unsigned bits);
+const bigint_t *_gnutls_dh_params_to_mpi (gnutls_dh_params_t);
+bigint_t gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime);
+bigint_t gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime);
 
 gnutls_dh_params_t
 _gnutls_get_dh_params (gnutls_dh_params_t dh_params,
