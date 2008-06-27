@@ -15,6 +15,8 @@ Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
 
 ** Added API to replace and update the crypto backend.
 
+** Rewritten opencdk crypto backend, to use the gnutls internal one.
+
 ** API and ABI modifications:
 gnutls_crypto_single_cipher_register2: Added
 gnutls_crypto_single_mac_register2: Added
