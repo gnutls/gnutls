@@ -3,6 +3,10 @@ Copyright (C) 2004, 2005, 2006, 2007 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 2.0.5 (unreleased)
+
+** Corrected a memory leak in DHE ciphersuites.
+
 * Version 2.0.4 (released 2007-11-16)
 
 ** Corrected bug in decompression of expanded compression data.           

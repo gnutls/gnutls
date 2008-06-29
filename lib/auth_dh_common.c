@@ -164,8 +164,6 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
       goto error;
     }
 
-  _gnutls_dh_set_peer_public (session, session->key->client_Y);
-
   /* THESE SHOULD BE DISCARDED */
   _gnutls_mpi_release (&session->key->client_Y);
   _gnutls_mpi_release (&session->key->client_p);
