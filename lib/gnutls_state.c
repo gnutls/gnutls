@@ -481,6 +481,9 @@ _gnutls_dh_set_peer_public (gnutls_session_t session, bigint_t public)
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
+  if (dh->public_key.data)
+      _gnutls_free_datum(&dh->public_key);
+
   ret = _gnutls_mpi_dprint_lz (public, &dh->public_key);
   if (ret < 0)
     {
@@ -547,6 +550,12 @@ _gnutls_rsa_export_set_pubkey (gnutls_session_t session,
   if (info == NULL)
     return GNUTLS_E_INTERNAL_ERROR;
 
+  if (info->rsa_export.modulus.data)
+      _gnutls_free_datum(&info->rsa_export.modulus);
+
+  if (info->rsa_export.exponent.data)
+      _gnutls_free_datum(&info->rsa_export.exponent);
+
   ret = _gnutls_mpi_dprint_lz (modulus, &info->rsa_export.modulus);
   if (ret < 0)
     {
@@ -611,6 +620,12 @@ _gnutls_dh_set_group (gnutls_session_t session, bigint_t gen, bigint_t prime)
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
+
+  if (dh->prime.data)
+      _gnutls_free_datum(&dh->prime);
+
+  if (dh->generator.data)
+      _gnutls_free_datum(&dh->generator);
 
   /* prime
    */
