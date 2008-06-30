@@ -22,11 +22,13 @@
 
 #include <gnutls/gnutls.h>
 #include <openssl_compat.h>
-#include <gc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <gnutls/openssl.h>
+#include "../lib/gnutls_int.h"
+#include "../lib/random.h"
+#include "../lib/gnutls_hash_int.h"
 
 /* XXX: See lib/gnutls_int.h. */
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
@@ -36,6 +38,10 @@
 
 static int last_error = 0;
 
+struct MD_CTX_INT
+{
+  digest_hd_st handle;
+};
 
 /* Library initialisation functions */
 
@@ -960,14 +966,14 @@ RAND_seed (const void *buf, int num)
 int
 RAND_bytes (unsigned char *buf, int num)
 {
-  gc_random (buf, num);
+  _gnutls_rnd (GNUTLS_RND_RANDOM, buf, num);
   return 1;
 }
 
 int
 RAND_pseudo_bytes (unsigned char *buf, int num)
 {
-  gc_pseudo_random (buf, num);
+  _gnutls_rnd (GNUTLS_RND_NONCE, buf, num);
   return 1;
 }
 
@@ -1002,24 +1008,19 @@ RAND_egd_bytes (const char *path, int bytes)
 void
 MD5_Init (MD5_CTX * ctx)
 {
-  gc_hash_open (GC_MD5, 0, &ctx->handle);
+  _gnutls_hash_init( &ctx->handle, GNUTLS_DIG_MD5);
 }
 
 void
 MD5_Update (MD5_CTX * ctx, const void *buf, int len)
 {
-  gc_hash_write (ctx->handle, len, buf);
+  _gnutls_hash( &ctx->handle, buf, len);
 }
 
 void
 MD5_Final (unsigned char *md, MD5_CTX * ctx)
 {
-  const char *local_md;
-
-  local_md = gc_hash_read (ctx->handle);
-  if (md)
-    memcpy (md, local_md, gc_hash_digest_length (GC_MD5));
-  gc_hash_close (ctx->handle);
+  _gnutls_hash_deinit( &ctx->handle, md);
 }
 
 unsigned char *
@@ -1028,7 +1029,7 @@ MD5 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  gc_hash_buffer (GC_MD5, buf, len, md);
+  _gnutls_hash_fast( GNUTLS_DIG_MD5, buf, len, md);
 
   return md;
 }
@@ -1036,24 +1037,19 @@ MD5 (const unsigned char *buf, unsigned long len, unsigned char *md)
 void
 RIPEMD160_Init (RIPEMD160_CTX * ctx)
 {
-  gc_hash_open (GC_RMD160, 0, &ctx->handle);
+  _gnutls_hash_init( &ctx->handle, GNUTLS_DIG_RMD160);
 }
 
 void
 RIPEMD160_Update (RIPEMD160_CTX * ctx, const void *buf, int len)
 {
-  gc_hash_write (ctx->handle, len, buf);
+  _gnutls_hash( &ctx->handle, buf, len);
 }
 
 void
 RIPEMD160_Final (unsigned char *md, RIPEMD160_CTX * ctx)
 {
-  const char *local_md;
-
-  local_md = gc_hash_read (ctx->handle);
-  if (md)
-    memcpy (md, local_md, gc_hash_digest_length (GC_RMD160));
-  gc_hash_close (ctx->handle);
+  _gnutls_hash_deinit( &ctx->handle, md);
 }
 
 unsigned char *
@@ -1062,7 +1058,7 @@ RIPEMD160 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  gc_hash_buffer (GC_RMD160, buf, len, md);
+  _gnutls_hash_fast( GNUTLS_DIG_RMD160, buf, len, md);
 
   return md;
 }
