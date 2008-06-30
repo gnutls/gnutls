@@ -26,6 +26,8 @@ Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2930>.
 
 ** srptool: Fix a problem where --verify check does not succeed.
+Report and tiny patch by Matthias Koenig <mkoenig@suse.de> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2944>.
 
 ** API and ABI modifications:
 No changes since last version.
