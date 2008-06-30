@@ -19,7 +19,25 @@
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
-gl_MODULES([arpa_inet autobuild error fdl gendocs getaddrinfo getline getpass-gnu gnupload gpl-3.0 inet_ntop inet_pton lgpl-2.1 maintainer-makefile progname readline version-etc-fsf])
+gl_MODULES([
+  arpa_inet
+  autobuild
+  error
+  fdl
+  gendocs
+  getaddrinfo
+  getline
+  getpass-gnu
+  gnupload
+  gpl-3.0
+  inet_ntop
+  inet_pton
+  lgpl-2.1
+  maintainer-makefile
+  progname
+  readline
+  version-etc-fsf
+])
 gl_AVOID([fseeko gettext-h malloc-posix realloc-posix snprintf stdbool stdio string sys_socket unistd vasnprintf])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
