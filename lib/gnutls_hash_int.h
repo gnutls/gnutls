@@ -77,6 +77,9 @@ int _gnutls_hash (const digest_hd_st* handle, const void *text,
 void _gnutls_hash_deinit (digest_hd_st* handle, void *digest);
 void _gnutls_hash_output (digest_hd_st* handle, void *digest);
 
+int _gnutls_hash_fast( gnutls_digest_algorithm_t algorithm, 
+	const void* text, size_t textlen, void* digest);
+
 int _gnutls_ssl3_generate_random (void *secret, int secret_len,
 				  void *rnd, int random_len, int bytes,
 				  opaque * ret);

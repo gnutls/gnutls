@@ -167,6 +167,31 @@ _gnutls_hash_deinit (digest_hd_st* handle, void *digest)
   _gnutls_digest_ops.deinit( handle->hd.gc);
 }
 
+int _gnutls_hash_fast( gnutls_digest_algorithm_t algorithm,
+	const void* text, size_t textlen, void* digest)
+{
+digest_hd_st dig;
+int ret;
+
+    ret = _gnutls_hash_init( &dig, algorithm);
+    if (ret < 0)
+      {
+        gnutls_assert();
+        return ret;
+      }
+      
+    ret = _gnutls_hash( &dig, text, textlen);
+    if (ret < 0)
+      {
+        gnutls_assert();
+        _gnutls_hash_deinit( &dig, NULL);
+        return ret;
+      }
+      
+    _gnutls_hash_deinit( &dig, digest);
+    return 0;
+}
+
 
 /* HMAC interface */
 
