@@ -13,6 +13,8 @@ Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
 Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2930>.
 
+** Fix memory leaks when doing a re-handshake.
+
 ** API and ABI modifications:
 No changes since last version.
 
