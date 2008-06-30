@@ -48,8 +48,7 @@ srptool_version (void)
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <crypt-gaa.h>
-
-#include <gc.h>			/* for randomize */
+#include "../lib/random.h" /* for random */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -507,7 +506,7 @@ _srp_crypt (const char *username, const char *passwd, int salt_size,
 
   /* generate the salt
    */
-  if (gc_nonce (salt, salt_size) != GC_OK)
+  if (_gnutls_rnd (RND_NONCE, salt, salt_size) < 0)
     {
       fprintf (stderr, "Could not create nonce\n");
       return NULL;
