@@ -27,10 +27,15 @@ dist_man_MANS += srptool.1
 endif
 
 APIMANS =
-APIMANS += gnutls_crypto_cipher_register.3
-APIMANS += gnutls_crypto_rnd_register.3
-APIMANS += gnutls_crypto_mac_register.3
-APIMANS += gnutls_crypto_digest_register.3
+APIMANS += gnutls_crypto_single_cipher_register2.3
+APIMANS += gnutls_crypto_rnd_register2.3
+APIMANS += gnutls_crypto_single_mac_register2.3
+APIMANS += gnutls_crypto_single_digest_register2.3
+APIMANS += gnutls_crypto_bigint_register2.3
+APIMANS += gnutls_crypto_pk_register2.3
+APIMANS += gnutls_crypto_cipher_register2.3
+APIMANS += gnutls_crypto_mac_register2.3
+APIMANS += gnutls_crypto_digest_register2.3
 APIMANS += gnutls_oprfi_enable_client.3
 APIMANS += gnutls_oprfi_enable_server.3
 APIMANS += gnutls_server_name_get.3

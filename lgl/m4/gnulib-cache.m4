@@ -19,7 +19,39 @@
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([lgl/override])
-gl_MODULES([c-ctype crypto/gc crypto/gc-arcfour crypto/gc-arctwo crypto/gc-camellia crypto/gc-des crypto/gc-hmac-md5 crypto/gc-md2 crypto/gc-md4 crypto/gc-md5 crypto/gc-pbkdf2-sha1 crypto/gc-random crypto/gc-rijndael crypto/gc-sha1 fseeko func gettext memmem-simple memmove minmax read-file snprintf socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd vasprintf])
+gl_MODULES([
+  c-ctype
+  crypto/gc
+  crypto/gc-arcfour
+  crypto/gc-arctwo
+  crypto/gc-camellia
+  crypto/gc-des
+  crypto/gc-hmac-md5
+  crypto/gc-md2
+  crypto/gc-md4
+  crypto/gc-md5
+  crypto/gc-pbkdf2-sha1
+  crypto/gc-random
+  crypto/gc-rijndael
+  crypto/gc-sha1
+  fseeko
+  func
+  gettext
+  memmem-simple
+  memmove
+  minmax
+  read-file
+  snprintf
+  socklen
+  stdint
+  strcase
+  strverscmp
+  sys_socket
+  sys_stat
+  time_r
+  unistd
+  vasprintf
+])
 gl_AVOID([])
 gl_SOURCE_BASE([lgl])
 gl_M4_BASE([lgl/m4])
