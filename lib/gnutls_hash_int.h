@@ -60,6 +60,9 @@ int _gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm);
 int _gnutls_hmac (const digest_hd_st* handle, const void *text,
 		  size_t textlen);
 
+int _gnutls_hmac_fast( gnutls_mac_algorithm_t algorithm, const void* key, int keylen, 
+	const void* text, size_t textlen, void* digest);
+
 void _gnutls_hmac_deinit (digest_hd_st* handle, void *digest);
 void _gnutls_hmac_output (digest_hd_st* handle, void *digest);
 

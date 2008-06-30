@@ -27,7 +27,10 @@
 
 #include "utils.h"
 
-#include "gc.h"
+#include "../lib/gnutls_int.h"
+#include "../lib/gnutls_hash_int.h"
+#include "../lib/x509/pbkdf2-sha1.h"
+#include "../lib/debug.h"
 
 int
 is_secure_mem (const void *ign)
@@ -44,105 +47,51 @@ doit (void)
   /* XXX: We need this to fix secure memory. */
   gnutls_global_init();
 
-  err = gc_init ();
-  if (err)
-    fail ("gc_init() failed: %d\n", err);
-
-  gc_set_allocators (malloc, malloc, is_secure_mem, realloc, free);
-
-  err = gc_md5 ("abcdefgh", 8, digest);
-  if (err)
-    fail ("gc_md5() failed: %d\n", err);
-  else
-    {
-      if (memcmp (digest, "\xe8\xdc\x40\x81\xb1\x34\x34\xb4"
-		  "\x51\x89\xa7\x20\xb7\x7b\x68\x18", 16) == 0)
-	success ("gc_md5() OK\n");
-      else
-	{
-	  hexprint (digest, 16);
-	  fail ("gc_md5() failure\n");
-	}
-    }
-
-  err = gc_hash_buffer (GC_MD5, "abcdefgh", 8, digest);
-  if (err)
-    fail ("gc_hash_buffer(GC_MD5) failed: %d\n", err);
-  else
-    {
-      if (memcmp (digest, "\xe8\xdc\x40\x81\xb1\x34\x34\xb4"
-		  "\x51\x89\xa7\x20\xb7\x7b\x68\x18", 16) == 0)
-	success ("gc_hash_buffer(GC_MD5) OK\n");
-      else
-	{
-	  hexprint (digest, 16);
-	  fail ("gc_hash_buffer(GC_MD5) failure\n");
-	}
-    }
-
-  err = gc_hash_buffer (GC_SHA1, "abcdefgh", 8, digest);
-  if (err)
-    fail ("gc_hash_buffer(GC_SHA1) failed: %d\n", err);
-  else
-    {
-      if (memcmp (digest, "\x42\x5a\xf1\x2a\x07\x43\x50\x2b"
-		  "\x32\x2e\x93\xa0\x15\xbc\xf8\x68\xe3\x24\xd5\x6a",
-		  20) == 0)
-	success ("gc_hash_buffer(GC_SHA1) OK\n");
-      else
-	{
-	  hexprint (digest, 20);
-	  fail ("gc_hash_buffer(GC_SHA1) failure\n");
-	}
-    }
-
-  err = gc_hmac_md5 ("keykeykey", 9, "abcdefgh", 8, digest);
-  if (err)
-    fail ("gc_hmac_md5() failed: %d\n", err);
+  err = _gnutls_hmac_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
+  if (err < 0)
+    fail ("_gnutls_hmac_fast(MD5) failed: %d\n", err);
   else
     {
       if (memcmp (digest, "\x3c\xb0\x9d\x83\x28\x01\xef\xc0"
 		  "\x7b\xb3\xaf\x42\x69\xe5\x93\x9a", 16) == 0)
-	success ("gc_hmac_md5() OK\n");
+	success ("_gnutls_hmac_fast(MD5) OK\n");
       else
 	{
 	  hexprint (digest, 16);
-	  fail ("gc_hmac_md5() failure\n");
+	  fail ("_gnutls_hmac_fast(MD5) failure\n");
 	}
     }
 
-  err = gc_hmac_sha1 ("keykeykey", 9, "abcdefgh", 8, digest);
-  if (err)
-    fail ("gc_hmac_sha1() failed: %d\n", err);
+  err = _gnutls_hmac_fast (GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh", 8, digest);
+  if (err < 0)
+    fail ("_gnutls_hmac_fast(SHA1) failed: %d\n", err);
   else
     {
       if (memcmp (digest, "\x58\x93\x7a\x58\xfe\xea\x82\xf8"
 		  "\x0e\x64\x62\x01\x40\x2b\x2c\xed\x5d\x54\xc1\xfa",
 		  20) == 0)
-	success ("gc_hmac_sha1() OK\n");
+	success ("_gnutls_hmac_fast(SHA1) OK\n");
       else
 	{
 	  hexprint (digest, 20);
-	  fail ("gc_hmac_sha1() failure\n");
+	  fail ("_gnutls_hmac_fast(SHA1) failure\n");
 	}
     }
 
-  err = gc_pbkdf2_sha1 ("password", 8, "salt", 4, 4711, digest, 16);
-  if (err)
-    fail ("gc_pkcs5_pbkdf2_sha1() failed: %d\n", err);
+  err = _gnutls_pbkdf2_sha1 ("password", 8, "salt", 4, 4711, digest, 16);
+  if (err < 0)
+    fail ("_gnutls_pkcs5_pbkdf2_sha1() failed: %d\n", err);
   else
     {
       if (memcmp (digest, "\x09\xb7\x85\x57\xdd\xf6\x07\x15"
 		  "\x1c\x52\x34\xde\xba\x5c\xdc\x59", 16) == 0)
-	success ("gc_pkcs5_pbkdf2_sha1() OK\n");
+	success ("_gnutls_pkcs5_pbkdf2_sha1() OK\n");
       else
 	{
 	  hexprint (digest, 16);
-	  fail ("gc_pkcs5_pbkdf2_sha1() failure\n");
+	  fail ("_gnutls_pkcs5_pbkdf2_sha1() failure\n");
 	}
     }
-
-  gc_done ();
 
   gnutls_global_deinit();
 }

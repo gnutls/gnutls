@@ -176,6 +176,30 @@ _gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm)
   return digest_length(algorithm);
 }
 
+int _gnutls_hmac_fast( gnutls_mac_algorithm_t algorithm, const void* key, int keylen, 
+	const void* text, size_t textlen, void* digest)
+{
+digest_hd_st dig;
+int ret;
+
+    ret = _gnutls_hmac_init( &dig, algorithm, key, keylen);
+    if (ret < 0)
+      {
+        gnutls_assert();
+        return ret;
+      }
+      
+    ret = _gnutls_hmac( &dig, text, textlen);
+    if (ret < 0)
+      {
+        gnutls_assert();
+        _gnutls_hmac_deinit( &dig, NULL);
+        return ret;
+      }
+      
+    _gnutls_hmac_deinit( &dig, digest);
+    return 0;
+}
 
 int _gnutls_hmac_init (digest_hd_st *dig, gnutls_mac_algorithm_t algorithm,
 		   const void *key, int keylen)

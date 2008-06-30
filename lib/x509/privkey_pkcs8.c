@@ -38,7 +38,7 @@
 #include <gnutls_num.h>
 #include <gc.h>
 #include <random.h>
-
+#include <pbkdf2-sha1.h>
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
 #define PBKDF2_OID "1.2.840.113549.1.5.12"
@@ -1490,14 +1490,13 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
    */
   if (schema == PBES2)
     {
-      result = gc_pbkdf2_sha1 (password, strlen (password),
+      result = _gnutls_pbkdf2_sha1 (password, strlen (password),
 			       kdf_params->salt, kdf_params->salt_size,
 			       kdf_params->iter_count, key, key_size);
 
-      if (result != GC_OK)
+      if (result < 0)
 	{
 	  gnutls_assert ();
-	  result = GNUTLS_E_DECRYPTION_FAILED;
 	  goto error;
 	}
     }
@@ -1795,14 +1794,14 @@ generate_key (schema_id schema,
   if (schema == PBES2)
     {
 
-      ret = gc_pbkdf2_sha1 (password, strlen (password),
+      ret = _gnutls_pbkdf2_sha1 (password, strlen (password),
 			    kdf_params->salt, kdf_params->salt_size,
 			    kdf_params->iter_count,
 			    key->data, kdf_params->key_size);
-      if (ret != GC_OK)
+      if (ret < 0)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_ENCRYPTION_FAILED;
+	  return ret;
 	}
 
       if (enc_params->iv_size)
