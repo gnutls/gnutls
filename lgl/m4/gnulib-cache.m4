@@ -21,19 +21,6 @@
 gl_LOCAL_DIR([lgl/override])
 gl_MODULES([
   c-ctype
-  crypto/gc
-  crypto/gc-arcfour
-  crypto/gc-arctwo
-  crypto/gc-camellia
-  crypto/gc-des
-  crypto/gc-hmac-md5
-  crypto/gc-md2
-  crypto/gc-md4
-  crypto/gc-md5
-  crypto/gc-pbkdf2-sha1
-  crypto/gc-random
-  crypto/gc-rijndael
-  crypto/gc-sha1
   fseeko
   func
   gettext

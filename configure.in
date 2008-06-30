@@ -356,19 +356,10 @@ dnl Can't disable - gnutls depends on gcrypt
 *** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
 ***
 ]]))
-libgcrypt=yes
 
 # If this ever changes to 0, the user disabled some officially enabled
 # stuff so we will print a warning.
 ac_full=1
-
-# Hard-wire the gl/m4/gc.m4 test.
-AC_ARG_WITH(builtin-crypto,
-	AS_HELP_STRING([--with-builtin-crypto],
-		[use internal crypto instead of libgcrypt (EXPERIMENTAL)]),
-	ac_cv_libgcrypt=no,
-	ac_cv_libgcrypt=yes)
-LTLIBGCRYPT=$LIBGCRYPT_LIBS
 
 AC_MSG_CHECKING([whether to enable Opaque PRF input support])
 AC_ARG_ENABLE(opaque-prf-input,
