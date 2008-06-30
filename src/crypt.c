@@ -218,6 +218,7 @@ _verify_passwd_int (const char *username, const char *passwd,
 
   /* encode the verifier into _salt */
   salt_size = sizeof (_salt);
+  memset(_salt, 0, salt_size);
   if (gnutls_srp_base64_encode (&new_verifier, _salt, &salt_size) < 0)
     {
       fprintf (stderr, "Encoding error\n");
