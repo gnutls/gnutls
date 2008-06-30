@@ -36,7 +36,6 @@
 #include "x509_int.h"
 #include <gnutls_algorithms.h>
 #include <gnutls_num.h>
-#include <gc.h>
 #include <random.h>
 #include <pbkdf2-sha1.h>
 

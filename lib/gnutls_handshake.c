@@ -51,7 +51,6 @@
 #include <gnutls_rsa_export.h>	/* for gnutls_get_rsa_params() */
 #include <auth_anon.h>		/* for gnutls_anon_server_credentials_t */
 #include <auth_psk.h>		/* for gnutls_psk_server_credentials_t */
-#include <gc.h>
 #include <random.h>
 
 #ifdef HANDSHAKE_DEBUG
