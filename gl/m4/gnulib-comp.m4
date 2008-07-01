@@ -265,6 +265,13 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdarg.m4
   m4/strdup.m4
   m4/strerror.m4
+  tests/test-EOVERFLOW.c
+  tests/test-arpa_inet.c
+  tests/test-getaddrinfo.c
+  tests/test-getdelim.c
+  tests/test-getline.c
+  tests/test-netinet_in.c
+  tests/test-strerror.c
   top/GNUmakefile
   top/maint.mk
 ])

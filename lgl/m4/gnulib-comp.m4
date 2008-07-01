@@ -129,7 +129,10 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgltests_LIBSOURCES_LIST], [])
   m4_pushdef([lgltests_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='tests'
+  gl_source_base='lgl/tests'
+  gt_TYPE_WCHAR_T
+  gt_TYPE_WINT_T
+  AC_CHECK_FUNCS([shutdown])
   m4_ifval(lgltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]lgltests_LIBSOURCES_DIR[ ||
       for gl_file in ]lgltests_LIBSOURCES_LIST[ ; do
@@ -160,6 +163,8 @@ AC_DEFUN([lgl_INIT],
     AC_SUBST([lgltests_LIBOBJS], [$lgltests_libobjs])
     AC_SUBST([lgltests_LTLIBOBJS], [$lgltests_ltlibobjs])
   ])
+  LIBTESTS_LIBDEPS="$gltests_libdeps"
+  AC_SUBST([LIBTESTS_LIBDEPS])
 ])
 
 # Like AC_LIBOBJ, except that the module name goes
@@ -210,7 +215,7 @@ AC_DEFUN([lgltests_REPLACE_FUNCS], [
 AC_DEFUN([lgltests_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([lgltests_LIBSOURCES_DIR], [tests])
+      m4_define([lgltests_LIBSOURCES_DIR], [lgl/tests])
       m4_append([lgltests_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
@@ -334,4 +339,32 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/test-EOVERFLOW.c
+  tests/test-alloca-opt.c
+  tests/test-c-ctype.c
+  tests/test-fseeko.c
+  tests/test-fseeko.sh
+  tests/test-func.c
+  tests/test-lseek.c
+  tests/test-lseek.sh
+  tests/test-memchr.c
+  tests/test-memcmp.c
+  tests/test-read-file.c
+  tests/test-snprintf.c
+  tests/test-stdbool.c
+  tests/test-stdint.c
+  tests/test-stdio.c
+  tests/test-stdlib.c
+  tests/test-string.c
+  tests/test-strings.c
+  tests/test-sys_socket.c
+  tests/test-sys_stat.c
+  tests/test-time.c
+  tests/test-unistd.c
+  tests/test-vasnprintf.c
+  tests/test-vasprintf.c
+  tests/test-wchar.c
+  tests=lib/dummy.c
+  tests=lib/intprops.h
+  tests=lib/verify.h
 ])
