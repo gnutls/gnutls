@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.5.2 (unreleased)
 
+** Fix bug in gnutls_dh_params_generate2 that swapped prime and generator.
+
 ** API and ABI modifications:
 No changes since last version.
 
