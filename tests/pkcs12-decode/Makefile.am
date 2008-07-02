@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2006 Free Software Foundation
+# Copyright (C) 2006, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -27,7 +27,8 @@ TESTS = pkcs12 pkcs12_s2k
 
 check_PROGRAMS = pkcs12_s2k
 
-AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl -I..		\
+AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl 		\
+	-I$(srcdir)/.. 							\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
 	-I$(top_srcdir)/lib 						\
