@@ -3,11 +3,13 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.5.0 (unreleased)
+* Version 2.5.0 (released 2008-07-02)
 
 ** Port fixes from v2.4.1 release, see below.
 
 ** Added API to replace and update the crypto backend.
+The header gnutls/crypto.h is now officially supported, and declares
+the symbols below.
 
 ** Rewritten opencdk crypto backend, to use the gnutls internal one.
 
