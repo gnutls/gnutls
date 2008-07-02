@@ -1,3 +1,310 @@
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.0.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs12-decode/Makefile.am: The -I.. needs to point to
+	srcdir.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/Makefile.am: Need -I to builddir for gnutls.h.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Ignore more.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am: Dist pbkdf2-sha1.h.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* po/pl.po.in, po/vi.po.in: Sync with TP.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, cfg.mk: Disable building guile for now, to be able to
+	do a release.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Sort functions.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Don't use @acronym for C++, as it breaks old
+	texinfo/tetex installations.  Further, C++ isn't an acronym anyway
+	as far as I know.
+
+2008-07-01  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/tests/Makefile.am, gl/tests/gnulib.mk,
+	gl/tests/test-EOVERFLOW.c, gl/tests/test-arpa_inet.c,
+	gl/tests/test-getaddrinfo.c, gl/tests/test-getdelim.c,
+	gl/tests/test-getline.c, gl/tests/test-netinet_in.c,
+	gl/tests/test-strerror.c, lgl/Makefile.am, lgl/m4/gnulib-cache.m4,
+	lgl/m4/gnulib-comp.m4, lgl/tests/Makefile.am, lgl/tests/dummy.c,
+	lgl/tests/intprops.h, lgl/tests/test-EOVERFLOW.c,
+	lgl/tests/test-alloca-opt.c, lgl/tests/test-c-ctype.c,
+	lgl/tests/test-fseeko.c, lgl/tests/test-fseeko.sh,
+	lgl/tests/test-func.c, lgl/tests/test-lseek.c,
+	lgl/tests/test-lseek.sh, lgl/tests/test-memchr.c,
+	lgl/tests/test-memcmp.c, lgl/tests/test-read-file.c,
+	lgl/tests/test-snprintf.c, lgl/tests/test-stdbool.c,
+	lgl/tests/test-stdint.c, lgl/tests/test-stdio.c,
+	lgl/tests/test-stdlib.c, lgl/tests/test-string.c,
+	lgl/tests/test-strings.c, lgl/tests/test-sys_socket.c,
+	lgl/tests/test-sys_stat.c, lgl/tests/test-time.c,
+	lgl/tests/test-unistd.c, lgl/tests/test-vasnprintf.c,
+	lgl/tests/test-vasprintf.c, lgl/tests/test-wchar.c,
+	lgl/tests/verify.h: Add gnulib self-tests.
+
+2008-07-01  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/gnulib-cache.m4: Put gnulib tests in a separate directory.
+
+2008-07-01  Simon Josefsson <simon@josefsson.org>
+
+	* m4/gc_random.m4: Remove unused code.
+
+2008-07-01  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/arcfour.c, lgl/arcfour.h, lgl/arctwo.c,
+	lgl/arctwo.h, lgl/des.c, lgl/des.h, lgl/gc-gnulib.c,
+	lgl/gc-libgcrypt.c, lgl/gc-pbkdf2-sha1.c, lgl/gc.h, lgl/hmac-md5.c,
+	lgl/hmac-sha1.c, lgl/hmac.h, lgl/m4/arcfour.m4, lgl/m4/arctwo.m4,
+	lgl/m4/des.m4, lgl/m4/gc-arcfour.m4, lgl/m4/gc-arctwo.m4,
+	lgl/m4/gc-camellia.m4, lgl/m4/gc-des.m4, lgl/m4/gc-hmac-md5.m4,
+	lgl/m4/gc-hmac-sha1.m4, lgl/m4/gc-md2.m4, lgl/m4/gc-md4.m4,
+	lgl/m4/gc-md5.m4, lgl/m4/gc-pbkdf2-sha1.m4, lgl/m4/gc-random.m4,
+	lgl/m4/gc-rijndael.m4, lgl/m4/gc-sha1.m4, lgl/m4/gc.m4,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4, lgl/m4/hmac-md5.m4,
+	lgl/m4/hmac-sha1.m4, lgl/m4/md2.m4, lgl/m4/md4.m4, lgl/m4/md5.m4,
+	lgl/m4/memxor.m4, lgl/m4/rijndael.m4, lgl/m4/sha1.m4, lgl/md2.c,
+	lgl/md2.h, lgl/md4.c, lgl/md4.h, lgl/md5.c, lgl/md5.h,
+	lgl/memxor.c, lgl/memxor.h, lgl/rijndael-alg-fst.c,
+	lgl/rijndael-alg-fst.h, lgl/rijndael-api-fst.c,
+	lgl/rijndael-api-fst.h, lgl/sha1.c, lgl/sha1.h: Drop gnulib gc
+	modules.
+
+2008-07-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lgl/m4/gnulib-cache.m4: Drop gc.
+
+2008-07-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cipher.c, lib/gnutls_handshake.c,
+	lib/x509/privkey_pkcs8.c: Drop gc.h.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: (_gnutls_handshake_hash_buffers_clear): Make sure deinitialized MAC
+	hashes are initialized.  Report and tiny patch from Tomas Mraz
+	<tmraz@redhat.com>.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/crypt.c: this fixes a problem in srptool, where the passwords
+	never match (--verify check) on some architectures (patch by
+	Matthias Koenig <mkoenig@suse.de>)
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* includes/gnutls/openssl.h, libextra/gnutls_openssl.c: corrected
+	openssl.
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* includes/gnutls/openssl.h, libextra/gnutls_openssl.c: use native
+	gnutls functions.
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_hash_int.c, lib/gnutls_hash_int.h: added
+	_gnutls_hash_fast()
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit fded9a7d1e6d58f951fc7e8f4db80d3e23f5ea1f Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Mon Jun 30 20:15:19
+	2008 +0300
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/crypt.c, src/psk.c: avoid using gc_ functions for random data.
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_hash_int.c, lib/gnutls_hash_int.h,
+	lib/x509/Makefile.am, lib/x509/pbkdf2-sha1.c,
+	lib/x509/pbkdf2-sha1.h, lib/x509/privkey_pkcs8.c, tests/gc.c: added
+	_gnutls_pkcs5_pbkdf2_sha1() based on gc_pkcs5_pbkdf2_sha1()
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* : Remove executable.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk_netconf.c: Remove debug code.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-cache.m4, gl/m4/gnulib-tool.m4,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-tool.m4: Update gnulib files.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-29  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_state.c: added check before reallocation of parameters
+	to avoid memory leaks on rehandshake.
+
+2008-06-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: document the rewrite of opencdk crypto backend.
+
+2008-06-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, doc/gnutls.texi, includes/gnutls/crypto.h,
+	includes/gnutls/gnutls.h.in, lib/Makefile.am, lib/auth_anon.c,
+	lib/auth_dh_common.c, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/auth_dhe_psk.c, lib/auth_rsa.c, lib/auth_rsa_export.c,
+	lib/auth_srp.c, lib/cipher-libgcrypt.c, lib/crypto.c, lib/crypto.h,
+	lib/debug.c, lib/debug.h, lib/gnutls_algorithms.c,
+	lib/gnutls_cert.h, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_datum.h, lib/gnutls_dh.c,
+	lib/gnutls_dh.h, lib/gnutls_dh_primes.c, lib/gnutls_global.c,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_int.h,
+	lib/gnutls_mpi.c, lib/gnutls_mpi.h, lib/gnutls_openpgp.c,
+	lib/gnutls_pk.c, lib/gnutls_pk.h, lib/gnutls_priority.c,
+	lib/gnutls_psk_netconf.c, lib/gnutls_rsa_export.c,
+	lib/gnutls_rsa_export.h, lib/gnutls_sig.c, lib/gnutls_sig.h,
+	lib/gnutls_srp.c, lib/gnutls_srp.h, lib/gnutls_state.c,
+	lib/gnutls_state.h, lib/gnutls_supplemental.c, lib/gnutls_x509.h,
+	lib/mac-libgcrypt.c, lib/mpi-libgcrypt.c, lib/opencdk/Makefile.am,
+	lib/opencdk/armor.c, lib/opencdk/context.h, lib/opencdk/dummy.c,
+	lib/opencdk/filters.h, lib/opencdk/hash.c, lib/opencdk/kbnode.c,
+	lib/opencdk/keydb.c, lib/opencdk/literal.c, lib/opencdk/main.c,
+	lib/opencdk/main.h, lib/opencdk/misc.c, lib/opencdk/new-packet.c,
+	lib/opencdk/opencdk.h, lib/opencdk/packet.h, lib/opencdk/pubkey.c,
+	lib/opencdk/read-packet.c, lib/opencdk/seskey.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c, lib/opencdk/types.h,
+	lib/opencdk/verify.c, lib/opencdk/write-packet.c,
+	lib/openpgp/extras.c, lib/openpgp/openpgp_int.h,
+	lib/openpgp/output.c, lib/openpgp/pgp.c, lib/openpgp/privkey.c,
+	lib/pk-libgcrypt.c, lib/random.c, lib/random.h,
+	lib/rnd-libgcrypt.c, lib/x509/Makefile.am, lib/x509/common.c,
+	lib/x509/common.h, lib/x509/crl.c, lib/x509/mpi.c,
+	lib/x509/pkcs12.c, lib/x509/pkcs12_encr.c, lib/x509/privkey.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/sign.c, lib/x509/verify.c,
+	lib/x509/x509.c, lib/x509/x509_int.h, src/psk-gaa.c,
+	tests/Makefile.am, tests/ca.pem, tests/crypto_rng.c, tests/mpi.c,
+	tests/netconf-psk.c, tests/openpgp/keyring.c,
+	tests/pkcs12-decode/Makefile.am, tests/pkcs12-decode/pkcs12_s2k.c: 
+	Initial merge attempt with gnutls_with_ext_mpi
+
+2008-06-25  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_dh_primes.c: do not add trailing zero on the size
+	count.
+
+2008-06-23  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile: Update gnulib files.
+
+2008-06-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Fix build failures related to opencdk.h.
+	Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2930>.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix typo.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Disable C++ library if psk, srp, anon etc have been
+	disabled.  The libgnutlsxx.cpp file calls several functions that may
+	have been removed.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, doc/examples/Makefile.am: Make
+	--disable-psk-authentication work.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/m4/lock.m4: Update gnulib files.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-cxx.cpp: Use cstring instead of string.h.
+	Reported by Daniel Black <dragonheart@gentoo.org> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2922>.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c, src/psk.c: Fix warning regarding undeclared getpass
+	replacement.  Reported by Massimo Gaspari <massimo.gaspari@alice.it>
+	in <http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Fix warning.  Reported by Massimo Gaspari
+	<massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.h: Add prototype for _gnutls_session_is_psk.
+	Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, NEWS, configure.in: Bump versions.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-06-18  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add v2.4.0 release notes.
