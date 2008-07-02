@@ -191,8 +191,8 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
       return ret;
     }
 
-  params->params[0] = group.g;
-  params->params[1] = group.p;
+  params->params[0] = group.p;
+  params->params[1] = group.g;
 
   return 0;
 }
