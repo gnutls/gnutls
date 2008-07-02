@@ -2260,7 +2260,7 @@ implemented by another example.
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example with TLS/IA support::
-* Simple client example in @acronym{C++}::
+* Simple client example in C++::
 * Helper function for TCP connections::
 @end menu
 
@@ -2356,11 +2356,11 @@ The following client is a simple client which uses the
 
 @verbatiminclude examples/ex-client-tlsia.c
 
-@node Simple client example in @acronym{C++}
-@subsection Simple Client Example using the @acronym{C++} API
+@node Simple client example in C++
+@subsection Simple Client Example using the C++ API
 
-The following client is a simple example of a client
-client utilizing the GnuTLS @acronym{C++} API. 
+The following client is a simple example of a client client utilizing
+the GnuTLS C++ API.
 
 @verbatiminclude examples/ex-cxx.cpp
 
