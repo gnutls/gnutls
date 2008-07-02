@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)/lgl -I$(top_builddir)/lgl
+AM_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir)/lgl -I$(top_builddir)/lgl
 
 noinst_LTLIBRARIES = libminitasn1.la
 

@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 # USA
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/minitasn1		\
 	-I$(top_srcdir)/libextra/openpgp/				\
