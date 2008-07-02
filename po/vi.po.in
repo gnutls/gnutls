@@ -1,14 +1,14 @@
 # Vietnamese translation for GnuTLS.
 # Copyright © 2008 Free Software Foundation, Inc.
-# This file is distributed under the same license as the gnutls-2.3.8 package.
+# This file is distributed under the same license as the gnutls package.
 # Clytie Siddall <clytie@riverland.net.au>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnutls 2.3.8\n"
+"Project-Id-Version: gnutls 2.4.0\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2008-04-29 12:24+0200\n"
-"PO-Revision-Date: 2008-05-02 16:39+0930\n"
+"POT-Creation-Date: 2008-06-18 17:09+0200\n"
+"PO-Revision-Date: 2008-06-26 22:24+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -463,7 +463,7 @@ msgstr "\t\t\tMã hoá dữ liệu.\n"
 msgid "\t\t\tKey agreement.\n"
 msgstr "\t\t\tChấp thuận khoá.\n"
 
-#: lib/x509/output.c:227
+#: lib/x509/output.c:227 lib/openpgp/output.c:106
 msgid "\t\t\tCertificate signing.\n"
 msgstr "\t\t\tKý chứng nhận.\n"
 
@@ -537,7 +537,7 @@ msgstr ""
 "\n"
 "\t\t\tASCII tên khác: "
 
-#: lib/x509/output.c:516 lib/x509/output.c:1181
+#: lib/x509/output.c:516 lib/x509/output.c:1181 lib/openpgp/output.c:321
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tPhiên bản %d\n"
@@ -570,34 +570,39 @@ msgstr "\t\tKhông phải sau : %s\n"
 msgid "\tSubject: %s\n"
 msgstr "\tNgười dân: %s\n"
 
+#: lib/x509/output.c:610 lib/x509/output.c:881 lib/x509/output.c:1291
+#: lib/openpgp/output.c:237
+msgid "unknown"
+msgstr "không rõ"
+
 #: lib/x509/output.c:612
 #, c-format
 msgid "\tSubject Public Key Algorithm: %s\n"
 msgstr "\tThuật toán khoá công người dân: %s\n"
 
-#: lib/x509/output.c:625
+#: lib/x509/output.c:625 lib/openpgp/output.c:256
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tGiá trị tuyệt đối (%d bit):\n"
 
-#: lib/x509/output.c:627
+#: lib/x509/output.c:627 lib/openpgp/output.c:258
 msgid "\t\tExponent:\n"
 msgstr "\t\tMũ :\n"
 
-#: lib/x509/output.c:646
+#: lib/x509/output.c:646 lib/openpgp/output.c:281
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tKhoá công (%d bit):\n"
 
-#: lib/x509/output.c:648
+#: lib/x509/output.c:648 lib/openpgp/output.c:283
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
-#: lib/x509/output.c:650
+#: lib/x509/output.c:650 lib/openpgp/output.c:285
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
-#: lib/x509/output.c:652
+#: lib/x509/output.c:652 lib/openpgp/output.c:287
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
@@ -754,3 +759,90 @@ msgstr "\t\tThu hồi vào : %s\n"
 #: lib/x509/output.c:1352
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Danh sách Thu hồi Chứng nhận X.509:\n"
+
+#: lib/openpgp/output.c:84
+msgid "\t\tKey Usage:\n"
+msgstr "\t\tSử dụng khoá:\n"
+
+#: lib/openpgp/output.c:93
+#, c-format
+msgid "error: get_key_usage: %s\n"
+msgstr "lỗi: get_key_usage: %s\n"
+
+#: lib/openpgp/output.c:98
+msgid "\t\t\tDigital signatures.\n"
+msgstr "\t\t\tChữ ký thuật số.\n"
+
+#: lib/openpgp/output.c:100
+msgid "\t\t\tCommunications encipherment.\n"
+msgstr "\t\t\tMã hoá giao thông.\n"
+
+#: lib/openpgp/output.c:102
+msgid "\t\t\tStorage data encipherment.\n"
+msgstr "\t\t\tMã hoá dữ liệu lưu trữ.\n"
+
+#: lib/openpgp/output.c:104
+msgid "\t\t\tAuthentication.\n"
+msgstr "\t\t\tXác thực.\n"
+
+#: lib/openpgp/output.c:127
+msgid "\tID (hex): "
+msgstr "\tMã số (thập lục): "
+
+#: lib/openpgp/output.c:148
+msgid "\tFingerprint (hex): "
+msgstr "\tDấu tay (thập lục):"
+
+#: lib/openpgp/output.c:165
+msgid "\tRevoked: True\n"
+msgstr "\tThu hồi: Đúng\n"
+
+#: lib/openpgp/output.c:167
+msgid "\tRevoked: False\n"
+msgstr "\tThu hồi: Sai\n"
+
+#: lib/openpgp/output.c:175
+msgid "\tTime stamps:\n"
+msgstr "\tNhãn thời gian.\n"
+
+#: lib/openpgp/output.c:192
+#, c-format
+msgid "\t\tCreation: %s\n"
+msgstr "\t\tTạo : %s\n"
+
+#: lib/openpgp/output.c:206
+msgid "\t\tExpiration: Never\n"
+msgstr "\t\tHết hạn: Không bao giờ\n"
+
+#: lib/openpgp/output.c:215
+#, c-format
+msgid "\t\tExpiration: %s\n"
+msgstr "\t\tHết hạn: %s\n"
+
+#: lib/openpgp/output.c:239
+#, c-format
+msgid "\tPublic Key Algorithm: %s\n"
+msgstr "\tThuật toán khoá công: %s\n"
+
+#: lib/openpgp/output.c:343
+#, c-format
+msgid "\tName[%d]: %s\n"
+msgstr "\tTên[%d]: %s\n"
+
+#: lib/openpgp/output.c:345
+#, c-format
+msgid "\tRevoked Name[%d]: %s\n"
+msgstr "\tThu hồi tên [%d]: %s\n"
+
+#: lib/openpgp/output.c:360
+#, c-format
+msgid ""
+"\n"
+"\tSubkey[%d]:\n"
+msgstr ""
+"\n"
+"\tKhoá phụ[%d]:\n"
+
+#: lib/openpgp/output.c:395
+msgid "OpenPGP Certificate Information:\n"
+msgstr "Thông tin chứng nhận OpenPGP:\n"
