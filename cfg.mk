@@ -18,7 +18,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-CFGFLAGS ?= --enable-developer-mode --enable-gtk-doc --disable-guile
+CFGFLAGS ?= --enable-developer-mode --enable-gtk-doc
 
 INDENT_SOURCES = `find . -name \*.c|grep -v -e ^./lgl -e ^./gl -e ^./src/cfg -e -gaa.c -e asn1_tab.c`
 

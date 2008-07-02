@@ -20,7 +20,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --disable-guile
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 SUBDIRS = lgl gl includes lib libextra src doc tests po
 
