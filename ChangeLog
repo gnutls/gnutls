@@ -1,5 +1,72 @@
 2008-07-02  Simon Josefsson <simon@josefsson.org>
 
+	* NEWS: Version 2.5.1.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, doc/examples/ex-cert-select.c,
+	doc/examples/ex-client-psk.c, doc/examples/ex-client-tlsia.c,
+	doc/examples/ex-client1.c, doc/examples/ex-client2.c,
+	doc/examples/ex-serv-export.c, doc/examples/ex-serv-pgp.c,
+	doc/examples/ex-serv-psk.c, doc/examples/ex-serv1.c,
+	guile/src/core.c, guile/src/errors.c, guile/src/extra.c,
+	lib/auth_cert.c, lib/auth_dh_common.c, lib/auth_dhe.c,
+	lib/auth_psk.c, lib/auth_psk_passwd.c, lib/auth_rsa.c,
+	lib/auth_rsa_export.c, lib/auth_srp.c, lib/auth_srp_passwd.c,
+	lib/auth_srp_rsa.c, lib/cipher-libgcrypt.c, lib/crypto.c,
+	lib/debug.c, lib/ext_cert_type.c, lib/ext_max_record.c,
+	lib/ext_oprfi.c, lib/ext_server_name.c, lib/ext_srp.c,
+	lib/gnutls_alert.c, lib/gnutls_algorithms.c,
+	lib/gnutls_anon_cred.c, lib/gnutls_auth.c, lib/gnutls_buffers.c,
+	lib/gnutls_cert.c, lib/gnutls_cipher.c, lib/gnutls_cipher_int.c,
+	lib/gnutls_compress.c, lib/gnutls_constate.c, lib/gnutls_db.c,
+	lib/gnutls_dh.c, lib/gnutls_dh_primes.c, lib/gnutls_errors.c,
+	lib/gnutls_extensions.c, lib/gnutls_global.c,
+	lib/gnutls_handshake.c, lib/gnutls_hash_int.c, lib/gnutls_kx.c,
+	lib/gnutls_mpi.c, lib/gnutls_openpgp.c, lib/gnutls_pk.c,
+	lib/gnutls_priority.c, lib/gnutls_psk.c, lib/gnutls_psk_netconf.c,
+	lib/gnutls_record.c, lib/gnutls_session.c,
+	lib/gnutls_session_pack.c, lib/gnutls_sig.c, lib/gnutls_srp.c,
+	lib/gnutls_state.c, lib/gnutls_str.c, lib/gnutls_supplemental.c,
+	lib/gnutls_ui.c, lib/gnutls_v2_compat.c, lib/gnutls_x509.c,
+	lib/mac-libgcrypt.c, lib/minitasn1/structure.c,
+	lib/mpi-libgcrypt.c, lib/opencdk/armor.c, lib/opencdk/dummy.c,
+	lib/opencdk/hash.c, lib/opencdk/kbnode.c, lib/opencdk/keydb.c,
+	lib/opencdk/literal.c, lib/opencdk/main.c, lib/opencdk/misc.c,
+	lib/opencdk/new-packet.c, lib/opencdk/pubkey.c,
+	lib/opencdk/read-packet.c, lib/opencdk/seskey.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c,
+	lib/opencdk/verify.c, lib/opencdk/write-packet.c,
+	lib/openpgp/compat.c, lib/openpgp/extras.c, lib/openpgp/output.c,
+	lib/openpgp/pgp.c, lib/openpgp/pgpverify.c, lib/openpgp/privkey.c,
+	lib/pk-libgcrypt.c, lib/random.c, lib/rnd-libgcrypt.c,
+	lib/x509/common.c, lib/x509/crl.c, lib/x509/crq.c, lib/x509/dn.c,
+	lib/x509/dsa.c, lib/x509/extensions.c, lib/x509/mpi.c,
+	lib/x509/output.c, lib/x509/pbkdf2-sha1.c, lib/x509/pkcs12.c,
+	lib/x509/pkcs12_encr.c, lib/x509/pkcs7.c, lib/x509/privkey.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/rfc2818_hostname.c,
+	lib/x509/sign.c, lib/x509/x509.c, lib/x509/x509_write.c,
+	libextra/gnutls_openssl.c, src/certtool-cfg.c, src/certtool.c,
+	src/cli.c, src/common.c, src/crypt.c, src/psk.c, src/select.c,
+	src/serv.c, src/tests.c, src/tls_test.c,
+	tests/certificate_set_x509_crl.c, tests/crypto_rng.c,
+	tests/dhepskself.c, tests/dn.c, tests/gc.c,
+	tests/hostname-check/hostname-check.c, tests/mini.c,
+	tests/moredn.c, tests/mpi.c, tests/openpgp/keyring.c,
+	tests/openpgpself.c, tests/oprfi.c, tests/parse_ca.c,
+	tests/pkcs12-decode/pkcs12_s2k.c, tests/x509dn.c, tests/x509self.c,
+	tests/x509signself.c: Indent code.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
 	* NEWS: Version 2.5.0.
 
 2008-07-02  Simon Josefsson <simon@josefsson.org>
