@@ -12,15 +12,15 @@ See the end for copying conditions.
 ** Rewritten opencdk crypto backend, to use the gnutls internal one.
 
 ** API and ABI modifications:
-gnutls_crypto_single_cipher_register2: Added
-gnutls_crypto_single_mac_register2: Added
-gnutls_crypto_single_digest_register2: Added
-gnutls_crypto_cipher_register2: Added
-gnutls_crypto_mac_register2: Added
-gnutls_crypto_digest_register2: Added
-gnutls_crypto_rnd_register2: Added
-gnutls_crypto_pk_register2: Added
-gnutls_crypto_bigint_register2: Added
+gnutls_crypto_bigint_register2: ADDED.
+gnutls_crypto_cipher_register2: ADDED.
+gnutls_crypto_digest_register2: ADDED.
+gnutls_crypto_mac_register2: ADDED.
+gnutls_crypto_pk_register2: ADDED.
+gnutls_crypto_rnd_register2: ADDED.
+gnutls_crypto_single_cipher_register2: ADDED.
+gnutls_crypto_single_digest_register2: ADDED.
+gnutls_crypto_single_mac_register2: ADDED.
 
 * Version 2.4.1 (released 2008-06-30)
 
