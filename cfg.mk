@@ -18,7 +18,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-CFGFLAGS ?= --enable-developer-mode --enable-gtk-doc
+CFGFLAGS ?= --enable-developer-mode --enable-gtk-doc --disable-guile
 
 INDENT_SOURCES = `ls includes/gnutls/*.h{,.in} {lib,lib/x509,libextra,libextra/openpgp,src,tests}/*.{c,h} | grep -v -- -gaa`
 
