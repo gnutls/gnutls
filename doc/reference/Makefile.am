@@ -72,7 +72,7 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	der.h errors.h gstr.h parser_aux.h element.h errors_int.h	\
 	int.h structure.h						\
 									\
-	common.h compat.h						\
+	common.h compat.h pbkdf2-sha1.h					\
 									\
 	openssl_compat.h						\
 									\
