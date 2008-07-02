@@ -129,7 +129,7 @@ gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 	}
 
       ret = gnutls_hex_decode (key, (char *) res->key.data, &size);
-      res->key.size = (unsigned int)size;
+      res->key.size = (unsigned int) size;
       if (ret < 0)
 	{
 	  gnutls_assert ();

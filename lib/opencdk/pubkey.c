@@ -35,24 +35,24 @@
  * them into a way for _gnutls_pk_verify to use.
  */
 static cdk_error_t
-sig_to_datum (gnutls_datum_t *r_sig, cdk_pkt_signature_t sig)
+sig_to_datum (gnutls_datum_t * r_sig, cdk_pkt_signature_t sig)
 {
   int err;
   cdk_error_t rc;
-  
+
   if (!r_sig || !sig)
-    return CDK_Inv_Value;  
-  
+    return CDK_Inv_Value;
+
   rc = 0;
-  if (is_RSA (sig->pubkey_algo)) 
+  if (is_RSA (sig->pubkey_algo))
     {
-      err = _gnutls_mpi_dprint( sig->mpi[0], r_sig);
+      err = _gnutls_mpi_dprint (sig->mpi[0], r_sig);
       if (err < 0)
 	rc = map_gnutls_error (err);
     }
   else if (is_DSA (sig->pubkey_algo))
     {
-      err = _gnutls_encode_ber_rs( r_sig, sig->mpi[0], sig->mpi[1]);
+      err = _gnutls_encode_ber_rs (r_sig, sig->mpi[0], sig->mpi[1]);
       if (err < 0)
 	rc = map_gnutls_error (err);
     }
@@ -70,7 +70,7 @@ sig_to_datum (gnutls_datum_t *r_sig, cdk_pkt_signature_t sig)
  * Verify the signature in @sig and compare it with the message digest in @md.
  **/
 cdk_error_t
-cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte *md)
+cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
 {
   gnutls_datum s_sig;
   byte *encmd = NULL;
@@ -80,51 +80,56 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte *md)
   gnutls_datum data;
   gnutls_pk_params_st params;
 
-  if (!pk || !sig || !md) {
-    gnutls_assert();
-    return CDK_Inv_Value;
-  }
-    
-  if (is_DSA (pk->pubkey_algo)) algo = GNUTLS_PK_DSA;
-  else if (is_RSA( pk->pubkey_algo)) algo = GNUTLS_PK_RSA;
-  else 
+  if (!pk || !sig || !md)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
-  
+
+  if (is_DSA (pk->pubkey_algo))
+    algo = GNUTLS_PK_DSA;
+  else if (is_RSA (pk->pubkey_algo))
+    algo = GNUTLS_PK_RSA;
+  else
+    {
+      gnutls_assert ();
+      return CDK_Inv_Value;
+    }
+
   rc = sig_to_datum (&s_sig, sig);
-  if (rc) {
-    gnutls_assert();
-    goto leave;
-  }
-  
+  if (rc)
+    {
+      gnutls_assert ();
+      goto leave;
+    }
+
   rc = _cdk_digest_encode_pkcs1 (&encmd, &enclen, pk->pubkey_algo, md,
 				 sig->digest_algo, cdk_pk_get_nbits (pk));
-  if (rc) {
-    gnutls_assert();
-    goto leave;
-  }
-  
+  if (rc)
+    {
+      gnutls_assert ();
+      goto leave;
+    }
+
   data.data = encmd;
   data.size = enclen;
 
   params.params = pk->mpi;
-  params.params_nr = cdk_pk_get_npkey( pk->pubkey_algo);
+  params.params_nr = cdk_pk_get_npkey (pk->pubkey_algo);
   params.flags = 0;
-  ret = _gnutls_pk_verify( algo, &data, &s_sig, &params);
-  
-  if (ret < 0) 
+  ret = _gnutls_pk_verify (algo, &data, &s_sig, &params);
+
+  if (ret < 0)
     {
-      gnutls_assert();
-      rc = map_gnutls_error( ret);
+      gnutls_assert ();
+      rc = map_gnutls_error (ret);
       goto leave;
     }
-  
+
   rc = 0;
-    
-  leave:
-  _gnutls_free_datum( &s_sig);
+
+leave:
+  _gnutls_free_datum (&s_sig);
   cdk_free (encmd);
   return rc;
 }
@@ -158,13 +163,17 @@ cdk_pk_get_nbits (cdk_pubkey_t pk)
 int
 cdk_pk_get_npkey (int algo)
 {
-  if (is_RSA(algo)) return RSA_PUBLIC_PARAMS;
-  else if (is_DSA(algo)) return DSA_PUBLIC_PARAMS;
-  else if (is_ELG(algo)) return 3;
-  else {
-      gnutls_assert();
+  if (is_RSA (algo))
+    return RSA_PUBLIC_PARAMS;
+  else if (is_DSA (algo))
+    return DSA_PUBLIC_PARAMS;
+  else if (is_ELG (algo))
+    return 3;
+  else
+    {
+      gnutls_assert ();
       return 0;
-  }
+    }
 }
 
 
@@ -178,17 +187,21 @@ cdk_pk_get_npkey (int algo)
 int
 cdk_pk_get_nskey (int algo)
 {
-int ret;
+  int ret;
 
-  if (is_RSA(algo)) ret = RSA_PRIVATE_PARAMS;
-  else if (is_DSA(algo)) ret = DSA_PRIVATE_PARAMS;
-  else if (is_ELG(algo)) ret = 4;
-  else {
-      gnutls_assert();
+  if (is_RSA (algo))
+    ret = RSA_PRIVATE_PARAMS;
+  else if (is_DSA (algo))
+    ret = DSA_PRIVATE_PARAMS;
+  else if (is_ELG (algo))
+    ret = 4;
+  else
+    {
+      gnutls_assert ();
       return 0;
-  }
-  
-  ret -= cdk_pk_get_npkey(algo);
+    }
+
+  ret -= cdk_pk_get_npkey (algo);
   return ret;
 }
 
@@ -202,9 +215,12 @@ int ret;
 int
 cdk_pk_get_nsig (int algo)
 {
-  if (is_RSA(algo)) return 1;
-  else if (is_DSA(algo)) return 2;
-  else return 0;
+  if (is_RSA (algo))
+    return 1;
+  else if (is_DSA (algo))
+    return 2;
+  else
+    return 0;
 }
 
 
@@ -217,9 +233,12 @@ cdk_pk_get_nsig (int algo)
 int
 cdk_pk_get_nenc (int algo)
 {
-  if (is_RSA(algo)) return 1;
-  else if (is_ELG(algo)) return 2;
-  else return 0;
+  if (is_RSA (algo))
+    return 1;
+  else if (is_ELG (algo))
+    return 2;
+  else
+    return 0;
 }
 
 
@@ -231,46 +250,59 @@ _cdk_pk_algo_usage (int algo)
   /* The ElGamal sign+encrypt algorithm is not supported any longer. */
   switch (algo)
     {
-    case CDK_PK_RSA  : usage = CDK_KEY_USG_SIGN | CDK_KEY_USG_ENCR; break;
-    case CDK_PK_RSA_E: usage = CDK_KEY_USG_ENCR; break;
-    case CDK_PK_RSA_S: usage = CDK_KEY_USG_SIGN; break;
-    case CDK_PK_ELG_E: usage = CDK_KEY_USG_ENCR; break;
-    case CDK_PK_DSA  : usage = CDK_KEY_USG_SIGN; break;
-    default: usage = 0;
+    case CDK_PK_RSA:
+      usage = CDK_KEY_USG_SIGN | CDK_KEY_USG_ENCR;
+      break;
+    case CDK_PK_RSA_E:
+      usage = CDK_KEY_USG_ENCR;
+      break;
+    case CDK_PK_RSA_S:
+      usage = CDK_KEY_USG_SIGN;
+      break;
+    case CDK_PK_ELG_E:
+      usage = CDK_KEY_USG_ENCR;
+      break;
+    case CDK_PK_DSA:
+      usage = CDK_KEY_USG_SIGN;
+      break;
+    default:
+      usage = 0;
     }
-  return usage;  
+  return usage;
 }
 
 /* You can use a NULL buf to get the output size only
  */
 static cdk_error_t
-mpi_to_buffer (bigint_t a, byte *buf, size_t buflen,
-	       size_t *r_nwritten, size_t *r_nbits)
+mpi_to_buffer (bigint_t a, byte * buf, size_t buflen,
+	       size_t * r_nwritten, size_t * r_nbits)
 {
   size_t nbits;
   int err;
-  
-  if (!a || !r_nwritten) {
-    gnutls_assert();
-    return CDK_Inv_Value;
-  }
-  
+
+  if (!a || !r_nwritten)
+    {
+      gnutls_assert ();
+      return CDK_Inv_Value;
+    }
+
   nbits = _gnutls_mpi_get_nbits (a);
   if (r_nbits)
     *r_nbits = nbits;
 
   if (r_nwritten)
-    *r_nwritten = (nbits+7)/8+2;
+    *r_nwritten = (nbits + 7) / 8 + 2;
 
-  if ((nbits+7)/8+2 > buflen)
+  if ((nbits + 7) / 8 + 2 > buflen)
     return CDK_Too_Short;
 
   *r_nwritten = buflen;
   err = _gnutls_mpi_print (a, buf, r_nwritten);
-  if (err < 0) {
-    gnutls_assert();
-    return map_gnutls_error(err);
-  }
+  if (err < 0)
+    {
+      gnutls_assert ();
+      return map_gnutls_error (err);
+    }
 
   return 0;
 }
@@ -288,12 +320,13 @@ mpi_to_buffer (bigint_t a, byte *buf, size_t buflen,
  **/
 cdk_error_t
 cdk_pk_get_mpi (cdk_pubkey_t pk, size_t idx,
-                byte *buf, size_t buflen, size_t *r_nwritten, size_t *r_nbits)
+		byte * buf, size_t buflen, size_t * r_nwritten,
+		size_t * r_nbits)
 {
   if (!pk || !r_nwritten)
     return CDK_Inv_Value;
 
-  if ((ssize_t)idx > cdk_pk_get_npkey (pk->pubkey_algo))
+  if ((ssize_t) idx > cdk_pk_get_npkey (pk->pubkey_algo))
     return CDK_Inv_Value;
   return mpi_to_buffer (pk->mpi[idx], buf, buflen, r_nwritten, r_nbits);
 }
@@ -313,12 +346,13 @@ cdk_pk_get_mpi (cdk_pubkey_t pk, size_t idx,
  **/
 cdk_error_t
 cdk_sk_get_mpi (cdk_pkt_seckey_t sk, size_t idx,
-                byte *buf, size_t buflen, size_t *r_nwritten, size_t *r_nbits)
+		byte * buf, size_t buflen, size_t * r_nwritten,
+		size_t * r_nbits)
 {
   if (!sk || !r_nwritten)
     return CDK_Inv_Value;
 
-  if ((ssize_t)idx > cdk_pk_get_nskey (sk->pubkey_algo))
+  if ((ssize_t) idx > cdk_pk_get_nskey (sk->pubkey_algo))
     return CDK_Inv_Value;
   return mpi_to_buffer (sk->mpi[idx], buf, buflen, r_nwritten, r_nbits);
 }
@@ -327,17 +361,17 @@ cdk_sk_get_mpi (cdk_pkt_seckey_t sk, size_t idx,
 static u16
 checksum_mpi (bigint_t m)
 {
-  byte buf[MAX_MPI_BYTES+2];
+  byte buf[MAX_MPI_BYTES + 2];
   size_t nread;
   unsigned int i;
   u16 chksum = 0;
 
   if (!m)
     return 0;
-  nread = DIM(buf);
+  nread = DIM (buf);
   if (_gnutls_mpi_print_pgp (m, buf, &nread) < 0)
     return 0;
-  for (i=0; i < nread; i++)
+  for (i = 0; i < nread; i++)
     chksum += buf[i];
   return chksum;
 }
@@ -350,7 +384,7 @@ checksum_mpi (bigint_t m)
  * Create a new public key from a secret key.
  **/
 cdk_error_t
-cdk_pk_from_secret_key (cdk_pkt_seckey_t sk, cdk_pubkey_t *ret_pk)
+cdk_pk_from_secret_key (cdk_pkt_seckey_t sk, cdk_pubkey_t * ret_pk)
 {
   if (!sk)
     return CDK_Inv_Value;
@@ -362,7 +396,7 @@ int
 _cdk_sk_get_csum (cdk_pkt_seckey_t sk)
 {
   u16 csum = 0, i;
-  
+
   if (!sk)
     return 0;
   for (i = 0; i < cdk_pk_get_nskey (sk->pubkey_algo); i++)
@@ -383,7 +417,7 @@ _cdk_sk_get_csum (cdk_pkt_seckey_t sk)
  * possible to avoid overflows.
  **/
 cdk_error_t
-cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte *fpr)
+cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte * fpr)
 {
   digest_hd_st hd;
   int md_algo;
@@ -392,9 +426,9 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte *fpr)
 
   if (!pk || !fpr)
     return CDK_Inv_Value;
-  
+
   if (pk->version < 4 && is_RSA (pk->pubkey_algo))
-    md_algo = GNUTLS_DIG_MD5; /* special */
+    md_algo = GNUTLS_DIG_MD5;	/* special */
   else
     md_algo = GNUTLS_DIG_SHA1;
   dlen = _gnutls_hash_get_algo_len (md_algo);
@@ -402,7 +436,7 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte *fpr)
   if (err < 0)
     return map_gnutls_error (err);
   _cdk_hash_pubkey (pk, &hd, 1);
-  _gnutls_hash_deinit( &hd, fpr);
+  _gnutls_hash_deinit (&hd, fpr);
   if (dlen == 16)
     memset (fpr + 16, 0, 4);
   return 0;
@@ -420,34 +454,34 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte *fpr)
  * return it in the given byte array.
  **/
 cdk_error_t
-cdk_pk_to_fingerprint (cdk_pubkey_t pk, 
-		       byte *fprbuf, size_t fprbuflen, size_t *r_nout)
+cdk_pk_to_fingerprint (cdk_pubkey_t pk,
+		       byte * fprbuf, size_t fprbuflen, size_t * r_nout)
 {
   size_t key_fprlen;
   cdk_error_t err;
-  
+
   if (!pk)
     return CDK_Inv_Value;
-    
+
   if (pk->version < 4)
     key_fprlen = 16;
   else
     key_fprlen = 20;
-  
+
   /* Only return the required buffer size for the fingerprint. */
   if (!fprbuf && !fprbuflen && r_nout)
-    {      
+    {
       *r_nout = key_fprlen;
       return 0;
     }
-  
+
   if (!fprbuf || key_fprlen > fprbuflen)
     return CDK_Too_Short;
 
   err = cdk_pk_get_fingerprint (pk, fprbuf);
   if (r_nout)
     *r_nout = key_fprlen;
-  
+
   return err;
 }
 
@@ -461,9 +495,9 @@ cdk_pk_to_fingerprint (cdk_pubkey_t pk,
  * For version 3 keys, this is not working.
  **/
 u32
-cdk_pk_fingerprint_get_keyid (const byte *fpr, size_t fprlen, u32 *keyid)
+cdk_pk_fingerprint_get_keyid (const byte * fpr, size_t fprlen, u32 * keyid)
 {
-    u32 lowbits = 0;
+  u32 lowbits = 0;
 
   /* In this case we say the key is a V3 RSA key and we can't
      use the fingerprint to get the keyid. */
@@ -493,22 +527,24 @@ cdk_pk_fingerprint_get_keyid (const byte *fpr, size_t fprlen, u32 *keyid)
  * Calculate the key ID of the given public key.
  **/
 u32
-cdk_pk_get_keyid (cdk_pubkey_t pk, u32 *keyid)
+cdk_pk_get_keyid (cdk_pubkey_t pk, u32 * keyid)
 {
   u32 lowbits = 0;
   byte buf[24];
-  
-  if (pk && (!pk->keyid[0] || !pk->keyid[1])) 
+
+  if (pk && (!pk->keyid[0] || !pk->keyid[1]))
     {
-      if (pk->version < 4 && is_RSA (pk->pubkey_algo)) 
+      if (pk->version < 4 && is_RSA (pk->pubkey_algo))
 	{
 	  byte p[MAX_MPI_BYTES];
 	  size_t n;
-	  
+
 	  n = MAX_MPI_BYTES;
 	  _gnutls_mpi_print (pk->mpi[0], p, &n);
-	  pk->keyid[0] = p[n-8] << 24 | p[n-7] << 16 | p[n-6] << 8 | p[n-5];
-	  pk->keyid[1] = p[n-4] << 24 | p[n-3] << 16 | p[n-2] << 8 | p[n-1];
+	  pk->keyid[0] =
+	    p[n - 8] << 24 | p[n - 7] << 16 | p[n - 6] << 8 | p[n - 5];
+	  pk->keyid[1] =
+	    p[n - 4] << 24 | p[n - 3] << 16 | p[n - 2] << 8 | p[n - 1];
 	}
       else if (pk->version == 4)
 	{
@@ -523,7 +559,7 @@ cdk_pk_get_keyid (cdk_pubkey_t pk, u32 *keyid)
       keyid[0] = pk->keyid[0];
       keyid[1] = pk->keyid[1];
     }
-  
+
   return lowbits;
 }
 
@@ -536,17 +572,17 @@ cdk_pk_get_keyid (cdk_pubkey_t pk, u32 *keyid)
  * Calculate the key ID of the secret key, actually the public key.
  **/
 u32
-cdk_sk_get_keyid (cdk_pkt_seckey_t sk, u32 *keyid)
+cdk_sk_get_keyid (cdk_pkt_seckey_t sk, u32 * keyid)
 {
   u32 lowbits = 0;
-  
+
   if (sk && sk->pk)
     {
       lowbits = cdk_pk_get_keyid (sk->pk, keyid);
       sk->keyid[0] = sk->pk->keyid[0];
       sk->keyid[1] = sk->pk->keyid[1];
     }
-  
+
   return lowbits;
 }
 
@@ -559,10 +595,10 @@ cdk_sk_get_keyid (cdk_pkt_seckey_t sk, u32 *keyid)
  * Retrieve the key ID from the given signature.
  **/
 u32
-cdk_sig_get_keyid (cdk_pkt_signature_t sig, u32 *keyid)
+cdk_sig_get_keyid (cdk_pkt_signature_t sig, u32 * keyid)
 {
   u32 lowbits = sig ? sig->keyid[1] : 0;
-  
+
   if (keyid && sig)
     {
       keyid[0] = sig->keyid[0];
@@ -575,55 +611,55 @@ cdk_sig_get_keyid (cdk_pkt_signature_t sig, u32 *keyid)
 /* Return the key ID from the given packet.
    If this is not possible, 0 is returned */
 u32
-_cdk_pkt_get_keyid (cdk_packet_t pkt, u32 *keyid)
+_cdk_pkt_get_keyid (cdk_packet_t pkt, u32 * keyid)
 {
   u32 lowbits;
-  
+
   if (!pkt)
     return 0;
-  
+
   switch (pkt->pkttype)
     {
     case CDK_PKT_PUBLIC_KEY:
     case CDK_PKT_PUBLIC_SUBKEY:
       lowbits = cdk_pk_get_keyid (pkt->pkt.public_key, keyid);
       break;
-      
+
     case CDK_PKT_SECRET_KEY:
     case CDK_PKT_SECRET_SUBKEY:
       lowbits = cdk_sk_get_keyid (pkt->pkt.secret_key, keyid);
       break;
-      
+
     case CDK_PKT_SIGNATURE:
       lowbits = cdk_sig_get_keyid (pkt->pkt.signature, keyid);
       break;
-      
+
     default:
       lowbits = 0;
       break;
     }
-  
+
   return lowbits;
 }
 
 
 /* Get the fingerprint of the packet if possible. */
 int
-_cdk_pkt_get_fingerprint (cdk_packet_t pkt, byte *fpr)
+_cdk_pkt_get_fingerprint (cdk_packet_t pkt, byte * fpr)
 {
   if (!pkt || !fpr)
     return CDK_Inv_Value;
-  
+
   switch (pkt->pkttype)
     {
     case CDK_PKT_PUBLIC_KEY:
     case CDK_PKT_PUBLIC_SUBKEY:
       return cdk_pk_get_fingerprint (pkt->pkt.public_key, fpr);
-      
+
     case CDK_PKT_SECRET_KEY:
     case CDK_PKT_SECRET_SUBKEY:
       return cdk_pk_get_fingerprint (pkt->pkt.secret_key->pk, fpr);
-      
+
     default:
       return CDK_Inv_Mode;
     }

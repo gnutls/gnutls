@@ -205,8 +205,8 @@ _gnutls_peers_cert_less_512 (gnutls_session_t session)
 
   if ((ret =
        _gnutls_get_auth_info_gcert (&peer_cert,
-				  session->security_parameters.cert_type,
-				  info, CERT_NO_COPY)) < 0)
+				    session->security_parameters.cert_type,
+				    info, CERT_NO_COPY)) < 0)
     {
       gnutls_assert ();
       return 0;
@@ -304,8 +304,8 @@ proc_rsa_export_server_kx (gnutls_session_t session,
 
   if ((ret =
        _gnutls_get_auth_info_gcert (&peer_cert,
-				  session->security_parameters.cert_type,
-				  info, CERT_NO_COPY)) < 0)
+				    session->security_parameters.cert_type,
+				    info, CERT_NO_COPY)) < 0)
     {
       gnutls_assert ();
       return ret;

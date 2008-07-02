@@ -147,23 +147,23 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
       if (cred == NULL)
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 
-      if( cred->server_get_cert_callback == NULL)
-        {
-          for (i = 0; i < cred->ncerts; i++)
-    	    {
+      if (cred->server_get_cert_callback == NULL)
+	{
+	  for (i = 0; i < cred->ncerts; i++)
+	    {
 	      if (cred->cert_list[i][0].cert_type == cert_type)
-	        {
-	          cert_found = 1;
-	          break;
-	        }
-              }
+		{
+		  cert_found = 1;
+		  break;
+		}
+	    }
 
-          if (cert_found == 0)
+	  if (cert_found == 0)
 	    /* no certificate is of that type.
 	     */
 	    return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
-          }
-        }
+	}
+    }
 
   if (session->internals.priorities.cert_type.algorithms == 0
       && cert_type == DEFAULT_CERT_TYPE)
@@ -382,8 +382,8 @@ gnutls_deinit (gnutls_session_t session)
   if (session->connection_state.read_compression_state != NULL)
     _gnutls_comp_deinit (session->connection_state.read_compression_state, 1);
   if (session->connection_state.write_compression_state != NULL)
-    _gnutls_comp_deinit (session->connection_state.
-			 write_compression_state, 0);
+    _gnutls_comp_deinit (session->connection_state.write_compression_state,
+			 0);
 
   _gnutls_free_datum (&session->cipher_specs.server_write_mac_secret);
   _gnutls_free_datum (&session->cipher_specs.client_write_mac_secret);
@@ -482,7 +482,7 @@ _gnutls_dh_set_peer_public (gnutls_session_t session, bigint_t public)
     }
 
   if (dh->public_key.data)
-      _gnutls_free_datum(&dh->public_key);
+    _gnutls_free_datum (&dh->public_key);
 
   ret = _gnutls_mpi_dprint_lz (public, &dh->public_key);
   if (ret < 0)
@@ -551,10 +551,10 @@ _gnutls_rsa_export_set_pubkey (gnutls_session_t session,
     return GNUTLS_E_INTERNAL_ERROR;
 
   if (info->rsa_export.modulus.data)
-      _gnutls_free_datum(&info->rsa_export.modulus);
+    _gnutls_free_datum (&info->rsa_export.modulus);
 
   if (info->rsa_export.exponent.data)
-      _gnutls_free_datum(&info->rsa_export.exponent);
+    _gnutls_free_datum (&info->rsa_export.exponent);
 
   ret = _gnutls_mpi_dprint_lz (modulus, &info->rsa_export.modulus);
   if (ret < 0)
@@ -622,10 +622,10 @@ _gnutls_dh_set_group (gnutls_session_t session, bigint_t gen, bigint_t prime)
     }
 
   if (dh->prime.data)
-      _gnutls_free_datum(&dh->prime);
+    _gnutls_free_datum (&dh->prime);
 
   if (dh->generator.data)
-      _gnutls_free_datum(&dh->generator);
+    _gnutls_free_datum (&dh->generator);
 
   /* prime
    */
@@ -662,7 +662,7 @@ _gnutls_dh_set_group (gnutls_session_t session, bigint_t gen, bigint_t prime)
   **/
 void
 gnutls_openpgp_send_cert (gnutls_session_t session,
-			 gnutls_openpgp_crt_status_t status)
+			  gnutls_openpgp_crt_status_t status)
 {
   session->internals.pgp_fingerprint = status;
 }
@@ -895,8 +895,7 @@ _gnutls_PRF (gnutls_session_t session,
     {
       result =
 	_gnutls_P_hash (GNUTLS_MAC_SHA1, secret, secret_size,
-			s_seed, s_seed_size,
-			total_bytes, ret);
+			s_seed, s_seed_size, total_bytes, ret);
       if (result < 0)
 	{
 	  gnutls_assert ();
@@ -1131,8 +1130,8 @@ gnutls_session_is_resumed (gnutls_session_t session)
 	  session->security_parameters.session_id_size ==
 	  session->internals.resumed_security_parameters.session_id_size
 	  && memcmp (session->security_parameters.session_id,
-		     session->internals.resumed_security_parameters.
-		     session_id,
+		     session->internals.
+		     resumed_security_parameters.session_id,
 		     session->security_parameters.session_id_size) == 0)
 	return 1;
     }
@@ -1158,8 +1157,8 @@ _gnutls_session_is_export (gnutls_session_t session)
   gnutls_cipher_algorithm_t cipher;
 
   cipher =
-    _gnutls_cipher_suite_get_cipher_algo (&session->security_parameters.
-					  current_cipher_suite);
+    _gnutls_cipher_suite_get_cipher_algo (&session->
+					  security_parameters.current_cipher_suite);
 
   if (_gnutls_cipher_get_export_flag (cipher) != 0)
     return 1;
@@ -1180,8 +1179,9 @@ _gnutls_session_is_psk (gnutls_session_t session)
 {
   gnutls_kx_algorithm_t kx;
 
-  kx = _gnutls_cipher_suite_get_kx_algo (&session->security_parameters.
-					 current_cipher_suite);
+  kx =
+    _gnutls_cipher_suite_get_kx_algo (&session->
+				      security_parameters.current_cipher_suite);
   if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK)
     return 1;
 
@@ -1285,7 +1285,8 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
  **/
 void
 gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
-						 gnutls_handshake_post_client_hello_func func)
+						 gnutls_handshake_post_client_hello_func
+						 func)
 {
   session->internals.user_hello_func = func;
 }
@@ -1305,5 +1306,5 @@ gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
 void
 gnutls_session_enable_compatibility_mode (gnutls_session_t session)
 {
-  gnutls_record_disable_padding( session);
+  gnutls_record_disable_padding (session);
 }

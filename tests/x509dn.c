@@ -107,8 +107,7 @@ const char ca_pem[] =
   "Viyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAiaIRqGfp1jPpNeVhABK60SU0KIAy\n"
   "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\n"
   "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\n"
-  "PfqUpIhz5Bbm7J4=\n"
-  "-----END CERTIFICATE-----\n";
+  "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca = { ca_pem, sizeof (ca_pem) };
 
 const char cert_pem[] =
@@ -124,8 +123,7 @@ const char cert_pem[] =
   "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-  "dc8Siq5JojruiMizAf0pA7in\n"
-  "-----END CERTIFICATE-----\n";
+  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t cert = { cert_pem, sizeof (cert_pem) };
 
 const char key_pem[] =
@@ -150,9 +148,9 @@ const gnutls_datum_t key = { key_pem, sizeof (key_pem) };
 
 static int
 cert_callback (gnutls_session session,
-               const gnutls_datum *req_ca_rdn, int nreqs,
-               const gnutls_pk_algorithm *sign_algos,
-               int sign_algos_length, gnutls_retr_st *st)
+	       const gnutls_datum * req_ca_rdn, int nreqs,
+	       const gnutls_pk_algorithm * sign_algos,
+	       int sign_algos_length, gnutls_retr_st * st)
 {
   int result;
   gnutls_x509_dn_t dn;
@@ -165,7 +163,7 @@ cert_callback (gnutls_session session,
 
   success ("client: invoked to provide client cert.\n");
 
-  result = gnutls_x509_dn_init( &dn);
+  result = gnutls_x509_dn_init (&dn);
   if (result < 0)
     {
       fail ("client: could not initialize DN.\n");
@@ -176,38 +174,38 @@ cert_callback (gnutls_session session,
   if (result == 0)
     {
       gnutls_x509_ava_st val;
-      
+
       success ("client: imported DN.\n");
-      
+
       if (gnutls_x509_dn_get_rdn_ava (dn, 0, 0, &val) == 0)
-        {
-          success ("client: got RDN 0.\n");
-          
-          if (val.value.size == strlen(EXPECT_RDN0)
-              && strncmp(val.value.data, EXPECT_RDN0, val.value.size) == 0)
-            {
-              success ("client: RND 0 correct.\n");
-            }
-          else
-            {
-              fail ("client: RND 0 bad: %.*s\n", 
-                    val.value.size, val.value.data);
-              return -1;
-            }
-        }
+	{
+	  success ("client: got RDN 0.\n");
+
+	  if (val.value.size == strlen (EXPECT_RDN0)
+	      && strncmp (val.value.data, EXPECT_RDN0, val.value.size) == 0)
+	    {
+	      success ("client: RND 0 correct.\n");
+	    }
+	  else
+	    {
+	      fail ("client: RND 0 bad: %.*s\n",
+		    val.value.size, val.value.data);
+	      return -1;
+	    }
+	}
       else
-        {
-          fail ("client: could not retrieve RDN 0.\n");
-          return -1;
-        }
-      
+	{
+	  fail ("client: could not retrieve RDN 0.\n");
+	  return -1;
+	}
+
       gnutls_x509_dn_deinit (dn);
     }
   else
     {
       fail ("client: failed to parse RDN: %s\n", gnutls_strerror (result));
     }
-  
+
   return 0;
 }
 
@@ -270,7 +268,7 @@ client (void)
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info(session);
+  print_info (session);
 
   gnutls_record_send (session, MSG, strlen (MSG));
 
@@ -380,11 +378,11 @@ const char server_cert_pem[] =
   "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
   "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
   "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-  "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n"
-  "-----END CERTIFICATE-----\n";
+  "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
-				     sizeof (server_cert_pem) };
+  sizeof (server_cert_pem)
+};
 
 const char server_key_pem[] =
   "-----BEGIN RSA PRIVATE KEY-----\n"
@@ -404,7 +402,8 @@ const char server_key_pem[] =
   "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_key = { server_key_pem,
-				    sizeof (server_key_pem) };
+  sizeof (server_key_pem)
+};
 
 void
 server_start (void)
@@ -493,7 +492,7 @@ server (void)
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info(session);
+  print_info (session);
 
   i = 0;
   for (;;)
@@ -558,18 +557,20 @@ doit (void)
       /* parent */
       server ();
       wait (&status);
-      
+
 #if defined(WIFEXITED) && defined(WEXITSTATUS)
       if (WIFEXITED (status) && WEXITSTATUS (status))
-        {
-          fail ("server: client failed with exit status %d\n", WEXITSTATUS (status));
-        }
+	{
+	  fail ("server: client failed with exit status %d\n",
+		WEXITSTATUS (status));
+	}
 #endif
 #if defined(WIFSIGNALED) && defined(WTERMSIG)
       if (WIFSIGNALED (status))
-        {
-          fail ("server: client failed with fatal signal %d\n", WTERMSIG (status));
-        }
+	{
+	  fail ("server: client failed with fatal signal %d\n",
+		WTERMSIG (status));
+	}
 #endif
 
     }

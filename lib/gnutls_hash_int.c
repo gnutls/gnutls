@@ -30,55 +30,59 @@
 #include <gnutls_hash_int.h>
 #include <gnutls_errors.h>
 
-static int digest_length(gnutls_digest_algorithm_t algo)
+static int
+digest_length (gnutls_digest_algorithm_t algo)
 {
-    switch (algo) {
-        case GNUTLS_DIG_NULL:
-          return 0;
-        case GNUTLS_DIG_MD5:
-        case GNUTLS_DIG_MD2:
-          return 16;
-        case GNUTLS_DIG_SHA1:
-        case GNUTLS_DIG_RMD160:
-          return 20;
-        case GNUTLS_DIG_SHA256:
-          return 32;
-        case GNUTLS_DIG_SHA384:
-          return 48;
-        case GNUTLS_DIG_SHA512:
-          return 64;
-        case GNUTLS_DIG_SHA224:
-          return 28;
-        default:
-          gnutls_assert();
-          return GNUTLS_E_INTERNAL_ERROR;
+  switch (algo)
+    {
+    case GNUTLS_DIG_NULL:
+      return 0;
+    case GNUTLS_DIG_MD5:
+    case GNUTLS_DIG_MD2:
+      return 16;
+    case GNUTLS_DIG_SHA1:
+    case GNUTLS_DIG_RMD160:
+      return 20;
+    case GNUTLS_DIG_SHA256:
+      return 32;
+    case GNUTLS_DIG_SHA384:
+      return 48;
+    case GNUTLS_DIG_SHA512:
+      return 64;
+    case GNUTLS_DIG_SHA224:
+      return 28;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 }
 
 int
-_gnutls_hash_init (digest_hd_st* dig, gnutls_digest_algorithm_t algorithm)
+_gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
 {
   int result;
-  gnutls_crypto_single_digest_st * cc = NULL;
+  gnutls_crypto_single_digest_st *cc = NULL;
 
   dig->algorithm = algorithm;
 
   /* check if a digest has been registered 
    */
-  cc = _gnutls_get_crypto_digest( algorithm);
-  if (cc != NULL) {
-    dig->registered = 1;
-    dig->hd.rh.cc = cc;
-    if (cc->init(& dig->hd.rh.ctx) < 0) {
-      gnutls_assert();
-      return GNUTLS_E_HASH_FAILED;
+  cc = _gnutls_get_crypto_digest (algorithm);
+  if (cc != NULL)
+    {
+      dig->registered = 1;
+      dig->hd.rh.cc = cc;
+      if (cc->init (&dig->hd.rh.ctx) < 0)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_HASH_FAILED;
+	}
+      return 0;
     }
-    return 0;
-  }
 
-  dig->registered = 0;  
+  dig->registered = 0;
 
-  result = _gnutls_digest_ops.init( algorithm, &dig->hd.gc);
+  result = _gnutls_digest_ops.init (algorithm, &dig->hd.gc);
   if (result < 0)
     {
       gnutls_assert ();
@@ -93,22 +97,25 @@ _gnutls_hash_init (digest_hd_st* dig, gnutls_digest_algorithm_t algorithm)
 int
 _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm)
 {
-  return digest_length(algorithm);
+  return digest_length (algorithm);
 }
 
 int
-_gnutls_hash (const digest_hd_st* handle, const void *text, size_t textlen)
+_gnutls_hash (const digest_hd_st * handle, const void *text, size_t textlen)
 {
-  if (textlen > 0) {
-    if (handle->registered) {
-      return handle->hd.rh.cc->hash( handle->hd.rh.ctx, text, textlen);
+  if (textlen > 0)
+    {
+      if (handle->registered)
+	{
+	  return handle->hd.rh.cc->hash (handle->hd.rh.ctx, text, textlen);
+	}
+      return _gnutls_digest_ops.hash (handle->hd.gc, text, textlen);
     }
-    return _gnutls_digest_ops.hash (handle->hd.gc, text, textlen);
-  }
   return 0;
 }
 
-int _gnutls_hash_copy (digest_hd_st* dst, digest_hd_st* src)
+int
+_gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
 {
   int result;
 
@@ -117,14 +124,15 @@ int _gnutls_hash_copy (digest_hd_st* dst, digest_hd_st* src)
   dst->keysize = 0;
   dst->registered = src->registered;
 
-  if (src->registered) {
-    return src->hd.rh.cc->copy( &dst->hd.rh.ctx, src->hd.rh.ctx);
-  }
+  if (src->registered)
+    {
+      return src->hd.rh.cc->copy (&dst->hd.rh.ctx, src->hd.rh.ctx);
+    }
 
-  result = _gnutls_digest_ops.copy ( &dst->hd.gc, src->hd.gc);
+  result = _gnutls_digest_ops.copy (&dst->hd.gc, src->hd.gc);
   if (result < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return result;
     }
 
@@ -134,62 +142,63 @@ int _gnutls_hash_copy (digest_hd_st* dst, digest_hd_st* src)
 /* when the current output is needed without calling deinit
  */
 void
-_gnutls_hash_output (digest_hd_st* handle, void *digest)
+_gnutls_hash_output (digest_hd_st * handle, void *digest)
 {
   int maclen;
 
   maclen = _gnutls_hash_get_algo_len (handle->algorithm);
 
-  if (handle->registered && handle->hd.rh.ctx != NULL) 
+  if (handle->registered && handle->hd.rh.ctx != NULL)
     {
       if (digest != NULL)
-        handle->hd.rh.cc->output( handle->hd.rh.ctx, digest, maclen);
+	handle->hd.rh.cc->output (handle->hd.rh.ctx, digest, maclen);
       return;
     }
 
   if (digest != NULL)
     {
-      _gnutls_digest_ops.output( handle->hd.gc, digest, maclen);
+      _gnutls_digest_ops.output (handle->hd.gc, digest, maclen);
     }
 }
 
 void
-_gnutls_hash_deinit (digest_hd_st* handle, void *digest)
+_gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 {
-  _gnutls_hash_output( handle, digest);
+  _gnutls_hash_output (handle, digest);
 
-  if (handle->registered && handle->hd.rh.ctx != NULL) 
+  if (handle->registered && handle->hd.rh.ctx != NULL)
     {
-      handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
+      handle->hd.rh.cc->deinit (handle->hd.rh.ctx);
       return;
     }
 
-  _gnutls_digest_ops.deinit( handle->hd.gc);
+  _gnutls_digest_ops.deinit (handle->hd.gc);
 }
 
-int _gnutls_hash_fast( gnutls_digest_algorithm_t algorithm,
-	const void* text, size_t textlen, void* digest)
+int
+_gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
+		   const void *text, size_t textlen, void *digest)
 {
-digest_hd_st dig;
-int ret;
+  digest_hd_st dig;
+  int ret;
 
-    ret = _gnutls_hash_init( &dig, algorithm);
-    if (ret < 0)
-      {
-        gnutls_assert();
-        return ret;
-      }
-      
-    ret = _gnutls_hash( &dig, text, textlen);
-    if (ret < 0)
-      {
-        gnutls_assert();
-        _gnutls_hash_deinit( &dig, NULL);
-        return ret;
-      }
-      
-    _gnutls_hash_deinit( &dig, digest);
-    return 0;
+  ret = _gnutls_hash_init (&dig, algorithm);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_hash (&dig, text, textlen);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_hash_deinit (&dig, NULL);
+      return ret;
+    }
+
+  _gnutls_hash_deinit (&dig, digest);
+  return 0;
 }
 
 
@@ -198,39 +207,41 @@ int ret;
 int
 _gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm)
 {
-  return digest_length(algorithm);
+  return digest_length (algorithm);
 }
 
-int _gnutls_hmac_fast( gnutls_mac_algorithm_t algorithm, const void* key, int keylen, 
-	const void* text, size_t textlen, void* digest)
+int
+_gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
+		   int keylen, const void *text, size_t textlen, void *digest)
 {
-digest_hd_st dig;
-int ret;
+  digest_hd_st dig;
+  int ret;
 
-    ret = _gnutls_hmac_init( &dig, algorithm, key, keylen);
-    if (ret < 0)
-      {
-        gnutls_assert();
-        return ret;
-      }
-      
-    ret = _gnutls_hmac( &dig, text, textlen);
-    if (ret < 0)
-      {
-        gnutls_assert();
-        _gnutls_hmac_deinit( &dig, NULL);
-        return ret;
-      }
-      
-    _gnutls_hmac_deinit( &dig, digest);
-    return 0;
+  ret = _gnutls_hmac_init (&dig, algorithm, key, keylen);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_hmac (&dig, text, textlen);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_hmac_deinit (&dig, NULL);
+      return ret;
+    }
+
+  _gnutls_hmac_deinit (&dig, digest);
+  return 0;
 }
 
-int _gnutls_hmac_init (digest_hd_st *dig, gnutls_mac_algorithm_t algorithm,
+int
+_gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
 		   const void *key, int keylen)
 {
   int result;
-  gnutls_crypto_single_mac_st * cc = NULL;
+  gnutls_crypto_single_mac_st *cc = NULL;
 
   dig->algorithm = algorithm;
   dig->key = key;
@@ -238,31 +249,34 @@ int _gnutls_hmac_init (digest_hd_st *dig, gnutls_mac_algorithm_t algorithm,
 
   /* check if a digest has been registered 
    */
-  cc = _gnutls_get_crypto_mac( algorithm);
-  if (cc != NULL) {
-    dig->registered = 1;
+  cc = _gnutls_get_crypto_mac (algorithm);
+  if (cc != NULL)
+    {
+      dig->registered = 1;
 
-    dig->hd.rh.cc = cc;
-    if (cc->init(&dig->hd.rh.ctx) < 0) {
-      gnutls_assert();
-      return GNUTLS_E_HASH_FAILED;
+      dig->hd.rh.cc = cc;
+      if (cc->init (&dig->hd.rh.ctx) < 0)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_HASH_FAILED;
+	}
+
+      if (cc->setkey (dig->hd.rh.ctx, key, keylen) < 0)
+	{
+	  gnutls_assert ();
+	  cc->deinit (dig->hd.rh.ctx);
+	  return GNUTLS_E_HASH_FAILED;
+	}
+
+      return 0;
     }
 
-    if (cc->setkey( dig->hd.rh.ctx, key, keylen) < 0) {
-      gnutls_assert();
-      cc->deinit(dig->hd.rh.ctx);
-      return GNUTLS_E_HASH_FAILED;
-    }
-
-    return 0;
-  }
-
-  dig->registered = 0;  
+  dig->registered = 0;
 
   result = _gnutls_mac_ops.init (algorithm, &dig->hd.gc);
   if (result < 0)
-    { 
-      gnutls_assert();
+    {
+      gnutls_assert ();
       return result;
     }
 
@@ -272,49 +286,51 @@ int _gnutls_hmac_init (digest_hd_st *dig, gnutls_mac_algorithm_t algorithm,
 }
 
 int
-_gnutls_hmac (const digest_hd_st* handle, const void *text, size_t textlen)
+_gnutls_hmac (const digest_hd_st * handle, const void *text, size_t textlen)
 {
-  if (textlen > 0) {
-    if (handle->registered) {
-      return handle->hd.rh.cc->hash( handle->hd.rh.ctx, text, textlen);
+  if (textlen > 0)
+    {
+      if (handle->registered)
+	{
+	  return handle->hd.rh.cc->hash (handle->hd.rh.ctx, text, textlen);
+	}
+      return _gnutls_mac_ops.hash (handle->hd.gc, text, textlen);
     }
-    return _gnutls_mac_ops.hash (handle->hd.gc, text, textlen);
-  }
   return 0;
 }
 
 void
-_gnutls_hmac_output (digest_hd_st* handle, void *digest)
+_gnutls_hmac_output (digest_hd_st * handle, void *digest)
 {
   int maclen;
 
   maclen = _gnutls_hmac_get_algo_len (handle->algorithm);
 
-  if (handle->registered && handle->hd.rh.ctx != NULL) 
+  if (handle->registered && handle->hd.rh.ctx != NULL)
     {
       if (digest != NULL)
-        handle->hd.rh.cc->output( handle->hd.rh.ctx, digest, maclen);
+	handle->hd.rh.cc->output (handle->hd.rh.ctx, digest, maclen);
       return;
     }
 
   if (digest != NULL)
     {
-      _gnutls_mac_ops.output( handle->hd.gc, digest, maclen);
+      _gnutls_mac_ops.output (handle->hd.gc, digest, maclen);
     }
 }
 
 void
-_gnutls_hmac_deinit (digest_hd_st* handle, void *digest)
+_gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
 {
-  _gnutls_hmac_output( handle, digest);
+  _gnutls_hmac_output (handle, digest);
 
-  if (handle->registered && handle->hd.rh.ctx != NULL) 
+  if (handle->registered && handle->hd.rh.ctx != NULL)
     {
-      handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
+      handle->hd.rh.cc->deinit (handle->hd.rh.ctx);
       return;
     }
 
-  _gnutls_mac_ops.deinit( handle->hd.gc);
+  _gnutls_mac_ops.deinit (handle->hd.gc);
 }
 
 inline static int
@@ -335,8 +351,9 @@ get_padsize (gnutls_mac_algorithm_t algorithm)
 /* Special functions for SSL3 MAC
  */
 
-int _gnutls_mac_init_ssl3 (digest_hd_st* ret, gnutls_mac_algorithm_t algorithm, void *key,
-		       int keylen)
+int
+_gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
+		       void *key, int keylen)
 {
   opaque ipad[48];
   int padsize, result;
@@ -353,22 +370,22 @@ int _gnutls_mac_init_ssl3 (digest_hd_st* ret, gnutls_mac_algorithm_t algorithm, 
   result = _gnutls_hash_init (ret, algorithm);
   if (result < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return result;
     }
 
-    ret->key = key;
-    ret->keysize = keylen;
+  ret->key = key;
+  ret->keysize = keylen;
 
-    if (keylen > 0)
-      _gnutls_hash (ret, key, keylen);
-    _gnutls_hash (ret, ipad, padsize);
+  if (keylen > 0)
+    _gnutls_hash (ret, key, keylen);
+  _gnutls_hash (ret, ipad, padsize);
 
   return 0;
 }
 
 void
-_gnutls_mac_deinit_ssl3 (digest_hd_st* handle, void *digest)
+_gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
 {
   opaque ret[MAX_HASH_SIZE];
   digest_hd_st td;
@@ -388,25 +405,25 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st* handle, void *digest)
   rc = _gnutls_hash_init (&td, handle->algorithm);
   if (rc < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return;
     }
 
-    if (handle->keysize > 0)
-      _gnutls_hash (&td, handle->key, handle->keysize);
+  if (handle->keysize > 0)
+    _gnutls_hash (&td, handle->key, handle->keysize);
 
-    _gnutls_hash (&td, opad, padsize);
-    block = _gnutls_hmac_get_algo_len (handle->algorithm);
-    _gnutls_hash_deinit (handle, ret);	/* get the previous hash */
-    _gnutls_hash (&td, ret, block);
+  _gnutls_hash (&td, opad, padsize);
+  block = _gnutls_hmac_get_algo_len (handle->algorithm);
+  _gnutls_hash_deinit (handle, ret);	/* get the previous hash */
+  _gnutls_hash (&td, ret, block);
 
-    _gnutls_hash_deinit (&td, digest);
-    
-    return;
+  _gnutls_hash_deinit (&td, digest);
+
+  return;
 }
 
 void
-_gnutls_mac_deinit_ssl3_handshake (digest_hd_st* handle,
+_gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
 				   void *digest, opaque * key,
 				   uint32_t key_size)
 {
@@ -430,26 +447,26 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st* handle,
   rc = _gnutls_hash_init (&td, handle->algorithm);
   if (rc < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return;
     }
 
-    if (key_size > 0)
-      _gnutls_hash (&td, key, key_size);
+  if (key_size > 0)
+    _gnutls_hash (&td, key, key_size);
 
-    _gnutls_hash (&td, opad, padsize);
-    block = _gnutls_hmac_get_algo_len (handle->algorithm);
+  _gnutls_hash (&td, opad, padsize);
+  block = _gnutls_hmac_get_algo_len (handle->algorithm);
 
-    if (key_size > 0)
-       _gnutls_hash (handle, key, key_size);
-    _gnutls_hash (handle, ipad, padsize);
-    _gnutls_hash_deinit (handle, ret);	/* get the previous hash */
+  if (key_size > 0)
+    _gnutls_hash (handle, key, key_size);
+  _gnutls_hash (handle, ipad, padsize);
+  _gnutls_hash_deinit (handle, ret);	/* get the previous hash */
 
-    _gnutls_hash (&td, ret, block);
+  _gnutls_hash (&td, ret, block);
 
-    _gnutls_hash_deinit (&td, digest);
+  _gnutls_hash_deinit (&td, digest);
 
-    return;
+  return;
 }
 
 static int

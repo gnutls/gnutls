@@ -50,12 +50,14 @@ main (void)
 
   /* Use default priorities */
   ret = gnutls_priority_set_direct (session, "PERFORMANCE", &err);
-  if (ret < 0) {
-    if (ret == GNUTLS_E_INVALID_REQUEST) {
-      fprintf(stderr, "Syntax error at: %s\n", err);
+  if (ret < 0)
+    {
+      if (ret == GNUTLS_E_INVALID_REQUEST)
+	{
+	  fprintf (stderr, "Syntax error at: %s\n", err);
+	}
+      exit (1);
     }
-    exit(1);
-  }
 
   /* put the x509 credentials to the current session
    */

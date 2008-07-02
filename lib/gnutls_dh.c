@@ -61,10 +61,10 @@ gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime)
       return NULL;
     }
 
-  x = _gnutls_mpi_randomize( NULL, x_size, GNUTLS_RND_RANDOM);
+  x = _gnutls_mpi_randomize (NULL, x_size, GNUTLS_RND_RANDOM);
   if (x == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return NULL;
     }
 

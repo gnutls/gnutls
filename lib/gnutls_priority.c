@@ -418,7 +418,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 {
   if (priority == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_NO_CIPHER_SUITES;
     }
 
@@ -533,8 +533,8 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       _set_priority (&(*priority_cache)->compression, comp_priority);
       _set_priority (&(*priority_cache)->cert_type, cert_type_priority);
       i = 0;
-    } 
-    else 
+    }
+  else
     {
       i = 1;
     }
@@ -554,15 +554,18 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}
-      else if (strcasecmp (broken_list[i], "SECURE256") == 0 || strcasecmp (broken_list[i], "SECURE") == 0)
+      else if (strcasecmp (broken_list[i], "SECURE256") == 0
+	       || strcasecmp (broken_list[i], "SECURE") == 0)
 	{
-	  _set_priority (&(*priority_cache)->cipher, cipher_priority_secure256);
+	  _set_priority (&(*priority_cache)->cipher,
+			 cipher_priority_secure256);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}
       else if (strcasecmp (broken_list[i], "SECURE128") == 0)
 	{
-	  _set_priority (&(*priority_cache)->cipher, cipher_priority_secure128);
+	  _set_priority (&(*priority_cache)->cipher,
+			 cipher_priority_secure128);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
 	}

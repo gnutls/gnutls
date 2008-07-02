@@ -66,7 +66,8 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
       return ret;
     }
 
-  ret = gnutls_openpgp_crt_import (key, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
+  ret =
+    gnutls_openpgp_crt_import (key, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     {
       gnutls_assert ();

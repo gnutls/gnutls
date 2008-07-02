@@ -19,7 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-#include <gcrypt.h> /* for gcry_control */
+#include <gcrypt.h>		/* for gcry_control */
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -129,7 +129,7 @@ main (void)
 
   generate_dh_params ();
 
-  gnutls_priority_init( &priority_cache, "NORMAL:PSK", NULL);
+  gnutls_priority_init (&priority_cache, "NORMAL:PSK", NULL);
 
 
   gnutls_certificate_set_dh_params (x509_cred, dh_params);
@@ -217,7 +217,7 @@ main (void)
   gnutls_certificate_free_credentials (x509_cred);
   gnutls_psk_free_server_credentials (psk_cred);
 
-  gnutls_priority_deinit(priority_cache);
+  gnutls_priority_deinit (priority_cache);
 
   gnutls_global_deinit ();
 

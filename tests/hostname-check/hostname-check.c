@@ -86,8 +86,7 @@ char pem1[] =
   "6Twc+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBAHvoEWwVP/kBoPEo\n"
   "DGJQWPiSRPu/qyCKO4HK5Whgcd8r6FBYgjLv+25KcizJN0+IHdcbaFvbgxsa87SO\n"
   "4IgD4kORvtixyvJi7KH9GshBjP5TG74DyaE99K5X/ESmNLssLqdWFB+J6TrsH6Pa\n"
-  "16GUO3IdEnG5ZaGFokw60Szp6eoc\n"
-  "-----END CERTIFICATE-----\n";
+  "16GUO3IdEnG5ZaGFokw60Szp6eoc\n" "-----END CERTIFICATE-----\n";
 
 /* Certificate with CN but no SAN. */
 char pem2[] =
@@ -208,8 +207,7 @@ char pem3[] =
   "FOk8HPutkm7mBqRWLKLhwFMnyPKVMAsGCSqGSIb3DQEBBQOBgQChMLwBsw+Yf452\n"
   "fSOHNBV/pq6h+4d14+ga5V4DXb9EdUZP0qEoUIRJbTvgvE7eeYX64Qe3bgwUBEqC\n"
   "ufMiaryZFCA7SR/kl9nq63Oag6bMuFX7Uo5fhnyd+q8Ddq6X4GRQWXMimVXP2lkx\n"
-  "CuhtoFO8OWMurJJK6Yse0APfM7tOiA==\n"
-  "-----END CERTIFICATE-----\n";
+  "CuhtoFO8OWMurJJK6Yse0APfM7tOiA==\n" "-----END CERTIFICATE-----\n";
 
 /* Certificate with wildcard SAN but no CN. */
 char pem4[] =
@@ -382,8 +380,7 @@ char pem6[] =
   "FFST5lmbKDtFKTeIGK75pKu/TZkYMAsGCSqGSIb3DQEBBQOBgQAQ9PStleVvfmlK\n"
   "wRs8RE/oOO+ouC3qLdnumNEITMRFh8Q12/X4yMLD3CH0aQ/hvHcP26PxAWzpNutk\n"
   "swNx7AzsCu6pN1t1aI3jLgo8e4/zZi57e8QcRuXZPDJxtJxVhJZX/C4pSz802WhS\n"
-  "64NgtpHEMu9JUHFhtRwPcvVGYqPUUA==\n"
-  "-----END CERTIFICATE-----\n";
+  "64NgtpHEMu9JUHFhtRwPcvVGYqPUUA==\n" "-----END CERTIFICATE-----\n";
 
 /* Certificate with prefixed and suffixed wildcard SAN but no CN. */
 char pem7[] =
@@ -431,8 +428,7 @@ char pem7[] =
   "DgQWBBRUk+ZZmyg7RSk3iBiu+aSrv02ZGDALBgkqhkiG9w0BAQUDgYEAPPNe38jc\n"
   "8NsZQVKKLYc1Y4y8LRPhvnxkSnlcGa1RzYZY1s12BZ6OVIfyxD1Z9BcNdqRSq7bQ\n"
   "kEicsGp5ugGQTNq6aSlzYOUD9/fUP3jDsH7HVb36aCF3waGCQWj+pLqK0LYcW2p/\n"
-  "xnr5+z4YevFBhn7l/fMhg8TzKejxYm7TECg=\n"
-  "-----END CERTIFICATE-----\n";
+  "xnr5+z4YevFBhn7l/fMhg8TzKejxYm7TECg=\n" "-----END CERTIFICATE-----\n";
 
 /* Certificate with ending wildcard SAN but no CN. */
 char pem8[] =
@@ -480,8 +476,7 @@ char pem8[] =
   "k+ZZmyg7RSk3iBiu+aSrv02ZGDALBgkqhkiG9w0BAQUDgYEAZ7gLXtXwFW61dSAM\n"
   "0Qt6IN68WBH7LCzetSF8ofG1WVUImCUU3pqXhXYtPGTrswOh2AavWTRbzVTtrFvf\n"
   "WJg09Z7H6I70RPvAYGsK9t9qJ/4TPoYTGYQgsTbVpkv13O54O6jzemd8Zws/xMH5\n"
-  "7/q6C7P5OUmGOtfVe7UVDY0taQM=\n"
-  "-----END CERTIFICATE-----\n";
+  "7/q6C7P5OUmGOtfVe7UVDY0taQM=\n" "-----END CERTIFICATE-----\n";
 
 
 void

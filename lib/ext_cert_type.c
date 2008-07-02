@@ -177,9 +177,9 @@ _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
 
 	  for (i = 0; i < len; i++)
 	    {
-	      data[i + 1] = _gnutls_cert_type2num (session->internals.
-						   priorities.cert_type.
-						   priority[i]);
+	      data[i + 1] =
+		_gnutls_cert_type2num (session->internals.priorities.
+				       cert_type.priority[i]);
 	    }
 	  return len + 1;
 	}

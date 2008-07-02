@@ -165,7 +165,7 @@ _gnutls_session_unpack (gnutls_session_t session,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  if (_gnutls_get_auth_info(session) != NULL)
+  if (_gnutls_get_auth_info (session) != NULL)
     {
       _gnutls_free_auth_info (session);
     }
@@ -600,7 +600,8 @@ unpack_srp_auth_info (gnutls_session_t session,
  *      x bytes the public key
  */
 static int
-pack_anon_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
+pack_anon_auth_info (gnutls_session_t session,
+		     gnutls_datum_t * packed_session)
 {
   anon_auth_info_t info = _gnutls_get_auth_info (session);
   int pos = 0;
@@ -766,8 +767,8 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
 
   if (info)
     {
-      username_size = strlen (info->username) + 1; /* include the terminating null */
-      hint_size = strlen (info->hint) + 1; /* include the terminating null */
+      username_size = strlen (info->username) + 1;	/* include the terminating null */
+      hint_size = strlen (info->hint) + 1;	/* include the terminating null */
       pack_size = username_size + hint_size +
 	2 + 4 * 3 + info->dh.prime.size + info->dh.generator.size +
 	info->dh.public_key.size;
@@ -1054,8 +1055,9 @@ pack_security_parameters (gnutls_session_t session,
 	  session->security_parameters.extensions.srp_username, len);
   pos += len;
 
-  _gnutls_write_uint16 (session->security_parameters.extensions.
-			server_names_size, &packed_session->data[pos]);
+  _gnutls_write_uint16 (session->security_parameters.
+			extensions.server_names_size,
+			&packed_session->data[pos]);
   pos += 2;
 
   for (i = 0; i < session->security_parameters.extensions.server_names_size;
@@ -1063,15 +1065,15 @@ pack_security_parameters (gnutls_session_t session,
     {
       packed_session->data[pos++] =
 	session->security_parameters.extensions.server_names[i].type;
-      _gnutls_write_uint16 (session->security_parameters.extensions.
-			    server_names[i].name_length,
+      _gnutls_write_uint16 (session->security_parameters.
+			    extensions.server_names[i].name_length,
 			    &packed_session->data[pos]);
       pos += 2;
 
       memcpy (&packed_session->data[pos],
 	      session->security_parameters.extensions.server_names[i].name,
-	      session->security_parameters.extensions.server_names[i].
-	      name_length);
+	      session->security_parameters.extensions.
+	      server_names[i].name_length);
       pos +=
 	session->security_parameters.extensions.server_names[i].name_length;
     }
@@ -1130,10 +1132,10 @@ unpack_security_parameters (gnutls_session_t session,
     packed_session->data[pos++];
   session->internals.resumed_security_parameters.write_compression_algorithm =
     packed_session->data[pos++];
-  session->internals.resumed_security_parameters.current_cipher_suite.
-    suite[0] = packed_session->data[pos++];
-  session->internals.resumed_security_parameters.current_cipher_suite.
-    suite[1] = packed_session->data[pos++];
+  session->internals.resumed_security_parameters.
+    current_cipher_suite.suite[0] = packed_session->data[pos++];
+  session->internals.resumed_security_parameters.
+    current_cipher_suite.suite[1] = packed_session->data[pos++];
 
   session->internals.resumed_security_parameters.cert_type =
     packed_session->data[pos++];
@@ -1182,34 +1184,35 @@ unpack_security_parameters (gnutls_session_t session,
 
   /* SRP */
   len = packed_session->data[pos++];	/* srp username length */
-  memcpy (session->internals.resumed_security_parameters.extensions.
-	  srp_username, &packed_session->data[pos], len);
-  session->internals.resumed_security_parameters.extensions.
-    srp_username[len] = 0;
+  memcpy (session->internals.resumed_security_parameters.
+	  extensions.srp_username, &packed_session->data[pos], len);
+  session->internals.resumed_security_parameters.
+    extensions.srp_username[len] = 0;
   pos += len;
 
-  session->internals.resumed_security_parameters.extensions.
-    server_names_size = _gnutls_read_uint16 (&packed_session->data[pos]);
+  session->internals.resumed_security_parameters.
+    extensions.server_names_size =
+    _gnutls_read_uint16 (&packed_session->data[pos]);
   pos += 2;
   for (i = 0;
        i <
-       session->internals.resumed_security_parameters.extensions.
-       server_names_size; i++)
+       session->internals.resumed_security_parameters.
+       extensions.server_names_size; i++)
     {
-      session->internals.resumed_security_parameters.extensions.
-	server_names[i].type = packed_session->data[pos++];
-      session->internals.resumed_security_parameters.extensions.
-	server_names[i].name_length =
+      session->internals.resumed_security_parameters.
+	extensions.server_names[i].type = packed_session->data[pos++];
+      session->internals.resumed_security_parameters.
+	extensions.server_names[i].name_length =
 	_gnutls_read_uint16 (&packed_session->data[pos]);
       pos += 2;
 
-      memcpy (session->internals.resumed_security_parameters.extensions.
-	      server_names[i].name, &packed_session->data[pos],
-	      session->internals.resumed_security_parameters.extensions.
-	      server_names[i].name_length);
+      memcpy (session->internals.resumed_security_parameters.
+	      extensions.server_names[i].name, &packed_session->data[pos],
+	      session->internals.resumed_security_parameters.
+	      extensions.server_names[i].name_length);
       pos +=
-	session->internals.resumed_security_parameters.extensions.
-	server_names[i].name_length;
+	session->internals.resumed_security_parameters.
+	extensions.server_names[i].name_length;
     }
   return 0;
 }

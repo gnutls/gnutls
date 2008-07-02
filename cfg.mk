@@ -20,7 +20,7 @@
 
 CFGFLAGS ?= --enable-developer-mode --enable-gtk-doc --disable-guile
 
-INDENT_SOURCES = `ls includes/gnutls/*.h{,.in} {lib,lib/x509,libextra,libextra/openpgp,src,tests}/*.{c,h} | grep -v -- -gaa`
+INDENT_SOURCES = `find . -name \*.c|grep -v -e ^./lgl -e ^./gl -e ^./src/cfg -e -gaa.c -e asn1_tab.c`
 
 ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap

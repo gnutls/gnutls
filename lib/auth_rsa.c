@@ -87,8 +87,8 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
   ret =
     _gnutls_get_auth_info_gcert (&peer_cert,
-			       session->security_parameters.cert_type,
-			       info, CERT_ONLY_PUBKEY | CERT_NO_COPY);
+				 session->security_parameters.cert_type,
+				 info, CERT_ONLY_PUBKEY | CERT_NO_COPY);
 
   if (ret < 0)
     {
@@ -99,7 +99,8 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
   /* EXPORT case: */
   if (_gnutls_cipher_suite_get_kx_algo
-      (&session->security_parameters.current_cipher_suite) == GNUTLS_KX_RSA_EXPORT
+      (&session->security_parameters.current_cipher_suite) ==
+      GNUTLS_KX_RSA_EXPORT
       && _gnutls_mpi_get_nbits (peer_cert.params[0]) > 512)
     {
 
@@ -168,8 +169,8 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
     }
 
   bits =
-    _gnutls_mpi_get_nbits (session->internals.selected_cert_list[0].
-			   params[0]);
+    _gnutls_mpi_get_nbits (session->internals.
+			   selected_cert_list[0].params[0]);
 
   if (_gnutls_cipher_suite_get_kx_algo
       (&session->security_parameters.current_cipher_suite)
@@ -290,7 +291,9 @@ _gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 
       /* we do not need strong random numbers here.
        */
-      ret = _gnutls_rnd (RND_NONCE, session->key->key.data, session->key->key.size);
+      ret =
+	_gnutls_rnd (RND_NONCE, session->key->key.data,
+		     session->key->key.size);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -345,8 +348,9 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_rnd( RND_RANDOM, session->key->key.data, session->key->key.size);
-  if ( ret < 0)
+  ret =
+    _gnutls_rnd (RND_RANDOM, session->key->key.data, session->key->key.size);
+  if (ret < 0)
     {
       gnutls_assert ();
       return ret;

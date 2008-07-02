@@ -19,7 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-#include <gcrypt.h> /* for gcry_control */
+#include <gcrypt.h>		/* for gcry_control */
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -54,11 +54,11 @@ initialize_tls_session (void)
   /* request client certificate if any.
    */
   gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
-  
+
   /* Set maximum compatibility mode. This is only suggested on public webservers
    * that need to trade security for compatibility
    */
-  gnutls_session_enable_compatibility_mode( session);
+  gnutls_session_enable_compatibility_mode (session);
 
   return session;
 }
@@ -115,7 +115,7 @@ main (void)
 
   generate_dh_params ();
 
-  gnutls_priority_init( &priority_cache, "NORMAL", NULL);
+  gnutls_priority_init (&priority_cache, "NORMAL", NULL);
 
 
   gnutls_certificate_set_dh_params (x509_cred, dh_params);
@@ -201,7 +201,7 @@ main (void)
   close (listen_sd);
 
   gnutls_certificate_free_credentials (x509_cred);
-  gnutls_priority_deinit(priority_cache);
+  gnutls_priority_deinit (priority_cache);
 
   gnutls_global_deinit ();
 

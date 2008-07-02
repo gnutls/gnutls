@@ -154,7 +154,7 @@ _gnutls_x509_read_dsa_params (opaque * der, int dersize, bigint_t * params)
  */
 
 int
-_gnutls_x509_read_der_int  (opaque * der, int dersize, bigint_t * out)
+_gnutls_x509_read_der_int (opaque * der, int dersize, bigint_t * out)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -199,7 +199,7 @@ _gnutls_x509_read_der_int  (opaque * der, int dersize, bigint_t * out)
 int
 _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
 {
-  return _gnutls_x509_read_der_int( der, dersize, &params[3]);
+  return _gnutls_x509_read_der_int (der, dersize, &params[3]);
 }
 
 
@@ -219,8 +219,9 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 
   /* Read the algorithm's parameters
    */
-  result = _gnutls_x509_read_value( cert->cert,
-    "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey", &tmp, 2);
+  result = _gnutls_x509_read_value (cert->cert,
+				    "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+				    &tmp, 2);
 
   if (result < 0)
     {
@@ -242,7 +243,8 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 	  goto error;
 	}
 
-      if ((result = _gnutls_x509_read_rsa_params (tmp.data, tmp.size, params)) < 0)
+      if ((result =
+	   _gnutls_x509_read_rsa_params (tmp.data, tmp.size, params)) < 0)
 	{
 	  gnutls_assert ();
 	  goto error;
@@ -265,7 +267,8 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 	  goto error;
 	}
 
-      if ((result = _gnutls_x509_read_dsa_pubkey (tmp.data, tmp.size, params)) < 0)
+      if ((result =
+	   _gnutls_x509_read_dsa_pubkey (tmp.data, tmp.size, params)) < 0)
 	{
 	  gnutls_assert ();
 	  goto error;
@@ -273,11 +276,11 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 
       /* Now read the parameters
        */
-      _gnutls_free_datum( &tmp);
+      _gnutls_free_datum (&tmp);
 
       result = _gnutls_x509_read_value (cert->cert,
-				"tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
-				&tmp, 0);
+					"tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
+					&tmp, 0);
 
       /* FIXME: If the parameters are not included in the certificate
        * then the issuer's parameters should be used. This is not
@@ -290,7 +293,8 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 	  goto error;
 	}
 
-      if ((result = _gnutls_x509_read_dsa_params (tmp.data, tmp.size, params)) < 0)
+      if ((result =
+	   _gnutls_x509_read_dsa_params (tmp.data, tmp.size, params)) < 0)
 	{
 	  gnutls_assert ();
 	  goto error;
@@ -309,9 +313,9 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
     }
 
   result = 0;
-  
+
 error:
-  _gnutls_free_datum( &tmp);
+  _gnutls_free_datum (&tmp);
   return result;
 }
 
@@ -384,8 +388,8 @@ cleanup:
 int
 _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
 			       gnutls_pk_algorithm_t pk_algorithm,
-			       gnutls_digest_algorithm_t dig, bigint_t * params,
-			       int params_size)
+			       gnutls_digest_algorithm_t dig,
+			       bigint_t * params, int params_size)
 {
   gnutls_datum_t der;
   int result;

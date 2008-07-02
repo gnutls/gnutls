@@ -195,12 +195,11 @@ int
 oprfi_callback (gnutls_session_t session,
 		void *userdata,
 		size_t oprfi_len,
-		const unsigned char *in_oprfi,
-		unsigned char *out_oprfi)
+		const unsigned char *in_oprfi, unsigned char *out_oprfi)
 {
   size_t i;
 
-  puts("cb");
+  puts ("cb");
 
   for (i = 0; i < oprfi_len; i++)
     printf ("OPRF[%d]: %02x %03d %c\n", i, in_oprfi[i],

@@ -125,8 +125,9 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
   * Since: 2.4.0
   **/
 void
-gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc, 
-  gnutls_x509_crt_t **x509_ca_list, unsigned int* ncas)
+gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
+				 gnutls_x509_crt_t ** x509_ca_list,
+				 unsigned int *ncas)
 {
   *x509_ca_list = sc->x509_ca_list;
   *ncas = sc->x509_ncas;
@@ -144,8 +145,9 @@ gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
   * Since: 2.4.0
   **/
 void
-gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc, 
-  gnutls_x509_crl_t **x509_crl_list, unsigned int* ncrls)
+gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
+				  gnutls_x509_crl_t ** x509_crl_list,
+				  unsigned int *ncrls)
 {
   *x509_crl_list = sc->x509_crl_list;
   *ncrls = sc->x509_ncrls;
@@ -164,8 +166,8 @@ gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
   * Since: 2.4.0
   **/
 void
-gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc, 
-  gnutls_openpgp_keyring_t *keyring)
+gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc,
+					gnutls_openpgp_keyring_t * keyring)
 {
   *keyring = sc->keyring;
 }
@@ -252,7 +254,7 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 #endif
 
 #ifdef ENABLE_OPENPGP
-  gnutls_openpgp_keyring_deinit( sc->keyring);
+  gnutls_openpgp_keyring_deinit (sc->keyring);
 #endif
 
   gnutls_free (sc);
@@ -504,7 +506,7 @@ _gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
   -*/
 int
 _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
-				   unsigned int *status)
+				  unsigned int *status)
 {
   cert_auth_info_t info;
   gnutls_certificate_credentials_t cred;
@@ -545,7 +547,7 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
    */
   ret =
     _gnutls_openpgp_verify_key (cred, &info->raw_certificate_list[0],
-				  peer_certificate_list_size, status);
+				peer_certificate_list_size, status);
 
   if (ret < 0)
     {
@@ -677,14 +679,14 @@ gnutls_certificate_expiration_time_peers (gnutls_session_t session)
   switch (gnutls_certificate_type_get (session))
     {
     case GNUTLS_CRT_X509:
-      return _gnutls_x509_get_raw_crt_expiration_time (&info->
-						       raw_certificate_list
-						       [0]);
+      return
+	_gnutls_x509_get_raw_crt_expiration_time (&info->raw_certificate_list
+						  [0]);
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
-      return _gnutls_openpgp_get_raw_key_expiration_time (&info->
-							    raw_certificate_list
-							    [0]);
+      return
+	_gnutls_openpgp_get_raw_key_expiration_time
+	(&info->raw_certificate_list[0]);
 #endif
     default:
       return (time_t) - 1;
@@ -722,14 +724,14 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
   switch (gnutls_certificate_type_get (session))
     {
     case GNUTLS_CRT_X509:
-      return _gnutls_x509_get_raw_crt_activation_time (&info->
-						       raw_certificate_list
-						       [0]);
+      return
+	_gnutls_x509_get_raw_crt_activation_time (&info->raw_certificate_list
+						  [0]);
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
-      return _gnutls_openpgp_get_raw_key_creation_time (&info->
-							  raw_certificate_list
-							  [0]);
+      return
+	_gnutls_openpgp_get_raw_key_creation_time (&info->raw_certificate_list
+						   [0]);
 #endif
     default:
       return (time_t) - 1;
@@ -741,17 +743,22 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
  */
 int
 _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
-			   gnutls_certificate_type_t type,
-			   cert_auth_info_t info,
-			   int flags /* OR of ConvFlags */ )
+			     gnutls_certificate_type_t type,
+			     cert_auth_info_t info,
+			     int flags /* OR of ConvFlags */ )
 {
   switch (type)
     {
     case GNUTLS_CRT_X509:
-      return _gnutls_x509_raw_cert_to_gcert (gcert,  &info->raw_certificate_list[0], flags);
+      return _gnutls_x509_raw_cert_to_gcert (gcert,
+					     &info->raw_certificate_list[0],
+					     flags);
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
-      return _gnutls_openpgp_raw_crt_to_gcert (gcert,  &info->raw_certificate_list[0], info->use_subkey?info->subkey_id:NULL);
+      return _gnutls_openpgp_raw_crt_to_gcert (gcert,
+					       &info->raw_certificate_list[0],
+					       info->use_subkey ? info->
+					       subkey_id : NULL);
 #endif
     default:
       gnutls_assert ();
@@ -921,8 +928,7 @@ _gnutls_gcert_deinit (gnutls_cert * cert)
  **/
 void
 gnutls_sign_callback_set (gnutls_session_t session,
-			  gnutls_sign_func sign_func,
-			  void *userdata)
+			  gnutls_sign_func sign_func, void *userdata)
 {
   session->internals.sign_func = sign_func;
   session->internals.sign_func_userdata = userdata;
@@ -939,8 +945,7 @@ gnutls_sign_callback_set (gnutls_session_t session,
  *   if not set, %NULL.
  **/
 gnutls_sign_func
-gnutls_sign_callback_get (gnutls_session_t session,
-			  void **userdata)
+gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
 {
   if (userdata)
     *userdata = session->internals.sign_func_userdata;

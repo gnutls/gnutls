@@ -209,8 +209,7 @@ print_private_key (gnutls_x509_privkey_t key)
       ret = gnutls_x509_privkey_export (key, info.outcert_format,
 					buffer, &size);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "privkey_export: %s",
-	       gnutls_strerror (ret));
+	error (EXIT_FAILURE, 0, "privkey_export: %s", gnutls_strerror (ret));
     }
   else
     {
@@ -227,8 +226,8 @@ print_private_key (gnutls_x509_privkey_t key)
 
       size = sizeof (buffer);
       ret =
-	  gnutls_x509_privkey_export_pkcs8 (key, info.outcert_format, pass,
-					    flags, buffer, &size);
+	gnutls_x509_privkey_export_pkcs8 (key, info.outcert_format, pass,
+					  flags, buffer, &size);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "privkey_export_pkcs8: %s",
 	       gnutls_strerror (ret));
@@ -342,12 +341,10 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
   days = get_days ();
 
   result =
-      gnutls_x509_crt_set_expiration_time (crt,
-					   time (NULL) +
-					   days * 24 * 60 * 60);
+    gnutls_x509_crt_set_expiration_time (crt,
+					 time (NULL) + days * 24 * 60 * 60);
   if (result < 0)
-    error (EXIT_FAILURE, 0, "set_expiration: %s",
-	   gnutls_strerror (result));
+    error (EXIT_FAILURE, 0, "set_expiration: %s", gnutls_strerror (result));
 
   if (!batch)
     fprintf (stderr, "\n\nExtensions.\n");
@@ -372,8 +369,8 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	  policylanguage = get_proxy_policy (&policy, &policylen);
 
 	  result =
-	      gnutls_x509_crt_set_proxy (crt, proxypathlen, policylanguage,
-					 policy, policylen);
+	    gnutls_x509_crt_set_proxy (crt, proxypathlen, policylanguage,
+				       policy, policylen);
 	  if (result < 0)
 	    error (EXIT_FAILURE, 0, "set_proxy: %s",
 		   gnutls_strerror (result));
@@ -387,7 +384,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	path_len = -1;
 
       result =
-	  gnutls_x509_crt_set_basic_constraints (crt, ca_status, path_len);
+	gnutls_x509_crt_set_basic_constraints (crt, ca_status, path_len);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "basic_constraints: %s",
 	       gnutls_strerror (result));
@@ -399,8 +396,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 							GNUTLS_KP_TLS_WWW_CLIENT,
 							0);
 	  if (result < 0)
-	    error (EXIT_FAILURE, 0, "key_kp: %s",
-		   gnutls_strerror (result));
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
 	}
 
       server = get_tls_server_status ();
@@ -414,7 +410,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	      if (str != NULL)
 		{
 		  result = gnutls_x509_crt_set_subject_alternative_name
-		      (crt, GNUTLS_SAN_DNSNAME, str);
+		    (crt, GNUTLS_SAN_DNSNAME, str);
 		}
 	      else
 		{
@@ -422,7 +418,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 		  if (str != NULL)
 		    {
 		      result = gnutls_x509_crt_set_subject_alternative_name
-			  (crt, GNUTLS_SAN_IPADDRESS, str);
+			(crt, GNUTLS_SAN_IPADDRESS, str);
 		    }
 		}
 
@@ -432,12 +428,10 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	    }
 
 	  result =
-	      gnutls_x509_crt_set_key_purpose_oid (crt,
-						   GNUTLS_KP_TLS_WWW_SERVER,
-						   0);
+	    gnutls_x509_crt_set_key_purpose_oid (crt,
+						 GNUTLS_KP_TLS_WWW_SERVER, 0);
 	  if (result < 0)
-	    error (EXIT_FAILURE, 0, "key_kp: %s",
-		   gnutls_strerror (result));
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
 	}
       else if (!proxy)
 	{
@@ -446,7 +440,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	  if (str != NULL)
 	    {
 	      result = gnutls_x509_crt_set_subject_alternative_name
-		  (crt, GNUTLS_SAN_RFC822NAME, str);
+		(crt, GNUTLS_SAN_RFC822NAME, str);
 	      if (result < 0)
 		error (EXIT_FAILURE, 0, "subject_alt_name: %s",
 		       gnutls_strerror (result));
@@ -490,9 +484,9 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	  if (result)
 	    {
 	      result =
-		  gnutls_x509_crt_set_key_purpose_oid (crt,
-						       GNUTLS_KP_CODE_SIGNING,
-						       0);
+		gnutls_x509_crt_set_key_purpose_oid (crt,
+						     GNUTLS_KP_CODE_SIGNING,
+						     0);
 	      if (result < 0)
 		error (EXIT_FAILURE, 0, "key_kp: %s",
 		       gnutls_strerror (result));
@@ -502,9 +496,9 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	  if (result)
 	    {
 	      result =
-		  gnutls_x509_crt_set_key_purpose_oid (crt,
-						       GNUTLS_KP_OCSP_SIGNING,
-						       0);
+		gnutls_x509_crt_set_key_purpose_oid (crt,
+						     GNUTLS_KP_OCSP_SIGNING,
+						     0);
 	      if (result < 0)
 		error (EXIT_FAILURE, 0, "key_kp: %s",
 		       gnutls_strerror (result));
@@ -514,9 +508,9 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	  if (result)
 	    {
 	      result =
-		  gnutls_x509_crt_set_key_purpose_oid (crt,
-						       GNUTLS_KP_TIME_STAMPING,
-						       0);
+		gnutls_x509_crt_set_key_purpose_oid (crt,
+						     GNUTLS_KP_TIME_STAMPING,
+						     0);
 	      if (result < 0)
 		error (EXIT_FAILURE, 0, "key_kp: %s",
 		       gnutls_strerror (result));
@@ -553,13 +547,12 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	  if (result < 0)
 	    {
 	      size = sizeof (buffer);
-	      result =
-		  gnutls_x509_crt_get_key_id (ca_crt, 0, buffer, &size);
+	      result = gnutls_x509_crt_get_key_id (ca_crt, 0, buffer, &size);
 	    }
 	  if (result >= 0)
 	    {
 	      result =
-		  gnutls_x509_crt_set_authority_key_id (crt, buffer, size);
+		gnutls_x509_crt_set_authority_key_id (crt, buffer, size);
 	      if (result < 0)
 		error (EXIT_FAILURE, 0, "set_authority_key_id: %s",
 		       gnutls_strerror (result));
@@ -601,8 +594,7 @@ generate_crl (void)
     {
       result = gnutls_x509_crl_set_crt (crl, crts[i], now);
       if (result < 0)
-	error (EXIT_FAILURE, 0, "crl_set_crt: %s",
-	       gnutls_strerror (result));
+	error (EXIT_FAILURE, 0, "crl_set_crt: %s", gnutls_strerror (result));
     }
 
   result = gnutls_x509_crl_set_this_update (crl, now);
@@ -612,8 +604,7 @@ generate_crl (void)
   fprintf (stderr, "Update times.\n");
   days = get_crl_next_update ();
 
-  result =
-      gnutls_x509_crl_set_next_update (crl, now + days * 24 * 60 * 60);
+  result = gnutls_x509_crl_set_next_update (crl, now + days * 24 * 60 * 60);
   if (result < 0)
     error (EXIT_FAILURE, 0, "next_update: %s", gnutls_strerror (result));
 
@@ -660,8 +651,7 @@ generate_self_signed (void)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
-  result =
-      gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
+  result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
@@ -703,8 +693,7 @@ generate_signed_certificate (void)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
-  result =
-      gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
+  result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
@@ -738,8 +727,7 @@ generate_proxy_certificate (void)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
-  result =
-      gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
+  result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
@@ -797,10 +785,9 @@ update_signed_certificate (void)
   days = get_days ();
 
   result =
-      gnutls_x509_crt_set_expiration_time (crt, tim + days * 24 * 60 * 60);
+    gnutls_x509_crt_set_expiration_time (crt, tim + days * 24 * 60 * 60);
   if (result < 0)
-    error (EXIT_FAILURE, 0, "set_expiration: %s",
-	   gnutls_strerror (result));
+    error (EXIT_FAILURE, 0, "set_expiration: %s", gnutls_strerror (result));
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
@@ -809,8 +796,7 @@ update_signed_certificate (void)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
-  result =
-      gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
+  result = gnutls_x509_crt_export (crt, info.outcert_format, buffer, &size);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_export: %s", gnutls_strerror (result));
 
@@ -819,14 +805,15 @@ update_signed_certificate (void)
   gnutls_x509_crt_deinit (crt);
 }
 
-FILE* safe_open_rw(const char* file)
+FILE *
+safe_open_rw (const char *file)
 {
   mode_t oldmask;
   FILE *fh;
 
   if (info.privkey_op != 0)
     {
-      oldmask = umask (S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
+      oldmask = umask (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     }
 
   fh = fopen (file, "wb");
@@ -1009,8 +996,8 @@ certificate_info (void)
 
   crt_num = MAX_CRTS;
   ret =
-      gnutls_x509_crt_list_import (crt, &crt_num, &pem, info.incert_format,
-				   GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+    gnutls_x509_crt_list_import (crt, &crt_num, &pem, info.incert_format,
+				 GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
   if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       error (0, 0,
@@ -1087,8 +1074,7 @@ pgp_certificate_info (void)
     }
 
   size = sizeof (buffer);
-  ret =
-      gnutls_openpgp_crt_export (crt, info.outcert_format, buffer, &size);
+  ret = gnutls_openpgp_crt_export (crt, info.outcert_format, buffer, &size);
   if (ret < 0)
     {
       error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
@@ -1119,8 +1105,7 @@ pgp_privkey_info (void)
   pem.size = size;
 
   ret =
-      gnutls_openpgp_privkey_import (key, &pem, info.incert_format, NULL,
-				     0);
+    gnutls_openpgp_privkey_import (key, &pem, info.incert_format, NULL, 0);
 
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
@@ -1143,8 +1128,7 @@ pgp_privkey_info (void)
       if (i == -1)
 	ret = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
       else
-	ret =
-	    gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, i, NULL);
+	ret = gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, i, NULL);
 
       fprintf (outfile, "\tPublic Key Algorithm: ");
 
@@ -1162,13 +1146,13 @@ pgp_privkey_info (void)
 
 	  if (i == -1)
 	    ret =
-		gnutls_openpgp_privkey_export_rsa_raw (key, &m, &e, &d, &p,
-						       &q, &u);
+	      gnutls_openpgp_privkey_export_rsa_raw (key, &m, &e, &d, &p,
+						     &q, &u);
 	  else
 	    ret =
-		gnutls_openpgp_privkey_export_subkey_rsa_raw (key, i, &m,
-							      &e, &d, &p,
-							      &q, &u);
+	      gnutls_openpgp_privkey_export_subkey_rsa_raw (key, i, &m,
+							    &e, &d, &p,
+							    &q, &u);
 	  if (ret < 0)
 	    fprintf (stderr, "Error in key RSA data export: %s\n",
 		     gnutls_strerror (ret));
@@ -1182,13 +1166,11 @@ pgp_privkey_info (void)
 
 	  if (i == -1)
 	    ret =
-		gnutls_openpgp_privkey_export_dsa_raw (key, &p, &q, &g, &y,
-						       &x);
+	      gnutls_openpgp_privkey_export_dsa_raw (key, &p, &q, &g, &y, &x);
 	  else
 	    ret =
-		gnutls_openpgp_privkey_export_subkey_dsa_raw (key, i, &p,
-							      &q, &g, &y,
-							      &x);
+	      gnutls_openpgp_privkey_export_subkey_dsa_raw (key, i, &p,
+							    &q, &g, &y, &x);
 	  if (ret < 0)
 	    fprintf (stderr, "Error in key DSA data export: %s\n",
 		     gnutls_strerror (ret));
@@ -1211,16 +1193,15 @@ pgp_privkey_info (void)
 	}
       else
 	{
-	  fprintf (outfile, "Public Key ID: %s\n",
-		   raw_to_string (keyid, 8));
+	  fprintf (outfile, "Public Key ID: %s\n", raw_to_string (keyid, 8));
 	}
 
     }
 
   size = sizeof (buffer);
   ret =
-      gnutls_openpgp_privkey_export (key, GNUTLS_OPENPGP_FMT_BASE64,
-				     NULL, 0, buffer, &size);
+    gnutls_openpgp_privkey_export (key, GNUTLS_OPENPGP_FMT_BASE64,
+				   NULL, 0, buffer, &size);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
 
@@ -1253,24 +1234,22 @@ pgp_ring_info (void)
 
   count = gnutls_openpgp_keyring_get_crt_count (ring);
   if (count > 0)
-    fprintf (outfile, "Keyring contains %d OpenPGP certificates\n\n",
-	     count);
+    fprintf (outfile, "Keyring contains %d OpenPGP certificates\n\n", count);
   else
     error (EXIT_FAILURE, 0, "Keyring error: %s", gnutls_strerror (count));
 
   for (i = 0; i < count; i++)
     {
       ret = gnutls_openpgp_keyring_get_crt (ring, i, &crt);
-      
+
       if (ret < 0)
-        {
+	{
 	  error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
-        }
+	}
 
       size = sizeof (buffer);
       ret =
-	  gnutls_openpgp_crt_export (crt, info.outcert_format, buffer,
-				     &size);
+	gnutls_openpgp_crt_export (crt, info.outcert_format, buffer, &size);
       if (ret < 0)
 	{
 	  error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
@@ -1307,8 +1286,7 @@ print_hex_datum (gnutls_datum_t * dat)
 
 
 static void
-print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
-			unsigned int all)
+print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
 {
   gnutls_datum_t info;
   int ret;
@@ -1316,8 +1294,7 @@ print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
   if (all)
     ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &info);
   else
-    ret =
-	gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_UNSIGNED_FULL, &info);
+    ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_UNSIGNED_FULL, &info);
   if (ret == 0)
     {
       fprintf (out, "%s\n", info.data);
@@ -1412,8 +1389,8 @@ privkey_info (void)
       else
 	pass = get_pass ();
       ret =
-	  gnutls_x509_privkey_import_pkcs8 (key, &pem, info.incert_format,
-					    pass, 0);
+	gnutls_x509_privkey_import_pkcs8 (key, &pem, info.incert_format,
+					  pass, 0);
     }
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
@@ -1435,8 +1412,7 @@ privkey_info (void)
     {
       gnutls_datum_t m, e, d, p, q, u;
 
-      ret =
-	  gnutls_x509_privkey_export_rsa_raw (key, &m, &e, &d, &p, &q, &u);
+      ret = gnutls_x509_privkey_export_rsa_raw (key, &m, &e, &d, &p, &q, &u);
       if (ret < 0)
 	fprintf (stderr, "Error in key RSA data export: %s\n",
 		 gnutls_strerror (ret));
@@ -1466,8 +1442,7 @@ privkey_info (void)
     }
   else
     {
-      fprintf (outfile, "Public Key ID: %s\n",
-	       raw_to_string (buffer, size));
+      fprintf (outfile, "Public Key ID: %s\n", raw_to_string (buffer, size));
     }
 
   if (info.fix_key != 0)
@@ -1478,8 +1453,7 @@ privkey_info (void)
     }
 
   size = sizeof (buffer);
-  ret =
-      gnutls_x509_privkey_export (key, GNUTLS_X509_FMT_PEM, buffer, &size);
+  ret = gnutls_x509_privkey_export (key, GNUTLS_X509_FMT_PEM, buffer, &size);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
 
@@ -1512,15 +1486,14 @@ load_private_key (int mand)
   dat.size = size;
 
   if (!dat.data)
-    error (EXIT_FAILURE, errno, "reading --load-privkey: %s",
-	   info.privkey);
+    error (EXIT_FAILURE, errno, "reading --load-privkey: %s", info.privkey);
 
   if (info.pkcs8)
     {
       const char *pass = get_pass ();
       ret =
-	  gnutls_x509_privkey_import_pkcs8 (key, &dat, info.incert_format,
-					    pass, 0);
+	gnutls_x509_privkey_import_pkcs8 (key, &dat, info.incert_format,
+					  pass, 0);
     }
   else
     ret = gnutls_x509_privkey_import (key, &dat, info.incert_format);
@@ -1561,8 +1534,7 @@ load_request (void)
   dat.size = size;
 
   if (!dat.data)
-    error (EXIT_FAILURE, errno, "reading --load-request: %s",
-	   info.request);
+    error (EXIT_FAILURE, errno, "reading --load-request: %s", info.request);
 
   ret = gnutls_x509_crq_import (crq, &dat, info.incert_format);
   if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
@@ -1607,8 +1579,8 @@ load_ca_private_key (void)
     {
       const char *pass = get_pass ();
       ret =
-	  gnutls_x509_privkey_import_pkcs8 (key, &dat, info.incert_format,
-					    pass, 0);
+	gnutls_x509_privkey_import_pkcs8 (key, &dat, info.incert_format,
+					  pass, 0);
     }
   else
     ret = gnutls_x509_privkey_import (key, &dat, info.incert_format);
@@ -1641,8 +1613,7 @@ load_ca_cert (void)
   dat.size = size;
 
   if (!dat.data)
-    error (EXIT_FAILURE, errno, "reading --load-ca-certificate: %s",
-	   info.ca);
+    error (EXIT_FAILURE, errno, "reading --load-ca-certificate: %s", info.ca);
 
   ret = gnutls_x509_crt_import (crt, &dat, info.incert_format);
   free (dat.data);
@@ -1728,8 +1699,7 @@ load_cert_list (int mand, int *crt_size)
 
       ptr_size = size;
       ptr_size -=
-	  (unsigned int) ((unsigned char *) ptr -
-			  (unsigned char *) buffer);
+	(unsigned int) ((unsigned char *) ptr - (unsigned char *) buffer);
 
       if (ptr_size < 0)
 	break;
@@ -1846,16 +1816,15 @@ _verify_x509_mem (const void *cert, int cert_size)
     do
       {
 	x509_crl_list =
-	    (gnutls_x509_crl_t *) realloc (x509_crl_list,
-					   i * sizeof (gnutls_x509_crl_t));
+	  (gnutls_x509_crl_t *) realloc (x509_crl_list,
+					 i * sizeof (gnutls_x509_crl_t));
 	if (x509_crl_list == NULL)
 	  error (EXIT_FAILURE, 0, "memory error");
 
 	tmp.data = (char *) ptr;
 	tmp.size = cert_size;
 	tmp.size -=
-	    (unsigned int) ((unsigned char *) ptr -
-			    (unsigned char *) cert);
+	  (unsigned int) ((unsigned char *) ptr - (unsigned char *) cert);
 
 	ret = gnutls_x509_crl_init (&x509_crl_list[i - 1]);
 	if (ret < 0)
@@ -1890,8 +1859,8 @@ _verify_x509_mem (const void *cert, int cert_size)
   do
     {
       x509_cert_list =
-	  (gnutls_x509_crt_t *) realloc (x509_cert_list,
-					 i * sizeof (gnutls_x509_crt_t));
+	(gnutls_x509_crt_t *) realloc (x509_cert_list,
+				       i * sizeof (gnutls_x509_crt_t));
       if (x509_cert_list == NULL)
 	error (EXIT_FAILURE, 0, "memory error");
 
@@ -1899,7 +1868,7 @@ _verify_x509_mem (const void *cert, int cert_size)
       tmp.data = (char *) ptr;
       tmp.size = cert_size;
       tmp.size -=
-	  (unsigned int) ((unsigned char *) ptr - (unsigned char *) cert);
+	(unsigned int) ((unsigned char *) ptr - (unsigned char *) cert);
 
       ret = gnutls_x509_crt_init (&x509_cert_list[i - 1]);
       if (ret < 0)
@@ -1907,8 +1876,8 @@ _verify_x509_mem (const void *cert, int cert_size)
 	       gnutls_strerror (ret));
 
       ret =
-	  gnutls_x509_crt_import (x509_cert_list[i - 1], &tmp,
-				  GNUTLS_X509_FMT_PEM);
+	gnutls_x509_crt_import (x509_cert_list[i - 1], &tmp,
+				GNUTLS_X509_FMT_PEM);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "Error parsing the certificate[%d]: %s", i,
 	       gnutls_strerror (ret));
@@ -1922,8 +1891,7 @@ _verify_x509_mem (const void *cert, int cert_size)
 
 	  name_size = sizeof (name);
 	  ret =
-	      gnutls_x509_crt_get_dn (x509_cert_list[i - 2], name,
-				      &name_size);
+	    gnutls_x509_crt_get_dn (x509_cert_list[i - 2], name, &name_size);
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
 
@@ -1933,9 +1901,8 @@ _verify_x509_mem (const void *cert, int cert_size)
 	   */
 	  issuer_name_size = sizeof (issuer_name);
 	  ret =
-	      gnutls_x509_crt_get_issuer_dn (x509_cert_list[i - 2],
-					     issuer_name,
-					     &issuer_name_size);
+	    gnutls_x509_crt_get_issuer_dn (x509_cert_list[i - 2],
+					   issuer_name, &issuer_name_size);
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "get_issuer_dn: %s",
 		   gnutls_strerror (ret));
@@ -1946,13 +1913,11 @@ _verify_x509_mem (const void *cert, int cert_size)
 	   */
 	  name_size = sizeof (name);
 	  ret =
-	      gnutls_x509_crt_get_dn (x509_cert_list[i - 1], name,
-				      &name_size);
+	    gnutls_x509_crt_get_dn (x509_cert_list[i - 1], name, &name_size);
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
 
-	  fprintf (outfile, "\tVerifying against certificate[%d].\n",
-		   i - 1);
+	  fprintf (outfile, "\tVerifying against certificate[%d].\n", i - 1);
 
 	  if (strcmp (issuer_name, name) != 0)
 	    {
@@ -1997,8 +1962,8 @@ _verify_x509_mem (const void *cert, int cert_size)
    */
   issuer_name_size = sizeof (issuer_name);
   ret =
-      gnutls_x509_crt_get_issuer_dn (x509_cert_list[x509_ncerts - 1],
-				     issuer_name, &issuer_name_size);
+    gnutls_x509_crt_get_issuer_dn (x509_cert_list[x509_ncerts - 1],
+				   issuer_name, &issuer_name_size);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "get_issuer_dn: %s", gnutls_strerror (ret));
 
@@ -2162,8 +2127,7 @@ verify_crl (void)
   fprintf (outfile, "Verification output: ");
   ret = gnutls_x509_crl_verify (crl, &issuer, 1, 0, &output);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Verification error: %s",
-	   gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "Verification error: %s", gnutls_strerror (ret));
 
   if (output & GNUTLS_CERT_INVALID)
     {
@@ -2244,8 +2208,8 @@ generate_pkcs8 (void)
 
   size = sizeof (buffer);
   result =
-      gnutls_x509_privkey_export_pkcs8 (key, info.outcert_format,
-					password, flags, buffer, &size);
+    gnutls_x509_privkey_export_pkcs8 (key, info.outcert_format,
+				      password, flags, buffer, &size);
 
   if (result < 0)
     error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
@@ -2333,8 +2297,7 @@ generate_pkcs12 (void)
 
       result = gnutls_pkcs12_bag_encrypt (bag, password, flags);
       if (result < 0)
-	error (EXIT_FAILURE, 0, "bag_encrypt: %s",
-	       gnutls_strerror (result));
+	error (EXIT_FAILURE, 0, "bag_encrypt: %s", gnutls_strerror (result));
 
       result = gnutls_pkcs12_set_bag (pkcs12, bag);
       if (result < 0)
@@ -2356,22 +2319,18 @@ generate_pkcs12 (void)
 
       size = sizeof (buffer);
       result =
-	  gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER,
-					    password, flags, buffer,
-					    &size);
+	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER,
+					  password, flags, buffer, &size);
       if (result < 0)
-	error (EXIT_FAILURE, 0, "key_export: %s",
-	       gnutls_strerror (result));
+	error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
 
       data.data = buffer;
       data.size = size;
       result =
-	  gnutls_pkcs12_bag_set_data (kbag,
-				      GNUTLS_BAG_PKCS8_ENCRYPTED_KEY,
-				      &data);
+	gnutls_pkcs12_bag_set_data (kbag,
+				    GNUTLS_BAG_PKCS8_ENCRYPTED_KEY, &data);
       if (result < 0)
-	error (EXIT_FAILURE, 0, "bag_set_data: %s",
-	       gnutls_strerror (result));
+	error (EXIT_FAILURE, 0, "bag_set_data: %s", gnutls_strerror (result));
 
       index = result;
 
@@ -2403,8 +2362,7 @@ generate_pkcs12 (void)
     error (EXIT_FAILURE, 0, "generate_mac: %s", gnutls_strerror (result));
 
   size = sizeof (buffer);
-  result =
-      gnutls_pkcs12_export (pkcs12, info.outcert_format, buffer, &size);
+  result = gnutls_pkcs12_export (pkcs12, info.outcert_format, buffer, &size);
   if (result < 0)
     error (EXIT_FAILURE, 0, "pkcs12_export: %s", gnutls_strerror (result));
 
@@ -2458,8 +2416,7 @@ print_bag_data (gnutls_pkcs12_bag_t bag)
       fprintf (stderr, "\tType: %s\n", BAGTYPE (type));
 
       name = NULL;
-      result =
-	  gnutls_pkcs12_bag_get_friendly_name (bag, i, (char **) &name);
+      result = gnutls_pkcs12_bag_get_friendly_name (bag, i, (char **) &name);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "get_friendly_name: %s",
 	       gnutls_strerror (type));
@@ -2471,8 +2428,7 @@ print_bag_data (gnutls_pkcs12_bag_t bag)
       result = gnutls_pkcs12_bag_get_key_id (bag, i, &id);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "get_key_id: %s", gnutls_strerror (type));
-      fprintf (outfile, "\tKey ID: %s\n",
-	       raw_to_string (id.data, id.size));
+      fprintf (outfile, "\tKey ID: %s\n", raw_to_string (id.data, id.size));
 
       result = gnutls_pkcs12_bag_get_data (bag, i, &cdata);
       if (result < 0)
@@ -2683,8 +2639,7 @@ smime_to_pkcs7 (void)
     {
       len = getline (&lineptr, &linesize, infile);
       if (len == -1)
-	error (EXIT_FAILURE, 0,
-	       "Cannot find RFC 2822 header/body separator");
+	error (EXIT_FAILURE, 0, "Cannot find RFC 2822 header/body separator");
     }
   while (strcmp (lineptr, "\r\n") != 0 && strcmp (lineptr, "\n") != 0);
 

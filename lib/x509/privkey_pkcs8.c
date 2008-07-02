@@ -692,9 +692,10 @@ read_pkcs_schema_params (schema_id schema, const char *password,
 	{
 	  result =
 	    _gnutls_pkcs12_string_to_key (2 /*IV*/, kdf_params->salt,
-				   kdf_params->salt_size,
-				   kdf_params->iter_count, password,
-				   enc_params->iv_size, enc_params->iv);
+					  kdf_params->salt_size,
+					  kdf_params->iter_count, password,
+					  enc_params->iv_size,
+					  enc_params->iv);
 	  if (result < 0)
 	    {
 	      gnutls_assert ();
@@ -1490,8 +1491,8 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   if (schema == PBES2)
     {
       result = _gnutls_pbkdf2_sha1 (password, strlen (password),
-			       kdf_params->salt, kdf_params->salt_size,
-			       kdf_params->iter_count, key, key_size);
+				    kdf_params->salt, kdf_params->salt_size,
+				    kdf_params->iter_count, key, key_size);
 
       if (result < 0)
 	{
@@ -1503,9 +1504,9 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
     {
       result =
 	_gnutls_pkcs12_string_to_key (1 /*KEY*/, kdf_params->salt,
-			       kdf_params->salt_size,
-			       kdf_params->iter_count, password,
-			       key_size, key);
+				      kdf_params->salt_size,
+				      kdf_params->iter_count, password,
+				      key_size, key);
 
       if (result < 0)
 	{
@@ -1531,7 +1532,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
       gnutls_assert ();
       goto error;
     }
-    
+
   ch_init = 1;
 
   result = _gnutls_cipher_decrypt (&ch, data, data_size);
@@ -1752,7 +1753,7 @@ generate_key (schema_id schema,
   else if (schema == PKCS12_RC2_40_SHA1)
     enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
 
-  ret = _gnutls_rnd( RND_RANDOM, rnd, 2);
+  ret = _gnutls_rnd (RND_RANDOM, rnd, 2);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1767,8 +1768,8 @@ generate_key (schema_id schema,
   else
     kdf_params->salt_size = 8;
 
-  ret = _gnutls_rnd ( RND_RANDOM, kdf_params->salt, kdf_params->salt_size);
-  if ( ret < 0) 
+  ret = _gnutls_rnd (RND_RANDOM, kdf_params->salt, kdf_params->salt_size);
+  if (ret < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_RANDOM_FAILED;
@@ -1794,9 +1795,9 @@ generate_key (schema_id schema,
     {
 
       ret = _gnutls_pbkdf2_sha1 (password, strlen (password),
-			    kdf_params->salt, kdf_params->salt_size,
-			    kdf_params->iter_count,
-			    key->data, kdf_params->key_size);
+				 kdf_params->salt, kdf_params->salt_size,
+				 kdf_params->iter_count,
+				 key->data, kdf_params->key_size);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1804,22 +1805,22 @@ generate_key (schema_id schema,
 	}
 
       if (enc_params->iv_size)
-        {
+	{
 	  ret = _gnutls_rnd (RND_NONCE, enc_params->iv, enc_params->iv_size);
 	  if (ret < 0)
-  	    {
+	    {
 	      gnutls_assert ();
 	      return ret;
 	    }
-        }
+	}
     }
   else
     {				/* PKCS12 schemas */
       ret =
 	_gnutls_pkcs12_string_to_key (1 /*KEY*/, kdf_params->salt,
-			       kdf_params->salt_size,
-			       kdf_params->iter_count, password,
-			       kdf_params->key_size, key->data);
+				      kdf_params->salt_size,
+				      kdf_params->iter_count, password,
+				      kdf_params->key_size, key->data);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1832,9 +1833,10 @@ generate_key (schema_id schema,
 	{
 	  ret =
 	    _gnutls_pkcs12_string_to_key (2 /*IV*/, kdf_params->salt,
-				   kdf_params->salt_size,
-				   kdf_params->iter_count, password,
-				   enc_params->iv_size, enc_params->iv);
+					  kdf_params->salt_size,
+					  kdf_params->iter_count, password,
+					  enc_params->iv_size,
+					  enc_params->iv);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();

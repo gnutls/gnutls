@@ -51,10 +51,8 @@
 #include "gnutls_num.h"
 
 typedef int (*supp_recv_func) (gnutls_session_t session,
-			       const opaque *data,
-			       size_t data_size);
-typedef int (*supp_send_func) (gnutls_session_t session,
-			       gnutls_buffer *buf);
+			       const opaque * data, size_t data_size);
+typedef int (*supp_send_func) (gnutls_session_t session, gnutls_buffer * buf);
 
 typedef struct
 {
@@ -65,7 +63,7 @@ typedef struct
 } gnutls_supplemental_entry;
 
 gnutls_supplemental_entry _gnutls_supplemental[] = {
-  { 0, 0, 0, 0 }
+  {0, 0, 0, 0}
 };
 
 const char *
@@ -73,8 +71,8 @@ gnutls_supplemental_get_name (gnutls_supplemental_data_format_type_t type)
 {
   gnutls_supplemental_entry *p;
 
-  for(p = _gnutls_supplemental; p->name != NULL; p++)
-    if(p->type == type)
+  for (p = _gnutls_supplemental; p->name != NULL; p++)
+    if (p->type == type)
       return p->name;
 
   return NULL;
@@ -85,15 +83,15 @@ get_supp_func_recv (gnutls_supplemental_data_format_type_t type)
 {
   gnutls_supplemental_entry *p;
 
-  for(p = _gnutls_supplemental; p->name != NULL; p++)
-    if(p->type == type)
+  for (p = _gnutls_supplemental; p->name != NULL; p++)
+    if (p->type == type)
       return p->supp_recv_func;
 
   return NULL;
 }
 
 int
-_gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer *buf)
+_gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer * buf)
 {
   gnutls_supplemental_entry *p;
   int ret;
@@ -106,7 +104,7 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer *buf)
       return ret;
     }
 
-  for(p = _gnutls_supplemental; p->name; p++)
+  for (p = _gnutls_supplemental; p->name; p++)
     {
       supp_send_func supp_send = p->supp_send_func;
       size_t sizepos = buf->length;
@@ -133,7 +131,7 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer *buf)
 	  buf->data[sizepos] = 0;
 	  buf->data[sizepos + 1] = p->type;
 	  buf->data[sizepos + 2] = ((buf->length - sizepos - 4) >> 8) & 0xFF;
-	  buf->data[sizepos + 3] = (buf->length - sizepos -4) & 0xFF;
+	  buf->data[sizepos + 3] = (buf->length - sizepos - 4) & 0xFF;
 	}
       else
 	buf->length -= 4;
@@ -151,8 +149,7 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer *buf)
 
 int
 _gnutls_parse_supplemental (gnutls_session_t session,
-			    const uint8_t * data,
-			    int datalen)
+			    const uint8_t * data, int datalen)
 {
   const opaque *p = data;
   ssize_t dsize = datalen;
@@ -162,9 +159,9 @@ _gnutls_parse_supplemental (gnutls_session_t session,
   total_size = _gnutls_read_uint24 (p);
   p += 3;
 
-  if (dsize != (ssize_t)total_size)
+  if (dsize != (ssize_t) total_size)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
     }
 

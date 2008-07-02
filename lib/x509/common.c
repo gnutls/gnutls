@@ -218,10 +218,11 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
     }
 
   if ((result =
-       asn1_der_decoding (&tmpasn, value, value_size, asn1_err)) != ASN1_SUCCESS)
+       asn1_der_decoding (&tmpasn, value, value_size,
+			  asn1_err)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      _gnutls_x509_log("asn1_der_decoding: %s:%s\n", str, asn1_err);
+      _gnutls_x509_log ("asn1_der_decoding: %s:%s\n", str, asn1_err);
       asn1_delete_structure (&tmpasn);
       return _gnutls_asn2err (result);
     }
@@ -256,8 +257,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
        * UTF-8 (thus ASCII as well).
        */
       if (strcmp (str, "printableString") != 0 &&
-	  strcmp (str, "ia5String") != 0 &&
-	  strcmp (str, "utf8String") != 0)
+	  strcmp (str, "ia5String") != 0 && strcmp (str, "utf8String") != 0)
 	{
 	  non_printable = 1;
 	}
@@ -711,8 +711,9 @@ _gnutls_x509_san_find_type (char *str_type)
  */
 int
 _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
-                               gnutls_x509_crt_fmt_t format, char *pem_header,
-                               unsigned char *output_data, size_t * output_data_size)
+			       gnutls_x509_crt_fmt_t format, char *pem_header,
+			       unsigned char *output_data,
+			       size_t * output_data_size)
 {
   int result, len;
 
@@ -745,12 +746,12 @@ _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
       opaque *out;
       gnutls_datum tmp;
 
-      result = _gnutls_x509_der_encode( asn1_data, name, &tmp, 0);
+      result = _gnutls_x509_der_encode (asn1_data, name, &tmp, 0);
       if (result < 0)
-        {
-          gnutls_assert();
-          return result;
-        }
+	{
+	  gnutls_assert ();
+	  return result;
+	}
 
       result = _gnutls_fbase64_encode (pem_header, tmp.data, tmp.size, &out);
 
@@ -795,12 +796,13 @@ _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
 
 int
 _gnutls_x509_export_int (ASN1_TYPE asn1_data,
-                         gnutls_x509_crt_fmt_t format, char *pem_header,
-                         unsigned char *output_data, size_t * output_data_size)
+			 gnutls_x509_crt_fmt_t format, char *pem_header,
+			 unsigned char *output_data,
+			 size_t * output_data_size)
 {
-    return _gnutls_x509_export_int_named (asn1_data, "", 
-                                          format, pem_header, output_data,
-                                          output_data_size);
+  return _gnutls_x509_export_int_named (asn1_data, "",
+					format, pem_header, output_data,
+					output_data_size);
 }
 
 /* Decodes an octet string. Leave string_type null for a normal
@@ -883,7 +885,8 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       return result;
     }
 
-  if (flags==2) len /= 8;
+  if (flags == 2)
+    len /= 8;
 
   tmp = gnutls_malloc (len);
   if (tmp == NULL)
@@ -901,12 +904,13 @@ _gnutls_x509_read_value (ASN1_TYPE c, const char *root,
       goto cleanup;
     }
 
-  if (flags==2) len /= 8;
+  if (flags == 2)
+    len /= 8;
 
   /* Extract the OCTET STRING.
    */
 
-  if (flags==1)
+  if (flags == 1)
     {
       slen = len;
       result = _gnutls_x509_decode_octet_string (NULL, tmp, slen, tmp, &slen);
@@ -1324,38 +1328,39 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 
   len /= 8;
 
-  switch (algo) 
+  switch (algo)
     {
     case GNUTLS_PK_RSA:
       {
-      if ((result = _gnutls_x509_read_rsa_params (str, len, params)) < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+	if ((result = _gnutls_x509_read_rsa_params (str, len, params)) < 0)
+	  {
+	    gnutls_assert ();
+	    return result;
+	  }
 
-      bits[0] = _gnutls_mpi_get_nbits (params[0]);
+	bits[0] = _gnutls_mpi_get_nbits (params[0]);
 
-      _gnutls_mpi_release (&params[0]);
-      _gnutls_mpi_release (&params[1]);
+	_gnutls_mpi_release (&params[0]);
+	_gnutls_mpi_release (&params[1]);
       }
       break;
     case GNUTLS_PK_DSA:
       {
 
-      if ((result = _gnutls_x509_read_dsa_pubkey (str, len, params)) < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+	if ((result = _gnutls_x509_read_dsa_pubkey (str, len, params)) < 0)
+	  {
+	    gnutls_assert ();
+	    return result;
+	  }
 
-      bits[0] = _gnutls_mpi_get_nbits (params[3]);
+	bits[0] = _gnutls_mpi_get_nbits (params[3]);
 
-      _gnutls_mpi_release (&params[3]);
+	_gnutls_mpi_release (&params[3]);
       }
       break;
     default:
-      _gnutls_x509_log("_gnutls_x509_get_pk_algorithm: unhandled algorithm %d\n", algo);
+      _gnutls_x509_log
+	("_gnutls_x509_get_pk_algorithm: unhandled algorithm %d\n", algo);
     }
 
   gnutls_free (str);

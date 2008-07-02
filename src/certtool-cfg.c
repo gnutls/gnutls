@@ -224,7 +224,7 @@ read_int_with_default (const char *input_str, int def)
   char *endptr;
   long l;
 
-  printf(input_str, def);
+  printf (input_str, def);
   in = readline ("");
 
   l = strtol (in, &endptr, 0);
@@ -612,7 +612,8 @@ get_serial (void)
   else
     {
       return read_int_with_default
-	("Enter the certificate's serial number in decimal (default: %u): ", default_serial);
+	("Enter the certificate's serial number in decimal (default: %u): ",
+	 default_serial);
     }
 }
 
@@ -897,7 +898,7 @@ get_crl_next_update (void)
 }
 
 const char *
-get_proxy_policy (char **policy, size_t *policylen)
+get_proxy_policy (char **policy, size_t * policylen)
 {
   const char *ret;
 

@@ -41,8 +41,8 @@ scm_gnutls_error (int c_err, const char *c_func)
      complaints.  */
   abort ();
 }
-
 
+
 void
 scm_init_gnutls_error (void)
 {

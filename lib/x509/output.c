@@ -395,8 +395,9 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert)
       size_t size = 0;
       int err;
 
-      err = gnutls_x509_crt_get_subject_alt_name (cert, san_idx, buffer, &size,
-						  NULL);
+      err =
+	gnutls_x509_crt_get_subject_alt_name (cert, san_idx, buffer, &size,
+					      NULL);
       if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 	break;
       if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -883,7 +884,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	}
       if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
 	{
-	  addf (str, _("warning: signed using a broken signature algorithm that can be forged.\n"));
+	  addf (str,
+		_
+		("warning: signed using a broken signature algorithm that can be forged.\n"));
 	}
 
       err = gnutls_x509_crt_get_signature (cert, buffer, &size);
@@ -921,7 +924,7 @@ print_fingerprint (gnutls_string * str, gnutls_x509_crt_t cert,
 {
   int err;
   char buffer[MAX_HASH_SIZE];
-  size_t size = sizeof(buffer);
+  size_t size = sizeof (buffer);
 
   err = gnutls_x509_crt_get_fingerprint (cert, algo, buffer, &size);
   if (err < 0)
@@ -1063,8 +1066,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
     int err;
 
     err = gnutls_x509_crt_get_proxy (cert, NULL,
-				     &pathlen, &policyLanguage,
-				     NULL, NULL);
+				     &pathlen, &policyLanguage, NULL, NULL);
     if (err == 0)
       {
 	addf (str, "proxy certificate (policy=");
@@ -1125,7 +1127,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
 int
 gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 		       gnutls_certificate_print_formats_t format,
-		       gnutls_datum_t *out)
+		       gnutls_datum_t * out)
 {
   gnutls_string str;
 
@@ -1166,9 +1168,7 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 }
 
 static void
-print_crl (gnutls_string *str,
-	   gnutls_x509_crl_t crl,
-	   int notsigned)
+print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 {
   /* Version. */
   {
@@ -1293,7 +1293,9 @@ print_crl (gnutls_string *str,
 	}
       if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
 	{
-	  addf (str, _("warning: signed using a broken signature algorithm that can be forged.\n"));
+	  addf (str,
+		_
+		("warning: signed using a broken signature algorithm that can be forged.\n"));
 	}
 
       err = gnutls_x509_crl_get_signature (crl, buffer, &size);
@@ -1342,7 +1344,7 @@ print_crl (gnutls_string *str,
 int
 gnutls_x509_crl_print (gnutls_x509_crl_t crl,
 		       gnutls_certificate_print_formats_t format,
-		       gnutls_datum_t *out)
+		       gnutls_datum_t * out)
 {
   gnutls_string str;
 

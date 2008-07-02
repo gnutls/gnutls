@@ -125,6 +125,7 @@ _gnutls_dump_mpi (const char *prefix, bigint_t a)
 
   if (_gnutls_mpi_print (a, mpi_buf, &n) < 0)
     strcpy (buf, "[can't print value]");	/* Flawfinder: ignore */
-  else _gnutls_bin2hex (mpi_buf, n, buf, sizeof(buf));
+  else
+    _gnutls_bin2hex (mpi_buf, n, buf, sizeof (buf));
   _gnutls_hard_log ("MPI: length: %d\n\t%s%s\n", n, prefix, buf);
 }

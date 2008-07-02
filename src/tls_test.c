@@ -237,26 +237,25 @@ main (int argc, char **argv)
 
       sd = -1;
       for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
-        {
-          sd = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-          if (sd == -1)
-            {
-              continue;
-            }
+	{
+	  sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+	  if (sd == -1)
+	    {
+	      continue;
+	    }
 
-          getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
-                       NULL, 0, NI_NUMERICHOST);
-          if (tt++ == 0) printf("Connecting to '%s:%d'...\n", buffer, port);
-          if ((err = connect(sd, ptr->ai_addr, ptr->ai_addrlen)) != 0)
-            {
-              close (sd);
-              sd = -1;
-              continue;
-            }
-        }
-      ERR(err, "connect")
-
-      gnutls_init (&state, GNUTLS_CLIENT);
+	  getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
+		       NULL, 0, NI_NUMERICHOST);
+	  if (tt++ == 0)
+	    printf ("Connecting to '%s:%d'...\n", buffer, port);
+	  if ((err = connect (sd, ptr->ai_addr, ptr->ai_addrlen)) != 0)
+	    {
+	      close (sd);
+	      sd = -1;
+	      continue;
+	    }
+	}
+      ERR (err, "connect") gnutls_init (&state, GNUTLS_CLIENT);
       gnutls_transport_set_ptr (state, (gnutls_transport_ptr_t) sd);
 
       do

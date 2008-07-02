@@ -54,9 +54,9 @@ _pkcs12_check_pass (const char *pass, size_t plen)
  */
 int
 _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
-		       unsigned int salt_size, unsigned int iter,
-		       const char *pw, unsigned int req_keylen,
-		       opaque * keybuf)
+			      unsigned int salt_size, unsigned int iter,
+			      const char *pw, unsigned int req_keylen,
+			      opaque * keybuf)
 {
   int rc;
   unsigned int i, j;
@@ -67,13 +67,14 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
   opaque hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
   size_t n;
-  const opaque buf_512[] = /* 2^64 */
+  const opaque buf_512[] =	/* 2^64 */
   { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+  };
 
   cur_keylen = 0;
 
@@ -94,12 +95,12 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
       return rc;
     }
 
-  rc = _gnutls_mpi_scan (&mpi512, buf_512, sizeof(buf_512));
+  rc = _gnutls_mpi_scan (&mpi512, buf_512, sizeof (buf_512));
   if (rc < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
-    } 
+    }
 
   /* Store salt and password in BUF_I */
   p = buf_i;
@@ -131,19 +132,19 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
 	  unsigned char lid = id & 0xFF;
 	  _gnutls_hash (&md, &lid, 1);
 	}
-      _gnutls_hash( &md, buf_i, pw ? 128 : 64);
-      _gnutls_hash_deinit( &md, hash);
+      _gnutls_hash (&md, buf_i, pw ? 128 : 64);
+      _gnutls_hash_deinit (&md, hash);
       for (i = 1; i < iter; i++)
-        {
-          rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
-          if (rc < 0)
-            {
-              gnutls_assert();
-              goto cleanup;
-            }
-          _gnutls_hash( &md, hash, 20);
-          _gnutls_hash_deinit( &md, hash);
-        }
+	{
+	  rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
+	  if (rc < 0)
+	    {
+	      gnutls_assert ();
+	      goto cleanup;
+	    }
+	  _gnutls_hash (&md, hash, 20);
+	  _gnutls_hash_deinit (&md, hash);
+	}
       for (i = 0; i < 20 && cur_keylen < req_keylen; i++)
 	keybuf[cur_keylen++] = hash[i];
       if (cur_keylen == req_keylen)
@@ -187,7 +188,7 @@ cleanup:
   _gnutls_mpi_release (&num_ij);
   _gnutls_mpi_release (&num_b1);
   _gnutls_mpi_release (&mpi512);
-  
+
   return rc;
 }
 

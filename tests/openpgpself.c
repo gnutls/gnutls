@@ -113,8 +113,7 @@ const char cert_txt[] =
   "Tm8gY29tbWVudHMpIDx3aG9Ad2hvaXMub3JnPohdBBMRAgAdBQI8Z5WNBQkDwmcA\n"
   "BQsHCgMEAxUDAgMWAgECF4AACgkQNRRc6qfZPD+WWACfeJnLyfbpTDB7mDh3aATb\n"
   "+0PXz28AoKRdApBVM6Bty+vWyXH6HfF6ZTj+\n"
-  "=m8dH\n"
-  "-----END PGP PUBLIC KEY BLOCK-----\n";
+  "=m8dH\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
 const gnutls_datum_t cert = { cert_txt, sizeof (cert_txt) };
 
 const char key_txt[] =
@@ -137,8 +136,7 @@ const char key_txt[] =
   "KE5vIGNvbW1lbnRzKSA8d2hvQHdob2lzLm9yZz6IXQQTEQIAHQUCPGeVjQUJA8Jn\n"
   "AAULBwoDBAMVAwIDFgIBAheAAAoJEDUUXOqn2Tw/llgAnjBPQdWxIqBCQGlcI2K/\n"
   "gLkZR1ARAJ9kaAeJYERc0bV/vlm0ot7UDdr+bQ==\n"
-  "=4M0W\n"
-  "-----END PGP PRIVATE KEY BLOCK-----\n";
+  "=4M0W\n" "-----END PGP PRIVATE KEY BLOCK-----\n";
 const gnutls_datum_t key = { key_txt, sizeof (key_txt) };
 
 void
@@ -204,7 +202,7 @@ client (void)
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info(session);
+  print_info (session);
 
   gnutls_record_send (session, MSG, strlen (MSG));
 
@@ -325,8 +323,7 @@ const char server_crt_txt[] =
   "fZJo+m0Xf8zI57NeQF+hXJhW7lIrWgQVr8IVp/lgo76acLHfL/t1n0Nhg4r2srz2\n"
   "fpP2w5laQ0qImYLnZhGFHU+rJUyFaHfhD8/svN2LuZkO570pjV/K68EaHnEfk5b8\n"
   "jWu/euohwcCwf20M1kTo3Bg=\n"
-  "=Xjon\n"
-  "-----END PGP PUBLIC KEY BLOCK-----\n";
+  "=Xjon\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
 const gnutls_datum_t server_crt = { server_crt_txt, sizeof (server_crt_txt) };
 
 const char server_key_txt[] =
@@ -372,8 +369,7 @@ const char server_key_txt[] =
   "uXDDNkpoJwhEJBw5uQuwxWh9kmj6bRd/zMjns15AX6FcmFbuUitaBBWvwhWn+WCj\n"
   "vppwsd8v+3WfQ2GDivayvPZ+k/bDmVpDSoiZgudmEYUdT6slTIVod+EPz+y83Yu5\n"
   "mQ7nvSmNX8rrwRoecR+TlvyNa7966iHBwLB/bQzWROjcGA==\n"
-  "=mZnW\n"
-  "-----END PGP PRIVATE KEY BLOCK-----\n";
+  "=mZnW\n" "-----END PGP PRIVATE KEY BLOCK-----\n";
 const gnutls_datum_t server_key = { server_key_txt, sizeof (server_key_txt) };
 
 void
@@ -467,7 +463,7 @@ server (void)
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info(session);
+  print_info (session);
 
   i = 0;
   for (;;)

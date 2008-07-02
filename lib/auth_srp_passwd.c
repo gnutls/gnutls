@@ -286,7 +286,7 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
 	      ret = _randomize_pwd_entry (entry);
 	      if (ret < 0)
 		{
-		  gnutls_assert();
+		  gnutls_assert ();
 		  _gnutls_srp_entry_free (entry);
 		  return ret;
 		}
@@ -423,7 +423,7 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
     }
 
   ret = _gnutls_rnd (RND_RANDOM, entry->v.data, 20);
-  if ( ret < 0)
+  if (ret < 0)
     {
       gnutls_assert ();
       return ret;
@@ -439,10 +439,10 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
   ret = _gnutls_rnd (RND_NONCE, entry->salt.data, entry->salt.size);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
-    
+
   return 0;
 }
 

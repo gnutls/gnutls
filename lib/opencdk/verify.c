@@ -36,17 +36,26 @@
 
 
 /* Table of all supported digest algorithms and their names. */
-struct {
-    const char *name;
-    int algo;
-} digest_table[] = {
-    {"MD5",       GNUTLS_DIG_MD5},
-    {"SHA1",      GNUTLS_DIG_SHA1},
-    {"RIPEMD160", GNUTLS_DIG_RMD160},
-    {"SHA256",    GNUTLS_DIG_SHA256},
-    {"SHA384",    GNUTLS_DIG_SHA384},
-    {"SHA512",    GNUTLS_DIG_SHA512},
-    {NULL, 0}
+struct
+{
+  const char *name;
+  int algo;
+} digest_table[] =
+{
+  {
+  "MD5", GNUTLS_DIG_MD5},
+  {
+  "SHA1", GNUTLS_DIG_SHA1},
+  {
+  "RIPEMD160", GNUTLS_DIG_RMD160},
+  {
+  "SHA256", GNUTLS_DIG_SHA256},
+  {
+  "SHA384", GNUTLS_DIG_SHA384},
+  {
+  "SHA512", GNUTLS_DIG_SHA512},
+  {
+  NULL, 0}
 };
 
 
@@ -90,18 +99,18 @@ cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
   char buf[4096];
   int n;
   cdk_error_t rc;
-  
+
   if (!hd || !file)
     return CDK_Inv_Value;
   if (output && !hd->opt.overwrite && !stat (output, &stbuf))
     return CDK_Inv_Mode;
-  
+
   rc = cdk_stream_open (file, &inp);
   if (rc)
     return rc;
-  if (cdk_armor_filter_use (inp)) 
+  if (cdk_armor_filter_use (inp))
     {
-      n = cdk_stream_peek (inp, (byte*) buf, DIM (buf)-1);
+      n = cdk_stream_peek (inp, (byte *) buf, DIM (buf) - 1);
       if (!n || n == -1)
 	return CDK_EOF;
       buf[n] = '\0';
@@ -112,7 +121,7 @@ cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
 	}
       cdk_stream_set_armor_flag (inp, 0);
     }
-  
+
   if (data_file)
     {
       rc = cdk_stream_open (data_file, &data);
@@ -121,12 +130,12 @@ cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
 	  cdk_stream_close (inp);
 	  return rc;
 	}
-    }  
+    }
   else
     data = NULL;
-    
+
   rc = _cdk_proc_packets (hd, inp, data, NULL, NULL, NULL);
-  
+
   if (data != NULL)
     cdk_stream_close (data);
   cdk_stream_close (inp);
@@ -149,7 +158,7 @@ cdk_verify_result_t
 _cdk_result_verify_new (void)
 {
   cdk_verify_result_t res;
-  
+
   res = cdk_calloc (1, sizeof *res);
   if (!res)
     return NULL;
@@ -168,103 +177,103 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   int digest_algo = 0;
   int err;
   cdk_error_t rc;
-  
+
   if (output)
     {
       rc = cdk_stream_create (output, &out);
       if (rc)
 	return rc;
     }
-  
+
   rc = cdk_stream_open (file, &inp);
   if (rc)
     {
       if (output)
 	cdk_stream_close (out);
-      return rc;  
-    } 
-  
+      return rc;
+    }
+
   s = "-----BEGIN PGP SIGNED MESSAGE-----";
-  while (!cdk_stream_eof (inp)) 
+  while (!cdk_stream_eof (inp))
     {
-      nbytes = _cdk_stream_gets (inp, buf, DIM (buf)-1);
+      nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
 	break;
-      if (!strncmp (buf, s, strlen (s))) 
+      if (!strncmp (buf, s, strlen (s)))
 	{
 	  is_signed = 1;
 	  break;
 	}
     }
-  
+
   if (cdk_stream_eof (inp) && !is_signed)
     {
       rc = CDK_Armor_Error;
       goto leave;
     }
-  
-  while (!cdk_stream_eof (inp)) 
+
+  while (!cdk_stream_eof (inp))
     {
-      nbytes = _cdk_stream_gets (inp, buf, DIM (buf)-1);
+      nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
 	break;
-      if (nbytes == 1) /* Empty line */
+      if (nbytes == 1)		/* Empty line */
 	break;
       else if (!strncmp (buf, "Hash: ", 6))
 	{
 	  for (i = 0; digest_table[i].name; i++)
 	    {
-	      if (!strcmp (buf + 6, digest_table[i].name)) 
+	      if (!strcmp (buf + 6, digest_table[i].name))
 		{
 		  digest_algo = digest_table[i].algo;
 		  break;
 		}
 	    }
-        }
+	}
     }
-  
-  if (digest_algo && _gnutls_hash_get_algo_len(digest_algo) <= 0)
+
+  if (digest_algo && _gnutls_hash_get_algo_len (digest_algo) <= 0)
     {
       rc = CDK_Inv_Algo;
       goto leave;
     }
-  
+
   if (!digest_algo)
     digest_algo = GNUTLS_DIG_MD5;
-  
+
   err = _gnutls_hash_init (&md, digest_algo);
   if (err < 0)
     {
       rc = map_gnutls_error (err);
       goto leave;
-    } 
+    }
 
   s = "-----BEGIN PGP SIGNATURE-----";
-  while (!cdk_stream_eof (inp)) 
+  while (!cdk_stream_eof (inp))
     {
-      nbytes = _cdk_stream_gets (inp, buf, DIM (buf)-1);
+      nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
 	break;
       if (!strncmp (buf, s, strlen (s)))
 	break;
-      else 
+      else
 	{
-	  cdk_stream_peek (inp, (byte*)chk, DIM (chk)-1);
+	  cdk_stream_peek (inp, (byte *) chk, DIM (chk) - 1);
 	  i = strncmp (chk, s, strlen (s));
 	  if (strlen (buf) == 0 && i == 0)
-	    continue; /* skip last '\n' */
-	  _cdk_trim_string (buf, i == 0? 0 : 1);
+	    continue;		/* skip last '\n' */
+	  _cdk_trim_string (buf, i == 0 ? 0 : 1);
 	  _gnutls_hash (&md, buf, strlen (buf));
-        }
-      if (!strncmp (buf, "- ", 2)) /* FIXME: handle it recursive. */
+	}
+      if (!strncmp (buf, "- ", 2))	/* FIXME: handle it recursive. */
 	memmove (buf, buf + 2, nbytes - 2);
-      if (out) 
+      if (out)
 	{
 	  if (strstr (buf, "\r\n"))
-	    buf[strlen (buf)-2] = '\0';
+	    buf[strlen (buf) - 2] = '\0';
 	  cdk_stream_write (out, buf, strlen (buf));
 	  _cdk_stream_puts (out, _cdk_armor_get_lineend ());
-        }
+	}
     }
 
   /* We create a temporary stream object to store the
@@ -277,12 +286,12 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   _cdk_stream_puts (tmp, s);
   while (!cdk_stream_eof (inp))
     {
-      nbytes = _cdk_stream_gets (inp, buf, DIM (buf)-1);
+      nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
 	break;
-      if (nbytes < (int)(DIM (buf) -3))
+      if (nbytes < (int) (DIM (buf) - 3))
 	{
-	  buf[nbytes-1] = '\n';
+	  buf[nbytes - 1] = '\n';
 	  buf[nbytes] = '\0';
 	}
       cdk_stream_write (tmp, buf, nbytes);
@@ -293,11 +302,11 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   cdk_stream_seek (tmp, 0);
   cdk_stream_set_armor_flag (tmp, 0);
   cdk_stream_read (tmp, NULL, 0);
-  
+
   /* the digest handle will be closed there. */
   rc = _cdk_proc_packets (hd, tmp, NULL, NULL, NULL, &md);
-  
-  leave:
+
+leave:
   _gnutls_hash_deinit (&md, NULL);
   cdk_stream_close (out);
   cdk_stream_close (tmp);

@@ -48,7 +48,7 @@ srptool_version (void)
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <crypt-gaa.h>
-#include "../lib/random.h" /* for random */
+#include "../lib/random.h"	/* for random */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -71,7 +71,8 @@ srptool_version (void)
 
 int crypt_int (const char *username, const char *passwd, int salt,
 	       char *tpasswd_conf, char *tpasswd, int uindex);
-static int read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n, char *str);
+static int read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n,
+			     char *str);
 static int _verify_passwd_int (const char *username, const char *passwd,
 			       char *verifier, char *salt,
 			       const gnutls_datum_t * g,
@@ -218,7 +219,7 @@ _verify_passwd_int (const char *username, const char *passwd,
 
   /* encode the verifier into _salt */
   salt_size = sizeof (_salt);
-  memset(_salt, 0, salt_size);
+  memset (_salt, 0, salt_size);
   if (gnutls_srp_base64_encode (&new_verifier, _salt, &salt_size) < 0)
     {
       fprintf (stderr, "Encoding error\n");

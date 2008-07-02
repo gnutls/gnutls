@@ -64,7 +64,7 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
     {
       k++;
 
-      snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", k);
+      snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u", k);
 
       len = sizeof (str) - 1;
       result = asn1_read_value (cert->cert, name, str, &len);
@@ -188,7 +188,7 @@ _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
     {
       k++;
 
-      snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", k);
+      snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u", k);
 
       len = sizeof (str) - 1;
       result = asn1_read_value (cert->cert, name, str, &len);
@@ -326,7 +326,7 @@ overwrite_extension (ASN1_TYPE asn, unsigned int indx,
   const char *str;
   int result;
 
-  snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", indx);
+  snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u", indx);
 
   if (critical == 0)
     str = "FALSE";
@@ -379,7 +379,7 @@ _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
     {
       k++;
 
-      snprintf( name, sizeof(name), "tbsCertificate.extensions.?%u", k);
+      snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u", k);
 
       len = sizeof (extnID) - 1;
       result = asn1_read_value (cert->cert, name, extnID, &len);
@@ -523,7 +523,7 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
 	*pathLenConstraint = -1;
       else if (result != GNUTLS_E_SUCCESS)
 	{
-	  gnutls_assert();
+	  gnutls_assert ();
 	  asn1_delete_structure (&ext);
 	  return _gnutls_asn2err (result);
 	}
@@ -951,9 +951,8 @@ int
 _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
 					char **policyLanguage,
 					char **policy,
-					size_t *sizeof_policy,
-					opaque * extnValue,
-					int extnValueLen)
+					size_t * sizeof_policy,
+					opaque * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;

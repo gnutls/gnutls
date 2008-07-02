@@ -39,8 +39,8 @@
 #include <list.h>
 
 #if defined _WIN32 || defined __WIN32__
-int _win_select(int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
-		const struct timeval *tv);
+int _win_select (int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
+		 const struct timeval *tv);
 #define select _win_select
 #endif
 
@@ -132,11 +132,12 @@ static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 #define HTTP_STATE_RESPONSE	2
 #define HTTP_STATE_CLOSING	3
 
-LIST_TYPE_DECLARE (listener_item, char *http_request;
-		   char *http_response; int request_length;
-		   int response_length; int response_written;
-		   int http_state;
-		   int fd; gnutls_session_t tls_session; int handshake_ok;);
+LIST_TYPE_DECLARE (listener_item, char *http_request; char *http_response;
+		   int request_length; int response_length;
+		   int response_written; int http_state; int fd;
+		   gnutls_session_t tls_session;
+		   int handshake_ok;
+  );
 
 static const char *
 safe_strerror (int value)
@@ -265,7 +266,8 @@ static_dh_params (void)
       exit (1);
     }
 
-  ret = gnutls_dh_params_import_pkcs3 (dh_params, &params, GNUTLS_X509_FMT_PEM);
+  ret =
+    gnutls_dh_params_import_pkcs3 (dh_params, &params, GNUTLS_X509_FMT_PEM);
 
   if (ret < 0)
     {
@@ -344,8 +346,7 @@ int
 oprfi_callback (gnutls_session_t session,
 		void *userdata,
 		size_t oprfi_len,
-		const unsigned char *in_oprfi,
-		unsigned char *out_oprfi)
+		const unsigned char *in_oprfi, unsigned char *out_oprfi)
 {
   size_t ourlen = strlen (info.opaque_prf_input);
   size_t i;
@@ -356,7 +357,7 @@ oprfi_callback (gnutls_session_t session,
     printf ("%02x", in_oprfi[i]);
   printf ("\n");
 
-  memset(out_oprfi, 0, oprfi_len);
+  memset (out_oprfi, 0, oprfi_len);
   strncpy (out_oprfi, info.opaque_prf_input, oprfi_len);
 
   return 0;
@@ -385,8 +386,8 @@ initialize_session (void)
 
   if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
     {
-      fprintf(stderr, "Syntax error at: %s\n", err);
-      exit(1);
+      fprintf (stderr, "Syntax error at: %s\n", err);
+      exit (1);
     }
 
   if (cipher_priority[0])
@@ -415,17 +416,18 @@ initialize_session (void)
 
   if (disable_client_cert)
     gnutls_certificate_server_set_request (session, GNUTLS_CERT_IGNORE);
-  else {
-    if (require_cert)
-      gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
-    else
-      gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
-  }
+  else
+    {
+      if (require_cert)
+	gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
+      else
+	gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+    }
 
   /* Set maximum compatibility mode. This is only suggested on public webservers
    * that need to trade security for compatibility
    */
-   gnutls_session_enable_compatibility_mode( session);
+  gnutls_session_enable_compatibility_mode (session);
 
 #ifdef ENABLE_OPRFI
   if (info.opaque_prf_input)
@@ -446,7 +448,8 @@ static const char DEFAULT_DATA[] =
  */
 #define tmp2 &http_buffer[strlen(http_buffer)]
 char *
-peer_print_info (gnutls_session_t session, int *ret_length, const char *header)
+peer_print_info (gnutls_session_t session, int *ret_length,
+		 const char *header)
 {
   const char *tmp;
   unsigned char sesid[32];
@@ -661,34 +664,36 @@ listen_socket (const char *name, int listen_port)
 
   for (ptr = res; (ptr != NULL) && (s == -1); ptr = ptr->ai_next)
     {
-      if ((s = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol)) < 0)
-        {
-          perror ("socket() failed");
-          continue;
-        }
+      if ((s =
+	   socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol)) < 0)
+	{
+	  perror ("socket() failed");
+	  continue;
+	}
 
       yes = 1;
       if (setsockopt
-          (s, SOL_SOCKET, SO_REUSEADDR, (const void *) &yes, sizeof (yes)) < 0)
-        {
-          perror ("setsockopt() failed");
-        failed:
-          close (s);
-          s = -1;
-          continue;
-        }
+	  (s, SOL_SOCKET, SO_REUSEADDR, (const void *) &yes,
+	   sizeof (yes)) < 0)
+	{
+	  perror ("setsockopt() failed");
+	failed:
+	  close (s);
+	  s = -1;
+	  continue;
+	}
 
       if (bind (s, res->ai_addr, res->ai_addrlen) < 0)
-        {
-          perror ("bind() failed");
-          goto failed;
-        }
+	{
+	  perror ("bind() failed");
+	  goto failed;
+	}
 
       if (listen (s, 10) < 0)
-        {
-          perror ("listen() failed");
-          goto failed;
-        }
+	{
+	  perror ("listen() failed");
+	  goto failed;
+	}
     }
 
   freeaddrinfo (res);
@@ -774,20 +779,22 @@ tls_log_func (int level, const char *str)
 
 static void gaa_parser (int argc, char **argv);
 
-static int get_port (const struct sockaddr_storage *addr)
+static int
+get_port (const struct sockaddr_storage *addr)
 {
   switch (addr->ss_family)
     {
-      case AF_INET6:
-        return ntohs (((const struct sockaddr_in6 *)addr)->sin6_port);
-      case AF_INET:
-        return ntohs (((const struct sockaddr_in *)addr)->sin_port);
+    case AF_INET6:
+      return ntohs (((const struct sockaddr_in6 *) addr)->sin6_port);
+    case AF_INET:
+      return ntohs (((const struct sockaddr_in *) addr)->sin_port);
     }
   return -1;
 }
 
-static const char *addr_ntop (const struct sockaddr *sa, socklen_t salen,
-                              char *buf, size_t buflen)
+static const char *
+addr_ntop (const struct sockaddr *sa, socklen_t salen,
+	   char *buf, size_t buflen)
 {
   if (getnameinfo (sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) == 0)
     {
@@ -899,7 +906,8 @@ main (int argc, char **argv)
   if (pgp_keyring != NULL)
     {
       ret =
-	gnutls_certificate_set_openpgp_keyring_file (cert_cred, pgp_keyring, GNUTLS_OPENPGP_FMT_BASE64);
+	gnutls_certificate_set_openpgp_keyring_file (cert_cred, pgp_keyring,
+						     GNUTLS_OPENPGP_FMT_BASE64);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error setting the OpenPGP keyring file\n");
@@ -911,7 +919,8 @@ main (int argc, char **argv)
     {
       if (info.pgp_subkey != NULL)
 	ret = gnutls_certificate_set_openpgp_key_file2
-	  (cert_cred, pgp_certfile, pgp_keyfile, info.pgp_subkey, GNUTLS_OPENPGP_FMT_BASE64);
+	  (cert_cred, pgp_certfile, pgp_keyfile, info.pgp_subkey,
+	   GNUTLS_OPENPGP_FMT_BASE64);
       else
 	ret = gnutls_certificate_set_openpgp_key_file
 	  (cert_cred, pgp_certfile, pgp_keyfile, GNUTLS_OPENPGP_FMT_BASE64);
@@ -1151,8 +1160,9 @@ main (int argc, char **argv)
 		    if (verbose == 0)
 		      {
 			printf ("\n* connection from %s, port %d\n",
-				addr_ntop ((struct sockaddr *)&client_address, calen,
-					   topbuf, sizeof (topbuf)),
+				addr_ntop ((struct sockaddr *)
+					   &client_address, calen, topbuf,
+					   sizeof (topbuf)),
 				get_port (&client_address));
 			print_info (j->tls_session, NULL, 1);
 		      }
@@ -1247,8 +1257,9 @@ main (int argc, char **argv)
 		    if (verbose == 0)
 		      {
 			printf ("- connection from %s, port %d\n",
-				addr_ntop ((struct sockaddr*) &client_address, calen,
-					   topbuf, sizeof (topbuf)),
+				addr_ntop ((struct sockaddr *)
+					   &client_address, calen, topbuf,
+					   sizeof (topbuf)),
 				get_port (&client_address));
 
 			print_info (j->tls_session, NULL, 1);

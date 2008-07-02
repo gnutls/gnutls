@@ -97,7 +97,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
 	}
 
       ret = _gnutls_rnd (RND_RANDOM, ps, psize);
-      if ( ret < 0)
+      if (ret < 0)
 	{
 	  gnutls_assert ();
 	  gnutls_free (edata);
@@ -141,9 +141,11 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
   to_encrypt.size = k;
 
   if (btype == 2)		/* encrypt */
-    ret = _gnutls_pk_encrypt (GNUTLS_PK_RSA, &encrypted, &to_encrypt, &pk_params);
+    ret =
+      _gnutls_pk_encrypt (GNUTLS_PK_RSA, &encrypted, &to_encrypt, &pk_params);
   else				/* sign */
-    ret = _gnutls_pk_sign (GNUTLS_PK_RSA, &encrypted, &to_encrypt, &pk_params);
+    ret =
+      _gnutls_pk_sign (GNUTLS_PK_RSA, &encrypted, &to_encrypt, &pk_params);
 
   gnutls_free (edata);
 
@@ -185,7 +187,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  memcpy( &ciphertext->data[pad], encrypted.data, encrypted.size);
+  memcpy (&ciphertext->data[pad], encrypted.data, encrypted.size);
   for (i = 0; i < pad; i++)
     ciphertext->data[i] = 0;
 
@@ -233,11 +235,13 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
    */
   if (btype == 2)
     {
-      ret = _gnutls_pk_decrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
+      ret =
+	_gnutls_pk_decrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
     }
   else
     {
-      ret = _gnutls_pk_encrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
+      ret =
+	_gnutls_pk_encrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
     }
 
   if (ret < 0)
@@ -284,16 +288,16 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
 	  if (plaintext->data[i] != 0xff)
 	    {
 	      _gnutls_handshake_log ("PKCS #1 padding error");
-	      _gnutls_free_datum( plaintext);
+	      _gnutls_free_datum (plaintext);
 	      /* PKCS #1 padding error.  Don't use
-		 GNUTLS_E_PKCS1_WRONG_PAD here.  */
+	         GNUTLS_E_PKCS1_WRONG_PAD here.  */
 	      break;
 	    }
 	}
       break;
     default:
       gnutls_assert ();
-      _gnutls_free_datum( plaintext);
+      _gnutls_free_datum (plaintext);
       break;
     }
   i++;
@@ -301,11 +305,11 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
   if (ret < 0)
     {
       gnutls_assert ();
-      _gnutls_free_datum( plaintext);
+      _gnutls_free_datum (plaintext);
       return GNUTLS_E_DECRYPTION_FAILED;
     }
-    
-  memmove(plaintext->data, &plaintext->data[i], esize - i);
+
+  memmove (plaintext->data, &plaintext->data[i], esize - i);
   plaintext->size = esize - i;
 
   return 0;
@@ -434,7 +438,8 @@ _gnutls_dsa_sign (gnutls_datum_t * signature,
 /* decodes the Dss-Sig-Value structure
  */
 int
-_gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r, bigint_t * s)
+_gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
+		       bigint_t * s)
 {
   ASN1_TYPE sig;
   int result;
@@ -511,78 +516,95 @@ _gnutls_dsa_verify (const gnutls_datum_t * vdata,
 }
 
 /* some generic pk functions */
-static
-int _generate_params(int algo, bigint_t * resarr, unsigned int *resarr_len, int bits)
+static int
+_generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
+		  int bits)
 {
-gnutls_pk_params_st params;
-int ret;
-unsigned int i;
-	
-	ret = _gnutls_pk_ops.generate( GNUTLS_PK_RSA, bits, &params);
+  gnutls_pk_params_st params;
+  int ret;
+  unsigned int i;
 
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+  ret = _gnutls_pk_ops.generate (GNUTLS_PK_RSA, bits, &params);
 
-	if (resarr && resarr_len && *resarr_len > params.params_nr) {
-		*resarr_len = params.params_nr;
-		for (i=0;i<params.params_nr;i++)
-			resarr[i] = params.params[i];
-	} else {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-	return 0;
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  if (resarr && resarr_len && *resarr_len > params.params_nr)
+    {
+      *resarr_len = params.params_nr;
+      for (i = 0; i < params.params_nr; i++)
+	resarr[i] = params.params[i];
+    }
+  else
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+  return 0;
 }
 
 
 
-int _gnutls_rsa_generate_params (bigint_t * resarr, unsigned int *resarr_len, int bits)
+int
+_gnutls_rsa_generate_params (bigint_t * resarr, unsigned int *resarr_len,
+			     int bits)
 {
-	return _generate_params( GNUTLS_PK_RSA, resarr, resarr_len, bits);
+  return _generate_params (GNUTLS_PK_RSA, resarr, resarr_len, bits);
 }
 
-int _gnutls_dsa_generate_params (bigint_t * resarr, unsigned int *resarr_len, int bits)
+int
+_gnutls_dsa_generate_params (bigint_t * resarr, unsigned int *resarr_len,
+			     int bits)
 {
-	return _generate_params( GNUTLS_PK_DSA, resarr, resarr_len, bits);
+  return _generate_params (GNUTLS_PK_DSA, resarr, resarr_len, bits);
 }
 
-int _gnutls_pk_params_copy( gnutls_pk_params_st* dst, bigint_t* params, int params_len)
+int
+_gnutls_pk_params_copy (gnutls_pk_params_st * dst, bigint_t * params,
+			int params_len)
 {
-int i,j;
-	dst->params_nr = 0;
+  int i, j;
+  dst->params_nr = 0;
 
-	dst->params = gnutls_malloc( sizeof(bigint_t)*params_len);
-	if (dst->params == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+  dst->params = gnutls_malloc (sizeof (bigint_t) * params_len);
+  if (dst->params == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  for (i = 0; i < params_len; i++)
+    {
+      dst->params[i] = _gnutls_mpi_set (NULL, params[i]);
+      if (dst->params[i] == NULL)
+	{
+	  for (j = 0; j < i; j++)
+	    _gnutls_mpi_release (&dst->params[j]);
+	  return GNUTLS_E_MEMORY_ERROR;
 	}
+      dst->params_nr++;
+    }
 
-	for (i=0;i<params_len;i++) {
-		dst->params[i] = _gnutls_mpi_set( NULL, params[i]);
-		if (dst->params[i] == NULL) {
-			for (j=0;j<i;j++)
-				_gnutls_mpi_release( &dst->params[j]);
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		dst->params_nr++;
-	}
-	
-	return 0;
+  return 0;
 }
 
-void gnutls_pk_params_init( gnutls_pk_params_st* p)
+void
+gnutls_pk_params_init (gnutls_pk_params_st * p)
 {
-	memset( p, 0, sizeof(gnutls_pk_params_st));
+  memset (p, 0, sizeof (gnutls_pk_params_st));
 }
 
-void gnutls_pk_params_release( gnutls_pk_params_st* p)
+void
+gnutls_pk_params_release (gnutls_pk_params_st * p)
 {
-unsigned int i;
-	for (i=0;i<p->params_nr;i++) {
-		_gnutls_mpi_release( &p->params[i]);
-	}
-	gnutls_free( p->params);
-	p->params = NULL;
+  unsigned int i;
+  for (i = 0; i < p->params_nr; i++)
+    {
+      _gnutls_mpi_release (&p->params[i]);
+    }
+  gnutls_free (p->params);
+  p->params = NULL;
 }

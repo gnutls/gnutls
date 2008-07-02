@@ -190,7 +190,7 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
       gnutls_assert ();
       return ret;
     }
-  
+
   params->params[0] = group.g;
   params->params[1] = group.p;
 
@@ -475,7 +475,7 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
       *params_data_size = result - 1;
 
       if (params_data)
-        memcpy (params_data, out, result);
+	memcpy (params_data, out, result);
 
       gnutls_free (out);
 
@@ -512,15 +512,15 @@ gnutls_dh_params_export_raw (gnutls_dh_params_t params,
   ret = _gnutls_mpi_dprint (params->params[1], generator);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
   ret = _gnutls_mpi_dprint (params->params[0], prime);
   if (ret < 0)
     {
-      gnutls_assert();
-      _gnutls_free_datum(generator);
+      gnutls_assert ();
+      _gnutls_free_datum (generator);
       return ret;
     }
 

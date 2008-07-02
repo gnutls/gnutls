@@ -50,10 +50,10 @@ static const char cert_pem[] =
   "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-  "dc8Siq5JojruiMizAf0pA7in\n"
-  "-----END CERTIFICATE-----\n";
-static const gnutls_datum_t cert_datum = { (char *)cert_pem,
-					   sizeof (cert_pem) };
+  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
+static const gnutls_datum_t cert_datum = { (char *) cert_pem,
+  sizeof (cert_pem)
+};
 
 void
 doit (void)
@@ -67,7 +67,7 @@ doit (void)
 
   gnutls_global_init ();
 
-  if (gnutls_x509_crt_init(&cert) == 0)
+  if (gnutls_x509_crt_init (&cert) == 0)
     success ("success: cert init\n");
   else
     fail ("cert init failure\n");
@@ -87,8 +87,7 @@ doit (void)
   if (rv == 0)
     success ("success: exported subject DN.\n");
   else
-    fail ("FAIL: could not export subject DN: %s\n",
-	  gnutls_strerror (rv));
+    fail ("FAIL: could not export subject DN: %s\n", gnutls_strerror (rv));
 
   if (gnutls_x509_dn_init (&dn2) == 0)
     success ("success: init DN.\n");
@@ -108,8 +107,7 @@ doit (void)
   if (rv == 0)
     success ("success: exported subject DN.\n");
   else
-    fail ("FAIL: could not export subject DN: %s\n",
-	  gnutls_strerror (rv));
+    fail ("FAIL: could not export subject DN: %s\n", gnutls_strerror (rv));
 
   if (buflen == buf2len && memcmp (buf, buf2, buflen) == 0)
     success ("success: export/import/export match.\n");

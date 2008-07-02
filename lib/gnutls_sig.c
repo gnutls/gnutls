@@ -59,7 +59,8 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
   digest_hd_st td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
-  ret = _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
+  ret =
+    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -76,8 +77,9 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 	}
 
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-					 session->security_parameters.
-					 master_secret, TLS_MASTER_SIZE);
+					 session->
+					 security_parameters.master_secret,
+					 TLS_MASTER_SIZE);
     }
   else
     _gnutls_hash_deinit (&td_sha, &concat[16]);
@@ -85,7 +87,9 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
   switch (cert->subject_pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      ret = _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle_md5);
+      ret =
+	_gnutls_hash_copy (&td_md5,
+			   &session->internals.handshake_mac_handle_md5);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -94,8 +98,9 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 
       if (ver == GNUTLS_SSL3)
 	_gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-					   session->security_parameters.
-					   master_secret, TLS_MASTER_SIZE);
+					   session->
+					   security_parameters.master_secret,
+					   TLS_MASTER_SIZE);
       else
 	_gnutls_hash_deinit (&td_md5, concat);
 
@@ -155,7 +160,7 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
 	{
 	  digest_hd_st td_md5;
 
-	  ret =_gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
+	  ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -185,8 +190,7 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
 #else
 	  /* No parameters field. */
 	  memcpy (concat,
-		  "\x30\x1f\x30\x07\x06\x05\x2b\x0e\x03\x02\x1a\x04\x14",
-		  13);
+		  "\x30\x1f\x30\x07\x06\x05\x2b\x0e\x03\x02\x1a\x04\x14", 13);
 	  _gnutls_hash_deinit (&td_sha, &concat[13]);
 	  dconcat.size = 33;
 #endif
@@ -284,8 +288,7 @@ _gnutls_tls_sign (gnutls_session_t session,
 
       return (*session->internals.sign_func)
 	(session, session->internals.sign_func_userdata,
-	 cert->cert_type, &cert->raw,
-	 hash_concat, signature);
+	 cert->cert_type, &cert->raw, hash_concat, signature);
     }
 
   return _gnutls_sign (pkey->pk_algorithm, pkey->params,
@@ -295,8 +298,7 @@ _gnutls_tls_sign (gnutls_session_t session,
 static int
 _gnutls_verify_sig (gnutls_cert * cert,
 		    const gnutls_datum_t * hash_concat,
-		    gnutls_datum_t * signature,
-		    size_t sha1pos)
+		    gnutls_datum_t * signature, size_t sha1pos)
 {
   int ret;
   gnutls_datum_t vdata;
@@ -375,14 +377,16 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
   gnutls_datum_t dconcat;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
-  ret = _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle_md5);
+  ret =
+    _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle_md5);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
+  ret =
+    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -400,11 +404,13 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
 	}
 
       _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-					 session->security_parameters.
-					 master_secret, TLS_MASTER_SIZE);
+					 session->
+					 security_parameters.master_secret,
+					 TLS_MASTER_SIZE);
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-					 session->security_parameters.
-					 master_secret, TLS_MASTER_SIZE);
+					 session->
+					 security_parameters.master_secret,
+					 TLS_MASTER_SIZE);
     }
   else
     {
@@ -462,7 +468,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
     {
       gnutls_assert ();
       if (ver < GNUTLS_TLS1_2)
-        _gnutls_hash_deinit (&td_md5, NULL);
+	_gnutls_hash_deinit (&td_md5, NULL);
       return ret;
     }
 
@@ -490,8 +496,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
 #else
       /* No parameters field. */
       memcpy (concat,
-	      "\x30\x1f\x30\x07\x06\x05\x2b\x0e\x03\x02\x1a\x04\x14",
-	      13);
+	      "\x30\x1f\x30\x07\x06\x05\x2b\x0e\x03\x02\x1a\x04\x14", 13);
       _gnutls_hash_deinit (&td_sha, &concat[13]);
       dconcat.size = 33;
 #endif

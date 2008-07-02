@@ -33,27 +33,27 @@
 #include "filters.h"
 
 static cdk_error_t
-hash_encode (void *opaque, FILE *in, FILE *out)
+hash_encode (void *opaque, FILE * in, FILE * out)
 {
   md_filter_t *mfx = opaque;
   byte buf[BUFSIZE];
   int err;
   int nread;
-  
+
   if (!mfx)
     return CDK_Inv_Value;
-  
+
   _cdk_log_debug ("hash filter: encode algo=%d\n", mfx->digest_algo);
-  
+
   if (!mfx->md_initialized)
     {
       err = _gnutls_hash_init (&mfx->md, mfx->digest_algo);
       if (err < 0)
 	return map_gnutls_error (err);
-      
+
       mfx->md_initialized = 1;
     }
-  
+
   while (!feof (in))
     {
       nread = fread (buf, 1, BUFSIZE, in);
@@ -61,26 +61,26 @@ hash_encode (void *opaque, FILE *in, FILE *out)
 	break;
       _gnutls_hash (&mfx->md, buf, nread);
     }
-  
+
   wipemem (buf, sizeof (buf));
   return 0;
 }
 
 cdk_error_t
-_cdk_filter_hash (void *opaque, int ctl, FILE *in, FILE *out)
+_cdk_filter_hash (void *opaque, int ctl, FILE * in, FILE * out)
 {
   if (ctl == STREAMCTL_READ)
     return hash_encode (opaque, in, out);
   else if (ctl == STREAMCTL_FREE)
     {
       md_filter_t *mfx = opaque;
-      if (mfx) 
+      if (mfx)
 	{
 	  _cdk_log_debug ("free hash filter\n");
 	  _gnutls_hash_deinit (&mfx->md, NULL);
 	  mfx->md_initialized = 0;
 	  return 0;
-        }   
+	}
     }
   return CDK_Inv_Mode;
 }

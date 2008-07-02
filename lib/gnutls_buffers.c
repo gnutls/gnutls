@@ -310,12 +310,12 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 
       if (session->internals._gnutls_pull_func == NULL)
 	{
-	  i = recv (GNUTLS_POINTER_TO_INT(fd), &ptr[sizeOfPtr - left],
+	  i = recv (GNUTLS_POINTER_TO_INT (fd), &ptr[sizeOfPtr - left],
 		    left, flags);
 #if HAVE_WINSOCK
 	  if (i < 0)
 	    {
-	      int tmperr = WSAGetLastError();
+	      int tmperr = WSAGetLastError ();
 	      switch (tmperr)
 		{
 		case WSAEWOULDBLOCK:
@@ -330,7 +330,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 		  session->internals.errnum = EIO;
 		  break;
 		}
-	      WSASetLastError(tmperr);
+	      WSASetLastError (tmperr);
 	    }
 #endif
 	}
@@ -777,11 +777,11 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 
       if (session->internals._gnutls_push_func == NULL)
 	{
-	  i = send (GNUTLS_POINTER_TO_INT(fd), &ptr[n - left], left, 0);
+	  i = send (GNUTLS_POINTER_TO_INT (fd), &ptr[n - left], left, 0);
 #if HAVE_WINSOCK
 	  if (i < 0)
 	    {
-	      int tmperr = WSAGetLastError();
+	      int tmperr = WSAGetLastError ();
 	      switch (tmperr)
 		{
 		case WSAEWOULDBLOCK:
@@ -796,7 +796,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 		  session->internals.errnum = EIO;
 		  break;
 		}
-	      WSASetLastError(tmperr);
+	      WSASetLastError (tmperr);
 	    }
 #endif
 	}
@@ -813,8 +813,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 	      session->internals.record_send_buffer_prev_size += n - left;
 
 	      retval =
-		_gnutls_buffer_insert (&session->internals.
-				       record_send_buffer,
+		_gnutls_buffer_insert (&session->internals.record_send_buffer,
 				       &ptr[n - left], left);
 	      if (retval < 0)
 		{
@@ -1027,8 +1026,8 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
 	      gnutls_assert ();
 
 	      retval =
-		_gnutls_buffer_insert (&session->internals.
-				       handshake_send_buffer,
+		_gnutls_buffer_insert (&session->
+				       internals.handshake_send_buffer,
 				       &ptr[n - left], left);
 	      if (retval < 0)
 		{
@@ -1100,8 +1099,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	  session->internals.handshake_recv_buffer.length -= sizeOfPtr;
 
 	  memmove (session->internals.handshake_recv_buffer.data,
-		   &session->internals.handshake_recv_buffer.
-		   data[sizeOfPtr],
+		   &session->internals.handshake_recv_buffer.data[sizeOfPtr],
 		   session->internals.handshake_recv_buffer.length);
 
 	  return sizeOfPtr;
@@ -1130,8 +1128,8 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	      gnutls_assert ();
 
 	      session->internals.handshake_recv_buffer.data =
-		gnutls_realloc_fast (session->internals.
-				     handshake_recv_buffer.data, dsize);
+		gnutls_realloc_fast (session->internals.handshake_recv_buffer.
+				     data, dsize);
 	      if (session->internals.handshake_recv_buffer.data == NULL)
 		{
 		  gnutls_assert ();

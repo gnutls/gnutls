@@ -296,10 +296,10 @@ gnutls_global_init (void)
     }
 
   /* Initialize the random generator */
-  result = _gnutls_rnd_init();
+  result = _gnutls_rnd_init ();
   if (result < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       goto out;
     }
 
@@ -325,10 +325,10 @@ gnutls_global_deinit (void)
 #if HAVE_WINSOCK
       WSACleanup ();
 #endif
-      _gnutls_rnd_deinit();
+      _gnutls_rnd_deinit ();
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);
-      _gnutls_crypto_deregister();
+      _gnutls_crypto_deregister ();
     }
   _gnutls_init--;
 }

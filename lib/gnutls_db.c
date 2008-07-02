@@ -159,8 +159,8 @@ gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
     if (timestamp -
 	((security_parameters_st *) (session_entry.data))->timestamp <=
 	session->internals.expire_time
-	|| ((security_parameters_st *) (session_entry.data))->
-	timestamp > timestamp
+	|| ((security_parameters_st *) (session_entry.data))->timestamp >
+	timestamp
 	|| ((security_parameters_st *) (session_entry.data))->timestamp == 0)
       return GNUTLS_E_EXPIRED;
 

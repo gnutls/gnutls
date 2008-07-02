@@ -34,8 +34,7 @@
 
 int
 oprfi_recv_server (gnutls_session_t session,
-		   const opaque * data,
-		   size_t _data_size)
+		   const opaque * data, size_t _data_size)
 {
   ssize_t data_size = _data_size;
   uint16_t len;
@@ -72,8 +71,7 @@ oprfi_recv_server (gnutls_session_t session,
 
 int
 oprfi_recv_client (gnutls_session_t session,
-		   const opaque * data,
-		   size_t _data_size)
+		   const opaque * data, size_t _data_size)
 {
   ssize_t data_size = _data_size;
   uint16_t len;
@@ -116,8 +114,7 @@ oprfi_recv_client (gnutls_session_t session,
 
 int
 _gnutls_oprfi_recv_params (gnutls_session_t session,
-			   const opaque * data,
-			   size_t data_size)
+			   const opaque * data, size_t data_size)
 {
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     return oprfi_recv_client (session, data, data_size);
@@ -126,9 +123,7 @@ _gnutls_oprfi_recv_params (gnutls_session_t session,
 }
 
 int
-oprfi_send_client (gnutls_session_t session,
-		   opaque * data,
-		   size_t _data_size)
+oprfi_send_client (gnutls_session_t session, opaque * data, size_t _data_size)
 {
   opaque *p = data;
   ssize_t data_size = _data_size;
@@ -149,9 +144,7 @@ oprfi_send_client (gnutls_session_t session,
 }
 
 int
-oprfi_send_server (gnutls_session_t session,
-		   opaque * data,
-		   size_t _data_size)
+oprfi_send_server (gnutls_session_t session, opaque * data, size_t _data_size)
 {
   opaque *p = data;
   int ret;
@@ -187,12 +180,13 @@ oprfi_send_server (gnutls_session_t session,
     }
 
   DECR_LENGTH_RET (data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
-  _gnutls_write_uint16 (session->security_parameters.
-			extensions.oprfi_server_len, p);
+  _gnutls_write_uint16 (session->security_parameters.extensions.
+			oprfi_server_len, p);
   p += 2;
 
-  DECR_LENGTH_RET (data_size, session->security_parameters.
-		   extensions.oprfi_server_len, GNUTLS_E_SHORT_MEMORY_BUFFER);
+  DECR_LENGTH_RET (data_size,
+		   session->security_parameters.extensions.oprfi_server_len,
+		   GNUTLS_E_SHORT_MEMORY_BUFFER);
 
   memcpy (p, session->security_parameters.extensions.oprfi_server,
 	  session->security_parameters.extensions.oprfi_server_len);
@@ -202,8 +196,7 @@ oprfi_send_server (gnutls_session_t session,
 
 int
 _gnutls_oprfi_send_params (gnutls_session_t session,
-			   opaque * data,
-			   size_t data_size)
+			   opaque * data, size_t data_size)
 {
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     return oprfi_send_client (session, data, data_size);
@@ -226,8 +219,7 @@ _gnutls_oprfi_send_params (gnutls_session_t session,
  **/
 void
 gnutls_oprfi_enable_client (gnutls_session_t session,
-			    size_t len,
-			    unsigned char *data)
+			    size_t len, unsigned char *data)
 {
   session->security_parameters.extensions.oprfi_client_len = len;
   session->security_parameters.extensions.oprfi_client = data;
@@ -255,8 +247,7 @@ gnutls_oprfi_enable_client (gnutls_session_t session,
  **/
 void
 gnutls_oprfi_enable_server (gnutls_session_t session,
-			    gnutls_oprfi_callback_func cb,
-			    void *userdata)
+			    gnutls_oprfi_callback_func cb, void *userdata)
 {
   session->security_parameters.extensions.oprfi_cb = cb;
   session->security_parameters.extensions.oprfi_userdata = userdata;

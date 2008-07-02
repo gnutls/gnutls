@@ -53,8 +53,7 @@ const static char castr[] =
   "Viyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAiaIRqGfp1jPpNeVhABK60SU0KIAy\r\n"
   "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\r\n"
   "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\r\n"
-  "PfqUpIhz5Bbm7J4=\r\n"
-  "-----END CERTIFICATE-----\r\n";
+  "PfqUpIhz5Bbm7J4=\r\n" "-----END CERTIFICATE-----\r\n";
 
 void
 doit (void)
@@ -63,7 +62,7 @@ doit (void)
   gnutls_certificate_credentials_t cred;
   gnutls_datum_t ca = { castr, sizeof (castr) };
 
-  gnutls_global_init();
+  gnutls_global_init ();
 
   rc = gnutls_certificate_allocate_credentials (&cred);
   if (rc)
@@ -75,7 +74,7 @@ doit (void)
 
   gnutls_certificate_free_credentials (cred);
 
-  gnutls_global_deinit();
+  gnutls_global_deinit ();
 
   success ("import ok\n");
 }

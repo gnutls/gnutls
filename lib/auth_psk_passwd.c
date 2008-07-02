@@ -79,7 +79,7 @@ pwd_put_values (gnutls_datum_t * psk, char *str)
     }
 
   ret = _gnutls_hex2bin ((opaque *) p, len, psk->data, &size);
-  psk->size = (unsigned int)size;
+  psk->size = (unsigned int) size;
   if (ret < 0)
     {
       gnutls_assert ();
@@ -99,7 +99,7 @@ static int
 _randomize_psk (gnutls_datum_t * psk)
 {
   int ret;
-  
+
   psk->data = gnutls_malloc (16);
   if (psk->data == NULL)
     {
@@ -108,14 +108,14 @@ _randomize_psk (gnutls_datum_t * psk)
     }
 
   psk->size = 16;
-  
+
   ret = _gnutls_rnd (RND_NONCE, (char *) psk->data, 16);
-  if ( ret < 0)
+  if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
-    
+
   return 0;
 }
 

@@ -116,8 +116,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
 
   adv_version = _gnutls_version_get (data[pos], data[pos + 1]);
 
-  ret = _gnutls_negotiate_version( session, adv_version);
-  if (ret < 0) 
+  ret = _gnutls_negotiate_version (session, adv_version);
+  if (ret < 0)
     {
       gnutls_assert ();
       return ret;
@@ -154,10 +154,10 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
 
   /* call the user hello callback
    */
-  ret = _gnutls_user_hello_func( session, adv_version);
-  if (ret < 0) 
+  ret = _gnutls_user_hello_func (session, adv_version);
+  if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
@@ -177,8 +177,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
    */
   if (_gnutls_get_kx_cred
       (session,
-       _gnutls_cipher_suite_get_kx_algo (&session->security_parameters.
-					 current_cipher_suite),
+       _gnutls_cipher_suite_get_kx_algo (&session->
+					 security_parameters.current_cipher_suite),
        &err) == NULL && err != 0)
     {
       gnutls_assert ();
@@ -191,8 +191,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
    */
   session->internals.auth_struct =
     _gnutls_kx_auth_struct (_gnutls_cipher_suite_get_kx_algo
-			    (&session->security_parameters.
-			     current_cipher_suite));
+			    (&session->
+			     security_parameters.current_cipher_suite));
   if (session->internals.auth_struct == NULL)
     {
 
@@ -232,24 +232,21 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   ret = _gnutls_server_restore_session (session, session_id, session_id_len);
 
   if (ret == 0)
-    { /* resumed! */
+    {				/* resumed! */
       /* get the new random values */
-      memcpy (session->internals.resumed_security_parameters.
-	      server_random, session->security_parameters.server_random,
-	      TLS_RANDOM_SIZE);
-      memcpy (session->internals.resumed_security_parameters.
-	      client_random, session->security_parameters.client_random,
-	      TLS_RANDOM_SIZE);
+      memcpy (session->internals.resumed_security_parameters.server_random,
+	      session->security_parameters.server_random, TLS_RANDOM_SIZE);
+      memcpy (session->internals.resumed_security_parameters.client_random,
+	      session->security_parameters.client_random, TLS_RANDOM_SIZE);
 
       session->internals.resumed = RESUME_TRUE;
       return 0;
     }
   else
     {
-      _gnutls_generate_session_id (session->security_parameters.
-				   session_id,
-				   &session->security_parameters.
-				   session_id_size);
+      _gnutls_generate_session_id (session->security_parameters.session_id,
+				   &session->
+				   security_parameters.session_id_size);
       session->internals.resumed = RESUME_FALSE;
     }
 

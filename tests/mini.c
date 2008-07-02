@@ -179,21 +179,23 @@ doit (void)
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
 
-  do {
-    if (cret == GNUTLS_E_AGAIN)
-      {
-	success ("loop invoking client:\n");
-	cret = gnutls_handshake (client);
-	success ("client %d: %s\n", cret, gnutls_strerror (cret));
-      }
+  do
+    {
+      if (cret == GNUTLS_E_AGAIN)
+	{
+	  success ("loop invoking client:\n");
+	  cret = gnutls_handshake (client);
+	  success ("client %d: %s\n", cret, gnutls_strerror (cret));
+	}
 
-    if (sret == GNUTLS_E_AGAIN)
-      {
-	success ("loop invoking server:\n");
-	sret = gnutls_handshake (server);
-	success ("server %d: %s\n", sret, gnutls_strerror (sret));
-      }
-  } while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
+      if (sret == GNUTLS_E_AGAIN)
+	{
+	  success ("loop invoking server:\n");
+	  sret = gnutls_handshake (server);
+	  success ("server %d: %s\n", sret, gnutls_strerror (sret));
+	}
+    }
+  while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
 
   success ("Handshake established\n");
 

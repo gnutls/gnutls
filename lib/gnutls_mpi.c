@@ -39,55 +39,60 @@
 #define clearbit(v,n)    ((unsigned char)(v) & ~( (unsigned char)(1) << (unsigned)(n)))
 
 /* FIXME: test this function */
-bigint_t _gnutls_mpi_randomize( bigint_t r, unsigned int bits, gnutls_rnd_level_t level)
+bigint_t
+_gnutls_mpi_randomize (bigint_t r, unsigned int bits,
+		       gnutls_rnd_level_t level)
 {
-opaque * buf = NULL;
-int size = 1+(bits/8), ret;
-int rem, i;
-bigint_t tmp;
+  opaque *buf = NULL;
+  int size = 1 + (bits / 8), ret;
+  int rem, i;
+  bigint_t tmp;
 
-  buf = gnutls_malloc( size);
+  buf = gnutls_malloc (size);
   if (buf == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return NULL;
     }
 
-  ret = _gnutls_rnd( level, buf, size);
+  ret = _gnutls_rnd (level, buf, size);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       goto cleanup;
     }
-  
+
   /* mask the bits that weren't requested */
   rem = bits % 8;
 
-  if (rem == 0) {
-    buf[0]=0;
-  } else {
-    for (i=8;i>=rem;i--)
-      buf[0]=clearbit(buf[0], i);
-  }
-
-  ret = _gnutls_mpi_scan ( &tmp, buf, size);
-  if (ret < 0) 
+  if (rem == 0)
     {
-      gnutls_assert();
+      buf[0] = 0;
+    }
+  else
+    {
+      for (i = 8; i >= rem; i--)
+	buf[0] = clearbit (buf[0], i);
+    }
+
+  ret = _gnutls_mpi_scan (&tmp, buf, size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
       goto cleanup;
     }
-    
-  if (r != NULL) 
+
+  if (r != NULL)
     {
-      _gnutls_mpi_set(r, tmp);
-      _gnutls_mpi_release( &tmp);
+      _gnutls_mpi_set (r, tmp);
+      _gnutls_mpi_release (&tmp);
       return r;
     }
 
   return tmp;
-  
+
 cleanup:
-  gnutls_free(buf);
+  gnutls_free (buf);
   return NULL;
 }
 
@@ -104,26 +109,27 @@ _gnutls_mpi_release (bigint_t * x)
 /* returns zero on success
  */
 int
-_gnutls_mpi_scan (bigint_t * ret_mpi, const void * buffer, size_t nbytes)
+_gnutls_mpi_scan (bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 {
-  *ret_mpi = _gnutls_mpi_ops.bigint_scan (buffer, nbytes, GNUTLS_MPI_FORMAT_USG);
+  *ret_mpi =
+    _gnutls_mpi_ops.bigint_scan (buffer, nbytes, GNUTLS_MPI_FORMAT_USG);
   if (*ret_mpi == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
-  
+
   return 0;
 }
 
 /* returns zero on success. Fails if the number is zero.
  */
 int
-_gnutls_mpi_scan_nz (bigint_t *ret_mpi, const void * buffer, size_t nbytes)
+_gnutls_mpi_scan_nz (bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 {
-int ret;
+  int ret;
 
-  ret = _gnutls_mpi_scan(ret_mpi, buffer, nbytes);
+  ret = _gnutls_mpi_scan (ret_mpi, buffer, nbytes);
   if (ret < 0)
     return ret;
 
@@ -139,15 +145,16 @@ int ret;
 }
 
 int
-_gnutls_mpi_scan_pgp (bigint_t *ret_mpi, const void * buffer, size_t nbytes)
+_gnutls_mpi_scan_pgp (bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 {
-  *ret_mpi = _gnutls_mpi_ops.bigint_scan (buffer, nbytes, GNUTLS_MPI_FORMAT_PGP);
+  *ret_mpi =
+    _gnutls_mpi_ops.bigint_scan (buffer, nbytes, GNUTLS_MPI_FORMAT_PGP);
   if (*ret_mpi == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
-  
+
   return 0;
 }
 
@@ -226,19 +233,22 @@ _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest, size_t size)
 
   _gnutls_mpi_print (a, NULL, &bytes);
   if (bytes != 0)
-    buf = gnutls_malloc (MAX(size, bytes));
+    buf = gnutls_malloc (MAX (size, bytes));
   if (buf == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
-  dest->size = MAX(size, bytes);
+  dest->size = MAX (size, bytes);
 
-  if (bytes <= size) {
+  if (bytes <= size)
+    {
       size_t diff = size - bytes;
-      for (i=0;i<diff;i++)
-        buf[i] = 0;
-      ret = _gnutls_mpi_print(a, &buf[diff], &bytes);
-    } else {
-      ret = _gnutls_mpi_print(a, buf, &bytes);
+      for (i = 0; i < diff; i++)
+	buf[i] = 0;
+      ret = _gnutls_mpi_print (a, &buf[diff], &bytes);
+    }
+  else
+    {
+      ret = _gnutls_mpi_print (a, buf, &bytes);
     }
 
   if (ret < 0)
@@ -248,7 +258,7 @@ _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest, size_t size)
     }
 
   dest->data = buf;
-  dest->size = MAX(size, bytes);
+  dest->size = MAX (size, bytes);
   return 0;
 }
 
@@ -301,7 +311,8 @@ _gnutls_x509_read_int (ASN1_TYPE node, const char *value, bigint_t * ret_mpi)
 /* Writes the specified integer into the specified node.
  */
 int
-_gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi, int lz)
+_gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi,
+			int lz)
 {
   opaque *tmpstr;
   size_t s_len;

@@ -45,9 +45,10 @@ doit (void)
   int err;
 
   /* XXX: We need this to fix secure memory. */
-  gnutls_global_init();
+  gnutls_global_init ();
 
-  err = _gnutls_hmac_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
+  err =
+    _gnutls_hmac_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
   if (err < 0)
     fail ("_gnutls_hmac_fast(MD5) failed: %d\n", err);
   else
@@ -62,7 +63,9 @@ doit (void)
 	}
     }
 
-  err = _gnutls_hmac_fast (GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh", 8, digest);
+  err =
+    _gnutls_hmac_fast (GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh", 8,
+		       digest);
   if (err < 0)
     fail ("_gnutls_hmac_fast(SHA1) failed: %d\n", err);
   else
@@ -93,5 +96,5 @@ doit (void)
 	}
     }
 
-  gnutls_global_deinit();
+  gnutls_global_deinit ();
 }

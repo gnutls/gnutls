@@ -104,11 +104,13 @@ do_handshake (gnutls_session_t session)
 }
 
 static int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+
 static const int kx_priority[16] =
   { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_ANON_DH,
   GNUTLS_KX_RSA_EXPORT, 0
 };
+
 static const int cipher_priority[16] =
   { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128,
   GNUTLS_CIPHER_ARCFOUR_40, 0
@@ -154,7 +156,7 @@ ADD_CIPHER (gnutls_session_t session, int cipher)
 
 static void
 ADD_CIPHER4 (gnutls_session_t session, int cipher1, int cipher2, int cipher3,
-	int cipher4)
+	     int cipher4)
 {
   static int _cipher_priority[] = { 0, 0, 0, 0, 0 };
   _cipher_priority[0] = cipher1;
@@ -216,8 +218,8 @@ ADD_PROTOCOL3 (gnutls_session_t session, int p1, int p2, int p3)
 static int srp_detected;
 
 int
-_test_srp_username_callback (gnutls_session_t session, 
-    char **username, char **password)
+_test_srp_username_callback (gnutls_session_t session,
+			     char **username, char **password)
 {
   srp_detected = 1;
 
@@ -514,8 +516,8 @@ test_bye (gnutls_session_t session)
   old = siginterrupt (SIGALRM, 1);
   alarm (secs);
 #else
-  setsockopt ((int)gnutls_transport_get_ptr (session), SOL_SOCKET, SO_RCVTIMEO,
-	      (char *) &secs, sizeof (int));
+  setsockopt ((int) gnutls_transport_get_ptr (session), SOL_SOCKET,
+	      SO_RCVTIMEO, (char *) &secs, sizeof (int));
 #endif
 
   do
@@ -604,10 +606,10 @@ test_unknown_ciphersuites (gnutls_session_t session)
   int ret;
 #ifdef	ENABLE_CAMELLIA
   ADD_CIPHER4 (session, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_3DES_CBC,
-	GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_CIPHER_ARCFOUR_128);
+	       GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_CIPHER_ARCFOUR_128);
 #else
   ADD_CIPHER4 (session, GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_3DES_CBC,
-	GNUTLS_CIPHER_ARCFOUR_128, 0);
+	       GNUTLS_CIPHER_ARCFOUR_128, 0);
 #endif
   ADD_ALL_COMP (session);
   ADD_ALL_CERTTYPES (session);

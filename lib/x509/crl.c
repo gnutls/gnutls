@@ -324,7 +324,7 @@ gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl)
  **/
 int
 gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
-			       char *sig, size_t *sizeof_sig)
+			       char *sig, size_t * sizeof_sig)
 {
   int result;
   int bits;
@@ -506,8 +506,10 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  snprintf( serial_name, sizeof(serial_name), "tbsCertList.revokedCertificates.?%u.userCertificate", indx+1);
-  snprintf( date_name, sizeof(date_name), "tbsCertList.revokedCertificates.?%u.revocationDate", indx+1);
+  snprintf (serial_name, sizeof (serial_name),
+	    "tbsCertList.revokedCertificates.?%u.userCertificate", indx + 1);
+  snprintf (date_name, sizeof (date_name),
+	    "tbsCertList.revokedCertificates.?%u.revocationDate", indx + 1);
 
   _serial_size = *serial_size;
   result = asn1_read_value (crl->crl, serial_name, serial, &_serial_size);
@@ -639,8 +641,7 @@ gnutls_x509_crl_export (gnutls_x509_crl_t crl,
     }
 
   return _gnutls_x509_export_int (crl->crl, format, PEM_CRL,
-				  output_data,
-				  output_data_size);
+				  output_data, output_data_size);
 }
 
 /*-

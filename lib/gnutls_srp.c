@@ -220,7 +220,8 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
  * this is our shared key (server premaster secret)
  */
 bigint_t
-_gnutls_calc_srp_S1 (bigint_t A, bigint_t b, bigint_t u, bigint_t v, bigint_t n)
+_gnutls_calc_srp_S1 (bigint_t A, bigint_t b, bigint_t u, bigint_t v,
+		     bigint_t n)
 {
   bigint_t tmp1 = NULL, tmp2 = NULL;
   bigint_t S = NULL;
@@ -291,7 +292,7 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
   digest_hd_st td;
   opaque res[MAX_HASH_SIZE];
   int ret;
-  
+
   *size = 20;
 
   ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
@@ -333,7 +334,8 @@ _gnutls_calc_srp_x (char *username, char *password, opaque * salt,
  * this is our shared key (client premaster secret)
  */
 bigint_t
-_gnutls_calc_srp_S2 (bigint_t B, bigint_t g, bigint_t x, bigint_t a, bigint_t u, bigint_t n)
+_gnutls_calc_srp_S2 (bigint_t B, bigint_t g, bigint_t x, bigint_t a,
+		     bigint_t u, bigint_t n)
 {
   bigint_t S = NULL, tmp1 = NULL, tmp2 = NULL;
   bigint_t tmp4 = NULL, tmp3 = NULL, k = NULL;
@@ -626,8 +628,10 @@ gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
   * -1 indicates an error.
   **/
 void
-gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t cred,
-					    gnutls_srp_client_credentials_function * func)
+gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t
+					    cred,
+					    gnutls_srp_client_credentials_function
+					    * func)
 {
   cred->get_function = func;
 }

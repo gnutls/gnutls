@@ -109,8 +109,7 @@ static char ca_pem[] =
   "Viyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAiaIRqGfp1jPpNeVhABK60SU0KIAy\n"
   "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\n"
   "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\n"
-  "PfqUpIhz5Bbm7J4=\n"
-  "-----END CERTIFICATE-----\n";
+  "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca = { ca_pem, sizeof (ca_pem) };
 
 static char cert_pem[] =
@@ -126,8 +125,7 @@ static char cert_pem[] =
   "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-  "dc8Siq5JojruiMizAf0pA7in\n"
-  "-----END CERTIFICATE-----\n";
+  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t cert = { cert_pem, sizeof (cert_pem) };
 
 int
@@ -135,8 +133,7 @@ sign_func (gnutls_session_t session,
 	   void *userdata,
 	   gnutls_certificate_type_t cert_type,
 	   const gnutls_datum_t * cert,
-	   const gnutls_datum_t * hash,
-	   gnutls_datum_t * signature)
+	   const gnutls_datum_t * hash, gnutls_datum_t * signature)
 {
   gnutls_x509_privkey_t key;
   char key_pem[] =
@@ -172,7 +169,7 @@ sign_func (gnutls_session_t session,
 
   ret = 0;
 
- done:
+done:
   gnutls_x509_privkey_deinit (key);
   return ret;
 }
@@ -238,7 +235,7 @@ client (void)
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info(session);
+  print_info (session);
 
   gnutls_record_send (session, MSG, strlen (MSG));
 
@@ -347,11 +344,11 @@ static char server_cert_pem[] =
   "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
   "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
   "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
-  "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n"
-  "-----END CERTIFICATE-----\n";
+  "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
-				     sizeof (server_cert_pem) };
+  sizeof (server_cert_pem)
+};
 
 static char server_key_pem[] =
   "-----BEGIN RSA PRIVATE KEY-----\n"
@@ -371,7 +368,8 @@ static char server_key_pem[] =
   "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t server_key = { server_key_pem,
-				    sizeof (server_key_pem) };
+  sizeof (server_key_pem)
+};
 
 void
 server_start (void)
@@ -460,7 +458,7 @@ server (void)
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info(session);
+  print_info (session);
 
   i = 0;
   for (;;)

@@ -303,7 +303,7 @@ gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
   /* Step 2. Parse the CertificateSet 
    */
 
-  snprintf( root2, sizeof(root2), "certificates.?%u", indx+1);
+  snprintf (root2, sizeof (root2), "certificates.?%u", indx + 1);
 
   len = sizeof (oid) - 1;
 
@@ -440,8 +440,7 @@ gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
     return GNUTLS_E_INVALID_REQUEST;
 
   return _gnutls_x509_export_int (pkcs7->pkcs7, format, PEM_PKCS7,
-				  output_data,
-				  output_data_size);
+				  output_data, output_data_size);
 }
 
 /* Creates an empty signed data structure in the pkcs7
@@ -692,7 +691,7 @@ gnutls_pkcs7_delete_crt (gnutls_pkcs7_t pkcs7, int indx)
   /* Step 2. Delete the certificate.
    */
 
-  snprintf( root2, sizeof(root2), "certificates.?%u", indx+1);
+  snprintf (root2, sizeof (root2), "certificates.?%u", indx + 1);
 
   result = asn1_write_value (c2, root2, NULL, 0);
   if (result != ASN1_SUCCESS)
@@ -765,7 +764,7 @@ gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
   /* Step 2. Parse the CertificateSet 
    */
 
-  snprintf( root2, sizeof(root2), "crls.?%u", indx+1);
+  snprintf (root2, sizeof (root2), "crls.?%u", indx + 1);
 
   /* Get the raw CRL 
    */
@@ -1002,7 +1001,7 @@ gnutls_pkcs7_delete_crl (gnutls_pkcs7_t pkcs7, int indx)
   /* Step 2. Delete the crl.
    */
 
-  snprintf( root2, sizeof(root2), "crls.?%u", indx+1);
+  snprintf (root2, sizeof (root2), "crls.?%u", indx + 1);
 
   result = asn1_write_value (c2, root2, NULL, 0);
   if (result != ASN1_SUCCESS)

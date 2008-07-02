@@ -117,12 +117,12 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
 	    case 0:		/* NAME_DNS */
 	      if (len <= MAX_SERVER_NAME_SIZE)
 		{
-		  memcpy (session->security_parameters.extensions.
-			  server_names[i].name, p, len);
-		  session->security_parameters.extensions.
-		    server_names[i].name_length = len;
-		  session->security_parameters.extensions.
-		    server_names[i].type = GNUTLS_NAME_DNS;
+		  memcpy (session->security_parameters.
+			  extensions.server_names[i].name, p, len);
+		  session->security_parameters.extensions.server_names[i].
+		    name_length = len;
+		  session->security_parameters.extensions.server_names[i].
+		    type = GNUTLS_NAME_DNS;
 		  break;
 		}
 	    }
@@ -163,8 +163,8 @@ _gnutls_server_name_send_params (gnutls_session_t session,
 	  /* count the total size 
 	   */
 	  len =
-	    session->security_parameters.extensions.server_names[i].
-	    name_length;
+	    session->security_parameters.extensions.
+	    server_names[i].name_length;
 
 	  /* uint8_t + uint16_t + size 
 	   */
@@ -183,14 +183,14 @@ _gnutls_server_name_send_params (gnutls_session_t session,
 	   i < session->security_parameters.extensions.server_names_size; i++)
 	{
 
-	  switch (session->security_parameters.extensions.
-		  server_names[i].type)
+	  switch (session->security_parameters.extensions.server_names[i].
+		  type)
 	    {
 	    case GNUTLS_NAME_DNS:
 
 	      len =
-		session->security_parameters.extensions.
-		server_names[i].name_length;
+		session->security_parameters.extensions.server_names[i].
+		name_length;
 	      if (len == 0)
 		break;
 
@@ -208,8 +208,8 @@ _gnutls_server_name_send_params (gnutls_session_t session,
 	      p += 2;
 
 	      memcpy (p,
-		      session->security_parameters.extensions.
-		      server_names[i].name, len);
+		      session->security_parameters.extensions.server_names[i].
+		      name, len);
 	      p += len;
 	      break;
 	    default:
@@ -269,11 +269,11 @@ gnutls_server_name_get (gnutls_session_t session, void *data,
       session->security_parameters.extensions.server_names[indx].name_length)
     {
       *data_length =
-	session->security_parameters.extensions.server_names[indx].
-	name_length;
+	session->security_parameters.extensions.
+	server_names[indx].name_length;
       memcpy (data,
-	      session->security_parameters.extensions.server_names[indx].
-	      name, *data_length);
+	      session->security_parameters.extensions.server_names[indx].name,
+	      *data_length);
 
       if (*type == GNUTLS_NAME_DNS)	/* null terminate */
 	_data[(*data_length)] = 0;
@@ -282,8 +282,8 @@ gnutls_server_name_get (gnutls_session_t session, void *data,
   else
     {
       *data_length =
-	session->security_parameters.extensions.server_names[indx].
-	name_length;
+	session->security_parameters.extensions.
+	server_names[indx].name_length;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
@@ -331,8 +331,8 @@ gnutls_server_name_set (gnutls_session_t session,
 
   session->security_parameters.extensions.server_names[server_names -
 						       1].type = type;
-  memcpy (session->security_parameters.extensions.
-	  server_names[server_names - 1].name, name, name_length);
+  memcpy (session->security_parameters.
+	  extensions.server_names[server_names - 1].name, name, name_length);
   session->security_parameters.extensions.server_names[server_names -
 						       1].name_length =
     name_length;

@@ -123,11 +123,12 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
       k1++;
       /* create a string like "tbsCertList.issuer.rdnSequence.?1"
        */
-      if (asn1_rdn_name[0]!=0)
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name, k1);
+      if (asn1_rdn_name[0] != 0)
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name,
+		  k1);
       else
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
-      
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
+
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
 
@@ -150,10 +151,11 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 				 */
 	  k2++;
 
-          if (tmpbuffer1[0] != 0)
-  	    snprintf( tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1, k2);
-          else
-  	    snprintf( tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
+	  if (tmpbuffer1[0] != 0)
+	    snprintf (tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1,
+		      k2);
+	  else
+	    snprintf (tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
 
 	  /* Try to read the RelativeDistinguishedName attributes.
 	   */
@@ -261,7 +263,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 	  STR_APPEND (ldap_desc);
 	  STR_APPEND ("=");
 	  result = 0;
-	  
+
 	  if (printable)
 	    result =
 	      _gnutls_x509_oid_data2string (oid,
@@ -362,9 +364,10 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
       /* create a string like "tbsCertList.issuer.rdnSequence.?1"
        */
       if (asn1_rdn_name[0] != 0)
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name, k1);
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name,
+		  k1);
       else
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
 
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
@@ -389,10 +392,11 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
 				 */
 	  k2++;
 
-          if (tmpbuffer1[0] != 0)
-            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1, k2);
-          else
-            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
+	  if (tmpbuffer1[0] != 0)
+	    snprintf (tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1,
+		      k2);
+	  else
+	    snprintf (tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
 
 	  /* Try to read the RelativeDistinguishedName attributes.
 	   */
@@ -529,9 +533,10 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
       /* create a string like "tbsCertList.issuer.rdnSequence.?1"
        */
       if (asn1_rdn_name[0] != 0)
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name, k1);
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", asn1_rdn_name,
+		  k1);
       else
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
 
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
@@ -556,10 +561,11 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 				 */
 	  k2++;
 
-          if (tmpbuffer1[0] != 0)
-            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1, k2);
-          else
-            snprintf( tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
+	  if (tmpbuffer1[0] != 0)
+	    snprintf (tmpbuffer2, sizeof (tmpbuffer2), "%s.?%u", tmpbuffer1,
+		      k2);
+	  else
+	    snprintf (tmpbuffer2, sizeof (tmpbuffer2), "?%u", k2);
 
 	  /* Try to read the RelativeDistinguishedName attributes.
 	   */
@@ -956,7 +962,8 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
  *
  * Since: 2.4.0
  **/
-int gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
+int
+gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
 {
   int result;
   ASN1_TYPE dn = ASN1_TYPE_EMPTY;
@@ -991,8 +998,7 @@ int gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
  * Since: 2.4.0
  **/
 int
-gnutls_x509_dn_import (gnutls_x509_dn_t odn,
-		       const gnutls_datum_t * data)
+gnutls_x509_dn_import (gnutls_x509_dn_t odn, const gnutls_datum_t * data)
 {
   int result;
   char err[MAX_ERROR_DESCRIPTION_SIZE];
@@ -1002,7 +1008,7 @@ gnutls_x509_dn_import (gnutls_x509_dn_t odn,
   if (result != ASN1_SUCCESS)
     {
       /* couldn't decode DER */
-      _gnutls_x509_log("ASN.1 Decoding error: %s\n", err);
+      _gnutls_x509_log ("ASN.1 Decoding error: %s\n", err);
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
@@ -1024,7 +1030,7 @@ gnutls_x509_dn_deinit (gnutls_x509_dn_t idn)
 {
   ASN1_TYPE dn = idn;
 
-  asn1_delete_structure(&dn);
+  asn1_delete_structure (&dn);
 }
 
 /**
@@ -1246,7 +1252,7 @@ gnutls_x509_dn_export (gnutls_x509_dn_t dn,
 		       size_t * output_data_size)
 {
   ASN1_TYPE asn1 = dn;
-  
+
   if (asn1 == NULL)
     {
       gnutls_assert ();
@@ -1254,7 +1260,6 @@ gnutls_x509_dn_export (gnutls_x509_dn_t dn,
     }
 
   return _gnutls_x509_export_int_named (asn1, "rdnSequence",
-                                        format, "NAME",
-                                        output_data,
-                                        output_data_size);
+					format, "NAME",
+					output_data, output_data_size);
 }

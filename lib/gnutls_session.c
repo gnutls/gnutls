@@ -78,7 +78,7 @@ gnutls_session_get_data (gnutls_session_t session,
   ret = 0;
 
 error:
-  _gnutls_free_datum( &psession);
+  _gnutls_free_datum (&psession);
   return ret;
 }
 

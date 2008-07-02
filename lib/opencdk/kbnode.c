@@ -44,7 +44,7 @@ cdk_kbnode_t
 cdk_kbnode_new (cdk_packet_t pkt)
 {
   cdk_kbnode_t n;
-  
+
   n = cdk_calloc (1, sizeof *n);
   if (!n)
     return NULL;
@@ -73,8 +73,8 @@ void
 cdk_kbnode_release (cdk_kbnode_t node)
 {
   cdk_kbnode_t n2;
-  
-  while (node) 
+
+  while (node)
     {
       n2 = node->next;
       if (!node->is_cloned)
@@ -104,7 +104,7 @@ void
 _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node)
 {
   cdk_kbnode_t n1;
-  
+
   for (n1 = root; n1->next; n1 = n1->next)
     ;
   n1->next = node;
@@ -121,19 +121,20 @@ _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node)
  * type @pkttype (only if @pkttype != 0).
  **/
 void
-cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node, cdk_packet_type_t pkttype)
+cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node,
+		   cdk_packet_type_t pkttype)
 {
   if (!pkttype)
     {
       node->next = root->next;
       root->next = node;
     }
-  else 
+  else
     {
       cdk_kbnode_t n1;
-      
+
       for (n1 = root; n1->next; n1 = n1->next)
-	if (pkttype != n1->next->pkt->pkttype) 
+	if (pkttype != n1->next->pkt->pkttype)
 	  {
 	    node->next = n1->next;
 	    n1->next = node;
@@ -156,10 +157,11 @@ cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node, cdk_packet_type_t pktty
  * with pkttype @pkttype in the list starting with @root of @node.
  **/
 cdk_kbnode_t
-cdk_kbnode_find_prev (cdk_kbnode_t root, cdk_kbnode_t node, cdk_packet_type_t pkttype)
+cdk_kbnode_find_prev (cdk_kbnode_t root, cdk_kbnode_t node,
+		      cdk_packet_type_t pkttype)
 {
   cdk_kbnode_t n1;
-  
+
   for (n1 = NULL; root && root != node; root = root->next)
     {
       if (!pkttype || root->pkt->pkttype == pkttype)
@@ -234,9 +236,9 @@ cdk_packet_t
 cdk_kbnode_find_packet (cdk_kbnode_t node, cdk_packet_type_t pkttype)
 {
   cdk_kbnode_t res;
-  
+
   res = cdk_kbnode_find (node, pkttype);
-  return res? res->pkt : NULL;
+  return res ? res->pkt : NULL;
 }
 
 
@@ -249,18 +251,18 @@ cdk_kbnode_find_packet (cdk_kbnode_t node, cdk_packet_type_t pkttype)
  * to start with ROOT).
  */
 cdk_kbnode_t
-cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t *ctx, int all)
+cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t * ctx, int all)
 {
   cdk_kbnode_t n;
-  
-  do 
+
+  do
     {
-      if (! *ctx)
+      if (!*ctx)
 	{
 	  *ctx = root;
 	  n = root;
 	}
-      else 
+      else
 	{
 	  n = (*ctx)->next;
 	  *ctx = n;
@@ -282,11 +284,11 @@ cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t *ctx, int all)
  * Returns: true if any node has been changed
  */
 int
-cdk_kbnode_commit (cdk_kbnode_t *root)
+cdk_kbnode_commit (cdk_kbnode_t * root)
 {
   cdk_kbnode_t n, nl;
   int changed = 0;
-  
+
   for (n = *root, nl = NULL; n; n = nl->next)
     {
       if (n->is_deleted)
@@ -315,10 +317,10 @@ cdk_kbnode_commit (cdk_kbnode_t *root)
  * Removes a node from the root node.
  */
 void
-cdk_kbnode_remove (cdk_kbnode_t *root, cdk_kbnode_t node)
+cdk_kbnode_remove (cdk_kbnode_t * root, cdk_kbnode_t node)
 {
   cdk_kbnode_t n, nl;
-  
+
   for (n = *root, nl = NULL; n; n = nl->next)
     {
       if (n == node)
@@ -350,16 +352,16 @@ void
 cdk_kbnode_move (cdk_kbnode_t * root, cdk_kbnode_t node, cdk_kbnode_t where)
 {
   cdk_kbnode_t tmp, prev;
-  
+
   if (!root || !*root || !node)
     return;
   for (prev = *root; prev && prev->next != node; prev = prev->next)
     ;
   if (!prev)
-    return; /* Node is not in the list */
-  
-  if (!where) 
-    { /* Move node before root */
+    return;			/* Node is not in the list */
+
+  if (!where)
+    {				/* Move node before root */
       if (node == *root)
 	return;
       prev->next = node->next;
@@ -367,7 +369,7 @@ cdk_kbnode_move (cdk_kbnode_t * root, cdk_kbnode_t node, cdk_kbnode_t where)
       *root = node;
       return;
     }
-  if (node == where) /* Move it after where. */
+  if (node == where)		/* Move it after where. */
     return;
   tmp = node->next;
   node->next = where->next;
@@ -402,25 +404,25 @@ cdk_kbnode_get_packet (cdk_kbnode_t node)
  * Tries to read a key node from the memory buffer @buf.
  **/
 cdk_error_t
-cdk_kbnode_read_from_mem (cdk_kbnode_t *ret_node,
-                          const byte *buf, size_t buflen)
+cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
+			  const byte * buf, size_t buflen)
 {
   cdk_stream_t inp;
   cdk_error_t rc;
-  
+
   if (!ret_node || !buf)
     return CDK_Inv_Value;
-  
+
   *ret_node = NULL;
   if (!buflen)
-    return CDK_Too_Short;  
-  
+    return CDK_Too_Short;
+
   rc = cdk_stream_tmp_from_mem (buf, buflen, &inp);
   if (rc)
     return rc;
   rc = cdk_keydb_get_keyblock (inp, ret_node);
   if (rc)
-    gnutls_assert();
+    gnutls_assert ();
   cdk_stream_close (inp);
   return rc;
 }
@@ -436,24 +438,24 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t *ret_node,
  * it allocates the buffer to avoid the lengthy second run.
  */
 cdk_error_t
-cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node, 
-			       byte **r_buf, size_t *r_buflen)
+cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
+			       byte ** r_buf, size_t * r_buflen)
 {
   cdk_kbnode_t n;
   cdk_stream_t s;
   cdk_error_t rc;
   size_t len;
-  
+
   if (!node || !r_buf || !r_buflen)
     return CDK_Inv_Value;
-  
+
   *r_buf = NULL;
   *r_buflen = 0;
-  
+
   rc = cdk_stream_tmp_new (&s);
   if (rc)
     return rc;
-  
+
   for (n = node; n; n = n->next)
     {
       /* Skip all packets which cannot occur in a key composition. */
@@ -472,16 +474,16 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
 	  return rc;
 	}
     }
-  
+
   cdk_stream_seek (s, 0);
-  len  = cdk_stream_get_length (s);
+  len = cdk_stream_get_length (s);
   *r_buf = cdk_calloc (1, len);
   *r_buflen = cdk_stream_read (s, *r_buf, len);
   cdk_stream_close (s);
   return 0;
 }
-  
-  
+
+
 /**
  * cdk_kbnode_write_to_mem:
  * @node: the key node
@@ -494,20 +496,20 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
  * Whenever it is possible, the cdk_kbnode_write_to_mem_alloc should be used.
  **/
 cdk_error_t
-cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
+cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
 {
   cdk_kbnode_t n;
-  cdk_stream_t s;  
+  cdk_stream_t s;
   cdk_error_t rc;
   size_t len;
-  
+
   if (!node || !r_nbytes)
     return CDK_Inv_Value;
-  
+
   rc = cdk_stream_tmp_new (&s);
   if (rc)
     return rc;
-  
+
   for (n = node; n; n = n->next)
     {
       /* Skip all packets which cannot occur in a key composition. */
@@ -526,17 +528,17 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
 	  return rc;
 	}
     }
-  
+
   cdk_stream_seek (s, 0);
   len = cdk_stream_get_length (s);
-  if (!buf) 
+  if (!buf)
     {
-      *r_nbytes = len; /* Only return the length of the buffer */
+      *r_nbytes = len;		/* Only return the length of the buffer */
       cdk_stream_close (s);
       return 0;
     }
   if (*r_nbytes < len)
-    { 
+    {
       *r_nbytes = len;
       rc = CDK_Too_Short;
     }
@@ -561,40 +563,40 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte *buf, size_t *r_nbytes)
  * is extracted from it.
  **/
 cdk_error_t
-cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st* md, int is_v4,
-                 cdk_packet_type_t pkttype, int flags)
+cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st * md, int is_v4,
+		 cdk_packet_type_t pkttype, int flags)
 {
   cdk_packet_t pkt;
-  
+
   if (!node || !md)
     return CDK_Inv_Value;
   if (!pkttype)
-    {      
+    {
       pkt = cdk_kbnode_get_packet (node);
       pkttype = pkt->pkttype;
-    }  
+    }
   else
-    {      
+    {
       pkt = cdk_kbnode_find_packet (node, pkttype);
       if (!pkt)
 	return CDK_Inv_Packet;
     }
-  
-  switch (pkttype) 
+
+  switch (pkttype)
     {
     case CDK_PKT_PUBLIC_KEY:
     case CDK_PKT_PUBLIC_SUBKEY:
       _cdk_hash_pubkey (pkt->pkt.public_key, md, flags & 1);
       break;
-      
+
     case CDK_PKT_USER_ID:
-      _cdk_hash_userid (pkt->pkt.user_id, is_v4, md); 
+      _cdk_hash_userid (pkt->pkt.user_id, is_v4, md);
       break;
-      
+
     case CDK_PKT_SIGNATURE:
       _cdk_hash_sig_data (pkt->pkt.signature, md);
       break;
-      
+
     default:
       return CDK_Inv_Mode;
     }

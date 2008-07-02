@@ -556,10 +556,11 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
   if (result)
     {
       int ret = _gnutls_hash_init (&td, HASH2MAC (algo));
-      if (ret < 0) {
-        gnutls_assert();
-	return ret;
-      }
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
 
       _gnutls_hash (&td, data->data, data->size);
 

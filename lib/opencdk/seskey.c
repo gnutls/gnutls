@@ -40,8 +40,8 @@
  * PAD consists of FF bytes.
  */
 static cdk_error_t
-do_encode_md(byte ** r_frame, size_t * r_flen, const byte * md, int algo,
-	     size_t len, unsigned nbits, const byte * asn, size_t asnlen)
+do_encode_md (byte ** r_frame, size_t * r_flen, const byte * md, int algo,
+	      size_t len, unsigned nbits, const byte * asn, size_t asnlen)
 {
   byte *frame = NULL;
   size_t nframe = (nbits + 7) / 8;
@@ -54,27 +54,29 @@ do_encode_md(byte ** r_frame, size_t * r_flen, const byte * md, int algo,
   if (len + asnlen + 4 > nframe)
     return CDK_General_Error;
 
-  frame = cdk_calloc(1, nframe);
+  frame = cdk_calloc (1, nframe);
   if (!frame)
     return CDK_Out_Of_Core;
   frame[n++] = 0;
   frame[n++] = 1;
   i = nframe - len - asnlen - 3;
-  if (i < 0) {
-    cdk_free(frame);
-    return CDK_Inv_Value;
-  }
-  memset(frame + n, 0xFF, i);
+  if (i < 0)
+    {
+      cdk_free (frame);
+      return CDK_Inv_Value;
+    }
+  memset (frame + n, 0xFF, i);
   n += i;
   frame[n++] = 0;
-  memcpy(frame + n, asn, asnlen);
+  memcpy (frame + n, asn, asnlen);
   n += asnlen;
-  memcpy(frame + n, md, len);
+  memcpy (frame + n, md, len);
   n += len;
-  if (n != nframe) {
-    cdk_free(frame);
-    return CDK_Inv_Value;
-  }
+  if (n != nframe)
+    {
+      cdk_free (frame);
+      return CDK_Inv_Value;
+    }
   *r_frame = frame;
   *r_flen = n;
   return 0;
@@ -121,70 +123,75 @@ static const byte rmd160_asn[15] =	/* Object ID is 1.3.36.3.2.1 */
   0x02, 0x01, 0x05, 0x00, 0x04, 0x14
 };
 
-static int _gnutls_get_digest_oid(gnutls_digest_algorithm_t algo, const byte** data)
+static int
+_gnutls_get_digest_oid (gnutls_digest_algorithm_t algo, const byte ** data)
 {
-    switch (algo) {
-        case GNUTLS_DIG_MD5:
-          *data = md5_asn;
-          return sizeof(md5_asn);
-        case GNUTLS_DIG_SHA1:
-          *data = sha1_asn;
-          return sizeof(sha1_asn);
-        case GNUTLS_DIG_RMD160:
-          *data = rmd160_asn;
-          return sizeof(rmd160_asn);
-        case GNUTLS_DIG_SHA256:
-          *data = sha256_asn;
-          return sizeof(sha256_asn);
-        case GNUTLS_DIG_SHA384:
-          *data = sha384_asn;
-          return sizeof(sha384_asn);
-        case GNUTLS_DIG_SHA512:
-          *data = sha512_asn;
-          return sizeof(sha512_asn);
-        case GNUTLS_DIG_SHA224:
-          *data = sha224_asn;
-          return sizeof(sha224_asn);
-        default:
-          gnutls_assert();
-          return GNUTLS_E_INTERNAL_ERROR;
+  switch (algo)
+    {
+    case GNUTLS_DIG_MD5:
+      *data = md5_asn;
+      return sizeof (md5_asn);
+    case GNUTLS_DIG_SHA1:
+      *data = sha1_asn;
+      return sizeof (sha1_asn);
+    case GNUTLS_DIG_RMD160:
+      *data = rmd160_asn;
+      return sizeof (rmd160_asn);
+    case GNUTLS_DIG_SHA256:
+      *data = sha256_asn;
+      return sizeof (sha256_asn);
+    case GNUTLS_DIG_SHA384:
+      *data = sha384_asn;
+      return sizeof (sha384_asn);
+    case GNUTLS_DIG_SHA512:
+      *data = sha512_asn;
+      return sizeof (sha512_asn);
+    case GNUTLS_DIG_SHA224:
+      *data = sha224_asn;
+      return sizeof (sha224_asn);
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 }
 
 
 /* Encode the given digest into a pkcs#1 compatible format. */
 cdk_error_t
-_cdk_digest_encode_pkcs1(byte ** r_md, size_t * r_mdlen, int pk_algo,
-			 const byte * md, int digest_algo, unsigned nbits)
+_cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
+			  const byte * md, int digest_algo, unsigned nbits)
 {
   size_t dlen;
 
   if (!md || !r_md || !r_mdlen)
     return CDK_Inv_Value;
 
-  dlen = _gnutls_hash_get_algo_len(digest_algo);
+  dlen = _gnutls_hash_get_algo_len (digest_algo);
   if (dlen <= 0)
     return CDK_Inv_Algo;
-  if (is_DSA(pk_algo)) {	/* DSS does not use a special encoding. */
-    *r_md = cdk_malloc(dlen + 1);
-    if (!*r_md)
-      return CDK_Out_Of_Core;
-    *r_mdlen = dlen;
-    memcpy(*r_md, md, dlen);
-    return 0;
-  } else {
-    const byte *asn;
-    int asnlen;
-    cdk_error_t rc;
+  if (is_DSA (pk_algo))
+    {				/* DSS does not use a special encoding. */
+      *r_md = cdk_malloc (dlen + 1);
+      if (!*r_md)
+	return CDK_Out_Of_Core;
+      *r_mdlen = dlen;
+      memcpy (*r_md, md, dlen);
+      return 0;
+    }
+  else
+    {
+      const byte *asn;
+      int asnlen;
+      cdk_error_t rc;
 
-    asnlen = _gnutls_get_digest_oid( digest_algo, &asn);
-    if (asnlen < 0)
-      return asnlen;
+      asnlen = _gnutls_get_digest_oid (digest_algo, &asn);
+      if (asnlen < 0)
+	return asnlen;
 
-    rc = do_encode_md(r_md, r_mdlen, md, digest_algo, dlen,
-		      nbits, asn, asnlen);
-    return rc;
-  }
+      rc = do_encode_md (r_md, r_mdlen, md, digest_algo, dlen,
+			 nbits, asn, asnlen);
+      return rc;
+    }
   return 0;
 }
 
@@ -200,8 +207,8 @@ _cdk_digest_encode_pkcs1(byte ** r_md, size_t * r_mdlen, int pk_algo,
  * The @salt parameter must be always 8 octets.
  **/
 cdk_error_t
-cdk_s2k_new(cdk_s2k_t * ret_s2k, int mode, int digest_algo,
-	    const byte * salt)
+cdk_s2k_new (cdk_s2k_t * ret_s2k, int mode, int digest_algo,
+	     const byte * salt)
 {
   cdk_s2k_t s2k;
 
@@ -211,16 +218,16 @@ cdk_s2k_new(cdk_s2k_t * ret_s2k, int mode, int digest_algo,
   if (mode != 0x00 && mode != 0x01 && mode != 0x03)
     return CDK_Inv_Mode;
 
-  if (_gnutls_hash_get_algo_len(digest_algo) <= 0)
+  if (_gnutls_hash_get_algo_len (digest_algo) <= 0)
     return CDK_Inv_Algo;
 
-  s2k = cdk_calloc(1, sizeof *s2k);
+  s2k = cdk_calloc (1, sizeof *s2k);
   if (!s2k)
     return CDK_Out_Of_Core;
   s2k->mode = mode;
   s2k->hash_algo = digest_algo;
   if (salt)
-    memcpy(s2k->salt, salt, 8);
+    memcpy (s2k->salt, salt, 8);
   *ret_s2k = s2k;
   return 0;
 }
@@ -232,19 +239,21 @@ cdk_s2k_new(cdk_s2k_t * ret_s2k, int mode, int digest_algo,
  * 
  * Release the given S2K object.
  **/
-void cdk_s2k_free(cdk_s2k_t s2k)
+void
+cdk_s2k_free (cdk_s2k_t s2k)
 {
-  cdk_free(s2k);
+  cdk_free (s2k);
 }
 
 
 /* Make a copy of the source s2k into R_DST. */
-cdk_error_t _cdk_s2k_copy(cdk_s2k_t * r_dst, cdk_s2k_t src)
+cdk_error_t
+_cdk_s2k_copy (cdk_s2k_t * r_dst, cdk_s2k_t src)
 {
   cdk_s2k_t dst;
   cdk_error_t err;
 
-  err = cdk_s2k_new(&dst, src->mode, src->hash_algo, src->salt);
+  err = cdk_s2k_new (&dst, src->mode, src->hash_algo, src->salt);
   if (err)
     return err;
   dst->count = src->count;

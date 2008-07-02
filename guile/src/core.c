@@ -28,15 +28,15 @@
 #include "smobs.h"
 #include "errors.h"
 #include "utils.h"
-
-
 
+
+
 /* SMOB and enums type definitions.  */
 #include "enum-map.i.c"
 #include "smob-types.i.c"
 
 const char scm_gnutls_array_error_message[] =
-   "cannot handle non-contiguous array: ~A";
+  "cannot handle non-contiguous array: ~A";
 
 
 /* Data that are attached to `gnutls_session_t' objects.
@@ -71,9 +71,9 @@ const char scm_gnutls_array_error_message[] =
   scm_to_bool (SCM_CAR (SCM_GNUTLS_SESSION_DATA (c_session)))
 #define SCM_GNUTLS_SESSION_RECORD_PORT(c_session)	\
   SCM_CDR (SCM_GNUTLS_SESSION_DATA (c_session))
-
-
 
+
+
 /* Bindings.  */
 
 /* Mark the data associated with SESSION.  */
@@ -94,6 +94,7 @@ SCM_DEFINE (scm_gnutls_version, "gnutls-version", 0, 0, 0,
 {
   return (scm_from_locale_string (gnutls_check_version (NULL)));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 0,
@@ -119,6 +120,7 @@ SCM_DEFINE (scm_gnutls_make_session, "make-session", 1, 0, 0,
 
   return (scm_from_gnutls_session (c_session));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_bye, "bye", 2, 0, 0,
@@ -139,11 +141,11 @@ SCM_DEFINE (scm_gnutls_bye, "bye", 2, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_handshake, "handshake", 1, 0, 0,
-	    (SCM session),
-	    "Perform a handshake for @var{session}.")
+	    (SCM session), "Perform a handshake for @var{session}.")
 #define FUNC_NAME s_scm_gnutls_handshake
 {
   int err;
@@ -157,11 +159,11 @@ SCM_DEFINE (scm_gnutls_handshake, "handshake", 1, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_rehandshake, "rehandshake", 1, 0, 0,
-	    (SCM session),
-	    "Perform a re-handshaking for @var{session}.")
+	    (SCM session), "Perform a re-handshaking for @var{session}.")
 #define FUNC_NAME s_scm_gnutls_rehandshake
 {
   int err;
@@ -175,11 +177,11 @@ SCM_DEFINE (scm_gnutls_rehandshake, "rehandshake", 1, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_alert_get, "alert-get", 1, 0, 0,
-	    (SCM session),
-	    "Get an aleter from @var{session}.")
+	    (SCM session), "Get an aleter from @var{session}.")
 #define FUNC_NAME s_scm_gnutls_alert_get
 {
   gnutls_session_t c_session;
@@ -191,6 +193,7 @@ SCM_DEFINE (scm_gnutls_alert_get, "alert-get", 1, 0, 0,
 
   return (scm_from_gnutls_alert_description (c_alert));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_alert_send, "alert-send", 3, 0, 0,
@@ -213,16 +216,16 @@ SCM_DEFINE (scm_gnutls_alert_send, "alert-send", 3, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 /* FIXME: Omitting `alert-send-appropriate'.  */
-
 
+
 /* Session accessors.  */
 
 SCM_DEFINE (scm_gnutls_session_cipher, "session-cipher", 1, 0, 0,
-	    (SCM session),
-	    "Return @var{session}'s cipher.")
+	    (SCM session), "Return @var{session}'s cipher.")
 #define FUNC_NAME s_scm_gnutls_session_cipher
 {
   gnutls_session_t c_session;
@@ -234,11 +237,11 @@ SCM_DEFINE (scm_gnutls_session_cipher, "session-cipher", 1, 0, 0,
 
   return (scm_from_gnutls_cipher (c_cipher));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_kx, "session-kx", 1, 0, 0,
-	    (SCM session),
-	    "Return @var{session}'s kx.")
+	    (SCM session), "Return @var{session}'s kx.")
 #define FUNC_NAME s_scm_gnutls_session_kx
 {
   gnutls_session_t c_session;
@@ -250,11 +253,11 @@ SCM_DEFINE (scm_gnutls_session_kx, "session-kx", 1, 0, 0,
 
   return (scm_from_gnutls_kx (c_kx));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_mac, "session-mac", 1, 0, 0,
-	    (SCM session),
-	    "Return @var{session}'s MAC.")
+	    (SCM session), "Return @var{session}'s MAC.")
 #define FUNC_NAME s_scm_gnutls_session_mac
 {
   gnutls_session_t c_session;
@@ -266,12 +269,12 @@ SCM_DEFINE (scm_gnutls_session_mac, "session-mac", 1, 0, 0,
 
   return (scm_from_gnutls_mac (c_mac));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_compression_method,
 	    "session-compression-method", 1, 0, 0,
-	    (SCM session),
-	    "Return @var{session}'s compression method.")
+	    (SCM session), "Return @var{session}'s compression method.")
 #define FUNC_NAME s_scm_gnutls_session_compression_method
 {
   gnutls_session_t c_session;
@@ -283,12 +286,12 @@ SCM_DEFINE (scm_gnutls_session_compression_method,
 
   return (scm_from_gnutls_compression_method (c_comp));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_certificate_type,
 	    "session-certificate-type", 1, 0, 0,
-	    (SCM session),
-	    "Return @var{session}'s certificate type.")
+	    (SCM session), "Return @var{session}'s certificate type.")
 #define FUNC_NAME s_scm_gnutls_session_certificate_type
 {
   gnutls_session_t c_session;
@@ -300,11 +303,11 @@ SCM_DEFINE (scm_gnutls_session_certificate_type,
 
   return (scm_from_gnutls_certificate_type (c_cert));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_protocol, "session-protocol", 1, 0, 0,
-	    (SCM session),
-	    "Return the protocol used by @var{session}.")
+	    (SCM session), "Return the protocol used by @var{session}.")
 #define FUNC_NAME s_scm_gnutls_session_protocol
 {
   gnutls_session_t c_session;
@@ -316,6 +319,7 @@ SCM_DEFINE (scm_gnutls_session_protocol, "session-protocol", 1, 0, 0,
 
   return (scm_from_gnutls_protocol (c_protocol));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_authentication_type,
@@ -335,6 +339,7 @@ SCM_DEFINE (scm_gnutls_session_authentication_type,
 
   return (scm_from_gnutls_credentials (c_auth));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_server_authentication_type,
@@ -354,6 +359,7 @@ SCM_DEFINE (scm_gnutls_session_server_authentication_type,
 
   return (scm_from_gnutls_credentials (c_auth));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_client_authentication_type,
@@ -373,6 +379,7 @@ SCM_DEFINE (scm_gnutls_session_client_authentication_type,
 
   return (scm_from_gnutls_credentials (c_auth));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_peer_certificate_chain,
@@ -405,9 +412,7 @@ SCM_DEFINE (scm_gnutls_session_peer_certificate_chain,
 
       result = scm_make_list (scm_from_uint (c_list_size), SCM_UNSPECIFIED);
 
-      for (i = 0, pair = result;
-	   i < c_list_size;
-	   i++, pair = SCM_CDR (pair))
+      for (i = 0, pair = result; i < c_list_size; i++, pair = SCM_CDR (pair))
 	{
 	  unsigned char *c_cert_copy;
 
@@ -423,6 +428,7 @@ SCM_DEFINE (scm_gnutls_session_peer_certificate_chain,
 
   return result;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_session_our_certificate_chain,
@@ -462,6 +468,7 @@ SCM_DEFINE (scm_gnutls_session_our_certificate_chain,
 
   return result;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_server_session_certificate_request_x,
@@ -484,17 +491,17 @@ SCM_DEFINE (scm_gnutls_set_server_session_certificate_request_x,
 
   return SCM_UNSPECIFIED;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Choice of a protocol and cipher suite.  */
 
 #include "priorities.i.c"
 
 SCM_DEFINE (scm_gnutls_set_default_priority_x,
 	    "set-session-default-priority!", 1, 0, 0,
-	    (SCM session),
-	    "Have @var{session} use the default priorities.")
+	    (SCM session), "Have @var{session} use the default priorities.")
 #define FUNC_NAME s_scm_gnutls_set_default_priority_x
 {
   gnutls_session_t c_session;
@@ -504,6 +511,7 @@ SCM_DEFINE (scm_gnutls_set_default_priority_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_default_export_priority_x,
@@ -519,6 +527,7 @@ SCM_DEFINE (scm_gnutls_set_default_export_priority_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_cipher_suite_to_string, "cipher-suite->string",
@@ -540,6 +549,7 @@ SCM_DEFINE (scm_gnutls_cipher_suite_to_string, "cipher-suite->string",
 
   return (scm_from_locale_string (c_name));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
@@ -557,11 +567,13 @@ SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
     {
       gnutls_certificate_credentials_t c_cred;
 
-      c_cred = scm_to_gnutls_certificate_credentials (cred, 2,
-						      FUNC_NAME);
-      err = gnutls_credentials_set (c_session, GNUTLS_CRD_CERTIFICATE, c_cred);
+      c_cred = scm_to_gnutls_certificate_credentials (cred, 2, FUNC_NAME);
+      err =
+	gnutls_credentials_set (c_session, GNUTLS_CRD_CERTIFICATE, c_cred);
     }
-  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_anonymous_client_credentials, cred))
+  else
+    if (SCM_SMOB_PREDICATE
+	(scm_tc16_gnutls_anonymous_client_credentials, cred))
     {
       gnutls_anon_client_credentials_t c_cred;
 
@@ -579,41 +591,33 @@ SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
       err = gnutls_credentials_set (c_session, GNUTLS_CRD_ANON, c_cred);
     }
 #ifdef ENABLE_SRP
-  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_srp_client_credentials,
-			       cred))
+  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_srp_client_credentials, cred))
     {
       gnutls_srp_client_credentials_t c_cred;
 
-      c_cred = scm_to_gnutls_srp_client_credentials (cred, 2,
-						     FUNC_NAME);
+      c_cred = scm_to_gnutls_srp_client_credentials (cred, 2, FUNC_NAME);
       err = gnutls_credentials_set (c_session, GNUTLS_CRD_SRP, c_cred);
     }
-  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_srp_server_credentials,
-			       cred))
+  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_srp_server_credentials, cred))
     {
       gnutls_srp_server_credentials_t c_cred;
 
-      c_cred = scm_to_gnutls_srp_server_credentials (cred, 2,
-						     FUNC_NAME);
+      c_cred = scm_to_gnutls_srp_server_credentials (cred, 2, FUNC_NAME);
       err = gnutls_credentials_set (c_session, GNUTLS_CRD_SRP, c_cred);
     }
 #endif
-  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_psk_client_credentials,
-			       cred))
+  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_psk_client_credentials, cred))
     {
       gnutls_psk_client_credentials_t c_cred;
 
-      c_cred = scm_to_gnutls_psk_client_credentials (cred, 2,
-						     FUNC_NAME);
+      c_cred = scm_to_gnutls_psk_client_credentials (cred, 2, FUNC_NAME);
       err = gnutls_credentials_set (c_session, GNUTLS_CRD_PSK, c_cred);
     }
-  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_psk_server_credentials,
-			       cred))
+  else if (SCM_SMOB_PREDICATE (scm_tc16_gnutls_psk_server_credentials, cred))
     {
       gnutls_psk_server_credentials_t c_cred;
 
-      c_cred = scm_to_gnutls_psk_server_credentials (cred, 2,
-						     FUNC_NAME);
+      c_cred = scm_to_gnutls_psk_server_credentials (cred, 2, FUNC_NAME);
       err = gnutls_credentials_set (c_session, GNUTLS_CRD_PSK, c_cred);
     }
   else
@@ -624,9 +628,10 @@ SCM_DEFINE (scm_gnutls_set_session_credentials_x, "set-session-credentials!",
 
   return SCM_UNSPECIFIED;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Record layer.  */
 
 SCM_DEFINE (scm_gnutls_record_send, "record-send", 2, 0, 0,
@@ -645,8 +650,7 @@ SCM_DEFINE (scm_gnutls_record_send, "record-send", 2, 0, 0,
   c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
   SCM_VALIDATE_ARRAY (2, array);
 
-  c_array = scm_gnutls_get_array (array, &c_handle, &c_len,
-				  FUNC_NAME);
+  c_array = scm_gnutls_get_array (array, &c_handle, &c_len, FUNC_NAME);
 
   c_result = gnutls_record_send (c_session, c_array, c_len);
 
@@ -659,6 +663,7 @@ SCM_DEFINE (scm_gnutls_record_send, "record-send", 2, 0, 0,
 
   return (result);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_record_receive_x, "record-receive!", 2, 0, 0,
@@ -692,6 +697,7 @@ SCM_DEFINE (scm_gnutls_record_receive_x, "record-receive!", 2, 0, 0,
 
   return (result);
 }
+
 #undef FUNC_NAME
 
 
@@ -706,7 +712,8 @@ static scm_t_bits session_record_port_type;
 #define SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE 4096
 
 /* Hint for the `scm_gc_' functions.  */
-static const char session_record_port_gc_hint[] = "gnutls-session-record-port";
+static const char session_record_port_gc_hint[] =
+  "gnutls-session-record-port";
 
 /* Mark the session associated with PORT.  */
 static SCM
@@ -743,6 +750,7 @@ free_session_record_port (SCM port)
 
   return 0;
 }
+
 #undef FUNC_NAME
 
 /* Data passed to `do_fill_port ()'.  */
@@ -812,6 +820,7 @@ fill_session_record_port_input (SCM port)
 
   return chr;
 }
+
 #undef FUNC_NAME
 
 /* Write SIZE octets from DATA to PORT.  */
@@ -837,6 +846,7 @@ write_to_session_record_port (SCM port, const void *data, size_t size)
 	c_sent += c_result;
     }
 }
+
 #undef FUNC_NAME
 
 /* Return a new session port for SESSION.  */
@@ -849,8 +859,9 @@ make_session_record_port (SCM session)
   const unsigned long mode_bits = SCM_OPN | SCM_RDNG | SCM_WRTNG;
 
   c_port_buf =
-    (unsigned char *) scm_gc_malloc (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
-				     session_record_port_gc_hint);
+    (unsigned char *)
+    scm_gc_malloc (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
+		   session_record_port_gc_hint);
 
   /* Create a new port.  */
   port = scm_new_port_table_entry (session_record_port_type);
@@ -894,6 +905,7 @@ SCM_DEFINE (scm_gnutls_session_record_port, "session-record-port", 1, 0, 0,
 
   return (port);
 }
+
 #undef FUNC_NAME
 
 /* Create the session port type.  */
@@ -907,13 +919,12 @@ scm_init_gnutls_session_record_port_type (void)
   scm_set_port_mark (session_record_port_type, mark_session_record_port);
   scm_set_port_free (session_record_port_type, free_session_record_port);
 }
-
 
+
 /* Transport.  */
 
-SCM_DEFINE (scm_gnutls_set_session_transport_fd_x, "set-session-transport-fd!",
-	    2, 0, 0,
-	    (SCM session, SCM fd),
+SCM_DEFINE (scm_gnutls_set_session_transport_fd_x,
+	    "set-session-transport-fd!", 2, 0, 0, (SCM session, SCM fd),
 	    "Use file descriptor @var{fd} as the underlying transport for "
 	    "@var{session}.")
 #define FUNC_NAME s_scm_gnutls_set_session_transport_fd_x
@@ -930,6 +941,7 @@ SCM_DEFINE (scm_gnutls_set_session_transport_fd_x, "set-session-transport-fd!",
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 /* Pull SIZE octets from TRANSPORT (a Scheme port) into DATA.  */
@@ -948,8 +960,7 @@ pull_from_port (gnutls_transport_ptr_t transport, void *data, size_t size)
 
 /* Write SIZE octets from DATA to TRANSPORT (a Scheme port).  */
 static ssize_t
-push_to_port (gnutls_transport_ptr_t transport, const void *data,
-	      size_t size)
+push_to_port (gnutls_transport_ptr_t transport, const void *data, size_t size)
 {
   SCM port;
 
@@ -987,13 +998,14 @@ SCM_DEFINE (scm_gnutls_set_session_transport_port_x,
 
   return SCM_UNSPECIFIED;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Diffie-Hellman.  */
 
-typedef int (* pkcs_export_function_t) (void *, gnutls_x509_crt_fmt_t,
-					unsigned char *, size_t *);
+typedef int (*pkcs_export_function_t) (void *, gnutls_x509_crt_fmt_t,
+				       unsigned char *, size_t *);
 
 /* Hint for the `scm_gc' functions.  */
 static const char pkcs_export_gc_hint[] = "gnutls-pkcs-export";
@@ -1021,8 +1033,7 @@ pkcs_export_parameters (pkcs_export_function_t export,
       if (err == GNUTLS_E_SHORT_MEMORY_BUFFER)
 	{
 	  output = scm_gc_realloc (output, output_total_len,
-				   output_total_len * 2,
-				   pkcs_export_gc_hint);
+				   output_total_len * 2, pkcs_export_gc_hint);
 	  output_total_len *= 2;
 	}
     }
@@ -1041,12 +1052,12 @@ pkcs_export_parameters (pkcs_export_function_t export,
 
   return (scm_take_u8vector (output, output_len));
 }
+
 #undef FUNC_NAME
 
 
 SCM_DEFINE (scm_gnutls_make_dh_parameters, "make-dh-parameters", 1, 0, 0,
-	    (SCM bits),
-	    "Return new Diffie-Hellman parameters.")
+	    (SCM bits), "Return new Diffie-Hellman parameters.")
 #define FUNC_NAME s_scm_gnutls_make_dh_parameters
 {
   int err;
@@ -1068,6 +1079,7 @@ SCM_DEFINE (scm_gnutls_make_dh_parameters, "make-dh-parameters", 1, 0, 0,
 
   return (scm_from_gnutls_dh_parameters (c_dh_params));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_pkcs3_import_dh_parameters,
@@ -1112,6 +1124,7 @@ SCM_DEFINE (scm_gnutls_pkcs3_import_dh_parameters,
 
   return (scm_from_gnutls_dh_parameters (c_dh_params));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_pkcs3_export_dh_parameters,
@@ -1133,11 +1146,11 @@ SCM_DEFINE (scm_gnutls_pkcs3_export_dh_parameters,
 
   result = pkcs_export_parameters ((pkcs_export_function_t)
 				   gnutls_dh_params_export_pkcs3,
-				   (void *) c_dh_params,
-				   c_format, FUNC_NAME);
+				   (void *) c_dh_params, c_format, FUNC_NAME);
 
   return (result);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_session_dh_prime_bits_x,
@@ -1156,15 +1169,15 @@ SCM_DEFINE (scm_gnutls_set_session_dh_prime_bits_x,
 
   return SCM_UNSPECIFIED;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Anonymous credentials.  */
 
 SCM_DEFINE (scm_gnutls_make_anon_server_credentials,
 	    "make-anonymous-server-credentials",
-	    0, 0, 0, (void),
-	    "Return anonymous server credentials.")
+	    0, 0, 0, (void), "Return anonymous server credentials.")
 #define FUNC_NAME s_scm_gnutls_make_anon_server_credentials
 {
   int err;
@@ -1177,12 +1190,12 @@ SCM_DEFINE (scm_gnutls_make_anon_server_credentials,
 
   return (scm_from_gnutls_anonymous_server_credentials (c_cred));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_make_anon_client_credentials,
 	    "make-anonymous-client-credentials",
-	    0, 0, 0, (void),
-	    "Return anonymous client credentials.")
+	    0, 0, 0, (void), "Return anonymous client credentials.")
 #define FUNC_NAME s_scm_gnutls_make_anon_client_credentials
 {
   int err;
@@ -1195,6 +1208,7 @@ SCM_DEFINE (scm_gnutls_make_anon_client_credentials,
 
   return (scm_from_gnutls_anonymous_client_credentials (c_cred));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_anonymous_server_dh_parameters_x,
@@ -1207,23 +1221,21 @@ SCM_DEFINE (scm_gnutls_set_anonymous_server_dh_parameters_x,
   gnutls_dh_params_t c_dh_params;
   gnutls_anon_server_credentials_t c_cred;
 
-  c_cred = scm_to_gnutls_anonymous_server_credentials (cred, 1,
-						       FUNC_NAME);
-  c_dh_params = scm_to_gnutls_dh_parameters (dh_params, 2,
-					     FUNC_NAME);
+  c_cred = scm_to_gnutls_anonymous_server_credentials (cred, 1, FUNC_NAME);
+  c_dh_params = scm_to_gnutls_dh_parameters (dh_params, 2, FUNC_NAME);
 
   gnutls_anon_set_server_dh_params (c_cred, c_dh_params);
 
   return SCM_UNSPECIFIED;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* RSA parameters.  */
 
 SCM_DEFINE (scm_gnutls_make_rsa_parameters, "make-rsa-parameters", 1, 0, 0,
-	    (SCM bits),
-	    "Return new RSA parameters.")
+	    (SCM bits), "Return new RSA parameters.")
 #define FUNC_NAME s_scm_gnutls_make_rsa_parameters
 {
   int err;
@@ -1245,6 +1257,7 @@ SCM_DEFINE (scm_gnutls_make_rsa_parameters, "make-rsa-parameters", 1, 0, 0,
 
   return (scm_from_gnutls_rsa_parameters (c_rsa_params));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_pkcs1_import_rsa_parameters,
@@ -1289,6 +1302,7 @@ SCM_DEFINE (scm_gnutls_pkcs1_import_rsa_parameters,
 
   return (scm_from_gnutls_rsa_parameters (c_rsa_params));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_pkcs1_export_rsa_parameters,
@@ -1315,24 +1329,26 @@ SCM_DEFINE (scm_gnutls_pkcs1_export_rsa_parameters,
 
   return (result);
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Certificate credentials.  */
 
-typedef int (* certificate_set_file_function_t) (gnutls_certificate_credentials_t,
-						 const char *,
-						 gnutls_x509_crt_fmt_t);
+typedef
+  int (*certificate_set_file_function_t) (gnutls_certificate_credentials_t,
+					  const char *,
+					  gnutls_x509_crt_fmt_t);
 
-typedef int (* certificate_set_data_function_t) (gnutls_certificate_credentials_t,
-						 const gnutls_datum_t *,
-						 gnutls_x509_crt_fmt_t);
+typedef
+  int (*certificate_set_data_function_t) (gnutls_certificate_credentials_t,
+					  const gnutls_datum_t *,
+					  gnutls_x509_crt_fmt_t);
 
 /* Helper function to implement the `set-file!' functions.  */
 static unsigned int
 set_certificate_file (certificate_set_file_function_t set_file,
-		      SCM cred, SCM file, SCM format,
-		      const char *func_name)
+		      SCM cred, SCM file, SCM format, const char *func_name)
 #define FUNC_NAME func_name
 {
   int err;
@@ -1359,13 +1375,13 @@ set_certificate_file (certificate_set_file_function_t set_file,
   /* Return the number of certificates processed.  */
   return ((unsigned int) err);
 }
+
 #undef FUNC_NAME
 
 /* Helper function implementing the `set-data!' functions.  */
 static inline unsigned int
 set_certificate_data (certificate_set_data_function_t set_data,
-		      SCM cred, SCM data, SCM format,
-		      const char *func_name)
+		      SCM cred, SCM data, SCM format, const char *func_name)
 #define FUNC_NAME func_name
 {
   int err;
@@ -1393,6 +1409,7 @@ set_certificate_data (certificate_set_data_function_t set_data,
   /* Return the number of certificates processed.  */
   return ((unsigned int) err);
 }
+
 #undef FUNC_NAME
 
 
@@ -1413,6 +1430,7 @@ SCM_DEFINE (scm_gnutls_make_certificate_credentials,
 
   return (scm_from_gnutls_certificate_credentials (c_cred));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_dh_params_x,
@@ -1433,6 +1451,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_dh_params_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_rsa_export_params_x,
@@ -1453,6 +1472,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_rsa_export_params_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_files_x,
@@ -1477,14 +1497,13 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_files_x,
   c_cert_file_len = scm_c_string_length (cert_file);
   c_cert_file = (char *) alloca (c_cert_file_len + 1);
 
-  c_key_file_len = scm_c_string_length  (key_file);
+  c_key_file_len = scm_c_string_length (key_file);
   c_key_file = (char *) alloca (c_key_file_len + 1);
 
   (void) scm_to_locale_stringbuf (cert_file, c_cert_file,
 				  c_cert_file_len + 1);
   c_cert_file[c_cert_file_len] = '\0';
-  (void) scm_to_locale_stringbuf (key_file, c_key_file,
-				  c_key_file_len + 1);
+  (void) scm_to_locale_stringbuf (key_file, c_key_file, c_key_file_len + 1);
   c_key_file[c_key_file_len] = '\0';
 
   err = gnutls_certificate_set_x509_key_file (c_cred, c_cert_file, c_key_file,
@@ -1494,6 +1513,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_files_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_trust_file_x,
@@ -1508,11 +1528,11 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_trust_file_x,
   unsigned int count;
 
   count = set_certificate_file (gnutls_certificate_set_x509_trust_file,
-				cred, file, format,
-				FUNC_NAME);
+				cred, file, format, FUNC_NAME);
 
   return scm_from_uint (count);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_crl_file_x,
@@ -1527,11 +1547,11 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_crl_file_x,
   unsigned int count;
 
   count = set_certificate_file (gnutls_certificate_set_x509_crl_file,
-				cred, file, format,
-				FUNC_NAME);
+				cred, file, format, FUNC_NAME);
 
   return scm_from_uint (count);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_trust_data_x,
@@ -1546,11 +1566,11 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_trust_data_x,
   unsigned int count;
 
   count = set_certificate_data (gnutls_certificate_set_x509_trust_mem,
-				cred, data, format,
-				FUNC_NAME);
+				cred, data, format, FUNC_NAME);
 
   return scm_from_uint (count);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_crl_data_x,
@@ -1565,11 +1585,11 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_crl_data_x,
   unsigned int count;
 
   count = set_certificate_data (gnutls_certificate_set_x509_crl_mem,
-				cred, data, format,
-				FUNC_NAME);
+				cred, data, format, FUNC_NAME);
 
   return scm_from_uint (count);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_data_x,
@@ -1599,13 +1619,12 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_data_x,
      C_CERT_HANDLE is not released.  */
   c_cert = scm_gnutls_get_array (cert, &c_cert_handle, &c_cert_len,
 				 FUNC_NAME);
-  c_key  = scm_gnutls_get_array (key, &c_key_handle, &c_key_len,
-				 FUNC_NAME);
+  c_key = scm_gnutls_get_array (key, &c_key_handle, &c_key_len, FUNC_NAME);
 
   c_cert_d.data = (unsigned char *) c_cert;
   c_cert_d.size = c_cert_len;
-  c_key_d.data  = (unsigned char *) c_key;
-  c_key_d.size  = c_key_len;
+  c_key_d.data = (unsigned char *) c_key;
+  c_key_d.size = c_key_len;
 
   err = gnutls_certificate_set_x509_key_mem (c_cred, &c_cert_d, &c_key_d,
 					     c_format);
@@ -1617,6 +1636,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_data_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_keys_x,
@@ -1638,10 +1658,8 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_keys_x,
   SCM_VALIDATE_LIST_COPYLEN (2, certs, c_cert_count);
   c_key = scm_to_gnutls_x509_private_key (privkey, 3, FUNC_NAME);
 
-  c_certs = (gnutls_x509_crt_t *) alloca (c_cert_count * sizeof (* c_certs));
-  for (i = 0;
-       scm_is_pair (certs);
-       certs = SCM_CDR (certs), i++)
+  c_certs = (gnutls_x509_crt_t *) alloca (c_cert_count * sizeof (*c_certs));
+  for (i = 0; scm_is_pair (certs); certs = SCM_CDR (certs), i++)
     {
       c_certs[i] = scm_to_gnutls_x509_certificate (SCM_CAR (certs),
 						   2, FUNC_NAME);
@@ -1654,6 +1672,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_keys_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_verify_limits_x,
@@ -1677,6 +1696,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_verify_limits_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_verify_flags_x,
@@ -1693,8 +1713,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_verify_flags_x,
   c_cred = scm_to_gnutls_certificate_credentials (cred, 1, FUNC_NAME);
 
   for (c_flags = 0, c_pos = 2;
-       !scm_is_null (flags);
-       flags = SCM_CDR (flags), c_pos++)
+       !scm_is_null (flags); flags = SCM_CDR (flags), c_pos++)
     {
       c_flags |= (unsigned int)
 	scm_to_gnutls_certificate_verify (SCM_CAR (flags), c_pos, FUNC_NAME);
@@ -1704,6 +1723,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_verify_flags_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_peer_certificate_status, "peer-certificate-status",
@@ -1748,17 +1768,16 @@ SCM_DEFINE (scm_gnutls_peer_certificate_status, "peer-certificate-status",
 
   return (result);
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* SRP credentials.  */
 
 #ifdef ENABLE_SRP
 SCM_DEFINE (scm_gnutls_make_srp_server_credentials,
 	    "make-srp-server-credentials",
-	    0, 0, 0,
-	    (void),
-	    "Return new SRP server credentials.")
+	    0, 0, 0, (void), "Return new SRP server credentials.")
 #define FUNC_NAME s_scm_gnutls_make_srp_server_credentials
 {
   int err;
@@ -1770,6 +1789,7 @@ SCM_DEFINE (scm_gnutls_make_srp_server_credentials,
 
   return (scm_from_gnutls_srp_server_credentials (c_cred));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_srp_server_credentials_files_x,
@@ -1809,13 +1829,12 @@ SCM_DEFINE (scm_gnutls_set_srp_server_credentials_files_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_make_srp_client_credentials,
 	    "make-srp-client-credentials",
-	    0, 0, 0,
-	    (void),
-	    "Return new SRP client credentials.")
+	    0, 0, 0, (void), "Return new SRP client credentials.")
 #define FUNC_NAME s_scm_gnutls_make_srp_client_credentials
 {
   int err;
@@ -1827,6 +1846,7 @@ SCM_DEFINE (scm_gnutls_make_srp_client_credentials,
 
   return (scm_from_gnutls_srp_client_credentials (c_cred));
 }
+
 #undef FUNC_NAME
 
 
@@ -1853,20 +1873,18 @@ SCM_DEFINE (scm_gnutls_set_srp_client_credentials_x,
   c_username = (char *) alloca (c_username_len + 1);
   c_password = (char *) alloca (c_password_len + 1);
 
-  (void) scm_to_locale_stringbuf (username, c_username,
-				  c_username_len + 1);
+  (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
-  (void) scm_to_locale_stringbuf (password, c_password,
-				  c_password_len + 1);
+  (void) scm_to_locale_stringbuf (password, c_password, c_password_len + 1);
   c_password[c_password_len] = '\0';
 
-  err = gnutls_srp_set_client_credentials (c_cred, c_username,
-					   c_password);
+  err = gnutls_srp_set_client_credentials (c_cred, c_username, c_password);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_server_session_srp_username,
@@ -1891,6 +1909,7 @@ SCM_DEFINE (scm_gnutls_server_session_srp_username,
 
   return (result);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_srp_base64_encode, "srp-base64-encode",
@@ -1953,6 +1972,7 @@ SCM_DEFINE (scm_gnutls_srp_base64_encode, "srp-base64-encode",
 
   return (scm_take_locale_string (c_result));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
@@ -1983,8 +2003,7 @@ SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
   c_str_d.size = c_str_len;
 
   c_result_actual_len = c_result_len;
-  err = gnutls_srp_base64_decode (&c_str_d, c_result,
-				  &c_result_actual_len);
+  err = gnutls_srp_base64_decode (&c_str_d, c_result, &c_result_actual_len);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
 
@@ -1992,17 +2011,16 @@ SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
 
   return (scm_from_locale_string (c_result));
 }
+
 #undef FUNC_NAME
 #endif /* ENABLE_SRP */
-
 
+
 /* PSK credentials.  */
 
 SCM_DEFINE (scm_gnutls_make_psk_server_credentials,
 	    "make-psk-server-credentials",
-	    0, 0, 0,
-	    (void),
-	    "Return new PSK server credentials.")
+	    0, 0, 0, (void), "Return new PSK server credentials.")
 #define FUNC_NAME s_scm_gnutls_make_psk_server_credentials
 {
   int err;
@@ -2014,6 +2032,7 @@ SCM_DEFINE (scm_gnutls_make_psk_server_credentials,
 
   return (scm_from_gnutls_psk_server_credentials (c_cred));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_psk_server_credentials_file_x,
@@ -2044,13 +2063,12 @@ SCM_DEFINE (scm_gnutls_set_psk_server_credentials_file_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_make_psk_client_credentials,
 	    "make-psk-client-credentials",
-	    0, 0, 0,
-	    (void),
-	    "Return a new PSK client credentials object.")
+	    0, 0, 0, (void), "Return a new PSK client credentials object.")
 #define FUNC_NAME s_scm_gnutls_make_psk_client_credentials
 {
   int err;
@@ -2062,6 +2080,7 @@ SCM_DEFINE (scm_gnutls_make_psk_client_credentials,
 
   return (scm_from_gnutls_psk_client_credentials (c_cred));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_psk_client_credentials_x,
@@ -2089,8 +2108,7 @@ SCM_DEFINE (scm_gnutls_set_psk_client_credentials_x,
   c_username_len = scm_c_string_length (username);
   c_username = (char *) alloca (c_username_len + 1);
 
-  (void) scm_to_locale_stringbuf (username, c_username,
-				  c_username_len + 1);
+  (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
 
   c_key = scm_gnutls_get_array (key, &c_handle, &c_key_len, FUNC_NAME);
@@ -2106,6 +2124,7 @@ SCM_DEFINE (scm_gnutls_set_psk_client_credentials_x,
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_server_session_psk_username,
@@ -2130,9 +2149,10 @@ SCM_DEFINE (scm_gnutls_server_session_psk_username,
 
   return (result);
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* X.509 certificates.  */
 
 SCM_DEFINE (scm_gnutls_import_x509_certificate, "import-x509-certificate",
@@ -2177,6 +2197,7 @@ SCM_DEFINE (scm_gnutls_import_x509_certificate, "import-x509-certificate",
 
   return (scm_from_gnutls_x509_certificate (c_cert));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_import_x509_private_key, "import-x509-private-key",
@@ -2221,6 +2242,7 @@ SCM_DEFINE (scm_gnutls_import_x509_private_key, "import-x509-private-key",
 
   return (scm_from_gnutls_x509_private_key (c_key));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
@@ -2292,6 +2314,7 @@ SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
 
   return (scm_from_gnutls_x509_private_key (c_key));
 }
+
 #undef FUNC_NAME
 
 /* Provide the body of a `get_dn' function.  */
@@ -2326,6 +2349,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_dn, "x509-certificate-dn",
 {
   X509_CERTIFICATE_DN_FUNCTION_BODY (gnutls_x509_crt_get_dn);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_issuer_dn,
@@ -2338,6 +2362,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_issuer_dn,
 {
   X509_CERTIFICATE_DN_FUNCTION_BODY (gnutls_x509_crt_get_issuer_dn);
 }
+
 #undef FUNC_NAME
 
 #undef X509_CERTIFICATE_DN_FUNCTION_BODY
@@ -2399,6 +2424,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_dn_oid, "x509-certificate-dn-oid",
 {
   X509_CERTIFICATE_DN_OID_FUNCTION_BODY (gnutls_x509_crt_get_dn_oid);
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_issuer_dn_oid,
@@ -2412,6 +2438,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_issuer_dn_oid,
 {
   X509_CERTIFICATE_DN_OID_FUNCTION_BODY (gnutls_x509_crt_get_issuer_dn_oid);
 }
+
 #undef FUNC_NAME
 
 #undef X509_CERTIFICATE_DN_OID_FUNCTION_BODY
@@ -2448,6 +2475,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_matches_hostname_p,
 
   return result;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_signature_algorithm,
@@ -2469,6 +2497,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_signature_algorithm,
 
   return (scm_from_gnutls_sign_algorithm (c_result));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_public_key_algorithm,
@@ -2491,6 +2520,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_public_key_algorithm,
   return (scm_values (scm_list_2 (scm_from_gnutls_pk_algorithm (c_pk),
 				  scm_from_uint (c_bits))));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_key_usage,
@@ -2522,12 +2552,11 @@ SCM_DEFINE (scm_gnutls_x509_certificate_key_usage,
 
   return usage;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_version, "x509-certificate-version",
-	    1, 0, 0,
-	    (SCM cert),
-	    "Return the version of @var{cert}.")
+	    1, 0, 0, (SCM cert), "Return the version of @var{cert}.")
 #define FUNC_NAME s_scm_gnutls_x509_certificate_version
 {
   int c_result;
@@ -2541,6 +2570,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_version, "x509-certificate-version",
 
   return (scm_from_int (c_result));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_key_id, "x509-certificate-key-id",
@@ -2572,6 +2602,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_key_id, "x509-certificate-key-id",
 
   return result;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_authority_key_id,
@@ -2595,8 +2626,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_authority_key_id,
   scm_array_get_handle (result, &c_id_handle);
   c_id = scm_array_handle_u8_writable_elements (&c_id_handle);
 
-  err = gnutls_x509_crt_get_authority_key_id (c_cert, c_id, &c_id_len,
-					      NULL);
+  err = gnutls_x509_crt_get_authority_key_id (c_cert, c_id, &c_id_len, NULL);
   scm_array_handle_release (&c_id_handle);
 
   if (EXPECT_FALSE (err))
@@ -2604,6 +2634,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_authority_key_id,
 
   return result;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_subject_key_id,
@@ -2626,8 +2657,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_subject_key_id,
   scm_array_get_handle (result, &c_id_handle);
   c_id = scm_array_handle_u8_writable_elements (&c_id_handle);
 
-  err = gnutls_x509_crt_get_subject_key_id (c_cert, c_id, &c_id_len,
-					    NULL);
+  err = gnutls_x509_crt_get_subject_key_id (c_cert, c_id, &c_id_len, NULL);
   scm_array_handle_release (&c_id_handle);
 
   if (EXPECT_FALSE (err))
@@ -2635,6 +2665,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_subject_key_id,
 
   return result;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_x509_certificate_subject_alternative_name,
@@ -2695,9 +2726,10 @@ SCM_DEFINE (scm_gnutls_x509_certificate_subject_alternative_name,
 
   return result;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Debugging.  */
 
 static SCM log_procedure = SCM_BOOL_F;
@@ -2727,6 +2759,7 @@ SCM_DEFINE (scm_gnutls_set_log_procedure_x, "set-log-procedure!",
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_set_log_level_x, "set-log-level!", 1, 0, 0,
@@ -2741,9 +2774,10 @@ SCM_DEFINE (scm_gnutls_set_log_level_x, "set-log-level!", 1, 0, 0,
 
   return SCM_UNSPECIFIED;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Initialization.  */
 
 void

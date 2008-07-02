@@ -176,12 +176,18 @@ static const gnutls_cipher_entry algorithms[] = {
   {"IDEA-PGP-CFB", GNUTLS_CIPHER_IDEA_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0},
   {"3DES-PGP-CFB", GNUTLS_CIPHER_3DES_PGP_CFB, 8, 24, CIPHER_BLOCK, 8, 0},
   {"CAST5-PGP-CFB", GNUTLS_CIPHER_CAST5_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0},
-  {"BLOWFISH-PGP-CFB", GNUTLS_CIPHER_BLOWFISH_PGP_CFB, 8, 16/*actually unlimited*/, CIPHER_BLOCK, 8, 0},
-  {"SAFER-SK128-PGP-CFB", GNUTLS_CIPHER_SAFER_SK128_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0},
-  {"AES-128-PGP-CFB", GNUTLS_CIPHER_AES128_PGP_CFB, 16, 16, CIPHER_BLOCK, 16, 0},
-  {"AES-192-PGP-CFB", GNUTLS_CIPHER_AES192_PGP_CFB, 16, 24, CIPHER_BLOCK, 16, 0},
-  {"AES-256-PGP-CFB", GNUTLS_CIPHER_AES256_PGP_CFB, 16, 32, CIPHER_BLOCK, 16, 0},
-  {"TWOFISH-PGP-CFB", GNUTLS_CIPHER_TWOFISH_PGP_CFB, 16, 16, CIPHER_BLOCK, 16, 0},
+  {"BLOWFISH-PGP-CFB", GNUTLS_CIPHER_BLOWFISH_PGP_CFB, 8,
+   16 /*actually unlimited */ , CIPHER_BLOCK, 8, 0},
+  {"SAFER-SK128-PGP-CFB", GNUTLS_CIPHER_SAFER_SK128_PGP_CFB, 8, 16,
+   CIPHER_BLOCK, 8, 0},
+  {"AES-128-PGP-CFB", GNUTLS_CIPHER_AES128_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
+   0},
+  {"AES-192-PGP-CFB", GNUTLS_CIPHER_AES192_PGP_CFB, 16, 24, CIPHER_BLOCK, 16,
+   0},
+  {"AES-256-PGP-CFB", GNUTLS_CIPHER_AES256_PGP_CFB, 16, 32, CIPHER_BLOCK, 16,
+   0},
+  {"TWOFISH-PGP-CFB", GNUTLS_CIPHER_TWOFISH_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
+   0},
 #endif
   {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0},
   {0, 0, 0, 0, 0, 0, 0}
@@ -217,7 +223,7 @@ struct gnutls_hash_entry
   const char *name;
   const char *oid;
   gnutls_mac_algorithm_t id;
-  size_t key_size; /* in case of mac */
+  size_t key_size;		/* in case of mac */
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
@@ -227,7 +233,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
   {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32},
   {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48},
   {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64},
-  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0}, /* not used as MAC */
+  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0},	/* not used as MAC */
   {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20},
   {"NULL", NULL, GNUTLS_MAC_NULL, 0},
   {0, 0, 0, 0}
@@ -709,11 +715,11 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
  *   MAC algorithm, or %GNUTLS_MAC_UNKNOWN on failures.
  **/
 gnutls_mac_algorithm_t
-gnutls_mac_get_id (const char* name)
+gnutls_mac_get_id (const char *name)
 {
   gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
-  GNUTLS_HASH_LOOP( if (strcasecmp( p->name, name)==0) ret = p->id);
+  GNUTLS_HASH_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
 
   return ret;
 }
@@ -800,11 +806,9 @@ _gnutls_compression_priority (gnutls_session_t session,
 			      gnutls_compression_method_t algorithm)
 {				/* actually returns the priority */
   unsigned int i;
-  for (i = 0;
-       i < session->internals.priorities.compression.algorithms; i++)
+  for (i = 0; i < session->internals.priorities.compression.algorithms; i++)
     {
-      if (session->internals.priorities.
-	  compression.priority[i] == algorithm)
+      if (session->internals.priorities.compression.priority[i] == algorithm)
 	return i;
     }
   return -1;
@@ -840,11 +844,14 @@ gnutls_compression_get_name (gnutls_compression_method_t algorithm)
  *   %GNUTLS_COMP_UNKNOWN on error.
  **/
 gnutls_compression_method_t
-gnutls_compression_get_id (const char* name)
+gnutls_compression_get_id (const char *name)
 {
   gnutls_compression_method_t ret = GNUTLS_COMP_UNKNOWN;
 
-  GNUTLS_COMPRESSION_LOOP( if (strcasecmp( p->name+sizeof("GNUTLS_COMP_")-1, name)==0) ret = p->id);
+  GNUTLS_COMPRESSION_LOOP (if
+			   (strcasecmp
+			    (p->name + sizeof ("GNUTLS_COMP_") - 1,
+			     name) == 0) ret = p->id);
 
   return ret;
 }
@@ -948,11 +955,9 @@ _gnutls_cipher_priority (gnutls_session_t session,
 			 gnutls_cipher_algorithm_t algorithm)
 {
   unsigned int i;
-  for (i = 0;
-       i < session->internals.priorities.cipher.algorithms; i++)
+  for (i = 0; i < session->internals.priorities.cipher.algorithms; i++)
     {
-      if (session->internals.priorities.
-	  cipher.priority[i] == algorithm)
+      if (session->internals.priorities.cipher.priority[i] == algorithm)
 	return i;
     }
   return -1;
@@ -1035,11 +1040,11 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
  *   the specified cipher, or %GNUTLS_CIPHER_UNKNOWN on error.
  **/
 gnutls_cipher_algorithm_t
-gnutls_cipher_get_id (const char* name)
+gnutls_cipher_get_id (const char *name)
 {
   gnutls_cipher_algorithm_t ret = GNUTLS_CIPHER_UNKNOWN;
 
-  GNUTLS_LOOP( if (strcasecmp( p->name, name)==0) ret = p->id);
+  GNUTLS_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
 
   return ret;
 }
@@ -1129,11 +1134,11 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
  *   on error.
  **/
 gnutls_kx_algorithm_t
-gnutls_kx_get_id (const char* name)
+gnutls_kx_get_id (const char *name)
 {
   gnutls_cipher_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
-  GNUTLS_KX_LOOP( if (strcasecmp( p->name, name)==0) ret = p->algorithm);
+  GNUTLS_KX_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->algorithm);
 
   return ret;
 }
@@ -1275,11 +1280,11 @@ gnutls_protocol_get_name (gnutls_protocol_t version)
   * %GNUTLS_VERSION_UNKNOWN on error.
   **/
 gnutls_protocol_t
-gnutls_protocol_get_id (const char* name)
+gnutls_protocol_get_id (const char *name)
 {
   gnutls_protocol_t ret = GNUTLS_VERSION_UNKNOWN;
 
-  GNUTLS_VERSION_LOOP( if (strcasecmp( p->name, name)==0) ret = p->id);
+  GNUTLS_VERSION_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
 
   return ret;
 }
@@ -1814,8 +1819,9 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 
   for (i = j = 0; i < SUPPORTED_COMPRESSION_METHODS; i++)
     {
-      int tmp = _gnutls_compression_get_num (session->internals.priorities.
-					     compression.priority[i]);
+      int tmp =
+	_gnutls_compression_get_num (session->internals.
+				     priorities.compression.priority[i]);
 
       /* remove private compression algorithms, if requested.
        */
@@ -1872,15 +1878,15 @@ gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
   * %GNUTLS_CRT_UNKNOWN on error.
   **/
 gnutls_certificate_type_t
-gnutls_certificate_type_get_id (const char* name)
+gnutls_certificate_type_get_id (const char *name)
 {
   gnutls_certificate_type_t ret = GNUTLS_CRT_UNKNOWN;
 
-  if (strcasecmp( name, "X.509")==0 || strcasecmp( name, "X509")==0)
+  if (strcasecmp (name, "X.509") == 0 || strcasecmp (name, "X509") == 0)
     return GNUTLS_CRT_X509;
-  if (strcasecmp( name, "OPENPGP")==0)
+  if (strcasecmp (name, "OPENPGP") == 0)
     return GNUTLS_CRT_OPENPGP;
-  
+
   return ret;
 }
 
@@ -2116,4 +2122,3 @@ _gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
 
   return ret;
 }
-

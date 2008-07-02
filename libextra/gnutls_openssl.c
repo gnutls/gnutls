@@ -1003,23 +1003,23 @@ RAND_egd_bytes (const char *path, int bytes)
 void
 MD5_Init (MD5_CTX * ctx)
 {
-  ctx->handle = gnutls_malloc( sizeof(digest_hd_st));
+  ctx->handle = gnutls_malloc (sizeof (digest_hd_st));
   if (!ctx->handle)
-      abort();
-  _gnutls_hash_init( ctx->handle, GNUTLS_DIG_MD5);
+    abort ();
+  _gnutls_hash_init (ctx->handle, GNUTLS_DIG_MD5);
 }
 
 void
 MD5_Update (MD5_CTX * ctx, const void *buf, int len)
 {
-  _gnutls_hash( ctx->handle, buf, len);
+  _gnutls_hash (ctx->handle, buf, len);
 }
 
 void
 MD5_Final (unsigned char *md, MD5_CTX * ctx)
 {
-  _gnutls_hash_deinit( ctx->handle, md);
-  gnutls_free(ctx->handle);
+  _gnutls_hash_deinit (ctx->handle, md);
+  gnutls_free (ctx->handle);
 }
 
 unsigned char *
@@ -1028,7 +1028,7 @@ MD5 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  _gnutls_hash_fast( GNUTLS_DIG_MD5, buf, len, md);
+  _gnutls_hash_fast (GNUTLS_DIG_MD5, buf, len, md);
 
   return md;
 }
@@ -1036,23 +1036,23 @@ MD5 (const unsigned char *buf, unsigned long len, unsigned char *md)
 void
 RIPEMD160_Init (RIPEMD160_CTX * ctx)
 {
-  ctx->handle = gnutls_malloc( sizeof(digest_hd_st));
+  ctx->handle = gnutls_malloc (sizeof (digest_hd_st));
   if (!ctx->handle)
-      abort();
-  _gnutls_hash_init( ctx->handle, GNUTLS_DIG_RMD160);
+    abort ();
+  _gnutls_hash_init (ctx->handle, GNUTLS_DIG_RMD160);
 }
 
 void
 RIPEMD160_Update (RIPEMD160_CTX * ctx, const void *buf, int len)
 {
-  _gnutls_hash( ctx->handle, buf, len);
+  _gnutls_hash (ctx->handle, buf, len);
 }
 
 void
 RIPEMD160_Final (unsigned char *md, RIPEMD160_CTX * ctx)
 {
-  _gnutls_hash_deinit( ctx->handle, md);
-  gnutls_free(ctx->handle);
+  _gnutls_hash_deinit (ctx->handle, md);
+  gnutls_free (ctx->handle);
 }
 
 unsigned char *
@@ -1061,7 +1061,7 @@ RIPEMD160 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  _gnutls_hash_fast( GNUTLS_DIG_RMD160, buf, len, md);
+  _gnutls_hash_fast (GNUTLS_DIG_RMD160, buf, len, md);
 
   return md;
 }

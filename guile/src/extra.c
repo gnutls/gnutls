@@ -35,24 +35,23 @@
 #include "enums.h"
 #include "extra-enums.h"
 #include "extra-smobs.h"
-
-
 
+
+
 /* SMOB and enums type definitions.  */
 
 #include "extra-smob-types.i.c"
 #include "extra-enum-map.i.c"
-
 
+
 /* OpenPGP keys.  */
 
 
 /* Maximum size we support for the name of OpenPGP keys.  */
 #define GUILE_GNUTLS_MAX_OPENPGP_NAME_LENGTH  2048
 
-SCM_DEFINE (scm_gnutls_import_openpgp_certificate, "import-openpgp-certificate",
-	    2, 0, 0,
-	    (SCM data, SCM format),
+SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
+	    "import-openpgp-certificate", 2, 0, 0, (SCM data, SCM format),
 	    "Return a new OpenPGP certificate object resulting from the "
 	    "import of @var{data} (a uniform array) according to "
 	    "@var{format}.")
@@ -92,11 +91,12 @@ SCM_DEFINE (scm_gnutls_import_openpgp_certificate, "import-openpgp-certificate",
 
   return (scm_from_gnutls_openpgp_certificate (c_key));
 }
+
 #undef FUNC_NAME
 
-SCM_DEFINE (scm_gnutls_import_openpgp_private_key, "import-openpgp-private-key",
-	    2, 1, 0,
-	    (SCM data, SCM format, SCM pass),
+SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
+	    "import-openpgp-private-key", 2, 1, 0, (SCM data, SCM format,
+						    SCM pass),
 	    "Return a new OpenPGP private key object resulting from the "
 	    "import of @var{data} (a uniform array) according to "
 	    "@var{format}.  Optionally, a passphrase may be provided.")
@@ -136,7 +136,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key, "import-openpgp-private-key",
     }
 
   err = gnutls_openpgp_privkey_import (c_key, &c_data_d, c_format, c_pass,
-				       0 /* currently unused */);
+				       0 /* currently unused */ );
   scm_gnutls_release_array (&c_data_handle);
 
   if (EXPECT_FALSE (err))
@@ -147,6 +147,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key, "import-openpgp-private-key",
 
   return (scm_from_gnutls_openpgp_private_key (c_key));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
@@ -162,7 +163,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
 
   c_key = scm_to_gnutls_openpgp_certificate (key, 1, FUNC_NAME);
 
-  c_id = (unsigned char * ) malloc (8);
+  c_id = (unsigned char *) malloc (8);
   if (c_id == NULL)
     scm_gnutls_error (GNUTLS_E_MEMORY_ERROR, FUNC_NAME);
 
@@ -172,6 +173,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
 
   return (scm_take_u8vector (c_id, 8));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
@@ -194,8 +196,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
   if (EXPECT_FALSE (c_id_size < 8))
     {
       scm_gnutls_release_array (&c_id_handle);
-      scm_misc_error (FUNC_NAME, "ID vector too small: ~A",
-		      scm_list_1 (id));
+      scm_misc_error (FUNC_NAME, "ID vector too small: ~A", scm_list_1 (id));
     }
 
   err = gnutls_openpgp_crt_get_id (c_key, (unsigned char *) c_id);
@@ -206,6 +207,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
 
   return SCM_UNSPECIFIED;
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
@@ -236,14 +238,14 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
 
   return (scm_from_size_t (c_actual_len));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
 	    "openpgp-certificate-fingerprint",
 	    1, 0, 0,
 	    (SCM key),
-	    "Return a new u8vector denoting the fingerprint of "
-	    "@var{key}.")
+	    "Return a new u8vector denoting the fingerprint of " "@var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_fingerprint
 {
   int err;
@@ -262,8 +264,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
   do
     {
       c_actual_len = 0;
-      err = gnutls_openpgp_crt_get_fingerprint (c_key, c_fpr,
-						&c_actual_len);
+      err = gnutls_openpgp_crt_get_fingerprint (c_key, c_fpr, &c_actual_len);
       if (err == GNUTLS_E_SHORT_MEMORY_BUFFER)
 	{
 	  /* Grow C_FPR.  */
@@ -296,6 +297,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
 
   return (scm_take_u8vector (c_fpr, c_actual_len));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
@@ -313,20 +315,18 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
   c_key = scm_to_gnutls_openpgp_certificate (key, 1, FUNC_NAME);
   c_index = scm_to_int (index);
 
-  err = gnutls_openpgp_crt_get_name (c_key, c_index, c_name,
-				     &c_name_len);
+  err = gnutls_openpgp_crt_get_name (c_key, c_index, c_name, &c_name_len);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
 
   /* XXX: The name is really UTF-8.  */
   return (scm_from_locale_string (c_name));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
-	    1, 0, 0,
-	    (SCM key),
-	    "Return the list of names for @var{key}.")
+	    1, 0, 0, (SCM key), "Return the list of names for @var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_names
 {
   int err;
@@ -340,12 +340,10 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
 
   do
     {
-      err = gnutls_openpgp_crt_get_name (c_key, c_index, c_name,
-					 &c_name_len);
+      err = gnutls_openpgp_crt_get_name (c_key, c_index, c_name, &c_name_len);
       if (!err)
 	{
-	  result = scm_cons (scm_from_locale_string (c_name),
-			     result);
+	  result = scm_cons (scm_from_locale_string (c_name), result);
 	  c_index++;
 	}
     }
@@ -356,6 +354,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
 
   return (scm_reverse_x (result, SCM_EOL));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
@@ -376,6 +375,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
   return (scm_values (scm_list_2 (scm_from_gnutls_pk_algorithm (c_algo),
 				  scm_from_uint (c_bits))));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
@@ -394,6 +394,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
 
   return (scm_from_int (c_version));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "openpgp-certificate-usage",
@@ -414,10 +415,11 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "openpgp-certificate-usage",
 
   return (scm_from_gnutls_key_usage_flags (c_usage));
 }
+
 #undef FUNC_NAME
-
-
 
+
+
 /* OpenPGP keyrings.  */
 
 SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
@@ -462,6 +464,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
 
   return (scm_from_gnutls_openpgp_keyring (c_keyring));
 }
+
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
@@ -481,8 +484,7 @@ SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
   c_keyring = scm_to_gnutls_openpgp_keyring (keyring, 1, FUNC_NAME);
   SCM_VALIDATE_ARRAY (1, id);
 
-  c_id = scm_gnutls_get_array (id, &c_id_handle, &c_id_len,
-			       FUNC_NAME);
+  c_id = scm_gnutls_get_array (id, &c_id_handle, &c_id_len, FUNC_NAME);
   if (EXPECT_FALSE (c_id_len != 8))
     {
       scm_gnutls_release_array (&c_id_handle);
@@ -491,15 +493,16 @@ SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
 
   c_result = gnutls_openpgp_keyring_check_id (c_keyring,
 					      (unsigned char *) c_id,
-					      0 /* unused */);
+					      0 /* unused */ );
 
   scm_gnutls_release_array (&c_id_handle);
 
   return (scm_from_bool (c_result == 0));
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Certificates.  */
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_openpgp_keys_x,
@@ -525,9 +528,10 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_openpgp_keys_x,
 
   return SCM_UNSPECIFIED;
 }
-#undef FUNC_NAME
 
+#undef FUNC_NAME
 
+
 /* Initialization.  */
 
 void

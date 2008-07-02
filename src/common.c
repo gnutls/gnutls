@@ -153,8 +153,8 @@ print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 	      printf
 		(" # The hostname in the certificate does NOT match '%s'.\n",
 		 hostname);
-              if (!insecure)
-                exit(1);
+	      if (!insecure)
+		exit (1);
 	    }
 	  else
 	    {
@@ -282,7 +282,8 @@ print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 #ifdef ENABLE_OPENPGP
 
 void
-print_openpgp_info (gnutls_session_t session, const char *hostname, int insecure)
+print_openpgp_info (gnutls_session_t session, const char *hostname,
+		    int insecure)
 {
 
   char digest[20];
@@ -344,12 +345,13 @@ print_openpgp_info (gnutls_session_t session, const char *hostname, int insecure
 	      printf
 		(" # The hostname in the certificate does NOT match '%s'.\n",
 		 hostname);
-              if (!insecure)
-                exit(1);
+	      if (!insecure)
+		exit (1);
 	    }
 	  else
 	    {
-	      printf (" # The hostname in the certificate matches '%s'.\n", hostname);
+	      printf (" # The hostname in the certificate matches '%s'.\n",
+		      hostname);
 	    }
 	}
 
@@ -445,10 +447,8 @@ void
 print_dh_info (gnutls_session_t session, const char *str)
 {
   printf ("- %sDiffie-Hellman parameters\n", str);
-  printf (" - Using prime: %d bits\n",
-	  gnutls_dh_get_prime_bits (session));
-  printf (" - Secret key: %d bits\n",
-	  gnutls_dh_get_secret_bits (session));
+  printf (" - Using prime: %d bits\n", gnutls_dh_get_prime_bits (session));
+  printf (" - Secret key: %d bits\n", gnutls_dh_get_secret_bits (session));
   printf (" - Peer's public key: %d bits\n",
 	  gnutls_dh_get_peers_public_bits (session));
 
@@ -475,8 +475,7 @@ print_dh_info (gnutls_session_t session, const char *str)
 	  goto out;
 	}
 
-      ret = gnutls_dh_params_import_raw (dh_params, &raw_prime,
-					 &raw_gen);
+      ret = gnutls_dh_params_import_raw (dh_params, &raw_prime, &raw_gen);
       if (ret)
 	{
 	  fprintf (stderr, "gnutls_dh_params_import_raw %d\n", ret);
@@ -485,8 +484,7 @@ print_dh_info (gnutls_session_t session, const char *str)
 
       ret = gnutls_dh_params_export_pkcs3 (dh_params,
 					   GNUTLS_X509_FMT_PEM,
-					   params_data,
-					   &params_data_size);
+					   params_data, &params_data_size);
       if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	{
 	  fprintf (stderr, "gnutls_dh_params_export_pkcs3 %d\n", ret);
@@ -502,8 +500,7 @@ print_dh_info (gnutls_session_t session, const char *str)
 
       ret = gnutls_dh_params_export_pkcs3 (dh_params,
 					   GNUTLS_X509_FMT_PEM,
-					   params_data,
-					   &params_data_size);
+					   params_data, &params_data_size);
       if (ret)
 	{
 	  fprintf (stderr, "gnutls_dh_params_export_pkcs3-2 %d\n", ret);
@@ -606,12 +603,13 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
   tmp = SU (gnutls_compression_get_name (gnutls_compression_get (session)));
   printf ("- Compression: %s\n", tmp);
 
-  if (verbose) {
-    char id[32];
-    size_t id_size = sizeof(id);
-    gnutls_session_get_id (session, id, &id_size);
-    printf("- Session ID: %s\n", raw_to_string(id, id_size) );
-  }
+  if (verbose)
+    {
+      char id[32];
+      size_t id_size = sizeof (id);
+      gnutls_session_get_id (session, id, &id_size);
+      printf ("- Session ID: %s\n", raw_to_string (id, id_size));
+    }
 
 
   fflush (stdout);
@@ -631,9 +629,9 @@ print_cert_info (gnutls_session_t session, const char *hostname, int insecure)
     {
     case GNUTLS_CRT_UNKNOWN:
       printf ("Unknown\n");
-      
+
       if (!insecure)
-        exit(1);
+	exit (1);
       break;
     case GNUTLS_CRT_X509:
       printf ("X.509\n");
@@ -788,7 +786,7 @@ void
 parse_protocols (char **protocols, int protocols_size, int *protocol_priority)
 {
   int i, j;
-  
+
   if (protocols != NULL && protocols_size > 0)
     {
       DEPRECATED;

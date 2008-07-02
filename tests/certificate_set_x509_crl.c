@@ -42,8 +42,7 @@ static char crl[] =
   "elUNpllhhTgXDTA2MTIyNzA4MDIzNFowCwYJKoZIhvcNAQEFA4GBAD0zX+J2hkcc\n"
   "Nbrq1Dn5IKL8nXLgPGcHv1I/le1MNo9t1ohGQxB5HnFUkRPAY82fR6Epor4aHgVy\n"
   "b+5y+neKN9Kn2mPF4iiun+a4o26CjJ0pArojCL1p8T0yyi9Xxvyc/ezaZ98HiIyP\n"
-  "c3DGMNR+oUmSjKZ0jIhAYmeLxaPHfQwR\n"
-  "-----END X509 CRL-----\n";
+  "c3DGMNR+oUmSjKZ0jIhAYmeLxaPHfQwR\n" "-----END X509 CRL-----\n";
 
 /* Test regression of bug reported by Max Kellermann <max@duempel.org>
    in Message-ID: <20061211075202.GA1517@roonstrasse.net> to the

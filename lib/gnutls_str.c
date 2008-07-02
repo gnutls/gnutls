@@ -285,12 +285,10 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
  * Since: 2.4.0
  **/
 int
-gnutls_hex2bin (const char * hex_data,
-		size_t hex_size,
-		char * bin_data,
-		size_t * bin_size)
+gnutls_hex2bin (const char *hex_data,
+		size_t hex_size, char *bin_data, size_t * bin_size)
 {
-  return _gnutls_hex2bin (hex_data, (int)hex_size, bin_data, bin_size);
+  return _gnutls_hex2bin (hex_data, (int) hex_size, bin_data, bin_size);
 }
 
 int
@@ -335,31 +333,32 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 int
 _gnutls_hostname_compare (const char *certname, const char *hostname)
 {
-   /* find the first different character */
-  for (; *certname && *hostname && toupper(*certname) == toupper(*hostname); certname++, hostname++)
+  /* find the first different character */
+  for (; *certname && *hostname && toupper (*certname) == toupper (*hostname);
+       certname++, hostname++)
     ;
- 
-   /* the strings are the same */
+
+  /* the strings are the same */
   if (strlen (certname) == 0 && strlen (hostname) == 0)
     return 1;
-  
+
   if (*certname == '*')
     {
       /* a wildcard certificate */
 
       certname++;
-  
+
       while (1)
-       	{
+	{
 	  /* Use a recursive call to allow multiple wildcards */
 	  if (_gnutls_hostname_compare (certname, hostname))
- 	    {
- 	      return 1;
- 	    }
- 	  /* wildcards are only allowed to match a single domain component or component fragment */
- 	  if (*hostname == '\0' || *hostname == '.')
- 	    break;
- 	  hostname++;
+	    {
+	      return 1;
+	    }
+	  /* wildcards are only allowed to match a single domain component or component fragment */
+	  if (*hostname == '\0' || *hostname == '.')
+	    break;
+	  hostname++;
 	}
 
       return 0;

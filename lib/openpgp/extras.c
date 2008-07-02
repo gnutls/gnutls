@@ -132,7 +132,7 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 
   if (data->data == NULL || data->size == 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
 
@@ -171,17 +171,19 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 	  goto error;
 	}
 
-      size_t written=0;
-      do 
-        {
-          err = cdk_stream_read (input, raw_data+written, raw_len-written);
+      size_t written = 0;
+      do
+	{
+	  err =
+	    cdk_stream_read (input, raw_data + written, raw_len - written);
 
-          if (err > 0) written += err;
-        }
-      while( written < raw_len && err != EOF && err > 0);
-      
+	  if (err > 0)
+	    written += err;
+	}
+      while (written < raw_len && err != EOF && err > 0);
+
       raw_len = written;
-      
+
     }
   else
     {				/* RAW */
@@ -266,8 +268,7 @@ gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
  **/
 int
 gnutls_openpgp_keyring_get_crt (gnutls_openpgp_keyring_t ring,
-				unsigned int idx,
-				gnutls_openpgp_crt_t * cert)
+				unsigned int idx, gnutls_openpgp_crt_t * cert)
 {
   cdk_kbnode_t knode;
   cdk_error_t err;

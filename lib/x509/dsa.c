@@ -41,7 +41,7 @@ _gnutls_dsa_generate_params (mpi_t * resarr, int *resarr_len, int bits)
   gcry_sexp_t parms, key, list;
 
   /* FIXME: Remove me once we depend on 1.3.1 */
-  if (bits > 1024 && gcry_check_version("1.3.1")==NULL)
+  if (bits > 1024 && gcry_check_version ("1.3.1") == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;

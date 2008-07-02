@@ -32,22 +32,24 @@
 #include <gnutls_mpi.h>
 #include <gcrypt.h>
 
-static int wrap_gcry_rnd_init( void** ctx)
+static int
+wrap_gcry_rnd_init (void **ctx)
 {
-char c;
+  char c;
 
-  gcry_create_nonce ( &c, 1);
-  gcry_randomize(&c, 1, GCRY_STRONG_RANDOM);
-  
+  gcry_create_nonce (&c, 1);
+  gcry_randomize (&c, 1, GCRY_STRONG_RANDOM);
+
   return 0;
 }
 
-static int wrap_gcry_rnd( void* ctx, int level, void* data, int datasize)
+static int
+wrap_gcry_rnd (void *ctx, int level, void *data, int datasize)
 {
   if (level == GNUTLS_RND_NONCE)
-     gcry_create_nonce ( data, datasize);
+    gcry_create_nonce (data, datasize);
   else
-     gcry_randomize( data, datasize, level);
+    gcry_randomize (data, datasize, level);
 
   return 0;
 }

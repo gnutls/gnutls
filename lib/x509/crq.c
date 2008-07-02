@@ -312,9 +312,9 @@ parse_attribute (ASN1_TYPE asn1_struct,
       /* create a string like "attribute.?1"
        */
       if (attr_name[0] != 0)
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", attr_name, k1);
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "%s.?%u", attr_name, k1);
       else
-        snprintf( tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
+	snprintf (tmpbuffer1, sizeof (tmpbuffer1), "?%u", k1);
 
       len = sizeof (value) - 1;
       result = asn1_read_value (asn1_struct, tmpbuffer1, value, &len);
@@ -356,7 +356,8 @@ parse_attribute (ASN1_TYPE asn1_struct,
 
 	  /* Read the Value 
 	   */
-	  snprintf( tmpbuffer3, sizeof (tmpbuffer3), "%s.values.?%u", tmpbuffer1, indx+1);
+	  snprintf (tmpbuffer3, sizeof (tmpbuffer3), "%s.values.?%u",
+		    tmpbuffer1, indx + 1);
 
 	  len = sizeof (value) - 1;
 	  result = asn1_read_value (asn1_struct, tmpbuffer3, value, &len);
@@ -861,8 +862,7 @@ gnutls_x509_crq_export (gnutls_x509_crq_t crq,
     }
 
   return _gnutls_x509_export_int (crq->crq, format, PEM_CRQ,
-				  output_data,
-				  output_data_size);
+				  output_data, output_data_size);
 }
 
 /**

@@ -217,9 +217,8 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
 
   if ((ret =
        _gnutls_get_auth_info_gcert (&peer_cert,
-				  session->security_parameters.cert_type,
-				  info,
-				  CERT_NO_COPY)) < 0)
+				    session->security_parameters.cert_type,
+				    info, CERT_NO_COPY)) < 0)
     {
       gnutls_assert ();
       return ret;

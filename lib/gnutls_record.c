@@ -371,8 +371,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   _gnutls_record_log
     ("REC[%x]: Sending Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&session->connection_state.
-				   write_sequence_number),
+     (int) _gnutls_uint64touint32 (&session->
+				   connection_state.write_sequence_number),
      _gnutls_packet2str (type), type, sizeofdata);
 
   if (sizeofdata > MAX_RECORD_SEND_SIZE)
@@ -410,7 +410,9 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher_size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, cipher, cipher_size, type, (session->internals.priorities.no_padding==0)?1:0);
+			 data2send_size, cipher, cipher_size, type,
+			 (session->internals.priorities.no_padding ==
+			  0) ? 1 : 0);
       if (cipher_size <= 0)
 	{
 	  gnutls_assert ();
@@ -434,8 +436,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	  return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-      ret =
-	_gnutls_io_write_buffered (session, cipher, cipher_size);
+      ret = _gnutls_io_write_buffered (session, cipher, cipher_size);
       gnutls_free (cipher);
     }
 
@@ -465,9 +466,9 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   _gnutls_record_log ("REC[%x]: Sent Packet[%d] %s(%d) with length: %d\n",
 		      session,
-		      (int) _gnutls_uint64touint32 (&session->
-						    connection_state.
-						    write_sequence_number),
+		      (int)
+		      _gnutls_uint64touint32
+		      (&session->connection_state.write_sequence_number),
 		      _gnutls_packet2str (type), type, cipher_size);
 
   return retval;
@@ -790,9 +791,9 @@ record_check_type (gnutls_session_t session,
 inline static int
 get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
 {
-size_t max_record_size;
+  size_t max_record_size;
 
-  if (gnutls_compression_get(session) != GNUTLS_COMP_NULL)
+  if (gnutls_compression_get (session) != GNUTLS_COMP_NULL)
     max_record_size = MAX_RECORD_RECV_SIZE + EXTRA_COMP_SIZE;
   else
     max_record_size = MAX_RECORD_RECV_SIZE;
@@ -809,8 +810,7 @@ size_t max_record_size;
       /* Initialize the internal buffer.
        */
       session->internals.recv_buffer.data =
-	gnutls_realloc (session->internals.recv_buffer.data,
-			max_record_size);
+	gnutls_realloc (session->internals.recv_buffer.data, max_record_size);
 
       if (session->internals.recv_buffer.data == NULL)
 	{
@@ -939,14 +939,14 @@ begin:
 
   _gnutls_record_log
     ("REC[%x]: Expected Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&session->connection_state.
-				   read_sequence_number),
+     (int) _gnutls_uint64touint32 (&session->
+				   connection_state.read_sequence_number),
      _gnutls_packet2str (type), type, sizeofdata);
-  _gnutls_record_log
-    ("REC[%x]: Received Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&session->connection_state.
-				   read_sequence_number),
-     _gnutls_packet2str (recv_type), recv_type, length);
+  _gnutls_record_log ("REC[%x]: Received Packet[%d] %s(%d) with length: %d\n",
+		      session,
+		      (int) _gnutls_uint64touint32 (&session->
+						    connection_state.read_sequence_number),
+		      _gnutls_packet2str (recv_type), recv_type, length);
 
   if (length > MAX_RECV_SIZE)
     {
@@ -1024,8 +1024,8 @@ begin:
 
   _gnutls_record_log
     ("REC[%x]: Decrypted Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&session->connection_state.
-				   read_sequence_number),
+     (int) _gnutls_uint64touint32 (&session->
+				   connection_state.read_sequence_number),
      _gnutls_packet2str (recv_type), recv_type, decrypted_length);
 
 /* increase sequence number 

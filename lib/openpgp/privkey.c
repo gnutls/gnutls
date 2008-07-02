@@ -48,7 +48,7 @@ gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key)
   *key = gnutls_calloc (1, sizeof (gnutls_openpgp_privkey_int));
 
   if (*key)
-    return 0; /* success */
+    return 0;			/* success */
   return GNUTLS_E_MEMORY_ERROR;
 }
 
@@ -99,10 +99,10 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 
   if (data->data == NULL || data->size == 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
-  
+
   if (format == GNUTLS_OPENPGP_FMT_RAW)
     rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
   else
@@ -113,7 +113,7 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 	  rc = _gnutls_map_cdk_rc (rc);
 	  gnutls_assert ();
 	  return rc;
-	}      
+	}
       if (cdk_armor_filter_use (inp))
 	rc = cdk_stream_set_armor_flag (inp, 0);
       if (!rc)
@@ -131,10 +131,10 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_SECRET_KEY);
   if (pkt == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
-  
+
   return 0;
 }
 
@@ -158,12 +158,13 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
  **/
 int
 gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
-			   gnutls_openpgp_crt_fmt_t format,
-			   const char* password, unsigned int flags,
-			   void *output_data, size_t * output_data_size)
+			       gnutls_openpgp_crt_fmt_t format,
+			       const char *password, unsigned int flags,
+			       void *output_data, size_t * output_data_size)
 {
   /* FIXME for now we do not export encrypted keys */
-  return _gnutls_openpgp_export( key->knode, format, output_data, output_data_size, 1);
+  return _gnutls_openpgp_export (key->knode, format, output_data,
+				 output_data_size, 1);
 }
 
 
@@ -193,36 +194,38 @@ gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
 
   if (!key)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_PK_UNKNOWN;
     }
-  
+
   algo = 0;
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_SECRET_KEY);
   if (pkt)
     {
       if (bits)
 	*bits = cdk_pk_get_nbits (pkt->pkt.secret_key->pk);
-      algo = _gnutls_openpgp_get_algo(pkt->pkt.secret_key->pk->pubkey_algo);
+      algo = _gnutls_openpgp_get_algo (pkt->pkt.secret_key->pk->pubkey_algo);
     }
-  
+
   return algo;
 }
 
-int _gnutls_openpgp_get_algo( int cdk_algo)
+int
+_gnutls_openpgp_get_algo (int cdk_algo)
 {
-int algo;
+  int algo;
 
-      if (is_RSA (cdk_algo))
-	algo = GNUTLS_PK_RSA;
-      else if (is_DSA (cdk_algo))
-	algo = GNUTLS_PK_DSA;
-      else {
-        _gnutls_x509_log("Unknown OpenPGP algorithm %d\n", cdk_algo);
-	algo = GNUTLS_PK_UNKNOWN;
-      }
-      
-      return algo;
+  if (is_RSA (cdk_algo))
+    algo = GNUTLS_PK_RSA;
+  else if (is_DSA (cdk_algo))
+    algo = GNUTLS_PK_DSA;
+  else
+    {
+      _gnutls_x509_log ("Unknown OpenPGP algorithm %d\n", cdk_algo);
+      algo = GNUTLS_PK_UNKNOWN;
+    }
+
+  return algo;
 }
 
 /**
@@ -251,7 +254,8 @@ gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key)
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
-  if (pkt->pkt.secret_key->is_revoked != 0) return 1;
+  if (pkt->pkt.secret_key->is_revoked != 0)
+    return 1;
   return 0;
 }
 
@@ -270,7 +274,7 @@ gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key)
  **/
 int
 gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
-				    void *fpr, size_t * fprlen)
+					void *fpr, size_t * fprlen)
 {
   cdk_packet_t pkt;
   cdk_pkt_pubkey_t pk = NULL;
@@ -284,15 +288,15 @@ gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
   *fprlen = 0;
 
   pkt = cdk_kbnode_find_packet (key->knode, CDK_PKT_SECRET_KEY);
-  if (!pkt) 
+  if (!pkt)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
 
   pk = pkt->pkt.secret_key->pk;
   *fprlen = 20;
-  
+
   if (is_RSA (pk->pubkey_algo) && pk->version < 4)
     *fprlen = 16;
 
@@ -330,8 +334,8 @@ gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
   cdk_sk_get_keyid (pkt->pkt.secret_key, kid);
-  _gnutls_write_uint32( kid[0], keyid);
-  _gnutls_write_uint32( kid[1], keyid+4);
+  _gnutls_write_uint32 (kid[0], keyid);
+  _gnutls_write_uint32 (kid[1], keyid + 4);
 
   return 0;
 }
@@ -374,7 +378,8 @@ gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key)
 }
 
 /* returns the subkey with the given index */
-static cdk_packet_t _get_secret_subkey(gnutls_openpgp_privkey_t key, unsigned int indx)
+static cdk_packet_t
+_get_secret_subkey (gnutls_openpgp_privkey_t key, unsigned int indx)
 {
   cdk_kbnode_t p, ctx;
   cdk_packet_t pkt;
@@ -405,7 +410,8 @@ static cdk_packet_t _get_secret_subkey(gnutls_openpgp_privkey_t key, unsigned in
  * Since: 2.4.0
  **/
 int
-gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key, unsigned int idx)
+gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t
+						  key, unsigned int idx)
 {
   cdk_packet_t pkt;
 
@@ -415,11 +421,12 @@ gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key, 
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  pkt = _get_secret_subkey( key, idx);
+  pkt = _get_secret_subkey (key, idx);
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
-  if (pkt->pkt.secret_key->is_revoked != 0) return 1;
+  if (pkt->pkt.secret_key->is_revoked != 0)
+    return 1;
   return 0;
 }
 
@@ -443,18 +450,19 @@ gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key, 
  **/
 gnutls_pk_algorithm_t
 gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
-    unsigned int idx, unsigned int *bits)
+						unsigned int idx,
+						unsigned int *bits)
 {
   cdk_packet_t pkt;
   int algo;
 
   if (!key)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_PK_UNKNOWN;
     }
-  
-  pkt = _get_secret_subkey( key, idx);
+
+  pkt = _get_secret_subkey (key, idx);
 
   algo = 0;
   if (pkt)
@@ -497,12 +505,12 @@ gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  KEYID_IMPORT( kid, keyid);
-  ret = _gnutls_openpgp_find_subkey_idx( key->knode, kid, 1);
+  KEYID_IMPORT (kid, keyid);
+  ret = _gnutls_openpgp_find_subkey_idx (key->knode, kid, 1);
 
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
     }
 
   return ret;
@@ -529,7 +537,7 @@ gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key,
   if (!key)
     return (time_t) - 1;
 
-  pkt = _get_secret_subkey( key, idx);
+  pkt = _get_secret_subkey (key, idx);
   if (pkt)
     timestamp = pkt->pkt.secret_key->pk->timestamp;
   else
@@ -551,8 +559,8 @@ gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key,
  * Since: 2.4.0
  **/
 time_t
-gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
-						   unsigned int idx)
+gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t
+						   key, unsigned int idx)
 {
   cdk_packet_t pkt;
   time_t expiredate;
@@ -560,7 +568,7 @@ gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
   if (!key)
     return (time_t) - 1;
 
-  pkt = _get_secret_subkey( key, idx);
+  pkt = _get_secret_subkey (key, idx);
   if (pkt)
     expiredate = pkt->pkt.secret_key->expiredate;
   else
@@ -595,13 +603,13 @@ gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  pkt = _get_secret_subkey( key, idx);
+  pkt = _get_secret_subkey (key, idx);
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
   cdk_sk_get_keyid (pkt->pkt.secret_key, kid);
-  _gnutls_write_uint32( kid[0], keyid);
-  _gnutls_write_uint32( kid[1], keyid+4);
+  _gnutls_write_uint32 (kid[0], keyid);
+  _gnutls_write_uint32 (kid[1], keyid + 4);
 
   return 0;
 }
@@ -636,7 +644,7 @@ gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t key,
 
   *fprlen = 0;
 
-  pkt = _get_secret_subkey( key, idx);
+  pkt = _get_secret_subkey (key, idx);
   if (!pkt)
     return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
@@ -655,8 +663,9 @@ gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t key,
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
-_gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey, uint32_t *keyid /*[2]*/,
-			   bigint_t * params, int *params_size)
+_gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
+				  uint32_t * keyid /*[2] */ ,
+				  bigint_t * params, int *params_size)
 {
   int result, i;
   int pk_algorithm, local_params;
@@ -665,55 +674,56 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey, uint32_t *keyid
   if (keyid == NULL)
     pkt = cdk_kbnode_find_packet (pkey->knode, CDK_PKT_SECRET_KEY);
   else
-    pkt = _gnutls_openpgp_find_key( pkey->knode, keyid, 1);
-  
+    pkt = _gnutls_openpgp_find_key (pkey->knode, keyid, 1);
+
   if (pkt == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
 
-  pk_algorithm = _gnutls_openpgp_get_algo( pkt->pkt.secret_key->pk->pubkey_algo);
+  pk_algorithm =
+    _gnutls_openpgp_get_algo (pkt->pkt.secret_key->pk->pubkey_algo);
 
   switch (pk_algorithm)
     {
-      case GNUTLS_PK_RSA:
-        local_params = RSA_PRIVATE_PARAMS;
-        break;
-      case GNUTLS_PK_DSA:
-        local_params = DSA_PRIVATE_PARAMS;
-        break;
-      default:
-        gnutls_assert ();
-        return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+    case GNUTLS_PK_RSA:
+      local_params = RSA_PRIVATE_PARAMS;
+      break;
+    case GNUTLS_PK_DSA:
+      local_params = DSA_PRIVATE_PARAMS;
+      break;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
     }
 
-  if (*params_size < local_params) 
+  if (*params_size < local_params)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
-    
+
   *params_size = local_params;
 
-    
+
   for (i = 0; i < local_params; i++)
     {
-       result = _gnutls_read_pgp_mpi( pkt, 1, i, &params[i]);
-       if (result < 0)
-         {
-           gnutls_assert();
-           goto error;
-         }
+      result = _gnutls_read_pgp_mpi (pkt, 1, i, &params[i]);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  goto error;
+	}
     }
 
   return 0;
-  
+
 error:
   {
     int j;
-    for (j=0;j<i;j++)
-      _gnutls_mpi_release( &params[j]);
+    for (j = 0; j < i; j++)
+      _gnutls_mpi_release (&params[j]);
   }
 
   return result;
@@ -721,11 +731,11 @@ error:
 
 /* The internal version of export
  */
-static
-int _get_sk_rsa_raw(gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
-  gnutls_datum_t * m, gnutls_datum_t * e,
-  gnutls_datum_t * d, gnutls_datum_t * p,
-  gnutls_datum_t * q, gnutls_datum_t * u)
+static int
+_get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
+		 gnutls_datum_t * m, gnutls_datum_t * e,
+		 gnutls_datum_t * d, gnutls_datum_t * p,
+		 gnutls_datum_t * q, gnutls_datum_t * u)
 {
   int pk_algorithm, ret, i;
   cdk_packet_t pkt;
@@ -738,18 +748,19 @@ int _get_sk_rsa_raw(gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-  
-  KEYID_IMPORT(kid32, keyid);
-  
-  pkt = _gnutls_openpgp_find_key( pkey->knode, kid32, 1);
+
+  KEYID_IMPORT (kid32, keyid);
+
+  pkt = _gnutls_openpgp_find_key (pkey->knode, kid32, 1);
   if (pkt == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
 
-  pk_algorithm = _gnutls_openpgp_get_algo( pkt->pkt.secret_key->pk->pubkey_algo);
-  
+  pk_algorithm =
+    _gnutls_openpgp_get_algo (pkt->pkt.secret_key->pk->pubkey_algo);
+
   if (pk_algorithm != GNUTLS_PK_RSA)
     {
       gnutls_assert ();
@@ -830,11 +841,10 @@ cleanup:
   return ret;
 }
 
-static
-int _get_sk_dsa_raw(gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
-				gnutls_datum_t * p, gnutls_datum_t * q,
-				gnutls_datum_t * g, gnutls_datum_t * y,
-				gnutls_datum_t * x)
+static int
+_get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
+		 gnutls_datum_t * p, gnutls_datum_t * q,
+		 gnutls_datum_t * g, gnutls_datum_t * y, gnutls_datum_t * x)
 {
   int pk_algorithm, ret, i;
   cdk_packet_t pkt;
@@ -847,18 +857,19 @@ int _get_sk_dsa_raw(gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-  
-  KEYID_IMPORT(kid32, keyid);
 
-  pkt = _gnutls_openpgp_find_key( pkey->knode, kid32, 1);
+  KEYID_IMPORT (kid32, keyid);
+
+  pkt = _gnutls_openpgp_find_key (pkey->knode, kid32, 1);
   if (pkt == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
 
-  pk_algorithm = _gnutls_openpgp_get_algo( pkt->pkt.secret_key->pk->pubkey_algo);
-  
+  pk_algorithm =
+    _gnutls_openpgp_get_algo (pkt->pkt.secret_key->pk->pubkey_algo);
+
   if (pk_algorithm != GNUTLS_PK_DSA)
     {
       gnutls_assert ();
@@ -953,22 +964,22 @@ cleanup:
  * Since: 2.4.0
  **/
 int
-gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey, 
-				    gnutls_datum_t * m, gnutls_datum_t * e,
-				    gnutls_datum_t * d, gnutls_datum_t * p,
-				    gnutls_datum_t * q, gnutls_datum_t * u)
+gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey,
+				       gnutls_datum_t * m, gnutls_datum_t * e,
+				       gnutls_datum_t * d, gnutls_datum_t * p,
+				       gnutls_datum_t * q, gnutls_datum_t * u)
 {
-gnutls_openpgp_keyid_t keyid;
-int ret;
+  gnutls_openpgp_keyid_t keyid;
+  int ret;
 
-  ret = gnutls_openpgp_privkey_get_key_id( pkey, keyid);  
+  ret = gnutls_openpgp_privkey_get_key_id (pkey, keyid);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
-    
-  return _get_sk_rsa_raw( pkey, keyid, m, e, d, p, q, u);
+
+  return _get_sk_rsa_raw (pkey, keyid, m, e, d, p, q, u);
 }
 
 /**
@@ -989,22 +1000,22 @@ int ret;
  * Since: 2.4.0
  **/
 int
-gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey, 
-				    gnutls_datum_t * p, gnutls_datum_t * q,
-				    gnutls_datum_t * g, gnutls_datum_t * y,
-				    gnutls_datum_t * x)
+gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey,
+				       gnutls_datum_t * p, gnutls_datum_t * q,
+				       gnutls_datum_t * g, gnutls_datum_t * y,
+				       gnutls_datum_t * x)
 {
-gnutls_openpgp_keyid_t keyid;
-int ret;
+  gnutls_openpgp_keyid_t keyid;
+  int ret;
 
-  ret = gnutls_openpgp_privkey_get_key_id( pkey, keyid);  
+  ret = gnutls_openpgp_privkey_get_key_id (pkey, keyid);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
-    
-  return _get_sk_dsa_raw( pkey, keyid, p, q, g, y, x);
+
+  return _get_sk_dsa_raw (pkey, keyid, p, q, g, y, x);
 }
 
 /**
@@ -1027,22 +1038,26 @@ int ret;
  * Since: 2.4.0
  **/
 int
-gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey, unsigned int idx,
-				    gnutls_datum_t * m, gnutls_datum_t * e,
-				    gnutls_datum_t * d, gnutls_datum_t * p,
-				    gnutls_datum_t * q, gnutls_datum_t * u)
+gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey,
+					      unsigned int idx,
+					      gnutls_datum_t * m,
+					      gnutls_datum_t * e,
+					      gnutls_datum_t * d,
+					      gnutls_datum_t * p,
+					      gnutls_datum_t * q,
+					      gnutls_datum_t * u)
 {
-gnutls_openpgp_keyid_t keyid;
-int ret;
+  gnutls_openpgp_keyid_t keyid;
+  int ret;
 
-  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, keyid);  
+  ret = gnutls_openpgp_privkey_get_subkey_id (pkey, idx, keyid);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
-    
-  return _get_sk_rsa_raw( pkey, keyid, m, e, d, p, q, u);
+
+  return _get_sk_rsa_raw (pkey, keyid, m, e, d, p, q, u);
 }
 
 /**
@@ -1075,14 +1090,14 @@ gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey,
   gnutls_openpgp_keyid_t keyid;
   int ret;
 
-  ret = gnutls_openpgp_privkey_get_subkey_id( pkey, idx, keyid);
+  ret = gnutls_openpgp_privkey_get_subkey_id (pkey, idx, keyid);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  return _get_sk_dsa_raw( pkey, keyid, p, q, g, y, x);
+  return _get_sk_dsa_raw (pkey, keyid, p, q, g, y, x);
 }
 
 /**
@@ -1105,7 +1120,7 @@ gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  memcpy( keyid, key->preferred_keyid, sizeof(gnutls_openpgp_keyid_t));
+  memcpy (keyid, key->preferred_keyid, sizeof (gnutls_openpgp_keyid_t));
 
   return 0;
 }
@@ -1122,7 +1137,8 @@ gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key,
  **/
 int
 gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
-					     const gnutls_openpgp_keyid_t keyid)
+					     const gnutls_openpgp_keyid_t
+					     keyid)
 {
   int ret;
 
@@ -1133,16 +1149,16 @@ gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
     }
 
   /* check if the id is valid */
-  ret = gnutls_openpgp_privkey_get_subkey_idx ( key, keyid);
+  ret = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
   if (ret < 0)
     {
-      _gnutls_x509_log("the requested subkey does not exist\n");
-      gnutls_assert();
+      _gnutls_x509_log ("the requested subkey does not exist\n");
+      gnutls_assert ();
       return ret;
     }
 
   key->preferred_set = 1;
-  memcpy( key->preferred_keyid, keyid, sizeof(gnutls_openpgp_keyid_t));
+  memcpy (key->preferred_keyid, keyid, sizeof (gnutls_openpgp_keyid_t));
 
   return 0;
 }

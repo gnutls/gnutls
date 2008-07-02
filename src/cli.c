@@ -45,8 +45,8 @@
 #include "cli-gaa.h"
 
 #if defined _WIN32 || defined __WIN32__
-int _win_select(int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
-		const struct timeval *tv);
+int _win_select (int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
+		 const struct timeval *tv);
 #define select _win_select
 #endif
 
@@ -164,23 +164,25 @@ static gnutls_x509_privkey_t x509_key = NULL;
 static gnutls_openpgp_crt_t pgp_crt = NULL;
 static gnutls_openpgp_privkey_t pgp_key = NULL;
 
-static void get_keyid( gnutls_openpgp_keyid_t keyid, const char* str)
+static void
+get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
 {
-    size_t keyid_size = sizeof(keyid);
+  size_t keyid_size = sizeof (keyid);
 
-    if (strlen(str) != 16)
-      {
-        fprintf(stderr, "The OpenPGP subkey ID has to be 16 hexadecimal characters.\n");
-        exit(1);
-      }  
+  if (strlen (str) != 16)
+    {
+      fprintf (stderr,
+	       "The OpenPGP subkey ID has to be 16 hexadecimal characters.\n");
+      exit (1);
+    }
 
-    if (gnutls_hex2bin (str, strlen(str), keyid, &keyid_size) < 0)
-      {
-        fprintf(stderr, "Error converting hex string: %s.\n", str);
-        exit(1);
-      }
-          
-    return;
+  if (gnutls_hex2bin (str, strlen (str), keyid, &keyid_size) < 0)
+    {
+      fprintf (stderr, "Error converting hex string: %s.\n", str);
+      exit (1);
+    }
+
+  return;
 }
 
 /* Load the certificate and the private key.
@@ -297,34 +299,35 @@ load_keys (void)
       unload_file (data);
 
       if (info.pgp_subkey != NULL)
-        {
-          gnutls_openpgp_keyid_t keyid;
+	{
+	  gnutls_openpgp_keyid_t keyid;
 
-          if (strcasecmp(info.pgp_subkey, "auto")==0)
-            {
-              ret = gnutls_openpgp_crt_get_auth_subkey( pgp_crt, keyid, 1);
-              if (ret < 0)
-                {
-    	          fprintf (stderr,
-		      "*** Error setting preferred sub key id (%s): %s\n", info.pgp_subkey,
-		      gnutls_strerror (ret));
-                  exit (1);
-                }
-            }
-          else
-            get_keyid( keyid, info.pgp_subkey);
+	  if (strcasecmp (info.pgp_subkey, "auto") == 0)
+	    {
+	      ret = gnutls_openpgp_crt_get_auth_subkey (pgp_crt, keyid, 1);
+	      if (ret < 0)
+		{
+		  fprintf (stderr,
+			   "*** Error setting preferred sub key id (%s): %s\n",
+			   info.pgp_subkey, gnutls_strerror (ret));
+		  exit (1);
+		}
+	    }
+	  else
+	    get_keyid (keyid, info.pgp_subkey);
 
-          ret = gnutls_openpgp_crt_set_preferred_key_id( pgp_crt, keyid);
-          if (ret >= 0)
-            ret = gnutls_openpgp_privkey_set_preferred_key_id( pgp_key, keyid);
-          if (ret < 0)
-            {
-    	      fprintf (stderr,
-		   "*** Error setting preferred sub key id (%s): %s\n", info.pgp_subkey,
-		   gnutls_strerror (ret));
-              exit (1);
-            } 
-        }
+	  ret = gnutls_openpgp_crt_set_preferred_key_id (pgp_crt, keyid);
+	  if (ret >= 0)
+	    ret =
+	      gnutls_openpgp_privkey_set_preferred_key_id (pgp_key, keyid);
+	  if (ret < 0)
+	    {
+	      fprintf (stderr,
+		       "*** Error setting preferred sub key id (%s): %s\n",
+		       info.pgp_subkey, gnutls_strerror (ret));
+	      exit (1);
+	    }
+	}
 
       fprintf (stderr, "Processed 1 client PGP certificate...\n");
     }
@@ -420,7 +423,7 @@ cert_callback (gnutls_session_t session,
 static gnutls_session_t
 init_tls_session (const char *hostname)
 {
-const char *err;
+  const char *err;
 
   gnutls_session_t session;
 
@@ -428,8 +431,8 @@ const char *err;
 
   if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
     {
-      fprintf(stderr, "Syntax error at: %s\n", err);
-      exit(1);
+      fprintf (stderr, "Syntax error at: %s\n", err);
+      exit (1);
     }
 
   /* allow the use of private ciphersuites.
@@ -971,9 +974,8 @@ srp_username_callback (gnutls_session_t session,
   return 0;
 }
 
-static int psk_callback (gnutls_session_t session,
-			 char **username,
-			 gnutls_datum_t * key)
+static int
+psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
 {
   const char *hint = gnutls_psk_client_get_hint (session);
   char *passwd;
@@ -1022,12 +1024,11 @@ static int psk_callback (gnutls_session_t session,
     }
 
   ret = gnutls_psk_netconf_derive_key (passwd,
-				       *username,
-				       hint ? hint : "",
-				       key);
+				       *username, hint ? hint : "", key);
   if (ret < 0)
     {
-      fprintf (stderr, "Error deriving password: %s\n", gnutls_strerror (ret));
+      fprintf (stderr, "Error deriving password: %s\n",
+	       gnutls_strerror (ret));
       gnutls_free (*username);
       return ret;
     }
@@ -1097,7 +1098,9 @@ init_global_tls_stuff (void)
 #ifdef ENABLE_OPENPGP
   if (pgp_keyring != NULL)
     {
-      ret = gnutls_certificate_set_openpgp_keyring_file (xcred, pgp_keyring, GNUTLS_OPENPGP_FMT_BASE64);
+      ret =
+	gnutls_certificate_set_openpgp_keyring_file (xcred, pgp_keyring,
+						     GNUTLS_OPENPGP_FMT_BASE64);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error setting the OpenPGP keyring file\n");

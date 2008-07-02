@@ -218,8 +218,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 					       1].params_size, &kid);
 
 
-      _gnutls_x509_write_rsa_params (res->cert_list[res->ncerts - 1][0].
-				     params,
+      _gnutls_x509_write_rsa_params (res->
+				     cert_list[res->ncerts - 1][0].params,
 				     res->cert_list[res->ncerts -
 						    1][0].params_size, &cid);
     }
@@ -230,8 +230,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 				     res->pkey[res->ncerts -
 					       1].params_size, &kid);
 
-      _gnutls_x509_write_dsa_params (res->cert_list[res->ncerts - 1][0].
-				     params,
+      _gnutls_x509_write_dsa_params (res->
+				     cert_list[res->ncerts - 1][0].params,
 				     res->cert_list[res->ncerts -
 						    1][0].params_size, &cid);
     }
@@ -681,7 +681,9 @@ _gnutls_x509_raw_privkey_to_gkey (gnutls_privkey * privkey,
 
   /* If normal key decoding doesn't work try decoding a plain PKCS #8 key */
   if (ret < 0)
-    ret = gnutls_x509_privkey_import_pkcs8( tmpkey, raw_key, type, NULL, GNUTLS_PKCS_PLAIN);
+    ret =
+      gnutls_x509_privkey_import_pkcs8 (tmpkey, raw_key, type, NULL,
+					GNUTLS_PKCS_PLAIN);
 
   if (ret < 0)
     {
@@ -731,7 +733,8 @@ read_key_mem (gnutls_certificate_credentials_t res,
       tmp.size = key_size;
 
       ret =
-	_gnutls_x509_raw_privkey_to_gkey (&res->pkey[res->ncerts], &tmp, type);
+	_gnutls_x509_raw_privkey_to_gkey (&res->pkey[res->ncerts], &tmp,
+					  type);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1171,7 +1174,7 @@ parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
 	  ptr3 = memmem (ptr, size, PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
 	  if (ptr3 == NULL)
 	    ptr3 = memmem (ptr, size,
-			  PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
+			   PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
 
 	  ptr = ptr3;
 	  size = input_cert_size - (ptr - input_cert);
@@ -1316,19 +1319,19 @@ gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
 
   for (i = 0; i < ca_list_size; i++)
     {
-      ret = gnutls_x509_crt_init (&res->x509_ca_list[ res->x509_ncas]);
+      ret = gnutls_x509_crt_init (&res->x509_ca_list[res->x509_ncas]);
       if (ret < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
 	}
 
-      ret = _gnutls_x509_crt_cpy (res->x509_ca_list[ res->x509_ncas],
+      ret = _gnutls_x509_crt_cpy (res->x509_ca_list[res->x509_ncas],
 				  ca_list[i]);
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  gnutls_x509_crt_deinit (res->x509_ca_list[ res->x509_ncas]);
+	  gnutls_x509_crt_deinit (res->x509_ca_list[res->x509_ncas]);
 	  return ret;
 	}
       res->x509_ncas++;
@@ -1375,11 +1378,9 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
     }
 
   if (type == GNUTLS_X509_FMT_DER)
-    ret = parse_der_ca_mem (&res->x509_ca_list, &res->x509_ncas,
-			    data, size);
+    ret = parse_der_ca_mem (&res->x509_ca_list, &res->x509_ncas, data, size);
   else
-    ret = parse_pem_ca_mem (&res->x509_ca_list, &res->x509_ncas,
-			    data, size);
+    ret = parse_pem_ca_mem (&res->x509_ca_list, &res->x509_ncas, data, size);
 
   free (data);
 
@@ -1879,9 +1880,9 @@ done:
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_certificate_set_x509_simple_pkcs12_file
-(gnutls_certificate_credentials_t res, const char *pkcs12file,
- gnutls_x509_crt_fmt_t type, const char *password)
+  gnutls_certificate_set_x509_simple_pkcs12_file
+  (gnutls_certificate_credentials_t res, const char *pkcs12file,
+   gnutls_x509_crt_fmt_t type, const char *password)
 {
   gnutls_pkcs12_t p12;
   gnutls_datum_t p12blob;
@@ -1899,7 +1900,7 @@ gnutls_certificate_set_x509_simple_pkcs12_file
     }
 
   p12blob.data = read_binary_file (pkcs12file, &size);
-  p12blob.size = (unsigned int)size;
+  p12blob.size = (unsigned int) size;
   if (p12blob.data == NULL)
     {
       gnutls_assert ();

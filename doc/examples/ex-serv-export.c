@@ -19,7 +19,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-#include <gcrypt.h> /* for gcry_control */
+#include <gcrypt.h>		/* for gcry_control */
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -56,7 +56,7 @@ initialize_tls_session (void)
 
   /* Use the default priorities, plus, export cipher suites.
    */
-  gnutls_priority_set_direct( session, "EXPORT", NULL);
+  gnutls_priority_set_direct (session, "EXPORT", NULL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
@@ -90,13 +90,12 @@ static char srp_dh_group2048[] =
   "KRipli8Lk7hV+XmT7Jde6qgNdArb9P90c1nQQdXDPqcdKB5EaxR3O8qXtDoj+4AW\n"
   "dr0gekNsZIHx0rkHhxdGGludMuaI+HdIVEUjtSSw1X1ep3onddLs+gMs+9v1L7N4\n"
   "YWAnkATleuavh05zA85TKZzMBBx7wwjYKlaY86jQw4JxrjX46dv7tpS1yAPYn3rk\n"
-  "Nd4jbVJfVHWbZeNy/NaO8g+nER+eSv9zAgEC\n"
-  "-----END DH PARAMETERS-----\n";
-  
+  "Nd4jbVJfVHWbZeNy/NaO8g+nER+eSv9zAgEC\n" "-----END DH PARAMETERS-----\n";
+
 int
 generate_dh_params (void)
 {
-gnutls_datum_t dparams = { srp_dh_group2048, sizeof( srp_dh_group2048) };
+  gnutls_datum_t dparams = { srp_dh_group2048, sizeof (srp_dh_group2048) };
   /* Here instead of generating Diffie Hellman parameters (for use with DHE
    * kx algorithms) we import them.
    */

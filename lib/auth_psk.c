@@ -395,7 +395,7 @@ _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
 
   ret = 0;
 
- error:
+error:
   return ret;
 }
 

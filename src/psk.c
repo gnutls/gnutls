@@ -48,7 +48,7 @@ psktool_version (void)
 #include <gnutls/extra.h>
 #include <psk-gaa.h>
 
-#include "../lib/random.h" /* for random */
+#include "../lib/random.h"	/* for random */
 #include "getpass.h"
 
 #include <sys/types.h>
@@ -148,8 +148,7 @@ main (int argc, char **argv)
 
       ret = gnutls_psk_netconf_derive_key (passwd,
 					   info.username,
-					   info.netconf_hint,
-					   &dkey);
+					   info.netconf_hint, &dkey);
     }
   else
     {
@@ -158,7 +157,7 @@ main (int argc, char **argv)
 
       printf ("Generating a random key for user '%s'\n", info.username);
 
-      ret = _gnutls_rnd (RND_RANDOM, (char*)key, info.key_size);
+      ret = _gnutls_rnd (RND_RANDOM, (char *) key, info.key_size);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Not enough randomness\n");

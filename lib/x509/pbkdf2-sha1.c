@@ -51,9 +51,8 @@
 
 int
 _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
-		const char *S, size_t Slen,
-		unsigned int c,
-		char *DK, size_t dkLen)
+		     const char *S, size_t Slen,
+		     unsigned int c, char *DK, size_t dkLen)
 {
   unsigned int hLen = 20;
   char U[20];
@@ -69,13 +68,13 @@ _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
 
   if (c == 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
   if (dkLen == 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
   /*
@@ -87,8 +86,8 @@ _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
    */
 
   if (dkLen > 4294967295U)
-    { 
-      gnutls_assert();
+    {
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
@@ -152,7 +151,7 @@ _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
   tmp = gnutls_malloc (tmplen);
   if (tmp == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -171,10 +170,11 @@ _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
 	      tmp[Slen + 2] = (i & 0x0000ff00) >> 8;
 	      tmp[Slen + 3] = (i & 0x000000ff) >> 0;
 
-	      rc = _gnutls_hmac_fast( GNUTLS_MAC_SHA1, P, Plen, tmp, tmplen, U);
+	      rc =
+		_gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, tmp, tmplen, U);
 	    }
 	  else
-            rc = _gnutls_hmac_fast( GNUTLS_MAC_SHA1, P, Plen, U, hLen, U);
+	    rc = _gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, U, hLen, U);
 
 	  if (rc < 0)
 	    {

@@ -49,50 +49,81 @@
  *
  * Return an error text for the given id.
  **/
-const char*
+const char *
 cdk_strerror (int ec)
 {
   static char buf[20];
-  
-  switch (ec) 
+
+  switch (ec)
     {
-    case CDK_EOF:              return "End Of File";
-    case CDK_Success:          return "No error";
-    case CDK_General_Error:    return "General error";
-    case CDK_File_Error:       return strerror (errno);
-    case CDK_Bad_Sig:          return "Bad signature";
-    case CDK_Inv_Packet:       return "Invalid packet";
-    case CDK_Inv_Algo:         return "Invalid algorithm";
-    case CDK_Not_Implemented:  return "This is not implemented yet";
-    case CDK_Armor_Error:      return "ASCII armor error";
-    case CDK_Armor_CRC_Error:  return "ASCII armored damaged (CRC error)";
-    case CDK_MPI_Error:        return "Invalid or missformed MPI";
-    case CDK_Inv_Value:        return "Invalid parameter or value";
-    case CDK_Error_No_Key:     return "No key available or not found";
-    case CDK_Chksum_Error:     return "Check for key does not match";
-    case CDK_Time_Conflict:    return "Time conflict";
-    case CDK_Zlib_Error:       return "ZLIB error";
-    case CDK_Weak_Key:         return "Weak key was detected";
-    case CDK_Out_Of_Core:      return "Out of core!!";
-    case CDK_Wrong_Seckey:     return "Wrong secret key";
-    case CDK_Wrong_Format:     return "Data has wrong format";
-    case CDK_Bad_MDC:          return "Manipulated MDC detected";
-    case CDK_Inv_Mode:         return "Invalid mode";
-    case CDK_Error_No_Keyring: return "No keyring available";
-    case CDK_Inv_Packet_Ver:   return "Invalid version for packet";
-    case CDK_Too_Short:        return "Buffer or object is too short";
-    case CDK_Unusable_Key:     return "Unusable public key";
-    case CDK_No_Data:          return "No data";
-    case CDK_No_Passphrase:    return "No passphrase supplied";
-    case CDK_Network_Error:    return "A network error occurred";
-    default:                   sprintf (buf, "ec=%d", ec); return buf;
+    case CDK_EOF:
+      return "End Of File";
+    case CDK_Success:
+      return "No error";
+    case CDK_General_Error:
+      return "General error";
+    case CDK_File_Error:
+      return strerror (errno);
+    case CDK_Bad_Sig:
+      return "Bad signature";
+    case CDK_Inv_Packet:
+      return "Invalid packet";
+    case CDK_Inv_Algo:
+      return "Invalid algorithm";
+    case CDK_Not_Implemented:
+      return "This is not implemented yet";
+    case CDK_Armor_Error:
+      return "ASCII armor error";
+    case CDK_Armor_CRC_Error:
+      return "ASCII armored damaged (CRC error)";
+    case CDK_MPI_Error:
+      return "Invalid or missformed MPI";
+    case CDK_Inv_Value:
+      return "Invalid parameter or value";
+    case CDK_Error_No_Key:
+      return "No key available or not found";
+    case CDK_Chksum_Error:
+      return "Check for key does not match";
+    case CDK_Time_Conflict:
+      return "Time conflict";
+    case CDK_Zlib_Error:
+      return "ZLIB error";
+    case CDK_Weak_Key:
+      return "Weak key was detected";
+    case CDK_Out_Of_Core:
+      return "Out of core!!";
+    case CDK_Wrong_Seckey:
+      return "Wrong secret key";
+    case CDK_Wrong_Format:
+      return "Data has wrong format";
+    case CDK_Bad_MDC:
+      return "Manipulated MDC detected";
+    case CDK_Inv_Mode:
+      return "Invalid mode";
+    case CDK_Error_No_Keyring:
+      return "No keyring available";
+    case CDK_Inv_Packet_Ver:
+      return "Invalid version for packet";
+    case CDK_Too_Short:
+      return "Buffer or object is too short";
+    case CDK_Unusable_Key:
+      return "Unusable public key";
+    case CDK_No_Data:
+      return "No data";
+    case CDK_No_Passphrase:
+      return "No passphrase supplied";
+    case CDK_Network_Error:
+      return "A network error occurred";
+    default:
+      sprintf (buf, "ec=%d", ec);
+      return buf;
     }
   return NULL;
 }
 
 /* Use the passphrase callback in the handle HD or
    return NULL if there is no valid callback. */
-char*
+char *
 _cdk_passphrase_get (cdk_ctx_t hd, const char *prompt)
 {
   if (!hd || !hd->passphrase_cb)
@@ -108,7 +139,7 @@ handle_set_digest (cdk_ctx_t hd, int digest)
     return;
   if (_gnutls_hash_get_algo_len (digest) <= 0)
     digest = DEFAULT_DIGEST_ALGO;
-  hd->digest_algo = digest;   
+  hd->digest_algo = digest;
 }
 
 
@@ -120,8 +151,7 @@ handle_set_s2k (cdk_ctx_t hd, int mode, int digest)
   if (_gnutls_hash_get_algo_len (digest) <= 0)
     digest = DEFAULT_DIGEST_ALGO;
   if (mode != CDK_S2K_SIMPLE &&
-      mode != CDK_S2K_SALTED &&
-      mode != CDK_S2K_ITERSALTED)
+      mode != CDK_S2K_SALTED && mode != CDK_S2K_ITERSALTED)
     mode = CDK_S2K_ITERSALTED;
   hd->_s2k.mode = mode;
   hd->_s2k.digest_algo = digest;
@@ -138,7 +168,7 @@ handle_set_compress (cdk_ctx_t hd, int algo, int level)
   hd->compress.algo = algo;
   if (!algo)
     hd->opt.compress = 0;
-  else 
+  else
     {
       if (level > 0 && level < 10)
 	hd->compress.level = level;
@@ -161,38 +191,38 @@ cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...)
 {
   va_list arg_ptr;
   int set = action == CDK_CTLF_SET, val = 0;
-  
+
   if (!hd)
     return -1;
-  
+
   if (action != CDK_CTLF_SET && action != CDK_CTLF_GET)
     return -1;
   va_start (arg_ptr, cmd);
-  switch( cmd ) 
+  switch (cmd)
     {
     case CDK_CTL_ARMOR:
       if (set)
-	hd->opt.armor = va_arg( arg_ptr, int );
+	hd->opt.armor = va_arg (arg_ptr, int);
       else
 	val = hd->opt.armor;
       break;
 
     case CDK_CTL_DIGEST:
       if (set)
-	handle_set_digest( hd, va_arg( arg_ptr, int ) );
+	handle_set_digest (hd, va_arg (arg_ptr, int));
       else
 	val = hd->digest_algo;
       break;
-      
+
     case CDK_CTL_OVERWRITE:
       if (set)
 	hd->opt.overwrite = va_arg (arg_ptr, int);
       else
 	val = hd->opt.overwrite;
       break;
-      
+
     case CDK_CTL_COMPRESS:
-      if (set) 
+      if (set)
 	{
 	  int algo = va_arg (arg_ptr, int);
 	  int level = va_arg (arg_ptr, int);
@@ -201,40 +231,41 @@ cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...)
       else
 	val = hd->compress.algo;
       break;
-      
+
     case CDK_CTL_S2K:
-      if( set ) {
-	int mode = va_arg( arg_ptr, int );
-	int digest = va_arg( arg_ptr, int );
-	handle_set_s2k( hd, mode, digest);
-      }
+      if (set)
+	{
+	  int mode = va_arg (arg_ptr, int);
+	  int digest = va_arg (arg_ptr, int);
+	  handle_set_s2k (hd, mode, digest);
+	}
       else
 	val = hd->_s2k.mode;
       break;
-      
+
     case CDK_CTL_FORCE_DIGEST:
       if (set)
 	hd->opt.force_digest = va_arg (arg_ptr, int);
       else
 	val = hd->opt.force_digest;
       break;
-      
+
     case CDK_CTL_BLOCKMODE_ON:
-      if( set )
-	hd->opt.blockmode = va_arg( arg_ptr, int );
+      if (set)
+	hd->opt.blockmode = va_arg (arg_ptr, int);
       else
 	val = hd->opt.blockmode;
       break;
-      
+
     default:
       val = -1;
-          break;
+      break;
     }
   va_end (arg_ptr);
   return val;
 }
 
-            
+
 
 /**
  * cdk_handle_new:
@@ -243,31 +274,31 @@ cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...)
  * create a new session handle.
  **/
 cdk_error_t
-cdk_handle_new (cdk_ctx_t *r_ctx)
+cdk_handle_new (cdk_ctx_t * r_ctx)
 {
   cdk_ctx_t c;
-  
+
   if (!r_ctx)
     return CDK_Inv_Value;
-  
+
   c = cdk_calloc (1, sizeof *c);
   if (!c)
     return CDK_Out_Of_Core;
-  
+
   /* For S2K use the iterated and salted mode and use the
      default digest and cipher algorithms. Because the MDC
      feature will be used, the default cipher should use a 
      blocksize of 128 bits. */
   c->_s2k.mode = CDK_S2K_ITERSALTED;
   c->_s2k.digest_algo = DEFAULT_DIGEST_ALGO;
-  
+
   c->opt.mdc = 1;
   c->opt.compress = 1;
   c->opt.armor = 0;
   c->opt.textmode = 0;
-  
+
   c->digest_algo = DEFAULT_DIGEST_ALGO;
-  
+
   c->compress.algo = CDK_COMPRESS_ZIP;
   c->compress.level = 6;
 
@@ -289,11 +320,11 @@ cdk_handle_set_keyring (cdk_ctx_t hd, int type, const char *kringname)
 {
   cdk_keydb_hd_t db;
   cdk_error_t err;
-  
+
   err = cdk_keydb_new_from_file (&db, type, kringname);
   if (err)
     return err;
-  
+
   if (!type)
     hd->db.pub = db;
   else
@@ -302,7 +333,7 @@ cdk_handle_set_keyring (cdk_ctx_t hd, int type, const char *kringname)
   return 0;
 }
 
-  
+
 /**
  * cdk_handle_set_keydb:
  * @hd: session handle
@@ -353,14 +384,15 @@ cdk_handle_get_keydb (cdk_ctx_t hd, int type)
  *
  * set the passphrase callback.
  **/
-void cdk_handle_set_passphrase_cb (cdk_ctx_t hd,
-                                   char *(*cb) (void *opa, const char *prompt),
-                                   void * cb_value)
+void
+cdk_handle_set_passphrase_cb (cdk_ctx_t hd,
+			      char *(*cb) (void *opa, const char *prompt),
+			      void *cb_value)
 {
-    if (!hd)
-        return;
-    hd->passphrase_cb = cb;
-    hd->passphrase_cb_value = cb_value;
+  if (!hd)
+    return;
+  hd->passphrase_cb = cb;
+  hd->passphrase_cb_value = cb_value;
 }
 
 
@@ -371,7 +403,7 @@ void cdk_handle_set_passphrase_cb (cdk_ctx_t hd,
  * Return the verify result for the current session.
  * Do not free the pointer.
  **/
-cdk_verify_result_t 
+cdk_verify_result_t
 cdk_handle_verify_get_result (cdk_ctx_t hd)
 {
   return hd->result.verify;
@@ -400,6 +432,6 @@ cdk_handle_free (cdk_ctx_t hd)
       if (hd->db.sec)
 	cdk_keydb_free (hd->db.sec);
       hd->db.pub = hd->db.sec = NULL;
-    }  
+    }
   cdk_free (hd);
 }

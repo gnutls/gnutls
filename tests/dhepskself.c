@@ -156,7 +156,7 @@ client (void)
 
   printf ("- Received %d bytes: ", ret);
   for (ii = 0; ii < ret; ii++)
-      fputc (buffer[ii], stdout);
+    fputc (buffer[ii], stdout);
   fputs ("\n", stdout);
 
   gnutls_bye (session, GNUTLS_SHUT_RDWR);

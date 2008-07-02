@@ -244,9 +244,9 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
    */
 
   data_b = &data_s[1 + pwd_entry->salt.size];
-  if (_gnutls_mpi_print (B, &data_b[2], &n_b) != 0) 
+  if (_gnutls_mpi_print (B, &data_b[2], &n_b) != 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MPI_PRINT_FAILED;
     }
 
@@ -344,9 +344,9 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
   ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
   _gnutls_mpi_release (&S);
 
-  if (ret < 0) 
+  if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
@@ -483,6 +483,7 @@ static const unsigned char srp_generator = 0x02;
 const gnutls_datum_t gnutls_srp_1024_group_prime = {
   (void *) srp_params_1024, sizeof (srp_params_1024)
 };
+
 const gnutls_datum_t gnutls_srp_1024_group_generator = {
   (void *) &srp_generator, sizeof (srp_generator)
 };
@@ -515,6 +516,7 @@ static const unsigned char srp_params_1536[] = {
 const gnutls_datum_t gnutls_srp_1536_group_prime = {
   (void *) srp_params_1536, sizeof (srp_params_1536)
 };
+
 const gnutls_datum_t gnutls_srp_1536_group_generator = {
   (void *) &srp_generator, sizeof (srp_generator)
 };
@@ -554,6 +556,7 @@ static const unsigned char srp_params_2048[] = {
 const gnutls_datum_t gnutls_srp_2048_group_prime = {
   (void *) srp_params_2048, sizeof (srp_params_2048)
 };
+
 const gnutls_datum_t gnutls_srp_2048_group_generator = {
   (void *) &srp_generator, sizeof (srp_generator)
 };
@@ -567,7 +570,7 @@ check_g_n (const opaque * g, size_t n_g, const opaque * n, size_t n_n)
 
   if (n_g != 1 || g[0] != srp_generator)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
     }
 
@@ -589,7 +592,7 @@ check_g_n (const opaque * g, size_t n_g, const opaque * n, size_t n_n)
       return 0;
     }
 
-  gnutls_assert();
+  gnutls_assert ();
   return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 }
 

@@ -57,10 +57,10 @@ static char pem[] =
   "jxL92AgHPzSFy/nyqmZ1ADcnB5fC5WsEYyr9tPM1gpjJEsi95YIBrO7Uyt4tj5U3\n"
   "dYDvbU+Mg1r0gJi61wciuyAllwKfu9aqkCjJKQGHrTimWzRa6RPygaojWIEmap89\n"
   "bHarWgDg9CKVP1DggVkcD838s//kE1Vl2DReyfAtEQ1agSXLFncgxL+yOi1o3lcq\n"
-  "+dmDgpDn168TY1Iug80uVKg7AfkLrA==\n"
-  "-----END CERTIFICATE-----\n";
+  "+dmDgpDn168TY1Iug80uVKg7AfkLrA==\n" "-----END CERTIFICATE-----\n";
 
-void print_dn (gnutls_x509_dn_t dn)
+void
+print_dn (gnutls_x509_dn_t dn)
 {
   int i, j, ret = 0;
   gnutls_x509_ava_st ava;
@@ -68,7 +68,7 @@ void print_dn (gnutls_x509_dn_t dn)
   for (i = 0; ret == 0; i++)
     for (j = 0; ret == 0; j++)
       {
-	ret = gnutls_x509_dn_get_rdn_ava(dn, i, j, &ava);
+	ret = gnutls_x509_dn_get_rdn_ava (dn, i, j, &ava);
 	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
 	  {
 	    if (j > 0)
@@ -80,9 +80,8 @@ void print_dn (gnutls_x509_dn_t dn)
 	  }
 	if (ret < 0)
 	  fail ("get_rdn_ava %d\n", ret);
-	printf("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
-	       ava.oid.size, ava.oid.data,
-	       ava.value.size, ava.value.data);
+	printf ("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
+		ava.oid.size, ava.oid.data, ava.value.size, ava.value.data);
       }
 }
 
@@ -90,7 +89,7 @@ void
 doit (void)
 {
   int ret;
-  gnutls_datum_t derCert = { pem, sizeof(pem) };
+  gnutls_datum_t derCert = { pem, sizeof (pem) };
   gnutls_x509_crt_t cert;
   gnutls_x509_dn_t xdn;
 
@@ -106,14 +105,14 @@ doit (void)
   if (ret < 0)
     fail ("crt_import %d\n", ret);
 
-  ret = gnutls_x509_crt_get_issuer(cert, &xdn);
+  ret = gnutls_x509_crt_get_issuer (cert, &xdn);
   if (ret < 0)
     fail ("get_subject %d\n", ret);
 
   printf ("Issuer:\n");
   print_dn (xdn);
 
-  ret = gnutls_x509_crt_get_subject(cert, &xdn);
+  ret = gnutls_x509_crt_get_subject (cert, &xdn);
   if (ret < 0)
     fail ("get_subject %d\n", ret);
 

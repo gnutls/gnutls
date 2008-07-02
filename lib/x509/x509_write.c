@@ -134,7 +134,7 @@ gnutls_x509_crt_set_issuer_dn_by_oid (gnutls_x509_crt_t crt,
  *   negative error value.
  **/
 int
-gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt,gnutls_x509_crt_t eecrt,
+gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt, gnutls_x509_crt_t eecrt,
 			      unsigned int raw_flag, const void *name,
 			      unsigned int sizeof_name)
 {
@@ -351,8 +351,7 @@ gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_set_basic_constraints (gnutls_x509_crt_t crt,
-				       unsigned int ca,
-				       int pathLenConstraint)
+				       unsigned int ca, int pathLenConstraint)
 {
   int result;
   gnutls_datum_t der_data;
@@ -537,8 +536,7 @@ int
 gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
 			   int pathLenConstraint,
 			   const char *policyLanguage,
-			   const char *policy,
-			   size_t sizeof_policy)
+			   const char *policy, size_t sizeof_policy)
 {
   int result;
   gnutls_datum_t der_data;

@@ -31,13 +31,11 @@ extern void tcp_close (int sd);
 
 int
 client_avp (gnutls_session_t session, void *ptr,
-	   const char *last, size_t lastlen,
-	   char **new, size_t *newlen)
+	    const char *last, size_t lastlen, char **new, size_t * newlen)
 {
 
   if (last)
-    printf ("- received %d bytes AVP: `%.*s'\n",
-	    lastlen, lastlen, last);
+    printf ("- received %d bytes AVP: `%.*s'\n", lastlen, lastlen, last);
   else
     printf ("- new application phase\n");
 

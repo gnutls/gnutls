@@ -284,8 +284,7 @@ gnutls_pkcs12_export (gnutls_pkcs12_t pkcs12,
     }
 
   return _gnutls_x509_export_int (pkcs12->pkcs12, format, PEM_PKCS12,
-				  output_data,
-				  output_data_size);
+				  output_data, output_data_size);
 }
 
 static int
@@ -388,7 +387,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
   for (i = 0; i < bag->bag_elements; i++)
     {
 
-      snprintf( root, sizeof (root), "?%u.bagId", i+1);
+      snprintf (root, sizeof (root), "?%u.bagId", i + 1);
 
       len = sizeof (oid);
       result = asn1_read_value (c2, root, oid, &len);
@@ -412,7 +411,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
       /* Read the Bag Value
        */
 
-      snprintf( root, sizeof (root), "?%u.bagValue", i+1);
+      snprintf (root, sizeof (root), "?%u.bagValue", i + 1);
 
       result = _gnutls_x509_read_value (c2, root, &bag->element[i].data, 0);
       if (result < 0)
@@ -438,7 +437,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 
       /* read the bag attributes
        */
-      snprintf( root, sizeof (root), "?%u.bagAttributes", i+1);
+      snprintf (root, sizeof (root), "?%u.bagAttributes", i + 1);
 
       result = asn1_number_of_elements (c2, root, &attributes);
       if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND)
@@ -455,7 +454,8 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 	for (j = 0; j < attributes; j++)
 	  {
 
-            snprintf( root, sizeof (root), "?%u.bagAttributes.?%u", i+1, j+1);
+	    snprintf (root, sizeof (root), "?%u.bagAttributes.?%u", i + 1,
+		      j + 1);
 
 	    result =
 	      _gnutls_x509_decode_and_read_attribute (c2, root, oid,
@@ -606,7 +606,7 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   /* Step 2. Parse the AuthenticatedSafe
    */
 
-  snprintf( root2, sizeof (root2), "?%u.contentType", indx+1);
+  snprintf (root2, sizeof (root2), "?%u.contentType", indx + 1);
 
   len = sizeof (oid) - 1;
   result = asn1_read_value (c2, root2, oid, &len);
@@ -627,7 +627,7 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   /* Not encrypted Bag
    */
 
-  snprintf( root2, sizeof (root2), "?%u.content", indx+1);
+  snprintf (root2, sizeof (root2), "?%u.content", indx + 1);
 
   if (strcmp (oid, DATA_OID) == 0)
     {
@@ -910,7 +910,7 @@ gnutls_pkcs12_generate_mac (gnutls_pkcs12_t pkcs12, const char *pass)
   /* Generate the key.
    */
   result = _gnutls_pkcs12_string_to_key (3 /*MAC*/, salt, sizeof (salt),
-				  iter, pass, sizeof (key), key);
+					 iter, pass, sizeof (key), key);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1034,7 +1034,7 @@ gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
   /* Generate the key.
    */
   result = _gnutls_pkcs12_string_to_key (3 /*MAC*/, salt.data, salt.size,
-				  iter, pass, sizeof (key), key);
+					 iter, pass, sizeof (key), key);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1134,10 +1134,12 @@ write_attributes (gnutls_pkcs12_bag_t bag, int elem,
 
       result =
 	_gnutls_x509_encode_and_write_attribute (KEY_ID_OID, c2, root,
-						 bag->element[elem].
-						 local_key_id.data,
-						 bag->element[elem].
-						 local_key_id.size, 1);
+						 bag->
+						 element[elem].local_key_id.
+						 data,
+						 bag->
+						 element[elem].local_key_id.
+						 size, 1);
       if (result < 0)
 	{
 	  gnutls_assert ();

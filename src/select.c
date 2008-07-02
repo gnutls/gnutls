@@ -59,8 +59,9 @@
  *   cause this function call to take up to 100 ms longer than you specified.
  * - Pipes are not checked for writability or errors (errno = ENOSYS)
  */
-int _win_select(int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
-                const struct timeval *tv)
+int
+_win_select (int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
+	     const struct timeval *tv)
 {
   DWORD ms_total, limit;
   HANDLE handles[MAXIMUM_WAIT_OBJECTS], hPipes[MAXIMUM_WAIT_OBJECTS];
@@ -79,184 +80,186 @@ int _win_select(int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
   iPipes = 0;
 
   /* calculate how long we need to wait in milliseconds */
-  if(tv == NULL)
+  if (tv == NULL)
     ms_total = INFINITE;
   else
-  {
-    ms_total = tv->tv_sec * 1000;
-    ms_total += tv->tv_usec / 1000;
-  }
+    {
+      ms_total = tv->tv_sec * 1000;
+      ms_total += tv->tv_usec / 1000;
+    }
 
   /* select() may be used as a portable way to sleep */
   if (!(rfds || wfds || efds))
-  {
-    Sleep(ms_total);
+    {
+      Sleep (ms_total);
 
-    return 0;
-  }
+      return 0;
+    }
 
-  FD_ZERO(&sock_read);
-  FD_ZERO(&sock_write);
-  FD_ZERO(&sock_except);
+  FD_ZERO (&sock_read);
+  FD_ZERO (&sock_write);
+  FD_ZERO (&sock_except);
 
   /* build an array of handles for non-sockets */
-  for(i = 0; i < max_fd; i++)
-  {
-    if(SAFE_FD_ISSET(i, rfds) || SAFE_FD_ISSET(i, wfds) ||
-       SAFE_FD_ISSET(i, efds))
+  for (i = 0; i < max_fd; i++)
     {
-      unsigned long ulVal;
+      if (SAFE_FD_ISSET (i, rfds) || SAFE_FD_ISSET (i, wfds) ||
+	  SAFE_FD_ISSET (i, efds))
+	{
+	  unsigned long ulVal;
 
-      if (ioctlsocket(i, FIONREAD, &ulVal) != SOCKET_ERROR && _get_osfhandle(i) == -1) 
-      {
-        /* socket */
-        if(SAFE_FD_ISSET(i, rfds))
-          FD_SET(i, &sock_read);
+	  if (ioctlsocket (i, FIONREAD, &ulVal) != SOCKET_ERROR
+	      && _get_osfhandle (i) == -1)
+	    {
+	      /* socket */
+	      if (SAFE_FD_ISSET (i, rfds))
+		FD_SET (i, &sock_read);
 
-        if(SAFE_FD_ISSET(i, wfds))
-          FD_SET(i, &sock_write);
+	      if (SAFE_FD_ISSET (i, wfds))
+		FD_SET (i, &sock_write);
 
-        if(SAFE_FD_ISSET(i, efds))
-          FD_SET(i, &sock_except);
+	      if (SAFE_FD_ISSET (i, efds))
+		FD_SET (i, &sock_except);
 
-        if(i > sock_max_fd)
-          sock_max_fd = i;
-      }
-      else
-      {
-        if (GetFileType((HANDLE) i) == FILE_TYPE_PIPE)
-          hPipes[iPipes++] = (HANDLE) i;  /* Pipe */
-        else
-        {
-          handles[n_handles] = (HANDLE) _get_osfhandle(i);
-          if ((DWORD) handles[n_handles] == 0xffffffff)
-            handles[n_handles] = (HANDLE) i;
-          handle_slot_to_fd[n_handles] = i;
-          n_handles++;
-        }
-      }
+	      if (i > sock_max_fd)
+		sock_max_fd = i;
+	    }
+	  else
+	    {
+	      if (GetFileType ((HANDLE) i) == FILE_TYPE_PIPE)
+		hPipes[iPipes++] = (HANDLE) i;	/* Pipe */
+	      else
+		{
+		  handles[n_handles] = (HANDLE) _get_osfhandle (i);
+		  if ((DWORD) handles[n_handles] == 0xffffffff)
+		    handles[n_handles] = (HANDLE) i;
+		  handle_slot_to_fd[n_handles] = i;
+		  n_handles++;
+		}
+	    }
+	}
     }
-  }
 
-  if((n_handles == 0) && (iPipes == 0))
-  {
-    /* plain sockets only - let winsock handle the whole thing */
-    if ((retcode = select(max_fd, rfds, wfds, efds, tv)) == SOCKET_ERROR)
-      SetErrnoFromWinsockError(WSAGetLastError());
-    return retcode;  
-  }
+  if ((n_handles == 0) && (iPipes == 0))
+    {
+      /* plain sockets only - let winsock handle the whole thing */
+      if ((retcode = select (max_fd, rfds, wfds, efds, tv)) == SOCKET_ERROR)
+	SetErrnoFromWinsockError (WSAGetLastError ());
+      return retcode;
+    }
 
   /* mixture of handles and sockets; lets multiplex between
    * winsock and waiting on the handles */
 
-  FD_ZERO(&aread);
-  FD_ZERO(&awrite);
-  FD_ZERO(&aexcept);
+  FD_ZERO (&aread);
+  FD_ZERO (&awrite);
+  FD_ZERO (&aexcept);
 
-  limit = GetTickCount() + ms_total;
+  limit = GetTickCount () + ms_total;
   do
-  {
-    retcode = 0;
-
-    if(sock_max_fd >= 0)
     {
-      /* overwrite the zero'd sets here; the select call
-       * will clear those that are not active */
-      aread = sock_read;
-      awrite = sock_write;
-      aexcept = sock_except;
+      retcode = 0;
 
-      tvslice.tv_sec = 0;
-      tvslice.tv_usec = 100000;
+      if (sock_max_fd >= 0)
+	{
+	  /* overwrite the zero'd sets here; the select call
+	   * will clear those that are not active */
+	  aread = sock_read;
+	  awrite = sock_write;
+	  aexcept = sock_except;
 
-      if ((retcode = select(sock_max_fd + 1, &aread, &awrite, &aexcept,
-                            &tvslice)) == SOCKET_ERROR)
-      {
-        SetErrnoFromWinsockError(WSAGetLastError());
+	  tvslice.tv_sec = 0;
+	  tvslice.tv_usec = 100000;
 
-        return -1;
-      }
-    }
-
-    if(n_handles > 0)
-    {
-      /* check handles */
-      DWORD wret;
-
-      wret =
-        MsgWaitForMultipleObjects(n_handles, handles, FALSE,
-                                  retcode > 0 ? 0 : 100, QS_ALLEVENTS);
-
-      if(wret == WAIT_TIMEOUT)
-      {
-        /* set retcode to 0; this is the default.
-         * select() may have set it to something else,
-         * in which case we leave it alone, so this branch
-         * does nothing */
-        ;
-      }
-      else if(wret == WAIT_FAILED)
-      {
-        SetErrnoFromWinError(GetLastError());
-
-        return -1;
-      }
-      else
-      {
-        for(i = 0; i < n_handles; i++)
-        {
-          if(WAIT_OBJECT_0 == WaitForSingleObject(handles[i], 0))
-          {
-            if(SAFE_FD_ISSET(handle_slot_to_fd[i], rfds))
-            {
-              FD_SET(handle_slot_to_fd[i], &aread);
-            }
-
-            if(SAFE_FD_ISSET(handle_slot_to_fd[i], wfds))
-              FD_SET(handle_slot_to_fd[i], &awrite);
-
-            if(SAFE_FD_ISSET(handle_slot_to_fd[i], efds))
-              FD_SET(handle_slot_to_fd[i], &aexcept);
-
-            retcode++;
-          }
-        }
-      }
-    }
-
-    /* Poll Pipes */
-    for(i = 0; i < iPipes; i++)
-    {
-      DWORD dwBytes;
-      if(SAFE_FD_ISSET(hPipes[i], rfds))
-      {
-	    if (! PeekNamedPipe(hPipes[i], NULL, 0, NULL, &dwBytes, NULL))
+	  if ((retcode = select (sock_max_fd + 1, &aread, &awrite, &aexcept,
+				 &tvslice)) == SOCKET_ERROR)
 	    {
-	      retcode = -1;
-	      SetErrnoFromWinError(GetLastError());
-	    }
-	    else if (dwBytes)
-	    {
-	      FD_SET((int) hPipes[i], &aread);
-	      retcode++;
-	    }
-      }
-      else if (SAFE_FD_ISSET(hPipes[i], wfds) || SAFE_FD_ISSET(hPipes[i], efds))
-      {
-        errno = ENOSYS;
-        return -1;  /* Not implemented */
-      }
-    }
-  }
-  while(retcode == 0 && (ms_total == INFINITE || GetTickCount() < limit));
+	      SetErrnoFromWinsockError (WSAGetLastError ());
 
-  if(rfds)
+	      return -1;
+	    }
+	}
+
+      if (n_handles > 0)
+	{
+	  /* check handles */
+	  DWORD wret;
+
+	  wret =
+	    MsgWaitForMultipleObjects (n_handles, handles, FALSE,
+				       retcode > 0 ? 0 : 100, QS_ALLEVENTS);
+
+	  if (wret == WAIT_TIMEOUT)
+	    {
+	      /* set retcode to 0; this is the default.
+	       * select() may have set it to something else,
+	       * in which case we leave it alone, so this branch
+	       * does nothing */
+	      ;
+	    }
+	  else if (wret == WAIT_FAILED)
+	    {
+	      SetErrnoFromWinError (GetLastError ());
+
+	      return -1;
+	    }
+	  else
+	    {
+	      for (i = 0; i < n_handles; i++)
+		{
+		  if (WAIT_OBJECT_0 == WaitForSingleObject (handles[i], 0))
+		    {
+		      if (SAFE_FD_ISSET (handle_slot_to_fd[i], rfds))
+			{
+			  FD_SET (handle_slot_to_fd[i], &aread);
+			}
+
+		      if (SAFE_FD_ISSET (handle_slot_to_fd[i], wfds))
+			FD_SET (handle_slot_to_fd[i], &awrite);
+
+		      if (SAFE_FD_ISSET (handle_slot_to_fd[i], efds))
+			FD_SET (handle_slot_to_fd[i], &aexcept);
+
+		      retcode++;
+		    }
+		}
+	    }
+	}
+
+      /* Poll Pipes */
+      for (i = 0; i < iPipes; i++)
+	{
+	  DWORD dwBytes;
+	  if (SAFE_FD_ISSET (hPipes[i], rfds))
+	    {
+	      if (!PeekNamedPipe (hPipes[i], NULL, 0, NULL, &dwBytes, NULL))
+		{
+		  retcode = -1;
+		  SetErrnoFromWinError (GetLastError ());
+		}
+	      else if (dwBytes)
+		{
+		  FD_SET ((int) hPipes[i], &aread);
+		  retcode++;
+		}
+	    }
+	  else if (SAFE_FD_ISSET (hPipes[i], wfds)
+		   || SAFE_FD_ISSET (hPipes[i], efds))
+	    {
+	      errno = ENOSYS;
+	      return -1;	/* Not implemented */
+	    }
+	}
+    }
+  while (retcode == 0 && (ms_total == INFINITE || GetTickCount () < limit));
+
+  if (rfds)
     *rfds = aread;
 
-  if(wfds)
+  if (wfds)
     *wfds = awrite;
 
-  if(efds)
+  if (efds)
     *efds = aexcept;
 
   return retcode;

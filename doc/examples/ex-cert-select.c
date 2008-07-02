@@ -54,24 +54,25 @@ load_file (const char *file)
   long filelen;
   void *ptr;
 
-  if (!(f = fopen(file, "r"))
-      || fseek(f, 0, SEEK_END) != 0
-      || (filelen = ftell(f)) < 0
-      || fseek(f, 0, SEEK_SET) != 0
-      || !(ptr = malloc((size_t)filelen))
-      || fread(ptr, 1, (size_t)filelen, f) < (size_t)filelen)
+  if (!(f = fopen (file, "r"))
+      || fseek (f, 0, SEEK_END) != 0
+      || (filelen = ftell (f)) < 0
+      || fseek (f, 0, SEEK_SET) != 0
+      || !(ptr = malloc ((size_t) filelen))
+      || fread (ptr, 1, (size_t) filelen, f) < (size_t) filelen)
     {
       return loaded_file;
     }
 
   loaded_file.data = ptr;
-  loaded_file.size = (unsigned int)filelen;
+  loaded_file.size = (unsigned int) filelen;
   return loaded_file;
 }
 
-static void unload_file(gnutls_datum_t data)
+static void
+unload_file (gnutls_datum_t data)
 {
-  free(data.data);
+  free (data.data);
 }
 
 /* Load the certificate and the private key.
@@ -140,7 +141,7 @@ main (void)
   gnutls_certificate_allocate_credentials (&xcred);
 
   /* priorities */
-  gnutls_priority_init( &priorities_cache, "NORMAL", NULL);
+  gnutls_priority_init (&priorities_cache, "NORMAL", NULL);
 
 
   /* sets the trusted cas file
@@ -211,7 +212,7 @@ end:
   gnutls_deinit (session);
 
   gnutls_certificate_free_credentials (xcred);
-  gnutls_priority_deinit( priorities_cache);
+  gnutls_priority_deinit (priorities_cache);
 
   gnutls_global_deinit ();
 

@@ -36,7 +36,7 @@
 int
 _gnutls_m_plaintext2compressed (gnutls_session_t session,
 				gnutls_datum_t * compressed,
-				const gnutls_datum_t* plaintext)
+				const gnutls_datum_t * plaintext)
 {
   int size;
   opaque *data;
@@ -59,15 +59,15 @@ _gnutls_m_plaintext2compressed (gnutls_session_t session,
 int
 _gnutls_m_compressed2plaintext (gnutls_session_t session,
 				gnutls_datum_t * plain,
-				const gnutls_datum_t* compressed)
+				const gnutls_datum_t * compressed)
 {
   int size;
   opaque *data;
 
   size =
-    _gnutls_decompress (session->connection_state.
-			read_compression_state, compressed->data,
-			compressed->size, &data, MAX_RECORD_RECV_SIZE);
+    _gnutls_decompress (session->connection_state.read_compression_state,
+			compressed->data, compressed->size, &data,
+			MAX_RECORD_RECV_SIZE);
   if (size < 0)
     {
       gnutls_assert ();

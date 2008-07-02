@@ -68,11 +68,13 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_LARGE_PACKET, 1),
   ERROR_ENTRY (N_("A record packet with illegal version was received."),
 	       GNUTLS_E_UNSUPPORTED_VERSION_PACKET, 1),
-  ERROR_ENTRY (N_("The Diffie Hellman prime sent by the server is not acceptable (not long enough)."),
-     GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1),
+  ERROR_ENTRY (N_
+	       ("The Diffie Hellman prime sent by the server is not acceptable (not long enough)."),
+	       GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1),
   ERROR_ENTRY (N_("A TLS packet with unexpected length was received."),
 	       GNUTLS_E_UNEXPECTED_PACKET_LENGTH, 1),
-  ERROR_ENTRY (N_("The specified session has been invalidated for some reason."),
+  ERROR_ENTRY (N_
+	       ("The specified session has been invalidated for some reason."),
 	       GNUTLS_E_INVALID_SESSION, 1),
 
   ERROR_ENTRY (N_("GnuTLS internal error."), GNUTLS_E_INTERNAL_ERROR, 1),
@@ -84,8 +86,9 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_UNEXPECTED_PACKET, 1),
   ERROR_ENTRY (N_("A TLS warning alert has been received."),
 	       GNUTLS_E_WARNING_ALERT_RECEIVED, 0),
-  ERROR_ENTRY (N_("An error was encountered at the TLS Finished packet calculation."),
-     GNUTLS_E_ERROR_IN_FINISHED_PACKET, 1),
+  ERROR_ENTRY (N_
+	       ("An error was encountered at the TLS Finished packet calculation."),
+	       GNUTLS_E_ERROR_IN_FINISHED_PACKET, 1),
   ERROR_ENTRY (N_("The peer did not send any certificate."),
 	       GNUTLS_E_NO_CERTIFICATE_FOUND, 1),
 
@@ -130,7 +133,8 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("Hashing has failed."), GNUTLS_E_HASH_FAILED, 1),
   ERROR_ENTRY (N_("Base64 decoding error."), GNUTLS_E_BASE64_DECODING_ERROR,
 	       1),
-  ERROR_ENTRY (N_("Base64 unexpected header error."), GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR,
+  ERROR_ENTRY (N_("Base64 unexpected header error."),
+	       GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR,
 	       1),
   ERROR_ENTRY (N_("Base64 encoding error."), GNUTLS_E_BASE64_ENCODING_ERROR,
 	       1),
@@ -140,8 +144,9 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 0),
   ERROR_ENTRY (N_("Error in the pull function."), GNUTLS_E_PULL_ERROR, 1),
   ERROR_ENTRY (N_("Error in the push function."), GNUTLS_E_PUSH_ERROR, 1),
-  ERROR_ENTRY (N_("The upper limit of record packet sequence numbers has been reached. Wow!"),
-     GNUTLS_E_RECORD_LIMIT_REACHED, 1),
+  ERROR_ENTRY (N_
+	       ("The upper limit of record packet sequence numbers has been reached. Wow!"),
+	       GNUTLS_E_RECORD_LIMIT_REACHED, 1),
   ERROR_ENTRY (N_("Error in the certificate."), GNUTLS_E_CERTIFICATE_ERROR,
 	       1),
   ERROR_ENTRY (N_("Unknown Subject Alternative name in X.509 certificate."),
@@ -155,8 +160,9 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("Function was interrupted."), GNUTLS_E_INTERRUPTED, 0),
   ERROR_ENTRY (N_("Rehandshake was requested by the peer."),
 	       GNUTLS_E_REHANDSHAKE, 0),
-  ERROR_ENTRY (N_("TLS Application data were received, while expecting handshake data."),
-     GNUTLS_E_GOT_APPLICATION_DATA, 1),
+  ERROR_ENTRY (N_
+	       ("TLS Application data were received, while expecting handshake data."),
+	       GNUTLS_E_GOT_APPLICATION_DATA, 1),
   ERROR_ENTRY (N_("Error in Database backend."), GNUTLS_E_DB_ERROR, 1),
   ERROR_ENTRY (N_("The certificate type is not supported."),
 	       GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE, 1),
@@ -193,8 +199,9 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_TOO_MANY_EMPTY_PACKETS, 1),
   ERROR_ENTRY (N_("The initialization of GnuTLS-extra has failed."),
 	       GNUTLS_E_INIT_LIBEXTRA, 1),
-  ERROR_ENTRY (N_("The GnuTLS library version does not match the GnuTLS-extra library version."),
-     GNUTLS_E_LIBRARY_VERSION_MISMATCH, 1),
+  ERROR_ENTRY (N_
+	       ("The GnuTLS library version does not match the GnuTLS-extra library version."),
+	       GNUTLS_E_LIBRARY_VERSION_MISMATCH, 1),
   ERROR_ENTRY (N_("The gcrypt library version is too old."),
 	       GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY, 1),
 

@@ -111,8 +111,8 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 	  if (cred->get_function (session, &username, &password) < 0
 	      || username == NULL || password == NULL)
 	    {
-                gnutls_assert ();
-                return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+	      gnutls_assert ();
+	      return GNUTLS_E_ILLEGAL_SRP_USERNAME;
 	    }
 
 	  len = MIN (strlen (username), 255);

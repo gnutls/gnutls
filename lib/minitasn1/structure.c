@@ -409,7 +409,7 @@ _asn1_copy_structure3 (node_asn * source_node)
 	  if (p_s->name)
 	    _asn1_set_name (p_d, p_s->name);
 	  if (p_s->value)
-             _asn1_set_value (p_d, p_s->value, p_s->value_len);
+	    _asn1_set_value (p_d, p_s->value, p_s->value_len);
 	  move = DOWN;
 	}
       else

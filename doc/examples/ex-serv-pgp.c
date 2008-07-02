@@ -61,7 +61,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  gnutls_priority_set_direct(session, "NORMAL", NULL);
+  gnutls_priority_set_direct (session, "NORMAL", NULL);
 
   /* request client certificate if any.
    */
@@ -93,9 +93,11 @@ main (void)
   gnutls_global_init ();
 
   gnutls_certificate_allocate_credentials (&cred);
-  gnutls_certificate_set_openpgp_keyring_file (cred, RINGFILE, GNUTLS_OPENPGP_FMT_BASE64);
+  gnutls_certificate_set_openpgp_keyring_file (cred, RINGFILE,
+					       GNUTLS_OPENPGP_FMT_BASE64);
 
-  gnutls_certificate_set_openpgp_key_file (cred, CERTFILE, KEYFILE, GNUTLS_OPENPGP_FMT_BASE64);
+  gnutls_certificate_set_openpgp_key_file (cred, CERTFILE, KEYFILE,
+					   GNUTLS_OPENPGP_FMT_BASE64);
 
   generate_dh_params ();
 

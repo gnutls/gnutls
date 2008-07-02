@@ -305,7 +305,8 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
  * be inserted */
 int
 _gnutls_dh_common_print_server_kx (gnutls_session_t session,
-				   bigint_t g, bigint_t p, opaque ** data, int psk)
+				   bigint_t g, bigint_t p, opaque ** data,
+				   int psk)
 {
   bigint_t x, X;
   size_t n_X, n_g, n_p;

@@ -59,7 +59,8 @@ gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
   * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
 int
-gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *sc)
+gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
+					 sc)
 {
 
   *sc = gnutls_calloc (1, sizeof (anon_server_credentials_st));
@@ -90,7 +91,8 @@ gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc)
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *sc)
+gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
+					 sc)
 {
   /* anon_dummy is only there for *sc not to be null.
    * it is not used at all;

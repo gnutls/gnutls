@@ -174,8 +174,9 @@ gnutls_auth_get_type (gnutls_session_t session)
 
   return
     _gnutls_map_kx_get_cred (_gnutls_cipher_suite_get_kx_algo
-			     (&session->security_parameters.
-			      current_cipher_suite), server);
+			     (&session->
+			      security_parameters.current_cipher_suite),
+			     server);
 }
 
 /**
@@ -194,8 +195,8 @@ gnutls_auth_server_get_type (gnutls_session_t session)
 {
   return
     _gnutls_map_kx_get_cred (_gnutls_cipher_suite_get_kx_algo
-			     (&session->security_parameters.
-			      current_cipher_suite), 1);
+			     (&session->
+			      security_parameters.current_cipher_suite), 1);
 }
 
 /**
@@ -214,8 +215,8 @@ gnutls_auth_client_get_type (gnutls_session_t session)
 {
   return
     _gnutls_map_kx_get_cred (_gnutls_cipher_suite_get_kx_algo
-			     (&session->security_parameters.
-			      current_cipher_suite), 0);
+			     (&session->
+			      security_parameters.current_cipher_suite), 0);
 }
 
 
@@ -402,11 +403,10 @@ _gnutls_auth_info_set (gnutls_session_t session,
 	   */
 	  if (gnutls_auth_get_type (session) != session->key->auth_info_type)
 	    {
-	    
+
 	      _gnutls_free_auth_info (session);
-	      
-	      session->key->auth_info =
-		calloc( 1, size);
+
+	      session->key->auth_info = calloc (1, size);
 	      if (session->key->auth_info == NULL)
 		{
 		  gnutls_assert ();
