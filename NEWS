@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.5.0 (released 2008-07-02)
+* Version 2.5.0 (unreleased)
 
 ** Port fixes from v2.4.1 release, see below.
 
@@ -12,6 +12,12 @@ The header gnutls/crypto.h is now officially supported, and declares
 the symbols below.
 
 ** Rewritten opencdk crypto backend, to use the gnutls internal one.
+
+** Update gnulib and translations.
+The gnulib gc crypto code has been removed since it was never finished
+and is no longer even used.  An internal non-libgcrypt crypto
+implementation may be added in the future, but we'll decide that later
+on.
 
 ** API and ABI modifications:
 gnutls_crypto_bigint_register2: ADDED.
