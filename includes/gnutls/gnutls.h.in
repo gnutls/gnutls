@@ -480,6 +480,29 @@ extern "C"
 
 /* TLS Extensions */
 
+  typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
+				       const unsigned char *data, size_t len);
+  typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
+				       unsigned char *data, size_t len);
+
+  /* This flag indicates for an extension whether
+   * it is useful to application level or TLS level only.
+   * This is (only) used to parse the application level extensions
+   * before the user_hello callback is called.
+   */
+  typedef enum
+    {
+      GNUTLS_EXT_ANY,
+      GNUTLS_EXT_APPLICATION,
+      GNUTLS_EXT_TLS
+    } gnutls_ext_parse_type_t;
+
+  int gnutls_ext_register (int type,
+			   const char *name,
+			   gnutls_ext_parse_type_t parse_type,
+			   gnutls_ext_recv_func recv_func,
+			   gnutls_ext_send_func send_func);
+
   typedef enum
   {
     GNUTLS_NAME_DNS = 1

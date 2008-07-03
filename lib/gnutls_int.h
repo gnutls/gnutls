@@ -282,18 +282,6 @@ typedef struct
   uint16_t oprfi_server_len;
 } tls_ext_st;
 
-/* This flag indicates for an extension whether
- * it is useful to application level or TLS level only.
- * This is used to parse the application level extensions
- * before the user_hello callback is called.
- */
-typedef enum tls_ext_parse_type_t
-{
-  EXTENSION_ANY,
-  EXTENSION_APPLICATION,
-  EXTENSION_TLS
-} tls_ext_parse_type_t;
-
 /* auth_info_t structures now MAY contain malloced 
  * elements.
  */

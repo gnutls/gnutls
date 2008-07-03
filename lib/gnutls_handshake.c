@@ -440,7 +440,9 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
    */
   if (neg_version >= GNUTLS_TLS1)
     {
-      ret = _gnutls_parse_extensions (session, EXTENSION_APPLICATION, &data[pos], len);	/* len is the rest of the parsed length */
+      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_APPLICATION,
+				      &data[pos], len);
+      /* len is the rest of the parsed length */
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -457,7 +459,9 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 
   if (neg_version >= GNUTLS_TLS1)
     {
-      ret = _gnutls_parse_extensions (session, EXTENSION_TLS, &data[pos], len);	/* len is the rest of the parsed length */
+      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_TLS,
+				      &data[pos], len);
+      /* len is the rest of the parsed length */
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1559,7 +1563,9 @@ _gnutls_read_server_hello (gnutls_session_t session,
    */
   if (version >= GNUTLS_TLS1)
     {
-      ret = _gnutls_parse_extensions (session, EXTENSION_ANY, &data[pos], len);	/* len is the rest of the parsed length */
+      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_ANY,
+				      &data[pos], len);
+      /* len is the rest of the parsed length */
       if (ret < 0)
 	{
 	  gnutls_assert ();

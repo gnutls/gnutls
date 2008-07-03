@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,24 +22,9 @@
  *
  */
 
-#include <gnutls_int.h>
-
-const char *_gnutls_extension_get_name (uint16_t type);
-int _gnutls_parse_extensions (gnutls_session_t, tls_ext_parse_type_t, const opaque *, int);
+int _gnutls_parse_extensions (gnutls_session_t session,
+			      gnutls_ext_parse_type_t parse_type,
+			      const opaque *data, int data_size);
 int _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 			    size_t data_size);
-
-typedef int (*ext_recv_func) (gnutls_session_t, const opaque *, size_t);	/* recv data */
-typedef int (*ext_send_func) (gnutls_session_t, opaque *, size_t);	/* send data */
-
-ext_send_func _gnutls_ext_func_send (uint16_t type);
-ext_recv_func _gnutls_ext_func_recv (uint16_t type, tls_ext_parse_type_t);
-
-typedef struct
-{
-  const char *name;
-  uint16_t type;
-  tls_ext_parse_type_t parse_type;
-  ext_recv_func gnutls_ext_func_recv;
-  ext_send_func gnutls_ext_func_send;
-} gnutls_extension_entry;
+int _gnutls_ext_init (void);

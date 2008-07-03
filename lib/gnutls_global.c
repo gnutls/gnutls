@@ -29,6 +29,8 @@
 #include <random.h>
 #include <gcrypt.h>
 
+#include <gnutls_extensions.h> /* for _gnutls_ext_init */
+
 #ifdef HAVE_WINSOCK
 # include <winsock2.h>
 #endif
@@ -297,6 +299,14 @@ gnutls_global_init (void)
 
   /* Initialize the random generator */
   result = _gnutls_rnd_init ();
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto out;
+    }
+
+  /* Initialize the default TLS extensions */
+  result = _gnutls_ext_init ();
   if (result < 0)
     {
       gnutls_assert ();
