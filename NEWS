@@ -8,8 +8,18 @@ See the end for copying conditions.
 ** libgnutls: Fix bug in gnutls_dh_params_generate2.
 The prime and generator was swapped.
 
+** libgnutls: New interface to register a new TLS extension handler.
+The new function gnutls_ext_register can be used to register handlers
+for specific TLS extension types.  The callback functions have the new
+types gnutls_ext_recv_func and gnutls_ext_send_func.  A type to
+classify TLS extensions, gnutls_ext_parse_type_t, has been added as
+well.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_ext_recv_func: ADDED
+gnutls_ext_send_func: ADDED
+gnutls_ext_parse_type_t: ADDED
+gnutls_ext_register: ADDED
 
 * Version 2.5.1 (released 2008-07-02)
 
