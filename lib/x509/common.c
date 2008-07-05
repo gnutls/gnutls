@@ -851,7 +851,7 @@ _gnutls_x509_decode_octet_string (const char *string_type,
       goto cleanup;
     }
 
-  return 0;
+  result = 0;
 
 cleanup:
   if (c2)
