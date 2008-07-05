@@ -3,19 +3,36 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.4.1 (unreleased)
+* Version 2.4.2 (unreleased)
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.4.1 (released 2008-06-30)
+
+** libgnutls: Fix local crash in gnutls_handshake.  [GNUTLS-SA-2008-2]
+If the gnutls_handshake function is called for a normal session, which
+can happen for re-handshakes, the library would crash because it tried
+to hash some data using a libgcrypt handle that had been deallocated.
+Report and tiny patch from Tomas Mraz <tmraz@redhat.com>.  Any updates
+with more details about this vulnerability will be added to
+<http://www.gnu.org/software/gnutls/security.html>
+
+** libgnutls: Fix memory leaks when doing a re-handshake.
+Reported by Sam Varshavchik <mrsam@courier-mta.com> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2928>.
 
 ** Fix compiler warnings.
 Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
-<http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+<http://thread.gmane.org/gmane.network.gnutls.general/1281>.
 
 ** Fix ordering of -I's to avoid opencdk.h conflict with system headers.
 Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
-<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2930>.
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2930>.
 
-** Fix memory leaks when doing a re-handshake.
-Reported by Sam Varshavchik <mrsam@courier-mta.com> in
-<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2928>.
+** srptool: Fix a problem where --verify check does not succeed.
+Report and tiny patch by Matthias Koenig <mkoenig@suse.de> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2944>.
 
 ** API and ABI modifications:
 No changes since last version.

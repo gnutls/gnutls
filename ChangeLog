@@ -1,3 +1,93 @@
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.4.1.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix links.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* : commit 0fee3917077e191dea3c9787c95c072979532086 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Mon Jun 30 22:44:47 2008
+	+0200
+
+2008-06-30  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/crypt.c: this fixes a problem in srptool, where the passwords
+	never match (--verify check) on some architectures (patch by
+	Matthias Koenig <mkoenig@suse.de>)
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-29  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_state.c: added check before reallocation of parameters
+	to avoid memory leaks on rehandshake.
+
+2008-06-23  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Upload to ftp.gnu.org, not alpha.
+
+2008-06-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Fix build failures related to opencdk.h.
+	Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2930>.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.h: Add prototype for _gnutls_session_is_psk.
+	Reported by Massimo Gaspari <massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Fix warning.  Reported by Massimo Gaspari
+	<massimo.gaspari@alice.it> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c, src/psk.c: Fix warning regarding undeclared getpass
+	replacement.  Reported by Massimo Gaspari <massimo.gaspari@alice.it>
+	in <http://permalink.gmane.org/gmane.network.gnutls.general/1281>.
+
+2008-06-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-06-18  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Add v2.4.0 release notes.
