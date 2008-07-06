@@ -493,6 +493,9 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL",
   * "NORMAL:%COMPAT".
   *
+  * For all the current available algorithms and protocols use "gnutls-cli -l"
+  * to get a listing.
+  *
   * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
   * %GNUTLS_E_SUCCESS on success, or an error code.
   **/
