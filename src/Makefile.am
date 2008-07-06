@@ -17,7 +17,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = README README.srptool
+EXTRA_DIST = README README.srptool algorithms.texi
 
 SUBDIRS = cfg
 
@@ -75,11 +75,14 @@ certtool_SOURCES += cfg/cfg+.c cfg/cfgfile.c cfg/cmdline.c cfg/parse.c	\
 	cfg/platon/str/strplus.c
 endif
 
-noinst_PROGRAMS = errcodes
+noinst_PROGRAMS = errcodes printlist
 errcodes_SOURCES = errcodes.c
 errcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) \
 	../gl/libgnu.la ../lgl/liblgnu.la
 
+printlist_SOURCES = printlist.c
+printlist_LDADD = ../lib/libgnutls.la	\
+	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) ../gl/libgnu.la
 
 
 psk-gaa.c: $(srcdir)/psk.gaa
@@ -95,3 +98,7 @@ tls_test-gaa.c: $(srcdir)/tls_test.gaa
 serv-gaa.c: $(srcdir)/serv.gaa
 	-$(GAA) $< -o serv-gaa.c -i serv-gaa.h
 
+algorithms.texi: printlist
+	@./printlist >algorithms.texi
+
+dist-hook: algorithms.texi
