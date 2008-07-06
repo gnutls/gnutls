@@ -39,7 +39,7 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl-2.1.texi	\
 	examples/ex-serv-export.c examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
-	examples/ex-pkcs12.c guile.texi $(guile_texi)
+	examples/ex-pkcs12.c guile.texi $(guile_texi) ../src/algorithms.texi
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\
@@ -95,6 +95,9 @@ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 
 ../lib/x509/x509-api.texi:
 	cd ../lib/x509 && make x509-api.texi
+
+../src/algorithms.texi:
+	cd ../src/ && make algorithms.texi
 
 ../lib/openpgp/pgp-api.texi:
 	cd ../lib/openpgp && make pgp-api.texi
