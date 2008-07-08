@@ -35,7 +35,6 @@
 #include <ext_server_name.h>
 #include <ext_oprfi.h>
 #include <ext_srp.h>
-#include <ext_inner_application.h>
 #include <gnutls_num.h>
 
 typedef struct
@@ -324,14 +323,6 @@ _gnutls_ext_init (void)
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 #endif
-
-  ret = gnutls_ext_register (GNUTLS_EXTENSION_INNER_APPLICATION,
-			     "INNER_APPLICATION",
-			     GNUTLS_EXT_TLS,
-			     _gnutls_inner_application_recv_params,
-			     _gnutls_inner_application_send_params);
-  if (ret != GNUTLS_E_SUCCESS)
-    return ret;
 
   return GNUTLS_E_SUCCESS;
 }

@@ -15,6 +15,12 @@ types gnutls_ext_recv_func and gnutls_ext_send_func.  A type to
 classify TLS extensions, gnutls_ext_parse_type_t, has been added as
 well.
 
+** Move more code for TLS/IA extension from libgnutls to libgnutls-extra.
+This was made possible by using the new gnutls_ext_register interface.
+The TLS/IA functionality has only been supported through the
+libgnutls-extra library, so it makes sense for the code to belong
+there too.
+
 ** API and ABI modifications:
 gnutls_ext_recv_func: ADDED
 gnutls_ext_send_func: ADDED

@@ -86,7 +86,8 @@ libgnutls_extra_la_LDFLAGS = -no-undefined
 
 # TLS/IA
 
-libgnutls_extra_la_SOURCES += gnutls_ia.c
+libgnutls_extra_la_SOURCES += \
+	ext_inner_application.h ext_inner_application.c gnutls_ia.c
 
 # Rest
 

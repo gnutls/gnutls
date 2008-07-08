@@ -5,24 +5,26 @@
  *
  * This file is part of GNUTLS-EXTRA.
  *
- * GNUTLS-EXTRA is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *               
- * GNUTLS-EXTRA is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *                               
+ * GNUTLS-EXTRA is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * GNUTLS-EXTRA is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
 #include <gnutls_algorithms.h>
+#include <ext_inner_application.h>
 #ifdef USE_LZO
 # ifdef USE_MINILZO
 #  include "minilzo/minilzo.h"
@@ -97,6 +99,8 @@ static int _gnutls_init_extra = 0;
 int
 gnutls_global_init_extra (void)
 {
+  int ret;
+
   /* If the version of libgnutls != version of
    * libextra, then do not initialize the library.
    * This is because it may break things.
@@ -113,27 +117,31 @@ gnutls_global_init_extra (void)
       return 0;
     }
 
+  ret = gnutls_ext_register (GNUTLS_EXTENSION_INNER_APPLICATION,
+			     "INNER_APPLICATION",
+			     GNUTLS_EXT_TLS,
+			     _gnutls_inner_application_recv_params,
+			     _gnutls_inner_application_send_params);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+
   /* Initialize the LZO library
    */
 #ifdef USE_LZO
-  {
-    int ret;
+  if (lzo_init () != LZO_E_OK)
+    {
+      return GNUTLS_E_LZO_INIT_FAILED;
+    }
 
-    if (lzo_init () != LZO_E_OK)
-      {
-	return GNUTLS_E_LZO_INIT_FAILED;
-      }
-
-    /* Add the LZO compression method in the list of compression
-     * methods.
-     */
-    ret = _gnutls_add_lzo_comp ();
-    if (ret < 0)
-      {
-	gnutls_assert ();
-	return ret;
-      }
-  }
+  /* Add the LZO compression method in the list of compression
+   * methods.
+   */
+  ret = _gnutls_add_lzo_comp ();
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
 #endif
 
   return 0;
