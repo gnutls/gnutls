@@ -441,7 +441,12 @@ server (void)
 {
   /* this must be called once in the program
    */
-  gnutls_global_init ();
+  ret = gnutls_global_init ();
+  if (ret)
+    fail ("global_init: %d\n", ret);
+  ret = gnutls_global_init_extra ();
+  if (ret)
+    fail ("global_init_extra: %d\n", ret);
 
   gnutls_anon_allocate_server_credentials (&anoncred);
   gnutls_ia_allocate_server_credentials (&iacred);
