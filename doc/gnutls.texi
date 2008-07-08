@@ -3465,7 +3465,7 @@ expressions.
 @anchor{ciphersuites}
 @cindex Ciphersuites
 
-@include ../src/algorithms.texi
+@include algorithms.texi
 
 @c
 @c Guile Bindings
