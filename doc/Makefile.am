@@ -29,7 +29,7 @@ endif
 
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl-2.1.texi	\
-	gpl-3.0.texi error_codes.texi gnutls-api.texi			\
+	gpl-3.0.texi gnutls-api.texi			\
 	gnutls-extra-api.texi ia-api.texi x509-api.texi pgp-api.texi	\
 	examples/ex-client1.c examples/ex-client2.c			\
 	examples/ex-session-info.c examples/ex-verify.c			\
@@ -39,7 +39,10 @@ gnutls_TEXINFOS = gnutls.texi signatures.texi fdl.texi lgpl-2.1.texi	\
 	examples/ex-serv-export.c examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
-	examples/ex-pkcs12.c guile.texi $(guile_texi) ../src/algorithms.texi
+	examples/ex-pkcs12.c guile.texi $(guile_texi)
+
+# Generated texinfos.
+gnutls_TEXINFOS += error_codes.texi algorithms.texi
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\
@@ -120,8 +123,13 @@ pgp-api.texi: ../lib/openpgp/pgp-api.texi
 ia-api.texi: ../libextra/ia-api.texi
 	-$(srcdir)/scripts/sort2.pl < ../libextra/ia-api.texi > ia-api.texi
 
+# Generated texinfos.
+
 error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi
+
+algorithms.texi: ../src/algorithms.c
+	-../src/printlist > algorithms.texi
 
 
 guile_texi           = core.c.texi extra.c.texi

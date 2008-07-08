@@ -17,7 +17,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = README README.srptool algorithms.texi
+EXTRA_DIST = README README.srptool
 
 SUBDIRS = cfg
 
@@ -97,8 +97,3 @@ tls_test-gaa.c: $(srcdir)/tls_test.gaa
 	-$(GAA) $< -o tls_test-gaa.c -i tls_test-gaa.h
 serv-gaa.c: $(srcdir)/serv.gaa
 	-$(GAA) $< -o serv-gaa.c -i serv-gaa.h
-
-algorithms.texi: printlist
-	@./printlist >algorithms.texi
-
-dist-hook: algorithms.texi
