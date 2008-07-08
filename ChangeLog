@@ -1,3 +1,111 @@
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.2.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix @include of algorithms.texi.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Fix typos.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, src/Makefile.am: Generate algorithms.texi the
+	same way as error_codes.texi for consistency.  Fixes 'make
+	distcheck' due to srcdir != objdir breakage.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump libtool library version because we added
+	interfaces.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/Makefile.am, lib/ext_inner_application.c,
+	lib/ext_inner_application.h, lib/gnutls_extensions.c,
+	libextra/Makefile.am, libextra/ext_inner_application.c,
+	libextra/ext_inner_application.h, libextra/gnutls_extra.c: Move
+	TLS/IA features to libgnutls-extra.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/tlsia.c: Initialize extra library.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-07-07  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/printlist.c: added missing file.
+
+2008-07-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/Makefile.am, doc/gnutls.texi: automatically generate the
+	appendix with supported algorithms and ciphersuites.
+
+2008-07-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/Makefile.am: automatically generate the appendix with
+	supported algorithms and ciphersuites.
+
+2008-07-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_priority.c: document a way to get the available
+	algorithms and protocols.
+
+2008-07-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/common.c: Corrected memory leak in read_octet. Based on
+	patch by Colin Leroy (colin@colino.net)
+
+2008-07-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-07-03  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, lib/gnutls_extensions.c,
+	lib/gnutls_extensions.h, lib/gnutls_global.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h: Add APIs to register TLS
+	extension handlers.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/Makefile.am, lib/x509/Makefile.am: Use AM_CPPFLAGS.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/Makefile.am: lib/opencdk/Makefile.am (INCLUDES):
+	Rename to `AM_CPPFLAGS'.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, cfg.mk: Guile problem fixed.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_dh_primes.c: Fix typo that swapped prime/generator in
+	gnutls_dh_params_generate2.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-07-02  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.1.
