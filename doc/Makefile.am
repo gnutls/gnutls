@@ -99,9 +99,6 @@ AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 ../lib/x509/x509-api.texi:
 	cd ../lib/x509 && make x509-api.texi
 
-../src/algorithms.texi:
-	cd ../src/ && make algorithms.texi
-
 ../lib/openpgp/pgp-api.texi:
 	cd ../lib/openpgp && make pgp-api.texi
 
@@ -128,7 +125,7 @@ ia-api.texi: ../libextra/ia-api.texi
 error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
 	-../src/errcodes > error_codes.texi
 
-algorithms.texi: ../src/algorithms.c
+algorithms.texi: ../src/printlist.c
 	-../src/printlist > algorithms.texi
 
 
