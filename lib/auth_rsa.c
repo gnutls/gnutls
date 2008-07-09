@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -291,9 +291,8 @@ _gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 
       /* we do not need strong random numbers here.
        */
-      ret =
-	_gnutls_rnd (RND_NONCE, session->key->key.data,
-		     session->key->key.size);
+      ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->key->key.data,
+			 session->key->key.size);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -348,8 +347,8 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret =
-    _gnutls_rnd (RND_RANDOM, session->key->key.data, session->key->key.size);
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, session->key->key.data,
+		     session->key->key.size);
   if (ret < 0)
     {
       gnutls_assert ();

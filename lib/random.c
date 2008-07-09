@@ -32,7 +32,7 @@
 static void *rnd_ctx;
 
 int
-_gnutls_rnd_init ()
+_gnutls_rnd_init (void)
 {
   if (_gnutls_rnd_ops.init != NULL)
     {
@@ -47,7 +47,7 @@ _gnutls_rnd_init ()
 }
 
 void
-_gnutls_rnd_deinit ()
+_gnutls_rnd_deinit (void)
 {
   if (_gnutls_rnd_ops.deinit != NULL)
     {
@@ -58,7 +58,7 @@ _gnutls_rnd_deinit ()
 }
 
 int
-_gnutls_rnd (int level, void *data, int len)
+_gnutls_rnd (int level, void *data, size_t len)
 {
   if (len > 0)
     {

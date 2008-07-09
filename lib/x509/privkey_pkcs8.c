@@ -1753,7 +1753,7 @@ generate_key (schema_id schema,
   else if (schema == PKCS12_RC2_40_SHA1)
     enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
 
-  ret = _gnutls_rnd (RND_RANDOM, rnd, 2);
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, rnd, 2);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1768,7 +1768,8 @@ generate_key (schema_id schema,
   else
     kdf_params->salt_size = 8;
 
-  ret = _gnutls_rnd (RND_RANDOM, kdf_params->salt, kdf_params->salt_size);
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, kdf_params->salt,
+		     kdf_params->salt_size);
   if (ret < 0)
     {
       gnutls_assert ();
