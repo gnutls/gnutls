@@ -35,18 +35,18 @@
 #include <common.h>
 #include <time.h>
 
-typedef struct _oid2string
+struct oid2string
 {
   const char *oid;
   const char *ldap_desc;
   int choice;			/* of type DirectoryString */
   int printable;
-} oid2string;
+};
 
 /* This list contains all the OIDs that may be
  * contained in a rdnSequence and are printable.
  */
-static const oid2string _oid2str[] = {
+static const struct oid2string _oid2str[] = {
   /* PKIX
    */
   {"1.3.6.1.5.5.7.9.1", "dateOfBirth", 0, 1},
