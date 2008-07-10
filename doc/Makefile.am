@@ -19,10 +19,10 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = TODO README.GIT README.autoconf certtool.cfg	\
-	gnutls.ps gnutls.pdf gnutls.html			\
-        extract-guile-c-doc.scm
-SUBDIRS = examples scripts manpages credentials
+EXTRA_DIST = TODO README.GIT README.autoconf certtool.cfg gnutls.ps	\
+	gnutls.pdf gnutls.html extract-guile-c-doc.scm			\
+	doxygen/Doxyfile.in doxygen/Doxyfile.orig
+SUBDIRS = examples scripts manpages credentials doxygen
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
