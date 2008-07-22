@@ -92,10 +92,10 @@ AC_DEFUN([lgl_INIT],
   gl_WCHAR_H
   gl_XSIZE
   m4_ifval(lgl_LIBSOURCES_LIST, [
-    m4_syscmd([test ! -d ]lgl_LIBSOURCES_DIR[ ||
+    m4_syscmd([test ! -d ]m4_defn([lgl_LIBSOURCES_DIR])[ ||
       for gl_file in ]lgl_LIBSOURCES_LIST[ ; do
-        if test ! -r ]lgl_LIBSOURCES_DIR[/$gl_file ; then
-          echo "missing file ]lgl_LIBSOURCES_DIR[/$gl_file" >&2
+        if test ! -r ]m4_defn([lgl_LIBSOURCES_DIR])[/$gl_file ; then
+          echo "missing file ]m4_defn([lgl_LIBSOURCES_DIR])[/$gl_file" >&2
           exit 1
         fi
       done])dnl
@@ -134,10 +134,10 @@ AC_DEFUN([lgl_INIT],
   gt_TYPE_WINT_T
   AC_CHECK_FUNCS([shutdown])
   m4_ifval(lgltests_LIBSOURCES_LIST, [
-    m4_syscmd([test ! -d ]lgltests_LIBSOURCES_DIR[ ||
+    m4_syscmd([test ! -d ]m4_defn([lgltests_LIBSOURCES_DIR])[ ||
       for gl_file in ]lgltests_LIBSOURCES_LIST[ ; do
-        if test ! -r ]lgltests_LIBSOURCES_DIR[/$gl_file ; then
-          echo "missing file ]lgltests_LIBSOURCES_DIR[/$gl_file" >&2
+        if test ! -r ]m4_defn([lgltests_LIBSOURCES_DIR])[/$gl_file ; then
+          echo "missing file ]m4_defn([lgltests_LIBSOURCES_DIR])[/$gl_file" >&2
           exit 1
         fi
       done])dnl
