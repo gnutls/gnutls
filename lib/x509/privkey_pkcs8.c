@@ -1807,7 +1807,8 @@ generate_key (schema_id schema,
 
       if (enc_params->iv_size)
 	{
-	  ret = _gnutls_rnd (RND_NONCE, enc_params->iv, enc_params->iv_size);
+	  ret = _gnutls_rnd (GNUTLS_RND_NONCE,
+			     enc_params->iv, enc_params->iv_size);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
