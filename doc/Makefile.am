@@ -22,7 +22,7 @@
 EXTRA_DIST = TODO README.GIT README.autoconf certtool.cfg gnutls.ps	\
 	gnutls.pdf gnutls.html extract-guile-c-doc.scm			\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig
-SUBDIRS = examples scripts manpages credentials doxygen
+SUBDIRS = examples scripts manpages credentials
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
