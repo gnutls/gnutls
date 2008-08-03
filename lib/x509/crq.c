@@ -678,6 +678,74 @@ gnutls_x509_crq_set_key (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 }
 
 /**
+  * gnutls_x509_crq_set_key_rsa_raw - This function will associate the Certificate request with a key
+  * @crq: should contain a gnutls_x509_crq_t structure
+  * @m: holds the modulus
+  * @e: holds the public exponent
+  *
+  * This function will set the public parameters from the given private key to the
+  * request. Only RSA keys are currently supported.
+  *
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.
+  *
+  **/
+int
+gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq, 
+				    const gnutls_datum_t * m,
+				    const gnutls_datum_t * e)
+{
+  int result, ret;
+  size_t siz = 0;
+  bigint_t temp_params[RSA_PUBLIC_PARAMS];
+  
+
+  if (crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  memset(temp_params, 0, sizeof(temp_params));
+
+  siz = m->size;
+  if (_gnutls_mpi_scan_nz (&temp_params[0], m->data, siz))
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto error;
+    }
+
+  siz = e->size;
+  if (_gnutls_mpi_scan_nz (&temp_params[1], e->data, siz))
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto error;
+    }
+
+  result = _gnutls_x509_encode_and_copy_PKI_params (crq->crq,
+						    "certificationRequestInfo.subjectPKInfo",
+						    GNUTLS_PK_RSA,
+						    temp_params,
+						    RSA_PUBLIC_PARAMS);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      ret = result;
+      goto error;
+    }
+
+  ret = 0;
+
+error:
+    _gnutls_mpi_release (&temp_params[0]);
+    _gnutls_mpi_release (&temp_params[1]);
+    return ret;
+}
+
+/**
   * gnutls_x509_crq_set_challenge_password - This function will set a challenge password 
   * @crq: should contain a gnutls_x509_crq_t structure
   * @pass: holds a null terminated password

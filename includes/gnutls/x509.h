@@ -664,6 +664,9 @@ extern "C"
 
   int gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
 
+  int gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq, 
+				    const gnutls_datum_t * m,
+				    const gnutls_datum_t * e);
 
 
 #ifdef __cplusplus
