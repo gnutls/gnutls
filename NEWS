@@ -5,7 +5,14 @@ See the end for copying conditions.
 
 * Version 2.5.3 (unreleased)
 
+** libgnutls: New API to set the public parameters in a certificate request
+** from a private key.
+The function is gnutls_x509_crq_set_key_rsa_raw.
+
 ** doc: Add doxygen files in doc/doxygen/.
+
+** API and ABI modifications:
+gnutls_x509_crq_set_key_rsa_raw: ADDED
 
 * Version 2.5.2 (released 2008-07-08)
 
