@@ -309,6 +309,7 @@ APIMANS += gnutls_x509_crq_set_dn_by_oid.3
 APIMANS += gnutls_x509_crq_set_version.3
 APIMANS += gnutls_x509_crq_get_version.3
 APIMANS += gnutls_x509_crq_set_key.3
+APIMANS += gnutls_x509_crq_set_key_rsa_raw.3
 APIMANS += gnutls_x509_crq_set_challenge_password.3
 APIMANS += gnutls_x509_crq_sign2.3
 APIMANS += gnutls_x509_crq_sign.3
