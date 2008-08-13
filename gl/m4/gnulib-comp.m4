@@ -220,6 +220,8 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/gpl-3.0.texi
   doc/lgpl-2.1.texi
   lib/arpa_inet.in.h
+  lib/c-ctype.c
+  lib/c-ctype.h
   lib/error.c
   lib/error.h
   lib/gai_strerror.c
@@ -267,6 +269,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/strerror.m4
   tests/test-EOVERFLOW.c
   tests/test-arpa_inet.c
+  tests/test-c-ctype.c
   tests/test-getaddrinfo.c
   tests/test-getdelim.c
   tests/test-getline.c

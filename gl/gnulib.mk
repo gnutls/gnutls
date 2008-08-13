@@ -49,6 +49,12 @@ EXTRA_DIST += arpa_inet.in.h
 
 ## end   gnulib module arpa_inet
 
+## begin gnulib module c-ctype
+
+libgnu_la_SOURCES += c-ctype.h c-ctype.c
+
+## end   gnulib module c-ctype
+
 ## begin gnulib module error
 
 

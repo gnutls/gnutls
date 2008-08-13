@@ -52,6 +52,15 @@ EXTRA_DIST += test-arpa_inet.c
 
 ## end   gnulib module arpa_inet-tests
 
+## begin gnulib module c-ctype-tests
+
+TESTS += test-c-ctype
+check_PROGRAMS += test-c-ctype
+
+EXTRA_DIST += test-c-ctype.c
+
+## end   gnulib module c-ctype-tests
+
 ## begin gnulib module getaddrinfo-tests
 
 TESTS += test-getaddrinfo
