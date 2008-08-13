@@ -211,6 +211,7 @@ APIMANS += gnutls_prf.3
 APIMANS += gnutls_session_get_client_random.3
 APIMANS += gnutls_session_get_server_random.3
 APIMANS += gnutls_session_get_master_secret.3
+APIMANS += gnutls_session_set_finished_function.3
 APIMANS += gnutls_session_is_resumed.3
 APIMANS += gnutls_session_get_ptr.3
 APIMANS += gnutls_session_set_ptr.3
