@@ -13,6 +13,9 @@ The function is gnutls_x509_crq_set_key_rsa_raw.
 The function to register is gnutls_session_set_finished_function and
 it takes a callback of the gnutls_finished_callback_func type.
 
+** libgnutls: Drop final comma after GNUTLS_CRT_PRINT_UNSIGNED_FULL in enum.
+Reported in <https://savannah.gnu.org/support/?106453>.
+
 ** doc: Add doxygen files in doc/doxygen/.
 
 ** API and ABI modifications:
