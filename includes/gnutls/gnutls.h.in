@@ -608,6 +608,15 @@ extern "C"
   const void *gnutls_session_get_client_random (gnutls_session_t session);
   const void *gnutls_session_get_master_secret (gnutls_session_t session);
 
+  typedef void
+  (*gnutls_finished_callback_func) (gnutls_session_t session,
+				    const void *finished,
+				    size_t len);
+  void
+  gnutls_session_set_finished_function (gnutls_session_t session,
+					gnutls_finished_callback_func
+					finished_func);
+
 /* checks if this session is a resumed one 
  */
   int gnutls_session_is_resumed (gnutls_session_t session);

@@ -639,6 +639,9 @@ typedef struct
   gnutls_sign_func sign_func;
   void *sign_func_userdata;
 
+  /* Callback to extract TLS Finished message. */
+  gnutls_finished_callback_func finished_func;
+
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
 } internals_st;

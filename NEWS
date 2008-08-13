@@ -9,10 +9,16 @@ See the end for copying conditions.
 ** from a private key.
 The function is gnutls_x509_crq_set_key_rsa_raw.
 
+** libgnutls: New API to set a callback to extract TLS Finished data.
+The function to register is gnutls_session_set_finished_function and
+it takes a callback of the gnutls_finished_callback_func type.
+
 ** doc: Add doxygen files in doc/doxygen/.
 
 ** API and ABI modifications:
 gnutls_x509_crq_set_key_rsa_raw: ADDED
+gnutls_session_set_finished_function: ADDED
+gnutls_finished_callback_func: ADDED
 
 * Version 2.5.2 (released 2008-07-08)
 

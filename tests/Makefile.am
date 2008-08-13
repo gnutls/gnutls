@@ -40,7 +40,8 @@ noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
 ctests = simple openssl gc set_pkcs12_cred certder mpi			\
-	certificate_set_x509_crl dn parse_ca moredn crypto_rng mini
+	certificate_set_x509_crl dn parse_ca moredn crypto_rng mini	\
+	finished
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 
 if HAVE_FORK

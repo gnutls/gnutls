@@ -569,6 +569,8 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  return ret;
 	}
 
+      if (session->internals.finished_func)
+	session->internals.finished_func (session, data, data_size);
     }
 
   ret =
