@@ -396,10 +396,12 @@ void session::set_credentials( credentials &cred)
     RETWRAP(gnutls_credentials_set( s, cred.get_type(), cred.ptr()));
 }
 
+#ifdef ENABLE_SRP
 const char* server_session::get_srp_username() const
 {
     return gnutls_srp_server_get_username( s);
 }
+#endif
 
 const char* server_session::get_psk_username() const
 {
@@ -678,6 +680,8 @@ void certificate_client_credentials::set_retrieve_function( gnutls_certificate_c
 
 // SRP
 
+#ifdef ENABLE_SRP
+
 srp_server_credentials::srp_server_credentials() : credentials(GNUTLS_CRD_SRP)
 { 
     RETWRAP(gnutls_srp_allocate_server_credentials( &cred));
@@ -721,6 +725,8 @@ void srp_client_credentials::set_credentials_function(gnutls_srp_client_credenti
 {
     gnutls_srp_set_client_credentials_function( cred, func);
 }
+
+#endif /* ENABLE_SRP */
 
 // PSK
 
