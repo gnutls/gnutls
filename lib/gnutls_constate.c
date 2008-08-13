@@ -62,8 +62,8 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 /* FIXME: This function is too long
  */
   opaque *key_block;
-  opaque rnd[2 * TLS_RANDOM_SIZE];
-  opaque rrnd[2 * TLS_RANDOM_SIZE];
+  opaque rnd[2 * GNUTLS_RANDOM_SIZE];
+  opaque rrnd[2 * GNUTLS_RANDOM_SIZE];
   int pos, ret;
   int block_size;
   char buf[65];
@@ -88,27 +88,27 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  memcpy (rnd, session->security_parameters.server_random, TLS_RANDOM_SIZE);
-  memcpy (&rnd[TLS_RANDOM_SIZE],
-	  session->security_parameters.client_random, TLS_RANDOM_SIZE);
+  memcpy (rnd, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+  memcpy (&rnd[GNUTLS_RANDOM_SIZE],
+	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
 
-  memcpy (rrnd, session->security_parameters.client_random, TLS_RANDOM_SIZE);
-  memcpy (&rrnd[TLS_RANDOM_SIZE],
-	  session->security_parameters.server_random, TLS_RANDOM_SIZE);
+  memcpy (rrnd, session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+  memcpy (&rrnd[GNUTLS_RANDOM_SIZE],
+	  session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 
   if (session->security_parameters.version == GNUTLS_SSL3)
     {				/* SSL 3 */
       ret =
 	_gnutls_ssl3_generate_random
-	(session->security_parameters.master_secret, TLS_MASTER_SIZE, rnd,
-	 2 * TLS_RANDOM_SIZE, block_size, key_block);
+	(session->security_parameters.master_secret, GNUTLS_MASTER_SIZE, rnd,
+	 2 * GNUTLS_RANDOM_SIZE, block_size, key_block);
     }
   else
     {				/* TLS 1.0 */
       ret =
 	_gnutls_PRF (session, session->security_parameters.master_secret,
-		     TLS_MASTER_SIZE, keyexp, keyexp_length,
-		     rnd, 2 * TLS_RANDOM_SIZE, block_size, key_block);
+		     GNUTLS_MASTER_SIZE, keyexp, keyexp_length,
+		     rnd, 2 * GNUTLS_RANDOM_SIZE, block_size, key_block);
     }
 
   if (ret < 0)
@@ -191,7 +191,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	      ret =
 		_gnutls_ssl3_hash_md5 (&key_block[pos],
 				       key_size, rrnd,
-				       2 * TLS_RANDOM_SIZE,
+				       2 * GNUTLS_RANDOM_SIZE,
 				       EXPORT_FINAL_KEY_SIZE,
 				       client_write_key);
 
@@ -202,7 +202,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 		_gnutls_PRF (session, &key_block[pos], key_size,
 			     cliwrite, cliwrite_length,
 			     rrnd,
-			     2 * TLS_RANDOM_SIZE,
+			     2 * GNUTLS_RANDOM_SIZE,
 			     EXPORT_FINAL_KEY_SIZE, client_write_key);
 	    }
 
@@ -222,7 +222,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	    {			/* SSL 3 */
 	      ret =
 		_gnutls_ssl3_hash_md5 (&key_block[pos], key_size,
-				       rnd, 2 * TLS_RANDOM_SIZE,
+				       rnd, 2 * GNUTLS_RANDOM_SIZE,
 				       EXPORT_FINAL_KEY_SIZE,
 				       server_write_key);
 	    }
@@ -231,7 +231,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	      ret =
 		_gnutls_PRF (session, &key_block[pos], key_size,
 			     servwrite, servwrite_length,
-			     rrnd, 2 * TLS_RANDOM_SIZE,
+			     rrnd, 2 * GNUTLS_RANDOM_SIZE,
 			     EXPORT_FINAL_KEY_SIZE, server_write_key);
 	    }
 
@@ -323,7 +323,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
       if (session->security_parameters.version == GNUTLS_SSL3)
 	{			/* SSL 3 */
 	  ret = _gnutls_ssl3_hash_md5 ("", 0,
-				       rrnd, TLS_RANDOM_SIZE * 2,
+				       rrnd, GNUTLS_RANDOM_SIZE * 2,
 				       IV_size, iv_block);
 
 	  if (ret < 0)
@@ -335,7 +335,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	    }
 
 	  ret = _gnutls_ssl3_hash_md5 ("", 0, rnd,
-				       TLS_RANDOM_SIZE * 2,
+				       GNUTLS_RANDOM_SIZE * 2,
 				       IV_size, &iv_block[IV_size]);
 
 	}
@@ -343,7 +343,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	{			/* TLS 1.0 */
 	  ret = _gnutls_PRF (session, "", 0,
 			     ivblock, ivblock_length, rrnd,
-			     2 * TLS_RANDOM_SIZE, IV_size * 2, iv_block);
+			     2 * GNUTLS_RANDOM_SIZE, IV_size * 2, iv_block);
 	}
 
       if (ret < 0)
@@ -426,9 +426,9 @@ _gnutls_set_write_keys (gnutls_session_t session)
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
 	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(cipher_suite_st)); \
-	memcpy( dst->master_secret, src->master_secret, TLS_MASTER_SIZE); \
-	memcpy( dst->client_random, src->client_random, TLS_RANDOM_SIZE); \
-	memcpy( dst->server_random, src->server_random, TLS_RANDOM_SIZE); \
+	memcpy( dst->master_secret, src->master_secret, GNUTLS_MASTER_SIZE); \
+	memcpy( dst->client_random, src->client_random, GNUTLS_RANDOM_SIZE); \
+	memcpy( dst->server_random, src->server_random, GNUTLS_RANDOM_SIZE); \
 	memcpy( dst->session_id, src->session_id, TLS_MAX_SESSION_ID_SIZE); \
 	dst->session_id_size = src->session_id_size; \
 	dst->cert_type = src->cert_type; \
@@ -437,7 +437,7 @@ _gnutls_set_write_keys (gnutls_session_t session)
 	dst->max_record_send_size = src->max_record_send_size; \
 	dst->version = src->version; \
 	memcpy( &dst->extensions, &src->extensions, sizeof(tls_ext_st)); \
-	memcpy( &dst->inner_secret, &src->inner_secret, TLS_MASTER_SIZE);
+	memcpy( &dst->inner_secret, &src->inner_secret, GNUTLS_MASTER_SIZE);
 
 static void
 _gnutls_cpy_read_security_parameters (security_parameters_st *

@@ -167,7 +167,7 @@ _gnutls_ia_prf (gnutls_session_t session,
 {
   int ret;
   opaque *seed;
-  size_t seedsize = 2 * TLS_RANDOM_SIZE + extra_size;
+  size_t seedsize = 2 * GNUTLS_RANDOM_SIZE + extra_size;
 
   seed = gnutls_malloc (seedsize);
   if (!seed)
@@ -176,13 +176,13 @@ _gnutls_ia_prf (gnutls_session_t session,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  memcpy (seed, session->security_parameters.server_random, TLS_RANDOM_SIZE);
-  memcpy (seed + TLS_RANDOM_SIZE, session->security_parameters.client_random,
-	  TLS_RANDOM_SIZE);
-  memcpy (seed + 2 * TLS_RANDOM_SIZE, extra, extra_size);
+  memcpy (seed, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+  memcpy (seed + GNUTLS_RANDOM_SIZE, session->security_parameters.client_random,
+	  GNUTLS_RANDOM_SIZE);
+  memcpy (seed + 2 * GNUTLS_RANDOM_SIZE, extra, extra_size);
 
   ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
-		     TLS_MASTER_SIZE,
+		     GNUTLS_MASTER_SIZE,
 		     label, label_size, seed, seedsize, outsize, out);
 
   gnutls_free (seed);
@@ -214,7 +214,7 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
 			 inner_permutation_label,
 			 session_keys_size,
 			 session_keys,
-			 TLS_RANDOM_SIZE,
+			 GNUTLS_RANDOM_SIZE,
 			 session->security_parameters.inner_secret);
 }
 
@@ -257,7 +257,7 @@ gnutls_ia_generate_challenge (gnutls_session_t session,
 void
 gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer)
 {
-  memcpy (buffer, session->security_parameters.inner_secret, TLS_MASTER_SIZE);
+  memcpy (buffer, session->security_parameters.inner_secret, GNUTLS_MASTER_SIZE);
 }
 
 /**
@@ -287,7 +287,7 @@ gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
   int ret;
 
   ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
-		     TLS_MASTER_SIZE, label, size_of_label - 1,
+		     GNUTLS_MASTER_SIZE, label, size_of_label - 1,
 		     /* XXX specification unclear on seed. */
 		     "", 0, CHECKSUM_SIZE, local_checksum);
   if (ret < 0)
@@ -340,7 +340,7 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
   int ret;
 
   ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
-		     TLS_MASTER_SIZE,
+		     GNUTLS_MASTER_SIZE,
 		     label, size_of_label - 1,
 		     "", 0, CHECKSUM_SIZE, local_checksum);
   if (ret < 0)

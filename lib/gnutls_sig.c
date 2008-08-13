@@ -79,7 +79,7 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
 					 session->
 					 security_parameters.master_secret,
-					 TLS_MASTER_SIZE);
+					 GNUTLS_MASTER_SIZE);
     }
   else
     _gnutls_hash_deinit (&td_sha, &concat[16]);
@@ -100,7 +100,7 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 	_gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
 					   session->
 					   security_parameters.master_secret,
-					   TLS_MASTER_SIZE);
+					   GNUTLS_MASTER_SIZE);
       else
 	_gnutls_hash_deinit (&td_md5, concat);
 
@@ -148,9 +148,9 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
     }
 
   _gnutls_hash (&td_sha, session->security_parameters.client_random,
-		TLS_RANDOM_SIZE);
+		GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, session->security_parameters.server_random,
-		TLS_RANDOM_SIZE);
+		GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, params->data, params->size);
 
   switch (cert->subject_pk_algorithm)
@@ -168,9 +168,9 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
 	    }
 
 	  _gnutls_hash (&td_md5, session->security_parameters.client_random,
-			TLS_RANDOM_SIZE);
+			GNUTLS_RANDOM_SIZE);
 	  _gnutls_hash (&td_md5, session->security_parameters.server_random,
-			TLS_RANDOM_SIZE);
+			GNUTLS_RANDOM_SIZE);
 	  _gnutls_hash (&td_md5, params->data, params->size);
 
 	  _gnutls_hash_deinit (&td_md5, concat);
@@ -406,11 +406,11 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
       _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
 					 session->
 					 security_parameters.master_secret,
-					 TLS_MASTER_SIZE);
+					 GNUTLS_MASTER_SIZE);
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
 					 session->
 					 security_parameters.master_secret,
-					 TLS_MASTER_SIZE);
+					 GNUTLS_MASTER_SIZE);
     }
   else
     {
@@ -457,9 +457,9 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
 	}
 
       _gnutls_hash (&td_md5, session->security_parameters.client_random,
-		    TLS_RANDOM_SIZE);
+		    GNUTLS_RANDOM_SIZE);
       _gnutls_hash (&td_md5, session->security_parameters.server_random,
-		    TLS_RANDOM_SIZE);
+		    GNUTLS_RANDOM_SIZE);
       _gnutls_hash (&td_md5, params->data, params->size);
     }
 
@@ -473,9 +473,9 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
     }
 
   _gnutls_hash (&td_sha, session->security_parameters.client_random,
-		TLS_RANDOM_SIZE);
+		GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, session->security_parameters.server_random,
-		TLS_RANDOM_SIZE);
+		GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, params->data, params->size);
 
   if (ver < GNUTLS_TLS1_2)

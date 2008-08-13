@@ -97,7 +97,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   int ret = 0;
   uint16_t sizeOfSuites;
   gnutls_protocol_t adv_version;
-  opaque rnd[TLS_RANDOM_SIZE];
+  opaque rnd[GNUTLS_RANDOM_SIZE];
   int len = datalen;
   int err;
   uint16_t challenge;
@@ -146,7 +146,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   challenge = _gnutls_read_uint16 (&data[pos]);
   pos += 2;
 
-  if (challenge < 16 || challenge > TLS_RANDOM_SIZE)
+  if (challenge < 16 || challenge > GNUTLS_RANDOM_SIZE)
     {
       gnutls_assert ();
       return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
@@ -212,9 +212,9 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   pos += session_id_len;
 
   DECR_LEN (len, challenge);
-  memset (rnd, 0, TLS_RANDOM_SIZE);
+  memset (rnd, 0, GNUTLS_RANDOM_SIZE);
 
-  memcpy (&rnd[TLS_RANDOM_SIZE - challenge], &data[pos], challenge);
+  memcpy (&rnd[GNUTLS_RANDOM_SIZE - challenge], &data[pos], challenge);
 
   _gnutls_set_client_random (session, rnd);
 
@@ -235,9 +235,9 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
     {				/* resumed! */
       /* get the new random values */
       memcpy (session->internals.resumed_security_parameters.server_random,
-	      session->security_parameters.server_random, TLS_RANDOM_SIZE);
+	      session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
       memcpy (session->internals.resumed_security_parameters.client_random,
-	      session->security_parameters.client_random, TLS_RANDOM_SIZE);
+	      session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
 
       session->internals.resumed = RESUME_TRUE;
       return 0;

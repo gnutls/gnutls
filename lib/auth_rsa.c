@@ -249,7 +249,7 @@ _gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 
   ret = _gnutls_pkcs1_rsa_decrypt (&plaintext, &ciphertext, params, params_len, 2);	/* btype==2 */
 
-  if (ret < 0 || plaintext.size != TLS_MASTER_SIZE)
+  if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE)
     {
       /* In case decryption fails then don't inform
        * the peer. Just use a random key. (in order to avoid
@@ -281,7 +281,7 @@ _gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 
   if (randomize_key != 0)
     {
-      session->key->key.size = TLS_MASTER_SIZE;
+      session->key->key.size = GNUTLS_MASTER_SIZE;
       session->key->key.data = gnutls_malloc (session->key->key.size);
       if (session->key->key.data == NULL)
 	{
@@ -338,7 +338,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  session->key->key.size = TLS_MASTER_SIZE;
+  session->key->key.size = GNUTLS_MASTER_SIZE;
   session->key->key.data = gnutls_secure_malloc (session->key->key.size);
 
   if (session->key->key.data == NULL)

@@ -1019,15 +1019,15 @@ pack_security_parameters (gnutls_session_t session,
   packed_session->data[pos++] = session->security_parameters.version;
 
   memcpy (&packed_session->data[pos],
-	  session->security_parameters.master_secret, TLS_MASTER_SIZE);
-  pos += TLS_MASTER_SIZE;
+	  session->security_parameters.master_secret, GNUTLS_MASTER_SIZE);
+  pos += GNUTLS_MASTER_SIZE;
 
   memcpy (&packed_session->data[pos],
-	  session->security_parameters.client_random, TLS_RANDOM_SIZE);
-  pos += TLS_RANDOM_SIZE;
+	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+  pos += GNUTLS_RANDOM_SIZE;
   memcpy (&packed_session->data[pos],
-	  session->security_parameters.server_random, TLS_RANDOM_SIZE);
-  pos += TLS_RANDOM_SIZE;
+	  session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+  pos += GNUTLS_RANDOM_SIZE;
 
   packed_session->data[pos++] = session->security_parameters.session_id_size;
   memcpy (&packed_session->data[pos], session->security_parameters.session_id,
@@ -1143,15 +1143,15 @@ unpack_security_parameters (gnutls_session_t session,
     packed_session->data[pos++];
 
   memcpy (session->internals.resumed_security_parameters.master_secret,
-	  &packed_session->data[pos], TLS_MASTER_SIZE);
-  pos += TLS_MASTER_SIZE;
+	  &packed_session->data[pos], GNUTLS_MASTER_SIZE);
+  pos += GNUTLS_MASTER_SIZE;
 
   memcpy (session->internals.resumed_security_parameters.client_random,
-	  &packed_session->data[pos], TLS_RANDOM_SIZE);
-  pos += TLS_RANDOM_SIZE;
+	  &packed_session->data[pos], GNUTLS_RANDOM_SIZE);
+  pos += GNUTLS_RANDOM_SIZE;
   memcpy (session->internals.resumed_security_parameters.server_random,
-	  &packed_session->data[pos], TLS_RANDOM_SIZE);
-  pos += TLS_RANDOM_SIZE;
+	  &packed_session->data[pos], GNUTLS_RANDOM_SIZE);
+  pos += GNUTLS_RANDOM_SIZE;
 
   session->internals.resumed_security_parameters.session_id_size =
     packed_session->data[pos++];

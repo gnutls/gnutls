@@ -49,9 +49,7 @@
  */
 #define MAX_HANDSHAKE_PACKET_SIZE 48*1024
 
-#define TLS_RANDOM_SIZE 32
 #define TLS_MAX_SESSION_ID_SIZE 32
-#define TLS_MASTER_SIZE 48
 
 /* The maximum digest size of hash algorithms. 
  */
@@ -321,9 +319,9 @@ typedef struct
    * on resume;
    */
   cipher_suite_st current_cipher_suite;
-  opaque master_secret[TLS_MASTER_SIZE];
-  opaque client_random[TLS_RANDOM_SIZE];
-  opaque server_random[TLS_RANDOM_SIZE];
+  opaque master_secret[GNUTLS_MASTER_SIZE];
+  opaque client_random[GNUTLS_RANDOM_SIZE];
+  opaque server_random[GNUTLS_RANDOM_SIZE];
   opaque session_id[TLS_MAX_SESSION_ID_SIZE];
   uint8_t session_id_size;
   time_t timestamp;
@@ -338,7 +336,7 @@ typedef struct
   gnutls_certificate_type_t cert_type;
   gnutls_protocol_t version;	/* moved here */
   /* For TLS/IA.  XXX: Move to IA credential? */
-  opaque inner_secret[TLS_MASTER_SIZE];
+  opaque inner_secret[GNUTLS_MASTER_SIZE];
 } security_parameters_st;
 
 /* This structure holds the generated keys

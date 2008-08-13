@@ -86,9 +86,9 @@ resume_copy_required_values (gnutls_session_t session)
 {
   /* get the new random values */
   memcpy (session->internals.resumed_security_parameters.server_random,
-	  session->security_parameters.server_random, TLS_RANDOM_SIZE);
+	  session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
   memcpy (session->internals.resumed_security_parameters.client_random,
-	  session->security_parameters.client_random, TLS_RANDOM_SIZE);
+	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
 
   /* keep the ciphersuite and compression 
    * That is because the client must see these in our
@@ -124,13 +124,13 @@ resume_copy_required_values (gnutls_session_t session)
 void
 _gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd)
 {
-  memcpy (session->security_parameters.server_random, rnd, TLS_RANDOM_SIZE);
+  memcpy (session->security_parameters.server_random, rnd, GNUTLS_RANDOM_SIZE);
 }
 
 void
 _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd)
 {
-  memcpy (session->security_parameters.client_random, rnd, TLS_RANDOM_SIZE);
+  memcpy (session->security_parameters.client_random, rnd, GNUTLS_RANDOM_SIZE);
 }
 
 /* Calculate The SSL3 Finished message 
@@ -179,11 +179,11 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
   _gnutls_mac_deinit_ssl3_handshake (&td_md5, ret,
 				     session->
 				     security_parameters.master_secret,
-				     TLS_MASTER_SIZE);
+				     GNUTLS_MASTER_SIZE);
   _gnutls_mac_deinit_ssl3_handshake (&td_sha, &ret[16],
 				     session->
 				     security_parameters.master_secret,
-				     TLS_MASTER_SIZE);
+				     GNUTLS_MASTER_SIZE);
 
   return 0;
 }
@@ -248,10 +248,10 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
     }
 
   return _gnutls_PRF (session, session->security_parameters.master_secret,
-		      TLS_MASTER_SIZE, mesg, siz, concat, len, 12, ret);
+		      GNUTLS_MASTER_SIZE, mesg, siz, concat, len, 12, ret);
 }
 
-/* this function will produce TLS_RANDOM_SIZE==32 bytes of random data
+/* this function will produce GNUTLS_RANDOM_SIZE==32 bytes of random data
  * and put it to dst.
  */
 int
@@ -269,7 +269,7 @@ _gnutls_tls_create_random (opaque * dst)
   /* generate server random value */
   _gnutls_write_uint32 (tim, dst);
 
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, &dst[4], TLS_RANDOM_SIZE - 4);
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, &dst[4], GNUTLS_RANDOM_SIZE - 4);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -354,7 +354,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   gnutls_protocol_t adv_version;
   int neg_version;
   int len = datalen;
-  opaque rnd[TLS_RANDOM_SIZE], *suite_ptr, *comp_ptr;
+  opaque rnd[GNUTLS_RANDOM_SIZE], *suite_ptr, *comp_ptr;
 
   if (session->internals.v2_hello != 0)
     {				/* version 2.0 */
@@ -378,9 +378,9 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 
   /* Read client random value.
    */
-  DECR_LEN (len, TLS_RANDOM_SIZE);
+  DECR_LEN (len, GNUTLS_RANDOM_SIZE);
   _gnutls_set_client_random (session, &data[pos]);
-  pos += TLS_RANDOM_SIZE;
+  pos += GNUTLS_RANDOM_SIZE;
 
   _gnutls_tls_create_random (rnd);
   _gnutls_set_server_random (session, rnd);
@@ -1451,9 +1451,9 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
     {
       /* resume session */
       memcpy (session->internals.resumed_security_parameters.server_random,
-	      session->security_parameters.server_random, TLS_RANDOM_SIZE);
+	      session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
       memcpy (session->internals.resumed_security_parameters.client_random,
-	      session->security_parameters.client_random, TLS_RANDOM_SIZE);
+	      session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
       session->internals.resumed = RESUME_TRUE;	/* we are resuming */
 
       return 0;
@@ -1508,9 +1508,9 @@ _gnutls_read_server_hello (gnutls_session_t session,
 
   pos += 2;
 
-  DECR_LEN (len, TLS_RANDOM_SIZE);
+  DECR_LEN (len, GNUTLS_RANDOM_SIZE);
   _gnutls_set_server_random (session, &data[pos]);
-  pos += TLS_RANDOM_SIZE;
+  pos += GNUTLS_RANDOM_SIZE;
 
 
   /* Read session ID
@@ -1702,7 +1702,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   int extdatalen;
   int pos = 0;
   int datalen = 0, ret = 0;
-  opaque rnd[TLS_RANDOM_SIZE];
+  opaque rnd[GNUTLS_RANDOM_SIZE];
   gnutls_protocol_t hver;
   opaque extdata[MAX_EXT_DATA_LENGTH];
 
@@ -1719,8 +1719,8 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   if (again == 0)
     {
 
-      datalen = 2 + (session_id_len + 1) + TLS_RANDOM_SIZE;
-      /* 2 for version, (4 for unix time + 28 for random bytes==TLS_RANDOM_SIZE) 
+      datalen = 2 + (session_id_len + 1) + GNUTLS_RANDOM_SIZE;
+      /* 2 for version, (4 for unix time + 28 for random bytes==GNUTLS_RANDOM_SIZE) 
        */
 
       data = gnutls_malloc (datalen);
@@ -1774,8 +1774,8 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       _gnutls_tls_create_random (rnd);
       _gnutls_set_client_random (session, rnd);
 
-      memcpy (&data[pos], rnd, TLS_RANDOM_SIZE);
-      pos += TLS_RANDOM_SIZE;
+      memcpy (&data[pos], rnd, GNUTLS_RANDOM_SIZE);
+      pos += GNUTLS_RANDOM_SIZE;
 
       /* Copy the Session ID 
        */
@@ -1929,7 +1929,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 
   if (again == 0)
     {
-      datalen = 2 + session_id_len + 1 + TLS_RANDOM_SIZE + 3;
+      datalen = 2 + session_id_len + 1 + GNUTLS_RANDOM_SIZE + 3;
       extdatalen =
 	_gnutls_gen_extensions (session, extdata, sizeof (extdata));
 
@@ -1952,8 +1952,8 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	_gnutls_version_get_minor (session->security_parameters.version);
 
       memcpy (&data[pos],
-	      session->security_parameters.server_random, TLS_RANDOM_SIZE);
-      pos += TLS_RANDOM_SIZE;
+	      session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+      pos += GNUTLS_RANDOM_SIZE;
 
       data[pos++] = session_id_len;
       if (session_id_len > 0)

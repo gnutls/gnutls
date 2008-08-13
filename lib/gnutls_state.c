@@ -980,7 +980,7 @@ gnutls_prf_raw (gnutls_session_t session,
 
   ret = _gnutls_PRF (session,
 		     session->security_parameters.master_secret,
-		     TLS_MASTER_SIZE,
+		     GNUTLS_MASTER_SIZE,
 		     label,
 		     label_size, (opaque *) seed, seed_size, outsize, out);
 
@@ -1025,7 +1025,7 @@ gnutls_prf (gnutls_session_t session,
 {
   int ret;
   opaque *seed;
-  size_t seedsize = 2 * TLS_RANDOM_SIZE + extra_size;
+  size_t seedsize = 2 * GNUTLS_RANDOM_SIZE + extra_size;
 
   seed = gnutls_malloc (seedsize);
   if (!seed)
@@ -1036,15 +1036,15 @@ gnutls_prf (gnutls_session_t session,
 
   memcpy (seed, server_random_first ?
 	  session->security_parameters.server_random :
-	  session->security_parameters.client_random, TLS_RANDOM_SIZE);
-  memcpy (seed + TLS_RANDOM_SIZE, server_random_first ?
+	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+  memcpy (seed + GNUTLS_RANDOM_SIZE, server_random_first ?
 	  session->security_parameters.client_random :
-	  session->security_parameters.server_random, TLS_RANDOM_SIZE);
+	  session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 
-  memcpy (seed + 2 * TLS_RANDOM_SIZE, extra, extra_size);
+  memcpy (seed + 2 * GNUTLS_RANDOM_SIZE, extra, extra_size);
 
   ret = _gnutls_PRF (session, session->security_parameters.master_secret,
-		     TLS_MASTER_SIZE,
+		     GNUTLS_MASTER_SIZE,
 		     label, label_size, seed, seedsize, outsize, out);
 
   gnutls_free (seed);

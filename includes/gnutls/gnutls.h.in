@@ -602,8 +602,8 @@ extern "C"
 /* returns security values. 
  * Do not use them unless you know what you're doing.
  */
-#define TLS_MASTER_SIZE 48
-#define TLS_RANDOM_SIZE 32
+#define GNUTLS_MASTER_SIZE 48
+#define GNUTLS_RANDOM_SIZE 32
   const void *gnutls_session_get_server_random (gnutls_session_t session);
   const void *gnutls_session_get_client_random (gnutls_session_t session);
   const void *gnutls_session_get_master_secret (gnutls_session_t session);
