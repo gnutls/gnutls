@@ -16,6 +16,12 @@ it takes a callback of the gnutls_finished_callback_func type.
 ** libgnutls: Drop final comma after GNUTLS_CRT_PRINT_UNSIGNED_FULL in enum.
 Reported in <https://savannah.gnu.org/support/?106453>.
 
+** libgnutls: Fix namespace problem with TLS_MASTER_SIZE and TLS_RANDOM_SIZE.
+The new names are GNUTLS_MASTER_SIZE and GNUTLS_RANDOM_SIZE.  The old
+names are mapped to the new names in compat.h.  These mappings will
+likely be removed more quickly than other mappings in that file due to
+the namespace violation.
+
 ** libgnutlsxx: Make it build when SRP is disabled.
 
 ** doc: Add doxygen files in doc/doxygen/.
@@ -24,6 +30,10 @@ Reported in <https://savannah.gnu.org/support/?106453>.
 gnutls_x509_crq_set_key_rsa_raw: ADDED
 gnutls_session_set_finished_function: ADDED
 gnutls_finished_callback_func: ADDED
+GNUTLS_MASTER_SIZE: ADDED
+GNUTLS_RANDOM_SIZE: ADDED
+TLS_MASTER_SIZE: DEPRECATED
+TLS_RANDOM_SIZE: DEPRECATED
 
 * Version 2.5.2 (released 2008-07-08)
 
