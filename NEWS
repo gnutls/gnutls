@@ -516,6 +516,8 @@ vasprintf symbol from the libgcrypt library which caused problems.
 
 ** Update of gnulib files.
 
+** tests: New self-test of crypto.h RNG code tests/crypto_rng.
+
 ** API and ABI modifications:
 GNUTLS_E_HANDSHAKE_TOO_LARGE: ADDED.
 
