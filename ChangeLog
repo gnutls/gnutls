@@ -1,3 +1,134 @@
+2008-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.3.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h, includes/gnutls/openssl.h,
+	includes/gnutls/pkcs12.h, includes/gnutls/x509.h: Bump copyright in
+	installed header files.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Drop final comma in enum.  Reported
+	in <https://savannah.gnu.org/support/?106453>.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp: Don't call SRP functions if SRP is disabled.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/compat.h, includes/gnutls/gnutls.h.in,
+	lib/auth_rsa.c, lib/gnutls_constate.c, lib/gnutls_handshake.c,
+	lib/gnutls_int.h, lib/gnutls_kx.c, lib/gnutls_session_pack.c,
+	lib/gnutls_sig.c, lib/gnutls_state.c, lib/gnutls_v2_compat.c,
+	libextra/gnutls_ia.c: Fix namespace problem with TLS_MASTER_SIZE and
+	TLS_RANDOM_SIZE.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/c-ctype.c, gl/c-ctype.h, gl/gnulib.mk, gl/inet_pton.c,
+	gl/m4/gnulib-comp.m4, gl/m4/inet_pton.m4, gl/tests/gnulib.mk,
+	gl/tests/test-c-ctype.c: Update gnulib files.
+
+2008-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_handshake.c,
+	lib/gnutls_int.h, lib/gnutls_state.c, tests/Makefile.am,
+	tests/finished.c: Add API to set callback to extract TLS Finished
+	messages.
+
+2008-08-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-08-05  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile: Update gnulib files.
+
+2008-08-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, build-aux/gnupload: Update gnulib files.
+
+2008-08-03  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* includes/gnutls/x509.h, lib/x509/crq.c: added
+	gnutls_x509_crq_set_key_rsa_raw() which will set a raw key to a
+	certificate request.
+
+2008-08-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit 767fb210de7dcde20ac05e1f3ca78375279f5603 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Sat Aug 2 11:55:56
+	2008 +0300
+
+2008-07-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_psk_passwd.c, lib/gnutls_cipher.c,
+	lib/gnutls_handshake.c, lib/x509/pkcs12.c,
+	lib/x509/privkey_pkcs8.c, src/crypt.c: Make it compile.
+
+2008-07-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Drop doxygen.
+
+2008-07-22  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, gl/m4/gnulib-comp.m4, lgl/m4/gnulib-comp.m4,
+	lgl/vasnprintf.c: Update gnulib files.
+
+2008-07-10  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2008-07-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, doc/Makefile.am, doc/doxygen/Doxyfile.in,
+	doc/doxygen/Doxyfile.orig: Add doxygen scripts.
+
+2008-07-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Cleanup struct name, for doxygen documentation.
+
+2008-07-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/random.h: Add license.
+
+2008-07-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_rsa.c, lib/auth_srp_passwd.c, lib/gnutls_pk.c,
+	lib/random.c, lib/random.h, lib/x509/privkey_pkcs8.c, src/psk.c: 
+	Minor randomness API cleanups.
+
+2008-07-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/dsa.c: Remove unused code.
+
+2008-07-08  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-07-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.2.
