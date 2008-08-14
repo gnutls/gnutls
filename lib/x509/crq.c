@@ -678,27 +678,27 @@ gnutls_x509_crq_set_key (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 }
 
 /**
-  * gnutls_x509_crq_set_key_rsa_raw - This function will associate the Certificate request with a key
-  * @crq: should contain a gnutls_x509_crq_t structure
-  * @m: holds the modulus
-  * @e: holds the public exponent
-  *
-  * This function will set the public parameters from the given private key to the
-  * request. Only RSA keys are currently supported.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crq_set_key_rsa_raw - associate Certificate request with a key
+ * @crq: should contain a #gnutls_x509_crq_t structure
+ * @m: holds the modulus
+ * @e: holds the public exponent
+ *
+ * This function will set the public parameters from the given private
+ * key to the request. Only RSA keys are currently supported.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 2.6.0
+ **/
 int
-gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq, 
-				    const gnutls_datum_t * m,
-				    const gnutls_datum_t * e)
+gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
+				 const gnutls_datum_t * m,
+				 const gnutls_datum_t * e)
 {
   int result, ret;
   size_t siz = 0;
   bigint_t temp_params[RSA_PUBLIC_PARAMS];
-  
 
   if (crq == NULL)
     {

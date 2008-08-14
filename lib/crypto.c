@@ -143,26 +143,27 @@ _gnutls_crypto_deregister (void)
 }
 
 /**
-  * gnutls_crypto_single_cipher_register2 - register a cipher algorithm
-  * @algorithm: is the gnutls algorithm identifier
-  * @priority: is the priority of the algorithm
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new cipher's data
-  *
-  * This function will register a cipher algorithm to be used
-  * by gnutls. Any algorithm registered will override
-  * the included algorithms and by convention kernel implemented
-  * algorithms have priority of 90. The algorithm with the lowest
-  * priority will be used by gnutls.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_single_cipher_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_single_cipher_register2 - register a cipher algorithm
+ * @algorithm: is the gnutls algorithm identifier
+ * @priority: is the priority of the algorithm
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new cipher's data
+ *
+ * This function will register a cipher algorithm to be used by
+ * gnutls.  Any algorithm registered will override the included
+ * algorithms and by convention kernel implemented algorithms have
+ * priority of 90.  The algorithm with the lowest priority will be
+ * used by gnutls.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience
+ * gnutls_crypto_single_cipher_register() macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
 				       int priority, int version,
@@ -173,6 +174,7 @@ gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
       gnutls_assert ();
       return GNUTLS_E_UNIMPLEMENTED_FEATURE;
     }
+
   return _algo_register (&glob_cl, algorithm, priority, s);
 }
 
@@ -183,25 +185,26 @@ _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
 }
 
 /**
-  * gnutls_crypto_rnd_register2 - register a random generator
-  * @priority: is the priority of the generator
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new generator's data
-  *
-  * This function will register a random generator to be used
-  * by gnutls. Any generator registered will override
-  * the included generator and by convention kernel implemented
-  * generators have priority of 90. The generator with the lowest
-  * priority will be used by gnutls.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_rnd_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_rnd_register2 - register a random generator
+ * @priority: is the priority of the generator
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new generator's data
+ *
+ * This function will register a random generator to be used by
+ * gnutls.  Any generator registered will override the included
+ * generator and by convention kernel implemented generators have
+ * priority of 90.  The generator with the lowest priority will be
+ * used by gnutls.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience
+ * gnutls_crypto_rnd_register() macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_rnd_register2 (int priority, int version,
 			     gnutls_crypto_rnd_st * s)
@@ -218,30 +221,31 @@ gnutls_crypto_rnd_register2 (int priority, int version,
       crypto_rnd_prio = priority;
       return 0;
     }
+
   return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /**
-  * gnutls_crypto_single_mac_register2 - register a MAC algorithm
-  * @algorithm: is the gnutls algorithm identifier
-  * @priority: is the priority of the algorithm
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new algorithms's data
-  *
-  * This function will register a MAC algorithm to be used
-  * by gnutls. Any algorithm registered will override
-  * the included algorithms and by convention kernel implemented
-  * algorithms have priority of 90. The algorithm with the lowest
-  * priority will be used by gnutls.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_single_mac_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_single_mac_register2 - register a MAC algorithm
+ * @algorithm: is the gnutls algorithm identifier
+ * @priority: is the priority of the algorithm
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new algorithms's data
+ *
+ * This function will register a MAC algorithm to be used by gnutls.
+ * Any algorithm registered will override the included algorithms and
+ * by convention kernel implemented algorithms have priority of 90.
+ * The algorithm with the lowest priority will be used by gnutls.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience
+ * gnutls_crypto_single_mac_register() macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_single_mac_register2 (gnutls_mac_algorithm_t algorithm,
 				    int priority, int version,
@@ -263,26 +267,27 @@ _gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
 }
 
 /**
-  * gnutls_crypto_single_digest_register2 - register a digest algorithm
-  * @algorithm: is the gnutls algorithm identifier
-  * @priority: is the priority of the algorithm
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new algorithms's data
-  *
-  * This function will register a digest (hash) algorithm to be used
-  * by gnutls. Any algorithm registered will override
-  * the included algorithms and by convention kernel implemented
-  * algorithms have priority of 90. The algorithm with the lowest
-  * priority will be used by gnutls.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_single_digest_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_single_digest_register2 - register a digest algorithm
+ * @algorithm: is the gnutls algorithm identifier
+ * @priority: is the priority of the algorithm
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new algorithms's data
+ *
+ * This function will register a digest (hash) algorithm to be used by
+ * gnutls.  Any algorithm registered will override the included
+ * algorithms and by convention kernel implemented algorithms have
+ * priority of 90.  The algorithm with the lowest priority will be
+ * used by gnutls.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience
+ * gnutls_crypto_single_digest_register() macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
 				       int priority, int version,
@@ -293,6 +298,7 @@ gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
       gnutls_assert ();
       return GNUTLS_E_UNIMPLEMENTED_FEATURE;
     }
+
   return _algo_register (&glob_dl, algorithm, priority, s);
 }
 
@@ -303,28 +309,29 @@ _gnutls_get_crypto_digest (gnutls_digest_algorithm_t algo)
 }
 
 /**
-  * gnutls_crypto_bigint_register2 - register a bigint interface
-  * @priority: is the priority of the interface
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new interface's data
-  *
-  * This function will register an interface for gnutls to operate
-  * on big integers. Any interface registered will override
-  * the included interface. The interface with the lowest
-  * priority will be used by gnutls.
-  *
-  * Note that the bigint interface must interoperate with the public
-  * key interface. Thus if this interface is updated the
-  * gnutls_crypto_pk_register() should also be used.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_bigint_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_bigint_register2 - register a bigint interface
+ * @priority: is the priority of the interface
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new interface's data
+ *
+ * This function will register an interface for gnutls to operate
+ * on big integers. Any interface registered will override
+ * the included interface. The interface with the lowest
+ * priority will be used by gnutls.
+ *
+ * Note that the bigint interface must interoperate with the public
+ * key interface. Thus if this interface is updated the
+ * gnutls_crypto_pk_register() should also be used.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience gnutls_crypto_bigint_register()
+ * macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_bigint_register2 (int priority, int version,
 				gnutls_crypto_bigint_st * s)
@@ -341,32 +348,34 @@ gnutls_crypto_bigint_register2 (int priority, int version,
       crypto_bigint_prio = priority;
       return 0;
     }
+
   return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /**
-  * gnutls_crypto_pk_register2 - register a public key interface
-  * @priority: is the priority of the interface
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new interface's data
-  *
-  * This function will register an interface for gnutls to operate
-  * on public key operations. Any interface registered will override
-  * the included interface. The interface with the lowest
-  * priority will be used by gnutls.
-  *
-  * Note that the bigint interface must interoperate with the bigint
-  * interface. Thus if this interface is updated the
-  * gnutls_crypto_bigint_register() should also be used.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_pk_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_pk_register2 - register a public key interface
+ * @priority: is the priority of the interface
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new interface's data
+ *
+ * This function will register an interface for gnutls to operate
+ * on public key operations. Any interface registered will override
+ * the included interface. The interface with the lowest
+ * priority will be used by gnutls.
+ *
+ * Note that the bigint interface must interoperate with the bigint
+ * interface. Thus if this interface is updated the
+ * gnutls_crypto_bigint_register() should also be used.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience gnutls_crypto_pk_register()
+ * macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_pk_register2 (int priority, int version,
 			    gnutls_crypto_pk_st * s)
@@ -376,35 +385,38 @@ gnutls_crypto_pk_register2 (int priority, int version,
       gnutls_assert ();
       return GNUTLS_E_UNIMPLEMENTED_FEATURE;
     }
+
   if (crypto_pk_prio > priority)
     {
       memcpy (&_gnutls_pk_ops, s, sizeof (*s));
       crypto_pk_prio = priority;
       return 0;
     }
+
   return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /**
-  * gnutls_crypto_cipher_register2 - register a cipher interface
-  * @priority: is the priority of the cipher interface
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new interface's data
-  *
-  * This function will register a cipher interface to be used
-  * by gnutls. Any interface registered will override
-  * the included engine and by convention kernel implemented
-  * interfaces should have priority of 90. The interface with the lowest
-  * priority will be used by gnutls.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_cipher_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_cipher_register2 - register a cipher interface
+ * @priority: is the priority of the cipher interface
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new interface's data
+ *
+ * This function will register a cipher interface to be used by
+ * gnutls. Any interface registered will override the included engine
+ * and by convention kernel implemented interfaces should have
+ * priority of 90. The interface with the lowest priority will be used
+ * by gnutls.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience
+ * gnutls_crypto_cipher_register() macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_cipher_register2 (int priority, int version,
 				gnutls_crypto_cipher_st * s)
@@ -421,29 +433,31 @@ gnutls_crypto_cipher_register2 (int priority, int version,
       crypto_cipher_prio = priority;
       return 0;
     }
+
   return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /**
-  * gnutls_crypto_mac_register2 - register a mac interface
-  * @priority: is the priority of the mac interface
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new interface's data
-  *
-  * This function will register a mac interface to be used
-  * by gnutls. Any interface registered will override
-  * the included engine and by convention kernel implemented
-  * interfaces should have priority of 90. The interface with the lowest
-  * priority will be used by gnutls.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_mac_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_mac_register2 - register a mac interface
+ * @priority: is the priority of the mac interface
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new interface's data
+ *
+ * This function will register a mac interface to be used by
+ * gnutls. Any interface registered will override the included engine
+ * and by convention kernel implemented interfaces should have
+ * priority of 90. The interface with the lowest priority will be used
+ * by gnutls.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience
+ * gnutls_crypto_mac_register() macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_mac_register2 (int priority, int version,
 			     gnutls_crypto_mac_st * s)
@@ -460,29 +474,31 @@ gnutls_crypto_mac_register2 (int priority, int version,
       crypto_mac_prio = priority;
       return 0;
     }
+
   return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
 /**
-  * gnutls_crypto_digest_register2 - register a digest interface
-  * @priority: is the priority of the digest interface
-  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
-  * @s: is a structure holding new interface's data
-  *
-  * This function will register a digest interface to be used
-  * by gnutls. Any interface registered will override
-  * the included engine and by convention kernel implemented
-  * interfaces should have priority of 90. The interface with the lowest
-  * priority will be used by gnutls.
-  *
-  * This function should be called before gnutls_global_init().
-  *
-  * For simplicity you can use the convenience gnutls_crypto_digest_register()
-  * macro.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_crypto_digest_register2 - register a digest interface
+ * @priority: is the priority of the digest interface
+ * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
+ * @s: is a structure holding new interface's data
+ *
+ * This function will register a digest interface to be used by
+ * gnutls. Any interface registered will override the included engine
+ * and by convention kernel implemented interfaces should have
+ * priority of 90. The interface with the lowest priority will be used
+ * by gnutls.
+ *
+ * This function should be called before gnutls_global_init().
+ *
+ * For simplicity you can use the convenience
+ * gnutls_crypto_digest_register() macro.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
+ **/
 int
 gnutls_crypto_digest_register2 (int priority, int version,
 				gnutls_crypto_digest_st * s)
@@ -499,5 +515,6 @@ gnutls_crypto_digest_register2 (int priority, int version,
       crypto_digest_prio = priority;
       return 0;
     }
+
   return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }

@@ -1134,6 +1134,8 @@ gnutls_session_get_master_secret (gnutls_session_t session)
  * It is recommended that the function returns quickly in order to not
  * delay the handshake.  Use the function to store a copy of the TLS
  * finished message for later use.
+ *
+ * Since: 2.6.0
  **/
 void
 gnutls_session_set_finished_function (gnutls_session_t session,

@@ -338,6 +338,8 @@ _gnutls_ext_init (void)
  * This function is used to register a new TLS extension handler.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.6.0
  **/
 int
 gnutls_ext_register (int type,
