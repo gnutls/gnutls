@@ -1071,6 +1071,45 @@ Note however that the values suggested here are nothing more than an educated
 guess that is valid today. There are no guarrantees that an algorithm will remain unbreakable or that these values will remain constant in time. There could be scientific breakthroughs that cannot be predicted or total failure of the current public key systems by quantum computers. On the other hand though the cryptosystems
 used in TLS are selected in a conservative way and such catastrophic breakthroughs or failures are believed to be unlikely.
 
+NIST publication SP 800-57 @xcite{NISTSP80057} contains a similar
+table that extends beyond the key sizes given above.
+
+@multitable @columnfractions .15 .20 .20 .20
+
+@item Bits of security
+@tab Symmetric key algorithms
+@tab RSA key size, DSA, DH and SRP prime size
+@tab ECC key size
+
+@item 80
+@tab 2TDEA
+@tab 1024
+@tab 160-223
+
+@item 112
+@tab 3DES
+@tab 2048
+@tab 224-255
+
+@item 128
+@tab AES-128
+@tab 3072
+@tab 256-383
+
+@item 192
+@tab AES-192
+@tab 7680
+@tab 384-511
+
+@item 256
+@tab AES-256
+@tab 15360
+@tab 512+
+
+@end multitable
+
+The recommendations are fairly consistent.
+
 @node On SSL 2 and older protocols
 @section On SSL 2 and Older Protocols
 @cindex SSL 2
@@ -3832,6 +3871,11 @@ Mike Ashley, "The GNU Privacy Handbook", 2002, available from
 Peter Gutmann, "Everything you never wanted to know about PKI but were
 forced to find out", Available from
 @url{http://www.cs.auckland.ac.nz/~pgut001/}.
+
+@item @anchor{NISTSP80057}[NISTSP80057]
+NIST Special Publication 800-57, "Recommendation for Key Management -
+Part 1: General (Revised)", March 2007, available from
+@url{http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57-Part1-revised2_Mar08-2007.pdf}.
 
 @item @anchor{RFC2246}[RFC2246]
 Tim Dierks and Christopher Allen, "The TLS Protocol Version 1.0",
