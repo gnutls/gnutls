@@ -1,3 +1,55 @@
+2008-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.4.
+
+2008-08-18  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/autobuild.m4, lgl/m4/lock.m4: Update gnulib files.
+
+2008-08-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-08-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Fix secure memory initialization of
+	libgcrypt.  Reported by Joe Orton <joe@manyfish.co.uk> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2992>.
+
+2008-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Reference NIST SP 800-57.
+
+2008-08-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rfc5246.txt: Add.
+
+2008-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Re-add lost entry.
+
+2008-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/crypto.c, lib/gnutls_extensions.c, lib/gnutls_state.c,
+	lib/x509/crq.c: Doc fixes.
+
+2008-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-08-14  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.3.
