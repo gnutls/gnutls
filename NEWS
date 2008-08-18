@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.5.4 (unreleased)
 
+** Doc fixes.
+Added 'Since:' tags to new APIs for gtk-doc.
+
 ** API and ABI modifications:
 No changes since last version.
 
