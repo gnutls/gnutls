@@ -250,11 +250,6 @@ gnutls_global_init (void)
 	  return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
 	}
 
-      /* for gcrypt in order to be able to allocate memory */
-      gcry_set_allocation_handler (gnutls_malloc, gnutls_secure_malloc,
-				   _gnutls_is_secure_memory, gnutls_realloc,
-				   gnutls_free);
-
       /* gcry_control (GCRYCTL_DISABLE_INTERNAL_LOCKING, NULL, 0); */
 
       gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
@@ -266,6 +261,11 @@ gnutls_global_init (void)
       gcry_set_log_handler (_gnutls_gcry_log_handler, NULL);
 #endif
     }
+
+  /* for gcrypt in order to be able to allocate memory */
+  gcry_set_allocation_handler (gnutls_malloc, gnutls_secure_malloc,
+			       _gnutls_is_secure_memory, gnutls_realloc,
+			       gnutls_free);
 
 #ifdef DEBUG
   gnutls_global_set_log_function (dlog);
