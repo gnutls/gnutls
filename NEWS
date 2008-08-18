@@ -10,6 +10,7 @@ Reported by Joe Orton <joe@manyfish.co.uk> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2992>.
 
 ** Doc fixes.
+Reference to NIST SP 800-57 in the manual on key size recommendations.
 Added 'Since:' tags to new APIs for gtk-doc.
 
 ** API and ABI modifications:
