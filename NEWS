@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.5.4 (unreleased)
 
+** Fix secure memory initialization of libgcrypt.
+Reported by Joe Orton <joe@manyfish.co.uk> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/2992>.
+
 ** Doc fixes.
 Added 'Since:' tags to new APIs for gtk-doc.
 
