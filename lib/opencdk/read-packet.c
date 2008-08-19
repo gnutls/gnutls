@@ -78,10 +78,35 @@ read_16 (cdk_stream_t s)
 }
 
 
-static int
+/* read about S2K at http://tools.ietf.org/html/rfc4880#section-3.7.1 */
+static cdk_error_t
 read_s2k (cdk_stream_t inp, cdk_s2k_t s2k)
 {
-  return CDK_Not_Implemented;
+  size_t nread;
+
+  s2k->mode = cdk_stream_getc (inp);
+  s2k->hash_algo = cdk_stream_getc (inp);
+  if (s2k->mode == CDK_S2K_SIMPLE) 
+      return 0;
+  else if (s2k->mode == CDK_S2K_SALTED || s2k->mode == CDK_S2K_ITERSALTED)
+    {
+      if (stream_read (inp, s2k->salt, DIM (s2k->salt), &nread))
+	return CDK_Inv_Packet;
+      if (nread != DIM (s2k->salt))
+	return CDK_Inv_Packet;
+      
+      if (s2k->mode == CDK_S2K_ITERSALTED)
+	s2k->count = cdk_stream_getc (inp);
+    }
+  else if (s2k->mode == CDK_S2K_GNU_DUMMY)
+    {
+      /* look for --export-secret-subkeys in gpg(1) */
+      return 0;
+    }
+  else
+    return CDK_Not_Implemented;
+
+  return 0;
 }
 
 
@@ -330,14 +355,19 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
       rc = read_s2k (inp, sk->protect.s2k);
       if (rc)
 	return rc;
-      sk->protect.ivlen = _gnutls_cipher_get_block_size (sk->protect.algo);
-      if (sk->protect.ivlen <= 0)
-	return CDK_Inv_Packet;
-      rc = stream_read (inp, sk->protect.iv, sk->protect.ivlen, &nread);
-      if (rc)
-	return rc;
-      if (nread != sk->protect.ivlen)
-	return CDK_Inv_Packet;
+       /* refer to --export-secret-subkeys in gpg(1) */
+      if (sk->protect.s2k->mode == CDK_S2K_GNU_DUMMY) 
+ 	sk->protect.ivlen = 0;
+      else {
+ 	sk->protect.ivlen = gcry_cipher_get_algo_blklen (sk->protect.algo);
+ 	if (!sk->protect.ivlen)
+ 	  return CDK_Inv_Packet;
+ 	rc = stream_read (inp, sk->protect.iv, sk->protect.ivlen, &nread);
+ 	if (rc)
+ 	  return rc;
+ 	if (nread != sk->protect.ivlen)
+ 	  return CDK_Inv_Packet;
+      }
     }
   else
     sk->protect.algo = _pgp_cipher_to_gnutls (sk->s2k_usage);
@@ -390,6 +420,11 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
       if (!sk->encdata)
 	return CDK_Out_Of_Core;
       if (stream_read (inp, sk->encdata, sk->enclen, &nread))
+	return CDK_Inv_Packet;
+      /* checking that this is supposed to be a GNU Dummy S2K, which we know: */
+      if ((sk->protect.s2k->mode == CDK_S2K_GNU_DUMMY) && 
+	  ((sk->enclen != strlen("GNU\01")) ||
+	   (0 != memcmp("GNU\01", sk->encdata, strlen("GNU\01")))))
 	return CDK_Inv_Packet;
       nskey = cdk_pk_get_nskey (sk->pk->pubkey_algo);
       if (!nskey)

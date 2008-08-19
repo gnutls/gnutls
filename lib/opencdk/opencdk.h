@@ -185,7 +185,8 @@ enum cdk_pubkey_algo_t {
 enum cdk_s2k_type_t {
     CDK_S2K_SIMPLE     = 0,
     CDK_S2K_SALTED     = 1,
-    CDK_S2K_ITERSALTED = 3
+    CDK_S2K_ITERSALTED = 3,
+    CDK_S2K_GNU_DUMMY = 101 /* look for --export-secret-subkeys in gpg(1) */
 };
 
 /* The different kind of user ID preferences. */
