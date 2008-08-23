@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** opencdk: Parse (but not decrypt) encrypted secret keys.
 Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
+** Add French translation, thanks to Nicolas Provost.
+
 ** API and ABI modifications:
 No changes since last version.
 
