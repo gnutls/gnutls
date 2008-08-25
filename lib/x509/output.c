@@ -285,11 +285,12 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 	case GNUTLS_SAN_URI:
 	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
 	  break;
-
+#if 0
+/* FIXME: This is broken. Ip address is a 4 or 16 byte address. */
 	case GNUTLS_SAN_IPADDRESS:
 	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
 	  break;
-
+#endif
 	case GNUTLS_SAN_DN:
 	  addf (str, "\t\t\tdirectoryName: %.*s\n", size, buffer);
 	  break;
@@ -437,11 +438,12 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert)
 	case GNUTLS_SAN_URI:
 	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
 	  break;
-
+#if 0
+/* FIXME: This is broken. Ip address is a 4 or 16 byte address. */
 	case GNUTLS_SAN_IPADDRESS:
 	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
 	  break;
-
+#endif
 	case GNUTLS_SAN_DN:
 	  addf (str, "\t\t\tdirectoryName: %.*s\n", size, buffer);
 	  break;
