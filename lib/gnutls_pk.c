@@ -568,6 +568,12 @@ _gnutls_pk_params_copy (gnutls_pk_params_st * dst, bigint_t * params,
 {
   int i, j;
   dst->params_nr = 0;
+  
+  if (params_len == 0 || params == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
 
   dst->params = gnutls_malloc (sizeof (bigint_t) * params_len);
   if (dst->params == NULL)

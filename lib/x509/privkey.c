@@ -965,7 +965,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
 
   /* Read all the sizes */
   total = 0;
-  for (i = 0; i < 5; i++)
+  for (i = 0; i < RSA_PRIVATE_PARAMS; i++)
     {
       _gnutls_mpi_print_lz (params[i], NULL, &size[i]);
       total += size[i];
