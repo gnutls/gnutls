@@ -147,8 +147,6 @@ gnutls_global_init_extra (void)
   return 0;
 }
 
-#include <strverscmp.h>
-
 /**
  * gnutls_extra_check_version - This function checks the library's version
  * @req_version: the version to check

@@ -389,8 +389,6 @@ gnutls_transport_set_push_function (gnutls_session_t session,
   session->internals._gnutls_push_func = push_func;
 }
 
-#include <strverscmp.h>
-
 /**
   * gnutls_check_version - check the library's version
   * @req_version: the version to check
