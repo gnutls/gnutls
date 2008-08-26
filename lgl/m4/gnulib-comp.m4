@@ -76,6 +76,7 @@ AC_DEFUN([lgl_INIT],
   gl_HEADER_STRING_H
   gl_HEADER_STRINGS_H
   gl_FUNC_STRVERSCMP
+  gl_STRING_MODULE_INDICATOR([strverscmp])
   gl_HEADER_SYS_SOCKET
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
@@ -261,7 +262,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/strings.in.h
   lib/strncasecmp.c
   lib/strverscmp.c
-  lib/strverscmp.h
   lib/sys_socket.in.h
   lib/sys_stat.in.h
   lib/time.in.h
@@ -328,6 +328,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/strverscmp.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
+  m4/threadlib.m4
   m4/time_h.m4
   m4/time_r.m4
   m4/uintmax_t.m4
@@ -357,6 +358,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-stdlib.c
   tests/test-string.c
   tests/test-strings.c
+  tests/test-strverscmp.c
   tests/test-sys_socket.c
   tests/test-sys_stat.c
   tests/test-time.c
