@@ -98,9 +98,9 @@ read_s2k (cdk_stream_t inp, cdk_s2k_t s2k)
       if (s2k->mode == CDK_S2K_ITERSALTED)
 	s2k->count = cdk_stream_getc (inp);
     }
-  else if (s2k->mode == CDK_S2K_GNU_DUMMY)
+  else if (s2k->mode == CDK_S2K_GNU_EXT)
     {
-      /* look for --export-secret-subkeys in gpg(1) */
+      /* GNU extensions to the S2K : read DETAILS from gnupg */
       return 0;
     }
   else
@@ -356,7 +356,7 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
       if (rc)
 	return rc;
        /* refer to --export-secret-subkeys in gpg(1) */
-      if (sk->protect.s2k->mode == CDK_S2K_GNU_DUMMY) 
+      if (sk->protect.s2k->mode == CDK_S2K_GNU_EXT) 
  	sk->protect.ivlen = 0;
       else {
  	sk->protect.ivlen = gcry_cipher_get_algo_blklen (sk->protect.algo);
@@ -421,11 +421,22 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
 	return CDK_Out_Of_Core;
       if (stream_read (inp, sk->encdata, sk->enclen, &nread))
 	return CDK_Inv_Packet;
-      /* checking that this is supposed to be a GNU Dummy S2K, which we know: */
-      if ((sk->protect.s2k->mode == CDK_S2K_GNU_DUMMY) && 
-	  ((sk->enclen != strlen("GNU\01")) ||
-	   (0 != memcmp("GNU\01", sk->encdata, strlen("GNU\01")))))
-	return CDK_Inv_Packet;
+      /* Handle the GNU S2K extensions we know (just gnu-dummy right now): */
+      if (sk->protect.s2k->mode == CDK_S2K_GNU_EXT) {
+	unsigned char gnumode;
+	if ((sk->enclen < strlen("GNU") + 1) ||
+	    (0 != memcmp("GNU", sk->encdata, strlen("GNU"))))
+	  return CDK_Inv_Packet;
+	gnumode = sk->encdata[strlen("GNU")];
+	/* we only handle gnu-dummy (mode 1).
+	   mode 2 should refer to external smart cards.
+	*/
+	if (gnumode != 1)
+	  return CDK_Inv_Packet;
+	/* gnu-dummy should have no more data */
+	if (sk->enclen != strlen("GNU") + 1)
+	  return CDK_Inv_Packet;
+      }
       nskey = cdk_pk_get_nskey (sk->pk->pubkey_algo);
       if (!nskey)
 	{
