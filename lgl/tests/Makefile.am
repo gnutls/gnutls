@@ -188,6 +188,14 @@ EXTRA_DIST += test-strings.c
 
 ## end   gnulib module strings-tests
 
+## begin gnulib module strverscmp-tests
+
+TESTS += test-strverscmp
+check_PROGRAMS += test-strverscmp
+EXTRA_DIST += test-strverscmp.c
+
+## end   gnulib module strverscmp-tests
+
 ## begin gnulib module sys_socket-tests
 
 TESTS += test-sys_socket
