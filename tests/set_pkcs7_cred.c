@@ -67,8 +67,8 @@ static char p7crts[] =
    <https://gnunet.org/mantis/view.php?id=1417> and
    <https://gnunet.org/mantis/view.php?id=1418>. */
 
-int
-main (void)
+void
+doit (void)
 {
   int rc;
   gnutls_certificate_credentials_t crt;
@@ -77,25 +77,28 @@ main (void)
   rc = gnutls_global_init ();
   if (rc)
     {
-      printf ("gnutls_global_init rc %d: %s\n", rc, gnutls_strerror (rc));
-      return 1;
+      fail ("gnutls_global_init rc %d: %s\n", rc, gnutls_strerror (rc));
+      return;
     }
 
   rc = gnutls_certificate_allocate_credentials (&crt);
   if (rc)
     {
-      printf ("gnutls_certificate_allocate_credentials rc %d: %s\n",
-	      rc, gnutls_strerror (rc));
-      return 1;
+      fail ("gnutls_certificate_allocate_credentials rc %d: %s\n",
+	    rc, gnutls_strerror (rc));
+      return;
     }
 
   rc = gnutls_certificate_set_x509_key_mem (crt, &p7crtsdatum, NULL,
 					    GNUTLS_X509_FMT_PEM);
   if (rc != 2)
     {
-      printf ("gnutls_certificate_set_x509_crt_mem num %d\n", rc);
-      return 1;
+      fail ("gnutls_certificate_set_x509_crt_mem num %d\n", rc);
+      return;
     }
+
+  success ("gnutls_certificate_set_x509_key_mem on a pkcs7 struct OK (%d)\n",
+	   rc);
 
   gnutls_certificate_free_credentials (crt);
 
