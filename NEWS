@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Fix segmentation fault when generating private keys.
 Reported by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
+** libgnutls: Fix PKCS#7 import of certificate chains.
+
 ** opencdk: Parse (but not decrypt) encrypted secret keys.
 Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
