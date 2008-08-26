@@ -6,6 +6,7 @@ See the end for copying conditions.
 * Version 2.5.5 (unreleased)
 
 ** libgnutls: Fix segmentation fault when generating private keys.
+Reported by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
 ** opencdk: Parse (but not decrypt) encrypted secret keys.
 Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
