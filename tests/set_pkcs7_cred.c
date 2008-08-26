@@ -103,6 +103,4 @@ doit (void)
   gnutls_certificate_free_credentials (crt);
 
   gnutls_global_deinit ();
-
-  return 0;
 }
