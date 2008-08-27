@@ -962,7 +962,8 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
     memcpy (&data[pos], i_data, i_datasize);
 
   _gnutls_handshake_log ("HSK[%x]: %s was send [%ld bytes]\n",
-			 session, _gnutls_handshake2str (type), datasize);
+			 session, _gnutls_handshake2str (type),
+			 (long) datasize);
 
 
   /* Here we keep the handshake messages in order to hash them...
