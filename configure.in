@@ -129,18 +129,25 @@ return 0;
 	AC_MSG_WARN([C99 macros not supported. This may affect compiling.]))
 
 if test $ac_cv_c_compiler_gnu != no; then
+
 	if test x$opt_developer_mode = xyes; then
-	  AM_CFLAGS="${AM_CFLAGS} -g -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wno-unused-parameter"
-#	  AM_CFLAGS="${AM_CFLAGS} -g -W -Wall -Wcast-align -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wshadow -Wno-unused-parameter -Wimplicit -fno-common -Wno-sign-compare -Wbad-function-cast -Wendif-labels -Wmissing-declarations -Wno-missing-format-attribute -Wmissing-prototypes -Wnested-externs -Wpointer-arith -pedantic -Wlong-long -Wcast-qual -Wcast-align -Winline -Wredundant-decls -Wstrict-prototypes -Wwrite-strings -Wparentheses -Wsequence-point -Wpacked -Waggregate-return -Wfloat-equal -Wmultichar -Wunknown-pragmas -Wtrigraphs -Wswitch -Wreturn-type -Wmain -Wchar-subscripts -Wcomment -Wno-missing-noreturn"
+	   AC_MSG_CHECKING([whether gcc supports various warning flags])
+	   _gcc_cflags_save="$CFLAGS"
+	   CFLAGS="${CFLAGS} -g -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wno-unused-parameter"
+	   AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_warns=yes,_gcc_warns=no)
+	   AC_MSG_RESULT($_gcc_warns)
+	   if test x"$_gcc_warns" != xyes ; then
+	      CFLAGS=$_gcc_cflags_save;
+	   fi
 	fi
 
 	AC_MSG_CHECKING([whether gcc supports -Wno-pointer-sign])
-	_gcc_cflags_save=$CFLAGS
+	_gcc_cflags_save="$CFLAGS"
 	CFLAGS="${CFLAGS} -Wno-pointer-sign"
 	AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_psign=yes,_gcc_psign=no)
 	AC_MSG_RESULT($_gcc_psign)
-	if test x"$_gcc_psign" != xyes ; then
-	  CFLAGS=$_gcc_cflags_save;
+	if test "$_gcc_psign" != "yes"; then
+	  CFLAGS="$_gcc_cflags_save";
 	fi
 
 	AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
@@ -149,7 +156,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 	AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),
 	  _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
 	AC_MSG_RESULT($_gcc_gnu89_inline)
-	CFLAGS=$_gcc_cflags_save;
+	CFLAGS="$_gcc_cflags_save"
 
 	AC_MSG_CHECKING([if gcc/ld supports -Wl,--output-def])
 	if test "$enable_shared" = no; then
