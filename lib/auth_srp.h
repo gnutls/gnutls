@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -49,14 +49,6 @@ typedef struct srp_server_auth_info_st
 {
   char username[MAX_SRP_USERNAME + 1];
 } *srp_server_auth_info_t;
-
-extern const gnutls_datum_t gnutls_srp_1024_group_prime;
-extern const gnutls_datum_t gnutls_srp_1024_group_generator;
-extern const gnutls_datum_t gnutls_srp_1536_group_prime;
-extern const gnutls_datum_t gnutls_srp_1536_group_generator;
-extern const gnutls_datum_t gnutls_srp_2048_group_prime;
-extern const gnutls_datum_t gnutls_srp_2048_group_generator;
-
 
 #ifdef ENABLE_SRP
 
