@@ -42,12 +42,10 @@ static int _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
 					const gnutls_x509_crt_t * trusted_cas,
 					int tcas_size, unsigned int flags,
 					unsigned int *output);
-int _gnutls_x509_verify_signature (const gnutls_datum_t * signed_data,
-				   const gnutls_datum_t * signature,
-				   gnutls_x509_crt_t issuer);
 
-static
-  int is_crl_issuer (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer_cert);
+static int is_crl_issuer (gnutls_x509_crl_t crl,
+			  gnutls_x509_crt_t issuer_cert);
+
 static int _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
 				const gnutls_x509_crt_t * trusted_cas,
 				int tcas_size, unsigned int flags,

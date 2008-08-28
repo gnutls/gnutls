@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -131,11 +131,5 @@ int _gnutls_kx_priority (gnutls_session_t session,
 			 gnutls_kx_algorithm_t algorithm);
 int _gnutls_compression_priority (gnutls_session_t session,
 				  gnutls_compression_method_t algorithm);
-
-gnutls_mac_algorithm_t gnutls_mac_get_id (const char* name);
-gnutls_cipher_algorithm_t gnutls_cipher_get_id (const char* name);
-gnutls_kx_algorithm_t gnutls_kx_get_id (const char* name);
-gnutls_protocol_t gnutls_protocol_get_id (const char* name);
-gnutls_certificate_type_t gnutls_certificate_type_get_id (const char* name);
 
 #endif

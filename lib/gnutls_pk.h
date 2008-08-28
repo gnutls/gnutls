@@ -41,8 +41,6 @@ _gnutls_pk_fixup( gnutls_pk_algorithm_t algo, gnutls_direction_t direction, gnut
 }
 
 int _gnutls_pk_params_copy( gnutls_pk_params_st* dst, bigint_t* params, int params_len);
-void gnutls_pk_params_release( gnutls_pk_params_st* p);
-void gnutls_pk_params_init( gnutls_pk_params_st* p);
 
 int _gnutls_rsa_generate_params (bigint_t * resarr, unsigned int *resarr_len, int bits);
 int _gnutls_dsa_generate_params (bigint_t * resarr, unsigned int *resarr_len, int bits);

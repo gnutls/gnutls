@@ -100,7 +100,7 @@ static int write_pkcs12_kdf_params (ASN1_TYPE pbes2_asn,
 /* Returns a negative error code if the encryption schema in
  * the OID is not supported. The schema ID is returned.
  */
-inline static int
+static int
 check_schema (const char *oid)
 {
 

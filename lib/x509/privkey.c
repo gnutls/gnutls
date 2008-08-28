@@ -35,7 +35,6 @@
 #include <gnutls_pk.h>
 
 static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params);
-int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, bigint_t * params);
 
 /* remove this when libgcrypt can handle the PKCS #1 coefficients from
  * rsa keys
