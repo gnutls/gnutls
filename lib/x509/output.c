@@ -233,6 +233,8 @@ print_key_usage (gnutls_string * str, gnutls_x509_crt_t cert)
     addf (str, _("\t\t\tKey decipher only.\n"));
 }
 
+#ifdef ENABLE_PKI
+
 static void
 print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 {
@@ -362,6 +364,8 @@ print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
       gnutls_free (buffer);
     }
 }
+
+#endif
 
 static void
 print_basic (gnutls_string * str, gnutls_x509_crt_t cert)
@@ -613,6 +617,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  name = _("unknown");
 
 	addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
+#ifdef ENABLE_PKI
 	switch (err)
 	  {
 	  case GNUTLS_PK_RSA:
@@ -661,6 +666,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  default:
 	    break;
 	  }
+#endif
       }
   }
 
@@ -770,7 +776,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	      addf (str, _("\t\tKey Purpose (%s):\n"),
 		    critical ? _("critical") : _("not critical"));
 
+#ifdef ENABLE_PKI
 	      print_key_purpose (str, cert);
+#endif
 
 	      keypurpose_idx++;
 	    }
@@ -800,7 +808,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	      addf (str, _("\t\tCRL Distribution points (%s):\n"),
 		    critical ? _("critical") : _("not critical"));
 
+#ifdef ENABLE_PKI
 	      print_crldist (str, cert);
+#endif
 
 	      crldist_idx++;
 	    }
@@ -1169,6 +1179,8 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
   return 0;
 }
 
+#ifdef ENABLE_PKI
+
 static void
 print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 {
@@ -1363,3 +1375,5 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
 
   return 0;
 }
+
+#endif /* ENABLE_PKI */
