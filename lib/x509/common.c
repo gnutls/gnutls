@@ -711,7 +711,8 @@ _gnutls_x509_san_find_type (char *str_type)
  */
 int
 _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
-			       gnutls_x509_crt_fmt_t format, char *pem_header,
+			       gnutls_x509_crt_fmt_t format,
+			       const char *pem_header,
 			       unsigned char *output_data,
 			       size_t * output_data_size)
 {
@@ -796,7 +797,8 @@ _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
 
 int
 _gnutls_x509_export_int (ASN1_TYPE asn1_data,
-			 gnutls_x509_crt_fmt_t format, char *pem_header,
+			 gnutls_x509_crt_fmt_t format,
+			 const char *pem_header,
 			 unsigned char *output_data,
 			 size_t * output_data_size)
 {
