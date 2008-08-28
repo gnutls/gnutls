@@ -260,7 +260,7 @@ gnutls_openpgp_crt_get_fingerprint (gnutls_openpgp_crt_t key,
   return 0;
 }
 
-int
+static int
 _gnutls_openpgp_count_key_names (gnutls_openpgp_crt_t key)
 {
   cdk_kbnode_t p, ctx;

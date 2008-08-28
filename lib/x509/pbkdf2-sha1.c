@@ -1,5 +1,5 @@
 /* gc-pbkdf2-sha1.c --- Password-Based Key Derivation Function a'la PKCS#5
-   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -22,6 +22,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_errors.h>
 #include <gnutls_hash_int.h>
+#include <pbkdf2-sha1.h>
 
 /*
  * 5.2 PBKDF2
