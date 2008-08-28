@@ -59,6 +59,15 @@ EXTRA_DIST += test-alloca-opt.c
 
 ## end   gnulib module alloca-opt-tests
 
+## begin gnulib module byteswap-tests
+
+TESTS += test-byteswap
+check_PROGRAMS += test-byteswap
+
+EXTRA_DIST += test-byteswap.c
+
+## end   gnulib module byteswap-tests
+
 ## begin gnulib module c-ctype-tests
 
 TESTS += test-c-ctype

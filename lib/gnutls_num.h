@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -25,14 +25,6 @@
 #include <gnutls_int.h>
 
 #include <minmax.h>
-
-#define rotl32(x,n)   (((x) << ((uint16_t)(n))) | ((x) >> (32 - (uint16_t)(n))))
-#define rotr32(x,n)   (((x) >> ((uint16_t)(n))) | ((x) << (32 - (uint16_t)(n))))
-#define rotl16(x,n)   (((x) << ((uint16_t)(n))) | ((x) >> (16 - (uint16_t)(n))))
-#define rotr16(x,n)   (((x) >> ((uint16_t)(n))) | ((x) << (16 - (uint16_t)(n))))
-
-#define byteswap16(x)  ((rotl16(x, 8) & 0x00ff) | (rotr16(x, 8) & 0xff00))
-#define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ffUL) | (rotr32(x, 8) & 0xff00ff00UL))
 
 uint32_t _gnutls_uint24touint32 (uint24 num);
 uint24 _gnutls_uint32touint24 (uint32_t num);

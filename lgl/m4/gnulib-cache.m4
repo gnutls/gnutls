@@ -15,11 +15,12 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=lgl/override --lib=liblgnu --source-base=lgl --m4-base=lgl/m4 --doc-base=doc --aux-dir=build-aux --with-tests --lgpl=2 --libtool --macro-prefix=lgl --no-vc-files c-ctype fseeko func gettext memmem-simple memmove minmax read-file snprintf socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd vasprintf
+#   gnulib-tool --import --dir=. --local-dir=lgl/override --lib=liblgnu --source-base=lgl --m4-base=lgl/m4 --doc-base=doc --aux-dir=build-aux --with-tests --lgpl=2 --libtool --macro-prefix=lgl --no-vc-files byteswap c-ctype fseeko func gettext memmem-simple memmove minmax read-file snprintf socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd vasprintf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([lgl/override])
 gl_MODULES([
+  byteswap
   c-ctype
   fseeko
   func

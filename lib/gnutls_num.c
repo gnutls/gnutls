@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -29,6 +29,8 @@
 #include <gnutls_int.h>
 #include <gnutls_num.h>
 #include <gnutls_errors.h>
+
+#include <byteswap.h>
 
 /* This function will add one to uint64 x.
  * Returns 0 on success, or -1 if the uint64 max limit
@@ -95,7 +97,7 @@ _gnutls_read_uint24 (const opaque * data)
 
   res = _gnutls_uint24touint32 (num);
 #ifndef WORDS_BIGENDIAN
-  res = byteswap32 (res);
+  res = bswap_32 (res);
 #endif
   return res;
 }
@@ -106,7 +108,7 @@ _gnutls_write_uint24 (uint32_t num, opaque * data)
   uint24 tmp;
 
 #ifndef WORDS_BIGENDIAN
-  num = byteswap32 (num);
+  num = bswap_32 (num);
 #endif
   tmp = _gnutls_uint32touint24 (num);
 
@@ -122,7 +124,7 @@ _gnutls_read_uint32 (const opaque * data)
 
   memcpy (&res, data, sizeof (uint32_t));
 #ifndef WORDS_BIGENDIAN
-  res = byteswap32 (res);
+  res = bswap_32 (res);
 #endif
   return res;
 }
@@ -132,7 +134,7 @@ _gnutls_write_uint32 (uint32_t num, opaque * data)
 {
 
 #ifndef WORDS_BIGENDIAN
-  num = byteswap32 (num);
+  num = bswap_32 (num);
 #endif
   memcpy (data, &num, sizeof (uint32_t));
 }
@@ -143,7 +145,7 @@ _gnutls_read_uint16 (const opaque * data)
   uint16_t res;
   memcpy (&res, data, sizeof (uint16_t));
 #ifndef WORDS_BIGENDIAN
-  res = byteswap16 (res);
+  res = bswap_16 (res);
 #endif
   return res;
 }
@@ -153,7 +155,7 @@ _gnutls_write_uint16 (uint16_t num, opaque * data)
 {
 
 #ifndef WORDS_BIGENDIAN
-  num = byteswap16 (num);
+  num = bswap_16 (num);
 #endif
   memcpy (data, &num, sizeof (uint16_t));
 }
@@ -162,7 +164,7 @@ uint32_t
 _gnutls_conv_uint32 (uint32_t data)
 {
 #ifndef WORDS_BIGENDIAN
-  return byteswap32 (data);
+  return bswap_32 (data);
 #else
   return data;
 #endif
@@ -172,7 +174,7 @@ uint16_t
 _gnutls_conv_uint16 (uint16_t data)
 {
 #ifndef WORDS_BIGENDIAN
-  return byteswap16 (data);
+  return bswap_16 (data);
 #else
   return data;
 #endif
@@ -185,7 +187,7 @@ _gnutls_uint64touint32 (const uint64 * num)
 
   memcpy (&ret, &num->i[4], 4);
 #ifndef WORDS_BIGENDIAN
-  ret = byteswap32 (ret);
+  ret = bswap_32 (ret);
 #endif
 
   return ret;
