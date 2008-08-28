@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -36,12 +36,6 @@
 #include "auth_srp.h"
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-
-int _gnutls_gen_srp_server_kx (gnutls_session_t, opaque **);
-int _gnutls_gen_srp_client_kx (gnutls_session_t, opaque **);
-
-int _gnutls_proc_srp_server_kx (gnutls_session_t, opaque *, size_t);
-int _gnutls_proc_srp_client_kx (gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st srp_auth_struct = {
   "SRP",

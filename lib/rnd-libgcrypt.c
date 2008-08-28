@@ -44,7 +44,7 @@ wrap_gcry_rnd_init (void **ctx)
 }
 
 static int
-wrap_gcry_rnd (void *ctx, int level, void *data, int datasize)
+wrap_gcry_rnd (void *ctx, int level, void *data, size_t datasize)
 {
   if (level == GNUTLS_RND_NONCE)
     gcry_create_nonce (data, datasize);
