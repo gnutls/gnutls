@@ -133,7 +133,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_developer_mode = xyes; then
 	   AC_MSG_CHECKING([whether gcc supports various warning flags])
 	   _gcc_cflags_save="$CFLAGS"
-	   CFLAGS="${CFLAGS} -Wall -W -Wcast-align -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wno-unused-parameter -Wredundant-decls -Wmissing-declarations"
+	   CFLAGS="${CFLAGS} -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused -Wfloat-equal -Wtraditional -Wtraditional-conversion -Wdeclaration-after-statement -Wundef -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wconversion -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wpadded -Wredundant-decls -Wnested-externs -Wunreachable-code -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
 	   AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_warns=yes,_gcc_warns=no)
 	   AC_MSG_RESULT($_gcc_warns)
 	   if test x"$_gcc_warns" != xyes ; then
