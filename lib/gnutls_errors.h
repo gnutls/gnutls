@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -21,6 +21,9 @@
  * USA
  *
  */
+
+#ifndef GNUTLS_ERRORS_H
+# define GNUTLS_ERRORS_H
 
 #include <defines.h>
 
@@ -71,3 +74,5 @@ extern int _gnutls_log_level;
 void _gnutls_null_log (void *, ...);
 
 #endif /* C99_MACROS */
+
+#endif /* GNUTLS_ERRORS_H */
