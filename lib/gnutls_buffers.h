@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -63,5 +63,3 @@ ssize_t _gnutls_handshake_io_send_int (gnutls_session_t, content_type_t,
 				       const void *, size_t);
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
 ssize_t _gnutls_handshake_io_write_flush (gnutls_session_t session);
-
-size_t gnutls_record_check_pending (gnutls_session_t session);

@@ -29,9 +29,6 @@
 
 void _gnutls_session_cert_type_set (gnutls_session_t session,
 				    gnutls_certificate_type_t);
-gnutls_kx_algorithm_t gnutls_kx_get (gnutls_session_t session);
-gnutls_cipher_algorithm_t gnutls_cipher_get (gnutls_session_t session);
-gnutls_certificate_type_t gnutls_certificate_type_get (gnutls_session_t);
 
 #include <gnutls_auth_int.h>
 
@@ -68,7 +65,5 @@ int _gnutls_PRF (gnutls_session_t session,
 		 const char *label, int label_size,
 		 const opaque * seed, int seed_size,
 		 int total_bytes, void *ret);
-
-int gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end);
 
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509
