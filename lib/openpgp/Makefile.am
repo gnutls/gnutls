@@ -21,8 +21,7 @@
 # MA 02110-1301, USA
 
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl	\
-	-I$(top_srcdir)/crypto -I$(top_srcdir)/lib	\
-	-I$(top_srcdir)/includes -I../../includes	\
+	-I$(top_srcdir)/lib -I$(top_srcdir)/includes -I../../includes	\
 	-I$(top_srcdir)/lib/opencdk
 
 if ENABLE_MINITASN1
