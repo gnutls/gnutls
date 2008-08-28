@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -29,7 +29,6 @@ int _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 
 #define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
 #define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
-#define PEM_PKCS7_SEP "-----BEGIN PKCS7"
 
 #define PEM_CRL_SEP "-----BEGIN X509 CRL"
 

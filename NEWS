@@ -8,8 +8,12 @@ See the end for copying conditions.
 ** libgnutls: Fix segmentation fault when generating private keys.
 Reported by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
-** libgnutls: Fix PKCS#7 import of certificate chains.
-Reported by Christian Grothoff <christian@grothoff.org>.
+** libgnutls: Remove code to import certificate chains in PKCS#7 format.
+The code has not worked since v0.9.0 and apparently nobody has missed
+it, so we decided to remove the code rather than fix it.  If you have
+old certificate chains stored in PKCS#7 format, you can convert them
+to a list of PEM certificates by using 'certtool --p7-info'.  Reported
+by Christian Grothoff <christian@grothoff.org>.
 
 ** opencdk: Parse (but not decrypt) encrypted secret keys.
 Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.

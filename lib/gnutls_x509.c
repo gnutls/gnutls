@@ -257,9 +257,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
   return 0;
 }
 
-/* Reads a DER encoded certificate list from memory and stores it to
- * a gnutls_cert structure. This is only called if PKCS7 read fails.
- * returns the number of certificates parsed (1)
+/* Reads a DER encoded certificate list from memory and stores it to a
+ * gnutls_cert structure.  Returns the number of certificates parsed.
  */
 static int
 parse_crt_mem (gnutls_cert ** cert_list, unsigned *ncerts,
@@ -292,9 +291,8 @@ parse_crt_mem (gnutls_cert ** cert_list, unsigned *ncerts,
   return 1;			/* one certificate parsed */
 }
 
-/* Reads a DER encoded certificate list from memory and stores it to
- * a gnutls_cert structure. This is only called if PKCS7 read fails.
- * returns the number of certificates parsed (1)
+/* Reads a DER encoded certificate list from memory and stores it to a
+ * gnutls_cert structure. Returns the number of certificates parsed.
  */
 static int
 parse_der_cert_mem (gnutls_cert ** cert_list, unsigned *ncerts,
@@ -328,136 +326,6 @@ parse_der_cert_mem (gnutls_cert ** cert_list, unsigned *ncerts,
   return ret;
 }
 
-#define CERT_PEM 1
-
-
-/* Reads a PKCS7 base64 encoded certificate list from memory and stores it to
- * a gnutls_cert structure.
- * returns the number of certificate parsed
- */
-static int
-parse_pkcs7_cert_mem (gnutls_cert ** cert_list, unsigned *ncerts, const
-		      void *input_cert, int input_cert_size, int flags)
-{
-#ifdef ENABLE_PKI
-  int i, j, count;
-  gnutls_datum_t tmp, tmp2;
-  int ret;
-  opaque *pcert = NULL;
-  size_t pcert_size;
-  gnutls_pkcs7_t pkcs7;
-
-  ret = gnutls_pkcs7_init (&pkcs7);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  tmp.data = (opaque *) input_cert;
-  tmp.size = input_cert_size;
-
-  if (flags & CERT_PEM)
-    ret = gnutls_pkcs7_import (pkcs7, &tmp, GNUTLS_X509_FMT_PEM);
-  else
-    ret = gnutls_pkcs7_import (pkcs7, &tmp, GNUTLS_X509_FMT_DER);
-  if (ret < 0)
-    {
-      /* if we failed to read the structure,
-       * then just try to decode a plain DER
-       * certificate.
-       */
-      gnutls_assert ();
-      gnutls_pkcs7_deinit (pkcs7);
-#endif
-      return parse_der_cert_mem (cert_list, ncerts,
-				 input_cert, input_cert_size);
-#ifdef ENABLE_PKI
-    }
-
-  i = *ncerts + 1;
-
-  /* tmp now contains the decoded certificate list */
-  tmp.data = (opaque *) input_cert;
-  tmp.size = input_cert_size;
-
-  ret = gnutls_pkcs7_get_crt_count (pkcs7);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_pkcs7_deinit (pkcs7);
-      return ret;
-    }
-  count = ret;
-
-  j = count - 1;
-  do
-    {
-      pcert_size = 0;
-      ret = gnutls_pkcs7_get_crt_raw (pkcs7, j, NULL, &pcert_size);
-      if (ret != GNUTLS_E_MEMORY_ERROR)
-	{
-	  count--;
-	  continue;
-	}
-
-      pcert = gnutls_malloc (pcert_size);
-      if (ret == GNUTLS_E_MEMORY_ERROR)
-	{
-	  gnutls_assert ();
-	  count--;
-	  continue;
-	}
-
-      /* read the certificate
-       */
-      ret = gnutls_pkcs7_get_crt_raw (pkcs7, j, pcert, &pcert_size);
-
-      j--;
-
-      if (ret >= 0)
-	{
-	  *cert_list =
-	    (gnutls_cert *) gnutls_realloc_fast (*cert_list,
-						 i * sizeof (gnutls_cert));
-
-	  if (*cert_list == NULL)
-	    {
-	      gnutls_assert ();
-	      gnutls_free (pcert);
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
-
-	  tmp2.data = pcert;
-	  tmp2.size = pcert_size;
-
-	  ret =
-	    _gnutls_x509_raw_cert_to_gcert (&cert_list[0][i - 1], &tmp2, 0);
-
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      gnutls_pkcs7_deinit (pkcs7);
-	      gnutls_free (pcert);
-	      return ret;
-	    }
-
-	  i++;
-	}
-
-      gnutls_free (pcert);
-
-    }
-  while (ret >= 0 && j >= 0);
-
-  *ncerts = i - 1;
-
-  gnutls_pkcs7_deinit (pkcs7);
-  return count;
-#endif
-}
-
 /* Reads a base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure. Returns the number of certificate parsed.
  */
@@ -470,18 +338,6 @@ parse_pem_cert_mem (gnutls_cert ** cert_list, unsigned *ncerts,
   opaque *ptr2;
   gnutls_datum_t tmp;
   int ret, count;
-
-#ifdef ENABLE_PKI
-  if ((ptr = memmem (input_cert, input_cert_size,
-		     PEM_PKCS7_SEP, sizeof (PEM_PKCS7_SEP) - 1)) != NULL)
-    {
-      size = strlen (ptr);
-
-      ret = parse_pkcs7_cert_mem (cert_list, ncerts, ptr, size, CERT_PEM);
-
-      return ret;
-    }
-#endif
 
   /* move to the certificate
    */
@@ -600,14 +456,13 @@ read_cert_mem (gnutls_certificate_credentials_t res, const void *cert,
   res->cert_list_length[res->ncerts] = 0;
 
   if (type == GNUTLS_X509_FMT_DER)
-    ret = parse_pkcs7_cert_mem (&res->cert_list[res->ncerts],
-				&res->cert_list_length[res->ncerts],
-				cert, cert_size, 0);
+    ret = parse_der_cert_mem (&res->cert_list[res->ncerts],
+			      &res->cert_list_length[res->ncerts],
+			      cert, cert_size);
   else
-    ret =
-      parse_pem_cert_mem (&res->cert_list[res->ncerts],
-			  &res->cert_list_length[res->ncerts], cert,
-			  cert_size);
+    ret = parse_pem_cert_mem (&res->cert_list[res->ncerts],
+			      &res->cert_list_length[res->ncerts], cert,
+			      cert_size);
 
   if (ret < 0)
     {
@@ -1196,9 +1051,8 @@ parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
   return count;
 }
 
-/* Reads a DER encoded certificate list from memory and stores it to
- * a gnutls_cert structure. This is only called if PKCS7 read fails.
- * returns the number of certificates parsed (1)
+/* Reads a DER encoded certificate list from memory and stores it to a
+ * gnutls_cert structure.  Returns the number of certificates parsed.
  */
 static int
 parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
@@ -1482,9 +1336,8 @@ parse_pem_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned *ncrls,
   return count;
 }
 
-/* Reads a DER encoded certificate list from memory and stores it to
- * a gnutls_cert structure. This is only called if PKCS7 read fails.
- * returns the number of certificates parsed (1)
+/* Reads a DER encoded certificate list from memory and stores it to a
+ * gnutls_cert structure. Returns the number of certificates parsed.
  */
 static int
 parse_der_crl_mem (gnutls_x509_crl_t ** crl_list, unsigned *ncrls,
