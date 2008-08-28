@@ -504,7 +504,7 @@ _gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
   * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
-int
+static int
 _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
 				  unsigned int *status)
 {

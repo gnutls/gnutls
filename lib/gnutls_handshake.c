@@ -193,7 +193,7 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
 #define TLS_MSG_LEN 15
-int
+static int
 _gnutls_finished (gnutls_session_t session, int type, void *ret)
 {
   const int siz = TLS_MSG_LEN;
@@ -344,7 +344,7 @@ _gnutls_user_hello_func (gnutls_session session,
  * or version 2.0 client hello (only for compatibility
  * since SSL version 2.0 is not supported).
  */
-int
+static int
 _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 			   int datalen)
 {
@@ -528,7 +528,7 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
  * and initializing encryption. This is the first encrypted message
  * we send.
  */
-int
+static int
 _gnutls_send_finished (gnutls_session_t session, int again)
 {
   uint8_t data[36];
@@ -557,9 +557,8 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	}
       else
 	{			/* TLS 1.0 */
-	  ret =
-	    _gnutls_finished (session,
-			      session->security_parameters.entity, data);
+	  ret = _gnutls_finished (session,
+				  session->security_parameters.entity, data);
 	  data_size = 12;
 	}
 
@@ -583,7 +582,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 /* This is to be called after sending our finished message. If everything
  * went fine we have negotiated a secure connection 
  */
-int
+static int
 _gnutls_recv_finished (gnutls_session_t session)
 {
   uint8_t data[36], *vrfy;
@@ -871,7 +870,7 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
  * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
  * (until it returns ok), with NULL parameters.
  */
-int
+static int
 _gnutls_send_empty_handshake (gnutls_session_t session,
 			      gnutls_handshake_description_t type, int again)
 {
@@ -2160,7 +2159,7 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
   return 0;
 }
 
-int
+static int
 _gnutls_send_supplemental (gnutls_session_t session, int again)
 {
   int ret = 0;
@@ -2190,7 +2189,7 @@ _gnutls_send_supplemental (gnutls_session_t session, int again)
   return ret;
 }
 
-int
+static int
 _gnutls_recv_supplemental (gnutls_session_t session)
 {
   uint8_t *data = NULL;
@@ -2693,8 +2692,9 @@ _gnutls_handshake_common (gnutls_session_t session)
 int
 _gnutls_generate_session_id (opaque * session_id, uint8_t * len)
 {
-  *len = TLS_MAX_SESSION_ID_SIZE;
   int ret;
+
+  *len = TLS_MAX_SESSION_ID_SIZE;
 
   ret = _gnutls_rnd (GNUTLS_RND_NONCE, session_id, *len);
   if (ret < 0)

@@ -65,7 +65,7 @@ const mod_auth_st rsa_auth_struct = {
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-int
+static int
 _gnutls_get_public_rsa_params (gnutls_session_t session,
 			       bigint_t params[MAX_PUBLIC_PARAMS_SIZE],
 			       int *params_len)
@@ -146,7 +146,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
 /* This function reads the RSA parameters from the private key
  */
-int
+static int
 _gnutls_get_private_rsa_params (gnutls_session_t session,
 				bigint_t ** params, int *params_size)
 {

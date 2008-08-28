@@ -133,8 +133,16 @@ if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_developer_mode = xyes; then
 	   AC_MSG_CHECKING([whether gcc supports various warning flags])
 	   _gcc_cflags_save="$CFLAGS"
-	   CFLAGS="${CFLAGS} -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wunused -Wfloat-equal -Wtraditional-conversion -Wdeclaration-after-statement -Wundef -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wconversion -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wpadded -Wredundant-decls -Wnested-externs -Wunreachable-code -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
+	   CFLAGS="${CFLAGS} -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
 	   # -Wtraditional: warns on #elif which we use often
+	   # -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
+	   # -Wpadded: many of our structs are not optimized for padding
+	   # -Wtraditional-conversion: we catch missing prototypes anyway
+	   # -Wno-unused-parameter: added because -Wunused cause too many warns
+	   # -Wunreachable-code: appears to return many false positives
+	   # -Wconversion: too many warnings for now
+	   # -Wswitch-default: too many warnings for now
+	   # -Wswitch-enum: too many warnings for now
 	   AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_warns=yes,_gcc_warns=no)
 	   AC_MSG_RESULT($_gcc_warns)
 	   if test x"$_gcc_warns" != xyes ; then

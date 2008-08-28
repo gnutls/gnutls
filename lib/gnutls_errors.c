@@ -343,20 +343,6 @@ gnutls_strerror (int error)
   return _(ret);
 }
 
-/* This will print the actual define of the
- * given error code.
- */
-const char *
-_gnutls_strerror (int error)
-{
-  const char *ret = NULL;
-
-  /* avoid prefix */
-  GNUTLS_ERROR_ALG_LOOP (ret = p->_name);
-
-  return _(ret);
-}
-
 int
 _gnutls_asn2err (int asn_err)
 {

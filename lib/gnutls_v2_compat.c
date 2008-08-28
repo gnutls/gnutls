@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2006, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -40,6 +40,7 @@
 #include "gnutls_db.h"
 #include "gnutls_extensions.h"
 #include "gnutls_auth_int.h"
+#include "gnutls_v2_compat.h"
 
 /* This selects the best supported ciphersuite from the ones provided */
 static int

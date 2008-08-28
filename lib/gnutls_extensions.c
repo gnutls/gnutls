@@ -63,18 +63,6 @@ _gnutls_ext_func_recv (uint16_t type, gnutls_ext_parse_type_t parse_type)
   return NULL;
 }
 
-const char *
-_gnutls_extension_get_name (uint16_t type)
-{
-  size_t i;
-
-  for (i = 0; i < extfunc_size; i++)
-    if (extfunc[i].type == type)
-      return extfunc[i].name;
-
-  return NULL;
-}
-
 /* Checks if the extension we just received is one of the 
  * requested ones. Otherwise it's a fatal error.
  */
