@@ -133,7 +133,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_developer_mode = xyes; then
 	   AC_MSG_CHECKING([whether gcc supports various warning flags])
 	   _gcc_cflags_save="$CFLAGS"
-	   CFLAGS="${CFLAGS} -g -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wno-unused-parameter"
+	   CFLAGS="${CFLAGS} -g -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wno-format-y2k -Wmissing-braces -Winline -Wstrict-prototypes -Wno-unused-parameter -Wredundant-decls"
 	   AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_warns=yes,_gcc_warns=no)
 	   AC_MSG_RESULT($_gcc_warns)
 	   if test x"$_gcc_warns" != xyes ; then
