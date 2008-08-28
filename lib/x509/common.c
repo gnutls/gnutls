@@ -325,6 +325,7 @@ _gnutls_x509_data2hex (const opaque * data, size_t data_size,
 {
   char *res;
   char escaped[MAX_STRING_LEN];
+  unsigned int size;
 
   if (2 * data_size + 1 > MAX_STRING_LEN)
     {
@@ -333,29 +334,24 @@ _gnutls_x509_data2hex (const opaque * data, size_t data_size,
     }
 
   res = _gnutls_bin2hex (data, data_size, escaped, sizeof (escaped));
-
-  if (res)
-    {
-      unsigned int size = strlen (res) + 1;
-      if (size + 1 > *sizeof_out)
-	{
-	  *sizeof_out = size;
-	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
-      *sizeof_out = size;	/* -1 for the null +1 for the '#' */
-
-      if (out)
-	{
-	  strcpy (out, "#");
-	  strcat (out, res);
-	}
-
-      return 0;
-    }
-  else
+  if (!res)
     {
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  size = strlen (res) + 1;
+  if (size + 1 > *sizeof_out)
+    {
+      *sizeof_out = size;
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+  *sizeof_out = size;	/* -1 for the null +1 for the '#' */
+
+  if (out)
+    {
+      strcpy (out, "#");
+      strcat (out, res);
     }
 
   return 0;
