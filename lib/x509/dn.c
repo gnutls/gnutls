@@ -763,7 +763,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
 static int
 _gnutls_x509_write_attribute (const char *given_oid,
 			      ASN1_TYPE asn1_struct, const char *where,
-			      const void *_data, int sizeof_data, int multi)
+			      const void *_data, int sizeof_data)
 {
   char tmp[128];
   int result;
@@ -773,21 +773,6 @@ _gnutls_x509_write_attribute (const char *given_oid,
 
   _gnutls_str_cpy (tmp, sizeof (tmp), where);
   _gnutls_str_cat (tmp, sizeof (tmp), ".value");
-
-  if (multi != 0)
-    {				/* if not writing an AttributeTypeAndValue, but an Attribute */
-      _gnutls_str_cat (tmp, sizeof (tmp), "s");	/* values */
-
-      result = asn1_write_value (asn1_struct, tmp, "NEW", 1);
-      if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
-	}
-
-      _gnutls_str_cat (tmp, sizeof (tmp), ".?LAST");
-
-    }
 
   result = asn1_write_value (asn1_struct, tmp, _data, sizeof_data);
   if (result < 0)
@@ -936,7 +921,7 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
     {
       result =
 	_gnutls_x509_write_attribute (given_oid, asn1_struct,
-				      tmp, name, sizeof_name, 0);
+				      tmp, name, sizeof_name);
     }
 
   if (result < 0)
