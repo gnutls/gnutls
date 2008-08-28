@@ -21,8 +21,7 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/minitasn1		\
-	-I$(top_srcdir)/libextra/openpgp/				\
-	-I$(top_srcdir)/libextra/opencdk -I$(top_srcdir)/lib		\
+	-I$(top_srcdir)/lib		\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
 	$(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
 
