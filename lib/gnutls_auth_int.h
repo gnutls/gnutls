@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,6 +22,9 @@
  *
  */
 
+#ifndef GNUTLS_AUTH_INT_H
+# define GNUTLS_AUTH_INT_H
+
 const void *_gnutls_get_cred (gnutls_key_st key,
 			      gnutls_credentials_type_t kx, int *err);
 const void *_gnutls_get_kx_cred (gnutls_session_t session,
@@ -30,3 +33,5 @@ void *_gnutls_get_auth_info (gnutls_session_t session);
 int _gnutls_auth_info_set (gnutls_session_t session,
 			   gnutls_credentials_type_t type, int size,
 			   int allow_change);
+
+#endif /* GNUTLS_AUTH_INT_H */
