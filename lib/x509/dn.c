@@ -760,7 +760,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
  * 'multi' must be zero if writing an AttributeTypeAndValue, and 1 if Attribute.
  * In all cases only one value is written.
  */
-int
+static int
 _gnutls_x509_write_attribute (const char *given_oid,
 			      ASN1_TYPE asn1_struct, const char *where,
 			      const void *_data, int sizeof_data, int multi)

@@ -638,6 +638,7 @@ extern "C"
 				     unsigned int sizeof_name);
   int gnutls_x509_crq_set_version (gnutls_x509_crq_t crq,
 				   unsigned int version);
+  int gnutls_x509_crq_get_version (gnutls_x509_crq_t crq);
   int gnutls_x509_crq_set_key (gnutls_x509_crq_t crq,
 			       gnutls_x509_privkey_t key);
   int gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq,

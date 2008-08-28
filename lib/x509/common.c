@@ -434,7 +434,7 @@ mktime_utc (const struct fake_tm *tm)
  * month|day|hour|minute|sec* (2 chars each)
  * and year is given. Returns a time_t date.
  */
-time_t
+static time_t
 _gnutls_x509_time2gtime (const char *ttime, int year)
 {
   char xx[3];
@@ -502,7 +502,7 @@ _gnutls_x509_time2gtime (const char *ttime, int year)
  *
  * (seconds are optional)
  */
-time_t
+static time_t
 _gnutls_x509_utcTime2gtime (const char *ttime)
 {
   char xx[3];
@@ -532,7 +532,7 @@ _gnutls_x509_utcTime2gtime (const char *ttime)
  * The given time is expressed as:
  * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)
  */
-int
+static int
 _gnutls_x509_gtime2utcTime (time_t gtime, char *str_time, int str_time_size)
 {
   size_t ret;
@@ -565,7 +565,7 @@ _gnutls_x509_gtime2utcTime (time_t gtime, char *str_time, int str_time_size)
  * The given time is expressed as:
  * YEAR(4)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)*
  */
-time_t
+static time_t
 _gnutls_x509_generalTime2gtime (const char *ttime)
 {
   char xx[5];
