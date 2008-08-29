@@ -47,7 +47,7 @@ static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 
 #define TLS_SESSION_CACHE 50
 
-gnutls_session_t
+static gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;
@@ -92,7 +92,7 @@ static char srp_dh_group2048[] =
   "YWAnkATleuavh05zA85TKZzMBBx7wwjYKlaY86jQw4JxrjX46dv7tpS1yAPYn3rk\n"
   "Nd4jbVJfVHWbZeNy/NaO8g+nER+eSv9zAgEC\n" "-----END DH PARAMETERS-----\n";
 
-int
+static int
 generate_dh_params (void)
 {
   gnutls_datum_t dparams = { srp_dh_group2048, sizeof (srp_dh_group2048) };

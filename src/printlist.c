@@ -29,7 +29,7 @@
 #include <time.h>
 #include <common.h>
 
-int main()
+int main(void)
 {
   {
     size_t i;

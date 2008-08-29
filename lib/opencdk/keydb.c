@@ -1680,7 +1680,7 @@ keydb_parse_allsigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd, int check)
   return 0;
 }
 
-void
+static void
 add_key_usage (cdk_kbnode_t knode, u32 keyid[2], unsigned int usage)
 {
   cdk_kbnode_t p, ctx;

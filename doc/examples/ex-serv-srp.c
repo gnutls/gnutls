@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -40,7 +40,7 @@
 gnutls_srp_server_credentials_t srp_cred;
 gnutls_certificate_credentials_t cert_cred;
 
-gnutls_session_t
+static gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;

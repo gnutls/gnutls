@@ -53,7 +53,7 @@ static size_t session_data_size = 0, session_id_size = 0;
 static int sfree = 0;
 static int handshake_output = 0;
 
-int
+static int
 do_handshake (gnutls_session_t session)
 {
   int ret, alert;
@@ -479,7 +479,7 @@ test_ssl3 (gnutls_session_t session)
 }
 
 static int alrm = 0;
-void
+static void
 got_alarm (int k)
 {
   alrm = 1;

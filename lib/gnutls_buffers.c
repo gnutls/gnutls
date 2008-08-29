@@ -861,7 +861,8 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 		{
 		  if (sum < n - left)
 		    {
-		      sprintf (tmp, "%.2x ", ((unsigned char *) ptr)[sum++]);
+		      sprintf (tmp, "%.2x ",
+			       ((const unsigned char *) ptr)[sum++]);
 		      _gnutls_str_cat (line, sizeof (line), tmp);
 		    }
 		  else

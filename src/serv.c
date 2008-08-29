@@ -364,7 +364,7 @@ oprfi_callback (gnutls_session_t session,
 }
 #endif
 
-gnutls_session_t
+static gnutls_session_t
 initialize_session (void)
 {
   gnutls_session_t session;
@@ -447,7 +447,7 @@ static const char DEFAULT_DATA[] =
 /* Creates html with the current session information.
  */
 #define tmp2 &http_buffer[strlen(http_buffer)]
-char *
+static char *
 peer_print_info (gnutls_session_t session, int *ret_length,
 		 const char *header)
 {
@@ -480,7 +480,6 @@ peer_print_info (gnutls_session_t session, int *ret_length,
     {
       const gnutls_datum_t *cert_list;
       unsigned int cert_list_size = 0;
-      size_t i;
 
       cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
 
@@ -746,7 +745,7 @@ unimplemented:
   *response_length = ((*response) ? strlen (*response) : 0);
 }
 
-void
+static void
 terminate (int sig)
 {
   fprintf (stderr, "Exiting via signal %d\n", sig);

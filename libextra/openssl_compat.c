@@ -852,7 +852,7 @@ gnutls_x509_pkcs7_extract_certificate (const gnutls_datum_t *
   * Returns a negative value on failure.
   *
   -*/
-int
+static int
 gnutls_x509_pkcs7_extract_certificate_count (const gnutls_datum_t *
 					     pkcs7_struct)
 {
