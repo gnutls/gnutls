@@ -360,6 +360,8 @@ gnutls_strerror (int error)
  *
  * Returns: A string corresponding to the symbol name of the error
  * code.
+ *
+ * Since: 2.6.0
  **/
 const char *
 gnutls_strerror_name (int error)
