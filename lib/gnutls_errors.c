@@ -263,69 +263,62 @@ static const gnutls_error_entry error_algorithms[] = {
   {NULL, NULL, 0, 0}
 };
 
-#define GNUTLS_ERROR_LOOP(b) \
-        const gnutls_error_entry *p; \
-                for(p = error_algorithms; p->desc != NULL; p++) { b ; }
-
-#define GNUTLS_ERROR_ALG_LOOP(a) \
-                        GNUTLS_ERROR_LOOP( if(p->number == error) { a; break; } )
-
-
-
 /**
-  * gnutls_error_is_fatal - Returns non-zero in case of a fatal error
-  * @error: is an error returned by a gnutls function. Error should be a negative value.
-  *
-  * If a function returns a negative value you may feed that value
-  * to this function to see if it is fatal. Returns 1 for a fatal 
-  * error 0 otherwise. However you may want to check the
-  * error code manually, since some non-fatal errors to the protocol
-  * may be fatal for you (your program).
-  *
-  * This is only useful if you are dealing with errors from the
-  * record layer or the handshake layer.
-  *
-  * For positive @error values, 0 is returned.
-  *
-  **/
+ * gnutls_error_is_fatal - Returns non-zero in case of a fatal error
+ * @error: is a GnuTLS error code, a negative value
+ *
+ * If a GnuTLS function returns a negative value you may feed that
+ * value to this function to see if the error condition is fatal.
+ *
+ * Note that you may want to check the error code manually, since some
+ * non-fatal errors to the protocol may be fatal for you program.
+ *
+ * This function is only useful if you are dealing with errors from
+ * the record layer or the handshake layer.
+ *
+ * Returns: 1 if the error code is fatal, for positive @error values,
+ *   0 is returned.  For unknown @error values, -1 is returned.
+ **/
 int
 gnutls_error_is_fatal (int error)
 {
   int ret = 1;
+  const gnutls_error_entry *p;
 
   /* Input sanitzation.  Positive values are not errors at all, and
      definitely not fatal. */
   if (error > 0)
     return 0;
 
-  GNUTLS_ERROR_ALG_LOOP (ret = p->fatal);
+  for (p = error_algorithms; p->desc != NULL; p++)
+    {
+      if (p->number == error)
+	{
+	  ret = p->fatal;
+	  break;
+	}
+    }
 
   return ret;
 }
 
 /**
-  * gnutls_perror - prints a string to stderr with a description of an error
-  * @error: is an error returned by a gnutls function. Error is always a negative value.
-  *
-  * This function is like perror(). The only difference is that it accepts an 
-  * error number returned by a gnutls function.
-  **/
+ * gnutls_perror - prints a string to stderr with a description of an error
+ * @error: is a GnuTLS error code, a negative value
+ *
+ * This function is like perror(). The only difference is that it
+ * accepts an error number returned by a gnutls function.
+ **/
 void
 gnutls_perror (int error)
 {
-  const char *ret = NULL;
-
-  /* avoid prefix */
-  GNUTLS_ERROR_ALG_LOOP (ret = p->desc);
-  if (ret == NULL)
-    ret = "(unknown)";
-  fprintf (stderr, "GNUTLS ERROR: %s\n", _(ret));
+  fprintf (stderr, "GNUTLS ERROR: %s\n", gnutls_strerror (error));
 }
 
 
 /**
  * gnutls_strerror - Returns a string with a description of an error
- * @error: is an error returned by a gnutls function.
+ * @error: is a GnuTLS error code, a negative value
  *
  * This function is similar to strerror().  Differences: it accepts an
  * error number returned by a gnutls function; In case of an unknown
@@ -339,11 +332,21 @@ const char *
 gnutls_strerror (int error)
 {
   const char *ret = NULL;
+  const gnutls_error_entry *p;
+
+  for (p = error_algorithms; p->desc != NULL; p++)
+    {
+      if (p->number == error)
+	{
+	  ret = p->desc;
+	  break;
+	}
+    }
 
   /* avoid prefix */
-  GNUTLS_ERROR_ALG_LOOP (ret = p->desc);
   if (ret == NULL)
     return "(unknown error code)";
+
   return _(ret);
 }
 
@@ -362,9 +365,16 @@ const char *
 gnutls_strerror_name (int error)
 {
   const char *ret = NULL;
+  const gnutls_error_entry *p;
 
-  /* avoid prefix */
-  GNUTLS_ERROR_ALG_LOOP (ret = p->_name);
+  for (p = error_algorithms; p->desc != NULL; p++)
+    {
+      if (p->number == error)
+	{
+	  ret = p->_name;
+	  break;
+	}
+    }
 
   return _(ret);
 }
