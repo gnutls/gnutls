@@ -79,7 +79,8 @@ gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc)
 {
 }
 
-static const gnutls_anon_client_credentials_t anon_dummy;
+static struct gnutls_anon_client_credentials_st anon_dummy_struct;
+static const gnutls_anon_client_credentials_t anon_dummy = &anon_dummy_struct;
 
 /**
  * gnutls_anon_allocate_client_credentials - Used to allocate a credentials structure
