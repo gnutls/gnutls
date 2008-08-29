@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.5.5 (unreleased)
 
+** libgnutls: Fix include paths so that building with internal libtasn1 works.
+Reported by "jth.net ApS" <info@jth.net>.
+
 ** libgnutls: Fix segmentation fault when generating private keys.
 Reported by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
