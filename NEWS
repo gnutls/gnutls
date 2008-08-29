@@ -26,6 +26,8 @@ Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
 ** libgnutls: Fix many warnings.
 
+** Included copy of libtasn1 is upgraded to version 1.5.
+
 ** Add French translation, thanks to Nicolas Provost.
 
 ** API and ABI modifications:
