@@ -7,8 +7,6 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 
-const char *_gnutls_strerror (int);
-
 typedef struct
 {
   char name[128];
@@ -38,7 +36,7 @@ main (int argc, char *argv[])
   j = 0;
   for (i = 0; i > -400; i--)
     {
-      _name = _gnutls_strerror (i);
+      _name = gnutls_strerror_name (i);
       if (_name == NULL)
 	continue;
 

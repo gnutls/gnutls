@@ -324,13 +324,17 @@ gnutls_perror (int error)
 
 
 /**
-  * gnutls_strerror - Returns a string with a description of an error
-  * @error: is an error returned by a gnutls function. Error is always a negative value.
-  *
-  * This function is similar to strerror(). Differences: it accepts an error
-  * number returned by a gnutls function; In case of an unknown error
-  * a descriptive string is sent instead of NULL.
-  **/
+ * gnutls_strerror - Returns a string with a description of an error
+ * @error: is an error returned by a gnutls function.
+ *
+ * This function is similar to strerror().  Differences: it accepts an
+ * error number returned by a gnutls function; In case of an unknown
+ * error a descriptive string is sent instead of NULL.
+ *
+ * Error codes are always a negative value.
+ *
+ * Returns: A string explaining the GnuTLS error message.
+ **/
 const char *
 gnutls_strerror (int error)
 {
@@ -340,6 +344,28 @@ gnutls_strerror (int error)
   GNUTLS_ERROR_ALG_LOOP (ret = p->desc);
   if (ret == NULL)
     return "(unknown error code)";
+  return _(ret);
+}
+
+/**
+ * gnutls_strerror_name:
+ * @error: is an error returned by a gnutls function.
+ *
+ * Return the GnuTLS error code define as a string.  For example,
+ * gnutls_strerror_name (GNUTLS_E_DH_PRIME_UNACCEPTABLE) will return
+ * the string "GNUTLS_E_DH_PRIME_UNACCEPTABLE".
+ *
+ * Returns: A string corresponding to the symbol name of the error
+ * code.
+ **/
+const char *
+gnutls_strerror_name (int error)
+{
+  const char *ret = NULL;
+
+  /* avoid prefix */
+  GNUTLS_ERROR_ALG_LOOP (ret = p->_name);
+
   return _(ret);
 }
 

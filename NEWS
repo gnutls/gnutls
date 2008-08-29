@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.5.5 (unreleased)
 
+** libgnutls: New API to get a string corresponding to a error symbol.
+The function is gnutls_strerror_name.
+
 ** libgnutls: Fix include paths so that building with internal libtasn1 works.
 Reported by "jth.net ApS" <info@jth.net>.
 
@@ -24,7 +27,7 @@ Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 ** Add French translation, thanks to Nicolas Provost.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_strerror_name: ADDED
 
 * Version 2.5.4 (released 2008-08-19)
 

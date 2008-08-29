@@ -437,6 +437,7 @@ extern "C"
 
   void gnutls_perror (int error);
   const char *gnutls_strerror (int error);
+  const char *gnutls_strerror_name (int error);
 
 /* Semi-internal functions.
  */
