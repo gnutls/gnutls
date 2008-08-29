@@ -916,6 +916,13 @@ cdk_error_t cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
 					   size_t *r_buflen);
 
 void cdk_kbnode_release (cdk_kbnode_t node);
+void cdk_kbnode_delete (cdk_kbnode_t node);
+void cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node,
+			cdk_packet_type_t pkttype);
+int cdk_kbnode_commit (cdk_kbnode_t * root);
+void cdk_kbnode_remove (cdk_kbnode_t * root, cdk_kbnode_t node);
+void cdk_kbnode_move (cdk_kbnode_t * root, cdk_kbnode_t node,
+		      cdk_kbnode_t where);
 cdk_kbnode_t cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t * ctx, int all);
 cdk_packet_t cdk_kbnode_find_packet (cdk_kbnode_t node, cdk_packet_type_t pkttype);
 cdk_packet_t cdk_kbnode_get_packet (cdk_kbnode_t node);

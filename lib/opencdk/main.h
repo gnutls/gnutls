@@ -98,6 +98,7 @@ int _cdk_check_args( int overwrite, const char * in, const char * out );
 u32 _cdk_buftou32 (const byte * buf);
 void _cdk_u32tobuf (u32 u, byte * buf);
 const char *_cdk_memistr (const char * buf, size_t buflen, const char * sub);
+FILE *_cdk_tmpfile (void);
 
 /* Helper to provide case insentensive strstr version. */
 #define stristr(haystack, needle) \
@@ -196,5 +197,5 @@ int _gnutls_hash_algo_to_pgp(int algo);
 int _pgp_hash_algo_to_gnutls(int algo);
 int _gnutls_cipher_to_pgp(int cipher);
 int _pgp_cipher_to_gnutls(int cipher);
-    
+
 #endif /* CDK_MAIN_H */

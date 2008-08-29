@@ -49,9 +49,6 @@ static int stream_cache_flush (cdk_stream_t s, FILE * fp);
 struct stream_filter_s *filter_add (cdk_stream_t s, filter_fnct_t fnc,
 				    int type);
 
-/* Customized tmpfile() version from misc.c */
-FILE *_cdk_tmpfile (void);
-
 
 /* FIXME: The read/write/putc/getc function cannot directly
           return an error code. It is stored in an error variable

@@ -25,6 +25,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
+#include <auth_srp_passwd.h>
 
 #ifdef ENABLE_SRP
 
@@ -147,7 +148,7 @@ encode (uint8_t * result, const uint8_t * rdata, int left)
 /* encodes data and puts the result into result (locally allocated)
  * The result_size is the return value
  */
-int
+static int
 _gnutls_sbase64_encode (uint8_t * data, size_t data_size, uint8_t ** result)
 {
   unsigned i, j;

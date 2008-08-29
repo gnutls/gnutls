@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Free Software Foundation
+ * Copyright (C) 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -108,7 +108,6 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer * buf)
     {
       supp_send_func supp_send = p->supp_send_func;
       size_t sizepos = buf->length;
-      int ret;
 
       /* Make room for supplement type and length byte length field. */
       ret = _gnutls_buffer_append (buf, "\0\0\0\0", 4);

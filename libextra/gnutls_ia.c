@@ -452,7 +452,7 @@ gnutls_ia_recv (gnutls_session_t session, char *data, size_t sizeofdata)
    handle EAGAIN/EINTERRUPTED?  just add more problems to callers,
    though.  */
 
-int
+static int
 _gnutls_ia_client_handshake (gnutls_session_t session)
 {
   char *buf = NULL;
@@ -521,7 +521,7 @@ _gnutls_ia_client_handshake (gnutls_session_t session)
   return 0;
 }
 
-int
+static int
 _gnutls_ia_server_handshake (gnutls_session_t session)
 {
   gnutls_ia_apptype_t msg_type;

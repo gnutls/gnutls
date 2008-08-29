@@ -24,6 +24,8 @@ by Christian Grothoff <christian@grothoff.org>.
 ** opencdk: Parse (but not decrypt) encrypted secret keys.
 Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
+** libgnutls: Fix many warnings.
+
 ** Add French translation, thanks to Nicolas Provost.
 
 ** API and ABI modifications:

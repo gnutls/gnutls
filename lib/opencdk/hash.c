@@ -33,9 +33,9 @@
 #include "filters.h"
 
 static cdk_error_t
-hash_encode (void *opaque, FILE * in, FILE * out)
+hash_encode (void *data, FILE * in, FILE * out)
 {
-  md_filter_t *mfx = opaque;
+  md_filter_t *mfx = data;
   byte buf[BUFSIZE];
   int err;
   int nread;
@@ -67,13 +67,13 @@ hash_encode (void *opaque, FILE * in, FILE * out)
 }
 
 cdk_error_t
-_cdk_filter_hash (void *opaque, int ctl, FILE * in, FILE * out)
+_cdk_filter_hash (void *data, int ctl, FILE * in, FILE * out)
 {
   if (ctl == STREAMCTL_READ)
-    return hash_encode (opaque, in, out);
+    return hash_encode (data, in, out);
   else if (ctl == STREAMCTL_FREE)
     {
-      md_filter_t *mfx = opaque;
+      md_filter_t *mfx = data;
       if (mfx)
 	{
 	  _cdk_log_debug ("free hash filter\n");

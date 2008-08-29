@@ -115,7 +115,7 @@ wrap_gcry_hash_init (gnutls_digest_algorithm_t algo, void **ctx)
   return GNUTLS_E_ENCRYPTION_FAILED;
 }
 
-int
+static int
 wrap_gcry_mac_output (void *src_ctx, void *digest, size_t digestsize)
 {
   opaque *_digest = gcry_md_read (src_ctx, 0);

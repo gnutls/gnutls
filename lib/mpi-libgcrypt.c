@@ -49,7 +49,7 @@ _format_conv (gnutls_bigint_format_t format)
 
 /* returns zero on success
  */
-bigint_t
+static bigint_t
 wrap_gcry_mpi_scan (const void *buffer, size_t nbytes,
 		    gnutls_bigint_format_t format)
 {
@@ -63,7 +63,7 @@ wrap_gcry_mpi_scan (const void *buffer, size_t nbytes,
   return ret_mpi;
 }
 
-int
+static int
 wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
 		     gnutls_bigint_format_t format)
 {
@@ -84,7 +84,7 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
 #undef _gnutls_mpi_alloc_like
 #define _gnutls_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x))
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_mod (const bigint_t a, const bigint_t b)
 {
   bigint_t r = _gnutls_mpi_alloc_like (b);
@@ -97,7 +97,7 @@ wrap_gcry_mpi_mod (const bigint_t a, const bigint_t b)
   return r;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_powm (bigint_t w, const bigint_t b, const bigint_t e,
 		    const bigint_t m)
 {
@@ -112,7 +112,7 @@ wrap_gcry_mpi_powm (bigint_t w, const bigint_t b, const bigint_t e,
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_addm (bigint_t w, const bigint_t a, const bigint_t b,
 		    const bigint_t m)
 {
@@ -127,7 +127,7 @@ wrap_gcry_mpi_addm (bigint_t w, const bigint_t a, const bigint_t b,
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_subm (bigint_t w, const bigint_t a, const bigint_t b,
 		    const bigint_t m)
 {
@@ -142,7 +142,7 @@ wrap_gcry_mpi_subm (bigint_t w, const bigint_t a, const bigint_t b,
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_mulm (bigint_t w, const bigint_t a, const bigint_t b,
 		    const bigint_t m)
 {
@@ -157,7 +157,7 @@ wrap_gcry_mpi_mulm (bigint_t w, const bigint_t a, const bigint_t b,
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_add (bigint_t w, const bigint_t a, const bigint_t b)
 {
   if (w == NULL)
@@ -171,7 +171,7 @@ wrap_gcry_mpi_add (bigint_t w, const bigint_t a, const bigint_t b)
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_sub (bigint_t w, const bigint_t a, const bigint_t b)
 {
   if (w == NULL)
@@ -185,7 +185,7 @@ wrap_gcry_mpi_sub (bigint_t w, const bigint_t a, const bigint_t b)
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_mul (bigint_t w, const bigint_t a, const bigint_t b)
 {
   if (w == NULL)
@@ -200,7 +200,7 @@ wrap_gcry_mpi_mul (bigint_t w, const bigint_t a, const bigint_t b)
 }
 
 /* q = a / b */
-bigint_t
+static bigint_t
 wrap_gcry_mpi_div (bigint_t q, const bigint_t a, const bigint_t b)
 {
   if (q == NULL)
@@ -214,7 +214,7 @@ wrap_gcry_mpi_div (bigint_t q, const bigint_t a, const bigint_t b)
   return q;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_add_ui (bigint_t w, const bigint_t a, unsigned long b)
 {
   if (w == NULL)
@@ -228,7 +228,7 @@ wrap_gcry_mpi_add_ui (bigint_t w, const bigint_t a, unsigned long b)
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_sub_ui (bigint_t w, const bigint_t a, unsigned long b)
 {
   if (w == NULL)
@@ -242,7 +242,7 @@ wrap_gcry_mpi_sub_ui (bigint_t w, const bigint_t a, unsigned long b)
   return w;
 }
 
-bigint_t
+static bigint_t
 wrap_gcry_mpi_mul_ui (bigint_t w, const bigint_t a, unsigned long b)
 {
   if (w == NULL)
@@ -256,13 +256,13 @@ wrap_gcry_mpi_mul_ui (bigint_t w, const bigint_t a, unsigned long b)
   return w;
 }
 
-int
+static int
 wrap_gcry_prime_check (bigint_t pp)
 {
   return gcry_prime_check (pp, 0);
 }
 
-int
+static int
 wrap_gcry_generate_group (gnutls_group_st * group, unsigned int bits)
 {
   bigint_t g = NULL, prime = NULL;

@@ -397,7 +397,7 @@ cdk_keydb_free (cdk_keydb_hd_t hd)
 }
 
 
-cdk_error_t
+static cdk_error_t
 _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t * ret_kr)
 {
   cdk_error_t rc;

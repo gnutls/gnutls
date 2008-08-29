@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Free Software Foundation
+ * Copyright (C) 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -23,6 +23,7 @@
  */
 
 #include <gnutls_int.h>
+#include <gnutls_helper.h>
 
 int
 _gnutls_file_exists (const char *file)
