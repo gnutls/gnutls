@@ -376,7 +376,7 @@ gnutls_strerror_name (int error)
 	}
     }
 
-  return _(ret);
+  return ret;
 }
 
 int
