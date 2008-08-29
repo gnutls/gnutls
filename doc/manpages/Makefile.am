@@ -119,6 +119,7 @@ APIMANS += gnutls_dh_params_export_raw.3
 APIMANS += gnutls_error_is_fatal.3
 APIMANS += gnutls_perror.3
 APIMANS += gnutls_strerror.3
+APIMANS += gnutls_strerror_name.3
 APIMANS += gnutls_ext_register.3
 APIMANS += gnutls_global_set_log_function.3
 APIMANS += gnutls_global_set_log_level.3
