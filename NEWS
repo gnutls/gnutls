@@ -19,6 +19,8 @@ Fixes crash with libgcrypt 1.4.2.  Reported by Ludovic Courtes
 
 ** doc/: Fix texinfo markup for old texinfo versions.
 
+** Included copy of libtasn1 is upgraded to version 1.5.
+
 ** API and ABI modifications:
 No changes since last version.
 
