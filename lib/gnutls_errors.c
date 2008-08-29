@@ -345,7 +345,7 @@ gnutls_strerror (int error)
 
   /* avoid prefix */
   if (ret == NULL)
-    return "(unknown error code)";
+    return _("(unknown error code)");
 
   return _(ret);
 }
