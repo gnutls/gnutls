@@ -24,6 +24,8 @@ Connect, establish a plain session and start TLS when EOF or a SIGALRM
 is received.
 .IP "\-v, \-\-version"
 Prints the program's version number.
+.IP "\-V, \-\-verbose"
+More verbose output.
 
 .SS TLS/SSL control options
 .IP "\-\-priority \fIPRIORITY STRING\fR"
@@ -93,11 +95,32 @@ Send CR LF instead of LF.
 Send the openpgp fingerprint, instead of the key.
 .IP "\-p, \-\-port \fIinteger\fR"
 The port to connect to.
+.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
+Ciphers to enable (use \fBgnutls\-cli \-\-list\fR to show the
+supported ciphers).
 .IP "\-\-protocols \fIprotocol1 protocol2...\fR"
 Protocols to enable (use \fBgnutls\-cli \-\-list\fR to show the
 supported protocols).
+.IP "\-\-comp \fIcomp1 comp2...\fR"
+Compression methods to enable (use \fBgnutls\-cli \-\-list\fR to
+show the supported methods).
+.IP "\-\-macs \fImac1 mac2...\fR"
+MACs to enable (use \fBgnutls\-cli \-\-list\fR to show the
+supported MACs).
+.IP "\-\-kx \fIkx1 kx2...\fR"
+Key exchange methods to enable (use gnutls\-cli \-\-list\fR to
+show the supported methods).
+.IP "\-\-ctypes \fIcertType1 certType2...\fR"
+Certificate types to enable (use gnutls\-cli \-\-list\fR to show
+the supported types).
 .IP "\-\-recordsize \fIinteger\fR"
 The maximum record size to advertize.
+.IP "\-\-disable-extensions"
+Disable all the TLS extensions.
+.IP "\-\-print-cert"
+Print the certificate in PEM format.
+.IP "\-\-insecure"
+Don't abort program if server certificates can't be validated.
 
 .SS Certificate options
 .IP "\-\-pgpcertfile \fIFILE\fR"
@@ -108,6 +131,8 @@ PGP Key file to use.
 PGP Key ring file to use.
 .IP "\-\-pgptrustdb \fIFILE\fR"
 PGP trustdb file to use.
+.IP "\-\-pgpsubkey \fIHEX|auto\fR2
+PGP subkey to use.
 .IP "\-\-srppasswd \fIPASSWD\fR"
 SRP password to use.
 .IP "\-\-srpusername \fINAME\fR"
@@ -120,8 +145,14 @@ X.509 Certificate file to use.
 Use DER format for certificates
 .IP "\-\-x509keyfile \fIFILE\fR"
 X.509 key file to use.
-.IP "\-\-xml"
-Print the certificate information in XML format.
+.IP "\-\-x509crlfile \fIFILE\fR"
+X.509 CRL file to use.
+.IP "\-\-pskusername \fINAME\fR"
+PSK username to use.
+.IP "\-\-pskkey \fIKEY\fR"
+PSK key (in hex) to use.
+.IP "\-\-opaque-prf-input \fIDATA\fR"
+Use Opaque PRF Input DATA.
 
 .SH "SEE ALSO"
 .BR gnutls\-cli\-debug (1),
