@@ -95,8 +95,6 @@ dlog (int level, const char *str)
 }
 #endif
 
-int _gnutls_is_secure_mem_null (const void *);
-
 /**
   * gnutls_global_set_mem_functions - set the memory allocation functions
   * @alloc_func: it's the default memory allocation function. Like malloc().

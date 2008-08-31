@@ -284,7 +284,7 @@ _gnutls_calc_srp_A (bigint_t * a, bigint_t g, bigint_t n)
 /* generate x = SHA(s | SHA(U | ":" | p))
  * The output is exactly 20 bytes
  */
-int
+static int
 _gnutls_calc_srp_sha (const char *username, const char *password,
 		      opaque * salt, int salt_size, size_t * size,
 		      void *digest)

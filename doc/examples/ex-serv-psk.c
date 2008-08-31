@@ -42,7 +42,7 @@ gnutls_certificate_credentials_t x509_cred;
 gnutls_psk_server_credentials_t psk_cred;
 gnutls_priority_t priority_cache;
 
-gnutls_session_t
+static gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;

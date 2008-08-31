@@ -81,7 +81,7 @@ my_ctime (const time_t * tv)
 }
 
 
-void
+static void
 print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 {
   gnutls_x509_crt_t crt;
@@ -281,7 +281,7 @@ print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 
 #ifdef ENABLE_OPENPGP
 
-void
+static void
 print_openpgp_info (gnutls_session_t session, const char *hostname,
 		    int insecure)
 {
@@ -401,7 +401,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
 
 #endif
 
-void
+static void
 print_cert_vrfy (gnutls_session_t session)
 {
   int rc;
@@ -443,7 +443,7 @@ print_cert_vrfy (gnutls_session_t session)
     }
 }
 
-void
+static void
 print_dh_info (gnutls_session_t session, const char *str)
 {
   printf ("- %sDiffie-Hellman parameters\n", str);

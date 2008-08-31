@@ -49,9 +49,9 @@ dup_trim_filename (const char *s)
 
 
 static cdk_error_t
-literal_decode (void *opaque, FILE * in, FILE * out)
+literal_decode (void *data, FILE * in, FILE * out)
 {
-  literal_filter_t *pfx = opaque;
+  literal_filter_t *pfx = data;
   cdk_stream_t si, so;
   cdk_packet_t pkt;
   cdk_pkt_literal_t pt;
@@ -173,9 +173,9 @@ intmode_to_char (int mode)
 
 
 static cdk_error_t
-literal_encode (void *opaque, FILE * in, FILE * out)
+literal_encode (void *data, FILE * in, FILE * out)
 {
-  literal_filter_t *pfx = opaque;
+  literal_filter_t *pfx = data;
   cdk_pkt_literal_t pt;
   cdk_stream_t si;
   cdk_packet_t pkt;
@@ -225,15 +225,15 @@ literal_encode (void *opaque, FILE * in, FILE * out)
 
 
 int
-_cdk_filter_literal (void *opaque, int ctl, FILE * in, FILE * out)
+_cdk_filter_literal (void *data, int ctl, FILE * in, FILE * out)
 {
   if (ctl == STREAMCTL_READ)
-    return literal_decode (opaque, in, out);
+    return literal_decode (data, in, out);
   else if (ctl == STREAMCTL_WRITE)
-    return literal_encode (opaque, in, out);
+    return literal_encode (data, in, out);
   else if (ctl == STREAMCTL_FREE)
     {
-      literal_filter_t *pfx = opaque;
+      literal_filter_t *pfx = data;
       if (pfx)
 	{
 	  _cdk_log_debug ("free literal filter\n");
@@ -249,7 +249,7 @@ _cdk_filter_literal (void *opaque, int ctl, FILE * in, FILE * out)
 
 
 static int
-text_encode (void *opaque, FILE * in, FILE * out)
+text_encode (void *data, FILE * in, FILE * out)
 {
   const char *s;
   char buf[2048];
@@ -272,9 +272,9 @@ text_encode (void *opaque, FILE * in, FILE * out)
 
 
 static int
-text_decode (void *opaque, FILE * in, FILE * out)
+text_decode (void *data, FILE * in, FILE * out)
 {
-  text_filter_t *tfx = opaque;
+  text_filter_t *tfx = data;
   const char *s;
   char buf[2048];
 
@@ -296,15 +296,15 @@ text_decode (void *opaque, FILE * in, FILE * out)
 
 
 int
-_cdk_filter_text (void *opaque, int ctl, FILE * in, FILE * out)
+_cdk_filter_text (void *data, int ctl, FILE * in, FILE * out)
 {
   if (ctl == STREAMCTL_READ)
-    return text_encode (opaque, in, out);
+    return text_encode (data, in, out);
   else if (ctl == STREAMCTL_WRITE)
-    return text_decode (opaque, in, out);
+    return text_decode (data, in, out);
   else if (ctl == STREAMCTL_FREE)
     {
-      text_filter_t *tfx = opaque;
+      text_filter_t *tfx = data;
       if (tfx)
 	{
 	  _cdk_log_debug ("free text filter\n");

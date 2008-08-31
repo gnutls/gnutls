@@ -338,9 +338,9 @@ update_crc (u32 crc, const byte * buf, size_t buflen)
 
 
 static cdk_error_t
-armor_encode (void *opaque, FILE * in, FILE * out)
+armor_encode (void *data, FILE * in, FILE * out)
 {
-  armor_filter_t *afx = opaque;
+  armor_filter_t *afx = data;
   struct stat statbuf;
   char crcbuf[5], buf[128], raw[49];
   byte crcbuf2[3];
@@ -446,9 +446,9 @@ _cdk_armor_get_lineend (void)
 
 
 static cdk_error_t
-armor_decode (void *opaque, FILE * in, FILE * out)
+armor_decode (void *data, FILE * in, FILE * out)
 {
-  armor_filter_t *afx = opaque;
+  armor_filter_t *afx = data;
   const char *s;
   char buf[127];
   byte raw[128], crcbuf[4];
@@ -655,15 +655,15 @@ cdk_file_dearmor (const char *file, const char *output)
 
 
 int
-_cdk_filter_armor (void *opaque, int ctl, FILE * in, FILE * out)
+_cdk_filter_armor (void *data, int ctl, FILE * in, FILE * out)
 {
   if (ctl == STREAMCTL_READ)
-    return armor_decode (opaque, in, out);
+    return armor_decode (data, in, out);
   else if (ctl == STREAMCTL_WRITE)
-    return armor_encode (opaque, in, out);
+    return armor_encode (data, in, out);
   else if (ctl == STREAMCTL_FREE)
     {
-      armor_filter_t *afx = opaque;
+      armor_filter_t *afx = data;
       if (afx)
 	{
 	  _cdk_log_debug ("free armor filter\n");

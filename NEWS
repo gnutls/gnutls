@@ -3,7 +3,15 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.5.5 (unreleased)
+* Version 2.5.6 (unreleased)
+
+* Version 2.5.5 (released 2008-08-29)
+
+** libgnutls: New API to get a string corresponding to a error symbol.
+The function is gnutls_strerror_name.
+
+** libgnutls: Fix include paths so that building with internal libtasn1 works.
+Reported by "jth.net ApS" <info@jth.net>.
 
 ** libgnutls: Fix segmentation fault when generating private keys.
 Reported by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
@@ -18,10 +26,14 @@ by Christian Grothoff <christian@grothoff.org>.
 ** opencdk: Parse (but not decrypt) encrypted secret keys.
 Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
 
+** libgnutls: Fix many warnings.
+
+** Included copy of libtasn1 is upgraded to version 1.5.
+
 ** Add French translation, thanks to Nicolas Provost.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_strerror_name: ADDED
 
 * Version 2.5.4 (released 2008-08-19)
 

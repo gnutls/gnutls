@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -32,8 +32,6 @@
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
 #include "gnutls_mpi.h"
-
-static const int anon_dummy;
 
 /**
   * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials_t structure
@@ -81,6 +79,9 @@ gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc)
 {
 }
 
+static struct gnutls_anon_client_credentials_st anon_dummy_struct;
+static const gnutls_anon_client_credentials_t anon_dummy = &anon_dummy_struct;
+
 /**
  * gnutls_anon_allocate_client_credentials - Used to allocate a credentials structure
  * @sc: is a pointer to an #gnutls_anon_client_credentials_t structure.
@@ -97,7 +98,7 @@ gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
   /* anon_dummy is only there for *sc not to be null.
    * it is not used at all;
    */
-  *sc = (void *) &anon_dummy;
+  *sc = anon_dummy;
 
   return 0;
 }

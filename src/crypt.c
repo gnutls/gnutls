@@ -108,7 +108,7 @@ print_num (const char *msg, const gnutls_datum_t * num)
 
 }
 
-int
+static int
 generate_create_conf (char *tpasswd_conf)
 {
   FILE *fd;
@@ -320,7 +320,7 @@ find_strchr (char *username, char *file)
 /* Parses the tpasswd files, in order to verify the given
  * username/password pair.
  */
-int
+static int
 verify_passwd (char *conffile, char *tpasswd, char *username,
 	       const char *passwd)
 {
@@ -494,7 +494,7 @@ main (int argc, char **argv)
 
 }
 
-char *
+static char *
 _srp_crypt (const char *username, const char *passwd, int salt_size,
 	    const gnutls_datum_t * g, const gnutls_datum_t * n)
 {

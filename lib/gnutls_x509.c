@@ -1560,7 +1560,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	      gnutls_x509_crt_t * cert, gnutls_x509_crl_t * crl)
 {
   gnutls_pkcs12_bag_t bag = NULL;
-  int index = 0;
+  int idx = 0;
   int ret;
 
   for (;;)
@@ -1576,7 +1576,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	  goto done;
 	}
 
-      ret = gnutls_pkcs12_get_bag (p12, index, bag);
+      ret = gnutls_pkcs12_get_bag (p12, idx, bag);
       if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 	break;
       if (ret < 0)
@@ -1691,7 +1691,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	    }
 	}
 
-      index++;
+      idx++;
       gnutls_pkcs12_bag_deinit (bag);
     }
 

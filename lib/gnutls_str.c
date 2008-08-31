@@ -26,6 +26,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <gnutls_str.h>
+#include <stdarg.h>
 
 /* These function are like strcat, strcpy. They only
  * do bound checking (they shouldn't cause buffer overruns),

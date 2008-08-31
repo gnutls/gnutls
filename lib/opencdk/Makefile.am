@@ -24,6 +24,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/lib \
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes \
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl
 
+if ENABLE_MINITASN1
+AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
+else
+AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
+endif
+
 noinst_LTLIBRARIES = libminiopencdk.la
 
 libminiopencdk_la_SOURCES = armor.c filters.h keydb.h main.c types.h	\

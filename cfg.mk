@@ -50,3 +50,32 @@ mingw32: autoreconf
 	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess` --with-included-libtasn1 --with-included-opencdk --with-libgcrypt-prefix=$(LIBGCRYPTROOT)
 
 .PHONY: bootstrap autoreconf mingw32
+
+ChangeLog:
+	git log --pretty --numstat --summary --since="2005 November 07" -- | git2cl > ChangeLog
+	cat .clcopying >> ChangeLog
+
+tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
+htmldir = ../www-$(PACKAGE)
+
+release: upload webdocs
+
+upload:
+	! git-tag -l $(tag) | grep $(PACKAGE) > /dev/null
+	rm -f ChangeLog
+	$(MAKE) ChangeLog distcheck
+	git commit -m Generated. ChangeLog
+	git-tag -u b565716f! -m $(VERSION) $(tag)
+	git-push
+	git-push --tags
+	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.bz2
+	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/devel/
+	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
+	cp $(distdir).tar.bz2 $(distdir).tar.bz2.sig ../releases/$(PACKAGE)/
+	make webdocs
+
+webdocs:
+	cd doc && ../build-aux/gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) $(PACKAGE_NAME)
+	cd doc/doxygen && doxygen && cd ../.. && cp -v doc/doxygen/html/* $(htmldir)/doxygen/ && cd doc/doxygen/latex && make refman.pdf && cd ../../../ && cp doc/doxygen/latex/refman.pdf $(htmldir)/doxygen/$(PACKAGE).pdf
+	cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp doc/reference/html/*.css $(htmldir)/reference/
+	cd $(htmldir) && cvs commit -m "Update." manual/ reference/ doxygen/

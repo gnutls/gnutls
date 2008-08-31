@@ -1,3 +1,308 @@
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* .clcopying: Update copyright years.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, cfg.mk: Split up release targets.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/element.c, lib/minitasn1/libtasn1.h,
+	lib/minitasn1/structure.c: Use libtasn1 1.5.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.c: Include stdarg.h for va_start etc.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_anon_cred.c: Fix dummy cred.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump libtool version because of new API.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-tlsia.c, doc/examples/ex-serv-anon.c,
+	doc/examples/ex-serv-export.c, doc/examples/ex-serv-pgp.c,
+	doc/examples/ex-serv-psk.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, lib/gnutls_anon_cred.c,
+	lib/gnutls_buffers.c, lib/opencdk/keydb.c,
+	libextra/openssl_compat.c, libextra/openssl_compat.h,
+	src/certtool-cfg.c, src/certtool.c, src/cli.c, src/common.c,
+	src/crypt.c, src/prime.c, src/printlist.c, src/serv.c, src/tests.c,
+	src/tls_test.c: Fix warnings.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix description of --enable-developer-mode.  Right
+	now all it does is to enable compiler warnings.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/auth_cert.c, lib/auth_srp_passwd.h,
+	lib/auth_srp_sb64.c, lib/gnutls_constate.c, lib/gnutls_global.c,
+	lib/gnutls_helper.c, lib/gnutls_int.h, lib/gnutls_srp.c,
+	lib/gnutls_supplemental.c, lib/gnutls_x509.c, lib/mac-libgcrypt.c,
+	lib/mpi-libgcrypt.c, lib/opencdk/armor.c, lib/opencdk/hash.c,
+	lib/opencdk/keydb.c, lib/opencdk/literal.c, lib/opencdk/main.h,
+	lib/opencdk/opencdk.h, lib/opencdk/stream.c, lib/openpgp/extras.c,
+	lib/pk-libgcrypt.c, libextra/gnutls_ia.c: Fix warnings.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Translate unknown error code message.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Don't translate symbol names.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Fix warning about defining variable inside
+	functions.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_errors.c,
+	src/errcodes.c: Add gnutls_strerror_name.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c: Re-add, but mark static.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, gl/getdelim.c, gl/m4/getdelim.m4, maint.mk: Update
+	gnulib files.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/opencdk/Makefile.am, lib/x509/Makefile.am: Fix libtasn1
+	include paths.
+
+2008-08-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/read-packet.c: avoid using gcrypt function.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/auth_rsa.c, lib/debug.c, lib/gnutls_cert.c,
+	lib/gnutls_dh.c, lib/gnutls_errors.c, lib/gnutls_extensions.c,
+	lib/gnutls_handshake.c, lib/gnutls_v2_compat.c: Fix warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Simplify logic.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/dn.c: Remove dead code.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/Makefile.am: Don't include missing -I's.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Drop warning.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am: Drop removed libextra directories from -I's.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Enable all kind of warnings.  If you remove some,
+	add a comment on why.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/pgp.c, lib/x509/pbkdf2-sha1.c: Fix warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Tweak warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/x509.h, lib/x509/common.c, lib/x509/common.h,
+	lib/x509/dn.c: Fix warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c, lib/x509/common.h: Fix warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_srp.c, lib/rnd-libgcrypt.c: Fix warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_num.h: Protect against double inclusion.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/crypto.h: Protect against double inclusions.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/byteswap.in.h, lgl/m4/byteswap.m4,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/tests/Makefile.am, lgl/tests/test-byteswap.c, lib/gnutls_num.c,
+	lib/gnutls_num.h: Use byteswap from gnulib.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_srp.h, lib/gnutls_global.c: Fix warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_auth_int.h: Protect against double inclusion.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.h: Protect against double inclusion.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.h, lib/gnutls_record.h, lib/gnutls_state.h: Fix
+	warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.h, lib/gnutls_pk.h, lib/gnutls_x509.h,
+	lib/x509/privkey.c, lib/x509/privkey_pkcs8.c, lib/x509/verify.c: Fix
+	warnings.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Add warning.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Check whether warning flags are supported before
+	using them.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am, lib/gnutls_x509.c, lib/x509/output.c: 
+	Make disable-extra-pki work better.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Fix --disable-extra-pki flag.
+
+2008-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_x509.c, lib/gnutls_x509.h, tests/Makefile.am,
+	tests/set_pkcs7_cred.c: Remove code to import PKCS#7 certificate
+	chains.  The code hasn't worked since GnuTLS v0.9.0.  Reported by
+	Christian Grothoff <christian@grothoff.org>.
+
+2008-08-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Cast datasize to long to match %ld printf
+	format.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* tests/set_pkcs7_cred.c: Fix.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* tests/set_pkcs7_cred.c: Use utils infrastructure.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/set_pkcs7_cred.c: Add set_pkcs7_cred self
+	test.
+
+2008-08-26  Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+
+	* : commit 06ee30f6e553d4739ca50ab84492179da64cfc3e Author: Daniel
+	Kahn Gillmor <dkg@fifthhorseman.net> Date:   Tue Aug 26 11:00:27
+	2008 -0400
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c, libextra/gnutls_extra.c: Fix gnulib calls.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-26  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/autobuild.m4, lgl/Makefile.am, lgl/m4/gnulib-comp.m4,
+	lgl/m4/string_h.m4, lgl/m4/strverscmp.m4, lgl/m4/threadlib.m4,
+	lgl/string.in.h, lgl/strverscmp.h, lgl/tests/Makefile.am,
+	lgl/tests/test-strverscmp.c: Update gnulib files.
+
+2008-08-25  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_pk.c, lib/pk-libgcrypt.c, lib/x509/privkey.c: corrected
+	private key generation
+
+2008-08-25  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit 976565830d853f981ecd749bdb15dd02133ed93b Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Mon Aug 25 19:50:07
+	2008 +0300
+
+2008-08-25  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/output.c: removed code that incorrectly printed IP
+	addresses.
+
+2008-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-23  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS, po/fr.po.in, po/nl.po.in: Sync with TP.
+
+2008-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-08-19  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/opencdk.h, lib/opencdk/read-packet.c: patch by Daniel
+	Kahn Gillmor, to enable parsing (but not decrypting) of locked
+	secret keys (including the "gnu-dummy" S2K option).
+
+2008-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-08-19  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.4.
@@ -12780,8 +13085,10 @@
 
 	* Version 1.2.9.
 
-	----------------------------------------------------------------------
-	Copyright (C) 2005, 2006, 2007 Free Software Foundation
-	Copying and distribution of this file, with or without modification,
-	are permitted in any medium without royalty provided the copyright
-	notice and this notice are preserved.
+	-----
+
+	Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation
+
+	Copying and distribution of this file, with or without
+	modification, are permitted provided the copyright notice
+	and this notice are preserved.

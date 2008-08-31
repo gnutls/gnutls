@@ -217,7 +217,7 @@ read_crq_set (gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 
 /* The input_str should contain %d or %u to print the default.
  */
-int
+static int
 read_int_with_default (const char *input_str, int def)
 {
   char *in;

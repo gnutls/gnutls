@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -40,7 +40,7 @@
 gnutls_certificate_credentials_t x509_cred;
 gnutls_priority_t priority_cache;
 
-gnutls_session_t
+static gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;

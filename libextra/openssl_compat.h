@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -67,8 +67,6 @@ int gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
 
 #define gnutls_x509_fingerprint gnutls_fingerprint
 #define gnutls_x509_certificate_format gnutls_x509_crt_fmt_t
-
-int gnutls_x509_extract_key_pk_algorithm (const gnutls_datum_t * key);
 
 #define gnutls_certificate_set_rsa_params gnutls_certificate_set_rsa_export_params
 

@@ -677,4 +677,6 @@ void _gnutls_free_auth_info (gnutls_session_t session);
 void _gnutls_set_adv_version (gnutls_session_t, gnutls_protocol_t);
 gnutls_protocol_t _gnutls_get_adv_version (gnutls_session_t);
 
+int _gnutls_is_secure_mem_null (const void *);
+
 #endif /* GNUTLS_INT_H */

@@ -46,7 +46,7 @@
 int (*generate) (gnutls_pk_algorithm_t, unsigned int level /*bits */ ,
 		 gnutls_pk_params_st *);
 
-int
+static int
 _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
 		       gnutls_datum_t * ciphertext,
 		       const gnutls_datum_t * plaintext,
@@ -156,7 +156,7 @@ cleanup:
   return ret;
 }
 
-int
+static int
 _wrap_gcry_pk_decrypt (gnutls_pk_algorithm_t algo,
 		       gnutls_datum_t * plaintext,
 		       const gnutls_datum_t * ciphertext,
@@ -259,7 +259,7 @@ cleanup:
 
 /* in case of DSA puts into data, r,s
  */
-int
+static int
 _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
 		    const gnutls_datum_t * vdata,
 		    const gnutls_pk_params_st * pk_params)
@@ -409,7 +409,7 @@ cleanup:
   return ret;
 }
 
-int
+static int
 _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
 		      const gnutls_datum_t * vdata,
 		      const gnutls_datum_t * signature,

@@ -123,7 +123,6 @@ libgnutls_la_LIBADD += -lws2_32
 endif
 
 if ENABLE_OPENPGP
-libgnutls_la_SOURCES += gnutls_openpgp.c
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
 libgnutls_la_LIBADD += opencdk/libminiopencdk.la
 endif

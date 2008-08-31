@@ -548,7 +548,7 @@ handle_error (socket_st * hd, int err)
 
 int starttls_alarmed = 0;
 
-void
+static void
 starttls_alarm (int signum)
 {
   starttls_alarmed = 1;

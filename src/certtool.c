@@ -104,7 +104,7 @@ main (int argc, char **argv)
   return 0;
 }
 
-const char *
+static const char *
 raw_to_string (const unsigned char *raw, size_t raw_size)
 {
   static char buf[1024];
@@ -125,7 +125,7 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
   return buf;
 }
 
-void
+static void
 print_dsa_pkey (gnutls_datum * x, gnutls_datum * y, gnutls_datum * p,
 		gnutls_datum * q, gnutls_datum * g)
 {
@@ -141,7 +141,7 @@ print_dsa_pkey (gnutls_datum * x, gnutls_datum * y, gnutls_datum * p,
   print_hex_datum (g);
 }
 
-void
+static void
 print_rsa_pkey (gnutls_datum * m, gnutls_datum * e, gnutls_datum * d,
 		gnutls_datum * p, gnutls_datum * q, gnutls_datum * u)
 {
@@ -237,7 +237,7 @@ print_private_key (gnutls_x509_privkey_t key)
   fwrite (buffer, 1, size, outfile);
 }
 
-void
+static void
 generate_private_key (void)
 {
   gnutls_x509_privkey_t key;
@@ -250,7 +250,7 @@ generate_private_key (void)
 }
 
 
-gnutls_x509_crt_t
+static gnutls_x509_crt_t
 generate_certificate (gnutls_x509_privkey_t * ret_key,
 		      gnutls_x509_crt_t ca_crt, int proxy)
 {
@@ -575,7 +575,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 
 }
 
-gnutls_x509_crl_t
+static gnutls_x509_crl_t
 generate_crl (void)
 {
   gnutls_x509_crl_t crl;
@@ -661,7 +661,7 @@ generate_self_signed (void)
   gnutls_x509_privkey_deinit (key);
 }
 
-void
+static void
 generate_signed_certificate (void)
 {
   gnutls_x509_crt_t crt;
@@ -703,7 +703,7 @@ generate_signed_certificate (void)
   gnutls_x509_privkey_deinit (key);
 }
 
-void
+static void
 generate_proxy_certificate (void)
 {
   gnutls_x509_crt_t crt, eecrt;
@@ -737,7 +737,7 @@ generate_proxy_certificate (void)
   gnutls_x509_privkey_deinit (key);
 }
 
-void
+static void
 generate_signed_crl (void)
 {
   gnutls_x509_crl_t crl;
@@ -762,7 +762,7 @@ generate_signed_crl (void)
   gnutls_x509_crl_deinit (crl);
 }
 
-void
+static void
 update_signed_certificate (void)
 {
   gnutls_x509_crt_t crt;
@@ -805,7 +805,7 @@ update_signed_certificate (void)
   gnutls_x509_crt_deinit (crt);
 }
 
-FILE *
+static FILE *
 safe_open_rw (const char *file)
 {
   mode_t oldmask;
@@ -1786,7 +1786,7 @@ static void print_verification_res (gnutls_x509_crt_t crt,
 
 #define CERT_SEP "-----BEGIN CERT"
 #define CRL_SEP "-----BEGIN X509 CRL"
-int
+static int
 _verify_x509_mem (const void *cert, int cert_size)
 {
   int siz, i;
@@ -2370,7 +2370,7 @@ generate_pkcs12 (void)
 
 }
 
-const char *
+static const char *
 BAGTYPE (gnutls_pkcs12_bag_type_t x)
 {
   switch (x)
@@ -2392,7 +2392,7 @@ BAGTYPE (gnutls_pkcs12_bag_type_t x)
     }
 }
 
-void
+static void
 print_bag_data (gnutls_pkcs12_bag_t bag)
 {
   int result;

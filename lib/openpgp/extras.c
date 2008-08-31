@@ -145,6 +145,8 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
    */
   if (format == GNUTLS_OPENPGP_FMT_BASE64)
     {
+      size_t written = 0;
+
       err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
       if (!err)
 	err = cdk_stream_set_armor_flag (input, 0);
@@ -171,7 +173,6 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
 	  goto error;
 	}
 
-      size_t written = 0;
       do
 	{
 	  err =

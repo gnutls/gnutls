@@ -29,7 +29,7 @@
 #include "gnutls_cert.h"
 #include "gnutls_datum.h"
 #include "gnutls_global.h"
-#include "openpgp/gnutls_openpgp.h"
+#include "gnutls_openpgp.h"
 #include "read-file.h"
 #include <gnutls_str.h>
 #include <gnutls_sig.h>

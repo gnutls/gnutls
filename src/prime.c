@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004,2005,2007 Free Software Foundation
+ * Copyright (C) 2004,2005,2007,2008 Free Software Foundation
  * Copyright (C) 2001,2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
@@ -174,7 +174,6 @@ generate_prime (int bits, int how)
   if (!cparams)
     {				/* generate a PKCS#3 structure */
 
-      int ret;
       size_t len = buffer_size;
 
       ret = gnutls_dh_params_export_pkcs3 (dh_params, GNUTLS_X509_FMT_PEM,

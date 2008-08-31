@@ -54,7 +54,7 @@ static const int servwrite_length = sizeof (servwrite) - 1;
  * This function creates the keys and stores them into pending session.
  * (session->cipher_specs)
  */
-int
+static int
 _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 		  int key_size, int export_flag)
 {
@@ -381,7 +381,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   return 0;
 }
 
-int
+static int
 _gnutls_set_read_keys (gnutls_session_t session)
 {
   int hash_size;
@@ -402,7 +402,7 @@ _gnutls_set_read_keys (gnutls_session_t session)
 			   export_flag);
 }
 
-int
+static int
 _gnutls_set_write_keys (gnutls_session_t session)
 {
   int hash_size;

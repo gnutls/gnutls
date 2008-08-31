@@ -643,7 +643,7 @@ cleanup:
 /* Generate client certificate
  */
 
-int
+static int
 _gnutls_gen_x509_crt (gnutls_session_t session, opaque ** data)
 {
   int ret, i;
@@ -702,7 +702,7 @@ enum PGPKeyDescriptorType
 { PGP_KEY_FINGERPRINT, PGP_KEY, PGP_KEY_SUBKEY, PGP_KEY_FINGERPRINT_SUBKEY };
 
 #ifdef ENABLE_OPENPGP
-int
+static int
 _gnutls_gen_openpgp_certificate (gnutls_session_t session, opaque ** data)
 {
   int ret;
@@ -775,7 +775,7 @@ _gnutls_gen_openpgp_certificate (gnutls_session_t session, opaque ** data)
   return ret;
 }
 
-int
+static int
 _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session, opaque ** data)
 {
   int ret, packet_size;
@@ -894,7 +894,7 @@ _gnutls_gen_cert_server_certificate (gnutls_session_t session, opaque ** data)
  */
 
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_gcert_deinit(&peer_certificate_list[x])
-int
+static int
 _gnutls_proc_x509_server_certificate (gnutls_session_t session,
 				      opaque * data, size_t data_size)
 {
@@ -1037,7 +1037,7 @@ cleanup:
 
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_gcert_deinit(&peer_certificate_list[x])
 #ifdef ENABLE_OPENPGP
-int
+static int
 _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
 					 opaque * data, size_t data_size)
 {

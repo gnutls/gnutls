@@ -397,7 +397,7 @@ cdk_keydb_free (cdk_keydb_hd_t hd)
 }
 
 
-cdk_error_t
+static cdk_error_t
 _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t * ret_kr)
 {
   cdk_error_t rc;
@@ -1680,7 +1680,7 @@ keydb_parse_allsigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd, int check)
   return 0;
 }
 
-void
+static void
 add_key_usage (cdk_kbnode_t knode, u32 keyid[2], unsigned int usage)
 {
   cdk_kbnode_t p, ctx;

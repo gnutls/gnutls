@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -29,7 +29,7 @@
 extern int tcp_connect (void);
 extern void tcp_close (int sd);
 
-int
+static int
 client_avp (gnutls_session_t session, void *ptr,
 	    const char *last, size_t lastlen, char **new, size_t * newlen)
 {
