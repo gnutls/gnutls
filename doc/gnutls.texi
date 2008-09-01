@@ -2639,7 +2639,6 @@ Usage: certtool [options]
      -d, --debug LEVEL        specify the debug level. Default is 1.
      -h, --help               shows this help text
      -v, --version            shows the program's version
-     --copyright              shows the program's license
 @end verbatim
 
 The program can be used interactively or non interactively by
@@ -2928,7 +2927,6 @@ Usage:  gnutls-cli [options] hostname
                               algorithms  and modes.
      -h, --help               prints this help
      -v, --version            prints the program's version number
-     --copyright              prints the program's license
 @end verbatim
 
 To connect to a server using PSK authentication, you may use something
@@ -3089,7 +3087,6 @@ Usage: gnutls-serv [options]
                               algorithms  and modes.
      -h, --help               prints this help
      -v, --version            prints the program's version number
-     --copyright              prints the program's license
 @end verbatim
 
 @subsection Setting Up a Test HTTPS Server
