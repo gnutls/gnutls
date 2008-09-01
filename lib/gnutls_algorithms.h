@@ -103,19 +103,6 @@ enum encipher_type
 
 enum encipher_type _gnutls_kx_encipher_type (gnutls_kx_algorithm_t algorithm);
 
-struct gnutls_compression_entry
-{
-  const char *name;
-  gnutls_compression_method_t id;
-  int num;			/* the number reserved in TLS for the specific compression method */
-
-  /* used in zlib compressor */
-  int window_bits;
-  int mem_level;
-  int comp_level;
-};
-typedef struct gnutls_compression_entry gnutls_compression_entry;
-
 /* Functions for sign algorithms. */
 gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm (const char *oid);
 gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk,
