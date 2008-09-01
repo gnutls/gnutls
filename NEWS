@@ -5,10 +5,12 @@ See the end for copying conditions.
 
 * Version 2.5.6 (unreleased)
 
-** Add interface to deal with public key and signature algorithms.
+** libgnutls: Add interface to deal with public key and signature algorithms.
 The functions are called gnutls_pk_list, gnutls_pk_get_id,
 gnutls_sign_list, and gnutls_sign_get_id.  Suggested by Sam
 Varshavchik <mrsam@courier-mta.com>.
+
+** gnutls-cli: Improve --list output to include public key and signature algs.
 
 ** API and ABI modifications:
 gnutls_pk_list: ADDED
