@@ -2091,6 +2091,51 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
   return ret;
 }
 
+/**
+ * gnutls_pk_list - Get a list of supported public key algorithms
+ *
+ * Get a list of supported public key algorithms.
+ *
+ * Returns: a zero-terminated list of #gnutls_pk_algorithm_t integers
+ *   indicating the available ciphers.
+ *
+ * Since: 2.6.0
+ **/
+const gnutls_pk_algorithm_t *
+gnutls_pk_list (void)
+{
+  const static supported_pks[] = {
+    GNUTLS_PK_RSA,
+    GNUTLS_PK_DSA
+  };
+
+  return supported_pks;
+}
+
+/**
+ * gnutls_pk_get_id - Get #gnutls_pk_algorithm_t from a string
+ * @name: is a string containing a public key algorithm name.
+ *
+ * Convert a string to a #gnutls_pk_algorithm_t value.  The names are
+ * compared in a case insensitive way.  For example,
+ * gnutls_pk_get_id("RSA") will return %GNUTLS_PK_RSA.
+ *
+ * Returns: an #gnutls_pk_algorithm_tid of the specified in a string
+ *   public key algorithm, or %GNUTLS_PK_UNKNOWN on failures.
+ *
+ * Since: 2.6.0
+ **/
+gnutls_pk_algorithm_t
+gnutls_pk_get_id (const char *name)
+{
+  if (strcasecmp (name, "RSA") == 0)
+    return GNUTLS_PK_RSA;
+  else if  (strcasecmp (name, "DSA") == 0)
+    return GNUTLS_PK_DSA;
+
+  return GNUTLS_PK_UNKNOWN;
+}
+
 gnutls_pk_algorithm_t
 _gnutls_x509_oid2pk_algorithm (const char *oid)
 {

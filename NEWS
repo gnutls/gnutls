@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 2.5.6 (unreleased)
 
+** Add interface to deal with public key algorithms.
+The functions are called gnutls_pk_list and gnutls_pk_get_id.
+Suggested by Sam Varshavchik <mrsam@courier-mta.com>.
+
+** API and ABI modifications:
+gnutls_pk_list: ADDED
+gnutls_pk_get_id: ADDED
+
 * Version 2.5.5 (released 2008-08-29)
 
 ** libgnutls: New API to get a string corresponding to a error symbol.
