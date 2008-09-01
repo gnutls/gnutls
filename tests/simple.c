@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -31,14 +31,37 @@
 void
 doit (void)
 {
-  if (debug)
-    {
-      printf ("GNUTLS header version %s.\n", LIBGNUTLS_VERSION);
-      printf ("GNUTLS library version %s.\n", gnutls_check_version (NULL));
-    }
+  printf ("GNUTLS header version %s.\n", LIBGNUTLS_VERSION);
+  printf ("GNUTLS library version %s.\n", gnutls_check_version (NULL));
 
   if (gnutls_check_version (LIBGNUTLS_VERSION))
     success ("gnutls_check_version OK\n");
   else
     fail ("gnutls_check_version ERROR\n");
+
+  {
+    const gnutls_pk_algorithm_t *algs;
+    size_t i;
+    int pk;
+
+    algs = gnutls_pk_list ();
+    if (!algs)
+      fail ("gnutls_pk_list return NULL\n");
+
+    for (i = 0; algs[i]; i++)
+      {
+	printf ("pk_list[%d] = %d = %s = %d\n", i, algs[i],
+		gnutls_pk_algorithm_get_name (algs[i]),
+		gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i])));
+	if (gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i]))
+	    != algs[i])
+	  fail ("gnutls_pk id's doesn't match\n");
+      }
+
+    pk = gnutls_pk_get_id ("foo");
+    if (pk != GNUTLS_PK_UNKNOWN)
+      fail ("gnutls_pk unknown test failed (%d)\n", pk);
+
+    success ("gnutls_pk_list ok\n");
+  }
 }
