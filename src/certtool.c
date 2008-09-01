@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *               
+ *
  * GNUTLS is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *                               
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -2672,7 +2672,9 @@ smime_to_pkcs7 (void)
 void
 certtool_version (void)
 {
-  version_etc (stdout, program_name, PACKAGE_STRING,
-	       gnutls_check_version (NULL), "Nikos Mavrogiannopoulos",
-	       "Simon Josefsson", (char *) NULL);
+  const char *p = PACKAGE_NAME;
+  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
+    p = PACKAGE_STRING;
+  version_etc (stdout, program_name, p, gnutls_check_version (NULL),
+	       "Nikos Mavrogiannopoulos", "Simon Josefsson", (char *) NULL);
 }
