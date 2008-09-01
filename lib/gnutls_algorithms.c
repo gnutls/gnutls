@@ -1746,7 +1746,7 @@ static const gnutls_sign_entry sign_algorithms[] = {
 
 /* Keep the contents of this struct the same as the previous one. */
 static const gnutls_sign_algorithm_t supported_sign[] = {
-  GNUTLS_SIGN_RSA_SHA1
+  GNUTLS_SIGN_RSA_SHA1,
   GNUTLS_SIGN_RSA_SHA256,
   GNUTLS_SIGN_RSA_SHA384,
   GNUTLS_SIGN_RSA_SHA512,
