@@ -234,7 +234,7 @@ typedef struct gnutls_key_st *gnutls_key_st;
 
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
-#include <gnutls_compress_int.h>
+#include <gnutls_compress.h>
 #include <gnutls_cert.h>
 
 typedef struct

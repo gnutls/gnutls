@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -21,6 +21,8 @@
  * USA
  *
  */
+#ifndef GNUTLS_COMPRESS_H
+# define GNUTLS_COMPRESS_H
 
 int _gnutls_m_plaintext2compressed (gnutls_session_t session,
 				    gnutls_datum_t * compressed,
@@ -28,3 +30,26 @@ int _gnutls_m_plaintext2compressed (gnutls_session_t session,
 int _gnutls_m_compressed2plaintext (gnutls_session_t session,
 				    gnutls_datum_t * plain,
 				    const gnutls_datum_t* compressed);
+
+#ifdef HAVE_LIBZ
+# include <zlib.h>
+#endif
+
+#define GNUTLS_COMP_FAILED NULL
+
+typedef struct comp_hd_t_STRUCT
+{
+  void *handle;
+  gnutls_compression_method_t algo;
+} *comp_hd_t;
+
+comp_hd_t _gnutls_comp_init (gnutls_compression_method_t, int d);
+void _gnutls_comp_deinit (comp_hd_t handle, int d);
+
+int _gnutls_decompress (comp_hd_t handle, opaque * compressed,
+			size_t compressed_size, opaque ** plain,
+			size_t max_record_size);
+int _gnutls_compress (comp_hd_t, const opaque * plain, size_t plain_size,
+		      opaque ** compressed, size_t max_comp_size);
+
+#endif
