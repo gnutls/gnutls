@@ -57,6 +57,12 @@ int _gnutls_string_append_data (gnutls_string *, const void *data,
 				size_t data_size);
 int _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...);
 
+typedef gnutls_string gnutls_buffer;
+
+#define _gnutls_buffer_init(buf) _gnutls_string_init(buf, gnutls_malloc, gnutls_realloc, gnutls_free);
+#define _gnutls_buffer_clear _gnutls_string_clear
+#define _gnutls_buffer_append _gnutls_string_append_data
+
 char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
 		       size_t buffer_size);
 int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,

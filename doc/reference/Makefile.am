@@ -56,7 +56,7 @@ IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
 	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
 	gnutls_db.h gnutls_priority.h gnutls_auth.h auth_anon.h		\
-	gnutls_extensions.h gnutls_buffer.h gnutls_random.h x509_b64.h	\
+	gnutls_extensions.h gnutls_random.h x509_b64.h			\
 	gnutls_v2_compat.h gnutls_errors_int.h gnutls_datum.h		\
 	auth_cert.h gnutls_mpi.h gnutls_pk.h gnutls_record.h		\
 	gnutls_cert.h gnutls_constate.h gnutls_global.h strfile.h	\

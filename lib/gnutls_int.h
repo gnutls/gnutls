@@ -123,7 +123,7 @@ typedef enum handshake_state_t
   STATE70, STATE71
 } handshake_state_t;
 
-#include <gnutls_buffer.h>
+#include <gnutls_str.h>
 
 /* This is the maximum number of algorithms (ciphers or macs etc).
  * keep it synced with GNUTLS_MAX_ALGORITHM_NUM in gnutls.h
