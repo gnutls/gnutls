@@ -32,7 +32,8 @@ arpa/inet.h:
 	@MKDIR_P@ arpa
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_ARPA_INET_H''@|$(NEXT_ARPA_INET_H)|g' \
 	      -e 's|@''HAVE_ARPA_INET_H''@|$(HAVE_ARPA_INET_H)|g' \
 	      -e 's|@''GNULIB_INET_NTOP''@|$(GNULIB_INET_NTOP)|g' \
@@ -172,7 +173,8 @@ netinet/in.h: netinet_in.in.h
 	@MKDIR_P@ netinet
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_NETINET_IN_H''@|$(NEXT_NETINET_IN_H)|g' \
 	      -e 's|@''HAVE_NETINET_IN_H''@|$(HAVE_NETINET_IN_H)|g' \
 	      < $(srcdir)/netinet_in.in.h; \
@@ -209,7 +211,8 @@ BUILT_SOURCES += $(STDARG_H)
 stdarg.h: stdarg.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_STDARG_H''@|$(NEXT_STDARG_H)|g' \
 	      < $(srcdir)/stdarg.in.h; \
 	} > $@-t

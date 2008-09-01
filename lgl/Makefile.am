@@ -84,7 +84,8 @@ BUILT_SOURCES += $(FLOAT_H)
 float.h: float.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_FLOAT_H''@|$(NEXT_FLOAT_H)|g' \
 	      < $(srcdir)/float.in.h; \
 	} > $@-t
@@ -253,7 +254,8 @@ stdint.h: stdint.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's/@''HAVE_STDINT_H''@/$(HAVE_STDINT_H)/g' \
-	      -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_STDINT_H''@|$(NEXT_STDINT_H)|g' \
 	      -e 's/@''HAVE_SYS_TYPES_H''@/$(HAVE_SYS_TYPES_H)/g' \
 	      -e 's/@''HAVE_INTTYPES_H''@/$(HAVE_INTTYPES_H)/g' \
@@ -292,7 +294,8 @@ BUILT_SOURCES += stdio.h
 stdio.h: stdio.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_STDIO_H''@|$(NEXT_STDIO_H)|g' \
 	      -e 's|@''GNULIB_FPRINTF_POSIX''@|$(GNULIB_FPRINTF_POSIX)|g' \
 	      -e 's|@''GNULIB_PRINTF_POSIX''@|$(GNULIB_PRINTF_POSIX)|g' \
@@ -357,7 +360,8 @@ BUILT_SOURCES += stdlib.h
 stdlib.h: stdlib.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_STDLIB_H''@|$(NEXT_STDLIB_H)|g' \
 	      -e 's|@''GNULIB_MALLOC_POSIX''@|$(GNULIB_MALLOC_POSIX)|g' \
 	      -e 's|@''GNULIB_REALLOC_POSIX''@|$(GNULIB_REALLOC_POSIX)|g' \
@@ -411,7 +415,8 @@ BUILT_SOURCES += string.h
 string.h: string.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_STRING_H''@|$(NEXT_STRING_H)|g' \
 	      -e 's|@''GNULIB_MBSLEN''@|$(GNULIB_MBSLEN)|g' \
 	      -e 's|@''GNULIB_MBSNLEN''@|$(GNULIB_MBSNLEN)|g' \
@@ -487,7 +492,8 @@ BUILT_SOURCES += strings.h
 strings.h: strings.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_STRINGS_H''@|$(NEXT_STRINGS_H)|g' \
 	      -e 's|@''HAVE_STRCASECMP''@|$(HAVE_STRCASECMP)|g' \
 	      -e 's|@''HAVE_DECL_STRNCASECMP''@|$(HAVE_DECL_STRNCASECMP)|g' \
@@ -519,7 +525,8 @@ BUILT_SOURCES += $(SYS_SOCKET_H)
 sys/socket.h: sys_socket.in.h
 	@MKDIR_P@ sys
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_SYS_SOCKET_H''@|$(NEXT_SYS_SOCKET_H)|g' \
 	      -e 's|@''HAVE_SYS_SOCKET_H''@|$(HAVE_SYS_SOCKET_H)|g' \
 	      -e 's|@''HAVE_WINSOCK2_H''@|$(HAVE_WINSOCK2_H)|g' \
@@ -544,7 +551,8 @@ sys/stat.h: sys_stat.in.h
 	@MKDIR_P@ sys
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_SYS_STAT_H''@|$(NEXT_SYS_STAT_H)|g' \
 	      -e 's|@''HAVE_LSTAT''@|$(HAVE_LSTAT)|g' \
 	      -e 's|@''REPLACE_MKDIR''@|$(REPLACE_MKDIR)|g' \
@@ -567,7 +575,8 @@ BUILT_SOURCES += time.h
 time.h: time.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */' && \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@NEXT_TIME_H''@|$(NEXT_TIME_H)|g' \
 	      -e 's|@REPLACE_LOCALTIME_R''@|$(REPLACE_LOCALTIME_R)|g' \
 	      -e 's|@REPLACE_NANOSLEEP''@|$(REPLACE_NANOSLEEP)|g' \
@@ -603,7 +612,8 @@ unistd.h: unistd.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''HAVE_UNISTD_H''@|$(HAVE_UNISTD_H)|g' \
-	      -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_UNISTD_H''@|$(NEXT_UNISTD_H)|g' \
 	      -e 's|@''GNULIB_CHOWN''@|$(GNULIB_CHOWN)|g' \
 	      -e 's|@''GNULIB_DUP2''@|$(GNULIB_DUP2)|g' \
@@ -668,7 +678,8 @@ BUILT_SOURCES += $(WCHAR_H)
 wchar.h: wchar.in.h
 	rm -f $@-t $@
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's/@''INCLUDE_NEXT''@/$(INCLUDE_NEXT)/g' \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_WCHAR_H''@|$(NEXT_WCHAR_H)|g' \
 	      -e 's/@''HAVE_WCHAR_H''@/$(HAVE_WCHAR_H)/g' \
 	      -e 's|@''GNULIB_WCWIDTH''@|$(GNULIB_WCWIDTH)|g' \
