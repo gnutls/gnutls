@@ -27,6 +27,11 @@
 #include <gnutls_record.h>
 #include <debug.h>
 
+/* I18n of error codes. */
+#include "gettext.h"
+#define _(String) dgettext (PACKAGE, String)
+#define N_(String) gettext_noop (String)
+
 typedef struct
 {
   gnutls_alert_description_t alert;
@@ -34,67 +39,62 @@ typedef struct
 } gnutls_alert_entry;
 
 static const gnutls_alert_entry sup_alerts[] = {
-  {GNUTLS_A_CLOSE_NOTIFY, "Close notify"},
-  {GNUTLS_A_UNEXPECTED_MESSAGE, "Unexpected message"},
-  {GNUTLS_A_BAD_RECORD_MAC, "Bad record MAC"},
-  {GNUTLS_A_DECRYPTION_FAILED, "Decryption failed"},
-  {GNUTLS_A_RECORD_OVERFLOW, "Record overflow"},
-  {GNUTLS_A_DECOMPRESSION_FAILURE, "Decompression failed"},
-  {GNUTLS_A_HANDSHAKE_FAILURE, "Handshake failed"},
-  {GNUTLS_A_BAD_CERTIFICATE, "Certificate is bad"},
-  {GNUTLS_A_UNSUPPORTED_CERTIFICATE, "Certificate is not supported"},
-  {GNUTLS_A_CERTIFICATE_REVOKED, "Certificate was revoked"},
-  {GNUTLS_A_CERTIFICATE_EXPIRED, "Certificate is expired"},
-  {GNUTLS_A_CERTIFICATE_UNKNOWN, "Unknown certificate"},
-  {GNUTLS_A_ILLEGAL_PARAMETER, "Illegal parameter"},
-  {GNUTLS_A_UNKNOWN_CA, "CA is unknown"},
-  {GNUTLS_A_ACCESS_DENIED, "Access was denied"},
-  {GNUTLS_A_DECODE_ERROR, "Decode error"},
-  {GNUTLS_A_DECRYPT_ERROR, "Decrypt error"},
-  {GNUTLS_A_EXPORT_RESTRICTION, "Export restriction"},
-  {GNUTLS_A_PROTOCOL_VERSION, "Error in protocol version"},
-  {GNUTLS_A_INSUFFICIENT_SECURITY, "Insufficient security"},
-  {GNUTLS_A_USER_CANCELED, "User canceled"},
-  {GNUTLS_A_INTERNAL_ERROR, "Internal error"},
-  {GNUTLS_A_NO_RENEGOTIATION, "No renegotiation is allowed"},
+  {GNUTLS_A_CLOSE_NOTIFY, N_("Close notify")},
+  {GNUTLS_A_UNEXPECTED_MESSAGE, N_("Unexpected message")},
+  {GNUTLS_A_BAD_RECORD_MAC, N_("Bad record MAC")},
+  {GNUTLS_A_DECRYPTION_FAILED, N_("Decryption failed")},
+  {GNUTLS_A_RECORD_OVERFLOW, N_("Record overflow")},
+  {GNUTLS_A_DECOMPRESSION_FAILURE, N_("Decompression failed")},
+  {GNUTLS_A_HANDSHAKE_FAILURE, N_("Handshake failed")},
+  {GNUTLS_A_BAD_CERTIFICATE, N_("Certificate is bad")},
+  {GNUTLS_A_UNSUPPORTED_CERTIFICATE, N_("Certificate is not supported")},
+  {GNUTLS_A_CERTIFICATE_REVOKED, N_("Certificate was revoked")},
+  {GNUTLS_A_CERTIFICATE_EXPIRED, N_("Certificate is expired")},
+  {GNUTLS_A_CERTIFICATE_UNKNOWN, N_("Unknown certificate")},
+  {GNUTLS_A_ILLEGAL_PARAMETER, N_("Illegal parameter")},
+  {GNUTLS_A_UNKNOWN_CA, N_("CA is unknown")},
+  {GNUTLS_A_ACCESS_DENIED, N_("Access was denied")},
+  {GNUTLS_A_DECODE_ERROR, N_("Decode error")},
+  {GNUTLS_A_DECRYPT_ERROR, N_("Decrypt error")},
+  {GNUTLS_A_EXPORT_RESTRICTION, N_("Export restriction")},
+  {GNUTLS_A_PROTOCOL_VERSION, N_("Error in protocol version")},
+  {GNUTLS_A_INSUFFICIENT_SECURITY, N_("Insufficient security")},
+  {GNUTLS_A_USER_CANCELED, N_("User canceled")},
+  {GNUTLS_A_INTERNAL_ERROR, N_("Internal error")},
+  {GNUTLS_A_NO_RENEGOTIATION, N_("No renegotiation is allowed")},
   {GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
-   "Could not retrieve the specified certificate"},
-  {GNUTLS_A_UNSUPPORTED_EXTENSION, "An unsupported extension was sent"},
+   N_("Could not retrieve the specified certificate")},
+  {GNUTLS_A_UNSUPPORTED_EXTENSION, N_("An unsupported extension was sent")},
   {GNUTLS_A_UNRECOGNIZED_NAME,
-   "The server name sent was not recognized"},
+   N_("The server name sent was not recognized")},
   {GNUTLS_A_UNKNOWN_PSK_IDENTITY,
-   "The SRP/PSK username is missing or not known"},
+   N_("The SRP/PSK username is missing or not known")},
   {GNUTLS_A_INNER_APPLICATION_FAILURE,
-   "Inner application negotiation failed"},
+   N_("Inner application negotiation failed")},
   {GNUTLS_A_INNER_APPLICATION_VERIFICATION,
-   "Inner application verification failed"},
+   N_("Inner application verification failed")},
   {0, NULL}
 };
 
-#define GNUTLS_ALERT_LOOP(b) \
-        const gnutls_alert_entry *p; \
-                for(p = sup_alerts; p->desc != NULL; p++) { b ; }
-
-#define GNUTLS_ALERT_ID_LOOP(a) \
-                        GNUTLS_ALERT_LOOP( if(p->alert == alert) { a; break; })
-
 /**
-  * gnutls_alert_get_name - Returns a string describing the alert number given
-  * @alert: is an alert number #gnutls_session_t structure.
-  *
-  * This function will return a string that describes the given alert
-  * number, or %NULL.  See gnutls_alert_get().
-  *
-  * Returns: string corresponding to #gnutls_alert_description_t value.
-  **/
+ * gnutls_alert_get_name - Returns a string describing the alert number given
+ * @alert: is an alert number #gnutls_session_t structure.
+ *
+ * This function will return a string that describes the given alert
+ * number, or %NULL.  See gnutls_alert_get().
+ *
+ * Returns: string corresponding to #gnutls_alert_description_t value.
+ **/
 const char *
 gnutls_alert_get_name (gnutls_alert_description_t alert)
 {
-  const char *ret = NULL;
+  const gnutls_alert_entry *p;
 
-  GNUTLS_ALERT_ID_LOOP (ret = p->desc);
+  for (p = sup_alerts; p->desc != NULL; p++)
+    if (p->alert == alert)
+      return _(p->desc);
 
-  return ret;
+  return NULL;
 }
 
 /**
@@ -165,7 +165,7 @@ gnutls_error_to_alert (int err, int *level)
       /* GNUTLS_A_DECRYPTION_FAILED is not sent, because
        * it is not defined in SSL3. Note that we must
        * not distinguish Decryption failures from mac
-       * check failures, due to the possibility of some 
+       * check failures, due to the possibility of some
        * attacks.
        */
       ret = GNUTLS_A_BAD_RECORD_MAC;
@@ -255,7 +255,7 @@ gnutls_error_to_alert (int err, int *level)
 }
 
 /**
- * gnutls_alert_send_appropriate - send an alert to the peer depending on the error code
+ * gnutls_alert_send_appropriate - send alert to peer depending on error code
  * @session: is a #gnutls_session_t structure.
  * @err: is an integer
  *
