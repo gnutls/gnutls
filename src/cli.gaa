@@ -4,7 +4,6 @@
 
 #include <common.h>
 
-void print_license(void);
 void cli_version(void);
 
 #}
@@ -117,7 +116,6 @@ option (l, list) { print_list($verbose); exit(0); } "Print a list of the support
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 option (v, version) { cli_version(); exit(0); } "prints the program's version number"
-option ( copyright) { print_license(); exit(0); } "prints the program's license"
 
 #char *rest_args;
 rest STR "hostname" { $rest_args = $1; }

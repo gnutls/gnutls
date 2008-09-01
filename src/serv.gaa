@@ -2,7 +2,6 @@
 
 #include <common.h>
 
-void print_serv_license(void);
 void serv_version(void);
 
 #}
@@ -116,7 +115,6 @@ option (l, list) { print_list(0); exit(0); } "Print a list of the supported algo
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 option (v, version) { serv_version(); exit(0); } "prints the program's version number"
-option ( copyright) { print_serv_license(); exit(0); } "prints the program's license"
 
 INCOMP ra
 
