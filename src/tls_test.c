@@ -8,12 +8,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *               
+ *
  * GNUTLS is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *                               
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,6 +31,8 @@
 #include <tests.h>
 #include <common.h>
 #include <tls_test-gaa.h>
+
+#include <version-etc.h>
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
@@ -86,7 +88,7 @@ static const TLS_TEST tls_tests[] = {
   {"for version rollback bug in Client Hello", test_version_rollback,
    "no", "yes", "dunno"},
 
-  /* this test will disable TLS 1.0 if the server is 
+  /* this test will disable TLS 1.0 if the server is
    * buggy */
   {"whether we need to disable TLS 1.0", test_tls_disable, "no", "yes",
    "dunno"},
@@ -327,9 +329,9 @@ gaa_parser (int argc, char **argv)
 void
 tls_test_version (void)
 {
-  const char *v = gnutls_check_version (NULL);
-
-  printf ("gnutls-cli-debug (GnuTLS) %s\n", LIBGNUTLS_VERSION);
-  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
-    printf ("libgnutls %s\n", v);
+  const char *p = PACKAGE_NAME;
+  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
+    p = PACKAGE_STRING;
+  version_etc (stdout, "gnutls-cli-debug", p, gnutls_check_version (NULL),
+	       "Nikos Mavrogiannopoulos", (char *) NULL);
 }
