@@ -64,4 +64,30 @@ doit (void)
 
     success ("gnutls_pk_list ok\n");
   }
+
+  {
+    const gnutls_sign_algorithm_t *algs;
+    size_t i;
+    int pk;
+
+    algs = gnutls_sign_list ();
+    if (!algs)
+      fail ("gnutls_sign_list return NULL\n");
+
+    for (i = 0; algs[i]; i++)
+      {
+	printf ("sign_list[%d] = %d = %s = %d\n", i, algs[i],
+		gnutls_sign_algorithm_get_name (algs[i]),
+		gnutls_sign_get_id (gnutls_sign_algorithm_get_name (algs[i])));
+	if (gnutls_sign_get_id (gnutls_sign_algorithm_get_name (algs[i]))
+	    != algs[i])
+	  fail ("gnutls_sign id's doesn't match\n");
+      }
+
+    pk = gnutls_sign_get_id ("foo");
+    if (pk != GNUTLS_PK_UNKNOWN)
+      fail ("gnutls_sign unknown test failed (%d)\n", pk);
+
+    success ("gnutls_sign_list ok\n");
+  }
 }
