@@ -8,12 +8,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *               
+ *
  * GNUTLS is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *                               
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,6 +36,10 @@
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 #include <gcrypt.h>
+
+/* Gnulib portability files. */
+#include <progname.h>
+#include <version-etc.h>
 
 #include "error.h"
 #include "read-file.h"
@@ -576,6 +580,8 @@ main (int argc, char **argv)
   int user_term = 0;
   socket_st hd;
 
+  set_program_name (argv[0]);
+
   gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   if ((ret = gnutls_global_init ()) < 0)
@@ -882,11 +888,11 @@ gaa_parser (int argc, char **argv)
 void
 cli_version (void)
 {
-  const char *v = gnutls_check_version (NULL);
-
-  printf ("gnutls-cli (GnuTLS) %s\n", LIBGNUTLS_VERSION);
-  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
-    printf ("libgnutls %s\n", v);
+  const char *p = PACKAGE_NAME;
+  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
+    p = PACKAGE_STRING;
+  version_etc (stdout, program_name, p, gnutls_check_version (NULL),
+	       "Nikos Mavrogiannopoulos", (char *) NULL);
 }
 
 
