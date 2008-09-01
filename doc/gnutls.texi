@@ -362,9 +362,7 @@ Technically @acronym{GnuTLS} is a portable ANSI C based library which
 implements the TLS 1.1 and SSL 3.0 protocols (@xref{Introduction to
 TLS}, for a more detailed description of the protocols), accompanied
 with the required framework for authentication and public key
-infrastructure.  The library is available under the GNU Lesser GPL
-license@footnote{A copy of the license is included in the
-distribution}.  Important features of the @acronym{GnuTLS} library
+infrastructure.  Important features of the @acronym{GnuTLS} library
 include:
 
 @itemize
@@ -3412,9 +3410,9 @@ Their prototypes lie in @file{gnutls/x509.h}.
 @section @acronym{GnuTLS-extra} Functions
 @cindex @acronym{GnuTLS-extra} functions
 
-These functions are only available in the GPL version of the library
-called @code{gnutls-extra}. The prototypes for this library lie in
-@file{gnutls/extra.h}.
+These functions are only available in the GPLv3+ version of the
+library called @code{gnutls-extra}. The prototypes for this library
+lie in @file{gnutls/extra.h}.
 
 @include gnutls-extra-api.texi
 
@@ -3425,8 +3423,7 @@ called @code{gnutls-extra}. The prototypes for this library lie in
 
 The following functions are to be used for @acronym{OpenPGP}
 certificate handling.  Their prototypes lie in
-@file{gnutls/openpgp.h}.  You need to link with @file{libgnutls-extra}
-to be able to use these functions (@pxref{GnuTLS-extra functions}).
+@file{gnutls/openpgp.h}.
 
 @include pgp-api.texi
 
@@ -3746,9 +3743,9 @@ have to.
 
 The APIs need to be added to @code{includes/gnutls/gnutls.h} or
 @code{includes/gnutls/extra.h} as appropriate.  It is recommended that
-if you don't have a requirement to use the LGPL license for your
-extension, that you place your work under the GPL license and thus in
-the libgnutls-extra library.
+if you don't have a requirement to use the LGPLv2.1+ license for your
+extension, that you place your work under the GPLv3+ license and thus
+in the libgnutls-extra library.
 
 You can implement the API function in the @code{ext_foobar.c} file, or
 if that file ends up becoming rather larger, add a
