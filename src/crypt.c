@@ -21,22 +21,6 @@
 
 #include <config.h>
 
-/* Gnulib portability files. */
-#include <version-etc.h>
-
-#ifndef ENABLE_SRP
-
-#include <stdio.h>
-
-int
-main (int argc, char **argv)
-{
-  printf ("\nSRP not supported. This program is a dummy.\n\n");
-  return 1;
-};
-
-#else
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -57,8 +41,8 @@ main (int argc, char **argv)
 
 /* Gnulib portability files. */
 #include <getpass.h>
-
-#define _MAX(x,y) (x>y?x:y)
+#include <minmax.h>
+#include <version-etc.h>
 
 /* This may need some rewrite. A lot of stuff which should be here
  * are in the library, which is not good.
@@ -288,7 +272,7 @@ find_strchr (char *username, char *file)
 	{
 	  i++;
 	}
-      if (strncmp (username, line, _MAX (i, strlen (username))) == 0)
+      if (strncmp (username, line, MAX (i, strlen (username))) == 0)
 	{
 	  /* find the index */
 	  pos = strrchr (line, ':');
@@ -368,7 +352,7 @@ verify_passwd (char *conffile, char *tpasswd, char *username,
 	{
 	  i++;
 	}
-      if (strncmp (username, line, _MAX (i, strlen (username))) == 0)
+      if (strncmp (username, line, MAX (i, strlen (username))) == 0)
 	{
 	  char *verifier_pos, *salt_pos;
 
@@ -633,9 +617,8 @@ crypt_int (const char *username, const char *passwd, int salt_size,
 	  if (pp == NULL)
 	    continue;
 
-	  if (strncmp
-	      (p, username,
-	       _MAX (strlen (username), (unsigned int) (pp - p))) == 0)
+	  if (strncmp (p, username,
+		       MAX (strlen (username), (unsigned int) (pp - p))) == 0)
 	    {
 	      put = 1;
 	      fprintf (fd, "%s:%s:%u\n", username, cr, iindex);
@@ -726,8 +709,6 @@ read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n, char *str)
 
   return index;
 }
-
-#endif /* ENABLE_SRP */
 
 void
 srptool_version (void)
