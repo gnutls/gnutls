@@ -48,8 +48,6 @@ int _gnutls_supported_ciphersuites (gnutls_session_t session,
 				    cipher_suite_st ** ciphers);
 int _gnutls_supported_ciphersuites_sorted (gnutls_session_t session,
 					   cipher_suite_st ** ciphers);
-int _gnutls_supported_compression_methods (gnutls_session_t session,
-					   uint8_t ** comp);
 const char *_gnutls_cipher_suite_get_name (cipher_suite_st * algorithm);
 gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo (const
 								cipher_suite_st
@@ -76,15 +74,6 @@ int _gnutls_kx_needs_dh_params (gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_needs_rsa_params (gnutls_kx_algorithm_t algorithm);
 mod_auth_st *_gnutls_kx_auth_struct (gnutls_kx_algorithm_t algorithm);
 int _gnutls_kx_is_ok (gnutls_kx_algorithm_t algorithm);
-
-/* Functions for compression. */
-int _gnutls_compression_is_ok (gnutls_compression_method_t algorithm);
-int _gnutls_compression_get_num (gnutls_compression_method_t algorithm);
-gnutls_compression_method_t _gnutls_compression_get_id (int num);
-int _gnutls_compression_get_mem_level (gnutls_compression_method_t algorithm);
-int _gnutls_compression_get_comp_level (gnutls_compression_method_t
-					algorithm);
-int _gnutls_compression_get_wbits (gnutls_compression_method_t algorithm);
 
 /* Type to KX mappings. */
 gnutls_kx_algorithm_t _gnutls_map_kx_get_kx (gnutls_credentials_type_t type,
@@ -116,7 +105,5 @@ int _gnutls_cipher_priority (gnutls_session_t session,
 			     gnutls_cipher_algorithm_t algorithm);
 int _gnutls_kx_priority (gnutls_session_t session,
 			 gnutls_kx_algorithm_t algorithm);
-int _gnutls_compression_priority (gnutls_session_t session,
-				  gnutls_compression_method_t algorithm);
 
 #endif
