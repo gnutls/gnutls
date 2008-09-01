@@ -706,7 +706,7 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 
 /**
  * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
- * @algorithm: is a MAC algorithm name
+ * @name: is a MAC algorithm name
  *
  * Convert a string to a #gnutls_mac_algorithm_t value.  The names are
  * compared in a case insensitive way.
@@ -836,7 +836,7 @@ gnutls_compression_get_name (gnutls_compression_method_t algorithm)
 
 /**
  * gnutls_compression_get_id - Returns the gnutls id of the specified in string algorithm
- * @algorithm: is a compression method name
+ * @name: is a compression method name
  *
  * The names are compared in a case insensitive way.
  *
@@ -1032,7 +1032,7 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 
 /**
  * gnutls_cipher_get_id - Returns the gnutls id of the specified in string algorithm
- * @algorithm: is a MAC algorithm name
+ * @name: is a MAC algorithm name
  *
  * The names are compared in a case insensitive way.
  *
@@ -1125,7 +1125,7 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 
 /**
  * gnutls_kx_get_id - Returns the gnutls id of the specified in string algorithm
- * @algorithm: is a KX name
+ * @name: is a KX name
  *
  * Convert a string to a #gnutls_kx_algorithm_t value.  The names are
  * compared in a case insensitive way.
@@ -1271,14 +1271,14 @@ gnutls_protocol_get_name (gnutls_protocol_t version)
 }
 
 /**
-  * gnutls_protocol_get_id - Returns the gnutls id of the specified in string protocol
-  * @algorithm: is a protocol name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified protocol, or
-  * %GNUTLS_VERSION_UNKNOWN on error.
-  **/
+ * gnutls_protocol_get_id - Returns the gnutls id of the specified in string protocol
+ * @name: is a protocol name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: an id of the specified protocol, or
+ * %GNUTLS_VERSION_UNKNOWN on error.
+ **/
 gnutls_protocol_t
 gnutls_protocol_get_id (const char *name)
 {
@@ -1869,14 +1869,14 @@ gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
 }
 
 /**
-  * gnutls_certificate_type_get_id - Returns the gnutls id of the specified in string type
-  * @name: is a certificate type name
-  *
-  * The names are compared in a case insensitive way.
-  *
-  * Returns: an id of the specified in a string certificate type, or
-  * %GNUTLS_CRT_UNKNOWN on error.
-  **/
+ * gnutls_certificate_type_get_id - Returns the gnutls id of the specified in string type
+ * @name: is a certificate type name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: an #gnutls_certificate_type_t for the specified in a
+ *   string certificate type, or %GNUTLS_CRT_UNKNOWN on error.
+ **/
 gnutls_certificate_type_t
 gnutls_certificate_type_get_id (const char *name)
 {
@@ -2067,14 +2067,14 @@ static const gnutls_pk_entry pk_algorithms[] = {
 };
 
 /**
-  * gnutls_pk_algorithm_get_name - Returns a string with the name of the specified public key algorithm
-  * @algorithm: is a pk algorithm
-  *
-  * Convert a #gnutls_pk_algorithm_t value to a string.
-  *
-  * Returns: a string that contains the name of the specified public
-  *   key algorithm, or %NULL.
-  **/
+ * gnutls_pk_algorithm_get_name - Get string with name of public key algorithm
+ * @algorithm: is a pk algorithm
+ *
+ * Convert a #gnutls_pk_algorithm_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified public
+ *   key algorithm, or %NULL.
+ **/
 const char *
 gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
 {
