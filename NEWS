@@ -10,6 +10,8 @@ The functions are called gnutls_pk_list, gnutls_pk_get_id,
 gnutls_sign_list, and gnutls_sign_get_id.  Suggested by Sam
 Varshavchik <mrsam@courier-mta.com>.
 
+** libgnutls: Refactor and clean up some code.
+
 ** gnutls-cli: Improve --list output to include public key and signature algs.
 
 ** API and ABI modifications:
