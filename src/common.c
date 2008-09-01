@@ -756,6 +756,34 @@ print_list (int verbose)
 	  printf ("\n");
       }
   }
+
+  {
+    const gnutls_pk_algorithm_t *p = gnutls_pk_list ();
+
+    printf ("Public Key Systems: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_pk_algorithm_get_name (*p));
+	if (*(p + 1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
+
+  {
+    const gnutls_sign_algorithm_t *p = gnutls_sign_list ();
+
+    printf ("PK-signatures: ");
+    for (; *p; p++)
+      {
+	printf ("%s", gnutls_sign_algorithm_get_name (*p));
+	if (*(p + 1))
+	  printf (", ");
+	else
+	  printf ("\n");
+      }
+  }
 }
 
 void
