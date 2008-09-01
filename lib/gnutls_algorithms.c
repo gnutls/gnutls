@@ -2104,9 +2104,10 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
 const gnutls_pk_algorithm_t *
 gnutls_pk_list (void)
 {
-  const static supported_pks[] = {
+  const static gnutls_pk_algorithm_t supported_pks[] = {
     GNUTLS_PK_RSA,
-    GNUTLS_PK_DSA
+    GNUTLS_PK_DSA,
+    0
   };
 
   return supported_pks;
