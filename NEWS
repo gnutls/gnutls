@@ -13,6 +13,8 @@ Varshavchik <mrsam@courier-mta.com>.
 ** API and ABI modifications:
 gnutls_pk_list: ADDED
 gnutls_pk_get_id: ADDED
+gnutls_sign_list: ADDED
+gnutls_sign_get_id: ADDED
 
 * Version 2.5.5 (released 2008-08-29)
 
