@@ -1744,6 +1744,19 @@ static const gnutls_sign_entry sign_algorithms[] = {
   {0, 0, 0, 0, 0}
 };
 
+/* Keep the contents of this struct the same as the previous one. */
+static const gnutls_sign_algorithm_t supported_sign[] = {
+  GNUTLS_SIGN_RSA_SHA1
+  GNUTLS_SIGN_RSA_SHA256,
+  GNUTLS_SIGN_RSA_SHA384,
+  GNUTLS_SIGN_RSA_SHA512,
+  GNUTLS_SIGN_RSA_RMD160,
+  GNUTLS_SIGN_DSA_SHA1,
+  GNUTLS_SIGN_RSA_MD5,
+  GNUTLS_SIGN_RSA_MD2,
+  0
+};
+
 #define GNUTLS_SIGN_LOOP(b) \
   do {								       \
     const gnutls_sign_entry *p;					       \
@@ -1771,6 +1784,41 @@ gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign)
   GNUTLS_SIGN_ALG_LOOP (ret = p->name);
 
   return ret;
+}
+
+/**
+ * gnutls_sign_list - Get a list of supported public key signature algorithms
+ *
+ * Get a list of supported public key signature algorithms.
+ *
+ * Returns: a zero-terminated list of #gnutls_sign_algorithm_t
+ *   integers indicating the available ciphers.
+ *
+ **/
+const gnutls_sign_algorithm_t *
+gnutls_sign_list (void)
+{
+  return supported_sign;
+}
+
+/**
+ * gnutls_sign_get_id - Returns the gnutls id of the specified in signature algorithm
+ * @name: is a MAC algorithm name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: return a #gnutls_sign_algorithm_t value corresponding to
+ *   the specified cipher, or %GNUTLS_SIGN_UNKNOWN on error.
+ **/
+gnutls_sign_algorithm_t
+gnutls_sign_get_id (const char *name)
+{
+  gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
+
+  GNUTLS_SIGN_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
+
+  return ret;
+
 }
 
 gnutls_sign_algorithm_t
