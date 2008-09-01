@@ -131,18 +131,6 @@ static const gnutls_compression_method_t supported_compressions[] = {
   GNUTLS_COMPRESSION_LOOP( if(p->num == num) { a; break; } )
 
 /* Compression Functions */
-int
-_gnutls_compression_priority (gnutls_session_t session,
-			      gnutls_compression_method_t algorithm)
-{				/* actually returns the priority */
-  unsigned int i;
-  for (i = 0; i < session->internals.priorities.compression.algorithms; i++)
-    {
-      if (session->internals.priorities.compression.priority[i] == algorithm)
-	return i;
-    }
-  return -1;
-}
 
 /**
  * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
@@ -214,8 +202,8 @@ _gnutls_compression_get_num (gnutls_compression_method_t algorithm)
   return ret;
 }
 
-int
-_gnutls_compression_get_wbits (gnutls_compression_method_t algorithm)
+static int
+get_wbits (gnutls_compression_method_t algorithm)
 {
   int ret = -1;
   /* avoid prefix */
@@ -223,8 +211,8 @@ _gnutls_compression_get_wbits (gnutls_compression_method_t algorithm)
   return ret;
 }
 
-int
-_gnutls_compression_get_mem_level (gnutls_compression_method_t algorithm)
+static int
+get_mem_level (gnutls_compression_method_t algorithm)
 {
   int ret = -1;
   /* avoid prefix */
@@ -232,8 +220,8 @@ _gnutls_compression_get_mem_level (gnutls_compression_method_t algorithm)
   return ret;
 }
 
-int
-_gnutls_compression_get_comp_level (gnutls_compression_method_t algorithm)
+static int
+get_comp_level (gnutls_compression_method_t algorithm)
 {
   int ret = -1;
   /* avoid prefix */
@@ -364,9 +352,9 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
 	int comp_level;
 	z_stream *zhandle;
 
-	window_bits = _gnutls_compression_get_wbits (method);
-	mem_level = _gnutls_compression_get_mem_level (method);
-	comp_level = _gnutls_compression_get_comp_level (method);
+	window_bits = get_wbits (method);
+	mem_level = get_mem_level (method);
+	comp_level = get_comp_level (method);
 
 	ret->handle = gnutls_malloc (sizeof (z_stream));
 	if (ret->handle == NULL)
