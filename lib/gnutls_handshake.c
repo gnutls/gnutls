@@ -40,7 +40,7 @@
 #include "gnutls_db.h"
 #include "gnutls_extensions.h"
 #include "gnutls_supplemental.h"
-#include "gnutls_auth_int.h"
+#include "gnutls_auth.h"
 #include "gnutls_v2_compat.h"
 #include "auth_cert.h"
 #include "gnutls_cert.h"

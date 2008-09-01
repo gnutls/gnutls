@@ -30,7 +30,7 @@
 void _gnutls_session_cert_type_set (gnutls_session_t session,
 				    gnutls_certificate_type_t);
 
-#include <gnutls_auth_int.h>
+#include <gnutls_auth.h>
 
 #define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(session) != auth) { \
 	gnutls_assert(); \

@@ -32,7 +32,7 @@
 #include "gnutls_errors.h"
 #include <auth_srp_passwd.h>
 #include "auth_srp.h"
-#include "gnutls_auth_int.h"
+#include "gnutls_auth.h"
 #include "gnutls_srp.h"
 #include "gnutls_dh.h"
 #include "debug.h"

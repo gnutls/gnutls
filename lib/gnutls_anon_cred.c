@@ -28,7 +28,7 @@
 
 #include "gnutls_errors.h"
 #include "auth_anon.h"
-#include "gnutls_auth_int.h"
+#include "gnutls_auth.h"
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
 #include "gnutls_mpi.h"

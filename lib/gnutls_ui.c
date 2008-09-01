@@ -32,7 +32,7 @@
 #include <auth_cert.h>
 #include <auth_psk.h>
 #include <gnutls_errors.h>
-#include <gnutls_auth_int.h>
+#include <gnutls_auth.h>
 #include <gnutls_state.h>
 #include <gnutls_datum.h>
 

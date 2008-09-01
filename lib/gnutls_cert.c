@@ -38,7 +38,7 @@
 #include <gnutls_dh.h>
 #include <gnutls_str.h>
 #include <gnutls_state.h>
-#include <gnutls_auth_int.h>
+#include <gnutls_auth.h>
 #include <gnutls_x509.h>
 #include "x509/x509_int.h"
 #ifdef ENABLE_OPENPGP

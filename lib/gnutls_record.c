@@ -36,7 +36,7 @@
 #include "gnutls_cipher_int.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_db.h"
-#include "gnutls_auth_int.h"
+#include "gnutls_auth.h"
 #include "gnutls_num.h"
 #include "gnutls_record.h"
 #include "gnutls_datum.h"

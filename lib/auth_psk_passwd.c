@@ -32,7 +32,7 @@
 #include "gnutls_errors.h"
 #include <auth_psk_passwd.h>
 #include "auth_psk.h"
-#include "gnutls_auth_int.h"
+#include "gnutls_auth.h"
 #include "gnutls_dh.h"
 #include "debug.h"
 #include <gnutls_str.h>

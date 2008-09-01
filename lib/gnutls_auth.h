@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -46,5 +46,14 @@ typedef struct mod_auth_st_int
   int (*gnutls_process_server_certificate_request) (gnutls_session_t,
 						    opaque *, size_t);
 } mod_auth_st;
+
+const void *_gnutls_get_cred (gnutls_key_st key,
+			      gnutls_credentials_type_t kx, int *err);
+const void *_gnutls_get_kx_cred (gnutls_session_t session,
+				 gnutls_kx_algorithm_t algo, int *err);
+void *_gnutls_get_auth_info (gnutls_session_t session);
+int _gnutls_auth_info_set (gnutls_session_t session,
+			   gnutls_credentials_type_t type, int size,
+			   int allow_change);
 
 #endif

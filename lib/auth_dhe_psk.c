@@ -31,7 +31,7 @@
 
 #ifdef ENABLE_PSK
 
-#include "gnutls_auth_int.h"
+#include "gnutls_auth.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
 #include "auth_psk.h"

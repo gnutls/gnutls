@@ -23,7 +23,7 @@
  */
 
 #include <gnutls_int.h>
-#include "gnutls_auth_int.h"
+#include "gnutls_auth.h"
 #include "gnutls_errors.h"
 #include <gnutls_cert.h>
 #include <auth_cert.h>
