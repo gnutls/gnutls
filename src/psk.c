@@ -19,12 +19,12 @@
 
 #include <config.h>
 
-#define _MAX(x,y) (x>y?x:y)
+/* Gnulib portability files. */
+#include <version-etc.h>
 
 #ifndef ENABLE_PSK
 
 #include <stdio.h>
-
 
 int
 main (int argc, char **argv)
@@ -32,12 +32,6 @@ main (int argc, char **argv)
   printf ("\nPSK not supported. This program is a dummy.\n\n");
   return 1;
 };
-
-void
-psktool_version (void)
-{
-  fprintf (stderr, "GNU TLS dummy psktool.\n");
-}
 
 #else
 
@@ -49,7 +43,6 @@ psktool_version (void)
 #include <psk-gaa.h>
 
 #include "../lib/random.h"	/* for random */
-#include "getpass.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -61,19 +54,12 @@ psktool_version (void)
 # include <windows.h>
 #endif
 
+/* Gnulib portability files. */
+#include <minmax.h>
+#include "getpass.h"
+
 static int write_key (const char *username, const char *key, int key_size,
 		      char *passwd_file);
-
-void
-psktool_version (void)
-{
-  const char *v = gnutls_check_version (NULL);
-
-  printf ("psktool (GnuTLS) %s\n", LIBGNUTLS_VERSION);
-  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
-    printf ("libgnutls %s\n", v);
-}
-
 
 #define KPASSWD "/etc/passwd.psk"
 #define MAX_KEY_SIZE 64
@@ -285,9 +271,8 @@ write_key (const char *username, const char *key, int key_size,
       if (pp == NULL)
 	continue;
 
-      if (strncmp
-	  (p, username,
-	   _MAX (strlen (username), (unsigned int) (pp - p))) == 0)
+      if (strncmp (p, username,
+		   MAX (strlen (username), (unsigned int) (pp - p))) == 0)
 	{
 	  put = 1;
 	  fprintf (fd, "%s:%s\n", username, key);
@@ -314,3 +299,13 @@ write_key (const char *username, const char *key, int key_size,
 }
 
 #endif /* ENABLE_PSK */
+
+void
+psktool_version (void)
+{
+  const char *p = PACKAGE_NAME;
+  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
+    p = PACKAGE_STRING;
+  version_etc (stdout, "psktool", p, gnutls_check_version (NULL),
+	       "Nikos Mavrogiannopoulos", (char *) NULL);
+}

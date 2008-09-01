@@ -21,7 +21,8 @@
 
 #include <config.h>
 
-
+/* Gnulib portability files. */
+#include <version-etc.h>
 
 #ifndef ENABLE_SRP
 
@@ -33,12 +34,6 @@ main (int argc, char **argv)
   printf ("\nSRP not supported. This program is a dummy.\n\n");
   return 1;
 };
-
-void
-srptool_version (void)
-{
-  fprintf (stderr, "GNU TLS dummy srptool.\n");
-}
 
 #else
 
@@ -77,16 +72,6 @@ static int _verify_passwd_int (const char *username, const char *passwd,
 			       char *verifier, char *salt,
 			       const gnutls_datum_t * g,
 			       const gnutls_datum_t * n);
-
-void
-srptool_version (void)
-{
-  const char *v = gnutls_check_version (NULL);
-
-  printf ("srptool (GnuTLS) %s\n", LIBGNUTLS_VERSION);
-  if (strcmp (v, LIBGNUTLS_VERSION) != 0)
-    printf ("libgnutls %s\n", v);
-}
 
 
 static void
@@ -743,3 +728,13 @@ read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n, char *str)
 }
 
 #endif /* ENABLE_SRP */
+
+void
+srptool_version (void)
+{
+  const char *p = PACKAGE_NAME;
+  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
+    p = PACKAGE_STRING;
+  version_etc (stdout, "srptool", p, gnutls_check_version (NULL),
+	       "Nikos Mavrogiannopoulos", (char *) NULL);
+}
