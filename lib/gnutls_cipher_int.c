@@ -42,7 +42,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
   int ret = GNUTLS_E_INTERNAL_ERROR;
   gnutls_crypto_single_cipher_st *cc = NULL;
 
-  /* check if a cipher has been registered 
+  /* check if a cipher has been registered
    */
   cc = _gnutls_get_crypto_cipher (cipher);
   if (cc != NULL)
@@ -140,7 +140,8 @@ _gnutls_cipher_deinit (cipher_hd_st * handle)
     {
       if (handle->registered && handle->hd.rh.ctx != NULL)
 	{
-	  return handle->hd.rh.cc->deinit (handle->hd.rh.ctx);
+	  handle->hd.rh.cc->deinit (handle->hd.rh.ctx);
+	  return;
 	}
       _gnutls_cipher_ops.deinit (handle->hd.gc);
     }
