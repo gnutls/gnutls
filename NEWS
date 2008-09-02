@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Corrected memory leak in X.509 functions.
 Thanks to Colin Leroy <colin@colino.net>.
 
+** libgnutls: Fix compile error with Sun CC.
+
 ** gnutls-cli.1: Document all new parameters.
 Thanks to James Westby <jw+debian@jameswestby.net>.
 
