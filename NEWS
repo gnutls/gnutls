@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 2.4.2 (unreleased)
 
+** libgnutls: Corrected memory leak in X.509 functions.
+Thanks to Colin Leroy <colin@colino.net>.
+
+** gnutls-cli.1: Document all new parameters.
+Thanks to James Westby <jw+debian@jameswestby.net>.
+
+** doc/: Fix texinfo markup for old texinfo versions.
+
 ** API and ABI modifications:
 No changes since last version.
 
