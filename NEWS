@@ -12,6 +12,8 @@ Varshavchik <mrsam@courier-mta.com>.
 
 ** libgnutls: Refactor and clean up some code.
 
+** libgnutls: Fix compile error with Sun CC.
+
 ** gnutls-cli: Improve --list output to include public key and signature algs.
 
 ** gnutls-cli, gnutls-serv: Remove --copyright parameter.
