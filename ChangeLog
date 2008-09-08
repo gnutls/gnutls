@@ -1,3 +1,266 @@
+2008-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.6.
+
+2008-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/config.rpath, gl/m4/include_next.m4,
+	lgl/m4/include_next.m4: Update gnulib files.
+
+2008-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-alert.c, doc/examples/ex-cert-select.c,
+	doc/examples/ex-client-psk.c, doc/examples/ex-client-resume.c,
+	doc/examples/ex-client-srp.c, doc/examples/ex-client-tlsia.c,
+	doc/examples/ex-client1.c, doc/examples/ex-client2.c,
+	doc/examples/ex-crq.c, doc/examples/ex-cxx.cpp,
+	doc/examples/ex-pkcs12.c, doc/examples/ex-rfc2818.c,
+	doc/examples/ex-serv-anon.c, doc/examples/ex-serv-export.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-psk.c,
+	doc/examples/ex-serv-srp.c, doc/examples/ex-serv1.c,
+	doc/examples/ex-session-info.c, doc/examples/ex-verify.c,
+	doc/examples/ex-x509-info.c, doc/examples/tcp.c, lib/defines.h,
+	lib/gnutls_asn1_tab.c, lib/openpgp/openpgp_int.h,
+	lib/pkix_asn1_tab.c, src/errcodes.c, tests/anonself.c,
+	tests/certificate_set_x509_crl.c, tests/dhepskself.c,
+	tests/finished.c, tests/hostname-check/hostname-check.c,
+	tests/mini.c, tests/moredn.c, tests/netconf-psk.c,
+	tests/openpgpself.c, tests/oprfi.c, tests/pgps2kgnu.c,
+	tests/pskself.c, tests/resume.c, tests/tlsia.c, tests/x509dn.c,
+	tests/x509self.c, tests/x509signself.c: Use #ifdef for checking
+	HAVE_CONFIG_H for consistency.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* po/POTFILES.in: Mark gnutls_alert for translation.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* po/ms.po.in: Sync with TP.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/vasnprintf.c: Update gnulib files.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cipher_int.c: Don't return from a void function.
+	Reported by Dave Uhring <duhring@charter.net>.
+
+2008-09-01  Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+
+	* tests/Makefile.am, tests/pgps2kgnu.c: added pgps2kgnu test for GNU
+	extensions to OpenPGP String-to-Key (S2K) conventions.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/tls_test.c: Use gnulib for --version.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/crypt.c: Use gnulib more.  Remove code.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/crypt.c, src/psk.c: Use gnulib for --version.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli-gaa.c, src/cli-gaa.h, src/serv-gaa.c, src/serv-gaa.h: 
+	Generated.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi, doc/manpages/certtool.1,
+	doc/manpages/gnutls-cli.1, doc/manpages/gnutls-serv.1: Drop
+	--copyright from documentation.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/cli.gaa, src/common.c, src/serv.c, src/serv.gaa: Drop
+	--copyright.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Use gnulib for --version.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Use gnulib for --version.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Only print libgnutls version in --version if it is
+	different.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/Makefile.am, lib/gnutls_int.h,
+	lib/gnutls_str.h: Remove gnutls_buffer.h, move definitions to
+	gnutls_str.h.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_alert.c: Translate error messages.  Cleanup code.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_compress.c, lib/gnutls_compress.h: Remove unused stuff.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* tests/simple.c: Test sign algos.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Print pk and sign algos.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Typo.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_algorithms.c: Add
+	gnutls_sign_list and gnutls_sign_get_id.  Suggested by Sam
+	Varshavchik <mrsam@courier-mta.com>.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.h, lib/gnutls_compress.h: Move declarations.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/Makefile.am,
+	lib/gnutls_compress.c, lib/gnutls_compress.h,
+	lib/gnutls_compress_int.c, lib/gnutls_compress_int.h,
+	lib/gnutls_int.h: Merge gnutls_compress_int.? with
+	gnutls_compress.?.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/Makefile.am, lib/auth_anon.c,
+	lib/auth_cert.c, lib/auth_dh_common.c, lib/auth_dhe.c,
+	lib/auth_dhe_psk.c, lib/auth_psk.c, lib/auth_psk_passwd.c,
+	lib/auth_rsa.c, lib/auth_rsa_export.c, lib/auth_srp.c,
+	lib/auth_srp_passwd.c, lib/auth_srp_rsa.c, lib/ext_server_name.c,
+	lib/ext_srp.c, lib/gnutls_anon_cred.c, lib/gnutls_auth.c,
+	lib/gnutls_auth.h, lib/gnutls_auth_int.h, lib/gnutls_cert.c,
+	lib/gnutls_handshake.c, lib/gnutls_record.c,
+	lib/gnutls_session_pack.c, lib/gnutls_state.c, lib/gnutls_state.h,
+	lib/gnutls_ui.c, lib/gnutls_v2_compat.c, lib/gnutls_x509.c,
+	libextra/ext_inner_application.c: Move definitions in
+	gnutls_auth_int.h to gnutls_auth.h and update callers.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_compress.c: Move compression functions to
+	gnutls_compress.c to make gnutls_algorithms.c more readable.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Fix warning.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Doc fix.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* tests/simple.c: Add more tests.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Fix typo.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in, lib/gnutls_algorithms.c: Add
+	gnutls_pk_list and gnutls_pk_get_id.  Suggested by Sam Varshavchik
+	<mrsam@courier-mta.com>.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* gl/arpa_inet.in.h, gl/gnulib.mk, gl/m4/include_next.m4,
+	gl/m4/lib-link.m4, gl/m4/lib-prefix.m4, gl/netinet_in.in.h,
+	gl/stdarg.in.h, lgl/Makefile.am, lgl/float.in.h,
+	lgl/m4/include_next.m4, lgl/m4/lib-link.m4, lgl/m4/lib-prefix.m4,
+	lgl/stdint.in.h, lgl/stdio.in.h, lgl/stdlib.in.h, lgl/string.in.h,
+	lgl/strings.in.h, lgl/sys_socket.in.h, lgl/sys_stat.in.h,
+	lgl/time.in.h, lgl/unistd.in.h, lgl/wchar.in.h: Update gnulib files.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/Makefile.am, lib/openpgp/Makefile.am: Fixes.
+
+2008-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix license and libgnutls-extra stuff.
+
+2008-08-31  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit 765c079be0195f0f7fbefccf8b6a8910015042a6 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Sun Aug 31 13:33:52
+	2008 +0300
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, lib/gnutls_openpgp.c, lib/openpgp/Makefile.am,
+	lib/openpgp/gnutls_openpgp.c: Move gnutls_openpgp.c to lib/openpgp/.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Add Since: tag for gtk-doc.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix release target.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.5.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-08-29  Simon Josefsson <simon@josefsson.org>
 
 	* .clcopying: Update copyright years.
