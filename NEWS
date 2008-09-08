@@ -31,6 +31,9 @@ Use standard --version to get license info.
 ** gnutls-cli.1: Document all new parameters.
 Thanks to James Westby <jw+debian@jameswestby.net>.
 
+** tests: New self-test pgps2kgnu to test parsing of encrypted secrets.
+Contributed by Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>.
+
 ** API and ABI modifications:
 gnutls_pk_list: ADDED
 gnutls_pk_get_id: ADDED
