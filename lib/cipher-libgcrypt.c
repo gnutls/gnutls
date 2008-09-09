@@ -145,6 +145,13 @@ wrap_gcry_cipher_encrypt (void *ctx, const void *plain, size_t plainsize,
   return GNUTLS_E_ENCRYPTION_FAILED;
 }
 
+static void
+wrap_gcry_cipher_close (void *h)
+{
+  gcry_cipher_close (h);
+}
+
+
 int crypto_cipher_prio = INT_MAX;
 
 gnutls_crypto_cipher_st _gnutls_cipher_ops = {
@@ -153,5 +160,5 @@ gnutls_crypto_cipher_st _gnutls_cipher_ops = {
   .setiv = wrap_gcry_cipher_setiv,
   .encrypt = wrap_gcry_cipher_encrypt,
   .decrypt = wrap_gcry_cipher_decrypt,
-  .deinit = gcry_cipher_close,
+  .deinit = wrap_gcry_cipher_close,
 };
