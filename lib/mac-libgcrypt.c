@@ -81,6 +81,7 @@ static int
 wrap_gcry_md_write (void *ctx, const void *text, size_t textsize)
 {
   gcry_md_write (ctx, text, textsize);
+  return GNUTLS_E_SUCCESS;
 }
 
 static int
