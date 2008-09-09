@@ -81,6 +81,48 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
   return GNUTLS_E_MPI_PRINT_FAILED;
 }
 
+static bigint_t
+wrap_gcry_mpi_new (int nbits)
+{
+  return gcry_mpi_new (nbits);
+}
+
+static int
+wrap_gcry_mpi_cmp (const bigint_t u, const bigint_t v)
+{
+  return gcry_mpi_cmp (u, v);
+}
+
+static int
+wrap_gcry_mpi_cmp_ui (const bigint_t u, unsigned long v)
+{
+  return gcry_mpi_cmp_ui (u, v);
+}
+
+static bigint_t
+wrap_gcry_mpi_set (bigint_t w, const bigint_t u)
+{
+  return gcry_mpi_set (w, u);
+}
+
+static bigint_t
+wrap_gcry_mpi_set_ui (bigint_t w, unsigned long u)
+{
+  return gcry_mpi_set_ui (w, u);
+}
+
+static unsigned int
+wrap_gcry_mpi_get_nbits (bigint_t a)
+{
+  return gcry_mpi_get_nbits (a);
+}
+
+static void
+wrap_gcry_mpi_release (bigint_t a)
+{
+  return gcry_mpi_release (a);
+}
+
 #undef _gnutls_mpi_alloc_like
 #define _gnutls_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x))
 
@@ -348,13 +390,13 @@ cleanup:
 int crypto_bigint_prio = INT_MAX;
 
 gnutls_crypto_bigint_st _gnutls_mpi_ops = {
-  .bigint_new = gcry_mpi_new,
-  .bigint_cmp = gcry_mpi_cmp,
-  .bigint_cmp_ui = gcry_mpi_cmp_ui,
+  .bigint_new = wrap_gcry_mpi_new,
+  .bigint_cmp = wrap_gcry_mpi_cmp,
+  .bigint_cmp_ui = wrap_gcry_mpi_cmp_ui,
   .bigint_mod = wrap_gcry_mpi_mod,
-  .bigint_set = gcry_mpi_set,
-  .bigint_set_ui = gcry_mpi_set_ui,
-  .bigint_get_nbits = gcry_mpi_get_nbits,
+  .bigint_set = wrap_gcry_mpi_set,
+  .bigint_set_ui = wrap_gcry_mpi_set_ui,
+  .bigint_get_nbits = wrap_gcry_mpi_get_nbits,
   .bigint_powm = wrap_gcry_mpi_powm,
   .bigint_addm = wrap_gcry_mpi_addm,
   .bigint_subm = wrap_gcry_mpi_subm,
@@ -367,7 +409,7 @@ gnutls_crypto_bigint_st _gnutls_mpi_ops = {
   .bigint_mul_ui = wrap_gcry_mpi_mul_ui,
   .bigint_div = wrap_gcry_mpi_div,
   .bigint_prime_check = wrap_gcry_prime_check,
-  .bigint_release = gcry_mpi_release,
+  .bigint_release = wrap_gcry_mpi_release,
   .bigint_print = wrap_gcry_mpi_print,
   .bigint_scan = wrap_gcry_mpi_scan,
   .bigint_generate_group = wrap_gcry_generate_group
