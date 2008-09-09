@@ -2136,6 +2136,7 @@ the following subsections.
 
 @menu
 * Headers::
+* Initialization::
 * Version check::
 * Debugging::
 * Building the source::
@@ -2152,6 +2153,22 @@ library.
 The extra functionality of the @acronym{GnuTLS-extra} library is
 available by including the header file @file{gnutls/extra.h} in your
 programs.
+
+@node Initialization
+@subsection Initialization
+
+GnuTLS must be initialized before it can be used.  The library is
+initialized by calling @ref{gnutls_global_init}.  The resources
+allocated by the initialization process can be released if the
+application no longer has a need to call GnuTLS functions, this is
+done by calling @ref{gnutls_global_deinit}.
+
+The extra functionality of the @acronym{GnuTLS-extra} library is
+available after calling @ref{gnutls_global_init_extra}.
+
+In order to take advantage of the internationalisation features in
+GnuTLS, such as translated error messages, the application must set
+the current locale using @code{setlocale} before initializing GnuTLS.
 
 @node Version check
 @subsection Version Check
@@ -2222,14 +2239,9 @@ gcc -o foo foo.c `libgnutls-config --cflags --libs`
 @section Multi-Threaded Applications
 
 Although the @acronym{GnuTLS} library is thread safe by design, some
-parts of the crypto backend, such as the random generator, are
-not. Since @emph{libgcrypt 1.1.92} there was an automatic detection of
-the thread library used by the application, so most applications
-wouldn't need to do any changes to ensure thread-safety. Due to the
-unportability of the automatic thread detection, this was removed from
-later releases of @emph{libgcrypt}, so applications have now to
-register callback functions to ensure proper locking in sensitive
-parts of @emph{libgcrypt}.
+parts of Libgcrypt, such as the random generator, are not.
+Applications have to register callback functions to ensure proper
+locking in the sensitive parts of @emph{libgcrypt}.
 
 There are helper macros to help you properly initialize the libraries.
 Examples are shown below.
