@@ -340,6 +340,9 @@ cdk_pkt_alloc (cdk_packet_t * r_pkt, cdk_packet_type_t pkttype)
       if (!pkt->pkt.literal)
 	return CDK_Out_Of_Core;
       break;
+
+    default:
+      return CDK_Not_Implemented;
     }
   pkt->pkttype = pkttype;
   *r_pkt = pkt;
