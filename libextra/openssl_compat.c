@@ -841,40 +841,4 @@ gnutls_x509_pkcs7_extract_certificate (const gnutls_datum_t *
   return result;
 }
 
-
-/*-
-  * gnutls_x509_pkcs7_extract_certificate_count - This function returns the number of certificates in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
-  *
-  * This function will return the number of certifcates in the PKCS7 or 
-  * RFC2630 certificate set.
-  *
-  * Returns a negative value on failure.
-  *
-  -*/
-static int
-gnutls_x509_pkcs7_extract_certificate_count (const gnutls_datum_t *
-					     pkcs7_struct)
-{
-  gnutls_pkcs7_t pkcs7;
-  int result;
-
-  result = gnutls_pkcs7_init (&pkcs7);
-  if (result < 0)
-    return result;
-
-  result = gnutls_pkcs7_import (pkcs7, pkcs7_struct, GNUTLS_X509_FMT_DER);
-  if (result < 0)
-    {
-      gnutls_pkcs7_deinit (pkcs7);
-      return result;
-    }
-
-  result = gnutls_pkcs7_get_crt_count (pkcs7);
-
-  gnutls_pkcs7_deinit (pkcs7);
-
-  return result;
-}
-
 #endif
