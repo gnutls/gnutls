@@ -375,31 +375,12 @@ static int gaa_getint(char *arg)
     return tmp;
 }
 
-static char gaa_getchar(char *arg)
-{
-    if(strlen(arg) != 1)
-    {
-        printf("Option %s: '%s' isn't an character\n", gaa_current_option, arg);
-        GAAERROR(-1);
-    }
-    return arg[0];
-}
 
 static char* gaa_getstr(char *arg)
 {
     return arg;
 }
-static float gaa_getfloat(char *arg)
-{
-    float tmp;
-    char a;
-    if(sscanf(arg, "%f%c", &tmp, &a) < 1)
-    {
-        printf("Option %s: '%s' isn't a float number\n", gaa_current_option, arg);
-        GAAERROR(-1);
-    }
-    return tmp;
-}
+
 /* option structures */
 
 struct GAAOPTION_debug 
