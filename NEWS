@@ -5,9 +5,11 @@ See the end for copying conditions.
 
 * Version 2.5.7 (unreleased)
 
-** Fix libgnutls shared library version.
+** libgnutls: Fix libgnutls shared library version.
 It wasn't properly incremented after adding symbols in the last
 release.
+
+** tests/openssl: initialize gnutls before use.
 
 ** API and ABI modifications:
 No changes since last version.
