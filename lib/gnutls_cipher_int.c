@@ -178,7 +178,6 @@ _gnutls_cipher_deinit (cipher_hd_st* handle)
 	  handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
 	  return;
 	}
-      }
-      gc_cipher_close (handle->hd.gc);
     }
+  gc_cipher_close (handle->hd.gc);
 }
