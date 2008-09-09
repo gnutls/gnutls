@@ -72,7 +72,31 @@ wrap_gcry_mac_init (gnutls_mac_algorithm_t algo, void **ctx)
 }
 
 static int
-wrap_gcry_hash_init (gnutls_digest_algorithm_t algo, void **ctx)
+wrap_gcry_md_setkey (void *ctx, const void *key, size_t keylen)
+{
+  return gcry_md_setkey ((gcry_md_hd_t)ctx, key, keylen);
+}
+
+static int
+wrap_gcry_md_write (void *ctx, const void *text, size_t textsize)
+{
+  gcry_md_write (ctx, text, textsize);
+}
+
+static int
+wrap_gcry_md_copy (void **bhd, void *ahd)
+{
+  return gcry_md_copy ((gcry_md_hd_t*)bhd, (gcry_md_hd_t)ahd);
+}
+
+static void
+wrap_gcry_md_close (void *hd)
+{
+  return gcry_md_close (hd);
+}
+
+static int
+wrap_gcry_hash_init (gnutls_mac_algorithm_t algo, void **ctx)
 {
   int err;
   unsigned int flags = 0;
@@ -138,11 +162,11 @@ int crypto_mac_prio = INT_MAX;
 
 gnutls_crypto_mac_st _gnutls_mac_ops = {
   .init = wrap_gcry_mac_init,
-  .setkey = gcry_md_setkey,
-  .hash = gcry_md_write,
-  .copy = gcry_md_copy,
+  .setkey = wrap_gcry_md_setkey,
+  .hash = wrap_gcry_md_write,
+  .copy = wrap_gcry_md_copy,
   .output = wrap_gcry_mac_output,
-  .deinit = gcry_md_close,
+  .deinit = wrap_gcry_md_close,
 };
 
 int crypto_digest_prio = INT_MAX;
@@ -150,8 +174,8 @@ int crypto_digest_prio = INT_MAX;
 gnutls_crypto_digest_st _gnutls_digest_ops = {
   .init = wrap_gcry_hash_init,
   .setkey = NULL,
-  .hash = gcry_md_write,
-  .copy = gcry_md_copy,
+  .hash = wrap_gcry_md_write,
+  .copy = wrap_gcry_md_copy,
   .output = wrap_gcry_mac_output,
-  .deinit = gcry_md_close,
+  .deinit = wrap_gcry_md_close,
 };
