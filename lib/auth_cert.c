@@ -409,7 +409,7 @@ call_get_cert_callback (gnutls_session_t session,
   gnutls_cert *local_certs = NULL;
   gnutls_privkey *local_key = NULL;
   gnutls_retr_st st;
-  int ret;
+  int ret = GNUTLS_E_INTERNAL_ERROR;
   gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
   gnutls_certificate_credentials_t cred;
 
@@ -425,10 +425,20 @@ call_get_cert_callback (gnutls_session_t session,
 
   if (session->security_parameters.entity == GNUTLS_SERVER)
     {
+      if (cred->server_get_cert_callback == NULL)
+        {
+          gnutls_assert();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       ret = cred->server_get_cert_callback (session, &st);
     }
   else
     {				/* CLIENT */
+      if (cred->client_get_cert_callback == NULL)
+        {
+          gnutls_assert();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       ret =
 	cred->client_get_cert_callback (session,
 					issuers_dn, issuers_dn_length,
