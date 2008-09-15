@@ -28,7 +28,7 @@
 
 #include "utils.h"
 
-const static char castr[] =
+static char castr[] =
   "-----BEGIN CERTIFICATE-----\r\n"
   "MIIB5zCCAVKgAwIBAgIERiYdJzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\r\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTExWhcNMDgwNDE3MTMyOTExWjAZMRcw\r\n"
