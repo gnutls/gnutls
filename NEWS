@@ -5,6 +5,22 @@ See the end for copying conditions.
 
 * Version 2.4.2 (unreleased)
 
+** libgnutls: Corrected memory leak in X.509 functions.
+Thanks to Colin Leroy <colin@colino.net>.
+
+** libgnutls: Fix compile error with Sun CC.
+
+** gnutls-cli.1: Document all new parameters.
+Thanks to James Westby <jw+debian@jameswestby.net>.
+
+** tests/openssl: initialize gnutls before use.
+Fixes crash with libgcrypt 1.4.2.  Reported by Ludovic Courtes
+<ludovic.courtes@laas.fr>.
+
+** doc/: Fix texinfo markup for old texinfo versions.
+
+** Included copy of libtasn1 is upgraded to version 1.5.
+
 ** API and ABI modifications:
 No changes since last version.
 

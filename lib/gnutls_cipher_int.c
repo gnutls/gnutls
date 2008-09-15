@@ -173,9 +173,11 @@ _gnutls_cipher_deinit (cipher_hd_st* handle)
 {
   if (handle != NULL)
     {
-      if (handle->registered && handle->hd.rh.ctx != NULL) {
-        return handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
-      }
-      gc_cipher_close (handle->hd.gc);
+      if (handle->registered && handle->hd.rh.ctx != NULL)
+	{
+	  handle->hd.rh.cc->deinit( handle->hd.rh.ctx);
+	  return;
+	}
     }
+  gc_cipher_close (handle->hd.gc);
 }
