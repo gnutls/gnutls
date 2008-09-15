@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.4.2 (unreleased)
 
+** libgnutls: Don't crash when gnutls_credentials_set is called twice.
+
 ** libgnutls: Corrected memory leak in X.509 functions.
 Thanks to Colin Leroy <colin@colino.net>.
 
