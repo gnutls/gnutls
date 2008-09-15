@@ -96,7 +96,7 @@ tcp_close (int sd)
   close (sd);
 }
 
-const char cert_txt[] =
+static unsigned char cert_txt[] =
   "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
   "Version: GnuPG v1.0.6 (GNU/Linux)\n"
   "Comment: For info see http://www.gnupg.org\n"
@@ -116,7 +116,7 @@ const char cert_txt[] =
   "=m8dH\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
 const gnutls_datum_t cert = { cert_txt, sizeof (cert_txt) };
 
-const char key_txt[] =
+static unsigned char key_txt[] =
   "-----BEGIN PGP PRIVATE KEY BLOCK-----\n"
   "Version: GnuPG v1.0.6 (GNU/Linux)\n"
   "Comment: For info see http://www.gnupg.org\n"
@@ -297,7 +297,7 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
-const char server_crt_txt[] =
+static unsigned char server_crt_txt[] =
   "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
   "Version: GnuPG v1.4.6 (GNU/Linux)\n"
   "\n"
@@ -326,7 +326,7 @@ const char server_crt_txt[] =
   "=Xjon\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
 const gnutls_datum_t server_crt = { server_crt_txt, sizeof (server_crt_txt) };
 
-const char server_key_txt[] =
+static unsigned char server_key_txt[] =
   "-----BEGIN PGP PRIVATE KEY BLOCK-----\n"
   "Version: GnuPG v1.4.6 (GNU/Linux)\n"
   "\n"

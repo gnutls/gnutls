@@ -95,7 +95,7 @@ tcp_close (int sd)
   close (sd);
 }
 
-const char ca_pem[] =
+static unsigned char ca_pem[] =
   "-----BEGIN CERTIFICATE-----\n"
   "MIIB5zCCAVKgAwIBAgIERiYdJzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTExWhcNMDgwNDE3MTMyOTExWjAZMRcw\n"
@@ -110,7 +110,7 @@ const char ca_pem[] =
   "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca = { ca_pem, sizeof (ca_pem) };
 
-const char cert_pem[] =
+static unsigned char cert_pem[] =
   "-----BEGIN CERTIFICATE-----\n"
   "MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
@@ -126,7 +126,7 @@ const char cert_pem[] =
   "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t cert = { cert_pem, sizeof (cert_pem) };
 
-const char key_pem[] =
+static unsigned char key_pem[] =
   "-----BEGIN RSA PRIVATE KEY-----\n"
   "MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
   "9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
@@ -298,7 +298,7 @@ char buffer[MAX_BUF + 1];
 int optval = 1;
 
 
-const char server_cert_pem[] =
+static unsigned char server_cert_pem[] =
   "-----BEGIN CERTIFICATE-----\n"
   "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
@@ -318,7 +318,7 @@ const gnutls_datum_t server_cert = { server_cert_pem,
   sizeof (server_cert_pem)
 };
 
-const char server_key_pem[] =
+static unsigned char server_key_pem[] =
   "-----BEGIN RSA PRIVATE KEY-----\n"
   "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
   "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
