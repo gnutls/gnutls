@@ -58,14 +58,16 @@ ChangeLog:
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
 htmldir = ../www-$(PACKAGE)
 
-release: upload webdocs
+release: prepare upload web upload-web
 
-upload:
+prepare:
 	! git-tag -l $(tag) | grep $(PACKAGE) > /dev/null
 	rm -f ChangeLog
 	$(MAKE) ChangeLog distcheck
 	git commit -m Generated. ChangeLog
 	git-tag -u b565716f! -m $(VERSION) $(tag)
+
+upload:
 	git-push
 	git-push --tags
 	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.bz2
@@ -73,8 +75,10 @@ upload:
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
 	cp $(distdir).tar.bz2 $(distdir).tar.bz2.sig ../releases/$(PACKAGE)/
 
-webdocs:
+web:
 	cd doc && ../build-aux/gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) $(PACKAGE_NAME)
 	cd doc/doxygen && doxygen && cd ../.. && cp -v doc/doxygen/html/* $(htmldir)/doxygen/ && cd doc/doxygen/latex && make refman.pdf && cd ../../../ && cp doc/doxygen/latex/refman.pdf $(htmldir)/doxygen/$(PACKAGE).pdf
 	cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp doc/reference/html/*.css $(htmldir)/reference/
+
+upload-web:
 	cd $(htmldir) && cvs commit -m "Update." manual/ reference/ doxygen/
