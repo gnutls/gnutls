@@ -1,3 +1,81 @@
+2008-09-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.4.2.
+
+2008-09-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-15  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit d89d3790a7af4c871561526e3283f16e48bac541 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Mon Sep 15 21:41:02
+	2008 +0300
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cipher_int.c: Make it build.
+
+2008-08-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/element.c, lib/minitasn1/libtasn1.h: Use
+	libtasn1 1.5.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openssl.c: Need to initialize gnutls to avoid crash.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cipher_int.c: Don't return from a void function.
+	Reported by Dave Uhring <duhring@charter.net>.
+
+2008-09-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-08-31  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/manpages/gnutls-cli.1: patch by James Westby to cover issues
+	from http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=492775
+
+2008-08-25  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_x509.c: initialize uninitialized variable.
+
+2008-07-06  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_priority.c: document a way to get the available
+	algorithms and protocols.
+
+2008-07-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit 59384639d915fc8c2f8ab06bb3c3e311c17ee91a Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Sat Jul 5 10:53:59
+	2008 +0300
+
+2008-07-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Don't use @acronym for C++, as it breaks old
+	texinfo/tetex installations.  Further, C++ isn't an acronym anyway
+	as far as I know.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-06-30  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-06-30  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.4.1.
