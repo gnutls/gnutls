@@ -141,7 +141,6 @@ gnutls_credentials_set (gnutls_session_t session,
 	}
       else
 	{			/* modify existing entry */
-	  gnutls_free (ccred->credentials);
 	  ccred->credentials = cred;
 	}
     }
