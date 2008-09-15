@@ -48,7 +48,6 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([gl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl'
-  gl_EOVERFLOW
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
   gl_ERROR
@@ -247,7 +246,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/version-etc.h
   m4/arpa_inet_h.m4
   m4/autobuild.m4
-  m4/eoverflow.m4
   m4/error.m4
   m4/extensions.m4
   m4/getaddrinfo.m4
@@ -267,7 +265,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdarg.m4
   m4/strdup.m4
   m4/strerror.m4
-  tests/test-EOVERFLOW.c
   tests/test-arpa_inet.c
   tests/test-c-ctype.c
   tests/test-getaddrinfo.c

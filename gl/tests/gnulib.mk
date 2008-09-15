@@ -35,14 +35,6 @@ AM_CPPFLAGS = \
 
 LDADD = ../../gl/libgnu.la
 
-## begin gnulib module EOVERFLOW-tests
-
-TESTS += test-EOVERFLOW
-check_PROGRAMS += test-EOVERFLOW
-EXTRA_DIST += test-EOVERFLOW.c
-
-## end   gnulib module EOVERFLOW-tests
-
 ## begin gnulib module arpa_inet-tests
 
 TESTS += test-arpa_inet

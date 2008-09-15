@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=build-aux --with-tests --avoid=fseeko --avoid=gettext-h --avoid=malloc-posix --avoid=realloc-posix --avoid=snprintf --avoid=stdbool --avoid=stdio --avoid=string --avoid=sys_socket --avoid=unistd --avoid=vasnprintf --makefile-name=gnulib.mk --libtool --macro-prefix=gl --no-vc-files arpa_inet autobuild error fdl gendocs getaddrinfo getline getpass-gnu gnupload gpl-3.0 inet_ntop inet_pton lgpl-2.1 maintainer-makefile progname readline version-etc-fsf
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --aux-dir=build-aux --with-tests --avoid=errno --avoid=fseeko --avoid=gettext-h --avoid=malloc-posix --avoid=realloc-posix --avoid=snprintf --avoid=stdbool --avoid=stdio --avoid=string --avoid=sys_socket --avoid=unistd --avoid=vasnprintf --makefile-name=gnulib.mk --libtool --macro-prefix=gl --no-vc-files arpa_inet autobuild error fdl gendocs getaddrinfo getline getpass-gnu gnupload gpl-3.0 inet_ntop inet_pton lgpl-2.1 maintainer-makefile progname readline version-etc-fsf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
@@ -38,7 +38,7 @@ gl_MODULES([
   readline
   version-etc-fsf
 ])
-gl_AVOID([fseeko gettext-h malloc-posix realloc-posix snprintf stdbool stdio string sys_socket unistd vasnprintf])
+gl_AVOID([errno fseeko gettext-h malloc-posix realloc-posix snprintf stdbool stdio string sys_socket unistd vasnprintf])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
 gl_PO_BASE([])

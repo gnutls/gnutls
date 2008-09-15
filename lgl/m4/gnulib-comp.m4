@@ -43,9 +43,9 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='lgl'
-  gl_EOVERFLOW
   gl_FUNC_ALLOCA
   gl_BYTESWAP
+  gl_HEADER_ERRNO_H
   gl_FLOAT_H
   gl_FUNC_FSEEKO
   gl_STDIO_MODULE_INDICATOR([fseeko])
@@ -234,6 +234,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/byteswap.in.h
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/errno.in.h
   lib/float+.h
   lib/float.in.h
   lib/fseeko.c
@@ -277,7 +278,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/alloca.m4
   m4/byteswap.m4
   m4/codeset.m4
-  m4/eoverflow.m4
+  m4/errno_h.m4
   m4/extensions.m4
   m4/float_h.m4
   m4/fseeko.m4
@@ -343,10 +344,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
-  tests/test-EOVERFLOW.c
   tests/test-alloca-opt.c
   tests/test-byteswap.c
   tests/test-c-ctype.c
+  tests/test-errno.c
   tests/test-fseeko.c
   tests/test-fseeko.sh
   tests/test-func.c
