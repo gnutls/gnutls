@@ -48,16 +48,11 @@ release:
 	cd doc && ../build-aux/gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
 	git commit -m Generated. ChangeLog
 	git-tag -u b565716f! -m $(VERSION) $(tag)
-	gpg -b $(distdir).tar.bz2
-	gpg --verify $(distdir).tar.bz2.sig
-	cp -v $(distdir).tar.bz2 $(distdir).tar.bz2.sig $(htmldir)/releases/
 	cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.css doc/reference/html/*.devhelp $(htmldir)/reference/
 	git-push --tags
 	git-push
+	build-aux/gnupload --to ftp.gnu.org:gnutls $(distdir).tar.bz2
 	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/ && sha1sum *.tar.bz2 > CHECKSUMS'
-	build-aux/gnupload --to ftp.gnu.org:gnutls $(distdir).tar.bz2
-	cd $(htmldir) && \
-		cvs add -kb releases/$(distdir).tar.bz2 \
-			releases/$(distdir).tar.bz2.sig && \
-		cvs commit -m "Update." manual/ reference/ releases/
+	cp -v $(distdir).tar.bz2 $(distdir).tar.bz2.sig ../releases/$(PACKAGE)/
+	cd $(htmldir) && cvs commit -m "Update." manual/ reference/
