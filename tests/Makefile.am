@@ -46,7 +46,7 @@ openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 
 if HAVE_FORK
 ctests += x509self x509signself x509dn anonself pskself dhepskself	\
-	tlsia resume netconf-psk
+	tlsia resume netconf-psk setcredcrash
 
 if ENABLE_OPENPGP
 ctests += openpgpself 
