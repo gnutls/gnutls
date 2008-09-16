@@ -546,9 +546,6 @@ struct cdk_packet_s {
 };
 typedef struct cdk_packet_s *cdk_packet_t;
 
-/* Return a human readable error description of the given error coe. */
-const char* cdk_strerror (int ec);
-
 /* Session handle routines */
 cdk_error_t cdk_handle_new (cdk_ctx_t *r_ctx);
 void cdk_handle_free (cdk_ctx_t c);
