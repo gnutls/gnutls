@@ -20,6 +20,8 @@ release.
 
 ** tests/setcredcrash: New test to catch regressions of gnutls_credentials_set.
 
+** GTK-DOC manual: mention new symbols in 2.6.x.  Mention crypto.h functions.
+
 ** API and ABI modifications:
 gnutls_sign_get_name: ADDED
 gnutls_pk_get_name: ADDED
