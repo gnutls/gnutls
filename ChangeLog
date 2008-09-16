@@ -1,3 +1,194 @@
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.7.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Fix warning about trailing comma.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix math markup.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* src/printlist.c: Fix.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/gnutls.texi, src/printlist.c: Fix.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls-docs.sgml: Document crypto.h stuff.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls-docs.sgml: Add list of new symbols in 2.6.x.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/crypto.h: Indent.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in: Don't use extern on functions, for
+	consistency.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention new functions.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/manpages/Makefile.am, includes/gnutls/gnutls.h.in,
+	lib/gnutls_algorithms.c, src/printlist.c: Add interfaces to get PK
+	and PK-sign algorithms. Use them.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Credit.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Don't run pgps2kgnu self test when openpgp is
+	disable.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Merge in 2.4.2 news entries.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/main.c, lib/opencdk/opencdk.h: Remove cdk_strerror,
+	unused and uses non-thread safe strerror.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgpself.c, tests/x509dn.c, tests/x509self.c: Fix
+	warnings.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crypto_rng.c: Fix warnings.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* tests/parse_ca.c: Fix warning.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Split release target.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/eoverflow.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/strerror.m4, gl/strerror.c,
+	gl/tests/gnulib.mk, gl/tests/test-EOVERFLOW.c,
+	gl/tests/test-strerror.c, lgl/Makefile.am, lgl/errno.in.h,
+	lgl/m4/eoverflow.m4, lgl/m4/errno_h.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/stdio_h.m4, lgl/stdio.in.h, lgl/sys_socket.in.h,
+	lgl/tests/Makefile.am, lgl/tests/test-EOVERFLOW.c,
+	lgl/tests/test-errno.c, lgl/tests/test-memchr.c: Update gnulib
+	files.
+
+2008-09-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/setcredcrash.c: Self-test regression of
+	gnutls_credentials_set.
+
+2008-09-15  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_auth.c: removed unnesessary and dangerous free from
+	credentials_set().
+
+2008-09-14  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/auth_cert.c: added some pedantic error checking.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool-gaa.c, src/cli-gaa.c, src/crypt-gaa.c,
+	src/psk-gaa.c, src/serv-gaa.c, src/tls_test-gaa.c: Regenerate using
+	patched gaa.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Test release with -Werror to avoid regressions.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openssl_compat.c: Remove unused code.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mac-libgcrypt.c: Fix warning.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/new-packet.c: Fix warning.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/opencdk.h: (CDK_KEY_USG_ENCR, CDK_KEY_USG_SIGN): Protect | op.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/cipher-libgcrypt.c: Fix warnings.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mac-libgcrypt.c: Fix warnings.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mpi-libgcrypt.c: Fix warnings.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add initialization section.  Update thread
+	initialization discussion.
+
+2008-09-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openssl.c: Need to initialize gnutls to avoid crash.
+
+2008-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Drop redundant.
+
+2008-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove foo.def after testing --output-def.
+
+2008-09-08  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-09-08  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.6.
