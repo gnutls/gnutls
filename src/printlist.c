@@ -40,6 +40,7 @@ int main(void)
     gnutls_mac_algorithm_t mac;
     gnutls_protocol_t version;
 
+    printf ("\nAvailable cipher suites:\n@itemize\n");
     printf ("@multitable @columnfractions .60 .20 .20\n");
     for (i = 0; (name = gnutls_cipher_suite_info
 		 (i, id, &kx, &cipher, &mac, &version)); i++)
