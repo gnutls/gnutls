@@ -5,11 +5,16 @@ See the end for copying conditions.
 
 * Version 2.5.7 (unreleased)
 
+** libgnutls: New interfaces to get name of public key and signing algorithms.
+The functions are gnutls_sign_get_name and gnutls_pk_get_name.
+
 ** libgnutls: Don't crash when gnutls_credentials_set is called twice.
 
 ** libgnutls: Fix libgnutls shared library version.
 It wasn't properly incremented after adding symbols in the last
 release.
+
+** manual: Now mention supported public key and public key signing algorithms.
 
 ** tests/openssl: initialize gnutls before use.
 

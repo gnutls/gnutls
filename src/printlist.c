@@ -108,6 +108,28 @@ int main(void)
   }
 
   {
+    const gnutls_pk_algorithm_t *p = gnutls_pk_list ();
+
+    printf ("\nAvailable public key algorithms:\n@itemize\n");
+    for (; *p; p++)
+      {
+	printf ("@item %s\n", gnutls_pk_get_name (*p));
+      }
+    printf ("@end itemize\n");
+  }
+
+  {
+    const gnutls_sign_algorithm_t *p = gnutls_sign_list ();
+
+    printf ("\nAvailable public key signature algorithms:\n@itemize\n");
+    for (; *p; p++)
+      {
+	printf ("@item %s\n", gnutls_sign_get_name (*p));
+      }
+    printf ("@end itemize\n");
+  }
+
+  {
     const gnutls_compression_method_t *p = gnutls_compression_list ();
 
     printf ("\nAvailable compression methods:\n@itemize\n");

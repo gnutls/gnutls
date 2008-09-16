@@ -408,6 +408,8 @@ extern "C"
   const char *gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm);
   const char *gnutls_certificate_type_get_name (gnutls_certificate_type_t
 						type);
+  const char *gnutls_pk_get_name (gnutls_pk_algorithm_t algorithm);
+  const char *gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm);
 
   gnutls_mac_algorithm_t gnutls_mac_get_id (const char* name);
   gnutls_compression_method_t gnutls_compression_get_id (const char* name);

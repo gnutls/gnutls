@@ -1821,6 +1821,27 @@ gnutls_sign_get_id (const char *name)
 
 }
 
+/**
+ * gnutls_sign_get_name - Get name string for a #gnutls_sign_algorithm_t
+ * @algorithm: is a public key signature algorithm
+ *
+ * Convert a #gnutls_sign_algorithm_t value to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified public key signature algorithm, or %NULL.
+ *
+ * Since: 2.6.0
+ **/
+const char *
+gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm)
+{
+  const char *ret = "SIGN_UNKNOWN";
+
+  GNUTLS_SIGN_LOOP (if (p->id == algorithm) ret = p->name);
+
+  return ret;
+}
+
 gnutls_sign_algorithm_t
 _gnutls_x509_oid2sign_algorithm (const char *oid)
 {
@@ -1957,6 +1978,41 @@ gnutls_pk_get_id (const char *name)
     return GNUTLS_PK_DSA;
 
   return GNUTLS_PK_UNKNOWN;
+}
+
+/**
+ * gnutls_pk_get_name - Get name string with #gnutls_pk_algorithm_t algorithm
+ * @algorithm: is a public key algorithm
+ *
+ * Convert a #gnutls_pk_algorithm_t value to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified public key algorithm, or %NULL.
+ *
+ * Since: 2.6.0
+ **/
+const char *
+gnutls_pk_get_name (gnutls_pk_algorithm_t algorithm)
+{
+  const char *p;
+
+  switch (algorithm)
+    {
+    case GNUTLS_PK_RSA:
+      p = "RSA";
+      break;
+
+    case GNUTLS_PK_DSA:
+      p = "DSA";
+      break;
+
+    default:
+    case GNUTLS_PK_UNKNOWN:
+      p = "PK_UNKNOWN";
+      break;
+    }
+
+  return p;
 }
 
 gnutls_pk_algorithm_t
