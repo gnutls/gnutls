@@ -596,9 +596,6 @@ void cdk_set_log_level (int lvl);
 /* Set a custom log handler which is used for logging. */
 void cdk_set_log_handler (cdk_log_fnc_t logfnc, void *opaque);
 
-/* Return a human readable error description of the given error coe. */
-const char* cdk_strerror (int ec);
-
 /* Allow the user to set custom hooks for memory allocation.
    If this function is not used, the standard allocation functions
    will be used. Extra care must be taken for the 'secure' alloc
