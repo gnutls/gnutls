@@ -1996,17 +1996,20 @@ message of donating 1 @euro{} to Greenpeace and find out that he
 donated 1.000.000 @euro{} to Bad Inc.
 
 For a hash algorithm to be called cryptographic the following three
-requirements must hold
+requirements must hold:
+
 @enumerate
-@item Preimage resistance. That means the algorithm must be one way and given
-the output of the hash function @math{H(x)}, it is impossible to
-calculate @math{x}.
+@item Preimage resistance.
+That means the algorithm must be one way and given the output of the
+hash function @math{H(x)}, it is impossible to calculate @math{x}.
 
-@item 2nd preimage resistance. That means that given a pair @math{x,y} with @math{y=H(x)} it is impossible
-to calculate an @math{x'} such that @math{y=H(x')}.
+@item 2nd preimage resistance.
+That means that given a pair @math{x,y} with @math{y=H(x)} it is
+impossible to calculate an @math{x'} such that @math{y=H(x')}.
 
-@item Collision resistance. That means that it is impossible to calculate random @math{x} and @math{x'} such
-@math{H(x')=H(x)}.
+@item Collision resistance.
+That means that it is impossible to calculate random @math{x} and
+@math{x'} such @math{H(x')=H(x)}.
 @end enumerate
 
 The last two requirements in the list are the most important in
@@ -2016,23 +2019,23 @@ considered broken usually it means that the Collision resistance of
 the algorithm is less than brute force. Using the birthday paradox the
 brute force attack takes
 @iftex
-@math{2^{(\rm{hash\ size}) / 2}} 
+@math{2^{(\rm{hash\ size}) / 2}}
 @end iftex
 @ifnottex
-@math{2^{((hash size) / 2)}} 
+@math{2^{((hash size) / 2)}}
 @end ifnottex
 operations. Today colliding certificates using the MD5 hash algorithm
 have been generated as shown in @xcite{WEGER}.
 
 There has been cryptographic results for the SHA-1 hash algorithms as
 well, although they are not yet critical.  Before 2004, MD5 had a
-presumed collision strength of @math{2^64}, but it has been showed to
-have a collision strength well under @math{2^50}.  As of November
+presumed collision strength of @math{2^{64}}, but it has been showed
+to have a collision strength well under @math{2^{50}}.  As of November
 2005, it is believed that SHA-1's collision strength is around
-@math{2^63}.  We consider this sufficiently hard so that we still
+@math{2^{63}}.  We consider this sufficiently hard so that we still
 support SHA-1.  We anticipate that SHA-256/386/512 will be used in
-publicly-distributed certificates in the future.  When @math{2^63} can
-be considered too weak compared to the computer power available
+publicly-distributed certificates in the future.  When @math{2^{63}}
+can be considered too weak compared to the computer power available
 sometime in the future, SHA-1 will be disabled as well.  The collision
 attacks on SHA-1 may also get better, given the new interest in tools
 for creating them.
