@@ -93,7 +93,8 @@ No changes since last version.
 
 ** libgnutls: New API to set the public parameters in a certificate request
 ** from a private key.
-The function is gnutls_x509_crq_set_key_rsa_raw.
+The function is gnutls_x509_crq_set_key_rsa_raw.  Inspired by
+discussion with "Zach C." <fxchip@gmail.com>.
 
 ** libgnutls: New API to set a callback to extract TLS Finished data.
 The function to register is gnutls_session_set_finished_function and
