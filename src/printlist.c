@@ -40,7 +40,7 @@ int main(void)
     gnutls_mac_algorithm_t mac;
     gnutls_protocol_t version;
 
-    printf ("\nAvailable cipher suites:\n@itemize\n");
+    printf ("Available cipher suites:\n");
     printf ("@multitable @columnfractions .60 .20 .20\n");
     for (i = 0; (name = gnutls_cipher_suite_info
 		 (i, id, &kx, &cipher, &mac, &version)); i++)
@@ -56,7 +56,7 @@ int main(void)
   {
     const gnutls_certificate_type_t *p = gnutls_certificate_type_list ();
 
-    printf ("\n\nAvailable certificate types: \n@itemize\n");
+    printf ("\n\nAvailable certificate types:\n@itemize\n");
     for (; *p; p++)
       {
 	printf ("@item %s\n", gnutls_certificate_type_get_name (*p));
