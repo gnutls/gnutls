@@ -56,8 +56,7 @@ _gnutls_ext_func_recv (uint16_t type, gnutls_ext_parse_type_t parse_type)
 
   for (i = 0; i < extfunc_size; i++)
     if (extfunc[i].type == type)
-      if (parse_type == GNUTLS_EXT_ANY
-	  || extfunc[i].parse_type == parse_type)
+      if (parse_type == GNUTLS_EXT_ANY || extfunc[i].parse_type == parse_type)
 	return extfunc[i].recv_func;
 
   return NULL;
@@ -179,8 +178,9 @@ _gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
     {
       if (session->internals.extensions_sent_size < MAX_EXT_TYPES)
 	{
-	  session->internals.extensions_sent[session->internals.
-					     extensions_sent_size] = type;
+	  session->internals.extensions_sent[session->
+					     internals.extensions_sent_size] =
+	    type;
 	  session->internals.extensions_sent_size++;
 	}
       else

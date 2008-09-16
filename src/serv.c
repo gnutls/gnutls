@@ -134,12 +134,11 @@ static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 #define HTTP_STATE_RESPONSE	2
 #define HTTP_STATE_CLOSING	3
 
-LIST_TYPE_DECLARE (listener_item, char *http_request; char *http_response;
-		   int request_length; int response_length;
-		   int response_written; int http_state; int fd;
-		   gnutls_session_t tls_session;
-		   int handshake_ok;
-  );
+LIST_TYPE_DECLARE (listener_item, char *http_request;
+		   char *http_response; int request_length;
+		   int response_length; int response_written;
+		   int http_state;
+		   int fd; gnutls_session_t tls_session; int handshake_ok;);
 
 static const char *
 safe_strerror (int value)

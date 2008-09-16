@@ -218,8 +218,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 					       1].params_size, &kid);
 
 
-      _gnutls_x509_write_rsa_params (res->
-				     cert_list[res->ncerts - 1][0].params,
+      _gnutls_x509_write_rsa_params (res->cert_list[res->ncerts - 1][0].
+				     params,
 				     res->cert_list[res->ncerts -
 						    1][0].params_size, &cid);
     }
@@ -230,8 +230,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 				     res->pkey[res->ncerts -
 					       1].params_size, &kid);
 
-      _gnutls_x509_write_dsa_params (res->
-				     cert_list[res->ncerts - 1][0].params,
+      _gnutls_x509_write_dsa_params (res->cert_list[res->ncerts - 1][0].
+				     params,
 				     res->cert_list[res->ncerts -
 						    1][0].params_size, &cid);
     }

@@ -29,7 +29,8 @@
 #include <time.h>
 #include <common.h>
 
-int main(void)
+int
+main (void)
 {
   {
     size_t i;

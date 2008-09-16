@@ -74,7 +74,7 @@ wrap_gcry_mac_init (gnutls_mac_algorithm_t algo, void **ctx)
 static int
 wrap_gcry_md_setkey (void *ctx, const void *key, size_t keylen)
 {
-  return gcry_md_setkey ((gcry_md_hd_t)ctx, key, keylen);
+  return gcry_md_setkey ((gcry_md_hd_t) ctx, key, keylen);
 }
 
 static int
@@ -87,7 +87,7 @@ wrap_gcry_md_write (void *ctx, const void *text, size_t textsize)
 static int
 wrap_gcry_md_copy (void **bhd, void *ahd)
 {
-  return gcry_md_copy ((gcry_md_hd_t*)bhd, (gcry_md_hd_t)ahd);
+  return gcry_md_copy ((gcry_md_hd_t *) bhd, (gcry_md_hd_t) ahd);
 }
 
 static void

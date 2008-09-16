@@ -706,7 +706,7 @@ gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  memset(temp_params, 0, sizeof(temp_params));
+  memset (temp_params, 0, sizeof (temp_params));
 
   siz = m->size;
   if (_gnutls_mpi_scan_nz (&temp_params[0], m->data, siz))
@@ -740,9 +740,9 @@ gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
   ret = 0;
 
 error:
-    _gnutls_mpi_release (&temp_params[0]);
-    _gnutls_mpi_release (&temp_params[1]);
-    return ret;
+  _gnutls_mpi_release (&temp_params[0]);
+  _gnutls_mpi_release (&temp_params[1]);
+  return ret;
 }
 
 /**

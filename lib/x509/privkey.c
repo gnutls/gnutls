@@ -496,7 +496,7 @@ gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-    
+
   siz = m->size;
   if (_gnutls_mpi_scan_nz (&key->params[0], m->data, siz))
     {

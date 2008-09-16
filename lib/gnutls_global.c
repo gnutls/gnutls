@@ -29,7 +29,7 @@
 #include <random.h>
 #include <gcrypt.h>
 
-#include <gnutls_extensions.h> /* for _gnutls_ext_init */
+#include <gnutls_extensions.h>	/* for _gnutls_ext_init */
 
 #ifdef HAVE_WINSOCK
 # include <winsock2.h>

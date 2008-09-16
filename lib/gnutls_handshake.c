@@ -95,8 +95,8 @@ resume_copy_required_values (gnutls_session_t session)
    * hello message.
    */
   memcpy (session->security_parameters.current_cipher_suite.suite,
-	  session->internals.resumed_security_parameters.current_cipher_suite.
-	  suite, 2);
+	  session->internals.resumed_security_parameters.
+	  current_cipher_suite.suite, 2);
 
   session->internals.compression_method =
     session->internals.resumed_security_parameters.read_compression_algorithm;
@@ -108,8 +108,8 @@ resume_copy_required_values (gnutls_session_t session)
     session->internals.resumed_security_parameters.entity;
 
   _gnutls_set_current_version (session,
-			       session->internals.resumed_security_parameters.
-			       version);
+			       session->internals.
+			       resumed_security_parameters.version);
 
   session->security_parameters.cert_type =
     session->internals.resumed_security_parameters.cert_type;
@@ -124,13 +124,15 @@ resume_copy_required_values (gnutls_session_t session)
 void
 _gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd)
 {
-  memcpy (session->security_parameters.server_random, rnd, GNUTLS_RANDOM_SIZE);
+  memcpy (session->security_parameters.server_random, rnd,
+	  GNUTLS_RANDOM_SIZE);
 }
 
 void
 _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd)
 {
-  memcpy (session->security_parameters.client_random, rnd, GNUTLS_RANDOM_SIZE);
+  memcpy (session->security_parameters.client_random, rnd,
+	  GNUTLS_RANDOM_SIZE);
 }
 
 /* Calculate The SSL3 Finished message 
@@ -177,13 +179,11 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
   _gnutls_hash (&td_sha, mesg, siz);
 
   _gnutls_mac_deinit_ssl3_handshake (&td_md5, ret,
-				     session->
-				     security_parameters.master_secret,
-				     GNUTLS_MASTER_SIZE);
+				     session->security_parameters.
+				     master_secret, GNUTLS_MASTER_SIZE);
   _gnutls_mac_deinit_ssl3_handshake (&td_sha, &ret[16],
-				     session->
-				     security_parameters.master_secret,
-				     GNUTLS_MASTER_SIZE);
+				     session->security_parameters.
+				     master_secret, GNUTLS_MASTER_SIZE);
 
   return 0;
 }
@@ -411,8 +411,8 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   else
     {
       _gnutls_generate_session_id (session->security_parameters.session_id,
-				   &session->
-				   security_parameters.session_id_size);
+				   &session->security_parameters.
+				   session_id_size);
 
       session->internals.resumed = RESUME_FALSE;
     }
@@ -782,9 +782,9 @@ finish:
    */
   if (_gnutls_get_kx_cred
       (session,
-       _gnutls_cipher_suite_get_kx_algo (&session->
-					 security_parameters.current_cipher_suite),
-       &err) == NULL && err != 0)
+       _gnutls_cipher_suite_get_kx_algo (&session->security_parameters.
+					 current_cipher_suite), &err) == NULL
+      && err != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -797,8 +797,8 @@ finish:
    */
   session->internals.auth_struct =
     _gnutls_kx_auth_struct (_gnutls_cipher_suite_get_kx_algo
-			    (&session->
-			     security_parameters.current_cipher_suite));
+			    (&session->security_parameters.
+			     current_cipher_suite));
   if (session->internals.auth_struct == NULL)
     {
 
@@ -847,8 +847,8 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
 
 	      _gnutls_handshake_log
 		("HSK[%x]: Selected Compression Method: %s\n", session,
-		 gnutls_compression_get_name (session->
-					      internals.compression_method));
+		 gnutls_compression_get_name (session->internals.
+					      compression_method));
 
 
 	      return 0;
@@ -1011,8 +1011,8 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
   if (session->internals.handshake_header_buffer.header_size ==
       handshake_header_size || (session->internals.v2_hello != 0
 				&& type == GNUTLS_HANDSHAKE_CLIENT_HELLO
-				&& session->internals.handshake_header_buffer.
-				packet_length > 0))
+				&& session->internals.
+				handshake_header_buffer.packet_length > 0))
     {
 
       *recv_type = session->internals.handshake_header_buffer.recv_type;
@@ -1063,11 +1063,11 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 	_gnutls_handshake_io_recv_int (session, GNUTLS_HANDSHAKE,
 				       type,
 				       &dataptr
-				       [session->internals.handshake_header_buffer.header_size],
+				       [session->internals.
+					handshake_header_buffer.header_size],
 				       HANDSHAKE_HEADER_SIZE -
-				       session->
-				       internals.handshake_header_buffer.
-				       header_size);
+				       session->internals.
+				       handshake_header_buffer.header_size);
       if (ret <= 0)
 	{
 	  gnutls_assert ();
@@ -1249,11 +1249,10 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
 
 
   ret = _gnutls_handshake_hash_add_recvd (session, recv_type,
-					  session->
-					  internals.handshake_header_buffer.
-					  header,
-					  session->
-					  internals.handshake_header_buffer.header_size,
+					  session->internals.
+					  handshake_header_buffer.header,
+					  session->internals.
+					  handshake_header_buffer.header_size,
 					  dataptr, length32);
   if (ret < 0)
     {
@@ -1345,7 +1344,8 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
 
   _gnutls_handshake_log ("HSK[%x]: Selected cipher suite: %s\n", session,
 			 _gnutls_cipher_suite_get_name
-			 (&session->security_parameters.current_cipher_suite));
+			 (&session->security_parameters.
+			  current_cipher_suite));
 
 
   /* check if the credentials (username, public key etc.) are ok.
@@ -1368,8 +1368,8 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
    */
   session->internals.auth_struct =
     _gnutls_kx_auth_struct (_gnutls_cipher_suite_get_kx_algo
-			    (&session->
-			     security_parameters.current_cipher_suite));
+			    (&session->security_parameters.
+			     current_cipher_suite));
 
   if (session->internals.auth_struct == NULL)
     {
@@ -1971,8 +1971,8 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
       pos += 2;
 
       comp =
-	(uint8_t) _gnutls_compression_get_num (session->internals.
-					       compression_method);
+	(uint8_t) _gnutls_compression_get_num (session->
+					       internals.compression_method);
       data[pos++] = comp;
 
 
@@ -2319,11 +2319,13 @@ _gnutls_handshake_client (gnutls_session_t session)
 
   if (session->internals.resumed_security_parameters.session_id_size > 0)
     _gnutls_handshake_log ("HSK[%x]: Ask to resume: %s\n", session,
-			   _gnutls_bin2hex (session->
-					    internals.resumed_security_parameters.session_id,
-					    session->
-					    internals.resumed_security_parameters.session_id_size,
-					    buf, sizeof (buf)));
+			   _gnutls_bin2hex (session->internals.
+					    resumed_security_parameters.
+					    session_id,
+					    session->internals.
+					    resumed_security_parameters.
+					    session_id_size, buf,
+					    sizeof (buf)));
 #endif
 
   switch (STATE)

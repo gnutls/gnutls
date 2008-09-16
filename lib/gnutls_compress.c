@@ -167,9 +167,9 @@ gnutls_compression_get_id (const char *name)
   gnutls_compression_method_t ret = GNUTLS_COMP_UNKNOWN;
 
   GNUTLS_COMPRESSION_LOOP (if
-      (strcasecmp
-       (p->name + sizeof ("GNUTLS_COMP_") - 1,
-	name) == 0) ret = p->id);
+			   (strcasecmp
+			    (p->name + sizeof ("GNUTLS_COMP_") - 1,
+			     name) == 0) ret = p->id);
 
   return ret;
 }
@@ -277,8 +277,8 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
   for (i = j = 0; i < SUPPORTED_COMPRESSION_METHODS; i++)
     {
       int tmp =
-	_gnutls_compression_get_num (session->internals.
-				     priorities.compression.priority[i]);
+	_gnutls_compression_get_num (session->internals.priorities.
+				     compression.priority[i]);
 
       /* remove private compression algorithms, if requested.
        */

@@ -346,7 +346,7 @@ _gnutls_x509_data2hex (const opaque * data, size_t data_size,
       *sizeof_out = size;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
-  *sizeof_out = size;	/* -1 for the null +1 for the '#' */
+  *sizeof_out = size;		/* -1 for the null +1 for the '#' */
 
   if (out)
     {

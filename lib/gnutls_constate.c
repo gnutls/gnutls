@@ -88,11 +88,13 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  memcpy (rnd, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+  memcpy (rnd, session->security_parameters.server_random,
+	  GNUTLS_RANDOM_SIZE);
   memcpy (&rnd[GNUTLS_RANDOM_SIZE],
 	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
 
-  memcpy (rrnd, session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+  memcpy (rrnd, session->security_parameters.client_random,
+	  GNUTLS_RANDOM_SIZE);
   memcpy (&rrnd[GNUTLS_RANDOM_SIZE],
 	  session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 
@@ -503,34 +505,35 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
     {
       rc = _gnutls_set_read_cipher (session,
 				    _gnutls_cipher_suite_get_cipher_algo
-				    (&session->
-				     security_parameters.current_cipher_suite));
+				    (&session->security_parameters.
+				     current_cipher_suite));
       if (rc < 0)
 	return rc;
       rc = _gnutls_set_read_mac (session,
 				 _gnutls_cipher_suite_get_mac_algo
-				 (&session->
-				  security_parameters.current_cipher_suite));
+				 (&session->security_parameters.
+				  current_cipher_suite));
       if (rc < 0)
 	return rc;
 
       rc = _gnutls_set_kx (session,
 			   _gnutls_cipher_suite_get_kx_algo
-			   (&session->
-			    security_parameters.current_cipher_suite));
+			   (&session->security_parameters.
+			    current_cipher_suite));
       if (rc < 0)
 	return rc;
 
       rc = _gnutls_set_read_compression (session,
-					 session->
-					 internals.compression_method);
+					 session->internals.
+					 compression_method);
       if (rc < 0)
 	return rc;
     }
   else
     {				/* RESUME_TRUE */
       _gnutls_cpy_read_security_parameters (&session->security_parameters,
-					    &session->internals.resumed_security_parameters);
+					    &session->internals.
+					    resumed_security_parameters);
     }
 
 
@@ -541,7 +544,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
   _gnutls_handshake_log ("HSK[%x]: Cipher Suite: %s\n",
 			 session,
 			 _gnutls_cipher_suite_get_name
-			 (&session->security_parameters.current_cipher_suite));
+			 (&session->security_parameters.
+			  current_cipher_suite));
 
   if (_gnutls_compression_is_ok
       (session->security_parameters.read_compression_algorithm) != 0)
@@ -569,8 +573,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
 
 
   mac_size =
-    _gnutls_hash_get_algo_len (session->
-			       security_parameters.read_mac_algorithm);
+    _gnutls_hash_get_algo_len (session->security_parameters.
+			       read_mac_algorithm);
 
   _gnutls_handshake_log
     ("HSK[%x]: Initializing internal [read] cipher sessions\n", session);
@@ -581,8 +585,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
       /* initialize cipher session
        */
       rc = _gnutls_cipher_init (&session->connection_state.read_cipher_state,
-				session->security_parameters.
-				read_bulk_cipher_algorithm,
+				session->
+				security_parameters.read_bulk_cipher_algorithm,
 				&session->cipher_specs.client_write_key,
 				&session->cipher_specs.client_write_IV);
       if (rc < 0
@@ -599,11 +603,10 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
       if (mac_size > 0)
 	{
 	  if (_gnutls_sset_datum (&session->connection_state.read_mac_secret,
-				  session->
-				  cipher_specs.client_write_mac_secret.data,
-				  session->
-				  cipher_specs.client_write_mac_secret.size) <
-	      0)
+				  session->cipher_specs.
+				  client_write_mac_secret.data,
+				  session->cipher_specs.
+				  client_write_mac_secret.size) < 0)
 	    {
 	      gnutls_assert ();
 	      return GNUTLS_E_MEMORY_ERROR;
@@ -615,8 +618,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
 
     case GNUTLS_CLIENT:
       rc = _gnutls_cipher_init (&session->connection_state.read_cipher_state,
-				session->security_parameters.
-				read_bulk_cipher_algorithm,
+				session->
+				security_parameters.read_bulk_cipher_algorithm,
 				&session->cipher_specs.server_write_key,
 				&session->cipher_specs.server_write_IV);
 
@@ -634,11 +637,10 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
       if (mac_size > 0)
 	{
 	  if (_gnutls_sset_datum (&session->connection_state.read_mac_secret,
-				  session->
-				  cipher_specs.server_write_mac_secret.data,
-				  session->
-				  cipher_specs.server_write_mac_secret.size) <
-	      0)
+				  session->cipher_specs.
+				  server_write_mac_secret.data,
+				  session->cipher_specs.
+				  server_write_mac_secret.size) < 0)
 	    {
 	      gnutls_assert ();
 	      return GNUTLS_E_MEMORY_ERROR;
@@ -653,8 +655,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
     }
 
   session->connection_state.read_compression_state =
-    _gnutls_comp_init (session->
-		       security_parameters.read_compression_algorithm, 1);
+    _gnutls_comp_init (session->security_parameters.
+		       read_compression_algorithm, 1);
 
   if (session->connection_state.read_compression_state == GNUTLS_COMP_FAILED)
     {
@@ -685,34 +687,35 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
     {
       rc = _gnutls_set_write_cipher (session,
 				     _gnutls_cipher_suite_get_cipher_algo
-				     (&session->
-				      security_parameters.current_cipher_suite));
+				     (&session->security_parameters.
+				      current_cipher_suite));
       if (rc < 0)
 	return rc;
       rc = _gnutls_set_write_mac (session,
 				  _gnutls_cipher_suite_get_mac_algo
-				  (&session->
-				   security_parameters.current_cipher_suite));
+				  (&session->security_parameters.
+				   current_cipher_suite));
       if (rc < 0)
 	return rc;
 
       rc = _gnutls_set_kx (session,
 			   _gnutls_cipher_suite_get_kx_algo
-			   (&session->
-			    security_parameters.current_cipher_suite));
+			   (&session->security_parameters.
+			    current_cipher_suite));
       if (rc < 0)
 	return rc;
 
       rc = _gnutls_set_write_compression (session,
-					  session->
-					  internals.compression_method);
+					  session->internals.
+					  compression_method);
       if (rc < 0)
 	return rc;
     }
   else
     {				/* RESUME_TRUE */
       _gnutls_cpy_write_security_parameters (&session->security_parameters,
-					     &session->internals.resumed_security_parameters);
+					     &session->internals.
+					     resumed_security_parameters);
     }
 
   rc = _gnutls_set_write_keys (session);
@@ -721,7 +724,8 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
 
   _gnutls_handshake_log ("HSK[%x]: Cipher Suite: %s\n", session,
 			 _gnutls_cipher_suite_get_name
-			 (&session->security_parameters.current_cipher_suite));
+			 (&session->security_parameters.
+			  current_cipher_suite));
 
   if (_gnutls_compression_is_ok
       (session->security_parameters.write_compression_algorithm) != 0)
@@ -751,8 +755,8 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
 			 0);
 
   mac_size =
-    _gnutls_hash_get_algo_len (session->
-			       security_parameters.write_mac_algorithm);
+    _gnutls_hash_get_algo_len (session->security_parameters.
+			       write_mac_algorithm);
 
   _gnutls_handshake_log
     ("HSK[%x]: Initializing internal [write] cipher sessions\n", session);
@@ -763,8 +767,8 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
       /* initialize cipher session
        */
       rc = _gnutls_cipher_init (&session->connection_state.write_cipher_state,
-				session->
-				security_parameters.write_bulk_cipher_algorithm,
+				session->security_parameters.
+				write_bulk_cipher_algorithm,
 				&session->cipher_specs.server_write_key,
 				&session->cipher_specs.server_write_IV);
 
@@ -783,11 +787,10 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
       if (mac_size > 0)
 	{
 	  if (_gnutls_sset_datum (&session->connection_state.write_mac_secret,
-				  session->
-				  cipher_specs.server_write_mac_secret.data,
-				  session->
-				  cipher_specs.server_write_mac_secret.size) <
-	      0)
+				  session->cipher_specs.
+				  server_write_mac_secret.data,
+				  session->cipher_specs.
+				  server_write_mac_secret.size) < 0)
 	    {
 	      gnutls_assert ();
 	      return GNUTLS_E_MEMORY_ERROR;
@@ -800,8 +803,8 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
 
     case GNUTLS_CLIENT:
       rc = _gnutls_cipher_init (&session->connection_state.write_cipher_state,
-				session->
-				security_parameters.write_bulk_cipher_algorithm,
+				session->security_parameters.
+				write_bulk_cipher_algorithm,
 				&session->cipher_specs.client_write_key,
 				&session->cipher_specs.client_write_IV);
 
@@ -818,11 +821,10 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
       if (mac_size > 0)
 	{
 	  if (_gnutls_sset_datum (&session->connection_state.write_mac_secret,
-				  session->
-				  cipher_specs.client_write_mac_secret.data,
-				  session->
-				  cipher_specs.client_write_mac_secret.size) <
-	      0)
+				  session->cipher_specs.
+				  client_write_mac_secret.data,
+				  session->cipher_specs.
+				  client_write_mac_secret.size) < 0)
 	    {
 	      gnutls_assert ();
 	      return GNUTLS_E_MEMORY_ERROR;
@@ -838,8 +840,8 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
 
 
   session->connection_state.write_compression_state =
-    _gnutls_comp_init (session->
-		       security_parameters.write_compression_algorithm, 0);
+    _gnutls_comp_init (session->security_parameters.
+		       write_compression_algorithm, 0);
 
   if (session->connection_state.write_compression_state == GNUTLS_COMP_FAILED)
     {

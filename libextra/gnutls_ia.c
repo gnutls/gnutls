@@ -176,9 +176,10 @@ _gnutls_ia_prf (gnutls_session_t session,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  memcpy (seed, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
-  memcpy (seed + GNUTLS_RANDOM_SIZE, session->security_parameters.client_random,
+  memcpy (seed, session->security_parameters.server_random,
 	  GNUTLS_RANDOM_SIZE);
+  memcpy (seed + GNUTLS_RANDOM_SIZE,
+	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
   memcpy (seed + 2 * GNUTLS_RANDOM_SIZE, extra, extra_size);
 
   ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
@@ -257,7 +258,8 @@ gnutls_ia_generate_challenge (gnutls_session_t session,
 void
 gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer)
 {
-  memcpy (buffer, session->security_parameters.inner_secret, GNUTLS_MASTER_SIZE);
+  memcpy (buffer, session->security_parameters.inner_secret,
+	  GNUTLS_MASTER_SIZE);
 }
 
 /**

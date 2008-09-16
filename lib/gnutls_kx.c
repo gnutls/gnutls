@@ -65,13 +65,11 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 		    _gnutls_bin2hex (PREMASTER.data, PREMASTER.size, buf,
 				     sizeof (buf)));
   _gnutls_hard_log ("INT: CLIENT RANDOM[%d]: %s\n", 32,
-		    _gnutls_bin2hex (session->
-				     security_parameters.client_random, 32,
-				     buf, sizeof (buf)));
+		    _gnutls_bin2hex (session->security_parameters.
+				     client_random, 32, buf, sizeof (buf)));
   _gnutls_hard_log ("INT: SERVER RANDOM[%d]: %s\n", 32,
-		    _gnutls_bin2hex (session->
-				     security_parameters.server_random, 32,
-				     buf, sizeof (buf)));
+		    _gnutls_bin2hex (session->security_parameters.
+				     server_random, 32, buf, sizeof (buf)));
 
   if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
     {
@@ -86,8 +84,8 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 	_gnutls_ssl3_generate_random (PREMASTER.data, PREMASTER.size,
 				      rnd, 2 * GNUTLS_RANDOM_SIZE,
 				      GNUTLS_MASTER_SIZE,
-				      session->
-				      security_parameters.master_secret);
+				      session->security_parameters.
+				      master_secret);
 
     }
   else if (session->security_parameters.extensions.oprfi_client_len > 0 &&
@@ -107,24 +105,20 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 	}
 
       _gnutls_hard_log ("INT: CLIENT OPRFI[%d]: %s\n",
-			session->security_parameters.extensions.
-			oprfi_server_len,
-			_gnutls_bin2hex (session->
-					 security_parameters.extensions.
-					 oprfi_client,
-					 session->
-					 security_parameters.extensions.
-					 oprfi_client_len, buf,
+			session->security_parameters.
+			extensions.oprfi_server_len,
+			_gnutls_bin2hex (session->security_parameters.
+					 extensions.oprfi_client,
+					 session->security_parameters.
+					 extensions.oprfi_client_len, buf,
 					 sizeof (buf)));
       _gnutls_hard_log ("INT: SERVER OPRFI[%d]: %s\n",
-			session->security_parameters.extensions.
-			oprfi_server_len,
-			_gnutls_bin2hex (session->
-					 security_parameters.extensions.
-					 oprfi_server,
-					 session->
-					 security_parameters.extensions.
-					 oprfi_server_len, buf,
+			session->security_parameters.
+			extensions.oprfi_server_len,
+			_gnutls_bin2hex (session->security_parameters.
+					 extensions.oprfi_server,
+					 session->security_parameters.
+					 extensions.oprfi_server_len, buf,
 					 sizeof (buf)));
 
       memcpy (rnd, session->security_parameters.client_random,
@@ -175,9 +169,9 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
     return ret;
 
   _gnutls_hard_log ("INT: MASTER SECRET: %s\n",
-		    _gnutls_bin2hex (session->
-				     security_parameters.master_secret,
-				     GNUTLS_MASTER_SIZE, buf, sizeof (buf)));
+		    _gnutls_bin2hex (session->security_parameters.
+				     master_secret, GNUTLS_MASTER_SIZE, buf,
+				     sizeof (buf)));
 
   return ret;
 }
@@ -242,8 +236,8 @@ _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
   int data_size = 0;
   int ret = 0;
 
-  if (session->internals.
-      auth_struct->gnutls_generate_server_certificate_request == NULL)
+  if (session->internals.auth_struct->
+      gnutls_generate_server_certificate_request == NULL)
     return 0;
 
   if (session->internals.send_cert_req <= 0)
@@ -255,9 +249,8 @@ _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
   if (again == 0)
     {
       data_size =
-	session->internals.
-	auth_struct->gnutls_generate_server_certificate_request (session,
-								 &data);
+	session->internals.auth_struct->
+	gnutls_generate_server_certificate_request (session, &data);
 
       if (data_size < 0)
 	{
@@ -356,8 +349,8 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
   if (again == 0)
     {
       data_size =
-	session->internals.
-	auth_struct->gnutls_generate_client_cert_vrfy (session, &data);
+	session->internals.auth_struct->
+	gnutls_generate_client_cert_vrfy (session, &data);
       if (data_size < 0)
 	{
 	  gnutls_assert ();
@@ -434,8 +427,8 @@ _gnutls_recv_server_certificate_request (gnutls_session_t session)
   int datasize;
   int ret = 0;
 
-  if (session->internals.
-      auth_struct->gnutls_process_server_certificate_request != NULL)
+  if (session->internals.auth_struct->
+      gnutls_process_server_certificate_request != NULL)
     {
 
       ret =
@@ -450,9 +443,8 @@ _gnutls_recv_server_certificate_request (gnutls_session_t session)
 	return 0;		/* ignored */
 
       ret =
-	session->internals.
-	auth_struct->gnutls_process_server_certificate_request (session, data,
-								datasize);
+	session->internals.auth_struct->
+	gnutls_process_server_certificate_request (session, data, datasize);
       gnutls_free (data);
       if (ret < 0)
 	return ret;
@@ -523,8 +515,8 @@ _gnutls_send_client_certificate (gnutls_session_t session, int again)
 	  /* TLS 1.0 or SSL 3.0 with a valid certificate 
 	   */
 	  data_size =
-	    session->internals.
-	    auth_struct->gnutls_generate_client_certificate (session, &data);
+	    session->internals.auth_struct->
+	    gnutls_generate_client_certificate (session, &data);
 
 	  if (data_size < 0)
 	    {
@@ -585,8 +577,8 @@ _gnutls_send_server_certificate (gnutls_session_t session, int again)
   if (again == 0)
     {
       data_size =
-	session->internals.
-	auth_struct->gnutls_generate_server_certificate (session, &data);
+	session->internals.auth_struct->
+	gnutls_generate_server_certificate (session, &data);
 
       if (data_size < 0)
 	{
@@ -680,9 +672,8 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
 	  return 0;
 	}
       ret =
-	session->internals.
-	auth_struct->gnutls_process_client_certificate (session, data,
-							datasize);
+	session->internals.auth_struct->
+	gnutls_process_client_certificate (session, data, datasize);
 
       gnutls_free (data);
       if (ret < 0 && ret != GNUTLS_E_NO_CERTIFICATE_FOUND)
@@ -726,9 +717,8 @@ _gnutls_recv_server_certificate (gnutls_session_t session)
 	}
 
       ret =
-	session->internals.
-	auth_struct->gnutls_process_server_certificate (session, data,
-							datasize);
+	session->internals.auth_struct->
+	gnutls_process_server_certificate (session, data, datasize);
       gnutls_free (data);
       if (ret < 0)
 	{
@@ -778,9 +768,8 @@ _gnutls_recv_client_certificate_verify_message (gnutls_session_t session)
 	}
 
       ret =
-	session->internals.
-	auth_struct->gnutls_process_client_cert_vrfy (session, data,
-						      datasize);
+	session->internals.auth_struct->
+	gnutls_process_client_cert_vrfy (session, data, datasize);
       gnutls_free (data);
       if (ret < 0)
 	return ret;

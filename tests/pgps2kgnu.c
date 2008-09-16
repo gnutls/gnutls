@@ -61,8 +61,7 @@ static char dummy_key[] =
   "vQP/ZhK+2ly9oI2z7ZcNC/BJRch0/ybQ3haahII8pXXmOThpZohr/LUgoWgCZdXg\n"
   "vP6yiszNk2tIs8KphCAw7Lw/qzDC2hEORjWO4f46qk73RAgSqG/GyzI4ltWiDhqn\n"
   "vnQCFl3+QFSe4zinqykHnLwGPMXv428d/ZjkIc2ju8dRsn4=\n"
-  "=CR5w\n"
-  "-----END PGP PRIVATE KEY BLOCK-----\n";
+  "=CR5w\n" "-----END PGP PRIVATE KEY BLOCK-----\n";
 
 /* Test capability of reading the gnu-dummy OpenPGP S2K extension. 
    See: doc/DETAILS from gnupg
@@ -73,7 +72,8 @@ int
 main (void)
 {
   int rc;
-  gnutls_datum_t keydatum = { (unsigned char*)dummy_key, strlen (dummy_key) };
+  gnutls_datum_t keydatum =
+    { (unsigned char *) dummy_key, strlen (dummy_key) };
   gnutls_openpgp_privkey_t key;
 
   rc = gnutls_global_init ();
@@ -95,7 +95,7 @@ main (void)
 				      GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
   if (rc)
     {
-      printf ("gnutls_openpgp_privkey_import rc %d: %s\n", 
+      printf ("gnutls_openpgp_privkey_import rc %d: %s\n",
 	      rc, gnutls_strerror (rc));
       return 1;
     }

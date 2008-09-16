@@ -78,9 +78,10 @@ doit (void)
       {
 	printf ("sign_list[%d] = %d = %s = %d\n", i, algs[i],
 		gnutls_sign_algorithm_get_name (algs[i]),
-		gnutls_sign_get_id (gnutls_sign_algorithm_get_name (algs[i])));
-	if (gnutls_sign_get_id (gnutls_sign_algorithm_get_name (algs[i]))
-	    != algs[i])
+		gnutls_sign_get_id (gnutls_sign_algorithm_get_name
+				    (algs[i])));
+	if (gnutls_sign_get_id (gnutls_sign_algorithm_get_name (algs[i])) !=
+	    algs[i])
 	  fail ("gnutls_sign id's doesn't match\n");
       }
 

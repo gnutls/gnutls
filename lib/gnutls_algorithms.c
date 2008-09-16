@@ -1974,7 +1974,7 @@ gnutls_pk_get_id (const char *name)
 {
   if (strcasecmp (name, "RSA") == 0)
     return GNUTLS_PK_RSA;
-  else if  (strcasecmp (name, "DSA") == 0)
+  else if (strcasecmp (name, "DSA") == 0)
     return GNUTLS_PK_DSA;
 
   return GNUTLS_PK_UNKNOWN;

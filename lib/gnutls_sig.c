@@ -77,9 +77,8 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 	}
 
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-					 session->
-					 security_parameters.master_secret,
-					 GNUTLS_MASTER_SIZE);
+					 session->security_parameters.
+					 master_secret, GNUTLS_MASTER_SIZE);
     }
   else
     _gnutls_hash_deinit (&td_sha, &concat[16]);
@@ -98,9 +97,8 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 
       if (ver == GNUTLS_SSL3)
 	_gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-					   session->
-					   security_parameters.master_secret,
-					   GNUTLS_MASTER_SIZE);
+					   session->security_parameters.
+					   master_secret, GNUTLS_MASTER_SIZE);
       else
 	_gnutls_hash_deinit (&td_md5, concat);
 
@@ -404,13 +402,11 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
 	}
 
       _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-					 session->
-					 security_parameters.master_secret,
-					 GNUTLS_MASTER_SIZE);
+					 session->security_parameters.
+					 master_secret, GNUTLS_MASTER_SIZE);
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-					 session->
-					 security_parameters.master_secret,
-					 GNUTLS_MASTER_SIZE);
+					 session->security_parameters.
+					 master_secret, GNUTLS_MASTER_SIZE);
     }
   else
     {

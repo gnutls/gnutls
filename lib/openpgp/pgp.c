@@ -715,8 +715,8 @@ _gnutls_openpgp_find_key (cdk_kbnode_t knode, uint32_t keyid[2],
 	       || pkt->pkttype == CDK_PKT_PUBLIC_KEY)) || (priv != 0
 							   && (pkt->pkttype ==
 							       CDK_PKT_SECRET_SUBKEY
-							       || pkt->
-							       pkttype ==
+							       || pkt->pkttype
+							       ==
 							       CDK_PKT_SECRET_KEY)))
 	{
 	  if (priv == 0)

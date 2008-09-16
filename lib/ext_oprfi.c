@@ -180,8 +180,8 @@ oprfi_send_server (gnutls_session_t session, opaque * data, size_t _data_size)
     }
 
   DECR_LENGTH_RET (data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
-  _gnutls_write_uint16 (session->security_parameters.extensions.
-			oprfi_server_len, p);
+  _gnutls_write_uint16 (session->security_parameters.
+			extensions.oprfi_server_len, p);
   p += 2;
 
   DECR_LENGTH_RET (data_size,

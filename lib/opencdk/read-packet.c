@@ -86,15 +86,15 @@ read_s2k (cdk_stream_t inp, cdk_s2k_t s2k)
 
   s2k->mode = cdk_stream_getc (inp);
   s2k->hash_algo = cdk_stream_getc (inp);
-  if (s2k->mode == CDK_S2K_SIMPLE) 
-      return 0;
+  if (s2k->mode == CDK_S2K_SIMPLE)
+    return 0;
   else if (s2k->mode == CDK_S2K_SALTED || s2k->mode == CDK_S2K_ITERSALTED)
     {
       if (stream_read (inp, s2k->salt, DIM (s2k->salt), &nread))
 	return CDK_Inv_Packet;
       if (nread != DIM (s2k->salt))
 	return CDK_Inv_Packet;
-      
+
       if (s2k->mode == CDK_S2K_ITERSALTED)
 	s2k->count = cdk_stream_getc (inp);
     }
@@ -355,19 +355,21 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
       rc = read_s2k (inp, sk->protect.s2k);
       if (rc)
 	return rc;
-       /* refer to --export-secret-subkeys in gpg(1) */
-      if (sk->protect.s2k->mode == CDK_S2K_GNU_EXT) 
- 	sk->protect.ivlen = 0;
-      else {
- 	sk->protect.ivlen = _gnutls_cipher_get_block_size ( sk->protect.algo);
- 	if (!sk->protect.ivlen)
- 	  return CDK_Inv_Packet;
- 	rc = stream_read (inp, sk->protect.iv, sk->protect.ivlen, &nread);
- 	if (rc)
- 	  return rc;
- 	if (nread != sk->protect.ivlen)
- 	  return CDK_Inv_Packet;
-      }
+      /* refer to --export-secret-subkeys in gpg(1) */
+      if (sk->protect.s2k->mode == CDK_S2K_GNU_EXT)
+	sk->protect.ivlen = 0;
+      else
+	{
+	  sk->protect.ivlen =
+	    _gnutls_cipher_get_block_size (sk->protect.algo);
+	  if (!sk->protect.ivlen)
+	    return CDK_Inv_Packet;
+	  rc = stream_read (inp, sk->protect.iv, sk->protect.ivlen, &nread);
+	  if (rc)
+	    return rc;
+	  if (nread != sk->protect.ivlen)
+	    return CDK_Inv_Packet;
+	}
     }
   else
     sk->protect.algo = _pgp_cipher_to_gnutls (sk->s2k_usage);
@@ -422,21 +424,22 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
       if (stream_read (inp, sk->encdata, sk->enclen, &nread))
 	return CDK_Inv_Packet;
       /* Handle the GNU S2K extensions we know (just gnu-dummy right now): */
-      if (sk->protect.s2k->mode == CDK_S2K_GNU_EXT) {
-	unsigned char gnumode;
-	if ((sk->enclen < strlen("GNU") + 1) ||
-	    (0 != memcmp("GNU", sk->encdata, strlen("GNU"))))
-	  return CDK_Inv_Packet;
-	gnumode = sk->encdata[strlen("GNU")];
-	/* we only handle gnu-dummy (mode 1).
-	   mode 2 should refer to external smart cards.
-	*/
-	if (gnumode != 1)
-	  return CDK_Inv_Packet;
-	/* gnu-dummy should have no more data */
-	if (sk->enclen != strlen("GNU") + 1)
-	  return CDK_Inv_Packet;
-      }
+      if (sk->protect.s2k->mode == CDK_S2K_GNU_EXT)
+	{
+	  unsigned char gnumode;
+	  if ((sk->enclen < strlen ("GNU") + 1) ||
+	      (0 != memcmp ("GNU", sk->encdata, strlen ("GNU"))))
+	    return CDK_Inv_Packet;
+	  gnumode = sk->encdata[strlen ("GNU")];
+	  /* we only handle gnu-dummy (mode 1).
+	     mode 2 should refer to external smart cards.
+	   */
+	  if (gnumode != 1)
+	    return CDK_Inv_Packet;
+	  /* gnu-dummy should have no more data */
+	  if (sk->enclen != strlen ("GNU") + 1)
+	    return CDK_Inv_Packet;
+	}
       nskey = cdk_pk_get_nskey (sk->pk->pubkey_algo);
       if (!nskey)
 	{

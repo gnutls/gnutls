@@ -133,8 +133,7 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 
 void
 client_finished_callback (gnutls_session_t session,
-			  const void *finished,
-			  size_t len)
+			  const void *finished, size_t len)
 {
   success ("client finished (length %d)\n", len);
   hexprint (finished, len);
@@ -142,8 +141,7 @@ client_finished_callback (gnutls_session_t session,
 
 void
 server_finished_callback (gnutls_session_t session,
-			  const void *finished,
-			  size_t len)
+			  const void *finished, size_t len)
 {
   success ("server finished (length %d)\n", len);
   hexprint (finished, len);
