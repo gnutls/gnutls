@@ -25,7 +25,7 @@
 #ifndef GNUTLS_ERRORS_H
 # define GNUTLS_ERRORS_H
 
-#include <defines.h>
+#include <gnutls_int.h>
 
 #define GNUTLS_E_INT_RET_0 -1251
 

@@ -51,7 +51,7 @@ CFILE_GLOB=$(top_srcdir)/lib/*.c \
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=debug.h gnutls_compress.h defines.h gnutls_cipher.h	\
+IGNORE_HFILES=debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
 	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\

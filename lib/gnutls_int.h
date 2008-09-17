@@ -23,10 +23,38 @@
  */
 
 #ifndef GNUTLS_INT_H
+# define GNUTLS_INT_H
 
-#define GNUTLS_INT_H
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-#include <defines.h>
+#include <stddef.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <limits.h>
+#include <stdint.h>
+
+#ifdef NO_SSIZE_T
+# define HAVE_SSIZE_T
+typedef int ssize_t;
+#endif
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <time.h>
+
+/* some systems had problems with long long int, thus,
+ * it is not used.
+ */
+typedef struct
+{
+  unsigned char i[8];
+} uint64;
 
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
