@@ -535,6 +535,7 @@ SRPMANS += gnutls_srp_set_server_credentials_function.3
 SRPMANS += gnutls_srp_set_client_credentials_function.3
 SRPMANS += gnutls_srp_server_get_username.3
 SRPMANS += gnutls_srp_verifier.3
+SRPMANS += gnutls_srp_set_prime_bits.3
 
 dist_man_MANS += $(APIMANS)
 if ENABLE_SRP
