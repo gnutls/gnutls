@@ -635,7 +635,7 @@ gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
   /* allocate memory for CRL
    */
   crl_list_size = CRL_list_length;
-  crl_list = gnutls_calloc (1, crl_list_size * sizeof (gnutls_x509_crl_t));
+  crl_list = gnutls_calloc (crl_list_size, sizeof (gnutls_x509_crl_t));
   if (crl_list == NULL)
     {
       gnutls_assert ();
