@@ -10,7 +10,8 @@ The function is gnutls_srp_set_prime_bits.  Tiny patch by Kevin Quick
 <quick@sparq.org> in <https://savannah.gnu.org/support/index.php?106454>.
 
 ** libgnutls: Check for overflows in gnutls_calloc and gnutls_secure_calloc.
-Reported by Werner Koch <wk@gnupg.org>.
+Also fix overflows in calls to those functions.  Reported by Werner
+Koch <wk@gnupg.org>.
 
 ** Indent code.
 

@@ -333,7 +333,7 @@ _gnutls_selected_cert_supported_kx (gnutls_session_t session,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  *alg = gnutls_calloc (1, sizeof (gnutls_kx_algorithm_t) * i);
+  *alg = gnutls_calloc (i, sizeof (gnutls_kx_algorithm_t));
   if (*alg == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 

@@ -79,7 +79,7 @@ _gnutls_copy_certificate_auth_info (cert_auth_info_t info,
     }
 
   info->raw_certificate_list =
-    gnutls_calloc (1, sizeof (gnutls_datum_t) * ncerts);
+    gnutls_calloc (sizeof (gnutls_datum_t), ncerts);
   if (info->raw_certificate_list == NULL)
     {
       gnutls_assert ();

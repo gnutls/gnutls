@@ -614,8 +614,7 @@ gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
    */
   peer_certificate_list_size = cert_list_length;
   peer_certificate_list =
-    gnutls_calloc (1,
-		   peer_certificate_list_size * sizeof (gnutls_x509_crt_t));
+    gnutls_calloc (peer_certificate_list_size, sizeof (gnutls_x509_crt_t));
   if (peer_certificate_list == NULL)
     {
       gnutls_assert ();
@@ -625,7 +624,7 @@ gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
 
   ca_certificate_list_size = CA_list_length;
   ca_certificate_list =
-    gnutls_calloc (1, ca_certificate_list_size * sizeof (gnutls_x509_crt_t));
+    gnutls_calloc (ca_certificate_list_size, sizeof (gnutls_x509_crt_t));
   if (ca_certificate_list == NULL)
     {
       gnutls_assert ();

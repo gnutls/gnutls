@@ -442,7 +442,7 @@ unpack_certificate_auth_info (gnutls_session_t session,
   if (info->ncerts > 0)
     {
       info->raw_certificate_list =
-	gnutls_calloc (1, sizeof (gnutls_datum_t) * info->ncerts);
+	gnutls_calloc (info->ncerts, sizeof (gnutls_datum_t));
       if (info->raw_certificate_list == NULL)
 	{
 	  gnutls_assert ();
