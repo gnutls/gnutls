@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -25,6 +25,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
+#include <xsize.h>
 
 gnutls_alloc_function gnutls_secure_malloc = malloc;
 gnutls_alloc_function gnutls_malloc = malloc;
@@ -47,8 +48,8 @@ void *
 _gnutls_calloc (size_t nmemb, size_t size)
 {
   void *ret;
-  size *= nmemb;
-  ret = gnutls_malloc (size);
+  size_t n = xtimes (nmemb, size);
+  ret = (size_in_bounds_p (n) ? gnutls_malloc (n) : NULL);
   if (ret != NULL)
     memset (ret, 0, size);
   return ret;
@@ -58,8 +59,8 @@ svoid *
 gnutls_secure_calloc (size_t nmemb, size_t size)
 {
   svoid *ret;
-  size *= nmemb;
-  ret = gnutls_secure_malloc (size);
+  size_t n = xtimes (nmemb, size);
+  ret = (size_in_bounds_p (n) ? gnutls_secure_malloc (n) : NULL);
   if (ret != NULL)
     memset (ret, 0, size);
   return ret;
