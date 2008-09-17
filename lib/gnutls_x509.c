@@ -132,8 +132,7 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
    */
   peer_certificate_list_size = info->ncerts;
   peer_certificate_list =
-    gnutls_calloc (1,
-		   peer_certificate_list_size * sizeof (gnutls_x509_crt_t));
+    gnutls_calloc (peer_certificate_list_size, sizeof (gnutls_x509_crt_t));
   if (peer_certificate_list == NULL)
     {
       gnutls_assert ();
