@@ -640,6 +640,11 @@ typedef struct
   /* Callback to extract TLS Finished message. */
   gnutls_finished_callback_func finished_func;
 
+  /* minimum bits to allow for SRP
+   * use gnutls_srp_set_prime_bits() to adjust it.
+   */
+  uint16_t srp_prime_bits;
+
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
 } internals_st;

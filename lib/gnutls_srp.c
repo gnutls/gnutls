@@ -725,4 +725,25 @@ gnutls_srp_verifier (const char *username, const char *password,
   return 0;
 }
 
+/**
+ * gnutls_srp_set_prime_bits - set the minimum bits for a SRP ciphersuite
+ * @session: is a #gnutls_session_t structure.
+ * @bits: is the number of bits
+ *
+ * This function sets the minimum accepted number of bits, for use in
+ * an SRP key exchange.  If zero, the default 2048 bits will be used.
+ *
+ * In the client side it sets the minimum accepted number of bits.  If
+ * a server sends a prime with less bits than that
+ * %GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER will be returned by the
+ * handshake.
+ *
+ * Since: 2.6.0
+ **/
+void
+gnutls_srp_set_prime_bits (gnutls_session_t session, unsigned int bits)
+{
+  session->internals.srp_prime_bits = bits;
+}
+
 #endif /* ENABLE_SRP */

@@ -5,10 +5,14 @@ See the end for copying conditions.
 
 * Version 2.5.8 (unreleased)
 
+** libgnutls: New function to set minimum acceptable SRP bits.
+The function is gnutls_srp_set_prime_bits.  Tiny patch by Kevin Quick
+<quick@sparq.org> in <https://savannah.gnu.org/support/index.php?106454>.
+
 ** Indent code.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_srp_set_prime_bits: ADDED
 
 * Version 2.5.7 (released 2008-09-16)
 

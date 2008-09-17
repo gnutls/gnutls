@@ -595,12 +595,14 @@ check_g_n (const opaque * g, size_t n_g, const opaque * n, size_t n_n)
  * Otherwise only the included parameters must be used.
  */
 static int
-group_check_g_n (bigint_t g, bigint_t n)
+group_check_g_n (gnutls_session_t session, bigint_t g, bigint_t n)
 {
   bigint_t q = NULL, two = NULL, w = NULL;
   int ret;
 
-  if (_gnutls_mpi_get_nbits (n) < 2048)
+  if (_gnutls_mpi_get_nbits (n) < (session->internals.srp_prime_bits
+				   ? session->internals.srp_prime_bits
+				   : 2048))
     {
       gnutls_assert ();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -814,7 +816,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
   if ((ret = check_g_n (data_g, _n_g, data_n, _n_n)) < 0)
     {
       _gnutls_x509_log ("Checking the SRP group parameters.\n");
-      if ((ret = group_check_g_n (G, N)) < 0)
+      if ((ret = group_check_g_n (session, G, N)) < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
