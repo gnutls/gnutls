@@ -98,6 +98,7 @@ AC_MSG_RESULT([***
 
 gl_EARLY
 lgl_EARLY
+xgl_EARLY
 AC_C_CONST
 AC_C_INLINE
 
@@ -649,6 +650,7 @@ AC_MSG_RESULT([***
 ])
 gl_INIT
 lgl_INIT
+xgl_INIT
 
 AC_MSG_RESULT([***
 *** Detecting options for shared libraries...
