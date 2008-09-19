@@ -35,15 +35,14 @@
 # endif
 #endif
 
+#ifdef USE_LZO
+#include <gnutls_compress.h>
 
 /* the number of the compression algorithms available in the compression
  * structure.
  */
 extern int _gnutls_comp_algorithms_size;
 
-/* Functions in gnutls that have not been initialized.
- */
-#ifdef USE_LZO
 typedef int (*LZO_FUNC) ();
 extern LZO_FUNC _gnutls_lzo1x_decompress_safe;
 extern LZO_FUNC _gnutls_lzo1x_1_compress;
@@ -86,7 +85,7 @@ _gnutls_add_lzo_comp (void)
 static int _gnutls_init_extra = 0;
 
 /**
-  * gnutls_global_init_extra - This function initializes the global state of gnutls-extra 
+  * gnutls_global_init_extra - initializes the global state of gnutls-extra
   *
   * This function initializes the global state of gnutls-extra library
   * to defaults.  Returns zero on success.

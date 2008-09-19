@@ -89,19 +89,6 @@ _gnutls_m_compressed2plaintext (gnutls_session_t session,
 #define MAX_COMP_METHODS 5
 const int _gnutls_comp_algorithms_size = MAX_COMP_METHODS;
 
-struct gnutls_compression_entry
-{
-  const char *name;
-  gnutls_compression_method_t id;
-  int num;			/* the number reserved in TLS for the specific compression method */
-
-  /* used in zlib compressor */
-  int window_bits;
-  int mem_level;
-  int comp_level;
-};
-typedef struct gnutls_compression_entry gnutls_compression_entry;
-
 gnutls_compression_entry _gnutls_compression_algorithms[MAX_COMP_METHODS] = {
   GNUTLS_COMPRESSION_ENTRY (GNUTLS_COMP_NULL, 0x00, 0, 0, 0),
 #ifdef HAVE_LIBZ

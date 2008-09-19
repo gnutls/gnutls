@@ -59,4 +59,18 @@ int _gnutls_decompress (comp_hd_t handle, opaque * compressed,
 int _gnutls_compress (comp_hd_t, const opaque * plain, size_t plain_size,
 		      opaque ** compressed, size_t max_comp_size);
 
+struct gnutls_compression_entry
+{
+  const char *name;
+  gnutls_compression_method_t id;
+  /* the number reserved in TLS for the specific compression method */
+  int num;
+
+  /* used in zlib compressor */
+  int window_bits;
+  int mem_level;
+  int comp_level;
+};
+typedef struct gnutls_compression_entry gnutls_compression_entry;
+
 #endif
