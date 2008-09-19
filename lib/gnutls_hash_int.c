@@ -126,6 +126,7 @@ _gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
 
   if (src->registered)
     {
+      dst->hd.rh.cc = src->hd.rh.cc;
       return src->hd.rh.cc->copy (&dst->hd.rh.ctx, src->hd.rh.ctx);
     }
 
@@ -144,7 +145,7 @@ _gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
 void
 _gnutls_hash_output (digest_hd_st * handle, void *digest)
 {
-  int maclen;
+  size_t maclen;
 
   maclen = _gnutls_hash_get_algo_len (handle->algorithm);
 
