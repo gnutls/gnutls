@@ -15,10 +15,16 @@ The function is gnutls_srp_set_prime_bits.  Tiny patch by Kevin Quick
 Also fix overflows in calls to those functions.  Reported by Werner
 Koch <wk@gnupg.org>.
 
+** libgnutls-extra: Add function to work with Libgcrypt in FIPS mode.
+The function is gnutls_register_md5_handler.  When libgcrypt is in
+FIPS mode, MD5 is disabled, but TLS normally requires use of MD5 in
+the PRF.
+
 ** Indent code.
 
 ** API and ABI modifications:
 gnutls_srp_set_prime_bits: ADDED
+gnutls_register_md5_handler: ADDED
 
 * Version 2.5.7 (released 2008-09-16)
 
