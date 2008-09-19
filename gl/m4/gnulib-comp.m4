@@ -79,8 +79,6 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_READLINE
   gl_TYPE_SOCKLEN_T
   gl_STDARG_H
-  gl_FUNC_STRDUP
-  gl_STRING_MODULE_INDICATOR([strdup])
   gl_FUNC_STRERROR
   gl_STRING_MODULE_INDICATOR([strerror])
   m4_ifval(gl_LIBSOURCES_LIST, [
@@ -239,7 +237,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/readline.c
   lib/readline.h
   lib/stdarg.in.h
-  lib/strdup.c
   lib/strerror.c
   lib/version-etc-fsf.c
   lib/version-etc.c
@@ -263,7 +260,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/readline.m4
   m4/socklen.m4
   m4/stdarg.m4
-  m4/strdup.m4
   m4/strerror.m4
   tests/test-arpa_inet.c
   tests/test-c-ctype.c

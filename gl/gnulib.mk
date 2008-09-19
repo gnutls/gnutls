@@ -223,15 +223,6 @@ EXTRA_DIST += stdarg.in.h
 
 ## end   gnulib module stdarg
 
-## begin gnulib module strdup
-
-
-EXTRA_DIST += strdup.c
-
-EXTRA_libgnu_la_SOURCES += strdup.c
-
-## end   gnulib module strdup
-
 ## begin gnulib module strerror
 
 

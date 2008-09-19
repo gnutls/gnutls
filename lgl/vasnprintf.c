@@ -215,7 +215,7 @@ local_wcslen (const wchar_t *s)
 #undef remainder
 #define remainder rem
 
-#if (NEED_PRINTF_DIRECTIVE_A || NEED_PRINTF_LONG_DOUBLE || NEED_PRINTF_DOUBLE || NEED_PRINTF_INFINITE_DOUBLE) && !defined IN_LIBINTL
+#if (NEED_PRINTF_DIRECTIVE_A || NEED_PRINTF_LONG_DOUBLE || NEED_PRINTF_INFINITE_LONG_DOUBLE || NEED_PRINTF_DOUBLE || NEED_PRINTF_INFINITE_DOUBLE) && !defined IN_LIBINTL
 /* Determine the decimal-point character according to the current locale.  */
 # ifndef decimal_point_char_defined
 #  define decimal_point_char_defined 1
@@ -255,11 +255,11 @@ is_infinite_or_zero (double x)
 
 #if NEED_PRINTF_INFINITE_LONG_DOUBLE && !NEED_PRINTF_LONG_DOUBLE && !defined IN_LIBINTL
 
-/* Equivalent to !isfinite(x), but does not require libm.  */
+/* Equivalent to !isfinite(x) || x == 0, but does not require libm.  */
 static int
-is_infinitel (long double x)
+is_infinite_or_zerol (long double x)
 {
-  return isnanl (x) || (x + x == x && x != 0.0L);
+  return isnanl (x) || x + x == x;
 }
 
 #endif
@@ -2578,8 +2578,10 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 # elif NEED_PRINTF_INFINITE_LONG_DOUBLE
 			 || (a.arg[dp->arg_index].type == TYPE_LONGDOUBLE
 			     /* Some systems produce wrong output for Inf,
-				-Inf, and NaN.  */
-			     && is_infinitel (a.arg[dp->arg_index].a.a_longdouble))
+				-Inf, and NaN.  Some systems in this category
+				(IRIX 5.3) also do so for -0.0.  Therefore we
+				treat this case here as well.  */
+			     && is_infinite_or_zerol (a.arg[dp->arg_index].a.a_longdouble))
 # endif
 			))
 	      {
@@ -3139,7 +3141,49 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 			      abort ();
 #  else
 			    /* arg is finite.  */
-			    abort ();
+			    if (!(arg == 0.0L))
+			      abort ();
+
+			    pad_ptr = p;
+
+			    if (dp->conversion == 'f' || dp->conversion == 'F')
+			      {
+				*p++ = '0';
+				if ((flags & FLAG_ALT) || precision > 0)
+				  {
+				    *p++ = decimal_point_char ();
+				    for (; precision > 0; precision--)
+				      *p++ = '0';
+				  }
+			      }
+			    else if (dp->conversion == 'e' || dp->conversion == 'E')
+			      {
+				*p++ = '0';
+				if ((flags & FLAG_ALT) || precision > 0)
+				  {
+				    *p++ = decimal_point_char ();
+				    for (; precision > 0; precision--)
+				      *p++ = '0';
+				  }
+				*p++ = dp->conversion; /* 'e' or 'E' */
+				*p++ = '+';
+				*p++ = '0';
+				*p++ = '0';
+			      }
+			    else if (dp->conversion == 'g' || dp->conversion == 'G')
+			      {
+				*p++ = '0';
+				if (flags & FLAG_ALT)
+				  {
+				    size_t ndigits =
+				      (precision > 0 ? precision - 1 : 0);
+				    *p++ = decimal_point_char ();
+				    for (; ndigits > 0; --ndigits)
+				      *p++ = '0';
+				  }
+			      }
+			    else
+			      abort ();
 #  endif
 			  }
 
