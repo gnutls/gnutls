@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.5.8 (unreleased)
 
+** libgnutls: Fix crash in hashing code when using non-libgcrypt handlers.
+
 ** libgnutls: New function to set minimum acceptable SRP bits.
 The function is gnutls_srp_set_prime_bits.  Tiny patch by Kevin Quick
 <quick@sparq.org> in <https://savannah.gnu.org/support/index.php?106454>.
