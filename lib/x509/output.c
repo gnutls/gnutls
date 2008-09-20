@@ -29,6 +29,7 @@
 #include <common.h>
 #include <gnutls_x509.h>
 #include <x509_int.h>
+#include <gnutls_num.h>
 #include <gnutls_errors.h>
 #include <c-ctype.h>
 
@@ -39,6 +40,8 @@
 
 #define addf _gnutls_string_append_printf
 #define adds _gnutls_string_append_str
+
+#define ERROR_STR "(error)"
 
 static void
 hexdump (gnutls_string * str, const char *data, size_t len, const char *spc)
@@ -89,6 +92,46 @@ asciiprint (gnutls_string * str, const char *data, size_t len)
       addf (str, "%c", (unsigned char) data[j]);
     else
       addf (str, ".");
+}
+
+static char* ip_to_string( void* _ip, int ip_size, char* string, int string_size)
+{
+uint8_t* ip;
+
+    if (ip_size != 4 && ip_size != 16) 
+      {
+        gnutls_assert();
+        return NULL;
+      }
+
+    if (ip_size == 4 && string_size < 16)
+      {
+        gnutls_assert();
+        return NULL;
+      }
+
+    if (ip_size == 16 && string_size < 48)
+      {
+        gnutls_assert();
+        return NULL;
+      }
+    
+    ip = _ip;
+    switch(ip_size) 
+      {
+        case 4:
+          sprintf(string, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
+          break;
+        case 16:
+          sprintf(string, "%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x", 
+            ip[0], ip[1], ip[2], ip[3],
+            ip[4], ip[5], ip[6], ip[7],
+            ip[8], ip[9], ip[10], ip[11],
+            ip[12], ip[13], ip[14], ip[15]);
+          break;
+      }
+      
+      return string;
 }
 
 static void
@@ -240,6 +283,8 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 {
   char *buffer = NULL;
   size_t size;
+  char str_ip[64];
+  char* p;
   int err;
   int indx;
 
@@ -287,12 +332,11 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 	case GNUTLS_SAN_URI:
 	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
 	  break;
-#if 0
-/* FIXME: This is broken. Ip address is a 4 or 16 byte address. */
 	case GNUTLS_SAN_IPADDRESS:
-	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
+	  p = ip_to_string(buffer, size, str_ip, sizeof(str_ip));
+	  if (p == NULL) p = ERROR_STR;
+	  addf (str, "\t\t\tIPAddress: %s\n", p);
 	  break;
-#endif
 	case GNUTLS_SAN_DN:
 	  addf (str, "\t\t\tdirectoryName: %.*s\n", size, buffer);
 	  break;
@@ -389,10 +433,13 @@ print_basic (gnutls_string * str, gnutls_x509_crt_t cert)
     addf (str, _("\t\t\tPath Length Constraint: %d\n"), pathlen);
 }
 
+
 static void
 print_san (gnutls_string * str, gnutls_x509_crt_t cert)
 {
   unsigned int san_idx;
+  char str_ip[64];
+  char* p;
 
   for (san_idx = 0;; san_idx++)
     {
@@ -442,12 +489,11 @@ print_san (gnutls_string * str, gnutls_x509_crt_t cert)
 	case GNUTLS_SAN_URI:
 	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
 	  break;
-#if 0
-/* FIXME: This is broken. Ip address is a 4 or 16 byte address. */
 	case GNUTLS_SAN_IPADDRESS:
-	  addf (str, "\t\t\tIPAddress: %.*s\n", size, buffer);
+	  p = ip_to_string(buffer, size, str_ip, sizeof(str_ip));
+	  if (p == NULL) p = ERROR_STR;
+	  addf (str, "\t\t\tIPAddress: %s\n", p);
 	  break;
-#endif
 	case GNUTLS_SAN_DN:
 	  addf (str, "\t\t\tdirectoryName: %.*s\n", size, buffer);
 	  break;

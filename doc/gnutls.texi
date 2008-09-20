@@ -2953,12 +2953,13 @@ expiration_days = 700
 
 # A dnsname in case of a WWW server.
 #dns_name = "www.none.org"
+#dns_name = "www.morethanone.org"
 
 # An IP address in case of a server.
 #ip_address = "192.168.1.1"
 
 # An email in case of a person
-email = "none@@none.org"
+email = "none@none.org"
 
 # An URL that has CRLs (certificate revocation lists)
 # available. Needed in CA certificates.

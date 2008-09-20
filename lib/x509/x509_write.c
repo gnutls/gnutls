@@ -174,7 +174,7 @@ gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt, gnutls_x509_crt_t eecrt,
  *
  * To create well-formed certificates, you must specify version 3 if
  * you use any certificate extensions.  Extensions are created by
- * functions such as gnutls_x509_crt_set_subject_alternative_name()
+ * functions such as gnutls_x509_crt_set_subject_alt_name()
  * or gnutls_x509_crt_set_key_usage().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
@@ -458,7 +458,11 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
  * @data_string: The data to be set, a zero terminated string
  *
  * This function will set the subject alternative name certificate
- * extension.
+ * extension. This function assumes that data can be expressed as a null
+ * terminated string.
+ *
+ * The name of the function is unfortunate since it is incosistent with
+ * gnutls_x509_crt_get_subject_alt_name().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -468,10 +472,46 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
 					      gnutls_x509_subject_alt_name_t
 					      type, const char *data_string)
 {
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* only handle text extensions */  
+  if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME && 
+    type != GNUTLS_SAN_URI) 
+    {
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return gnutls_x509_crt_set_subject_alt_name( crt, type, data_string, strlen(data_string), GNUTLS_FSAN_SET);
+}
+
+/**
+ * gnutls_x509_crt_set_subject_alt_name - Set the subject Alternative Name
+ * @crt: should contain a gnutls_x509_crt_t structure
+ * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
+ * @data: The data to be set
+ * @data_size: The size of data to be set
+ * @flags: GNUTLS_FSAN_SET to clear previous data or GNUTLS_FSAN_APPEND to append. 
+ *
+ * This function will set the subject alternative name certificate
+ * extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
+			      gnutls_x509_subject_alt_name_t type, 
+			      const void *data, unsigned int data_size, unsigned int flags)
+{
   int result;
-  gnutls_datum_t der_data;
-  gnutls_datum_t dnsname;
-  unsigned int critical;
+  gnutls_datum_t der_data = { NULL, 0 };
+  gnutls_datum_t prev_der_data = { NULL, 0 };
+  unsigned int critical = 0;
 
   if (crt == NULL)
     {
@@ -481,28 +521,34 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
 
   /* Check if the extension already exists.
    */
-  result =
-    _gnutls_x509_crt_get_extension (crt, "2.5.29.17", 0, &dnsname, &critical);
 
-  if (result >= 0)
-    _gnutls_free_datum (&dnsname);
-  if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+  if (flags == GNUTLS_FSAN_APPEND)
     {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
+      result =
+        _gnutls_x509_crt_get_extension (crt, "2.5.29.17", 0, &prev_der_data, &critical);
+      
+      if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+        {
+          gnutls_assert ();
+          return result;
+        }
     }
 
   /* generate the extension.
    */
   result =
-    _gnutls_x509_ext_gen_subject_alt_name (type, data_string, &der_data);
+    _gnutls_x509_ext_gen_subject_alt_name (type, data, data_size, &prev_der_data, &der_data);
+
+  if (flags == GNUTLS_FSAN_APPEND)
+    _gnutls_free_datum (&prev_der_data);
+
   if (result < 0)
     {
       gnutls_assert ();
-      return result;
+      goto finish;
     }
 
-  result = _gnutls_x509_crt_set_extension (crt, "2.5.29.17", &der_data, 0);
+  result = _gnutls_x509_crt_set_extension (crt, "2.5.29.17", &der_data, critical);
 
   _gnutls_free_datum (&der_data);
 
@@ -515,6 +561,10 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
   crt->use_extensions = 1;
 
   return 0;
+
+finish:
+  _gnutls_free_datum (&prev_der_data);
+  return result;
 }
 
 /**
@@ -763,9 +813,31 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
 				     type, const void *data_string,
 				     unsigned int reason_flags)
 {
+  return gnutls_x509_crt_set_crl_dist_points2( crt, type, data_string, strlen(data_string),reason_flags);
+}
+
+/**
+ * gnutls_x509_crt_set_crl_dist_points2 - Set the CRL dist points
+ * @crt: should contain a gnutls_x509_crt_t structure
+ * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
+ * @data: The data to be set
+ * @data_size: The data size
+ * @reason_flags: revocation reasons
+ *
+ * This function will set the CRL distribution points certificate extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
+				     gnutls_x509_subject_alt_name_t
+				     type, const void *data, unsigned int data_size,
+				     unsigned int reason_flags)
+{
   int result;
-  gnutls_datum_t der_data;
-  gnutls_datum_t oldname;
+  gnutls_datum_t der_data = { NULL, 0 };
+  gnutls_datum_t oldname = { NULL, 0 };
   unsigned int critical;
 
   if (crt == NULL)
@@ -779,8 +851,8 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
   result =
     _gnutls_x509_crt_get_extension (crt, "2.5.29.31", 0, &oldname, &critical);
 
-  if (result >= 0)
-    _gnutls_free_datum (&oldname);
+  _gnutls_free_datum (&oldname);
+
   if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
     {
       gnutls_assert ();
@@ -790,7 +862,7 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
   /* generate the extension.
    */
   result =
-    _gnutls_x509_ext_gen_crl_dist_points (type, data_string,
+    _gnutls_x509_ext_gen_crl_dist_points (type, data, data_size,
 					  reason_flags, &der_data);
   if (result < 0)
     {
@@ -811,6 +883,7 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
   crt->use_extensions = 1;
 
   return 0;
+
 }
 
 /**

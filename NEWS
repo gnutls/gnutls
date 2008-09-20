@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.5.8 (unreleased)
 
+** certtool: updated so it can add several subject alternative names using
+the template file.
+
+** libgnutls: gnutls_x509_crt_set_subject_alt_name() was added that can
+either set or append alternative names. It can also handle binary structures
+such as IP addresses.
+
 ** libgnutls: Fix crash in hashing code when using non-libgcrypt handlers.
 
 ** libgnutls: New function to set minimum acceptable SRP bits.
@@ -25,6 +32,8 @@ the PRF.
 ** API and ABI modifications:
 gnutls_srp_set_prime_bits: ADDED
 gnutls_register_md5_handler: ADDED
+gnutls_x509_crt_set_crl_dist_points2: ADDED
+gnutls_x509_crt_set_subject_alt_name: ADDED
 
 * Version 2.5.7 (released 2008-09-16)
 

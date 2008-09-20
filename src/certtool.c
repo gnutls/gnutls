@@ -406,25 +406,8 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 
 	  if (!proxy)
 	    {
-	      str = get_dns_name ();
-	      if (str != NULL)
-		{
-		  result = gnutls_x509_crt_set_subject_alternative_name
-		    (crt, GNUTLS_SAN_DNSNAME, str);
-		}
-	      else
-		{
-		  str = get_ip_addr ();
-		  if (str != NULL)
-		    {
-		      result = gnutls_x509_crt_set_subject_alternative_name
-			(crt, GNUTLS_SAN_IPADDRESS, str);
-		    }
-		}
-
-	      if (result < 0)
-		error (EXIT_FAILURE, 0, "subject_alt_name: %s",
-		       gnutls_strerror (result));
+	      get_dns_name_set( crt);
+	      get_ip_addr_set( crt);
 	    }
 
 	  result =
@@ -435,16 +418,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	}
       else if (!proxy)
 	{
-	  str = get_email ();
-
-	  if (str != NULL)
-	    {
-	      result = gnutls_x509_crt_set_subject_alternative_name
-		(crt, GNUTLS_SAN_RFC822NAME, str);
-	      if (result < 0)
-		error (EXIT_FAILURE, 0, "subject_alt_name: %s",
-		       gnutls_strerror (result));
-	    }
+	  get_email_set( crt);
 	}
 
       if (!ca_status || server)

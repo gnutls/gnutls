@@ -29,6 +29,11 @@
 #include <inttypes.h>
 #include <time.h>
 
+/* for inet_pton */
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+                    
 /* Gnulib portability files. */
 #include <getpass.h>
 #include "readline.h"
@@ -46,9 +51,9 @@ typedef struct _cfg_ctx
   char *challenge_password;
   char *pkcs9_email;
   char *country;
-  char *dns_name;
-  char *ip_addr;
-  char *email;
+  char **dns_name;
+  char **ip_addr;
+  char **email;
   char **dn_oid;
   char *crl_dist_points;
   char *password;
@@ -105,9 +110,9 @@ template_parse (const char *template)
     {NULL, '\0', "password", CFG_STR, (void *) &cfg.password, 0},
     {NULL, '\0', "pkcs9_email", CFG_STR, (void *) &cfg.pkcs9_email, 0},
     {NULL, '\0', "country", CFG_STR, (void *) &cfg.country, 0},
-    {NULL, '\0', "dns_name", CFG_STR, (void *) &cfg.dns_name, 0},
-    {NULL, '\0', "ip_address", CFG_STR, (void *) &cfg.ip_addr, 0},
-    {NULL, '\0', "email", CFG_STR, (void *) &cfg.email, 0},
+    {NULL, '\0', "dns_name", CFG_STR|CFG_MULTI_ARRAY, (void *) &cfg.dns_name, 0},
+    {NULL, '\0', "ip_address", CFG_STR|CFG_MULTI_ARRAY, (void *) &cfg.ip_addr, 0},
+    {NULL, '\0', "email", CFG_STR|CFG_MULTI_ARRAY, (void *) &cfg.email, 0},
 
     {NULL, '\0', "dn_oid", CFG_STR + CFG_MULTI_SEPARATED,
      (void *) &cfg.dn_oid, 0},
@@ -717,47 +722,154 @@ get_tls_server_status (void)
     }
 }
 
-const char *
-get_dns_name (void)
+/* avoid depending on in6addr etc. 
+ *
+ * ip must be of size 16 or more.
+ */
+static int string_to_ip( unsigned char *ip, const char * str)
 {
+  int len = strlen( str);
+  int ret;
+  
+  if ( len > 16) { /* IPv6 */
+    ret = sscanf( str, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", 
+        &ip[0], &ip[1], &ip[2], &ip[3], &ip[4], &ip[5], &ip[6], 
+        &ip[7], &ip[8], &ip[9], &ip[10], &ip[11], &ip[12], &ip[13], 
+        &ip[14], &ip[15]);
+    if (ret <= 0) return 0;
+    
+    return 16;
+  } else { /* IPv4 */
+    ret = sscanf( str, "%hhu.%hhu.%hhu.%hhu", &ip[0], &ip[1], &ip[2], &ip[3]);
+    if (ret <= 0) return 0;
+
+    return 4;    
+  }
+
+}
+
+void
+get_ip_addr_set (gnutls_x509_crt_t crt)
+{
+  int ret, i;
+  unsigned char ip[16];
+  int len;
+
   if (batch)
     {
-      return cfg.dns_name;
+      if (!cfg.ip_addr)
+	return;
+
+      for (i = 0; cfg.ip_addr[i] != NULL; i++)
+	{
+          len = string_to_ip( ip, cfg.ip_addr[i]);
+          if (len <= 0) {
+            fprintf(stderr, "Error parsing address: %s\n", cfg.ip_addr[i]);
+            exit(1);
+          }
+
+	  ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
+	    ip, len, GNUTLS_FSAN_APPEND);
+	    
+          if (ret < 0) break;
+	}
     }
   else
     {
-      return
-	read_str ("Enter the dnsName of the subject of the certificate: ");
+      const char *p;
+      
+      p = read_str ("Enter the dnsName of the subject of the certificate: ");
+      if (!p) return;
+
+        len = string_to_ip( ip, cfg.ip_addr[i]);
+        if (len <= 0) {
+            fprintf(stderr, "Error parsing address: %s\n", cfg.ip_addr[i]);
+            exit(1);
+        }
+        ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
+	    ip, len, GNUTLS_FSAN_APPEND);
+    }
+
+  if (ret < 0)
+    {
+      fprintf (stderr, "set_subject_alt_name: %s\n", gnutls_strerror (ret));
+      exit (1);
     }
 }
 
-const char *
-get_ip_addr (void)
+
+void
+get_email_set (gnutls_x509_crt_t crt)
 {
+  int ret, i;
+
   if (batch)
     {
-      return cfg.ip_addr;
+      if (!cfg.email)
+	return;
+
+      for (i = 0; cfg.email[i] != NULL; i ++)
+	{
+	  ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
+	    cfg.email[i], strlen(cfg.email[i]), GNUTLS_FSAN_APPEND);
+	    
+          if (ret < 0) break;
+	}
     }
   else
     {
-      return
-	read_str ("Enter the IP address of the subject of the certificate: ");
+      const char *p;
+      
+      p = read_str ("Enter the e-mail of the subject of the certificate: ");
+      if (!p) return;
+
+      ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
+        p, strlen(p), GNUTLS_FSAN_APPEND);
+    }
+
+  if (ret < 0)
+    {
+      fprintf (stderr, "set_subject_alt_name: %s\n", gnutls_strerror (ret));
+      exit (1);
     }
 }
 
-const char *
-get_email (void)
+void
+get_dns_name_set (gnutls_x509_crt_t crt)
 {
+  int ret, i;
+
   if (batch)
     {
-      return cfg.email;
+      if (!cfg.dns_name)
+	return;
+
+      for (i = 0; cfg.dns_name[i] != NULL; i ++)
+	{
+	  ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
+	    cfg.dns_name[i], strlen(cfg.dns_name[i]), GNUTLS_FSAN_APPEND);
+	    
+          if (ret < 0) break;
+	}
     }
   else
     {
-      return
-	read_str ("Enter the e-mail of the subject of the certificate: ");
+      const char *p;
+      
+      p = read_str ("Enter the dnsName of the subject of the certificate: ");
+      if (!p) return;
+
+      ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
+        p, strlen(p), GNUTLS_FSAN_APPEND);
+    }
+
+  if (ret < 0)
+    {
+      fprintf (stderr, "set_subject_alt_name: %s\n", gnutls_strerror (ret));
+      exit (1);
     }
 }
+
 
 int
 get_sign_status (int server)

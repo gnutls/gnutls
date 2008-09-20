@@ -651,7 +651,7 @@ _gnutls_x509_ext_gen_keyUsage (uint16_t usage, gnutls_datum_t * der_ext)
 static int
 write_new_general_name (ASN1_TYPE ext, const char *ext_name,
 			gnutls_x509_subject_alt_name_t type,
-			const char *data_string)
+			const void *data, unsigned int data_size)
 {
   const char *str;
   int result;
@@ -703,7 +703,7 @@ write_new_general_name (ASN1_TYPE ext, const char *ext_name,
   _gnutls_str_cat (name, sizeof (name), ".");
   _gnutls_str_cat (name, sizeof (name), str);
 
-  result = asn1_write_value (ext, name, data_string, strlen (data_string));
+  result = asn1_write_value (ext, name, data, data_size);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -719,8 +719,8 @@ write_new_general_name (ASN1_TYPE ext, const char *ext_name,
  */
 int
 _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
-				       type, const char *data_string,
-				       gnutls_datum_t * der_ext)
+				       type, const void* data, unsigned int data_size,
+				       gnutls_datum_t* prev_der_ext, gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -733,7 +733,19 @@ _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
       return _gnutls_asn2err (result);
     }
 
-  result = write_new_general_name (ext, "", type, data_string);
+  if (prev_der_ext != NULL && prev_der_ext->data != NULL && prev_der_ext->size != 0) 
+    {
+      result = asn1_der_decoding (&ext, prev_der_ext->data, prev_der_ext->size, NULL);
+
+      if (result != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          asn1_delete_structure (&ext);
+          return _gnutls_asn2err (result);
+        }
+    }
+
+  result = write_new_general_name (ext, "", type, data, data_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -843,7 +855,7 @@ _gnutls_x509_ext_gen_auth_key_id (const void *id, size_t id_size,
  */
 int
 _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
-				      type, const void *data_string,
+				      type, const void *data, unsigned int data_size,
 				      unsigned int reason_flags,
 				      gnutls_datum_t * der_ext)
 {
@@ -921,7 +933,7 @@ _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
 
   result =
     write_new_general_name (ext, "?LAST.distributionPoint.fullName",
-			    type, data_string);
+			    type, data, data_size);
   if (result < 0)
     {
       gnutls_assert ();
