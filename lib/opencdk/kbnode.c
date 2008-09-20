@@ -447,14 +447,20 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
   size_t len;
 
   if (!node || !r_buf || !r_buflen)
-    return CDK_Inv_Value;
+    {
+      gnutls_assert();
+      return CDK_Inv_Value;
+    }
 
   *r_buf = NULL;
   *r_buflen = 0;
 
   rc = cdk_stream_tmp_new (&s);
   if (rc)
-    return rc;
+    {
+      gnutls_assert();
+      return rc;
+    }
 
   for (n = node; n; n = n->next)
     {
@@ -471,6 +477,7 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
       if (rc)
 	{
 	  cdk_stream_close (s);
+	  gnutls_assert();
 	  return rc;
 	}
     }
@@ -504,11 +511,17 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
   size_t len;
 
   if (!node || !r_nbytes)
-    return CDK_Inv_Value;
+    {
+      gnutls_assert();
+      return CDK_Inv_Value;
+    }
 
   rc = cdk_stream_tmp_new (&s);
   if (rc)
-    return rc;
+    {
+      gnutls_assert();
+      return rc;
+    }
 
   for (n = node; n; n = n->next)
     {
@@ -525,6 +538,7 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
       if (rc)
 	{
 	  cdk_stream_close (s);
+	  gnutls_assert();
 	  return rc;
 	}
     }
@@ -544,6 +558,8 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
     }
   if (!rc)
     *r_nbytes = cdk_stream_read (s, buf, len);
+  else
+    gnutls_assert();
   cdk_stream_close (s);
   return rc;
 }
@@ -569,7 +585,10 @@ cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st * md, int is_v4,
   cdk_packet_t pkt;
 
   if (!node || !md)
-    return CDK_Inv_Value;
+    {
+      gnutls_assert();
+      return CDK_Inv_Value;
+    }
   if (!pkttype)
     {
       pkt = cdk_kbnode_get_packet (node);
@@ -579,7 +598,10 @@ cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st * md, int is_v4,
     {
       pkt = cdk_kbnode_find_packet (node, pkttype);
       if (!pkt)
-	return CDK_Inv_Packet;
+        {
+          gnutls_assert();
+  	  return CDK_Inv_Packet;
+        }
     }
 
   switch (pkttype)
@@ -598,6 +620,7 @@ cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st * md, int is_v4,
       break;
 
     default:
+      gnutls_assert();
       return CDK_Inv_Mode;
     }
   return 0;

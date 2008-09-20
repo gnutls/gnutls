@@ -41,7 +41,10 @@ hash_encode (void *data, FILE * in, FILE * out)
   int nread;
 
   if (!mfx)
-    return CDK_Inv_Value;
+    {
+      gnutls_assert();
+      return CDK_Inv_Value;
+    }
 
   _cdk_log_debug ("hash filter: encode algo=%d\n", mfx->digest_algo);
 
@@ -49,7 +52,10 @@ hash_encode (void *data, FILE * in, FILE * out)
     {
       err = _gnutls_hash_init (&mfx->md, mfx->digest_algo);
       if (err < 0)
-	return map_gnutls_error (err);
+        {
+          gnutls_assert();
+  	  return map_gnutls_error (err);
+        }
 
       mfx->md_initialized = 1;
     }
@@ -82,5 +88,7 @@ _cdk_filter_hash (void *data, int ctl, FILE * in, FILE * out)
 	  return 0;
 	}
     }
+    
+  gnutls_assert();
   return CDK_Inv_Mode;
 }
