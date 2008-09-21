@@ -502,11 +502,15 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.6.0
  **/
 int
 gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
-			      gnutls_x509_subject_alt_name_t type, 
-			      const void *data, unsigned int data_size, unsigned int flags)
+				      gnutls_x509_subject_alt_name_t type,
+				      const void *data,
+				      unsigned int data_size,
+				      unsigned int flags)
 {
   int result;
   gnutls_datum_t der_data = { NULL, 0 };
@@ -524,20 +528,19 @@ gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
 
   if (flags == GNUTLS_FSAN_APPEND)
     {
-      result =
-        _gnutls_x509_crt_get_extension (crt, "2.5.29.17", 0, &prev_der_data, &critical);
-      
+      result = _gnutls_x509_crt_get_extension (crt, "2.5.29.17", 0,
+					       &prev_der_data, &critical);
       if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-        {
-          gnutls_assert ();
-          return result;
-        }
+	{
+	  gnutls_assert ();
+	  return result;
+	}
     }
 
   /* generate the extension.
    */
-  result =
-    _gnutls_x509_ext_gen_subject_alt_name (type, data, data_size, &prev_der_data, &der_data);
+  result = _gnutls_x509_ext_gen_subject_alt_name (type, data, data_size,
+						  &prev_der_data, &der_data);
 
   if (flags == GNUTLS_FSAN_APPEND)
     _gnutls_free_datum (&prev_der_data);
@@ -548,7 +551,8 @@ gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
       goto finish;
     }
 
-  result = _gnutls_x509_crt_set_extension (crt, "2.5.29.17", &der_data, critical);
+  result = _gnutls_x509_crt_set_extension (crt, "2.5.29.17", &der_data,
+					   critical);
 
   _gnutls_free_datum (&der_data);
 
@@ -574,7 +578,7 @@ finish:
  *   and negative values indicate that the pathLenConstraints field should
  *   not be present.
  * @policyLanguage: OID describing the language of @policy.
- * @policy: opaque byte array with policy language, can be %NULL 
+ * @policy: opaque byte array with policy language, can be %NULL
  * @sizeof_policy: size of @policy.
  *
  * This function will set the proxyCertInfo extension.
@@ -630,7 +634,7 @@ gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
  * @crt: should contain a gnutls_x509_crt_t structure
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
- * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
+ * @dig: The message digest to use, %GNUTLS_DIG_SHA1 is a safe choice
  * @flags: must be 0
  *
  * This function will sign the certificate with the issuer's private key, and
@@ -828,12 +832,15 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.6.0
  **/
 int
 gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
-				     gnutls_x509_subject_alt_name_t
-				     type, const void *data, unsigned int data_size,
-				     unsigned int reason_flags)
+				      gnutls_x509_subject_alt_name_t type,
+				      const void *data,
+				      unsigned int data_size,
+				      unsigned int reason_flags)
 {
   int result;
   gnutls_datum_t der_data = { NULL, 0 };
