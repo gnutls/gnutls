@@ -712,6 +712,7 @@ wchar.h: wchar.in.h
 	      -e 's|@''NEXT_WCHAR_H''@|$(NEXT_WCHAR_H)|g' \
 	      -e 's/@''HAVE_WCHAR_H''@/$(HAVE_WCHAR_H)/g' \
 	      -e 's|@''GNULIB_WCWIDTH''@|$(GNULIB_WCWIDTH)|g' \
+	      -e 's/@''HAVE_WINT_T''@/$(HAVE_WINT_T)/g' \
 	      -e 's|@''HAVE_DECL_WCWIDTH''@|$(HAVE_DECL_WCWIDTH)|g' \
 	      -e 's|@''REPLACE_WCWIDTH''@|$(REPLACE_WCWIDTH)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
