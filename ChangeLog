@@ -1,3 +1,231 @@
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.8.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* po/fr.po.in, po/pl.po.in, po/sv.po.in: Sync with TP.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Use srcdir for -Igl/.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Don't use CFLAGS with distcheck, causes errors in
+	./configure tests.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix warnings.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am, src/certtool.c, src/serv.c: Use internal md5 if
+	libgcrypt is in FIPS mode.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Initialize libgnutls-extra too.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Add prototype for
+	gnutls_register_md5_handler.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/fipsmd5.c: Add Since: tag.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c: Doc fixes.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Need -I for aclocal.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/wchar.m4, lgl/tests/test-wchar.c,
+	lgl/wchar.in.h: Add.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, libextra/Makefile.am, src/Makefile.am, src/cli.c: 
+	Fix libextra build.  Make gnutls-cli work in libgcrypt FIPS mode.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Fix typo.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix markup.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Add -I for hmac.h, md5.h.
+
+2008-09-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool.c: deinitialize structures after use.
+
+2008-09-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_pk.c: Corrected memory leak. Reported by Sam
+	Varshavchik.
+
+2008-09-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* includes/gnutls/x509.h: added missing headers.
+
+2008-09-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_pk.c, lib/x509/privkey.c: Corrected several bugs in DSA
+	DER key importing. Reported and debugged by Sam Varshavchik.
+
+2008-09-20  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/armor.c, lib/opencdk/hash.c, lib/opencdk/kbnode.c,
+	lib/opencdk/keydb.c, lib/opencdk/stream.c: added gnutls_assert() to
+	assist debugging.
+
+2008-09-20  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/openpgp/privkey.c: properly report the error line.
+
+2008-09-20  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, doc/gnutls.texi, lib/x509/extensions.c, lib/x509/output.c,
+	lib/x509/x509_int.h, lib/x509/x509_write.c, src/certtool-cfg.c,
+	src/certtool-cfg.h, src/certtool.c: output.c: Can properly print IP
+	addresses in certificates.  x509_write.c: added
+	gnutls_x509_crt_set_subject_alt_name added that can add multiple
+	subject alternative names.  certtool: use the new function to be
+	able to add several names.
+
+2008-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2008-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, libextra/Makefile.am, libextra/fipsmd5.c: Add
+	gnutls_register_md5_handler.
+
+2008-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* gl/gnulib.mk, gl/m4/gnulib-comp.m4, gl/m4/strdup.m4, gl/strdup.c,
+	lgl/vasnprintf.c: Update gnulib files.
+
+2008-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, libextra/gl/Makefile.am, libextra/gl/hmac-md5.c,
+	libextra/gl/hmac.h, libextra/gl/m4/gnulib-cache.m4,
+	libextra/gl/m4/gnulib-common.m4, libextra/gl/m4/gnulib-comp.m4,
+	libextra/gl/m4/gnulib-tool.m4, libextra/gl/m4/hmac-md5.m4,
+	libextra/gl/m4/md5.m4, libextra/gl/m4/memxor.m4, libextra/gl/md5.c,
+	libextra/gl/md5.h, libextra/gl/memxor.c, libextra/gl/memxor.h: Add
+	md5 and hmac from gnulib to libextra/gl/.
+
+2008-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_hash_int.c: Make _gnutls_hash_copy work with registered
+	hashes.
+
+2008-09-19  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS, lib/gnutls_compress.c, lib/gnutls_compress.h,
+	libextra/gnutls_extra.c: Make LZO compression support build.  Tiny
+	patch from Arfrever Frehtes Taifersar Arahesis
+	<arfrever.fta@gmail.com>.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, lib/Makefile.am, lib/defines.h,
+	lib/gnutls_errors.h, lib/gnutls_int.h: Merge defines.h into
+	gnutls_int.h.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffer.h: Remove, unused.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c, lib/gnutls_x509.c: Fix overflows in gnutls_calloc
+	calls.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/openssl_compat.c: Fix last commit.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/auth_cert.c, lib/gnutls_cert.c,
+	lib/gnutls_session_pack.c, libextra/openssl_compat.c: Fix overflows
+	in gnutls_calloc calls.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_mem.c: libgnutls: Check for overflows in
+	gnutls_calloc and gnutls_secure_calloc.  Reported by Werner Koch
+	<wk@gnupg.org>.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, lib/auth_srp.c, lib/gnutls_int.h, lib/gnutls_srp.c: 
+	libgnutls: New function to set minimum acceptable SRP bits.  The
+	function is gnutls_srp_set_prime_bits.  Tiny patch by Kevin Quick
+	<quick@sparq.org> in
+	<https://savannah.gnu.org/support/index.php?106454>.
+
+2008-09-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/gnutls-cli.1: Fix markup, tiny patch from Sam
+	Varshavchik <mrsam@courier-mta.com>.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/auth_cert.c, lib/auth_rsa.c, lib/ext_cert_type.c,
+	lib/ext_max_record.c, lib/ext_oprfi.c, lib/ext_server_name.c,
+	lib/gnutls_algorithms.c, lib/gnutls_auth.c, lib/gnutls_buffers.c,
+	lib/gnutls_cert.c, lib/gnutls_cipher.c, lib/gnutls_compress.c,
+	lib/gnutls_constate.c, lib/gnutls_extensions.c,
+	lib/gnutls_global.c, lib/gnutls_handshake.c, lib/gnutls_kx.c,
+	lib/gnutls_pk.c, lib/gnutls_record.c, lib/gnutls_session_pack.c,
+	lib/gnutls_sig.c, lib/gnutls_state.c, lib/gnutls_v2_compat.c,
+	lib/gnutls_x509.c, lib/mac-libgcrypt.c, lib/minitasn1/structure.c,
+	lib/opencdk/armor.c, lib/opencdk/read-packet.c, lib/openpgp/pgp.c,
+	lib/x509/common.c, lib/x509/crq.c, lib/x509/pkcs12.c,
+	lib/x509/privkey.c, libextra/gnutls_ia.c, src/printlist.c,
+	src/serv.c, tests/finished.c, tests/openssl.c, tests/pgps2kgnu.c,
+	tests/pkcs12-decode/pkcs12_s2k.c, tests/simple.c: Indent.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-09-16  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.7.
