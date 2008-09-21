@@ -77,6 +77,9 @@ extern "C"
 #define GNUTLS_KP_OCSP_SIGNING			"1.3.6.1.5.5.7.3.9"
 #define GNUTLS_KP_ANY				"2.5.29.37.0"
 
+#define GNUTLS_FSAN_SET 0
+#define GNUTLS_FSAN_APPEND 1
+
 /* Certificate handling functions.
  */
   typedef enum gnutls_certificate_import_flags
@@ -154,6 +157,10 @@ extern "C"
 					   size_t * ret_size,
 					   unsigned int *reason_flags,
 					   unsigned int *critical);
+  int gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
+					   gnutls_x509_subject_alt_name_t
+					   type, const void *data, unsigned int data_size,
+					   unsigned int reason_flags);
   int gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
 					   gnutls_x509_subject_alt_name_t
 					   type, const void *data_string,
@@ -259,6 +266,12 @@ extern "C"
 						    gnutls_x509_subject_alt_name_t
 						    type,
 						    const char *data_string);
+
+  int gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
+					    gnutls_x509_subject_alt_name_t
+					    type,
+					    const void *data, unsigned int data_size,
+					    unsigned int flags);
   int gnutls_x509_crt_sign (gnutls_x509_crt_t crt,
 			    gnutls_x509_crt_t issuer,
 			    gnutls_x509_privkey_t issuer_key);
