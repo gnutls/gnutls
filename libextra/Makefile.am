@@ -50,7 +50,7 @@ defexec_DATA =
 
 lib_LTLIBRARIES = libgnutls-extra.la
 
-libgnutls_extra_la_SOURCES = gnutls_extra.c
+libgnutls_extra_la_SOURCES = gnutls_extra.c fipsmd5.c
 
 libgnutls_openssl_la_LDFLAGS = -no-undefined
 
@@ -60,7 +60,7 @@ if ENABLE_OPENSSL
 lib_LTLIBRARIES += libgnutls-openssl.la
 
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
-	openssl_compat.c fipsmd5.c
+	openssl_compat.c
 
 libgnutls_openssl_la_LIBADD = ../lgl/liblgnu.la ../lib/libgnutls.la 
 
