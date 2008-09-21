@@ -223,6 +223,8 @@ gnutls_crypto_single_mac_st mac =
  * FIPS mode.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *
+ * Since: 2.6.0
  **/
 int
 gnutls_register_md5_handler (void)
