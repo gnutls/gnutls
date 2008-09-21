@@ -19,6 +19,7 @@
 
 #include <config.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
 #include <gcrypt.h>
 
 #include <stdio.h>
@@ -260,7 +261,6 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
   int ret;
   int serial, client;
   int days, result, ca_status = 0, path_len;
-  const char *str;
   int vers;
   unsigned int usage = 0, server;
   gnutls_x509_crq_t crq;	/* request */
