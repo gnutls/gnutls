@@ -36,7 +36,7 @@ endif
 
 gnutls_serv_SOURCES = serv.gaa serv-gaa.h serv-gaa.c list.h serv.c	\
 	common.h common.c select.c
-gnutls_serv_LDADD = ../lib/libgnutls.la \
+gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
 	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) ../gl/libgnu.la
 
 if ENABLE_SRP
@@ -64,8 +64,8 @@ gnutls_cli_debug_LDADD = ../lib/libgnutls.la			\
 
 certtool_SOURCES = certtool.gaa certtool-gaa.h certtool-cfg.h	\
 	certtool-gaa.c certtool.c prime.c certtool-cfg.c
-certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) \
-	$(LIBTASN1_LIBS) ../gl/libgnu.la @LTLIBREADLINE@
+certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
+	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) ../gl/libgnu.la @LTLIBREADLINE@
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else

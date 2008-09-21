@@ -815,6 +815,16 @@ main (int argc, char **argv)
 
   set_program_name (argv[0]);
 
+#ifdef gcry_fips_mode_active
+  if (gcry_fips_mode_active())
+    {
+      ret = gnutls_register_md5_handler ();
+      if (ret)
+	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
+		 gnutls_strerror (ret));
+    }
+#endif
+
 #ifndef _WIN32
   signal (SIGPIPE, SIG_IGN);
   signal (SIGHUP, SIG_IGN);
@@ -846,6 +856,13 @@ main (int argc, char **argv)
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
       exit (1);
     }
+
+  if ((ret = gnutls_global_init_extra ()) < 0)
+    {
+      fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
 

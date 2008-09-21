@@ -872,11 +872,24 @@ gaa_parser (int argc, char **argv)
   if (info.quick_random != 0)
     gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
+#ifdef gcry_fips_mode_active
+  if (gcry_fips_mode_active())
+    {
+      ret = gnutls_register_md5_handler ();
+      if (ret)
+	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
+		 gnutls_strerror (ret));
+    }
+#endif
+
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (info.debug);
 
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
+
+  if ((ret = gnutls_global_init_extra ()) < 0)
+    error (EXIT_FAILURE, 0, "global_init_extra: %s", gnutls_strerror (ret));
 
   switch (info.action)
     {
