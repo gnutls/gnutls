@@ -159,6 +159,8 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
   bigint_t temp_params[RSA_PRIVATE_PARAMS];
   gnutls_pk_params_st pk_params;
 
+  memset( temp_params, 0, sizeof(temp_params));
+
   pk_params.params = temp_params;
   pk_params.params_nr = RSA_PRIVATE_PARAMS;
 
@@ -249,6 +251,8 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 
 error:
   asn1_delete_structure (&pkey_asn);
+  /* we cannot use pk_params_release() since pk_params.params
+   * is not allocated */
   _gnutls_mpi_release (&pk_params.params[0]);
   _gnutls_mpi_release (&pk_params.params[1]);
   _gnutls_mpi_release (&pk_params.params[2]);
@@ -1316,7 +1320,7 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
 			      unsigned int flags)
 {
   int ret;
-  unsigned int params_len;
+  unsigned int params_len = MAX_PRIV_PARAMS_SIZE;
   unsigned int i;
 
   if (key == NULL)
