@@ -27,6 +27,8 @@ The function is gnutls_register_md5_handler.  When libgcrypt is in
 FIPS mode, MD5 is disabled, but TLS normally requires use of MD5 in
 the PRF.
 
+** Opencdk: Add calls to gnutls_assert to ease debugging.
+
 ** Indent code.
 
 ** API and ABI modifications:
