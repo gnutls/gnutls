@@ -531,15 +531,17 @@ _generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
       gnutls_assert ();
       return ret;
     }
-
+    
   if (resarr && resarr_len && *resarr_len >= params.params_nr)
     {
       *resarr_len = params.params_nr;
       for (i = 0; i < params.params_nr; i++)
 	resarr[i] = params.params[i];
+      gnutls_free(params.params);
     }
   else
     {
+      gnutls_free(params.params);
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
