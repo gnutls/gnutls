@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnutls-2.4.0\n"
+"Project-Id-Version: gnutls-2.5.7\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2008-06-18 17:09+0200\n"
-"PO-Revision-Date: 2008-06-23 22:01+0200\n"
+"POT-Creation-Date: 2008-09-16 16:45+0200\n"
+"PO-Revision-Date: 2008-09-17 16:22+0200\n"
 "Last-Translator: Jakub Bogusz <qboosh@pld-linux.org>\n"
 "Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -51,371 +51,491 @@ msgstr "Odebrano du¿y pakiet rekordu TLS."
 msgid "A record packet with illegal version was received."
 msgstr "Odebrano pakiet rekordu o niedozwolonej wersji."
 
-#: lib/gnutls_errors.c:71
+#: lib/gnutls_errors.c:72
 msgid "The Diffie Hellman prime sent by the server is not acceptable (not long enough)."
 msgstr "Liczba pierwsza Diffie Hellmana wys³ana przez serwer jest nieakceptowalna (zbyt ma³a)."
 
-#: lib/gnutls_errors.c:73
+#: lib/gnutls_errors.c:74
 msgid "A TLS packet with unexpected length was received."
 msgstr "Odebrano pakiet TLS o nieoczekiwanej d³ugo¶ci."
 
-#: lib/gnutls_errors.c:75
+#: lib/gnutls_errors.c:77
 msgid "The specified session has been invalidated for some reason."
 msgstr "Podana sesja zosta³a z jakiego¶ powodu uniewa¿niona."
 
-#: lib/gnutls_errors.c:78
+#: lib/gnutls_errors.c:80
 msgid "GnuTLS internal error."
 msgstr "B³±d wewnêtrzny GnuTLS."
 
-#: lib/gnutls_errors.c:79
+#: lib/gnutls_errors.c:81
 msgid "An illegal TLS extension was received."
 msgstr "Odebrano niedozwolone rozszerzenie TLS."
 
-#: lib/gnutls_errors.c:81
+#: lib/gnutls_errors.c:83
 msgid "A TLS fatal alert has been received."
 msgstr "Odebrano krytyczny alarm TLS."
 
-#: lib/gnutls_errors.c:83
+#: lib/gnutls_errors.c:85
 msgid "An unexpected TLS packet was received."
 msgstr "Odebrano nieoczekiwany pakiet TLS."
 
-#: lib/gnutls_errors.c:85
+#: lib/gnutls_errors.c:87
 msgid "A TLS warning alert has been received."
 msgstr "Odebrano ostrzegawczy alarm TLS."
 
-#: lib/gnutls_errors.c:87
+#: lib/gnutls_errors.c:90
 msgid "An error was encountered at the TLS Finished packet calculation."
 msgstr "Wykryto b³±d przy obliczaniu pakietu TLS Finished."
 
-#: lib/gnutls_errors.c:89
+#: lib/gnutls_errors.c:92
 msgid "The peer did not send any certificate."
 msgstr "Druga strona nie wys³a³a ¿adnego certyfikatu."
 
-#: lib/gnutls_errors.c:92
+#: lib/gnutls_errors.c:95
 msgid "There is already a crypto algorithm with lower priority."
 msgstr "Istnieje ju¿ algorytm kryptograficzny z ni¿szym priorytetem."
 
-#: lib/gnutls_errors.c:95
+#: lib/gnutls_errors.c:98
 msgid "No temporary RSA parameters were found."
 msgstr "Nie znaleziono parametrów tymczasowych RSA."
 
-#: lib/gnutls_errors.c:97
+#: lib/gnutls_errors.c:100
 msgid "No temporary DH parameters were found."
 msgstr "Nie znaleziono parametrów tymczasowych DH."
 
-#: lib/gnutls_errors.c:99
+#: lib/gnutls_errors.c:102
 msgid "An unexpected TLS handshake packet was received."
 msgstr "Odebrano nieoczekiwany pakiet nawi±zania TLS."
 
-#: lib/gnutls_errors.c:101
+#: lib/gnutls_errors.c:104
 msgid "The scanning of a large integer has failed."
 msgstr "Poszukiwanie du¿ej liczby ca³kowitej nie powiod³o siê."
 
-#: lib/gnutls_errors.c:103
+#: lib/gnutls_errors.c:106
 msgid "Could not export a large integer."
 msgstr "Nie uda³o siê wyeksportowaæ du¿ej liczby ca³kowitej."
 
-#: lib/gnutls_errors.c:105
+#: lib/gnutls_errors.c:108
 msgid "Decryption has failed."
 msgstr "Odszyfrowywanie nie powiod³o siê."
 
-#: lib/gnutls_errors.c:106
+#: lib/gnutls_errors.c:109
 msgid "Encryption has failed."
 msgstr "Szyfrowanie nie powiod³o siê."
 
-#: lib/gnutls_errors.c:107
+#: lib/gnutls_errors.c:110
 msgid "Public key decryption has failed."
 msgstr "Odszyfrowywanie z kluczem publicznym nie powiod³o siê."
 
-#: lib/gnutls_errors.c:109
+#: lib/gnutls_errors.c:112
 msgid "Public key encryption has failed."
 msgstr "Szyfrowanie z kluczem publicznym nie powiod³o siê."
 
-#: lib/gnutls_errors.c:111
+#: lib/gnutls_errors.c:114
 msgid "Public key signing has failed."
 msgstr "Podpisywanie z kluczem publicznym nie powiod³o siê."
 
-#: lib/gnutls_errors.c:113
+#: lib/gnutls_errors.c:116
 msgid "Public key signature verification has failed."
 msgstr "Sprawdzenie podpisu z kluczem publicznym nie powiod³o siê."
 
-#: lib/gnutls_errors.c:115
+#: lib/gnutls_errors.c:118
 msgid "Decompression of the TLS record packet has failed."
 msgstr "Dekompresja pakietu rekordu TLS nie powiod³a siê."
 
-#: lib/gnutls_errors.c:117
+#: lib/gnutls_errors.c:120
 msgid "Compression of the TLS record packet has failed."
 msgstr "Kompresja pakietu rekordu TLS nie powiod³a siê."
 
-#: lib/gnutls_errors.c:120
+#: lib/gnutls_errors.c:123
 msgid "Internal error in memory allocation."
 msgstr "B³±d wewnêtrzny przy przydzielaniu pamiêci."
 
-#: lib/gnutls_errors.c:122
+#: lib/gnutls_errors.c:125
 msgid "An unimplemented or disabled feature has been requested."
 msgstr "Za¿±dano niezaimplementowanej lub wy³±czonej opcji."
 
-#: lib/gnutls_errors.c:124
+#: lib/gnutls_errors.c:127
 msgid "Insufficient credentials for that request."
 msgstr "Niewystarczaj±ce uprawnienia dla tego ¿±dania."
 
-#: lib/gnutls_errors.c:126
+#: lib/gnutls_errors.c:129
 msgid "Error in password file."
 msgstr "B³±d w pliku hase³."
 
-#: lib/gnutls_errors.c:127
+#: lib/gnutls_errors.c:130
 msgid "Wrong padding in PKCS1 packet."
 msgstr "B³êdne wyrównanie w pakiecie PKCS1."
 
-#: lib/gnutls_errors.c:129
+#: lib/gnutls_errors.c:132
 msgid "The requested session has expired."
 msgstr "¯±dana sesja wygas³a."
 
-#: lib/gnutls_errors.c:130
+#: lib/gnutls_errors.c:133
 msgid "Hashing has failed."
 msgstr "Funkcja skrótu nie powiod³a siê."
 
-#: lib/gnutls_errors.c:131
+#: lib/gnutls_errors.c:134
 msgid "Base64 decoding error."
 msgstr "B³±d dekodowania base64."
 
-#: lib/gnutls_errors.c:133
+#: lib/gnutls_errors.c:136
 msgid "Base64 unexpected header error."
 msgstr "Nieoczekiwany b³±d nag³ówka base64."
 
-#: lib/gnutls_errors.c:135
+#: lib/gnutls_errors.c:139
 msgid "Base64 encoding error."
 msgstr "B³±d kodowania base64."
 
-#: lib/gnutls_errors.c:137
+#: lib/gnutls_errors.c:141
 msgid "Parsing error in password file."
 msgstr "B³±d przetwarzania pliku hase³."
 
-#: lib/gnutls_errors.c:139
+#: lib/gnutls_errors.c:143
 msgid "The requested data were not available."
 msgstr "¯±dane dane nie by³y dostêpne."
 
-#: lib/gnutls_errors.c:141
+#: lib/gnutls_errors.c:145
 msgid "Error in the pull function."
 msgstr "B³±d w funkcji pull."
 
-#: lib/gnutls_errors.c:142
+#: lib/gnutls_errors.c:146
 msgid "Error in the push function."
 msgstr "B³±d w funkcji push."
 
-#: lib/gnutls_errors.c:143
+#: lib/gnutls_errors.c:148
 msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
 msgstr "Osi±gniêto górne ograniczenie numerów sekwencyjnych pakietów rekordów. Wow!"
 
-#: lib/gnutls_errors.c:145
+#: lib/gnutls_errors.c:150
 msgid "Error in the certificate."
 msgstr "B³±d w certyfikacie."
 
-#: lib/gnutls_errors.c:147
+#: lib/gnutls_errors.c:152
 msgid "Unknown Subject Alternative name in X.509 certificate."
 msgstr "Nieznana nazwa Subject Alternative w certyfikacie X.509."
 
-#: lib/gnutls_errors.c:150
+#: lib/gnutls_errors.c:155
 msgid "Unsupported critical extension in X.509 certificate."
 msgstr "Nieobs³ugiwane rozszerzenie krytyczne w certyfikacie X.509."
 
-#: lib/gnutls_errors.c:152
+#: lib/gnutls_errors.c:157
 msgid "Key usage violation in certificate has been detected."
 msgstr "Wykryto naruszenie u¿ycia klucza w certyfikacie."
 
-#: lib/gnutls_errors.c:154 lib/gnutls_errors.c:155
+#: lib/gnutls_errors.c:159 lib/gnutls_errors.c:160
 msgid "Function was interrupted."
 msgstr "Funkcja zosta³a przerwana."
 
-#: lib/gnutls_errors.c:156
+#: lib/gnutls_errors.c:161
 msgid "Rehandshake was requested by the peer."
 msgstr "Druga strona za¿±da³a ponownego nawi±zania sesji."
 
-#: lib/gnutls_errors.c:158
+#: lib/gnutls_errors.c:164
 msgid "TLS Application data were received, while expecting handshake data."
 msgstr "Odebrano dane aplikacji TLS, ale oczekiwano na nawi±zanie sesji."
 
-#: lib/gnutls_errors.c:160
+#: lib/gnutls_errors.c:166
 msgid "Error in Database backend."
 msgstr "B³±d w backendzie bazy danych."
 
-#: lib/gnutls_errors.c:161
+#: lib/gnutls_errors.c:167
 msgid "The certificate type is not supported."
 msgstr "Ten typ certyfikatu nie jest obs³ugiwany."
 
-#: lib/gnutls_errors.c:163
+#: lib/gnutls_errors.c:169
 msgid "The given memory buffer is too short to hold parameters."
 msgstr "Przekazany bufor pamiêci jest zbyt ma³y do przechowania parametrów."
 
-#: lib/gnutls_errors.c:165
+#: lib/gnutls_errors.c:171
 msgid "The request is invalid."
 msgstr "¯±danie jest nieprawid³owe."
 
-#: lib/gnutls_errors.c:166
+#: lib/gnutls_errors.c:172
 msgid "An illegal parameter has been received."
 msgstr "Odebrano niedozwolony parametr."
 
-#: lib/gnutls_errors.c:168
+#: lib/gnutls_errors.c:174
 msgid "Error while reading file."
 msgstr "B³±d podczas odczytu pliku."
 
-#: lib/gnutls_errors.c:170
+#: lib/gnutls_errors.c:176
 msgid "ASN1 parser: Element was not found."
 msgstr "Analiza ASN1: Nie znaleziono elementu."
 
-#: lib/gnutls_errors.c:172
+#: lib/gnutls_errors.c:178
 msgid "ASN1 parser: Identifier was not found"
 msgstr "Analiza ASN1: Nie znaleziono identyfikatora."
 
-#: lib/gnutls_errors.c:174
+#: lib/gnutls_errors.c:180
 msgid "ASN1 parser: Error in DER parsing."
 msgstr "Analiza ASN1: B³±d przy analizie DER."
 
-#: lib/gnutls_errors.c:176
+#: lib/gnutls_errors.c:182
 msgid "ASN1 parser: Value was not found."
 msgstr "Analiza ASN1: Nie znaleziono warto¶ci."
 
-#: lib/gnutls_errors.c:178
+#: lib/gnutls_errors.c:184
 msgid "ASN1 parser: Generic parsing error."
 msgstr "Analiza ASN1: Ogólny b³±d przetwarzania."
 
-#: lib/gnutls_errors.c:180
+#: lib/gnutls_errors.c:186
 msgid "ASN1 parser: Value is not valid."
 msgstr "Analiza ASN1: Warto¶æ nie jest prawid³owa."
 
-#: lib/gnutls_errors.c:182
+#: lib/gnutls_errors.c:188
 msgid "ASN1 parser: Error in TAG."
 msgstr "Analiza ASN1: B³±d w znaczniku."
 
-#: lib/gnutls_errors.c:183
+#: lib/gnutls_errors.c:189
 msgid "ASN1 parser: error in implicit tag"
 msgstr "Analiza ASN1: b³±d w domy¶lnym znaczniku."
 
-#: lib/gnutls_errors.c:185
+#: lib/gnutls_errors.c:191
 msgid "ASN1 parser: Error in type 'ANY'."
 msgstr "Analiza ASN1: B³±d w typie 'ANY'."
 
-#: lib/gnutls_errors.c:187
+#: lib/gnutls_errors.c:193
 msgid "ASN1 parser: Syntax error."
 msgstr "Analiza ASN1: B³±d sk³adni."
 
-#: lib/gnutls_errors.c:189
+#: lib/gnutls_errors.c:195
 msgid "ASN1 parser: Overflow in DER parsing."
 msgstr "Analiza ASN1: Przepe³nienie przy analizie DER."
 
-#: lib/gnutls_errors.c:192
+#: lib/gnutls_errors.c:198
 msgid "Too many empty record packets have been received."
 msgstr "Odebrano zbyt du¿o pustych pakietów rekordów."
 
-#: lib/gnutls_errors.c:194
+#: lib/gnutls_errors.c:200
 msgid "The initialization of GnuTLS-extra has failed."
 msgstr "Inicjalizacja GnuTLS-extra nie powiod³a siê."
 
-#: lib/gnutls_errors.c:196
+#: lib/gnutls_errors.c:203
 msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
 msgstr "Wersja biblioteki GnuTLS nie zgadza siê z wersj± biblioteki GnuTLS-extra."
 
-#: lib/gnutls_errors.c:198
+#: lib/gnutls_errors.c:205
 msgid "The gcrypt library version is too old."
 msgstr "Wersja biblioteki gcrypt jest zbyt stara."
 
-#: lib/gnutls_errors.c:201
+#: lib/gnutls_errors.c:208
 msgid "The tasn1 library version is too old."
 msgstr "Wersja biblioteki tasn1 jest zbyt stara."
 
-#: lib/gnutls_errors.c:203
+#: lib/gnutls_errors.c:210
 msgid "The OpenPGP User ID is revoked."
 msgstr "Identyfikator u¿ytkownika OpenPGP jest uniewa¿niony."
 
-#: lib/gnutls_errors.c:205
+#: lib/gnutls_errors.c:212
 msgid "Error loading the keyring."
 msgstr "B³±d przy wczytywaniu zbioru kluczy."
 
-#: lib/gnutls_errors.c:207
+#: lib/gnutls_errors.c:214
 msgid "The initialization of LZO has failed."
 msgstr "Inicjalizacja LZO nie powiod³a siê."
 
-#: lib/gnutls_errors.c:209
+#: lib/gnutls_errors.c:216
 msgid "No supported compression algorithms have been found."
 msgstr "Nie znaleziono obs³ugiwanego algorytmu kompresji."
 
-#: lib/gnutls_errors.c:211
+#: lib/gnutls_errors.c:218
 msgid "No supported cipher suites have been found."
 msgstr "Nie znaleziono obs³ugiwanego zestawu certyfikatów."
 
-#: lib/gnutls_errors.c:213
+#: lib/gnutls_errors.c:220
 msgid "Could not get OpenPGP key."
 msgstr "Nie uda³o siê uzyskaæ klucza OpenPGP."
 
-#: lib/gnutls_errors.c:215
+#: lib/gnutls_errors.c:222
 msgid "Could not find OpenPGP subkey."
 msgstr "Nie uda³o siê odnale¼æ podklucza OpenPGP."
 
-#: lib/gnutls_errors.c:218
+#: lib/gnutls_errors.c:225
 msgid "The SRP username supplied is illegal."
 msgstr "Podana nazwa u¿ytkownika SRP nie jest dozwolona."
 
-#: lib/gnutls_errors.c:221
+#: lib/gnutls_errors.c:228
 msgid "The OpenPGP fingerprint is not supported."
 msgstr "Odcisk klucza OpenPGP nie jest obs³ugiwany."
 
-#: lib/gnutls_errors.c:223
+#: lib/gnutls_errors.c:230
 msgid "The certificate has unsupported attributes."
 msgstr "Certyfikat ma nieobs³ugiwane atrybuty."
 
-#: lib/gnutls_errors.c:225
+#: lib/gnutls_errors.c:232
 msgid "The OID is not supported."
 msgstr "OID nie jest obs³ugiwany."
 
-#: lib/gnutls_errors.c:227
+#: lib/gnutls_errors.c:234
 msgid "The hash algorithm is unknown."
 msgstr "Algorytm skrótu jest nieznany."
 
-#: lib/gnutls_errors.c:229
+#: lib/gnutls_errors.c:236
 msgid "The PKCS structure's content type is unknown."
 msgstr "Typ zawarto¶ci struktury PKCS jest nieznany."
 
-#: lib/gnutls_errors.c:231
+#: lib/gnutls_errors.c:238
 msgid "The PKCS structure's bag type is unknown."
 msgstr "Typ opakowania struktury PKCS jest nieznany."
 
-#: lib/gnutls_errors.c:233
+#: lib/gnutls_errors.c:240
 msgid "The given password contains invalid characters."
 msgstr "Podane has³o zawiera nieprawid³owe znaki."
 
-#: lib/gnutls_errors.c:235
+#: lib/gnutls_errors.c:242
 msgid "The Message Authentication Code verification failed."
 msgstr "Sprawdzenie kodu autentyczno¶ci wiadomo¶ci (MAC) nie powiod³o siê."
 
-#: lib/gnutls_errors.c:237
+#: lib/gnutls_errors.c:244
 msgid "Some constraint limits were reached."
 msgstr "Osi±gniêto niektóre ograniczenia."
 
-#: lib/gnutls_errors.c:239
+#: lib/gnutls_errors.c:246
 msgid "Failed to acquire random data."
 msgstr "Nie uda³o siê pozyskaæ danych losowych."
 
-#: lib/gnutls_errors.c:242
+#: lib/gnutls_errors.c:249
 msgid "Received a TLS/IA Intermediate Phase Finished message"
 msgstr "Odebrano wiadomo¶æ TLS/IA Intermediate Phase Finished"
 
-#: lib/gnutls_errors.c:244
+#: lib/gnutls_errors.c:251
 msgid "Received a TLS/IA Final Phase Finished message"
 msgstr "Odebrano wiadomo¶æ TLS/IA Final Phase Finished"
 
-#: lib/gnutls_errors.c:246
+#: lib/gnutls_errors.c:253
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Sprawdzenie sumy kontrolnej frazy TLS/IA nie powiod³o siê"
 
-#: lib/gnutls_errors.c:249
+#: lib/gnutls_errors.c:256
 msgid "The specified algorithm or protocol is unknown."
 msgstr "Podany algorytm lub protokó³ jest nieznany."
 
-#: lib/gnutls_errors.c:252
+#: lib/gnutls_errors.c:259
 msgid "The handshake data size is too large (DoS?), check gnutls_handshake_set_max_packet_length()."
 msgstr "Rozmiar danych nawi±zania jest zbyt du¿y (DoS?), proszê sprawdziæ gnutls_handshake_set_max_packet_length()."
 
-#: lib/x509/output.c:113 lib/x509/output.c:384
+#: lib/gnutls_errors.c:348
+msgid "(unknown error code)"
+msgstr "(nieznany kod b³êdu)"
+
+#: lib/gnutls_alert.c:42
+msgid "Close notify"
+msgstr "Powiadomienie o zamkniêciu"
+
+#: lib/gnutls_alert.c:43
+msgid "Unexpected message"
+msgstr "Nieoczekiwany komunikat"
+
+#: lib/gnutls_alert.c:44
+msgid "Bad record MAC"
+msgstr "B³êdny MAC rekordu"
+
+#: lib/gnutls_alert.c:45
+msgid "Decryption failed"
+msgstr "Odszyfrowywanie nie powiod³o siê"
+
+#: lib/gnutls_alert.c:46
+msgid "Record overflow"
+msgstr "Przepe³nienie rekordu"
+
+#: lib/gnutls_alert.c:47
+msgid "Decompression failed"
+msgstr "Dekompresja nie powiod³a siê"
+
+#: lib/gnutls_alert.c:48
+msgid "Handshake failed"
+msgstr "Nawi±zanie komunikacji nie powiod³o siê"
+
+#: lib/gnutls_alert.c:49
+msgid "Certificate is bad"
+msgstr "B³êdny certyfikat"
+
+#: lib/gnutls_alert.c:50
+msgid "Certificate is not supported"
+msgstr "Nieobs³ugiwany certyfikat"
+
+#: lib/gnutls_alert.c:51
+msgid "Certificate was revoked"
+msgstr "Certyfikat zosta³ anulowany"
+
+#: lib/gnutls_alert.c:52
+msgid "Certificate is expired"
+msgstr "Certyfikat wygas³"
+
+#: lib/gnutls_alert.c:53
+msgid "Unknown certificate"
+msgstr "Nieznany certyfikat"
+
+#: lib/gnutls_alert.c:54
+msgid "Illegal parameter"
+msgstr "Niedozwolony parametr"
+
+#: lib/gnutls_alert.c:55
+msgid "CA is unknown"
+msgstr "Nieznane CA"
+
+#: lib/gnutls_alert.c:56
+msgid "Access was denied"
+msgstr "Dostêp zabroniony"
+
+#: lib/gnutls_alert.c:57
+msgid "Decode error"
+msgstr "B³±d dekodowania"
+
+#: lib/gnutls_alert.c:58
+msgid "Decrypt error"
+msgstr "B³±d odszyfrowywania"
+
+#: lib/gnutls_alert.c:59
+msgid "Export restriction"
+msgstr "Ograniczenia eksportowe"
+
+#: lib/gnutls_alert.c:60
+msgid "Error in protocol version"
+msgstr "B³±d w wersji protoko³u"
+
+#: lib/gnutls_alert.c:61
+msgid "Insufficient security"
+msgstr "Niewystarczaj±ce bezpieczeñstwo"
+
+#: lib/gnutls_alert.c:62
+msgid "User canceled"
+msgstr "Anulowane przez u¿ytkownika"
+
+#: lib/gnutls_alert.c:63
+msgid "Internal error"
+msgstr "B³±d wewnêtrzny"
+
+#: lib/gnutls_alert.c:64
+msgid "No renegotiation is allowed"
+msgstr "Renegocjacja niedozwolona"
+
+#: lib/gnutls_alert.c:66
+msgid "Could not retrieve the specified certificate"
+msgstr "Nie uda³o siê pobraæ wskazanego certyfikatu"
+
+#: lib/gnutls_alert.c:67
+msgid "An unsupported extension was sent"
+msgstr "Wys³ano nieobs³ugiwane rozszerzenie"
+
+#: lib/gnutls_alert.c:69
+msgid "The server name sent was not recognized"
+msgstr "Nierozpoznana wys³ana nazwa serwera"
+
+#: lib/gnutls_alert.c:71
+msgid "The SRP/PSK username is missing or not known"
+msgstr "Brak lub nieznana nazwa u¿ytkownika SRP/PSK"
+
+#: lib/gnutls_alert.c:73
+msgid "Inner application negotiation failed"
+msgstr "Negocjacja w ramach aplikacji nie powiod³a siê"
+
+#: lib/gnutls_alert.c:75
+msgid "Inner application verification failed"
+msgstr "Weryfikacja w ramach aplikacji nie powiod³a siê"
+
+#: lib/x509/output.c:113 lib/x509/output.c:389
 #, c-format
 msgid "\t\t\tPath Length Constraint: %d\n"
 msgstr "\t\t\tOgraniczenie d³ugo¶ci ¶cie¿ki: %d\n"
@@ -461,7 +581,7 @@ msgstr "\t\t\tSzyfrowanie danych.\n"
 msgid "\t\t\tKey agreement.\n"
 msgstr "\t\t\tUzgodnienie klucza.\n"
 
-#: lib/x509/output.c:227 lib/openpgp/output.c:106
+#: lib/x509/output.c:227 lib/openpgp/output.c:107
 msgid "\t\t\tCertificate signing.\n"
 msgstr "\t\t\tPodpisanie certyfikatu.\n"
 
@@ -477,57 +597,57 @@ msgstr "\t\t\tTylko szyfrowanie klucza.\n"
 msgid "\t\t\tKey decipher only.\n"
 msgstr "\t\t\tTylko deszyfrowanie klucza.\n"
 
-#: lib/x509/output.c:345
+#: lib/x509/output.c:348
 msgid "\t\t\tTLS WWW Server.\n"
 msgstr "\t\t\tSerwer WWW TLS.\n"
 
-#: lib/x509/output.c:347
+#: lib/x509/output.c:350
 msgid "\t\t\tTLS WWW Client.\n"
 msgstr "\t\t\tKlient WWW TLS.\n"
 
-#: lib/x509/output.c:349
+#: lib/x509/output.c:352
 msgid "\t\t\tCode signing.\n"
 msgstr "\t\t\tPodpisywanie kodu.\n"
 
-#: lib/x509/output.c:351
+#: lib/x509/output.c:354
 msgid "\t\t\tEmail protection.\n"
 msgstr "\t\t\tOchrona poczty elektronicznej.\n"
 
-#: lib/x509/output.c:353
+#: lib/x509/output.c:356
 msgid "\t\t\tTime stamping.\n"
 msgstr "\t\t\tOznaczanie czasu.\n"
 
-#: lib/x509/output.c:355
+#: lib/x509/output.c:358
 msgid "\t\t\tOCSP signing.\n"
 msgstr "\t\t\tPodpisywanie OCSP.\n"
 
-#: lib/x509/output.c:357
+#: lib/x509/output.c:360
 msgid "\t\t\tAny purpose.\n"
 msgstr "\t\t\tDowolne zastosowanie.\n"
 
-#: lib/x509/output.c:379
+#: lib/x509/output.c:384
 msgid "\t\t\tCertificate Authority (CA): FALSE\n"
 msgstr "\t\t\tCA: NIE\n"
 
-#: lib/x509/output.c:381
+#: lib/x509/output.c:386
 msgid "\t\t\tCertificate Authority (CA): TRUE\n"
 msgstr "\t\t\tCA: TAK\n"
 
-#: lib/x509/output.c:484
+#: lib/x509/output.c:491
 #, c-format
 msgid "\t\t\tXMPP Address: %.*s\n"
 msgstr "\t\t\tAdres XMPP: %.*s\n"
 
-#: lib/x509/output.c:487
+#: lib/x509/output.c:494
 #, c-format
 msgid "\t\t\totherName OID: %.*s\n"
 msgstr "\t\t\tOID otherName: %.*s\n"
 
-#: lib/x509/output.c:488
+#: lib/x509/output.c:495
 msgid "\t\t\totherName DER: "
 msgstr "\t\t\tDER otherName: "
 
-#: lib/x509/output.c:490
+#: lib/x509/output.c:497
 msgid ""
 "\n"
 "\t\t\totherName ASCII: "
@@ -535,158 +655,158 @@ msgstr ""
 "\n"
 "\t\t\tASCII otherName: "
 
-#: lib/x509/output.c:516 lib/x509/output.c:1181 lib/openpgp/output.c:321
+#: lib/x509/output.c:523 lib/x509/output.c:1195 lib/openpgp/output.c:326
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tWersja: %d\n"
 
-#: lib/x509/output.c:530
+#: lib/x509/output.c:537
 msgid "\tSerial Number (hex): "
 msgstr "\tNumer seryjny (hex): "
 
-#: lib/x509/output.c:547 lib/x509/output.c:1195
+#: lib/x509/output.c:554 lib/x509/output.c:1209
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tWystawca: %s\n"
 
-#: lib/x509/output.c:554
+#: lib/x509/output.c:561
 msgid "\tValidity:\n"
 msgstr "\tWa¿no¶æ:\n"
 
-#: lib/x509/output.c:567
+#: lib/x509/output.c:574
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tNie wcze¶niej ni¿: %s\n"
 
-#: lib/x509/output.c:581
+#: lib/x509/output.c:588
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tNie pó¼niej ni¿: %s\n"
 
-#: lib/x509/output.c:595
+#: lib/x509/output.c:602
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tPrzedmiot: %s\n"
 
-#: lib/x509/output.c:610 lib/x509/output.c:881 lib/x509/output.c:1291
-#: lib/openpgp/output.c:237
+#: lib/x509/output.c:617 lib/x509/output.c:894 lib/x509/output.c:1305
+#: lib/openpgp/output.c:238
 msgid "unknown"
 msgstr "nieznany"
 
-#: lib/x509/output.c:612
+#: lib/x509/output.c:619
 #, c-format
 msgid "\tSubject Public Key Algorithm: %s\n"
 msgstr "\tAlgorytm klucza publicznego: %s\n"
 
-#: lib/x509/output.c:625 lib/openpgp/output.c:256
+#: lib/x509/output.c:633 lib/openpgp/output.c:258
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tReszta (bitów: %d):\n"
 
-#: lib/x509/output.c:627 lib/openpgp/output.c:258
+#: lib/x509/output.c:635 lib/openpgp/output.c:260
 msgid "\t\tExponent:\n"
 msgstr "\t\tWyk³adnik:\n"
 
-#: lib/x509/output.c:646 lib/openpgp/output.c:281
+#: lib/x509/output.c:654 lib/openpgp/output.c:285
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tKlucz publiczny (bitów: %d):\n"
 
-#: lib/x509/output.c:648 lib/openpgp/output.c:283
+#: lib/x509/output.c:656 lib/openpgp/output.c:287
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
-#: lib/x509/output.c:650 lib/openpgp/output.c:285
+#: lib/x509/output.c:658 lib/openpgp/output.c:289
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
-#: lib/x509/output.c:652 lib/openpgp/output.c:287
+#: lib/x509/output.c:660 lib/openpgp/output.c:291
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
-#: lib/x509/output.c:697
+#: lib/x509/output.c:706
 msgid "\tExtensions:\n"
 msgstr "\tRozszerzenia:\n"
 
-#: lib/x509/output.c:707
+#: lib/x509/output.c:716
 #, c-format
 msgid "\t\tBasic Constraints (%s):\n"
 msgstr "\t\tOgraniczenia podstawowe (%s):\n"
 
-#: lib/x509/output.c:708 lib/x509/output.c:723 lib/x509/output.c:738
-#: lib/x509/output.c:753 lib/x509/output.c:768 lib/x509/output.c:783
-#: lib/x509/output.c:798 lib/x509/output.c:813 lib/x509/output.c:825
+#: lib/x509/output.c:717 lib/x509/output.c:732 lib/x509/output.c:747
+#: lib/x509/output.c:762 lib/x509/output.c:777 lib/x509/output.c:794
+#: lib/x509/output.c:809 lib/x509/output.c:826 lib/x509/output.c:838
 msgid "critical"
 msgstr "krytyczny"
 
-#: lib/x509/output.c:708 lib/x509/output.c:723 lib/x509/output.c:738
-#: lib/x509/output.c:753 lib/x509/output.c:768 lib/x509/output.c:783
-#: lib/x509/output.c:798 lib/x509/output.c:813 lib/x509/output.c:825
+#: lib/x509/output.c:717 lib/x509/output.c:732 lib/x509/output.c:747
+#: lib/x509/output.c:762 lib/x509/output.c:777 lib/x509/output.c:794
+#: lib/x509/output.c:809 lib/x509/output.c:826 lib/x509/output.c:838
 msgid "not critical"
 msgstr "niekrytyczny"
 
-#: lib/x509/output.c:722
+#: lib/x509/output.c:731
 #, c-format
 msgid "\t\tSubject Key Identifier (%s):\n"
 msgstr "\t\tIdentyfikator klucza przedmiotu (%s):\n"
 
-#: lib/x509/output.c:737
+#: lib/x509/output.c:746
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tIdentyfikator klucza autorytetu (%s):\n"
 
-#: lib/x509/output.c:752
+#: lib/x509/output.c:761
 #, c-format
 msgid "\t\tKey Usage (%s):\n"
 msgstr "\t\tU¿ycie klucza (%s):\n"
 
-#: lib/x509/output.c:767
+#: lib/x509/output.c:776
 #, c-format
 msgid "\t\tKey Purpose (%s):\n"
 msgstr "\t\tPrzeznaczenie klucza (%s):\n"
 
-#: lib/x509/output.c:782
+#: lib/x509/output.c:793
 #, c-format
 msgid "\t\tSubject Alternative Name (%s):\n"
 msgstr "\t\tAlternatywna nazwa przedmiotu (%s):\n"
 
-#: lib/x509/output.c:797
+#: lib/x509/output.c:808
 #, c-format
 msgid "\t\tCRL Distribution points (%s):\n"
 msgstr "\t\tPunkty rozproszenia CRL (%s):\n"
 
-#: lib/x509/output.c:812
+#: lib/x509/output.c:825
 #, c-format
 msgid "\t\tProxy Certificate Information (%s):\n"
 msgstr "\t\tInformacja o certyfikacie proxy (%s):\n"
 
-#: lib/x509/output.c:824
+#: lib/x509/output.c:837
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tNieznane rozszerzenie %s (%s):\n"
 
-#: lib/x509/output.c:853
+#: lib/x509/output.c:866
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: lib/x509/output.c:857
+#: lib/x509/output.c:870
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tZrzut hex: "
 
-#: lib/x509/output.c:882 lib/x509/output.c:1292
+#: lib/x509/output.c:895 lib/x509/output.c:1306
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tAlgorytm podpisu: %s\n"
 
-#: lib/x509/output.c:886 lib/x509/output.c:1296
+#: lib/x509/output.c:901 lib/x509/output.c:1312
 msgid "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr "uwaga: podpisano z³amanym algorytmem podpisu, który mo¿e byæ podrobiony.\n"
 
-#: lib/x509/output.c:911 lib/x509/output.c:1321
+#: lib/x509/output.c:926 lib/x509/output.c:1337
 msgid "\tSignature:\n"
 msgstr "\tPodpis:\n"
 
-#: lib/x509/output.c:934
+#: lib/x509/output.c:949
 msgid ""
 "\tMD5 fingerprint:\n"
 "\t\t"
@@ -694,7 +814,7 @@ msgstr ""
 "\tOdcisk MD5:\n"
 "\t\t"
 
-#: lib/x509/output.c:936
+#: lib/x509/output.c:951
 msgid ""
 "\tSHA-1 fingerprint:\n"
 "\t\t"
@@ -702,7 +822,7 @@ msgstr ""
 "\tOdcisk SHA-1:\n"
 "\t\t"
 
-#: lib/x509/output.c:970
+#: lib/x509/output.c:985
 msgid ""
 "\tPublic Key Id:\n"
 "\t\t"
@@ -710,129 +830,129 @@ msgstr ""
 "\tIdentyfikator klucza publicznego:\n"
 "\t\t"
 
-#: lib/x509/output.c:1137
+#: lib/x509/output.c:1151
 msgid "X.509 Certificate Information:\n"
 msgstr "Informacja o certyfikacie X.509:\n"
 
-#: lib/x509/output.c:1141
+#: lib/x509/output.c:1155
 msgid "Other Information:\n"
 msgstr "Inne informacje:\n"
 
-#: lib/x509/output.c:1177
+#: lib/x509/output.c:1191
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tWersja: 1 (domy¶lna)\n"
 
-#: lib/x509/output.c:1202
+#: lib/x509/output.c:1216
 msgid "\tUpdate dates:\n"
 msgstr "\tDaty uaktualnieñ:\n"
 
-#: lib/x509/output.c:1215
+#: lib/x509/output.c:1229
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tWystawiono: %s\n"
 
-#: lib/x509/output.c:1231
+#: lib/x509/output.c:1245
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tNastêpnie: %s\n"
 
-#: lib/x509/output.c:1241
+#: lib/x509/output.c:1255
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tUniewa¿nione certyfikaty (%d):\n"
 
-#: lib/x509/output.c:1243
+#: lib/x509/output.c:1257
 msgid "\tNo revoked certificates.\n"
 msgstr "\tBrak uniewa¿nionych certyfikatów.\n"
 
-#: lib/x509/output.c:1262
+#: lib/x509/output.c:1276
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tNumer seryjny (hex): "
 
-#: lib/x509/output.c:1271
+#: lib/x509/output.c:1285
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tUniewa¿niono: %s\n"
 
-#: lib/x509/output.c:1352
+#: lib/x509/output.c:1368
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Informacja o li¶cie uniewa¿nieñ certyfikatów X.509:\n"
 
-#: lib/openpgp/output.c:84
+#: lib/openpgp/output.c:85
 msgid "\t\tKey Usage:\n"
 msgstr "\t\tU¿ycie klucza:\n"
 
-#: lib/openpgp/output.c:93
+#: lib/openpgp/output.c:94
 #, c-format
 msgid "error: get_key_usage: %s\n"
 msgstr "b³±d: get_key_usage: %s\n"
 
-#: lib/openpgp/output.c:98
+#: lib/openpgp/output.c:99
 msgid "\t\t\tDigital signatures.\n"
 msgstr "\t\t\tPodpisy cyfrowe.\n"
 
-#: lib/openpgp/output.c:100
+#: lib/openpgp/output.c:101
 msgid "\t\t\tCommunications encipherment.\n"
 msgstr "\t\t\tSzyfrowanie komunikacji.\n"
 
-#: lib/openpgp/output.c:102
+#: lib/openpgp/output.c:103
 msgid "\t\t\tStorage data encipherment.\n"
 msgstr "\t\t\tSzyfrowanie przechowywanych danych.\n"
 
-#: lib/openpgp/output.c:104
+#: lib/openpgp/output.c:105
 msgid "\t\t\tAuthentication.\n"
 msgstr "\t\t\tUwierzytelnianie.\n"
 
-#: lib/openpgp/output.c:127
+#: lib/openpgp/output.c:128
 msgid "\tID (hex): "
 msgstr "\tID (hex): "
 
-#: lib/openpgp/output.c:148
+#: lib/openpgp/output.c:149
 msgid "\tFingerprint (hex): "
 msgstr "\tOdcisk (hex): "
 
-#: lib/openpgp/output.c:165
+#: lib/openpgp/output.c:166
 msgid "\tRevoked: True\n"
 msgstr "\tUniewa¿niony: tak\n"
 
-#: lib/openpgp/output.c:167
+#: lib/openpgp/output.c:168
 msgid "\tRevoked: False\n"
 msgstr "\tUniewa¿niony: nie\n"
 
-#: lib/openpgp/output.c:175
+#: lib/openpgp/output.c:176
 msgid "\tTime stamps:\n"
 msgstr "\tOznaczenia czasu:\n"
 
-#: lib/openpgp/output.c:192
+#: lib/openpgp/output.c:193
 #, c-format
 msgid "\t\tCreation: %s\n"
 msgstr "\t\tUtworzenie: %s\n"
 
-#: lib/openpgp/output.c:206
+#: lib/openpgp/output.c:207
 msgid "\t\tExpiration: Never\n"
 msgstr "\t\tWyga¶niêcie: nigdy\n"
 
-#: lib/openpgp/output.c:215
+#: lib/openpgp/output.c:216
 #, c-format
 msgid "\t\tExpiration: %s\n"
 msgstr "\t\tWyga¶niêcie: %s\n"
 
-#: lib/openpgp/output.c:239
+#: lib/openpgp/output.c:240
 #, c-format
 msgid "\tPublic Key Algorithm: %s\n"
 msgstr "\tAlgorytm klucza publicznego: %s\n"
 
-#: lib/openpgp/output.c:343
+#: lib/openpgp/output.c:349
 #, c-format
 msgid "\tName[%d]: %s\n"
 msgstr "\tNazwa[%d]: %s\n"
 
-#: lib/openpgp/output.c:345
+#: lib/openpgp/output.c:352
 #, c-format
 msgid "\tRevoked Name[%d]: %s\n"
 msgstr "\tNazwa uniewa¿niona[%d]: %s\n"
 
-#: lib/openpgp/output.c:360
+#: lib/openpgp/output.c:369
 #, c-format
 msgid ""
 "\n"
@@ -841,6 +961,6 @@ msgstr ""
 "\n"
 "\tPodklucz[%d]:\n"
 
-#: lib/openpgp/output.c:395
+#: lib/openpgp/output.c:404
 msgid "OpenPGP Certificate Information:\n"
 msgstr "Informacja o certyfikacie OpenPGP:\n"
