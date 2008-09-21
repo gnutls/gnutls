@@ -584,6 +584,16 @@ main (int argc, char **argv)
 
   gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
+#ifdef gcry_fips_mode_active
+  if (gcry_fips_mode_active())
+    {
+      ret = gnutls_register_md5_handler ();
+      if (ret)
+	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
+		 gnutls_strerror (ret));
+    }
+#endif
+
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));

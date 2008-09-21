@@ -702,7 +702,8 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	tests/hostname-check/Makefile \
 	includes/Makefile includes/gnutls/gnutls.h \
 	lib/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
-	libextra/Makefile lib/openpgp/Makefile lib/opencdk/Makefile \
+	libextra/Makefile libextra/gl/Makefile \
+	lib/openpgp/Makefile lib/opencdk/Makefile \
 	tests/openpgp/Makefile tests/openpgp-certs/Makefile \
 	src/Makefile \
 	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \

@@ -31,7 +31,7 @@ else
 AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
-SUBDIRS = 
+SUBDIRS = gl
 
 bin_SCRIPTS = libgnutls-extra-config
 
@@ -105,7 +105,8 @@ libgnutls_extra_la_LDFLAGS += \
 
 libgnutls_extra_la_SOURCES += libgnutls-extra.vers
 
-libgnutls_extra_la_LIBADD += ../lgl/liblgnu.la ../lib/libgnutls.la
+libgnutls_extra_la_LIBADD += ../lgl/liblgnu.la gl/libxgnu.la \
+	../lib/libgnutls.la
 
 if HAVE_LD_VERSION_SCRIPT
 libgnutls_extra_la_LDFLAGS += \
