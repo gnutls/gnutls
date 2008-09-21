@@ -29,6 +29,6 @@ if HAVE_GUILE
 SUBDIRS += guile
 endif
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lgl/m4
+ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lgl/m4 -I libextra/gl/m4
 
 EXTRA_DIST = cfg.mk maint.mk .clcopying
