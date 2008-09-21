@@ -2959,7 +2959,7 @@ expiration_days = 700
 #ip_address = "192.168.1.1"
 
 # An email in case of a person
-email = "none@none.org"
+email = "none@@none.org"
 
 # An URL that has CRLs (certificate revocation lists)
 # available. Needed in CA certificates.
