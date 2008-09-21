@@ -600,6 +600,12 @@ main (int argc, char **argv)
       exit (1);
     }
 
+  if ((ret = gnutls_global_init_extra ()) < 0)
+    {
+      fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+
   gaa_parser (argc, argv);
   if (hostname == NULL)
     {
