@@ -1009,6 +1009,8 @@ certificate_info (void)
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
       fwrite (buffer, 1, size, outfile);
+      
+      gnutls_x509_crt_deinit( crt[i]);
     }
 }
 
@@ -1180,6 +1182,8 @@ pgp_privkey_info (void)
     error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
 
   fprintf (outfile, "\n%s\n", buffer);
+
+  gnutls_openpgp_privkey_deinit (key);
 }
 
 void
@@ -1331,6 +1335,8 @@ crl_info (void)
     error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
 
   print_crl_info (crl, outfile);
+
+  gnutls_x509_crl_deinit (crl);
 }
 
 void
@@ -1391,8 +1397,15 @@ privkey_info (void)
 	fprintf (stderr, "Error in key RSA data export: %s\n",
 		 gnutls_strerror (ret));
       else
-	print_rsa_pkey (&m, &e, &d, &p, &q, &u);
-
+        {
+	  print_rsa_pkey (&m, &e, &d, &p, &q, &u);
+          gnutls_free(m.data);
+          gnutls_free(e.data);
+          gnutls_free(d.data);
+          gnutls_free(p.data);
+          gnutls_free(q.data);
+          gnutls_free(u.data);
+        }
     }
   else if (ret == GNUTLS_PK_DSA)
     {
@@ -1403,7 +1416,14 @@ privkey_info (void)
 	fprintf (stderr, "Error in key DSA data export: %s\n",
 		 gnutls_strerror (ret));
       else
-	print_dsa_pkey (&x, &y, &p, &q, &g);
+        {
+	  print_dsa_pkey (&x, &y, &p, &q, &g);
+          gnutls_free(x.data);
+          gnutls_free(y.data);
+          gnutls_free(p.data);
+          gnutls_free(q.data);
+          gnutls_free(g.data);
+        }
     }
 
   fprintf (outfile, "\n");
@@ -1432,6 +1452,8 @@ privkey_info (void)
     error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
 
   fprintf (outfile, "\n%s\n", buffer);
+
+  gnutls_x509_privkey_deinit (key);
 }
 
 
