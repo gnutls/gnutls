@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-AM_CPPFLAGS = -Igl -I$(top_srcdir)/lgl -I$(top_builddir)/lgl		\
+AM_CPPFLAGS = -I$(srcdir)/gl -I$(top_srcdir)/lgl -I$(top_builddir)/lgl	\
 	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
 	-I$(top_srcdir)/lib/minitasn1 \
 	$(LIBGCRYPT_CFLAGS)
