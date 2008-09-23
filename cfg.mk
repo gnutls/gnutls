@@ -44,10 +44,10 @@ update-po: refresh-po
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
 
-LIBGCRYPTROOT ?= $(HOME)/w32root
+W32ROOT ?= $(HOME)/gnutls4win/inst
 
 mingw32: autoreconf 
-	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess` --with-included-libtasn1 --with-included-opencdk --with-libgcrypt-prefix=$(LIBGCRYPTROOT)
+	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`./config.guess` --with-libtasn1-prefix=$(W32ROOT) --with-libgcrypt-prefix=$(W32ROOT) --prefix $(W32ROOT)
 
 .PHONY: bootstrap autoreconf mingw32
 
