@@ -258,7 +258,7 @@ gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
  * gnutls_openpgp_keyring_get_crt - export an openpgp certificate from a keyring
  * @key: Holds the key.
  * @idx: the index of the certificate to export
- * @crt: An uninitialized &gnutls_openpgp_crt_t structure
+ * @crt: An uninitialized #gnutls_openpgp_crt_t structure
  *
  * This function will extract an OpenPGP certificate from the given
  * keyring.  If the index given is out of range
