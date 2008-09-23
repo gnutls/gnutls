@@ -259,7 +259,7 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
 /**
   * gnutls_x509_crl_set_crt - This function will set a revoked certificate's serial number
   * @crl: should contain a gnutls_x509_crl_t structure
-  * @crt: should contain a gnutls_x509_crt_t structure with the revoked certificate
+  * @crt: a certificate of type #gnutls_x509_crt_t with the revoked certificate
   * @revocation_time: The time this certificate was revoked
   *
   * This function will set a revoked certificate's serial number to the CRL. 
