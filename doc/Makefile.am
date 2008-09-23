@@ -21,7 +21,8 @@
 
 EXTRA_DIST = TODO README.GIT README.autoconf certtool.cfg gnutls.ps	\
 	gnutls.pdf gnutls.html extract-guile-c-doc.scm			\
-	doxygen/Doxyfile.in doxygen/Doxyfile.orig
+	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css
+
 SUBDIRS = examples scripts manpages credentials
 if ENABLE_GTK_DOC
 SUBDIRS += reference
@@ -88,7 +89,7 @@ images_DATA = gnutls-certificate-user-use-case.png		\
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
-	--no-split
+	--no-split --css-include=texinfo.css
 
 ../lib/gnutls-api.texi:
 	cd ../lib && make gnutls-api.texi
