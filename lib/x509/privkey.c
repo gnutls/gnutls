@@ -1075,10 +1075,10 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
    */
    
   /* first make sure that no previously allocated data are leaked */
-  if (c2 != ASN1_TYPE_EMPTY)
+  if (*c2 != ASN1_TYPE_EMPTY)
     {
       asn1_delete_structure (c2);
-      c2 = ASN1_TYPE_EMPTY;
+      *c2 = ASN1_TYPE_EMPTY;
     }
 
   if ((result = asn1_create_element
@@ -1243,10 +1243,10 @@ _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, bigint_t * params)
    */
 
   /* first make sure that no previously allocated data are leaked */
-  if (c2 != ASN1_TYPE_EMPTY)
+  if (*c2 != ASN1_TYPE_EMPTY)
     {
       asn1_delete_structure (c2);
-      c2 = ASN1_TYPE_EMPTY;
+      *c2 = ASN1_TYPE_EMPTY;
     }
 
   if ((result = asn1_create_element
