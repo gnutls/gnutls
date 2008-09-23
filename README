@@ -14,7 +14,7 @@ COMPILATION ISSUES
 ------------------
 
 The library needs libgcrypt. You can find libgcrypt at
-<ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/>.  Note that by
+<ftp://ftp.gnupg.org/pub/gcrypt/libgcrypt/>.  Note that by
 compiling libgcrypt with CPU optimizations gnutls' speed will
 increase.
 
