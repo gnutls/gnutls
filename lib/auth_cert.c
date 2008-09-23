@@ -71,6 +71,11 @@ _gnutls_copy_certificate_auth_info (cert_auth_info_t info,
    */
   int ret, i, j;
 
+  if (info->raw_certificate_list != NULL)
+    {
+      gnutls_free( info->raw_certificate_list);
+    }
+
   if (ncerts == 0)
     {
       info->raw_certificate_list = NULL;

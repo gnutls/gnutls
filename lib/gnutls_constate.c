@@ -58,10 +58,6 @@ static int
 _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 		  int key_size, int export_flag)
 {
-
-/* FIXME: This function is too long
- */
-  opaque *key_block;
   opaque rnd[2 * GNUTLS_RANDOM_SIZE];
   opaque rrnd[2 * GNUTLS_RANDOM_SIZE];
   int pos, ret;
@@ -81,12 +77,8 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   if (export_flag == 0)
     block_size += 2 * IV_size;
 
-  key_block = gnutls_secure_malloc (block_size);
-  if (key_block == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+  /* avoid using malloc */
+  opaque key_block[block_size];
 
   memcpy (rnd, session->security_parameters.server_random,
 	  GNUTLS_RANDOM_SIZE);
@@ -116,7 +108,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (key_block);
       return ret;
     }
 
@@ -127,11 +118,18 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   pos = 0;
   if (hash_size > 0)
     {
+    
+      if (session->cipher_specs.client_write_mac_secret.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.client_write_mac_secret);
+
+      if (session->cipher_specs.server_write_mac_secret.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.server_write_mac_secret);
+
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_mac_secret,
 	   &key_block[pos], hash_size) < 0)
 	{
-	  gnutls_free (key_block);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       pos += hash_size;
@@ -140,7 +138,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  (&session->cipher_specs.server_write_mac_secret,
 	   &key_block[pos], hash_size) < 0)
 	{
-	  gnutls_free (key_block);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       pos += hash_size;
@@ -148,9 +146,10 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 
   if (key_size > 0)
     {
+      opaque key1[EXPORT_FINAL_KEY_SIZE];
+      opaque key2[EXPORT_FINAL_KEY_SIZE];
       opaque *client_write_key, *server_write_key;
       int client_write_key_size, server_write_key_size;
-      int free_keys = 0;
 
       if (export_flag == 0)
 	{
@@ -167,24 +166,8 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	}
       else
 	{			/* export */
-	  free_keys = 1;
-
-	  client_write_key = gnutls_secure_malloc (EXPORT_FINAL_KEY_SIZE);
-	  if (client_write_key == NULL)
-	    {
-	      gnutls_assert ();
-	      gnutls_free (key_block);
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
-
-	  server_write_key = gnutls_secure_malloc (EXPORT_FINAL_KEY_SIZE);
-	  if (server_write_key == NULL)
-	    {
-	      gnutls_assert ();
-	      gnutls_free (key_block);
-	      gnutls_free (client_write_key);
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
+	  client_write_key = key1;
+	  server_write_key = key2;
 
 	  /* generate the final keys */
 
@@ -211,9 +194,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
-	      gnutls_free (key_block);
-	      gnutls_free (server_write_key);
-	      gnutls_free (client_write_key);
 	      return ret;
 	    }
 
@@ -240,9 +220,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
-	      gnutls_free (key_block);
-	      gnutls_free (server_write_key);
-	      gnutls_free (client_write_key);
 	      return ret;
 	    }
 
@@ -250,13 +227,14 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  pos += key_size;
 	}
 
+      if (session->cipher_specs.client_write_key.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.client_write_key);
+
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_key,
 	   client_write_key, client_write_key_size) < 0)
 	{
-	  gnutls_free (key_block);
-	  gnutls_free (server_write_key);
-	  gnutls_free (client_write_key);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       _gnutls_hard_log ("INT: CLIENT WRITE KEY [%d]: %s\n",
@@ -265,13 +243,14 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 					 client_write_key_size, buf,
 					 sizeof (buf)));
 
+      if (session->cipher_specs.server_write_key.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.server_write_key);
+
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.server_write_key,
 	   server_write_key, server_write_key_size) < 0)
 	{
-	  gnutls_free (key_block);
-	  gnutls_free (server_write_key);
-	  gnutls_free (client_write_key);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -281,11 +260,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 					 server_write_key_size, buf,
 					 sizeof (buf)));
 
-      if (free_keys != 0)
-	{
-	  gnutls_free (server_write_key);
-	  gnutls_free (client_write_key);
-	}
     }
 
 
@@ -293,20 +267,26 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
    */
   if (IV_size > 0 && export_flag == 0)
     {
+      if (session->cipher_specs.client_write_IV.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.client_write_IV);
+
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_IV, &key_block[pos],
 	   IV_size) < 0)
 	{
-	  gnutls_free (key_block);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       pos += IV_size;
+
+      if (session->cipher_specs.server_write_IV.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.server_write_IV);
 
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.server_write_IV, &key_block[pos],
 	   IV_size) < 0)
 	{
-	  gnutls_free (key_block);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       pos += IV_size;
@@ -314,13 +294,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
     }
   else if (IV_size > 0 && export_flag != 0)
     {
-      opaque *iv_block = gnutls_malloc (IV_size * 2);
-      if (iv_block == NULL)
-	{
-	  gnutls_assert ();
-	  gnutls_free (key_block);
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+      opaque iv_block[IV_size * 2];
 
       if (session->security_parameters.version == GNUTLS_SSL3)
 	{			/* SSL 3 */
@@ -331,8 +305,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
-	      gnutls_free (key_block);
-	      gnutls_free (iv_block);
 	      return ret;
 	    }
 
@@ -351,32 +323,30 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  gnutls_free (iv_block);
-	  gnutls_free (key_block);
 	  return ret;
 	}
+
+      if (session->cipher_specs.client_write_IV.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.client_write_IV);
 
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_IV, iv_block, IV_size) < 0)
 	{
-	  gnutls_free (iv_block);
-	  gnutls_free (key_block);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
+
+      if (session->cipher_specs.server_write_IV.data != NULL)
+        _gnutls_free_datum(&session->cipher_specs.server_write_IV);
 
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.server_write_IV,
 	   &iv_block[IV_size], IV_size) < 0)
 	{
-	  gnutls_free (iv_block);
-	  gnutls_free (key_block);
+	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
-
-      gnutls_free (iv_block);
     }
-
-  gnutls_free (key_block);
 
   session->cipher_specs.generated_keys = 1;
 

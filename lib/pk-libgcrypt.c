@@ -330,6 +330,8 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
   rc = gcry_pk_sign (&s_sig, s_hash, s_key);
   gcry_sexp_release (s_hash);
   gcry_sexp_release (s_key);
+  s_hash = NULL;
+  s_key = NULL;
 
   if (rc != 0)
     {
@@ -352,6 +354,7 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
 
       res[0] = gcry_sexp_nth_mpi (list, 1, 0);
       gcry_sexp_release (list);
+      list = NULL;
 
       list = gcry_sexp_find_token (s_sig, "s", 0);
       if (list == NULL)
@@ -363,6 +366,7 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
 
       res[1] = gcry_sexp_nth_mpi (list, 1, 0);
       gcry_sexp_release (list);
+      list = NULL;
 
       ret = _gnutls_encode_ber_rs (signature, res[0], res[1]);
 
@@ -379,6 +383,7 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
 
       res[0] = gcry_sexp_nth_mpi (list, 1, 0);
       gcry_sexp_release (list);
+      list = NULL;
 
       ret = _gnutls_mpi_dprint (res[0], signature);
     }
@@ -389,9 +394,7 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
       goto cleanup;
     }
 
-  gcry_sexp_release (s_sig);
-
-  return 0;
+  ret = 0;
 
 cleanup:
   _gnutls_mpi_release (&hash);

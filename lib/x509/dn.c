@@ -697,8 +697,8 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();
-	  asn1_delete_structure (&c2);
-	  return _gnutls_asn2err (result);
+	  result = _gnutls_asn2err (result);
+	  goto error;
 	}
 
       _gnutls_str_cpy (tmp, sizeof (tmp), string_type);
@@ -708,8 +708,8 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      asn1_delete_structure (&c2);
-      return _gnutls_asn2err (result);
+      result = _gnutls_asn2err (result);
+      goto error;
     }
 
 
@@ -727,7 +727,8 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
+	  result = _gnutls_asn2err (result);
+	  goto error;
 	}
 
       _gnutls_str_cat (tmp, sizeof (tmp), ".?LAST");
@@ -738,7 +739,8 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
   if (result < 0)
     {
       gnutls_assert ();
-      return result;
+      result = _gnutls_asn2err (result);
+      goto error;
     }
 
   /* write the type
@@ -750,10 +752,15 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return _gnutls_asn2err (result);
+      result = _gnutls_asn2err (result);
+      goto error;
     }
 
-  return 0;
+  result = 0;
+
+error:
+  asn1_delete_structure (&c2);
+  return result;
 }
 
 /* This will write the AttributeTypeAndValue field. The data must be already DER encoded.
