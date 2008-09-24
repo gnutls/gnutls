@@ -5,8 +5,10 @@ See the end for copying conditions.
 
 * Version 2.5.9 (unreleased)
 
-** Fix memory leaks.
+** libgnutls: Fix several memory leaks.
 Reported by Sam Varshavchik <mrsam@courier-mta.com>.
+
+** doc: Texinfo HTML manual uses a stylesheet to improve readability.
 
 ** API and ABI modifications:
 No changes since last version.
