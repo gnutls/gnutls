@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.5.9 (unreleased)
 
+** Fix memory leaks.
+Reported by Sam Varshavchik <mrsam@courier-mta.com>.
+
 ** API and ABI modifications:
 No changes since last version.
 
