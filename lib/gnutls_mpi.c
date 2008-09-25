@@ -43,10 +43,17 @@ bigint_t
 _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
 		       gnutls_rnd_level_t level)
 {
+  opaque *buf = NULL;
   int size = 1 + (bits / 8), ret;
   int rem, i;
   bigint_t tmp;
-  opaque buf[size];
+
+  buf = gnutls_malloc (size);
+  if (buf == NULL)
+    {
+      gnutls_assert ();
+      return NULL;
+    }
 
   ret = _gnutls_rnd (level, buf, size);
   if (ret < 0)
@@ -75,6 +82,8 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
       goto cleanup;
     }
 
+  gnutls_free (buf);
+
   if (r != NULL)
     {
       _gnutls_mpi_set (r, tmp);
@@ -85,6 +94,7 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
   return tmp;
 
 cleanup:
+  gnutls_free (buf);
   return NULL;
 }
 
