@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2007 Free Software Foundation
+# Copyright (C) 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -24,3 +24,5 @@ EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem
 dist_check_SCRIPTS = pathlen
 
 TESTS = pathlen
+
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)

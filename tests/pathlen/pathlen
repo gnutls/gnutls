@@ -23,7 +23,7 @@
 set -e
 
 srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 $CERTTOOL --certificate-info --infile $srcdir/ca-no-pathlen.pem \
 	  --outfile new-ca-no-pathlen.pem
