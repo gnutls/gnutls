@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2006 Free Software Foundation
+# Copyright (C) 2006, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -27,3 +27,5 @@ EXTRA_DIST = MD5CollisionCA.cer \
 dist_check_SCRIPTS = rsa-md5-collision
 
 TESTS = rsa-md5-collision
+
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)

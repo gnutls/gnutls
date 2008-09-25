@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2006, 2007 Free Software Foundation
+# Copyright (C) 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -23,7 +23,7 @@
 set -e
 
 srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 echo ca > template
 echo cn = "SHA 512 CA" >> template

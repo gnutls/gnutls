@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2007 Free Software Foundation
+# Copyright (C) 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -23,7 +23,7 @@
 set -e
 
 srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 PARAMS="--generate-certificate --load-privkey $srcdir/key-user.pem --load-ca-privkey $srcdir/key-ca.pem --template tmpl"
 

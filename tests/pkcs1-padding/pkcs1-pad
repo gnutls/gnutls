@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -21,7 +21,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 # Test 1, PKCS#1 pad digestAlgorithm.parameters
 

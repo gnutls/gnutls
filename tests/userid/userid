@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2006 Free Software Foundation
+# Copyright (C) 2006, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -23,6 +23,6 @@
 set -e
 
 srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 exec $CERTTOOL --certificate-info --infile $srcdir/userid.pem

@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2006 Free Software Foundation
+# Copyright (C) 2006, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -24,3 +24,5 @@ EXTRA_DIST = userid.pem
 dist_check_SCRIPTS = userid
 
 TESTS = userid
+
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)

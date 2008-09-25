@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2007 Free Software Foundation
+# Copyright (C) 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -24,3 +24,5 @@ EXTRA_DIST = key-ca.pem key-subca.pem key-subsubca.pem key-user.pem
 dist_check_SCRIPTS = sha2
 
 TESTS = sha2
+
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)

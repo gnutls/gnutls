@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2006 Free Software Foundation
+# Copyright (C) 2006, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -27,3 +27,5 @@ EXTRA_DIST = pkcs1-pad-ok.pem pkcs1-pad-broken.pem \
 dist_check_SCRIPTS = pkcs1-pad
 
 TESTS = pkcs1-pad
+
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
