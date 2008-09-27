@@ -38,7 +38,6 @@
 
 #define clearbit(v,n)    ((unsigned char)(v) & ~( (unsigned char)(1) << (unsigned)(n)))
 
-/* FIXME: test this function */
 bigint_t
 _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
 		       gnutls_rnd_level_t level)
@@ -46,7 +45,26 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
   int size = 1 + (bits / 8), ret;
   int rem, i;
   bigint_t tmp;
-  opaque buf[size];
+  char tmpbuf[512];
+  opaque *buf;
+  int buf_release;
+
+  if ( size < sizeof(tmpbuf)) 
+    {
+      buf = tmpbuf;
+      buf_release = 0;
+    } 
+  else 
+    {
+      buf = gnutls_malloc(size);
+      if (buf == NULL) 
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+      buf_release = 1;
+    }  
+      
 
   ret = _gnutls_rnd (level, buf, size);
   if (ret < 0)
@@ -75,6 +93,12 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
       goto cleanup;
     }
 
+  if (buf_release != 0)
+    {
+      gnutls_free( buf);
+      buf = NULL;
+    }
+
   if (r != NULL)
     {
       _gnutls_mpi_set (r, tmp);
@@ -85,6 +109,8 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
   return tmp;
 
 cleanup:
+  if (buf_release != 0)
+    gnutls_free( buf);
   return NULL;
 }
 
