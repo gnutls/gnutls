@@ -11,6 +11,8 @@ Reported by Sam Varshavchik <mrsam@courier-mta.com>.
 ** libgnutls: Fix buffer overrun in gnutls_x509_crt_list_import.
 Report and patch by Jonathan Manktelow.
 
+
+
 ** doc: Texinfo HTML manual uses a stylesheet to improve readability.
 
 ** tests: Scripts now use EXEEXT properly.
