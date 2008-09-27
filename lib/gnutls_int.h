@@ -82,6 +82,8 @@ typedef struct
 /* The maximum digest size of hash algorithms. 
  */
 #define MAX_HASH_SIZE 64
+#define MAX_CIPHER_BLOCK_SIZE 16
+#define MAX_CIPHER_KEY_SIZE 32
 
 #define MAX_LOG_SIZE 1024	/* maximum size of log message */
 #define MAX_SRP_USERNAME 128

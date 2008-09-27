@@ -63,6 +63,8 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   int pos, ret;
   int block_size;
   char buf[65];
+  /* avoid using malloc */
+  opaque key_block[2 * MAX_HASH_SIZE + 2 * MAX_CIPHER_KEY_SIZE + 2 * MAX_CIPHER_BLOCK_SIZE];
 
   if (session->cipher_specs.generated_keys != 0)
     {
@@ -76,9 +78,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   block_size = 2 * hash_size + 2 * key_size;
   if (export_flag == 0)
     block_size += 2 * IV_size;
-
-  /* avoid using malloc */
-  opaque key_block[block_size];
 
   memcpy (rnd, session->security_parameters.server_random,
 	  GNUTLS_RANDOM_SIZE);
@@ -294,7 +293,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
     }
   else if (IV_size > 0 && export_flag != 0)
     {
-      opaque iv_block[IV_size * 2];
+      opaque iv_block[MAX_CIPHER_BLOCK_SIZE * 2];
 
       if (session->security_parameters.version == GNUTLS_SSL3)
 	{			/* SSL 3 */
