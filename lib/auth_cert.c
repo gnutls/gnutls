@@ -73,6 +73,8 @@ _gnutls_copy_certificate_auth_info (cert_auth_info_t info,
 
   if (info->raw_certificate_list != NULL)
     {
+      for (j = 0; j < info->ncerts; j++)
+        _gnutls_free_datum (&info->raw_certificate_list[j]);
       gnutls_free( info->raw_certificate_list);
     }
 
