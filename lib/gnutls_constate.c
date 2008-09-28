@@ -114,16 +114,17 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 		    _gnutls_bin2hex (key_block, block_size, buf,
 				     sizeof (buf)));
 
+  _gnutls_free_datum (&session->cipher_specs.server_write_mac_secret);
+  _gnutls_free_datum (&session->cipher_specs.client_write_mac_secret);
+  _gnutls_free_datum (&session->cipher_specs.server_write_IV);
+  _gnutls_free_datum (&session->cipher_specs.client_write_IV);
+  _gnutls_free_datum (&session->cipher_specs.server_write_key);
+  _gnutls_free_datum (&session->cipher_specs.client_write_key);
+
   pos = 0;
   if (hash_size > 0)
     {
     
-      if (session->cipher_specs.client_write_mac_secret.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.client_write_mac_secret);
-
-      if (session->cipher_specs.server_write_mac_secret.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.server_write_mac_secret);
-
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_mac_secret,
 	   &key_block[pos], hash_size) < 0)
@@ -226,9 +227,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  pos += key_size;
 	}
 
-      if (session->cipher_specs.client_write_key.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.client_write_key);
-
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_key,
 	   client_write_key, client_write_key_size) < 0)
@@ -241,9 +239,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 			_gnutls_bin2hex (client_write_key,
 					 client_write_key_size, buf,
 					 sizeof (buf)));
-
-      if (session->cipher_specs.server_write_key.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.server_write_key);
 
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.server_write_key,
@@ -266,9 +261,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
    */
   if (IV_size > 0 && export_flag == 0)
     {
-      if (session->cipher_specs.client_write_IV.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.client_write_IV);
-
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_IV, &key_block[pos],
 	   IV_size) < 0)
@@ -277,9 +269,6 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       pos += IV_size;
-
-      if (session->cipher_specs.server_write_IV.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.server_write_IV);
 
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.server_write_IV, &key_block[pos],
@@ -325,18 +314,12 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	  return ret;
 	}
 
-      if (session->cipher_specs.client_write_IV.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.client_write_IV);
-
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.client_write_IV, iv_block, IV_size) < 0)
 	{
 	  gnutls_assert();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
-
-      if (session->cipher_specs.server_write_IV.data != NULL)
-        _gnutls_free_datum(&session->cipher_specs.server_write_IV);
 
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.server_write_IV,
