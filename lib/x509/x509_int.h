@@ -56,7 +56,7 @@ typedef struct gnutls_pkcs7_int
   ASN1_TYPE pkcs7;
 } gnutls_pkcs7_int;
 
-#define MAX_PRIV_PARAMS_SIZE 6	/* ok for RSA and DSA */
+#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS /* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5

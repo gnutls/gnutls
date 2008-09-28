@@ -156,12 +156,9 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 {
   int result;
   ASN1_TYPE pkey_asn;
-  bigint_t temp_params[RSA_PRIVATE_PARAMS];
   gnutls_pk_params_st pk_params;
 
-  memset( temp_params, 0, sizeof(temp_params));
-
-  pk_params.params = temp_params;
+  memset( &pk_params, 0, sizeof(pk_params));
   pk_params.params_nr = RSA_PRIVATE_PARAMS;
 
   if ((result =
@@ -170,13 +167,6 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 			    &pkey_asn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return NULL;
-    }
-
-  if ((sizeof (pkey->params) / sizeof (bigint_t)) < RSA_PRIVATE_PARAMS)
-    {
-      gnutls_assert ();
-      /* internal error. Increase the bigint_ts in params */
       return NULL;
     }
 
@@ -251,14 +241,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 
 error:
   asn1_delete_structure (&pkey_asn);
-  /* we cannot use pk_params_release() since pk_params.params
-   * is not allocated */
-  _gnutls_mpi_release (&pk_params.params[0]);
-  _gnutls_mpi_release (&pk_params.params[1]);
-  _gnutls_mpi_release (&pk_params.params[2]);
-  _gnutls_mpi_release (&pk_params.params[3]);
-  _gnutls_mpi_release (&pk_params.params[4]);
-  _gnutls_mpi_release (&pk_params.params[5]);
+  gnutls_pk_params_release (&pk_params);
   return NULL;
 
 }
@@ -275,13 +258,6 @@ decode_dsa_key (const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
 			    &dsa_asn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return NULL;
-    }
-
-  if ((sizeof (pkey->params) / sizeof (bigint_t)) < DSA_PRIVATE_PARAMS)
-    {
-      gnutls_assert ();
-      /* internal error. Increase the bigint_ts in params */
       return NULL;
     }
 

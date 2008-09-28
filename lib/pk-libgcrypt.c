@@ -763,21 +763,19 @@ wrap_gcry_pk_generate_params (gnutls_pk_algorithm_t algo,
 
     case GNUTLS_PK_DSA:
       params->params_nr = DSA_PRIVATE_PARAMS;
-      params->params = gnutls_malloc (sizeof (bigint_t) * params->params_nr);
-      if (params->params == NULL)
+      if (params->params_nr > GNUTLS_MAX_PK_PARAMS)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
+	  return GNUTLS_E_INTERNAL_ERROR;
 	}
       return _dsa_generate_params (params->params, &params->params_nr, level);
 
     case GNUTLS_PK_RSA:
       params->params_nr = RSA_PRIVATE_PARAMS;
-      params->params = gnutls_malloc (sizeof (bigint_t) * params->params_nr);
-      if (params->params == NULL)
+      if (params->params_nr > GNUTLS_MAX_PK_PARAMS)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
+	  return GNUTLS_E_INTERNAL_ERROR;
 	}
       return _rsa_generate_params (params->params, &params->params_nr, level);
 

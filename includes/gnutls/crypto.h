@@ -168,8 +168,10 @@ typedef struct gnutls_crypto_bigint {
 		       gnutls_bigint_format_t format);
 } gnutls_crypto_bigint_st;
 
+#define GNUTLS_MAX_PK_PARAMS 6
+
 typedef struct {
-  bigint_t *params;
+  bigint_t params[GNUTLS_MAX_PK_PARAMS];
   unsigned int params_nr; /* the number of parameters */
   unsigned int flags;
 } gnutls_pk_params_st;

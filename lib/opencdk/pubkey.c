@@ -77,6 +77,7 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
   size_t enclen;
   cdk_error_t rc;
   int ret, algo;
+  unsigned int i;
   gnutls_datum data;
   gnutls_pk_params_st params;
 
@@ -114,8 +115,9 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
   data.data = encmd;
   data.size = enclen;
 
-  params.params = pk->mpi;
   params.params_nr = cdk_pk_get_npkey (pk->pubkey_algo);
+  for (i=0;i<params.params_nr;i++)
+    params.params[i] = pk->mpi[i];
   params.flags = 0;
   ret = _gnutls_pk_verify (algo, &data, &s_sig, &params);
 
