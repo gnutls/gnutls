@@ -21,6 +21,7 @@ Modern libtool doesn't create wrapper script, so the self tests need
 to invoke certtool.exe under MinGW32+Wine.
 
 ** Uses autoconf 2.63, automake 1.10.1, libtool 2.2.6a.
+Automake warnings are now also enabled.
 
 ** API and ABI modifications:
 gnutls_pk_params_st: MODIFIED
