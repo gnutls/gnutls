@@ -123,11 +123,11 @@ uint8_t* ip;
           sprintf(string, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
           break;
         case 16:
-          sprintf(string, "%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x:%x", 
-            ip[0], ip[1], ip[2], ip[3],
-            ip[4], ip[5], ip[6], ip[7],
-            ip[8], ip[9], ip[10], ip[11],
-            ip[12], ip[13], ip[14], ip[15]);
+          sprintf(string, "%x:%x:%x:%x:%x:%x:%x:%x", 
+            (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
+            (ip[4] << 8) | ip[5], (ip[6] <<8) | ip[7],
+            (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
+            (ip[12] << 8)| ip[13], (ip[14] << 8) | ip[15]);
           break;
       }
       

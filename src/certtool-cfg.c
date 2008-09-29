@@ -722,26 +722,31 @@ get_tls_server_status (void)
     }
 }
 
-/* avoid depending on in6addr etc. 
- *
- * ip must be of size 16 or more.
- */
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+/* convert a printable IP to binary */
 static int string_to_ip( unsigned char *ip, const char * str)
 {
   int len = strlen( str);
   int ret;
-  
-  if ( len > 16) { /* IPv6 */
-    ret = sscanf( str, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", 
-        &ip[0], &ip[1], &ip[2], &ip[3], &ip[4], &ip[5], &ip[6], 
-        &ip[7], &ip[8], &ip[9], &ip[10], &ip[11], &ip[12], &ip[13], 
-        &ip[14], &ip[15]);
-    if (ret <= 0) return 0;
-    
+
+  if ( strchr(str, ':') != NULL || len > 16) { /* IPv6 */
+    ret = inet_pton(AF_INET6, str, ip);
+    if (ret <= 0) {
+        fprintf(stderr, "Error in IPv6 address %s\n", str);
+        exit(1);
+    }
+
+    /* To be done */
     return 16;
   } else { /* IPv4 */
-    ret = sscanf( str, "%hhu.%hhu.%hhu.%hhu", &ip[0], &ip[1], &ip[2], &ip[3]);
-    if (ret <= 0) return 0;
+    ret = inet_pton(AF_INET, str, ip);
+    if (ret <= 0) {
+        fprintf(stderr, "Error in IPv4 address %s\n", str);
+        exit(1);
+    }
 
     return 4;    
   }
