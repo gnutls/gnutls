@@ -11,6 +11,9 @@ Reported by Sam Varshavchik <mrsam@courier-mta.com>.
 ** libgnutls: Fix buffer overrun in gnutls_x509_crt_list_import.
 Report and patch by Jonathan Manktelow.
 
+** libgnutls: crypto.h gnutls_pk_params_st changes allocation strategy.
+The parameters are now allocated in the structure itself.
+
 ** doc: Texinfo HTML manual uses a stylesheet to improve readability.
 
 ** tests: Scripts now use EXEEXT properly.
@@ -20,7 +23,7 @@ to invoke certtool.exe under MinGW32+Wine.
 ** Uses autoconf 2.63, automake 1.10.1, libtool 2.2.6a.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pk_params_st: MODIFIED
 
 * Version 2.5.8 (released 2008-09-21)
 
