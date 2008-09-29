@@ -1,3 +1,162 @@
+2008-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.5.9.
+
+2008-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Document ABI change.
+
+2008-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_constate.c: Re-add comment about too long function, it
+	is one of the most complex in gnutls.
+
+2008-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Need AC_CONFIG_MACRO_DIR for modern libtool.
+
+2008-09-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* includes/gnutls/crypto.h, lib/gnutls_pk.c, lib/opencdk/pubkey.c,
+	lib/pk-libgcrypt.c, lib/x509/privkey.c, lib/x509/x509_int.h: changed
+	crypto API to reduce probability of memory leaks during usage of
+	pk_params.
+
+2008-09-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit 699aa57dacc6446e92c123e93bba1f894067893e Author: Nikos
+	Mavrogiannopoulos <nmav@turtle.(none)> Date:   Sun Sep 28 03:34:59
+	2008 +0300
+
+2008-09-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: Revert "fixed" This reverts commit 14647811d21d3eda2d5bd82557329bcf7778f31b.
+
+2008-09-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: fixed
+
+2008-09-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_constate.c, lib/gnutls_int.h: 
+	avoid using malloc for small buffers.
+
+2008-09-28  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_mpi.c: optimized in order to avoid calling malloc for
+	small buffers.
+
+2008-09-27  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_constate.c, lib/gnutls_mpi.c: Revert "Revert C99 uses.
+	Fixes gnutls_mpi.c mem leak, but not others." This reverts commit bdfa289133b15ad7d92eb3151ce86cca4c879426.
+
+2008-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/Makefile.am, tests/pathlen/pathlen: Use EXEEXT in
+	self-test scripts.
+
+2008-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/key-id/Makefile.am, tests/key-id/key-id,
+	tests/pkcs1-padding/Makefile.am, tests/pkcs1-padding/pkcs1-pad,
+	tests/rsa-md5-collision/Makefile.am,
+	tests/rsa-md5-collision/rsa-md5-collision, tests/sha2/Makefile.am,
+	tests/sha2/sha2, tests/userid/Makefile.am, tests/userid/userid: Use
+	EXEEXT in self-test scripts.
+
+2008-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/vasnprintf.c: Update gnulib files.
+
+2008-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS: Add.
+
+2008-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_constate.c, lib/gnutls_mpi.c: Revert C99 uses.  Fixes
+	gnutls_mpi.c mem leak, but not others.
+
+2008-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-09-23  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/x509.c: Corrected buffer overrun in crt_list_import.
+	Reported and patch by Jonathan Manktelow.
+
+2008-09-23  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* README: corrected libgcrypt site.
+
+2008-09-23  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/privkey.c: corrected embarrasing bug.
+
+2008-09-23  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/auth_cert.c, lib/gnutls_constate.c, lib/gnutls_mpi.c,
+	lib/pk-libgcrypt.c, lib/x509/common.c, lib/x509/dn.c: Corrected
+	several memory leaks reported by Sam. In some cases switched to C99
+	to avoid having complex code.
+
+2008-09-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/extras.c: Doc fix.
+
+2008-09-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crl_write.c, lib/x509/x509_write.c: Doc fix.
+
+2008-09-23  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, doc/reference/Makefile.am: Use automake warnings.
+
+2008-09-23  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Typo.
+
+2008-09-23  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix mingw32 rules.
+
+2008-09-23  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, doc/Makefile.am, doc/texinfo.css: Use a stylesheet for
+	texinfo HTML manual.
+
+2008-09-21  Nikos Mavrogiannopoulos <nmav@turtle.(none)>
+
+	* lib/x509/privkey.c: fixed memory leak in reencoding of RSA and DSA
+	private keys. Reported and studied by Sam Varshavchik
+
+2008-09-21  Nikos Mavrogiannopoulos <nmav@turtle.(none)>
+
+	* lib/x509/x509_write.c: documented the way set_subject_alt_name()
+	can set value.
+
+2008-09-21  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-09-21  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.8.
