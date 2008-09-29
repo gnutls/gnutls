@@ -58,6 +58,8 @@ static int
 _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 		  int key_size, int export_flag)
 {
+  /* FIXME: This function is too long
+   */
   opaque rnd[2 * GNUTLS_RANDOM_SIZE];
   opaque rrnd[2 * GNUTLS_RANDOM_SIZE];
   int pos, ret;
