@@ -5,8 +5,18 @@ See the end for copying conditions.
 
 * Version 2.6.0 (unreleased)
 
+** libgnutls: Added functions to handle CRL extensions.
+
+** certtool: Print and set CRL extensions.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crl_get_authority_key_id: ADDED
+gnutls_x509_crl_get_number: ADDED
+gnutls_x509_crl_get_extension_oid: ADDED
+gnutls_x509_crl_get_extension_info: ADDED
+gnutls_x509_crl_get_extension_data: ADDED
+gnutls_x509_crl_set_authority_key_id: ADDED
+gnutls_x509_crl_set_number: ADDED
 
 * Version 2.5.9 (released 2008-09-29)
 

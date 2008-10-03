@@ -38,6 +38,7 @@
 typedef struct gnutls_x509_crl_int
 {
   ASN1_TYPE crl;
+  int use_extensions;
 } gnutls_x509_crl_int;
 
 typedef struct gnutls_x509_crt_int
@@ -179,6 +180,18 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *raw_key,
 int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, bigint_t * params);
 
 /* extensions.c */
+int _gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
+				const char *extension_id, int indx,
+				gnutls_datum_t * ret, unsigned int *_critical);
+
+int _gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl,
+				    int indx, void *oid, size_t * sizeof_oid);
+
+int _gnutls_x509_crl_set_extension (gnutls_x509_crl_t crl,
+				const char *ext_id,
+				const gnutls_datum_t * ext_data,
+				unsigned int critical);
+
 int _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
 				    const char *extension_id, int indx,
 				    gnutls_datum_t * ret,
@@ -196,6 +209,16 @@ int _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
 				    const char *extension_id,
 				    const gnutls_datum_t * ext_data,
 				    unsigned int critical);
+
+int
+_gnutls_x509_ext_extract_number (opaque *number,
+					   size_t* nr_size,
+					   opaque * extnValue,
+					   int extnValueLen);
+int
+_gnutls_x509_ext_gen_number (const opaque* nuber, size_t nr_size, gnutls_datum_t * der_ext);
+
+
 int _gnutls_x509_ext_gen_basicConstraints (int CA, int pathLenConstraint,
 					   gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_keyUsage (uint16_t usage, gnutls_datum_t * der_ext);

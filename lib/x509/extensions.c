@@ -33,17 +33,8 @@
 #include <x509_int.h>
 #include <gnutls_datum.h>
 
-/* This function will attempt to return the requested extension found in
- * the given X509v3 certificate. The return value is allocated and stored into
- * ret.
- *
- * Critical will be either 0 or 1.
- *
- * If the extension does not exist, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
- * be returned.
- */
-int
-_gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
+static int
+get_extension (ASN1_TYPE asn, const char* root,
 				const char *extension_id, int indx,
 				gnutls_datum_t * ret, unsigned int *_critical)
 {
@@ -64,10 +55,10 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
     {
       k++;
 
-      snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u", k);
+      snprintf (name, sizeof (name), "%s.?%u", root, k);
 
       len = sizeof (str) - 1;
-      result = asn1_read_value (cert->cert, name, str, &len);
+      result = asn1_read_value (asn, name, str, &len);
 
       /* move to next
        */
@@ -84,7 +75,7 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
 	  _gnutls_str_cat (name2, sizeof (name2), ".extnID");
 
 	  len = sizeof (extnID) - 1;
-	  result = asn1_read_value (cert->cert, name2, extnID, &len);
+	  result = asn1_read_value (asn, name2, extnID, &len);
 
 	  if (result == ASN1_ELEMENT_NOT_FOUND)
 	    {
@@ -111,7 +102,7 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
 
 	      len = sizeof (str_critical);
 	      result =
-		asn1_read_value (cert->cert, name2, str_critical, &len);
+		asn1_read_value (asn, name2, str_critical, &len);
 
 	      if (result == ASN1_ELEMENT_NOT_FOUND)
 		{
@@ -134,7 +125,7 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
 	      _gnutls_str_cpy (name2, sizeof (name2), name);
 	      _gnutls_str_cat (name2, sizeof (name2), ".extnValue");
 
-	      result = _gnutls_x509_read_value (cert->cert, name2, &value, 0);
+	      result = _gnutls_x509_read_value (asn, name2, &value, 0);
 	      if (result < 0)
 		{
 		  gnutls_assert ();
@@ -167,14 +158,40 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
     }
 }
 
+/* This function will attempt to return the requested extension found in
+ * the given X509v3 certificate. The return value is allocated and stored into
+ * ret.
+ *
+ * Critical will be either 0 or 1.
+ *
+ * If the extension does not exist, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
+ * be returned.
+ */
+int
+_gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
+				const char *extension_id, int indx,
+				gnutls_datum_t * ret, unsigned int *_critical)
+{
+  return get_extension( cert->cert, "tbsCertificate.extensions", extension_id, indx, ret, _critical);
+}
+
+int
+_gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
+				const char *extension_id, int indx,
+				gnutls_datum_t * ret, unsigned int *_critical)
+{
+  return get_extension( crl->crl, "tbsCertList.crlExtensions", extension_id, indx, ret, _critical);
+}
+
+
 /* This function will attempt to return the requested extension OID found in
  * the given X509v3 certificate. 
  *
  * If you have passed the last extension, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
  * be returned.
  */
-int
-_gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
+static int
+get_extension_oid (ASN1_TYPE asn, const char* root,
 				    int indx, void *oid, size_t * sizeof_oid)
 {
   int k, result, len;
@@ -188,10 +205,10 @@ _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
     {
       k++;
 
-      snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u", k);
+      snprintf (name, sizeof (name), "%s.?%u", root, k);
 
       len = sizeof (str) - 1;
-      result = asn1_read_value (cert->cert, name, str, &len);
+      result = asn1_read_value (asn, name, str, &len);
 
       /* move to next
        */
@@ -208,7 +225,7 @@ _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
 	  _gnutls_str_cat (name2, sizeof (name2), ".extnID");
 
 	  len = sizeof (extnID) - 1;
-	  result = asn1_read_value (cert->cert, name2, extnID, &len);
+	  result = asn1_read_value (asn, name2, extnID, &len);
 
 	  if (result == ASN1_ELEMENT_NOT_FOUND)
 	    {
@@ -257,30 +274,54 @@ _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
     }
 }
 
+/* This function will attempt to return the requested extension OID found in
+ * the given X509v3 certificate. 
+ *
+ * If you have passed the last extension, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
+ * be returned.
+ */
+int
+_gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
+				    int indx, void *oid, size_t * sizeof_oid)
+{
+  return get_extension_oid( cert->cert, "tbsCertificate.extensions", indx, oid, sizeof_oid);
+}
+
+int
+_gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl,
+				    int indx, void *oid, size_t * sizeof_oid)
+{
+  return get_extension_oid( crl->crl, "tbsCertList.crlExtensions", indx, oid, sizeof_oid);
+}
+
 /* This function will attempt to set the requested extension in
  * the given X509v3 certificate. 
  *
  * Critical will be either 0 or 1.
  */
 static int
-set_extension (ASN1_TYPE asn, const char *extension_id,
+set_extension (ASN1_TYPE asn, const char* root, const char *extension_id,
 	       const gnutls_datum_t * ext_data, unsigned int critical)
 {
   int result;
   const char *str;
+  char name[MAX_NAME_SIZE];
+
+  snprintf (name, sizeof (name), "%s", root);
 
   /* Add a new extension in the list.
    */
-  result = asn1_write_value (asn, "tbsCertificate.extensions", "NEW", 1);
+  result = asn1_write_value (asn, name, "NEW", 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
+  snprintf (name, sizeof (name), "%s.?LAST.extnID", root);
+
   result =
-    asn1_write_value (asn, "tbsCertificate.extensions.?LAST.extnID",
-		      extension_id, 1);
+    asn1_write_value (asn, name, extension_id, 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -292,20 +333,20 @@ set_extension (ASN1_TYPE asn, const char *extension_id,
   else
     str = "TRUE";
 
+  snprintf (name, sizeof (name), "%s.?LAST.critical", root);
 
   result =
-    asn1_write_value (asn, "tbsCertificate.extensions.?LAST.critical",
-		      str, 1);
+    asn1_write_value (asn, name, str, 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
+  snprintf (name, sizeof (name), "%s.?LAST.extnValue", root);
+
   result =
-    _gnutls_x509_write_value (asn,
-			      "tbsCertificate.extensions.?LAST.extnValue",
-			      ext_data, 0);
+    _gnutls_x509_write_value (asn, name, ext_data, 0);
   if (result < 0)
     {
       gnutls_assert ();
@@ -319,14 +360,14 @@ set_extension (ASN1_TYPE asn, const char *extension_id,
  * index here starts from one.
  */
 static int
-overwrite_extension (ASN1_TYPE asn, unsigned int indx,
+overwrite_extension (ASN1_TYPE asn, const char* root, unsigned int indx,
 		     const gnutls_datum_t * ext_data, unsigned int critical)
 {
   char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
   const char *str;
   int result;
 
-  snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u", indx);
+  snprintf (name, sizeof (name), "%s.?%u", root, indx);
 
   if (critical == 0)
     str = "FALSE";
@@ -418,7 +459,7 @@ _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
 	    {
 	      /* extension was found 
 	       */
-	      return overwrite_extension (cert->cert, k, ext_data, critical);
+	      return overwrite_extension (cert->cert, "tbsCertificate.extensions", k, ext_data, critical);
 	    }
 
 
@@ -429,7 +470,87 @@ _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
 
   if (result == ASN1_ELEMENT_NOT_FOUND)
     {
-      return set_extension (cert->cert, ext_id, ext_data, critical);
+      return set_extension (cert->cert, "tbsCertificate.extensions", ext_id, ext_data, critical);
+    }
+  else
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+
+  return 0;
+}
+
+int
+_gnutls_x509_crl_set_extension (gnutls_x509_crl_t crl,
+				const char *ext_id,
+				const gnutls_datum_t * ext_data,
+				unsigned int critical)
+{
+  int result;
+  int k, len;
+  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
+  char extnID[128];
+
+  /* Find the index of the given extension.
+   */
+  k = 0;
+  do
+    {
+      k++;
+
+      snprintf (name, sizeof (name), "tbsCertList.crlExtensions.?%u", k);
+
+      len = sizeof (extnID) - 1;
+      result = asn1_read_value (crl->crl, name, extnID, &len);
+
+      /* move to next
+       */
+
+      if (result == ASN1_ELEMENT_NOT_FOUND)
+	{
+	  break;
+	}
+
+      do
+	{
+
+	  _gnutls_str_cpy (name2, sizeof (name2), name);
+	  _gnutls_str_cat (name2, sizeof (name2), ".extnID");
+
+	  len = sizeof (extnID) - 1;
+	  result = asn1_read_value (crl->crl, name2, extnID, &len);
+
+	  if (result == ASN1_ELEMENT_NOT_FOUND)
+	    {
+	      gnutls_assert ();
+	      break;
+	    }
+	  else if (result != ASN1_SUCCESS)
+	    {
+	      gnutls_assert ();
+	      return _gnutls_asn2err (result);
+	    }
+
+	  /* Handle Extension 
+	   */
+	  if (strcmp (extnID, ext_id) == 0)
+	    {
+	      /* extension was found 
+	       */
+	      return overwrite_extension (crl->crl, "tbsCertList.crlExtensions", k, ext_data, critical);
+	    }
+
+
+	}
+      while (0);
+    }
+  while (1);
+
+  if (result == ASN1_ELEMENT_NOT_FOUND)
+    {
+      return set_extension (crl->crl, "tbsCertList.crlExtensions", ext_id, ext_data, critical);
     }
   else
     {
@@ -592,6 +713,89 @@ _gnutls_x509_ext_gen_basicConstraints (int CA,
       gnutls_assert ();
       asn1_delete_structure (&ext);
       return result;
+    }
+
+  result = _gnutls_x509_der_encode (ext, "", der_ext, 0);
+
+  asn1_delete_structure (&ext);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  return 0;
+}
+
+/* extract an INTEGER from the DER encoded extension
+ */
+int
+_gnutls_x509_ext_extract_number (opaque *number,
+					   size_t* _nr_size,
+					   opaque * extnValue,
+					   int extnValueLen)
+{
+  ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+  int result;
+  int nr_size = *_nr_size;
+
+  /* here it doesn't matter so much that we use CertificateSerialNumber. It is equal
+   * to using INTEGER.
+   */
+  if ((result = asn1_create_element
+       (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber", &ext)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_der_decoding (&ext, extnValue, extnValueLen, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&ext);
+      return _gnutls_asn2err (result);
+    }
+
+  /* the default value of cA is false.
+   */
+  result = asn1_read_value (ext, "", number, &nr_size);
+  if (result != ASN1_SUCCESS)
+    result = _gnutls_asn2err (result);
+  else
+    result = 0;
+  
+  *_nr_size = nr_size;
+
+  asn1_delete_structure (&ext);
+
+  return result;
+}
+
+/* generate an INTEGER in a DER encoded extension
+ */
+int
+_gnutls_x509_ext_gen_number (const opaque* number, size_t nr_size, gnutls_datum_t * der_ext)
+{
+  ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+  const char *str;
+  int result;
+
+  result =
+    asn1_create_element (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber", &ext);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_write_value (ext, "", number, nr_size);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&ext);
+      return _gnutls_asn2err (result);
     }
 
   result = _gnutls_x509_der_encode (ext, "", der_ext, 0);

@@ -70,7 +70,7 @@ static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
 static void gaa_parser (int argc, char **argv);
 void generate_self_signed (void);
 void generate_request (void);
-gnutls_x509_crt_t *load_cert_list (int mand, int *size);
+gnutls_x509_crt_t *load_cert_list (int mand, size_t *size);
 
 static void print_hex_datum (gnutls_datum_t * dat);
 
@@ -550,13 +550,15 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 }
 
 static gnutls_x509_crl_t
-generate_crl (void)
+generate_crl (gnutls_x509_crt_t ca_crt)
 {
   gnutls_x509_crl_t crl;
   gnutls_x509_crt_t *crts;
-  int size;
+  size_t size;
   int days, result, i;
   time_t now = time (NULL);
+  unsigned char buffer[128];
+  unsigned int number;
 
   result = gnutls_x509_crl_init (&crl);
   if (result < 0)
@@ -585,6 +587,42 @@ generate_crl (void)
   result = gnutls_x509_crl_set_version (crl, 2);
   if (result < 0)
     error (EXIT_FAILURE, 0, "set_version: %s", gnutls_strerror (result));
+
+  /* Authority Key ID.
+   */
+  if (ca_crt != NULL)
+    {
+      size = sizeof (buffer);
+      result = gnutls_x509_crt_get_subject_key_id (ca_crt, buffer,
+						       &size, NULL);
+      if (result < 0)
+        {
+           size = sizeof (buffer);
+           result = gnutls_x509_crt_get_key_id (ca_crt, 0, buffer, &size);
+        }
+      if (result >= 0)
+        {
+	      result =
+		gnutls_x509_crl_set_authority_key_id (crl, buffer, size);
+	      if (result < 0)
+		error (EXIT_FAILURE, 0, "set_authority_key_id: %s",
+		       gnutls_strerror (result));
+        }
+    }
+
+    number = get_crl_number ();
+    
+    buffer[4] = number & 0xff;
+    buffer[3] = (number >> 8) & 0xff;
+    buffer[2] = (number >> 16) & 0xff;
+    buffer[1] = (number >> 24) & 0xff;
+    buffer[0] = 0;
+
+    result =
+	gnutls_x509_crl_set_number(crl, buffer, 5);
+    if (result < 0)
+	error (EXIT_FAILURE, 0, "set_number: %s",
+	       gnutls_strerror (result));
 
   return crl;
 }
@@ -723,7 +761,7 @@ generate_signed_crl (void)
 
   ca_key = load_ca_private_key ();
   ca_crt = load_ca_cert ();
-  crl = generate_crl ();
+  crl = generate_crl (ca_crt);
 
   fprintf (stderr, "\n");
 
@@ -1641,7 +1679,7 @@ gnutls_x509_crt_t
 load_cert (int mand)
 {
   gnutls_x509_crt_t *crt;
-  int size;
+  size_t size;
 
   crt = load_cert_list (mand, &size);
 
@@ -1653,7 +1691,7 @@ load_cert (int mand)
 /* Loads a certificate list
  */
 gnutls_x509_crt_t *
-load_cert_list (int mand, int *crt_size)
+load_cert_list (int mand, size_t *crt_size)
 {
   FILE *fd;
   static gnutls_x509_crt_t crt[MAX_CERTS];
@@ -2246,7 +2284,7 @@ generate_pkcs12 (void)
   gnutls_datum_t key_id;
   unsigned char _key_id[20];
   int index;
-  int ncrts;
+  size_t ncrts;
   int i;
 
   fprintf (stderr, "Generating a PKCS #12 structure...\n");

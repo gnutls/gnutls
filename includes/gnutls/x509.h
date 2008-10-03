@@ -414,6 +414,28 @@ extern "C"
   int gnutls_x509_crl_set_crt (gnutls_x509_crl_t crl,
 			       gnutls_x509_crt_t crt, time_t revocation_time);
 
+  int gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
+				      size_t * ret_size,
+				      unsigned int *critical);
+  int gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
+				      size_t * ret_size,
+				      unsigned int *critical);
+
+  int gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
+				   void *oid, size_t * sizeof_oid);
+
+  int gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
+				    void *oid, size_t * sizeof_oid,
+				    int *critical);
+
+  int gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
+				    void *data, size_t * sizeof_data);
+  int gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
+				      const void *id, size_t id_size);
+
+  int gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,
+				      const void *nr, size_t nr_size);
+
 
 /* PKCS7 structures handling
  */

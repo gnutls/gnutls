@@ -310,9 +310,137 @@ static void
 disable_optional_stuff (gnutls_x509_crl_t crl)
 {
 
-  asn1_write_value (crl->crl, "tbsCertList.crlExtensions", NULL, 0);
+  if (crl->use_extensions == 0) 
+    {
+      asn1_write_value (crl->crl, "tbsCertList.crlExtensions", NULL, 0);
+    }
 
   return;
+}
+
+/**
+ * gnutls_x509_crl_set_authority_key_id - Set the CRL's authority key id
+ * @crl: a CRL of type #gnutls_x509_crl_t
+ * @id: The key ID
+ * @id_size: Holds the size of the serial field.
+ *
+ * This function will set the CRL's authority key ID extension.
+ * Only the keyIdentifier field can be set with this function.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
+				      const void *id, size_t id_size)
+{
+  int result;
+  gnutls_datum_t old_id, der_data;
+  unsigned int critical;
+
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* Check if the extension already exists.
+   */
+  result =
+    _gnutls_x509_crl_get_extension (crl, "2.5.29.35", 0, &old_id, &critical);
+
+  if (result >= 0)
+    _gnutls_free_datum (&old_id);
+  if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* generate the extension.
+   */
+  result = _gnutls_x509_ext_gen_auth_key_id (id, id_size, &der_data);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result = _gnutls_x509_crl_set_extension (crl, "2.5.29.35", &der_data, 0);
+
+  _gnutls_free_datum (&der_data);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  crl->use_extensions = 1;
+
+  return 0;
+}
+
+/**
+ * gnutls_x509_crl_set_number - Set the CRL's number extension
+ * @crl: a CRL of type #gnutls_x509_crl_t
+ * @nr: The CRL number
+ * @nr_size: Holds the size of the nr field.
+ *
+ * This function will set the CRL's number extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,
+				      const void *nr, size_t nr_size)
+{
+  int result;
+  gnutls_datum_t old_id, der_data;
+  unsigned int critical;
+
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* Check if the extension already exists.
+   */
+  result =
+    _gnutls_x509_crl_get_extension (crl, "2.5.29.20", 0, &old_id, &critical);
+
+  if (result >= 0)
+    _gnutls_free_datum (&old_id);
+  if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* generate the extension.
+   */
+  result = _gnutls_x509_ext_gen_number (nr, nr_size, &der_data);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result = _gnutls_x509_crl_set_extension (crl, "2.5.29.20", &der_data, 0);
+
+  _gnutls_free_datum (&der_data);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  crl->use_extensions = 1;
+
+  return 0;
 }
 
 #endif /* ENABLE_PKI */

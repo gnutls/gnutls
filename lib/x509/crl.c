@@ -701,4 +701,319 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 
 }
 
+/**
+  * gnutls_x509_crl_get_authority_key_id - This function returns the CRL authority's identifier
+  * @crl: should contain a #gnutls_x509_crl_t structure
+  * @result: The place where the identifier will be copied
+  * @result_size: Holds the size of the result field.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the CRL authority's key identifier.
+  * This is obtained by the X.509 Authority Key identifier extension
+  * field (2.5.29.35). Note that this function only returns the keyIdentifier
+  * field of the extension.
+  *
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.and a negative value in case of an error.
+  *
+  **/
+int
+gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
+				      size_t * ret_size,
+				      unsigned int *critical)
+{
+  int result, len;
+  gnutls_datum_t id;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+
+  if (ret)
+    memset (ret, 0, *ret_size);
+  else
+    *ret_size = 0;
+
+  if ((result =
+       _gnutls_x509_crl_get_extension (crl, "2.5.29.35", 0, &id,
+				       critical)) < 0)
+    {
+      return result;
+    }
+
+  if (id.size == 0 || id.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  result = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.AuthorityKeyIdentifier", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (&id);
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_der_decoding (&c2, id.data, id.size, NULL);
+  _gnutls_free_datum (&id);
+
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return _gnutls_asn2err (result);
+    }
+
+  len = *ret_size;
+  result = asn1_read_value (c2, "keyIdentifier", ret, &len);
+
+  *ret_size = len;
+  asn1_delete_structure (&c2);
+
+  if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
+    {
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return 0;
+}
+
+/**
+  * gnutls_x509_crl_get_number - This function returns the CRL number (extension)
+  * @crl: should contain a #gnutls_x509_crl_t structure
+  * @result: The place where the number will be copied
+  * @result_size: Holds the size of the result field.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the CRL number extension.
+  * This is obtained by the CRL Number extension
+  * field (2.5.29.20). 
+  *
+  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+  *   negative error value.and a negative value in case of an error.
+  *
+  **/
+int
+gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
+				      size_t * ret_size,
+				      unsigned int *critical)
+{
+  int result, len;
+  gnutls_datum_t id;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+
+  if (ret)
+    memset (ret, 0, *ret_size);
+  else
+    *ret_size = 0;
+
+  if ((result =
+       _gnutls_x509_crl_get_extension (crl, "2.5.29.20", 0, &id,
+				       critical)) < 0)
+    {
+      return result;
+    }
+
+  if (id.size == 0 || id.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  result = _gnutls_x509_ext_extract_number (ret, ret_size, id.data, id.size);
+  
+  _gnutls_free_datum( &id);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  return 0;
+}
+
+/**
+  * gnutls_x509_crl_get_extension_oid - This function returns the specified extension OID
+  * @crl: should contain a #gnutls_x509_crl_t structure
+  * @indx: Specifies which extension OID to send. Use zero to get the first one.
+  * @oid: a pointer to a structure to hold the OID (may be null)
+  * @sizeof_oid: initially holds the size of @oid
+  *
+  * This function will return the requested extension OID in the CRL.
+  * The extension OID will be stored as a string in the provided buffer.
+  *
+  * A negative value may be returned in case of parsing error.
+  * If your have reached the last extension available 
+  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+  *
+  **/
+int
+gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
+				   void *oid, size_t * sizeof_oid)
+{
+  int result;
+
+  if (crl == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_x509_crl_get_extension_oid (crl, indx, oid, sizeof_oid);
+  if (result < 0)
+    {
+      return result;
+    }
+
+  return 0;
+
+}
+
+/**
+ * gnutls_x509_crl_get_extension_info - Get extension id and criticality
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @oid: a pointer to a structure to hold the OID
+ * @sizeof_oid: initially holds the maximum size of @oid, on return
+ *   holds actual size of @oid.
+ * @critical: output variable with critical flag, may be NULL.
+ *
+ * This function will return the requested extension OID in the
+ * CRL, and the critical flag for it.  The extension OID will
+ * be stored as a string in the provided buffer.  Use
+ * gnutls_x509_crl_get_extension_data() to extract the data.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
+ * returned.
+ *
+ * Return 0 on success.  A negative value may be returned in case of
+ * parsing error.  If you have reached the last extension available
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ **/
+int
+gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
+				    void *oid, size_t * sizeof_oid,
+				    int *critical)
+{
+  int result;
+  char str_critical[10];
+  char name[MAX_NAME_SIZE];
+  int len;
+
+  if (!crl)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  snprintf (name, sizeof (name), "tbsCertList.crlExtensions.?%u.extnID",
+	    indx + 1);
+
+  len = *sizeof_oid;
+  result = asn1_read_value (crl->crl, name, oid, &len);
+  *sizeof_oid = len;
+
+  if (result == ASN1_ELEMENT_NOT_FOUND)
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  else if (result < 0)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  snprintf (name, sizeof (name), "tbsCertList.crlExtensions.?%u.critical",
+	    indx + 1);
+  len = sizeof (str_critical);
+  result = asn1_read_value (crl->crl, name, str_critical, &len);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  if (critical)
+    {
+      if (str_critical[0] == 'T')
+	*critical = 1;
+      else
+	*critical = 0;
+    }
+
+  return 0;
+
+}
+
+/**
+ * gnutls_x509_crl_get_extension_data - Get the specified extension data
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @data: a pointer to a structure to hold the data (may be null)
+ * @sizeof_data: initially holds the size of @oid
+ *
+ * This function will return the requested extension data in the
+ * CRL.  The extension data will be stored as a string in the
+ * provided buffer.
+ *
+ * Use gnutls_x509_crl_get_extension_info() to extract the OID and
+ * critical flag.  Use gnutls_x509_crl_get_extension_by_oid() instead,
+ * if you want to get data indexed by the extension OID rather than
+ * sequence.
+ *
+ * Return 0 on success.  A negative value may be returned in case of
+ * parsing error.  If you have reached the last extension available
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ **/
+int
+gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
+				    void *data, size_t * sizeof_data)
+{
+  int result, len;
+  char name[MAX_NAME_SIZE];
+
+  if (!crl)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  snprintf (name, sizeof (name), "tbsCertList.crlExtensions.?%u.extnValue",
+	    indx + 1);
+
+  len = *sizeof_data;
+  result = asn1_read_value (crl->crl, name, data, &len);
+  *sizeof_data = len;
+
+  if (result == ASN1_ELEMENT_NOT_FOUND)
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  else if (result < 0)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return 0;
+}
+
 #endif

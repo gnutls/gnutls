@@ -72,6 +72,7 @@ typedef struct _cfg_ctx
   int ocsp_sign_key;
   int time_stamping_key;
   int crl_next_update;
+  int crl_number;
   char *proxy_policy_language;
 } cfg_ctx;
 
@@ -128,6 +129,9 @@ template_parse (const char *template)
 
     {NULL, '\0', "crl_next_update", CFG_INT,
      (void *) &cfg.crl_next_update, 0},
+
+    {NULL, '\0', "crl_number", CFG_INT,
+     (void *) &cfg.crl_number, 0},
 
     {NULL, '\0', "ca", CFG_BOOL, (void *) &cfg.ca, 0},
     {NULL, '\0', "path_len", CFG_INT, (void *) &cfg.path_len, 0},
@@ -656,6 +660,20 @@ get_ca_status (void)
     {
       return
 	read_yesno ("Does the certificate belong to an authority? (y/N): ");
+    }
+}
+
+int
+get_crl_number (void)
+{
+  if (batch)
+    {
+      return cfg.crl_number;
+    }
+  else
+    {
+      return read_int_with_default
+	("CRL Number: ", 1);
     }
 }
 

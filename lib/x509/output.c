@@ -207,14 +207,21 @@ print_ski (gnutls_string * str, gnutls_x509_crt_t cert)
   gnutls_free (buffer);
 }
 
+#define TYPE_CRL 1
+#define TYPE_CRT 2
+
 static void
-print_aki (gnutls_string * str, gnutls_x509_crt_t cert)
+print_aki (gnutls_string * str, int type, void* cert)
 {
   char *buffer = NULL;
   size_t size = 0;
   int err;
 
-  err = gnutls_x509_crt_get_authority_key_id (cert, buffer, &size, NULL);
+  if (type == TYPE_CRT)
+    err = gnutls_x509_crt_get_authority_key_id (cert, buffer, &size, NULL);
+  else
+    err = gnutls_x509_crl_get_authority_key_id (cert, buffer, &size, NULL);
+
   if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       addf (str, "error: get_authority_key_id: %s\n", gnutls_strerror (err));
@@ -228,7 +235,11 @@ print_aki (gnutls_string * str, gnutls_x509_crt_t cert)
       return;
     }
 
-  err = gnutls_x509_crt_get_authority_key_id (cert, buffer, &size, NULL);
+  if (type == TYPE_CRT)
+    err = gnutls_x509_crt_get_authority_key_id (cert, buffer, &size, NULL);
+  else
+    err = gnutls_x509_crl_get_authority_key_id (cert, buffer, &size, NULL);
+
   if (err < 0)
     {
       gnutls_free (buffer);
@@ -792,7 +803,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	      addf (str, _("\t\tAuthority Key Identifier (%s):\n"),
 		    critical ? _("critical") : _("not critical"));
 
-	      print_aki (str, cert);
+	      print_aki (str, TYPE_CRT, cert);
 
 	      aki_idx++;
 	    }
@@ -1291,6 +1302,124 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	addf (str, _("\t\tNext at: %s\n"), s);
     }
   }
+
+  /* Extensions. */
+  if (gnutls_x509_crl_get_version (crl) >= 2)
+    {
+      size_t i;
+      int err = 0;
+
+      for (i = 0;; i++)
+	{
+	  char oid[128] = "";
+	  size_t sizeof_oid = sizeof (oid);
+	  int critical;
+	  int crl_nr = 0;
+	  int aki_idx = 0;
+
+	  err = gnutls_x509_crl_get_extension_info (crl, i,
+						    oid, &sizeof_oid,
+						    &critical);
+	  if (err < 0)
+	    {
+	      if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+		break;
+	      addf (str, "error: get_extension_info: %s\n",
+		    gnutls_strerror (err));
+	      continue;
+	    }
+
+	  if (i == 0)
+	    addf (str, _("\tExtensions:\n"));
+
+	  if (strcmp (oid, "2.5.29.20") == 0)
+	    {
+	      char nr[128];
+	      size_t nr_size = sizeof(nr);
+	      
+	      if (crl_nr)
+		{
+		  addf (str, "error: more than one CRL number\n");
+		  continue;
+		}
+
+              err = gnutls_x509_crl_get_number (crl, nr, &nr_size, &critical);
+
+	      addf (str, _("\t\tCRL Number (%s): "),
+		    critical ? _("critical") : _("not critical"));
+
+              if (err < 0)
+                addf (str, "error: get_number: %s\n", gnutls_strerror (err));
+              else
+                {
+                  hexprint (str, nr, nr_size);
+                  addf (str, "\n");
+                }
+
+	      crl_nr++;
+	    }
+	  else if (strcmp (oid, "2.5.29.35") == 0)
+	    {
+	      if (aki_idx)
+		{
+		  addf (str, "error: more than one AKI extension\n");
+		  continue;
+		}
+
+	      addf (str, _("\t\tAuthority Key Identifier (%s):\n"),
+		    critical ? _("critical") : _("not critical"));
+
+	      print_aki (str, TYPE_CRL, crl);
+
+	      aki_idx++;
+	    }
+	  else
+	    {
+	      char *buffer;
+	      size_t extlen = 0;
+
+	      addf (str, _("\t\tUnknown extension %s (%s):\n"), oid,
+		    critical ? _("critical") : _("not critical"));
+
+	      err = gnutls_x509_crl_get_extension_data (crl, i,
+							NULL, &extlen);
+	      if (err < 0)
+		{
+		  addf (str, "error: get_extension_data: %s\n",
+			gnutls_strerror (err));
+		  continue;
+		}
+
+	      buffer = gnutls_malloc (extlen);
+	      if (!buffer)
+		{
+		  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		  continue;
+		}
+
+	      err = gnutls_x509_crl_get_extension_data (crl, i,
+							buffer, &extlen);
+	      if (err < 0)
+		{
+		  gnutls_free (buffer);
+		  addf (str, "error: get_extension_data2: %s\n",
+			gnutls_strerror (err));
+		  continue;
+		}
+
+	      addf (str, _("\t\t\tASCII: "));
+	      asciiprint (str, buffer, extlen);
+	      addf (str, "\n");
+
+	      addf (str, _("\t\t\tHexdump: "));
+	      hexprint (str, buffer, extlen);
+	      adds (str, "\n");
+
+	      gnutls_free (buffer);
+	    }
+	}
+    }
+
 
   /* Revoked certificates. */
   {
