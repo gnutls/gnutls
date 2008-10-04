@@ -785,7 +785,7 @@ int i, err;
 	      char *buffer;
 	      size_t extlen = 0;
 
-	      addf (str, _("%s\t\tUnknown extension %s (%s):\n"), oid, prefix,
+	      addf (str, _("%s\t\tUnknown extension %s (%s):\n"), prefix, oid,
 		    critical ? _("critical") : _("not critical"));
 
 	      if (type == TYPE_CRT) 
