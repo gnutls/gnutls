@@ -37,6 +37,7 @@
 /* Gnulib portability files. */
 #include <getpass.h>
 #include "readline.h"
+#include "certtool-common.h"
 
 extern int batch;
 
@@ -772,7 +773,7 @@ static int string_to_ip( unsigned char *ip, const char * str)
 }
 
 void
-get_ip_addr_set (gnutls_x509_crt_t crt)
+get_ip_addr_set (int type, void* crt)
 {
   int ret, i;
   unsigned char ip[16];
@@ -791,7 +792,11 @@ get_ip_addr_set (gnutls_x509_crt_t crt)
             exit(1);
           }
 
-	  ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
+	  if (type == TYPE_CRT)
+  	    ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
+	    ip, len, GNUTLS_FSAN_APPEND);
+          else
+  	    ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
 	    ip, len, GNUTLS_FSAN_APPEND);
 	    
           if (ret < 0) break;
@@ -801,15 +806,20 @@ get_ip_addr_set (gnutls_x509_crt_t crt)
     {
       const char *p;
       
-      p = read_str ("Enter the dnsName of the subject of the certificate: ");
+      p = read_str ("Enter the IP address of the subject of the certificate: ");
       if (!p) return;
 
-        len = string_to_ip( ip, cfg.ip_addr[i]);
+        len = string_to_ip( ip, p);
         if (len <= 0) {
             fprintf(stderr, "Error parsing address: %s\n", cfg.ip_addr[i]);
             exit(1);
         }
-        ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
+
+        if (type == TYPE_CRT)
+  	    ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
+	    ip, len, GNUTLS_FSAN_APPEND);
+        else
+  	    ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
 	    ip, len, GNUTLS_FSAN_APPEND);
     }
 
@@ -822,7 +832,7 @@ get_ip_addr_set (gnutls_x509_crt_t crt)
 
 
 void
-get_email_set (gnutls_x509_crt_t crt)
+get_email_set (int type, void* crt)
 {
   int ret, i;
 
@@ -833,8 +843,12 @@ get_email_set (gnutls_x509_crt_t crt)
 
       for (i = 0; cfg.email[i] != NULL; i ++)
 	{
-	  ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
-	    cfg.email[i], strlen(cfg.email[i]), GNUTLS_FSAN_APPEND);
+	  if (type == TYPE_CRT)
+	    ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
+	      cfg.email[i], strlen(cfg.email[i]), GNUTLS_FSAN_APPEND);
+          else
+	    ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
+	      cfg.email[i], strlen(cfg.email[i]), GNUTLS_FSAN_APPEND);
 	    
           if (ret < 0) break;
 	}
@@ -846,8 +860,12 @@ get_email_set (gnutls_x509_crt_t crt)
       p = read_str ("Enter the e-mail of the subject of the certificate: ");
       if (!p) return;
 
-      ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
-        p, strlen(p), GNUTLS_FSAN_APPEND);
+      if (type == TYPE_CRT)
+        ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
+          p, strlen(p), GNUTLS_FSAN_APPEND);
+      else
+        ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
+          p, strlen(p), GNUTLS_FSAN_APPEND);
     }
 
   if (ret < 0)
@@ -858,7 +876,7 @@ get_email_set (gnutls_x509_crt_t crt)
 }
 
 void
-get_dns_name_set (gnutls_x509_crt_t crt)
+get_dns_name_set (int type, void* crt)
 {
   int ret, i;
 
@@ -869,8 +887,12 @@ get_dns_name_set (gnutls_x509_crt_t crt)
 
       for (i = 0; cfg.dns_name[i] != NULL; i ++)
 	{
-	  ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
-	    cfg.dns_name[i], strlen(cfg.dns_name[i]), GNUTLS_FSAN_APPEND);
+          if (type == TYPE_CRT)
+            ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
+	      cfg.dns_name[i], strlen(cfg.dns_name[i]), GNUTLS_FSAN_APPEND);
+          else
+            ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
+	      cfg.dns_name[i], strlen(cfg.dns_name[i]), GNUTLS_FSAN_APPEND);
 	    
           if (ret < 0) break;
 	}
@@ -882,8 +904,12 @@ get_dns_name_set (gnutls_x509_crt_t crt)
       p = read_str ("Enter the dnsName of the subject of the certificate: ");
       if (!p) return;
 
-      ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
-        p, strlen(p), GNUTLS_FSAN_APPEND);
+      if (type == TYPE_CRT)
+        ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
+          p, strlen(p), GNUTLS_FSAN_APPEND);
+      else
+        ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
+          p, strlen(p), GNUTLS_FSAN_APPEND);
     }
 
   if (ret < 0)

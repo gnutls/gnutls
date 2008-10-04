@@ -30,6 +30,7 @@
 #include <gnutls/openpgp.h>
 #include <time.h>
 #include "certtool-gaa.h"
+#include "certtool-common.h"
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
 #include <certtool-cfg.h>
@@ -48,6 +49,7 @@
 static void print_crl_info (gnutls_x509_crl_t crl, FILE * out);
 int generate_prime (int bits, int how);
 void pkcs7_info (void);
+void crq_info (void);
 void smime_to_pkcs7 (void);
 void pkcs12_info (void);
 void generate_pkcs12 (void);
@@ -406,8 +408,8 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 
 	  if (!proxy)
 	    {
-	      get_dns_name_set( crt);
-	      get_ip_addr_set( crt);
+	      get_dns_name_set( TYPE_CRT, crt);
+	      get_ip_addr_set( TYPE_CRT, crt);
 	    }
 
 	  result =
@@ -418,7 +420,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	}
       else if (!proxy)
 	{
-	  get_email_set( crt);
+	  get_email_set( TYPE_CRT, crt);
 	}
 
       if (!ca_status || server)
@@ -931,74 +933,77 @@ gaa_parser (int argc, char **argv)
 
   switch (info.action)
     {
-    case 0:
+    case ACTION_SELF_SIGNED:
       generate_self_signed ();
       break;
-    case 1:
+    case ACTION_GENERATE_PRIVKEY:
       generate_private_key ();
       break;
-    case 2:
+    case ACTION_CERT_INFO:
       certificate_info ();
       break;
-    case 3:
+    case ACTION_GENERATE_REQUEST:
       generate_request ();
       break;
-    case 4:
+    case ACTION_GENERATE_CERTIFICATE:
       generate_signed_certificate ();
       break;
-    case 5:
+    case ACTION_VERIFY_CHAIN:
       verify_chain ();
       break;
-    case 6:
+    case ACTION_PRIVKEY_INFO:
       privkey_info ();
       break;
-    case 7:
+    case ACTION_UPDATE_CERTIFICATE:
       update_signed_certificate ();
       break;
-    case 8:
+    case ACTION_TO_PKCS12:
       generate_pkcs12 ();
       break;
-    case 9:
+    case ACTION_PKCS12_INFO:
       pkcs12_info ();
       break;
-    case 10:
+    case ACTION_GENERATE_DH:
       generate_prime (info.bits, 1);
       break;
-    case 16:
+    case ACTION_GET_DH:
       generate_prime (info.bits, 0);
       break;
-    case 11:
+    case ACTION_CRL_INFO:
       crl_info ();
       break;
-    case 12:
+    case ACTION_P7_INFO:
       pkcs7_info ();
       break;
-    case 13:
+    case ACTION_GENERATE_CRL:
       generate_signed_crl ();
       break;
-    case 14:
+    case ACTION_VERIFY_CRL:
       verify_crl ();
       break;
-    case 15:
+    case ACTION_SMIME_TO_P7:
       smime_to_pkcs7 ();
       break;
-    case 17:
+    case ACTION_GENERATE_PROXY:
       generate_proxy_certificate ();
       break;
-    case 18:
+    case ACTION_GENERATE_PKCS8:
       generate_pkcs8 ();
       break;
 #ifdef ENABLE_OPENPGP
-    case 19:
+    case ACTION_PGP_INFO:
       pgp_certificate_info ();
       break;
-    case 20:
+    case ACTION_PGP_PRIVKEY_INFO:
       pgp_privkey_info ();
       break;
-    case 21:
+    case ACTION_RING_INFO:
       pgp_ring_info ();
       break;
 #endif
+    case ACTION_REQUEST:
+      crq_info();
+      break;
     default:
       gaa_help ();
       exit (0);
@@ -1390,6 +1395,59 @@ crl_info (void)
   gnutls_x509_crl_deinit (crl);
 }
 
+static void
+print_crq_info (gnutls_x509_crq_t crq, FILE * out)
+{
+  gnutls_datum_t info;
+  int ret;
+  size_t size;
+
+  ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &info);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crq_print: %s", gnutls_strerror (ret));
+
+  fprintf (out, "%s\n", info.data);
+
+  gnutls_free (info.data);
+
+  size = sizeof (buffer);
+  ret = gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, buffer, &size);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crq_export: %s", gnutls_strerror (ret));
+
+  fwrite (buffer, 1, size, outfile);
+}
+
+void
+crq_info (void)
+{
+  gnutls_x509_crq_t crq;
+  int ret;
+  size_t size;
+  gnutls_datum_t pem;
+
+  ret = gnutls_x509_crq_init (&crq);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "crq_init: %s", gnutls_strerror (ret));
+
+  pem.data = fread_file (infile, &size);
+  pem.size = size;
+
+  if (!pem.data)
+    error (EXIT_FAILURE, errno, "%s", info.infile ? info.infile :
+	   "standard input");
+
+  ret = gnutls_x509_crq_import (crq, &pem, info.incert_format);
+
+  free (pem.data);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+
+  print_crq_info (crq, outfile);
+
+  gnutls_x509_crq_deinit (crq);
+}
+
 void
 privkey_info (void)
 {
@@ -1766,9 +1824,10 @@ generate_request (void)
 {
   gnutls_x509_crq_t crq;
   gnutls_x509_privkey_t key;
-  int ret;
+  int ret, ca_status, path_len;
   const char *pass;
   size_t size;
+  unsigned int usage;
 
   fprintf (stderr, "Generating a PKCS #10 certificate request...\n");
 
@@ -1797,14 +1856,56 @@ generate_request (void)
   get_uid_crq_set (crq);
   get_oid_crq_set (crq);
 
+  get_dns_name_set( TYPE_CRQ, crq);
+  get_ip_addr_set( TYPE_CRQ, crq);
+  get_email_set( TYPE_CRQ, crq);
+
   pass = get_challenge_pass ();
 
-  if (pass != NULL)
+  if (pass != NULL && pass[0] != 0)
     {
       ret = gnutls_x509_crq_set_challenge_password (crq, pass);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "set_pass: %s", gnutls_strerror (ret));
     }
+
+  ca_status = get_ca_status ();
+  if (ca_status)
+    path_len = get_path_len ();
+  else
+    path_len = -1;
+
+  ret =
+	gnutls_x509_crq_set_basic_constraints (crq, ca_status, path_len);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "set_basic_constraints: %s", gnutls_strerror (ret));
+
+
+  ret = get_sign_status (1);
+  if (ret)
+    usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+
+  ret = get_encrypt_status (1);
+  if (ret)
+    usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
+  else
+    usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+
+  if (ca_status)
+    {
+	  ret = get_cert_sign_status ();
+	  if (ret)
+	    usage |= GNUTLS_KEY_KEY_CERT_SIGN;
+
+	  ret = get_crl_sign_status ();
+	  if (ret)
+	    usage |= GNUTLS_KEY_CRL_SIGN;
+    }
+
+  ret = gnutls_x509_crq_set_key_usage (crq, usage);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "key_usage: %s",
+		   gnutls_strerror (ret));
 
   ret = gnutls_x509_crq_set_key (crq, key);
   if (ret < 0)

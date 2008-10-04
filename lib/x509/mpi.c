@@ -205,27 +205,23 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
 
 /* Extracts DSA and RSA parameters from a certificate.
  */
-int
-_gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
+static int
+ get_mpis (int pk_algorithm, ASN1_TYPE asn, const char* root,
 			   bigint_t * params, int *params_size)
 {
   int result;
-  int pk_algorithm;
+  char name[256];
   gnutls_datum tmp = { NULL, 0 };
-
-  /* Read the algorithm's OID
-   */
-  pk_algorithm = gnutls_x509_crt_get_pk_algorithm (cert, NULL);
 
   /* Read the algorithm's parameters
    */
-  result = _gnutls_x509_read_value (cert->cert,
-				    "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-				    &tmp, 2);
+  snprintf(name, sizeof(name), "%s.subjectPublicKey", root);
+  result = _gnutls_x509_read_value (asn, name, &tmp, 2);
 
   if (result < 0)
     {
       gnutls_assert ();
+      fprintf(stderr, "name: %s\n", name);
       return result;
     }
 
@@ -278,9 +274,8 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
        */
       _gnutls_free_datum (&tmp);
 
-      result = _gnutls_x509_read_value (cert->cert,
-					"tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
-					&tmp, 0);
+      snprintf(name, sizeof(name), "%s.algorithm.parameters", root);
+      result = _gnutls_x509_read_value (asn, name, &tmp, 0);
 
       /* FIXME: If the parameters are not included in the certificate
        * then the issuer's parameters should be used. This is not
@@ -317,6 +312,40 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 error:
   _gnutls_free_datum (&tmp);
   return result;
+}
+
+/* Extracts DSA and RSA parameters from a certificate.
+ */
+int
+_gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
+			   bigint_t * params, int *params_size)
+{
+  int result;
+  int pk_algorithm;
+  gnutls_datum tmp = { NULL, 0 };
+
+  /* Read the algorithm's OID
+   */
+  pk_algorithm = gnutls_x509_crt_get_pk_algorithm (cert, NULL);
+  
+  return get_mpis( pk_algorithm, cert->cert, "tbsCertificate.subjectPublicKeyInfo", params, params_size);
+}
+
+/* Extracts DSA and RSA parameters from a certificate.
+ */
+int
+_gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
+			   bigint_t * params, int *params_size)
+{
+  int result;
+  int pk_algorithm;
+  gnutls_datum tmp = { NULL, 0 };
+
+  /* Read the algorithm's OID
+   */
+  pk_algorithm = gnutls_x509_crq_get_pk_algorithm (cert, NULL);
+  
+  return get_mpis( pk_algorithm, cert->crq, "certificationRequestInfo.subjectPKInfo", params, params_size);
 }
 
 /*

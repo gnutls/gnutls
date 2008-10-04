@@ -904,8 +904,8 @@ is_type_printable (int type)
 /* returns the type and the name on success.
  * Type is also returned as a parameter in case of an error.
  */
-static int
-parse_general_name (ASN1_TYPE src, const char *src_name,
+int
+_gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 		    int seq, void *name, size_t * name_size,
 		    unsigned int *ret_type, int othername_oid)
 {
@@ -1132,12 +1132,13 @@ get_subject_alt_name (gnutls_x509_crt_t cert,
     }
 
   result =
-    parse_general_name (c2, "", seq, ret, ret_size, ret_type, othername_oid);
+    _gnutls_parse_general_name (c2, "", seq, ret, ret_size, ret_type, othername_oid);
 
   asn1_delete_structure (&c2);
 
   if (result < 0)
     {
+      gnutls_assert();
       return result;
     }
 
@@ -1618,7 +1619,7 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
 
   if (result == ASN1_ELEMENT_NOT_FOUND)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-  else if (result < 0)
+  else if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -1628,7 +1629,7 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
 	    indx + 1);
   len = sizeof (str_critical);
   result = asn1_read_value (cert->cert, name, str_critical, &len);
-  if (result < 0)
+  if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -2437,7 +2438,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
    */
   _gnutls_str_cpy (name, sizeof (name), "?1.distributionPoint.fullName");
 
-  result = parse_general_name (c2, name, seq, ret, ret_size, NULL, 0);
+  result = _gnutls_parse_general_name (c2, name, seq, ret, ret_size, NULL, 0);
   if (result < 0)
     {
       asn1_delete_structure (&c2);

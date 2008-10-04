@@ -9,32 +9,34 @@
 
 void certtool_version(void);
 
+#include "certtool-common.h"
+
 #}
 
 helpnode "Certtool help\nUsage: certtool [options]"
 
 #int privkey_op;
 #int action;
-option (s, generate-self-signed) { $action=0; } "Generate a self-signed certificate."
+option (s, generate-self-signed) { $action=ACTION_SELF_SIGNED; } "Generate a self-signed certificate."
 
-option (c, generate-certificate) { $action=4; } "Generate a signed certificate."
+option (c, generate-certificate) { $action=ACTION_GENERATE_CERTIFICATE; } "Generate a signed certificate."
 
-option (generate-proxy) { $action=17; } "Generate a proxy certificate."
+option (generate-proxy) { $action=ACTION_GENERATE_PROXY; } "Generate a proxy certificate."
 
-option (generate-crl) { $action=13; } "Generate a CRL."
+option (generate-crl) { $action=ACTION_GENERATE_CRL; } "Generate a CRL."
 
-option (u, update-certificate) { $action=7; } "Update a signed certificate."
+option (u, update-certificate) { $action=ACTION_UPDATE_CERTIFICATE; } "Update a signed certificate."
 
-option (p, generate-privkey) { $privkey_op=1; $action=1; } "Generate a private key."
+option (p, generate-privkey) { $privkey_op=1; $action=ACTION_GENERATE_PRIVKEY; } "Generate a private key."
 
-option (q, generate-request) { $action=3; } "Generate a PKCS #10 certificate request."
+option (q, generate-request) { $action=ACTION_GENERATE_REQUEST; } "Generate a PKCS #10 certificate request."
 
-option (e, verify-chain) { $action=5; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
+option (e, verify-chain) { $action=ACTION_VERIFY_CHAIN; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
 
-option (verify-crl) { $action=14; } "Verify a CRL."
+option (verify-crl) { $action=ACTION_VERIFY_CRL; } "Verify a CRL."
 
-option (generate-dh-params) { $action=10; } "Generate PKCS #3 encoded Diffie Hellman parameters."
-option (get-dh-params) { $action=16; } "Get the included PKCS #3 encoded Diffie Hellman parameters."
+option (generate-dh-params) { $action=ACTION_GENERATE_DH; } "Generate PKCS #3 encoded Diffie Hellman parameters."
+option (get-dh-params) { $action=ACTION_GET_DH; } "Get the included PKCS #3 encoded Diffie Hellman parameters."
 
 #char *privkey;
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."
@@ -54,25 +56,27 @@ option (load-ca-certificate) STR "FILE" { $ca = $1 } "Certificate authority's ce
 #char *pass;
 option (password) STR "PASSWORD" { $pass = $1 } "Password to use."
 
-option (i, certificate-info) { $action = 2; } "Print information on a certificate."
+option (i, certificate-info) { $action = ACTION_CERT_INFO; } "Print information on a certificate."
 
-option (pgp-certificate-info) { $action = 19; } "Print information on a OpenPGP certificate."
+option (pgp-certificate-info) { $action = ACTION_PGP_INFO; } "Print information on a OpenPGP certificate."
 
-option (pgp-ring-info) { $action = 21; } "Print information on a keyring structure."
+option (pgp-ring-info) { $action = ACTION_RING_INFO; } "Print information on a keyring structure."
 
-option (l, crl-info) { $action = 11; } "Print information on a CRL."
+option (l, crl-info) { $action = ACTION_CRL_INFO; } "Print information on a CRL."
 
-option (p12-info) { $action = 9; } "Print information on a PKCS #12 structure."
+option (crq-info) { $action = ACTION_REQUEST; } "Print information on a Certificate Request."
 
-option (p7-info) { $action = 12; } "Print information on a PKCS #7 structure."
+option (p12-info) { $action = ACTION_PKCS12_INFO; } "Print information on a PKCS #12 structure."
 
-option (smime-to-p7) { $action = 15; } "Convert S/MIME to PKCS #7 structure."
+option (p7-info) { $action = ACTION_P7_INFO; } "Print information on a PKCS #7 structure."
+
+option (smime-to-p7) { $action = ACTION_SMIME_TO_P7; } "Convert S/MIME to PKCS #7 structure."
 
 /* on private key operations set $privkey_op to != 0 
  */
-option (k, key-info) { $privkey_op=1; $action = 6; } "Print information on a private key."
+option (k, key-info) { $privkey_op=1; $action = ACTION_PRIVKEY_INFO; } "Print information on a private key."
 
-option (pgp-key-info) { $privkey_op=1; $action = 20; } "Print information on a OpenPGP private key."
+option (pgp-key-info) { $privkey_op=1; $action = ACTION_PGP_PRIVKEY_INFO; } "Print information on a OpenPGP private key."
 
 #int fix_key;
 option (fix-key) { $privkey_op=1; $fix_key = 1; } "Regenerate the parameters in a private key."
@@ -80,9 +84,9 @@ option (fix-key) { $privkey_op=1; $fix_key = 1; } "Regenerate the parameters in 
 #int v1_cert;
 option (v1) { $v1_cert = 1; } "Generate an X.509 version 1 certificate (no extensions)."
 
-option (to-p12) { $action = 8; } "Generate a PKCS #12 structure."
+option (to-p12) { $action = ACTION_TO_PKCS12; } "Generate a PKCS #12 structure."
 
-option (to-p8) { $action = 18; } "Generate a PKCS #8 key structure."
+option (to-p8) { $action = ACTION_GENERATE_PKCS8; } "Generate a PKCS #8 key structure."
 
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."

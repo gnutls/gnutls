@@ -937,7 +937,7 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
 
   if (result == ASN1_ELEMENT_NOT_FOUND)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-  else if (result < 0)
+  else if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -947,7 +947,7 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
 	    indx + 1);
   len = sizeof (str_critical);
   result = asn1_read_value (crl->crl, name, str_critical, &len);
-  if (result < 0)
+  if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);

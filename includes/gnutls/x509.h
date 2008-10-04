@@ -651,6 +651,11 @@ extern "C"
   struct gnutls_x509_crq_int;
   typedef struct gnutls_x509_crq_int *gnutls_x509_crq_t;
 
+  int gnutls_x509_crq_print (gnutls_x509_crq_t crq,
+		       gnutls_certificate_print_formats_t format,
+		       gnutls_datum_t * out);
+
+
   int gnutls_x509_crq_init (gnutls_x509_crq_t * crq);
   void gnutls_x509_crq_deinit (gnutls_x509_crq_t crq);
   int gnutls_x509_crq_import (gnutls_x509_crq_t crq,
@@ -703,7 +708,50 @@ extern "C"
   int gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq, 
 				    const gnutls_datum_t * m,
 				    const gnutls_datum_t * e);
+  int gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
+				      gnutls_x509_subject_alt_name_t type,
+				      const void *data,
+				      unsigned int data_size,
+				      unsigned int flags);
 
+  int gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage);
+  int gnutls_x509_crq_set_basic_constraints (gnutls_x509_crq_t crq,
+				       unsigned int ca, int pathLenConstraint);
+
+  int gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t cert, int indx,
+				    void *data, size_t * sizeof_data);
+  int gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t cert, int indx,
+				    void *oid, size_t * sizeof_oid,
+				    int *critical);
+  int gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t cert, int indx,
+				    void *data, size_t * sizeof_data);
+  int gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t cert, int indx,
+				    void *oid, size_t * sizeof_oid);
+  int gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits);
+
+  int gnutls_x509_crq_get_key_rsa_raw (gnutls_x509_crq_t crq, 
+				    gnutls_datum_t * m,
+				    gnutls_datum_t * e);
+
+  int gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t cert,
+			       unsigned int *key_usage,
+			       unsigned int *critical);
+  int gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t cert,
+				       unsigned int *critical,
+				       int *ca, int *pathlen);
+  int gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t cert,
+				       unsigned int seq, void *ret,
+				       size_t * ret_size,
+				       unsigned int *ret_type,
+				       unsigned int *critical);
+  int gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t cert,
+					       unsigned int seq,
+					       void *ret, size_t * ret_size);
+
+  int gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t cert,
+				      const char *oid, int indx,
+				      void *buf, size_t * sizeof_buf,
+				      unsigned int *critical);
 
 #ifdef __cplusplus
 }

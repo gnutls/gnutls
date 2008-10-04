@@ -161,6 +161,10 @@ int _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 			     const char *asn1_rdn_name,
 			     int indx, void *_oid, size_t * sizeof_oid);
 
+int _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
+	int seq, void *name, size_t * name_size,
+        unsigned int *ret_type, int othername_oid);
+                                        
 /* dsa.c */
 
 
@@ -247,7 +251,9 @@ int _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
 					gnutls_datum_t * der_ext);
 
 /* mpi.c */
-
+int _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
+                           bigint_t * params, int *params_size);
+                           
 int _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 			       bigint_t * params, int *params_size);
 int _gnutls_x509_read_rsa_params (opaque * der, int dersize, bigint_t * params);
@@ -347,5 +353,11 @@ int _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
 			    const gnutls_datum_t * in, gnutls_datum_t * out);
 int _pkcs12_encode_crt_bag (gnutls_pkcs12_bag_type_t type,
 			    const gnutls_datum_t * raw, gnutls_datum_t * out);
+
+/* crq */
+int _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
+				const char *ext_id,
+				const gnutls_datum_t * ext_data,
+				unsigned int critical);
 
 #endif
