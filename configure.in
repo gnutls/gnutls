@@ -135,7 +135,8 @@ if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_developer_mode = xyes; then
 	   AC_MSG_CHECKING([whether gcc supports various warning flags])
 	   _gcc_cflags_save="$CFLAGS"
-	   CFLAGS="${CFLAGS} -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
+	   CFLAGS="${CFLAGS} -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
+	   #removed "-Wlogical-op" and "-Wvla" which are not supported by my gcc --nmav
 	   # -Wtraditional: warns on #elif which we use often
 	   # -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
 	   # -Wpadded: many of our structs are not optimized for padding
