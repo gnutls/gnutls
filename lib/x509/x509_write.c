@@ -249,9 +249,9 @@ gnutls_x509_crt_set_key (gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @crq: holds a certificate request
  *
- * This function will set the name and public parameters from the
- * given certificate request to the certificate. Only RSA keys are
- * currently supported.
+ * This function will set the name and public parameters as well as
+ * the extensions from the given certificate request to the certificate. 
+ * Only RSA keys are currently supported.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -260,15 +260,12 @@ int
 gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
 {
   int result;
-  int pk_algorithm;
 
   if (crt == NULL || crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-
-  pk_algorithm = gnutls_x509_crq_get_pk_algorithm (crq, NULL);
 
   result = asn1_copy_node (crt->cert, "tbsCertificate.subject",
 			   crq->crq, "certificationRequestInfo.subject");
@@ -286,6 +283,72 @@ gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
+
+  return 0;
+}
+
+/**
+ * gnutls_x509_crt_set_crq_extensions - Associate the Certificate with a request
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @crq: holds a certificate request
+ *
+ * This function will set extensions from the given request to the certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
+{
+  int result, i;
+  char oid[MAX_OID_SIZE];
+  size_t oid_size;
+  opaque extensions[MAX_CRQ_EXTENSIONS_SIZE];
+  size_t extensions_size = sizeof(extensions);
+  unsigned int critical;
+  gnutls_datum ext;
+
+  if (crt == NULL || crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  for (i=0;;i++)
+    {
+      oid_size = sizeof(oid);
+      result = gnutls_x509_crq_get_extension_info ( crq, i, oid, &oid_size, &critical);
+      if (result < 0)
+        {
+          if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+            break;
+
+          gnutls_assert();
+          return result;
+        }
+
+      extensions_size = sizeof(extensions);      
+      result = gnutls_x509_crq_get_extension_data (crq, i, extensions, &extensions_size);
+
+      if (result < 0)
+        {
+          gnutls_assert();
+          return result;
+        }
+        
+      ext.data = extensions;
+      ext.size = extensions_size;
+      
+      result = _gnutls_x509_crt_set_extension (crt, oid, &ext, critical);
+      if (result < 0)
+        {
+          gnutls_assert();
+          return result;
+        }
+      
+    }
+      
+  if (i>0) crt->use_extensions = 1;
 
   return 0;
 }

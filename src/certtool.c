@@ -352,6 +352,14 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
     fprintf (stderr, "\n\nExtensions.\n");
 
   /* do not allow extensions on a v1 certificate */
+  if (crq && get_crq_extensions_status()!=0)
+    {
+      result = gnutls_x509_crt_set_crq_extensions (crt, crq);
+      if (result < 0)
+	error (EXIT_FAILURE, 0, "set_crq: %s", gnutls_strerror (result));
+    }
+
+  /* append additional extensions */
   if (info.v1_cert == 0)
     {
 

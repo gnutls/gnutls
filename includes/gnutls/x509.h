@@ -661,8 +661,6 @@ extern "C"
   int gnutls_x509_crq_import (gnutls_x509_crq_t crq,
 			      const gnutls_datum_t * data,
 			      gnutls_x509_crt_fmt_t format);
-  int gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq,
-					unsigned int *bits);
   int gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf,
 			      size_t * sizeof_buf);
   int gnutls_x509_crq_get_dn_oid (gnutls_x509_crq_t crq, int indx,
@@ -704,6 +702,7 @@ extern "C"
 			      void *output_data, size_t * output_data_size);
 
   int gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
+  int gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
 
   int gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq, 
 				    const gnutls_datum_t * m,

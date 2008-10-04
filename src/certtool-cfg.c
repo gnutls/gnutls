@@ -74,6 +74,7 @@ typedef struct _cfg_ctx
   int time_stamping_key;
   int crl_next_update;
   int crl_number;
+  int crq_extensions;
   char *proxy_policy_language;
 } cfg_ctx;
 
@@ -135,6 +136,7 @@ template_parse (const char *template)
      (void *) &cfg.crl_number, 0},
 
     {NULL, '\0', "ca", CFG_BOOL, (void *) &cfg.ca, 0},
+    {NULL, '\0', "honor_crq_extensions", CFG_BOOL, (void *) &cfg.crq_extensions, 0},
     {NULL, '\0', "path_len", CFG_INT, (void *) &cfg.path_len, 0},
     {NULL, '\0', "tls_www_client", CFG_BOOL,
      (void *) &cfg.tls_www_client, 0},
@@ -661,6 +663,20 @@ get_ca_status (void)
     {
       return
 	read_yesno ("Does the certificate belong to an authority? (y/N): ");
+    }
+}
+
+int
+get_crq_extensions_status (void)
+{
+  if (batch)
+    {
+      return cfg.crq_extensions;
+    }
+  else
+    {
+      return
+	read_yesno ("Do you want to honour the extensions from the request? (y/N): ");
     }
 }
 

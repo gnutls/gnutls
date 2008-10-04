@@ -559,7 +559,7 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_version (gnutls_x509_crt_t cert)
 {
-  opaque version[5];
+  opaque version[8];
   int len, result;
 
   if (cert == NULL)

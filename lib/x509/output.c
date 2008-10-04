@@ -613,13 +613,13 @@ print_san (gnutls_string * str, const char* prefix, int type, void* cert)
     }
 }
 
-void print_extensions( gnutls_string * str, const char* prefix, int type, void* cert)
+static void print_extensions( gnutls_string * str, const char* prefix, int type, void* cert)
 {
 int i, err;
 
       for (i = 0;; i++)
 	{
-	  char oid[128] = "";
+	  char oid[MAX_OID_SIZE] = "";
 	  size_t sizeof_oid = sizeof (oid);
 	  int critical;
 	  size_t san_idx = 0;
@@ -1006,9 +1006,6 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
   /* Extensions. */
   if (gnutls_x509_crt_get_version (cert) >= 3)
     {
-      size_t i;
-      int err = 0;
-
       print_extensions( str, "", TYPE_CRT, cert);
     }
 
@@ -1390,7 +1387,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 
       for (i = 0;; i++)
 	{
-	  char oid[128] = "";
+	  char oid[MAX_OID_SIZE] = "";
 	  size_t sizeof_oid = sizeof (oid);
 	  int critical;
 	  int crl_nr = 0;
@@ -1735,9 +1732,8 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 
       for (i = 0;; i++)
 	{
-	  char oid[128] = "";
+	  char oid[MAX_OID_SIZE] = "";
 	  size_t sizeof_oid = sizeof (oid);
-	  int critical;
 	  int extensions = 0;
 	  int challenge = 0;
 
@@ -1771,7 +1767,6 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 	    {
               char pass[1024];
               size_t pass_size = sizeof (pass);
-              int err;
               
 	      if (challenge)
 		{

@@ -47,7 +47,7 @@ static int
 _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
 			  gnutls_datum_t * raw)
 {
-  char oid[128];
+  char oid[MAX_OID_SIZE];
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_datum_t auth_safe = { NULL, 0 };
   int tmp_size, len, result;
@@ -344,7 +344,7 @@ int
 _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 			      gnutls_pkcs12_bag_t bag)
 {
-  char oid[128], root[MAX_NAME_SIZE];
+  char oid[MAX_OID_SIZE], root[MAX_NAME_SIZE];
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int len, result;
   int bag_type;
@@ -586,7 +586,7 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len;
   char root2[MAX_NAME_SIZE];
-  char oid[128];
+  char oid[MAX_OID_SIZE];
 
   if (pkcs12 == NULL)
     {

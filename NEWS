@@ -35,6 +35,7 @@ gnutls_x509_crq_set_key_usage: ADDED
 gnutls_x509_crq_set_subject_alt_name: ADDED
 gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_get_key_purpose_oid: ADDED
+gnutls_x509_crt_set_crq_extensions: ADDED
 
 * Version 2.5.9 (released 2008-09-29)
 

@@ -46,7 +46,7 @@ static int
 _decode_pkcs7_signed_data (ASN1_TYPE pkcs7, ASN1_TYPE * sdata,
 			   gnutls_datum_t * raw)
 {
-  char oid[128];
+  char oid[MAX_OID_SIZE];
   ASN1_TYPE c2;
   opaque *tmp = NULL;
   int tmp_size, len, result;
@@ -285,7 +285,7 @@ gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len;
   char root2[MAX_NAME_SIZE];
-  char oid[128];
+  char oid[MAX_OID_SIZE];
   gnutls_datum_t tmp = { NULL, 0 };
 
   if (certificate_size == NULL || pkcs7 == NULL)

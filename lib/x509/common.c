@@ -433,7 +433,7 @@ mktime_utc (const struct fake_tm *tm)
 static time_t
 _gnutls_x509_time2gtime (const char *ttime, int year)
 {
-  char xx[3];
+  char xx[4];
   struct fake_tm etime;
   time_t ret;
 

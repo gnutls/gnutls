@@ -379,7 +379,7 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
 int
 gnutls_x509_crl_get_version (gnutls_x509_crl_t crl)
 {
-  opaque version[5];
+  opaque version[8];
   int len, result;
 
   if (crl == NULL)
@@ -810,9 +810,8 @@ gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
 				      size_t * ret_size,
 				      unsigned int *critical)
 {
-  int result, len;
+  int result;
   gnutls_datum_t id;
-  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
   if (crl == NULL)
     {

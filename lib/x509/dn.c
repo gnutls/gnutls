@@ -98,7 +98,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
   opaque value[MAX_STRING_LEN], *value2 = NULL;
   char *escaped = NULL;
   const char *ldap_desc;
-  char oid[128];
+  char oid[MAX_OID_SIZE];
   int len, printable;
   char *string = NULL;
   size_t sizeof_string, sizeof_escaped;
@@ -346,7 +346,7 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
   char tmpbuffer2[MAX_NAME_SIZE];
   char tmpbuffer3[MAX_NAME_SIZE];
   opaque value[256];
-  char oid[128];
+  char oid[MAX_OID_SIZE];
   int len, printable;
   int i = 0;
   char *cbuf = buf;
@@ -521,7 +521,7 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
   char tmpbuffer2[MAX_NAME_SIZE];
   char tmpbuffer3[MAX_NAME_SIZE];
   char value[256];
-  char oid[128];
+  char oid[MAX_OID_SIZE];
   int len;
   int i = 0;
 

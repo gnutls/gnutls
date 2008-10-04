@@ -293,7 +293,7 @@ parse_attribute (ASN1_TYPE asn1_struct,
   char tmpbuffer1[MAX_NAME_SIZE];
   char tmpbuffer3[MAX_NAME_SIZE];
   char value[200];
-  char oid[128];
+  char oid[MAX_OID_SIZE];
   int len, printable;
 
   if (*sizeof_buf == 0)
@@ -455,7 +455,6 @@ add_attribute (ASN1_TYPE asn, const char* root, const char *attribute_id,
 	       const gnutls_datum_t * ext_data)
 {
   int result;
-  const char *str;
   char name[MAX_NAME_SIZE];
 
   snprintf (name, sizeof (name), "%s", root);
@@ -509,7 +508,6 @@ overwrite_attribute (ASN1_TYPE asn, const char* root, unsigned int indx,
 		     const gnutls_datum_t * ext_data)
 {
   char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
-  const char *str;
   int result;
 
   snprintf (name, sizeof (name), "%s.?%u", root, indx);
@@ -536,7 +534,7 @@ set_attribute (ASN1_TYPE asn, const char* root,
   int result;
   int k, len;
   char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
-  char extnID[128];
+  char extnID[MAX_OID_SIZE];
 
   /* Find the index of the given attribute.
    */
@@ -626,7 +624,6 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
 				      const char *oid, void *buf,
 				      size_t sizeof_buf)
 {
-  int result;
   gnutls_datum data = { buf, sizeof_buf };
 
   if (crq == NULL)
@@ -756,7 +753,7 @@ gnutls_x509_crq_set_version (gnutls_x509_crq_t crq, unsigned int version)
 int
 gnutls_x509_crq_get_version (gnutls_x509_crq_t crq)
 {
-  opaque version[5];
+  opaque version[8];
   int len, result;
 
   if (crq == NULL)
@@ -1206,7 +1203,6 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t cert, int indx,
 				    void *oid, size_t * sizeof_oid)
 {
   int result;
-  char str_critical[10];
   char name[MAX_NAME_SIZE];
   int len;
 
@@ -1502,7 +1498,7 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t cert,
 {
   int result;
   uint16_t _usage;
-  opaque buf[256];
+  opaque buf[128];
   size_t buf_size = sizeof(buf);
 
   if (cert == NULL)
@@ -1742,9 +1738,8 @@ gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t cert,
 				      unsigned int *critical)
 {
   int result;
-  gnutls_datum_t output;
   unsigned int i;
-  char _oid[256];
+  char _oid[MAX_OID_SIZE];
   size_t oid_size;
 
   for (i=0;;i++)
@@ -2190,6 +2185,8 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t cert,
       gnutls_assert ();
       return result;
     }
+    
+  return 0;
 }
 
 #endif /* ENABLE_PKI */

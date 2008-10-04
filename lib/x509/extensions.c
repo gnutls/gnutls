@@ -811,7 +811,6 @@ int
 _gnutls_x509_ext_gen_number (const opaque* number, size_t nr_size, gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-  const char *str;
   int result;
 
   result =

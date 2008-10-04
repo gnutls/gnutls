@@ -40,7 +40,12 @@
 #endif
 
 int _gnutls_asn2err (int asn_err);
-void _gnutls_log (int, const char *fmt, ...);
+void _gnutls_log (int, const char *fmt, ...)  
+#ifdef __GNUC__
+__attribute__ ((format (printf, 2, 3)));
+#else
+;
+#endif
 
 extern int _gnutls_log_level;
 

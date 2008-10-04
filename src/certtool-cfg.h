@@ -39,6 +39,7 @@ int get_days (void);
 int get_ca_status (void);
 int get_crl_number (void);
 int get_path_len (void);
+int get_crq_extensions_status(void);
 const char *get_pkcs12_key_name (void);
 int get_tls_client_status (void);
 int get_tls_server_status (void);

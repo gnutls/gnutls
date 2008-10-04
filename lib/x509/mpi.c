@@ -320,9 +320,7 @@ int
 _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 			   bigint_t * params, int *params_size)
 {
-  int result;
   int pk_algorithm;
-  gnutls_datum tmp = { NULL, 0 };
 
   /* Read the algorithm's OID
    */
@@ -337,9 +335,7 @@ int
 _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
 			   bigint_t * params, int *params_size)
 {
-  int result;
   int pk_algorithm;
-  gnutls_datum tmp = { NULL, 0 };
 
   /* Read the algorithm's OID
    */

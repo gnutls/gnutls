@@ -654,9 +654,9 @@ _gnutls_recv_finished (gnutls_session_t session)
  */
 static int
 _gnutls_server_find_pk_algos_in_ciphersuites (const opaque *
-					      data, int datalen)
+					      data, unsigned int datalen)
 {
-  int j;
+  unsigned int j;
   gnutls_pk_algorithm_t algo = GNUTLS_PK_NONE, prev_algo = 0;
   gnutls_kx_algorithm_t kx;
   cipher_suite_st cs;
