@@ -7,7 +7,10 @@ See the end for copying conditions.
 
 ** libgnutls: Added functions to handle CRL extensions.
 
-** certtool: Print and set CRL extensions.
+** libgnutls: Added functions to handle X.509 extensions in Certificate
+Requests.
+
+** certtool: Print and set CRL and CRQ extensions.
 
 ** API and ABI modifications:
 gnutls_x509_crl_get_authority_key_id: ADDED
