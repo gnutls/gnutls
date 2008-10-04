@@ -1316,7 +1316,7 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t cert, int indx,
   int result;
   char str_critical[10];
   char name[MAX_NAME_SIZE];
-  unsigned char extensions[4*1024];
+  unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
   size_t extensions_size = sizeof(extensions);
   ASN1_TYPE c2;
   int len;
@@ -1421,7 +1421,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t cert, int indx,
 {
   int result, len;
   char name[MAX_NAME_SIZE];
-  unsigned char extensions[4*1024];
+  unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
   size_t extensions_size = sizeof(extensions);
   ASN1_TYPE c2;
 
@@ -1804,7 +1804,7 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
 				      unsigned int flags)
 {
   int result = 0;
-  opaque tmp[4*1024];
+  opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
   size_t tmp_size;
   gnutls_datum_t der_data = { NULL, 0 };
   gnutls_datum_t prev_der_data;

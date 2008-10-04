@@ -522,7 +522,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 				const gnutls_datum_t * ext_data,
 				unsigned int critical)
 {
-  unsigned char extensions[4*1024];
+  unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
   size_t extensions_size = sizeof(extensions);
   gnutls_datum der;
   ASN1_TYPE c2;
