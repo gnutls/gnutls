@@ -26,3 +26,5 @@ enum {
 
 #define TYPE_CRT 1
 #define TYPE_CRQ 2
+
+void certtool_version(void);

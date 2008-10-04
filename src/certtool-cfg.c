@@ -791,7 +791,7 @@ static int string_to_ip( unsigned char *ip, const char * str)
 void
 get_ip_addr_set (int type, void* crt)
 {
-  int ret, i;
+  int ret = 0, i;
   unsigned char ip[16];
   int len;
 
@@ -827,7 +827,7 @@ get_ip_addr_set (int type, void* crt)
 
         len = string_to_ip( ip, p);
         if (len <= 0) {
-            fprintf(stderr, "Error parsing address: %s\n", cfg.ip_addr[i]);
+            fprintf(stderr, "Error parsing address: %s\n", p);
             exit(1);
         }
 
@@ -850,7 +850,7 @@ get_ip_addr_set (int type, void* crt)
 void
 get_email_set (int type, void* crt)
 {
-  int ret, i;
+  int ret = 0, i;
 
   if (batch)
     {
@@ -894,7 +894,7 @@ get_email_set (int type, void* crt)
 void
 get_dns_name_set (int type, void* crt)
 {
-  int ret, i;
+  int ret = 0, i;
 
   if (batch)
     {

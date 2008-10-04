@@ -7,8 +7,6 @@
 # include <io.h>
 #endif
 
-void certtool_version(void);
-
 #include "certtool-common.h"
 
 #}

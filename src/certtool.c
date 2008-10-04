@@ -565,9 +565,9 @@ generate_crl (gnutls_x509_crt_t ca_crt)
   gnutls_x509_crl_t crl;
   gnutls_x509_crt_t *crts;
   size_t size;
-  int days, result, i;
+  int days, result;
+  unsigned int i;
   time_t now = time (NULL);
-  unsigned char buffer[128];
   unsigned int number;
 
   result = gnutls_x509_crl_init (&crl);
@@ -830,19 +830,19 @@ update_signed_certificate (void)
 static FILE *
 safe_open_rw (const char *file)
 {
-  mode_t oldmask;
+  mode_t omask = 0;
   FILE *fh;
 
   if (info.privkey_op != 0)
     {
-      oldmask = umask (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+      omask = umask (S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     }
 
   fh = fopen (file, "wb");
 
   if (info.privkey_op != 0)
     {
-      umask (oldmask);
+      umask (omask);
     }
 
   return fh;
@@ -1330,17 +1330,17 @@ print_hex_datum (gnutls_datum_t * dat)
 static void
 print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
 {
-  gnutls_datum_t info;
+  gnutls_datum_t cinfo;
   int ret;
 
   if (all)
-    ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &info);
+    ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &cinfo);
   else
-    ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_UNSIGNED_FULL, &info);
+    ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_UNSIGNED_FULL, &cinfo);
   if (ret == 0)
     {
-      fprintf (out, "%s\n", info.data);
-      gnutls_free (info.data);
+      fprintf (out, "%s\n", cinfo.data);
+      gnutls_free (cinfo.data);
     }
 
   if (out == stderr && batch == 0)	/* interactive */
@@ -1353,17 +1353,17 @@ print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
 static void
 print_crl_info (gnutls_x509_crl_t crl, FILE * out)
 {
-  gnutls_datum_t info;
+  gnutls_datum_t cinfo;
   int ret;
   size_t size;
 
-  ret = gnutls_x509_crl_print (crl, GNUTLS_CRT_PRINT_FULL, &info);
+  ret = gnutls_x509_crl_print (crl, GNUTLS_CRT_PRINT_FULL, &cinfo);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_print: %s", gnutls_strerror (ret));
 
-  fprintf (out, "%s\n", info.data);
+  fprintf (out, "%s\n", cinfo.data);
 
-  gnutls_free (info.data);
+  gnutls_free (cinfo.data);
 
   size = sizeof (buffer);
   ret = gnutls_x509_crl_export (crl, GNUTLS_X509_FMT_PEM, buffer, &size);
@@ -1406,17 +1406,17 @@ crl_info (void)
 static void
 print_crq_info (gnutls_x509_crq_t crq, FILE * out)
 {
-  gnutls_datum_t info;
+  gnutls_datum_t cinfo;
   int ret;
   size_t size;
 
-  ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &info);
+  ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &cinfo);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crq_print: %s", gnutls_strerror (ret));
 
-  fprintf (out, "%s\n", info.data);
+  fprintf (out, "%s\n", cinfo.data);
 
-  gnutls_free (info.data);
+  gnutls_free (cinfo.data);
 
   size = sizeof (buffer);
   ret = gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, buffer, &size);
@@ -1819,7 +1819,7 @@ load_cert_list (int mand, size_t *crt_size)
 
       (*crt_size)++;
     }
-  fprintf (stderr, "Loaded %d certificates.\n", *crt_size);
+  fprintf (stderr, "Loaded %d certificates.\n", (int)*crt_size);
 
   return crt;
 }
@@ -1834,8 +1834,7 @@ generate_request (void)
   gnutls_x509_privkey_t key;
   int ret, ca_status, path_len;
   const char *pass;
-  size_t size;
-  unsigned int usage;
+  unsigned int usage = 0;
 
   fprintf (stderr, "Generating a PKCS #10 certificate request...\n");
 
@@ -2279,16 +2278,16 @@ print_verification_res (gnutls_x509_crt_t crt,
 void
 verify_chain (void)
 {
-  char *buffer;
+  char *buf;
   size_t size;
 
-  buffer = fread_file (infile, &size);
-  if (buffer == NULL)
+  buf = fread_file (infile, &size);
+  if (buf == NULL)
     error (EXIT_FAILURE, errno, "reading chain");
 
-  buffer[size] = 0;
+  buf[size] = 0;
 
-  _verify_x509_mem (buffer, size);
+  _verify_x509_mem (buf, size);
 
 }
 
@@ -2437,14 +2436,13 @@ generate_pkcs12 (void)
   int result;
   size_t size;
   gnutls_datum_t data;
-  const char *password;
+  const char *pass;
   const char *name;
-  unsigned int flags;
+  unsigned int flags, i;
   gnutls_datum_t key_id;
   unsigned char _key_id[20];
-  int index;
+  int indx;
   size_t ncrts;
-  int i;
 
   fprintf (stderr, "Generating a PKCS #12 structure...\n");
 
@@ -2458,9 +2456,9 @@ generate_pkcs12 (void)
     error (EXIT_FAILURE, 0, "pkcs12_init: %s", gnutls_strerror (result));
 
   if (info.pass)
-    password = info.pass;
+    pass = info.pass;
   else
-    password = get_pass ();
+    pass = get_pass ();
 
   for (i = 0; i < ncrts; i++)
     {
@@ -2475,9 +2473,9 @@ generate_pkcs12 (void)
 	error (EXIT_FAILURE, 0, "set_crt[%d]: %s", i,
 	       gnutls_strerror (result));
 
-      index = result;
+      indx = result;
 
-      result = gnutls_pkcs12_bag_set_friendly_name (bag, index, name);
+      result = gnutls_pkcs12_bag_set_friendly_name (bag, indx, name);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_set_friendly_name: %s",
 	       gnutls_strerror (result));
@@ -2491,7 +2489,7 @@ generate_pkcs12 (void)
       key_id.data = _key_id;
       key_id.size = size;
 
-      result = gnutls_pkcs12_bag_set_key_id (bag, index, &key_id);
+      result = gnutls_pkcs12_bag_set_key_id (bag, indx, &key_id);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_set_key_id: %s",
 	       gnutls_strerror (result));
@@ -2501,7 +2499,7 @@ generate_pkcs12 (void)
       else
 	flags = GNUTLS_PKCS8_USE_PKCS12_3DES;
 
-      result = gnutls_pkcs12_bag_encrypt (bag, password, flags);
+      result = gnutls_pkcs12_bag_encrypt (bag, pass, flags);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_encrypt: %s", gnutls_strerror (result));
 
@@ -2526,7 +2524,7 @@ generate_pkcs12 (void)
       size = sizeof (buffer);
       result =
 	gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER,
-					  password, flags, buffer, &size);
+					  pass, flags, buffer, &size);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
 
@@ -2538,9 +2536,9 @@ generate_pkcs12 (void)
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_set_data: %s", gnutls_strerror (result));
 
-      index = result;
+      indx = result;
 
-      result = gnutls_pkcs12_bag_set_friendly_name (kbag, index, name);
+      result = gnutls_pkcs12_bag_set_friendly_name (kbag, indx, name);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_set_friendly_name: %s",
 	       gnutls_strerror (result));
@@ -2553,7 +2551,7 @@ generate_pkcs12 (void)
       key_id.data = _key_id;
       key_id.size = size;
 
-      result = gnutls_pkcs12_bag_set_key_id (kbag, index, &key_id);
+      result = gnutls_pkcs12_bag_set_key_id (kbag, indx, &key_id);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_set_key_id: %s",
 	       gnutls_strerror (result));
@@ -2563,7 +2561,7 @@ generate_pkcs12 (void)
 	error (EXIT_FAILURE, 0, "set_bag: %s", gnutls_strerror (result));
     }
 
-  result = gnutls_pkcs12_generate_mac (pkcs12, password);
+  result = gnutls_pkcs12_generate_mac (pkcs12, pass);
   if (result < 0)
     error (EXIT_FAILURE, 0, "generate_mac: %s", gnutls_strerror (result));
 
@@ -2679,8 +2677,8 @@ pkcs12_info (void)
   int result;
   size_t size;
   gnutls_datum_t data;
-  const char *password;
-  int index;
+  const char *pass;
+  int indx;
 
   result = gnutls_pkcs12_init (&pkcs12);
   if (result < 0)
@@ -2695,23 +2693,23 @@ pkcs12_info (void)
     error (EXIT_FAILURE, 0, "p12_import: %s", gnutls_strerror (result));
 
   if (info.pass)
-    password = info.pass;
+    pass = info.pass;
   else
-    password = get_pass ();
+    pass = get_pass ();
 
-  result = gnutls_pkcs12_verify_mac (pkcs12, password);
+  result = gnutls_pkcs12_verify_mac (pkcs12, pass);
   if (result < 0)
     error (EXIT_FAILURE, 0, "verify_mac: %s", gnutls_strerror (result));
 
-  index = 0;
+  indx = 0;
 
-  for (index = 0;; index++)
+  for (indx = 0;; indx++)
     {
       result = gnutls_pkcs12_bag_init (&bag);
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_init: %s", gnutls_strerror (result));
 
-      result = gnutls_pkcs12_get_bag (pkcs12, index, bag);
+      result = gnutls_pkcs12_get_bag (pkcs12, indx, bag);
       if (result < 0)
 	break;
 
@@ -2719,7 +2717,7 @@ pkcs12_info (void)
       if (result < 0)
 	error (EXIT_FAILURE, 0, "bag_count: %s", gnutls_strerror (result));
 
-      fprintf (outfile, "BAG #%d\n", index);
+      fprintf (outfile, "BAG #%d\n", indx);
 
       result = gnutls_pkcs12_bag_get_type (bag, 0);
       if (result < 0)
@@ -2730,7 +2728,7 @@ pkcs12_info (void)
 	  fprintf (stderr, "\tType: %s\n", BAGTYPE (result));
 	  fprintf (stderr, "\n\tDecrypting...\n");
 
-	  result = gnutls_pkcs12_bag_decrypt (bag, password);
+	  result = gnutls_pkcs12_bag_decrypt (bag, pass);
 
 	  if (result < 0)
 	    error (EXIT_FAILURE, 0, "bag_decrypt: %s",
@@ -2755,7 +2753,7 @@ pkcs7_info (void)
   int result;
   size_t size;
   gnutls_datum_t data, b64;
-  int index, count;
+  int indx, count;
 
   result = gnutls_pkcs7_init (&pkcs7);
   if (result < 0)
@@ -2780,12 +2778,12 @@ pkcs7_info (void)
   if (count > 0)
     fprintf (outfile, "Number of certificates: %u\n", count);
 
-  for (index = 0; index < count; index++)
+  for (indx = 0; indx < count; indx++)
     {
       fputs ("\n", outfile);
 
       size = sizeof (buffer);
-      result = gnutls_pkcs7_get_crt_raw (pkcs7, index, buffer, &size);
+      result = gnutls_pkcs7_get_crt_raw (pkcs7, indx, buffer, &size);
       if (result < 0)
 	break;
 
@@ -2811,12 +2809,12 @@ pkcs7_info (void)
   if (count > 0)
     fprintf (outfile, "\nNumber of CRLs: %u\n", count);
 
-  for (index = 0; index < count; index++)
+  for (indx = 0; indx < count; indx++)
     {
       fputs ("\n", outfile);
 
       size = sizeof (buffer);
-      result = gnutls_pkcs7_get_crl_raw (pkcs7, index, buffer, &size);
+      result = gnutls_pkcs7_get_crl_raw (pkcs7, indx, buffer, &size);
       if (result < 0)
 	break;
 
@@ -2875,8 +2873,7 @@ smime_to_pkcs7 (void)
   free (lineptr);
 }
 
-void
-certtool_version (void)
+void certtool_version (void)
 {
   const char *p = PACKAGE_NAME;
   if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
