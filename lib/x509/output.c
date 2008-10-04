@@ -372,7 +372,7 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 }
 
 static void
-print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
+print_key_purpose (gnutls_string * str, const char* prefix, int type, void* cert)
 {
   int indx;
   char *buffer = NULL;
@@ -382,8 +382,13 @@ print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
   for (indx = 0;; indx++)
     {
       size = 0;
-      err = gnutls_x509_crt_get_key_purpose_oid (cert, indx, buffer,
+      if (type == TYPE_CRT)
+        err = gnutls_x509_crt_get_key_purpose_oid (cert, indx, buffer,
 						 &size, NULL);
+      else
+        err = gnutls_x509_crq_get_key_purpose_oid (cert, indx, buffer,
+						 &size, NULL);
+
       if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 	return;
       if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -400,8 +405,13 @@ print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
 	  return;
 	}
 
-      err = gnutls_x509_crt_get_key_purpose_oid (cert, indx, buffer,
+      if (type == TYPE_CRT)
+        err = gnutls_x509_crt_get_key_purpose_oid (cert, indx, buffer,
 						 &size, NULL);
+      else
+        err = gnutls_x509_crq_get_key_purpose_oid (cert, indx, buffer,
+						 &size, NULL);
+
       if (err < 0)
 	{
 	  gnutls_free (buffer);
@@ -411,21 +421,21 @@ print_key_purpose (gnutls_string * str, gnutls_x509_crt_t cert)
 	}
 
       if (strcmp (buffer, GNUTLS_KP_TLS_WWW_SERVER) == 0)
-	addf (str, _("\t\t\tTLS WWW Server.\n"));
+	addf (str, _("%s\t\t\tTLS WWW Server.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_TLS_WWW_CLIENT) == 0)
-	addf (str, _("\t\t\tTLS WWW Client.\n"));
+	addf (str, _("%s\t\t\tTLS WWW Client.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_CODE_SIGNING) == 0)
-	addf (str, _("\t\t\tCode signing.\n"));
+	addf (str, _("%s\t\t\tCode signing.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_EMAIL_PROTECTION) == 0)
-	addf (str, _("\t\t\tEmail protection.\n"));
+	addf (str, _("%s\t\t\tEmail protection.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_TIME_STAMPING) == 0)
-	addf (str, _("\t\t\tTime stamping.\n"));
+	addf (str, _("%s\t\t\tTime stamping.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_OCSP_SIGNING) == 0)
-	addf (str, _("\t\t\tOCSP signing.\n"));
+	addf (str, _("%s\t\t\tOCSP signing.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_ANY) == 0)
-	addf (str, _("\t\t\tAny purpose.\n"));
+	addf (str, _("%s\t\t\tAny purpose.\n"), prefix);
       else
-	addf (str, "\t\t\t%s\n", buffer);
+	addf (str, "%s\t\t\t%s\n", prefix, buffer);
 
       gnutls_free (buffer);
     }
@@ -718,7 +728,7 @@ int i, err;
 		    critical ? _("critical") : _("not critical"));
 
 #ifdef ENABLE_PKI
-	      if (type == TYPE_CRT) print_key_purpose (str, cert);
+	      print_key_purpose (str, prefix, type, cert);
 #endif
 
 	      keypurpose_idx++;

@@ -582,8 +582,6 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 
   result = gnutls_x509_crq_set_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
 				      der.data, der.size);
-				      
-  _gnutls_free_datum( &der);
 
   if (result < 0)
     {

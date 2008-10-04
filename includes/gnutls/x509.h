@@ -717,6 +717,11 @@ extern "C"
   int gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage);
   int gnutls_x509_crq_set_basic_constraints (gnutls_x509_crq_t crq,
 				       unsigned int ca, int pathLenConstraint);
+  int gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t cert,
+				     const void *oid, unsigned int critical);
+  int gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t cert,
+				     int indx, void *oid, size_t * sizeof_oid,
+				     unsigned int *critical);
 
   int gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t cert, int indx,
 				    void *data, size_t * sizeof_data);

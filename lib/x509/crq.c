@@ -524,6 +524,7 @@ overwrite_attribute (ASN1_TYPE asn, const char* root, unsigned int indx,
       return result;
     }
 
+
   return 0;
 }
 
@@ -626,7 +627,7 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
 				      size_t sizeof_buf)
 {
   int result;
-  gnutls_datum data = {buf, sizeof_buf};
+  gnutls_datum data = { buf, sizeof_buf };
 
   if (crq == NULL)
     {
@@ -1361,7 +1362,6 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t cert, int indx,
   if (result == ASN1_ELEMENT_NOT_FOUND)
     {
       asn1_delete_structure (&c2);
-      gnutls_assert();
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
   else if (result < 0)
@@ -1961,6 +1961,235 @@ gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage)
     }
 
   return 0;
+}
+
+/**
+  * gnutls_x509_crq_get_key_purpose_oid - This function returns the Certificate's key purpose OIDs
+  * @cert: should contain a #gnutls_x509_crq_t structure
+  * @indx: This specifies which OID to return. Use zero to get the first one.
+  * @oid: a pointer to a buffer to hold the OID (may be null)
+  * @sizeof_oid: initially holds the size of @oid
+  *
+  * This function will extract the key purpose OIDs of the Certificate
+  * specified by the given index. These are stored in the Extended Key
+  * Usage extension (2.5.29.37) See the GNUTLS_KP_* definitions for
+  * human readable names.
+  *
+  * If @oid is null then only the size will be filled.
+  *
+  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
+  * not long enough, and in that case the *sizeof_oid will be updated
+  * with the required size.  On success 0 is returned.
+  **/
+int
+gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t cert,
+				     int indx, void *oid, size_t * sizeof_oid,
+				     unsigned int *critical)
+{
+  char tmpstr[MAX_NAME_SIZE];
+  int result, len;
+  gnutls_datum_t prev_data;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
+  size_t tmp_size;
+
+  if (cert == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if (oid)
+    memset (oid, 0, *sizeof_oid);
+  else
+    *sizeof_oid = 0;
+
+  tmp_size = sizeof(tmp);
+  result = gnutls_x509_crq_get_extension_by_oid (cert, "2.5.29.37", 0,
+					       tmp, &tmp_size, critical);
+
+  if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    {
+      gnutls_assert();
+      return result;
+    }
+
+  if (result < 0)
+    {
+      prev_data.data = NULL;
+      prev_data.size = 0;
+    }
+  else
+    {
+      prev_data.data = tmp;
+      prev_data.size = tmp_size;
+    }
+
+  result = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.ExtKeyUsageSyntax", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+
+  if ( prev_data.size > 0)
+    {
+      result = asn1_der_decoding (&c2, prev_data.data, prev_data.size, NULL);
+      if (result != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          asn1_delete_structure (&c2);
+          return _gnutls_asn2err (result);
+        }
+    }
+
+  indx++;
+  /* create a string like "?1"
+   */
+  snprintf (tmpstr, sizeof (tmpstr), "?%u", indx);
+
+  len = *sizeof_oid;
+  result = asn1_read_value (c2, tmpstr, oid, &len);
+
+  *sizeof_oid = len;
+  asn1_delete_structure (&c2);
+
+  if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
+    {
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  if (result != ASN1_SUCCESS)
+    {
+      if (result != ASN1_MEM_ERROR)
+        gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  return 0;
+
+}
+
+/**
+ * gnutls_x509_crq_set_key_purpose_oid - Sets the Certificate's key purpose OIDs
+ * @cert: a certificate of type #gnutls_x509_crq_t
+ * @oid: a pointer to a null terminated string that holds the OID
+ * @critical: Whether this extension will be critical or not
+ *
+ * This function will set the key purpose OIDs of the Certificate.
+ * These are stored in the Extended Key Usage extension (2.5.29.37)
+ * See the GNUTLS_KP_* definitions for human readable names.
+ *
+ * Subsequent calls to this function will append OIDs to the OID list.
+ *
+ * On success 0 is returned.
+ **/
+int
+gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t cert,
+				     const void *oid, unsigned int critical)
+{
+  int result;
+  gnutls_datum_t prev_data, der_data;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
+  size_t tmp_size;
+
+  if (cert == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* Check if the extension already exists.
+   */
+  tmp_size = sizeof(tmp);
+  result = gnutls_x509_crq_get_extension_by_oid (cert, "2.5.29.37", 0,
+					       tmp, &tmp_size, NULL);
+
+  if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    {
+      gnutls_assert();
+      return result;
+    }
+
+  if (result < 0)
+    {
+      prev_data.data = NULL;
+      prev_data.size = 0;
+    }
+  else
+    {
+      prev_data.data = tmp;
+      prev_data.size = tmp_size;
+    }
+
+  result = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.ExtKeyUsageSyntax", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  if (prev_data.size > 0)
+    {
+      /* decode it.
+       */
+      result = asn1_der_decoding (&c2, prev_data.data, prev_data.size, NULL);
+
+      if (result != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  asn1_delete_structure (&c2);
+	  return _gnutls_asn2err (result);
+	}
+
+    }
+
+  /* generate the extension.
+   */
+  /* 1. create a new element.
+   */
+  result = asn1_write_value (c2, "", "NEW", 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return _gnutls_asn2err (result);
+    }
+
+  /* 2. Add the OID.
+   */
+  result = asn1_write_value (c2, "?LAST", oid, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return _gnutls_asn2err (result);
+    }
+
+  result = _gnutls_x509_der_encode (c2, "", &der_data, 0);
+  asn1_delete_structure (&c2);
+
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = _gnutls_x509_crq_set_extension (cert, "2.5.29.37",
+					   &der_data, critical);
+
+  _gnutls_free_datum (&der_data);
+
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
 }
 
 #endif /* ENABLE_PKI */

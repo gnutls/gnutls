@@ -33,6 +33,8 @@ gnutls_x509_crq_get_subject_alt_othername_oid: ADDED
 gnutls_x509_crq_set_basic_constraints: ADDED
 gnutls_x509_crq_set_key_usage: ADDED
 gnutls_x509_crq_set_subject_alt_name: ADDED
+gnutls_x509_crq_set_key_purpose_oid: ADDED
+gnutls_x509_crq_get_key_purpose_oid: ADDED
 
 * Version 2.5.9 (released 2008-09-29)
 
