@@ -35,7 +35,7 @@ bin_PROGRAMS += srptool
 endif
 
 gnutls_serv_SOURCES = serv.gaa serv-gaa.h serv-gaa.c list.h serv.c	\
-	common.h common.c select.c
+	common.h common.c select.c certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
 	$(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) ../gl/libgnu.la
 
