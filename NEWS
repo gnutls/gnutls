@@ -7,6 +7,10 @@ See the end for copying conditions.
 
 ** libgnutls: Correct printing and parsing of IPv6 addresses.
 
+** libgnutls-openssl: fix out of bounds access.
+Problem in X509_get_subject_name and X509_get_issuer_name.  Tiny patch
+from Thomas Viehmann <tv@beamnet.de>.
+
 ** certtool: Use inet_pton for parsing IPv6 addresses.
 
 ** API and ABI modifications:
