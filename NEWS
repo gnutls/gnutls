@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.6.0 (unreleased)
 
+** libgnutls: Correct printing and parsing of IPv6 addresses.
+
+** certtool: Use inet_pton for parsing IPv6 addresses.
+
 ** API and ABI modifications:
 No changes since last version.
 
