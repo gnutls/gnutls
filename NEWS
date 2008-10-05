@@ -12,6 +12,10 @@ Requests.
 
 ** certtool: Print and set CRL and CRQ extensions.
 
+** libgnutls-openssl: fix out of bounds access.
+Problem in X509_get_subject_name and X509_get_issuer_name.  Tiny patch
+from Thomas Viehmann <tv@beamnet.de>.
+
 ** API and ABI modifications:
 gnutls_x509_crl_get_authority_key_id: ADDED
 gnutls_x509_crl_get_number: ADDED
