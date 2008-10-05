@@ -13,6 +13,96 @@ from Thomas Viehmann <tv@beamnet.de>.
 
 ** certtool: Use inet_pton for parsing IPv6 addresses.
 
+** Major changes compared to the v2.4 branch:
+
+*** Added API to replace and update the crypto backend.
+
+*** certtool: can add several subject alternative names via template file.
+
+*** opencdk: Parse (but not decrypt) encrypted secret keys.
+
+*** libgnutls: gnutls_x509_crt_set_subject_alt_name() was added that can
+either set or append alternative names. It can also handle binary structures
+such as IP addresses.
+
+*** libgnutls: New function to set minimum acceptable SRP bits.
+The function is gnutls_srp_set_prime_bits.
+
+*** libgnutls: Add interface to deal with public key and signature algorithms.
+The functions are called gnutls_pk_list, gnutls_pk_get_id,
+gnutls_sign_list, and gnutls_sign_get_id.
+
+*** libgnutls: New interfaces to get name of public key and signing algorithms.
+The functions are gnutls_sign_get_name and gnutls_pk_get_name.
+
+*** libgnutls: New API to get a string corresponding to a error symbol.
+The function is gnutls_strerror_name.
+
+*** libgnutls: New API to set the public parameters in a certificate request
+*** from a private key.
+The function is gnutls_x509_crq_set_key_rsa_raw.
+
+*** libgnutls: New API to set a callback to extract TLS Finished data.
+The function to register is gnutls_session_set_finished_function and
+it takes a callback of the gnutls_finished_callback_func type.
+
+*** libgnutls: Fix namespace problem with TLS_MASTER_SIZE and TLS_RANDOM_SIZE.
+
+*** libgnutls: New interface to register a new TLS extension handler.
+The new function gnutls_ext_register can be used to register handlers
+for specific TLS extension types.  The callback functions have the new
+types gnutls_ext_recv_func and gnutls_ext_send_func.  A type to
+classify TLS extensions, gnutls_ext_parse_type_t, has been added as
+well.
+
+*** libgnutls-extra: Add function to work with Libgcrypt in FIPS mode.
+The function is gnutls_register_md5_handler.  When libgcrypt is in
+FIPS mode, MD5 is disabled, but TLS normally requires use of MD5 in
+the PRF.
+
+*** API/ABI changes in GnuTLS 2.6
+No functions have been removed or modified.  The library should be
+fully backwards compatible on both the source and binary level.
+
+A new header file <gnutls/crypto.h> have been added.  It contains
+definitions related to replacing the internal crypto functionality.
+All definitions and the header itself is experimental but supported.
+
+We have realized that the symbols TLS_MASTER_SIZE and TLS_RANDOM_SIZE
+does not use the normal namespace.  We have added GNUTLS_MASTER_SIZE
+and GNUTLS_RANDOM_SIZE, but the old symbols are still defined.
+
+The following functions have been added to libgnutls:
+
+GNUTLS_MASTER_SIZE
+GNUTLS_RANDOM_SIZE
+gnutls_crypto_bigint_register2
+gnutls_crypto_cipher_register2
+gnutls_crypto_digest_register2
+gnutls_crypto_mac_register2
+gnutls_crypto_pk_register2
+gnutls_crypto_rnd_register2
+gnutls_crypto_single_cipher_register2
+gnutls_crypto_single_digest_register2
+gnutls_crypto_single_mac_register2
+gnutls_ext_register
+gnutls_pk_get_id
+gnutls_pk_get_name
+gnutls_pk_list
+gnutls_session_set_finished_function
+gnutls_sign_get_id
+gnutls_sign_get_name
+gnutls_sign_list
+gnutls_srp_set_prime_bits:
+gnutls_strerror_name
+gnutls_x509_crq_set_key_rsa_raw
+gnutls_x509_crt_set_crl_dist_points2
+gnutls_x509_crt_set_subject_alt_name
+
+The following functions have been added to libgnutls-extra:
+
+gnutls_register_md5_handler
+
 ** API and ABI modifications:
 No changes since last version.
 
