@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2008 Free Software Foundation
  * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  *
  * This file is part of GNUTLS-EXTRA.
@@ -859,7 +859,7 @@ X509_get_subject_name (const X509 * cert)
 {
   gnutls_x509_dn *dn;
   dn = (gnutls_x509_dn *) calloc (1, sizeof (gnutls_x509_dn));
-  if (gnutls_x509_extract_certificate_dn (&cert[0], dn) < 0)
+  if (gnutls_x509_extract_certificate_dn (cert, dn) < 0)
     {
       free (dn);
       return NULL;
@@ -872,7 +872,7 @@ X509_get_issuer_name (const X509 * cert)
 {
   gnutls_x509_dn *dn;
   dn = (gnutls_x509_dn *) calloc (1, sizeof (gnutls_x509_dn));
-  if (gnutls_x509_extract_certificate_dn (&cert[1], dn) < 0)
+  if (gnutls_x509_extract_certificate_dn (cert, dn) < 0)
     {
       free (dn);
       return NULL;
