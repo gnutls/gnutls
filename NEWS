@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.6.1 (unreleased)
 
+** libgnutls-openssl: Fix patch against X509_get_issuer_name.
+It incorrectly returned the subject DN instead of issuer DN in v2.6.0.
+Thanks to Thomas Viehmann <tv@beamnet.de> for report.
+
 ** API and ABI modifications:
 No changes since last version.
 
