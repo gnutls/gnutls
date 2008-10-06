@@ -1,3 +1,54 @@
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Upload to non-beta site.
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.6.0.
+
+2008-10-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-05  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Fix out-of-bounds access.  Similar to
+	debian #499945 lynx-cur problem.  libextra/gnutls_openssl.c: fix
+	X509_get_issuer_name to return issuer name of given certificate and
+	not try to get the subject dn of the issuer certificate wich may or
+	may not exist. (Checked how openssl does this, too.) This fixes a
+	accessing an array outside its bounds.  Debian bug #499945 is
+	instructive about the problem. While lynx-cur credits Thomas Dickey
+	for the bug, the code and implications are essentially the same for
+	the gnutls openssl-compat libary.  Tiny patch from Thomas Viehmann
+	<tv@beamnet.de>.
+
+2008-10-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-01  Simon Josefsson <simon@josefsson.org>
+
+	* po/nl.po.in, po/vi.po.in: Sync with TP.
+
+2008-10-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-09-29  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit c357933a30801a82e484bed8fbc4bd5b2b34d5e0 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Mon Sep 29 15:08:02
+	2008 +0300
+
+2008-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-09-29  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.9.
