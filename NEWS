@@ -16,7 +16,8 @@ Requests.
 Problem in X509_get_subject_name and X509_get_issuer_name.  Tiny patch
 from Thomas Viehmann <tv@beamnet.de>.
 
-** tests: Make pkcs12-decode compile when using internal libtasn1.
+** tests: Make tests compile when using internal libtasn1.
+Patch by ludo@gnu.org (Ludovic Courtès).
 
 ** API and ABI modifications:
 gnutls_x509_crl_get_authority_key_id: ADDED
