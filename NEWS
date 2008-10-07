@@ -9,7 +9,8 @@ See the end for copying conditions.
 It incorrectly returned the subject DN instead of issuer DN in v2.6.0.
 Thanks to Thomas Viehmann <tv@beamnet.de> for report.
 
-** tests: Make pkcs12-decode compile when using internal libtasn1.
+** tests: Make tests compile when using internal libtasn1.
+Patch by ludo@gnu.org (Ludovic Courtès).
 
 ** API and ABI modifications:
 No changes since last version.
