@@ -16,6 +16,8 @@ Requests.
 Problem in X509_get_subject_name and X509_get_issuer_name.  Tiny patch
 from Thomas Viehmann <tv@beamnet.de>.
 
+** tests: Make pkcs12-decode compile when using internal libtasn1.
+
 ** API and ABI modifications:
 gnutls_x509_crl_get_authority_key_id: ADDED
 gnutls_x509_crl_get_number: ADDED
