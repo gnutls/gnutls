@@ -36,6 +36,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 AM_LDFLAGS = -no-install
 LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la libutils.la
 
+if ENABLE_MINITASN1
+
+AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
+
+endif
+
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
