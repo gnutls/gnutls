@@ -98,7 +98,6 @@ AC_MSG_RESULT([***
 gl_EARLY
 lgl_EARLY
 xgl_EARLY
-AC_C_CONST
 AC_C_INLINE
 
 AM_GNU_GETTEXT([external])
@@ -684,10 +683,6 @@ AC_CONFIG_COMMANDS([chmod-config],[[
  chmod +x libextra/libgnutls-extra-config
 ]],[[]])
 
-
-AC_DEFINE([INTERNAL_GNUTLS_CRYPTO_H_ENABLE_UNSUPPORTED_API], 1,
-          [Enable prototypes in includes/crypto.h.])
-
 AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile doc/doxygen/Doxyfile \
@@ -712,6 +707,5 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	guile/src/Makefile guile/tests/Makefile])
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
-
 
 AC_OUTPUT
