@@ -26,8 +26,6 @@ AM_CPPFLAGS = -I$(top_srcdir)/lib \
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
-else
-AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 noinst_LTLIBRARIES = libminiopencdk.la

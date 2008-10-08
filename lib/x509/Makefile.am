@@ -22,12 +22,10 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/lib						\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
-	$(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
+	$(LIBOPENCDK_CFLAGS)
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
-else
-AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 noinst_LTLIBRARIES = libgnutls_x509.la

@@ -22,13 +22,10 @@
 
 AM_CPPFLAGS = -I$(srcdir)/gl -I$(top_srcdir)/lgl -I$(top_builddir)/lgl	\
 	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
-	-I$(top_srcdir)/lib/minitasn1 \
-	$(LIBGCRYPT_CFLAGS)
+	-I$(top_srcdir)/lib/minitasn1
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
-else
-AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 SUBDIRS = gl

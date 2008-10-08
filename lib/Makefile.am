@@ -41,8 +41,6 @@ endif
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/minitasn1
-else
-AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 bin_SCRIPTS = libgnutls-config
