@@ -26,7 +26,6 @@
 #include "gnutls_errors.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <gcrypt.h>
 #include "debug.h"
 
 #ifdef DEBUG

@@ -26,7 +26,6 @@
 #endif
 #include <assert.h>
 #include <stdio.h>
-#include <gcrypt.h>
 
 #include "opencdk.h"
 #include "main.h"

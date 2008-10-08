@@ -26,7 +26,6 @@
 #endif
 #include <stdio.h>
 #include <time.h>
-#include <gcrypt.h>
 #include <assert.h>
 
 #include "opencdk.h"
