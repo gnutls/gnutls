@@ -34,16 +34,17 @@ gnutls_x509_crq_get_attribute_info: ADDED
 gnutls_x509_crq_get_attribute_data: ADDED
 gnutls_x509_crq_get_extension_info: ADDED
 gnutls_x509_crq_get_extension_data: ADDED
-gnutls_x509_crq_get_extension_by_oid: ADDED
 gnutls_x509_crq_get_key_usage: ADDED
 gnutls_x509_crq_get_basic_constraints: ADDED
 gnutls_x509_crq_get_subject_alt_name: ADDED
 gnutls_x509_crq_get_subject_alt_othername_oid: ADDED
+gnutls_x509_crq_get_extension_by_oid: ADDED
+gnutls_x509_crq_set_subject_alt_name: ADDED
 gnutls_x509_crq_set_basic_constraints: ADDED
 gnutls_x509_crq_set_key_usage: ADDED
-gnutls_x509_crq_set_subject_alt_name: ADDED
-gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_get_key_purpose_oid: ADDED
+gnutls_x509_crq_set_key_purpose_oid: ADDED
+gnutls_x509_crq_print: ADDED
 gnutls_x509_crt_set_crq_extensions: ADDED
 
 * Version 2.6.0 (released 2008-10-06)
