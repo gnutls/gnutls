@@ -27,6 +27,8 @@
 
 #include <gnutls/x509.h>
 
+#include <libtasn1.h>
+
 #define MAX_CRQ_EXTENSIONS_SIZE 8*1024
 #define MAX_OID_SIZE 128
 
