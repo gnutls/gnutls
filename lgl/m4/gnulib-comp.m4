@@ -257,6 +257,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/stdbool.in.h
   lib/stdint.in.h
   lib/stdio-impl.h
+  lib/stdio-write.c
   lib/stdio.in.h
   lib/stdlib.in.h
   lib/str-two-way.h
@@ -274,6 +275,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasnprintf.h
   lib/vasprintf.c
   lib/wchar.in.h
+  lib/winsock.c
   lib/xsize.h
   m4/alloca.m4
   m4/byteswap.m4

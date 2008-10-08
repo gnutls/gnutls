@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libxgnu --source-base=libextra/gl --m4-base=libextra/gl/m4 --doc-base=doc --aux-dir=build-aux --avoid=dummy --avoid=stdint --libtool --macro-prefix=xgl --no-vc-files crypto/hmac-md5 crypto/md5
+#   gnulib-tool --import --dir=. --lib=libxgnu --source-base=libextra/gl --m4-base=libextra/gl/m4 --doc-base=doc --tests-base=tests --aux-dir=build-aux --avoid=dummy --avoid=stdint --libtool --macro-prefix=xgl --no-vc-files crypto/hmac-md5 crypto/md5
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])

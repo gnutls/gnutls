@@ -35,6 +35,11 @@
 /* mingw fails to declare _exit in <unistd.h>.  */
 #include <stdlib.h>
 
+#if @GNULIB_WRITE@ && @REPLACE_WRITE@ && @GNULIB_UNISTD_H_SIGPIPE@
+/* Get ssize_t.  */
+# include <sys/types.h>
+#endif
+
 /* The definition of GL_LINK_WARNING is copied here.  */
 
 
@@ -135,6 +140,23 @@ extern int dup2 (int, int);
 #endif
 
 
+#if @GNULIB_FSYNC@
+/* Synchronize changes to a file.
+   Return 0 if successful, otherwise -1 and errno set.
+   See POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/fsync.html>.  */
+# if !@HAVE_FSYNC@
+extern int fsync (int fd);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fsync
+# define fsync(fd) \
+    (GL_LINK_WARNING ("fsync is unportable - " \
+                      "use gnulib module fsync for portability"), \
+     fsync (fd))
+#endif
+
+
 #if @GNULIB_FTRUNCATE@
 # if !@HAVE_FTRUNCATE@
 /* Change the size of the file to which FD is opened to become equal to LENGTH.
@@ -176,6 +198,20 @@ extern char * getcwd (char *buf, size_t size);
     (GL_LINK_WARNING ("getcwd is unportable - " \
                       "use gnulib module getcwd for portability"), \
      getcwd (b, s))
+#endif
+
+
+#if @GNULIB_GETDTABLESIZE@
+# if !@HAVE_GETDTABLESIZE@
+/* Return the maximum number of file descriptors in the current process.  */
+extern int getdtablesize (void);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef getdtablesize
+# define getdtablesize() \
+    (GL_LINK_WARNING ("getdtablesize is unportable - " \
+                      "use gnulib module getdtablesize for portability"), \
+     getdtablesize ())
 #endif
 
 
@@ -330,6 +366,16 @@ extern unsigned int sleep (unsigned int n);
     (GL_LINK_WARNING ("sleep is unportable - " \
                       "use gnulib module sleep for portability"), \
      sleep (n))
+#endif
+
+
+#if @GNULIB_WRITE@ && @REPLACE_WRITE@ && @GNULIB_UNISTD_H_SIGPIPE@
+/* Write up to COUNT bytes starting at BUF to file descriptor FD.
+   See the POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/write.html>.  */
+# undef write
+# define write rpl_write
+extern ssize_t write (int fd, const void *buf, size_t count);
 #endif
 
 

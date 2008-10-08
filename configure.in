@@ -688,7 +688,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/manpages/Makefile doc/reference/Makefile doc/doxygen/Doxyfile \
 	doc/credentials/Makefile doc/credentials/x509/Makefile \
 	doc/credentials/srp/Makefile doc/credentials/openpgp/Makefile \
-	gl/Makefile lgl/Makefile \
+	gl/Makefile gl/tests/Makefile lgl/Makefile lgl/tests/Makefile \
 	tests/Makefile tests/rsa-md5-collision/Makefile tests/userid/Makefile \
 	tests/pkcs1-padding/Makefile tests/pkcs8-decode/Makefile \
 	tests/pkcs12-decode/Makefile tests/pathlen/Makefile \
