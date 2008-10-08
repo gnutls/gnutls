@@ -380,7 +380,7 @@ main(argc, argv)
 		int size;
 
 		str2 = PLATON_FUNC(str_white_str)(argv[1], argv[2], &size);
-		/* str2 = str_white_str("telnet \t atlantis.sk 	5678", "t  a", &size);
+		/* str2 = str_white_str("telnet \t atlantis.sk	5678", "t  a", &size);
 		*/
 		printf("  ptr = [%s], size = %d\n", str2, size);
 

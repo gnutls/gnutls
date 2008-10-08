@@ -26,7 +26,6 @@
 #endif
 #include <string.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include "opencdk.h"
 #include "main.h"

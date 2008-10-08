@@ -38,7 +38,7 @@
 /* For key Usage, test as:
  * if (st.key_usage & KEY_DIGITAL_SIGNATURE) ...
  */
-#define KEY_DIGITAL_SIGNATURE 		128
+#define KEY_DIGITAL_SIGNATURE		128
 #define KEY_NON_REPUDIATION		64
 #define KEY_KEY_ENCIPHERMENT		32
 #define KEY_DATA_ENCIPHERMENT		16
@@ -50,20 +50,21 @@
 
 typedef struct gnutls_cert
 {
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 
-					 * key algorithm 
-					 * RSA: [0] is modulus
-					 *      [1] is public exponent
-					 * DSA: [0] is p
-					 *      [1] is q
-					 *      [2] is g
-					 *      [3] is public key
-					 */
+  /* the size of params depends on the public
+   * key algorithm
+   * RSA: [0] is modulus
+   *      [1] is public exponent
+   * DSA: [0] is p
+   *      [1] is q
+   *      [2] is g
+   *      [3] is public key
+   */
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size;		/* holds the size of MPI params */
 
   gnutls_pk_algorithm_t subject_pk_algorithm;
 
-  unsigned int key_usage;	/* bits from KEY_* 
+  unsigned int key_usage;	/* bits from KEY_*
 				 */
 
   unsigned int version;
@@ -81,10 +82,8 @@ typedef struct gnutls_cert
 
 typedef struct gnutls_privkey_int
 {
-  bigint_t params[MAX_PRIV_PARAMS_SIZE];	/* the size of params depends on the public 
-					 * key algorithm 
-					 */
-  /*
+  /* the size of params depends on the public
+   * key algorithm
    * RSA: [0] is modulus
    *      [1] is public exponent
    *      [2] is private exponent
@@ -97,12 +96,14 @@ typedef struct gnutls_privkey_int
    *      [3] is y (public key)
    *      [4] is x (private key)
    */
+  bigint_t params[MAX_PRIV_PARAMS_SIZE];
   int params_size;		/* holds the number of params */
 
   gnutls_pk_algorithm_t pk_algorithm;
 } gnutls_privkey;
 
-struct gnutls_session_int;	/* because gnutls_session_t is not defined when this file is included */
+/* because gnutls_session_t is not defined when this file is included */
+struct gnutls_session_int;
 
 typedef enum ConvFlags
 {

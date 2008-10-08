@@ -25,7 +25,6 @@
 # include <config.h>
 #endif
 #include <stdio.h>
-#include <assert.h>
 #include <sys/stat.h>
 
 #include "opencdk.h"
