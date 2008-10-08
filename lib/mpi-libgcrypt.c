@@ -27,7 +27,6 @@
  */
 
 #include <gnutls_int.h>
-#include <libtasn1.h>
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <gnutls_mpi.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -27,7 +27,6 @@
 #include <x509_b64.h>
 #include <auth_cert.h>
 #include <gnutls_cert.h>
-#include <libtasn1.h>
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>

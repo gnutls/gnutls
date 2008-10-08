@@ -26,7 +26,6 @@
 # define GNUTLS_CERT_H
 
 #include <gnutls_pk.h>
-#include <libtasn1.h>
 #include "x509/x509_int.h"
 #include <gnutls/openpgp.h>
 
