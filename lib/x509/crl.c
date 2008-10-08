@@ -702,21 +702,23 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 }
 
 /**
-  * gnutls_x509_crl_get_authority_key_id - This function returns the CRL authority's identifier
-  * @crl: should contain a #gnutls_x509_crl_t structure
-  * @result: The place where the identifier will be copied
-  * @result_size: Holds the size of the result field.
-  * @critical: will be non zero if the extension is marked as critical (may be null)
-  *
-  * This function will return the CRL authority's key identifier.
-  * This is obtained by the X.509 Authority Key identifier extension
-  * field (2.5.29.35). Note that this function only returns the keyIdentifier
-  * field of the extension.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
-  *
-  **/
+ * gnutls_x509_crl_get_authority_key_id - get the CRL authority's identifier
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @ret: The place where the identifier will be copied
+ * @ret_size: Holds the size of the result field.
+ * @critical: will be non zero if the extension is marked as critical
+ *   (may be null)
+ *
+ * This function will return the CRL authority's key identifier.  This
+ * is obtained by the X.509 Authority Key identifier extension field
+ * (2.5.29.35).  Note that this function only returns the
+ * keyIdentifier field of the extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative value in case of an error.
+ *
+ * Since: 2.8.0
+ **/
 int
 gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
 				      size_t * ret_size,
@@ -791,20 +793,21 @@ gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
 }
 
 /**
-  * gnutls_x509_crl_get_number - This function returns the CRL number (extension)
-  * @crl: should contain a #gnutls_x509_crl_t structure
-  * @result: The place where the number will be copied
-  * @result_size: Holds the size of the result field.
-  * @critical: will be non zero if the extension is marked as critical (may be null)
-  *
-  * This function will return the CRL number extension.
-  * This is obtained by the CRL Number extension
-  * field (2.5.29.20). 
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
-  *
-  **/
+ * gnutls_x509_crl_get_number - get the CRL number (extension)
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @ret: The place where the number will be copied
+ * @ret_size: Holds the size of the result field.
+ * @critical: will be non zero if the extension is marked as critical
+ *   (may be null)
+ *
+ * This function will return the CRL number extension.  This is
+ * obtained by the CRL Number extension field (2.5.29.20).
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative value in case of an error.
+ *
+ * Since: 2.8.0
+ **/
 int
 gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
 			    size_t * ret_size, unsigned int *critical)
@@ -851,20 +854,23 @@ gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
 }
 
 /**
-  * gnutls_x509_crl_get_extension_oid - This function returns the specified extension OID
-  * @crl: should contain a #gnutls_x509_crl_t structure
-  * @indx: Specifies which extension OID to send. Use zero to get the first one.
-  * @oid: a pointer to a structure to hold the OID (may be null)
-  * @sizeof_oid: initially holds the size of @oid
-  *
-  * This function will return the requested extension OID in the CRL.
-  * The extension OID will be stored as a string in the provided buffer.
-  *
-  * A negative value may be returned in case of parsing error.
-  * If your have reached the last extension available 
-  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
-  *
-  **/
+ * gnutls_x509_crl_get_extension_oid - get the specified extension OID
+ * @crl: should contain a #gnutls_x509_crl_t structure
+ * @indx: Specifies which extension OID to send, use zero to get the first one.
+ * @oid: a pointer to a structure to hold the OID (may be null)
+ * @sizeof_oid: initially holds the size of @oid
+ *
+ * This function will return the requested extension OID in the CRL.
+ * The extension OID will be stored as a string in the provided
+ * buffer.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative value in case of an error.  If your have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
+ *
+ * Since: 2.8.0
+ **/
 int
 gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
 				   void *oid, size_t * sizeof_oid)
@@ -890,25 +896,27 @@ gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
 /**
  * gnutls_x509_crl_get_extension_info - Get extension id and criticality
  * @crl: should contain a #gnutls_x509_crl_t structure
- * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @indx: Specifies which extension OID to send, use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
  * @critical: output variable with critical flag, may be NULL.
  *
- * This function will return the requested extension OID in the
- * CRL, and the critical flag for it.  The extension OID will
- * be stored as a string in the provided buffer.  Use
+ * This function will return the requested extension OID in the CRL,
+ * and the critical flag for it.  The extension OID will be stored as
+ * a string in the provided buffer.  Use
  * gnutls_x509_crl_get_extension_data() to extract the data.
  *
  * If the buffer provided is not long enough to hold the output, then
  * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned.
  *
- * Return 0 on success.  A negative value may be returned in case of
- * parsing error.  If you have reached the last extension available
- * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative value in case of an error.  If your have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
  *
+ * Since: 2.8.0
  **/
 int
 gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
@@ -970,18 +978,21 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
  *
- * This function will return the requested extension data in the
- * CRL.  The extension data will be stored as a string in the
- * provided buffer.
+ * This function will return the requested extension data in the CRL.
+ * The extension data will be stored as a string in the provided
+ * buffer.
  *
  * Use gnutls_x509_crl_get_extension_info() to extract the OID and
  * critical flag.  Use gnutls_x509_crl_get_extension_by_oid() instead,
  * if you want to get data indexed by the extension OID rather than
  * sequence.
  *
- * Return 0 on success.  A negative value may be returned in case of
- * parsing error.  If you have reached the last extension available
- * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative value in case of an error.  If your have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
+ *
+ * Since: 2.8.0
  **/
 int
 gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,

@@ -1899,6 +1899,8 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.8.0
  **/
 int
 gnutls_x509_crq_print (gnutls_x509_crq_t crq,

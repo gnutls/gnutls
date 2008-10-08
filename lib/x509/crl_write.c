@@ -324,11 +324,13 @@ disable_optional_stuff (gnutls_x509_crl_t crl)
  * @id: The key ID
  * @id_size: Holds the size of the serial field.
  *
- * This function will set the CRL's authority key ID extension.
- * Only the keyIdentifier field can be set with this function.
+ * This function will set the CRL's authority key ID extension.  Only
+ * the keyIdentifier field can be set with this function.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.8.0
  **/
 int
 gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
@@ -391,6 +393,8 @@ gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.8.0
  **/
 int
 gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,

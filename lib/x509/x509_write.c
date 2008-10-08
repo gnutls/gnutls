@@ -292,10 +292,13 @@ gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @crq: holds a certificate request
  *
- * This function will set extensions from the given request to the certificate.
+ * This function will set extensions from the given request to the
+ * certificate.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.8.0
  **/
 int
 gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
