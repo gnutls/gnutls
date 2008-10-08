@@ -266,7 +266,7 @@ gnutls_global_init (void)
    * version.
    */
 
-  if (asn1_check_version (GNUTLS_LIBTASN1_VERSION) == NULL)
+  if (asn1_check_version (LIBTASN1_VERSION) == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;

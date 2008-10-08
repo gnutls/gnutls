@@ -19,6 +19,8 @@ from Thomas Viehmann <tv@beamnet.de>.
 ** tests: Make tests compile when using internal libtasn1.
 Patch by ludo@gnu.org (Ludovic Courtès).
 
+** Changed detection of libtasn1 to avoid depending on libtasn1-config.
+
 ** API and ABI modifications:
 gnutls_x509_crl_get_authority_key_id: ADDED
 gnutls_x509_crl_get_number: ADDED
