@@ -226,17 +226,13 @@ gnutls_global_init (void)
 
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
     {
-      const char *p;
-      p = strchr (GNUTLS_GCRYPT_VERSION, ':');
-      if (p == NULL)
-	p = GNUTLS_GCRYPT_VERSION;
-      else
-	p++;
+      const char *p = gcry_check_version (GCRYPT_VERSION);
 
-      if (gcry_check_version (p) == NULL)
+      if (p == NULL)
 	{
 	  gnutls_assert ();
-	  _gnutls_debug_log ("Checking for libgcrypt failed '%s'\n", p);
+	  _gnutls_debug_log ("Checking for libgcrypt failed: %s < %s\n",
+			     gcry_check_version (NULL), GCRYPT_VERSION);
 	  return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
 	}
 
