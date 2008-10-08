@@ -45,9 +45,6 @@ else
 AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
-# Make sure this comes after any -I's for internal headers.
-AM_CPPFLAGS += $(LIBGCRYPT_CFLAGS)
-
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
@@ -114,7 +111,7 @@ libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
-	@LTLIBZ@ $(LIBGCRYPT_LIBS) @LTLIBINTL@
+	$(LTLIBZ) $(LTLIBGCRYPT) $(LTLIBINTL)
 
 if NEED_WS2_32
 libgnutls_la_LIBADD += -lws2_32

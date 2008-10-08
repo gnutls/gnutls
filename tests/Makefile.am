@@ -69,7 +69,7 @@ if ENABLE_OPRFI
 ctests +=  oprfi
 endif
 
-gc_LDADD = $(LDADD) $(LIBGCRYPT_LIBS)
+gc_LDADD = $(LDADD)
 
 check_PROGRAMS = $(ctests)
 

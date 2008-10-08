@@ -37,32 +37,29 @@ endif
 gnutls_serv_SOURCES = serv.gaa serv-gaa.h serv-gaa.c list.h serv.c	\
 	common.h common.c select.c certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
-	$(LIBGCRYPT_LIBS) ../gl/libgnu.la
+	../gl/libgnu.la
 
 if ENABLE_SRP
 srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
-srptool_LDADD = ../lib/libgnutls.la \
-	$(LIBGCRYPT_LIBS) ../gl/libgnu.la ../lgl/liblgnu.la
+srptool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la
 endif
 
 psktool_SOURCES = psk.gaa psk-gaa.h psk-gaa.c psk.c
-psktool_LDADD = ../lib/libgnutls.la \
-	$(LIBGCRYPT_LIBS) ../gl/libgnu.la ../lgl/liblgnu.la
+psktool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la
 
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
 	common.c select.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
-	$(LIBGCRYPT_LIBS) ../gl/libgnu.la
+	../gl/libgnu.la
 
 gnutls_cli_debug_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c	\
 	tls_test.c tests.h tests.c common.h common.c
-gnutls_cli_debug_LDADD = ../lib/libgnutls.la			\
-	$(LIBGCRYPT_LIBS) ../gl/libgnu.la
+gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
 certtool_SOURCES = certtool.gaa certtool-gaa.h certtool-cfg.h	\
 	certtool-gaa.c certtool.c prime.c certtool-cfg.c
 certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
-	$(LIBGCRYPT_LIBS) ../gl/libgnu.la @LTLIBREADLINE@
+	../gl/libgnu.la @LTLIBREADLINE@
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else
@@ -74,12 +71,10 @@ endif
 
 noinst_PROGRAMS = errcodes printlist
 errcodes_SOURCES = errcodes.c
-errcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) \
-	../gl/libgnu.la ../lgl/liblgnu.la
+errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la
 
 printlist_SOURCES = printlist.c
-printlist_LDADD = ../lib/libgnutls.la	\
-	$(LIBGCRYPT_LIBS) ../gl/libgnu.la
+printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
 
 psk-gaa.c: $(srcdir)/psk.gaa
