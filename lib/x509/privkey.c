@@ -158,7 +158,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
   ASN1_TYPE pkey_asn;
   gnutls_pk_params_st pk_params;
 
-  memset( &pk_params, 0, sizeof(pk_params));
+  memset (&pk_params, 0, sizeof (pk_params));
   pk_params.params_nr = RSA_PRIVATE_PARAMS;
 
   if ((result =
@@ -1049,7 +1049,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
 
   /* Ok. Now we have the data. Create the asn1 structures
    */
-   
+
   /* first make sure that no previously allocated data are leaked */
   if (*c2 != ASN1_TYPE_EMPTY)
     {

@@ -1074,11 +1074,11 @@ _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
        */
       val.data = gnutls_malloc (asize);
       if (val.data == NULL)
-        {
-          gnutls_assert ();
-          result = GNUTLS_E_MEMORY_ERROR;
-          goto cleanup;
-        }
+	{
+	  gnutls_assert ();
+	  result = GNUTLS_E_MEMORY_ERROR;
+	  goto cleanup;
+	}
 
       if ((result = asn1_create_element
 	   (_gnutls_get_pkix (), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS)

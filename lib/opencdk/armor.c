@@ -162,7 +162,7 @@ base64_encode (char *out, const byte * in, size_t len, size_t olen)
 {
   if (!out || !in)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -204,7 +204,7 @@ base64_decode (byte * out, const char *in)
 
   if (!out || !in)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return -1;
     }
 
@@ -213,28 +213,28 @@ base64_decode (byte * out, const char *in)
     {
       digit1 = in[0];
       if (digit1 > 127 || b64val (digit1) == BAD)
-        {
-          gnutls_assert();
-  	  return -1;
-        }
+	{
+	  gnutls_assert ();
+	  return -1;
+	}
       digit2 = in[1];
       if (digit2 > 127 || b64val (digit2) == BAD)
-        {
-          gnutls_assert();
+	{
+	  gnutls_assert ();
 	  return -1;
-        }
+	}
       digit3 = in[2];
       if (digit3 > 127 || ((digit3 != '=') && (b64val (digit3) == BAD)))
-        {
-          gnutls_assert();
+	{
+	  gnutls_assert ();
 	  return -1;
-        }
+	}
       digit4 = in[3];
       if (digit4 > 127 || ((digit4 != '=') && (b64val (digit4) == BAD)))
 	{
-	  gnutls_assert();
+	  gnutls_assert ();
 	  return -1;
-        }
+	}
       in += 4;
 
       /* digits are already sanity-checked */
@@ -323,7 +323,7 @@ is_armored (int ctb)
 
   if (!(ctb & 0x80))
     {
-      gnutls_assert();
+      gnutls_assert ();
       return 1;			/* invalid packet: assume it is armored */
     }
   pkttype = ctb & 0x40 ? (ctb & 0x3f) : ((ctb >> 2) & 0xf);
@@ -370,13 +370,13 @@ armor_encode (void *data, FILE * in, FILE * out)
 
   if (!afx)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   if (afx->idx < 0 || afx->idx > (int) DIM (armor_begin) ||
       afx->idx2 < 0 || afx->idx2 > (int) DIM (armor_end))
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -393,7 +393,7 @@ armor_encode (void *data, FILE * in, FILE * out)
 
   if (fstat (fileno (in), &statbuf))
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_General_Error;
     }
 
@@ -403,10 +403,10 @@ armor_encode (void *data, FILE * in, FILE * out)
       if (!nread)
 	break;
       if (ferror (in))
-        {
-          gnutls_assert();
-  	  return CDK_File_Error;
-        }
+	{
+	  gnutls_assert ();
+	  return CDK_File_Error;
+	}
       afx->crc = update_crc (afx->crc, (byte *) raw, nread);
       base64_encode (buf, (byte *) raw, nread, DIM (buf) - 1);
       fprintf (out, "%s%s", buf, lf);
@@ -462,7 +462,7 @@ search_header (const char *buf, const char **array)
 
   if (strlen (buf) < 5 || strncmp (buf, "-----", 5))
     {
-      gnutls_assert();
+      gnutls_assert ();
       return -1;
     }
   for (i = 0; (s = array[i]); i++)
@@ -495,7 +495,7 @@ armor_decode (void *data, FILE * in, FILE * out)
 
   if (!afx)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -515,7 +515,7 @@ armor_decode (void *data, FILE * in, FILE * out)
 
   if (feof (in) || !pgp_data)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Armor_Error;	/* no data found */
     }
 
@@ -534,10 +534,10 @@ armor_decode (void *data, FILE * in, FILE * out)
          Headers to be corruption of the ASCII Armor. A colon and a single
          space separate the key and value. */
       if (!strstr (buf, ": "))
-        {
-          gnutls_assert();
-  	  return CDK_Armor_Error;
-        }
+	{
+	  gnutls_assert ();
+	  return CDK_Armor_Error;
+	}
       rc = CDK_General_Error;
       for (i = 0; (s = valid_headers[i]); i++)
 	{
@@ -625,7 +625,7 @@ cdk_file_armor (cdk_ctx_t hd, const char *file, const char *output)
   rc = cdk_stream_open (file, &inp);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
@@ -633,7 +633,7 @@ cdk_file_armor (cdk_ctx_t hd, const char *file, const char *output)
   if (rc)
     {
       cdk_stream_close (inp);
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
@@ -671,14 +671,14 @@ cdk_file_dearmor (const char *file, const char *output)
   rc = _cdk_check_args (1, file, output);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
   rc = cdk_stream_open (file, &inp);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
@@ -686,7 +686,7 @@ cdk_file_dearmor (const char *file, const char *output)
   if (rc)
     {
       cdk_stream_close (inp);
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
@@ -706,7 +706,7 @@ cdk_file_dearmor (const char *file, const char *output)
 
   cdk_stream_close (inp);
   cdk_stream_close (out);
-  gnutls_assert();
+  gnutls_assert ();
   return rc;
 }
 
@@ -730,7 +730,7 @@ _cdk_filter_armor (void *data, int ctl, FILE * in, FILE * out)
 	}
     }
 
-  gnutls_assert();
+  gnutls_assert ();
   return CDK_Inv_Mode;
 }
 
@@ -758,12 +758,12 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
 
   if (!inbuf || !nwritten)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   if (type > CDK_ARMOR_SIGNATURE)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Mode;
     }
 
@@ -776,7 +776,7 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
 
   if (outbuf && outlen < pos)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Too_Short;
     }
 

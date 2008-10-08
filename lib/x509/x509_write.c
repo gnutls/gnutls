@@ -298,13 +298,14 @@ gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
  *   negative error value.
  **/
 int
-gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
+gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
+				    gnutls_x509_crq_t crq)
 {
   int result, i;
   char oid[MAX_OID_SIZE];
   size_t oid_size;
   opaque extensions[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t extensions_size = sizeof(extensions);
+  size_t extensions_size = sizeof (extensions);
   unsigned int critical;
   gnutls_datum ext;
 
@@ -314,41 +315,46 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  for (i=0;;i++)
+  for (i = 0;; i++)
     {
-      oid_size = sizeof(oid);
-      result = gnutls_x509_crq_get_extension_info ( crq, i, oid, &oid_size, &critical);
+      oid_size = sizeof (oid);
+      result =
+	gnutls_x509_crq_get_extension_info (crq, i, oid, &oid_size,
+					    &critical);
       if (result < 0)
-        {
-          if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-            break;
+	{
+	  if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	    break;
 
-          gnutls_assert();
-          return result;
-        }
+	  gnutls_assert ();
+	  return result;
+	}
 
-      extensions_size = sizeof(extensions);      
-      result = gnutls_x509_crq_get_extension_data (crq, i, extensions, &extensions_size);
+      extensions_size = sizeof (extensions);
+      result =
+	gnutls_x509_crq_get_extension_data (crq, i, extensions,
+					    &extensions_size);
 
       if (result < 0)
-        {
-          gnutls_assert();
-          return result;
-        }
-        
+	{
+	  gnutls_assert ();
+	  return result;
+	}
+
       ext.data = extensions;
       ext.size = extensions_size;
-      
+
       result = _gnutls_x509_crt_set_extension (crt, oid, &ext, critical);
       if (result < 0)
-        {
-          gnutls_assert();
-          return result;
-        }
-      
+	{
+	  gnutls_assert ();
+	  return result;
+	}
+
     }
-      
-  if (i>0) crt->use_extensions = 1;
+
+  if (i > 0)
+    crt->use_extensions = 1;
 
   return 0;
 }
@@ -541,15 +547,17 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  /* only handle text extensions */  
-  if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME && 
-    type != GNUTLS_SAN_URI) 
+  /* only handle text extensions */
+  if (type != GNUTLS_SAN_DNSNAME && type != GNUTLS_SAN_RFC822NAME &&
+      type != GNUTLS_SAN_URI)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return gnutls_x509_crt_set_subject_alt_name( crt, type, data_string, strlen(data_string), GNUTLS_FSAN_SET);
+  return gnutls_x509_crt_set_subject_alt_name (crt, type, data_string,
+					       strlen (data_string),
+					       GNUTLS_FSAN_SET);
 }
 
 /**
@@ -890,7 +898,9 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
 				     type, const void *data_string,
 				     unsigned int reason_flags)
 {
-  return gnutls_x509_crt_set_crl_dist_points2( crt, type, data_string, strlen(data_string),reason_flags);
+  return gnutls_x509_crt_set_crl_dist_points2 (crt, type, data_string,
+					       strlen (data_string),
+					       reason_flags);
 }
 
 /**

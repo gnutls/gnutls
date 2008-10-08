@@ -49,22 +49,22 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
   opaque *buf;
   int buf_release;
 
-  if ( size < sizeof(tmpbuf)) 
+  if (size < sizeof (tmpbuf))
     {
       buf = tmpbuf;
       buf_release = 0;
-    } 
-  else 
+    }
+  else
     {
-      buf = gnutls_malloc(size);
-      if (buf == NULL) 
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
+      buf = gnutls_malloc (size);
+      if (buf == NULL)
+	{
+	  gnutls_assert ();
+	  goto cleanup;
+	}
       buf_release = 1;
-    }  
-      
+    }
+
 
   ret = _gnutls_rnd (level, buf, size);
   if (ret < 0)
@@ -95,7 +95,7 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
 
   if (buf_release != 0)
     {
-      gnutls_free( buf);
+      gnutls_free (buf);
       buf = NULL;
     }
 
@@ -110,7 +110,7 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
 
 cleanup:
   if (buf_release != 0)
-    gnutls_free( buf);
+    gnutls_free (buf);
   return NULL;
 }
 

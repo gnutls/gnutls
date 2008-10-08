@@ -94,44 +94,45 @@ asciiprint (gnutls_string * str, const char *data, size_t len)
       addf (str, ".");
 }
 
-static char* ip_to_string( void* _ip, int ip_size, char* string, int string_size)
+static char *
+ip_to_string (void *_ip, int ip_size, char *string, int string_size)
 {
-uint8_t* ip;
+  uint8_t *ip;
 
-    if (ip_size != 4 && ip_size != 16) 
-      {
-        gnutls_assert();
-        return NULL;
-      }
+  if (ip_size != 4 && ip_size != 16)
+    {
+      gnutls_assert ();
+      return NULL;
+    }
 
-    if (ip_size == 4 && string_size < 16)
-      {
-        gnutls_assert();
-        return NULL;
-      }
+  if (ip_size == 4 && string_size < 16)
+    {
+      gnutls_assert ();
+      return NULL;
+    }
 
-    if (ip_size == 16 && string_size < 48)
-      {
-        gnutls_assert();
-        return NULL;
-      }
-    
-    ip = _ip;
-    switch(ip_size) 
-      {
-        case 4:
-          sprintf(string, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
-          break;
-        case 16:
-          sprintf(string, "%x:%x:%x:%x:%x:%x:%x:%x", 
-            (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
-            (ip[4] << 8) | ip[5], (ip[6] <<8) | ip[7],
-            (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
-            (ip[12] << 8)| ip[13], (ip[14] << 8) | ip[15]);
-          break;
-      }
-      
-      return string;
+  if (ip_size == 16 && string_size < 48)
+    {
+      gnutls_assert ();
+      return NULL;
+    }
+
+  ip = _ip;
+  switch (ip_size)
+    {
+    case 4:
+      sprintf (string, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
+      break;
+    case 16:
+      sprintf (string, "%x:%x:%x:%x:%x:%x:%x:%x",
+	       (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
+	       (ip[4] << 8) | ip[5], (ip[6] << 8) | ip[7],
+	       (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
+	       (ip[12] << 8) | ip[13], (ip[14] << 8) | ip[15]);
+      break;
+    }
+
+  return string;
 }
 
 static void
@@ -211,7 +212,8 @@ print_ski (gnutls_string * str, gnutls_x509_crt_t cert)
 #define TYPE_CRT 2
 #define TYPE_CRQ 3
 
-typedef union {
+typedef union
+{
   gnutls_x509_crt_t crt;
   gnutls_x509_crq_t crq;
   gnutls_x509_crl_t crl;
@@ -225,13 +227,16 @@ print_aki (gnutls_string * str, int type, cert_type_t cert)
   int err;
 
   if (type == TYPE_CRT)
-    err = gnutls_x509_crt_get_authority_key_id (cert.crt, buffer, &size, NULL);
+    err =
+      gnutls_x509_crt_get_authority_key_id (cert.crt, buffer, &size, NULL);
   else if (type == TYPE_CRL)
-    err = gnutls_x509_crl_get_authority_key_id (cert.crl, buffer, &size, NULL);
-  else {
-    gnutls_assert();
-    return;
-  }
+    err =
+      gnutls_x509_crl_get_authority_key_id (cert.crl, buffer, &size, NULL);
+  else
+    {
+      gnutls_assert ();
+      return;
+    }
 
   if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
@@ -247,9 +252,11 @@ print_aki (gnutls_string * str, int type, cert_type_t cert)
     }
 
   if (type == TYPE_CRT)
-    err = gnutls_x509_crt_get_authority_key_id (cert.crt, buffer, &size, NULL);
+    err =
+      gnutls_x509_crt_get_authority_key_id (cert.crt, buffer, &size, NULL);
   else
-    err = gnutls_x509_crl_get_authority_key_id (cert.crl, buffer, &size, NULL);
+    err =
+      gnutls_x509_crl_get_authority_key_id (cert.crl, buffer, &size, NULL);
 
   if (err < 0)
     {
@@ -266,7 +273,8 @@ print_aki (gnutls_string * str, int type, cert_type_t cert)
 }
 
 static void
-print_key_usage (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
+print_key_usage (gnutls_string * str, const char *prefix, int type,
+		 cert_type_t cert)
 {
   unsigned int key_usage;
   int err;
@@ -312,7 +320,7 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
   char *buffer = NULL;
   size_t size;
   char str_ip[64];
-  char* p;
+  char *p;
   int err;
   int indx;
 
@@ -361,8 +369,9 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
 	  break;
 	case GNUTLS_SAN_IPADDRESS:
-	  p = ip_to_string(buffer, size, str_ip, sizeof(str_ip));
-	  if (p == NULL) p = ERROR_STR;
+	  p = ip_to_string (buffer, size, str_ip, sizeof (str_ip));
+	  if (p == NULL)
+	    p = ERROR_STR;
 	  addf (str, "\t\t\tIPAddress: %s\n", p);
 	  break;
 	case GNUTLS_SAN_DN:
@@ -378,7 +387,8 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 }
 
 static void
-print_key_purpose (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
+print_key_purpose (gnutls_string * str, const char *prefix, int type,
+		   cert_type_t cert)
 {
   int indx;
   char *buffer = NULL;
@@ -389,12 +399,13 @@ print_key_purpose (gnutls_string * str, const char* prefix, int type, cert_type_
     {
       size = 0;
       if (type == TYPE_CRT)
-        err = gnutls_x509_crt_get_key_purpose_oid (cert.crt, indx, buffer,
-						 &size, NULL);
+	err = gnutls_x509_crt_get_key_purpose_oid (cert.crt, indx, buffer,
+						   &size, NULL);
       else if (type == TYPE_CRQ)
-        err = gnutls_x509_crq_get_key_purpose_oid (cert.crq, indx, buffer,
-						 &size, NULL);
-      else return;
+	err = gnutls_x509_crq_get_key_purpose_oid (cert.crq, indx, buffer,
+						   &size, NULL);
+      else
+	return;
 
       if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 	return;
@@ -413,11 +424,11 @@ print_key_purpose (gnutls_string * str, const char* prefix, int type, cert_type_
 	}
 
       if (type == TYPE_CRT)
-        err = gnutls_x509_crt_get_key_purpose_oid (cert.crt, indx, buffer,
-						 &size, NULL);
+	err = gnutls_x509_crt_get_key_purpose_oid (cert.crt, indx, buffer,
+						   &size, NULL);
       else
-        err = gnutls_x509_crq_get_key_purpose_oid (cert.crq, indx, buffer,
-						 &size, NULL);
+	err = gnutls_x509_crq_get_key_purpose_oid (cert.crq, indx, buffer,
+						   &size, NULL);
 
       if (err < 0)
 	{
@@ -451,17 +462,21 @@ print_key_purpose (gnutls_string * str, const char* prefix, int type, cert_type_
 #endif
 
 static void
-print_basic (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
+print_basic (gnutls_string * str, const char *prefix, int type,
+	     cert_type_t cert)
 {
   int pathlen;
   int err;
 
   if (type == TYPE_CRT)
-    err = gnutls_x509_crt_get_basic_constraints (cert.crt, NULL, NULL, &pathlen);
+    err =
+      gnutls_x509_crt_get_basic_constraints (cert.crt, NULL, NULL, &pathlen);
   else if (type == TYPE_CRQ)
-    err = gnutls_x509_crq_get_basic_constraints (cert.crq, NULL, NULL, &pathlen);
-  else return;
-  
+    err =
+      gnutls_x509_crq_get_basic_constraints (cert.crq, NULL, NULL, &pathlen);
+  else
+    return;
+
   if (err < 0)
     {
       addf (str, "error: get_basic_constraints: %s\n", gnutls_strerror (err));
@@ -479,11 +494,12 @@ print_basic (gnutls_string * str, const char* prefix, int type, cert_type_t cert
 
 
 static void
-print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
+print_san (gnutls_string * str, const char *prefix, int type,
+	   cert_type_t cert)
 {
   unsigned int san_idx;
   char str_ip[64];
-  char* p;
+  char *p;
 
   for (san_idx = 0;; san_idx++)
     {
@@ -492,12 +508,15 @@ print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
       int err;
 
       if (type == TYPE_CRT)
-        err = gnutls_x509_crt_get_subject_alt_name (cert.crt, san_idx, buffer, &size,
-					      NULL);
+	err =
+	  gnutls_x509_crt_get_subject_alt_name (cert.crt, san_idx, buffer,
+						&size, NULL);
       else if (type == TYPE_CRQ)
-        err = gnutls_x509_crq_get_subject_alt_name (cert.crq, san_idx, buffer, &size,
-            NULL, NULL);
-      else return;
+	err =
+	  gnutls_x509_crq_get_subject_alt_name (cert.crq, san_idx, buffer,
+						&size, NULL, NULL);
+      else
+	return;
 
       if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 	break;
@@ -516,11 +535,13 @@ print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
 	}
 
       if (type == TYPE_CRT)
-        err = gnutls_x509_crt_get_subject_alt_name (cert.crt, san_idx, buffer, &size,
-					      NULL);
+	err =
+	  gnutls_x509_crt_get_subject_alt_name (cert.crt, san_idx, buffer,
+						&size, NULL);
       else if (type == TYPE_CRQ)
-        err = gnutls_x509_crq_get_subject_alt_name (cert.crq, san_idx, buffer, &size,
-					      NULL, NULL);
+	err =
+	  gnutls_x509_crq_get_subject_alt_name (cert.crq, san_idx, buffer,
+						&size, NULL, NULL);
 
       if (err < 0)
 	{
@@ -544,8 +565,9 @@ print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
 	  addf (str, "%s\t\t\tURI: %.*s\n", prefix, size, buffer);
 	  break;
 	case GNUTLS_SAN_IPADDRESS:
-	  p = ip_to_string(buffer, size, str_ip, sizeof(str_ip));
-	  if (p == NULL) p = ERROR_STR;
+	  p = ip_to_string (buffer, size, str_ip, sizeof (str_ip));
+	  if (p == NULL)
+	    p = ERROR_STR;
 	  addf (str, "%s\t\t\tIPAddress: %s\n", prefix, p);
 	  break;
 	case GNUTLS_SAN_DN:
@@ -558,13 +580,13 @@ print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
 	    size_t oidsize;
 
 	    oidsize = 0;
-            if (type == TYPE_CRT)
-  	      err = gnutls_x509_crt_get_subject_alt_othername_oid
-	      (cert.crt, san_idx, oid, &oidsize);
-            else if (type == TYPE_CRQ)
-  	      err = gnutls_x509_crq_get_subject_alt_othername_oid
-	      (cert.crq, san_idx, oid, &oidsize);
-            
+	    if (type == TYPE_CRT)
+	      err = gnutls_x509_crt_get_subject_alt_othername_oid
+		(cert.crt, san_idx, oid, &oidsize);
+	    else if (type == TYPE_CRQ)
+	      err = gnutls_x509_crq_get_subject_alt_othername_oid
+		(cert.crq, san_idx, oid, &oidsize);
+
 	    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	      {
 		gnutls_free (buffer);
@@ -581,12 +603,12 @@ print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
 		return;
 	      }
 
-            if (type == TYPE_CRT)
-  	      err = gnutls_x509_crt_get_subject_alt_othername_oid
-	      (cert.crt, san_idx, oid, &oidsize);
-            else if (type == TYPE_CRQ)
-  	      err = gnutls_x509_crq_get_subject_alt_othername_oid
-	      (cert.crq, san_idx, oid, &oidsize);
+	    if (type == TYPE_CRT)
+	      err = gnutls_x509_crt_get_subject_alt_othername_oid
+		(cert.crt, san_idx, oid, &oidsize);
+	    else if (type == TYPE_CRQ)
+	      err = gnutls_x509_crq_get_subject_alt_othername_oid
+		(cert.crq, san_idx, oid, &oidsize);
 	    if (err < 0)
 	      {
 		gnutls_free (buffer);
@@ -597,10 +619,12 @@ print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
 	      }
 
 	    if (err == GNUTLS_SAN_OTHERNAME_XMPP)
-	      addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix, size, buffer);
+	      addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix, size,
+		    buffer);
 	    else
 	      {
-		addf (str, _("%s\t\t\totherName OID: %.*s\n"), prefix, oidsize, oid);
+		addf (str, _("%s\t\t\totherName OID: %.*s\n"), prefix,
+		      oidsize, oid);
 		addf (str, _("%s\t\t\totherName DER: "), prefix);
 		hexprint (str, buffer, size);
 		addf (str, _("\n%s\t\t\totherName ASCII: "), prefix);
@@ -620,230 +644,244 @@ print_san (gnutls_string * str, const char* prefix, int type, cert_type_t cert)
     }
 }
 
-static void print_extensions( gnutls_string * str, const char* prefix, int type, cert_type_t cert)
+static void
+print_extensions (gnutls_string * str, const char *prefix, int type,
+		  cert_type_t cert)
 {
-int i, err;
+  int i, err;
 
-      for (i = 0;; i++)
+  for (i = 0;; i++)
+    {
+      char oid[MAX_OID_SIZE] = "";
+      size_t sizeof_oid = sizeof (oid);
+      int critical;
+      size_t san_idx = 0;
+      size_t proxy_idx = 0;
+      size_t basic_idx = 0;
+      size_t keyusage_idx = 0;
+      size_t keypurpose_idx = 0;
+      size_t ski_idx = 0;
+      size_t aki_idx = 0;
+      size_t crldist_idx = 0;
+
+      if (type == TYPE_CRT)
+	err = gnutls_x509_crt_get_extension_info (cert.crt, i,
+						  oid, &sizeof_oid,
+						  &critical);
+
+      else if (type == TYPE_CRQ)
+	err = gnutls_x509_crq_get_extension_info (cert.crq, i,
+						  oid, &sizeof_oid,
+						  &critical);
+      else
 	{
-	  char oid[MAX_OID_SIZE] = "";
-	  size_t sizeof_oid = sizeof (oid);
-	  int critical;
-	  size_t san_idx = 0;
-	  size_t proxy_idx = 0;
-	  size_t basic_idx = 0;
-	  size_t keyusage_idx = 0;
-	  size_t keypurpose_idx = 0;
-	  size_t ski_idx = 0;
-	  size_t aki_idx = 0;
-	  size_t crldist_idx = 0;
+	  gnutls_assert ();
+	  return;
+	}
+
+      if (err < 0)
+	{
+	  if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	    break;
+	  addf (str, "error: get_extension_info: %s\n",
+		gnutls_strerror (err));
+	  continue;
+	}
+
+      if (i == 0)
+	addf (str, _("%s\tExtensions:\n"), prefix);
+
+      if (strcmp (oid, "2.5.29.19") == 0)
+	{
+	  if (basic_idx)
+	    {
+	      addf (str, "error: more than one basic constraint\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tBasic Constraints (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+	  print_basic (str, prefix, type, cert);
+
+	  basic_idx++;
+	}
+      else if (strcmp (oid, "2.5.29.14") == 0)
+	{
+	  if (ski_idx)
+	    {
+	      addf (str, "error: more than one SKI extension\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tSubject Key Identifier (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
 
 	  if (type == TYPE_CRT)
-    	    err = gnutls_x509_crt_get_extension_info (cert.crt, i,
-						    oid, &sizeof_oid,
-						    &critical);
+	    print_ski (str, cert.crt);
 
+	  ski_idx++;
+	}
+      else if (strcmp (oid, "2.5.29.35") == 0)
+	{
+
+	  if (aki_idx)
+	    {
+	      addf (str, "error: more than one AKI extension\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tAuthority Key Identifier (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+	  if (type == TYPE_CRT)
+	    print_aki (str, TYPE_CRT, cert);
+
+	  aki_idx++;
+	}
+      else if (strcmp (oid, "2.5.29.15") == 0)
+	{
+	  if (keyusage_idx)
+	    {
+	      addf (str, "error: more than one key usage extension\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tKey Usage (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+	  print_key_usage (str, prefix, type, cert);
+
+	  keyusage_idx++;
+	}
+      else if (strcmp (oid, "2.5.29.37") == 0)
+	{
+	  if (keypurpose_idx)
+	    {
+	      addf (str, "error: more than one key purpose extension\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tKey Purpose (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+#ifdef ENABLE_PKI
+	  print_key_purpose (str, prefix, type, cert);
+#endif
+
+	  keypurpose_idx++;
+	}
+      else if (strcmp (oid, "2.5.29.17") == 0)
+	{
+	  if (san_idx)
+	    {
+	      addf (str, "error: more than one SKI extension\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tSubject Alternative Name (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+	  print_san (str, prefix, type, cert);
+
+	  san_idx++;
+	}
+      else if (strcmp (oid, "2.5.29.31") == 0)
+	{
+	  if (crldist_idx)
+	    {
+	      addf (str, "error: more than one CRL distribution point\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tCRL Distribution points (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+#ifdef ENABLE_PKI
+	  if (type == TYPE_CRT)
+	    print_crldist (str, cert.crt);
+#endif
+
+	  crldist_idx++;
+	}
+      else if (strcmp (oid, "1.3.6.1.5.5.7.1.14") == 0)
+	{
+	  if (proxy_idx)
+	    {
+	      addf (str, "error: more than one proxy extension\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tProxy Certificate Information (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+	  if (type == TYPE_CRT)
+	    print_proxy (str, cert.crt);
+
+	  proxy_idx++;
+	}
+      else
+	{
+	  char *buffer;
+	  size_t extlen = 0;
+
+	  addf (str, _("%s\t\tUnknown extension %s (%s):\n"), prefix, oid,
+		critical ? _("critical") : _("not critical"));
+
+	  if (type == TYPE_CRT)
+	    err =
+	      gnutls_x509_crt_get_extension_data (cert.crt, i, NULL, &extlen);
 	  else if (type == TYPE_CRQ)
-    	    err = gnutls_x509_crq_get_extension_info (cert.crq, i,
-						    oid, &sizeof_oid,
-						    &critical);
-          else {
-            gnutls_assert();
-            return;
-          }
+	    err =
+	      gnutls_x509_crq_get_extension_data (cert.crq, i, NULL, &extlen);
+	  else
+	    {
+	      gnutls_assert ();
+	      return;
+	    }
 
 	  if (err < 0)
 	    {
-	      if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-		break;
-	      addf (str, "error: get_extension_info: %s\n",
+	      addf (str, "error: get_extension_data: %s\n",
 		    gnutls_strerror (err));
 	      continue;
 	    }
 
-	  if (i == 0)
-	    addf (str, _("%s\tExtensions:\n"), prefix);
-
-	  if (strcmp (oid, "2.5.29.19") == 0)
+	  buffer = gnutls_malloc (extlen);
+	  if (!buffer)
 	    {
-	      if (basic_idx)
-		{
-		  addf (str, "error: more than one basic constraint\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tBasic Constraints (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-	      print_basic (str, prefix, type, cert);
-
-	      basic_idx++;
+	      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	      continue;
 	    }
-	  else if (strcmp (oid, "2.5.29.14") == 0)
+
+	  if (type == TYPE_CRT)
+	    err =
+	      gnutls_x509_crt_get_extension_data (cert.crt, i, buffer,
+						  &extlen);
+	  else if (type == TYPE_CRQ)
+	    err =
+	      gnutls_x509_crq_get_extension_data (cert.crq, i, buffer,
+						  &extlen);
+
+	  if (err < 0)
 	    {
-	      if (ski_idx)
-		{
-		  addf (str, "error: more than one SKI extension\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tSubject Key Identifier (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-	      if (type == TYPE_CRT) print_ski (str, cert.crt);
-
-	      ski_idx++;
-	    }
-	  else if (strcmp (oid, "2.5.29.35") == 0)
-	    {
-
-	      if (aki_idx)
-		{
-		  addf (str, "error: more than one AKI extension\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tAuthority Key Identifier (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-	      if (type == TYPE_CRT) print_aki (str, TYPE_CRT, cert);
-
-	      aki_idx++;
-	    }
-	  else if (strcmp (oid, "2.5.29.15") == 0)
-	    {
-	      if (keyusage_idx)
-		{
-		  addf (str, "error: more than one key usage extension\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tKey Usage (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-	      print_key_usage (str, prefix, type, cert);
-
-	      keyusage_idx++;
-	    }
-	  else if (strcmp (oid, "2.5.29.37") == 0)
-	    {
-	      if (keypurpose_idx)
-		{
-		  addf (str, "error: more than one key purpose extension\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tKey Purpose (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-#ifdef ENABLE_PKI
-	      print_key_purpose (str, prefix, type, cert);
-#endif
-
-	      keypurpose_idx++;
-	    }
-	  else if (strcmp (oid, "2.5.29.17") == 0)
-	    {
-	      if (san_idx)
-		{
-		  addf (str, "error: more than one SKI extension\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tSubject Alternative Name (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-	      print_san (str, prefix, type, cert);
-
-	      san_idx++;
-	    }
-	  else if (strcmp (oid, "2.5.29.31") == 0)
-	    {
-	      if (crldist_idx)
-		{
-		  addf (str, "error: more than one CRL distribution point\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tCRL Distribution points (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-#ifdef ENABLE_PKI
-	      if (type == TYPE_CRT) print_crldist (str, cert.crt);
-#endif
-
-	      crldist_idx++;
-	    }
-	  else if (strcmp (oid, "1.3.6.1.5.5.7.1.14") == 0)
-	    {
-	      if (proxy_idx)
-		{
-		  addf (str, "error: more than one proxy extension\n");
-		  continue;
-		}
-
-	      addf (str, _("%s\t\tProxy Certificate Information (%s):\n"), prefix,
-		    critical ? _("critical") : _("not critical"));
-
-	      if (type == TYPE_CRT) print_proxy (str, cert.crt);
-
-	      proxy_idx++;
-	    }
-	  else
-	    {
-	      char *buffer;
-	      size_t extlen = 0;
-
-	      addf (str, _("%s\t\tUnknown extension %s (%s):\n"), prefix, oid,
-		    critical ? _("critical") : _("not critical"));
-
-	      if (type == TYPE_CRT) 
-	        err = gnutls_x509_crt_get_extension_data (cert.crt, i, NULL, &extlen);
-              else if (type == TYPE_CRQ)
-	        err = gnutls_x509_crq_get_extension_data (cert.crq, i, NULL, &extlen);
-              else {
-                gnutls_assert();
-                return;
-              }
-                                                  
-	      if (err < 0)
-		{
-		  addf (str, "error: get_extension_data: %s\n",
-			gnutls_strerror (err));
-		  continue;
-		}
-
-	      buffer = gnutls_malloc (extlen);
-	      if (!buffer)
-		{
-		  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-		  continue;
-		}
-
-	      if (type == TYPE_CRT) 
-	        err = gnutls_x509_crt_get_extension_data (cert.crt, i, buffer, &extlen);
-              else if (type == TYPE_CRQ)
-	        err = gnutls_x509_crq_get_extension_data (cert.crq, i, buffer, &extlen);
-
-	      if (err < 0)
-		{
-		  gnutls_free (buffer);
-		  addf (str, "error: get_extension_data2: %s\n",
-			gnutls_strerror (err));
-		  continue;
-		}
-
-	      addf (str, _("%s\t\t\tASCII: "), prefix);
-	      asciiprint (str, buffer, extlen);
-	      addf (str, "\n");
-
-	      addf (str, _("%s\t\t\tHexdump: "), prefix);
-	      hexprint (str, buffer, extlen);
-	      adds (str, "\n");
-
 	      gnutls_free (buffer);
+	      addf (str, "error: get_extension_data2: %s\n",
+		    gnutls_strerror (err));
+	      continue;
 	    }
+
+	  addf (str, _("%s\t\t\tASCII: "), prefix);
+	  asciiprint (str, buffer, extlen);
+	  addf (str, "\n");
+
+	  addf (str, _("%s\t\t\tHexdump: "), prefix);
+	  hexprint (str, buffer, extlen);
+	  adds (str, "\n");
+
+	  gnutls_free (buffer);
 	}
+    }
 }
 
 static void
@@ -1016,9 +1054,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
   if (gnutls_x509_crt_get_version (cert) >= 3)
     {
       cert_type_t ccert;
-      
+
       ccert.crt = cert;
-      print_extensions( str, "", TYPE_CRT, ccert);
+      print_extensions (str, "", TYPE_CRT, ccert);
     }
 
   /* Signature. */
@@ -1423,33 +1461,33 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	  if (strcmp (oid, "2.5.29.20") == 0)
 	    {
 	      char nr[128];
-	      size_t nr_size = sizeof(nr);
-	      
+	      size_t nr_size = sizeof (nr);
+
 	      if (crl_nr)
 		{
 		  addf (str, "error: more than one CRL number\n");
 		  continue;
 		}
 
-              err = gnutls_x509_crl_get_number (crl, nr, &nr_size, &critical);
+	      err = gnutls_x509_crl_get_number (crl, nr, &nr_size, &critical);
 
 	      addf (str, _("\t\tCRL Number (%s): "),
 		    critical ? _("critical") : _("not critical"));
 
-              if (err < 0)
-                addf (str, "error: get_number: %s\n", gnutls_strerror (err));
-              else
-                {
-                  hexprint (str, nr, nr_size);
-                  addf (str, "\n");
-                }
+	      if (err < 0)
+		addf (str, "error: get_number: %s\n", gnutls_strerror (err));
+	      else
+		{
+		  hexprint (str, nr, nr_size);
+		  addf (str, "\n");
+		}
 
 	      crl_nr++;
 	    }
 	  else if (strcmp (oid, "2.5.29.35") == 0)
 	    {
 	      cert_type_t ccert;
-	      
+
 	      if (aki_idx)
 		{
 		  addf (str, "error: more than one AKI extension\n");
@@ -1459,7 +1497,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	      addf (str, _("\t\tAuthority Key Identifier (%s):\n"),
 		    critical ? _("critical") : _("not critical"));
 
-              ccert.crl = crl;
+	      ccert.crl = crl;
 	      print_aki (str, TYPE_CRL, ccert);
 
 	      aki_idx++;
@@ -1655,17 +1693,17 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
   }
 
   /* Subject */
-    {
-      char dn[1024];
-      size_t dn_size = sizeof (dn);
-      int err;
+  {
+    char dn[1024];
+    size_t dn_size = sizeof (dn);
+    int err;
 
-      err = gnutls_x509_crq_get_dn (cert, dn, &dn_size);
-      if (err < 0)
-	addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
-      else
-	addf (str, _("\tSubject: %s\n"), dn);
-    }
+    err = gnutls_x509_crq_get_dn (cert, dn, &dn_size);
+    if (err < 0)
+      addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
+    else
+      addf (str, _("\tSubject: %s\n"), dn);
+  }
 
   /* SubjectPublicKeyInfo. */
   {
@@ -1705,7 +1743,7 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 
 	    }
 	    break;
-#if 0 /* not implemented yet */
+#if 0				/* not implemented yet */
 	  case GNUTLS_PK_DSA:
 	    {
 	      gnutls_datum_t p, q, g, y;
@@ -1741,110 +1779,111 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
   }
 
   /* parse attributes */
-    {
-      size_t i;
-      int err = 0;
+  {
+    size_t i;
+    int err = 0;
 
-      for (i = 0;; i++)
-	{
-	  char oid[MAX_OID_SIZE] = "";
-	  size_t sizeof_oid = sizeof (oid);
-	  int extensions = 0;
-	  int challenge = 0;
+    for (i = 0;; i++)
+      {
+	char oid[MAX_OID_SIZE] = "";
+	size_t sizeof_oid = sizeof (oid);
+	int extensions = 0;
+	int challenge = 0;
 
-	  err = gnutls_x509_crq_get_attribute_info (cert, i,
-						    oid, &sizeof_oid);
-	  if (err < 0)
-	    {
-	      if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-		break;
-	      addf (str, "error: get_extension_info: %s\n",
+	err = gnutls_x509_crq_get_attribute_info (cert, i, oid, &sizeof_oid);
+	if (err < 0)
+	  {
+	    if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	      break;
+	    addf (str, "error: get_extension_info: %s\n",
+		  gnutls_strerror (err));
+	    continue;
+	  }
+
+	if (i == 0)
+	  addf (str, _("\tAttributes:\n"));
+
+	if (strcmp (oid, "1.2.840.113549.1.9.14") == 0)
+	  {
+	    cert_type_t ccert;
+
+	    if (extensions)
+	      {
+		addf (str, "error: more than one extensionsRequest\n");
+		continue;
+	      }
+
+	    ccert.crq = cert;
+	    print_extensions (str, "\t", TYPE_CRQ, ccert);
+
+	    extensions++;
+	  }
+	else if (strcmp (oid, "1.2.840.113549.1.9.7") == 0)
+	  {
+	    char pass[1024];
+	    size_t pass_size = sizeof (pass);
+
+	    if (challenge)
+	      {
+		addf (str,
+		      "error: more than one Challenge password attribute\n");
+		continue;
+	      }
+
+	    err =
+	      gnutls_x509_crq_get_challenge_password (cert, pass, &pass_size);
+	    if (err < 0)
+	      addf (str, "error: get_challenge_password: %s\n",
 		    gnutls_strerror (err));
-	      continue;
-	    }
+	    else
+	      addf (str, _("\t\tChallenge password: %s\n"), pass);
 
-	  if (i == 0)
-	    addf (str, _("\tAttributes:\n"));
+	    challenge++;
+	  }
+	else
+	  {
+	    char *buffer;
+	    size_t extlen = 0;
 
-	  if (strcmp (oid, "1.2.840.113549.1.9.14") == 0)
-	    {
-	      cert_type_t ccert;
-	      
-	      if (extensions)
-		{
-		  addf (str, "error: more than one extensionsRequest\n");
-		  continue;
-		}
+	    addf (str, _("\t\tUnknown attribute %s:\n"), oid);
 
-              ccert.crq = cert;
-              print_extensions (str, "\t", TYPE_CRQ, ccert);
+	    err = gnutls_x509_crq_get_attribute_data (cert, i, NULL, &extlen);
+	    if (err < 0)
+	      {
+		addf (str, "error: get_attribute_data: %s\n",
+		      gnutls_strerror (err));
+		continue;
+	      }
 
-	      extensions++;
-	    }
-	  else if (strcmp (oid, "1.2.840.113549.1.9.7") == 0)
-	    {
-              char pass[1024];
-              size_t pass_size = sizeof (pass);
-              
-	      if (challenge)
-		{
-		  addf (str, "error: more than one Challenge password attribute\n");
-		  continue;
-		}
+	    buffer = gnutls_malloc (extlen);
+	    if (!buffer)
+	      {
+		addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		continue;
+	      }
 
-              err = gnutls_x509_crq_get_challenge_password (cert, pass, &pass_size);
-              if (err < 0)
-                addf (str, "error: get_challenge_password: %s\n", gnutls_strerror (err));
-              else
-                addf (str, _("\t\tChallenge password: %s\n"), pass);
+	    err = gnutls_x509_crq_get_attribute_data (cert, i,
+						      buffer, &extlen);
+	    if (err < 0)
+	      {
+		gnutls_free (buffer);
+		addf (str, "error: get_attribute_data2: %s\n",
+		      gnutls_strerror (err));
+		continue;
+	      }
 
-	      challenge++;
-	    }
-	  else
-	    {
-	      char *buffer;
-	      size_t extlen = 0;
+	    addf (str, _("\t\t\tASCII: "));
+	    asciiprint (str, buffer, extlen);
+	    addf (str, "\n");
 
-	      addf (str, _("\t\tUnknown attribute %s:\n"), oid);
+	    addf (str, _("\t\t\tHexdump: "));
+	    hexprint (str, buffer, extlen);
+	    adds (str, "\n");
 
-	      err = gnutls_x509_crq_get_attribute_data (cert, i,
-							NULL, &extlen);
-	      if (err < 0)
-		{
-		  addf (str, "error: get_attribute_data: %s\n",
-			gnutls_strerror (err));
-		  continue;
-		}
-
-	      buffer = gnutls_malloc (extlen);
-	      if (!buffer)
-		{
-		  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-		  continue;
-		}
-
-	      err = gnutls_x509_crq_get_attribute_data (cert, i,
-							buffer, &extlen);
-	      if (err < 0)
-		{
-		  gnutls_free (buffer);
-		  addf (str, "error: get_attribute_data2: %s\n",
-			gnutls_strerror (err));
-		  continue;
-		}
-
-	      addf (str, _("\t\t\tASCII: "));
-	      asciiprint (str, buffer, extlen);
-	      addf (str, "\n");
-
-	      addf (str, _("\t\t\tHexdump: "));
-	      hexprint (str, buffer, extlen);
-	      adds (str, "\n");
-
-	      gnutls_free (buffer);
-	    }
-	}
-    }
+	    gnutls_free (buffer);
+	  }
+      }
+  }
 }
 
 /**
@@ -1870,7 +1909,9 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
 
   _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
 
-  _gnutls_string_append_str (&str, _("PKCS #10 Certificate Request Information:\n"));
+  _gnutls_string_append_str (&str,
+			     _
+			     ("PKCS #10 Certificate Request Information:\n"));
 
   print_crq (&str, crq);
 

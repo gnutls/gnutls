@@ -33,7 +33,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-                    
+
 /* Gnulib portability files. */
 #include <getpass.h>
 #include "readline.h"
@@ -113,9 +113,11 @@ template_parse (const char *template)
     {NULL, '\0', "password", CFG_STR, (void *) &cfg.password, 0},
     {NULL, '\0', "pkcs9_email", CFG_STR, (void *) &cfg.pkcs9_email, 0},
     {NULL, '\0', "country", CFG_STR, (void *) &cfg.country, 0},
-    {NULL, '\0', "dns_name", CFG_STR|CFG_MULTI_ARRAY, (void *) &cfg.dns_name, 0},
-    {NULL, '\0', "ip_address", CFG_STR|CFG_MULTI_ARRAY, (void *) &cfg.ip_addr, 0},
-    {NULL, '\0', "email", CFG_STR|CFG_MULTI_ARRAY, (void *) &cfg.email, 0},
+    {NULL, '\0', "dns_name", CFG_STR | CFG_MULTI_ARRAY,
+     (void *) &cfg.dns_name, 0},
+    {NULL, '\0', "ip_address", CFG_STR | CFG_MULTI_ARRAY,
+     (void *) &cfg.ip_addr, 0},
+    {NULL, '\0', "email", CFG_STR | CFG_MULTI_ARRAY, (void *) &cfg.email, 0},
 
     {NULL, '\0', "dn_oid", CFG_STR + CFG_MULTI_SEPARATED,
      (void *) &cfg.dn_oid, 0},
@@ -136,7 +138,8 @@ template_parse (const char *template)
      (void *) &cfg.crl_number, 0},
 
     {NULL, '\0', "ca", CFG_BOOL, (void *) &cfg.ca, 0},
-    {NULL, '\0', "honor_crq_extensions", CFG_BOOL, (void *) &cfg.crq_extensions, 0},
+    {NULL, '\0', "honor_crq_extensions", CFG_BOOL,
+     (void *) &cfg.crq_extensions, 0},
     {NULL, '\0', "path_len", CFG_INT, (void *) &cfg.path_len, 0},
     {NULL, '\0', "tls_www_client", CFG_BOOL,
      (void *) &cfg.tls_www_client, 0},
@@ -676,7 +679,8 @@ get_crq_extensions_status (void)
   else
     {
       return
-	read_yesno ("Do you want to honour the extensions from the request? (y/N): ");
+	read_yesno
+	("Do you want to honour the extensions from the request? (y/N): ");
     }
 }
 
@@ -689,8 +693,7 @@ get_crl_number (void)
     }
   else
     {
-      return read_int_with_default
-	("CRL Number: ", 1);
+      return read_int_with_default ("CRL Number: ", 1);
     }
 }
 
@@ -762,34 +765,40 @@ get_tls_server_status (void)
 #include <arpa/inet.h>
 
 /* convert a printable IP to binary */
-static int string_to_ip( unsigned char *ip, const char * str)
+static int
+string_to_ip (unsigned char *ip, const char *str)
 {
-  int len = strlen( str);
+  int len = strlen (str);
   int ret;
 
-  if ( strchr(str, ':') != NULL || len > 16) { /* IPv6 */
-    ret = inet_pton(AF_INET6, str, ip);
-    if (ret <= 0) {
-        fprintf(stderr, "Error in IPv6 address %s\n", str);
-        exit(1);
-    }
+  if (strchr (str, ':') != NULL || len > 16)
+    {				/* IPv6 */
+      ret = inet_pton (AF_INET6, str, ip);
+      if (ret <= 0)
+	{
+	  fprintf (stderr, "Error in IPv6 address %s\n", str);
+	  exit (1);
+	}
 
-    /* To be done */
-    return 16;
-  } else { /* IPv4 */
-    ret = inet_pton(AF_INET, str, ip);
-    if (ret <= 0) {
-        fprintf(stderr, "Error in IPv4 address %s\n", str);
-        exit(1);
+      /* To be done */
+      return 16;
     }
+  else
+    {				/* IPv4 */
+      ret = inet_pton (AF_INET, str, ip);
+      if (ret <= 0)
+	{
+	  fprintf (stderr, "Error in IPv4 address %s\n", str);
+	  exit (1);
+	}
 
-    return 4;    
-  }
+      return 4;
+    }
 
 }
 
 void
-get_ip_addr_set (int type, void* crt)
+get_ip_addr_set (int type, void *crt)
 {
   int ret = 0, i;
   unsigned char ip[16];
@@ -802,41 +811,52 @@ get_ip_addr_set (int type, void* crt)
 
       for (i = 0; cfg.ip_addr[i] != NULL; i++)
 	{
-          len = string_to_ip( ip, cfg.ip_addr[i]);
-          if (len <= 0) {
-            fprintf(stderr, "Error parsing address: %s\n", cfg.ip_addr[i]);
-            exit(1);
-          }
+	  len = string_to_ip (ip, cfg.ip_addr[i]);
+	  if (len <= 0)
+	    {
+	      fprintf (stderr, "Error parsing address: %s\n", cfg.ip_addr[i]);
+	      exit (1);
+	    }
 
 	  if (type == TYPE_CRT)
-  	    ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
-	    ip, len, GNUTLS_FSAN_APPEND);
-          else
-  	    ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
-	    ip, len, GNUTLS_FSAN_APPEND);
-	    
-          if (ret < 0) break;
+	    ret =
+	      gnutls_x509_crt_set_subject_alt_name (crt, GNUTLS_SAN_IPADDRESS,
+						    ip, len,
+						    GNUTLS_FSAN_APPEND);
+	  else
+	    ret =
+	      gnutls_x509_crq_set_subject_alt_name (crt, GNUTLS_SAN_IPADDRESS,
+						    ip, len,
+						    GNUTLS_FSAN_APPEND);
+
+	  if (ret < 0)
+	    break;
 	}
     }
   else
     {
       const char *p;
-      
-      p = read_str ("Enter the IP address of the subject of the certificate: ");
-      if (!p) return;
 
-        len = string_to_ip( ip, p);
-        if (len <= 0) {
-            fprintf(stderr, "Error parsing address: %s\n", p);
-            exit(1);
-        }
+      p =
+	read_str ("Enter the IP address of the subject of the certificate: ");
+      if (!p)
+	return;
 
-        if (type == TYPE_CRT)
-  	    ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
-	    ip, len, GNUTLS_FSAN_APPEND);
-        else
-  	    ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_IPADDRESS,
-	    ip, len, GNUTLS_FSAN_APPEND);
+      len = string_to_ip (ip, p);
+      if (len <= 0)
+	{
+	  fprintf (stderr, "Error parsing address: %s\n", p);
+	  exit (1);
+	}
+
+      if (type == TYPE_CRT)
+	ret = gnutls_x509_crt_set_subject_alt_name (crt, GNUTLS_SAN_IPADDRESS,
+						    ip, len,
+						    GNUTLS_FSAN_APPEND);
+      else
+	ret = gnutls_x509_crq_set_subject_alt_name (crt, GNUTLS_SAN_IPADDRESS,
+						    ip, len,
+						    GNUTLS_FSAN_APPEND);
     }
 
   if (ret < 0)
@@ -848,7 +868,7 @@ get_ip_addr_set (int type, void* crt)
 
 
 void
-get_email_set (int type, void* crt)
+get_email_set (int type, void *crt)
 {
   int ret = 0, i;
 
@@ -857,31 +877,45 @@ get_email_set (int type, void* crt)
       if (!cfg.email)
 	return;
 
-      for (i = 0; cfg.email[i] != NULL; i ++)
+      for (i = 0; cfg.email[i] != NULL; i++)
 	{
 	  if (type == TYPE_CRT)
-	    ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
-	      cfg.email[i], strlen(cfg.email[i]), GNUTLS_FSAN_APPEND);
-          else
-	    ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
-	      cfg.email[i], strlen(cfg.email[i]), GNUTLS_FSAN_APPEND);
-	    
-          if (ret < 0) break;
+	    ret =
+	      gnutls_x509_crt_set_subject_alt_name (crt,
+						    GNUTLS_SAN_RFC822NAME,
+						    cfg.email[i],
+						    strlen (cfg.email[i]),
+						    GNUTLS_FSAN_APPEND);
+	  else
+	    ret =
+	      gnutls_x509_crq_set_subject_alt_name (crt,
+						    GNUTLS_SAN_RFC822NAME,
+						    cfg.email[i],
+						    strlen (cfg.email[i]),
+						    GNUTLS_FSAN_APPEND);
+
+	  if (ret < 0)
+	    break;
 	}
     }
   else
     {
       const char *p;
-      
+
       p = read_str ("Enter the e-mail of the subject of the certificate: ");
-      if (!p) return;
+      if (!p)
+	return;
 
       if (type == TYPE_CRT)
-        ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
-          p, strlen(p), GNUTLS_FSAN_APPEND);
+	ret =
+	  gnutls_x509_crt_set_subject_alt_name (crt, GNUTLS_SAN_RFC822NAME, p,
+						strlen (p),
+						GNUTLS_FSAN_APPEND);
       else
-        ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_RFC822NAME,
-          p, strlen(p), GNUTLS_FSAN_APPEND);
+	ret =
+	  gnutls_x509_crq_set_subject_alt_name (crt, GNUTLS_SAN_RFC822NAME, p,
+						strlen (p),
+						GNUTLS_FSAN_APPEND);
     }
 
   if (ret < 0)
@@ -892,7 +926,7 @@ get_email_set (int type, void* crt)
 }
 
 void
-get_dns_name_set (int type, void* crt)
+get_dns_name_set (int type, void *crt)
 {
   int ret = 0, i;
 
@@ -901,31 +935,41 @@ get_dns_name_set (int type, void* crt)
       if (!cfg.dns_name)
 	return;
 
-      for (i = 0; cfg.dns_name[i] != NULL; i ++)
+      for (i = 0; cfg.dns_name[i] != NULL; i++)
 	{
-          if (type == TYPE_CRT)
-            ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
-	      cfg.dns_name[i], strlen(cfg.dns_name[i]), GNUTLS_FSAN_APPEND);
-          else
-            ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
-	      cfg.dns_name[i], strlen(cfg.dns_name[i]), GNUTLS_FSAN_APPEND);
-	    
-          if (ret < 0) break;
+	  if (type == TYPE_CRT)
+	    ret =
+	      gnutls_x509_crt_set_subject_alt_name (crt, GNUTLS_SAN_DNSNAME,
+						    cfg.dns_name[i],
+						    strlen (cfg.dns_name[i]),
+						    GNUTLS_FSAN_APPEND);
+	  else
+	    ret =
+	      gnutls_x509_crq_set_subject_alt_name (crt, GNUTLS_SAN_DNSNAME,
+						    cfg.dns_name[i],
+						    strlen (cfg.dns_name[i]),
+						    GNUTLS_FSAN_APPEND);
+
+	  if (ret < 0)
+	    break;
 	}
     }
   else
     {
       const char *p;
-      
+
       p = read_str ("Enter the dnsName of the subject of the certificate: ");
-      if (!p) return;
+      if (!p)
+	return;
 
       if (type == TYPE_CRT)
-        ret = gnutls_x509_crt_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
-          p, strlen(p), GNUTLS_FSAN_APPEND);
+	ret = gnutls_x509_crt_set_subject_alt_name (crt, GNUTLS_SAN_DNSNAME,
+						    p, strlen (p),
+						    GNUTLS_FSAN_APPEND);
       else
-        ret = gnutls_x509_crq_set_subject_alt_name( crt, GNUTLS_SAN_DNSNAME,
-          p, strlen(p), GNUTLS_FSAN_APPEND);
+	ret = gnutls_x509_crq_set_subject_alt_name (crt, GNUTLS_SAN_DNSNAME,
+						    p, strlen (p),
+						    GNUTLS_FSAN_APPEND);
     }
 
   if (ret < 0)

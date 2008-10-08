@@ -906,8 +906,8 @@ is_type_printable (int type)
  */
 int
 _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
-		    int seq, void *name, size_t * name_size,
-		    unsigned int *ret_type, int othername_oid)
+			    int seq, void *name, size_t * name_size,
+			    unsigned int *ret_type, int othername_oid)
 {
   unsigned int len;
   char nptr[MAX_NAME_SIZE];
@@ -1132,13 +1132,14 @@ get_subject_alt_name (gnutls_x509_crt_t cert,
     }
 
   result =
-    _gnutls_parse_general_name (c2, "", seq, ret, ret_size, ret_type, othername_oid);
+    _gnutls_parse_general_name (c2, "", seq, ret, ret_size, ret_type,
+				othername_oid);
 
   asn1_delete_structure (&c2);
 
   if (result < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return result;
     }
 

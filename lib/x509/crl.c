@@ -807,8 +807,7 @@ gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
   **/
 int
 gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
-				      size_t * ret_size,
-				      unsigned int *critical)
+			    size_t * ret_size, unsigned int *critical)
 {
   int result;
   gnutls_datum_t id;
@@ -839,8 +838,8 @@ gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
     }
 
   result = _gnutls_x509_ext_extract_number (ret, ret_size, id.data, id.size);
-  
-  _gnutls_free_datum( &id);
+
+  _gnutls_free_datum (&id);
 
   if (result < 0)
     {

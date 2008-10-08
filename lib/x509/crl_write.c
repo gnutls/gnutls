@@ -310,7 +310,7 @@ static void
 disable_optional_stuff (gnutls_x509_crl_t crl)
 {
 
-  if (crl->use_extensions == 0) 
+  if (crl->use_extensions == 0)
     {
       asn1_write_value (crl->crl, "tbsCertList.crlExtensions", NULL, 0);
     }
@@ -394,7 +394,7 @@ gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
  **/
 int
 gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,
-				      const void *nr, size_t nr_size)
+			    const void *nr, size_t nr_size)
 {
   int result;
   gnutls_datum_t old_id, der_data;

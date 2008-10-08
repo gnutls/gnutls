@@ -79,7 +79,7 @@ _cdk_stream_open_mode (const char *file, const char *mode,
 
   if (!file || !ret_s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -88,14 +88,14 @@ _cdk_stream_open_mode (const char *file, const char *mode,
   s = cdk_calloc (1, sizeof *s);
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   s->fname = cdk_strdup (file);
   if (!s->fname)
     {
       cdk_free (s);
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   s->fp = fopen (file, mode);
@@ -103,7 +103,7 @@ _cdk_stream_open_mode (const char *file, const char *mode,
     {
       cdk_free (s->fname);
       cdk_free (s);
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_File_Error;
     }
   _cdk_log_debug ("open stream fd=%d\n", fileno (s->fp));
@@ -130,7 +130,7 @@ cdk_stream_new_from_cbs (cdk_stream_cbs_t cbs, void *opa,
 
   if (!cbs || !opa || !ret_s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -138,7 +138,7 @@ cdk_stream_new_from_cbs (cdk_stream_cbs_t cbs, void *opa,
   s = cdk_calloc (1, sizeof *s);
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
 
@@ -172,7 +172,7 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
 
   if (!ret_s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -181,7 +181,7 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
   s = cdk_calloc (1, sizeof *s);
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   s->flags.write = 1;
@@ -193,7 +193,7 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
       if (!s->fname)
 	{
 	  cdk_free (s);
-          gnutls_assert();
+	  gnutls_assert ();
 	  return CDK_Out_Of_Core;
 	}
     }
@@ -202,7 +202,7 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
     {
       cdk_free (s->fname);
       cdk_free (s);
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_File_Error;
     }
   _cdk_log_debug ("new stream fd=%d\n", fileno (s->fp));
@@ -226,7 +226,7 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
 
   if (!file || !ret_s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -235,7 +235,7 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
   s = cdk_calloc (1, sizeof *s);
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   s->flags.write = 1;
@@ -244,7 +244,7 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
   if (!s->fname)
     {
       cdk_free (s);
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   s->fp = fopen (file, "w+b");
@@ -252,7 +252,7 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
     {
       cdk_free (s->fname);
       cdk_free (s);
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_File_Error;
     }
   _cdk_log_debug ("stream create fd=%d\n", fileno (s->fp));
@@ -294,7 +294,7 @@ cdk_stream_tmp_from_mem (const void *buf, size_t buflen, cdk_stream_t * r_out)
   rc = cdk_stream_tmp_new (&s);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
@@ -302,7 +302,7 @@ cdk_stream_tmp_from_mem (const void *buf, size_t buflen, cdk_stream_t * r_out)
   if (nwritten == EOF)
     {
       cdk_stream_close (s);
-      gnutls_assert();
+      gnutls_assert ();
       return s->error;
     }
   cdk_stream_seek (s, 0);
@@ -320,7 +320,7 @@ _cdk_stream_fpopen (FILE * fp, unsigned write_mode, cdk_stream_t * ret_out)
   s = cdk_calloc (1, sizeof *s);
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
 
@@ -343,7 +343,7 @@ _cdk_stream_append (const char *file, cdk_stream_t * ret_s)
 
   if (!ret_s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   *ret_s = NULL;
@@ -351,7 +351,7 @@ _cdk_stream_append (const char *file, cdk_stream_t * ret_s)
   rc = _cdk_stream_open_mode (file, "a+b", &s);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
@@ -394,7 +394,7 @@ cdk_stream_flush (cdk_stream_t s)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -419,7 +419,7 @@ cdk_stream_flush (cdk_stream_t s)
       if (rc)
 	{
 	  s->error = rc;
-          gnutls_assert();
+	  gnutls_assert ();
 	  return rc;
 	}
     }
@@ -453,7 +453,7 @@ cdk_stream_close (cdk_stream_t s)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -469,7 +469,7 @@ cdk_stream_close (cdk_stream_t s)
       else
 	rc = 0;
       cdk_free (s);
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
 
@@ -510,7 +510,7 @@ cdk_stream_close (cdk_stream_t s)
   s->cache.alloced = 0;
 
   cdk_free (s);
-  gnutls_assert();
+  gnutls_assert ();
   return rc;
 }
 
@@ -570,7 +570,7 @@ cdk_stream_get_length (cdk_stream_t s)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return (off_t) - 1;
     }
 
@@ -582,14 +582,14 @@ cdk_stream_get_length (cdk_stream_t s)
   if (rc)
     {
       s->error = rc;
-      gnutls_assert();
+      gnutls_assert ();
       return (off_t) - 1;
     }
 
   if (fstat (fileno (s->fp), &statbuf))
     {
       s->error = CDK_File_Error;
-      gnutls_assert();
+      gnutls_assert ();
       return (off_t) - 1;
     }
 
@@ -727,14 +727,14 @@ cdk_stream_filter_disable (cdk_stream_t s, int type)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
   fnc = stream_id_to_filter (type);
   if (!fnc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   f = filter_search (s, fnc);
@@ -757,7 +757,7 @@ stream_fp_replace (cdk_stream_t s, FILE ** tmp)
   rc = fclose (s->fp);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_File_Error;
     }
   s->fp = *tmp;
@@ -779,7 +779,7 @@ stream_filter_write (cdk_stream_t s)
 
   if (s->flags.filtrated)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -933,7 +933,7 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
   if (!s)
     {
       s->error = CDK_Inv_Value;
-      gnutls_assert();
+      gnutls_assert ();
       return EOF;
     }
 
@@ -947,7 +947,7 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
   if (s->flags.write && !s->flags.temp)
     {
       s->error = CDK_Inv_Mode;
-      gnutls_assert();
+      gnutls_assert ();
       return EOF;		/* This is a write stream */
     }
 
@@ -959,7 +959,7 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
 	  s->error = rc;
 	  if (feof (s->fp))
 	    s->flags.eof = 1;
-          gnutls_assert();
+	  gnutls_assert ();
 	  return EOF;
 	}
       s->flags.filtrated = 1;
@@ -990,14 +990,14 @@ cdk_stream_getc (cdk_stream_t s)
   if (!s)
     {
       s->error = CDK_Inv_Value;
-      gnutls_assert();
+      gnutls_assert ();
       return EOF;
     }
   nread = cdk_stream_read (s, buf, 1);
   if (nread == EOF)
     {
       s->error = CDK_File_Error;
-      gnutls_assert();
+      gnutls_assert ();
       return EOF;
     }
   return buf[0];
@@ -1023,7 +1023,7 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
   if (!s)
     {
       s->error = CDK_Inv_Value;
-      gnutls_assert();
+      gnutls_assert ();
       return EOF;
     }
 
@@ -1037,7 +1037,7 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
   if (!s->flags.write)
     {
       s->error = CDK_Inv_Mode;	/* this is a read stream */
-      gnutls_assert();
+      gnutls_assert ();
       return EOF;
     }
 
@@ -1082,7 +1082,7 @@ cdk_stream_putc (cdk_stream_t s, int c)
   if (!s)
     {
       s->error = CDK_Inv_Value;
-      gnutls_assert();
+      gnutls_assert ();
       return EOF;
     }
   buf[0] = c;
@@ -1107,7 +1107,7 @@ cdk_stream_seek (cdk_stream_t s, off_t offset)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -1127,7 +1127,7 @@ cdk_stream_seek (cdk_stream_t s, off_t offset)
 
   if (fseek (s->fp, offset, SEEK_SET))
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_File_Error;
     }
   return 0;
@@ -1164,13 +1164,13 @@ cdk_stream_set_armor_flag (cdk_stream_t s, int armor_type)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   f = filter_add (s, _cdk_filter_armor, fARMOR);
   if (!f)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   f->u.afx.idx = f->u.afx.idx2 = armor_type;
@@ -1201,7 +1201,7 @@ cdk_stream_set_literal_flag (cdk_stream_t s, cdk_lit_format_t mode,
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -1209,7 +1209,7 @@ cdk_stream_set_literal_flag (cdk_stream_t s, cdk_lit_format_t mode,
   f = filter_add (s, _cdk_filter_literal, fLITERAL);
   if (!f)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   f->u.pfx.mode = mode;
@@ -1240,7 +1240,7 @@ cdk_error_t
 cdk_stream_set_compress_flag (cdk_stream_t s, int algo, int level)
 {
 
-  gnutls_assert();
+  gnutls_assert ();
   return CDK_Not_Implemented;
 
 #if 0
@@ -1273,13 +1273,13 @@ cdk_stream_set_text_flag (cdk_stream_t s, const char *lf)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   f = filter_add (s, _cdk_filter_text, fTEXT);
   if (!f)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   f->ctl = stream_get_mode (s);
@@ -1303,18 +1303,18 @@ cdk_stream_set_hash_flag (cdk_stream_t s, int digest_algo)
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   if (stream_get_mode (s))
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Mode;
     }
   f = filter_add (s, _cdk_filter_hash, fHASH);
   if (!f)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Out_Of_Core;
     }
   f->ctl = stream_get_mode (s);
@@ -1336,12 +1336,12 @@ cdk_stream_enable_cache (cdk_stream_t s, int val)
 {
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   if (!s->flags.write)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Mode;
     }
   s->cache.on = val;
@@ -1368,10 +1368,10 @@ stream_cache_flush (cdk_stream_t s, FILE * fp)
     {
       nwritten = fwrite (s->cache.buf, 1, s->cache.size, fp);
       if (!nwritten)
-        {
-          gnutls_assert();
+	{
+	  gnutls_assert ();
 	  return CDK_File_Error;
-        }
+	}
       s->cache.size = 0;
       s->cache.on = 0;
       wipemem (s->cache.buf, s->cache.alloced);
@@ -1397,7 +1397,7 @@ cdk_stream_kick_off (cdk_stream_t inp, cdk_stream_t out)
 
   if (!inp || !out)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   rc = CDK_Success;
@@ -1440,7 +1440,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
 
   if (!ret_buf || !ret_buflen)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
   *ret_buf = NULL;
@@ -1448,7 +1448,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
 
   if (!s)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Value;
     }
 
@@ -1456,7 +1456,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
   if (s->cbs_hd)
     {
       _cdk_log_debug ("cdk_stream_mmap_part: not supported on callbacks\n");
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Inv_Mode;
     }
 
@@ -1464,13 +1464,13 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
   rc = cdk_stream_flush (s);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
   rc = cdk_stream_seek (s, off);
   if (rc)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return rc;
     }
   if (!len)
@@ -1478,12 +1478,12 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
   if (!len)
     {
       _cdk_log_debug ("cdk_stream_mmap_part: invalid file size %lu\n", len);
-      gnutls_assert();
+      gnutls_assert ();
       return s->error;
     }
   if (len > MAX_MAP_SIZE)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return CDK_Too_Short;
     }
 
@@ -1494,7 +1494,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
     *ret_buflen = n;
   rc = cdk_stream_seek (s, oldpos);
   if (rc)
-    gnutls_assert();
+    gnutls_assert ();
   return rc;
 }
 

@@ -816,7 +816,7 @@ main (int argc, char **argv)
   set_program_name (argv[0]);
 
 #ifdef gcry_fips_mode_active
-  if (gcry_fips_mode_active())
+  if (gcry_fips_mode_active ())
     {
       ret = gnutls_register_md5_handler ();
       if (ret)

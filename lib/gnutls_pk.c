@@ -55,7 +55,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
   gnutls_pk_params_st pk_params;
   gnutls_datum to_encrypt, encrypted;
 
-  for (i=0;i<params_len;i++)
+  for (i = 0; i < params_len; i++)
     pk_params.params[i] = params[i];
   pk_params.params_nr = params_len;
 
@@ -215,7 +215,7 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
   size_t esize, mod_bits;
   gnutls_pk_params_st pk_params;
 
-  for (i=0;i<params_len;i++)
+  for (i = 0; i < params_len; i++)
     pk_params.params[i] = params[i];
   pk_params.params_nr = params_len;
 
@@ -415,7 +415,7 @@ _gnutls_dsa_sign (gnutls_datum_t * signature,
   size_t k;
   gnutls_pk_params_st pk_params;
 
-  for (i=0;i<params_len;i++)
+  for (i = 0; i < params_len; i++)
     pk_params.params[i] = params[i];
   pk_params.params_nr = params_len;
 
@@ -497,7 +497,7 @@ _gnutls_dsa_verify (const gnutls_datum_t * vdata,
   int ret, i;
   gnutls_pk_params_st pk_params;
 
-  for (i=0;i<params_len;i++)
+  for (i = 0; i < params_len; i++)
     pk_params.params[i] = params[i];
   pk_params.params_nr = params_len;
 
@@ -535,7 +535,7 @@ _generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
       gnutls_assert ();
       return ret;
     }
-    
+
   if (resarr && resarr_len && *resarr_len >= params.params_nr)
     {
       *resarr_len = params.params_nr;

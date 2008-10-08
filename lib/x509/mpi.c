@@ -206,8 +206,8 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
 /* Extracts DSA and RSA parameters from a certificate.
  */
 static int
- get_mpis (int pk_algorithm, ASN1_TYPE asn, const char* root,
-			   bigint_t * params, int *params_size)
+get_mpis (int pk_algorithm, ASN1_TYPE asn, const char *root,
+	  bigint_t * params, int *params_size)
 {
   int result;
   char name[256];
@@ -215,13 +215,13 @@ static int
 
   /* Read the algorithm's parameters
    */
-  snprintf(name, sizeof(name), "%s.subjectPublicKey", root);
+  snprintf (name, sizeof (name), "%s.subjectPublicKey", root);
   result = _gnutls_x509_read_value (asn, name, &tmp, 2);
 
   if (result < 0)
     {
       gnutls_assert ();
-      fprintf(stderr, "name: %s\n", name);
+      fprintf (stderr, "name: %s\n", name);
       return result;
     }
 
@@ -274,7 +274,7 @@ static int
        */
       _gnutls_free_datum (&tmp);
 
-      snprintf(name, sizeof(name), "%s.algorithm.parameters", root);
+      snprintf (name, sizeof (name), "%s.algorithm.parameters", root);
       result = _gnutls_x509_read_value (asn, name, &tmp, 0);
 
       /* FIXME: If the parameters are not included in the certificate
@@ -325,8 +325,10 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
   /* Read the algorithm's OID
    */
   pk_algorithm = gnutls_x509_crt_get_pk_algorithm (cert, NULL);
-  
-  return get_mpis( pk_algorithm, cert->cert, "tbsCertificate.subjectPublicKeyInfo", params, params_size);
+
+  return get_mpis (pk_algorithm, cert->cert,
+		   "tbsCertificate.subjectPublicKeyInfo", params,
+		   params_size);
 }
 
 /* Extracts DSA and RSA parameters from a certificate.
@@ -340,8 +342,10 @@ _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
   /* Read the algorithm's OID
    */
   pk_algorithm = gnutls_x509_crq_get_pk_algorithm (cert, NULL);
-  
-  return get_mpis( pk_algorithm, cert->crq, "certificationRequestInfo.subjectPKInfo", params, params_size);
+
+  return get_mpis (pk_algorithm, cert->crq,
+		   "certificationRequestInfo.subjectPKInfo", params,
+		   params_size);
 }
 
 /*

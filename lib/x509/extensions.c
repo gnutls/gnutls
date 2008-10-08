@@ -34,9 +34,9 @@
 #include <gnutls_datum.h>
 
 static int
-get_extension (ASN1_TYPE asn, const char* root,
-				const char *extension_id, int indx,
-				gnutls_datum_t * ret, unsigned int *_critical)
+get_extension (ASN1_TYPE asn, const char *root,
+	       const char *extension_id, int indx,
+	       gnutls_datum_t * ret, unsigned int *_critical)
 {
   int k, result, len;
   char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
@@ -101,8 +101,7 @@ get_extension (ASN1_TYPE asn, const char* root,
 	      _gnutls_str_cat (name2, sizeof (name2), ".critical");
 
 	      len = sizeof (str_critical);
-	      result =
-		asn1_read_value (asn, name2, str_critical, &len);
+	      result = asn1_read_value (asn, name2, str_critical, &len);
 
 	      if (result == ASN1_ELEMENT_NOT_FOUND)
 		{
@@ -172,7 +171,8 @@ _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
 				const char *extension_id, int indx,
 				gnutls_datum_t * ret, unsigned int *_critical)
 {
-  return get_extension( cert->cert, "tbsCertificate.extensions", extension_id, indx, ret, _critical);
+  return get_extension (cert->cert, "tbsCertificate.extensions", extension_id,
+			indx, ret, _critical);
 }
 
 int
@@ -180,7 +180,8 @@ _gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
 				const char *extension_id, int indx,
 				gnutls_datum_t * ret, unsigned int *_critical)
 {
-  return get_extension( crl->crl, "tbsCertList.crlExtensions", extension_id, indx, ret, _critical);
+  return get_extension (crl->crl, "tbsCertList.crlExtensions", extension_id,
+			indx, ret, _critical);
 }
 
 
@@ -191,8 +192,8 @@ _gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
  * be returned.
  */
 static int
-get_extension_oid (ASN1_TYPE asn, const char* root,
-				    int indx, void *oid, size_t * sizeof_oid)
+get_extension_oid (ASN1_TYPE asn, const char *root,
+		   int indx, void *oid, size_t * sizeof_oid)
 {
   int k, result, len;
   char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
@@ -284,14 +285,16 @@ int
 _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
 				    int indx, void *oid, size_t * sizeof_oid)
 {
-  return get_extension_oid( cert->cert, "tbsCertificate.extensions", indx, oid, sizeof_oid);
+  return get_extension_oid (cert->cert, "tbsCertificate.extensions", indx,
+			    oid, sizeof_oid);
 }
 
 int
 _gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl,
 				    int indx, void *oid, size_t * sizeof_oid)
 {
-  return get_extension_oid( crl->crl, "tbsCertList.crlExtensions", indx, oid, sizeof_oid);
+  return get_extension_oid (crl->crl, "tbsCertList.crlExtensions", indx, oid,
+			    sizeof_oid);
 }
 
 /* This function will attempt to set the requested extension in
@@ -300,7 +303,7 @@ _gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl,
  * Critical will be either 0 or 1.
  */
 static int
-add_extension (ASN1_TYPE asn, const char* root, const char *extension_id,
+add_extension (ASN1_TYPE asn, const char *root, const char *extension_id,
 	       const gnutls_datum_t * ext_data, unsigned int critical)
 {
   int result;
@@ -323,8 +326,7 @@ add_extension (ASN1_TYPE asn, const char* root, const char *extension_id,
   else
     snprintf (name, sizeof (name), "?LAST.extnID");
 
-  result =
-    asn1_write_value (asn, name, extension_id, 1);
+  result = asn1_write_value (asn, name, extension_id, 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -341,8 +343,7 @@ add_extension (ASN1_TYPE asn, const char* root, const char *extension_id,
   else
     snprintf (name, sizeof (name), "?LAST.critical");
 
-  result =
-    asn1_write_value (asn, name, str, 1);
+  result = asn1_write_value (asn, name, str, 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -354,8 +355,7 @@ add_extension (ASN1_TYPE asn, const char* root, const char *extension_id,
   else
     snprintf (name, sizeof (name), "?LAST.extnValue");
 
-  result =
-    _gnutls_x509_write_value (asn, name, ext_data, 0);
+  result = _gnutls_x509_write_value (asn, name, ext_data, 0);
   if (result < 0)
     {
       gnutls_assert ();
@@ -369,7 +369,7 @@ add_extension (ASN1_TYPE asn, const char* root, const char *extension_id,
  * index here starts from one.
  */
 static int
-overwrite_extension (ASN1_TYPE asn, const char* root, unsigned int indx,
+overwrite_extension (ASN1_TYPE asn, const char *root, unsigned int indx,
 		     const gnutls_datum_t * ext_data, unsigned int critical)
 {
   char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
@@ -410,10 +410,9 @@ overwrite_extension (ASN1_TYPE asn, const char* root, unsigned int indx,
 }
 
 static int
-set_extension (ASN1_TYPE asn, const char* root,
-				const char *ext_id,
-				const gnutls_datum_t * ext_data,
-				unsigned int critical)
+set_extension (ASN1_TYPE asn, const char *root,
+	       const char *ext_id,
+	       const gnutls_datum_t * ext_data, unsigned int critical)
 {
   int result;
   int k, len;
@@ -428,9 +427,9 @@ set_extension (ASN1_TYPE asn, const char* root,
       k++;
 
       if (root[0] != 0)
-        snprintf (name, sizeof (name), "%s.?%u", root, k);
+	snprintf (name, sizeof (name), "%s.?%u", root, k);
       else
-        snprintf (name, sizeof (name), "?%u", k);
+	snprintf (name, sizeof (name), "?%u", k);
 
       len = sizeof (extnID) - 1;
       result = asn1_read_value (asn, name, extnID, &len);
@@ -503,7 +502,8 @@ _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
 				const gnutls_datum_t * ext_data,
 				unsigned int critical)
 {
-  return set_extension( cert->cert, "tbsCertificate.extensions", ext_id, ext_data, critical); 
+  return set_extension (cert->cert, "tbsCertificate.extensions", ext_id,
+			ext_data, critical);
 }
 
 int
@@ -512,7 +512,8 @@ _gnutls_x509_crl_set_extension (gnutls_x509_crl_t crl,
 				const gnutls_datum_t * ext_data,
 				unsigned int critical)
 {
-  return set_extension( crl->crl, "tbsCertList.crlExtensions", ext_id, ext_data, critical); 
+  return set_extension (crl->crl, "tbsCertList.crlExtensions", ext_id,
+			ext_data, critical);
 }
 
 #ifdef ENABLE_PKI
@@ -523,28 +524,28 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 				unsigned int critical)
 {
   unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t extensions_size = sizeof(extensions);
+  size_t extensions_size = sizeof (extensions);
   gnutls_datum der;
   ASN1_TYPE c2;
   int result;
 
   result = gnutls_x509_crq_get_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
-				      0, extensions, &extensions_size);
+						 0, extensions,
+						 &extensions_size);
   if (result < 0)
     {
-      if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) 
-        {
-          extensions_size = 0;
-        } 
-      else 
-        {
-          gnutls_assert ();
-          return result;
-        }
+      if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	{
+	  extensions_size = 0;
+	}
+      else
+	{
+	  gnutls_assert ();
+	  return result;
+	}
     }
 
-  result = asn1_create_element
-    (_gnutls_get_pkix (), "PKIX1.Extensions", &c2);
+  result = asn1_create_element (_gnutls_get_pkix (), "PKIX1.Extensions", &c2);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -555,14 +556,14 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
     {
       result = asn1_der_decoding (&c2, extensions, extensions_size, NULL);
       if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          asn1_delete_structure (&c2);
-          return _gnutls_asn2err (result);
-        }
+	{
+	  gnutls_assert ();
+	  asn1_delete_structure (&c2);
+	  return _gnutls_asn2err (result);
+	}
     }
 
-  result = set_extension( c2, "", ext_id, ext_data, critical); 
+  result = set_extension (c2, "", ext_id, ext_data, critical);
   if (result < 0)
     {
       gnutls_assert ();
@@ -581,7 +582,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
     }
 
   result = gnutls_x509_crq_set_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
-				      der.data, der.size);
+						 der.data, der.size);
 
   if (result < 0)
     {
@@ -589,7 +590,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
       return result;
     }
 
-  
+
   return 0;
 }
 
@@ -763,10 +764,9 @@ _gnutls_x509_ext_gen_basicConstraints (int CA,
 /* extract an INTEGER from the DER encoded extension
  */
 int
-_gnutls_x509_ext_extract_number (opaque *number,
-					   size_t* _nr_size,
-					   opaque * extnValue,
-					   int extnValueLen)
+_gnutls_x509_ext_extract_number (opaque * number,
+				 size_t * _nr_size,
+				 opaque * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -776,7 +776,8 @@ _gnutls_x509_ext_extract_number (opaque *number,
    * to using INTEGER.
    */
   if ((result = asn1_create_element
-       (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber", &ext)) != ASN1_SUCCESS)
+       (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber",
+	&ext)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -797,7 +798,7 @@ _gnutls_x509_ext_extract_number (opaque *number,
     result = _gnutls_asn2err (result);
   else
     result = 0;
-  
+
   *_nr_size = nr_size;
 
   asn1_delete_structure (&ext);
@@ -808,13 +809,15 @@ _gnutls_x509_ext_extract_number (opaque *number,
 /* generate an INTEGER in a DER encoded extension
  */
 int
-_gnutls_x509_ext_gen_number (const opaque* number, size_t nr_size, gnutls_datum_t * der_ext)
+_gnutls_x509_ext_gen_number (const opaque * number, size_t nr_size,
+			     gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
 
   result =
-    asn1_create_element (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber", &ext);
+    asn1_create_element (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber",
+			 &ext);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -954,8 +957,10 @@ write_new_general_name (ASN1_TYPE ext, const char *ext_name,
  */
 int
 _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
-				       type, const void* data, unsigned int data_size,
-				       gnutls_datum_t* prev_der_ext, gnutls_datum_t * der_ext)
+				       type, const void *data,
+				       unsigned int data_size,
+				       gnutls_datum_t * prev_der_ext,
+				       gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -968,16 +973,19 @@ _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
       return _gnutls_asn2err (result);
     }
 
-  if (prev_der_ext != NULL && prev_der_ext->data != NULL && prev_der_ext->size != 0) 
+  if (prev_der_ext != NULL && prev_der_ext->data != NULL
+      && prev_der_ext->size != 0)
     {
-      result = asn1_der_decoding (&ext, prev_der_ext->data, prev_der_ext->size, NULL);
+      result =
+	asn1_der_decoding (&ext, prev_der_ext->data, prev_der_ext->size,
+			   NULL);
 
       if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          asn1_delete_structure (&ext);
-          return _gnutls_asn2err (result);
-        }
+	{
+	  gnutls_assert ();
+	  asn1_delete_structure (&ext);
+	  return _gnutls_asn2err (result);
+	}
     }
 
   result = write_new_general_name (ext, "", type, data, data_size);
@@ -1090,7 +1098,8 @@ _gnutls_x509_ext_gen_auth_key_id (const void *id, size_t id_size,
  */
 int
 _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
-				      type, const void *data, unsigned int data_size,
+				      type, const void *data,
+				      unsigned int data_size,
 				      unsigned int reason_flags,
 				      gnutls_datum_t * der_ext)
 {

@@ -116,16 +116,16 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 	}
 
       if (cdk_armor_filter_use (inp))
-        {
+	{
 	  rc = cdk_stream_set_armor_flag (inp, 0);
 	  if (rc != 0)
 	    {
 	      rc = _gnutls_map_cdk_rc (rc);
-              cdk_stream_close (inp);
+	      cdk_stream_close (inp);
 	      gnutls_assert ();
 	      return rc;
-            }
-        }
+	    }
+	}
 
       rc = cdk_keydb_get_keyblock (inp, &key->knode);
       cdk_stream_close (inp);

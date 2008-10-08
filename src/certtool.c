@@ -72,7 +72,7 @@ static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
 static void gaa_parser (int argc, char **argv);
 void generate_self_signed (void);
 void generate_request (void);
-gnutls_x509_crt_t *load_cert_list (int mand, size_t *size);
+gnutls_x509_crt_t *load_cert_list (int mand, size_t * size);
 
 static void print_hex_datum (gnutls_datum_t * dat);
 
@@ -352,7 +352,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
     fprintf (stderr, "\n\nExtensions.\n");
 
   /* do not allow extensions on a v1 certificate */
-  if (crq && get_crq_extensions_status()!=0)
+  if (crq && get_crq_extensions_status () != 0)
     {
       result = gnutls_x509_crt_set_crq_extensions (crt, crq);
       if (result < 0)
@@ -416,8 +416,8 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 
 	  if (!proxy)
 	    {
-	      get_dns_name_set( TYPE_CRT, crt);
-	      get_ip_addr_set( TYPE_CRT, crt);
+	      get_dns_name_set (TYPE_CRT, crt);
+	      get_ip_addr_set (TYPE_CRT, crt);
 	    }
 
 	  result =
@@ -428,7 +428,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	}
       else if (!proxy)
 	{
-	  get_email_set( TYPE_CRT, crt);
+	  get_email_set (TYPE_CRT, crt);
 	}
 
       if (!ca_status || server)
@@ -604,35 +604,32 @@ generate_crl (gnutls_x509_crt_t ca_crt)
     {
       size = sizeof (buffer);
       result = gnutls_x509_crt_get_subject_key_id (ca_crt, buffer,
-						       &size, NULL);
+						   &size, NULL);
       if (result < 0)
-        {
-           size = sizeof (buffer);
-           result = gnutls_x509_crt_get_key_id (ca_crt, 0, buffer, &size);
-        }
+	{
+	  size = sizeof (buffer);
+	  result = gnutls_x509_crt_get_key_id (ca_crt, 0, buffer, &size);
+	}
       if (result >= 0)
-        {
-	      result =
-		gnutls_x509_crl_set_authority_key_id (crl, buffer, size);
-	      if (result < 0)
-		error (EXIT_FAILURE, 0, "set_authority_key_id: %s",
-		       gnutls_strerror (result));
-        }
+	{
+	  result = gnutls_x509_crl_set_authority_key_id (crl, buffer, size);
+	  if (result < 0)
+	    error (EXIT_FAILURE, 0, "set_authority_key_id: %s",
+		   gnutls_strerror (result));
+	}
     }
 
-    number = get_crl_number ();
-    
-    buffer[4] = number & 0xff;
-    buffer[3] = (number >> 8) & 0xff;
-    buffer[2] = (number >> 16) & 0xff;
-    buffer[1] = (number >> 24) & 0xff;
-    buffer[0] = 0;
+  number = get_crl_number ();
 
-    result =
-	gnutls_x509_crl_set_number(crl, buffer, 5);
-    if (result < 0)
-	error (EXIT_FAILURE, 0, "set_number: %s",
-	       gnutls_strerror (result));
+  buffer[4] = number & 0xff;
+  buffer[3] = (number >> 8) & 0xff;
+  buffer[2] = (number >> 16) & 0xff;
+  buffer[1] = (number >> 24) & 0xff;
+  buffer[0] = 0;
+
+  result = gnutls_x509_crl_set_number (crl, buffer, 5);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "set_number: %s", gnutls_strerror (result));
 
   return crl;
 }
@@ -921,7 +918,7 @@ gaa_parser (int argc, char **argv)
     gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
 #ifdef gcry_fips_mode_active
-  if (gcry_fips_mode_active())
+  if (gcry_fips_mode_active ())
     {
       ret = gnutls_register_md5_handler ();
       if (ret)
@@ -1010,7 +1007,7 @@ gaa_parser (int argc, char **argv)
       break;
 #endif
     case ACTION_REQUEST:
-      crq_info();
+      crq_info ();
       break;
     default:
       gaa_help ();
@@ -1073,8 +1070,8 @@ certificate_info (void)
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
       fwrite (buffer, 1, size, outfile);
-      
-      gnutls_x509_crt_deinit( crt[i]);
+
+      gnutls_x509_crt_deinit (crt[i]);
     }
 }
 
@@ -1514,15 +1511,15 @@ privkey_info (void)
 	fprintf (stderr, "Error in key RSA data export: %s\n",
 		 gnutls_strerror (ret));
       else
-        {
+	{
 	  print_rsa_pkey (&m, &e, &d, &p, &q, &u);
-          gnutls_free(m.data);
-          gnutls_free(e.data);
-          gnutls_free(d.data);
-          gnutls_free(p.data);
-          gnutls_free(q.data);
-          gnutls_free(u.data);
-        }
+	  gnutls_free (m.data);
+	  gnutls_free (e.data);
+	  gnutls_free (d.data);
+	  gnutls_free (p.data);
+	  gnutls_free (q.data);
+	  gnutls_free (u.data);
+	}
     }
   else if (ret == GNUTLS_PK_DSA)
     {
@@ -1533,14 +1530,14 @@ privkey_info (void)
 	fprintf (stderr, "Error in key DSA data export: %s\n",
 		 gnutls_strerror (ret));
       else
-        {
+	{
 	  print_dsa_pkey (&x, &y, &p, &q, &g);
-          gnutls_free(x.data);
-          gnutls_free(y.data);
-          gnutls_free(p.data);
-          gnutls_free(q.data);
-          gnutls_free(g.data);
-        }
+	  gnutls_free (x.data);
+	  gnutls_free (y.data);
+	  gnutls_free (p.data);
+	  gnutls_free (q.data);
+	  gnutls_free (g.data);
+	}
     }
 
   fprintf (outfile, "\n");
@@ -1757,7 +1754,7 @@ load_cert (int mand)
 /* Loads a certificate list
  */
 gnutls_x509_crt_t *
-load_cert_list (int mand, size_t *crt_size)
+load_cert_list (int mand, size_t * crt_size)
 {
   FILE *fd;
   static gnutls_x509_crt_t crt[MAX_CERTS];
@@ -1819,7 +1816,7 @@ load_cert_list (int mand, size_t *crt_size)
 
       (*crt_size)++;
     }
-  fprintf (stderr, "Loaded %d certificates.\n", (int)*crt_size);
+  fprintf (stderr, "Loaded %d certificates.\n", (int) *crt_size);
 
   return crt;
 }
@@ -1863,9 +1860,9 @@ generate_request (void)
   get_uid_crq_set (crq);
   get_oid_crq_set (crq);
 
-  get_dns_name_set( TYPE_CRQ, crq);
-  get_ip_addr_set( TYPE_CRQ, crq);
-  get_email_set( TYPE_CRQ, crq);
+  get_dns_name_set (TYPE_CRQ, crq);
+  get_ip_addr_set (TYPE_CRQ, crq);
+  get_email_set (TYPE_CRQ, crq);
 
   pass = get_challenge_pass ();
 
@@ -1882,10 +1879,10 @@ generate_request (void)
   else
     path_len = -1;
 
-  ret =
-	gnutls_x509_crq_set_basic_constraints (crq, ca_status, path_len);
+  ret = gnutls_x509_crq_set_basic_constraints (crq, ca_status, path_len);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "set_basic_constraints: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "set_basic_constraints: %s",
+	   gnutls_strerror (ret));
 
 
   ret = get_sign_status (1);
@@ -1900,64 +1897,57 @@ generate_request (void)
 
   if (ca_status)
     {
-	  ret = get_cert_sign_status ();
-	  if (ret)
-	    usage |= GNUTLS_KEY_KEY_CERT_SIGN;
+      ret = get_cert_sign_status ();
+      if (ret)
+	usage |= GNUTLS_KEY_KEY_CERT_SIGN;
 
-	  ret = get_crl_sign_status ();
-	  if (ret)
-	    usage |= GNUTLS_KEY_CRL_SIGN;
+      ret = get_crl_sign_status ();
+      if (ret)
+	usage |= GNUTLS_KEY_CRL_SIGN;
 
-	  ret = get_code_sign_status ();
-	  if (ret)
-	    {
-	      ret =
-		gnutls_x509_crq_set_key_purpose_oid (crq,
-						     GNUTLS_KP_CODE_SIGNING,
-						     0);
-	      if (ret < 0)
-		error (EXIT_FAILURE, 0, "key_kp: %s",
-		       gnutls_strerror (ret));
-	    }
+      ret = get_code_sign_status ();
+      if (ret)
+	{
+	  ret =
+	    gnutls_x509_crq_set_key_purpose_oid (crq,
+						 GNUTLS_KP_CODE_SIGNING, 0);
+	  if (ret < 0)
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	}
 
-	  ret = get_ocsp_sign_status ();
-	  if (ret)
-	    {
-	      ret =
-		gnutls_x509_crq_set_key_purpose_oid (crq,
-						     GNUTLS_KP_OCSP_SIGNING,
-						     0);
-	      if (ret < 0)
-		error (EXIT_FAILURE, 0, "key_kp: %s",
-		       gnutls_strerror (ret));
-	    }
+      ret = get_ocsp_sign_status ();
+      if (ret)
+	{
+	  ret =
+	    gnutls_x509_crq_set_key_purpose_oid (crq,
+						 GNUTLS_KP_OCSP_SIGNING, 0);
+	  if (ret < 0)
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	}
 
-	  ret = get_time_stamp_status ();
-	  if (ret)
-	    {
-	      ret =
-		gnutls_x509_crq_set_key_purpose_oid (crq,
-						     GNUTLS_KP_TIME_STAMPING,
-						     0);
-	      if (ret < 0)
-		error (EXIT_FAILURE, 0, "key_kp: %s",
-		       gnutls_strerror (ret));
-	    }
+      ret = get_time_stamp_status ();
+      if (ret)
+	{
+	  ret =
+	    gnutls_x509_crq_set_key_purpose_oid (crq,
+						 GNUTLS_KP_TIME_STAMPING, 0);
+	  if (ret < 0)
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	}
 
     }
 
   ret = gnutls_x509_crq_set_key_usage (crq, usage);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "key_usage: %s",
-		   gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "key_usage: %s", gnutls_strerror (ret));
 
   ret = get_tls_client_status ();
   if (ret != 0)
     {
-       ret = gnutls_x509_crq_set_key_purpose_oid (crq,
-				GNUTLS_KP_TLS_WWW_CLIENT, 0);
-       if (ret < 0) 
-         error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+      ret = gnutls_x509_crq_set_key_purpose_oid (crq,
+						 GNUTLS_KP_TLS_WWW_CLIENT, 0);
+      if (ret < 0)
+	error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
     }
 
   ret = get_tls_server_status ();
@@ -1966,7 +1956,7 @@ generate_request (void)
       ret = gnutls_x509_crq_set_key_purpose_oid (crq,
 						 GNUTLS_KP_TLS_WWW_SERVER, 0);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
     }
 
   ret = gnutls_x509_crq_set_key (crq, key);
@@ -2873,7 +2863,8 @@ smime_to_pkcs7 (void)
   free (lineptr);
 }
 
-void certtool_version (void)
+void
+certtool_version (void)
 {
   const char *p = PACKAGE_NAME;
   if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)

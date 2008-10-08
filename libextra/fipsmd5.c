@@ -194,25 +194,23 @@ hmacmd5deinit (void *ctx)
   gnutls_free (p);
 }
 
-gnutls_crypto_single_digest_st dig =
-  {
-    md5init,
-    NULL,
-    md5hash,
-    md5copy,
-    md5output,
-    md5deinit
-  };
+gnutls_crypto_single_digest_st dig = {
+  md5init,
+  NULL,
+  md5hash,
+  md5copy,
+  md5output,
+  md5deinit
+};
 
-gnutls_crypto_single_mac_st mac =
-  {
-    hmacmd5init,
-    hmacmd5setkey,
-    hmacmd5hash,
-    hmacmd5copy,
-    hmacmd5output,
-    hmacmd5deinit
-  };
+gnutls_crypto_single_mac_st mac = {
+  hmacmd5init,
+  hmacmd5setkey,
+  hmacmd5hash,
+  hmacmd5copy,
+  hmacmd5output,
+  hmacmd5deinit
+};
 
 /**
  * gnutls_register_md5_handler:
