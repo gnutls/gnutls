@@ -132,7 +132,7 @@ endif
 if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
-libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS) 
+libgnutls_la_LDFLAGS += $(LTLIBTASN1)
 endif
 
 if HAVE_LD_OUTPUT_DEF

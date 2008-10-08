@@ -69,7 +69,7 @@ libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_
 if ENABLE_MINITASN1
 libgnutls_openssl_la_LIBADD += ../lib/minitasn1/libminitasn1.la
 else
-libgnutls_openssl_la_LDFLAGS += $(LIBTASN1_LIBS) 
+libgnutls_openssl_la_LDFLAGS += $(LTLIBTASN1)
 endif
 
 if HAVE_LD_OUTPUT_DEF
