@@ -194,7 +194,7 @@ hmacmd5deinit (void *ctx)
   gnutls_free (p);
 }
 
-gnutls_crypto_single_digest_st dig =
+static gnutls_crypto_single_digest_st dig =
   {
     md5init,
     NULL,
@@ -204,7 +204,7 @@ gnutls_crypto_single_digest_st dig =
     md5deinit
   };
 
-gnutls_crypto_single_mac_st mac =
+static gnutls_crypto_single_mac_st mac =
   {
     hmacmd5init,
     hmacmd5setkey,
