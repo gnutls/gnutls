@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.6.1 (unreleased)
 
+** libgnutls-extra: Protect internal symbols with static.
+Fixes problem when linking certtool statically.  Tiny patch from Aaron
+Ucko <ucko@ncbi.nlm.nih.gov>.
+
 ** libgnutls-openssl: Fix patch against X509_get_issuer_name.
 It incorrectly returned the subject DN instead of issuer DN in v2.6.0.
 Thanks to Thomas Viehmann <tv@beamnet.de> for report.
