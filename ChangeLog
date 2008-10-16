@@ -1,3 +1,321 @@
+2008-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.0.
+
+2008-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Drop netdb.h check.
+
+2008-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* lgl/Makefile.am, lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/netdb_h.m4, lgl/netdb.in.h, lgl/tests/Makefile.am,
+	lgl/tests/test-netdb.c, src/common.h: Add netdb gnulib module.  Use
+	it.
+
+2008-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am: Upgrade.
+
+2008-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, gl/getaddrinfo.c, gl/m4/getaddrinfo.m4,
+	lgl/Makefile.am, lgl/m4/gnulib-comp.m4, lgl/m4/stdio_h.m4,
+	lgl/m4/sys_ioctl_h.m4, lgl/m4/sys_socket_h.m4, lgl/m4/unistd_h.m4,
+	lgl/stdio-write.c, lgl/stdio.in.h, lgl/sys_socket.in.h,
+	lgl/unistd.in.h, lgl/winsock.c: Update gnulib files.
+
+2008-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Need to build libutils.la before recursing into
+	e.g. pkcs12-decode.
+
+2008-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp: Minimize ABI changes.
+
+2008-10-13  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-10-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Improve GNUTLS_E_AGAIN explanation.
+	Suggested by "Lavrentiev, Anton (NIH/NLM/NCBI) [C]"
+	<lavr@ncbi.nlm.nih.gov>.
+
+2008-10-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO: Add.
+
+2008-10-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-11  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS, libextra/fipsmd5.c: Add static qualifiers on internal
+	symbols.  Tiny patch from Aaron Ucko <ucko@ncbi.nlm.nih.gov>.
+
+2008-10-09  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Sync with upstream.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.h, lib/opencdk/armor.c, lib/opencdk/hash.c,
+	lib/opencdk/kbnode.c, lib/opencdk/new-packet.c,
+	lib/opencdk/seskey.c, lib/opencdk/verify.c, lib/x509/x509_int.h,
+	src/cfg/platon/str/strplus.c: Fix syntax-check warnings.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/opencdk.h: Indent.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/debug.c, lib/opencdk/seskey.c, lib/opencdk/sig-check.c: Drop
+	gcrypt.h includes.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention libgcrypt dependency.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/opencdk/Makefile.am,
+	lib/openpgp/Makefile.am, lib/x509/Makefile.am, libextra/Makefile.am: 
+	More libgcrypt fixes.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, src/Makefile.am, tests/Makefile.am: 
+	More libgcrypt fixes.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/gnutls_global.c, m4/libgcrypt.m4: Modernize
+	libgcrypt detection.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls-docs.sgml, includes/gnutls/x509.h,
+	lib/x509/crl.c, lib/x509/crl_write.c, lib/x509/crq.c,
+	lib/x509/output.c, lib/x509/x509_write.c: Doc fixes.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Sync with real list.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_int.h: Need libtasn1.h here.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_rsa.c, lib/auth_rsa_export.c, lib/gnutls_cert.c,
+	lib/gnutls_cert.h, lib/gnutls_mpi.h, lib/gnutls_sig.c,
+	lib/gnutls_x509.c, lib/mpi-libgcrypt.c, lib/rnd-libgcrypt.c: Reduce
+	libtasn1.h includes.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Drop obsolete libtasn1 flags.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, libextra/Makefile.am, src/Makefile.am: Update
+	libtasn1 linker flags.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, configure.in, gl/arpa_inet.in.h, gl/c-ctype.h,
+	gl/gnulib.mk, gl/m4/arpa_inet_h.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4,
+	gl/strerror.c, lgl/Makefile.am, lgl/c-ctype.h, lgl/errno.in.h,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-comp.m4, lgl/m4/memcmp.m4,
+	lgl/m4/stdio_h.m4, lgl/m4/string_h.m4, lgl/m4/sys_socket_h.m4,
+	lgl/m4/unistd_h.m4, lgl/m4/wchar.m4, lgl/stdio.in.h,
+	lgl/string.in.h, lgl/sys_socket.in.h, lgl/unistd.in.h,
+	libextra/gl/Makefile.am, libextra/gl/m4/gnulib-cache.m4,
+	libextra/gl/md5.c: Update gnulib files.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove obsolete stuff.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c, lib/gnutls_constate.c, lib/gnutls_mpi.c,
+	lib/gnutls_pk.c, lib/opencdk/armor.c, lib/opencdk/hash.c,
+	lib/opencdk/kbnode.c, lib/opencdk/keydb.c, lib/opencdk/pubkey.c,
+	lib/opencdk/stream.c, lib/openpgp/privkey.c, lib/x509/common.c,
+	lib/x509/crl.c, lib/x509/crl_write.c, lib/x509/crq.c,
+	lib/x509/extensions.c, lib/x509/mpi.c, lib/x509/output.c,
+	lib/x509/privkey.c, lib/x509/x509.c, lib/x509/x509_write.c,
+	libextra/fipsmd5.c, libextra/gl/md5.c, src/certtool-cfg.c,
+	src/certtool.c, src/cli.c, src/serv.c: Indent.
+
+2008-10-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, lib/gnutls_global.c, m4/libtasn1.m4: Detect
+	libtasn1 via AC_LIB_HAVE_LINKFLAGS.
+
+2008-10-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-10-07  Ludovic Courtès <ludo@gnu.org>
+
+	* tests/Makefile.am: More test compilation fixes with minitasn1.  * tests/Makefile.am (AM_CPPFLAGS)[ENABLE_MINITASN1]: Add minitasn1   directory.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2008-10-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-07  Ludovic Courtès <ludo@gnu.org>
+
+	* tests/pkcs12-decode/Makefile.am: Fix compilation of
+	`pkcs12-decode' test when using minitasn1.  * tests/pkcs12-decode/Makefile.am (AM_CPPFLAGS)[ENABLE_MINITASN1]:
+	  Add `minitasn1' include directory.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Get issuer dn in X509_get_issuer_name,
+	correct last patch.
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add 2.6.0 entries.
+
+2008-10-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-10-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-05  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Fix out-of-bounds access.  Similar to
+	debian #499945 lynx-cur problem.  libextra/gnutls_openssl.c: fix
+	X509_get_issuer_name to return issuer name of given certificate and
+	not try to get the subject dn of the issuer certificate wich may or
+	may not exist. (Checked how openssl does this, too.) This fixes a
+	accessing an array outside its bounds.  Debian bug #499945 is
+	instructive about the problem. While lynx-cur credits Thomas Dickey
+	for the bug, the code and implications are essentially the same for
+	the gnutls openssl-compat libary.  Tiny patch from Thomas Viehmann
+	<tv@beamnet.de>.
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool-cfg.c, src/certtool-cfg.h, src/certtool-common.h,
+	src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.c,
+	src/certtool.gaa: reduced warnings in compilation of certtool.
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/output.c: use union to avoid wrong type issues.
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/output.c: corrected print order.
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, doc/certtool.cfg, includes/gnutls/x509.h,
+	lib/gnutls_errors.h, lib/gnutls_handshake.c, lib/x509/common.c,
+	lib/x509/crl.c, lib/x509/crq.c, lib/x509/dn.c,
+	lib/x509/extensions.c, lib/x509/mpi.c, lib/x509/output.c,
+	lib/x509/pkcs12.c, lib/x509/pkcs7.c, lib/x509/x509.c,
+	lib/x509/x509_int.h, lib/x509/x509_write.c, src/certtool-cfg.c,
+	src/certtool-cfg.h, src/certtool.c: Added function to copy
+	extensions from a CRL to a certificate.  Reduced many warnings (and
+	added more by defining gnutls_log as printf like function --gcc
+	only)
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* configure.in: Disable certain warnings that do not work with my
+	compiler.
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, includes/gnutls/x509.h, lib/x509/crq.c,
+	lib/x509/extensions.c, lib/x509/output.c, src/certtool.c: Added
+	gnutls_x509_crq_set_key_purpose_oid and
+	gnutls_x509_crq_get_key_purpose_oid.
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: documentation added functions
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: updated
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/crq.c, lib/x509/extensions.c, lib/x509/x509_int.h: set
+	global maximum size for certificate requests' extensions size.
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/Makefile.am: added missing file
+
+2008-10-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* includes/gnutls/x509.h, lib/x509/crl.c, lib/x509/crq.c,
+	lib/x509/extensions.c, lib/x509/mpi.c, lib/x509/output.c,
+	lib/x509/x509.c, lib/x509/x509_int.h, src/certtool-cfg.c,
+	src/certtool-cfg.h, src/certtool-common.h, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa: Added initial
+	support for certificate requests handling of X.509 extensions.
+	Added support to certtool to handle these extensions (add/read)
+
+2008-10-03  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, doc/certtool.cfg, includes/gnutls/x509.h, lib/x509/crl.c,
+	lib/x509/crl_write.c, lib/x509/extensions.c, lib/x509/output.c,
+	lib/x509/x509_int.h, src/certtool-cfg.c, src/certtool-cfg.h,
+	src/certtool.c: Added functions to handle and set CRL extensions.
+
+2008-10-01  Simon Josefsson <simon@josefsson.org>
+
+	* po/nl.po.in, po/vi.po.in: Sync with TP.
+
+2008-10-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-09-29  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit c357933a30801a82e484bed8fbc4bd5b2b34d5e0 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Mon Sep 29 15:08:02
+	2008 +0300
+
+2008-09-29  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-09-29  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.5.9.
