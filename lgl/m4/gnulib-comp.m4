@@ -62,6 +62,7 @@ AC_DEFUN([lgl_INIT],
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
   gl_MINMAX
+  gl_HEADER_NETDB
   gl_FUNC_READ_FILE
   gl_FUNC_REALLOC_POSIX
   gl_STDLIB_MODULE_INDICATOR([realloc-posix])
@@ -246,6 +247,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/memmem.c
   lib/memmove.c
   lib/minmax.h
+  lib/netdb.in.h
   lib/printf-args.c
   lib/printf-args.h
   lib/printf-parse.c
@@ -313,6 +315,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/memmem.m4
   m4/memmove.m4
   m4/minmax.m4
+  m4/netdb_h.m4
   m4/nls.m4
   m4/po.m4
   m4/printf-posix.m4
@@ -359,6 +362,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-lseek.sh
   tests/test-memchr.c
   tests/test-memcmp.c
+  tests/test-netdb.c
   tests/test-read-file.c
   tests/test-snprintf.c
   tests/test-stdbool.c
