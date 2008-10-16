@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2006, 2007 Free Software Foundation
+# Copyright (C) 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -21,17 +21,20 @@
 
 AUTOMAKE_OPTIONS = 1.5 gnits
 
+SUBDIRS =
 noinst_HEADERS =
 noinst_LIBRARIES =
 noinst_LTLIBRARIES =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
-MOSTLYCLEANFILES =
+MOSTLYCLEANFILES = core *.stackdump
 MOSTLYCLEANDIRS =
 CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
+SUBDIRS += tests
+EXTRA_DIST += m4/gnulib-cache.m4
 
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl
 
