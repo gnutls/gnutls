@@ -10,6 +10,9 @@ See the end for copying conditions.
 ** libgnutls: Added functions to handle X.509 extensions in Certificate
 Requests.
 
+** libgnutls: Improved error string for GNUTLS_E_AGAIN.
+Suggested by "Lavrentiev, Anton (NIH/NLM/NCBI) [C]" <lavr@ncbi.nlm.nih.gov>.
+
 ** certtool: Print and set CRL and CRQ extensions.
 
 ** libgnutls-extra: Protect internal symbols with static.
