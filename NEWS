@@ -23,6 +23,8 @@ Ucko <ucko@ncbi.nlm.nih.gov>.
 Problem in X509_get_subject_name and X509_get_issuer_name.  Tiny patch
 from Thomas Viehmann <tv@beamnet.de>.
 
+** libgnutlsxx: Define server_session::get_srp_username even if no SRP.
+
 ** tests: Make tests compile when using internal libtasn1.
 Patch by ludo@gnu.org (Ludovic Courtès).
 
