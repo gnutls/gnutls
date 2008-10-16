@@ -79,6 +79,7 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_STRVERSCMP
   gl_STRING_MODULE_INDICATOR([strverscmp])
   gl_HEADER_SYS_SOCKET
+  gl_MODULE_INDICATOR([sys_socket])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
@@ -332,6 +333,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/string_h.m4
   m4/strings_h.m4
   m4/strverscmp.m4
+  m4/sys_ioctl_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
   m4/threadlib.m4

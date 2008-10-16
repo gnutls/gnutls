@@ -138,10 +138,9 @@ rpl_fd_isset (int fd, fd_set * set)
 
 /* Wrap everything else to use libc file descriptors for sockets.  */
 
-# if @HAVE_WINSOCK2_H@
+# if @HAVE_WINSOCK2_H@ && !defined _GL_UNISTD_H
 #  undef close
-#  define close			rpl_close
-extern int rpl_close(int);
+#  define close close_used_without_including_unistd_h
 # endif
 
 # if @GNULIB_SOCKET@
@@ -280,12 +279,6 @@ extern int rpl_listen (int, int);
       listen (s, b))
 # endif
 
-# if @HAVE_WINSOCK2_H@
-#  undef ioctl
-#  define ioctl			rpl_ioctl
-extern int rpl_ioctl (int, unsigned long, char *);
-# endif
-
 # if @GNULIB_RECV@
 #  if @HAVE_WINSOCK2_H@
 #   undef recv
@@ -371,9 +364,32 @@ extern int rpl_setsockopt (int, int, int, const void *, int);
       setsockopt (s, lvl, o, v, l))
 # endif
 
+# if @GNULIB_SHUTDOWN@
+#  if @HAVE_WINSOCK2_H@
+#   undef shutdown
+#   define shutdown		rpl_shutdown
+extern int rpl_shutdown (int, int);
+#  endif
+# elif @HAVE_WINSOCK2_H@
+#  undef shutdown
+#  define shutdown shutdown_used_without_requesting_gnulib_module_shutdown
+# elif defined GNULIB_POSIXCHECK
+#  undef shutdown
+#  define shutdown(s,h) \
+     (GL_LINK_WARNING ("shutdown is not always POSIX compliant - " \
+                       "use gnulib module shutdown for portability"), \
+      shutdown (s, h))
+# endif
+
 # if @HAVE_WINSOCK2_H@
 #  undef select
 #  define select		select_used_without_including_sys_select_h
+# endif
+
+# if @GNULIB_CLOSE@ && @HAVE_WINSOCK2_H@
+/* gnulib internal function.  */
+#  define HAVE__GL_CLOSE_FD_MAYBE_SOCKET 1
+extern int _gl_close_fd_maybe_socket (int fd);
 # endif
 
 # ifdef __cplusplus

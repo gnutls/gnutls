@@ -349,6 +349,7 @@ stdio.h: stdio.in.h
 	      -e 's|@''GNULIB_FTELL''@|$(GNULIB_FTELL)|g' \
 	      -e 's|@''GNULIB_FTELLO''@|$(GNULIB_FTELLO)|g' \
 	      -e 's|@''GNULIB_FFLUSH''@|$(GNULIB_FFLUSH)|g' \
+	      -e 's|@''GNULIB_FCLOSE''@|$(GNULIB_FCLOSE)|g' \
 	      -e 's|@''GNULIB_FPUTC''@|$(GNULIB_FPUTC)|g' \
 	      -e 's|@''GNULIB_PUTC''@|$(GNULIB_PUTC)|g' \
 	      -e 's|@''GNULIB_PUTCHAR''@|$(GNULIB_PUTCHAR)|g' \
@@ -381,6 +382,7 @@ stdio.h: stdio.in.h
 	      -e 's|@''REPLACE_FTELLO''@|$(REPLACE_FTELLO)|g' \
 	      -e 's|@''REPLACE_FTELL''@|$(REPLACE_FTELL)|g' \
 	      -e 's|@''REPLACE_FFLUSH''@|$(REPLACE_FFLUSH)|g' \
+	      -e 's|@''REPLACE_FCLOSE''@|$(REPLACE_FCLOSE)|g' \
 	      -e 's|@''HAVE_DECL_GETDELIM''@|$(HAVE_DECL_GETDELIM)|g' \
 	      -e 's|@''HAVE_DECL_GETLINE''@|$(HAVE_DECL_GETLINE)|g' \
 	      -e 's|@''REPLACE_GETLINE''@|$(REPLACE_GETLINE)|g' \
@@ -576,6 +578,7 @@ sys/socket.h: sys_socket.in.h
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_SYS_SOCKET_H''@|$(NEXT_SYS_SOCKET_H)|g' \
 	      -e 's|@''HAVE_SYS_SOCKET_H''@|$(HAVE_SYS_SOCKET_H)|g' \
+	      -e 's|@''GNULIB_CLOSE''@|$(GNULIB_CLOSE)|g' \
 	      -e 's|@''GNULIB_SOCKET''@|$(GNULIB_SOCKET)|g' \
 	      -e 's|@''GNULIB_CONNECT''@|$(GNULIB_CONNECT)|g' \
 	      -e 's|@''GNULIB_ACCEPT''@|$(GNULIB_ACCEPT)|g' \
@@ -589,6 +592,7 @@ sys/socket.h: sys_socket.in.h
 	      -e 's|@''GNULIB_RECVFROM''@|$(GNULIB_RECVFROM)|g' \
 	      -e 's|@''GNULIB_SENDTO''@|$(GNULIB_SENDTO)|g' \
 	      -e 's|@''GNULIB_SETSOCKOPT''@|$(GNULIB_SETSOCKOPT)|g' \
+	      -e 's|@''GNULIB_SHUTDOWN''@|$(GNULIB_SHUTDOWN)|g' \
 	      -e 's|@''HAVE_WINSOCK2_H''@|$(HAVE_WINSOCK2_H)|g' \
 	      -e 's|@''HAVE_WS2TCPIP_H''@|$(HAVE_WS2TCPIP_H)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
@@ -679,6 +683,7 @@ unistd.h: unistd.in.h
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_UNISTD_H''@|$(NEXT_UNISTD_H)|g' \
 	      -e 's|@''GNULIB_CHOWN''@|$(GNULIB_CHOWN)|g' \
+	      -e 's|@''GNULIB_CLOSE''@|$(GNULIB_CLOSE)|g' \
 	      -e 's|@''GNULIB_DUP2''@|$(GNULIB_DUP2)|g' \
 	      -e 's|@''GNULIB_ENVIRON''@|$(GNULIB_ENVIRON)|g' \
 	      -e 's|@''GNULIB_FCHDIR''@|$(GNULIB_FCHDIR)|g' \
@@ -706,12 +711,14 @@ unistd.h: unistd.in.h
 	      -e 's|@''HAVE_OS_H''@|$(HAVE_OS_H)|g' \
 	      -e 's|@''HAVE_SYS_PARAM_H''@|$(HAVE_SYS_PARAM_H)|g' \
 	      -e 's|@''REPLACE_CHOWN''@|$(REPLACE_CHOWN)|g' \
+	      -e 's|@''REPLACE_CLOSE''@|$(REPLACE_CLOSE)|g' \
 	      -e 's|@''REPLACE_FCHDIR''@|$(REPLACE_FCHDIR)|g' \
 	      -e 's|@''REPLACE_GETCWD''@|$(REPLACE_GETCWD)|g' \
 	      -e 's|@''REPLACE_GETPAGESIZE''@|$(REPLACE_GETPAGESIZE)|g' \
 	      -e 's|@''REPLACE_LCHOWN''@|$(REPLACE_LCHOWN)|g' \
 	      -e 's|@''REPLACE_LSEEK''@|$(REPLACE_LSEEK)|g' \
 	      -e 's|@''REPLACE_WRITE''@|$(REPLACE_WRITE)|g' \
+	      -e 's|@''UNISTD_H_HAVE_WINSOCK2_H''@|$(UNISTD_H_HAVE_WINSOCK2_H)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/unistd.in.h; \
 	} > $@-t
