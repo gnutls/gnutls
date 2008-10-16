@@ -6,14 +6,14 @@
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
 #ifdef _WIN32
 # include <io.h>
 # include <winbase.h>
 # define close closesocket
 #else
 # include <netinet/in.h>
-# include <unistd.h>
-# include <netdb.h>
 # include <signal.h>
 #endif
 

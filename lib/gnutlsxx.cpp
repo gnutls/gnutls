@@ -396,12 +396,14 @@ void session::set_credentials( credentials &cred)
     RETWRAP(gnutls_credentials_set( s, cred.get_type(), cred.ptr()));
 }
 
-#ifdef ENABLE_SRP
 const char* server_session::get_srp_username() const
 {
-    return gnutls_srp_server_get_username( s);
-}
+#ifdef ENABLE_SRP
+  return gnutls_srp_server_get_username( s);
+#else
+  return NULL;
 #endif
+}
 
 const char* server_session::get_psk_username() const
 {

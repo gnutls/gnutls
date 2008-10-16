@@ -127,6 +127,15 @@ EXTRA_DIST += test-memcmp.c
 
 ## end   gnulib module memcmp-tests
 
+## begin gnulib module netdb-tests
+
+TESTS += test-netdb
+check_PROGRAMS += test-netdb
+
+EXTRA_DIST += test-netdb.c
+
+## end   gnulib module netdb-tests
+
 ## begin gnulib module read-file-tests
 
 TESTS += test-read-file

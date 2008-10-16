@@ -3,18 +3,27 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.7.0 (unreleased)
+* Version 2.7.0 (released 2008-10-16)
 
 ** libgnutls: Added functions to handle CRL extensions.
 
 ** libgnutls: Added functions to handle X.509 extensions in Certificate
 Requests.
 
+** libgnutls: Improved error string for GNUTLS_E_AGAIN.
+Suggested by "Lavrentiev, Anton (NIH/NLM/NCBI) [C]" <lavr@ncbi.nlm.nih.gov>.
+
 ** certtool: Print and set CRL and CRQ extensions.
+
+** libgnutls-extra: Protect internal symbols with static.
+Fixes problem when linking certtool statically.  Tiny patch from Aaron
+Ucko <ucko@ncbi.nlm.nih.gov>.
 
 ** libgnutls-openssl: fix out of bounds access.
 Problem in X509_get_subject_name and X509_get_issuer_name.  Tiny patch
 from Thomas Viehmann <tv@beamnet.de>.
+
+** libgnutlsxx: Define server_session::get_srp_username even if no SRP.
 
 ** tests: Make tests compile when using internal libtasn1.
 Patch by ludo@gnu.org (Ludovic Courtès).

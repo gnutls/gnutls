@@ -94,6 +94,9 @@ Current list:
 - Investigate why failed client authentication results in weird error
   messages.  See http://permalink.gmane.org/gmane.network.gnutls.general/875
 - Print X.509 DN in the proper order.
+- Debug why connections to smtp.hispeed.ch fails (Debian #429183).
+  Most likely the server is buggy, but it would be useful to document
+  the problem better.
 
 (+) Means high priority 
 (*) Means medium priority
