@@ -37,6 +37,7 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <list.h>
+#include <netdb.h>
 
 #if defined _WIN32 || defined __WIN32__
 int _win_select (int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
@@ -48,8 +49,6 @@ int _win_select (int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
 #include "progname.h"
 #include "version-etc.h"
 #include "read-file.h"
-
-#include "getaddrinfo.h"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
