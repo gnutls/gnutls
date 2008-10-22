@@ -5,6 +5,24 @@ See the end for copying conditions.
 
 * Version 2.6.1 (unreleased)
 
+** certtool: print a PKCS #8 key even if it is not encrypted.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.7.0 (released 2008-10-16)
+
+** libgnutls: Added functions to handle CRL extensions.
+
+** libgnutls: Added functions to handle X.509 extensions in Certificate
+Requests.
+
+** libgnutls: Improved error string for GNUTLS_E_AGAIN.
+Suggested by "Lavrentiev, Anton (NIH/NLM/NCBI) [C]" <lavr@ncbi.nlm.nih.gov>.
+
+** certtool: Print and set CRL and CRQ extensions.
+>>>>>>> 3eab289... certtool: print a PKCS #8 key even if it is not encrypted.:NEWS
+
 ** libgnutls-extra: Protect internal symbols with static.
 Fixes problem when linking certtool statically.  Tiny patch from Aaron
 Ucko <ucko@ncbi.nlm.nih.gov>.
