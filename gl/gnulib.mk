@@ -76,7 +76,7 @@ EXTRA_DIST += $(top_srcdir)/build-aux/gendocs.sh
 ## begin gnulib module getaddrinfo
 
 
-EXTRA_DIST += gai_strerror.c getaddrinfo.c getaddrinfo.h
+EXTRA_DIST += gai_strerror.c getaddrinfo.c
 
 EXTRA_libgnu_la_SOURCES += gai_strerror.c getaddrinfo.c
 
@@ -171,6 +171,29 @@ EXTRA_DIST += $(top_srcdir)/build-aux/link-warning.h
 EXTRA_DIST += $(top_srcdir)/maint.mk
 
 ## end   gnulib module maintainer-makefile
+
+## begin gnulib module netdb
+
+BUILT_SOURCES += $(NETDB_H)
+
+# We need the following in order to create <netdb.h> when the system
+# doesn't have one that works with the given compiler.
+netdb.h: netdb.in.h
+	rm -f $@-t $@
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''NEXT_NETDB_H''@|$(NEXT_NETDB_H)|g' \
+	      -e 's|@''HAVE_NETDB_H''@|$(HAVE_NETDB_H)|g' \
+	      -e 's|@''GNULIB_GETADDRINFO''@|$(GNULIB_GETADDRINFO)|g' \
+	      < $(srcdir)/netdb.in.h; \
+	} > $@-t
+	mv $@-t $@
+MOSTLYCLEANFILES += netdb.h netdb.h-t
+
+EXTRA_DIST += netdb.in.h
+
+## end   gnulib module netdb
 
 ## begin gnulib module netinet_in
 

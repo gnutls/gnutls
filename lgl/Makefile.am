@@ -236,6 +236,7 @@ netdb.h: netdb.in.h
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_NETDB_H''@|$(NEXT_NETDB_H)|g' \
 	      -e 's|@''HAVE_NETDB_H''@|$(HAVE_NETDB_H)|g' \
+	      -e 's|@''GNULIB_GETADDRINFO''@|$(GNULIB_GETADDRINFO)|g' \
 	      < $(srcdir)/netdb.in.h; \
 	} > $@-t
 	mv $@-t $@
@@ -436,6 +437,8 @@ stdlib.h: stdlib.in.h
 	      -e 's|@''GNULIB_MALLOC_POSIX''@|$(GNULIB_MALLOC_POSIX)|g' \
 	      -e 's|@''GNULIB_REALLOC_POSIX''@|$(GNULIB_REALLOC_POSIX)|g' \
 	      -e 's|@''GNULIB_CALLOC_POSIX''@|$(GNULIB_CALLOC_POSIX)|g' \
+	      -e 's|@''GNULIB_ATOLL''@|$(GNULIB_ATOLL)|g' \
+	      -e 's|@''GNULIB_GETLOADAVG''@|$(GNULIB_GETLOADAVG)|g' \
 	      -e 's|@''GNULIB_GETSUBOPT''@|$(GNULIB_GETSUBOPT)|g' \
 	      -e 's|@''GNULIB_MKDTEMP''@|$(GNULIB_MKDTEMP)|g' \
 	      -e 's|@''GNULIB_MKSTEMP''@|$(GNULIB_MKSTEMP)|g' \
@@ -443,7 +446,10 @@ stdlib.h: stdlib.in.h
 	      -e 's|@''GNULIB_RPMATCH''@|$(GNULIB_RPMATCH)|g' \
 	      -e 's|@''GNULIB_SETENV''@|$(GNULIB_SETENV)|g' \
 	      -e 's|@''GNULIB_STRTOD''@|$(GNULIB_STRTOD)|g' \
+	      -e 's|@''GNULIB_STRTOLL''@|$(GNULIB_STRTOLL)|g' \
+	      -e 's|@''GNULIB_STRTOULL''@|$(GNULIB_STRTOULL)|g' \
 	      -e 's|@''GNULIB_UNSETENV''@|$(GNULIB_UNSETENV)|g' \
+	      -e 's|@''HAVE_ATOLL''@|$(HAVE_ATOLL)|g' \
 	      -e 's|@''HAVE_CALLOC_POSIX''@|$(HAVE_CALLOC_POSIX)|g' \
 	      -e 's|@''HAVE_GETSUBOPT''@|$(HAVE_GETSUBOPT)|g' \
 	      -e 's|@''HAVE_MALLOC_POSIX''@|$(HAVE_MALLOC_POSIX)|g' \
@@ -452,7 +458,11 @@ stdlib.h: stdlib.in.h
 	      -e 's|@''HAVE_RPMATCH''@|$(HAVE_RPMATCH)|g' \
 	      -e 's|@''HAVE_SETENV''@|$(HAVE_SETENV)|g' \
 	      -e 's|@''HAVE_STRTOD''@|$(HAVE_STRTOD)|g' \
+	      -e 's|@''HAVE_STRTOLL''@|$(HAVE_STRTOLL)|g' \
+	      -e 's|@''HAVE_STRTOULL''@|$(HAVE_STRTOULL)|g' \
+	      -e 's|@''HAVE_SYS_LOADAVG_H''@|$(HAVE_SYS_LOADAVG_H)|g' \
 	      -e 's|@''HAVE_UNSETENV''@|$(HAVE_UNSETENV)|g' \
+	      -e 's|@''HAVE_DECL_GETLOADAVG''@|$(HAVE_DECL_GETLOADAVG)|g' \
 	      -e 's|@''REPLACE_MKSTEMP''@|$(REPLACE_MKSTEMP)|g' \
 	      -e 's|@''REPLACE_PUTENV''@|$(REPLACE_PUTENV)|g' \
 	      -e 's|@''REPLACE_STRTOD''@|$(REPLACE_STRTOD)|g' \
@@ -624,9 +634,7 @@ sys/socket.h: sys_socket.in.h
 MOSTLYCLEANFILES += sys/socket.h sys/socket.h-t
 MOSTLYCLEANDIRS += sys
 
-EXTRA_DIST += sys_socket.in.h winsock.c
-
-EXTRA_liblgnu_la_SOURCES += winsock.c
+EXTRA_DIST += sys_socket.in.h
 
 ## end   gnulib module sys_socket
 
@@ -643,8 +651,13 @@ sys/stat.h: sys_stat.in.h
 	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_SYS_STAT_H''@|$(NEXT_SYS_STAT_H)|g' \
+	      -e 's|@''GNULIB_LCHMOD''@|$(GNULIB_LCHMOD)|g' \
+	      -e 's|@''GNULIB_LSTAT''@|$(GNULIB_LSTAT)|g' \
+	      -e 's|@''HAVE_LCHMOD''@|$(HAVE_LCHMOD)|g' \
 	      -e 's|@''HAVE_LSTAT''@|$(HAVE_LSTAT)|g' \
+	      -e 's|@''REPLACE_LSTAT''@|$(REPLACE_LSTAT)|g' \
 	      -e 's|@''REPLACE_MKDIR''@|$(REPLACE_MKDIR)|g' \
+	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/sys_stat.in.h; \
 	} > $@-t
 	mv $@-t $@
@@ -708,13 +721,17 @@ unistd.h: unistd.in.h
 	      -e 's|@''GNULIB_CLOSE''@|$(GNULIB_CLOSE)|g' \
 	      -e 's|@''GNULIB_DUP2''@|$(GNULIB_DUP2)|g' \
 	      -e 's|@''GNULIB_ENVIRON''@|$(GNULIB_ENVIRON)|g' \
+	      -e 's|@''GNULIB_EUIDACCESS''@|$(GNULIB_EUIDACCESS)|g' \
 	      -e 's|@''GNULIB_FCHDIR''@|$(GNULIB_FCHDIR)|g' \
 	      -e 's|@''GNULIB_FSYNC''@|$(GNULIB_FSYNC)|g' \
 	      -e 's|@''GNULIB_FTRUNCATE''@|$(GNULIB_FTRUNCATE)|g' \
 	      -e 's|@''GNULIB_GETCWD''@|$(GNULIB_GETCWD)|g' \
+	      -e 's|@''GNULIB_GETDOMAINNAME''@|$(GNULIB_GETDOMAINNAME)|g' \
 	      -e 's|@''GNULIB_GETDTABLESIZE''@|$(GNULIB_GETDTABLESIZE)|g' \
+	      -e 's|@''GNULIB_GETHOSTNAME''@|$(GNULIB_GETHOSTNAME)|g' \
 	      -e 's|@''GNULIB_GETLOGIN_R''@|$(GNULIB_GETLOGIN_R)|g' \
 	      -e 's|@''GNULIB_GETPAGESIZE''@|$(GNULIB_GETPAGESIZE)|g' \
+	      -e 's|@''GNULIB_GETUSERSHELL''@|$(GNULIB_GETUSERSHELL)|g' \
 	      -e 's|@''GNULIB_LCHOWN''@|$(GNULIB_LCHOWN)|g' \
 	      -e 's|@''GNULIB_LSEEK''@|$(GNULIB_LSEEK)|g' \
 	      -e 's|@''GNULIB_READLINK''@|$(GNULIB_READLINK)|g' \
@@ -722,10 +739,14 @@ unistd.h: unistd.in.h
 	      -e 's|@''GNULIB_UNISTD_H_SIGPIPE''@|$(GNULIB_UNISTD_H_SIGPIPE)|g' \
 	      -e 's|@''GNULIB_WRITE''@|$(GNULIB_WRITE)|g' \
 	      -e 's|@''HAVE_DUP2''@|$(HAVE_DUP2)|g' \
+	      -e 's|@''HAVE_EUIDACCESS''@|$(HAVE_EUIDACCESS)|g' \
 	      -e 's|@''HAVE_FSYNC''@|$(HAVE_FSYNC)|g' \
 	      -e 's|@''HAVE_FTRUNCATE''@|$(HAVE_FTRUNCATE)|g' \
+	      -e 's|@''HAVE_GETDOMAINNAME''@|$(HAVE_GETDOMAINNAME)|g' \
 	      -e 's|@''HAVE_GETDTABLESIZE''@|$(HAVE_GETDTABLESIZE)|g' \
+	      -e 's|@''HAVE_GETHOSTNAME''@|$(HAVE_GETHOSTNAME)|g' \
 	      -e 's|@''HAVE_GETPAGESIZE''@|$(HAVE_GETPAGESIZE)|g' \
+	      -e 's|@''HAVE_GETUSERSHELL''@|$(HAVE_GETUSERSHELL)|g' \
 	      -e 's|@''HAVE_READLINK''@|$(HAVE_READLINK)|g' \
 	      -e 's|@''HAVE_SLEEP''@|$(HAVE_SLEEP)|g' \
 	      -e 's|@''HAVE_DECL_ENVIRON''@|$(HAVE_DECL_ENVIRON)|g' \

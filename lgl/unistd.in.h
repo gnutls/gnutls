@@ -1,5 +1,5 @@
 /* Substitute for and wrapper around <unistd.h>.
-   Copyright (C) 2004-2008 Free Software Foundation, Inc.
+   Copyright (C) 2003-2008 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -17,7 +17,9 @@
 
 #ifndef _GL_UNISTD_H
 
+#if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
+#endif
 
 /* The include_next requires a split double-inclusion guard.  */
 #if @HAVE_UNISTD_H@
@@ -132,6 +134,21 @@ extern char **environ;
 #endif
 
 
+#if @GNULIB_EUIDACCESS@
+# if !@HAVE_EUIDACCESS@
+/* Like access(), except that is uses the effective user id and group id of
+   the current process.  */
+extern int euidaccess (const char *filename, int mode);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef euidaccess
+# define euidaccess(f,m) \
+    (GL_LINK_WARNING ("euidaccess is unportable - " \
+                      "use gnulib module euidaccess for portability"), \
+     euidaccess (f, m))
+#endif
+
+
 #if @GNULIB_FCHDIR@
 # if @REPLACE_FCHDIR@
 
@@ -218,6 +235,29 @@ extern char * getcwd (char *buf, size_t size);
 #endif
 
 
+#if @GNULIB_GETDOMAINNAME@
+/* Return the NIS domain name of the machine.
+   WARNING! The NIS domain name is unrelated to the fully qualified host name
+            of the machine.  It is also unrelated to email addresses.
+   WARNING! The NIS domain name is usually the empty string or "(none)" when
+            not using NIS.
+
+   Put up to LEN bytes of the NIS domain name into NAME.
+   Null terminate it if the name is shorter than LEN.
+   If the NIS domain name is longer than LEN, set errno = EINVAL and return -1.
+   Return 0 if successful, otherwise set errno and return -1.  */
+# if !@HAVE_GETDOMAINNAME@
+extern int getdomainname(char *name, size_t len);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef getdomainname
+# define getdomainname(n,l) \
+    (GL_LINK_WARNING ("getdomainname is unportable - " \
+                      "use gnulib module getdomainname for portability"), \
+     getdomainname (n, l))
+#endif
+
+
 #if @GNULIB_GETDTABLESIZE@
 # if !@HAVE_GETDTABLESIZE@
 /* Return the maximum number of file descriptors in the current process.  */
@@ -229,6 +269,26 @@ extern int getdtablesize (void);
     (GL_LINK_WARNING ("getdtablesize is unportable - " \
                       "use gnulib module getdtablesize for portability"), \
      getdtablesize ())
+#endif
+
+
+#if @GNULIB_GETHOSTNAME@
+/* Return the standard host name of the machine.
+   WARNING! The host name may or may not be fully qualified.
+
+   Put up to LEN bytes of the host name into NAME.
+   Null terminate it if the name is shorter than LEN.
+   If the host name is longer than LEN, set errno = EINVAL and return -1.
+   Return 0 if successful, otherwise set errno and return -1.  */
+# if !@HAVE_GETHOSTNAME@
+extern int gethostname(char *name, size_t len);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef gethostname
+# define gethostname(n,l) \
+    (GL_LINK_WARNING ("gethostname is unportable - " \
+                      "use gnulib module gethostname for portability"), \
+     gethostname (n, l))
 #endif
 
 
@@ -310,6 +370,36 @@ extern int getpagesize (void);
     (GL_LINK_WARNING ("getpagesize is unportable - " \
                       "use gnulib module getpagesize for portability"), \
      getpagesize ())
+#endif
+
+
+#if @GNULIB_GETUSERSHELL@
+# if !@HAVE_GETUSERSHELL@
+/* Return the next valid login shell on the system, or NULL when the end of
+   the list has been reached.  */
+extern char *getusershell (void);
+/* Rewind to pointer that is advanced at each getusershell() call.  */
+extern void setusershell (void);
+/* Free the pointer that is advanced at each getusershell() call and
+   associated resources.  */
+extern void endusershell (void);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef getusershell
+# define getusershell() \
+    (GL_LINK_WARNING ("getusershell is unportable - " \
+                      "use gnulib module getusershell for portability"), \
+     getusershell ())
+# undef setusershell
+# define setusershell() \
+    (GL_LINK_WARNING ("setusershell is unportable - " \
+                      "use gnulib module getusershell for portability"), \
+     setusershell ())
+# undef endusershell
+# define endusershell() \
+    (GL_LINK_WARNING ("endusershell is unportable - " \
+                      "use gnulib module getusershell for portability"), \
+     endusershell ())
 #endif
 
 
