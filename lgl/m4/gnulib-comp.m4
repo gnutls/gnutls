@@ -278,7 +278,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasnprintf.h
   lib/vasprintf.c
   lib/wchar.in.h
-  lib/winsock.c
   lib/xsize.h
   m4/alloca.m4
   m4/byteswap.m4

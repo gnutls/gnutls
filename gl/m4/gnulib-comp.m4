@@ -55,6 +55,7 @@ AC_DEFUN([gl_INIT],
     [AM_XGETTEXT_OPTION([--flag=error:3:c-format])
      AM_XGETTEXT_OPTION([--flag=error_at_line:5:c-format])])
   gl_GETADDRINFO
+  gl_NETDB_MODULE_INDICATOR([getaddrinfo])
   gl_FUNC_GETDELIM
   gl_STDIO_MODULE_INDICATOR([getdelim])
   gl_FUNC_GETLINE
@@ -74,6 +75,7 @@ AC_DEFUN([gl_INIT],
   gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
   gl_INET_PTON
   gl_ARPA_INET_MODULE_INDICATOR([inet_pton])
+  gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_FUNC_READLINE
@@ -224,7 +226,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/error.h
   lib/gai_strerror.c
   lib/getaddrinfo.c
-  lib/getaddrinfo.h
   lib/getdelim.c
   lib/getline.c
   lib/getpass.c
@@ -232,6 +233,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
+  lib/netdb.in.h
   lib/netinet_in.in.h
   lib/progname.c
   lib/progname.h
@@ -257,6 +259,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/readline.m4
   m4/socklen.m4
@@ -267,6 +270,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getaddrinfo.c
   tests/test-getdelim.c
   tests/test-getline.c
+  tests/test-netdb.c
   tests/test-netinet_in.c
   tests/test-strerror.c
   top/GNUmakefile
