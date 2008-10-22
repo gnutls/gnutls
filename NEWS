@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.7.1 (unreleased)
 
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.7.0 (released 2008-10-16)
 
 ** libgnutls: Added functions to handle CRL extensions.
