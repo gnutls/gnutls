@@ -30,6 +30,10 @@
 #include "../lib/random.h"
 #include "../lib/gnutls_hash_int.h"
 
+/* Gnulib re-defines shutdown on mingw.  We only use it as a variable
+   name, so restore the original name. */
+#undef shutdown
+
 /* XXX: See lib/gnutls_int.h. */
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 #define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))

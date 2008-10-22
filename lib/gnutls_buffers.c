@@ -55,9 +55,10 @@
 
 #include <errno.h>
 
-#ifdef _WIN32
-# include <winsock2.h>
-#endif
+/* We need to disable gnulib's replacement wrappers to get native
+   Windows interfaces. */
+#undef recv
+#undef send
 
 #ifndef EAGAIN
 # define EAGAIN EWOULDBLOCK
