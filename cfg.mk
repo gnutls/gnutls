@@ -49,10 +49,13 @@ bootstrap: autoreconf
 init-coverage:
 	make clean
 	lcov --directory . --zerocounters
+	ln -sf /usr/local/share/gaa/gaa.skel src/gaa.skel
+
+COVERAGE_OPTS="-g -fprofile-arcs -ftest-coverage"
 
 build-coverage:
-	make CFLAGS="-g -fprofile-arcs -ftest-coverage" VALGRIND=
-	make CFLAGS="-g -fprofile-arcs -ftest-coverage" VALGRIND= check
+	make CFLAGS=$(COVERAGE_OPTS) CXXFLAGS=$(COVERAGE_OPTS) VALGRIND=
+	make CFLAGS=$(COVERAGE_OPTS) CXXFLAGS=$(COVERAGE_OPTS) VALGRIND= check
 	mkdir -p doc/coverage
 	lcov --directory . --output-file doc/coverage/$(PACKAGE).info --capture
 
