@@ -44,12 +44,41 @@ update-po: refresh-po
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
 
+# Code Coverage
+
+init-coverage:
+	make clean
+	lcov --directory . --zerocounters
+
+build-coverage:
+	make CFLAGS="-g -fprofile-arcs -ftest-coverage" VALGRIND= check
+	mkdir -p doc/coverage
+	lcov --directory . --output-file doc/coverage/$(PACKAGE).info --capture
+
+gen-coverage:
+	genhtml --output-directory doc/coverage doc/coverage/$(PACKAGE).info \
+		--highlight --frames --legend --title "$(PACKAGE_NAME)"
+
+coverage: init-coverage build-coverage gen-coverage
+
+web-coverage:
+	rm -fv `find $(htmldir)/coverage -type f | grep -v CVS`
+	cp -rv doc/coverage/* $(htmldir)/coverage/
+
+upload-web-coverage:
+	cd $(htmldir) && \
+		cvs commit -m "Update." coverage
+
+# Mingw32
+
 W32ROOT ?= $(HOME)/gnutls4win/inst
 
 mingw32: autoreconf 
 	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`build-aux/config.guess` --with-libtasn1-prefix=$(W32ROOT) --with-libgcrypt-prefix=$(W32ROOT) --prefix $(W32ROOT)
 
 .PHONY: bootstrap autoreconf mingw32
+
+# Release
 
 ChangeLog:
 	git log --pretty --numstat --summary --since="2005 November 07" -- | git2cl > ChangeLog
