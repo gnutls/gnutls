@@ -51,6 +51,7 @@ init-coverage:
 	lcov --directory . --zerocounters
 
 build-coverage:
+	make CFLAGS="-g -fprofile-arcs -ftest-coverage" VALGRIND=
 	make CFLAGS="-g -fprofile-arcs -ftest-coverage" VALGRIND= check
 	mkdir -p doc/coverage
 	lcov --directory . --output-file doc/coverage/$(PACKAGE).info --capture
