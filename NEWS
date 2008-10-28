@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Fix buffer overrun in gnutls_x509_crt_list_import.
 Report and patch by Jonathan Manktelow.
 
+** libgnutls: Avoid use of non-thread safe strerror.
+
 ** API and ABI modifications:
 No changes since last version.
 
