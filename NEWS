@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.4.3 (unreleased)
 
+** libgnutls: Fix buffer overrun in gnutls_x509_crt_list_import.
+Report and patch by Jonathan Manktelow.
+
 ** API and ABI modifications:
 No changes since last version.
 
