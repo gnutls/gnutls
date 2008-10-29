@@ -46,24 +46,8 @@ bootstrap: autoreconf
 
 # Code Coverage
 
-init-coverage:
-	make clean
-	lcov --directory . --zerocounters
+pre-coverage:
 	ln -sf /usr/local/share/gaa/gaa.skel src/gaa.skel
-
-COVERAGE_OPTS="-g -fprofile-arcs -ftest-coverage"
-
-build-coverage:
-	make CFLAGS=$(COVERAGE_OPTS) CXXFLAGS=$(COVERAGE_OPTS) VALGRIND=
-	make CFLAGS=$(COVERAGE_OPTS) CXXFLAGS=$(COVERAGE_OPTS) VALGRIND= check
-	mkdir -p doc/coverage
-	lcov --directory . --output-file doc/coverage/$(PACKAGE).info --capture
-
-gen-coverage:
-	genhtml --output-directory doc/coverage doc/coverage/$(PACKAGE).info \
-		--highlight --frames --legend --title "$(PACKAGE_NAME)"
-
-coverage: init-coverage build-coverage gen-coverage
 
 web-coverage:
 	rm -fv `find $(htmldir)/coverage -type f | grep -v CVS`
