@@ -1,3 +1,451 @@
+2008-10-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.1.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Really fix -I's.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Fix -I's.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add -lgnutls-extra for openpgp-keyring.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/sys_stat_h.m4, gl/sys_stat.in.h, gl/tests/Makefile.am,
+	gl/tests/test-sys_stat.c: Need more gnulib modules.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/connect.c, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/recv.c, gl/send.c, gl/tests/Makefile.am,
+	gl/tests/connect.c, src/certtool.c, src/cli.c: Need more gnulib
+	modules.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/perror.c, gl/tests/Makefile.am, gl/tests/perror.c: Update gnulib
+	files.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Update.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/.gitignore, lib/po/.gitignore, libextra/.gitignore: Update.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/minmax.m4, gl/m4/read-file.m4, gl/minmax.h, gl/read-file.c,
+	gl/read-file.h, gl/tests/Makefile.am, gl/tests/test-read-file.c,
+	src/Makefile.am, src/cli.c, src/serv.c: Need more gnulib modules.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/accept.c, gl/alloca.c, gl/bind.c, gl/close.c, gl/fclose.c,
+	gl/listen.c, gl/m4/close.m4, gl/m4/fclose.m4, gl/m4/perror.m4,
+	gl/m4/sockets.m4, gl/m4/sys_ioctl_h.m4, gl/m4/sys_select_h.m4,
+	gl/m4/sys_time_h.m4, gl/setsockopt.c, gl/socket.c,
+	gl/sys_select.in.h, gl/sys_time.in.h, gl/tests/connect.c,
+	gl/tests/ioctl.c, gl/tests/perror.c, gl/tests/sockets.c,
+	gl/tests/sockets.h, gl/tests/sys_ioctl.in.h,
+	gl/tests/test-perror.c, gl/tests/test-perror.sh,
+	gl/tests/test-select.c, gl/tests/test-sockets.c,
+	gl/tests/test-sys_select.c, gl/tests/test-sys_time.c,
+	gl/tests/w32sock.h, gl/winsock-select.c: Update gnulib files.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/shutdown.c, gl/tests/Makefile.am, gl/tests/dummy.c,
+	gl/w32sock.h, lib/Makefile.am, src/common.h: Use sockets module.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Fix.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/sockets.m4, lib/gl/sockets.c,
+	lib/gl/sockets.h, lib/gl/tests/Makefile.am,
+	lib/gl/tests/test-sockets.c, lib/gnutls_buffers.c,
+	lib/gnutls_global.c: Better gnulib module usage.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-comp.m4: Update gnulib files.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, configure.in: Rename.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am, src/Makefile.am: Fixes.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/configure.ac, tests/Makefile.am: Fixes.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Remove.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, configure.in, doc/Makefile.am,
+	doc/examples/Makefile.am, doc/reference/Makefile.am,
+	guile/src/Makefile.am, includes/Makefile.am,
+	includes/gnutls/compat.h, includes/gnutls/crypto.h,
+	includes/gnutls/extra.h, includes/gnutls/gnutls.h.in,
+	includes/gnutls/gnutlsxx.h, includes/gnutls/openpgp.h,
+	includes/gnutls/openssl.h, includes/gnutls/pkcs12.h,
+	includes/gnutls/x509.h, lib/Makefile.am, lib/configure.ac,
+	lib/includes/Makefile.am, lib/includes/gnutls/compat.h,
+	lib/includes/gnutls/crypto.h, lib/includes/gnutls/gnutls.h.in,
+	lib/includes/gnutls/gnutlsxx.h, lib/includes/gnutls/openpgp.h,
+	lib/includes/gnutls/pkcs12.h, lib/includes/gnutls/x509.h,
+	lib/opencdk/Makefile.am, lib/openpgp/Makefile.am,
+	lib/x509/Makefile.am, libextra/Makefile.am, libextra/configure.ac,
+	libextra/includes/Makefile.am, libextra/includes/gnutls/extra.h,
+	libextra/includes/gnutls/openssl.h, src/Makefile.am,
+	tests/Makefile.am, tests/hostname-check.README,
+	tests/hostname-check.c, tests/hostname-check/Makefile.am,
+	tests/hostname-check/README, tests/hostname-check/hostname-check.c,
+	tests/openpgp-keyring.c, tests/openpgp/Makefile.am,
+	tests/openpgp/keyring.c, tests/pkcs12-decode/Makefile.am: Separate
+	headers as well.  Clean up -I's.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am, tests/Makefile.am,
+	tests/pkcs12-decode/Makefile.am: Builds on my system now.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/gnutls_mem.h: Drop dmalloc and efence support.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/configure.ac, lib/m4/hooks.m4,
+	lib/openpgp/Makefile.am, lib/x509/Makefile.am,
+	libextra/Makefile.am, src/Makefile.am: Make it build better.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/m4/hooks.m4,
+	libextra/Makefile.am, src/Makefile.am: Fixes.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, configure.in, includes/gnutls/gnutls.h.in,
+	lib/Makefile.am, lib/configure.ac, lib/m4/hooks.m4,
+	lib/openpgp/Makefile.am, lib/x509/Makefile.am: Make it build.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/POTFILES.in: Fix paths.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, lib/m4/hooks.m4: Build fixes.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix i18n stuff.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4, libextra/m4/hooks.m4: New files, forgotten in
+	last commit.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/build-aux/config.rpath, lib/build-aux/link-warning.h,
+	lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	libextra/build-aux/config.rpath: Update gnulib files.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* COPYING.LIB, Makefile.am, configure.in, lib/AUTHORS, lib/COPYING,
+	lib/ChangeLog, lib/Makefile.am, lib/NEWS, lib/README,
+	lib/configure.ac, lib/po/.gitignore, lib/po/LINGUAS,
+	lib/po/Makevars, lib/po/POTFILES.in, lib/po/de.po.in,
+	lib/po/fr.po.in, lib/po/ms.po.in, lib/po/nl.po.in, lib/po/pl.po.in,
+	lib/po/sv.po.in, lib/po/vi.po.in, libextra/AUTHORS,
+	libextra/COPYING, libextra/ChangeLog, libextra/Makefile.am,
+	libextra/NEWS, libextra/README, libextra/configure.ac,
+	libextra/gl/Makefile.am, libextra/gl/m4/gnulib-cache.m4,
+	libextra/gl/m4/gnulib-comp.m4, libextra/gl/m4/lib-ld.m4,
+	libextra/gl/m4/lib-link.m4, libextra/gl/m4/lib-prefix.m4,
+	po/.gitignore, po/LINGUAS, po/Makevars, po/POTFILES.in,
+	po/de.po.in, po/fr.po.in, po/ms.po.in, po/nl.po.in, po/pl.po.in,
+	po/sv.po.in, po/vi.po.in: More splitting updates.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gl/Makefile.am, libextra/gl/m4/gnulib-cache.m4,
+	libextra/gl/m4/gnulib-comp.m4: Update gnulib files.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/alloca.in.h, gl/asnprintf.c, gl/errno.in.h, gl/float+.h,
+	gl/float.in.h, gl/fseeko.c, gl/gettext.h, gl/lseek.c,
+	gl/m4/alloca.m4, gl/m4/errno_h.m4, gl/m4/float_h.m4,
+	gl/m4/fseeko.m4, gl/m4/intmax_t.m4, gl/m4/inttypes_h.m4,
+	gl/m4/longlong.m4, gl/m4/lseek.m4, gl/m4/malloc.m4,
+	gl/m4/printf.m4, gl/m4/realloc.m4, gl/m4/size_max.m4,
+	gl/m4/snprintf.m4, gl/m4/sockpfaf.m4, gl/m4/stdbool.m4,
+	gl/m4/stdint.m4, gl/m4/stdint_h.m4, gl/m4/stdio_h.m4,
+	gl/m4/stdlib_h.m4, gl/m4/string_h.m4, gl/m4/sys_socket_h.m4,
+	gl/m4/unistd_h.m4, gl/m4/vasnprintf.m4, gl/m4/wchar.m4,
+	gl/m4/wchar_t.m4, gl/m4/wint_t.m4, gl/m4/xsize.m4,
+	gl/printf-args.c, gl/printf-args.h, gl/printf-parse.c,
+	gl/printf-parse.h, gl/realloc.c, gl/size_max.h, gl/snprintf.c,
+	gl/stdbool.in.h, gl/stdint.in.h, gl/stdio-impl.h, gl/stdio-write.c,
+	gl/stdio.in.h, gl/stdlib.in.h, gl/string.in.h, gl/sys_socket.in.h,
+	gl/tests/dummy.c, gl/tests/test-alloca-opt.c,
+	gl/tests/test-errno.c, gl/tests/test-fseeko.c,
+	gl/tests/test-fseeko.sh, gl/tests/test-lseek.c,
+	gl/tests/test-lseek.sh, gl/tests/test-snprintf.c,
+	gl/tests/test-stdbool.c, gl/tests/test-stdint.c,
+	gl/tests/test-stdio.c, gl/tests/test-stdlib.c,
+	gl/tests/test-string.c, gl/tests/test-sys_socket.c,
+	gl/tests/test-unistd.c, gl/tests/test-vasnprintf.c,
+	gl/tests/test-wchar.c, gl/tests/verify.h, gl/unistd.in.h,
+	gl/vasnprintf.c, gl/vasnprintf.h, gl/wchar.in.h, gl/xsize.h: Update
+	gnulib files.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, configure.in, gl/Makefile.am, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/tests/Makefile.am, lib/configure.ac,
+	libextra/Makefile.am, libextra/configure.ac: More splitting.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/config.rpath, lib/gl/Makefile.am,
+	lib/gl/m4/gnulib-cache.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/stdlib_h.m4, lib/gl/m4/sys_ioctl_h.m4,
+	lib/gl/m4/sys_socket_h.m4, lib/gl/stdlib.in.h,
+	lib/gl/sys_socket.in.h, lib/gl/sys_stat.in.h,
+	lib/gl/tests/Makefile.am, lib/gl/unistd.in.h: Update gnulib files.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, build-aux/config.rpath, configure.in,
+	lgl/Makefile.am, lgl/alloca.in.h, lgl/asnprintf.c, lgl/asprintf.c,
+	lgl/byteswap.in.h, lgl/c-ctype.c, lgl/c-ctype.h, lgl/errno.in.h,
+	lgl/float+.h, lgl/float.in.h, lgl/fseeko.c, lgl/gettext.h,
+	lgl/lseek.c, lgl/m4/alloca.m4, lgl/m4/byteswap.m4,
+	lgl/m4/codeset.m4, lgl/m4/errno_h.m4, lgl/m4/extensions.m4,
+	lgl/m4/float_h.m4, lgl/m4/fseeko.m4, lgl/m4/func.m4,
+	lgl/m4/gettext.m4, lgl/m4/glibc2.m4, lgl/m4/glibc21.m4,
+	lgl/m4/gnulib-cache.m4, lgl/m4/gnulib-common.m4,
+	lgl/m4/gnulib-comp.m4, lgl/m4/gnulib-tool.m4, lgl/m4/iconv.m4,
+	lgl/m4/include_next.m4, lgl/m4/intdiv0.m4, lgl/m4/intl.m4,
+	lgl/m4/intldir.m4, lgl/m4/intlmacosx.m4, lgl/m4/intmax.m4,
+	lgl/m4/intmax_t.m4, lgl/m4/inttypes-pri.m4, lgl/m4/inttypes_h.m4,
+	lgl/m4/lcmessage.m4, lgl/m4/lib-ld.m4, lgl/m4/lib-link.m4,
+	lgl/m4/lib-prefix.m4, lgl/m4/lock.m4, lgl/m4/longlong.m4,
+	lgl/m4/lseek.m4, lgl/m4/malloc.m4, lgl/m4/memchr.m4,
+	lgl/m4/memcmp.m4, lgl/m4/memmem.m4, lgl/m4/memmove.m4,
+	lgl/m4/minmax.m4, lgl/m4/netdb_h.m4, lgl/m4/nls.m4, lgl/m4/po.m4,
+	lgl/m4/printf-posix.m4, lgl/m4/printf.m4, lgl/m4/progtest.m4,
+	lgl/m4/read-file.m4, lgl/m4/realloc.m4, lgl/m4/size_max.m4,
+	lgl/m4/snprintf.m4, lgl/m4/socklen.m4, lgl/m4/sockpfaf.m4,
+	lgl/m4/stdbool.m4, lgl/m4/stdint.m4, lgl/m4/stdint_h.m4,
+	lgl/m4/stdio_h.m4, lgl/m4/stdlib_h.m4, lgl/m4/strcase.m4,
+	lgl/m4/string_h.m4, lgl/m4/strings_h.m4, lgl/m4/strverscmp.m4,
+	lgl/m4/sys_ioctl_h.m4, lgl/m4/sys_socket_h.m4,
+	lgl/m4/sys_stat_h.m4, lgl/m4/threadlib.m4, lgl/m4/time_h.m4,
+	lgl/m4/time_r.m4, lgl/m4/uintmax_t.m4, lgl/m4/unistd_h.m4,
+	lgl/m4/vasnprintf.m4, lgl/m4/vasprintf.m4, lgl/m4/visibility.m4,
+	lgl/m4/wchar.m4, lgl/m4/wchar_t.m4, lgl/m4/wint_t.m4,
+	lgl/m4/xsize.m4, lgl/memchr.c, lgl/memcmp.c, lgl/memmem.c,
+	lgl/memmove.c, lgl/minmax.h, lgl/netdb.in.h,
+	lgl/override/lib/gc-libgcrypt.c.diff, lgl/printf-args.c,
+	lgl/printf-args.h, lgl/printf-parse.c, lgl/printf-parse.h,
+	lgl/read-file.c, lgl/read-file.h, lgl/realloc.c, lgl/size_max.h,
+	lgl/snprintf.c, lgl/stdbool.in.h, lgl/stdint.in.h,
+	lgl/stdio-impl.h, lgl/stdio-write.c, lgl/stdio.in.h,
+	lgl/stdlib.in.h, lgl/str-two-way.h, lgl/strcasecmp.c,
+	lgl/string.in.h, lgl/strings.in.h, lgl/strncasecmp.c,
+	lgl/strverscmp.c, lgl/sys_socket.in.h, lgl/sys_stat.in.h,
+	lgl/tests/Makefile.am, lgl/tests/dummy.c, lgl/tests/intprops.h,
+	lgl/tests/test-alloca-opt.c, lgl/tests/test-byteswap.c,
+	lgl/tests/test-c-ctype.c, lgl/tests/test-errno.c,
+	lgl/tests/test-fseeko.c, lgl/tests/test-fseeko.sh,
+	lgl/tests/test-func.c, lgl/tests/test-lseek.c,
+	lgl/tests/test-lseek.sh, lgl/tests/test-memchr.c,
+	lgl/tests/test-memcmp.c, lgl/tests/test-netdb.c,
+	lgl/tests/test-read-file.c, lgl/tests/test-snprintf.c,
+	lgl/tests/test-stdbool.c, lgl/tests/test-stdint.c,
+	lgl/tests/test-stdio.c, lgl/tests/test-stdlib.c,
+	lgl/tests/test-string.c, lgl/tests/test-strings.c,
+	lgl/tests/test-strverscmp.c, lgl/tests/test-sys_socket.c,
+	lgl/tests/test-sys_stat.c, lgl/tests/test-time.c,
+	lgl/tests/test-unistd.c, lgl/tests/test-vasnprintf.c,
+	lgl/tests/test-vasprintf.c, lgl/tests/test-wchar.c,
+	lgl/tests/verify.h, lgl/time.in.h, lgl/time_r.c, lgl/unistd.in.h,
+	lgl/vasnprintf.c, lgl/vasnprintf.h, lgl/vasprintf.c,
+	lgl/wchar.in.h, lgl/xsize.h, lib/Makefile.am, lib/configure.ac,
+	lib/gl/Makefile.am, lib/gl/alloca.in.h, lib/gl/asnprintf.c,
+	lib/gl/asprintf.c, lib/gl/byteswap.in.h, lib/gl/c-ctype.c,
+	lib/gl/c-ctype.h, lib/gl/errno.in.h, lib/gl/float+.h,
+	lib/gl/float.in.h, lib/gl/fseeko.c, lib/gl/gettext.h,
+	lib/gl/lseek.c, lib/gl/m4/alloca.m4, lib/gl/m4/byteswap.m4,
+	lib/gl/m4/codeset.m4, lib/gl/m4/errno_h.m4,
+	lib/gl/m4/extensions.m4, lib/gl/m4/float_h.m4, lib/gl/m4/fseeko.m4,
+	lib/gl/m4/func.m4, lib/gl/m4/gettext.m4, lib/gl/m4/glibc2.m4,
+	lib/gl/m4/glibc21.m4, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-common.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/gnulib-tool.m4, lib/gl/m4/iconv.m4,
+	lib/gl/m4/include_next.m4, lib/gl/m4/intdiv0.m4, lib/gl/m4/intl.m4,
+	lib/gl/m4/intldir.m4, lib/gl/m4/intlmacosx.m4, lib/gl/m4/intmax.m4,
+	lib/gl/m4/intmax_t.m4, lib/gl/m4/inttypes-pri.m4,
+	lib/gl/m4/inttypes_h.m4, lib/gl/m4/lcmessage.m4,
+	lib/gl/m4/lib-ld.m4, lib/gl/m4/lib-link.m4,
+	lib/gl/m4/lib-prefix.m4, lib/gl/m4/lock.m4, lib/gl/m4/longlong.m4,
+	lib/gl/m4/lseek.m4, lib/gl/m4/malloc.m4, lib/gl/m4/memchr.m4,
+	lib/gl/m4/memcmp.m4, lib/gl/m4/memmem.m4, lib/gl/m4/memmove.m4,
+	lib/gl/m4/minmax.m4, lib/gl/m4/netdb_h.m4, lib/gl/m4/nls.m4,
+	lib/gl/m4/po.m4, lib/gl/m4/printf-posix.m4, lib/gl/m4/printf.m4,
+	lib/gl/m4/progtest.m4, lib/gl/m4/read-file.m4,
+	lib/gl/m4/realloc.m4, lib/gl/m4/size_max.m4, lib/gl/m4/snprintf.m4,
+	lib/gl/m4/socklen.m4, lib/gl/m4/sockpfaf.m4, lib/gl/m4/stdbool.m4,
+	lib/gl/m4/stdint.m4, lib/gl/m4/stdint_h.m4, lib/gl/m4/stdio_h.m4,
+	lib/gl/m4/stdlib_h.m4, lib/gl/m4/strcase.m4, lib/gl/m4/string_h.m4,
+	lib/gl/m4/strings_h.m4, lib/gl/m4/strverscmp.m4,
+	lib/gl/m4/sys_ioctl_h.m4, lib/gl/m4/sys_socket_h.m4,
+	lib/gl/m4/sys_stat_h.m4, lib/gl/m4/threadlib.m4,
+	lib/gl/m4/time_h.m4, lib/gl/m4/time_r.m4, lib/gl/m4/uintmax_t.m4,
+	lib/gl/m4/unistd_h.m4, lib/gl/m4/vasnprintf.m4,
+	lib/gl/m4/vasprintf.m4, lib/gl/m4/visibility.m4,
+	lib/gl/m4/wchar.m4, lib/gl/m4/wchar_t.m4, lib/gl/m4/wint_t.m4,
+	lib/gl/m4/xsize.m4, lib/gl/memchr.c, lib/gl/memcmp.c,
+	lib/gl/memmem.c, lib/gl/memmove.c, lib/gl/minmax.h,
+	lib/gl/netdb.in.h, lib/gl/override/lib/gc-libgcrypt.c.diff,
+	lib/gl/printf-args.c, lib/gl/printf-args.h, lib/gl/printf-parse.c,
+	lib/gl/printf-parse.h, lib/gl/read-file.c, lib/gl/read-file.h,
+	lib/gl/realloc.c, lib/gl/size_max.h, lib/gl/snprintf.c,
+	lib/gl/stdbool.in.h, lib/gl/stdint.in.h, lib/gl/stdio-impl.h,
+	lib/gl/stdio-write.c, lib/gl/stdio.in.h, lib/gl/stdlib.in.h,
+	lib/gl/str-two-way.h, lib/gl/strcasecmp.c, lib/gl/string.in.h,
+	lib/gl/strings.in.h, lib/gl/strncasecmp.c, lib/gl/strverscmp.c,
+	lib/gl/sys_socket.in.h, lib/gl/sys_stat.in.h,
+	lib/gl/tests/Makefile.am, lib/gl/tests/dummy.c,
+	lib/gl/tests/intprops.h, lib/gl/tests/test-alloca-opt.c,
+	lib/gl/tests/test-byteswap.c, lib/gl/tests/test-c-ctype.c,
+	lib/gl/tests/test-errno.c, lib/gl/tests/test-fseeko.c,
+	lib/gl/tests/test-fseeko.sh, lib/gl/tests/test-func.c,
+	lib/gl/tests/test-lseek.c, lib/gl/tests/test-lseek.sh,
+	lib/gl/tests/test-memchr.c, lib/gl/tests/test-memcmp.c,
+	lib/gl/tests/test-netdb.c, lib/gl/tests/test-read-file.c,
+	lib/gl/tests/test-snprintf.c, lib/gl/tests/test-stdbool.c,
+	lib/gl/tests/test-stdint.c, lib/gl/tests/test-stdio.c,
+	lib/gl/tests/test-stdlib.c, lib/gl/tests/test-string.c,
+	lib/gl/tests/test-strings.c, lib/gl/tests/test-strverscmp.c,
+	lib/gl/tests/test-sys_socket.c, lib/gl/tests/test-sys_stat.c,
+	lib/gl/tests/test-time.c, lib/gl/tests/test-unistd.c,
+	lib/gl/tests/test-vasnprintf.c, lib/gl/tests/test-vasprintf.c,
+	lib/gl/tests/test-wchar.c, lib/gl/tests/verify.h, lib/gl/time.in.h,
+	lib/gl/time_r.c, lib/gl/unistd.in.h, lib/gl/vasnprintf.c,
+	lib/gl/vasnprintf.h, lib/gl/vasprintf.c, lib/gl/wchar.in.h,
+	lib/gl/xsize.h, libextra/configure.ac: Start configure split.
+
+2008-10-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, doc/gnutls.texi, lib/Makefile.am,
+	lib/libgnutls-config.in, lib/libgnutls.m4, libextra/.gitignore,
+	libextra/Makefile.am, libextra/libgnutls-extra-config.in,
+	libextra/libgnutls-extra.m4: Remove *-config scripts and old M4
+	checks.
+
+2008-10-29  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, maint.mk: Update gnulib files.
+
+2008-10-28  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix coverage rules.
+
+2008-10-28  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Need to build before running checks.
+
+2008-10-28  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Add code coverage rules.
+
+2008-10-23  Simon Josefsson <simon@josefsson.org>
+
+	* : commit 3eab289192e97f0bada61ca2c4d51214a4e4f7df Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Wed Oct 22 22:06:21
+	2008 +0300
+
+2008-10-22  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit 8973cd66b52fda65b4c9ffadab3b9db59a464fb0 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Wed Oct 22 18:42:41 2008
+	+0200
+
+2008-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/netdb_h.m4, gl/netdb.in.h, lgl/m4/netdb_h.m4,
+	lgl/netdb.in.h, lgl/sys_socket.in.h: Update gnulib files.
+
+2008-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/scripts/gdoc: Sync gdoc with libidn for license fixes.
+
+2008-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Use netdb.h instead of getaddrinfo.h.
+
+2008-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* gl/arpa_inet.in.h, gl/gai_strerror.c, gl/getaddrinfo.c,
+	gl/getaddrinfo.h, gl/gnulib.mk, gl/m4/getaddrinfo.m4,
+	gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4, gl/m4/netdb_h.m4,
+	gl/netdb.in.h, gl/netinet_in.in.h, gl/stdarg.in.h,
+	gl/tests/gnulib.mk, gl/tests/test-getaddrinfo.c,
+	gl/tests/test-netdb.c, lgl/Makefile.am, lgl/errno.in.h,
+	lgl/float.in.h, lgl/m4/gnulib-common.m4, lgl/m4/gnulib-comp.m4,
+	lgl/m4/netdb_h.m4, lgl/m4/stdlib_h.m4, lgl/m4/sys_socket_h.m4,
+	lgl/m4/sys_stat_h.m4, lgl/m4/unistd_h.m4, lgl/netdb.in.h,
+	lgl/stdint.in.h, lgl/stdio.in.h, lgl/stdlib.in.h, lgl/string.in.h,
+	lgl/strings.in.h, lgl/sys_socket.in.h, lgl/sys_stat.in.h,
+	lgl/time.in.h, lgl/unistd.in.h, lgl/wchar.in.h, lgl/winsock.c,
+	libextra/gl/m4/gnulib-common.m4: Update gnulib files.
+
+2008-10-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-10-16  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit a1c1da1939efe571f427a6323a8bb5311d933061 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Thu Oct 16 12:21:32 2008
+	+0200
+
 2008-10-16  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.0.
@@ -55,6 +503,10 @@
 2008-10-12  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO: Add.
+
+2008-10-11  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* .gitignore: added to reduce untracked files.
 
 2008-10-11  Simon Josefsson <simon@josefsson.org>
 
