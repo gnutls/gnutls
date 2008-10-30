@@ -112,6 +112,8 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
+  gl_FUNC_PERROR
+  gl_STRING_MODULE_INDICATOR([perror])
   gl_FUNC_READ_FILE
   gl_FUNC_READLINE
   gl_FUNC_REALLOC_POSIX
@@ -210,8 +212,6 @@ AC_SUBST([LTALLOCA])
   fi
   gl_SYS_IOCTL_MODULE_INDICATOR([ioctl])
   gl_MODULE_INDICATOR([ioctl])
-  gl_FUNC_PERROR
-  gl_STRING_MODULE_INDICATOR([perror])
   gl_SOCKETS
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
@@ -348,6 +348,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/minmax.h
   lib/netdb.in.h
   lib/netinet_in.in.h
+  lib/perror.c
   lib/printf-args.c
   lib/printf-args.h
   lib/printf-parse.c
@@ -476,7 +477,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests=lib/connect.c
   tests=lib/ioctl.c
-  tests=lib/perror.c
   tests=lib/sockets.c
   tests=lib/sockets.h
   tests=lib/sys_ioctl.in.h

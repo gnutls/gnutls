@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --libtool --macro-prefix=gl --no-vc-files accept arpa_inet autobuild bind close error fdl gendocs getaddrinfo getline getpass-gnu gnupload gpl-3.0 inet_ntop inet_pton lgpl-2.1 listen maintainer-makefile minmax progname read-file readline select setsockopt shutdown socket version-etc-fsf
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --libtool --macro-prefix=gl --no-vc-files accept arpa_inet autobuild bind close error fdl gendocs getaddrinfo getline getpass-gnu gnupload gpl-3.0 inet_ntop inet_pton lgpl-2.1 listen maintainer-makefile minmax perror progname read-file readline select setsockopt shutdown socket version-etc-fsf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
@@ -39,6 +39,7 @@ gl_MODULES([
   listen
   maintainer-makefile
   minmax
+  perror
   progname
   read-file
   readline

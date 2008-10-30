@@ -160,15 +160,6 @@ EXTRA_DIST += test-netinet_in.c
 
 ## end   gnulib module netinet_in-tests
 
-## begin gnulib module perror
-
-
-EXTRA_DIST += perror.c
-
-EXTRA_libtests_a_SOURCES += perror.c
-
-## end   gnulib module perror
-
 ## begin gnulib module perror-tests
 
 TESTS += test-perror.sh
