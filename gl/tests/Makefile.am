@@ -300,6 +300,15 @@ EXTRA_DIST += test-sys_socket.c
 
 ## end   gnulib module sys_socket-tests
 
+## begin gnulib module sys_stat-tests
+
+TESTS += test-sys_stat
+check_PROGRAMS += test-sys_stat
+
+EXTRA_DIST += test-sys_stat.c
+
+## end   gnulib module sys_stat-tests
+
 ## begin gnulib module sys_time-tests
 
 TESTS += test-sys_time

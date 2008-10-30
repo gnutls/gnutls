@@ -170,6 +170,8 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_SYS_SOCKET
   gl_MODULE_INDICATOR([sys_socket])
   AC_PROG_MKDIR_P
+  gl_HEADER_SYS_STAT_H
+  AC_PROG_MKDIR_P
   gl_HEADER_SYS_TIME_H
   AC_PROG_MKDIR_P
   gl_UNISTD_H
@@ -389,6 +391,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/string.in.h
   lib/sys_select.in.h
   lib/sys_socket.in.h
+  lib/sys_stat.in.h
   lib/sys_time.in.h
   lib/unistd.in.h
   lib/vasnprintf.c
@@ -450,6 +453,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_ioctl_h.m4
   m4/sys_select_h.m4
   m4/sys_socket_h.m4
+  m4/sys_stat_h.m4
   m4/sys_time_h.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
@@ -484,6 +488,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-string.c
   tests/test-sys_select.c
   tests/test-sys_socket.c
+  tests/test-sys_stat.c
   tests/test-sys_time.c
   tests/test-unistd.c
   tests/test-vasnprintf.c
