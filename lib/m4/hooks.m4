@@ -22,6 +22,21 @@
 
 AC_DEFUN([LIBGNUTLS_HOOKS],
 [
+  AC_PROG_CXX
+
+  AC_ARG_ENABLE(cxx,
+                AS_HELP_STRING([--disable-cxx],
+                               [unconditionally disable the C++ library]),
+                use_cxx=$enableval, use_cxx=yes)
+  if test "$use_cxx" != "no"; then
+    AC_LANG_PUSH(C++)
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])], use_cxx=yes, use_cxx=no)
+    AC_LANG_POP(C++)
+  fi
+  AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+  AC_MSG_CHECKING([whether to build C++ library])
+  AC_MSG_RESULT($use_cxx)
+
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
       included_libtasn1=$withval,
@@ -146,4 +161,37 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
    AC_MSG_RESULT(no)
   fi
   AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
+
+  AC_MSG_CHECKING([if gcc/ld supports -Wl,--output-def])
+  if test "$enable_shared" = no; then
+    output_def=no
+    AC_MSG_RESULT([no need, since shared libraries are disabled])
+  else
+    _gcc_ldflags_save=$LDFLAGS
+    LDFLAGS="-Wl,--output-def,foo.def"
+    AC_LINK_IFELSE(AC_LANG_PROGRAM([]),output_def=yes,output_def=no)
+    rm -f foo.def
+    AC_MSG_RESULT($output_def)
+    LDFLAGS="$_gcc_ldflags_save"
+  fi
+  AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
+
+  # For some systems we know that we have ld_version scripts.
+  # Use it then as default.
+  have_ld_version_script=no
+  case "${host}" in
+      *-*-linux*)
+          have_ld_version_script=yes
+          ;;
+      *-*-gnu*)
+          have_ld_version_script=yes
+          ;;
+  esac
+  AC_ARG_ENABLE([ld-version-script],
+                AC_HELP_STRING([--enable-ld-version-script],
+                               [enable/disable use of linker version script.
+                                (default is system dependent)]),
+                [have_ld_version_script=$enableval],
+                [ : ] )
+  AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 ])
