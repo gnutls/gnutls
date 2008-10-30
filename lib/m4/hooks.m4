@@ -217,4 +217,19 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
                 [have_ld_version_script=$enableval],
                 [ : ] )
   AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
+
+  # For storing integers in pointers without warnings
+  # http://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
+  AC_CHECK_SIZEOF(void *)
+  AC_CHECK_SIZEOF(long)
+  AC_CHECK_SIZEOF(int)
+  case $ac_cv_sizeof_void_p in
+    $ac_cv_sizeof_long)
+      AC_DEFINE(GNUTLS_POINTER_TO_INT_CAST, [(long)],
+                [Additional cast to bring void* to a type castable to int.])
+      ;;
+    *)
+      AC_DEFINE(GNUTLS_POINTER_TO_INT_CAST, [])
+      ;;
+  esac
 ])

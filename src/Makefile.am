@@ -59,7 +59,7 @@ gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 certtool_SOURCES = certtool.gaa certtool-gaa.h certtool-cfg.h	\
 	certtool-gaa.c certtool.c prime.c certtool-cfg.c
 certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
-	../gl/libgnu.la @LTLIBREADLINE@
+	../gl/libgnu.la ../lib/gl/liblgnu.la @LTLIBREADLINE@
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else

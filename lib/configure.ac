@@ -40,6 +40,12 @@ AC_PROG_LIBTOOL
 
 LIBGNUTLS_HOOKS
 
+AC_C_BIGENDIAN
+
+# For minitasn1.
+AC_CHECK_SIZEOF(unsigned long int, 4)
+AC_CHECK_SIZEOF(unsigned int, 4)
+
 AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
                                  [disable zlib compression support]),
             ac_zlib=$withval, ac_zlib=yes)
