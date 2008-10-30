@@ -69,15 +69,6 @@ EXTRA_DIST += test-c-ctype.c
 
 ## end   gnulib module c-ctype-tests
 
-## begin gnulib module connect
-
-
-EXTRA_DIST += connect.c w32sock.h
-
-EXTRA_libtests_a_SOURCES += connect.c
-
-## end   gnulib module connect
-
 ## begin gnulib module errno-tests
 
 TESTS += test-errno

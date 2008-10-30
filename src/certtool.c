@@ -39,10 +39,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <error.h>
 
 /* Gnulib portability files. */
 #include <read-file.h>
-#include <error.h>
 #include <progname.h>
 #include <version-etc.h>
 

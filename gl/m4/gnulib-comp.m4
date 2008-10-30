@@ -68,6 +68,11 @@ AC_SUBST([LTALLOCA])
   gl_SYS_SOCKET_MODULE_INDICATOR([bind])
   gl_FUNC_CLOSE
   gl_UNISTD_MODULE_INDICATOR([close])
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([connect])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([connect])
   gl_HEADER_ERRNO_H
   gl_ERROR
   m4_ifdef([AM_XGETTEXT_OPTION],
@@ -118,11 +123,21 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_READLINE
   gl_FUNC_REALLOC_POSIX
   gl_STDLIB_MODULE_INDICATOR([realloc-posix])
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([recv])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([recv])
   AC_REQUIRE([gl_HEADER_SYS_SELECT])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([winsock-select])
   fi
   gl_SYS_SELECT_MODULE_INDICATOR([select])
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([send])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([send])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([setsockopt])
@@ -200,11 +215,6 @@ AC_SUBST([LTALLOCA])
   m4_pushdef([gltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl/tests'
-  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
-  if test "$ac_cv_header_winsock2_h" = yes; then
-    AC_LIBOBJ([connect])
-  fi
-  gl_SYS_SOCKET_MODULE_INDICATOR([connect])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([ioctl])
@@ -326,6 +336,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/c-ctype.c
   lib/c-ctype.h
   lib/close.c
+  lib/connect.c
   lib/errno.in.h
   lib/error.c
   lib/error.h
@@ -360,6 +371,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/readline.c
   lib/readline.h
   lib/realloc.c
+  lib/recv.c
+  lib/send.c
   lib/setsockopt.c
   lib/shutdown.c
   lib/size_max.h
@@ -475,7 +488,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-unistd.c
   tests/test-vasnprintf.c
   tests/test-wchar.c
-  tests=lib/connect.c
   tests=lib/ioctl.c
   tests=lib/sockets.c
   tests=lib/sockets.h

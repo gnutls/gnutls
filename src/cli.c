@@ -28,8 +28,10 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <error.h>
 
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
@@ -40,10 +42,8 @@
 /* Gnulib portability files. */
 #include <progname.h>
 #include <version-etc.h>
-
-#include "error.h"
-#include "read-file.h"
-#include "getpass.h"
+#include <read-file.h>
+#include <getpass.h>
 
 #include "common.h"
 #include "cli-gaa.h"
