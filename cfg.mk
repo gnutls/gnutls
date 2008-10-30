@@ -26,8 +26,10 @@ ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
 endif
 
+PODIR := lib/po
+
 autoreconf:
-	for f in po/*.po.in; do \
+	for f in $(PODIR)/*.po.in; do \
 		cp $$f `echo $$f | sed 's/.in//'`; \
 	done
 	mv build-aux/config.rpath build-aux/config.rpath-
@@ -35,11 +37,11 @@ autoreconf:
 	mv build-aux/config.rpath- build-aux/config.rpath
 
 update-po: refresh-po
-	for f in `ls po/*.po | grep -v quot.po`; do \
+	for f in `ls $(PODIR)/*.po | grep -v quot.po`; do \
 		cp $$f $$f.in; \
 	done
-	git-add po/*.po.in
-	git-commit -m "Sync with TP." po/LINGUAS po/*.po.in
+	git-add $(PODIR)/*.po.in
+	git-commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
 
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
