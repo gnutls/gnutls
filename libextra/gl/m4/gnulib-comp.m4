@@ -15,7 +15,7 @@
 # In projects using CVS, this file can be treated like other built files.
 
 
-# This macro should be invoked from ./configure.in, in the section
+# This macro should be invoked from ./configure.ac, in the section
 # "Checks for programs", right after AC_PROG_CC, and certainly before
 # any checks for libraries, header files, types and library functions.
 AC_DEFUN([xgl_EARLY],
@@ -27,7 +27,7 @@ AC_DEFUN([xgl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
 ])
 
-# This macro should be invoked from ./configure.in, in the section
+# This macro should be invoked from ./configure.ac, in the section
 # "Check for header files, types and library functions".
 AC_DEFUN([xgl_INIT],
 [
@@ -39,7 +39,7 @@ AC_DEFUN([xgl_INIT],
   m4_pushdef([xgl_LIBSOURCES_LIST], [])
   m4_pushdef([xgl_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='libextra/gl'
+  gl_source_base='gl'
   gl_HMAC_MD5
   gl_MD5
   gl_MEMXOR
@@ -135,7 +135,7 @@ AC_DEFUN([xgl_REPLACE_FUNCS], [
 AC_DEFUN([xgl_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([xgl_LIBSOURCES_DIR], [libextra/gl])
+      m4_define([xgl_LIBSOURCES_DIR], [gl])
       m4_append([xgl_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
