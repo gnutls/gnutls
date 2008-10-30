@@ -29,6 +29,12 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.10 -Wall -Werror -Wno-override])
 AM_CONFIG_HEADER(config.h)
 
+# Compute numeric versions, used in includes/gnutls/gnutls.h.in.
+AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
+AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
+AC_SUBST(PATCH_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\..*\.\(.*\)/\1/g'`)
+AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION $PATCH_VERSION`)
+
 AC_PROG_CC
 lgl_EARLY
 
@@ -71,6 +77,8 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 
 AC_CONFIG_FILES([ \
   Makefile \
+  includes/Makefile
+  includes/gnutls/gnutls.h \
   minitasn1/Makefile \
   x509/Makefile \
   openpgp/Makefile \

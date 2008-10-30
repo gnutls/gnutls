@@ -18,8 +18,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
 # USA
 
-AM_CPPFLAGS = -I$(srcdir)/.. -I$(srcdir)/../gl -I$(builddir)/../gl	\
-	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
+AM_CPPFLAGS = \
+	-I$(srcdir)/../gl		\
+	-I$(builddir)/../gl		\
+	-I$(srcdir)/../includes 	\
+	-I$(builddir)/../includes	\
+	-I$(srcdir)/..			\
 	$(LIBOPENCDK_CFLAGS)
 
 if ENABLE_MINITASN1

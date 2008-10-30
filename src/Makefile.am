@@ -21,9 +21,12 @@ EXTRA_DIST = README README.srptool
 
 SUBDIRS = cfg
 
-AM_CPPFLAGS = -I$(builddir)../includes -I$(srcdir)/..includes \
-	-I$(srcdir)/../lib/gl -I$(builddir)/../lib/gl \
-	-I$(srcdir)/../gl -I$(builddir)/../gl \
+AM_CPPFLAGS = \
+	-I$(srcdir)/../gl			\
+	-I$(builddir)/../gl			\
+	-I$(builddir)../lib/includes		\
+	-I$(srcdir)/../lib/includes		\
+	-I$(srcdir)/../libextra/includes	\
 	-I$(srcdir)/cfg
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug

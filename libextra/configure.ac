@@ -77,6 +77,7 @@ AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
 AC_CONFIG_FILES([ \
   Makefile \
+  includes/Makefile
   gl/Makefile \
   gnutls-extra.pc \
 ])

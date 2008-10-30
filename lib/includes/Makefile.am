@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -20,33 +20,11 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
-AM_CPPFLAGS = \
-	-I$(srcdir)/../gl		\
-	-I$(builddir)/../gl		\
-	-I$(srcdir)/../includes 	\
-	-I$(builddir)/../includes	\
-	-I$(srcdir)/..			\
-	-I$(srcdir)/../opencdk
+nobase_include_HEADERS = gnutls/x509.h gnutls/pkcs12.h gnutls/compat.h	\
+	gnutls/openpgp.h gnutls/crypto.h
 
-if ENABLE_MINITASN1
-AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
+if ENABLE_CXX
+nobase_include_HEADERS += gnutls/gnutlsxx.h
 endif
 
-noinst_LTLIBRARIES = libgnutls_openpgp.la
-
-COBJECTS = pgp.c pgpverify.c extras.c compat.c privkey.c output.c	\
-	gnutls_openpgp.c
-
-libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp_int.h gnutls_openpgp.h
-
-EXTRA_DIST = pgp-api.texi
-
-pgp-api.texi: $(COBJECTS)
-	@echo "" > pgp-api.texi
-	@for i in $(COBJECTS); do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../../doc/scripts/gdoc -texinfo $$i >> pgp-api.texi && \
-		echo "ok"; \
-	done
-
-dist-hook: pgp-api.texi
+nobase_nodist_include_HEADERS = gnutls/gnutls.h

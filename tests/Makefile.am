@@ -26,11 +26,11 @@ if ENABLE_OPENPGP
 SUBDIRS += openpgp openpgp-certs
 endif
 
-EXTRA_DIST = libgcrypt.supp
+EXTRA_DIST = libgcrypt.supp hostname-check.README
 
 AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
-	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
+	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
 	-I$(top_srcdir)/lib 						\
 	-I$(top_srcdir)/doc/examples
 AM_LDFLAGS = -no-install
@@ -47,7 +47,7 @@ libutils_la_SOURCES = utils.h utils.c
 
 ctests = simple openssl gc set_pkcs12_cred certder mpi			\
 	certificate_set_x509_crl dn parse_ca moredn crypto_rng mini	\
-	finished
+	finished hostname-check openpgp-keyring
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 
 if ENABLE_OPENPGP

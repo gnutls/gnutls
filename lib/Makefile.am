@@ -22,16 +22,18 @@
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
-SUBDIRS = gl po x509
+SUBDIRS = gl includes po x509
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
 
 localedir = $(datadir)/locale
 
-AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
-	-I$(srcdir)/gl -I$(builddir)/gl					\
-	-I$(srcdir)/../includes -I$(builddir)../includes		\
+AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"	\
+	-I$(srcdir)/gl				\
+	-I$(builddir)/gl			\
+	-I$(srcdir)/includes			\
+	-I$(builddir)/includes			\
 	-I$(srcdir)/x509
 
 if ENABLE_OPENPGP

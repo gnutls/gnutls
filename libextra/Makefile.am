@@ -22,16 +22,20 @@
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I ../lib/m4
 
-AM_CPPFLAGS = -I$(srcdir)/gl						\
-	-I$(srcdir)/../lib/gl -I$(builddir)/../lib/gl			\
-	-I$(srcdir)/../lib						\
-	-I$(builddir)/../includes -I$(srcdir)/../includes
+AM_CPPFLAGS = \
+	-I$(srcdir)/../lib/gl		\
+	-I$(builddir)/../lib/gl		\
+	-I$(srcdir)/gl			\
+	-I$(builddir)/../lib/includes	\
+	-I$(srcdir)/../lib/includes	\
+	-I$(srcdir)/includes		\
+	-I$(srcdir)/../lib
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
 endif
 
-SUBDIRS = gl
+SUBDIRS = gl includes
 
 # Pkg-config script.
 pkgconfigdir = $(libdir)/pkgconfig
