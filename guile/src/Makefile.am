@@ -62,7 +62,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/includes \
 	-I$(top_builddir)/lib/includes	\
 	-I$(top_srcdir)/libextra/includes \
-	-I$(builddir)
+	-I$(top_builddir)
 
 if HAVE_GCC
 

@@ -22,9 +22,11 @@ EXTRA_DIST = README README.srptool
 SUBDIRS = cfg
 
 AM_CPPFLAGS = \
+	-I$(srcdir)/../lib/gl			\
+	-I$(builddir)/../lib/gl			\
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
-	-I$(builddir)../lib/includes		\
+	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
 	-I$(srcdir)/../libextra/includes	\
 	-I$(srcdir)/cfg
