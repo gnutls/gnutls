@@ -69,6 +69,15 @@ EXTRA_DIST += test-c-ctype.c
 
 ## end   gnulib module c-ctype-tests
 
+## begin gnulib module connect
+
+
+EXTRA_DIST += connect.c w32sock.h
+
+EXTRA_libtests_a_SOURCES += connect.c
+
+## end   gnulib module connect
+
 ## begin gnulib module errno-tests
 
 TESTS += test-errno
@@ -115,6 +124,15 @@ EXTRA_DIST += test-getline.c
 
 ## end   gnulib module getline-tests
 
+## begin gnulib module ioctl
+
+
+EXTRA_DIST += ioctl.c w32sock.h
+
+EXTRA_libtests_a_SOURCES += ioctl.c
+
+## end   gnulib module ioctl
+
 ## begin gnulib module lseek-tests
 
 TESTS += test-lseek.sh
@@ -142,6 +160,34 @@ EXTRA_DIST += test-netinet_in.c
 
 ## end   gnulib module netinet_in-tests
 
+## begin gnulib module perror
+
+
+EXTRA_DIST += perror.c
+
+EXTRA_libtests_a_SOURCES += perror.c
+
+## end   gnulib module perror
+
+## begin gnulib module perror-tests
+
+TESTS += test-perror.sh
+TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@' srcdir='$(srcdir)'
+check_PROGRAMS += test-perror
+EXTRA_DIST += test-perror.c test-perror.sh
+
+## end   gnulib module perror-tests
+
+## begin gnulib module select-tests
+
+TESTS += test-select
+check_PROGRAMS += test-select
+test_select_LDADD = $(LDADD) @LIBSOCKET@
+
+EXTRA_DIST += test-select.c
+
+## end   gnulib module select-tests
+
 ## begin gnulib module snprintf-tests
 
 TESTS += test-snprintf
@@ -150,6 +196,21 @@ check_PROGRAMS += test-snprintf
 EXTRA_DIST += test-snprintf.c
 
 ## end   gnulib module snprintf-tests
+
+## begin gnulib module sockets
+
+libtests_a_SOURCES += sockets.h sockets.c
+
+## end   gnulib module sockets
+
+## begin gnulib module sockets-tests
+
+TESTS += test-sockets
+check_PROGRAMS += test-sockets
+test_sockets_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-sockets.c
+
+## end   gnulib module sockets-tests
 
 ## begin gnulib module stdbool-tests
 
@@ -204,6 +265,42 @@ EXTRA_DIST += test-string.c
 
 ## end   gnulib module string-tests
 
+## begin gnulib module sys_ioctl
+
+BUILT_SOURCES += $(SYS_IOCTL_H)
+
+# We need the following in order to create <sys/ioctl.h> when the system
+# does not have a complete one.
+sys/ioctl.h: sys_ioctl.in.h
+	@MKDIR_P@ sys
+	rm -f $@-t $@
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's|@''HAVE_SYS_IOCTL_H''@|$(HAVE_SYS_IOCTL_H)|g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''NEXT_SYS_IOCTL_H''@|$(NEXT_SYS_IOCTL_H)|g' \
+	      -e 's|@''GNULIB_IOCTL''@|$(GNULIB_IOCTL)|g' \
+	      -e 's|@''SYS_IOCTL_H_HAVE_WINSOCK2_H''@|$(SYS_IOCTL_H_HAVE_WINSOCK2_H)|g' \
+	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
+	      < $(srcdir)/sys_ioctl.in.h; \
+	} > $@-t
+	mv $@-t $@
+MOSTLYCLEANFILES += sys/ioctl.h sys/ioctl.h-t
+MOSTLYCLEANDIRS += sys
+
+EXTRA_DIST += sys_ioctl.in.h
+
+## end   gnulib module sys_ioctl
+
+## begin gnulib module sys_select-tests
+
+TESTS += test-sys_select
+check_PROGRAMS += test-sys_select
+
+EXTRA_DIST += test-sys_select.c
+
+## end   gnulib module sys_select-tests
+
 ## begin gnulib module sys_socket-tests
 
 TESTS += test-sys_socket
@@ -212,6 +309,15 @@ check_PROGRAMS += test-sys_socket
 EXTRA_DIST += test-sys_socket.c
 
 ## end   gnulib module sys_socket-tests
+
+## begin gnulib module sys_time-tests
+
+TESTS += test-sys_time
+check_PROGRAMS += test-sys_time
+
+EXTRA_DIST += test-sys_time.c
+
+## end   gnulib module sys_time-tests
 
 ## begin gnulib module unistd-tests
 
@@ -245,12 +351,6 @@ check_PROGRAMS += test-wchar
 EXTRA_DIST += test-wchar.c
 
 ## end   gnulib module wchar-tests
-
-## begin gnulib module dummy
-
-libtests_a_SOURCES += dummy.c
-
-## end   gnulib module dummy
 
 # Clean up after Solaris cc.
 clean-local:

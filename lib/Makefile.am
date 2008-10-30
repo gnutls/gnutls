@@ -107,7 +107,7 @@ libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_la_LIBADD = gl/liblgnu.la x509/libgnutls_x509.la \
-	$(LTLIBZ) $(LTLIBGCRYPT) $(LTLIBINTL)
+	$(LTLIBZ) $(LTLIBGCRYPT) $(LTLIBINTL) $(LIBSOCKET)
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la

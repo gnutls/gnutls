@@ -8,13 +8,11 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <netinet/in.h>
+#include <signal.h>
 #ifdef _WIN32
 # include <io.h>
 # include <winbase.h>
-# define close closesocket
-#else
-# include <netinet/in.h>
-# include <signal.h>
 #endif
 
 /* the number of elements in the priority structures.
