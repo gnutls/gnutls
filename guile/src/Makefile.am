@@ -69,7 +69,7 @@ if HAVE_GCC
 # Generated `.x' files and Guile's `scm_c_define_gsubr ()' require
 # `-Wno-strict-prototypes'.  This trick makes sure `-Wno-s-p' appears
 # after `-Ws-p'.
-AM_CFLAGS += -Wno-strict-prototypes
+AM_CFLAGS = -Wno-strict-prototypes
 
 # The `-fgnu89-inline' option appeared in GCC 4.1.3.
 if HAVE_GCC_GNU89_INLINE_OPTION
