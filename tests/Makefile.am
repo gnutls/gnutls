@@ -49,6 +49,7 @@ ctests = simple openssl gc set_pkcs12_cred certder mpi			\
 	certificate_set_x509_crl dn parse_ca moredn crypto_rng mini	\
 	finished hostname-check openpgp-keyring
 openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
+openpgp_keyring_LDADD = $(LDADD) ../libextra/libgnutls-extra.la
 
 if ENABLE_OPENPGP
 ctests += pgps2kgnu 
