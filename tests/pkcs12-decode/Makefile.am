@@ -27,14 +27,14 @@ TESTS = pkcs12 pkcs12_s2k
 
 check_PROGRAMS = pkcs12_s2k
 
-AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl 		\
+AM_CPPFLAGS = \
 	-I$(srcdir)/.. 							\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/includes -I$(top_builddir)/includes		\
 	-I$(top_srcdir)/lib 						\
 	-I$(top_srcdir)/doc/examples
 AM_LDFLAGS = -no-install
-LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la ../../lgl/liblgnu.la ../libutils.la
+LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la ../libutils.la
 
 if ENABLE_MINITASN1
 

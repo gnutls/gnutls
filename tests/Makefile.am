@@ -34,7 +34,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
 	-I$(top_srcdir)/lib 						\
 	-I$(top_srcdir)/doc/examples
 AM_LDFLAGS = -no-install
-LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la libutils.la
+LDADD = ../lib/libgnutls.la ../gl/libgnu.la libutils.la
 
 if ENABLE_MINITASN1
 
