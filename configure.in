@@ -160,15 +160,6 @@ AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
 
-# Check for and replace ssize_t.
-AC_CHECK_TYPE(ssize_t,
-	[DEFINE_SSIZE_T="#include <sys/types.h>"
-	AC_SUBST(DEFINE_SSIZE_T)],
-	[AC_DEFINE(NO_SSIZE_T, 1, [no ssize_t type was found])
-	DEFINE_SSIZE_T="typedef int ssize_t;"
-	AC_SUBST(DEFINE_SSIZE_T)],
-	[#include <sys/types.h>])
-
 AC_MSG_RESULT([***
 *** Checking for external libraries...
 ])
