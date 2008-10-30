@@ -28,6 +28,7 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_GNU_SOURCE])
   AB_INIT
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  AC_REQUIRE([AC_FUNC_FSEEKO])
   dnl Some compilers (e.g., AIX 5.3 cc) need to be in c99 mode
   dnl for the builtin va_copy to work.  With Autoconf 2.60 or later,
   dnl AC_PROG_CC_STDC arranges for this.  With older Autoconf AC_PROG_CC_STDC
@@ -48,12 +49,17 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([gl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl'
+  gl_FUNC_ALLOCA
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
+  gl_HEADER_ERRNO_H
   gl_ERROR
   m4_ifdef([AM_XGETTEXT_OPTION],
     [AM_XGETTEXT_OPTION([--flag=error:3:c-format])
      AM_XGETTEXT_OPTION([--flag=error_at_line:5:c-format])])
+  gl_FLOAT_H
+  gl_FUNC_FSEEKO
+  gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_GETADDRINFO
   gl_NETDB_MODULE_INDICATOR([getaddrinfo])
   gl_FUNC_GETDELIM
@@ -61,6 +67,8 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_GETLINE
   gl_STDIO_MODULE_INDICATOR([getline])
   gl_FUNC_GETPASS_GNU
+  AC_SUBST([LIBINTL])
+  AC_SUBST([LTLIBINTL])
   # Autoconf 2.61a.99 and earlier don't support linking a file only
   # in VPATH builds.  But since GNUmakefile is for maintainer use
   # only, it does not matter if we skip the link with older autoconf.
@@ -75,14 +83,33 @@ AC_DEFUN([gl_INIT],
   gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
   gl_INET_PTON
   gl_ARPA_INET_MODULE_INDICATOR([inet_pton])
+  gl_FUNC_LSEEK
+  gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_FUNC_READLINE
+  gl_FUNC_REALLOC_POSIX
+  gl_STDLIB_MODULE_INDICATOR([realloc-posix])
+  gl_SIZE_MAX
+  gl_FUNC_SNPRINTF
+  gl_STDIO_MODULE_INDICATOR([snprintf])
   gl_TYPE_SOCKLEN_T
   gl_STDARG_H
+  AM_STDBOOL_H
+  gl_STDINT_H
+  gl_STDIO_H
+  gl_STDLIB_H
   gl_FUNC_STRERROR
   gl_STRING_MODULE_INDICATOR([strerror])
+  gl_HEADER_STRING_H
+  gl_HEADER_SYS_SOCKET
+  gl_MODULE_INDICATOR([sys_socket])
+  AC_PROG_MKDIR_P
+  gl_UNISTD_H
+  gl_FUNC_VASNPRINTF
+  gl_WCHAR_H
+  gl_XSIZE
   m4_ifval(gl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gl_LIBSOURCES_DIR])[ ||
       for gl_file in ]gl_LIBSOURCES_LIST[ ; do
@@ -122,6 +149,9 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([gltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl/tests'
+  gt_TYPE_WCHAR_T
+  gt_TYPE_WINT_T
+  AC_CHECK_FUNCS([shutdown])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
       for gl_file in ]gltests_LIBSOURCES_LIST[ ; do
@@ -152,6 +182,8 @@ AC_DEFUN([gl_INIT],
     AC_SUBST([gltests_LIBOBJS], [$gltests_libobjs])
     AC_SUBST([gltests_LTLIBOBJS], [$gltests_ltlibobjs])
   ])
+  LIBTESTS_LIBDEPS="$gltests_libdeps"
+  AC_SUBST([LIBTESTS_LIBDEPS])
 ])
 
 # Like AC_LIBOBJ, except that the module name goes
@@ -219,35 +251,67 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/gendocs_template
   doc/gpl-3.0.texi
   doc/lgpl-2.1.texi
+  lib/alloca.in.h
   lib/arpa_inet.in.h
+  lib/asnprintf.c
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/errno.in.h
   lib/error.c
   lib/error.h
+  lib/float+.h
+  lib/float.in.h
+  lib/fseeko.c
   lib/gai_strerror.c
   lib/getaddrinfo.c
   lib/getdelim.c
   lib/getline.c
   lib/getpass.c
   lib/getpass.h
+  lib/gettext.h
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
+  lib/lseek.c
   lib/netdb.in.h
   lib/netinet_in.in.h
+  lib/printf-args.c
+  lib/printf-args.h
+  lib/printf-parse.c
+  lib/printf-parse.h
   lib/progname.c
   lib/progname.h
   lib/readline.c
   lib/readline.h
+  lib/realloc.c
+  lib/size_max.h
+  lib/snprintf.c
   lib/stdarg.in.h
+  lib/stdbool.in.h
+  lib/stdint.in.h
+  lib/stdio-impl.h
+  lib/stdio-write.c
+  lib/stdio.in.h
+  lib/stdlib.in.h
   lib/strerror.c
+  lib/string.in.h
+  lib/sys_socket.in.h
+  lib/unistd.in.h
+  lib/vasnprintf.c
+  lib/vasnprintf.h
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h
+  lib/wchar.in.h
+  lib/xsize.h
+  m4/alloca.m4
   m4/arpa_inet_h.m4
   m4/autobuild.m4
+  m4/errno_h.m4
   m4/error.m4
   m4/extensions.m4
+  m4/float_h.m4
+  m4/fseeko.m4
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
@@ -256,23 +320,64 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/include_next.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
+  m4/intmax_t.m4
+  m4/inttypes_h.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
+  m4/longlong.m4
+  m4/lseek.m4
+  m4/malloc.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
+  m4/printf.m4
   m4/readline.m4
+  m4/realloc.m4
+  m4/size_max.m4
+  m4/snprintf.m4
   m4/socklen.m4
+  m4/sockpfaf.m4
   m4/stdarg.m4
+  m4/stdbool.m4
+  m4/stdint.m4
+  m4/stdint_h.m4
+  m4/stdio_h.m4
+  m4/stdlib_h.m4
   m4/strerror.m4
+  m4/string_h.m4
+  m4/sys_socket_h.m4
+  m4/unistd_h.m4
+  m4/vasnprintf.m4
+  m4/wchar.m4
+  m4/wchar_t.m4
+  m4/wint_t.m4
+  m4/xsize.m4
+  tests/test-alloca-opt.c
   tests/test-arpa_inet.c
   tests/test-c-ctype.c
+  tests/test-errno.c
+  tests/test-fseeko.c
+  tests/test-fseeko.sh
   tests/test-getaddrinfo.c
   tests/test-getdelim.c
   tests/test-getline.c
+  tests/test-lseek.c
+  tests/test-lseek.sh
   tests/test-netdb.c
   tests/test-netinet_in.c
+  tests/test-snprintf.c
+  tests/test-stdbool.c
+  tests/test-stdint.c
+  tests/test-stdio.c
+  tests/test-stdlib.c
   tests/test-strerror.c
+  tests/test-string.c
+  tests/test-sys_socket.c
+  tests/test-unistd.c
+  tests/test-vasnprintf.c
+  tests/test-wchar.c
+  tests=lib/dummy.c
+  tests=lib/verify.h
   top/GNUmakefile
   top/maint.mk
 ])

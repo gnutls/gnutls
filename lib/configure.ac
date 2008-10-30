@@ -29,11 +29,12 @@ AC_CONFIG_MACRO_DIR([../m4])
 AM_INIT_AUTOMAKE([1.10 -Wall -Werror -Wno-override])
 AM_CONFIG_HEADER(config.h)
 
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
-
 AC_PROG_CC
 AC_PROG_CXX
+lgl_EARLY
+
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
 
 # Check for libtasn1
 AC_ARG_WITH(included-libtasn1,
@@ -160,6 +161,35 @@ else
  AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
+
+dnl CHECK FOR ZLIB SUPPORT
+dnl
+
+AC_MSG_CHECKING([whether to include zlib compression support])
+
+AC_ARG_WITH(zlib,
+	AS_HELP_STRING([--without-zlib], [disable zlib compression support]),
+	ac_zlib=$withval,
+	ac_zlib=yes)
+
+if test x$ac_zlib != xno; then
+ AC_MSG_RESULT(yes)
+ AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
+ if test "$ac_cv_libz" != yes; then
+   AC_MSG_WARN(
+*** 
+*** ZLIB was not found. You will not be able to use ZLIB compression.)
+ fi
+else
+ AC_MSG_RESULT(no)
+fi
+
+lgl_INIT
+
+LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
+LIBGNUTLS_CFLAGS="-I${includedir}"
+AC_SUBST(LIBGNUTLS_LIBS)
+AC_SUBST(LIBGNUTLS_CFLAGS)
 
 AC_CONFIG_FILES([ \
   Makefile \

@@ -92,8 +92,6 @@ AC_MSG_RESULT([***
 ])
 
 gl_EARLY
-lgl_EARLY
-xgl_EARLY
 AC_C_INLINE
 
 AM_GNU_GETTEXT([external])
@@ -409,66 +407,6 @@ LIBS=$SAVED_LIBS
 AC_MSG_CHECKING([whether to use the included libcfg])
 AC_MSG_RESULT($libcfg_enabled)
 
-
-dnl CHECK FOR ZLIB SUPPORT
-dnl
-
-AC_MSG_CHECKING([whether to include zlib compression support])
-
-AC_ARG_WITH(zlib,
-	AS_HELP_STRING([--without-zlib], [disable zlib compression support]),
-	ac_zlib=$withval,
-	ac_zlib=yes)
-
-if test x$ac_zlib != xno; then
- AC_MSG_RESULT(yes)
- AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
- if test "$ac_cv_libz" != yes; then
-   AC_MSG_WARN(
-*** 
-*** ZLIB was not found. You will not be able to use ZLIB compression.)
- fi
-else
- AC_MSG_RESULT(no)
-fi
-
-
-dnl CHECK FOR LZO SUPPORT
-dnl
-
-AC_ARG_WITH(lzo,
-	AS_HELP_STRING([--with-lzo], [use experimental LZO compression]),
-	use_lzo=$withval,
-	use_lzo=no)
-AC_MSG_CHECKING([whether to include LZO compression support])
-AC_MSG_RESULT($use_lzo)
-
-LZO_LIBS=
-if test "$use_lzo" = "yes"; then
-  AC_CHECK_LIB(lzo2, lzo1x_1_compress, LZO_LIBS=-llzo2)
-  if test "$LZO_LIBS" = ""; then
-    AC_CHECK_LIB(lzo, lzo1x_1_compress, LZO_LIBS=-llzo, [
-      use_lzo=no
-      AC_MSG_WARN(
-***
-*** Could not find liblzo or liblzo2.  Disabling LZO compression.
-)
-      ])
-  fi
-fi
-AC_SUBST(LZO_LIBS)
-
-if test "$use_lzo" = "yes"; then
-  AC_DEFINE(USE_LZO, 1, [whether to use the LZO compression])
-  if test "$LZO_LIBS" = "-llzo"; then
-    AC_CHECK_HEADERS(lzo1x.h)
-  elif test "$LZO_LIBS" = "-llzo2"; then
-    AC_CHECK_HEADERS(lzo/lzo1x.h)
-  fi
-fi
-
-AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
-
 # Windows hacks.
 
 AC_DEFINE([WINVER], [0x0501], [Windows 2000 or before not supported.])
@@ -494,24 +432,12 @@ AC_MSG_RESULT([***
 *** Setting up gnulib compatibility files...
 ])
 gl_INIT
-lgl_INIT
-xgl_INIT
 
 AC_MSG_RESULT([***
 *** Detecting options for shared libraries...
 ])
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
-
-LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
-LIBGNUTLS_CFLAGS="-I${includedir}"
-AC_SUBST(LIBGNUTLS_LIBS)
-AC_SUBST(LIBGNUTLS_CFLAGS)
-
-LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LZO_LIBS $LIBGNUTLS_LIBS"
-LIBGNUTLS_EXTRA_CFLAGS="-I${includedir}"
-AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
-AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
 export ac_full
 

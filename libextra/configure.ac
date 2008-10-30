@@ -29,6 +29,9 @@ AC_CONFIG_MACRO_DIR([../m4])
 AM_INIT_AUTOMAKE([1.10 -Wall -Werror -Wno-override])
 AM_CONFIG_HEADER(config.h)
 
+AC_PROG_CC
+xgl_EARLY
+
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
@@ -64,6 +67,49 @@ fi
 AC_MSG_CHECKING([whether to use the included minitasn1])
 AC_MSG_RESULT($included_libtasn1)
 AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
+
+dnl CHECK FOR LZO SUPPORT
+dnl
+
+AC_ARG_WITH(lzo,
+	AS_HELP_STRING([--with-lzo], [use experimental LZO compression]),
+	use_lzo=$withval,
+	use_lzo=no)
+AC_MSG_CHECKING([whether to include LZO compression support])
+AC_MSG_RESULT($use_lzo)
+
+LZO_LIBS=
+if test "$use_lzo" = "yes"; then
+  AC_CHECK_LIB(lzo2, lzo1x_1_compress, LZO_LIBS=-llzo2)
+  if test "$LZO_LIBS" = ""; then
+    AC_CHECK_LIB(lzo, lzo1x_1_compress, LZO_LIBS=-llzo, [
+      use_lzo=no
+      AC_MSG_WARN(
+***
+*** Could not find liblzo or liblzo2.  Disabling LZO compression.
+)
+      ])
+  fi
+fi
+AC_SUBST(LZO_LIBS)
+
+if test "$use_lzo" = "yes"; then
+  AC_DEFINE(USE_LZO, 1, [whether to use the LZO compression])
+  if test "$LZO_LIBS" = "-llzo"; then
+    AC_CHECK_HEADERS(lzo1x.h)
+  elif test "$LZO_LIBS" = "-llzo2"; then
+    AC_CHECK_HEADERS(lzo/lzo1x.h)
+  fi
+fi
+
+AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
+
+xgl_INIT
+
+LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LZO_LIBS $LIBGNUTLS_LIBS"
+LIBGNUTLS_EXTRA_CFLAGS="-I${includedir}"
+AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
+AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
 AC_CONFIG_FILES([ \
   libextra/Makefile \
