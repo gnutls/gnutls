@@ -69,6 +69,7 @@ AC_CONFIG_FILES([ \
   x509/Makefile \
   openpgp/Makefile \
   opencdk/Makefile \
+  po/Makefile.in \
   gnutls.pc \
   gl/Makefile \
   gl/tests/Makefile \

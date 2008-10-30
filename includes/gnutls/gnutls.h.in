@@ -49,8 +49,6 @@ extern "C"
 
 #define LIBGNUTLS_VERSION_NUMBER @NUMBER_VERSION@
 
-@POSSIBLY_WARN_ABOUT_MISSING_FEATURES@
-
 /* Get size_t. */
 #include <stddef.h>
 /* Get ssize_t. */

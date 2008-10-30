@@ -32,7 +32,9 @@ autoreconf:
 	for f in $(PODIR)/*.po.in; do \
 		cp $$f `echo $$f | sed 's/.in//'`; \
 	done
+	mv lib/build-aux/config.rpath lib/build-aux/config.rpath-
 	test -f ./configure || autoreconf --install
+	mv lib/build-aux/config.rpath- lib/build-aux/config.rpath
 
 update-po: refresh-po
 	for f in `ls $(PODIR)/*.po | grep -v quot.po`; do \

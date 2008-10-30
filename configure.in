@@ -29,18 +29,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.10 dist-bzip2 -Wall -Werror -Wno-override])
 AM_CONFIG_HEADER(config.h)
 
-# Library code modified:                              REVISION++
-# Interfaces changed/added/removed:   CURRENT++       REVISION=0
-# Interfaces added:                             AGE++
-# Interfaces removed:                           AGE=0
-AC_SUBST(LT_CURRENT, 38)
-AC_SUBST(LT_REVISION, 1)
-AC_SUBST(LT_AGE, 12)
-
-# Used when creating the Windows libgnutls-XX.def files.
-SOVERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
-AC_SUBST(SOVERSION)
-
 # Compute numeric versions, used in includes/gnutls/gnutls.h.in.
 AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
 AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
@@ -371,7 +359,7 @@ AC_SUBST(AM_CFLAGS)
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
 
-AC_CONFIG_FILES([Makefile po/Makefile.in \
+AC_CONFIG_FILES([Makefile \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile doc/doxygen/Doxyfile \
 	doc/credentials/Makefile doc/credentials/x509/Makefile \
