@@ -20,7 +20,9 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
-SUBDIRS = x509
+ACLOCAL_AMFLAGS = -I gl/m4
+
+SUBDIRS = gl x509
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -28,7 +30,7 @@ endif
 localedir = $(datadir)/locale
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
-	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
+	-I$(srcdir)/gl -I$(builddir)/gl					\
 	-I$(top_srcdir)/includes -I../includes				\
 	-I$(srcdir)/x509						\
 	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/openpgp/
