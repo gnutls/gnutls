@@ -145,6 +145,11 @@ rpl_fd_isset (SOCKET fd, fd_set * set)
 #  define close close_used_without_including_unistd_h
 # endif
 
+# if @HAVE_WINSOCK2_H@ && !defined _GL_UNISTD_H
+#  undef gethostname
+#  define gethostname gethostname_used_without_including_unistd_h
+# endif
+
 # if @GNULIB_SOCKET@
 #  if @HAVE_WINSOCK2_H@
 #   undef socket
@@ -386,11 +391,6 @@ extern int rpl_shutdown (int, int);
 # if @HAVE_WINSOCK2_H@
 #  undef select
 #  define select		select_used_without_including_sys_select_h
-# endif
-
-# if @GNULIB_CLOSE@ && @HAVE_WINSOCK2_H@
-/* Need a gnulib internal function.  */
-#  define HAVE__GL_CLOSE_FD_MAYBE_SOCKET 1
 # endif
 
 # ifdef __cplusplus

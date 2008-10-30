@@ -15,7 +15,7 @@
 # In projects using CVS, this file can be treated like other built files.
 
 
-# This macro should be invoked from ./configure.in, in the section
+# This macro should be invoked from ./configure.ac, in the section
 # "Checks for programs", right after AC_PROG_CC, and certainly before
 # any checks for libraries, header files, types and library functions.
 AC_DEFUN([lgl_EARLY],
@@ -30,7 +30,7 @@ AC_DEFUN([lgl_EARLY],
   AC_REQUIRE([AC_FUNC_FSEEKO])
 ])
 
-# This macro should be invoked from ./configure.in, in the section
+# This macro should be invoked from ./configure.ac, in the section
 # "Check for header files, types and library functions".
 AC_DEFUN([lgl_INIT],
 [
@@ -42,7 +42,7 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgl_LIBSOURCES_LIST], [])
   m4_pushdef([lgl_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='lgl'
+  gl_source_base='gl'
   gl_FUNC_ALLOCA
   gl_BYTESWAP
   gl_HEADER_ERRNO_H
@@ -133,7 +133,7 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgltests_LIBSOURCES_LIST], [])
   m4_pushdef([lgltests_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='lgl/tests'
+  gl_source_base='gl/tests'
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   AC_CHECK_FUNCS([shutdown])
@@ -192,7 +192,7 @@ AC_DEFUN([lgl_REPLACE_FUNCS], [
 AC_DEFUN([lgl_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([lgl_LIBSOURCES_DIR], [lgl])
+      m4_define([lgl_LIBSOURCES_DIR], [gl])
       m4_append([lgl_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
@@ -219,7 +219,7 @@ AC_DEFUN([lgltests_REPLACE_FUNCS], [
 AC_DEFUN([lgltests_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([lgltests_LIBSOURCES_DIR], [lgl/tests])
+      m4_define([lgltests_LIBSOURCES_DIR], [gl/tests])
       m4_append([lgltests_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
@@ -335,7 +335,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/string_h.m4
   m4/strings_h.m4
   m4/strverscmp.m4
-  m4/sys_ioctl_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
   m4/threadlib.m4

@@ -32,9 +32,9 @@ MAINTAINERCLEANFILES =
 AM_CPPFLAGS = \
   -I. -I$(srcdir) \
   -I../.. -I$(srcdir)/../.. \
-  -I../../lgl -I$(srcdir)/../../lgl
+  -I../../gl -I$(srcdir)/../../gl
 
-LDADD = libtests.a ../../lgl/liblgnu.la libtests.a $(LIBTESTS_LIBDEPS)
+LDADD = libtests.a ../../gl/liblgnu.la libtests.a $(LIBTESTS_LIBDEPS)
 
 libtests_a_SOURCES =
 libtests_a_LIBADD = $(lgltests_LIBOBJS)
