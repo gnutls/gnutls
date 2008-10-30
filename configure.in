@@ -306,8 +306,7 @@ AC_CONFIG_FILES([Makefile \
 	tests/pkcs1-padding/Makefile tests/pkcs8-decode/Makefile \
 	tests/pkcs12-decode/Makefile tests/pathlen/Makefile \
 	tests/key-id/Makefile tests/sha2/Makefile \
-	tests/hostname-check/Makefile \
-	tests/openpgp/Makefile tests/openpgp-certs/Makefile \
+	tests/openpgp-certs/Makefile \
 	src/Makefile \
 	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 	guile/Makefile guile/modules/Makefile \
