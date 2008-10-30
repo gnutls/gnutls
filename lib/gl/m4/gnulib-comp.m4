@@ -69,6 +69,7 @@ AC_DEFUN([lgl_INIT],
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
+  gl_SOCKETS
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
   gl_STDINT_H
@@ -257,6 +258,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/realloc.c
   lib/size_max.h
   lib/snprintf.c
+  lib/sockets.c
+  lib/sockets.h
   lib/stdbool.in.h
   lib/stdint.in.h
   lib/stdio-impl.h
@@ -324,6 +327,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/realloc.m4
   m4/size_max.m4
   m4/snprintf.m4
+  m4/sockets.m4
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdbool.m4
@@ -363,6 +367,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-netdb.c
   tests/test-read-file.c
   tests/test-snprintf.c
+  tests/test-sockets.c
   tests/test-stdbool.c
   tests/test-stdint.c
   tests/test-stdio.c

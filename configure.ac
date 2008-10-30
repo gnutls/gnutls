@@ -104,15 +104,6 @@ if test $ac_cv_c_compiler_gnu != no; then
 	  _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
 	AC_MSG_RESULT($_gcc_gnu89_inline)
 	CFLAGS="$_gcc_cflags_save"
-
-	AC_MSG_CHECKING([whether we have GNU assembler])
-	GAS=`as --version < /dev/null 2>/dev/null | grep GNU`
-	if test "$GAS"; then
-	  AM_CFLAGS="${AM_CFLAGS} -pipe"
-	  AC_MSG_RESULT(yes)
-	else
-	  AC_MSG_RESULT(no)
-	fi
 fi
 
 # Needs to be called outside of 'if' clause.
@@ -251,26 +242,6 @@ LIBS=$SAVED_LIBS
 AC_MSG_CHECKING([whether to use the included libcfg])
 AC_MSG_RESULT($libcfg_enabled)
 
-# Windows hacks.
-
-AC_DEFINE([WINVER], [0x0501], [Windows 2000 or before not supported.])
-save_LIBS="$LIBS"
-LIBS="$LIBS -lws2_32"
-AC_TRY_LINK([#include <winsock2.h>], [
-  WORD wVersionRequested = MAKEWORD(2, 2);
-  WSADATA wsaData;
-  int err = WSAStartup(wVersionRequested, &wsaData);
-  WSACleanup ();], wsastartup=yes, wsastartup=no)
-LIBS="$save_LIBS"
-if test "$wsastartup" = "yes"; then
-  AC_DEFINE(HAVE_WINSOCK, 1, [Call WSAStartup in gnutls_global_init])
-fi
-AC_MSG_CHECKING([if we have Windows and WSAStartup/WSACleanup in -lws2_32])
-AC_MSG_RESULT($wsastartup)
-
-dnl Gnulib files
-dnl
-
 AC_MSG_RESULT([***
 *** Setting up gnulib compatibility files...
 ])
@@ -281,8 +252,6 @@ AC_MSG_RESULT([***
 ])
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
-
-AC_SUBST(AM_CFLAGS)
 
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])

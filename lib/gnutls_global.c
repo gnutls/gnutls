@@ -31,10 +31,7 @@
 
 #include <gnutls_extensions.h>	/* for _gnutls_ext_init */
 
-#ifdef HAVE_WINSOCK
-# include <winsock2.h>
-#endif
-
+#include "sockets.h"
 #include "gettext.h"
 
 #define gnutls_log_func LOG_FUNC
@@ -198,29 +195,8 @@ gnutls_global_init (void)
   if (_gnutls_init++)
     goto out;
 
-#if HAVE_WINSOCK
-  {
-    WORD requested;
-    WSADATA data;
-    int err;
-
-    requested = MAKEWORD (1, 1);
-    err = WSAStartup (requested, &data);
-    if (err != 0)
-      {
-	_gnutls_debug_log ("WSAStartup failed: %d.\n", err);
-	return GNUTLS_E_LIBRARY_VERSION_MISMATCH;
-      }
-
-    if (data.wVersion < requested)
-      {
-	_gnutls_debug_log ("WSAStartup version check failed (%d < %d).\n",
-			   data.wVersion, requested);
-	WSACleanup ();
-	return GNUTLS_E_LIBRARY_VERSION_MISMATCH;
-      }
-  }
-#endif
+  if (gl_sockets_startup (SOCKETS_1_1))
+    return GNUTLS_E_LIBRARY_VERSION_MISMATCH;
 
   bindtextdomain (PACKAGE, LOCALEDIR);
 
@@ -318,9 +294,7 @@ gnutls_global_deinit (void)
 {
   if (_gnutls_init == 1)
     {
-#if HAVE_WINSOCK
-      WSACleanup ();
-#endif
+      gl_sockets_cleanup ();
       _gnutls_rnd_deinit ();
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);

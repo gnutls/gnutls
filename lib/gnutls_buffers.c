@@ -313,7 +313,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 	{
 	  i = recv (GNUTLS_POINTER_TO_INT (fd), &ptr[sizeOfPtr - left],
 		    left, flags);
-#if HAVE_WINSOCK
+#if HAVE_WINSOCK2_H
 	  if (i < 0)
 	    {
 	      int tmperr = WSAGetLastError ();
@@ -779,7 +779,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
       if (session->internals._gnutls_push_func == NULL)
 	{
 	  i = send (GNUTLS_POINTER_TO_INT (fd), &ptr[n - left], left, 0);
-#if HAVE_WINSOCK
+#if HAVE_WINSOCK2_H
 	  if (i < 0)
 	    {
 	      int tmperr = WSAGetLastError ();

@@ -153,6 +153,15 @@ EXTRA_DIST += test-snprintf.c
 
 ## end   gnulib module snprintf-tests
 
+## begin gnulib module sockets-tests
+
+TESTS += test-sockets
+check_PROGRAMS += test-sockets
+test_sockets_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-sockets.c
+
+## end   gnulib module sockets-tests
+
 ## begin gnulib module stdbool-tests
 
 TESTS += test-stdbool
