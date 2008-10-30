@@ -20,9 +20,9 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
-ACLOCAL_AMFLAGS = -I gl/m4
+ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
-SUBDIRS = gl x509
+SUBDIRS = gl po x509
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -110,10 +110,6 @@ libgnutls_la_LDFLAGS = -no-undefined \
 
 libgnutls_la_LIBADD = ../lgl/liblgnu.la x509/libgnutls_x509.la \
 	$(LTLIBZ) $(LTLIBGCRYPT) $(LTLIBINTL)
-
-if NEED_WS2_32
-libgnutls_la_LIBADD += -lws2_32
-endif
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la

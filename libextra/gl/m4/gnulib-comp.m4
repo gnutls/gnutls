@@ -171,6 +171,7 @@ AC_DEFUN([xgltests_LIBSOURCES], [
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([xgl_FILE_LIST], [
+  build-aux/config.rpath
   lib/hmac-md5.c
   lib/hmac.h
   lib/md5.c
@@ -179,6 +180,9 @@ AC_DEFUN([xgl_FILE_LIST], [
   lib/memxor.h
   m4/gnulib-common.m4
   m4/hmac-md5.m4
+  m4/lib-ld.m4
+  m4/lib-link.m4
+  m4/lib-prefix.m4
   m4/md5.m4
   m4/memxor.m4
 ])

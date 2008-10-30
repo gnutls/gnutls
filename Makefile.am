@@ -22,12 +22,12 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
-SUBDIRS = gl includes lib libextra src doc tests po
+SUBDIRS = gl includes lib libextra src doc tests
 
 if HAVE_GUILE
 SUBDIRS += guile
 endif
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4
+ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I lib/m4 -I libextra/m4
 
 EXTRA_DIST = cfg.mk maint.mk .clcopying

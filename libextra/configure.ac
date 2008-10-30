@@ -23,8 +23,8 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
 AC_INIT([libgnutls-extra], [2.7.1], [bug-gnutls@gnu.org])
-AC_CONFIG_AUX_DIR([../build-aux])
-AC_CONFIG_MACRO_DIR([../m4])
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([1.10 -Wall -Werror -Wno-override])
 AM_CONFIG_HEADER(config.h)
@@ -35,41 +35,8 @@ xgl_EARLY
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
-AC_MSG_CHECKING([whether to disable OpenSSL compatibility layer])
-AC_ARG_ENABLE(openssl-compatibility,
-	AS_HELP_STRING([--disable-openssl-compatibility],
-		[disable the OpenSSL compatibility support]),
-	ac_enable_openssl=$withval,
-	ac_enable_openssl=yes)
-if test x$ac_enable_openssl != xno; then
- AC_MSG_RESULT(no)
-else
- AC_MSG_RESULT(yes)
-fi
-AM_CONDITIONAL(ENABLE_OPENSSL, test "$ac_enable_openssl" = "yes")
-
-# Check for libtasn1
-AC_ARG_WITH(included-libtasn1,
-  AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
-    included_libtasn1=$withval,
-    included_libtasn1=no)
-if test "$included_libtasn1" = "no"; then
-  AC_LIB_HAVE_LINKFLAGS(tasn1,, [#include <libtasn1.h>],
-  				[asn1_check_version (NULL)])
-  if test "$ac_cv_libtasn1" != yes; then
-    included_libtasn1=yes
-    AC_MSG_WARN([[
-*** 
-*** Libtasn1 was not found. Will use the included one.
-]])
-  fi
-fi
-AC_MSG_CHECKING([whether to use the included minitasn1])
-AC_MSG_RESULT($included_libtasn1)
-AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
-
-dnl CHECK FOR LZO SUPPORT
-dnl
+LIBGNUTLS_HOOKS
+LIBGNUTLS_EXTRA_HOOKS
 
 AC_ARG_WITH(lzo,
 	AS_HELP_STRING([--with-lzo], [use experimental LZO compression]),
@@ -77,7 +44,6 @@ AC_ARG_WITH(lzo,
 	use_lzo=no)
 AC_MSG_CHECKING([whether to include LZO compression support])
 AC_MSG_RESULT($use_lzo)
-
 LZO_LIBS=
 if test "$use_lzo" = "yes"; then
   AC_CHECK_LIB(lzo2, lzo1x_1_compress, LZO_LIBS=-llzo2)
@@ -92,7 +58,6 @@ if test "$use_lzo" = "yes"; then
   fi
 fi
 AC_SUBST(LZO_LIBS)
-
 if test "$use_lzo" = "yes"; then
   AC_DEFINE(USE_LZO, 1, [whether to use the LZO compression])
   if test "$LZO_LIBS" = "-llzo"; then
@@ -101,7 +66,6 @@ if test "$use_lzo" = "yes"; then
     AC_CHECK_HEADERS(lzo/lzo1x.h)
   fi
 fi
-
 AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
 
 xgl_INIT
@@ -112,8 +76,8 @@ AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
 AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
 AC_CONFIG_FILES([ \
-  libextra/Makefile \
-  libextra/gl/Makefile \
-  libextra/gnutls-extra.pc \
+  Makefile \
+  gl/Makefile \
+  gnutls-extra.pc \
 ])
 AC_OUTPUT
