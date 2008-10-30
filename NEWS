@@ -10,6 +10,10 @@ See the end for copying conditions.
 ** Old libgnutls.m4 and libgnutls-config scripts removed.
 Please use pkg-config instead.
 
+** Configuration system modified.
+There is now a configure script in lib/ and libextra/ as well, because
+gnulib works better with a config.h per gnulib directory.
+
 ** API and ABI modifications:
 No changes since last version.
 
