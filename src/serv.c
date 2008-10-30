@@ -35,17 +35,12 @@
 #include <gnutls/extra.h>
 #include <gnutls/openpgp.h>
 #include <sys/time.h>
+#include <sys/select.h>
 #include <fcntl.h>
 #include <list.h>
 #include <netdb.h>
+#include <error.h>
 
-#if defined _WIN32 || defined __WIN32__
-int _win_select (int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
-		 const struct timeval *tv);
-#define select _win_select
-#endif
-
-#include "error.h"
 #include "progname.h"
 #include "version-etc.h"
 #include "read-file.h"

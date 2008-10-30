@@ -108,9 +108,11 @@ AC_SUBST([LTALLOCA])
   gl_SYS_SOCKET_MODULE_INDICATOR([listen])
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
+  gl_MINMAX
   gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
+  gl_FUNC_READ_FILE
   gl_FUNC_READLINE
   gl_FUNC_REALLOC_POSIX
   gl_STDLIB_MODULE_INDICATOR([realloc-posix])
@@ -343,6 +345,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/intprops.h
   lib/listen.c
   lib/lseek.c
+  lib/minmax.h
   lib/netdb.in.h
   lib/netinet_in.in.h
   lib/printf-args.c
@@ -351,6 +354,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/printf-parse.h
   lib/progname.c
   lib/progname.h
+  lib/read-file.c
+  lib/read-file.h
   lib/readline.c
   lib/readline.h
   lib/realloc.c
@@ -407,10 +412,12 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/longlong.m4
   m4/lseek.m4
   m4/malloc.m4
+  m4/minmax.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/perror.m4
   m4/printf.m4
+  m4/read-file.m4
   m4/readline.m4
   m4/realloc.m4
   m4/size_max.m4
@@ -451,6 +458,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-netinet_in.c
   tests/test-perror.c
   tests/test-perror.sh
+  tests/test-read-file.c
   tests/test-select.c
   tests/test-snprintf.c
   tests/test-sockets.c

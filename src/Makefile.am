@@ -22,8 +22,6 @@ EXTRA_DIST = README README.srptool
 SUBDIRS = cfg
 
 AM_CPPFLAGS = \
-	-I$(srcdir)/../lib/gl			\
-	-I$(builddir)/../lib/gl			\
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
 	-I$(builddir)/../lib/includes		\
@@ -40,7 +38,7 @@ bin_PROGRAMS += srptool
 endif
 
 gnutls_serv_SOURCES = serv.gaa serv-gaa.h serv-gaa.c list.h serv.c	\
-	common.h common.c select.c certtool-common.h
+	common.h common.c certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la
 
@@ -53,7 +51,7 @@ psktool_SOURCES = psk.gaa psk-gaa.h psk-gaa.c psk.c
 psktool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la
 
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
-	common.c select.c
+	common.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
 	../gl/libgnu.la
 

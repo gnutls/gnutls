@@ -48,12 +48,6 @@
 #include "common.h"
 #include "cli-gaa.h"
 
-#if defined _WIN32 || defined __WIN32__
-int _win_select (int max_fd, fd_set * rfds, fd_set * wfds, fd_set * efds,
-		 const struct timeval *tv);
-#define select _win_select
-#endif
-
 #define SA struct sockaddr
 #define ERR(err,s) do { if (err==-1) {perror(s);return(1);} } while (0)
 #define MAX_BUF 4096

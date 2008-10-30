@@ -178,6 +178,14 @@ EXTRA_DIST += test-perror.c test-perror.sh
 
 ## end   gnulib module perror-tests
 
+## begin gnulib module read-file-tests
+
+TESTS += test-read-file
+check_PROGRAMS += test-read-file
+EXTRA_DIST += test-read-file.c
+
+## end   gnulib module read-file-tests
+
 ## begin gnulib module select-tests
 
 TESTS += test-select
