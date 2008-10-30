@@ -22,18 +22,16 @@
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I ../lib/m4
 
-AM_CPPFLAGS = -I$(srcdir)/gl -I$(top_srcdir)/lgl -I$(top_builddir)/lgl	\
-	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
-	-I$(top_srcdir)/lib/minitasn1
+AM_CPPFLAGS = -I$(srcdir)/gl						\
+	-I$(srcdir)/../lib/gl -I$(builddir)/../lib/gl			\
+	-I$(srcdir)/../lib						\
+	-I$(builddir)/../includes -I$(srcdir)/../includes
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
 endif
 
 SUBDIRS = gl
-
-m4datadir = $(datadir)/aclocal
-dist_m4data_DATA = libgnutls-extra.m4
 
 # Pkg-config script.
 pkgconfigdir = $(libdir)/pkgconfig
@@ -59,7 +57,7 @@ lib_LTLIBRARIES += libgnutls-openssl.la
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = ../lgl/liblgnu.la ../lib/libgnutls.la 
+libgnutls_openssl_la_LIBADD = ../lib/gl/liblgnu.la ../lib/libgnutls.la 
 
 libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
@@ -102,7 +100,7 @@ libgnutls_extra_la_LDFLAGS += \
 
 libgnutls_extra_la_SOURCES += libgnutls-extra.vers
 
-libgnutls_extra_la_LIBADD += ../lgl/liblgnu.la gl/libxgnu.la \
+libgnutls_extra_la_LIBADD += ../lib/gl/liblgnu.la gl/libxgnu.la \
 	../lib/libgnutls.la
 
 if HAVE_LD_VERSION_SCRIPT

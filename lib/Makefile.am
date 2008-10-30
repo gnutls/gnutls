@@ -31,9 +31,8 @@ localedir = $(datadir)/locale
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"				\
 	-I$(srcdir)/gl -I$(builddir)/gl					\
-	-I$(top_srcdir)/includes -I../includes				\
-	-I$(srcdir)/x509						\
-	-I$(top_srcdir)/libextra -I$(top_srcdir)/lib/openpgp/
+	-I$(srcdir)/../includes -I$(builddir)../includes		\
+	-I$(srcdir)/x509
 
 if ENABLE_OPENPGP
 SUBDIRS += opencdk
@@ -44,9 +43,6 @@ endif
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/minitasn1
 endif
-
-m4datadir = $(datadir)/aclocal
-dist_m4data_DATA = libgnutls.m4
 
 # Pkg-config script.
 pkgconfigdir = $(libdir)/pkgconfig

@@ -49,6 +49,17 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_MSG_CHECKING([whether to build C++ library])
   AC_MSG_RESULT($use_cxx)
 
+  AC_LIB_HAVE_LINKFLAGS(gcrypt,, [#include <gcrypt.h>],
+    [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
+  if test "$ac_cv_libgcrypt" != yes; then
+    AC_MSG_ERROR([[
+***  
+*** libgcrypt was not found. You may want to get it from
+*** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
+***
+    ]])
+  fi
+
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),
       included_libtasn1=$withval,

@@ -289,18 +289,6 @@ if test "x$opt_guile_bindings" = "xyes"; then
 fi
 AM_CONDITIONAL(HAVE_GUILE, test "x$opt_guile_bindings" = "xyes")
 
-# Check for libgcrypt
-AC_LIB_HAVE_LINKFLAGS(gcrypt,, [#include <gcrypt.h>],
-  [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
-if test "$ac_cv_libgcrypt" != yes; then
-  AC_MSG_ERROR([[
-***  
-*** libgcrypt was not found. You may want to get it from
-*** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
-***
-]])
-fi
-
 dnl Check for libcfg+
 
 SAVED_LIBS=$LIBS

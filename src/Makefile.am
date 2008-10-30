@@ -21,9 +21,9 @@ EXTRA_DIST = README README.srptool
 
 SUBDIRS = cfg
 
-AM_CPPFLAGS = -I../includes -I$(top_srcdir)/includes \
-	-I$(top_srcdir)/lgl -I$(top_builddir)/lgl \
-	-I$(top_srcdir)/gl -I$(top_builddir)/gl \
+AM_CPPFLAGS = -I$(builddir)../includes -I$(srcdir)/..includes \
+	-I$(srcdir)/../lib/gl -I$(builddir)/../lib/gl \
+	-I$(srcdir)/../gl -I$(builddir)/../gl \
 	-I$(srcdir)/cfg
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
@@ -41,11 +41,11 @@ gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
 
 if ENABLE_SRP
 srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
-srptool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la
+srptool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la
 endif
 
 psktool_SOURCES = psk.gaa psk-gaa.h psk-gaa.c psk.c
-psktool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la
+psktool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la
 
 gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
 	common.c select.c
@@ -71,7 +71,7 @@ endif
 
 noinst_PROGRAMS = errcodes printlist
 errcodes_SOURCES = errcodes.c
-errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lgl/liblgnu.la
+errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la
 
 printlist_SOURCES = printlist.c
 printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
