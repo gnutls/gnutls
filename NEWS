@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** certtool: print a PKCS #8 key even if it is not encrypted.
 
+** Old libgnutls.m4 and libgnutls-config scripts removed.
+Please use pkg-config instead.
+
 ** API and ABI modifications:
 No changes since last version.
 

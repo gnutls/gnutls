@@ -30,8 +30,6 @@ endif
 
 SUBDIRS = gl
 
-bin_SCRIPTS = libgnutls-extra-config
-
 m4datadir = $(datadir)/aclocal
 dist_m4data_DATA = libgnutls-extra.m4
 

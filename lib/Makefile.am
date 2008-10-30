@@ -43,8 +43,6 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/minitasn1
 endif
 
-bin_SCRIPTS = libgnutls-config
-
 m4datadir = $(datadir)/aclocal
 dist_m4data_DATA = libgnutls.m4
 

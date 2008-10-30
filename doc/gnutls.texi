@@ -2305,47 +2305,48 @@ verbose information on the @acronym{GnuTLS} functions internal flow.
 @node Building the source
 @subsection Building the Source
 
-If you want to compile a source file including the `gnutls/gnutls.h'
-header file, you must make sure that the compiler can find it in the
-directory hierarchy.  This is accomplished by adding the path to the
-directory in which the header file is located to the compilers include
-file search path (via the -I option).
+If you want to compile a source file including the
+@file{gnutls/gnutls.h} header file, you must make sure that the
+compiler can find it in the directory hierarchy.  This is accomplished
+by adding the path to the directory in which the header file is
+located to the compilers include file search path (via the @option{-I}
+option).
 
 However, the path to the include file is determined at the time the
-source is configured.  To solve this problem, @acronym{GnuTLS} ships
-with two small helper programs @command{libgnutls-config} and
-@command{libgnutls-extra-config} that knows about the path to the
+source is configured.  To solve this problem, the library uses the
+external package @command{pkg-config} that knows the path to the
 include file and other configuration options.  The options that need
 to be added to the compiler invocation at compile time are output by
-the @code{--cflags} option to @command{libgnutls-config}.  The
+the @option{--cflags} option to @command{pkg-config libgnutls}.  The
 following example shows how it can be used at the command line:
 
 @example
-gcc -c foo.c `libgnutls-config --cflags`
+gcc -c foo.c `pkg-config libgnutls --cflags`
 @end example
 
-Adding the output of @command{libgnutls-config --cflags} to the
+Adding the output of @samp{pkg-config libgnutls --cflags} to the
 compilers command line will ensure that the compiler can find the
-@acronym{GnuTLS} header file.
+@file{gnutls/gnutls.h} header file.
 
 A similar problem occurs when linking the program with the library.
 Again, the compiler has to find the library files.  For this to work,
 the path to the library files has to be added to the library search
-path (via the -L option).  For this, the option @code{--libs} to
-@command{libgnutls-config} can be used.  For convenience, this option
-also outputs all other options that are required to link the program
-with the @acronym{GnuTLS} libararies.  The example shows how to link
-`foo.o' with the @acronym{GnuTLS} libraries to a program @emph{foo}.
+path (via the @option{-L} option).  For this, the option
+@option{--libs} to @command{pkg-config libgnutls} can be used.  For
+convenience, this option also outputs all other options that are
+required to link the program with the libarary (for instance, the
+@samp{-ltasn1} option).  The example shows how to link @file{foo.o}
+with the library to a program @command{foo}.
 
 @example
-gcc -o foo foo.o `libgnutls-config --libs`
+gcc -o foo foo.o `pkg-config libgnutls --libs`
 @end example
 
 Of course you can also combine both examples to a single command by
-specifying both options to `libgnutls-config':
+specifying both options to @command{pkg-config}:
 
 @example
-gcc -o foo foo.c `libgnutls-config --cflags --libs`
+gcc -o foo foo.c `pkg-config libgnutls --cflags --libs`
 @end example
 
 @node Multi-threaded applications

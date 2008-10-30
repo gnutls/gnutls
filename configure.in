@@ -665,11 +665,6 @@ fi
 
 AC_SUBST(AM_CFLAGS)
 
-AC_CONFIG_COMMANDS([chmod-config],[[
- chmod +x lib/libgnutls-config
- chmod +x libextra/libgnutls-extra-config
-]],[[]])
-
 AC_CONFIG_FILES([Makefile po/Makefile.in \
 	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
 	doc/manpages/Makefile doc/reference/Makefile doc/doxygen/Doxyfile \
@@ -688,7 +683,6 @@ AC_CONFIG_FILES([Makefile po/Makefile.in \
 	tests/openpgp/Makefile tests/openpgp-certs/Makefile \
 	src/Makefile \
 	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
-	lib/libgnutls-config libextra/libgnutls-extra-config \
 	lib/gnutls.pc libextra/gnutls-extra.pc
 	guile/Makefile guile/modules/Makefile
 	guile/src/Makefile guile/tests/Makefile])
