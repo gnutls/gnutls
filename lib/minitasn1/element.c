@@ -417,19 +417,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	  (!negative && (value_temp[k] & 0x80)))
 	k--;
 
-      asn1_length_der (len - k, NULL, &len2);
-      temp = (unsigned char *) _asn1_malloc (len - k + len2);
-      if (temp == NULL)
-	{
-	  _asn1_free (value_temp);
-	  return ASN1_MEM_ALLOC_ERROR;
-	}
-
-      asn1_octet_der (value_temp + k, len - k, temp, &len2);
-      _asn1_set_value (node, temp, len2);
-
-      _asn1_free (temp);
-
+      _asn1_set_value_octet (node, value_temp+k, len-k);
 
       if (node->type & CONST_DEFAULT)
 	{
@@ -569,26 +557,12 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
     case TYPE_OCTET_STRING:
       if (len == 0)
 	len = strlen (value);
-      asn1_length_der (len, NULL, &len2);
-      temp = (unsigned char *) _asn1_malloc (len + len2);
-      if (temp == NULL)
-	return ASN1_MEM_ALLOC_ERROR;
-
-      asn1_octet_der (value, len, temp, &len2);
-      _asn1_set_value (node, temp, len2);
-      _asn1_free (temp);
+      _asn1_set_value_octet (node, value, len);
       break;
     case TYPE_GENERALSTRING:
       if (len == 0)
 	len = strlen (value);
-      asn1_length_der (len, NULL, &len2);
-      temp = (unsigned char *) _asn1_malloc (len + len2);
-      if (temp == NULL)
-	return ASN1_MEM_ALLOC_ERROR;
-
-      asn1_octet_der (value, len, temp, &len2);
-      _asn1_set_value (node, temp, len2);
-      _asn1_free (temp);
+      _asn1_set_value_octet (node, value, len);
       break;
     case TYPE_BIT_STRING:
       if (len == 0)
@@ -599,8 +573,8 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	return ASN1_MEM_ALLOC_ERROR;
 
       asn1_bit_der (value, len, temp, &len2);
-      _asn1_set_value (node, temp, len2);
-      _asn1_free (temp);
+      _asn1_set_value_m (node, temp, len2);
+      temp = NULL;
       break;
     case TYPE_CHOICE:
       p = node->down;
@@ -627,14 +601,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	return ASN1_ELEMENT_NOT_FOUND;
       break;
     case TYPE_ANY:
-      asn1_length_der (len, NULL, &len2);
-      temp = (unsigned char *) _asn1_malloc (len + len2);
-      if (temp == NULL)
-	return ASN1_MEM_ALLOC_ERROR;
-
-      asn1_octet_der (value, len, temp, &len2);
-      _asn1_set_value (node, temp, len2);
-      _asn1_free (temp);
+      _asn1_set_value_octet (node, value, len);
       break;
     case TYPE_SEQUENCE_OF:
     case TYPE_SET_OF:

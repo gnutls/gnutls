@@ -2,6 +2,7 @@
 #ifndef _PARSER_AUX_H
 #define _PARSER_AUX_H
 
+#define DER_LEN 16
 
 /***************************************/
 /*  Functions used by ASN.1 parser     */
@@ -11,6 +12,15 @@ _asn1_add_node(unsigned int type);
 
 node_asn *
 _asn1_set_value(node_asn *node,const void *value,unsigned int len);
+
+node_asn *
+_asn1_set_value_m(node_asn *node,void *value,unsigned int len);
+
+node_asn *
+_asn1_set_value_octet(node_asn *node,const void *value,unsigned int len);
+
+node_asn *
+_asn1_append_value(node_asn *node,const void *value,unsigned int len);
 
 node_asn *
 _asn1_set_name(node_asn *node,const char *name);
