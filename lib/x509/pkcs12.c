@@ -51,7 +51,8 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_datum_t auth_safe = { NULL, 0 };
   int tmp_size, len, result;
-
+  char error_str[MAX_ERROR_DESCRIPTION_SIZE];
+  
   len = sizeof (oid) - 1;
   result = asn1_read_value (pkcs12, "authSafe.contentType", oid, &len);
   if (result != ASN1_SUCCESS)
@@ -60,6 +61,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
       return _gnutls_asn2err (result);
     }
 
+  _gnutls_x509_log ("PKCS12 Content OID '%s'\n", oid);
   if (strcmp (oid, DATA_OID) != 0)
     {
       gnutls_assert ();
@@ -91,10 +93,11 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
       goto cleanup;
     }
 
-  result = asn1_der_decoding (&c2, auth_safe.data, auth_safe.size, NULL);
+  result = asn1_der_decoding (&c2, auth_safe.data, auth_safe.size, error_str);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      _gnutls_x509_log("DER error: %s\n", error_str);
       result = _gnutls_asn2err (result);
       goto cleanup;
     }
@@ -198,6 +201,7 @@ gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
 {
   int result = 0, need_free = 0;
   gnutls_datum_t _data;
+  char error_str[MAX_ERROR_DESCRIPTION_SIZE];
 
   _data.data = data->data;
   _data.size = data->size;
@@ -231,10 +235,11 @@ gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
       need_free = 1;
     }
 
-  result = asn1_der_decoding (&pkcs12->pkcs12, _data.data, _data.size, NULL);
+  result = asn1_der_decoding (&pkcs12->pkcs12, _data.data, _data.size, error_str);
   if (result != ASN1_SUCCESS)
     {
       result = _gnutls_asn2err (result);
+      _gnutls_x509_log("DER error: %s\n", error_str);
       gnutls_assert ();
       goto cleanup;
     }
