@@ -929,6 +929,7 @@ gaa_parser (int argc, char **argv)
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (info.debug);
+  if (info.debug > 1) printf("Setting log level to %d\n", info.debug);
 
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
@@ -2696,7 +2697,7 @@ pkcs12_info (void)
 
   result = gnutls_pkcs12_verify_mac (pkcs12, pass);
   if (result < 0)
-    error (EXIT_FAILURE, 0, "verify_mac: %s", gnutls_strerror (result));
+    fprintf (stderr, "verify_mac: %s", gnutls_strerror (result));
 
   indx = 0;
 
@@ -2727,9 +2728,12 @@ pkcs12_info (void)
 
 	  result = gnutls_pkcs12_bag_decrypt (bag, pass);
 
-	  if (result < 0)
-	    error (EXIT_FAILURE, 0, "bag_decrypt: %s",
+	  if (result < 0) 
+	    {
+	    	fprintf (stderr, "bag_decrypt: %s",
 		   gnutls_strerror (result));
+		continue;
+	    }
 
 	  result = gnutls_pkcs12_bag_get_count (bag);
 	  if (result < 0)
