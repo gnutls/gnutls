@@ -199,27 +199,131 @@ asn1_find_node (ASN1_TYPE pointer, const char *name)
 /* Return: pointer to the NODE_ASN element.                       */
 /******************************************************************/
 node_asn *
-_asn1_set_value (node_asn * node, const void *_value, unsigned int len)
+_asn1_set_value (node_asn * node, const void *value, unsigned int len)
 {
-  const unsigned char *value = _value;
-
   if (node == NULL)
     return node;
   if (node->value)
     {
-      _asn1_free (node->value);
+      if (node->value != node->small_value) _asn1_free (node->value);
       node->value = NULL;
       node->value_len = 0;
     }
+
   if (!len)
     return node;
-  node->value = (unsigned char *) _asn1_malloc (len);
-  if (node->value == NULL)
-    return NULL;
+
+  if (len < sizeof(node->small_value)) {
+      node->value = node->small_value;
+  } else {
+      node->value = _asn1_malloc (len);
+      if (node->value == NULL)
+        return NULL;
+  }
   node->value_len = len;
 
   memcpy (node->value, value, len);
   return node;
+}
+
+/******************************************************************/
+/* Function : _asn1_set_value_octet                               */
+/* Description: sets the field VALUE in a NODE_ASN element. The   */
+/*              previous value (if exist) will be lost. The value */
+/* 		given is stored as an octet string.               */
+/* Parameters:                                                    */
+/*   node: element pointer.                                       */
+/*   value: pointer to the value that you want to set.            */
+/*   len: character number of value.                              */
+/* Return: pointer to the NODE_ASN element.                       */
+/******************************************************************/
+node_asn *
+_asn1_set_value_octet (node_asn * node, const void *value, unsigned int len)
+{
+int len2;
+void* temp;
+
+  if (node == NULL)
+    return node;
+
+  asn1_length_der (len, NULL, &len2);
+  temp = (unsigned char *) _asn1_malloc (len + len2);
+  if (temp == NULL)
+    return NULL;
+
+  asn1_octet_der (value, len, temp, &len2);
+  return _asn1_set_value_m (node, temp, len2);
+}
+
+/* the same as _asn1_set_value except that it sets an already malloc'ed
+ * value.
+ */
+node_asn *
+_asn1_set_value_m (node_asn * node, void *value, unsigned int len)
+{
+  if (node == NULL)
+    return node;
+
+  if (node->value)
+    {
+      if (node->value != node->small_value) _asn1_free (node->value);
+      node->value = NULL;
+      node->value_len = 0;
+    }
+
+  if (!len)
+    return node;
+
+  node->value = value;
+  node->value_len = len;
+
+  return node;
+}
+
+/******************************************************************/
+/* Function : _asn1_append_value                                  */
+/* Description: appends to the field VALUE in a NODE_ASN element. */
+/*              					          */
+/* Parameters:                                                    */
+/*   node: element pointer.                                       */
+/*   value: pointer to the value that you want to be appended.    */
+/*   len: character number of value.                              */
+/* Return: pointer to the NODE_ASN element.                       */
+/******************************************************************/
+node_asn *
+_asn1_append_value (node_asn * node, const void *value, unsigned int len)
+{
+  if (node == NULL)
+    return node;
+  if (node->value != NULL && node->value != node->small_value) /* value is allocated */
+    {
+      int prev_len = node->value_len;
+      node->value_len+=len;
+      node->value = _asn1_realloc( node->value, node->value_len);
+      if (node->value == NULL) {
+        node->value_len = 0;
+        return NULL;
+      }
+      memcpy( &node->value[prev_len], value, len);
+      
+      return node;
+    }
+  else if (node->value == node->small_value) /* value is in node */
+    {
+      int prev_len = node->value_len;
+      node->value_len+=len;
+      node->value = _asn1_malloc( node->value_len);
+      if (node->value == NULL) {
+        node->value_len = 0;
+        return NULL;
+      }
+      memcpy( node->value, node->small_value, prev_len);
+      memcpy( &node->value[prev_len], value, len);
+      
+      return node;
+    } 
+  else /* node->value == NULL */
+    return _asn1_set_value(node, value, len);
 }
 
 /******************************************************************/
@@ -401,7 +505,7 @@ _asn1_remove_node (node_asn * node)
 
   if (node->name != NULL)
     _asn1_free (node->name);
-  if (node->value != NULL)
+  if (node->value != NULL && node->value != node->small_value)
     _asn1_free (node->value);
   _asn1_free (node);
 }
