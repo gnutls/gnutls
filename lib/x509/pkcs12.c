@@ -61,7 +61,6 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
       return _gnutls_asn2err (result);
     }
 
-  _gnutls_x509_log ("PKCS12 Content OID '%s'\n", oid);
   if (strcmp (oid, DATA_OID) != 0)
     {
       gnutls_assert ();
