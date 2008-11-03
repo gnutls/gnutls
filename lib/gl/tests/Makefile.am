@@ -111,22 +111,6 @@ EXTRA_DIST += test-lseek.c test-lseek.sh
 
 ## end   gnulib module lseek-tests
 
-## begin gnulib module memchr-tests
-
-TESTS += test-memchr
-check_PROGRAMS += test-memchr
-EXTRA_DIST += test-memchr.c
-
-## end   gnulib module memchr-tests
-
-## begin gnulib module memcmp-tests
-
-TESTS += test-memcmp
-check_PROGRAMS += test-memcmp
-EXTRA_DIST += test-memcmp.c
-
-## end   gnulib module memcmp-tests
-
 ## begin gnulib module netdb-tests
 
 TESTS += test-netdb

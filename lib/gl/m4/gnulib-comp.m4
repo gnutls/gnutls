@@ -56,8 +56,6 @@ AC_DEFUN([lgl_INIT],
   AC_SUBST([LTLIBINTL])
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
-  gl_FUNC_MEMCHR
-  gl_FUNC_MEMCMP
   gl_FUNC_MEMMEM_SIMPLE
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
@@ -243,8 +241,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/fseeko.c
   lib/gettext.h
   lib/lseek.c
-  lib/memchr.c
-  lib/memcmp.c
   lib/memmem.c
   lib/memmove.c
   lib/minmax.h
@@ -312,8 +308,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/longlong.m4
   m4/lseek.m4
   m4/malloc.m4
-  m4/memchr.m4
-  m4/memcmp.m4
   m4/memmem.m4
   m4/memmove.m4
   m4/minmax.m4
@@ -362,8 +356,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-func.c
   tests/test-lseek.c
   tests/test-lseek.sh
-  tests/test-memchr.c
-  tests/test-memcmp.c
   tests/test-netdb.c
   tests/test-read-file.c
   tests/test-snprintf.c
