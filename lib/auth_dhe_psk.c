@@ -169,7 +169,6 @@ static int
 proc_psk_client_kx (gnutls_session_t session, opaque * data,
 		    size_t _data_size)
 {
-  int bits;
   int ret;
   bigint_t p, g;
   gnutls_dh_params_t dh_params;
@@ -187,8 +186,6 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
       gnutls_assert ();
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
-
-  bits = _gnutls_dh_get_allowed_prime_bits (session);
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,

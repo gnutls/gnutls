@@ -115,13 +115,10 @@ proc_anon_client_kx (gnutls_session_t session, opaque * data,
 		     size_t _data_size)
 {
   gnutls_anon_server_credentials_t cred;
-  int bits;
   int ret;
   bigint_t p, g;
   gnutls_dh_params_t dh_params;
   const bigint_t *mpis;
-
-  bits = _gnutls_dh_get_allowed_prime_bits (session);
 
   cred = (gnutls_anon_server_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
