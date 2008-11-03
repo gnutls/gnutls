@@ -27,7 +27,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Interfaces added:                             AGE++
   # Interfaces removed:                           AGE=0
   AC_SUBST(LT_CURRENT, 38)
-  AC_SUBST(LT_REVISION, 1)
+  AC_SUBST(LT_REVISION, 2)
   AC_SUBST(LT_AGE, 12)
 
   # Used when creating the Windows libgnutls-XX.def files.
@@ -79,6 +79,21 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_MSG_RESULT($included_libtasn1)
   AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
   
+  AC_MSG_CHECKING([whether C99 macros are supported])
+  AC_TRY_COMPILE(,
+  [
+    #define test_mac(...) 
+    int z,y,x;
+    test_mac(x,y,z);
+    return 0;
+  ], [
+    AC_DEFINE(C99_MACROS, 1, [C99 macros are supported])
+    AC_MSG_RESULT(yes)
+  ], [
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
+  ])
+
   AC_MSG_CHECKING([whether to enable Opaque PRF input support])
   AC_ARG_ENABLE(opaque-prf-input,
   	AS_HELP_STRING([--enable-opaque-prf-input=DD],

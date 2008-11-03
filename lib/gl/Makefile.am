@@ -181,24 +181,6 @@ EXTRA_liblgnu_la_SOURCES += lseek.c
 
 ## end   gnulib module lseek
 
-## begin gnulib module memchr
-
-
-EXTRA_DIST += memchr.c
-
-EXTRA_liblgnu_la_SOURCES += memchr.c
-
-## end   gnulib module memchr
-
-## begin gnulib module memcmp
-
-
-EXTRA_DIST += memcmp.c
-
-EXTRA_liblgnu_la_SOURCES += memcmp.c
-
-## end   gnulib module memcmp
-
 ## begin gnulib module memmem-simple
 
 

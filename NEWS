@@ -3,6 +3,13 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 2.7.2 (unreleased)
+
+** Fix detection of C99 macros, to make debug logging work again.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.7.1 (released 2008-10-31)
 
 ** certtool: print a PKCS #8 key even if it is not encrypted.
