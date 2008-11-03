@@ -46,11 +46,14 @@
  * This function sets the number of bits, for use in an Diffie Hellman
  * key exchange.  This is used both in DH ephemeral and DH anonymous
  * cipher suites.  This will set the minimum size of the prime that
- * will be used for the handshake.
+ * will be used for the handshake. 
  *
  * In the client side it sets the minimum accepted number of bits.  If
  * a server sends a prime with less bits than that
  * %GNUTLS_E_DH_PRIME_UNACCEPTABLE will be returned by the handshake.
+ *
+ * This function has no effect in server side.
+ *
  **/
 void
 gnutls_dh_set_prime_bits (gnutls_session_t session, unsigned int bits)
