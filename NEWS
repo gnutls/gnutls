@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.7.2 (unreleased)
 
+** Fix detection of C99 macros, to make debug logging work again.
+
 ** API and ABI modifications:
 No changes since last version.
 
