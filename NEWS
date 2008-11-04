@@ -13,6 +13,13 @@ Reported by Kevin Quick <quick@sparq.org> in
 
 ** doc: Change license on the manual to GFDLv1.3+.
 
+** doc: GTK-DOC fixes for new splitted configuration system.
+
+** doc: Texinfo stylesheet uses white background.
+
+** gnulib: Deprecated modules removed.
+Modules include memchr and memcmp.
+
 ** API and ABI modifications:
 No changes since last version.
 
