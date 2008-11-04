@@ -941,8 +941,8 @@ extern "C"
 
   const char *gnutls_srp_server_get_username (gnutls_session_t session);
 
-  extern void gnutls_srp_set_min_prime_bits (gnutls_session_t,
-					     unsigned int newval);
+  extern void gnutls_srp_set_prime_bits (gnutls_session_t session,
+					 unsigned int bits)
 
   int gnutls_srp_verifier (const char *username,
 			   const char *password,
