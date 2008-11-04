@@ -28,7 +28,7 @@ endif
 
 EXTRA_DIST = libgcrypt.supp hostname-check.README
 
-AM_CPPFLAGS = -I$(top_srcdir)/lgl -I$(top_builddir)/lgl			\
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl				\
 	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
 	-I$(top_srcdir)/lib 						\
