@@ -55,7 +55,7 @@ CFILE_GLOB=$(top_srcdir)/lib/*.c \
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=debug.h gnutls_compress.h gnutls_cipher.h	\
+IGNORE_HFILES=debug.h gnutls_compress.h gnutls_cipher.h			\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
 	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
@@ -86,7 +86,20 @@ IGNORE_HFILES=debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_supplemental.h						\
 	opencdk.h							\
 									\
-	config.h
+	config.h							\
+									\
+	alloca.in.h byteswap.in.h c-ctype.h errno.in.h float+.h		\
+	float.in.h gettext.h minmax.h netdb.in.h printf-args.h		\
+	printf-parse.h read-file.h size_max.h sockets.h stdbool.in.h	\
+	stdint.in.h stdio-impl.h stdio.in.h stdlib.in.h string.in.h	\
+	strings.in.h str-two-way.h sys_socket.in.h sys_stat.in.h	\
+	time.in.h unistd.in.h vasnprintf.h wchar.in.h xsize.h		\
+									\
+	alloca.h byteswap.h c-ctype.h errno.h float.h netdb.h stdint.h	\
+	stdio.h stdlib.h string.h strings.h sys_socket.h sys_stat.h	\
+	time.h unistd.h wchar.h						\
+									\
+	hmac.h  md5.h  memxor.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
