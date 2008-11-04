@@ -738,6 +738,8 @@ gnutls_srp_verifier (const char *username, const char *password,
  * %GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER will be returned by the
  * handshake.
  *
+ * This function has no effect in server side.
+ *
  * Since: 2.6.0
  **/
 void
