@@ -5,7 +5,11 @@ See the end for copying conditions.
 
 * Version 2.7.2 (unreleased)
 
-** Fix detection of C99 macros, to make debug logging work again.
+** libgnutls: Fix detection of C99 macros, to make debug logging work again.
+
+** libgnutls: Add missing prototype for gnutls_srp_set_prime_bits.
+Reported by Kevin Quick <quick@sparq.org> in
+<https://savannah.gnu.org/support/index.php?106454>.
 
 ** API and ABI modifications:
 No changes since last version.
