@@ -325,7 +325,7 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/gendocs.sh
   build-aux/gnupload
   build-aux/link-warning.h
-  doc/fdl.texi
+  doc/fdl-1.3.texi
   doc/gendocs_template
   doc/gpl-3.0.texi
   doc/lgpl-2.1.texi

@@ -11,6 +11,8 @@ See the end for copying conditions.
 Reported by Kevin Quick <quick@sparq.org> in
 <https://savannah.gnu.org/support/index.php?106454>.
 
+** doc: Change license on the manual to GFDLv1.3+.
+
 ** API and ABI modifications:
 No changes since last version.
 
