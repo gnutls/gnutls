@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.6.1 (unreleased)
 
+** libgnutls: Add missing prototype for gnutls_srp_set_prime_bits.
+Reported by Kevin Quick <quick@sparq.org> in
+<https://savannah.gnu.org/support/index.php?106454>.
+
 ** libgnutls-extra: Protect internal symbols with static.
 Fixes problem when linking certtool statically.  Tiny patch from Aaron
 Ucko <ucko@ncbi.nlm.nih.gov>.
