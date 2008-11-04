@@ -70,10 +70,7 @@ if ENABLE_OPRFI
 ctests +=  oprfi
 endif
 
-gc_LDADD = $(LDADD)
-
 check_PROGRAMS = $(ctests)
-
 TESTS = $(ctests)
 
 TESTS_ENVIRONMENT = \
