@@ -2697,7 +2697,7 @@ pkcs12_info (void)
 
   result = gnutls_pkcs12_verify_mac (pkcs12, pass);
   if (result < 0)
-    fprintf (stderr, "verify_mac: %s", gnutls_strerror (result));
+    error (0, 0, "verify_mac: %s", gnutls_strerror (result));
 
   indx = 0;
 
@@ -2728,11 +2728,10 @@ pkcs12_info (void)
 
 	  result = gnutls_pkcs12_bag_decrypt (bag, pass);
 
-	  if (result < 0) 
+	  if (result < 0)
 	    {
-	    	fprintf (stderr, "bag_decrypt: %s",
-		   gnutls_strerror (result));
-		continue;
+	      error (0, 0, "bag_decrypt: %s", gnutls_strerror (result));
+	      continue;
 	    }
 
 	  result = gnutls_pkcs12_bag_get_count (bag);
