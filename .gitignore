@@ -52,6 +52,7 @@ doc/examples/ex-serv-pgp
 doc/examples/ex-serv-psk
 doc/examples/ex-serv-srp
 doc/examples/ex-serv1
+doc/manpages/
 lib/includes/gnutls/gnutls.h
 lib/gnutls-api.texi
 lib/gnutls.pc
@@ -99,3 +100,7 @@ tests/tlsia
 tests/x509dn
 tests/x509self
 tests/x509signself
+lib/build-aux/
+libextra/build-aux/
+lib/gl/tests/
+gl/tests/
