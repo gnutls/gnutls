@@ -304,6 +304,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	  get_cn_crt_set (crt);
 	  get_uid_crt_set (crt);
 	  get_oid_crt_set (crt);
+	  get_key_purpose_set( crt);
 
 	  if (!batch)
 	    fprintf (stderr,

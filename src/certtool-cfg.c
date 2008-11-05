@@ -72,6 +72,7 @@ typedef struct _cfg_ctx
   int code_sign_key;
   int ocsp_sign_key;
   int time_stamping_key;
+  char** key_purpose_oids;
   int crl_next_update;
   int crl_number;
   int crq_extensions;
@@ -121,6 +122,8 @@ template_parse (const char *template)
 
     {NULL, '\0', "dn_oid", CFG_STR + CFG_MULTI_SEPARATED,
      (void *) &cfg.dn_oid, 0},
+    {NULL, '\0', "key_purpose_oids", CFG_STR + CFG_MULTI_SEPARATED,
+     (void *) &cfg.key_purpose_oids, 0},
 
     {NULL, '\0', "crl_dist_points", CFG_STR,
      (void *) &cfg.crl_dist_points, 0},
@@ -580,6 +583,28 @@ get_oid_crt_set (gnutls_x509_crt_t crt)
 	  if (ret < 0)
 	    {
 	      fprintf (stderr, "set_dn_oid: %s\n", gnutls_strerror (ret));
+	      exit (1);
+	    }
+	}
+    }
+}
+
+void
+get_key_purpose_set (gnutls_x509_crt_t crt)
+{
+  int ret, i;
+
+  if (batch)
+    {
+      if (!cfg.key_purpose_oids)
+	return;
+      for (i = 0; cfg.key_purpose_oids[i] != NULL; i ++)
+	{
+	  ret = gnutls_x509_crt_set_key_purpose_oid (crt, cfg.key_purpose_oids[i], 0);
+
+	  if (ret < 0)
+	    {
+	      fprintf (stderr, "set_key_purpose_oid (%s): %s\n",  cfg.key_purpose_oids[i], gnutls_strerror (ret));
 	      exit (1);
 	    }
 	}
