@@ -1560,7 +1560,17 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
   gnutls_pkcs12_bag_t bag = NULL;
   int idx = 0;
   int ret;
+  size_t cert_id_size = 0;
+  size_t key_id_size = 0;
+  opaque cert_id[20];
+  opaque key_id[20];
+  int privkey_ok = 0;
 
+  *cert = NULL;
+  *key = NULL;
+  *crl = NULL;  
+
+  /* find the first private key */
   for (;;)
     {
       int elements_in_bag;
@@ -1630,6 +1640,12 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	    {
 	    case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY:
 	    case GNUTLS_BAG_PKCS8_KEY:
+	      if (*key != NULL) /* too simple to continue */
+	        {
+                  gnutls_assert();
+                  break;
+	        }
+	        
 	      ret = gnutls_x509_privkey_init (key);
 	      if (ret < 0)
 		{
@@ -1643,11 +1659,117 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	      if (ret < 0)
 		{
 		  gnutls_assert ();
+		  gnutls_x509_privkey_deinit( *key);
 		  goto done;
 		}
+              
+              key_id_size = sizeof(key_id);
+              ret = gnutls_x509_privkey_get_key_id( *key, 0, key_id, &key_id_size);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  gnutls_x509_privkey_deinit( *key);
+		  goto done;
+		}
+              
+              privkey_ok = 1; /* break */
 	      break;
+	    default:
+	      break;
+	    }
+	}
 
+      idx++;
+      gnutls_pkcs12_bag_deinit (bag);
+      
+      if (privkey_ok != 0) /* private key was found */
+        break;
+    }
+
+  if (privkey_ok == 0) /* no private key */
+    {
+      gnutls_assert();
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  /* now find the corresponding certificate 
+   */
+  idx = 0;
+  bag = NULL;
+  for (;;)
+    {
+      int elements_in_bag;
+      int i;
+
+      ret = gnutls_pkcs12_bag_init (&bag);
+      if (ret < 0)
+	{
+	  bag = NULL;
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      ret = gnutls_pkcs12_get_bag (p12, idx, bag);
+      if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	break;
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      ret = gnutls_pkcs12_bag_get_type (bag, 0);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      if (ret == GNUTLS_BAG_ENCRYPTED)
+	{
+	  ret = gnutls_pkcs12_bag_decrypt (bag, password);
+	  if (ret < 0)
+	    {
+	      gnutls_assert ();
+	      goto done;
+	    }
+	}
+
+      elements_in_bag = gnutls_pkcs12_bag_get_count (bag);
+      if (elements_in_bag < 0)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      for (i = 0; i < elements_in_bag; i++)
+	{
+	  int type;
+	  gnutls_datum_t data;
+
+	  type = gnutls_pkcs12_bag_get_type (bag, i);
+	  if (type < 0)
+	    {
+	      gnutls_assert ();
+	      goto done;
+	    }
+
+	  ret = gnutls_pkcs12_bag_get_data (bag, i, &data);
+	  if (ret < 0)
+	    {
+	      gnutls_assert ();
+	      goto done;
+	    }
+
+	  switch (type)
+	    {
 	    case GNUTLS_BAG_CERTIFICATE:
+	      if (*cert != NULL) /* no need to set it again */
+	        {
+	          gnutls_assert();
+	          break;
+                }
+
 	      ret = gnutls_x509_crt_init (cert);
 	      if (ret < 0)
 		{
@@ -1660,11 +1782,34 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	      if (ret < 0)
 		{
 		  gnutls_assert ();
+		  gnutls_x509_crt_deinit( *cert);
 		  goto done;
 		}
+
+	      /* check if the key id match */
+              cert_id_size = sizeof(cert_id);
+              ret = gnutls_x509_crt_get_key_id( *cert, 0, cert_id, &cert_id_size);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  gnutls_x509_crt_deinit( *cert);
+		  goto done;
+		}
+              
+              if (memcmp( cert_id, key_id, cert_id_size) != 0)
+                { /* they don't match - skip the certificate */
+                  gnutls_x509_crt_deinit( *cert);
+                  *cert = NULL;
+                }
 	      break;
 
 	    case GNUTLS_BAG_CRL:
+	      if (*crl != NULL)
+	        {
+	          gnutls_assert();
+	          break;
+                }
+
 	      ret = gnutls_x509_crl_init (crl);
 	      if (ret < 0)
 		{
@@ -1676,6 +1821,7 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
 	      if (ret < 0)
 		{
 		  gnutls_assert ();
+		  gnutls_x509_crl_deinit( *crl);
 		  goto done;
 		}
 	      break;
@@ -1739,8 +1885,62 @@ int
   (gnutls_certificate_credentials_t res, const char *pkcs12file,
    gnutls_x509_crt_fmt_t type, const char *password)
 {
-  gnutls_pkcs12_t p12;
   gnutls_datum_t p12blob;
+  size_t size;
+  int ret;
+
+  p12blob.data = read_binary_file (pkcs12file, &size);
+  p12blob.size = (unsigned int) size;
+  if (p12blob.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_FILE_ERROR;
+    }
+  
+  ret = gnutls_certificate_set_x509_simple_pkcs12_mem(res, &p12blob, type, password);
+  free(p12blob.data);
+
+  return ret;
+}
+
+/**
+ * gnutls_certificate_set_x509_simple_pkcs12_mem:
+ * @res: is an #gnutls_certificate_credentials_t structure.
+ * @p12blob: the PKCS#12 blob.
+ * @type: is PEM or DER of the @pkcs12file.
+ * @password: optional password used to decrypt PKCS#12 file, bags and keys.
+ *
+ * This function sets a certificate/private key pair and/or a CRL in
+ * the gnutls_certificate_credentials_t structure.  This function may
+ * be called more than once (in case multiple keys/certificates exist
+ * for the server).
+ *
+ * MAC:ed PKCS#12 files are supported.  Encrypted PKCS#12 bags are
+ * supported.  Encrypted PKCS#8 private keys are supported.  However,
+ * only password based security, and the same password for all
+ * operations, are supported.
+ *
+ * The private keys may be RSA PKCS#1 or DSA private keys encoded in
+ * the OpenSSL way.
+ *
+ * PKCS#12 file may contain many keys and/or certificates, and there
+ * is no way to identify which key/certificate pair you want.  You
+ * should make sure the PKCS#12 file only contain one key/certificate
+ * pair and/or one CRL.
+ *
+ * It is believed that the limitations of this function is acceptable
+ * for most usage, and that any more flexibility would introduce
+ * complexity that would make it harder to use this functionality at
+ * all.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
+int
+  gnutls_certificate_set_x509_simple_pkcs12_mem
+  (gnutls_certificate_credentials_t res, const gnutls_datum *p12blob,
+   gnutls_x509_crt_fmt_t type, const char *password)
+{
+  gnutls_pkcs12_t p12;
   gnutls_x509_privkey_t key = NULL;
   gnutls_x509_crt_t cert = NULL;
   gnutls_x509_crl_t crl = NULL;
@@ -1754,17 +1954,7 @@ int
       return ret;
     }
 
-  p12blob.data = read_binary_file (pkcs12file, &size);
-  p12blob.size = (unsigned int) size;
-  if (p12blob.data == NULL)
-    {
-      gnutls_assert ();
-      gnutls_pkcs12_deinit (p12);
-      return GNUTLS_E_FILE_ERROR;
-    }
-
-  ret = gnutls_pkcs12_import (p12, &p12blob, type, 0);
-  free (p12blob.data);
+  ret = gnutls_pkcs12_import (p12, p12blob, type, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1811,6 +2001,13 @@ int
 	}
     }
 
+  /* check if the key and certificate found match */
+  if (key && (ret = _gnutls_check_key_cert_match (res)) < 0)
+    {
+      gnutls_assert ();
+      goto done;
+    }
+
   ret = 0;
 
 done:
@@ -1823,6 +2020,7 @@ done:
 
   return ret;
 }
+
 
 
 /**

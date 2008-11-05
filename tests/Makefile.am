@@ -76,4 +76,6 @@ TESTS = $(ctests)
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12	\
 	PKCS12PASSWORD=foobar \
+	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
+	PKCS12PASSWORD_2="" \
 	$(VALGRIND)

@@ -64,5 +64,33 @@ doit (void)
 
   gnutls_certificate_free_credentials (x509cred);
 
+  /* try now if we can read correctly from a pkcs12 file that
+   * contains two certificates (one unrelated with key)
+   */
+  ret = gnutls_certificate_allocate_credentials (&x509cred);
+  if (ret < 0)
+    fail ("gnutls_certificate_allocate_credentials failed %d\n", ret);
+
+  file = getenv ("PKCS12FILE_2");
+  password = getenv ("PKCS12PASSWORD_2");
+
+  if (!file)
+    file = "pkcs12-decode/pkcs12_2certs.p12";
+  if (!password)
+    password = "";
+
+  success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+	   file, password);
+  ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
+							file,
+							GNUTLS_X509_FMT_DER,
+							password);
+  if (ret < 0)
+    fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
+
+  success ("Read file OK\n");
+
+  gnutls_certificate_free_credentials (x509cred);
+
   gnutls_global_deinit ();
 }

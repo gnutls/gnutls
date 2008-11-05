@@ -23,7 +23,7 @@ Reported by Kevin Quick <quick@sparq.org> in
 Modules include memchr and memcmp.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_certificate_set_x509_simple_pkcs12_mem: ADDED
 
 * Version 2.7.1 (released 2008-10-31)
 
