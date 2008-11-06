@@ -23,7 +23,7 @@ Ucko <ucko@ncbi.nlm.nih.gov>.
 It incorrectly returned the subject DN instead of issuer DN in v2.6.0.
 Thanks to Thomas Viehmann <tv@beamnet.de> for report.
 
-** certtool: print a PKCS #8 key even if it is not encrypted.
+** certtool: Print a PKCS #8 key even if it is not encrypted.
 
 ** tests: Make tests compile when using internal libtasn1.
 Patch by ludo@gnu.org (Ludovic Courtès).
