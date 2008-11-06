@@ -105,14 +105,11 @@ extern "C"
 /* that represent an ASN.1 DEFINITION.                */
 /******************************************************/
 
-#define SMALL_VALUE_SIZE 16
-
   struct node_asn_struct
   {
     char *name;			/* Node name */
     unsigned int type;		/* Node type */
     unsigned char *value;	/* Node value */
-    unsigned char small_value[SMALL_VALUE_SIZE]; /* if value is less than that store it here */
     int value_len;
     struct node_asn_struct *down;	/* Pointer to the son node */
     struct node_asn_struct *right;	/* Pointer to the brother node */
@@ -230,8 +227,6 @@ extern "C"
 				 int str_size, int *bit_len);
 
   signed long asn1_get_length_der (const unsigned char *der, int der_len,
-				   int *len);
-  long asn1_get_length_ber (const unsigned char *ber, int ber_len,
 				   int *len);
 
   void asn1_length_der (unsigned long int len, unsigned char *ans,
