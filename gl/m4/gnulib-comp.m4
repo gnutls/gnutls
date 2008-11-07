@@ -119,6 +119,7 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_FUNC_PERROR
   gl_STRING_MODULE_INDICATOR([perror])
+  gl_PMCCABE2HTML
   gl_FUNC_READ_FILE
   gl_FUNC_READLINE
   gl_FUNC_REALLOC_POSIX
@@ -325,6 +326,8 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/gendocs.sh
   build-aux/gnupload
   build-aux/link-warning.h
+  build-aux/pmccabe.css
+  build-aux/pmccabe2html
   doc/fdl-1.3.texi
   doc/gendocs_template
   doc/gpl-3.0.texi
@@ -433,6 +436,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/perror.m4
+  m4/pmccabe2html.m4
   m4/printf.m4
   m4/read-file.m4
   m4/readline.m4

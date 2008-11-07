@@ -256,21 +256,40 @@ AC_PROG_LIBTOOL
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
 
-AC_CONFIG_FILES([Makefile \
-	doc/Makefile doc/examples/Makefile doc/scripts/Makefile \
-	doc/manpages/Makefile doc/reference/Makefile doc/doxygen/Doxyfile \
-	doc/credentials/Makefile doc/credentials/x509/Makefile \
-	doc/credentials/srp/Makefile doc/credentials/openpgp/Makefile \
-	gl/Makefile gl/tests/Makefile \
-	tests/Makefile tests/rsa-md5-collision/Makefile tests/userid/Makefile \
-	tests/pkcs1-padding/Makefile tests/pkcs8-decode/Makefile \
-	tests/pkcs12-decode/Makefile tests/pathlen/Makefile \
-	tests/key-id/Makefile tests/sha2/Makefile \
-	tests/openpgp-certs/Makefile \
-	src/Makefile \
-	src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
-	guile/Makefile guile/modules/Makefile \
-	guile/src/Makefile guile/tests/Makefile])
+AC_CONFIG_FILES([ \
+  Makefile \
+  doc/Makefile \
+  doc/examples/Makefile \
+  doc/cyclo/Makefile \
+  doc/scripts/Makefile \
+  doc/manpages/Makefile \
+  doc/reference/Makefile \
+  doc/doxygen/Doxyfile \
+  doc/credentials/Makefile \
+  doc/credentials/x509/Makefile \
+  doc/credentials/srp/Makefile \
+  doc/credentials/openpgp/Makefile \
+  gl/Makefile \
+  gl/tests/Makefile \
+  tests/Makefile \
+  tests/rsa-md5-collision/Makefile \
+  tests/userid/Makefile \
+  tests/pkcs1-padding/Makefile \
+  tests/pkcs8-decode/Makefile \
+  tests/pkcs12-decode/Makefile \
+  tests/pathlen/Makefile \
+  tests/key-id/Makefile \
+  tests/sha2/Makefile \
+  tests/openpgp-certs/Makefile \
+  src/Makefile \
+  src/cfg/Makefile \
+  src/cfg/platon/Makefile \
+  src/cfg/platon/str/Makefile \
+  guile/Makefile \
+  guile/modules/Makefile \
+  guile/src/Makefile \
+  guile/tests/Makefile \
+])
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 
