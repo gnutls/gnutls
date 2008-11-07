@@ -18,6 +18,10 @@ Build failure reported by Arfrever Frehtes Taifersar Arahesis
 <arfrever.fta@gmail.com> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3194>.
 
+** libgnutls: Change detection of when to use a linker version script.
+Use --enable-ld-version-script or --disable-ld-version-script to
+override auto-detection logic.
+
 ** doc: Change license on the manual to GFDLv1.3+.
 
 ** doc: GTK-DOC fixes for new splitted configuration system.
