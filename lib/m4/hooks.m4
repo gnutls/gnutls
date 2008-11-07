@@ -78,7 +78,36 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_MSG_CHECKING([whether to use the included minitasn1])
   AC_MSG_RESULT($included_libtasn1)
   AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
-  
+
+  AC_ARG_WITH(lzo,
+    AS_HELP_STRING([--with-lzo], [use experimental LZO compression]),
+                   use_lzo=$withval, use_lzo=no)
+  AC_MSG_CHECKING([whether to include LZO compression support])
+  AC_MSG_RESULT($use_lzo)
+  LZO_LIBS=
+  if test "$use_lzo" = "yes"; then
+    AC_CHECK_LIB(lzo2, lzo1x_1_compress, LZO_LIBS=-llzo2)
+    if test "$LZO_LIBS" = ""; then
+      AC_CHECK_LIB(lzo, lzo1x_1_compress, LZO_LIBS=-llzo, [
+        use_lzo=no
+        AC_MSG_WARN(
+  ***
+  *** Could not find liblzo or liblzo2.  Disabling LZO compression.
+  )
+        ])
+    fi
+  fi
+  AC_SUBST(LZO_LIBS)
+  if test "$use_lzo" = "yes"; then
+    AC_DEFINE(USE_LZO, 1, [whether to use the LZO compression])
+    if test "$LZO_LIBS" = "-llzo"; then
+      AC_CHECK_HEADERS(lzo1x.h)
+    elif test "$LZO_LIBS" = "-llzo2"; then
+      AC_CHECK_HEADERS(lzo/lzo1x.h)
+    fi
+  fi
+  AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
+
   AC_MSG_CHECKING([whether C99 macros are supported])
   AC_TRY_COMPILE(,
   [
