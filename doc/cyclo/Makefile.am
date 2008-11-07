@@ -22,7 +22,7 @@
 EXTRA_DIST = cyclo-gnutls.html
 
 cyclo-gnutls.html:
-	$(PMCCABE) ${top_srcdir}/lib/*.[ch] \
+	$(PMCCABE) ${top_srcdir}/lib/*.[ch] ${top_srcdir}/lib/x509/*.[ch] ${top_srcdir}/lib/openpgp/*.[ch] ${top_srcdir}/lib/opencdk/*.[ch] \
 		| sort -nr \
 		| $(AWK) -f ${top_srcdir}/build-aux/pmccabe2html \
 			-v lang=html -v name="$(PACKAGE_NAME)" \
