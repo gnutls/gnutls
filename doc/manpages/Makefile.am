@@ -246,6 +246,7 @@ APIMANS += gnutls_certificate_set_x509_crl_mem.3
 APIMANS += gnutls_certificate_set_x509_crl.3
 APIMANS += gnutls_certificate_set_x509_crl_file.3
 APIMANS += gnutls_certificate_set_x509_simple_pkcs12_file.3
+APIMANS += gnutls_certificate_set_x509_simple_pkcs12_mem.3
 APIMANS += gnutls_certificate_free_crls.3
 APIMANS += gnutls_pem_base64_encode.3
 APIMANS += gnutls_pem_base64_encode_alloc.3
