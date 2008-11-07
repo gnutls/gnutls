@@ -42,11 +42,7 @@
 #define OPENCDK_VERSION_PATCH 6
 
 #ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
+extern "C" {
 #endif
 
 /* General contexts */
