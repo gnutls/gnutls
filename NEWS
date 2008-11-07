@@ -11,6 +11,9 @@ active attackers) to assume any server name and trick GNU TLS clients
 into trusting that name.  Thanks for report and analysis from Martin
 von Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 
+Any updates with more details about this vulnerability will be added
+to <http://www.gnu.org/software/gnutls/security.html>
+
 ** libgnutls: Add missing prototype for gnutls_srp_set_prime_bits.
 Reported by Kevin Quick <quick@sparq.org> in
 <https://savannah.gnu.org/support/index.php?106454>.
