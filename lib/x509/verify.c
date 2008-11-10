@@ -374,6 +374,17 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
   int i = 0, ret;
   unsigned int status = 0, output;
 
+  /* Check if the last certificate in the path is self signed.
+   * In that case ignore it (a certificate is trusted only if it
+   * leads to a trusted party by us, not the server's).
+   */
+  if (gnutls_x509_crt_check_issuer (certificate_list[clist_size - 1],
+				    certificate_list[clist_size - 1]) > 0
+      && clist_size > 0)
+    {
+      clist_size--;
+    }
+
   /* Verify the last certificate in the certificate path
    * against the trusted CA certificate list.
    *
@@ -411,17 +422,6 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
 	}
     }
 #endif
-
-  /* Check if the last certificate in the path is self signed.
-   * In that case ignore it (a certificate is trusted only if it
-   * leads to a trusted party by us, not the server's).
-   */
-  if (gnutls_x509_crt_check_issuer (certificate_list[clist_size - 1],
-				    certificate_list[clist_size - 1]) > 0
-      && clist_size > 0)
-    {
-      clist_size--;
-    }
 
   /* Verify the certificate path (chain) 
    */

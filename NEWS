@@ -5,6 +5,15 @@ See the end for copying conditions.
 
 * Version 2.7.2 (unreleased)
 
+** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
+The flaw makes it possible for man in the middle attackers (i.e.,
+active attackers) to assume any name and trick GNU TLS clients into
+trusting that name.  Thanks for report and analysis from Martin von
+Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
+
+Any updates with more details about this vulnerability will be added
+to <http://www.gnu.org/software/gnutls/security.html>
+
 ** certtool: allow setting arbitrary key purpose object identifiers.
 
 ** libgnutls: Fix detection of C99 macros, to make debug logging work again.
@@ -102,6 +111,37 @@ gnutls_x509_crq_get_key_purpose_oid: ADDED
 gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_print: ADDED
 gnutls_x509_crt_set_crq_extensions: ADDED
+
+* Version 2.6.1 (released 2008-11-10)
+
+** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
+The flaw makes it possible for man in the middle attackers (i.e.,
+active attackers) to assume any name and trick GNU TLS clients into
+trusting that name.  Thanks for report and analysis from Martin von
+Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
+
+Any updates with more details about this vulnerability will be added
+to <http://www.gnu.org/software/gnutls/security.html>
+
+** libgnutls: Add missing prototype for gnutls_srp_set_prime_bits.
+Reported by Kevin Quick <quick@sparq.org> in
+<https://savannah.gnu.org/support/index.php?106454>.
+
+** libgnutls-extra: Protect internal symbols with static.
+Fixes problem when linking certtool statically.  Tiny patch from Aaron
+Ucko <ucko@ncbi.nlm.nih.gov>.
+
+** libgnutls-openssl: Fix patch against X509_get_issuer_name.
+It incorrectly returned the subject DN instead of issuer DN in v2.6.0.
+Thanks to Thomas Viehmann <tv@beamnet.de> for report.
+
+** certtool: Print a PKCS #8 key even if it is not encrypted.
+
+** tests: Make tests compile when using internal libtasn1.
+Patch by ludo@gnu.org (Ludovic Courtès).
+
+** API and ABI modifications:
+No changes since last version.
 
 * Version 2.6.0 (released 2008-10-06)
 
