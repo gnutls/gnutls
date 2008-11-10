@@ -1,3 +1,104 @@
+2008-11-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.6.1.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix, suggested by Martin.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Mention security link.
+
+2008-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool.c: Cosmetic fixes.
+
+2008-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2008-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/decoding.c, lib/minitasn1/element.c,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/parser_aux.h: Revert "* added BER octet string decoder
+	from libtasn1." This reverts commit 47a0c91a38c458653be1645ff162c53253cbeadd.
+
+2008-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-11-03  Martin von Gagern <Martin.vGagern@gmx.net>
+
+	* lib/x509/verify.c: Drop self signed certificate from certificate
+	chain before validating certificates. This avoids the penultimate
+	certificate to get incorrectly trusted.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, includes/gnutls/gnutls.h.in: Add missing prototype for
+	gnutls_srp_set_prime_bits.
+
+2008-11-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/minitasn1/decoding.c, lib/minitasn1/element.c,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/parser_aux.h: * added BER octet string decoder from libtasn1.  * added the tree generation optimizations.
+
+2008-10-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Revert broken commit.
+
+2008-10-22  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, src/certtool.c: certtool: print a PKCS #8 key even if it is
+	not encrypted.
+
+2008-10-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-11  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS, libextra/fipsmd5.c: Add static qualifiers on internal
+	symbols.  Tiny patch from Aaron Ucko <ucko@ncbi.nlm.nih.gov>.
+
+2008-10-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-10-07  Ludovic Courtès <ludo@gnu.org>
+
+	* tests/Makefile.am: More test compilation fixes with minitasn1.  * tests/Makefile.am (AM_CPPFLAGS)[ENABLE_MINITASN1]: Add minitasn1   directory.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2008-10-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-07  Ludovic Courtès <ludo@gnu.org>
+
+	* tests/pkcs12-decode/Makefile.am: Fix compilation of
+	`pkcs12-decode' test when using minitasn1.  * tests/pkcs12-decode/Makefile.am (AM_CPPFLAGS)[ENABLE_MINITASN1]:
+	  Add `minitasn1' include directory.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Get issuer dn in X509_get_issuer_name,
+	correct last patch.
+
+2008-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-10-06  Simon Josefsson <simon@josefsson.org>
 
 	* cfg.mk: Upload to non-beta site.
