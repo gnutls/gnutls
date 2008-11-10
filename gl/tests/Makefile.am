@@ -115,6 +115,24 @@ EXTRA_DIST += test-getline.c
 
 ## end   gnulib module getline-tests
 
+## begin gnulib module gettimeofday
+
+
+EXTRA_DIST += gettimeofday.c
+
+EXTRA_libtests_a_SOURCES += gettimeofday.c
+
+## end   gnulib module gettimeofday
+
+## begin gnulib module gettimeofday-tests
+
+TESTS += test-gettimeofday
+check_PROGRAMS += test-gettimeofday
+
+EXTRA_DIST += test-gettimeofday.c
+
+## end   gnulib module gettimeofday-tests
+
 ## begin gnulib module ioctl
 
 
@@ -170,11 +188,15 @@ EXTRA_DIST += test-read-file.c
 
 ## begin gnulib module select-tests
 
-TESTS += test-select
-check_PROGRAMS += test-select
+TESTS += test-select test-select-in.sh test-select-out.sh
+# test-select-stdin has to be run by hand.
+TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@'
+check_PROGRAMS += test-select test-select-fd test-select-stdin
 test_select_LDADD = $(LDADD) @LIBSOCKET@
+test_select_fd_LDADD = $(LDADD) @LIBSOCKET@
+test_select_stdin_LDADD = $(LDADD) @LIBSOCKET@
 
-EXTRA_DIST += test-select.c
+EXTRA_DIST += test-select.c test-select-fd.c test-select-in.sh test-select-out.sh test-select-stdin.c
 
 ## end   gnulib module select-tests
 

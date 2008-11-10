@@ -218,6 +218,7 @@ AC_SUBST([LTALLOCA])
   m4_pushdef([gltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl/tests'
+  gl_FUNC_GETTIMEOFDAY
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([ioctl])
@@ -225,6 +226,7 @@ AC_SUBST([LTALLOCA])
   fi
   gl_SYS_IOCTL_MODULE_INDICATOR([ioctl])
   gl_MODULE_INDICATOR([ioctl])
+  AC_CHECK_HEADERS_ONCE([unistd.h sys/wait.h])
   gl_SOCKETS
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
@@ -420,6 +422,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
+  m4/gettimeofday.m4
   m4/gnulib-common.m4
   m4/include_next.m4
   m4/inet_ntop.m4
@@ -474,6 +477,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getaddrinfo.c
   tests/test-getdelim.c
   tests/test-getline.c
+  tests/test-gettimeofday.c
   tests/test-lseek.c
   tests/test-lseek.sh
   tests/test-netdb.c
@@ -481,6 +485,10 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-perror.c
   tests/test-perror.sh
   tests/test-read-file.c
+  tests/test-select-fd.c
+  tests/test-select-in.sh
+  tests/test-select-out.sh
+  tests/test-select-stdin.c
   tests/test-select.c
   tests/test-snprintf.c
   tests/test-sockets.c
@@ -497,6 +505,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-unistd.c
   tests/test-vasnprintf.c
   tests/test-wchar.c
+  tests=lib/gettimeofday.c
   tests=lib/ioctl.c
   tests=lib/sockets.c
   tests=lib/sockets.h
