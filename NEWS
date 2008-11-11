@@ -37,6 +37,9 @@ override auto-detection logic.
 
 ** doc: Texinfo stylesheet uses white background.
 
+** tests: Add cve-2008-4989.c self-test.
+Tests regressions of the GNUTLS-SA-2008-3 security problem.
+
 ** gnulib: Deprecated modules removed.
 Modules include memchr and memcmp.
 
