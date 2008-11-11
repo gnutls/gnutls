@@ -296,6 +296,7 @@ gnutls_global_deinit (void)
     {
       gl_sockets_cleanup ();
       _gnutls_rnd_deinit ();
+      _gnutls_ext_deinit ();
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);
       _gnutls_crypto_deregister ();

@@ -327,6 +327,12 @@ _gnutls_ext_init (void)
   return GNUTLS_E_SUCCESS;
 }
 
+int
+_gnutls_ext_deinit (void)
+{
+  gnutls_free (extfunc);
+}
+
 /**
  * gnutls_ext_register - Register a handler for a TLS extension
  * @type: the 16-bit integer referring to the extension type
