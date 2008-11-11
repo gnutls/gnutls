@@ -177,7 +177,6 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_UNISTD_H
   gl_FUNC_VASNPRINTF
-  gl_WARN_INIT
   gl_WCHAR_H
   gl_XSIZE
   m4_ifval(gl_LIBSOURCES_LIST, [
@@ -465,7 +464,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_time_h.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
-  m4/warnings.m4
   m4/wchar.m4
   m4/wchar_t.m4
   m4/wint_t.m4
