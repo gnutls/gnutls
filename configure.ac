@@ -172,6 +172,11 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
+# These are warnings we could enable:
+# -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings -Wno-pointer-sign
+#
+# These are warnings we have tried but have turned out not to be useful:
+#
 # -Wtraditional: warns on #elif which we use often
 # -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
 # -Wpadded: many of our structs are not optimized for padding
@@ -181,7 +186,8 @@ gl_INIT
 # -Wconversion: too many warnings for now
 # -Wswitch-default: too many warnings for now
 # -Wswitch-enum: too many warnings for now
-for w in -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings -Wno-pointer-sign; do
+
+for w in -Wall; do
   gl_WARN_ADD([$w])
 done
 export WARN_CFLAGS
@@ -232,7 +238,7 @@ AC_MSG_NOTICE([summary of build options:
   Host type:        ${host}
   Install prefix:   ${prefix}
   Compiler:         ${CC}
-  Compiler flags:   ${CFLAGS}
+  Warning flags:    ${WARN_CFLAGS}
   Library types:    Shared=${enable_shared}, Static=${enable_static}
   Valgrind:         ${VALGRIND}
   Linker script:    $have_ld_version_script
