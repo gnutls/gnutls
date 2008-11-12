@@ -44,7 +44,7 @@ update-po: refresh-po
 	git-commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
 
 bootstrap: autoreconf
-	 WARN_CFLAGS="-Werror" ./configure $(CFGFLAGS)
+	 ./configure $(CFGFLAGS)
 
 # Code Coverage
 
