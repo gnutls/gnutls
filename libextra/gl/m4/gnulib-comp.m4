@@ -25,6 +25,7 @@ AC_DEFUN([xgl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
+  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -178,6 +179,7 @@ AC_DEFUN([xgl_FILE_LIST], [
   lib/md5.h
   lib/memxor.c
   lib/memxor.h
+  m4/extensions.m4
   m4/gnulib-common.m4
   m4/hmac-md5.m4
   m4/lib-ld.m4
