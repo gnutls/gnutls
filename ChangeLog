@@ -1,3 +1,24 @@
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.6.2.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump version.  Add NEWS item.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Remove check of last certificate in path is
+	self signed.  Causes crashes further down in the code for
+	certificate chains that only contain one self-signed certificate.
+	Still protects against the GNUTLS-SA-2008-3 vulnerabillity.
+	Reported by Michael Meskes <meskes@debian.org> in
+	<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
+
+2008-11-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-11-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.6.1.
