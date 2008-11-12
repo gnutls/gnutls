@@ -47,12 +47,11 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
   bigint_t tmp;
   char tmpbuf[512];
   opaque *buf;
-  int buf_release;
+  int buf_release = 0;
 
   if (size < sizeof (tmpbuf))
     {
       buf = tmpbuf;
-      buf_release = 0;
     }
   else
     {

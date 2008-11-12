@@ -327,7 +327,7 @@ _gnutls_ext_init (void)
   return GNUTLS_E_SUCCESS;
 }
 
-int
+void
 _gnutls_ext_deinit (void)
 {
   gnutls_free (extfunc);

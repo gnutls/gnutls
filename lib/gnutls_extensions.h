@@ -28,4 +28,4 @@ int _gnutls_parse_extensions (gnutls_session_t session,
 int _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 			    size_t data_size);
 int _gnutls_ext_init (void);
-int _gnutls_ext_deinit (void);
+void _gnutls_ext_deinit (void);

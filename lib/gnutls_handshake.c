@@ -1090,7 +1090,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 
       _gnutls_handshake_log ("HSK[%p]: %s was received [%ld bytes]\n",
 			     session, _gnutls_handshake2str (dataptr[0]),
-			     length32 + HANDSHAKE_HEADER_SIZE);
+			     (long int) (length32 + HANDSHAKE_HEADER_SIZE));
 
     }
   else
@@ -1103,7 +1103,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 
       _gnutls_handshake_log ("HSK[%p]: %s(v2) was received [%ld bytes]\n",
 			     session, _gnutls_handshake2str (*recv_type),
-			     length32 + handshake_header_size);
+			     (long int) (length32 + handshake_header_size));
 
       if (*recv_type != GNUTLS_HANDSHAKE_CLIENT_HELLO)
 	{			/* it should be one or nothing */

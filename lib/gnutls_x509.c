@@ -1945,7 +1945,6 @@ int
   gnutls_x509_crt_t cert = NULL;
   gnutls_x509_crl_t crl = NULL;
   int ret;
-  size_t size;
 
   ret = gnutls_pkcs12_init (&p12);
   if (ret < 0)

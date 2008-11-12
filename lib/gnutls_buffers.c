@@ -345,7 +345,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 	  int err = session->internals.errnum ? session->internals.errnum
 	    : errno;
 
-	  _gnutls_read_log ("READ: %d returned from %d, errno=%d gerrno=%d\n",
+	  _gnutls_read_log ("READ: %d returned from %p, errno=%d gerrno=%d\n",
 			    i, fd, errno, session->internals.errnum);
 
 	  if (err == EAGAIN || err == EINTR)
@@ -353,7 +353,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 	      if (sizeOfPtr - left > 0)
 		{
 
-		  _gnutls_read_log ("READ: returning %d bytes from %d\n",
+		  _gnutls_read_log ("READ: returning %d bytes from %p\n",
 				    sizeOfPtr - left, fd);
 
 		  goto finish;
@@ -373,7 +373,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
       else
 	{
 
-	  _gnutls_read_log ("READ: Got %d bytes from %d\n", i, fd);
+	  _gnutls_read_log ("READ: Got %d bytes from %p\n", i, fd);
 
 	  if (i == 0)
 	    break;		/* EOF */
@@ -391,7 +391,7 @@ finish:
       char tmp[16];
 
 
-      _gnutls_read_log ("READ: read %d bytes from %d\n",
+      _gnutls_read_log ("READ: read %d bytes from %p\n",
 			(sizeOfPtr - left), fd);
 
       for (x = 0; x < ((sizeOfPtr - left) / 16) + 1; x++)
@@ -767,7 +767,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 	("WRITE: Restoring old write. (%d bytes to send)\n", n);
     }
 
-  _gnutls_write_log ("WRITE: Will write %d bytes to %d.\n", n, fd);
+  _gnutls_write_log ("WRITE: Will write %d bytes to %p.\n", n, fd);
 
   i = 0;
   left = n;
@@ -846,7 +846,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 
 
 	  _gnutls_write_log
-	    ("WRITE: wrote %d bytes to %d. Left %d bytes. Total %d bytes.\n",
+	    ("WRITE: wrote %d bytes to %p. Left %d bytes. Total %d bytes.\n",
 	     i, fd, left, n);
 	  for (x = 0; x < (unsigned) ((i) / 16) + 1; x++)
 	    {
