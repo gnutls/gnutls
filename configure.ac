@@ -214,6 +214,9 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
+gl_WARN_ADD([-Wall])
+export WARN_CFLAGS
+
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
 
