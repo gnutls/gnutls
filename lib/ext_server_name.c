@@ -82,7 +82,7 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
 	    }
 	  else
 	    _gnutls_handshake_log
-	      ("HSK[%x]: Received zero size server name (under attack?)\n",
+	      ("HSK[%p]: Received zero size server name (under attack?)\n",
 	       session);
 
 	}
@@ -92,7 +92,7 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
       if (server_names > MAX_SERVER_NAME_EXTENSIONS)
 	{
 	  _gnutls_handshake_log
-	    ("HSK[%x]: Too many server names received (under attack?)\n",
+	    ("HSK[%p]: Too many server names received (under attack?)\n",
 	     session);
 	  server_names = MAX_SERVER_NAME_EXTENSIONS;
 	}

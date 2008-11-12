@@ -515,7 +515,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 	{
 	  gnutls_assert ();
 	  _gnutls_record_log
-	    ("REC[%x]: Short record length %d > %d - %d (under attack?)\n",
+	    ("REC[%p]: Short record length %d > %d - %d (under attack?)\n",
 	     session, pad, ciphertext.size, hash_size);
 	  /* We do not fail here. We check below for the
 	   * the pad_failed. If zero means success.

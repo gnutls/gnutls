@@ -140,7 +140,7 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer * buf)
   buf->data[1] = ((buf->length - 3) >> 8) & 0xFF;
   buf->data[2] = (buf->length - 3) & 0xFF;
 
-  _gnutls_debug_log ("EXT[%x]: Sending %d bytes of supplemental data\n",
+  _gnutls_debug_log ("EXT[%p]: Sending %d bytes of supplemental data\n",
 		     session, buf->length);
 
   return buf->length;
@@ -178,7 +178,7 @@ _gnutls_parse_supplemental (gnutls_session_t session,
       supp_data_length = _gnutls_read_uint16 (p);
       p += 2;
 
-      _gnutls_debug_log ("EXT[%x]: Got supplemental type=%02x length=%d\n",
+      _gnutls_debug_log ("EXT[%p]: Got supplemental type=%02x length=%d\n",
 			 session, supp_data_type, supp_data_length);
 
       recv_func = get_supp_func_recv (supp_data_type);

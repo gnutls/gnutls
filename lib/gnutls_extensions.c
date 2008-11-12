@@ -133,7 +133,7 @@ _gnutls_parse_extensions (gnutls_session_t session,
       type = _gnutls_read_uint16 (&data[pos]);
       pos += 2;
 
-      _gnutls_debug_log ("EXT[%x]: Received extension '%s/%d'\n", session,
+      _gnutls_debug_log ("EXT[%p]: Received extension '%s/%d'\n", session,
 			 _gnutls_extension_get_name (type), type);
 
       if ((ret = _gnutls_extension_list_check (session, type)) < 0)
@@ -249,7 +249,7 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 	   */
 	  _gnutls_extension_list_add (session, p->type);
 
-	  _gnutls_debug_log ("EXT[%x]: Sending extension %s\n",
+	  _gnutls_debug_log ("EXT[%p]: Sending extension %s\n",
 			     session, p->name);
 	}
       else if (size < 0)

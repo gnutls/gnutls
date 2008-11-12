@@ -51,7 +51,7 @@ _gnutls_handshake_select_v2_suite (gnutls_session_t session,
   opaque *_data;
   int _datalen;
 
-  _gnutls_handshake_log ("HSK[%x]: Parsing a version 2.0 client hello.\n",
+  _gnutls_handshake_log ("HSK[%p]: Parsing a version 2.0 client hello.\n",
 			 session);
 
   _data = gnutls_malloc (datalen);
@@ -110,7 +110,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   DECR_LEN (len, 2);
 
   _gnutls_handshake_log
-    ("HSK[%x]: SSL 2.0 Hello: Client's version: %d.%d\n", session,
+    ("HSK[%p]: SSL 2.0 Hello: Client's version: %d.%d\n", session,
      data[pos], data[pos + 1]);
 
   set_adv_version (session, data[pos], data[pos + 1]);
@@ -198,7 +198,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
     {
 
       _gnutls_handshake_log
-	("HSK[%x]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
+	("HSK[%p]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
 	 session);
 
       gnutls_assert ();
