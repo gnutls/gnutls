@@ -29,13 +29,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.10 dist-bzip2 -Wall -Werror -Wno-override])
 AM_CONFIG_HEADER(config.h)
 
-opt_developer_mode=no
-AC_MSG_CHECKING([whether to enable compiler warnings])
-AC_ARG_ENABLE(developer-mode,
-	AS_HELP_STRING([--enable-developer-mode], [enable compiler warnings]),
-opt_developer_mode=$enableval)
-AC_MSG_RESULT($opt_developer_mode)
-
 AC_MSG_RESULT([***
 *** Checking for compilation programs...
 ])
@@ -60,48 +53,13 @@ AC_C_INLINE
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
 
-if test $ac_cv_c_compiler_gnu != no; then
-
-	if test x$opt_developer_mode = xyes; then
-	   AC_MSG_CHECKING([whether gcc supports various warning flags])
-	   _gcc_cflags_save="$CFLAGS"
-	   CFLAGS="${CFLAGS} -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
-	   #removed "-Wlogical-op" and "-Wvla" which are not supported by my gcc --nmav
-	   # -Wtraditional: warns on #elif which we use often
-	   # -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
-	   # -Wpadded: many of our structs are not optimized for padding
-	   # -Wtraditional-conversion: we catch missing prototypes anyway
-	   # -Wno-unused-parameter: added because -Wunused cause too many warns
-	   # -Wunreachable-code: appears to return many false positives
-	   # -Wconversion: too many warnings for now
-	   # -Wswitch-default: too many warnings for now
-	   # -Wswitch-enum: too many warnings for now
-	   AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_warns=yes,_gcc_warns=no)
-	   AC_MSG_RESULT($_gcc_warns)
-	   if test x"$_gcc_warns" != xyes ; then
-	      CFLAGS=$_gcc_cflags_save;
-	   fi
-	fi
-
-	AC_MSG_CHECKING([whether gcc supports -Wno-pointer-sign])
-	_gcc_cflags_save="$CFLAGS"
-	CFLAGS="${CFLAGS} -Wno-pointer-sign"
-	AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),_gcc_psign=yes,_gcc_psign=no)
-	AC_MSG_RESULT($_gcc_psign)
-	if test "$_gcc_psign" != "yes"; then
-	  CFLAGS="$_gcc_cflags_save";
-	fi
-
-	AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
-	_gcc_cflags_save="$CFLAGS"
-	CFLAGS="${CFLAGS} -fgnu89-inline"
-	AC_COMPILE_IFELSE(AC_LANG_PROGRAM([]),
-	  _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
-	AC_MSG_RESULT($_gcc_gnu89_inline)
-	CFLAGS="$_gcc_cflags_save"
-fi
-
-# Needs to be called outside of 'if' clause.
+AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
+_gcc_cflags_save="$CFLAGS"
+CFLAGS="${CFLAGS} -fgnu89-inline"
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
+AC_MSG_RESULT($_gcc_gnu89_inline)
+CFLAGS="$_gcc_cflags_save"
 AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
                [test "$_gcc_gnu89_inline" = "yes"])
 
@@ -214,7 +172,19 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
-gl_WARN_ADD([-Wall])
+# -Wtraditional: warns on #elif which we use often
+# -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
+# -Wpadded: many of our structs are not optimized for padding
+# -Wtraditional-conversion: we catch missing prototypes anyway
+# -Wno-unused-parameter: added because -Wunused cause too many warns
+# -Wunreachable-code: appears to return many false positives
+# -Wconversion: too many warnings for now
+# -Wswitch-default: too many warnings for now
+# -Wswitch-enum: too many warnings for now
+for w in -Wall -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings -Wno-pointer-sign; do
+  gl_WARN_ADD([$w])
+done
+echo warnings $WARN_CFLAGS
 export WARN_CFLAGS
 
 AC_CONFIG_SUBDIRS([lib])
