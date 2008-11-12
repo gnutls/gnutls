@@ -229,20 +229,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   fi
   AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
 
-  AC_MSG_CHECKING([if gcc/ld supports -Wl,--output-def])
-  if test "$enable_shared" = no; then
-    output_def=no
-    AC_MSG_RESULT([no need, since shared libraries are disabled])
-  else
-    _gcc_ldflags_save=$LDFLAGS
-    LDFLAGS="-Wl,--output-def,foo.def"
-    AC_LINK_IFELSE(AC_LANG_PROGRAM([]),output_def=yes,output_def=no)
-    rm -f foo.def
-    AC_MSG_RESULT($output_def)
-    LDFLAGS="$_gcc_ldflags_save"
-  fi
-  AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
-
+  sj_OUTPUT_DEF
   sj_LINKER_SCRIPT([$srcdir/libgnutls.vers])
 
   # For storing integers in pointers without warnings
