@@ -116,6 +116,17 @@ gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_print: ADDED
 gnutls_x509_crt_set_crq_extensions: ADDED
 
+* Version 2.6.2 (released 2008-11-12)
+
+** libgnutls: Fix crash in X.509 validation code for self-signed certificates.
+The patch to fix the security problem GNUTLS-SA-2008-3 introduced a
+problem for certificate chains that contained just one self-signed
+certificate.  Reported by Michael Meskes <meskes@debian.org> in
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.6.1 (released 2008-11-10)
 
 ** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
