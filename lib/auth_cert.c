@@ -65,11 +65,13 @@ static gnutls_privkey *alloc_and_load_x509_key (gnutls_x509_privkey_t key);
  */
 static int
 _gnutls_copy_certificate_auth_info (cert_auth_info_t info,
-				    gnutls_cert * cert, int ncerts)
+				    gnutls_cert * cert,
+				    size_t ncerts)
 {
   /* Copy peer's information to auth_info_t
    */
-  int ret, i, j;
+  int ret;
+  size_t i, j;
 
   if (info->raw_certificate_list != NULL)
     {
@@ -920,9 +922,9 @@ _gnutls_proc_x509_server_certificate (gnutls_session_t session,
   cert_auth_info_t info;
   gnutls_certificate_credentials_t cred;
   ssize_t dsize = data_size;
-  int i, j, x;
+  int i;
   gnutls_cert *peer_certificate_list;
-  int peer_certificate_list_size = 0;
+  size_t peer_certificate_list_size = 0, j, x;
   gnutls_datum_t tmp;
 
   cred = (gnutls_certificate_credentials_t)

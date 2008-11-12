@@ -147,7 +147,7 @@ wrap_gcry_mac_output (void *src_ctx, void *digest, size_t digestsize)
 
   if (_digest != NULL)
     {
-      int len = gcry_md_get_algo_dlen (gcry_md_get_algo (src_ctx));
+      unsigned int len = gcry_md_get_algo_dlen (gcry_md_get_algo (src_ctx));
 
       if (len <= digestsize && digest != NULL)
 	memcpy (digest, _digest, len);

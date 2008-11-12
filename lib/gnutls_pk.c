@@ -411,7 +411,8 @@ _gnutls_dsa_sign (gnutls_datum_t * signature,
 		  const gnutls_datum_t * hash, bigint_t * params,
 		  unsigned int params_len)
 {
-  int ret, i;
+  int ret;
+  size_t i;
   size_t k;
   gnutls_pk_params_st pk_params;
 

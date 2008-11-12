@@ -42,7 +42,8 @@ bigint_t
 _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
 		       gnutls_rnd_level_t level)
 {
-  int size = 1 + (bits / 8), ret;
+  size_t size = 1 + (bits / 8);
+  int ret;
   int rem, i;
   bigint_t tmp;
   char tmpbuf[512];
