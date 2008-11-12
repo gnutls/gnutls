@@ -45,10 +45,10 @@ LIBGNUTLS_EXTRA_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
 AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
-AC_CONFIG_FILES([ \
-  Makefile \
+AC_CONFIG_FILES([
+  Makefile
+  gnutls-extra.pc
+  gl/Makefile
   includes/Makefile
-  gl/Makefile \
-  gnutls-extra.pc \
 ])
 AC_OUTPUT

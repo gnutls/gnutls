@@ -86,17 +86,17 @@ LIBGNUTLS_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
-AC_CONFIG_FILES([ \
-  Makefile \
+AC_CONFIG_FILES([
+  Makefile
+  gnutls.pc
+  gl/Makefile
+  gl/tests/Makefile
   includes/Makefile
-  includes/gnutls/gnutls.h \
-  minitasn1/Makefile \
-  x509/Makefile \
-  openpgp/Makefile \
-  opencdk/Makefile \
-  po/Makefile.in \
-  gnutls.pc \
-  gl/Makefile \
-  gl/tests/Makefile \
+  includes/gnutls/gnutls.h
+  minitasn1/Makefile
+  opencdk/Makefile
+  openpgp/Makefile
+  po/Makefile.in
+  x509/Makefile
 ])
 AC_OUTPUT

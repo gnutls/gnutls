@@ -54,11 +54,6 @@ if test "x$GAA" = "x"; then
 fi
 AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
 
-
-AC_MSG_RESULT([***
-*** Detecting compiler options...
-])
-
 gl_EARLY
 AC_C_INLINE
 
@@ -110,10 +105,6 @@ fi
 AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
                [test "$_gcc_gnu89_inline" = "yes"])
 
-AC_MSG_RESULT([***
-*** Detecting C library capabilities...
-])
-
 AC_HEADER_STDC
 AC_CHECK_FUNCS(fork,,)
 AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
@@ -126,37 +117,13 @@ AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 # No fork on MinGW, disable some self-tests until we fix them.
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
-AC_MSG_RESULT([***
-*** Detecting system's parameters...
-])
-
-# Run self-tests under valgrind?
-if test "$cross_compiling" = no; then
-  AC_CHECK_PROGS(VALGRIND, valgrind)
-fi
-if test -n "$VALGRIND" && $VALGRIND true > /dev/null 2>&1; then
-  opt_valgrind_tests=yes
-else
-  opt_valgrind_tests=no
-  VALGRIND=
-fi 
-AC_MSG_CHECKING([whether self tests are run under valgrind])
-AC_ARG_ENABLE(valgrind-tests,
-	AS_HELP_STRING([--enable-valgrind-tests],
-                       [run self tests under valgrind]),
-  opt_valgrind_tests=$enableval)
-AC_MSG_RESULT($opt_valgrind_tests)
+sj_VALGRIND
 
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
 
-AC_MSG_RESULT([***
-*** Checking for external libraries...
-])
-
 # For Guile bindings.
-
 opt_guile_bindings=yes
 AC_MSG_CHECKING([whether building Guile bindings])
 AC_ARG_ENABLE(guile,
@@ -242,55 +209,59 @@ LIBS=$SAVED_LIBS
 AC_MSG_CHECKING([whether to use the included libcfg])
 AC_MSG_RESULT($libcfg_enabled)
 
-AC_MSG_RESULT([***
-*** Setting up gnulib compatibility files...
-])
-gl_INIT
-
-AC_MSG_RESULT([***
-*** Detecting options for shared libraries...
-])
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+
+gl_INIT
 
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
 
-AC_CONFIG_FILES([ \
-  Makefile \
-  doc/Makefile \
-  doc/examples/Makefile \
-  doc/cyclo/Makefile \
-  doc/scripts/Makefile \
-  doc/manpages/Makefile \
-  doc/reference/Makefile \
-  doc/doxygen/Doxyfile \
-  doc/credentials/Makefile \
-  doc/credentials/x509/Makefile \
-  doc/credentials/srp/Makefile \
-  doc/credentials/openpgp/Makefile \
-  gl/Makefile \
-  gl/tests/Makefile \
-  tests/Makefile \
-  tests/rsa-md5-collision/Makefile \
-  tests/userid/Makefile \
-  tests/pkcs1-padding/Makefile \
-  tests/pkcs8-decode/Makefile \
-  tests/pkcs12-decode/Makefile \
-  tests/pathlen/Makefile \
-  tests/key-id/Makefile \
-  tests/sha2/Makefile \
-  tests/openpgp-certs/Makefile \
-  src/Makefile \
-  src/cfg/Makefile \
-  src/cfg/platon/Makefile \
-  src/cfg/platon/str/Makefile \
-  guile/Makefile \
-  guile/modules/Makefile \
-  guile/src/Makefile \
-  guile/tests/Makefile \
-])
-
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
-
+AC_CONFIG_FILES([
+  Makefile
+  doc/Makefile
+  doc/credentials/Makefile
+  doc/credentials/openpgp/Makefile
+  doc/credentials/srp/Makefile
+  doc/credentials/x509/Makefile
+  doc/cyclo/Makefile
+  doc/doxygen/Doxyfile
+  doc/examples/Makefile
+  doc/manpages/Makefile
+  doc/reference/Makefile
+  doc/scripts/Makefile
+  gl/Makefile
+  gl/tests/Makefile
+  guile/Makefile
+  guile/modules/Makefile
+  guile/src/Makefile
+  guile/tests/Makefile
+  src/Makefile
+  src/cfg/Makefile
+  src/cfg/platon/Makefile
+  src/cfg/platon/str/Makefile
+  tests/Makefile
+  tests/key-id/Makefile
+  tests/openpgp-certs/Makefile
+  tests/pathlen/Makefile
+  tests/pkcs1-padding/Makefile
+  tests/pkcs12-decode/Makefile
+  tests/pkcs8-decode/Makefile
+  tests/rsa-md5-collision/Makefile
+  tests/sha2/Makefile
+  tests/userid/Makefile
+])
 AC_OUTPUT
+
+AC_MSG_NOTICE([summary of build options:
+
+  version:          ${VERSION} shared $LT_CURRENT:$LT_REVISION:$LT_AGE
+  Host type:        ${host}
+  Install prefix:   ${prefix}
+  Compiler:         ${CC}
+  Compiler flags:   ${CFLAGS}
+  Library types:    Shared=${enable_shared}, Static=${enable_static}
+  Valgrind:         ${VALGRIND}
+  Linker script:    $have_ld_version_script
+])
