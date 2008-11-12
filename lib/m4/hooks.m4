@@ -243,7 +243,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   fi
   AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
 
-  sj_LINKER_SCRIPT
+  sj_LINKER_SCRIPT([$srcdir/libgnutls.vers])
 
   # For storing integers in pointers without warnings
   # http://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
