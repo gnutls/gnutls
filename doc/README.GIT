@@ -17,15 +17,13 @@ Those are optional:
 
 1. Download the git tree
 $ git clone git://git.savannah.gnu.org/gnutls.git
-
 $ cd gnutls
 
 2. Create configure script
 $ autoreconf -i -f
 
 3. Compile the sources
-$ ./configure --enable-developer-mode
+$ ./configure
 $ make
 
-4. If you intend to change any code in gnutls, check the file
- doc/README.CODING_STYLE.
+4. If you intend to change any code, check the file doc/README.CODING_STYLE.
