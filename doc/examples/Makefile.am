@@ -20,6 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 AM_CPPFLAGS = \
+	$(WARN_CFLAGS)				\
 	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
 	-I$(top_srcdir)/libextra/includes				\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl
@@ -42,6 +43,7 @@ endif
 
 if ENABLE_CXX
 ex_cxx_SOURCES = ex-cxx.cpp
+ex_cxx_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
 ex_cxx_LDADD = $(CXX_LDADD)
 noinst_PROGRAMS += ex-cxx
 endif
