@@ -172,18 +172,11 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
-# These are warnings we could enable:
+# These are additional warnings we could enable:
 #
-# -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self
-# --Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal
-# --Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations
-# --Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align
-# --Wlogical-op -Waggregate-return -Wstrict-prototypes
-# --Wold-style-definition -Wmissing-prototypes -Wmissing-declarations
-# --Wmissing-noreturn -Wmissing-format-attribute -Wpacked
-# --Wredundant-decls -Wnested-externs -Winline -Wvla
-# --Wvolatile-register-var -Wdisabled-optimization -Wstack-protector
-# --Woverlength-strings
+# -Wshadow -Wunsafe-loop-optimizations Wcast-qual Wlogical-op
+# -Waggregate-return Wmissing-prototypes -Wmissing-declarations
+# -Wmissing-noreturn -Wmissing-format-attribute Wredundant-decls -Wvla
 #
 # These are warnings we have tried but have turned out not to be useful:
 #
@@ -201,7 +194,13 @@ gl_INIT
 # -Wno-pointer-sign: too many warnings for now
 # -Wno-unused-parameter: added because -Wunused cause too many warns
 
-for w in -Wall -W -Wno-pointer-sign -Wno-unused-parameter; do
+BASICS="-Wall -W"
+
+ADDITIONAL="-Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wfloat-equal -Wdeclaration-after-statement -Wpointer-arith -Wbad-function-cast  -Wcast-align -Wstrict-prototypes -Wold-style-definition -Wpacked -Wnested-externs -Winline -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
+
+REMOVE="-Wno-pointer-sign -Wno-unused-parameter"
+
+for w in $BASICS $ADDITIONAL $REMOVE; do
   gl_WARN_ADD([$w])
 done
 export WARN_CFLAGS
