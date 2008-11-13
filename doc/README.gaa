@@ -1,0 +1,154 @@
+If you modify src/*.gaa files you need to rebuild them using the 'gaa'
+tool.  The last release, 1.6.6, contains some minor problems that
+triggers warnings on the output C code.  The following patch against
+gaa 1.6.6 is used to generate files stored in GnuTLS.
+
+diff -ur gaa-1.6.6.orig/source/skel/gaa.skel gaa-1.6.6/source/skel/gaa.skel
+--- gaa-1.6.6.orig/source/skel/gaa.skel	2004-04-15 13:32:29.000000000 +0200
++++ gaa-1.6.6/source/skel/gaa.skel	2008-11-13 10:52:23.000000000 +0100
+@@ -340,31 +340,12 @@
+     return tmp;
+ }
+ 
+-static char gaa_getchar(char *arg)
+-{
+-    if(strlen(arg) != 1)
+-    {
+-        printf("Option %s: '%s' isn't an character\n", gaa_current_option, arg);
+-        GAAERROR(-1);
+-    }
+-    return arg[0];
+-}
+ 
+ static char* gaa_getstr(char *arg)
+ {
+     return arg;
+ }
+-static float gaa_getfloat(char *arg)
+-{
+-    float tmp;
+-    char a;
+-    if(sscanf(arg, "%f%c", &tmp, &a) < 1)
+-    {
+-        printf("Option %s: '%s' isn't a float number\n", gaa_current_option, arg);
+-        GAAERROR(-1);
+-    }
+-    return tmp;
+-}
++
+ /* option structures */
+ @         
+ #line 349 "gaa.skel"
+@@ -444,16 +425,19 @@
+ int gaa(int argc, char **argv, gaainfo *gaaval)
+ {
+     int tmp1, tmp2;
+-    int i, j@;
++    int l;
++    size_t i, j@;
+     char *opt_list;
+ 
++    i = 0;
++
+     GAAargv = argv;
+     GAAargc = argc;
+ 
+     opt_list = (char*) gaa_malloc(GAA_NB_OPTION + 1);
+ 
+-    for(i = 0; i < GAA_NB_OPTION + 1; i++)
+-        opt_list[i] = 0;
++    for(l = 0; l < GAA_NB_OPTION + 1; l++)
++        opt_list[l] = 0;
+     /* initialization */
+     if(inited == 0)
+     {
+@@ -468,27 +452,27 @@
+       gaa_arg_used = gaa_malloc(argc * sizeof(char));
+     }
+ 
+-    for(i = 1; i < argc; i++)
+-        gaa_arg_used[i] = 0;
+-    for(i = 1; i < argc; i++)
++    for(l = 1; l < argc; l++)
++        gaa_arg_used[l] = 0;
++    for(l = 1; l < argc; l++)
+     {
+-        if(gaa_arg_used[i] == 0)
++        if(gaa_arg_used[l] == 0)
+         {
+             j = 0;
+-            tmp1 = gaa_is_an_argument(GAAargv[i]);
++            tmp1 = gaa_is_an_argument(GAAargv[l]);
+             switch(tmp1)
+             {
+             case GAA_WORD_OPTION:
+                 j++;
+             case GAA_LETTER_OPTION:
+                 j++;
+-                tmp2 = gaa_get_option_num(argv[i]+j, tmp1);
++                tmp2 = gaa_get_option_num(argv[l]+j, tmp1);
+                 if(tmp2 == GAA_ERROR_NOMATCH)
+                 {
+-                    printf("Invalid option '%s'\n", argv[i]+j);
++                    printf("Invalid option '%s'\n", argv[l]+j);
+                     return 0;
+                 }
+-                switch(gaa_try(tmp2, i+1, gaaval, opt_list))
++                switch(gaa_try(tmp2, l+1, gaaval, opt_list))
+                 {
+                 case GAA_ERROR_NOTENOUGH_ARGS:
+                     printf("'%s': not enough arguments\n",gaa_current_option);
+@@ -501,18 +485,18 @@
+                 default:
+                     printf("Unknown error\n");
+                 }
+-                gaa_arg_used[i] = 1;
++                gaa_arg_used[l] = 1;
+                 break;
+             case GAA_MULTIPLE_OPTION:
+-                for(j = 1; j < strlen(argv[i]); j++)
++                for(j = 1; j < strlen(argv[l]); j++)
+                 {
+-                    tmp2 = gaa_get_option_num(argv[i]+j, tmp1);
++                    tmp2 = gaa_get_option_num(argv[l]+j, tmp1);
+                     if(tmp2 == GAA_ERROR_NOMATCH)
+                     {
+-                        printf("Invalid option '%c'\n", *(argv[i]+j));
++                        printf("Invalid option '%c'\n", *(argv[l]+j));
+                         return 0;
+                     }
+-                    switch(gaa_try(tmp2, i+1, gaaval, opt_list))
++                    switch(gaa_try(tmp2, l+1, gaaval, opt_list))
+                     {
+                     case GAA_ERROR_NOTENOUGH_ARGS:
+                         printf("'%s': not enough arguments\n",gaa_current_option);
+@@ -526,7 +510,7 @@
+                         printf("Unknown error\n");
+                     }
+                 }
+-                gaa_arg_used[i] = 1;
++                gaa_arg_used[l] = 1;
+                 break;
+             default: break;
+             }
+@@ -552,9 +536,9 @@
+     }
+ #endif
+ }
+-    for(i = 1; i < argc; i++)
++    for(l = 1; l < argc; l++)
+     {
+-        if(gaa_arg_used[i] == 0)
++        if(gaa_arg_used[l] == 0)
+         {
+             printf("Too many arguments\n");
+             return 0;
+@@ -605,7 +589,7 @@
+ 
+         len++;
+         a = fgetc( file);
+-        if(a==EOF) return 0; //a = ' ';
++        if(a==EOF) return 0; /* a = ' '; */
+     }
+ 
+     len += 1;
