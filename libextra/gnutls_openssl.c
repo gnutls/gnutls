@@ -911,7 +911,8 @@ X509_free (const X509 * cert)
 void
 BIO_get_fd (gnutls_session_t gnutls_state, int *fd)
 {
-  *fd = GNUTLS_POINTER_TO_INT (gnutls_transport_get_ptr (gnutls_state));
+  gnutls_transport_ptr_t tmp = gnutls_transport_get_ptr (gnutls_state);
+  *fd = GNUTLS_POINTER_TO_INT (tmp);
 }
 
 BIO *
