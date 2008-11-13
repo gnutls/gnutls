@@ -41,7 +41,7 @@ AM_CPPFLAGS = \
 if ENABLE_OPENPGP
 SUBDIRS += opencdk
 SUBDIRS += openpgp
-AM_CPPFLAGS += -I$(srcdir)/opencdk -I$(top_srcdir)/lib/opencdk
+AM_CPPFLAGS += -I$(srcdir)/opencdk
 endif
 
 if ENABLE_MINITASN1
