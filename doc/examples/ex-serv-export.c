@@ -272,10 +272,10 @@ main (void)
 typedef struct
 {
   char session_id[MAX_SESSION_ID_SIZE];
-  int session_id_size;
+  size_t session_id_size;
 
   char session_data[MAX_SESSION_DATA_SIZE];
-  int session_data_size;
+  size_t session_data_size;
 } CACHE;
 
 static CACHE *cache_db;

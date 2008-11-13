@@ -21,14 +21,14 @@ EXTRA_DIST = README README.srptool
 
 SUBDIRS = cfg
 
-AM_CPPFLAGS = \
-	$(WARN_CFLAGS)				\
+INCS = \
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
 	-I$(srcdir)/../libextra/includes	\
 	-I$(srcdir)/cfg
+AM_CPPFLAGS = $(WARN_CFLAGS) $(INCS)
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
 if ENABLE_PKI
@@ -67,10 +67,13 @@ certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else
-certtool_SOURCES += cfg/cfg+.c cfg/cfgfile.c cfg/cmdline.c cfg/parse.c	\
+noinst_LTLIBRARIES = libcfg.la
+libcfg_la_CPPFLAGS = $(INCS)
+libcfg_la_SOURCES = cfg/cfg+.c cfg/cfgfile.c cfg/cmdline.c cfg/parse.c	\
 	cfg/props.c cfg/shared.c cfg/platon/str/dynfgets.c		\
 	cfg/platon/str/strctype.c cfg/platon/str/strdyn.c		\
 	cfg/platon/str/strplus.c
+certtool_LDADD += libcfg.la
 endif
 
 noinst_PROGRAMS = errcodes printlist

@@ -1022,7 +1022,7 @@ test_session_resume2 (gnutls_session_t session)
 {
   int ret;
   char tmp_session_id[32];
-  int tmp_session_id_size;
+  size_t tmp_session_id_size;
 
   if (session == NULL)
     return TEST_IGNORE;

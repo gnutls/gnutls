@@ -111,6 +111,7 @@ _gnutls_recv_inner_application (gnutls_session_t session,
 				opaque * data, size_t sizeofdata)
 {
   ssize_t len;
+  uint32_t len24;
   opaque pkt[4];
 
   len = _gnutls_recv_int (session, GNUTLS_INNER_APPLICATION, -1, pkt, 4);
@@ -121,28 +122,28 @@ _gnutls_recv_inner_application (gnutls_session_t session,
     }
 
   *msg_type = pkt[0];
-  len = _gnutls_read_uint24 (&pkt[1]);
+  len24 = _gnutls_read_uint24 (&pkt[1]);
 
-  if (*msg_type != GNUTLS_IA_APPLICATION_PAYLOAD && len != CHECKSUM_SIZE)
+  if (*msg_type != GNUTLS_IA_APPLICATION_PAYLOAD && len24 != CHECKSUM_SIZE)
     {
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 
-  if (sizeofdata < len)
+  if (sizeofdata < len24)
     {
       /* XXX push back pkt to IA buffer? */
       gnutls_assert ();
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  if (len > 0)
+  if (len24 > 0)
     {
-      int tmplen = len;
+      uint32_t tmplen = len24;
 
-      len = _gnutls_recv_int (session, GNUTLS_INNER_APPLICATION, -1,
-			      data, tmplen);
-      if (len != tmplen)
+      len24 = _gnutls_recv_int (session, GNUTLS_INNER_APPLICATION, -1,
+				data, tmplen);
+      if (len24 != tmplen)
 	{
 	  gnutls_assert ();
 	  /* XXX Correct? */
@@ -150,7 +151,7 @@ _gnutls_recv_inner_application (gnutls_session_t session,
 	}
     }
 
-  return len;
+  return len24;
 }
 
 /* Apply the TLS PRF using the TLS/IA inner secret as keying material,

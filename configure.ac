@@ -173,7 +173,17 @@ AC_PROG_LIBTOOL
 gl_INIT
 
 # These are warnings we could enable:
-# -W -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal -Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wlogical-op -Waggregate-return -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes -Wmissing-declarations -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wvla -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings
+#
+# -Wchar-subscripts -Wformat-security -Wnonnull -Winit-self
+# --Wmissing-include-dirs -Wunused -Wno-unused-parameter -Wfloat-equal
+# --Wdeclaration-after-statement -Wshadow -Wunsafe-loop-optimizations
+# --Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align
+# --Wlogical-op -Waggregate-return -Wstrict-prototypes
+# --Wold-style-definition -Wmissing-prototypes -Wmissing-declarations
+# --Wmissing-noreturn -Wmissing-format-attribute -Wpacked
+# --Wredundant-decls -Wnested-externs -Winline -Wvla
+# --Wvolatile-register-var -Wdisabled-optimization -Wstack-protector
+# --Woverlength-strings
 #
 # These are warnings we have tried but have turned out not to be useful:
 #
@@ -181,13 +191,17 @@ gl_INIT
 # -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
 # -Wpadded: many of our structs are not optimized for padding
 # -Wtraditional-conversion: we catch missing prototypes anyway
-# -Wno-unused-parameter: added because -Wunused cause too many warns
 # -Wunreachable-code: appears to return many false positives
 # -Wconversion: too many warnings for now
 # -Wswitch-default: too many warnings for now
 # -Wswitch-enum: too many warnings for now
+#
+# These are warnings that we had to explicitly disable:
+#
+# -Wno-pointer-sign: too many warnings for now
+# -Wno-unused-parameter: added because -Wunused cause too many warns
 
-for w in -Wall -Wno-pointer-sign; do
+for w in -Wall -W -Wno-pointer-sign -Wno-unused-parameter; do
   gl_WARN_ADD([$w])
 done
 export WARN_CFLAGS
