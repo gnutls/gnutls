@@ -19,9 +19,9 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = TODO README.GIT certtool.cfg gnutls.ps gnutls.pdf	\
-	gnutls.html extract-guile-c-doc.scm doxygen/Doxyfile.in	\
-	doxygen/Doxyfile.orig texinfo.css
+EXTRA_DIST = TODO README.GIT README.gaa certtool.cfg gnutls.ps	\
+	gnutls.pdf gnutls.html extract-guile-c-doc.scm		\
+	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css
 
 SUBDIRS = examples cyclo scripts manpages credentials
 if ENABLE_GTK_DOC
