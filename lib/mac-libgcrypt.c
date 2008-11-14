@@ -93,7 +93,7 @@ wrap_gcry_md_copy (void **bhd, void *ahd)
 static void
 wrap_gcry_md_close (void *hd)
 {
-  return gcry_md_close (hd);
+  gcry_md_close (hd);
 }
 
 static int
