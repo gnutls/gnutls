@@ -331,6 +331,8 @@ global_stop (void)
 void
 server (void)
 {
+  size_t t;
+
   /* this must be called once in the program, it is mostly for the server.
    */
   gnutls_global_init ();
@@ -347,8 +349,6 @@ server (void)
     {
       wrap_db_init ();
     }
-
-  int t;
 
   for (t = 0; t < 2; t++)
     {
