@@ -26,6 +26,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
 #include "ext_inner_application.h"
+#include <gnutls/extra.h>
 
 #define NO 0
 #define YES 1

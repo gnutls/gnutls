@@ -24,6 +24,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
 #include "gnutls_state.h"
+#include <gnutls/extra.h>
 
 #define CHECKSUM_SIZE 12
 

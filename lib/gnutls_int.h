@@ -57,7 +57,6 @@ typedef struct
 } uint64;
 
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 
 /*
  * They are not needed any more. You can simply enable
