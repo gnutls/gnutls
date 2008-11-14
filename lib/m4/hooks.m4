@@ -34,13 +34,12 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   SOVERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(SOVERSION)
 
-  AC_PROG_CXX
-
   AC_ARG_ENABLE(cxx,
                 AS_HELP_STRING([--disable-cxx],
                                [unconditionally disable the C++ library]),
                 use_cxx=$enableval, use_cxx=yes)
   if test "$use_cxx" != "no"; then
+    AC_PROG_CXX
     AC_LANG_PUSH(C++)
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])], use_cxx=yes, use_cxx=no)
     AC_LANG_POP(C++)
