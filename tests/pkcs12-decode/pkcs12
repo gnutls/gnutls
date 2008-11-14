@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005, 2006 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006, 2008 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -24,7 +24,7 @@ srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool}
 
 ret=0
-for p12 in 'client.p12 foobar' noclient.p12 unclient.p12; do
+for p12 in 'client.p12 foobar' noclient.p12 unclient.p12 pkcs12_2certs.p12; do
     set -- $p12
     file=$1
     passwd=$2
