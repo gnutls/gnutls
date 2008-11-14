@@ -23,24 +23,6 @@ EXTRA_DIST = client.p12 noclient.p12 unclient.p12 pkcs12_2certs.p12
 
 dist_check_SCRIPTS = pkcs12
 
-TESTS = pkcs12 pkcs12_s2k
+TESTS = pkcs12
 
-check_PROGRAMS = pkcs12_s2k
-
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/gl		\
-	-I$(top_builddir)/gl		\
-	-I$(top_srcdir)/lib/includes	\
-	-I$(top_builddir)/lib/includes	\
-	-I$(srcdir)/..			\
-	-I$(top_srcdir)/lib		\
-	-I$(top_srcdir)/doc/examples
-
-AM_LDFLAGS = -no-install
-LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la ../libutils.la
-
-if ENABLE_MINITASN1
-
-AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
-
-endif
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
