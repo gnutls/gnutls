@@ -460,7 +460,9 @@ void* session::get_user_ptr( ) const
   
 void session::send_openpgp_cert( gnutls_openpgp_crt_status_t status)
 {
-    gnutls_openpgp_send_cert(s, status);
+#ifdef ENABLE_OPENPGP
+  gnutls_openpgp_send_cert(s, status);
+#endif
 }
 
 
