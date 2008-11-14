@@ -119,7 +119,7 @@ wrap_gcry_mpi_get_nbits (bigint_t a)
 static void
 wrap_gcry_mpi_release (bigint_t a)
 {
-  return gcry_mpi_release (a);
+  gcry_mpi_release (a);
 }
 
 #undef _gnutls_mpi_alloc_like
