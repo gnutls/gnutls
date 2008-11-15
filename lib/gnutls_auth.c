@@ -317,6 +317,17 @@ _gnutls_free_auth_info (gnutls_session_t session)
 	_gnutls_free_dh_info (dh_info);
       }
       break;
+    case GNUTLS_CRD_PSK:
+      {
+	psk_auth_info_t info = _gnutls_get_auth_info (session);
+
+	if (info == NULL)
+	  break;
+
+	dh_info = &info->dh;
+	_gnutls_free_dh_info (dh_info);
+      }
+      break;
     case GNUTLS_CRD_CERTIFICATE:
       {
 	unsigned int i;
