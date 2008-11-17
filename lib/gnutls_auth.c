@@ -28,6 +28,7 @@
 #include "gnutls_auth.h"
 #include "gnutls_algorithms.h"
 #include "auth_cert.h"
+#include "auth_psk.h"
 #include <gnutls_datum.h>
 
 #include "auth_anon.h"
