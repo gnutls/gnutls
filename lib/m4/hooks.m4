@@ -45,8 +45,6 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
     AC_LANG_POP(C++)
   fi
   AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
-  AC_MSG_CHECKING([whether to build C++ library])
-  AC_MSG_RESULT($use_cxx)
 
   AC_LIB_HAVE_LINKFLAGS(gcrypt,, [#include <gcrypt.h>],
     [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])

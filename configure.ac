@@ -130,8 +130,8 @@ if test "$opt_guile_bindings" = "yes"; then
         _gcc_cflags_save="$CFLAGS"
         CFLAGS="${CFLAGS} -fgnu89-inline"
         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                          _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
-        AC_MSG_RESULT($_gcc_gnu89_inline)
+                          gnu89_inline=yes, gnu89_inline=no)
+        AC_MSG_RESULT($gnu89_inline)
         CFLAGS="$_gcc_cflags_save"
       else
         AC_MSG_RESULT([no])
@@ -141,8 +141,7 @@ if test "$opt_guile_bindings" = "yes"; then
    fi
 fi
 AM_CONDITIONAL(HAVE_GUILE, test "$opt_guile_bindings" = "yes")
-AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
-               [test "$_gcc_gnu89_inline" = "yes"])
+AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
 dnl Check for libcfg+
@@ -256,4 +255,5 @@ AC_MSG_NOTICE([summary of build options:
   Valgrind:         ${VALGRIND}
   Linker script:    $have_ld_version_script
   Guile wrappers:   $opt_guile_bindings
+  C++ library:      $use_cxx
 ])
