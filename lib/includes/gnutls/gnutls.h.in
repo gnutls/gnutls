@@ -36,19 +36,6 @@
 #ifndef GNUTLS_H
 # define GNUTLS_H
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#define LIBGNUTLS_VERSION "@VERSION@"
-
-#define LIBGNUTLS_VERSION_MAJOR @MAJOR_VERSION@
-#define LIBGNUTLS_VERSION_MINOR @MINOR_VERSION@
-#define LIBGNUTLS_VERSION_PATCH @PATCH_VERSION@
-
-#define LIBGNUTLS_VERSION_NUMBER @NUMBER_VERSION@
-
 /* Get size_t. */
 #include <stddef.h>
 /* Get ssize_t. */
@@ -59,6 +46,18 @@ extern "C"
 /* Get time_t. */
 #include <time.h>
 #include <gnutls/compat.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBGNUTLS_VERSION "@VERSION@"
+
+#define LIBGNUTLS_VERSION_MAJOR @MAJOR_VERSION@
+#define LIBGNUTLS_VERSION_MINOR @MINOR_VERSION@
+#define LIBGNUTLS_VERSION_PATCH @PATCH_VERSION@
+
+#define LIBGNUTLS_VERSION_NUMBER @NUMBER_VERSION@
 
 #define GNUTLS_CIPHER_RIJNDAEL_128_CBC GNUTLS_CIPHER_AES_128_CBC
 #define GNUTLS_CIPHER_RIJNDAEL_256_CBC GNUTLS_CIPHER_AES_256_CBC
