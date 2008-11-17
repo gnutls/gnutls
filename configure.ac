@@ -47,6 +47,9 @@ if test "x$GAA" = "x"; then
 ***]])
 fi
 
+gl_EARLY
+AC_C_INLINE
+
 AC_ARG_ENABLE(cxx,
   AS_HELP_STRING([--disable-cxx], [unconditionally disable the C++ library]),
     use_cxx=$enableval, use_cxx=yes)
@@ -57,9 +60,6 @@ if test "$use_cxx" != "no"; then
   AC_LANG_POP(C++)
 fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
-
-gl_EARLY
-AC_C_INLINE
 
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
