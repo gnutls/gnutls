@@ -89,6 +89,11 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 # Finish things from ../configure.ac.
 AC_SUBST([WARN_CFLAGS])
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
+AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
+AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+if test "$use_cxx" != "no"; then
+  AC_PROG_CXX
+fi
 
 AC_CONFIG_FILES([
   Makefile

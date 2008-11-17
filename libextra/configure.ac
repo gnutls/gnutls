@@ -48,6 +48,7 @@ AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 # Finish things from ../configure.ac.
 AC_SUBST([WARN_CFLAGS])
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
+AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
 
 AC_CONFIG_FILES([
   Makefile

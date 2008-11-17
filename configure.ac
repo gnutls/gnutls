@@ -47,6 +47,17 @@ if test "x$GAA" = "x"; then
 ***]])
 fi
 
+AC_ARG_ENABLE(cxx,
+  AS_HELP_STRING([--disable-cxx], [unconditionally disable the C++ library]),
+    use_cxx=$enableval, use_cxx=yes)
+if test "$use_cxx" != "no"; then
+  AC_PROG_CXX
+  AC_LANG_PUSH(C++)
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])], use_cxx=yes, use_cxx=no)
+  AC_LANG_POP(C++)
+fi
+AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+
 gl_EARLY
 AC_C_INLINE
 
@@ -67,6 +78,7 @@ AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 sj_VALGRIND
 sj_LINKER_SCRIPT([$srcdir/lib/libgnutls.vers])
+sj_OUTPUT_DEF
 
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
@@ -207,6 +219,8 @@ gl_WARN_ADD([-fdiagnostics-show-option])
 # Export things for */configure.ac.
 export WARN_CFLAGS
 export have_ld_version_script
+export output_def
+export use_cxx
 
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
