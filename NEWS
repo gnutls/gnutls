@@ -14,6 +14,14 @@ Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 Any updates with more details about this vulnerability will be added
 to <http://www.gnu.org/software/gnutls/security.html>
 
+** libgnutls: Fix namespace issue with version symbols.
+The symbols LIBGNUTLS_VERSION, LIBGNUTLS_VERSION_MAJOR,
+LIBGNUTLS_VERSION_MINOR, LIBGNUTLS_VERSION_PATCH, and
+LIBGNUTLS_VERSION_NUMBER were renamed to GNUTLS_VERSION_NUMBER,
+GNUTLS_VERSION_MAJOR, GNUTLS_VERSION_MINOR, GNUTLS_VERSION_PATCH, and
+GNUTLS_VERSION_NUMBER respectively.  The old symbols will continue to
+work but are deprecated.
+
 ** certtool: allow setting arbitrary key purpose object identifiers.
 
 ** libgnutls: Fix detection of C99 macros, to make debug logging work again.
@@ -48,6 +56,16 @@ Modules include memchr and memcmp.
 
 ** API and ABI modifications:
 gnutls_certificate_set_x509_simple_pkcs12_mem: ADDED
+GNUTLS_VERSION: ADDED, replaces LIBGNUTLS_VERSION.
+GNUTLS_VERSION_MAJOR: ADDED, replaces LIBGNUTLS_VERSION_MAJOR.
+GNUTLS_VERSION_MINOR: ADDED, replaces LIBGNUTLS_VERSION_MINOR.
+GNUTLS_VERSION_PATCH: ADDED, replaces LIBGNUTLS_VERSION_PATCH.
+GNUTLS_VERSION_NUMBER: ADDED, replaces LIBGNUTLS_VERSION_NUMBER.
+LIBGNUTLS_VERSION: DEPRECATED.
+LIBGNUTLS_VERSION_MAJOR: DEPRECATED.
+LIBGNUTLS_VERSION_MINOR: DEPRECATED.
+LIBGNUTLS_VERSION_PATCH: DEPRECATED.
+LIBGNUTLS_VERSION_NUMBER: DEPRECATED.
 
 * Version 2.7.1 (released 2008-10-31)
 
