@@ -44,6 +44,8 @@ follow-on problem with crashes on length 1 certificate chains.
 ** gnulib: Deprecated modules removed.
 Modules include memchr and memcmp.
 
+** Fix warnings and build GnuTLS with more warnings enabled.
+
 ** API and ABI modifications:
 gnutls_certificate_set_x509_simple_pkcs12_mem: ADDED
 
