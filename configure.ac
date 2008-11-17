@@ -173,58 +173,36 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
-# These are warnings we have tried but have turned out not to be useful:
-#
-# -Wtraditional: warns on #elif which we use often
-# -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
-# -Wpadded: many of our structs are not optimized for padding
-# -Wtraditional-conversion: we catch missing prototypes anyway
-# -Wunreachable-code: appears to return many false positives
-# -Wconversion: too many warnings for now
-# -Wswitch-default: too many warnings for now
-# -Wswitch-enum: too many warnings for now
-#
-# These are warnings that we had to explicitly disable:
-#
-# -Wno-pointer-sign: too many warnings for now
-# -Wno-unused-parameter: added because -Wunused cause too many warns
-
+# Disable useless warnings.
+W=
+W="$W -Wsystem-headers"         # Don't let system headers trigger warnings
+W="$W -Wc++-compat"             # We don't care strongly about C++ compilers
+W="$W -Wundef"                  # Warns on '#if GNULIB_PORTCHECK' etc in gnulib
+W="$W -Wtraditional"            # Warns on #elif which we use often
+W="$W -Wlogical-op"             # Too many false positives
+W="$W -Wold-style-definition"   # 
+W="$W -Wpadded"                 # Our structs are not padded
+W="$W -Wunreachable-code"       # Too many false positives
+W="$W -Wtraditional-conversion" # Too many warnings for now
+W="$W -Wcast-qual"              # Too many warnings for now
+W="$W -Waggregate-return"       # Too many warnings for now
+W="$W -Wshadow"                 # Too many warnings for now
+W="$W -Wswitch-default"         # Too many warnings for now
+W="$W -Wswitch-enum"            # Too many warnings for now
+W="$W -Wconversion"             # Too many warnings for now
+W="$W -Wsign-conversion"        # Too many warnings for now
+W="$W -Wformat-y2k"             # Too many warnings for now
+W="$W -Wunsafe-loop-optimizations"
+W="$W -Wstrict-overflow"
 gl_WARN_SUPPORTED([WARNINGS])
-
-# Useless warnings.
-USELESS_WARNINGS=" \
-  -Wc++-compat \
-  -Wsystem-headers \
-  -Wundef \
-  -Wtraditional \
-  -Wtraditional-conversion"
-gl_WARN_COMPLEMENT(WARNINGS, [$WARNINGS], [$USELESS_WARNINGS])
-# Review these from time to time.
-USELESS_WARNINGS=" \
-  -Wcast-qual \
-  -Wlogical-op \
-  -Waggregate-return \
-  -Wshadow \
-  -Wswitch-default \
-  -Wswitch-enum \
-  -Wconversion \
-  -Wsign-conversion \
-  -Wold-style-definition \
-  -Wpadded \
-  -Wsign-compare \
-  -Wunreachable-code \
-  -Wformat-y2k \
-  -Wunsafe-loop-optimizations \
-  -Wstrict-overflow"
-gl_WARN_COMPLEMENT(WARNINGS, [$WARNINGS], [$USELESS_WARNINGS])
-
+gl_WARN_COMPLEMENT(WARNINGS, [$WARNINGS], [$W])
 for w in $WARNINGS; do
   gl_WARN_ADD([$w])
 done
-
-gl_WARN_ADD([-Wno-missing-field-initializers])
-gl_WARN_ADD([-Wno-pointer-sign])
-gl_WARN_ADD([-Wno-unused-parameter])
+gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
+gl_WARN_ADD([-Wno-sign-compare])     # Too many warnings for now
+gl_WARN_ADD([-Wno-pointer-sign])     # Too many warnings for now
+gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
 gl_WARN_ADD([-fdiagnostics-show-option])
 export WARN_CFLAGS
 
