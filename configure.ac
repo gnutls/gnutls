@@ -228,8 +228,6 @@ gl_WARN_ADD([-Wno-unused-parameter])
 gl_WARN_ADD([-fdiagnostics-show-option])
 export WARN_CFLAGS
 
-gl_WARN_ADD([])
-
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
 
