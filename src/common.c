@@ -19,6 +19,13 @@
  */
 
 #include <config.h>
+
+/* Work around problem reported in
+   <http://permalink.gmane.org/gmane.comp.lib.gnulib.bugs/15755>.*/
+#if GETTIMEOFDAY_CLOBBERS_LOCALTIME
+#undef localtime
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
