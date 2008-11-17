@@ -256,4 +256,5 @@ AC_MSG_NOTICE([summary of build options:
   Linker script:    $have_ld_version_script
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
+  OpenSSL library:  $enable_openssl
 ])
