@@ -46,23 +46,12 @@ if test "x$GAA" = "x"; then
 *** read doc/README.gaa.
 ***]])
 fi
-AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
 
 gl_EARLY
 AC_C_INLINE
 
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
-
-AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
-_gcc_cflags_save="$CFLAGS"
-CFLAGS="${CFLAGS} -fgnu89-inline"
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                  _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
-AC_MSG_RESULT($_gcc_gnu89_inline)
-CFLAGS="$_gcc_cflags_save"
-AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
-               [test "$_gcc_gnu89_inline" = "yes"])
 
 AC_HEADER_STDC
 AC_CHECK_FUNCS(fork,,)
@@ -94,7 +83,7 @@ AC_ARG_WITH([--with-guile-site-dir],
   [AS_HELP_STRING([--with-guile-site-dir],
      [use the given directory as the Guile site (use with care)])])
 
-if test "x$opt_guile_bindings" = "xyes"; then
+if test "$opt_guile_bindings" = "yes"; then
    AC_MSG_RESULT([***
 *** Detecting GNU Guile...
 ])
@@ -117,7 +106,7 @@ if test "x$opt_guile_bindings" = "xyes"; then
       CFLAGS="$save_CFLAGS"
       LIBS="$save_LIBS"
 
-      if test "x$opt_guile_bindings" = "xyes"; then
+      if test "$opt_guile_bindings" = xyes"; then
         AC_MSG_RESULT([yes])
 	case "x$with_guile_site_dir" in 
 	     xno)
@@ -137,6 +126,13 @@ if test "x$opt_guile_bindings" = "xyes"; then
 		AC_SUBST(GUILE_SITE)
 		;;
 	esac
+        AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
+        _gcc_cflags_save="$CFLAGS"
+        CFLAGS="${CFLAGS} -fgnu89-inline"
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                          _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
+        AC_MSG_RESULT($_gcc_gnu89_inline)
+        CFLAGS="$_gcc_cflags_save"
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
@@ -144,7 +140,10 @@ if test "x$opt_guile_bindings" = "xyes"; then
       fi
    fi
 fi
-AM_CONDITIONAL(HAVE_GUILE, test "x$opt_guile_bindings" = "xyes")
+AM_CONDITIONAL(HAVE_GUILE, test "$opt_guile_bindings" = "yes")
+AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
+               [test "$_gcc_gnu89_inline" = "yes"])
+AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
 dnl Check for libcfg+
 
@@ -256,4 +255,5 @@ AC_MSG_NOTICE([summary of build options:
   Library types:    Shared=${enable_shared}, Static=${enable_static}
   Valgrind:         ${VALGRIND}
   Linker script:    $have_ld_version_script
+  Guile wrappers:   $opt_guile_bindings
 ])
