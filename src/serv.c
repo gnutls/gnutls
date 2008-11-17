@@ -23,6 +23,8 @@
  * (which means it is quite unreadable)
  */
 
+#include <config.h>
+
 #include "common.h"
 #include "serv-gaa.h"
 #include <stdio.h>

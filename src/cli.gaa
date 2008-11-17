@@ -2,6 +2,7 @@
 
 /* C declarations */
 
+#include <config.h>
 #include <common.h>
 
 void cli_version(void);

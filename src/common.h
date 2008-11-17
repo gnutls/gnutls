@@ -1,7 +1,6 @@
 #define PORT 5556
 #define SERVER "127.0.0.1"
 
-#include <config.h>
 #include <gnutls/gnutls.h>
 
 #include <sys/socket.h>
