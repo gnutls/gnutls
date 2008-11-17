@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+
+#include "examples.h"
 
 /* All the available CRLs
  */

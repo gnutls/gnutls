@@ -21,14 +21,14 @@ EXTRA_DIST = README README.srptool
 
 SUBDIRS = cfg
 
-INCS = \
+AM_CFLAGS = $(WARN_CFLAGS)
+AM_CPPFLAGS = \
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
 	-I$(srcdir)/../libextra/includes	\
 	-I$(srcdir)/cfg
-AM_CPPFLAGS = $(WARN_CFLAGS) $(INCS)
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
 if ENABLE_PKI
@@ -38,43 +38,65 @@ if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
 
-gnutls_serv_SOURCES = serv.gaa serv-gaa.h serv-gaa.c list.h serv.c	\
-	common.h common.c certtool-common.h
+noinst_LTLIBRARIES =
+
+gnutls_serv_SOURCES = list.h serv.c common.h common.c certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
-	../gl/libgnu.la
+	../gl/libgnu.la libcmd-serv.la
+noinst_LTLIBRARIES += libcmd-serv.la
+libcmd_serv_la_CFLAGS =
+libcmd_serv_la_SOURCES = serv.gaa serv-gaa.h serv-gaa.c
 
 if ENABLE_SRP
-srptool_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c crypt.c
-srptool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la
+srptool_SOURCES = crypt.c
+srptool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la \
+	libcmd-srp.la
+noinst_LTLIBRARIES += libcmd-srp.la
+libcmd_srp_la_CFLAGS =
+libcmd_srp_la_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c
 endif
 
-psktool_SOURCES = psk.gaa psk-gaa.h psk-gaa.c psk.c
-psktool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la
+psktool_SOURCES = psk.c
+psktool_LDADD = ../lib/libgnutls.la ../gl/libgnu.la ../lib/gl/liblgnu.la \
+	libcmd-psk.la
+noinst_LTLIBRARIES += libcmd-psk.la
+libcmd_psk_la_CFLAGS =
+libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 
-gnutls_cli_SOURCES = cli.gaa cli-gaa.h cli-gaa.c cli.c common.h	\
-	common.c
+gnutls_cli_SOURCES = cli.c common.h common.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
-	../gl/libgnu.la
+	../gl/libgnu.la libcmd-cli.la
+noinst_LTLIBRARIES += libcmd-cli.la
+libcmd_cli_la_CFLAGS =
+libcmd_cli_la_SOURCES = cli.gaa cli-gaa.h cli-gaa.c
 
-gnutls_cli_debug_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c	\
-	tls_test.c tests.h tests.c common.h common.c
-gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
+gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c
+gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../gl/libgnu.la \
+	libcmd-cli-debug.la
+noinst_LTLIBRARIES += libcmd-cli-debug.la
+libcmd_cli_debug_la_CFLAGS =
+libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 
-certtool_SOURCES = certtool.gaa certtool-gaa.h certtool-cfg.h	\
-	certtool-gaa.c certtool.c prime.c certtool-cfg.c
-certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la \
-	../gl/libgnu.la ../lib/gl/liblgnu.la @LTLIBREADLINE@
+certtool_SOURCES = certtool.c prime.c
+certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la	\
+	../gl/libgnu.la ../lib/gl/liblgnu.la @LTLIBREADLINE@		\
+	libcmd-certtool.la
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else
-noinst_LTLIBRARIES = libcfg.la
-libcfg_la_CPPFLAGS = $(INCS)
+noinst_LTLIBRARIES += libcfg.la
+libcfg_la_CFLAGS =
 libcfg_la_SOURCES = cfg/cfg+.c cfg/cfgfile.c cfg/cmdline.c cfg/parse.c	\
 	cfg/props.c cfg/shared.c cfg/platon/str/dynfgets.c		\
 	cfg/platon/str/strctype.c cfg/platon/str/strdyn.c		\
 	cfg/platon/str/strplus.c
 certtool_LDADD += libcfg.la
 endif
+noinst_LTLIBRARIES += libcmd-certtool.la
+libcmd_certtool_la_CFLAGS =
+libcmd_certtool_la_SOURCES = certtool.gaa certtool-gaa.h	\
+	certtool-gaa.c certtool-cfg.h certtool-cfg.c
+libcmd_certtool_la_LIBADD = ../gl/libgnu.la 
 
 noinst_PROGRAMS = errcodes printlist
 errcodes_SOURCES = errcodes.c

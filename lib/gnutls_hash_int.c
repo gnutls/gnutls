@@ -531,9 +531,9 @@ ssl3_md5 (int i, opaque * secret, int secret_len,
 }
 
 int
-_gnutls_ssl3_hash_md5 (void *first, int first_len,
-		       void *second, int second_len, int ret_len,
-		       opaque * ret)
+_gnutls_ssl3_hash_md5 (const void *first, int first_len,
+		       const void *second, int second_len,
+		       int ret_len, opaque * ret)
 {
   opaque digest[MAX_HASH_SIZE];
   digest_hd_st td;

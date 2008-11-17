@@ -39,6 +39,8 @@ extern const int buffer_size;
 
 static int cparams = 0;
 
+int generate_prime (int bits, int how);
+
 /* If how is zero then the included parameters are used.
  */
 int

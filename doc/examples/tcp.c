@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -19,6 +19,10 @@
 #include <unistd.h>
 
 #define SA struct sockaddr
+
+/* tcp.c */
+int tcp_connect (void);
+void tcp_close (int sd);
 
 /* Connects to the peer and returns a socket
  * descriptor.

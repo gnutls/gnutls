@@ -22,6 +22,7 @@
 
 #include <gnutls_int.h>
 #include <gnutls/crypto.h>
+#include <gnutls/extra.h>
 
 #include <md5.h>
 #include <hmac.h>

@@ -849,7 +849,7 @@ SSL_CIPHER_description (SSL_CIPHER * cipher, char *buf, int size)
     {
       if (local_alloc)
 	free (tmpbuf);
-      return "Buffer too small";
+      return (char*) "Buffer too small";
     }
 
   return tmpbuf;

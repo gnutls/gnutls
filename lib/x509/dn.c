@@ -673,7 +673,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
 
   if ((result = _gnutls_x509_oid_data_choice (given_oid)) > 0)
     {
-      char *string_type;
+      const char *string_type;
       int i;
 
       string_type = "printableString";

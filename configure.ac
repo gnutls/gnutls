@@ -42,7 +42,8 @@ if test "x$GAA" = "x"; then
    AC_MSG_WARN([[***
 *** GAA was not found.  It is only needed if you wish to modify
 *** the source code or command-line description files.  In this case,
-*** you may want to get it from http://gaa.sourceforge.net/
+*** you may want to get it from http://gaa.sourceforge.net/ and
+*** read doc/README.gaa.
 ***]])
 fi
 AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
@@ -172,12 +173,6 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
-# These are additional warnings we could enable:
-#
-# -Wshadow -Wunsafe-loop-optimizations Wcast-qual Wlogical-op
-# -Waggregate-return Wmissing-prototypes -Wmissing-declarations
-# -Wmissing-noreturn -Wmissing-format-attribute Wredundant-decls -Wvla
-#
 # These are warnings we have tried but have turned out not to be useful:
 #
 # -Wtraditional: warns on #elif which we use often
@@ -194,16 +189,46 @@ gl_INIT
 # -Wno-pointer-sign: too many warnings for now
 # -Wno-unused-parameter: added because -Wunused cause too many warns
 
-BASICS="-Wall -W"
+gl_WARN_SUPPORTED([WARNINGS])
 
-ADDITIONAL="-Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wfloat-equal -Wdeclaration-after-statement -Wpointer-arith -Wbad-function-cast  -Wcast-align -Wstrict-prototypes -Wold-style-definition -Wpacked -Wnested-externs -Winline -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
+# Useless warnings.
+USELESS_WARNINGS=" \
+  -Wc++-compat \
+  -Wsystem-headers \
+  -Wundef \
+  -Wtraditional \
+  -Wtraditional-conversion"
+gl_WARN_COMPLEMENT(WARNINGS, [$WARNINGS], [$USELESS_WARNINGS])
+# Review these from time to time.
+USELESS_WARNINGS=" \
+  -Wcast-qual \
+  -Wlogical-op \
+  -Waggregate-return \
+  -Wshadow \
+  -Wswitch-default \
+  -Wswitch-enum \
+  -Wconversion \
+  -Wsign-conversion \
+  -Wold-style-definition \
+  -Wpadded \
+  -Wsign-compare \
+  -Wunreachable-code \
+  -Wformat-y2k \
+  -Wunsafe-loop-optimizations \
+  -Wstrict-overflow"
+gl_WARN_COMPLEMENT(WARNINGS, [$WARNINGS], [$USELESS_WARNINGS])
 
-REMOVE="-Wno-pointer-sign -Wno-unused-parameter"
-
-for w in $BASICS $ADDITIONAL $REMOVE; do
+for w in $WARNINGS; do
   gl_WARN_ADD([$w])
 done
+
+gl_WARN_ADD([-Wno-missing-field-initializers])
+gl_WARN_ADD([-Wno-pointer-sign])
+gl_WARN_ADD([-Wno-unused-parameter])
+gl_WARN_ADD([-fdiagnostics-show-option])
 export WARN_CFLAGS
+
+gl_WARN_ADD([])
 
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])

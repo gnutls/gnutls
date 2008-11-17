@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007 Free Software Foundation
+ * Copyright (C) 2006, 2007, 2008 Free Software Foundation
  * Author: Simon Josefsson, Howard Chu
  *
  * This file is part of GNUTLS.
@@ -59,7 +59,7 @@ static char pem[] =
   "bHarWgDg9CKVP1DggVkcD838s//kE1Vl2DReyfAtEQ1agSXLFncgxL+yOi1o3lcq\n"
   "+dmDgpDn168TY1Iug80uVKg7AfkLrA==\n" "-----END CERTIFICATE-----\n";
 
-void
+static void
 print_dn (gnutls_x509_dn_t dn)
 {
   int i, j, ret = 0;

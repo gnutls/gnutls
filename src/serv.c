@@ -742,6 +742,8 @@ unimplemented:
   *response_length = ((*response) ? strlen (*response) : 0);
 }
 
+static void terminate (int sig) __attribute__ ((noreturn));
+
 static void
 terminate (int sig)
 {
@@ -1432,6 +1434,8 @@ gaa_parser (int argc, char **argv)
   parse_kx (info.kx, info.nkx, kx_priority);
   parse_comp (info.comp, info.ncomp, comp_priority);
 }
+
+extern void serv_version(void);
 
 void
 serv_version (void)

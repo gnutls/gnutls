@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+
+#include "examples.h"
 
 /* This function will try to verify the peer's certificate, and
  * also check if the hostname matches, and the activation, expiration dates.

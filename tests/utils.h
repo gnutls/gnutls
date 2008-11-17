@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -27,14 +27,22 @@
 # include <stdarg.h>
 # include <gnutls/gnutls.h>
 
+#ifndef __attribute__
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
+#  define __attribute__(Spec)	/* empty */
+# endif
+#endif
+
 extern int debug;
 extern int error_count;
 extern int break_on_error;
 
-extern char *pkcs3;
+extern const char *pkcs3;
 
-extern void fail (const char *format, ...);
-extern void success (const char *format, ...);
+extern void fail (const char *format, ...)
+  __attribute__ ((format (printf, 1, 2)));
+extern void success (const char *format, ...)
+  __attribute__ ((format (printf, 1, 2)));
 
 extern void escapeprint (const char *str, size_t len);
 extern void hexprint (const char *str, size_t len);

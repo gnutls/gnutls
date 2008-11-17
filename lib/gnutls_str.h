@@ -55,7 +55,17 @@ int _gnutls_string_copy_str (gnutls_string * dest, const char *src);
 int _gnutls_string_append_str (gnutls_string *, const char *str);
 int _gnutls_string_append_data (gnutls_string *, const void *data,
 				size_t data_size);
-int _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...);
+
+
+#ifndef __attribute__
+/* This feature is available in gcc versions 2.5 and later.  */
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
+#  define __attribute__(Spec)	/* empty */
+# endif
+#endif
+
+int _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
+  __attribute__ ((format (printf, 2, 3)));
 
 typedef gnutls_string gnutls_buffer;
 

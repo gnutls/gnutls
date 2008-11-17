@@ -54,7 +54,7 @@
 
 /* global stuff here */
 int resume, starttls, insecure;
-char *hostname = NULL;
+const char *hostname = NULL;
 char *service;
 int record_max_size;
 int fingerprint;
@@ -894,6 +894,8 @@ gaa_parser (int argc, char **argv)
   parse_kx (info.kx, info.nkx, kx_priority);
   parse_comp (info.comp, info.ncomp, comp_priority);
 }
+
+void cli_version (void);
 
 void
 cli_version (void)

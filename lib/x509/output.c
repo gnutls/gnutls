@@ -41,7 +41,7 @@
 #define addf _gnutls_string_append_printf
 #define adds _gnutls_string_append_str
 
-#define ERROR_STR "(error)"
+#define ERROR_STR (char*) "(error)"
 
 static void
 hexdump (gnutls_string * str, const char *data, size_t len, const char *spc)
@@ -940,9 +940,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r (%d)\n", t);
+	addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
       else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
-	addf (str, "error: strftime (%d)\n", t);
+	addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
       else
 	addf (str, _("\t\tNot Before: %s\n"), s);
     }
@@ -954,9 +954,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r (%d)\n", t);
+	addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
       else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
-	addf (str, "error: strftime (%d)\n", t);
+	addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
       else
 	addf (str, _("\t\tNot After: %s\n"), s);
     }
@@ -1233,9 +1233,9 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "unknown activation (%d), ", t);
+	addf (str, "unknown activation (%ld), ", (unsigned long) tim);
       else if (strftime (s, max, "%Y-%m-%d %H:%M:%S UTC", &t) == 0)
-	addf (str, "failed activation (%d), ", t);
+	addf (str, "failed activation (%ld), ", (unsigned long) tim);
       else
 	addf (str, "activated `%s', ", s);
     }
@@ -1247,9 +1247,9 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "unknown expiry (%d), ", t);
+	addf (str, "unknown expiry (%ld), ", (unsigned long) tim);
       else if (strftime (s, max, "%Y-%m-%d %H:%M:%S UTC", &t) == 0)
-	addf (str, "failed expiry (%d), ", t);
+	addf (str, "failed expiry (%ld), ", (unsigned long) tim);
       else
 	addf (str, "expires `%s', ", s);
     }
@@ -1405,9 +1405,9 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r (%d)\n", t);
+	addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
       else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
-	addf (str, "error: strftime (%d)\n", t);
+	addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
       else
 	addf (str, _("\t\tIssued: %s\n"), s);
     }
@@ -1421,9 +1421,9 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
       if (tim == -1)
 	addf (str, "\t\tNo next update time.\n");
       else if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r (%d)\n", t);
+	addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
       else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
-	addf (str, "error: strftime (%d)\n", t);
+	addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
       else
 	addf (str, _("\t\tNext at: %s\n"), s);
     }
@@ -1582,9 +1582,9 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	    adds (str, "\n");
 
 	    if (gmtime_r (&tim, &t) == NULL)
-	      addf (str, "error: gmtime_r (%d)\n", t);
+	      addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
 	    else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
-	      addf (str, "error: strftime (%d)\n", t);
+	      addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
 	    else
 	      addf (str, _("\t\tRevoked at: %s\n"), s);
 	  }

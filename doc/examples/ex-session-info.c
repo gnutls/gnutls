@@ -14,7 +14,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-extern void print_x509_certificate_info (gnutls_session_t);
+#include "examples.h"
 
 /* This function will print some details of the
  * given session.

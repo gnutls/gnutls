@@ -89,7 +89,7 @@ main (int argc, char **argv)
     }
 
   if (info.passwd == NULL)
-    info.passwd = KPASSWD;
+    info.passwd = (char*) KPASSWD;
 
   if (info.username == NULL)
     {
@@ -299,6 +299,8 @@ write_key (const char *username, const char *key, int key_size,
 }
 
 #endif /* ENABLE_PSK */
+
+void psktool_version (void);
 
 void
 psktool_version (void)

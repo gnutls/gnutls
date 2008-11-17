@@ -70,5 +70,6 @@ endif
 
 noinst_LTLIBRARIES = libexamples.la
 
-libexamples_la_SOURCES = ex-alert.c ex-pkcs12.c ex-rfc2818.c	\
-	ex-session-info.c ex-x509-info.c ex-verify.c tcp.c
+libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c		\
+	ex-rfc2818.c ex-session-info.c ex-x509-info.c ex-verify.c	\
+	tcp.c
