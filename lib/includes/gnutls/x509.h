@@ -29,12 +29,12 @@
 #ifndef GNUTLS_X509_H
 # define GNUTLS_X509_H
 
-#ifdef __cplusplus
+# include <gnutls/gnutls.h>
+
+# ifdef __cplusplus
 extern "C"
 {
-#endif
-
-#include <gnutls/gnutls.h>
+# endif
 
 /* Some OIDs usually found in Distinguished names, or
  * in Subject Directory Attribute extensions.
@@ -125,7 +125,7 @@ extern "C"
 
   int gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert);
   int gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
-				     char *sig, size_t *sizeof_sig);
+				     char *sig, size_t * sizeof_sig);
   int gnutls_x509_crt_get_version (gnutls_x509_crt_t cert);
   int gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt,
 				  unsigned int flags,
@@ -158,9 +158,10 @@ extern "C"
 					   unsigned int *reason_flags,
 					   unsigned int *critical);
   int gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
-					   gnutls_x509_subject_alt_name_t
-					   type, const void *data, unsigned int data_size,
-					   unsigned int reason_flags);
+					    gnutls_x509_subject_alt_name_t
+					    type, const void *data,
+					    unsigned int data_size,
+					    unsigned int reason_flags);
   int gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
 					   gnutls_x509_subject_alt_name_t
 					   type, const void *data_string,
@@ -187,9 +188,11 @@ extern "C"
 					    size_t * ret_size,
 					    unsigned int *critical);
   int gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
-                                unsigned int seq, void *ret, size_t * ret_size, 
-                                unsigned int* ret_type, unsigned int *critical);
-                                                                                                                                                        
+					     unsigned int seq, void *ret,
+					     size_t * ret_size,
+					     unsigned int *ret_type,
+					     unsigned int *critical);
+
   int gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
 						     unsigned int seq,
 						     void *ret,
@@ -199,8 +202,7 @@ extern "C"
 				     unsigned int *critical);
   int gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
 					     unsigned int *critical,
-					     int *ca,
-					     int *pathlen);
+					     int *ca, int *pathlen);
 
 /* The key_usage flags are defined in gnutls.h. They are the
  * GNUTLS_KEY_* definitions.
@@ -215,8 +217,7 @@ extern "C"
 				 unsigned int *critical,
 				 int *pathlen,
 				 char **policyLanguage,
-				 char **policy,
-				 size_t *sizeof_policy);
+				 char **policy, size_t * sizeof_policy);
 
   int gnutls_x509_dn_oid_known (const char *oid);
 
@@ -270,21 +271,20 @@ extern "C"
   int gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
 					    gnutls_x509_subject_alt_name_t
 					    type,
-					    const void *data, unsigned int data_size,
+					    const void *data,
+					    unsigned int data_size,
 					    unsigned int flags);
-  int gnutls_x509_crt_sign (gnutls_x509_crt_t crt,
-			    gnutls_x509_crt_t issuer,
+  int gnutls_x509_crt_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 			    gnutls_x509_privkey_t issuer_key);
-  int gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt,
-			     gnutls_x509_crt_t issuer,
+  int gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 			     gnutls_x509_privkey_t issuer_key,
 			     gnutls_digest_algorithm_t, unsigned int flags);
   int gnutls_x509_crt_set_activation_time (gnutls_x509_crt_t cert,
 					   time_t act_time);
   int gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert,
 					   time_t exp_time);
-  int gnutls_x509_crt_set_serial (gnutls_x509_crt_t cert,
-				  const void *serial, size_t serial_size);
+  int gnutls_x509_crt_set_serial (gnutls_x509_crt_t cert, const void *serial,
+				  size_t serial_size);
 
   int gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
 					  const void *id, size_t id_size);
@@ -297,15 +297,14 @@ extern "C"
   int gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
 				 int pathLenConstraint,
 				 const char *policyLanguage,
-				 const char *policy,
-				 size_t sizeof_policy);
+				 const char *policy, size_t sizeof_policy);
 
   int gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 			     gnutls_certificate_print_formats_t format,
-			     gnutls_datum_t *out);
+			     gnutls_datum_t * out);
   int gnutls_x509_crl_print (gnutls_x509_crl_t crl,
 			     gnutls_certificate_print_formats_t format,
-			     gnutls_datum_t *out);
+			     gnutls_datum_t * out);
 
   /* Access to internal Certificate fields.
    */
@@ -328,27 +327,28 @@ extern "C"
 
   typedef void *gnutls_x509_dn_t;
 
-  typedef struct gnutls_x509_ava_st {
+  typedef struct gnutls_x509_ava_st
+  {
     gnutls_datum_t oid;
     gnutls_datum_t value;
     unsigned long value_tag;
   } gnutls_x509_ava_st;
 
   int gnutls_x509_crt_get_subject (gnutls_x509_crt_t cert,
-				   gnutls_x509_dn_t *dn);
+				   gnutls_x509_dn_t * dn);
   int gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert,
-				  gnutls_x509_dn_t *dn);
+				  gnutls_x509_dn_t * dn);
   int gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn,
-				  int iava, gnutls_x509_ava_st *avast);
+				  int iava, gnutls_x509_ava_st * avast);
 
   int gnutls_x509_dn_init (gnutls_x509_dn_t * dn);
 
   int gnutls_x509_dn_import (gnutls_x509_dn_t odn,
-                             const gnutls_datum_t * data);
+			     const gnutls_datum_t * data);
 
   int gnutls_x509_dn_export (gnutls_x509_dn_t dn,
-                             gnutls_x509_crt_fmt_t format, void *output_data,
-                             size_t * output_data_size);
+			     gnutls_x509_crt_fmt_t format, void *output_data,
+			     size_t * output_data_size);
 
   void gnutls_x509_dn_deinit (gnutls_x509_dn_t idn);
 
@@ -376,7 +376,7 @@ extern "C"
 
   int gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl);
   int gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
-				     char *sig, size_t *sizeof_sig);
+				     char *sig, size_t * sizeof_sig);
   int gnutls_x509_crl_get_version (gnutls_x509_crl_t crl);
 
   time_t gnutls_x509_crl_get_this_update (gnutls_x509_crl_t crl);
@@ -653,8 +653,8 @@ extern "C"
   typedef struct gnutls_x509_crq_int *gnutls_x509_crq_t;
 
   int gnutls_x509_crq_print (gnutls_x509_crq_t crq,
-		       gnutls_certificate_print_formats_t format,
-		       gnutls_datum_t * out);
+			     gnutls_certificate_print_formats_t format,
+			     gnutls_datum_t * out);
 
   int gnutls_x509_crq_init (gnutls_x509_crq_t * crq);
   void gnutls_x509_crq_deinit (gnutls_x509_crq_t crq);
@@ -763,7 +763,8 @@ extern "C"
 					    void *buf, size_t * sizeof_buf,
 					    unsigned int *critical);
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 }
-#endif
+# endif
+
 #endif				/* GNUTLS_X509_H */

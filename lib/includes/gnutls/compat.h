@@ -1,23 +1,7 @@
-/* Typedefs to be fully compatible with the types of
- * GnuTLS 1.0.x.
- */
+/* Typedefs for more compatibility with older GnuTLS. */
 
-#ifndef GCOMPAT_H
-# define GCOMPAT_H
-
-#ifdef __GNUC__
-
-#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  
-
-#if _GNUTLS_GCC_VERSION >= 30100
-#define _GNUTLS_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
-#endif
-
-#endif /* __GNUC__ */
-
-#ifndef _GNUTLS_GCC_ATTR_DEPRECATED
-#define _GNUTLS_GCC_ATTR_DEPRECATED
-#endif
+#ifndef GNUTLS_COMPAT_H
+# define GNUTLS_COMPAT_H
 
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
@@ -106,11 +90,11 @@
 #define TLS_MASTER_SIZE GNUTLS_MASTER_SIZE
 #define TLS_RANDOM_SIZE GNUTLS_RANDOM_SIZE
 
-/* Further namespace problems. */
+/* Namespace problems. */
 #define LIBGNUTLS_VERSION GNUTLS_VERSION
 #define LIBGNUTLS_VERSION_MAJOR GNUTLS_VERSION_MAJOR
 #define LIBGNUTLS_VERSION_MINOR GNUTLS_VERSION_MINOR
 #define LIBGNUTLS_VERSION_PATCH GNUTLS_VERSION_PATCH
 #define LIBGNUTLS_VERSION_NUMBER GNUTLS_VERSION_NUMBER
 
-#endif /* GCOMPAT_H */
+#endif /* GNUTLS_COMPAT_H */
