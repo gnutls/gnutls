@@ -106,7 +106,7 @@ if test "$opt_guile_bindings" = "yes"; then
       CFLAGS="$save_CFLAGS"
       LIBS="$save_LIBS"
 
-      if test "$opt_guile_bindings" = xyes"; then
+      if test "$opt_guile_bindings" = "yes"; then
         AC_MSG_RESULT([yes])
 	case "x$with_guile_site_dir" in 
 	     xno)
