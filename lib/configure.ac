@@ -86,7 +86,9 @@ LIBGNUTLS_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
+# Finish things from ../configure.ac.
 AC_SUBST([WARN_CFLAGS])
+AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
 AC_CONFIG_FILES([
   Makefile

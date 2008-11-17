@@ -66,6 +66,7 @@ AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 sj_VALGRIND
+sj_LINKER_SCRIPT([$srcdir/lib/libgnutls.vers])
 
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
@@ -202,7 +203,10 @@ gl_WARN_ADD([-Wno-sign-compare])     # Too many warnings for now
 gl_WARN_ADD([-Wno-pointer-sign])     # Too many warnings for now
 gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
 gl_WARN_ADD([-fdiagnostics-show-option])
+
+# Export things for */configure.ac.
 export WARN_CFLAGS
+export have_ld_version_script
 
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])

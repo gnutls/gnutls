@@ -227,7 +227,6 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
 
   sj_OUTPUT_DEF
-  sj_LINKER_SCRIPT([$srcdir/libgnutls.vers])
 
   # For storing integers in pointers without warnings
   # http://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
