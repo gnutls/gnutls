@@ -34,9 +34,9 @@
 #include "structure.h"
 
 void
-_asn1_hierarchical_name (node_asn * node, char *name, int name_size)
+_asn1_hierarchical_name (ASN1_TYPE  node, char *name, int name_size)
 {
-  node_asn *p;
+  ASN1_TYPE p;
   char tmp_name[64];
 
   p = node;
@@ -129,9 +129,9 @@ _asn1_convert_integer (const char *value, unsigned char *value_out,
 
 
 int
-_asn1_append_sequence_set (node_asn * node)
+_asn1_append_sequence_set (ASN1_TYPE  node)
 {
-  node_asn *p, *p2;
+  ASN1_TYPE p, p2;
   char temp[10];
   long n;
 
@@ -278,7 +278,7 @@ asn1_retCode
 asn1_write_value (ASN1_TYPE node_root, const char *name,
 		  const void *ivalue, int len)
 {
-  node_asn *node, *p, *p2;
+  ASN1_TYPE node, p, p2;
   unsigned char *temp, *value_temp = NULL, *default_temp = NULL;
   int len2, k, k2, negative;
   const unsigned char *value = ivalue;
@@ -713,7 +713,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 asn1_retCode
 asn1_read_value (ASN1_TYPE root, const char *name, void *ivalue, int *len)
 {
-  node_asn *node, *p, *p2;
+  ASN1_TYPE node, p, p2;
   int len2, len3;
   int value_size = *len;
   unsigned char *value = ivalue;
@@ -893,10 +893,10 @@ asn1_read_value (ASN1_TYPE root, const char *name, void *ivalue, int *len)
   *
   **/
 asn1_retCode
-asn1_read_tag (node_asn * root, const char *name, int *tagValue,
+asn1_read_tag (ASN1_TYPE root, const char *name, int *tagValue,
 	       int *classValue)
 {
-  node_asn *node, *p, *pTag;
+  ASN1_TYPE node, p, pTag;
 
   node = asn1_find_node (root, name);
   if (node == NULL)

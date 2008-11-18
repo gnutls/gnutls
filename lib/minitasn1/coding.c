@@ -46,7 +46,7 @@
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_error_description_value_not_found (node_asn * node,
+_asn1_error_description_value_not_found (ASN1_TYPE  node,
 					 char *ErrorDescription)
 {
 
@@ -55,7 +55,7 @@ _asn1_error_description_value_not_found (node_asn * node,
 
   Estrcpy (ErrorDescription, ":: value of element '");
   _asn1_hierarchical_name (node, ErrorDescription + strlen (ErrorDescription),
-			   MAX_ERROR_DESCRIPTION_SIZE - 40);
+			   ASN1_MAX_ERROR_DESCRIPTION_SIZE - 40);
   Estrcat (ErrorDescription, "' not found");
 
 }
@@ -371,10 +371,10 @@ asn1_bit_der (const unsigned char *str, int bit_len,
 /*   otherwise ASN1_SUCCESS.                          */
 /******************************************************/
 asn1_retCode
-_asn1_complete_explicit_tag (node_asn * node, unsigned char *der,
+_asn1_complete_explicit_tag (ASN1_TYPE  node, unsigned char *der,
 			     int *counter, int *max_len)
 {
-  node_asn *p;
+  ASN1_TYPE p;
   int is_tag_implicit, len2, len3;
   unsigned char temp[SIZEOF_UNSIGNED_INT];
 
@@ -444,10 +444,10 @@ _asn1_complete_explicit_tag (node_asn * node, unsigned char *der,
 /*   otherwise ASN1_SUCCESS.                          */
 /******************************************************/
 asn1_retCode
-_asn1_insert_tag_der (node_asn * node, unsigned char *der, int *counter,
+_asn1_insert_tag_der (ASN1_TYPE  node, unsigned char *der, int *counter,
 		      int *max_len)
 {
-  node_asn *p;
+  ASN1_TYPE p;
   int tag_len, is_tag_implicit;
   unsigned char class, class_implicit = 0, temp[SIZEOF_UNSIGNED_INT * 3 + 1];
   unsigned long tag_implicit = 0;
@@ -605,7 +605,7 @@ _asn1_insert_tag_der (node_asn * node, unsigned char *der, int *counter,
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_ordering_set (unsigned char *der, int der_len, node_asn * node)
+_asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE  node)
 {
   struct vet
   {
@@ -616,7 +616,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, node_asn * node)
 
   int counter, len, len2;
   struct vet *first, *last, *p_vet, *p2_vet;
-  node_asn *p;
+  ASN1_TYPE p;
   unsigned char class, *temp;
   unsigned long tag;
 
@@ -719,7 +719,7 @@ _asn1_ordering_set (unsigned char *der, int der_len, node_asn * node)
 /* Return:                                            */
 /******************************************************/
 void
-_asn1_ordering_set_of (unsigned char *der, int der_len, node_asn * node)
+_asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE  node)
 {
   struct vet
   {
@@ -729,7 +729,7 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, node_asn * node)
 
   int counter, len, len2, change;
   struct vet *first, *last, *p_vet, *p2_vet;
-  node_asn *p;
+  ASN1_TYPE p;
   unsigned char *temp, class;
   unsigned long k, max;
 
@@ -874,7 +874,7 @@ asn1_retCode
 asn1_der_coding (ASN1_TYPE element, const char *name, void *ider, int *len,
 		 char *ErrorDescription)
 {
-  node_asn *node, *p, *p2;
+  ASN1_TYPE node, p, p2;
   char temp[SIZEOF_UNSIGNED_LONG_INT * 3 + 1];
   int counter, counter_old, len2, len3, tlen, move, max_len, max_len_old;
   asn1_retCode err;

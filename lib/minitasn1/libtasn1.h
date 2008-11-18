@@ -25,94 +25,82 @@
 # define LIBTASN1_H
 
 #include <stdio.h>		/* for FILE* */
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#define LIBTASN1_VERSION "1.5"
-
 #include <sys/types.h>
 #include <time.h>
 
-#define MAX_NAME_SIZE 128	/* maximum number of characters of a name */
-  /* inside a file with ASN1 definitons     */
-#define MAX_ERROR_DESCRIPTION_SIZE 128	/* maximum number of characters */
-  /* of a description message     */
-  /* (null character included)    */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#define ASN1_VERSION "1.7"
 
   typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 
   /*****************************************/
-  /*  Errors returned by libtasn1 functions */
+  /* Errors returned by libtasn1 functions */
   /*****************************************/
-#define ASN1_SUCCESS               0
-#define ASN1_FILE_NOT_FOUND        1
-#define ASN1_ELEMENT_NOT_FOUND     2
-#define ASN1_IDENTIFIER_NOT_FOUND  3
-#define ASN1_DER_ERROR             4
-#define ASN1_VALUE_NOT_FOUND       5
-#define ASN1_GENERIC_ERROR         6
-#define ASN1_VALUE_NOT_VALID       7
-#define ASN1_TAG_ERROR             8
-#define ASN1_TAG_IMPLICIT          9
-#define ASN1_ERROR_TYPE_ANY        10
-#define ASN1_SYNTAX_ERROR          11
-#define ASN1_MEM_ERROR		   12
-#define ASN1_MEM_ALLOC_ERROR	   13
-#define ASN1_DER_OVERFLOW          14
-#define ASN1_NAME_TOO_LONG         15
-#define ASN1_ARRAY_ERROR           16
-#define ASN1_ELEMENT_NOT_EMPTY     17
+#define ASN1_SUCCESS			0
+#define ASN1_FILE_NOT_FOUND		1
+#define ASN1_ELEMENT_NOT_FOUND		2
+#define ASN1_IDENTIFIER_NOT_FOUND	3
+#define ASN1_DER_ERROR			4
+#define ASN1_VALUE_NOT_FOUND		5
+#define ASN1_GENERIC_ERROR		6
+#define ASN1_VALUE_NOT_VALID		7
+#define ASN1_TAG_ERROR			8
+#define ASN1_TAG_IMPLICIT		9
+#define ASN1_ERROR_TYPE_ANY		10
+#define ASN1_SYNTAX_ERROR		11
+#define ASN1_MEM_ERROR			12
+#define ASN1_MEM_ALLOC_ERROR		13
+#define ASN1_DER_OVERFLOW		14
+#define ASN1_NAME_TOO_LONG		15
+#define ASN1_ARRAY_ERROR		16
+#define ASN1_ELEMENT_NOT_EMPTY		17
 
-/*************************************/
-/* Constants used in asn1_visit_tree */
-/*************************************/
-#define ASN1_PRINT_NAME             1
-#define ASN1_PRINT_NAME_TYPE        2
-#define ASN1_PRINT_NAME_TYPE_VALUE  3
-#define ASN1_PRINT_ALL              4
+  /*************************************/
+  /* Constants used in asn1_visit_tree */
+  /*************************************/
+#define ASN1_PRINT_NAME			1
+#define ASN1_PRINT_NAME_TYPE		2
+#define ASN1_PRINT_NAME_TYPE_VALUE	3
+#define ASN1_PRINT_ALL			4
 
-/*****************************************/
-/* Constants returned by asn1_read_tag   */
-/*****************************************/
-#define ASN1_CLASS_UNIVERSAL        0x00	/* old: 1 */
-#define ASN1_CLASS_APPLICATION      0x40	/* old: 2 */
-#define ASN1_CLASS_CONTEXT_SPECIFIC 0x80	/* old: 3 */
-#define ASN1_CLASS_PRIVATE          0xC0	/* old: 4 */
-#define ASN1_CLASS_STRUCTURED       0x20
+  /*****************************************/
+  /* Constants returned by asn1_read_tag   */
+  /*****************************************/
+#define ASN1_CLASS_UNIVERSAL		0x00	/* old: 1 */
+#define ASN1_CLASS_APPLICATION		0x40	/* old: 2 */
+#define ASN1_CLASS_CONTEXT_SPECIFIC	0x80	/* old: 3 */
+#define ASN1_CLASS_PRIVATE		0xC0	/* old: 4 */
+#define ASN1_CLASS_STRUCTURED		0x20
 
-/*****************************************/
-/* Constants returned by asn1_read_tag   */
-/*****************************************/
-#define ASN1_TAG_BOOLEAN          0x01
-#define ASN1_TAG_INTEGER          0x02
-#define ASN1_TAG_SEQUENCE         0x10
-#define ASN1_TAG_SET              0x11
-#define ASN1_TAG_OCTET_STRING     0x04
-#define ASN1_TAG_BIT_STRING       0x03
-#define ASN1_TAG_UTCTime          0x17
-#define ASN1_TAG_GENERALIZEDTime  0x18
-#define ASN1_TAG_OBJECT_ID        0x06
-#define ASN1_TAG_ENUMERATED       0x0A
-#define ASN1_TAG_NULL             0x05
-#define ASN1_TAG_GENERALSTRING    0x1B
+  /*****************************************/
+  /* Constants returned by asn1_read_tag   */
+  /*****************************************/
+#define ASN1_TAG_BOOLEAN		0x01
+#define ASN1_TAG_INTEGER		0x02
+#define ASN1_TAG_SEQUENCE		0x10
+#define ASN1_TAG_SET			0x11
+#define ASN1_TAG_OCTET_STRING		0x04
+#define ASN1_TAG_BIT_STRING		0x03
+#define ASN1_TAG_UTCTime		0x17
+#define ASN1_TAG_GENERALIZEDTime	0x18
+#define ASN1_TAG_OBJECT_ID		0x06
+#define ASN1_TAG_ENUMERATED		0x0A
+#define ASN1_TAG_NULL			0x05
+#define ASN1_TAG_GENERALSTRING		0x1B
 
-/******************************************************/
-/* Structure definition used for the node of the tree */
-/* that represent an ASN.1 DEFINITION.                */
-/******************************************************/
-
-#define SMALL_VALUE_SIZE 16
+  /******************************************************/
+  /* Structure definition used for the node of the tree */
+  /* that represent an ASN.1 DEFINITION.                */
+  /******************************************************/
 
   struct node_asn_struct
   {
     char *name;			/* Node name */
     unsigned int type;		/* Node type */
     unsigned char *value;	/* Node value */
-    unsigned char small_value[SMALL_VALUE_SIZE]; /* if value is less than that store it here */
     int value_len;
     struct node_asn_struct *down;	/* Pointer to the son node */
     struct node_asn_struct *right;	/* Pointer to the brother node */
@@ -125,16 +113,29 @@ extern "C"
 
 #define ASN1_TYPE_EMPTY  NULL
 
+  /*****************************************/
+  /* For the on-disk format of ASN.1 trees */
+  /*****************************************/
   struct static_struct_asn
   {
-    const char *name;			/* Node name */
-    unsigned int type;		/* Node type */
+    const char *name;	/* Node name */
+    unsigned int type;	/* Node type */
     const void *value;	/* Node value */
   };
-
   typedef struct static_struct_asn ASN1_ARRAY_TYPE;
 
+  /***********************************/
+  /*  Fixed constants                */
+  /***********************************/
 
+  /* maximum number of characters of a name */
+  /* inside a file with ASN1 definitons     */
+#define ASN1_MAX_NAME_SIZE 128
+
+  /* maximum number of characters */
+  /* of a description message     */
+  /* (null character included)    */
+#define ASN1_MAX_ERROR_DESCRIPTION_SIZE 128
 
   /***********************************/
   /*  Functions definitions          */
@@ -198,7 +199,7 @@ extern "C"
 					 const char *octetName,
 					 const char *objectName);
 
-  asn1_retCode asn1_read_tag (node_asn * root, const char *name,
+  asn1_retCode asn1_read_tag (ASN1_TYPE root, const char *name,
 			      int *tagValue, int *classValue);
 
   const char *asn1_find_structure_from_oid (ASN1_TYPE definitions,
@@ -206,9 +207,8 @@ extern "C"
 
   const char *asn1_check_version (const char *req_version);
 
-  const char *libtasn1_strerror (asn1_retCode error);
-
-  void libtasn1_perror (asn1_retCode error);
+  const char *asn1_strerror (asn1_retCode error);
+  void asn1_perror (asn1_retCode error);
 
   /* DER utility functions. */
 
@@ -231,7 +231,7 @@ extern "C"
 
   signed long asn1_get_length_der (const unsigned char *der, int der_len,
 				   int *len);
-  long asn1_get_length_ber (const unsigned char *ber, int ber_len,
+  signed long asn1_get_length_ber (const unsigned char *ber, int ber_len,
 				   int *len);
 
   void asn1_length_der (unsigned long int len, unsigned char *ans,
@@ -243,6 +243,38 @@ extern "C"
 
   asn1_retCode asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
 			       ASN1_TYPE src, const char *src_name);
+
+
+  /* Deprecated stuff. */
+
+#ifndef ASN1_DISABLE_DEPRECATED
+
+#define LIBTASN1_VERSION ASN1_VERSION
+
+#ifndef MAX_NAME_SIZE
+# define MAX_NAME_SIZE ASN1_MAX_NAME_SIZE
+#endif
+
+#ifndef MAX_ERROR_DESCRIPTION_SIZE
+# define MAX_ERROR_DESCRIPTION_SIZE ASN1_MAX_ERROR_DESCRIPTION_SIZE
+#endif
+
+#ifndef __attribute__
+  /* This feature is available in gcc versions 2.5 and later.  */
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
+#  define __attribute__(Spec)	/* empty */
+# endif
+#endif
+
+  /* Use asn1_strerror instead. */
+  const char *libtasn1_strerror (asn1_retCode error)
+    __attribute__ ((deprecated));
+
+  /* Use asn1_perror instead. */
+  void libtasn1_perror (asn1_retCode error)
+    __attribute__ ((deprecated));
+
+#endif
 
 #ifdef __cplusplus
 }

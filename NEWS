@@ -54,6 +54,8 @@ Modules include memchr and memcmp.
 
 ** Fix warnings and build GnuTLS with more warnings enabled.
 
+** minitasn1: Internal copy updated to libtasn1 v1.7.
+
 ** API and ABI modifications:
 gnutls_certificate_set_x509_simple_pkcs12_mem: ADDED
 GNUTLS_VERSION: ADDED, replaces LIBGNUTLS_VERSION.
