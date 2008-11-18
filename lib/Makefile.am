@@ -29,8 +29,8 @@ endif
 
 localedir = $(datadir)/locale
 
+AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = \
-	$(WARN_CFLAGS)				\
 	-DLOCALEDIR=\"$(localedir)\"		\
 	-I$(srcdir)/gl				\
 	-I$(builddir)/gl			\
