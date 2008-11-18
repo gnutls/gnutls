@@ -379,10 +379,8 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
 #endif
     case GNUTLS_COMP_LZO:
 #ifdef USE_LZO
-      if (d)
-	{			/* LZO does not use memory on decompressor *//* ret->handle = NULL; */
-	}
-      else
+      /* LZO does not use memory on decompressor */
+      if (!d)
 	{
 	  ret->handle = gnutls_malloc (LZO1X_1_MEM_COMPRESS);
 
