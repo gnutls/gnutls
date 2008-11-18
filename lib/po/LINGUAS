@@ -1,9 +1,9 @@
 en@boldquot
 en@quot
-de
-fr
-ms
-nl
-pl
-sv
-vi
+lib/de.po
+lib/fr.po
+lib/ms.po
+lib/nl.po
+lib/pl.po
+lib/sv.po
+lib/vi.po
