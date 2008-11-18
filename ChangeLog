@@ -1,3 +1,636 @@
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.2.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Add deprecated guard for libtasn1.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/element.h,
+	lib/minitasn1/errors.c, lib/minitasn1/gstr.h,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/parser_aux.h, lib/minitasn1/structure.c,
+	lib/minitasn1/structure.h: Sync with libtasn1 v1.7.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am, lib/Makefile.am,
+	lib/openpgp/Makefile.am, libextra/Makefile.am: Fix WARN_CFLAGS uses.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_compress.c: Fix warnings.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Respect ENABLE_OPENSSL.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Move gnulib EARLY early.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	lib/m4/output-def.m4, libextra/configure.ac, m4/output-def.m4: Move
+	C++ and -output-def detection.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	lib/m4/linker-script.m4, libextra/configure.ac, m4/linker-script.m4: 
+	Fix linker script test.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Fix typo.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, libextra/m4/hooks.m4: Print Openssl status.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/m4/hooks.m4: Print C++ status.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Cleanup guile tests.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/warnings.m4: Update gnulib files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Rewrite warning initializations.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Typo.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/warnings.m4: Update gnulib files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/examples.h: Add.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, doc/examples/Makefile.am, doc/examples/ex-alert.c,
+	doc/examples/ex-client-psk.c, doc/examples/ex-pkcs12.c,
+	doc/examples/ex-rfc2818.c, doc/examples/ex-session-info.c,
+	doc/examples/ex-verify.c, doc/examples/ex-x509-info.c,
+	doc/examples/tcp.c, gl/gettext.h, gl/override/lib/gettext.h.diff,
+	lib/gl/gettext.h, lib/gl/override/lib/gettext.h.diff,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_state.c,
+	lib/gnutls_str.h, lib/openpgp/output.c, lib/x509/Makefile.am,
+	lib/x509/dn.c, lib/x509/output.c, lib/x509/privkey.c,
+	libextra/fipsmd5.c, libextra/gnutls_extra.c,
+	libextra/gnutls_openssl.c, src/Makefile.am, src/cli.c,
+	src/common.h, src/crypt.c, src/prime.c, src/psk.c, src/serv.c,
+	src/tls_test.c, tests/Makefile.am, tests/anonself.c,
+	tests/crypto_rng.c, tests/dhepskself.c, tests/dn.c,
+	tests/finished.c, tests/gc.c, tests/mini.c, tests/openpgpself.c,
+	tests/pkcs12_s2k.c, tests/pskself.c, tests/resume.c,
+	tests/set_pkcs12_cred.c, tests/tlsia.c, tests/utils.c,
+	tests/utils.h, tests/x509dn.c, tests/x509self.c,
+	tests/x509signself.c: Use more warnings.  Fix many warnings.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/warnings.m4, gl/override/tests/test-select-out.sh.diff,
+	gl/tests/test-select-out.sh: Update gnulib files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/compat.h, lib/includes/gnutls/crypto.h,
+	lib/includes/gnutls/gnutlsxx.h, lib/includes/gnutls/openpgp.h,
+	lib/includes/gnutls/pkcs12.h, lib/includes/gnutls/x509.h: Fix
+	cosmetic nits in header files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/includes/gnutls/compat.h,
+	lib/includes/gnutls/gnutls.h.in: Fix namespace of version symbols.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in: Move #include's outside of C++
+	markers.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli-gaa.c, src/cli-gaa.h, src/serv-gaa.c, src/serv-gaa.h: 
+	Generated.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Work around gnulib+mingw problem.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.gaa, src/common.h, src/serv.c, src/serv.gaa: Never include
+	config.h in *.h files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/hostent.m4, gl/m4/servent.m4: Update gnulib files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/tests/test-select-out.sh.diff,
+	gl/tests/test-select-out.sh: Work around reported bug in gnulib
+	self-tests.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/getaddrinfo.m4, gl/m4/gnulib-comp.m4, gl/m4/sockets.m4,
+	gl/tests/test-select-out.sh, lib/gl/m4/sockets.m4: Update gnulib
+	files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, build-aux/gnupload, gl/m4/getaddrinfo.m4,
+	gl/m4/netdb_h.m4, gl/netdb.in.h, gl/tests/sockets.h,
+	lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/netdb_h.m4, lib/gl/netdb.in.h,
+	lib/gl/sockets.h, lib/gl/tests/Makefile.am,
+	libextra/gl/Makefile.am, libextra/gl/m4/gnulib-cache.m4,
+	libextra/gl/m4/gnulib-comp.m4: Update gnulib files.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_auth.c: Make it build.
+
+2008-11-15  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_auth.c: Corrected memory leak in
+	_gnutls_free_auth_info(). Trace and patch by Michael Weiser.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Disable openpgp-keyring when not building
+	openpgp.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add -I for libextra too.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp: Make it compile with --disable-openpgp.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/resume.c: Fix warning.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mpi-libgcrypt.c: Don't return from void function.  Reported by
+	Jeff Cai <jeff.cai@sun.com> in
+	https://savannah.gnu.org/support/?106549
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h, libextra/ext_inner_application.c,
+	libextra/gnutls_ia.c: Include gnutls/extra.h at the right places.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mac-libgcrypt.c: Don't return from void function.  Reported by
+	Jeff Cai <jeff.cai@sun.com> in
+	https://savannah.gnu.org/support/?106549
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/pkcs12-decode/Makefile.am,
+	tests/pkcs12-decode/pkcs12_s2k.c, tests/pkcs12_s2k.c: Move
+	pkcs12_s2k.c test to top-level to avoid -I/etc flag duplication.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs12-decode/pkcs12: Test pkcs12_2certs.p12 too.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs12-decode/Makefile.am: Dist pkcs12_2certs.p12.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Dist README.gaa.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Remove README.autoconf.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4: Run AC_PROG_CXX only when needed.  Reported by
+	Daniel Black <dragonheart@gentoo.org> in
+	<https://savannah.gnu.org/support/?106542>.
+
+2008-11-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Use more warnings.
+
+2008-11-13  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gnutls_openssl.c: Fix warning.
+
+2008-11-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am: Drop incorrect -I.
+
+2008-11-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/README.gaa: Add.
+
+2008-11-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, doc/examples/ex-serv-export.c,
+	libextra/gnutls_ia.c, src/Makefile.am, src/certtool-gaa.c,
+	src/cli-gaa.c, src/crypt-gaa.c, src/psk-gaa.c, src/serv-gaa.c,
+	src/tests.c, src/tls_test-gaa.c: Use more warnings.  Fix warnings.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c, lib/gnutls_mpi.c, lib/gnutls_pk.c,
+	lib/mac-libgcrypt.c: Fix warnings.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Add -Werror again, code is fixed.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am: Use warning flags, but not for C++ code.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/cve-2008-4989.c: Use more warnings.  Fix
+	warnings.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am, src/certtool-cfg.h, src/certtool-gaa.c: Use more
+	warnings.  Fix warnings.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/Makefile.am, libextra/Makefile.am,
+	libextra/gl/Makefile.am, libextra/gl/m4/extensions.m4,
+	libextra/gl/m4/gnulib-cache.m4, libextra/gl/m4/gnulib-comp.m4: Use
+	more warning flags.  Need extensions in libextra.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.c, lib/gnutls_extensions.c,
+	lib/gnutls_extensions.h, lib/gnutls_handshake.c, lib/gnutls_mpi.c,
+	lib/gnutls_x509.c: Fix warnings.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in: Add prototype for
+	gnutls_certificate_set_x509_simple_pkcs12_mem.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am: Use WARN_CFLAGS.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_server_name.c, lib/gnutls_cipher.c,
+	lib/gnutls_constate.c, lib/gnutls_extensions.c,
+	lib/gnutls_handshake.c, lib/gnutls_record.c,
+	lib/gnutls_supplemental.c, lib/gnutls_v2_compat.c: Fix warnings.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Build gl/ later.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Drop -Werror because gnutls code doesn't compile with it.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/Makefile.am: Disable pointer sign warnings.  Use
+	WARN_CFLAGS more.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Better warning flag hangling.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, doc/README.GIT: Drop --enable-developer-mode.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Remove debug code.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, configure.ac: Use warnings module.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, configure.ac, gl/m4/gnulib-comp.m4, gl/m4/warnings.m4,
+	lib/configure.ac, libextra/configure.ac: Use gnulib warnings module.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add v2.6.2 entries.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4, lib/m4/output-def.m4: Use output-def.m4.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls.pc.in, libextra/gnutls-extra.pc.in: Add URL fields.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4, lib/m4/linker-script.m4: Fix version script
+	detection.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	lib/m4/linker-script.m4, libextra/configure.ac, m4/valgrind.m4: Use
+	external m4 files for shared tests.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/cve-2008-4989.c: Frob expected verify status code.  With
+	latest verify.c patch it just say the chain is invalid, rather than
+	complaining about missing signer certificate.  This is arguable more
+	correct.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Remove check of last certificate in path is
+	self signed.  Causes crashes further down in the code for
+	certificate chains that only contain one self-signed certificate.
+	Still protects against the GNUTLS-SA-2008-3 vulnerabillity.
+	Reported by Michael Meskes <meskes@debian.org> in
+	<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/test-select-out.sh: Comment out broken test.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/warnings.m4, lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/warnings.m4: Update gnulib
+	files.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Need more -I's.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/warnings.m4: Update gnulib
+	files.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/fseeko.c, gl/m4/getaddrinfo.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/netdb_h.m4,
+	gl/m4/printf.m4, gl/netdb.in.h, gl/tests/test-select-fd.c,
+	gl/tests/test-select-in.sh, gl/tests/test-select-out.sh,
+	lib/gl/Makefile.am, lib/gl/fseeko.c, lib/gl/m4/netdb_h.m4,
+	lib/gl/m4/printf.m4, lib/gl/netdb.in.h: Update gnulib files.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* tests/cve-2008-4989.c: Also test chain length of 1 since the
+	security patch caused a crash.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* tests/libgcrypt.supp: Add another gcrypt leak.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c, lib/gnutls_extensions.h,
+	lib/gnutls_global.c: Fix mem leak.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* tests/cve-2008-4989.c: Fix mem leaks.
+
+2008-11-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/Makefile.am, tests/cve-2008-4989.c: Add
+	cve-2008-4989.c self-test.
+
+2008-11-10  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/gettimeofday.c, gl/tests/test-gettimeofday.c,
+	gl/tests/test-select-fd.c, gl/tests/test-select-in.sh,
+	gl/tests/test-select-out.sh, gl/tests/test-select-stdin.c: Update
+	gnulib files.
+
+2008-11-10  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gettimeofday.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/sys_ioctl_h.m4, gl/tests/Makefile.am,
+	lib/gl/m4/include_next.m4, lib/gl/sys_stat.in.h: Update gnulib
+	files.
+
+2008-11-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, lib/x509/verify.c: Merge in v2.6.1 fixes.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/m4/hooks.m4: Use modern -Wl,--version-script check.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/cyclo/Makefile.am: Cover more files.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/opencdk.h: Fix C++ rule, for pmccabe2html.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/pmccabe.css, build-aux/pmccabe2html, configure.ac,
+	doc/Makefile.am, doc/cyclo/Makefile.am, gl/Makefile.am,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/pmccabe2html.m4,
+	gl/sys_stat.in.h: Add cyclomatic code complexity charts.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-11-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/m4/hooks.m4, libextra/configure.ac: Need LZO detection
+	in libgnutls.
+
+2008-11-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, lib/gnutls_x509.c, tests/Makefile.am,
+	tests/set_pkcs12_cred.c: * Added gnutls_certificate_set_x509_simple_pkcs12_mem * Made gnutls_certificate_set_x509_simple_pkcs12_file() more
+	advanced.  It will return a corresponding certificate and key pair.
+	[The previous version would return the first ones found]. Eliminated
+	memory leaks on error conditions on these functions.
+
+2008-11-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* .gitignore: ignore more stuff
+
+2008-11-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, doc/certtool.cfg, src/certtool-cfg.c, src/certtool.c: 
+	certtool: allow setting arbitrary key purpose object identifiers.
+
+2008-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/README.autoconf: Remove obsolete instructions.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_srp.c, lib/gnutls_ui.c: Doc fix.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Use error instead of fprintf.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in: Indent differently for gtk-doc.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Ignore gnulib headers.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* m4/ax_create_stdint_h.m4: Remove.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Ignore config.h.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Drop pointless gc_LDADD.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Drop removed -Ilgl.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/Makefile.am, doc/fdl-1.3.texi, doc/fdl.texi,
+	doc/gnutls.texi, gl/Makefile.am, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/include_next.m4: Update gnulib files.
+	Use GFDLv1.3 for manual.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in: Fix typo.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in: Sync gnutls_srp_set_prime_bits
+	prototype with code.
+
+2008-11-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in: Add forgotten prototype for
+	gnutls_srp_server_get_username.  Reported by Kevin Quick.
+
+2008-11-03  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_ui.c: documented that gnutls_dh_set_prime_bits() has no
+	effect in server side.
+
+2008-11-03  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit fe191e360728fcee72cf5ba835f2301f1bf78b49 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Mon Nov 3 21:44:38
+	2008 +0200
+
+2008-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gl/Makefile.am, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/memchr.m4, lib/gl/m4/memcmp.m4, lib/gl/memchr.c,
+	lib/gl/memcmp.c, lib/gl/tests/Makefile.am,
+	lib/gl/tests/test-memchr.c, lib/gl/tests/test-memcmp.c, maint.mk: 
+	Update gnulib files.
+
+2008-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2008-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4: Check for C99 macros.
+
+2008-11-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/minitasn1/decoding.c, lib/minitasn1/element.c,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/parser_aux.h: * added BER octet string decoder from libtasn1.  * added the tree generation optimizations.
+
+2008-11-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool.c: * Some more verbose out.  * Do not abort the pkcs12 structure parsing if one bag failed.
+
+2008-11-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/pkcs12.c: Reduce verbosity
+
+2008-11-02  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/pkcs12.c: print DER errors if any.
+
+2008-10-31  Simon Josefsson <simon@josefsson.org>
+
+	* doc/texinfo.css: Use white background.
+
+2008-10-31  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-10-31  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.1.
