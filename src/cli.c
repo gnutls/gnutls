@@ -577,7 +577,7 @@ main (int argc, char **argv)
   fd_set rset;
   int maxfd;
   struct timeval tv;
-  int user_term = 0;
+  int user_term = 0, retval = 0;
   socket_st hd;
 
   set_program_name (argv[0]);
@@ -659,8 +659,6 @@ main (int argc, char **argv)
 	    printf ("*** This is a resumed session\n");
 	}
 
-
-
       if (resume != 0 && i == 0)
 	{
 
@@ -721,6 +719,7 @@ after_handshake:
 	    {
 	      fprintf (stderr, "*** Handshake has failed\n");
 	      user_term = 1;
+	      retval = 1;
 	      break;
 	    }
 	}
@@ -751,6 +750,7 @@ after_handshake:
 	    {
 	      fprintf (stderr,
 		       "*** Server has terminated the connection abnormally.\n");
+	      retval = 1;
 	      break;
 	    }
 	  else if (ret > 0)
@@ -784,6 +784,7 @@ after_handshake:
 		    {
 		      fprintf (stderr, "*** Handshake has failed\n");
 		      user_term = 1;
+		      retval = 1;
 		      break;
 		    }
 		}
@@ -840,7 +841,7 @@ after_handshake:
 
   gnutls_global_deinit ();
 
-  return 0;
+  return retval;
 }
 
 void
