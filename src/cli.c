@@ -539,7 +539,7 @@ handle_error (socket_st * hd, int err)
        */
     }
 
-  check_rehandshake (hd, ret);
+  check_rehandshake (hd, err);
 
   return ret;
 }
