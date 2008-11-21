@@ -22,7 +22,7 @@ dnl Process this file with autoconf to produce a configure script.
 # USA
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [2.7.2], [bug-gnutls@gnu.org])
+AC_INIT([GnuTLS], [2.7.3], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -42,26 +42,27 @@ if test "x$GAA" = "x"; then
    AC_MSG_WARN([[***
 *** GAA was not found.  It is only needed if you wish to modify
 *** the source code or command-line description files.  In this case,
-*** you may want to get it from http://gaa.sourceforge.net/
+*** you may want to get it from http://gaa.sourceforge.net/ and
+*** read doc/README.gaa.
 ***]])
 fi
-AM_CONDITIONAL(HAVE_GCC,   test "x$GCC" = "xyes")
 
 gl_EARLY
 AC_C_INLINE
 
+AC_ARG_ENABLE(cxx,
+  AS_HELP_STRING([--disable-cxx], [unconditionally disable the C++ library]),
+    use_cxx=$enableval, use_cxx=yes)
+if test "$use_cxx" != "no"; then
+  AC_PROG_CXX
+  AC_LANG_PUSH(C++)
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[])], use_cxx=yes, use_cxx=no)
+  AC_LANG_POP(C++)
+fi
+AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
-
-AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
-_gcc_cflags_save="$CFLAGS"
-CFLAGS="${CFLAGS} -fgnu89-inline"
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                  _gcc_gnu89_inline=yes, _gcc_gnu89_inline=no)
-AC_MSG_RESULT($_gcc_gnu89_inline)
-CFLAGS="$_gcc_cflags_save"
-AM_CONDITIONAL([HAVE_GCC_GNU89_INLINE_OPTION],
-               [test "$_gcc_gnu89_inline" = "yes"])
 
 AC_HEADER_STDC
 AC_CHECK_FUNCS(fork,,)
@@ -76,6 +77,8 @@ AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 sj_VALGRIND
+sj_LINKER_SCRIPT([$srcdir/lib/libgnutls.vers])
+sj_OUTPUT_DEF
 
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
@@ -93,7 +96,7 @@ AC_ARG_WITH([--with-guile-site-dir],
   [AS_HELP_STRING([--with-guile-site-dir],
      [use the given directory as the Guile site (use with care)])])
 
-if test "x$opt_guile_bindings" = "xyes"; then
+if test "$opt_guile_bindings" = "yes"; then
    AC_MSG_RESULT([***
 *** Detecting GNU Guile...
 ])
@@ -116,7 +119,7 @@ if test "x$opt_guile_bindings" = "xyes"; then
       CFLAGS="$save_CFLAGS"
       LIBS="$save_LIBS"
 
-      if test "x$opt_guile_bindings" = "xyes"; then
+      if test "$opt_guile_bindings" = "yes"; then
         AC_MSG_RESULT([yes])
 	case "x$with_guile_site_dir" in 
 	     xno)
@@ -136,6 +139,13 @@ if test "x$opt_guile_bindings" = "xyes"; then
 		AC_SUBST(GUILE_SITE)
 		;;
 	esac
+        AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
+        _gcc_cflags_save="$CFLAGS"
+        CFLAGS="${CFLAGS} -fgnu89-inline"
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                          gnu89_inline=yes, gnu89_inline=no)
+        AC_MSG_RESULT($gnu89_inline)
+        CFLAGS="$_gcc_cflags_save"
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
@@ -143,7 +153,9 @@ if test "x$opt_guile_bindings" = "xyes"; then
       fi
    fi
 fi
-AM_CONDITIONAL(HAVE_GUILE, test "x$opt_guile_bindings" = "xyes")
+AM_CONDITIONAL(HAVE_GUILE, test "$opt_guile_bindings" = "yes")
+AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
+AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
 dnl Check for libcfg+
 
@@ -172,38 +184,43 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
-# These are additional warnings we could enable:
-#
-# -Wshadow -Wunsafe-loop-optimizations Wcast-qual Wlogical-op
-# -Waggregate-return Wmissing-prototypes -Wmissing-declarations
-# -Wmissing-noreturn -Wmissing-format-attribute Wredundant-decls -Wvla
-#
-# These are warnings we have tried but have turned out not to be useful:
-#
-# -Wtraditional: warns on #elif which we use often
-# -Wundef: warns on '#if GNULIB_PORTCHECK' etc in gnulib headers
-# -Wpadded: many of our structs are not optimized for padding
-# -Wtraditional-conversion: we catch missing prototypes anyway
-# -Wunreachable-code: appears to return many false positives
-# -Wconversion: too many warnings for now
-# -Wswitch-default: too many warnings for now
-# -Wswitch-enum: too many warnings for now
-#
-# These are warnings that we had to explicitly disable:
-#
-# -Wno-pointer-sign: too many warnings for now
-# -Wno-unused-parameter: added because -Wunused cause too many warns
-
-BASICS="-Wall -W"
-
-ADDITIONAL="-Wchar-subscripts -Wformat-security -Wnonnull -Winit-self -Wmissing-include-dirs -Wunused -Wfloat-equal -Wdeclaration-after-statement -Wpointer-arith -Wbad-function-cast  -Wcast-align -Wstrict-prototypes -Wold-style-definition -Wpacked -Wnested-externs -Winline -Wvolatile-register-var -Wdisabled-optimization -Wstack-protector -Woverlength-strings"
-
-REMOVE="-Wno-pointer-sign -Wno-unused-parameter"
-
-for w in $BASICS $ADDITIONAL $REMOVE; do
+# Disable useless warnings.
+W=
+W="$W -Wsystem-headers"         # Don't let system headers trigger warnings
+W="$W -Wc++-compat"             # We don't care strongly about C++ compilers
+W="$W -Wundef"                  # Warns on '#if GNULIB_PORTCHECK' etc in gnulib
+W="$W -Wtraditional"            # Warns on #elif which we use often
+W="$W -Wlogical-op"             # Too many false positives
+W="$W -Wold-style-definition"   # 
+W="$W -Wpadded"                 # Our structs are not padded
+W="$W -Wunreachable-code"       # Too many false positives
+W="$W -Wtraditional-conversion" # Too many warnings for now
+W="$W -Wcast-qual"              # Too many warnings for now
+W="$W -Waggregate-return"       # Too many warnings for now
+W="$W -Wshadow"                 # Too many warnings for now
+W="$W -Wswitch-default"         # Too many warnings for now
+W="$W -Wswitch-enum"            # Too many warnings for now
+W="$W -Wconversion"             # Too many warnings for now
+W="$W -Wsign-conversion"        # Too many warnings for now
+W="$W -Wformat-y2k"             # Too many warnings for now
+W="$W -Wunsafe-loop-optimizations"
+W="$W -Wstrict-overflow"
+gl_WARN_SUPPORTED([WARNINGS])
+gl_WARN_COMPLEMENT(WARNINGS, [$WARNINGS], [$W])
+for w in $WARNINGS; do
   gl_WARN_ADD([$w])
 done
+gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
+gl_WARN_ADD([-Wno-sign-compare])     # Too many warnings for now
+gl_WARN_ADD([-Wno-pointer-sign])     # Too many warnings for now
+gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
+gl_WARN_ADD([-fdiagnostics-show-option])
+
+# Export things for */configure.ac.
 export WARN_CFLAGS
+export have_ld_version_script
+export output_def
+export use_cxx
 
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
@@ -255,4 +272,7 @@ AC_MSG_NOTICE([summary of build options:
   Library types:    Shared=${enable_shared}, Static=${enable_static}
   Valgrind:         ${VALGRIND}
   Linker script:    $have_ld_version_script
+  Guile wrappers:   $opt_guile_bindings
+  C++ library:      $use_cxx
+  OpenSSL library:  $enable_openssl
 ])

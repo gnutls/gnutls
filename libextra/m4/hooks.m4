@@ -26,12 +26,8 @@ AC_DEFUN([LIBGNUTLS_EXTRA_HOOKS],
   AC_ARG_ENABLE(openssl-compatibility,
   	AS_HELP_STRING([--disable-openssl-compatibility],
   		[disable the OpenSSL compatibility support]),
-  	ac_enable_openssl=$withval,
-  	ac_enable_openssl=yes)
-  if test x$ac_enable_openssl != xno; then
-   AC_MSG_RESULT(no)
-  else
-   AC_MSG_RESULT(yes)
-  fi
-  AM_CONDITIONAL(ENABLE_OPENSSL, test "$ac_enable_openssl" = "yes")
+  	enable_openssl=$withval,
+  	enable_openssl=yes)
+  AC_MSG_RESULT($enable_openssl)
+  AM_CONDITIONAL(ENABLE_OPENSSL, test "$enable_openssl" = "yes")
 ])

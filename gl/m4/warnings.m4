@@ -29,16 +29,102 @@ m4_ifdef([AS_VAR_APPEND],
 AC_DEFUN([gl_WARN_ADD],
 [AS_VAR_PUSHDEF([gl_Warn], [gl_cv_warn_$1])dnl
 AC_CACHE_CHECK([whether compiler handles $1], [gl_Warn], [
-  save_CFLAGS="$CFLAGS"
-  CFLAGS="${CFLAGS} $1"
+  save_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="${CPPFLAGS} $1"
   AC_PREPROC_IFELSE([AC_LANG_PROGRAM([])],
                     [AS_VAR_SET([gl_Warn], [yes])],
 		    [AS_VAR_SET([gl_Warn], [no])])
-  CFLAGS="$save_CFLAGS"
+  CPPFLAGS="$save_CPPFLAGS"
 ])
 AS_VAR_PUSHDEF([gl_Flags], m4_if([$2], [], [[WARN_CFLAGS]], [[$2]]))dnl
 gl_AS_VAR_IF([gl_Warn], [yes], [gl_AS_VAR_APPEND([gl_Flags], [" $1"])])
 AS_VAR_POPDEF([gl_Flags])dnl
 AS_VAR_POPDEF([gl_Warn])dnl
 m4_ifval([$2], [AS_LITERAL_IF([$2], [AC_SUBST([$2])], [])])dnl
+])
+
+# gl_WARN_SUPPORTED(VARIABLE)
+# ----------------------
+# Add all supported warning parameters to variable VARIABLE.
+AC_DEFUN([gl_WARN_SUPPORTED],
+[
+ FOO=
+ # List of all supported warning parameters according to GCC 4.3.2 manual.
+ for w in \
+   -Wall \
+   -W \
+   -Wformat-y2k \
+   -Wformat-nonliteral \
+   -Wformat-security \
+   -Winit-self \
+   -Wmissing-include-dirs \
+   -Wswitch-default \
+   -Wswitch-enum \
+   -Wunused \
+   -Wunknown-pragmas \
+   -Wstrict-aliasing \
+   -Wstrict-overflow \
+   -Wsystem-headers \
+   -Wfloat-equal \
+   -Wtraditional \
+   -Wtraditional-conversion \
+   -Wdeclaration-after-statement \
+   -Wundef \
+   -Wshadow \
+   -Wunsafe-loop-optimizations \
+   -Wpointer-arith \
+   -Wbad-function-cast \
+   -Wc++-compat \
+   -Wcast-qual \
+   -Wcast-align \
+   -Wwrite-strings \
+   -Wconversion \
+   -Wsign-conversion \
+   -Wlogical-op \
+   -Waggregate-return \
+   -Wstrict-prototypes \
+   -Wold-style-definition \
+   -Wmissing-prototypes \
+   -Wmissing-declarations \
+   -Wmissing-noreturn \
+   -Wmissing-format-attribute \
+   -Wpacked \
+   -Wpadded \
+   -Wredundant-decls \
+   -Wnested-externs \
+   -Wunreachable-code \
+   -Winline \
+   -Winvalid-pch \
+   -Wlong-long \
+   -Wvla \
+   -Wvolatile-register-var \
+   -Wdisabled-optimization \
+   -Wstack-protector \
+   -Woverlength-strings \
+  ; do
+    FOO="$FOO $w"
+  done
+  $1=$FOO
+])
+
+# gl_WARN_COMPLEMENT(OUTVAR, LISTVAR, REMOVEVAR)
+# ----------------------
+# Copy LISTVAR to OUTVAR except for the entries in REMOVEVAR.
+# Elements separated by whitespace.  In set logic terms, the function
+# does OUTVAR = LISTVAR \ REMOVEVAR.
+AC_DEFUN([gl_WARN_COMPLEMENT],
+[
+  gl_warn_set=
+  set x $2; shift
+  for gl_warn_item
+  do
+    case " $3 " in
+      *" $gl_warn_item "*)
+        ;;
+      *)
+        gl_warn_set="$gl_warn_set $gl_warn_item"
+        ;;
+    esac
+  done
+  $1=$gl_warn_set
 ])

@@ -102,6 +102,7 @@ AC_SUBST([LTALLOCA])
   	m4_defn([m4_PACKAGE_VERSION])), [1], [],
         [AC_CONFIG_LINKS([$GNUmakefile:$GNUmakefile], [],
   	[GNUmakefile=$GNUmakefile])])
+  gl_HOSTENT
   gl_INET_NTOP
   gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
   gl_INET_PTON
@@ -139,6 +140,7 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([send])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([send])
+  gl_SERVENT
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([setsockopt])
@@ -425,6 +427,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getpass.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4
+  m4/hostent.m4
   m4/include_next.m4
   m4/inet_ntop.m4
   m4/inet_pton.m4
@@ -445,6 +448,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/read-file.m4
   m4/readline.m4
   m4/realloc.m4
+  m4/servent.m4
   m4/size_max.m4
   m4/snprintf.m4
   m4/sockets.m4

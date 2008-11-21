@@ -8,81 +8,81 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 111 "serv.gaa"
+#line 112 "serv.gaa"
 	char *priorities;
-#line 108 "serv.gaa"
+#line 109 "serv.gaa"
 	char **ctype;
-#line 107 "serv.gaa"
+#line 108 "serv.gaa"
 	int nctype;
-#line 104 "serv.gaa"
+#line 105 "serv.gaa"
 	char **kx;
-#line 103 "serv.gaa"
+#line 104 "serv.gaa"
 	int nkx;
-#line 100 "serv.gaa"
+#line 101 "serv.gaa"
 	char **macs;
-#line 99 "serv.gaa"
+#line 100 "serv.gaa"
 	int nmacs;
-#line 96 "serv.gaa"
+#line 97 "serv.gaa"
 	char **comp;
-#line 95 "serv.gaa"
+#line 96 "serv.gaa"
 	int ncomp;
-#line 92 "serv.gaa"
+#line 93 "serv.gaa"
 	char **proto;
-#line 91 "serv.gaa"
+#line 92 "serv.gaa"
 	int nproto;
-#line 88 "serv.gaa"
+#line 89 "serv.gaa"
 	char **ciphers;
-#line 87 "serv.gaa"
+#line 88 "serv.gaa"
 	int nciphers;
-#line 84 "serv.gaa"
+#line 85 "serv.gaa"
 	char *opaque_prf_input;
-#line 81 "serv.gaa"
+#line 82 "serv.gaa"
 	char *srp_passwd_conf;
-#line 78 "serv.gaa"
+#line 79 "serv.gaa"
 	char *srp_passwd;
-#line 75 "serv.gaa"
+#line 76 "serv.gaa"
 	char *psk_hint;
-#line 72 "serv.gaa"
+#line 73 "serv.gaa"
 	char *psk_passwd;
-#line 69 "serv.gaa"
+#line 70 "serv.gaa"
 	int disable_client_cert;
-#line 66 "serv.gaa"
+#line 67 "serv.gaa"
 	int require_cert;
-#line 63 "serv.gaa"
+#line 64 "serv.gaa"
 	char *x509_dsacertfile;
-#line 60 "serv.gaa"
+#line 61 "serv.gaa"
 	char *x509_dsakeyfile;
-#line 57 "serv.gaa"
+#line 58 "serv.gaa"
 	char *x509_certfile;
-#line 54 "serv.gaa"
+#line 55 "serv.gaa"
 	char *x509_keyfile;
-#line 51 "serv.gaa"
+#line 52 "serv.gaa"
 	char *pgp_subkey;
-#line 48 "serv.gaa"
+#line 49 "serv.gaa"
 	char *pgp_certfile;
-#line 45 "serv.gaa"
+#line 46 "serv.gaa"
 	char *pgp_keyfile;
-#line 42 "serv.gaa"
+#line 43 "serv.gaa"
 	char *pgp_keyring;
-#line 39 "serv.gaa"
+#line 40 "serv.gaa"
 	char *x509_crlfile;
-#line 36 "serv.gaa"
+#line 37 "serv.gaa"
 	char *x509_cafile;
-#line 33 "serv.gaa"
+#line 34 "serv.gaa"
 	int fmtder;
-#line 30 "serv.gaa"
+#line 31 "serv.gaa"
 	char *dh_params_file;
-#line 26 "serv.gaa"
+#line 27 "serv.gaa"
 	int http;
-#line 23 "serv.gaa"
+#line 24 "serv.gaa"
 	int nodb;
-#line 20 "serv.gaa"
+#line 21 "serv.gaa"
 	int quiet;
-#line 17 "serv.gaa"
+#line 18 "serv.gaa"
 	int port;
-#line 14 "serv.gaa"
+#line 15 "serv.gaa"
 	int generate;
-#line 11 "serv.gaa"
+#line 12 "serv.gaa"
 	int debug;
 
 #line 114 "gaa.skel"

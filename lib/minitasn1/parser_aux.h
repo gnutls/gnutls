@@ -7,47 +7,47 @@
 /***************************************/
 /*  Functions used by ASN.1 parser     */
 /***************************************/
-node_asn *
+ASN1_TYPE
 _asn1_add_node(unsigned int type);
 
-node_asn *
-_asn1_set_value(node_asn *node,const void *value,unsigned int len);
+ASN1_TYPE
+_asn1_set_value(ASN1_TYPE node,const void *value,unsigned int len);
 
-node_asn *
-_asn1_set_value_m(node_asn *node,void *value,unsigned int len);
+ASN1_TYPE
+_asn1_set_value_m(ASN1_TYPE node,void *value,unsigned int len);
 
-node_asn *
-_asn1_set_value_octet(node_asn *node,const void *value,unsigned int len);
+ASN1_TYPE
+_asn1_set_value_octet(ASN1_TYPE node,const void *value,unsigned int len);
 
-node_asn *
-_asn1_append_value(node_asn *node,const void *value,unsigned int len);
+ASN1_TYPE
+_asn1_append_value(ASN1_TYPE node,const void *value,unsigned int len);
 
-node_asn *
-_asn1_set_name(node_asn *node,const char *name);
+ASN1_TYPE
+_asn1_set_name(ASN1_TYPE node,const char *name);
 
-node_asn *
-_asn1_set_right(node_asn *node,node_asn *right);
+ASN1_TYPE
+_asn1_set_right(ASN1_TYPE node, ASN1_TYPE right);
 
-node_asn *
-_asn1_get_right(node_asn *node);
+ASN1_TYPE
+_asn1_get_right(ASN1_TYPE node);
 
-node_asn *
-_asn1_get_last_right(node_asn *node);
+ASN1_TYPE
+_asn1_get_last_right(ASN1_TYPE node);
 
-node_asn *
-_asn1_set_down(node_asn *node,node_asn *down);
+ASN1_TYPE
+_asn1_set_down(ASN1_TYPE node, ASN1_TYPE down);
 
 char *
-_asn1_get_name(node_asn *node);
+_asn1_get_name(ASN1_TYPE node);
 
-node_asn *
-_asn1_get_down(node_asn *node);
+ASN1_TYPE
+_asn1_get_down(ASN1_TYPE node);
 
-node_asn *
-_asn1_mod_type(node_asn *node,unsigned int value);
+ASN1_TYPE
+_asn1_mod_type(ASN1_TYPE node,unsigned int value);
 
 void
-_asn1_remove_node(node_asn *node);
+_asn1_remove_node(ASN1_TYPE node);
 
 void _asn1_delete_list(void);
 
@@ -55,7 +55,7 @@ void _asn1_delete_list_and_nodes(void);
 
 char * _asn1_ltostr(long v,char *str);
 
-node_asn * _asn1_find_up(node_asn *node);
+ASN1_TYPE _asn1_find_up(ASN1_TYPE node);
 
 asn1_retCode _asn1_change_integer_value(ASN1_TYPE node);
 

@@ -1,5 +1,6 @@
 #{
 
+#include <config.h>
 #include <common.h>
 
 void serv_version(void);

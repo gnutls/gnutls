@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Free Software Foundation
+ * Copyright (C) 2007, 2008 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -37,10 +37,10 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-char *salt[3] = { "salt1", "ltsa22", "balt33" };
-char *pw[3] = { "secret1", "verysecret2", "veryverysecret3" };
+static const char *salt[3] = { "salt1", "ltsa22", "balt33" };
+static const char *pw[3] = { "secret1", "verysecret2", "veryverysecret3" };
 
-char *values[] = {
+static const char *values[] = {
 /* 1.0 */
   "85a3c676a66f0960f4807144a28c8d61a0001b81846f301a1ac164289879972f",
 /* 1.2 */

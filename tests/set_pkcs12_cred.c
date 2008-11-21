@@ -32,7 +32,7 @@ void
 doit (void)
 {
   gnutls_certificate_credentials_t x509cred;
-  char *file, *password;
+  const char *file, *password;
   int ret;
 
   ret = gnutls_global_init ();

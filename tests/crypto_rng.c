@@ -32,28 +32,20 @@
 #include <gnutls/crypto.h>
 #include "../lib/random.h"
 
-void
-mylogfn (int level, const char *ptr)
-{
-  printf ("Got Logs: ");
-  if (ptr)
-    printf ("%s", ptr);
-}
-
-int
+static int
 rng_init (void **ctx)
 {
   return 0;
 }
 
-int
+static int
 rng_rnd (void *ctx, int level, void *data, size_t datasize)
 {
   memset (data, 1, datasize);
   return 0;
 }
 
-void
+static void
 rng_deinit (void *ctx)
 {
 }

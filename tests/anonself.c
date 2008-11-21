@@ -37,6 +37,8 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
+#include "tcp.c"
+
 #include "utils.h"
 
 static void
@@ -51,46 +53,7 @@ tls_log_func (int level, const char *str)
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
-/* Connects to the peer and returns a socket
- * descriptor.
- */
-int
-tcp_connect (void)
-{
-  const char *PORT = "5556";
-  const char *SERVER = "127.0.0.1";
-  int err, sd;
-  struct sockaddr_in sa;
-
-  /* connects to server
-   */
-  sd = socket (AF_INET, SOCK_STREAM, 0);
-
-  memset (&sa, '\0', sizeof (sa));
-  sa.sin_family = AF_INET;
-  sa.sin_port = htons (atoi (PORT));
-  inet_pton (AF_INET, SERVER, &sa.sin_addr);
-
-  err = connect (sd, (struct sockaddr *) &sa, sizeof (sa));
-  if (err < 0)
-    {
-      fprintf (stderr, "Connect error\n");
-      exit (1);
-    }
-
-  return sd;
-}
-
-/* closes the given socket descriptor.
- */
-void
-tcp_close (int sd)
-{
-  shutdown (sd, SHUT_RDWR);	/* no more receptions */
-  close (sd);
-}
-
-void
+static void
 client (void)
 {
   int ret, sd, ii;
@@ -189,7 +152,7 @@ end:
 /* These are global */
 gnutls_anon_server_credentials_t anoncred;
 
-gnutls_session_t
+static gnutls_session_t
 initialize_tls_session (void)
 {
   gnutls_session_t session;
@@ -215,7 +178,7 @@ static gnutls_dh_params_t dh_params;
 static int
 generate_dh_params (void)
 {
-  const gnutls_datum_t p3 = { pkcs3, strlen (pkcs3) };
+  const gnutls_datum_t p3 = { (char*) pkcs3, strlen (pkcs3) };
   /* Generate Diffie Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
@@ -235,7 +198,7 @@ gnutls_session_t session;
 char buffer[MAX_BUF + 1];
 int optval = 1;
 
-void
+static void
 server_start (void)
 {
   /* Socket operations
@@ -274,7 +237,7 @@ server_start (void)
   success ("server: ready. Listening to port '%d'.\n", PORT);
 }
 
-void
+static void
 server (void)
 {
   /* this must be called once in the program

@@ -46,7 +46,7 @@ size_t to_server_len;
 char *to_client;
 size_t to_client_len;
 
-ssize_t
+static ssize_t
 client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
   success ("client_pull len %d has %d\n", len, to_client_len);
@@ -65,7 +65,7 @@ client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
   return len;
 }
 
-ssize_t
+static ssize_t
 client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
   size_t newlen = to_server_len + len;
@@ -88,7 +88,7 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   return len;
 }
 
-ssize_t
+static ssize_t
 server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
   success ("server_pull len %d has %d\n", len, to_server_len);
@@ -107,7 +107,7 @@ server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
   return len;
 }
 
-ssize_t
+static ssize_t
 server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
   size_t newlen = to_client_len + len;
@@ -131,7 +131,7 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   return len;
 }
 
-void
+static void
 client_finished_callback (gnutls_session_t session,
 			  const void *finished, size_t len)
 {
@@ -139,7 +139,7 @@ client_finished_callback (gnutls_session_t session,
   hexprint (finished, len);
 }
 
-void
+static void
 server_finished_callback (gnutls_session_t session,
 			  const void *finished, size_t len)
 {
@@ -155,7 +155,7 @@ doit (void)
 {
   /* Server stuff. */
   gnutls_anon_server_credentials_t s_anoncred;
-  const gnutls_datum_t p3 = { pkcs3, strlen (pkcs3) };
+  const gnutls_datum_t p3 = { (char*) pkcs3, strlen (pkcs3) };
   static gnutls_dh_params_t dh_params;
   gnutls_session_t server;
   int sret = GNUTLS_E_AGAIN;

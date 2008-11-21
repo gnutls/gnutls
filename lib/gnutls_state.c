@@ -44,6 +44,15 @@
 #include <gnutls_algorithms.h>
 #include <gnutls_rsa_export.h>
 
+/* These should really be static, but src/tests.c calls them.  Make
+   them public functions?  */
+void
+_gnutls_record_set_default_version (gnutls_session_t session,
+				    unsigned char major, unsigned char minor);
+void
+_gnutls_rsa_pms_set_version (gnutls_session_t session,
+			     unsigned char major, unsigned char minor);
+
 void
 _gnutls_session_cert_type_set (gnutls_session_t session,
 			       gnutls_certificate_type_t ct)

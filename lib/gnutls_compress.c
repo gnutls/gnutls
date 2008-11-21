@@ -189,6 +189,8 @@ _gnutls_compression_get_num (gnutls_compression_method_t algorithm)
   return ret;
 }
 
+#ifdef HAVE_LIBZ
+
 static int
 get_wbits (gnutls_compression_method_t algorithm)
 {
@@ -215,6 +217,8 @@ get_comp_level (gnutls_compression_method_t algorithm)
   GNUTLS_COMPRESSION_ALG_LOOP (ret = p->comp_level);
   return ret;
 }
+
+#endif
 
 /* returns the gnutls internal ID of the TLS compression
  * method num
@@ -318,7 +322,6 @@ comp_hd_t
 _gnutls_comp_init (gnutls_compression_method_t method, int d)
 {
   comp_hd_t ret;
-  int err;
 
   ret = gnutls_malloc (sizeof (struct comp_hd_t_STRUCT));
   if (ret == NULL)
@@ -332,12 +335,13 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
 
   switch (method)
     {
-#ifdef HAVE_LIBZ
     case GNUTLS_COMP_DEFLATE:
+#ifdef HAVE_LIBZ
       {
 	int window_bits, mem_level;
 	int comp_level;
 	z_stream *zhandle;
+	int err;
 
 	window_bits = get_wbits (method);
 	mem_level = get_mem_level (method);
@@ -370,15 +374,13 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
 	    gnutls_free (ret->handle);
 	    goto cleanup_ret;
 	  }
-	break;
       }
+      break;
 #endif
     case GNUTLS_COMP_LZO:
 #ifdef USE_LZO
-      if (d)
-	{			/* LZO does not use memory on decompressor *//* ret->handle = NULL; */
-	}
-      else
+      /* LZO does not use memory on decompressor */
+      if (!d)
 	{
 	  ret->handle = gnutls_malloc (LZO1X_1_MEM_COMPRESS);
 
@@ -388,12 +390,13 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
 	      goto cleanup_ret;
 	    }
 	}
-#endif
       break;
+#endif
     case GNUTLS_COMP_NULL:
     case GNUTLS_COMP_UNKNOWN:
       break;
     }
+
   return ret;
 
 cleanup_ret:
@@ -407,19 +410,21 @@ cleanup_ret:
 void
 _gnutls_comp_deinit (comp_hd_t handle, int d)
 {
-  int err;
-
   if (handle != NULL)
     {
       switch (handle->algo)
 	{
 #ifdef HAVE_LIBZ
 	case GNUTLS_COMP_DEFLATE:
-	  if (d)
-	    err = inflateEnd (handle->handle);
-	  else
-	    err = deflateEnd (handle->handle);
-	  break;
+	  {
+	    int err;
+
+	    if (d)
+	      err = inflateEnd (handle->handle);
+	    else
+	      err = deflateEnd (handle->handle);
+	    break;
+	  }
 #endif
 	default:
 	  break;
@@ -439,7 +444,6 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
 		  size_t max_comp_size)
 {
   int compressed_size = GNUTLS_E_COMPRESSION_FAILED;
-  int err;
 
   /* NULL compression is not handled here
    */
@@ -456,6 +460,7 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
       {
 	lzo_uint out_len;
 	size_t size;
+	int err;
 
 	if (_gnutls_lzo1x_1_compress == NULL)
 	  return GNUTLS_E_COMPRESSION_FAILED;
@@ -488,6 +493,7 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
       {
 	uLongf size;
 	z_stream *zhandle;
+	int err;
 
 	size = (plain_size + plain_size) + 10;
 	*compressed = gnutls_malloc (size);
@@ -545,8 +551,7 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
 		    size_t compressed_size, opaque ** plain,
 		    size_t max_record_size)
 {
-  int plain_size = GNUTLS_E_DECOMPRESSION_FAILED, err;
-  int cur_pos;
+  int plain_size = GNUTLS_E_DECOMPRESSION_FAILED;
 
   if (compressed_size > max_record_size + EXTRA_COMP_SIZE)
     {
@@ -570,6 +575,7 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
       {
 	lzo_uint out_size;
 	lzo_uint new_size;
+	int err;
 
 	if (_gnutls_lzo1x_decompress_safe == NULL)
 	  return GNUTLS_E_DECOMPRESSION_FAILED;
@@ -614,6 +620,8 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
       {
 	uLongf out_size;
 	z_stream *zhandle;
+	int cur_pos;
+	int err;
 
 	*plain = NULL;
 	out_size = compressed_size + compressed_size;

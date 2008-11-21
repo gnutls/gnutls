@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs12.h>
+
+#include "examples.h"
 
 #define OUTFILE "out.p12"
 
@@ -36,7 +38,7 @@ write_pkcs12 (const gnutls_datum_t * cert,
   /* A good idea might be to use gnutls_x509_privkey_get_key_id()
    * to obtain a unique ID.
    */
-  gnutls_datum_t key_id = { "\x00\x00\x07", 3 };
+  gnutls_datum_t key_id = { (char*) "\x00\x00\x07", 3 };
 
   gnutls_global_init ();
 

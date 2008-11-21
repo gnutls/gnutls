@@ -37,12 +37,12 @@ static asn1_retCode
 _asn1_get_indefinite_length_string (const unsigned char *der, int *len);
 
 static void
-_asn1_error_description_tag_error (node_asn * node, char *ErrorDescription)
+_asn1_error_description_tag_error (ASN1_TYPE node, char *ErrorDescription)
 {
 
   Estrcpy (ErrorDescription, ":: tag error near element '");
   _asn1_hierarchical_name (node, ErrorDescription + strlen (ErrorDescription),
-			   MAX_ERROR_DESCRIPTION_SIZE - 40);
+			   ASN1_MAX_ERROR_DESCRIPTION_SIZE - 40);
   Estrcat (ErrorDescription, "'");
 
 }
@@ -166,28 +166,30 @@ asn1_get_tag_der (const unsigned char *der, int der_len,
  * @ber_len: Length of BER data to decode.
  * @len: Output variable containing the length of the BER length field.
  *
- * Extract a length field from BER data.
+ * Extract a length field from BER data.  The difference to
+ * asn1_get_length_der() is that this function will return a length
+ * even if the value has indefinite encoding.
  *
  * Return value: Return the decoded length value, or negative value
- * when the value was too big. The difference with asn1_get_length_der()
- * is that it will return length even if the value has indefinite encoding.
+ *   when the value was too big.
  *
+ * Since: 2.0
  **/
-long
+signed long
 asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len)
 {
   int ret;
   long err;
 
   ret = asn1_get_length_der( ber, ber_len, len);
-  if (ret == -1) 
+  if (ret == -1)
     {			/* indefinite length method */
       ret = ber_len;
       err = _asn1_get_indefinite_length_string (ber+1, &ret);
       if (err != ASN1_SUCCESS)
-        return -3;
+	return -3;
     }
-    
+
   return ret;
 }
 
@@ -339,10 +341,10 @@ asn1_get_bit_der (const unsigned char *der, int der_len,
 
 
 int
-_asn1_extract_tag_der (node_asn * node, const unsigned char *der, int der_len,
+_asn1_extract_tag_der (ASN1_TYPE node, const unsigned char *der, int der_len,
 		       int *ret_len)
 {
-  node_asn *p;
+  ASN1_TYPE p;
   int counter, len2, len3, is_tag_implicit;
   unsigned long tag, tag_implicit = 0;
   unsigned char class, class2, class_implicit = 0;
@@ -538,9 +540,9 @@ _asn1_extract_tag_der (node_asn * node, const unsigned char *der, int der_len,
 
 
 int
-_asn1_delete_not_used (node_asn * node)
+_asn1_delete_not_used (ASN1_TYPE node)
 {
-  node_asn *p, *p2;
+  ASN1_TYPE p, p2;
 
   if (node == NULL)
     return ASN1_ELEMENT_NOT_FOUND;
@@ -596,7 +598,7 @@ _asn1_delete_not_used (node_asn * node)
   return ASN1_SUCCESS;
 }
 
-asn1_retCode _asn1_extract_der_octet(node_asn * node, const unsigned char *der, int der_len)
+asn1_retCode _asn1_extract_der_octet(ASN1_TYPE node, const unsigned char *der, int der_len)
 {
 int len2, len3;
 int counter2, counter_end;
@@ -639,7 +641,7 @@ int counter2, counter_end;
 
 
 asn1_retCode
-_asn1_get_octet_string (const unsigned char *der, node_asn * node, int *len)
+_asn1_get_octet_string (const unsigned char *der, ASN1_TYPE node, int *len)
 {
   int len2, len3, counter, tot_len, indefinite;
 
@@ -800,7 +802,7 @@ asn1_retCode
 asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 		   char *errorDescription)
 {
-  node_asn *node, *p, *p2, *p3;
+  ASN1_TYPE node, p, p2, p3;
   char temp[128];
   int counter, len2, len3, len4, move, ris, tlen;
   unsigned char class;
@@ -1354,9 +1356,9 @@ asn1_retCode
 asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 			   const void *ider, int len, char *errorDescription)
 {
-  node_asn *node, *p, *p2, *p3, *nodeFound = ASN1_TYPE_EMPTY;
-  char temp[128], currentName[MAX_NAME_SIZE * 10], *dot_p, *char_p;
-  int nameLen = MAX_NAME_SIZE * 10 - 1, state;
+  ASN1_TYPE node, p, p2, p3, nodeFound = ASN1_TYPE_EMPTY;
+  char temp[128], currentName[ASN1_MAX_NAME_SIZE * 10], *dot_p, *char_p;
+  int nameLen = ASN1_MAX_NAME_SIZE * 10 - 1, state;
   int counter, len2, len3, len4, move, ris, tlen;
   unsigned char class, *temp2;
   unsigned long tag;
@@ -2125,7 +2127,7 @@ asn1_retCode
 asn1_der_decoding_startEnd (ASN1_TYPE element, const void *ider, int len,
 			    const char *name_element, int *start, int *end)
 {
-  node_asn *node, *node_to_find, *p, *p2, *p3;
+  ASN1_TYPE node, node_to_find, p, p2, p3;
   int counter, len2, len3, len4, move, ris;
   unsigned char class;
   unsigned long tag;
@@ -2468,12 +2470,12 @@ asn1_der_decoding_startEnd (ASN1_TYPE element, const void *ider, int len,
 asn1_retCode
 asn1_expand_any_defined_by (ASN1_TYPE definitions, ASN1_TYPE * element)
 {
-  char definitionsName[MAX_NAME_SIZE], name[2 * MAX_NAME_SIZE + 1],
-    value[MAX_NAME_SIZE];
+  char definitionsName[ASN1_MAX_NAME_SIZE], name[2 * ASN1_MAX_NAME_SIZE + 1],
+    value[ASN1_MAX_NAME_SIZE];
   asn1_retCode retCode = ASN1_SUCCESS, result;
   int len, len2, len3;
   ASN1_TYPE p, p2, p3, aux = ASN1_TYPE_EMPTY;
-  char errorDescription[MAX_ERROR_DESCRIPTION_SIZE];
+  char errorDescription[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
 
   if ((definitions == ASN1_TYPE_EMPTY) || (*element == ASN1_TYPE_EMPTY))
     return ASN1_ELEMENT_NOT_FOUND;
@@ -2557,7 +2559,7 @@ asn1_expand_any_defined_by (ASN1_TYPE definitions, ASN1_TYPE * element)
 		      strcpy (name, definitionsName);
 		      strcat (name, p2->name);
 
-		      len = MAX_NAME_SIZE;
+		      len = ASN1_MAX_NAME_SIZE;
 		      result =
 			asn1_read_value (definitions, name, value, &len);
 
@@ -2707,12 +2709,12 @@ asn1_retCode
 asn1_expand_octet_string (ASN1_TYPE definitions, ASN1_TYPE * element,
 			  const char *octetName, const char *objectName)
 {
-  char name[2 * MAX_NAME_SIZE + 1], value[MAX_NAME_SIZE];
+  char name[2 * ASN1_MAX_NAME_SIZE + 1], value[ASN1_MAX_NAME_SIZE];
   asn1_retCode retCode = ASN1_SUCCESS, result;
   int len, len2, len3;
   ASN1_TYPE p2, aux = ASN1_TYPE_EMPTY;
   ASN1_TYPE octetNode = ASN1_TYPE_EMPTY, objectNode = ASN1_TYPE_EMPTY;
-  char errorDescription[MAX_ERROR_DESCRIPTION_SIZE];
+  char errorDescription[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
 
   if ((definitions == ASN1_TYPE_EMPTY) || (*element == ASN1_TYPE_EMPTY))
     return ASN1_ELEMENT_NOT_FOUND;

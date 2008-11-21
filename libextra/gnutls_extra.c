@@ -34,6 +34,7 @@
 #  include <lzo1x.h>
 # endif
 #endif
+#include <gnutls/extra.h>
 
 #ifdef USE_LZO
 #include <gnutls_compress.h>

@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2008 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
+
+#include "examples.h"
 
 /* This function will check whether the given return code from
  * a gnutls function (recv/send), is an alert, and will print

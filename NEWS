@@ -3,7 +3,12 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.7.2 (unreleased)
+* Version 2.7.3 (unreleased)
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.7.2 (released 2008-11-18)
 
 ** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
 The flaw makes it possible for man in the middle attackers (i.e.,
@@ -13,6 +18,14 @@ Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 
 Any updates with more details about this vulnerability will be added
 to <http://www.gnu.org/software/gnutls/security.html>
+
+** libgnutls: Fix namespace issue with version symbols.
+The symbols LIBGNUTLS_VERSION, LIBGNUTLS_VERSION_MAJOR,
+LIBGNUTLS_VERSION_MINOR, LIBGNUTLS_VERSION_PATCH, and
+LIBGNUTLS_VERSION_NUMBER were renamed to GNUTLS_VERSION_NUMBER,
+GNUTLS_VERSION_MAJOR, GNUTLS_VERSION_MINOR, GNUTLS_VERSION_PATCH, and
+GNUTLS_VERSION_NUMBER respectively.  The old symbols will continue to
+work but are deprecated.
 
 ** certtool: allow setting arbitrary key purpose object identifiers.
 
@@ -44,8 +57,22 @@ follow-on problem with crashes on length 1 certificate chains.
 ** gnulib: Deprecated modules removed.
 Modules include memchr and memcmp.
 
+** Fix warnings and build GnuTLS with more warnings enabled.
+
+** minitasn1: Internal copy updated to libtasn1 v1.7.
+
 ** API and ABI modifications:
 gnutls_certificate_set_x509_simple_pkcs12_mem: ADDED
+GNUTLS_VERSION: ADDED, replaces LIBGNUTLS_VERSION.
+GNUTLS_VERSION_MAJOR: ADDED, replaces LIBGNUTLS_VERSION_MAJOR.
+GNUTLS_VERSION_MINOR: ADDED, replaces LIBGNUTLS_VERSION_MINOR.
+GNUTLS_VERSION_PATCH: ADDED, replaces LIBGNUTLS_VERSION_PATCH.
+GNUTLS_VERSION_NUMBER: ADDED, replaces LIBGNUTLS_VERSION_NUMBER.
+LIBGNUTLS_VERSION: DEPRECATED.
+LIBGNUTLS_VERSION_MAJOR: DEPRECATED.
+LIBGNUTLS_VERSION_MINOR: DEPRECATED.
+LIBGNUTLS_VERSION_PATCH: DEPRECATED.
+LIBGNUTLS_VERSION_NUMBER: DEPRECATED.
 
 * Version 2.7.1 (released 2008-10-31)
 

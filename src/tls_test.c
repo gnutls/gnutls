@@ -40,7 +40,7 @@
 
 /* global stuff here */
 int resume;
-char *hostname = NULL;
+const char *hostname = NULL;
 int port;
 int record_max_size;
 int fingerprint;
@@ -69,11 +69,11 @@ typedef test_code_t (*TEST_FUNC) (gnutls_session_t);
 
 typedef struct
 {
-  char *test_name;
+  const char *test_name;
   TEST_FUNC func;
-  char *suc_str;
-  char *fail_str;
-  char *unsure_str;
+  const char *suc_str;
+  const char *fail_str;
+  const char *unsure_str;
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
@@ -325,6 +325,8 @@ gaa_parser (int argc, char **argv)
   verbose = info.more_info;
 
 }
+
+void tls_test_version (void);
 
 void
 tls_test_version (void)

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2006 Free Software Foundation, Inc.
+ *      Copyright (C) 2006, 2008 Free Software Foundation, Inc.
  *      Copyright (C) 2002, 2005 Fabio Fiorina
  *
  * This file is part of LIBTASN1.
@@ -26,9 +26,7 @@
 # include <stdarg.h>
 #endif
 
-
-#define LIBTASN1_ERROR_ENTRY(name) \
-	{ #name, name }
+#define LIBTASN1_ERROR_ENTRY(name) { #name, name }
 
 struct libtasn1_error_entry
 {
@@ -59,77 +57,81 @@ static const libtasn1_error_entry error_algorithms[] = {
   {0}
 };
 
-#define LIBTASN1_ERROR_LOOP(b) \
-        const libtasn1_error_entry *p; \
-                for(p = error_algorithms; p->name != NULL; p++) { b ; }
-
-#define LIBTASN1_ERROR_ALG_LOOP(a) \
-                        LIBTASN1_ERROR_LOOP( if(p->number == error) { a; break; } )
-
-
+/**
+ * asn1_perror - prints a string to stderr with a description of an error
+ * @error: is an error returned by a libtasn1 function.
+ *
+ * This function is like perror(). The only difference is that it
+ * accepts an error returned by a libtasn1 function.
+ *
+ * Since: 1.6
+ **/
+void
+asn1_perror (asn1_retCode error)
+{
+  const char *str = asn1_strerror (error);
+  fprintf (stderr, "LIBTASN1 ERROR: %s\n", str ? str : "(null)");
+}
 
 /**
-  * libtasn1_perror - prints a string to stderr with a description of an error
-  * @error: is an error returned by a libtasn1 function.
-  *
-  * This function is like perror(). The only difference is that it
-  * accepts an error returned by a libtasn1 function.
-  **/
+ * asn1_strerror - Returns a string with a description of an error
+ * @error: is an error returned by a libtasn1 function.
+ *
+ * This function is similar to strerror(). The only difference is
+ * that it accepts an error (number) returned by a libtasn1 function.
+ *
+ * Returns: Pointer to static zero-terminated string describing error
+ *   code.
+ *
+ * Since: 1.6
+ **/
+const char *
+asn1_strerror (asn1_retCode error)
+{
+  const libtasn1_error_entry *p;
+
+  for (p = error_algorithms; p->name != NULL; p++)
+    if (p->number == error)
+      return p->name + sizeof ("ASN1_") - 1;
+
+  return NULL;
+}
+
+#ifndef ASN1_DISABLE_DEPRECATED
+
+/* Compatibility mappings to preserve ABI. */
+
+/**
+ * libtasn1_perror - prints a string to stderr with a description of an error
+ * @error: is an error returned by a libtasn1 function.
+ *
+ * This function is like perror(). The only difference is that it
+ * accepts an error returned by a libtasn1 function.
+ *
+ * Deprecated: Use asn1_perror() instead.
+ **/
 void
 libtasn1_perror (asn1_retCode error)
 {
-  const char *ret = NULL;
-
-  /* avoid prefix */
-  LIBTASN1_ERROR_ALG_LOOP (ret = p->name + sizeof ("ASN1_") - 1);
-
-  fprintf (stderr, "LIBTASN1 ERROR: %s\n", ret);
-
+  asn1_perror (error);
 }
 
-
 /**
-  * libtasn1_strerror - Returns a string with a description of an error
-  * @error: is an error returned by a libtasn1 function.
-  *
-  * This function is similar to strerror(). The only difference is
-  * that it accepts an error (number) returned by a libtasn1 function.
-  *
-  * Returns: Pointer to static zero-terminated string describing error
-  *   code.
-  **/
+ * libtasn1_strerror - Returns a string with a description of an error
+ * @error: is an error returned by a libtasn1 function.
+ *
+ * This function is similar to strerror(). The only difference is
+ * that it accepts an error (number) returned by a libtasn1 function.
+ *
+ * Returns: Pointer to static zero-terminated string describing error
+ *   code.
+ *
+ * Deprecated: Use asn1_strerror() instead.
+ **/
 const char *
 libtasn1_strerror (asn1_retCode error)
 {
-  const char *ret = NULL;
-
-  /* avoid prefix */
-  LIBTASN1_ERROR_ALG_LOOP (ret = p->name + sizeof ("ASN1_") - 1);
-
-  return ret;
+  return asn1_strerror (error);
 }
 
-/* this function will output a message.
- */
-#ifdef LIBTASN1_DEBUG
-void
-_libtasn1_log (const char *fmt, ...)
-{
-  va_list args;
-  char str[MAX_LOG_SIZE];
-
-  va_start (args, fmt);
-  vsprintf (str, fmt, args);	/* Flawfinder: ignore */
-  va_end (args);
-
-  fprintf (stderr, str);
-
-  return;
-}
-#else /* not DEBUG */
-void
-_libtasn1_log (const char *fmt, ...)
-{
-  return;
-}
-#endif /* DEBUG */
+#endif

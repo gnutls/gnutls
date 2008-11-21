@@ -14,6 +14,8 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+#include "examples.h"
+
 static const char *
 bin2hex (const void *bin, size_t bin_size)
 {

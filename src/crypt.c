@@ -57,7 +57,6 @@ static int _verify_passwd_int (const char *username, const char *passwd,
 			       const gnutls_datum_t * g,
 			       const gnutls_datum_t * n);
 
-
 static void
 print_num (const char *msg, const gnutls_datum_t * num)
 {
@@ -419,9 +418,9 @@ main (int argc, char **argv)
     }
 
   if (info.passwd == NULL)
-    info.passwd = KPASSWD;
+    info.passwd = (char*) KPASSWD;
   if (info.passwd_conf == NULL)
-    info.passwd_conf = KPASSWD_CONF;
+    info.passwd_conf = (char*) KPASSWD_CONF;
 
   if (info.username == NULL)
     {
@@ -709,6 +708,8 @@ read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n, char *str)
 
   return index;
 }
+
+extern void srptool_version(void);
 
 void
 srptool_version (void)

@@ -1374,7 +1374,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
   if (session->security_parameters.cert_type == GNUTLS_CRT_OPENPGP
       && size != 0)
     {
-      gnutls_assert ();		// size should be zero
+      gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 

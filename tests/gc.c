@@ -32,12 +32,6 @@
 #include "../lib/x509/pbkdf2-sha1.h"
 #include "../lib/debug.h"
 
-int
-is_secure_mem (const void *ign)
-{
-  return 0;
-}
-
 void
 doit (void)
 {

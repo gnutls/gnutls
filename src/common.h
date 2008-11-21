@@ -1,7 +1,6 @@
 #define PORT 5556
 #define SERVER "127.0.0.1"
 
-#include <config.h>
 #include <gnutls/gnutls.h>
 
 #include <sys/socket.h>
@@ -13,6 +12,12 @@
 #ifdef _WIN32
 # include <io.h>
 # include <winbase.h>
+#endif
+
+#ifndef __attribute__
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
+#  define __attribute__(Spec)	/* empty */
+# endif
 #endif
 
 /* the number of elements in the priority structures.
