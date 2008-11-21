@@ -4,6 +4,10 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
+* Optimize the gnutls_record_recv() code to allow fast small byte
+  reads.
+* Implement Datagram-TLS (DTLS).
+* Correct TLS 1.2 support.
 * Cleanup pkix.asn and remove unused (by the certificate api) structures.
   That way memory used will be reduced.
 * Improve or rewrite libtasn1 to make it easier to maintain.
@@ -43,7 +47,6 @@ Current list:
   application to give progress feedback to user.
 - Support non-blocking gnutls_{dh,rsa}_params_generate2 for when there
   is not enough entropy available. 
-- Implement Datagram-TLS (DTLS).
 - Chain verifications.
   - Short-cut the certificate verification algorithm before the
     root if a middle-CA is trusted.
