@@ -833,9 +833,10 @@ read_literal (cdk_stream_t inp, size_t pktlen,
   pt->namelen = cdk_stream_getc (inp);
   if (pt->namelen > 0)
     {
-      *ret_pt = pt = cdk_realloc (pt, sizeof *pt + pt->namelen + 1);
+      *ret_pt = pt = cdk_realloc (pt, sizeof *pt + pt->namelen + 2);
       if (!pt)
 	return CDK_Out_Of_Core;
+      pt->name = (void*)pt + sizeof(*pt);
       rc = stream_read (inp, pt->name, pt->namelen, &nread);
       if (rc)
 	return rc;
@@ -997,15 +998,18 @@ cdk_pkt_read (cdk_stream_t inp, cdk_packet_t pkt)
 				     + pkt->pktlen + 16 + 1);
       if (!pkt->pkt.user_id)
 	return CDK_Out_Of_Core;
+      pkt->pkt.user_id->name = (void*)pkt->pkt.user_id + sizeof(*pkt->pkt.user_id);
+
       rc = read_attribute (inp, pktlen, pkt->pkt.user_id);
       pkt->pkttype = CDK_PKT_ATTRIBUTE;
       break;
 
     case CDK_PKT_USER_ID:
       pkt->pkt.user_id = cdk_calloc (1, sizeof *pkt->pkt.user_id
-				     + pkt->pktlen);
+				     + pkt->pktlen + 1);
       if (!pkt->pkt.user_id)
 	return CDK_Out_Of_Core;
+      pkt->pkt.user_id->name = (void*)pkt->pkt.user_id + sizeof(*pkt->pkt.user_id);
       rc = read_user_id (inp, pktlen, pkt->pkt.user_id);
       break;
 

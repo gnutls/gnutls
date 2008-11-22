@@ -99,7 +99,7 @@ struct cdk_subpkt_s {
   struct cdk_subpkt_s * next;
   u32 size;
   byte type;
-  byte d[1];  
+  byte *d;  
 };
 
 struct cdk_keylist_s {
@@ -121,7 +121,7 @@ struct cdk_dek_s {
 
 struct cdk_strlist_s {
   struct cdk_strlist_s * next;
-  char d[1]; 
+  char *d; 
 };
 
 #endif /* CDK_CONTEXT_H */

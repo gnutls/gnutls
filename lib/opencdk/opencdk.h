@@ -430,7 +430,7 @@ struct cdk_pkt_userid_s
   unsigned char *attrib_img;	/* Tag 17 if not null */
   size_t attrib_len;
   cdk_pkt_signature_t selfsig;
-  char name[1];
+  char *name;
 };
 typedef struct cdk_pkt_userid_s *cdk_pkt_userid_t;
 
@@ -538,7 +538,7 @@ struct cdk_pkt_literal_s
   int mode;
   unsigned int timestamp;
   int namelen;
-  char name[1];
+  char *name;
 };
 typedef struct cdk_pkt_literal_s *cdk_pkt_literal_t;
 

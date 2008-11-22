@@ -290,6 +290,7 @@ cdk_pkt_alloc (cdk_packet_t * r_pkt, cdk_packet_type_t pkttype)
       pkt->pkt.user_id = cdk_calloc (1, sizeof pkt->pkt.user_id);
       if (!pkt->pkt.user_id)
 	return CDK_Out_Of_Core;
+      pkt->pkt.user_id->name = NULL;
       break;
 
     case CDK_PKT_PUBLIC_KEY:
@@ -338,6 +339,7 @@ cdk_pkt_alloc (cdk_packet_t * r_pkt, cdk_packet_type_t pkttype)
       pkt->pkt.literal = cdk_calloc (1, sizeof *pkt->pkt.literal);
       if (!pkt->pkt.literal)
 	return CDK_Out_Of_Core;
+      pkt->pkt.literal->name = NULL;
       break;
 
     default:
@@ -383,9 +385,11 @@ _cdk_copy_userid (cdk_pkt_userid_t * dst, cdk_pkt_userid_t src)
     return CDK_Inv_Value;
 
   *dst = NULL;
-  u = cdk_calloc (1, sizeof *u + strlen (src->name) + 1);
+  u = cdk_calloc (1, sizeof *u + strlen (src->name) + 2);
   if (!u)
     return CDK_Out_Of_Core;
+  u->name = (void*)u + sizeof(*u);
+
   memcpy (u, src, sizeof *u);
   memcpy (u->name, src->name, strlen (src->name));
   u->prefs = _cdk_copy_prefs (src->prefs);
@@ -620,9 +624,11 @@ cdk_subpkt_new (size_t size)
 
   if (!size)
     return NULL;
-  s = cdk_calloc (1, sizeof *s + size + 1);
+  s = cdk_calloc (1, sizeof *s + size + 2);
   if (!s)
     return NULL;
+  s->d = (void*)s + sizeof(*s);
+
   return s;
 }
 
