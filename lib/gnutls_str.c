@@ -97,7 +97,7 @@ _gnutls_string_init (gnutls_string * str,
 		     gnutls_realloc_function realloc_func,
 		     gnutls_free_function free_func)
 {
-  str->data = NULL;
+  str->data = str->allocd = NULL;
   str->max_length = 0;
   str->length = 0;
 
@@ -109,91 +109,16 @@ _gnutls_string_init (gnutls_string * str,
 void
 _gnutls_string_clear (gnutls_string * str)
 {
-  if (str == NULL || str->data == NULL)
+  if (str == NULL || str->allocd == NULL)
     return;
-  str->free_func (str->data);
+  str->free_func (str->allocd);
 
-  str->data = NULL;
+  str->data = str->allocd = NULL;
   str->max_length = 0;
   str->length = 0;
 }
 
-/* This one does not copy the string.
- */
-gnutls_datum_t
-_gnutls_string2datum (gnutls_string * str)
-{
-  gnutls_datum_t ret;
-
-  ret.data = str->data;
-  ret.size = str->length;
-
-  return ret;
-}
-
 #define MIN_CHUNK 256
-
-int
-_gnutls_string_copy_str (gnutls_string * dest, const char *src)
-{
-  size_t src_len = strlen (src);
-
-  if (dest->max_length >= src_len)
-    {
-      memcpy (dest->data, src, src_len);
-      dest->length = src_len;
-
-      return src_len;
-    }
-  else
-    {
-      dest->data = dest->realloc_func (dest->data, MAX (src_len, MIN_CHUNK));
-      if (dest->data == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-      dest->max_length = MAX (MIN_CHUNK, src_len);
-
-      memcpy (dest->data, src, src_len);
-      dest->length = src_len;
-
-      return src_len;
-    }
-}
-
-int
-_gnutls_string_append_str (gnutls_string * dest, const char *src)
-{
-  size_t src_len = strlen (src);
-  size_t tot_len = src_len + dest->length;
-
-  if (dest->max_length >= tot_len)
-    {
-      memcpy (&dest->data[dest->length], src, src_len);
-      dest->length = tot_len;
-
-      return tot_len;
-    }
-  else
-    {
-      size_t new_len =
-	MAX (src_len, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
-
-      dest->data = dest->realloc_func (dest->data, new_len);
-      if (dest->data == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-      dest->max_length = new_len;
-
-      memcpy (&dest->data[dest->length], src, src_len);
-      dest->length = tot_len;
-
-      return tot_len;
-    }
-}
 
 int
 _gnutls_string_append_data (gnutls_string * dest, const void *data,
@@ -203,6 +128,15 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
 
   if (dest->max_length >= tot_len)
     {
+      size_t unused = MEMSUB(dest->data, dest->allocd);
+      
+      if (dest->max_length - unused <= tot_len)
+        {
+          if (dest->length && dest->data)
+            memmove(dest->allocd, dest->data, dest->length);
+
+          dest->data = dest->allocd;
+        }
       memcpy (&dest->data[dest->length], data, data_size);
       dest->length = tot_len;
 
@@ -210,22 +144,121 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
     }
   else
     {
+      size_t unused = MEMSUB(dest->data, dest->allocd);
       size_t new_len =
 	MAX (data_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
-      dest->data = dest->realloc_func (dest->data, new_len);
-      if (dest->data == NULL)
+      dest->allocd = dest->realloc_func (dest->allocd, new_len);
+      if (dest->allocd == NULL)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       dest->max_length = new_len;
+      dest->data = dest->allocd + unused;
+
+      if (dest->length && dest->data)
+        memmove(dest->allocd, dest->data, dest->length);
+      dest->data = dest->allocd;
 
       memcpy (&dest->data[dest->length], data, data_size);
       dest->length = tot_len;
 
       return tot_len;
     }
+}
+
+int
+_gnutls_string_resize (gnutls_string * dest, size_t new_size)
+{
+  if (dest->max_length >= new_size)
+    {
+      size_t unused = MEMSUB(dest->data, dest->allocd);
+      if (dest->max_length - unused <= new_size)
+        {
+          if (dest->length && dest->data)
+            memmove(dest->allocd, dest->data, dest->length);
+          dest->data = dest->allocd;
+        }
+
+      return 0;
+    }
+  else
+    {
+      size_t unused = MEMSUB(dest->data, dest->allocd);
+      size_t alloc_len =
+	MAX (new_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
+
+      dest->allocd = dest->realloc_func (dest->allocd, alloc_len);
+      if (dest->allocd == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+      dest->max_length = alloc_len;
+      dest->data = dest->allocd + unused;
+
+      if (dest->length && dest->data)
+        memmove(dest->allocd, dest->data, dest->length);
+      dest->data = dest->allocd;
+
+      return 0;
+    }
+}
+
+int
+_gnutls_string_append_str (gnutls_string * dest, const char *src)
+{
+  return _gnutls_string_append_data (dest, src, strlen(src));
+}
+
+/* returns data from a string in a constant buffer. 
+ * The data will NOT be valid if buffer is released or
+ * data are appended in the buffer.
+ */
+void
+_gnutls_string_get_datum (gnutls_string * str, gnutls_datum *data,
+			    size_t req_size)
+{
+
+  if (str->length == 0) {
+      data->data = NULL;
+      data->size = 0;
+      return;
+  }
+
+  if (req_size > str->length)
+      req_size = str->length;
+
+  data->data = str->data;
+  data->size = req_size;
+  
+  str->data += req_size;
+  str->length -= req_size;
+
+  /* if string becomes empty start from begining */  
+  if (str->length == 0) {
+      str->data = str->allocd;
+  }
+  
+  return;
+  
+}
+
+/* returns data from a string in a constant buffer. 
+ */
+void
+_gnutls_string_get_data (gnutls_string * str, void *data,
+			    size_t *req_size)
+{
+gnutls_datum tdata;
+
+  _gnutls_string_get_datum( str, &tdata, *req_size);
+
+  *req_size = tdata.size;
+  memcpy( data, tdata.data, tdata.size);
+  
+  return;
 }
 
 int

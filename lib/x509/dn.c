@@ -307,10 +307,11 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
   if (buf)
     {
-      memcpy (buf, out_str.data, out_str.length);
-      buf[out_str.length] = 0;
+      _gnutls_string_get_data( &out_str, buf, sizeof_buf);
+      buf[*sizeof_buf] = 0;
     }
-  *sizeof_buf = out_str.length;
+  else 
+    *sizeof_buf = out_str.length;
 
   result = 0;
 

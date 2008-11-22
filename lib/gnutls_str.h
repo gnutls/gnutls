@@ -34,9 +34,10 @@ void _gnutls_str_cat (char *dest, size_t dest_tot_size, const char *src);
 
 typedef struct
 {
-  opaque *data;
+  opaque *allocd; /* pointer to allocated data */
+  opaque *data; /* API: pointer to data to copy from */
   size_t max_length;
-  size_t length;
+  size_t length; /* API: current length */
   gnutls_realloc_function realloc_func;
   gnutls_alloc_function alloc_func;
   gnutls_free_function free_func;
@@ -45,17 +46,14 @@ typedef struct
 void _gnutls_string_init (gnutls_string *, gnutls_alloc_function,
 			  gnutls_realloc_function, gnutls_free_function);
 void _gnutls_string_clear (gnutls_string *);
+int _gnutls_string_resize (gnutls_string *, size_t new_size);
 
-/* Beware, do not clear the string, after calling this
- * function
- */
-gnutls_datum_t _gnutls_string2datum (gnutls_string * str);
-
-int _gnutls_string_copy_str (gnutls_string * dest, const char *src);
 int _gnutls_string_append_str (gnutls_string *, const char *str);
 int _gnutls_string_append_data (gnutls_string *, const void *data,
 				size_t data_size);
 
+void _gnutls_string_get_data( gnutls_string *, void*, size_t *size);
+void _gnutls_string_get_datum( gnutls_string *, gnutls_datum*, size_t max_size);
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
@@ -72,6 +70,9 @@ typedef gnutls_string gnutls_buffer;
 #define _gnutls_buffer_init(buf) _gnutls_string_init(buf, gnutls_malloc, gnutls_realloc, gnutls_free);
 #define _gnutls_buffer_clear _gnutls_string_clear
 #define _gnutls_buffer_append _gnutls_string_append_data
+#define _gnutls_buffer_get_datum _gnutls_string_get_datum
+#define _gnutls_buffer_get_data _gnutls_string_get_data
+#define _gnutls_buffer_resize _gnutls_string_resize
 
 char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
 		       size_t buffer_size);
