@@ -77,7 +77,7 @@ libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 
 certtool_SOURCES = certtool.c prime.c
 certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
-certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la @LTLIBREADLINE@
+certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else
@@ -93,7 +93,7 @@ noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool.gaa certtool-gaa.h	\
 	certtool-gaa.c certtool-cfg.h certtool-cfg.c
-libcmd_certtool_la_LIBADD = ../gl/libgnu.la 
+libcmd_certtool_la_LIBADD = ../gl/libgnu.la @LTLIBREADLINE@
 
 noinst_PROGRAMS = errcodes printlist
 errcodes_SOURCES = errcodes.c
