@@ -631,7 +631,6 @@ _gnutls_io_write_buffered (gnutls_session_t session,
   unsigned j, x, sum = 0;
   ssize_t retval, i;
   const opaque *ptr;
-  int ret;
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
 
   /* to know where the procedure was interrupted.
