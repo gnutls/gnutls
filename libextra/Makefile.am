@@ -33,7 +33,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../lib
 
 if ENABLE_MINITASN1
-AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
+AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
 endif
 
 SUBDIRS = gl includes
