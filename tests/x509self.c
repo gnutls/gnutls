@@ -118,7 +118,7 @@ client (void)
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
-    gnutls_global_set_log_level (4711);
+    gnutls_global_set_log_level (6);
 
   gnutls_certificate_allocate_credentials (&xcred);
 
@@ -166,9 +166,38 @@ client (void)
   /* see the Getting peer's information example */
   print_info (session);
 
-  gnutls_record_send (session, MSG, strlen (MSG));
+  ret = gnutls_record_send (session, MSG, strlen (MSG));
+  
+  if (ret == strlen(MSG))
+    {
+      success ("client: sent record.\n");
+    }
+  else 
+    {
+      fail ("client: failed to send record.\n");
+      gnutls_perror(ret);
+      goto end;
+    }
 
   ret = gnutls_record_recv (session, buffer, MAX_BUF);
+
+  success ("client: recv returned %d.\n", ret);
+
+  if (ret == GNUTLS_E_REHANDSHAKE)
+    {
+      success ("client: doing handshake!\n");
+      ret = gnutls_handshake (session);
+      if (ret == 0) 
+        {
+          success ("client: handshake complete, reading again.\n");
+          ret = gnutls_record_recv (session, buffer, MAX_BUF);
+        }
+      else
+        {
+          fail ("client: handshake failed.\n");
+        }
+  }
+
   if (ret == 0)
     {
       success ("client: Peer has closed the TLS connection\n");
@@ -227,7 +256,7 @@ initialize_tls_session (void)
 
   /* request client certificate if any.
    */
-  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+//  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
 
   gnutls_dh_set_prime_bits (session, DH_BITS);
 
@@ -349,7 +378,7 @@ server (void)
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
-    gnutls_global_set_log_level (4711);
+    gnutls_global_set_log_level (6);
 
   gnutls_certificate_allocate_credentials (&x509_cred);
   gnutls_certificate_set_x509_trust_mem (x509_cred, &ca, GNUTLS_X509_FMT_PEM);
@@ -408,6 +437,28 @@ server (void)
 	}
       else if (ret > 0)
 	{
+          gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+
+          success ("server: got data, forcing rehandshake.\n");
+
+          ret = gnutls_rehandshake(session);
+          if (ret < 0) 
+            {
+              fail ("server: rehandshake failed\n");
+              gnutls_perror(ret);
+              break;
+            }
+          
+          ret = gnutls_handshake(session);
+          if (ret < 0) 
+            {
+              fail ("server: (re)handshake failed\n");
+              gnutls_perror(ret);
+              break;
+            }
+            
+          success ("server: rehandshake complete.\n");
+
 	  /* echo data back to the client
 	   */
 	  gnutls_record_send (session, buffer, strlen (buffer));
