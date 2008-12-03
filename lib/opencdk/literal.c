@@ -200,7 +200,7 @@ literal_encode (void *data, FILE * in, FILE * out)
   filelen = strlen (pfx->filename);
   cdk_pkt_new (&pkt);
   pt = pkt->pkt.literal = cdk_calloc (1, sizeof *pt + filelen);
-  pt->name = pt + sizeof(*pt);
+  pt->name = (char*) (pt + sizeof(*pt));
   if (!pt)
     {
       cdk_pkt_release (pkt);

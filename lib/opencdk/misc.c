@@ -97,7 +97,7 @@ cdk_strlist_add (cdk_strlist_t * list, const char *string)
   sl = cdk_calloc (1, sizeof *sl + strlen (string) + 2);
   if (!sl)
     return NULL;
-  sl->d = sl + sizeof(*sl);
+  sl->d = (char*) (sl + sizeof(*sl));
   strcpy (sl->d, string);
   sl->next = *list;
   *list = sl;
