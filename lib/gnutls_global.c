@@ -202,7 +202,16 @@ gnutls_global_init (void)
 
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
     {
-      const char *p = gcry_check_version (GCRYPT_VERSION);
+      const char *p;
+
+#ifdef DEBUG
+      /* applications may want to override that, so we only use
+       * it in debugging mode.
+       */
+      gcry_set_log_handler (_gnutls_gcry_log_handler, NULL);
+#endif
+      
+      p = gcry_check_version (GCRYPT_VERSION);
 
       if (p == NULL)
 	{
@@ -212,22 +221,13 @@ gnutls_global_init (void)
 	  return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
 	}
 
-      /* gcry_control (GCRYCTL_DISABLE_INTERNAL_LOCKING, NULL, 0); */
+      /* for gcrypt in order to be able to allocate memory */
+      gcry_set_allocation_handler (gnutls_malloc, gnutls_secure_malloc,
+	       _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
 
       gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
 
-#ifdef DEBUG
-      /* applications may want to override that, so we only use
-       * it in debugging mode.
-       */
-      gcry_set_log_handler (_gnutls_gcry_log_handler, NULL);
-#endif
     }
-
-  /* for gcrypt in order to be able to allocate memory */
-  gcry_set_allocation_handler (gnutls_malloc, gnutls_secure_malloc,
-			       _gnutls_is_secure_memory, gnutls_realloc,
-			       gnutls_free);
 
 #ifdef DEBUG
   gnutls_global_set_log_function (dlog);
