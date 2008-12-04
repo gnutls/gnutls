@@ -915,9 +915,6 @@ gaa_parser (int argc, char **argv)
       template_parse (info.template);
     }
 
-  if (info.quick_random != 0)
-    gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
-
 #ifdef gcry_fips_mode_active
   if (gcry_fips_mode_active ())
     {
@@ -937,6 +934,9 @@ gaa_parser (int argc, char **argv)
 
   if ((ret = gnutls_global_init_extra ()) < 0)
     error (EXIT_FAILURE, 0, "global_init_extra: %s", gnutls_strerror (ret));
+
+  if (info.quick_random != 0)
+    gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   switch (info.action)
     {
