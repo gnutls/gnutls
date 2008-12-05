@@ -5,6 +5,16 @@ See the end for copying conditions.
 
 * Version 2.7.3 (unreleased)
 
+** gnutls: Libgcrypt initialization changed.
+If libgcrypt has not already been initialized, GnuTLS will now
+initialize libgcrypt with disabled secure memory.  Initialize
+libgcrypt explicitly in your application if you want to enable secure
+memory.  Before GnuTLS initialized libgcrypt to use GnuTLS's memory
+allocation functions, which doesn't use secure memory, so there is no
+real change in behaviour.
+
+** gnutls: Small byte reads via gnutls_record_recv() optimized.
+
 ** API and ABI modifications:
 No changes since last version.
 
