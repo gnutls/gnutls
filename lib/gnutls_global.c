@@ -200,17 +200,18 @@ gnutls_global_init (void)
 
   bindtextdomain (PACKAGE, LOCALEDIR);
 
+  /* Initialize libgcrypt if it hasn't already been initialized. */
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
     {
       const char *p;
 
 #ifdef DEBUG
-      /* applications may want to override that, so we only use
+      /* applications may want to override this, so we only use
        * it in debugging mode.
        */
       gcry_set_log_handler (_gnutls_gcry_log_handler, NULL);
 #endif
-      
+
       p = gcry_check_version (GCRYPT_VERSION);
 
       if (p == NULL)
@@ -222,22 +223,19 @@ gnutls_global_init (void)
 	}
 
       /* for gcrypt in order to be able to allocate memory */
-      gcry_set_allocation_handler (gnutls_malloc, gnutls_secure_malloc,
-	       _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
+      gcry_control (GCRYCTL_DISABLE_SECMEM, NULL, 0);
 
       gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
-
     }
 
 #ifdef DEBUG
   gnutls_global_set_log_function (dlog);
 #endif
 
-  /* initialize parser 
+  /* initialize ASN.1 parser
    * This should not deal with files in the final
    * version.
    */
-
   if (asn1_check_version (LIBTASN1_VERSION) == NULL)
     {
       gnutls_assert ();
