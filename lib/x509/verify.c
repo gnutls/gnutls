@@ -374,6 +374,24 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
   int i = 0, ret;
   unsigned int status = 0, output;
 
+  if (clist_size > 1) 
+    {
+      /* Check if the last certificate in the path is self signed.
+       * In that case ignore it (a certificate is trusted only if it
+       * leads to a trusted party by us, not the server's).
+       *
+       * This in addition prevents from verifying self signed certificates
+       * against themselves. This although not bad caused verification
+       * failures on some root self signed certificates that use the MD2
+       * algorithm.
+       */
+      if (gnutls_x509_crt_check_issuer (certificate_list[clist_size - 1],
+  				    certificate_list[clist_size - 1]) > 0)
+        {
+          clist_size--;
+        }
+    }
+
   /* Verify the last certificate in the certificate path
    * against the trusted CA certificate list.
    *
