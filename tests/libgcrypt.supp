@@ -74,6 +74,7 @@
    libgcrypt5
    Memcheck:Leak
    fun:malloc
+   fun:_gcry_private_malloc
    fun:do_malloc
    fun:_gcry_malloc
    fun:_gcry_xmalloc
@@ -90,6 +91,23 @@
    libgcrypt6
    Memcheck:Leak
    fun:malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_xmalloc
+   fun:_gcry_xcalloc
+   fun:initialize
+   fun:_gcry_create_nonce
+   fun:gcry_create_nonce
+   fun:wrap_gcry_rnd_init
+   fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt7
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
    fun:do_malloc
    fun:_gcry_malloc
    fun:_gcry_xmalloc
