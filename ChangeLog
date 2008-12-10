@@ -1,3 +1,255 @@
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.3.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Check ca=false with flags too.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/tests/test-lseek.sh.diff, gl/tests/test-lseek.sh,
+	lib/gl/tests/test-lseek.sh: Disable parts of gnulib self-tests that
+	fail on mingw.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gl/tests/test-lseek.c, maint.mk: Update gnulib files.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/tests/test-lseek.c.diff,
+	gl/override/tests/test-select-in.sh.diff, gl/tests/test-lseek.c,
+	gl/tests/test-select-in.sh: Disable parts of gnulib self-tests that
+	fail on mingw.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-cxx.cpp: Drop config.h, not needed (hopefully?)
+	and breaks mingw due to rpl_gmtime.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Certtool need libgnutls etc for
+	libcmd-certtool.la too, due to certtool-cfg.c.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509self.c: Fix comments.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/cve-2008-4989.c: Align with Nikos' patch.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/Makefile.am, lib/opencdk/armor.c,
+	lib/opencdk/keydb.c, lib/opencdk/literal.c, lib/opencdk/misc.c,
+	lib/opencdk/new-packet.c, lib/opencdk/read-packet.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c: Revert "Fix warnings
+	in opencdk." This reverts commit 59cddc711e55bbd094bdf95986277fb33ba964ee.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Revert last commit.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Add GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT flag
+	when needed.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Add hbci chain.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Fix comments.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Fix order to match comments.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Don't fail on expect errors, to allow more
+	information to be collected.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/verify.c: Revert Nikos revert, and fix verification
+	hopefully better.  The new logic is to include the CA cert in
+	validation, but short-cut full validation of trusted certificates.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Add chain with CA having a basic constraint
+	saying CA=FALSE.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/cve-2008-4989.c: Add note.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/Makefile.am, tests/chainverify.c: Add self-test of
+	chain verification logic.
+
+2008-12-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/libgcrypt.supp: Ignore more.
+
+2008-12-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-12-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/verify.c: reintroduced the self signed certificate
+	removal code. This time shouldn't have the drawbacks that used to.
+
+2008-12-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Disable secmem rather than overriding
+	libgcrypt memory allocators.  Suggested by Werner Koch in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.libgcrypt.devel/2056>.
+
+2008-12-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_global.c: rearranged initialization stuff based on
+	Werner's suggestions.
+
+2008-12-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool.c: gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0) is
+	being called after libgcrypt initialization (gnutls_global_init).
+
+2008-12-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/Makefile.am, lib/opencdk/armor.c,
+	lib/opencdk/keydb.c, lib/opencdk/literal.c, lib/opencdk/misc.c,
+	lib/opencdk/new-packet.c, lib/opencdk/read-packet.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c: Fix warnings in
+	opencdk.
+
+2008-12-03  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/manywarnings.m4: Add.
+
+2008-12-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, gl/Makefile.am, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/include_next.m4, gl/m4/warnings.m4,
+	gl/stdint.in.h, gl/sys_time.in.h, lib/gl/m4/include_next.m4,
+	lib/gl/stdint.in.h: Update gnulib files.
+
+2008-11-29  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* tests/x509self.c: Incorporated patch (with modifications) from Joe
+	Orton that also checks the rehandshake capabilities.
+
+2008-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/Makefile.am, lib/openpgp/Makefile.am,
+	libextra/Makefile.am, tests/Makefile.am: Fix minitasn1 -I's.
+
+2008-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am: Fix minitasn1 -I.
+
+2008-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.c: Fix compiler warning.
+
+2008-11-23  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Libreadline is needed by libcmd_certtool.la, not
+	certtool.  Reported by Arfrever Frehtes Taifersar Arahesis
+	<arfrever.fta@gmail.com> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3293>.
+
+2008-11-23  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/opencdk/context.h, lib/opencdk/literal.c, lib/opencdk/misc.c,
+	lib/opencdk/new-packet.c, lib/opencdk/opencdk.h,
+	lib/opencdk/read-packet.c: Converted non-C compliant code to
+	standard C. The usage of structures like: struct x {   int el1;   char str[1]; } and the trick of using a single allocation for str and the structure
+	itself by allocating sizeof(x) + strlen()-1, are questionable. They
+	were converted to: struct x {   int el1;   char *str; } and there is a single allocation of sizeof(x)+strlen() but then the
+	str pointer is updated to point to the rest of the data.
+
+2008-11-23  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_buffers.c, lib/gnutls_int.h, lib/gnutls_str.c,
+	lib/gnutls_str.h, lib/x509/dn.c: When reading data from a buffer
+	(gnutls_string) avoid memmoving all remaining data.  This will speed
+	up short byte reads.
+
+2008-11-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/TODO: reorganized goals
+
+2008-11-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/cli.c: return non zero error code on error conditions.
+
+2008-11-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/certtool.cfg: better grouping of configuration directives
+
+2008-11-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* : commit 8b14ab18cf5e5214ac3d28412e0c503e83a753c1 Author: Nikos
+	Mavrogiannopoulos <nmav@crystal.(none)> Date:   Fri Nov 21 21:02:45
+	2008 +0200
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_compress.c: Clean up LZO initialization.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c: Don't use // comments.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Change link order, so that gnulib is last.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/LINGUAS: Sync with TP.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/LINGUAS: Sync with TP.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/LINGUAS, lib/po/ms.po.in: Sync with TP.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2008-11-18  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-11-18  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.2.
