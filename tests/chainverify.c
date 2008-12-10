@@ -310,6 +310,49 @@ static const char *pem_self_cert[] = {
   NULL
 };
 
+
+/* chain 4 (CA constraint FALSE in CA cert)*/
+static const char *thea_chain[] = {
+  /* chain[0] */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIC7DCCAlWgAwIBAgIBATANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJERTEM\n"
+  "MAoGA1UECBMDUkxQMSAwHgYDVQQKExdUZWNobmlzY2hlIFVuaXZlcnNpdGFldDEb\n"
+  "MBkGA1UECxMSRmFjaGJlcmVpY2ggUGh5c2lrMQswCQYDVQQDEwJDQTAeFw0wODA5\n"
+  "MTExMDUyMDdaFw0xODA5MDkxMDUyMDdaMIGTMQswCQYDVQQGEwJERTEMMAoGA1UE\n"
+  "CBMDUkxQMRcwFQYDVQQHEw5LYWlzZXJzbGF1dGVybjEgMB4GA1UEChMXVGVjaG5p\n"
+  "c2NoZSBVbml2ZXJzaXRhZXQxGzAZBgNVBAsTEkZhY2hiZXJlaWNoIFBoeXNpazEe\n"
+  "MBwGA1UEAxMVdGhlYS5waHlzaWsudW5pLWtsLmRlMIGfMA0GCSqGSIb3DQEBAQUA\n"
+  "A4GNADCBiQKBgQC/gTUrXSeNvuRH+ibdR7zvlCGs+66C6tDaq14SpEDiY/FEw/S4\n"
+  "mkhsHohiQkmqpcPJ0FONok7bvJryKZwwhGFHeESvvWjFVNIdxFgf6Jx2McKsRzBD\n"
+  "nbgVNeK6bywh2L5WgOeckRm0vUxCwX+jWtETorNHSYnZI9smmBtJ1FIPkQIDAQAB\n"
+  "o3sweTAJBgNVHRMEAjAAMCwGCWCGSAGG+EIBDQQfFh1PcGVuU1NMIEdlbmVyYXRl\n"
+  "ZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUS0IiRshnnlH2bneYeCn6OkY9nZAwHwYD\n"
+  "VR0jBBgwFoAU+rCwSUUzK53X9W5otZG4okyY/rswDQYJKoZIhvcNAQEFBQADgYEA\n"
+  "g0f6XFxpUL2hncpQcnKorNYdOkZkZHiKqu2SINtla+IbLZFO4nVVO+LKt+RCo2o7\n"
+  "tZIMLEU3aCeH5dgSEKQeyL5MPMg3MbA6ezjOBTkT/YgngzM4CMLOKcvAMLncfH/z\n"
+  "GYBW1DXijIy1r/SxO0k9zy8OEtKeOOUO0GqQTWuTOOg=\n"
+  "-----END CERTIFICATE-----\n",
+  /* chain[1] (CA) */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIICvzCCAiigAwIBAgIBADANBgkqhkiG9w0BAQUFADBnMQswCQYDVQQGEwJERTEM\n"
+  "MAoGA1UECBMDUkxQMSAwHgYDVQQKExdUZWNobmlzY2hlIFVuaXZlcnNpdGFldDEb\n"
+  "MBkGA1UECxMSRmFjaGJlcmVpY2ggUGh5c2lrMQswCQYDVQQDEwJDQTAeFw0wODA5\n"
+  "MTExMDQ3NDRaFw0xODA5MDkxMDQ3NDRaMGcxCzAJBgNVBAYTAkRFMQwwCgYDVQQI\n"
+  "EwNSTFAxIDAeBgNVBAoTF1RlY2huaXNjaGUgVW5pdmVyc2l0YWV0MRswGQYDVQQL\n"
+  "ExJGYWNoYmVyZWljaCBQaHlzaWsxCzAJBgNVBAMTAkNBMIGfMA0GCSqGSIb3DQEB\n"
+  "AQUAA4GNADCBiQKBgQC76RbqsB5J+VvU1KbBCrkIL3lgY8BxgFvYF3HiHgxtCdqq\n"
+  "BmRpAaDBcVAuEb1ihhP68181sYQ1UPMY+zwBwXVNSVvjeBba1JjGmagwPnJXOCay\n"
+  "7Cw5orY8KB7U33neEOGrlz1EKQGVaPsr993wGD/7AmntuVuxrRVpzoDP5s0PIwID\n"
+  "AQABo3sweTAJBgNVHRMEAjAAMCwGCWCGSAGG+EIBDQQfFh1PcGVuU1NMIEdlbmVy\n"
+  "YXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQU+rCwSUUzK53X9W5otZG4okyY/rsw\n"
+  "HwYDVR0jBBgwFoAU+rCwSUUzK53X9W5otZG4okyY/rswDQYJKoZIhvcNAQEFBQAD\n"
+  "gYEAUT+LmosiDHGuLAZmY40obam0eexJzn/g++mDy3FMh3WmMBKSsfwFsFsQ4k7N\n"
+  "lv1SCfTYeh2hpw/DQzkiYZUkcQI4mBR4hG5Zv56AfYQLGeLtN4VOOCMxguftvzv0\n"
+  "kziQa2QW+VzVJqV1gpRCRT30Jaa9s4u6ipO9DT5N03F4CcI=\n"
+  "-----END CERTIFICATE-----\n",
+  NULL
+};
+
 static struct
 {
   const char **chain;
@@ -321,6 +364,7 @@ static struct
   { pem_self_cert, &pem_self_cert[0], 0 },
   { verisign_com_chain, &verisign_com_chain[3], 0 },
   { citibank_com_chain, &citibank_com_chain[2], 0 },
+  { thea_chain, &thea_chain[1], GNUTLS_CERT_INVALID },
   { NULL, NULL, 0}
 };
 /* *INDENT-ON* */
