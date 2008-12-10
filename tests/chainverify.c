@@ -361,9 +361,9 @@ static struct
 } chains[] =
 {
   { cve_2008_4989_chain, &cve_2008_4989_chain[2], GNUTLS_CERT_INVALID },
-  { pem_self_cert, &pem_self_cert[0], 0 },
   { verisign_com_chain, &verisign_com_chain[3], 0 },
   { citibank_com_chain, &citibank_com_chain[2], 0 },
+  { pem_self_cert, &pem_self_cert[0], 0 },
   { thea_chain, &thea_chain[1], GNUTLS_CERT_INVALID },
   { NULL, NULL, 0}
 };
