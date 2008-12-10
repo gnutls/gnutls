@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.7.3 (unreleased)
 
+** gnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
+Reported by Michael Kiefer <Michael-Kiefer@web.de> in
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
+Andreas Metzler <ametzler@downhill.at.eu.org> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
+
 ** gnutls: Libgcrypt initialization changed.
 If libgcrypt has not already been initialized, GnuTLS will now
 initialize libgcrypt with disabled secure memory.  Initialize
