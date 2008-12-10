@@ -11,6 +11,13 @@ Reported by Michael Kiefer <Michael-Kiefer@web.de> in
 Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
 
+** gnutls: Fix memory leak in PSK authentication.
+Reported by Michael Weiser <michael@weiser.dinsnail.net> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1465>.
+
+** certtool: Move gcry_control(GCRYCTL_ENABLE_QUICK_RANDOM, 0) call earlier.
+It needs to be invoked before libgcrypt is initialized.
+
 * Version 2.6.2 (released 2008-11-12)
 
 ** libgnutls: Fix crash in X.509 validation code for self-signed certificates.
