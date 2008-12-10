@@ -255,8 +255,9 @@ initialize_tls_session (void)
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
   /* request client certificate if any.
-   */
-//  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+     Moved to later on to be able to test re-handshakes.
+  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+  */
 
   gnutls_dh_set_prime_bits (session, DH_BITS);
 
