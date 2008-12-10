@@ -595,8 +595,7 @@ armor_decode (void *data, FILE * in, FILE * out)
   afx->crc_okay = (afx->crc == crc2) ? 1 : 0;
   if (!afx->crc_okay && !rc)
     {
-      _cdk_log_debug ("file crc=%08lX afx_crc=%08lX\n",
-		      (unsigned long) crc2, (unsigned long) afx->crc);
+      _cdk_log_debug ("file crc=%08lX afx_crc=%08lX\n", crc2, afx->crc);
       rc = CDK_Armor_CRC_Error;
     }
 

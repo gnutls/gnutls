@@ -388,7 +388,7 @@ _cdk_copy_userid (cdk_pkt_userid_t * dst, cdk_pkt_userid_t src)
   u = cdk_calloc (1, sizeof *u + strlen (src->name) + 2);
   if (!u)
     return CDK_Out_Of_Core;
-  u->name = (char*) (u + sizeof(*u));
+  u->name = (void*)u + sizeof(*u);
 
   memcpy (u, src, sizeof *u);
   memcpy (u->name, src->name, strlen (src->name));
@@ -627,7 +627,7 @@ cdk_subpkt_new (size_t size)
   s = cdk_calloc (1, sizeof *s + size + 2);
   if (!s)
     return NULL;
-  s->d = (char*) (s + sizeof(*s));
+  s->d = (void*)s + sizeof(*s);
 
   return s;
 }

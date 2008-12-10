@@ -48,14 +48,13 @@ static cdk_kbnode_t find_selfsig_node (cdk_kbnode_t key, cdk_pkt_pubkey_t pk);
 static char *
 keydb_idx_mkname (const char *file)
 {
-  const char *add = ".idx";
-  char *fname;
+  char *fname, *fmt;
 
-  fname = cdk_calloc (1, strlen (file) + strlen (add) + 1);
+  fmt = "%s.idx";
+  fname = cdk_calloc (1, strlen (file) + strlen (fmt) + 1);
   if (!fname)
     return NULL;
-  strcpy (fname, file);
-  strcat (fname, add);
+  sprintf (fname, fmt, file);
   return fname;
 }
 
@@ -662,8 +661,7 @@ keydb_cache_add (cdk_keydb_search_t dbs, off_t offset)
   k->next = dbs->cache;
   dbs->cache = k;
   dbs->ncache++;
-  _cdk_log_debug ("cache: add entry off=%ld type=%d\n", (signed long) offset,
-		  dbs->type);
+  _cdk_log_debug ("cache: add entry off=%d type=%d\n", offset, dbs->type);
   return 0;
 }
 
