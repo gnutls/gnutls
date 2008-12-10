@@ -18,6 +18,10 @@ Reported by Michael Weiser <michael@weiser.dinsnail.net> in
 ** certtool: Move gcry_control(GCRYCTL_ENABLE_QUICK_RANDOM, 0) call earlier.
 It needs to be invoked before libgcrypt is initialized.
 
+** gnutls-cli: Return non-zero exit code on error conditions.
+
+** gnutls-cli: Corrected bug which caused a rehandshake request to be ignored.
+
 * Version 2.6.2 (released 2008-11-12)
 
 ** libgnutls: Fix crash in X.509 validation code for self-signed certificates.
