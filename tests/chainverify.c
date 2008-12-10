@@ -378,6 +378,7 @@ tls_log_func (int level, const char *str)
 int
 main (int argc, char *argv[])
 {
+  int exit_val = 0;
   size_t i;
   int ret;
 
@@ -445,10 +446,13 @@ main (int argc, char *argv[])
 	       i, j, gnutls_strerror (ret));
 
       if (verify_status != chains[i].expected_verify_result)
-	error (EXIT_FAILURE, 0, "verify_status: %d expected: %d",
-	       verify_status, chains[i].expected_verify_result);
-
-      printf ("done\n");
+	{
+	  error (0, 0, "verify_status: %d expected: %d",
+		 verify_status, chains[i].expected_verify_result);
+	  exit_val = 1;
+	}
+      else
+	printf ("done\n");
       printf ("\tCleanup...");
 
       gnutls_x509_crt_deinit (ca);
@@ -460,5 +464,5 @@ main (int argc, char *argv[])
 
   gnutls_global_deinit ();
 
-  return 0;
+  return exit_val;
 }
