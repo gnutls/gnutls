@@ -94,7 +94,7 @@ static const char *cve_2008_4989_chain[] = {
   NULL
 };
 
-/* chain 1 */
+/* chain 1 (ends with trusted RSA-MD2 chain) */
 static const char *verisign_com_chain[] = {
   /* chain[0] */
   "-----BEGIN CERTIFICATE-----\n"
@@ -309,7 +309,6 @@ static const char *pem_self_cert[] = {
     "-----END CERTIFICATE-----\n",
   NULL
 };
-
 
 /* chain 4 (CA constraint FALSE in CA cert)*/
 static const char *thea_chain[] = {
