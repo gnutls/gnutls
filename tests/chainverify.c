@@ -34,7 +34,7 @@
 
 /* *INDENT-OFF* */
 
-/* chain 0 */
+/* Triggers incorrect verification success on older versions */
 static const char *cve_2008_4989_chain[] = {
   /* chain[0] */
   "-----BEGIN CERTIFICATE-----\n"
@@ -94,7 +94,7 @@ static const char *cve_2008_4989_chain[] = {
   NULL
 };
 
-/* chain 1 (ends with trusted RSA-MD2 chain) */
+/* Chain length 3 ends with trusted v1 RSA-MD2 chain */
 static const char *verisign_com_chain[] = {
   /* chain[0] */
   "-----BEGIN CERTIFICATE-----\n"
@@ -216,7 +216,7 @@ static const char *verisign_com_chain[] = {
   NULL
 };
 
-/* chain 2 (ends with trusted RSA-MD2 cert) */
+/* Chain length 2 ends with trusted v1 RSA-MD2 cert */
 static const char *citibank_com_chain[] = {
   /* chain[0] */
   "-----BEGIN CERTIFICATE-----\n"
@@ -284,7 +284,7 @@ static const char *citibank_com_chain[] = {
   NULL
 };
 
-/* chain 3 */
+/* Self-signed certificate */
 static const char *pem_self_cert[] = {
   "-----BEGIN CERTIFICATE-----\n"
     "MIIDgjCCAmygAwIBAgIBADALBgkqhkiG9w0BAQUwSzELMAkGA1UEBhMCQlIxFDAS\n"
@@ -310,7 +310,7 @@ static const char *pem_self_cert[] = {
   NULL
 };
 
-/* chain 4 (CA constraint FALSE in CA cert)*/
+/* Chain length 2, CA constraint FALSE in v3 CA cert)*/
 static const char *thea_chain[] = {
   /* chain[0] */
   "-----BEGIN CERTIFICATE-----\n"
@@ -352,7 +352,8 @@ static const char *thea_chain[] = {
   NULL
 };
 
-/* chain 5 */
+/* Chain length 3 ends with trusted v1 RSA-MD2 cert, similar to
+   verisign_com_chain above */
 static const char *hbci_chain[] = {
   /* chain[0] */
   "-----BEGIN CERTIFICATE-----\n"
@@ -423,18 +424,30 @@ static const char *hbci_chain[] = {
 
 static struct
 {
+  const char *name;
   const char **chain;
   const char **ca;
+  int verify_flags;
   int expected_verify_result;
 } chains[] =
 {
-  { cve_2008_4989_chain, &cve_2008_4989_chain[2], GNUTLS_CERT_INVALID },
-  { verisign_com_chain, &verisign_com_chain[3], 0 },
-  { citibank_com_chain, &citibank_com_chain[2], 0 },
-  { pem_self_cert, &pem_self_cert[0], 0 },
-  { thea_chain, &thea_chain[1], GNUTLS_CERT_INVALID },
-  { hbci_chain, &hbci_chain[2], 0 },
-  { NULL, NULL, 0}
+  { "CVE-2008-4989", cve_2008_4989_chain, &cve_2008_4989_chain[2],
+    0, GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID },
+  { "verisign.com v1 fail", verisign_com_chain, &verisign_com_chain[3],
+    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+  { "verisign.com v1 ok", verisign_com_chain, &verisign_com_chain[3],
+    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, 0 },
+  { "citibank.com v1 fail", citibank_com_chain, &citibank_com_chain[2],
+    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+  { "self signed", pem_self_cert, &pem_self_cert[0],
+    0, 0 },
+  { "ca=false", thea_chain, &thea_chain[1],
+    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+  { "hbci v1 fail", hbci_chain, &hbci_chain[2],
+    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID},
+  { "hbci v1 ok", hbci_chain, &hbci_chain[2],
+    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, 0 },
+  { NULL, NULL, NULL, 0}
 };
 /* *INDENT-ON* */
 
@@ -469,7 +482,7 @@ main (int argc, char *argv[])
       gnutls_datum_t tmp;
       size_t j;
 
-      printf ("Chain %d...\n", i);
+      printf ("Chain '%s' (%d)...\n", chains[i].name, i);
 
       for (j = 0; chains[i].chain[j]; j++)
 	{
@@ -509,7 +522,9 @@ main (int argc, char *argv[])
       printf ("\tVerifying...");
 
       ret = gnutls_x509_crt_list_verify (certs, j,
-					 &ca, 1, NULL, 0, 0, &verify_status);
+					 &ca, 1, NULL, 0,
+					 chains[i].verify_flags,
+					 &verify_status);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify[%d,%d]: %s",
 	       i, j, gnutls_strerror (ret));
