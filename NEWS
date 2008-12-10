@@ -25,6 +25,13 @@ Reported by Michael Weiser <michael@weiser.dinsnail.net> in
 
 ** gnutls: Small byte reads via gnutls_record_recv() optimized.
 
+** certtool: Move gcry_control(GCRYCTL_ENABLE_QUICK_RANDOM, 0) call earlier.
+It needs to be invoked before libgcrypt is initialized.
+
+** gnutls-cli: Return non-zero exit code on error conditions.
+
+** gnutls-cli: Corrected bug which caused a rehandshake request to be ignored.
+
 ** tests: Added chainverify self-test that tests X.509 chain verifications.
 
 ** API and ABI modifications:
