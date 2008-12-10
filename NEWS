@@ -15,6 +15,8 @@ real change in behaviour.
 
 ** gnutls: Small byte reads via gnutls_record_recv() optimized.
 
+** tests: Added chainverify self-test that tests X.509 chain verifications.
+
 ** API and ABI modifications:
 No changes since last version.
 
