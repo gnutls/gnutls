@@ -19,6 +19,10 @@ memory.  Before GnuTLS initialized libgcrypt to use GnuTLS's memory
 allocation functions, which doesn't use secure memory, so there is no
 real change in behaviour.
 
+** gnutls: Fix memory leak in PSK authentication.
+Reported by Michael Weiser <michael@weiser.dinsnail.net> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1465>.
+
 ** gnutls: Small byte reads via gnutls_record_recv() optimized.
 
 ** tests: Added chainverify self-test that tests X.509 chain verifications.
