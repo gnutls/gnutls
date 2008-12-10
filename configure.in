@@ -22,7 +22,7 @@ dnl Process this file with autoconf to produce a configure script.
 # USA
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [2.6.2], [bug-gnutls@gnu.org])
+AC_INIT([GnuTLS], [2.6.3], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -34,7 +34,7 @@ AM_CONFIG_HEADER(config.h)
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 AC_SUBST(LT_CURRENT, 37)
-AC_SUBST(LT_REVISION, 3)
+AC_SUBST(LT_REVISION, 4)
 AC_SUBST(LT_AGE, 11)
 
 # Used when creating the Windows libgnutls-XX.def files.
