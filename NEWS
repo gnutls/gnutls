@@ -9,6 +9,8 @@ See the end for copying conditions.
 Patch from David Marín Carreño <davefx@gmail.com> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3321>.
 
+** gnutls: gnutls_x509_crq_print will now also print public key id.
+
 ** API and ABI modifications:
 gnutls_x509_crq_get_key_id: ADDED.
 
