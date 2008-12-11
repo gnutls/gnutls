@@ -1886,6 +1886,42 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
   }
 }
 
+static void
+print_crq_other (gnutls_string * str, gnutls_x509_crq_t crq)
+{
+  int err;
+  size_t size = 0;
+  char *buffer = NULL;
+
+  err = gnutls_x509_crq_get_key_id (crq, 0, buffer, &size);
+  if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  buffer = gnutls_malloc (size);
+  if (!buffer)
+    {
+      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  err = gnutls_x509_crq_get_key_id (crq, 0, buffer, &size);
+  if (err < 0)
+    {
+      gnutls_free (buffer);
+      addf (str, "error: get_key_id2: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  addf (str, _("\tPublic Key Id:\n\t\t"));
+  hexprint (str, buffer, size);
+  adds (str, "\n");
+
+  gnutls_free (buffer);
+}
+
 /**
  * gnutls_x509_crq_print - Pretty print PKCS 10 certificate request
  * @cert: The structure to be printed
@@ -1911,11 +1947,14 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
 
   _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
 
-  _gnutls_string_append_str (&str,
-			     _
-			     ("PKCS #10 Certificate Request Information:\n"));
+  _gnutls_string_append_str
+    (&str, _("PKCS #10 Certificate Request Information:\n"));
 
   print_crq (&str, crq);
+
+  _gnutls_string_append_str (&str, _("Other Information:\n"));
+
+  print_crq_other (&str, crq);
 
   _gnutls_string_append_data (&str, "\0", 1);
   out->data = str.data;
