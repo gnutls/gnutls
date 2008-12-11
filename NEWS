@@ -3,6 +3,15 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 2.7.4 (unreleased)
+
+** gnutls: New interface to get key id for certificate requests.
+Patch from David Marín Carreño <davefx@gmail.com> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3321>.
+
+** API and ABI modifications:
+gnutls_x509_crq_get_key_id: ADDED.
+
 * Version 2.7.3 (released 2008-12-10)
 
 ** gnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.

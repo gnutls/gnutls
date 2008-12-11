@@ -738,6 +738,9 @@ extern "C"
   int gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq,
 					unsigned int *bits);
 
+  int gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
+				  unsigned char *output_data,
+				  size_t * output_data_size);
   int gnutls_x509_crq_get_key_rsa_raw (gnutls_x509_crq_t crq,
 				       gnutls_datum_t * m,
 				       gnutls_datum_t * e);
