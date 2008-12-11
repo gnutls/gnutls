@@ -338,6 +338,7 @@ APIMANS += gnutls_x509_crq_set_basic_constraints.3
 APIMANS += gnutls_x509_crq_set_key_usage.3
 APIMANS += gnutls_x509_crq_get_key_purpose_oid.3
 APIMANS += gnutls_x509_crq_set_key_purpose_oid.3
+APIMANS += gnutls_x509_crq_get_key_id.3
 APIMANS += gnutls_x509_dn_init.3
 APIMANS += gnutls_x509_dn_import.3
 APIMANS += gnutls_x509_dn_deinit.3
