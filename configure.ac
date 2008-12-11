@@ -184,30 +184,29 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
-# Disable useless warnings.
-W=
-W="$W -Wsystem-headers"         # Don't let system headers trigger warnings
-W="$W -Wc++-compat"             # We don't care strongly about C++ compilers
-W="$W -Wundef"                  # Warns on '#if GNULIB_PORTCHECK' etc in gnulib
-W="$W -Wtraditional"            # Warns on #elif which we use often
-W="$W -Wlogical-op"             # Too many false positives
-W="$W -Wold-style-definition"   # 
-W="$W -Wpadded"                 # Our structs are not padded
-W="$W -Wunreachable-code"       # Too many false positives
-W="$W -Wtraditional-conversion" # Too many warnings for now
-W="$W -Wcast-qual"              # Too many warnings for now
-W="$W -Waggregate-return"       # Too many warnings for now
-W="$W -Wshadow"                 # Too many warnings for now
-W="$W -Wswitch-default"         # Too many warnings for now
-W="$W -Wswitch-enum"            # Too many warnings for now
-W="$W -Wconversion"             # Too many warnings for now
-W="$W -Wsign-conversion"        # Too many warnings for now
-W="$W -Wformat-y2k"             # Too many warnings for now
-W="$W -Wunsafe-loop-optimizations"
-W="$W -Wstrict-overflow"
-gl_MANYWARN_ALL_GCC([WARNINGS])
-gl_MANYWARN_COMPLEMENT(WARNINGS, [$WARNINGS], [$W])
-for w in $WARNINGS; do
+# Add many warnings, except some...
+nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
+nw="$nw -Wc++-compat"             # We don't care about C++ compilers
+nw="$nw -Wundef"                  # Warns on '#if GNULIB_FOO' etc in gnulib
+nw="$nw -Wtraditional"            # Warns on #elif which we use often
+nw="$nw -Wlogical-op"             # Too many false positives
+nw="$nw -Wold-style-definition"   # 
+nw="$nw -Wpadded"                 # Our structs are not padded
+nw="$nw -Wunreachable-code"       # Too many false positives
+nw="$nw -Wtraditional-conversion" # Too many warnings for now
+nw="$nw -Wcast-qual"              # Too many warnings for now
+nw="$nw -Waggregate-return"       # Too many warnings for now
+nw="$nw -Wshadow"                 # Too many warnings for now
+nw="$nw -Wswitch-default"         # Too many warnings for now
+nw="$nw -Wswitch-enum"            # Too many warnings for now
+nw="$nw -Wconversion"             # Too many warnings for now
+nw="$nw -Wsign-conversion"        # Too many warnings for now
+nw="$nw -Wformat-y2k"             # Too many warnings for now
+nw="$nw -Wunsafe-loop-optimizations"
+nw="$nw -Wstrict-overflow"
+gl_MANYWARN_ALL_GCC([ws])
+gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
+for w in $ws; do
   gl_WARN_ADD([$w])
 done
 gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
