@@ -26,9 +26,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Interfaces changed/added/removed:   CURRENT++       REVISION=0
   # Interfaces added:                             AGE++
   # Interfaces removed:                           AGE=0
-  AC_SUBST(LT_CURRENT, 38)
-  AC_SUBST(LT_REVISION, 3)
-  AC_SUBST(LT_AGE, 12)
+  AC_SUBST(LT_CURRENT, 39)
+  AC_SUBST(LT_REVISION, 0)
+  AC_SUBST(LT_AGE, 13)
 
   # Used when creating the Windows libgnutls-XX.def files.
   SOVERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
