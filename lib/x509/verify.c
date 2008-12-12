@@ -374,7 +374,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
   int i = 0, ret;
   unsigned int status = 0, output;
 
-  if (clist_size > 1) 
+  if (clist_size > 1)
     {
       /* Check if the last certificate in the path is self signed.
        * In that case ignore it (a certificate is trusted only if it
@@ -386,10 +386,10 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
        * algorithm.
        */
       if (gnutls_x509_crt_check_issuer (certificate_list[clist_size - 1],
-  				    certificate_list[clist_size - 1]) > 0)
-        {
-          clist_size--;
-        }
+					certificate_list[clist_size - 1]) > 0)
+	{
+	  clist_size--;
+	}
     }
 
   /* Verify the last certificate in the certificate path
