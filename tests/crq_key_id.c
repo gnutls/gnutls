@@ -29,6 +29,8 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+#include "utils.h"
+
 void
 doit (void)
 {
@@ -45,14 +47,14 @@ doit (void)
 
   int ret;
 
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
+
   ret = gnutls_global_init ();
   if (ret < 0)
     fail ("gnutls_global_init: %d\n", ret);
 
-
   for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_DSA; algorithm++)
     {
-
       ret = gnutls_x509_crq_init (&crq);
       if (ret < 0)
 	fail ("gnutls_x509_crq_init: %d\n", ret);
@@ -164,9 +166,7 @@ doit (void)
 
       gnutls_x509_crq_deinit (crq);
       gnutls_x509_privkey_deinit (pkey);
-
     }
 
   gnutls_global_deinit ();
-
 }
