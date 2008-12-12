@@ -26,6 +26,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <gcrypt.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
