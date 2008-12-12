@@ -1,3 +1,56 @@
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.6.3.
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Fix whitespace.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.  Add NEWS item.
+
+2008-12-04  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/certtool.c: gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0) is
+	being called after libgcrypt initialization (gnutls_global_init).
+
+2008-12-05  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/verify.c: reintroduced the self signed certificate
+	removal code. This time shouldn't have the drawbacks that used to.
+
+2008-11-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/cli.c: return non zero error code on error conditions.
+
+2008-11-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* src/cli.c: Corrected bug which caused a rehandshake request to be
+	ignored by gnutls-cli. Now a rehandshake is being performed on
+	request.
+
+2008-11-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_auth.c: Make it build.
+
+2008-11-15  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_auth.c: Corrected memory leak in
+	_gnutls_free_auth_info(). Trace and patch by Michael Weiser.
+
+2008-11-12  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-11-12  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.6.2.
