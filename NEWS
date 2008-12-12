@@ -11,6 +11,8 @@ Patch from David Marín Carreño <davefx@gmail.com> in
 
 ** gnutls: gnutls_x509_crq_print will now also print public key id.
 
+** tests: Add crq_key_id self-test of gnutls_x509_crq_get_key_id.
+
 ** API and ABI modifications:
 gnutls_x509_crq_get_key_id: ADDED.
 
