@@ -185,6 +185,28 @@ gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_print: ADDED
 gnutls_x509_crt_set_crq_extensions: ADDED
 
+* Version 2.6.3 (released 2008-12-12)
+
+** gnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
+Reported by Michael Kiefer <Michael-Kiefer@web.de> in
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
+Andreas Metzler <ametzler@downhill.at.eu.org> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
+
+** gnutls: Fix memory leak in PSK authentication.
+Reported by Michael Weiser <michael@weiser.dinsnail.net> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1465>.
+
+** certtool: Move gcry_control(GCRYCTL_ENABLE_QUICK_RANDOM, 0) call earlier.
+It needs to be invoked before libgcrypt is initialized.
+
+** gnutls-cli: Return non-zero exit code on error conditions.
+
+** gnutls-cli: Corrected bug which caused a rehandshake request to be ignored.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.6.2 (released 2008-11-12)
 
 ** libgnutls: Fix crash in X.509 validation code for self-signed certificates.
