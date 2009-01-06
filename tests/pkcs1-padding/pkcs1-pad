@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005, 2006, 2008 Free Software Foundation
+# Copyright (C) 2004, 2005, 2006, 2008, 2009 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -25,7 +25,7 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 # Test 1, PKCS#1 pad digestAlgorithm.parameters
 
-EXPECT1=2101
+EXPECT1=3102
 
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2
@@ -49,7 +49,7 @@ echo "PKCS1-PAD1 OK"
 
 # Test 2, Bleichenbacher's Crypto 06 rump session
 
-EXPECT2=1001
+EXPECT2=2002
 
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok2.pem | tee out1
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken2.pem | tee out2
@@ -74,7 +74,7 @@ echo "PKCS1-PAD2 OK"
 # Test 3, forged Starfield certificate,
 # by Andrei Pyshkin, Erik Tews and Ralf-Philipp Weinmann.
 
-EXPECT3=11
+EXPECT3=12
 
 $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken3.pem | tee out1
 
