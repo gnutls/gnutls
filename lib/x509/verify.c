@@ -320,6 +320,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
 	{
 	  if (output)
 	    *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
+	  ret = 0;
 	}
     }
 
@@ -1036,6 +1037,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
       {
 	if (output)
 	  *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
+	ret = 0;
       }
   }
 
