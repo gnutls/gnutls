@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Free Software Foundation
+ * Copyright (C) 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -422,6 +422,50 @@ static const char *hbci_chain[] = {
   NULL
 };
 
+/* End-entity cert signed using RSA-MD5. */
+static const char *mayfirst_chain[] = {
+  /* chain[0] */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIDVTCCAr6gAwIBAgIDCHp1MA0GCSqGSIb3DQEBBAUAMFoxCzAJBgNVBAYTAlVT\n"
+  "MRwwGgYDVQQKExNFcXVpZmF4IFNlY3VyZSBJbmMuMS0wKwYDVQQDEyRFcXVpZmF4\n"
+  "IFNlY3VyZSBHbG9iYWwgZUJ1c2luZXNzIENBLTEwHhcNMDgwNTE5MDUyOTE5WhcN\n"
+  "MDkxMDE5MDUyOTE5WjCBxDELMAkGA1UEBhMCVVMxHTAbBgNVBAoTFHN1cHBvcnQu\n"
+  "bWF5Zmlyc3Qub3JnMRMwEQYDVQQLEwpHVDY5MDc5ODgwMTEwLwYDVQQLEyhTZWUg\n"
+  "d3d3LnJhcGlkc3NsLmNvbS9yZXNvdXJjZXMvY3BzIChjKTA3MS8wLQYDVQQLEyZE\n"
+  "b21haW4gQ29udHJvbCBWYWxpZGF0ZWQgLSBSYXBpZFNTTChSKTEdMBsGA1UEAxMU\n"
+  "c3VwcG9ydC5tYXlmaXJzdC5vcmcwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGB\n"
+  "AN0TWIZwJ/hIfMHc08/bBMlzZ5WucJqEvxU/ZnxPo/H6V/m4v1iLpM2hip2c5cg0\n"
+  "BcEMc/TBHQ1UEV8sb0Lh91kWfiMB1Sp+L2Fpz/wnhsivXC5j6jq9IcPqmOZOXBYX\n"
+  "k04W1B6FKTvk9KrZJ0at2J44hp4SsAfWQI0eCKuas+R1AgMBAAGjgb0wgbowDgYD\n"
+  "VR0PAQH/BAQDAgTwMB0GA1UdDgQWBBS0D4iuCxp35TLADTkINq2AhgTYVTA7BgNV\n"
+  "HR8ENDAyMDCgLqAshipodHRwOi8vY3JsLmdlb3RydXN0LmNvbS9jcmxzL2dsb2Jh\n"
+  "bGNhMS5jcmwwHwYDVR0jBBgwFoAUvqigdHJQa0S3ySPY+6j/s1draGwwHQYDVR0l\n"
+  "BBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwDQYJKoZIhvcN\n"
+  "AQEEBQADgYEAXNWYnrO1mZgBSCwPlWhVa2aOKGCFmehLIcAPEBN+8xhXuOeigYBm\n"
+  "ic5ShCO583ttgHNCV3Y5dW9sNhv1US4vSb6soKjgUlG11fJKUqU8mwFKvbs7TUSq\n"
+  "j6h+1uvlfFI34WzODjJloY4QSM7FmbnW+HCiFKYyvra3iUqjcl9AeR4=\n"
+  "-----END CERTIFICATE-----\n",
+  /* chain[1] (CA) */
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIICkDCCAfmgAwIBAgIBATANBgkqhkiG9w0BAQQFADBaMQswCQYDVQQGEwJV\n"
+  "UzEcMBoGA1UEChMTRXF1aWZheCBTZWN1cmUgSW5jLjEtMCsGA1UEAxMkRXF1\n"
+  "aWZheCBTZWN1cmUgR2xvYmFsIGVCdXNpbmVzcyBDQS0xMB4XDTk5MDYyMTA0\n"
+  "MDAwMFoXDTIwMDYyMTA0MDAwMFowWjELMAkGA1UEBhMCVVMxHDAaBgNVBAoT\n"
+  "E0VxdWlmYXggU2VjdXJlIEluYy4xLTArBgNVBAMTJEVxdWlmYXggU2VjdXJl\n"
+  "IEdsb2JhbCBlQnVzaW5lc3MgQ0EtMTCBnzANBgkqhkiG9w0BAQEFAAOBjQAw\n"
+  "gYkCgYEAuucXkAJlsTRVPEnCUdXfp9E3j9HngXNBUmCbnaEXJnitx7HoJpQy\n"
+  "td4zjTov2/KaelpzmKNc6fuKcxtc58O/gGzNqfTWK8D3+ZmqY6KxRwIP1ORR\n"
+  "OhI8bIpaVIRw28HFkM9yRcuoWcDNM50/o5brhTMhHD4ePmBudpxnhcXIw2EC\n"
+  "AwEAAaNmMGQwEQYJYIZIAYb4QgEBBAQDAgAHMA8GA1UdEwEB/wQFMAMBAf8w\n"
+  "HwYDVR0jBBgwFoAUvqigdHJQa0S3ySPY+6j/s1draGwwHQYDVR0OBBYEFL6o\n"
+  "oHRyUGtEt8kj2Puo/7NXa2hsMA0GCSqGSIb3DQEBBAUAA4GBADDiAVGqx+pf\n"
+  "2rnQZQ8w1j7aDRRJbpGTJxQx78T3LUX47Me/okENI7SS+RkAZ70Br83gcfxa\n"
+  "z2TE4JaY0KNA4gGK7ycH8WUBikQtBmV1UsCGECAhX2xrD2yuCRyv8qIYNMR1\n"
+  "pHMc8Y3c7635s3a0kr/clRAevsvIO1qEYBlWlKlV\n"
+  "-----END CERTIFICATE-----\n",
+  NULL
+};
+
 static struct
 {
   const char *name;
@@ -450,6 +494,13 @@ static struct
     0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID},
   { "hbci v1 ok", hbci_chain, &hbci_chain[2],
     GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, 0 },
+  { "rsa-md5 fail", mayfirst_chain, &mayfirst_chain[1],
+    0, GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID },
+  { "rsa-md5 not ok", mayfirst_chain, &mayfirst_chain[1],
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2,
+    GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID },
+  { "rsa-md5 ok", mayfirst_chain, &mayfirst_chain[1],
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5, 0 },
   { NULL, NULL, NULL, 0}
 };
 /* *INDENT-ON* */
