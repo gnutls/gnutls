@@ -66,7 +66,7 @@ $CERTTOOL --generate-certificate --template template \
 num=`cat new-user.pem new-subsubca.pem new-subca.pem new-ca.pem | $CERTTOOL --verify-chain | tee verify | grep -c Verified`
 cat verify
 
-if test "$num" != "4"; then
+if test "$num" != "5"; then
     echo Verification failure
     exit 1
 else
