@@ -1,5 +1,5 @@
 GNU TLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
+Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
@@ -8,7 +8,11 @@ See the end for copying conditions.
 ** gnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
 This is a bugfix -- the previous attempt to do this from internal x509
 certificate verification procedures did not return the correct value
-for certificates using a weak hash.
+for certificates using a weak hash.  Reported by Daniel Kahn Gillmor
+<dkg@fifthhorseman.net> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3332>,
+debugged and patch by Tomas Mraz <tmraz@redhat.com> and Daniel Kahn
+Gillmor <dkg@fifthhorseman.net>.
 
 ** libgnutls: Fix compile error with Sun CC.
 Reported by Jeff Cai <jeff.cai@sun.com> in
