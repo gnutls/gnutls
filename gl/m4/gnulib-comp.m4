@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2008 Free Software Foundation, Inc.
+# Copyright (C) 2002-2009 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -115,6 +115,7 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_MINMAX
+  gl_MULTIARCH
   gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
@@ -441,6 +442,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/malloc.m4
   m4/manywarnings.m4
   m4/minmax.m4
+  m4/multiarch.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/perror.m4

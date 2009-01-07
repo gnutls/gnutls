@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2008 Free Software Foundation, Inc.
+# Copyright (C) 2002-2009 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -60,6 +60,7 @@ AC_DEFUN([lgl_INIT],
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
   gl_MINMAX
+  gl_MULTIARCH
   gl_HEADER_NETDB
   gl_FUNC_READ_FILE
   gl_FUNC_REALLOC_POSIX
@@ -311,6 +312,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/memmem.m4
   m4/memmove.m4
   m4/minmax.m4
+  m4/multiarch.m4
   m4/netdb_h.m4
   m4/nls.m4
   m4/po.m4
