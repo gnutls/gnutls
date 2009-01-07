@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
@@ -35,8 +35,6 @@
 #include <gnutls/openpgp.h>
 #include <time.h>
 #include <common.h>
-
-#define TEST_STRING
 
 #define SU(x) (x!=NULL?x:"Unknown")
 

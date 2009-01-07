@@ -1,4 +1,4 @@
-/* Copyright 2007, 2008 Free Software Foundation
+/* Copyright 2007, 2008, 2009 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -21,7 +21,6 @@ extern int tcp_connect (void);
 extern void tcp_close (int sd);
 
 #define MAX_BUF 1024
-#define CRLFILE "crl.pem"
 #define CAFILE "ca.pem"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 

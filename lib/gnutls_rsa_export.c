@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -32,13 +32,6 @@
 #include <gnutls_rsa_export.h>
 #include "x509/x509_int.h"
 #include "debug.h"
-
-/* This function takes a number of bits and returns a supported
- * number of bits. Ie a number of bits that we have a prime in the
- * dh_primes structure.
- */
-
-#define MAX_SUPPORTED_BITS 512
 
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.

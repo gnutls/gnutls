@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
@@ -48,8 +48,6 @@
 #include "common.h"
 #include "cli-gaa.h"
 
-#define SA struct sockaddr
-#define ERR(err,s) do { if (err==-1) {perror(s);return(1);} } while (0)
 #define MAX_BUF 4096
 
 /* global stuff here */

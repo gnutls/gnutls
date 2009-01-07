@@ -1,4 +1,4 @@
-/* Copyright 2007 Free Software Foundation
+/* Copyright 2007, 2009 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -25,10 +25,7 @@ extern void tcp_close (int sd);
 #define USERNAME "user"
 #define PASSWORD "pass"
 #define CAFILE "ca.pem"
-#define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
-
-#define MAX_PRIORITIES 3
 
 int
 main (void)
@@ -43,7 +40,7 @@ main (void)
   gnutls_global_init ();
 
   /* now enable the gnutls-extra library which contains the
-   * SRP stuff. 
+   * SRP stuff.
    */
   gnutls_global_init_extra ();
 
@@ -54,11 +51,11 @@ main (void)
 					  GNUTLS_X509_FMT_PEM);
   gnutls_srp_set_client_credentials (srp_cred, USERNAME, PASSWORD);
 
-  /* connects to server 
+  /* connects to server
    */
   sd = tcp_connect ();
 
-  /* Initialize TLS session 
+  /* Initialize TLS session
    */
   gnutls_init (&session, GNUTLS_CLIENT);
 

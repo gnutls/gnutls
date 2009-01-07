@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -35,11 +35,6 @@
 #include <gnutls_pk.h>
 
 static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params);
-
-/* remove this when libgcrypt can handle the PKCS #1 coefficients from
- * rsa keys
- */
-#define CALC_COEFF 1
 
 /**
  * gnutls_x509_privkey_init - initialize a #gnutls_privkey_t structure

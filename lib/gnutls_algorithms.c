@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -62,9 +62,6 @@ static const gnutls_cred_map cred_mappings[] = {
 
 #define GNUTLS_KX_MAP_ALG_LOOP_SERVER(a) \
                         GNUTLS_KX_MAP_LOOP( if(p->server_type == type) { a; break; })
-
-#define GNUTLS_KX_MAP_ALG_LOOP_CLIENT(a) \
-                        GNUTLS_KX_MAP_LOOP( if(p->client_type == type) { a; break; })
 
 /* KX mappings to PK algorithms */
 typedef struct
@@ -371,8 +368,10 @@ typedef struct
 #define GNUTLS_ANON_DH_AES_256_CBC_SHA1 { 0x00, 0x3A }
 
 /* rfc4132 */
+#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_ANON_DH_CAMELLIA_128_CBC_SHA1 { 0x00,0x46 }
 #define GNUTLS_ANON_DH_CAMELLIA_256_CBC_SHA1 { 0x00,0x89 }
+#endif
 
 /* PSK (not in TLS 1.0)
  * draft-ietf-tls-psk:
@@ -416,8 +415,10 @@ typedef struct
 #define GNUTLS_RSA_AES_256_CBC_SHA1 { 0x00, 0x35 }
 
 /* rfc4132 */
+#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_RSA_CAMELLIA_128_CBC_SHA1 { 0x00,0x41 }
 #define GNUTLS_RSA_CAMELLIA_256_CBC_SHA1 { 0x00,0x84 }
+#endif
 
 /* DHE DSS
  */
@@ -436,8 +437,10 @@ typedef struct
 #define GNUTLS_DHE_DSS_AES_128_CBC_SHA1 { 0x00, 0x32 }
 
 /* rfc4132 */
+#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA1 { 0x00,0x44 }
 #define GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA1 { 0x00,0x87 }
+#endif
 
 /* DHE RSA
  */
@@ -449,8 +452,10 @@ typedef struct
 #define GNUTLS_DHE_RSA_AES_256_CBC_SHA1 { 0x00, 0x39 }
 
 /* rfc4132 */
+#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA1 { 0x00,0x45 }
 #define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA1 { 0x00,0x88 }
+#endif
 
 #define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
 

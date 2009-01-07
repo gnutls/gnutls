@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -141,7 +141,6 @@ end:
 #define SA struct sockaddr
 #define MAX_BUF 1024
 #define PORT 5556		/* listen to 5556 port */
-#define DH_BITS 1024
 
 /* These are global */
 gnutls_psk_server_credentials_t server_pskcred;

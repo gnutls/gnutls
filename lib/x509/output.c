@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Free Software Foundation
+ * Copyright (C) 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -36,7 +36,6 @@
 /* I18n of error codes. */
 #include "gettext.h"
 #define _(String) dgettext (PACKAGE, String)
-#define N_(String) gettext_noop (String)
 
 #define addf _gnutls_string_append_printf
 #define adds _gnutls_string_append_str

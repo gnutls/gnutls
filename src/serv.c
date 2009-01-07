@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2006, 2007, 2008, 2009 Free Software Foundation
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavrogiannopoulos
  *
@@ -85,10 +85,7 @@ char *x509_crlfile = NULL;
 
 #define SMALL_READ_TEST (2147483647)
 
-#define SA struct sockaddr
-#define ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define GERR(ret) fprintf(stdout, "Error: %s\n", safe_strerror(ret))
-#define MAX_BUF 1024
 
 #undef max
 #define max(x,y) ((x) > (y) ? (x) : (y))
@@ -106,8 +103,6 @@ char *x509_crlfile = NULL;
 		"<HTML><BODY>\n" \
 		"<CENTER><H1>This is <a href=\"http://www.gnu.org/software/gnutls\">" \
 		"GNUTLS</a></H1></CENTER>\n\n"
-
-#define RENEGOTIATE
 
 /* These are global */
 gnutls_srp_server_credentials_t srp_cred = NULL;
