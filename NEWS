@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.6.4 (unreleased)
 
+** gnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
+This is a bugfix -- the previous attempt to do this from internal x509
+certificate verification procedures did not return the correct value
+for certificates using a weak hash.
+
 ** libgnutls: Fix compile error with Sun CC.
 Reported by Jeff Cai <jeff.cai@sun.com> in
 <https://savannah.gnu.org/support/?106549>.
