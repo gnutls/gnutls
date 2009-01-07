@@ -1,3 +1,138 @@
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.4.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_rsa_export.c: Doc fixes.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-psk.c, doc/examples/ex-client-resume.c,
+	doc/examples/ex-client-srp.c, doc/examples/ex-client-tlsia.c,
+	doc/examples/ex-client1.c, lib/gnutls_algorithms.c,
+	lib/gnutls_rsa_export.c, lib/openpgp/output.c, lib/x509/output.c,
+	lib/x509/privkey.c, src/cli.c, src/common.c, src/serv.c,
+	src/tls_test.c, tests/dhepskself.c: Fix warnings.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh, doc/gendocs_template, gl/Makefile.am,
+	gl/m4/errno_h.m4, gl/m4/extensions.m4, gl/m4/getaddrinfo.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/inttypes_h.m4,
+	gl/m4/lib-link.m4, gl/m4/manywarnings.m4, gl/m4/multiarch.m4,
+	gl/m4/printf.m4, gl/m4/size_max.m4, gl/m4/stdint.m4,
+	gl/m4/stdint_h.m4, gl/m4/wchar.m4, gl/m4/wchar_t.m4,
+	gl/m4/wint_t.m4, gl/m4/xsize.m4, gl/stdint.in.h, gl/stdlib.in.h,
+	gl/sys_select.in.h, gl/tests/Makefile.am,
+	gl/tests/test-select-in.sh, gl/unistd.in.h, gl/version-etc.c,
+	gl/wchar.in.h, lib/gl/Makefile.am, lib/gl/m4/codeset.m4,
+	lib/gl/m4/errno_h.m4, lib/gl/m4/extensions.m4,
+	lib/gl/m4/gettext.m4, lib/gl/m4/glibc2.m4, lib/gl/m4/glibc21.m4,
+	lib/gl/m4/gnulib-cache.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/iconv.m4, lib/gl/m4/intdiv0.m4, lib/gl/m4/intlmacosx.m4,
+	lib/gl/m4/intmax.m4, lib/gl/m4/inttypes-pri.m4,
+	lib/gl/m4/inttypes_h.m4, lib/gl/m4/lcmessage.m4,
+	lib/gl/m4/lib-link.m4, lib/gl/m4/multiarch.m4, lib/gl/m4/nls.m4,
+	lib/gl/m4/po.m4, lib/gl/m4/printf-posix.m4, lib/gl/m4/printf.m4,
+	lib/gl/m4/progtest.m4, lib/gl/m4/size_max.m4, lib/gl/m4/stdint.m4,
+	lib/gl/m4/stdint_h.m4, lib/gl/m4/threadlib.m4,
+	lib/gl/m4/uintmax_t.m4, lib/gl/m4/visibility.m4,
+	lib/gl/m4/wchar.m4, lib/gl/m4/wchar_t.m4, lib/gl/m4/wint_t.m4,
+	lib/gl/m4/xsize.m4, lib/gl/stdint.in.h, lib/gl/stdlib.in.h,
+	lib/gl/tests/Makefile.am, lib/gl/unistd.in.h, lib/gl/wchar.in.h,
+	libextra/gl/Makefile.am, libextra/gl/m4/extensions.m4,
+	libextra/gl/m4/gnulib-cache.m4, libextra/gl/m4/gnulib-comp.m4,
+	libextra/gl/m4/lib-link.m4: Update gnulib files.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix NEWS entry.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/sha2/sha2: Fix self-test with new certtool --verify-chain
+	output.
+
+2009-01-06  Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+
+	* NEWS: added NEWS item about MD5 deprecation
+
+2009-01-06  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-padding/pkcs1-pad: Fix expect strings to compensate
+	for new certtool -e output.
+
+2009-01-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool.c: certtool: Make --verify-chain use libgnutls
+	verification algorithm.
+
+2009-01-06  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Test chain with EE cert signed using RSA-MD5.
+
+2009-01-06  Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+
+	* lib/x509/verify.c: actually deprecate MD5 and MD2 signatures
+	during X.509 verification by treating them as invalid unless the
+	GNUTLS_VERIFY_ALLOW_SIGN_RSA_{MD5,MD2} flags are present.
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add NEWS entries from 2.6.3.
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crq_key_id.c: Fix.
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crq_key_id.c: Make it compile.  Speed up key generation.
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crq_key_id.c: Indent.
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/Makefile.am, tests/crq_key_id.c: Add crq_key_id
+	self-test from David Marín Carreño.
+
+2008-12-11  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Update manywarnings usage.
+
+2008-12-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-12-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Print public key id for certificate requests
+	too.
+
+2008-12-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2008-12-11  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2008-12-11  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS, NEWS, lib/includes/gnutls/x509.h, lib/x509/crq.c: gnutls:
+	New interface to get key id for certificate requests.  Patch from
+	David Marín Carreño <davefx@gmail.com> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3321>.
+
+2008-12-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-12-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.3.
