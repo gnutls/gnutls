@@ -45,24 +45,24 @@ _gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
     }
 
   return rsa_params->params;
-
 }
 
-
 /**
-  * gnutls_rsa_params_import_raw - set the RSA parameters
-  * @rsa_params: Is a structure will hold the parameters
-  * @m: holds the modulus
-  * @e: holds the public exponent
-  * @d: holds the private exponent
-  * @p: holds the first prime (p)
-  * @q: holds the second prime (q)
-  * @u: holds the coefficient
-  *
-  * This function will replace the parameters in the given structure.
-  * The new parameters should be stored in the appropriate gnutls_datum. 
-  * 
-  **/
+ * gnutls_rsa_params_import_raw - set the RSA parameters
+ * @rsa_params: Is a structure will hold the parameters
+ * @m: holds the modulus
+ * @e: holds the public exponent
+ * @d: holds the private exponent
+ * @p: holds the first prime (p)
+ * @q: holds the second prime (q)
+ * @u: holds the coefficient
+ *
+ * This function will replace the parameters in the given structure.
+ * The new parameters should be stored in the appropriate
+ * gnutls_datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ **/
 int
 gnutls_rsa_params_import_raw (gnutls_rsa_params_t rsa_params,
 			      const gnutls_datum_t * m,
@@ -76,12 +76,13 @@ gnutls_rsa_params_import_raw (gnutls_rsa_params_t rsa_params,
 }
 
 /**
-  * gnutls_rsa_params_init - initialize the temporary RSA parameters
-  * @rsa_params: Is a structure that will hold the parameters
-  *
-  * This function will initialize the temporary RSA parameters structure.
-  *
-  **/
+ * gnutls_rsa_params_init - initialize the temporary RSA parameters
+ * @rsa_params: Is a structure that will hold the parameters
+ *
+ * This function will initialize the temporary RSA parameters structure.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ **/
 int
 gnutls_rsa_params_init (gnutls_rsa_params_t * rsa_params)
 {
@@ -100,12 +101,11 @@ gnutls_rsa_params_init (gnutls_rsa_params_t * rsa_params)
 }
 
 /**
-  * gnutls_rsa_params_deinit - deinitialize the RSA parameters
-  * @rsa_params: Is a structure that holds the parameters
-  *
-  * This function will deinitialize the RSA parameters structure.
-  *
-  **/
+ * gnutls_rsa_params_deinit - deinitialize the RSA parameters
+ * @rsa_params: Is a structure that holds the parameters
+ *
+ * This function will deinitialize the RSA parameters structure.
+ **/
 void
 gnutls_rsa_params_deinit (gnutls_rsa_params_t rsa_params)
 {
@@ -113,14 +113,15 @@ gnutls_rsa_params_deinit (gnutls_rsa_params_t rsa_params)
 }
 
 /**
-  * gnutls_rsa_params_cpy - copy an RSA parameters structure
-  * @dst: Is the destination structure, which should be initialized.
-  * @src: Is the source structure
-  *
-  * This function will copy the RSA parameters structure from source
-  * to destination.
-  *
-  **/
+ * gnutls_rsa_params_cpy - copy an RSA parameters structure
+ * @dst: Is the destination structure, which should be initialized.
+ * @src: Is the source structure
+ *
+ * This function will copy the RSA parameters structure from source
+ * to destination.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ **/
 int
 gnutls_rsa_params_cpy (gnutls_rsa_params_t dst, gnutls_rsa_params_t src)
 {
@@ -128,20 +129,21 @@ gnutls_rsa_params_cpy (gnutls_rsa_params_t dst, gnutls_rsa_params_t src)
 }
 
 /**
-  * gnutls_rsa_params_generate2 - generate temporary RSA parameters
-  * @params: The structure where the parameters will be stored
-  * @bits: is the prime's number of bits
-  *
-  * This function will generate new temporary RSA parameters for use in 
-  * RSA-EXPORT ciphersuites.  This function is normally slow. 
-  * 
-  * Note that if the parameters are to be used in export cipher suites the 
-  * bits value should be 512 or less.
-  * Also note that the generation of new RSA parameters is only useful
-  * to servers. Clients use the parameters sent by the server, thus it's
-  * no use calling this in client side.
-  *
-  **/
+ * gnutls_rsa_params_generate2 - generate temporary RSA parameters
+ * @params: The structure where the parameters will be stored
+ * @bits: is the prime's number of bits
+ *
+ * This function will generate new temporary RSA parameters for use in
+ * RSA-EXPORT ciphersuites.  This function is normally slow.
+ *
+ * Note that if the parameters are to be used in export cipher suites the
+ * bits value should be 512 or less.
+ * Also note that the generation of new RSA parameters is only useful
+ * to servers. Clients use the parameters sent by the server, thus it's
+ * no use calling this in client side.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ **/
 int
 gnutls_rsa_params_generate2 (gnutls_rsa_params_t params, unsigned int bits)
 {
@@ -149,21 +151,19 @@ gnutls_rsa_params_generate2 (gnutls_rsa_params_t params, unsigned int bits)
 }
 
 /**
-  * gnutls_rsa_params_import_pkcs1 - import RSA params from a pkcs1 structure
-  * @params: A structure where the parameters will be copied to
-  * @pkcs1_params: should contain a PKCS1 RSAPublicKey structure PEM or DER encoded
-  * @format: the format of params. PEM or DER.
-  *
-  * This function will extract the RSAPublicKey found in a PKCS1 formatted
-  * structure. 
-  *
-  * If the structure is PEM encoded, it should have a header
-  * of "BEGIN RSA PRIVATE KEY".
-  *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
-  *
-  **/
+ * gnutls_rsa_params_import_pkcs1 - import RSA params from a pkcs1 structure
+ * @params: A structure where the parameters will be copied to
+ * @pkcs1_params: should contain a PKCS1 RSAPublicKey structure PEM or DER encoded
+ * @format: the format of params. PEM or DER.
+ *
+ * This function will extract the RSAPublicKey found in a PKCS1 formatted
+ * structure.
+ *
+ * If the structure is PEM encoded, it should have a header
+ * of "BEGIN RSA PRIVATE KEY".
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ **/
 int
 gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
 				const gnutls_datum_t * pkcs1_params,
@@ -172,25 +172,22 @@ gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
   return gnutls_x509_privkey_import (params, pkcs1_params, format);
 }
 
-
 /**
-  * gnutls_rsa_params_export_pkcs1 - export RSA params to a pkcs1 structure
-  * @params: Holds the RSA parameters
-  * @format: the format of output params. One of PEM or DER.
-  * @params_data: will contain a PKCS1 RSAPublicKey structure PEM or DER encoded
-  * @params_data_size: holds the size of params_data (and will be replaced by the actual size of parameters)
-  *
-  * This function will export the given RSA parameters to a PKCS1
-  * RSAPublicKey structure. If the buffer provided is not long enough to 
-  * hold the output, then GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN RSA PRIVATE KEY".
-  *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
-  *
-  **/
+ * gnutls_rsa_params_export_pkcs1 - export RSA params to a pkcs1 structure
+ * @params: Holds the RSA parameters
+ * @format: the format of output params. One of PEM or DER.
+ * @params_data: will contain a PKCS1 RSAPublicKey structure PEM or DER encoded
+ * @params_data_size: holds the size of params_data (and will be replaced by the actual size of parameters)
+ *
+ * This function will export the given RSA parameters to a PKCS1
+ * RSAPublicKey structure. If the buffer provided is not long enough to
+ * hold the output, then GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN RSA PRIVATE KEY".
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ **/
 int
 gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
 				gnutls_x509_crt_fmt_t format,
@@ -201,23 +198,23 @@ gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
 				     params_data, params_data_size);
 }
 
-
 /**
-  * gnutls_rsa_params_export_raw - export the RSA parameters
-  * @params: a structure that holds the rsa parameters
-  * @m: will hold the modulus
-  * @e: will hold the public exponent
-  * @d: will hold the private exponent
-  * @p: will hold the first prime (p)
-  * @q: will hold the second prime (q)
-  * @u: will hold the coefficient
-  * @bits: if non null will hold the prime's number of bits
-  *
-  * This function will export the RSA parameters found in the given
-  * structure. The new parameters will be allocated using
-  * gnutls_malloc() and will be stored in the appropriate datum.
-  * 
-  **/
+ * gnutls_rsa_params_export_raw - export the RSA parameters
+ * @params: a structure that holds the rsa parameters
+ * @m: will hold the modulus
+ * @e: will hold the public exponent
+ * @d: will hold the private exponent
+ * @p: will hold the first prime (p)
+ * @q: will hold the second prime (q)
+ * @u: will hold the coefficient
+ * @bits: if non null will hold the prime's number of bits
+ *
+ * This function will export the RSA parameters found in the given
+ * structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ **/
 int
 gnutls_rsa_params_export_raw (gnutls_rsa_params_t params,
 			      gnutls_datum_t * m, gnutls_datum_t * e,
@@ -238,5 +235,4 @@ gnutls_rsa_params_export_raw (gnutls_rsa_params_t params,
     *bits = _gnutls_mpi_get_nbits (params->params[3]);
 
   return 0;
-
 }
