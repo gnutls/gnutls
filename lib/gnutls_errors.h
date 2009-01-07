@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -26,6 +26,7 @@
 # define GNUTLS_ERRORS_H
 
 #include <gnutls_int.h>
+#include <gnutls_global.h>
 
 #define GNUTLS_E_INT_RET_0 -1251
 
@@ -40,14 +41,12 @@
 #endif
 
 int _gnutls_asn2err (int asn_err);
-void _gnutls_log (int, const char *fmt, ...)  
+void _gnutls_log (int, const char *fmt, ...)
 #ifdef __GNUC__
 __attribute__ ((format (printf, 2, 3)));
 #else
 ;
 #endif
-
-extern int _gnutls_log_level;
 
 #ifdef C99_MACROS
 #define LEVEL(l, ...) if (_gnutls_log_level >= l || _gnutls_log_level > 9) \

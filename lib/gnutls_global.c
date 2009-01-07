@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -34,17 +34,15 @@
 #include "sockets.h"
 #include "gettext.h"
 
-#define gnutls_log_func LOG_FUNC
-
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 
-LOG_FUNC _gnutls_log_func;
-int _gnutls_log_level = 0;	/* default log level */
-
 ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
+
+gnutls_log_func _gnutls_log_func;
+int _gnutls_log_level = 0;	/* default log level */
 
 /**
   * gnutls_global_set_log_function - set the logging function

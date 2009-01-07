@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -33,8 +33,6 @@
 #include "gettext.h"
 #define _(String) dgettext (PACKAGE, String)
 #define N_(String) gettext_noop (String)
-
-extern LOG_FUNC _gnutls_log_func;
 
 #define ERROR_ENTRY(desc, name, fatal) \
 	{ desc, #name, name, fatal}
@@ -429,7 +427,6 @@ _gnutls_log (int level, const char *fmt, ...)
 {
   va_list args;
   char str[MAX_LOG_SIZE];
-  void (*log_func) (int, const char *) = _gnutls_log_func;
 
   if (_gnutls_log_func == NULL)
     return;
@@ -438,7 +435,7 @@ _gnutls_log (int level, const char *fmt, ...)
   vsnprintf (str, MAX_LOG_SIZE - 1, fmt, args);	/* Flawfinder: ignore */
   va_end (args);
 
-  log_func (level, str);
+  _gnutls_log_func (level, str);
 }
 
 #ifndef DEBUG
