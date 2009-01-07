@@ -8,7 +8,11 @@ See the end for copying conditions.
 ** gnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
 This is a bugfix -- the previous attempt to do this from internal x509
 certificate verification procedures did not return the correct value
-for certificates using a weak hash.
+for certificates using a weak hash.  Reported by Daniel Kahn Gillmor
+<dkg@fifthhorseman.net> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3332>,
+debugged and patch by Tomas Mraz <tmraz@redhat.com> and Daniel Kahn
+Gillmor <dkg@fifthhorseman.net>.
 
 ** gnutls: New interface to get key id for certificate requests.
 Patch from David Marín Carreño <davefx@gmail.com> in
