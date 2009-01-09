@@ -17,7 +17,7 @@ No changes since last version.
 
 * Version 2.7.4 (released 2009-01-07)
 
-** gnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
+** libgnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
 This is a bugfix -- the previous attempt to do this from internal x509
 certificate verification procedures did not return the correct value
 for certificates using a weak hash.  Reported by Daniel Kahn Gillmor
@@ -26,11 +26,11 @@ for certificates using a weak hash.  Reported by Daniel Kahn Gillmor
 debugged and patch by Tomas Mraz <tmraz@redhat.com> and Daniel Kahn
 Gillmor <dkg@fifthhorseman.net>.
 
-** gnutls: New interface to get key id for certificate requests.
+** libgnutls: New interface to get key id for certificate requests.
 Patch from David Marín Carreño <davefx@gmail.com> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3321>.
 
-** gnutls: gnutls_x509_crq_print will now also print public key id.
+** libgnutls: gnutls_x509_crq_print will now also print public key id.
 
 ** certtool: --verify-chain now prints results of using library verification.
 Earlier, certtool --verify-chain used its own validation algorithm
@@ -46,13 +46,13 @@ gnutls_x509_crq_get_key_id: ADDED.
 
 * Version 2.7.3 (released 2008-12-10)
 
-** gnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
+** libgnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
 Reported by Michael Kiefer <Michael-Kiefer@web.de> in
 <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
 Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
 
-** gnutls: Libgcrypt initialization changed.
+** libgnutls: Libgcrypt initialization changed.
 If libgcrypt has not already been initialized, GnuTLS will now
 initialize libgcrypt with disabled secure memory.  Initialize
 libgcrypt explicitly in your application if you want to enable secure
@@ -60,11 +60,11 @@ memory.  Before GnuTLS initialized libgcrypt to use GnuTLS's memory
 allocation functions, which doesn't use secure memory, so there is no
 real change in behaviour.
 
-** gnutls: Fix memory leak in PSK authentication.
+** libgnutls: Fix memory leak in PSK authentication.
 Reported by Michael Weiser <michael@weiser.dinsnail.net> in
 <http://permalink.gmane.org/gmane.network.gnutls.general/1465>.
 
-** gnutls: Small byte reads via gnutls_record_recv() optimized.
+** libgnutls: Small byte reads via gnutls_record_recv() optimized.
 
 ** certtool: Move gcry_control(GCRYCTL_ENABLE_QUICK_RANDOM, 0) call earlier.
 It needs to be invoked before libgcrypt is initialized.
@@ -215,13 +215,13 @@ gnutls_x509_crt_set_crq_extensions: ADDED
 
 * Version 2.6.3 (released 2008-12-12)
 
-** gnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
+** libgnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
 Reported by Michael Kiefer <Michael-Kiefer@web.de> in
 <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
 Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
 
-** gnutls: Fix memory leak in PSK authentication.
+** libgnutls: Fix memory leak in PSK authentication.
 Reported by Michael Weiser <michael@weiser.dinsnail.net> in
 <http://permalink.gmane.org/gmane.network.gnutls.general/1465>.
 
