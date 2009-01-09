@@ -5,7 +5,14 @@ See the end for copying conditions.
 
 * Version 2.6.4 (unreleased)
 
-** gnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
+** libgnutls: Permit V1 Certificate Authorities properly.
+Before they were mistakenly rejected even though
+GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT and/or
+GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT were supplied.  Reported by
+"Douglas E. Engert" <deengert@anl.gov> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
+** libgnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
 This is a bugfix -- the previous attempt to do this from internal x509
 certificate verification procedures did not return the correct value
 for certificates using a weak hash.  Reported by Daniel Kahn Gillmor
