@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -125,8 +125,20 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
 	  }
       }
 
-  if (gnutls_x509_crt_get_ca_status (issuer, NULL) == 1)
+  result = gnutls_x509_crt_get_ca_status (issuer, NULL);
+  if (result == 1)
     {
+      result = 1;
+      goto cleanup;
+    }
+  /* Handle V1 CAs that do not have a basicConstraint, but accept
+     these certs only if the appropriate flags are set. */
+  else if ((result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) &&
+	   ((flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT) ||
+	    ((flags & GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT) &&
+	     (gnutls_x509_crt_check_issuer (issuer, issuer) == 1))))
+    {
+      gnutls_assert ();
       result = 1;
       goto cleanup;
     }

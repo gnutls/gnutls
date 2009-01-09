@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.7.5 (unreleased)
 
+** libgnutls: Permit V1 Certificate Authorities properly.
+Before they were mistakenly rejected even though
+GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT and/or
+GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT were supplied.  Reported by
+"Douglas E. Engert" <deengert@anl.gov> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
 ** API and ABI modifications:
 No changes since last version.
 
