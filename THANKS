@@ -1,5 +1,5 @@
 GNU TLS THANKS -- Acknowledgements.
-Copyright (C) 2005, 2006, 2007, 2008  Free Software Foundation
+Copyright (C) 2005, 2006, 2007, 2008, 2009  Free Software Foundation
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
@@ -94,6 +94,7 @@ Thomas Viehmann                 <tv@beamnet.de>
 Aaron Ucko                      <ucko@ncbi.nlm.nih.gov>
 Anton Lavrentiev                <lavr@ncbi.nlm.nih.gov>
 Martin von Gagern               <Martin.vGagern@gmx.net>
+Douglas E. Engert               <deengert@anl.gov>
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
