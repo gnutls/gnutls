@@ -2193,7 +2193,8 @@ _verify_x509_mem (const void *cert, int cert_size)
 				       &x509_cert_list[x509_ncerts - 1], 1,
 				       x509_crl_list,
 				       x509_ncrls,
-				       0, &verify_status);
+				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+				       &verify_status);
     if (ret < 0)
       error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify: %s",
 	     gnutls_strerror (ret));
