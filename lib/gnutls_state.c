@@ -313,9 +313,8 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
    * This is allocated in order to avoid small messages, making
    * the receive procedure slow.
    */
-  _gnutls_buffer_resize (&(*session)->internals.record_recv_buffer,
-			 INITIAL_RECV_BUFFER_SIZE);
-  if ((*session)->internals.record_recv_buffer.data == NULL)
+  if (_gnutls_buffer_resize (&(*session)->internals.record_recv_buffer,
+			     INITIAL_RECV_BUFFER_SIZE))
     {
       gnutls_free ((*session)->key);
       goto cleanup_session;
