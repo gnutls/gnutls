@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -309,12 +309,12 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   gnutls_handshake_set_max_packet_length ((*session),
 					  MAX_HANDSHAKE_PACKET_SIZE);
 
-  /* Allocate a minimum size for recv_data 
+  /* Allocate a minimum size for recv_data
    * This is allocated in order to avoid small messages, making
    * the receive procedure slow.
    */
-  (*session)->internals.record_recv_buffer.data =
-    gnutls_malloc (INITIAL_RECV_BUFFER_SIZE);
+  _gnutls_buffer_resize (&(*session)->internals.record_recv_buffer,
+			 INITIAL_RECV_BUFFER_SIZE);
   if ((*session)->internals.record_recv_buffer.data == NULL)
     {
       gnutls_free ((*session)->key);
