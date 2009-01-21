@@ -356,6 +356,8 @@ stdio.h: stdio.in.h
 	      -e 's|@''GNULIB_VPRINTF_POSIX''@|$(GNULIB_VPRINTF_POSIX)|g' \
 	      -e 's|@''GNULIB_VSNPRINTF''@|$(GNULIB_VSNPRINTF)|g' \
 	      -e 's|@''GNULIB_VSPRINTF_POSIX''@|$(GNULIB_VSPRINTF_POSIX)|g' \
+	      -e 's|@''GNULIB_DPRINTF''@|$(GNULIB_DPRINTF)|g' \
+	      -e 's|@''GNULIB_VDPRINTF''@|$(GNULIB_VDPRINTF)|g' \
 	      -e 's|@''GNULIB_VASPRINTF''@|$(GNULIB_VASPRINTF)|g' \
 	      -e 's|@''GNULIB_OBSTACK_PRINTF''@|$(GNULIB_OBSTACK_PRINTF)|g' \
 	      -e 's|@''GNULIB_OBSTACK_PRINTF_POSIX''@|$(GNULIB_OBSTACK_PRINTF_POSIX)|g' \
@@ -388,6 +390,10 @@ stdio.h: stdio.in.h
 	      -e 's|@''HAVE_DECL_VSNPRINTF''@|$(HAVE_DECL_VSNPRINTF)|g' \
 	      -e 's|@''REPLACE_SPRINTF''@|$(REPLACE_SPRINTF)|g' \
 	      -e 's|@''REPLACE_VSPRINTF''@|$(REPLACE_VSPRINTF)|g' \
+	      -e 's|@''HAVE_DPRINTF''@|$(HAVE_DPRINTF)|g' \
+	      -e 's|@''REPLACE_DPRINTF''@|$(REPLACE_DPRINTF)|g' \
+	      -e 's|@''HAVE_VDPRINTF''@|$(HAVE_VDPRINTF)|g' \
+	      -e 's|@''REPLACE_VDPRINTF''@|$(REPLACE_VDPRINTF)|g' \
 	      -e 's|@''HAVE_VASPRINTF''@|$(HAVE_VASPRINTF)|g' \
 	      -e 's|@''REPLACE_VASPRINTF''@|$(REPLACE_VASPRINTF)|g' \
 	      -e 's|@''HAVE_DECL_OBSTACK_PRINTF''@|$(HAVE_DECL_OBSTACK_PRINTF)|g' \
@@ -730,6 +736,7 @@ unistd.h: unistd.in.h
 	      -e 's|@''GNULIB_GETPAGESIZE''@|$(GNULIB_GETPAGESIZE)|g' \
 	      -e 's|@''GNULIB_GETUSERSHELL''@|$(GNULIB_GETUSERSHELL)|g' \
 	      -e 's|@''GNULIB_LCHOWN''@|$(GNULIB_LCHOWN)|g' \
+	      -e 's|@''GNULIB_LINK''@|$(GNULIB_LINK)|g' \
 	      -e 's|@''GNULIB_LSEEK''@|$(GNULIB_LSEEK)|g' \
 	      -e 's|@''GNULIB_READLINK''@|$(GNULIB_READLINK)|g' \
 	      -e 's|@''GNULIB_SLEEP''@|$(GNULIB_SLEEP)|g' \
@@ -744,6 +751,7 @@ unistd.h: unistd.in.h
 	      -e 's|@''HAVE_GETHOSTNAME''@|$(HAVE_GETHOSTNAME)|g' \
 	      -e 's|@''HAVE_GETPAGESIZE''@|$(HAVE_GETPAGESIZE)|g' \
 	      -e 's|@''HAVE_GETUSERSHELL''@|$(HAVE_GETUSERSHELL)|g' \
+	      -e 's|@''HAVE_LINK''@|$(HAVE_LINK)|g' \
 	      -e 's|@''HAVE_READLINK''@|$(HAVE_READLINK)|g' \
 	      -e 's|@''HAVE_SLEEP''@|$(HAVE_SLEEP)|g' \
 	      -e 's|@''HAVE_DECL_ENVIRON''@|$(HAVE_DECL_ENVIRON)|g' \
