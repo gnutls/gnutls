@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.7.5 (unreleased)
 
+** libgnutls: result_size in gnutls_hex_encode now holds
+the size of the result. Report by John Brooks <special@dereferenced.net>.
+
+** libgnutls: gnutls_handshake when sending client hello during a
+rehandshake, will not offer a version number larger than the current.
+Reported by Tristan Hill <stan@saticed.me.uk>.
+
 ** libgnutls: Permit V1 Certificate Authorities properly.
 Before they were mistakenly rejected even though
 GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT and/or
