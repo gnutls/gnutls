@@ -1705,11 +1705,15 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   opaque rnd[GNUTLS_RANDOM_SIZE];
   gnutls_protocol_t hver;
   opaque extdata[MAX_EXT_DATA_LENGTH];
+  int rehandshake = 0;
 
   opaque *SessionID =
     session->internals.resumed_security_parameters.session_id;
   uint8_t session_id_len =
     session->internals.resumed_security_parameters.session_id_size;
+
+  if (session->security_parameters.session_id_size)
+    rehandshake = 1;
 
   if (SessionID == NULL)
     session_id_len = 0;
@@ -1734,7 +1738,12 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
        * version number to the previously established.
        */
       if (SessionID == NULL)
-	hver = _gnutls_version_max (session);
+        {
+          if (rehandshake) /* already negotiated version thus version_max == negotiated version */
+            hver = session->security_parameters.version;
+          else
+  	    hver = _gnutls_version_max (session);
+        }
       else
 	{			/* we are resuming a session */
 	  hver = session->internals.resumed_security_parameters.version;
