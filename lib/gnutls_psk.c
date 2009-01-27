@@ -407,14 +407,17 @@ int
 gnutls_hex_encode (const gnutls_datum_t * data, char *result,
 		   size_t * result_size)
 {
-  if (*result_size < data->size + data->size + 1)
+size_t res = data->size + data->size + 1;
+
+  if (*result_size < res)
     {
       gnutls_assert ();
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
   _gnutls_bin2hex (data->data, data->size, result, *result_size);
-
+  *result_size = res;
+  
   return 0;
 }
 
