@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-## Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Simon Josefsson
-##                    added -texinfo, -listfunc
+## Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
+##                    added -texinfo, -listfunc, -pkg-name
 ##                    man page revamp
 ##                    various improvements
 ## Copyright (c) 2001, 2002 Nikos Mavrogiannopoulos
@@ -27,7 +27,7 @@
 # usage:
 # gdoc [ -docbook | -html | -text | -man | -tex | -texinfo | -listfunc ]
 #      [ -sourceversion verno ] [ -include file | -includefuncprefix ]
-#      [ -bugsto address ]
+#      [ -bugsto address ] [ -pkg-name packagename ]
 #      [ -seeinfo infonode ] [ -copyright notice ] [ -verbatimcopying ]
 #      [ -function funcname [ -function funcname ...] ] c file(s)s > outputfile
 #
@@ -50,6 +50,10 @@
 #  -bugsto address
 #       For man pages, include a section about reporting bugs and mention
 #       the given e-mail address, e.g 'bug-libidn@gnu.org'.
+#
+#  -pkg-name packagename
+#       For man pages when -bugsto is used, also include help URLs to the
+#       the project's home page.  For example, "GNU Libidn".
 #
 #  -seeinfo infonode
 #       For man pages, include a section that point to an info manual
@@ -184,7 +188,7 @@ sub usage {
     print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man | -tex | -texinfo  -listfunc ]\n";
     print "         [ -sourceversion verno ] [ -include file | -includefuncprefix ]\n";
     print "         [ -bugsto address ] [ -seeinfo infonode ] [ -copyright notice]\n";
-    print "         [ -verbatimcopying ]\n";
+    print "         [ -verbatimcopying ] [ -pkg-name packagename ]\n";
     print "         [ -function funcname [ -function funcname ...] ]\n";
     print "         c source file(s) > outputfile\n";
     exit 1;
@@ -240,6 +244,8 @@ while ($ARGV[0] =~ m/^-(.*)/) {
 	$includefuncprefix = 1;
     } elsif ($cmd eq "-bugsto") {
 	$bugsto = shift @ARGV;
+    } elsif ($cmd eq "-pkg-name") {
+	$pkgname = shift @ARGV;
     } elsif ($cmd eq "-copyright") {
 	$copyright = shift @ARGV;
     } elsif ($cmd eq "-verbatimcopying") {
@@ -633,6 +639,11 @@ sub output_man {
     if ($args{'bugsto'}) {
 	print ".SH \"REPORTING BUGS\"\n";
 	print "Report bugs to <". $args{'bugsto'} . ">.\n";
+	if ($args{'pkgname'}) {
+	    print $args{'pkgname'} . " home page: " .
+		"http://www.gnu.org/software/" . $args{'module'} . "/\n";
+	}
+	print "General help using GNU software: http://www.gnu.org/gethelp/\n";
     }
 
     if ($args{'copyright'}) {
@@ -755,6 +766,7 @@ sub dump_function {
 			 'include' => $include,
 			 'includefuncprefix' => $includefuncprefix,
 			 'bugsto' => $bugsto,
+			 'pkgname' => $pkgname,
 			 'copyright' => $copyright,
 			 'verbatimcopying' => $verbatimcopying,
 			 'seeinfo' => $seeinfo,
