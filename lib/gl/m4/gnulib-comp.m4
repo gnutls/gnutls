@@ -25,7 +25,6 @@ AC_DEFUN([lgl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
-  AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   AC_REQUIRE([AC_FUNC_FSEEKO])
 ])
@@ -45,7 +44,7 @@ AC_DEFUN([lgl_INIT],
   gl_source_base='lib/gl'
   gl_FUNC_ALLOCA
   gl_BYTESWAP
-  gl_HEADER_ERRNO_H
+  AC_REQUIRE([gl_HEADER_ERRNO_H])
   gl_FLOAT_H
   gl_FUNC_FSEEKO
   gl_STDIO_MODULE_INDICATOR([fseeko])
@@ -60,7 +59,7 @@ AC_DEFUN([lgl_INIT],
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
   gl_MINMAX
-  gl_MULTIARCH
+  AC_REQUIRE([gl_MULTIARCH])
   gl_HEADER_NETDB
   gl_FUNC_READ_FILE
   gl_FUNC_REALLOC_POSIX
@@ -279,6 +278,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasprintf.c
   lib/wchar.in.h
   lib/xsize.h
+  m4/00gnulib.m4
   m4/alloca.m4
   m4/byteswap.m4
   m4/codeset.m4

@@ -179,6 +179,7 @@ AC_DEFUN([xgl_FILE_LIST], [
   lib/md5.h
   lib/memxor.c
   lib/memxor.h
+  m4/00gnulib.m4
   m4/extensions.m4
   m4/gnulib-common.m4
   m4/hmac-md5.m4
