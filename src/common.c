@@ -430,8 +430,14 @@ print_cert_vrfy (gnutls_session_t session)
 
   if (gnutls_certificate_type_get (session) == GNUTLS_CRT_X509)
     {
+      if (status & GNUTLS_CERT_REVOKED)
+	printf ("- Peer's certificate chain revoked\n");
       if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
 	printf ("- Peer's certificate issuer is unknown\n");
+      if (status & GNUTLS_CERT_SIGNER_NOT_CA)
+	printf ("- Peer's certificate issuer is not a CA\n");
+      if (status & GNUTLS_CERT_INSECURE_ALGORITHM)
+	printf ("- Peer's certificate chain uses insecure algorithm\n");
       if (status & GNUTLS_CERT_INVALID)
 	printf ("- Peer's certificate is NOT trusted\n");
       else
