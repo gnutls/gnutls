@@ -703,6 +703,11 @@ static struct
     0, GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID },
   { "cacertrsamd5 ok", cacertrsamd5, &cacertrsamd5[2],
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5, 0 },
+  { "cacertrsamd5 short-cut not ok", cacertrsamd5, &cacertrsamd5[1],
+    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
+    GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID },
+  { "cacertrsamd5 short-cut ok", cacertrsamd5, &cacertrsamd5[1],
+    0, 0 },
   { NULL, NULL, NULL, 0}
 };
 /* *INDENT-ON* */

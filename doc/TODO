@@ -48,8 +48,6 @@ Current list:
 - Support non-blocking gnutls_{dh,rsa}_params_generate2 for when there
   is not enough entropy available. 
 - Chain verifications.
-  - Short-cut the certificate verification algorithm before the
-    root if a middle-CA is trusted.
   - Check path length constraints.
   - Check keyCertSign key usages.
   - Reject extensions in v1 certificates.
