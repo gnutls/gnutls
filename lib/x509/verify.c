@@ -51,6 +51,38 @@ static int _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
 				int tcas_size, unsigned int flags,
 				unsigned int *output);
 
+/* Checks if two certs are identical.  Return 0 onn match. */
+static int
+check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
+{
+  gnutls_datum_t cert1bin = { NULL, 0 }, cert2bin = { NULL, 0 };
+  int result;
+
+  result = _gnutls_x509_der_encode (cert1->cert, "", &cert1bin, 0);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_der_encode (cert2->cert, "", &cert2bin, 0);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  if ((cert1bin.size == cert2bin.size) &&
+      (memcmp (cert1bin.data, cert2bin.data, cert1bin.size) == 0))
+    result = 0;
+  else
+    result = 1;
+
+ cleanup:
+  _gnutls_free_datum (&cert1bin);
+  _gnutls_free_datum (&cert2bin);
+  return result;
+}
 
 /* Checks if the issuer of a certificate is a
  * Certificate Authority, or if the certificate is the same
@@ -365,16 +397,12 @@ gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
 }
 
 
-/* The algorithm used is:
- * 1. Check last certificate in the chain. If it is not verified return.
- * 2. Check if any certificates in the chain are revoked. If yes return.
- * 3. Try to verify the rest of certificates in the chain. If not verified return.
- * 4. Return 0.
+/* Verify X.509 certificate chain.
  *
  * Note that the return value is an OR of GNUTLS_CERT_* elements.
  *
- * This function verifies a X.509 certificate list. The certificate list should
- * lead to a trusted CA in order to be trusted.
+ * This function verifies a X.509 certificate list. The certificate
+ * list should lead to a trusted certificate in order to be trusted.
  */
 static unsigned int
 _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
@@ -386,46 +414,6 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
 {
   int i = 0, ret;
   unsigned int status = 0, output;
-
-  if (clist_size > 1)
-    {
-      /* Check if the last certificate in the path is self signed.
-       * In that case ignore it (a certificate is trusted only if it
-       * leads to a trusted party by us, not the server's).
-       *
-       * This in addition prevents from verifying self signed certificates
-       * against themselves. This although not bad caused verification
-       * failures on some root self signed certificates that use the MD2
-       * algorithm.
-       */
-      if (gnutls_x509_crt_check_issuer (certificate_list[clist_size - 1],
-					certificate_list[clist_size - 1]) > 0)
-	{
-	  clist_size--;
-	}
-    }
-
-  /* Verify the last certificate in the certificate path
-   * against the trusted CA certificate list.
-   *
-   * If no CAs are present returns CERT_INVALID. Thus works
-   * in self signed etc certificates.
-   */
-  ret =
-    _gnutls_verify_certificate2 (certificate_list[clist_size - 1],
-				 trusted_cas, tcas_size, flags, &output);
-
-  if (ret == 0)
-    {
-      /* if the last certificate in the certificate
-       * list is invalid, then the certificate is not
-       * trusted.
-       */
-      gnutls_assert ();
-      status |= output;
-      status |= GNUTLS_CERT_INVALID;
-      return status;
-    }
 
   /* Check for revoked certificates in the chain
    */
@@ -443,7 +431,69 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
     }
 #endif
 
-  /* Verify the certificate path (chain) 
+  if (clist_size > 1)
+    {
+      /* Check if the last certificate in the path is self signed.
+       * In that case ignore it (a certificate is trusted only if it
+       * leads to a trusted party by us, not the server's).
+       *
+       * This prevents from verifying self signed certificates against
+       * themselves. This (although not bad) caused verification
+       * failures on some root self signed certificates that use the
+       * MD2 algorithm.
+       */
+      if (gnutls_x509_crt_check_issuer (certificate_list[clist_size - 1],
+				    certificate_list[clist_size - 1]) > 0)
+	{
+	  clist_size--;
+	}
+    }
+
+  /* We want to shorten the chain by removing the cert that matches
+   * one of the certs we trust and all the certs after that i.e. if
+   * cert chain is A signed-by B signed-by C signed-by D (signed-by
+   * self-signed E but already removed above), and we trust B, remove
+   * B, C and D.  We must leave the first cert on chain. */
+  if (clist_size > 1 && !(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
+    {
+      for (i = 1; i < clist_size; i++)
+	{
+	  int j;
+
+	  for (j = 0; j < tcas_size; j++)
+	    {
+	      if (check_if_same_cert (certificate_list[i],
+				      trusted_cas[j]) == 0)
+		{
+		  clist_size = i;
+		  break;
+		}
+	    }
+	  /* clist_size may have been changed which gets out of loop */
+	}
+    }
+
+  /* Verify the last certificate in the certificate path
+   * against the trusted CA certificate list.
+   *
+   * If no CAs are present returns CERT_INVALID. Thus works
+   * in self signed etc certificates.
+   */
+  ret = _gnutls_verify_certificate2 (certificate_list[clist_size - 1],
+				     trusted_cas, tcas_size, flags, &output);
+  if (ret == 0)
+    {
+      /* if the last certificate in the certificate
+       * list is invalid, then the certificate is not
+       * trusted.
+       */
+      gnutls_assert ();
+      status |= output;
+      status |= GNUTLS_CERT_INVALID;
+      return status;
+    }
+
+  /* Verify the certificate path (chain)
    */
   for (i = clist_size - 1; i > 0; i--)
     {
