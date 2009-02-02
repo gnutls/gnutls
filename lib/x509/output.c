@@ -1139,36 +1139,19 @@ static void
 print_keyid (gnutls_string * str, gnutls_x509_crt_t cert)
 {
   int err;
-  size_t size = 0;
-  char *buffer = NULL;
-
-  err = gnutls_x509_crt_get_key_id (cert, 0, buffer, &size);
-  if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
-      return;
-    }
-
-  buffer = gnutls_malloc (size);
-  if (!buffer)
-    {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
-      return;
-    }
+  char buffer[20];
+  size_t size = 20;
 
   err = gnutls_x509_crt_get_key_id (cert, 0, buffer, &size);
   if (err < 0)
     {
-      gnutls_free (buffer);
-      addf (str, "error: get_key_id2: %s\n", gnutls_strerror (err));
+      addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
       return;
     }
 
   addf (str, _("\tPublic Key Id:\n\t\t"));
   hexprint (str, buffer, size);
   adds (str, "\n");
-
-  gnutls_free (buffer);
 }
 
 static void
