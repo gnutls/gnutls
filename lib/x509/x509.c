@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  * Author: Nikos Mavrogiannopoulos, Simon Josefsson, Howard Chu
  *
  * This file is part of GNUTLS.
@@ -751,7 +751,8 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
 
   if (result != ASN1_SUCCESS)
     {
-      gnutls_assert ();
+      if (result != ASN1_MEM_ERROR)
+	gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
@@ -840,7 +841,8 @@ gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
 
   if (result != ASN1_SUCCESS)
     {
-      gnutls_assert ();
+      if (result != ASN1_MEM_ERROR)
+	gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
