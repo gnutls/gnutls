@@ -1,3 +1,183 @@
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Need -lgnutls etc for certtool-cfg.c.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.5.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Merge in old NEWS entries.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Move down revocation check to revert code to
+	how it looked before.  The idea is that if you have marked a cert as
+	trusted, you may want to trust it even though some authority has
+	revoked it.  This changes back how this code used to work.
+
+2009-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/TODO, lib/x509/verify.c, tests/chainverify.c: Make it
+	possible to trust intermediary certificates.  Based on tiny patch
+	from "Douglas E. Engert" <deengert@anl.gov> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351/focus=3376>.
+
+2009-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Add another chain from bug reports.
+
+2009-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Print more certificate status values.
+
+2009-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Assert less for expected errors.
+
+2009-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Simplify keyid printing to avoid allocation and
+	asserts.
+
+2009-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, doc/scripts/gdoc: Update gdoc and use
+	-pkg-name.
+
+2009-02-01  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gnupload, gl/Makefile.am, gl/m4/00gnulib.m4,
+	gl/m4/errno_h.m4, gl/m4/extensions.m4, gl/m4/gnulib-common.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/multiarch.m4, gl/m4/pmccabe2html.m4,
+	gl/m4/stdlib_h.m4, gl/stdlib.in.h, gl/tests/test-getaddrinfo.c,
+	gl/version-etc.c, gl/version-etc.h, lib/gl/Makefile.am,
+	lib/gl/m4/00gnulib.m4, lib/gl/m4/errno_h.m4,
+	lib/gl/m4/extensions.m4, lib/gl/m4/gnulib-common.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/multiarch.m4,
+	lib/gl/m4/stdlib_h.m4, lib/gl/stdlib.in.h,
+	libextra/gl/m4/00gnulib.m4, libextra/gl/m4/extensions.m4,
+	libextra/gl/m4/gnulib-common.m4, libextra/gl/m4/gnulib-comp.m4: 
+	Update gnulib files.
+
+2009-01-27  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, lib/gnutls_handshake.c: gnutls_handshake when sending client
+	hello during a rehandshake, will not offer a version number larger
+	than the current.  Reported by Tristan Hill <stan@saticed.me.uk>.
+
+2009-01-27  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_psk.c: result_size in gnutls_hex_encode behaves as
+	documented. It now holds the size of the result. Reported by John
+	Brooks.
+
+2009-01-21  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/arpa_inet.in.h, gl/fseeko.c, gl/m4/alloca.m4,
+	gl/m4/errno_h.m4, gl/m4/getaddrinfo.m4, gl/m4/getline.m4,
+	gl/m4/getpass.m4, gl/m4/gettimeofday.m4, gl/m4/gnulib-common.m4,
+	gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4, gl/m4/intmax_t.m4,
+	gl/m4/inttypes_h.m4, gl/m4/lib-ld.m4, gl/m4/lib-link.m4,
+	gl/m4/longlong.m4, gl/m4/malloc.m4, gl/m4/minmax.m4,
+	gl/m4/printf.m4, gl/m4/readline.m4, gl/m4/realloc.m4,
+	gl/m4/sockets.m4, gl/m4/sockpfaf.m4, gl/m4/stdbool.m4,
+	gl/m4/stdint.m4, gl/m4/stdint_h.m4, gl/m4/stdio_h.m4,
+	gl/m4/unistd_h.m4, gl/m4/vasnprintf.m4, gl/m4/wchar_t.m4,
+	gl/m4/wint_t.m4, gl/progname.c, gl/stdint.in.h, gl/stdio.in.h,
+	gl/strerror.c, gl/sys_stat.in.h, gl/tests/gettimeofday.c,
+	gl/tests/ioctl.c, gl/tests/test-unistd.c, gl/unistd.in.h,
+	gl/wchar.in.h, lib/gl/Makefile.am, lib/gl/fseeko.c,
+	lib/gl/m4/alloca.m4, lib/gl/m4/byteswap.m4, lib/gl/m4/codeset.m4,
+	lib/gl/m4/errno_h.m4, lib/gl/m4/gettext.m4,
+	lib/gl/m4/gnulib-common.m4, lib/gl/m4/iconv.m4,
+	lib/gl/m4/intldir.m4, lib/gl/m4/intlmacosx.m4, lib/gl/m4/intmax.m4,
+	lib/gl/m4/intmax_t.m4, lib/gl/m4/inttypes-pri.m4,
+	lib/gl/m4/inttypes_h.m4, lib/gl/m4/lcmessage.m4,
+	lib/gl/m4/lib-ld.m4, lib/gl/m4/lib-link.m4, lib/gl/m4/lock.m4,
+	lib/gl/m4/longlong.m4, lib/gl/m4/malloc.m4, lib/gl/m4/memmem.m4,
+	lib/gl/m4/memmove.m4, lib/gl/m4/minmax.m4, lib/gl/m4/nls.m4,
+	lib/gl/m4/po.m4, lib/gl/m4/printf-posix.m4, lib/gl/m4/printf.m4,
+	lib/gl/m4/progtest.m4, lib/gl/m4/realloc.m4, lib/gl/m4/sockets.m4,
+	lib/gl/m4/sockpfaf.m4, lib/gl/m4/stdbool.m4, lib/gl/m4/stdint.m4,
+	lib/gl/m4/stdint_h.m4, lib/gl/m4/stdio_h.m4, lib/gl/m4/strcase.m4,
+	lib/gl/m4/strverscmp.m4, lib/gl/m4/threadlib.m4,
+	lib/gl/m4/uintmax_t.m4, lib/gl/m4/unistd_h.m4,
+	lib/gl/m4/vasnprintf.m4, lib/gl/m4/wchar_t.m4, lib/gl/m4/wint_t.m4,
+	lib/gl/stdint.in.h, lib/gl/stdio.in.h, lib/gl/sys_stat.in.h,
+	lib/gl/tests/test-unistd.c, lib/gl/unistd.in.h, lib/gl/wchar.in.h: 
+	Update gnulib files.
+
+2009-01-21  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2009-01-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gl/Makefile.am, libextra/gl/gnulib.mk,
+	libextra/gl/m4/gnulib-cache.m4, libextra/gl/m4/gnulib-common.m4,
+	libextra/gl/m4/lib-ld.m4, libextra/gl/m4/lib-link.m4,
+	libextra/gl/m4/md5.m4: Add -I's in libextra/gl for stdint.h on
+	Solaris.  Reported by Dagobert Michelsen <dam@opencsw.org> in
+
+	http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3388
+
+2009-01-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Check return value properly.
+
+2009-01-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_state.c: Fix mem leak because buffer is not expanded
+	correctly.
+
+2009-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix typos.
+
+2009-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/verify.c: Permit V1 Certificate Authorities
+	properly.  Before they were mistakenly rejected even though
+	GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT and/or
+	GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT were supplied.  Reported by
+	"Douglas E. Engert" <deengert@anl.gov> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
+2009-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Permit V1 CA's in new --verify-chain code.
+
+2009-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2009-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Added chain supplied by "Douglas E. Engert"
+	<deengert@anl.gov>.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* src/errcodes.c, src/printlist.c: Fix license header.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c, lib/gnutls_errors.h, lib/gnutls_global.c,
+	lib/gnutls_global.h, lib/gnutls_int.h: Cleanup logger function type.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-01-07  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.4.
