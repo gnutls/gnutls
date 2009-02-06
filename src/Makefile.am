@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
 #
 # This file is part of GNUTLS.
 #
@@ -95,6 +95,8 @@ libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool.gaa certtool-gaa.h	\
 	certtool-gaa.c certtool-cfg.h certtool-cfg.c
 libcmd_certtool_la_LIBADD = ../gl/libgnu.la @LTLIBREADLINE@
+libcmd_certtool_la_LIBADD += ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+libcmd_certtool_la_LIBADD += ../gl/libgnu.la
 
 noinst_PROGRAMS = errcodes printlist
 errcodes_SOURCES = errcodes.c
