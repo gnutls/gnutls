@@ -1,5 +1,13 @@
 2009-02-06  Simon Josefsson <simon@josefsson.org>
 
+	* NEWS: Version 2.4.3.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
 	* lib/x509/verify.c: Move down revocation check to revert code to
 	how it looked before.  The idea is that if you have marked a cert as
 	trusted, you may want to trust it even though some authority has
