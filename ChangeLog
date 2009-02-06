@@ -1,3 +1,91 @@
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.6.4.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Merge NEWS entries from 2.4.x branch.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Move down revocation check to revert code to
+	how it looked before.  The idea is that if you have marked a cert as
+	trusted, you may want to trust it even though some authority has
+	revoked it.  This changes back how this code used to work.
+
+2009-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/verify.c: Make it possible to trust intermediary
+	certificates.  Based on tiny patch from "Douglas E. Engert"
+	<deengert@anl.gov> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351/focus=3376>.
+
+2009-01-27  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS, lib/gnutls_handshake.c: gnutls_handshake when sending client
+	hello during a rehandshake, will not offer a version number larger
+	than the current.  Reported by Tristan Hill <stan@saticed.me.uk>.
+
+2009-01-27  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/gnutls_psk.c: result_size in gnutls_hex_encode behaves as
+	documented. It now holds the size of the result. Reported by John
+	Brooks.
+
+2009-01-21  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gl/Makefile.am, libextra/gl/gnulib.mk,
+	libextra/gl/m4/gnulib-cache.m4: Use -I's in libextra/gl for
+	stdint.h.
+
+2009-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix typos.
+
+2009-01-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/verify.c: Permit V1 Certificate Authorities
+	properly.  Before they were mistakenly rejected even though
+	GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT and/or
+	GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT were supplied.  Reported by
+	"Douglas E. Engert" <deengert@anl.gov> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
+2009-01-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix NEWS entry.
+
+2009-01-06  Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+
+	* NEWS, lib/x509/verify.c: backport fix to deprecate MD5 hashes
+	during X.509 certificate validation
+
+2008-12-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mac-libgcrypt.c: Don't return from void function.  Reported by
+	Jeff Cai <jeff.cai@sun.com> in
+	https://savannah.gnu.org/support/?106549
+
+2008-11-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mpi-libgcrypt.c: Don't return from void function.  Reported by
+	Jeff Cai <jeff.cai@sun.com> in
+	https://savannah.gnu.org/support/?106549
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-12-12  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-12-12  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.6.3.
