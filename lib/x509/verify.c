@@ -415,22 +415,6 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
   int i = 0, ret;
   unsigned int status = 0, output;
 
-  /* Check for revoked certificates in the chain
-   */
-#ifdef ENABLE_PKI
-  for (i = 0; i < clist_size; i++)
-    {
-      ret = gnutls_x509_crt_check_revocation (certificate_list[i],
-					      CRLs, crls_size);
-      if (ret == 1)
-	{			/* revoked */
-	  status |= GNUTLS_CERT_REVOKED;
-	  status |= GNUTLS_CERT_INVALID;
-	  return status;
-	}
-    }
-#endif
-
   if (clist_size > 1)
     {
       /* Check if the last certificate in the path is self signed.
@@ -492,6 +476,22 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
       status |= GNUTLS_CERT_INVALID;
       return status;
     }
+
+  /* Check for revoked certificates in the chain
+   */
+#ifdef ENABLE_PKI
+  for (i = 0; i < clist_size; i++)
+    {
+      ret = gnutls_x509_crt_check_revocation (certificate_list[i],
+					      CRLs, crls_size);
+      if (ret == 1)
+	{			/* revoked */
+	  status |= GNUTLS_CERT_REVOKED;
+	  status |= GNUTLS_CERT_INVALID;
+	  return status;
+	}
+    }
+#endif
 
   /* Verify the certificate path (chain)
    */
