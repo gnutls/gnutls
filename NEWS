@@ -233,6 +233,51 @@ gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_print: ADDED
 gnutls_x509_crt_set_crq_extensions: ADDED
 
+* Version 2.6.4 (released 2009-02-06)
+
+** libgnutls: Accept chains where intermediary certs are trusted.
+Before GnuTLS needed to validate the entire chain back to a
+self-signed certificate.  GnuTLS will now stop looking when it has
+found an intermediary trusted certificate.  The new behaviour is
+useful when chains, for example, contains a top-level CA, an
+intermediary CA signed using RSA-MD5, and an end-entity certificate.
+To avoid chain validation errors due to the RSA-MD5 cert, you can
+explicitly add the intermediary RSA-MD5 cert to your trusted certs.
+The signature on trusted certificates are not checked, so the chain
+has a chance to validate correctly.  Reported by "Douglas E. Engert"
+<deengert@anl.gov> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
+** libgnutls: result_size in gnutls_hex_encode now holds
+the size of the result. Report by John Brooks <special@dereferenced.net>.
+
+** libgnutls: gnutls_handshake when sending client hello during a
+rehandshake, will not offer a version number larger than the current.
+Reported by Tristan Hill <stan@saticed.me.uk>.
+
+** libgnutls: Permit V1 Certificate Authorities properly.
+Before they were mistakenly rejected even though
+GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT and/or
+GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT were supplied.  Reported by
+"Douglas E. Engert" <deengert@anl.gov> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
+** libgnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
+This is a bugfix -- the previous attempt to do this from internal x509
+certificate verification procedures did not return the correct value
+for certificates using a weak hash.  Reported by Daniel Kahn Gillmor
+<dkg@fifthhorseman.net> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3332>,
+debugged and patch by Tomas Mraz <tmraz@redhat.com> and Daniel Kahn
+Gillmor <dkg@fifthhorseman.net>.
+
+** libgnutls: Fix compile error with Sun CC.
+Reported by Jeff Cai <jeff.cai@sun.com> in
+<https://savannah.gnu.org/support/?106549>.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.6.3 (released 2008-12-12)
 
 ** libgnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
@@ -641,6 +686,66 @@ gnutls_crypto_rnd_register2: ADDED.
 gnutls_crypto_single_cipher_register2: ADDED.
 gnutls_crypto_single_digest_register2: ADDED.
 gnutls_crypto_single_mac_register2: ADDED.
+
+* Version 2.4.3 (released 2009-02-06)
+
+** libgnutls: Accept chains where intermediary certs are trusted.
+Before GnuTLS needed to validate the entire chain back to a
+self-signed certificate.  GnuTLS will now stop looking when it has
+found an intermediary trusted certificate.  The new behaviour is
+useful when chains, for example, contains a top-level CA, an
+intermediary CA signed using RSA-MD5, and an end-entity certificate.
+To avoid chain validation errors due to the RSA-MD5 cert, you can
+explicitly add the intermediary RSA-MD5 cert to your trusted certs.
+The signature on trusted certificates are not checked, so the chain
+has a chance to validate correctly.  Reported by "Douglas E. Engert"
+<deengert@anl.gov> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
+** libgnutls: Permit V1 Certificate Authorities properly.
+Before they were mistakenly rejected even though
+GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT and/or
+GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT were supplied.  Reported by
+"Douglas E. Engert" <deengert@anl.gov> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3351>.
+
+** libgnutls: deprecate X.509 validation chains using MD5 and MD2 signatures.
+This is a bugfix -- the previous attempt to do this from internal x509
+certificate verification procedures did not return the correct value
+for certificates using a weak hash.  Reported by Daniel Kahn Gillmor
+<dkg@fifthhorseman.net> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3332>,
+debugged and patch by Tomas Mraz <tmraz@redhat.com> and Daniel Kahn
+Gillmor <dkg@fifthhorseman.net>.
+
+** libgnutls: Fix chain verification for chains that ends with RSA-MD2 CAs.
+Reported by Michael Kiefer <Michael-Kiefer@web.de> in
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=507633> forwarded by
+Andreas Metzler <ametzler@downhill.at.eu.org> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3309>.
+
+** libgnutls: Fix crash in X.509 validation code for self-signed certificates.
+The patch to fix the security problem GNUTLS-SA-2008-3 introduced a
+problem for certificate chains that contained just one self-signed
+certificate.  Reported by Michael Meskes <meskes@debian.org> in
+<http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=505279>.
+
+** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
+The flaw makes it possible for man in the middle attackers (i.e.,
+active attackers) to assume any name and trick GNU TLS clients into
+trusting that name.  Thanks for report and analysis from Martin von
+Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
+
+Any updates with more details about this vulnerability will be added
+to <http://www.gnu.org/software/gnutls/security.html>
+
+** libgnutls: Fix buffer overrun in gnutls_x509_crt_list_import.
+Report and patch by Jonathan Manktelow.
+
+** libgnutls: Avoid use of non-thread safe strerror.
+
+** API and ABI modifications:
+No changes since last version.
 
 * Version 2.4.2 (released 2008-09-15)
 
