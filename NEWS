@@ -9,6 +9,8 @@ See the end for copying conditions.
 The tool now uses libgnutls' functions to print certificate
 information.  This avoids code duplication.
 
+** libgnutls: gnutls_x509_crt_print prints signature algorithm in oneline mode.
+
 ** API and ABI modifications:
 No changes since last version.
 

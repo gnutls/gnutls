@@ -1195,6 +1195,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
       addf (str, "issuer `%s', ", dn);
   }
 
+  /* Key algorithm and size. */
   {
     int bits;
     const char *name = gnutls_pk_algorithm_get_name
@@ -1202,6 +1203,26 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
     if (name == NULL)
       name = "Unknown";
     addf (str, "%s key %d bits, ", name, bits);
+  }
+
+  /* Signature Algorithm. */
+  {
+    int err;
+
+    err = gnutls_x509_crt_get_signature_algorithm (cert);
+    if (err < 0)
+      addf (str, "unknown signature algorithm (%s), ",
+	    gnutls_strerror (err));
+    else
+      {
+	const char *name = gnutls_sign_algorithm_get_name (err);
+	if (name == NULL)
+	  name = _("unknown");
+	if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
+	  addf (str, _("signed using %s (broken!), "), name);
+	else
+	  addf (str, _("signed using %s, "), name);
+      }
   }
 
   /* Validity. */
