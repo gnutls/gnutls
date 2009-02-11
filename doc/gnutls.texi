@@ -3196,17 +3196,25 @@ Usage: gnutls-serv [options]
      --x509cafile FILE        Certificate file to use.
      --x509crlfile FILE       CRL file to use.
      --pgpkeyring FILE        PGP Key ring file to use.
-     --pgptrustdb FILE        PGP trustdb file to use.
      --pgpkeyfile FILE        PGP Key file to use.
      --pgpcertfile FILE       PGP Public Key (certificate) file to
                               use.
+     --pgpsubkey HEX|auto     PGP subkey to use.
      --x509keyfile FILE       X.509 key file to use.
      --x509certfile FILE      X.509 Certificate file to use.
      --x509dsakeyfile FILE    Alternative X.509 key file to use.
      --x509dsacertfile FILE   Alternative X.509 certificate file to
                               use.
+     -r, --require-cert       Require a valid certificate.
+     -a, --disable-client-cert
+                              Disable request for a client
+                              certificate.
+     --pskpasswd FILE         PSK password file to use.
+     --pskhint HINT           PSK identity hint to use.
      --srppasswd FILE         SRP password file to use.
      --srppasswdconf FILE     SRP password conf file to use.
+     --opaque-prf-input DATA
+                              Use Opaque PRF Input DATA.
      --ciphers cipher1 cipher2...
                               Ciphers to enable.
      --protocols protocol1 protocol2...
@@ -3216,6 +3224,8 @@ Usage: gnutls-serv [options]
      --kx kx1 kx2...          Key exchange methods to enable.
      --ctypes certType1 certType2...
                               Certificate types to enable.
+     --priority PRIORITY STRING
+                              Priorities string.
      -l, --list               Print a list of the supported
                               algorithms  and modes.
      -h, --help               prints this help
