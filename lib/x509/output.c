@@ -1004,7 +1004,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		{
 		  addf (str, _("\t\tModulus (bits %d):\n"), bits);
 		  hexdump (str, m.data, m.size, "\t\t\t");
-		  addf (str, _("\t\tExponent:\n"));
+		  addf (str, _("\t\tExponent (bits %d):\n"), e.size * 8);
 		  hexdump (str, e.data, e.size, "\t\t\t");
 
 		  gnutls_free (m.data);
