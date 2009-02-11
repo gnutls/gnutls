@@ -43,9 +43,11 @@
 #include <netdb.h>
 #include <error.h>
 
+/* Gnulib portability files. */
 #include "progname.h"
 #include "version-etc.h"
 #include "read-file.h"
+#include "minmax.h"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -86,12 +88,6 @@ char *x509_crlfile = NULL;
 #define SMALL_READ_TEST (2147483647)
 
 #define GERR(ret) fprintf(stdout, "Error: %s\n", safe_strerror(ret))
-
-#undef max
-#define max(x,y) ((x) > (y) ? (x) : (y))
-#undef min
-#define min(x,y) ((x) < (y) ? (x) : (y))
-
 
 #define HTTP_END  "</BODY></HTML>\n\n"
 
@@ -1046,7 +1042,7 @@ main (int argc, char **argv)
 
 /* check for new incoming connections */
       FD_SET (h, &rd);
-      n = max (n, h);
+      n = MAX (n, h);
 
 /* flag which connections we are reading or writing to within the fd sets */
       lloopstart (listener_list, j)
@@ -1064,12 +1060,12 @@ main (int argc, char **argv)
 	if (j->http_state == HTTP_STATE_REQUEST)
 	  {
 	    FD_SET (j->fd, &rd);
-	    n = max (n, j->fd);
+	    n = MAX (n, j->fd);
 	  }
 	if (j->http_state == HTTP_STATE_RESPONSE)
 	  {
 	    FD_SET (j->fd, &wr);
-	    n = max (n, j->fd);
+	    n = MAX (n, j->fd);
 	  }
       }
       lloopend (listener_list, j);
@@ -1185,7 +1181,7 @@ main (int argc, char **argv)
 	    if (j->handshake_ok == 1)
 	      {
 		r = gnutls_record_recv (j->tls_session, buf,
-					min (1024, SMALL_READ_TEST));
+					MIN (1024, SMALL_READ_TEST));
 		if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN)
 		  {
 		    /* do nothing */
@@ -1286,7 +1282,7 @@ main (int argc, char **argv)
 		r = gnutls_record_send (j->tls_session,
 					j->http_response +
 					j->response_written,
-					min (j->response_length -
+					MIN (j->response_length -
 					     j->response_written,
 					     SMALL_READ_TEST));
 		if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN)
