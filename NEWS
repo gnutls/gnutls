@@ -22,6 +22,8 @@ behaviour.
 
 ** libgnutls: gnutls_openpgp_crt_print supports oneline mode.
 
+** doc: Update gnutls-cli and gnutls-serv --help output descriptions.
+
 ** API and ABI modifications:
 No changes since last version.
 
