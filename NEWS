@@ -5,16 +5,16 @@ See the end for copying conditions.
 
 * Version 2.7.6 (unreleased)
 
-** gnutls-cli: Certificate information output changed.
-The tool now uses libgnutls' functions to print certificate
-information.  This avoids code duplication.
-
-** gnutls-cli: No longer accepts V1 CAs by default.
+** gnutls-cli: No longer accepts V1 CAs by default during X.509 chain verify.
 Use --priority NORMAL:%VERIFY_ALLOW_X509_V1_CA_CRT to permit V1 CAs to
 be used for chain verification.
 
 ** gnutls-serv: No longer disable MAC padding by default.
 Use --priority NORMAL:%COMPAT to disable MAC padding again.
+
+** gnutls-cli: Certificate information output format changed.
+The tool now uses libgnutls' functions to print certificate
+information.  This avoids code duplication.
 
 ** libgnutls: New priority strings %VERIFY_ALLOW_SIGN_RSA_MD5
 ** and %VERIFY_ALLOW_X509_V1_CA_CRT.
