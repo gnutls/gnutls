@@ -43,9 +43,6 @@ extern int verbose;
 
 static char buffer[5 * 1024];
 
-#define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
-#define PRINT_PGP_NAME(X) PRINTX( "NAME:", name)
-
 const char str_unknown[] = "(unknown)";
 
 /* Hex encodes the given data.
@@ -69,20 +66,6 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
   buf[sizeof (buf) - 1] = '\0';
 
   return buf;
-}
-
-static const char *
-my_ctime (const time_t * tv)
-{
-  static char buf[256];
-  struct tm *tp;
-
-  if (((tp = localtime (tv)) == NULL) ||
-      (!strftime (buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp)))
-    strcpy (buf, str_unknown);	/* make sure buf text isn't garbage */
-
-  return buf;
-
 }
 
 static void
@@ -180,33 +163,35 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
 		    int insecure)
 {
 
-  char digest[20];
-  size_t digest_size = sizeof (digest);
-  int ret;
-  const char *print;
-  const char *cstr;
-  char name[256];
-  size_t name_len = sizeof (name);
   gnutls_openpgp_crt_t crt;
   const gnutls_datum_t *cert_list;
   int cert_list_size = 0;
-  time_t expiret;
-  time_t activet;
+  int hostname_ok = 0;
+  int ret;
 
   cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
 
   if (cert_list_size > 0)
     {
-      unsigned int algo, bits;
+      gnutls_datum_t cinfo;
 
       gnutls_openpgp_crt_init (&crt);
-      ret =
-	gnutls_openpgp_crt_import (crt, &cert_list[0],
-				   GNUTLS_OPENPGP_FMT_RAW);
+      ret = gnutls_openpgp_crt_import (crt, &cert_list[0],
+				       GNUTLS_OPENPGP_FMT_RAW);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Decoding error: %s\n", gnutls_strerror (ret));
 	  return;
+	}
+
+      if (verbose)
+	ret = gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &cinfo);
+      else
+	ret = gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_ONELINE, &cinfo);
+      if (ret == 0)
+	{
+	  printf ("  - %s\n", cinfo.data);
+	  gnutls_free (cinfo.data);
 	}
 
       if (print_cert)
@@ -215,81 +200,42 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
 
 	  size = sizeof (buffer);
 
-	  ret =
-	    gnutls_openpgp_crt_export (crt,
-				       GNUTLS_OPENPGP_FMT_BASE64,
-				       buffer, &size);
+	  ret = gnutls_openpgp_crt_export (crt, GNUTLS_OPENPGP_FMT_BASE64,
+					   buffer, &size);
 	  if (ret < 0)
 	    {
 	      fprintf (stderr, "Encoding error: %s\n", gnutls_strerror (ret));
 	      return;
 	    }
-	  fputs ("\n", stdout);
 	  fputs (buffer, stdout);
 	  fputs ("\n", stdout);
 	}
 
       if (hostname != NULL)
-	{			/* Check the hostname of the first certificate
-				 * if it matches the name of the host we
-				 * connected to.
-				 */
-	  if (gnutls_openpgp_crt_check_hostname (crt, hostname) == 0)
-	    {
-	      printf
-		(" # The hostname in the certificate does NOT match '%s'.\n",
-		 hostname);
-	      if (!insecure)
-		exit (1);
-	    }
-	  else
-	    {
-	      printf (" # The hostname in the certificate matches '%s'.\n",
-		      hostname);
-	    }
-	}
-
-      activet = gnutls_openpgp_crt_get_creation_time (crt);
-      expiret = gnutls_openpgp_crt_get_expiration_time (crt);
-
-      printf (" # Key was created at: %s", my_ctime (&activet));
-      printf (" # Key expires: ");
-      if (expiret != 0)
-	printf ("%s", my_ctime (&expiret));
-      else
-	printf ("Never\n");
-
-      if (gnutls_openpgp_crt_get_fingerprint (crt, digest, &digest_size) >= 0)
 	{
-	  print = raw_to_string (digest, digest_size);
-
-	  printf (" # PGP Key version: %d\n",
-		  gnutls_openpgp_crt_get_version (crt));
-
-	  bits = 0;
-	  algo = gnutls_openpgp_crt_get_pk_algorithm (crt, &bits);
-
-	  printf (" # PGP Key public key algorithm: ");
-	  cstr = SU (gnutls_pk_algorithm_get_name (algo));
-	  printf ("%s (%d bits)\n", cstr, bits);
-
-	  if (print != NULL)
-	    printf (" # PGP Key fingerprint: %s\n", print);
-
-	  name_len = sizeof (name);
-	  if (gnutls_openpgp_crt_get_name (crt, 0, name, &name_len) < 0)
-	    {
-	      fprintf (stderr, "Could not extract name\n");
-	    }
+	  /* Check the hostname of the first certificate if it matches
+	   * the name of the host we connected to.
+	   */
+	  if (gnutls_openpgp_crt_check_hostname (crt, hostname) == 0)
+	    hostname_ok = 1;
 	  else
-	    {
-	      PRINT_PGP_NAME (name);
-	    }
-
+	    hostname_ok = 2;
 	}
 
       gnutls_openpgp_crt_deinit (crt);
+    }
 
+  if (hostname_ok == 1)
+    {
+      printf ("- The hostname in the certificate does NOT match '%s'\n",
+	      hostname);
+      if (!insecure)
+	exit (1);
+    }
+  else if (hostname_ok == 2)
+    {
+      printf ("- The hostname in the certificate matches '%s'.\n",
+	      hostname);
     }
 }
 
