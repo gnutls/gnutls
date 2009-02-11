@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.7.6 (unreleased)
 
+** gnutls-cli: Certificate information output changed.
+The tool now uses libgnutls' functions to print certificate
+information.  This avoids code duplication.
+
 ** API and ABI modifications:
 No changes since last version.
 
