@@ -44,6 +44,7 @@
 #include <version-etc.h>
 #include <read-file.h>
 #include <getpass.h>
+#include <minmax.h>
 
 #include "common.h"
 #include "cli-gaa.h"
@@ -115,34 +116,19 @@ static void check_rehandshake (socket_st * socket, int ret);
 static int do_handshake (socket_st * socket);
 static void init_global_tls_stuff (void);
 
-
-#undef MAX
-#define MAX(X,Y) (X >= Y ? X : Y);
-
-
 /* Helper functions to load a certificate and key
  * files into memory.
  */
 static gnutls_datum_t
 load_file (const char *file)
 {
-  FILE *f;
   gnutls_datum_t loaded_file = { NULL, 0 };
-  long filelen;
-  void *ptr;
+  size_t length;
 
-  if (!(f = fopen (file, "r"))
-      || fseek (f, 0, SEEK_END) != 0
-      || (filelen = ftell (f)) < 0
-      || fseek (f, 0, SEEK_SET) != 0
-      || !(ptr = malloc ((size_t) filelen))
-      || fread (ptr, 1, (size_t) filelen, f) < (size_t) filelen)
-    {
-      return loaded_file;
-    }
+  loaded_file.data = read_binary_file (file, &length);
+  if (loaded_file.data)
+    loaded_file.size = (unsigned int) length;
 
-  loaded_file.data = ptr;
-  loaded_file.size = (unsigned int) filelen;
   return loaded_file;
 }
 
@@ -1077,9 +1063,8 @@ init_global_tls_stuff (void)
 
   if (x509_cafile != NULL)
     {
-      ret =
-	gnutls_certificate_set_x509_trust_file (xcred,
-						x509_cafile, x509ctype);
+      ret = gnutls_certificate_set_x509_trust_file (xcred,
+						    x509_cafile, x509ctype);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error setting the x509 trust file\n");
@@ -1092,8 +1077,8 @@ init_global_tls_stuff (void)
 #ifdef ENABLE_PKI
   if (x509_crlfile != NULL)
     {
-      ret =
-	gnutls_certificate_set_x509_crl_file (xcred, x509_crlfile, x509ctype);
+      ret = gnutls_certificate_set_x509_crl_file (xcred, x509_crlfile,
+						  x509ctype);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error setting the x509 CRL file\n");
