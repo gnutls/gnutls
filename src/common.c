@@ -190,7 +190,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
 	ret = gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_ONELINE, &cinfo);
       if (ret == 0)
 	{
-	  printf ("  - %s\n", cinfo.data);
+	  printf (" - %s\n", cinfo.data);
 	  gnutls_free (cinfo.data);
 	}
 
