@@ -98,14 +98,6 @@ libcmd_certtool_la_LIBADD = ../gl/libgnu.la @LTLIBREADLINE@
 libcmd_certtool_la_LIBADD += ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 libcmd_certtool_la_LIBADD += ../gl/libgnu.la
 
-noinst_PROGRAMS = errcodes printlist
-errcodes_SOURCES = errcodes.c
-errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
-
-printlist_SOURCES = printlist.c
-printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
-
-
 psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
 crypt-gaa.c: $(srcdir)/crypt.gaa

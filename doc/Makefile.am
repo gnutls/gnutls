@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -124,12 +124,19 @@ ia-api.texi: ../libextra/ia-api.texi
 
 # Generated texinfos.
 
-error_codes.texi: ../lib/gnutls_errors.c ../src/errcodes.c
-	-../src/errcodes > error_codes.texi
+noinst_PROGRAMS = errcodes printlist
 
-algorithms.texi: ../src/printlist.c
-	-../src/printlist > algorithms.texi
+errcodes_SOURCES = errcodes.c
+errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
+printlist_SOURCES = printlist.c
+printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
+
+error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c $(builddir)/errcodes
+	-./errcodes > error_codes.texi
+
+algorithms.texi: $(srcdir)/printlist.c $(builddir)/printlist
+	-./printlist > algorithms.texi
 
 guile_texi           = core.c.texi extra.c.texi
 BUILT_SOURCES        = $(guile_texi)
