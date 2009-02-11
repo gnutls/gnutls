@@ -18,7 +18,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
-Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -3025,7 +3025,6 @@ Usage:  gnutls-cli [options] hostname
                               of the key.
      --disable-extensions     Disable all the TLS extensions.
      --print-cert             Print the certificate in PEM format.
-     -p, --port integer       The port to connect to.
      --recordsize integer     The maximum record size to advertize.
      -V, --verbose            More verbose output.
      --ciphers cipher1 cipher2...
@@ -3037,21 +3036,28 @@ Usage:  gnutls-cli [options] hostname
      --kx kx1 kx2...          Key exchange methods to enable.
      --ctypes certType1 certType2...
                               Certificate types to enable.
+     --priority PRIORITY STRING
+                              Priorities string.
      --x509cafile FILE        Certificate file to use.
      --x509crlfile FILE       CRL file to use.
      --pgpkeyfile FILE        PGP Key file to use.
      --pgpkeyring FILE        PGP Key ring file to use.
-     --pgptrustdb FILE        PGP trustdb file to use.
      --pgpcertfile FILE       PGP Public Key (certificate) file to
                               use.
+     --pgpsubkey HEX|auto     PGP subkey to use.
      --x509keyfile FILE       X.509 key file to use.
      --x509certfile FILE      X.509 Certificate file to use.
      --srpusername NAME       SRP username to use.
      --srppasswd PASSWD       SRP password to use.
+     --pskusername NAME       PSK username to use.
+     --pskkey KEY             PSK key (in hex) to use.
+     --opaque-prf-input DATA
+                              Use Opaque PRF Input DATA.
+     -p, --port PORT          The port to connect to.
      --insecure               Don't abort program if server
                               certificate can't be validated.
      -l, --list               Print a list of the supported
-                              algorithms  and modes.
+                              algorithms and modes.
      -h, --help               prints this help
      -v, --version            prints the program's version number
 @end verbatim
