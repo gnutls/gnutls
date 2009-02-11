@@ -304,10 +304,8 @@ print_key_info (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
     }
 }
 
-
 static void
-print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert,
-	    unsigned int format)
+print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert)
 {
   int i, subkeys;
   int err;
@@ -376,6 +374,100 @@ print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert,
 
 }
 
+static void
+print_oneline (gnutls_string * str, gnutls_openpgp_crt_t cert)
+{
+  int err, i;
+
+  /* Names. */
+  i = 0;
+  do
+    {
+      size_t dn_size;
+      char dn[1024];
+
+      dn_size = sizeof (dn);
+      err = gnutls_openpgp_crt_get_name (cert, i++, dn, &dn_size);
+      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
+	  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+	{
+	  addf (str, "cannot get_name %d (%s), ", err, gnutls_strerror (err));
+	  break;
+	}
+
+      if (err >= 0)
+	addf (str, _("name[%d]: %s, "), i - 1, dn);
+      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
+	addf (str, _("revoked name[%d]: %s, "), i - 1, dn);
+    }
+  while (err >= 0);
+
+  {
+    char fpr[128];
+    size_t fpr_size = sizeof (fpr);
+    int err;
+
+    err = gnutls_openpgp_crt_get_fingerprint (cert, fpr, &fpr_size);
+    if (err < 0)
+      addf (str, "error: get_fingerprint: %s\n", gnutls_strerror (err));
+    else
+      {
+	addf (str, _("fingerprint: "));
+	hexprint (str, fpr, fpr_size);
+	addf (str, ", ");
+      }
+  }
+
+  {
+    time_t tim;
+
+    tim = gnutls_openpgp_crt_get_creation_time (cert);
+    {
+      char s[42];
+      size_t max = sizeof (s);
+      struct tm t;
+
+      if (gmtime_r (&tim, &t) == NULL)
+	addf (str, "error: gmtime_r (%ld), ", (unsigned long) tim);
+      else if (strftime (s, max, "%Y-%m-%d %H:%M:%S UTC", &t) == 0)
+	addf (str, "error: strftime (%ld), ", (unsigned long) tim);
+      else
+	addf (str, _("created: %s, "), s);
+    }
+
+    tim = gnutls_openpgp_crt_get_expiration_time (cert);
+    {
+      char s[42];
+      size_t max = sizeof (s);
+      struct tm t;
+
+      if (tim == 0)
+	adds (str, _("never expires, "));
+      else
+	{
+	  if (gmtime_r (&tim, &t) == NULL)
+	    addf (str, "error: gmtime_r (%ld), ", (unsigned long) tim);
+	  else if (strftime (s, max, "%Y-%m-%d %H:%M:%S UTC", &t) == 0)
+	    addf (str, "error: strftime (%ld), ", (unsigned long) tim);
+	  else
+	    addf (str, _("expires: %s, "), s);
+	}
+    }
+  }
+
+  {
+    unsigned int bits = 0;
+    gnutls_pk_algorithm_t algo =
+      gnutls_openpgp_crt_get_pk_algorithm (cert, &bits);
+    const char *algostr = gnutls_pk_algorithm_get_name (algo);
+
+    if (algostr)
+      addf (str, _("key algorithm %s (%d bits)"), algostr, bits);
+    else
+      addf (str, _("unknown key algorithm (%d)"), algo);
+  }
+}
+
 /**
  * gnutls_openpgp_crt_print - Pretty print OpenPGP certificates
  * @cert: The structure to be printed
@@ -400,11 +492,16 @@ gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
 
   _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
 
-  _gnutls_string_append_str (&str, _("OpenPGP Certificate Information:\n"));
-
-  print_cert (&str, cert, format);
+  if (format == GNUTLS_CRT_PRINT_ONELINE)
+    print_oneline (&str, cert);
+  else
+    {
+      _gnutls_string_append_str (&str, _("OpenPGP Certificate Information:\n"));
+      print_cert (&str, cert);
+    }
 
   _gnutls_string_append_data (&str, "\0", 1);
+
   out->data = str.data;
   out->size = strlen (str.data);
 
