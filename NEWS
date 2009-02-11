@@ -13,6 +13,9 @@ information.  This avoids code duplication.
 Use --priority NORMAL:%VERIFY_ALLOW_X509_V1_CA_CRT to permit V1 CAs to
 be used for chain verification.
 
+** gnutls-serv: No longer disable MAC padding by default.
+Use --priority NORMAL:%COMPAT to disable MAC padding again.
+
 ** libgnutls: New priority strings %VERIFY_ALLOW_SIGN_RSA_MD5
 ** and %VERIFY_ALLOW_X509_V1_CA_CRT.
 They can be used to override the default certificate chain validation
