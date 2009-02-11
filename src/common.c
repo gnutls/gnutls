@@ -124,6 +124,7 @@ print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 	      return;
 	    }
 
+	  fputs ("\n", stdout);
 	  fputs (buffer, stdout);
 	  fputs ("\n", stdout);
 	}
