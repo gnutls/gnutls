@@ -10,6 +10,13 @@ The tool now uses libgnutls' functions to print certificate
 information.  This avoids code duplication.
 
 ** gnutls-cli: No longer accepts V1 CAs by default.
+Use --priority NORMAL:%VERIFY_ALLOW_X509_V1_CA_CRT to permit V1 CAs to
+be used for chain verification.
+
+** libgnutls: New priority strings %VERIFY_ALLOW_SIGN_RSA_MD5
+** and %VERIFY_ALLOW_X509_V1_CA_CRT.
+They can be used to override the default certificate chain validation
+behaviour.
 
 ** libgnutls: gnutls_x509_crt_print prints signature algorithm in oneline mode.
 

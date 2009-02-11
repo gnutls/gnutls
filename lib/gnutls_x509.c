@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -171,12 +171,12 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 
   /* Verify certificate 
    */
-  ret =
-    gnutls_x509_crt_list_verify (peer_certificate_list,
-				 peer_certificate_list_size,
-				 cred->x509_ca_list, cred->x509_ncas,
-				 cred->x509_crl_list, cred->x509_ncrls,
-				 cred->verify_flags, status);
+  ret = gnutls_x509_crt_list_verify (peer_certificate_list,
+				     peer_certificate_list_size,
+				     cred->x509_ca_list, cred->x509_ncas,
+				     cred->x509_crl_list, cred->x509_ncrls,
+				     cred->verify_flags | session->internals.priorities.additional_verify_flags,
+				     status);
 
   CLEAR_CERTS;
 

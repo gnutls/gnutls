@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -472,6 +472,9 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * '!' or '-' appended with an algorithm will remove this algorithm.
   * '+' appended with an algorithm will add this algorithm.
   * '%COMPAT' will enable compatibility features for a server.
+  * '%VERIFY_ALLOW_SIGN_RSA_MD5' will allow RSA-MD5 signatures in
+  * certificate chains.
+  * '%VERIFY_ALLOW_X509_V1_CA_CRT' will allow V1 CAs in chains.
   *
   * To avoid collisions in order to specify a compression algorithm in
   * this string you have to prefix it with "COMP-", protocol versions
@@ -623,6 +626,14 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	{
 	  if (strcasecmp (&broken_list[i][1], "COMPAT") == 0)
 	    (*priority_cache)->no_padding = 1;
+	  else if (strcasecmp (&broken_list[i][1],
+			       "VERIFY_ALLOW_SIGN_RSA_MD5") == 0)
+	    (*priority_cache)->additional_verify_flags |=
+	      GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5;
+	  else if (strcasecmp (&broken_list[i][1],
+			       "VERIFY_ALLOW_X509_V1_CA_CRT") == 0)
+	    (*priority_cache)->additional_verify_flags |=
+	      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
 	  else
 	    goto error;
 	}
