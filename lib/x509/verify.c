@@ -504,7 +504,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
        * certificates can exist in a supplied chain.
        */
       if (!(flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT))
-	flags ^= GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
+	flags &= ~(GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
       if ((ret =
 	   _gnutls_verify_certificate2 (certificate_list[i - 1],
 					&certificate_list[i], 1, flags,
