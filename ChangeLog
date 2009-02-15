@@ -1,3 +1,52 @@
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.4.3.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/verify.c: Move down revocation check to revert code to
+	how it looked before.  The idea is that if you have marked a cert as
+	trusted, you may want to trust it even though some authority has
+	revoked it.  This changes back how this code used to work.
+
+2009-02-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/verify.c: Back-port chain verification fixes.
+
+2008-10-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-16  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/main.c, lib/opencdk/opencdk.h: Remove cdk_strerror,
+	unused and uses non-thread safe strerror.
+
+2008-10-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2008-09-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2008-09-23  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/x509.c: Corrected buffer overrun in crt_list_import.
+	Reported and patch by Jonathan Manktelow.
+
+2008-09-15  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am: Update release target.
+
+2008-09-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2008-09-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.4.2.
