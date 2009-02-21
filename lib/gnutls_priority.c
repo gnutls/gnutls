@@ -472,6 +472,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * '!' or '-' appended with an algorithm will remove this algorithm.
   * '+' appended with an algorithm will add this algorithm.
   * '%COMPAT' will enable compatibility features for a server.
+  * '%SSL3_RECORD_VERSION' will use SSL3.0 record version in client hello
   *
   * To avoid collisions in order to specify a compression algorithm in
   * this string you have to prefix it with "COMP-", protocol versions
@@ -623,6 +624,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	{
 	  if (strcasecmp (&broken_list[i][1], "COMPAT") == 0)
 	    (*priority_cache)->no_padding = 1;
+	  else if (strcasecmp (&broken_list[i][1],
+			       "SSL3_RECORD_VERSION") == 0)
+	    (*priority_cache)->ssl3_record_version = 1;
 	  else
 	    goto error;
 	}
