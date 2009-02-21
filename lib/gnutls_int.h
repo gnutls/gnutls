@@ -412,6 +412,7 @@ struct gnutls_priority_st
 
   /* to disable record padding */
   int no_padding;
+  int ssl3_record_version;
   int additional_verify_flags;
 };
 

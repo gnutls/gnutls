@@ -1742,7 +1742,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
           if (rehandshake) /* already negotiated version thus version_max == negotiated version */
             hver = session->security_parameters.version;
           else
-  	    hver = _gnutls_version_max (session);
+            hver = _gnutls_version_max (session);
         }
       else
 	{			/* we are resuming a session */
@@ -1764,15 +1764,24 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
        */
       _gnutls_set_adv_version (session, hver);
 
-      /* Some old implementations do not interoperate if we send a
-       * different version in the record layer.
-       * It seems they prefer to read the record's version
-       * as the one we actually requested.
-       * The proper behaviour is to use the one in the client hello 
-       * handshake packet and ignore the one in the packet's record 
-       * header.
-       */
-      _gnutls_set_current_version (session, hver);
+      if (session->internals.priorities.ssl3_record_version) 
+        {
+          /* Honor the SSL3_RECORD_VERSION option
+           */
+          _gnutls_set_current_version (session, GNUTLS_SSL3);
+        }
+      else
+        {
+          /* Some old implementations do not interoperate if we send a
+           * different version in the record layer.
+           * It seems they prefer to read the record's version
+           * as the one we actually requested.
+           * The proper behaviour is to use the one in the client hello 
+           * handshake packet and ignore the one in the packet's record 
+           * header.
+           */
+          _gnutls_set_current_version (session, hver);
+        }
 
       /* In order to know when this session was initiated.
        */
