@@ -21,6 +21,10 @@ information.  This avoids code duplication.
 They can be used to override the default certificate chain validation
 behaviour.
 
+** libgnutls: Added %SSL3_RECORD_VERSION priority string that allows to 
+specify the client hello message record version. Used to overcome buggy 
+TLS servers. Report by Martin von Gagern.
+
 ** libgnutls: gnutls_x509_crt_print prints signature algorithm in oneline mode.
 
 ** libgnutls: gnutls_openpgp_crt_print supports oneline mode.
