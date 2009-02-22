@@ -657,6 +657,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
   if (val_name == NULL)
     {
       gnutls_assert ();
+      _gnutls_x509_log ("Cannot find OID: %s\n", given_oid);
       return GNUTLS_E_X509_UNSUPPORTED_OID;
     }
 
