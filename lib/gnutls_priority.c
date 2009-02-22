@@ -469,10 +469,10 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   * compression methods.
   *
   * Special keywords:
-  * '!' or '-' appended with an algorithm will remove this algorithm.
-  * '+' appended with an algorithm will add this algorithm.
-  * '%COMPAT' will enable compatibility features for a server.
-  * '%SSL3_RECORD_VERSION' will use SSL3.0 record version in client hello
+  * "!" or "-" appended with an algorithm will remove this algorithm.
+  * "+" appended with an algorithm will add this algorithm.
+  * "%COMPAT" will enable compatibility features for a server.
+  * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
   *
   * To avoid collisions in order to specify a compression algorithm in
   * this string you have to prefix it with "COMP-", protocol versions
