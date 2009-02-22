@@ -25,12 +25,19 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <gcrypt.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
 #include "utils.h"
+
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "%s |<%d>| %s", "crq_key_id", level, str);
+}
 
 void
 doit (void)
@@ -53,6 +60,9 @@ doit (void)
   ret = gnutls_global_init ();
   if (ret < 0)
     fail ("gnutls_global_init: %d\n", ret);
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (4711);
 
   for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_DSA; algorithm++)
     {
