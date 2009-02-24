@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -983,18 +983,20 @@ get_dns_name_set (int type, void *crt)
     {
       const char *p;
 
-      p = read_str ("Enter the dnsName of the subject of the certificate: ");
-      if (!p)
-	return;
+      do
+	{
+	  p = read_str ("Enter a dnsName of the subject of the certificate: ");
+	  if (!p)
+	    return;
 
-      if (type == TYPE_CRT)
-	ret = gnutls_x509_crt_set_subject_alt_name (crt, GNUTLS_SAN_DNSNAME,
-						    p, strlen (p),
-						    GNUTLS_FSAN_APPEND);
-      else
-	ret = gnutls_x509_crq_set_subject_alt_name (crt, GNUTLS_SAN_DNSNAME,
-						    p, strlen (p),
-						    GNUTLS_FSAN_APPEND);
+	  if (type == TYPE_CRT)
+	    ret = gnutls_x509_crt_set_subject_alt_name
+	      (crt, GNUTLS_SAN_DNSNAME, p, strlen (p), GNUTLS_FSAN_APPEND);
+	  else
+	    ret = gnutls_x509_crq_set_subject_alt_name
+	      (crt, GNUTLS_SAN_DNSNAME, p, strlen (p), GNUTLS_FSAN_APPEND);
+	}
+      while (p);
     }
 
   if (ret < 0)

@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.7.6 (unreleased)
 
+** certtool: Query for multiple dnsName subjectAltName in interactive mode.
+This applies both to generating certificates and certificate requests.
+
 ** pkix.asn: Removed unneeded definitions to reduce memory usage.
 
 ** gnutls-cli: No longer accepts V1 CAs by default during X.509 chain verify.
