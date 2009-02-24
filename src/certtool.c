@@ -82,8 +82,6 @@ FILE *outfile;
 FILE *infile;
 gnutls_digest_algorithm_t dig = GNUTLS_DIG_SHA1;
 
-#define UNKNOWN "Unknown"
-
 /* non interactive operation if set
  */
 int batch;
@@ -236,7 +234,6 @@ print_private_key (gnutls_x509_privkey_t key)
 	       gnutls_strerror (ret));
     }
 
-
   fwrite (buffer, 1, size, outfile);
 }
 
@@ -261,7 +258,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
   gnutls_x509_privkey_t key = NULL;
   size_t size;
   int ret;
-  int serial, client;
+  int client;
   int days, result, ca_status = 0, path_len;
   int vers;
   unsigned int usage = 0, server;
@@ -325,16 +322,20 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
     }
 
 
-  serial = get_serial ();
-  buffer[4] = serial & 0xff;
-  buffer[3] = (serial >> 8) & 0xff;
-  buffer[2] = (serial >> 16) & 0xff;
-  buffer[1] = (serial >> 24) & 0xff;
-  buffer[0] = 0;
+  {
+    int serial = get_serial ();
+    char bin_serial[5];
 
-  result = gnutls_x509_crt_set_serial (crt, buffer, 5);
-  if (result < 0)
-    error (EXIT_FAILURE, 0, "serial: %s", gnutls_strerror (result));
+    bin_serial[4] = serial & 0xff;
+    bin_serial[3] = (serial >> 8) & 0xff;
+    bin_serial[2] = (serial >> 16) & 0xff;
+    bin_serial[1] = (serial >> 24) & 0xff;
+    bin_serial[0] = 0;
+
+    result = gnutls_x509_crt_set_serial (crt, bin_serial, 5);
+    if (result < 0)
+      error (EXIT_FAILURE, 0, "serial: %s", gnutls_strerror (result));
+  }
 
   if (!batch)
     fprintf (stderr, "\n\nActivation/Expiration time.\n");
@@ -569,7 +570,6 @@ generate_crl (gnutls_x509_crt_t ca_crt)
   int days, result;
   unsigned int i;
   time_t now = time (NULL);
-  unsigned int number;
 
   result = gnutls_x509_crl_init (&crl);
   if (result < 0)
@@ -620,17 +620,20 @@ generate_crl (gnutls_x509_crt_t ca_crt)
 	}
     }
 
-  number = get_crl_number ();
+  {
+    unsigned int number = get_crl_number ();
+    char bin_number[5];
 
-  buffer[4] = number & 0xff;
-  buffer[3] = (number >> 8) & 0xff;
-  buffer[2] = (number >> 16) & 0xff;
-  buffer[1] = (number >> 24) & 0xff;
-  buffer[0] = 0;
+    bin_number[4] = number & 0xff;
+    bin_number[3] = (number >> 8) & 0xff;
+    bin_number[2] = (number >> 16) & 0xff;
+    bin_number[1] = (number >> 24) & 0xff;
+    bin_number[0] = 0;
 
-  result = gnutls_x509_crl_set_number (crl, buffer, 5);
-  if (result < 0)
-    error (EXIT_FAILURE, 0, "set_number: %s", gnutls_strerror (result));
+    result = gnutls_x509_crl_set_number (crl, bin_number, 5);
+    if (result < 0)
+      error (EXIT_FAILURE, 0, "set_number: %s", gnutls_strerror (result));
+  }
 
   return crl;
 }
@@ -1170,13 +1173,10 @@ pgp_privkey_info (void)
 	ret = gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, i, NULL);
 
       fprintf (outfile, "\tPublic Key Algorithm: ");
-
       cprint = gnutls_pk_algorithm_get_name (ret);
-      if (cprint == NULL)
-	cprint = UNKNOWN;
-      fprintf (outfile, "%s\n", cprint);
+      fprintf (outfile, "%s\n", cprint ? cprint : "Unknown");
 
-      /* Print the raw public and private keys    
+      /* Print the raw public and private keys
        */
 
       if (ret == GNUTLS_PK_RSA)
@@ -1505,11 +1505,9 @@ privkey_info (void)
   fprintf (outfile, "\tPublic Key Algorithm: ");
 
   cprint = gnutls_pk_algorithm_get_name (ret);
-  if (cprint == NULL)
-    cprint = UNKNOWN;
-  fprintf (outfile, "%s\n", cprint);
+  fprintf (outfile, "%s\n", cprint ? cprint : "Unknown");
 
-  /* Print the raw public and private keys    
+  /* Print the raw public and private keys
    */
   if (ret == GNUTLS_PK_RSA)
     {
