@@ -1,3 +1,220 @@
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Fix distcheck.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Fix.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Remove error_codes.texi and algorithms.texi to
+	fix make distcheck.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Update --css-include path to fix distcheck.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.6.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Fix.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/test-fseeko2.sh, lib/gl/tests/test-fseeko2.sh: Update
+	gnulib files.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-comp.m4, gl/m4/printf.m4, gl/m4/stdint.m4,
+	gl/m4/stdlib_h.m4, gl/m4/vasnprintf.m4, gl/tests/Makefile.am,
+	gl/tests/test-fseeko.c, gl/tests/test-getaddrinfo.c,
+	gl/vasnprintf.c, lib/gl/m4/gnulib-comp.m4, lib/gl/m4/printf.m4,
+	lib/gl/m4/stdint.m4, lib/gl/m4/stdlib_h.m4,
+	lib/gl/m4/vasnprintf.m4, lib/gl/tests/Makefile.am,
+	lib/gl/tests/test-fseeko.c, lib/gl/vasnprintf.c: Update gnulib
+	files.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/ungetc.m4, lib/gl/m4/ungetc.m4: Update gnulib files.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/scripts/gdoc: Revert %-hack that lead to syntax errors in
+	texinfo output.
+
+2009-02-24  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Minor cleanup.
+
+2009-02-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool-cfg.c: certtool: Query for multiple dnsName
+	subjectAltName in interactive mode.
+
+2009-02-23  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/include_next.m4, lib/gl/m4/include_next.m4: Update gnulib
+	files.
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented pkix.asn change
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkix.asn: Removed several unneeded parameters from pkix tree.
+	This reduces initial memory usage after gnutls_global_init() from
+	140kb (in amd64) to 50kb.
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/dn.c, tests/crq_key_id.c: Added more verbose information.
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkix.asn, lib/pkix_asn1_tab.c, lib/x509/dn.c,
+	tests/crq_key_id.c: Revert "Added more verbose debugging info" This reverts commit c2d3596cddbb54ac4f19c44b15a03ee1fcceab12.
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkix.asn, lib/pkix_asn1_tab.c, lib/x509/dn.c,
+	tests/crq_key_id.c: Added more verbose debugging info
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/TODO: removed items that have already been done or solved.
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: documented the SSL3_RECORD_VERSION priority string
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/scripts/gdoc, lib/gnutls_priority.c: Applied patch by Martin
+	von Gagern: The attached patch fixes gnutls_priority_init(3), but in
+	a very hackish way, treating a percent sign as indicating a constant
+	only if it is not immediately preceded by a double quote.
+
+2009-02-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/manpages/gnutls-cli.1: Corrected listing of special keywords.
+	Reported by Martin von Gagern.
+
+2009-02-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/manpages/gnutls-cli.1, lib/gnutls_handshake.c,
+	lib/gnutls_int.h, lib/gnutls_priority.c: Added %SSL3_RECORD_VERSION
+	priority option that allows to specify the client hello message
+	record version. Used to overcome buggy TLS servers. Report by Martin
+	von Gagern.
+
+2009-02-15  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/verify.c: Corrected bit disable (was flipping instead).
+	Initialy reported by Daniel Kahn Gillmor on 9/1/2008. Many thanks to
+	moog@sysdev.oucs.ox.ac.uk for bringing this into my attention.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/serv.c: gnutls-serv: No longer disable MAC padding by
+	default.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: More gnulib usage.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Use more gnulib interfaces.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Update gnutls-serv --help output.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Update gnutls-cli --help output.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls_int.h, lib/gnutls_priority.c, lib/gnutls_x509.c: 
+	libgnutls: Add new priority strings for allowing RSA-MD5 and V1-CA.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/cli.c: gnutls-cli: Don't permit V1 CAs by default.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/errcodes.c, doc/printlist.c,
+	src/Makefile.am, src/errcodes.c, src/printlist.c: Move doc related
+	tools from src/ to doc/.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Typo.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Typo.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* src/common.c: Print OpenPGP cert info using libgnutls.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/openpgp/output.c: libgnutls: gnutls_openpgp_crt_print
+	supports oneline mode.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem: Fix expected test vectors.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/x509/output.c: libgnutls: gnutls_x509_crt_print prints
+	signature algorithm in oneline mode.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/close.m4, gl/m4/sockets.m4, gl/tests/sockets.h,
+	gl/tests/test-sockets.c, lib/gl/m4/sockets.m4, lib/gl/sockets.h,
+	lib/gl/tests/test-sockets.c: Update gnulib files.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/common.c: gnutls-cli: Print certificate info using
+	libgnutls.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-02-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Print bit size of RSA exponents.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-02-06  Simon Josefsson <simon@josefsson.org>
 
 	* src/Makefile.am: Need -lgnutls etc for certtool-cfg.c.
