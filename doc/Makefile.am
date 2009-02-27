@@ -45,6 +45,7 @@ gnutls_TEXINFOS = gnutls.texi						\
 
 # Generated texinfos.
 gnutls_TEXINFOS += error_codes.texi algorithms.texi
+MAINTAINERCLEANFILES = error_codes.texi algorithms.texi
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\
