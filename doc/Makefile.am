@@ -90,7 +90,7 @@ images_DATA = gnutls-certificate-user-use-case.png		\
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
-	--no-split --css-include=texinfo.css
+	--no-split --css-include=$(srcdir)/texinfo.css
 
 ../lib/gnutls-api.texi:
 	cd ../lib && make gnutls-api.texi
