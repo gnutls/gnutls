@@ -80,10 +80,10 @@ EXTRA_DIST += test-errno.c
 
 ## begin gnulib module fseeko-tests
 
-TESTS += test-fseeko.sh
+TESTS += test-fseeko.sh test-fseeko2.sh
 TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@' srcdir='$(srcdir)'
 check_PROGRAMS += test-fseeko
-EXTRA_DIST += test-fseeko.c test-fseeko.sh
+EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh
 
 ## end   gnulib module fseeko-tests
 

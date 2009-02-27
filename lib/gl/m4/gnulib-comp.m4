@@ -133,6 +133,7 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='lib/gl/tests'
+  gl_FUNC_UNGETC_WORKS
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   AC_CHECK_FUNCS([shutdown])
@@ -341,6 +342,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/time_h.m4
   m4/time_r.m4
   m4/uintmax_t.m4
+  m4/ungetc.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/vasprintf.m4
@@ -355,6 +357,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-errno.c
   tests/test-fseeko.c
   tests/test-fseeko.sh
+  tests/test-fseeko2.sh
   tests/test-func.c
   tests/test-lseek.c
   tests/test-lseek.sh

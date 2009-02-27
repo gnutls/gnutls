@@ -221,6 +221,7 @@ AC_SUBST([LTALLOCA])
   m4_pushdef([gltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl/tests'
+  gl_FUNC_UNGETC_WORKS
   gl_FUNC_GETTIMEOFDAY
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
@@ -470,6 +471,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
   m4/sys_time_h.m4
+  m4/ungetc.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/warnings.m4
@@ -483,6 +485,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-errno.c
   tests/test-fseeko.c
   tests/test-fseeko.sh
+  tests/test-fseeko2.sh
   tests/test-getaddrinfo.c
   tests/test-getdelim.c
   tests/test-getline.c
