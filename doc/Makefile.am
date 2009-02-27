@@ -141,7 +141,7 @@ algorithms.texi: $(srcdir)/printlist.c $(builddir)/printlist
 
 guile_texi           = core.c.texi extra.c.texi
 BUILT_SOURCES        = $(guile_texi)
-MAINTAINERCLEANFILES = $(guile_texi)
+MAINTAINERCLEANFILES += $(guile_texi)
 EXTRA_DIST           += $(guile_texi)
 
 if HAVE_GUILE
