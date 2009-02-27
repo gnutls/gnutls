@@ -102,5 +102,3 @@ tests/x509self
 tests/x509signself
 lib/build-aux/
 libextra/build-aux/
-lib/gl/tests/
-gl/tests/
