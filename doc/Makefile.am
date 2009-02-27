@@ -133,10 +133,10 @@ errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 printlist_SOURCES = printlist.c
 printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
-error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c $(builddir)/errcodes
+error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
 	-./errcodes > error_codes.texi
 
-algorithms.texi: $(srcdir)/printlist.c $(builddir)/printlist
+algorithms.texi: $(srcdir)/printlist.c
 	-./printlist > algorithms.texi
 
 guile_texi           = core.c.texi extra.c.texi
