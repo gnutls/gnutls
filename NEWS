@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.7.7 (unreleased)
 
+** doc: Fix build failure of errcodes/printlist.
+Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3435>.
+
 ** API and ABI modifications:
 No changes since last version.
 
