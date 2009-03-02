@@ -133,6 +133,8 @@ errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 printlist_SOURCES = printlist.c
 printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
+AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
+
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
 	-./errcodes > error_codes.texi
 
