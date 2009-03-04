@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2006, 2008 Free Software Foundation, Inc.
+ *      Copyright (C) 2006, 2008, 2009 Free Software Foundation, Inc.
  *      Copyright (C) 2002, 2005 Fabio Fiorina
  *
  * This file is part of LIBTASN1.

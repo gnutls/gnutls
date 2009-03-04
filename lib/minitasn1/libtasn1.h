@@ -1,6 +1,6 @@
 /*
- *      Copyright (C) 2004, 2005, 2006, 2008 Free Software Foundation
- *      Copyright (C) 2002 Fabio Fiorina
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
+ * Copyright (C) 2002 Fabio Fiorina
  *
  * This file is part of LIBTASN1.
  *
@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#define ASN1_VERSION "1.7"
+#define ASN1_VERSION "1.8"
 
   typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 
