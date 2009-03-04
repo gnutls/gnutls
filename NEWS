@@ -6,6 +6,7 @@ See the end for copying conditions.
 * Version 2.7.7 (unreleased)
 
 ** minitasn1: Internal copy updated to libtasn1 v1.8.
+GnuTLS is also internally ready to be used with libtasn1 v2.0.
 
 ** doc: Fix build failure of errcodes/printlist.
 Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
