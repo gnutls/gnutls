@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -290,8 +290,8 @@ parse_attribute (ASN1_TYPE asn1_struct,
 		 int raw, char *buf, size_t * sizeof_buf)
 {
   int k1, result;
-  char tmpbuffer1[MAX_NAME_SIZE];
-  char tmpbuffer3[MAX_NAME_SIZE];
+  char tmpbuffer1[ASN1_MAX_NAME_SIZE];
+  char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   char value[200];
   char oid[MAX_OID_SIZE];
   int len, printable;
@@ -455,7 +455,7 @@ add_attribute (ASN1_TYPE asn, const char *root, const char *attribute_id,
 	       const gnutls_datum_t * ext_data)
 {
   int result;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
 
   snprintf (name, sizeof (name), "%s", root);
 
@@ -505,7 +505,7 @@ static int
 overwrite_attribute (ASN1_TYPE asn, const char *root, unsigned int indx,
 		     const gnutls_datum_t * ext_data)
 {
-  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
   int result;
 
   snprintf (name, sizeof (name), "%s.?%u", root, indx);
@@ -530,7 +530,7 @@ set_attribute (ASN1_TYPE asn, const char *root,
 {
   int result;
   int k, len;
-  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
   char extnID[MAX_OID_SIZE];
 
   /* Find the index of the given attribute.
@@ -1205,7 +1205,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t cert, int indx,
 				    void *oid, size_t * sizeof_oid)
 {
   int result;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
   int len;
 
   if (!cert)
@@ -1261,7 +1261,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t cert, int indx,
 				    void *data, size_t * sizeof_data)
 {
   int result, len;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
 
   if (!cert)
     {
@@ -1319,7 +1319,7 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t cert, int indx,
 {
   int result;
   char str_critical[10];
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
   unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
   size_t extensions_size = sizeof (extensions);
   ASN1_TYPE c2;
@@ -1426,7 +1426,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t cert, int indx,
 				    void *data, size_t * sizeof_data)
 {
   int result, len;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
   unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
   size_t extensions_size = sizeof (extensions);
   ASN1_TYPE c2;
@@ -2023,7 +2023,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t cert,
 				     int indx, void *oid, size_t * sizeof_oid,
 				     unsigned int *critical)
 {
-  char tmpstr[MAX_NAME_SIZE];
+  char tmpstr[ASN1_MAX_NAME_SIZE];
   int result, len;
   gnutls_datum_t prev_data;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;

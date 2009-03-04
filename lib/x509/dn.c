@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008  Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009  Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -92,9 +92,9 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 {
   gnutls_string out_str;
   int k2, k1, result;
-  char tmpbuffer1[MAX_NAME_SIZE];
-  char tmpbuffer2[MAX_NAME_SIZE];
-  char tmpbuffer3[MAX_NAME_SIZE];
+  char tmpbuffer1[ASN1_MAX_NAME_SIZE];
+  char tmpbuffer2[ASN1_MAX_NAME_SIZE];
+  char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   opaque value[MAX_STRING_LEN], *value2 = NULL;
   char *escaped = NULL;
   const char *ldap_desc;
@@ -343,9 +343,9 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
 			   void *buf, size_t * sizeof_buf)
 {
   int k2, k1, result;
-  char tmpbuffer1[MAX_NAME_SIZE];
-  char tmpbuffer2[MAX_NAME_SIZE];
-  char tmpbuffer3[MAX_NAME_SIZE];
+  char tmpbuffer1[ASN1_MAX_NAME_SIZE];
+  char tmpbuffer2[ASN1_MAX_NAME_SIZE];
+  char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   opaque value[256];
   char oid[MAX_OID_SIZE];
   int len, printable;
@@ -518,9 +518,9 @@ _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
 			 int indx, void *_oid, size_t * sizeof_oid)
 {
   int k2, k1, result;
-  char tmpbuffer1[MAX_NAME_SIZE];
-  char tmpbuffer2[MAX_NAME_SIZE];
-  char tmpbuffer3[MAX_NAME_SIZE];
+  char tmpbuffer1[ASN1_MAX_NAME_SIZE];
+  char tmpbuffer2[ASN1_MAX_NAME_SIZE];
+  char tmpbuffer3[ASN1_MAX_NAME_SIZE];
   char value[256];
   char oid[MAX_OID_SIZE];
   int len;
@@ -872,7 +872,7 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
 			 int raw_flag, const char *name, int sizeof_name)
 {
   int result;
-  char tmp[MAX_NAME_SIZE], asn1_rdn_name[MAX_NAME_SIZE];
+  char tmp[ASN1_MAX_NAME_SIZE], asn1_rdn_name[ASN1_MAX_NAME_SIZE];
 
   if (sizeof_name == 0 || name == NULL)
     {
@@ -995,7 +995,7 @@ int
 gnutls_x509_dn_import (gnutls_x509_dn_t odn, const gnutls_datum_t * data)
 {
   int result;
-  char err[MAX_ERROR_DESCRIPTION_SIZE];
+  char err[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
   ASN1_TYPE dn = odn;
 
   result = asn1_der_decoding (&dn, data->data, data->size, err);

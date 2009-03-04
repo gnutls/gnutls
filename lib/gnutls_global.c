@@ -234,7 +234,7 @@ gnutls_global_init (void)
    * This should not deal with files in the final
    * version.
    */
-  if (asn1_check_version (LIBTASN1_VERSION) == NULL)
+  if (asn1_check_version (ASN1_VERSION) == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;

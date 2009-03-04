@@ -497,8 +497,8 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
 {
 
   int result, _serial_size;
-  char serial_name[MAX_NAME_SIZE];
-  char date_name[MAX_NAME_SIZE];
+  char serial_name[ASN1_MAX_NAME_SIZE];
+  char date_name[ASN1_MAX_NAME_SIZE];
 
   if (crl == NULL)
     {
@@ -925,7 +925,7 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
 {
   int result;
   char str_critical[10];
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
   int len;
 
   if (!crl)
@@ -999,7 +999,7 @@ gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
 				    void *data, size_t * sizeof_data)
 {
   int result, len;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
 
   if (!crl)
     {

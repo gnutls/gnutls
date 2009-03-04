@@ -183,7 +183,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
   const char *ANAME = NULL;
   int CHOICE = -1, len = -1, result;
   ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
-  char asn1_err[MAX_ERROR_DESCRIPTION_SIZE] = "";
+  char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 
   if (value == NULL || value_size <= 0 || res_size == NULL)
     {

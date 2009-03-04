@@ -51,7 +51,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_datum_t auth_safe = { NULL, 0 };
   int tmp_size, len, result;
-  char error_str[MAX_ERROR_DESCRIPTION_SIZE];
+  char error_str[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
   
   len = sizeof (oid) - 1;
   result = asn1_read_value (pkcs12, "authSafe.contentType", oid, &len);
@@ -200,7 +200,7 @@ gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
 {
   int result = 0, need_free = 0;
   gnutls_datum_t _data;
-  char error_str[MAX_ERROR_DESCRIPTION_SIZE];
+  char error_str[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
 
   _data.data = data->data;
   _data.size = data->size;
@@ -348,7 +348,7 @@ int
 _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 			      gnutls_pkcs12_bag_t bag)
 {
-  char oid[MAX_OID_SIZE], root[MAX_NAME_SIZE];
+  char oid[MAX_OID_SIZE], root[ASN1_MAX_NAME_SIZE];
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int len, result;
   int bag_type;
@@ -589,7 +589,7 @@ gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len;
-  char root2[MAX_NAME_SIZE];
+  char root2[ASN1_MAX_NAME_SIZE];
   char oid[MAX_OID_SIZE];
 
   if (pkcs12 == NULL)

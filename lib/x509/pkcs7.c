@@ -284,7 +284,7 @@ gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len;
-  char root2[MAX_NAME_SIZE];
+  char root2[ASN1_MAX_NAME_SIZE];
   char oid[MAX_OID_SIZE];
   gnutls_datum_t tmp = { NULL, 0 };
 
@@ -674,7 +674,7 @@ gnutls_pkcs7_delete_crt (gnutls_pkcs7_t pkcs7, int indx)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result;
-  char root2[MAX_NAME_SIZE];
+  char root2[ASN1_MAX_NAME_SIZE];
 
   if (pkcs7 == NULL)
     return GNUTLS_E_INVALID_REQUEST;
@@ -745,7 +745,7 @@ gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result;
-  char root2[MAX_NAME_SIZE];
+  char root2[ASN1_MAX_NAME_SIZE];
   gnutls_datum_t tmp = { NULL, 0 };
   int start, end;
 
@@ -984,7 +984,7 @@ gnutls_pkcs7_delete_crl (gnutls_pkcs7_t pkcs7, int indx)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result;
-  char root2[MAX_NAME_SIZE];
+  char root2[ASN1_MAX_NAME_SIZE];
 
   if (pkcs7 == NULL)
     return GNUTLS_E_INVALID_REQUEST;

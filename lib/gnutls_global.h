@@ -36,8 +36,8 @@ extern ASN1_TYPE _gnutls_gnutls_asn;
  * prevent warnings, since libtasn1 doesn't
  * use the const keywork in its functions.
  */
-#define _gnutls_get_gnutls_asn() ((node_asn*) _gnutls_gnutls_asn)
-#define _gnutls_get_pkix() ((node_asn*) _gnutls_pkix1_asn)
+#define _gnutls_get_gnutls_asn() ((ASN1_TYPE) _gnutls_gnutls_asn)
+#define _gnutls_get_pkix() ((ASN1_TYPE) _gnutls_pkix1_asn)
 
 extern gnutls_log_func _gnutls_log_func;
 extern int _gnutls_log_level;

@@ -912,7 +912,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 			    unsigned int *ret_type, int othername_oid)
 {
   unsigned int len;
-  char nptr[MAX_NAME_SIZE];
+  char nptr[ASN1_MAX_NAME_SIZE];
   int result;
   opaque choice_type[128];
   gnutls_x509_subject_alt_name_t type;
@@ -1604,7 +1604,7 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
 {
   int result;
   char str_critical[10];
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
   int len;
 
   if (!cert)
@@ -1675,7 +1675,7 @@ gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
 				    void *data, size_t * sizeof_data)
 {
   int result, len;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
 
   if (!cert)
     {
@@ -1869,7 +1869,7 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
   ASN1_TYPE rdn, elem;
   long len;
   int lenlen, remlen, ret;
-  char rbuf[MAX_NAME_SIZE];
+  char rbuf[ASN1_MAX_NAME_SIZE];
   unsigned char cls, *ptr;
 
   iava++;
@@ -2384,7 +2384,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
   int result;
   gnutls_datum_t dist_points = { NULL, 0 };
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
   int len;
   gnutls_x509_subject_alt_name_t type;
   uint8_t reasons[2];
@@ -2498,7 +2498,7 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
 				     int indx, void *oid, size_t * sizeof_oid,
 				     unsigned int *critical)
 {
-  char tmpstr[MAX_NAME_SIZE];
+  char tmpstr[ASN1_MAX_NAME_SIZE];
   int result, len;
   gnutls_datum_t id;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;

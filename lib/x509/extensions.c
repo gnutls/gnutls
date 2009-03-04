@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -39,7 +39,7 @@ get_extension (ASN1_TYPE asn, const char *root,
 	       gnutls_datum_t * ret, unsigned int *_critical)
 {
   int k, result, len;
-  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
   char str[1024];
   char str_critical[10];
   int critical = 0;
@@ -196,7 +196,7 @@ get_extension_oid (ASN1_TYPE asn, const char *root,
 		   int indx, void *oid, size_t * sizeof_oid)
 {
   int k, result, len;
-  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
   char str[1024];
   char extnID[128];
   int indx_counter = 0;
@@ -308,7 +308,7 @@ add_extension (ASN1_TYPE asn, const char *root, const char *extension_id,
 {
   int result;
   const char *str;
-  char name[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE];
 
   snprintf (name, sizeof (name), "%s", root);
 
@@ -372,7 +372,7 @@ static int
 overwrite_extension (ASN1_TYPE asn, const char *root, unsigned int indx,
 		     const gnutls_datum_t * ext_data, unsigned int critical)
 {
-  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
   const char *str;
   int result;
 
@@ -416,7 +416,7 @@ set_extension (ASN1_TYPE asn, const char *root,
 {
   int result;
   int k, len;
-  char name[MAX_NAME_SIZE], name2[MAX_NAME_SIZE];
+  char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
   char extnID[128];
 
   /* Find the index of the given extension.
