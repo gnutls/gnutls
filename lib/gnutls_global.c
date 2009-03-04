@@ -34,6 +34,11 @@
 #include "sockets.h"
 #include "gettext.h"
 
+/* Remove this when we require libtasn1 v1.6 or later. */
+#ifndef ASN1_VERSION
+# define ASN1_VERSION LIBTASN1_VERSION
+#endif
+
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
