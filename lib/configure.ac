@@ -32,9 +32,6 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 lgl_EARLY
 
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
-
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
@@ -105,7 +102,6 @@ AC_CONFIG_FILES([
   minitasn1/Makefile
   opencdk/Makefile
   openpgp/Makefile
-  po/Makefile.in
   x509/Makefile
 ])
 AC_OUTPUT

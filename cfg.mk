@@ -1,4 +1,4 @@
-# Copyright (C) 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -26,7 +26,7 @@ ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
 endif
 
-PODIR := lib/po
+PODIR := po
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \

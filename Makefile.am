@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
-#               2006, 2007, 2008 Free Software Foundation
+#               2006, 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -22,7 +22,7 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
-SUBDIRS = lib libextra gl src doc tests
+SUBDIRS = lib libextra gl po src doc tests
 
 if HAVE_GUILE
 SUBDIRS += guile

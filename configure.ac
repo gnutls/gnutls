@@ -50,6 +50,9 @@ fi
 gl_EARLY
 AC_C_INLINE
 
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
+
 AC_ARG_ENABLE(cxx,
   AS_HELP_STRING([--disable-cxx], [unconditionally disable the C++ library]),
     use_cxx=$enableval, use_cxx=yes)
@@ -244,6 +247,7 @@ AC_CONFIG_FILES([
   guile/modules/Makefile
   guile/src/Makefile
   guile/tests/Makefile
+  po/Makefile.in
   src/Makefile
   src/cfg/Makefile
   src/cfg/platon/Makefile
