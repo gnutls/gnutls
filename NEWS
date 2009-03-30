@@ -9,6 +9,8 @@ See the end for copying conditions.
 specify the client hello message record version. Used to overcome buggy
 TLS servers. Report by Martin von Gagern.
 
+** GnuTLS no longer uses the libtasn1-config script to find libtasn1.
+
 ** API and ABI modifications:
 No changes since last version.
 
