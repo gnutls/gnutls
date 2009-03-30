@@ -130,10 +130,7 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([recv])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([recv])
-  AC_REQUIRE([gl_HEADER_SYS_SELECT])
-  if test "$ac_cv_header_winsock2_h" = yes; then
-    AC_LIBOBJ([winsock-select])
-  fi
+  gl_FUNC_SELECT
   gl_SYS_SELECT_MODULE_INDICATOR([select])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
@@ -171,7 +168,6 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_SYS_SELECT
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_SOCKET
-  gl_MODULE_INDICATOR([sys_socket])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
@@ -346,6 +342,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/bind.c
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/close-hook.c
+  lib/close-hook.h
   lib/close.c
   lib/connect.c
   lib/errno.in.h
@@ -383,6 +381,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/readline.h
   lib/realloc.c
   lib/recv.c
+  lib/select.c
   lib/send.c
   lib/setsockopt.c
   lib/shutdown.c
@@ -410,7 +409,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/version-etc.h
   lib/w32sock.h
   lib/wchar.in.h
-  lib/winsock-select.c
   lib/xsize.h
   m4/00gnulib.m4
   m4/alloca.m4
@@ -452,6 +450,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/read-file.m4
   m4/readline.m4
   m4/realloc.m4
+  m4/select.m4
   m4/servent.m4
   m4/size_max.m4
   m4/snprintf.m4

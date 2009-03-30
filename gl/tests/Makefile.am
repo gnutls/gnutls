@@ -213,6 +213,8 @@ EXTRA_DIST += test-snprintf.c
 
 libtests_a_SOURCES += sockets.h sockets.c
 
+EXTRA_DIST += w32sock.h
+
 ## end   gnulib module sockets
 
 ## begin gnulib module sockets-tests

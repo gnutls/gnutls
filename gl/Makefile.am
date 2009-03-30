@@ -29,6 +29,7 @@ SUBDIRS += tests
 EXTRA_DIST += m4/gnulib-cache.m4
 
 AM_CPPFLAGS =
+AM_CFLAGS =
 
 noinst_LTLIBRARIES += libgnu.la
 
@@ -122,11 +123,19 @@ libgnu_la_SOURCES += c-ctype.h c-ctype.c
 ## begin gnulib module close
 
 
-EXTRA_DIST += close.c w32sock.h
+EXTRA_DIST += close.c
 
 EXTRA_libgnu_la_SOURCES += close.c
 
 ## end   gnulib module close
+
+## begin gnulib module close-hook
+
+libgnu_la_SOURCES += close-hook.c
+
+EXTRA_DIST += close-hook.h
+
+## end   gnulib module close-hook
 
 ## begin gnulib module connect
 
@@ -461,9 +470,9 @@ EXTRA_libgnu_la_SOURCES += recv.c
 ## begin gnulib module select
 
 
-EXTRA_DIST += winsock-select.c
+EXTRA_DIST += select.c
 
-EXTRA_libgnu_la_SOURCES += winsock-select.c
+EXTRA_libgnu_la_SOURCES += select.c
 
 ## end   gnulib module select
 
@@ -851,6 +860,7 @@ sys/select.h: sys_select.in.h
 	      -e 's|@''HAVE_SYS_SELECT_H''@|$(HAVE_SYS_SELECT_H)|g' \
 	      -e 's|@''GNULIB_SELECT''@|$(GNULIB_SELECT)|g' \
 	      -e 's|@''HAVE_WINSOCK2_H''@|$(HAVE_WINSOCK2_H)|g' \
+	      -e 's|@''REPLACE_SELECT''@|$(REPLACE_SELECT)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/sys_select.in.h; \
 	} > $@-t

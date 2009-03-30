@@ -19,7 +19,9 @@
 
 #include <config.h>
 #include <netdb.h>
+
 #include <arpa/inet.h>
+#include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
@@ -49,6 +51,7 @@ int simple (char *host, char *service)
   struct addrinfo hints;
   struct addrinfo *ai0, *ai;
   int res;
+  int err;
 
   /* Once we skipped the test, do not try anything else */
   if (skip)
@@ -64,6 +67,7 @@ int simple (char *host, char *service)
   hints.ai_socktype = SOCK_STREAM;
 
   res = getaddrinfo (host, service, 0, &ai0);
+  err = errno;
 
   dbgprintf ("res %d: %s\n", res, gai_strerror (res));
 
@@ -83,13 +87,16 @@ int simple (char *host, char *service)
       if (res == EAI_NONAME)
 	return 0;
       /* Solaris reports EAI_SERVICE for "http" and "https".  Don't
-         fail the test merely because of this.  */
+	 fail the test merely because of this.  */
       if (res == EAI_SERVICE)
 	return 0;
       /* AIX reports EAI_NODATA for "https".  Don't fail the test
 	 merely because of this.  */
       if (res == EAI_NODATA)
 	return 0;
+      /* Provide details if errno was set.  */
+      if (res == EAI_SYSTEM)
+	dbgprintf ("system error: %s\n", strerror (err));
 
       return 1;
     }
