@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -22,13 +22,10 @@
 
 AM_CPPFLAGS = -I$(srcdir)/gl -I$(top_srcdir)/lgl -I$(top_builddir)/lgl	\
 	-I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes	\
-	-I$(top_srcdir)/lib/minitasn1 \
 	$(LIBGCRYPT_CFLAGS)
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(top_srcdir)/lib/minitasn1
-else
-AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
 endif
 
 SUBDIRS = gl
@@ -69,7 +66,7 @@ libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_
 if ENABLE_MINITASN1
 libgnutls_openssl_la_LIBADD += ../lib/minitasn1/libminitasn1.la
 else
-libgnutls_openssl_la_LDFLAGS += $(LIBTASN1_LIBS) 
+libgnutls_openssl_la_LDFLAGS += $(LTLIBTASN1) 
 endif
 
 if HAVE_LD_OUTPUT_DEF
