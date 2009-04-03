@@ -22,7 +22,7 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
-SUBDIRS = lib libextra gl po src doc tests
+SUBDIRS = lib libextra gl src doc tests
 
 if HAVE_GUILE
 SUBDIRS += guile

@@ -37,6 +37,9 @@ AC_PROG_LIBTOOL
 
 LIBGNUTLS_HOOKS
 
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
+
 AC_C_BIGENDIAN
 
 # For includes/gnutls/gnutls.h.in.
@@ -102,6 +105,7 @@ AC_CONFIG_FILES([
   minitasn1/Makefile
   opencdk/Makefile
   openpgp/Makefile
+  po/Makefile.in
   x509/Makefile
 ])
 AC_OUTPUT

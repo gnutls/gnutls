@@ -22,7 +22,7 @@
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
-SUBDIRS = gl includes x509
+SUBDIRS = gl po includes x509
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
