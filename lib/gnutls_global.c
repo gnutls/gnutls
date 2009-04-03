@@ -201,9 +201,7 @@ gnutls_global_init (void)
   if (gl_sockets_startup (SOCKETS_1_1))
     return GNUTLS_E_LIBRARY_VERSION_MISMATCH;
 
-#if ENABLE_NLS
-  bindtextdomain ("gnutls", LOCALEDIR);
-#endif
+  bindtextdomain (PACKAGE, LOCALEDIR);
 
   /* Initialize libgcrypt if it hasn't already been initialized. */
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
