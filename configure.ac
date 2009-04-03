@@ -81,7 +81,6 @@ AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 sj_VALGRIND
 sj_LINKER_SCRIPT([$srcdir/lib/libgnutls.map])
-sj_OUTPUT_DEF
 
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
