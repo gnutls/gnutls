@@ -31,8 +31,8 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_SUBST(LT_AGE, 13)
 
   # Used when creating the Windows libgnutls-XX.def files.
-  SOVERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
-  AC_SUBST(SOVERSION)
+  DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
+  AC_SUBST(DLL_VERSION)
 
   AC_LIB_HAVE_LINKFLAGS(gcrypt,, [#include <gcrypt.h>],
     [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
