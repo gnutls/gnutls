@@ -80,7 +80,6 @@ AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 sj_VALGRIND
-sj_LINKER_SCRIPT([$srcdir/lib/libgnutls.map])
 
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
