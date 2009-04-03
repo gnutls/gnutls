@@ -906,9 +906,9 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       addf (str, "error: get_serial: %s\n", gnutls_strerror (err));
     else
       {
-	addf (str, _("\tSerial Number (hex): "));
+	adds (str, _("\tSerial Number (hex): "));
 	hexprint (str, serial, serial_size);
-	addf (str, "\n");
+	adds (str, "\n");
       }
   }
 
@@ -930,7 +930,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
   {
     time_t tim;
 
-    addf (str, _("\tValidity:\n"));
+    adds (str, _("\tValidity:\n"));
 
     tim = gnutls_x509_crt_get_activation_time (cert);
     {
@@ -1026,11 +1026,11 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 		{
 		  addf (str, _("\t\tPublic key (bits %d):\n"), bits);
 		  hexdump (str, y.data, y.size, "\t\t\t");
-		  addf (str, _("\t\tP:\n"));
+		  adds (str, _("\t\tP:\n"));
 		  hexdump (str, p.data, p.size, "\t\t\t");
-		  addf (str, _("\t\tQ:\n"));
+		  adds (str, _("\t\tQ:\n"));
 		  hexdump (str, q.data, q.size, "\t\t\t");
-		  addf (str, _("\t\tG:\n"));
+		  adds (str, _("\t\tG:\n"));
 		  hexdump (str, g.data, g.size, "\t\t\t");
 
 		  gnutls_free (p.data);
@@ -1078,9 +1078,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	}
       if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
 	{
-	  addf (str,
-		_
-		("warning: signed using a broken signature algorithm that can be forged.\n"));
+	  adds (str, _("warning: signed using a broken signature "
+		       "algorithm that can be forged.\n"));
 	}
 
       err = gnutls_x509_crt_get_signature (cert, buffer, &size);
@@ -1105,7 +1104,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  return;
 	}
 
-      addf (str, _("\tSignature:\n"));
+      adds (str, _("\tSignature:\n"));
       hexdump (str, buffer, size, "\t\t");
 
       gnutls_free (buffer);
@@ -1128,9 +1127,9 @@ print_fingerprint (gnutls_string * str, gnutls_x509_crt_t cert,
     }
 
   if (algo == GNUTLS_DIG_MD5)
-    addf (str, _("\tMD5 fingerprint:\n\t\t"));
+    adds (str, _("\tMD5 fingerprint:\n\t\t"));
   else
-    addf (str, _("\tSHA-1 fingerprint:\n\t\t"));
+    adds (str, _("\tSHA-1 fingerprint:\n\t\t"));
   hexprint (str, buffer, size);
   adds (str, "\n");
 }
@@ -1149,7 +1148,7 @@ print_keyid (gnutls_string * str, gnutls_x509_crt_t cert)
       return;
     }
 
-  addf (str, _("\tPublic Key Id:\n\t\t"));
+  adds (str, _("\tPublic Key Id:\n\t\t"));
   hexprint (str, buffer, size);
   adds (str, "\n");
 }
@@ -1374,7 +1373,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
   {
     int version = gnutls_x509_crl_get_version (crl);
     if (version == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-      addf (str, _("\tVersion: 1 (default)\n"));
+      adds (str, _("\tVersion: 1 (default)\n"));
     else if (version < 0)
       addf (str, "error: get_version: %s\n", gnutls_strerror (version));
     else
@@ -1399,7 +1398,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
   {
     time_t tim;
 
-    addf (str, _("\tUpdate dates:\n"));
+    adds (str, _("\tUpdate dates:\n"));
 
     tim = gnutls_x509_crl_get_this_update (crl);
     {
@@ -1459,7 +1458,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	    }
 
 	  if (i == 0)
-	    addf (str, _("\tExtensions:\n"));
+	    adds (str, _("\tExtensions:\n"));
 
 	  if (strcmp (oid, "2.5.29.20") == 0)
 	    {
@@ -1539,11 +1538,11 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 		  continue;
 		}
 
-	      addf (str, _("\t\t\tASCII: "));
+	      adds (str, _("\t\t\tASCII: "));
 	      asciiprint (str, buffer, extlen);
-	      addf (str, "\n");
+	      adds (str, "\n");
 
-	      addf (str, _("\t\t\tHexdump: "));
+	      adds (str, _("\t\t\tHexdump: "));
 	      hexprint (str, buffer, extlen);
 	      adds (str, "\n");
 
@@ -1561,7 +1560,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
     if (num)
       addf (str, _("\tRevoked certificates (%d):\n"), num);
     else
-      addf (str, _("\tNo revoked certificates.\n"));
+      adds (str, _("\tNo revoked certificates.\n"));
 
     for (j = 0; j < num; j++)
       {
@@ -1580,7 +1579,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	    size_t max = sizeof (s);
 	    struct tm t;
 
-	    addf (str, _("\t\tSerial Number (hex): "));
+	    adds (str, _("\t\tSerial Number (hex): "));
 	    hexprint (str, serial, serial_size);
 	    adds (str, "\n");
 
@@ -1614,9 +1613,8 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	}
       if (err == GNUTLS_SIGN_RSA_MD5 || err == GNUTLS_SIGN_RSA_MD2)
 	{
-	  addf (str,
-		_
-		("warning: signed using a broken signature algorithm that can be forged.\n"));
+	  adds (str, _("warning: signed using a broken signature "
+		       "algorithm that can be forged.\n"));
 	}
 
       err = gnutls_x509_crl_get_signature (crl, buffer, &size);
@@ -1641,7 +1639,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	  return;
 	}
 
-      addf (str, _("\tSignature:\n"));
+      adds (str, _("\tSignature:\n"));
       hexdump (str, buffer, size, "\t\t");
 
       gnutls_free (buffer);
@@ -1737,7 +1735,7 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 		{
 		  addf (str, _("\t\tModulus (bits %d):\n"), bits);
 		  hexdump (str, m.data, m.size, "\t\t\t");
-		  addf (str, _("\t\tExponent:\n"));
+		  adds (str, _("\t\tExponent:\n"));
 		  hexdump (str, e.data, e.size, "\t\t\t");
 
 		  gnutls_free (m.data);
@@ -1804,7 +1802,7 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 	  }
 
 	if (i == 0)
-	  addf (str, _("\tAttributes:\n"));
+	  adds (str, _("\tAttributes:\n"));
 
 	if (strcmp (oid, "1.2.840.113549.1.9.14") == 0)
 	  {
@@ -1875,11 +1873,11 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 		continue;
 	      }
 
-	    addf (str, _("\t\t\tASCII: "));
+	    adds (str, _("\t\t\tASCII: "));
 	    asciiprint (str, buffer, extlen);
-	    addf (str, "\n");
+	    adds (str, "\n");
 
-	    addf (str, _("\t\t\tHexdump: "));
+	    adds (str, _("\t\t\tHexdump: "));
 	    hexprint (str, buffer, extlen);
 	    adds (str, "\n");
 
@@ -1918,7 +1916,7 @@ print_crq_other (gnutls_string * str, gnutls_x509_crq_t crq)
       return;
     }
 
-  addf (str, _("\tPublic Key Id:\n\t\t"));
+  adds (str, _("\tPublic Key Id:\n\t\t"));
   hexprint (str, buffer, size);
   adds (str, "\n");
 

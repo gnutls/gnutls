@@ -32,13 +32,13 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 lgl_EARLY
 
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
-
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
 LIBGNUTLS_HOOKS
+
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
 
 AC_C_BIGENDIAN
 
@@ -89,7 +89,7 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 # Finish things from ../configure.ac.
 AC_SUBST([WARN_CFLAGS])
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
-AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
+AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$gl_cv_ld_output_def" = "yes")
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 if test "$use_cxx" != "no"; then
   AC_PROG_CXX

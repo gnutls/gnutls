@@ -29,6 +29,7 @@ SUBDIRS += tests
 EXTRA_DIST += m4/gnulib-cache.m4
 
 AM_CPPFLAGS =
+AM_CFLAGS =
 
 noinst_LTLIBRARIES += liblgnu.la
 
@@ -77,6 +78,14 @@ EXTRA_DIST += byteswap.in.h
 liblgnu_la_SOURCES += c-ctype.h c-ctype.c
 
 ## end   gnulib module c-ctype
+
+## begin gnulib module close-hook
+
+liblgnu_la_SOURCES += close-hook.c
+
+EXTRA_DIST += close-hook.h
+
+## end   gnulib module close-hook
 
 ## begin gnulib module errno
 
@@ -269,6 +278,8 @@ EXTRA_liblgnu_la_SOURCES += snprintf.c
 ## begin gnulib module sockets
 
 liblgnu_la_SOURCES += sockets.h sockets.c
+
+EXTRA_DIST += w32sock.h
 
 ## end   gnulib module sockets
 

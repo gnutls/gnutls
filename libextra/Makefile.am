@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -74,8 +74,8 @@ endif
 
 if HAVE_LD_OUTPUT_DEF
 libgnutls_openssl_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-openssl-$(SOVERSION).def
-defexec_DATA += libgnutls-openssl-$(SOVERSION).def
+	-Wl,--output-def,libgnutls-openssl-$(DLL_VERSION).def
+defexec_DATA += libgnutls-openssl-$(DLL_VERSION).def
 endif
 endif
 
@@ -93,8 +93,8 @@ libgnutls_extra_la_SOURCES += \
 
 if HAVE_LD_OUTPUT_DEF
 libgnutls_extra_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-extra-$(SOVERSION).def
-defexec_DATA += libgnutls-extra-$(SOVERSION).def
+	-Wl,--output-def,libgnutls-extra-$(DLL_VERSION).def
+defexec_DATA += libgnutls-extra-$(DLL_VERSION).def
 endif
 
 DISTCLEANFILES += $(defexec_DATA)

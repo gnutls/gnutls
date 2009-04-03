@@ -82,6 +82,11 @@ rpl_fseeko (FILE *fp, off_t offset, int whence)
   if ((fp->_Mode & _MWRITE ? fp->_Next == fp->_Buf : fp->_Next == fp->_Rend)
       && fp->_Rback == fp->_Back + sizeof (fp->_Back)
       && fp->_Rsave == NULL)
+#elif defined __MINT__              /* Atari FreeMiNT */
+  if (fp->__bufp == fp->__buffer
+      && fp->__get_limit == fp->__bufp
+      && fp->__put_limit == fp->__bufp
+      && !fp->__pushed_back)
 #else
   #error "Please port gnulib fseeko.c to your platform! Look at the code in fpurge.c, then report this to bug-gnulib."
 #endif
@@ -112,6 +117,9 @@ rpl_fseeko (FILE *fp, off_t offset, int whence)
       fp->_flags &= ~_IOEOF;
 #elif defined _IOERR                /* AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, mingw */
       fp->_flag &= ~_IOEOF;
+#elif defined __MINT__              /* Atari FreeMiNT */
+      fp->__offset = pos;
+      fp->__eof = 0;
 #endif
       /* If we were not requested to position beyond end of file, we're
 	 done.  */

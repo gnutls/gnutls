@@ -79,7 +79,6 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_STRVERSCMP
   gl_STRING_MODULE_INDICATOR([strverscmp])
   gl_HEADER_SYS_SOCKET
-  gl_MODULE_INDICATOR([sys_socket])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
@@ -236,6 +235,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/byteswap.in.h
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/close-hook.c
+  lib/close-hook.h
   lib/errno.in.h
   lib/float+.h
   lib/float.in.h
@@ -277,6 +278,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
+  lib/w32sock.h
   lib/wchar.in.h
   lib/xsize.h
   m4/00gnulib.m4

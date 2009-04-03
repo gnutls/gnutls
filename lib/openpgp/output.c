@@ -81,7 +81,7 @@ print_key_usage (gnutls_string * str, gnutls_openpgp_crt_t cert,
   unsigned int key_usage;
   int err;
 
-  addf (str, _("\t\tKey Usage:\n"));
+  adds (str, _("\t\tKey Usage:\n"));
 
 
   if (idx == (unsigned int) -1)
@@ -95,15 +95,15 @@ print_key_usage (gnutls_string * str, gnutls_openpgp_crt_t cert,
     }
 
   if (key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-    addf (str, _("\t\t\tDigital signatures.\n"));
+    adds (str, _("\t\t\tDigital signatures.\n"));
   if (key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-    addf (str, _("\t\t\tCommunications encipherment.\n"));
+    adds (str, _("\t\t\tCommunications encipherment.\n"));
   if (key_usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-    addf (str, _("\t\t\tStorage data encipherment.\n"));
+    adds (str, _("\t\t\tStorage data encipherment.\n"));
   if (key_usage & GNUTLS_KEY_KEY_AGREEMENT)
-    addf (str, _("\t\t\tAuthentication.\n"));
+    adds (str, _("\t\t\tAuthentication.\n"));
   if (key_usage & GNUTLS_KEY_KEY_CERT_SIGN)
-    addf (str, _("\t\t\tCertificate signing.\n"));
+    adds (str, _("\t\t\tCertificate signing.\n"));
 }
 
 /* idx == -1 indicates main key
@@ -124,7 +124,7 @@ print_key_id (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
     addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
   else
     {
-      addf (str, _("\tID (hex): "));
+      adds (str, _("\tID (hex): "));
       hexprint (str, id, sizeof (id));
       addf (str, "\n");
     }
@@ -145,7 +145,7 @@ print_key_fingerprint (gnutls_string * str, gnutls_openpgp_crt_t cert)
     addf (str, "error: get_fingerprint: %s\n", gnutls_strerror (err));
   else
     {
-      addf (str, _("\tFingerprint (hex): "));
+      adds (str, _("\tFingerprint (hex): "));
       hexprint (str, fpr, fpr_size);
       addf (str, "\n");
     }
@@ -162,9 +162,9 @@ print_key_revoked (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
     err = gnutls_openpgp_crt_get_subkey_revoked_status (cert, idx);
 
   if (err != 0)
-    addf (str, _("\tRevoked: True\n"));
+    adds (str, _("\tRevoked: True\n"));
   else
-    addf (str, _("\tRevoked: False\n"));
+    adds (str, _("\tRevoked: False\n"));
 }
 
 static void
@@ -172,7 +172,7 @@ print_key_times (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 {
   time_t tim;
 
-  addf (str, _("\tTime stamps:\n"));
+  adds (str, _("\tTime stamps:\n"));
 
   if (idx == -1)
     tim = gnutls_openpgp_crt_get_creation_time (cert);
@@ -203,7 +203,7 @@ print_key_times (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 
     if (tim == 0)
       {
-	addf (str, _("\t\tExpiration: Never\n"));
+	adds (str, _("\t\tExpiration: Never\n"));
       }
     else
       {
@@ -256,7 +256,7 @@ print_key_info (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 	      {
 		addf (str, _("\t\tModulus (bits %d):\n"), bits);
 		hexdump (str, m.data, m.size, "\t\t\t");
-		addf (str, _("\t\tExponent:\n"));
+		adds (str, _("\t\tExponent:\n"));
 		hexdump (str, e.data, e.size, "\t\t\t");
 
 		gnutls_free (m.data);
@@ -283,11 +283,11 @@ print_key_info (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 	      {
 		addf (str, _("\t\tPublic key (bits %d):\n"), bits);
 		hexdump (str, y.data, y.size, "\t\t\t");
-		addf (str, _("\t\tP:\n"));
+		adds (str, _("\t\tP:\n"));
 		hexdump (str, p.data, p.size, "\t\t\t");
-		addf (str, _("\t\tQ:\n"));
+		adds (str, _("\t\tQ:\n"));
 		hexdump (str, q.data, q.size, "\t\t\t");
-		addf (str, _("\t\tG:\n"));
+		adds (str, _("\t\tG:\n"));
 		hexdump (str, g.data, g.size, "\t\t\t");
 
 		gnutls_free (p.data);
@@ -412,7 +412,7 @@ print_oneline (gnutls_string * str, gnutls_openpgp_crt_t cert)
       addf (str, "error: get_fingerprint: %s\n", gnutls_strerror (err));
     else
       {
-	addf (str, _("fingerprint: "));
+	adds (str, _("fingerprint: "));
 	hexprint (str, fpr, fpr_size);
 	addf (str, ", ");
       }
