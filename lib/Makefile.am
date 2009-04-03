@@ -103,7 +103,7 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
-	$(PSK_COBJECTS) gnutls.asn pkix.asn libgnutls.vers
+	$(PSK_COBJECTS) gnutls.asn pkix.asn libgnutls.map
 
 libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
@@ -117,7 +117,7 @@ libgnutls_la_LIBADD += opencdk/libminiopencdk.la
 endif
 
 if HAVE_LD_VERSION_SCRIPT
-libgnutls_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutls.vers
+libgnutls_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutls.map
 endif
 
 if ENABLE_MINITASN1
@@ -142,7 +142,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/includes/
 
 lib_LTLIBRARIES += libgnutlsxx.la
 
-libgnutlsxx_la_SOURCES = gnutlsxx.cpp libgnutlsxx.vers
+libgnutlsxx_la_SOURCES = gnutlsxx.cpp libgnutlsxx.map
 
 libgnutlsxx_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
@@ -150,7 +150,7 @@ libgnutlsxx_la_LDFLAGS = -no-undefined \
 libgnutlsxx_la_LIBADD = libgnutls.la
 
 if HAVE_LD_VERSION_SCRIPT
-libgnutlsxx_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutlsxx.vers
+libgnutlsxx_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutlsxx.map
 endif
 endif
 
