@@ -12,8 +12,12 @@ GnuTLS is also internally ready to be used with libtasn1 v2.0.
 Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3435>.
 
+** Applied patch by Cedric Bail to add functions
+gnutls_x509_crt_verify_hash() and gnutls_x509_crt_get_sig_algorithm().
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_verify_hash: ADDED
+gnutls_x509_crt_get_sig_algorithm: ADDED
 
 * Version 2.7.6 (released 2009-02-27)
 
