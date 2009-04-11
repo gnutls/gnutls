@@ -1,3 +1,77 @@
+2009-04-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.6.5.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/opencdk/Makefile.am,
+	lib/openpgp/Makefile.am, lib/x509/Makefile.am,
+	libextra/Makefile.am, src/Makefile.am: Fix libtasn1 libs/cflags
+	settings.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, m4/libtasn1.m4: Don't require libtasn1-config
+	to find libtasn1.
+
+2009-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pkix_asn1_tab.c: Generated.
+
+2009-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/scripts/gdoc: Revert gdoc patch.
+
+2009-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Bump versions.
+
+2009-02-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* NEWS: documented SSL3_RECORD_VERSION priority string
+
+2009-02-22  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/scripts/gdoc, lib/gnutls_priority.c: Applied patch by Martin
+	von Gagern: The attached patch fixes gnutls_priority_init(3), but in
+	a very hackish way, treating a percent sign as indicating a constant
+	only if it is not immediately preceded by a double quote.
+
+2009-02-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/manpages/gnutls-cli.1: Corrected listing of special keywords.
+	Reported by Martin von Gagern.
+
+2009-02-21  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* doc/manpages/gnutls-cli.1, lib/gnutls_handshake.c,
+	lib/gnutls_int.h, lib/gnutls_priority.c: Added %SSL3_RECORD_VERSION
+	priority option that allows to specify the client hello message
+	record version. Used to overcome buggy TLS servers. Report by Martin
+	von Gagern.
+
+2009-02-15  Nikos Mavrogiannopoulos <nmav@crystal.(none)>
+
+	* lib/x509/verify.c: Corrected bit disable (was flipping instead).
+	Initialy reported by Daniel Kahn Gillmor on 9/1/2008. Many thanks to
+	moog@sysdev.oucs.ox.ac.uk for bringing this into my attention.
+
+2009-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-02-06  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.6.4.
