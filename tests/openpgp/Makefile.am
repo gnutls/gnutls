@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2007 Free Software Foundation
+# Copyright (C) 2007, 2009 Free Software Foundation
 #
 # Author: Ludovic Courtès.
 #
@@ -30,9 +30,11 @@ check_PROGRAMS = keyring
 
 AM_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes	\
 	      -I$(top_srcdir)/tests
-LDADD = -L$(top_builddir)/libextra -lgnutls-extra	\
-        -L$(top_builddir)/lib      -lgnutls		\
-	-L$(top_builddir)/tests    -lutils
+
+LDADD = \
+	$(top_builddir)/lib/libgnutls.la \
+	$(top_builddir)/libextra/libgnutls-extra.la \
+	../libutils.la
 
 else
 
