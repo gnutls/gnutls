@@ -641,6 +641,14 @@ extern "C"
 				   unsigned int flags,
 				   const gnutls_datum_t * data,
 				   const gnutls_datum_t * signature);
+  int gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt,
+				   unsigned int flags,
+				   const gnutls_datum_t * hash,
+				   const gnutls_datum_t * signature);
+
+  int gnutls_x509_crt_get_sig_algorithm(gnutls_digest_algorithm_t *hash,
+					 const gnutls_x509_crt_t crt,
+					 const gnutls_datum_t * signature);
 
   int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
 				     const gnutls_datum_t * hash,

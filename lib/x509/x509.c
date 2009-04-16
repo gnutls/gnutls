@@ -2305,6 +2305,32 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 }
 
 /**
+  * gnutls_x509_crt_get_sig_algorithm - This function will return the hash algorithm used during signature.
+  * @hash: The result of the call with the hash algorithm used for signature
+  * @crt: Holds the certificate
+  * @signature: contains the signature
+  *
+  * This function will read the certifcate and the signed data to
+  * determine the hash algorithm used to generate the signature.
+  *
+  * Returns: 0 if the hash algorithm was found. A negative value is
+  * returned on error.
+  **/
+int
+gnutls_x509_crt_get_sig_algorithm(gnutls_digest_algorithm_t *hash,
+				   const gnutls_x509_crt_t crt,
+				   const gnutls_datum_t * signature)
+{
+   if (crt == NULL)
+     {
+       gnutls_assert ();
+       return GNUTLS_E_INVALID_REQUEST;
+     }
+
+   return _gnutls_x509_verify_algorithm(hash, signature, crt);
+}
+
+/**
   * gnutls_x509_crt_verify_data - This function will verify the given signed data.
   * @crt: Holds the certificate
   * @flags: should be 0 for now
@@ -2330,7 +2356,43 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_verify_signature (data, signature, crt);
+  result = _gnutls_x509_verify_signature (data, NULL, signature, crt);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return 0;
+    }
+
+  return result;
+}
+
+/**
+  * gnutls_x509_crt_verify_data - This function will verify the given signed data.
+  * @crt: Holds the certificate
+  * @flags: should be 0 for now
+  * @hash: holds the hash digest to be verified
+  * @signature: contains the signature
+  *
+  * This function will verify the given signed digest, using the
+  * parameters from the certificate.
+  *
+  * Returns: In case of a verification failure 0 is returned, and 1 on
+  * success.
+  **/
+int
+gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
+			     const gnutls_datum_t * hash,
+			     const gnutls_datum_t * signature)
+{
+  int result;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_x509_verify_signature (NULL, hash, signature, crt);
   if (result < 0)
     {
       gnutls_assert ();
