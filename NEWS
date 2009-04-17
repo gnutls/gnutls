@@ -12,8 +12,12 @@ GnuTLS is also internally ready to be used with libtasn1 v2.0.
 Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3435>.
 
-** Applied patch by Cedric Bail to add functions
+** libgnutls: Applied patch by Cedric Bail to add functions
 gnutls_x509_crt_verify_hash() and gnutls_x509_crt_get_sig_algorithm().
+
+** i18n: The GnuTLS gettext domain is now 'libgnutls' instead of 'gnutls'.
+It is currently only used by the core library.  This will enable a new
+domain 'gnutls' for translations of the command line tools.
 
 ** API and ABI modifications:
 gnutls_x509_crt_verify_hash: ADDED
