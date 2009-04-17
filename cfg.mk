@@ -27,6 +27,7 @@ ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 endif
 
 PODIR := lib/po
+PO_DOMAIN := libgnutls
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \
