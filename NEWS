@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.7.7 (unreleased)
 
+** libgnutls: Applied patch by Cedric Bail to add functions
+gnutls_x509_crt_verify_hash() and gnutls_x509_crt_get_sig_algorithm().
+
 ** gnutls.pc: Add -ltasn1 to 'pkg-config --libs --static gnutls' output.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://article.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3467>.
@@ -15,9 +18,6 @@ GnuTLS is also internally ready to be used with libtasn1 v2.0.
 ** doc: Fix build failure of errcodes/printlist.
 Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3435>.
-
-** libgnutls: Applied patch by Cedric Bail to add functions
-gnutls_x509_crt_verify_hash() and gnutls_x509_crt_get_sig_algorithm().
 
 ** i18n: The GnuTLS gettext domain is now 'libgnutls' instead of 'gnutls'.
 It is currently only used by the core library.  This will enable a new
