@@ -2305,7 +2305,7 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 }
 
 /**
-  * gnutls_x509_crt_get_sig_algorithm - This function will return the hash algorithm used during signature.
+  * gnutls_x509_crt_get_verify_algorithm - This function will return the hash algorithm used during signature.
   * @hash: The result of the call with the hash algorithm used for signature
   * @crt: Holds the certificate
   * @signature: contains the signature
@@ -2317,7 +2317,7 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
   * returned on error.
   **/
 int
-gnutls_x509_crt_get_sig_algorithm(gnutls_digest_algorithm_t *hash,
+gnutls_x509_crt_get_verify_algorithm(gnutls_digest_algorithm_t *hash,
 				   const gnutls_x509_crt_t crt,
 				   const gnutls_datum_t * signature)
 {
@@ -2327,7 +2327,7 @@ gnutls_x509_crt_get_sig_algorithm(gnutls_digest_algorithm_t *hash,
        return GNUTLS_E_INVALID_REQUEST;
      }
 
-   return _gnutls_x509_verify_algorithm(hash, signature, crt);
+   return _gnutls_x509_verify_algorithm((gnutls_mac_algorithm_t*)hash, signature, crt);
 }
 
 /**

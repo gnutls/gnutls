@@ -646,7 +646,7 @@ extern "C"
 				   const gnutls_datum_t * hash,
 				   const gnutls_datum_t * signature);
 
-  int gnutls_x509_crt_get_sig_algorithm(gnutls_digest_algorithm_t *hash,
+  int gnutls_x509_crt_get_verify_algorithm(gnutls_digest_algorithm_t *hash,
 					 const gnutls_x509_crt_t crt,
 					 const gnutls_datum_t * signature);
 

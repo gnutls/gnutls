@@ -6,7 +6,7 @@ See the end for copying conditions.
 * Version 2.7.7 (unreleased)
 
 ** libgnutls: Applied patch by Cedric Bail to add functions
-gnutls_x509_crt_verify_hash() and gnutls_x509_crt_get_sig_algorithm().
+gnutls_x509_crt_verify_hash() and gnutls_x509_crt_get_verify_algorithm().
 
 ** gnutls.pc: Add -ltasn1 to 'pkg-config --libs --static gnutls' output.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
@@ -25,7 +25,7 @@ domain 'gnutls' for translations of the command line tools.
 
 ** API and ABI modifications:
 gnutls_x509_crt_verify_hash: ADDED
-gnutls_x509_crt_get_sig_algorithm: ADDED
+gnutls_x509_crt_get_verify_algorithm: ADDED
 
 * Version 2.7.6 (released 2009-02-27)
 

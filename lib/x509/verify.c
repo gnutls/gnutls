@@ -664,7 +664,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
        _gnutls_hash (&hd, text->data, text->size);
        _gnutls_hash_deinit (&hd, md);
 
-       cmp = &md;
+       cmp = md;
     }
 
   if (memcmp (cmp, digest, digest_size) != 0)
