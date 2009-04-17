@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.6.6 (unreleased)
 
+** gnutls-cli, gnutls-cli-debug: Fix AIX getaddrinfo problem.
+Reported by LAUPRETRE François (P) <francois.laupretre@ratp.fr> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3468>.
+
 ** tests: Fix linking of tests/openpgp/keyring self-test.
 Reported by Daniel Black in <https://savannah.gnu.org/support/?106543>.
 

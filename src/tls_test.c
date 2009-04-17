@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000,2001,2002,2003,2006,2007,2008 Nikos Mavrogiannopoulos
+ * Copyright (C) 2000,2001,2002,2003,2006,2007,2008,2009 Nikos Mavrogiannopoulos
  * Copyright (C) 2004,2005, 2008 Free Software Foundation
  *
  * This file is part of GNUTLS.
@@ -33,6 +33,8 @@
 #include <tls_test-gaa.h>
 
 #include <version-etc.h>
+
+#include "getaddrinfo.h"
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}

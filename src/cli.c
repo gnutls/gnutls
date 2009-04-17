@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
@@ -44,6 +44,8 @@
 #include "error.h"
 #include "read-file.h"
 #include "getpass.h"
+
+#include "getaddrinfo.h"
 
 #include "common.h"
 #include "cli-gaa.h"
