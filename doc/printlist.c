@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 
