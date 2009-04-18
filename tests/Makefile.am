@@ -52,7 +52,7 @@ libutils_la_SOURCES = utils.h utils.c
 ctests = simple gc set_pkcs12_cred certder mpi				\
 	certificate_set_x509_crl dn parse_ca moredn crypto_rng mini	\
 	finished hostname-check cve-2008-4989 pkcs12_s2k chainverify	\
-	crq_key_id
+	crq_key_id x509sign-verify
 
 if ENABLE_OPENSSL
 ctests +=  openssl

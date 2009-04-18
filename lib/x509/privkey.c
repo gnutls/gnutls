@@ -1530,7 +1530,10 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature
  *
- * This function will sign the given hash using the private key.
+ * This function will sign the given hash using the private key. Do not
+ * use this function directly unless you know what it is. Typical signing
+ * requires the data to be hashed and stored in special formats 
+ * (e.g. BER Digest-Info for RSA).
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
