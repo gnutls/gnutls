@@ -2811,7 +2811,7 @@ $ certtool --generate-privkey --outfile key.pem
 To create a DSA private key, run:
 
 @example
-$ certtool --generate-privkey --outfile key-dsa.pem
+$ certtool --dsa --generate-privkey --outfile key-dsa.pem
 @end example
 
 @item
