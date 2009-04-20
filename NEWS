@@ -12,6 +12,9 @@ Reported by LAUPRETRE François (P) <francois.laupretre@ratp.fr> in
 ** tests: Fix linking of tests/openpgp/keyring self-test.
 Reported by Daniel Black in <https://savannah.gnu.org/support/?106543>.
 
+** Corrected possible memory corruption on signature verification failure. 
+Reported by Miroslav Kratochvil <exa.exa@gmail.com>
+
 ** API and ABI modifications:
 No changes since last version.
 
