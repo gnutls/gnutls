@@ -23,6 +23,9 @@ Reported by Roman Bogorodskiy <novel@FreeBSD.org> in
 It is currently only used by the core library.  This will enable a new
 domain 'gnutls' for translations of the command line tools.
 
+** Corrected possible memory corruption on signature verification failure. 
+Reported by Miroslav Kratochvil <exa.exa@gmail.com>
+
 ** API and ABI modifications:
 gnutls_x509_crt_verify_hash: ADDED
 gnutls_x509_crt_get_verify_algorithm: ADDED
