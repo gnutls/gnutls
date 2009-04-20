@@ -1,3 +1,262 @@
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.7.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Really generate DSA key in example.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Fix return value.  Doc fix.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Explain how to generate DSA key.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c, lib/x509/x509.c: Doc fix for new APIs.
+
+2009-04-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/pk-libgcrypt.c: Corrected possible memory corruption on
+	signature verification failure. Reported by Miroslav Kratochvil
+	<exa.exa@gmail.com>
+
+2009-04-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/printlist.c: Added small patch from Romain Francoise to remove
+	unneeded include.
+
+2009-04-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/x509.h, lib/x509/privkey.c, lib/x509/x509.c,
+	tests/Makefile.am, tests/x509sign-verify.c: Added self test for
+	gnutls_x509_crt_verify_hash() and
+	gnutls_x509_crt_get_verify_algorithm().  Added some notes in
+	gnutls_x509_privkey_sign_hash().
+
+2009-04-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/includes/gnutls/x509.h, lib/x509/verify.c,
+	lib/x509/x509.c: gnutls_x509_crt_get_sig_algorithm was renamed to
+	gnutls_x509_crt_get_verify_algorithm.  Corrected some issues with
+	the code.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Reorder.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/gnutls.pc.in: Add -ltasn1 to pkg-config file.  Reported
+	by Andreas Metzler <ametzler@downhill.at.eu.org> in
+
+	<http://article.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3467>.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Use new po domain.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/de.po.in: Sync with TP.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/de.po.in: Sync with TP.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/de.po.in: Sync with TP.
+
+2009-04-16  Simon Josefsson <simon@josefsson.org>
+
+	* : commit 934102c33ac89ace9a1e1d02047d54f2fea6b59b Merge:
+	bc279f4... d720f3f...  Author: Nikos Mavrogiannopoulos
+	<nmav@gnutls.org> Date:   Wed Apr 15 22:43:03 2009 +0300
+
+2009-04-14  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh, doc/gendocs_template, doc/lgpl-2.1.texi: 
+	Update gnulib files.
+
+2009-04-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/inet_ntop.m4, maint.mk: Update gnulib files.
+
+2009-04-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented Cedric Bail's function addition
+
+2009-04-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : commit 258d2e873f61d5543c674f46a6247b4a379d2cca Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Fri Apr 3 15:20:09 2009
+	+0200
+
+2009-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/POTFILES.in: Fix filenames.
+
+2009-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix PODIR.
+
+2009-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, configure.ac, lib/Makefile.am, lib/configure.ac,
+	lib/po/LINGUAS, lib/po/Makevars, lib/po/POTFILES.in,
+	lib/po/cs.po.in, lib/po/de.po.in, lib/po/fr.po.in, lib/po/ms.po.in,
+	lib/po/nl.po.in, lib/po/pl.po.in, lib/po/sv.po.in, lib/po/vi.po.in,
+	po/LINGUAS, po/Makevars, po/POTFILES.in, po/cs.po.in, po/de.po.in,
+	po/fr.po.in, po/ms.po.in, po/nl.po.in, po/pl.po.in, po/sv.po.in,
+	po/vi.po.in: Move i18n dir back to lib/, after discussion with
+	Bruno.
+
+2009-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, gl/Makefile.am, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/ld-version-script.m4,
+	m4/linker-script.m4: Use linker-script from gnulib.
+
+2009-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, gl/Makefile.am, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/ld-output-def.m4, lib/configure.ac,
+	libextra/configure.ac, m4/output-def.m4: Use output-def test from
+	gnulib.
+
+2009-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/Makefile.am, lib/libgnutls.map,
+	lib/libgnutls.vers, lib/libgnutlsxx.map, lib/libgnutlsxx.vers: 
+	Rename linker script.
+
+2009-04-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, lib/m4/hooks.m4, libextra/Makefile.am: Use
+	DLL_VERSION variable name.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS, po/cs.po.in: Sync with TP.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c, lib/openpgp/output.c, lib/x509/output.c: Fix
+	warnings.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Only add warnings when using gcc.  Don't use
+	-Wformat-nonliteral.
+
+2009-03-30  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, build-aux/gnupload, gl/Makefile.am, gl/close-hook.c,
+	gl/close-hook.h, gl/close.c, gl/fseeko.c, gl/gai_strerror.c,
+	gl/m4/close.m4, gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/printf.m4, gl/m4/select.m4, gl/m4/stdarg.m4,
+	gl/m4/sys_select_h.m4, gl/readline.c, gl/select.c, gl/setsockopt.c,
+	gl/stdint.in.h, gl/sys_select.in.h, gl/sys_socket.in.h,
+	gl/tests/Makefile.am, gl/tests/sockets.c, gl/tests/sockets.h,
+	gl/tests/test-getaddrinfo.c, gl/tests/test-sockets.c,
+	gl/unistd.in.h, gl/vasnprintf.c, gl/winsock-select.c,
+	lib/gl/Makefile.am, lib/gl/close-hook.c, lib/gl/close-hook.h,
+	lib/gl/fseeko.c, lib/gl/m4/gnulib-common.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/printf.m4, lib/gl/sockets.c,
+	lib/gl/sockets.h, lib/gl/stdint.in.h, lib/gl/sys_socket.in.h,
+	lib/gl/tests/test-sockets.c, lib/gl/unistd.in.h,
+	lib/gl/vasnprintf.c, lib/gl/w32sock.h,
+	libextra/gl/m4/gnulib-common.m4, maint.mk: Update gnulib files.
+
+2009-03-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/x509.h, lib/x509/verify.c, lib/x509/x509.c,
+	lib/x509/x509_int.h: Applied patch by Cedric Bail to add functions
+	gnutls_x509_crt_verify_hash() and
+	gnutls_x509_crt_get_sig_algorithm().
+
+2009-03-23  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix bootstrap.
+
+2009-03-23  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, cfg.mk, configure.ac, lib/Makefile.am,
+	lib/configure.ac: Fix po paths.
+
+2009-03-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/LINGUAS, lib/po/Makevars, lib/po/POTFILES.in,
+	lib/po/de.po.in, lib/po/fr.po.in, lib/po/ms.po.in, lib/po/nl.po.in,
+	lib/po/pl.po.in, lib/po/sv.po.in, lib/po/vi.po.in, po/LINGUAS,
+	po/Makevars, po/POTFILES.in, po/de.po.in, po/fr.po.in, po/ms.po.in,
+	po/nl.po.in, po/pl.po.in, po/sv.po.in, po/vi.po.in: Move lib/po to
+	po/ since the gettext domain is global for gnutls.
+
+2009-03-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/Makefile.am: Cosmetic fix.
+
+2009-03-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c, lib/x509/x509_int.h: Be compatible with
+	libtasn1 before v1.6.
+
+2009-03-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-03-04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/errors.c,
+	lib/minitasn1/errors.h, lib/minitasn1/gstr.c, lib/minitasn1/int.h,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/parser_aux.c,
+	lib/minitasn1/structure.c: Update to minitasn1 v1.8.
+
+2009-03-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c, lib/gnutls_global.h, lib/x509/common.c,
+	lib/x509/crl.c, lib/x509/crq.c, lib/x509/dn.c,
+	lib/x509/extensions.c, lib/x509/pkcs12.c, lib/x509/pkcs7.c,
+	lib/x509/x509.c: Use modern libtasn1 interfaces.
+
+2009-03-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-03-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump version.
+
+2009-03-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Add -I's for errcodes/printlist.  Reported by
+	Roman Bogorodskiy <novel@FreeBSD.org> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3435>.
+
+2009-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-02-27  Simon Josefsson <simon@josefsson.org>
 
 	* doc/Makefile.am: Fix distcheck.
