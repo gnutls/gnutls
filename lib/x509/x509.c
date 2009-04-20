@@ -2305,17 +2305,19 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 }
 
 /**
-  * gnutls_x509_crt_get_verify_algorithm - This function will return the hash algorithm used during signature.
-  * @crt: Holds the certificate
-  * @signature: contains the signature
-  * @hash: The result of the call with the hash algorithm used for signature
-  *
-  * This function will read the certifcate and the signed data to
-  * determine the hash algorithm used to generate the signature.
-  *
-  * Returns: the 0 if the hash algorithm is found. A negative value is
-  * returned on error.
-  **/
+ * gnutls_x509_crt_get_verify_algorithm - This function will return the hash algorithm used during signature.
+ * @crt: Holds the certificate
+ * @signature: contains the signature
+ * @hash: The result of the call with the hash algorithm used for signature
+ *
+ * This function will read the certifcate and the signed data to
+ * determine the hash algorithm used to generate the signature.
+ *
+ * Returns: the 0 if the hash algorithm is found. A negative value is
+ * returned on error.
+ *
+ * Since: 2.8.0
+ **/
 int
 gnutls_x509_crt_get_verify_algorithm(gnutls_x509_crt_t crt, const gnutls_datum_t * signature, gnutls_digest_algorithm_t *hash)
 {

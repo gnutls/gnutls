@@ -1934,6 +1934,8 @@ int
  * all.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.8.0
  **/
 int
   gnutls_certificate_set_x509_simple_pkcs12_mem
