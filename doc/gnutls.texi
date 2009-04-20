@@ -2802,10 +2802,16 @@ Note that a self-signed certificate usually belongs to a certificate
 authority, that signs other certificates.
 
 @item
-To create a private key, run:
+To create a private key (RSA by default), run:
 
 @example
 $ certtool --generate-privkey --outfile key.pem
+@end example
+
+To create a DSA private key, run:
+
+@example
+$ certtool --generate-privkey --outfile key-dsa.pem
 @end example
 
 @item
