@@ -50,7 +50,7 @@ defexec_DATA =
 
 lib_LTLIBRARIES = libgnutls-extra.la
 
-libgnutls_extra_la_SOURCES = gnutls_extra.c fipsmd5.c
+libgnutls_extra_la_SOURCES = libgnutls-extra.map gnutls_extra.c fipsmd5.c
 
 libgnutls_openssl_la_LDFLAGS = -no-undefined
 
@@ -103,14 +103,14 @@ libgnutls_extra_la_LDFLAGS += \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES += libgnutls-extra.vers
-
 libgnutls_extra_la_LIBADD += ../lib/gl/liblgnu.la gl/libxgnu.la \
 	../lib/libgnutls.la
 
 if HAVE_LD_VERSION_SCRIPT
 libgnutls_extra_la_LDFLAGS += \
-	-Wl,--version-script=$(srcdir)/libgnutls-extra.vers
+	-Wl,--version-script=$(srcdir)/libgnutls-extra.map
+else
+libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^(gnutls_).*'
 endif
 
 gnutls-extra-api.texi: gnutls_extra.c

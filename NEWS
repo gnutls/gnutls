@@ -5,6 +5,22 @@ See the end for copying conditions.
 
 * Version 2.7.8 (unreleased)
 
+** lib: Linker version scripts reduces number of exported symbols.
+The linker version script now lists all exported ABIs explicitly, to
+avoid accidentally exporting unintended functions.  Compared to
+before, most symbols beginning with _gnutls* are no longer exported.
+These functions have never been intended for use by applications, and
+there were no prototypes for these function in the public header
+files.  Thus we believe it is possible to do this without incrementing
+the library ABI version.
+
+** lib: Limit exported symbols on systems without LD linker scripts.
+Before all symbols were exported.  Now we limit the exported symbols
+to (for libgnutls and libgnutls-extra) gnutls* and (for libgnutls)
+_gnutls*.  This is a superset of the actual supported ABI, but still
+an improvement compared to before.  This is implemented using Libtool
+-export-symbols-regex.
+
 ** libgnutls: Incremented CURRENT/AGE libtool version to reflect new symbols.
 This should have been done in the last release.
 
