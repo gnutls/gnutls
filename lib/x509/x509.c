@@ -2305,7 +2305,7 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_verify_algorithm - This function will return the hash algorithm used during signature.
+ * gnutls_x509_crt_get_verify_algorithm - get hash algorithm used to verify signature.
  * @crt: Holds the certificate
  * @signature: contains the signature
  * @hash: The result of the call with the hash algorithm used for signature
@@ -2319,32 +2319,33 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crt_get_verify_algorithm(gnutls_x509_crt_t crt, const gnutls_datum_t * signature, gnutls_digest_algorithm_t *hash)
+gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
+				      const gnutls_datum_t * signature,
+				      gnutls_digest_algorithm_t *hash)
 {
-int ret;
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
 
-   if (crt == NULL)
-     {
-       gnutls_assert ();
-       return GNUTLS_E_INVALID_REQUEST;
-     }
-
-   ret = _gnutls_x509_verify_algorithm((gnutls_mac_algorithm_t*)hash, signature, crt);
+  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
+					signature, crt);
 }
 
 /**
-  * gnutls_x509_crt_verify_data - This function will verify the given signed data.
-  * @crt: Holds the certificate
-  * @flags: should be 0 for now
-  * @data: holds the data to be signed
-  * @signature: contains the signature
-  *
-  * This function will verify the given signed data, using the
-  * parameters from the certificate.
-  *
-  * Returns: In case of a verification failure 0 is returned, and 1 on
-  * success.
-  **/
+ * gnutls_x509_crt_verify_data - verify the given signed data.
+ * @crt: Holds the certificate
+ * @flags: should be 0 for now
+ * @data: holds the data to be signed
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed data, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure 0 is returned, and 1 on
+ * success.
+ **/
 int
 gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
 			     const gnutls_datum_t * data,
@@ -2369,18 +2370,18 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
 }
 
 /**
-  * gnutls_x509_crt_verify_data - This function will verify the given signed data.
-  * @crt: Holds the certificate
-  * @flags: should be 0 for now
-  * @hash: holds the hash digest to be verified
-  * @signature: contains the signature
-  *
-  * This function will verify the given signed digest, using the
-  * parameters from the certificate.
-  *
-  * Returns: In case of a verification failure 0 is returned, and 1 on
-  * success.
-  **/
+ * gnutls_x509_crt_verify_hash - verify the given signed digest
+ * @crt: Holds the certificate
+ * @flags: should be 0 for now
+ * @hash: holds the hash digest to be verified
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed digest, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure 0 is returned, and 1 on
+ * success.
+ **/
 int
 gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
 			     const gnutls_datum_t * hash,
