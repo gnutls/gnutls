@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.7.8 (unreleased)
 
+** libgnutls: Incremented CURRENT/AGE libtool version to reflect new symbols.
+This should have been done in the last release.
+
 ** API and ABI modifications:
 No changes since last version.
 
