@@ -209,14 +209,6 @@ EXTRA_DIST += test-snprintf.c
 
 ## end   gnulib module snprintf-tests
 
-## begin gnulib module sockets
-
-libtests_a_SOURCES += sockets.h sockets.c
-
-EXTRA_DIST += w32sock.h
-
-## end   gnulib module sockets
-
 ## begin gnulib module sockets-tests
 
 TESTS += test-sockets
@@ -374,6 +366,12 @@ check_PROGRAMS += test-wchar
 EXTRA_DIST += test-wchar.c
 
 ## end   gnulib module wchar-tests
+
+## begin gnulib module dummy
+
+libtests_a_SOURCES += dummy.c
+
+## end   gnulib module dummy
 
 # Clean up after Solaris cc.
 clean-local:

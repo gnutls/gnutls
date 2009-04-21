@@ -158,6 +158,7 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([socket])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([socket])
+  gl_SOCKETS
   gl_TYPE_SOCKLEN_T
   gl_STDARG_H
   AM_STDBOOL_H
@@ -229,7 +230,6 @@ AC_SUBST([LTALLOCA])
   gl_SYS_IOCTL_MODULE_INDICATOR([ioctl])
   gl_MODULE_INDICATOR([ioctl])
   AC_CHECK_HEADERS_ONCE([unistd.h sys/wait.h])
-  gl_SOCKETS
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   gl_SYS_IOCTL_H
@@ -390,6 +390,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/size_max.h
   lib/snprintf.c
   lib/socket.c
+  lib/sockets.c
+  lib/sockets.h
   lib/stdarg.in.h
   lib/stdbool.in.h
   lib/stdint.in.h
@@ -520,10 +522,9 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-unistd.c
   tests/test-vasnprintf.c
   tests/test-wchar.c
+  tests=lib/dummy.c
   tests=lib/gettimeofday.c
   tests=lib/ioctl.c
-  tests=lib/sockets.c
-  tests=lib/sockets.h
   tests=lib/sys_ioctl.in.h
   tests=lib/verify.h
   tests=lib/w32sock.h
