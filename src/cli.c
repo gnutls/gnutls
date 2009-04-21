@@ -45,6 +45,7 @@
 #include <read-file.h>
 #include <getpass.h>
 #include <minmax.h>
+#include "sockets.h"
 
 #include "common.h"
 #include "cli-gaa.h"
@@ -924,8 +925,10 @@ static int
 do_handshake (socket_st * socket)
 {
   int ret;
+
   gnutls_transport_set_ptr (socket->session,
-			    (gnutls_transport_ptr_t) socket->fd);
+			    (gnutls_transport_ptr_t)
+			    gl_fd_to_handle (socket->fd));
   do
     {
       ret = gnutls_handshake (socket->session);
