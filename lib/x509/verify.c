@@ -766,7 +766,7 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t *hash,
   gnutls_datum_t decrypted;
   int issuer_params_size;
   int digest_size;
-  int ret;
+  int ret, i;
 
   switch (gnutls_x509_crt_get_pk_algorithm (issuer, NULL))
     {
@@ -786,6 +786,13 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t *hash,
       ret =
 	_gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
 				   issuer_params, issuer_params_size, 1);
+
+      /* release allocated mpis */
+      for (i = 0; i < issuer_params_size; i++)
+        {
+          _gnutls_mpi_release (&issuer_params[i]);
+        }
+
       if (ret < 0)
 	{
 	   gnutls_assert ();
