@@ -1,6 +1,6 @@
 # libgcrypt.supp -- Valgrind suppresion file for libgcrypt
 
-# Copyright (C) 2008 Simon Josefsson
+# Copyright (C) 2008, 2009 Simon Josefsson
 
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
@@ -15,6 +15,22 @@
    fun:_gcry_malloc
    fun:_gcry_module_add
    fun:gcry_pk_register_default
+   fun:_gcry_pk_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt1-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:pk_register_default
    fun:_gcry_pk_init
    fun:global_init
    fun:_gcry_check_version
@@ -39,6 +55,22 @@
 }
 
 {
+   libgcrypt2-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:md_register_default
+   fun:_gcry_md_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
    libgcrypt3
    Memcheck:Leak
    fun:malloc
@@ -47,6 +79,22 @@
    fun:_gcry_malloc
    fun:_gcry_module_add
    fun:gcry_cipher_register_default
+   fun:_gcry_cipher_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt3-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:cipher_register_default
    fun:_gcry_cipher_init
    fun:global_init
    fun:_gcry_check_version
@@ -113,6 +161,24 @@
    fun:_gcry_xmalloc
    fun:_gcry_xcalloc
    fun:initialize
+   fun:_gcry_create_nonce
+   fun:gcry_create_nonce
+   fun:wrap_gcry_rnd_init
+   fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt7-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_xmalloc
+   fun:_gcry_xcalloc
+   fun:initialize
+   fun:_gcry_rngcsprng_create_nonce
    fun:_gcry_create_nonce
    fun:gcry_create_nonce
    fun:wrap_gcry_rnd_init
