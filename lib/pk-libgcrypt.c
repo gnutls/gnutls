@@ -43,8 +43,6 @@
 /* this is based on code from old versions of libgcrypt (centuries ago)
  */
 
-#define SEXP_RELEASE(x) gcry_sexp_release(x);x=NULL
-
 int (*generate) (gnutls_pk_algorithm_t, unsigned int level /*bits */ ,
 		 gnutls_pk_params_st *);
 
@@ -100,8 +98,10 @@ _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
 
   /* pass it to libgcrypt */
   rc = gcry_pk_encrypt (&s_ciph, s_data, s_pkey);
-  SEXP_RELEASE (s_data);
-  SEXP_RELEASE (s_pkey);
+  gcry_sexp_release (s_data);
+  s_data = NULL;
+  gcry_sexp_release (s_pkey);
+  s_pkey = NULL;
 
   if (rc != 0)
     {
@@ -122,7 +122,7 @@ _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
 	}
 
       res = gcry_sexp_nth_mpi (list, 1, 0);
-      SEXP_RELEASE (list);
+      gcry_sexp_release (list);
 
       if (res == NULL)
 	{
@@ -141,17 +141,17 @@ _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
 	}
     }
 
-  SEXP_RELEASE (s_ciph);
+  gcry_sexp_release (s_ciph);
   return 0;
 
 cleanup:
   _gnutls_mpi_release (&data);
   if (s_ciph)
-    SEXP_RELEASE (s_ciph);
+    gcry_sexp_release (s_ciph);
   if (s_data)
-    SEXP_RELEASE (s_data);
+    gcry_sexp_release (s_data);
   if (s_pkey)
-    SEXP_RELEASE (s_pkey);
+    gcry_sexp_release (s_pkey);
 
   return ret;
 }
@@ -209,8 +209,8 @@ _wrap_gcry_pk_decrypt (gnutls_pk_algorithm_t algo,
 
   /* pass it to libgcrypt */
   rc = gcry_pk_decrypt (&s_plain, s_data, s_pkey);
-  SEXP_RELEASE (s_data);
-  SEXP_RELEASE (s_pkey);
+  gcry_sexp_release (s_data);
+  gcry_sexp_release (s_pkey);
 
   if (rc != 0)
     {
@@ -221,7 +221,7 @@ _wrap_gcry_pk_decrypt (gnutls_pk_algorithm_t algo,
     {
       bigint_t res;
       res = gcry_sexp_nth_mpi (s_plain, 0, 0);
-      SEXP_RELEASE (s_plain);
+      gcry_sexp_release (s_plain);
 
       if (res == NULL)
 	{
@@ -246,11 +246,11 @@ _wrap_gcry_pk_decrypt (gnutls_pk_algorithm_t algo,
 cleanup:
   _gnutls_mpi_release (&data);
   if (s_plain)
-    SEXP_RELEASE (s_plain);
+    gcry_sexp_release (s_plain);
   if (s_data)
-    SEXP_RELEASE (s_data);
+    gcry_sexp_release (s_data);
   if (s_pkey)
-    SEXP_RELEASE (s_pkey);
+    gcry_sexp_release (s_pkey);
 
   return ret;
 
@@ -328,8 +328,10 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
 
   /* pass it to libgcrypt */
   rc = gcry_pk_sign (&s_sig, s_hash, s_key);
-  SEXP_RELEASE (s_hash);
-  SEXP_RELEASE (s_key);
+  gcry_sexp_release (s_hash);
+  gcry_sexp_release (s_key);
+  s_hash = NULL;
+  s_key = NULL;
 
   if (rc != 0)
     {
@@ -346,12 +348,13 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
       if (list == NULL)
 	{
 	  gnutls_assert ();
-	  SEXP_RELEASE (s_sig);
+	  gcry_sexp_release (s_sig);
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
       res[0] = gcry_sexp_nth_mpi (list, 1, 0);
-      SEXP_RELEASE (list);
+      gcry_sexp_release (list);
+      list = NULL;
 
       list = gcry_sexp_find_token (s_sig, "s", 0);
       if (list == NULL)
@@ -362,7 +365,8 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
 	}
 
       res[1] = gcry_sexp_nth_mpi (list, 1, 0);
-      SEXP_RELEASE (list);
+      gcry_sexp_release (list);
+      list = NULL;
 
       ret = _gnutls_encode_ber_rs (signature, res[0], res[1]);
 
@@ -378,7 +382,8 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
 	}
 
       res[0] = gcry_sexp_nth_mpi (list, 1, 0);
-      SEXP_RELEASE (list);
+      gcry_sexp_release (list);
+      list = NULL;
 
       ret = _gnutls_mpi_dprint (res[0], signature);
     }
@@ -396,13 +401,13 @@ cleanup:
   _gnutls_mpi_release (&res[0]);
   _gnutls_mpi_release (&res[1]);
   if (s_sig)
-    SEXP_RELEASE (s_sig);
+    gcry_sexp_release (s_sig);
   if (list)
-    SEXP_RELEASE (list);
+    gcry_sexp_release (list);
   if (s_hash)
-    SEXP_RELEASE (s_hash);
+    gcry_sexp_release (s_hash);
   if (s_key)
-    SEXP_RELEASE (s_key);
+    gcry_sexp_release (s_key);
 
   return ret;
 }
@@ -503,9 +508,9 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
 
   rc = gcry_pk_verify (s_sig, s_hash, s_pkey);
 
-  SEXP_RELEASE (s_sig);
-  SEXP_RELEASE (s_hash);
-  SEXP_RELEASE (s_pkey);
+  gcry_sexp_release (s_sig);
+  gcry_sexp_release (s_hash);
+  gcry_sexp_release (s_pkey);
 
   if (rc != 0)
     {
@@ -521,11 +526,11 @@ cleanup:
   _gnutls_mpi_release (&tmp[0]);
   _gnutls_mpi_release (&tmp[1]);
   if (s_sig)
-    SEXP_RELEASE (s_sig);
+    gcry_sexp_release (s_sig);
   if (s_hash)
-    SEXP_RELEASE (s_hash);
+    gcry_sexp_release (s_hash);
   if (s_pkey)
-    SEXP_RELEASE (s_pkey);
+    gcry_sexp_release (s_pkey);
 
   return ret;
 }
@@ -560,7 +565,7 @@ _dsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   /* generate the DSA key 
    */
   ret = gcry_pk_genkey (&key, parms);
-  SEXP_RELEASE (parms);
+  gcry_sexp_release (parms);
 
   if (ret != 0)
     {
@@ -572,59 +577,60 @@ _dsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[0] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
   list = gcry_sexp_find_token (key, "q", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[1] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
   list = gcry_sexp_find_token (key, "g", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[2] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
   list = gcry_sexp_find_token (key, "y", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[3] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
 
   list = gcry_sexp_find_token (key, "x", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[4] = gcry_sexp_nth_mpi (list, 1, 0);
+  gcry_sexp_release (list);
 
-  SEXP_RELEASE (list);
-  SEXP_RELEASE (key);
+
+  gcry_sexp_release (key);
 
   _gnutls_dump_mpi ("p: ", resarr[0]);
   _gnutls_dump_mpi ("q: ", resarr[1]);
@@ -654,7 +660,7 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
 
   /* generate the RSA key */
   ret = gcry_pk_genkey (&key, parms);
-  SEXP_RELEASE (parms);
+  gcry_sexp_release (parms);
 
   if (ret != 0)
     {
@@ -666,71 +672,71 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[0] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
   list = gcry_sexp_find_token (key, "e", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[1] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
   list = gcry_sexp_find_token (key, "d", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[2] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
   list = gcry_sexp_find_token (key, "p", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[3] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
 
   list = gcry_sexp_find_token (key, "q", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[4] = gcry_sexp_nth_mpi (list, 1, 0);
-  SEXP_RELEASE (list);
+  gcry_sexp_release (list);
 
 
   list = gcry_sexp_find_token (key, "u", 0);
   if (list == NULL)
     {
       gnutls_assert ();
-      SEXP_RELEASE (key);
+      gcry_sexp_release (key);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
   resarr[5] = gcry_sexp_nth_mpi (list, 1, 0);
+  gcry_sexp_release (list);
 
-  SEXP_RELEASE (list);
-  SEXP_RELEASE (key);
+  gcry_sexp_release (key);
 
   _gnutls_dump_mpi ("n: ", resarr[0]);
   _gnutls_dump_mpi ("e: ", resarr[1]);
