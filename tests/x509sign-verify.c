@@ -52,7 +52,7 @@ const gnutls_datum_t raw_data = {
   5
 };
 
-static char cert_pem[] =
+static char pem1_cert[] =
   "-----BEGIN CERTIFICATE-----\n"
   "MIICHjCCAYmgAwIBAgIERiYdNzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
   "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTI3WhcNMDgwNDE3MTMyOTI3WjAdMRsw\n"
@@ -65,10 +65,10 @@ static char cert_pem[] =
   "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
-const gnutls_datum_t cert = { cert_pem, sizeof (cert_pem) };
+  "dc8Siq5JojruiMizAf0pA7in\n"
+  "-----END CERTIFICATE-----\n";
 
-char key_pem[] =
+static char pem1_key[] =
   "-----BEGIN RSA PRIVATE KEY-----\n"
   "MIICXAIBAAKBgQC7ZkP18sXXtozMxd/1iDuxyUtqDqGtIFBACIChT1yj0Phsz+Y8\n"
   "9+wEdhMXi2SJIlvA3VN8O+18BLuAuSi+jpvGjqClEsv1Vx6i57u3M0mf47tKrmpN\n"
@@ -84,7 +84,53 @@ char key_pem[] =
   "/iVX2cmMTSh3w3z8MaECQEp0XJWDVKOwcTW6Ajp9SowtmiZ3YDYo1LF9igb4iaLv\n"
   "sWZGfbnU3ryjvkb6YuFjgtzbZDZHWQCo8/cOtOBmPdk=\n"
   "-----END RSA PRIVATE KEY-----\n";
-const gnutls_datum_t key_dat = { key_pem, sizeof (key_pem) };
+
+static char pem2_cert[] =
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIDbzCCAtqgAwIBAgIERiYdRTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+  "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTQxWhcNMDgwNDE3MTMyOTQxWjA3MRsw\n"
+  "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
+  "Lm9yZzCCAbQwggEpBgcqhkjOOAQBMIIBHAKBgLmE9VqBvhoNxYpzjwybL5u2DkvD\n"
+  "dBp/ZK2d8yjFoEe8m1dW8ZfVfjcD6fJM9OOLfzCjXS+7oaI3wuo1jx+xX6aiXwHx\n"
+  "IzYr5E8vLd2d1TqmOa96UXzSJY6XdM8exXtLdkOBBx8GFLhuWBLhkOI3b9Ib7GjF\n"
+  "WOLmMOBqXixjeOwHAhSfVoxIZC/+jap6bZbbBF0W7wilcQKBgGIGfuRcdgi3Rhpd\n"
+  "15fUKiH7HzHJ0vT6Odgn0Zv8J12nCqca/FPBL0PCN8iFfz1Mq12BMvsdXh5UERYg\n"
+  "xoBa2YybQ/Dda6D0w/KKnDnSHHsP7/ook4/SoSLr3OCKi60oDs/vCYXpNr2LelDV\n"
+  "e/clDWxgEcTvcJDP1hvru47GPjqXA4GEAAKBgA+Kh1fy0cLcrN9Liw+Luin34QPk\n"
+  "VfqymAfW/RKxgLz1urRQ1H+gDkPnn8l4EV/l5Awsa2qkNdy9VOVgNpox0YpZbmsc\n"
+  "ur0uuut8h+/ayN2h66SD5out+vqOW9c3yDI+lsI+9EPafZECD7e8+O+P90EAXpbf\n"
+  "DwiW3Oqy6QaCr9Ivo4GTMIGQMAwGA1UdEwEB/wQCMAAwGgYDVR0RBBMwEYIPdGVz\n"
+  "dC5nbnV0bHMub3JnMBMGA1UdJQQMMAoGCCsGAQUFBwMBMA8GA1UdDwEB/wQFAwMH\n"
+  "gAAwHQYDVR0OBBYEFL/su87Y6HtwVuzz0SuS1tSZClvzMB8GA1UdIwQYMBaAFOk8\n"
+  "HPutkm7mBqRWLKLhwFMnyPKVMAsGCSqGSIb3DQEBBQOBgQBCsrnfD1xzh8/Eih1f\n"
+  "x+M0lPoX1Re5L2ElHI6DJpHYOBPwf9glwxnet2+avzgUQDUFwUSxOhodpyeaACXD\n"
+  "o0gGVpcH8sOBTQ+aTdM37hGkPxoXjtIkR/LgG5nP2H2JRd5TkW8l13JdM4MJFB4W\n"
+  "QcDzQ8REwidsfh9uKAluk1c/KQ==\n"
+  "-----END CERTIFICATE-----\n";
+
+static char pem2_key[] =
+  "-----BEGIN DSA PRIVATE KEY-----\n"
+  "MIIBugIBAAKBgQC5hPVagb4aDcWKc48Mmy+btg5Lw3Qaf2StnfMoxaBHvJtXVvGX\n"
+  "1X43A+nyTPTji38wo10vu6GiN8LqNY8fsV+mol8B8SM2K+RPLy3dndU6pjmvelF8\n"
+  "0iWOl3TPHsV7S3ZDgQcfBhS4blgS4ZDiN2/SG+xoxVji5jDgal4sY3jsBwIVAJ9W\n"
+  "jEhkL/6NqnptltsEXRbvCKVxAoGAYgZ+5Fx2CLdGGl3Xl9QqIfsfMcnS9Po52CfR\n"
+  "m/wnXacKpxr8U8EvQ8I3yIV/PUyrXYEy+x1eHlQRFiDGgFrZjJtD8N1roPTD8oqc\n"
+  "OdIcew/v+iiTj9KhIuvc4IqLrSgOz+8Jhek2vYt6UNV79yUNbGARxO9wkM/WG+u7\n"
+  "jsY+OpcCgYAPiodX8tHC3KzfS4sPi7op9+ED5FX6spgH1v0SsYC89bq0UNR/oA5D\n"
+  "55/JeBFf5eQMLGtqpDXcvVTlYDaaMdGKWW5rHLq9LrrrfIfv2sjdoeukg+aLrfr6\n"
+  "jlvXN8gyPpbCPvRD2n2RAg+3vPjvj/dBAF6W3w8IltzqsukGgq/SLwIUS5/r/2ya\n"
+  "AoNBXjeBjgCGMei2m8E=\n"
+  "-----END DSA PRIVATE KEY-----\n";
+
+const gnutls_datum_t cert_dat[] = {
+  { pem1_cert, sizeof (pem1_cert) },
+  { pem2_cert, sizeof (pem2_cert) }
+};
+
+const gnutls_datum_t key_dat[] = {
+  { pem1_key, sizeof (pem1_key) },
+  { pem2_key, sizeof (pem2_key) }
+};
 
 void
 doit (void)
@@ -96,42 +142,49 @@ doit (void)
   size_t _signature_size = sizeof (_signature);
   gnutls_datum signature;
   int ret;
+  size_t i;
 
   gnutls_global_init ();
 
-  ret = gnutls_x509_privkey_init (&key);
-  if (ret < 0)
-    fail ("gnutls_x509_privkey_init\n");
+  for (i = 0; i < sizeof (key_dat) / sizeof (key_dat[0]); i++)
+    {
+      success ("loop %d\n", i);
 
-  ret = gnutls_x509_privkey_import (key, &key_dat, GNUTLS_X509_FMT_PEM);
-  if (ret < 0)
-    fail ("gnutls_x509_privkey_import\n");
+      ret = gnutls_x509_privkey_init (&key);
+      if (ret < 0)
+	fail ("gnutls_x509_privkey_init\n");
 
-  ret = gnutls_x509_privkey_sign_data (key, GNUTLS_DIG_SHA1, 0, &raw_data,
-				       _signature, &_signature_size);
-  if (ret < 0)
-    fail ("gnutls_x509_privkey_sign_hash\n");
+      ret = gnutls_x509_privkey_import (key, &key_dat[i], GNUTLS_X509_FMT_PEM);
+      if (ret < 0)
+	fail ("gnutls_x509_privkey_import\n");
 
-  ret = gnutls_x509_crt_init (&crt);
-  if (ret < 0)
-    fail ("gnutls_x509_crt_init\n");
+      ret = gnutls_x509_privkey_sign_data (key, GNUTLS_DIG_SHA1, 0, &raw_data,
+					   _signature, &_signature_size);
+      if (ret < 0)
+	fail ("gnutls_x509_privkey_sign_hash\n");
 
-  ret = gnutls_x509_crt_import (crt, &cert, GNUTLS_X509_FMT_PEM);
-  if (ret < 0)
-    fail ("gnutls_x509_crt_import\n");
+      ret = gnutls_x509_crt_init (&crt);
+      if (ret < 0)
+	fail ("gnutls_x509_crt_init\n");
 
-  signature.data = _signature;
-  signature.size = _signature_size;
+      ret = gnutls_x509_crt_import (crt, &cert_dat[i], GNUTLS_X509_FMT_PEM);
+      if (ret < 0)
+	fail ("gnutls_x509_crt_import\n");
 
-  ret = gnutls_x509_crt_get_verify_algorithm (crt, &signature, &hash_algo);
-  if (ret < 0 || hash_algo != GNUTLS_DIG_SHA1)
-    fail ("gnutls_x509_crt_get_verify_algorithm\n");
+      signature.data = _signature;
+      signature.size = _signature_size;
 
-  ret = gnutls_x509_crt_verify_hash (crt, 0, &hash_data, &signature);
-  if (ret < 0)
-    fail ("gnutls_x509_privkey_verify_hash\n");
+      ret = gnutls_x509_crt_get_verify_algorithm (crt, &signature, &hash_algo);
+      if (ret < 0 || hash_algo != GNUTLS_DIG_SHA1)
+	fail ("gnutls_x509_crt_get_verify_algorithm\n");
 
-  gnutls_x509_privkey_deinit (key);
-  gnutls_x509_crt_deinit (crt);
+      ret = gnutls_x509_crt_verify_hash (crt, 0, &hash_data, &signature);
+      if (ret < 0)
+	fail ("gnutls_x509_privkey_verify_hash\n");
+
+      gnutls_x509_privkey_deinit (key);
+      gnutls_x509_crt_deinit (crt);
+    }
+
   gnutls_global_deinit ();
 }
