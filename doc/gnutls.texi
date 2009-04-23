@@ -30,14 +30,13 @@ Documentation License''.
 @end quotation
 @end copying
 
-@dircategory GNU Libraries
+@dircategory Software libraries
 @direntry
-* libgnutls: (gnutls).		A Transport Layer Security Library.
+* GnuTLS: (gnutls).		GNU Transport Layer Security Library.
 @end direntry
 
-@dircategory Network Applications
+@dircategory System Administration
 @direntry
-* GnuTLS: (gnutls).			Package for Transport Layer Security.
 * certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
 * gnutls-serv: (gnutls)Invoking gnutls-serv.	GNU TLS test server.
 * gnutls-cli: (gnutls)Invoking gnutls-cli.	GNU TLS test client.

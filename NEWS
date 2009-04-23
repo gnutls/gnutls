@@ -24,6 +24,13 @@ an improvement compared to before.  This is implemented using Libtool
 ** libgnutls: Incremented CURRENT/AGE libtool version to reflect new symbols.
 This should have been done in the last release.
 
+** doc: Improved sections for the info manual.
+We now follow the advice given by the texinfo manual on which
+directory categories to use.  In particular, libgnutls moved from the
+'GNU Libraries' section to the 'Software libraries' and the command
+line tools moved from 'Network Applications' to 'System
+Administration'.
+
 ** API and ABI modifications:
 No changes since last version.
 
