@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -418,7 +418,7 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
 		      const gnutls_datum_t * signature,
 		      const gnutls_pk_params_st * pk_params)
 {
-  gcry_sexp_t s_sig, s_hash, s_pkey;
+  gcry_sexp_t s_sig = NULL, s_hash = NULL, s_pkey = NULL;
   int rc = -1, ret;
   bigint_t hash;
   bigint_t tmp[2] = { NULL, NULL };
@@ -511,6 +511,7 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
   gcry_sexp_release (s_sig);
   gcry_sexp_release (s_hash);
   gcry_sexp_release (s_pkey);
+  s_sig = s_hash = s_pkey = NULL;
 
   if (rc != 0)
     {
