@@ -24,6 +24,10 @@ an improvement compared to before.  This is implemented using Libtool
 ** libgnutls: Incremented CURRENT/AGE libtool version to reflect new symbols.
 This should have been done in the last release.
 
+** gnutls-serv: Listen on all interfaces, including both IPv4 and IPv6.
+Reported by Peter Hendrickson <pdh@wiredyne.com> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3476>.
+
 ** doc: Improved sections for the info manual.
 We now follow the advice given by the texinfo manual on which
 directory categories to use.  In particular, libgnutls moved from the

@@ -124,7 +124,7 @@ static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 LIST_TYPE_DECLARE (listener_item, char *http_request;
 		   char *http_response; int request_length;
 		   int response_length; int response_written;
-		   int http_state;
+		   int http_state; int listen_socket;
 		   int fd; gnutls_session_t tls_session; int handshake_ok;);
 
 static const char *
@@ -631,6 +631,7 @@ listen_socket (const char *name, int listen_port)
   char portname[6];
   int s;
   int yes;
+  listener_item *j = NULL;
 
   snprintf (portname, sizeof (portname), "%d", listen_port);
   memset (&hints, 0, sizeof (hints));
@@ -644,24 +645,40 @@ listen_socket (const char *name, int listen_port)
     }
   s = -1;
 
-  for (ptr = res; (ptr != NULL) && (s == -1); ptr = ptr->ai_next)
+  for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
-      if ((s =
-	   socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol)) < 0)
+      /* Print what we are doing. */
+      {
+	char host[NI_MAXHOST], service[NI_MAXSERV];
+	int rc = getnameinfo(ptr->ai_addr, ptr->ai_addrlen,
+			     host, NI_MAXHOST,
+			     service, NI_MAXSERV,
+			     NI_NUMERICHOST|NI_NUMERICSERV);
+	if (rc == 0)
+	  fprintf (stderr, "%s listening to %s:%s (family %d)...",
+		   name, host, service, ptr->ai_family);
+	else
+	  {
+	    fprintf(stderr, "getnameinfo: %s\n", gai_strerror(s));
+	    fprintf (stderr, "%s listening to *:%s (family %d)...",
+		     name, portname, ptr->ai_family);
+	  }
+      }
+
+      if ((s = socket (ptr->ai_family, ptr->ai_socktype,
+		       ptr->ai_protocol)) < 0)
 	{
 	  perror ("socket() failed");
 	  continue;
 	}
 
       yes = 1;
-      if (setsockopt
-	  (s, SOL_SOCKET, SO_REUSEADDR, (const void *) &yes,
-	   sizeof (yes)) < 0)
+      if (setsockopt (s, SOL_SOCKET, SO_REUSEADDR,
+		      (const void *) &yes, sizeof (yes)) < 0)
 	{
 	  perror ("setsockopt() failed");
 	failed:
 	  close (s);
-	  s = -1;
 	  continue;
 	}
 
@@ -676,16 +693,24 @@ listen_socket (const char *name, int listen_port)
 	  perror ("listen() failed");
 	  goto failed;
 	}
+
+      /* new list entry for the connection */
+      lappend (listener_list);
+      j = listener_list.tail;
+      j->listen_socket = 1;
+      j->fd = s;
+
+      /* Complete earlier message. */
+      fprintf (stderr, "done\n");
     }
+
+  fflush (stderr);
 
   freeaddrinfo (res);
-  if (s == -1)
-    {
-      return -1;
-    }
+  if (!j)
+    return -1;
 
-  printf ("%s ready. Listening to port '%s'.\n\n", name, portname);
-  return s;
+  return 0;
 }
 
 static void
@@ -790,7 +815,7 @@ addr_ntop (const struct sockaddr *sa, socklen_t salen,
 int
 main (int argc, char **argv)
 {
-  int ret, n, h;
+  int ret, n;
   char topbuf[512];
   char name[256];
   int accept_fd;
@@ -1021,8 +1046,7 @@ main (int argc, char **argv)
 /*      gnutls_anon_set_server_dh_params(dh_cred, dh_params); */
 #endif
 
-  h = listen_socket (name, port);
-  if (h < 0)
+  if (listen_socket (name, port) < 0)
     exit (1);
 
   for (;;)
@@ -1034,10 +1058,6 @@ main (int argc, char **argv)
       FD_ZERO (&rd);
       FD_ZERO (&wr);
       n = 0;
-
-/* check for new incoming connections */
-      FD_SET (h, &rd);
-      n = MAX (n, h);
 
 /* flag which connections we are reading or writing to within the fd sets */
       lloopstart (listener_list, j)
@@ -1052,6 +1072,11 @@ main (int argc, char **argv)
 	  }
 #endif
 
+	if (j->listen_socket)
+	  {
+	    FD_SET (j->fd, &rd);
+	    n = MAX (n, j->fd);
+	  }
 	if (j->http_state == HTTP_STATE_REQUEST)
 	  {
 	    FD_SET (j->fd, &rd);
@@ -1075,58 +1100,60 @@ main (int argc, char **argv)
 	  exit (1);
 	}
 
-/* a new connection has arrived */
-      if (FD_ISSET (h, &rd))
-	{
-	  gnutls_session_t tls_session;
-
-	  tls_session = initialize_session ();
-
-	  calen = sizeof (client_address);
-	  memset (&client_address, 0, calen);
-	  accept_fd = accept (h, (struct sockaddr *) &client_address, &calen);
-
-	  if (accept_fd < 0)
-	    {
-	      perror ("accept()");
-	    }
-	  else
-	    {
-	      time_t tt;
-	      char *ctt;
-
-/* new list entry for the connection */
-	      lappend (listener_list);
-	      j = listener_list.tail;
-	      j->http_request = (char *) strdup ("");
-	      j->http_state = HTTP_STATE_REQUEST;
-	      j->fd = accept_fd;
-
-	      j->tls_session = tls_session;
-	      gnutls_transport_set_ptr (tls_session,
-					(gnutls_transport_ptr_t) accept_fd);
-	      j->handshake_ok = 0;
-
-	      if (verbose == 0)
-		{
-		  tt = time (0);
-		  ctt = ctime (&tt);
-		  ctt[strlen (ctt) - 1] = 0;
-
-/*
-		        printf("\n* connection from %s, port %d\n",
-			     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
-			       sizeof(topbuf)), ntohs(client_address.sin_port));
-      */
-
-		}
-	    }
-	}
-
 /* read or write to each connection as indicated by select()'s return argument */
       lloopstart (listener_list, j)
       {
-	if (FD_ISSET (j->fd, &rd))
+
+	/* a new connection has arrived */
+	if (FD_ISSET (j->fd, &rd) && j->listen_socket)
+	  {
+	    gnutls_session_t tls_session;
+
+	    tls_session = initialize_session ();
+
+	    calen = sizeof (client_address);
+	    memset (&client_address, 0, calen);
+	    accept_fd = accept (j->fd, (struct sockaddr *) &client_address,
+				&calen);
+
+	    if (accept_fd < 0)
+	      {
+		perror ("accept()");
+	      }
+	    else
+	      {
+		time_t tt;
+		char *ctt;
+
+		/* new list entry for the connection */
+		lappend (listener_list);
+		j = listener_list.tail;
+		j->http_request = (char *) strdup ("");
+		j->http_state = HTTP_STATE_REQUEST;
+		j->fd = accept_fd;
+
+		j->tls_session = tls_session;
+		gnutls_transport_set_ptr (tls_session,
+					  (gnutls_transport_ptr_t) accept_fd);
+		j->handshake_ok = 0;
+
+		if (verbose == 0)
+		  {
+		    tt = time (0);
+		    ctt = ctime (&tt);
+		    ctt[strlen (ctt) - 1] = 0;
+
+		    /*
+		      printf("\n* connection from %s, port %d\n",
+		      inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
+		      sizeof(topbuf)), ntohs(client_address.sin_port));
+		    */
+
+		  }
+	      }
+	  }
+
+	if (FD_ISSET (j->fd, &rd) && !j->listen_socket)
 	  {
 /* read partial GET request */
 	    char buf[1024];
