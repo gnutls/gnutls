@@ -12,7 +12,8 @@ before, most symbols beginning with _gnutls* are no longer exported.
 These functions have never been intended for use by applications, and
 there were no prototypes for these function in the public header
 files.  Thus we believe it is possible to do this without incrementing
-the library ABI version.
+the library ABI version which normally has to be done when removing an
+interface.
 
 ** lib: Limit exported symbols on systems without LD linker scripts.
 Before all symbols were exported.  Now we limit the exported symbols
