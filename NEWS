@@ -20,7 +20,8 @@ Before all symbols were exported.  Now we limit the exported symbols
 to (for libgnutls and libgnutls-extra) gnutls* and (for libgnutls)
 _gnutls*.  This is a superset of the actual supported ABI, but still
 an improvement compared to before.  This is implemented using Libtool
--export-symbols-regex.
+-export-symbols-regex.  It is more portable than linker version
+scripts.
 
 ** libgnutls: Incremented CURRENT/AGE libtool version to reflect new symbols.
 This should have been done in the last release.
