@@ -352,6 +352,15 @@ EXTRA_DIST += test-vasnprintf.c
 
 ## end   gnulib module vasnprintf-tests
 
+## begin gnulib module vc-list-files-tests
+
+TESTS += test-vc-list-files-git.sh
+TESTS += test-vc-list-files-cvs.sh
+TESTS_ENVIRONMENT += PATH='$(abs_aux_dir)'$(PATH_SEPARATOR)"$$PATH"
+EXTRA_DIST += test-vc-list-files-git.sh test-vc-list-files-cvs.sh
+
+## end   gnulib module vc-list-files-tests
+
 ## begin gnulib module verify
 
 libtests_a_SOURCES += verify.h
