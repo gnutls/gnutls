@@ -77,7 +77,6 @@ GNUTLS_1_4
     gnutls_certificate_set_x509_key_file;
     gnutls_certificate_set_x509_key_mem;
     gnutls_certificate_set_x509_simple_pkcs12_file;
-    gnutls_certificate_set_x509_simple_pkcs12_mem;
     gnutls_certificate_set_x509_trust;
     gnutls_certificate_set_x509_trust_file;
     gnutls_certificate_set_x509_trust_mem;
@@ -379,17 +378,12 @@ GNUTLS_1_4
     gnutls_x509_crl_check_issuer;
     gnutls_x509_crl_deinit;
     gnutls_x509_crl_export;
-    gnutls_x509_crl_get_authority_key_id;
     gnutls_x509_crl_get_crt_count;
     gnutls_x509_crl_get_crt_serial;
     gnutls_x509_crl_get_dn_oid;
-    gnutls_x509_crl_get_extension_data;
-    gnutls_x509_crl_get_extension_info;
-    gnutls_x509_crl_get_extension_oid;
     gnutls_x509_crl_get_issuer_dn;
     gnutls_x509_crl_get_issuer_dn_by_oid;
     gnutls_x509_crl_get_next_update;
-    gnutls_x509_crl_get_number;
     gnutls_x509_crl_get_signature;
     gnutls_x509_crl_get_signature_algorithm;
     gnutls_x509_crl_get_this_update;
@@ -397,11 +391,9 @@ GNUTLS_1_4
     gnutls_x509_crl_import;
     gnutls_x509_crl_init;
     gnutls_x509_crl_print;
-    gnutls_x509_crl_set_authority_key_id;
     gnutls_x509_crl_set_crt;
     gnutls_x509_crl_set_crt_serial;
     gnutls_x509_crl_set_next_update;
-    gnutls_x509_crl_set_number;
     gnutls_x509_crl_set_this_update;
     gnutls_x509_crl_set_version;
     gnutls_x509_crl_sign2;
@@ -410,36 +402,20 @@ GNUTLS_1_4
     gnutls_x509_crq_deinit;
     gnutls_x509_crq_export;
     gnutls_x509_crq_get_attribute_by_oid;
-    gnutls_x509_crq_get_attribute_data;
-    gnutls_x509_crq_get_attribute_info;
-    gnutls_x509_crq_get_basic_constraints;
     gnutls_x509_crq_get_challenge_password;
     gnutls_x509_crq_get_dn;
     gnutls_x509_crq_get_dn_by_oid;
     gnutls_x509_crq_get_dn_oid;
-    gnutls_x509_crq_get_extension_by_oid;
-    gnutls_x509_crq_get_extension_data;
-    gnutls_x509_crq_get_extension_info;
-    gnutls_x509_crq_get_key_id;
-    gnutls_x509_crq_get_key_purpose_oid;
-    gnutls_x509_crq_get_key_rsa_raw;
-    gnutls_x509_crq_get_key_usage;
     gnutls_x509_crq_get_pk_algorithm;
-    gnutls_x509_crq_get_subject_alt_name;
-    gnutls_x509_crq_get_subject_alt_othername_oid;
     gnutls_x509_crq_get_version;
     gnutls_x509_crq_import;
     gnutls_x509_crq_init;
-    gnutls_x509_crq_print;
     gnutls_x509_crq_set_attribute_by_oid;
     gnutls_x509_crq_set_basic_constraints;
     gnutls_x509_crq_set_challenge_password;
     gnutls_x509_crq_set_dn_by_oid;
-    gnutls_x509_crq_set_key;
-    gnutls_x509_crq_set_key_purpose_oid;
     gnutls_x509_crq_set_key_rsa_raw;
     gnutls_x509_crq_set_key_usage;
-    gnutls_x509_crq_set_subject_alt_name;
     gnutls_x509_crq_set_version;
     gnutls_x509_crq_sign2;
     gnutls_x509_crq_sign;
@@ -484,7 +460,6 @@ GNUTLS_1_4
     gnutls_x509_crt_get_subject_alt_name;
     gnutls_x509_crt_get_subject_alt_othername_oid;
     gnutls_x509_crt_get_subject_key_id;
-    gnutls_x509_crt_get_verify_algorithm;
     gnutls_x509_crt_get_version;
     gnutls_x509_crt_import;
     gnutls_x509_crt_init;
@@ -498,7 +473,6 @@ GNUTLS_1_4
     gnutls_x509_crt_set_crl_dist_points2;
     gnutls_x509_crt_set_crl_dist_points;
     gnutls_x509_crt_set_crq;
-    gnutls_x509_crt_set_crq_extensions;
     gnutls_x509_crt_set_dn_by_oid;
     gnutls_x509_crt_set_expiration_time;
     gnutls_x509_crt_set_extension_by_oid;
@@ -517,7 +491,6 @@ GNUTLS_1_4
     gnutls_x509_crt_sign;
     gnutls_x509_crt_verify;
     gnutls_x509_crt_verify_data;
-    gnutls_x509_crt_verify_hash;
     gnutls_x509_dn_deinit;
     gnutls_x509_dn_export;
     gnutls_x509_dn_get_rdn_ava;
@@ -565,6 +538,38 @@ GNUTLS_1_4
   local:
     *;
 };
+
+GNUTLS_2_8
+{
+  global:
+    gnutls_x509_crt_verify_hash;
+    gnutls_x509_crt_get_verify_algorithm;
+    gnutls_x509_crq_get_key_id;
+    gnutls_certificate_set_x509_simple_pkcs12_mem;
+    gnutls_x509_crl_get_authority_key_id;
+    gnutls_x509_crl_get_number;
+    gnutls_x509_crl_get_extension_data;
+    gnutls_x509_crl_get_extension_info;
+    gnutls_x509_crl_get_extension_oid;
+    gnutls_x509_crl_set_authority_key_id;
+    gnutls_x509_crl_set_number;
+    gnutls_x509_crq_get_key_rsa_raw;
+    gnutls_x509_crq_get_attribute_data;
+    gnutls_x509_crq_get_attribute_info;
+    gnutls_x509_crq_get_extension_data;
+    gnutls_x509_crq_get_extension_info;
+    gnutls_x509_crq_get_key_usage;
+    gnutls_x509_crq_get_basic_constraints;
+    gnutls_x509_crq_get_subject_alt_name;
+    gnutls_x509_crq_get_subject_alt_othername_oid;
+    gnutls_x509_crq_get_extension_by_oid;
+    gnutls_x509_crq_set_subject_alt_name;
+    gnutls_x509_crq_set_key;
+    gnutls_x509_crq_get_key_purpose_oid;
+    gnutls_x509_crq_set_key_purpose_oid;
+    gnutls_x509_crq_print;
+    gnutls_x509_crt_set_crq_extensions;
+} GNUTLS_1_4;
 
 GNUTLS_PRIVATE {
   global:
