@@ -1048,7 +1048,7 @@ certificate_info (void)
 					 info.incert_format, 0);
     }
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   free (pem.data);
 
@@ -1056,8 +1056,8 @@ certificate_info (void)
 
   if (count > 1 && info.outcert_format == GNUTLS_X509_FMT_DER)
     {
-      error (0, 0,
-	     "Cannot output multiple certificates in DER format, using PEM instead.");
+      error (0, 0, "cannot output multiple certificates in DER format, "
+	     "using PEM instead.");
       info.outcert_format = GNUTLS_X509_FMT_PEM;
     }
 
@@ -1073,7 +1073,7 @@ certificate_info (void)
       ret = gnutls_x509_crt_export (crt[i], info.outcert_format, buffer,
 				    &size);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
+	error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
       fwrite (buffer, 1, size, outfile);
 
       gnutls_x509_crt_deinit (crt[i]);
@@ -1100,7 +1100,7 @@ pgp_certificate_info (void)
   ret = gnutls_openpgp_crt_import (crt, &pem, info.incert_format);
 
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   free (pem.data);
 
@@ -1119,7 +1119,7 @@ pgp_certificate_info (void)
   ret = gnutls_openpgp_crt_export (crt, info.outcert_format, buffer, &size);
   if (ret < 0)
     {
-      error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
+      error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
       fwrite (buffer, 1, size, outfile);
     }
 
@@ -1146,11 +1146,11 @@ pgp_privkey_info (void)
   pem.data = buffer;
   pem.size = size;
 
-  ret =
-    gnutls_openpgp_privkey_import (key, &pem, info.incert_format, NULL, 0);
+  ret = gnutls_openpgp_privkey_import (key, &pem, info.incert_format,
+				       NULL, 0);
 
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   /* Public key algorithm
    */
@@ -1238,11 +1238,10 @@ pgp_privkey_info (void)
     }
 
   size = sizeof (buffer);
-  ret =
-    gnutls_openpgp_privkey_export (key, GNUTLS_OPENPGP_FMT_BASE64,
-				   NULL, 0, buffer, &size);
+  ret = gnutls_openpgp_privkey_export (key, GNUTLS_OPENPGP_FMT_BASE64,
+				       NULL, 0, buffer, &size);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
 
   fprintf (outfile, "\n%s\n", buffer);
 
@@ -1269,7 +1268,7 @@ pgp_ring_info (void)
   ret = gnutls_openpgp_keyring_import (ring, &pem, info.incert_format);
 
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   free (pem.data);
 
@@ -1277,24 +1276,19 @@ pgp_ring_info (void)
   if (count > 0)
     fprintf (outfile, "Keyring contains %d OpenPGP certificates\n\n", count);
   else
-    error (EXIT_FAILURE, 0, "Keyring error: %s", gnutls_strerror (count));
+    error (EXIT_FAILURE, 0, "keyring error: %s", gnutls_strerror (count));
 
   for (i = 0; i < count; i++)
     {
       ret = gnutls_openpgp_keyring_get_crt (ring, i, &crt);
-
       if (ret < 0)
-	{
-	  error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
-	}
+	error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
 
       size = sizeof (buffer);
-      ret =
-	gnutls_openpgp_crt_export (crt, info.outcert_format, buffer, &size);
+      ret = gnutls_openpgp_crt_export (crt, info.outcert_format,
+				       buffer, &size);
       if (ret < 0)
-	{
-	  error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
-	}
+	error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
 
       fwrite (buffer, 1, size, outfile);
       fprintf (outfile, "\n\n");
@@ -1395,7 +1389,7 @@ crl_info (void)
 
   free (pem.data);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   print_crl_info (crl, outfile);
 
@@ -1448,7 +1442,7 @@ crq_info (void)
 
   free (pem.data);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   print_crq_info (crq, outfile);
 
@@ -1481,22 +1475,22 @@ privkey_info (void)
   if (info.pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       /* first try to import the key without asking any password */
-      ret =
-	gnutls_x509_privkey_import_pkcs8 (key, &pem, info.incert_format,
-					  NULL, GNUTLS_PKCS_PLAIN);
-      if (ret < 0) 
-        {
+      ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
+					      info.incert_format,
+					      NULL, GNUTLS_PKCS_PLAIN);
+      if (ret < 0)
+	{
 	  if (info.pass)
 	    pass = info.pass;
 	  else
 	    pass = get_pass ();
-          ret = 
-	    gnutls_x509_privkey_import_pkcs8 (key, &pem, info.incert_format, 
-					  pass, 0);
+	  ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
+						  info.incert_format,
+						  pass, 0);
 	}
     }
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   /* Public key algorithm
    */
@@ -1570,7 +1564,7 @@ privkey_info (void)
   size = sizeof (buffer);
   ret = gnutls_x509_privkey_export (key, GNUTLS_X509_FMT_PEM, buffer, &size);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Export error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
 
   fprintf (outfile, "\n%s\n", buffer);
 
@@ -1620,7 +1614,8 @@ load_private_key (int mand)
   if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       error (EXIT_FAILURE, 0,
-	     "Import error: Could not find a valid PEM header. Check if your key is PKCS #8 or PKCS #12 encoded.");
+	     "import error: could not find a valid PEM header; "
+	     "check if your key is PKCS #8 or PKCS #12 encoded");
     }
 
   if (ret < 0)
@@ -1657,7 +1652,7 @@ load_request (void)
   if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       error (EXIT_FAILURE, 0,
-	     "Import error: Could not find a valid PEM header.");
+	     "import error: could not find a valid PEM header");
     }
 
   free (dat.data);
@@ -1784,7 +1779,7 @@ load_cert_list (int mand, size_t * crt_size)
 
   fd = fopen (info.cert, "r");
   if (fd == NULL)
-    error (EXIT_FAILURE, 0, "File %s does not exist", info.cert);
+    error (EXIT_FAILURE, errno, "%s", info.cert);
 
   size = fread (buffer, 1, sizeof (buffer) - 1, fd);
   buffer[size] = 0;
@@ -2030,13 +2025,13 @@ _verify_x509_mem (const void *cert, int cert_size)
 
 	ret = gnutls_x509_crl_init (&x509_crl_list[i - 1]);
 	if (ret < 0)
-	  error (EXIT_FAILURE, 0, "Error parsing the CRL[%d]: %s", i,
+	  error (EXIT_FAILURE, 0, "error parsing CRL[%d]: %s", i,
 		 gnutls_strerror (ret));
 
 	ret = gnutls_x509_crl_import (x509_crl_list[i - 1], &tmp,
 				      GNUTLS_X509_FMT_PEM);
 	if (ret < 0)
-	  error (EXIT_FAILURE, 0, "Error parsing the CRL[%d]: %s", i,
+	  error (EXIT_FAILURE, 0, "error parsing CRL[%d]: %s", i,
 		 gnutls_strerror (ret));
 
 	/* now we move ptr after the pem header */
@@ -2074,14 +2069,14 @@ _verify_x509_mem (const void *cert, int cert_size)
 
       ret = gnutls_x509_crt_init (&x509_cert_list[i - 1]);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "Error parsing the certificate[%d]: %s", i,
+	error (EXIT_FAILURE, 0, "error parsing certificate[%d]: %s", i,
 	       gnutls_strerror (ret));
 
       ret =
 	gnutls_x509_crt_import (x509_cert_list[i - 1], &tmp,
 				GNUTLS_X509_FMT_PEM);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "Error parsing the certificate[%d]: %s", i,
+	error (EXIT_FAILURE, 0, "error parsing certificate[%d]: %s", i,
 	       gnutls_strerror (ret));
 
 
@@ -2125,7 +2120,7 @@ _verify_x509_mem (const void *cert, int cert_size)
 	    {
 	      fprintf (stderr, "Error: Issuer's name: %s\n", name);
 	      error (EXIT_FAILURE, 0,
-		     "Issuer's name does not match the next certificate");
+		     "issuer name does not match the next certificate");
 	    }
 
 	  fprintf (outfile, "\tVerification output: ");
@@ -2172,8 +2167,7 @@ _verify_x509_mem (const void *cert, int cert_size)
   fprintf (outfile, "\tIssued by: %s\n", name);
 
   if (strcmp (issuer_name, name) != 0)
-    error (EXIT_FAILURE, 0,
-	   "Error: The last certificate is not self signed.");
+    error (EXIT_FAILURE, 0, "the last certificate is not self signed.");
 
   fprintf (outfile, "\tVerification output: ");
   print_verification_res (x509_cert_list[x509_ncerts - 1],
@@ -2239,8 +2233,7 @@ _verify_x509_mem (const void *cert, int cert_size)
   free (x509_crl_list);
 
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Error in verification: %s",
-	   gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
 
   return 0;
 }
@@ -2257,7 +2250,7 @@ print_verification_res (gnutls_x509_crt_t crt,
 
   ret = gnutls_x509_crt_verify (crt, &issuer, 1, 0, &output);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Error in verification: %s",
+    error (EXIT_FAILURE, 0, "verification error: %s",
 	   gnutls_strerror (ret));
 
   if (output & GNUTLS_CERT_INVALID)
@@ -2308,7 +2301,7 @@ print_verification_res (gnutls_x509_crt_t crt,
 
   ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Revocation check: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "revocation check: %s", gnutls_strerror (ret));
 
   if (ret == 1)
     {				/* revoked */
@@ -2369,14 +2362,14 @@ verify_crl (void)
   ret = gnutls_x509_crl_import (crl, &pem, info.incert_format);
   free (pem.data);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
   print_crl_info (crl, outfile);
 
   fprintf (outfile, "Verification output: ");
   ret = gnutls_x509_crl_verify (crl, &issuer, 1, 0, &output);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "Verification error: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
 
   if (output & GNUTLS_CERT_INVALID)
     {
@@ -2811,7 +2804,7 @@ pkcs7_info (void)
   result = gnutls_pkcs7_import (pkcs7, &data, info.incert_format);
   free (data.data);
   if (result < 0)
-    error (EXIT_FAILURE, 0, "Import error: %s", gnutls_strerror (result));
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (result));
 
   /* Read and print the certificates.
    */
@@ -2889,7 +2882,7 @@ smime_to_pkcs7 (void)
     {
       len = getline (&lineptr, &linesize, infile);
       if (len == -1)
-	error (EXIT_FAILURE, 0, "Cannot find RFC 2822 header/body separator");
+	error (EXIT_FAILURE, 0, "cannot find RFC 2822 header/body separator");
     }
   while (strcmp (lineptr, "\r\n") != 0 && strcmp (lineptr, "\n") != 0);
 
@@ -2897,7 +2890,7 @@ smime_to_pkcs7 (void)
     {
       len = getline (&lineptr, &linesize, infile);
       if (len == -1)
-	error (EXIT_FAILURE, 0, "Message has RFC 2822 header but no body");
+	error (EXIT_FAILURE, 0, "message has RFC 2822 header but no body");
     }
   while (strcmp (lineptr, "\r\n") == 0 && strcmp (lineptr, "\n") == 0);
 
