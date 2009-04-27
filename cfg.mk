@@ -29,6 +29,8 @@ endif
 PODIR := lib/po
 PO_DOMAIN := libgnutls
 
+local-checks-to-skip = sc_prohibit_strcmp
+
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \
 		cp $$f `echo $$f | sed 's/.in//'`; \
