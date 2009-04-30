@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 2.6.6 (unreleased)
 
-** libgnutls: Corrected double free on signature verification failure. 
+** libgnutls: Corrected double free on signature verification failure.
 Reported by Miroslav Kratochvil <exa.exa@gmail.com>.  See the advisory
 for more details.  [GNUTLS-SA-2009-1] [CVE-2009-1415]
 
