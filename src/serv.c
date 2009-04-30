@@ -682,7 +682,7 @@ listen_socket (const char *name, int listen_port)
 	  continue;
 	}
 
-      if (bind (s, res->ai_addr, res->ai_addrlen) < 0)
+      if (bind (s, ptr->ai_addr, ptr->ai_addrlen) < 0)
 	{
 	  perror ("bind() failed");
 	  goto failed;
