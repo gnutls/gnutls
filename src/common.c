@@ -427,6 +427,10 @@ print_cert_vrfy (gnutls_session_t session)
     {
       if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
 	printf ("- Peer's certificate issuer is unknown\n");
+      if (status & GNUTLS_CERT_NOT_ACTIVATED)
+	printf ("- Peer's certificate chain uses not yet valid certificate\n");
+      if (status & GNUTLS_CERT_EXPIRED)
+	printf ("- Peer's certificate chain uses expired certificate\n");
       if (status & GNUTLS_CERT_INVALID)
 	printf ("- Peer's certificate is NOT trusted\n");
       else

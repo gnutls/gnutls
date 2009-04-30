@@ -493,6 +493,32 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
     }
 #endif
 
+  /* Check activation/expiration times
+   */
+  if (!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
+    {
+      time_t t, now = time (0);
+
+      for (i = 0; i < clist_size; i++)
+	{
+	  t = gnutls_x509_crt_get_activation_time (certificate_list[i]);
+	  if (t == (time_t) -1 || now < t)
+	    {
+	      status |= GNUTLS_CERT_NOT_ACTIVATED;
+	      status |= GNUTLS_CERT_INVALID;
+	      return status;
+	    }
+
+	  t = gnutls_x509_crt_get_expiration_time (certificate_list[i]);
+	  if (t == (time_t) -1 || now > t)
+	    {
+	      status |= GNUTLS_CERT_EXPIRED;
+	      status |= GNUTLS_CERT_INVALID;
+	      return status;
+	    }
+	}
+    }
+
   /* Verify the certificate path (chain)
    */
   for (i = clist_size - 1; i > 0; i--)
@@ -810,9 +836,6 @@ _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
   * @verify: will hold the certificate verification output.
   *
   * This function will try to verify the given certificate list and return its status.
-  * Note that expiration and activation dates are not checked
-  * by this function, you should check them using the appropriate functions.
-  *
   * If no flags are specified (0), this function will use the 
   * basicConstraints (2.5.29.19) PKIX extension. This means that only a certificate 
   * authority is allowed to sign a certificate.

@@ -481,7 +481,13 @@ extern "C"
 
     /* Allow certificates to be signed using the broken MD5 algorithm.
      */
-    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
+
+    /* Disable checking of activation and expiration validity
+     * periods of certificate chains. Don't set this unless you
+     * understand the security implications.
+     */
+    GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,

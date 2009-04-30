@@ -251,7 +251,13 @@ extern "C"
      */
     GNUTLS_CERT_SIGNER_NOT_FOUND = 64,
     GNUTLS_CERT_SIGNER_NOT_CA = 128,
-    GNUTLS_CERT_INSECURE_ALGORITHM = 256
+    GNUTLS_CERT_INSECURE_ALGORITHM = 256,
+
+    /* Time verification.
+     */
+    GNUTLS_CERT_NOT_ACTIVATED = 512,
+    GNUTLS_CERT_EXPIRED = 1024
+
   } gnutls_certificate_status_t;
 
   typedef enum
