@@ -5,6 +5,20 @@ See the end for copying conditions.
 
 * Version 2.7.8 (unreleased)
 
+** libgnutls: Fix DSA key generation.
+Merged from stable branch.  [GNUTLS-SA-2009-2] [CVE-2009-1416]
+
+** libgnutls: Check expiration/activation time on untrusted certificates.
+Merged from stable branch.  Reported by Romain Francoise
+<romain@orebokech.com>.  This changes the semantics of
+gnutls_x509_crt_list_verify, which in turn is used by
+gnutls_certificate_verify_peers and gnutls_certificate_verify_peers2.
+We add two new gnutls_certificate_status_t codes for reporting the new
+error condition, GNUTLS_CERT_NOT_ACTIVATED and GNUTLS_CERT_EXPIRED.
+We also add a new gnutls_certificate_verify_flags flag,
+GNUTLS_VERIFY_DISABLE_TIME_CHECKS, that can be used to disable the new
+behaviour.  [GNUTLS-SA-2009-3] [CVE-2009-1417]
+
 ** lib: Linker version scripts reduces number of exported symbols.
 The linker version script now lists all exported ABIs explicitly, to
 avoid accidentally exporting unintended functions.  Compared to
@@ -38,7 +52,12 @@ line tools moved from 'Network Applications' to 'System
 Administration'.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_list_verify: CHANGED, checks activation/expiration times.
+gnutls_certificate_verify_peers: Likewise.
+gnutls_certificate_verify_peers2: Likewise.
+GNUTLS_CERT_NOT_ACTIVATED: ADDED.
+GNUTLS_CERT_EXPIRED: ADDED.
+GNUTLS_VERIFY_DISABLE_TIME_CHECKS: ADDED.
 
 * Version 2.7.7 (released 2009-04-20)
 
