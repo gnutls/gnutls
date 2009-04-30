@@ -2237,6 +2237,7 @@ else!
 * Miscellaneous examples::
 * Compatibility with the OpenSSL library::
 * Opaque PRF Input TLS Extension::
+* Keying Material Exporters::
 @end menu
 
 @node Preparation
@@ -2679,6 +2680,30 @@ The server utilizes a callback function into the application.  The
 callback can look at the random string provided by the client, and
 also set the server string.  The string lengths must be equal
 according to the protocol.
+
+@node Keying Material Exporters
+@section Keying Material Exporters
+@cindex Keying Material Exporters
+@cindex Exporting Keying Material
+
+GnuTLS supports the Keying Material Exporters for TLS extension
+(@code{draft-ietf-tls-extractor-05.txt}).  The API to use is
+@ref{gnutls_prf}.  The function needs to be provided with the label,
+and the extra data to mix in (i.e., the @code{context_value} value is
+provided in the @code{extra} parameter).  The draft always mix the
+client random field first, so the @code{server_random_first} parameter
+should always be 0.
+
+For example, after establishing a TLS session using
+@ref{gnutls_handshake}, you can export keying material with this call:
+
+@smallexample
+#define MYLABEL "EXPORTER-FOO"
+#define MYCONTEXT "some context data"
+char out[32];
+rc = gnutls_prf (session, strlen (MYLABEL), MYLABEL, 0,
+                 strlen (MYCONTEXT), MYCONTEXT, 32, out);
+@end smallexample
 
 @node Included programs
 @chapter Included Programs
