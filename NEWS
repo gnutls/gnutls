@@ -333,6 +333,68 @@ gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_print: ADDED
 gnutls_x509_crt_set_crq_extensions: ADDED
 
+* Version 2.6.6 (released 2009-04-30)
+
+** libgnutls: Corrected double free on signature verification failure.
+Reported by Miroslav Kratochvil <exa.exa@gmail.com>.  See the advisory
+for more details.  [GNUTLS-SA-2009-1] [CVE-2009-1415]
+
+** libgnutls: Fix DSA key generation.
+Noticed when investigating the previous GNUTLS-SA-2009-1 problem.  All
+DSA keys generated using GnuTLS 2.6.x are corrupt.  See the advisory
+for more details.  [GNUTLS-SA-2009-2] [CVE-2009-1416]
+
+** libgnutls: Check expiration/activation time on untrusted certificates.
+Reported by Romain Francoise <romain@orebokech.com>.  Before the
+library did not check activation/expiration times on certificates, and
+was documented as not doing so.  We have realized that many
+applications that use libgnutls, including gnutls-cli, fail to perform
+proper checks.  Implementing similar logic in all applications leads
+to code duplication.  Hence, we decided to check whether the current
+time (as reported by the time function) is within the
+activation/expiration period of certificates when verifying untrusted
+certificates.
+
+This changes the semantics of gnutls_x509_crt_list_verify, which in
+turn is used by gnutls_certificate_verify_peers and
+gnutls_certificate_verify_peers2.  We add two new
+gnutls_certificate_status_t codes for reporting the new error
+condition, GNUTLS_CERT_NOT_ACTIVATED and GNUTLS_CERT_EXPIRED.  We also
+add a new gnutls_certificate_verify_flags flag,
+GNUTLS_VERIFY_DISABLE_TIME_CHECKS, that can be used to disable the new
+behaviour.
+
+More details about the vulnerabilities will be posted at
+<http://www.gnu.org/software/gnutls/security.html>.
+
+** gnutls-cli, gnutls-cli-debug: Fix AIX build problem.
+Reported by LAUPRETRE François (P) <francois.laupretre@ratp.fr> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3468>.
+
+** tests: Fix linking of tests/openpgp/keyring self-test.
+Reported by Daniel Black in <https://savannah.gnu.org/support/?106543>.
+
+** API and ABI modifications:
+gnutls_x509_crt_list_verify: CHANGED, checks activation/expiration times.
+gnutls_certificate_verify_peers: Likewise.
+gnutls_certificate_verify_peers2: Likewise.
+GNUTLS_CERT_NOT_ACTIVATED: ADDED.
+GNUTLS_CERT_EXPIRED: ADDED.
+GNUTLS_VERIFY_DISABLE_TIME_CHECKS: ADDED.
+
+* Version 2.6.5 (released 2009-04-11)
+
+** libgnutls: Added %SSL3_RECORD_VERSION priority string that allows to
+specify the client hello message record version. Used to overcome buggy
+TLS servers. Report by Martin von Gagern.
+
+** GnuTLS no longer uses the libtasn1-config script to find libtasn1.
+Libtasn1 0.3.4 or later is required.  This is to align with the
+upcoming libtasn1 v2.0 release that doesn't have a libtasn1-script.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.6.4 (released 2009-02-06)
 
 ** libgnutls: Accept chains where intermediary certs are trusted.
