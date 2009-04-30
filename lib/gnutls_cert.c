@@ -655,6 +655,8 @@ gnutls_certificate_verify_peers (gnutls_session_t session)
   * This function will return the peer's certificate expiration time.
   *
   * Returns: (time_t)-1 on error.
+  *
+  * Deprecated: gnutls_certificate_verify_peers2() now verifies expiration times.
   **/
 time_t
 gnutls_certificate_expiration_time_peers (gnutls_session_t session)
@@ -700,6 +702,8 @@ gnutls_certificate_expiration_time_peers (gnutls_session_t session)
   * This is the creation time for openpgp keys.
   *
   * Returns: (time_t)-1 on error.
+  *
+  * Deprecated: gnutls_certificate_verify_peers2() now verifies activation times.
   **/
 time_t
 gnutls_certificate_activation_time_peers (gnutls_session_t session)
