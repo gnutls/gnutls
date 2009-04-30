@@ -1,4 +1,4 @@
-# Copyright (C) 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -38,8 +38,8 @@ update-po: refresh-po
 	for f in `ls po/*.po | grep -v quot.po`; do \
 		cp $$f $$f.in; \
 	done
-	git-add po/*.po.in
-	git-commit -m "Sync with TP." po/LINGUAS po/*.po.in
+	git add po/*.po.in
+	git commit -m "Sync with TP." po/LINGUAS po/*.po.in
 
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
@@ -61,15 +61,15 @@ htmldir = ../www-$(PACKAGE)
 release: prepare upload web upload-web
 
 prepare:
-	! git-tag -l $(tag) | grep $(PACKAGE) > /dev/null
+	! git tag -l $(tag) | grep $(PACKAGE) > /dev/null
 	rm -f ChangeLog
 	$(MAKE) ChangeLog distcheck
 	git commit -m Generated. ChangeLog
-	git-tag -u b565716f! -m $(VERSION) $(tag)
+	git tag -u b565716f! -m $(VERSION) $(tag)
 
 upload:
-	git-push
-	git-push --tags
+	git push
+	git push --tags
 	build-aux/gnupload --to ftp.gnu.org:$(PACKAGE) $(distdir).tar.bz2
 	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/ && sha1sum *.tar.bz2 > CHECKSUMS'
