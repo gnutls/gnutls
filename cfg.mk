@@ -43,8 +43,8 @@ update-po: refresh-po
 	for f in `ls $(PODIR)/*.po | grep -v quot.po`; do \
 		cp $$f $$f.in; \
 	done
-	git-add $(PODIR)/*.po.in
-	git-commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
+	git add $(PODIR)/*.po.in
+	git commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
 
 bootstrap: autoreconf
 	WARN_CFLAGS=-Werror ./configure $(CFGFLAGS)
@@ -83,15 +83,15 @@ htmldir = ../www-$(PACKAGE)
 release: prepare upload web upload-web
 
 prepare:
-	! git-tag -l $(tag) | grep $(PACKAGE) > /dev/null
+	! git tag -l $(tag) | grep $(PACKAGE) > /dev/null
 	rm -f ChangeLog
 	$(MAKE) ChangeLog distcheck
 	git commit -m Generated. ChangeLog
-	git-tag -u b565716f! -m $(VERSION) $(tag)
+	git tag -u b565716f! -m $(VERSION) $(tag)
 
 upload:
-	git-push
-	git-push --tags
+	git push
+	git push --tags
 	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.bz2
 	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/devel/
 	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
