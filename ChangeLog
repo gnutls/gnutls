@@ -1,3 +1,81 @@
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix release target.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.6.6.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/gnutls.h.in, includes/gnutls/x509.h,
+	lib/gnutls_cert.c, lib/x509/verify.c, src/common.c: libgnutls: Check
+	activation/expiration times on untrusted certificates.  Reported by
+	Romain Francoise.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_pk.c: Fix DSA key generation.
+
+2009-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pk-libgcrypt.c: Fix verify crash in minimal way on stable
+	branch.
+
+2009-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pk-libgcrypt.c: Revert "Corrected possible memory corruption
+	on signature verification failure. Reported by Miroslav Kratochvil
+	<exa.exa@gmail.com>" This reverts commit 70756c51e9636826e0664de5eb45965147fde219.
+
+2009-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-04-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/pk-libgcrypt.c: Corrected possible memory corruption on
+	signature verification failure. Reported by Miroslav Kratochvil
+	<exa.exa@gmail.com>
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/cli.c, src/tls_test.c: gnutls-cli, gnutls-cli-debug: Fix
+	AIX getaddrinfo problem.  Reported by LAUPRETRE François (P)
+	<francois.laupretre@ratp.fr> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3468>.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/texinfo.css: No pink.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2009-04-17  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp/Makefile.am: Properly link openpgp/keyring
+	self-test.  Reported by Daniel Black in
+	<https://savannah.gnu.org/support/?106543>.
+
+2009-04-11  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-04-11  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.6.5.
