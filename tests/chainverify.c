@@ -676,7 +676,7 @@ static struct
   { "citibank.com v1 fail", citibank_com_chain, &citibank_com_chain[2],
     0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
   { "self signed", pem_self_cert, &pem_self_cert[0],
-    0, 0 },
+    GNUTLS_VERIFY_DISABLE_TIME_CHECKS, 0 },
   { "ca=false", thea_chain, &thea_chain[1],
     GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
     GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
@@ -762,6 +762,10 @@ main (int argc, char *argv[])
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s", i, j,
 		   gnutls_strerror (ret));
+
+	  gnutls_x509_crt_print (certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
+	  printf ("\tCertificate %d: %.*s\n", j, tmp.size, tmp.data);
+	  gnutls_free (tmp.data);
 	}
 
       printf ("\tAdding CA certificate...");
@@ -780,6 +784,11 @@ main (int argc, char *argv[])
 	       gnutls_strerror (ret));
 
       printf ("done\n");
+
+      gnutls_x509_crt_print (ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
+      printf ("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
+      gnutls_free (tmp.data);
+
       printf ("\tVerifying...");
 
       ret = gnutls_x509_crt_list_verify (certs, j,
@@ -808,6 +817,8 @@ main (int argc, char *argv[])
     }
 
   gnutls_global_deinit ();
+
+  printf ("Exit status...%d\n", exit_val);
 
   return exit_val;
 }
