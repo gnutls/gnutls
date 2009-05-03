@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -80,8 +80,8 @@ extern "C"
   extern void
     gnutls_ia_set_client_avp_ptr (gnutls_ia_client_credentials_t cred,
 				  void *ptr);
-  extern void *gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t
-					     cred);
+  extern void *
+  gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t cred);
 
   /* Server TLS/IA credential functions. */
   extern void
@@ -90,8 +90,8 @@ extern "C"
   extern void
     gnutls_ia_set_server_avp_ptr (gnutls_ia_server_credentials_t cred,
 				  void *ptr);
-  extern void *gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t
-					     cred);
+  extern void *
+  gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred);
 
   /* TLS/IA handshake. */
   extern int gnutls_ia_handshake_p (gnutls_session_t session);

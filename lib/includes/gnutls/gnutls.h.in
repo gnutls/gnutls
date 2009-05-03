@@ -1,5 +1,5 @@
 /* -*- c -*-
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -691,24 +691,21 @@ extern "C" {
 					 gnutls_dh_params_t dh_params);
 
   void
-    gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t
-					    res,
-					    gnutls_params_function * func);
+  gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t res,
+					  gnutls_params_function * func);
 
-  void gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t
-					    sc);
+  void
+  gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc);
   int
-    gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t
-					     * sc);
+  gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t * sc);
 
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
-  void gnutls_certificate_free_credentials (gnutls_certificate_credentials_t
-					    sc);
+  void
+  gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc);
   int
-    gnutls_certificate_allocate_credentials (gnutls_certificate_credentials_t
-					     * res);
+  gnutls_certificate_allocate_credentials (gnutls_certificate_credentials_t *res);
 
   void gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc);
   void gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc);

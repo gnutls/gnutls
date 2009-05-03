@@ -196,14 +196,14 @@ extern "C"
 						     key, unsigned int idx);
 
   int gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t
-						    crt, unsigned int idx,
+						    pkey, unsigned int idx,
 						    gnutls_datum_t * p,
 						    gnutls_datum_t * q,
 						    gnutls_datum_t * g,
 						    gnutls_datum_t * y,
 						    gnutls_datum_t * x);
   int gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t
-						    crt, unsigned int idx,
+						    pkey, unsigned int idx,
 						    gnutls_datum_t * m,
 						    gnutls_datum_t * e,
 						    gnutls_datum_t * d,
@@ -211,13 +211,13 @@ extern "C"
 						    gnutls_datum_t * q,
 						    gnutls_datum_t * u);
 
-  int gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t crt,
+  int gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey,
 					     gnutls_datum_t * p,
 					     gnutls_datum_t * q,
 					     gnutls_datum_t * g,
 					     gnutls_datum_t * y,
 					     gnutls_datum_t * x);
-  int gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t crt,
+  int gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey,
 					     gnutls_datum_t * m,
 					     gnutls_datum_t * e,
 					     gnutls_datum_t * d,
@@ -324,13 +324,13 @@ extern "C"
 					      res, const char *CERTFILE,
 					      const char *KEYFILE,
 					      const char *keyid,
-					      gnutls_openpgp_crt_fmt_t);
+					      gnutls_openpgp_crt_fmt_t format);
   int
     gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
 					     res, const gnutls_datum_t * CERT,
 					     const gnutls_datum_t * KEY,
 					     const char *keyid,
-					     gnutls_openpgp_crt_fmt_t);
+					     gnutls_openpgp_crt_fmt_t format);
 
   int
     gnutls_certificate_set_openpgp_keyring_mem
