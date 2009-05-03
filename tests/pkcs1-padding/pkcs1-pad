@@ -23,12 +23,19 @@
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
+# Check for datefudge
+TSTAMP=`datefudge "2006-09-23" date -u +%s`
+if test "$TSTAMP" != "1158962400"; then
+    echo "Cannot fake timestamps, please install datefudge..."
+    exit 77
+fi
+
 # Test 1, PKCS#1 pad digestAlgorithm.parameters
 
 EXPECT1=3102
 
-$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1
-$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2
+datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1
+datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2
 
 out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' out2 | wc -l | tr -d " "`
@@ -51,8 +58,8 @@ echo "PKCS1-PAD1 OK"
 
 EXPECT2=2002
 
-$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok2.pem | tee out1
-$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken2.pem | tee out2
+datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok2.pem | tee out1
+datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken2.pem | tee out2
 
 out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
 out2oks=`grep 'Verified.' out2 | wc -l | tr -d " "`
@@ -76,7 +83,7 @@ echo "PKCS1-PAD2 OK"
 
 EXPECT3=12
 
-$CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken3.pem | tee out1
+datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken3.pem | tee out1
 
 out1oks=`grep 'Verified.' out1 | wc -l | tr -d " "`
 out1fails=`grep 'Not verified.' out1 | wc -l | tr -d " "`
