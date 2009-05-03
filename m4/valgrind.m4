@@ -1,5 +1,5 @@
 # valgrind.m4 serial 1
-dnl Copyright (C) 2008 Free Software Foundation, Inc.
+dnl Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -20,11 +20,11 @@ AC_DEFUN([sj_VALGRIND],
   else
     opt_valgrind_tests=no
     VALGRIND=
-  fi 
+  fi
   AC_MSG_CHECKING([whether self tests are run under valgrind])
   AC_ARG_ENABLE(valgrind-tests,
-  	AS_HELP_STRING([--enable-valgrind-tests],
-                         [run self tests under valgrind]),
+    AS_HELP_STRING([--enable-valgrind-tests],
+                   [run self tests under valgrind]),
     opt_valgrind_tests=$enableval)
   AC_MSG_RESULT($opt_valgrind_tests)
 ])

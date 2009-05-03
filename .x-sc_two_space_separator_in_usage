@@ -1,0 +1,3 @@
+^build-aux/gnupload
+^doc/gnutls.texi
+^tests/sha2/sha2

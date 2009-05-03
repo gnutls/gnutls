@@ -22,7 +22,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/../gl		\
 	-I$(builddir)/../gl		\
-	-I$(srcdir)/../includes 	\
+	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
 	-I$(srcdir)/..			\
 	$(LIBOPENCDK_CFLAGS)

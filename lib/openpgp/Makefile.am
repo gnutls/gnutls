@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -24,7 +24,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/../gl		\
 	-I$(builddir)/../gl		\
-	-I$(srcdir)/../includes 	\
+	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
 	-I$(srcdir)/..			\
 	-I$(srcdir)/../opencdk

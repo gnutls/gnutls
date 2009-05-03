@@ -29,7 +29,10 @@ endif
 PODIR := lib/po
 PO_DOMAIN := libgnutls
 
-local-checks-to-skip = sc_prohibit_strcmp
+local-checks-to-skip = sc_prohibit_strcmp sc_prohibit_atoi_atof		\
+	sc_error_message_uppercase sc_prohibit_have_config_h		\
+	sc_require_config_h sc_require_config_h_first			\
+	sc_trailing_blank sc_unmarked_diagnostics sc_immutable_NEWS
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \

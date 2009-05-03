@@ -32,6 +32,7 @@
 #include <common.h>
 #include <tls_test-gaa.h>
 
+#include <progname.h>
 #include <version-etc.h>
 
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
@@ -164,6 +165,7 @@ main (int argc, char **argv)
   char portname[6];
   struct addrinfo hints, *res, *ptr;
 
+  set_program_name (argv[0]);
   gaa_parser (argc, argv);
 
 #ifndef _WIN32

@@ -140,10 +140,8 @@ static void
 listener_free (listener_item * j)
 {
 
-  if (j->http_request)
-    free (j->http_request);
-  if (j->http_response)
-    free (j->http_response);
+  free (j->http_request);
+  free (j->http_response);
   if (j->fd >= 0)
     {
       gnutls_bye (j->tls_session, GNUTLS_SHUT_WR);

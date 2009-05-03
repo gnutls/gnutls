@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Simon Josefsson
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
  * Copyright (C) 2001,2003 Nikos Mavrogiannopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -42,6 +42,7 @@
 /* Gnulib portability files. */
 #include <getpass.h>
 #include <minmax.h>
+#include <progname.h>
 #include <version-etc.h>
 
 /* This may need some rewrite. A lot of stuff which should be here
@@ -395,6 +396,8 @@ main (int argc, char **argv)
   const char *passwd;
   int salt, ret;
   struct passwd *pwd;
+
+  set_program_name (argv[0]);
 
   if ((ret = gnutls_global_init ()) < 0)
     {

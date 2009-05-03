@@ -1040,9 +1040,8 @@ certificate_info (void)
 				 GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
   if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
-      error (0, 0,
-	     "Too many certificates (%d), will only read the first %d.",
-	     crt_num, MAX_CRTS);
+      error (0, 0, "too many certificates (%d); "
+	     "will only read the first %d", crt_num, MAX_CRTS);
       crt_num = MAX_CRTS;
       ret = gnutls_x509_crt_list_import (crt, &crt_num, &pem,
 					 info.incert_format, 0);
@@ -1056,8 +1055,8 @@ certificate_info (void)
 
   if (count > 1 && info.outcert_format == GNUTLS_X509_FMT_DER)
     {
-      error (0, 0, "cannot output multiple certificates in DER format, "
-	     "using PEM instead.");
+      error (0, 0, "cannot output multiple certificates in DER format; "
+	     "using PEM instead");
       info.outcert_format = GNUTLS_X509_FMT_PEM;
     }
 
@@ -2167,7 +2166,7 @@ _verify_x509_mem (const void *cert, int cert_size)
   fprintf (outfile, "\tIssued by: %s\n", name);
 
   if (strcmp (issuer_name, name) != 0)
-    error (EXIT_FAILURE, 0, "the last certificate is not self signed.");
+    error (EXIT_FAILURE, 0, "the last certificate is not self signed");
 
   fprintf (outfile, "\tVerification output: ");
   print_verification_res (x509_cert_list[x509_ncerts - 1],

@@ -17,27 +17,27 @@ RSAPublicKey ::= SEQUENCE {
 -- CRT algorithm.
 --
 RSAPrivateKey ::= SEQUENCE {
-        version          	Version,
-        modulus          	INTEGER, -- (Usually large) n
-        publicExponent   	INTEGER, -- (Usually small) e
-        privateExponent  	INTEGER, -- (Usually large) d
-        prime1           	INTEGER, -- (Usually large) p
-	prime2           	INTEGER, -- (Usually large) q
-	exponent1        	INTEGER, -- (Usually large) d mod (p-1)
-	exponent2        	INTEGER, -- (Usually large) d mod (q-1)
-	coefficient      	INTEGER, -- (Usually large) (inverse of q) mod p
-	otherPrimeInfos 	OtherPrimeInfos OPTIONAL
+  version          Version,
+  modulus          INTEGER, -- (Usually large) n
+  publicExponent   INTEGER, -- (Usually small) e
+  privateExponent  INTEGER, -- (Usually large) d
+  prime1           INTEGER, -- (Usually large) p
+  prime2           INTEGER, -- (Usually large) q
+  exponent1        INTEGER, -- (Usually large) d mod (p-1)
+  exponent2        INTEGER, -- (Usually large) d mod (q-1)
+  coefficient      INTEGER, -- (Usually large) (inverse of q) mod p
+  otherPrimeInfos  OtherPrimeInfos OPTIONAL
 }
 
 Version ::= INTEGER { two-prime(0), multi(1) }
---	(CONSTRAINED BY { version must be multi if otherPrimeInfos present }) --
+-- (CONSTRAINED BY { version must be multi if otherPrimeInfos present }) --
 
 OtherPrimeInfos ::= SEQUENCE SIZE(1..MAX) OF OtherPrimeInfo
 
 OtherPrimeInfo ::= SEQUENCE {
-	prime INTEGER,  -- ri
-	exponent INTEGER, -- di
-	coefficient INTEGER -- ti 
+  prime INTEGER,  -- ri
+  exponent INTEGER, -- di
+  coefficient INTEGER -- ti 
 }
 
 -- for signature calculation
@@ -74,19 +74,19 @@ DSASignatureValue ::= SEQUENCE {
 }
 
 DSAPrivateKey ::= SEQUENCE {
-        version          	INTEGER, -- should be zero
-        p          		INTEGER,
-        q   			INTEGER,
-        g  			INTEGER,
-        Y	     	      	INTEGER, -- public
-	priv           		INTEGER
+  version  INTEGER, -- should be zero
+  p        INTEGER,
+  q        INTEGER,
+  g        INTEGER,
+  Y        INTEGER, -- public
+  priv     INTEGER
 }
 
 -- from PKCS#3
 DHParameter ::= SEQUENCE {
-	prime INTEGER, -- p
-	base INTEGER, -- g
-	privateValueLength INTEGER OPTIONAL 
+  prime               INTEGER, -- p
+  base                INTEGER, -- g
+  privateValueLength  INTEGER OPTIONAL 
 }
 
 

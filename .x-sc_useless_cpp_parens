@@ -1,0 +1,4 @@
+^gl/
+^lib/gl/
+^src/cfg/
+^src/.*-gaa.c

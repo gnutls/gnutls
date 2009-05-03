@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -21,6 +21,7 @@
 
 /* Gnulib portability files. */
 #include <version-etc.h>
+#include <progname.h>
 
 #ifndef ENABLE_PSK
 
@@ -73,6 +74,8 @@ main (int argc, char **argv)
   char hex_key[MAX_KEY_SIZE * 2 + 1];
   gnutls_datum_t dkey;
   size_t hex_key_size = sizeof (hex_key);
+
+  set_program_name (argv[0]);
 
   if ((ret = gnutls_global_init ()) < 0)
     {

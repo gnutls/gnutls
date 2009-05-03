@@ -3131,7 +3131,7 @@ up to date information.
 
 ** Fix gnutls-cli-debug regarding resume support detection.
 Earlier, if the session-id from the server had a length of 0, it would
-indicate the the server supports resumption, which isn't the case.
+indicate that the server supports resumption, which isn't the case.
 Reported by Kataja Kai <kai.kataja@op.fi>.
 
 ** Fix building of examples on FreeBSD by including netinet/in.h.

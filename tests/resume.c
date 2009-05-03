@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -443,8 +443,7 @@ wrap_db_init (void)
 static void
 wrap_db_deinit (void)
 {
-  if (cache_db)
-    free (cache_db);
+  free (cache_db);
   cache_db = NULL;
   return;
 }

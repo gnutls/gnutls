@@ -23,7 +23,7 @@ GPATH = $(srcdir)
 
 TARGET_DIR=$(HTML_DIR)/$(DOC_MODULE)
 
-EXTRA_DIST = 				\
+EXTRA_DIST =				\
 	$(content_files)		\
 	$(HTML_IMAGES)			\
 	$(DOC_MAIN_SGML_FILE)		\
@@ -33,8 +33,8 @@ EXTRA_DIST = 				\
 DOC_STAMPS=scan-build.stamp tmpl-build.stamp sgml-build.stamp html-build.stamp \
 	   $(srcdir)/tmpl.stamp $(srcdir)/sgml.stamp $(srcdir)/html.stamp
 
-SCANOBJ_FILES = 		 \
-	$(DOC_MODULE).args 	 \
+SCANOBJ_FILES =			 \
+	$(DOC_MODULE).args	 \
 	$(DOC_MODULE).hierarchy  \
 	$(DOC_MODULE).interfaces \
 	$(DOC_MODULE).prerequisites \

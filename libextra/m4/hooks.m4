@@ -1,4 +1,4 @@
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
 #    Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
@@ -24,10 +24,9 @@ AC_DEFUN([LIBGNUTLS_EXTRA_HOOKS],
 [
   AC_MSG_CHECKING([whether to disable OpenSSL compatibility layer])
   AC_ARG_ENABLE(openssl-compatibility,
-  	AS_HELP_STRING([--disable-openssl-compatibility],
-  		[disable the OpenSSL compatibility support]),
-  	enable_openssl=$withval,
-  	enable_openssl=yes)
+    AS_HELP_STRING([--disable-openssl-compatibility],
+                   [disable the OpenSSL compatibility support]),
+    enable_openssl=$withval, enable_openssl=yes)
   AC_MSG_RESULT($enable_openssl)
   AM_CONDITIONAL(ENABLE_OPENSSL, test "$enable_openssl" = "yes")
 ])

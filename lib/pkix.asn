@@ -220,16 +220,16 @@ X520telephoneNumber ::=     PrintableString
 id-at-facsimileTelephoneNumber       AttributeType   ::=     {id-at 23}
 X520facsimileTelephoneNumber ::=     PrintableString
 
-id-at-pseudonym 	AttributeType   ::=     {id-at 65}
-X520pseudonym ::=	DirectoryString
+id-at-pseudonym         AttributeType   ::=     {id-at 65}
+X520pseudonym ::=       DirectoryString
 
-id-at-name 	AttributeType   ::=     {id-at 41}
-X520name ::=	DirectoryString
+id-at-name      AttributeType   ::=     {id-at 41}
+X520name ::=    DirectoryString
 
-id-at-streetAddress 	AttributeType   ::=     {id-at 9}
-X520streetAddress ::=	DirectoryString
+id-at-streetAddress     AttributeType   ::=     {id-at 9}
+X520streetAddress ::=   DirectoryString
  
-id-at-postalAddress	AttributeType	::=	{id-at 16}
+id-at-postalAddress     AttributeType   ::=     {id-at 16}
 X520postalAddress ::= PostalAddress
 
 PostalAddress ::= SEQUENCE OF DirectoryString
@@ -532,35 +532,35 @@ pkcs-5-PBKDF2-params ::= SEQUENCE {
 -- PKCS #12 stuff
 
 pkcs-12-PFX ::= SEQUENCE {
-    	version		INTEGER {v3(3)},
-    	authSafe	pkcs-7-ContentInfo,
-    	macData    	pkcs-12-MacData OPTIONAL
+  version   INTEGER {v3(3)},
+  authSafe  pkcs-7-ContentInfo,
+  macData   pkcs-12-MacData OPTIONAL
 }
 
 pkcs-12-PbeParams ::= SEQUENCE {
-	salt	OCTET STRING,
-	iterations INTEGER
+  salt        OCTET STRING,
+  iterations  INTEGER
 }
 
 pkcs-12-MacData ::= SEQUENCE {
-    	mac 		pkcs-7-DigestInfo,
-	macSalt	        OCTET STRING,
-	iterations	INTEGER DEFAULT 1
+  mac         pkcs-7-DigestInfo,
+  macSalt     OCTET STRING,
+  iterations  INTEGER DEFAULT 1
 -- Note: The default is for historical reasons and its use is
 -- deprecated. A higher value, like 1024 is recommended.
 }
 
 pkcs-12-AuthenticatedSafe ::= SEQUENCE OF pkcs-7-ContentInfo
-	-- Data if unencrypted
-	-- EncryptedData if password-encrypted
-	-- EnvelopedData if public key-encrypted
+  -- Data if unencrypted
+  -- EncryptedData if password-encrypted
+  -- EnvelopedData if public key-encrypted
 
 pkcs-12-SafeContents ::= SEQUENCE OF pkcs-12-SafeBag
 
 pkcs-12-SafeBag ::= SEQUENCE {
-  	bagId	      	OBJECT IDENTIFIER,
-  	bagValue      	[0] EXPLICIT ANY DEFINED BY badId,
-  	bagAttributes 	SET OF pkcs-12-PKCS12Attribute OPTIONAL
+  bagId          OBJECT IDENTIFIER,
+  bagValue       [0] EXPLICIT ANY DEFINED BY badId,
+  bagAttributes  SET OF pkcs-12-PKCS12Attribute OPTIONAL
 }
 
 -- Bag types
@@ -574,20 +574,19 @@ pkcs-12-PKCS8ShroudedKeyBag ::= pkcs-8-EncryptedPrivateKeyInfo
 -- CertBag
 
 pkcs-12-CertBag ::= SEQUENCE {
-	certId    OBJECT IDENTIFIER,
-	certValue [0] EXPLICIT ANY DEFINED BY certId
+  certId    OBJECT IDENTIFIER,
+  certValue [0] EXPLICIT ANY DEFINED BY certId
 }
 
 -- x509Certificate BAG-TYPE ::= {OCTET STRING IDENTIFIED BY {pkcs-9-certTypes 1}}
 -- DER-encoded X.509 certificate stored in OCTET STRING
 
 pkcs-12-CRLBag ::= SEQUENCE {
-	crlId     	OBJECT IDENTIFIER,
-	crlValue 	[0] EXPLICIT ANY DEFINED BY crlId
+  crlId     OBJECT IDENTIFIER,
+  crlValue  [0] EXPLICIT ANY DEFINED BY crlId
 }
 
--- x509CRL BAG-TYPE ::=
---	{OCTET STRING IDENTIFIED BY {pkcs-9-crlTypes 1}}
+-- x509CRL BAG-TYPE ::= {OCTET STRING IDENTIFIED BY {pkcs-9-crlTypes 1}}
 -- DER-encoded X.509 CRL stored in OCTET STRING
 
 pkcs-12-PKCS12Attribute ::= Attribute
@@ -642,12 +641,12 @@ CountryOfResidence ::=      PrintableString (SIZE (2))
 -- rfc3820
 
 ProxyCertInfo ::= SEQUENCE {
-	pCPathLenConstraint	INTEGER (0..MAX) OPTIONAL,
-	proxyPolicy		ProxyPolicy }
+   pCPathLenConstraint  INTEGER (0..MAX) OPTIONAL,
+   proxyPolicy          ProxyPolicy }
 
 ProxyPolicy ::= SEQUENCE {
-	policyLanguage	OBJECT IDENTIFIER,
-        policy		OCTET STRING OPTIONAL }
+  policyLanguage   OBJECT IDENTIFIER,
+  policy           OCTET STRING OPTIONAL }
 
 -- rfc3920 section 5.1.1
 

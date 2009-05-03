@@ -340,8 +340,7 @@ get_confirmed_pass (bool empty_ok)
 	  if (pass)
 	    printf ("Password missmatch, try again.\n");
 
-	  if (copy)
-	    free (copy);
+	  free (copy);
 
 	  pass = getpass ("Enter password: ");
 	  copy = strdup (pass);

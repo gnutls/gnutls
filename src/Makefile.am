@@ -94,7 +94,7 @@ noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool.gaa certtool-gaa.h	\
 	certtool-gaa.c certtool-cfg.h certtool-cfg.c
-libcmd_certtool_la_LIBADD = ../gl/libgnu.la @LTLIBREADLINE@
+libcmd_certtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
 libcmd_certtool_la_LIBADD += ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 libcmd_certtool_la_LIBADD += ../gl/libgnu.la
 

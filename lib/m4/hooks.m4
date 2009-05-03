@@ -51,7 +51,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
       included_libtasn1=no)
   if test "$included_libtasn1" = "no"; then
     AC_LIB_HAVE_LINKFLAGS(tasn1,, [#include <libtasn1.h>],
-    				[asn1_check_version (NULL)])
+                          [asn1_check_version (NULL)])
     if test "$ac_cv_libtasn1" != yes; then
       included_libtasn1=yes
       AC_MSG_WARN([[
@@ -84,7 +84,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   fi
   AC_SUBST(LZO_LIBS)
   if test "$use_lzo" = "yes"; then
-    AC_DEFINE(USE_LZO, 1, [whether to use the LZO compression])
+    AC_DEFINE([USE_LZO], 1, [whether to use the LZO compression])
     if test "$LZO_LIBS" = "-llzo"; then
       AC_CHECK_HEADERS(lzo1x.h)
     elif test "$LZO_LIBS" = "-llzo2"; then
@@ -101,7 +101,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
     test_mac(x,y,z);
     return 0;
   ], [
-    AC_DEFINE(C99_MACROS, 1, [C99 macros are supported])
+    AC_DEFINE([C99_MACROS], 1, [C99 macros are supported])
     AC_MSG_RESULT(yes)
   ], [
     AC_MSG_RESULT(no)
@@ -110,9 +110,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
 
   AC_MSG_CHECKING([whether to enable Opaque PRF input support])
   AC_ARG_ENABLE(opaque-prf-input,
-  	AS_HELP_STRING([--enable-opaque-prf-input=DD],
-  		[enable Opaque PRF input using DD as extension type]),
-  	ac_opaque_prf_input=$enableval, ac_opaque_prf_input=no)
+    AS_HELP_STRING([--enable-opaque-prf-input=DD],
+                   [enable Opaque PRF input using DD as extension type]),
+    ac_opaque_prf_input=$enableval, ac_opaque_prf_input=no)
   if test "$ac_opaque_prf_input" != "no"; then
     if ! echo $ac_opaque_prf_input | egrep -q '^[[0-9]]+$'; then
       ac_opaque_prf_input=no
@@ -124,7 +124,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   fi
   if test "$ac_opaque_prf_input" != "no"; then
    AC_MSG_RESULT([yes (extension value $ac_opaque_prf_input)])
-   AC_DEFINE_UNQUOTED(ENABLE_OPRFI, $ac_opaque_prf_input,
+   AC_DEFINE_UNQUOTED([ENABLE_OPRFI], $ac_opaque_prf_input,
                       [enable Opaque PRF Input])
   else
    AC_MSG_RESULT(no)
@@ -133,12 +133,12 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   
   AC_MSG_CHECKING([whether to disable SRP authentication support])
   AC_ARG_ENABLE(srp-authentication,
-  	AS_HELP_STRING([--disable-srp-authentication],
-  		[disable the SRP authentication support]),
-  	ac_enable_srp=no)
+    AS_HELP_STRING([--disable-srp-authentication],
+                   [disable the SRP authentication support]),
+    ac_enable_srp=no)
   if test x$ac_enable_srp != xno; then
    AC_MSG_RESULT(no)
-   AC_DEFINE(ENABLE_SRP, 1, [enable SRP authentication])
+   AC_DEFINE([ENABLE_SRP], 1, [enable SRP authentication])
   else
    ac_full=0
    AC_MSG_RESULT(yes)
@@ -147,12 +147,12 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   
   AC_MSG_CHECKING([whether to disable PSK authentication support])
   AC_ARG_ENABLE(psk-authentication,
-         AS_HELP_STRING([--disable-psk-authentication],
-                 [disable the PSK authentication support]),
-         ac_enable_psk=no)
+    AS_HELP_STRING([--disable-psk-authentication],
+                   [disable the PSK authentication support]),
+    ac_enable_psk=no)
   if test x$ac_enable_psk != xno; then
    AC_MSG_RESULT(no)
-   AC_DEFINE(ENABLE_PSK, 1, [enable PSK authentication])
+   AC_DEFINE([ENABLE_PSK], 1, [enable PSK authentication])
   else
    ac_full=0
    AC_MSG_RESULT(yes)
@@ -161,12 +161,12 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   
   AC_MSG_CHECKING([whether to disable anonymous authentication support])
   AC_ARG_ENABLE(anon-authentication,
-  	AS_HELP_STRING([--disable-anon-authentication],
-  		[disable the anonymous authentication support]),
-  	ac_enable_anon=no)
+    AS_HELP_STRING([--disable-anon-authentication],
+                   [disable the anonymous authentication support]),
+    ac_enable_anon=no)
   if test x$ac_enable_anon != xno; then
    AC_MSG_RESULT(no)
-   AC_DEFINE(ENABLE_ANON, 1, [enable anonymous authentication])
+   AC_DEFINE([ENABLE_ANON], 1, [enable anonymous authentication])
   else
    ac_full=0
    AC_MSG_RESULT(yes)
@@ -180,36 +180,36 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_MSG_CHECKING([whether to disable Camellia cipher])
   if test "$enable_camellia" != "no"; then
    AC_MSG_RESULT([no])
-   AC_DEFINE(ENABLE_CAMELLIA, 1, [enable camellia block cipher])
+   AC_DEFINE([ENABLE_CAMELLIA], 1, [enable camellia block cipher])
   else
    AC_MSG_RESULT([yes])
   fi
   
   AC_MSG_CHECKING([whether to disable extra PKI stuff])
   AC_ARG_ENABLE(extra-pki,
-  	AS_HELP_STRING([--disable-extra-pki],
-  		[only enable the basic PKI stuff]),
-  	enable_pki=$enableval, enable_pki=yes)
+    AS_HELP_STRING([--disable-extra-pki],
+                   [only enable the basic PKI stuff]),
+    enable_pki=$enableval, enable_pki=yes)
   if test "$enable_pki" != "yes"; then
    ac_full=0
    AC_MSG_RESULT(yes)
   else
    AC_MSG_RESULT(no)
-   AC_DEFINE(ENABLE_PKI, 1, [whether to include all the PKCS/PKI stuff])
+   AC_DEFINE([ENABLE_PKI], 1, [whether to include all the PKCS/PKI stuff])
   fi
   AM_CONDITIONAL(ENABLE_PKI, test "$enable_pki" = "yes")
   
   ac_enable_openpgp=yes
   AC_MSG_CHECKING([whether to disable OpenPGP Certificate authentication support])
   AC_ARG_ENABLE(openpgp-authentication,
-  	AS_HELP_STRING([--disable-openpgp-authentication],
-  		[disable the OpenPGP authentication support]),
-  	ac_enable_openpgp=no)
+    AS_HELP_STRING([--disable-openpgp-authentication],
+                   [disable the OpenPGP authentication support]),
+    ac_enable_openpgp=no)
   if test x$ac_enable_openpgp = xno; then
    AC_MSG_RESULT(yes)
    ac_full=0
   else
-   AC_DEFINE(ENABLE_OPENPGP, 1, [use openpgp authentication])
+   AC_DEFINE([ENABLE_OPENPGP], 1, [use openpgp authentication])
    AC_MSG_RESULT(no)
   fi
   AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
@@ -221,11 +221,11 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_CHECK_SIZEOF(int)
   case $ac_cv_sizeof_void_p in
     $ac_cv_sizeof_long)
-      AC_DEFINE(GNUTLS_POINTER_TO_INT_CAST, [(long)],
+      AC_DEFINE([GNUTLS_POINTER_TO_INT_CAST], [(long)],
                 [Additional cast to bring void* to a type castable to int.])
       ;;
     *)
-      AC_DEFINE(GNUTLS_POINTER_TO_INT_CAST, [])
+      AC_DEFINE([GNUTLS_POINTER_TO_INT_CAST], [])
       ;;
   esac
 ])

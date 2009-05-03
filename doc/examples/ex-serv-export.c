@@ -1,4 +1,4 @@
-/* Copyright 2007, 2008 Free Software Foundation
+/* Copyright 2007, 2008, 2009 Free Software Foundation
  *
  * Copying and distribution of this file, with or without modification,
  * are permitted in any medium without royalty provided the copyright
@@ -292,8 +292,7 @@ wrap_db_init (void)
 static void
 wrap_db_deinit (void)
 {
-  if (cache_db)
-    free (cache_db);
+  free (cache_db);
   cache_db = NULL;
   return;
 }

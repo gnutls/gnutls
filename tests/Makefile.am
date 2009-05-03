@@ -72,7 +72,7 @@ if ENABLE_OPENPGP
 ctests += openpgpself 
 endif
 
-tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) @LTLIBREADLINE@
+tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) $(LTLIBREADLINE)
 endif
 
 if ENABLE_OPRFI

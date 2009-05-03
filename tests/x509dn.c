@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -520,14 +520,15 @@ doit (void)
       server ();
       wait (&status);
 
-#if defined(WIFEXITED) && defined(WEXITSTATUS)
+#if defined WIFEXITED && defined WEXITSTATUS
       if (WIFEXITED (status) && WEXITSTATUS (status))
 	{
 	  fail ("server: client failed with exit status %d\n",
 		WEXITSTATUS (status));
 	}
 #endif
-#if defined(WIFSIGNALED) && defined(WTERMSIG)
+
+#if defined WIFSIGNALED && defined WTERMSIG
       if (WIFSIGNALED (status))
 	{
 	  fail ("server: client failed with fatal signal %d\n",

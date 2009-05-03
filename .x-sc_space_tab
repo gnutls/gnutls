@@ -1,0 +1,9 @@
+*.png
+^ChangeLog
+^doc/protocol/
+^gl/
+^lib/gl/
+^lib/minitasn1/
+^libextra/gl/
+^tests/nist-pkits/
+^tests/x509paths/
