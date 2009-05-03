@@ -1,3 +1,182 @@
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.8.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/gettext.h, gl/m4/wchar.m4, gl/wchar.in.h,
+	lib/gl/Makefile.am, lib/gl/gettext.h, lib/gl/m4/wchar.m4,
+	lib/gl/wchar.in.h: Update gnulib files.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs1-padding/pkcs1-pad: Fix self test fails because of
+	expired certs using datefudge.
+
+2009-05-01  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Print cert details.  Fix verifying expired
+	cert.
+
+2009-05-01  Simon Josefsson <simon@josefsson.org>
+
+	* tests/cve-2008-4989.c: Avoid time checks.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/cve-2009-1415.c, tests/cve-2009-1416.c: 
+	Add self-tests for security problems.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c, lib/includes/gnutls/gnutls.h.in,
+	lib/includes/gnutls/x509.h, lib/x509/verify.c, src/common.c: 
+	libgnutls: Check activation/expiration times on untrusted
+	certificates.  Reported by Romain Francoise.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_pk.c: Fix DSA key generation.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Use modern git names.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add old NEWS entries.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Document how to use TLS exporters.
+
+2009-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Fix getaddrinfo/bind loop.
+
+2009-04-28  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* : Replace PDF with official ZIP file.  The PDFs have the same
+	SHA-1.  The file was downloaded from:
+
+	http://csrc.nist.gov/groups/ST/crypto_apps_infra/documents/PKI%20Testing%20Page.htmUsing the direct link:
+
+	http://csrc.nist.gov/groups/ST/crypto_apps_infra/documents/certpath1.07.zip
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix.
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/useless-if-before-free, build-aux/vc-list-files,
+	gl/Makefile.am, gl/m4/gnulib-comp.m4, gl/tests/Makefile.am,
+	gl/tests/test-vc-list-files-cvs.sh,
+	gl/tests/test-vc-list-files-git.sh, maint.mk: Update gnulib files.
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Fix some error messages.
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/lib-link.m4, gl/m4/lib-prefix.m4, gl/vasnprintf.c,
+	lib/gl/m4/lib-link.m4, lib/gl/m4/lib-prefix.m4,
+	lib/gl/vasnprintf.c, libextra/gl/m4/lib-link.m4,
+	libextra/gl/m4/lib-prefix.m4, maint.mk: Update gnulib files.
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-04-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutls.map: Move symbols new with gnutls 2.8.x under
+	GNUTLS_2_8 version.
+
+2009-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/serv.c: gnutls-serv: Listen on all interfaces.
+
+2009-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2009-04-24  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pk-libgcrypt.c: Cleanup code and fix memory leaks.
+
+2009-04-23  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gendocs_template: Update gnulib files.
+
+2009-04-23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/gnutls.texi: Improve texinfo section names.
+
+2009-04-23  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509sign-verify.c: Also test DSA keys.
+
+2009-04-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/verify.c: release allocated mpis in
+	_gnutls_x509_verify_algorithm().
+
+2009-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* tests/libgcrypt.supp: Suppress more for modern libgcrypt.
+
+2009-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509sign-verify.c: Cleanup code.
+
+2009-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Pass proper socket to libgnutls on Windows.
+
+2009-04-21  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/sockets.c, gl/sockets.h, gl/tests/Makefile.am, gl/tests/dummy.c,
+	gl/tests/sockets.c, gl/tests/sockets.h: Need sockets module.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutls.map: Make check needs more symbols.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/Makefile.am, lib/libgnutls.map, libextra/Makefile.am,
+	libextra/libgnutls-extra.map, libextra/libgnutls-extra.vers: Improve
+	version scripts.  Limit exported symbols on systems without linker
+	script.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, build-aux/gendocs.sh, configure.ac, lib/configure.ac,
+	lib/m4/hooks.m4, libextra/configure.ac: Bump version.
+
+2009-04-20  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-04-20  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.7.
@@ -85,9 +264,9 @@
 
 2009-04-16  Simon Josefsson <simon@josefsson.org>
 
-	* : commit 934102c33ac89ace9a1e1d02047d54f2fea6b59b Merge:
-	bc279f4... d720f3f...  Author: Nikos Mavrogiannopoulos
-	<nmav@gnutls.org> Date:   Wed Apr 15 22:43:03 2009 +0300
+	* : commit 934102c33ac89ace9a1e1d02047d54f2fea6b59b Merge: bc279f4
+	d720f3f Author: Nikos Mavrogiannopoulos <nmav@gnutls.org> Date:
+	Wed Apr 15 22:43:03 2009 +0300
 
 2009-04-14  Simon Josefsson <simon@josefsson.org>
 
