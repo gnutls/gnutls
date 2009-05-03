@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.7.9 (unreleased)
 
+** doc: Fix tables of error codes and supported algorithms.
+
 ** API and ABI modifications:
 No changes since last version.
 
