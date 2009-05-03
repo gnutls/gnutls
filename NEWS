@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.7.9 (unreleased)
 
+** Fix build failure when LZO is enabled.
+Reported by Arfrever Frehtes Taifersar Arahesis
+<arfrever.fta@gmail.com> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3522>.
+
 ** doc: Fix tables of error codes and supported algorithms.
 
 ** API and ABI modifications:
