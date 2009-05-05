@@ -23,6 +23,7 @@ We require several tools to build the software, including:
 - Valgrind <http://valgrind.org/> (optional)
 - libgcrypt <http://www.gnupg.org/>
 - Guile <http://www.gnu.org/software/guile/>
+- Gaa <http://gaa.sf.net> (optional)
 
 The required software is typically disitributed with your operating
 system, and the instructions for installing them differ.  Here are
