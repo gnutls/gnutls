@@ -13,7 +13,6 @@ We require several tools to build the software, including:
 - Gettext <http://www.gnu.org/software/gettext/>
 - Texinfo <http://www.gnu.org/software/texinfo/>
 - help2man <http://www.gnu.org/software/help2man/>
-- libgcrypt <http://www.gnupg.org/>
 - Tar <http://www.gnu.org/software/tar/>
 - Gzip <http://www.gnu.org/software/gzip/>
 - Texlive & epsf <http://www.tug.org/texlive/> (for PDF manual)
@@ -22,13 +21,18 @@ We require several tools to build the software, including:
 - Git <http://git.or.cz/>
 - Perl <http://www.cpan.org/>
 - Valgrind <http://valgrind.org/> (optional)
+- libgcrypt <http://www.gnupg.org/>
+- Guile <http://www.gnu.org/software/guile/>
 
 The required software is typically disitributed with your operating
 system, and the instructions for installing them differ.  Here are
 some hints:
 
 gNewSense/Debian/Ubuntu:
-sudo apt-get install git-core autoconf automake libtool gettext cvs texinfo help2man valgrind texlive texlive-generic-recommended texlive-extra-utils gtk-doc-tools libgcrypt-dev
+sudo apt-get install git-core autoconf automake libtool gettext cvs 
+sudo apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
+sudo apt-get install help2man gtk-doc-tools valgrind
+sudo apt-get install libgcrypt-dev guile-1.8-dev
 
 To download the version controlled sources:
 
