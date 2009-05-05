@@ -1,0 +1,52 @@
+GNU TLS README-alpha -- Information for developers.             -*- outline -*-
+Copyright (C) 2009 Simon Josefsson
+See the end for copying conditions.
+
+This file contains instructions for developers and advanced users that
+wants to build from version controlled sources.
+
+We require several tools to build the software, including:
+
+- Automake <http://www.gnu.org/software/automake/>
+- Autoconf <http://www.gnu.org/software/autoconf/>
+- Libtool <http://www.gnu.org/software/libtool/>
+- Gettext <http://www.gnu.org/software/gettext/>
+- Texinfo <http://www.gnu.org/software/texinfo/>
+- help2man <http://www.gnu.org/software/help2man/>
+- libgcrypt <http://www.gnupg.org/>
+- Tar <http://www.gnu.org/software/tar/>
+- Gzip <http://www.gnu.org/software/gzip/>
+- Texlive & epsf <http://www.tug.org/texlive/> (for PDF manual)
+- CVS <http://www.gnu.org/software/cvs/> (for gettext autopoint)
+- GTK-DOC <http://www.gtk.org/gtk-doc/> (for API manual)
+- Git <http://git.or.cz/>
+- Perl <http://www.cpan.org/>
+- Valgrind <http://valgrind.org/> (optional)
+
+The required software is typically disitributed with your operating
+system, and the instructions for installing them differ.  Here are
+some hints:
+
+gNewSense/Debian/Ubuntu:
+sudo apt-get install git-core autoconf automake libtool gettext cvs texinfo help2man valgrind texlive texlive-generic-recommended texlive-extra-utils gtk-doc-tools libgcrypt-dev
+
+To download the version controlled sources:
+
+$ git clone git://git.savannah.gnu.org/gnutls.git
+$ cd gnutls
+
+The next step is to run autoreconf, ./configure, etc:
+
+$ make bootstrap
+
+Then build the project normally:
+
+$ make
+$ make check
+
+Happy hacking!
+
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
