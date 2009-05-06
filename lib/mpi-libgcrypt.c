@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -306,9 +306,9 @@ wrap_gcry_prime_check (bigint_t pp)
 static int
 wrap_gcry_generate_group (gnutls_group_st * group, unsigned int bits)
 {
-  bigint_t g = NULL, prime = NULL;
+  gcry_mpi_t g = NULL, prime = NULL;
   gcry_error_t err;
-  int result, times = 0, qbits;
+  int times = 0, qbits;
   gcry_mpi_t *factors = NULL;
 
   /* Calculate the size of a prime factor of (prime-1)/2.
@@ -328,22 +328,19 @@ wrap_gcry_generate_group (gnutls_group_st * group, unsigned int bits)
    */
   do
     {
-
       if (times)
 	{
-	  _gnutls_mpi_release (&prime);
+	  gcry_mpi_release (prime);
 	  gcry_prime_release_factors (factors);
 	}
 
-      err = gcry_prime_generate ((gcry_mpi_t *) & prime, bits, qbits,
-				 &factors, NULL, NULL, GCRY_STRONG_RANDOM,
+      err = gcry_prime_generate (&prime, bits, qbits, &factors,
+				 NULL, NULL, GCRY_STRONG_RANDOM,
 				 GCRY_PRIME_FLAG_SPECIAL_FACTOR);
-
       if (err != 0)
 	{
 	  gnutls_assert ();
-	  result = GNUTLS_E_INTERNAL_ERROR;
-	  goto cleanup;
+	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
       err = gcry_prime_check (prime, 0);
@@ -355,35 +352,26 @@ wrap_gcry_generate_group (gnutls_group_st * group, unsigned int bits)
   if (err != 0)
     {
       gnutls_assert ();
-      result = GNUTLS_E_INTERNAL_ERROR;
-      goto cleanup;
+      gcry_mpi_release (prime);
+      gcry_prime_release_factors (factors);
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
   /* generate the group generator.
    */
-  err = gcry_prime_group_generator ((gcry_mpi_t *) & g, prime, factors, NULL);
+  err = gcry_prime_group_generator (&g, prime, factors, NULL);
+  gcry_prime_release_factors (factors);
   if (err != 0)
     {
       gnutls_assert ();
-      result = GNUTLS_E_INTERNAL_ERROR;
-      goto cleanup;
+      gcry_mpi_release (prime);
+      return GNUTLS_E_INTERNAL_ERROR;
     }
-
-  gcry_prime_release_factors (factors);
-  factors = NULL;
 
   group->g = g;
   group->p = prime;
 
   return 0;
-
-cleanup:
-  gcry_prime_release_factors (factors);
-  _gnutls_mpi_release (&g);
-  _gnutls_mpi_release (&prime);
-
-  return result;
-
 }
 
 int crypto_bigint_prio = INT_MAX;
