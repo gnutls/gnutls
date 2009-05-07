@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2006, 2007, 2008, 2009 Free Software Foundation
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavrogiannopoulos
  *
@@ -784,8 +784,10 @@ get_port (const struct sockaddr_storage *addr)
 {
   switch (addr->ss_family)
     {
+#if HAVE_IPV6
     case AF_INET6:
       return ntohs (((const struct sockaddr_in6 *) addr)->sin6_port);
+#endif
     case AF_INET:
       return ntohs (((const struct sockaddr_in *) addr)->sin_port);
     }

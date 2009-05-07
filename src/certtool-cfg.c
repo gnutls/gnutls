@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -732,6 +732,7 @@ static int string_to_ip( unsigned char *ip, const char * str)
   int len = strlen( str);
   int ret;
 
+#if HAVE_IPV6
   if ( strchr(str, ':') != NULL || len > 16) { /* IPv6 */
     ret = inet_pton(AF_INET6, str, ip);
     if (ret <= 0) {
@@ -741,14 +742,16 @@ static int string_to_ip( unsigned char *ip, const char * str)
 
     /* To be done */
     return 16;
-  } else { /* IPv4 */
+  } else
+#endif
+  { /* IPv4 */
     ret = inet_pton(AF_INET, str, ip);
     if (ret <= 0) {
         fprintf(stderr, "Error in IPv4 address %s\n", str);
         exit(1);
     }
 
-    return 4;    
+    return 4;
   }
 
 }

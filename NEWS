@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.6.7 (unreleased)
 
+** Fix build failure on systems without AF_INET6, e.g., Solaris 2.6.
+Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3524>.
+
 ** API and ABI modifications:
 No changes since last version.
 
