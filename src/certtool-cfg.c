@@ -795,6 +795,7 @@ string_to_ip (unsigned char *ip, const char *str)
   int len = strlen (str);
   int ret;
 
+#if HAVE_IPV6
   if (strchr (str, ':') != NULL || len > 16)
     {				/* IPv6 */
       ret = inet_pton (AF_INET6, str, ip);
@@ -808,6 +809,7 @@ string_to_ip (unsigned char *ip, const char *str)
       return 16;
     }
   else
+#endif
     {				/* IPv4 */
       ret = inet_pton (AF_INET, str, ip);
       if (ret <= 0)

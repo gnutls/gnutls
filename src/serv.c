@@ -791,8 +791,10 @@ get_port (const struct sockaddr_storage *addr)
 {
   switch (addr->ss_family)
     {
+#if HAVE_IPV6
     case AF_INET6:
       return ntohs (((const struct sockaddr_in6 *) addr)->sin6_port);
+#endif
     case AF_INET:
       return ntohs (((const struct sockaddr_in *) addr)->sin_port);
     }

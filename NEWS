@@ -10,6 +10,10 @@ Reported by Arfrever Frehtes Taifersar Arahesis
 <arfrever.fta@gmail.com> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3522>.
 
+** Fix build failure on systems without AF_INET6, e.g., Solaris 2.6.
+Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3524>.
+
 ** doc: Fix tables of error codes and supported algorithms.
 
 ** API and ABI modifications:
