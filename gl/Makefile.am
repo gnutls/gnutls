@@ -50,7 +50,8 @@ EXTRA_libgnu_la_SOURCES += accept.c
 
 ## begin gnulib module alignof
 
-libgnu_la_SOURCES += alignof.h
+
+EXTRA_DIST += alignof.h
 
 ## end   gnulib module alignof
 
