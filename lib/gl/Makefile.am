@@ -41,8 +41,7 @@ liblgnu_la_LDFLAGS = $(AM_LDFLAGS)
 
 ## begin gnulib module alignof
 
-
-EXTRA_DIST += alignof.h
+liblgnu_la_SOURCES += alignof.h
 
 ## end   gnulib module alignof
 
