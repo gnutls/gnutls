@@ -39,6 +39,13 @@ liblgnu_la_DEPENDENCIES = $(lgl_LTLIBOBJS)
 EXTRA_liblgnu_la_SOURCES =
 liblgnu_la_LDFLAGS = $(AM_LDFLAGS)
 
+## begin gnulib module alignof
+
+
+EXTRA_DIST += alignof.h
+
+## end   gnulib module alignof
+
 ## begin gnulib module alloca-opt
 
 BUILT_SOURCES += $(ALLOCA_H)
@@ -642,6 +649,7 @@ sys/socket.h: sys_socket.in.h
 	      -e 's|@''GNULIB_SHUTDOWN''@|$(GNULIB_SHUTDOWN)|g' \
 	      -e 's|@''HAVE_WINSOCK2_H''@|$(HAVE_WINSOCK2_H)|g' \
 	      -e 's|@''HAVE_WS2TCPIP_H''@|$(HAVE_WS2TCPIP_H)|g' \
+	      -e 's|@''HAVE_STRUCT_SOCKADDR_STORAGE''@|$(HAVE_STRUCT_SOCKADDR_STORAGE)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/sys_socket.in.h; \
 	} > $@-t

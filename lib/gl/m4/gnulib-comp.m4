@@ -44,7 +44,7 @@ AC_DEFUN([lgl_INIT],
   gl_source_base='lib/gl'
   gl_FUNC_ALLOCA
   gl_BYTESWAP
-  AC_REQUIRE([gl_HEADER_ERRNO_H])
+  gl_HEADER_ERRNO_H
   gl_FLOAT_H
   gl_FUNC_FSEEKO
   gl_STDIO_MODULE_INDICATOR([fseeko])
@@ -59,7 +59,7 @@ AC_DEFUN([lgl_INIT],
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
   gl_MINMAX
-  AC_REQUIRE([gl_MULTIARCH])
+  gl_MULTIARCH
   gl_HEADER_NETDB
   gl_FUNC_READ_FILE
   gl_FUNC_REALLOC_POSIX
@@ -229,6 +229,7 @@ AC_DEFUN([lgltests_LIBSOURCES], [
 AC_DEFUN([lgl_FILE_LIST], [
   build-aux/config.rpath
   build-aux/link-warning.h
+  lib/alignof.h
   lib/alloca.in.h
   lib/asnprintf.c
   lib/asprintf.c
