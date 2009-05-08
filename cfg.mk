@@ -18,6 +18,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+WFLAGS ?= WARN_CFLAGS=-Werror
 CFGFLAGS ?= --enable-gtk-doc
 
 INDENT_SOURCES = `find . -name \*.c|grep -v -e ^./lgl -e ^./gl -e ^./src/cfg -e -gaa.c -e asn1_tab.c`
@@ -50,7 +51,7 @@ update-po: refresh-po
 	git commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
 
 bootstrap: autoreconf
-	WARN_CFLAGS=-Werror ./configure $(CFGFLAGS)
+	$(WFLAGS) ./configure $(CFGFLAGS)
 
 # Code Coverage
 
