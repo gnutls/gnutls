@@ -357,24 +357,26 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
       switch (err)
 	{
 	case GNUTLS_SAN_DNSNAME:
-	  addf (str, "\t\t\tDNSname: %.*s\n", size, buffer);
+	  addf (str, "\t\t\tDNSname: %.*s\n", (int) size, buffer);
 	  break;
 
 	case GNUTLS_SAN_RFC822NAME:
-	  addf (str, "\t\t\tRFC822name: %.*s\n", size, buffer);
+	  addf (str, "\t\t\tRFC822name: %.*s\n", (int) size, buffer);
 	  break;
 
 	case GNUTLS_SAN_URI:
-	  addf (str, "\t\t\tURI: %.*s\n", size, buffer);
+	  addf (str, "\t\t\tURI: %.*s\n", (int) size, buffer);
 	  break;
+
 	case GNUTLS_SAN_IPADDRESS:
 	  p = ip_to_string (buffer, size, str_ip, sizeof (str_ip));
 	  if (p == NULL)
 	    p = ERROR_STR;
 	  addf (str, "\t\t\tIPAddress: %s\n", p);
 	  break;
+
 	case GNUTLS_SAN_DN:
-	  addf (str, "\t\t\tdirectoryName: %.*s\n", size, buffer);
+	  addf (str, "\t\t\tdirectoryName: %.*s\n", (int) size, buffer);
 	  break;
 
 	default:
@@ -553,24 +555,27 @@ print_san (gnutls_string * str, const char *prefix, int type,
       switch (err)
 	{
 	case GNUTLS_SAN_DNSNAME:
-	  addf (str, "%s\t\t\tDNSname: %.*s\n", prefix, size, buffer);
+	  addf (str, "%s\t\t\tDNSname: %.*s\n", prefix, (int) size, buffer);
 	  break;
 
 	case GNUTLS_SAN_RFC822NAME:
-	  addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, size, buffer);
+	  addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, (int) size, buffer);
 	  break;
 
 	case GNUTLS_SAN_URI:
-	  addf (str, "%s\t\t\tURI: %.*s\n", prefix, size, buffer);
+	  addf (str, "%s\t\t\tURI: %.*s\n", prefix, (int) size, buffer);
 	  break;
+
 	case GNUTLS_SAN_IPADDRESS:
 	  p = ip_to_string (buffer, size, str_ip, sizeof (str_ip));
 	  if (p == NULL)
 	    p = ERROR_STR;
 	  addf (str, "%s\t\t\tIPAddress: %s\n", prefix, p);
 	  break;
+
 	case GNUTLS_SAN_DN:
-	  addf (str, "%s\t\t\tdirectoryName: %.*s\n", prefix, size, buffer);
+	  addf (str, "%s\t\t\tdirectoryName: %.*s\n", prefix,
+		(int) size, buffer);
 	  break;
 
 	case GNUTLS_SAN_OTHERNAME:
@@ -618,12 +623,12 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	      }
 
 	    if (err == GNUTLS_SAN_OTHERNAME_XMPP)
-	      addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix, size,
-		    buffer);
+	      addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix,
+		    (int) size, buffer);
 	    else
 	      {
 		addf (str, _("%s\t\t\totherName OID: %.*s\n"), prefix,
-		      oidsize, oid);
+		      (int) oidsize, oid);
 		addf (str, _("%s\t\t\totherName DER: "), prefix);
 		hexprint (str, buffer, size);
 		addf (str, _("\n%s\t\t\totherName ASCII: "), prefix);
