@@ -20,7 +20,7 @@
 
 WFLAGS ?= WARN_CFLAGS=-Werror
 ADDFLAGS ?=
-CFGFLAGS ?= --enable-gtk-doc $(ADDCFGFLAGS)
+CFGFLAGS ?= --enable-gtk-doc $(ADDFLAGS)
 
 INDENT_SOURCES = `find . -name \*.c|grep -v -e ^./lgl -e ^./gl -e ^./src/cfg -e -gaa.c -e asn1_tab.c`
 
