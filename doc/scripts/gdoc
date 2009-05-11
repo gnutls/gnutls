@@ -633,10 +633,7 @@ sub output_man {
 	print ".SH \"" . uc($section) . "\"\n";
 	$sec = $args{'sections'}{$section};
 	$sec =~ s/-/\\-/g;
-	$sec =~ s/"%/__gdoc_quotepercent_hack__/g;
-	$sec = just_highlight ($sec);
-	$sec =~ s/__gdoc_quotepercent_hack__/"%/g;
-	print $sec;
+	output_highlight($sec);
     }
 
     if ($args{'bugsto'}) {
