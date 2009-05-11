@@ -102,15 +102,6 @@ EXTRA_DIST += intprops.h
 
 ## end   gnulib module intprops
 
-## begin gnulib module lseek-tests
-
-TESTS += test-lseek.sh
-TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@' srcdir='$(srcdir)'
-check_PROGRAMS += test-lseek
-EXTRA_DIST += test-lseek.c test-lseek.sh
-
-## end   gnulib module lseek-tests
-
 ## begin gnulib module netdb-tests
 
 TESTS += test-netdb

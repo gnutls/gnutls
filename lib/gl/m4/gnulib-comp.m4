@@ -362,8 +362,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-fseeko.sh
   tests/test-fseeko2.sh
   tests/test-func.c
-  tests/test-lseek.c
-  tests/test-lseek.sh
   tests/test-netdb.c
   tests/test-read-file.c
   tests/test-snprintf.c

@@ -42,7 +42,7 @@ noinst_LTLIBRARIES =
 
 gnutls_serv_SOURCES = list.h serv.c common.h common.c certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
-gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
+gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la $(LIBSOCKET)
 noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
 libcmd_serv_la_SOURCES = serv.gaa serv-gaa.h serv-gaa.c
@@ -63,14 +63,14 @@ libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
-gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la
+gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBSOCKET)
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS =
 libcmd_cli_la_SOURCES = cli.gaa cli-gaa.h cli-gaa.c
 
 gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la
-gnutls_cli_debug_LDADD += ../gl/libgnu.la
+gnutls_cli_debug_LDADD += ../gl/libgnu.la $(LIBSOCKET)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
 libcmd_cli_debug_la_CFLAGS =
 libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c

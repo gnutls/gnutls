@@ -40,7 +40,11 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/doc/examples
 
 AM_LDFLAGS = -no-install
-LDADD = ../lib/libgnutls.la ../gl/libgnu.la libutils.la $(LTLIBGCRYPT)
+LDADD = ../lib/libgnutls.la \
+	../gl/libgnu.la \
+	libutils.la \
+	$(LTLIBGCRYPT)	\
+	$(LIBSOCKET)
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
