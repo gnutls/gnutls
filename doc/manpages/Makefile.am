@@ -349,14 +349,6 @@ APIMANS += gnutls_x509_dn_export.3
 APIMANS += gnutls_x509_crt_print.3
 APIMANS += gnutls_x509_crl_print.3
 APIMANS += gnutls_x509_crq_print.3
-APIMANS += gnutls_pkcs12_init.3
-APIMANS += gnutls_pkcs12_deinit.3
-APIMANS += gnutls_pkcs12_import.3
-APIMANS += gnutls_pkcs12_export.3
-APIMANS += gnutls_pkcs12_get_bag.3
-APIMANS += gnutls_pkcs12_set_bag.3
-APIMANS += gnutls_pkcs12_generate_mac.3
-APIMANS += gnutls_pkcs12_verify_mac.3
 APIMANS += gnutls_pkcs12_bag_init.3
 APIMANS += gnutls_pkcs12_bag_deinit.3
 APIMANS += gnutls_pkcs12_bag_get_type.3
@@ -371,6 +363,14 @@ APIMANS += gnutls_pkcs12_bag_get_friendly_name.3
 APIMANS += gnutls_pkcs12_bag_set_friendly_name.3
 APIMANS += gnutls_pkcs12_bag_decrypt.3
 APIMANS += gnutls_pkcs12_bag_encrypt.3
+APIMANS += gnutls_pkcs12_init.3
+APIMANS += gnutls_pkcs12_deinit.3
+APIMANS += gnutls_pkcs12_import.3
+APIMANS += gnutls_pkcs12_export.3
+APIMANS += gnutls_pkcs12_get_bag.3
+APIMANS += gnutls_pkcs12_set_bag.3
+APIMANS += gnutls_pkcs12_generate_mac.3
+APIMANS += gnutls_pkcs12_verify_mac.3
 APIMANS += gnutls_pkcs7_init.3
 APIMANS += gnutls_pkcs7_deinit.3
 APIMANS += gnutls_pkcs7_import.3
@@ -606,7 +606,7 @@ doit:
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2008 Free Software Foundation" \
 			-function $$i \
-			$(top_srcdir)/lib/*.c >> $$i.3 && \
+			$(top_srcdir)/lib/*.c > $$i.3 && \
 		echo -n "."; \
 	done; \
 	echo ""; \
@@ -620,7 +620,7 @@ doit:
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2008 Free Software Foundation" \
 			-function $$i \
-			$(top_srcdir)/libextra/*.c >> $$i.3 && \
+			$(top_srcdir)/libextra/*.c > $$i.3 && \
 		echo -n "."; \
 	done; \
 	echo ""; \
@@ -634,7 +634,7 @@ doit:
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2008 Free Software Foundation" \
 			-function $$i \
-			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
+			$(top_srcdir)/lib/x509/*.c > $$i.3 && \
 		echo -n "."; \
 	done; \
 	echo ""; \
@@ -648,7 +648,7 @@ doit:
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2008 Free Software Foundation" \
 			-function $$i \
-			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
+			$(top_srcdir)/lib/x509/*.c > $$i.3 && \
 		echo -n "."; \
 	done; \
 	echo ""; \
@@ -662,7 +662,7 @@ doit:
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2008 Free Software Foundation" \
 			-function $$i \
-			$(top_srcdir)/lib/openpgp/*.c >> $$i.3 && \
+			$(top_srcdir)/lib/openpgp/*.c > $$i.3 && \
 		echo -n "."; \
 	done; \
 	echo ""
