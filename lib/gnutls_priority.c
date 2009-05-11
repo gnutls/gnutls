@@ -432,77 +432,90 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 #define MAX_ELEMENTS 48
 
 /**
-  * gnutls_priority_init - Sets priorities for the cipher suites supported by gnutls.
-  * @priority_cache: is a #gnutls_prioritity_t structure.
-  * @priorities: is a string describing priorities
-  * @err_pos: In case of an error this will have the position in the string the error occured
-  *
-  * Sets priorities for the ciphers, key exchange methods, macs and
-  * compression methods. This is to avoid using the
-  * gnutls_*_priority() functions.
-  *
-  * The #priorities option allows you to specify a semi-colon
-  * separated list of the cipher priorities to enable.
-  *
-  * Unless the first keyword is "NONE" the defaults are:
-  * Protocols: TLS1.1, TLS1.0, and SSL3.0.
-  * Compression: NULL.
-  * Certificate types: X.509, OpenPGP.
-  *
-  * You can also use predefined sets of ciphersuites: "PERFORMANCE"
-  * all the "secure" ciphersuites are enabled, limited to 128 bit
-  * ciphers and sorted by terms of speed performance.
-  *
-  * "NORMAL" option enables all "secure" ciphersuites. The 256-bit ciphers
-  * are included as a fallback only. The ciphers are sorted by security margin.
-  *
-  * "SECURE128" flag enables all "secure" ciphersuites with ciphers up to 
-  * 128 bits, sorted by security margin.
-  *
-  * "SECURE256" flag enables all "secure" ciphersuites including the 256 bit
-  * ciphers, sorted by security margin.
-  *
-  * "EXPORT" all the ciphersuites are enabled, including the
-  * low-security 40 bit ciphers.
-  *
-  * "NONE" nothing is enabled. This disables even protocols and
-  * compression methods.
-  *
-  * Special keywords:
-  * "!" or "-" appended with an algorithm will remove this algorithm.
-  * "+" appended with an algorithm will add this algorithm.
-  * "%COMPAT" will enable compatibility features for a server.
-  * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
-  * "%VERIFY_ALLOW_SIGN_RSA_MD5" will allow RSA-MD5 signatures in
-  * certificate chains.
-  * "%VERIFY_ALLOW_X509_V1_CA_CRT" will allow V1 CAs in chains.
-  *
-  * To avoid collisions in order to specify a compression algorithm in
-  * this string you have to prefix it with "COMP-", protocol versions
-  * with "VERS-" and certificate types with "CTYPE-". All other
-  * algorithms don't need a prefix.
-  *
-  * For key exchange algorithms when in NORMAL or SECURE levels the
-  * perfect forward secrecy algorithms take precendence of the other
-  * protocols.  In all cases all the supported key exchange algorithms
-  * are enabled (except for the RSA-EXPORT which is only enabled in
-  * EXPORT level).
-  *
-  * Note that although one can select very long key sizes (such as 256 bits) 
-  * for symmetric algorithms, to actually increase security the public key
-  * algorithms have to use longer key sizes as well.
-  *
-  * Examples: "NORMAL:!AES-128-CBC",
-  * "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE:+CTYPE-OPENPGP",
-  * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL",
-  * "NORMAL:%COMPAT".
-  *
-  * For all the current available algorithms and protocols use "gnutls-cli -l"
-  * to get a listing.
-  *
-  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
-  * %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_priority_init - Sets priorities for the cipher suites supported by gnutls.
+ * @priority_cache: is a #gnutls_prioritity_t structure.
+ * @priorities: is a string describing priorities
+ * @err_pos: In case of an error this will have the position in the string the error occured
+ *
+ * Sets priorities for the ciphers, key exchange methods, macs and
+ * compression methods. This is to avoid using the
+ * gnutls_*_priority() functions.
+ *
+ * The #priorities option allows you to specify a semi-colon
+ * separated list of the cipher priorities to enable.
+ *
+ * Unless the first keyword is "NONE" the defaults (in preference
+ * order) are for TLS protocols TLS1.1, TLS1.0, SSL3.0; for
+ * compression NULL; for certificate types X.509, OpenPGP.
+ *
+ * For key exchange algorithms when in NORMAL or SECURE levels the
+ * perfect forward secrecy algorithms take precendence of the other
+ * protocols.  In all cases all the supported key exchange algorithms
+ * are enabled (except for the RSA-EXPORT which is only enabled in
+ * EXPORT level).
+ *
+ * Note that although one can select very long key sizes (such as 256 bits)
+ * for symmetric algorithms, to actually increase security the public key
+ * algorithms have to use longer key sizes as well.
+ *
+ * For all the current available algorithms and protocols use
+ * "gnutls-cli -l" to get a listing.
+ *
+ * Common keywords: Some keywords are defined to provide quick access
+ * to common preferences.
+ *
+ * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
+ * limited to 128 bit ciphers and sorted by terms of speed
+ * performance.
+ *
+ * "NORMAL" means all "secure" ciphersuites. The 256-bit ciphers are
+ * included as a fallback only.  The ciphers are sorted by security
+ * margin.
+ *
+ * "SECURE128" means all "secure" ciphersuites with ciphers up to 128
+ * bits, sorted by security margin.
+ *
+ * "SECURE256" means all "secure" ciphersuites including the 256 bit
+ * ciphers, sorted by security margin.
+ *
+ * "EXPORT" means all ciphersuites are enabled, including the
+ * low-security 40 bit ciphers.
+ *
+ * "NONE" means nothing is enabled.  This disables even protocols and
+ * compression methods.
+ *
+ * Special keywords:
+ * "!" or "-" appended with an algorithm will remove this algorithm.
+ *
+ * "+" appended with an algorithm will add this algorithm.
+ *
+ * "%COMPAT" will enable compatibility features for a server.
+ *
+ * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
+ *
+ * "%VERIFY_ALLOW_SIGN_RSA_MD5" will allow RSA-MD5 signatures in
+ * certificate chains.
+ *
+ * "%VERIFY_ALLOW_X509_V1_CA_CRT" will allow V1 CAs in chains.
+ *
+ * Namespace concern:
+ * To avoid collisions in order to specify a compression algorithm in
+ * this string you have to prefix it with "COMP-", protocol versions
+ * with "VERS-" and certificate types with "CTYPE-". All other
+ * algorithms don't need a prefix.
+ *
+ * Examples:
+ * "NORMAL:!AES-128-CBC" means normal ciphers except for AES-128.
+ *
+ * "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE" means that export ciphers are
+ * enabled, TLS 1.0 is disabled, and libz compression enabled.
+ *
+ * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL",
+ * "%COMPAT".
+ *
+ * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
+ * %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_priority_init (gnutls_priority_t * priority_cache,
 		      const char *priorities, const char **err_pos)
