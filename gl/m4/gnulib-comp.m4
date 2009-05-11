@@ -106,8 +106,6 @@ AC_SUBST([LTALLOCA])
   gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
   gl_INET_PTON
   gl_ARPA_INET_MODULE_INDICATOR([inet_pton])
-  gl_LD_OUTPUT_DEF
-  gl_LD_VERSION_SCRIPT
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([listen])
@@ -442,8 +440,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/inet_pton.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
-  m4/ld-output-def.m4
-  m4/ld-version-script.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4

@@ -43,6 +43,8 @@ AC_DEFUN([xgl_INIT],
   gl_source_base='gl'
   gl_HMAC_MD5
   gl_MD5
+  gl_LD_OUTPUT_DEF
+  gl_LD_VERSION_SCRIPT
   gl_MEMXOR
   m4_ifval(xgl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([xgl_LIBSOURCES_DIR])[ ||
@@ -183,6 +185,8 @@ AC_DEFUN([xgl_FILE_LIST], [
   m4/extensions.m4
   m4/gnulib-common.m4
   m4/hmac-md5.m4
+  m4/ld-output-def.m4
+  m4/ld-version-script.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4

@@ -53,6 +53,8 @@ AC_DEFUN([lgl_INIT],
   AM_GNU_GETTEXT_VERSION([0.17])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
+  gl_LD_OUTPUT_DEF
+  gl_LD_VERSION_SCRIPT
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_FUNC_MEMMEM_SIMPLE
@@ -306,6 +308,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/inttypes-pri.m4
   m4/inttypes_h.m4
   m4/lcmessage.m4
+  m4/ld-output-def.m4
+  m4/ld-version-script.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
