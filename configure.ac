@@ -220,8 +220,6 @@ fi
 
 # Export things for */configure.ac.
 export WARN_CFLAGS
-export have_ld_version_script
-export output_def
 export use_cxx
 
 AC_CONFIG_SUBDIRS([lib])
@@ -273,7 +271,6 @@ AC_MSG_NOTICE([summary of build options:
   Warning flags:    ${WARN_CFLAGS}
   Library types:    Shared=${enable_shared}, Static=${enable_static}
   Valgrind:         ${VALGRIND}
-  Linker script:    $have_ld_version_script
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
   OpenSSL library:  $enable_openssl
