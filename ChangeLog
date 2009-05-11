@@ -1,3 +1,255 @@
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.9.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/configure.ac, libextra/configure.ac: Drop obsolete stuff.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Drop obsolete stuff.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/ld-output-def.m4, gl/m4/ld-version-script.m4,
+	lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/ld-output-def.m4,
+	lib/gl/m4/ld-version-script.m4, libextra/gl/gnulib.mk,
+	libextra/gl/m4/gnulib-cache.m4, libextra/gl/m4/gnulib-comp.m4,
+	libextra/gl/m4/ld-output-def.m4,
+	libextra/gl/m4/ld-version-script.m4: Move gnulib tests into proper
+	directory.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/scripts/gdoc: Fix gnutls_priority_init documentation.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/scripts/gdoc: Revert "Fix man output for "%COMPAT" in
+	docstrings." This reverts commit d10f1872bcbf7eb63632a8ce2e50728f42bd03fa.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/scripts/gdoc: Fix man output for "%COMPAT" in docstrings.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: When writing man pages, don't append to
+	any existing file.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: Doc fix.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/examples/Makefile.am, lib/gl/Makefile.am,
+	lib/gl/m4/gnulib-cache.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/tests/Makefile.am, lib/gl/tests/test-lseek.c,
+	lib/gl/tests/test-lseek.sh, src/Makefile.am, tests/Makefile.am: Fix
+	MinGW build failures.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/autogen.sh: Add.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* gtk-doc.make: Fix syntax-check.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* gtk-doc.make, m4/gtk-doc.m4: Upgrade gtk-doc files.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, gl/sys_socket.in.h, gl/tests/test-vc-list-files-git.sh,
+	lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/sys_socket.in.h,
+	lib/gl/tests/Makefile.am, lib/gl/tests/test-lseek.c,
+	lib/gl/tests/test-lseek.sh, libextra/gl/gnulib.mk,
+	libextra/gl/m4/gnulib-cache.m4, libextra/gl/m4/gnulib-comp.m4: 
+	Update gnulib files.
+
+2009-05-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Verisign CA v1 cert has expired!  Change
+	expected results.  Also test expiration code more.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Don't always rebuild manual.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/sys_socket_h.m4, lib/gl/m4/sys_socket_h.m4: Update gnulib
+	files.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, lib/gl/Makefile.am: Update gnulib files.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/alignof.h, lib/gl/Makefile.am: Update gnulib
+	files.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gnupload, gl/Makefile.am, gl/m4/errno_h.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/multiarch.m4, gl/m4/sys_socket_h.m4,
+	gl/m4/vasnprintf.m4, gl/sys_socket.in.h,
+	gl/tests/test-sys_socket.c, lib/gl/Makefile.am, lib/gl/alignof.h,
+	lib/gl/m4/errno_h.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/multiarch.m4, lib/gl/m4/sys_socket_h.m4,
+	lib/gl/m4/vasnprintf.m4, lib/gl/sys_socket.in.h,
+	lib/gl/tests/test-sys_socket.c, maint.mk: Update gnulib files.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix -Werror handling.
+
+2009-05-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Fix warnings.
+
+2009-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-serv-anon.c, doc/examples/ex-serv-export.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-psk.c,
+	doc/examples/ex-serv-srp.c, doc/examples/ex-serv1.c,
+	tests/anonself.c, tests/dhepskself.c, tests/openpgpself.c,
+	tests/oprfi.c, tests/pskself.c, tests/resume.c, tests/tlsia.c,
+	tests/x509dn.c, tests/x509self.c, tests/x509signself.c: Fix
+	warnings.
+
+2009-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/anonself.c, tests/dhepskself.c, tests/openpgpself.c,
+	tests/oprfi.c, tests/pskself.c, tests/resume.c, tests/tlsia.c,
+	tests/x509dn.c, tests/x509self.c, tests/x509signself.c: Use memset
+	instead of deprecated bzero.
+
+2009-05-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/certtool-cfg.c, src/serv.c: Fix build failure on systems
+	without AF_INET6, e.g., Solaris 2.6.  Reported by "Tom G.
+	Christensen" <tgc@jupiterrise.com> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3524>.
+
+2009-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Drop README.GIT.
+
+2009-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Need to link directly to libgcrypt here.
+
+2009-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/mpi-libgcrypt.c: Don't use casts that break strict-aliasing
+	rules.
+
+2009-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* README-alpha: Fix.
+
+2009-05-06  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Fix.
+
+2009-05-05  Simon Josefsson <simon@josefsson.org>
+
+	* README-alpha, doc/README.GIT: Replace doc/README.GIT with
+	README-alpha.
+
+2009-05-05  Simon Josefsson <simon@josefsson.org>
+
+	* README-alpha: Fix.
+
+2009-05-05  Simon Josefsson <simon@josefsson.org>
+
+	* README-alpha: Add.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/libgnutls.map: Fix build failure when LZO is enabled.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in, lib/includes/gnutls/openpgp.h,
+	libextra/includes/gnutls/extra.h: Fix gtk-doc warnings.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_asn1_tab.c, lib/pkix_asn1_tab.c: Regenerated libtasn1
+	files.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Build tools before using them.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* .x-sc_GPL_version, .x-sc_avoid_if_before_free,
+	.x-sc_cast_of_alloca_return_value, .x-sc_cast_of_argument_to_free,
+	.x-sc_file_system, .x-sc_m4_quote_check, .x-sc_makefile_check,
+	.x-sc_program_name, .x-sc_prohibit_HAVE_MBRTOWC,
+	.x-sc_prohibit_S_IS_definition, .x-sc_space_tab, .x-sc_the_the,
+	.x-sc_two_space_separator_in_usage, .x-sc_useless_cpp_parens, NEWS,
+	cfg.mk, doc/examples/ex-serv-export.c, doc/gnutls.texi,
+	gtk-doc.make, lib/gnutls.asn, lib/m4/hooks.m4,
+	lib/openpgp/Makefile.am, lib/pkix.asn, lib/x509/Makefile.am,
+	libextra/m4/hooks.m4, m4/valgrind.m4, src/Makefile.am,
+	src/certtool-cfg.c, src/certtool.c, src/crypt.c, src/psk.c,
+	src/serv.c, src/tls_test.c, tests/Makefile.am, tests/resume.c,
+	tests/x509dn.c: Fix syntax-check warnings.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, gtk-doc.make: Upgrade gtk-doc files.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-05-03  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.8.
