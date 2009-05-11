@@ -54,6 +54,11 @@ update-po: refresh-po
 bootstrap: autoreconf
 	$(WFLAGS) ./configure $(CFGFLAGS)
 
+glimport:
+	gnulib-tool --m4-base gl/m4 --import
+	cd lib && gnulib-tool --m4-base gl/m4 --import
+	cd libextra && gnulib-tool --m4-base gl/m4 --import
+
 # Code Coverage
 
 pre-coverage:

@@ -11,8 +11,7 @@ tmpfiles=t-lseek.tmp
 echo hi | ./test-lseek${EXEEXT} 1 | cat || exit 1
 
 # closed descriptors
-# Doesn't work under mingw -- simon@josefsson.org
-#./test-lseek${EXEEXT} 2 <&- >&- || exit 1
+./test-lseek${EXEEXT} 2 <&- >&- || exit 1
 
 rm -rf $tmpfiles
 exit 0

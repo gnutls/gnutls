@@ -40,7 +40,7 @@ AC_DEFUN([xgl_INIT],
   m4_pushdef([xgl_LIBSOURCES_LIST], [])
   m4_pushdef([xgl_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='libextra/gl'
+  gl_source_base='gl'
   gl_HMAC_MD5
   gl_MD5
   gl_MEMXOR
@@ -82,7 +82,7 @@ AC_DEFUN([xgl_INIT],
   m4_pushdef([xgltests_LIBSOURCES_LIST], [])
   m4_pushdef([xgltests_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='libextra/gl/tests'
+  gl_source_base='gl/tests'
   m4_ifval(xgltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([xgltests_LIBSOURCES_DIR])[ ||
       for gl_file in ]xgltests_LIBSOURCES_LIST[ ; do
@@ -136,7 +136,7 @@ AC_DEFUN([xgl_REPLACE_FUNCS], [
 AC_DEFUN([xgl_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([xgl_LIBSOURCES_DIR], [libextra/gl])
+      m4_define([xgl_LIBSOURCES_DIR], [gl])
       m4_append([xgl_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
@@ -163,7 +163,7 @@ AC_DEFUN([xgltests_REPLACE_FUNCS], [
 AC_DEFUN([xgltests_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([xgltests_LIBSOURCES_DIR], [libextra/gl/tests])
+      m4_define([xgltests_LIBSOURCES_DIR], [gl/tests])
       m4_append([xgltests_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])

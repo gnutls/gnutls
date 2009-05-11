@@ -41,7 +41,7 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgl_LIBSOURCES_LIST], [])
   m4_pushdef([lgl_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='lib/gl'
+  gl_source_base='gl'
   gl_FUNC_ALLOCA
   gl_BYTESWAP
   gl_HEADER_ERRNO_H
@@ -131,7 +131,7 @@ AC_DEFUN([lgl_INIT],
   m4_pushdef([lgltests_LIBSOURCES_LIST], [])
   m4_pushdef([lgltests_LIBSOURCES_DIR], [])
   gl_COMMON
-  gl_source_base='lib/gl/tests'
+  gl_source_base='gl/tests'
   gl_FUNC_UNGETC_WORKS
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
@@ -191,7 +191,7 @@ AC_DEFUN([lgl_REPLACE_FUNCS], [
 AC_DEFUN([lgl_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([lgl_LIBSOURCES_DIR], [lib/gl])
+      m4_define([lgl_LIBSOURCES_DIR], [gl])
       m4_append([lgl_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])
@@ -218,7 +218,7 @@ AC_DEFUN([lgltests_REPLACE_FUNCS], [
 AC_DEFUN([lgltests_LIBSOURCES], [
   m4_foreach([_gl_NAME], [$1], [
     m4_if(_gl_NAME, [alloca.c], [], [
-      m4_define([lgltests_LIBSOURCES_DIR], [lib/gl/tests])
+      m4_define([lgltests_LIBSOURCES_DIR], [gl/tests])
       m4_append([lgltests_LIBSOURCES_LIST], _gl_NAME, [ ])
     ])
   ])

@@ -85,9 +85,9 @@ main (int argc, char **argv)
 
     case '2': /* closed */
       /* Explicitly close file descriptors 0 and 1.  The <&- and >&- in the
-         invoking shell are not enough on HP-UX.
-      close (0);     calling close fails on mingw -- simon@josefsson.org
-      close (1);  */
+         invoking shell are not enough on HP-UX.  */
+      close (0);
+      close (1);
       errno = 0;
       ASSERT (lseek (0, (off_t)0, SEEK_CUR) == -1);
       ASSERT (errno == EBADF);
