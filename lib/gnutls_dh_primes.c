@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -58,10 +58,12 @@ _gnutls_dh_params_to_mpi (gnutls_dh_params_t dh_primes)
  * @prime: holds the new prime
  * @generator: holds the new generator
  *
- * This function will replace the pair of prime and generator for use in
- * the Diffie-Hellman key exchange. The new parameters should be stored in the
- * appropriate gnutls_datum.
+ * This function will replace the pair of prime and generator for use
+ * in the Diffie-Hellman key exchange.  The new parameters should be
+ * stored in the appropriate gnutls_datum.
  *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
  **/
 int
 gnutls_dh_params_import_raw (gnutls_dh_params_t dh_params,
@@ -96,12 +98,14 @@ gnutls_dh_params_import_raw (gnutls_dh_params_t dh_params,
 }
 
 /**
-  * gnutls_dh_params_init - initialize the DH parameters
-  * @dh_params: Is a structure that will hold the prime numbers
-  *
-  * This function will initialize the DH parameters structure.
-  *
-  **/
+ * gnutls_dh_params_init - initialize the DH parameters
+ * @dh_params: Is a structure that will hold the prime numbers
+ *
+ * This function will initialize the DH parameters structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_dh_params_init (gnutls_dh_params_t * dh_params)
 {
@@ -118,12 +122,11 @@ gnutls_dh_params_init (gnutls_dh_params_t * dh_params)
 }
 
 /**
-  * gnutls_dh_params_deinit - deinitialize the DH parameters
-  * @dh_params: Is a structure that holds the prime numbers
-  *
-  * This function will deinitialize the DH parameters structure.
-  *
-  **/
+ * gnutls_dh_params_deinit - deinitialize the DH parameters
+ * @dh_params: Is a structure that holds the prime numbers
+ *
+ * This function will deinitialize the DH parameters structure.
+ **/
 void
 gnutls_dh_params_deinit (gnutls_dh_params_t dh_params)
 {
@@ -138,14 +141,16 @@ gnutls_dh_params_deinit (gnutls_dh_params_t dh_params)
 }
 
 /**
-  * gnutls_dh_params_cpy - copy a DH parameters structure
-  * @dst: Is the destination structure, which should be initialized.
-  * @src: Is the source structure
-  *
-  * This function will copy the DH parameters structure from source
-  * to destination.
-  *
-  **/
+ * gnutls_dh_params_cpy - copy a DH parameters structure
+ * @dst: Is the destination structure, which should be initialized.
+ * @src: Is the source structure
+ *
+ * This function will copy the DH parameters structure from source
+ * to destination.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_dh_params_cpy (gnutls_dh_params_t dst, gnutls_dh_params_t src)
 {
@@ -163,21 +168,23 @@ gnutls_dh_params_cpy (gnutls_dh_params_t dst, gnutls_dh_params_t src)
 
 
 /**
-  * gnutls_dh_params_generate2 - generate new DH parameters
-  * @params: Is the structure that the DH parameters will be stored
-  * @bits: is the prime's number of bits
-  *
-  * This function will generate a new pair of prime and generator for use in 
-  * the Diffie-Hellman key exchange. The new parameters will be allocated using
-  * gnutls_malloc() and will be stored in the appropriate datum.
-  * This function is normally slow. 
-  * 
-  * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
-  * Also note that the DH parameters are only useful to servers.
-  * Since clients use the parameters sent by the server, it's of
-  * no use to call this in client side.
-  *
-  **/
+ * gnutls_dh_params_generate2 - generate new DH parameters
+ * @params: Is the structure that the DH parameters will be stored
+ * @bits: is the prime's number of bits
+ *
+ * This function will generate a new pair of prime and generator for use in
+ * the Diffie-Hellman key exchange. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ * This function is normally slow.
+ *
+ * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
+ * Also note that the DH parameters are only useful to servers.
+ * Since clients use the parameters sent by the server, it's of
+ * no use to call this in client side.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
 {
@@ -198,21 +205,20 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
 }
 
 /**
-  * gnutls_dh_params_import_pkcs3 - import DH params from a pkcs3 structure
-  * @params: A structure where the parameters will be copied to
-  * @pkcs3_params: should contain a PKCS3 DHParams structure PEM or DER encoded
-  * @format: the format of params. PEM or DER.
-  *
-  * This function will extract the DHParams found in a PKCS3 formatted
-  * structure. This is the format generated by "openssl dhparam" tool.
-  *
-  * If the structure is PEM encoded, it should have a header
-  * of "BEGIN DH PARAMETERS".
-  *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
-  *
-  **/
+ * gnutls_dh_params_import_pkcs3 - import DH params from a pkcs3 structure
+ * @params: A structure where the parameters will be copied to
+ * @pkcs3_params: should contain a PKCS3 DHParams structure PEM or DER encoded
+ * @format: the format of params. PEM or DER.
+ *
+ * This function will extract the DHParams found in a PKCS3 formatted
+ * structure. This is the format generated by "openssl dhparam" tool.
+ *
+ * If the structure is PEM encoded, it should have a header
+ * of "BEGIN DH PARAMETERS".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
 			       const gnutls_datum_t * pkcs3_params,
@@ -308,24 +314,23 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
 }
 
 /**
-  * gnutls_dh_params_export_pkcs3 - export DH params to a pkcs3 structure
-  * @params: Holds the DH parameters
-  * @format: the format of output params. One of PEM or DER.
-  * @params_data: will contain a PKCS3 DHParams structure PEM or DER encoded
-  * @params_data_size: holds the size of params_data (and will be replaced by the actual size of parameters)
-  *
-  * This function will export the given dh parameters to a PKCS3
-  * DHParams structure. This is the format generated by "openssl dhparam" tool.
-  * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN DH PARAMETERS".
-  *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
-  *
-  **/
+ * gnutls_dh_params_export_pkcs3 - export DH params to a pkcs3 structure
+ * @params: Holds the DH parameters
+ * @format: the format of output params. One of PEM or DER.
+ * @params_data: will contain a PKCS3 DHParams structure PEM or DER encoded
+ * @params_data_size: holds the size of params_data (and will be replaced by the actual size of parameters)
+ *
+ * This function will export the given dh parameters to a PKCS3
+ * DHParams structure. This is the format generated by "openssl dhparam" tool.
+ * If the buffer provided is not long enough to hold the output, then
+ * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN DH PARAMETERS".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
 			       gnutls_x509_crt_fmt_t format,
@@ -485,17 +490,20 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
 }
 
 /**
-  * gnutls_dh_params_export_raw - export the raw DH parameters
-  * @params: Holds the DH parameters
-  * @prime: will hold the new prime
-  * @generator: will hold the new generator
-  * @bits: if non null will hold is the prime's number of bits
-  *
-  * This function will export the pair of prime and generator for use in 
-  * the Diffie-Hellman key exchange. The new parameters will be allocated using
-  * gnutls_malloc() and will be stored in the appropriate datum.
-  * 
-  **/
+ * gnutls_dh_params_export_raw - export the raw DH parameters
+ * @params: Holds the DH parameters
+ * @prime: will hold the new prime
+ * @generator: will hold the new generator
+ * @bits: if non null will hold is the prime's number of bits
+ *
+ * This function will export the pair of prime and generator for use
+ * in the Diffie-Hellman key exchange.  The new parameters will be
+ * allocated using gnutls_malloc() and will be stored in the
+ * appropriate datum.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_dh_params_export_raw (gnutls_dh_params_t params,
 			     gnutls_datum_t * prime,
