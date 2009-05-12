@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -86,16 +86,21 @@ _gnutls_add_lzo_comp (void)
 static int _gnutls_init_extra = 0;
 
 /**
-  * gnutls_global_init_extra - initializes the global state of gnutls-extra
-  *
-  * This function initializes the global state of gnutls-extra library
-  * to defaults.  Returns zero on success.
-  *
-  * Note that gnutls_global_init() has to be called before this
-  * function.  If this function is not called then the gnutls-extra
-  * library will not be usable.
-  *
-  **/
+ * gnutls_global_init_extra - initializes the global state of gnutls-extra
+ *
+ * This function initializes the global state of gnutls-extra library
+ * to defaults.
+ *
+ * Note that gnutls_global_init() has to be called before this
+ * function.  If this function is not called then the gnutls-extra
+ * library will not be usable.
+ *
+ * This function is not thread safe, see the discussion for
+ * gnutls_global_init() on how to deal with that.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_global_init_extra (void)
 {
@@ -113,9 +118,7 @@ gnutls_global_init_extra (void)
   _gnutls_init_extra++;
 
   if (_gnutls_init_extra != 1)
-    {
-      return 0;
-    }
+    return 0;
 
   ret = gnutls_ext_register (GNUTLS_EXTENSION_INNER_APPLICATION,
 			     "INNER_APPLICATION",
@@ -129,9 +132,7 @@ gnutls_global_init_extra (void)
    */
 #ifdef USE_LZO
   if (lzo_init () != LZO_E_OK)
-    {
-      return GNUTLS_E_LZO_INIT_FAILED;
-    }
+    return GNUTLS_E_LZO_INIT_FAILED;
 
   /* Add the LZO compression method in the list of compression
    * methods.
@@ -148,14 +149,18 @@ gnutls_global_init_extra (void)
 }
 
 /**
- * gnutls_extra_check_version - This function checks the library's version
- * @req_version: the version to check
+ * gnutls_extra_check_version - checks the libgnutls-extra version
+ * @req_version: version string to compare with, or %NULL.
  *
- * Check that the version of the gnutls-extra library is at minimum
- * the requested one and return the version string; return NULL if the
- * condition is not satisfied.  If a NULL is passed to this function,
- * no check is done, but the version string is simply returned.
+ * Check GnuTLS Extra Library version.
  *
+ * See %LIBGNUTLS_EXTRA_VERSION for a suitable @req_version string.
+ *
+ * Return value: Check that the version of the library is at
+ *   minimum the one given as a string in @req_version and return the
+ *   actual version string of the library; return %NULL if the
+ *   condition is not met.  If %NULL is passed to this function no
+ *   check is done and only the version string is returned.
  **/
 const char *
 gnutls_extra_check_version (const char *req_version)

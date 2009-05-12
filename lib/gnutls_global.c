@@ -50,17 +50,17 @@ gnutls_log_func _gnutls_log_func;
 int _gnutls_log_level = 0;	/* default log level */
 
 /**
-  * gnutls_global_set_log_function - set the logging function
-  * @log_func: it's a log function
-  *
-  * This is the function where you set the logging function gnutls
-  * is going to use. This function only accepts a character array.
-  * Normally you may not use this function since it is only used 
-  * for debugging purposes.
-  *
-  * gnutls_log_func is of the form, 
-  * void (*gnutls_log_func)( int level, const char*);
-  **/
+ * gnutls_global_set_log_function - set the logging function
+ * @log_func: it's a log function
+ *
+ * This is the function where you set the logging function gnutls is
+ * going to use.  This function only accepts a character array.
+ * Normally you may not use this function since it is only used for
+ * debugging purposes.
+ *
+ * gnutls_log_func is of the form,
+ * void (*gnutls_log_func)( int level, const char*);
+ **/
 void
 gnutls_global_set_log_function (gnutls_log_func log_func)
 {
@@ -68,50 +68,40 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
 }
 
 /**
-  * gnutls_global_set_log_level - set the logging level
-  * @level: it's an integer from 0 to 9. 
-  *
-  * This is the function that allows you to set the log level.
-  * The level is an integer between 0 and 9. Higher values mean
-  * more verbosity. The default value is 0. Larger values should
-  * only be used with care, since they may reveal sensitive information.
-  *
-  * Use a log level over 10 to enable all debugging options.
-  *
-  **/
+ * gnutls_global_set_log_level - set the logging level
+ * @level: it's an integer from 0 to 9.
+ *
+ * This is the function that allows you to set the log level.  The
+ * level is an integer between 0 and 9.  Higher values mean more
+ * verbosity. The default value is 0.  Larger values should only be
+ * used with care, since they may reveal sensitive information.
+ *
+ * Use a log level over 10 to enable all debugging options.
+ **/
 void
 gnutls_global_set_log_level (int level)
 {
   _gnutls_log_level = level;
 }
 
-
-#ifdef DEBUG
-/* default logging function */
-static void
-dlog (int level, const char *str)
-{
-  fputs (str, stderr);
-}
-#endif
-
 /**
-  * gnutls_global_set_mem_functions - set the memory allocation functions
-  * @alloc_func: it's the default memory allocation function. Like malloc().
-  * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
-  * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
-  * @realloc_func: A realloc function
-  * @free_func: The function that frees allocated data. Must accept a NULL pointer.
-  *
-  * This is the function were you set the memory allocation functions gnutls
-  * is going to use. By default the libc's allocation functions (malloc(), free()),
-  * are used by gnutls, to allocate both sensitive and not sensitive data.
-  * This function is provided to set the memory allocation functions to
-  * something other than the defaults (ie the gcrypt allocation functions). 
-  *
-  * This function must be called before gnutls_global_init() is called.
-  *
-  **/
+ * gnutls_global_set_mem_functions - set the memory allocation functions
+ * @alloc_func: it's the default memory allocation function. Like malloc().
+ * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
+ * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
+ * @realloc_func: A realloc function
+ * @free_func: The function that frees allocated data. Must accept a NULL pointer.
+ *
+ * This is the function were you set the memory allocation functions
+ * gnutls is going to use. By default the libc's allocation functions
+ * (malloc(), free()), are used by gnutls, to allocate both sensitive
+ * and not sensitive data.  This function is provided to set the
+ * memory allocation functions to something other than the defaults
+ * (ie the gcrypt allocation functions).
+ *
+ * This function must be called before gnutls_global_init() is called.
+ * This function is not thread safe.
+ **/
 void
 gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
 				 gnutls_alloc_function
@@ -146,49 +136,40 @@ gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
 
 }
 
-#ifdef DEBUG
-static void
-_gnutls_gcry_log_handler (void *dummy, int level,
-			  const char *fmt, va_list list)
-{
-  _gnutls_log (fmt, list);
-}
-#endif
-
 static int _gnutls_init = 0;
 
 /**
-  * gnutls_global_init - initialize the global data to defaults.
-  *
-  * This function initializes the global data to defaults.  Every
-  * gnutls application has a global data which holds common parameters
-  * shared by gnutls session structures.  You should call
-  * gnutls_global_deinit() when gnutls usage is no longer needed
-  *
-  * Note that this function will also initialize libgcrypt, if it has
-  * not been initialized before.  Thus if you want to manually
-  * initialize libgcrypt you must do it before calling this function.
-  * This is useful in cases you want to disable libgcrypt's internal
-  * lockings etc.
-  *
-  * This function increment a global counter, so that
-  * gnutls_global_deinit() only releases resources when it has been
-  * called as many times as gnutls_global_init().  This is useful when
-  * GnuTLS is used by more than one library in an application.  This
-  * function can be called many times, but will only do something the
-  * first time.
-  *
-  * Note!  This function is not thread safe.  If two threads call this
-  * function simultaneously, they can cause a race between checking
-  * the global counter and incrementing it, causing both threads to
-  * execute the library initialization code.  That would lead to a
-  * memory leak.  To handle this, your application could invoke this
-  * function after aquiring a thread mutex.  To ignore the potential
-  * memory leak is also an option.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
-  *   otherwise an error code is returned.
-  **/
+ * gnutls_global_init - initialize the global data to defaults.
+ *
+ * This function initializes the global data to defaults.  Every
+ * gnutls application has a global data which holds common parameters
+ * shared by gnutls session structures.  You should call
+ * gnutls_global_deinit() when gnutls usage is no longer needed
+ *
+ * Note that this function will also initialize libgcrypt, if it has
+ * not been initialized before.  Thus if you want to manually
+ * initialize libgcrypt you must do it before calling this function.
+ * This is useful in cases you want to disable libgcrypt's internal
+ * lockings etc.
+ *
+ * This function increment a global counter, so that
+ * gnutls_global_deinit() only releases resources when it has been
+ * called as many times as gnutls_global_init().  This is useful when
+ * GnuTLS is used by more than one library in an application.  This
+ * function can be called many times, but will only do something the
+ * first time.
+ *
+ * Note!  This function is not thread safe.  If two threads call this
+ * function simultaneously, they can cause a race between checking
+ * the global counter and incrementing it, causing both threads to
+ * execute the library initialization code.  That would lead to a
+ * memory leak.  To handle this, your application could invoke this
+ * function after aquiring a thread mutex.  To ignore the potential
+ * memory leak is also an option.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_global_init (void)
 {
@@ -208,13 +189,6 @@ gnutls_global_init (void)
     {
       const char *p;
 
-#ifdef DEBUG
-      /* applications may want to override this, so we only use
-       * it in debugging mode.
-       */
-      gcry_set_log_handler (_gnutls_gcry_log_handler, NULL);
-#endif
-
       p = gcry_check_version (GCRYPT_VERSION);
 
       if (p == NULL)
@@ -230,10 +204,6 @@ gnutls_global_init (void)
 
       gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
     }
-
-#ifdef DEBUG
-  gnutls_global_set_log_function (dlog);
-#endif
 
   /* initialize ASN.1 parser
    * This should not deal with files in the final
@@ -281,15 +251,14 @@ out:
 }
 
 /**
-  * gnutls_global_deinit - deinitialize the global data
-  *
-  * This function deinitializes the global data, that were initialized
-  * using gnutls_global_init().
-  *
-  * Note!  This function is not thread safe.  See the discussion for
-  * gnutls_global_init() for more information.
-  *
-  **/
+ * gnutls_global_deinit - deinitialize the global data
+ *
+ * This function deinitializes the global data, that were initialized
+ * using gnutls_global_init().
+ *
+ * Note!  This function is not thread safe.  See the discussion for
+ * gnutls_global_init() for more information.
+ **/
 void
 gnutls_global_deinit (void)
 {
@@ -305,24 +274,22 @@ gnutls_global_deinit (void)
   _gnutls_init--;
 }
 
-
-/* These functions should be elsewere. Kept here for 
+/* These functions should be elsewere. Kept here for
  * historical reasons.
  */
 
 /**
-  * gnutls_transport_set_pull_function - set a read like function
-  * @pull_func: a callback function similar to read()
-  * @session: gnutls session
-  *
-  * This is the function where you set a function for gnutls 
-  * to receive data. Normally, if you use berkeley style sockets,
-  * do not need to use this function since the default (recv(2)) will 
-  * probably be ok.
-  *
-  * PULL_FUNC is of the form, 
-  * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
-  **/
+ * gnutls_transport_set_pull_function - set a read like function
+ * @pull_func: a callback function similar to read()
+ * @session: gnutls session
+ *
+ * This is the function where you set a function for gnutls to receive
+ * data.  Normally, if you use berkeley style sockets, do not need to
+ * use this function since the default (recv(2)) will probably be ok.
+ *
+ * PULL_FUNC is of the form,
+ * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
+ **/
 void
 gnutls_transport_set_pull_function (gnutls_session_t session,
 				    gnutls_pull_func pull_func)
@@ -331,19 +298,19 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_transport_set_push_function - set the function to send data
-  * @push_func: a callback function similar to write()
-  * @session: gnutls session
-  *
-  * This is the function where you set a push function for gnutls
-  * to use in order to send data. If you are going to use berkeley style
-  * sockets, you do not need to use this function since
-  * the default (send(2)) will probably be ok. Otherwise you should
-  * specify this function for gnutls to be able to send data.
-  *  
-  * PUSH_FUNC is of the form, 
-  * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
-  **/
+ * gnutls_transport_set_push_function - set the function to send data
+ * @push_func: a callback function similar to write()
+ * @session: gnutls session
+ *
+ * This is the function where you set a push function for gnutls to
+ * use in order to send data.  If you are going to use berkeley style
+ * sockets, you do not need to use this function since the default
+ * (send(2)) will probably be ok.  Otherwise you should specify this
+ * function for gnutls to be able to send data.
+ *
+ * PUSH_FUNC is of the form,
+ * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
+ **/
 void
 gnutls_transport_set_push_function (gnutls_session_t session,
 				    gnutls_push_func push_func)
@@ -352,20 +319,18 @@ gnutls_transport_set_push_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_check_version - check the library's version
-  * @req_version: the version to check
-  *
-  * Check that the version of the library is at minimum the requested one
-  * and return the version string; return NULL if the condition is not
-  * satisfied.  If a NULL is passed to this function, no check is done,
-  * but the version string is simply returned.
-  *
-  * See %LIBGNUTLS_VERSION for a suitable @req_version string.
-  *
-  * Return value: Version string of run-time library, or NULL if the
-  *   run-time library does not meet the required version number.  If
-  *   %NULL is passed to this function no check is done and only the
-  *   version string is returned.
+ * gnutls_check_version - checks the libgnutls version
+ * @req_version: version string to compare with, or %NULL.
+ *
+ * Check GnuTLS Library version.
+ *
+ * See %LIBGNUTLS_VERSION for a suitable @req_version string.
+ *
+ * Return value: Check that the version of the library is at
+ *   minimum the one given as a string in @req_version and return the
+ *   actual version string of the library; return %NULL if the
+ *   condition is not met.  If %NULL is passed to this function no
+ *   check is done and only the version string is returned.
   **/
 const char *
 gnutls_check_version (const char *req_version)
