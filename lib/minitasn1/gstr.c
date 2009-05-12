@@ -21,6 +21,7 @@
  */
 
 #include <int.h>
+#include "gstr.h"
 
 /* These function are like strcat, strcpy. They only
  * do bounds checking (they shouldn't cause buffer overruns),

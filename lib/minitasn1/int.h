@@ -39,11 +39,24 @@
 
 #include <libtasn1.h>
 
-/*
-#define LIBTASN1_DEBUG
-#define LIBTASN1_DEBUG_PARSER
-#define LIBTASN1_DEBUG_INTEGER
-*/
+#define ASN1_SMALL_VALUE_SIZE 16
+
+/* This structure is also in libtasn1.h, but then contains less
+   fields.  You cannot make any modifications to these first fields
+   without breaking ABI.  */
+struct node_asn_struct
+{
+  /* public fields: */
+  char *name;			/* Node name */
+  unsigned int type;		/* Node type */
+  unsigned char *value;		/* Node value */
+  int value_len;
+  ASN1_TYPE down;		/* Pointer to the son node */
+  ASN1_TYPE right;		/* Pointer to the brother node */
+  ASN1_TYPE left;		/* Pointer to the next list element */
+  /* private fields: */
+  unsigned char small_value[ASN1_SMALL_VALUE_SIZE];	/* For small values */
+};
 
 #define _asn1_malloc malloc
 #define _asn1_free free
@@ -51,7 +64,7 @@
 #define _asn1_realloc realloc
 #define _asn1_strdup strdup
 
-#define MAX_LOG_SIZE 1024 /* maximum number of characters of a log message */
+#define MAX_LOG_SIZE 1024	/* maximum number of characters of a log message */
 
 /* Define used for visiting trees. */
 #define UP     1
@@ -99,13 +112,13 @@
 #define CONST_EXPLICIT    (1<<11)
 #define CONST_IMPLICIT    (1<<12)
 
-#define CONST_TAG         (1<<13)  /*  Used in ASN.1 assignement  */
+#define CONST_TAG         (1<<13)	/*  Used in ASN.1 assignement  */
 #define CONST_OPTION      (1<<14)
 #define CONST_DEFAULT     (1<<15)
 #define CONST_TRUE        (1<<16)
 #define CONST_FALSE       (1<<17)
 
-#define CONST_LIST        (1<<18)  /*  Used with TYPE_INTEGER and TYPE_BIT_STRING  */
+#define CONST_LIST        (1<<18)	/*  Used with TYPE_INTEGER and TYPE_BIT_STRING  */
 #define CONST_MIN_MAX     (1<<19)
 
 #define CONST_1_PARAM     (1<<20)

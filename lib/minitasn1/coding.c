@@ -28,7 +28,6 @@
 /*****************************************************/
 
 #include <int.h>
-#include <errors.h>
 #include "parser_aux.h"
 #include <gstr.h>
 #include "element.h"
@@ -45,8 +44,8 @@
 /*   ErrorDescription: string returned.               */
 /* Return:                                            */
 /******************************************************/
-void
-_asn1_error_description_value_not_found (ASN1_TYPE  node,
+static void
+_asn1_error_description_value_not_found (ASN1_TYPE node,
 					 char *ErrorDescription)
 {
 
@@ -113,7 +112,7 @@ asn1_length_der (unsigned long int len, unsigned char *ans, int *ans_len)
 /*            (ans[0]..ans[ans_len-1]).               */
 /* Return:                                            */
 /******************************************************/
-void
+static void
 _asn1_tag_der (unsigned char class, unsigned int tag_value,
 	       unsigned char *ans, int *ans_len)
 {
@@ -179,7 +178,7 @@ asn1_octet_der (const unsigned char *str, int str_len,
 /*   ASN1_MEM_ERROR when DER isn't big enough         */
 /*   ASN1_SUCCESS otherwise                           */
 /******************************************************/
-asn1_retCode
+static asn1_retCode
 _asn1_time_der (unsigned char *str, unsigned char *der, int *der_len)
 {
   int len_len;
@@ -250,7 +249,7 @@ _asn1_get_utctime_der(unsigned char *der,int *der_len,unsigned char *str)
 /*   ASN1_MEM_ERROR when DER isn't big enough         */
 /*   ASN1_SUCCESS otherwise                           */
 /******************************************************/
-asn1_retCode
+static asn1_retCode
 _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
 {
   int len_len, counter, k, first, max_len;
@@ -370,8 +369,8 @@ asn1_bit_der (const unsigned char *str, int bit_len,
 /*   ASN1_MEM_ERROR if der vector isn't big enough,   */
 /*   otherwise ASN1_SUCCESS.                          */
 /******************************************************/
-asn1_retCode
-_asn1_complete_explicit_tag (ASN1_TYPE  node, unsigned char *der,
+static asn1_retCode
+_asn1_complete_explicit_tag (ASN1_TYPE node, unsigned char *der,
 			     int *counter, int *max_len)
 {
   ASN1_TYPE p;
@@ -443,8 +442,8 @@ _asn1_complete_explicit_tag (ASN1_TYPE  node, unsigned char *der,
 /*   ASN1_MEM_ERROR if der vector isn't big enough,   */
 /*   otherwise ASN1_SUCCESS.                          */
 /******************************************************/
-asn1_retCode
-_asn1_insert_tag_der (ASN1_TYPE  node, unsigned char *der, int *counter,
+static asn1_retCode
+_asn1_insert_tag_der (ASN1_TYPE node, unsigned char *der, int *counter,
 		      int *max_len)
 {
   ASN1_TYPE p;
@@ -604,8 +603,8 @@ _asn1_insert_tag_der (ASN1_TYPE  node, unsigned char *der, int *counter,
 /*   node: pointer to the SET element.                */
 /* Return:                                            */
 /******************************************************/
-void
-_asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE  node)
+static void
+_asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE node)
 {
   struct vet
   {
@@ -718,8 +717,8 @@ _asn1_ordering_set (unsigned char *der, int der_len, ASN1_TYPE  node)
 /*   node: pointer to the SET OF element.             */
 /* Return:                                            */
 /******************************************************/
-void
-_asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE  node)
+static void
+_asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE node)
 {
   struct vet
   {

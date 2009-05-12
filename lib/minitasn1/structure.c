@@ -29,7 +29,6 @@
 
 
 #include <int.h>
-#include <errors.h>
 #include <structure.h>
 #include "parser_aux.h"
 #include <gstr.h>
@@ -70,7 +69,7 @@ _asn1_add_node_only (unsigned int type)
 /* Return: NULL if not found.                                     */
 /******************************************************************/
 ASN1_TYPE
-_asn1_find_left (ASN1_TYPE  node)
+_asn1_find_left (ASN1_TYPE node)
 {
   if ((node == NULL) || (node->left == NULL) || (node->left->down == node))
     return NULL;
@@ -387,7 +386,7 @@ asn1_delete_element (ASN1_TYPE structure, const char *element_name)
 }
 
 ASN1_TYPE
-_asn1_copy_structure3 (ASN1_TYPE  source_node)
+_asn1_copy_structure3 (ASN1_TYPE source_node)
 {
   ASN1_TYPE dest_node, p_s, p_d, p_d_prev;
   int move;
@@ -409,7 +408,7 @@ _asn1_copy_structure3 (ASN1_TYPE  source_node)
 	  if (p_s->name)
 	    _asn1_set_name (p_d, p_s->name);
 	  if (p_s->value)
-             _asn1_set_value (p_d, p_s->value, p_s->value_len);
+	    _asn1_set_value (p_d, p_s->value, p_s->value_len);
 	  move = DOWN;
 	}
       else
@@ -456,7 +455,7 @@ _asn1_copy_structure3 (ASN1_TYPE  source_node)
 
 
 static ASN1_TYPE
-_asn1_copy_structure2 (ASN1_TYPE  root, const char *source_name)
+_asn1_copy_structure2 (ASN1_TYPE root, const char *source_name)
 {
   ASN1_TYPE source_node;
 
@@ -467,8 +466,8 @@ _asn1_copy_structure2 (ASN1_TYPE  root, const char *source_name)
 }
 
 
-asn1_retCode
-_asn1_type_choice_config (ASN1_TYPE  node)
+static asn1_retCode
+_asn1_type_choice_config (ASN1_TYPE node)
 {
   ASN1_TYPE p, p2, p3, p4;
   int move, tlen;
@@ -552,8 +551,8 @@ _asn1_type_choice_config (ASN1_TYPE  node)
 }
 
 
-asn1_retCode
-_asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE  root)
+static asn1_retCode
+_asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE root)
 {
   ASN1_TYPE p, p2, p3;
   char name2[ASN1_MAX_NAME_SIZE + 2];

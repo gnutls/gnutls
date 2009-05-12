@@ -28,13 +28,14 @@
 
 
 #include <int.h>
-#include <errors.h>
 #include "parser_aux.h"
 #include <gstr.h>
 #include "structure.h"
 
+#include "element.h"
+
 void
-_asn1_hierarchical_name (ASN1_TYPE  node, char *name, int name_size)
+_asn1_hierarchical_name (ASN1_TYPE node, char *name, int name_size)
 {
   ASN1_TYPE p;
   char tmp_name[64];
@@ -115,21 +116,19 @@ _asn1_convert_integer (const char *value, unsigned char *value_out,
   for (k2 = k; k2 < SIZEOF_UNSIGNED_LONG_INT; k2++)
     value_out[k2 - k] = val[k2];
 
-
-#ifdef LIBTASN1_DEBUG_INTEGER
-  _libtasn1_log ("_asn1_convert_integer: valueIn=%s, lenOut=%d", value, *len);
+#if 0
+  printf ("_asn1_convert_integer: valueIn=%s, lenOut=%d", value, *len);
   for (k = 0; k < SIZEOF_UNSIGNED_LONG_INT; k++)
-    _libtasn1_log (", vOut[%d]=%d", k, value_out[k]);
-  _libtasn1_log ("\n");
+    printf (", vOut[%d]=%d", k, value_out[k]);
+  printf ("\n");
 #endif
-
 
   return ASN1_SUCCESS;
 }
 
 
 int
-_asn1_append_sequence_set (ASN1_TYPE  node)
+_asn1_append_sequence_set (ASN1_TYPE node)
 {
   ASN1_TYPE p, p2;
   char temp[10];
@@ -281,6 +280,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
   ASN1_TYPE node, p, p2;
   unsigned char *temp, *value_temp = NULL, *default_temp = NULL;
   int len2, k, k2, negative;
+  size_t i;
   const unsigned char *value = ivalue;
 
   node = asn1_find_node (node_root, name);
@@ -417,7 +417,7 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	  (!negative && (value_temp[k] & 0x80)))
 	k--;
 
-      _asn1_set_value_octet (node, value_temp+k, len-k);
+      _asn1_set_value_octet (node, value_temp + k, len - k);
 
       if (node->type & CONST_DEFAULT)
 	{
@@ -492,8 +492,8 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
       _asn1_free (value_temp);
       break;
     case TYPE_OBJECT_ID:
-      for (k = 0; k < strlen (value); k++)
-	if ((!isdigit (value[k])) && (value[k] != '.') && (value[k] != '+'))
+      for (i = 0; i < strlen (value); i++)
+	if ((!isdigit (value[i])) && (value[i] != '.') && (value[i] != '+'))
 	  return ASN1_VALUE_NOT_VALID;
       if (node->type & CONST_DEFAULT)
 	{
@@ -636,8 +636,8 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	}
 
 #define ADD_STR_VALUE( ptr, ptr_size, data) \
-	*len = strlen(data) + 1; \
-	if (ptr_size < strlen(ptr)+(*len)) { \
+	*len = (int) strlen(data) + 1; \
+	if (ptr_size < (int) strlen(ptr)+(*len)) { \
 		return ASN1_MEM_ERROR; \
 	} else { \
 		/* this strcat is checked */ \

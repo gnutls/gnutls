@@ -27,7 +27,6 @@
 /*****************************************************/
 
 #include <int.h>
-#include <errors.h>
 #include "parser_aux.h"
 #include <gstr.h>
 #include "structure.h"
@@ -181,11 +180,11 @@ asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len)
   int ret;
   long err;
 
-  ret = asn1_get_length_der( ber, ber_len, len);
+  ret = asn1_get_length_der (ber, ber_len, len);
   if (ret == -1)
-    {			/* indefinite length method */
+    {				/* indefinite length method */
       ret = ber_len;
-      err = _asn1_get_indefinite_length_string (ber+1, &ret);
+      err = _asn1_get_indefinite_length_string (ber + 1, &ret);
       if (err != ASN1_SUCCESS)
 	return -3;
     }
@@ -237,7 +236,7 @@ asn1_get_octet_der (const unsigned char *der, int der_len,
 
 /* Returns ASN1_SUCCESS on success or an error code on error.
  */
-int
+static int
 _asn1_get_time_der (const unsigned char *der, int der_len, int *ret_len,
 		    char *str, int str_size)
 {
@@ -257,7 +256,7 @@ _asn1_get_time_der (const unsigned char *der, int der_len, int *ret_len,
 
 
 
-void
+static void
 _asn1_get_objectid_der (const unsigned char *der, int der_len, int *ret_len,
 			char *str, int str_size)
 {
@@ -340,7 +339,7 @@ asn1_get_bit_der (const unsigned char *der, int der_len,
 
 
 
-int
+static int
 _asn1_extract_tag_der (ASN1_TYPE node, const unsigned char *der, int der_len,
 		       int *ret_len)
 {
@@ -386,7 +385,7 @@ _asn1_extract_tag_der (ASN1_TYPE node, const unsigned char *der, int der_len,
 					 &len2);
 		  if (len3 < 0)
 		    return ASN1_DER_ERROR;
-                  
+
 		  counter += len2;
 		  if (counter > der_len)
 		    return ASN1_DER_ERROR;
@@ -539,7 +538,7 @@ _asn1_extract_tag_der (ASN1_TYPE node, const unsigned char *der, int der_len,
 }
 
 
-int
+static int
 _asn1_delete_not_used (ASN1_TYPE node)
 {
   ASN1_TYPE p, p2;
@@ -598,49 +597,53 @@ _asn1_delete_not_used (ASN1_TYPE node)
   return ASN1_SUCCESS;
 }
 
-asn1_retCode _asn1_extract_der_octet(ASN1_TYPE node, const unsigned char *der, int der_len)
+static asn1_retCode
+_asn1_extract_der_octet (ASN1_TYPE node, const unsigned char *der,
+			 int der_len)
 {
-int len2, len3;
-int counter2, counter_end;
+  int len2, len3;
+  int counter2, counter_end;
 
-    len2 = asn1_get_length_der (der, der_len, &len3);
-    if (len2 < -1)
-        return ASN1_DER_ERROR;
+  len2 = asn1_get_length_der (der, der_len, &len3);
+  if (len2 < -1)
+    return ASN1_DER_ERROR;
 
-    counter2 = len3 + 1;
+  counter2 = len3 + 1;
 
-    if (len2 == -1)
-        counter_end = der_len - 2;
-    else
-        counter_end = der_len;
+  if (len2 == -1)
+    counter_end = der_len - 2;
+  else
+    counter_end = der_len;
 
-    while (counter2 < counter_end)
-      {
-	len2 = asn1_get_length_der (der + counter2, der_len - counter2, &len3);
+  while (counter2 < counter_end)
+    {
+      len2 = asn1_get_length_der (der + counter2, der_len - counter2, &len3);
 
-        if (len2 < -1)
-	  return ASN1_DER_ERROR;
+      if (len2 < -1)
+	return ASN1_DER_ERROR;
 
-	if (len2 > 0)
-	  {
-	    _asn1_append_value( node, der + counter2 + len3, len2);
-          }
-        else
-          { /* indefinite */
-            
-            len2 = _asn1_extract_der_octet( node, der+counter2+len3, der_len-counter2-len3);
-            if (len2 < 0)
-                return len2;
-          }
+      if (len2 > 0)
+	{
+	  _asn1_append_value (node, der + counter2 + len3, len2);
+	}
+      else
+	{			/* indefinite */
 
-        counter2 += len2 + len3 + 1;
-      }
-      
-      return ASN1_SUCCESS;
+	  len2 =
+	    _asn1_extract_der_octet (node, der + counter2 + len3,
+				     der_len - counter2 - len3);
+	  if (len2 < 0)
+	    return len2;
+	}
+
+      counter2 += len2 + len3 + 1;
+    }
+
+  return ASN1_SUCCESS;
 }
 
 
-asn1_retCode
+static asn1_retCode
 _asn1_get_octet_string (const unsigned char *der, ASN1_TYPE node, int *len)
 {
   int len2, len3, counter, tot_len, indefinite;
@@ -692,17 +695,17 @@ _asn1_get_octet_string (const unsigned char *der, ASN1_TYPE node, int *len)
 	{
 	  unsigned char temp[DER_LEN];
 	  int ret;
-	  
-	  len2 = sizeof(temp);
+
+	  len2 = sizeof (temp);
 
 	  asn1_length_der (tot_len, temp, &len2);
 	  _asn1_set_value (node, temp, len2);
 
 	  tot_len += len2;
 
- 	  ret = _asn1_extract_der_octet(node, der, *len);
- 	  if (ret!=ASN1_SUCCESS)
-             return ret;
+	  ret = _asn1_extract_der_octet (node, der, *len);
+	  if (ret != ASN1_SUCCESS)
+	    return ret;
 
 	}
     }
@@ -1241,7 +1244,7 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 	      if (len4 != -1)
 		{
 		  len2 += len4;
-		  _asn1_set_value_octet (p, der+counter, len2+len3);
+		  _asn1_set_value_octet (p, der + counter, len2 + len3);
 		  counter += len2 + len3;
 		}
 	      else
@@ -1261,7 +1264,7 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 		      return ris;
 		    }
 
-		  _asn1_set_value_octet (p, der+counter, len2);
+		  _asn1_set_value_octet (p, der + counter, len2);
 		  counter += len2;
 
 		  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
@@ -1907,7 +1910,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 		  len2 += len4;
 		  if (state == FOUND)
 		    {
-		      _asn1_set_value_octet (p, der+counter, len2+len3);
+		      _asn1_set_value_octet (p, der + counter, len2 + len3);
 		      temp2 = NULL;
 
 		      if (p == nodeFound)
@@ -1934,7 +1937,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 
 		  if (state == FOUND)
 		    {
-		      _asn1_set_value_octet (p, der+counter, len2);
+		      _asn1_set_value_octet (p, der + counter, len2);
 
 		      if (p == nodeFound)
 			state = EXIT;
