@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -155,15 +155,15 @@ gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
 #ifdef ENABLE_OPENPGP
 
 /**
-  * gnutls_certificate_get_openpgp_keyring - Used to export the keyring from a gnutls_certificate_credentials_t structure
-  * @sc: is an #gnutls_certificate_credentials_t structure.
-  * @ring: the exported keyring. Should be treated as constant
-  *
-  * This function will export the OpenPGP keyring associated with the
-  * given credentials.
-  *
-  * Since: 2.4.0
-  **/
+ * gnutls_certificate_get_openpgp_keyring - export keyring from a #gnutls_certificate_credentials_t
+ * @sc: is an #gnutls_certificate_credentials_t structure.
+ * @keyring: the exported keyring. Should be treated as constant
+ *
+ * This function will export the OpenPGP keyring associated with the
+ * given credentials.
+ *
+ * Since: 2.4.0
+ **/
 void
 gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc,
 					gnutls_openpgp_keyring_t * keyring)
