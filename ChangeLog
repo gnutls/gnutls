@@ -1,3 +1,133 @@
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.10.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/tests/Makefile.am, gl/tests/test-alignof.c, lib/gl/Makefile.am,
+	lib/gl/m4/gnulib-cache.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/tests/Makefile.am, lib/gl/tests/test-alignof.c: Avoid failing
+	tests.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_auth.c, lib/gnutls_buffers.c,
+	lib/gnutls_cert.c, lib/gnutls_global.c, lib/gnutls_priority.c,
+	lib/gnutls_psk.c, lib/gnutls_session.c, lib/gnutls_state.c,
+	lib/includes/gnutls/gnutls.h.in, lib/includes/gnutls/openpgp.h,
+	lib/includes/gnutls/pkcs12.h, lib/includes/gnutls/x509.h,
+	lib/openpgp/extras.c, lib/openpgp/gnutls_openpgp.c,
+	lib/openpgp/pgp.c, lib/openpgp/privkey.c, lib/x509/crq.c,
+	lib/x509/dn.c, lib/x509/pkcs12_bag.c, lib/x509/x509.c,
+	lib/x509/x509_write.c, libextra/gnutls_ia.c: Doc fixes for GTK-DOC.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_server_name.c, lib/gnutls_priority.c,
+	lib/gnutls_record.c, lib/gnutls_srp.c, lib/gnutls_state.c,
+	lib/gnutls_ui.c, lib/gnutls_x509.c,
+	lib/includes/gnutls/gnutls.h.in, lib/includes/gnutls/x509.h,
+	lib/x509/crq.c, lib/x509/dn.c, lib/x509/pkcs7.c,
+	lib/x509/privkey.c, lib/x509/verify.c, lib/x509/x509.c,
+	lib/x509/x509_write.c: Doc fixes for GTK-DOC.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/crypto.h, lib/includes/gnutls/openpgp.h,
+	lib/includes/gnutls/x509.h, lib/openpgp/gnutls_openpgp.c,
+	lib/x509/dn.c, lib/x509/output.c, lib/x509/pkcs7.c,
+	lib/x509/verify.c, lib/x509/x509.c: Doc fixes for GTK-DOC.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-alert.c, doc/examples/ex-cert-select.c,
+	doc/examples/ex-client-psk.c, doc/examples/ex-client-resume.c,
+	doc/examples/ex-client-srp.c, doc/examples/ex-client-tlsia.c,
+	doc/examples/ex-client1.c, doc/examples/ex-client2.c,
+	doc/examples/ex-crq.c, doc/examples/ex-pkcs12.c,
+	doc/examples/ex-rfc2818.c, doc/examples/ex-serv-anon.c,
+	doc/examples/ex-serv-export.c, doc/examples/ex-serv-pgp.c,
+	doc/examples/ex-serv-psk.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, doc/examples/ex-session-info.c,
+	doc/examples/ex-verify.c, doc/examples/ex-x509-info.c,
+	doc/examples/tcp.c: Place examples in public domain.  After
+	discussion with Karl.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/alignof.h, gl/m4/gnulib-comp.m4, gl/tests/Makefile.am,
+	gl/tests/test-alignof.c, lib/gl/alignof.h,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/tests/Makefile.am,
+	lib/gl/tests/test-alignof.c, maint.mk: Update gnulib files.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/keydb.c: Avoid sprintf.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-client-tlsia.c, lib/opencdk/literal.c,
+	lib/opencdk/misc.c, src/common.c, tests/chainverify.c,
+	tests/tlsia.c: Fix warnings.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pk-libgcrypt.c: Fix crash.
+
+2009-05-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c: Doc fix.
+
+2009-05-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_dh_primes.c: Doc fix.
+
+2009-05-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/Makefile.am, lib/minitasn1/errors.h: Drop removed
+	libtasn1 file.
+
+2009-05-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/coding.c, lib/minitasn1/decoding.c,
+	lib/minitasn1/element.c, lib/minitasn1/element.h,
+	lib/minitasn1/errors.c, lib/minitasn1/gstr.c, lib/minitasn1/gstr.h,
+	lib/minitasn1/int.h, lib/minitasn1/libtasn1.h,
+	lib/minitasn1/parser_aux.c, lib/minitasn1/parser_aux.h,
+	lib/minitasn1/structure.c, lib/minitasn1/structure.h: Upgrade
+	libtasn1 to v2.1.
+
+2009-05-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c, libextra/gnutls_extra.c: Doc fixes.  Remove
+	debugging code.
+
+2009-05-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-05-11  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-05-11  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.9.
