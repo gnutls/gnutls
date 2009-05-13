@@ -1,9 +1,4 @@
-/* Copyright 2007, 2008 Free Software Foundation
- *
- * Copying and distribution of this file, with or without modification,
- * are permitted in any medium without royalty provided the copyright
- * notice and this notice are preserved.
- */
+/* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
