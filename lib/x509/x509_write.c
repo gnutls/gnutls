@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -541,8 +541,8 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
  **/
 int
 gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
-					      gnutls_x509_subject_alt_name_t
-					      type, const char *data_string)
+					      gnutls_x509_subject_alt_name_t type,
+					      const char *data_string)
 {
   if (crt == NULL)
     {
@@ -897,8 +897,8 @@ disable_optional_stuff (gnutls_x509_crt_t cert)
  **/
 int
 gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
-				     gnutls_x509_subject_alt_name_t
-				     type, const void *data_string,
+				     gnutls_x509_subject_alt_name_t type,
+				     const void *data_string,
 				     unsigned int reason_flags)
 {
   return gnutls_x509_crt_set_crl_dist_points2 (crt, type, data_string,

@@ -653,44 +653,44 @@ read_key_file (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an #gnutls_certificate_credentials_t structure.
-  * @cert: contains a certificate list (path) for the specified private key
-  * @key: is the private key, or %NULL
-  * @type: is PEM or DER
-  *
-  * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials_t structure. This function may be called
-  * more than once (in case multiple keys/certificates exist for the
-  * server).
-  *
-  * Currently are supported: RSA PKCS-1 encoded private keys, 
-  * DSA private keys.
-  *
-  * DSA private keys are encoded the OpenSSL way, which is an ASN.1
-  * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
-  *
-  * Note that the keyUsage (2.5.29.15) PKIX extension in X.509 certificates 
-  * is supported. This means that certificates intended for signing cannot
-  * be used for ciphersuites that require encryption.
-  *
-  * If the certificate and the private key are given in PEM encoding
-  * then the strings that hold their values must be null terminated.
-  *
-  * The @key may be %NULL if you are using a sign callback, see
-  * gnutls_sign_callback_set().
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials_t structure
+ * @res: is an #gnutls_certificate_credentials_t structure.
+ * @cert: contains a certificate list (path) for the specified private key
+ * @key: is the private key, or %NULL
+ * @type: is PEM or DER
+ *
+ * This function sets a certificate/private key pair in the
+ * gnutls_certificate_credentials_t structure. This function may be called
+ * more than once (in case multiple keys/certificates exist for the
+ * server).
+ *
+ * Currently are supported: RSA PKCS-1 encoded private keys,
+ * DSA private keys.
+ *
+ * DSA private keys are encoded the OpenSSL way, which is an ASN.1
+ * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
+ *
+ * Note that the keyUsage (2.5.29.15) PKIX extension in X.509 certificates
+ * is supported. This means that certificates intended for signing cannot
+ * be used for ciphersuites that require encryption.
+ *
+ * If the certificate and the private key are given in PEM encoding
+ * then the strings that hold their values must be null terminated.
+ *
+ * The @key may be %NULL if you are using a sign callback, see
+ * gnutls_sign_callback_set().
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
-gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t
-				     res, const gnutls_datum_t * cert,
+gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
+				     const gnutls_datum_t * cert,
 				     const gnutls_datum_t * key,
 				     gnutls_x509_crt_fmt_t type)
 {
   int ret;
 
-  /* this should be first 
+  /* this should be first
    */
   if ((ret = read_key_mem (res, key ? key->data : NULL,
 			   key ? key->size : 0, type)) < 0)
@@ -798,37 +798,37 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_x509_key_file - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an #gnutls_certificate_credentials_t structure.
-  * @CERTFILE: is a file that containing the certificate list (path) for
-  * the specified private key, in PKCS7 format, or a list of certificates
-  * @KEYFILE: is a file that contains the private key
-  * @type: is PEM or DER
-  *
-  * This function sets a certificate/private key pair in the
-  * gnutls_certificate_credentials_t structure.  This function may be
-  * called more than once (in case multiple keys/certificates exist
-  * for the server).
-  *
-  * Currently only PKCS-1 encoded RSA and DSA private keys are accepted by
-  * this function.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_certificate_set_x509_key_file - Used to set keys in a gnutls_certificate_credentials_t structure
+ * @res: is an #gnutls_certificate_credentials_t structure.
+ * @certfile: is a file that containing the certificate list (path) for
+ *   the specified private key, in PKCS7 format, or a list of certificates
+ * @keyfile: is a file that contains the private key
+ * @type: is PEM or DER
+ *
+ * This function sets a certificate/private key pair in the
+ * gnutls_certificate_credentials_t structure.  This function may be
+ * called more than once (in case multiple keys/certificates exist
+ * for the server).
+ *
+ * Currently only PKCS-1 encoded RSA and DSA private keys are accepted by
+ * this function.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
-gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t
-				      res, const char *CERTFILE,
-				      const char *KEYFILE,
+gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t res,
+				      const char *certfile,
+				      const char *keyfile,
 				      gnutls_x509_crt_fmt_t type)
 {
   int ret;
 
   /* this should be first 
    */
-  if ((ret = read_key_file (res, KEYFILE, type)) < 0)
+  if ((ret = read_key_file (res, keyfile, type)) < 0)
     return ret;
 
-  if ((ret = read_cert_file (res, CERTFILE, type)) < 0)
+  if ((ret = read_cert_file (res, certfile, type)) < 0)
     return ret;
 
   res->ncerts++;
@@ -1117,8 +1117,8 @@ parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
   * on error.
   **/
 int
-gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t
-				       res, const gnutls_datum_t * ca,
+gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t res,
+				       const gnutls_datum_t * ca,
 				       gnutls_x509_crt_fmt_t type)
 {
   int ret, ret2;
@@ -1219,8 +1219,8 @@ gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
   * error.
   **/
 int
-gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
-					res, const char *cafile,
+gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
+					const char *cafile,
 					gnutls_x509_crt_fmt_t type)
 {
   int ret, ret2;
@@ -1434,8 +1434,8 @@ read_crl_mem (gnutls_certificate_credentials_t res, const void *crl,
   * Returns: number of CRLs processed, or a negative value on error.
   **/
 int
-gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t
-				     res, const gnutls_datum_t * CRL,
+gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t res,
+				     const gnutls_datum_t * CRL,
 				     gnutls_x509_crt_fmt_t type)
 {
   int ret;
@@ -1516,8 +1516,8 @@ gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
   * Returns: number of CRLs processed or a negative value on error.
   **/
 int
-gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t
-				      res, const char *crlfile,
+gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t res,
+				      const char *crlfile,
 				      gnutls_x509_crt_fmt_t type)
 {
   int ret;

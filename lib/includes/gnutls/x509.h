@@ -158,13 +158,13 @@ extern "C"
 					   unsigned int *reason_flags,
 					   unsigned int *critical);
   int gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
-					    gnutls_x509_subject_alt_name_t
-					    type, const void *data,
+					    gnutls_x509_subject_alt_name_t type,
+					    const void *data,
 					    unsigned int data_size,
 					    unsigned int reason_flags);
   int gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
-					   gnutls_x509_subject_alt_name_t
-					   type, const void *data_string,
+					   gnutls_x509_subject_alt_name_t type,
+					   const void *data_string,
 					   unsigned int reason_flags);
   int gnutls_x509_crt_cpy_crl_dist_points (gnutls_x509_crt_t dst,
 					   gnutls_x509_crt_t src);
@@ -264,10 +264,8 @@ extern "C"
 					     unsigned int ca,
 					     int pathLenConstraint);
   int gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
-						    gnutls_x509_subject_alt_name_t
-						    type,
+						    gnutls_x509_subject_alt_name_t type,
 						    const char *data_string);
-
   int gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
 					    gnutls_x509_subject_alt_name_t type,
 					    const void *data,
@@ -342,14 +340,14 @@ extern "C"
 
   int gnutls_x509_dn_init (gnutls_x509_dn_t * dn);
 
-  int gnutls_x509_dn_import (gnutls_x509_dn_t odn,
+  int gnutls_x509_dn_import (gnutls_x509_dn_t dn,
 			     const gnutls_datum_t * data);
 
   int gnutls_x509_dn_export (gnutls_x509_dn_t dn,
 			     gnutls_x509_crt_fmt_t format, void *output_data,
 			     size_t * output_data_size);
 
-  void gnutls_x509_dn_deinit (gnutls_x509_dn_t idn);
+  void gnutls_x509_dn_deinit (gnutls_x509_dn_t dn);
 
 
 /* CRL handling functions.
@@ -686,8 +684,8 @@ extern "C"
   int gnutls_x509_crq_set_dn_by_oid (gnutls_x509_crq_t crq,
 				     const char *oid,
 				     unsigned int raw_flag,
-				     const void *name,
-				     unsigned int sizeof_name);
+				     const void *data,
+				     unsigned int sizeof_data);
   int gnutls_x509_crq_set_version (gnutls_x509_crq_t crq,
 				   unsigned int version);
   int gnutls_x509_crq_get_version (gnutls_x509_crq_t crq);

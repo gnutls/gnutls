@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1176,9 +1176,10 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
   * gnutls_record_get_max_size - returns the maximum record size
   * @session: is a #gnutls_session_t structure.
   *
-  * This function returns the maximum record packet size in this
-  * connection.  The maximum record size is negotiated by the client
-  * after the first handshake message.
+  * Get the record size.  The maximum record size is negotiated by the
+  * client after the first handshake message.
+  *
+  * Returns: The maximum record packet size in this connection.
   **/
 size_t
 gnutls_record_get_max_size (gnutls_session_t session)
@@ -1191,22 +1192,25 @@ gnutls_record_get_max_size (gnutls_session_t session)
 
 
 /**
-  * gnutls_record_set_max_size - sets the maximum record size
-  * @session: is a #gnutls_session_t structure.
-  * @size: is the new size
-  *
-  * This function sets the maximum record packet size in this
-  * connection.  This property can only be set to clients.  The server
-  * may choose not to accept the requested size.
-  *
-  * Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and
-  * 4096(=2^12).  Returns 0 on success. The requested record size does
-  * get in effect immediately only while sending data. The receive
-  * part will take effect after a successful handshake.
-  *
-  * This function uses a TLS extension called 'max record size'.  Not
-  * all TLS implementations use or even understand this extension.
-  **/
+ * gnutls_record_set_max_size - sets the maximum record size
+ * @session: is a #gnutls_session_t structure.
+ * @size: is the new size
+ *
+ * This function sets the maximum record packet size in this
+ * connection.  This property can only be set to clients.  The server
+ * may choose not to accept the requested size.
+ *
+ * Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and
+ * 4096(=2^12).  The requested record size does get in effect
+ * immediately only while sending data. The receive part will take
+ * effect after a successful handshake.
+ *
+ * This function uses a TLS extension called 'max record size'.  Not
+ * all TLS implementations use or even understand this extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 ssize_t
 gnutls_record_set_max_size (gnutls_session_t session, size_t size)
 {

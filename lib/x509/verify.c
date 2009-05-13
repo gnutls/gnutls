@@ -378,17 +378,17 @@ cleanup:
 }
 
 /**
-  * gnutls_x509_crt_check_issuer - This function checks if the certificate given has the given issuer
-  * @cert: is the certificate to be checked
-  * @issuer: is the certificate of a possible issuer
-  *
-  * This function will check if the given certificate was issued by the
-  * given issuer. It will return true (1) if the given certificate is issued
-  * by the given issuer, and false (0) if not.
-  *
-  * A negative value is returned in case of an error.
-  *
-  **/
+ * gnutls_x509_crt_check_issuer - check if certificate has given issuer
+ * @cert: is the certificate to be checked
+ * @issuer: is the certificate of a possible issuer
+ *
+ * This function will check if the given certificate was issued by the
+ * given issuer.
+ *
+ * Returns: It will return true (1) if the given certificate is issued
+ *   by the given issuer, and false (0) if not.  A negative value is
+ *   returned in case of an error.
+ **/
 int
 gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
 			      gnutls_x509_crt_t issuer)

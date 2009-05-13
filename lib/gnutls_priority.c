@@ -404,15 +404,15 @@ prio_add (priority_st * priority_list, unsigned int algo)
 
 
 /**
-  * gnutls_priority_set - Sets priorities for the cipher suites supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @priority: is a #gnutls_priority_t structure.
-  *
-  * Sets the priorities to use on the ciphers, key exchange methods,
-  * macs and compression methods. 
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_priority_set - Sets priorities for the cipher suites supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @priority: is a #gnutls_priority_t structure.
+ *
+ * Sets the priorities to use on the ciphers, key exchange methods,
+ * macs and compression methods.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 {
@@ -677,12 +677,11 @@ error:
 }
 
 /**
-  * gnutls_priority_deinit - Deinitialize the priorities cache for the cipher suites supported by gnutls.
-  * @priority_cache: is a #gnutls_prioritity_t structure.
-  *
-  * Deinitializes the priority cache.
-  *
-  **/
+ * gnutls_priority_deinit - deinitialize the priorities cache
+ * @priority_cache: is a #gnutls_prioritity_t structure.
+ *
+ * Deinitializes the priority cache.
+ **/
 void
 gnutls_priority_deinit (gnutls_priority_t priority_cache)
 {
@@ -691,21 +690,22 @@ gnutls_priority_deinit (gnutls_priority_t priority_cache)
 
 
 /**
-  * gnutls_priority_set_direct - Sets priorities for the cipher suites supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @priorities: is a string describing priorities
-  * @err_pos: In case of an error this will have the position in the string the error occured
-  *
-  * Sets the priorities to use on the ciphers, key exchange methods,
-  * macs and compression methods. This function avoids keeping a
-  * priority cache and is used to directly set string priorities to a
-  * TLS session.  For documentation check the gnutls_priority_init().
-  *
-  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
-  * %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_priority_set_direct - Sets priorities for the cipher suites supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @priorities: is a string describing priorities
+ * @err_pos: In case of an error this will have the position in the string the error occured
+ *
+ * Sets the priorities to use on the ciphers, key exchange methods,
+ * macs and compression methods.  This function avoids keeping a
+ * priority cache and is used to directly set string priorities to a
+ * TLS session.  For documentation check the gnutls_priority_init().
+ *
+ * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
+ * %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
-gnutls_priority_set_direct (gnutls_session_t session, const char *priorities,
+gnutls_priority_set_direct (gnutls_session_t session,
+			    const char *priorities,
 			    const char **err_pos)
 {
   gnutls_priority_t prio;

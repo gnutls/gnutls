@@ -1175,12 +1175,12 @@ get_subject_alt_name (gnutls_x509_crt_t cert,
   * recognized.
   *
   * Returns: the alternative subject name type on success, one of the
-  * enumerated #gnutls_x509_subject_alt_name_t.  It will return
-  * %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough to
-  * hold the value.  In that case @ret_size will be updated with the
-  * required size.  If the certificate does not have an Alternative
-  * name with the specified sequence number then
-  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+  *   enumerated #gnutls_x509_subject_alt_name_t.  It will return
+  *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough
+  *   to hold the value.  In that case @ret_size will be updated with
+  *   the required size.  If the certificate does not have an
+  *   Alternative name with the specified sequence number then
+  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
   **/
 int
 gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
@@ -1192,23 +1192,29 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
 }
 
 /**
-  * gnutls_x509_crt_get_subject_alt_name2 - Get certificate's alternative name, if any
-  * @cert: should contain a #gnutls_x509_crt_t structure
-  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
-  * @ret: is the place where the alternative name will be copied to
-  * @ret_size: holds the size of ret.
-  * @ret_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
-  * @critical: will be non zero if the extension is marked as critical (may be null)
-  *
-  * This function will return the alternative names, contained in the
-  * given certificate. It is the same as gnutls_x509_crt_get_subject_alt_name()
-  * except for the fact that it will return the type of the alternative
-  * name in @ret_type even if the function fails for some reason (i.e.
-  * the buffer provided is not enough).
-  *
-  * The return values are the same as with gnutls_x509_crt_get_subject_alt_name().
-  *
-  **/
+ * gnutls_x509_crt_get_subject_alt_name2 - Get certificate's alternative name, if any
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+ * @ret: is the place where the alternative name will be copied to
+ * @ret_size: holds the size of ret.
+ * @ret_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
+ * @critical: will be non zero if the extension is marked as critical (may be null)
+ *
+ * This function will return the alternative names, contained in the
+ * given certificate. It is the same as
+ * gnutls_x509_crt_get_subject_alt_name() except for the fact that it
+ * will return the type of the alternative name in @ret_type even if
+ * the function fails for some reason (i.e.  the buffer provided is
+ * not enough).
+ *
+ * Returns: the alternative subject name type on success, one of the
+ *   enumerated #gnutls_x509_subject_alt_name_t.  It will return
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough
+ *   to hold the value.  In that case @ret_size will be updated with
+ *   the required size.  If the certificate does not have an
+ *   Alternative name with the specified sequence number then
+ *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+ **/
 int
 gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
 				       unsigned int seq, void *ret,
@@ -1414,16 +1420,15 @@ gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
  * @pathlen: pointer to output integer indicating path length (may be
  *   NULL), non-negative values indicate a present pCPathLenConstraint
  *   field and the actual value, -1 indicate that the field is absent.
+ * @policyLanguage: output variable with OID of policy language
+ * @policy: output variable with policy data
+ * @sizeof_policy: output variable size of policy data
  *
- * This function will read the certificate's basic constraints, and
- * return the certificates CA status.  It reads the basicConstraints
- * X.509 extension (2.5.29.19).
+ * This function will get information from a proxy certificate.  It
+ * reads the ProxyCertInfo X.509 extension (1.3.6.1.5.5.7.1.14).
  *
- * Return value: If the certificate is a CA a positive value will be
- * returned, or zero if the certificate does not have CA flag set.  A
- * negative value may be returned in case of errors.  If the
- * certificate does not contain the basicConstraints extension
- * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
  **/
 int
 gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
@@ -1471,23 +1476,23 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
 }
 
 /**
-  * gnutls_x509_crt_get_extension_by_oid - This function returns the specified extension
-  * @cert: should contain a #gnutls_x509_crt_t structure
-  * @oid: holds an Object Identified in null terminated string
-  * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use zero to get the first one.
-  * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initially holds the size of @buf
-  * @critical: will be non zero if the extension is marked as critical
-  *
-  * This function will return the extension specified by the OID in the certificate.
-  * The extensions will be returned as binary data DER encoded, in the provided
-  * buffer.
-  *
-  * A negative value may be returned in case of parsing error.
-  * If the certificate does not contain the specified extension
-  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
-  *
-  **/
+ * gnutls_x509_crt_get_extension_by_oid - This function returns the specified extension
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @oid: holds an Object Identified in null terminated string
+ * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use zero to get the first one.
+ * @buf: a pointer to a structure to hold the name (may be null)
+ * @sizeof_buf: initially holds the size of @buf
+ * @critical: will be non zero if the extension is marked as critical
+ *
+ * This function will return the extension specified by the OID in the
+ * certificate.  The extensions will be returned as binary data DER
+ * encoded, in the provided buffer.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned. If the certificate does not
+ *   contain the specified extension
+ *   GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ **/
 int
 gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
 				      const char *oid, int indx,
@@ -1590,10 +1595,10 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned.
  *
- * Return 0 on success.  A negative value may be returned in case of
- * parsing error.  If you have reached the last extension available
- * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
- *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.  If you have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
  **/
 int
 gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
@@ -2544,17 +2549,18 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
+  * @critical: output flag to indicate criticality of extension
   *
   * This function will extract the key purpose OIDs of the Certificate
-  * specified by the given index. These are stored in the Extended Key
-  * Usage extension (2.5.29.37) See the GNUTLS_KP_* definitions for
-  * human readable names.
+  * specified by the given index.  These are stored in the Extended
+  * Key Usage extension (2.5.29.37) See the GNUTLS_KP_* definitions
+  * for human readable names.
   *
   * If @oid is null then only the size will be filled.
   *
   * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
-  * not long enough, and in that case the *sizeof_oid will be updated
-  * with the required size.  On success 0 is returned.
+  *   not long enough, and in that case the *sizeof_oid will be
+  *   updated with the required size.  On success 0 is returned.
   **/
 int
 gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,

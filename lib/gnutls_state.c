@@ -1326,8 +1326,7 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
  **/
 void
 gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
-						 gnutls_handshake_post_client_hello_func
-						 func)
+						 gnutls_handshake_post_client_hello_func func)
 {
   session->internals.user_hello_func = func;
 }

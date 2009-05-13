@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -641,8 +641,8 @@ gnutls_certificate_set_verify_flags (gnutls_certificate_credentials_t
  * limits.
  **/
 void
-gnutls_certificate_set_verify_limits (gnutls_certificate_credentials_t
-				      res, unsigned int max_bits,
+gnutls_certificate_set_verify_limits (gnutls_certificate_credentials_t res,
+				      unsigned int max_bits,
 				      unsigned int max_depth)
 {
   res->verify_depth = max_depth;

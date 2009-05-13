@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -519,8 +519,8 @@ gnutls_srp_allocate_server_credentials (gnutls_srp_server_credentials_t * sc)
   *   error code.
   **/
 int
-gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t
-					res, const char *password_file,
+gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t res,
+					const char *password_file,
 					const char *password_conf_file)
 {
 

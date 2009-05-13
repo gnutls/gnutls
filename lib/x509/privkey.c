@@ -839,7 +839,7 @@ error:
 
 /**
  * gnutls_x509_privkey_export_dsa_raw - export the DSA private key
- * @params: a structure that holds the DSA parameters
+ * @key: a structure that holds the DSA parameters
  * @p: will hold the p
  * @q: will hold the q
  * @g: will hold the g

@@ -944,7 +944,7 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
 
 /**
  * gnutls_x509_dn_init: initialize an opaque DN object
- * @odn: the object to be initialized
+ * @dn: the object to be initialized
  *
  * This function initializes a #gnutls_x509_dn_t structure.
  *
@@ -957,20 +957,20 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
  * Since: 2.4.0
  **/
 int
-gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
+gnutls_x509_dn_init (gnutls_x509_dn_t * dn)
 {
   int result;
-  ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+  ASN1_TYPE tmpdn = ASN1_TYPE_EMPTY;
 
   if ((result =
        asn1_create_element (_gnutls_get_pkix (),
-			    "PKIX1.Name", &dn)) != ASN1_SUCCESS)
+			    "PKIX1.Name", &tmpdn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
-  *odn = dn;
+  *dn = tmpdn;
 
   return 0;
 }
@@ -978,7 +978,7 @@ gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
 /**
  * gnutls_x509_dn_import: get opaque DN object from DER RDN sequence
  *
- * @odn: the structure that will hold the imported DN
+ * @dn: the structure that will hold the imported DN
  * @data: should contain a DER encoded RDN sequence
  *
  * This function parses an RDN sequence and stores the result to a
@@ -992,13 +992,13 @@ gnutls_x509_dn_init (gnutls_x509_dn_t * odn)
  * Since: 2.4.0
  **/
 int
-gnutls_x509_dn_import (gnutls_x509_dn_t odn, const gnutls_datum_t * data)
+gnutls_x509_dn_import (gnutls_x509_dn_t dn, const gnutls_datum_t * data)
 {
   int result;
   char err[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
-  ASN1_TYPE dn = odn;
 
-  result = asn1_der_decoding (&dn, data->data, data->size, err);
+  result = asn1_der_decoding ((ASN1_TYPE *) &dn,
+			      data->data, data->size, err);
   if (result != ASN1_SUCCESS)
     {
       /* couldn't decode DER */
@@ -1012,7 +1012,7 @@ gnutls_x509_dn_import (gnutls_x509_dn_t odn, const gnutls_datum_t * data)
 
 /**
  * gnutls_x509_dn_deinit: deallocate a DN object
- * @idn: a DN opaque object pointer.
+ * @dn: a DN opaque object pointer.
  *
  * This function deallocates the DN object as returned by
  * gnutls_x509_dn_import().
@@ -1020,11 +1020,9 @@ gnutls_x509_dn_import (gnutls_x509_dn_t odn, const gnutls_datum_t * data)
  * Since: 2.4.0
  **/
 void
-gnutls_x509_dn_deinit (gnutls_x509_dn_t idn)
+gnutls_x509_dn_deinit (gnutls_x509_dn_t dn)
 {
-  ASN1_TYPE dn = idn;
-
-  asn1_delete_structure (&dn);
+  asn1_delete_structure ((ASN1_TYPE *) &dn);
 }
 
 /**

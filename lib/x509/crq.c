@@ -665,26 +665,26 @@ gnutls_x509_crq_get_attribute_by_oid (gnutls_x509_crq_t crq,
 }
 
 /**
-  * gnutls_x509_crq_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
-  * @crq: should contain a gnutls_x509_crq_t structure
-  * @oid: holds an Object Identifier in a null terminated string
-  * @raw_flag: must be 0, or 1 if the data are DER encoded
-  * @data: a pointer to the input data
-  * @sizeof_data: holds the size of @data
-  *
-  * This function will set the part of the name of the Certificate request subject, specified
-  * by the given OID. The input string should be ASCII or UTF-8 encoded.
-  *
-  * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * With this function you can only set the known OIDs. You can test
-  * for known OIDs using gnutls_x509_dn_oid_known(). For OIDs that are
-  * not known (by gnutls) you should properly DER encode your data, and
-  * call this function with raw_flag set.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crq_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
+ * @crq: should contain a gnutls_x509_crq_t structure
+ * @oid: holds an Object Identifier in a null terminated string
+ * @raw_flag: must be 0, or 1 if the data are DER encoded
+ * @data: a pointer to the input data
+ * @sizeof_data: holds the size of @data
+ *
+ * This function will set the part of the name of the Certificate
+ * request subject, specified by the given OID. The input string
+ * should be ASCII or UTF-8 encoded.
+ *
+ * Some helper macros with popular OIDs can be found in gnutls/x509.h
+ * With this function you can only set the known OIDs. You can test
+ * for known OIDs using gnutls_x509_dn_oid_known(). For OIDs that are
+ * not known (by gnutls) you should properly DER encode your data,
+ * and call this function with raw_flag set.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crq_set_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
 			       unsigned int raw_flag, const void *data,

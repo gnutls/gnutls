@@ -260,7 +260,7 @@ cleanup:
 
 /**
  * gnutls_pkcs7_get_crt_raw - get a certificate from a PKCS7 certificate set
- * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: should contain a gnutls_pkcs7_t structure
  * @indx: contains the index of the certificate to extract
  * @certificate: the contents of the certificate will be copied
  *   there (may be null)
@@ -428,8 +428,8 @@ gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7)
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN PKCS7".
  *
- * Return value: In case of failure a negative value will be
- *   returned, and 0 on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
   **/
 int
 gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
@@ -618,7 +618,7 @@ cleanup:
 
 /**
   * gnutls_pkcs7_set_crt - add a parsed certificate in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+  * @pkcs7: should contain a #gnutls_pkcs7_t structure
   * @crt: the certificate to be copied.
   *
   * This function will add a parsed certificate to the PKCS7 or
@@ -660,7 +660,7 @@ gnutls_pkcs7_set_crt (gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
 
 /**
  * gnutls_pkcs7_delete_crt - deletes a certificate from a PKCS7 certificate set
- * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: should contain a gnutls_pkcs7_t structure
  * @indx: the index of the certificate to delete
  *
  * This function will delete a certificate from a PKCS7 or RFC2630
@@ -970,7 +970,7 @@ gnutls_pkcs7_set_crl (gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl)
 
 /**
  * gnutls_pkcs7_delete_crl - deletes a CRL from a PKCS7 crl set
- * @pkcs7_struct: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @indx: the index of the crl to delete
  *
  * This function will delete a crl from a PKCS7 or RFC2630 crl set.
