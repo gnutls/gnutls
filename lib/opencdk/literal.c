@@ -1,5 +1,5 @@
 /* literal.c - Literal packet filters
- * Copyright (C) 2002, 2003, 2008 Free Software Foundation, Inc.
+ * Copyright (C) 2002, 2003, 2008, 2009 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz
  *
@@ -200,7 +200,7 @@ literal_encode (void *data, FILE * in, FILE * out)
   filelen = strlen (pfx->filename);
   cdk_pkt_new (&pkt);
   pt = pkt->pkt.literal = cdk_calloc (1, sizeof *pt + filelen);
-  pt->name = pt + sizeof(*pt);
+  pt->name = (char*) pt + sizeof(*pt);
   if (!pt)
     {
       cdk_pkt_release (pkt);

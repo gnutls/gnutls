@@ -34,7 +34,8 @@ client_avp (gnutls_session_t session, void *ptr,
 {
 
   if (last)
-    printf ("- received %d bytes AVP: `%.*s'\n", lastlen, lastlen, last);
+    printf ("- received %d bytes AVP: `%.*s'\n",
+	    lastlen, (int) lastlen, last);
   else
     printf ("- new application phase\n");
 

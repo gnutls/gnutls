@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -59,7 +59,7 @@ client_avp (gnutls_session_t session, void *ptr,
 
   if (last)
     printf ("client: received %d bytes AVP: `%.*s'\n",
-	    lastlen, lastlen, last);
+	    lastlen, (int) lastlen, last);
   else
     printf ("client: new application phase\n");
 
@@ -291,7 +291,7 @@ server_avp (gnutls_session_t session, void *ptr,
 
   if (last)
     printf ("server: received %d bytes AVP: `%.*s'\n",
-	    lastlen, lastlen, last);
+	    lastlen, (int) lastlen, last);
 
   gnutls_ia_permute_inner_secret (session, 3, "foo");
 

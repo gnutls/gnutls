@@ -714,7 +714,7 @@ static struct
     GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID },
   { "cacertrsamd5 short-cut ok", cacertrsamd5, &cacertrsamd5[1],
     0, 0 },
-  { NULL, NULL, NULL, 0}
+  { NULL, NULL, NULL, 0, 0}
 };
 /* *INDENT-ON* */
 

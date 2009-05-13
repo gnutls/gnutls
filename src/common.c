@@ -356,7 +356,8 @@ print_dh_info (gnutls_session_t session, const char *str)
 	  goto out;
 	}
 
-      printf (" - PKCS#3 format:\n\n%.*s\n", params_data_size, params_data);
+      printf (" - PKCS#3 format:\n\n%.*s\n", (int) params_data_size,
+	      params_data);
 
     out:
       gnutls_free (params_data);
