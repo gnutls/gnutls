@@ -358,6 +358,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/test-alignof.c
   tests/test-alloca-opt.c
   tests/test-byteswap.c
   tests/test-c-ctype.c

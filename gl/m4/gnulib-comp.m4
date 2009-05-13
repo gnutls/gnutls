@@ -485,6 +485,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/test-alignof.c
   tests/test-alloca-opt.c
   tests/test-arpa_inet.c
   tests/test-c-ctype.c
