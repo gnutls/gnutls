@@ -9,7 +9,8 @@ See the end for copying conditions.
 GnuTLS should work fine with libtasn1 v1.x and that is still
 supported.
 
-** Fix crash in signature verification (cve-2009-1415 bug again).
+** Fix crash in signature verification
+The fix for the CVE-2009-1415 problem wasn't merged completely.
 
 ** API and ABI modifications:
 No changes since last version.
