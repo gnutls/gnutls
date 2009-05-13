@@ -1,5 +1,5 @@
 /* keydb.c - Key database routines
- * Copyright (C) 2002, 2003, 2007, 2008 Free Software Foundation, Inc.
+ * Copyright (C) 2002, 2003, 2007, 2008, 2009 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz
  *
@@ -48,13 +48,15 @@ static cdk_kbnode_t find_selfsig_node (cdk_kbnode_t key, cdk_pkt_pubkey_t pk);
 static char *
 keydb_idx_mkname (const char *file)
 {
-  char *fname, *fmt;
+  static const char *fmt = "%s.idx";
+  char *fname;
+  size_t len = strlen (file) + strlen (fmt);
 
-  fmt = "%s.idx";
-  fname = cdk_calloc (1, strlen (file) + strlen (fmt) + 1);
+  fname = cdk_calloc (1, len + 1);
   if (!fname)
     return NULL;
-  sprintf (fname, fmt, file);
+  if (snprintf (fname, len, fmt, file) <= 0)
+    return NULL;
   return fname;
 }
 
