@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=liblgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=lseek-tests --lgpl=2 --libtool --macro-prefix=lgl --no-vc-files byteswap c-ctype fseeko func gettext lib-msvc-compat lib-symbol-versions memmem-simple memmove minmax netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd vasprintf
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=liblgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --lgpl=2 --libtool --macro-prefix=lgl --no-vc-files byteswap c-ctype fseeko func gettext lib-msvc-compat lib-symbol-versions memmem-simple memmove minmax netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd vasprintf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
@@ -44,7 +44,7 @@ gl_MODULES([
   unistd
   vasprintf
 ])
-gl_AVOID([lseek-tests])
+gl_AVOID([alignof-tests lseek-tests])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
 gl_PO_BASE([])

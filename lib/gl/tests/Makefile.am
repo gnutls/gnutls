@@ -42,15 +42,6 @@ libtests_a_DEPENDENCIES = $(lgltests_LIBOBJS)
 EXTRA_libtests_a_SOURCES =
 AM_LIBTOOLFLAGS = --preserve-dup-deps
 
-## begin gnulib module alignof-tests
-
-TESTS += test-alignof
-check_PROGRAMS += test-alignof
-
-EXTRA_DIST += test-alignof.c
-
-## end   gnulib module alignof-tests
-
 ## begin gnulib module alloca-opt-tests
 
 TESTS += test-alloca-opt
