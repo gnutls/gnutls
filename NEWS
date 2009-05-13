@@ -5,12 +5,18 @@ See the end for copying conditions.
 
 * Version 2.7.10 (unreleased)
 
+** examples: Now released into the public domain.
+This makes the license of the example code compatible with more
+licenses, including the (L)GPL.
+
 ** minitasn1: Internal copy updated to libtasn1 v2.1.
 GnuTLS should work fine with libtasn1 v1.x and that is still
 supported.
 
-** Fix crash in signature verification
+** libgnutls: Fix crash in signature verification
 The fix for the CVE-2009-1415 problem wasn't merged completely.
+
+** doc: Fixes for GTK-DOC output.
 
 ** API and ABI modifications:
 No changes since last version.
