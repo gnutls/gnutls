@@ -402,7 +402,7 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
 		      const gnutls_datum_t * signature,
 		      const gnutls_pk_params_st * pk_params)
 {
-  gcry_sexp_t s_sig, s_hash, s_pkey;
+  gcry_sexp_t s_sig = NULL, s_hash = NULL, s_pkey = NULL;
   int rc = -1, ret;
   bigint_t hash;
   bigint_t tmp[2] = { NULL, NULL };
