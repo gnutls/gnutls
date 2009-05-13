@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Free Software Foundation
+ * Copyright (C) 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -254,19 +254,15 @@ typedef struct gnutls_crypto_pk
   gnutls_crypto_single_digest_register2(algo, prio,			\
 					GNUTLS_CRYPTO_API_VERSION, st)
 
-int gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t
-					   algorithm, int priority,
-					   int version,
-					   gnutls_crypto_single_cipher_st *
-					   s);
+int gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
+					   int priority, int version,
+					   gnutls_crypto_single_cipher_st *s);
 int gnutls_crypto_single_mac_register2 (gnutls_mac_algorithm_t algorithm,
 					int priority, int version,
 					gnutls_crypto_single_mac_st * s);
-int gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t
-					   algorithm, int priority,
-					   int version,
-					   gnutls_crypto_single_digest_st *
-					   s);
+int gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
+					   int priority, int version,
+					   gnutls_crypto_single_digest_st *s);
 
 # define gnutls_crypto_cipher_register(prio, st)			\
   gnutls_crypto_cipher_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)

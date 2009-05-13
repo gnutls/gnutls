@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Timo Schulz, Nikos Mavrogiannopoulos
  *
@@ -456,8 +456,8 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
  * Since: 2.4.0
  **/
 int
-gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
-					  res, const char *certfile,
+gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t res,
+					  const char *certfile,
 					  const char *keyfile,
 					  const char *subkey_id,
 					  gnutls_openpgp_crt_fmt_t format)
@@ -552,6 +552,7 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
  * gnutls_certificate_set_openpgp_keyring_file - Sets a keyring file for OpenPGP
  * @c: A certificate credentials structure
  * @file: filename of the keyring.
+ * @format: format of keyring.
  *
  * The function is used to set keyrings that will be used internally
  * by various OpenPGP functions. For example to find a key when it
@@ -562,8 +563,8 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
  *   negative error value.
  **/
 int
-gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t
-					     c, const char *file,
+gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
+					     const char *file,
 					     gnutls_openpgp_crt_fmt_t format)
 {
   gnutls_datum_t ring;

@@ -1145,8 +1145,8 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
  * gnutls_x509_rdn_get_oid - parse an RDN sequence and returns an OID.
  * @idn: should contain a DER encoded RDN sequence
  * @indx: Indicates which OID to return. Use 0 for the first one.
- * @oid: a pointer to a structure to hold the peer's name OID
- * @sizeof_oid: holds the size of @oid
+ * @buf: a pointer to a structure to hold the peer's name OID
+ * @sizeof_buf: holds the size of @buf
  *
  * This function will return the specified Object identifier, of the
  * RDN sequence.

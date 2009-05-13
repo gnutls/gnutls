@@ -1012,17 +1012,17 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
 #ifdef ENABLE_PKI
 
 /**
-  * gnutls_x509_crl_check_issuer - This function checks if the CRL given has the given issuer
-  * @crl: is the CRL to be checked
-  * @issuer: is the certificate of a possible issuer
-  *
-  * This function will check if the given CRL was issued by the
-  * given issuer certificate. It will return true (1) if the given CRL was issued
-  * by the given issuer, and false (0) if not.
-  *
-  * A negative value is returned in case of an error.
-  *
-  **/
+ * gnutls_x509_crl_check_issuer - checks if CRL has given issuer
+ * @crl: is the CRL to be checked
+ * @issuer: is the certificate of a possible issuer
+ *
+ * This function will check if the given CRL was issued by the given
+ * issuer certificate.  It will return true (1) if the given CRL was
+ * issued by the given issuer, and false (0) if not.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_check_issuer (gnutls_x509_crl_t cert,
 			      gnutls_x509_crt_t issuer)
@@ -1031,21 +1031,20 @@ gnutls_x509_crl_check_issuer (gnutls_x509_crl_t cert,
 }
 
 /**
-  * gnutls_x509_crl_verify - This function verifies the given crl against a given trusted one
-  * @crl: is the crl to be verified
-  * @CA_list: is a certificate list that is considered to be trusted one
-  * @CA_list_length: holds the number of CA certificates in CA_list
-  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
-  * @verify: will hold the crl verification output.
-  *
-  * This function will try to verify the given crl and return its status.
-  * See gnutls_x509_crt_list_verify() for a detailed description of
-  * return values.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
-  *
-  **/
+ * gnutls_x509_crl_verify - This function verifies the given crl against a given trusted one
+ * @crl: is the crl to be verified
+ * @CA_list: is a certificate list that is considered to be trusted one
+ * @CA_list_length: holds the number of CA certificates in CA_list
+ * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+ * @verify: will hold the crl verification output.
+ *
+ * This function will try to verify the given crl and return its status.
+ * See gnutls_x509_crt_list_verify() for a detailed description of
+ * return values.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_verify (gnutls_x509_crl_t crl,
 			const gnutls_x509_crt_t * CA_list,

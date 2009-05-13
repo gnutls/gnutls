@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -369,7 +369,7 @@ cleanup:
 
 /**
  * gnutls_pkcs7_get_crt_count - return the number of certificates in a PKCS7 certificate set
- * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: should contain a #gnutls_pkcs7_t structure
  *
  * This function will return the number of certifcates in the PKCS7
  * or RFC2630 certificate set.
@@ -524,7 +524,7 @@ cleanup:
 
 /**
  * gnutls_pkcs7_set_crt_raw - add a certificate in a PKCS7 certificate set
- * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @crt: the DER encoded certificate to be added
  *
  * This function will add a certificate to the PKCS7 or RFC2630
@@ -725,8 +725,8 @@ cleanup:
  */
 
 /**
- * gnutls_pkcs7_get_crl_raw - This function returns a crl in a PKCS7 crl set
- * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * gnutls_pkcs7_get_crl_raw - returns a crl in a PKCS7 crl set
+ * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @indx: contains the index of the crl to extract
  * @crl: the contents of the crl will be copied there (may be null)
  * @crl_size: should hold the size of the crl
@@ -803,7 +803,7 @@ cleanup:
 
 /**
  * gnutls_pkcs7_get_crl_count - returns the number of CRLs in a PKCS7 crl set
- * @pkcs7_struct: should contain a gnutls_pkcs7_t structure
+ * @pkcs7: should contain a gnutls_pkcs7_t structure
  *
  * This function will return the number of certifcates in the PKCS7
  * or RFC2630 crl set.
@@ -847,7 +847,7 @@ gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7)
 
 /**
  * gnutls_pkcs7_set_crl_raw - add a crl in a PKCS7 crl set
- * @pkcs7_struct: should contain #a gnutls_pkcs7_t structure
+ * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @crl: the DER encoded crl to be added
  *
  * This function will add a crl to the PKCS7 or RFC2630 crl set.
@@ -930,7 +930,7 @@ cleanup:
 
 /**
  * gnutls_pkcs7_set_crl - add a parsed crl in a PKCS7 crl set
- * @pkcs7_struct: should contain a #gnutls_pkcs7_t structure
+ * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @crl: the DER encoded crl to be added
  *
  * This function will add a parsed CRL to the PKCS7 or RFC2630 crl

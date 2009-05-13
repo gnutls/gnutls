@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -80,9 +80,9 @@ extern "C"
   int gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
 				   int idx, char *buf, size_t * sizeof_buf);
 
-    gnutls_pk_algorithm_t
-    gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
-					 unsigned int *bits);
+  gnutls_pk_algorithm_t
+  gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
+				       unsigned int *bits);
 
   int gnutls_openpgp_crt_get_version (gnutls_openpgp_crt_t key);
 
@@ -102,15 +102,15 @@ extern "C"
 					 const gnutls_openpgp_keyid_t keyid);
   int gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
 						    unsigned int idx);
-    gnutls_pk_algorithm_t
-    gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
-						unsigned int idx,
-						unsigned int *bits);
-  time_t gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t
-						      key, unsigned int idx);
-  time_t gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t
-							key,
-							unsigned int idx);
+  gnutls_pk_algorithm_t
+  gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
+					      unsigned int idx,
+					      unsigned int *bits);
+  time_t gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
+						      unsigned int idx);
+  time_t
+  gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key,
+						 unsigned int idx);
   int gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
 					unsigned int idx,
 					gnutls_openpgp_keyid_t keyid);
@@ -139,17 +139,17 @@ extern "C"
 
   int gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
 					       gnutls_openpgp_keyid_t keyid);
-  int gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
-					       const gnutls_openpgp_keyid_t
-					       keyid);
+  int
+  gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
+					   const gnutls_openpgp_keyid_t keyid);
 
 /* privkey stuff.
  */
   int gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key);
   void gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key);
-    gnutls_pk_algorithm_t
-    gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
-					     unsigned int *bits);
+  gnutls_pk_algorithm_t
+  gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
+					   unsigned int *bits);
   int gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 				     const gnutls_datum_t * data,
 				     gnutls_openpgp_crt_fmt_t format,
@@ -160,56 +160,56 @@ extern "C"
   int gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
 					      void *fpr, size_t * fprlen);
   int
-    gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t
-						   key, unsigned int idx,
-						   void *fpr,
-						   size_t * fprlen);
+  gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t key,
+						 unsigned int idx,
+						 void *fpr,
+						 size_t * fprlen);
   int gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
 					 gnutls_openpgp_keyid_t keyid);
   int gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key);
   int gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key,
-					     const gnutls_openpgp_keyid_t
-					     keyid);
+					     const gnutls_openpgp_keyid_t keyid);
 
   int
-    gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t
-						      key, unsigned int idx);
+  gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t key,
+						    unsigned int idx);
 
-  int gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t
-						 key);
+  int gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key);
 
-    gnutls_pk_algorithm_t
-    gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t
-						    key, unsigned int idx,
-						    unsigned int *bits);
+  gnutls_pk_algorithm_t
+  gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
+						  unsigned int idx,
+						  unsigned int *bits);
 
-    time_t
-    gnutls_openpgp_privkey_get_subkey_expiration_time
-    (gnutls_openpgp_privkey_t key, unsigned int idx);
+  time_t
+  gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t key,
+						     unsigned int idx);
 
   int gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key,
 					    unsigned int idx,
 					    gnutls_openpgp_keyid_t keyid);
 
-    time_t
-    gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t
-						     key, unsigned int idx);
+  time_t
+  gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key,
+						   unsigned int idx);
 
-  int gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t
-						    pkey, unsigned int idx,
-						    gnutls_datum_t * p,
-						    gnutls_datum_t * q,
-						    gnutls_datum_t * g,
-						    gnutls_datum_t * y,
-						    gnutls_datum_t * x);
-  int gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t
-						    pkey, unsigned int idx,
-						    gnutls_datum_t * m,
-						    gnutls_datum_t * e,
-						    gnutls_datum_t * d,
-						    gnutls_datum_t * p,
-						    gnutls_datum_t * q,
-						    gnutls_datum_t * u);
+  int
+  gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey,
+						unsigned int idx,
+						gnutls_datum_t * p,
+						gnutls_datum_t * q,
+						gnutls_datum_t * g,
+						gnutls_datum_t * y,
+						gnutls_datum_t * x);
+  int
+  gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey,
+						unsigned int idx,
+						gnutls_datum_t * m,
+						gnutls_datum_t * e,
+						gnutls_datum_t * d,
+						gnutls_datum_t * p,
+						gnutls_datum_t * q,
+						gnutls_datum_t * u);
 
   int gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey,
 					     gnutls_datum_t * p,
@@ -232,15 +232,12 @@ extern "C"
 				     void *output_data,
 				     size_t * output_data_size);
 
-  int gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t
-						   key,
-						   const
-						   gnutls_openpgp_keyid_t
-						   keyid);
-  int gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t
-						   key,
-						   gnutls_openpgp_keyid_t
-						   keyid);
+  int
+  gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
+					       const gnutls_openpgp_keyid_t keyid);
+  int
+  gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key,
+					       gnutls_openpgp_keyid_t keyid);
 
   int gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
 					  gnutls_openpgp_keyid_t keyid,
@@ -296,51 +293,52 @@ extern "C"
 					       unsigned int keyfpr_length,
 					       gnutls_datum_t * key);
 
-  void gnutls_openpgp_set_recv_key_function (gnutls_session_t session,
-					     gnutls_openpgp_recv_key_func
-					     func);
+  void
+  gnutls_openpgp_set_recv_key_function (gnutls_session_t session,
+					gnutls_openpgp_recv_key_func func);
 
 
 
 /* certificate authentication stuff.
  */
-  int gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
-					  res, gnutls_openpgp_crt_t key,
+  int gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
+					  gnutls_openpgp_crt_t key,
 					  gnutls_openpgp_privkey_t pkey);
 
   int
-    gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
-					     res, const char *CERTFILE,
-					     const char *KEYFILE,
-					     gnutls_openpgp_crt_fmt_t);
-  int gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
-					      res,
-					      const gnutls_datum_t * CERT,
-					      const gnutls_datum_t * KEY,
-					      gnutls_openpgp_crt_fmt_t);
+  gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t res,
+					   const char *certfile,
+					   const char *keyfile,
+					   gnutls_openpgp_crt_fmt_t);
+  int
+  gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t res,
+					  const gnutls_datum_t * cert,
+					  const gnutls_datum_t * key,
+					  gnutls_openpgp_crt_fmt_t);
 
   int
-    gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
-					      res, const char *CERTFILE,
-					      const char *KEYFILE,
-					      const char *keyid,
+  gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t res,
+					    const char *certfile,
+					    const char *keyfile,
+					    const char *keyid,
+					    gnutls_openpgp_crt_fmt_t format);
+  int
+  gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
+					   const gnutls_datum_t * cert,
+					   const gnutls_datum_t * key,
+					   const char *keyid,
+					   gnutls_openpgp_crt_fmt_t format);
+
+  int
+  gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t c,
+					      const unsigned char *data,
+					      size_t dlen,
 					      gnutls_openpgp_crt_fmt_t format);
-  int
-    gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
-					     res, const gnutls_datum_t * CERT,
-					     const gnutls_datum_t * KEY,
-					     const char *keyid,
-					     gnutls_openpgp_crt_fmt_t format);
 
   int
-    gnutls_certificate_set_openpgp_keyring_mem
-    (gnutls_certificate_credentials_t c, const unsigned char *data,
-     size_t dlen, gnutls_openpgp_crt_fmt_t);
-
-  int
-    gnutls_certificate_set_openpgp_keyring_file
-    (gnutls_certificate_credentials_t c, const char *file,
-     gnutls_openpgp_crt_fmt_t);
+  gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
+					       const char *file,
+					       gnutls_openpgp_crt_fmt_t format);
 
 # ifdef __cplusplus
 }

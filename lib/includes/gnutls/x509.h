@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -269,8 +269,7 @@ extern "C"
 						    const char *data_string);
 
   int gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
-					    gnutls_x509_subject_alt_name_t
-					    type,
+					    gnutls_x509_subject_alt_name_t type,
 					    const void *data,
 					    unsigned int data_size,
 					    unsigned int flags);
@@ -339,7 +338,7 @@ extern "C"
   int gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert,
 				  gnutls_x509_dn_t * dn);
   int gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn, int irdn,
-				  int iava, gnutls_x509_ava_st * avast);
+				  int iava, gnutls_x509_ava_st * ava);
 
   int gnutls_x509_dn_init (gnutls_x509_dn_t * dn);
 
@@ -402,7 +401,8 @@ extern "C"
   int gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl,
 			     gnutls_x509_crt_t issuer,
 			     gnutls_x509_privkey_t issuer_key,
-			     gnutls_digest_algorithm_t, unsigned int flags);
+			     gnutls_digest_algorithm_t dig,
+			     unsigned int flags);
   int gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl,
 				       time_t act_time);
   int gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl,
@@ -466,7 +466,7 @@ extern "C"
   int gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7);
 
   int gnutls_pkcs7_set_crl_raw (gnutls_pkcs7_t pkcs7,
-				const gnutls_datum_t * crt);
+				const gnutls_datum_t * crl);
   int gnutls_pkcs7_set_crl (gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl);
   int gnutls_pkcs7_delete_crl (gnutls_pkcs7_t pkcs7, int indx);
 
@@ -580,7 +580,8 @@ extern "C"
   int gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
 					const gnutls_datum_t * data,
 					gnutls_x509_crt_fmt_t format,
-					const char *pass, unsigned int flags);
+					const char *password,
+					unsigned int flags);
   int gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
 					  const gnutls_datum_t * m,
 					  const gnutls_datum_t * e,
@@ -694,7 +695,8 @@ extern "C"
 			       gnutls_x509_privkey_t key);
   int gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq,
 			     gnutls_x509_privkey_t key,
-			     gnutls_digest_algorithm_t, unsigned int flags);
+			     gnutls_digest_algorithm_t dig,
+			     unsigned int flags);
   int gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key);
 
   int gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,

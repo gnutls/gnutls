@@ -1930,7 +1930,7 @@ print_crq_other (gnutls_string * str, gnutls_x509_crq_t crq)
 
 /**
  * gnutls_x509_crq_print - Pretty print PKCS 10 certificate request
- * @cert: The structure to be printed
+ * @crq: The structure to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with zero terminated string.
  *

@@ -760,21 +760,20 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
 }
 
 /**
-  * gnutls_x509_crt_get_authority_key_id - This function returns the certificate authority's identifier
-  * @cert: should contain a #gnutls_x509_crt_t structure
-  * @result: The place where the identifier will be copied
-  * @result_size: Holds the size of the result field.
-  * @critical: will be non zero if the extension is marked as critical (may be null)
-  *
-  * This function will return the X.509v3 certificate authority's key identifier.
-  * This is obtained by the X.509 Authority Key identifier extension
-  * field (2.5.29.35). Note that this function only returns the keyIdentifier
-  * field of the extension.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
-  *
-  **/
+ * gnutls_x509_crt_get_authority_key_id - This function returns the certificate authority's identifier
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @ret: The place where the identifier will be copied
+ * @ret_size: Holds the size of the result field.
+ * @critical: will be non zero if the extension is marked as critical (may be null)
+ *
+ * This function will return the X.509v3 certificate authority's key
+ * identifier.  This is obtained by the X.509 Authority Key
+ * identifier extension field (2.5.29.35). Note that this function
+ * only returns the keyIdentifier field of the extension.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.and a negative value in case of an error.
+ **/
 int
 gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
 				      size_t * ret_size,
@@ -1334,10 +1333,9 @@ gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
  * Use gnutls_x509_crt_get_basic_constraints() if you want to read the
  * pathLenConstraint field too.
  *
- * A negative value may be returned in case of parsing error.
+ * Returns: A negative value may be returned in case of parsing error.
  * If the certificate does not contain the basicConstraints extension
- * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
- *
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  **/
 int
 gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
