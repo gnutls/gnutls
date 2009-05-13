@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -77,8 +77,8 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
  * gnutls_openpgp_privkey_import - import a RAW or BASE64 encoded key
  * @key: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded key.
- * @format: One of gnutls_openpgp_crt_fmt_t elements.
- * @password: (unused for now)
+ * @format: One of #gnutls_openpgp_crt_fmt_t elements.
+ * @password: not used for now
  * @flags: should be zero
  *
  * This function will convert the given RAW or Base64 encoded key to

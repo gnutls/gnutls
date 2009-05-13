@@ -2004,6 +2004,7 @@ gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage)
  * @indx: This specifies which OID to return. Use zero to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
  * @sizeof_oid: initially holds the size of @oid
+ * @critical: output variable with critical flag, may be NULL.
  *
  * This function will extract the key purpose OIDs of the Certificate
  * specified by the given index.  These are stored in the Extended

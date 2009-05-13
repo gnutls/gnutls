@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -438,14 +438,14 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
 }
 
 /**
-  * gnutls_psk_set_server_params_function - set the DH parameters callback
-  * @res: is a gnutls_certificate_credentials_t structure
-  * @func: is the function to be called
-  *
-  * This function will set a callback in order for the server to get
-  * the diffie hellman parameters for PSK authentication. The callback
-  * should return zero on success.
-  **/
+ * gnutls_psk_set_server_params_function - set the DH parameters callback
+ * @res: is a #gnutls_certificate_credentials_t structure
+ * @func: is the function to be called
+ *
+ * This function will set a callback in order for the server to get
+ * the diffie hellman parameters for PSK authentication. The callback
+ * should return zero on success.
+ **/
 void
 gnutls_psk_set_server_params_function (gnutls_psk_server_credentials_t res,
 				       gnutls_params_function * func)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -83,22 +83,23 @@ error:
 }
 
 /**
-  * gnutls_session_get_data2 - Returns all session parameters.
-  * @session: is a #gnutls_session_t structure.
-  * @session_data: is a pointer to a datum that will hold the session.
-  *
-  * Returns all session parameters, in order to support resuming.
-  * The client should call this, and keep the returned session, if he wants to
-  * resume that current version later by calling gnutls_session_set_data()
-  * This function must be called after a successful handshake. The returned
-  * datum must be freed with gnutls_free().
-  *
-  * Resuming sessions is really useful and speedups connections after
-  * a succesful one.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
-  *   an error code is returned.
-  **/
+ * gnutls_session_get_data2 - Returns all session parameters.
+ * @session: is a #gnutls_session_t structure.
+ * @data: is a pointer to a datum that will hold the session.
+ *
+ * Returns all session parameters, in order to support resuming.  The
+ * client should call this, and keep the returned session, if he wants
+ * to resume that current version later by calling
+ * gnutls_session_set_data().  This function must be called after a
+ * successful handshake.  The returned datum must be freed with
+ * gnutls_free().
+ *
+ * Resuming sessions is really useful and speedups connections after
+ * a succesful one.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
 int
 gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum_t * data)
 {

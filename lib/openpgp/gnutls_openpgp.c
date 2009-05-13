@@ -115,22 +115,24 @@ _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * gcert,
 }
 
 /**
-  * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an #gnutls_certificate_credentials_t structure.
-  * @key: contains an openpgp public key
-  * @pkey: is an openpgp private key
-  *
-  * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials_t structure. This function may be called
-  * more than once (in case multiple keys/certificates exist for the
-  * server).
-  *
-  * With this function the subkeys of the certificate are not used.
-  *
-  **/
+ * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials_t structure
+ * @res: is an #gnutls_certificate_credentials_t structure.
+ * @key: contains an openpgp public key
+ * @pkey: is an openpgp private key
+ *
+ * This function sets a certificate/private key pair in the
+ * gnutls_certificate_credentials_t structure.  This function may be
+ * called more than once (in case multiple keys/certificates exist
+ * for the server).
+ *
+ * With this function the subkeys of the certificate are not used.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
-gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
-				    res, gnutls_openpgp_crt_t crt,
+gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
+				    gnutls_openpgp_crt_t crt,
 				    gnutls_openpgp_privkey_t pkey)
 {
   int ret;
@@ -283,12 +285,12 @@ leave:
  *   negative error value.
  **/
 int
-gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
-					res, const gnutls_datum_t * icert,
-					const gnutls_datum_t * ikey,
+gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t res,
+					const gnutls_datum_t * cert,
+					const gnutls_datum_t * key,
 					gnutls_openpgp_crt_fmt_t format)
 {
-  return gnutls_certificate_set_openpgp_key_mem2 (res, icert, ikey,
+  return gnutls_certificate_set_openpgp_key_mem2 (res, cert, key,
 						  NULL, format);
 }
 
@@ -308,8 +310,8 @@ gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t
  *   negative error value.
  **/
 int
-gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t
-					 res, const char *certfile,
+gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t res,
+					 const char *certfile,
 					 const char *keyfile,
 					 gnutls_openpgp_crt_fmt_t format)
 {
@@ -350,7 +352,7 @@ get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
  * credentials structure.  The files should only contain one key which
  * is not encrypted.
  *
- * The special keyword "auto" is also accepted as &subkey_id. In that
+ * The special keyword "auto" is also accepted as @subkey_id.  In that
  * case the gnutls_openpgp_crt_get_auth_subkey() will be used to
  * retrieve the subkey.
  *
@@ -360,45 +362,45 @@ get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
  * Since: 2.4.0
  **/
 int
-gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
-					 res, const gnutls_datum_t * icert,
-					 const gnutls_datum_t * ikey,
+gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
+					 const gnutls_datum_t * cert,
+					 const gnutls_datum_t * key,
 					 const char *subkey_id,
 					 gnutls_openpgp_crt_fmt_t format)
 {
-  gnutls_openpgp_privkey_t key;
-  gnutls_openpgp_crt_t cert;
+  gnutls_openpgp_privkey_t pkey;
+  gnutls_openpgp_crt_t crt;
   int ret;
 
-  ret = gnutls_openpgp_privkey_init (&key);
+  ret = gnutls_openpgp_privkey_init (&pkey);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = gnutls_openpgp_privkey_import (key, ikey, format, NULL, 0);
+  ret = gnutls_openpgp_privkey_import (pkey, key, format, NULL, 0);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_openpgp_privkey_deinit (key);
+      gnutls_openpgp_privkey_deinit (pkey);
       return ret;
     }
 
-  ret = gnutls_openpgp_crt_init (&cert);
+  ret = gnutls_openpgp_crt_init (&crt);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_openpgp_privkey_deinit (key);
+      gnutls_openpgp_privkey_deinit (pkey);
       return ret;
     }
 
-  ret = gnutls_openpgp_crt_import (cert, icert, format);
+  ret = gnutls_openpgp_crt_import (crt, cert, format);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_openpgp_privkey_deinit (key);
-      gnutls_openpgp_crt_deinit (cert);
+      gnutls_openpgp_privkey_deinit (pkey);
+      gnutls_openpgp_crt_deinit (crt);
       return ret;
     }
 
@@ -407,30 +409,30 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
       gnutls_openpgp_keyid_t keyid;
 
       if (strcasecmp (subkey_id, "auto") == 0)
-	ret = gnutls_openpgp_crt_get_auth_subkey (cert, keyid, 1);
+	ret = gnutls_openpgp_crt_get_auth_subkey (crt, keyid, 1);
       else
 	ret = get_keyid (keyid, subkey_id);
 
       if (ret >= 0)
 	{
-	  ret = gnutls_openpgp_crt_set_preferred_key_id (cert, keyid);
+	  ret = gnutls_openpgp_crt_set_preferred_key_id (crt, keyid);
 	  if (ret >= 0)
-	    ret = gnutls_openpgp_privkey_set_preferred_key_id (key, keyid);
+	    ret = gnutls_openpgp_privkey_set_preferred_key_id (pkey, keyid);
 	}
 
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  gnutls_openpgp_privkey_deinit (key);
-	  gnutls_openpgp_crt_deinit (cert);
+	  gnutls_openpgp_privkey_deinit (pkey);
+	  gnutls_openpgp_crt_deinit (crt);
 	  return ret;
 	}
     }
 
-  ret = gnutls_certificate_set_openpgp_key (res, cert, key);
+  ret = gnutls_certificate_set_openpgp_key (res, crt, pkey);
 
-  gnutls_openpgp_privkey_deinit (key);
-  gnutls_openpgp_crt_deinit (cert);
+  gnutls_openpgp_privkey_deinit (pkey);
+  gnutls_openpgp_crt_deinit (crt);
 
   return ret;
 }
@@ -447,8 +449,9 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t
  * This funtion is used to load OpenPGP keys into the GnuTLS credential 
  * structure. The files should contain non encrypted keys.
  *
- * The special keyword "auto" is also accepted as &subkey_id. In that case
- * the gnutls_openpgp_crt_get_auth_subkey() will be used to retrieve the subkey.
+ * The special keyword "auto" is also accepted as @subkey_id.  In that
+ * case the gnutls_openpgp_crt_get_auth_subkey() will be used to
+ * retrieve the subkey.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -599,6 +602,7 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
  * @c: A certificate credentials structure
  * @data: buffer with keyring data.
  * @dlen: length of data buffer.
+ * @format: the format of the keyring
  *
  * The function is used to set keyrings that will be used internally
  * by various OpenPGP functions. For example to find a key when it
@@ -609,8 +613,8 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
  *   negative error value.
  **/
 int
-gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
-					    c, const opaque * data,
+gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t c,
+					    const opaque * data,
 					    size_t dlen,
 					    gnutls_openpgp_crt_fmt_t format)
 {

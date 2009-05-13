@@ -330,8 +330,8 @@ extern "C" {
     GNUTLS_SIGN_RSA_SHA224
   } gnutls_sign_algorithm_t;
 
-  const char *gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t
-					      algorithm);
+  const char *
+  gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign);
 
 /* If you want to change this, then also change the define in
  * gnutls_int.h, and recompile.
@@ -432,8 +432,8 @@ extern "C" {
   const gnutls_kx_algorithm_t *gnutls_kx_list (void);
   const gnutls_pk_algorithm_t *gnutls_pk_list (void);
   const gnutls_sign_algorithm_t *gnutls_sign_list (void);
-  const char *gnutls_cipher_suite_info (size_t i,
-					char *id,
+  const char *gnutls_cipher_suite_info (size_t idx,
+					char *cs_id,
 					gnutls_kx_algorithm_t *kx,
 					gnutls_cipher_algorithm_t *cipher,
 					gnutls_mac_algorithm_t *mac,
@@ -569,14 +569,14 @@ extern "C" {
 /* if you just want some defaults, use the following.
  */
   int gnutls_priority_init (gnutls_priority_t *priority_cache,
-			    const char *priority,
+			    const char *priorities,
 			    const char** err_pos);
-  void gnutls_priority_deinit (gnutls_priority_t);
+  void gnutls_priority_deinit (gnutls_priority_t priority_cache);
 
   int gnutls_priority_set (gnutls_session_t session,
 			   gnutls_priority_t priority);
   int gnutls_priority_set_direct (gnutls_session_t session,
-				  const char *priority,
+				  const char *priorities,
 				  const char** err_pos);
 
   /* for compatibility
@@ -585,12 +585,10 @@ extern "C" {
   int gnutls_set_default_export_priority (gnutls_session_t session);
 
 /* Returns the name of a cipher suite */
-  const char *gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t
-					    kx_algorithm,
-					    gnutls_cipher_algorithm_t
-					    cipher_algorithm,
-					    gnutls_mac_algorithm_t
-					    mac_algorithm);
+  const char *
+  gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t kx_algorithm,
+				gnutls_cipher_algorithm_t cipher_algorithm,
+				gnutls_mac_algorithm_t mac_algorithm);
 
 /* get the currently used protocol version */
   gnutls_protocol_t gnutls_protocol_get_version (gnutls_session_t session);
@@ -627,8 +625,7 @@ extern "C" {
 						 size_t len);
   void
   gnutls_session_set_finished_function (gnutls_session_t session,
-					gnutls_finished_callback_func
-					finished_func);
+					gnutls_finished_callback_func func);
 
 /* checks if this session is a resumed one 
  */
@@ -817,13 +814,12 @@ extern "C" {
   typedef void (*gnutls_free_function) (void *);
   typedef void *(*gnutls_realloc_function) (void *, size_t);
 
-  void gnutls_global_set_mem_functions (gnutls_alloc_function gt_alloc_func,
-					gnutls_alloc_function
-					gt_secure_alloc_func,
-					gnutls_is_secure_function
-					gt_is_secure_func,
-					gnutls_realloc_function gt_realloc_func,
-					gnutls_free_function gt_free_func);
+  void
+  gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
+				   gnutls_alloc_function secure_alloc_func,
+				   gnutls_is_secure_function is_secure_func,
+				   gnutls_realloc_function realloc_func,
+				   gnutls_free_function free_func);
 
 /* For use in callbacks */
   extern gnutls_alloc_function gnutls_malloc;
@@ -1053,9 +1049,9 @@ extern "C" {
 						      const char *username,
 						      gnutls_datum_t * key);
   void
-    gnutls_psk_set_server_credentials_function
-    (gnutls_psk_server_credentials_t cred,
-     gnutls_psk_server_credentials_function * func);
+  gnutls_psk_set_server_credentials_function
+  (gnutls_psk_server_credentials_t cred,
+   gnutls_psk_server_credentials_function * func);
 
   typedef int gnutls_psk_client_credentials_function (gnutls_session_t,
 						      char **username,
@@ -1070,12 +1066,13 @@ extern "C" {
   int gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
 			 size_t * result_size);
 
-  void gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
-					gnutls_dh_params_t dh_params);
+  void
+  gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
+				   gnutls_dh_params_t dh_params);
 
-  void gnutls_psk_set_server_params_function (gnutls_psk_server_credentials_t
-					      res,
-					      gnutls_params_function * func);
+  void
+  gnutls_psk_set_server_params_function (gnutls_psk_server_credentials_t res,
+					 gnutls_params_function * func);
 
   int gnutls_psk_netconf_derive_key (const char *password,
 				     const char *psk_identity,

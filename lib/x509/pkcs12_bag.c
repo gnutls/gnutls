@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -95,14 +95,14 @@ gnutls_pkcs12_bag_deinit (gnutls_pkcs12_bag_t bag)
 }
 
 /**
-  * gnutls_pkcs12_bag_get_type - This function returns the bag's type
-  * @bag: The bag
-  * @indx: The element of the bag to get the type
-  *
-  * This function will return the bag's type. One of the gnutls_pkcs12_bag_type_t
-  * enumerations.
-  *
-  **/
+ * gnutls_pkcs12_bag_get_type - This function returns the bag's type
+ * @bag: The bag
+ * @indx: The element of the bag to get the type
+ *
+ * This function will return the bag's type.
+ *
+ * Returns: One of the #gnutls_pkcs12_bag_type_t enumerations.
+ **/
 gnutls_pkcs12_bag_type_t
 gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t bag, int indx)
 {
@@ -118,12 +118,14 @@ gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t bag, int indx)
 }
 
 /**
-  * gnutls_pkcs12_bag_get_count - This function returns the bag's elements count
-  * @bag: The bag
-  *
-  * This function will return the number of the elements withing the bag. 
-  *
-  **/
+ * gnutls_pkcs12_bag_get_count - This function returns the bag's elements count
+ * @bag: The bag
+ *
+ * This function will return the number of the elements withing the bag.
+ *
+ * Returns: Number of elements in bag, or an negative error code on
+ *   error.
+ **/
 int
 gnutls_pkcs12_bag_get_count (gnutls_pkcs12_bag_t bag)
 {
@@ -622,13 +624,16 @@ gnutls_pkcs12_bag_set_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
 
 
 /**
-  * gnutls_pkcs12_bag_decrypt - This function will decrypt an encrypted bag
-  * @bag: The bag
-  * @pass: The password used for encryption. This can only be ASCII.
-  *
-  * This function will decrypt the given encrypted bag and return 0 on success.
-  *
-  **/
+ * gnutls_pkcs12_bag_decrypt - This function will decrypt an encrypted bag
+ * @bag: The bag
+ * @pass: The password used for encryption, must be ASCII.
+ *
+ * This function will decrypt the given encrypted bag and return 0 on
+ * success.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t bag, const char *pass)
 {
@@ -675,14 +680,16 @@ gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t bag, const char *pass)
 }
 
 /**
-  * gnutls_pkcs12_bag_encrypt - This function will encrypt a bag
-  * @bag: The bag
-  * @pass: The password used for encryption. This can only be ASCII.
-  * @flags: should be one of gnutls_pkcs_encrypt_flags_t elements bitwise or'd
-  *
-  * This function will encrypt the given bag and return 0 on success.
-  *
-  **/
+ * gnutls_pkcs12_bag_encrypt - This function will encrypt a bag
+ * @bag: The bag
+ * @pass: The password used for encryption, must be ASCII
+ * @flags: should be one of #gnutls_pkcs_encrypt_flags_t elements bitwise or'd
+ *
+ * This function will encrypt the given bag.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
+ **/
 int
 gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t bag, const char *pass,
 			   unsigned int flags)

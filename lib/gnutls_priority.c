@@ -518,7 +518,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  **/
 int
 gnutls_priority_init (gnutls_priority_t * priority_cache,
-		      const char *priorities, const char **err_pos)
+		      const char *priorities,
+		      const char **err_pos)
 {
   char *broken_list[MAX_ELEMENTS];
   int broken_list_size, i, j;

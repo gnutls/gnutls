@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -187,16 +187,18 @@ _gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
 }
 
 /**
-  * gnutls_record_check_pending - checks if there are any data to receive in gnutls buffers.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function checks if there are any data to receive
-  * in the gnutls buffers. Returns the size of that data or 0.
-  * Notice that you may also use select() to check for data in
-  * a TCP connection, instead of this function.
-  * (gnutls leaves some data in the tcp buffer in order for select
-  * to work).
-  **/
+ * gnutls_record_check_pending - checks if there are any data to receive in gnutls buffers.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function checks if there are any data to receive in the gnutls
+ * buffers.
+ *
+ * Notice that you may also use select() to check for data in a TCP
+ * connection, instead of this function.  GnuTLS leaves some data in
+ * the tcp buffer in order for select to work.
+ *
+ * Returns: the size of that data or 0.
+ **/
 size_t
 gnutls_record_check_pending (gnutls_session_t session)
 {

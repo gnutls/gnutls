@@ -1123,7 +1123,7 @@ gnutls_session_get_master_secret (gnutls_session_t session)
 /**
  * gnutls_session_set_finished_function:
  * @session: is a #gnutls_session_t structure.
- * @finished_func: a #gnutls_finished_callback_func callback.
+ * @func: a #gnutls_finished_callback_func callback.
  *
  * Register a callback function for the session that will be called
  * when a TLS Finished message has been generated.  The function is
@@ -1132,7 +1132,7 @@ gnutls_session_get_master_secret (gnutls_session_t session)
  *
  * The callback should follow this prototype:
  *
- * void callback (gnutls_session_t session, const void *finished, size_t len);
+ * void callback (gnutls_session_t @session, const void *@finished, size_t @len);
  *
  * The @finished parameter will contain the binary TLS finished
  * message, and @len will contains its length.  For SSLv3 connections,
@@ -1147,10 +1147,9 @@ gnutls_session_get_master_secret (gnutls_session_t session)
  **/
 void
 gnutls_session_set_finished_function (gnutls_session_t session,
-				      gnutls_finished_callback_func
-				      finished_func)
+				      gnutls_finished_callback_func func)
 {
-  session->internals.finished_func = finished_func;
+  session->internals.finished_func = func;
 }
 
 /**
@@ -1305,7 +1304,7 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
 
 /**
  * gnutls_handshake_set_post_client_hello_function - set callback to be called after the client hello is received
- * @res: is a gnutls_anon_server_credentials_t structure
+ * @session: is a #gnutls_session_t structure.
  * @func: is the function to be called
  *
  * This function will set a callback to be called after the client

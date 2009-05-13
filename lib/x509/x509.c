@@ -1541,20 +1541,20 @@ gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
 }
 
 /**
-  * gnutls_x509_crt_get_extension_oid - This function returns the specified extension OID
-  * @cert: should contain a #gnutls_x509_crt_t structure
-  * @indx: Specifies which extension OID to send. Use zero to get the first one.
-  * @oid: a pointer to a structure to hold the OID (may be null)
-  * @sizeof_oid: initially holds the size of @oid
-  *
-  * This function will return the requested extension OID in the certificate.
-  * The extension OID will be stored as a string in the provided buffer.
-  *
-  * A negative value may be returned in case of parsing error.
-  * If your have reached the last extension available 
-  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
-  *
-  **/
+ * gnutls_x509_crt_get_extension_oid - get the specified extension OID
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @oid: a pointer to a structure to hold the OID (may be null)
+ * @sizeof_oid: initially holds the size of @oid
+ *
+ * This function will return the requested extension OID in the certificate.
+ * The extension OID will be stored as a string in the provided buffer.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.  If you have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
+ **/
 int
 gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
 				   void *oid, size_t * sizeof_oid)
@@ -1669,9 +1669,10 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
  * if you want to get data indexed by the extension OID rather than
  * sequence.
  *
- * Return 0 on success.  A negative value may be returned in case of
- * parsing error.  If you have reached the last extension available
- * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.  If you have reached the
+ *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ *   will be returned.
  **/
 int
 gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -72,8 +72,9 @@ extern "C"
     GNUTLS_BAG_UNKNOWN = 20
   } gnutls_pkcs12_bag_type_t;
 
-  gnutls_pkcs12_bag_type_t gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t
-						       bag, int indx);
+  gnutls_pkcs12_bag_type_t
+  gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t bag,
+			      int indx);
   int gnutls_pkcs12_bag_get_data (gnutls_pkcs12_bag_t bag, int indx,
 				  gnutls_datum_t * data);
   int gnutls_pkcs12_bag_set_data (gnutls_pkcs12_bag_t bag,

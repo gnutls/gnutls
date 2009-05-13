@@ -977,7 +977,6 @@ gnutls_x509_dn_init (gnutls_x509_dn_t * dn)
 
 /**
  * gnutls_x509_dn_import: get opaque DN object from DER RDN sequence
- *
  * @dn: the structure that will hold the imported DN
  * @data: should contain a DER encoded RDN sequence
  *

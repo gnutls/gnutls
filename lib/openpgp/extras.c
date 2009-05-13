@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos, Timo Schulz
  *
@@ -256,9 +256,9 @@ gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
 
 /**
  * gnutls_openpgp_keyring_get_crt - export an openpgp certificate from a keyring
- * @key: Holds the key.
+ * @ring: Holds the keyring.
  * @idx: the index of the certificate to export
- * @crt: An uninitialized #gnutls_openpgp_crt_t structure
+ * @cert: An uninitialized #gnutls_openpgp_crt_t structure
  *
  * This function will extract an OpenPGP certificate from the given
  * keyring.  If the index given is out of range

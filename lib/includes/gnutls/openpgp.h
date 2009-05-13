@@ -69,7 +69,7 @@ extern "C"
 /* The key_usage flags are defined in gnutls.h. They are
  * the GNUTLS_KEY_* definitions.
  */
-  int gnutls_openpgp_crt_get_key_usage (gnutls_openpgp_crt_t cert,
+  int gnutls_openpgp_crt_get_key_usage (gnutls_openpgp_crt_t key,
 					unsigned int *key_usage);
   int gnutls_openpgp_crt_get_fingerprint (gnutls_openpgp_crt_t key, void *fpr,
 					  size_t * fprlen);
@@ -153,7 +153,8 @@ extern "C"
   int gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 				     const gnutls_datum_t * data,
 				     gnutls_openpgp_crt_fmt_t format,
-				     const char *pass, unsigned int flags);
+				     const char *password,
+				     unsigned int flags);
   int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 					const gnutls_datum_t * hash,
 					gnutls_datum_t * signature);
@@ -287,6 +288,8 @@ extern "C"
  * fingerprint instead of a full key.  See also
  * gnutls_openpgp_set_recv_key_function().
  *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
  */
   typedef int (*gnutls_openpgp_recv_key_func) (gnutls_session_t session,
 					       const unsigned char *keyfpr,
@@ -309,24 +312,24 @@ extern "C"
   gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t res,
 					   const char *certfile,
 					   const char *keyfile,
-					   gnutls_openpgp_crt_fmt_t);
+					   gnutls_openpgp_crt_fmt_t format);
   int
   gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t res,
 					  const gnutls_datum_t * cert,
 					  const gnutls_datum_t * key,
-					  gnutls_openpgp_crt_fmt_t);
+					  gnutls_openpgp_crt_fmt_t format);
 
   int
   gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t res,
 					    const char *certfile,
 					    const char *keyfile,
-					    const char *keyid,
+					    const char *subkey_id,
 					    gnutls_openpgp_crt_fmt_t format);
   int
   gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
 					   const gnutls_datum_t * cert,
 					   const gnutls_datum_t * key,
-					   const char *keyid,
+					   const char *subkey_id,
 					   gnutls_openpgp_crt_fmt_t format);
 
   int

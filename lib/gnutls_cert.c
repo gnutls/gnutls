@@ -574,8 +574,8 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
   * Note that you must also check the peer's name in order to check if
   * the verified certificate belongs to the actual peer.
   *
-  * This is the same as gnutls_x509_crt_list_verify() and uses the
-  * loaded CAs in the credentials as trusted CAs.
+  * This function uses gnutls_x509_crt_list_verify() with the CAs in
+  * the credentials as trusted CAs.
   *
   * Note that some commonly used X.509 Certificate Authorities are
   * still using Version 1 certificates.  If you want to accept them,
@@ -623,11 +623,10 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
   * the peer's name in order to check if the verified certificate
   * belongs to the actual peer.
   *
-  * The return value should be one or more of the
-  * gnutls_certificate_status_t enumerated elements bitwise or'd, or a
-  * negative value on error.
+  * This function uses gnutls_x509_crt_list_verify().
   *
-  * This is the same as gnutls_x509_crt_list_verify().
+  * Returns: one or more of the #gnutls_certificate_status_t
+  * enumerated elements bitwise or'd, or a negative value on error.
   *
   * Deprecated: Use gnutls_certificate_verify_peers2() instead.
   **/

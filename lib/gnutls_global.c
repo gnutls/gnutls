@@ -104,10 +104,8 @@ gnutls_global_set_log_level (int level)
  **/
 void
 gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
-				 gnutls_alloc_function
-				 secure_alloc_func,
-				 gnutls_is_secure_function
-				 is_secure_func,
+				 gnutls_alloc_function secure_alloc_func,
+				 gnutls_is_secure_function is_secure_func,
 				 gnutls_realloc_function realloc_func,
 				 gnutls_free_function free_func)
 {

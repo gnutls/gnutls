@@ -1262,17 +1262,17 @@ _gnutls_cipher_suite_get_name (cipher_suite_st * suite)
 }
 
 /**
-  * gnutls_cipher_suite_get_name - Returns a string with the name of the specified cipher suite
-  * @kx_algorithm: is a Key exchange algorithm
-  * @cipher_algorithm: is a cipher algorithm
-  * @mac_algorithm: is a MAC algorithm
-  *
-  * Note that the full cipher suite name must be prepended by TLS or
-  * SSL depending of the protocol in use.
-  *
-  * Returns: a string that contains the name of a TLS cipher suite,
-  * specified by the given algorithms, or %NULL.
-  **/
+ * gnutls_cipher_suite_get_name - get name of the specified cipher suite
+ * @kx_algorithm: is a Key exchange algorithm
+ * @cipher_algorithm: is a cipher algorithm
+ * @mac_algorithm: is a MAC algorithm
+ *
+ * Note that the full cipher suite name must be prepended by TLS or
+ * SSL depending of the protocol in use.
+ *
+ * Returns: a string that contains the name of a TLS cipher suite,
+ * specified by the given algorithms, or %NULL.
+ **/
 const char *
 gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t kx_algorithm,
 			      gnutls_cipher_algorithm_t cipher_algorithm,
@@ -1775,7 +1775,7 @@ static const gnutls_sign_algorithm_t supported_sign[] = {
 
 /**
  * gnutls_sign_algorithm_get_name - Returns a string with the name of the specified sign algorithm
- * @algorithm: is a sign algorithm
+ * @sign: is a sign algorithm
  *
  * Convert a #gnutls_sign_algorithm_t value to a string.
  *

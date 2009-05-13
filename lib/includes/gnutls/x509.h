@@ -271,11 +271,14 @@ extern "C"
 					    const void *data,
 					    unsigned int data_size,
 					    unsigned int flags);
-  int gnutls_x509_crt_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+  int gnutls_x509_crt_sign (gnutls_x509_crt_t crt,
+			    gnutls_x509_crt_t issuer,
 			    gnutls_x509_privkey_t issuer_key);
-  int gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+  int gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt,
+			     gnutls_x509_crt_t issuer,
 			     gnutls_x509_privkey_t issuer_key,
-			     gnutls_digest_algorithm_t, unsigned int flags);
+			     gnutls_digest_algorithm_t dig,
+			     unsigned int flags);
   int gnutls_x509_crt_set_activation_time (gnutls_x509_crt_t cert,
 					   time_t act_time);
   int gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert,

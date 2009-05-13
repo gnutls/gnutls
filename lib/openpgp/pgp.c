@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Timo Schulz, Nikos Mavrogiannopoulos
  *
@@ -1549,6 +1549,8 @@ gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
  * This allows setting a preferred key id for the given certificate.
  * This key will be used by functions that involve key handling.
  *
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
  **/
 int
 gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
@@ -1579,7 +1581,7 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
 
 /**
  * gnutls_openpgp_crt_get_auth_subkey - Gets the keyID of an authentication subkey
- * @key: the structure that contains the OpenPGP public key.
+ * @crt: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
  * @flag: Non zero indicates that a valid subkey is always returned.
  *

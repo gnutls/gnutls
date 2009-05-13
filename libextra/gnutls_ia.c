@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2006, 2008 Free Software Foundation
+ * Copyright (C) 2005, 2006, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -9,12 +9,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *               
+ *
  * GNUTLS-EXTRA is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *                               
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -635,7 +635,8 @@ gnutls_ia_handshake_p (gnutls_session_t session)
  * Perform a TLS/IA handshake.  This should be called after
  * gnutls_handshake() iff gnutls_ia_handshake_p().
  *
- * Return 0 on success, or an error code.
+ * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
+ *   otherwise an error code is returned.
  **/
 int
 gnutls_ia_handshake (gnutls_session_t session)
