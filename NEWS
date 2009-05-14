@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.7.11 (unreleased)
 
+** minitasn1: Fix build failure due to incorrect -I paths.
+Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3548>.
+
 ** API and ABI modifications:
 No changes since last version.
 
