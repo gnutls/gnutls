@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 2.7.11 (unreleased)
 
-** minitasn1: Fix build failure due to incorrect -I paths.
+** minitasn1: Fix build failure when using internal libtasn1.
 Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3548>.
 
