@@ -9,6 +9,10 @@ See the end for copying conditions.
 Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3548>.
 
+** libgnutls: Fix build failure with --disable-cxx.
+Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3557>.
+
 ** API and ABI modifications:
 No changes since last version.
 

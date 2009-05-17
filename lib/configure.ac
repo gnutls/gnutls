@@ -88,10 +88,8 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 
 # Finish things from ../configure.ac.
 AC_SUBST([WARN_CFLAGS])
+AC_PROG_CXX
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
-if test "$use_cxx" != "no"; then
-  AC_PROG_CXX
-fi
 
 AC_CONFIG_FILES([
   Makefile
