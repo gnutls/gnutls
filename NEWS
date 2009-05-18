@@ -17,6 +17,9 @@ Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3560>
 
+** Building with many warning flags now requires --enable-gcc-warnings.
+This avoids crying wolf for normal compiles.
+
 ** API and ABI modifications:
 No changes since last version.
 

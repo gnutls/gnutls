@@ -21,7 +21,7 @@ EXTRA_DIST = README README.srptool
 
 SUBDIRS = cfg
 
-AM_CFLAGS = $(WARN_CFLAGS)
+AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\

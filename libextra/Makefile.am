@@ -22,7 +22,7 @@
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I ../lib/m4
 
-AM_CFLAGS = $(WARN_CFLAGS)
+AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/../lib/gl		\
 	-I$(builddir)/../lib/gl		\

@@ -183,8 +183,20 @@ AC_PROG_LIBTOOL
 
 gl_INIT
 
-# Add many warnings, except some...
-if test "$GCC" = "yes"; then
+AC_ARG_ENABLE([gcc-warnings],
+  [AS_HELP_STRING([--enable-gcc-warnings],
+		  [turn on lots of GCC warnings (for developers)])],
+  [case $enableval in
+     yes|no) ;;
+     *)      AC_MSG_ERROR([bad value $enableval for gcc-warnings option]) ;;
+   esac
+   gl_gcc_warnings=$enableval],
+  [gl_gcc_warnings=no]
+)
+
+if test "$gl_gcc_warnings" = yes; then
+  gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
+
   nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
   nw="$nw -Wc++-compat"             # We don't care about C++ compilers
   nw="$nw -Wundef"                  # Warns on '#if GNULIB_FOO' etc in gnulib
@@ -205,11 +217,13 @@ if test "$GCC" = "yes"; then
   nw="$nw -Wformat-nonliteral"      # Incompatible with gettext _()
   nw="$nw -Wunsafe-loop-optimizations"
   nw="$nw -Wstrict-overflow"
+
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])
   for w in $ws; do
     gl_WARN_ADD([$w])
   done
+
   gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
   gl_WARN_ADD([-Wno-sign-compare])     # Too many warnings for now
   gl_WARN_ADD([-Wno-pointer-sign])     # Too many warnings for now
@@ -220,6 +234,7 @@ if test "$GCC" = "yes"; then
 fi
 
 # Export things for */configure.ac.
+export WERROR_CFLAGS
 export WARN_CFLAGS
 export use_cxx
 
@@ -269,7 +284,7 @@ AC_MSG_NOTICE([summary of build options:
   Host type:        ${host}
   Install prefix:   ${prefix}
   Compiler:         ${CC}
-  Warning flags:    ${WARN_CFLAGS}
+  Warning flags:    errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
   Library types:    Shared=${enable_shared}, Static=${enable_static}
   Valgrind:         ${VALGRIND}
   Guile wrappers:   $opt_guile_bindings

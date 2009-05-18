@@ -47,6 +47,7 @@ AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
 # Finish things from ../configure.ac.
 AC_SUBST([WARN_CFLAGS])
+AC_SUBST([WERROR_CFLAGS])
 
 AC_CONFIG_FILES([
   Makefile

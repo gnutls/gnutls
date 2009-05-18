@@ -18,9 +18,9 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-WFLAGS ?= WARN_CFLAGS=-Werror
+WFLAGS ?= --enable-gcc-warnings
 ADDFLAGS ?=
-CFGFLAGS ?= --enable-gtk-doc $(ADDFLAGS)
+CFGFLAGS ?= --enable-gtk-doc $(ADDFLAGS) $(WFLAGS)
 
 INDENT_SOURCES = `find . -name \*.c|grep -v -e ^./lgl -e ^./gl -e ^./src/cfg -e -gaa.c -e asn1_tab.c`
 
@@ -52,7 +52,7 @@ update-po: refresh-po
 	git commit -m "Sync with TP." $(PODIR)/LINGUAS $(PODIR)/*.po.in
 
 bootstrap: autoreconf
-	$(WFLAGS) ./configure $(CFGFLAGS)
+	./configure $(CFGFLAGS)
 
 glimport:
 	gnulib-tool --m4-base gl/m4 --import
