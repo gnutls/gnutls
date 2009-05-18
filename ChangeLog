@@ -1,3 +1,79 @@
+2009-05-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.7.11.
+
+2009-05-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, cfg.mk, configure.ac, doc/examples/Makefile.am,
+	lib/Makefile.am, lib/configure.ac, lib/openpgp/Makefile.am,
+	lib/x509/Makefile.am, libextra/Makefile.am, libextra/configure.ac,
+	src/Makefile.am, tests/Makefile.am: Don't build with warnings all
+	the time.  Use a WERROR_CFLAGS.
+
+2009-05-18  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2009-05-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-18  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Don't use unportable NI_MAXHOST/NI_MAXSERV.
+
+2009-05-17  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Link getaddrinfo libraries.  Reported by "Tom G.
+	Christensen" <tgc@jupiterrise.com> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3560>.
+
+2009-05-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac: Need to run AC_PROG_CXX
+	unconditionally.
+
+2009-05-16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/doxygen/Doxyfile.in, libextra/gl/Makefile.am: Fix old gnulib
+	lgpl/ paths.  Reported by "Tom G. Christensen" <tgc@jupiterrise.com>
+	in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3556>.
+
+2009-05-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-05-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/Makefile.am: Need -DASN1_BUILDING for libtasn1.
+
+2009-05-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announcement-template.txt: Add.
+
+2009-05-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/minitasn1/Makefile.am: Fix -I's after gnulib changes.
+	Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3548>.
+
+2009-05-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-05-13  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-05-13  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.10.
