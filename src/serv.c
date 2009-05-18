@@ -252,8 +252,8 @@ static_dh_params (void)
       exit (1);
     }
 
-  ret =
-    gnutls_dh_params_import_pkcs3 (dh_params, &params, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_dh_params_import_pkcs3 (dh_params, &params,
+				       GNUTLS_X509_FMT_PEM);
 
   if (ret < 0)
     {
@@ -623,6 +623,33 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 }
 
 static int
+get_port (const struct sockaddr *addr)
+{
+  switch (addr->sa_family)
+    {
+#if HAVE_IPV6
+    case AF_INET6:
+      return ntohs (((const struct sockaddr_in6 *) addr)->sin6_port);
+#endif
+
+    case AF_INET:
+      return ntohs (((const struct sockaddr_in *) addr)->sin_port);
+    }
+
+  return -1;
+}
+
+static const char *
+addr_ntop (const struct sockaddr *sa, socklen_t salen,
+	   char *buf, size_t buflen)
+{
+  if (getnameinfo (sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) == 0)
+    return buf;
+
+  return NULL;
+}
+
+static int
 listen_socket (const char *name, int listen_port)
 {
   struct addrinfo hints, *res, *ptr;
@@ -647,20 +674,12 @@ listen_socket (const char *name, int listen_port)
     {
       /* Print what we are doing. */
       {
-	char host[NI_MAXHOST], service[NI_MAXSERV];
-	int rc = getnameinfo(ptr->ai_addr, ptr->ai_addrlen,
-			     host, NI_MAXHOST,
-			     service, NI_MAXSERV,
-			     NI_NUMERICHOST|NI_NUMERICSERV);
-	if (rc == 0)
-	  fprintf (stderr, "%s listening to %s:%s (family %d)...",
-		   name, host, service, ptr->ai_family);
-	else
-	  {
-	    fprintf(stderr, "getnameinfo: %s\n", gai_strerror(s));
-	    fprintf (stderr, "%s listening to *:%s (family %d)...",
-		     name, portname, ptr->ai_family);
-	  }
+	char topbuf[512];
+
+	fprintf (stderr, "%s listening on %s port %d family %d...",
+		 name, addr_ntop (ptr->ai_addr, ptr->ai_addrlen,
+				  topbuf, sizeof (topbuf)),
+		 get_port (ptr->ai_addr), ptr->ai_family);
       }
 
       if ((s = socket (ptr->ai_family, ptr->ai_socktype,
@@ -785,32 +804,6 @@ tls_log_func (int level, const char *str)
 }
 
 static void gaa_parser (int argc, char **argv);
-
-static int
-get_port (const struct sockaddr_storage *addr)
-{
-  switch (addr->ss_family)
-    {
-#if HAVE_IPV6
-    case AF_INET6:
-      return ntohs (((const struct sockaddr_in6 *) addr)->sin6_port);
-#endif
-    case AF_INET:
-      return ntohs (((const struct sockaddr_in *) addr)->sin_port);
-    }
-  return -1;
-}
-
-static const char *
-addr_ntop (const struct sockaddr *sa, socklen_t salen,
-	   char *buf, size_t buflen)
-{
-  if (getnameinfo (sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) == 0)
-    {
-      return buf;
-    }
-  return NULL;
-}
 
 int
 main (int argc, char **argv)
@@ -1193,7 +1186,8 @@ main (int argc, char **argv)
 				addr_ntop ((struct sockaddr *)
 					   &client_address, calen, topbuf,
 					   sizeof (topbuf)),
-				get_port (&client_address));
+				get_port ((struct sockaddr *)
+					  &client_address));
 			print_info (j->tls_session, NULL, 1);
 		      }
 		    j->handshake_ok = 1;
@@ -1290,7 +1284,8 @@ main (int argc, char **argv)
 				addr_ntop ((struct sockaddr *)
 					   &client_address, calen, topbuf,
 					   sizeof (topbuf)),
-				get_port (&client_address));
+				get_port ((struct sockaddr *)
+					  &client_address));
 
 			print_info (j->tls_session, NULL, 1);
 		      }
@@ -1480,7 +1475,6 @@ int cache_db_ptr = 0;
 static void
 wrap_db_init (void)
 {
-
   /* allocate cache_db */
   cache_db = calloc (1, ssl_session_cache * sizeof (CACHE));
 }
@@ -1528,8 +1522,6 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
       if (key.size == cache_db[i].session_id_size &&
 	  memcmp (key.data, cache_db[i].session_id, key.size) == 0)
 	{
-
-
 	  res.size = cache_db[i].session_data_size;
 
 	  res.data = gnutls_malloc (res.size);
@@ -1566,5 +1558,4 @@ wrap_db_delete (void *dbf, gnutls_datum_t key)
     }
 
   return -1;
-
 }
