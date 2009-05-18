@@ -13,6 +13,10 @@ Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3557>.
 
+** gnutls-serv: Fix build failure for unportable NI_MAXHOST/NI_MAXSERV.
+Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3560>
+
 ** API and ABI modifications:
 No changes since last version.
 
