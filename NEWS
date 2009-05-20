@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.7.12 (unreleased)
 
+** tests/crq_key_id: Don't read entropy from /dev/random in self-test.
+Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3570>.
+
 ** API and ABI modifications:
 No changes since last version.
 
