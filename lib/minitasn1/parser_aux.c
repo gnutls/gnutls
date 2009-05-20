@@ -1142,7 +1142,7 @@ parse_version_string (const char *s, int *major, int *minor, int *micro)
  * asn1_check_version - check for library version
  * @req_version: Required version number, or NULL.
  *
- * Check that the the version of the library is at minimum the
+ * Check that the version of the library is at minimum the
  * requested one and return the version string; return %NULL if the
  * condition is not satisfied.  If a %NULL is passed to this function,
  * no check is done, but the version string is simply returned.

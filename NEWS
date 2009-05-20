@@ -14,6 +14,10 @@ Missing sa_family_t and vsnprintf on IRIX.  Reported by "Tom
 G. Christensen" <tgc@jupiterrise.com> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3571>.
 
+** minitasn1: Internal copy updated to libtasn1 v2.2.
+GnuTLS should work fine with libtasn1 v1.x and that is still
+supported.
+
 ** API and ABI modifications:
 No changes since last version.
 
