@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.7.12 (unreleased)
 
+** gnutls-serv, gnutls-cli-debug: Make them work on Windows.
+
 ** tests/crq_key_id: Don't read entropy from /dev/random in self-test.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3570>.

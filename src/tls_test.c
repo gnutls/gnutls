@@ -32,8 +32,10 @@
 #include <common.h>
 #include <tls_test-gaa.h>
 
+/* Gnulib portability files. */
 #include <progname.h>
 #include <version-etc.h>
+#include "sockets.h"
 
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
 #define MAX_BUF 4096
@@ -259,7 +261,8 @@ main (int argc, char **argv)
 	    }
 	}
       ERR (err, "connect") gnutls_init (&state, GNUTLS_CLIENT);
-      gnutls_transport_set_ptr (state, (gnutls_transport_ptr_t) sd);
+      gnutls_transport_set_ptr (state, (gnutls_transport_ptr_t)
+				gl_fd_to_handle (sd));
 
       do
 	{

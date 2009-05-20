@@ -48,6 +48,7 @@
 #include "version-etc.h"
 #include "read-file.h"
 #include "minmax.h"
+#include "sockets.h"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -1127,7 +1128,8 @@ main (int argc, char **argv)
 
 		j->tls_session = tls_session;
 		gnutls_transport_set_ptr (tls_session,
-					  (gnutls_transport_ptr_t) accept_fd);
+					  (gnutls_transport_ptr_t)
+					  gl_fd_to_handle (accept_fd));
 		j->handshake_ok = 0;
 
 		if (verbose == 0)
