@@ -9,6 +9,11 @@ See the end for copying conditions.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3570>.
 
+** Fix build failures.
+Missing sa_family_t and vsnprintf on IRIX.  Reported by "Tom
+G. Christensen" <tgc@jupiterrise.com> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3571>.
+
 ** API and ABI modifications:
 No changes since last version.
 
