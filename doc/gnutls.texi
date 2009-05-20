@@ -3507,11 +3507,14 @@ empty PSK identity hint, using @code{--netconf-hint ""}.
 @cindex srptool
 
 The @file{srptool} is a very simple program that emulates the programs
-in the @emph{Stanford SRP libraries}.  It is intended for use in
-places where you don't expect @acronym{SRP} authentication to be the
-used for system users.  Traditionally @emph{libsrp} used two
-files. One called 'tpasswd' which holds usernames and verifiers, and
-'tpasswd.conf' which holds generators and primes.
+in the @emph{Stanford SRP libraries}, see
+@url{http://srp.stanford.edu/}.  It is intended for use in places
+where you don't expect @acronym{SRP} authentication to be the used for
+system users.
+
+Traditionally @emph{libsrp} used two files. One called @code{tpasswd}
+which holds usernames and verifiers, and @code{tpasswd.conf} which
+holds generators and primes.
 
 How to use srptool:
 
@@ -3527,8 +3530,8 @@ $ srptool --create-conf /etc/tpasswd.conf
 
 @item
 This command will create /etc/tpasswd and will add user 'test' (you
-will also be prompted for a password). Verifiers are stored by default
-in the way libsrp expects.
+will also be prompted for a password).  Verifiers are stored by
+default in the way libsrp expects.
 
 @example
 $ srptool --passwd /etc/tpasswd \
@@ -3536,7 +3539,7 @@ $ srptool --passwd /etc/tpasswd \
 @end example
 
 @item
-This command will check against a password. If the password matches
+This command will check against a password.  If the password matches
 the one in /etc/tpasswd you will get an ok.
 
 @example

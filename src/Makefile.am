@@ -17,8 +17,6 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = README README.srptool
-
 SUBDIRS = cfg
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
