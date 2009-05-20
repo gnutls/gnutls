@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Free Software Foundation
+ * Copyright (C) 2008, 2009 Free Software Foundation
  *
  * Author: David Marín Carreño
  *
@@ -55,11 +55,11 @@ doit (void)
 
   int ret;
 
-  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
-
   ret = gnutls_global_init ();
   if (ret < 0)
     fail ("gnutls_global_init: %d\n", ret);
+
+  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (4711);
