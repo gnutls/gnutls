@@ -93,6 +93,8 @@ AC_DEFUN([lgl_INIT],
   m4_ifdef([AM_XGETTEXT_OPTION],
     [AM_XGETTEXT_OPTION([--flag=asprintf:2:c-format])
      AM_XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
+  gl_FUNC_VSNPRINTF
+  gl_STDIO_MODULE_INDICATOR([vsnprintf])
   gl_WCHAR_H
   gl_XSIZE
   m4_ifval(lgl_LIBSOURCES_LIST, [
@@ -281,6 +283,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
+  lib/vsnprintf.c
   lib/w32sock.h
   lib/wchar.in.h
   lib/xsize.h
@@ -354,6 +357,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/vasnprintf.m4
   m4/vasprintf.m4
   m4/visibility.m4
+  m4/vsnprintf.m4
   m4/wchar.m4
   m4/wchar_t.m4
   m4/wint_t.m4
@@ -383,6 +387,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-unistd.c
   tests/test-vasnprintf.c
   tests/test-vasprintf.c
+  tests/test-vsnprintf.c
   tests/test-wchar.c
   tests=lib/dummy.c
   tests=lib/intprops.h

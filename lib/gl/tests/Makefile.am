@@ -259,6 +259,15 @@ libtests_a_SOURCES += verify.h
 
 ## end   gnulib module verify
 
+## begin gnulib module vsnprintf-tests
+
+TESTS += test-vsnprintf
+check_PROGRAMS += test-vsnprintf
+
+EXTRA_DIST += test-vsnprintf.c
+
+## end   gnulib module vsnprintf-tests
+
 ## begin gnulib module wchar-tests
 
 TESTS += test-wchar
