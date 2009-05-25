@@ -263,7 +263,7 @@ GnuTLS may be downloaded from one of the mirror sites or direct from
 <ftp://ftp.gnu.org/gnu/gnutls/>.  The list of mirrors can be found at
 <http://www.gnu.org/software/gnutls/download.html>.
 
-Here are the BZIP2 compressed sources (4.9MB):
+Here are the BZIP2 compressed sources (6.0MB):
 
   ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.8.0.tar.bz2
   http://ftp.gnu.org/gnu/gnutls/gnutls-2.8.0.tar.bz2
@@ -302,9 +302,9 @@ Alternatively, after successfully verifying the OpenPGP signature of
 this announcement, you could verify that the files match the following
 checksum values.  The values are for SHA-1 and SHA-224 respectively:
 
-d1693e611aa7270f14bc500bd56ef529ffcb1703  gnutls-2.6.6.tar.bz2
+d1693e611aa7270f14bc500bd56ef529ffcb1703  gnutls-2.8.0.tar.bz2
 
-5e5bc180293b0854b7e8c27a5eb55f172579b346fba61b2d4b0b0c61  gnutls-2.6.6.tar.bz2
+5e5bc180293b0854b7e8c27a5eb55f172579b346fba61b2d4b0b0c61  gnutls-2.8.0.tar.bz2
 
 Documentation
 =============
@@ -342,7 +342,7 @@ Windows installer
 GnuTLS has been ported to the Windows operating system, and a binary
 installer is available.  The installer contains DLLs for application
 development, manuals, examples, and source code.  The installer uses
-libgpg-error v1.7, libgcrypt v1.4.4, libtasn1 v2.1, and GnuTLS v2.8.0.
+libgpg-error v1.7, libgcrypt v1.4.4, libtasn1 v2.2, and GnuTLS v2.8.0.
 
 For more information about GnuTLS for Windows:
   http://josefsson.org/gnutls4win/
@@ -353,9 +353,9 @@ The Windows binary installer and PGP signature:
 
 The checksum values for SHA-1 and SHA-224 are:
 
-8a86a846cbdc16b6c21442c706854a5c02416336  gnutls-2.6.6.exe
+8a86a846cbdc16b6c21442c706854a5c02416336  gnutls-2.8.0.exe
 
-555afa0c1524d8ad05a12384e1bd1b09da720b03058f0089dc812cfc  gnutls-2.6.6.exe
+555afa0c1524d8ad05a12384e1bd1b09da720b03058f0089dc812cfc  gnutls-2.8.0.exe
 
 A ZIP archive containing the Windows binaries:
   http://josefsson.org/gnutls4win/gnutls-2.8.0.zip (5.3MB)
@@ -366,9 +366,9 @@ A Debian mingw32 package is also available:
 
 The checksum values for SHA-1 and SHA-224 are:
 
-b141f97c196d408bf12b8a58ede6bda8fb291be6  mingw32-gnutls_2.6.6-1_all.deb
+b141f97c196d408bf12b8a58ede6bda8fb291be6  mingw32-gnutls_2.8.0-1_all.deb
 
-541e2fca8248460b419e2224a138b292020de1724c86c77b9478da93  mingw32-gnutls_2.6.6-1_all.deb
+541e2fca8248460b419e2224a138b292020de1724c86c77b9478da93  mingw32-gnutls_2.8.0-1_all.deb
 
 Internationalization
 ====================
