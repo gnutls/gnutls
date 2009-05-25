@@ -414,6 +414,7 @@ GNUTLS_1_4
     gnutls_x509_crq_set_basic_constraints;
     gnutls_x509_crq_set_challenge_password;
     gnutls_x509_crq_set_dn_by_oid;
+    gnutls_x509_crq_set_key;
     gnutls_x509_crq_set_key_rsa_raw;
     gnutls_x509_crq_set_key_usage;
     gnutls_x509_crq_set_version;
@@ -564,7 +565,6 @@ GNUTLS_2_8
     gnutls_x509_crq_get_subject_alt_othername_oid;
     gnutls_x509_crq_get_extension_by_oid;
     gnutls_x509_crq_set_subject_alt_name;
-    gnutls_x509_crq_set_key;
     gnutls_x509_crq_get_key_purpose_oid;
     gnutls_x509_crq_set_key_purpose_oid;
     gnutls_x509_crq_print;
