@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.7.13 (unreleased)
 
+** libgnutls: Fix version of some exported symbols in shared library.
+Affected functions are gnutls_x509_crq_set_basic_constraints,
+gnutls_x509_crq_set_key_usage, and gnutls_x509_crq_set_key.
+
 ** tests: Handle recently expired certificates in chainverify self-test.
 Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3580>.
