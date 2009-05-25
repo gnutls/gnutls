@@ -40,6 +40,7 @@ GNUTLS_1_4
     gnutls_bye;
     gnutls_calc_dh_key;
     gnutls_calc_dh_secret;
+    gnutls_calloc;
     gnutls_certificate_activation_time_peers;
     gnutls_certificate_allocate_credentials;
     gnutls_certificate_client_get_request_status;
@@ -139,6 +140,7 @@ GNUTLS_1_4
     gnutls_error_to_alert;
     gnutls_ext_register;
     gnutls_fingerprint;
+    gnutls_free;
     gnutls_global_deinit;
     gnutls_global_init;
     gnutls_global_set_log_function;
@@ -165,6 +167,7 @@ GNUTLS_1_4
     gnutls_mac_get_name;
     gnutls_mac_list;
     gnutls_mac_set_priority;
+    gnutls_malloc;
     gnutls_openpgp_count_key_names;
     gnutls_openpgp_crt_check_hostname;
     gnutls_openpgp_crt_deinit;
@@ -306,6 +309,7 @@ GNUTLS_1_4
     gnutls_psk_set_server_credentials_hint;
     gnutls_psk_set_server_dh_params;
     gnutls_psk_set_server_params_function;
+    gnutls_realloc;
     gnutls_realloc_fast;
     gnutls_record_check_pending;
     gnutls_record_disable_padding;
@@ -326,6 +330,7 @@ GNUTLS_1_4
     gnutls_rsa_params_import_raw;
     gnutls_rsa_params_init;
     gnutls_secure_calloc;
+    gnutls_secure_malloc;
     gnutls_server_name_get;
     gnutls_server_name_set;
     gnutls_session_enable_compatibility_mode;
@@ -348,6 +353,12 @@ GNUTLS_1_4
     gnutls_sign_get_id;
     gnutls_sign_get_name;
     gnutls_sign_list;
+    gnutls_srp_1024_group_generator;
+    gnutls_srp_1024_group_prime;
+    gnutls_srp_1536_group_generator;
+    gnutls_srp_1536_group_prime;
+    gnutls_srp_2048_group_generator;
+    gnutls_srp_2048_group_prime;
     gnutls_srp_allocate_client_credentials;
     gnutls_srp_allocate_server_credentials;
     gnutls_srp_base64_decode;
@@ -363,6 +374,7 @@ GNUTLS_1_4
     gnutls_srp_set_server_credentials_file;
     gnutls_srp_set_server_credentials_function;
     gnutls_srp_verifier;
+    gnutls_strdup;
     gnutls_strerror;
     gnutls_strerror_name;
     gnutls_supplemental_get_name;
@@ -517,22 +529,6 @@ GNUTLS_1_4
     gnutls_x509_rdn_get;
     gnutls_x509_rdn_get_by_oid;
     gnutls_x509_rdn_get_oid;
-
-    # SRP related variables:
-    gnutls_srp_1024_group_generator;
-    gnutls_srp_1024_group_prime;
-    gnutls_srp_1536_group_generator;
-    gnutls_srp_1536_group_prime;
-    gnutls_srp_2048_group_generator;
-    gnutls_srp_2048_group_prime;
-
-    # Memory allocation related variables:
-    gnutls_calloc;
-    gnutls_free;
-    gnutls_malloc;
-    gnutls_strdup;
-    gnutls_realloc;
-    gnutls_secure_malloc;
 
   local:
     *;
