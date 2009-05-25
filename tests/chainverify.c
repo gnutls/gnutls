@@ -701,10 +701,18 @@ static struct
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5, 0 },
   { "v1ca fail", v1ca, &v1ca[2],
     0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+  { "v1ca expired", v1ca, &v1ca[2],
+    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+    GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID  },
   { "v1ca ok", v1ca, &v1ca[2],
-    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, 0 },
-  { "v1ca ok2", v1ca, &v1ca[2],
-    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, 0 },
+    GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+    0 },
+  { "v1ca2 expired", v1ca, &v1ca[2],
+    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT,
+    GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID },
+  { "v1ca2 ok", v1ca, &v1ca[2],
+    GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT,
+    0 },
   { "cacertrsamd5 fail", cacertrsamd5, &cacertrsamd5[2],
     0, GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID },
   { "cacertrsamd5 ok", cacertrsamd5, &cacertrsamd5[2],
@@ -810,6 +818,11 @@ main (int argc, char *argv[])
 	  error (0, 0, "verify_status: %d expected: %d",
 		 verify_status, chains[i].expected_verify_result);
 	  exit_val = 1;
+	  if (argc > 1)
+	    {
+	      printf ("Exiting early with status...%d\n", exit_val);
+	      return exit_val;
+	    }
 	}
       else
 	printf ("done\n");
