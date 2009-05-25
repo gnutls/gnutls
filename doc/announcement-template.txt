@@ -10,8 +10,8 @@ General Public License version 2.1 (or later).  The "extra" GnuTLS
 library (which contains TLS/IA support, LZO compression and Libgcrypt
 FIPS-mode handler), the OpenSSL compatibility library, the self tests
 and the command line tools are all distributed under the GNU General
-Public License version 3.0 (or later).  The manual is distributed under
-the GNU Free Documentation License version 1.3 (or later).
+Public License version 3.0 (or later).  The manual is distributed
+under the GNU Free Documentation License version 1.3 (or later).
 
 The project page of the library is available at:
   http://www.gnu.org/software/gnutls/
@@ -19,8 +19,8 @@ The project page of the library is available at:
 What's New
 ==========
 
-Version 2.8.0 is the first stable release on the 2.8.x branch and is the
-result of 7 months of work on the experimental 2.7.x branch.
+Version 2.8.0 is the first stable release on the 2.8.x branch and is
+the result of 7 months of work on the experimental 2.7.x branch.
 
 ** lib: Linker version scripts reduces number of exported symbols.
 The linker version script now lists all exported ABIs explicitly, to
@@ -170,13 +170,34 @@ licenses, including the (L)GPL.
 API/ABI changes in GnuTLS 2.8
 =============================
 
-No functions have been removed or modified.  The library should be fully
-backwards compatible on both the source and binary level.
+No offically supported interfaces have been modified or removed.  The
+library should be completely backwards compatible on both the source
+and binary level.
 
-Although the same patch has also been applied to the 2.6.x branch, we'd
-like to remind you functions have been changed so that X.509 chain
-verification now also checks activation/expiration times on
-certificates.  The affected functions are:
+The shared library no longer exports some symbols that have never been
+officially supported, i.e., not mentioned in any of the header files.
+The symbols are:
+
+  _gnutls*
+  gnutls_asn1_tab
+  
+Normally when symbols are removed, the shared library version has to
+be incremented.  This leads to a significant cost for everyone using
+the library.  Because none of the above symbols have ever been
+intended for use by well-behaved applications, we decided that the it
+would be better for those applications to pay the price rather than
+incurring problems on the majority of applications.
+
+If it turns out that applications have been using unofficial
+interfaces, we will need to release a follow-on release on the v2.8
+branch to exports additional interfaces.  However, initial testing
+suggests that few if any applications have been using any of the
+internal symbols.
+
+Although not a new change compared to 2.6.x, we'd like to remind you
+interfaces have been modified so that X.509 chain verification now
+also checks activation/expiration times on certificates.  The affected
+functions are:
 
 gnutls_x509_crt_list_verify: CHANGED, checks activation/expiration times.
 gnutls_certificate_verify_peers: Likewise.
@@ -185,43 +206,49 @@ GNUTLS_CERT_NOT_ACTIVATED: ADDED.
 GNUTLS_CERT_EXPIRED: ADDED.
 GNUTLS_VERIFY_DISABLE_TIME_CHECKS: ADDED.
 
-The following functions or symbols have been added to the library or
-header files:
+This change in behaviour was made during the GnuTLS 2.6.x cycle, and
+we gave our rationale for it in earlier release notes.
+
+The following symbols have been added to the library:
 
 gnutls_certificate_set_x509_simple_pkcs12_mem: ADDED
-gnutls_x509_crt_verify_hash: ADDED
-gnutls_x509_crt_get_verify_algorithm: ADDED
 gnutls_x509_crl_get_authority_key_id: ADDED
-gnutls_x509_crl_get_number: ADDED
-gnutls_x509_crl_get_extension_oid: ADDED
-gnutls_x509_crl_get_extension_info: ADDED
 gnutls_x509_crl_get_extension_data: ADDED
+gnutls_x509_crl_get_extension_info: ADDED
+gnutls_x509_crl_get_extension_oid: ADDED
+gnutls_x509_crl_get_number: ADDED
 gnutls_x509_crl_set_authority_key_id: ADDED
 gnutls_x509_crl_set_number: ADDED
-gnutls_x509_crq_get_key_rsa_raw: ADDED
-gnutls_x509_crq_get_attribute_info: ADDED
 gnutls_x509_crq_get_attribute_data: ADDED
-gnutls_x509_crq_get_extension_info: ADDED
-gnutls_x509_crq_get_extension_data: ADDED
-gnutls_x509_crq_get_key_usage: ADDED
+gnutls_x509_crq_get_attribute_info: ADDED
 gnutls_x509_crq_get_basic_constraints: ADDED
+gnutls_x509_crq_get_extension_by_oid: ADDED
+gnutls_x509_crq_get_extension_data: ADDED
+gnutls_x509_crq_get_extension_info: ADDED
+gnutls_x509_crq_get_key_id: ADDED.
+gnutls_x509_crq_get_key_purpose_oid: ADDED
+gnutls_x509_crq_get_key_rsa_raw: ADDED
+gnutls_x509_crq_get_key_usage: ADDED
 gnutls_x509_crq_get_subject_alt_name: ADDED
 gnutls_x509_crq_get_subject_alt_othername_oid: ADDED
-gnutls_x509_crq_get_extension_by_oid: ADDED
-gnutls_x509_crq_set_subject_alt_name: ADDED
-gnutls_x509_crq_set_basic_constraints: ADDED
-gnutls_x509_crq_set_key_usage: ADDED
-gnutls_x509_crq_get_key_purpose_oid: ADDED
-gnutls_x509_crq_set_key_purpose_oid: ADDED
 gnutls_x509_crq_print: ADDED
+gnutls_x509_crq_set_basic_constraints: ADDED
+gnutls_x509_crq_set_key_purpose_oid: ADDED
+gnutls_x509_crq_set_key_usage: ADDED
+gnutls_x509_crq_set_subject_alt_name: ADDED
+gnutls_x509_crt_get_verify_algorithm: ADDED
 gnutls_x509_crt_set_crq_extensions: ADDED
+gnutls_x509_crt_verify_hash: ADDED
+
+The following interfaces have been added to the header files:
+
 GNUTLS_VERSION: ADDED, replaces LIBGNUTLS_VERSION.
 GNUTLS_VERSION_MAJOR: ADDED, replaces LIBGNUTLS_VERSION_MAJOR.
 GNUTLS_VERSION_MINOR: ADDED, replaces LIBGNUTLS_VERSION_MINOR.
 GNUTLS_VERSION_PATCH: ADDED, replaces LIBGNUTLS_VERSION_PATCH.
 GNUTLS_VERSION_NUMBER: ADDED, replaces LIBGNUTLS_VERSION_NUMBER.
 
-The following symbols have been deprecated:
+The following interfaces have been deprecated:
 
 LIBGNUTLS_VERSION: DEPRECATED.
 LIBGNUTLS_VERSION_MAJOR: DEPRECATED.
