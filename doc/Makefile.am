@@ -136,10 +136,14 @@ printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
 
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
-	-$(builddir)/errcodes > error_codes.texi
+	make $(builddir)/errcodes
+	$(builddir)/errcodes > error_codes.texi-tmp && \
+		mv error_codes.texi-tmp error_codes.texi
 
 algorithms.texi: $(srcdir)/printlist.c
-	-$(builddir)/printlist > algorithms.texi
+	make $(builddir)/printlist
+	$(builddir)/printlist > algorithms.texi-tmp && \
+		mv algorithms.texi-tmp algorithms.texi
 
 guile_texi           = core.c.texi extra.c.texi
 BUILT_SOURCES        = $(guile_texi)
