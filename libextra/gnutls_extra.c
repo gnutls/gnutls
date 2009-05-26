@@ -154,7 +154,7 @@ gnutls_global_init_extra (void)
  *
  * Check GnuTLS Extra Library version.
  *
- * See %LIBGNUTLS_EXTRA_VERSION for a suitable @req_version string.
+ * See %GNUTLS_EXTRA_VERSION for a suitable @req_version string.
  *
  * Return value: Check that the version of the library is at
  *   minimum the one given as a string in @req_version and return the

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -39,7 +39,7 @@ doit (void)
   if (gnutls_global_init () != 0)
     fail ("gnutls_global_init\n");
 
-  if (!gnutls_check_version (LIBGNUTLS_VERSION))
+  if (!gnutls_check_version (GNUTLS_VERSION))
     success ("gnutls_check_version ERROR\n");
 
   MD5_Init (&c);
