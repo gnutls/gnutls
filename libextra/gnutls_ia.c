@@ -376,8 +376,8 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
  * @sizeofdata: is the length of the data
  *
  * Send TLS/IA application payload data.  This function has the
- * similar semantics with send(). The only difference is that is
- * accepts a GNUTLS session, and uses different error codes.
+ * similar semantics with send().  The only difference is that it
+ * accepts a GnuTLS session, and uses different error codes.
  *
  * The TLS/IA protocol is synchronous, so you cannot send more than
  * one packet at a time.  The client always send the first packet.
@@ -415,7 +415,7 @@ gnutls_ia_send (gnutls_session_t session, const char *data, size_t sizeofdata)
  * @sizeofdata: the number of requested bytes, must be >= 12.
  *
  * Receive TLS/IA data.  This function has the similar semantics with
- * recv(). The only difference is that is accepts a GNUTLS session,
+ * recv().  The only difference is that it accepts a GnuTLS session,
  * and uses different error codes.
  *
  * If the server attempt to finish an application phase, this function

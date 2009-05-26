@@ -171,13 +171,13 @@ generate_dh_primes (void)
       exit (1);
     }
 
-  /* Generate Diffie Hellman parameters - for use with DHE
+  /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a week or once a month. Depends on the
    * security requirements.
    */
   printf
-    ("Generating Diffie Hellman parameters [%d]. Please wait...\n",
+    ("Generating Diffie-Hellman parameters [%d]. Please wait...\n",
      prime_bits);
   fflush (stdout);
 
@@ -229,7 +229,7 @@ read_dh_params (void)
       exit (1);
     }
 
-  printf ("Read Diffie Hellman parameters.\n");
+  printf ("Read Diffie-Hellman parameters.\n");
   fflush (stdout);
 
 }
@@ -262,7 +262,7 @@ static_dh_params (void)
       exit (1);
     }
 
-  printf ("Set static Diffie Hellman parameters, consider --dhparams.\n");
+  printf ("Set static Diffie-Hellman parameters, consider --dhparams.\n");
 
   return 0;
 }
@@ -870,7 +870,7 @@ main (int argc, char **argv)
   gnutls_global_set_log_level (debug);
 
   /* Note that servers must generate parameters for
-   * Diffie Hellman. See gnutls_dh_params_generate(), and
+   * Diffie-Hellman. See gnutls_dh_params_generate(), and
    * gnutls_dh_params_set().
    */
   if (generate != 0)

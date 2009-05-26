@@ -67,7 +67,7 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("A record packet with illegal version was received."),
 	       GNUTLS_E_UNSUPPORTED_VERSION_PACKET, 1),
   ERROR_ENTRY (N_
-	       ("The Diffie Hellman prime sent by the server is not acceptable (not long enough)."),
+	       ("The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."),
 	       GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1),
   ERROR_ENTRY (N_("A TLS packet with unexpected length was received."),
 	       GNUTLS_E_UNEXPECTED_PACKET_LENGTH, 1),

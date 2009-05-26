@@ -64,7 +64,7 @@ static int
 generate_dh_params (void)
 {
 
-  /* Generate Diffie Hellman parameters - for use with DHE
+  /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. When short bit length is used, it might
    * be wise to regenerate parameters.
    *

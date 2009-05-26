@@ -116,12 +116,12 @@ static const TLS_TEST tls_tests[] = {
 #ifdef ENABLE_ANON
   {"for anonymous authentication support", test_anonymous, "yes", "no",
    "dunno"},
-  {"anonymous Diffie Hellman group info", test_dhe_group, "", "N/A",
+  {"anonymous Diffie-Hellman group info", test_dhe_group, "", "N/A",
    "N/A"},
 #endif
-  {"for ephemeral Diffie Hellman support", test_dhe, "yes", "no",
+  {"for ephemeral Diffie-Hellman support", test_dhe, "yes", "no",
    "dunno"},
-  {"ephemeral Diffie Hellman group info", test_dhe_group, "", "N/A",
+  {"ephemeral Diffie-Hellman group info", test_dhe_group, "", "N/A",
    "N/A"},
   {"for AES cipher support (TLS extension)", test_aes, "yes", "no",
    "dunno"},

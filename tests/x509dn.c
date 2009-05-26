@@ -306,7 +306,7 @@ static int
 generate_dh_params (void)
 {
   const gnutls_datum_t p3 = { (char*) pkcs3, strlen (pkcs3) };
-  /* Generate Diffie Hellman parameters - for use with DHE
+  /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
    * security requirements.

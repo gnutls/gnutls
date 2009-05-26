@@ -834,7 +834,7 @@ extern "C" {
   void gnutls_global_set_log_function (gnutls_log_func log_func);
   void gnutls_global_set_log_level (int level);
 
-/* Diffie Hellman parameter handling.
+/* Diffie-Hellman parameter handling.
  */
   int gnutls_dh_params_init (gnutls_dh_params_t * dh_params);
   void gnutls_dh_params_deinit (gnutls_dh_params_t dh_params);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005, 2007 Free Software Foundation
+ * Copyright (C) 2005, 2007, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,9 +22,8 @@
  *
  */
 
-/* This file contains the PSK Diffie Hellman key exchange part of
- * the PSK authentication. The functions here are used in the
- * handshake.
+/* This file contains the PSK Diffie-Hellman key exchange part of the
+ * PSK authentication.  The functions here are used in the handshake.
  */
 
 #include <gnutls_int.h>

@@ -38,7 +38,7 @@ static int
 generate_dh_params (void)
 {
 
-  /* Generate Diffie Hellman parameters - for use with DHE
+  /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
    * security requirements.

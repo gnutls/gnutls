@@ -33,8 +33,8 @@ option (e, verify-chain) { $action=ACTION_VERIFY_CHAIN; } "Verify a PEM encoded 
 
 option (verify-crl) { $action=ACTION_VERIFY_CRL; } "Verify a CRL."
 
-option (generate-dh-params) { $action=ACTION_GENERATE_DH; } "Generate PKCS #3 encoded Diffie Hellman parameters."
-option (get-dh-params) { $action=ACTION_GET_DH; } "Get the included PKCS #3 encoded Diffie Hellman parameters."
+option (generate-dh-params) { $action=ACTION_GENERATE_DH; } "Generate PKCS #3 encoded Diffie-Hellman parameters."
+option (get-dh-params) { $action=ACTION_GET_DH; } "Get the included PKCS #3 encoded Diffie-Hellman parameters."
 
 #char *privkey;
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."

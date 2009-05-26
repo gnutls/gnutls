@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -2767,7 +2767,7 @@ check_server_params (gnutls_session_t session,
 
   cred_type = _gnutls_map_kx_get_cred (kx, 1);
 
-  /* Read the Diffie Hellman parameters, if any.
+  /* Read the Diffie-Hellman parameters, if any.
    */
   if (cred_type == GNUTLS_CRD_CERTIFICATE)
     {

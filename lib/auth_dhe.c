@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,9 +22,9 @@
  *
  */
 
-/* This file contains everything for the Ephemeral Diffie Hellman (DHE)
- * key exchange. This is used in the handshake procedure of the certificate
- * authentication.
+/* This file contains everything for the Ephemeral Diffie-Hellman
+ * (DHE) key exchange.  This is used in the handshake procedure of the
+ * certificate authentication.
  */
 
 #include "gnutls_int.h"
