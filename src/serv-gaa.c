@@ -126,7 +126,7 @@ void gaa_help(void)
 {
 	printf("GNU TLS test server\nUsage: gnutls-serv [options]\n\n\n");
 	__gaa_helpsingle('d', "debug", "integer ", "Enable debugging");
-	__gaa_helpsingle('g', "generate", "", "Generate Diffie Hellman Parameters.");
+	__gaa_helpsingle('g', "generate", "", "Generate Diffie-Hellman Parameters.");
 	__gaa_helpsingle('p', "port", "integer ", "The port to connect to.");
 	__gaa_helpsingle('q', "quiet", "", "Suppress some messages.");
 	__gaa_helpsingle(0, "nodb", "", "Does not use the resume database.");
