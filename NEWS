@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.7.14 (unreleased)
 
+** Several typo fixes in documentation.
+Reported by Peter Hendrickson <pdh@wiredyne.com>.
+
 ** API and ABI modifications:
 No changes since last version.
 
