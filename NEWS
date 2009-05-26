@@ -5,11 +5,17 @@ See the end for copying conditions.
 
 * Version 2.7.14 (unreleased)
 
-** Several typo fixes in documentation.
+** libgnutls: Fix namespace issue with version symbol for libgnutls-extra.
+The symbol LIBGNUTLS_EXTRA_VERSION were renamed to
+GNUTLS_EXTRA_VERSION.  The old symbol will continue to work but is
+deprecated.
+
+** Doc: Several typo fixes in documentation.
 Reported by Peter Hendrickson <pdh@wiredyne.com>.
 
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_VERSION: ADDED, replaces LIBGNUTLS_EXTRA_VERSION.
+LIBGNUTLS_EXTRA_VERSION: DEPRECATED.
 
 * Version 2.7.13 (released 2009-05-25)
 
