@@ -48,6 +48,11 @@ GNUTLS_VERSION_MAJOR, GNUTLS_VERSION_MINOR, GNUTLS_VERSION_PATCH, and
 GNUTLS_VERSION_NUMBER respectively.  The old symbols will continue to
 work but are deprecated.
 
+** libgnutls: Fix namespace issue with version symbol for libgnutls-extra.
+The symbol LIBGNUTLS_EXTRA_VERSION were renamed to
+GNUTLS_EXTRA_VERSION.  The old symbol will continue to work but is
+deprecated.
+
 ** libgnutls: Add functions to verify a hash against a certificate.
 gnutls_x509_crt_verify_hash: ADDED
 gnutls_x509_crt_get_verify_algorithm: ADDED
@@ -247,6 +252,7 @@ GNUTLS_VERSION_MAJOR: ADDED, replaces LIBGNUTLS_VERSION_MAJOR.
 GNUTLS_VERSION_MINOR: ADDED, replaces LIBGNUTLS_VERSION_MINOR.
 GNUTLS_VERSION_PATCH: ADDED, replaces LIBGNUTLS_VERSION_PATCH.
 GNUTLS_VERSION_NUMBER: ADDED, replaces LIBGNUTLS_VERSION_NUMBER.
+GNUTLS_VERSION: ADDED, replaces LIBGNUTLS_EXTRA_VERSION.
 
 The following interfaces have been deprecated:
 
@@ -255,6 +261,7 @@ LIBGNUTLS_VERSION_MAJOR: DEPRECATED.
 LIBGNUTLS_VERSION_MINOR: DEPRECATED.
 LIBGNUTLS_VERSION_PATCH: DEPRECATED.
 LIBGNUTLS_VERSION_NUMBER: DEPRECATED.
+LIBGNUTLS_EXTRA_VERSION: DEPRECATED.
 
 Getting the Software
 ====================
