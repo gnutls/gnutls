@@ -20,8 +20,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = TODO README.gaa certtool.cfg gnutls.ps gnutls.pdf	\
-	gnutls.html extract-guile-c-doc.scm doxygen/Doxyfile.in	\
-	doxygen/Doxyfile.orig texinfo.css
+	gnutls.html doxygen/Doxyfile.in doxygen/Doxyfile.orig	\
+	texinfo.css
 
 SUBDIRS = examples cyclo scripts manpages credentials
 if ENABLE_GTK_DOC
@@ -29,11 +29,10 @@ SUBDIRS += reference
 endif
 
 info_TEXINFOS = gnutls.texi
-gnutls_TEXINFOS = gnutls.texi						\
-	fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi				\
-	gnutls-api.texi extra-api.texi ia-api.texi			\
-	x509-api.texi pgp-api.texi					\
-	examples/ex-client1.c examples/ex-client2.c			\
+gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi
+
+# Examples.
+gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
 	examples/ex-session-info.c examples/ex-verify.c			\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
 	examples/ex-client-srp.c examples/ex-client-tlsia.c		\
@@ -41,11 +40,7 @@ gnutls_TEXINFOS = gnutls.texi						\
 	examples/ex-serv-export.c examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
-	examples/ex-pkcs12.c guile.texi $(guile_texi)
-
-# Generated texinfos.
-gnutls_TEXINFOS += error_codes.texi algorithms.texi
-MAINTAINERCLEANFILES = error_codes.texi algorithms.texi
+	examples/ex-pkcs12.c
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\
@@ -92,6 +87,15 @@ AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 	--no-split --css-include=$(srcdir)/texinfo.css
+
+MAINTAINERCLEANFILES =
+
+# Generated texinfos.
+
+gnutls_TEXINFOS += gnutls-api.texi extra-api.texi ia-api.texi	\
+	x509-api.texi pgp-api.texi
+MAINTAINERCLEANFILES += gnutls-api.texi extra-api.texi ia-api.texi	\
+	x509-api.texi pgp-api.texi
 
 gnutls-api.texi: $(srcdir)/../lib/*.c
 	echo "" > $@-tmp
@@ -150,6 +154,11 @@ ia-api.texi: $(srcdir)/../libextra/gnutls_ia.c
 
 # Generated texinfos.
 
+gnutls_TEXINFOS += error_codes.texi algorithms.texi
+MAINTAINERCLEANFILES += error_codes.texi algorithms.texi
+
+AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
+
 noinst_PROGRAMS = errcodes printlist
 
 errcodes_SOURCES = errcodes.c
@@ -157,8 +166,6 @@ errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
 printlist_SOURCES = printlist.c
 printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
-
-AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
 
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
 	make $(builddir)/errcodes
@@ -170,16 +177,15 @@ algorithms.texi: $(srcdir)/printlist.c
 	$(builddir)/printlist > $@-tmp
 	mv $@-tmp $@
 
+# Guile texinfos.
+
 guile_texi           = core.c.texi extra.c.texi
+gnutls_TEXINFOS      += guile.texi $(guile_texi)
 BUILT_SOURCES        = $(guile_texi)
 MAINTAINERCLEANFILES += $(guile_texi)
-EXTRA_DIST           += $(guile_texi)
+EXTRA_DIST           += $(guile_texi) extract-guile-c-doc.scm
 
 if HAVE_GUILE
-
-#
-# Guile documentation extraction from C code.
-#
 
 GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
 
