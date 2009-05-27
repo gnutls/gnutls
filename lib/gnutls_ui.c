@@ -295,10 +295,13 @@ gnutls_dh_get_secret_bits (gnutls_session_t session)
  *
  * This function will return the bits of the prime used in the last
  * Diffie-Hellman authentication with the peer.  Should be used for
- * both anonymous and ephemeral Diffie-Hellman.
+ * both anonymous and ephemeral Diffie-Hellman.  Note that some
+ * ciphers, like RSA and DSA without DHE, does not use a
+ * Diffie-Hellman exchange, and then this function will return 0.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
- *   an error code is returned.
+ * Returns: The Diffie-Hellman bit strength is returned, or 0 if no
+ *   Diffie-Hellman exchange was done, or a negative error code on
+ *   failure.
  **/
 int
 gnutls_dh_get_prime_bits (gnutls_session_t session)
