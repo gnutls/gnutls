@@ -5,10 +5,7 @@ See the end for copying conditions.
 
 * Version 2.8.0 (unreleased)
 
-** libgnutls: Doc fix.
-Reported by Peter Hendrickson <pdh@wiredyne.com>.
-
-** doc: Fix error codes and algorithm lists.
+** doc: Fix gnutls_dh_get_prime_bits.  Fix error codes and algorithm lists.
 
 ** API and ABI modifications:
 No changes since last version.
