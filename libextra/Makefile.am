@@ -43,8 +43,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls-extra.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
-EXTRA_DIST = gnutls-extra-api.texi ia-api.texi
-
 defexecdir = $(bindir)
 defexec_DATA = 
 
@@ -112,21 +110,3 @@ libgnutls_extra_la_LDFLAGS += \
 else
 libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^(gnutls_).*'
 endif
-
-gnutls-extra-api.texi: gnutls_extra.c
-	@echo "" > $@
-	@for i in $<; do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../doc/scripts/gdoc -texinfo $$i >> $@ && \
-		echo "ok"; \
-	done
-
-ia-api.texi: gnutls_ia.c
-	@echo "" > $@
-	@for i in $<; do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../doc/scripts/gdoc -texinfo $$i >> $@ && \
-		echo "ok"; \
-	done
-
-dist-hook: gnutls-extra-api.texi ia-api.texi

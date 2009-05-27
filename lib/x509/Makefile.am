@@ -57,15 +57,3 @@ libgnutls_x509_la_SOURCES =	\
 	x509.c			\
 	x509_int.h		\
 	x509_write.c
-
-EXTRA_DIST = x509-api.texi
-
-x509-api.texi: $(libgnutls_x509_la_SOURCES)
-	@echo "" > x509-api.texi
-	@for i in $(libgnutls_x509_la_SOURCES); do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../../doc/scripts/gdoc -texinfo $$i >> x509-api.texi && \
-		echo "ok"; \
-	done
-
-dist-hook: x509-api.texi

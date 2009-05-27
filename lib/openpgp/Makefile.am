@@ -39,15 +39,3 @@ COBJECTS = pgp.c pgpverify.c extras.c compat.c privkey.c output.c	\
 	gnutls_openpgp.c
 
 libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp_int.h gnutls_openpgp.h
-
-EXTRA_DIST = pgp-api.texi
-
-pgp-api.texi: $(COBJECTS)
-	@echo "" > pgp-api.texi
-	@for i in $(COBJECTS); do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../../doc/scripts/gdoc -texinfo $$i >> pgp-api.texi && \
-		echo "ok"; \
-	done
-
-dist-hook: pgp-api.texi

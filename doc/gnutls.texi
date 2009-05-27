@@ -3588,7 +3588,7 @@ These functions are only available in the GPLv3+ version of the
 library called @code{gnutls-extra}. The prototypes for this library
 lie in @file{gnutls/extra.h}.
 
-@include gnutls-extra-api.texi
+@include extra-api.texi
 
 @node OpenPGP functions
 @section @acronym{OpenPGP} Functions

@@ -53,7 +53,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
-EXTRA_DIST = gnutls-api.texi
 lib_LTLIBRARIES = libgnutls.la
 
 SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
@@ -161,13 +160,3 @@ pkix_asn1_tab.c: pkix.asn
 
 gnutls_asn1_tab.c: gnutls.asn
 	-asn1Parser gnutls.asn gnutls_asn1_tab.c
-
-gnutls-api.texi: $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS) $(OPRFI_COBJECTS)
-	@echo "" > gnutls-api.texi
-	@for i in $(COBJECTS) $(SRP_COBJECTS) $(PSK_COBJECTS) $(OPRFI_COBJECTS); do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../doc/scripts/gdoc -texinfo $$i >> gnutls-api.texi && \
-		echo "ok"; \
-	done
-
-dist-hook: gnutls-api.texi

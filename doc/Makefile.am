@@ -31,7 +31,7 @@ endif
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi						\
 	fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi				\
-	gnutls-api.texi gnutls-extra-api.texi ia-api.texi		\
+	gnutls-api.texi extra-api.texi ia-api.texi			\
 	x509-api.texi pgp-api.texi					\
 	examples/ex-client1.c examples/ex-client2.c			\
 	examples/ex-session-info.c examples/ex-verify.c			\
@@ -93,35 +93,60 @@ TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
 AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS) \
 	--no-split --css-include=$(srcdir)/texinfo.css
 
-../lib/gnutls-api.texi:
-	cd ../lib && make gnutls-api.texi
+gnutls-api.texi: $(srcdir)/../lib/*.c
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
+	rm -f $@-tmp
+	mv $@-tmp2 $@
 
-../libextra/gnutls-extra-api.texi:
-	cd ../libextra && make gnutls-extra-api.texi
+x509-api.texi: $(srcdir)/../lib/x509/*.c
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
+	rm -f $@-tmp
+	mv $@-tmp2 $@
 
-../lib/x509/x509-api.texi:
-	cd ../lib/x509 && make x509-api.texi
+pgp-api.texi: $(srcdir)/../lib/openpgp/*.c
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
+	rm -f $@-tmp
+	mv $@-tmp2 $@
 
-../lib/openpgp/pgp-api.texi:
-	cd ../lib/openpgp && make pgp-api.texi
+extra-api.texi: $(srcdir)/../libextra/gnutls_extra.c
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
+	rm -f $@-tmp
+	mv $@-tmp2 $@
 
-../libextra/ia-api.texi:
-	cd ../libextra && make ia-api.texi
-
-gnutls-api.texi: ../lib/gnutls-api.texi
-	-$(srcdir)/scripts/sort2.pl < ../lib/gnutls-api.texi > gnutls-api.texi
-
-gnutls-extra-api.texi: ../libextra/gnutls-extra-api.texi
-	-$(srcdir)/scripts/sort2.pl < ../libextra/gnutls-extra-api.texi > gnutls-extra-api.texi
-
-x509-api.texi: ../lib/x509/x509-api.texi
-	-$(srcdir)/scripts/sort2.pl < ../lib/x509/x509-api.texi > x509-api.texi
-
-pgp-api.texi: ../lib/openpgp/pgp-api.texi
-	-$(srcdir)/scripts/sort2.pl < ../lib/openpgp/pgp-api.texi > pgp-api.texi
-
-ia-api.texi: ../libextra/ia-api.texi
-	-$(srcdir)/scripts/sort2.pl < ../libextra/ia-api.texi > ia-api.texi
+ia-api.texi: $(srcdir)/../libextra/gnutls_ia.c
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
+	rm -f $@-tmp
+	mv $@-tmp2 $@
 
 # Generated texinfos.
 
@@ -137,13 +162,13 @@ AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
 
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
 	make $(builddir)/errcodes
-	$(builddir)/errcodes > error_codes.texi-tmp && \
-		mv error_codes.texi-tmp error_codes.texi
+	$(builddir)/errcodes > $@-tmp
+	mv $@-tmp $@
 
 algorithms.texi: $(srcdir)/printlist.c
 	make $(builddir)/printlist
-	$(builddir)/printlist > algorithms.texi-tmp && \
-		mv algorithms.texi-tmp algorithms.texi
+	$(builddir)/printlist > $@-tmp
+	mv $@-tmp $@
 
 guile_texi           = core.c.texi extra.c.texi
 BUILT_SOURCES        = $(guile_texi)
