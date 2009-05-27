@@ -1,3 +1,55 @@
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.8.0.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announcement-template.txt: Typo.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, cfg.mk, configure.ac, lib/configure.ac,
+	libextra/configure.ac: Prepare for stable release.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.c: Doc fix.  Reported by Peter Hendrickson
+	<pdh@wiredyne.com>.
+
+2009-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* src/select.c: Remove unused file, replaced by poll from gnulib.
+
+2009-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Fix generation of error_codes.texi and
+	algorithms.texi.
+
+2009-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
+2009-05-26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announcement-template.txt: Fix.
+
 2009-05-26  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.7.14.
