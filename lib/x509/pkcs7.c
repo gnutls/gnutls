@@ -195,7 +195,7 @@ gnutls_pkcs7_deinit (gnutls_pkcs7_t pkcs7)
  *
  * This function will convert the given DER or PEM encoded PKCS7 to
  * the native #gnutls_pkcs7_t format.  The output will be stored in
- * 'pkcs7'.
+ * @pkcs7.
  *
  * If the PKCS7 is PEM encoded it should have a header of "PKCS7".
  *
