@@ -1,3 +1,64 @@
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.0.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix paths for alpha release.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.c: Doc fix.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gnupload: Update gnulib files.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/srptool.1: Fix.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/gnutls-serv.1: Doc fix.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_psk.c: Doc fix.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/pkcs7.c: Doc fix.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Cleanup rules.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am, doc/gnutls.texi, lib/Makefile.am,
+	lib/openpgp/Makefile.am, lib/x509/Makefile.am, libextra/Makefile.am: 
+	Move API texinfo generation into doc/.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/include_next.m4, gl/m4/size_max.m4,
+	lib/gl/m4/include_next.m4, lib/gl/m4/size_max.m4: Update gnulib
+	files.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-05-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.8.0.
