@@ -375,7 +375,7 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
  * encoded.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.and a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,

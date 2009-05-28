@@ -946,7 +946,7 @@ _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
   * GNUTLS_CERT_REVOKED: a certificate in the chain has been revoked.
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int
@@ -983,7 +983,7 @@ gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
   * The verification output in this functions cannot be GNUTLS_CERT_NOT_VALID.
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int

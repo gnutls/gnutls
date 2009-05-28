@@ -642,7 +642,7 @@ gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert)
   * opaque. 
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int
@@ -683,7 +683,7 @@ gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
   * field (2.5.29.14). 
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative value in case of an error.
+  *   negative error value.
   *
   **/
 int
@@ -772,7 +772,7 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
  * only returns the keyIdentifier field of the extension.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.and a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
