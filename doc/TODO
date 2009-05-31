@@ -84,6 +84,8 @@ Current list:
 - Debug why connections to smtp.hispeed.ch fails (Debian #429183).
   Most likely the server is buggy, but it would be useful to document
   the problem better.
+- The return value of gnutls_dh_get_prime_bits and probably other get*bits
+  functions' are rounded up on byte level. Fix it.
 
 (+) Means high priority 
 (*) Means medium priority
