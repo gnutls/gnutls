@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.9.1 (unreleased)
 
+** Reduce stack usage for some CRQ functions.
+
+** Doc fixes for CRQ functions.
+
 ** API and ABI modifications:
 No changes since last version.
 
