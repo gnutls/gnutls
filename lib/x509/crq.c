@@ -2338,7 +2338,6 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
 
   if (*output_data_size < 20)
     {
-      gnutls_assert ();
       *output_data_size = 20;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
