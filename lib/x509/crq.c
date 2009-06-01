@@ -92,20 +92,21 @@ gnutls_x509_crq_deinit (gnutls_x509_crq_t crq)
 #define PEM_CRQ2 "CERTIFICATE REQUEST"
 
 /**
-  * gnutls_x509_crq_import - This function will import a DER or PEM encoded Certificate request
-  * @crq: The structure to store the parsed certificate request.
-  * @data: The DER or PEM encoded certificate.
-  * @format: One of DER or PEM
-  *
-  * This function will convert the given DER or PEM encoded Certificate
-  * to the native gnutls_x509_crq_t format. The output will be stored in @cert.
-  *
-  * If the Certificate is PEM encoded it should have a header of "NEW CERTIFICATE REQUEST".
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crq_import - This function will import a DER or PEM encoded Certificate request
+ * @crq: The structure to store the parsed certificate request.
+ * @data: The DER or PEM encoded certificate.
+ * @format: One of DER or PEM
+ *
+ * This function will convert the given DER or PEM encoded Certificate
+ * to the native gnutls_x509_crq_t format. The output will be stored
+ * in @crq.
+ *
+ * If the Certificate is PEM encoded it should have a header of "NEW
+ * CERTIFICATE REQUEST".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crq_import (gnutls_x509_crq_t crq,
 			const gnutls_datum_t * data,
@@ -1170,7 +1171,7 @@ gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
 
 /**
  * gnutls_x509_crq_get_attribute_info - Get attribute id
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which attribute OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
@@ -1193,7 +1194,7 @@ gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t cert, int indx,
+gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
 				    void *oid, size_t * sizeof_oid)
 {
   int result;
@@ -1227,7 +1228,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t cert, int indx,
 
 /**
  * gnutls_x509_crq_get_attribute_data - Get the specified attribute data
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which attribute OID to send. Use zero to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
@@ -1249,7 +1250,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t cert, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t cert, int indx,
+gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
 				    void *data, size_t * sizeof_data)
 {
   int result, len;
@@ -1281,7 +1282,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t cert, int indx,
 
 /**
  * gnutls_x509_crq_get_extension_info - Get extension id and criticality
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
@@ -1305,7 +1306,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t cert, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t cert, int indx,
+gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
 				    void *oid, size_t * sizeof_oid,
 				    int *critical)
 {
@@ -1392,7 +1393,7 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t cert, int indx,
 
 /**
  * gnutls_x509_crq_get_extension_data - Get the specified extension data
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
@@ -1414,7 +1415,7 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t cert, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t cert, int indx,
+gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t crq, int indx,
 				    void *data, size_t * sizeof_data)
 {
   int result, len;
@@ -1475,7 +1476,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t cert, int indx,
 
 /**
  * gnutls_x509_crq_get_key_usage - return the certificate's key usage
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @key_usage: where the key usage bits will be stored
  * @critical: will be non zero if the extension is marked as critical
  *
@@ -1495,7 +1496,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t cert, int indx,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t cert,
+gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
 			       unsigned int *key_usage,
 			       unsigned int *critical)
 {
@@ -1533,7 +1534,7 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t cert,
 
 /**
  * gnutls_x509_crq_get_basic_constraints - get certificate's basic constraints
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @critical: will be non zero if the extension is marked as critical
  * @ca: pointer to output integer indicating CA status, may be NULL,
  *   value is 1 if the certificate CA flag is set, 0 otherwise.
@@ -1554,7 +1555,7 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t cert,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t cert,
+gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t crq,
 				       unsigned int *critical,
 				       int *ca, int *pathlen)
 {
@@ -1593,7 +1594,7 @@ gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t cert,
 }
 
 static int
-get_subject_alt_name (gnutls_x509_crq_t cert,
+get_subject_alt_name (gnutls_x509_crq_t crq,
 		      unsigned int seq, void *ret,
 		      size_t * ret_size, unsigned int *ret_type,
 		      unsigned int *critical, int othername_oid)
@@ -1659,7 +1660,7 @@ get_subject_alt_name (gnutls_x509_crq_t cert,
 
 /**
  * gnutls_x509_crq_get_subject_alt_name - Get certificate's alternative name
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @seq: specifies the sequence number of the alt name, 0 for the
  *   first one, 1 for the second etc.
  * @ret: is the place where the alternative name will be copied to
@@ -1686,7 +1687,7 @@ get_subject_alt_name (gnutls_x509_crq_t cert,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t cert,
+gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t crq,
 				      unsigned int seq, void *ret,
 				      size_t * ret_size,
 				      unsigned int *ret_type,
@@ -1698,7 +1699,7 @@ gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t cert,
 
 /**
  * gnutls_x509_crq_get_subject_alt_othername_oid - Get SAN otherName OID
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the otherName OID will be copied to
  * @ret_size: holds the size of ret.
@@ -1725,7 +1726,7 @@ gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t cert,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t cert,
+gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
 					       unsigned int seq,
 					       void *ret, size_t * ret_size)
 {
@@ -1734,7 +1735,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t cert,
 
 /**
  * gnutls_x509_crq_get_extension_by_oid - get the specified extension
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the extensions, this
  *   specifies which to send. Use zero to get the first one.
@@ -1754,7 +1755,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t cert,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t cert,
+gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
 				      const char *oid, int indx,
 				      void *buf, size_t * sizeof_buf,
 				      unsigned int *critical)
@@ -1992,7 +1993,7 @@ gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage)
 
 /**
  * gnutls_x509_crq_get_key_purpose_oid - get Certificate's key purpose OIDs
- * @cert: should contain a #gnutls_x509_crq_t structure
+ * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: This specifies which OID to return. Use zero to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
  * @sizeof_oid: initially holds the size of @oid
@@ -2012,7 +2013,7 @@ gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage)
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t cert,
+gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
 				     int indx, void *oid, size_t * sizeof_oid,
 				     unsigned int *critical)
 {
@@ -2104,7 +2105,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t cert,
 
 /**
  * gnutls_x509_crq_set_key_purpose_oid - Sets the Certificate's key purpose OIDs
- * @cert: a certificate of type #gnutls_x509_crq_t
+ * @crq: a certificate of type #gnutls_x509_crq_t
  * @oid: a pointer to a null terminated string that holds the OID
  * @critical: Whether this extension will be critical or not
  *
@@ -2120,7 +2121,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t cert,
  * Since: 2.8.0
  **/
 int
-gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t cert,
+gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
 				     const void *oid, unsigned int critical)
 {
   int result;
