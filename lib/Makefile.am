@@ -29,7 +29,7 @@ endif
 
 localedir = $(datadir)/locale
 
-AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
+AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS)
 AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\"		\
 	-I$(srcdir)/gl				\
