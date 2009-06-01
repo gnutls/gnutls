@@ -583,7 +583,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 
   result = gnutls_x509_crq_set_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
 						 der.data, der.size);
-
+  gnutls_free (der.data);
   if (result < 0)
     {
       gnutls_assert ();
