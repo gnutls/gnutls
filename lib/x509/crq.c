@@ -1201,7 +1201,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
   char name[ASN1_MAX_NAME_SIZE];
   int len;
 
-  if (!cert)
+  if (!crq)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -1211,7 +1211,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
 	    "certificationRequestInfo.attributes.?%u.type", indx + 1);
 
   len = *sizeof_oid;
-  result = asn1_read_value (cert->crq, name, oid, &len);
+  result = asn1_read_value (crq->crq, name, oid, &len);
   *sizeof_oid = len;
 
   if (result == ASN1_ELEMENT_NOT_FOUND)
@@ -1256,7 +1256,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
   int result, len;
   char name[ASN1_MAX_NAME_SIZE];
 
-  if (!cert)
+  if (!crq)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -1266,7 +1266,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
 	    "certificationRequestInfo.attributes.?%u.values.?1", indx + 1);
 
   len = *sizeof_data;
-  result = asn1_read_value (cert->crq, name, data, &len);
+  result = asn1_read_value (crq->crq, name, data, &len);
   *sizeof_data = len;
 
   if (result == ASN1_ELEMENT_NOT_FOUND)
@@ -1313,32 +1313,46 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
   int result;
   char str_critical[10];
   char name[ASN1_MAX_NAME_SIZE];
-  unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t extensions_size = sizeof (extensions);
+  char *extensions = NULL;
+  size_t extensions_size = 0;
   ASN1_TYPE c2;
   int len;
 
-  if (!cert)
+  if (!crq)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
   /* read extensionRequest */
-  result =
-    gnutls_x509_crq_get_attribute_by_oid (cert, "1.2.840.113549.1.9.14", 0,
-					  extensions, &extensions_size);
+  result = gnutls_x509_crq_get_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
+						 0, NULL, &extensions_size);
+  if (result == GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      extensions = gnutls_malloc (extensions_size);
+      if (extensions == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      result = gnutls_x509_crq_get_attribute_by_oid (crq,
+						     "1.2.840.113549.1.9.14",
+						     0, extensions,
+						     &extensions_size);
+    }
   if (result < 0)
     {
       gnutls_assert ();
-      return result;
+      goto out;
     }
 
   result = asn1_create_element (_gnutls_get_pkix (), "PKIX1.Extensions", &c2);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return _gnutls_asn2err (result);
+      result = _gnutls_asn2err (result);
+      goto out;
     }
 
   result = asn1_der_decoding (&c2, extensions, extensions_size, NULL);
@@ -1346,7 +1360,8 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
     {
       gnutls_assert ();
       asn1_delete_structure (&c2);
-      return _gnutls_asn2err (result);
+      result = _gnutls_asn2err (result);
+      goto out;
     }
 
   snprintf (name, sizeof (name), "?%u.extnID", indx + 1);
@@ -1358,13 +1373,15 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
   if (result == ASN1_ELEMENT_NOT_FOUND)
     {
       asn1_delete_structure (&c2);
-      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+      result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+      goto out;
     }
   else if (result < 0)
     {
       gnutls_assert ();
       asn1_delete_structure (&c2);
-      return _gnutls_asn2err (result);
+      result = _gnutls_asn2err (result);
+      goto out;
     }
 
   snprintf (name, sizeof (name), "?%u.critical", indx + 1);
@@ -1376,7 +1393,8 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
   if (result < 0)
     {
       gnutls_assert ();
-      return _gnutls_asn2err (result);
+      result = _gnutls_asn2err (result);
+      goto out;
     }
 
   if (critical)
@@ -1387,8 +1405,11 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
 	*critical = 0;
     }
 
-  return 0;
+  result = 0;
 
+ out:
+  gnutls_free (extensions);
+  return result;
 }
 
 /**
@@ -1424,7 +1445,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t crq, int indx,
   size_t extensions_size = sizeof (extensions);
   ASN1_TYPE c2;
 
-  if (!cert)
+  if (!crq)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -1432,7 +1453,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t crq, int indx,
 
   /* read extensionRequest */
   result =
-    gnutls_x509_crq_get_attribute_by_oid (cert, "1.2.840.113549.1.9.14", 0,
+    gnutls_x509_crq_get_attribute_by_oid (crq, "1.2.840.113549.1.9.14", 0,
 					  extensions, &extensions_size);
   if (result < 0)
     {
@@ -1505,13 +1526,13 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
   opaque buf[128];
   size_t buf_size = sizeof (buf);
 
-  if (cert == NULL)
+  if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = gnutls_x509_crq_get_extension_by_oid (cert, "2.5.29.15", 0,
+  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.15", 0,
 						 buf, &buf_size, critical);
   if (result < 0)
     {
@@ -1564,13 +1585,13 @@ gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t crq,
   opaque buf[256];
   size_t buf_size = sizeof (buf);
 
-  if (cert == NULL)
+  if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = gnutls_x509_crq_get_extension_by_oid (cert, "2.5.29.19", 0,
+  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.19", 0,
 						 buf, &buf_size, critical);
   if (result < 0)
     {
@@ -1605,7 +1626,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
   opaque dnsname[2048];
   size_t dnsname_size = sizeof (dnsname);
 
-  if (cert == NULL)
+  if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -1617,7 +1638,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
     *ret_size = 0;
 
   if ((result =
-       gnutls_x509_crq_get_extension_by_oid (cert, "2.5.29.17", 0,
+       gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
 					     dnsname, &dnsname_size,
 					     critical)) < 0)
     {
@@ -1693,7 +1714,7 @@ gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t crq,
 				      unsigned int *ret_type,
 				      unsigned int *critical)
 {
-  return get_subject_alt_name (cert, seq, ret, ret_size, ret_type, critical,
+  return get_subject_alt_name (crq, seq, ret, ret_size, ret_type, critical,
 			       0);
 }
 
@@ -1730,7 +1751,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
 					       unsigned int seq,
 					       void *ret, size_t * ret_size)
 {
-  return get_subject_alt_name (cert, seq, ret, ret_size, NULL, NULL, 1);
+  return get_subject_alt_name (crq, seq, ret, ret_size, NULL, NULL, 1);
 }
 
 /**
@@ -1769,7 +1790,7 @@ gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
     {
       oid_size = sizeof (_oid);
       result =
-	gnutls_x509_crq_get_extension_info (cert, i, _oid, &oid_size,
+	gnutls_x509_crq_get_extension_info (crq, i, _oid, &oid_size,
 					    critical);
       if (result < 0)
 	{
@@ -1780,7 +1801,7 @@ gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
       if (strcmp (oid, _oid) == 0)
 	{			/* found */
 	  if (indx == 0)
-	    return gnutls_x509_crq_get_extension_data (cert, i, buf,
+	    return gnutls_x509_crq_get_extension_data (crq, i, buf,
 						       sizeof_buf);
 	  else
 	    indx--;
@@ -2024,7 +2045,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
   opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
   size_t tmp_size;
 
-  if (cert == NULL)
+  if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -2036,7 +2057,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
     *sizeof_oid = 0;
 
   tmp_size = sizeof (tmp);
-  result = gnutls_x509_crq_get_extension_by_oid (cert, "2.5.29.37", 0,
+  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
 						 tmp, &tmp_size, critical);
 
   if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
@@ -2130,7 +2151,7 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
   opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
   size_t tmp_size;
 
-  if (cert == NULL)
+  if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -2139,7 +2160,7 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
   /* Check if the extension already exists.
    */
   tmp_size = sizeof (tmp);
-  result = gnutls_x509_crq_get_extension_by_oid (cert, "2.5.29.37", 0,
+  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
 						 tmp, &tmp_size, NULL);
 
   if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
@@ -2213,7 +2234,7 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
       return _gnutls_asn2err (result);
     }
 
-  result = _gnutls_x509_crq_set_extension (cert, "2.5.29.37",
+  result = _gnutls_x509_crq_set_extension (crq, "2.5.29.37",
 					   &der_data, critical);
 
   _gnutls_free_datum (&der_data);
