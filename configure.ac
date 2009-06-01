@@ -236,6 +236,7 @@ fi
 
 # Export things for */configure.ac.
 export WERROR_CFLAGS
+export WSTACK_CFLAGS
 export WARN_CFLAGS
 export use_cxx
 
