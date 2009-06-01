@@ -296,14 +296,6 @@ parse_attribute (ASN1_TYPE asn1_struct,
   char oid[MAX_OID_SIZE];
   int len, printable;
 
-  if (*sizeof_buf == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  buf[0] = 0;
-
   k1 = 0;
   do
     {
@@ -391,7 +383,7 @@ parse_attribute (ASN1_TYPE asn1_struct,
 	    }
 	  else
 	    {			/* raw!=0 */
-	      if (*sizeof_buf > (size_t) len && buf != NULL)
+	      if (*sizeof_buf >= (size_t) len && buf != NULL)
 		{
 		  *sizeof_buf = len;
 		  memcpy (buf, value, len);
