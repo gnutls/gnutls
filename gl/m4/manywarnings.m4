@@ -91,7 +91,6 @@ AC_DEFUN([gl_MANYWARN_ALL_GCC],
    -Wmudflap \
    -Wpacked-bitfield-compat \
    -Wsync-nand \
-   -Wunsuffixed-float-constants \
   ; do
     gl_manywarn_set="$gl_manywarn_set $gl_manywarn_item"
   done
