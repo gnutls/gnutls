@@ -394,7 +394,6 @@ parse_attribute (ASN1_TYPE asn1_struct,
 	      else
 		{
 		  *sizeof_buf = len;
-		  gnutls_assert ();
 		  return GNUTLS_E_SHORT_MEMORY_BUFFER;
 		}
 	    }
