@@ -2076,38 +2076,31 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
   else
     *sizeof_oid = 0;
 
-  /* Check if the extension already exists.
+  /* Extract extension.
    */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
 						 NULL, &prev.size,
 						 critical);
-  switch (result)
+  if (result < 0)
     {
-    case GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE:
-      /* Replacing non-existing data means the same as set data. */
-      break;
-
-    case GNUTLS_E_SUCCESS:
-      prev.data = gnutls_malloc (prev.size);
-      if (prev.data == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-
-      result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						     prev.data, &prev.size,
-						     critical);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  gnutls_free (prev.data);
-	  return result;
-	}
-      break;
-
-    default:
       gnutls_assert ();
+      return result;
+    }
+
+  prev.data = gnutls_malloc (prev.size);
+  if (prev.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
+						 prev.data, &prev.size,
+						 critical);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      gnutls_free (prev.data);
       return result;
     }
 
@@ -2120,17 +2113,13 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
       return _gnutls_asn2err (result);
     }
 
-
-  if (prev.data)
+  result = asn1_der_decoding (&c2, prev.data, prev.size, NULL);
+  gnutls_free (prev.data);
+  if (result != ASN1_SUCCESS)
     {
-      result = asn1_der_decoding (&c2, prev.data, prev.size, NULL);
-      gnutls_free (prev.data);
-      if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  asn1_delete_structure (&c2);
-	  return _gnutls_asn2err (result);
-	}
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return _gnutls_asn2err (result);
     }
 
   indx++;
@@ -2157,7 +2146,6 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
     }
 
   return 0;
-
 }
 
 /**
