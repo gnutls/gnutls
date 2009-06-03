@@ -964,21 +964,18 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
 
   /* Add the attribute.
    */
-  result =
-    asn1_write_value (crq->crq, "certificationRequestInfo.attributes",
-		      "NEW", 1);
+  result = asn1_write_value (crq->crq, "certificationRequestInfo.attributes",
+			     "NEW", 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
-  result =
-    _gnutls_x509_encode_and_write_attribute ("1.2.840.113549.1.9.7",
-					     crq->crq,
-					     "certificationRequestInfo.attributes.?LAST",
-					     pass, strlen (pass), 1);
-
+  result = _gnutls_x509_encode_and_write_attribute
+    ("1.2.840.113549.1.9.7", crq->crq,
+     "certificationRequestInfo.attributes.?LAST",
+     pass, strlen (pass), 1);
   if (result < 0)
     {
       gnutls_assert ();
