@@ -188,7 +188,8 @@ print_ski (gnutls_string * str, gnutls_x509_crt_t cert)
   buffer = gnutls_malloc (size);
   if (!buffer)
     {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+      addf (str, "error: malloc: %s\n",
+	    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
       return;
     }
 
@@ -246,7 +247,8 @@ print_aki (gnutls_string * str, int type, cert_type_t cert)
   buffer = gnutls_malloc (size);
   if (!buffer)
     {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+      addf (str, "error: malloc: %s\n",
+	    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
       return;
     }
 
@@ -340,7 +342,8 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -420,7 +423,8 @@ print_key_purpose (gnutls_string * str, const char *prefix, int type,
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -531,7 +535,8 @@ print_san (gnutls_string * str, const char *prefix, int type,
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -603,7 +608,8 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	    if (!oid)
 	      {
 		gnutls_free (buffer);
-		addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		addf (str, "error: malloc: %s\n",
+		      gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 		return;
 	      }
 
@@ -854,7 +860,8 @@ print_extensions (gnutls_string * str, const char *prefix, int type,
 	  buffer = gnutls_malloc (extlen);
 	  if (!buffer)
 	    {
-	      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	      addf (str, "error: malloc: %s\n",
+		    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	      continue;
 	    }
 
@@ -1097,7 +1104,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -1529,7 +1537,8 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	      buffer = gnutls_malloc (extlen);
 	      if (!buffer)
 		{
-		  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		  addf (str, "error: malloc: %s\n",
+			gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 		  continue;
 		}
 
@@ -1632,7 +1641,8 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -1864,7 +1874,8 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 	    buffer = gnutls_malloc (extlen);
 	    if (!buffer)
 	      {
-		addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		addf (str, "error: malloc: %s\n",
+		      gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 		continue;
 	      }
 
@@ -1909,7 +1920,8 @@ print_crq_other (gnutls_string * str, gnutls_x509_crq_t crq)
   buffer = gnutls_malloc (size);
   if (!buffer)
     {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+      addf (str, "error: malloc: %s\n",
+	    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
       return;
     }
 
