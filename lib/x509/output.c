@@ -1836,23 +1836,42 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 	  }
 	else if (strcmp (oid, "1.2.840.113549.1.9.7") == 0)
 	  {
-	    char pass[1024];
-	    size_t pass_size = sizeof (pass);
+	    char *pass;
+	    size_t size;
 
 	    if (challenge)
 	      {
-		addf (str,
+		adds (str,
 		      "error: more than one Challenge password attribute\n");
 		continue;
 	      }
 
-	    err =
-	      gnutls_x509_crq_get_challenge_password (cert, pass, &pass_size);
+	    err = gnutls_x509_crq_get_challenge_password (cert, NULL, &size);
+	    if (err < 0)
+	      {
+		addf (str, "error: get_challenge_password: %s\n",
+		      gnutls_strerror (err));
+		continue;
+	      }
+
+	    size++;
+
+	    pass = gnutls_malloc (size);
+	    if (!pass)
+	      {
+		addf (str, "error: malloc: %s\n",
+		      gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+		continue;
+	      }
+
+	    err = gnutls_x509_crq_get_challenge_password (cert, pass, &size);
 	    if (err < 0)
 	      addf (str, "error: get_challenge_password: %s\n",
 		    gnutls_strerror (err));
 	    else
 	      addf (str, _("\t\tChallenge password: %s\n"), pass);
+
+	    gnutls_free (pass);
 
 	    challenge++;
 	  }
