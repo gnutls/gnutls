@@ -2068,41 +2068,47 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
 {
   char tmpstr[ASN1_MAX_NAME_SIZE];
   int result, len;
-  gnutls_datum_t prev_data;
+  gnutls_datum_t prev = { NULL, 0 };
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t tmp_size;
-
-  if (crq == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 
   if (oid)
     memset (oid, 0, *sizeof_oid);
   else
     *sizeof_oid = 0;
 
-  tmp_size = sizeof (tmp);
+  /* Check if the extension already exists.
+   */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						 tmp, &tmp_size, critical);
-
-  if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+						 NULL, &prev.size,
+						 critical);
+  switch (result)
     {
+    case GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE:
+      /* Replacing non-existing data means the same as set data. */
+      break;
+
+    case GNUTLS_E_SUCCESS:
+      prev.data = gnutls_malloc (prev.size);
+      if (prev.data == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
+						     prev.data, &prev.size,
+						     critical);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  gnutls_free (prev.data);
+	  return result;
+	}
+      break;
+
+    default:
       gnutls_assert ();
       return result;
-    }
-
-  if (result < 0)
-    {
-      prev_data.data = NULL;
-      prev_data.size = 0;
-    }
-  else
-    {
-      prev_data.data = tmp;
-      prev_data.size = tmp_size;
     }
 
   result = asn1_create_element
@@ -2110,13 +2116,15 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      gnutls_free (prev.data);
       return _gnutls_asn2err (result);
     }
 
 
-  if (prev_data.size > 0)
+  if (prev.data)
     {
-      result = asn1_der_decoding (&c2, prev_data.data, prev_data.size, NULL);
+      result = asn1_der_decoding (&c2, prev.data, prev.size, NULL);
+      gnutls_free (prev.data);
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -2174,61 +2182,65 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
 				     const void *oid, unsigned int critical)
 {
   int result;
-  gnutls_datum_t prev_data, der_data;
+  gnutls_datum_t prev = { NULL, 0 }, der_data;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t tmp_size;
-
-  if (crq == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 
   /* Check if the extension already exists.
    */
-  tmp_size = sizeof (tmp);
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						 tmp, &tmp_size, NULL);
-
-  if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+						 NULL, &prev.size,
+						 &critical);
+  switch (result)
     {
+    case GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE:
+      /* Replacing non-existing data means the same as set data. */
+      break;
+
+    case GNUTLS_E_SUCCESS:
+      prev.data = gnutls_malloc (prev.size);
+      if (prev.data == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
+						     prev.data, &prev.size,
+						     &critical);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  gnutls_free (prev.data);
+	  return result;
+	}
+      break;
+
+    default:
       gnutls_assert ();
       return result;
     }
 
-  if (result < 0)
-    {
-      prev_data.data = NULL;
-      prev_data.size = 0;
-    }
-  else
-    {
-      prev_data.data = tmp;
-      prev_data.size = tmp_size;
-    }
-
-  result = asn1_create_element
-    (_gnutls_get_pkix (), "PKIX1.ExtKeyUsageSyntax", &c2);
+  result = asn1_create_element (_gnutls_get_pkix (),
+				"PKIX1.ExtKeyUsageSyntax", &c2);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      gnutls_free (prev.data);
       return _gnutls_asn2err (result);
     }
 
-  if (prev_data.size > 0)
+  if (prev.data)
     {
       /* decode it.
        */
-      result = asn1_der_decoding (&c2, prev_data.data, prev_data.size, NULL);
-
+      result = asn1_der_decoding (&c2, prev.data, prev.size, NULL);
+      gnutls_free (prev.data);
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();
 	  asn1_delete_structure (&c2);
 	  return _gnutls_asn2err (result);
 	}
-
     }
 
   /* generate the extension.
@@ -2264,10 +2276,7 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
 
   result = _gnutls_x509_crq_set_extension (crq, "2.5.29.37",
 					   &der_data, critical);
-
   _gnutls_free_datum (&der_data);
-
-
   if (result < 0)
     {
       gnutls_assert ();
