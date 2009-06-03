@@ -59,6 +59,7 @@ const gnutls_datum_t key = { key_pem, sizeof (key_pem) };
 void doit (void)
 {
   gnutls_x509_privkey_t pkey;
+  gnutls_x509_crt_t crt;
   gnutls_x509_crq_t crq;
 
   gnutls_datum_t out;
@@ -76,15 +77,19 @@ void doit (void)
 
   ret = gnutls_x509_crq_init (&crq);
   if (ret != 0)
-    fail ("gnutls_global_init\n");
+    fail ("gnutls_x509_crq_init\n");
 
   ret = gnutls_x509_privkey_init (&pkey);
   if (ret != 0)
-    fail ("gnutls_global_init\n");
+    fail ("gnutls_x509_privkey_init\n");
+
+  ret = gnutls_x509_crt_init (&crt);
+  if (ret != 0)
+    fail ("gnutls_x509_crt_init\n");
 
   ret = gnutls_x509_privkey_import (pkey, &key, GNUTLS_X509_FMT_PEM);
   if (ret != 0)
-    fail ("gnutls_global_init\n");
+    fail ("gnutls_x509_privkey_import\n");
 
   ret = gnutls_x509_crq_set_version (crq, 0);
   if (ret != 0)
@@ -112,11 +117,30 @@ void doit (void)
   if (ret != 0)
     fail ("gnutls_x509_crq_get_extension_info2\n");
 
-#if 0
+  s = 0;
   ret = gnutls_x509_crq_get_extension_data (crq, 0, NULL, &s);
   if (ret != 0)
     fail ("gnutls_x509_crq_get_extension_data\n");
-#endif
+
+  ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
+					      "foo", 3, 1);
+  if (ret != 0)
+    fail ("gnutls_x509_crq_set_subject_alt_name\n");
+
+  ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
+					      "bar", 3, 1);
+  if (ret != 0)
+    fail ("gnutls_x509_crq_set_subject_alt_name\n");
+
+  ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
+					      "apa", 3, 0);
+  if (ret != 0)
+    fail ("gnutls_x509_crq_set_subject_alt_name\n");
+
+  ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
+					      "foo", 3, 1);
+  if (ret != 0)
+    fail ("gnutls_x509_crq_set_subject_alt_name\n");
 
   ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &out);
   if (ret != 0)
@@ -124,7 +148,22 @@ void doit (void)
   printf ("crq: %.*s\n", out.size, out.data);
   gnutls_free (out.data);
 
+  ret = gnutls_x509_crt_set_version (crt, 3);
+  if (ret != 0)
+    fail ("gnutls_x509_crt_set_version\n");
+
+  ret = gnutls_x509_crt_set_crq_extensions (crt, crq);
+  if (ret != 0)
+    fail ("gnutls_x509_crt_set_crq_extensions\n");
+
+  ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &out);
+  if (ret != 0)
+    fail ("gnutls_x509_crt_print\n");
+  printf ("crt: %.*s\n", out.size, out.data);
+  gnutls_free (out.data);
+
   gnutls_x509_crq_deinit (crq);
+  gnutls_x509_crt_deinit (crt);
   gnutls_x509_privkey_deinit (pkey);
 
   gnutls_global_deinit ();
