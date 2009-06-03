@@ -142,6 +142,26 @@ void doit (void)
   if (ret != 0)
     fail ("gnutls_x509_crq_set_subject_alt_name\n");
 
+  s = 0;
+  ret = gnutls_x509_crq_get_key_purpose_oid (crq, 0, NULL, &s, NULL);
+  if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    fail ("gnutls_x509_crq_get_key_purpose_oid %d\n", ret);
+
+  s = 0;
+  ret = gnutls_x509_crq_set_key_purpose_oid (crq, GNUTLS_KP_TLS_WWW_SERVER, 0);
+  if (ret != 0)
+    fail ("gnutls_x509_crq_set_key_purpose_oid %d\n", ret);
+
+  s = 0;
+  ret = gnutls_x509_crq_get_key_purpose_oid (crq, 0, NULL, &s, NULL);
+  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+    fail ("gnutls_x509_crq_get_key_purpose_oid %d\n", ret);
+
+  s = 0;
+  ret = gnutls_x509_crq_set_key_purpose_oid (crq, GNUTLS_KP_TLS_WWW_CLIENT, 1);
+  if (ret != 0)
+    fail ("gnutls_x509_crq_set_key_purpose_oid2 %d\n", ret);
+
   ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &out);
   if (ret != 0)
     fail ("gnutls_x509_crq_print\n");
