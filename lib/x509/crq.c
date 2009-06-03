@@ -414,6 +414,8 @@ cleanup:
  * @sizeof_pass: Initially holds the size of @pass.
  *
  * This function will return the challenge password in the request.
+ * The challenge password is intended to be used for requesting a
+ * revocation of the certificate.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
