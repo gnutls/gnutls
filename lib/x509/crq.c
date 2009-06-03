@@ -1867,7 +1867,7 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
 {
   int result = 0;
   opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t tmp_size;
+  size_t tmp_size = 0;
   gnutls_datum_t der_data = { NULL, 0 };
   gnutls_datum_t prev_der_data;
   unsigned int critical = 0;
