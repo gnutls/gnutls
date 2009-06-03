@@ -1866,10 +1866,8 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
 				      unsigned int flags)
 {
   int result = 0;
-  opaque tmp[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t tmp_size = 0;
   gnutls_datum_t der_data = { NULL, 0 };
-  gnutls_datum_t prev_der_data;
+  gnutls_datum_t prev_der_data = { NULL, 0 };
   unsigned int critical = 0;
 
   if (crq == NULL)
@@ -1880,15 +1878,38 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
 
   /* Check if the extension already exists.
    */
-
   if (flags == GNUTLS_FSAN_APPEND)
     {
-      tmp_size = sizeof (tmp);
       result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
-						     tmp, &tmp_size,
+						     NULL, &prev_der_data.size,
 						     &critical);
-      if (result < 0 && result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+      switch (result)
 	{
+	case GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE:
+	  /* Replacing non-existing data means the same as set data. */
+	  break;
+
+	case GNUTLS_E_SUCCESS:
+	  prev_der_data.data = gnutls_malloc (prev_der_data.size);
+	  if (prev_der_data.data == NULL)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_MEMORY_ERROR;
+	    }
+
+	  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
+							 prev_der_data.data,
+							 &prev_der_data.size,
+							 &critical);
+	  if (result < 0)
+	    {
+	      gnutls_assert ();
+	      gnutls_free (prev_der_data.data);
+	      return result;
+	    }
+	  break;
+
+	default:
 	  gnutls_assert ();
 	  return result;
 	}
@@ -1896,20 +1917,9 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
 
   /* generate the extension.
    */
-  if (result < 0)
-    {
-      prev_der_data.data = NULL;
-      prev_der_data.size = 0;
-    }
-  else
-    {
-      prev_der_data.data = tmp;
-      prev_der_data.size = tmp_size;
-    }
-
   result = _gnutls_x509_ext_gen_subject_alt_name (nt, data, data_size,
 						  &prev_der_data, &der_data);
-
+  gnutls_free (prev_der_data.data);
   if (result < 0)
     {
       gnutls_assert ();
