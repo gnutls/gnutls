@@ -1633,8 +1633,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
   int result;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_x509_subject_alt_name_t type;
-  opaque dnsname[2048];
-  size_t dnsname_size = sizeof (dnsname);
+  gnutls_datum_t dnsname = { NULL, 0 };
 
   if (crq == NULL)
     {
@@ -1647,12 +1646,31 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
   else
     *ret_size = 0;
 
-  if ((result =
-       gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
-					     dnsname, &dnsname_size,
-					     critical)) < 0)
+  /* Extract extension.
+   */
+  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
+						 NULL, &dnsname.size,
+						 critical);
+  if (result < 0)
     {
       gnutls_assert ();
+      return result;
+    }
+
+  dnsname.data = gnutls_malloc (dnsname.size);
+  if (dnsname.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
+						 dnsname.data, &dnsname.size,
+						 critical);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      gnutls_free (dnsname.data);
       return result;
     }
 
@@ -1661,11 +1679,12 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      gnutls_free (dnsname.data);
       return _gnutls_asn2err (result);
     }
 
-  result = asn1_der_decoding (&c2, dnsname, dnsname_size, NULL);
-
+  result = asn1_der_decoding (&c2, dnsname.data, dnsname.size, NULL);
+  gnutls_free (dnsname.data);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -1673,12 +1692,9 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
       return _gnutls_asn2err (result);
     }
 
-  result =
-    _gnutls_parse_general_name (c2, "", seq, ret, ret_size, ret_type,
-				othername_oid);
-
+  result = _gnutls_parse_general_name (c2, "", seq, ret, ret_size,
+				       ret_type, othername_oid);
   asn1_delete_structure (&c2);
-
   if (result < 0)
     {
       return result;
