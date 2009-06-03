@@ -66,6 +66,8 @@ void doit (void)
 
   size_t s = 0;
 
+  char smallbuf[10];
+
   int ret;
 
   ret = gnutls_global_init ();
@@ -111,6 +113,25 @@ void doit (void)
   ret = gnutls_x509_crq_set_key_usage (crq, 0);
   if (ret != 0)
     fail ("gnutls_x509_crq_set_key_usage %d\n", ret);
+
+  ret = gnutls_x509_crq_get_challenge_password (crq, NULL, &s);
+  if (ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    fail ("gnutls_x509_crq_get_challenge_password %d\n", ret);
+
+  ret = gnutls_x509_crq_set_challenge_password (crq, "foo");
+  if (ret != 0)
+    fail ("gnutls_x509_crq_set_challenge_password %d\n", ret);
+
+  s = 0;
+  ret = gnutls_x509_crq_get_challenge_password (crq, NULL, &s);
+  if (ret != 0 || s != 3)
+    fail ("gnutls_x509_crq_get_challenge_password2 %d/%d\n", ret, s);
+
+  s = 10;
+  ret = gnutls_x509_crq_get_challenge_password (crq, smallbuf, &s);
+  if (ret != 0 || s != 3 || strcmp (smallbuf, "foo") != 0)
+    fail ("gnutls_x509_crq_get_challenge_password3 %d/%d/%s\n",
+	  ret, s, smallbuf);
 
   s = 0;
   ret = gnutls_x509_crq_get_extension_info (crq, 0, NULL, &s, NULL);
