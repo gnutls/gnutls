@@ -418,6 +418,65 @@ _gnutls_asn2err (int asn_err)
     }
 }
 
+void
+_gnutls_mpi_log (const char *prefix, bigint_t a)
+{
+  size_t binlen = 0;
+  void *binbuf;
+  size_t hexlen;
+  char *hexbuf;
+  int res;
+
+  res = _gnutls_mpi_print (a, NULL, &binlen);
+  if (res != 0)
+    {
+      gnutls_assert ();
+      _gnutls_hard_log ("MPI: can't print value (%d/%d)\n", res, binlen);
+      return;
+    }
+
+  if (binlen > 1024*1024)
+    {
+      gnutls_assert ();
+      _gnutls_hard_log ("MPI: too large mpi (%d)\n", binlen);
+      return;
+    }
+
+  binbuf = gnutls_malloc (binlen);
+  if (!binbuf)
+    {
+      gnutls_assert ();
+      _gnutls_hard_log ("MPI: out of memory (%d)\n", binlen);
+      return;
+    }
+
+  res = _gnutls_mpi_print (a, binbuf, &binlen);
+  if (res != 0)
+    {
+      gnutls_assert ();
+      _gnutls_hard_log ("MPI: can't print value (%d/%d)\n", res, binlen);
+      gnutls_free (binbuf);
+      return;
+    }
+
+  hexlen = 2 * binlen + 1;
+  hexbuf = gnutls_malloc (hexlen);
+
+  if (!hexbuf)
+    {
+      gnutls_assert ();
+      _gnutls_hard_log ("MPI: out of memory (hex %d)\n", hexlen);
+      gnutls_free (binbuf);
+      return;
+    }
+
+  _gnutls_bin2hex (binbuf, binlen, hexbuf, hexlen);
+
+  _gnutls_hard_log ("MPI: length: %d\n\t%s%s\n", binlen, prefix, hexbuf);
+
+  gnutls_free (hexbuf);
+  gnutls_free (binbuf);
+}
 
 /* this function will output a message using the
  * caller provided function

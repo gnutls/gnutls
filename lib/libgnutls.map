@@ -604,7 +604,7 @@ GNUTLS_PRIVATE {
     # Internal symbols needed by tests/mpi:
     _gnutls_mpi_ops;
     _gnutls_mpi_randomize;
-    _gnutls_dump_mpi;
+    _gnutls_mpi_log;
     # Internal symbols needed by tests/pkcs12_s2k:
     _gnutls_pkcs12_string_to_key;
     _gnutls_bin2hex;

@@ -33,7 +33,6 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_num.h>
-#include "debug.h"
 #include <x509/x509_int.h>
 #include <x509/common.h>
 #include <random.h>
@@ -609,11 +608,11 @@ _dsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   gcry_sexp_release (list);
   gcry_sexp_release (key);
 
-  _gnutls_dump_mpi ("p: ", resarr[0]);
-  _gnutls_dump_mpi ("q: ", resarr[1]);
-  _gnutls_dump_mpi ("g: ", resarr[2]);
-  _gnutls_dump_mpi ("y: ", resarr[3]);
-  _gnutls_dump_mpi ("x: ", resarr[4]);
+  _gnutls_mpi_log ("p: ", resarr[0]);
+  _gnutls_mpi_log ("q: ", resarr[1]);
+  _gnutls_mpi_log ("g: ", resarr[2]);
+  _gnutls_mpi_log ("y: ", resarr[3]);
+  _gnutls_mpi_log ("x: ", resarr[4]);
 
   *resarr_len = 5;
 
@@ -715,12 +714,12 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   gcry_sexp_release (list);
   gcry_sexp_release (key);
 
-  _gnutls_dump_mpi ("n: ", resarr[0]);
-  _gnutls_dump_mpi ("e: ", resarr[1]);
-  _gnutls_dump_mpi ("d: ", resarr[2]);
-  _gnutls_dump_mpi ("p: ", resarr[3]);
-  _gnutls_dump_mpi ("q: ", resarr[4]);
-  _gnutls_dump_mpi ("u: ", resarr[5]);
+  _gnutls_mpi_log ("n: ", resarr[0]);
+  _gnutls_mpi_log ("e: ", resarr[1]);
+  _gnutls_mpi_log ("d: ", resarr[2]);
+  _gnutls_mpi_log ("p: ", resarr[3]);
+  _gnutls_mpi_log ("q: ", resarr[4]);
+  _gnutls_mpi_log ("u: ", resarr[5]);
 
   *resarr_len = 6;
 

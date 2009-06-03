@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -27,28 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "debug.h"
-
-#ifdef DEBUG
-
-
-void
-_gnutls_print_state (gnutls_session_t session)
-{
-
-  _gnutls_debug_log ("GNUTLS State:\n");
-  _gnutls_debug_log ("Connection End: %d\n",
-		     session->security_parameters.entity);
-  _gnutls_debug_log ("Cipher Algorithm: %d\n",
-		     session->security_parameters.read_bulk_cipher_algorithm);
-  _gnutls_debug_log ("MAC algorithm: %d\n",
-		     session->security_parameters.read_mac_algorithm);
-  _gnutls_debug_log ("Compression Algorithm: %d\n",
-		     session->security_parameters.read_compression_algorithm);
-  _gnutls_debug_log ("\n");
-
-}
-
-#endif
 
 const char *
 _gnutls_packet2str (content_type_t packet)
@@ -114,18 +92,4 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
       return "Unknown Handshake packet";
 
     }
-}
-
-void
-_gnutls_dump_mpi (const char *prefix, bigint_t a)
-{
-  opaque mpi_buf[1024];
-  opaque buf[1024];
-  size_t n = sizeof buf;
-
-  if (_gnutls_mpi_print (a, mpi_buf, &n) < 0)
-    strcpy (buf, "[can't print value]");	/* Flawfinder: ignore */
-  else
-    _gnutls_bin2hex (mpi_buf, n, buf, sizeof (buf));
-  _gnutls_hard_log ("MPI: length: %d\n\t%s%s\n", n, prefix, buf);
 }

@@ -48,6 +48,8 @@ __attribute__ ((format (printf, 2, 3)));
 ;
 #endif
 
+void _gnutls_mpi_log (const char *prefix, bigint_t a);
+
 #ifdef C99_MACROS
 #define LEVEL(l, ...) if (_gnutls_log_level >= l || _gnutls_log_level > 9) \
 	_gnutls_log( l, __VA_ARGS__)
