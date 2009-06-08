@@ -46,7 +46,7 @@ typedef struct
   gnutls_ext_send_func send_func;
 } gnutls_extension_entry;
 
-size_t extfunc_size = 0;
+static size_t extfunc_size = 0;
 static gnutls_extension_entry *extfunc = NULL;
 
 static gnutls_ext_recv_func
