@@ -230,6 +230,7 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
   gl_WARN_ADD([-Wno-stack-protector])  # Some functions cannot be protected
+  gl_WARN_ADD([-Wno-strict-aliasing])  # Breaks src/*.c, fixed in v2.9.x
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
