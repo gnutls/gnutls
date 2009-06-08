@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.9.1 (unreleased)
 
+** libgnutls: Fix crash in gnutls_global_init after earlier init/deinit cycle.
+See <http://bugs.gentoo.org/272388>.
+
+** tests: Added new self-tests init_roundtrip.c to detect previous problem.
+
 ** Reduce stack usage for some CRQ functions.
 
 ** Doc fixes for CRQ functions.
