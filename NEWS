@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.8.1 (unreleased)
 
+** libgnutls: Fix crash in gnutls_global_init after earlier init/deinit cycle.
+See <http://bugs.gentoo.org/272388>.
+
 ** API and ABI modifications:
 No changes since last version.
 
