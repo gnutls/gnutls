@@ -176,6 +176,7 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_UNISTD_H
   gl_FUNC_VASNPRINTF
+  gl_VERSION_ETC
   AC_SUBST([WARN_CFLAGS])
   gl_WCHAR_H
   gl_XSIZE
@@ -480,6 +481,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/ungetc.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
+  m4/version-etc.m4
   m4/warnings.m4
   m4/wchar.m4
   m4/wchar_t.m4
