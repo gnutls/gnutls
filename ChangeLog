@@ -1,3 +1,207 @@
+2009-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-comp.m4, gl/m4/version-etc.m4,
+	gl/tests/test-alignof.c, gl/version-etc.c: Update gnulib files.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.1.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c: Mark global extfunc_size as having static
+	scope.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/init_roundtrip.c: Add self-test to detect
+	extension init/deinit problem.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c: Deinitalize extension global variable
+	properly.  See <http://bugs.gentoo.org/272388>.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/alignof.h, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-comp.m4, gl/tests/Makefile.am,
+	gl/tests/test-alignof.c, lib/gl/alignof.h: Update gnulib files.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_srp.c, lib/debug.c, lib/debug.h, lib/gnutls_errors.c,
+	lib/gnutls_errors.h, lib/libgnutls.map, lib/pk-libgcrypt.c,
+	tests/mpi.c: Rename _gnutls_dump_mpi to _gnutls_mpi_log.  Rewrite to
+	use less stack space.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Reduce stack size limit check.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Reduce stack size.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Fix malloc failure error strings.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crq_apis.c: Test more.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: (_gnutls_x509_oid_data2string): Return proper @res_size for NULL
+	res.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Indent.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Doc fix.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Reduce stack usage.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Doc fix.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Simplify.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crq_apis.c: Test more.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Reduce stack usage.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crq_apis.c: Test more.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Reduce stack usage.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Fix uninitialized variable access.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Reduce stack frame usage.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509_write.c: Reduce stack usage.
+
+2009-06-02  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/manywarnings.m4: Update gnulib files.
+
+2009-06-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/crq_apis.c: Add.
+
+2009-06-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Don't assert on expected errors.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Add crq self-test.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/extensions.c: Reduce stack usage.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Reduce stack usage.  Fix build failure wrt
+	variable names.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/x509.h: Doc fix.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Doc fix.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Return buffer size for NULL/0 inputs.  Fix output
+	buffer size computation.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/extensions.c: Fix mem leak.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Don't assert for expected errors.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Export wstack.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/configure.ac, libextra/configure.ac: Fix WSTACK_CFLAGS.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* src/serv.c: Improve logging and fix warnings.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/Makefile.am, lib/openpgp/Makefile.am,
+	lib/x509/Makefile.am, libextra/Makefile.am: Check stack size.
+
+2009-06-01  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/manywarnings.m4: Update gnulib files.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/pkcs12_bag.c, lib/x509/verify.c, lib/x509/x509.c,
+	lib/x509/x509_write.c: Doc fix.  Reported by Peter Hendrickson
+	<pdh@wiredyne.com>.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix paths.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-05-28  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.0.
