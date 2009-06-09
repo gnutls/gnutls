@@ -57,6 +57,7 @@ AC_DEFUN([lgl_INIT],
   gl_LD_VERSION_SCRIPT
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
+  gl_FUNC_MEMCHR
   gl_FUNC_MEMMEM_SIMPLE
   gl_STRING_MODULE_INDICATOR([memmem])
   gl_FUNC_MEMMOVE
@@ -137,6 +138,11 @@ AC_DEFUN([lgl_INIT],
   gl_COMMON
   gl_source_base='gl/tests'
   gl_FUNC_UNGETC_WORKS
+  gl_FUNC_GETPAGESIZE
+  gl_UNISTD_MODULE_INDICATOR([getpagesize])
+  gl_FUNC_MMAP_ANON
+  AC_CHECK_HEADERS_ONCE([sys/mman.h])
+  AC_CHECK_FUNCS_ONCE([mprotect])
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   AC_CHECK_FUNCS([shutdown])
@@ -248,6 +254,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/fseeko.c
   lib/gettext.h
   lib/lseek.c
+  lib/memchr.c
   lib/memmem.c
   lib/memmove.c
   lib/minmax.h
@@ -296,6 +303,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/float_h.m4
   m4/fseeko.m4
   m4/func.m4
+  m4/getpagesize.m4
   m4/gettext.m4
   m4/glibc2.m4
   m4/glibc21.m4
@@ -320,9 +328,11 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/longlong.m4
   m4/lseek.m4
   m4/malloc.m4
+  m4/memchr.m4
   m4/memmem.m4
   m4/memmove.m4
   m4/minmax.m4
+  m4/mmap-anon.m4
   m4/multiarch.m4
   m4/netdb_h.m4
   m4/nls.m4
@@ -370,6 +380,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-fseeko.sh
   tests/test-fseeko2.sh
   tests/test-func.c
+  tests/test-memchr.c
   tests/test-netdb.c
   tests/test-read-file.c
   tests/test-snprintf.c
@@ -389,7 +400,9 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-vasprintf.c
   tests/test-vsnprintf.c
   tests/test-wchar.c
+  tests/zerosize-ptr.h
   tests=lib/dummy.c
+  tests=lib/getpagesize.c
   tests=lib/intprops.h
   tests=lib/verify.h
 ])

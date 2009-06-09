@@ -113,6 +113,7 @@ AC_SUBST([LTALLOCA])
   gl_SYS_SOCKET_MODULE_INDICATOR([listen])
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
+  gl_FUNC_MEMCHR
   gl_MINMAX
   gl_MULTIARCH
   gl_HEADER_NETDB
@@ -220,6 +221,8 @@ AC_SUBST([LTALLOCA])
   gl_COMMON
   gl_source_base='gl/tests'
   gl_FUNC_UNGETC_WORKS
+  gl_FUNC_GETPAGESIZE
+  gl_UNISTD_MODULE_INDICATOR([getpagesize])
   gl_FUNC_GETTIMEOFDAY
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
@@ -228,6 +231,9 @@ AC_SUBST([LTALLOCA])
   fi
   gl_SYS_IOCTL_MODULE_INDICATOR([ioctl])
   gl_MODULE_INDICATOR([ioctl])
+  gl_FUNC_MMAP_ANON
+  AC_CHECK_HEADERS_ONCE([sys/mman.h])
+  AC_CHECK_FUNCS_ONCE([mprotect])
   AC_CHECK_HEADERS_ONCE([unistd.h sys/wait.h])
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
@@ -371,6 +377,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/intprops.h
   lib/listen.c
   lib/lseek.c
+  lib/memchr.c
   lib/minmax.h
   lib/netdb.in.h
   lib/netinet_in.in.h
@@ -432,6 +439,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
+  m4/getpagesize.m4
   m4/getpass.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4
@@ -448,7 +456,9 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lseek.m4
   m4/malloc.m4
   m4/manywarnings.m4
+  m4/memchr.m4
   m4/minmax.m4
+  m4/mmap-anon.m4
   m4/multiarch.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
@@ -501,6 +511,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-gettimeofday.c
   tests/test-lseek.c
   tests/test-lseek.sh
+  tests/test-memchr.c
   tests/test-netdb.c
   tests/test-netinet_in.c
   tests/test-perror.c
@@ -528,7 +539,9 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-vc-list-files-cvs.sh
   tests/test-vc-list-files-git.sh
   tests/test-wchar.c
+  tests/zerosize-ptr.h
   tests=lib/dummy.c
+  tests=lib/getpagesize.c
   tests=lib/gettimeofday.c
   tests=lib/ioctl.c
   tests=lib/sys_ioctl.in.h
