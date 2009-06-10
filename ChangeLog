@@ -1,3 +1,50 @@
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.8.1.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs12_s2k.c: Fix test vectors.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/pkcs12_encr.c: Fix PKCS#12 string to key function for
+	1/128 inputs.  Reported by "Kukosa, Tomas"
+	<tomas.kukosa@siemens-enterprise.com> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1663>.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c: Mark global extfunc_size as having static
+	scope.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Disable strict aliasing warning for v2.8.x (fixed in
+	v2.9.x).
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_extensions.c: Deinitalize extension global variable
+	properly.  See <http://bugs.gentoo.org/272388>.
+
+2009-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-05-27  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-05-27  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.8.0.
