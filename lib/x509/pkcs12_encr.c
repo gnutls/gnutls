@@ -1,6 +1,6 @@
 /* minip12.c - A mini pkcs-12 implementation (modified for gnutls)
  *
- * Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2002, 2004, 2005, 2009 Free Software Foundation, Inc.
  *
  * This file is part of GNUTLS.
  *
@@ -66,7 +66,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
   unsigned int pwlen;
   opaque hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
-  size_t n;
+  size_t n, m;
   const opaque buf_512[] =	/* 2^64 */
   { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -175,7 +175,13 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
 	    }
 	  _gnutls_mpi_addm (num_ij, num_ij, num_b1, mpi512);
 	  n = 64;
-	  rc = _gnutls_mpi_print (num_ij, buf_i + i, &n);
+#ifndef PKCS12_BROKEN_KEYGEN
+	  m = (_gnutls_mpi_get_nbits (num_ij) + 7) / 8;
+#else
+	  m = n;
+#endif
+	  memset (buf_i + i, 0, n - m);
+	  rc = _gnutls_mpi_print (num_ij, buf_i + i + n - m, &n);
 	  if (rc < 0)
 	    {
 	      gnutls_assert ();
