@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008 Free Software Foundation
+ * Copyright (C) 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -52,7 +52,11 @@ static const char *values[] = {
 /* 2.1 */
   "de8dd3ffd59b65d3d5f59a1f71d7add582741f7752a786c045953e727e4465c0",
 /* 2.2 */
+#ifndef PKCS12_BROKEN_KEYGEN
+  "9dd7f19e5e6aee5c5008b5deefd35889ab75193594ed49a605df4e93e7c2a155",
+#else
   "9dd7f19e5e6aee5c5008b5deefd35889ab7519356f13478ecdee593c5ed689b1",
+#endif
 /* 3.0 */
   "1c165e5a291a1539f3dbcf82a3e6ed566eb9d50ad4b0b3b57b599b08f0531236",
 /* 3.1 */
