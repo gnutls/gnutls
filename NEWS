@@ -17,7 +17,8 @@ No changes since last version.
 * Version 2.9.1 (released 2009-06-08)
 
 ** libgnutls: Fix crash in gnutls_global_init after earlier init/deinit cycle.
-See <http://bugs.gentoo.org/272388>.
+Forwarded by Martin von Gagern <Martin.vGagern@gmx.net> from
+<http://bugs.gentoo.org/272388>.
 
 ** tests: Added new self-tests init_roundtrip.c to detect previous problem.
 
