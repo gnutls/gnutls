@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.9.2 (unreleased)
 
+** libgnutls: Fix PKCS#12 decryption from password.
+The encryption key derived from the password was incorrect for (on
+average) 1 in every 128 input for random inputs.  Reported by "Kukosa,
+Tomas" <tomas.kukosa@siemens-enterprise.com> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1663>.
+
 ** API and ABI modifications:
 No changes since last version.
 
