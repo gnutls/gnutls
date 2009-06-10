@@ -13,6 +13,8 @@ Tomas" <tomas.kukosa@siemens-enterprise.com> in
 
 ** tests: Added new self-test pkcs12_s2k_pem to detect previous problem.
 
+** tests: Improved test vectors in self-test pkcs12_s2k.
+
 ** API and ABI modifications:
 No changes since last version.
 
