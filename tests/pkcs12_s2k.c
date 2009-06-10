@@ -152,5 +152,7 @@ doit (void)
     }
   printf ("\n");
 
+  gnutls_global_deinit ();
+
   success ("_gnutls_pkcs12_string_to_key ok\n");
 }
