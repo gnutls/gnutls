@@ -11,6 +11,8 @@ average) 1 in every 128 input for random inputs.  Reported by "Kukosa,
 Tomas" <tomas.kukosa@siemens-enterprise.com> in
 <http://permalink.gmane.org/gmane.network.gnutls.general/1663>.
 
+** tests: Added new self-test pkcs12_s2k_pem to detect previous problem.
+
 ** API and ABI modifications:
 No changes since last version.
 
