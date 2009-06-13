@@ -149,7 +149,7 @@ gnutls_pkcs12_bag_get_count (gnutls_pkcs12_bag_t bag)
   * is deleted.
   *
   * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.and a negative error code on error.
+  *   negative error value.
   *
   **/
 int

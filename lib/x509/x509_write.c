@@ -304,13 +304,7 @@ int
 gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
 				    gnutls_x509_crq_t crq)
 {
-  int result, i;
-  char oid[MAX_OID_SIZE];
-  size_t oid_size;
-  opaque extensions[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t extensions_size = sizeof (extensions);
-  unsigned int critical;
-  gnutls_datum ext;
+  size_t i;
 
   if (crt == NULL || crq == NULL)
     {
@@ -320,10 +314,17 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
 
   for (i = 0;; i++)
     {
+      int result;
+      char oid[MAX_OID_SIZE];
+      size_t oid_size;
+      opaque *extensions;
+      size_t extensions_size;
+      unsigned int critical;
+      gnutls_datum ext;
+
       oid_size = sizeof (oid);
-      result =
-	gnutls_x509_crq_get_extension_info (crq, i, oid, &oid_size,
-					    &critical);
+      result = gnutls_x509_crq_get_extension_info (crq, i, oid,
+						   &oid_size, &critical);
       if (result < 0)
 	{
 	  if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
@@ -333,14 +334,28 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
 	  return result;
 	}
 
-      extensions_size = sizeof (extensions);
-      result =
-	gnutls_x509_crq_get_extension_data (crq, i, extensions,
-					    &extensions_size);
-
+      extensions_size = 0;
+      result = gnutls_x509_crq_get_extension_data (crq, i, NULL,
+						   &extensions_size);
       if (result < 0)
 	{
 	  gnutls_assert ();
+	  return result;
+	}
+
+      extensions = gnutls_malloc (extensions_size);
+      if (extensions == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      result = gnutls_x509_crq_get_extension_data (crq, i, extensions,
+						   &extensions_size);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  gnutls_free (extensions);
 	  return result;
 	}
 
@@ -348,12 +363,12 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
       ext.size = extensions_size;
 
       result = _gnutls_x509_crt_set_extension (crt, oid, &ext, critical);
+      gnutls_free (extensions);
       if (result < 0)
 	{
 	  gnutls_assert ();
 	  return result;
 	}
-
     }
 
   if (i > 0)
@@ -375,7 +390,7 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
  * encoded.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.and a negative value in case of an error.
+ *   negative error value.
  **/
 int
 gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,

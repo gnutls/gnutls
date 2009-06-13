@@ -43,7 +43,7 @@
  * @session: is a #gnutls_session_t structure.
  * @bits: is the number of bits
  *
- * This function sets the number of bits, for use in an Diffie Hellman
+ * This function sets the number of bits, for use in an Diffie-Hellman
  * key exchange.  This is used both in DH ephemeral and DH anonymous
  * cipher suites.  This will set the minimum size of the prime that
  * will be used for the handshake.
@@ -63,15 +63,15 @@ gnutls_dh_set_prime_bits (gnutls_session_t session, unsigned int bits)
 
 
 /**
- * gnutls_dh_get_group - return the group of the DH authentication
+ * gnutls_dh_get_group - return the group of the D-H key exchange
  * @session: is a gnutls session
  * @raw_gen: will hold the generator.
  * @raw_prime: will hold the prime.
  *
  * This function will return the group parameters used in the last
- * Diffie Hellman authentication with the peer.  These are the prime
- * and the generator used.  This function should be used for both
- * anonymous and ephemeral diffie Hellman.  The output parameters must
+ * Diffie-Hellman key exchange with the peer.  These are the prime and
+ * the generator used.  This function should be used for both
+ * anonymous and ephemeral Diffie-Hellman.  The output parameters must
  * be freed with gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
@@ -131,14 +131,14 @@ gnutls_dh_get_group (gnutls_session_t session,
 }
 
 /**
- * gnutls_dh_get_pubkey - return the peer's public key used in DH authentication
+ * gnutls_dh_get_pubkey - return the peer's public key used in D-H key exchange
  * @session: is a gnutls session
  * @raw_key: will hold the public key.
  *
  * This function will return the peer's public key used in the last
- * Diffie Hellman authentication.  This function should be used for
- * both anonymous and ephemeral diffie Hellman.  The output
- * parameters must be freed with gnutls_free().
+ * Diffie-Hellman key exchange.  This function should be used for both
+ * anonymous and ephemeral Diffie-Hellman.  The output parameters must
+ * be freed with gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -239,12 +239,12 @@ gnutls_rsa_export_get_pubkey (gnutls_session_t session,
 
 
 /**
- * gnutls_dh_get_secret_bits - return the bits used in DH authentication
+ * gnutls_dh_get_secret_bits - return the bits used in D-H key exchange
  * @session: is a gnutls session
  *
- * This function will return the bits used in the last Diffie Hellman
- * authentication with the peer.  Should be used for both anonymous
- * and ephemeral diffie Hellman.
+ * This function will return the bits used in the last Diffie-Hellman
+ * key exchange with the peer.  Should be used for both anonymous and
+ * ephemeral Diffie-Hellman.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -290,15 +290,18 @@ gnutls_dh_get_secret_bits (gnutls_session_t session)
 
 
 /**
- * gnutls_dh_get_prime_bits - return the bits used in DH authentication
+ * gnutls_dh_get_prime_bits - return the bits used in D-H key exchange
  * @session: is a gnutls session
  *
  * This function will return the bits of the prime used in the last
- * Diffie Hellman authentication with the peer.  Should be used for
- * both anonymous and ephemeral diffie Hellman.
+ * Diffie-Hellman key exchange with the peer.  Should be used for both
+ * anonymous and ephemeral Diffie-Hellman.  Note that some ciphers,
+ * like RSA and DSA without DHE, does not use a Diffie-Hellman key
+ * exchange, and then this function will return 0.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
- *   an error code is returned.
+ * Returns: The Diffie-Hellman bit strength is returned, or 0 if no
+ *   Diffie-Hellman key exchange was done, or a negative error code on
+ *   failure.
  **/
 int
 gnutls_dh_get_prime_bits (gnutls_session_t session)
@@ -369,15 +372,14 @@ gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
 }
 
 /**
- * gnutls_dh_get_peers_public_bits - return the bits used in DH authentication
+ * gnutls_dh_get_peers_public_bits - return the bits used in D-H key exchange
  * @session: is a gnutls session
  *
  * Get the Diffie-Hellman public key bit size.  Can be used for both
- * anonymous and ephemeral diffie Hellman.
+ * anonymous and ephemeral Diffie-Hellman.
  *
- * Returns: the public key bit size used in the last Diffie Hellman
- * authentication with the peer, or a negative value in case of
- * error.
+ * Returns: the public key bit size used in the last Diffie-Hellman
+ *   key exchange with the peer, or a negative value in case of error.
  **/
 int
 gnutls_dh_get_peers_public_bits (gnutls_session_t session)
@@ -505,8 +507,8 @@ gnutls_certificate_get_peers (gnutls_session_t
  * Get whether client certificate is requested or not.
  *
  * Returns: 0 if the peer (server) did not request client
- * authentication or 1 otherwise, or a negative value in case of
- * error.
+ *   authentication or 1 otherwise, or a negative value in case of
+ *   error.
  **/
 int
 gnutls_certificate_client_get_request_status (gnutls_session_t session)
@@ -577,11 +579,11 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
 /**
  * gnutls_certificate_set_dh_params - set the DH parameters for a server to use
  * @res: is a gnutls_certificate_credentials_t structure
- * @dh_params: is a structure that holds diffie hellman parameters.
+ * @dh_params: is a structure that holds Diffie-Hellman parameters.
  *
- * This function will set the diffie hellman parameters for a
+ * This function will set the Diffie-Hellman parameters for a
  * certificate server to use. These parameters will be used in
- * Ephemeral Diffie Hellman cipher suites.  Note that only a pointer
+ * Ephemeral Diffie-Hellman cipher suites.  Note that only a pointer
  * to the parameters are stored in the certificate handle, so if you
  * deallocate the parameters before the certificate is deallocated,
  * you must change the parameters stored in the certificate first.
@@ -600,9 +602,8 @@ gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get
- * the diffie hellman or RSA parameters for certificate
+ * the Diffie-Hellman or RSA parameters for certificate
  * authentication.  The callback should return zero on success.
- *
  **/
 void
 gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
@@ -671,7 +672,7 @@ gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get
- * the diffie hellman or RSA parameters for psk authentication.  The
+ * the Diffie-Hellman or RSA parameters for PSK authentication.  The
  * callback should return zero on success.
  **/
 void
@@ -687,7 +688,7 @@ gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get
- * the diffie hellman or RSA parameters for anonymous authentication.
+ * the Diffie-Hellman or RSA parameters for anonymous authentication.
  * The callback should return zero on success.
  **/
 void

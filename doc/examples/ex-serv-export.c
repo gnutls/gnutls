@@ -91,7 +91,7 @@ static int
 generate_dh_params (void)
 {
   gnutls_datum_t dparams = { srp_dh_group2048, sizeof (srp_dh_group2048) };
-  /* Here instead of generating Diffie Hellman parameters (for use with DHE
+  /* Here instead of generating Diffie-Hellman parameters (for use with DHE
    * kx algorithms) we import them.
    */
   gnutls_dh_params_init (&dh_params);

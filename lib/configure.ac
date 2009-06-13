@@ -22,7 +22,7 @@ dnl Process this file with autoconf to produce a configure script.
 # MA 02110-1301, USA
 
 AC_PREREQ(2.61)
-AC_INIT([libgnutls], [2.7.13], [bug-gnutls@gnu.org])
+AC_INIT([libgnutls], [2.9.2], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -87,8 +87,9 @@ AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
 # Finish things from ../configure.ac.
-AC_SUBST([WARN_CFLAGS])
 AC_SUBST([WERROR_CFLAGS])
+AC_SUBST([WSTACK_CFLAGS])
+AC_SUBST([WARN_CFLAGS])
 AC_PROG_CXX
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 

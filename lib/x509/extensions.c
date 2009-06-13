@@ -523,15 +523,28 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 				const gnutls_datum_t * ext_data,
 				unsigned int critical)
 {
-  unsigned char extensions[MAX_CRQ_EXTENSIONS_SIZE];
-  size_t extensions_size = sizeof (extensions);
+  unsigned char *extensions = NULL;
+  size_t extensions_size = 0;
   gnutls_datum der;
   ASN1_TYPE c2;
   int result;
 
   result = gnutls_x509_crq_get_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
-						 0, extensions,
-						 &extensions_size);
+						 0, NULL, &extensions_size);
+  if (result == GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      extensions = gnutls_malloc (extensions_size);
+      if (extensions == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      result = gnutls_x509_crq_get_attribute_by_oid (crq,
+						     "1.2.840.113549.1.9.14",
+						     0, extensions,
+						     &extensions_size);
+    }
   if (result < 0)
     {
       if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
@@ -541,6 +554,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
       else
 	{
 	  gnutls_assert ();
+	  gnutls_free (extensions);
 	  return result;
 	}
     }
@@ -549,12 +563,14 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      gnutls_free (extensions);
       return _gnutls_asn2err (result);
     }
 
   if (extensions_size > 0)
     {
       result = asn1_der_decoding (&c2, extensions, extensions_size, NULL);
+      gnutls_free (extensions);
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();
@@ -583,7 +599,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 
   result = gnutls_x509_crq_set_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
 						 der.data, der.size);
-
+  gnutls_free (der.data);
   if (result < 0)
     {
       gnutls_assert ();

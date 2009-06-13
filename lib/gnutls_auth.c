@@ -162,9 +162,9 @@ gnutls_credentials_set (gnutls_session_t session,
   * The returned information is to be used to distinguish the function used
   * to access authentication data.
   *
-  * Eg. for CERTIFICATE ciphersuites (key exchange algorithms: KX_RSA,
-  * KX_DHE_RSA), the same function are to be used to access the
-  * authentication data.
+  * Eg. for CERTIFICATE ciphersuites (key exchange algorithms:
+  * %GNUTLS_KX_RSA, %GNUTLS_KX_DHE_RSA), the same function are to be
+  * used to access the authentication data.
   *
   * Returns: The type of credentials for the current authentication
   *   schema, an #gnutls_credentials_type_t type.

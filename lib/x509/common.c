@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -291,25 +291,23 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 	    non_printable = 0;
 	}
 
-      if (res)
+      if (non_printable == 0)
 	{
-	  if (non_printable == 0)
+	  str[len] = 0;
+
+	  if (res)
+	    _gnutls_str_cpy (res, *res_size, str);
+	  *res_size = len;
+	}
+      else
+	{
+	  result = _gnutls_x509_data2hex (str, len, res, res_size);
+	  if (result < 0)
 	    {
-	      str[len] = 0;
-	      _gnutls_str_cpy (res, *res_size, str);
-	      *res_size = len;
-	    }
-	  else
-	    {
-	      result = _gnutls_x509_data2hex (str, len, res, res_size);
-	      if (result < 0)
-		{
-		  gnutls_assert ();
-		  return result;
-		}
+	      gnutls_assert ();
+	      return result;
 	    }
 	}
-
     }
 
   return 0;

@@ -42,6 +42,15 @@ libtests_a_DEPENDENCIES = $(gltests_LIBOBJS)
 EXTRA_libtests_a_SOURCES =
 AM_LIBTOOLFLAGS = --preserve-dup-deps
 
+## begin gnulib module alignof-tests
+
+TESTS += test-alignof
+check_PROGRAMS += test-alignof
+
+EXTRA_DIST += test-alignof.c
+
+## end   gnulib module alignof-tests
+
 ## begin gnulib module alloca-opt-tests
 
 TESTS += test-alloca-opt
@@ -115,6 +124,15 @@ EXTRA_DIST += test-getline.c
 
 ## end   gnulib module getline-tests
 
+## begin gnulib module getpagesize
+
+
+EXTRA_DIST += getpagesize.c
+
+EXTRA_libtests_a_SOURCES += getpagesize.c
+
+## end   gnulib module getpagesize
+
 ## begin gnulib module gettimeofday
 
 
@@ -150,6 +168,14 @@ check_PROGRAMS += test-lseek
 EXTRA_DIST += test-lseek.c test-lseek.sh
 
 ## end   gnulib module lseek-tests
+
+## begin gnulib module memchr-tests
+
+TESTS += test-memchr
+check_PROGRAMS += test-memchr
+EXTRA_DIST += test-memchr.c zerosize-ptr.h
+
+## end   gnulib module memchr-tests
 
 ## begin gnulib module netdb-tests
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2007, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,9 +22,9 @@
  *
  */
 
-/* This file contains common stuff in Ephemeral Diffie Hellman (DHE) and
- * Anonymous DH key exchange(DHA). These are used in the handshake procedure 
- * of the certificate and anoymous authentication.
+/* This file contains common stuff in Ephemeral Diffie-Hellman (DHE)
+ * and Anonymous DH key exchange(DHA). These are used in the handshake
+ * procedure of the certificate and anoymous authentication.
  */
 
 #include "gnutls_int.h"

@@ -95,12 +95,29 @@ EXTRA_DIST += test-func.c
 
 ## end   gnulib module func-tests
 
+## begin gnulib module getpagesize
+
+
+EXTRA_DIST += getpagesize.c
+
+EXTRA_libtests_a_SOURCES += getpagesize.c
+
+## end   gnulib module getpagesize
+
 ## begin gnulib module intprops
 
 
 EXTRA_DIST += intprops.h
 
 ## end   gnulib module intprops
+
+## begin gnulib module memchr-tests
+
+TESTS += test-memchr
+check_PROGRAMS += test-memchr
+EXTRA_DIST += test-memchr.c zerosize-ptr.h
+
+## end   gnulib module memchr-tests
 
 ## begin gnulib module netdb-tests
 

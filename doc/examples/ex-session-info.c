@@ -66,7 +66,7 @@ print_info (gnutls_session_t session)
 
     case GNUTLS_CRD_CERTIFICATE:	/* certificate authentication */
 
-      /* Check if we have been using ephemeral Diffie Hellman.
+      /* Check if we have been using ephemeral Diffie-Hellman.
        */
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
 	{

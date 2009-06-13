@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos, Simon Josefsson
  *
@@ -46,7 +46,7 @@ typedef struct
   gnutls_ext_send_func send_func;
 } gnutls_extension_entry;
 
-size_t extfunc_size = 0;
+static size_t extfunc_size = 0;
 static gnutls_extension_entry *extfunc = NULL;
 
 static gnutls_ext_recv_func
@@ -331,6 +331,8 @@ void
 _gnutls_ext_deinit (void)
 {
   gnutls_free (extfunc);
+  extfunc = NULL;
+  extfunc_size = 0;
 }
 
 /**

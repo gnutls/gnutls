@@ -36,7 +36,7 @@ extern "C"
 {
 #endif
 
-#define LIBGNUTLS_EXTRA_VERSION LIBGNUTLS_VERSION
+#define GNUTLS_EXTRA_VERSION GNUTLS_VERSION
 
   /* TLS/IA stuff
    */

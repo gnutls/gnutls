@@ -40,6 +40,7 @@ GNUTLS_1_4
     gnutls_bye;
     gnutls_calc_dh_key;
     gnutls_calc_dh_secret;
+    gnutls_calloc;
     gnutls_certificate_activation_time_peers;
     gnutls_certificate_allocate_credentials;
     gnutls_certificate_client_get_request_status;
@@ -139,6 +140,7 @@ GNUTLS_1_4
     gnutls_error_to_alert;
     gnutls_ext_register;
     gnutls_fingerprint;
+    gnutls_free;
     gnutls_global_deinit;
     gnutls_global_init;
     gnutls_global_set_log_function;
@@ -165,6 +167,7 @@ GNUTLS_1_4
     gnutls_mac_get_name;
     gnutls_mac_list;
     gnutls_mac_set_priority;
+    gnutls_malloc;
     gnutls_openpgp_count_key_names;
     gnutls_openpgp_crt_check_hostname;
     gnutls_openpgp_crt_deinit;
@@ -306,6 +309,7 @@ GNUTLS_1_4
     gnutls_psk_set_server_credentials_hint;
     gnutls_psk_set_server_dh_params;
     gnutls_psk_set_server_params_function;
+    gnutls_realloc;
     gnutls_realloc_fast;
     gnutls_record_check_pending;
     gnutls_record_disable_padding;
@@ -326,6 +330,7 @@ GNUTLS_1_4
     gnutls_rsa_params_import_raw;
     gnutls_rsa_params_init;
     gnutls_secure_calloc;
+    gnutls_secure_malloc;
     gnutls_server_name_get;
     gnutls_server_name_set;
     gnutls_session_enable_compatibility_mode;
@@ -348,6 +353,12 @@ GNUTLS_1_4
     gnutls_sign_get_id;
     gnutls_sign_get_name;
     gnutls_sign_list;
+    gnutls_srp_1024_group_generator;
+    gnutls_srp_1024_group_prime;
+    gnutls_srp_1536_group_generator;
+    gnutls_srp_1536_group_prime;
+    gnutls_srp_2048_group_generator;
+    gnutls_srp_2048_group_prime;
     gnutls_srp_allocate_client_credentials;
     gnutls_srp_allocate_server_credentials;
     gnutls_srp_base64_decode;
@@ -363,6 +374,7 @@ GNUTLS_1_4
     gnutls_srp_set_server_credentials_file;
     gnutls_srp_set_server_credentials_function;
     gnutls_srp_verifier;
+    gnutls_strdup;
     gnutls_strerror;
     gnutls_strerror_name;
     gnutls_supplemental_get_name;
@@ -411,11 +423,10 @@ GNUTLS_1_4
     gnutls_x509_crq_import;
     gnutls_x509_crq_init;
     gnutls_x509_crq_set_attribute_by_oid;
-    gnutls_x509_crq_set_basic_constraints;
     gnutls_x509_crq_set_challenge_password;
     gnutls_x509_crq_set_dn_by_oid;
+    gnutls_x509_crq_set_key;
     gnutls_x509_crq_set_key_rsa_raw;
-    gnutls_x509_crq_set_key_usage;
     gnutls_x509_crq_set_version;
     gnutls_x509_crq_sign2;
     gnutls_x509_crq_sign;
@@ -519,22 +530,6 @@ GNUTLS_1_4
     gnutls_x509_rdn_get_by_oid;
     gnutls_x509_rdn_get_oid;
 
-    # SRP related variables:
-    gnutls_srp_1024_group_generator;
-    gnutls_srp_1024_group_prime;
-    gnutls_srp_1536_group_generator;
-    gnutls_srp_1536_group_prime;
-    gnutls_srp_2048_group_generator;
-    gnutls_srp_2048_group_prime;
-
-    # Memory allocation related variables:
-    gnutls_calloc;
-    gnutls_free;
-    gnutls_malloc;
-    gnutls_strdup;
-    gnutls_realloc;
-    gnutls_secure_malloc;
-
   local:
     *;
 };
@@ -542,33 +537,34 @@ GNUTLS_1_4
 GNUTLS_2_8
 {
   global:
-    gnutls_x509_crt_verify_hash;
-    gnutls_x509_crt_get_verify_algorithm;
-    gnutls_x509_crq_get_key_id;
     gnutls_certificate_set_x509_simple_pkcs12_mem;
     gnutls_x509_crl_get_authority_key_id;
-    gnutls_x509_crl_get_number;
     gnutls_x509_crl_get_extension_data;
     gnutls_x509_crl_get_extension_info;
     gnutls_x509_crl_get_extension_oid;
+    gnutls_x509_crl_get_number;
     gnutls_x509_crl_set_authority_key_id;
     gnutls_x509_crl_set_number;
-    gnutls_x509_crq_get_key_rsa_raw;
     gnutls_x509_crq_get_attribute_data;
     gnutls_x509_crq_get_attribute_info;
+    gnutls_x509_crq_get_basic_constraints;
+    gnutls_x509_crq_get_extension_by_oid;
     gnutls_x509_crq_get_extension_data;
     gnutls_x509_crq_get_extension_info;
+    gnutls_x509_crq_get_key_id;
+    gnutls_x509_crq_get_key_purpose_oid;
+    gnutls_x509_crq_get_key_rsa_raw;
     gnutls_x509_crq_get_key_usage;
-    gnutls_x509_crq_get_basic_constraints;
     gnutls_x509_crq_get_subject_alt_name;
     gnutls_x509_crq_get_subject_alt_othername_oid;
-    gnutls_x509_crq_get_extension_by_oid;
-    gnutls_x509_crq_set_subject_alt_name;
-    gnutls_x509_crq_set_key;
-    gnutls_x509_crq_get_key_purpose_oid;
-    gnutls_x509_crq_set_key_purpose_oid;
     gnutls_x509_crq_print;
+    gnutls_x509_crq_set_basic_constraints;
+    gnutls_x509_crq_set_key_purpose_oid;
+    gnutls_x509_crq_set_key_usage;
+    gnutls_x509_crq_set_subject_alt_name;
+    gnutls_x509_crt_get_verify_algorithm;
     gnutls_x509_crt_set_crq_extensions;
+    gnutls_x509_crt_verify_hash;
 } GNUTLS_1_4;
 
 GNUTLS_PRIVATE {
@@ -608,7 +604,7 @@ GNUTLS_PRIVATE {
     # Internal symbols needed by tests/mpi:
     _gnutls_mpi_ops;
     _gnutls_mpi_randomize;
-    _gnutls_dump_mpi;
+    _gnutls_mpi_log;
     # Internal symbols needed by tests/pkcs12_s2k:
     _gnutls_pkcs12_string_to_key;
     _gnutls_bin2hex;

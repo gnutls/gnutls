@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -31,10 +31,10 @@
 void
 doit (void)
 {
-  printf ("GNUTLS header version %s.\n", LIBGNUTLS_VERSION);
-  printf ("GNUTLS library version %s.\n", gnutls_check_version (NULL));
+  printf ("GnuTLS header version %s.\n", GNUTLS_VERSION);
+  printf ("GnuTLS library version %s.\n", gnutls_check_version (NULL));
 
-  if (gnutls_check_version (LIBGNUTLS_VERSION))
+  if (gnutls_check_version (GNUTLS_VERSION))
     success ("gnutls_check_version OK\n");
   else
     fail ("gnutls_check_version ERROR\n");

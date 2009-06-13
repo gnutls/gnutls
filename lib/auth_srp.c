@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -31,7 +31,6 @@
 #include "gnutls_auth.h"
 #include "gnutls_auth.h"
 #include "gnutls_srp.h"
-#include "debug.h"
 #include "gnutls_num.h"
 #include "auth_srp.h"
 #include <gnutls_str.h>
@@ -318,7 +317,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_dump_mpi ("SRP U: ", session->key->u);
+  _gnutls_mpi_log ("SRP U: ", session->key->u);
 
   /* S = (B - g^x) ^ (a + u * x) % N */
   S = _gnutls_calc_srp_S2 (B, G, session->key->x, _a, session->key->u, N);
@@ -328,7 +327,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_dump_mpi ("SRP B: ", B);
+  _gnutls_mpi_log ("SRP B: ", B);
 
   _gnutls_mpi_release (&_b);
   _gnutls_mpi_release (&V);
@@ -395,8 +394,8 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  _gnutls_dump_mpi ("SRP A: ", A);
-  _gnutls_dump_mpi ("SRP B: ", B);
+  _gnutls_mpi_log ("SRP A: ", A);
+  _gnutls_mpi_log ("SRP B: ", B);
 
   /* Checks if A % n == 0.
    */
@@ -416,7 +415,7 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_dump_mpi ("SRP U: ", session->key->u);
+  _gnutls_mpi_log ("SRP U: ", session->key->u);
 
   /* S = (A * v^u) ^ b % N 
    */
@@ -427,7 +426,7 @@ _gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_dump_mpi ("SRP S: ", S);
+  _gnutls_mpi_log ("SRP S: ", S);
 
   _gnutls_mpi_release (&A);
   _gnutls_mpi_release (&_b);
@@ -613,7 +612,7 @@ group_check_g_n (gnutls_session_t session, bigint_t g, bigint_t n)
    */
   if (_gnutls_prime_check (n) != 0)
     {
-      _gnutls_dump_mpi ("no prime N: ", n);
+      _gnutls_mpi_log ("no prime N: ", n);
       gnutls_assert ();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
     }
@@ -646,7 +645,7 @@ group_check_g_n (gnutls_session_t session, bigint_t g, bigint_t n)
     {
       /* N was not on the form N=2q+1, where q = prime
        */
-      _gnutls_dump_mpi ("no prime Q: ", q);
+      _gnutls_mpi_log ("no prime Q: ", q);
       gnutls_assert ();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
     }

@@ -78,14 +78,14 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
   * @username: is the user's zero-terminated userid
   * @key: is the user's key
   * @format: indicate the format of the key, either
-  * %GNUTLS_PSK_KEY_RAW or %GNUTLS_PSK_KEY_HEX.
+  *   %GNUTLS_PSK_KEY_RAW or %GNUTLS_PSK_KEY_HEX.
   *
   * This function sets the username and password, in a
   * gnutls_psk_client_credentials_t structure.  Those will be used in
-  * PSK authentication. @username should be an ASCII string or UTF-8
+  * PSK authentication.  @username should be an ASCII string or UTF-8
   * strings prepared using the "SASLprep" profile of "stringprep".
-  * The key can be either in raw byte format or in Hex (not with the
-  * '0x' prefix).
+  * The key can be either in raw byte format or in Hex format (without
+  * the 0x prefix).
   *
   * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   **/
@@ -424,11 +424,11 @@ size_t res = data->size + data->size + 1;
 /**
   * gnutls_psk_set_server_dh_params - set the DH parameters for a server to use
   * @res: is a gnutls_psk_server_credentials_t structure
-  * @dh_params: is a structure that holds diffie hellman parameters.
+  * @dh_params: is a structure that holds Diffie-Hellman parameters.
   *
-  * This function will set the diffie hellman parameters for an
-  * anonymous server to use. These parameters will be used in Diffie
-  * Hellman with PSK cipher suites.
+  * This function will set the Diffie-Hellman parameters for an
+  * anonymous server to use. These parameters will be used in
+  * Diffie-Hellman exchange with PSK cipher suites.
   **/
 void
 gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
@@ -443,7 +443,7 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
  * @func: is the function to be called
  *
  * This function will set a callback in order for the server to get
- * the diffie hellman parameters for PSK authentication. The callback
+ * the Diffie-Hellman parameters for PSK authentication.  The callback
  * should return zero on success.
  **/
 void

@@ -322,7 +322,7 @@ gnutls_transport_set_push_function (gnutls_session_t session,
  *
  * Check GnuTLS Library version.
  *
- * See %LIBGNUTLS_VERSION for a suitable @req_version string.
+ * See %GNUTLS_VERSION for a suitable @req_version string.
  *
  * Return value: Check that the version of the library is at
  *   minimum the one given as a string in @req_version and return the

@@ -22,7 +22,7 @@ dnl Process this file with autoconf to produce a configure script.
 # USA
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [2.7.13], [bug-gnutls@gnu.org])
+AC_INIT([GnuTLS], [2.9.2], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -196,6 +196,7 @@ AC_ARG_ENABLE([gcc-warnings],
 
 if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
+  gl_WARN_ADD([-Wframe-larger-than=2100], [WSTACK_CFLAGS])
 
   nw="$nw -Wsystem-headers"         # Don't let system headers trigger warnings
   nw="$nw -Wc++-compat"             # We don't care about C++ compilers
@@ -235,6 +236,7 @@ fi
 
 # Export things for */configure.ac.
 export WERROR_CFLAGS
+export WSTACK_CFLAGS
 export WARN_CFLAGS
 export use_cxx
 

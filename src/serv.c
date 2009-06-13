@@ -171,13 +171,13 @@ generate_dh_primes (void)
       exit (1);
     }
 
-  /* Generate Diffie Hellman parameters - for use with DHE
+  /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a week or once a month. Depends on the
    * security requirements.
    */
   printf
-    ("Generating Diffie Hellman parameters [%d]. Please wait...\n",
+    ("Generating Diffie-Hellman parameters [%d]. Please wait...\n",
      prime_bits);
   fflush (stdout);
 
@@ -229,7 +229,7 @@ read_dh_params (void)
       exit (1);
     }
 
-  printf ("Read Diffie Hellman parameters.\n");
+  printf ("Read Diffie-Hellman parameters.\n");
   fflush (stdout);
 
 }
@@ -262,7 +262,7 @@ static_dh_params (void)
       exit (1);
     }
 
-  printf ("Set static Diffie Hellman parameters, consider --dhparams.\n");
+  printf ("Set static Diffie-Hellman parameters, consider --dhparams.\n");
 
   return 0;
 }
@@ -623,31 +623,52 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   return http_buffer;
 }
 
-static int
-get_port (const struct sockaddr *addr)
+static const char *
+human_addr (const struct sockaddr *sa, socklen_t salen,
+	    char *buf, size_t buflen)
 {
-  switch (addr->sa_family)
+  const char *save_buf = buf;
+  size_t l;
+
+  if (!buf || !buflen)
+    return NULL;
+
+  *buf = '\0';
+
+  switch (sa->sa_family)
     {
 #if HAVE_IPV6
     case AF_INET6:
-      return ntohs (((const struct sockaddr_in6 *) addr)->sin6_port);
+      snprintf (buf, buflen, "IPv6 ");
+      break;
 #endif
 
     case AF_INET:
-      return ntohs (((const struct sockaddr_in *) addr)->sin_port);
+      snprintf (buf, buflen, "IPv4 ");
+      break;
     }
 
-  return -1;
-}
+  l = strlen (buf);
+  buf += l;
+  buflen -= l;
 
-static const char *
-addr_ntop (const struct sockaddr *sa, socklen_t salen,
-	   char *buf, size_t buflen)
-{
-  if (getnameinfo (sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) == 0)
-    return buf;
+  if (getnameinfo (sa, salen, buf, buflen, NULL, 0, NI_NUMERICHOST) != 0)
+    return NULL;
 
-  return NULL;
+  l = strlen (buf);
+  buf += l;
+  buflen -= l;
+
+  strncat (buf, " port ", buflen);
+
+  l = strlen (buf);
+  buf += l;
+  buflen -= l;
+
+  if (getnameinfo (sa, salen, NULL, 0, buf, buflen, NI_NUMERICSERV) != 0)
+    return NULL;
+
+  return save_buf;
 }
 
 static int
@@ -677,10 +698,9 @@ listen_socket (const char *name, int listen_port)
       {
 	char topbuf[512];
 
-	fprintf (stderr, "%s listening on %s port %d family %d...",
-		 name, addr_ntop (ptr->ai_addr, ptr->ai_addrlen,
-				  topbuf, sizeof (topbuf)),
-		 get_port (ptr->ai_addr), ptr->ai_family);
+	fprintf (stderr, "%s listening on %s...",
+		 name, human_addr (ptr->ai_addr, ptr->ai_addrlen,
+				   topbuf, sizeof (topbuf)));
       }
 
       if ((s = socket (ptr->ai_family, ptr->ai_socktype,
@@ -870,7 +890,7 @@ main (int argc, char **argv)
   gnutls_global_set_log_level (debug);
 
   /* Note that servers must generate parameters for
-   * Diffie Hellman. See gnutls_dh_params_generate(), and
+   * Diffie-Hellman. See gnutls_dh_params_generate(), and
    * gnutls_dh_params_set().
    */
   if (generate != 0)
@@ -1138,12 +1158,10 @@ main (int argc, char **argv)
 		    ctt = ctime (&tt);
 		    ctt[strlen (ctt) - 1] = 0;
 
-		    /*
-		      printf("\n* connection from %s, port %d\n",
-		      inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
-		      sizeof(topbuf)), ntohs(client_address.sin_port));
-		    */
-
+		    printf("\n* Accepted connection from %s on %s\n",
+			   human_addr ((struct sockaddr *)
+				       &client_address, calen, topbuf,
+				       sizeof (topbuf)), ctt);
 		  }
 	      }
 	  }
@@ -1184,12 +1202,10 @@ main (int argc, char **argv)
 
 		    if (verbose == 0)
 		      {
-			printf ("\n* connection from %s, port %d\n",
-				addr_ntop ((struct sockaddr *)
-					   &client_address, calen, topbuf,
-					   sizeof (topbuf)),
-				get_port ((struct sockaddr *)
-					  &client_address));
+			printf ("\n* Successful handshake from %s\n",
+				human_addr ((struct sockaddr *)
+					    &client_address, calen, topbuf,
+					    sizeof (topbuf)));
 			print_info (j->tls_session, NULL, 1);
 		      }
 		    j->handshake_ok = 1;
@@ -1282,12 +1298,10 @@ main (int argc, char **argv)
 		      printf ("*** This is a resumed session\n");
 		    if (verbose == 0)
 		      {
-			printf ("- connection from %s, port %d\n",
-				addr_ntop ((struct sockaddr *)
-					   &client_address, calen, topbuf,
-					   sizeof (topbuf)),
-				get_port ((struct sockaddr *)
-					  &client_address));
+			printf ("- connection from %s\n",
+				human_addr ((struct sockaddr *)
+					    &client_address, calen, topbuf,
+					    sizeof (topbuf)));
 
 			print_info (j->tls_session, NULL, 1);
 		      }

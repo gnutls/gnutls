@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Free Software Foundation
+ * Copyright (C) 2007, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -63,7 +63,7 @@ doit (void)
 
   _gnutls_mpi_randomize (n1, RND_BITS, GNUTLS_RND_NONCE);
 
-  _gnutls_dump_mpi ("rand:", n1);
+  _gnutls_mpi_log ("rand:", n1);
 
   rc = _gnutls_mpi_get_nbits (n1);
   if (rc > RND_BITS)

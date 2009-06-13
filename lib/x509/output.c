@@ -188,7 +188,8 @@ print_ski (gnutls_string * str, gnutls_x509_crt_t cert)
   buffer = gnutls_malloc (size);
   if (!buffer)
     {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+      addf (str, "error: malloc: %s\n",
+	    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
       return;
     }
 
@@ -246,7 +247,8 @@ print_aki (gnutls_string * str, int type, cert_type_t cert)
   buffer = gnutls_malloc (size);
   if (!buffer)
     {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+      addf (str, "error: malloc: %s\n",
+	    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
       return;
     }
 
@@ -340,7 +342,8 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -420,7 +423,8 @@ print_key_purpose (gnutls_string * str, const char *prefix, int type,
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -531,7 +535,8 @@ print_san (gnutls_string * str, const char *prefix, int type,
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -603,7 +608,8 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	    if (!oid)
 	      {
 		gnutls_free (buffer);
-		addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		addf (str, "error: malloc: %s\n",
+		      gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 		return;
 	      }
 
@@ -854,7 +860,8 @@ print_extensions (gnutls_string * str, const char *prefix, int type,
 	  buffer = gnutls_malloc (extlen);
 	  if (!buffer)
 	    {
-	      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	      addf (str, "error: malloc: %s\n",
+		    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	      continue;
 	    }
 
@@ -1097,7 +1104,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -1529,7 +1537,8 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 	      buffer = gnutls_malloc (extlen);
 	      if (!buffer)
 		{
-		  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		  addf (str, "error: malloc: %s\n",
+			gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 		  continue;
 		}
 
@@ -1632,7 +1641,8 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
       buffer = gnutls_malloc (size);
       if (!buffer)
 	{
-	  addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+	  addf (str, "error: malloc: %s\n",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 	  return;
 	}
 
@@ -1826,23 +1836,42 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 	  }
 	else if (strcmp (oid, "1.2.840.113549.1.9.7") == 0)
 	  {
-	    char pass[1024];
-	    size_t pass_size = sizeof (pass);
+	    char *pass;
+	    size_t size;
 
 	    if (challenge)
 	      {
-		addf (str,
+		adds (str,
 		      "error: more than one Challenge password attribute\n");
 		continue;
 	      }
 
-	    err =
-	      gnutls_x509_crq_get_challenge_password (cert, pass, &pass_size);
+	    err = gnutls_x509_crq_get_challenge_password (cert, NULL, &size);
+	    if (err < 0)
+	      {
+		addf (str, "error: get_challenge_password: %s\n",
+		      gnutls_strerror (err));
+		continue;
+	      }
+
+	    size++;
+
+	    pass = gnutls_malloc (size);
+	    if (!pass)
+	      {
+		addf (str, "error: malloc: %s\n",
+		      gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+		continue;
+	      }
+
+	    err = gnutls_x509_crq_get_challenge_password (cert, pass, &size);
 	    if (err < 0)
 	      addf (str, "error: get_challenge_password: %s\n",
 		    gnutls_strerror (err));
 	    else
 	      addf (str, _("\t\tChallenge password: %s\n"), pass);
+
+	    gnutls_free (pass);
 
 	    challenge++;
 	  }
@@ -1864,7 +1893,8 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 	    buffer = gnutls_malloc (extlen);
 	    if (!buffer)
 	      {
-		addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+		addf (str, "error: malloc: %s\n",
+		      gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
 		continue;
 	      }
 
@@ -1909,7 +1939,8 @@ print_crq_other (gnutls_string * str, gnutls_x509_crq_t crq)
   buffer = gnutls_malloc (size);
   if (!buffer)
     {
-      addf (str, "error: malloc: %s\n", gnutls_strerror (err));
+      addf (str, "error: malloc: %s\n",
+	    gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
       return;
     }
 

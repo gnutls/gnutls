@@ -1105,8 +1105,8 @@ begin:
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
-  * This function has the similar semantics with send(). The only
-  * difference is that is accepts a GNUTLS session, and uses different
+  * This function has the similar semantics with send().  The only
+  * difference is that it accepts a GnuTLS session, and uses different
   * error codes.
   *
   * Note that if the send buffer is full, send() will block this
@@ -1141,15 +1141,15 @@ gnutls_record_send (gnutls_session_t session, const void *data,
   * @data: the buffer that the data will be read into
   * @sizeofdata: the number of requested bytes
   *
-  * This function has the similar semantics with recv(). The only
-  * difference is that is accepts a GNUTLS session, and uses different
+  * This function has the similar semantics with recv().  The only
+  * difference is that it accepts a GnuTLS session, and uses different
   * error codes.
   *
   * In the special case that a server requests a renegotiation, the
   * client may receive an error code of %GNUTLS_E_REHANDSHAKE.  This
-  * message may be simply ignored, replied with an alert containing
-  * NO_RENEGOTIATION, or replied with a new handshake, depending on
-  * the client's will.
+  * message may be simply ignored, replied with an alert
+  * %GNUTLS_A_NO_RENEGOTIATION, or replied with a new handshake,
+  * depending on the client's will.
   *
   * If %EINTR is returned by the internal push function (the default
   * is recv()) then %GNUTLS_E_INTERRUPTED will be returned.  If

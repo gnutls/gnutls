@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  *
  * This file is part of GNUTLS-EXTRA.
@@ -65,7 +65,7 @@ extern "C"
 
 #define OPENSSL_VERSION_NUMBER (0x0090604F)
 #define SSLEAY_VERSION_NUMBER OPENSSL_VERSION_NUMBER
-#define OPENSSL_VERSION_TEXT ("GNUTLS " LIBGNUTLS_VERSION " ")
+#define OPENSSL_VERSION_TEXT ("GNUTLS " GNUTLS_VERSION " ")
 
 #define SSL_ERROR_NONE        (0)
 #define SSL_ERROR_SSL         (1)
