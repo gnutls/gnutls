@@ -95,15 +95,6 @@ EXTRA_DIST += test-func.c
 
 ## end   gnulib module func-tests
 
-## begin gnulib module getpagesize
-
-
-EXTRA_DIST += getpagesize.c
-
-EXTRA_libtests_a_SOURCES += getpagesize.c
-
-## end   gnulib module getpagesize
-
 ## begin gnulib module intprops
 
 
