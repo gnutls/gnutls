@@ -23,9 +23,11 @@ gnutls_dh_get_peers_public_bits.  Before the reported value was
 overestimated.  Reported by Peter Hendrickson <pdh@wiredyne.com> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3607>.
 
-** tests: Added new self-test pkcs12_s2k_pem to detect previous problem.
+** tests: Added new self-test pkcs12_s2k_pem to detect MPI bit length error.
 
 ** tests: Improved test vectors in self-test pkcs12_s2k.
+
+** tests: Added new self-test dn2 to detect off-by-one size error.
 
 ** API and ABI modifications:
 No changes since last version.
