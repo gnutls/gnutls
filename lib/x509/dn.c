@@ -36,7 +36,7 @@
  */
 
 /* Converts the given OID to an ldap acceptable string or
- * a dotted OID. 
+ * a dotted OID.
  */
 static const char *
 oid2ldap_string (const char *oid)
@@ -240,7 +240,8 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 	  ldap_desc = oid2ldap_string (oid);
 	  printable = _gnutls_x509_oid_data_printable (oid);
 
-	  sizeof_escaped = 2 * len + 1;
+	  /* leading #, hex encoded value and terminating NULL */
+	  sizeof_escaped = 2 * len + 2;
 
 	  escaped = gnutls_malloc (sizeof_escaped);
 	  if (escaped == NULL)
@@ -310,7 +311,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
       _gnutls_string_get_data( &out_str, buf, sizeof_buf);
       buf[*sizeof_buf] = 0;
     }
-  else 
+  else
     *sizeof_buf = out_str.length;
 
   result = 0;
