@@ -319,9 +319,9 @@ gnutls_perror (int error)
  * gnutls_strerror - Returns a string with a description of an error
  * @error: is a GnuTLS error code, a negative value
  *
- * This function is similar to strerror().  Differences: it accepts an
- * error number returned by a gnutls function; In case of an unknown
- * error a descriptive string is sent instead of NULL.
+ * This function is similar to strerror.  The difference is that it
+ * accepts an error number returned by a gnutls function; In case of
+ * an unknown error a descriptive string is sent instead of %NULL.
  *
  * Error codes are always a negative value.
  *
