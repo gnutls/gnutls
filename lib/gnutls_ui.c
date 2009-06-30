@@ -288,6 +288,24 @@ gnutls_dh_get_secret_bits (gnutls_session_t session)
     }
 }
 
+static int
+mpi_buf2bits (gnutls_datum_t *mpi_buf)
+{
+  bigint_t mpi;
+  int rc;
+
+  rc = _gnutls_mpi_scan_nz (&mpi, mpi_buf->data, mpi_buf->size);
+  if (rc)
+    {
+      gnutls_assert ();
+      return rc;
+    }
+
+  rc = _gnutls_mpi_get_nbits (mpi);
+  _gnutls_mpi_release (&mpi);
+
+  return rc;
+}
 
 /**
  * gnutls_dh_get_prime_bits - return the bits used in D-H key exchange
@@ -346,8 +364,7 @@ gnutls_dh_get_prime_bits (gnutls_session_t session)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return (dh->prime.size) * 8;
-
+  return mpi_buf2bits (&dh->prime);
 }
 
 /**
@@ -368,7 +385,7 @@ gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
   if (info == NULL)
     return GNUTLS_E_INTERNAL_ERROR;
 
-  return info->rsa_export.modulus.size * 8;
+  return mpi_buf2bits (&info->rsa_export.modulus);
 }
 
 /**
@@ -426,8 +443,7 @@ gnutls_dh_get_peers_public_bits (gnutls_session_t session)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return dh->public_key.size * 8;
-
+  return mpi_buf2bits (&dh->public_key);
 }
 
 /* CERTIFICATE STUFF */

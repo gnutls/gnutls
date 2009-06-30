@@ -29,6 +29,7 @@
 #include "utils.h"
 #include "../lib/gnutls_int.h"
 #include "../lib/gnutls_mpi.h"
+#include "../lib/gnutls_errors.h"
 #include "../lib/debug.h"
 
 static void

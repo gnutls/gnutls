@@ -175,8 +175,8 @@ Sweden
 E-mail: simon@josefsson.org
 @end verbatim
 
-If your company provide support related to GnuTLS and would like to be
-mentioned here, contact the author (@pxref{Bug Reports}).
+If your company provides support related to GnuTLS and would like to
+be mentioned here, contact the author (@pxref{Bug Reports}).
 
 @node Downloading and Installing
 @section Downloading and Installing

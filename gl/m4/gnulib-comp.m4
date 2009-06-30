@@ -88,6 +88,8 @@ AC_SUBST([LTALLOCA])
   gl_STDIO_MODULE_INDICATOR([getdelim])
   gl_FUNC_GETLINE
   gl_STDIO_MODULE_INDICATOR([getline])
+  gl_FUNC_GETPAGESIZE
+  gl_UNISTD_MODULE_INDICATOR([getpagesize])
   gl_FUNC_GETPASS_GNU
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
@@ -114,6 +116,7 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_FUNC_MEMCHR
+  gl_STRING_MODULE_INDICATOR([memchr])
   gl_MINMAX
   gl_MULTIARCH
   gl_HEADER_NETDB
@@ -221,8 +224,6 @@ AC_SUBST([LTALLOCA])
   gl_COMMON
   gl_source_base='gl/tests'
   gl_FUNC_UNGETC_WORKS
-  gl_FUNC_GETPAGESIZE
-  gl_UNISTD_MODULE_INDICATOR([getpagesize])
   gl_FUNC_GETTIMEOFDAY
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
@@ -231,9 +232,6 @@ AC_SUBST([LTALLOCA])
   fi
   gl_SYS_IOCTL_MODULE_INDICATOR([ioctl])
   gl_MODULE_INDICATOR([ioctl])
-  gl_FUNC_MMAP_ANON
-  AC_CHECK_HEADERS_ONCE([sys/mman.h])
-  AC_CHECK_FUNCS_ONCE([mprotect])
   AC_CHECK_HEADERS_ONCE([unistd.h sys/wait.h])
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
@@ -369,6 +367,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getaddrinfo.c
   lib/getdelim.c
   lib/getline.c
+  lib/getpagesize.c
   lib/getpass.c
   lib/getpass.h
   lib/gettext.h
@@ -378,6 +377,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/listen.c
   lib/lseek.c
   lib/memchr.c
+  lib/memchr.valgrind
   lib/minmax.h
   lib/netdb.in.h
   lib/netinet_in.in.h
@@ -541,7 +541,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/dummy.c
-  tests=lib/getpagesize.c
   tests=lib/gettimeofday.c
   tests=lib/ioctl.c
   tests=lib/sys_ioctl.in.h
