@@ -137,7 +137,7 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
 
           dest->data = dest->allocd;
         }
-      memcpy (&dest->data[dest->length], data, data_size);
+      memmove (&dest->data[dest->length], data, data_size);
       dest->length = tot_len;
 
       return tot_len;
