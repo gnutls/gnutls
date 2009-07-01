@@ -529,14 +529,7 @@ gnutls_certificate_get_peers (gnutls_session_t
 int
 gnutls_certificate_client_get_request_status (gnutls_session_t session)
 {
-  cert_auth_info_t info;
-
-  CHECK_AUTH (GNUTLS_CRD_CERTIFICATE, 0);
-
-  info = _gnutls_get_auth_info (session);
-  if (info == NULL)
-    return GNUTLS_E_INTERNAL_ERROR;
-  return info->certificate_requested;
+  return session->key->certificate_requested;
 }
 
 /**

@@ -105,10 +105,6 @@ typedef struct rsa_info_st
  */
 typedef struct cert_auth_info_st
 {
-  int certificate_requested;	/* if the peer requested certificate
-				 * this is non zero;
-				 */
-
   /* These (dh/rsa) are just copies from the credentials_t structure.
    * They must be freed.
    */
