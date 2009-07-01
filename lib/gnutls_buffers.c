@@ -657,7 +657,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
     {
       gnutls_datum bdata;
       /* checking is handled above */
-      _gnutls_buffer_get_datum (&session->internals.record_send_buffer, &bdata, n);
+      _gnutls_buffer_get_datum (&session->internals.record_send_buffer, &bdata, session->internals.record_send_buffer.length);
 
       ptr = bdata.data;
       n = bdata.size;
@@ -854,7 +854,7 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
       gnutls_assert ();
 
       /* checking is handled above */
-      _gnutls_buffer_get_datum (&session->internals.handshake_send_buffer, &bdata, n);
+      _gnutls_buffer_get_datum (&session->internals.handshake_send_buffer, &bdata, session->internals.handshake_send_buffer.length);
 
       ptr = bdata.data;
       n = bdata.size;
