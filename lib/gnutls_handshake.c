@@ -573,7 +573,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
     }
 
   ret =
-    _gnutls_send_handshake (session, data, data_size,
+    _gnutls_send_handshake (session, data_size ? data : NULL, data_size,
 			    GNUTLS_HANDSHAKE_FINISHED);
 
   return ret;
