@@ -1633,6 +1633,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_x509_subject_alt_name_t type;
   gnutls_datum_t dnsname = { NULL, 0 };
+  size_t dns_size = 0;
 
   if (crq == NULL)
     {
@@ -1648,7 +1649,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
   /* Extract extension.
    */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
-						 NULL, &dnsname.size,
+						 NULL, &dns_size,
 						 critical);
   if (result < 0)
     {
@@ -1656,6 +1657,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
       return result;
     }
 
+  dnsname.size = dns_size;
   dnsname.data = gnutls_malloc (dnsname.size);
   if (dnsname.data == NULL)
     {
@@ -1664,7 +1666,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
     }
 
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
-						 dnsname.data, &dnsname.size,
+						 dnsname.data, &dns_size,
 						 critical);
   if (result < 0)
     {
@@ -1876,6 +1878,7 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
   gnutls_datum_t der_data = { NULL, 0 };
   gnutls_datum_t prev_der_data = { NULL, 0 };
   unsigned int critical = 0;
+  size_t prev_data_size = 0;
 
   if (crq == NULL)
     {
@@ -1888,8 +1891,10 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
   if (flags == GNUTLS_FSAN_APPEND)
     {
       result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
-						     NULL, &prev_der_data.size,
+						     NULL, &prev_data_size,
 						     &critical);
+      prev_der_data.size = prev_data_size;
+
       switch (result)
 	{
 	case GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE:
@@ -1906,7 +1911,7 @@ gnutls_x509_crq_set_subject_alt_name (gnutls_x509_crq_t crq,
 
 	  result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
 							 prev_der_data.data,
-							 &prev_der_data.size,
+							 &prev_data_size,
 							 &critical);
 	  if (result < 0)
 	    {
@@ -2075,6 +2080,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
   int result, len;
   gnutls_datum_t prev = { NULL, 0 };
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  size_t prev_size = 0;
 
   if (oid)
     memset (oid, 0, *sizeof_oid);
@@ -2084,8 +2090,10 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
   /* Extract extension.
    */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						 NULL, &prev.size,
+						 NULL, &prev_size,
 						 critical);
+  prev.size = prev_size;
+
   if (result < 0)
     {
       gnutls_assert ();
@@ -2100,7 +2108,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
     }
 
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						 prev.data, &prev.size,
+						 prev.data, &prev_size,
 						 critical);
   if (result < 0)
     {
@@ -2177,12 +2185,15 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
   int result;
   gnutls_datum_t prev = { NULL, 0 }, der_data;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  size_t prev_size = 0;
 
   /* Read existing extension, if there is one.
    */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						 NULL, &prev.size,
+						 NULL, &prev_size,
 						 &critical);
+  prev.size = prev_size;
+
   switch (result)
     {
     case GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE:
@@ -2198,7 +2209,7 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
 	}
 
       result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						     prev.data, &prev.size,
+						     prev.data, &prev_size,
 						     &critical);
       if (result < 0)
 	{
