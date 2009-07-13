@@ -99,6 +99,15 @@ tests/simple
 tests/tlsia
 tests/x509dn
 tests/x509self
+doc/cyclo/cyclo-gnutls.html
+doc/errcodes
+doc/printlist
 tests/x509signself
+tests/dn2
 lib/build-aux/
 libextra/build-aux/
+gl/
+m4/
+lib/po
+po
+stamp-h1
