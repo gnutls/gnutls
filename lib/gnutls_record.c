@@ -373,7 +373,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     ("REC[%p]: Sending Packet[%d] %s(%d) with length: %d\n", session,
      (int) _gnutls_uint64touint32 (&session->connection_state.
 				   write_sequence_number),
-     _gnutls_packet2str (type), type, sizeofdata);
+     _gnutls_packet2str (type), type, (int)sizeofdata);
 
   if (sizeofdata > MAX_RECORD_SEND_SIZE)
     data2send_size = MAX_RECORD_SEND_SIZE;
@@ -941,7 +941,7 @@ begin:
     ("REC[%p]: Expected Packet[%d] %s(%d) with length: %d\n", session,
      (int) _gnutls_uint64touint32 (&session->connection_state.
 				   read_sequence_number),
-     _gnutls_packet2str (type), type, sizeofdata);
+     _gnutls_packet2str (type), type, (int)sizeofdata);
   _gnutls_record_log ("REC[%p]: Received Packet[%d] %s(%d) with length: %d\n",
 		      session,
 		      (int)

@@ -198,7 +198,7 @@ read_crt_set (gnutls_x509_crt_t crt, const char *input_str, const char *oid)
   int ret;
 
   fputs (input_str, stderr);
-  fgets (input, sizeof (input), stdin);
+  if (fgets (input, sizeof (input), stdin)==NULL) return;
 
   if (strlen (input) == 1)	/* only newline */
     return;
@@ -219,7 +219,7 @@ read_crq_set (gnutls_x509_crq_t crq, const char *input_str, const char *oid)
   int ret;
 
   fputs (input_str, stderr);
-  fgets (input, sizeof (input), stdin);
+  if (fgets (input, sizeof (input), stdin)==NULL) return;
 
   if (strlen (input) == 1)	/* only newline */
     return;
@@ -302,7 +302,7 @@ read_yesno (const char *input_str)
   char input[128];
 
   fputs (input_str, stderr);
-  fgets (input, sizeof (input), stdin);
+  if (fgets (input, sizeof (input), stdin)==NULL) return 0;
 
   if (strlen (input) == 1)	/* only newline */
     return 0;

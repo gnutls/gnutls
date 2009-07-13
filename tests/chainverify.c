@@ -757,15 +757,15 @@ main (int argc, char *argv[])
       gnutls_datum_t tmp;
       size_t j;
 
-      printf ("Chain '%s' (%d)...\n", chains[i].name, i);
+      printf ("Chain '%s' (%d)...\n", chains[i].name, (int)i);
 
       for (j = 0; chains[i].chain[j]; j++)
 	{
-	  printf ("\tAdding certificate %d...", j);
+	  printf ("\tAdding certificate %d...", (int)j);
 
 	  ret = gnutls_x509_crt_init (&certs[j]);
 	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_init[%d,%d]: %s", i, j,
+	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_init[%d,%d]: %s", (int)i, (int)j,
 		   gnutls_strerror (ret));
 
 	  tmp.data = (char *) chains[i].chain[j];
@@ -774,11 +774,11 @@ main (int argc, char *argv[])
 	  ret = gnutls_x509_crt_import (certs[j], &tmp, GNUTLS_X509_FMT_PEM);
 	  printf ("done\n");
 	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s", i, j,
+	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s", (int)i, (int)j,
 		   gnutls_strerror (ret));
 
 	  gnutls_x509_crt_print (certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
-	  printf ("\tCertificate %d: %.*s\n", j, tmp.size, tmp.data);
+	  printf ("\tCertificate %d: %.*s\n", (int)j, tmp.size, tmp.data);
 	  gnutls_free (tmp.data);
 	}
 

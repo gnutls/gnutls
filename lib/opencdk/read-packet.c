@@ -128,15 +128,15 @@ read_mpi (cdk_stream_t inp, bigint_t * ret_m, int secure)
 
   if (nbits > MAX_MPI_BITS || nbits == 0)
     {
-      _cdk_log_debug ("read_mpi: too large %d bits\n", nbits);
+      _cdk_log_debug ("read_mpi: too large %d bits\n",(int) nbits);
       return CDK_MPI_Error;	/* Sanity check */
     }
 
   rc = stream_read (inp, buf + 2, nread, &nread);
   if (!rc && nread != ((nbits + 7) / 8))
     {
-      _cdk_log_debug ("read_mpi: too short %d < %d\n", nread,
-		      (nbits + 7) / 8);
+      _cdk_log_debug ("read_mpi: too short %d < %d\n", (int)nread,
+		      (int)((nbits + 7) / 8));
       return CDK_MPI_Error;
     }
 
@@ -197,7 +197,7 @@ read_pubkey_enc (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_enc_t pke)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_pubkey_enc: %d octets\n", pktlen);
+    _cdk_log_debug ("read_pubkey_enc: %d octets\n", (int)pktlen);
 
   if (pktlen < 12)
     return CDK_Inv_Packet;
@@ -251,7 +251,7 @@ read_compressed (cdk_stream_t inp, size_t pktlen, cdk_pkt_compressed_t c)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_compressed: %d octets\n", pktlen);
+    _cdk_log_debug ("read_compressed: %d octets\n", (int)pktlen);
 
   c->algorithm = cdk_stream_getc (inp);
   if (c->algorithm > 3)
@@ -278,7 +278,7 @@ read_public_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_t pk)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_public_key: %d octets\n", pktlen);
+    _cdk_log_debug ("read_public_key: %d octets\n", (int)pktlen);
 
   pk->is_invalid = 1;		/* default to detect missing self signatures */
   pk->is_revoked = 0;
@@ -336,7 +336,7 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_secret_key: %d octets\n", pktlen);
+    _cdk_log_debug ("read_secret_key: %d octets\n", (int)pktlen);
 
   p1 = cdk_stream_tell (inp);
   rc = read_public_key (inp, pktlen, sk->pk);
@@ -484,7 +484,7 @@ read_attribute (cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t attr)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_attribute: %d octets\n", pktlen);
+    _cdk_log_debug ("read_attribute: %d octets\n", (int) pktlen);
 
   strcpy (attr->name, "[attribute]");
   attr->len = strlen (attr->name);
@@ -631,7 +631,7 @@ read_onepass_sig (cdk_stream_t inp, size_t pktlen, cdk_pkt_onepass_sig_t sig)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_onepass_sig: %d octets\n", pktlen);
+    _cdk_log_debug ("read_onepass_sig: %d octets\n", (int)pktlen);
 
   if (pktlen != 13)
     return CDK_Inv_Packet;
@@ -730,7 +730,7 @@ read_signature (cdk_stream_t inp, size_t pktlen, cdk_pkt_signature_t sig)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_signature: %d octets\n", pktlen);
+    _cdk_log_debug ("read_signature: %d octets\n", (int)pktlen);
 
   if (pktlen < 16)
     return CDK_Inv_Packet;
@@ -822,7 +822,7 @@ read_literal (cdk_stream_t inp, size_t pktlen,
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_literal: %d octets\n", pktlen);
+    _cdk_log_debug ("read_literal: %d octets\n", (int) pktlen);
 
   pt->mode = cdk_stream_getc (inp);
   if (pt->mode != 0x62 && pt->mode != 0x74 && pt->mode != 0x75)
@@ -958,7 +958,7 @@ cdk_pkt_read (cdk_stream_t inp, cdk_packet_t pkt)
   if (!(ctb & 0x80))
     {
       _cdk_log_info ("cdk_pkt_read: no openpgp data found. "
-		     "(ctb=%02X; fpos=%02X)\n", ctb, cdk_stream_tell (inp));
+		     "(ctb=%02X; fpos=%02X)\n",(int) ctb, (int)cdk_stream_tell (inp));
       return CDK_Inv_Packet;
     }
 

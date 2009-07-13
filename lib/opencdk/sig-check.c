@@ -541,9 +541,9 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
 	    }
 	}
 
-      _cdk_log_debug ("signature %s: signer %08lX keyid %08lX\n",
-		      rc == CDK_Bad_Sig ? "BAD" : "good", sig->keyid[1],
-		      keyid);
+      _cdk_log_debug ("signature %s: signer %08X keyid %08X\n",
+		      rc == CDK_Bad_Sig ? "BAD" : "good", (unsigned int)sig->keyid[1],
+		      (unsigned int)keyid);
 
       if (IS_UID_SIG (sig) && uid_name != NULL)
 	{

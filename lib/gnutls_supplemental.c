@@ -141,7 +141,7 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer * buf)
   buf->data[2] = (buf->length - 3) & 0xFF;
 
   _gnutls_debug_log ("EXT[%p]: Sending %d bytes of supplemental data\n",
-		     session, buf->length);
+		     session, (int)buf->length);
 
   return buf->length;
 }
