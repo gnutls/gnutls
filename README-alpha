@@ -3,7 +3,7 @@ Copyright (C) 2009 Simon Josefsson
 See the end for copying conditions.
 
 This file contains instructions for developers and advanced users that
-wants to build from version controlled sources.
+want to build from version controlled sources.
 
 We require several tools to build the software, including:
 
@@ -26,7 +26,7 @@ We require several tools to build the software, including:
 - Gaa <http://gaa.sf.net> (optional)
 - libtasn1 <http://josefsson.org/libtasn1/> (optional)
 
-The required software is typically disitributed with your operating
+The required software is typically distributed with your operating
 system, and the instructions for installing them differ.  Here are
 some hints:
 
