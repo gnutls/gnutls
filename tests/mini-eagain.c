@@ -271,7 +271,7 @@ doit (void)
         fputs (".", stdout);
       }
     }
-  while (transferred < 55000);
+  while (transferred < 7000);
   fputs ("\n", stdout);
 
   gnutls_bye (client, GNUTLS_SHUT_RDWR);
