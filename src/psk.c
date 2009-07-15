@@ -138,6 +138,11 @@ main (int argc, char **argv)
       ret = gnutls_psk_netconf_derive_key (passwd,
 					   info.username,
 					   info.netconf_hint, &dkey);
+      if (ret < 0)
+	{
+	  fprintf (stderr, "Deriving the key failed\n");
+	  exit (1);
+	}
     }
   else
     {

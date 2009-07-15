@@ -794,6 +794,11 @@ decode_pkcs8_key (const gnutls_datum_t * raw_key,
 			     &raw_key->data[params_start],
 			     params_len, &kdf_params, &enc_params);
 
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto error;
+    }
 
   /* Parameters have been decoded. Now
    * decrypt the EncryptedData.

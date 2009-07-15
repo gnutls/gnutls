@@ -104,7 +104,15 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
     }
 
   if (format == GNUTLS_OPENPGP_FMT_RAW)
-    rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
+    {
+      rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
+      if (rc != 0)
+	{
+	  rc = _gnutls_map_cdk_rc (rc);
+	  gnutls_assert ();
+	  return rc;
+	}
+    }
   else
     {
       rc = cdk_stream_tmp_from_mem (data->data, data->size, &inp);
