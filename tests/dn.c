@@ -107,7 +107,7 @@ doit (void)
 
   ret = gnutls_x509_crt_get_issuer (cert, &xdn);
   if (ret < 0)
-    fail ("get_subject %d\n", ret);
+    fail ("get_issuer %d\n", ret);
 
   printf ("Issuer:\n");
   print_dn (xdn);
