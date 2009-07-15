@@ -144,6 +144,7 @@ static const gnutls_version_entry sup_versions[] = {
   {"TLS1.0", GNUTLS_TLS1, 3, 1, 1},
   {"TLS1.1", GNUTLS_TLS1_1, 3, 2, 1},
   {"TLS1.2", GNUTLS_TLS1_2, 3, 3, 1},
+  {"DTLS1.0", GNUTLS_DTLS1_0, 254, 255, 1}, /* 1.1 over datagram */
   {0, 0, 0, 0, 0}
 };
 
@@ -153,6 +154,7 @@ static const gnutls_protocol_t supported_protocols[] = {
   GNUTLS_TLS1,
   GNUTLS_TLS1_1,
   GNUTLS_TLS1_2,
+  GNUTLS_DTLS1_0,
   0
 };
 
