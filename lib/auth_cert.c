@@ -1065,7 +1065,7 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
   cert_auth_info_t info;
   gnutls_certificate_credentials_t cred;
   ssize_t dsize = data_size;
-  int i, x, key_type;
+  int x, key_type;
   gnutls_cert *peer_certificate_list = NULL;
   int peer_certificate_list_size = 0;
   gnutls_datum_t tmp, akey = { NULL, 0 };
@@ -1106,7 +1106,6 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
       /* no certificate was sent */
       return GNUTLS_E_NO_CERTIFICATE_FOUND;
     }
-  i = dsize;
 
   /* Read PGPKeyDescriptor */
   DECR_LEN (dsize, 1);

@@ -100,7 +100,15 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
     }
 
   if (format == GNUTLS_OPENPGP_FMT_RAW)
-    rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
+    {
+      rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
+      if (rc)
+	{
+	  rc = _gnutls_map_cdk_rc (rc);
+	  gnutls_assert ();
+	  return rc;
+	}
+    }
   else
     {
       rc = cdk_stream_tmp_from_mem (data->data, data->size, &inp);
@@ -190,6 +198,13 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
 				    CDK_ARMOR_PUBKEY);
       gnutls_free (in);
       *output_data_size = calc_size;
+
+      if (rc)
+        {
+          rc = _gnutls_map_cdk_rc (rc);
+          gnutls_assert ();
+          return rc;
+        }
     }
 
   return 0;

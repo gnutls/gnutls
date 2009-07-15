@@ -70,7 +70,7 @@ initialize_tls_session (void)
 int
 main (void)
 {
-  int err, listen_sd, i;
+  int err, listen_sd;
   int sd, ret;
   struct sockaddr_in sa_serv;
   struct sockaddr_in sa_cli;
@@ -143,7 +143,6 @@ main (void)
       /* see the Getting peer's information example */
       /* print_info(session); */
 
-      i = 0;
       for (;;)
 	{
 	  memset (buffer, 0, MAX_BUF + 1);

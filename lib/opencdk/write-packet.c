@@ -562,34 +562,40 @@ write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
     }
   if (!rc)
     rc = stream_putc (out, _cdk_pub_algo_to_pgp (pk->pubkey_algo));
+
   if (!rc)
     rc = write_mpibuf (out, pk->mpi, npkey);
-  if (sk->is_protected == 0)
-    rc = stream_putc (out, 0x00);
-  else
+
+  if (!rc) 
     {
-      if (is_RSA (pk->pubkey_algo) && pk->version < 4)
-	stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
-      else if (sk->protect.s2k)
-	{
-	  s2k_mode = sk->protect.s2k->mode;
-	  rc = stream_putc (out, sk->protect.sha1chk ? 0xFE : 0xFF);
-	  if (!rc)
-	    rc = stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
-	  if (!rc)
-	    rc = stream_putc (out, sk->protect.s2k->mode);
-	  if (!rc)
-	    rc = stream_putc (out, sk->protect.s2k->hash_algo);
-	  if (!rc && (s2k_mode == 1 || s2k_mode == 3))
-	    {
-	      rc = stream_write (out, sk->protect.s2k->salt, 8);
-	      if (!rc && s2k_mode == 3)
-		rc = stream_putc (out, sk->protect.s2k->count);
-	    }
-	}
+      if (sk->is_protected == 0)
+        rc = stream_putc (out, 0x00);
       else
-	return CDK_Inv_Value;
-      rc = stream_write (out, sk->protect.iv, sk->protect.ivlen);
+        {
+          if (is_RSA (pk->pubkey_algo) && pk->version < 4)
+   	    rc = stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
+          else if (sk->protect.s2k)
+            {
+              s2k_mode = sk->protect.s2k->mode;
+              rc = stream_putc (out, sk->protect.sha1chk ? 0xFE : 0xFF);
+              if (!rc)
+                rc = stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
+              if (!rc)
+                rc = stream_putc (out, sk->protect.s2k->mode);
+              if (!rc)
+                rc = stream_putc (out, sk->protect.s2k->hash_algo);
+              if (!rc && (s2k_mode == 1 || s2k_mode == 3))
+                {
+                  rc = stream_write (out, sk->protect.s2k->salt, 8);
+                  if (!rc && s2k_mode == 3)
+                    rc = stream_putc (out, sk->protect.s2k->count);
+                }
+            }
+          else
+            return CDK_Inv_Value;
+          if (!rc)
+          rc = stream_write (out, sk->protect.iv, sk->protect.ivlen);
+        }
     }
   if (!rc && sk->is_protected && pk->version == 4)
     {

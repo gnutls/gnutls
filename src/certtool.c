@@ -1985,9 +1985,8 @@ static void print_verification_res (gnutls_x509_crt_t crt,
 static int
 _verify_x509_mem (const void *cert, int cert_size)
 {
-  int siz, i;
   const char *ptr;
-  int ret;
+  int ret, i;
   char name[256];
   char issuer_name[256];
   size_t name_size;
@@ -2003,7 +2002,6 @@ _verify_x509_mem (const void *cert, int cert_size)
 
   /* Decode the CRL list
    */
-  siz = cert_size;
   ptr = cert;
 
   i = 1;
@@ -2047,7 +2045,6 @@ _verify_x509_mem (const void *cert, int cert_size)
 
   /* Decode the certificate chain. 
    */
-  siz = cert_size;
   ptr = cert;
 
   i = 1;

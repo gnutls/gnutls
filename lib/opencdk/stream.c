@@ -932,7 +932,6 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
 
   if (!s)
     {
-      s->error = CDK_Inv_Value;
       gnutls_assert ();
       return EOF;
     }
@@ -989,7 +988,6 @@ cdk_stream_getc (cdk_stream_t s)
 
   if (!s)
     {
-      s->error = CDK_Inv_Value;
       gnutls_assert ();
       return EOF;
     }
@@ -1022,7 +1020,6 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
 
   if (!s)
     {
-      s->error = CDK_Inv_Value;
       gnutls_assert ();
       return EOF;
     }
@@ -1081,7 +1078,6 @@ cdk_stream_putc (cdk_stream_t s, int c)
 
   if (!s)
     {
-      s->error = CDK_Inv_Value;
       gnutls_assert ();
       return EOF;
     }

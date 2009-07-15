@@ -270,22 +270,24 @@ _gnutls_tls_sign (gnutls_session_t session,
    */
 
   if (cert != NULL)
-    if (cert->key_usage != 0)
-      if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_KEY_USAGE_VIOLATION;
-	}
-
-  /* External signing. */
-  if (!pkey || pkey->params_size == 0)
     {
-      if (!session->internals.sign_func)
-	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+      if (cert->key_usage != 0)
+        if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
+	  {
+  	    gnutls_assert ();
+	    return GNUTLS_E_KEY_USAGE_VIOLATION;
+  	  }
 
-      return (*session->internals.sign_func)
-	(session, session->internals.sign_func_userdata,
-	 cert->cert_type, &cert->raw, hash_concat, signature);
+      /* External signing. */
+      if (!pkey || pkey->params_size == 0)
+        {
+          if (!session->internals.sign_func)
+	    return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+
+          return (*session->internals.sign_func)
+	    (session, session->internals.sign_func_userdata,
+	     cert->cert_type, &cert->raw, hash_concat, signature);
+        }
     }
 
   return _gnutls_sign (pkey->pk_algorithm, pkey->params,

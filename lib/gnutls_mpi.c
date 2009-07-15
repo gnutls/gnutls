@@ -341,6 +341,12 @@ _gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi,
     result = _gnutls_mpi_print_lz (mpi, NULL, &s_len);
   else
     result = _gnutls_mpi_print (mpi, NULL, &s_len);
+  
+  if (result != 0)
+    {
+      gnutls_assert();
+      return result;
+    }
 
   tmpstr = gnutls_malloc (s_len);
   if (tmpstr == NULL)

@@ -361,7 +361,7 @@ int
 _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
 {
   ASN1_TYPE sig;
-  int result, tot_len;
+  int result;
 
   if ((result =
        asn1_create_element (_gnutls_get_gnutls_asn (),
@@ -387,8 +387,6 @@ _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
       asn1_delete_structure (&sig);
       return result;
     }
-
-  tot_len = 0;
 
   result = _gnutls_x509_der_encode (sig, "", sig_value, 0);
 
