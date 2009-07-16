@@ -111,3 +111,15 @@ m4/
 lib/po
 po
 stamp-h1
+tests/chainverify
+tests/crq_apis
+tests/crq_key_id
+tests/cve-2008-4989
+tests/cve-2009-1415
+tests/cve-2009-1416
+tests/init_roundtrip
+tests/mini-eagain
+tests/pkcs12_s2k
+tests/pkcs12_s2k_pem
+tests/session_ticket.c
+tests/x509sign-verify
