@@ -363,6 +363,36 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   return 0;
 }
 
+/**
+  * gnutls_init_dtls - initialize the session like gnutls_init, but
+  * with a DTLS compatible transport.
+  * @con_end: indicate if this session is to be used for server or client.
+  * @session: is a pointer to a #gnutls_session_t structure.
+  * @flags: dtls flags for optional behavior.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+  **/
+int
+gnutls_init_dtls (gnutls_session_t * session,
+		  gnutls_connection_end_t con_end,
+		  gnutls_dtls_flags_t flags)
+{
+  int ret;
+
+  /* FIXME, we should inhibit the allocation of many buffers that are
+     useless with datagram transport. */
+  ret = gnutls_init(session, con_end);
+
+  if(ret != 0)
+    return ret;
+
+  /* Flags do nothing, so just copy them into the struct for now. */
+  (*session)->internals.dtls.flags = flags;
+  (*session)->internals.transport = GNUTLS_DGRAM;
+
+  return 0;
+}
+
 /* returns RESUME_FALSE or RESUME_TRUE.
  */
 int
