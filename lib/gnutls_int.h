@@ -139,6 +139,12 @@ typedef struct
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
 
+typedef enum transport_t
+{
+  GNUTLS_STREAM,
+  GNUTLS_DGRAM
+} transport_t;
+
 /* the maximum size of encrypted packets */
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define RECORD_HEADER_SIZE 5
@@ -150,6 +156,9 @@ typedef struct
 #define MAX_RECV_SIZE (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE+RECORD_HEADER_SIZE)
 
 #define HANDSHAKE_HEADER_SIZE 4
+
+/* the maximum size of the DTLS cookie */
+#define DTLS_MAX_COOKIE_SIZE 32
 
 /* defaults for verification functions
  */
@@ -223,6 +232,7 @@ typedef enum content_type_t
   GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA,
   GNUTLS_INNER_APPLICATION = 24
 } content_type_t;
+
 
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t)-1
 #define GNUTLS_PK_NONE (gnutls_pk_algorithm_t)-2
@@ -498,6 +508,14 @@ typedef struct
   int free_rsa_params;
 } internal_params_st;
 
+/* DTLS session state
+ */
+typedef struct
+{
+  /* HelloVerifyRequest DOS prevention cookie */
+  opaque  cookie[DTLS_MAX_COOKIE_SIZE];
+  uint8_t cookie_len;
+} dtls_st;
 
 
 typedef struct
@@ -755,6 +773,11 @@ typedef struct
     extension_priv_data_t priv;
     int set:1;
   } resumed_extension_int_data[MAX_EXT_TYPES];
+  /* The type of transport protocol; stream or datagram */
+  transport_t transport;
+
+  /* DTLS session state */
+  dtls_st dtls;
 
   unsigned int cb_tls_unique_len;
   unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
