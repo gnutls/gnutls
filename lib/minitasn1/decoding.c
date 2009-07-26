@@ -256,24 +256,25 @@ _asn1_get_time_der (const unsigned char *der, int der_len, int *ret_len,
 
 
 
-static void
+static int
 _asn1_get_objectid_der (const unsigned char *der, int der_len, int *ret_len,
 			char *str, int str_size)
 {
   int len_len, len, k;
+  int leading;
   char temp[20];
-  unsigned long val, val1;
+  unsigned long val, val1, prev_val;
 
   *ret_len = 0;
   if (str && str_size > 0)
     str[0] = 0;			/* no oid */
 
   if (str == NULL || der_len <= 0)
-    return;
+    return ASN1_GENERIC_ERROR;
   len = asn1_get_length_der (der, der_len, &len_len);
 
   if (len < 0 || len > der_len || len_len > der_len)
-    return;
+    return ASN1_DER_ERROR;
 
   val1 = der[len_len] / 40;
   val = der[len_len] - val1 * 40;
@@ -282,19 +283,38 @@ _asn1_get_objectid_der (const unsigned char *der, int der_len, int *ret_len,
   _asn1_str_cat (str, str_size, ".");
   _asn1_str_cat (str, str_size, _asn1_ltostr (val, temp));
 
+  prev_val = 0;
   val = 0;
+  leading = 1;
   for (k = 1; k < len; k++)
     {
+      
+
+      /* X.690 mandates that the leading byte must never be 0x80
+       */
+      if (leading != 0 && der[len_len + k] == 0x80) return ASN1_DER_ERROR;
+      leading = 0;
+
+      /* check for wrap around */
       val = val << 7;
       val |= der[len_len + k] & 0x7F;
+
+      if (val < prev_val) return ASN1_DER_ERROR;
+
+      prev_val = val;
+
       if (!(der[len_len + k] & 0x80))
 	{
 	  _asn1_str_cat (str, str_size, ".");
 	  _asn1_str_cat (str, str_size, _asn1_ltostr (val, temp));
 	  val = 0;
+	  prev_val = 0;
+	  leading = 1;
 	}
     }
   *ret_len = len + len_len;
+  
+  return ASN1_SUCCESS;
 }
 
 /**
@@ -1034,8 +1054,14 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 	      move = RIGHT;
 	      break;
 	    case TYPE_OBJECT_ID:
-	      _asn1_get_objectid_der (der + counter, len - counter, &len2,
+	      result = _asn1_get_objectid_der (der + counter, len - counter, &len2,
 				      temp, sizeof (temp));
+	      if (result != ASN1_SUCCESS)
+		{
+		  asn1_delete_structure (element);
+		  return result;
+		}
+
 	      tlen = strlen (temp);
 	      if (tlen > 0)
 		_asn1_set_value (p, temp, tlen + 1);
@@ -1644,8 +1670,13 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 	    case TYPE_OBJECT_ID:
 	      if (state == FOUND)
 		{
-		  _asn1_get_objectid_der (der + counter, len - counter, &len2,
+		  result = _asn1_get_objectid_der (der + counter, len - counter, &len2,
 					  temp, sizeof (temp));
+                  if (result != ASN1_SUCCESS)
+                  {
+		    return result;
+                  }
+
 		  tlen = strlen (temp);
 
 		  if (tlen > 0)
