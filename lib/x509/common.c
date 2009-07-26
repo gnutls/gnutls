@@ -181,7 +181,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 {
   char str[MAX_STRING_LEN], tmpname[128];
   const char *ANAME = NULL;
-  int CHOICE = -1, len = -1, result;
+  int CHOICE = -1, len = -1, result, i;
   ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
   char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 
@@ -311,6 +311,12 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 	}
 
     }
+  
+  /* Convert null char in the name to '?'
+   * to protect applications */
+  for (i=0;i<*res_size;i++) {
+      if (res[i] == 0) res[i]='?';
+  }
 
   return 0;
 }
