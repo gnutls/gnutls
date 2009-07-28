@@ -375,7 +375,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   size_t cipher_size;
   int retval, ret;
   int data2send_size;
-  uint8_t headers[5];
+  uint8_t headers[MAX_RECORD_HEADER_SIZE];
+  int header_size;
   const uint8_t *data = _data;
   record_parameters_st *record_params;
   record_state_st *record_state;
@@ -421,6 +422,9 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
    */
   copy_record_version (session, htype, &headers[1]);
 
+  header_size = RECORD_HEADER_SIZE;
+  /* Adjust header length and add sequence for DTLS */
+    sequence_write(&record_state->sequence_number, &headers[3]);
 
   _gnutls_record_log
     ("REC[%p]: Sending Packet[%d] %s(%d) with length: %d\n", session,
@@ -459,7 +463,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
         }
 
       cipher_size =
-        _gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
+        _gnutls_encrypt (session, headers, header_size, data,
                          data2send_size, _mbuffer_get_udata_ptr (bufel),
                          cipher_size, type,
                          (session->internals.priorities.no_padding ==
@@ -604,11 +608,12 @@ check_buffers (gnutls_session_t session, content_type_t type,
  */
 static int
 record_check_headers (gnutls_session_t session,
-                      uint8_t headers[RECORD_HEADER_SIZE],
+                      uint8_t headers[MAX_RECORD_HEADER_SIZE],
                       content_type_t type,
                       gnutls_handshake_description_t htype,
                       /*output */ content_type_t * recv_type,
-                      opaque version[2], uint16_t * length,
+                      opaque version[2], uint64* sequence,
+                      uint16_t * length,
                       uint16_t * header_size)
 {
 
@@ -641,6 +646,17 @@ record_check_headers (gnutls_session_t session,
       _gnutls_record_log ("REC[%p]: V2 packet received. Length: %d\n",
                           session, *length);
 
+    }
+  else if(_gnutls_is_dtls(session))
+    {
+      /* dtls version 1.0 */
+      *recv_type = headers[0];
+      version[0] = headers[1];
+      version[1] = headers[2];
+
+      sequence_read(sequence, &headers[3]);
+
+      *length = _gnutls_read_uint16 (&headers[11]);
     }
   else
     {
@@ -904,6 +920,7 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
 {
   int decrypted_length;
   opaque version[2];
+  uint64 sequence;
   content_type_t recv_type;
   uint16_t length;
   uint8_t *ciphertext;
@@ -1000,7 +1017,7 @@ begin:
 
   if ((ret =
        record_check_headers (session, data_enc.data, type, htype, &recv_type,
-                             version, &length, &header_size)) < 0)
+                             version, &sequence, &length, &header_size)) < 0)
     {
       gnutls_assert ();
       return ret;

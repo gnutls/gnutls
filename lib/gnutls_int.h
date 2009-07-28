@@ -151,8 +151,14 @@ typedef enum transport_t
 } transport_t;
 
 /* the maximum size of encrypted packets */
+#define IS_DTLS (session->internals.transport == GNUTLS_DGRAM)
+
 #define DEFAULT_MAX_RECORD_SIZE 16384
-#define RECORD_HEADER_SIZE 5
+#define TLS_RECORD_HEADER_SIZE 5
+#define DTLS_RECORD_HEADER_SIZE (TLS_RECORD_HEADER_SIZE+8)
+#define RECORD_HEADER_SIZE (IS_DTLS ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
+#define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
+
 #define MAX_RECORD_SEND_SIZE (size_t)session->security_parameters.max_record_send_size
 #define MAX_RECORD_RECV_SIZE (size_t)session->security_parameters.max_record_recv_size
 #define MAX_PAD_SIZE 255
@@ -160,7 +166,10 @@ typedef enum transport_t
 #define MAX_RECORD_OVERHEAD (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+EXTRA_COMP_SIZE)
 #define MAX_RECV_SIZE (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE+RECORD_HEADER_SIZE)
 
-#define HANDSHAKE_HEADER_SIZE 4
+#define TLS_HANDSHAKE_HEADER_SIZE 4
+#define DTLS_HANDSHAKE_HEADER_SIZE (TLS_HANDSHAKE_HEADER_SIZE+8)
+#define HANDSHAKE_HEADER_SIZE (IS_DTLS ? DTLS_HANDSHAKE_HEADER_SIZE : TLS_HANDSHAKE_HEADER_SIZE)
+#define MAX_HANDSHAKE_HEADER_SIZE DTLS_HANDSHAKE_HEADER_SIZE
 
 /* the maximum size of the DTLS cookie */
 #define DTLS_MAX_COOKIE_SIZE 32
@@ -526,7 +535,7 @@ typedef struct
 
 typedef struct
 {
-  opaque header[HANDSHAKE_HEADER_SIZE];
+  opaque header[MAX_HANDSHAKE_HEADER_SIZE];
   /* this holds the number of bytes in the handshake_header[] */
   size_t header_size;
   /* this holds the length of the handshake packet */

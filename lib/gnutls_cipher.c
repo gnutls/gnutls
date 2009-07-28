@@ -40,6 +40,7 @@
 #include "gnutls_kx.h"
 #include "gnutls_record.h"
 #include "gnutls_constate.h"
+#include <gnutls_state.h>
 #include <random.h>
 
 static int _gnutls_compressed2ciphertext (gnutls_session_t session,
@@ -125,7 +126,11 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
 
   /* copy the headers */
   memcpy (ciphertext, headers, headers_size);
-  _gnutls_write_uint16 (ret, &ciphertext[3]);
+  
+  if(_gnutls_is_dtls(session))
+    _gnutls_write_uint16 (ret, &ciphertext[11]);
+  else
+    _gnutls_write_uint16 (ret, &ciphertext[3]);
 
   return ret + headers_size;
 }
