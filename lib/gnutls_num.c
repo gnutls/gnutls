@@ -62,6 +62,35 @@ _gnutls_uint64pp (uint64 * x)
   return 0;
 }
 
+/* This function will add one to uint48 x.
+ * Returns 0 on success, or -1 if the uint48 max limit
+ * has been reached.
+ */
+int
+_gnutls_uint48pp (uint48 * x)
+{
+  register int i, y = 0;
+
+  for (i = 5; i >= 0; i--)
+    {
+      y = 0;
+      if (x->i[i] == 0xff)
+	{
+	  x->i[i] = 0;
+	  y = 1;
+	}
+      else
+	x->i[i]++;
+
+      if (y == 0)
+	break;
+    }
+  if (y != 0)
+    return -1;			/* over 48 bits! meh... */
+
+  return 0;
+}
+
 uint32_t
 _gnutls_uint24touint32 (uint24 num)
 {

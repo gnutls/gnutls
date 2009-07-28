@@ -319,6 +319,38 @@ copy_record_version (gnutls_session_t session,
     }
 }
 
+/* Increments the sequence value
+ */
+inline static int
+sequence_increment (gnutls_session_t session,
+		    uint64 * value)
+{
+  if (_gnutls_is_dtls(session))
+    {
+      return _gnutls_uint48pp((uint48*)&value->i[2]);
+    }
+  else
+    {
+      return _gnutls_uint64pp(value);
+    }
+}
+
+/* Read epoch and sequence from a DTLS packet */
+inline static void
+sequence_read (uint64 * sequence,
+	       opaque * data)
+{
+  memcpy(sequence->i, data, 8);
+}
+
+/* Write epoch and sequence to a DTLS packet */
+inline static void
+sequence_write (uint64 * sequence,
+		opaque * data)
+{
+  memcpy(data, sequence->i, 8);
+}
+
 /* This function behaves exactly like write(). The only difference is
  * that it accepts, the gnutls_session_t and the content_type_t of data to
  * send (if called by the user the Content is specific)
