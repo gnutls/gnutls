@@ -81,6 +81,9 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
     case GNUTLS_HANDSHAKE_SERVER_HELLO:
       return "SERVER HELLO";
       break;
+    case GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST:
+      return "HELLO VERIFY REQUEST";
+      break;
     case GNUTLS_HANDSHAKE_CERTIFICATE_PKT:
       return "CERTIFICATE";
       break;
