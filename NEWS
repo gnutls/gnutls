@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.9.2 (unreleased)
 
+** libgnutls: Fix return value of gnutls_certificate_client_get_request_status.
+Before it always returned false.  Reported by Peter Hendrickson
+<pdh@wiredyne.com> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3668>.
+
 ** libgnutls: Fix off-by-one size computation error in unknown DN printing.
 The error resulted in truncated strings when printing unknown OIDs in
 X.509 certificate DNs.  Reported by Tim Kosse
