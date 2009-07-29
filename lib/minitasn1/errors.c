@@ -78,8 +78,8 @@ asn1_perror (asn1_retCode error)
  * asn1_strerror - Returns a string with a description of an error
  * @error: is an error returned by a libtasn1 function.
  *
- * This function is similar to strerror().  The only difference is
- * that it accepts an error (number) returned by a libtasn1 function.
+ * This function is similar to strerror.  The only difference is that
+ * it accepts an error (number) returned by a libtasn1 function.
  *
  * This function replaces libtasn1_strerror() in older libtasn1.
  *
@@ -123,8 +123,8 @@ libtasn1_perror (asn1_retCode error)
  * libtasn1_strerror - Returns a string with a description of an error
  * @error: is an error returned by a libtasn1 function.
  *
- * This function is similar to strerror(). The only difference is
- * that it accepts an error (number) returned by a libtasn1 function.
+ * This function is similar to strerror.  The only difference is that
+ * it accepts an error (number) returned by a libtasn1 function.
  *
  * Returns: Pointer to static zero-terminated string describing error
  *   code.
