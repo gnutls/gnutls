@@ -10,6 +10,8 @@ Before it always returned false.  Reported by Peter Hendrickson
 <pdh@wiredyne.com> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3668>.
 
+** minitasn1: Internal copy updated to libtasn1 v2.3.
+
 ** API and ABI modifications:
 No changes since last version.
 
