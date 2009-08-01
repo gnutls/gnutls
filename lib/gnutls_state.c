@@ -919,6 +919,7 @@ _gnutls_PRF (gnutls_session_t session,
   memcpy (s_seed, label, label_size);
   memcpy (&s_seed[label_size], seed, seed_size);
 
+
   if (_gnutls_version_has_selectable_prf (ver))
     {
       result =
