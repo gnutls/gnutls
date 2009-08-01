@@ -1592,6 +1592,7 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
   return 0;
 }
 
+
 #define CERTTYPE_SIZE 3
 int
 _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
