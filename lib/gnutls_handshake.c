@@ -2138,6 +2138,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	  return ret;
 	}
 
+
       /* Generate and copy TLS extensions.
        */
       if (_gnutls_version_has_extensions (hver))
