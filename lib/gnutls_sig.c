@@ -694,6 +694,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
   return sign_algo;
 }
 
+
 /* Generates a signature of all the previous sent packets in the 
  * handshake procedure. 
  * 20040227: now it works for SSL 3.0 as well
