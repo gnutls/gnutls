@@ -1279,6 +1279,7 @@ _gnutls_version_has_selectable_prf (gnutls_protocol_t version)
   return version == GNUTLS_TLS1_2;
 }
 
+
 /* This function determines if the version specified has selectable
    signature/hash functions for certificate authentification. */
 int
@@ -1292,7 +1293,12 @@ _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
 int
 _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
 {
-  return version >= GNUTLS_TLS1_2;
+  switch(version) {
+  case GNUTLS_TLS1_2:
+    return 1;
+  default:
+    return 0;
+  }
 }
 
 /* This function determines if the version specified has support for
@@ -1300,6 +1306,7 @@ _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
 int
 _gnutls_version_has_extensions (gnutls_protocol_t version)
 {
+<<<<<<< HEAD:lib/gnutls_algorithms.c
   switch (version)
     {
     case GNUTLS_TLS1_0:
@@ -1340,6 +1347,16 @@ _gnutls_version_has_variable_padding (gnutls_protocol_t version)
     default:
       return 0;
     }
+=======
+  switch(version) {
+  case GNUTLS_TLS1_0:
+  case GNUTLS_TLS1_1:
+  case GNUTLS_TLS1_2:
+    return 1;
+  default:
+    return 0;
+  }
+>>>>>>> Do not rely on version ordering; use switch..case instead.:lib/gnutls_algorithms.c
 }
 
 /* This function determines if the version specified has explicit IVs
@@ -1347,14 +1364,27 @@ _gnutls_version_has_variable_padding (gnutls_protocol_t version)
 int
 _gnutls_version_has_explicit_iv (gnutls_protocol_t version)
 {
-  return version >= GNUTLS_TLS1_1;
+  switch(version) {
+  case GNUTLS_TLS1_1:
+  case GNUTLS_TLS1_2:
+    return 1;
+  default:
+    return 0;
+  }
 }
 
 /* This function determines if the version specified can have
    non-minimal padding. */
 int _gnutls_version_has_variable_padding (gnutls_protocol_t version)
 {
-  return version >= GNUTLS_TLS1_0;
+  switch(version) {
+  case GNUTLS_TLS1_0:
+  case GNUTLS_TLS1_1:
+  case GNUTLS_TLS1_2:
+    return 1;
+  default:
+    return 0;
+  }
 }
 
 /* Type to KX mappings */
