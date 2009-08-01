@@ -1342,6 +1342,13 @@ _gnutls_version_has_explicit_iv (gnutls_protocol_t version)
   return version >= GNUTLS_TLS1_1;
 }
 
+/* This function determines if the version specified can have
+   non-minimal padding. */
+int _gnutls_version_has_variable_padding (gnutls_protocol_t version)
+{
+  return version >= GNUTLS_TLS1_0;
+}
+
 /* Type to KX mappings */
 gnutls_kx_algorithm_t
 _gnutls_map_kx_get_kx (gnutls_credentials_type_t type, int server)
