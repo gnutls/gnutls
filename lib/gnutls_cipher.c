@@ -447,6 +447,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   return length;
 }
 
+
 /* Deciphers the ciphertext packet, and puts the result to compress_data, of compress_size.
  * Returns the actual compressed packet size.
  */
