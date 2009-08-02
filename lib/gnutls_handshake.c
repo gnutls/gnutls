@@ -3324,6 +3324,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
   int newSuiteSize = 0, i;
   gnutls_certificate_credentials_t cert_cred;
   gnutls_kx_algorithm_t kx;
+  gnutls_cipher_algorithm_t cid;
   int server = session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
   gnutls_kx_algorithm_t *alg = NULL;
   int alg_size = 0;
@@ -3407,6 +3408,15 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
           if (!_gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL))
             delete = 1;
         }
+
+      /* if dtls and not appropriate for dtls */
+      if(_gnutls_is_dtls(session))
+	{
+	  cid = _gnutls_cipher_suite_get_cipher_algo (&(*cipherSuites)[i]);
+
+	  if(cid == GNUTLS_CIPHER_ARCFOUR_128 || cid == GNUTLS_CIPHER_ARCFOUR_40)
+	    delete = 1;
+	}
 
       memcpy (&cs.suite, &(*cipherSuites)[i].suite, 2);
 
