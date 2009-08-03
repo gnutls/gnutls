@@ -309,12 +309,13 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 	    }
 	}
     }
-  
-  /* Convert null char in the name to '?'
-   * to protect applications */
-  for (i=0;i<*res_size;i++) {
-      if (res[i] == 0) res[i]='?';
-  }
+
+  if (res)
+    /* Convert null char in the name to '?'
+     * to protect applications */
+    for (i = 0; i < *res_size; i++) {
+      if (res[i] == 0)
+	res[i] = '?';
 
   return 0;
 }
