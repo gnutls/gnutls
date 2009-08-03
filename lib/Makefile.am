@@ -81,7 +81,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	crypto.c random.c  ext_signature.c cryptodev.c system.c \
 	crypto-api.c ext_safe_renegotiation.c gnutls_privkey.c \
 	pkcs11.c pkcs11_privkey.c gnutls_pubkey.c pkcs11_write.c locks.c \
-	pkcs11_secret.c hash.c
+	pkcs11_secret.c hash.c gnutls_dtls.c
 
 
 if ENABLE_NETTLE
