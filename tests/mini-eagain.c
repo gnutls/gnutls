@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2008 Free Software Foundation
  *
- * Author: Simon Josefsson
+ * Author: Simon Josefsson, Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -29,6 +29,8 @@
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
+
+#include <gcrypt.h>
 
 #include "utils.h"
 
@@ -77,17 +79,7 @@ client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 static ssize_t
 client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-  unsigned char rnd;
   char *tmp;
-
-#if 0
-  gcry_create_nonce (&rnd, 1);
-  if (handshake == 0 && rnd % 2 == 0) 
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-#endif
   size_t newlen = to_server_len + len;
 //  success ("client_push len %d has %d\n", len, to_server_len);
 //  hexprint (data, len);
@@ -138,6 +130,7 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
   unsigned char rnd;
   char *tmp;
+  size_t newlen = to_client_len + len;
 
   //success ("server_push len %d has %d\n", len, to_client_len);
   gcry_create_nonce (&rnd, 1);
@@ -147,7 +140,6 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
       return -1;
     }
 
-  size_t newlen = to_client_len + len;
 //  hexprint (data, len);
 
   tmp = realloc (to_client, newlen);
@@ -179,7 +171,7 @@ doit (void)
   /* Client stuff. */
   gnutls_anon_client_credentials_t c_anoncred;
   gnutls_session_t client;
-  int n, cret = GNUTLS_E_AGAIN;
+  int cret = GNUTLS_E_AGAIN;
   /* Need to enable anonymous KX specifically. */
   const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
   char buffer[MAX_BUF + 1];
