@@ -71,3 +71,17 @@ int _gnutls_PRF (gnutls_session_t session,
                  int total_bytes, void *ret);
 
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509
+
+/*-
+ * _gnutls_is_dtls - Used to check whether this session uses DTLS.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return non zero if this session uses DTLS.
+ *
+ -*/
+static inline
+int
+_gnutls_is_dtls (gnutls_session_t session)
+{
+  return session->internals.transport == GNUTLS_DGRAM;
+}
