@@ -529,7 +529,12 @@ typedef struct
   /* HelloVerifyRequest DOS prevention cookie */
   opaque  cookie[DTLS_MAX_COOKIE_SIZE];
   uint8_t cookie_len;
+
   gnutls_dtls_flags_t flags;
+
+  /* For DTLS handshake fragmentation and reassembly. */
+  uint16_t hsk_write_seq;
+  uint16_t hsk_read_seq;
 } dtls_st;
 
 

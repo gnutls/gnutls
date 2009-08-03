@@ -1197,8 +1197,7 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
    * message was sent in a single fragment. */
   if (_gnutls_is_dtls(session))
     {
-      /* FIXME: dummy sequence number */
-      _gnutls_write_uint16 (0, &data[pos]);
+      _gnutls_write_uint16 (session->internals.dtls.hsk_write_seq++, &data[pos]);
       pos += 2;
 
       /* Fragment offset */
