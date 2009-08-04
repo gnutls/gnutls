@@ -171,6 +171,10 @@ typedef enum transport_t
 #define HANDSHAKE_HEADER_SIZE (IS_DTLS ? DTLS_HANDSHAKE_HEADER_SIZE : TLS_HANDSHAKE_HEADER_SIZE)
 #define MAX_HANDSHAKE_HEADER_SIZE DTLS_HANDSHAKE_HEADER_SIZE
 
+/* This is the maximum handshake message size we send without
+   fragmentation. This currently ignores record layer overhead. */
+#define DTLS_DEFAULT_MTU 1200
+
 /* the maximum size of the DTLS cookie */
 #define DTLS_MAX_COOKIE_SIZE 32
 
@@ -535,6 +539,7 @@ typedef struct
   /* For DTLS handshake fragmentation and reassembly. */
   uint16_t hsk_write_seq;
   uint16_t hsk_read_seq;
+  uint16_t hsk_mtu;
 } dtls_st;
 
 

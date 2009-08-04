@@ -388,6 +388,7 @@ gnutls_init_dtls (gnutls_session_t * session,
 
   /* Flags do nothing, so just copy them into the struct for now. */
   (*session)->internals.dtls.flags = flags;
+  (*session)->internals.dtls.hsk_mtu = DTLS_DEFAULT_MTU;
   (*session)->internals.transport = GNUTLS_DGRAM;
 
   return 0;
