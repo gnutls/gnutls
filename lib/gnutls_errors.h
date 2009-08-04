@@ -65,6 +65,7 @@ _gnutls_log (int, const char *fmt, ...)
 #define _gnutls_buffers_log(...) LEVEL_EQ(6, __VA_ARGS__)
 #define _gnutls_hard_log(...) LEVEL(9, __VA_ARGS__)
 #define _gnutls_record_log(...) LEVEL(4, __VA_ARGS__)
+# define _gnutls_dtls_log(...) LEVEL(6, __VA_ARGS__)
 #define _gnutls_read_log(...) LEVEL_EQ(7, __VA_ARGS__)
 #define _gnutls_write_log(...) LEVEL_EQ(7, __VA_ARGS__)
 #define _gnutls_x509_log(...) LEVEL(1, __VA_ARGS__)
@@ -75,6 +76,7 @@ _gnutls_log (int, const char *fmt, ...)
 #define _gnutls_buffers_log _gnutls_null_log
 #define _gnutls_hard_log _gnutls_null_log
 #define _gnutls_record_log _gnutls_null_log
+# define _gnutls_dtls_log _gnutls_null_log
 #define _gnutls_read_log _gnutls_null_log
 #define _gnutls_write_log _gnutls_null_log
 #define _gnutls_x509_log _gnutls_null_log
