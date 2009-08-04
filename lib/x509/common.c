@@ -181,7 +181,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 {
   char *str, tmpname[128];
   const char *ANAME = NULL;
-  int CHOICE = -1, len = -1, result, i;
+  int len = -1, result, i;
   ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
   char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 
@@ -198,7 +198,6 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
     }
 
   ANAME = asn1_find_structure_from_oid (_gnutls_get_pkix (), oid);
-  CHOICE = _gnutls_x509_oid_data_choice (oid);
 
   if (ANAME == NULL)
     {
@@ -248,6 +247,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 
   if ((result = asn1_read_value (tmpasn, "", str, &len)) != ASN1_SUCCESS)
     {
+      gnutls_free (str);
       gnutls_assert ();
       asn1_delete_structure (&tmpasn);
       return _gnutls_asn2err (result);
@@ -255,7 +255,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 
   str[len] = '\0';
 
-  if (CHOICE == 0)
+  if (_gnutls_x509_oid_data_choice (oid) == 0)
     {
       if (res)
 	_gnutls_str_cpy (res, *res_size, str);
@@ -303,6 +303,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       if ((result =
 	   asn1_read_value (tmpasn, tmpname, str, &len)) != ASN1_SUCCESS)
 	{
+	  gnutls_free (str);
 	  asn1_delete_structure (&tmpasn);
 	  return _gnutls_asn2err (result);
 	}
@@ -336,6 +337,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 	  result = _gnutls_x509_data2hex (str, len, res, res_size);
 	  if (result < 0)
 	    {
+	      gnutls_free (str);
 	      gnutls_assert ();
 	      return result;
 	    }
