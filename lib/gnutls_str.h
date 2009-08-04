@@ -79,7 +79,7 @@ char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
 int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 		     size_t * bin_size);
 
-int _gnutls_hostname_compare (const char *certname, const char *hostname);
+int _gnutls_hostname_compare (const char *certname, size_t certnamesize, const char *hostname);
 #define MAX_CN 256
 
 #endif
