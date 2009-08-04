@@ -363,17 +363,20 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 
 /* compare hostname against certificate, taking account of wildcards
  * return 1 on success or 0 on error
+ *
+ * note: certnamesize is required as X509 certs can contain embedded NULLs in
+ * the strings such as CN or subjectAltName
  */
 int
-_gnutls_hostname_compare (const char *certname, const char *hostname)
+_gnutls_hostname_compare (const char *certname, size_t certnamesize, const char *hostname)
 {
   /* find the first different character */
   for (; *certname && *hostname && toupper (*certname) == toupper (*hostname);
-       certname++, hostname++)
+       certname++, hostname++, certnamesize--)
     ;
 
   /* the strings are the same */
-  if (strlen (certname) == 0 && strlen (hostname) == 0)
+  if (certnamesize == 0 && strlen (hostname) == 0)
     return 1;
 
   if (*certname == '*')
@@ -381,11 +384,12 @@ _gnutls_hostname_compare (const char *certname, const char *hostname)
       /* a wildcard certificate */
 
       certname++;
+      certnamesize--;
 
       while (1)
 	{
 	  /* Use a recursive call to allow multiple wildcards */
-	  if (_gnutls_hostname_compare (certname, hostname))
+	  if (_gnutls_hostname_compare (certname, certnamesize, hostname))
 	    {
 	      return 1;
 	    }

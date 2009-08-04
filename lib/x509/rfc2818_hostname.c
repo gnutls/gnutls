@@ -74,7 +74,7 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
       if (ret == GNUTLS_SAN_DNSNAME)
 	{
 	  found_dnsname = 1;
-	  if (_gnutls_hostname_compare (dnsname, hostname))
+	  if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
 	    {
 	      return 1;
 	    }
@@ -84,7 +84,7 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
 	  found_dnsname = 1;	/* RFC 2818 is unclear whether the CN
 				   should be compared for IP addresses
 				   too, but we won't do it.  */
-	  if (_gnutls_hostname_compare (dnsname, hostname))
+	  if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
 	    {
 	      return 1;
 	    }
@@ -104,7 +104,7 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
 	  return 0;
 	}
 
-      if (_gnutls_hostname_compare (dnsname, hostname))
+      if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
 	{
 	  return 1;
 	}
