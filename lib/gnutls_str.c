@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2004, 2005, 2007, 2008  Free Software Foundation
+ * Copyright (C) 2002, 2004, 2005, 2007, 2008, 2009  Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -364,11 +364,13 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 /* compare hostname against certificate, taking account of wildcards
  * return 1 on success or 0 on error
  *
- * note: certnamesize is required as X509 certs can contain embedded NULLs in
+ * note: certnamesize is required as X509 certs can contain embedded NULs in
  * the strings such as CN or subjectAltName
  */
 int
-_gnutls_hostname_compare (const char *certname, size_t certnamesize, const char *hostname)
+_gnutls_hostname_compare (const char *certname,
+			  size_t certnamesize,
+			  const char *hostname)
 {
   /* find the first different character */
   for (; *certname && *hostname && toupper (*certname) == toupper (*hostname);
@@ -376,7 +378,7 @@ _gnutls_hostname_compare (const char *certname, size_t certnamesize, const char 
     ;
 
   /* the strings are the same */
-  if (certnamesize == 0 && strlen (hostname) == 0)
+  if (certnamesize == 0 && *hostname == '\0')
     return 1;
 
   if (*certname == '*')
@@ -390,10 +392,10 @@ _gnutls_hostname_compare (const char *certname, size_t certnamesize, const char 
 	{
 	  /* Use a recursive call to allow multiple wildcards */
 	  if (_gnutls_hostname_compare (certname, certnamesize, hostname))
-	    {
-	      return 1;
-	    }
-	  /* wildcards are only allowed to match a single domain component or component fragment */
+	    return 1;
+
+	  /* wildcards are only allowed to match a single domain
+	     component or component fragment */
 	  if (*hostname == '\0' || *hostname == '.')
 	    break;
 	  hostname++;
