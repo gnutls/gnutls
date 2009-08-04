@@ -526,6 +526,27 @@ typedef struct
   int free_rsa_params;
 } internal_params_st;
 
+struct dtls_hsk_retransmit_buffer;
+typedef struct dtls_hsk_retransmit_buffer dtls_hsk_retransmit_buffer;
+
+/* This is a linked list used to buffer the next flight of outgoing
+   handshake messages. Messages are queued whole; they are fragmented
+   dynamically on transmit. */
+struct dtls_hsk_retransmit_buffer
+{
+  dtls_hsk_retransmit_buffer *next;
+
+  /* The actual handshake message */
+  gnutls_datum_t msg;
+
+  /* Record layer epoch of message */
+  uint16_t epoch;
+
+  /* Handshake layer type and sequence of message */
+  gnutls_handshake_description_t type;
+  uint16_t sequence;
+};
+
 /* DTLS session state
  */
 typedef struct
@@ -540,6 +561,10 @@ typedef struct
   uint16_t hsk_write_seq;
   uint16_t hsk_read_seq;
   uint16_t hsk_mtu;
+
+  /* Head of the next outgoing flight. */
+  dtls_hsk_retransmit_buffer *retransmit;
+  dtls_hsk_retransmit_buffer **retransmit_end;
 } dtls_st;
 
 
