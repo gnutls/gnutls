@@ -94,6 +94,7 @@ main (void)
 {
   gnutls_x509_crt_t crt;
   int ret;
+  int exit_code = 0;
 
   ret = gnutls_global_init ();
   if (ret < 0)
@@ -124,6 +125,7 @@ main (void)
   else
     {
       puts("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-CN)");
+      exit_code = 1;
     }
 
   ret = gnutls_x509_crt_import (crt, &badguy_nul_san, GNUTLS_X509_FMT_PEM);
@@ -141,11 +143,12 @@ main (void)
   else
     {
       puts("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-SAN)");
+      exit_code = 1;
     }
 
   gnutls_x509_crt_deinit (crt);
 
   gnutls_global_deinit ();
 
-  return 0;
+  return exit_code;
 }
