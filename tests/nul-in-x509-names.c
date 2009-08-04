@@ -119,7 +119,7 @@ main (void)
   ret = gnutls_x509_crt_check_hostname (crt, "www.bank.com");
   if (ret == 0)
     {
-      puts("gnutls_x509_crt_check_hostname OK");
+      puts("gnutls_x509_crt_check_hostname OK (NUL-IN-CN)");
     }
   else
     {
