@@ -58,7 +58,7 @@ ctests = simple gc set_pkcs12_cred certder mpi				\
 	finished hostname-check cve-2008-4989 pkcs12_s2k chainverify	\
 	crq_key_id x509sign-verify cve-2009-1415 cve-2009-1416		\
 	crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain		\
-	nul-in-x509-names
+	nul-in-x509-names rfc2231-escape-test
 
 if ENABLE_OPENSSL
 ctests +=  openssl
@@ -93,4 +93,5 @@ TESTS_ENVIRONMENT = \
 	PKCS12PASSWORD=foobar \
 	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
 	PKCS12PASSWORD_2="" \
+	EXEEXT=$(EXEEXT) \
 	$(VALGRIND)
