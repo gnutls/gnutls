@@ -51,6 +51,8 @@ overestimated.  Reported by Peter Hendrickson <pdh@wiredyne.com> in
 
 ** tests: Added new self-test dn2 to detect off-by-one size error.
 
+** tests: Fix failure in "chainverify" because a certificate have expired.
+
 ** API and ABI modifications:
 No changes since last version.
 
