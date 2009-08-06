@@ -58,7 +58,7 @@ ctests = simple gc set_pkcs12_cred certder mpi				\
 	finished hostname-check cve-2008-4989 pkcs12_s2k chainverify	\
 	crq_key_id x509sign-verify cve-2009-1415 cve-2009-1416		\
 	crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain		\
-	nul-in-x509-names rfc2231-escape-test
+	nul-in-x509-names
 
 if ENABLE_OPENSSL
 ctests +=  openssl
@@ -86,7 +86,9 @@ ctests +=  oprfi
 endif
 
 check_PROGRAMS = $(ctests)
-TESTS = $(ctests)
+dist_check_SCRIPTS = rfc2253-escape-test
+
+TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12	\
