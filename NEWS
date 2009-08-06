@@ -9,13 +9,14 @@ See the end for copying conditions.
 By using a NUL byte in CN/SAN fields, it was possible to fool GnuTLS
 into 1) not printing the entire CN/SAN field value when printing a
 certificate and 2) cause incorrect positive matches when matching a
-hostname against a certificate.  Combined with the fact that some CAs
-apparently have poor checking CN/SAN values and issue such (arguably
-incorrect) certificates, it can be used by attackers to become a MITM
-on server-authenticated TLS sessions.  The problem is mitigated since
-attackers needs to get one certificate per site they want to attack,
-and the attacker reveals his tracks by applying for a certificate at
-the CA.  Research presented independently by Dan Kaminsky and Moxie
+hostname against a certificate.  Some CAs apparently have poor
+checking of CN/SAN values and issue these (arguable invalid)
+certificates.  Combined, this can be used by attackers to become a
+MITM on server-authenticated TLS sessions.  The problem is mitigated
+since attackers needs to get one certificate per site they want to
+attack, and the attacker reveals his tracks by applying for a
+certificate at the CA.  It does not apply to client authenticated TLS
+sessions.  Research presented independently by Dan Kaminsky and Moxie
 Marlinspike at BlackHat09.  Thanks to Tomas Hoger <thoger@redhat.com>
 for providing one part of the patch.  [GNUTLS-SA-2009-4].
 
