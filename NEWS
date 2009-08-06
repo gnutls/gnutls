@@ -16,12 +16,6 @@ X.509 certificate DNs.  Reported by Tim Kosse
 <tim.kosse@filezilla-project.org> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3651>.
 
-** libgnutls: Fix PKCS#12 decryption from password.
-The encryption key derived from the password was incorrect for (on
-average) 1 in every 128 input for random inputs.  Reported by "Kukosa,
-Tomas" <tomas.kukosa@siemens-enterprise.com> in
-<http://permalink.gmane.org/gmane.network.gnutls.general/1663>.
-
 ** libgnutls: Return correct bit lengths of some MPIs.
 gnutls_dh_get_prime_bits, gnutls_rsa_export_get_modulus_bits, and
 gnutls_dh_get_peers_public_bits.  Before the reported value was
