@@ -39,6 +39,8 @@ overestimated.  Reported by Peter Hendrickson <pdh@wiredyne.com> in
 
 ** minitasn1: Internal copy updated to libtasn1 v2.3.
 
+** tests: Fix failure in "chainverify" because a certificate have expired.
+
 ** API and ABI modifications:
 No changes since last version.
 
