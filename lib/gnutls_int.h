@@ -209,6 +209,28 @@ typedef enum
   HANDSHAKE_MAC_TYPE_12
 } handshake_mac_type_t;
 
+/* Message buffers (mbuffers) structures */
+
+typedef struct mbuffer_st
+{
+  struct mbuffer_st *next;
+
+  gnutls_datum_t msg;
+  /* msg->size - mark = number of bytes left to process in this
+     message. Mark should only be non-zero when this buffer is the
+     head of the queue. */
+  size_t mark;
+} mbuffer_st;
+
+typedef struct mbuffer_head_st
+{
+  mbuffer_st *head;
+  mbuffer_st **tail;
+
+  unsigned int length;
+  size_t byte_length;
+} mbuffer_head_st;
+
 /* Store & Retrieve functions defines: 
  */
 
