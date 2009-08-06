@@ -242,6 +242,10 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
     {
       str[len] = 0;
 
+      /* Refuse to deal with strings containing NULs. */
+      if (strlen (str) != len)
+	return GNUTLS_E_ASN1_DER_ERROR;
+
       if (res)
 	_gnutls_str_cpy (res, *res_size, str);
       *res_size = len;
@@ -294,6 +298,10 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       if (non_printable == 0)
 	{
 	  str[len] = 0;
+
+	  /* Refuse to deal with strings containing NULs. */
+	  if (strlen (str) != len)
+	    return GNUTLS_E_ASN1_DER_ERROR;
 
 	  if (res)
 	    _gnutls_str_cpy (res, *res_size, str);
