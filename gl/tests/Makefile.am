@@ -384,6 +384,16 @@ libtests_a_SOURCES += verify.h
 
 ## end   gnulib module verify
 
+## begin gnulib module version-etc-tests
+
+TESTS += test-version-etc.sh
+TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@'
+check_PROGRAMS += test-version-etc
+test_version_etc_LDADD = $(LDADD) @LIBINTL@
+EXTRA_DIST += test-version-etc.c test-version-etc.sh
+
+## end   gnulib module version-etc-tests
+
 ## begin gnulib module wchar-tests
 
 TESTS += test-wchar

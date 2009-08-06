@@ -1,5 +1,6 @@
-/* Test of <stdlib.h> substitute.
-   Copyright (C) 2007, 2009 Free Software Foundation, Inc.
+/* Test suite for version-etc.
+   Copyright (C) 2009 Free Software Foundation, Inc.
+   This file is part of the GNUlib Library.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,30 +15,19 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
-
 #include <config.h>
 
-#include <stdlib.h>
+#include "version-etc.h"
 
-#include "verify.h"
+#include "progname.h"
 
-int exitcode;
-
-/* Check that NULL can be passed through varargs as a pointer type,
-   per POSIX 2008.  */
-verify (sizeof NULL == sizeof (void *));
+#define AUTHORS "Sergey Poznyakoff", "Eric Blake"
 
 int
-main ()
+main (int argc, char **argv)
 {
-  /* Check that some macros are defined and different integer constants.  */
-  switch (exitcode)
-    {
-    case EXIT_SUCCESS:
-    case EXIT_FAILURE:
-      break;
-    }
-
+  set_program_name (argv[0]);
+  version_etc (stdout, "test-version-etc", "dummy", "0", AUTHORS,
+               (const char *) NULL);
   return 0;
 }
