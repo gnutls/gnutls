@@ -26,7 +26,7 @@ if ENABLE_OPENPGP
 SUBDIRS += openpgp-certs
 endif
 
-EXTRA_DIST = libgcrypt.supp hostname-check.README
+EXTRA_DIST = libgcrypt.supp
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \

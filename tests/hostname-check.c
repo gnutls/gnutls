@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Free Software Foundation
+ * Copyright (C) 2007, 2009 Free Software Foundation
  *
  * Author: Simon Josefsson
  *
@@ -29,6 +29,12 @@
 #include <gnutls/x509.h>
 
 #include "utils.h"
+
+/*
+  A self-test of the RFC 2818 hostname matching algorithm.  Used to
+  detect regressions of the bug reported in:
+  http://lists.gnupg.org/pipermail/gnutls-dev/2007-February/001385.html
+*/
 
 /* Certificate with no SAN nor CN. */
 char pem1[] =
