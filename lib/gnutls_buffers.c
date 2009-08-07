@@ -347,30 +347,10 @@ finish:
 
   if (_gnutls_log_level >= 7)
     {
-      char line[128];
-      char tmp[16];
-
-
       _gnutls_read_log ("READ: read %d bytes from %p\n",
 			(int) (sizeOfPtr - left), fd);
 
-      for (x = 0; x < ((sizeOfPtr - left) / 16) + 1; x++)
-	{
-	  line[0] = 0;
-
-	  sprintf (tmp, "%.4x - ", x);
-	  _gnutls_str_cat (line, sizeof (line), tmp);
-
-	  for (j = 0; j < 16; j++)
-	    {
-	      if (sum < (sizeOfPtr - left))
-		{
-		  sprintf (tmp, "%.2x ", ((unsigned char *) ptr)[sum++]);
-		  _gnutls_str_cat (line, sizeof (line), tmp);
-		}
-	    }
-	  _gnutls_read_log ("%s\n", line);
-	}
+      dump_bytes(ptr, sizeOfPtr - left, 0);
     }
 
   return (sizeOfPtr - left);
