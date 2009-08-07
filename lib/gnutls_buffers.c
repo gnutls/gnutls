@@ -356,7 +356,60 @@ finish:
   return (sizeOfPtr - left);
 }
 
+static ssize_t
+_gnutls_simple_write (gnutls_session_t session, void *iptr,
+		      size_t sizeOfPtr)
+{
+  int i;
+  gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
 
+  session->internals.errnum = 0;
+
+  if (session->internals._gnutls_push_func == NULL)
+    {
+      i = send (GNUTLS_POINTER_TO_INT (fd), iptr, sizeOfPtr, 0);
+#if HAVE_WINSOCK2_H
+      if (i < 0)
+	{
+	  int tmperr = WSAGetLastError ();
+	  switch (tmperr)
+	    {
+	    case WSAEWOULDBLOCK:
+	      session->internals.errnum = EAGAIN;
+	      break;
+
+	    case WSAEINTR:
+	      session->internals.errnum = EINTR;
+	      break;
+
+	    default:
+	      session->internals.errnum = EIO;
+	      break;
+	    }
+	  WSASetLastError (tmperr);
+	}
+#endif
+    }
+  else
+    i = session->internals._gnutls_push_func (fd, iptr, sizeOfPtr);
+
+  if (i == -1)
+    {
+      int err = session->internals.errnum ? session->internals.errnum
+	: errno;
+
+      if (err == EAGAIN)
+	return GNUTLS_E_AGAIN;
+      else if (err == EINTR)
+	return GNUTLS_E_INTERRUPTED;
+      else
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_PUSH_ERROR;
+	}
+    }
+  return i;
+}
 #define RCVLOWAT session->internals.lowat
 
 /* This function is only used with berkeley style sockets.
