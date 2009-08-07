@@ -53,6 +53,7 @@
 #include <gnutls_num.h>
 #include <gnutls_record.h>
 #include <gnutls_buffers.h>
+#include <gnutls_mbuffers.h>
 
 #include <errno.h>
 
@@ -664,158 +665,20 @@ ssize_t
 _gnutls_io_write_buffered (gnutls_session_t session,
 			   const void *iptr, size_t n)
 {
-  size_t left;
-  unsigned j, x, sum = 0;
-  ssize_t retval, i;
-  const opaque *ptr;
-  gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
+  mbuffer_head_st * const send_buffer = &session->internals.record_send_buffer;
+  gnutls_datum_t msg;
+  int ret;
 
-  /* to know where the procedure was interrupted.
-   */
-  session->internals.direction = 1;
+  msg.data = iptr;
+  msg.size = n;
 
-  ptr = iptr;
+  _gnutls_mbuffer_enqueue_copy(send_buffer, msg);
+  _gnutls_write_log
+    ("WRITE: enqueued %d bytes for %p. Total %d bytes.\n",
+     (int)n, session->internals.transport_recv_ptr,
+     (int)send_buffer->byte_length);
 
-  /* In case the previous write was interrupted, check if the
-   * iptr != NULL and we have data in the buffer.
-   * If this is true then return an error.
-   */
-  if (session->internals.record_send_buffer.length > 0 && iptr != NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  /* If data in the buffer exist
-   */
-  if (iptr == NULL)
-    {
-      gnutls_datum_t bdata;
-      /* checking is handled above */
-      _gnutls_buffer_get_datum (&session->internals.record_send_buffer,
-				&bdata,
-				session->internals.record_send_buffer.length);
-
-      ptr = bdata.data;
-      n = bdata.size;
-
-      _gnutls_write_log
-	("WRITE: Restoring old write. (%d bytes to send)\n", (int) n);
-    }
-
-  _gnutls_write_log ("WRITE: Will write %d bytes to %p.\n", (int) n, fd);
-
-  left = n;
-  while (left > 0)
-    {
-
-      session->internals.errnum = 0;
-
-      if (session->internals._gnutls_push_func == NULL)
-	{
-	  i = send (GNUTLS_POINTER_TO_INT (fd), &ptr[n - left], left, 0);
-#if HAVE_WINSOCK2_H
-	  if (i < 0)
-	    {
-	      int tmperr = WSAGetLastError ();
-	      switch (tmperr)
-		{
-		case WSAEWOULDBLOCK:
-		  session->internals.errnum = EAGAIN;
-		  break;
-
-		case WSAEINTR:
-		  session->internals.errnum = EINTR;
-		  break;
-
-		default:
-		  session->internals.errnum = EIO;
-		  break;
-		}
-	      WSASetLastError (tmperr);
-	    }
-#endif
-	}
-      else
-	i = session->internals._gnutls_push_func (fd, &ptr[n - left], left);
-
-      if (i == -1)
-	{
-	  int err = session->internals.errnum ? session->internals.errnum
-	    : errno;
-
-	  if (err == EAGAIN || err == EINTR)
-	    {
-	      session->internals.record_send_buffer_prev_size += n - left;
-
-	      retval =
-		_gnutls_buffer_append (&session->internals.record_send_buffer,
-				       &ptr[n - left], left);
-	      if (retval < 0)
-		{
-		  gnutls_assert ();
-		  return retval;
-		}
-
-	      _gnutls_write_log
-		("WRITE: Interrupted. Stored %d bytes to buffer. Already sent %d bytes.\n",
-		 (int) left, (int) (n - left));
-
-	      if (err == EAGAIN)
-		return GNUTLS_E_AGAIN;
-	      return GNUTLS_E_INTERRUPTED;
-	    }
-	  else
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_PUSH_ERROR;
-	    }
-	}
-      left -= i;
-
-
-      if (_gnutls_log_level >= 7)
-	{
-	  char line[128];
-	  char tmp[16];
-
-
-	  _gnutls_write_log
-	    ("WRITE: wrote %d bytes to %p. Left %d bytes. Total %d bytes.\n",
-	     (int) i, fd, (int) left, (int) n);
-	  for (x = 0; x < (unsigned) ((i) / 16) + 1; x++)
-	    {
-	      line[0] = 0;
-
-	      if (sum > n - left)
-		break;
-
-	      sprintf (tmp, "%.4x - ", x);
-	      _gnutls_str_cat (line, sizeof (line), tmp);
-
-	      for (j = 0; j < 16; j++)
-		{
-		  if (sum < n - left)
-		    {
-		      sprintf (tmp, "%.2x ",
-			       ((const unsigned char *) ptr)[sum++]);
-		      _gnutls_str_cat (line, sizeof (line), tmp);
-		    }
-		  else
-		    break;
-		}
-	      _gnutls_write_log ("%s\n", line);
-	    }
-	}
-    }
-
-  retval = n + session->internals.record_send_buffer_prev_size;
-
-  session->internals.record_send_buffer.length = 0;
-  session->internals.record_send_buffer_prev_size = 0;
-
-  return retval;
-
+  return _gnutls_io_write_flush (session);
 }
 
 /* This function writes the data that are left in the
@@ -825,16 +688,47 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 ssize_t
 _gnutls_io_write_flush (gnutls_session_t session)
 {
-  ssize_t ret;
+  mbuffer_head_st * const send_buffer = &session->internals.record_send_buffer;
+  gnutls_datum_t msg;
+  int ret;
+  ssize_t total = 0;
 
-  if (session->internals.record_send_buffer.length == 0)
-    return 0;			/* done */
+  _gnutls_write_log ("WRITE FLUSH: %d bytes in buffer.\n",
+		     (int)send_buffer->byte_length);
 
-  ret = _gnutls_io_write_buffered (session, NULL, 0);
-  _gnutls_write_log ("WRITE FLUSH: %d [buffer: %d]\n", (int) ret,
-		     (int) session->internals.record_send_buffer.length);
+  for (_gnutls_mbuffer_get_head(send_buffer, &msg);
+       msg.data != NULL && msg.size > 0;
+       _gnutls_mbuffer_get_head(send_buffer, &msg))
+    {
+      ret = _gnutls_simple_write(session, msg.data, msg.size);
 
-  return ret;
+      if(ret >= 0)
+	{
+	  dump_bytes(msg.data, msg.size, 1);
+	  _gnutls_mbuffer_remove_bytes(send_buffer, ret);
+
+	  _gnutls_write_log ("WRITE: wrote %d bytes, %d bytes left.\n",
+			     ret, (int)send_buffer->byte_length);
+
+	  total += ret;
+	}
+      else if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_AGAIN)
+	{
+	  _gnutls_write_log ("WRITE interrupted: %d bytes left.\n",
+			     (int)send_buffer->byte_length);
+	  return ret;
+	}
+      else
+	{
+	  _gnutls_write_log ("WRITE error: code %d, %d bytes left.\n",
+			     ret, (int)send_buffer->byte_length);
+
+	  gnutls_assert();
+	  return ret;
+	}
+    }
+
+  return total;
 }
 
 /* This function writes the data that are left in the
