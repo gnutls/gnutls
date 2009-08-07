@@ -38,6 +38,7 @@
 #include <gnutls_handshake.h>
 #include <gnutls_dh.h>
 #include <gnutls_buffers.h>
+#include <gnutls_mbuffers.h>
 #include <gnutls_state.h>
 #include <auth_cert.h>
 #include <auth_anon.h>
@@ -297,7 +298,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
   _gnutls_buffer_init (&(*session)->internals.ia_data_buffer);
 
-  _gnutls_buffer_init (&(*session)->internals.record_send_buffer);
+  _gnutls_mbuffer_init (&(*session)->internals.record_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.record_recv_buffer);
 
   _gnutls_buffer_init (&(*session)->internals.handshake_send_buffer);
@@ -396,7 +397,7 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_buffer_clear (&session->internals.handshake_data_buffer);
   _gnutls_buffer_clear (&session->internals.application_data_buffer);
   _gnutls_buffer_clear (&session->internals.record_recv_buffer);
-  _gnutls_buffer_clear (&session->internals.record_send_buffer);
+  _gnutls_mbuffer_clear (&session->internals.record_send_buffer);
 
   gnutls_credentials_clear (session);
   _gnutls_selected_certs_deinit (session);

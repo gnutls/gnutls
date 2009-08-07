@@ -601,7 +601,7 @@ typedef struct
    * non blocking IO.
    */
   gnutls_buffer record_recv_buffer;
-  gnutls_buffer record_send_buffer;	/* holds cached data
+  mbuffer_head_st record_send_buffer;	/* holds cached data
 					 * for the gnutls_io_write_buffered()
 					 * function.
 					 */
