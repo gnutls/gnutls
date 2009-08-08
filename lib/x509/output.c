@@ -357,6 +357,17 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 	  return;
 	}
 
+      if ((err == GNUTLS_SAN_DNSNAME
+	   || err == GNUTLS_SAN_RFC822NAME
+	   || err == GNUTLS_SAN_URI) &&
+	  strlen (buffer) != size)
+	{
+	  adds (str, _("warning: distributionPoint contains an embedded NUL, "
+		       "replacing with '!'\n"));
+	  while (strlen (buffer) < size)
+	    buffer[strlen (buffer)] = '!';
+	}
+
       switch (err)
 	{
 	case GNUTLS_SAN_DNSNAME:
@@ -557,6 +568,17 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	  return;
 	}
 
+      if ((err == GNUTLS_SAN_DNSNAME
+	   || err == GNUTLS_SAN_RFC822NAME
+	   || err == GNUTLS_SAN_URI) &&
+	  strlen (buffer) != size)
+	{
+	  adds (str, _("warning: SAN contains an embedded NUL, "
+		       "replacing with '!'\n"));
+	  while (strlen (buffer) < size)
+	    buffer[strlen (buffer)] = '!';
+	}
+
       switch (err)
 	{
 	case GNUTLS_SAN_DNSNAME:
@@ -629,8 +651,18 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	      }
 
 	    if (err == GNUTLS_SAN_OTHERNAME_XMPP)
-	      addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix,
-		    (int) size, buffer);
+	      {
+		if (strlen (buffer) != size)
+		  {
+		    adds (str, _("warning: SAN contains an embedded NUL, "
+				 "replacing with '!'\n"));
+		    while (strlen (buffer) < size)
+		      buffer[strlen (buffer)] = '!';
+		  }
+
+		addf (str, _("%s\t\t\tXMPP Address: %.*s\n"), prefix,
+		      (int) size, buffer);
+	      }
 	    else
 	      {
 		addf (str, _("%s\t\t\totherName OID: %.*s\n"), prefix,

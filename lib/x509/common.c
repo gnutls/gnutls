@@ -179,9 +179,9 @@ int
 _gnutls_x509_oid_data2string (const char *oid, void *value,
 			      int value_size, char *res, size_t * res_size)
 {
-  char *str, tmpname[128];
+  char str[MAX_STRING_LEN], tmpname[128];
   const char *ANAME = NULL;
-  int len = -1, result, i;
+  int CHOICE = -1, len = -1, result;
   ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
   char asn1_err[ASN1_MAX_ERROR_DESCRIPTION_SIZE] = "";
 
@@ -198,6 +198,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
     }
 
   ANAME = asn1_find_structure_from_oid (_gnutls_get_pkix (), oid);
+  CHOICE = _gnutls_x509_oid_data_choice (oid);
 
   if (ANAME == NULL)
     {
@@ -205,11 +206,11 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  _gnutls_str_cpy (tmpname, sizeof (tmpname), "PKIX1.");
-  _gnutls_str_cat (tmpname, sizeof (tmpname), ANAME);
+  _gnutls_str_cpy (str, sizeof (str), "PKIX1.");
+  _gnutls_str_cat (str, sizeof (str), ANAME);
 
   if ((result =
-       asn1_create_element (_gnutls_get_pkix (), tmpname,
+       asn1_create_element (_gnutls_get_pkix (), str,
 			    &tmpasn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -221,7 +222,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 			  asn1_err)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("asn1_der_decoding: %s:%s\n", tmpname, asn1_err);
+      _gnutls_x509_log ("asn1_der_decoding: %s:%s\n", str, asn1_err);
       asn1_delete_structure (&tmpasn);
       return _gnutls_asn2err (result);
     }
@@ -229,45 +230,32 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
   /* If this is a choice then we read the choice. Otherwise it
    * is the value;
    */
-  len = 0;
-  if ((result = asn1_read_value (tmpasn, "", NULL, &len)) != ASN1_MEM_ERROR)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&tmpasn);
-      return _gnutls_asn2err (result);
-    }
-
-  len++;
-  str = gnutls_malloc (len);
-  if (str == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
+  len = sizeof (str) - 1;
   if ((result = asn1_read_value (tmpasn, "", str, &len)) != ASN1_SUCCESS)
-    {
-      gnutls_free (str);
+    {				/* CHOICE */
       gnutls_assert ();
       asn1_delete_structure (&tmpasn);
       return _gnutls_asn2err (result);
     }
 
-  str[len] = '\0';
-
-  if (_gnutls_x509_oid_data_choice (oid) == 0)
+  if (CHOICE == 0)
     {
+      str[len] = 0;
+
+      /* Refuse to deal with strings containing NULs. */
+      if (strlen (str) != len)
+	return GNUTLS_E_ASN1_DER_ERROR;
+
       if (res)
 	_gnutls_str_cpy (res, *res_size, str);
       *res_size = len;
-
-      gnutls_free (str);
 
       asn1_delete_structure (&tmpasn);
     }
   else
     {				/* CHOICE */
       int non_printable = 0, teletex = 0;
+      str[len] = 0;
 
       /* Note that we do not support strings other than
        * UTF-8 (thus ASCII as well).
@@ -280,30 +268,13 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       if (strcmp (str, "teletexString") == 0)
 	teletex = 1;
 
+
       _gnutls_str_cpy (tmpname, sizeof (tmpname), str);
 
-      gnutls_free (str);
-
-      len = 0;
-      if ((result =
-	   asn1_read_value (tmpasn, tmpname, NULL, &len)) != ASN1_MEM_ERROR)
-	{
-	  asn1_delete_structure (&tmpasn);
-	  return _gnutls_asn2err (result);
-	}
-
-      len++;
-      str = gnutls_malloc (len);
-      if (str == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-
+      len = sizeof (str) - 1;
       if ((result =
 	   asn1_read_value (tmpasn, tmpname, str, &len)) != ASN1_SUCCESS)
 	{
-	  gnutls_free (str);
 	  asn1_delete_structure (&tmpasn);
 	  return _gnutls_asn2err (result);
 	}
@@ -328,6 +299,10 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 	{
 	  str[len] = 0;
 
+	  /* Refuse to deal with strings containing NULs. */
+	  if (strlen (str) != len)
+	    return GNUTLS_E_ASN1_DER_ERROR;
+
 	  if (res)
 	    _gnutls_str_cpy (res, *res_size, str);
 	  *res_size = len;
@@ -337,21 +312,11 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
 	  result = _gnutls_x509_data2hex (str, len, res, res_size);
 	  if (result < 0)
 	    {
-	      gnutls_free (str);
 	      gnutls_assert ();
 	      return result;
 	    }
 	}
-
-      gnutls_free (str);
     }
-
-  if (res)
-    /* Convert null char in the name to '?'
-     * to protect applications */
-    for (i = 0; i < *res_size; i++)
-      if (res[i] == 0)
-	res[i] = '?';
 
   return 0;
 }

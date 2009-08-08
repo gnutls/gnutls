@@ -26,7 +26,7 @@ if ENABLE_OPENPGP
 SUBDIRS += openpgp-certs
 endif
 
-EXTRA_DIST = libgcrypt.supp hostname-check.README
+EXTRA_DIST = libgcrypt.supp
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -86,11 +86,14 @@ ctests +=  oprfi
 endif
 
 check_PROGRAMS = $(ctests)
-TESTS = $(ctests)
+dist_check_SCRIPTS = rfc2253-escape-test
+
+TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT = \
 	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12	\
 	PKCS12PASSWORD=foobar \
 	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
 	PKCS12PASSWORD_2="" \
+	EXEEXT=$(EXEEXT) \
 	$(VALGRIND)

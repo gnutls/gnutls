@@ -44,7 +44,7 @@ ifeq ($(origin prev_version_file), undefined)
   prev_version_file = $(srcdir)/.prev-version
 endif
 
-PREV_VERSION := $(shell cat $(prev_version_file))
+PREV_VERSION := $(shell cat $(prev_version_file) 2>/dev/null)
 VERSION_REGEXP = $(subst .,\.,$(VERSION))
 PREV_VERSION_REGEXP = $(subst .,\.,$(PREV_VERSION))
 
@@ -70,9 +70,11 @@ export LC_ALL = C
 ## Sanity checks.  ##
 ## --------------- ##
 
+_cfg_mk := $(shell test -f $(srcdir)/cfg.mk && echo '$(srcdir)/cfg.mk')
+
 # Collect the names of rules starting with `sc_'.
 syntax-check-rules := $(shell sed -n 's/^\(sc_[a-zA-Z0-9_-]*\):.*/\1/p' \
-			$(srcdir)/$(ME) $(srcdir)/cfg.mk)
+			$(srcdir)/$(ME) $(_cfg_mk))
 .PHONY: $(syntax-check-rules)
 
 local-checks-available = \
@@ -363,16 +365,19 @@ sc_program_name:
 # Require that the final line of each test-lib.sh-using test be this one:
 # Exit $fail
 # Note: this test requires GNU grep's --label= option.
+Exit_witness_file ?= tests/test-lib.sh
+Exit_base := $(notdir $(Exit_witness_file))
 sc_require_test_exit_idiom:
-	@if test -f $(srcdir)/tests/test-lib.sh; then			\
+	@if test -f $(srcdir)/$(Exit_witness_file); then		\
 	  die=0;							\
-	  for i in $$(grep -l -F /../test-lib.sh $$($(VC_LIST) tests)); do \
-	    tail -n1 $$i | grep '^Exit \$$fail$$' > /dev/null		\
+	  for i in $$(grep -l -F 'srcdir/$(Exit_base)'			\
+		$$($(VC_LIST) tests)); do				\
+	    tail -n1 $$i | grep '^Exit .' > /dev/null			\
 	      && : || { die=1; echo $$i; }				\
 	  done;								\
 	  test $$die = 1 &&						\
 	    { echo 1>&2 '$(ME): the final line in each of the above is not:'; \
-	      echo 1>&2 'Exit $$fail';					\
+	      echo 1>&2 'Exit something';				\
 	      exit 1; } || :;						\
 	fi
 
@@ -487,7 +492,7 @@ sc_immutable_NEWS:
 # Update the hash stored above.  Do this after each release and
 # for any corrections to old entries.
 update-NEWS-hash: NEWS
-	perl -pi -e 's/^(old_NEWS_hash = ).*/$${1}'"$(NEWS_hash)/" \
+	perl -pi -e 's/^(old_NEWS_hash[ \t]+:?=[ \t]+).*/$${1}'"$(NEWS_hash)/" \
 	  $(srcdir)/cfg.mk
 
 # Ensure that we use only the standard $(VAR) notation,
@@ -537,6 +542,7 @@ sc_po_check:
 	  for file in $$($(VC_LIST_EXCEPT)) lib/*.[ch]; do		\
 	    test -r $$file || continue;					\
 	    case $$file in						\
+	      *.m4|*.mk) continue ;;					\
 	      *.?|*.??) ;;						\
 	      *) continue;;						\
 	    esac;							\
@@ -623,7 +629,7 @@ maintainer-distcheck:
 # Also, make sure the NEWS file is up-to-date.
 ALL_RECURSIVE_TARGETS += vc-dist
 vc-dist: $(local-check) cvs-check maintainer-distcheck
-	XZ_OPT=-9ev $(MAKE) dist
+	XZ_OPT=9ev $(MAKE) dist
 
 # Use this to make sure we don't run these programs when building
 # from a virgin tgz file, below.
@@ -765,3 +771,12 @@ INDENT_SOURCES ?= $(C_SOURCES)
 .PHONY: indent
 indent:
 	indent $(INDENT_SOURCES)
+
+# Run this rule once per year (usually early in January)
+# to update all FSF copyright year lists in your project.
+update-copyright-exclude-regexp ?= (^|/)COPYING$$
+.PHONY: update-copyright
+update-copyright:
+	grep -l -w Copyright $$($(VC_LIST_EXCEPT))		\
+	  | grep -v -E '$(update-copyright-exclude-regexp)'	\
+	  | xargs $(build_aux)/$@

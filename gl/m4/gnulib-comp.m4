@@ -538,6 +538,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-vasnprintf.c
   tests/test-vc-list-files-cvs.sh
   tests/test-vc-list-files-git.sh
+  tests/test-version-etc.c
+  tests/test-version-etc.sh
   tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/dummy.c
