@@ -2663,33 +2663,34 @@ _gnutls_recv_supplemental (gnutls_session_t session)
 }
 
 /**
- * gnutls_handshake:
- * @session: is a #gnutls_session_t structure.
- *
- * This function does the handshake of the TLS/SSL protocol, and
- * initializes the TLS connection.
- *
- * This function will fail if any problem is encountered, and will
- * return a negative error code. In case of a client, if the client
- * has asked to resume a session, but the server couldn't, then a
- * full handshake will be performed.
- *
- * The non-fatal errors such as %GNUTLS_E_AGAIN and
- * %GNUTLS_E_INTERRUPTED interrupt the handshake procedure, which
- * should be later be resumed.  Call this function again, until it
- * returns 0; cf.  gnutls_record_get_direction() and
- * gnutls_error_is_fatal().
- *
- * If this function is called by a server after a rehandshake request
- * then %GNUTLS_E_GOT_APPLICATION_DATA or
- * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
- * are non fatal errors, only in the specific case of a rehandshake.
- * Their meaning is that the client rejected the rehandshake request or
- * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
- * some data were pending.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
- **/
+  * gnutls_handshake - This is the main function in the handshake protocol.
+  * @session: is a #gnutls_session_t structure.
+  *
+  * This function does the handshake of the TLS/SSL protocol, and
+  * initializes the TLS connection.
+  *
+  * This function will fail if any problem is encountered, and will
+  * return a negative error code. In case of a client, if the client
+  * has asked to resume a session, but the server couldn't, then a
+  * full handshake will be performed.
+  *
+  * The non-fatal errors such as %GNUTLS_E_AGAIN and
+  * %GNUTLS_E_INTERRUPTED interrupt the handshake procedure, which
+  * should be later be resumed.  Call this function again, until it
+  * returns 0; cf.  gnutls_record_get_direction() and
+  * gnutls_error_is_fatal().
+  *
+  * If this function is called by a server after a rehandshake request
+  * then %GNUTLS_E_GOT_APPLICATION_DATA or
+  * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
+  * are non fatal errors, only in the specific case of a rehandshake.
+  * Their meaning is that the client rejected the rehandshake request or
+  * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
+  * some data were pending.
+  *
+  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+  *
+  **/
 int
 gnutls_handshake (gnutls_session_t session)
 {

@@ -744,14 +744,12 @@ record_check_type (gnutls_session_t session,
 	  if (session->security_parameters.entity == GNUTLS_SERVER)
 	    {
 	      gnutls_assert ();
-	      ret =
-		_gnutls_record_buffer_put (recv_type, session, (void *) data,
-					   data_size);
-	      if (ret < 0)
-		{
-		  gnutls_assert ();
-		  return ret;
-		}
+	      ret = _gnutls_record_buffer_put (recv_type, session, (void *) data, data_size);
+	      if (ret < 0) 
+	        {
+	          gnutls_assert();
+	          return ret;
+                }
 	      return GNUTLS_E_REHANDSHAKE;
 	    }
 
