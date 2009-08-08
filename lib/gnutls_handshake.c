@@ -2259,7 +2259,9 @@ _gnutls_recv_supplemental (gnutls_session_t session)
   * then %GNUTLS_E_GOT_APPLICATION_DATA or
   * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
   * are non fatal errors, only in the specific case of a rehandshake.
-  * Their meaning is that the client rejected the rehandshake request.
+  * Their meaning is that the client rejected the rehandshake request or
+  * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
+  * some data were pending.
   *
   * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
   *
