@@ -347,7 +347,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
    * If the previous send was interrupted then a null pointer is
    * ok, and means to resume.
    */
-  if (session->internals.record_send_buffer.length == 0 &&
+  if (session->internals.record_send_buffer.byte_length == 0 &&
       (sizeofdata == 0 && _data == NULL))
     {
       gnutls_assert ();
@@ -383,7 +383,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   /* Only encrypt if we don't have data to send 
    * from the previous run. - probably interrupted.
    */
-  if (session->internals.record_send_buffer.length > 0)
+  if (session->internals.record_send_buffer.byte_length > 0)
     {
       ret = _gnutls_io_write_flush (session);
       if (ret > 0)
@@ -393,7 +393,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher = NULL;
 
-      retval = session->internals.record_send_buffer_user_size;
+      retval = session->internals.record_send_buffer.byte_length;
     }
   else
     {
@@ -423,7 +423,6 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	}
 
       retval = data2send_size;
-      session->internals.record_send_buffer_user_size = data2send_size;
 
       /* increase sequence number
        */
@@ -461,8 +460,6 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       gnutls_assert ();
       return ret;
     }
-
-  session->internals.record_send_buffer_user_size = 0;
 
   _gnutls_record_log ("REC[%p]: Sent Packet[%d] %s(%d) with length: %d\n",
 		      session,
