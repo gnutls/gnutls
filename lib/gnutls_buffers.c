@@ -809,28 +809,10 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
 #ifdef WRITE_DEBUG
   else
     {
-      size_t sum = 0, x, j;
-
       _gnutls_write_log ("HWRITE: will write %d bytes to %d.\n", n,
 			 gnutls_transport_get_ptr (session));
-      for (x = 0; x < ((n) / 16) + 1; x++)
-	{
-	  if (sum > n)
-	    break;
 
-	  _gnutls_write_log ("%.4x - ", x);
-	  for (j = 0; j < 16; j++)
-	    {
-	      if (sum < n)
-		{
-		  _gnutls_write_log ("%.2x ", ((unsigned char *) ptr)[sum++]);
-		}
-	      else
-		break;
-	    }
-	  _gnutls_write_log ("\n");
-	}
-      _gnutls_write_log ("\n");
+      dump_bytes(ptr, n, 1);
     }
 #endif
 
