@@ -38,8 +38,6 @@ int _gnutls_io_clear_peeked_data (gnutls_session_t session);
 
 ssize_t _gnutls_io_write_buffered (gnutls_session_t session,
 				   const gnutls_datum_t *msg);
-ssize_t _gnutls_io_write_buffered2 (gnutls_session_t, const void *iptr,
-				    size_t n, const void *iptr2, size_t n2);
 
 int _gnutls_handshake_buffer_get_size (gnutls_session_t session);
 int _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
