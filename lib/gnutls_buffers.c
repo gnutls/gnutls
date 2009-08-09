@@ -653,29 +653,34 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
 /* This function is like write. But it does not return -1 on error.
  * It does return gnutls_errno instead.
  *
- * In case of E_AGAIN and E_INTERRUPTED errors, you must call gnutls_write_flush(),
- * until it returns ok (0).
+ * This function takes full responsibility of freeing msg->data.
  *
- * We need to push exactly the data in n, since we cannot send less
- * data. In TLS the peer must receive the whole packet in order
- * to decrypt and verify the integrity. 
+ * In case of E_AGAIN and E_INTERRUPTED errors, you must call
+ * gnutls_write_flush(), until it returns ok (0).
+ *
+ * We need to push exactly the data in msg->size, since we cannot send
+ * less data. In TLS the peer must receive the whole packet in order
+ * to decrypt and verify the integrity.
  *
  */
 ssize_t
 _gnutls_io_write_buffered (gnutls_session_t session,
-			   const void *iptr, size_t n)
+			   const gnutls_datum_t *msg)
 {
   mbuffer_head_st * const send_buffer = &session->internals.record_send_buffer;
-  gnutls_datum_t msg;
   int ret;
 
-  msg.data = iptr;
-  msg.size = n;
+  ret = _gnutls_mbuffer_enqueue (send_buffer, msg);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      gnutls_free (msg->data);
+      return ret;
+    }
 
-  _gnutls_mbuffer_enqueue_copy(send_buffer, &msg);
   _gnutls_write_log
     ("WRITE: enqueued %d bytes for %p. Total %d bytes.\n",
-     (int)n, session->internals.transport_recv_ptr,
+     (int)msg->size, session->internals.transport_recv_ptr,
      (int)send_buffer->byte_length);
 
   return _gnutls_io_write_flush (session);

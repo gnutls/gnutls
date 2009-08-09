@@ -436,8 +436,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	  return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-      ret = _gnutls_io_write_buffered (session, cipher, cipher_size);
-      gnutls_free (cipher);
+      gnutls_datum_t tmp = {cipher, cipher_size};
+      ret = _gnutls_io_write_buffered (session, &tmp);
     }
 
   if (ret != cipher_size)
