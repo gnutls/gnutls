@@ -672,7 +672,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
   msg.data = iptr;
   msg.size = n;
 
-  _gnutls_mbuffer_enqueue_copy(send_buffer, msg);
+  _gnutls_mbuffer_enqueue_copy(send_buffer, &msg);
   _gnutls_write_log
     ("WRITE: enqueued %d bytes for %p. Total %d bytes.\n",
      (int)n, session->internals.transport_recv_ptr,

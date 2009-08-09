@@ -53,7 +53,7 @@ _gnutls_mbuffer_clear (mbuffer_head_st *buf)
 }
 
 int
-_gnutls_mbuffer_enqueue (mbuffer_head_st *buf, gnutls_datum_t msg)
+_gnutls_mbuffer_enqueue (mbuffer_head_st *buf, const gnutls_datum_t *msg)
 {
   mbuffer_st *bufel = gnutls_malloc (sizeof (mbuffer_st));
 
@@ -66,10 +66,10 @@ _gnutls_mbuffer_enqueue (mbuffer_head_st *buf, gnutls_datum_t msg)
   bufel->next = NULL;
   bufel->mark = 0;
 
-  bufel->msg = msg;
+  bufel->msg = *msg;
 
   buf->length++;
-  buf->byte_length += msg.size;
+  buf->byte_length += msg->size;
 
   *(buf->tail) = bufel;
   buf->tail = &bufel->next;
@@ -78,11 +78,11 @@ _gnutls_mbuffer_enqueue (mbuffer_head_st *buf, gnutls_datum_t msg)
 }
 
 int
-_gnutls_mbuffer_enqueue_copy (mbuffer_head_st *buf, gnutls_datum_t msg)
+_gnutls_mbuffer_enqueue_copy (mbuffer_head_st *buf, const gnutls_datum_t *msg)
 {
   gnutls_datum_t msg_copy;
 
-  msg_copy.data = gnutls_malloc (msg.size);
+  msg_copy.data = gnutls_malloc (msg->size);
 
   if (msg_copy.data == NULL)
     {
@@ -90,10 +90,10 @@ _gnutls_mbuffer_enqueue_copy (mbuffer_head_st *buf, gnutls_datum_t msg)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  msg_copy.size = msg.size;
-  memcpy (msg_copy.data, msg.data, msg_copy.size);
+  msg_copy.size = msg->size;
+  memcpy (msg_copy.data, msg->data, msg_copy.size);
 
-  return _gnutls_mbuffer_enqueue (buf, msg_copy);
+  return _gnutls_mbuffer_enqueue (buf, &msg_copy);
 }
 
 void
