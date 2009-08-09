@@ -336,8 +336,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 		  gnutls_handshake_description_t htype, const void *_data,
 		  size_t sizeofdata)
 {
-  uint8_t *cipher;
-  int cipher_size;
+  gnutls_datum_t cipher;
   int retval, ret;
   int data2send_size;
   uint8_t headers[5];
@@ -387,11 +386,11 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     {
       ret = _gnutls_io_write_flush (session);
       if (ret > 0)
-	cipher_size = ret;
+	cipher.size = ret;
       else
-	cipher_size = 0;
+	cipher.size = 0;
 
-      cipher = NULL;
+      cipher.data = NULL;
 
       retval = session->internals.record_send_buffer.byte_length;
     }
@@ -400,26 +399,26 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       /* now proceed to packet encryption
        */
-      cipher_size = data2send_size + MAX_RECORD_OVERHEAD;
-      cipher = gnutls_malloc (cipher_size);
-      if (cipher == NULL)
+      cipher.size = data2send_size + MAX_RECORD_OVERHEAD;
+      cipher.data = gnutls_malloc (cipher.size);
+      if (cipher.data == NULL)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
-      cipher_size =
+      cipher.size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, cipher, cipher_size, type,
+			 data2send_size, cipher.data, cipher.size, type,
 			 (session->internals.priorities.no_padding ==
 			  0) ? 1 : 0);
-      if (cipher_size <= 0)
+      if (cipher.size <= 0)
 	{
 	  gnutls_assert ();
-	  if (cipher_size == 0)
-	    cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-	  gnutls_free (cipher);
-	  return cipher_size;	/* error */
+	  if (cipher.size == 0)
+	    cipher.size = GNUTLS_E_ENCRYPTION_FAILED;
+	  gnutls_free (cipher.data);
+	  return cipher.size;	/* error */
 	}
 
       retval = data2send_size;
@@ -431,15 +430,14 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	{
 	  session_invalidate (session);
 	  gnutls_assert ();
-	  gnutls_free (cipher);
+	  gnutls_free (cipher.data);
 	  return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-      gnutls_datum_t tmp = {cipher, cipher_size};
-      ret = _gnutls_io_write_buffered (session, &tmp);
+      ret = _gnutls_io_write_buffered (session, &cipher);
     }
 
-  if (ret != cipher_size)
+  if (ret != cipher.size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
 	{
@@ -466,7 +464,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 		      (int)
 		      _gnutls_uint64touint32
 		      (&session->connection_state.write_sequence_number),
-		      _gnutls_packet2str (type), type, cipher_size);
+		      _gnutls_packet2str (type), type, cipher.size);
 
   return retval;
 }
