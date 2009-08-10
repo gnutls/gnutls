@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.8.3 (unreleased)
 
+** libgnutls: Fix patch for NUL in CN/SAN in last release.
+Some code that was intended to be removed will cause a read-out-bound.
+Reported by Tomas Hoger <thoger@redhat.com>.
+
 ** API and ABI modifications:
 No changes since last version.
 
