@@ -34,6 +34,10 @@
 #include "sockets.h"
 #include "gettext.h"
 
+/* Minimum library versions we accept. */
+#define GNUTLS_MIN_LIBGCRYPT_VERSION "1.2.4"
+#define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
+
 /* Remove this when we require libtasn1 v1.6 or later. */
 #ifndef ASN1_VERSION
 # define ASN1_VERSION LIBTASN1_VERSION
@@ -187,13 +191,14 @@ gnutls_global_init (void)
     {
       const char *p;
 
-      p = gcry_check_version (GCRYPT_VERSION);
+      p = gcry_check_version (GNUTLS_MIN_LIBGCRYPT_VERSION);
 
       if (p == NULL)
 	{
 	  gnutls_assert ();
 	  _gnutls_debug_log ("Checking for libgcrypt failed: %s < %s\n",
-			     gcry_check_version (NULL), GCRYPT_VERSION);
+			     gcry_check_version (NULL),
+			     GNUTLS_MIN_LIBGCRYPT_VERSION);
 	  return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
 	}
 
@@ -207,9 +212,12 @@ gnutls_global_init (void)
    * This should not deal with files in the final
    * version.
    */
-  if (asn1_check_version (ASN1_VERSION) == NULL)
+  if (asn1_check_version (GNUTLS_MIN_LIBTASN1_VERSION) == NULL)
     {
       gnutls_assert ();
+      _gnutls_debug_log ("Checking for libtasn1 failed: %s < %s\n",
+			 asn1_check_version (NULL),
+			 GNUTLS_MIN_LIBTASN1_VERSION);
       return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
     }
 
