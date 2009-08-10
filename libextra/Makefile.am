@@ -62,7 +62,8 @@ lib_LTLIBRARIES += libgnutls-openssl.la
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = ../lib/gl/liblgnu.la ../lib/libgnutls.la 
+libgnutls_openssl_la_LIBADD = ../lib/gl/liblgnu.la $(LIBSOCKET) \
+	../lib/libgnutls.la
 
 libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
@@ -81,7 +82,7 @@ endif
 
 # OpenPGP
 
-libgnutls_extra_la_LIBADD =
+libgnutls_extra_la_LIBADD = $(LIBSOCKET)
 libgnutls_extra_la_LDFLAGS = -no-undefined
 
 # TLS/IA
