@@ -43,6 +43,13 @@ Report and patch by Tim Kosse <tim.kosse@filezilla-project.org> in
 and
 <http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3670>.
 
+** libgnutls: Relax checking of required libtasn1/libgcrypt versions.
+Before we required that the runtime library used the same (or more
+recent) libgcrypt/libtasn1 as it was compiled with.  Now we just check
+that the runtime usage is above the minimum required.  Reported by
+Marco d'Itri <md@linux.it> via Andreas Metzler
+<ametzler@downhill.at.eu.org> in <http://bugs.debian.org/540449>.
+
 ** minitasn1: Internal copy updated to libtasn1 v2.3.
 
 ** tests: Fix failure in "chainverify" because a certificate have expired.
