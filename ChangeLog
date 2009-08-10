@@ -1,3 +1,159 @@
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.8.2.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Look only for latest _required_
+	libgcrypt/libtasn1 version.  Reported by Marco d'Itri <md@linux.it> via Andreas Metzler
+	<ametzler@downhill.at.eu.org> as Debian BTS #540449.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_str.c: There are cases where those buffers might
+	overlap
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Fix expected output, a cert have expired.
+
+2009-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/mini-eagain.c: Make it build.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Check for NUL in SANs and replace accordingly.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Refuse to return DNs with embedded NULs which
+	breaks other code.  Problem published by Dan Kaminsky and Moxie Marlinspike at
+	BlackHat09.
+
+2009-06-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: (_gnutls_x509_oid_data2string): Return proper @res_size for NULL
+	res.
+
+2009-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.c: Cleanup code.
+
+2009-08-04  Tomas Hoger <thoger@redhat.com>
+
+	* lib/gnutls_str.c, lib/gnutls_str.h, lib/openpgp/pgp.c,
+	lib/x509/rfc2818_hostname.c: GnuTLS vs. NULL chars in CNs Check cert name size in _gnutls_hostname_compare()     This is needed to protect against NULL (\0) characters embedded
+	    in X509 certificates' CNs or subjectAltNames, that can be used
+	    to fool SSL certificate verification as was demonstrated by Moxie
+	Marlinspike on BH USA 2009:
+	http://www.blackhat.com/html/bh-usa-09/bh-usa-09-archives.html#MarlinspikeSigned-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.c: Return proper MPI lengths in bits.  Reported by
+	Peter Hendrickson <pdh@wiredyne.com> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3607>.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/dn.c: Fix off-by-one size computation that leads to
+	truncated strings.  Reported by Tim Kosse
+	<tim.kosse@filezilla-project.org> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3651>.
+
+2009-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* : commit 872048c5dd438a2c8f6c307d8b303b8cf8be174f Author: Nikos
+	Mavrogiannopoulos <nmav@gnutls.org> Date:   Mon Jul 13 20:17:56 2009
+	+0300
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c: Patch by Tim Kosse: "If
+	_gnutls_send_finished fails with GNUTLS_E_AGAIN or GNUTLS_E_AGAIN it
+	eventually gets called a second time.  It however does not call _gnutls_send_handshake with a NULL pointer
+	on repeated calls, ultimately leading to an internal error in
+	_gnutls_handshake_io_send_int."
+
+2009-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/errors.c, lib/minitasn1/libtasn1.h: Use
+	libtasn1 v2.3.
+
+2009-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add NEWS entry.
+
+2009-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump version.
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.h, lib/gnutls_ui.c: Corrected
+	gnutls_certificate_client_get_request_status(). Based on observation
+	by Peter Hendrickson <pdh@wiredyne.com>.
+
+2009-07-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/minitasn1/decoding.c: more careful decoding of OID.
+
+2009-07-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/common.c: do not allow null character in DN.
+
+2009-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-serv-anon.c, doc/examples/ex-serv-export.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-psk.c,
+	doc/examples/ex-serv-srp.c, doc/examples/ex-serv1.c,
+	lib/auth_cert.c, lib/gnutls_buffers.c, lib/gnutls_mpi.c,
+	lib/gnutls_pk.c, lib/gnutls_sig.c, lib/opencdk/stream.c,
+	lib/opencdk/write-packet.c, lib/openpgp/pgp.c,
+	lib/openpgp/privkey.c, lib/x509/privkey_pkcs8.c, src/certtool.c,
+	src/psk.c: Several bug fixes by Fabian Keil (some were modified by
+	me).
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c, tests/Makefile.am, tests/mini-eagain.c: 
+	Added bug fix that allows gnutls_record_recv/send resuming from
+	previously interrupted actions. Patch by from Tim Kosse
+	<tim.kosse@filezilla-project.org>.  Added a self test to check those functions in handling interrupted
+	states.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-06-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.8.1.
