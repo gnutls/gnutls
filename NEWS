@@ -91,6 +91,75 @@ No changes since last version.
 ** API and ABI modifications:
 No changes since last version.
 
+* Version 2.8.2 (released 2009-08-10)
+
+** libgnutls: Fix problem with NUL bytes in X.509 CN and SAN fields.
+By using a NUL byte in CN/SAN fields, it was possible to fool GnuTLS
+into 1) not printing the entire CN/SAN field value when printing a
+certificate and 2) cause incorrect positive matches when matching a
+hostname against a certificate.  Some CAs apparently have poor
+checking of CN/SAN values and issue these (arguable invalid)
+certificates.  Combined, this can be used by attackers to become a
+MITM on server-authenticated TLS sessions.  The problem is mitigated
+since attackers needs to get one certificate per site they want to
+attack, and the attacker reveals his tracks by applying for a
+certificate at the CA.  It does not apply to client authenticated TLS
+sessions.  Research presented independently by Dan Kaminsky and Moxie
+Marlinspike at BlackHat09.  Thanks to Tomas Hoger <thoger@redhat.com>
+for providing one part of the patch.  [GNUTLS-SA-2009-4].
+
+** libgnutls: Fix return value of gnutls_certificate_client_get_request_status.
+Before it always returned false.  Reported by Peter Hendrickson
+<pdh@wiredyne.com> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3668>.
+
+** libgnutls: Fix off-by-one size computation error in unknown DN printing.
+The error resulted in truncated strings when printing unknown OIDs in
+X.509 certificate DNs.  Reported by Tim Kosse
+<tim.kosse@filezilla-project.org> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3651>.
+
+** libgnutls: Return correct bit lengths of some MPIs.
+gnutls_dh_get_prime_bits, gnutls_rsa_export_get_modulus_bits, and
+gnutls_dh_get_peers_public_bits.  Before the reported value was
+overestimated.  Reported by Peter Hendrickson <pdh@wiredyne.com> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3607>.
+
+** libgnutls: Avoid internal error when invoked after GNUTLS_E_AGAIN.
+Report and patch by Tim Kosse <tim.kosse@filezilla-project.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3671>
+and
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3670>.
+
+** libgnutls: Relax checking of required libtasn1/libgcrypt versions.
+Before we required that the runtime library used the same (or more
+recent) libgcrypt/libtasn1 as it was compiled with.  Now we just check
+that the runtime usage is above the minimum required.  Reported by
+Marco d'Itri <md@linux.it> via Andreas Metzler
+<ametzler@downhill.at.eu.org> in <http://bugs.debian.org/540449>.
+
+** minitasn1: Internal copy updated to libtasn1 v2.3.
+
+** tests: Fix failure in "chainverify" because a certificate have expired.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.8.1 (released 2009-06-10)
+
+** libgnutls: Fix crash in gnutls_global_init after earlier init/deinit cycle.
+Forwarded by Martin von Gagern <Martin.vGagern@gmx.net> from
+<http://bugs.gentoo.org/272388>.
+
+** libgnutls: Fix PKCS#12 decryption from password.
+The encryption key derived from the password was incorrect for (on
+average) 1 in every 128 input for random inputs.  Reported by "Kukosa,
+Tomas" <tomas.kukosa@siemens-enterprise.com> in
+<http://permalink.gmane.org/gmane.network.gnutls.general/1663>.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.8.0 (released 2009-05-27)
 
 ** doc: Fix gnutls_dh_get_prime_bits.  Fix error codes and algorithm lists.
