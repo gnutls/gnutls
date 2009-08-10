@@ -109,7 +109,7 @@ upload:
 
 web:
 	cd doc && ../build-aux/gendocs.sh --html "--css-include=texinfo.css" \
-		-o ../$(htmldir)/devel/manual/ $(PACKAGE) $(PACKAGE_NAME)
+		-o ../$(htmldir)/devel/manual/ $(PACKAGE) "$(PACKAGE_NAME)"
 	cd doc/doxygen && doxygen && cd ../.. && cp -v doc/doxygen/html/* $(htmldir)/devel/doxygen/ && cd doc/doxygen/latex && make refman.pdf && cd ../../../ && cp doc/doxygen/latex/refman.pdf $(htmldir)/devel/doxygen/$(PACKAGE).pdf
 	cp -v doc/reference/html/*.html doc/reference/html/*.png doc/reference/html/*.devhelp doc/reference/html/*.css $(htmldir)/devel/reference/
 	cp -v doc/cyclo/cyclo-$(PACKAGE).html $(htmldir)/cyclo/
