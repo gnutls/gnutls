@@ -37,6 +37,12 @@ gnutls_dh_get_peers_public_bits.  Before the reported value was
 overestimated.  Reported by Peter Hendrickson <pdh@wiredyne.com> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3607>.
 
+** libgnutls: Avoid internal error when invoked after GNUTLS_E_AGAIN.
+Report and patch by Tim Kosse <tim.kosse@filezilla-project.org> in
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3671>
+and
+<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3670>.
+
 ** minitasn1: Internal copy updated to libtasn1 v2.3.
 
 ** tests: Fix failure in "chainverify" because a certificate have expired.
