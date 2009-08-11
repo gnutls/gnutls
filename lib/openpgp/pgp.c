@@ -559,7 +559,7 @@ gnutls_openpgp_crt_get_revoked_status (gnutls_openpgp_crt_t key)
 
 /**
  * gnutls_openpgp_crt_check_hostname - compare hostname with the key's hostname
- * @key: should contain an #gnutls_openpgp_crt_t structure
+ * @key: should contain a #gnutls_openpgp_crt_t structure
  * @hostname: A null terminated string that contains a DNS name
  *
  * This function will check if the given key's owner matches the

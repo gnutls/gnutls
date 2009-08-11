@@ -391,7 +391,7 @@ freeall:
 
 /**
   * gnutls_srp_free_client_credentials - Used to free an allocated gnutls_srp_client_credentials_t structure
-  * @sc: is an #gnutls_srp_client_credentials_t structure.
+  * @sc: is a #gnutls_srp_client_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
@@ -407,7 +407,7 @@ gnutls_srp_free_client_credentials (gnutls_srp_client_credentials_t sc)
 
 /**
   * gnutls_srp_allocate_client_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
-  * @sc: is a pointer to an #gnutls_srp_server_credentials_t structure.
+  * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate it.
@@ -428,7 +428,7 @@ gnutls_srp_allocate_client_credentials (gnutls_srp_client_credentials_t * sc)
 
 /**
   * gnutls_srp_set_client_credentials - Used to set the username/password, in a gnutls_srp_client_credentials_t structure
-  * @res: is an #gnutls_srp_client_credentials_t structure.
+  * @res: is a #gnutls_srp_client_credentials_t structure.
   * @username: is the user's userid
   * @password: is the user's password
   *
@@ -468,7 +468,7 @@ gnutls_srp_set_client_credentials (gnutls_srp_client_credentials_t res,
 
 /**
   * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_server_credentials_t structure
-  * @sc: is an #gnutls_srp_server_credentials_t structure.
+  * @sc: is a #gnutls_srp_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
@@ -485,7 +485,7 @@ gnutls_srp_free_server_credentials (gnutls_srp_server_credentials_t sc)
 
 /**
   * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
-  * @sc: is a pointer to an #gnutls_srp_server_credentials_t structure.
+  * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus this
   * helper function is provided in order to allocate it.
@@ -506,7 +506,7 @@ gnutls_srp_allocate_server_credentials (gnutls_srp_server_credentials_t * sc)
 
 /**
   * gnutls_srp_set_server_credentials_file - Used to set the password files, in a gnutls_srp_server_credentials_t structure
-  * @res: is an #gnutls_srp_server_credentials_t structure.
+  * @res: is a #gnutls_srp_server_credentials_t structure.
   * @password_file: is the SRP password file (tpasswd)
   * @password_conf_file: is the SRP password conf file (tpasswd.conf)
   *

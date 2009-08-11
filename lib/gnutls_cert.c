@@ -46,7 +46,7 @@
 
 /**
   * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials_t structure
-  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @sc: is a #gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the keys and the certificates associated
   * with the given credentials. This function must not be called when a
@@ -87,7 +87,7 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 
 /**
   * gnutls_certificate_free_cas - Used to free all the CAs from a gnutls_certificate_credentials_t structure
-  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @sc: is a #gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the CAs associated
   * with the given credentials. Servers that do not use
@@ -114,7 +114,7 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 
 /**
   * gnutls_certificate_get_x509_cas - Used to export all the CAs from a gnutls_certificate_credentials_t structure
-  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @sc: is a #gnutls_certificate_credentials_t structure.
   * @x509_ca_list: will point to the CA list. Should be treated as constant
   * @ncas: the number of CAs
   *
@@ -134,7 +134,7 @@ gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
 
 /**
   * gnutls_certificate_get_x509_crls - Used to export all the CRLs from a gnutls_certificate_credentials_t structure
-  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @sc: is a #gnutls_certificate_credentials_t structure.
   * @x509_crl_list: the exported CRL list. Should be treated as constant
   * @ncrls: the number of exported CRLs
   *
@@ -156,7 +156,7 @@ gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
 
 /**
  * gnutls_certificate_get_openpgp_keyring - export keyring from a #gnutls_certificate_credentials_t
- * @sc: is an #gnutls_certificate_credentials_t structure.
+ * @sc: is a #gnutls_certificate_credentials_t structure.
  * @keyring: the exported keyring. Should be treated as constant
  *
  * This function will export the OpenPGP keyring associated with the
@@ -175,7 +175,7 @@ gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc,
 
 /**
   * gnutls_certificate_free_ca_names - Used to free all the CA names from a gnutls_certificate_credentials_t structure
-  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @sc: is a #gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the CA name in the
   * given credentials. Clients may call this to save some memory
@@ -233,7 +233,7 @@ _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params,
 
 /**
   * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials_t structure
-  * @sc: is an #gnutls_certificate_credentials_t structure.
+  * @sc: is a #gnutls_certificate_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
@@ -262,7 +262,7 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 
 /**
   * gnutls_certificate_allocate_credentials - Used to allocate a gnutls_certificate_credentials_t structure
-  * @res: is a pointer to an #gnutls_certificate_credentials_t structure.
+  * @res: is a pointer to a #gnutls_certificate_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus this
   * helper function is provided in order to allocate it.
@@ -346,7 +346,7 @@ _gnutls_selected_cert_supported_kx (gnutls_session_t session,
 
 /**
   * gnutls_certificate_server_set_request - Used to set whether to request a client certificate
-  * @session: is an #gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
   *
   * This function specifies if we (in case of a server) are going

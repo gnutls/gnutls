@@ -678,7 +678,7 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
  * Convert a string to a #gnutls_mac_algorithm_t value.  The names are
  * compared in a case insensitive way.
  *
- * Returns: an #gnutls_mac_algorithm_tid of the specified in a string
+ * Returns: a #gnutls_mac_algorithm_tid of the specified in a string
  *   MAC algorithm, or %GNUTLS_MAC_UNKNOWN on failures.
  **/
 gnutls_mac_algorithm_t
@@ -1655,7 +1655,7 @@ gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
  *
  * The names are compared in a case insensitive way.
  *
- * Returns: an #gnutls_certificate_type_t for the specified in a
+ * Returns: a #gnutls_certificate_type_t for the specified in a
  *   string certificate type, or %GNUTLS_CRT_UNKNOWN on error.
  **/
 gnutls_certificate_type_t
@@ -1971,7 +1971,7 @@ gnutls_pk_list (void)
  * compared in a case insensitive way.  For example,
  * gnutls_pk_get_id("RSA") will return %GNUTLS_PK_RSA.
  *
- * Returns: an #gnutls_pk_algorithm_tid of the specified in a string
+ * Returns: a #gnutls_pk_algorithm_tid of the specified in a string
  *   public key algorithm, or %GNUTLS_PK_UNKNOWN on failures.
  *
  * Since: 2.6.0

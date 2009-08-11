@@ -39,7 +39,7 @@
 
 /**
   * gnutls_psk_free_client_credentials - Used to free an allocated gnutls_psk_client_credentials_t structure
-  * @sc: is an #gnutls_psk_client_credentials_t structure.
+  * @sc: is a #gnutls_psk_client_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus this
   * helper function is provided in order to free (deallocate) it.
@@ -54,7 +54,7 @@ gnutls_psk_free_client_credentials (gnutls_psk_client_credentials_t sc)
 
 /**
   * gnutls_psk_allocate_client_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
-  * @sc: is a pointer to an #gnutls_psk_server_credentials_t structure.
+  * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus this
   * helper function is provided in order to allocate it.
@@ -74,7 +74,7 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
 
 /**
   * gnutls_psk_set_client_credentials - Used to set the username/password, in a gnutls_psk_client_credentials_t structure
-  * @res: is an #gnutls_psk_client_credentials_t structure.
+  * @res: is a #gnutls_psk_client_credentials_t structure.
   * @username: is the user's zero-terminated userid
   * @key: is the user's key
   * @format: indicate the format of the key, either
@@ -148,7 +148,7 @@ error:
 
 /**
  * gnutls_psk_free_server_credentials - Used to free an allocated gnutls_psk_server_credentials_t structure
- * @sc: is an #gnutls_psk_server_credentials_t structure.
+ * @sc: is a #gnutls_psk_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to free (deallocate) it.
@@ -162,7 +162,7 @@ gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t sc)
 
 /**
  * gnutls_psk_allocate_server_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
- * @sc: is a pointer to an #gnutls_psk_server_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
@@ -183,7 +183,7 @@ gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
 
 /**
  * gnutls_psk_set_server_credentials_file - Used to set the password files, in a gnutls_psk_server_credentials_t structure
- * @res: is an #gnutls_psk_server_credentials_t structure.
+ * @res: is a #gnutls_psk_server_credentials_t structure.
  * @password_file: is the PSK password file (passwd.psk)
  *
  * This function sets the password file, in a
@@ -222,7 +222,7 @@ gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
 
 /**
  * gnutls_psk_set_server_credentials_hint - Set a identity hint, in a %gnutls_psk_server_credentials_t structure
- * @res: is an #gnutls_psk_server_credentials_t structure.
+ * @res: is a #gnutls_psk_server_credentials_t structure.
  * @hint: is the PSK identity hint string
  *
  * This function sets the identity hint, in a

@@ -653,7 +653,7 @@ gnutls_ia_handshake (gnutls_session_t session)
 
 /**
  * gnutls_ia_allocate_client_credentials - Used to allocate an gnutls_ia_server_credentials_t structure
- * @sc: is a pointer to an #gnutls_ia_server_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_ia_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
@@ -679,7 +679,7 @@ gnutls_ia_allocate_client_credentials (gnutls_ia_client_credentials_t * sc)
 
 /**
  * gnutls_ia_free_client_credentials - Used to free an allocated #gnutls_ia_client_credentials_t structure
- * @sc: is an #gnutls_ia_client_credentials_t structure.
+ * @sc: is a #gnutls_ia_client_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to free (deallocate) it.
@@ -763,7 +763,7 @@ gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t cred)
 
 /**
  * gnutls_ia_allocate_server_credentials - Used to allocate an gnutls_ia_server_credentials_t structure
- * @sc: is a pointer to an #gnutls_ia_server_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_ia_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
@@ -789,7 +789,7 @@ gnutls_ia_allocate_server_credentials (gnutls_ia_server_credentials_t * sc)
 
 /**
  * gnutls_ia_free_server_credentials - Used to free an allocated #gnutls_ia_server_credentials_t structure
- * @sc: is an #gnutls_ia_server_credentials_t structure.
+ * @sc: is a #gnutls_ia_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to free (deallocate) it.
@@ -825,7 +825,7 @@ gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc)
  * client, and to get a new AVP to send to the client.  It can also be
  * used to instruct the TLS/IA handshake to do go into the
  * Intermediate or Final phases.  It return a negative error code, or
- * an #gnutls_ia_apptype_t message type.
+ * a #gnutls_ia_apptype_t message type.
  *
  * The callback may invoke gnutls_ia_permute_inner_secret() to mix any
  * generated session keys with the TLS/IA inner secret.
