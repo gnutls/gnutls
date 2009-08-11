@@ -35,7 +35,7 @@
 
 /**
   * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials_t structure
-  * @sc: is an #gnutls_anon_server_credentials_t structure.
+  * @sc: is a #gnutls_anon_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus this
   * helper function is provided in order to free (deallocate) it.
@@ -49,7 +49,7 @@ gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
 
 /**
   * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials_t structure
-  * @sc: is a pointer to an #gnutls_anon_server_credentials_t structure.
+  * @sc: is a pointer to a #gnutls_anon_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus this
   * helper function is provided in order to allocate it.
@@ -69,7 +69,7 @@ gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
 
 /**
   * gnutls_anon_free_client_credentials - Used to free an allocated gnutls_anon_client_credentials_t structure
-  * @sc: is an #gnutls_anon_client_credentials_t structure.
+  * @sc: is a #gnutls_anon_client_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus this
   * helper function is provided in order to free (deallocate) it.
@@ -84,7 +84,7 @@ static const gnutls_anon_client_credentials_t anon_dummy = &anon_dummy_struct;
 
 /**
  * gnutls_anon_allocate_client_credentials - Used to allocate a credentials structure
- * @sc: is a pointer to an #gnutls_anon_client_credentials_t structure.
+ * @sc: is a pointer to a #gnutls_anon_client_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to allocate it.

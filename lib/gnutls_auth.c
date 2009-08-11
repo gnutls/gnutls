@@ -167,7 +167,7 @@ gnutls_credentials_set (gnutls_session_t session,
   * used to access the authentication data.
   *
   * Returns: The type of credentials for the current authentication
-  *   schema, an #gnutls_credentials_type_t type.
+  *   schema, a #gnutls_credentials_type_t type.
   **/
 gnutls_credentials_type_t
 gnutls_auth_get_type (gnutls_session_t session)
@@ -192,7 +192,7 @@ gnutls_auth_get_type (gnutls_session_t session)
   * to access authentication data.
   *
   * Returns: The type of credentials for the server authentication
-  *   schema, an #gnutls_credentials_type_t type.
+  *   schema, a #gnutls_credentials_type_t type.
   **/
 gnutls_credentials_type_t
 gnutls_auth_server_get_type (gnutls_session_t session)
@@ -212,7 +212,7 @@ gnutls_auth_server_get_type (gnutls_session_t session)
   * to access authentication data.
   *
   * Returns: The type of credentials for the client authentication
-  *   schema, an #gnutls_credentials_type_t type.
+  *   schema, a #gnutls_credentials_type_t type.
   **/
 gnutls_credentials_type_t
 gnutls_auth_client_get_type (gnutls_session_t session)

@@ -66,7 +66,7 @@ _gnutls_session_cert_type_set (gnutls_session_t session,
  *
  * Get currently used cipher.
  *
- * Returns: the currently used cipher, an #gnutls_cipher_algorithm_t
+ * Returns: the currently used cipher, a #gnutls_cipher_algorithm_t
  *   type.
  **/
 gnutls_cipher_algorithm_t
