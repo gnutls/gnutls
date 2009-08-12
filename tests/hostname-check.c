@@ -782,9 +782,9 @@ doit (void)
 
   ret = gnutls_x509_crt_check_hostname (cert, "foo.example.org");
   if (ret)
-    success ("Hostname incorrectly matches (%d)\n", ret);
+    fail ("Hostname incorrectly matches (%d)\n", ret);
   else
-    fail ("Hostname correctly does not match (%d)\n", ret);
+    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (cert, "bar.example.org");
   if (ret)
