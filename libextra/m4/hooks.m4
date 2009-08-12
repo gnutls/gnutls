@@ -29,4 +29,7 @@ AC_DEFUN([LIBGNUTLS_EXTRA_HOOKS],
     enable_openssl=$enableval, enable_openssl=yes)
   AC_MSG_RESULT($enable_openssl)
   AM_CONDITIONAL(ENABLE_OPENSSL, test "$enable_openssl" = "yes")
+
+  # We link to ../lib's gnulib, which needs -lws2_32 via LIBSOCKET in Makefile.am.
+  gl_SOCKETS
 ])
