@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I ../lib/m4
+ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I ../lib/m4 -I ../lib/gl/m4
 
 AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS)
 AM_CPPFLAGS = \
