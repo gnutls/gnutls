@@ -484,6 +484,70 @@ char pem8[] =
   "WJg09Z7H6I70RPvAYGsK9t9qJ/4TPoYTGYQgsTbVpkv13O54O6jzemd8Zws/xMH5\n"
   "7/q6C7P5OUmGOtfVe7UVDY0taQM=\n" "-----END CERTIFICATE-----\n";
 
+/* Certificate with SAN and CN but for different names. */
+char pem9[] =
+  "X.509 Certificate Information:\n"
+  "	Version: 3\n"
+  "	Serial Number (hex): 4a827d5c\n"
+  "	Issuer: O=GnuTLS hostname check test CA,CN=foo.example.org\n"
+  "	Validity:\n"
+  "		Not Before: Wed Aug 12 08:29:17 UTC 2009\n"
+  "		Not After: Thu Aug 13 08:29:23 UTC 2009\n"
+  "	Subject: O=GnuTLS hostname check test CA,CN=foo.example.org\n"
+  "	Subject Public Key Algorithm: RSA\n"
+  "		Modulus (bits 1024):\n"
+  "			bb:66:43:f5:f2:c5:d7:b6:8c:cc:c5:df:f5:88:3b:b1\n"
+  "			c9:4b:6a:0e:a1:ad:20:50:40:08:80:a1:4f:5c:a3:d0\n"
+  "			f8:6c:cf:e6:3c:f7:ec:04:76:13:17:8b:64:89:22:5b\n"
+  "			c0:dd:53:7c:3b:ed:7c:04:bb:80:b9:28:be:8e:9b:c6\n"
+  "			8e:a0:a5:12:cb:f5:57:1e:a2:e7:bb:b7:33:49:9f:e3\n"
+  "			bb:4a:ae:6a:4d:68:ff:c9:11:e2:32:8d:ce:3d:80:0b\n"
+  "			8d:75:ef:d8:00:81:8f:28:04:03:a0:22:8d:61:04:07\n"
+  "			fa:b6:37:7d:21:07:49:d2:09:61:69:98:90:a3:58:a9\n"
+  "		Exponent (bits 24):\n"
+  "			01:00:01\n"
+  "	Extensions:\n"
+  "		Basic Constraints (critical):\n"
+  "			Certificate Authority (CA): TRUE\n"
+  "		Subject Alternative Name (not critical):\n"
+  "			DNSname: bar.example.org\n"
+  "		Key Purpose (not critical):\n"
+  "			TLS WWW Server.\n"
+  "		Subject Key Identifier (not critical):\n"
+  "			4cb90a9bfa1d34e37edecbd20715fea1dacb6891\n"
+  "	Signature Algorithm: RSA-SHA\n"
+  "	Signature:\n"
+  "		a2:1f:d2:90:5f:c9:1c:6f:92:1d:c5:0b:ac:b0:17:23\n"
+  "		c5:67:46:94:6f:0f:62:7d:66:4c:28:ff:b7:10:73:60\n"
+  "		ae:0e:a2:47:82:83:bb:89:0d:f1:16:5e:f9:5b:35:4b\n"
+  "		ce:ee:5e:d0:ad:b5:8b:cc:37:b3:ac:4d:1b:58:c2:4f\n"
+  "		1c:7f:c6:ac:3d:25:18:67:37:f0:27:11:9b:2c:20:b6\n"
+  "		78:24:21:a6:77:44:e7:1a:e5:f6:bf:45:84:32:81:67\n"
+  "		af:8d:96:26:f7:39:31:6b:63:c5:15:9d:e0:a0:9a:1e\n"
+  "		96:12:cb:ad:85:cb:a7:d4:86:ac:d8:f5:e9:a4:2b:20\n"
+  "Other Information:\n"
+  "	MD5 fingerprint:\n"
+  "		f27b18092c7497f206e70f504eee0f8e\n"
+  "	SHA-1 fingerprint:\n"
+  "		bebdac9d0dd54e8f044642e0f065fae5d75ca6e5\n"
+  "	Public Key Id:\n"
+  "		4cb90a9bfa1d34e37edecbd20715fea1dacb6891\n"
+  "\n"
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIICWTCCAcSgAwIBAgIESoJ9XDALBgkqhkiG9w0BAQUwQjEmMCQGA1UEChMdR251\n"
+  "VExTIGhvc3RuYW1lIGNoZWNrIHRlc3QgQ0ExGDAWBgNVBAMTD2Zvby5leGFtcGxl\n"
+  "Lm9yZzAeFw0wOTA4MTIwODI5MTdaFw0wOTA4MTMwODI5MjNaMEIxJjAkBgNVBAoT\n"
+  "HUdudVRMUyBob3N0bmFtZSBjaGVjayB0ZXN0IENBMRgwFgYDVQQDEw9mb28uZXhh\n"
+  "bXBsZS5vcmcwgZwwCwYJKoZIhvcNAQEBA4GMADCBiAKBgLtmQ/Xyxde2jMzF3/WI\n"
+  "O7HJS2oOoa0gUEAIgKFPXKPQ+GzP5jz37AR2ExeLZIkiW8DdU3w77XwEu4C5KL6O\n"
+  "m8aOoKUSy/VXHqLnu7czSZ/ju0quak1o/8kR4jKNzj2AC41179gAgY8oBAOgIo1h\n"
+  "BAf6tjd9IQdJ0glhaZiQo1ipAgMBAAGjYzBhMA8GA1UdEwEB/wQFMAMBAf8wGgYD\n"
+  "VR0RBBMwEYIPYmFyLmV4YW1wbGUub3JnMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0G\n"
+  "A1UdDgQWBBRMuQqb+h00437ey9IHFf6h2stokTALBgkqhkiG9w0BAQUDgYEAoh/S\n"
+  "kF/JHG+SHcULrLAXI8VnRpRvD2J9Zkwo/7cQc2CuDqJHgoO7iQ3xFl75WzVLzu5e\n"
+  "0K21i8w3s6xNG1jCTxx/xqw9JRhnN/AnEZssILZ4JCGmd0TnGuX2v0WEMoFnr42W\n"
+  "Jvc5MWtjxRWd4KCaHpYSy62Fy6fUhqzY9emkKyA=\n"
+  "-----END CERTIFICATE-----\n";
 
 void
 doit (void)
@@ -707,6 +771,26 @@ doit (void)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
+
+  success ("Testing pem9...\n");
+  data.data = pem9;
+  data.size = strlen (pem9);
+
+  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  if (ret < 0)
+    fail ("gnutls_x509_crt_import: %d\n", ret);
+
+  ret = gnutls_x509_crt_check_hostname (cert, "foo.example.org");
+  if (ret)
+    success ("Hostname incorrectly matches (%d)\n", ret);
+  else
+    fail ("Hostname correctly does not match (%d)\n", ret);
+
+  ret = gnutls_x509_crt_check_hostname (cert, "bar.example.org");
+  if (ret)
+    success ("Hostname correctly matches (%d)\n", ret);
+  else
+    fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   gnutls_x509_crt_deinit (cert);
 
