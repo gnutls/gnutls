@@ -26,7 +26,7 @@ AC_INIT([GnuTLS], [2.9.2], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.10 dist-bzip2 -Wall -Werror -Wno-override])
+AM_INIT_AUTOMAKE([1.10 no-dist-gzip dist-bzip2 -Wall -Werror -Wno-override])
 AM_CONFIG_HEADER(config.h)
 
 AC_MSG_RESULT([***
