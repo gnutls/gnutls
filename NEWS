@@ -9,6 +9,10 @@ See the end for copying conditions.
 Some code that was intended to be removed will cause a read-out-bound.
 Reported by Tomas Hoger <thoger@redhat.com>.
 
+** libgnutls: Fix rare failure in gnutls_x509_crt_import.
+The function may fail incorrectly when an earlier certificate was
+imported to the same gnutls_x509_crt_t structure.
+
 ** libgnutls-extra, libgnutls-openssl: Fix MinGW cross-compiling build error.
 
 ** tests: Made self-test mini-eagain take less time.
