@@ -1,3 +1,80 @@
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.8.3.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Need to add LIBSOCKET because we link to
+	../lib's gnulib library, for mingw.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: (gnutls_x509_crt_import): Re-initialize the ASN.1 structure.  If this is not done here, the next certificate loading may fail
+	because asn1_der_decoding modified the ASN.1 structure.  Triggered
+	by the hostname-check self-test.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Add -I to get to ../lib's gnulib.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/m4/hooks.m4: Add.
+
+2009-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Doc fix.
+
+2009-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_anon_cred.c,
+	lib/gnutls_auth.c, lib/gnutls_cert.c, lib/gnutls_psk.c,
+	lib/gnutls_srp.c, lib/gnutls_state.c, lib/gnutls_x509.c,
+	lib/openpgp/gnutls_openpgp.c, lib/openpgp/pgp.c,
+	libextra/gnutls_ia.c: Fix typos in documentation.  Reported by Daiki
+	Ueno <ueno> in <https://savannah.gnu.org/support/?106969>.
+
+2009-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/mini-eagain.c: reduced transferred data size.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Revert "do not allow null character in DN." This reverts commit 21bc1439e5ce485dfc34ae7da425a7d4126888af.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-08-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.8.2.
