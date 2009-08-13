@@ -19,7 +19,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 WFLAGS ?= --enable-gcc-warnings
-ADDFLAGS ?=
+ADDFLAGS ?= CFLAGS=-g
 CFGFLAGS ?= --enable-gtk-doc $(ADDFLAGS) $(WFLAGS)
 
 INDENT_SOURCES = `find . -name \*.c|grep -v -e ^./lgl -e ^./gl -e ^./src/cfg -e -gaa.c -e asn1_tab.c`
