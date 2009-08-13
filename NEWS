@@ -18,7 +18,7 @@ attack, and the attacker reveals his tracks by applying for a
 certificate at the CA.  It does not apply to client authenticated TLS
 sessions.  Research presented independently by Dan Kaminsky and Moxie
 Marlinspike at BlackHat09.  Thanks to Tomas Hoger <thoger@redhat.com>
-for providing one part of the patch.  [GNUTLS-SA-2009-4].
+for providing one part of the patch.  [GNUTLS-SA-2009-4] [CVE-2009-2730].
 
 ** libgnutls: Fix rare failure in gnutls_x509_crt_import.
 The function may fail incorrectly when an earlier certificate was
