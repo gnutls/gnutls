@@ -890,12 +890,6 @@ doit (void)
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "localhost");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
-
   gnutls_x509_crt_deinit (cert);
 
   gnutls_global_deinit ();
