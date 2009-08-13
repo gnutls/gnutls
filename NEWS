@@ -7,7 +7,8 @@ See the end for copying conditions.
 
 ** libgnutls: Fix patch for NUL in CN/SAN in last release.
 Code intended to be removed would lead to an read-out-bound error in
-some situations.  Reported by Tomas Hoger <thoger@redhat.com>.
+some situations.  Reported by Tomas Hoger <thoger@redhat.com>.  A CVE
+code have been allocated for the vulnerability: [CVE-2009-2730].
 
 ** libgnutls: Fix rare failure in gnutls_x509_crt_import.
 The function may fail incorrectly when an earlier certificate was
