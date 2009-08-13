@@ -62,7 +62,6 @@ typedef struct
  * They are not needed any more. You can simply enable
  * the gnutls_log callback to get error descriptions.
 
-#define IO_DEBUG 3 // define this to check non blocking behaviour
 #define BUFFERS_DEBUG
 #define WRITE_DEBUG
 #define READ_DEBUG

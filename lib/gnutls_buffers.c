@@ -64,10 +64,6 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
-#ifdef IO_DEBUG
-# include <io_debug.h>
-#endif
-
 /**
  * gnutls_transport_set_errno:
  * @session: is a #gnutls_session_t structure.

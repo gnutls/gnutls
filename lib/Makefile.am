@@ -91,7 +91,7 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	gnutls_extensions.h x509_b64.h gnutls_v2_compat.h		\
 	gnutls_datum.h auth_cert.h gnutls_mpi.h gnutls_pk.h		\
 	gnutls_record.h gnutls_cert.h gnutls_constate.h			\
-	gnutls_global.h gnutls_sig.h gnutls_mem.h io_debug.h		\
+	gnutls_global.h gnutls_sig.h gnutls_mem.h			\
 	ext_max_record.h gnutls_session_pack.h gnutls_str.h		\
 	gnutls_state.h gnutls_x509.h ext_cert_type.h			\
 	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
