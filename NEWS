@@ -6,8 +6,8 @@ See the end for copying conditions.
 * Version 2.8.3 (unreleased)
 
 ** libgnutls: Fix patch for NUL in CN/SAN in last release.
-Some code that was intended to be removed will cause a read-out-bound.
-Reported by Tomas Hoger <thoger@redhat.com>.
+Some code that was intended to be removed leads to an read-out-bound
+error.  Reported by Tomas Hoger <thoger@redhat.com>.
 
 ** libgnutls: Fix rare failure in gnutls_x509_crt_import.
 The function may fail incorrectly when an earlier certificate was
