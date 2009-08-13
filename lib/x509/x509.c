@@ -62,6 +62,9 @@ gnutls_x509_crt_init (gnutls_x509_crt_t * cert)
       return _gnutls_asn2err (result);
     }
 
+  /* If you add anything here, be sure to check if it has to be added
+     to gnutls_x509_crt_import as well. */
+
   *cert = tmp;
 
   return 0;			/* success */
@@ -166,7 +169,6 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
 {
   int result = 0, need_free = 0;
   gnutls_datum_t _data;
-  opaque *signature = NULL;
 
   if (cert == NULL)
     {
@@ -209,6 +211,23 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
       need_free = 1;
     }
 
+  if (cert->cert)
+    {
+      /* Any earlier asn1_der_decoding will modify the ASN.1
+	 structure, so we need to replace it with a fresh
+	 structure. */
+      asn1_delete_structure (&cert->cert);
+
+      result = asn1_create_element (_gnutls_get_pkix (),
+				    "PKIX1.Certificate", &cert->cert);
+      if (result != ASN1_SUCCESS)
+	{
+	  result = _gnutls_asn2err (result);
+	  gnutls_assert ();
+	  goto cleanup;
+	}
+    }
+
   result = asn1_der_decoding (&cert->cert, _data.data, _data.size, NULL);
   if (result != ASN1_SUCCESS)
     {
@@ -226,7 +245,6 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
   return 0;
 
 cleanup:
-  gnutls_free (signature);
   if (need_free)
     _gnutls_free_datum (&_data);
   return result;
