@@ -20,6 +20,10 @@ sessions.  Research presented independently by Dan Kaminsky and Moxie
 Marlinspike at BlackHat09.  Thanks to Tomas Hoger <thoger@redhat.com>
 for providing one part of the patch.  [GNUTLS-SA-2009-4].
 
+** libgnutls: Fix rare failure in gnutls_x509_crt_import.
+The function may fail incorrectly when an earlier certificate was
+imported to the same gnutls_x509_crt_t structure.
+
 ** minitasn1: Internal copy updated to libtasn1 v2.3.
 
 ** libgnutls: Fix return value of gnutls_certificate_client_get_request_status.
