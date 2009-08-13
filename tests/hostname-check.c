@@ -549,6 +549,90 @@ char pem9[] =
   "Jvc5MWtjxRWd4KCaHpYSy62Fy6fUhqzY9emkKyA=\n"
   "-----END CERTIFICATE-----\n";
 
+/* Certificate with SAN and CN that match iff you truncate the SAN to
+   the embedded NUL. */
+char pem10[] =
+  "X.509 Certificate Information:\n"
+  "	Version: 3\n"
+  "	Serial Number (hex): 0b5d0a870d09\n"
+  "	Issuer: C=NN,O=Edel Curl Arctic Illudium Research Cloud,CN=Nothern Nowhere Trust Anchor\n"
+  "	Validity:\n"
+  "		Not Before: Tue Aug 04 22:07:33 UTC 2009\n"
+  "		Not After: Sat Oct 21 22:07:33 UTC 2017\n"
+  "	Subject: C=NN,O=Edel Curl Arctic Illudium Research Cloud,CN=localhost\n"
+  "	Subject Public Key Algorithm: RSA\n"
+  "		Modulus (bits 1024):\n"
+  "			be:67:3b:b4:ea:c0:85:b4:c3:56:c1:a4:96:23:36:f5\n"
+  "			c6:77:aa:ad:e5:c1:dd:ce:c1:9a:97:07:dd:16:90:eb\n"
+  "			f0:38:b5:95:6b:a6:0f:b9:73:4e:7d:82:57:ab:5f:b5\n"
+  "			ba:5c:a0:48:8c:82:77:fd:67:d8:53:44:61:86:a5:06\n"
+  "			19:bf:73:51:68:2e:1a:0a:c5:05:39:ca:3d:ca:83:ed\n"
+  "			07:fe:ae:b7:73:1d:60:dd:ab:9e:0e:7e:02:f3:68:42\n"
+  "			93:27:c8:5f:c5:fa:cb:a9:84:06:2f:f3:66:bd:de:7d\n"
+  "			29:82:57:47:e4:a9:df:bf:8b:bc:c0:46:33:5a:7b:87\n"
+  "		Exponent (bits 24):\n"
+  "			01:00:01\n"
+  "	Extensions:\n"
+  "		Subject Alternative Name (not critical):\n"
+  "warning: SAN contains an embedded NUL, replacing with '!'\n"
+  "			DNSname: localhost!h\n"
+  "		Key Usage (not critical):\n"
+  "			Key encipherment.\n"
+  "		Key Purpose (not critical):\n"
+  "			TLS WWW Server.\n"
+  "		Subject Key Identifier (not critical):\n"
+  "			0c37a3db0f73b3388a69d36eb3a7d6d8774eda67\n"
+  "		Authority Key Identifier (not critical):\n"
+  "			126b24d24a68b7a1b01ccdbfd64ccc405b7fe040\n"
+  "		Basic Constraints (critical):\n"
+  "			Certificate Authority (CA): FALSE\n"
+  "	Signature Algorithm: RSA-SHA\n"
+  "	Signature:\n"
+  "		88:a0:17:77:77:bf:c1:8a:18:4e:a3:94:6e:45:18:31\n"
+  "		fa:2f:7b:1f:ee:95:20:d1:cd:40:df:ee:f0:45:2e:e9\n"
+  "		e6:cf:c8:77:bd:85:16:d7:9f:18:52:78:3f:ea:9c:86\n"
+  "		62:6e:db:90:b0:cd:f1:c1:6f:2d:87:4a:a0:be:b3:dc\n"
+  "		6d:e4:6b:d1:da:b9:10:25:7e:35:1f:1b:aa:a7:09:2f\n"
+  "		84:77:27:b0:48:a8:6d:54:57:38:35:22:34:03:0f:d4\n"
+  "		5d:ab:1c:72:15:b1:d9:89:56:10:12:fb:7d:0d:18:12\n"
+  "		a9:0a:38:dc:93:cf:69:ff:75:86:9e:e3:6b:eb:92:6c\n"
+  "		55:16:d5:65:8b:d7:9c:5e:4b:82:c8:92:6c:8b:e6:18\n"
+  "		a2:f8:8c:65:aa:b6:eb:23:ed:cb:99:db:fc:8b:8e:1d\n"
+  "		7a:39:c9:f5:7b:7f:58:7b:ed:01:6c:3c:40:ec:e3:a9\n"
+  "		5f:c4:3d:cb:81:17:03:6d:2d:d7:bd:00:5f:c4:79:f2\n"
+  "		fb:ab:c6:0e:a2:01:8b:a1:42:73:de:96:29:3e:bf:d7\n"
+  "		d9:51:a7:d4:98:07:7f:f0:f4:cd:00:a1:e1:ac:6c:05\n"
+  "		ac:ab:93:1b:b0:5c:2c:13:ad:ff:27:dc:80:99:34:66\n"
+  "		bd:e3:31:54:d5:b6:3f:ce:d4:08:a3:52:28:61:5e:bd\n"
+  "Other Information:\n"
+  "	MD5 fingerprint:\n"
+  "		0b4d6d944200cdd1639008b24dc0fe0a\n"
+  "	SHA-1 fingerprint:\n"
+  "		ce85660f5451b0cc12f525577f0eb9411a20c76b\n"
+  "	Public Key Id:\n"
+  "		a1d18c15e65c7c4935512eeea7ca5d3e6baad4e1\n"
+  "\n"
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIDQzCCAiugAwIBAgIGC10Khw0JMA0GCSqGSIb3DQEBBQUAMGcxCzAJBgNVBAYT\n"
+  "Ak5OMTEwLwYDVQQKDChFZGVsIEN1cmwgQXJjdGljIElsbHVkaXVtIFJlc2VhcmNo\n"
+  "IENsb3VkMSUwIwYDVQQDDBxOb3RoZXJuIE5vd2hlcmUgVHJ1c3QgQW5jaG9yMB4X\n"
+  "DTA5MDgwNDIyMDczM1oXDTE3MTAyMTIyMDczM1owVDELMAkGA1UEBhMCTk4xMTAv\n"
+  "BgNVBAoMKEVkZWwgQ3VybCBBcmN0aWMgSWxsdWRpdW0gUmVzZWFyY2ggQ2xvdWQx\n"
+  "EjAQBgNVBAMMCWxvY2FsaG9zdDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA\n"
+  "vmc7tOrAhbTDVsGkliM29cZ3qq3lwd3OwZqXB90WkOvwOLWVa6YPuXNOfYJXq1+1\n"
+  "ulygSIyCd/1n2FNEYYalBhm/c1FoLhoKxQU5yj3Kg+0H/q63cx1g3aueDn4C82hC\n"
+  "kyfIX8X6y6mEBi/zZr3efSmCV0fkqd+/i7zARjNae4cCAwEAAaOBizCBiDAWBgNV\n"
+  "HREEDzANggtsb2NhbGhvc3QAaDALBgNVHQ8EBAMCBSAwEwYDVR0lBAwwCgYIKwYB\n"
+  "BQUHAwEwHQYDVR0OBBYEFAw3o9sPc7M4imnTbrOn1th3TtpnMB8GA1UdIwQYMBaA\n"
+  "FBJrJNJKaLehsBzNv9ZMzEBbf+BAMAwGA1UdEwEB/wQCMAAwDQYJKoZIhvcNAQEF\n"
+  "BQADggEBAIigF3d3v8GKGE6jlG5FGDH6L3sf7pUg0c1A3+7wRS7p5s/Id72FFtef\n"
+  "GFJ4P+qchmJu25CwzfHBby2HSqC+s9xt5GvR2rkQJX41HxuqpwkvhHcnsEiobVRX\n"
+  "ODUiNAMP1F2rHHIVsdmJVhAS+30NGBKpCjjck89p/3WGnuNr65JsVRbVZYvXnF5L\n"
+  "gsiSbIvmGKL4jGWqtusj7cuZ2/yLjh16Ocn1e39Ye+0BbDxA7OOpX8Q9y4EXA20t\n"
+  "170AX8R58vurxg6iAYuhQnPelik+v9fZUafUmAd/8PTNAKHhrGwFrKuTG7BcLBOt\n"
+  "/yfcgJk0Zr3jMVTVtj/O1AijUihhXr0=\n"
+  "-----END CERTIFICATE-----\n";
+
 void
 doit (void)
 {
@@ -787,6 +871,26 @@ doit (void)
     success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (cert, "bar.example.org");
+  if (ret)
+    success ("Hostname correctly matches (%d)\n", ret);
+  else
+    fail ("Hostname incorrectly does not match (%d)\n", ret);
+
+  success ("Testing pem10...\n");
+  data.data = pem10;
+  data.size = strlen (pem10);
+
+  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  if (ret < 0)
+    fail ("gnutls_x509_crt_import: %d\n", ret);
+
+  ret = gnutls_x509_crt_check_hostname (cert, "localhost");
+  if (ret)
+    fail ("Hostname incorrectly matches (%d)\n", ret);
+  else
+    success ("Hostname correctly does not match (%d)\n", ret);
+
+  ret = gnutls_x509_crt_check_hostname (cert, "localhost");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
