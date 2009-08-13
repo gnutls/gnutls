@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.8.3 (unreleased)
+* Version 2.8.3 (released 2009-08-13)
 
 ** libgnutls: Fix patch for NUL in CN/SAN in last release.
 Code intended to be removed would lead to an read-out-bound error in
