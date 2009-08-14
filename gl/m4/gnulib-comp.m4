@@ -159,6 +159,15 @@ AC_SUBST([LTALLOCA])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([socket])
   fi
+  # When this module is used, sockets may actually occur as file descriptors,
+  # hence it is worth warning if the modules 'close' and 'ioctl' are not used.
+  m4_ifdef([gl_UNISTD_H_DEFAULTS], [AC_REQUIRE([gl_UNISTD_H_DEFAULTS])])
+  m4_ifdef([gl_SYS_IOCTL_H_DEFAULTS], [AC_REQUIRE([gl_SYS_IOCTL_H_DEFAULTS])])
+  AC_REQUIRE([gl_PREREQ_SYS_H_WINSOCK2])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS=1
+    SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS=1
+  fi
   gl_SYS_SOCKET_MODULE_INDICATOR([socket])
   gl_SOCKETS
   gl_TYPE_SOCKLEN_T
@@ -227,6 +236,9 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_GETTIMEOFDAY
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
+    dnl Even if the 'socket' module is not used here, another part of the
+    dnl application may use it and pass file descriptors that refer to
+    dnl sockets to the ioctl() function. So enable the support for sockets.
     AC_LIBOBJ([ioctl])
     gl_REPLACE_SYS_IOCTL_H
   fi
