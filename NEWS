@@ -95,6 +95,26 @@ No changes since last version.
 ** API and ABI modifications:
 No changes since last version.
 
+* Version 2.8.3 (released 2009-08-13)
+
+** libgnutls: Fix patch for NUL in CN/SAN in last release.
+Code intended to be removed would lead to an read-out-bound error in
+some situations.  Reported by Tomas Hoger <thoger@redhat.com>.  A CVE
+code have been allocated for the vulnerability: [CVE-2009-2730].
+
+** libgnutls: Fix rare failure in gnutls_x509_crt_import.
+The function may fail incorrectly when an earlier certificate was
+imported to the same gnutls_x509_crt_t structure.
+
+** libgnutls-extra, libgnutls-openssl: Fix MinGW cross-compiling build error.
+
+** tests: Made self-test mini-eagain take less time.
+
+** doc: Typo fixes.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.8.2 (released 2009-08-10)
 
 ** libgnutls: Fix problem with NUL bytes in X.509 CN and SAN fields.
