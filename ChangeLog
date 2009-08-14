@@ -1,3 +1,504 @@
+2009-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.2.
+
+2009-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add 2.8.3 entry.
+
+2009-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/close.m4, gl/m4/fclose.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/sys_ioctl_h.m4, gl/m4/sys_socket_h.m4,
+	gl/m4/unistd_h.m4, gl/tests/Makefile.am, gl/tests/sys_ioctl.in.h,
+	gl/tests/test-stdio.c, gl/tests/test-stdlib.c,
+	gl/tests/test-string.c, gl/tests/test-unistd.c,
+	gl/tests/test-version-etc.sh, gl/unistd.in.h, gl/vasnprintf.c,
+	lib/gl/Makefile.am, lib/gl/m4/sys_socket_h.m4,
+	lib/gl/m4/threadlib.m4, lib/gl/m4/unistd_h.m4,
+	lib/gl/tests/test-stdio.c, lib/gl/tests/test-stdlib.c,
+	lib/gl/tests/test-string.c, lib/gl/tests/test-unistd.c,
+	lib/gl/unistd.in.h, lib/gl/vasnprintf.c: Update gnulib files.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/test-version-etc.sh: Update gnulib files.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/test-version-etc.sh: Update gnulib files.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Don't generate gzip archives.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, lib/gnutls_buffers.c, lib/gnutls_int.h,
+	lib/io_debug.h: Remove io_debug.h stuff, it is superseded by
+	self-tests like mini-eagain.c.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: (gnutls_x509_crt_import): Re-initialize the ASN.1 structure.  If this is not done here, the next certificate loading may fail
+	because asn1_der_decoding modified the ASN.1 structure.  Triggered
+	by the hostname-check self-test.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Revert "Always build vc checkouts with debugging." This reverts commit b68235be4d1ff7739456e0c5d8c28c6e96e15a14.  It
+	breaks because -Wdisabled-optimizations will cause an error when
+	optimizations are disabled.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Always build vc checkouts with debugging.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check.c: Fix.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check.c: Add another SAN/CN collision test.
+	Reported by Daniel Stenberg <daniel@haxx.se> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1735>.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check.c: Fix logic.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check.c: Test when SAN and CN differs.  Inspired by
+	report by Daniel Stenberg <daniel@haxx.se> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1734>.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am, libextra/gl/m4/sockets.m4: Use include
+	instead of copy.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gl/m4/sockets.m4: Add, needed for -lws2_32 in libextra.
+
+2009-08-12  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/m4/hooks.m4: Add.
+
+2009-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Doc fix.
+
+2009-08-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_anon_cred.c,
+	lib/gnutls_auth.c, lib/gnutls_cert.c, lib/gnutls_psk.c,
+	lib/gnutls_srp.c, lib/gnutls_state.c, lib/gnutls_x509.c,
+	lib/openpgp/gnutls_openpgp.c, lib/openpgp/pgp.c,
+	libextra/gnutls_ia.c: Fix typos in documentation.  Reported by Daiki
+	Ueno <ueno> in <https://savannah.gnu.org/support/?106969>.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-comp.m4, gl/m4/sys_select_h.m4, gl/stdio-write.c,
+	gl/sys_select.in.h, gl/tests/gettimeofday.c,
+	gl/tests/test-sys_select.c, gl/tests/test-version-etc.sh,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/stdio-write.c, maint.mk: Update
+	gnulib files.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/Makefile.am: Need to add LIBSOCKET because we link to
+	../lib's gnulib library, for mingw.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/cs.po.in, lib/po/fr.po.in, lib/po/nl.po.in,
+	lib/po/pl.po.in, lib/po/sv.po.in: Sync with TP.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add 2.8.x news entries.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix usage.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Copy cyclomatic code complexity charts too.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c: Look only for latest _required_
+	libgcrypt/libtasn1 version.  Reported by Marco d'Itri <md@linux.it> via Andreas Metzler
+	<ametzler@downhill.at.eu.org> as Debian BTS #540449.
+
+2009-08-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : commit c529f792e4c899080eb1f6e104c8552fa0770356 Author: Nikos
+	Mavrogiannopoulos <nmav@gnutls.org> Date:   Sat Aug 8 09:06:57 2009
+	+0300
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Check for NUL in SANs and replace accordingly.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/hostname-check.README,
+	tests/hostname-check.c: Move comment into source.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Refuse to return DNs with embedded NULs which
+	breaks other code.  Problem published by Dan Kaminsky and Moxie Marlinspike at
+	BlackHat09.
+
+2009-08-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Revert everything since last release, to allow
+	minimal patch to be applied.
+
+2009-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Fix invocation of rfc2253-escape-test.  Reported by Brad Hards <bradh@frogmouth.net> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3750>.
+
+2009-08-06  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/vc-list-files, gl/Makefile.am, gl/error.c, gl/fseeko.c,
+	gl/m4/gnulib-comp.m4, gl/m4/lib-link.m4, gl/m4/stdio_h.m4,
+	gl/m4/unistd_h.m4, gl/socket.c, gl/sockets.c, gl/stdio.in.h,
+	gl/tests/Makefile.am, gl/tests/test-select.c,
+	gl/tests/test-stdio.c, gl/tests/test-stdlib.c,
+	gl/tests/test-string.c, gl/tests/test-unistd.c,
+	gl/tests/test-version-etc.c, gl/tests/test-version-etc.sh,
+	gl/unistd.in.h, gl/version-etc.c, gl/version-etc.h,
+	lib/gl/Makefile.am, lib/gl/fseeko.c, lib/gl/m4/iconv.m4,
+	lib/gl/m4/lib-link.m4, lib/gl/m4/stdio_h.m4, lib/gl/m4/time_h.m4,
+	lib/gl/m4/unistd_h.m4, lib/gl/sockets.c, lib/gl/stdio.in.h,
+	lib/gl/tests/test-stdio.c, lib/gl/tests/test-stdlib.c,
+	lib/gl/tests/test-string.c, lib/gl/tests/test-unistd.c,
+	lib/gl/time.in.h, lib/gl/unistd.in.h, libextra/gl/m4/lib-link.m4,
+	libextra/gl/md5.h, maint.mk: Update gnulib files.
+
+2009-08-05  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/rfc2253-escape-test: Add self-test of RFC
+	2253 escaping.
+
+2009-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Simplify and fix mem leak.
+
+2009-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Don't use fixed size buffer for strings.
+
+2009-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nul-in-x509-names.c: Exit with failure on failure.
+
+2009-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* tests/nul-in-x509-names.c: Fix output.
+
+2009-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.c: Cleanup code.
+
+2009-08-04  Tomas Hoger <thoger@redhat.com>
+
+	* lib/gnutls_str.c, lib/gnutls_str.h, lib/openpgp/pgp.c,
+	lib/x509/rfc2818_hostname.c: GnuTLS vs. NULL chars in CNs Check cert name size in _gnutls_hostname_compare()     This is needed to protect against NULL (\0) characters embedded
+	    in X509 certificates' CNs or subjectAltNames, that can be used
+	    to fool SSL certificate verification as was demonstrated by Moxie
+	Marlinspike on BH USA 2009:
+	http://www.blackhat.com/html/bh-usa-09/bh-usa-09-archives.html#MarlinspikeSigned-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-04  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/nul-in-x509-names.c: Add self-test for
+	NUL in X.509 CN/SAN problem.
+
+2009-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Fix typo.
+
+2009-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Fix expected output, a cert have expired.
+
+2009-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.c: Fix crash.
+
+2009-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/mini-eagain.c: Make it build.
+
+2009-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Drop .c and sort.
+
+2009-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/errors.c, lib/minitasn1/libtasn1.h: Use
+	libtasn1 v2.3.
+
+2009-07-29  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-07-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : commit c02e9f1459330119d2947a4e46fb60c0e12fa32d Author: Nikos
+	Mavrogiannopoulos <nmav@gnutls.org> Date:   Sun Jul 26 15:22:06 2009
+	+0300
+
+2009-07-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/common.c: do not allow null character in DN.
+
+2009-07-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: updated files to be ignored.
+
+2009-07-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/dn.c: Typo fix in test output. Patch by Brad Hards
+	<bradh@frogmouth.net>
+
+2009-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* THANKS: Removed duplicate entry of Daniel and added Fabian, Brad
+	and Daiki.
+
+2009-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-serv-anon.c, doc/examples/ex-serv-export.c,
+	doc/examples/ex-serv-pgp.c, doc/examples/ex-serv-psk.c,
+	doc/examples/ex-serv-srp.c, doc/examples/ex-serv1.c,
+	lib/auth_cert.c, lib/gnutls_buffers.c, lib/gnutls_mpi.c,
+	lib/gnutls_pk.c, lib/gnutls_sig.c, lib/opencdk/stream.c,
+	lib/opencdk/write-packet.c, lib/openpgp/pgp.c,
+	lib/openpgp/privkey.c, lib/x509/privkey_pkcs8.c, src/certtool.c,
+	src/psk.c: Several bug fixes by Fabian Keil (some were modified by
+	me).
+
+2009-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/mini-eagain.c: reduced transferred data size.
+
+2009-07-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_srp.c, lib/gnutls_buffers.c, lib/gnutls_errors.c,
+	lib/gnutls_record.c, lib/gnutls_supplemental.c,
+	lib/opencdk/armor.c, lib/opencdk/keydb.c, lib/opencdk/literal.c,
+	lib/opencdk/read-packet.c, lib/opencdk/sig-check.c,
+	lib/opencdk/stream.c, src/certtool-cfg.c, tests/chainverify.c: Added
+	casts to reduce warnings (based on report by Brad Hards).
+
+2009-07-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: Added more stuff to have a clean status.
+
+2009-07-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* README-alpha: Documentation corrections by Brad Hards.
+
+2009-07-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/crq.c: size_t and unsigned int fixes.
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_str.c: There are cases where those buffers might
+	overlap
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c: Patch by Tim Kosse: "If
+	_gnutls_send_finished fails with GNUTLS_E_AGAIN or GNUTLS_E_AGAIN it
+	eventually gets called a second time.  It however does not call _gnutls_send_handshake with a NULL pointer
+	on repeated calls, ultimately leading to an internal error in
+	_gnutls_handshake_io_send_int."
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.h, lib/gnutls_ui.c: Corrected
+	gnutls_certificate_client_get_request_status(). Based on observation
+	by Peter Hendrickson <pdh@wiredyne.com>.
+
+2009-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c, tests/Makefile.am, tests/mini-eagain.c: 
+	Added bug fix that allows gnutls_record_recv/send resuming from
+	previously interrupted actions. Patch by from Tim Kosse
+	<tim.kosse@filezilla-project.org>.  Added a self test to check those functions in handling interrupted
+	states.
+
+2009-06-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : commit 21a7186bf83084a2bc85bbb7ddb600ccd070f1c2 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Tue Jun 23 23:04:51 2009
+	+0200
+
+2009-06-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Doc fix.
+
+2009-06-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-06-22  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/dn2.c: Add self-test of off-by-one size
+	error.
+
+2009-06-22  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2009-06-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/dn.c: Fix off-by-one size computation that leads to
+	truncated strings.  Reported by Tim Kosse
+	<tim.kosse@filezilla-project.org> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3651>.
+
+2009-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/errno.in.h, gl/getpagesize.c,
+	gl/m4/errno_h.m4, gl/m4/gnulib-comp.m4, gl/m4/memchr.m4,
+	gl/m4/string_h.m4, gl/memchr.valgrind, gl/strerror.c,
+	gl/string.in.h, gl/tests/Makefile.am, gl/tests/getpagesize.c,
+	lib/gl/Makefile.am, lib/gl/errno.in.h, lib/gl/getpagesize.c,
+	lib/gl/m4/errno_h.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/memchr.m4, lib/gl/m4/string_h.m4, lib/gl/memchr.valgrind,
+	lib/gl/string.in.h, lib/gl/tests/Makefile.am,
+	lib/gl/tests/getpagesize.c: Update gnulib files.
+
+2009-06-18  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/m4/hooks.m4: Fix --disable-openssl-compatibility
+	parameter.  Reported by Matthias Drochner <M.Drochner@fz-juelich.de>
+	in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3646>.
+
+2009-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Typo.
+
+2009-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* tests/mpi.c: Fix build error.
+
+2009-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.c: Return proper MPI lengths in bits.  Reported by
+	Peter Hendrickson <pdh@wiredyne.com> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3607>.
+
+2009-06-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : commit fad0d9b3289087dbd56176e7a1ccb498cf5ef099 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Wed Jun 10 17:55:05 2009
+	+0200
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs12_s2k.c: Improve test vectors.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, tests/Makefile.am, tests/pkcs12_s2k_pem.c: Added new
+	self-test pkcs12_s2k_pem.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-06-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/pkcs12_encr.c: Fix PKCS#12 string to key function for
+	1/128 inputs.  Reported by "Kukosa, Tomas"
+	<tomas.kukosa@siemens-enterprise.com> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1663>.
+
+2009-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/getpagesize.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/memchr.m4, gl/m4/mmap-anon.m4, gl/memchr.c,
+	gl/tests/Makefile.am, gl/tests/getpagesize.c,
+	gl/tests/test-memchr.c, gl/tests/zerosize-ptr.h,
+	lib/gl/Makefile.am, lib/gl/m4/getpagesize.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/memchr.m4,
+	lib/gl/m4/mmap-anon.m4, lib/gl/memchr.c, lib/gl/tests/Makefile.am,
+	lib/gl/tests/getpagesize.c, lib/gl/tests/test-memchr.c,
+	lib/gl/tests/zerosize-ptr.h: Update gnulib files.
+
+2009-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-06-09  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-06-09  Simon Josefsson <simon@josefsson.org>
 
 	* gl/m4/gnulib-comp.m4, gl/m4/version-etc.m4,
@@ -178,6 +679,10 @@
 2009-06-01  Simon Josefsson <simon@josefsson.org>
 
 	* gl/m4/manywarnings.m4: Update gnulib files.
+
+2009-05-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/TODO: Added gnutls_dh_get_prime_bits limitation.
 
 2009-05-28  Simon Josefsson <simon@josefsson.org>
 
