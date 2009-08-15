@@ -359,8 +359,8 @@ finish:
 }
 
 static ssize_t
-_gnutls_simple_write (gnutls_session_t session, void *iptr,
-		      size_t sizeOfPtr)
+_gnutls_write (gnutls_session_t session, void *iptr,
+	       size_t sizeOfPtr)
 {
   int i;
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
@@ -706,7 +706,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
        msg.data != NULL && msg.size > 0;
        _gnutls_mbuffer_get_head(send_buffer, &msg))
     {
-      ret = _gnutls_simple_write(session, msg.data, msg.size);
+      ret = _gnutls_write(session, msg.data, msg.size);
 
       if(ret >= 0)
 	{
