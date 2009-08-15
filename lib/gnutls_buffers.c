@@ -711,7 +711,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
 
 	  total += ret;
 	}
-      else if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_AGAIN)
+      else if (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN)
 	{
 	  _gnutls_write_log ("WRITE interrupted: %d bytes left.\n",
 			     (int)send_buffer->byte_length);
