@@ -53,11 +53,11 @@ _gnutls_log (int, const char *fmt, ...)
      void _gnutls_mpi_log (const char *prefix, bigint_t a);
 
 #ifdef C99_MACROS
-#define LEVEL(l, ...) if (_gnutls_log_level >= l || _gnutls_log_level > 9) \
-	_gnutls_log( l, __VA_ARGS__)
+#define LEVEL(l, ...) do { if (_gnutls_log_level >= l || _gnutls_log_level > 9) \
+      _gnutls_log( l, __VA_ARGS__); } while(0)
 
-#define LEVEL_EQ(l, ...) if (_gnutls_log_level == l || _gnutls_log_level > 9) \
-	_gnutls_log( l, __VA_ARGS__)
+#define LEVEL_EQ(l, ...) do { if (_gnutls_log_level == l || _gnutls_log_level > 9) \
+      _gnutls_log( l, __VA_ARGS__); } while(0)
 
 # define _gnutls_debug_log(...) LEVEL(2, __VA_ARGS__)
 # define _gnutls_handshake_log(...) LEVEL(3, __VA_ARGS__)
