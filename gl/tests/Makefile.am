@@ -244,6 +244,15 @@ EXTRA_DIST += test-stdbool.c
 
 ## end   gnulib module stdbool-tests
 
+## begin gnulib module stddef-tests
+
+TESTS += test-stddef
+check_PROGRAMS += test-stddef
+
+EXTRA_DIST += test-stddef.c
+
+## end   gnulib module stddef-tests
+
 ## begin gnulib module stdint-tests
 
 TESTS += test-stdint

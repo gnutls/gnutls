@@ -76,6 +76,7 @@ AC_DEFUN([lgl_INIT],
   gl_SOCKETS
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
+  gl_STDDEF_H
   gl_STDINT_H
   gl_STDIO_H
   gl_STDLIB_H
@@ -271,6 +272,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/sockets.c
   lib/sockets.h
   lib/stdbool.in.h
+  lib/stddef.in.h
   lib/stdint.in.h
   lib/stdio-impl.h
   lib/stdio-write.c
@@ -348,6 +350,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdbool.m4
+  m4/stddef_h.m4
   m4/stdint.m4
   m4/stdint_h.m4
   m4/stdio_h.m4
@@ -386,6 +389,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-snprintf.c
   tests/test-sockets.c
   tests/test-stdbool.c
+  tests/test-stddef.c
   tests/test-stdint.c
   tests/test-stdio.c
   tests/test-stdlib.c
