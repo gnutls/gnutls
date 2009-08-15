@@ -66,6 +66,7 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
+
 /**
  * gnutls_transport_set_errno:
  * @session: is a #gnutls_session_t structure.
