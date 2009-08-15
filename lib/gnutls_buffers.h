@@ -37,7 +37,7 @@ void _gnutls_io_clear_read_buffer (gnutls_session_t);
 int _gnutls_io_clear_peeked_data (gnutls_session_t session);
 
 ssize_t _gnutls_io_write_buffered (gnutls_session_t session,
-				   const gnutls_datum_t *msg);
+				   mbuffer_st *bufel);
 
 int _gnutls_handshake_buffer_get_size (gnutls_session_t session);
 int _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,

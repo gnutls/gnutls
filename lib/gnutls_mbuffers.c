@@ -45,7 +45,6 @@ _gnutls_mbuffer_clear (mbuffer_head_st *buf)
   for(bufel = buf->head; bufel != NULL; bufel = next)
     {
       next = bufel->next;
-      gnutls_free(bufel->msg.data);
       gnutls_free(bufel);
     }
 
@@ -135,7 +134,6 @@ remove_front (mbuffer_head_st *buf)
 
   buf->byte_length -= (bufel->msg.size - bufel->mark);
   buf->length -= 1;
-  gnutls_free(bufel->msg.data);
   gnutls_free(bufel);
 
   if (!buf->head)

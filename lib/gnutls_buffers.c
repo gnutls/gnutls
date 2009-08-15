@@ -666,22 +666,15 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
  */
 ssize_t
 _gnutls_io_write_buffered (gnutls_session_t session,
-			   const gnutls_datum_t *msg)
+			   mbuffer_st *bufel)
 {
   mbuffer_head_st * const send_buffer = &session->internals.record_send_buffer;
-  int ret;
 
-  ret = _gnutls_mbuffer_enqueue (send_buffer, msg);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_free (msg->data);
-      return ret;
-    }
+  _gnutls_mbuffer_enqueue_mbuffer (send_buffer, bufel);
 
   _gnutls_write_log
     ("WRITE: enqueued %d bytes for %p. Total %d bytes.\n",
-     (int)msg->size, session->internals.transport_recv_ptr,
+     (int)bufel->msg.size, session->internals.transport_recv_ptr,
      (int)send_buffer->byte_length);
 
   return _gnutls_io_write_flush (session);
