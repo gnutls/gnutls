@@ -142,7 +142,7 @@ _gnutls_mbuffer_alloc (size_t payload_size)
     }
 
   //payload points after the mbuffer_st structure
-  st->msg.data = st + sizeof (mbuffer_st);
+  st->msg.data = (opaque*)st + sizeof (mbuffer_st);
   st->msg.size = payload_size;
   st->mark = 0;
   st->next = NULL;
