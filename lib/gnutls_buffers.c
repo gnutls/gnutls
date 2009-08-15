@@ -352,7 +352,7 @@ finish:
       _gnutls_read_log ("READ: read %d bytes from %p\n",
 			(int) (sizeOfPtr - left), fd);
 
-      dump_bytes(ptr, sizeOfPtr - left, 0);
+      dump_bytes (ptr, sizeOfPtr - left, 0);
     }
 
   return (sizeOfPtr - left);
@@ -702,16 +702,16 @@ _gnutls_io_write_flush (gnutls_session_t session)
   _gnutls_write_log ("WRITE FLUSH: %d bytes in buffer.\n",
 		     (int)send_buffer->byte_length);
 
-  for (_gnutls_mbuffer_get_head(send_buffer, &msg);
+  for (_gnutls_mbuffer_get_head (send_buffer, &msg);
        msg.data != NULL && msg.size > 0;
-       _gnutls_mbuffer_get_head(send_buffer, &msg))
+       _gnutls_mbuffer_get_head (send_buffer, &msg))
     {
-      ret = _gnutls_write(session, msg.data, msg.size);
+      ret = _gnutls_write (session, msg.data, msg.size);
 
-      if(ret >= 0)
+      if (ret >= 0)
 	{
-	  dump_bytes(msg.data, msg.size, 1);
-	  _gnutls_mbuffer_remove_bytes(send_buffer, ret);
+	  dump_bytes (msg.data, msg.size, 1);
+	  _gnutls_mbuffer_remove_bytes (send_buffer, ret);
 
 	  _gnutls_write_log ("WRITE: wrote %d bytes, %d bytes left.\n",
 			     ret, (int)send_buffer->byte_length);
@@ -729,7 +729,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
 	  _gnutls_write_log ("WRITE error: code %d, %d bytes left.\n",
 			     ret, (int)send_buffer->byte_length);
 
-	  gnutls_assert();
+	  gnutls_assert ();
 	  return ret;
 	}
     }
