@@ -68,11 +68,7 @@ _gnutls_mbuffer_enqueue (mbuffer_head_st *buf, const gnutls_datum_t *msg)
 
   bufel->msg = *msg;
 
-  buf->length++;
-  buf->byte_length += msg->size;
-
-  *(buf->tail) = bufel;
-  buf->tail = &bufel->next;
+  _gnutls_mbuffer_enqueue_mbuffer(buf, bufel);
 
   return 0;
 }
@@ -94,6 +90,18 @@ _gnutls_mbuffer_enqueue_copy (mbuffer_head_st *buf, const gnutls_datum_t *msg)
   memcpy (msg_copy.data, msg->data, msg_copy.size);
 
   return _gnutls_mbuffer_enqueue (buf, &msg_copy);
+}
+
+void
+_gnutls_mbuffer_enqueue_mbuffer (mbuffer_head_st *buf, mbuffer_st *bufel)
+{
+  bufel->next = NULL;
+
+  buf->length++;
+  buf->byte_length += bufel->msg.size - bufel->mark;
+
+  *(buf->tail) = bufel;
+  buf->tail = &bufel->next;
 }
 
 void
@@ -161,4 +169,25 @@ _gnutls_mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
     }
 
   return 0;
+}
+
+mbuffer_st *
+_gnutls_mbuffer_alloc (size_t payload_size)
+{
+  mbuffer_st * st;
+
+  st = gnutls_malloc (payload_size+sizeof (mbuffer_st));
+  if (st == NULL)
+    {
+      gnutls_assert ();
+      return NULL;
+    }
+
+  //payload points after the mbuffer_st structure
+  st->msg.data = st + sizeof (mbuffer_st);
+  st->msg.size = payload_size;
+  st->mark = 0;
+  st->next = NULL;
+
+  return st;
 }
