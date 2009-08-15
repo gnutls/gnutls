@@ -733,148 +733,88 @@ _gnutls_io_write_flush (gnutls_session_t session)
 /* This function writes the data that are left in the
  * Handshake write buffer (ie. because the previous write was
  * interrupted.
+ *
+ * FIXME: This is practically the same as _gnutls_io_write_flush.
  */
 ssize_t
 _gnutls_handshake_io_write_flush (gnutls_session_t session)
 {
-  ssize_t ret;
-  ret = _gnutls_handshake_io_send_int (session, 0, 0, NULL, 0);
-  if (ret < 0)
+  mbuffer_head_st * const send_buffer = &session->internals.handshake_send_buffer;
+  gnutls_datum_t msg;
+  int ret;
+  ssize_t total = 0;
+
+  _gnutls_write_log ("HWRITE FLUSH: %d bytes in buffer.\n",
+		     (int)send_buffer->byte_length);
+
+  for (_gnutls_mbuffer_get_head (send_buffer, &msg);
+       msg.data != NULL && msg.size > 0;
+       _gnutls_mbuffer_get_head (send_buffer, &msg))
     {
-      gnutls_assert ();
-      return ret;
+      ret = _gnutls_send_int (session, GNUTLS_HANDSHAKE,
+			      session->internals.handshake_send_buffer_htype,
+			      msg.data, msg.size);
+
+      if (ret >= 0)
+	{
+	  dump_bytes (msg.data, msg.size, 1);
+	  _gnutls_mbuffer_remove_bytes (send_buffer, ret);
+
+	  _gnutls_write_log ("HWRITE: wrote %d bytes, %d bytes left.\n",
+			     ret, (int)send_buffer->byte_length);
+
+	  total += ret;
+	}
+      else if (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN)
+	{
+	  _gnutls_write_log ("HWRITE interrupted: %d bytes left.\n",
+			     (int)send_buffer->byte_length);
+	  return ret;
+	}
+      else
+	{
+	  _gnutls_write_log ("HWRITE error: code %d, %d bytes left.\n",
+			     ret, (int)send_buffer->byte_length);
+
+	  gnutls_assert ();
+	  return ret;
+	}
     }
 
-  _gnutls_write_log ("HANDSHAKE_FLUSH: written[1] %d bytes\n", (int) ret);
-
-  if (session->internals.handshake_send_buffer.length == 0)
-    {
-      ret = session->internals.handshake_send_buffer_prev_size;	/* done */
-      session->internals.handshake_send_buffer_prev_size = 0;
-    }
-
-  return ret;
+  return total;
 }
 
 
 /* This is a send function for the gnutls handshake 
  * protocol. Just makes sure that all data have been sent.
+ *
+ * FIXME: This is practically the same as _gnutls_io_write_buffered.
  */
 ssize_t
 _gnutls_handshake_io_send_int (gnutls_session_t session,
-			       content_type_t type,
 			       gnutls_handshake_description_t htype,
 			       const void *iptr, size_t n)
 {
-  size_t left;
-  ssize_t ret = 0;
-  const opaque *ptr;
-  ssize_t retval = 0;
+  mbuffer_head_st * const send_buffer = &session->internals.handshake_send_buffer;
+  mbuffer_st *bufel = _gnutls_mbuffer_alloc(n);
 
-  ptr = iptr;
-
-  if (session->internals.handshake_send_buffer.length > 0 && ptr == NULL
-      && n == 0)
+  if(bufel == NULL)
     {
-      gnutls_datum_t bdata;
-
-      /* resuming previously interrupted write
-       */
-      gnutls_assert ();
-
-      /* checking is handled above */
-      _gnutls_buffer_get_datum (&session->internals.handshake_send_buffer,
-				&bdata,
-				session->internals.handshake_send_buffer.
-				length);
-
-      ptr = bdata.data;
-      n = bdata.size;
-
-      type = session->internals.handshake_send_buffer_type;
-      htype = session->internals.handshake_send_buffer_htype;
-
-    }
-  else if (session->internals.handshake_send_buffer.length > 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-#ifdef WRITE_DEBUG
-  else
-    {
-      _gnutls_write_log ("HWRITE: will write %d bytes to %d.\n", n,
-			 gnutls_transport_get_ptr (session));
-
-      dump_bytes(ptr, n, 1);
-    }
-#endif
-
-  if (n == 0)
-    {				/* if we have no data to send */
-      gnutls_assert ();
-      return 0;
-    }
-  else if (ptr == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      gnutls_assert ()
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
+  memcpy(bufel->msg.data, iptr, n);
 
-  left = n;
-  while (left > 0)
-    {
-      ret = _gnutls_send_int (session, type, htype, &ptr[n - left], left);
+  _gnutls_mbuffer_enqueue (send_buffer, bufel);
+  session->internals.handshake_send_buffer_htype = htype;
 
-      if (ret <= 0)
-	{
-	  if (ret == 0)
-	    {
-	      gnutls_assert ();
-	      ret = GNUTLS_E_INTERNAL_ERROR;
-	    }
+  _gnutls_write_log
+    ("HWRITE: enqueued %d. Total %d bytes.\n",
+     (int)bufel->msg.size,
+     (int)send_buffer->byte_length);
 
-	  if (left > 0
-	      && (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN))
-	    {
-	      gnutls_assert ();
-
-	      retval =
-		_gnutls_buffer_append (&session->
-				       internals.handshake_send_buffer,
-				       &ptr[n - left], left);
-	      if (retval < 0)
-		{
-		  gnutls_assert ();
-		  return retval;
-		}
-
-	      session->internals.handshake_send_buffer_prev_size += n - left;
-
-	      session->internals.handshake_send_buffer_type = type;
-	      session->internals.handshake_send_buffer_htype = htype;
-
-	    }
-	  else
-	    {
-	      session->internals.handshake_send_buffer_prev_size = 0;
-	      session->internals.handshake_send_buffer.length = 0;
-	    }
-
-	  gnutls_assert ();
-	  return ret;
-	}
-      left -= ret;
-    }
-
-  retval = n + session->internals.handshake_send_buffer_prev_size;
-
-  session->internals.handshake_send_buffer.length = 0;
-  session->internals.handshake_send_buffer_prev_size = 0;
-
-  return retval;
-
+  return _gnutls_handshake_io_write_flush(session);
 }
 
 /* This is a receive function for the gnutls handshake 

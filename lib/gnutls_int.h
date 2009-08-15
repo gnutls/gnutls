@@ -589,9 +589,7 @@ typedef struct
   /* These buffers are used in the handshake
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();
    */
-  gnutls_buffer handshake_send_buffer;
-  size_t handshake_send_buffer_prev_size;
-  content_type_t handshake_send_buffer_type;
+  mbuffer_head_st handshake_send_buffer;
   gnutls_handshake_description_t handshake_send_buffer_htype;
   content_type_t handshake_recv_buffer_type;
   gnutls_handshake_description_t handshake_recv_buffer_htype;

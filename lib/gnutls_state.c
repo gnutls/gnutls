@@ -301,7 +301,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   _gnutls_mbuffer_init (&(*session)->internals.record_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.record_recv_buffer);
 
-  _gnutls_buffer_init (&(*session)->internals.handshake_send_buffer);
+  _gnutls_mbuffer_init (&(*session)->internals.handshake_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.handshake_recv_buffer);
 
   (*session)->key = gnutls_calloc (1, sizeof (struct gnutls_key_st));

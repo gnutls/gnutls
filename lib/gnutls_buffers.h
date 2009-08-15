@@ -48,14 +48,13 @@ int _gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
 				      opaque ** data_ptr, size_t * length);
 
 #define _gnutls_handshake_io_buffer_clear( session) \
-        _gnutls_buffer_clear( &session->internals.handshake_send_buffer); \
-        _gnutls_buffer_clear( &session->internals.handshake_recv_buffer); \
-        session->internals.handshake_send_buffer_prev_size = 0
+        _gnutls_mbuffer_clear( &session->internals.handshake_send_buffer); \
+        _gnutls_buffer_clear( &session->internals.handshake_recv_buffer);
 
 ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,
 				       gnutls_handshake_description_t, void *,
 				       size_t);
-ssize_t _gnutls_handshake_io_send_int (gnutls_session_t, content_type_t,
+ssize_t _gnutls_handshake_io_send_int (gnutls_session_t,
 				       gnutls_handshake_description_t,
 				       const void *, size_t);
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);

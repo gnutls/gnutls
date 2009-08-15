@@ -1187,8 +1187,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
   session->internals.last_handshake_out = type;
 
   ret =
-    _gnutls_handshake_io_send_int (session, GNUTLS_HANDSHAKE, type,
-				   data, datasize);
+    _gnutls_handshake_io_send_int (session, type, data, datasize);
 
   gnutls_free (data);
 
