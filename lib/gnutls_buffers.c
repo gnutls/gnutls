@@ -670,7 +670,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 {
   mbuffer_head_st * const send_buffer = &session->internals.record_send_buffer;
 
-  _gnutls_mbuffer_enqueue_mbuffer (send_buffer, bufel);
+  _gnutls_mbuffer_enqueue (send_buffer, bufel);
 
   _gnutls_write_log
     ("WRITE: enqueued %d bytes for %p. Total %d bytes.\n",

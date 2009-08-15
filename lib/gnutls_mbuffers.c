@@ -51,48 +51,8 @@ _gnutls_mbuffer_clear (mbuffer_head_st *buf)
   _gnutls_mbuffer_init (buf);
 }
 
-int
-_gnutls_mbuffer_enqueue (mbuffer_head_st *buf, const gnutls_datum_t *msg)
-{
-  mbuffer_st *bufel = gnutls_malloc (sizeof (mbuffer_st));
-
-  if (bufel == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  bufel->next = NULL;
-  bufel->mark = 0;
-
-  bufel->msg = *msg;
-
-  _gnutls_mbuffer_enqueue_mbuffer(buf, bufel);
-
-  return 0;
-}
-
-int
-_gnutls_mbuffer_enqueue_copy (mbuffer_head_st *buf, const gnutls_datum_t *msg)
-{
-  gnutls_datum_t msg_copy;
-
-  msg_copy.data = gnutls_malloc (msg->size);
-
-  if (msg_copy.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  msg_copy.size = msg->size;
-  memcpy (msg_copy.data, msg->data, msg_copy.size);
-
-  return _gnutls_mbuffer_enqueue (buf, &msg_copy);
-}
-
 void
-_gnutls_mbuffer_enqueue_mbuffer (mbuffer_head_st *buf, mbuffer_st *bufel)
+_gnutls_mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
 {
   bufel->next = NULL;
 
