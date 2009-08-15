@@ -793,18 +793,9 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
 ssize_t
 _gnutls_handshake_io_send_int (gnutls_session_t session,
 			       gnutls_handshake_description_t htype,
-			       const void *iptr, size_t n)
+			       mbuffer_st *bufel)
 {
   mbuffer_head_st * const send_buffer = &session->internals.handshake_send_buffer;
-  mbuffer_st *bufel = _gnutls_mbuffer_alloc(n);
-
-  if(bufel == NULL)
-    {
-      gnutls_assert ()
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  memcpy(bufel->msg.data, iptr, n);
 
   _gnutls_mbuffer_enqueue (send_buffer, bufel);
   session->internals.handshake_send_buffer_htype = htype;

@@ -56,6 +56,6 @@ ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,
 				       size_t);
 ssize_t _gnutls_handshake_io_send_int (gnutls_session_t,
 				       gnutls_handshake_description_t,
-				       const void *, size_t);
+				       mbuffer_st *bufel);
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
 ssize_t _gnutls_handshake_io_write_flush (gnutls_session_t session);

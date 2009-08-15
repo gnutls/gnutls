@@ -1135,6 +1135,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
   uint8_t *data;
   uint32_t datasize;
   int pos = 0;
+  mbuffer_st *bufel;
 
   if (i_data == NULL && i_datasize == 0)
     {
@@ -1154,12 +1155,13 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 
   /* first run */
   datasize = i_datasize + HANDSHAKE_HEADER_SIZE;
-  data = gnutls_malloc (datasize);
-  if (data == NULL)
+  bufel = _gnutls_mbuffer_alloc (datasize);
+  if (bufel == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
+  data = bufel->msg.data;
 
   data[pos++] = (uint8_t) type;
   _gnutls_write_uint24 (i_datasize, &data[pos]);
@@ -1186,10 +1188,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 
   session->internals.last_handshake_out = type;
 
-  ret =
-    _gnutls_handshake_io_send_int (session, type, data, datasize);
-
-  gnutls_free (data);
+  ret = _gnutls_handshake_io_send_int (session, type, bufel);
 
   return ret;
 }
