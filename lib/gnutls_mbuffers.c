@@ -149,3 +149,21 @@ _gnutls_mbuffer_alloc (size_t payload_size)
 
   return st;
 }
+
+mbuffer_st*
+_gnutls_mbuffer_realloc (mbuffer_st *bufel, size_t payload_size)
+{
+  mbuffer_st *ret;
+
+  ret = gnutls_realloc_fast (bufel, payload_size+sizeof (mbuffer_st));
+  if (ret == NULL)
+    {
+      gnutls_assert ();
+      return NULL;
+    }
+
+  ret->msg.size = payload_size;
+  ret->msg.data = (opaque*)ret + sizeof (mbuffer_st);
+
+  return ret;
+}

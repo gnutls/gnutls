@@ -39,6 +39,37 @@
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
 
+/* This is a temporary function to be used before the generate_*
+   internal API is changed to use mbuffers. For now we don't avoid the
+   extra alloc + memcpy. */
+static inline int
+send_handshake (gnutls_session_t session, opaque *data, size_t size,
+		gnutls_handshake_description_t type)
+{
+  mbuffer_st *bufel;
+
+  if(data == NULL && size == 0)
+    return _gnutls_send_handshake(session, NULL, type);
+
+  if (data == NULL && size > 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  bufel = _gnutls_handshake_alloc(size);
+  if (bufel == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  memcpy(bufel->msg.data + bufel->mark, data, size);
+
+  return _gnutls_send_handshake(session, bufel, type);
+}
+
+
 /* This file contains important thing for the TLS handshake procedure.
  */
 
@@ -220,9 +251,8 @@ _gnutls_send_server_kx_message (gnutls_session_t session, int again)
 	}
     }
 
-  ret =
-    _gnutls_send_handshake (session, data, data_size,
-			    GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE);
+  ret = send_handshake (session, data, data_size,
+			GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE);
   gnutls_free (data);
 
   if (ret < 0)
@@ -266,9 +296,8 @@ _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
 	  return data_size;
 	}
     }
-  ret =
-    _gnutls_send_handshake (session, data, data_size,
-			    GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
+  ret = send_handshake (session, data, data_size,
+			GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
   gnutls_free (data);
 
   if (ret < 0)
@@ -308,9 +337,8 @@ _gnutls_send_client_kx_message (gnutls_session_t session, int again)
 	  return data_size;
 	}
     }
-  ret =
-    _gnutls_send_handshake (session, data, data_size,
-			    GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
+  ret =  send_handshake (session, data, data_size,
+			 GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
   gnutls_free (data);
 
   if (ret < 0)
@@ -368,9 +396,8 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
 	return 0;
 
     }
-  ret =
-    _gnutls_send_handshake (session, data,
-			    data_size, GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
+  ret = send_handshake (session, data, data_size,
+			GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
   gnutls_free (data);
 
   return ret;
@@ -550,9 +577,8 @@ _gnutls_send_client_certificate (gnutls_session_t session, int again)
   else
     {				/* TLS 1.0 or SSL 3.0 with a valid certificate 
 				 */
-      ret =
-	_gnutls_send_handshake (session, data, data_size,
-				GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+      ret = send_handshake (session, data, data_size,
+			    GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
       gnutls_free (data);
     }
 
@@ -595,9 +621,8 @@ _gnutls_send_server_certificate (gnutls_session_t session, int again)
 	  return data_size;
 	}
     }
-  ret =
-    _gnutls_send_handshake (session, data, data_size,
-			    GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+  ret = send_handshake (session, data, data_size,
+			GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
   gnutls_free (data);
 
   if (ret < 0)

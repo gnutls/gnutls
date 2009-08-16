@@ -34,6 +34,7 @@
 #include "gnutls_compress.h"
 #include "gnutls_cipher.h"
 #include "gnutls_buffers.h"
+#include "gnutls_mbuffers.h"
 #include "gnutls_kx.h"
 #include "gnutls_handshake.h"
 #include "gnutls_num.h"
@@ -74,6 +75,27 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 				  opaque * header, uint16_t header_size,
 				  opaque * dataptr, uint32_t datalen);
 
+
+mbuffer_st*
+_gnutls_handshake_alloc(size_t size)
+{
+  mbuffer_st *ret = _gnutls_mbuffer_alloc (HANDSHAKE_HEADER_SIZE + size);
+
+  if (!ret)
+    return NULL;
+
+  ret->mark = HANDSHAKE_HEADER_SIZE;
+
+  return ret;
+}
+
+mbuffer_st*
+_gnutls_handshake_realloc(mbuffer_st *bufel, size_t size)
+{
+  mbuffer_st *ret = _gnutls_mbuffer_realloc (bufel, HANDSHAKE_HEADER_SIZE + size);
+
+  return ret;
+}
 
 /* Clears the handshake hash buffers and handles.
  */
@@ -646,13 +668,19 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
 static int
 _gnutls_send_finished (gnutls_session_t session, int again)
 {
-  uint8_t data[MAX_VERIFY_DATA_SIZE];
+  mbuffer_st *bufel;
+  opaque *data;
   int ret;
-  int data_size = 0;
-
 
   if (again == 0)
     {
+      bufel = _gnutls_handshake_alloc (36);
+      if (bufel == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+      data = bufel->msg.data + bufel->mark;
 
       /* This is needed in order to hash all the required
        * messages.
@@ -668,13 +696,12 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  ret =
 	    _gnutls_ssl3_finished (session,
 				   session->security_parameters.entity, data);
-	  data_size = 36;
 	}
       else
 	{			/* TLS 1.0+ */
 	  ret = _gnutls_finished (session,
 				  session->security_parameters.entity, data);
-	  data_size = 12;
+	  bufel->msg.size = 12 + bufel->mark;
 	}
 
       if (ret < 0)
@@ -684,37 +711,14 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	}
 
       if (session->internals.finished_func)
-	session->internals.finished_func (session, data, data_size);
-    }
+	session->internals.finished_func (session, data, bufel->msg.size - bufel->mark);
 
-  /* Save data for safe renegotiation. 
-   */
-  if (data_size > MAX_VERIFY_DATA_SIZE)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-    }
-
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
-      session->security_parameters.extensions.client_verify_data_len =
-	data_size;
-
-      memcpy (session->security_parameters.extensions.client_verify_data,
-	      data, data_size);
+      ret = _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_FINISHED);
     }
   else
     {
-      session->security_parameters.extensions.server_verify_data_len =
-	data_size;
-
-      memcpy (session->security_parameters.extensions.server_verify_data,
-	      data, data_size);
+      ret = _gnutls_send_handshake (session, NULL, GNUTLS_HANDSHAKE_FINISHED);
     }
-
-  ret =
-    _gnutls_send_handshake (session, data_size ? data : NULL, data_size,
-			    GNUTLS_HANDSHAKE_FINISHED);
 
   return ret;
 }
@@ -1057,15 +1061,21 @@ static int
 _gnutls_send_empty_handshake (gnutls_session_t session,
 			      gnutls_handshake_description_t type, int again)
 {
-  opaque data = 0;
-  opaque *ptr;
+  mbuffer_st *bufel;
 
   if (again == 0)
-    ptr = &data;
+    {
+      bufel = _gnutls_handshake_alloc (0);
+      if (bufel == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+    }
   else
-    ptr = NULL;
+    bufel = NULL;
 
-  return _gnutls_send_handshake (session, ptr, 0, type);
+  return _gnutls_send_handshake (session, bufel, type);
 }
 
 
@@ -1127,17 +1137,15 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
  * (until it returns ok), with NULL parameters.
  */
 int
-_gnutls_send_handshake (gnutls_session_t session, void *i_data,
-			uint32_t i_datasize,
+_gnutls_send_handshake (gnutls_session_t session, mbuffer_st *bufel,
 			gnutls_handshake_description_t type)
 {
   int ret;
   uint8_t *data;
   uint32_t datasize;
   int pos = 0;
-  mbuffer_st *bufel;
 
-  if (i_data == NULL && i_datasize == 0)
+  if (bufel == NULL)
     {
       /* we are resuming a previously interrupted
        * send.
@@ -1147,28 +1155,15 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 
     }
 
-  if (i_data == NULL && i_datasize > 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
   /* first run */
-  datasize = i_datasize + HANDSHAKE_HEADER_SIZE;
-  bufel = _gnutls_mbuffer_alloc (datasize);
-  if (bufel == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
   data = bufel->msg.data;
+  datasize = bufel->msg.size;
 
   data[pos++] = (uint8_t) type;
-  _gnutls_write_uint24 (i_datasize, &data[pos]);
+  _gnutls_write_uint24 (bufel->msg.size - bufel->mark, &data[pos]);
   pos += 3;
 
-  if (i_datasize > 0)
-    memcpy (&data[pos], i_data, i_datasize);
+  bufel->mark = 0;
 
   _gnutls_handshake_log ("HSK[%p]: %s was sent [%ld bytes]\n",
 			 session, _gnutls_handshake2str (type),
@@ -1182,7 +1177,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
 	 _gnutls_handshake_hash_add_sent (session, type, data, datasize)) < 0)
       {
 	gnutls_assert ();
-	gnutls_free (data);
+	gnutls_free (bufel);
 	return ret;
       }
 
@@ -1946,6 +1941,7 @@ _gnutls_copy_comp_methods (gnutls_session_t session,
 static int
 _gnutls_send_client_hello (gnutls_session_t session, int again)
 {
+  mbuffer_st *bufel = NULL;
   opaque *data = NULL;
   int extdatalen;
   int pos = 0, type;
@@ -1969,12 +1965,13 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* 2 for version, (4 for unix time + 28 for random bytes==GNUTLS_RANDOM_SIZE) 
        */
 
-      data = gnutls_malloc (datalen);
-      if (data == NULL)
+      bufel = _gnutls_handshake_alloc (datalen);
+      if (bufel == NULL)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
+      data = bufel->msg.data + bufel->mark;
 
       extdatalen = MAX_EXT_DATA_LENGTH
 	+
@@ -2007,8 +2004,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       if (hver == GNUTLS_VERSION_UNKNOWN || hver == 0)
 	{
 	  gnutls_assert ();
-	  gnutls_free (data);
-	  gnutls_free (extdata);
+	  gnutls_free (bufel);
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -2074,24 +2070,15 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	  session->security_parameters.entity == GNUTLS_CLIENT &&
 	  gnutls_protocol_get_version (session) == GNUTLS_SSL3)
 	{
-	  ret =
-	    _gnutls_copy_ciphersuites (session, extdata, extdatalen, TRUE);
-	  _gnutls_extension_list_add (session,
-				      GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
-	}
-      else
-	ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen, FALSE);
-
-      if (ret > 0)
-	{
-	  datalen += ret;
-	  data = gnutls_realloc_fast (data, datalen);
-	  if (data == NULL)
+	  datalen += extdatalen;
+	  bufel = _gnutls_handshake_realloc (bufel, datalen);
+	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
+	  data = bufel->msg.data + bufel->mark;
 
 	  memcpy (&data[pos], extdata, ret);
 	  pos += ret;
@@ -2099,10 +2086,9 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	}
       else
 	{
-	  if (ret == 0)
-	    ret = GNUTLS_E_INTERNAL_ERROR;
-	  gnutls_free (data);
-	  gnutls_free (extdata);
+	  if (extdatalen == 0)
+	    extdatalen = GNUTLS_E_INTERNAL_ERROR;
+	  gnutls_free (bufel);
 	  gnutls_assert ();
 	  return ret;
 	}
@@ -2113,25 +2099,24 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       ret = _gnutls_copy_comp_methods (session, extdata, extdatalen);
       if (ret > 0)
 	{
-	  datalen += ret;
-	  data = gnutls_realloc_fast (data, datalen);
-	  if (data == NULL)
+	  datalen += extdatalen;
+	  bufel = _gnutls_handshake_realloc (bufel, datalen);
+	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
+	  data = bufel->msg.data + bufel->mark;
 
-	  memcpy (&data[pos], extdata, ret);
-	  pos += ret;
-
+	  memcpy (&data[pos], extdata, extdatalen);
+	  pos += extdatalen;
 	}
       else
 	{
-	  if (ret == 0)
-	    ret = GNUTLS_E_INTERNAL_ERROR;
-	  gnutls_free (data);
-	  gnutls_free (extdata);
+	  if (extdatalen == 0)
+	    extdatalen = GNUTLS_E_INTERNAL_ERROR;
+	  gnutls_free (bufel);
 	  gnutls_assert ();
 	  return ret;
 	}
@@ -2149,17 +2134,24 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	    type = GNUTLS_EXT_NONE;
 	}
 
-      ret = _gnutls_gen_extensions (session, extdata, extdatalen, type);
+	  if (extdatalen > 0)
+	    {
+	      datalen += extdatalen;
+	      bufel = _gnutls_handshake_realloc (bufel, datalen);
+	      if (bufel == NULL)
+		{
+		  gnutls_assert ();
+		  return GNUTLS_E_MEMORY_ERROR;
+		}
+	      data = bufel->msg.data + bufel->mark;
 
-      if (ret > 0)
-	{
-	  datalen += ret;
-	  data = gnutls_realloc_fast (data, datalen);
-	  if (data == NULL)
+	      memcpy (&data[pos], extdata, extdatalen);
+	    }
+	  else if (extdatalen < 0)
 	    {
 	      gnutls_assert ();
-	      gnutls_free (extdata);
-	      return GNUTLS_E_MEMORY_ERROR;
+	      gnutls_free (bufel);
+	      return extdatalen;
 	    }
 
 	  memcpy (&data[pos], extdata, ret);
@@ -2174,10 +2166,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
     }
 
-  ret =
-    _gnutls_send_handshake (session, data, datalen,
-			    GNUTLS_HANDSHAKE_CLIENT_HELLO);
-  gnutls_free (data);
+  ret = _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_CLIENT_HELLO);
 
   return ret;
 }
@@ -2185,6 +2174,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 static int
 _gnutls_send_server_hello (gnutls_session_t session, int again)
 {
+  mbuffer_st *bufel = NULL;
   opaque *data = NULL;
   opaque extdata[MAX_EXT_DATA_LENGTH];
   int extdatalen;
@@ -2231,12 +2221,13 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	  return extdatalen;
 	}
 
-      data = gnutls_malloc (datalen + extdatalen);
-      if (data == NULL)
+      bufel = _gnutls_handshake_alloc (datalen + extdatalen);
+      if (bufel == NULL)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
+      data = bufel->msg.data + bufel->mark;
 
       data[pos++] =
 	_gnutls_version_get_major (session->security_parameters.version);
@@ -2278,10 +2269,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	}
     }
 
-  ret =
-    _gnutls_send_handshake (session, data, datalen,
-			    GNUTLS_HANDSHAKE_SERVER_HELLO);
-  gnutls_free (data);
+  ret = _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_SERVER_HELLO);
 
   return ret;
 }
@@ -2603,13 +2591,13 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
 static int
 _gnutls_send_supplemental (gnutls_session_t session, int again)
 {
+  mbuffer_st *bufel;
   int ret = 0;
 
   _gnutls_debug_log ("EXT[%p]: Sending supplemental data\n", session);
 
   if (again)
-    ret = _gnutls_send_handshake (session, NULL, 0,
-				  GNUTLS_HANDSHAKE_SUPPLEMENTAL);
+    ret = _gnutls_send_handshake (session, NULL, GNUTLS_HANDSHAKE_SUPPLEMENTAL);
   else
     {
       gnutls_buffer buf;
@@ -2622,9 +2610,18 @@ _gnutls_send_supplemental (gnutls_session_t session, int again)
 	  return ret;
 	}
 
-      ret = _gnutls_send_handshake (session, buf.data, buf.length,
-				    GNUTLS_HANDSHAKE_SUPPLEMENTAL);
+      bufel = _gnutls_handshake_alloc(buf.length);
+      if (bufel == NULL)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      memcpy(bufel->msg.data + bufel->mark, buf.data, buf.length);
       _gnutls_buffer_clear (&buf);
+
+      ret = _gnutls_send_handshake (session, bufel,
+				    GNUTLS_HANDSHAKE_SUPPLEMENTAL);
     }
 
   return ret;

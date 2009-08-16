@@ -33,5 +33,6 @@ void _gnutls_mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel);
 void _gnutls_mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg);
 int  _gnutls_mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes);
 mbuffer_st* _gnutls_mbuffer_alloc (size_t payload_size);
+mbuffer_st* _gnutls_mbuffer_realloc (mbuffer_st *bufel, size_t payload_size);
 
 #endif
