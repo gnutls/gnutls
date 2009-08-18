@@ -38,7 +38,8 @@ VC-tag = git tag -s -m '$(VERSION)' -u '$(gpg_key_ID)'
 VC_LIST = $(build_aux)/vc-list-files -C $(srcdir)
 
 VC_LIST_EXCEPT = \
-  $(VC_LIST) | if test -f $(srcdir)/.x-$@; then grep -vEf $(srcdir)/.x-$@; else grep -v ChangeLog; fi
+  $(VC_LIST) | if test -f $(srcdir)/.x-$@; then grep -vEf $(srcdir)/.x-$@; \
+	       else grep -Ev "$${VC_LIST_EXCEPT_DEFAULT-ChangeLog}"; fi
 
 ifeq ($(origin prev_version_file), undefined)
   prev_version_file = $(srcdir)/.prev-version
@@ -772,19 +773,19 @@ INDENT_SOURCES ?= $(C_SOURCES)
 indent:
 	indent $(INDENT_SOURCES)
 
-# If you have an additional project-specific rule,
-# define it in cfg.mk and set this variable to its name.
-update-copyright-local ?=
-
 # If you want to set UPDATE_COPYRIGHT_* environment variables,
 # put the assignments in this variable.
 update-copyright-env ?=
 
 # Run this rule once per year (usually early in January)
 # to update all FSF copyright year lists in your project.
-update-copyright-exclude-regexp ?= (^|/)COPYING$$
+# If you have an additional project-specific rule,
+# add it in cfg.mk along with a line 'update-copyright: prereq'.
+# By default, exclude all variants of COPYING; you can also
+# add exemptions (such as ChangeLog..* for rotated change logs)
+# in the file .x-update-copyright.
 .PHONY: update-copyright
-update-copyright: $(update-copyright-local)
-	grep -l -w Copyright $$($(VC_LIST_EXCEPT))		\
-	  | grep -v -E '$(update-copyright-exclude-regexp)'	\
+update-copyright:
+	grep -l -w Copyright                                             \
+	  $$(export VC_LIST_EXCEPT_DEFAULT=COPYING && $(VC_LIST_EXCEPT)) \
 	  | $(update-copyright-env) xargs $(build_aux)/$@

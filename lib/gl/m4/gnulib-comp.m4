@@ -63,7 +63,6 @@ AC_DEFUN([lgl_INIT],
   gl_STRING_MODULE_INDICATOR([memchr])
   gl_FUNC_MEMMEM_SIMPLE
   gl_STRING_MODULE_INDICATOR([memmem])
-  gl_FUNC_MEMMOVE
   gl_MINMAX
   gl_MULTIARCH
   gl_HEADER_NETDB
@@ -257,7 +256,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/memchr.c
   lib/memchr.valgrind
   lib/memmem.c
-  lib/memmove.c
   lib/minmax.h
   lib/netdb.in.h
   lib/printf-args.c
@@ -332,7 +330,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/malloc.m4
   m4/memchr.m4
   m4/memmem.m4
-  m4/memmove.m4
   m4/minmax.m4
   m4/mmap-anon.m4
   m4/multiarch.m4
