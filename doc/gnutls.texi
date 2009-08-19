@@ -974,6 +974,7 @@ in @acronym{GnuTLS} are:
 @itemize
 @item Maximum fragment length negotiation
 @item Server name indication
+@item Session tickets
 @end itemize
 
 and they will be discussed in the subsections that follow.
@@ -1004,6 +1005,21 @@ begins within the first handshake packet.  The functions
 @ref{gnutls_server_name_set} and @ref{gnutls_server_name_get} can be
 used to enable this extension, or to retrieve the name sent by a
 client.
+
+@subsection Session Tickets
+@cindex TLS Extensions
+@cindex Session Tickets
+@cindex Ticket
+
+To resume a TLS session the server normally store some state.  This
+complicates deployment, and typical situations the client can cache
+information and send it to the server instead.  The Session Ticket
+extension implements this idea, and it is documented in RFC 4507/5077.
+
+Clients can enable support for TLS tickets with
+@ref{gnutls_session_ticket_enable_client} and servers use
+@ref{gnutls_session_ticket_key_generate} to generate a key and
+@ref{gnutls_session_ticket_enable_server} to enable the extension.
 
 @node Selecting cryptographic key sizes
 @section Selecting Cryptographic Key Sizes
