@@ -206,7 +206,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   int rc;
 
-  if (ver < GNUTLS_TLS1_2)
+  if (!_gnutls_version_has_selectable_prf(ver))
     {
       rc =
 	_gnutls_hash_copy (&td_md5,
@@ -227,7 +227,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
       return rc;
     }
 
-  if (ver < GNUTLS_TLS1_2)
+  if (!_gnutls_version_has_selectable_prf(ver))
     {
       _gnutls_hash_deinit (&td_md5, concat);
       _gnutls_hash_deinit (&td_sha, &concat[16]);
@@ -440,7 +440,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 
   /* Parse the extensions (if any)
    */
-  if (neg_version >= GNUTLS_TLS1)
+  if (_gnutls_version_has_extensions(neg_version))
     {
       ret = _gnutls_parse_extensions (session, GNUTLS_EXT_APPLICATION,
 				      &data[pos], len);
@@ -459,7 +459,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  if (neg_version >= GNUTLS_TLS1)
+  if (_gnutls_version_has_extensions(neg_version))
     {
       ret = _gnutls_parse_extensions (session, GNUTLS_EXT_TLS,
 				      &data[pos], len);
@@ -1584,7 +1584,7 @@ _gnutls_read_server_hello (gnutls_session_t session,
 
   /* Parse extensions.
    */
-  if (version >= GNUTLS_TLS1)
+  if (_gnutls_version_has_extensions(version))
     {
       ret = _gnutls_parse_extensions (session, GNUTLS_EXT_ANY,
 				      &data[pos], len);
@@ -1884,7 +1884,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       /* Generate and copy TLS extensions.
        */
-      if (hver >= GNUTLS_TLS1)
+      if (_gnutls_version_has_extensions(hver))
 	{
 	  extdatalen =
 	    _gnutls_gen_extensions (session, extdata, sizeof (extdata));

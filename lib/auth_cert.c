@@ -1352,7 +1352,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  if (ver == GNUTLS_TLS1_2)
+  if (_gnutls_version_has_selectable_sighash(ver))
     {
       /* read supported hashes */
       int hash_num;
@@ -1526,7 +1526,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
       session->internals.ignore_rdn_sequence == 0)
     size += cred->x509_rdn_sequence.size;
 
-  if (ver == GNUTLS_TLS1_2)
+  if (_gnutls_version_has_selectable_sighash(ver))
     /* Need at least one byte to announce the number of supported hash
        functions (see below).  */
     size += 1;
@@ -1546,7 +1546,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   pdata[2] = DSA_SIGN;		/* only these for now */
   pdata += CERTTYPE_SIZE;
 
-  if (ver == GNUTLS_TLS1_2)
+  if (_gnutls_version_has_selectable_sighash(ver))
     {
       /* Supported hashes (nothing for now -- FIXME). */
       *pdata = 0;

@@ -153,7 +153,7 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
   switch (cert->subject_pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      if (ver < GNUTLS_TLS1_2)
+      if (!_gnutls_version_has_selectable_prf(ver))
 	{
 	  digest_hd_st td_md5;
 
@@ -444,7 +444,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   opaque concat[36];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
-  if (ver < GNUTLS_TLS1_2)
+  if (!_gnutls_version_has_selectable_prf(ver))
     {
       ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
       if (ret < 0)
@@ -464,7 +464,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   if (ret < 0)
     {
       gnutls_assert ();
-      if (ver < GNUTLS_TLS1_2)
+      if (!_gnutls_version_has_selectable_prf(ver))
 	_gnutls_hash_deinit (&td_md5, NULL);
       return ret;
     }
@@ -475,7 +475,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
 		GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, params->data, params->size);
 
-  if (ver < GNUTLS_TLS1_2)
+  if (!_gnutls_version_has_selectable_prf(ver))
     {
       _gnutls_hash_deinit (&td_md5, concat);
       _gnutls_hash_deinit (&td_sha, &concat[16]);

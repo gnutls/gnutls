@@ -1178,6 +1178,67 @@ _gnutls_version_is_supported (gnutls_session_t session,
     return 1;
 }
 
+
+/* This function determines if the version specified has a
+   cipher-suite selected PRF hash function instead of the old
+   hardcoded MD5+SHA1. */
+int
+_gnutls_version_has_selectable_prf (gnutls_protocol_t version)
+{
+  return version == GNUTLS_TLS1_2;
+}
+
+/* This function determines if the version specified has selectable
+   signature/hash functions for certificate authentification. */
+int
+_gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
+{
+  return version == GNUTLS_TLS1_2;
+}
+
+/* This function determines if the version specified has support for
+   TLS extensions. */
+int
+_gnutls_version_has_extensions (gnutls_protocol_t version)
+{
+  switch(version) {
+  case GNUTLS_TLS1_0:
+  case GNUTLS_TLS1_1:
+  case GNUTLS_TLS1_2:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+/* This function determines if the version specified has explicit IVs
+   (for CBC attack prevention). */
+int
+_gnutls_version_has_explicit_iv (gnutls_protocol_t version)
+{
+  switch(version) {
+  case GNUTLS_TLS1_1:
+  case GNUTLS_TLS1_2:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
+/* This function determines if the version specified can have
+   non-minimal padding. */
+int _gnutls_version_has_variable_padding (gnutls_protocol_t version)
+{
+  switch(version) {
+  case GNUTLS_TLS1_0:
+  case GNUTLS_TLS1_1:
+  case GNUTLS_TLS1_2:
+    return 1;
+  default:
+    return 0;
+  }
+}
+
 /* Type to KX mappings */
 gnutls_kx_algorithm_t
 _gnutls_map_kx_get_kx (gnutls_credentials_type_t type, int server)

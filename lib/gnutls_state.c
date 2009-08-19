@@ -903,7 +903,7 @@ _gnutls_PRF (gnutls_session_t session,
   memcpy (s_seed, label, label_size);
   memcpy (&s_seed[label_size], seed, seed_size);
 
-  if (ver >= GNUTLS_TLS1_2)
+  if (_gnutls_version_has_selectable_prf(ver))
     {
       result =
 	_gnutls_P_hash (GNUTLS_MAC_SHA1, secret, secret_size,
