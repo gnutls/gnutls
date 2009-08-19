@@ -357,7 +357,7 @@ _gnutls_session_ticket_send_params (gnutls_session_t session,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  * error code.
  *
- * Since: 2.10.0.
+ * Since: 2.10.0
  **/
 int
 gnutls_session_ticket_key_generate (gnutls_datum_t *key)
@@ -393,7 +393,7 @@ gnutls_session_ticket_key_generate (gnutls_datum_t *key)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  * error code.
  *
- * Since: 2.10.0.
+ * Since: 2.10.0
  **/
 int
 gnutls_session_ticket_enable_client (gnutls_session_t session)
@@ -420,7 +420,7 @@ gnutls_session_ticket_enable_client (gnutls_session_t session)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  * error code.
  *
- * Since: 2.10.0.
+ * Since: 2.10.0
  **/
 int
 gnutls_session_ticket_enable_server (gnutls_session_t session,
