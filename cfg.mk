@@ -115,4 +115,5 @@ web:
 	cp -v doc/cyclo/cyclo-$(PACKAGE).html $(htmldir)/cyclo/
 
 upload-web:
-	cd $(htmldir) && cvs commit -m "Update." manual/ reference/ doxygen/
+	cd $(htmldir) && \
+		cvs commit -m "Update." manual/ reference/ doxygen/ devel/
