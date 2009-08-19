@@ -51,6 +51,12 @@ OpenPGP discussion and improvements.
 David Marín Carreño <davefx@gmail.com>
 Added gnutls_x509_crq_get_key_id.
 
+Daiki Ueno <ueno@unixuser.org>
+Added TLS Session Ticket (RFC 5077) support.
+
+Jonathan Bastien-Filiatrault <joe@x2a.org>
+Fix TLS-version checks.
+
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.
