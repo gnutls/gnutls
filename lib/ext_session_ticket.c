@@ -227,7 +227,7 @@ _gnutls_session_ticket_recv_params (gnutls_session_t session,
 
   if (!session->internals.session_ticket_enable)
     return 0;
-    
+
   if (session->security_parameters.entity == GNUTLS_SERVER)
     {
       struct ticket ticket;
@@ -271,7 +271,7 @@ _gnutls_session_ticket_recv_params (gnutls_session_t session,
 
       DECR_LEN (data_size, MAC_SIZE);
       memcpy (ticket.mac, data, MAC_SIZE);
-	  
+
       ticket.encrypted_state = gnutls_malloc (ticket.encrypted_state_len);
       if (!ticket.encrypted_state)
 	{

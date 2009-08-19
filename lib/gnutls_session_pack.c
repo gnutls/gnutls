@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1091,7 +1091,7 @@ pack_security_parameters (gnutls_session_t session,
 	  session->security_parameters.extensions.session_ticket,
 	  session->security_parameters.extensions.session_ticket_len);
   pos += session->security_parameters.extensions.session_ticket_len;
-  
+
   /* write the total size */
   _gnutls_write_uint32 (pos - init - 4, &packed_session->data[init]);
   packed_session->size += pos - init;

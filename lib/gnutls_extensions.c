@@ -49,7 +49,7 @@ typedef struct
    * < 0 on other error.
    */
   gnutls_ext_recv_func recv_func;
-  
+
   /* this function must return 0 when Not Applicable
    * size of extension data if ok
    * GNUTLS_E_INT_RET_0 if extension data size is zero
