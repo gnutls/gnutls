@@ -1,3 +1,128 @@
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.3.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_session_ticket.c: Typo.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_sig.c: Need gnutls_algorithms.h for prototypes.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Add.
+
+2009-08-18  Jonathan Bastien-Filiatrault <joe@x2a.org>
+
+	* lib/auth_cert.c, lib/gnutls_algorithms.c,
+	lib/gnutls_algorithms.h, lib/gnutls_cipher.c,
+	lib/gnutls_handshake.c, lib/gnutls_sig.c, lib/gnutls_state.c: 
+	Replace explicit version checks with feature checks Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Reformat paragraphs.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, src/cli-gaa.c, src/cli-gaa.h,
+	src/serv-gaa.c, src/serv-gaa.h: Generated.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Typo.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add cross reference.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls-docs.sgml, lib/ext_session_ticket.c: Fix
+	GTK-DOC output.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutls.map: Fix namespace of new APIs.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_session_ticket.c, lib/gnutls_extensions.c,
+	lib/gnutls_session_pack.c: Fix whitespace.
+
+2009-08-19  Daiki Ueno <ueno@unixuser.org>
+
+	* doc/TODO, lib/Makefile.am, lib/ext_session_ticket.c,
+	lib/ext_session_ticket.h, lib/gnutls_constate.c,
+	lib/gnutls_extensions.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_session_pack.c, lib/gnutls_state.c,
+	lib/includes/gnutls/gnutls.h.in, lib/libgnutls.map,
+	lib/m4/hooks.m4, src/cli.c, src/cli.gaa, src/serv.c, src/serv.gaa,
+	tests/resume.c: session ticket support Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix indent rule.
+
+2009-08-19  Daiki Ueno <ueno@unixuser.org>
+
+	* doc/gnutls.texi: internals doc update Hi, When I wrote SessionTicket extension I referred to the manual node
+	"Adding a New TLS Extension", and noticed that it is not up to date.
+	So, here is a patch.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-18  Simon Josefsson <simon@josefsson.org>
+
+	* gl/stdio.in.h, lib/gl/Makefile.am, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/memmove.m4, lib/gl/memmove.c,
+	lib/gl/stdio.in.h, maint.mk: Update gnulib files.
+
+2009-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/stddef_h.m4, lib/gl/m4/stddef_h.m4: Update gnulib files.
+
+2009-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Don't ignore gl/ files!
+
+2009-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/test-stddef.c, lib/gl/tests/test-stddef.c: Update gnulib
+	files.
+
+2009-08-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-comp.m4, gl/m4/wchar.m4,
+	gl/stddef.in.h, gl/stdlib.in.h, gl/string.in.h,
+	gl/tests/Makefile.am, gl/tests/test-stdio.c,
+	gl/tests/test-stdlib.c, gl/tests/test-string.c,
+	gl/tests/test-unistd.c, gl/tests/test-wchar.c, gl/unistd.in.h,
+	lib/gl/Makefile.am, lib/gl/m4/gnulib-comp.m4, lib/gl/m4/wchar.m4,
+	lib/gl/stddef.in.h, lib/gl/stdlib.in.h, lib/gl/string.in.h,
+	lib/gl/tests/Makefile.am, lib/gl/tests/test-stdio.c,
+	lib/gl/tests/test-stdlib.c, lib/gl/tests/test-string.c,
+	lib/gl/tests/test-time.c, lib/gl/tests/test-unistd.c,
+	lib/gl/tests/test-wchar.c, lib/gl/time.in.h, lib/gl/unistd.in.h,
+	maint.mk: Update gnulib files.
+
+2009-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-08-14  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-08-14  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.2.
