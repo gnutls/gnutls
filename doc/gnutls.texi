@@ -1020,6 +1020,8 @@ Clients can enable support for TLS tickets with
 @ref{gnutls_session_ticket_enable_client} and servers use
 @ref{gnutls_session_ticket_key_generate} to generate a key and
 @ref{gnutls_session_ticket_enable_server} to enable the extension.
+Clients resume sessions using the ticket using the normal session
+resume functions (@pxref{Resuming Sessions}).
 
 @node Selecting cryptographic key sizes
 @section Selecting Cryptographic Key Sizes
