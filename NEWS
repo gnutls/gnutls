@@ -5,8 +5,17 @@ See the end for copying conditions.
 
 * Version 2.9.3 (unreleased)
 
+** libgnutls: Support for TLS tickets was contributed by Daiki Ueno.
+The new APIs are gnutls_session_ticket_enable_client,
+gnutls_session_ticket_enable_server, and
+gnutls_session_ticket_key_generate.
+
+** gnutls-cli, gnutls-serv: New parameter --noticket to disable TLS tickets.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_session_ticket_key_generate: ADDED.
+gnutls_session_ticket_enable_client: ADDED.
+gnutls_session_ticket_enable_server: ADDED.
 
 * Version 2.9.2 (released 2009-08-14)
 
