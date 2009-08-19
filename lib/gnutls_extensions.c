@@ -35,6 +35,7 @@
 #include <ext_server_name.h>
 #include <ext_oprfi.h>
 #include <ext_srp.h>
+#include <ext_session_ticket.h>
 #include <gnutls_num.h>
 
 typedef struct
@@ -42,7 +43,18 @@ typedef struct
   const char *name;
   uint16_t type;
   gnutls_ext_parse_type_t parse_type;
+
+  /* this function must return 0 when Not Applicable
+   * size of extension data if ok
+   * < 0 on other error.
+   */
   gnutls_ext_recv_func recv_func;
+  
+  /* this function must return 0 when Not Applicable
+   * size of extension data if ok
+   * GNUTLS_E_INT_RET_0 if extension data size is zero
+   * < 0 on other error.
+   */
   gnutls_ext_send_func send_func;
 } gnutls_extension_entry;
 
@@ -197,7 +209,7 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
   int size;
   uint16_t pos = 0;
   opaque *sdata;
-  int sdata_size;
+  size_t sdata_size;
   size_t i;
 
   if (data_size < 2)
@@ -225,8 +237,11 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 	continue;
 
       size = p->send_func (session, sdata, sdata_size);
-      if (size > 0)
+      if (size > 0 || size == GNUTLS_E_INT_RET_0)
 	{
+	  if (size == GNUTLS_E_INT_RET_0)
+	    size = 0;
+
 	  if (data_size < pos + (size_t) size + 4)
 	    {
 	      gnutls_assert ();
@@ -320,6 +335,16 @@ _gnutls_ext_init (void)
 			     GNUTLS_EXT_TLS,
 			     _gnutls_srp_recv_params,
 			     _gnutls_srp_send_params);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+#endif
+
+#ifdef ENABLE_SESSION_TICKET
+  ret = gnutls_ext_register (GNUTLS_EXTENSION_SESSION_TICKET,
+			      "SESSION_TICKET",
+			      GNUTLS_EXT_TLS,
+			      _gnutls_session_ticket_recv_params,
+			      _gnutls_session_ticket_send_params);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 #endif

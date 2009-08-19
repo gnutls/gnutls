@@ -24,6 +24,9 @@ option (q, quiet) { $quiet = 1 } "Suppress some messages."
 #int nodb;
 option (nodb) { $nodb = 1 } "Does not use the resume database."
 
+#int noticket;
+option (noticket) { $noticket = 1 } "Does not issue session tickets."
+
 #int http;
 option (http) { $http = 1 } "Act as an HTTP Server."
 option (echo) { $http = 0 } "Act as an Echo Server."
@@ -121,7 +124,7 @@ INCOMP ra
 
 init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
-	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $nodb = 0;
+	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $nodb = 0; $noticket = 0;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $x509_crlfile = NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 

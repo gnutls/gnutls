@@ -486,9 +486,12 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
     }
   else
     {				/* RESUME_TRUE */
+      opaque *session_ticket =
+	session->security_parameters.extensions.session_ticket;
       _gnutls_cpy_read_security_parameters (&session->security_parameters,
 					    &session->internals.
 					    resumed_security_parameters);
+      session->security_parameters.extensions.session_ticket = session_ticket;
     }
 
 
@@ -668,9 +671,12 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
     }
   else
     {				/* RESUME_TRUE */
+      opaque *session_ticket =
+	session->security_parameters.extensions.session_ticket;
       _gnutls_cpy_write_security_parameters (&session->security_parameters,
 					     &session->internals.
 					     resumed_security_parameters);
+      session->security_parameters.extensions.session_ticket = session_ticket;
     }
 
   rc = _gnutls_set_write_keys (session);

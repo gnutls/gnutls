@@ -48,6 +48,7 @@
 #include <gnutls_record.h>
 #include <gnutls_state.h>
 #include <ext_srp.h>
+#include <ext_session_ticket.h>
 #include <gnutls_rsa_export.h>	/* for gnutls_get_rsa_params() */
 #include <auth_anon.h>		/* for gnutls_anon_server_credentials_t */
 #include <auth_psk.h>		/* for gnutls_psk_server_credentials_t */
@@ -354,7 +355,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   gnutls_protocol_t adv_version;
   int neg_version;
   int len = datalen;
-  opaque rnd[GNUTLS_RANDOM_SIZE], *suite_ptr, *comp_ptr;
+  opaque rnd[GNUTLS_RANDOM_SIZE], *suite_ptr, *comp_ptr, *session_id;
 
   if (session->internals.v2_hello != 0)
     {				/* version 2.0 */
@@ -399,7 +400,8 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
     }
   DECR_LEN (len, session_id_len);
 
-  ret = _gnutls_server_restore_session (session, &data[pos], session_id_len);
+  session_id = &data[pos];
+  ret = _gnutls_server_restore_session (session, session_id, session_id_len);
   pos += session_id_len;
 
   if (ret == 0)
@@ -466,6 +468,24 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 	{
 	  gnutls_assert ();
 	  return ret;
+	}
+
+      /* resumed by session_ticket extension */
+      if (session->internals.resumed == RESUME_TRUE)
+	{
+	  /* to indicate the client that the current session is resumed */
+	  memcpy (session->internals.resumed_security_parameters.session_id,
+		  session_id, session_id_len);
+	  session->internals.resumed_security_parameters.session_id_size =
+	    session_id_len;
+
+	  session->internals.resumed_security_parameters.max_record_recv_size =
+	    session->security_parameters.max_record_recv_size;
+	  session->internals.resumed_security_parameters.max_record_send_size =
+	    session->security_parameters.max_record_send_size;
+
+	  resume_copy_required_values (session);
+	  return 0;
 	}
     }
 
@@ -1291,6 +1311,7 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
     case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST:
     case GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY:
     case GNUTLS_HANDSHAKE_SUPPLEMENTAL:
+    case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
       ret = length32;
       break;
     default:
@@ -2686,6 +2707,23 @@ _gnutls_handshake_common (gnutls_session_t session)
       ret = _gnutls_recv_handshake_final (session, TRUE);
       IMED_RET ("recv handshake final", ret);
 
+#ifdef ENABLE_SESSION_TICKET
+      switch (STATE)
+	{
+	case STATE0:
+	case STATE40:
+	  if (session->internals.session_ticket_renew)
+	    {
+	      ret = _gnutls_send_new_session_ticket (session, AGAIN(STATE40));
+	      STATE = STATE40;
+	      IMED_RET ("send handshake new session ticket", ret);
+	    }
+	  STATE = STATE0;
+	default:
+	  break;
+	}
+#endif
+
       ret = _gnutls_send_handshake_final (session, FALSE);
       IMED_RET ("send handshake final", ret);
     }
@@ -2694,6 +2732,23 @@ _gnutls_handshake_common (gnutls_session_t session)
 
       ret = _gnutls_send_handshake_final (session, TRUE);
       IMED_RET ("send handshake final 2", ret);
+
+#ifdef ENABLE_SESSION_TICKET
+      switch (STATE)
+	{
+	case STATE0:
+	case STATE41:
+	  if (session->internals.session_ticket_renew)
+	    {
+	      ret = _gnutls_recv_new_session_ticket (session);
+	      STATE = STATE41;
+	      IMED_RET ("recv handshake new session ticket", ret);
+	    }
+	  STATE = STATE0;
+	default:
+	  break;
+	}
+#endif
 
       ret = _gnutls_recv_handshake_final (session, FALSE);
       IMED_RET ("recv handshake final 2", ret);

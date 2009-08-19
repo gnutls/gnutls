@@ -280,7 +280,8 @@ pack_certificate_auth_info (gnutls_session_t session,
   /* calculate the size and allocate the data.
    */
   packed_session->data =
-    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS);
+    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
+		   session->security_parameters.extensions.session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -513,7 +514,8 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
   /* calculate the size and allocate the data.
    */
   packed_session->data =
-    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS);
+    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
+		   session->security_parameters.extensions.session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -618,7 +620,8 @@ pack_anon_auth_info (gnutls_session_t session,
   /* calculate the size and allocate the data.
    */
   packed_session->data =
-    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS);
+    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
+		   session->security_parameters.extensions.session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -781,7 +784,8 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
   /* calculate the size and allocate the data.
    */
   packed_session->data =
-    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS);
+    gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
+		   session->security_parameters.extensions.session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -977,9 +981,11 @@ error:
  *      2 bytes the size of the first name 
  *      x bytes the first name (MAX_SERVER_NAME_SIZE)
  *       and so on...
+ *      2 bytes the session ticket size
+ *      x bytes the session ticket (MAX_SESSION_TICKET_SIZE)
  *
  *           --------------------
- *                MAX: 7+MAX_SRP_USERNAME+MAX_SERVER_NAME_EXTENSIONS*(3+MAX_SERVER_NAME_SIZE)
+ *                MAX: 7+MAX_SRP_USERNAME+MAX_SERVER_NAME_EXTENSIONS*(3+MAX_SERVER_NAME_SIZE)+MAX_SESSION_TICKET_SIZE
  */
 static int
 pack_security_parameters (gnutls_session_t session,
@@ -1077,6 +1083,15 @@ pack_security_parameters (gnutls_session_t session,
 	session->security_parameters.extensions.server_names[i].name_length;
     }
 
+  _gnutls_write_uint16 (session->security_parameters.extensions.
+			session_ticket_len,
+			&packed_session->data[pos]);
+  pos += 2;
+  memcpy (&packed_session->data[pos],
+	  session->security_parameters.extensions.session_ticket,
+	  session->security_parameters.extensions.session_ticket_len);
+  pos += session->security_parameters.extensions.session_ticket_len;
+  
   /* write the total size */
   _gnutls_write_uint32 (pos - init - 4, &packed_session->data[init]);
   packed_session->size += pos - init;
@@ -1109,7 +1124,7 @@ unpack_security_parameters (gnutls_session_t session,
     return GNUTLS_E_INVALID_REQUEST;
 
   /* a simple check for integrity */
-  if (pack_size > MAX_SEC_PARAMS)
+  if (pack_size > MAX_SEC_PARAMS + 2 + MAX_SESSION_TICKET_SIZE)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -1212,5 +1227,18 @@ unpack_security_parameters (gnutls_session_t session,
 	session->internals.resumed_security_parameters.extensions.
 	server_names[i].name_length;
     }
+
+  session->internals.resumed_security_parameters.extensions.
+    session_ticket_len = _gnutls_read_uint16 (&packed_session->data[pos]);
+  pos += 2;
+  session->internals.resumed_security_parameters.extensions.session_ticket =
+    gnutls_malloc (session->internals.resumed_security_parameters.extensions.
+		   session_ticket_len);
+  memcpy (session->internals.resumed_security_parameters.extensions.
+	  session_ticket,
+	  &packed_session->data[pos],
+	  session->internals.resumed_security_parameters.extensions.
+	  session_ticket_len);
+
   return 0;
 }

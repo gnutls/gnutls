@@ -62,6 +62,7 @@ static int debug;
 
 int verbose;
 static int nodb;
+static int noticket;
 int require_cert;
 int disable_client_cert;
 
@@ -78,6 +79,8 @@ char *x509_dsacertfile;
 char *x509_cafile;
 char *dh_params_file;
 char *x509_crlfile = NULL;
+
+gnutls_datum_t session_ticket_key;
 
 /* end of globals */
 
@@ -370,6 +373,10 @@ initialize_session (void)
       gnutls_db_set_store_function (session, wrap_db_store);
       gnutls_db_set_ptr (session, NULL);
     }
+#ifdef ENABLE_SESSION_TICKET
+  if (noticket == 0)
+    gnutls_session_ticket_enable_server (session, &session_ticket_key);
+#endif
 
   if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
     {
@@ -1060,6 +1067,11 @@ main (int argc, char **argv)
 /*      gnutls_anon_set_server_dh_params(dh_cred, dh_params); */
 #endif
 
+#ifdef ENABLE_SESSION_TICKET
+  if (noticket == 0)
+    gnutls_session_ticket_key_generate (&session_ticket_key);
+#endif
+
   if (listen_socket (name, port) < 0)
     exit (1);
 
@@ -1393,6 +1405,11 @@ main (int argc, char **argv)
   gnutls_anon_free_server_credentials (dh_cred);
 #endif
 
+#ifdef ENABLE_SESSION_TICKET
+  if (noticket == 0)
+    gnutls_free (session_ticket_key.data);
+#endif
+
   if (nodb == 0)
     wrap_db_deinit ();
   gnutls_global_deinit ();
@@ -1416,6 +1433,7 @@ gaa_parser (int argc, char **argv)
   debug = info.debug;
   verbose = info.quiet;
   nodb = info.nodb;
+  noticket = info.noticket;
 
   if (info.http == 0)
     http = 0;

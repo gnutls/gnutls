@@ -433,6 +433,10 @@ gnutls_deinit (gnutls_session_t session)
       gnutls_free (session->internals.srp_password);
     }
 
+  gnutls_free (session->security_parameters.extensions.session_ticket);
+  gnutls_free (session->internals.resumed_security_parameters.extensions.
+	       session_ticket);
+
   memset (session, 0, sizeof (struct gnutls_session_int));
   gnutls_free (session);
 }

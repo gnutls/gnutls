@@ -86,6 +86,12 @@ typedef struct
 #define MAX_LOG_SIZE 1024	/* maximum size of log message */
 #define MAX_SRP_USERNAME 128
 #define MAX_SERVER_NAME_SIZE 128
+#define MAX_SESSION_TICKET_SIZE 65535
+
+#define SESSION_TICKET_KEY_NAME_SIZE 16
+#define SESSION_TICKET_KEY_SIZE 16
+#define SESSION_TICKET_IV_SIZE 16
+#define SESSION_TICKET_MAC_SECRET_SIZE 32
 
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
@@ -149,8 +155,8 @@ typedef enum handshake_state_t
 { STATE0 = 0, STATE1, STATE2,
   STATE3, STATE4, STATE5,
   STATE6, STATE7, STATE8, STATE9, STATE20 = 20, STATE21,
-  STATE30 = 30, STATE31, STATE50 = 50, STATE60 = 60, STATE61, STATE62,
-  STATE70, STATE71
+  STATE30 = 30, STATE31, STATE40 = 40, STATE41, STATE50 = 50,
+  STATE60 = 60, STATE61, STATE62, STATE70, STATE71
 } handshake_state_t;
 
 #include <gnutls_str.h>
@@ -170,6 +176,7 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_OPAQUE_PRF_INPUT = ENABLE_OPRFI,
 #endif
   GNUTLS_EXTENSION_SRP = 12,
+  GNUTLS_EXTENSION_SESSION_TICKET = 35,
   GNUTLS_EXTENSION_INNER_APPLICATION = 37703
 } extensions_t;
 
@@ -281,6 +288,12 @@ typedef struct
 
 #define MAX_SERVER_NAME_EXTENSIONS 3
 
+struct gnutls_session_ticket_key_st {
+  opaque key_name[SESSION_TICKET_KEY_NAME_SIZE];
+  opaque key[SESSION_TICKET_KEY_SIZE];
+  opaque mac_secret[SESSION_TICKET_MAC_SECRET_SIZE];
+};
+
 typedef struct
 {
   server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
@@ -303,6 +316,11 @@ typedef struct
   uint16_t oprfi_client_len;
   opaque *oprfi_server;
   uint16_t oprfi_server_len;
+
+  opaque *session_ticket;
+  uint16_t session_ticket_len;
+  struct gnutls_session_ticket_key_st *session_ticket_key;
+  opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
@@ -671,6 +689,8 @@ typedef struct
    * use gnutls_srp_set_prime_bits() to adjust it.
    */
   uint16_t srp_prime_bits;
+
+  int session_ticket_enable, session_ticket_renew;
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

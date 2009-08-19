@@ -17,6 +17,9 @@ option (d, debug) INT "integer" { $debug = $1 } "Enable debugging"
 #int resume;
 option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again and resume this session."
 
+#int noticket;
+option (noticket) { $noticket = 1 } "Doen't accept session tickets."
+
 #int starttls;
 option (s, starttls) { $starttls = 1 } "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received."
 
@@ -121,7 +124,7 @@ option (v, version) { cli_version(); exit(0); } "prints the program's version nu
 #char *rest_args;
 rest STR "hostname" { $rest_args = $1; }
 
-init { $resume=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
+init { $resume=0; $noticket=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $record_size=0; 
 	$fingerprint=0; $pgp_keyring=NULL; $x509_crlfile = NULL;

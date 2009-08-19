@@ -63,6 +63,8 @@ PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c	\
 
 OPRFI_COBJECTS = ext_oprfi.c
 
+SESSION_TICKET_COBJECTS = ext_session_ticket.c
+
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_buffers.c gnutls_handshake.c gnutls_num.c		\
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c	\
@@ -97,12 +99,14 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
-	gnutls_supplemental.h ext_oprfi.h crypto.h random.h
+	gnutls_supplemental.h ext_oprfi.h crypto.h random.h		\
+	ext_session_ticket.h
 
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
-	$(PSK_COBJECTS) gnutls.asn pkix.asn libgnutls.map
+	$(PSK_COBJECTS) $(SESSION_TICKET_COBJECTS) \
+	gnutls.asn pkix.asn libgnutls.map
 
 libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)

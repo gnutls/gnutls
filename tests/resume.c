@@ -49,6 +49,26 @@ static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 
 #define TLS_SESSION_CACHE 50
 
+struct params_res
+{
+  const char *desc;
+  int enable_db;
+  int enable_session_ticket_server;
+  int enable_session_ticket_client;
+  int expect_resume;
+};
+
+struct params_res resume_tests[] =
+  {
+    {"try to resume from db", 50, 0, 0, 1},
+#ifdef ENABLE_SESSION_TICKET
+    {"try to resume from session ticket", 0, 1, 1, 1},
+    {"try to resume from session ticket (server only)", 0, 1, 0, 0},
+    {"try to resume from session ticket (client only)", 0, 0, 1, 0},
+#endif
+    {NULL, -1}
+  };
+
 /* A very basic TLS client, with anonymous authentication.
  */
 
@@ -56,7 +76,7 @@ static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 #define MSG "Hello TLS"
 
 static void
-client (void)
+client (struct params_res *params)
 {
   int ret, sd, ii;
   gnutls_session_t session;
@@ -92,6 +112,11 @@ client (void)
       /* put the anonymous credentials to the current session
        */
       gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
+
+#ifdef ENABLE_SESSION_TICKET
+      if (params->enable_session_ticket_client)
+	gnutls_session_ticket_enable_client (session);
+#endif
 
       if (t > 0)
 	{
@@ -131,11 +156,17 @@ client (void)
 	  /* check if we actually resumed the previous session */
 	  if (gnutls_session_is_resumed (session) != 0)
 	    {
-	      success ("- Previous session was resumed\n");
+	      if (params->expect_resume)
+		success ("- Previous session was resumed\n");
+	      else
+		fail ("- Previous session was resumed\n");
 	    }
 	  else
 	    {
-	      success ("*** Previous session was NOT resumed\n");
+	      if (params->expect_resume)
+		fail ("*** Previous session was NOT resumed\n");
+	      else
+		success ("*** Previous session was NOT resumed\n");
 	    }
 	}
 
@@ -185,9 +216,10 @@ client (void)
 
 /* These are global */
 gnutls_anon_server_credentials_t anoncred;
+gnutls_datum_t session_ticket_key;
 
 static gnutls_session_t
-initialize_tls_session (void)
+initialize_tls_session (struct params_res *params)
 {
   gnutls_session_t session;
   const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
@@ -204,13 +236,17 @@ initialize_tls_session (void)
 
   gnutls_dh_set_prime_bits (session, DH_BITS);
 
-  if (TLS_SESSION_CACHE != 0)
+  if (params->enable_db)
     {
       gnutls_db_set_retrieve_function (session, wrap_db_fetch);
       gnutls_db_set_remove_function (session, wrap_db_delete);
       gnutls_db_set_store_function (session, wrap_db_store);
       gnutls_db_set_ptr (session, NULL);
     }
+#ifdef ENABLE_SESSION_TICKET
+  if (params->enable_session_ticket_server)
+    gnutls_session_ticket_enable_server (session, &session_ticket_key);
+#endif
 
   return session;
 }
@@ -289,10 +325,12 @@ global_stop (void)
   gnutls_dh_params_deinit (dh_params);
 
   gnutls_global_deinit ();
+
+  shutdown (listen_sd, SHUT_RDWR);
 }
 
 static void
-server (void)
+server (struct params_res *params)
 {
   size_t t;
 
@@ -308,16 +346,20 @@ server (void)
 
   gnutls_anon_set_server_dh_params (anoncred, dh_params);
 
-  if (TLS_SESSION_CACHE != 0)
+  if (params->enable_db)
     {
       wrap_db_init ();
     }
+#ifdef ENABLE_SESSION_TICKET
+  if (params->enable_session_ticket_server)
+    gnutls_session_ticket_key_generate (&session_ticket_key);
+#endif
 
   for (t = 0; t < 2; t++)
     {
       client_len = sizeof (sa_cli);
 
-      session = initialize_tls_session ();
+      session = initialize_tls_session (params);
 
       sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
@@ -374,7 +416,7 @@ server (void)
 
   close (listen_sd);
 
-  if (TLS_SESSION_CACHE != 0)
+  if (params->enable_db)
     {
       wrap_db_deinit ();
     }
@@ -386,30 +428,39 @@ void
 doit (void)
 {
   pid_t child;
+  int i;
 
-  global_start ();
-  if (error_count)
-    return;
-
-  child = fork ();
-  if (child < 0)
+  for (i = 0; resume_tests[i].desc; i++)
     {
-      perror ("fork");
-      fail ("fork");
-      return;
-    }
+      printf ("%s\n", resume_tests[i].desc);
 
-  if (child)
-    {
-      int status;
-      /* parent */
-      server ();
-      wait (&status);
-    }
-  else
-    client ();
+      global_start ();
+      if (error_count)
+	return;
 
-  global_stop ();
+      child = fork ();
+      if (child < 0)
+	{
+	  perror ("fork");
+	  fail ("fork");
+	  return;
+	}
+
+      if (child)
+	{
+	  int status;
+	  /* parent */
+	  server (&resume_tests[i]);
+	  wait (&status);
+	  global_stop ();
+	}
+      else
+	{
+	  client (&resume_tests[i]);
+	  global_stop ();
+	  exit (0);
+	}
+    }
 }
 
 /* Functions and other stuff needed for session resuming.

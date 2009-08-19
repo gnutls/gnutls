@@ -221,6 +221,7 @@ extern "C" {
   { GNUTLS_HANDSHAKE_HELLO_REQUEST = 0,
     GNUTLS_HANDSHAKE_CLIENT_HELLO = 1,
     GNUTLS_HANDSHAKE_SERVER_HELLO = 2,
+    GNUTLS_HANDSHAKE_NEW_SESSION_TICKET = 4,
     GNUTLS_HANDSHAKE_CERTIFICATE_PKT = 11,
     GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE = 12,
     GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST = 13,
@@ -553,6 +554,12 @@ extern "C" {
 
   const char *gnutls_supplemental_get_name
   (gnutls_supplemental_data_format_type_t type);
+
+  /* SessionTicket, RFC 5077. */
+  int gnutls_session_ticket_key_generate (gnutls_datum_t *key);
+  int gnutls_session_ticket_enable_client (gnutls_session_t session);
+  int gnutls_session_ticket_enable_server (gnutls_session_t session,
+					   const gnutls_datum_t *key);
 
 /* functions to set priority of cipher suites 
  */

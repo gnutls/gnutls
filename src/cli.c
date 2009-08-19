@@ -476,6 +476,11 @@ init_tls_session (const char *hostname)
 				info.opaque_prf_input);
 #endif
 
+#ifdef ENABLE_SESSION_TICKET
+  if (!info.noticket)
+    gnutls_session_ticket_enable_client (session);
+#endif
+
   return session;
 }
 

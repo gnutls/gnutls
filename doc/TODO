@@ -50,7 +50,6 @@ Current list:
   be able to execve a new process that take over the current
   living socket (using the fcntl close-on-exec flag) and
   continue the TLS session as well.
-- Implement draft-salowey-tls-ticket-05, useful for (e.g.) EAP-FAST.
 - Reduce memory footprint
   - Inside gnutls_global_init, the library allocates about 64 kb of
     memory in almost 4000 calls to malloc. On my desktop, there are 22
