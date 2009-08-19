@@ -3808,7 +3808,7 @@ consider adding support for the hypothetical TLS extension
 
 @enumerate
 
-@item Modify @code{configure.in} to add @code{--enable-foobar} or @code{--disable-foobar}.
+@item Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
 Which to chose depends on whether you intend to make the extension be
 enabled by default.  Look at existing checks (i.e., SRP, authz) for
@@ -3830,6 +3830,8 @@ fi
 AM_CONDITIONAL(ENABLE_FOOBAR, test "$ac_enable_foobar" != "no")
 @end example
 
+These lines should go in @code{lib/m4/hooks.m4}.
+
 @item Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
 
 A good name for the value would be GNUTLS_EXTENSION_FOOBAR.  Check
@@ -3845,10 +3847,19 @@ foobar protocol is allocated another number.
 A typical entry would be:
 
 @example
+  int ret;
+
+  /* ...
+   */
+
 #if ENABLE_FOOBAR
-  GNUTLS_EXTENSION_ENTRY (GNUTLS_EXTENSION_FOOBAR,
-			  _gnutls_foobar_recv_params,
-			  _gnutls_foobar_send_params),
+  ret = gnutls_ext_register (GNUTLS_EXTENSION_FOOBAR,
+                             "FOOBAR",
+                             GNUTLS_EXT_TLS,
+                             _gnutls_foobar_recv_params,
+                             _gnutls_foobar_send_params);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
 #endif
 @end example
 
