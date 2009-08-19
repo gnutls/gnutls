@@ -1015,7 +1015,8 @@ client.
 To resume a TLS session the server normally store some state.  This
 complicates deployment, and typical situations the client can cache
 information and send it to the server instead.  The Session Ticket
-extension implements this idea, and it is documented in RFC 4507/5077.
+extension implements this idea, and it is documented in
+RFC 5077 @xcite{TLSTKT}.
 
 Clients can enable support for TLS tickets with
 @ref{gnutls_session_ticket_enable_client} and servers use
@@ -1727,8 +1728,7 @@ handling @acronym{X.509} certificates is described at section
 
 An @acronym{X.509} certificate usually contains information about the
 certificate holder, the signer, a unique serial number, expiration
-dates and some other fields @xcite{RFC3280} as shown in the table
-below.
+dates and some other fields @xcite{PKIX} as shown in the table below.
 
 @table @code
 
@@ -4171,22 +4171,27 @@ Magnus Nystrom and Burt Kaliski, "PKCS 10 v1.7: Certification Request
 Syntax Specification", November 2000, Available from
 @url{http://www.ietf.org/rfc/rfc2986.txt}.
 
-@item @anchor{RFC3280}[RFC3280]
-Russell Housley, Tim Polk, Warwick Ford and David Solo, "Internet
-X.509 Public Key Infrastructure Certificate and Certificate Revocation
-List (CRL) Profile", April 2002, Available from
-@url{http://www.ietf.org/rfc/rfc3280.txt}.
+@item @anchor{PKIX}[PKIX]
+D. Cooper, S. Santesson, S. Farrel, S. Boeyen, R. Housley, W. Polk,
+"Internet X.509 Public Key Infrastructure Certificate and Certificate
+Revocation List (CRL) Profile", May 2008, available from
+@url{http://www.ietf.org/rfc/rfc5280.txt}.
 
 @item @anchor{RFC3749}[RFC3749]
 Scott Hollenbeck, "Transport Layer Security Protocol Compression
-Methods", May 2004, Available from
+Methods", May 2004, available from
 @url{http://www.ietf.org/rfc/rfc3749.txt}.
 
 @item @anchor{RFC3820}[RFC3820]
 Steven Tuecke, Von Welch, Doug Engert, Laura Pearlman, and Mary
 Thompson, "Internet X.509 Public Key Infrastructure (PKI) Proxy
 Certificate Profile", June 2004, available from
-@url{http://www.ietf.org/rfc3820}.
+@url{http://www.ietf.org/rfc/rfc3820}.
+
+@item @anchor{TLSTKT}[TLSTKT]
+Joseph Salowey, Hao Zhou, Pasi Eronen, Hannes Tschofenig, "Transport
+Layer Security (TLS) Session Resumption without Server-Side State",
+January 2008, available from @url{http://www.ietf.org/rfc/rfc5077}.
 
 @item @anchor{PKCS12}[PKCS12]
 RSA Laboratories, "PKCS 12 v1.0: Personal Information Exchange
