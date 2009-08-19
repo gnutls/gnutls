@@ -18,7 +18,7 @@
 
 	* lib/auth_cert.c, lib/gnutls_algorithms.c,
 	lib/gnutls_algorithms.h, lib/gnutls_cipher.c,
-	lib/gnutls_handshake.c, lib/gnutls_sig.c, lib/gnutls_state.c: 
+	lib/gnutls_handshake.c, lib/gnutls_sig.c, lib/gnutls_state.c:
 	Replace explicit version checks with feature checks Signed-off-by: Simon Josefsson <simon@josefsson.org>
 
 2009-08-19  Simon Josefsson <simon@josefsson.org>
