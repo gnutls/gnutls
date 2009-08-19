@@ -570,6 +570,14 @@ GNUTLS_2_8
     gnutls_session_ticket_enable_server;
 } GNUTLS_1_4;
 
+GNUTLS_2_10
+{
+  global:
+    gnutls_session_ticket_key_generate;
+    gnutls_session_ticket_enable_client;
+    gnutls_session_ticket_enable_server;
+} GNUTLS_2_8;
+
 GNUTLS_PRIVATE {
   global:
     # Internal symbols needed by libgnutls-extra:
