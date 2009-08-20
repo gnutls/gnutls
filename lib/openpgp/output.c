@@ -309,8 +309,6 @@ print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert)
 {
   int i, subkeys;
   int err;
-  char dn[1024];
-  size_t dn_size;
 
   print_key_revoked (str, cert, -1);
 
@@ -332,23 +330,36 @@ print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert)
   i = 0;
   do
     {
-      dn_size = sizeof (dn);
-      err = gnutls_openpgp_crt_get_name (cert, i++, dn, &dn_size);
+      char *dn;
+      size_t dn_size = 0;
 
-      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
-	  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+      err = gnutls_openpgp_crt_get_name (cert, i, NULL, &dn_size);
+      if (err != GNUTLS_E_SHORT_MEMORY_BUFFER
+	  && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+	  && err != GNUTLS_E_OPENPGP_UID_REVOKED)
+	addf (str, "error: get_name: %s\n", gnutls_strerror (err));
+      else
 	{
-	  addf (str, "error: get_name: %s %d\n", gnutls_strerror (err), err);
-	  break;
+	  dn = gnutls_malloc (dn_size);
+	  if (!dn)
+	    addf (str, "error: malloc (%d): %s\n", (int) dn_size,
+		  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	  else
+	    {
+	      err = gnutls_openpgp_crt_get_name (cert, i, dn, &dn_size);
+	      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
+		  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+		addf (str, "error: get_name: %s\n", gnutls_strerror (err));
+	      else if (err >= 0)
+		addf (str, _("\tName[%d]: %s\n"), i, dn);
+	      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
+		addf (str, _("\tRevoked Name[%d]: %s\n"), i, dn);
+
+	      gnutls_free (dn);
+	    }
 	}
 
-      if (err >= 0)
-	addf (str, _("\tName[%d]: %s\n"), i - 1, dn);
-      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
-	{
-	  addf (str, _("\tRevoked Name[%d]: %s\n"), i - 1, dn);
-	}
-
+      i++;
     }
   while (err >= 0);
 
@@ -379,26 +390,39 @@ print_oneline (gnutls_string * str, gnutls_openpgp_crt_t cert)
 {
   int err, i;
 
-  /* Names. */
   i = 0;
   do
     {
-      size_t dn_size;
-      char dn[1024];
+      char *dn;
+      size_t dn_size = 0;
 
-      dn_size = sizeof (dn);
-      err = gnutls_openpgp_crt_get_name (cert, i++, dn, &dn_size);
-      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
-	  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+      err = gnutls_openpgp_crt_get_name (cert, i, NULL, &dn_size);
+      if (err != GNUTLS_E_SHORT_MEMORY_BUFFER
+	  && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+	  && err != GNUTLS_E_OPENPGP_UID_REVOKED)
+	addf (str, "unknown name (%s), ", gnutls_strerror (err));
+      else
 	{
-	  addf (str, "cannot get_name %d (%s), ", err, gnutls_strerror (err));
-	  break;
+	  dn = gnutls_malloc (dn_size);
+	  if (!dn)
+	    addf (str, "unknown name (%s), ",
+		  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	  else
+	    {
+	      err = gnutls_openpgp_crt_get_name (cert, i, dn, &dn_size);
+	      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
+		  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+		addf (str, "unknown name (%s), ", gnutls_strerror (err));
+	      else if (err >= 0)
+		addf (str, _("name[%d]: %s, "), i, dn);
+	      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
+		addf (str, _("revoked name[%d]: %s, "), i, dn);
+
+	      gnutls_free (dn);
+	    }
 	}
 
-      if (err >= 0)
-	addf (str, _("name[%d]: %s, "), i - 1, dn);
-      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
-	addf (str, _("revoked name[%d]: %s, "), i - 1, dn);
+      i++;
     }
   while (err >= 0);
 

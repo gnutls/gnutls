@@ -305,7 +305,8 @@ _gnutls_openpgp_count_key_names (gnutls_openpgp_crt_t key)
  * gnutls_openpgp_crt_get_name - Extracts the userID
  * @key: the structure that contains the OpenPGP public key.
  * @idx: the index of the ID to extract
- * @buf: a pointer to a structure to hold the name
+ * @buf: a pointer to a structure to hold the name, may be %NULL
+ *       to only get the @sizeof_buf.
  * @sizeof_buf: holds the maximum size of @buf, on return hold the
  *   actual/required size of @buf.
  *
@@ -324,7 +325,7 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
   cdk_pkt_userid_t uid = NULL;
   int pos = 0;
 
-  if (!key || !buf)
+  if (!key)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -359,8 +360,11 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  memcpy (buf, uid->name, uid->len);
-  buf[uid->len] = '\0';		/* make sure it's a string */
+  if (buf)
+    {
+      memcpy (buf, uid->name, uid->len);
+      buf[uid->len] = '\0';		/* make sure it's a string */
+    }
   *sizeof_buf = uid->len + 1;
 
   if (uid->is_revoked)
