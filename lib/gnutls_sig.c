@@ -154,7 +154,7 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
   switch (cert->subject_pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      if (!_gnutls_version_has_selectable_prf(ver))
+      if (!_gnutls_version_has_selectable_prf (ver))
 	{
 	  digest_hd_st td_md5;
 
@@ -273,22 +273,22 @@ _gnutls_tls_sign (gnutls_session_t session,
   if (cert != NULL)
     {
       if (cert->key_usage != 0)
-        if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
+	if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
 	  {
-  	    gnutls_assert ();
+	    gnutls_assert ();
 	    return GNUTLS_E_KEY_USAGE_VIOLATION;
-  	  }
+	  }
 
       /* External signing. */
       if (!pkey || pkey->params_size == 0)
-        {
-          if (!session->internals.sign_func)
+	{
+	  if (!session->internals.sign_func)
 	    return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 
-          return (*session->internals.sign_func)
+	  return (*session->internals.sign_func)
 	    (session, session->internals.sign_func_userdata,
 	     cert->cert_type, &cert->raw, hash_concat, signature);
-        }
+	}
     }
 
   return _gnutls_sign (pkey->pk_algorithm, pkey->params,
@@ -445,7 +445,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   opaque concat[36];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
-  if (!_gnutls_version_has_selectable_prf(ver))
+  if (!_gnutls_version_has_selectable_prf (ver))
     {
       ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
       if (ret < 0)
@@ -465,7 +465,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   if (ret < 0)
     {
       gnutls_assert ();
-      if (!_gnutls_version_has_selectable_prf(ver))
+      if (!_gnutls_version_has_selectable_prf (ver))
 	_gnutls_hash_deinit (&td_md5, NULL);
       return ret;
     }
@@ -476,7 +476,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
 		GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, params->data, params->size);
 
-  if (!_gnutls_version_has_selectable_prf(ver))
+  if (!_gnutls_version_has_selectable_prf (ver))
     {
       _gnutls_hash_deinit (&td_md5, concat);
       _gnutls_hash_deinit (&td_sha, &concat[16]);
