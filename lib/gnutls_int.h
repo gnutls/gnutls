@@ -83,7 +83,6 @@ typedef struct
 #define MAX_CIPHER_BLOCK_SIZE 16
 #define MAX_CIPHER_KEY_SIZE 32
 
-#define MAX_LOG_SIZE 1024	/* maximum size of log message */
 #define MAX_SRP_USERNAME 128
 #define MAX_SERVER_NAME_SIZE 128
 #define MAX_SESSION_TICKET_SIZE 65535
