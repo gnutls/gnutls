@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.8.4 (unreleased)
 
+** libgnutls: Make OpenPGP hostname checking work again.
+The patch to resolve the X.509 CN/SAN issue accidentally broken
+OpenPGP hostname comparison.
+
 ** API and ABI modifications:
 No changes since last version.
 
