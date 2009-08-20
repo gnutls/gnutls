@@ -129,6 +129,8 @@ md5_finish_ctx (struct md5_ctx *ctx, void *resbuf)
   return md5_read_ctx (ctx, resbuf);
 }
 
+#if 0 /* Not needed by GnuTLS, and it has a large stack frame. */
+
 /* Compute MD5 message digest for bytes read from STREAM.  The
    resulting message digest number will be written into the 16 bytes
    beginning at RESBLOCK.  */
@@ -194,6 +196,7 @@ process_partial_block:
   md5_finish_ctx (&ctx, resblock);
   return 0;
 }
+#endif
 
 /* Compute MD5 message digest for LEN bytes beginning at BUFFER.  The
    result is always in little endian byte order, so that a byte-wise
