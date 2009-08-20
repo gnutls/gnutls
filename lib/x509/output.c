@@ -959,15 +959,30 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
   /* Issuer. */
   if (!notsigned)
     {
-      char dn[1024];
-      size_t dn_size = sizeof (dn);
+      char *dn;
+      size_t dn_size = 0;
       int err;
 
-      err = gnutls_x509_crt_get_issuer_dn (cert, dn, &dn_size);
-      if (err < 0)
+      err = gnutls_x509_crt_get_issuer_dn (cert, NULL, &dn_size);
+      if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	addf (str, "error: get_issuer_dn: %s\n", gnutls_strerror (err));
       else
-	addf (str, _("\tIssuer: %s\n"), dn);
+	{
+	  dn = gnutls_malloc (dn_size);
+	  if (!dn)
+	    addf (str, "error: malloc (%d): %s\n", (int) dn_size,
+		  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	  else
+	    {
+	      err = gnutls_x509_crt_get_issuer_dn (cert, dn, &dn_size);
+	      if (err < 0)
+		addf (str, "error: get_issuer_dn: %s\n",
+		      gnutls_strerror (err));
+	      else
+		addf (str, _("\tIssuer: %s\n"), dn);
+	      gnutls_free (dn);
+	    }
+	}
     }
 
   /* Validity. */
@@ -1007,15 +1022,30 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 
   /* Subject. */
   {
-    char dn[1024];
-    size_t dn_size = sizeof (dn);
+    char *dn;
+    size_t dn_size = 0;
     int err;
 
-    err = gnutls_x509_crt_get_dn (cert, dn, &dn_size);
-    if (err < 0)
+    err = gnutls_x509_crt_get_dn (cert, NULL, &dn_size);
+    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
       addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
     else
-      addf (str, _("\tSubject: %s\n"), dn);
+      {
+	dn = gnutls_malloc (dn_size);
+	if (!dn)
+	  addf (str, "error: malloc (%d): %s\n", (int) dn_size,
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	else
+	  {
+	    err = gnutls_x509_crt_get_dn (cert, dn, &dn_size);
+	    if (err < 0)
+	      addf (str, "error: get_dn: %s\n",
+		    gnutls_strerror (err));
+	    else
+	      addf (str, _("\tSubject: %s\n"), dn);
+	    gnutls_free (dn);
+	  }
+      }
   }
 
   /* SubjectPublicKeyInfo. */
@@ -1212,31 +1242,60 @@ print_other (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 static void
 print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
 {
-
   /* Subject. */
   {
-    char dn[1024];
-    size_t dn_size = sizeof (dn);
+    char *dn;
+    size_t dn_size = 0;
     int err;
 
-    err = gnutls_x509_crt_get_dn (cert, dn, &dn_size);
-    if (err < 0)
+    err = gnutls_x509_crt_get_dn (cert, NULL, &dn_size);
+    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
       addf (str, "unknown subject (%s), ", gnutls_strerror (err));
     else
-      addf (str, "subject `%s', ", dn);
+      {
+	dn = gnutls_malloc (dn_size);
+	if (!dn)
+	  addf (str, "unknown subject (%s), ",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	else
+	  {
+	    err = gnutls_x509_crt_get_dn (cert, dn, &dn_size);
+	    if (err < 0)
+	      addf (str, "unknown subject (%s), ",
+		    gnutls_strerror (err));
+	    else
+	      addf (str, "subject `%s', ", dn);
+	    gnutls_free (dn);
+	  }
+      }
   }
 
   /* Issuer. */
   {
-    char dn[1024];
-    size_t dn_size = sizeof (dn);
+    char *dn;
+    size_t dn_size = 0;
     int err;
 
-    err = gnutls_x509_crt_get_issuer_dn (cert, dn, &dn_size);
-    if (err < 0)
+    err = gnutls_x509_crt_get_issuer_dn (cert, NULL, &dn_size);
+    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
       addf (str, "unknown issuer (%s), ", gnutls_strerror (err));
     else
-      addf (str, "issuer `%s', ", dn);
+      {
+	dn = gnutls_malloc (dn_size);
+	if (!dn)
+	  addf (str, "unknown issuer (%s), ",
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	else
+	  {
+	    err = gnutls_x509_crt_get_issuer_dn (cert, dn, &dn_size);
+	    if (err < 0)
+	      addf (str, "unknown issuer (%s), ",
+		    gnutls_strerror (err));
+	    else
+	      addf (str, "issuer `%s', ", dn);
+	    gnutls_free (dn);
+	  }
+      }
   }
 
   /* Key algorithm and size. */
@@ -1428,15 +1487,30 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
   /* Issuer. */
   if (!notsigned)
     {
-      char dn[1024];
-      size_t dn_size = sizeof (dn);
+      char *dn;
+      size_t dn_size = 0;
       int err;
 
-      err = gnutls_x509_crl_get_issuer_dn (crl, dn, &dn_size);
-      if (err < 0)
+      err = gnutls_x509_crl_get_issuer_dn (crl, NULL, &dn_size);
+      if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	addf (str, "error: get_issuer_dn: %s\n", gnutls_strerror (err));
       else
-	addf (str, _("\tIssuer: %s\n"), dn);
+	{
+	  dn = gnutls_malloc (dn_size);
+	  if (!dn)
+	    addf (str, "error: malloc (%d): %s\n", (int) dn_size,
+		  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	  else
+	    {
+	      err = gnutls_x509_crl_get_issuer_dn (crl, dn, &dn_size);
+	      if (err < 0)
+		addf (str, "error: get_issuer_dn: %s\n",
+		      gnutls_strerror (err));
+	      else
+		addf (str, _("\tIssuer: %s\n"), dn);
+	    }
+	  gnutls_free (dn);
+	}
     }
 
   /* Validity. */
@@ -1742,15 +1816,30 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 
   /* Subject */
   {
-    char dn[1024];
-    size_t dn_size = sizeof (dn);
+    char *dn;
+    size_t dn_size = 0;
     int err;
 
-    err = gnutls_x509_crq_get_dn (cert, dn, &dn_size);
-    if (err < 0)
+    err = gnutls_x509_crq_get_dn (cert, NULL, &dn_size);
+    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
       addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
     else
-      addf (str, _("\tSubject: %s\n"), dn);
+      {
+	dn = gnutls_malloc (dn_size);
+	if (!dn)
+	  addf (str, "error: malloc (%d): %s\n", (int) dn_size,
+		gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+	else
+	  {
+	    err = gnutls_x509_crq_get_dn (cert, dn, &dn_size);
+	    if (err < 0)
+	      addf (str, "error: get_dn: %s\n",
+		    gnutls_strerror (err));
+	    else
+	      addf (str, _("\tSubject: %s\n"), dn);
+	    gnutls_free (dn);
+	  }
+      }
   }
 
   /* SubjectPublicKeyInfo. */
