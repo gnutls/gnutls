@@ -27,6 +27,7 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <gnutls/openpgp.h>
 
 #include "utils.h"
 
@@ -550,7 +551,8 @@ char pem9[] =
   "-----END CERTIFICATE-----\n";
 
 /* Certificate with SAN and CN that match iff you truncate the SAN to
-   the embedded NUL. */
+   the embedded NUL.
+   See <http://thread.gmane.org/gmane.network.gnutls.general/1735>. */
 char pem10[] =
   "X.509 Certificate Information:\n"
   "	Version: 3\n"
@@ -633,10 +635,44 @@ char pem10[] =
   "/yfcgJk0Zr3jMVTVtj/O1AijUihhXr0=\n"
   "-----END CERTIFICATE-----\n";
 
+/* Check basic OpenPGP comparison too.
+   <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3812>. */
+char pem11[] =
+  "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
+  "Version: GnuPG v1.4.6 (GNU/Linux)\n"
+  "\n"
+  "mQGiBEXInlgRBAD0teb6ohIlchkHcFlmmvtVW1KXexlDfXExf8T+fOz5z354GPOX\n"
+  "sDq98ztCEE3hnPEOFj4NT0X3nEtrvLkhmZqrDHSbuJACB4qxeHwEbGFx7OIDW8+u\n"
+  "4sKxpaza1GVf1NQ7VIaQiXaGHy8Esn9SW7oNhK6z5l4TIRlm3OBt3cxU3wCgjnnO\n"
+  "jpGJeeo0OnZzSH+xsNLJQEcEAOmUc+7N9OhpT/gqddIgzYRr/FD0Ad6HBfABol6Q\n"
+  "wWCapzIxggnZJ9i+lHujpcA8idtrBU/DGhkGtW95QaHwQ8d5SvetM7Wc/xoHEP3o\n"
+  "HGvSGoXtfqlofastcC7eso39EBD10cpIB+gUmhe1MpaXm7A6m+KJO+2CkqE1vMkc\n"
+  "tmKHBACzDRrWgkV+AtGWKl3ge9RkYHKxAPc0FBrpzDrvmvvNMaIme2u/+WP/xa4T\n"
+  "nTjgys+pfeplHVfCO/n6nKWrVepMPE0+ZeNWzY6CsfhL7VjSN99vm7qzNHswBiJS\n"
+  "gCSwJXRmQcJcS9hxqLciUyVEB32zPqX24QHnsyPYaSCzEBgOnLQPdGVzdC5nbnV0\n"
+  "bHMub3JniF8EExECACAFAkXInlgCGwMGCwkIBwMCBBUCCAMEFgIDAQIeAQIXgAAK\n"
+  "CRCuX60+XR0U2FcfAJ9eZDmhk5a9k4K/zu+a5xFwb9SWsgCXTkDnOIQmueZPHg5U\n"
+  "VgKnazckK7kCDQRFyJ51EAgAozi9Vk9R5I2AtRcqV4jLfpzh3eiBYSUt4U3ZLxff\n"
+  "LAyvGMUXA7OATGGhuKphNQLux17AGpRN4nugnIWMLE9akyrxXqg/165UFKbwwVsl\n"
+  "po7KzPvEXHmOYDgVEqS0sZNWmkJeMPdCVsD2wifPkocufUu2Ux8CmrvT1nEgoiVu\n"
+  "kUjplJOralQBdsPkIEk8LMVtF3IW2aHCEET0yrJ2Y2q0i/u1K4bxSUi5ESrN0UNa\n"
+  "WT7wtCegdwWlObwJEgwcu/8YtjMnfBI855gXVdJiRLdOJvkU+65I/jnPQG5QEIQM\n"
+  "weLty/+GHkXVN2xw5OGUIryIPUHi8+EDGOGqoxqNUMTzvwADBQf/bTPc0z3oHp+X\n"
+  "hsj3JP/AMCSQV87peKqFYEnRIubsN4Y4tTwVjEkRA3s5u+qTNvdypE1tvAEmdspa\n"
+  "CL/EKfMCEltcW3WUwqUIULQ2Z0t9tBuVfMEH1Z1jjb68IOVwTJYz+iBtmbq5Wxoq\n"
+  "lc5woOCDVL9qaKR6hOuAukTl6L3wQL+5zGBE4k5UfLf8UVJEa4ZTqsoMi3iyQAFO\n"
+  "/h7WzqUATH3aQSz9tpilJ760wadDhc+Sdt2a0W6cC+SBmJaU/ym9seTd26nyWHG+\n"
+  "03G+ynCHf5pBAXHhfCNhA0lMv5h3eJECNElcCh0sYGmo19jOzbnlRSGKRqrflOtO\n"
+  "YwhQXK9y/ohJBBgRAgAJBQJFyJ51AhsMAAoJEK5frT5dHRTYDDgAn2bLaS5n3Xy8\n"
+  "Z/V2Me1st/9pqPfZAJ4+9YBnyjCq/0vosIoZabi+s92m7g==\n"
+  "=NkXV\n"
+  "-----END PGP PUBLIC KEY BLOCK-----\n";
+
 void
 doit (void)
 {
-  gnutls_x509_crt_t cert;
+  gnutls_x509_crt_t x509;
+  gnutls_openpgp_crt_t pgp;
   gnutls_datum_t data;
   int ret;
 
@@ -644,19 +680,23 @@ doit (void)
   if (ret < 0)
     fail ("gnutls_global_init: %d\n", ret);
 
-  ret = gnutls_x509_crt_init (&cert);
+  ret = gnutls_x509_crt_init (&x509);
   if (ret < 0)
     fail ("gnutls_x509_crt_init: %d\n", ret);
+
+  ret = gnutls_openpgp_crt_init (&pgp);
+  if (ret < 0)
+    fail ("gnutls_openpgp_crt_init: %d\n", ret);
 
   success ("Testing pem1...\n");
   data.data = pem1;
   data.size = strlen (pem1);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
@@ -666,23 +706,23 @@ doit (void)
   data.data = pem2;
   data.size = strlen (pem2);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "*.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "*.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
@@ -692,23 +732,23 @@ doit (void)
   data.data = pem3;
   data.size = strlen (pem3);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "*.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "*.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
@@ -718,29 +758,29 @@ doit (void)
   data.data = pem4;
   data.size = strlen (pem4);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo.example.com");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo.example.com");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
@@ -750,23 +790,23 @@ doit (void)
   data.data = pem5;
   data.size = strlen (pem5);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "1.2.3.4");
+  ret = gnutls_x509_crt_check_hostname (x509, "1.2.3.4");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
@@ -776,17 +816,17 @@ doit (void)
   data.data = pem6;
   data.size = strlen (pem6);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "bar.foo.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "bar.foo.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
@@ -796,29 +836,29 @@ doit (void)
   data.data = pem7;
   data.size = strlen (pem7);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo.bar.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo.bar.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foobar.bar.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "foobar.bar.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foobar.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "foobar.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foobazbar.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "foobazbar.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
@@ -828,29 +868,29 @@ doit (void)
   data.data = pem8;
   data.size = strlen (pem8);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.com");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.com");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "www.example.foo.com");
+  ret = gnutls_x509_crt_check_hostname (x509, "www.example.foo.com");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
@@ -860,17 +900,17 @@ doit (void)
   data.data = pem9;
   data.size = strlen (pem9);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "foo.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "bar.example.org");
+  ret = gnutls_x509_crt_check_hostname (x509, "bar.example.org");
   if (ret)
     success ("Hostname correctly matches (%d)\n", ret);
   else
@@ -880,17 +920,32 @@ doit (void)
   data.data = pem10;
   data.size = strlen (pem10);
 
-  ret = gnutls_x509_crt_import (cert, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
-  ret = gnutls_x509_crt_check_hostname (cert, "localhost");
+  ret = gnutls_x509_crt_check_hostname (x509, "localhost");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
-  gnutls_x509_crt_deinit (cert);
+  success ("Testing pem11...\n");
+  data.data = pem11;
+  data.size = strlen (pem11);
+
+  ret = gnutls_openpgp_crt_import (pgp, &data, GNUTLS_OPENPGP_FMT_BASE64);
+  if (ret < 0)
+    fail ("gnutls_openpgp_crt_import: %d\n", ret);
+
+  ret = gnutls_openpgp_crt_check_hostname (pgp, "test.gnutls.org");
+  if (ret)
+    success ("Hostname correctly matches (%d)\n", ret);
+  else
+    fail ("Hostname incorrectly does not match (%d)\n", ret);
+
+  gnutls_x509_crt_deinit (x509);
+  gnutls_openpgp_crt_deinit (pgp);
 
   gnutls_global_deinit ();
 }
