@@ -216,7 +216,7 @@ client (struct params_res *params)
 
 /* These are global */
 gnutls_anon_server_credentials_t anoncred;
-gnutls_datum_t session_ticket_key;
+gnutls_datum_t session_ticket_key = { NULL, 0 };
 
 static gnutls_session_t
 initialize_tls_session (struct params_res *params)
@@ -420,6 +420,8 @@ server (struct params_res *params)
     {
       wrap_db_deinit ();
     }
+
+  gnutls_free (session_ticket_key.data);
 
   success ("server: finished\n");
 }

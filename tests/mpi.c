@@ -77,5 +77,10 @@ doit (void)
   if (_gnutls_mpi_cmp_ui (n4, 0) != 0 && _gnutls_mpi_cmp_ui (n4, 1) != 0)
     fail ("mpi_cmp_ui failed\n");
 
+  _gnutls_mpi_release (&n1);
+  _gnutls_mpi_release (&n2);
+  _gnutls_mpi_release (&n3);
+  _gnutls_mpi_release (&n4);
+
   success ("mpi ops ok\n");
 }

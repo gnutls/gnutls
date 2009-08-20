@@ -100,6 +100,7 @@ doit (void)
 
   gnutls_x509_crt_deinit (cert);
   gnutls_global_deinit ();
+  gnutls_free (out.data);
 
   success ("done\n");
 }

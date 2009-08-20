@@ -1422,13 +1422,12 @@ cdk_keydb_get_pk (cdk_keydb_hd_t hd, u32 * keyid, cdk_pubkey_t * r_pk)
       return rc;
     }
   rc = cdk_keydb_search (st, hd, &knode);
+  cdk_keydb_search_release (st);
   if (rc)
     {
       gnutls_assert ();
       return rc;
     }
-
-  cdk_keydb_search_release (st);
 
   node = keydb_find_bykeyid (knode, keyid, s_type);
   if (!node)
