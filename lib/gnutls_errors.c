@@ -485,16 +485,21 @@ void
 _gnutls_log (int level, const char *fmt, ...)
 {
   va_list args;
-  char str[MAX_LOG_SIZE];
+  char *str;
+  int ret;
 
   if (_gnutls_log_func == NULL)
     return;
 
   va_start (args, fmt);
-  vsnprintf (str, MAX_LOG_SIZE - 1, fmt, args);	/* Flawfinder: ignore */
+  ret = vasprintf (&str, fmt, args);
   va_end (args);
 
-  _gnutls_log_func (level, str);
+  if (ret >= 0)
+    {
+      _gnutls_log_func (level, str);
+      free (str);
+    }
 }
 
 #ifndef DEBUG
