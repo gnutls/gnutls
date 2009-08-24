@@ -2734,8 +2734,6 @@ pkcs12_info (void)
   if (result < 0)
     error (0, 0, "verify_mac: %s", gnutls_strerror (result));
 
-  indx = 0;
-
   for (indx = 0;; indx++)
     {
       result = gnutls_pkcs12_bag_init (&bag);
