@@ -50,7 +50,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   char oid[MAX_OID_SIZE];
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_datum_t auth_safe = { NULL, 0 };
-  int tmp_size, len, result;
+  int len, result;
   char error_str[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
   
   len = sizeof (oid) - 1;
@@ -71,7 +71,6 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   /* Step 1. Read the content data
    */
 
-  tmp_size = 0;
   result =
     _gnutls_x509_read_value (pkcs12, "authSafe.content", &auth_safe, 1);
   if (result < 0)
