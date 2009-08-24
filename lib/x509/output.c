@@ -1555,14 +1555,14 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
     {
       size_t i;
       int err = 0;
+      int aki_idx = 0;
+      int crl_nr = 0;
 
       for (i = 0;; i++)
 	{
 	  char oid[MAX_OID_SIZE] = "";
 	  size_t sizeof_oid = sizeof (oid);
 	  int critical;
-	  int crl_nr = 0;
-	  int aki_idx = 0;
 
 	  err = gnutls_x509_crl_get_extension_info (crl, i,
 						    oid, &sizeof_oid,
