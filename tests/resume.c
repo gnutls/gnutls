@@ -422,6 +422,7 @@ server (struct params_res *params)
     }
 
   gnutls_free (session_ticket_key.data);
+  session_ticket_key.data = NULL;
 
   success ("server: finished\n");
 }
@@ -459,7 +460,7 @@ doit (void)
       else
 	{
 	  client (&resume_tests[i]);
-	  global_stop ();
+	  gnutls_global_deinit ();
 	  exit (0);
 	}
     }
