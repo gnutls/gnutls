@@ -691,14 +691,14 @@ print_extensions (gnutls_string * str, const char *prefix, int type,
 		  cert_type_t cert)
 {
   int i, err;
-  size_t san_idx = 0;
-  size_t proxy_idx = 0;
-  size_t basic_idx = 0;
-  size_t keyusage_idx = 0;
-  size_t keypurpose_idx = 0;
-  size_t ski_idx = 0;
-  size_t aki_idx = 0;
-  size_t crldist_idx = 0;
+  int san_idx = 0;
+  int proxy_idx = 0;
+  int basic_idx = 0;
+  int keyusage_idx = 0;
+  int keypurpose_idx = 0;
+  int ski_idx = 0;
+  int aki_idx = 0;
+  int crldist_idx = 0;
 
   for (i = 0;; i++)
     {
