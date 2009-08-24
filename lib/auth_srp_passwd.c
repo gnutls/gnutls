@@ -65,7 +65,6 @@ pwd_put_values (SRP_PWD_ENTRY * entry, char *str)
   *p = '\0';
   p++;
 
-  len = strlen (p);
   indx = atoi (p);
   if (indx == 0)
     {
