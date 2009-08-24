@@ -2894,7 +2894,6 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
       gnutls_assert ();
       return GNUTLS_E_BASE64_DECODING_ERROR;
     }
-  size = data->size - (ptr - (char *) data->data);
 
   count = 0;
 
