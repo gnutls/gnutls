@@ -394,7 +394,7 @@ main (int argc, char **argv)
 {
   gaainfo info;
   const char *passwd;
-  int salt, ret;
+  int salt_size, ret;
   struct passwd *pwd;
 
   set_program_name (argv[0]);
@@ -412,8 +412,6 @@ main (int argc, char **argv)
       fprintf (stderr, "Error in the arguments.\n");
       return -1;
     }
-
-  salt = info.salt;
 
   if (info.create_conf != NULL)
     {
@@ -443,7 +441,7 @@ main (int argc, char **argv)
 #endif
     }
 
-  salt = 16;
+  salt_size = 16;
 
   passwd = getpass ("Enter password: ");
   if (passwd == NULL)
@@ -460,7 +458,7 @@ main (int argc, char **argv)
     }
 
 
-  return crypt_int (info.username, passwd, salt,
+  return crypt_int (info.username, passwd, salt_size,
 		    info.passwd_conf, info.passwd, info.index);
 
 }
