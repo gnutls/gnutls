@@ -1919,13 +1919,13 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
   {
     size_t i;
     int err = 0;
+    int extensions = 0;
+    int challenge = 0;
 
     for (i = 0;; i++)
       {
 	char oid[MAX_OID_SIZE] = "";
 	size_t sizeof_oid = sizeof (oid);
-	int extensions = 0;
-	int challenge = 0;
 
 	err = gnutls_x509_crq_get_attribute_info (cert, i, oid, &sizeof_oid);
 	if (err < 0)
