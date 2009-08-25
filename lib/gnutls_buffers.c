@@ -664,7 +664,6 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 
   _gnutls_write_log ("WRITE: Will write %d bytes to %p.\n", (int)n, fd);
 
-  i = 0;
   left = n;
   while (left > 0)
     {
