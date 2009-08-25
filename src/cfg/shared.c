@@ -837,7 +837,7 @@ split_multi_arg(arg, ar, quote_prefix_ar, quote_postfix_ar, separator_ar)
 	char	**separator_ar;
 { /* {{{ */
 	register int i;
-	int sep_ar_idx, quote_idx, sep_size, tmp_sep_size;
+	int quote_idx, sep_size, tmp_sep_size;
 	char *p_quote, *p_sep, *tmp_s;
 	char *arg_base = arg;
 
@@ -850,7 +850,6 @@ split_multi_arg(arg, ar, quote_prefix_ar, quote_postfix_ar, separator_ar)
 		   and set quotation variables */
 		p_quote    = PLATON_FUNC(strdyn_str2)(arg, quote_prefix_ar, &quote_idx);
 		p_sep      = NULL; /* pointer to separator */
-		sep_ar_idx = -1;   /* index of separator */
 		sep_size   =  0;   /* length of separator string */
 
 		/* Searching first separator string (p_sep) */
@@ -858,7 +857,6 @@ split_multi_arg(arg, ar, quote_prefix_ar, quote_postfix_ar, separator_ar)
 			if ((tmp_s = PLATON_FUNC(str_white_str)(arg, separator_ar[i], &tmp_sep_size))
 					!= NULL && (p_sep == NULL || tmp_s < p_sep)) {
 				p_sep      = tmp_s;
-				sep_ar_idx = i;
 				sep_size   = tmp_sep_size;
 			}
 		}
