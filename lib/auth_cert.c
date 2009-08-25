@@ -1299,7 +1299,6 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
   int size, ret;
   opaque *p;
   gnutls_certificate_credentials_t cred;
-  cert_auth_info_t info;
   ssize_t dsize;
   int i, j;
   gnutls_pk_algorithm_t pk_algos[MAX_SIGN_ALGOS];
@@ -1321,8 +1320,6 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
       gnutls_assert ();
       return ret;
     }
-
-  info = _gnutls_get_auth_info (session);
 
   p = data;
   dsize = data_size;
