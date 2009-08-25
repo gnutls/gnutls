@@ -76,7 +76,6 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
   gnutls_privkey *apr_pkey;
   int apr_cert_list_length;
   gnutls_datum_t signature, ddata;
-  cert_auth_info_t info;
   gnutls_certificate_credentials_t cred;
 
   cred = (gnutls_certificate_credentials_t)
@@ -122,7 +121,6 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
       return ret;
     }
 
-  info = _gnutls_get_auth_info (session);
   _gnutls_rsa_export_set_pubkey (session, rsa_mpis[1], rsa_mpis[0]);
 
   _gnutls_mpi_print (rsa_mpis[0], NULL, &n_m);
