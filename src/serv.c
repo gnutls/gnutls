@@ -697,7 +697,6 @@ listen_socket (const char *name, int listen_port)
       fprintf (stderr, "getaddrinfo() failed: %s\n", gai_strerror (s));
       return -1;
     }
-  s = -1;
 
   for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
