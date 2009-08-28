@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -50,8 +50,10 @@ int _gnutls_find_pk_algos_in_ciphersuites (opaque * data, int datalen);
 int _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 				 int datalen);
 
-int _gnutls_negotiate_version( gnutls_session_t session, gnutls_protocol_t adv_version);
-int _gnutls_user_hello_func( gnutls_session, gnutls_protocol_t adv_version);
+int _gnutls_negotiate_version (gnutls_session_t session,
+			       gnutls_protocol_t adv_version);
+int _gnutls_user_hello_func (gnutls_session_t session,
+			     gnutls_protocol_t adv_version);
 
 #define STATE session->internals.handshake_state
 /* This returns true if we have got there

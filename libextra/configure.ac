@@ -50,6 +50,8 @@ AC_SUBST([WERROR_CFLAGS])
 AC_SUBST([WSTACK_CFLAGS])
 AC_SUBST([WARN_CFLAGS])
 
+AC_DEFINE([GNUTLS_COMPAT_H], 1, [Make sure we don't use old features in code.])
+
 AC_CONFIG_FILES([
   Makefile
   gnutls-extra.pc

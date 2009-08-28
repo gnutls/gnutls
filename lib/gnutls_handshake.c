@@ -314,7 +314,7 @@ _gnutls_negotiate_version (gnutls_session_t session,
 }
 
 int
-_gnutls_user_hello_func (gnutls_session session,
+_gnutls_user_hello_func (gnutls_session_t session,
 			 gnutls_protocol_t adv_version)
 {
   int ret;

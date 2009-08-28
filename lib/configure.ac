@@ -93,6 +93,8 @@ AC_SUBST([WARN_CFLAGS])
 AC_PROG_CXX
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 
+AC_DEFINE([GNUTLS_COMPAT_H], 1, [Make sure we don't use old features in code.])
+
 AC_CONFIG_FILES([
   Makefile
   gnutls.pc

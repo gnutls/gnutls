@@ -21,10 +21,10 @@
 # MA 02110-1301, USA
 
 AM_CPPFLAGS = \
-	-I$(srcdir)/../gl \
-	-I$(builddir)/../gl \
-	-I$(srcdir)/../includes \
-	-I$(builddir)/../includes \
+	-I$(srcdir)/../gl		\
+	-I$(builddir)/../gl		\
+	-I$(srcdir)/../includes		\
+	-I$(builddir)/../includes	\
 	-I$(srcdir)/..
 
 if ENABLE_MINITASN1

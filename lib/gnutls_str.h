@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -53,7 +53,7 @@ int _gnutls_string_append_data (gnutls_string *, const void *data,
 				size_t data_size);
 
 void _gnutls_string_get_data( gnutls_string *, void*, size_t *size);
-void _gnutls_string_get_datum( gnutls_string *, gnutls_datum*, size_t max_size);
+void _gnutls_string_get_datum( gnutls_string *, gnutls_datum_t *, size_t max_size);
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */

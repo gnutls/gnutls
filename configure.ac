@@ -240,6 +240,8 @@ export WSTACK_CFLAGS
 export WARN_CFLAGS
 export use_cxx
 
+AC_DEFINE([GNUTLS_COMPAT_H], 1, [Make sure we don't use old features in code.])
+
 AC_CONFIG_SUBDIRS([lib])
 AC_CONFIG_SUBDIRS([libextra])
 
