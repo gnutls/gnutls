@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.9.4 (unreleased)
 
+** Fix use of deprecated types internally.
+Use of deprecated types in GnuTLS from now on will lead to a compile
+error, to prevent this from happening again.
+
 ** API and ABI modifications:
 No changes since last version.
 
