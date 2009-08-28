@@ -610,7 +610,9 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
 				      const char *oid, void *buf,
 				      size_t sizeof_buf)
 {
-  gnutls_datum data = { buf, sizeof_buf };
+  gnutls_datum data;
+  data.data = buf;
+  data.size = sizeof_buf;
 
   if (crq == NULL)
     {

@@ -43,8 +43,8 @@
 /* This is the maximal amount of bytes we map. */
 #define MAX_MAP_SIZE 16777216
 
-static int stream_flush (cdk_stream_t s);
-static int stream_filter_write (cdk_stream_t s);
+static cdk_error_t stream_flush (cdk_stream_t s);
+static cdk_error_t stream_filter_write (cdk_stream_t s);
 static int stream_cache_flush (cdk_stream_t s, FILE * fp);
 struct stream_filter_s *filter_add (cdk_stream_t s, filter_fnct_t fnc,
 				    int type);

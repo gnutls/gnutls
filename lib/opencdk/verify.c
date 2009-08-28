@@ -58,7 +58,7 @@ struct
 };
 
 
-static int file_verify_clearsign (cdk_ctx_t, const char *, const char *);
+static cdk_error_t file_verify_clearsign (cdk_ctx_t, const char *, const char *);
 
 
 /**
