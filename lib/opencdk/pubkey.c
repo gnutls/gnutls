@@ -646,7 +646,7 @@ _cdk_pkt_get_keyid (cdk_packet_t pkt, u32 * keyid)
 
 
 /* Get the fingerprint of the packet if possible. */
-int
+cdk_error_t
 _cdk_pkt_get_fingerprint (cdk_packet_t pkt, byte * fpr)
 {
   if (!pkt || !fpr)
