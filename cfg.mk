@@ -42,6 +42,7 @@ autoreconf:
 	done
 	mv lib/build-aux/config.rpath lib/build-aux/config.rpath-
 	test -f ./configure || autoreconf --install
+	cp lib/gl/m4/size_max.m4 lib/m4/
 	mv lib/build-aux/config.rpath- lib/build-aux/config.rpath
 
 update-po: refresh-po
